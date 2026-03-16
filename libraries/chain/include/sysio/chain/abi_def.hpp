@@ -149,7 +149,7 @@ struct abi_def {
 abi_def sysio_contract_abi(const abi_def& sysio_system_abi);
 vector<type_def> common_type_defs();
 
-extern unsigned char sysio_abi_bin[2132];
+extern unsigned char sysio_abi_bin[2063];
 
 } } /// namespace sysio::chain
 

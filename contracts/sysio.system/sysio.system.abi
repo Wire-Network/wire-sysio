@@ -13,10 +13,6 @@
         {
             "new_type_name": "getpeerkeys_res_t",
             "type": "peerkeys_t[]"
-        },
-        {
-            "new_type_name": "trx_match_type",
-            "type": "uint8"
         }
     ],
     "structs": [
@@ -73,10 +69,6 @@
                 {
                     "name": "accounts",
                     "type": "permission_level_weight[]"
-                },
-                {
-                    "name": "waits",
-                    "type": "wait_weight[]"
                 }
             ]
         },
@@ -239,6 +231,20 @@
             ]
         },
         {
+            "name": "delpeerkey",
+            "base": "",
+            "fields": [
+                {
+                    "name": "proposer_finalizer_name",
+                    "type": "name"
+                },
+                {
+                    "name": "key",
+                    "type": "public_key"
+                }
+            ]
+        },
+        {
             "name": "fin_key_id_generator_info",
             "base": "",
             "fields": [
@@ -323,6 +329,11 @@
                     "type": "bytes"
                 }
             ]
+        },
+        {
+            "name": "getpeerkeys",
+            "base": "",
+            "fields": []
         },
         {
             "name": "init",
@@ -435,6 +446,34 @@
                 {
                     "name": "header",
                     "type": "block_header"
+                }
+            ]
+        },
+        {
+            "name": "peer_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "data",
+                    "type": "variant_v0_data"
+                }
+            ]
+        },
+        {
+            "name": "peerkeys_t",
+            "base": "",
+            "fields": [
+                {
+                    "name": "producer_name",
+                    "type": "name"
+                },
+                {
+                    "name": "peer_key",
+                    "type": "public_key?"
                 }
             ]
         },
@@ -565,6 +604,20 @@
                 {
                     "name": "proof_of_possession",
                     "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "regpeerkey",
+            "base": "",
+            "fields": [
+                {
+                    "name": "proposer_finalizer_name",
+                    "type": "name"
+                },
+                {
+                    "name": "key",
+                    "type": "public_key"
                 }
             ]
         },
@@ -887,16 +940,12 @@
             ]
         },
         {
-            "name": "wait_weight",
+            "name": "v0_data",
             "base": "",
             "fields": [
                 {
-                    "name": "wait_sec",
-                    "type": "uint32"
-                },
-                {
-                    "name": "weight",
-                    "type": "uint16"
+                    "name": "pubkey",
+                    "type": "public_key?"
                 }
             ]
         },
@@ -925,77 +974,6 @@
                 {
                     "name": "block_timestamp",
                     "type": "time_point"
-                }
-            ]
-        },
-        {
-            "name": "delpeerkey",
-            "base": "",
-            "fields": [
-                {
-                    "name": "proposer_finalizer_name",
-                    "type": "name"
-                },
-                {
-                    "name": "key",
-                    "type": "public_key"
-                }
-            ]
-        },
-        {
-            "name": "getpeerkeys",
-            "base": "",
-            "fields": []
-        },
-        {
-            "name": "peer_key",
-            "base": "",
-            "fields": [
-                {
-                    "name": "account",
-                    "type": "name"
-                },
-                {
-                    "name": "data",
-                    "type": "variant_v0_data"
-                }
-            ]
-        },
-        {
-            "name": "peerkeys_t",
-            "base": "",
-            "fields": [
-                {
-                    "name": "producer_name",
-                    "type": "name"
-                },
-                {
-                    "name": "peer_key",
-                    "type": "public_key?"
-                }
-            ]
-        },
-        {
-            "name": "regpeerkey",
-            "base": "",
-            "fields": [
-                {
-                    "name": "proposer_finalizer_name",
-                    "type": "name"
-                },
-                {
-                    "name": "key",
-                    "type": "public_key"
-                }
-            ]
-        },
-        {
-            "name": "v0_data",
-            "base": "",
-            "fields": [
-                {
-                    "name": "pubkey",
-                    "type": "public_key?"
                 }
             ]
         },
@@ -1108,6 +1086,16 @@
             "ricardian_contract": ""
         },
         {
+            "name": "delpeerkey",
+            "type": "delpeerkey",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "getpeerkeys",
+            "type": "getpeerkeys",
+            "ricardian_contract": ""
+        },
+        {
             "name": "init",
             "type": "init",
             "ricardian_contract": ""
@@ -1135,6 +1123,11 @@
         {
             "name": "regfinkey",
             "type": "regfinkey",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "regpeerkey",
+            "type": "regpeerkey",
             "ricardian_contract": ""
         },
         {
@@ -1233,21 +1226,6 @@
             "ricardian_contract": ""
         },
         {
-            "name": "delpeerkey",
-            "type": "delpeerkey",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "getpeerkeys",
-            "type": "getpeerkeys",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "regpeerkey",
-            "type": "regpeerkey",
-            "ricardian_contract": ""
-        },
-        {
             "name": "addtrxp",
             "type": "addtrxp",
             "ricardian_contract": ""
@@ -1302,6 +1280,13 @@
             "key_types": []
         },
         {
+            "name": "peerkeys",
+            "type": "peer_key",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
             "name": "producers",
             "type": "producer_info",
             "index_type": "i64",
@@ -1311,13 +1296,6 @@
         {
             "name": "blockinfo",
             "type": "block_info_record",
-            "index_type": "i64",
-            "key_names": [],
-            "key_types": []
-        },
-        {
-            "name": "peerkeys",
-            "type": "peer_key",
             "index_type": "i64",
             "key_names": [],
             "key_types": []
@@ -1359,6 +1337,26 @@
         {
             "name": "getpeerkeys",
             "result_type": "getpeerkeys_res_t"
+        }
+    ],
+    "enums": [
+        {
+            "name": "trx_match_type",
+            "type": "uint8",
+            "values": [
+                {
+                    "name": "only",
+                    "value": 0
+                },
+                {
+                    "name": "first",
+                    "value": 1
+                },
+                {
+                    "name": "any",
+                    "value": 2
+                }
+            ]
         }
     ]
 }

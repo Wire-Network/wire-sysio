@@ -767,8 +767,8 @@ namespace sysio {
         }
         check(created, "Failed to generate a unique account name after 3 attempts");
 
-        auto owner_auth = sysiosystem::authority{1, {{pubkey, 1}}, {}, {}};
-        auto active_auth = sysiosystem::authority{1, {{pubkey, 1}}, {}, {}};
+        auto owner_auth = sysiosystem::authority{1, {{pubkey, 1}}, {}};
+        auto active_auth = sysiosystem::authority{1, {{pubkey, 1}}, {}};
         action(
             permission_level{get_self(), "active"_n},
             "sysio"_n, "newaccount"_n,
