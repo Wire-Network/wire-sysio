@@ -291,13 +291,6 @@ void apply_sysio_updateauth(apply_context& context) {
    else
       SYS_ASSERT(!update.parent.empty(), action_validate_exception, "Only owner permission can have empty parent" );
 
-   if( update.auth.waits.size() > 0 ) {
-      auto max_delay = context.control.get_global_properties().configuration.max_transaction_delay;
-      SYS_ASSERT( update.auth.waits.back().wait_sec <= max_delay, action_validate_exception,
-                  "Cannot set delay longer than max_transacton_delay, which is {} seconds",
-                  max_delay );
-   }
-
    validate_authority_precondition(context, update.auth);
 
 

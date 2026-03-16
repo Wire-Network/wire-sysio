@@ -220,7 +220,7 @@ BOOST_FIXTURE_TEST_CASE( get_account, validating_tester ) try {
          BOOST_REQUIRE_EQUAL(1u, auth.threshold);
          BOOST_REQUIRE_EQUAL(1u, auth.keys.size());
          BOOST_REQUIRE_EQUAL(0u, auth.accounts.size());
-         BOOST_REQUIRE_EQUAL(0u, auth.waits.size());
+
 
          perm = result.permissions[1];
          BOOST_REQUIRE_EQUAL(name("owner"_n), perm.perm_name);
@@ -229,7 +229,7 @@ BOOST_FIXTURE_TEST_CASE( get_account, validating_tester ) try {
          BOOST_REQUIRE_EQUAL(1u, auth.threshold);
          BOOST_REQUIRE_EQUAL(1u, auth.keys.size());
          BOOST_REQUIRE_EQUAL(0u, auth.accounts.size());
-         BOOST_REQUIRE_EQUAL(0u, auth.waits.size());
+
       }
    };
 

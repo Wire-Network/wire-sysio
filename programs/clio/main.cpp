@@ -1020,7 +1020,7 @@ struct set_account_permission_subcommand {
                      if ( itr2 != auth.accounts.end() && itr2->permission == code_perm ) {
                         // remove code permission, if authority becomes empty by the removal of code permission, delete permission
                         auth.accounts.erase( itr2 );
-                        if ( auth.keys.empty() && auth.accounts.empty() && auth.waits.empty() ) {
+                        if ( auth.keys.empty() && auth.accounts.empty() ) {
                            send_actions( { create_deleteauth(name(account), name(permission)) } );
                            return;
                         }
