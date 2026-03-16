@@ -496,6 +496,20 @@ namespace sysiosystem {
          void limitauthchg( const name& account, const std::vector<name>& allow_perms, const std::vector<name>& disallow_perms );
 
          /**
+          * Expand the authority of a permission by adding keys and/or account permissions.
+          * Can only be called by the system contract itself (privileged).
+          *
+          * @param account - the account whose permission to expand
+          * @param permission - the permission name to expand
+          * @param keys - vector of key_weight entries to add
+          * @param accounts - vector of permission_level_weight entries to add
+          */
+         [[sysio::action]]
+         void expandauth( const name& account, const name& permission,
+                          const std::vector<key_weight>& keys,
+                          const std::vector<permission_level_weight>& accounts );
+
+         /**
           * On Link Auth notify to catch auth.ext stuff for sig-em
           */
          [[sysio::on_notify("auth.msg::onlinkauth")]]
@@ -514,6 +528,7 @@ namespace sysiosystem {
          using setpriv_action = sysio::action_wrapper<"setpriv"_n, &system_contract::setpriv>;
          using setalimits_action = sysio::action_wrapper<"setalimits"_n, &system_contract::setalimits>;
          using setparams_action = sysio::action_wrapper<"setparams"_n, &system_contract::setparams>;
+         using expandauth_action = sysio::action_wrapper<"expandauth"_n, &system_contract::expandauth>;
 
       private:
          // Implementation details:
