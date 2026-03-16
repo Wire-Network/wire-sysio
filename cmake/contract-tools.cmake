@@ -44,6 +44,17 @@ function(contracts_target TARGET)
   endif()
 
   cmake_parse_arguments(ARG "" "SOURCE_DIR;BINARY_DIR" "" ${ARGN})
+
+  # Collect all CMakeLists.txt files under the contract source tree so that
+  # switching branches (which may add/remove source files or entire contracts)
+  # triggers a re-configure of the ExternalProject.  CMAKE_CONFIGURE_DEPENDS
+  # tells the *parent* build system to re-run cmake when any of these files
+  # change, and the DEPENDS on the check_reconfigure step ensures the
+  # ExternalProject's own configure stamp is invalidated.
+  file(GLOB_RECURSE _contract_cmake_files "${ARG_SOURCE_DIR}/CMakeLists.txt"
+                                          "${ARG_SOURCE_DIR}/*/CMakeLists.txt")
+  set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${_contract_cmake_files})
+
   ExternalProject_Add(
     ${TARGET}
     SOURCE_DIR ${ARG_SOURCE_DIR}
@@ -54,6 +65,15 @@ function(contracts_target TARGET)
     TEST_COMMAND ""
     INSTALL_COMMAND ""
     BUILD_ALWAYS 1
+  )
+
+  # Force the ExternalProject to re-configure when any contract CMakeLists.txt
+  # changes (e.g. source files added/removed on a different branch).
+  ExternalProject_Add_Step(${TARGET} check_reconfigure
+    DEPENDEES download
+    DEPENDERS configure
+    DEPENDS ${_contract_cmake_files}
+    COMMENT "Checking if ${TARGET} needs reconfiguration"
   )
 
   # Expose the build step as a separate target for better dependency tracking
