@@ -7,7 +7,7 @@
 
 #include <fc/scoped_exit.hpp>
 
-#include <boost/range/algorithm/find.hpp>
+#include <algorithm>
 #include <boost/algorithm/cxx11/all_of.hpp>
 
 #include <functional>
@@ -64,7 +64,7 @@ namespace detail {
             permission_satisfied
          };
 
-         typedef map<permission_level, permission_cache_status> permission_cache_type;
+         typedef flat_map<permission_level, permission_cache_status> permission_cache_type;
 
          bool satisfied( const permission_level& permission, permission_cache_type* cached_perms = nullptr ) {
             permission_cache_type cached_permissions;
@@ -113,6 +113,10 @@ namespace detail {
          }
 
       private:
+         // Overloaded key resolution: no-op for public_key_type, converts for shared_public_key
+         static const public_key_type& resolve_key(const public_key_type& k) { return k; }
+         static public_key_type resolve_key(const shared_public_key& k) { return k.to_public_key(); }
+
          permission_cache_type* initialize_permission_cache( permission_cache_type& cached_permissions ) {
             for( const auto& p : provided_permissions ) {
                cached_permissions.emplace_hint( cached_permissions.end(), p, permission_satisfied );
@@ -122,15 +126,46 @@ namespace detail {
 
          template<typename AuthorityType>
          bool satisfied( const AuthorityType& authority, permission_cache_type& cached_permissions, uint16_t depth ) {
-            // Save the current used keys; if we do not satisfy this authority, the newly used keys aren't actually used
+            // Fast paths for keys-only authorities (no account references, no recursion possible)
+            // Avoids meta_permission_map allocation and rollback overhead entirely
+            if( authority.accounts.empty() ) {
+               // Single-key authority: direct check
+               if( authority.keys.size() == 1 && authority.threshold <= authority.keys[0].weight ) {
+                  const auto& search_key = resolve_key(authority.keys[0].key);
+                  auto itr = std::lower_bound( provided_keys.begin(), provided_keys.end(), search_key );
+                  if( itr != provided_keys.end() && *itr == search_key ) {
+                     _used_keys[itr - provided_keys.begin()] = true;
+                     return true;
+                  }
+                  return false;
+               }
+               // Threshold-1 multi-key (e.g. 1-of-3): find any matching key with sufficient weight
+               // No rollback needed since we only mark a key when returning success
+               if( authority.threshold == 1 ) {
+                  for( const auto& k : authority.keys ) {
+                     if( k.weight >= authority.threshold ) {
+                        const auto& search_key = resolve_key(k.key);
+                        auto itr = std::lower_bound( provided_keys.begin(), provided_keys.end(), search_key );
+                        if( itr != provided_keys.end() && *itr == search_key ) {
+                           _used_keys[itr - provided_keys.begin()] = true;
+                           return true;
+                        }
+                     }
+                  }
+                  return false;
+               }
+            }
+
+            // General case: save used keys state for rollback if this authority is not satisfied
             auto KeyReverter = fc::make_scoped_exit([this, keys = _used_keys] () mutable {
                _used_keys = keys;
             });
 
+            weight_tally_visitor visitor(*this, cached_permissions, depth);
+
             // Sort key permissions and account permissions together into a single set of meta_permissions
             detail::meta_permission_map permissions;
 
-            weight_tally_visitor visitor(*this, cached_permissions, depth);
             auto emplace_permission = [&permissions, &visitor](int priority, const auto& mp) {
                permissions.emplace(
                      std::make_tuple(mp.weight, priority),
@@ -170,8 +205,9 @@ namespace detail {
 
             template<typename KeyWeight, typename = std::enable_if_t<detail::is_any_of_v<KeyWeight, shared_key_weight, key_weight>>>
             uint32_t operator()(const KeyWeight& permission) {
-               auto itr = boost::find( checker.provided_keys, permission.key );
-               if( itr != checker.provided_keys.end() ) {
+               const auto& search_key = authority_checker::resolve_key(permission.key);
+               auto itr = std::lower_bound( checker.provided_keys.begin(), checker.provided_keys.end(), search_key );
+               if( itr != checker.provided_keys.end() && *itr == search_key ) {
                   checker._used_keys[itr - checker.provided_keys.begin()] = true;
                   total_weight += permission.weight;
                }
@@ -183,7 +219,6 @@ namespace detail {
                if( !status ) {
                   if( recursion_depth < checker.recursion_depth_limit ) {
                      bool r = false;
-                     typename permission_cache_type::iterator itr = cached_permissions.end();
 
                      std::invoke_result_t<decltype(checker.permission_to_authority), const permission_level> auth = nullptr;
                      try {
@@ -194,15 +229,16 @@ namespace detail {
                      if(!auth)
                         return total_weight;
 
-                     auto res = cached_permissions.emplace( permission.permission, being_evaluated );
-                     itr = res.first;
+                     cached_permissions.emplace( permission.permission, being_evaluated );
                      r = checker.satisfied( *auth, cached_permissions, recursion_depth + 1 );
 
+                     // Re-lookup after recursive call (flat_map iterators may be invalidated)
+                     auto cache_itr = cached_permissions.find( permission.permission );
                      if( r ) {
                         total_weight += permission.weight;
-                        itr->second = permission_satisfied;
+                        cache_itr->second = permission_satisfied;
                      } else {
-                        itr->second = permission_unsatisfied;
+                        cache_itr->second = permission_unsatisfied;
                      }
                   }
                } else if( *status == permission_satisfied ) {
