@@ -42,7 +42,7 @@ void k1_benchmarking() {
 void r1_benchmarking() {
    auto payload = "Test Cases";
    auto digest = sha256::hash(payload, const_strlen(payload));
-   auto key = private_key::generate<r1::private_key_shim>();
+   auto key = private_key::generate(private_key::key_type::r1);
 
    auto sign_f = [&]() {
       key.sign(digest);
