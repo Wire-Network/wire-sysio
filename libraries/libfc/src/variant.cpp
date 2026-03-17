@@ -848,6 +848,14 @@ void from_variant( const variant& var,  uint64_t& vo )
    vo = var.as_uint64();
 }
 
+void to_variant(const fc::int256& val, fc::variant& vo) {
+   vo = fc::variant(val);
+}
+
+void to_variant(const fc::uint256& val, fc::variant& vo) {
+   vo = fc::variant(val);
+}
+
 void from_variant(const fc::variant& var, fc::int256& vo) {
    vo = var.as_int256();
 }

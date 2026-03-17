@@ -20,7 +20,7 @@ std::string to_string( unsigned __int128 v ) {
 
 std::string to_string( __int128 v ) {
    if( v == 0 ) return "0";
-   if( v < 0 ) return "-" + to_string(static_cast<unsigned __int128>(-v));
+   if( v < 0 ) return "-" + to_string(-static_cast<unsigned __int128>(v));
    return to_string(static_cast<unsigned __int128>(v));
 }
 
@@ -53,7 +53,7 @@ unsigned __int128 uint128_from_string( const std::string& s ) {
 __int128 int128_from_string( const std::string& s ) {
    if( s.empty() ) return 0;
    if( s[0] == '-' ) {
-      return -static_cast<__int128>(uint128_from_string(s.substr(1)));
+      return static_cast<__int128>(-uint128_from_string(s.substr(1)));
    }
    // hex strings handled by uint128_from_string
    return static_cast<__int128>(uint128_from_string(s));

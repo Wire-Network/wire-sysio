@@ -13,11 +13,23 @@ namespace sysio { namespace chain { namespace webassembly {
    }
 
    void interface::__ashrti3(legacy_ptr<__int128> ret, uint64_t low, uint64_t high, uint32_t shift) const {
-      // retain the signedness
-      __int128 i = high;
-      i <<= 64;
-      i |= low;
-      *ret = (shift >= 128) ? (i >> 127) : (i >> shift);
+      // Arithmetic right shift implemented using only well-defined unsigned operations,
+      // avoiding implementation-defined behavior of signed >> on negative values.
+      unsigned __int128 u = (static_cast<unsigned __int128>(high) << 64) | low;
+      bool negative = (high >> 63) != 0;
+
+      if (shift >= 128) {
+         *ret = negative ? static_cast<__int128>(~static_cast<unsigned __int128>(0)) : 0;
+      } else if (shift == 0) {
+         *ret = static_cast<__int128>(u);
+      } else {
+         unsigned __int128 shifted = u >> shift;
+         if (negative) {
+            unsigned __int128 mask = ~static_cast<unsigned __int128>(0) << (128 - shift);
+            shifted |= mask;
+         }
+         *ret = static_cast<__int128>(shifted);
+      }
    }
 
    void interface::__lshlti3(legacy_ptr<__int128> ret, uint64_t low, uint64_t high, uint32_t shift) const {

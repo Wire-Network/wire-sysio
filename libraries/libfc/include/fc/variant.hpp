@@ -378,6 +378,10 @@ namespace fc
    /** @ingroup Serializable */
    void from_variant( const fc::variant& var,  uint64_t& vo );
    /** @ingroup Serializable */
+   void to_variant( const fc::int256& val, fc::variant& vo );
+   /** @ingroup Serializable */
+   void to_variant( const fc::uint256& val, fc::variant& vo );
+   /** @ingroup Serializable */
    void from_variant( const fc::variant& var,  fc::int256& vo );
    /** @ingroup Serializable */
    void from_variant( const fc::variant& var,  fc::uint256& vo );
