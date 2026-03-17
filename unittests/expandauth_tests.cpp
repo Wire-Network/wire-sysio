@@ -227,7 +227,7 @@ BOOST_FIXTURE_TEST_CASE( expandauth_add_eth_key, sysio_system::sysio_system_test
    const auto alice = "alice1111111"_n;
 
    // Generate an EM (ETH / secp256k1-uncompressed) key
-   auto em_priv_key = private_key_type::generate<em::private_key_shim>();
+   auto em_priv_key = private_key_type::generate(private_key_type::key_type::em);
    auto em_pub_key  = em_priv_key.get_public_key();
 
    // Add the ETH key to alice's active permission
@@ -274,7 +274,7 @@ BOOST_FIXTURE_TEST_CASE( expandauth_sign_with_eth_key, sysio_system::sysio_syste
    const auto alice = "alice1111111"_n;
 
    // Generate an EM (ETH) key and add it to alice's active permission
-   auto em_priv_key = private_key_type::generate<em::private_key_shim>();
+   auto em_priv_key = private_key_type::generate(private_key_type::key_type::em);
    auto em_pub_key  = em_priv_key.get_public_key();
 
    BOOST_REQUIRE_EQUAL( success(), push_action(config::system_account_name, "expandauth"_n, mvo()
@@ -301,7 +301,7 @@ BOOST_FIXTURE_TEST_CASE( expandauth_sign_with_eth_key, sysio_system::sysio_syste
    produce_block();
 
    // Sanity: a random EM key that is NOT in the permission must fail
-   auto bad_priv_key = private_key_type::generate<em::private_key_shim>();
+   auto bad_priv_key = private_key_type::generate(private_key_type::key_type::em);
    {
       signed_transaction trx;
       action reqauth_act;
