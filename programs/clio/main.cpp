@@ -1899,7 +1899,7 @@ int main( int argc, char** argv ) {
          return;
       }
 
-      auto pk    = r1 ? private_key_type::generate_r1() : private_key_type::generate();
+      auto pk    = r1 ? private_key_type::generate(crypto::private_key::key_type::r1) : private_key_type::generate();
       auto privs = pk.to_string({}, k1);
       auto pubs  = pk.get_public_key().to_string({}, k1);
       if (print_console) {

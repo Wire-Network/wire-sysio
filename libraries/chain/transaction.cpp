@@ -12,7 +12,6 @@
 #include <sysio/chain/transaction.hpp>
 
 #include <fc/static_variant.hpp>
-#include <fc/crypto/elliptic_ed.hpp> 
 #include <fc/crypto/signature.hpp>
 namespace sysio { namespace chain {
 
@@ -56,26 +55,7 @@ fc::microseconds transaction::get_signature_keys( const vector<signature_type>& 
    auto start = fc::time_point::now();
    recovered_pub_keys.clear();
 
-   // 1) Extract and validate extensions
-   auto validated_ext = validate_and_extract_extensions();
-   vector<public_key_type> ed_pubkeys;
-   for ( auto const& item : validated_ext ) {
-      if ( auto* e = std::get_if<ed_pubkey_extension>(&item.second) ) {
-         ed_pubkeys.emplace_back(e->pubkey);
-      }
-   }
-
    auto to_pk_str = [&](const auto& pk){ try { return pk.to_string([&]() {FC_CHECK_DEADLINE(deadline); }); } catch (...) { return std::string("unknown"); } };
-   if( !allow_duplicate_keys ) {
-      flat_set<public_key_type> seen;
-      for( auto& pk : ed_pubkeys ) {
-         auto [it, inserted] = seen.emplace(pk);
-         SYS_ASSERT( inserted, tx_duplicate_sig, "duplicate ED public-key extension for key {}", to_pk_str(pk) );
-      }
-   }
-
-   // Prepare index for public key extensions.
-   size_t pubkey_idx = 0;
 
    if ( !signatures.empty() ) {
       const digest_type digest = sig_digest(chain_id, cfd);
@@ -85,34 +65,19 @@ fc::microseconds transaction::get_signature_keys( const vector<signature_type>& 
             SYS_ASSERT( now < deadline, tx_cpu_usage_exceeded,
                         "sig verification timed out {}us", now-start );
 
-            // dynamic dispatch into the correct path
             sig.visit([&](auto const& shim){
                using Shim = std::decay_t<decltype(shim)>;
 
                if constexpr ( std::is_same_v<Shim, fc::crypto::bls::signature_shim>) {
                   SYS_THROW(fc::unsupported_exception, "BLS signatures can not be used to recover public keys.");
-               } else if constexpr( Shim::is_recoverable ) {
-                  // If public key can be recovered from signature
+               } else {
+                  static_assert( Shim::is_recoverable, "All non-BLS signature types must be recoverable" );
                   auto [itr, ok] = recovered_pub_keys.emplace(fc::crypto::public_key::recover(sig, digest));
                   SYS_ASSERT( allow_duplicate_keys || ok, tx_duplicate_sig, "duplicate signature for key {}", to_pk_str(*itr) );
-               } else {
-                  // If public key cannot be recovered from signature, we need to get it from transaction extensions and use verify.
-                  SYS_ASSERT( pubkey_idx < ed_pubkeys.size(), unsatisfied_authorization, "missing ED pubkey extension for signature #{}", pubkey_idx );
-
-                  const auto& pubkey   = ed_pubkeys[pubkey_idx++];
-                  const auto& pubkey_shim = pubkey.template get<typename Shim::public_key_type>();
-
-                  SYS_ASSERT( shim.verify(digest, pubkey_shim), unsatisfied_authorization, "non-recoverable signature #{} failed", pubkey_idx-1 );
-
-                  recovered_pub_keys.emplace(pubkey);
                }
             });
       }
    }
-
-   // Ensure no extra ED pubkey extensions were provided
-   SYS_ASSERT( pubkey_idx == ed_pubkeys.size(), unsatisfied_authorization,
-               "got {} ED public-key extensions but only {} ED signatures", ed_pubkeys.size(), pubkey_idx );
 
    return fc::time_point::now() - start;
 } FC_CAPTURE_AND_RETHROW("") }
