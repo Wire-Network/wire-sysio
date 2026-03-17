@@ -259,15 +259,19 @@ BOOST_AUTO_TEST_CASE(create_provider_solana_fixture_pub_priv_sig_interoperable) 
    BOOST_CHECK_EQUAL(ed_pub_key_base58, fixture.address);
    BOOST_CHECK_EQUAL(ed_pub_key_base58, fixture.public_key);
 
-   // Parse the fixture signature from base58
-   ed::signature_shim fixture_sig = ed::signature_shim::from_base58_string(fixture.signature);
+   // Decode the raw 64-byte fixture signature from base58
+   auto raw_sig_bytes = fc::from_base58(fixture.signature);
+   BOOST_REQUIRE_EQUAL(raw_sig_bytes.size(), crypto_sign_BYTES);
 
-   // The Python keygen signs the raw payload bytes (not a hash)
-   // But our C++ implementation signs a SHA256 hash, so we verify
-   // that the fixture signature verifies against the raw payload
-   // by using libsodium directly
+   // Build the full signature blob: [pubkey 32B][sig 64B]
+   ed::signature_shim fixture_sig;
+   memcpy(fixture_sig._data.data(), ed_pub_key._data.data(), crypto_sign_PUBLICKEYBYTES);
+   memcpy(fixture_sig._data.data() + crypto_sign_PUBLICKEYBYTES, raw_sig_bytes.data(), crypto_sign_BYTES);
+
+   // Verify the fixture signature against the raw payload using libsodium directly
+   // (Python keygen signs raw bytes, our C++ signs SHA256 hash)
    int verify_result = crypto_sign_verify_detached(
-      fixture_sig._data.data(),
+      fixture_sig._data.data() + crypto_sign_PUBLICKEYBYTES,
       reinterpret_cast<const unsigned char*>(fixture.payload.data()),
       fixture.payload.size(),
       ed_pub_key._data.data());
