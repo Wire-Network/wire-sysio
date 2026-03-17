@@ -478,6 +478,20 @@ namespace webassembly {
          int64_t get_account_creation_time(account_name account) const;
 
          /**
+          * Look up the permission of an account with the smallest name >= the given permission name.
+          *
+          * @ingroup permission
+          * @param account - the account to search.
+          * @param permission - the lower bound permission name.
+          * @param[out] buffer - output buffer for serialized permission_record
+          *   (perm_name, parent_name, last_updated, authority).
+          *
+          * @retval -1 if no permission found for the given account.
+          * @retval size of serialized data otherwise. Copies min(buffer.size(), data_size) bytes into buffer.
+          */
+         int32_t get_permission_lower_bound(account_name account, permission_name permission, span<char> buffer);
+
+         /**
           * Verifies that an account exists in the set of provided auths on an action. Fails if not found.
           *
           * @ingroup authorization

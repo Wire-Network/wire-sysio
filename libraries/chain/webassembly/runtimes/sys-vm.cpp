@@ -450,6 +450,7 @@ REGISTER_LEGACY_CF_HOST_FUNCTION(ripemd160);
 REGISTER_LEGACY_HOST_FUNCTION(check_transaction_authorization);
 REGISTER_LEGACY_HOST_FUNCTION(check_permission_authorization);
 REGISTER_HOST_FUNCTION(get_account_creation_time);
+REGISTER_HOST_FUNCTION(get_permission_lower_bound);
 
 // authorization api
 REGISTER_HOST_FUNCTION(require_auth);

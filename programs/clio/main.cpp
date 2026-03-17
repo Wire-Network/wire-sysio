@@ -1020,7 +1020,7 @@ struct set_account_permission_subcommand {
                      if ( itr2 != auth.accounts.end() && itr2->permission == code_perm ) {
                         // remove code permission, if authority becomes empty by the removal of code permission, delete permission
                         auth.accounts.erase( itr2 );
-                        if ( auth.keys.empty() && auth.accounts.empty() && auth.waits.empty() ) {
+                        if ( auth.keys.empty() && auth.accounts.empty() ) {
                            send_actions( { create_deleteauth(name(account), name(permission)) } );
                            return;
                         }
@@ -1899,7 +1899,7 @@ int main( int argc, char** argv ) {
          return;
       }
 
-      auto pk    = r1 ? private_key_type::generate_r1() : private_key_type::generate();
+      auto pk    = r1 ? private_key_type::generate(crypto::private_key::key_type::r1) : private_key_type::generate();
       auto privs = pk.to_string({}, k1);
       auto pubs  = pk.get_public_key().to_string({}, k1);
       if (print_console) {

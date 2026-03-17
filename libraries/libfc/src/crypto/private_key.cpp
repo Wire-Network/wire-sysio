@@ -18,6 +18,21 @@ namespace fc { namespace crypto {
       }, _storage));
    }
 
+   private_key private_key::generate(key_type t) {
+      // Compile-time dispatch table indexed by key_type
+      using gen_fn = private_key(*)();
+      static constexpr gen_fn generators[] = {
+         [] { return private_key(storage_type(ecc::private_key_shim::generate())); }, // k1
+         [] { return private_key(storage_type(r1::private_key_shim::generate())); },  // r1
+         [] { return private_key(storage_type(em::private_key_shim::generate())); },  // em
+         [] { return private_key(storage_type(ed::private_key_shim::generate())); },  // ed
+         [] { return private_key(storage_type(bls::private_key_shim::generate())); }, // bls
+      };
+      auto idx = static_cast<size_t>(t);
+      FC_ASSERT(idx < std::size(generators), "Key type does not support generation");
+      return generators[idx]();
+   }
+
    private_key private_key::from_string(const std::string& str, key_type type) {
       switch (type) {
       case key_type::k1:

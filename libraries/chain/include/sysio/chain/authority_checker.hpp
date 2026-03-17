@@ -140,10 +140,9 @@ namespace detail {
                );
             };
 
-            permissions.reserve(authority.waits.size() + authority.keys.size() + authority.accounts.size());
+            permissions.reserve(authority.keys.size() + authority.accounts.size());
             std::for_each(authority.accounts.begin(), authority.accounts.end(), std::bind(emplace_permission, 1, std::placeholders::_1));
             std::for_each(authority.keys.begin(), authority.keys.end(), std::bind(emplace_permission, 2, std::placeholders::_1));
-            std::for_each(authority.waits.begin(), authority.waits.end(), std::bind(emplace_permission, 3, std::placeholders::_1));
 
             // Check all permissions, from highest weight to lowest, seeing if provided authorization factors satisfies them or not
             for( const auto& p: permissions )
@@ -168,11 +167,6 @@ namespace detail {
             ,cached_permissions(cached_permissions)
             ,recursion_depth(recursion_depth)
             {}
-
-            uint32_t operator()(const wait_weight& permission) {
-               total_weight += permission.weight;
-               return total_weight;
-            }
 
             template<typename KeyWeight, typename = std::enable_if_t<detail::is_any_of_v<KeyWeight, shared_key_weight, key_weight>>>
             uint32_t operator()(const KeyWeight& permission) {
