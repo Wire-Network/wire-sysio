@@ -54,11 +54,12 @@ namespace fc { namespace crypto { namespace ed {
          FC_THROW_EXCEPTION(exception, "Failed to create ED25519 signature");
       }
 
-      // 4) Pack into your signature_shim
+      // 4) Pack into signature_shim: 32-byte pubkey + 64-byte sig
       signature_shim out;
-      // zero‑pad entire buffer then copy
       memset(out._data.data(), 0, out.size);
-      memcpy(out._data.data(), sigbuf, crypto_sign_BYTES);
+      auto pub = get_public_key();
+      memcpy(out._data.data(), pub._data.data(), crypto_sign_PUBLICKEYBYTES);
+      memcpy(out._data.data() + crypto_sign_PUBLICKEYBYTES, sigbuf, crypto_sign_BYTES);
       return out;
    }
 
@@ -69,9 +70,9 @@ namespace fc { namespace crypto { namespace ed {
       // 1) Convert raw digest to ASCII hex, added due to Phantom wallet limitations which doesn't allow signing raw binary data. Guard rails so users don't unknowingly sign malicious transactions.
       const std::string hex = fc::to_hex(digest.data(), digest.data_size());
 
-      // 2) Verify signature on hex payload
+      // 2) Verify signature on hex payload (sig starts at offset 32)
       return crypto_sign_verify_detached(
-         _data.data(),
+         _data.data() + crypto_sign_PUBLICKEYBYTES,
          reinterpret_cast<const unsigned char*>(hex.data()),
          hex.size(),
          pub._data.data()
@@ -95,18 +96,34 @@ namespace fc { namespace crypto { namespace ed {
          FC_THROW_EXCEPTION(exception, "Failed to create ED25519 signature");
       }
 
+      // Pack: 32-byte pubkey + 64-byte sig
       signature_shim out;
       memset(out._data.data(), 0, out.size);
-      memcpy(out._data.data(), sigbuf, crypto_sign_BYTES);
+      auto pub = get_public_key();
+      memcpy(out._data.data(), pub._data.data(), crypto_sign_PUBLICKEYBYTES);
+      memcpy(out._data.data() + crypto_sign_PUBLICKEYBYTES, sigbuf, crypto_sign_BYTES);
       return out;
+   }
+
+   // Recover public key from embedded bytes, verifying signature first
+   public_key_shim signature_shim::recover(const sha256& digest) const {
+      // Extract the embedded public key from [0..31]
+      public_key_shim pub;
+      memcpy(pub._data.data(), _data.data(), crypto_sign_PUBLICKEYBYTES);
+
+      // Verify the signature against the embedded key
+      FC_ASSERT( verify(digest, pub), "ED25519 signature verification failed during recovery" );
+
+      return pub;
    }
 
    // Verify raw bytes directly (for Solana transaction verification)
    bool signature_shim::verify_solana(const uint8_t* data, size_t len, const public_key_shim& pub) const {
       sodium_init_guard();
 
+      // Sig starts at offset 32
       return crypto_sign_verify_detached(
-         _data.data(),
+         _data.data() + crypto_sign_PUBLICKEYBYTES,
          data,
          len,
          pub._data.data()

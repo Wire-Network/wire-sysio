@@ -259,11 +259,11 @@ public:
             fc::crypto::private_key privkey;
             switch (key_type) {
             case fc::crypto::chain_key_type_wire: {
-               privkey = fc::crypto::private_key::generate<fc::ecc::private_key_shim>();
+               privkey = fc::crypto::private_key::generate();
                break;
             }
             case fc::crypto::chain_key_type_wire_bls: {
-               privkey = fc::crypto::private_key::generate<fc::crypto::bls::private_key_shim>();
+               privkey = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::bls);
                break;
             }
             default: {

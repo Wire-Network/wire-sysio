@@ -647,27 +647,8 @@ namespace impl {
          add(mvo, "context_free_actions", trx.context_free_actions, resolver, ctx);
          add(mvo, "actions", trx.actions, resolver, ctx);
 
-         // process contents of block.transaction_extensions
-         auto exts = trx.validate_and_extract_extensions();
-         // Iterate through every extension entry and serialize known ones:
-         for ( auto const& kv : exts ) {
-            auto id = kv.first;
-            auto const& var = kv.second;
-            switch (id) {
-               case ed_pubkey_extension::extension_id(): {
-                  // Unpack our ED25519 pubkey extension
-                  const auto& edext = std::get<ed_pubkey_extension>(var);
-                  // Emit the 32-byte pubkey (you can change the field name as needed)
-                  mvo("ed_pubkey", edext.pubkey);
-                  break;
-               }
-               // future case XXX_extension::extension_id(): …
-               default:
-                  // Should never reach this as validate_and_extract_extensions() should only return known extensions
-                  SYS_ASSERT( false, invalid_transaction_extension, "Transaction extension with id type {} is not supported", id);
-                  break;
-            }
-         }
+         // No transaction extensions are currently supported.
+         // When extensions are added in the future, deserialize them here.
 
          out(name, std::move(mvo));
       }
