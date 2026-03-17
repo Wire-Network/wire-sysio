@@ -1,4 +1,5 @@
 #include "test_api_db.hpp"
+#include <sysio/transaction.hpp>
 
 using namespace sysio;
 
@@ -592,3 +593,650 @@ void test_api_db::misaligned_secondary_key256_tests() {
 }
 
 #pragma clang diagnostic pop
+
+// ============================================================================
+// idx128 comprehensive tests
+// ============================================================================
+
+void test_api_db::idx128_general()
+{
+   uint64_t receiver = get_self().value;
+   const auto table = "idxaatbl"_n.value;
+
+   struct record { uint64_t id; uint128_t sec; };
+   record records[] = {
+      {100, (uint128_t)1000}, {200, (uint128_t)3000}, {300, (uint128_t)2000},
+      {400, (uint128_t)500},  {500, (uint128_t)4000}
+   };
+   // Secondary order: 500(400), 1000(100), 2000(300), 3000(200), 4000(500)
+
+   for (uint32_t i = 0; i < sizeof(records)/sizeof(records[0]); ++i)
+      db_idx128_store(receiver, table, receiver, records[i].id, &records[i].sec);
+
+   // find_primary
+   {
+      uint128_t sec = 0;
+      int itr = db_idx128_find_primary(receiver, receiver, table, &sec, 100);
+      sysio_assert(itr >= 0 && sec == (uint128_t)1000, "idx128_general - find_primary");
+      itr = db_idx128_find_primary(receiver, receiver, table, &sec, 999);
+      sysio_assert(itr < 0, "idx128_general - find_primary not found");
+   }
+
+   // iterate forward from smallest secondary (500 → id=400)
+   {
+      uint128_t sec = 0;
+      int itr = db_idx128_find_primary(receiver, receiver, table, &sec, 400);
+      sysio_assert(itr >= 0 && sec == (uint128_t)500, "idx128_general - find 400");
+
+      uint64_t prim = 0;
+      int next = db_idx128_next(itr, &prim);
+      sysio_assert(next >= 0 && prim == 100, "idx128_general - next 1");
+      next = db_idx128_next(next, &prim);
+      sysio_assert(next >= 0 && prim == 300, "idx128_general - next 2");
+      next = db_idx128_next(next, &prim);
+      sysio_assert(next >= 0 && prim == 200, "idx128_general - next 3");
+      next = db_idx128_next(next, &prim);
+      sysio_assert(next >= 0 && prim == 500, "idx128_general - next 4");
+      next = db_idx128_next(next, &prim);
+      sysio_assert(next < 0, "idx128_general - next end");
+   }
+
+   // iterate backward from largest secondary (4000 → id=500)
+   {
+      uint128_t sec = 0;
+      int itr = db_idx128_find_primary(receiver, receiver, table, &sec, 500);
+      sysio_assert(itr >= 0 && sec == (uint128_t)4000, "idx128_general - find 500");
+
+      uint64_t prim = 0;
+      int prev = db_idx128_previous(itr, &prim);
+      sysio_assert(prev >= 0 && prim == 200, "idx128_general - prev 1");
+      prev = db_idx128_previous(prev, &prim);
+      sysio_assert(prev >= 0 && prim == 300, "idx128_general - prev 2");
+      prev = db_idx128_previous(prev, &prim);
+      sysio_assert(prev >= 0 && prim == 100, "idx128_general - prev 3");
+      prev = db_idx128_previous(prev, &prim);
+      sysio_assert(prev >= 0 && prim == 400, "idx128_general - prev 4");
+      prev = db_idx128_previous(prev, &prim);
+      sysio_assert(prev < 0, "idx128_general - prev end");
+   }
+
+   // find_secondary
+   {
+      uint128_t sec = (uint128_t)2000;
+      uint64_t prim = 0;
+      int itr = db_idx128_find_secondary(receiver, receiver, table, &sec, &prim);
+      sysio_assert(itr >= 0 && prim == 300, "idx128_general - find_secondary");
+      sec = (uint128_t)9999;
+      itr = db_idx128_find_secondary(receiver, receiver, table, &sec, &prim);
+      sysio_assert(itr < 0, "idx128_general - find_secondary not found");
+   }
+
+   // update
+   {
+      uint128_t sec = 0;
+      int itr = db_idx128_find_primary(receiver, receiver, table, &sec, 300);
+      sysio_assert(itr >= 0, "idx128_general - update find");
+      uint128_t new_sec = (uint128_t)9999;
+      db_idx128_update(itr, receiver, &new_sec);
+      sec = 0;
+      itr = db_idx128_find_primary(receiver, receiver, table, &sec, 300);
+      sysio_assert(sec == (uint128_t)9999, "idx128_general - update verify");
+   }
+
+   // remove
+   {
+      uint128_t sec = 0;
+      int itr = db_idx128_find_primary(receiver, receiver, table, &sec, 300);
+      sysio_assert(itr >= 0, "idx128_general - remove find");
+      db_idx128_remove(itr);
+      itr = db_idx128_find_primary(receiver, receiver, table, &sec, 300);
+      sysio_assert(itr < 0, "idx128_general - remove verify");
+   }
+}
+
+void test_api_db::idx128_lowerbound()
+{
+   uint64_t receiver = get_self().value;
+   const auto table = "idxaatbl"_n.value;
+   const char* err = "idx128_lowerbound";
+   // Data from idx128_general (minus removed id=300): 500(400), 1000(100), 3000(200), 4000(500), 9999 removed
+   {
+      uint128_t sec = (uint128_t)500;
+      uint64_t prim = 0;
+      int lb = db_idx128_lowerbound(receiver, receiver, table, &sec, &prim);
+      sysio_assert(lb >= 0 && prim == 400, err);
+   }
+   {
+      uint128_t sec = (uint128_t)750;
+      uint64_t prim = 0;
+      int lb = db_idx128_lowerbound(receiver, receiver, table, &sec, &prim);
+      sysio_assert(lb >= 0 && prim == 100, err); // next after 750 is 1000(100)
+   }
+   {
+      uint128_t sec = (uint128_t)99999;
+      uint64_t prim = 0;
+      int lb = db_idx128_lowerbound(receiver, receiver, table, &sec, &prim);
+      sysio_assert(lb < 0, err);
+   }
+}
+
+void test_api_db::idx128_upperbound()
+{
+   uint64_t receiver = get_self().value;
+   const auto table = "idxaatbl"_n.value;
+   const char* err = "idx128_upperbound";
+   {
+      uint128_t sec = (uint128_t)500;
+      uint64_t prim = 0;
+      int ub = db_idx128_upperbound(receiver, receiver, table, &sec, &prim);
+      sysio_assert(ub >= 0 && prim == 100, err); // strictly > 500 → 1000(100)
+   }
+   {
+      uint128_t sec = (uint128_t)4000;
+      uint64_t prim = 0;
+      int ub = db_idx128_upperbound(receiver, receiver, table, &sec, &prim);
+      sysio_assert(ub < 0, err); // nothing > 4000
+   }
+}
+
+// ============================================================================
+// idx256 comprehensive tests
+// ============================================================================
+
+void test_api_db::idx256_general()
+{
+   uint64_t receiver = get_self().value;
+   const auto table = "idxbbtbl"_n.value;
+
+   // Use uint128_t[2] as checksum256 key; compare by first word then second
+   struct key256 { uint128_t w[2]; };
+   struct record { uint64_t id; key256 sec; };
+   record records[] = {
+      {100, {{(uint128_t)0, (uint128_t)1000}}},
+      {200, {{(uint128_t)0, (uint128_t)3000}}},
+      {300, {{(uint128_t)0, (uint128_t)2000}}},
+      {400, {{(uint128_t)0, (uint128_t)500}}},
+      {500, {{(uint128_t)0, (uint128_t)4000}}}
+   };
+
+   for (uint32_t i = 0; i < sizeof(records)/sizeof(records[0]); ++i)
+      db_idx256_store(receiver, table, receiver, records[i].id, records[i].sec.w, 2);
+
+   // find_primary
+   {
+      key256 sec = {{0,0}};
+      int itr = db_idx256_find_primary(receiver, receiver, table, sec.w, 2, 100);
+      sysio_assert(itr >= 0 && sec.w[1] == (uint128_t)1000, "idx256_general - find_primary");
+      itr = db_idx256_find_primary(receiver, receiver, table, sec.w, 2, 999);
+      sysio_assert(itr < 0, "idx256_general - find_primary not found");
+   }
+
+   // iterate forward from smallest (500 → id=400)
+   {
+      key256 sec = {{0,0}};
+      int itr = db_idx256_find_primary(receiver, receiver, table, sec.w, 2, 400);
+      sysio_assert(itr >= 0, "idx256_general - find 400");
+
+      uint64_t prim = 0;
+      int next = db_idx256_next(itr, &prim);
+      sysio_assert(next >= 0 && prim == 100, "idx256_general - next 1");
+      next = db_idx256_next(next, &prim);
+      sysio_assert(next >= 0 && prim == 300, "idx256_general - next 2");
+      next = db_idx256_next(next, &prim);
+      sysio_assert(next >= 0 && prim == 200, "idx256_general - next 3");
+      next = db_idx256_next(next, &prim);
+      sysio_assert(next >= 0 && prim == 500, "idx256_general - next 4");
+      next = db_idx256_next(next, &prim);
+      sysio_assert(next < 0, "idx256_general - next end");
+   }
+
+   // iterate backward from largest (4000 → id=500)
+   {
+      key256 sec = {{0,0}};
+      int itr = db_idx256_find_primary(receiver, receiver, table, sec.w, 2, 500);
+      sysio_assert(itr >= 0, "idx256_general - find 500");
+
+      uint64_t prim = 0;
+      int prev = db_idx256_previous(itr, &prim);
+      sysio_assert(prev >= 0 && prim == 200, "idx256_general - prev 1");
+      prev = db_idx256_previous(prev, &prim);
+      sysio_assert(prev >= 0 && prim == 300, "idx256_general - prev 2");
+      prev = db_idx256_previous(prev, &prim);
+      sysio_assert(prev >= 0 && prim == 100, "idx256_general - prev 3");
+      prev = db_idx256_previous(prev, &prim);
+      sysio_assert(prev >= 0 && prim == 400, "idx256_general - prev 4");
+      prev = db_idx256_previous(prev, &prim);
+      sysio_assert(prev < 0, "idx256_general - prev end");
+   }
+
+   // find_secondary
+   {
+      key256 sec = {{(uint128_t)0, (uint128_t)2000}};
+      uint64_t prim = 0;
+      int itr = db_idx256_find_secondary(receiver, receiver, table, sec.w, 2, &prim);
+      sysio_assert(itr >= 0 && prim == 300, "idx256_general - find_secondary");
+   }
+
+   // update
+   {
+      key256 sec = {{0,0}};
+      int itr = db_idx256_find_primary(receiver, receiver, table, sec.w, 2, 300);
+      sysio_assert(itr >= 0, "idx256_general - update find");
+      key256 new_sec = {{(uint128_t)0, (uint128_t)9999}};
+      db_idx256_update(itr, receiver, new_sec.w, 2);
+      sec = {{0,0}};
+      itr = db_idx256_find_primary(receiver, receiver, table, sec.w, 2, 300);
+      sysio_assert(sec.w[1] == (uint128_t)9999, "idx256_general - update verify");
+   }
+
+   // remove
+   {
+      key256 sec = {{0,0}};
+      int itr = db_idx256_find_primary(receiver, receiver, table, sec.w, 2, 300);
+      sysio_assert(itr >= 0, "idx256_general - remove find");
+      db_idx256_remove(itr);
+      itr = db_idx256_find_primary(receiver, receiver, table, sec.w, 2, 300);
+      sysio_assert(itr < 0, "idx256_general - remove verify");
+   }
+}
+
+void test_api_db::idx256_lowerbound()
+{
+   uint64_t receiver = get_self().value;
+   const auto table = "idxbbtbl"_n.value;
+   const char* err = "idx256_lowerbound";
+   {
+      uint128_t sec[2] = {(uint128_t)0, (uint128_t)500};
+      uint64_t prim = 0;
+      int lb = db_idx256_lowerbound(receiver, receiver, table, sec, 2, &prim);
+      sysio_assert(lb >= 0 && prim == 400, err);
+   }
+   {
+      uint128_t sec[2] = {(uint128_t)0, (uint128_t)750};
+      uint64_t prim = 0;
+      int lb = db_idx256_lowerbound(receiver, receiver, table, sec, 2, &prim);
+      sysio_assert(lb >= 0 && prim == 100, err);
+   }
+   {
+      uint128_t sec[2] = {(uint128_t)0, (uint128_t)99999};
+      uint64_t prim = 0;
+      int lb = db_idx256_lowerbound(receiver, receiver, table, sec, 2, &prim);
+      sysio_assert(lb < 0, err);
+   }
+}
+
+void test_api_db::idx256_upperbound()
+{
+   uint64_t receiver = get_self().value;
+   const auto table = "idxbbtbl"_n.value;
+   const char* err = "idx256_upperbound";
+   {
+      uint128_t sec[2] = {(uint128_t)0, (uint128_t)500};
+      uint64_t prim = 0;
+      int ub = db_idx256_upperbound(receiver, receiver, table, sec, 2, &prim);
+      sysio_assert(ub >= 0 && prim == 100, err);
+   }
+   {
+      uint128_t sec[2] = {(uint128_t)0, (uint128_t)4000};
+      uint64_t prim = 0;
+      int ub = db_idx256_upperbound(receiver, receiver, table, sec, 2, &prim);
+      sysio_assert(ub < 0, err);
+   }
+}
+
+// ============================================================================
+// idx_double comprehensive tests
+// ============================================================================
+
+void test_api_db::idx_double_general()
+{
+   uint64_t receiver = get_self().value;
+   const auto table = "idxdbltbl"_n.value;
+
+   struct record { uint64_t id; double sec; };
+   record records[] = {
+      {100, 1.5}, {200, 3.5}, {300, 2.5}, {400, 0.5}, {500, 4.5}
+   };
+   // Secondary order: 0.5(400), 1.5(100), 2.5(300), 3.5(200), 4.5(500)
+
+   for (uint32_t i = 0; i < sizeof(records)/sizeof(records[0]); ++i)
+      db_idx_double_store(receiver, table, receiver, records[i].id, &records[i].sec);
+
+   // find_primary
+   {
+      double sec = 0.0;
+      int itr = db_idx_double_find_primary(receiver, receiver, table, &sec, 100);
+      sysio_assert(itr >= 0 && sec == 1.5, "idx_double_general - find_primary");
+      itr = db_idx_double_find_primary(receiver, receiver, table, &sec, 999);
+      sysio_assert(itr < 0, "idx_double_general - find_primary not found");
+   }
+
+   // iterate forward from smallest (0.5 → id=400)
+   {
+      double sec = 0.0;
+      int itr = db_idx_double_find_primary(receiver, receiver, table, &sec, 400);
+      sysio_assert(itr >= 0 && sec == 0.5, "idx_double_general - find 400");
+
+      uint64_t prim = 0;
+      int next = db_idx_double_next(itr, &prim);
+      sysio_assert(next >= 0 && prim == 100, "idx_double_general - next 1");
+      next = db_idx_double_next(next, &prim);
+      sysio_assert(next >= 0 && prim == 300, "idx_double_general - next 2");
+      next = db_idx_double_next(next, &prim);
+      sysio_assert(next >= 0 && prim == 200, "idx_double_general - next 3");
+      next = db_idx_double_next(next, &prim);
+      sysio_assert(next >= 0 && prim == 500, "idx_double_general - next 4");
+      next = db_idx_double_next(next, &prim);
+      sysio_assert(next < 0, "idx_double_general - next end");
+   }
+
+   // iterate backward from largest (4.5 → id=500)
+   {
+      double sec = 0.0;
+      int itr = db_idx_double_find_primary(receiver, receiver, table, &sec, 500);
+
+      uint64_t prim = 0;
+      int prev = db_idx_double_previous(itr, &prim);
+      sysio_assert(prev >= 0 && prim == 200, "idx_double_general - prev 1");
+      prev = db_idx_double_previous(prev, &prim);
+      sysio_assert(prev >= 0 && prim == 300, "idx_double_general - prev 2");
+      prev = db_idx_double_previous(prev, &prim);
+      sysio_assert(prev >= 0 && prim == 100, "idx_double_general - prev 3");
+      prev = db_idx_double_previous(prev, &prim);
+      sysio_assert(prev >= 0 && prim == 400, "idx_double_general - prev 4");
+      prev = db_idx_double_previous(prev, &prim);
+      sysio_assert(prev < 0, "idx_double_general - prev end");
+   }
+
+   // find_secondary
+   {
+      double sec = 2.5;
+      uint64_t prim = 0;
+      int itr = db_idx_double_find_secondary(receiver, receiver, table, &sec, &prim);
+      sysio_assert(itr >= 0 && prim == 300, "idx_double_general - find_secondary");
+   }
+
+   // update
+   {
+      double sec = 0.0;
+      int itr = db_idx_double_find_primary(receiver, receiver, table, &sec, 300);
+      sysio_assert(itr >= 0, "idx_double_general - update find");
+      double new_sec = 9.9;
+      db_idx_double_update(itr, receiver, &new_sec);
+      sec = 0.0;
+      itr = db_idx_double_find_primary(receiver, receiver, table, &sec, 300);
+      sysio_assert(sec == 9.9, "idx_double_general - update verify");
+   }
+
+   // remove
+   {
+      double sec = 0.0;
+      int itr = db_idx_double_find_primary(receiver, receiver, table, &sec, 300);
+      sysio_assert(itr >= 0, "idx_double_general - remove find");
+      db_idx_double_remove(itr);
+      itr = db_idx_double_find_primary(receiver, receiver, table, &sec, 300);
+      sysio_assert(itr < 0, "idx_double_general - remove verify");
+   }
+}
+
+void test_api_db::idx_double_lowerbound()
+{
+   uint64_t receiver = get_self().value;
+   const auto table = "idxdbltbl"_n.value;
+   const char* err = "idx_double_lowerbound";
+   {
+      double sec = 0.5;
+      uint64_t prim = 0;
+      int lb = db_idx_double_lowerbound(receiver, receiver, table, &sec, &prim);
+      sysio_assert(lb >= 0 && prim == 400, err);
+   }
+   {
+      double sec = 0.75;
+      uint64_t prim = 0;
+      int lb = db_idx_double_lowerbound(receiver, receiver, table, &sec, &prim);
+      sysio_assert(lb >= 0 && prim == 100, err);
+   }
+   {
+      double sec = 99.9;
+      uint64_t prim = 0;
+      int lb = db_idx_double_lowerbound(receiver, receiver, table, &sec, &prim);
+      sysio_assert(lb < 0, err);
+   }
+}
+
+void test_api_db::idx_double_upperbound()
+{
+   uint64_t receiver = get_self().value;
+   const auto table = "idxdbltbl"_n.value;
+   const char* err = "idx_double_upperbound";
+   {
+      double sec = 0.5;
+      uint64_t prim = 0;
+      int ub = db_idx_double_upperbound(receiver, receiver, table, &sec, &prim);
+      sysio_assert(ub >= 0 && prim == 100, err);
+   }
+   {
+      double sec = 4.5;
+      uint64_t prim = 0;
+      int ub = db_idx_double_upperbound(receiver, receiver, table, &sec, &prim);
+      sysio_assert(ub < 0, err);
+   }
+}
+
+// ============================================================================
+// idx_long_double comprehensive tests
+// ============================================================================
+
+void test_api_db::idx_long_double_general()
+{
+   uint64_t receiver = get_self().value;
+   const auto table = "idxldtbl"_n.value;
+
+   struct record { uint64_t id; long double sec; };
+   record records[] = {
+      {100, 1.5L}, {200, 3.5L}, {300, 2.5L}, {400, 0.5L}, {500, 4.5L}
+   };
+
+   for (uint32_t i = 0; i < sizeof(records)/sizeof(records[0]); ++i)
+      db_idx_long_double_store(receiver, table, receiver, records[i].id, &records[i].sec);
+
+   // find_primary
+   {
+      long double sec = 0.0L;
+      int itr = db_idx_long_double_find_primary(receiver, receiver, table, &sec, 100);
+      sysio_assert(itr >= 0 && sec == 1.5L, "idx_long_double_general - find_primary");
+      itr = db_idx_long_double_find_primary(receiver, receiver, table, &sec, 999);
+      sysio_assert(itr < 0, "idx_long_double_general - find_primary not found");
+   }
+
+   // iterate forward
+   {
+      long double sec = 0.0L;
+      int itr = db_idx_long_double_find_primary(receiver, receiver, table, &sec, 400);
+      sysio_assert(itr >= 0, "idx_long_double_general - find 400");
+
+      uint64_t prim = 0;
+      int next = db_idx_long_double_next(itr, &prim);
+      sysio_assert(next >= 0 && prim == 100, "idx_long_double_general - next 1");
+      next = db_idx_long_double_next(next, &prim);
+      sysio_assert(next >= 0 && prim == 300, "idx_long_double_general - next 2");
+      next = db_idx_long_double_next(next, &prim);
+      sysio_assert(next >= 0 && prim == 200, "idx_long_double_general - next 3");
+      next = db_idx_long_double_next(next, &prim);
+      sysio_assert(next >= 0 && prim == 500, "idx_long_double_general - next 4");
+      next = db_idx_long_double_next(next, &prim);
+      sysio_assert(next < 0, "idx_long_double_general - next end");
+   }
+
+   // iterate backward
+   {
+      long double sec = 0.0L;
+      int itr = db_idx_long_double_find_primary(receiver, receiver, table, &sec, 500);
+
+      uint64_t prim = 0;
+      int prev = db_idx_long_double_previous(itr, &prim);
+      sysio_assert(prev >= 0 && prim == 200, "idx_long_double_general - prev 1");
+      prev = db_idx_long_double_previous(prev, &prim);
+      sysio_assert(prev >= 0 && prim == 300, "idx_long_double_general - prev 2");
+      prev = db_idx_long_double_previous(prev, &prim);
+      sysio_assert(prev >= 0 && prim == 100, "idx_long_double_general - prev 3");
+      prev = db_idx_long_double_previous(prev, &prim);
+      sysio_assert(prev >= 0 && prim == 400, "idx_long_double_general - prev 4");
+      prev = db_idx_long_double_previous(prev, &prim);
+      sysio_assert(prev < 0, "idx_long_double_general - prev end");
+   }
+
+   // find_secondary
+   {
+      long double sec = 2.5L;
+      uint64_t prim = 0;
+      int itr = db_idx_long_double_find_secondary(receiver, receiver, table, &sec, &prim);
+      sysio_assert(itr >= 0 && prim == 300, "idx_long_double_general - find_secondary");
+   }
+
+   // update
+   {
+      long double sec = 0.0L;
+      int itr = db_idx_long_double_find_primary(receiver, receiver, table, &sec, 300);
+      sysio_assert(itr >= 0, "idx_long_double_general - update find");
+      long double new_sec = 9.9L;
+      db_idx_long_double_update(itr, receiver, &new_sec);
+      sec = 0.0L;
+      itr = db_idx_long_double_find_primary(receiver, receiver, table, &sec, 300);
+      sysio_assert(sec == 9.9L, "idx_long_double_general - update verify");
+   }
+
+   // remove
+   {
+      long double sec = 0.0L;
+      int itr = db_idx_long_double_find_primary(receiver, receiver, table, &sec, 300);
+      sysio_assert(itr >= 0, "idx_long_double_general - remove find");
+      db_idx_long_double_remove(itr);
+      itr = db_idx_long_double_find_primary(receiver, receiver, table, &sec, 300);
+      sysio_assert(itr < 0, "idx_long_double_general - remove verify");
+   }
+}
+
+void test_api_db::idx_long_double_lowerbound()
+{
+   uint64_t receiver = get_self().value;
+   const auto table = "idxldtbl"_n.value;
+   const char* err = "idx_long_double_lowerbound";
+   {
+      long double sec = 0.5L;
+      uint64_t prim = 0;
+      int lb = db_idx_long_double_lowerbound(receiver, receiver, table, &sec, &prim);
+      sysio_assert(lb >= 0 && prim == 400, err);
+   }
+   {
+      long double sec = 0.75L;
+      uint64_t prim = 0;
+      int lb = db_idx_long_double_lowerbound(receiver, receiver, table, &sec, &prim);
+      sysio_assert(lb >= 0 && prim == 100, err);
+   }
+   {
+      long double sec = 99.9L;
+      uint64_t prim = 0;
+      int lb = db_idx_long_double_lowerbound(receiver, receiver, table, &sec, &prim);
+      sysio_assert(lb < 0, err);
+   }
+}
+
+void test_api_db::idx_long_double_upperbound()
+{
+   uint64_t receiver = get_self().value;
+   const auto table = "idxldtbl"_n.value;
+   const char* err = "idx_long_double_upperbound";
+   {
+      long double sec = 0.5L;
+      uint64_t prim = 0;
+      int ub = db_idx_long_double_upperbound(receiver, receiver, table, &sec, &prim);
+      sysio_assert(ub >= 0 && prim == 100, err);
+   }
+   {
+      long double sec = 4.5L;
+      uint64_t prim = 0;
+      int ub = db_idx_long_double_upperbound(receiver, receiver, table, &sec, &prim);
+      sysio_assert(ub < 0, err);
+   }
+}
+
+// ============================================================================
+// Action I/O tests
+// ============================================================================
+
+void test_api_db::test_action_data_size( uint64_t val )
+{
+   // CDT packs the uint64_t action parameter; verify action_data_size returns exact byte count
+   sysio_assert(sysio::action_data_size() == sizeof(uint64_t), "action_data_size mismatch");
+}
+
+void test_api_db::test_read_action_data( uint64_t val )
+{
+   // Read back the raw action payload and verify the uint64_t round-trips exactly
+   char buf[sizeof(uint64_t)];
+   uint32_t sz = sysio::read_action_data(buf, sizeof(buf));
+   sysio_assert(sz == sizeof(uint64_t), "read_action_data size mismatch");
+
+   uint64_t recovered = 0;
+   memcpy(&recovered, buf, sizeof(recovered));
+   sysio_assert(recovered == val, "read_action_data value mismatch");
+}
+
+void test_api_db::test_current_receiver()
+{
+   sysio_assert(sysio::current_receiver() == get_self(), "current_receiver mismatch");
+}
+
+// ============================================================================
+// Transaction metadata tests
+// ============================================================================
+
+void test_api_db::test_transaction_size()
+{
+   size_t sz = sysio::transaction_size();
+   sysio_assert(sz > 0, "transaction_size must be > 0");
+
+   // Verify read_transaction agrees with transaction_size
+   char buf[512];
+   size_t read_sz = sysio::read_transaction(buf, sizeof(buf));
+   sysio_assert(read_sz == sz, "read_transaction size != transaction_size");
+}
+
+void test_api_db::test_expiration()
+{
+   uint32_t exp = sysio::expiration();
+   // Expiration is a UTC timestamp in seconds; must be non-zero and reasonable
+   // (after 2020-01-01 = 1577836800)
+   sysio_assert(exp > 1577836800u, "expiration too small");
+}
+
+void test_api_db::test_tapos()
+{
+   // tapos_block_num and tapos_block_prefix are derived from the reference block
+   // They must be deterministic for the same transaction
+   int bn = sysio::tapos_block_num();
+   int bp = sysio::tapos_block_prefix();
+
+   // Call again — must return identical values (deterministic)
+   sysio_assert(bn == sysio::tapos_block_num(), "tapos_block_num not deterministic");
+   sysio_assert(bp == sysio::tapos_block_prefix(), "tapos_block_prefix not deterministic");
+
+   // block_prefix is a hash-derived value, should be non-zero in practice
+   sysio_assert(bp != 0, "tapos_block_prefix is zero");
+}
+
+void test_api_db::test_read_transaction()
+{
+   size_t sz = sysio::transaction_size();
+   sysio_assert(sz > 0 && sz <= 4096, "transaction_size out of range");
+
+   // Read into buffer and verify we get exactly sz bytes
+   char buf[4096];
+   size_t read_sz = sysio::read_transaction(buf, sz);
+   sysio_assert(read_sz == sz, "read_transaction returned wrong size");
+
+   // Reading with 0 buffer returns the size without writing
+   size_t probe_sz = sysio::read_transaction(buf, 0);
+   sysio_assert(probe_sz == sz, "read_transaction probe returned wrong size");
+}

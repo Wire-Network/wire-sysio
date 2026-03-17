@@ -39,4 +39,65 @@ public:
    [[sysio::action("sk32align")]]
    void misaligned_secondary_key256_tests();
 
+   // --- Comprehensive secondary index tests ---
+
+   [[sysio::action("s2g")]]
+   void idx128_general();
+
+   [[sysio::action("s2l")]]
+   void idx128_lowerbound();
+
+   [[sysio::action("s2u")]]
+   void idx128_upperbound();
+
+   [[sysio::action("s3g")]]
+   void idx256_general();
+
+   [[sysio::action("s3l")]]
+   void idx256_lowerbound();
+
+   [[sysio::action("s3u")]]
+   void idx256_upperbound();
+
+   [[sysio::action("s4g")]]
+   void idx_double_general();
+
+   [[sysio::action("s4l")]]
+   void idx_double_lowerbound();
+
+   [[sysio::action("s4u")]]
+   void idx_double_upperbound();
+
+   [[sysio::action("s5g")]]
+   void idx_long_double_general();
+
+   [[sysio::action("s5l")]]
+   void idx_long_double_lowerbound();
+
+   [[sysio::action("s5u")]]
+   void idx_long_double_upperbound();
+
+   // --- Action I/O and transaction metadata tests ---
+
+   [[sysio::action("actsize")]]
+   void test_action_data_size( uint64_t val );
+
+   [[sysio::action("actread")]]
+   void test_read_action_data( uint64_t val );
+
+   [[sysio::action("actrecv")]]
+   void test_current_receiver();
+
+   [[sysio::action("trxsize")]]
+   void test_transaction_size();
+
+   [[sysio::action("trxexp")]]
+   void test_expiration();
+
+   [[sysio::action("trxtapos")]]
+   void test_tapos();
+
+   [[sysio::action("trxread")]]
+   void test_read_transaction();
+
 };
