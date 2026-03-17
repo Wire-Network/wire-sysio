@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE( bls_key_not_allowed_for_trx ) { try {
 
    chain.create_accounts( {"alice"_n} );
    chain.produce_block();
-   private_key_type bls_active_priv_key = private_key_type::generate<bls::private_key_shim>(); // bls sigs not allowed
+   private_key_type bls_active_priv_key = private_key_type::generate(private_key_type::key_type::bls); // bls sigs not allowed
    public_key_type bls_active_pub_key = bls_active_priv_key.get_public_key();
    BOOST_REQUIRE_THROW( chain.set_authority(name("alice"), name("active"), authority(bls_active_pub_key), name("owner"),
                        { permission_level{name("alice"), name("active")} }, { chain.get_private_key(name("alice"), "active") }),

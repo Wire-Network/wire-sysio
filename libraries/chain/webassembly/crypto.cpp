@@ -58,21 +58,21 @@ namespace sysio::chain::webassembly {
                     sig_variable_size_limit_exception, "signature variable length component size greater than subjective maximum");
       // Check if the signature is ED25519
       if( s.contains<fc::crypto::ed::signature_shim>() ) {
-         // a) Extract 32 raw bytes from fc::sha256
-         auto sha_data = digest->data(); 
+         // Extract 32 raw bytes from fc::sha256
+         auto sha_data = digest->data();
          const unsigned char* msgptr = reinterpret_cast<const unsigned char*>(sha_data);
 
-         // b) Extract 64-byte signature (skip the 1-byte “which” prefix)
-         const unsigned char* sigptr = reinterpret_cast<const unsigned char*>(sig.data()) + 1;
-
-         // c) Extract 32-byte pubkey (skip the 1-byte “which” prefix)
+         // Extract 32-byte pubkey (skip the 1-byte “which” prefix)
          const unsigned char* pubptr = reinterpret_cast<const unsigned char*>(pub.data()) + 1;
+
+         // Extract 64-byte signature (skip 1-byte variant index + 32-byte embedded pubkey)
+         const unsigned char* sigptr = reinterpret_cast<const unsigned char*>(sig.data()) + 1 + crypto_sign_PUBLICKEYBYTES;
 
          // d) Call libsodium’s raw ED25519 detached-verify
          int ok = crypto_sign_verify_detached( sigptr,
-                                                msgptr,
-                                                32,
-                                                pubptr );
+                                               msgptr,
+                                               32,
+                                               pubptr );
          SYS_ASSERT( ok == 0,
                      crypto_api_exception,
                      "ED25519 signature verify failed" );
@@ -80,7 +80,7 @@ namespace sysio::chain::webassembly {
       }
 
       // otherwise, fall back to the existing ECDSA‐style recover→compare path
-      auto check = fc::crypto::public_key::recover( s, *digest);
+      auto check = fc::crypto::public_key::recover( s, *digest );
       SYS_ASSERT( check == p,
                   crypto_api_exception,
                   "Error expected key different than recovered key" );
@@ -94,7 +94,7 @@ namespace sysio::chain::webassembly {
       fc::raw::unpack(ds, s);
 
       using sig_type = fc::crypto::signature::sig_type;
-      SYS_ASSERT(s.contains_type(sig_type::k1, sig_type::r1, sig_type::wa, sig_type::em), unactivated_signature_type,
+      SYS_ASSERT(s.contains_type(sig_type::k1, sig_type::r1, sig_type::wa, sig_type::em, sig_type::ed), unactivated_signature_type,
                  "Unactivated signature type used during recover_key");
 
       if(context.control.is_speculative_block())
