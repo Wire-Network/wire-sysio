@@ -104,19 +104,19 @@ endif()
 
 add_dependencies(sysio_testing sysio_testing_contracts_copy)
 
-# When building contracts from source, ensure contracts.cpp.o is recompiled when contract files change
 if(BUILD_SYSTEM_CONTRACTS OR BUILD_TEST_CONTRACTS)
-  # Make the main testing library wait for the contracts to be built.
   add_dependencies(sysio_testing sysio_testing_contracts contracts_project)
-
-  # Set explicit file-level dependencies on contracts.cpp object file.
-  # We depend on the stamp file which gets touched only when contracts actually change.
-  # This ensures contracts.cpp.o is rebuilt when contracts are updated, but not on every build.
-  set_source_files_properties(
-    "${CMAKE_CURRENT_BINARY_DIR}/contracts.cpp"
-    PROPERTIES OBJECT_DEPENDS "${CONTRACTS_COPY_STAMP}"
-  )
 endif()
+
+# INCBIN/INCTXT embed contract WASM/ABI files via assembler .incbin directives
+# at compile time.  CMake cannot discover these implicit dependencies, so
+# contracts.cpp.o won't rebuild when the embedded files change.  Use
+# OBJECT_DEPENDS on the actual destination files (not the stamp) so that any
+# path (built-from-source or pre-built) triggers recompilation.
+set_source_files_properties(
+  "${CMAKE_CURRENT_BINARY_DIR}/contracts.cpp"
+  PROPERTIES OBJECT_DEPENDS "${BIOS_WASM_DST};${BIOS_ABI_DST};${ROA_WASM_DST};${ROA_ABI_DST}"
+)
 
 target_compile_definitions(sysio_testing PRIVATE
   "NATIVE_CONTRACTS_DIR=\"${CMAKE_BINARY_DIR}/contracts\"")

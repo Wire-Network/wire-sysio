@@ -83,6 +83,25 @@ function(contracts_target TARGET)
     COMMENT "Checking if ${TARGET} needs reconfiguration"
   )
 
+  # When contract headers change (e.g. branch switch adding/removing
+  # [[sysio::action]] attributes), the inner build's cached dependency
+  # info may be stale, leaving .obj files that reference removed symbols
+  # and preventing ABI/native-dispatch regeneration.  Force a clean build
+  # so everything is compiled fresh from the updated headers.
+  file(GLOB_RECURSE _contract_header_files
+    "${ARG_SOURCE_DIR}/*.hpp"
+    "${ARG_SOURCE_DIR}/*.h")
+
+  if(_contract_header_files)
+    ExternalProject_Add_Step(${TARGET} force_clean_on_header_change
+      DEPENDEES configure
+      DEPENDERS build
+      DEPENDS ${_contract_header_files}
+      COMMAND ${CMAKE_COMMAND} --build "${ARG_BINARY_DIR}" --target clean
+      COMMENT "Contract headers changed – cleaning build for ${TARGET}"
+    )
+  endif()
+
   # Expose the build step as a separate target for better dependency tracking
   ExternalProject_Add_StepTargets(${TARGET} build)
 
