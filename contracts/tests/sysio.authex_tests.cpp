@@ -112,7 +112,7 @@ public:
    };
 
    em_link_data make_eth_link(const std::string& username, uint64_t nonce) {
-      auto priv = fc::crypto::private_key::generate<fc::em::private_key_shim>();
+      auto priv = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em);
       auto pub  = priv.get_public_key();
       auto msg  = build_link_message(pub, username, "ethereum", nonce);
 
@@ -159,7 +159,7 @@ BOOST_FIXTURE_TEST_CASE( createlink_requires_username_auth, sysio_authex_tester 
 // ——— createlink: invalid chain ———
 
 BOOST_FIXTURE_TEST_CASE( createlink_invalid_chain, sysio_authex_tester ) try {
-   auto priv = fc::crypto::private_key::generate<fc::em::private_key_shim>();
+   auto priv = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em);
    auto pub  = priv.get_public_key();
    uint64_t nonce = now_ms();
    auto msg = build_link_message(pub, "alice", "bitcoin", nonce);
