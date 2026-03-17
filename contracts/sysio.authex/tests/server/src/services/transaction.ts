@@ -148,7 +148,7 @@ export async function createLinkTransaction(
       chain_kind: chainKind,
       username,
       sig: wireSig,
-      pubKey: pubKeyString,
+      pub_key: pubKeyString,
       nonce
     }
   }

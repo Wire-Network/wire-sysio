@@ -67,6 +67,22 @@ struct updateauth {
    }
 };
 
+struct expandauth {
+  account_name                      account;
+  permission_name                   permission;
+  std::vector<key_weight>           new_keys;
+  std::vector<permission_level_weight> new_accounts;
+
+  static account_name get_account() {
+    return sysio::chain::config::system_account_name;
+  }
+
+  static action_name get_name() {
+    return "expandauth"_n;
+  }
+};
+
+
 struct deleteauth {
    deleteauth() = default;
    deleteauth(const account_name& account, const permission_name& permission)

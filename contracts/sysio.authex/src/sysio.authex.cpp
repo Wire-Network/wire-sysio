@@ -16,6 +16,23 @@ struct updateauth {
    sysiosystem::authority auth;
 };
 
+struct expandauth {
+   name account;
+   name permission;
+   std::vector<key_weight> new_keys;
+   std::vector<sysiosystem::permission_level_weight> new_accounts;
+};
+
+using ed_raw_key_t = std::array<uint8_t, 32>;
+
+ed_raw_key_t get_ed_raw_key(const sysio::public_key& pub_key) {
+   const auto& arr = std::get<4>(pub_key);
+   ed_raw_key_t raw_key;
+   std::copy(arr.begin(), arr.end(), raw_key.data());
+   return raw_key;
+}
+
+
 /**
  * Bitcoin base58 alphabet
  */
@@ -70,7 +87,7 @@ namespace sysio {
 
 // ----- PUBLIC ACTIONS -----
 [[sysio::action]] void authex::createlink(const fc::crypto::chain_kind_t chain_kind, const name& username,
-                                          const signature& sig, const public_key& pubKey, const uint64_t nonce) {
+                                          const signature& sig, const public_key& pub_key, const uint64_t nonce) {
    using namespace fc::crypto;
    // Require caller authorization
    require_auth(username);
@@ -86,7 +103,7 @@ namespace sysio {
    check(by_namechain.find(name_chain) == by_namechain.end(), "Account already has a link for this chain.");
 
    auto by_pubkey = links.get_index<"bypubkey"_n>();
-   auto pub_hash = pubkey_to_checksum256(pubKey);
+   auto pub_hash = pubkey_to_checksum256(pub_key);
    check(by_pubkey.find(pub_hash) == by_pubkey.end(), "Public key already linked to a different account.");
 
    // ——— Nonce freshness ———
@@ -97,16 +114,17 @@ namespace sysio {
    // ——— Build the message string ———
    static constexpr const char* DIGEST_TAIL = "createlink auth";
    std::string chain_kind_str = std::to_string(static_cast<uint8_t>(chain_kind));
-   std::string msg = pubkey_to_string(pubKey) + "|" + username.to_string() + "|" + chain_kind_str + "|" +
+   std::string msg = pubkey_to_string(pub_key) + "|" + username.to_string() + "|" + chain_kind_str + "|" +
                      std::to_string(nonce) + "|" + DIGEST_TAIL;
 
+   std::optional<name> ex_permission = std::nullopt;
    // ——— Curve-specific signing & address derivation ———
    if (chain_kind == chain_kind_ethereum) {
       // 1) keccak(msg)
       auto eth_hash = sysio::keccak(msg.c_str(), msg.size());
 
       // 2) verify
-      assert_recover_key(eth_hash, sig, pubKey);
+      assert_recover_key(eth_hash, sig, pub_key);
 
       // 3) recover uncompressed pubkey and derive ETH address
       auto uncompressed = sysio::k1_recover_uncompressed(sig, eth_hash);
@@ -121,100 +139,96 @@ namespace sysio {
          a.key = links.available_primary_key();
          a.username = username;
          a.chain_kind = chain_kind;
-         a.pub_key = pubKey;
+         a.pub_key = pub_key;
          a.address = eth_addr;
       });
+      ex_permission = "ex.eth"_n;
 
-      action(
-         permission_level{
-            get_self(), "owner"_n
-      },
-         "sysio"_n, "updateauth"_n,
-         updateauth{username,
-                    "ex.eth"_n,
-                    "active"_n,
-                    {
-                       1,
-                       {{pubKey, 1}},
-                    }})
-         .send();
-
-   } else { // curve == ed
+   } else if (chain_kind == chain_kind_solana) {
       checksum256 hash256;
+      // 1) sha256(msg) → returns a checksum256
+      checksum256 raw_digest = sysio::sha256(msg.c_str(), msg.size());
+      auto const* raw1 = reinterpret_cast<const unsigned char*>(raw_digest.data());
 
-      if (chain_kind == chain_kind_solana) {
-         // 1) sha256(msg) → returns a checksum256
-         checksum256 raw_digest = sysio::sha256(msg.c_str(), msg.size());
-         auto const* raw1 = reinterpret_cast<const unsigned char*>(raw_digest.data());
-
-         // 2) map each byte into printable ASCII [33..126]
-         unsigned char mapped[32];
-         for (int i = 0; i < 32; ++i) {
-            mapped[i] = static_cast<unsigned char>((raw1[i] % 94) + 33);
-         }
-
-         // 3) pack into checksum256
-         std::memcpy(hash256.data(), mapped, 32);
-      } else { // sui
-         std::vector<uint8_t> bcs;
-         bcs.reserve(4 + msg.size());
-         bcs.insert(bcs.end(), {3, 0, 0, static_cast<uint8_t>(msg.size())});
-         bcs.insert(bcs.end(), msg.begin(), msg.end());
-
-         unsigned char raw_digest[32];
-         check(sysio::blake2b_256(reinterpret_cast<const char*>(bcs.data()), bcs.size(),
-                                  reinterpret_cast<char*>(raw_digest), sizeof(raw_digest)) == 0,
-               "blake2b_256 failed");
-         hash256 = checksum256(raw_digest);
+      // 2) map each byte into printable ASCII [33..126]
+      unsigned char mapped[32];
+      for (int i = 0; i < 32; ++i) {
+         mapped[i] = static_cast<unsigned char>((raw1[i] % 94) + 33);
       }
 
-      assert_recover_key(hash256, sig, pubKey);
+      // 3) pack into checksum256
+      std::memcpy(hash256.data(), mapped, 32);
+      assert_recover_key(hash256, sig, pub_key);
 
       // ed25519 raw 32-byte key
-      const auto& arr = std::get<4>(pubKey);
-      unsigned char raw_key[32];
-      std::copy(arr.begin(), arr.end(), raw_key);
+      auto raw_key = get_ed_raw_key(pub_key);
 
       // Solana address
-      auto sol = base58_encode(raw_key, 32);
+      auto sol = base58_encode(raw_key.data(), 32);
       links.emplace("sysio"_n, [&](auto& a) {
          a.key = links.available_primary_key();
          a.username = username;
          a.chain_kind = chain_kind_solana;
-         a.pub_key = pubKey;
+         a.pub_key = pub_key;
          a.address = sol;
       });
 
+      ex_permission = "ex.sol"_n;
+   } else if (chain_kind == chain_kind_sui) { // sui
+      std::vector<uint8_t> bcs;
+      bcs.reserve(4 + msg.size());
+      bcs.insert(bcs.end(), {3, 0, 0, static_cast<uint8_t>(msg.size())});
+      bcs.insert(bcs.end(), msg.begin(), msg.end());
+
+      unsigned char raw_digest[32];
+      check(sysio::blake2b_256(reinterpret_cast<const char*>(bcs.data()), bcs.size(),
+                               reinterpret_cast<char*>(raw_digest), sizeof(raw_digest)) == 0,
+            "blake2b_256 failed");
+      // auto hash256 = checksum256(raw_digest);
+
+      // Raw ED key
+      auto raw_key = get_ed_raw_key(pub_key);
+
       // SUI address
       unsigned char sui_raw[32];
-      check(sysio::blake2b_256(reinterpret_cast<const char*>(raw_key), 32, reinterpret_cast<char*>(sui_raw),
+      check(sysio::blake2b_256(reinterpret_cast<const char*>(raw_key.data()), 32, reinterpret_cast<char*>(sui_raw),
                                sizeof(sui_raw)) == 0,
             "blake2b_256(pubkey) failed");
 
       std::string sui = "0x" + sysio::to_hex(reinterpret_cast<const char*>(sui_raw), 32);
+      ex_permission = "ex.sui"_n;
 
       links.emplace("sysio"_n, [&](auto& a) {
          a.key = links.available_primary_key();
          a.username = username;
          a.chain_kind = chain_kind_sui;
-         a.pub_key = pubKey;
+         a.pub_key = pub_key;
          a.address = sui;
       });
-
-      action(
-         permission_level{
-            get_self(), "owner"_n
-      },
-         "sysio"_n, "updateauth"_n,
-         updateauth{username,
-                    "ex.sol"_n,
-                    "active"_n,
-                    {
-                       1,
-                       {{pubKey, 1}},
-                    }})
-         .send();
    }
+
+
+   sysio::check(ex_permission.has_value(), "Internal error: ex_permission not set");
+   action(
+      permission_level{
+         get_self(), "owner"_n
+   },
+      "sysio"_n, "updateauth"_n,
+      updateauth{username,
+                 ex_permission.value(),
+                 "active"_n,
+                 {
+                    1,
+                    {{pub_key, 1}},
+                 }})
+      .send();
+
+   action(permission_level{"sysio"_n, "active"_n}, "sysio"_n, "expandauth"_n,
+          expandauth{username, "active"_n,
+
+                     std::vector<key_weight>{key_weight{pub_key, 1}},
+                     std::vector<sysiosystem::permission_level_weight>{}})
+      .send();
 }
 
 

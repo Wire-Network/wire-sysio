@@ -28,7 +28,7 @@ namespace sysio {
      * @param chain_kind The chain identifier from fc::crypto::chain_kind_t (e.g. chain_kind_ethereum, chain_kind_solana, chain_kind_sui).
      * @param username   The WIRE account name of the user which the address is being linked to.
      * @param sig        A valid signature for the target chain converted to Wire's standard.
-     * @param pubKey     The external chain's public key in Wire format.
+     * @param pub_key     The external chain's public key in Wire format.
      * @param nonce      A nonce, timestamp in ms. Will reject if the nonce is more than 10 minutes old.
      * @return [[sysio::action]] void
      */
@@ -36,7 +36,7 @@ namespace sysio {
         const fc::crypto::chain_kind_t chain_kind,
         const sysio::name &username,
         const sysio::signature &sig,
-        const sysio::public_key &pubKey,
+        const sysio::public_key &pub_key,
         const uint64_t nonce);
 
     /**

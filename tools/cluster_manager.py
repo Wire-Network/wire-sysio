@@ -718,14 +718,17 @@ def _bootstrap(  # noqa: C901, PLR0912, PLR0915
                                 },
                                 "weight": 1
                             }
-                        ],
-                        "waits": []
+                        ]
                     }
                 },
                 "authorization": [
                     {
                         "actor": "sysio.authex",
                         "permission": "owner"
+                    },
+                    {
+                        "actor": "sysio",
+                        "permission": "active"
                     }
                 ]
             }]

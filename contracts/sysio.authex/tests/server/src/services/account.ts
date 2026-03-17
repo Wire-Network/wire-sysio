@@ -6,7 +6,8 @@ export async function getAccount(
 ): Promise<API.v1.AccountObject | null> {
   try {
     return await api.v1.chain.get_account(name)
-  } catch {
+  } catch (err) {
+    console.error(err)
     return null
   }
 }
