@@ -9,28 +9,25 @@ namespace sysio { namespace chain { namespace webassembly {
 
    void interface::__ashlti3(legacy_ptr<__int128> ret, uint64_t low, uint64_t high, uint32_t shift) const {
       fc::uint128 i = fc::to_uint128(high, low);
-      i <<= shift;
-      *ret = (unsigned __int128)i;
+      *ret = (shift >= 128) ? 0 : (unsigned __int128)(i << shift);
    }
 
    void interface::__ashrti3(legacy_ptr<__int128> ret, uint64_t low, uint64_t high, uint32_t shift) const {
       // retain the signedness
-      *ret = high;
-      *ret <<= 64;
-      *ret |= low;
-      *ret >>= shift;
+      __int128 i = high;
+      i <<= 64;
+      i |= low;
+      *ret = (shift >= 128) ? (i >> 127) : (i >> shift);
    }
 
    void interface::__lshlti3(legacy_ptr<__int128> ret, uint64_t low, uint64_t high, uint32_t shift) const {
       fc::uint128 i = fc::to_uint128(high, low);
-      i <<= shift;
-      *ret = (unsigned __int128)i;
+      *ret = (shift >= 128) ? 0 : (unsigned __int128)(i << shift);
    }
 
    void interface::__lshrti3(legacy_ptr<__int128> ret, uint64_t low, uint64_t high, uint32_t shift) const {
       fc::uint128 i = fc::to_uint128(high, low);
-      i >>= shift;
-      *ret = (unsigned __int128)i;
+      *ret = (shift >= 128) ? 0 : (unsigned __int128)(i >> shift);
    }
 
    void interface::__divti3(legacy_ptr<__int128> ret, uint64_t la, uint64_t ha, uint64_t lb, uint64_t hb) const {
