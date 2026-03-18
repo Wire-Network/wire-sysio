@@ -278,7 +278,8 @@ inline constexpr auto get_intrinsic_table() {
       "env.blake2b_256",
       "env.get_ram_usage",
       "env.set_finalizers",
-      "sysvmoc_internal.check_memcpy_params"
+      "sysvmoc_internal.check_memcpy_params",
+      "env.get_permission_lower_bound"
    );
 }
 inline constexpr std::size_t find_intrinsic_index(std::string_view hf) {

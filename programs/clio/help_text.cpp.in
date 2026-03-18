@@ -126,14 +126,6 @@ const char* error_advice_authority_type_exception = R"=====(Ensure that your aut
       "weight":     <INTEGER [1-2^16): satisfying the delegation contributes this to satisfying the threshold>
     }
     ...
-  ],
-  "waits": [        <waits must be sorted by wait_sec, largest first, and be unique>
-    ...
-    {
-      "wait_sec":   <INTEGER [1-2^32): seconds of delay which qualifies as passing this wait>
-      "weight":     <INTEGER [1-2^16): satisfying the delay contributes this to satisfying the threshold>
-    }
-    ...
   ]
 }
 )=====";

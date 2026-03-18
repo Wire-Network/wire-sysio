@@ -13,6 +13,7 @@ namespace sysio {
       string            remote_ip;
       string            remote_port;
       uint32_t          connection_id        = 0;
+      int32_t           peer_score           = 0;
       bool              connecting           = false;
       bool              syncing              = false;
       bool              is_bp_peer           = false;
@@ -70,6 +71,7 @@ namespace sysio {
                size_t block_sync_bytes_sent{0};
                bool block_sync_throttling{false};
                std::chrono::nanoseconds connection_start_time{0};
+               int32_t peer_score{0};
                std::string p2p_address;
                std::string unique_conn_node_id;
             };
@@ -113,7 +115,7 @@ namespace sysio {
 
 }
 
-FC_REFLECT( sysio::connection_status, (peer)(remote_ip)(remote_port)(connecting)(syncing)
+FC_REFLECT( sysio::connection_status, (peer)(remote_ip)(remote_port)(connection_id)(peer_score)(connecting)(syncing)
                                       (is_bp_peer)(is_bp_gossip_peer)(is_socket_open)(is_blocks_only)(is_transactions_only)
                                       (last_vote_received)(last_handshake) )
 FC_REFLECT( sysio::gossip_peer, (producer_name)(server_endpoint)(outbound_ip_address)(expiration) )

@@ -143,7 +143,7 @@ void solana_program_client::encode_type(borsh::encoder& encoder, const fc::varia
          encoder.write_u64(value.as_uint64());
          break;
       case idl::primitive_type::u128:
-         encoder.write_u128(fc::uint128(value.as_string()));
+         encoder.write_u128(fc::uint128_from_string(value.as_string()));
          break;
       case idl::primitive_type::u256:
          encoder.write_u256(fc::to_uint256(value));
@@ -161,7 +161,7 @@ void solana_program_client::encode_type(borsh::encoder& encoder, const fc::varia
          encoder.write_i64(value.as_int64());
          break;
       case idl::primitive_type::i128:
-         encoder.write_i128(fc::int128(value.as_string()));
+         encoder.write_i128(fc::int128_from_string(value.as_string()));
          break;
       case idl::primitive_type::i256:
          encoder.write_i256(fc::to_int256(value));
@@ -392,7 +392,7 @@ fc::variant solana_program_client::decode_type(borsh::decoder& decoder, const id
       case idl::primitive_type::u64:
          return fc::variant(decoder.read_u64());
       case idl::primitive_type::u128:
-         return fc::variant(decoder.read_u128().str());
+         return fc::variant(fc::to_string(decoder.read_u128()));
       case idl::primitive_type::u256:
          return fc::variant(decoder.read_u256().str());
       case idl::primitive_type::i8:
@@ -404,7 +404,7 @@ fc::variant solana_program_client::decode_type(borsh::decoder& decoder, const id
       case idl::primitive_type::i64:
          return fc::variant(decoder.read_i64());
       case idl::primitive_type::i128:
-         return fc::variant(decoder.read_i128().str());
+         return fc::variant(fc::to_string(decoder.read_i128()));
       case idl::primitive_type::i256:
          return fc::variant(decoder.read_i256().str());
       case idl::primitive_type::f32:

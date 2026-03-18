@@ -24,12 +24,6 @@
 
 namespace sysio::chain {
 
-
-uint128_t transaction_id_to_sender_id( const transaction_id_type& tid ) {
-   fc::uint128 _id = fc::to_uint128(tid._hash[3], tid._hash[2]);
-   return (unsigned __int128)_id;
-}
-
 void validate_authority_precondition( const apply_context& context, const authority& auth ) {
    for(const auto& a : auth.accounts) {
       auto* acct = context.db.find<account_object, by_name>(a.permission.actor);
@@ -290,13 +284,6 @@ void apply_sysio_updateauth(apply_context& context) {
       SYS_ASSERT(update.parent.empty(), action_validate_exception, "Cannot change owner authority's parent");
    else
       SYS_ASSERT(!update.parent.empty(), action_validate_exception, "Only owner permission can have empty parent" );
-
-   if( update.auth.waits.size() > 0 ) {
-      auto max_delay = context.control.get_global_properties().configuration.max_transaction_delay;
-      SYS_ASSERT( update.auth.waits.back().wait_sec <= max_delay, action_validate_exception,
-                  "Cannot set delay longer than max_transacton_delay, which is {} seconds",
-                  max_delay );
-   }
 
    validate_authority_precondition(context, update.auth);
 

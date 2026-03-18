@@ -171,6 +171,28 @@ def _load_state(chain_dir: Path) -> dict[str, Any]:
 # ---------------------------------------------------------------------------
 
 
+_HTTP_INSECURE_CONFIG = """\
+
+# -- http-insecure settings (cluster_manager) --
+# Specify the Access-Control-Allow-Origin to be returned on each request (sysio::http_plugin)
+access-control-allow-origin = *
+# Specify the Access-Control-Allow-Headers to be returned on each request (sysio::http_plugin)
+access-control-allow-headers = *
+# Append the error log to HTTP responses (sysio::http_plugin)
+verbose-http-errors = true
+# If set to false, then any incoming "Host" header is considered valid (sysio::http_plugin)
+http-validate-host = false
+"""
+
+
+def _patch_configs_http_insecure(data_path: Path) -> None:
+    """Append HTTP insecure settings to every config.ini under data_path."""
+    for config_ini in data_path.glob("*/config.ini"):
+        _echo(f"  Patching {config_ini.name} with --http-insecure settings ({config_ini.parent.name})")
+        with config_ini.open("a") as f:
+            f.write(_HTTP_INSECURE_CONFIG)
+
+
 def _create_cluster(
     chain_dir: Path,
     build_dir: Path,
@@ -178,6 +200,7 @@ def _create_cluster(
     total_nodes: int,
     prod_count: int,
     topo: str,
+    http_insecure: bool = False,
 ) -> None:
     """Generate configs, start nodes, bootstrap, then shut down."""
     delay = 2
@@ -244,6 +267,10 @@ def _create_cluster(
     launcher.define_network()
     launcher.generate()
 
+    # Patch config.ini files if --http-insecure was requested
+    if http_insecure:
+        _patch_configs_http_insecure(data_path)
+
     # --- Start all nodes ---
     bios_node = None
     nodes: list[Any] = []
@@ -289,9 +316,13 @@ def _create_cluster(
     _echo("Bootstrapping cluster...")
     _bootstrap(build_dir, bios_node, nodes, total_nodes, prod_count, activate_if)
 
-    # --- Persist state for 'run' ---
+    # --- Kill bios node (it is not needed after bootstrap) ---
+    _echo("Killing bios node (not needed after bootstrap)...")
+    bios_node.kill(signal.SIGTERM)
+
+    # --- Persist state for 'run' (bios excluded) ---
     node_states = []
-    for n in all_nodes:
+    for n in nodes:
         node_states.append(
             {
                 "nodeId": n.nodeId,
@@ -316,11 +347,10 @@ def _create_cluster(
         },
     )
 
-    # --- Shut down cleanly ---
+    # --- Shut down remaining nodes cleanly ---
     _echo("Shutting down nodes after bootstrap...")
     for n in nodes:
         n.kill(signal.SIGTERM)
-    bios_node.kill(signal.SIGTERM)
 
     _echo("Cluster created and bootstrapped successfully.")
     _echo(f"Chain directory: {chain_dir}")
@@ -396,7 +426,7 @@ def _bootstrap(  # noqa: C901, PLR0912, PLR0915
         if activate_if:
             _echo("Activating instant finality...")
             finalizer_nodes = []
-            for n in [*nodes, bios_node]:
+            for n in nodes:
                 if n and n.keys and n.keys[0].blspubkey and n.isProducer:
                     finalizer_nodes.append(n)
             if finalizer_nodes:
@@ -899,6 +929,12 @@ def cli(ctx: click.Context, chain_dir: str, force: bool) -> None:
     default="mesh",
     help="Network topology (star, mesh, ring, line).",
 )
+@click.option(
+    "--http-secure",
+    is_flag=True,
+    default=False,
+    help="Skip adding permissive CORS and HTTP settings to each node's config.ini.",
+)
 @click.pass_context
 def create(
     ctx: click.Context,
@@ -907,6 +943,7 @@ def create(
     total_nodes: int,
     prod_count: int,
     topo: str,
+    http_secure: bool,
 ) -> None:
     """Create and bootstrap a new cluster.
 
@@ -940,7 +977,7 @@ def create(
     try:
         if total_nodes <= 0:
             total_nodes = pnodes
-        _create_cluster(chain_dir, build_path, pnodes, total_nodes, prod_count, topo)
+        _create_cluster(chain_dir, build_path, pnodes, total_nodes, prod_count, topo, not http_secure)
     finally:
         _release_lock(chain_dir)
 
@@ -1009,6 +1046,299 @@ def stop(ctx: click.Context) -> None:
             return
 
     _echo(f"Process {pid} did not exit after 15s. You may need to kill it manually.")
+
+
+# ---------------------------------------------------------------------------
+# IDE integration
+# ---------------------------------------------------------------------------
+
+
+def _get_single_node_cmd(chain_dir: Path) -> tuple[list[str], dict[str, Any]]:
+    """Load cluster state and return (cmd, node_state) for a single-node cluster.
+
+    Raises ClickException if the cluster has more than one non-bios node.
+    """
+    state = _load_state(chain_dir)
+    node_states = state["nodes"]
+
+    # Filter out bios node (nodeId == -1 by convention)
+    non_bios = [ns for ns in node_states if ns["nodeId"] != "bios"]
+    if len(non_bios) != 1:
+        raise click.ClickException(
+            f"IDE run configs are only supported for single-node clusters "
+            f"(found {len(non_bios)} non-bios nodes)."
+        )
+
+    ns = non_bios[0]
+    cmd = list(ns["cmd"])
+
+    # Strip genesis args (same as `run`)
+    cmd_clean: list[str] = []
+    skip_next = False
+    for arg in cmd:
+        if skip_next:
+            skip_next = False
+            continue
+        if arg in ("--genesis-json", "--genesis-timestamp"):
+            skip_next = True
+            continue
+        cmd_clean.append(arg)
+    cmd = cmd_clean
+
+    if "--enable-stale-production" not in cmd:
+        cmd.append("--enable-stale-production")
+
+    return cmd, ns
+
+
+@cli.group()
+def ide() -> None:
+    """IDE integration commands."""
+
+
+@ide.command("run-config")
+@click.option(
+    "--name",
+    "config_name",
+    default=None,
+    help="Override the run-configuration name (defaults to chain-dir absolute path).",
+)
+@click.argument("ide_target", type=click.Choice(["vscode", "clion"]))
+@click.pass_context
+def ide_run_config(ctx: click.Context, config_name: str | None, ide_target: str) -> None:
+    """Generate an IDE run configuration for a single-node cluster.
+
+    IDE_TARGET is either 'vscode' or 'clion'.
+
+    The generated config maps to the same nodeop invocation used by 'run'.
+    """
+    chain_dir: Path = ctx.obj["chain_dir"]
+    cmd, ns = _get_single_node_cmd(chain_dir)
+
+    if not cmd:
+        raise click.ClickException("Empty node command in cluster state.")
+
+    nodeop_binary = cmd[0]
+    args = cmd[1:]
+    working_dir = str(ns["data_dir"])
+    name = config_name or str(chain_dir)
+
+    if ide_target == "vscode":
+        _gen_vscode_launch(nodeop_binary, args, working_dir, name)
+    elif ide_target == "clion":
+        _gen_clion_run_config(nodeop_binary, args, working_dir, name)
+
+
+def _gen_vscode_launch(
+    binary: str, args: list[str], working_dir: str, name: str
+) -> None:
+    """Create or merge a launch configuration into .vscode/launch.json."""
+    vscode_dir = Path(".vscode")
+    vscode_dir.mkdir(exist_ok=True)
+    launch_file = vscode_dir / "launch.json"
+
+    new_config = {
+        "type": "cppdbg",
+        "request": "launch",
+        "name": name,
+        "program": binary,
+        "args": args,
+        "cwd": working_dir,
+        "stopAtEntry": False,
+        "MIMode": "gdb",
+        "setupCommands": [
+            {
+                "description": "Enable pretty-printing for gdb",
+                "text": "-enable-pretty-printing",
+                "ignoreFailures": True,
+            }
+        ],
+    }
+
+    if launch_file.exists():
+        try:
+            content = json.loads(launch_file.read_text())
+        except (json.JSONDecodeError, OSError):
+            content = {"version": "0.2.0", "configurations": []}
+    else:
+        content = {"version": "0.2.0", "configurations": []}
+
+    configs: list[dict[str, Any]] = content.get("configurations", [])
+
+    # Replace existing config with same name, or append
+    replaced = False
+    for i, cfg in enumerate(configs):
+        if cfg.get("name") == name:
+            configs[i] = new_config
+            replaced = True
+            break
+    if not replaced:
+        configs.append(new_config)
+
+    content["configurations"] = configs
+    launch_file.write_text(json.dumps(content, indent=2) + "\n")
+    _echo(f"VSCode launch config written to {launch_file}")
+    _echo(f"  Config name: {name}")
+
+
+def _detect_clion_cmake_profile() -> str:
+    """Read .idea/cmake.xml and return the first enabled CMake profile name."""
+    import xml.etree.ElementTree as ET
+
+    cmake_xml = Path(".idea/cmake.xml")
+    if not cmake_xml.exists():
+        raise click.ClickException(
+            "No .idea/cmake.xml found. Open this project in CLion first "
+            "so the CMake profiles are configured."
+        )
+    tree = ET.parse(cmake_xml)
+    for cfg in tree.iter("configuration"):
+        if cfg.get("ENABLED", "true").lower() == "true":
+            profile = cfg.get("PROFILE_NAME")
+            if profile:
+                return profile
+    raise click.ClickException(
+        "No enabled CMake profile found in .idea/cmake.xml."
+    )
+
+
+def _clion_escape_params(args: list[str]) -> str:
+    """Quote args containing spaces/special chars, matching CLion's convention."""
+    escaped: list[str] = []
+    for arg in args:
+        if " " in arg or '"' in arg:
+            escaped.append(f"&quot;{_xml_escape(arg)}&quot;")
+        else:
+            escaped.append(_xml_escape(arg))
+    return " ".join(escaped)
+
+
+def _clion_config_attrs(
+    name: str, args_str: str, working_dir: str, cmake_profile: str
+) -> str:
+    """Return the attribute string for a CLion <configuration> element."""
+    return (
+        f'default="false" name="{_xml_escape(name)}"'
+        f' type="CMakeRunConfiguration" factoryName="Application"'
+        f' PROGRAM_PARAMS="{args_str}"'
+        f' REDIRECT_INPUT="false" ELEVATE="false"'
+        f' USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="true"'
+        f' WORKING_DIR="file://{_xml_escape(working_dir)}"'
+        f' PASS_PARENT_ENVS_2="true"'
+        f' PROJECT_NAME="wire-sysio" TARGET_NAME="nodeop"'
+        f' CONFIG_NAME="{_xml_escape(cmake_profile)}"'
+        f' RUN_TARGET_PROJECT_NAME="wire-sysio"'
+        f' RUN_TARGET_NAME="nodeop"'
+    )
+
+
+def _clion_config_block(attrs: str, indent: str = "    ") -> str:
+    """Return a complete <configuration> XML block."""
+    return (
+        f'{indent}<configuration {attrs}>\n'
+        f'{indent}  <method v="2">\n'
+        f'{indent}    <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider'
+        f'$BuildBeforeRunTask" enabled="true" />\n'
+        f'{indent}  </method>\n'
+        f'{indent}</configuration>'
+    )
+
+
+def _gen_clion_run_config(
+    binary: str, args: list[str], working_dir: str, name: str
+) -> None:
+    """Generate a CLion run configuration.
+
+    1. Write .idea/runConfigurations/<name>.run.xml (shared/VCS config)
+    2. Update .idea/workspace.xml RunManager (add config + list item)
+    """
+    import re
+
+    cmake_profile = _detect_clion_cmake_profile()
+    args_str = _clion_escape_params(args)
+    attrs = _clion_config_attrs(name, args_str, working_dir, cmake_profile)
+
+    # --- 1. Write the runConfigurations file ---
+    run_dir = Path(".idea/runConfigurations")
+    run_dir.mkdir(parents=True, exist_ok=True)
+
+    safe_name = ""
+    for c in name:
+        safe_name += c if c.isalnum() or c in "-." else "_"
+    config_file = run_dir / f"{safe_name}.run.xml"
+
+    xml_content = (
+        '<component name="ProjectRunConfigurationManager">\n'
+        f'  <configuration {attrs}>\n'
+        f'    <method v="2">\n'
+        f'      <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider'
+        f'$BuildBeforeRunTask" enabled="true" />\n'
+        f'    </method>\n'
+        f'  </configuration>\n'
+        f'</component>\n'
+    )
+    config_file.write_text(xml_content)
+    _echo(f"CLion run config written to {config_file}")
+
+    # --- 2. Update workspace.xml RunManager ---
+    workspace_file = Path(".idea/workspace.xml")
+    if not workspace_file.exists():
+        _echo("WARNING: .idea/workspace.xml not found, skipping RunManager update.")
+        _echo(f"  Config name: {name}")
+        _echo(f"  CMake profile: {cmake_profile}")
+        return
+
+    ws = workspace_file.read_text()
+    escaped_name = _xml_escape(name)
+    item_value = f"CMake Application.{name}"
+
+    # Remove any existing <configuration> block with the same name
+    pattern = re.compile(
+        r'[ \t]*<configuration\b[^>]*\bname="'
+        + re.escape(escaped_name)
+        + r'"[^>]*type="CMakeRunConfiguration"[^>]*>.*?</configuration>\s*',
+        re.DOTALL,
+    )
+    ws = pattern.sub("", ws)
+
+    # Insert the new config block before the <list> inside RunManager
+    config_block = _clion_config_block(attrs, indent="    ")
+    run_mgr_list = re.search(
+        r'(<component\s+name="RunManager"[^>]*>.*?)([ \t]*<list>)',
+        ws,
+        re.DOTALL,
+    )
+    if run_mgr_list:
+        insert_pos = run_mgr_list.start(2)
+        ws = ws[:insert_pos] + config_block + "\n" + ws[insert_pos:]
+
+    # Add item to the <list> if not already present
+    escaped_item = _xml_escape(item_value)
+    if escaped_item not in ws:
+        run_mgr_list_end = re.search(
+            r'(<component\s+name="RunManager"[^>]*>.*?<list>.*?)([ \t]*</list>)',
+            ws,
+            re.DOTALL,
+        )
+        if run_mgr_list_end:
+            insert_pos = run_mgr_list_end.start(2)
+            item_line = f'      <item itemvalue="{escaped_item}" />\n'
+            ws = ws[:insert_pos] + item_line + ws[insert_pos:]
+
+    workspace_file.write_text(ws)
+    _echo(f"  Updated .idea/workspace.xml RunManager")
+    _echo(f"  Config name: {name}")
+    _echo(f"  CMake profile: {cmake_profile}")
+
+
+def _xml_escape(s: str) -> str:
+    """Escape special characters for XML attribute values."""
+    return (
+        s.replace("&", "&amp;")
+        .replace('"', "&quot;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+    )
 
 
 if __name__ == "__main__":

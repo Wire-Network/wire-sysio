@@ -441,7 +441,7 @@ datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper<sysi
    fc::raw::pack(ds, as_type<uint32_t>(obj.obj.threshold));
    history_serialize_container(ds, obj.db, obj.obj.keys);
    history_serialize_container(ds, obj.db, obj.obj.accounts);
-   history_serialize_container(ds, obj.db, obj.obj.waits);
+   fc::raw::pack(ds, fc::unsigned_int(0)); // empty waits — SHiP binary compatibility
    return ds;
 }
 

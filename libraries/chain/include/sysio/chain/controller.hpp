@@ -357,6 +357,8 @@ namespace sysio::chain {
          signed_block_ptr fetch_block_by_id( const block_id_type& id )const;
          // thread-safe, retrieves serialized signed block
          std::vector<char> fetch_serialized_block_by_number( uint32_t block_num)const;
+         // thread-safe, batch retrieves serialized signed blocks starting at first_block_num
+         std::vector<std::vector<char>> fetch_serialized_blocks_by_number( uint32_t first_block_num, uint32_t count)const;
          // thread-safe
          bool block_exists(const block_id_type& id) const;
          bool validated_block_exists(const block_id_type& id) const;

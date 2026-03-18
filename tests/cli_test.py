@@ -207,8 +207,7 @@ def clio_abi_file_test():
               "weight": 1
             }
           ],
-          "accounts": [],
-          "waits": []
+          "accounts": []
         },
         "active": {
           "threshold": 1,
@@ -217,14 +216,13 @@ def clio_abi_file_test():
               "weight": 1
             }
           ],
-          "accounts": [],
-          "waits": []
+          "accounts": []
         }
     }"""
 
     cmd = ['./programs/clio/clio', '-u','http://127.0.0.1:12345', '--abi-file', system_abi_file_arg, 'convert', 'pack_action_data', account, action, unpacked_action_data]
     # the packed data hex changed because of the change to sysio in unpacked_action_data above
-    packed_action_data = '0000000000eab0c70000000000000e3d01000000010002c0ded2bc1f1305fb0faac5e6c03ee3a1924234985427b6167ca569d13df435cf0100000001000000010002c0ded2bc1f1305fb0faac5e6c03ee3a1924234985427b6167ca569d13df435cf01000000'
+    packed_action_data = '0000000000eab0c70000000000000e3d01000000010002c0ded2bc1f1305fb0faac5e6c03ee3a1924234985427b6167ca569d13df435cf01000001000000010002c0ded2bc1f1305fb0faac5e6c03ee3a1924234985427b6167ca569d13df435cf010000'
     outs, errs = processClioCommand(cmd)
     actual = outs.strip()
     assert(actual.decode('utf-8') == packed_action_data)
@@ -262,8 +260,7 @@ def clio_abi_file_test():
                     "weight": 1
                     }
                 ],
-                "accounts": [],
-                "waits": []
+                "accounts": []
                 },
                 "active": {
                 "threshold": 1,
@@ -272,11 +269,10 @@ def clio_abi_file_test():
                     "weight": 1
                     }
                 ],
-                "accounts": [],
-                "waits": []
+                "accounts": []
                 }
             },
-            "hex_data": "0000000000ea30550000000000000e3d01000000010002c0ded2bc1f1305fb0faac5e6c03ee3a1924234985427b6167ca569d13df435cf0100000001000000010002c0ded2bc1f1305fb0faac5e6c03ee3a1924234985427b6167ca569d13df435cf01000000"
+            "hex_data": "0000000000ea30550000000000000e3d01000000010002c0ded2bc1f1305fb0faac5e6c03ee3a1924234985427b6167ca569d13df435cf01000001000000010002c0ded2bc1f1305fb0faac5e6c03ee3a1924234985427b6167ca569d13df435cf010000"
             },
             {
             "account": "sysio.token",
@@ -301,7 +297,7 @@ def clio_abi_file_test():
         "context_free_data": []
     }"""
 
-    expected_output = b'3aacf360ee010b864b7e00000000020000000000eab0c700409e9a2264b89a010000000000eab0c700000000a8ed3232660000000000eab0c70000000000000e3d01000000010002c0ded2bc1f1305fb0faac5e6c03ee3a1924234985427b6167ca569d13df435cf0100000001000000010002c0ded2bc1f1305fb0faac5e6c03ee3a1924234985427b6167ca569d13df435cf0100000000a6823403eab0c7000000572d3ccdcd010000000000008c3100000000a8ed3232260000000000008c31000000000000ce39a08601000000000004535953000000000568656c6c6f00'
+    expected_output = b'3aacf360ee010b864b7e00000000020000000000eab0c700409e9a2264b89a010000000000eab0c700000000a8ed3232640000000000eab0c70000000000000e3d01000000010002c0ded2bc1f1305fb0faac5e6c03ee3a1924234985427b6167ca569d13df435cf01000001000000010002c0ded2bc1f1305fb0faac5e6c03ee3a1924234985427b6167ca569d13df435cf01000000a6823403eab0c7000000572d3ccdcd010000000000008c3100000000a8ed3232260000000000008c31000000000000ce39a08601000000000004535953000000000568656c6c6f00'
     cmd = ['./programs/clio/clio', '-u','http://127.0.0.1:12345', '--abi-file', system_abi_file_arg, token_abi_file_arg, 'convert', 'pack_transaction', '--pack-action-data', unpacked_trx]
     outs, errs = processClioCommand(cmd)
     assert(expected_output in outs)
@@ -313,7 +309,7 @@ def clio_abi_file_test():
         ],
         "compression": "none",
         "packed_context_free_data": "",
-        "packed_trx": "3aacf360ee010b864b7e00000000020000000000eab0c700409e9a2264b89a010000000000eab0c700000000a8ed3232660000000000eab0c70000000000000e3d01000000010002c0ded2bc1f1305fb0faac5e6c03ee3a1924234985427b6167ca569d13df435cf0100000001000000010002c0ded2bc1f1305fb0faac5e6c03ee3a1924234985427b6167ca569d13df435cf0100000000a6823403eab0c7000000572d3ccdcd010000000000008c3100000000a8ed3232260000000000008c31000000000000ce39a08601000000000004535953000000000568656c6c6f00"
+        "packed_trx": "3aacf360ee010b864b7e00000000020000000000eab0c700409e9a2264b89a010000000000eab0c700000000a8ed3232640000000000eab0c70000000000000e3d01000000010002c0ded2bc1f1305fb0faac5e6c03ee3a1924234985427b6167ca569d13df435cf01000001000000010002c0ded2bc1f1305fb0faac5e6c03ee3a1924234985427b6167ca569d13df435cf01000000a6823403eab0c7000000572d3ccdcd010000000000008c3100000000a8ed3232260000000000008c31000000000000ce39a08601000000000004535953000000000568656c6c6f00"
     }"""
     cmd = ['./programs/clio/clio', '-u','http://127.0.0.1:12345', '--abi-file', system_abi_file_arg, token_abi_file_arg, 'convert', 'unpack_transaction', '--unpack-action-data', packed_trx]
     outs, errs = processClioCommand(cmd)
@@ -430,6 +426,51 @@ def abi_file_with_nodeop_test():
 
         walletMgr.testFailed = not testSuccessful
 
+def clio_protobuf_abi_test():
+    """Test that clio can pack/unpack protobuf action data using --abi-file"""
+    proto_abi_path = os.path.abspath(os.getcwd() + '/unittests/test-contracts/proto_abi_test/proto_abi_test.abi')
+    if not os.path.exists(proto_abi_path):
+        Utils.Print("SKIP: proto_abi_test.abi not found at %s" % proto_abi_path)
+        return
+    proto_abi_file_arg = 'prototest' + ':' + proto_abi_path
+
+    # pack hiproto action data (flattened protobuf type)
+    account = 'prototest'
+    action = 'hiproto'
+    unpacked_action_data = '{"id":1,"type":2,"note":"hello"}'
+    cmd = ['./programs/clio/clio', '-u', 'http://127.0.0.1:12345', '--abi-file', proto_abi_file_arg,
+           'convert', 'pack_action_data', account, action, unpacked_action_data]
+    outs, errs = processClioCommand(cmd)
+    packed_data = outs.strip().decode('utf-8')
+    assert len(packed_data) > 0, "pack_action_data returned empty result for protobuf action"
+    Utils.Print("protobuf pack_action_data: %s -> %s" % (unpacked_action_data, packed_data))
+
+    # unpack the packed data and verify round-trip
+    cmd = ['./programs/clio/clio', '-u', 'http://127.0.0.1:12345', '--abi-file', proto_abi_file_arg,
+           'convert', 'unpack_action_data', account, action, packed_data]
+    outs, errs = processClioCommand(cmd)
+    assert b'"id": 1' in outs, "unpack missing id field"
+    assert b'"type": 2' in outs, "unpack missing type field"
+    assert b'"note": "hello"' in outs, "unpack missing note field"
+    Utils.Print("protobuf unpack_action_data round-trip OK")
+
+    # pack pbaction (different action, same protobuf type)
+    action = 'pbaction'
+    unpacked_action_data = '{"id":99,"type":0,"note":"test"}'
+    cmd = ['./programs/clio/clio', '-u', 'http://127.0.0.1:12345', '--abi-file', proto_abi_file_arg,
+           'convert', 'pack_action_data', account, action, unpacked_action_data]
+    outs, errs = processClioCommand(cmd)
+    packed_data2 = outs.strip().decode('utf-8')
+    assert len(packed_data2) > 0, "pack_action_data returned empty result for pbaction"
+
+    # unpack and verify
+    cmd = ['./programs/clio/clio', '-u', 'http://127.0.0.1:12345', '--abi-file', proto_abi_file_arg,
+           'convert', 'unpack_action_data', account, action, packed_data2]
+    outs, errs = processClioCommand(cmd)
+    assert b'"id": 99' in outs, "unpack missing id=99"
+    assert b'"note": "test"' in outs, "unpack missing note=test"
+    Utils.Print("protobuf pbaction round-trip OK")
+
 nodeop_help_test()
 
 clio_help_test(['--help'])
@@ -443,6 +484,7 @@ cli11_optional_option_arg_test()
 clio_sign_test()
 
 clio_abi_file_test()
+clio_protobuf_abi_test()
 abi_file_with_nodeop_test()
 
 errorCode = 0 if testSuccessful else 1

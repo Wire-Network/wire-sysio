@@ -267,9 +267,9 @@ public:
 
       private_key_type priv_key;
       if (key_type == "K1")
-         priv_key = fc::crypto::private_key::generate<fc::ecc::private_key_shim>();
+         priv_key = fc::crypto::private_key::generate();
       else if (key_type == "R1")
-         priv_key = fc::crypto::private_key::generate<fc::crypto::r1::private_key_shim>();
+         priv_key = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::r1);
       else
          SYS_THROW(chain::unsupported_key_type_exception, "Key type \"{}\" not supported by software wallet", key_type);
 

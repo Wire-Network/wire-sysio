@@ -13,10 +13,6 @@
         {
             "new_type_name": "getpeerkeys_res_t",
             "type": "peerkeys_t[]"
-        },
-        {
-            "new_type_name": "trx_match_type",
-            "type": "uint8"
         }
     ],
     "structs": [
@@ -73,10 +69,6 @@
                 {
                     "name": "accounts",
                     "type": "permission_level_weight[]"
-                },
-                {
-                    "name": "waits",
-                    "type": "wait_weight[]"
                 }
             ]
         },
@@ -235,6 +227,28 @@
                 {
                     "name": "finalizer_key",
                     "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "expandauth",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "permission",
+                    "type": "name"
+                },
+                {
+                    "name": "keys",
+                    "type": "key_weight[]"
+                },
+                {
+                    "name": "accounts",
+                    "type": "permission_level_weight[]"
                 }
             ]
         },
@@ -887,20 +901,6 @@
             ]
         },
         {
-            "name": "wait_weight",
-            "base": "",
-            "fields": [
-                {
-                    "name": "wait_sec",
-                    "type": "uint32"
-                },
-                {
-                    "name": "weight",
-                    "type": "uint16"
-                }
-            ]
-        },
-        {
             "name": "wasmcfg",
             "base": "",
             "fields": [
@@ -1105,6 +1105,11 @@
         {
             "name": "delfinkey",
             "type": "delfinkey",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "expandauth",
+            "type": "expandauth",
             "ricardian_contract": ""
         },
         {
@@ -1359,6 +1364,26 @@
         {
             "name": "getpeerkeys",
             "result_type": "getpeerkeys_res_t"
+        }
+    ],
+    "enums": [
+        {
+            "name": "trx_match_type",
+            "type": "uint8",
+            "values": [
+                {
+                    "name": "only",
+                    "value": 0
+                },
+                {
+                    "name": "first",
+                    "value": 1
+                },
+                {
+                    "name": "any",
+                    "value": 2
+                }
+            ]
         }
     ]
 }

@@ -810,7 +810,7 @@ BOOST_FIXTURE_TEST_CASE( sendinline, sysio_msig_tester ) try {
                               ("account", "alice")
                               ("permission", "perm")
                               ("parent", "active")
-                              ("auth",  authority{ 1, {}, {permission_level_weight{ {"sendinline"_n, config::active_name}, 1}}, {} })
+                              ("auth",  authority{ 1, {}, {permission_level_weight{ {"sendinline"_n, config::active_name}, 1}} })
    );
    produce_blocks();
 

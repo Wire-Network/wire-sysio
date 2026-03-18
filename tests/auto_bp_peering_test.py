@@ -96,38 +96,40 @@ try:
         scheduled_producers.append(prod["producer_name"])
     scheduled_producers.sort()
 
-    connection_failure = False
-    for nodeId in range(0, producerNodes):
-        # retrieve the connections in each node and check if each connects to the other bps in the schedule
-        connections = cluster.nodes[nodeId].processUrllibRequest("net", "connections")
-        if Utils.Debug: Utils.Print(f"Node {nodeId} connections {connections}")
-        peers = []
-        for conn in connections["payload"]:
-            if conn["is_socket_open"] is False:
-                continue
-            peer_addr = conn["peer"]
-            if len(peer_addr) == 0:
-                if len(conn["last_handshake"]["p2p_address"]) == 0:
+    def verifyConnections():
+        for nodeId in range(0, producerNodes):
+            # retrieve the connections in each node and check if each connects to the other bps in the schedule
+            connections = cluster.nodes[nodeId].processUrllibRequest("net", "connections")
+            if Utils.Debug: Utils.Print(f"Node {nodeId} connections {connections}")
+            peers = []
+            for conn in connections["payload"]:
+                if conn["is_socket_open"] is False:
                     continue
-                peer_addr = conn["last_handshake"]["p2p_address"].split()[0]
-            if peer_names[peer_addr] != "bios" and peer_addr != getHostName(nodeId):
-                if conn["is_bp_peer"]:
-                    peers.append(peer_names[peer_addr])
+                peer_addr = conn["peer"]
+                if len(peer_addr) == 0:
+                    if len(conn["last_handshake"]["p2p_address"]) == 0:
+                        continue
+                    peer_addr = conn["last_handshake"]["p2p_address"].split()[0]
+                if peer_names[peer_addr] != "bios" and peer_addr != getHostName(nodeId):
+                    if conn["is_bp_peer"]:
+                        peers.append(peer_names[peer_addr])
 
-        if not peers:
-            Utils.Print(f"ERROR: found no connected peers for node {nodeId}")
-            connection_failure = True
-            break
-        name = "defproducer" + chr(ord('a') + nodeId)
-        peers.append(name) # add ourselves so matches schedule_producers
-        peers = list(set(peers))
-        peers.sort()
-        if peers != scheduled_producers:
-            Utils.Print(f"ERROR: expect {name} has connections to {scheduled_producers}, got connections to {peers}")
-            connection_failure = True
-            break
+            if not peers:
+                Utils.Print(f"ERROR: found no connected peers for node {nodeId}")
+                return False
+            name = "defproducer" + chr(ord('a') + nodeId)
+            peers.append(name) # add ourselves so matches schedule_producers
+            peers = list(set(peers))
+            peers.sort()
+            if peers != scheduled_producers:
+                Utils.Print(f"ERROR: expect {name} has connections to {scheduled_producers}, got connections to {peers}")
+                return False
+        return True
 
-    testSuccessful = not connection_failure
+    # Use retry loop since auto-bp-peer connections may still be establishing
+    assert Utils.waitForBool(verifyConnections, timeout=60), \
+        "Timed out waiting for all auto-bp-peer connections to be established"
+    testSuccessful = True
 
 finally:
     TestHelper.shutdown(

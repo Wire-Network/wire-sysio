@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE( bls_key_not_allowed_for_trx ) { try {
 
    chain.create_accounts( {"alice"_n} );
    chain.produce_block();
-   private_key_type bls_active_priv_key = private_key_type::generate<bls::private_key_shim>(); // bls sigs not allowed
+   private_key_type bls_active_priv_key = private_key_type::generate(private_key_type::key_type::bls); // bls sigs not allowed
    public_key_type bls_active_pub_key = bls_active_priv_key.get_public_key();
    BOOST_REQUIRE_THROW( chain.set_authority(name("alice"), name("active"), authority(bls_active_pub_key), name("owner"),
                        { permission_level{name("alice"), name("active")} }, { chain.get_private_key(name("alice"), "active") }),
@@ -608,7 +608,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( linkauth_special, TESTER, validating_testers ) { 
            ("account", "tester")
            ("permission", "first")
            ("parent", "active")
-           ("auth",  authority(chain.get_public_key(tester_account, "first"), 5))
+           ("auth",  authority(chain.get_public_key(tester_account, "first")))
    );
 
    auto validate_disallow = [&] (const char *type) {
@@ -850,5 +850,56 @@ BOOST_FIXTURE_TEST_CASE(ext_permission_protection, validating_tester) {
       }
 
 } FC_LOG_AND_RETHROW() } // ext_permission_protection
+
+BOOST_AUTO_TEST_CASE( authority_without_waits ) { try {
+   // Verify that authority without waits validates and works correctly
+   validating_tester chain;
+   auto key = chain.get_public_key("test"_n, "active");
+   authority auth(key);
+   BOOST_REQUIRE_EQUAL(auth.threshold, 1u);
+   BOOST_REQUIRE_EQUAL(auth.keys.size(), 1u);
+   BOOST_REQUIRE_EQUAL(auth.accounts.size(), 0u);
+   BOOST_REQUIRE(validate(auth));
+
+   // Multi-key authority
+   auto key2 = chain.get_public_key("test"_n, "owner");
+   authority multi_auth(2, {{key, 1}, {key2, 1}});
+   multi_auth.sort_fields();
+   BOOST_REQUIRE(validate(multi_auth));
+
+   // Authority with accounts
+   authority acct_auth(permission_level{"test"_n, "active"_n});
+   BOOST_REQUIRE(validate(acct_auth));
+} FC_LOG_AND_RETHROW() }
+
+BOOST_AUTO_TEST_CASE( authority_threshold_not_lowered ) { try {
+   // Verify that authority threshold is not silently lowered.
+   // With wait_weight removed, an authority with threshold 2
+   // cannot be satisfied by a single key of weight 1.
+   validating_tester chain;
+   chain.create_accounts( {"alice"_n} );
+   chain.produce_block();
+
+   auto key = chain.get_public_key("alice"_n, "test");
+   // Set an authority with threshold 2 but only one key with weight 1
+   // This should fail validation since total weight (1) < threshold (2)
+   BOOST_REQUIRE_THROW(
+      chain.push_action(config::system_account_name, updateauth::get_name(), "alice"_n, fc::mutable_variant_object()
+              ("account", "alice")
+              ("permission", "test1")
+              ("parent", "active")
+              ("auth", authority(2, {{key, 1}}))
+      ),
+      action_validate_exception
+   );
+
+   // With threshold matching available weight, it should succeed
+   chain.push_action(config::system_account_name, updateauth::get_name(), "alice"_n, fc::mutable_variant_object()
+           ("account", "alice")
+           ("permission", "test1")
+           ("parent", "active")
+           ("auth", authority(1, {{key, 1}}))
+   );
+} FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()

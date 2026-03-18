@@ -55,6 +55,7 @@ namespace sysio { namespace chain {
 
          signed_block_ptr  read_block_by_num(uint32_t block_num)const;
          std::vector<char> read_serialized_block_by_num(uint32_t block_num)const;
+         std::vector<std::vector<char>> read_serialized_blocks_by_num(uint32_t first_block_num, uint32_t count)const;
          std::optional<signed_block_header> read_block_header_by_num(uint32_t block_num)const;
          std::optional<block_id_type>       read_block_id_by_num(uint32_t block_num)const;
 

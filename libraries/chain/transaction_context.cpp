@@ -280,10 +280,12 @@ namespace sysio::chain {
    void transaction_context::init_for_input_trx()
    {
       const transaction& trx = packed_trx.get_transaction();
-      // delayed and compressed transactions are not supported by wire
+      // delayed, compressed, and extension-bearing transactions are not supported by wire
       SYS_ASSERT( trx.delay_sec.value == 0, transaction_exception, "transaction cannot be delayed" );
       SYS_ASSERT( packed_trx.get_compression() == packed_transaction::compression_type::none,
                   tx_compression_not_allowed, "packed transaction cannot be compressed");
+      SYS_ASSERT( trx.transaction_extensions.empty(), invalid_transaction_extension,
+                  "transaction extensions are not currently supported" );
 
       is_input = true;
       if (!control.skip_trx_checks()) {

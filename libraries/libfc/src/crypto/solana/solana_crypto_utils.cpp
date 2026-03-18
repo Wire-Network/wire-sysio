@@ -59,8 +59,9 @@ solana_signature solana_signature::from_base58(const std::string& str) {
 
 solana_signature solana_signature::from_ed_signature(const fc::crypto::ed::signature_shim& sig) {
    solana_signature result;
-   static_assert(sizeof(sig._data) == SIZE, "ED25519 signature size mismatch");
-   std::ranges::copy(sig._data, result.data.begin());
+   // Copy the 64-byte signature from offset 32 (after the embedded pubkey)
+   static_assert(SIZE == crypto_sign_BYTES, "Solana signature size must be 64 bytes");
+   std::memcpy(result.data.data(), sig._data.data() + crypto_sign_PUBLICKEYBYTES, SIZE);
    return result;
 }
 

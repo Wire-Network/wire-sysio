@@ -171,13 +171,21 @@ BOOST_AUTO_TEST_CASE(shared_secret_symmetry) {
     } FC_LOG_AND_RETHROW()
 }
 
-// Test 4: signature_shim.recover() must throw (unsupported for ED25519)
-BOOST_AUTO_TEST_CASE(signature_recover_throws) {
+// Test 4: signature_shim.recover() succeeds with valid embedded pubkey
+BOOST_AUTO_TEST_CASE(signature_recover_works) {
     try {
-        signature_shim sig;
-        fc::sha256 dummy;
-        // Recover is unsupported—should always throw
-        BOOST_CHECK_THROW(sig.recover(dummy), fc::exception);
+        auto sk = private_key_shim::generate();
+        auto expected_pk = sk.get_public_key();
+        auto digest = fc::sha256::hash(std::string("recover test"));
+
+        signature_shim sig = sk.sign_sha256(digest);
+
+        // recover() should verify and return the embedded pubkey
+        auto recovered = sig.recover(digest);
+        BOOST_CHECK_MESSAGE(
+            recovered._data == expected_pk._data,
+            "recover() returned wrong public key"
+        );
     } FC_LOG_AND_RETHROW()
 }
 
@@ -200,38 +208,38 @@ BOOST_AUTO_TEST_CASE(pack_unpack_public_key) {
     } FC_LOG_AND_RETHROW()
 }
 
-// Test 6: pack/unpack signature_shim preserves 64 bytes + zero-padding
+// Test 6: pack/unpack signature_shim preserves all 96 bytes
 BOOST_AUTO_TEST_CASE(pack_unpack_signature) {
     try {
-        // 1) Prepare dummy signature_shim (64x 0x5A + pad=0)
+        // 1) Prepare dummy signature_shim (96 bytes)
         signature_shim orig;
-        std::fill_n(orig._data.data(), crypto_sign_BYTES, 0x5A);
+        std::fill_n(orig._data.data(), signature_shim::size, 0x5A);
 
         // 2) Pack: Use fc standard packing/unpacking
         auto blob = fc::raw::pack(orig);
         BOOST_CHECK_MESSAGE(
-            blob.size() == crypto_sign_BYTES,
+            blob.size() == signature_shim::size,
             "blob.size()=" << blob.size()
-            << ", expected=" << crypto_sign_BYTES
+            << ", expected=" << signature_shim::size
         );
 
-        // 3) Unpack back → got
+        // 3) Unpack back -> got
         auto got = fc::raw::unpack<signature_shim>(blob);
 
-        // 4) Verify the 64 data bytes match
+        // 4) Verify all 96 bytes match
         BOOST_CHECK_MESSAGE(
-            memcmp(orig._data.data(), got._data.data(), crypto_sign_BYTES) == 0,
+            memcmp(orig._data.data(), got._data.data(), signature_shim::size) == 0,
             "signature bytes mismatch after unpack"
         );
     } FC_LOG_AND_RETHROW()
 }
 
-// Test 7: padding persistence through multiple pack/unpack loops
+// Test 7: persistence through multiple pack/unpack loops (96 bytes)
 BOOST_AUTO_TEST_CASE(signature_padding_persistence) {
     try {
         // Prepare dummy signature_shim
         signature_shim orig;
-        std::fill_n(orig._data.data(), crypto_sign_BYTES, 0xA5);
+        std::fill_n(orig._data.data(), signature_shim::size, 0xA5);
 
         // Pack/unpack twice
         auto b1 = fc::raw::pack(orig);
@@ -239,10 +247,41 @@ BOOST_AUTO_TEST_CASE(signature_padding_persistence) {
         auto b2 = fc::raw::pack(u1);
         auto u2 = fc::raw::unpack<signature_shim>(b2);
 
-        // Inner 64 bytes must remain unchanged
+        // All 96 bytes must remain unchanged
         BOOST_CHECK_MESSAGE(
-            memcmp(orig._data.data(), u2._data.data(), crypto_sign_BYTES) == 0,
+            memcmp(orig._data.data(), u2._data.data(), signature_shim::size) == 0,
             "signature bytes corrupted after pack/unpack loops"
+        );
+    } FC_LOG_AND_RETHROW()
+}
+
+// Test 8: sign embeds the correct pubkey in last 32 bytes
+BOOST_AUTO_TEST_CASE(sign_embeds_pubkey) {
+    try {
+        auto sk = private_key_shim::generate();
+        auto expected_pk = sk.get_public_key();
+        auto digest = fc::sha256::hash(std::string("embed test"));
+
+        signature_shim sig = sk.sign_sha256(digest);
+
+        // First 32 bytes should match the public key
+        BOOST_CHECK_MESSAGE(
+            memcmp(sig._data.data(),
+                   expected_pk._data.data(),
+                   crypto_sign_PUBLICKEYBYTES) == 0,
+            "embedded pubkey doesn't match get_public_key()"
+        );
+
+        // Also check sign_raw embeds pubkey
+        const std::string msg = "raw embed test";
+        signature_shim raw_sig = sk.sign_raw(
+            reinterpret_cast<const uint8_t*>(msg.data()), msg.size());
+
+        BOOST_CHECK_MESSAGE(
+            memcmp(raw_sig._data.data(),
+                   expected_pk._data.data(),
+                   crypto_sign_PUBLICKEYBYTES) == 0,
+            "sign_raw: embedded pubkey doesn't match get_public_key()"
         );
     } FC_LOG_AND_RETHROW()
 }

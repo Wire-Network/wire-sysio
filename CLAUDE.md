@@ -8,6 +8,8 @@ Wire Sysio is a C++ implementation of the AntelopeIO protocol (a fork of Spring)
 
 ## Build Commands
 
+**Note:** The build directory varies by developer (e.g. `cmake-build-debug`, `build`, `build/debug-claude`). Examples below use `$BUILD_DIR` — substitute your actual build path.
+
 ### Prerequisites (one-time setup)
 ```bash
 # Install system packages (Ubuntu 24.04+)
@@ -26,7 +28,7 @@ export CXX=/usr/bin/clang++-18
 
 # Configure with CMake (Ninja recommended)
 cmake \
--B build/debug-claude \
+-B $BUILD_DIR \
 -S . \
 -G Ninja \
 -DCMAKE_BUILD_TYPE=Debug \
@@ -42,40 +44,41 @@ cmake \
 export NUM_JOBS=$(echo $(($(nproc) - 2)))
 
 # Build (use -j${NUM_JOBS} to avoid memory exhaustion; some files need 4GB RAM)
-cmake --build build/debug-claude -- -j${NUM_JOBS}
+cmake --build $BUILD_DIR -- -j${NUM_JOBS}
 ```
 
 ### Building Specific Targets
 ```bash
-ninja -C build/debug-claude fc              # Build libfc library only
-ninja -C build/debug-claude test_fc         # Build fc tests
-ninja -C build/debug-claude nodeop          # Build main node executable
-ninja -C build/debug-claude unit_test       # Build unit tests
+ninja -C $BUILD_DIR fc              # Build libfc library only
+ninja -C $BUILD_DIR test_fc         # Build fc tests
+ninja -C $BUILD_DIR nodeop          # Build main node executable
+ninja -C $BUILD_DIR unit_test       # Build unit tests
 ```
 
 ## Testing Commands
 
 ### Run All Parallelizable Tests
 ```bash
-cd build/debug-claude  && ctest -j "$(nproc)" -LE _tests
+cd $BUILD_DIR && ctest -j "$(nproc)" -LE _tests
 ```
 
 ### Run Specific Test Suite
 ```bash
 # Run a single Boost.Test suite
-./build/debug-claude/libraries/libfc/test/test_fc --run_test=solana_client_tests
+./$BUILD_DIR/libraries/libfc/test/test_fc --run_test=solana_client_tests
 
 # Run specific test case
-./build/debug-claude/libraries/libfc/test/test_fc --run_test=solana_client_tests/test_pubkey_base58_roundtrip
+./$BUILD_DIR/libraries/libfc/test/test_fc --run_test=solana_client_tests/test_pubkey_base58_roundtrip
 
 # Run unit tests with specific WASM runtime
-./build/debug-claude/unittests/unit_test --run_test=block_tests -- --sys-vm
-./build/debug-claude/unittests/unit_test --run_test=block_tests -- --sys-vm-jit
-./build/debug-claude/unittests/unit_test --run_test=block_tests -- --sys-vm-oc
+./$BUILD_DIR/unittests/unit_test --run_test=block_tests -- --sys-vm
+./$BUILD_DIR/unittests/unit_test --run_test=block_tests -- --sys-vm-jit
+./$BUILD_DIR/unittests/unit_test --run_test=block_tests -- --sys-vm-oc
 ```
 
 ### Test Categories
 ```bash
+# Run from $BUILD_DIR
 ctest -j "$(nproc)" -LE _tests           # Parallelizable unit tests
 ctest -j "$(nproc)" -L wasm_spec_tests   # WASM specification tests (CPU-intensive)
 ctest -L "nonparallelizable_tests"       # Serial component/integration tests
@@ -168,11 +171,12 @@ Tests run against all runtimes by default. Specify runtime with `-- --sys-vm`, `
 ./scripts/docker-build.sh --target=app-build-local
 ```
 
-## Python Integration Tests
+### Python Integration Tests
 
-The `tests/` directory contains Python integration tests using TestHarness framework:
-- `TestHarness/Cluster.py` - Cluster orchestration
-- `TestHarness/Node.py` - Individual node control
-- `TestHarness/Launcher.py` - Test environment generation
+The `tests/` directory contains Python integration tests using TestHarness framework (`TestHarness/Cluster.py`, `TestHarness/Node.py`, `TestHarness/Launcher.py`).
 
-Run Python tests directly: `python3 tests/<test_name>.py`
+**IMPORTANT:** CMake copies the Python test scripts into the build directory. Always run them **from the build directory** so they use the correct built binaries and copied test scripts:
+```bash
+cd $BUILD_DIR && python3 tests/<test_name>.py
+```
+Do NOT run from the source root — that would use stale or missing binaries.

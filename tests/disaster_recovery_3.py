@@ -119,11 +119,12 @@ try:
         node.removeState()
 
     Print("Restart nodes from snapshot")
+    snapshotPath = node0.getLatestSnapshot()
     for i in range(4):
-        isRelaunchSuccess = cluster.getNode(i).relaunch(chainArg=" -e --snapshot {}".format(node0.getLatestSnapshot()))
+        isRelaunchSuccess = cluster.getNode(i).relaunch(chainArg=" -e --pause-on-startup --snapshot {}".format(snapshotPath))
         assert isRelaunchSuccess, f"node {i} relaunch from snapshot failed"
 
-    Print("Verify forks resolve and libBlock is included on all nodes")
+    Print("Verify libBlock is included on all nodes")
     Print(f"Lib Block: {libBlock}")
     for node in [node0, node1, node2, node3]:
         node.waitForBlock(n_LIB)
@@ -146,7 +147,7 @@ try:
 
     Print("Restart nodes")
     for node in [node0, node1, node2, node3]:
-        node.relaunch(rmArgs=" --snapshot {}".format(node0.getLatestSnapshot()))
+        node.relaunch(rmArgs=" --pause-on-startup --snapshot {}".format(snapshotPath))
 
     Print("Verify LIB advances on all nodes")
     for node in [node0, node1, node2, node3]:

@@ -919,7 +919,7 @@ public:
 
  template<>
  struct keytype_converter<chain_apis::i256> {
-     using input_type = boost::multiprecision::uint256_t;
+     using input_type = fc::uint256;
      using index_type = chain::index256_index;
      static auto function() {
         return [](const input_type v) {

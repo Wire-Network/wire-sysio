@@ -1,4 +1,5 @@
 #include <fc/variant.hpp>
+#include <fc/variant_multiprecision.hpp>
 #include <fc/variant_object.hpp>
 #include <fc/exception/exception.hpp>
 #include <string.h>
@@ -82,24 +83,23 @@ variant::variant( int64_t val )
 
 variant::variant(fc::uint128 val)
 {
-   *reinterpret_cast<std::string**>(this)  = new std::string( val.str() );
+   *reinterpret_cast<std::string**>(this)  = new std::string( fc::to_string(val) );
    set_variant_type( this, uint128_type );
 }
 
 variant::variant(fc::int128 val)
 {
-   *reinterpret_cast<std::string**>(this)  = new std::string( val.str() );
+   *reinterpret_cast<std::string**>(this)  = new std::string( fc::to_string(val) );
    set_variant_type( this, int128_type );
 }
 
-variant::variant( int256 val )
+variant::variant( const int256& val )
 {
    *reinterpret_cast<std::string**>(this)  = new std::string( val.str() );
-   // *reinterpret_cast<int256*>(this)  = val;
    set_variant_type( this, int256_type );
 }
 
-variant::variant(fc::uint256 val) {
+variant::variant(const fc::uint256& val) {
    *reinterpret_cast<std::string**>(this)  = new std::string( val.str() );
    set_variant_type( this, uint256_type );
 }
@@ -482,17 +482,17 @@ fc::int128 variant::as_int128() const
    switch( get_type() )
    {
    case int64_type:
-      return fc::int128(*reinterpret_cast<const int64_t*>(this));
+      return static_cast<fc::int128>(*reinterpret_cast<const int64_t*>(this));
    case uint64_type:
-      return fc::int128(*reinterpret_cast<const uint64_t*>(this));
+      return static_cast<fc::int128>(*reinterpret_cast<const uint64_t*>(this));
    case int128_type:
-      return fc::int128(as_string());//*reinterpret_cast<const int256*>(this);
+      return fc::int128_from_string(as_string());
    case uint128_type:
-      return fc::int128(as_string());
+      return fc::int128_from_string(as_string());
    case string_type:
-      return fc::int128(as_string());
+      return fc::int128_from_string(as_string());
    case bool_type:
-      return int128(*reinterpret_cast<const bool*>(this));
+      return static_cast<fc::int128>(*reinterpret_cast<const bool*>(this));
    case null_type:
       return 0;
    default:
@@ -505,17 +505,17 @@ fc::uint128 fc::variant::as_uint128()const
    switch( get_type() )
    {
    case int64_type:
-      return fc::uint128(*reinterpret_cast<const int64_t*>(this));
+      return static_cast<fc::uint128>(*reinterpret_cast<const int64_t*>(this));
    case uint64_type:
-      return fc::uint128(*reinterpret_cast<const uint64_t*>(this));
+      return static_cast<fc::uint128>(*reinterpret_cast<const uint64_t*>(this));
    case int128_type:
-      return fc::uint128(as_string());//*reinterpret_cast<const int128*>(this);
+      return fc::uint128_from_string(as_string());
    case uint128_type:
-      return fc::uint128(as_string());
+      return fc::uint128_from_string(as_string());
    case string_type:
-      return fc::uint128(as_string());
+      return fc::uint128_from_string(as_string());
    case bool_type:
-      return uint128(*reinterpret_cast<const bool*>(this));
+      return static_cast<fc::uint128>(*reinterpret_cast<const bool*>(this));
    case null_type:
       return 0;
    default:
@@ -835,35 +835,8 @@ void from_variant( const variant& var,  int32_t& vo )
    vo = static_cast<int32_t>(var.as_int64());
 }
 
-void to_variant( const unsigned __int128& var,  variant& vo )  {
-   vo = boost::multiprecision::uint128_t( var ).str();
-}
-
-void from_variant( const variant& var,  unsigned __int128& vo )
-{
-   if( var.is_uint64() ) {
-      vo = var.as_uint64();
-   } else if( var.is_string() ) {
-      vo = static_cast<unsigned __int128>( boost::multiprecision::uint128_t(var.as_string()) );
-   } else {
-      FC_THROW_EXCEPTION( bad_cast_exception, "Cannot convert variant of type '{}' into a uint128_t", var.get_type() );
-   }
-}
-
-void to_variant( const __int128& var,  variant& vo )  {
-   vo = boost::multiprecision::int128_t( var ).str();
-}
-
-void from_variant( const variant& var,  __int128& vo )
-{
-   if( var.is_int64() ) {
-      vo = var.as_int64();
-   } else if( var.is_string() ) {
-      vo = static_cast<__int128>( boost::multiprecision::int128_t(var.as_string()) );
-   } else {
-      FC_THROW_EXCEPTION( bad_cast_exception, "Cannot convert variant of type '{}' into a int128_t", var.get_type() );
-   }
-}
+// to_variant/from_variant for unsigned __int128 and __int128 are now
+// provided by int128.cpp via fc::uint128/fc::int128 (same underlying type)
 
 void from_variant( const variant& var,  int64_t& vo )
 {
@@ -873,6 +846,14 @@ void from_variant( const variant& var,  int64_t& vo )
 void from_variant( const variant& var,  uint64_t& vo )
 {
    vo = var.as_uint64();
+}
+
+void to_variant(const fc::int256& val, fc::variant& vo) {
+   vo = fc::variant(val);
+}
+
+void to_variant(const fc::uint256& val, fc::variant& vo) {
+   vo = fc::variant(val);
 }
 
 void from_variant(const fc::variant& var, fc::int256& vo) {

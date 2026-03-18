@@ -9,6 +9,7 @@ set(SYSIO_SYSTEM_SOURCES
    ${CMAKE_CURRENT_SOURCE_DIR}/src/finalizer_key.cpp
    ${CMAKE_CURRENT_SOURCE_DIR}/src/peer_keys.cpp
    ${CMAKE_CURRENT_SOURCE_DIR}/src/trx_priority.cpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/src/expandauth.cpp
    ${CMAKE_CURRENT_SOURCE_DIR}/src/block_info.cpp)
 
 set(SYSIO_SYSTEM_HEADERS

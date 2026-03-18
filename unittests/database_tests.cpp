@@ -125,4 +125,88 @@ BOOST_AUTO_TEST_SUITE(database_tests)
       } FC_LOG_AND_RETHROW()
    }
 
+   // Batch fetch spanning block_log and fork_db
+   BOOST_AUTO_TEST_CASE( batch_fetch_spanning_blog_and_forkdb ) {
+      try {
+         savanna_tester chain;
+
+         // Produce enough blocks so that some are irreversible (in block_log)
+         // and some are reversible (in fork_db). Savanna finality: LIB = head - 2.
+         chain.produce_blocks(30);
+
+         uint32_t lib_num  = chain.last_irreversible_block_num();
+         uint32_t head_num = chain.head().block_num();
+
+         // Sanity: there should be blocks in fork_db (above LIB) and in block_log (at/below LIB)
+         BOOST_REQUIRE_GT(lib_num, 5u);
+         BOOST_REQUIRE_GT(head_num, lib_num);
+
+         // Request a batch that spans the block_log/fork_db boundary:
+         // start a few blocks before LIB and extend past head
+         uint32_t start = lib_num - 3;
+         uint32_t count = head_num - start + 5; // extends 5 past head
+         auto batch = chain.control->fetch_serialized_blocks_by_number(start, count);
+
+         // Should get exactly (head_num - start + 1) blocks — clamped at head
+         uint32_t expected_count = head_num - start + 1;
+         BOOST_REQUIRE_EQUAL(batch.size(), expected_count);
+
+         // Verify each block matches the single-fetch API
+         for (uint32_t i = 0; i < expected_count; ++i) {
+            auto single = chain.control->fetch_serialized_block_by_number(start + i);
+            BOOST_REQUIRE(!single.empty());
+            BOOST_REQUIRE(batch[i] == single);
+         }
+
+         // Verify the batch includes blocks from both sources by checking block numbers
+         for (uint32_t i = 0; i < expected_count; ++i) {
+            auto blk = fc::raw::unpack<signed_block>(batch[i]);
+            BOOST_REQUIRE_EQUAL(blk.block_num(), start + i);
+         }
+      } FC_LOG_AND_RETHROW()
+   }
+
+   // Batch fetch entirely from fork_db (all blocks above LIB)
+   BOOST_AUTO_TEST_CASE( batch_fetch_entirely_in_forkdb ) {
+      try {
+         savanna_tester chain;
+         chain.produce_blocks(10);
+
+         uint32_t lib_num  = chain.last_irreversible_block_num();
+         uint32_t head_num = chain.head().block_num();
+         BOOST_REQUIRE_GT(head_num, lib_num);
+
+         uint32_t start = lib_num + 1;
+         uint32_t count = head_num - lib_num;
+         auto batch = chain.control->fetch_serialized_blocks_by_number(start, count);
+         BOOST_REQUIRE_EQUAL(batch.size(), count);
+
+         for (uint32_t i = 0; i < count; ++i) {
+            auto single = chain.control->fetch_serialized_block_by_number(start + i);
+            BOOST_REQUIRE(batch[i] == single);
+         }
+      } FC_LOG_AND_RETHROW()
+   }
+
+   // Batch fetch entirely from block_log (all blocks below LIB)
+   BOOST_AUTO_TEST_CASE( batch_fetch_entirely_in_blog ) {
+      try {
+         savanna_tester chain;
+         chain.produce_blocks(30);
+
+         uint32_t lib_num = chain.last_irreversible_block_num();
+         BOOST_REQUIRE_GT(lib_num, 10u);
+
+         uint32_t start = 2;
+         uint32_t count = lib_num - 5;
+         auto batch = chain.control->fetch_serialized_blocks_by_number(start, count);
+         BOOST_REQUIRE_EQUAL(batch.size(), count);
+
+         for (uint32_t i = 0; i < count; ++i) {
+            auto single = chain.control->fetch_serialized_block_by_number(start + i);
+            BOOST_REQUIRE(batch[i] == single);
+         }
+      } FC_LOG_AND_RETHROW()
+   }
+
 BOOST_AUTO_TEST_SUITE_END()

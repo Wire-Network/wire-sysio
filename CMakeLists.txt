@@ -11,10 +11,10 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_EXTENSIONS ON)
 set(CXX_STANDARD_REQUIRED ON)
 
-set(VERSION_MAJOR 5)
-set(VERSION_MINOR 2)
+set(VERSION_MAJOR 1)
+set(VERSION_MINOR 0)
 set(VERSION_PATCH 0)
-set(VERSION_SUFFIX rc1)
+set(VERSION_SUFFIX dev)
 
 if(VERSION_SUFFIX)
   set(VERSION_FULL "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}-${VERSION_SUFFIX}")
@@ -221,6 +221,10 @@ install(FILES ${CMAKE_BINARY_DIR}/lib/cmake/sysio/SysioTester.cmake DESTINATION 
 install(FILES ${CMAKE_BINARY_DIR}/lib/cmake/sysio/SysioCheckVersion.cmake DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}/cmake/sysio)
 
 include(cmake/licenses.cmake)
+
+# Merge compile_commands.json from ExternalProject contract builds with the root
+# project's database so that IDEs (CLion, clangd) can navigate contract sources.
+add_merged_compile_commands_target()
 
 install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/licenses/sysio" DESTINATION "${CMAKE_INSTALL_FULL_DATAROOTDIR}/licenses/")
 

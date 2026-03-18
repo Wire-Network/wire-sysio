@@ -103,7 +103,8 @@ void log_non_default_options(const std::vector<bpo::basic_option<char>>& options
          result += v;
       }
    }
-   ilog("Non-default options: {}", result);
+   if (!result.empty())
+      ilog("Non-default options: {}", result);
 }
 
 void configure_logging(const std::filesystem::path& config_path) {
@@ -158,7 +159,6 @@ class application {
 public:
    explicit application(const application_config& cfg) : cfg_(cfg) {
       exe_name_ = fc::program_name();
-      ilog("{} started", exe_name_);
 
       uint32_t short_hash = 0;
       fc::from_hex(sysio::version::version_hash(), reinterpret_cast<char*>(&short_hash), sizeof(short_hash));
@@ -182,7 +182,7 @@ public:
    application(application&&) = delete;
    application& operator=(application&&) = delete;
    ~application() {
-      if (last_result_ != exit_code::NODE_MANAGEMENT_SUCCESS && cfg_.log_on_exit) {
+      if (last_result_ != exit_code::NODE_MANAGEMENT_SUCCESS && last_result_ != exit_code::INITIALIZE_FAIL && cfg_.log_on_exit) {
          detail::log_non_default_options(app_->get_parsed_options());
          auto full_ver = app_->version_string() == app_->full_version_string() ? "" : app_->full_version_string();
          ilog("{} version {} {}", exe_name_, app_->version_string(), full_ver);
@@ -211,6 +211,8 @@ public:
             }
             return last_result_;
          }
+
+         ilog("{} started", exe_name_);
 
          set_stop_executor_cb([]{});
 

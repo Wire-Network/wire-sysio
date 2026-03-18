@@ -526,6 +526,8 @@ namespace sysio { namespace chain {
                                     3015016, "ABI has an unsupported version" )
       FC_DECLARE_DERIVED_EXCEPTION( duplicate_abi_action_results_def_exception,  abi_exception,
                                     3015017, "Duplicate action results definition in the ABI" )
+      FC_DECLARE_DERIVED_EXCEPTION( duplicate_abi_enum_def_exception,  abi_exception,
+                                    3015018, "Duplicate enum definition in the ABI" )
 
    FC_DECLARE_DERIVED_EXCEPTION( contract_exception,           chain_exception,
                                  3160000, "Contract exception" )

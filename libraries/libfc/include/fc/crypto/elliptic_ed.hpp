@@ -51,11 +51,19 @@ struct public_key_shim {
 };
 
 /**
- * ED25519 signature (64 bytes)
+ * ED25519 signature (96 bytes = 32 embedded pubkey + 64 sig)
+ *
+ * The public key is embedded directly in the signature blob, making
+ * ED25519 signatures self-contained and recoverable. Layout:
+ *   [0..31]  - 32-byte ED25519 public key
+ *   [32..95] - 64-byte ED25519 signature
  */
 struct signature_shim {
-   static constexpr size_t size = crypto_sign_BYTES;
-   static constexpr bool is_recoverable = false;
+   static constexpr size_t size = crypto_sign_BYTES + crypto_sign_PUBLICKEYBYTES;
+   // ED25519 signatures are not mathematically recoverable like ECDSA (K1/R1),
+   // but we embed the public key in the signature blob so recover() can extract
+   // and verify it, allowing uniform treatment in get_signature_keys().
+   static constexpr bool is_recoverable = true;
 
    using data_type = std::array<uint8_t, size>;
    data_type _data{};
@@ -72,9 +80,7 @@ struct signature_shim {
    }
 
    using public_key_type = public_key_shim;
-   public_key_shim recover(const sha256&) const {
-      FC_THROW_EXCEPTION(exception, "ED25519 signature recovery not supported");
-   }
+   public_key_shim recover(const sha256& digest) const;
 
    bool verify(const sha256& digest, const public_key_shim& pub) const;
    bool verify_solana(const uint8_t* data, size_t len, const public_key_shim& pub) const;
@@ -85,7 +91,7 @@ struct signature_shim {
    }
 
    static signature_shim from_base58_string(const std::string& str) {
-      constexpr size_t max_sig_len = 88;
+      constexpr size_t max_sig_len = 132;
       FC_ASSERT( str.size() <= max_sig_len, "Invalid ED25519 signature string length {}", str.size());
       auto bytes = from_base58(str);
       FC_ASSERT(bytes.size() == size, "Invalid ED25519 signature bytes length {}", bytes.size());
@@ -206,13 +212,13 @@ DataStream& operator>>(DataStream& ds, crypto::ed::public_key_shim& pk) {
 
 template <typename DataStream>
 DataStream& operator<<(DataStream& ds, const crypto::ed::signature_shim& sig) {
-   ds.write(reinterpret_cast<const char*>(sig._data.data()), crypto_sign_BYTES);
+   ds.write(reinterpret_cast<const char*>(sig._data.data()), crypto::ed::signature_shim::size);
    return ds;
 }
 
 template <typename DataStream>
 DataStream& operator>>(DataStream& ds, crypto::ed::signature_shim& sig) {
-   ds.read(reinterpret_cast<char*>(sig._data.data()), crypto_sign_BYTES);
+   ds.read(reinterpret_cast<char*>(sig._data.data()), crypto::ed::signature_shim::size);
    return ds;
 }
 

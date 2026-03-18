@@ -454,7 +454,7 @@ namespace fc
     *  Escapes Control sequence Introducer 0x9b to \u009b
     *  All other characters unmolested.
     */
-   void escape_string( const std::string_view& str, std::string& out, const json::yield_function_t& yield, bool escape_control_chars )
+   bool escape_string( const std::string_view& str, std::string& out, const json::yield_function_t& yield, bool escape_control_chars )
    {
       const auto init_size = str.size();
       const auto start_pos = out.size();
@@ -531,12 +531,17 @@ namespace fc
          }
       }
 
+      bool escaped = (out.size() - start_pos) != init_size;
+
       std::string_view appended( out.data() + start_pos, out.size() - start_pos );
       if( !is_valid_utf8( appended ) ) {
          std::string pruned = prune_invalid_utf8( appended );
          out.resize( start_pos );
          out += pruned;
+         escaped = true;
       }
+
+      return escaped;
    }
 
    std::string escape_string( const std::string_view& str, const json::yield_function_t& yield, bool escape_control_chars )

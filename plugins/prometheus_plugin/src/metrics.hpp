@@ -61,6 +61,7 @@ struct catalog_type {
       prometheus::Family<Gauge>& block_sync_bytes_sent;
       prometheus::Family<Gauge>& block_sync_throttling;
       prometheus::Family<Gauge>& connection_start_time;
+      prometheus::Family<Gauge>& peer_score;
       prometheus::Family<Gauge>& peer_addr; // Empty gauge; we only want the label
    };
    p2p_connection_metrics p2p_metrics;
@@ -138,6 +139,7 @@ struct catalog_type {
             , .block_sync_bytes_sent{family<Gauge>("nodeop_p2p_block_sync_bytes_sent", "bytes of blocks sent during syncing")}
             , .block_sync_throttling{family<Gauge>("nodeop_p2p_block_sync_throttling", "is block sync throttling currently active")}
             , .connection_start_time{family<Gauge>("nodeop_p2p_connection_start_time", "time of last connection to peer")}
+            , .peer_score{family<Gauge>("nodeop_p2p_peer_score", "peer quality score")}
             , .peer_addr{family<Gauge>("nodeop_p2p_peer_addr", "peer address")}
          }
        , cpu_usage_us(family<Counter>("nodeop_cpu_usage_us_total", "total cpu usage in microseconds for blocks"))
@@ -231,6 +233,7 @@ struct catalog_type {
          add_and_set_gauge(p2p_metrics.block_sync_bytes_sent, peer.block_sync_bytes_sent);
          add_and_set_gauge(p2p_metrics.block_sync_throttling, peer.block_sync_throttling);
          add_and_set_gauge(p2p_metrics.connection_start_time, peer.connection_start_time.count());
+         add_and_set_gauge(p2p_metrics.peer_score, peer.peer_score);
       }
    }
 

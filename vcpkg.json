@@ -21,6 +21,7 @@
     "gtest",
     "spdlog",
     "magic-enum",
+    "protobuf",
     {
       "name": "curl",
       "features": [
