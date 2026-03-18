@@ -430,18 +430,13 @@ datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper_stat
 }
 
 template <typename ST>
-datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper_stateless<sysio::chain::wait_weight>& obj) {
-   fc::raw::pack(ds, as_type<uint32_t>(obj.obj.wait_sec));
-   fc::raw::pack(ds, as_type<uint16_t>(obj.obj.weight));
-   return ds;
-}
-
-template <typename ST>
 datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper<sysio::chain::shared_authority>& obj) {
    fc::raw::pack(ds, as_type<uint32_t>(obj.obj.threshold));
    history_serialize_container(ds, obj.db, obj.obj.keys);
    history_serialize_container(ds, obj.db, obj.obj.accounts);
-   fc::raw::pack(ds, fc::unsigned_int(0)); // empty waits — SHiP binary compatibility
+   fc::raw::pack(ds, fc::unsigned_int(0)); // empty waits — SHiP binary compatibility, wait_weight[] still in ABI
+                                           // was vector<struct wait_weight{uint32_t wait_sec; weight_type weight;}>
+
    return ds;
 }
 
