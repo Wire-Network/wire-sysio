@@ -815,11 +815,6 @@ int32_t check_permission_authorization(uint64_t account, uint64_t permission,
       delay_us);
 }
 
-INTRINSIC_EXPORT
-int64_t get_account_creation_time(uint64_t account) {
-   return native_context_stack::current()->get_account_creation_time(name{account});
-}
-
 // ============================================================================
 // Crypto extensions
 // ============================================================================
