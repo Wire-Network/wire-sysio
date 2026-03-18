@@ -9,28 +9,37 @@ namespace sysio { namespace chain { namespace webassembly {
 
    void interface::__ashlti3(legacy_ptr<__int128> ret, uint64_t low, uint64_t high, uint32_t shift) const {
       fc::uint128 i = fc::to_uint128(high, low);
-      i <<= shift;
-      *ret = (unsigned __int128)i;
+      *ret = (shift >= 128) ? 0 : (unsigned __int128)(i << shift);
    }
 
    void interface::__ashrti3(legacy_ptr<__int128> ret, uint64_t low, uint64_t high, uint32_t shift) const {
-      // retain the signedness
-      *ret = high;
-      *ret <<= 64;
-      *ret |= low;
-      *ret >>= shift;
+      // Arithmetic right shift implemented using only well-defined unsigned operations,
+      // avoiding implementation-defined behavior of signed >> on negative values.
+      unsigned __int128 u = (static_cast<unsigned __int128>(high) << 64) | low;
+      bool negative = (high >> 63) != 0;
+
+      if (shift >= 128) {
+         *ret = negative ? static_cast<__int128>(~static_cast<unsigned __int128>(0)) : 0;
+      } else if (shift == 0) {
+         *ret = static_cast<__int128>(u);
+      } else {
+         unsigned __int128 shifted = u >> shift;
+         if (negative) {
+            unsigned __int128 mask = ~static_cast<unsigned __int128>(0) << (128 - shift);
+            shifted |= mask;
+         }
+         *ret = static_cast<__int128>(shifted);
+      }
    }
 
    void interface::__lshlti3(legacy_ptr<__int128> ret, uint64_t low, uint64_t high, uint32_t shift) const {
       fc::uint128 i = fc::to_uint128(high, low);
-      i <<= shift;
-      *ret = (unsigned __int128)i;
+      *ret = (shift >= 128) ? 0 : (unsigned __int128)(i << shift);
    }
 
    void interface::__lshrti3(legacy_ptr<__int128> ret, uint64_t low, uint64_t high, uint32_t shift) const {
       fc::uint128 i = fc::to_uint128(high, low);
-      i >>= shift;
-      *ret = (unsigned __int128)i;
+      *ret = (shift >= 128) ? 0 : (unsigned __int128)(i >> shift);
    }
 
    void interface::__divti3(legacy_ptr<__int128> ret, uint64_t la, uint64_t ha, uint64_t lb, uint64_t hb) const {

@@ -8,11 +8,79 @@
 
 namespace fc {
 class variant;
-using int256   = boost::multiprecision::int256_t;
-using int256_t = int256;
 
-using uint256   = boost::multiprecision::uint256_t;
+class uint256 : public boost::multiprecision::uint256_t {
+   using base = boost::multiprecision::uint256_t;
+public:
+   using base::base;
+   using base::operator=;
+   uint256() = default;
+   uint256(const base& v) : base(v) {}
+   uint256(base&& v) : base(std::move(v)) {}
+
+   template<typename T>
+   friend bool operator==(const uint256& a, const T& b) {
+      return static_cast<const base&>(a) == b;
+   }
+   template<typename T>
+   friend bool operator<(const uint256& a, const T& b) {
+      return static_cast<const base&>(a) < b;
+   }
+   template<typename T>
+   friend bool operator>(const uint256& a, const T& b) {
+      return static_cast<const base&>(a) > b;
+   }
+   template<typename T>
+   friend bool operator<=(const uint256& a, const T& b) {
+      return static_cast<const base&>(a) <= b;
+   }
+   template<typename T>
+   friend bool operator>=(const uint256& a, const T& b) {
+      return static_cast<const base&>(a) >= b;
+   }
+   template<typename T>
+   friend bool operator!=(const uint256& a, const T& b) {
+      return static_cast<const base&>(a) != b;
+   }
+};
+
+class int256 : public boost::multiprecision::int256_t {
+   using base = boost::multiprecision::int256_t;
+public:
+   using base::base;
+   using base::operator=;
+   int256() = default;
+   int256(const base& v) : base(v) {}
+   int256(base&& v) : base(std::move(v)) {}
+
+   template<typename T>
+   friend bool operator==(const int256& a, const T& b) {
+      return static_cast<const base&>(a) == b;
+   }
+   template<typename T>
+   friend bool operator<(const int256& a, const T& b) {
+      return static_cast<const base&>(a) < b;
+   }
+   template<typename T>
+   friend bool operator>(const int256& a, const T& b) {
+      return static_cast<const base&>(a) > b;
+   }
+   template<typename T>
+   friend bool operator<=(const int256& a, const T& b) {
+      return static_cast<const base&>(a) <= b;
+   }
+   template<typename T>
+   friend bool operator>=(const int256& a, const T& b) {
+      return static_cast<const base&>(a) >= b;
+   }
+   template<typename T>
+   friend bool operator!=(const int256& a, const T& b) {
+      return static_cast<const base&>(a) != b;
+   }
+};
+
 using uint256_t = uint256;
+using int256_t = int256;
 
 fc::uint256 to_uint256(const fc::variant& v);
 fc::int256 to_int256(const fc::variant& v);
