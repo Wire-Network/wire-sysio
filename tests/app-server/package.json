@@ -1,5 +1,5 @@
 {
-  "name": "authex-test-app",
+  "name": "test-app-server",
   "version": "1.0.0",
   "private": true,
   "scripts": {
@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@wireio/sdk-core": "^1.0.8",
-    "@wireio/wallet-ext-sdk": "^0.1.0",
+    "@wireio/wallet-ext-sdk": "^0.1.2",
     "buffer": "^6.0.3",
     "ethers": "^6.16.0",
     "react": "^19.2.4",

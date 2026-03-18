@@ -63,7 +63,7 @@ export NODEOP_URL
 # Resolve build dir to absolute path
 if [[ "$BUILD_DIR" != /* ]]; then
    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-   REPO_ROOT="$(cd "$SCRIPT_DIR/../../../.." && pwd)"
+   REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
    BUILD_DIR="$REPO_ROOT/$BUILD_DIR"
 fi
 

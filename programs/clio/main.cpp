@@ -1127,11 +1127,22 @@ void ensure_kiod_running(CLI::App* app) {
        if (subapp->got_subcommand("listproducers")) // system list* do not require wallet
          return;
     }
-    if (wallet_url != default_wallet_url)
-      return;
 
     if (local_port_used())
        return;
+
+    // Parse unix socket path from wallet_url
+    std::string socket_path;
+    std::filesystem::path data_dir_path;
+    if (wallet_url.starts_with("unix://")) {
+        socket_path = wallet_url.substr(strlen("unix://"));
+        auto socket_abs_path = std::filesystem::path(socket_path);
+        data_dir_path = socket_abs_path.parent_path();
+        socket_path = socket_abs_path.filename().string();
+    } else {
+        // HTTP/HTTPS URLs - don't auto-launch
+        return;
+    }
 
     auto parent_path = boost::dll::program_location().parent_path();
     auto binPath = parent_path / key_store_executable_name;
@@ -1144,6 +1155,9 @@ void ensure_kiod_running(CLI::App* app) {
         binPath = std::filesystem::canonical(binPath);
 
         vector<std::string> pargs;
+        pargs.push_back("--data-dir");
+        pargs.push_back(data_dir_path.string());
+
         if (!wallet_dir.empty()) {
           pargs.push_back("--wallet-dir");
           pargs.push_back(std::filesystem::absolute(wallet_dir));
@@ -1152,7 +1166,7 @@ void ensure_kiod_running(CLI::App* app) {
         pargs.push_back("--http-server-address");
         pargs.push_back("");
         pargs.push_back("--unix-socket-path");
-        pargs.push_back(string(key_store_executable_name) + ".sock");
+        pargs.push_back(socket_path);
 
         bp::child ksys(binPath.string(), pargs,
                                      bp::std_in.close(),
