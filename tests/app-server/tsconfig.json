@@ -1,0 +1,16 @@
+{
+  "extends": "../../etc/tsconfig/tsconfig.base.esm.json",
+  "compilerOptions": {
+    "module": "bundler",
+    "outDir": "./lib",
+    "rootDir": "./src",
+  },
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "lib",
+    "dist",
+    "node_modules"
+  ]
+}

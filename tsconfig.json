@@ -1,0 +1,18 @@
+{
+  "extends": "./etc/tsconfig/tsconfig.base.json",
+  "files": [],
+  "exclude": [
+    "**/node_modules/**",
+    "**/lib/**",
+    "**/dist/**",
+    "node_modules",
+    "lib",
+    "target",
+    "dist"
+  ],
+  "references": [
+    {
+      "path": "./tests/app-server/tsconfig.json"
+    },
+  ]
+}

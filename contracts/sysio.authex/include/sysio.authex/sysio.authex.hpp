@@ -17,6 +17,10 @@
 #include <sysio/serialize.hpp>
 
 namespace sysio {
+
+  constexpr uint128_t to_namechain_key(const name& name, const fc::crypto::chain_kind_t kind) {
+    return (static_cast<uint128_t>(name.value) << 64) | static_cast<uint64_t>(kind);
+  }
   class [[sysio::contract("sysio.authex")]] authex : public contract {
     public:
     using contract::contract;
@@ -26,7 +30,7 @@ namespace sysio {
      * @brief Using the signature and provided parameters, this action will create a link between the WIRE account name and the external chain address. Pub keys / Addresses are 1:1 mapped.
      *
      * @param chain_kind The chain identifier from fc::crypto::chain_kind_t (e.g. chain_kind_ethereum, chain_kind_solana, chain_kind_sui).
-     * @param username   The WIRE account name of the user which the address is being linked to.
+     * @param account   The WIRE account name of the user which the address is being linked to.
      * @param sig        A valid signature for the target chain converted to Wire's standard.
      * @param pub_key     The external chain's public key in Wire format.
      * @param nonce      A nonce, timestamp in ms. Will reject if the nonce is more than 10 minutes old.
@@ -34,7 +38,7 @@ namespace sysio {
      */
     [[sysio::action]] void createlink(
         const fc::crypto::chain_kind_t chain_kind,
-        const sysio::name &username,
+        const sysio::name &account,
         const sysio::signature &sig,
         const sysio::public_key &pub_key,
         const uint64_t nonce);
@@ -46,7 +50,7 @@ namespace sysio {
      * @param permission    the permission which was removed.
      */
     [[sysio::on_notify("sysio::deleteauth")]]
-    void onmanualrmv(const name& account, const name& permission);
+    void onmanualrmv(const name& account, const fc::crypto::chain_kind_t kind);
 
     // ! For testing only, remove before MAINNET deployment.
     [[sysio::action]] void clearlinks();
@@ -61,27 +65,23 @@ namespace sysio {
       uint64_t key;
       name username;                       // Wire account name of the user
       fc::crypto::chain_kind_t chain_kind; // The external chain identifier
-      public_key pub_key;                  // External chain's Public key in Pub_XX_ format.
-      std::string address;                 // External chain's address in string format.
+      public_key pub_key;                  // External chain's Public key in PUB_XX_ format.
+
 
       uint64_t primary_key() const { return key; }
-      uint128_t by_namechain() const { return (static_cast<uint128_t>(username.value) << 64) | static_cast<uint64_t>(chain_kind); }
+      uint128_t by_namechain() const { return to_namechain_key(username, chain_kind); }
       uint64_t by_name() const { return username.value; }
       checksum256 by_pub_key() const {
         return pubkey_to_checksum256(pub_key);
       }
-      checksum256 by_address() const {
-        return sha256(address.c_str(), address.size());
-      }
-      uint64_t by_chain_kind() const { return static_cast<uint64_t>(chain_kind); }
+      uint64_t by_chain() const { return static_cast<uint64_t>(chain_kind); }
     };
 
     using links_t = multi_index<"links"_n, links_s,
         indexed_by<"bynamechain"_n, const_mem_fun<links_s, uint128_t, &links_s::by_namechain>>,
         indexed_by<"byname"_n, const_mem_fun<links_s, uint64_t, &links_s::by_name>>,
         indexed_by<"bypubkey"_n, const_mem_fun<links_s, checksum256, &links_s::by_pub_key>>,
-        indexed_by<"byaddress"_n, const_mem_fun<links_s, checksum256, &links_s::by_address>>,
-        indexed_by<"bychainkind"_n, const_mem_fun<links_s, uint64_t, &links_s::by_chain_kind>>
+        indexed_by<"bychain"_n, const_mem_fun<links_s, uint64_t, &links_s::by_chain>>
     >;
     // ----- Helper methods -----
 
@@ -97,11 +97,8 @@ namespace sysio {
     /**
      * @brief Get the checksum of a given pub_key, compressed_key, or address (contract address).
      *
-     * @return checksum256 (sha256 ) of the given parameter.
+     * @return string representation of the pubkey, mimicking the format used by eosjs-ecc for different key types (e.g. "PUB_EM_" + hex(compressed_33_bytes) for EM keys).
      */
-    // checksum256 get_checksum(const std::string &pub_key);
-    // checksum256 get_checksum(const std::array<char, 33> &compressed_key);
-    // checksum256 get_checksum(const std::vector<unsigned char> &address);
     static std::string pubkey_to_string(const sysio::public_key& pk);
 
     /**

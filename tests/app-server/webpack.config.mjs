@@ -9,7 +9,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const require = createRequire(import.meta.url);
 
 // Load .env from repo root
-const repoRoot = path.resolve(__dirname, '../../../..');
+const repoRoot = path.resolve(__dirname, '../..');
 const envPath = path.join(repoRoot, '.env');
 const envVars = {};
 if (fs.existsSync(envPath)) {

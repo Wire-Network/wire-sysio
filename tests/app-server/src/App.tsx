@@ -42,7 +42,7 @@ export default function App() {
     <ToastProvider>
       <div className="app">
         <div className="app-header">
-          <h1>AuthLink Test</h1>
+          <h1>Test App Server</h1>
           <ChainSelector selected={chain} onChange={handleChainChange} />
         </div>
 

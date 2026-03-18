@@ -1,4 +1,4 @@
-# Authex Test App
+# Test App Server
 
 A browser-based test application for the `sysio.authex` contract. It connects to an Ethereum wallet (e.g. MetaMask) and creates an auth link between an Ethereum address and a Wire account.
 

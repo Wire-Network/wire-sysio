@@ -86,11 +86,11 @@ std::string base58_encode(const unsigned char* bytes, uint32_t data_len) {
 namespace sysio {
 
 // ----- PUBLIC ACTIONS -----
-[[sysio::action]] void authex::createlink(const fc::crypto::chain_kind_t chain_kind, const name& username,
+[[sysio::action]] void authex::createlink(const fc::crypto::chain_kind_t chain_kind, const name& account,
                                           const signature& sig, const public_key& pub_key, const uint64_t nonce) {
    using namespace fc::crypto;
    // Require caller authorization
-   require_auth(username);
+   require_auth(account);
 
    // ——— Chain kind validation ———
    check(chain_kind == chain_kind_ethereum || chain_kind == chain_kind_solana || chain_kind == chain_kind_sui,
@@ -99,7 +99,7 @@ namespace sysio {
    // ——— Table & indices ———
    links_t links(get_self(), get_self().value);
    auto by_namechain = links.get_index<"bynamechain"_n>();
-   uint128_t name_chain = (static_cast<uint128_t>(username.value) << 64) | static_cast<uint64_t>(chain_kind);
+   uint128_t name_chain = (static_cast<uint128_t>(account.value) << 64) | static_cast<uint64_t>(chain_kind);
    check(by_namechain.find(name_chain) == by_namechain.end(), "Account already has a link for this chain.");
 
    auto by_pubkey = links.get_index<"bypubkey"_n>();
@@ -114,7 +114,7 @@ namespace sysio {
    // ——— Build the message string ———
    static constexpr const char* DIGEST_TAIL = "createlink auth";
    std::string chain_kind_str = std::to_string(static_cast<uint8_t>(chain_kind));
-   std::string msg = pubkey_to_string(pub_key) + "|" + username.to_string() + "|" + chain_kind_str + "|" +
+   std::string msg = pubkey_to_string(pub_key) + "|" + account.to_string() + "|" + chain_kind_str + "|" +
                      std::to_string(nonce) + "|" + DIGEST_TAIL;
 
    std::optional<name> ex_permission = std::nullopt;
@@ -126,22 +126,7 @@ namespace sysio {
       // 2) verify
       assert_recover_key(eth_hash, sig, pub_key);
 
-      // 3) recover uncompressed pubkey and derive ETH address
-      auto uncompressed = sysio::k1_recover_uncompressed(sig, eth_hash);
-      // uncompressed[0] = 0x04, [1..64] = X || Y coords
 
-      // 4) keccak(uncompressed X||Y) → last 20 bytes = ETH address
-      auto pk_hash = sysio::keccak(uncompressed.data() + 1, 64);
-      auto pk_bytes = pk_hash.extract_as_byte_array();
-      std::string eth_addr = "0x" + sysio::to_hex(reinterpret_cast<const char*>(pk_bytes.data() + 12), 20);
-
-      links.emplace("sysio"_n, [&](auto& a) {
-         a.key = links.available_primary_key();
-         a.username = username;
-         a.chain_kind = chain_kind;
-         a.pub_key = pub_key;
-         a.address = eth_addr;
-      });
       ex_permission = "ex.eth"_n;
 
    } else if (chain_kind == chain_kind_solana) {
@@ -160,19 +145,6 @@ namespace sysio {
       std::memcpy(hash256.data(), mapped, 32);
       assert_recover_key(hash256, sig, pub_key);
 
-      // ed25519 raw 32-byte key
-      auto raw_key = get_ed_raw_key(pub_key);
-
-      // Solana address
-      auto sol = base58_encode(raw_key.data(), 32);
-      links.emplace("sysio"_n, [&](auto& a) {
-         a.key = links.available_primary_key();
-         a.username = username;
-         a.chain_kind = chain_kind_solana;
-         a.pub_key = pub_key;
-         a.address = sol;
-      });
-
       ex_permission = "ex.sol"_n;
    } else if (chain_kind == chain_kind_sui) { // sui
       std::vector<uint8_t> bcs;
@@ -184,37 +156,28 @@ namespace sysio {
       check(sysio::blake2b_256(reinterpret_cast<const char*>(bcs.data()), bcs.size(),
                                reinterpret_cast<char*>(raw_digest), sizeof(raw_digest)) == 0,
             "blake2b_256 failed");
-      // auto hash256 = checksum256(raw_digest);
 
-      // Raw ED key
-      auto raw_key = get_ed_raw_key(pub_key);
-
-      // SUI address
-      unsigned char sui_raw[32];
-      check(sysio::blake2b_256(reinterpret_cast<const char*>(raw_key.data()), 32, reinterpret_cast<char*>(sui_raw),
-                               sizeof(sui_raw)) == 0,
-            "blake2b_256(pubkey) failed");
-
-      std::string sui = "0x" + sysio::to_hex(reinterpret_cast<const char*>(sui_raw), 32);
       ex_permission = "ex.sui"_n;
-
-      links.emplace("sysio"_n, [&](auto& a) {
-         a.key = links.available_primary_key();
-         a.username = username;
-         a.chain_kind = chain_kind_sui;
-         a.pub_key = pub_key;
-         a.address = sui;
-      });
    }
 
-
+   // MAKE SURE WE MAPPED TO A SUPPORTED PERMISSION
    sysio::check(ex_permission.has_value(), "Internal error: ex_permission not set");
+
+   // CREATE LINK RECORD
+   links.emplace("sysio"_n, [&](auto& a) {
+      a.key = links.available_primary_key();
+      a.username = account;
+      a.chain_kind = chain_kind;
+      a.pub_key = pub_key;
+   });
+
+   // PUSH `ex.<chain_prefix>` TO PERMISSIONS
    action(
       permission_level{
          get_self(), "owner"_n
    },
       "sysio"_n, "updateauth"_n,
-      updateauth{username,
+      updateauth{account,
                  ex_permission.value(),
                  "active"_n,
                  {
@@ -223,8 +186,9 @@ namespace sysio {
                  }})
       .send();
 
+   // AMEND `active` PERMISSIONS
    action(permission_level{"sysio"_n, "active"_n}, "sysio"_n, "expandauth"_n,
-          expandauth{username, "active"_n,
+          expandauth{account, "active"_n,
 
                      std::vector<key_weight>{key_weight{pub_key, 1}},
                      std::vector<sysiosystem::permission_level_weight>{}})
@@ -245,27 +209,15 @@ namespace sysio {
    }
 };
 
-// TODO: Adjust this logic need to handle removal of ex.eth or ex.sol respectively.
-void authex::onmanualrmv(const name& account, const name& permission) {
-   using namespace fc::crypto;
 
-   chain_kind_t kind;
-   switch (permission.value) {
-   case "ex.sol"_n.value:
-      kind = chain_kind_solana;
-      break;
-   case "ex.eth"_n.value:
-      kind = chain_kind_ethereum;
-      break;
-   default:
-      sysio::check(false, "Invalid permission for removal.");
-      return; // unreachable, silences uninitialized warning
-   }
+// TODO: Adjust this logic need to handle removal of ex.eth or ex.sol respectively.
+void authex::onmanualrmv(const name& account, const fc::crypto::chain_kind_t kind) {
+   using namespace fc::crypto;
 
    // Find reference to 'account' in links table via namechain index
    links_t links(get_self(), get_self().value);
    auto by_namechain = links.get_index<"bynamechain"_n>();
-   uint128_t name_chain = (static_cast<uint128_t>(account.value) << 64) | static_cast<uint64_t>(kind);
+   uint128_t name_chain = to_namechain_key(account, kind);
    auto itr = by_namechain.find(name_chain);
    if (itr == by_namechain.end())
       return;
@@ -302,8 +254,8 @@ std::array<uint8_t, 4> authex::digestSuffixRipemd160(const std::array<char, 33>&
 
 std::string authex::pubkey_to_string(const sysio::public_key& pk) {
    switch (pk.index()) {
-   case 3: { // PUB_EM_
-      // raw is std::array<char,33>
+   case fc::crypto::key_type_em: { // PUB_EM_
+
       auto raw = std::get<3>(pk);
 
       return "PUB_EM_" + sysio::to_hex(reinterpret_cast<const char*>(raw.data()), raw.size());

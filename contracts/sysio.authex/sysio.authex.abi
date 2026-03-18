@@ -13,11 +13,11 @@
             "base": "",
             "fields": [
                 {
-                    "name": "chainName",
-                    "type": "name"
+                    "name": "chain_kind",
+                    "type": "chain_kind_t"
                 },
                 {
-                    "name": "username",
+                    "name": "account",
                     "type": "name"
                 },
                 {
@@ -25,7 +25,7 @@
                     "type": "signature"
                 },
                 {
-                    "name": "pubKey",
+                    "name": "pub_key",
                     "type": "public_key"
                 },
                 {
@@ -47,33 +47,11 @@
                     "type": "name"
                 },
                 {
-                    "name": "chain",
-                    "type": "name"
+                    "name": "chain_kind",
+                    "type": "chain_kind_t"
                 },
                 {
                     "name": "pub_key",
-                    "type": "public_key"
-                },
-                {
-                    "name": "address",
-                    "type": "string"
-                }
-            ]
-        },
-        {
-            "name": "onlinkauth",
-            "base": "",
-            "fields": [
-                {
-                    "name": "accountName",
-                    "type": "name"
-                },
-                {
-                    "name": "permission",
-                    "type": "name"
-                },
-                {
-                    "name": "pubKey",
                     "type": "public_key"
                 }
             ]
@@ -89,11 +67,6 @@
             "name": "createlink",
             "type": "createlink",
             "ricardian_contract": ""
-        },
-        {
-            "name": "onlinkauth",
-            "type": "onlinkauth",
-            "ricardian_contract": ""
         }
     ],
     "tables": [
@@ -107,5 +80,33 @@
     ],
     "ricardian_clauses": [],
     "variants": [],
-    "action_results": []
+    "action_results": [],
+    "enums": [
+        {
+            "name": "chain_kind_t",
+            "type": "uint8",
+            "values": [
+                {
+                    "name": "chain_kind_unknown",
+                    "value": 0
+                },
+                {
+                    "name": "chain_kind_wire",
+                    "value": 1
+                },
+                {
+                    "name": "chain_kind_ethereum",
+                    "value": 2
+                },
+                {
+                    "name": "chain_kind_solana",
+                    "value": 3
+                },
+                {
+                    "name": "chain_kind_sui",
+                    "value": 4
+                }
+            ]
+        }
+    ]
 }
