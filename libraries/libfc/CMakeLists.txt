@@ -124,6 +124,8 @@ target_link_libraries(
 
 target_compile_definitions(fc PUBLIC -DFC_AVAILABLE=1)
 
+configure_fc_pch(fc)
+
 if (ENABLE_TESTS)
     add_subdirectory(test)
 endif ()

@@ -1,8 +1,7 @@
 #pragma once
 
-#include <boost/range/combine.hpp>
-#include <boost/range/adaptor/filtered.hpp>
-#include <boost/range/adaptor/transformed.hpp>
+#include <algorithm>
+#include <ranges>
 
 namespace sysio { namespace chain {
 
@@ -23,17 +22,14 @@ namespace sysio { namespace chain {
  */
 template<typename DataRange, typename MarkerRange, typename Marker>
 DataRange filter_data_by_marker(DataRange data, MarkerRange markers, const Marker& markerValue) {
-   auto remove_mismatched_markers = boost::adaptors::filtered([&markerValue](const auto& tuple) {
-      return boost::get<0>(tuple) == markerValue;
-   });
-   auto ToData = boost::adaptors::transformed([](const auto& tuple) {
-      return boost::get<1>(tuple);
-   });
-
-   // Zip the ranges together, filter out data with markers that don't match, and return the data without the markers
-   auto range = boost::combine(markers, data) | remove_mismatched_markers | ToData;
-   return {range.begin(), range.end()};
+   auto zipped = std::views::zip(markers, data)
+               | std::views::filter([&markerValue](const auto& tuple) {
+                    return std::get<0>(tuple) == markerValue;
+                 })
+               | std::views::transform([](const auto& tuple) {
+                    return std::get<1>(tuple);
+                 });
+   return {zipped.begin(), zipped.end()};
 }
 
 }} // namespace sysio::chain
-
