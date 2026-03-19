@@ -180,19 +180,6 @@ inline bool operator==( const key_weight& lhs, const shared_key_weight& rhs ) {
    return tie( lhs.key, lhs.weight ) == tie( rhs.key, rhs.weight );
 }
 
-struct wait_weight {
-   uint32_t     wait_sec;
-   weight_type  weight;
-
-   friend bool operator == ( const wait_weight& lhs, const wait_weight& rhs ) {
-      return tie( lhs.wait_sec, lhs.weight ) == tie( rhs.wait_sec, rhs.weight );
-   }
-
-   friend bool operator < ( const wait_weight& lhs, const wait_weight& rhs ) {
-      return tie( lhs.wait_sec, lhs.weight ) < tie( rhs.wait_sec, rhs.weight );
-   }
-};
-
 namespace config {
    template<>
    struct billable_size<permission_level_weight> {
@@ -202,11 +189,6 @@ namespace config {
    template<>
    struct billable_size<key_weight> {
       static const uint64_t value = 8; ///< over value of weight for safety, dynamically sizing key
-   };
-
-   template<>
-   struct billable_size<wait_weight> {
-      static const uint64_t value = 16; ///< over value of weight and wait_sec for safety
    };
 }
 
@@ -362,7 +344,6 @@ namespace fc {
 
 FC_REFLECT(sysio::chain::permission_level_weight, (permission)(weight) )
 FC_REFLECT(sysio::chain::key_weight, (key)(weight) )
-FC_REFLECT(sysio::chain::wait_weight, (wait_sec)(weight) )
 FC_REFLECT(sysio::chain::authority, (threshold)(keys)(accounts) )
 FC_REFLECT(sysio::chain::shared_key_weight, (key)(weight) )
 FC_REFLECT(sysio::chain::shared_authority, (threshold)(keys)(accounts) )
