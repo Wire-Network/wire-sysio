@@ -449,7 +449,6 @@ REGISTER_LEGACY_CF_HOST_FUNCTION(ripemd160);
 // permission api
 REGISTER_LEGACY_HOST_FUNCTION(check_transaction_authorization);
 REGISTER_LEGACY_HOST_FUNCTION(check_permission_authorization);
-REGISTER_HOST_FUNCTION(get_account_creation_time);
 REGISTER_HOST_FUNCTION(get_permission_lower_bound);
 
 // authorization api
@@ -652,7 +651,7 @@ REGISTER_CF_HOST_FUNCTION( bls_g1_map );
 REGISTER_CF_HOST_FUNCTION( bls_g2_map );
 REGISTER_CF_HOST_FUNCTION( bls_fp_mod );
 REGISTER_CF_HOST_FUNCTION( bls_fp_mul );
-REGISTER_CF_HOST_FUNCTION( bls_fp_exp ); 
+REGISTER_CF_HOST_FUNCTION( bls_fp_exp );
 
 } // namespace webassembly
 } // namespace chain

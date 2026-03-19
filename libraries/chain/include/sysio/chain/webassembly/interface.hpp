@@ -468,16 +468,6 @@ namespace webassembly {
          bool check_permission_authorization(account_name account, permission_name permission, legacy_span<const char> pubkeys_data, legacy_span<const char> perms_data, uint64_t delay_us) const;
 
          /**
-          * Returns the creation time of an account.
-          *
-          * @ingroup permission
-          * @param account - the account name.
-          *
-          * @return the creation time (in microseconds since Unix epoch) of the account.
-         */
-         int64_t get_account_creation_time(account_name account) const;
-
-         /**
           * Look up the permission of an account with the smallest name >= the given permission name.
           *
           * @ingroup permission
@@ -1738,11 +1728,11 @@ namespace webassembly {
          int32_t alt_bn128_mul(span<const char> g1_point, span<const char> scalar, span<char> result) const;
 
          /**
-          * Host function for optimal ate pairing check on the elliptic curve alt_bn128 
+          * Host function for optimal ate pairing check on the elliptic curve alt_bn128
           *
           * @ingroup crypto
           * @param g1_g2_pairs - a span containing pairs of G1,G2 points. (2 * 32 bytes) + (2 * 64 bytes)
-          * @return -1 if there was an error, 1 if false and 0 if true 
+          * @return -1 if there was an error, 1 if false and 0 if true
          */
          int32_t alt_bn128_pair(span<const char> g1_g2_pairs) const;
 
@@ -1777,7 +1767,7 @@ namespace webassembly {
           * @return                -1 if there was an error, 0 otherwise
          */
          int32_t blake2_f( uint32_t rounds, span<const char> state, span<const char> message, span<const char> t0_offset, span<const char> t1_offset, int32_t final, span<char> result) const;
-         
+
          /**
           * BLAKE2b-256 hash
           *

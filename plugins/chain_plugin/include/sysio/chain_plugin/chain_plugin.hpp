@@ -257,7 +257,6 @@ public:
 
       bool                       privileged = false;
       fc::time_point             last_code_update;
-      fc::time_point             created;
 
       std::optional<asset>       core_liquid_balance;
 
@@ -919,7 +918,7 @@ public:
 
  template<>
  struct keytype_converter<chain_apis::i256> {
-     using input_type = boost::multiprecision::uint256_t;
+     using input_type = fc::uint256;
      using index_type = chain::index256_index;
      static auto function() {
         return [](const input_type v) {
@@ -1029,7 +1028,7 @@ FC_REFLECT( sysio::chain_apis::read_only::get_producer_schedule_result, (active)
 
 FC_REFLECT( sysio::chain_apis::read_only::account_resource_info, (used)(available)(max)(last_usage_update_time)(current_used) )
 FC_REFLECT( sysio::chain_apis::read_only::get_account_results,
-            (account_name)(head_block_num)(head_block_time)(privileged)(last_code_update)(created)
+            (account_name)(head_block_num)(head_block_time)(privileged)(last_code_update)
             (core_liquid_balance)(ram_quota)(net_weight)(cpu_weight)(net_limit)(cpu_limit)(ram_usage)(permissions)
             (total_resources)
             (subjective_cpu_bill_limit) (sysio_any_linked_actions) )

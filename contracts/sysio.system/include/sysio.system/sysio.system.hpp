@@ -2,6 +2,7 @@
 
 #include <sysio/asset.hpp>
 #include <sysio/binary_extension.hpp>
+#include <sysio/crypto.hpp>
 #include <sysio/privileged.hpp>
 #include <sysio/producer_schedule.hpp>
 #include <sysio/singleton.hpp>

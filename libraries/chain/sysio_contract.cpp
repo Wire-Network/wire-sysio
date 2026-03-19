@@ -24,12 +24,6 @@
 
 namespace sysio::chain {
 
-
-uint128_t transaction_id_to_sender_id( const transaction_id_type& tid ) {
-   fc::uint128 _id = fc::to_uint128(tid._hash[3], tid._hash[2]);
-   return (unsigned __int128)_id;
-}
-
 void validate_authority_precondition( const apply_context& context, const authority& auth ) {
    for(const auto& a : auth.accounts) {
       auto* acct = context.db.find<account_object, by_name>(a.permission.actor);
@@ -93,7 +87,6 @@ void apply_sysio_newaccount(apply_context& context) {
       int ram_delta = 0;
       db.create<account_object>([&](auto& a) {
          a.name = create.name;
-         a.creation_date = context.control.pending_block_time();
       });
       ram_delta += config::billable_size_v<account_object>;
 
@@ -269,7 +262,7 @@ void apply_sysio_updateauth(apply_context& context) {
    auto update = context.get_action().data_as<updateauth>();
 
    // ** NEW ADDED IF STATEMENT **
-   if( update.permission.suffix() != name("ext")) {
+   if( update.permission.prefix() != name("ex")) {
       context.require_authorization(update.account); // only here to mark the single authority on this action as used
    }
 

@@ -1,17 +1,21 @@
 #pragma once
-#include <limits>
+#include <cstdint>
 #include <stdint.h>
 #include <string>
-
-#include <boost/multiprecision/cpp_int.hpp>
 
 namespace fc
 {
 
-   using int128   = boost::multiprecision::int128_t;
+   using int128   = __int128;
    using int128_t = int128;
-   using uint128   = boost::multiprecision::uint128_t;
+   using uint128   = unsigned __int128;
    using uint128_t = uint128;
+
+  // String conversion helpers (replacement for boost::multiprecision .str())
+  std::string to_string( unsigned __int128 v );
+  std::string to_string( __int128 v );
+  unsigned __int128 uint128_from_string( const std::string& s );
+  __int128 int128_from_string( const std::string& s );
 
   class variant;
 
