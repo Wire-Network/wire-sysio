@@ -2,7 +2,11 @@
 #include <sysio/testing/tester.hpp>
 #include <sysio/chain/abi_serializer.hpp>
 #include "sysio.system_tester.hpp"
+#include <contracts.hpp>
 #include <fc/variant_object.hpp>
+#include <fc/crypto/keccak256.hpp>
+#include <fc/crypto/elliptic_em.hpp>
+#include <fc/crypto/private_key.hpp>
 #include <boost/test/unit_test.hpp>
 #include <string>
 #include <type_traits>
@@ -1241,6 +1245,163 @@ BOOST_FIXTURE_TEST_CASE( extendpolicy_blocks_reduce, sysio_roa_full_tester ) try
    // But expand should still work
    BOOST_REQUIRE_NO_THROW(
       expand_roa_policy(node_owners[2], user, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0));
+} FC_LOG_AND_RETHROW()
+
+// ---------------------------------------------------------------------------
+// nodeownreg tests (OPP Node Owner NFT Registration via authex cross-contract)
+// ---------------------------------------------------------------------------
+
+// Helper: replicate authex's pubkey_to_string for EM keys
+static std::string contract_pubkey_to_string(const fc::crypto::public_key& pk) {
+   const auto& shim = pk.get<fc::em::public_key_shim>();
+   auto compressed = shim.serialize();
+   return "PUB_EM_" + fc::to_hex(compressed.data(), compressed.size());
+}
+
+static std::string build_link_message(
+   const fc::crypto::public_key& pub_key,
+   const std::string& account,
+   uint8_t chain_kind,
+   uint64_t nonce
+) {
+   auto pub_key_str = contract_pubkey_to_string(pub_key);
+   return pub_key_str + "|" + account + "|" + std::to_string(chain_kind) + "|" + std::to_string(nonce) + "|createlink auth";
+}
+
+class sysio_roa_nodeownreg_tester : public sysio_roa_tester {
+public:
+   static constexpr auto AUTHEX = "sysio.authex"_n;
+
+   sysio_roa_nodeownreg_tester() {
+      // Deploy authex contract
+      set_code( AUTHEX, contracts::authex_wasm() );
+      set_abi( AUTHEX, contracts::authex_abi().data() );
+      set_privileged( AUTHEX );
+      produce_blocks();
+
+      const auto* accnt = control->find_account_metadata( AUTHEX );
+      BOOST_REQUIRE( accnt != nullptr );
+      abi_def abi;
+      BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt->abi, abi), true);
+      authex_abi_ser.set_abi(abi, abi_serializer::create_yield_function(abi_serializer_max_time));
+   }
+
+   struct em_link_data {
+      fc::crypto::private_key priv;
+      fc::crypto::public_key  pub;
+      fc::crypto::signature   sig;
+      uint64_t                nonce;
+   };
+
+   static constexpr uint8_t CHAIN_KIND_ETHEREUM = 2;
+
+   uint64_t now_ms() {
+      return control->head().block_time().time_since_epoch().count() / 1000;
+   }
+
+   em_link_data make_eth_link(const std::string& account) {
+      uint64_t nonce = now_ms();
+      auto priv = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em);
+      auto pub  = priv.get_public_key();
+      auto msg  = build_link_message(pub, account, CHAIN_KIND_ETHEREUM, nonce);
+      auto msg_hash = fc::crypto::keccak256::hash(msg);
+      auto sig = priv.sign(fc::sha256(reinterpret_cast<const char*>(msg_hash.data()), 32));
+      return { priv, pub, sig, nonce };
+   }
+
+   action_result createlink(const account_name& signer, uint8_t chain_kind,
+                             const fc::crypto::signature& sig,
+                             const fc::crypto::public_key& pub_key, uint64_t nonce)
+   {
+      string action_type_name = authex_abi_ser.get_action_type("createlink"_n);
+      action act;
+      act.account = AUTHEX;
+      act.name    = "createlink"_n;
+      act.data    = authex_abi_ser.variant_to_binary( action_type_name, mvo()
+         ("chain_kind", chain_kind)
+         ("account",    signer)
+         ("sig",        sig)
+         ("pub_key",    pub_key)
+         ("nonce",      nonce),
+         abi_serializer::create_yield_function(abi_serializer_max_time)
+      );
+      return base_tester::push_action( std::move(act), signer.to_uint64_t() );
+   }
+
+   action_result nodeownreg(const name& owner, uint8_t tier, const fc::crypto::public_key& eth_pub_key) {
+      return push_action(ROA, "nodeownreg"_n, mvo()
+         ("owner", owner)
+         ("tier", tier)
+         ("eth_pub_key", eth_pub_key)
+      );
+   }
+
+   abi_serializer authex_abi_ser;
+};
+
+// Happy path: ETH link exists and matches → nodeownreg succeeds
+BOOST_FIXTURE_TEST_CASE( nodeownreg_happy_path, sysio_roa_nodeownreg_tester ) try {
+   auto link = make_eth_link("alice");
+   BOOST_REQUIRE_EQUAL(success(), createlink("alice"_n, CHAIN_KIND_ETHEREUM, link.sig, link.pub, link.nonce));
+   produce_blocks();
+
+   BOOST_REQUIRE_EQUAL(success(), nodeownreg("alice"_n, 1, link.pub));
+   produce_blocks();
+
+   auto alice_owner = get_nodeowner("alice"_n);
+   BOOST_REQUIRE_EQUAL(alice_owner.is_null(), false);
+   BOOST_REQUIRE_EQUAL(alice_owner["tier"].as<uint32_t>(), 1);
+} FC_LOG_AND_RETHROW()
+
+// Wrong ETH pub key → should fail
+BOOST_FIXTURE_TEST_CASE( nodeownreg_wrong_pubkey, sysio_roa_nodeownreg_tester ) try {
+   auto link = make_eth_link("alice");
+   BOOST_REQUIRE_EQUAL(success(), createlink("alice"_n, CHAIN_KIND_ETHEREUM, link.sig, link.pub, link.nonce));
+   produce_blocks();
+
+   // Generate a different key
+   auto wrong_key = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em).get_public_key();
+
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: ETH key does not match the linked key for this account"),
+      nodeownreg("alice"_n, 1, wrong_key));
+} FC_LOG_AND_RETHROW()
+
+// No ETH link → should fail
+BOOST_FIXTURE_TEST_CASE( nodeownreg_no_link, sysio_roa_nodeownreg_tester ) try {
+   auto random_key = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em).get_public_key();
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: Owner has no ETH link in sysio.authex"),
+      nodeownreg("alice"_n, 1, random_key));
+} FC_LOG_AND_RETHROW()
+
+// Already registered → should fail
+BOOST_FIXTURE_TEST_CASE( nodeownreg_already_registered, sysio_roa_nodeownreg_tester ) try {
+   auto link = make_eth_link("alice");
+   BOOST_REQUIRE_EQUAL(success(), createlink("alice"_n, CHAIN_KIND_ETHEREUM, link.sig, link.pub, link.nonce));
+   produce_blocks();
+
+   BOOST_REQUIRE_EQUAL(success(), nodeownreg("alice"_n, 1, link.pub));
+   produce_blocks();
+
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: This account is already registered."),
+      nodeownreg("alice"_n, 2, link.pub));
+} FC_LOG_AND_RETHROW()
+
+// Invalid tier → should fail
+BOOST_FIXTURE_TEST_CASE( nodeownreg_invalid_tier, sysio_roa_nodeownreg_tester ) try {
+   auto link = make_eth_link("alice");
+   BOOST_REQUIRE_EQUAL(success(), createlink("alice"_n, CHAIN_KIND_ETHEREUM, link.sig, link.pub, link.nonce));
+   produce_blocks();
+
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: Tier level must be between 1 and 3"),
+      nodeownreg("alice"_n, 0, link.pub));
+
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: Tier level must be between 1 and 3"),
+      nodeownreg("alice"_n, 4, link.pub));
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_SUITE_END()

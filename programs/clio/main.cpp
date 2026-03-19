@@ -73,6 +73,7 @@ Options:
 #include <unordered_map>
 #include <utility>
 #include <fc/crypto/hex.hpp>
+#include <fc/crypto/keccak256.hpp>
 #include <fc/variant.hpp>
 #include <fc/io/datastream.hpp>
 #include <fc/io/json.hpp>
@@ -2042,6 +2043,41 @@ int main( int argc, char** argv ) {
       }
       auto wasm_hash = fc::sha256::hash(wasm_str.data(), wasm_str.size());
       std::cout << "WASM hash: " << wasm_hash.str() << std::endl;
+   });
+
+   // ---- convert keccak256 ----
+   string keccak_input;
+   bool keccak_hex_input = false;
+   auto keccak_cmd = convert_cmd->add_subcommand("keccak256", localized("Compute Keccak-256 hash of input data"));
+   keccak_cmd->add_option("data", keccak_input, localized("Input data (text by default, or hex with --hex)"))->required();
+   keccak_cmd->add_flag("--hex", keccak_hex_input, localized("Interpret input as hex-encoded bytes"));
+   keccak_cmd->callback([&] {
+      std::vector<uint8_t> bytes;
+      if (keccak_hex_input) {
+         bytes = fc::from_hex(keccak_input);
+      } else {
+         bytes.assign(keccak_input.begin(), keccak_input.end());
+      }
+      auto hash = fc::crypto::keccak256::hash(std::span<const uint8_t>(bytes.data(), bytes.size()));
+      std::cout << hash.str() << std::endl;
+   });
+
+   // ---- convert sha256 ----
+   string sha256_input;
+   bool sha256_hex_input = false;
+   auto sha256_cmd = convert_cmd->add_subcommand("sha256", localized("Compute SHA-256 hash of input data"));
+   sha256_cmd->add_option("data", sha256_input, localized("Input data (text by default, or hex with --hex)"))->required();
+   sha256_cmd->add_flag("--hex", sha256_hex_input, localized("Interpret input as hex-encoded bytes"));
+   sha256_cmd->callback([&] {
+      std::vector<char> bytes;
+      if (sha256_hex_input) {
+         auto hb = fc::from_hex(sha256_input);
+         bytes.assign(hb.begin(), hb.end());
+      } else {
+         bytes.assign(sha256_input.begin(), sha256_input.end());
+      }
+      auto hash = fc::sha256::hash(bytes.data(), bytes.size());
+      std::cout << hash.str() << std::endl;
    });
 
    string k1_private_key;

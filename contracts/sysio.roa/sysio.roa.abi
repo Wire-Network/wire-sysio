@@ -220,6 +220,24 @@
             ]
         },
         {
+            "name": "nodeownreg",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "name"
+                },
+                {
+                    "name": "tier",
+                    "type": "uint8"
+                },
+                {
+                    "name": "eth_pub_key",
+                    "type": "public_key"
+                }
+            ]
+        },
+        {
             "name": "policies",
             "base": "",
             "fields": [
@@ -434,6 +452,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "nodeownreg",
+            "type": "nodeownreg",
+            "ricardian_contract": ""
+        },
+        {
             "name": "reducepolicy",
             "type": "reducepolicy",
             "ricardian_contract": ""
@@ -450,6 +473,13 @@
         }
     ],
     "tables": [
+        {
+            "name": "links",
+            "type": "authex_link",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
         {
             "name": "nodeownerreg",
             "type": "nodeownerreg",

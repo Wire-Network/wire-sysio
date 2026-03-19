@@ -133,6 +133,19 @@ namespace sysio {
             void forcereg(const name& owner, const uint8_t& tier);
 
             /**
+             * @brief Registers a node owner directly when the depot processes an
+             *        inbound OPP NodeOwnerRegistration attestation. Verifies the
+             *        depositor's ETH public key is linked to the owner's Wire account
+             *        via the sysio.authex links table.
+             *
+             * @param owner          The Wire account to register as node owner (must exist).
+             * @param tier           Node owner tier: 1, 2, or 3.
+             * @param eth_pub_key    The ETH public key of the depositor (in Wire PUB_EM format).
+             */
+            [[sysio::action]]
+            void nodeownreg(const name& owner, const uint8_t& tier, const public_key& eth_pub_key);
+
+            /**
              * @brief Creates a new user account on the network and records the sponsor mapping.
              *
              * @ricardian_contract

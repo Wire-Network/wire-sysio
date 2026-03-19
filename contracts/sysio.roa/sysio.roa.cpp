@@ -566,6 +566,45 @@ namespace sysio {
         regnodeowner(owner, tier);
     };
 
+    // Read-only mirror of sysio.authex links table for cross-contract verification.
+    // Must match field order and types exactly for cross-contract deserialization.
+    struct authex_link {
+       uint64_t   key;
+       name       username;
+       uint8_t    chain_kind;
+       public_key pub_key;
+
+       uint64_t  primary_key() const { return key; }
+       uint128_t by_namechain() const {
+          return (static_cast<uint128_t>(username.value) << 64) | static_cast<uint64_t>(chain_kind);
+       }
+    };
+
+    typedef multi_index<"links"_n, authex_link,
+       indexed_by<"bynamechain"_n, const_mem_fun<authex_link, uint128_t, &authex_link::by_namechain>>
+    > authex_links_t;
+
+    void roa::nodeownreg(const name& owner, const uint8_t& tier, const public_key& eth_pub_key) {
+        // Authorized by depot/batch operator processing OPP messages
+        require_auth(get_self()); // TODO: refine to depot account
+
+        check(tier > 0 && tier <= 3, "Tier level must be between 1 and 3");
+        check(is_account(owner), "Owner account does not exist");
+
+        // Verify ETH public key is linked to this Wire account via sysio.authex
+        // Use bynamechain index: look up (owner, chain_kind_ethereum) and verify pub_key matches
+        authex_links_t links("sysio.authex"_n, "sysio.authex"_n.value);
+        auto by_nc = links.get_index<"bynamechain"_n>();
+        constexpr uint8_t chain_kind_ethereum = 2; // fc::crypto::chain_kind_ethereum
+        uint128_t name_chain = (static_cast<uint128_t>(owner.value) << 64) | static_cast<uint64_t>(chain_kind_ethereum);
+        auto itr = by_nc.find(name_chain);
+
+        check(itr != by_nc.end(), "Owner has no ETH link in sysio.authex");
+        check(itr->pub_key == eth_pub_key, "ETH key does not match the linked key for this account");
+
+        regnodeowner(owner, tier);
+    };
+
     // ---- Private Helper Function ----
 
     void roa::regnodeowner(const name& owner, const uint8_t& tier) {

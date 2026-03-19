@@ -123,6 +123,7 @@ enum AttestationType {
    ATTESTATION_TYPE_OPERATOR_REG_DEREG  = 60931; // 0xEE03
    ATTESTATION_TYPE_CHALLENGE_RESPONSE  = 60932; // 0xEE04
    ATTESTATION_TYPE_SLASH_OPERATOR      = 60933; // 0xEE05
+   ATTESTATION_TYPE_NODE_OWNER_REG      = 2101;  // 0x0835
 }
 
 // ---------------------------------------------------------------------------

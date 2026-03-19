@@ -85,6 +85,22 @@ message ReserveDisbursement {
 }
 
 // ---------------------------------------------------------------------------
+//  Node owner registration
+// ---------------------------------------------------------------------------
+
+// Node owner registration via ERC1155 NFT deposit on an external chain.
+message NodeOwnerRegistration {
+  sysio.opp.types.ChainAddress actor          = 1;  // Depositor's ETH address (for reference)
+  bytes                        actor_pub_key  = 2;  // Depositor's full ETH public key (for on-chain verification)
+  sysio.opp.types.WireAccount  wire_account   = 3;  // Pre-existing Wire account to register
+  uint32                       tier           = 4;  // Node owner tier: 1, 2, or 3
+  sysio.opp.types.ChainAddress token_contract = 5;  // ERC1155 contract address
+  uint64                       token_id       = 6;  // NFT token ID
+  uint64                       token_amount   = 7;  // ERC1155 token amount
+  uint64                       timestamp      = 8;  // Deposit block timestamp (seconds)
+}
+
+// ---------------------------------------------------------------------------
 //  Protocol state tracking
 // ---------------------------------------------------------------------------
 
