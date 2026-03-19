@@ -6,6 +6,10 @@
 namespace {
 using namespace sysio;
 
+constexpr name ex_eth = "ex.eth"_n;
+constexpr name ex_sol = "ex.sol"_n;
+constexpr name ex_sui = "ex.sui"_n;
+
 /**
  * Duplicated struct representing ABI of the `updateauth` action.
  */
@@ -25,7 +29,7 @@ struct expandauth {
 
 using ed_raw_key_t = std::array<uint8_t, 32>;
 
-ed_raw_key_t get_ed_raw_key(const sysio::public_key& pub_key) {
+[[maybe_unused]] ed_raw_key_t get_ed_raw_key(const sysio::public_key& pub_key) {
    const auto& arr = std::get<4>(pub_key);
    ed_raw_key_t raw_key;
    std::copy(arr.begin(), arr.end(), raw_key.data());
@@ -127,7 +131,7 @@ namespace sysio {
       assert_recover_key(eth_hash, sig, pub_key);
 
 
-      ex_permission = "ex.eth"_n;
+      ex_permission = ex_eth;
 
    } else if (chain_kind == chain_kind_solana) {
       checksum256 hash256;
@@ -145,7 +149,7 @@ namespace sysio {
       std::memcpy(hash256.data(), mapped, 32);
       assert_recover_key(hash256, sig, pub_key);
 
-      ex_permission = "ex.sol"_n;
+      ex_permission = ex_sol;
    } else if (chain_kind == chain_kind_sui) { // sui
       std::vector<uint8_t> bcs;
       bcs.reserve(4 + msg.size());
@@ -157,7 +161,7 @@ namespace sysio {
                                reinterpret_cast<char*>(raw_digest), sizeof(raw_digest)) == 0,
             "blake2b_256 failed");
 
-      ex_permission = "ex.sui"_n;
+      ex_permission = ex_sui;
    }
 
    // MAKE SURE WE MAPPED TO A SUPPORTED PERMISSION
@@ -211,8 +215,24 @@ namespace sysio {
 
 
 // TODO: Adjust this logic need to handle removal of ex.eth or ex.sol respectively.
-void authex::onmanualrmv(const name& account, const fc::crypto::chain_kind_t kind) {
+void authex::onmanualrmv(const name& account, const name& permission) {
    using namespace fc::crypto;
+
+   chain_kind_t kind;
+   switch (permission.value) {
+   case ex_sol.value:
+      kind = chain_kind_solana;
+      break;
+   case ex_eth.value:
+      kind = chain_kind_ethereum;
+      break;
+   case ex_sui.value:
+      kind = chain_kind_sui;
+      break;
+   default:
+      sysio::check(false, "Invalid permission for removal.");
+      return; // unreachable, silences uninitialized warning
+   }
 
    // Find reference to 'account' in links table via namechain index
    links_t links(get_self(), get_self().value);

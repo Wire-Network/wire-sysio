@@ -289,14 +289,14 @@ namespace sysio { namespace chain {
                   "updateauth action should only have one declared authorization" );
       const auto& auth = auths[0];
 
-      
-      // Prevents users from updating / adding '**.ext' special permissions.
-      if(update.permission.suffix() == name("ext")) {
-         SYS_ASSERT( auth.actor == name("sysio"), invalid_permission, "Protected permission namespace. Only 'sysio' can update or add '**.ext' permissions." );
+
+      // Prevents users from updating / adding protected 'ex.*' permissions.
+      if(update.permission.prefix() == name("ex")) {
+         SYS_ASSERT( auth.actor == name("sysio"), invalid_permission, "Protected permission namespace. Only 'sysio' can update or add 'ex.*' permissions." );
       } else {
          SYS_ASSERT( (auth.actor == update.account), irrelevant_auth_exception,
                      "the owner of the affected permission needs to be the actor of the declared authorization" );
-                     
+
          const auto* min_permission = find_permission({update.account, update.permission});
          if( !min_permission ) { // creating a new permission
             min_permission = &get_permission({update.account, update.parent});

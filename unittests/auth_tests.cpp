@@ -767,22 +767,23 @@ BOOST_FIXTURE_TEST_CASE(ext_permission_protection, validating_tester) {
       // 1) setup accounts and keys
       create_account(name("alice"));
       // 'sysio' already exists in genesis
-      auto alice_ext_priv = get_private_key(name("alice"), "ext");
-      auto alice_ext_pub  = alice_ext_priv.get_public_key();
-      auto sysio_priv     = get_private_key(name("sysio"), "active");
+      auto alice_ext_priv    = get_private_key(name("alice"), "ext");
+      auto alice_ext_pub     = alice_ext_priv.get_public_key();
+      auto alice_active_priv = get_private_key(name("alice"), "active");
+      auto sysio_priv        = get_private_key(name("sysio"), "active");
 
       // build signing‐key vectors
       std::vector<private_key_type> alice_keys;
-      alice_keys.push_back(alice_ext_priv);
+      alice_keys.push_back(alice_active_priv);
 
       std::vector<private_key_type> sysio_keys;
       sysio_keys.push_back(sysio_priv);
 
-      // 2) non-sysio may NOT CREATE foo.ext
+      // 2) non-sysio may NOT CREATE ex.eth
       BOOST_CHECK_THROW(
          set_authority(
             name("alice"),                // account
-            name("foo.ext"),              // new .ext permission
+            name("ex.eth"),              // new ex.* permission
             authority(alice_ext_pub),     // authority ctor from pub_key
             name("active"),               // parent
             std::vector<permission_level>{{name("alice"), name("active")}},
@@ -791,10 +792,10 @@ BOOST_FIXTURE_TEST_CASE(ext_permission_protection, validating_tester) {
          invalid_permission
       );
 
-      // 3) sysio CAN CREATE foo.ext
+      // 3) sysio CAN CREATE ex.eth
       set_authority(
          name("alice"),
-         name("foo.ext"),
+         name("ex.eth"),
          authority(alice_ext_pub),
          name("active"),
          std::vector<permission_level>{{name("sysio"), name("active")}},
@@ -805,17 +806,17 @@ BOOST_FIXTURE_TEST_CASE(ext_permission_protection, validating_tester) {
       // verify creation succeeded
       {
          auto obj = find<permission_object, by_owner>(
-            boost::make_tuple(name("alice"), name("foo.ext"))
+            boost::make_tuple(name("alice"), name("ex.eth"))
          );
          BOOST_TEST(obj != nullptr);
-         BOOST_TEST(obj->name == name("foo.ext"));
+         BOOST_TEST(obj->name == name("ex.eth"));
       }
 
-      // 4) non-sysio may NOT MODIFY foo.ext
+      // 4) non-sysio may NOT MODIFY ex.eth
       BOOST_CHECK_THROW(
          set_authority(
             name("alice"),
-            name("foo.ext"),
+            name("ex.eth"),
             authority(alice_ext_pub),     // same pubkey, wrong actor
             name("active"),
             std::vector<permission_level>{{name("alice"), name("active")}},
@@ -824,7 +825,7 @@ BOOST_FIXTURE_TEST_CASE(ext_permission_protection, validating_tester) {
          invalid_permission
       );
 
-      // 5) sysio CAN MODIFY foo.ext
+      // 5) sysio CAN MODIFY ex.eth
       authority two_of_two;
       two_of_two.threshold = 2;
       two_of_two.keys.emplace_back(key_weight{alice_ext_pub, 1});
@@ -832,7 +833,7 @@ BOOST_FIXTURE_TEST_CASE(ext_permission_protection, validating_tester) {
 
       set_authority(
          name("alice"),
-         name("foo.ext"),
+         name("ex.eth"),
          two_of_two,
          name("active"),
          std::vector<permission_level>{{name("sysio"), name("active")}},
@@ -843,7 +844,7 @@ BOOST_FIXTURE_TEST_CASE(ext_permission_protection, validating_tester) {
       // verify the threshold bump
       {
          auto obj  = get<permission_object, by_owner>(
-            boost::make_tuple(name("alice"), name("foo.ext"))
+            boost::make_tuple(name("alice"), name("ex.eth"))
          );
          auto auth = obj.auth.to_authority();
          BOOST_TEST(auth.threshold == 2u);

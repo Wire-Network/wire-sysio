@@ -50,7 +50,7 @@ namespace sysio {
      * @param permission    the permission which was removed.
      */
     [[sysio::on_notify("sysio::deleteauth")]]
-    void onmanualrmv(const name& account, const fc::crypto::chain_kind_t kind);
+    void onmanualrmv(const name& account, const name& permission);
 
     // ! For testing only, remove before MAINNET deployment.
     [[sysio::action]] void clearlinks();
