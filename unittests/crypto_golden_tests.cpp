@@ -19,8 +19,11 @@
 #include <fc/crypto/bls_public_key.hpp>
 #include <fc/crypto/bls_signature.hpp>
 
+#include <fc/crypto/bls_utils.hpp>
+
 #include <boost/test/unit_test.hpp>
 
+#include <cstring>
 #include <string>
 #include <vector>
 
@@ -277,8 +280,9 @@ BOOST_AUTO_TEST_CASE(bls_sign_verify_determinism) {
    auto digest = sha256::hash("bls test message", 16);
    auto sig = privkey.sign_sha256(digest);
 
-   std::vector<uint8_t> msg(reinterpret_cast<const uint8_t*>("bls test message"),
-                            reinterpret_cast<const uint8_t*>("bls test message") + 16);
+   // Verify signature against the digest bytes (sign_sha256 signs the raw digest span)
+   BOOST_CHECK(fc::crypto::bls::verify(pubkey, digest.to_uint8_span(), sig));
+
    // Signature serialization round-trip
    auto sig_bytes = sig.serialize();
    auto sig2 = fc::crypto::bls::signature(sig_bytes);

@@ -1,5 +1,6 @@
 #include "test_api_db.hpp"
 #include <sysio/transaction.hpp>
+#include <vector>
 
 using namespace sysio;
 
@@ -1198,8 +1199,8 @@ void test_api_db::test_transaction_size()
    sysio_assert(sz > 0, "transaction_size must be > 0");
 
    // Verify read_transaction agrees with transaction_size
-   char buf[512];
-   size_t read_sz = sysio::read_transaction(buf, sizeof(buf));
+   std::vector<char> buf(sz);
+   size_t read_sz = sysio::read_transaction(buf.data(), buf.size());
    sysio_assert(read_sz == sz, "read_transaction size != transaction_size");
 }
 
