@@ -48,18 +48,23 @@ if("native-module" IN_LIST SYSIO_WASM_RUNTIMES)
 endif()
 
 # Explicitly produce copied contract artifacts so cmake knows how to build them
-set(TESTING_DST_BIOS_DIR ${CMAKE_BINARY_DIR}/libraries/testing/contracts/sysio.bios)
-set(TESTING_DST_ROA_DIR  ${CMAKE_BINARY_DIR}/libraries/testing/contracts/sysio.roa)
+set(TESTING_DST_BIOS_DIR    ${CMAKE_BINARY_DIR}/libraries/testing/contracts/sysio.bios)
+set(TESTING_DST_ROA_DIR     ${CMAKE_BINARY_DIR}/libraries/testing/contracts/sysio.roa)
+set(TESTING_DST_AUTHEX_DIR  ${CMAKE_BINARY_DIR}/libraries/testing/contracts/sysio.authex)
 
-set(BIOS_WASM_SRC ${CMAKE_BINARY_DIR}/contracts/sysio.bios/sysio.bios.wasm)
-set(BIOS_ABI_SRC  ${CMAKE_BINARY_DIR}/contracts/sysio.bios/sysio.bios.abi)
-set(ROA_WASM_SRC  ${CMAKE_BINARY_DIR}/contracts/sysio.roa/sysio.roa.wasm)
-set(ROA_ABI_SRC   ${CMAKE_BINARY_DIR}/contracts/sysio.roa/sysio.roa.abi)
+set(BIOS_WASM_SRC   ${CMAKE_BINARY_DIR}/contracts/sysio.bios/sysio.bios.wasm)
+set(BIOS_ABI_SRC    ${CMAKE_BINARY_DIR}/contracts/sysio.bios/sysio.bios.abi)
+set(ROA_WASM_SRC    ${CMAKE_BINARY_DIR}/contracts/sysio.roa/sysio.roa.wasm)
+set(ROA_ABI_SRC     ${CMAKE_BINARY_DIR}/contracts/sysio.roa/sysio.roa.abi)
+set(AUTHEX_WASM_SRC ${CMAKE_BINARY_DIR}/contracts/sysio.authex/sysio.authex.wasm)
+set(AUTHEX_ABI_SRC  ${CMAKE_BINARY_DIR}/contracts/sysio.authex/sysio.authex.abi)
 
-set(BIOS_WASM_DST ${TESTING_DST_BIOS_DIR}/sysio.bios.wasm)
-set(BIOS_ABI_DST  ${TESTING_DST_BIOS_DIR}/sysio.bios.abi)
-set(ROA_WASM_DST  ${TESTING_DST_ROA_DIR}/sysio.roa.wasm)
-set(ROA_ABI_DST   ${TESTING_DST_ROA_DIR}/sysio.roa.abi)
+set(BIOS_WASM_DST   ${TESTING_DST_BIOS_DIR}/sysio.bios.wasm)
+set(BIOS_ABI_DST    ${TESTING_DST_BIOS_DIR}/sysio.bios.abi)
+set(ROA_WASM_DST    ${TESTING_DST_ROA_DIR}/sysio.roa.wasm)
+set(ROA_ABI_DST     ${TESTING_DST_ROA_DIR}/sysio.roa.abi)
+set(AUTHEX_WASM_DST ${TESTING_DST_AUTHEX_DIR}/sysio.authex.wasm)
+set(AUTHEX_ABI_DST  ${TESTING_DST_AUTHEX_DIR}/sysio.authex.abi)
 
 if(BUILD_SYSTEM_CONTRACTS OR BUILD_TEST_CONTRACTS)
   # When building contracts from source, copy only if changed and update stamp file
@@ -76,10 +81,14 @@ if(BUILD_SYSTEM_CONTRACTS OR BUILD_TEST_CONTRACTS)
       -DDST3="${ROA_WASM_DST}"
       -DSRC4="${ROA_ABI_SRC}"
       -DDST4="${ROA_ABI_DST}"
-      -DCOUNT=4
+      -DSRC5="${AUTHEX_WASM_SRC}"
+      -DDST5="${AUTHEX_WASM_DST}"
+      -DSRC6="${AUTHEX_ABI_SRC}"
+      -DDST6="${AUTHEX_ABI_DST}"
+      -DCOUNT=6
       -DSTAMP_FILE="${CONTRACTS_COPY_STAMP}"
       -P "${CMAKE_SOURCE_DIR}/cmake/scripts/contract_copy_if_changed_and_stamp.cmake"
-    BYPRODUCTS ${BIOS_WASM_DST} ${BIOS_ABI_DST} ${ROA_WASM_DST} ${ROA_ABI_DST} ${CONTRACTS_COPY_STAMP}
+    BYPRODUCTS ${BIOS_WASM_DST} ${BIOS_ABI_DST} ${ROA_WASM_DST} ${ROA_ABI_DST} ${AUTHEX_WASM_DST} ${AUTHEX_ABI_DST} ${CONTRACTS_COPY_STAMP}
     COMMENT "Checking and copying test contracts to testing libraries build directory"
   )
   # Ensure contracts are built before copying
@@ -87,18 +96,21 @@ if(BUILD_SYSTEM_CONTRACTS OR BUILD_TEST_CONTRACTS)
 else()
   # When using pre-built contracts, use add_custom_command for proper dependency tracking
   add_custom_command(
-    OUTPUT ${BIOS_WASM_DST} ${BIOS_ABI_DST} ${ROA_WASM_DST} ${ROA_ABI_DST}
+    OUTPUT ${BIOS_WASM_DST} ${BIOS_ABI_DST} ${ROA_WASM_DST} ${ROA_ABI_DST} ${AUTHEX_WASM_DST} ${AUTHEX_ABI_DST}
     COMMAND ${CMAKE_COMMAND} -E make_directory ${TESTING_DST_BIOS_DIR}
     COMMAND ${CMAKE_COMMAND} -E make_directory ${TESTING_DST_ROA_DIR}
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${TESTING_DST_AUTHEX_DIR}
     COMMAND ${CMAKE_COMMAND} -E copy ${BIOS_WASM_SRC} ${BIOS_WASM_DST}
     COMMAND ${CMAKE_COMMAND} -E copy ${BIOS_ABI_SRC}  ${BIOS_ABI_DST}
     COMMAND ${CMAKE_COMMAND} -E copy ${ROA_WASM_SRC}  ${ROA_WASM_DST}
     COMMAND ${CMAKE_COMMAND} -E copy ${ROA_ABI_SRC}   ${ROA_ABI_DST}
-    DEPENDS ${BIOS_WASM_SRC} ${BIOS_ABI_SRC} ${ROA_WASM_SRC} ${ROA_ABI_SRC}
+    COMMAND ${CMAKE_COMMAND} -E copy ${AUTHEX_WASM_SRC} ${AUTHEX_WASM_DST}
+    COMMAND ${CMAKE_COMMAND} -E copy ${AUTHEX_ABI_SRC}  ${AUTHEX_ABI_DST}
+    DEPENDS ${BIOS_WASM_SRC} ${BIOS_ABI_SRC} ${ROA_WASM_SRC} ${ROA_ABI_SRC} ${AUTHEX_WASM_SRC} ${AUTHEX_ABI_SRC}
     COMMENT "Copying test contracts to testing libraries build directory"
   )
   add_custom_target(sysio_testing_contracts_copy ALL
-    DEPENDS ${BIOS_WASM_DST} ${BIOS_ABI_DST} ${ROA_WASM_DST} ${ROA_ABI_DST}
+    DEPENDS ${BIOS_WASM_DST} ${BIOS_ABI_DST} ${ROA_WASM_DST} ${ROA_ABI_DST} ${AUTHEX_WASM_DST} ${AUTHEX_ABI_DST}
   )
 endif()
 

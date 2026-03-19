@@ -1336,6 +1336,23 @@ class Cluster(object):
             Utils.Print("ERROR: Failed to set sysio.roa as privileged")
             return None
 
+        sysioAuthexAccount = copy.deepcopy(sysioAccount)
+        sysioAuthexAccount.name = 'sysio.authex'
+        contract="sysio.authex"
+        contractDir=str(self.libTestingContractsPath / contract)
+        wasmFile="%s.wasm" % (contract)
+        abiFile="%s.abi" % (contract)
+        Utils.Print("Publish %s contract" % (contract))
+        trans=biosNode.publishContract(sysioAuthexAccount, contractDir, wasmFile, abiFile, waitForTransBlock=True)
+        if trans is None:
+            Utils.Print("ERROR: Failed to publish contract %s." % (contract))
+            return None
+
+        trans=biosNode.setPriv(sysioAuthexAccount, sysioAccount, isPriv=True, waitForTransBlock=True)
+        if trans is None:
+            Utils.Print("ERROR: Failed to set sysio.authex as privileged")
+            return None
+
         if loadSystemContract:
             Utils.Print("Set default emission config")
             action="setemitcfg"

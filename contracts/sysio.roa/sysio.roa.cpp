@@ -2,6 +2,8 @@
 #include "sysio.system/native.hpp"
 #include "sysio.system/emissions.hpp"
 
+#include <sysio.authex/sysio.authex.hpp>
+
 namespace sysio {
 
     bool is_sysio_account(const name& account) {
@@ -555,6 +557,37 @@ namespace sysio {
         require_auth(get_self());
 
         check(tier > 0 && tier <= 3, "Tier level must be between 1 and 3");
+
+        regnodeowner(owner, tier);
+    };
+
+    void roa::nodeownreg(const name& owner, const uint8_t& tier, const public_key& eth_pub_key) {
+        // Authorized by depot/batch operator processing OPP messages.
+        // TODO: refine to depot account once it is finalized.
+        require_auth(get_self());
+
+        check(tier > 0 && tier <= 3, "Tier level must be between 1 and 3");
+        // EVM links in sysio.authex store EM (secp256k1) keys exclusively. Reject
+        // other variants up-front so the downstream equality-mismatch error doesn't
+        // hide a key-type bug at the caller.
+        check(eth_pub_key.index() == fc::crypto::key_type_em,
+              "eth_pub_key must be an EM (secp256k1) public key");
+        check(is_account(owner), "Owner account does not exist");
+
+        // Verify the depositor's ETH public key is linked to `owner` via
+        // sysio.authex's links table. Cross-contract kv::table read.
+        //
+        // EVM-only by design: NFT deposits land on Ethereum. If the flow is
+        // ever extended to SVM (Solana) or another ChainKind, promote the
+        // chain kind to an action parameter and look up the matching link
+        // instead of hardcoding CHAIN_KIND_EVM.
+        authex::links_t links("sysio.authex"_n);
+        auto by_namechain = links.get_index<"bynamechain"_n>();
+        const uint128_t name_chain = to_namechain_key(owner, opp::types::ChainKind::CHAIN_KIND_EVM);
+        auto itr = by_namechain.find(name_chain);
+
+        check(itr != by_namechain.end(), "Owner has no ETH link in sysio.authex");
+        check(itr->pub_key == eth_pub_key, "ETH key does not match the linked key for this account");
 
         regnodeowner(owner, tier);
     };
