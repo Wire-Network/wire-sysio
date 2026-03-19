@@ -1,5 +1,8 @@
 {
   "extends": "./etc/tsconfig/tsconfig.base.json",
+  "compilerOptions": {
+    "preserveWatchOutput": true
+  },
   "files": [],
   "exclude": [
     "**/node_modules/**",
@@ -13,6 +16,6 @@
   "references": [
     {
       "path": "./tests/app-server/tsconfig.json"
-    },
+    }
   ]
 }
