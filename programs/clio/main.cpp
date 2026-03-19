@@ -1577,8 +1577,6 @@ void get_account( const string& accountName, const string& coresym, bool json_fo
 
    auto res = json.as<sysio::chain_apis::read_only::get_account_results>();
    if (!json_format) {
-      std::cout << "created: " << res.created.to_iso_string() << std::endl;
-
       if(res.privileged) std::cout << "privileged: true" << std::endl;
 
       constexpr size_t indent_size = 5;

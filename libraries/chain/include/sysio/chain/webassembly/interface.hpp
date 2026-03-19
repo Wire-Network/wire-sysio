@@ -468,16 +468,6 @@ namespace webassembly {
          bool check_permission_authorization(account_name account, permission_name permission, legacy_span<const char> pubkeys_data, legacy_span<const char> perms_data, uint64_t delay_us) const;
 
          /**
-          * Returns the creation time of an account.
-          *
-          * @ingroup permission
-          * @param account - the account name.
-          *
-          * @return the creation time (in microseconds since Unix epoch) of the account.
-         */
-         int64_t get_account_creation_time(account_name account) const;
-
-         /**
           * Look up the permission of an account with the smallest name >= the given permission name.
           *
           * @ingroup permission
