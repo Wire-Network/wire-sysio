@@ -1,6 +1,7 @@
 set(contract_name sysio.authex)
 bootstrap_contract(${contract_name})
 if(BUILD_SYSTEM_CONTRACTS)
+  find_cdt_magic_enum()
   file(GLOB_RECURSE SOURCES src/*.cpp)
   file(GLOB_RECURSE HEADERS include/*.hpp src/*.hpp)
   add_contract(${contract_name} ${contract_name} ${SOURCES})
@@ -29,7 +30,14 @@ if(BUILD_SYSTEM_CONTRACTS)
             PUBLIC
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/libfc-lite/include>
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/../../libraries/opp/generated-cdt>
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.system/include>
     )
+
+    target_link_libraries(${target}
+            INTERFACE
+            magic_enum::magic_enum
+    )
+
   endforeach()
 endif()
