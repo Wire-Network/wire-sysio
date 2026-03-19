@@ -1,7 +1,6 @@
 {
   "extends": "../../etc/tsconfig/tsconfig.base.esm.json",
   "compilerOptions": {
-    "module": "bundler",
     "outDir": "./lib",
     "rootDir": "./src",
   },
