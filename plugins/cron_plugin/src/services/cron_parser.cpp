@@ -235,7 +235,7 @@ std::optional<cron_service::job_schedule> parse_cron_schedule(std::string_view c
 
 cron_service::job_schedule parse_cron_schedule_or_throw(std::string_view cron_expr) {
    auto result = parse_cron_schedule(cron_expr);
-   FC_ASSERT(result.has_value(), "Failed to parse cron schedule: '${expr}'", ("expr", cron_expr));
+   FC_ASSERT(result.has_value(), "Failed to parse cron schedule: '{}'", cron_expr);
    return std::move(*result);
 }
 

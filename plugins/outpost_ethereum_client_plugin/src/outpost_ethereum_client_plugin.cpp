@@ -73,10 +73,15 @@ void outpost_ethereum_client_plugin::plugin_initialize(const variables_map& opti
       auto& id           = parts[0];
       auto& url          = parts[2];
       auto& sig_id       = parts[1];
-      fc::ostring chain_id_str = parts[3];
-      std::optional<fc::uint256> chain_id;
-      if (chain_id_str.has_value())
-         chain_id = std::make_optional<fc::uint256>(fc::to_uint256(chain_id_str.value()));
+      fc::uint256 chain_id;
+      fc::ostring chain_id_str;
+      if (parts.size() == 4) {
+         chain_id_str = parts[3];
+         if (chain_id_str.has_value())
+            chain_id = fc::to_uint256(chain_id_str.value());
+      } else {
+         ilog("chainId: none");
+      }
 
       auto  sig_provider = plug_sig->get_provider(sig_id);
       my->add_client(id,
