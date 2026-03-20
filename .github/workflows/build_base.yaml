@@ -30,7 +30,7 @@ jobs:
       fail-fast: false
       matrix:
         platform: ${{fromJSON(inputs.platform-list)}}
-    runs-on: ["self-hosted", "enf-x86-beefy"]
+    runs-on: ["hosted-runner", "self-hosted", "enf-x86-beefy"]
     container:
       image: ${{ fromJSON(inputs.platforms)[matrix.platform].image }}
       credentials:
