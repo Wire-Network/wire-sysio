@@ -44,7 +44,7 @@ jobs:
       packages: write
       contents: read
     with:
-      runs-on: '["core-repo-runner-01", "self-hosted", "enf-x86-beefy"]'
+      runs-on: '{"group": "core-repo-group"}'
       platform-files: |
         .cicd/platforms
 
@@ -143,7 +143,8 @@ jobs:
           - cfg: {name: 'asan',          base: 'asan', builddir: 'asan'}
           - cfg: {name: 'asserton',      base: 'asserton', builddir: 'asserton'}
           - cfg: {name: 'gcc',      base: 'gcc', builddir: 'gcc'}
-    runs-on: ["core-repo-runner-01", "self-hosted", "enf-x86-beefy"]
+    runs-on:
+      group: core-repo-group
     container:
       image: ${{fromJSON(needs.platform-cache.outputs.platforms)[matrix.cfg.base].image}}
       credentials:
@@ -265,7 +266,8 @@ jobs:
           - cfg: {name: 'asserton',      base: 'asserton', builddir: 'asserton'}
           - cfg: {name: 'gcc',      base: 'gcc', builddir: 'gcc'}
 
-    runs-on: ["core-repo-runner-01", "self-hosted", "enf-x86-midtier"]
+    runs-on:
+      group: core-repo-group
 
     steps:
       - name: Create ephemeral Docker context
@@ -374,7 +376,8 @@ jobs:
           - cfg: {name: 'ubsan',         base: 'ubsan',    builddir: 'ubsan'}
           - cfg: {name: 'asserton',      base: 'asserton', builddir: 'asserton'}
           - cfg: {name: 'gcc',      base: 'gcc', builddir: 'gcc'}
-    runs-on: ["core-repo-runner-01", "self-hosted", "enf-x86-lowtier"]
+    runs-on:
+      group: core-repo-group
 
     steps:
       - name: Create ephemeral Docker context
