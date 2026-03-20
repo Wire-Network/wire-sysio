@@ -270,6 +270,9 @@ jobs:
       group: core-repo-group
 
     steps:
+      - name: Login to GHCR
+        run: echo "${{ secrets.GH_TOKEN_DEV }}" | docker login ghcr.io -u dev-wire --password-stdin
+
       - name: Cleanup stale containers
         run: |
           echo "Removing old containers..."
@@ -338,6 +341,9 @@ jobs:
       group: core-repo-group
 
     steps:
+      - name: Login to GHCR
+        run: echo "${{ secrets.GH_TOKEN_DEV }}" | docker login ghcr.io -u dev-wire --password-stdin
+
       - name: Cleanup stale containers
         run: |
           echo "Removing old containers..."
