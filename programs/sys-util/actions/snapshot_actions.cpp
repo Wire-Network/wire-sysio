@@ -73,13 +73,10 @@ int snapshot_actions::run_tojson() {
    if(!opt->chain_id.empty()) { // override it
       chain_id = chain_id_type(opt->chain_id);
    }
-   else { // try to retrieve it
-      auto infile = std::ifstream(snapshot_path.generic_string(),
-                               (std::ios::in | std::ios::binary));
-      istream_snapshot_reader reader(infile);
-      reader.validate();
+   else { // try to retrieve it; load_index() is cheap (no hash verification)
+      threaded_snapshot_reader reader(snapshot_path);
+      reader.load_index();
       chain_id = controller::extract_chain_id(reader);
-      infile.close();
    }
 
    // setup controller
@@ -99,9 +96,7 @@ int snapshot_actions::run_tojson() {
    protocol_feature_set pfs = initialize_protocol_features( std::filesystem::path("protocol_features"), false );
 
    try {
-      auto infile = std::ifstream(snapshot_path.generic_string(),
-                                  (std::ios::in | std::ios::binary));
-      auto reader = std::make_shared<istream_snapshot_reader>(infile);
+      auto reader = std::make_shared<threaded_snapshot_reader>(snapshot_path);
 
       auto check_shutdown = []() { return false; };
       auto shutdown = []() { throw; };
@@ -109,7 +104,6 @@ int snapshot_actions::run_tojson() {
       control.reset(new controller(cfg, std::move(pfs), chain_id));
       control->add_indices();
       control->startup(shutdown, check_shutdown, reader);
-      infile.close();
 
       ilog("Writing snapshot: {}", json_path.string());
       auto snap_out = std::ofstream(json_path.generic_string(), (std::ios::out));

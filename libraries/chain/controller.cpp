@@ -1415,7 +1415,7 @@ struct controller_impl {
       }
 
       if( conf.integrity_hash_on_start )
-         ilog( "chain database started with hash: {}", calculate_integrity_hash() );
+         ilog( "chain database started with hash: {}", calculate_integrity_hash().str() );
       okay_to_print_integrity_hash_on_stop = true;
 
       replaying = true;
@@ -1456,7 +1456,7 @@ struct controller_impl {
 
       //only log this not just if configured to, but also if initialization made it to the point we'd log the startup too
       if(okay_to_print_integrity_hash_on_stop && conf.integrity_hash_on_stop)
-         ilog( "chain database stopped with hash: {}", calculate_integrity_hash() );
+         ilog( "chain database stopped with hash: {}", calculate_integrity_hash().str() );
    }
 
    void add_indices() {
@@ -1710,8 +1710,7 @@ struct controller_impl {
          merkle_processor->read_from_snapshot(snapshot);
       }
 
-      constexpr unsigned max_snapshot_load_threads = 4;
-      const unsigned snapshot_load_threads = snapshot->supports_threading() ? max_snapshot_load_threads : 1;
+      const unsigned snapshot_load_threads = snapshot->supports_threading() ? snapshot_writer::max_threads : 1;
 
       snapshot_load_workqueue.run(snapshot_load_threads, std::chrono::seconds(5), [&]() {
          ilog("Snapshot initialization {}% complete", (unsigned)(((double)rows_loaded/total_snapshot_rows)*100));
@@ -1736,13 +1735,12 @@ struct controller_impl {
       return bsp ? bsp->strong_digest : digest_type{};
    }
 
-   fc::sha256 calculate_integrity_hash() {
-      fc::sha256::encoder enc;
-      auto hash_writer = std::make_shared<integrity_hash_snapshot_writer>(enc);
+   fc::crypto::blake3 calculate_integrity_hash() {
+      auto hash_writer = std::make_shared<integrity_hash_snapshot_writer>();
       add_to_snapshot(hash_writer);
       hash_writer->finalize();
 
-      return enc.result();
+      return hash_writer->get_integrity_hash();
    }
 
    void create_native_account( const fc::time_point& initial_timestamp, account_name name, const authority& owner, const authority& active, bool is_privileged = false ) {
@@ -4215,7 +4213,7 @@ digest_type controller::get_strong_digest_by_id( const block_id_type& id ) const
    return my->get_strong_digest_by_id(id);
 }
 
-fc::sha256 controller::calculate_integrity_hash() { try {
+fc::crypto::blake3 controller::calculate_integrity_hash() { try {
    return my->calculate_integrity_hash();
 } FC_LOG_AND_RETHROW() }
 

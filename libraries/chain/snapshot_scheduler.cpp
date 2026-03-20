@@ -170,12 +170,9 @@ void snapshot_scheduler::create_snapshot(next_function<snapshot_information> nex
    auto write_snapshot = [&](const fs::path& p) -> void {
       if(predicate) predicate();
       fs::create_directory(p.parent_path());
-      auto snap_out = std::ofstream(p.generic_string(), (std::ios::out | std::ios::binary));
-      auto writer = std::make_shared<ostream_snapshot_writer>(snap_out);
+      auto writer = std::make_shared<threaded_snapshot_writer>(p);
       chain.write_snapshot(writer);
       writer->finalize();
-      snap_out.flush();
-      snap_out.close();
    };
 
    // If in irreversible mode, create snapshot and return path to snapshot immediately.

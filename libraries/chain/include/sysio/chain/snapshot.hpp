@@ -1,22 +1,54 @@
 #pragma once
 
+#include <sysio/chain/blake3_encoder.hpp>
 #include <sysio/chain/database_utils.hpp>
 #include <sysio/chain/exceptions.hpp>
-#include <fc/variant_object.hpp>
-#include <fc/io/random_access_file.hpp>
-#include <boost/core/demangle.hpp>
-#include <ostream>
-#include <memory>
-#include <fc/crypto/elliptic_ed.hpp>
+
 #include <fc/variant.hpp>
+#include <fc/variant_object.hpp>
 #include <fc/io/raw.hpp>
+#include <fc/io/random_access_file.hpp>
+#include <fc/crypto/blake3.hpp>
+#include <fc/crypto/elliptic_ed.hpp>
 #include <fc/reflect/reflect.hpp>
+
+#include <boost/core/demangle.hpp>
+
+#include <atomic>
+#include <cstring>
+#include <filesystem>
+#include <fstream>
+#include <memory>
+#include <ostream>
+#include <streambuf>
 
 
 namespace sysio { namespace chain {
    /**
     * History:
-    * Version 1: initial version with string identified sections and rows
+    * Version 1: sequential write with parallel hash and index at end of file
+    *
+    * File format v1:
+    *   [Header]  (8 bytes)
+    *     magic:        uint32_t  (0x57495245 "WIRE")
+    *     version:      uint32_t  (1)
+    *
+    *   [Section Data]
+    *     section 0 raw packed rows
+    *     section 1 raw packed rows
+    *     ...
+    *
+    *   [Section Index] (num_sections entries, sorted by section name)
+    *     name:         null-terminated string
+    *     data_offset:  uint64_t  (from start of file)
+    *     data_size:    uint64_t
+    *     row_count:    uint64_t
+    *     hash:         char[32]  (BLAKE3 of section row data)
+    *
+    *   [Footer]  (44 bytes)
+    *     num_sections: uint32_t
+    *     root_hash:    char[32]  (BLAKE3 of concatenated section hashes in canonical order)
+    *     index_offset: uint64_t  (byte offset where section index starts)
     */
    static const uint32_t current_snapshot_version = 1;
 
@@ -78,6 +110,7 @@ namespace sysio { namespace chain {
       struct abstract_snapshot_row_writer {
          virtual void write(ostream_wrapper& out) const = 0;
          virtual void write(fc::sha256::encoder& out) const = 0;
+         virtual void write(blake3_encoder& out) const = 0;
          virtual fc::variant to_variant() const = 0;
          virtual std::string row_type_name() const = 0;
       };
@@ -97,6 +130,10 @@ namespace sysio { namespace chain {
          }
 
          void write(fc::sha256::encoder& out) const override {
+            write_stream(out);
+         }
+
+         void write(blake3_encoder& out) const override {
             write_stream(out);
          }
 
@@ -122,6 +159,7 @@ namespace sysio { namespace chain {
    class snapshot_writer {
       public:
          static constexpr uint32_t magic_number = 0x57495245; // WIRE in ASCII
+         static constexpr uint32_t max_threads  = 4;
 
          class section_writer {
             public:
@@ -164,6 +202,15 @@ namespace sysio { namespace chain {
    };
 
    using snapshot_writer_ptr = std::shared_ptr<snapshot_writer>;
+
+   /// Section metadata shared by threaded_snapshot_writer and threaded_snapshot_reader.
+   struct snapshot_section_entry {
+      std::string        name;
+      uint64_t           data_offset = 0;
+      uint64_t           data_size = 0;
+      uint64_t           row_count = 0;
+      fc::crypto::blake3 hash;
+   };
 
    namespace detail {
       struct abstract_snapshot_row_reader {
@@ -298,6 +345,8 @@ namespace sysio { namespace chain {
 
       virtual bool supports_threading() const {return false;}
 
+      virtual bool has_section( const std::string& section_name ) const { return false; }
+
       virtual ~snapshot_reader(){};
 
       protected:
@@ -336,6 +385,7 @@ namespace sysio { namespace chain {
          void clear_section() override;
          void return_to_header() override;
          size_t total_row_count() override;
+         bool has_section( const std::string& section_name ) const override;
 
       private:
          const fc::variant& snapshot;
@@ -343,21 +393,72 @@ namespace sysio { namespace chain {
          uint64_t cur_row;
    };
 
-   class ostream_snapshot_writer : public snapshot_writer {
+   /**
+    * Snapshot writer for v1 format.
+    *
+    * Writes sections sequentially to the output file. Each section's BLAKE3
+    * hash is computed inline during writes via a buffering streambuf, so no
+    * post-write re-read pass is needed. finalize() computes the root hash
+    * and appends the section index and footer.
+    */
+   class threaded_snapshot_writer : public snapshot_writer {
       public:
-         explicit ostream_snapshot_writer(std::ostream& snapshot);
+         explicit threaded_snapshot_writer(std::filesystem::path snapshot_path);
 
          const char* name() const override { return "snapshot"; }
-         void write_start_section( const std::string& section_name ) override;
-         void write_row( const detail::abstract_snapshot_row_writer& row_writer ) override;
-         void write_end_section( ) override;
+
+         /// Compute root hash, write index and footer.
+         /// Must be called after all write_section() calls complete.
          void finalize();
 
+         /// Returns the root hash (valid only after finalize()).
+         fc::crypto::blake3 get_root_hash() const { return root_hash_; }
+
+      protected:
+         void write_start_section( const std::string& section_name ) override;
+         void write_row( const detail::abstract_snapshot_row_writer& row_writer ) override;
+         void write_end_section() override;
+
       private:
-         detail::ostream_wrapper snapshot;
-         std::streampos          header_pos;
-         std::streampos          section_pos;
-         uint64_t                row_count;
+         /// Buffering streambuf that incrementally BLAKE3-hashes all writes
+         /// before forwarding them to the underlying file streambuf.
+         class hashing_streambuf : public std::streambuf {
+         public:
+            hashing_streambuf() = default;
+            void init(std::streambuf* sink, size_t buf_size = 1024 * 1024);
+
+            /// Flush buffer, return accumulated section hash, and reset hasher.
+            fc::crypto::blake3 finalize_section();
+
+            /// Flush buffer and reset hasher (discards accumulated hash).
+            void reset_section();
+
+         protected:
+            int_type overflow(int_type ch) override;
+            int sync() override;
+            std::streamsize xsputn(const char_type* s, std::streamsize count) override;
+            pos_type seekoff(off_type, std::ios_base::seekdir,
+                             std::ios_base::openmode = std::ios_base::out) override;
+
+         private:
+            void flush_buffer();
+            std::streambuf*    sink_ = nullptr;
+            blake3_encoder     hasher_;
+            std::vector<char>  buf_;
+         };
+
+         std::filesystem::path          snapshot_path_;
+         std::ofstream                  out_;
+         hashing_streambuf              hash_sbuf_;
+         std::ostream                   hash_os_{&hash_sbuf_};
+         detail::ostream_wrapper        wrapper_{hash_os_};
+
+         std::string                    current_section_name_;
+         uint64_t                       current_section_offset_ = 0;
+         uint64_t                       current_row_count_ = 0;
+
+         std::vector<snapshot_section_entry> sections_;
+         fc::crypto::blake3             root_hash_;
    };
 
    class ostream_json_snapshot_writer : public snapshot_writer {
@@ -373,27 +474,6 @@ namespace sysio { namespace chain {
       private:
          detail::ostream_wrapper snapshot;
          uint64_t                row_count;
-   };
-
-   class istream_snapshot_reader : public snapshot_reader {
-      public:
-         explicit istream_snapshot_reader(std::istream& snapshot);
-
-         void validate() override;
-         void set_section( const string& section_name ) override;
-         bool read_row( detail::abstract_snapshot_row_reader& row_reader ) override;
-         bool empty ( ) override;
-         void clear_section() override;
-         void return_to_header() override;
-         size_t total_row_count() override;
-
-      private:
-         bool validate_section() const;
-
-         std::istream&  snapshot;
-         std::streampos header_pos;
-         uint64_t       num_rows;
-         uint64_t       cur_row;
    };
 
    class istream_json_snapshot_reader : public snapshot_reader {
@@ -415,6 +495,13 @@ namespace sysio { namespace chain {
          std::unique_ptr<struct istream_json_snapshot_reader_impl> impl;
    };
 
+   /**
+    * Memory-mapped snapshot reader for v1 format.
+    *
+    * Parses the section index on validate() for O(1) section lookup.
+    * Thread-local datastream state allows multiple threads to read different
+    * sections concurrently from the same memory-mapped file.
+    */
    class threaded_snapshot_reader : public snapshot_reader {
       public:
          explicit threaded_snapshot_reader(const std::filesystem::path& snapshot_path);
@@ -428,10 +515,24 @@ namespace sysio { namespace chain {
          size_t total_row_count() override;
          bool supports_threading() const override {return true;}
 
+         bool has_section( const std::string& section_name ) const override;
+
+         /// Parse header, footer, and section index without verifying hashes.
+         /// Sufficient for lightweight operations like chain_id extraction.
+         void load_index();
+
+         /// Returns the root hash read from the file header (valid after validate()).
+         fc::crypto::blake3 get_root_hash() const { return root_hash_; }
+
       private:
          fc::random_access_file                   snapshot_file;
          const boost::interprocess::mapped_region mapped_snap;
          const char* const                        mapped_snap_addr;
+
+         std::vector<snapshot_section_entry>       section_index_;
+         fc::crypto::blake3                       root_hash_;
+         bool                                     index_loaded_ = false;
+         bool                                     validated_ = false;
 
          thread_local inline static fc::datastream<const char*> ds = fc::datastream<const char*>(nullptr, 0);
          thread_local inline static uint64_t                    num_rows;
@@ -440,7 +541,7 @@ namespace sysio { namespace chain {
 
    class integrity_hash_snapshot_writer : public snapshot_writer {
       public:
-         explicit integrity_hash_snapshot_writer(fc::sha256::encoder&  enc);
+         integrity_hash_snapshot_writer() = default;
 
          const char* name() const override { return "integrity hash"; }
          void write_start_section( const std::string& section_name ) override;
@@ -448,23 +549,36 @@ namespace sysio { namespace chain {
          void write_end_section( ) override;
          void finalize();
 
-      private:
-         fc::sha256::encoder&  enc;
+         fc::crypto::blake3 get_integrity_hash() const { return root_hash_; }
 
+      private:
+         struct section_hash {
+            std::string        name;
+            fc::crypto::blake3 hash;
+         };
+
+         blake3_encoder                  current_encoder_;
+         std::string                     current_section_name_;
+         std::vector<section_hash>       section_hashes_;
+         fc::crypto::blake3              root_hash_;
    };
-   
+
    struct snapshot_written_row_counter {
       snapshot_written_row_counter(const size_t total, const char* name) : total(total), name(name) {}
       void progress() {
-         if(++count % 50000 == 0 && time(NULL) - last_print >= 5) {
-            ilog("{} creation {}% complete", name, std::min((unsigned)(((double)count/total)*100),100u));
-            last_print = time(NULL);
+         auto c = count.fetch_add(1, std::memory_order_relaxed) + 1;
+         if(c % 50000 == 0) {
+            auto now = time(NULL);
+            auto expected = last_print.load(std::memory_order_relaxed);
+            if(now - expected >= 5 && last_print.compare_exchange_strong(expected, now, std::memory_order_relaxed)) {
+               ilog("{} creation {}% complete", name, std::min((unsigned)(((double)c/total)*100),100u));
+            }
          }
       }
-      size_t count = 0;
+      std::atomic<size_t> count{0};
       const size_t total = 0;
       const char* name = nullptr;
-      time_t last_print = time(NULL);
+      std::atomic<time_t> last_print{time(NULL)};
    };
 
    fc::variant snapshot_info(snapshot_reader& snapshot);

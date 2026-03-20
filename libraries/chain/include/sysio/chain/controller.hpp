@@ -373,7 +373,7 @@ namespace sysio::chain {
          // thread-safe
          digest_type get_strong_digest_by_id( const block_id_type& id ) const; // used in unittests
 
-         fc::sha256 calculate_integrity_hash();
+         fc::crypto::blake3 calculate_integrity_hash();
          void write_snapshot( const snapshot_writer_ptr& snapshot );
          // thread-safe
          bool is_writing_snapshot()const;
