@@ -12,7 +12,7 @@ int main(int argc, char** argv) {
 
    chain::application exe{application_config{.enable_resource_monitor = false, .log_on_exit = false}};
 
-   auto r = exe.init<outpost_ethereum_client_plugin, cron_plugin, beacon_chain_update_plugin>(argc, argv);
+   auto r = exe.init<signature_provider_manager_plugin, outpost_ethereum_client_plugin, cron_plugin, beacon_chain_update_plugin>(argc, argv);
    if (r != exit_code::SUCCESS)
       return r == exit_code::NODE_MANAGEMENT_SUCCESS ? exit_code::SUCCESS : r;
 
