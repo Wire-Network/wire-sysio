@@ -44,7 +44,7 @@ jobs:
       packages: write
       contents: read
     with:
-      runs-on: '["self-hosted", "enf-x86-beefy"]'
+      runs-on: '["hosted-runner", "self-hosted", "enf-x86-beefy"]'
       platform-files: |
         .cicd/platforms
 
@@ -143,7 +143,7 @@ jobs:
           - cfg: {name: 'asan',          base: 'asan', builddir: 'asan'}
           - cfg: {name: 'asserton',      base: 'asserton', builddir: 'asserton'}
           - cfg: {name: 'gcc',      base: 'gcc', builddir: 'gcc'}
-    runs-on: ["self-hosted", "enf-x86-beefy"]
+    runs-on: ["hosted-runner", "self-hosted", "enf-x86-beefy"]
     container:
       image: ${{fromJSON(needs.platform-cache.outputs.platforms)[matrix.cfg.base].image}}
       credentials:
@@ -265,7 +265,7 @@ jobs:
           - cfg: {name: 'asserton',      base: 'asserton', builddir: 'asserton'}
           - cfg: {name: 'gcc',      base: 'gcc', builddir: 'gcc'}
 
-    runs-on: ["self-hosted", "enf-x86-midtier"]
+    runs-on: ["hosted-runner", "self-hosted", "enf-x86-midtier"]
 
     steps:
       - name: Create ephemeral Docker context
@@ -374,7 +374,7 @@ jobs:
           - cfg: {name: 'ubsan',         base: 'ubsan',    builddir: 'ubsan'}
           - cfg: {name: 'asserton',      base: 'asserton', builddir: 'asserton'}
           - cfg: {name: 'gcc',      base: 'gcc', builddir: 'gcc'}
-    runs-on: ["self-hosted", "enf-x86-lowtier"]
+    runs-on: ["hosted-runner", "self-hosted", "enf-x86-lowtier"]
 
     steps:
       - name: Create ephemeral Docker context
