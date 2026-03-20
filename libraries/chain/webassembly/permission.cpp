@@ -3,6 +3,7 @@
 #include <sysio/chain/authorization_manager.hpp>
 #include <sysio/chain/transaction_context.hpp>
 #include <sysio/chain/apply_context.hpp>
+#include <sysio/chain/permission_object.hpp>
 
 namespace sysio { namespace chain { namespace webassembly {
    void unpack_provided_keys( flat_set<public_key_type>& keys, const char* pubkeys_data, uint32_t pubkeys_size ) {
@@ -73,10 +74,36 @@ namespace sysio { namespace chain { namespace webassembly {
       return false;
    }
 
-   int64_t interface::get_account_creation_time( account_name account ) const {
-      const auto* acct = context.db.find<account_object, by_name>(account);
-      SYS_ASSERT( acct != nullptr, action_validate_exception,
-                  "account '{}' does not exist", account );
-      return time_point(acct->creation_date).time_since_epoch().count();
+   int32_t interface::get_permission_lower_bound( account_name account, permission_name permission, span<char> buffer ) {
+      const auto& idx = context.db.get_index<permission_index>().indices().get<by_owner>();
+      auto itr = idx.lower_bound( boost::make_tuple( account, permission ) );
+      if( itr == idx.end() || itr->owner != account )
+         return -1;
+
+      // Resolve parent permission name (parent is stored as OID, root has id 0)
+      permission_name parent_name;
+      if( itr->parent._id != 0 ) {
+         const auto* parent_obj = context.db.find<permission_object>( itr->parent );
+         if( parent_obj )
+            parent_name = parent_obj->name;
+      }
+
+      // Serialize: perm_name, parent_name, last_updated, authority
+      authority auth = itr->auth.to_authority();
+      size_t data_size = fc::raw::pack_size( itr->name ) + fc::raw::pack_size( parent_name )
+                       + fc::raw::pack_size( itr->last_updated ) + fc::raw::pack_size( auth );
+
+      std::vector<char> data( data_size );
+      fc::datastream<char*> ds( data.data(), data.size() );
+      fc::raw::pack( ds, itr->name );
+      fc::raw::pack( ds, parent_name );
+      fc::raw::pack( ds, itr->last_updated );
+      fc::raw::pack( ds, auth );
+
+      auto copy_size = std::min( static_cast<size_t>(buffer.size()), data_size );
+      if( copy_size > 0 )
+         std::memcpy( buffer.data(), data.data(), copy_size );
+
+      return static_cast<int32_t>( data_size );
    }
 }}} // ns sysio::chain::webassembly

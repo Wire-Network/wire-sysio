@@ -132,6 +132,10 @@ namespace sysio {
         // Set sysio new account limits.
         set_resource_limits(sys_account, sysio_ram_bytes, -1, -1);
 
+        constexpr uint64_t authex_ram_bytes = 1024 * 1000;
+        set_reslimit("sysio.authex"_n, asset(0, total_sys.symbol), asset(0, total_sys.symbol), authex_ram_bytes);
+        set_resource_limits("sysio.authex"_n, authex_ram_bytes, -1,-1);
+
         // Add policy for sys_account for tracking RAM provided to accounts for account creation
         policies_t policies(get_self(), sys_account.value);
         policies.emplace(get_self(), [&](auto& row) {
@@ -146,6 +150,8 @@ namespace sysio {
         // Provide RAM for sysio.acct itself, but provide no CPU/NET
         set_reslimit("sysio.acct"_n, asset(0, total_sys.symbol), asset(0, total_sys.symbol), sysiosystem::newaccount_ram);
         set_resource_limits("sysio.acct"_n, sysiosystem::newaccount_ram, 0, 0);
+
+
     };
 
     void roa::setbyteprice(const uint64_t& bytes_per_unit) {
@@ -161,7 +167,7 @@ namespace sysio {
         check(state.is_active, "ROA is not currently active");
         check(sysiosystem::newaccount_ram == (sysiosystem::newaccount_ram / bytes_per_unit) * bytes_per_unit,
               "newaccount_ram needs to be evenly divisable to avoid dust");
-        
+
         state.bytes_per_unit = bytes_per_unit;
 
         // Set values to table.
@@ -338,7 +344,7 @@ namespace sysio {
             row.time_block = new_time_block;
         });
     };
-    
+
     void roa::reducepolicy(const name& owner, const name& issuer, const asset& net_weight, const asset& cpu_weight, const asset& ram_weight,
                            const uint8_t& network_gen)
     {
@@ -445,7 +451,7 @@ namespace sysio {
     };
 
     void roa::initnodereg(const name& owner) {
-        
+
         require_auth(permission_level{owner, "auth.ext"_n});
 
         roastate_t roastate(get_self(), get_self().value);
@@ -458,7 +464,7 @@ namespace sysio {
 
         nodeownerreg_t nodereg(get_self(), state.network_gen);
         auto nodereg_itr = nodereg.find(owner.value);
-        
+
         if (nodereg_itr != nodereg.end()) {
             check(nodereg_itr->status == 3, "A registration is already pending or confirmed.");
 
@@ -483,16 +489,16 @@ namespace sysio {
     };
 
     void roa::setpending(const name& owner, const uint8_t& tier ,const checksum256& trx_id, const uint128_t& block_num, const bytes& sig) {
-        
+
         require_auth(permission_level{owner, "auth.ext"_n});
-    
+
         roastate_t roastate(get_self(), get_self().value);
         auto state = roastate.get();
         check(state.is_active, "ROA is not active yet");
 
         nodeownerreg_t nodereg(get_self(), state.network_gen);
         auto nodereg_itr = nodereg.find(owner.value);
-        
+
         check(nodereg_itr != nodereg.end(),"Registration not initialized yet");
 
         check(tier > 0 && tier <= 3 , "Tier level must be between 1 and 3");
@@ -505,10 +511,10 @@ namespace sysio {
         check(foundtrxId == bytrxid_index.end(),"This trx Id is already used");
 
         nodereg.modify(nodereg_itr,get_self(),[&](auto &row){
-            row.status = 1; 
+            row.status = 1;
             row.trx_id = trx_id;
             row.trx_signature = sig;
-            row.tier = tier; 
+            row.tier = tier;
             row.block_num = block_num;
         });
         // TODO: might need to add require_receipient(account_name) call to notify validators of a new pending transaction
@@ -519,7 +525,7 @@ namespace sysio {
 
         // TODO -> Require authorization for validator !!!
         // require_auth();
-        
+
         roastate_t roastate(get_self(), get_self().value);
         auto state = roastate.get();
         check(state.is_active, "ROA is not active yet");
@@ -535,14 +541,14 @@ namespace sysio {
         check(status == 3 || status == 4, "Invalid status: Can only confirm (2) or reject (3)");
 
         if(status == 2){
-            
+
             regnodeowner(owner,nodereg_itr->tier);
 
             nodereg.modify(nodereg_itr,get_self(),[&](auto &row){
                 row.status = 2;
             });
 
-            //TODO -> Add require_receipient(account_name) call to notify council contract 
+            //TODO -> Add require_receipient(account_name) call to notify council contract
             // require_receipient("Council");
 
         } else {
@@ -565,7 +571,7 @@ namespace sysio {
     void roa::regnodeowner(const name& owner, const uint8_t& tier) {
 
         roastate_t roastate(get_self(), get_self().value);
-        auto state = roastate.get(); 
+        auto state = roastate.get();
         check(state.is_active, "ROA is not active yet");
 
         nodeowners_t nodeowners(get_self(), state.network_gen);
@@ -574,7 +580,7 @@ namespace sysio {
 
         // Get the total SYS allocation for this tier
         asset total_sys_allocation = get_allocation_for_tier(tier);
-        
+
         // We will track how much is allocated to bandwidth (CPU/NET) and RAM separately
         asset allocated_sys(0, state.total_sys.symbol);
         asset allocated_bw(0, state.total_sys.symbol);
@@ -608,11 +614,11 @@ namespace sysio {
             policies.emplace(get_self(), [&](auto& row) {
                 row.owner = owner;
                 row.issuer = owner;
-                row.net_weight = net_cpu_weight; 
-                row.cpu_weight = net_cpu_weight; 
-                row.ram_weight = personal_ram_weight; 
+                row.net_weight = net_cpu_weight;
+                row.cpu_weight = net_cpu_weight;
+                row.ram_weight = personal_ram_weight;
                 row.bytes_per_unit = state.bytes_per_unit;
-                row.time_block = 1; 
+                row.time_block = 1;
             });
 
             // Create sysio policy for RAM
@@ -621,7 +627,7 @@ namespace sysio {
                 row.issuer = owner;
                 row.net_weight = zero_asset;
                 row.cpu_weight = zero_asset;
-                row.ram_weight = sysio_allocation; 
+                row.ram_weight = sysio_allocation;
                 row.bytes_per_unit = state.bytes_per_unit;
                 row.time_block = UINT32_MAX; // do not allow to be extended
             });
@@ -654,7 +660,7 @@ namespace sysio {
             row.allocated_ram = allocated_ram;
             row.network_gen = state.network_gen;
         });
-        
+
         // TODO: Notify Council contract if needed
     };
 
@@ -663,7 +669,7 @@ namespace sysio {
         // Retrieve the current roastate
         roastate_t roastate(get_self(), get_self().value);
         auto state = roastate.get();
-        
+
         // Ensure the contract is active
         check(state.is_active, "Contract not active yet.");
 
@@ -767,8 +773,8 @@ namespace sysio {
         }
         check(created, "Failed to generate a unique account name after 3 attempts");
 
-        auto owner_auth = sysiosystem::authority{1, {{pubkey, 1}}, {}, {}};
-        auto active_auth = sysiosystem::authority{1, {{pubkey, 1}}, {}, {}};
+        auto owner_auth = sysiosystem::authority{1, {{pubkey, 1}}, {}};
+        auto active_auth = sysiosystem::authority{1, {{pubkey, 1}}, {}};
         action(
             permission_level{get_self(), "active"_n},
             "sysio"_n, "newaccount"_n,

@@ -336,7 +336,7 @@ BOOST_AUTO_TEST_CASE( fix_linkauth_restriction ) { try {
            ("account", name(tester_account).to_string())
            ("permission", "first")
            ("parent", "active")
-           ("auth",  authority(chain.get_public_key(tester_account, "first"), 5))
+           ("auth",  authority(chain.get_public_key(tester_account, "first")))
    );
 
    auto validate_disallow = [&] (const char *code, const char *type) {

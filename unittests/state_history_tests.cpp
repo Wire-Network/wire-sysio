@@ -1225,7 +1225,7 @@ BOOST_AUTO_TEST_CASE(test_delta_abi_roundtrip) {
          auto* obj = chain.control->db().find<account_object, by_name>(name);
          BOOST_REQUIRE_MESSAGE(obj != nullptr, "Account " + name.to_string() + " not in chainbase");
          BOOST_CHECK_EQUAL(acc["name"].as_string(), obj->name.to_string());
-         BOOST_CHECK_EQUAL(acc["creation_date"].as<block_timestamp_type>(), obj->creation_date);
+         BOOST_CHECK_EQUAL(acc["creation_date"].as<block_timestamp_type>(), block_timestamp_type{}); // always zero after removal
       }
    }
 

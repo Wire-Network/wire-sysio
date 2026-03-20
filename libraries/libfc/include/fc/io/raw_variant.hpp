@@ -22,11 +22,11 @@ namespace fc { namespace raw {
          }
          virtual void handle( const fc::int128& v )const
          {
-            fc::raw::pack( s, v.str() );
+            fc::raw::pack( s, fc::to_string(v) );
          }
          virtual void handle( const fc::uint128& v )const
          {
-            fc::raw::pack( s, v.str() );
+            fc::raw::pack( s, fc::to_string(v) );
          }
          virtual void handle( const fc::int256& v )const
          {

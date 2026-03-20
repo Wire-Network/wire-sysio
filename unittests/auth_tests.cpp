@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE( bls_key_not_allowed_for_trx ) { try {
 
    chain.create_accounts( {"alice"_n} );
    chain.produce_block();
-   private_key_type bls_active_priv_key = private_key_type::generate<bls::private_key_shim>(); // bls sigs not allowed
+   private_key_type bls_active_priv_key = private_key_type::generate(private_key_type::key_type::bls); // bls sigs not allowed
    public_key_type bls_active_pub_key = bls_active_priv_key.get_public_key();
    BOOST_REQUIRE_THROW( chain.set_authority(name("alice"), name("active"), authority(bls_active_pub_key), name("owner"),
                        { permission_level{name("alice"), name("active")} }, { chain.get_private_key(name("alice"), "active") }),
@@ -608,7 +608,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( linkauth_special, TESTER, validating_testers ) { 
            ("account", "tester")
            ("permission", "first")
            ("parent", "active")
-           ("auth",  authority(chain.get_public_key(tester_account, "first"), 5))
+           ("auth",  authority(chain.get_public_key(tester_account, "first")))
    );
 
    auto validate_disallow = [&] (const char *type) {
@@ -767,22 +767,23 @@ BOOST_FIXTURE_TEST_CASE(ext_permission_protection, validating_tester) {
       // 1) setup accounts and keys
       create_account(name("alice"));
       // 'sysio' already exists in genesis
-      auto alice_ext_priv = get_private_key(name("alice"), "ext");
-      auto alice_ext_pub  = alice_ext_priv.get_public_key();
-      auto sysio_priv     = get_private_key(name("sysio"), "active");
+      auto alice_ext_priv    = get_private_key(name("alice"), "ext");
+      auto alice_ext_pub     = alice_ext_priv.get_public_key();
+      auto alice_active_priv = get_private_key(name("alice"), "active");
+      auto sysio_priv        = get_private_key(name("sysio"), "active");
 
       // build signing‐key vectors
       std::vector<private_key_type> alice_keys;
-      alice_keys.push_back(alice_ext_priv);
+      alice_keys.push_back(alice_active_priv);
 
       std::vector<private_key_type> sysio_keys;
       sysio_keys.push_back(sysio_priv);
 
-      // 2) non-sysio may NOT CREATE foo.ext
+      // 2) non-sysio may NOT CREATE ex.eth
       BOOST_CHECK_THROW(
          set_authority(
             name("alice"),                // account
-            name("foo.ext"),              // new .ext permission
+            name("ex.eth"),              // new ex.* permission
             authority(alice_ext_pub),     // authority ctor from pub_key
             name("active"),               // parent
             std::vector<permission_level>{{name("alice"), name("active")}},
@@ -791,10 +792,10 @@ BOOST_FIXTURE_TEST_CASE(ext_permission_protection, validating_tester) {
          invalid_permission
       );
 
-      // 3) sysio CAN CREATE foo.ext
+      // 3) sysio CAN CREATE ex.eth
       set_authority(
          name("alice"),
-         name("foo.ext"),
+         name("ex.eth"),
          authority(alice_ext_pub),
          name("active"),
          std::vector<permission_level>{{name("sysio"), name("active")}},
@@ -805,17 +806,17 @@ BOOST_FIXTURE_TEST_CASE(ext_permission_protection, validating_tester) {
       // verify creation succeeded
       {
          auto obj = find<permission_object, by_owner>(
-            boost::make_tuple(name("alice"), name("foo.ext"))
+            boost::make_tuple(name("alice"), name("ex.eth"))
          );
          BOOST_TEST(obj != nullptr);
-         BOOST_TEST(obj->name == name("foo.ext"));
+         BOOST_TEST(obj->name == name("ex.eth"));
       }
 
-      // 4) non-sysio may NOT MODIFY foo.ext
+      // 4) non-sysio may NOT MODIFY ex.eth
       BOOST_CHECK_THROW(
          set_authority(
             name("alice"),
-            name("foo.ext"),
+            name("ex.eth"),
             authority(alice_ext_pub),     // same pubkey, wrong actor
             name("active"),
             std::vector<permission_level>{{name("alice"), name("active")}},
@@ -824,7 +825,7 @@ BOOST_FIXTURE_TEST_CASE(ext_permission_protection, validating_tester) {
          invalid_permission
       );
 
-      // 5) sysio CAN MODIFY foo.ext
+      // 5) sysio CAN MODIFY ex.eth
       authority two_of_two;
       two_of_two.threshold = 2;
       two_of_two.keys.emplace_back(key_weight{alice_ext_pub, 1});
@@ -832,7 +833,7 @@ BOOST_FIXTURE_TEST_CASE(ext_permission_protection, validating_tester) {
 
       set_authority(
          name("alice"),
-         name("foo.ext"),
+         name("ex.eth"),
          two_of_two,
          name("active"),
          std::vector<permission_level>{{name("sysio"), name("active")}},
@@ -843,12 +844,63 @@ BOOST_FIXTURE_TEST_CASE(ext_permission_protection, validating_tester) {
       // verify the threshold bump
       {
          auto obj  = get<permission_object, by_owner>(
-            boost::make_tuple(name("alice"), name("foo.ext"))
+            boost::make_tuple(name("alice"), name("ex.eth"))
          );
          auto auth = obj.auth.to_authority();
          BOOST_TEST(auth.threshold == 2u);
       }
 
 } FC_LOG_AND_RETHROW() } // ext_permission_protection
+
+BOOST_AUTO_TEST_CASE( authority_without_waits ) { try {
+   // Verify that authority without waits validates and works correctly
+   validating_tester chain;
+   auto key = chain.get_public_key("test"_n, "active");
+   authority auth(key);
+   BOOST_REQUIRE_EQUAL(auth.threshold, 1u);
+   BOOST_REQUIRE_EQUAL(auth.keys.size(), 1u);
+   BOOST_REQUIRE_EQUAL(auth.accounts.size(), 0u);
+   BOOST_REQUIRE(validate(auth));
+
+   // Multi-key authority
+   auto key2 = chain.get_public_key("test"_n, "owner");
+   authority multi_auth(2, {{key, 1}, {key2, 1}});
+   multi_auth.sort_fields();
+   BOOST_REQUIRE(validate(multi_auth));
+
+   // Authority with accounts
+   authority acct_auth(permission_level{"test"_n, "active"_n});
+   BOOST_REQUIRE(validate(acct_auth));
+} FC_LOG_AND_RETHROW() }
+
+BOOST_AUTO_TEST_CASE( authority_threshold_not_lowered ) { try {
+   // Verify that authority threshold is not silently lowered.
+   // With wait_weight removed, an authority with threshold 2
+   // cannot be satisfied by a single key of weight 1.
+   validating_tester chain;
+   chain.create_accounts( {"alice"_n} );
+   chain.produce_block();
+
+   auto key = chain.get_public_key("alice"_n, "test");
+   // Set an authority with threshold 2 but only one key with weight 1
+   // This should fail validation since total weight (1) < threshold (2)
+   BOOST_REQUIRE_THROW(
+      chain.push_action(config::system_account_name, updateauth::get_name(), "alice"_n, fc::mutable_variant_object()
+              ("account", "alice")
+              ("permission", "test1")
+              ("parent", "active")
+              ("auth", authority(2, {{key, 1}}))
+      ),
+      action_validate_exception
+   );
+
+   // With threshold matching available weight, it should succeed
+   chain.push_action(config::system_account_name, updateauth::get_name(), "alice"_n, fc::mutable_variant_object()
+           ("account", "alice")
+           ("permission", "test1")
+           ("parent", "active")
+           ("auth", authority(1, {{key, 1}}))
+   );
+} FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()

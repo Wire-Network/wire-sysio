@@ -76,7 +76,3 @@ std::array<uint64_t, 4> city_hash_crc_256(const char* s, size_t len);
 
 } // namespace fc
 
-template <>
-struct std::hash<fc::uint128> {
-   size_t operator()(const fc::uint128& s) const noexcept { return fc::city_hash_size_t((char*)&s, sizeof(s)); }
-};

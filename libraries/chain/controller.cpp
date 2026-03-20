@@ -1747,7 +1747,6 @@ struct controller_impl {
       int64_t ram_delta = 0;
       db.create<account_object>([&](auto& a) {
          a.name = name;
-         a.creation_date = initial_timestamp;
       });
       ram_delta += config::billable_size_v<account_object>;
 

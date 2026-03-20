@@ -84,7 +84,7 @@ namespace fc::crypto {
           * Note for Wire native types (k1, r1, wa, bls) the prefix is always included.
           * For k1 if include_prefix is false, then the legacy prefix is used instead of PUB_K1_
           */
-         std::string to_string(const fc::yield_function_t& yield, bool include_prefix = false) const;
+         std::string to_string(const fc::yield_function_t& yield, bool include_pub_prefix = false) const;
 
          template<typename... Args>
          bool contains() const { return (std::holds_alternative<Args>(_storage) || ...); }

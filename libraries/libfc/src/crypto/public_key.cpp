@@ -57,7 +57,7 @@ namespace fc::crypto {
       return std::visit([](const auto& key) { return key.valid(); }, _storage);
    }
 
-   std::string public_key::to_string(const fc::yield_function_t& yield, bool include_prefix) const {
+   std::string public_key::to_string(const fc::yield_function_t& yield, bool include_pub_prefix) const {
       switch (type()) {
       case key_type::k1:
       case key_type::r1:
@@ -67,20 +67,28 @@ namespace fc::crypto {
                return std::visit(base58str_visitor<storage_type, fc::crypto::constants::public_key_prefix, 0>(yield), _storage);
             return std::visit(base58str_visitor<storage_type, fc::crypto::constants::public_key_prefix, -1>(yield), _storage);
          };
-         if (type() == key_type::k1 && !include_prefix) {
+         if (type() == key_type::k1 && !include_pub_prefix) {
             return std::string(fc::crypto::constants::public_key_legacy_prefix) + visit(0);
          }
          return std::string(fc::crypto::constants::public_key_base_prefix) + "_" + visit(-1);
       }
       case key_type::em: {
-         std::string prefix = include_prefix
-                                 ? std::string(constants::public_key_base_prefix) + "_" + key_prefix(key_type::em) + "_"
+         std::string prefix = include_pub_prefix
+                                 ? std::format(
+                                    "{}_{}_",
+                                    constants::public_key_base_prefix,
+                                    key_prefix(key_type::em))
                                  : "";
-         return prefix + get<em::public_key_shim>().to_string();
+
+
+         return prefix + get<em::public_key_shim>().to_string(include_pub_prefix);
       }
       case key_type::ed: {
-         std::string prefix = include_prefix
-                                 ? std::string(constants::public_key_base_prefix) + "_" + key_prefix(key_type::ed) + "_"
+         std::string prefix = include_pub_prefix
+                                 ? std::format(
+                                    "{}_{}_",
+                                    constants::public_key_base_prefix,
+                                    key_prefix(key_type::ed))
                                  : "";
          return prefix + get<ed::public_key_shim>().to_string(yield);
       }

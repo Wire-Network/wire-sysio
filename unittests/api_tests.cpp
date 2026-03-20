@@ -69,13 +69,6 @@ struct check_auth {
 
 FC_REFLECT(check_auth, (account)(permission)(pubkeys) )
 
-struct test_permission_last_used_action {
-   account_name     account;
-   permission_name  permission;
-   fc::time_point   last_used_time;
-};
-
-FC_REFLECT( test_permission_last_used_action, (account)(permission)(last_used_time) )
 
 constexpr uint64_t TEST_METHOD(const char* CLASS, const char *METHOD) {
   return ( (uint64_t(DJBH(CLASS))<<32) | uint32_t(DJBH(METHOD)) );
@@ -1179,6 +1172,33 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(db_tests, T, validating_testers) { try {
    chain.push_action( "testapi"_n, "s1l"_n, "testapi"_n, mutable_variant_object() ); // idx64_lowerbound
    chain.push_action( "testapi"_n, "s1u"_n, "testapi"_n, mutable_variant_object() ); // idx64_upperbound
 
+   chain.push_action( "testapi"_n, "s2g"_n, "testapi"_n, mutable_variant_object() ); // idx128_general
+   chain.push_action( "testapi"_n, "s2l"_n, "testapi"_n, mutable_variant_object() ); // idx128_lowerbound
+   chain.push_action( "testapi"_n, "s2u"_n, "testapi"_n, mutable_variant_object() ); // idx128_upperbound
+
+   chain.push_action( "testapi"_n, "s3g"_n, "testapi"_n, mutable_variant_object() ); // idx256_general
+   chain.push_action( "testapi"_n, "s3l"_n, "testapi"_n, mutable_variant_object() ); // idx256_lowerbound
+   chain.push_action( "testapi"_n, "s3u"_n, "testapi"_n, mutable_variant_object() ); // idx256_upperbound
+
+   chain.push_action( "testapi"_n, "s4g"_n, "testapi"_n, mutable_variant_object() ); // idx_double_general
+   chain.push_action( "testapi"_n, "s4l"_n, "testapi"_n, mutable_variant_object() ); // idx_double_lowerbound
+   chain.push_action( "testapi"_n, "s4u"_n, "testapi"_n, mutable_variant_object() ); // idx_double_upperbound
+
+   chain.push_action( "testapi"_n, "s5g"_n, "testapi"_n, mutable_variant_object() ); // idx_long_double_general
+   chain.push_action( "testapi"_n, "s5l"_n, "testapi"_n, mutable_variant_object() ); // idx_long_double_lowerbound
+   chain.push_action( "testapi"_n, "s5u"_n, "testapi"_n, mutable_variant_object() ); // idx_long_double_upperbound
+
+   // Action I/O: verify action_data_size, read_action_data, current_receiver
+   chain.push_action( "testapi"_n, "actsize"_n, "testapi"_n, mutable_variant_object()("val", 42) );
+   chain.push_action( "testapi"_n, "actread"_n, "testapi"_n, mutable_variant_object()("val", 0xDEADBEEFCAFEBABEULL) );
+   chain.push_action( "testapi"_n, "actrecv"_n, "testapi"_n, mutable_variant_object() );
+
+   // Transaction metadata: verify transaction_size, expiration, tapos, read_transaction
+   chain.push_action( "testapi"_n, "trxsize"_n, "testapi"_n, mutable_variant_object() );
+   chain.push_action( "testapi"_n, "trxexp"_n,  "testapi"_n, mutable_variant_object() );
+   chain.push_action( "testapi"_n, "trxtapos"_n,"testapi"_n, mutable_variant_object() );
+   chain.push_action( "testapi"_n, "trxread"_n, "testapi"_n, mutable_variant_object() );
+
    // Store value in primary table
    chain.push_action( "testapi"_n, "tia"_n, "testapi"_n, mutable_variant_object() // test_invalid_access
       ("code", "testapi")
@@ -2048,35 +2068,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(datastream_tests, T, validating_testers) { try {
    chain.produce_block();
 
    CALL_TEST_FUNCTION( chain, "test_datastream", "test_basic", {} );
-
-   BOOST_REQUIRE_EQUAL( chain.validate(), true );
-} FC_LOG_AND_RETHROW() }
-
-/*************************************************************************************
- * account_creation_time_tests test cases
- *************************************************************************************/
-BOOST_AUTO_TEST_CASE_TEMPLATE(account_creation_time_tests, T, validating_testers) { try {
-   T chain;
-
-   chain.produce_block();
-   chain.create_account( "testapi"_n );
-   chain.produce_block();
-   chain.set_code("testapi"_n, test_contracts::test_api_wasm() );
-   chain.produce_block();
-
-   chain.create_account( "alice"_n );
-   auto alice_creation_time = chain.control->pending_block_time();
-
-   chain.produce_block();
-
-   CALL_TEST_FUNCTION( chain, "test_permission", "test_account_creation_time",
-                       fc::raw::pack(test_permission_last_used_action{
-                           "alice"_n, config::active_name,
-                           alice_creation_time
-                       })
-   );
-
-   chain.produce_block();
 
    BOOST_REQUIRE_EQUAL( chain.validate(), true );
 } FC_LOG_AND_RETHROW() }
