@@ -1,0 +1,99 @@
+syntax = "proto3";
+
+package sysio.opp.attestations;
+
+import "sysio/opp/types/types.proto";
+import "sysio/opp/opp.proto";
+
+option cc_enable_arenas = true;
+
+// ---------------------------------------------------------------------------
+//  Common (Pre & Post Launch) Attestations
+// ---------------------------------------------------------------------------
+
+// Reserve balance snapshot for a given chain.
+message ChainReserveBalanceSheet {
+  sysio.opp.types.ChainKind               kind = 1;
+  repeated sysio.opp.types.TokenAmount amounts = 2;
+}
+
+// ---------------------------------------------------------------------------
+//  Pre-launch specific attestations
+// ---------------------------------------------------------------------------
+
+// Pre-token stake attestation.
+message PretokenStakeChange {
+  sysio.opp.types.ChainAddress actor = 1;
+  sysio.opp.types.TokenAmount amount = 2;
+  int64                index_at_mint = 10; // -1 == unstake action
+  int64                index_at_burn = 11; // -1 == stake action
+}
+
+// Pre-token purchase attestation.
+message PretokenPurchase {
+  sysio.opp.types.ChainAddress actor = 1;
+  sysio.opp.types.TokenAmount  amount = 2;
+  int64                        pretoken_count = 3;
+  int64                        index_at_mint = 10;
+}
+
+// Pre-token yield distribution.
+message PretokenYield {
+  sysio.opp.types.ChainAddress actor = 1;
+  sysio.opp.types.TokenAmount  amount = 2;
+  int64                        index_at_mint = 3;
+}
+
+// ---------------------------------------------------------------------------
+//  Post-launch attestations
+// ---------------------------------------------------------------------------
+
+// Stake status update.
+message StakeUpdate {
+  sysio.opp.types.ChainAddress actor = 1;
+  sysio.opp.types.StakeStatus  status = 2;
+  sysio.opp.types.TokenAmount  amount = 3;
+}
+
+// Wire token purchase.
+message WireTokenPurchase {
+  sysio.opp.types.ChainAddress actor = 1;
+  repeated sysio.opp.types.TokenAmount amounts = 2;
+}
+
+// Operator registration or deregistration.
+message OperatorAction {
+  enum ActionType {
+    ACTION_TYPE_UNKNOWN = 0;
+    ACTION_TYPE_DEPOSIT = 1;
+    ACTION_TYPE_WITHDRAW = 2;
+  };
+  ActionType action_type = 1;
+  sysio.opp.types.ChainAddress actor = 2;
+  sysio.opp.types.WireAccount wire_account = 3;
+  sysio.opp.types.OperatorType   type = 5;
+  sysio.opp.types.OperatorStatus status = 10;
+  sysio.opp.types.TokenAmount   amount = 20;
+}
+
+// Reserve fund disbursement.
+message ReserveDisbursement {
+  sysio.opp.types.ChainAddress actor = 1;
+  sysio.opp.types.TokenAmount  amount = 2;
+
+  repeated sysio.opp.types.ChainSignature signature = 3;
+}
+
+// ---------------------------------------------------------------------------
+//  Protocol state tracking
+// ---------------------------------------------------------------------------
+
+
+// Protocol state tracking for a message chain on a given chain.
+message ProtocolState {
+  sysio.opp.types.ChainId       chain_id = 1;
+  bytes                         current_message_id = 2; // 32 bytes
+  bytes                         processed_message_id = 3; // 32 bytes
+  repeated sysio.opp.Message   incoming_messages = 10;
+  repeated sysio.opp.Message    outgoing_messages = 11;
+}
