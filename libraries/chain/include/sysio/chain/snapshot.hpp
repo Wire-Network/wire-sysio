@@ -203,6 +203,15 @@ namespace sysio { namespace chain {
 
    using snapshot_writer_ptr = std::shared_ptr<snapshot_writer>;
 
+   /// Section metadata shared by threaded_snapshot_writer and threaded_snapshot_reader.
+   struct snapshot_section_entry {
+      std::string        name;
+      uint64_t           data_offset = 0;
+      uint64_t           data_size = 0;
+      uint64_t           row_count = 0;
+      fc::crypto::blake3 hash;
+   };
+
    namespace detail {
       struct abstract_snapshot_row_reader {
          virtual void provide(std::istream& in) const = 0;
@@ -411,14 +420,6 @@ namespace sysio { namespace chain {
          void write_end_section() override;
 
       private:
-         struct section_info {
-            std::string  name;
-            uint64_t     data_offset = 0;
-            uint64_t     data_size = 0;
-            uint64_t     row_count = 0;
-            fc::crypto::blake3 hash;
-         };
-
          /// Buffering streambuf that incrementally BLAKE3-hashes all writes
          /// before forwarding them to the underlying file streambuf.
          class hashing_streambuf : public std::streambuf {
@@ -440,7 +441,7 @@ namespace sysio { namespace chain {
                              std::ios_base::openmode = std::ios_base::out) override;
 
          private:
-            bool flush_buffer();
+            void flush_buffer();
             std::streambuf*    sink_ = nullptr;
             blake3_encoder     hasher_;
             std::vector<char>  buf_;
@@ -456,7 +457,7 @@ namespace sysio { namespace chain {
          uint64_t                       current_section_offset_ = 0;
          uint64_t                       current_row_count_ = 0;
 
-         std::vector<section_info>      sections_;
+         std::vector<snapshot_section_entry> sections_;
          fc::crypto::blake3             root_hash_;
    };
 
@@ -524,19 +525,11 @@ namespace sysio { namespace chain {
          fc::crypto::blake3 get_root_hash() const { return root_hash_; }
 
       private:
-         struct section_entry {
-            std::string        name;
-            uint64_t           data_offset = 0;
-            uint64_t           data_size = 0;
-            uint64_t           row_count = 0;
-            fc::crypto::blake3 hash;
-         };
-
          fc::random_access_file                   snapshot_file;
          const boost::interprocess::mapped_region mapped_snap;
          const char* const                        mapped_snap_addr;
 
-         std::vector<section_entry>               section_index_;
+         std::vector<snapshot_section_entry>       section_index_;
          fc::crypto::blake3                       root_hash_;
          bool                                     index_loaded_ = false;
          bool                                     validated_ = false;

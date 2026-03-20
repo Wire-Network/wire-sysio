@@ -161,21 +161,20 @@ void threaded_snapshot_writer::hashing_streambuf::init(std::streambuf* sink, siz
    setp(buf_.data(), buf_.data() + buf_.size());
 }
 
-bool threaded_snapshot_writer::hashing_streambuf::flush_buffer() {
+void threaded_snapshot_writer::hashing_streambuf::flush_buffer() {
    const auto n = pptr() - pbase();
    if(n > 0) {
       hasher_.write(pbase(), n);
-      if(sink_->sputn(pbase(), n) != n)
-         return false;
+      SYS_ASSERT(sink_, snapshot_exception, "Snapshot stream buffer has no sink");
+      SYS_ASSERT(sink_->sputn(pbase(), n) == n, snapshot_exception,
+                 "Failed to write {} bytes to snapshot stream", n);
       setp(buf_.data(), buf_.data() + buf_.size());
    }
-   return true;
 }
 
 threaded_snapshot_writer::hashing_streambuf::int_type
 threaded_snapshot_writer::hashing_streambuf::overflow(int_type ch) {
-   if(!sink_ || !flush_buffer())
-      return traits_type::eof();
+   flush_buffer(); // throws on failure
    if(!traits_type::eq_int_type(ch, traits_type::eof())) {
       *pbase() = traits_type::to_char_type(ch);
       pbump(1);
@@ -184,7 +183,8 @@ threaded_snapshot_writer::hashing_streambuf::overflow(int_type ch) {
 }
 
 int threaded_snapshot_writer::hashing_streambuf::sync() {
-   return flush_buffer() ? 0 : -1;
+   flush_buffer(); // throws on failure
+   return 0;
 }
 
 std::streamsize threaded_snapshot_writer::hashing_streambuf::xsputn(
@@ -193,8 +193,7 @@ std::streamsize threaded_snapshot_writer::hashing_streambuf::xsputn(
    while(remaining > 0) {
       std::streamsize space = epptr() - pptr();
       if(space == 0) {
-         if(!flush_buffer())
-            return count - remaining;
+         flush_buffer();
          space = epptr() - pptr();
       }
       std::streamsize chunk = std::min(space, remaining);
@@ -209,8 +208,10 @@ std::streamsize threaded_snapshot_writer::hashing_streambuf::xsputn(
 threaded_snapshot_writer::hashing_streambuf::pos_type
 threaded_snapshot_writer::hashing_streambuf::seekoff(
       off_type off, std::ios_base::seekdir dir, std::ios_base::openmode which) {
-   if(!flush_buffer())
-      return pos_type(off_type(-1));
+   // Only tellp (seekoff(0, cur)) is safe — arbitrary seeks would corrupt the hash state.
+   SYS_ASSERT(off == 0 && dir == std::ios_base::cur, snapshot_exception,
+              "hashing_streambuf only supports tellp (seekoff(0, cur))");
+   flush_buffer();
    return sink_->pubseekoff(off, dir, which);
 }
 
@@ -257,7 +258,7 @@ void threaded_snapshot_writer::write_row(const detail::abstract_snapshot_row_wri
 }
 
 void threaded_snapshot_writer::write_end_section() {
-   section_info info;
+   snapshot_section_entry info;
    info.name = std::move(current_section_name_);
    info.data_offset = current_section_offset_;
    info.data_size = static_cast<uint64_t>(hash_os_.tellp()) - current_section_offset_;
@@ -275,7 +276,7 @@ void threaded_snapshot_writer::finalize() {
 
    // Sort sections by name for deterministic order
    std::sort(sections_.begin(), sections_.end(),
-             [](const section_info& a, const section_info& b) { return a.name < b.name; });
+             [](const snapshot_section_entry& a, const snapshot_section_entry& b) { return a.name < b.name; });
 
    // Compute root hash = BLAKE3(hash_0 || hash_1 || ... || hash_n)
    // Section hashes were computed inline during writes.
@@ -501,15 +502,15 @@ void threaded_snapshot_reader::load_index() {
       section_index_.reserve(num_sections);
 
       for(uint32_t i = 0; i < num_sections; i++) {
-         section_entry entry;
+         snapshot_section_entry entry;
 
          // Read null-terminated section name
          const char* name_start = ids.pos();
-         const char* name_end = name_start + ids.remaining();
+         const char* index_end = name_start + ids.remaining();
          const char* p = name_start;
-         while(p < name_end && *p != '\0')
+         while(p < index_end && *p != '\0')
             ++p;
-         SYS_ASSERT(p < name_end, snapshot_exception, "Section name not null-terminated");
+         SYS_ASSERT(p < index_end, snapshot_exception, "Section name not null-terminated");
          entry.name.assign(name_start, p - name_start);
          ids.skip(entry.name.size() + 1);
 
@@ -518,8 +519,8 @@ void threaded_snapshot_reader::load_index() {
          ids.read(reinterpret_cast<char*>(&entry.row_count), sizeof(entry.row_count));
          ids.read(entry.hash.char_data(), entry.hash.data_size());
 
-         SYS_ASSERT(entry.data_offset + entry.data_size <= file_size, snapshot_exception,
-                    "Section '{}' data extends beyond end of file", entry.name);
+         SYS_ASSERT(entry.data_offset + entry.data_size <= index_offset, snapshot_exception,
+                    "Section '{}' data extends beyond section index", entry.name);
 
          section_index_.push_back(std::move(entry));
       }
