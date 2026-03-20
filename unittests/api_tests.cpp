@@ -1172,6 +1172,33 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(db_tests, T, validating_testers) { try {
    chain.push_action( "testapi"_n, "s1l"_n, "testapi"_n, mutable_variant_object() ); // idx64_lowerbound
    chain.push_action( "testapi"_n, "s1u"_n, "testapi"_n, mutable_variant_object() ); // idx64_upperbound
 
+   chain.push_action( "testapi"_n, "s2g"_n, "testapi"_n, mutable_variant_object() ); // idx128_general
+   chain.push_action( "testapi"_n, "s2l"_n, "testapi"_n, mutable_variant_object() ); // idx128_lowerbound
+   chain.push_action( "testapi"_n, "s2u"_n, "testapi"_n, mutable_variant_object() ); // idx128_upperbound
+
+   chain.push_action( "testapi"_n, "s3g"_n, "testapi"_n, mutable_variant_object() ); // idx256_general
+   chain.push_action( "testapi"_n, "s3l"_n, "testapi"_n, mutable_variant_object() ); // idx256_lowerbound
+   chain.push_action( "testapi"_n, "s3u"_n, "testapi"_n, mutable_variant_object() ); // idx256_upperbound
+
+   chain.push_action( "testapi"_n, "s4g"_n, "testapi"_n, mutable_variant_object() ); // idx_double_general
+   chain.push_action( "testapi"_n, "s4l"_n, "testapi"_n, mutable_variant_object() ); // idx_double_lowerbound
+   chain.push_action( "testapi"_n, "s4u"_n, "testapi"_n, mutable_variant_object() ); // idx_double_upperbound
+
+   chain.push_action( "testapi"_n, "s5g"_n, "testapi"_n, mutable_variant_object() ); // idx_long_double_general
+   chain.push_action( "testapi"_n, "s5l"_n, "testapi"_n, mutable_variant_object() ); // idx_long_double_lowerbound
+   chain.push_action( "testapi"_n, "s5u"_n, "testapi"_n, mutable_variant_object() ); // idx_long_double_upperbound
+
+   // Action I/O: verify action_data_size, read_action_data, current_receiver
+   chain.push_action( "testapi"_n, "actsize"_n, "testapi"_n, mutable_variant_object()("val", 42) );
+   chain.push_action( "testapi"_n, "actread"_n, "testapi"_n, mutable_variant_object()("val", 0xDEADBEEFCAFEBABEULL) );
+   chain.push_action( "testapi"_n, "actrecv"_n, "testapi"_n, mutable_variant_object() );
+
+   // Transaction metadata: verify transaction_size, expiration, tapos, read_transaction
+   chain.push_action( "testapi"_n, "trxsize"_n, "testapi"_n, mutable_variant_object() );
+   chain.push_action( "testapi"_n, "trxexp"_n,  "testapi"_n, mutable_variant_object() );
+   chain.push_action( "testapi"_n, "trxtapos"_n,"testapi"_n, mutable_variant_object() );
+   chain.push_action( "testapi"_n, "trxread"_n, "testapi"_n, mutable_variant_object() );
+
    // Store value in primary table
    chain.push_action( "testapi"_n, "tia"_n, "testapi"_n, mutable_variant_object() // test_invalid_access
       ("code", "testapi")

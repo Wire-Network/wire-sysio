@@ -4,6 +4,36 @@
     "types": [],
     "structs": [
         {
+            "name": "idx128_general",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "idx128_lowerbound",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "idx128_upperbound",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "idx256_general",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "idx256_lowerbound",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "idx256_upperbound",
+            "base": "",
+            "fields": []
+        },
+        {
             "name": "idx64_general",
             "base": "",
             "fields": []
@@ -15,6 +45,16 @@
         },
         {
             "name": "idx64_upperbound",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "idx_double_general",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "idx_double_lowerbound",
             "base": "",
             "fields": []
         },
@@ -39,6 +79,26 @@
             "fields": []
         },
         {
+            "name": "idx_double_upperbound",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "idx_long_double_general",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "idx_long_double_lowerbound",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "idx_long_double_upperbound",
+            "base": "",
+            "fields": []
+        },
+        {
             "name": "misaligned_secondary_key256_tests",
             "base": "",
             "fields": []
@@ -55,6 +115,26 @@
         },
         {
             "name": "primary_i64_upperbound",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "test_action_data_size",
+            "base": "",
+            "fields": [
+                {
+                    "name": "val",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "test_current_receiver",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "test_expiration",
             "base": "",
             "fields": []
         },
@@ -79,9 +159,49 @@
                     "type": "bool"
                 }
             ]
+        },
+        {
+            "name": "test_read_action_data",
+            "base": "",
+            "fields": [
+                {
+                    "name": "val",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "test_read_transaction",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "test_tapos",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "test_transaction_size",
+            "base": "",
+            "fields": []
         }
     ],
     "actions": [
+        {
+            "name": "actread",
+            "type": "test_read_action_data",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "actrecv",
+            "type": "test_current_receiver",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "actsize",
+            "type": "test_action_data_size",
+            "ricardian_contract": ""
+        },
         {
             "name": "pg",
             "type": "primary_i64_general",
@@ -113,6 +233,66 @@
             "ricardian_contract": ""
         },
         {
+            "name": "s2g",
+            "type": "idx128_general",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "s2l",
+            "type": "idx128_lowerbound",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "s2u",
+            "type": "idx128_upperbound",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "s3g",
+            "type": "idx256_general",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "s3l",
+            "type": "idx256_lowerbound",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "s3u",
+            "type": "idx256_upperbound",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "s4g",
+            "type": "idx_double_general",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "s4l",
+            "type": "idx_double_lowerbound",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "s4u",
+            "type": "idx_double_upperbound",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "s5g",
+            "type": "idx_long_double_general",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "s5l",
+            "type": "idx_long_double_lowerbound",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "s5u",
+            "type": "idx_long_double_upperbound",
+            "ricardian_contract": ""
+        },
+        {
             "name": "sdnancreate",
             "type": "idx_double_nan_create_fail",
             "ricardian_contract": ""
@@ -135,6 +315,26 @@
         {
             "name": "tia",
             "type": "test_invalid_access",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "trxexp",
+            "type": "test_expiration",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "trxread",
+            "type": "test_read_transaction",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "trxsize",
+            "type": "test_transaction_size",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "trxtapos",
+            "type": "test_tapos",
             "ricardian_contract": ""
         }
     ],
