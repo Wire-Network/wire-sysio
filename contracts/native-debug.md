@@ -52,6 +52,60 @@ When you run tests with `--native-module`:
 4. The contract's native `apply()` calls intrinsics (`db_store_i64`, `require_auth`, etc.) which resolve to symbols exported from the test executable
 5. You can set breakpoints anywhere in the contract source code
 
+## How Native Compilation Works
+
+The `add_native_contract()` function (defined in CDT's `CDTMacros.cmake`) compiles contract sources with the **host compiler** (e.g. `clang++-18`) — not the CDT WASM toolchain — to produce a shared library (`.so`) that can be `dlopen`'d by the native-module runtime.
+
+### Compiler and Flags
+
+The host `CXX` compiler (whatever is configured for the wire-sysio build) is used. Key settings:
+
+| Setting | Value |
+|---------|-------|
+| **Library type** | `MODULE` (dlopen-able `.so`, no `lib` prefix) |
+| **Compile definitions** | `__sysio_cdt_native__`, `SYSIO_NATIVE`, `uint128_t=unsigned __int128`, `int128_t=__int128` |
+| **Compile flags** | `-Wno-unknown-attributes`, `-fPIC` |
+| **Force-included headers** | `cstdint`, `cstdlib`, `cstring`, `memory` (via `-include`) |
+| **Linker flags** | `--allow-shlib-undefined` (intrinsics resolved at dlopen time) |
+| **Linked libraries** | Shared `libgcc_s`, `libstdc++` (for cross-`.so` exception unwinding) |
+
+### Include Paths
+
+CDT include directories are used, but the `sysiolib/native/` directory is **excluded** to avoid conflicts with CDT's own intrinsic dispatch headers (`intrinsics.hpp`, `crt.hpp`), which would interfere with the dlopen-based symbol resolution:
+
+- `${CDT_ROOT}/include/sysiolib` (root, for relative includes in CDT sources)
+- `${CDT_ROOT}/include/sysiolib/capi`
+- `${CDT_ROOT}/include/sysiolib/core`
+- `${CDT_ROOT}/include/sysiolib/contracts`
+- `${CDT_ROOT}/include/bluegrass`
+- `${CDT_ROOT}/include`
+
+### CDT Source Files Compiled Natively
+
+Three CDT source files from `${CDT_ROOT}/share/cdt/native-contract-src/` are compiled alongside each contract:
+
+- `crypto.cpp` — cryptographic intrinsic wrappers
+- `sysiolib.cpp` — core sysiolib support functions
+- `base64.cpp` — base64 encoding/decoding
+
+### Dispatch Generation
+
+A Python script (`gen_native_dispatch.py`) auto-generates a `*_dispatch.cpp` file from the contract's ABI JSON. This file contains:
+
+- `#include` directives for the contract headers
+- An `extern "C" apply(uint64_t receiver, uint64_t code, uint64_t action)` entry point
+- A `switch` statement dispatching each ABI action name to the corresponding contract class method via `execute_action<>()` templates
+
+The dispatch file is regenerated whenever the ABI changes.
+
+### Intrinsic Symbol Resolution
+
+The ~149 blockchain intrinsic symbols (`db_store_i64`, `require_auth`, `prints`, etc.) are **not** linked into the `.so` at build time. Instead:
+
+1. `native_intrinsic_exports.cpp` defines all intrinsic symbols in the test executable
+2. `cmake/native-exports.cmake` links them with `--whole-archive` and generates a `--dynamic-list` so the linker exports them
+3. At runtime, `dlopen()` resolves the `.so`'s undefined intrinsic references against the executable's exported symbols
+
 ## Running Tests
 
 There are two test executables, each covering different contracts:
