@@ -89,7 +89,7 @@ try:
     contractAccount.name="contracttest"
     walletMgr.importKey(contractAccount, testWallet)
     Print("Create new account %s via %s" % (contractAccount.name, cluster.sysioAccount.name))
-    trans=nonProdNode.createInitializeAccount(contractAccount, cluster.sysioAccount, nodeOwner=cluster.carlAccount, stakedDeposit=500000, waitForTransBlock=True, stakeNet=50000, stakeCPU=50000, buyRAM=50000, exitOnError=True)
+    trans=nonProdNode.createInitializeAccount(contractAccount, cluster.sysioAccount, nodeOwner=cluster.carlAccount, stakedDeposit=500000, waitForTransBlock=True, stakeNet=50000, stakeCPU=50000, buyRAM=70000, exitOnError=True)
     transferAmount="90000000.0000 {0}".format(CORE_SYMBOL)
     Print("Transfer funds %s from account %s to %s" % (transferAmount, cluster.sysioAccount.name, contractAccount.name))
     nonProdNode.transferFunds(cluster.sysioAccount, contractAccount, transferAmount, "test transfer", waitForTransBlock=True)

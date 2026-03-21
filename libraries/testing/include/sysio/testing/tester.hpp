@@ -1,7 +1,7 @@
 #pragma once
 #include <sysio/chain/controller.hpp>
 #include <sysio/chain/asset.hpp>
-#include <sysio/chain/contract_table_objects.hpp>
+#include <sysio/chain/kv_table_objects.hpp>
 #include <sysio/chain/account_object.hpp>
 #include <sysio/chain/abi_serializer.hpp>
 #include <sysio/chain/contract_action_match.hpp>
@@ -103,8 +103,6 @@ namespace sysio::testing {
    using namespace sysio::chain;
 
    fc::variant_object filter_fields(const fc::variant_object& filter, const fc::variant_object& value);
-
-   void copy_row(const chain::key_value_object& obj, vector<char>& data);
 
    bool expect_assert_message(const fc::exception& ex, string expected);
 
@@ -453,28 +451,24 @@ namespace sysio::testing {
 
          void sync_with(base_tester& other);
 
-         const table_id_object* find_table( name code, name scope, name table );
-
          // method treats key as a name type, if this is not appropriate in your case, pass require == false and report the correct behavior
          template<typename Object>
          bool get_table_entry(Object& obj, account_name code, account_name scope, account_name table, uint64_t key, bool require = true) {
-            auto* maybe_tid = find_table(code, scope, table);
-            if( maybe_tid == nullptr ) {
-               BOOST_FAIL( "table for code=\"" + code.to_string()
-                            + "\" scope=\"" + scope.to_string()
-                            + "\" table=\"" + table.to_string()
-                            + "\" does not exist"                 );
-            }
+            auto kv_key = chain::make_kv_key(table.to_uint64_t(), scope.to_uint64_t(), key);
 
-            auto* o = control->db().find<key_value_object, by_scope_primary>(boost::make_tuple(maybe_tid->id, key));
-            if( o == nullptr ) {
+            const auto& kv_idx = control->db().get_index<chain::kv_index, chain::by_code_key>();
+            auto it = kv_idx.find(boost::make_tuple(code, std::string_view(kv_key.data, 24)));
+            if( it == kv_idx.end() ) {
                if( require )
-                  BOOST_FAIL("object does not exist for primary_key=\"" + name(key).to_string() + "\"");
+                  BOOST_FAIL("object does not exist for code=\"" + code.to_string()
+                              + "\" scope=\"" + scope.to_string()
+                              + "\" table=\"" + table.to_string()
+                              + "\" primary_key=\"" + name(key).to_string() + "\"");
 
                return false;
             }
 
-            fc::raw::unpack(o->value.data(), o->value.size(), obj);
+            fc::raw::unpack(it->value.data(), it->value.size(), obj);
             return true;
          }
 

@@ -7,7 +7,6 @@
 #include <fc/variant_object.hpp>
 #include <contracts.hpp>
 #include <test_contracts.hpp>
-#include <sysio/chain/contract_table_objects.hpp>
 #include <sysio/chain/resource_limits.hpp>
 #include <sysio/chain/wast_to_wasm.hpp>
 #include <sysio/chain/exceptions.hpp>

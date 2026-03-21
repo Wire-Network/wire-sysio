@@ -111,6 +111,24 @@
             ]
         },
         {
+            "name": "block_info_record",
+            "base": "",
+            "fields": [
+                {
+                    "name": "version",
+                    "type": "uint8"
+                },
+                {
+                    "name": "block_height",
+                    "type": "uint32"
+                },
+                {
+                    "name": "block_timestamp",
+                    "type": "time_point"
+                }
+            ]
+        },
+        {
             "name": "block_signing_authority_v0",
             "base": "",
             "fields": [
@@ -911,7 +929,7 @@
             ]
         },
         {
-            "name": "block_info_record",
+            "name": "limit_auth_change",
             "base": "",
             "fields": [
                 {
@@ -919,12 +937,16 @@
                     "type": "uint8"
                 },
                 {
-                    "name": "block_height",
-                    "type": "uint32"
+                    "name": "account",
+                    "type": "name"
                 },
                 {
-                    "name": "block_timestamp",
-                    "type": "time_point"
+                    "name": "allow_perms",
+                    "type": "name[]"
+                },
+                {
+                    "name": "disallow_perms",
+                    "type": "name[]"
                 }
             ]
         },
@@ -996,28 +1018,6 @@
                 {
                     "name": "pubkey",
                     "type": "public_key?"
-                }
-            ]
-        },
-        {
-            "name": "limit_auth_change",
-            "base": "",
-            "fields": [
-                {
-                    "name": "version",
-                    "type": "uint8"
-                },
-                {
-                    "name": "account",
-                    "type": "name"
-                },
-                {
-                    "name": "allow_perms",
-                    "type": "name[]"
-                },
-                {
-                    "name": "disallow_perms",
-                    "type": "name[]"
                 }
             ]
         },
@@ -1272,6 +1272,13 @@
             "key_types": []
         },
         {
+            "name": "blockinfo",
+            "type": "block_info_record",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
             "name": "finalizers",
             "type": "finalizer_info",
             "index_type": "i64",
@@ -1314,8 +1321,8 @@
             "key_types": []
         },
         {
-            "name": "blockinfo",
-            "type": "block_info_record",
+            "name": "limitauthchg",
+            "type": "limit_auth_change",
             "index_type": "i64",
             "key_names": [],
             "key_types": []
@@ -1323,13 +1330,6 @@
         {
             "name": "peerkeys",
             "type": "peer_key",
-            "index_type": "i64",
-            "key_names": [],
-            "key_types": []
-        },
-        {
-            "name": "limitauthchg",
-            "type": "limit_auth_change",
             "index_type": "i64",
             "key_names": [],
             "key_types": []

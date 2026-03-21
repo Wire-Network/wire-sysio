@@ -31,11 +31,9 @@ void test_permission::check_authorization( uint64_t receiver, uint64_t code, uin
                                                      microseconds{ 0 }
                                                    );
 
-   auto itr = db_lowerbound_i64( self, self, self, 1 );
-   if(itr == -1) {
-      db_store_i64( self, self, self, 1, &res64, sizeof(int64_t) );
-   } else {
-      db_update_i64( itr, self, &res64, sizeof(int64_t) );
-   }
+   char key[24];
+   make_kv_key(self, self, 1, key);
+   // kv_set does upsert — stores if new, updates if exists
+   kv_set( 0, self, key, 24, &res64, sizeof(int64_t) );
 }
 

@@ -555,6 +555,20 @@ namespace sysio { namespace chain {
                                     3160015, "Unknown wasm_config version" )
       FC_DECLARE_DERIVED_EXCEPTION( config_parse_error,                   contract_exception,
                                     3160016, "Parsing config error" )
+      FC_DECLARE_DERIVED_EXCEPTION( kv_key_too_large,                    contract_exception,
+                                    3160017, "KV key exceeds maximum allowed size" )
+      FC_DECLARE_DERIVED_EXCEPTION( kv_value_too_large,                  contract_exception,
+                                    3160018, "KV value exceeds maximum allowed size" )
+      FC_DECLARE_DERIVED_EXCEPTION( kv_iterator_limit_exceeded,          contract_exception,
+                                    3160019, "Exceeded maximum number of KV iterators" )
+      FC_DECLARE_DERIVED_EXCEPTION( kv_invalid_iterator,                 contract_exception,
+                                    3160020, "Invalid KV iterator handle" )
+      FC_DECLARE_DERIVED_EXCEPTION( kv_write_denied,                     contract_exception,
+                                    3160021, "KV write operation denied" )
+      FC_DECLARE_DERIVED_EXCEPTION( kv_key_not_found,                    contract_exception,
+                                    3160022, "KV key not found" )
+      FC_DECLARE_DERIVED_EXCEPTION( kv_secondary_key_too_large,          contract_exception,
+                                    3160023, "KV secondary key exceeds maximum allowed size" )
 
    FC_DECLARE_DERIVED_EXCEPTION( producer_exception,           chain_exception,
                                  3170000, "Producer exception" )

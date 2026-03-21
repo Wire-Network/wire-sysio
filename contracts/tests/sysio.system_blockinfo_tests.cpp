@@ -4,7 +4,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include <sysio/chain/config.hpp>
-#include <sysio/chain/contract_table_objects.hpp>
+#include <sysio/chain/kv_table_objects.hpp>
 #include <sysio/testing/tester.hpp>
 #include <fc/io/datastream.hpp>
 #include <fc/io/raw.hpp>
@@ -52,20 +52,6 @@ static const sysio::chain::name blockinfo_tester_account_name = "binfotester"_n;
 
 struct block_info_tester : sysio_system::sysio_system_tester
 {
-private:
-   std::optional<sysio::chain::table_id_object::id_type> get_blockinfo_table_id() const
-   {
-      const auto* table_id_itr = control->db().find<sysio::chain::table_id_object, sysio::chain::by_code_scope_table>(
-         boost::make_tuple(config::system_account_name, sysio::chain::name{0}, blockinfo_table_name));
-
-      if (!table_id_itr) {
-         // No blockinfo table exists.
-         return {};
-      }
-
-      return std::optional<sysio::chain::table_id_object::id_type>(table_id_itr->id);
-   }
-
 public:
    block_info_tester() : sysio_system_tester(sysio_system_tester::setup_level::deploy_contract) {}
 
@@ -76,6 +62,9 @@ public:
     * For each row visited, its deserialized block_info_record structure is passed into the visitor function.
     * If a call to the visitor function returns false, scanning will stop and this function will return.
     *
+    * KV key layout: [table:8B BE][scope:8B BE][pk:8B BE]
+    * blockinfo table uses scope=0, table=blockinfo_table_name, pk=block_height
+    *
     * @pre start_block_height <= end_block_height
     * @returns number of rows visited
     */
@@ -85,21 +74,24 @@ public:
    {
       FC_ASSERT(start_block_height <= end_block_height, "invalid inputs");
 
-      auto t_id = get_blockinfo_table_id();
-      if (!t_id) {
-         // No blockinfo table exists, so there is nothing to scan through.
-         return 0;
-      }
+      const auto& kv_idx = control->db().get_index<sysio::chain::kv_index, sysio::chain::by_code_key>();
 
-      const auto& idx = control->db().get_index<sysio::chain::key_value_index, sysio::chain::by_scope_primary>();
+      // Build lower-bound key: [blockinfo_table_name][scope=0][start_block_height]
+      auto lo_key = sysio::chain::make_kv_key(blockinfo_table_name, sysio::chain::name(0), static_cast<uint64_t>(start_block_height));
 
       unsigned int rows_visited = 0;
-
       block_info_record r;
 
-      for (auto itr = idx.lower_bound(boost::make_tuple(*t_id, static_cast<uint64_t>(start_block_height)));
-           itr != idx.end() && itr->t_id == *t_id && itr->primary_key <= end_block_height; ++itr) //
-      {
+      auto itr = kv_idx.lower_bound(boost::make_tuple(config::system_account_name, std::string_view(lo_key.data, 24)));
+      for (; itr != kv_idx.end() && itr->code == config::system_account_name; ++itr) {
+         auto kv = itr->key_view();
+         if (kv.size() != 24) break;
+         // Verify table and scope portions match
+         if (kv.substr(0, 16) != std::string_view(lo_key.data, 16)) break;
+         // Extract primary key (block height)
+         uint64_t pk = sysio::chain::kv_decode_be64(kv.data() + 16);
+         if (pk > end_block_height) break;
+
          fc::datastream<const char*> ds(itr->value.data(), itr->value.size());
          fc::raw::unpack(ds, r);
          ++rows_visited;
@@ -143,7 +135,23 @@ public:
 
       const auto& action_traces = result.second->action_traces;
 
+      fprintf(stderr, "DEBUG: action_traces.size() = %zu\n", action_traces.size());
+      for (size_t idx = 0; idx < action_traces.size(); ++idx) {
+         const auto& at = action_traces[idx];
+         fprintf(stderr, "DEBUG:   trace[%zu]: receiver=%s account=%s name=%s ordinal=%u creator_ordinal=%u has_receipt=%d console=%s\n",
+            idx, at.receiver.to_string().c_str(), at.act.account.to_string().c_str(), at.act.name.to_string().c_str(),
+            at.action_ordinal.value, at.creator_action_ordinal.value,
+            (int)at.receipt.has_value(), at.console.c_str());
+         if (at.except.has_value()) {
+            fprintf(stderr, "DEBUG:     except: %s\n", at.except->to_detail_string().c_str());
+         }
+      }
+      if (result.second->except.has_value()) {
+         fprintf(stderr, "DEBUG: trx except: %s\n", result.second->except->to_detail_string().c_str());
+      }
+
       if (action_traces.size() < 3) {
+         fprintf(stderr, "DEBUG: EARLY RETURN: action_traces.size() < 3\n");
          return result;
       }
 
