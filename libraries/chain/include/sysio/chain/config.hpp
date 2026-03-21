@@ -112,6 +112,13 @@ namespace sysio::chain::config {
 
   static constexpr uint32_t   hashing_checktime_block_size       = 10*1024;  /// call checktime from hashing intrinsic once per this number of bytes
 
+  static constexpr uint32_t   max_kv_key_size           = 256;       ///< maximum KV primary key size in bytes
+  static constexpr uint32_t   max_kv_value_size         = 256*1024;  ///< maximum KV value size (256 KiB) -- caps undo amplification
+  static constexpr uint32_t   max_kv_secondary_key_size = 256;       ///< maximum KV secondary key size in bytes
+  static constexpr uint32_t   max_kv_iterators          = 16;        ///< maximum concurrent KV iterators (shared primary + secondary pool)
+  static constexpr uint8_t    kv_format_raw             = 0;         ///< raw key bytes (variable-length, used by kv::raw_table)
+  static constexpr uint8_t    kv_format_standard        = 1;         ///< standard 24-byte [table:8B BE][scope:8B BE][pk:8B BE] layout
+
 #ifdef SYSIO_SYS_VM_JIT_RUNTIME_ENABLED
   static constexpr auto default_wasm_runtime = sysio::chain::wasm_interface::vm_type::sys_vm_jit;
 #else

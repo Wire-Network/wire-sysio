@@ -60,6 +60,8 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cli_test.py ${CMAKE_CURRENT_BINARY_DI
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ship_reqs_across_svnn_test.py ${CMAKE_CURRENT_BINARY_DIR}/ship_reqs_across_svnn_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ship_restart_test.py ${CMAKE_CURRENT_BINARY_DIR}/ship_restart_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ship_test.py ${CMAKE_CURRENT_BINARY_DIR}/ship_test.py COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ship_kv_delta_test.py ${CMAKE_CURRENT_BINARY_DIR}/ship_kv_delta_test.py COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/get_kv_rows_test.py ${CMAKE_CURRENT_BINARY_DIR}/get_kv_rows_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ship_streamer_test.py ${CMAKE_CURRENT_BINARY_DIR}/ship_streamer_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ship_kill_client_test.py ${CMAKE_CURRENT_BINARY_DIR}/ship_kill_client_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/bridge_for_fork_test_shape.json ${CMAKE_CURRENT_BINARY_DIR}/bridge_for_fork_test_shape.json COPYONLY)
@@ -156,6 +158,8 @@ add_np_test(NAME ship_reqs_across_svnn_test COMMAND tests/ship_reqs_across_svnn_
 add_np_test(NAME ship_restart_test COMMAND tests/ship_restart_test.py -v ${UNSHARE})
 add_np_test(NAME ship_test COMMAND tests/ship_test.py -v --num-clients 10 --num-requests 5000 ${UNSHARE})
 add_np_test(NAME ship_test_unix COMMAND tests/ship_test.py -v --num-clients 10 --num-requests 5000 ${UNSHARE} --unix-socket)
+add_np_test(NAME ship_kv_delta_test COMMAND tests/ship_kv_delta_test.py -v ${UNSHARE})
+add_np_test(NAME get_kv_rows_test COMMAND tests/get_kv_rows_test.py -v ${UNSHARE})
 
 add_lr_test(NAME ship_streamer_test COMMAND tests/ship_streamer_test.py -v --num-clients 10 ${UNSHARE})
 add_lr_test(NAME ship_streamer_if_fetch_finality_data_test COMMAND tests/ship_streamer_test.py -v --num-clients 10 --finality-data-history ${UNSHARE})

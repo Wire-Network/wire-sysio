@@ -143,6 +143,178 @@ namespace detail {
    };
 }
 
+// ---------------------------------------------------------------------------
+// BE key codec -- mirrors the CDT's be_key_stream encoding in kv_raw_table.hpp.
+// Used by get_kv_rows API to decode/encode format=0 raw keys.
+// Supports: uint8, int8, uint16, int16, uint32, int32, uint64, int64,
+//           name, bool, string, float64/double.
+// ---------------------------------------------------------------------------
+namespace be_key_codec {
+
+struct reader {
+   const char* pos;
+   const char* end;
+
+   reader(const char* d, size_t s) : pos(d), end(d + s) {}
+   size_t remaining() const { return static_cast<size_t>(end - pos); }
+
+   uint8_t  read_u8()   { return read_be<uint8_t>(); }
+   uint16_t read_be16() { return read_be<uint16_t>(); }
+   uint32_t read_be32() { return read_be<uint32_t>(); }
+   uint64_t read_be64() { return read_be<uint64_t>(); }
+
+   // NUL-escape decoding: 0x00,0x01 = literal NUL byte, 0x00,0x00 = end of string.
+   std::string read_nul_escaped_string() {
+      std::string s;
+      while (pos < end) {
+         char c = *pos++;
+         if (c == '\0') {
+            FC_ASSERT(pos < end, "BE key underflow reading string terminator");
+            char next = *pos++;
+            if (next == '\0') break;          // 0x00,0x00 = end
+            FC_ASSERT(next == '\x01', "Invalid NUL-escape sequence in BE key string");
+            s.push_back('\0');                 // 0x00,0x01 = literal NUL
+         } else {
+            s.push_back(c);
+         }
+      }
+      return s;
+   }
+
+private:
+   template<typename T>
+   T read_be() {
+      constexpr size_t N = sizeof(T);
+      FC_ASSERT(remaining() >= N, "BE key underflow reading {}-byte integer", N);
+      T v = 0;
+      for (size_t i = 0; i < N; ++i)
+         v = (v << 8) | static_cast<uint8_t>(pos[i]);
+      pos += N;
+      return v;
+   }
+};
+
+struct writer {
+   std::vector<char> buf;
+
+   void write_u8(uint8_t v) { buf.push_back(static_cast<char>(v)); }
+
+   void write_be16(uint16_t v) { write_be(v); }
+
+   void write_be32(uint32_t v) { write_be(v); }
+
+   void write_be64(uint64_t v) { write_be(v); }
+
+   // NUL-escape encoding: 0x00 -> 0x00,0x01, terminated by 0x00,0x00.
+   void write_nul_escaped_string(const std::string& s) {
+      for (char c : s) {
+         buf.push_back(c);
+         if (c == '\0') buf.push_back('\x01');
+      }
+      buf.push_back('\0');
+      buf.push_back('\0');
+   }
+
+   std::vector<char> release() { return std::move(buf); }
+
+private:
+   template<typename T>
+   void write_be(T v) {
+      char tmp[sizeof(T)];
+      for (int i = sizeof(T) - 1; i >= 0; --i) {
+         tmp[i] = static_cast<char>(v & 0xFF);
+         v >>= 8;
+      }
+      buf.insert(buf.end(), tmp, tmp + sizeof(T));
+   }
+};
+
+inline fc::variant decode_field(reader& r, const std::string& type) {
+   if (type == "uint8")         return fc::variant(r.read_u8());
+   if (type == "int8")          return fc::variant(static_cast<int8_t>(r.read_u8() ^ 0x80u));
+   if (type == "uint16")        return fc::variant(r.read_be16());
+   if (type == "int16")         return fc::variant(static_cast<int16_t>(r.read_be16() ^ 0x8000u));
+   if (type == "uint32")        return fc::variant(r.read_be32());
+   if (type == "int32")         return fc::variant(static_cast<int32_t>(r.read_be32() ^ 0x80000000u));
+   if (type == "uint64")        return fc::variant(r.read_be64());
+   if (type == "int64")         return fc::variant(static_cast<int64_t>(r.read_be64() ^ (uint64_t(1) << 63)));
+   if (type == "name")          return fc::variant(name(r.read_be64()).to_string());
+   if (type == "bool")          return fc::variant(r.read_u8() != 0);
+   if (type == "string")        return fc::variant(r.read_nul_escaped_string());
+   if (type == "float32" || type == "float") {
+      uint32_t bits = r.read_be32();
+      if (bits >> 31) bits ^= (uint32_t(1) << 31);
+      else            bits = ~bits;
+      float v; memcpy(&v, &bits, 4);
+      return fc::variant(static_cast<double>(v));
+   }
+   if (type == "float64" || type == "double") {
+      uint64_t bits = r.read_be64();
+      if (bits >> 63) bits ^= (uint64_t(1) << 63);
+      else            bits = ~bits;
+      double v; memcpy(&v, &bits, 8);
+      return fc::variant(v);
+   }
+   FC_ASSERT(false, "Unsupported BE key type: {}", type);
+}
+
+inline void encode_field(writer& w, const std::string& type, const fc::variant& val) {
+   if (type == "uint8")         { w.write_u8(static_cast<uint8_t>(val.as_uint64())); return; }
+   if (type == "int8")          { w.write_u8(static_cast<uint8_t>(static_cast<uint8_t>(val.as_int64()) ^ 0x80u)); return; }
+   if (type == "uint16")        { w.write_be16(static_cast<uint16_t>(val.as_uint64())); return; }
+   if (type == "int16")         { w.write_be16(static_cast<uint16_t>(static_cast<uint16_t>(val.as_int64()) ^ 0x8000u)); return; }
+   if (type == "uint32")        { w.write_be32(static_cast<uint32_t>(val.as_uint64())); return; }
+   if (type == "int32")         { w.write_be32(static_cast<uint32_t>(static_cast<uint32_t>(val.as_int64()) ^ 0x80000000u)); return; }
+   if (type == "uint64")        { w.write_be64(val.as_uint64()); return; }
+   if (type == "int64")         { w.write_be64(static_cast<uint64_t>(val.as_int64()) ^ (uint64_t(1) << 63)); return; }
+   if (type == "name")          { w.write_be64(name(val.as_string()).to_uint64_t()); return; }
+   if (type == "bool")          { w.write_u8(val.as_bool() ? 1 : 0); return; }
+   if (type == "string")        { w.write_nul_escaped_string(val.as_string()); return; }
+   if (type == "float32" || type == "float") {
+      float f = static_cast<float>(val.as_double());
+      uint32_t bits; memcpy(&bits, &f, 4);
+      if (bits >> 31) bits = ~bits;
+      else            bits ^= (uint32_t(1) << 31);
+      w.write_be32(bits); return;
+   }
+   if (type == "float64" || type == "double") {
+      double d = val.as_double();
+      uint64_t bits; memcpy(&bits, &d, 8);
+      if (bits >> 63) bits = ~bits;
+      else            bits ^= (uint64_t(1) << 63);
+      w.write_be64(bits); return;
+   }
+   FC_ASSERT(false, "Unsupported BE key type: {}", type);
+}
+
+inline fc::variant decode_key(const char* data, size_t size,
+                              const vector<std::string>& key_names,
+                              const vector<std::string>& key_types) {
+   FC_ASSERT(key_names.size() == key_types.size(), "ABI key_names/key_types size mismatch");
+   reader r(data, size);
+   fc::mutable_variant_object obj;
+   for (size_t i = 0; i < key_names.size(); ++i) {
+      obj(key_names[i], decode_field(r, key_types[i]));
+   }
+   return fc::variant(std::move(obj));
+}
+
+inline std::vector<char> encode_key(const fc::variant& key_var,
+                                    const vector<std::string>& key_names,
+                                    const vector<std::string>& key_types) {
+   FC_ASSERT(key_names.size() == key_types.size(), "ABI key_names/key_types size mismatch");
+   const auto& obj = key_var.get_object();
+   writer w;
+   for (size_t i = 0; i < key_names.size(); ++i) {
+      auto it = obj.find(key_names[i]);
+      FC_ASSERT(it != obj.end(), "Key field '{}' not found in bound object", key_names[i]);
+      encode_field(w, key_types[i], it->value());
+   }
+   return w.release();
+}
+
+} // namespace be_key_codec
+
 }
 
 namespace fc {

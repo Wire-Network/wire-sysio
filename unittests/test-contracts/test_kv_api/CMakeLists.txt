@@ -1,0 +1,6 @@
+if( BUILD_TEST_CONTRACTS )
+   add_contract( test_kv_api test_kv_api test_kv_api.cpp )
+else()
+   configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/test_kv_api.wasm ${CMAKE_CURRENT_BINARY_DIR}/test_kv_api.wasm COPYONLY )
+   configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/test_kv_api.abi  ${CMAKE_CURRENT_BINARY_DIR}/test_kv_api.abi  COPYONLY )
+endif()

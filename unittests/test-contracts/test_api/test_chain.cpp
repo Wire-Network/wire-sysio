@@ -42,11 +42,14 @@ void test_chain::test_get_ram_usage() {
     auto payer = ram_usage.account.value;
 
     std::string info = "tom's info";
-    // creates the table and adds an entry
-    db_store_i64( receiver, table1, payer, "tom"_n.value, info.c_str(), info.size() );
-    int64_t billable_size_v_table_id_object = 112; // see config::billable_size_v<table_id_object>;
-    int64_t billable_size_v_key_value_object = 112; // see config::billable_size_v<key_value_object>)
-    int64_t billable_size = (int64_t)(info.size() + billable_size_v_table_id_object + billable_size_v_key_value_object);
+    // creates a kv entry
+    char key1[24];
+    make_kv_key(table1, receiver, "tom"_n.value, key1);
+    kv_set( 0, payer, key1, 24, info.c_str(), info.size() );
+    // KV billing: key_size(24) + value_size + kv_object overhead (144)
+    // billable_size_v<kv_object> = 80 (fixed fields + id + padding) + 32*2 (index overhead) = 144
+    int64_t billable_size_v_kv_object = 144;
+    int64_t billable_size = (int64_t)(24 + info.size() + billable_size_v_kv_object);
 
     int64_t expected_ram = ram_usage.ram_bytes + billable_size;
 
@@ -56,9 +59,11 @@ void test_chain::test_get_ram_usage() {
         sysio_assert(ram_bytes == expected_ram, err.c_str());
     }
 
-    // table already created, just adds an entry
-    db_store_i64( receiver, table1, payer, "tom"_n.value+1, info.c_str(), info.size() );
-    expected_ram += (int64_t)(info.size() + billable_size_v_key_value_object);
+    // add another kv entry
+    char key2[24];
+    make_kv_key(table1, receiver, "tom"_n.value+1, key2);
+    kv_set( 0, payer, key2, 24, info.c_str(), info.size() );
+    expected_ram += (int64_t)(24 + info.size() + billable_size_v_kv_object);
 
     ram_bytes = get_ram_usage( ram_usage.account );
     if (ram_bytes != expected_ram) {

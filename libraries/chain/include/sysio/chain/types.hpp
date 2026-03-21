@@ -79,6 +79,85 @@ namespace sysio::chain {
    template<typename T>
    using deque = boost::container::deque< T, void, block_1024_option_t >;
 
+   // ── KV key encoding utilities ──────────────────────────────────────────────
+   // Used throughout chain, plugins, and tests for constructing KV 24-byte keys:
+   //   [table:8B BE][scope:8B BE][pk:8B BE]
+
+   /// Encode a uint64_t as 8 bytes big-endian into buf.
+   inline void kv_encode_be64(char* buf, uint64_t v) {
+      for (int i = 7; i >= 0; --i) { buf[i] = static_cast<char>(v & 0xFF); v >>= 8; }
+   }
+
+   /// Decode 8 bytes big-endian from buf into a uint64_t.
+   inline uint64_t kv_decode_be64(const char* buf) {
+      uint64_t v = 0;
+      for (int i = 0; i < 8; ++i) v = (v << 8) | static_cast<uint8_t>(buf[i]);
+      return v;
+   }
+
+   /// Standard KV key sizes (bytes)
+   inline constexpr size_t kv_key_size        = 24;  ///< [table:8B][scope:8B][pk:8B]
+   inline constexpr size_t kv_prefix_size     = 16;  ///< [table:8B][scope:8B]
+   inline constexpr size_t kv_table_prefix_size = 8; ///< [table:8B]
+
+   /// Build a 24-byte KV key: [table:8B BE][scope:8B BE][pk:8B BE]
+   struct kv_key_t {
+      static constexpr size_t size = kv_key_size;
+      char data[size];
+      std::string_view to_string_view() const { return {data, size}; }
+   };
+
+   inline kv_key_t make_kv_key(uint64_t table, uint64_t scope, uint64_t pk) {
+      kv_key_t key;
+      kv_encode_be64(key.data,      table);
+      kv_encode_be64(key.data + 8,  scope);
+      kv_encode_be64(key.data + 16, pk);
+      return key;
+   }
+
+   inline kv_key_t make_kv_key(name table, name scope, uint64_t pk) {
+      return make_kv_key(table.to_uint64_t(), scope.to_uint64_t(), pk);
+   }
+
+   /// Build a 16-byte KV prefix: [table:8B BE][scope:8B BE]
+   struct kv_prefix_t {
+      static constexpr size_t size = kv_prefix_size;
+      char data[size];
+      std::string_view to_string_view() const { return {data, size}; }
+      /// True if kv starts with this prefix
+      bool matches(std::string_view kv) const { return kv.size() >= size && memcmp(kv.data(), data, size) == 0; }
+   };
+
+   inline kv_prefix_t make_kv_prefix(uint64_t table, uint64_t scope) {
+      kv_prefix_t prefix;
+      kv_encode_be64(prefix.data,     table);
+      kv_encode_be64(prefix.data + 8, scope);
+      return prefix;
+   }
+
+   inline kv_prefix_t make_kv_prefix(name table, name scope) {
+      return make_kv_prefix(table.to_uint64_t(), scope.to_uint64_t());
+   }
+
+   /// Build an 8-byte KV table prefix: [table:8B BE]
+   struct kv_table_prefix_t {
+      static constexpr size_t size = kv_table_prefix_size;
+      char data[size];
+      std::string_view to_string_view() const { return {data, size}; }
+      /// True if kv starts with this prefix
+      bool matches(std::string_view kv) const { return kv.size() >= size && memcmp(kv.data(), data, size) == 0; }
+   };
+
+   inline kv_table_prefix_t make_kv_table_prefix(uint64_t table) {
+      kv_table_prefix_t prefix;
+      kv_encode_be64(prefix.data, table);
+      return prefix;
+   }
+
+   inline kv_table_prefix_t make_kv_table_prefix(name table) {
+      return make_kv_table_prefix(table.to_uint64_t());
+   }
+
    struct void_t{};
 
    using chainbase::allocator;
@@ -129,8 +208,10 @@ namespace sysio::chain {
     * packed_object::type field from enum_type to uint16 to avoid
     * warnings when converting packed_objects to/from json.
     *
-    * UNUSED_ enums can be taken for new purposes but otherwise the offsets
-    * in this enumeration are potentially shared_memory breaking
+    * After launch, removing or reordering entries is a shared-memory
+    * breaking change. Add new types before OBJECT_TYPE_COUNT. To retire
+    * a type, rename it UNUSED_<name> and leave it in place as a
+    * placeholder so subsequent ordinals remain stable.
     */
    enum object_type
    {
@@ -138,45 +219,21 @@ namespace sysio::chain {
       account_object_type,
       account_metadata_object_type,
       permission_object_type,
-      permission_usage_object_type,
       permission_link_object_type,
-      UNUSED_action_code_object_type,
-      key_value_object_type,
-      index64_object_type,
-      index128_object_type,
-      index256_object_type,
-      index_double_object_type,
-      index_long_double_object_type,
       global_property_object_type,
       dynamic_global_property_object_type,
       block_summary_object_type,
       transaction_object_type,
-      generated_transaction_object_type,
-      UNUSED_producer_object_type,
-      UNUSED_chain_property_object_type,
-      account_control_history_object_type,     ///< Defined by history_plugin
-      UNUSED_account_transaction_history_object_type,
-      UNUSED_transaction_history_object_type,
-      public_key_history_object_type,          ///< Defined by history_plugin
-      UNUSED_balance_object_type,
-      UNUSED_staked_balance_object_type,
-      UNUSED_producer_votes_object_type,
-      UNUSED_producer_schedule_object_type,
-      UNUSED_proxy_vote_object_type,
-      UNUSED_scope_sequence_object_type,
-      table_id_object_type,
       resource_object_type,
       resource_pending_object_type,
       resource_limits_state_object_type,
       resource_limits_config_object_type,
-      account_history_object_type,              ///< Defined by history_plugin
-      action_history_object_type,               ///< Defined by history_plugin
-      reversible_block_object_type,
       protocol_state_object_type,
-      UNUSED_account_ram_correction_object_type,
       code_object_type,
       database_header_object_type,
       contract_root_object_type,
+      kv_object_type,
+      kv_index_object_type,
       OBJECT_TYPE_COUNT ///< Sentry value which contains the number of different object types
    };
 
