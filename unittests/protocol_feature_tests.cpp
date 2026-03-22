@@ -618,68 +618,43 @@ BOOST_AUTO_TEST_CASE( get_sender_test ) { try {
    );
 } FC_LOG_AND_RETHROW() }
 
+// KV billing: RAM is always charged to the contract (receiver) account.
+// The payer argument in kv_multi_index is accepted for API compat but ignored.
+// This test verifies data can be moved between tables with RAM billed to the contract.
 BOOST_AUTO_TEST_CASE(move_my_ram) {
    try {
       tester c(setup_policy::full);
-      wlog("Starting MOVE MY RAM TEST");
 
       const auto &tester1_account = account_name("tester1");
       const auto &alice_account = account_name("alice");
       const auto &bob_account = account_name("bob");
-      const auto &carl_account = account_name("carl");
 
-
-      c.create_accounts({tester1_account, alice_account, bob_account, carl_account});
-      c.produce_block();
+      c.create_accounts({tester1_account, alice_account, bob_account});
       c.produce_block();
 
       c.set_code(tester1_account, test_contracts::ram_restrictions_test_wasm());
       c.set_abi(tester1_account, test_contracts::ram_restrictions_test_abi());
       c.produce_block();
 
-      wlog("Adding data using alice");
-      vector<permission_level> levels = vector<permission_level>{{alice_account, config::sysio_payer_name},{alice_account, config::active_name}};
-      c.push_action(tester1_account, "setdata"_n, levels, mutable_variant_object()
-                    ("len1", 10)
-                    ("len2", 0)
-                    ("payer", alice_account)
-      );
+      auto tester1_ram_before = c.control->get_resource_limits_manager().get_account_ram_usage(tester1_account);
+      auto alice_ram_before = c.control->get_resource_limits_manager().get_account_ram_usage(alice_account);
 
-      // do not allow move if it requires more RAM than available
-      BOOST_REQUIRE_EXCEPTION(
-         c.push_action(tester1_account, "setdata"_n, bob_account, mutable_variant_object()
-                       ("len1", 0)
-                       ("len2", 11)
-                       ("payer", alice_account)
-         ),
-         unauthorized_ram_usage_increase,
-         fc_exception_message_is("unprivileged contract cannot increase RAM usage of another account that has not authorized the action: alice")
-      );
-
-      wlog("Moving data around with bob's authorization...");
-      c.push_action(tester1_account, "setdata"_n, bob_account, mutable_variant_object()
-         ("len1", 0)
-         ("len2", 10)
-         ("payer", alice_account)
-      );
-
+      // Store data — KV bills tester1 (contract), not alice (named payer).
+      c.push_action(tester1_account, "setdata"_n, alice_account, mutable_variant_object()
+                    ("len1", 10)("len2", 0)("payer", alice_account));
       c.produce_block();
 
-      // move some RAM back
-      c.push_action(tester1_account, "setdata"_n, bob_account, mutable_variant_object()
-         ("len1", 5)
-         ("len2", 1)
-         ("payer", alice_account)
-      );
+      BOOST_REQUIRE_GT(c.control->get_resource_limits_manager().get_account_ram_usage(tester1_account), tester1_ram_before);
+      BOOST_REQUIRE_EQUAL(c.control->get_resource_limits_manager().get_account_ram_usage(alice_account), alice_ram_before);
 
+      // Move data between tables — still billed to tester1.
+      c.push_action(tester1_account, "setdata"_n, bob_account, mutable_variant_object()
+                    ("len1", 0)("len2", 10)("payer", alice_account));
       c.produce_block();
 
-      wlog("Removing data with bob's authorization...");
+      // Remove all data.
       c.push_action(tester1_account, "setdata"_n, bob_account, mutable_variant_object()
-                    ("len1", 0)
-                    ("len2", 0)
-                    ("payer", alice_account)
-      );
+                    ("len1", 0)("len2", 0)("payer", alice_account));
    } FC_LOG_AND_RETHROW()
 }
 
@@ -694,16 +669,16 @@ BOOST_AUTO_TEST_CASE(steal_contract_ram) {
       const auto &bob_account = account_name("bob");
 
       c.create_accounts({tester1_account, tester2_account, alice_account, bob_account}, false, true, false, true);
-      // Issuing _only_ enough RAM to load the contracts
-      c.add_roa_policy(c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "0.0870 SYS", 0, 0);
-      c.add_roa_policy(c.NODE_DADDY, tester2_account, "1.0000 SYS", "1.0000 SYS", "0.0870 SYS", 0, 0);
+      // Issuing _only_ enough RAM to load the contracts (KV contract is ~100KB)
+      c.add_roa_policy(c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "0.0975 SYS", 0, 0);
+      c.add_roa_policy(c.NODE_DADDY, tester2_account, "1.0000 SYS", "1.0000 SYS", "0.0975 SYS", 0, 0);
       c.produce_block();
       c.set_code(tester1_account, test_contracts::ram_restrictions_test_wasm());
       c.set_abi(tester1_account, test_contracts::ram_restrictions_test_abi());
       c.set_code(tester2_account, test_contracts::ram_restrictions_test_wasm());
       c.set_abi(tester2_account, test_contracts::ram_restrictions_test_abi());
       c.produce_block();
-      c.reduce_roa_policy(c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "0.0870 SYS", 0);
+      c.reduce_roa_policy(c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "0.0975 SYS", 0);
 
       c.register_node_owner(alice_account, 1);
       c.produce_block();
@@ -784,9 +759,13 @@ BOOST_AUTO_TEST_CASE(steal_contract_ram) {
 }
 
 /***
- * Test that ram resource limits are enforced.
- * This test activates ROA, so accounts are limited to the amount of RAM granted them by node owners.
- * The purpose of this testing is to ensure that the RAM is actually billed correctly against a limited balance.
+ * Test that ram resource limits are enforced under KV billing with ROA.
+ *
+ * KV billing: RAM is always charged to the contract (receiver) account, regardless of
+ * the payer argument passed by the contract.  This test verifies:
+ *  - A contract with insufficient RAM cannot store data.
+ *  - After expanding the contract's ROA policy, storage succeeds.
+ *  - Notification-based storage also bills the notified contract.
  */
 BOOST_AUTO_TEST_CASE( ram_restrictions_with_roa_test ) { try {
    tester c( setup_policy::full );
@@ -795,11 +774,11 @@ BOOST_AUTO_TEST_CASE( ram_restrictions_with_roa_test ) { try {
    const auto& tester2_account = account_name("tester2");
    const auto& alice_account = account_name("alice");
    const auto& bob_account = account_name("bob");
-   const auto &carl_account = account_name("carl");
+   const auto& carl_account = account_name("carl");
 
    c.create_accounts( {tester1_account, tester2_account, alice_account, bob_account, carl_account}, false, true, false);
-   c.add_roa_policy(c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "0.0870 SYS", 0, 0);
-   c.add_roa_policy(c.NODE_DADDY, tester2_account, "1.0000 SYS", "1.0000 SYS", "0.0870 SYS", 0, 0);
+   c.add_roa_policy(c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "0.0975 SYS", 0, 0);
+   c.add_roa_policy(c.NODE_DADDY, tester2_account, "1.0000 SYS", "1.0000 SYS", "0.0975 SYS", 0, 0);
    c.produce_block();
    c.set_code( tester1_account, test_contracts::ram_restrictions_test_wasm() );
    c.set_abi( tester1_account, test_contracts::ram_restrictions_test_abi() );
@@ -808,194 +787,65 @@ BOOST_AUTO_TEST_CASE( ram_restrictions_with_roa_test ) { try {
    c.set_abi( tester2_account, test_contracts::ram_restrictions_test_abi() );
    c.produce_block();
 
-   // Make Alice and Carl Tier 1 Node Owners
    c.register_node_owner(alice_account, 1);
    c.register_node_owner(carl_account, 1);
-
-   // Expand alice's policy to ensure sufficient net/cpu
    c.expand_roa_policy(alice_account, alice_account, "32.0000 SYS", "32.0000 SYS", "32.0000 SYS", 0);
-
-   // Add policy grant to bob from carl
    c.add_roa_policy(carl_account, bob_account, "32.0000 SYS", "32.0000 SYS", "32.0000 SYS", 0, 0);
-
    c.produce_block();
 
-   // Basic setup
-   auto alice_payer = vector<permission_level>{{alice_account, config::sysio_payer_name}, {alice_account, config::active_name}};
-   c.push_action( tester1_account, "setdata"_n, alice_payer, mutable_variant_object()
-      ("len1", 10)
-      ("len2", 0)
-      ("payer", alice_account)
-   );
-   wlog("A");
-
-   // Cannot bill more RAM to another account that has not authorized the action.
-   auto bob_payer = vector<permission_level>{{bob_account, config::sysio_payer_name}, {bob_account, config::active_name}};
+   // tester1 has no spare RAM — data storage fails (billed to contract, not named payer).
    BOOST_REQUIRE_EXCEPTION(
-      c.push_action( tester1_account, "setdata"_n, bob_payer, mutable_variant_object()
-         ("len1", 20)
-         ("len2", 0)
-         ("payer", alice_account)
-      ),
-      unauthorized_ram_usage_increase,
-      fc_exception_message_is( "unprivileged contract cannot increase RAM usage of another account that has not authorized the action: alice" )
-   );
-
-   // If you pay for the new data, you can remove the old data, but only if you are willing to pay for it...
-   c.push_action( tester1_account, "setdata"_n, bob_payer, mutable_variant_object()
-      ("len1", 0)
-      ("len2", 10)
-      ("payer", bob_account)
-   );
-   c.produce_block();
-   wlog("B^");
-
-   wlog("C");
-
-   // Cannot bill more RAM to another account within a notification
-   // even if the account authorized the original action.
-   BOOST_REQUIRE_EXCEPTION(
-      c.push_action( tester2_account, "notifysetdat"_n, alice_payer, mutable_variant_object()
-         ("acctonotify", tester1_account)
-         ("len1", 20)
-         ("len2", 0)
-         ("payer", alice_account)
-      ),
-      unauthorized_ram_usage_increase,
-      fc_exception_message_is( "unprivileged contract cannot increase RAM usage of another account within a notify context: alice" )
-   );
-   wlog("D");
-
-   // Cannot migrate data from table1 to table2 paid by another account
-   // in a RAM usage neutral way within a notification.
-   // This is due to the subjective mitigation in place.
-   BOOST_REQUIRE_EXCEPTION(
-      c.push_action( tester2_account, "notifysetdat"_n, alice_payer, mutable_variant_object()
-         ("acctonotify", tester1_account)
-         ("len1", 0)
-         ("len2", 10)
-         ("payer", alice_account)
-      ),
-      unauthorized_ram_usage_increase,
-      fc_exception_message_is( "unprivileged contract cannot increase RAM usage of another account within a notify context: alice" )
-   );
-   wlog("E");
-
-   c.produce_block();
-
-   // Still cannot bill more RAM to another account within a notification
-   // even if the account authorized the original action.
-   BOOST_REQUIRE_EXCEPTION(
-      c.push_action( tester2_account, "notifysetdat"_n, alice_payer, mutable_variant_object()
-         ("acctonotify", tester1_account)
-         ("len1", 10)
-         ("len2", 10)
-         ("payer", alice_account)
-      ),
-      unauthorized_ram_usage_increase,
-      fc_exception_message_is( "unprivileged contract cannot increase RAM usage of another account within a notify context: alice" )
-   );
-   wlog("I");
-
-   // Cannot bill more RAM to another account within a notification
-   // even if the account authorized the original action.
-   // This now fails with an objective error.
-   BOOST_REQUIRE_EXCEPTION(
-      c.push_action( tester2_account, "notifysetdat"_n, alice_payer, mutable_variant_object()
-         ("acctonotify", tester1_account)
-         ("len1", 20)
-         ("len2", 0)
-         ("payer", alice_account)
-      ),
-      unauthorized_ram_usage_increase,
-      fc_exception_message_starts_with( "unprivileged contract cannot increase RAM usage of another account within a notify context" )
-   );
-   wlog("L");
-
-   // Cannot bill more RAM to another account that has not authorized the action.
-   // This still fails objectively
-   BOOST_REQUIRE_EXCEPTION(
-      c.push_action( tester1_account, "setdata"_n, bob_payer, mutable_variant_object()
-         ("len1", 20)
-         ("len2", 0)
-         ("payer", alice_account)
-      ),
-      unauthorized_ram_usage_increase,
-      fc_exception_message_is( "unprivileged contract cannot increase RAM usage of another account that has not authorized the action: alice" )
-   );
-   wlog("M");
-
-   // Now also cannot migrate data from table2 to table1 paid by another account
-   // in a RAM usage neutral way within a notification .
-   BOOST_REQUIRE_EXCEPTION(
-   c.push_action( tester2_account, "notifysetdat"_n, bob_payer, mutable_variant_object()
-      ("acctonotify", "tester1")
-      ("len1", 10)
-      ("len2", 0)
-      ("payer", "alice")
-      ),
-      unauthorized_ram_usage_increase,
-      fc_exception_message_is( "unprivileged contract cannot increase RAM usage of another account within a notify context: alice" )
-   );
-
-   wlog("OO");
-   // Of course it should not be possible to migrate data from table1 to table2 paid by another account
-   // in a way that reduces RAM usage as well, within a notification.
-   BOOST_REQUIRE_EXCEPTION(
-   c.push_action( tester2_account, "notifysetdat"_n, bob_payer, mutable_variant_object()
-      ("acctonotify", "tester1")
-      ("len1", 0)
-      ("len2", 5)
-      ("payer", "alice")
-      ),
-      unauthorized_ram_usage_increase,
-      fc_exception_message_is( "unprivileged contract cannot increase RAM usage of another account within a notify context: alice" )
-   );
-   wlog("PP");
-
-   // Should be possible to just reduce the usage?
-   //c.push_action( tester2_account, "notifysetdat"_n, bob_payer, mutable_variant_object()
-   //   ("acctonotify", "tester1")
-   //   ("len1", 5)
-   //   ("len2", 0)
-   //   ("payer", "alice")
-   //);
-
-
-   // It should also still be possible for the receiver to take over payment of the RAM
-   // if it is necessary to increase RAM usage without the authorization of the original payer.
-   // This should all be possible to do even within a notification.
-   // But only if we can afford it...
-   BOOST_REQUIRE_EXCEPTION(
-   c.push_action( tester2_account, "notifysetdat"_n, bob_payer, mutable_variant_object()
-      ("acctonotify", "tester1")
-      ("len1", 10)
-      ("len2", 10)
-      ("payer", "tester1")
+      c.push_action( tester1_account, "setdata"_n, alice_account, mutable_variant_object()
+         ("len1", 10)("len2", 0)("payer", alice_account)
       ),
       ram_usage_exceeded,
       fc_exception_message_starts_with( "account tester1 has insufficient ram; needs" )
    );
 
+   // Expand tester1's RAM.
    c.expand_roa_policy(c.NODE_DADDY, tester1_account, "100.0000 SYS", "100.0000 SYS", "100.0000 SYS", 0);
-   c.push_action( tester2_account, "notifysetdat"_n, bob_payer, mutable_variant_object()
-      ("acctonotify", "tester1")
-      ("len1", 10)
-      ("len2", 10)
-      ("payer", "tester1")
-   );
-
    c.produce_block();
+
+   auto tester1_ram_before = c.control->get_resource_limits_manager().get_account_ram_usage(tester1_account);
+   auto alice_ram_before   = c.control->get_resource_limits_manager().get_account_ram_usage(alice_account);
+
+   // Now storage succeeds — RAM billed to tester1 (contract), not alice.
+   c.push_action( tester1_account, "setdata"_n, alice_account, mutable_variant_object()
+      ("len1", 10)("len2", 0)("payer", alice_account)
+   );
+   c.produce_block();
+
+   BOOST_REQUIRE_GT(c.control->get_resource_limits_manager().get_account_ram_usage(tester1_account), tester1_ram_before);
+   BOOST_REQUIRE_EQUAL(c.control->get_resource_limits_manager().get_account_ram_usage(alice_account), alice_ram_before);
+
+   // Notification path: tester2 notifies tester1 which stores data.
+   // KV bills tester1 (the notified receiver), not alice or tester2.
+   // But tester2 also needs RAM for the notification dispatch.
+   c.expand_roa_policy(c.NODE_DADDY, tester2_account, "100.0000 SYS", "100.0000 SYS", "100.0000 SYS", 0);
+   c.produce_block();
+
+   tester1_ram_before = c.control->get_resource_limits_manager().get_account_ram_usage(tester1_account);
+
+   auto bob_payer = vector<permission_level>{{bob_account, config::sysio_payer_name}, {bob_account, config::active_name}};
+   c.push_action( tester2_account, "notifysetdat"_n, bob_payer, mutable_variant_object()
+      ("acctonotify", tester1_account)
+      ("len1", 10)("len2", 10)("payer", tester1_account)
+   );
+   c.produce_block();
+
+   // tester1's RAM increased (it did the storage).
+   BOOST_REQUIRE_GT(c.control->get_resource_limits_manager().get_account_ram_usage(tester1_account), tester1_ram_before);
 
 } FC_LOG_AND_RETHROW() }
 
 /***
- * Test that ram restrictions are enforced.
- * This test does not activate ROA, so all accounts have unlimited RAM.
- * The purpose of this testing is to ensure integrity of the chain and that authorizations are checked correctly,
- * not to test that the RAM is actually billed correctly against a limited balance.
+ * Test KV RAM billing without ROA (unlimited RAM).
+ *
+ * KV billing: RAM is always charged to the contract (receiver) account regardless of the
+ * payer argument.  Without ROA all accounts have unlimited RAM, so all operations succeed.
+ * This test verifies that data can be stored, moved between tables, and stored via
+ * notification — with RAM always charged to the respective contract.
  */
-
 BOOST_AUTO_TEST_CASE( ram_restrictions_test ) { try {
    tester c( setup_policy::preactivate_feature_and_new_bios );
 
@@ -1012,138 +862,31 @@ BOOST_AUTO_TEST_CASE( ram_restrictions_test ) { try {
    c.set_abi( tester2_account, test_contracts::ram_restrictions_test_abi() );
    c.produce_block();
 
-   // Basic setup
-   vector<permission_level> alice_auths;
-   alice_auths.push_back( permission_level{alice_account, config::sysio_payer_name} );
-   alice_auths.push_back( permission_level{alice_account, config::active_name} );
-   c.push_action( tester1_account, "setdata"_n, alice_auths, mutable_variant_object()
-      ("len1", 10)
-      ("len2", 0)
-      ("payer", alice_account)
+   auto tester1_ram_before = c.control->get_resource_limits_manager().get_account_ram_usage(tester1_account);
+   auto alice_ram_before   = c.control->get_resource_limits_manager().get_account_ram_usage(alice_account);
+
+   // Store data via direct action — KV bills tester1 (receiver), not alice.
+   c.push_action( tester1_account, "setdata"_n, alice_account, mutable_variant_object()
+      ("len1", 10)("len2", 0)("payer", alice_account)
    );
 
-   // Cannot bill more RAM to another account that has not authorized the action.
-   vector<permission_level> bob_auths;
-   bob_auths.push_back( permission_level{bob_account, config::sysio_payer_name} );
-   bob_auths.push_back( permission_level{bob_account, config::active_name} );
-   BOOST_REQUIRE_EXCEPTION(
-      c.push_action( tester1_account, "setdata"_n, bob_auths, mutable_variant_object()
-         ("len1", 20)
-         ("len2", 0)
-         ("payer", alice_account)
-      ),
-      unauthorized_ram_usage_increase,
-      fc_exception_message_is( "unprivileged contract cannot increase RAM usage of another account that has not authorized the action: alice" )
-   );
+   BOOST_REQUIRE_GT(c.control->get_resource_limits_manager().get_account_ram_usage(tester1_account), tester1_ram_before);
+   BOOST_REQUIRE_EQUAL(c.control->get_resource_limits_manager().get_account_ram_usage(alice_account), alice_ram_before);
 
-   // Cannot bill more RAM to another account within a notification
-   // even if the account authorized the original action.
-   BOOST_REQUIRE_EXCEPTION(
-      c.push_action( tester2_account, "notifysetdat"_n, alice_auths, mutable_variant_object()
-         ("acctonotify", tester1_account)
-         ("len1", 20)
-         ("len2", 0)
-         ("payer", alice_account)
-      ),
-      unauthorized_ram_usage_increase,
-      fc_exception_message_is( "unprivileged contract cannot increase RAM usage of another account within a notify context: alice" )
-   );
-
-   // Can migrate data from table1 to table2 paid by another account
-   // in a RAM usage neutral way with the authority of that account.
-   c.push_action( tester1_account, "setdata"_n, alice_auths, mutable_variant_object()
-      ("len1", 0)
-      ("len2", 10)
-      ("payer", alice_account)
-   );
-
-   c.produce_block();
-
-   // Reset back to the original state.
-   c.push_action( tester1_account, "setdata"_n, alice_auths, mutable_variant_object()
-      ("len1", 10)
-      ("len2", 0)
-      ("payer", alice_account)
+   // Move data between tables — still billed to tester1.
+   c.push_action( tester1_account, "setdata"_n, bob_account, mutable_variant_object()
+      ("len1", 0)("len2", 10)("payer", alice_account)
    );
    c.produce_block();
 
-   // Still cannot bill more RAM to another account within a notification
-   // even if the account authorized the original action.
-   // This is due to the subjective mitigation in place.
-   BOOST_REQUIRE_EXCEPTION(
-      c.push_action( tester2_account, "notifysetdat"_n, alice_auths, mutable_variant_object()
-         ("acctonotify", tester1_account)
-         ("len1", 10)
-         ("len2", 10)
-         ("payer", alice_account)
-      ),
-      unauthorized_ram_usage_increase,
-      fc_exception_message_is( "unprivileged contract cannot increase RAM usage of another account within a notify context: alice" )
+   // Store via notification: tester2 notifies tester1 which stores data.
+   // KV bills tester1 (the notified receiver).
+   tester1_ram_before = c.control->get_resource_limits_manager().get_account_ram_usage(tester1_account);
+   c.push_action( tester2_account, "notifysetdat"_n, bob_account, mutable_variant_object()
+      ("acctonotify", tester1_account)
+      ("len1", 10)("len2", 10)("payer", tester1_account)
    );
-
-   c.produce_block();
-
-   // Cannot bill more RAM to another account within a notification
-   // even if the account authorized the original action.
-   // This now fails with an objective error.
-   BOOST_REQUIRE_EXCEPTION(
-      c.push_action( tester2_account, "notifysetdat"_n, alice_auths, mutable_variant_object()
-         ("acctonotify", tester1_account)
-         ("len1", 20)
-         ("len2", 0)
-         ("payer", alice_account)
-      ),
-      unauthorized_ram_usage_increase,
-      fc_exception_message_starts_with( "unprivileged contract cannot increase RAM usage of another account within a notify context" )
-   );
-
-   // Cannot bill more RAM to another account that has not authorized the action.
-   // This still fails objectively, but now with another error message.
-   BOOST_REQUIRE_EXCEPTION(
-      c.push_action( tester1_account, "setdata"_n, bob_auths, mutable_variant_object()
-         ("len1", 20)
-         ("len2", 0)
-         ("payer", alice_account)
-      ),
-      unauthorized_ram_usage_increase,
-      fc_exception_message_starts_with( "unprivileged contract cannot increase RAM usage of another account that has not authorized the action" )
-   );
-
-   // Now can migrate data from table1 to table2 paid by another account
-   // in a RAM usage neutral way without the authority of that account.
-   c.push_action( tester1_account, "setdata"_n, bob_auths, mutable_variant_object()
-      ("len1", 0)
-      ("len2", 10)
-      ("payer", alice_account)
-   );
-
-   // Now can also migrate data from table2 to table1 paid by another account
-   // in a RAM usage neutral way even within a notification .
-   c.push_action( tester2_account, "notifysetdat"_n, bob_auths, mutable_variant_object()
-      ("acctonotify", "tester1")
-      ("len1", 10)
-      ("len2", 0)
-      ("payer", "alice")
-   );
-
-   // Of course it should also be possible to migrate data from table1 to table2 paid by another account
-   // in a way that reduces RAM usage as well, even within a notification.
-   c.push_action( tester2_account, "notifysetdat"_n, bob_auths, mutable_variant_object()
-      ("acctonotify", "tester1")
-      ("len1", 0)
-      ("len2", 5)
-      ("payer", "alice")
-   );
-
-   // It should also still be possible for the receiver to take over payment of the RAM
-   // if it is necessary to increase RAM usage without the authorization of the original payer.
-   // This should all be possible to do even within a notification.
-   c.push_action( tester2_account, "notifysetdat"_n, bob_auths, mutable_variant_object()
-      ("acctonotify", "tester1")
-      ("len1", 10)
-      ("len2", 10)
-      ("payer", "tester1")
-   );
+   BOOST_REQUIRE_GT(c.control->get_resource_limits_manager().get_account_ram_usage(tester1_account), tester1_ram_before);
 
    c.produce_block();
 

@@ -492,78 +492,29 @@ REGISTER_LEGACY_CF_HOST_FUNCTION(printqf);
 REGISTER_CF_HOST_FUNCTION(printn);
 REGISTER_LEGACY_CF_HOST_FUNCTION(printhex);
 
-// database api
-// primary index api
-REGISTER_LEGACY_HOST_FUNCTION(db_store_i64);
-REGISTER_LEGACY_HOST_FUNCTION(db_update_i64);
-REGISTER_HOST_FUNCTION(db_remove_i64);
-REGISTER_LEGACY_HOST_FUNCTION(db_get_i64);
-REGISTER_LEGACY_HOST_FUNCTION(db_next_i64);
-REGISTER_LEGACY_HOST_FUNCTION(db_previous_i64);
-REGISTER_HOST_FUNCTION(db_find_i64);
-REGISTER_HOST_FUNCTION(db_lowerbound_i64);
-REGISTER_HOST_FUNCTION(db_upperbound_i64);
-REGISTER_HOST_FUNCTION(db_end_i64);
-
-// uint64_t secondary index api
-REGISTER_LEGACY_HOST_FUNCTION(db_idx64_store);
-REGISTER_LEGACY_HOST_FUNCTION(db_idx64_update);
-REGISTER_HOST_FUNCTION(db_idx64_remove);
-REGISTER_LEGACY_HOST_FUNCTION(db_idx64_find_secondary);
-REGISTER_LEGACY_HOST_FUNCTION(db_idx64_find_primary);
-REGISTER_LEGACY_HOST_FUNCTION(db_idx64_lowerbound);
-REGISTER_LEGACY_HOST_FUNCTION(db_idx64_upperbound);
-REGISTER_HOST_FUNCTION(db_idx64_end);
-REGISTER_LEGACY_HOST_FUNCTION(db_idx64_next);
-REGISTER_LEGACY_HOST_FUNCTION(db_idx64_previous);
-
-// uint128_t secondary index api
-REGISTER_LEGACY_HOST_FUNCTION(db_idx128_store);
-REGISTER_LEGACY_HOST_FUNCTION(db_idx128_update);
-REGISTER_HOST_FUNCTION(db_idx128_remove);
-REGISTER_LEGACY_HOST_FUNCTION(db_idx128_find_secondary);
-REGISTER_LEGACY_HOST_FUNCTION(db_idx128_find_primary);
-REGISTER_LEGACY_HOST_FUNCTION(db_idx128_lowerbound);
-REGISTER_LEGACY_HOST_FUNCTION(db_idx128_upperbound);
-REGISTER_HOST_FUNCTION(db_idx128_end);
-REGISTER_LEGACY_HOST_FUNCTION(db_idx128_next);
-REGISTER_LEGACY_HOST_FUNCTION(db_idx128_previous);
-
-// 256-bit secondary index api
-REGISTER_LEGACY_HOST_FUNCTION(db_idx256_store);
-REGISTER_LEGACY_HOST_FUNCTION(db_idx256_update);
-REGISTER_HOST_FUNCTION(db_idx256_remove);
-REGISTER_LEGACY_HOST_FUNCTION(db_idx256_find_secondary);
-REGISTER_LEGACY_HOST_FUNCTION(db_idx256_find_primary);
-REGISTER_LEGACY_HOST_FUNCTION(db_idx256_lowerbound);
-REGISTER_LEGACY_HOST_FUNCTION(db_idx256_upperbound);
-REGISTER_HOST_FUNCTION(db_idx256_end);
-REGISTER_LEGACY_HOST_FUNCTION(db_idx256_next);
-REGISTER_LEGACY_HOST_FUNCTION(db_idx256_previous);
-
-// double secondary index api
-REGISTER_LEGACY_HOST_FUNCTION(db_idx_double_store, is_nan_check);
-REGISTER_LEGACY_HOST_FUNCTION(db_idx_double_update, is_nan_check);
-REGISTER_HOST_FUNCTION(db_idx_double_remove);
-REGISTER_LEGACY_HOST_FUNCTION(db_idx_double_find_secondary, is_nan_check);
-REGISTER_LEGACY_HOST_FUNCTION(db_idx_double_find_primary);
-REGISTER_LEGACY_HOST_FUNCTION(db_idx_double_lowerbound, is_nan_check);
-REGISTER_LEGACY_HOST_FUNCTION(db_idx_double_upperbound, is_nan_check);
-REGISTER_HOST_FUNCTION(db_idx_double_end);
-REGISTER_LEGACY_HOST_FUNCTION(db_idx_double_next);
-REGISTER_LEGACY_HOST_FUNCTION(db_idx_double_previous);
-
-// long double secondary index api
-REGISTER_LEGACY_HOST_FUNCTION(db_idx_long_double_store, is_nan_check);
-REGISTER_LEGACY_HOST_FUNCTION(db_idx_long_double_update, is_nan_check);
-REGISTER_HOST_FUNCTION(db_idx_long_double_remove);
-REGISTER_LEGACY_HOST_FUNCTION(db_idx_long_double_find_secondary, is_nan_check);
-REGISTER_LEGACY_HOST_FUNCTION(db_idx_long_double_find_primary);
-REGISTER_LEGACY_HOST_FUNCTION(db_idx_long_double_lowerbound, is_nan_check);
-REGISTER_LEGACY_HOST_FUNCTION(db_idx_long_double_upperbound, is_nan_check);
-REGISTER_HOST_FUNCTION(db_idx_long_double_end);
-REGISTER_LEGACY_HOST_FUNCTION(db_idx_long_double_next);
-REGISTER_LEGACY_HOST_FUNCTION(db_idx_long_double_previous);
+// kv database api
+REGISTER_LEGACY_HOST_FUNCTION(kv_set);
+REGISTER_LEGACY_HOST_FUNCTION(kv_get);
+REGISTER_LEGACY_HOST_FUNCTION(kv_erase);
+REGISTER_LEGACY_HOST_FUNCTION(kv_contains);
+REGISTER_LEGACY_HOST_FUNCTION(kv_it_create);
+REGISTER_HOST_FUNCTION(kv_it_destroy);
+REGISTER_HOST_FUNCTION(kv_it_status);
+REGISTER_HOST_FUNCTION(kv_it_next);
+REGISTER_HOST_FUNCTION(kv_it_prev);
+REGISTER_LEGACY_HOST_FUNCTION(kv_it_lower_bound);
+REGISTER_LEGACY_HOST_FUNCTION(kv_it_key);
+REGISTER_LEGACY_HOST_FUNCTION(kv_it_value);
+REGISTER_LEGACY_HOST_FUNCTION(kv_idx_store);
+REGISTER_LEGACY_HOST_FUNCTION(kv_idx_remove);
+REGISTER_LEGACY_HOST_FUNCTION(kv_idx_update);
+REGISTER_LEGACY_HOST_FUNCTION(kv_idx_find_secondary);
+REGISTER_LEGACY_HOST_FUNCTION(kv_idx_lower_bound);
+REGISTER_HOST_FUNCTION(kv_idx_next);
+REGISTER_HOST_FUNCTION(kv_idx_prev);
+REGISTER_LEGACY_HOST_FUNCTION(kv_idx_key);
+REGISTER_LEGACY_HOST_FUNCTION(kv_idx_primary_key);
+REGISTER_HOST_FUNCTION(kv_idx_destroy);
 
 // memory api
 REGISTER_LEGACY_CF_HOST_FUNCTION(memcpy);

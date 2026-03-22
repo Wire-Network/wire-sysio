@@ -79,6 +79,70 @@ namespace sysio::chain {
    template<typename T>
    using deque = boost::container::deque< T, void, block_1024_option_t >;
 
+   // ── KV key encoding utilities ──────────────────────────────────────────────
+   // Used throughout chain, plugins, and tests for constructing KV 24-byte keys:
+   //   [table:8B BE][scope:8B BE][pk:8B BE]
+
+   /// Encode a uint64_t as 8 bytes big-endian into buf.
+   inline void kv_encode_be64(char* buf, uint64_t v) {
+      for (int i = 7; i >= 0; --i) { buf[i] = static_cast<char>(v & 0xFF); v >>= 8; }
+   }
+
+   /// Decode 8 bytes big-endian from buf into a uint64_t.
+   inline uint64_t kv_decode_be64(const char* buf) {
+      uint64_t v = 0;
+      for (int i = 0; i < 8; ++i) v = (v << 8) | static_cast<uint8_t>(buf[i]);
+      return v;
+   }
+
+   /// Build a 24-byte KV key: [table:8B BE][scope:8B BE][pk:8B BE]
+   struct kv_key_t {
+      char data[24];
+   };
+
+   inline kv_key_t make_kv_key(uint64_t table, uint64_t scope, uint64_t pk) {
+      kv_key_t key;
+      kv_encode_be64(key.data,      table);
+      kv_encode_be64(key.data + 8,  scope);
+      kv_encode_be64(key.data + 16, pk);
+      return key;
+   }
+
+   inline kv_key_t make_kv_key(name table, name scope, uint64_t pk) {
+      return make_kv_key(table.to_uint64_t(), scope.to_uint64_t(), pk);
+   }
+
+   /// Build a 16-byte KV prefix: [table:8B BE][scope:8B BE]
+   struct kv_prefix_t {
+      char data[16];
+   };
+
+   inline kv_prefix_t make_kv_prefix(uint64_t table, uint64_t scope) {
+      kv_prefix_t prefix;
+      kv_encode_be64(prefix.data,     table);
+      kv_encode_be64(prefix.data + 8, scope);
+      return prefix;
+   }
+
+   inline kv_prefix_t make_kv_prefix(name table, name scope) {
+      return make_kv_prefix(table.to_uint64_t(), scope.to_uint64_t());
+   }
+
+   /// Build an 8-byte KV table prefix: [table:8B BE]
+   struct kv_table_prefix_t {
+      char data[8];
+   };
+
+   inline kv_table_prefix_t make_kv_table_prefix(uint64_t table) {
+      kv_table_prefix_t prefix;
+      kv_encode_be64(prefix.data, table);
+      return prefix;
+   }
+
+   inline kv_table_prefix_t make_kv_table_prefix(name table) {
+      return make_kv_table_prefix(table.to_uint64_t());
+   }
+
    struct void_t{};
 
    using chainbase::allocator;
@@ -141,12 +205,12 @@ namespace sysio::chain {
       permission_usage_object_type,
       permission_link_object_type,
       UNUSED_action_code_object_type,
-      key_value_object_type,
-      index64_object_type,
-      index128_object_type,
-      index256_object_type,
-      index_double_object_type,
-      index_long_double_object_type,
+      UNUSED_key_value_object_type,
+      UNUSED_index64_object_type,
+      UNUSED_index128_object_type,
+      UNUSED_index256_object_type,
+      UNUSED_index_double_object_type,
+      UNUSED_index_long_double_object_type,
       global_property_object_type,
       dynamic_global_property_object_type,
       block_summary_object_type,
@@ -164,7 +228,7 @@ namespace sysio::chain {
       UNUSED_producer_schedule_object_type,
       UNUSED_proxy_vote_object_type,
       UNUSED_scope_sequence_object_type,
-      table_id_object_type,
+      UNUSED_table_id_object_type,
       resource_object_type,
       resource_pending_object_type,
       resource_limits_state_object_type,
@@ -177,6 +241,8 @@ namespace sysio::chain {
       code_object_type,
       database_header_object_type,
       contract_root_object_type,
+      kv_object_type,
+      kv_index_object_type,
       OBJECT_TYPE_COUNT ///< Sentry value which contains the number of different object types
    };
 

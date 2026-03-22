@@ -1,6 +1,6 @@
 #include <sysio/chain/deep_mind.hpp>
 #include <sysio/chain/block_state.hpp>
-#include <sysio/chain/contract_table_objects.hpp>
+#include <sysio/chain/kv_table_objects.hpp>
 #include <sysio/chain/resource_limits_private.hpp>
 #include <sysio/chain/permission_object.hpp>
 #include <sysio/chain/global_property_object.hpp>
@@ -151,63 +151,81 @@ namespace sysio::chain {
    {
       fc_dlog(_logger, "CREATION_OP CFA_INLINE {}", _action_id);
    }
-   void deep_mind_handler::on_create_table(const table_id_object& tid)
-   {
-      fc_dlog(_logger, "TBL_OP INS {} {} {} {} {}",
-         _action_id,
-         tid.code,
-         tid.scope,
-         tid.table,
-         tid.payer
-      );
+   // KV deep_mind hooks — format=1 (standard 24-byte keys) emit DB_OP, format=0 (raw) emit KV_OP
+   namespace {
+      struct kv_decoded_key {
+         name table_name;
+         name scope;
+         uint64_t primary_key = 0;
+         bool standard = false; // true if 24-byte key decoded successfully
+      };
+
+      kv_decoded_key decode_kv_key(const kv_object& obj) {
+         kv_decoded_key dk;
+         if (obj.key_format == 1 && obj.key_size == 24) {
+            dk.table_name = name(kv_decode_be64(obj.key_data()));
+            dk.scope      = name(kv_decode_be64(obj.key_data() + 8));
+            dk.primary_key = kv_decode_be64(obj.key_data() + 16);
+            dk.standard = true;
+         }
+         return dk;
+      }
    }
-   void deep_mind_handler::on_remove_table(const table_id_object& tid)
+
+   void deep_mind_handler::on_kv_set(const kv_object& obj, bool is_new, const char* old_value, std::size_t old_value_size)
    {
-      fc_dlog(_logger, "TBL_OP REM {} {} {} {} {}",
-         _action_id,
-         tid.code,
-         tid.scope,
-         tid.table,
-         tid.payer
-      );
+      auto dk = decode_kv_key(obj);
+      if (dk.standard) {
+         // Standard 24-byte key (format=1) — emit legacy DB_OP format
+         if (is_new) {
+            fc_dlog(_logger, "DB_OP INS {} {} {} {} {} {} {}",
+               _action_id, obj.payer, obj.code,
+               dk.scope, dk.table_name, name(dk.primary_key),
+               fc::to_hex(obj.value.data(), obj.value.size())
+            );
+         } else {
+            fc_dlog(_logger, "DB_OP UPD {} {}:{} {} {} {} {} {}:{}",
+               _action_id, obj.payer, obj.payer, obj.code,
+               dk.scope, dk.table_name, name(dk.primary_key),
+               fc::to_hex(old_value, old_value_size),
+               fc::to_hex(obj.value.data(), obj.value.size())
+            );
+         }
+      } else {
+         // Raw key (format=0) — emit KV_OP format with hex key
+         if (is_new) {
+            fc_dlog(_logger, "KV_OP INS {} {} {} {} {}",
+               _action_id, obj.payer, obj.code,
+               fc::to_hex(obj.key_data(), obj.key_size),
+               fc::to_hex(obj.value.data(), obj.value.size())
+            );
+         } else {
+            fc_dlog(_logger, "KV_OP UPD {} {}:{} {} {} {}:{}",
+               _action_id, obj.payer, obj.payer, obj.code,
+               fc::to_hex(obj.key_data(), obj.key_size),
+               fc::to_hex(old_value, old_value_size),
+               fc::to_hex(obj.value.data(), obj.value.size())
+            );
+         }
+      }
    }
-   void deep_mind_handler::on_db_store_i64(const table_id_object& tid, const key_value_object& kvo)
+
+   void deep_mind_handler::on_kv_erase(const kv_object& obj)
    {
-      fc_dlog(_logger, "DB_OP INS {} {} {} {} {} {} {}",
-         _action_id,
-         kvo.payer,
-         tid.code,
-         tid.scope,
-         tid.table,
-         name(kvo.primary_key),
-         fc::to_hex(kvo.value.data(), kvo.value.size())
-      );
-   }
-   void deep_mind_handler::on_db_update_i64(const table_id_object& tid, const key_value_object& kvo, account_name payer, const char* buffer, std::size_t buffer_size)
-   {
-      fc_dlog(_logger, "DB_OP UPD {} {}:{} {} {} {} {} {}:{}",
-         _action_id,
-         kvo.payer,
-         payer,
-         tid.code,
-         tid.scope,
-         tid.table,
-         name(kvo.primary_key),
-         fc::to_hex(kvo.value.data(),kvo.value.size()),
-         fc::to_hex(buffer, buffer_size)
-      );
-   }
-   void deep_mind_handler::on_db_remove_i64(const table_id_object& tid, const key_value_object& kvo)
-   {
-      fc_dlog(_logger, "DB_OP REM {} {} {} {} {} {} {}",
-         _action_id,
-         kvo.payer,
-         tid.code,
-         tid.scope,
-         tid.table,
-         name(kvo.primary_key),
-         fc::to_hex(kvo.value.data(), kvo.value.size())
-      );
+      auto dk = decode_kv_key(obj);
+      if (dk.standard) {
+         fc_dlog(_logger, "DB_OP REM {} {} {} {} {} {} {}",
+            _action_id, obj.payer, obj.code,
+            dk.scope, dk.table_name, name(dk.primary_key),
+            fc::to_hex(obj.value.data(), obj.value.size())
+         );
+      } else {
+         fc_dlog(_logger, "KV_OP REM {} {} {} {} {}",
+            _action_id, obj.payer, obj.code,
+            fc::to_hex(obj.key_data(), obj.key_size),
+            fc::to_hex(obj.value.data(), obj.value.size())
+         );
+      }
    }
    void deep_mind_handler::on_init_resource_limits(const resource_limits::resource_limits_config_object& config, const resource_limits::resource_limits_state_object& state)
    {

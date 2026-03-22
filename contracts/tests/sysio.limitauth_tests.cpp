@@ -1,6 +1,5 @@
 #include <boost/test/unit_test.hpp>
 #include <cstdlib>
-#include <sysio/chain/contract_table_objects.hpp>
 #include <sysio/chain/exceptions.hpp>
 #include <sysio/chain/global_property_object.hpp>
 #include <sysio/chain/resource_limits.hpp>

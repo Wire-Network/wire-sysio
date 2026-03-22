@@ -62,6 +62,14 @@ ninja -C $BUILD_DIR unit_test       # Build unit tests
 cd $BUILD_DIR && ctest -j "$(nproc)" -LE _tests
 ```
 
+**Tip:** ctest runs take a long time. Always log output to a temp file so you can grep/tail without re-running:
+```bash
+cd $BUILD_DIR && ctest -j "$(nproc)" -LE "(nonparallelizable_tests|long_running_tests|wasm_spec_tests)" --output-on-failure --timeout 1000 2>&1 | tee /tmp/ctest-run.log
+# Then analyze without re-running:
+grep "Failed" /tmp/ctest-run.log
+grep "% tests passed" /tmp/ctest-run.log
+```
+
 ### Run Specific Test Suite
 ```bash
 # Run a single Boost.Test suite
@@ -131,6 +139,10 @@ FC_REFLECT(my_namespace::my_type, (field1)(field2)(field3))
 FC_REFLECT_ENUM(my_namespace::my_enum, (value1)(value2)(value3))
 ```
 
+## Git Practices
+
+**NEVER use `git add -A` or `git add .`** — these will stage build artifacts, core dumps, submodules, and other untracked files. Always stage specific files by name.
+
 ## Code Style
 
 Uses `.clang-format` with LLVM base style and these key differences:
@@ -180,3 +192,93 @@ The `tests/` directory contains Python integration tests using TestHarness frame
 cd $BUILD_DIR && python3 tests/<test_name>.py
 ```
 Do NOT run from the source root — that would use stale or missing binaries.
+
+## Smart Contract Compilation
+
+Contracts are compiled with the Wire CDT (C/C++ Development Toolkit). The CDT repo is typically at `../wire-cdt-db-kv` (or `../wire-cdt`) with build dir `cmake-build-debug-vcpkg`.
+
+```bash
+CDT=<path-to-wire-cdt>/cmake-build-debug-vcpkg
+
+# Production contracts
+$CDT/bin/cdt-cpp -abigen -I contracts -o contracts/sysio.token/sysio.token.wasm contracts/sysio.token/sysio.token.cpp
+$CDT/bin/cdt-cpp -abigen -I contracts/sysio.bios -I contracts -o contracts/sysio.bios/sysio.bios.wasm contracts/sysio.bios/sysio.bios.cpp
+$CDT/bin/cdt-cpp -abigen -I contracts -o contracts/sysio.msig/sysio.msig.wasm contracts/sysio.msig/sysio.msig.cpp
+$CDT/bin/cdt-cpp -abigen -I contracts -I contracts/sysio.system/include -o contracts/sysio.roa/sysio.roa.wasm contracts/sysio.roa/sysio.roa.cpp
+$CDT/bin/cdt-cpp -abigen -I contracts/sysio.system/include -I contracts -o contracts/sysio.system/sysio.system.wasm contracts/sysio.system/src/*.cpp
+
+# Test contracts (example)
+$CDT/bin/cdt-cpp -abigen -o unittests/test-contracts/<name>/<name>.wasm unittests/test-contracts/<name>/<name>.cpp
+```
+
+### After Recompiling Contracts
+
+Compiled WASMs must be copied to the build directory locations where tests load them from:
+
+```bash
+# Production contracts used by contract tests
+cp contracts/sysio.token/sysio.token.{wasm,abi} $BUILD_DIR/contracts/sysio.token/
+cp contracts/sysio.system/sysio.system.{wasm,abi} $BUILD_DIR/contracts/sysio.system/
+cp contracts/sysio.msig/sysio.msig.{wasm,abi} $BUILD_DIR/contracts/sysio.msig/
+cp contracts/sysio.roa/sysio.roa.{wasm,abi} $BUILD_DIR/contracts/sysio.roa/
+
+# Embedded contracts (INCBIN in libtester) — requires .o deletion to force rebuild
+cp contracts/sysio.bios/sysio.bios.{wasm,abi} $BUILD_DIR/libraries/testing/contracts/sysio.bios/
+cp contracts/sysio.roa/sysio.roa.{wasm,abi} $BUILD_DIR/libraries/testing/contracts/sysio.roa/
+rm -f $BUILD_DIR/libraries/testing/CMakeFiles/sysio_testing.dir/contracts.cpp.o
+
+# Test contracts
+cp unittests/test-contracts/<name>/<name>.wasm $BUILD_DIR/unittests/test-contracts/<name>/
+```
+
+Then rebuild: `ninja -C $BUILD_DIR -j6 unit_test contracts_unit_test`
+
+### CDT-Generated Artifacts
+
+CDT generates `.actions.cpp`, `.dispatch.cpp`, and `.desc` files alongside compiled contracts. These are **not committed** — `.gitignore` files in `contracts/` and `unittests/test-contracts/` exclude them. If they appear as untracked, delete them:
+```bash
+find contracts/ unittests/test-contracts/ -name "*.actions.cpp" -o -name "*.dispatch.cpp" -o -name "*.desc" | xargs rm -f
+```
+
+### Action Name Constraints
+
+SYSIO action names must be valid SYSIO names: max 13 characters, only `a-z`, `1-5`, `.`. CDT will error with "not a valid sysio name" if violated.
+
+## Regenerating Test Reference Data
+
+Some tests compare against pre-generated reference data. When contracts are recompiled (different WASM = different action merkle roots), this data must be regenerated.
+
+### Deep Mind Log
+
+The `deep_mind_tests` compare against `unittests/deep-mind/deep-mind.log`. To regenerate:
+```bash
+$BUILD_DIR/unittests/unit_test --run_test=deep_mind_tests -- --sys-vm --save-dmlog
+```
+
+### Snapshot Compatibility Data
+
+The `snapshot_part2_tests/test_compatible_versions` test uses reference blockchain and snapshot files in `unittests/snapshots/`. To regenerate:
+```bash
+$BUILD_DIR/unittests/unit_test -t "snapshot_part2_tests" -- --sys-vm --save-snapshot --generate-snapshot-log
+```
+This writes directly to `unittests/snapshots/` in the source tree (blocks.log, blocks.index, snap_v1.*.gz).
+
+**IMPORTANT:** CMake copies snapshot files via `configure_file` at **configure time only**. After regenerating, you must manually copy to any other build directories:
+```bash
+cp unittests/snapshots/blocks.* unittests/snapshots/snap_v1.* $OTHER_BUILD_DIR/unittests/snapshots/
+```
+Or re-run cmake: `cmake --build $OTHER_BUILD_DIR --target rebuild_cache`
+
+### Consensus Blockchain Data
+
+The `savanna_misc_tests/verify_block_compatibitity` test uses `unittests/test-data/consensus_blockchain/`. To regenerate:
+```bash
+$BUILD_DIR/unittests/unit_test -t "savanna_misc_tests/verify_block_compatibitity" -- --sys-vm --save-blockchain
+```
+
+### When to Regenerate
+
+Regenerate all reference data whenever:
+- Any production contract is recompiled (changes action merkle roots)
+- Chain-level serialization changes (block format, snapshot format)
+- Genesis intrinsics change (different genesis state)

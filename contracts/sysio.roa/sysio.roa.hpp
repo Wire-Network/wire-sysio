@@ -1,6 +1,7 @@
 #pragma once
 
 #include <sysio/sysio.hpp>
+#include <sysio/multi_index.hpp>
 #include <sysio/system.hpp> // For current_block_number
 #include <sysio/singleton.hpp>
 #include <sysio/asset.hpp>
