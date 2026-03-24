@@ -8,13 +8,15 @@
 
 namespace sysio {
 
-   /// Batch operator plugin — cranks Depot and Outpost contracts, ferries OPP
-   /// message chains between WIRE chain and external blockchains (ETH, SOL).
+   /// Underwriter plugin — a separate daemon from the batch operator.
    ///
-   /// All 21 batch operators run this plugin in perpetuity. The epoch scheduler
-   /// (sysio.epoch) assigns operators into 3 groups of 7. Each epoch, one group
-   /// is elected; those 7 execute the full epoch cycle (outbound then inbound).
-   class batch_operator_plugin : public appbase::plugin<batch_operator_plugin> {
+   /// Does NOT crank any contracts. Instead it:
+   /// 1. Reads PENDING messages from sysio.msgch
+   /// 2. Independently verifies deposits on external chains (ETH/SOL)
+   /// 3. Selects swaps that maximize utilization of deposited collateral
+   /// 4. Submits underwriting intent to sysio.uwrit
+   /// 5. Monitors for dual-outpost confirmation
+   class underwriter_plugin : public appbase::plugin<underwriter_plugin> {
    public:
       APPBASE_PLUGIN_REQUIRES(
          (chain_plugin)
@@ -22,8 +24,8 @@ namespace sysio {
          (signature_provider_manager_plugin)
       )
 
-      batch_operator_plugin();
-      virtual ~batch_operator_plugin();
+      underwriter_plugin();
+      virtual ~underwriter_plugin();
 
       virtual void set_program_options(options_description& cli, options_description& cfg);
       virtual void plugin_initialize(const variables_map& options);

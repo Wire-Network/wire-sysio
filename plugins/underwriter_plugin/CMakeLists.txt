@@ -1,5 +1,5 @@
 plugin_target(
-        batch_operator_plugin
+        underwriter_plugin
         LIBRARIES
         appbase
         chainbase
