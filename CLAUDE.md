@@ -173,6 +173,17 @@ Three WASM execution runtimes available (x86_64 Linux):
 
 Tests run against all runtimes by default. Specify runtime with `-- --sys-vm`, `-- --sys-vm-jit`, or `-- --sys-vm-oc`.
 
+## OPP Protobufs & Libraries
+
+WIRE uses OPP to communicate between WIRE BLOCKCHAIN and EXTERNAL BLOCKCHAINS.
+
+OPP is a protocol (encoding scheme) that uses protobufs; the library is located at [libraries/opp](libraries/opp).
+The protobufs are located at [libraries/opp/proto](libraries/opp/proto).
+
+After updating the protobufs, before you can use them in the ethereum/solana contract/program repos, you need to run `cd wire-sysio/libraries/opp/tools &&
+  ./generate-opp-bundles.fish  --target=[solidity|solana]`. Additionally, WIRE contract code uses a C++ protoc plugin named `zpp_bits`, this is largely irrelevant,
+but keep in mind they are generated when the project is configured/built (CMake). Just an FYI.
+
 ## Docker Build
 
 ```bash

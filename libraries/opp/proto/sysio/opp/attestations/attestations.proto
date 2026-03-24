@@ -97,3 +97,83 @@ message ProtocolState {
   repeated sysio.opp.Message   incoming_messages = 10;
   repeated sysio.opp.Message    outgoing_messages = 11;
 }
+
+// ---------------------------------------------------------------------------
+//  Cross-chain swap & underwriting attestations
+// ---------------------------------------------------------------------------
+
+// Cross-chain swap request (source Outpost -> Depot).
+message Swap {
+  sysio.opp.types.ChainAddress actor = 1;
+  sysio.opp.types.TokenAmount  source_amount = 2;
+  sysio.opp.types.ChainId      target_chain = 3;
+  sysio.opp.types.ChainAddress recipient = 4;
+  sysio.opp.types.TokenKind    target_token = 5;
+}
+
+// Underwriting intent submission (Depot -> both Outposts).
+message UnderwriteIntent {
+  sysio.opp.types.ChainAddress    underwriter = 1;
+  sysio.opp.types.WireAccount     wire_account = 2;
+  bytes                           original_message_id = 3; // 32 bytes
+  sysio.opp.types.TokenAmount     source_amount = 4;
+  sysio.opp.types.TokenAmount     target_amount = 5;
+  sysio.opp.types.ChainId         target_chain = 6;
+  sysio.opp.types.ChainSignature  source_signature = 7;
+  sysio.opp.types.ChainSignature  target_signature = 8;
+  uint64                          unlock_timestamp = 9;
+}
+
+// Underwriting confirmation (Outpost -> Depot).
+message UnderwriteConfirm {
+  bytes                         original_message_id = 1; // 32 bytes
+  sysio.opp.types.ChainAddress  underwriter = 2;
+  bool                          confirmed = 3;
+  string                        error_reason = 4;
+}
+
+// Fund remittance (Depot -> target Outpost).
+message Remit {
+  sysio.opp.types.ChainAddress recipient = 1;
+  sysio.opp.types.TokenAmount  amount = 2;
+  bytes                        original_message_id = 3; // 32 bytes
+  sysio.opp.types.ChainAddress underwriter = 4;
+  uint64                       unlock_timestamp = 5;
+}
+
+// ---------------------------------------------------------------------------
+//  Challenge attestations
+// ---------------------------------------------------------------------------
+
+// Challenge request (Depot -> source Outpost).
+message ChallengeRequest {
+  uint32                            epoch_index = 1;
+  uint32                            round = 2;
+  bytes                             original_chain_hash = 3; // 32 bytes
+  repeated ChallengeOperatorHash    operator_hashes = 4;
+}
+
+// Per-operator hash submitted during a challenged epoch.
+message ChallengeOperatorHash {
+  sysio.opp.types.ChainAddress operator = 1;
+  bytes                        chain_hash = 2; // 32 bytes
+}
+
+// ---------------------------------------------------------------------------
+//  Epoch & roster management attestations
+// ---------------------------------------------------------------------------
+
+// Epoch sync notification (Depot -> Outpost).
+message EpochSync {
+  uint32 epoch_index = 1;
+  uint32 epoch_duration_sec = 2;
+  uint64 epoch_start_timestamp = 3;
+}
+
+// Roster update (Depot -> Outpost).
+message RosterUpdate {
+  sysio.opp.types.ChainAddress  operator = 1;
+  sysio.opp.types.OperatorType  type = 2;
+  sysio.opp.types.OperatorStatus new_status = 3;
+  string                        reason = 4;
+}
