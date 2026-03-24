@@ -1,5 +1,6 @@
 add_subdirectory(cron_plugin)
 add_subdirectory(batch_operator_plugin)
+add_subdirectory(underwriter_plugin)
 add_subdirectory(net_plugin)
 add_subdirectory(net_api_plugin)
 add_subdirectory(http_plugin)
