@@ -2,6 +2,8 @@
 
 namespace sysio {
 
+using opp::types::ChallengeStatus;
+
 // ---------------------------------------------------------------------------
 //  initchal
 // ---------------------------------------------------------------------------
@@ -13,7 +15,7 @@ void chalg::initchal(uint64_t chain_req_id) {
    // Check no existing challenge for this request
    auto req_idx = challenges.get_index<"byrequest"_n>();
    auto existing = req_idx.find(chain_req_id);
-   check(existing == req_idx.end() || existing->status == CHAL_RESOLVED,
+   check(existing == req_idx.end() || existing->status == ChallengeStatus::CHALLENGE_STATUS_RESOLVED,
          "active challenge already exists for this request");
 
    auto now = current_time_point();
@@ -23,7 +25,7 @@ void chalg::initchal(uint64_t chain_req_id) {
       c.chain_request_id = chain_req_id;
       c.epoch_index = 0; // TODO: read from sysio.epoch
       c.round = 1;
-      c.status = CHAL_CHALLENGE_SENT;
+      c.status = ChallengeStatus::CHALLENGE_STATUS_CHALLENGE_SENT;
       c.challenged_at = now;
    });
 
@@ -47,14 +49,14 @@ void chalg::submitresp(uint64_t challenge_id,
    challenges_t challenges(get_self(), get_self().value);
    auto it = challenges.find(challenge_id);
    check(it != challenges.end(), "challenge not found");
-   check(it->status == CHAL_CHALLENGE_SENT, "challenge not awaiting response");
+   check(it->status == ChallengeStatus::CHALLENGE_STATUS_CHALLENGE_SENT, "challenge not awaiting response");
 
    challenges.modify(it, same_payer, [&](auto& c) {
       c.response_hash = response_hash;
       c.correct_operators = correct_ops;
       c.faulty_operators = faulty_ops;
       c.responded_at = current_time_point();
-      c.status = CHAL_RESPONSE_RECEIVED;
+      c.status = ChallengeStatus::CHALLENGE_STATUS_RESPONSE_RECEIVED;
    });
 
    // Evaluate: if faulty operators identified, slash them and resolve
@@ -70,7 +72,7 @@ void chalg::submitresp(uint64_t challenge_id,
       }
 
       challenges.modify(it, same_payer, [&](auto& c) {
-         c.status = CHAL_RESOLVED;
+         c.status = ChallengeStatus::CHALLENGE_STATUS_RESOLVED;
       });
 
       // Unpause epoch
@@ -94,7 +96,7 @@ void chalg::escalate(uint64_t challenge_id) {
    challenges_t challenges(get_self(), get_self().value);
    auto it = challenges.find(challenge_id);
    check(it != challenges.end(), "challenge not found");
-   check(it->status == CHAL_RESPONSE_RECEIVED,
+   check(it->status == ChallengeStatus::CHALLENGE_STATUS_RESPONSE_RECEIVED,
          "challenge must be in RESPONSE_RECEIVED state to escalate");
 
    if (it->round < MAX_AUTOMATIC_ROUNDS) {
@@ -105,19 +107,19 @@ void chalg::escalate(uint64_t challenge_id) {
          c.chain_request_id = it->chain_request_id;
          c.epoch_index = it->epoch_index;
          c.round = it->round + 1;
-         c.status = CHAL_CHALLENGE_SENT;
+         c.status = ChallengeStatus::CHALLENGE_STATUS_CHALLENGE_SENT;
          c.challenged_at = now;
       });
 
       challenges.modify(it, same_payer, [&](auto& c) {
-         c.status = CHAL_ESCALATED;
+         c.status = ChallengeStatus::CHALLENGE_STATUS_ESCALATED;
       });
 
       // TODO: Queue new CHALLENGE_REQUEST to outpost
    } else {
       // Max automatic rounds exhausted — escalate to manual resolution
       challenges.modify(it, same_payer, [&](auto& c) {
-         c.status = CHAL_ESCALATED;
+         c.status = ChallengeStatus::CHALLENGE_STATUS_ESCALATED;
       });
 
       // GLOBAL PAUSE
@@ -143,7 +145,7 @@ void chalg::submitres(name submitter,
    challenges_t challenges(get_self(), get_self().value);
    auto it = challenges.find(challenge_id);
    check(it != challenges.end(), "challenge not found");
-   check(it->status == CHAL_ESCALATED, "challenge must be escalated for manual resolution");
+   check(it->status == ChallengeStatus::CHALLENGE_STATUS_ESCALATED, "challenge must be escalated for manual resolution");
    check(it->round >= MAX_AUTOMATIC_ROUNDS, "only escalated challenges accept manual resolution");
 
    resolutions_t resolutions(get_self(), get_self().value);
@@ -184,7 +186,7 @@ void chalg::enforce(uint64_t resolution_id) {
    auto chal_it = challenges.find(it->challenge_id);
    if (chal_it != challenges.end()) {
       challenges.modify(chal_it, same_payer, [&](auto& c) {
-         c.status = CHAL_RESOLVED;
+         c.status = ChallengeStatus::CHALLENGE_STATUS_RESOLVED;
       });
    }
 

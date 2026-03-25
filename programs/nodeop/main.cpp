@@ -13,6 +13,8 @@
 #include <sysio/chain_plugin/chain_plugin.hpp>
 #include <sysio/net_plugin/net_plugin.hpp>
 #include <sysio/producer_plugin/producer_plugin.hpp>
+#include <sysio/batch_operator_plugin/batch_operator_plugin.hpp>
+#include <sysio/underwriter_plugin/underwriter_plugin.hpp>
 
 using namespace appbase;
 using namespace sysio;
@@ -32,6 +34,8 @@ int main(int argc, char** argv)
    application_base::register_plugin<prometheus_plugin>();
    application_base::register_plugin<chain_api_plugin>();
    application_base::register_plugin<signature_provider_manager_plugin>();
+   application_base::register_plugin<batch_operator_plugin>();
+   application_base::register_plugin<underwriter_plugin>();
    auto r = exe.init<
       resource_monitor_plugin,
       chain_plugin,
