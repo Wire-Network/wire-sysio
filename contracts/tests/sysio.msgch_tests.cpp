@@ -74,7 +74,7 @@ public:
    }
 
    action_result deliver(name op, uint64_t req_id,
-                         checksum256 chain_hash, checksum256 merkle_root,
+                         fc::sha256 chain_hash, fc::sha256 merkle_root,
                          uint32_t msg_count, std::vector<char> raw = {}) {
       return push_msgch_action(op, "deliver"_n, mvo()
          ("operator_acct", op)
@@ -106,7 +106,7 @@ public:
       );
    }
 
-   checksum256 make_hash(const std::string& seed) {
+   fc::sha256 make_hash(const std::string& seed) {
       return fc::sha256::hash(seed);
    }
 

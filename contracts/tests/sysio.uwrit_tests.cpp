@@ -3,6 +3,7 @@
 #include <sysio/chain/abi_serializer.hpp>
 
 #include <fc/variant_object.hpp>
+#include <fc-lite/crypto/chain_types.hpp>
 
 #include "contracts.hpp"
 
@@ -10,6 +11,7 @@ using namespace sysio::testing;
 using namespace sysio;
 using namespace sysio::chain;
 using namespace fc;
+using namespace fc::crypto;
 
 using mvo = fc::mutable_variant_object;
 
@@ -77,7 +79,7 @@ public:
       );
    }
 
-   action_result updcltrl(name uw, uint8_t chain_kind, asset amount, bool increase) {
+   action_result updcltrl(name uw, chain_kind_t chain_kind, asset amount, bool increase) {
       return push_uwrit_action(UWRIT_ACCOUNT, "updcltrl"_n, mvo()
          ("underwriter", uw)
          ("chain_kind", chain_kind)
@@ -136,9 +138,8 @@ BOOST_FIXTURE_TEST_CASE(setconfig_validates_percentages, sysio_uwrit_tester) { t
 BOOST_FIXTURE_TEST_CASE(updcltrl_increase, sysio_uwrit_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), setconfig());
 
-   // ChainKind: ETHEREUM=2
    auto amount = asset::from_string("100.0000 SYS");
-   BOOST_REQUIRE_EQUAL(success(), updcltrl("underwriter1"_n, 2, amount, true));
+   BOOST_REQUIRE_EQUAL(success(), updcltrl("underwriter1"_n, chain_kind_ethereum, amount, true));
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(updcltrl_decrease_nonexistent, sysio_uwrit_tester) { try {
@@ -147,7 +148,7 @@ BOOST_FIXTURE_TEST_CASE(updcltrl_decrease_nonexistent, sysio_uwrit_tester) { try
    auto amount = asset::from_string("50.0000 SYS");
    BOOST_REQUIRE_EQUAL(
       error("assertion failure with message: cannot decrease non-existent collateral"),
-      updcltrl("underwriter1"_n, 2, amount, false)
+      updcltrl("underwriter1"_n, chain_kind_ethereum, amount, false)
    );
 } FC_LOG_AND_RETHROW() }
 
