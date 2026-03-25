@@ -78,8 +78,8 @@ public:
       return push_epoch_action(EPOCH_ACCOUNT, "setconfig"_n, mvo()
          ("epoch_duration_sec", duration)
          ("operators_per_epoch", ops_per)
-         ("total_operators", total)
-         ("groups", grps)
+         ("batch_operator_minimum_active", total)
+         ("batch_op_groups", grps)
          ("warmup_epochs", warmup)
          ("cooldown_epochs", cooldown)
       );
@@ -153,14 +153,14 @@ BOOST_FIXTURE_TEST_CASE(setconfig_basic, sysio_epoch_tester) { try {
    auto cfg = get_epoch_config();
    BOOST_REQUIRE_EQUAL(360, cfg["epoch_duration_sec"].as_uint64());
    BOOST_REQUIRE_EQUAL(7, cfg["operators_per_epoch"].as_uint64());
-   BOOST_REQUIRE_EQUAL(21, cfg["total_operators"].as_uint64());
-   BOOST_REQUIRE_EQUAL(3, cfg["groups"].as_uint64());
+   BOOST_REQUIRE_EQUAL(21, cfg["batch_operator_minimum_active"].as_uint64());
+   BOOST_REQUIRE_EQUAL(3, cfg["batch_op_groups"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(setconfig_validates_total, sysio_epoch_tester) { try {
-   // total_operators must equal operators_per_epoch * groups
+   // batch_operator_minimum_active must equal operators_per_epoch * batch_op_groups
    BOOST_REQUIRE_EQUAL(
-      error("assertion failure with message: total_operators must equal operators_per_epoch * groups"),
+      error("assertion failure with message: batch_operator_minimum_active must equal operators_per_epoch * batch_op_groups"),
       setconfig(360, 7, 20, 3)
    );
 } FC_LOG_AND_RETHROW() }

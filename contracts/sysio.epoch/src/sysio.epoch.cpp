@@ -7,17 +7,17 @@ namespace sysio {
 // ---------------------------------------------------------------------------
 void epoch::setconfig(uint32_t epoch_duration_sec,
                       uint32_t operators_per_epoch,
-                      uint32_t total_operators,
-                      uint32_t groups,
+                      uint32_t batch_operator_minimum_active,
+                      uint32_t batch_op_groups,
                       uint32_t warmup_epochs,
                       uint32_t cooldown_epochs) {
    require_auth(get_self());
 
    check(epoch_duration_sec > 0, "epoch_duration_sec must be positive");
    check(operators_per_epoch > 0, "operators_per_epoch must be positive");
-   check(groups > 0, "groups must be positive");
-   check(total_operators == operators_per_epoch * groups,
-         "total_operators must equal operators_per_epoch * groups");
+   check(batch_op_groups > 0, "batch_op_groups must be positive");
+   check(batch_operator_minimum_active == operators_per_epoch * batch_op_groups,
+         "batch_operator_minimum_active must equal operators_per_epoch * batch_op_groups");
 
    epochcfg_t cfg_tbl(get_self(), get_self().value);
    epoch_config cfg;
@@ -26,8 +26,8 @@ void epoch::setconfig(uint32_t epoch_duration_sec,
    }
    cfg.epoch_duration_sec = epoch_duration_sec;
    cfg.operators_per_epoch = operators_per_epoch;
-   cfg.total_operators = total_operators;
-   cfg.groups = groups;
+   cfg.batch_operator_minimum_active = batch_operator_minimum_active;
+   cfg.batch_op_groups = batch_op_groups;
    cfg.warmup_epochs = warmup_epochs;
    cfg.cooldown_epochs = cooldown_epochs;
    cfg_tbl.set(cfg, get_self());
@@ -56,7 +56,7 @@ void epoch::regoperator(name account, uint8_t type) {
          o.type = type;
          o.status = OP_STATUS_WARMUP;
          o.registered_epoch = state.current_epoch_index;
-         o.assigned_group = 255; // unassigned until initgroups
+         o.assigned_batch_op_group = 255; // unassigned until initgroups
          o.last_elected_epoch = 0;
          o.slash_count = 0;
          o.is_blacklisted = false;
@@ -107,15 +107,15 @@ void epoch::advance() {
    check(now >= state.next_epoch_start, "epoch has not elapsed yet");
 
    state.current_epoch_index++;
-   state.current_group = state.current_epoch_index % cfg.groups;
+   state.current_batch_op_group = state.current_epoch_index % cfg.batch_op_groups;
    state.current_epoch_start = state.next_epoch_start;
    state.next_epoch_start = state.current_epoch_start +
       microseconds(static_cast<int64_t>(cfg.epoch_duration_sec) * 1'000'000);
 
    // Update last_elected_epoch for operators in the active group
-   if (state.current_group < state.groups.size()) {
+   if (state.current_batch_op_group < state.batch_op_groups.size()) {
       operators_t ops(get_self(), get_self().value);
-      for (const auto& op_name : state.groups[state.current_group]) {
+      for (const auto& op_name : state.batch_op_groups[state.current_batch_op_group]) {
          auto it = ops.find(op_name.value);
          if (it != ops.end()) {
             ops.modify(it, same_payer, [&](auto& o) {
@@ -153,7 +153,7 @@ void epoch::initgroups() {
       }
    }
 
-   check(active_batch.size() >= cfg.total_operators,
+   check(active_batch.size() >= cfg.batch_operator_minimum_active,
          "not enough active batch operators for group assignment");
 
    // Sort by registration epoch (stable, deterministic)
@@ -163,8 +163,8 @@ void epoch::initgroups() {
       return ia->registered_epoch < ib->registered_epoch;
    });
 
-   // Trim to exactly total_operators
-   active_batch.resize(cfg.total_operators);
+   // Trim to exactly batch_operator_minimum_active
+   active_batch.resize(cfg.batch_operator_minimum_active);
 
    // Even/odd interleave shuffle
    std::vector<name> even_list, odd_list;
@@ -181,7 +181,7 @@ void epoch::initgroups() {
 
    // Divide into groups
    std::vector<std::vector<name>> new_groups;
-   for (uint32_t g = 0; g < cfg.groups; ++g) {
+   for (uint32_t g = 0; g < cfg.batch_op_groups; ++g) {
       std::vector<name> group;
       uint32_t start = g * cfg.operators_per_epoch;
       uint32_t end = start + cfg.operators_per_epoch;
@@ -191,13 +191,13 @@ void epoch::initgroups() {
       new_groups.push_back(group);
    }
 
-   // Update operator assigned_group
+   // Update operator assigned_batch_op_group
    for (uint8_t g = 0; g < new_groups.size(); ++g) {
       for (const auto& op_name : new_groups[g]) {
          auto it = ops.find(op_name.value);
          if (it != ops.end()) {
             ops.modify(it, same_payer, [&](auto& o) {
-               o.assigned_group = g;
+               o.assigned_batch_op_group = g;
             });
          }
       }
@@ -209,7 +209,7 @@ void epoch::initgroups() {
    if (state_tbl.exists()) {
       state = state_tbl.get();
    }
-   state.groups = new_groups;
+   state.batch_op_groups = new_groups;
    state_tbl.set(state, get_self());
 }
 
@@ -230,15 +230,15 @@ void epoch::replaceop(name old_op, name new_op) {
    check(new_it->status == OP_STATUS_ACTIVE, "replacement must be active");
    check(!new_it->is_blacklisted, "replacement is blacklisted");
 
-   uint8_t group = old_it->assigned_group;
+   uint8_t group = old_it->assigned_batch_op_group;
    check(group < 3, "old operator has no valid group assignment");
 
-   // Update assigned_group on both operators
+   // Update assigned_batch_op_group on both operators
    ops.modify(new_it, same_payer, [&](auto& o) {
-      o.assigned_group = group;
+      o.assigned_batch_op_group = group;
    });
    ops.modify(old_it, same_payer, [&](auto& o) {
-      o.assigned_group = 255; // unassigned
+      o.assigned_batch_op_group = 255; // unassigned
    });
 
    // Replace in epoch state groups
@@ -246,9 +246,9 @@ void epoch::replaceop(name old_op, name new_op) {
    check(state_tbl.exists(), "epoch state not initialized");
    auto state = state_tbl.get();
 
-   check(group < state.groups.size(), "group index out of range");
+   check(group < state.batch_op_groups.size(), "group index out of range");
    bool found = false;
-   for (auto& member : state.groups[group]) {
+   for (auto& member : state.batch_op_groups[group]) {
       if (member == old_op) {
          member = new_op;
          found = true;

@@ -20,8 +20,8 @@ namespace sysio {
       [[sysio::action]]
       void setconfig(uint32_t epoch_duration_sec,
                      uint32_t operators_per_epoch,
-                     uint32_t total_operators,
-                     uint32_t groups,
+                     uint32_t batch_operator_minimum_active,
+                     uint32_t batch_op_groups,
                      uint32_t warmup_epochs,
                      uint32_t cooldown_epochs);
 
@@ -65,14 +65,14 @@ namespace sysio {
       struct [[sysio::table("epochcfg")]] epoch_config {
          uint32_t    epoch_duration_sec = 360;   // 6 minutes
          uint32_t    operators_per_epoch = 7;
-         uint32_t    total_operators = 21;
-         uint32_t    groups = 3;                 // rotation groups (21 / 7)
+         uint32_t    batch_operator_minimum_active = 21;
+         uint32_t    batch_op_groups = 3;          // rotation groups (21 / 7)
          uint32_t    warmup_epochs = 1;
          uint32_t    cooldown_epochs = 1;
 
          SYSLIB_SERIALIZE(epoch_config,
             (epoch_duration_sec)(operators_per_epoch)
-            (total_operators)(groups)(warmup_epochs)(cooldown_epochs))
+            (batch_operator_minimum_active)(batch_op_groups)(warmup_epochs)(cooldown_epochs))
       };
 
       using epochcfg_t = sysio::singleton<"epochcfg"_n, epoch_config>;
@@ -82,14 +82,14 @@ namespace sysio {
          uint32_t                          current_epoch_index = 0;
          time_point                        current_epoch_start;
          time_point                        next_epoch_start;
-         uint8_t                           current_group = 0;     // 0, 1, or 2
-         std::vector<std::vector<name>>    groups;                // 3 groups of 7
+         uint8_t                           current_batch_op_group = 0; // 0, 1, or 2
+         std::vector<std::vector<name>>    batch_op_groups;           // 3 groups of 7
          checksum256                       last_consensus_hash;
          bool                              is_paused = false;
 
          SYSLIB_SERIALIZE(epoch_state,
             (current_epoch_index)(current_epoch_start)(next_epoch_start)
-            (current_group)(groups)(last_consensus_hash)(is_paused))
+            (current_batch_op_group)(batch_op_groups)(last_consensus_hash)(is_paused))
       };
 
       using epochstate_t = sysio::singleton<"epochstate"_n, epoch_state>;
@@ -102,7 +102,7 @@ namespace sysio {
          uint32_t    registered_epoch;
          std::vector<std::pair<uint8_t, checksum256>> chain_addresses; // ChainKind -> address
          std::vector<std::pair<uint8_t, int64_t>>      collateral;      // ChainKind -> amounts
-         uint8_t     assigned_group;    // 0, 1, or 2
+         uint8_t     assigned_batch_op_group; // 0, 1, or 2
          uint32_t    last_elected_epoch;
          uint32_t    slash_count = 0;
          bool        is_blacklisted = false;
