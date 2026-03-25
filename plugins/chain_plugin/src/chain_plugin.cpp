@@ -3230,7 +3230,7 @@ read_only::get_consensus_parameters_results
 read_only::get_consensus_parameters(const get_consensus_parameters_params&, const fc::time_point& ) const {
    get_consensus_parameters_results results;
 
-   to_variant(db.get_global_properties().configuration, results.chain_config); //chain_config_v1
+   to_variant(db.get_global_properties().configuration, results.chain_config);
    results.wasm_config = db.get_global_properties().wasm_configuration;
 
    return results;

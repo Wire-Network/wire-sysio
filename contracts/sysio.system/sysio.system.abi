@@ -195,10 +195,6 @@
                     "type": "uint32"
                 },
                 {
-                    "name": "deferred_trx_expiration_window",
-                    "type": "uint32"
-                },
-                {
                     "name": "max_transaction_delay",
                     "type": "uint32"
                 },
@@ -213,6 +209,22 @@
                 {
                     "name": "max_authority_depth",
                     "type": "uint16"
+                },
+                {
+                    "name": "max_action_return_value_size",
+                    "type": "uint32"
+                },
+                {
+                    "name": "max_kv_key_size",
+                    "type": "uint32"
+                },
+                {
+                    "name": "max_kv_value_size",
+                    "type": "uint32"
+                },
+                {
+                    "name": "max_kv_secondary_key_size",
+                    "type": "uint32"
                 }
             ]
         },

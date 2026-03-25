@@ -591,10 +591,10 @@ int64_t apply_context::kv_set(uint8_t key_format, uint64_t payer_val, const char
                "cannot store a KV record when executing a readonly transaction" );
    SYS_ASSERT( key_format <= 1, kv_key_too_large, "KV key_format must be 0 (raw) or 1 (standard)" );
    SYS_ASSERT( key_size > 0, kv_key_too_large, "KV key must not be empty" );
-   SYS_ASSERT( key_size <= config::max_kv_key_size, kv_key_too_large,
-               "KV key size {} exceeds maximum {}", key_size, config::max_kv_key_size );
-   SYS_ASSERT( value_size <= config::max_kv_value_size, kv_value_too_large,
-               "KV value size {} exceeds maximum {}", value_size, config::max_kv_value_size );
+   SYS_ASSERT( key_size <= control.get_global_properties().configuration.max_kv_key_size, kv_key_too_large,
+               "KV key size {} exceeds maximum {}", key_size, control.get_global_properties().configuration.max_kv_key_size );
+   SYS_ASSERT( value_size <= control.get_global_properties().configuration.max_kv_value_size, kv_value_too_large,
+               "KV value size {} exceeds maximum {}", value_size, control.get_global_properties().configuration.max_kv_value_size );
 
    // Resolve payer: 0 = receiver (default), non-zero = explicit.
    // Authorization is enforced at the transaction level via unauthorized_ram_usage_increase.
@@ -942,10 +942,10 @@ void apply_context::kv_idx_store(uint64_t payer_val, name table, uint8_t index_i
                                  const char* sec_key, uint32_t sec_key_size) {
    SYS_ASSERT( !trx_context.is_read_only(), table_operation_not_permitted,
                "cannot store a KV index when executing a readonly transaction" );
-   SYS_ASSERT( sec_key_size <= config::max_kv_secondary_key_size, kv_secondary_key_too_large,
-               "KV secondary key size {} exceeds maximum {}", sec_key_size, config::max_kv_secondary_key_size );
-   SYS_ASSERT( pri_key_size <= config::max_kv_key_size, kv_key_too_large,
-               "KV primary key size {} exceeds maximum {}", pri_key_size, config::max_kv_key_size );
+   SYS_ASSERT( sec_key_size <= control.get_global_properties().configuration.max_kv_secondary_key_size, kv_secondary_key_too_large,
+               "KV secondary key size {} exceeds maximum {}", sec_key_size, control.get_global_properties().configuration.max_kv_secondary_key_size );
+   SYS_ASSERT( pri_key_size <= control.get_global_properties().configuration.max_kv_key_size, kv_key_too_large,
+               "KV primary key size {} exceeds maximum {}", pri_key_size, control.get_global_properties().configuration.max_kv_key_size );
 
    account_name payer = (payer_val == 0) ? receiver : account_name(payer_val);
 
@@ -987,8 +987,8 @@ void apply_context::kv_idx_update(uint64_t payer_val, name table, uint8_t index_
                                   const char* new_sec_key, uint32_t new_sec_key_size) {
    SYS_ASSERT( !trx_context.is_read_only(), table_operation_not_permitted,
                "cannot update a KV index when executing a readonly transaction" );
-   SYS_ASSERT( new_sec_key_size <= config::max_kv_secondary_key_size, kv_secondary_key_too_large,
-               "KV secondary key size {} exceeds maximum {}", new_sec_key_size, config::max_kv_secondary_key_size );
+   SYS_ASSERT( new_sec_key_size <= control.get_global_properties().configuration.max_kv_secondary_key_size, kv_secondary_key_too_large,
+               "KV secondary key size {} exceeds maximum {}", new_sec_key_size, control.get_global_properties().configuration.max_kv_secondary_key_size );
 
    auto sv_old_sec = to_sv(old_sec_key, old_sec_key_size);
    auto sv_pri = to_sv(pri_key, pri_key_size);

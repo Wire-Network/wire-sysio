@@ -2489,8 +2489,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( action_results_tests, T, validating_testers ) { t
 
       auto &atrace = res->action_traces;
       BOOST_REQUIRE_EQUAL( atrace[0].receipt.has_value(), true );
-      BOOST_REQUIRE_EQUAL( atrace[0].return_value.size(), 256 );
-      vector<char> expected_vec(256 - 2, '0');//2 bytes for size of type unsigned_int
+      BOOST_REQUIRE_EQUAL( atrace[0].return_value.size(), 1024 );
+      vector<char> expected_vec(1024 - 2, '0');//2 bytes for size of type unsigned_int
       vector<char> ret_vec = fc::raw::unpack<vector<char>>(atrace[0].return_value);
 
       BOOST_REQUIRE_EQUAL_COLLECTIONS( ret_vec.begin(),

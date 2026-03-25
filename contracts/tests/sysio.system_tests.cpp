@@ -299,11 +299,14 @@ fc::mutable_variant_object config_to_variant( const sysio::chain::chain_config& 
       ( "max_transaction_cpu_usage", config.max_transaction_cpu_usage )
       ( "min_transaction_cpu_usage", config.min_transaction_cpu_usage )
       ( "max_transaction_lifetime", config.max_transaction_lifetime )
-      ( "deferred_trx_expiration_window", config.deferred_trx_expiration_window )
       ( "max_transaction_delay", config.max_transaction_delay )
       ( "max_inline_action_size", config.max_inline_action_size )
       ( "max_inline_action_depth", config.max_inline_action_depth )
-      ( "max_authority_depth", config.max_authority_depth );
+      ( "max_authority_depth", config.max_authority_depth )
+      ( "max_action_return_value_size", config.max_action_return_value_size )
+      ( "max_kv_key_size", config.max_kv_key_size )
+      ( "max_kv_value_size", config.max_kv_value_size )
+      ( "max_kv_secondary_key_size", config.max_kv_secondary_key_size );
 }
 
 BOOST_FIXTURE_TEST_CASE( setparams, sysio_system_tester ) try {

@@ -37,22 +37,20 @@ namespace sysio { namespace chain {
 
       SYS_ASSERT( 1 <= max_authority_depth, action_validate_exception,
                   "max authority depth should be at least 1" );
-}
 
-void chain_config_v1::validate() const {
-   chain_config_v0::validate();
    SYS_ASSERT( max_action_return_value_size <= MAX_SIZE_OF_BYTE_ARRAYS, action_validate_exception,
                "max action return value size should be less than MAX_SIZE_OF_BYTE_ARRAYS" );
+
+   SYS_ASSERT( max_kv_key_size >= 1 && max_kv_key_size <= 1024, action_validate_exception,
+               "max KV key size must be between 1 and 1024" );
+   SYS_ASSERT( max_kv_value_size >= 1 && max_kv_value_size <= 1024*1024, action_validate_exception,
+               "max KV value size must be between 1 and 1 MiB" );
+   SYS_ASSERT( max_kv_secondary_key_size >= 1 && max_kv_secondary_key_size <= 1024, action_validate_exception,
+               "max KV secondary key size must be between 1 and 1024" );
 }
 
 bool config_entry_validator::operator()(uint32_t id) const {
-   bool allowed = true;
-   switch(id){
-      case chain_config_v1::max_action_return_value_size_id:
-      break;
-   }
-
-   return allowed;
+   return id < chain_config_v0::PARAMS_COUNT;
 }
 
 } } // namespace sysio::chain

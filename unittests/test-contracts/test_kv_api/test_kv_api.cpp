@@ -881,36 +881,30 @@ public:
       kv_it_destroy(h);
    }
 
-   // ─── 29. tstitexhaust: allocate 16 iterators (max pool) ──────────────────
-   //     The 17th allocation must fail — tested from the host side
+   // ─── 29. tstitexhaust: allocate 1024 iterators (max pool) ─────────────────
    [[sysio::action]]
    void tstitexhaust() {
       uint64_t self = get_self().value;
       const char prefix[] = {0x23};
 
-      // Allocate all 16 slots
-      uint32_t handles[16];
-      for (int i = 0; i < 16; ++i) {
-         handles[i] = kv_it_create(key_format, self, prefix, 1);
+      // Allocate all 1024 slots
+      for (int i = 0; i < 1024; ++i) {
+         kv_it_create(key_format, self, prefix, 1);
       }
-
-      // Clean up all
-      for (int i = 0; i < 16; ++i) {
-         kv_it_destroy(handles[i]);
-      }
+      // Note: iterators destroyed automatically at end of transaction
    }
 
-   // ─── 30. tstitexhfail: try to allocate 17th iterator (should abort) ──────
+   // ─── 30. tstitexhfail: try to allocate 1025th iterator (should abort) ────
    [[sysio::action]]
    void tstitexhfail() {
       uint64_t self = get_self().value;
       const char prefix[] = {0x24};
 
-      // Allocate all 16 slots
-      for (int i = 0; i < 16; ++i) {
+      // Allocate all 1024 slots
+      for (int i = 0; i < 1024; ++i) {
          kv_it_create(key_format, self, prefix, 1);
       }
-      // 17th should fail — this line triggers the exception
+      // 1025th should fail — this line triggers the exception
       kv_it_create(key_format, self, prefix, 1);
       // Should not reach here
       check(false, "itexhfail: should have thrown");

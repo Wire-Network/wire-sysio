@@ -206,12 +206,13 @@ namespace sysio { namespace chain { namespace webassembly {
    uint32_t interface::get_blockchain_parameters_packed( legacy_span<char> packed_blockchain_parameters ) const {
       auto& gpo = context.control.get_global_properties();
 
-      auto s = fc::raw::pack_size( gpo.configuration.v0() );
+      const chain::chain_config_v0& cfg = gpo.configuration;
+      auto s = fc::raw::pack_size( cfg );
       if( packed_blockchain_parameters.size() == 0 ) return s;
 
       if ( s <= packed_blockchain_parameters.size() ) {
          fc::datastream<char*> ds( packed_blockchain_parameters.data(), s );
-         fc::raw::pack(ds, gpo.configuration.v0());
+         fc::raw::pack(ds, cfg);
          return s;
       }
       return 0;
@@ -220,8 +221,31 @@ namespace sysio { namespace chain { namespace webassembly {
    void interface::set_blockchain_parameters_packed( legacy_span<const char> packed_blockchain_parameters ) {
       SYS_ASSERT(!context.trx_context.is_read_only(), wasm_execution_error, "set_blockchain_parameters_packed not allowed in a readonly transaction");
       fc::datastream<const char*> ds( packed_blockchain_parameters.data(), packed_blockchain_parameters.size() );
-      chain::chain_config_v0 cfg;
-      fc::raw::unpack(ds, cfg);
+      // Preserve current config as base — contracts that don't know about newer
+      // fields (KV limits etc.) will only overwrite the fields they pack.
+      chain::chain_config_v0 cfg = context.control.get_global_properties().configuration;
+      // Unpack legacy fields (17 original fields)
+      fc::raw::unpack(ds, cfg.max_block_net_usage);
+      fc::raw::unpack(ds, cfg.target_block_net_usage_pct);
+      fc::raw::unpack(ds, cfg.max_transaction_net_usage);
+      fc::raw::unpack(ds, cfg.base_per_transaction_net_usage);
+      fc::raw::unpack(ds, cfg.net_usage_leeway);
+      fc::raw::unpack(ds, cfg.context_free_discount_net_usage_num);
+      fc::raw::unpack(ds, cfg.context_free_discount_net_usage_den);
+      fc::raw::unpack(ds, cfg.max_block_cpu_usage);
+      fc::raw::unpack(ds, cfg.target_block_cpu_usage_pct);
+      fc::raw::unpack(ds, cfg.max_transaction_cpu_usage);
+      fc::raw::unpack(ds, cfg.min_transaction_cpu_usage);
+      fc::raw::unpack(ds, cfg.max_transaction_lifetime);
+      fc::raw::unpack(ds, cfg.max_transaction_delay);
+      fc::raw::unpack(ds, cfg.max_inline_action_size);
+      fc::raw::unpack(ds, cfg.max_inline_action_depth);
+      fc::raw::unpack(ds, cfg.max_authority_depth);
+      // Unpack newer fields if present in the buffer
+      if (ds.remaining() > 0) fc::raw::unpack(ds, cfg.max_action_return_value_size);
+      if (ds.remaining() > 0) fc::raw::unpack(ds, cfg.max_kv_key_size);
+      if (ds.remaining() > 0) fc::raw::unpack(ds, cfg.max_kv_value_size);
+      if (ds.remaining() > 0) fc::raw::unpack(ds, cfg.max_kv_secondary_key_size);
       cfg.validate();
       context.db.modify( context.control.get_global_properties(),
          [&]( auto& gprops ) {

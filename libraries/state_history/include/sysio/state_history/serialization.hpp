@@ -305,7 +305,7 @@ datastream<ST>& operator<<(datastream<ST>&                                      
 
 template <typename ST>
 datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper_stateless<sysio::chain::chain_config>& obj) {
-   fc::raw::pack(ds, fc::unsigned_int(1));
+   fc::raw::pack(ds, fc::unsigned_int(0)); // variant index: chain_config_v0
    fc::raw::pack(ds, as_type<uint64_t>(obj.obj.max_block_net_usage));
    fc::raw::pack(ds, as_type<uint32_t>(obj.obj.target_block_net_usage_pct));
    fc::raw::pack(ds, as_type<uint32_t>(obj.obj.max_transaction_net_usage));
@@ -318,12 +318,14 @@ datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper_stat
    fc::raw::pack(ds, as_type<uint32_t>(obj.obj.max_transaction_cpu_usage));
    fc::raw::pack(ds, as_type<uint32_t>(obj.obj.min_transaction_cpu_usage));
    fc::raw::pack(ds, as_type<uint32_t>(obj.obj.max_transaction_lifetime));
-   fc::raw::pack(ds, as_type<uint32_t>(obj.obj.deferred_trx_expiration_window));
    fc::raw::pack(ds, as_type<uint32_t>(obj.obj.max_transaction_delay));
    fc::raw::pack(ds, as_type<uint32_t>(obj.obj.max_inline_action_size));
    fc::raw::pack(ds, as_type<uint16_t>(obj.obj.max_inline_action_depth));
    fc::raw::pack(ds, as_type<uint16_t>(obj.obj.max_authority_depth));
    fc::raw::pack(ds, as_type<uint32_t>(obj.obj.max_action_return_value_size));
+   fc::raw::pack(ds, as_type<uint32_t>(obj.obj.max_kv_key_size));
+   fc::raw::pack(ds, as_type<uint32_t>(obj.obj.max_kv_value_size));
+   fc::raw::pack(ds, as_type<uint32_t>(obj.obj.max_kv_secondary_key_size));
    return ds;
 }
 

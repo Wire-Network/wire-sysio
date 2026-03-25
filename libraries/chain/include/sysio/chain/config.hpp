@@ -69,9 +69,8 @@ namespace sysio::chain::config {
   static constexpr uint32_t   default_subjective_cpu_us                    = 300000; /// default subjective cpu given to each account
 
   static constexpr uint32_t   default_max_trx_lifetime                     = 60*60; // 1 hour
-  static constexpr uint32_t   default_deferred_trx_expiration_window       = 0; // deferred trx not supported by Wire
   static constexpr uint32_t   default_max_trx_delay                        = 45*24*3600; // 45 days
-  static constexpr uint32_t   default_max_inline_action_size               = 512 * 1024;   // 512 KB
+  static constexpr uint32_t   default_max_inline_action_size               = 512 * 1024;   // 512 KiB
   static constexpr uint16_t   default_max_inline_action_depth              = 4;
   static constexpr uint16_t   default_max_auth_depth                       = 6;
   static constexpr uint32_t   default_sig_cpu_bill_pct                     = 50 * percent_1; // billable percentage of signature recovery
@@ -80,7 +79,7 @@ namespace sysio::chain::config {
   static constexpr uint16_t   default_controller_thread_pool_size          = 2;
   static constexpr uint16_t   default_vote_thread_pool_size                = 4;
   static constexpr uint32_t   default_max_variable_signature_length        = 16384u;
-  static constexpr uint32_t   default_max_action_return_value_size         = 256;
+  static constexpr uint32_t   default_max_action_return_value_size         = 1024;
   static constexpr uint32_t   default_max_reversible_blocks                = 3600u;
 
   static constexpr uint32_t   default_max_transaction_finality_status_success_duration_sec = 180;
@@ -112,12 +111,14 @@ namespace sysio::chain::config {
 
   static constexpr uint32_t   hashing_checktime_block_size       = 10*1024;  /// call checktime from hashing intrinsic once per this number of bytes
 
-  static constexpr uint32_t   max_kv_key_size           = 256;       ///< maximum KV primary key size in bytes
-  static constexpr uint32_t   max_kv_value_size         = 256*1024;  ///< maximum KV value size (256 KiB) -- caps undo amplification
-  static constexpr uint32_t   max_kv_secondary_key_size = 256;       ///< maximum KV secondary key size in bytes
-  static constexpr uint32_t   max_kv_iterators          = 16;        ///< maximum concurrent KV iterators (shared primary + secondary pool)
-  static constexpr uint8_t    kv_format_raw             = 0;         ///< raw key bytes (variable-length, used by kv::raw_table)
-  static constexpr uint8_t    kv_format_standard        = 1;         ///< standard 24-byte [table:8B BE][scope:8B BE][pk:8B BE] layout
+  // KV default limits — on-chain consensus values are in chain_config
+  static constexpr uint32_t   default_max_kv_key_size           = 256;       ///< maximum KV primary key size in bytes
+  static constexpr uint32_t   default_max_kv_value_size         = 256*1024;  ///< maximum KV value size (256 KiB)
+  static constexpr uint32_t   default_max_kv_secondary_key_size = 256;       ///< maximum KV secondary key size in bytes
+  // Iterator limit is hardcoded (ephemeral per-transaction, bounded by CPU)
+  static constexpr uint32_t   max_kv_iterators                  = 1024;
+  static constexpr uint8_t    kv_format_raw                     = 0;         ///< raw key bytes (variable-length, used by kv::raw_table)
+  static constexpr uint8_t    kv_format_standard                = 1;         ///< standard 24-byte [table:8B BE][scope:8B BE][pk:8B BE] layout
 
 #ifdef SYSIO_SYS_VM_JIT_RUNTIME_ENABLED
   static constexpr auto default_wasm_runtime = sysio::chain::wasm_interface::vm_type::sys_vm_jit;
