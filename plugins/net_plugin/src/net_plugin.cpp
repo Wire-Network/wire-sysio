@@ -1513,7 +1513,7 @@ namespace sysio {
                        last_handshake.generation,
                        block_header::num_from_id(last_handshake.fork_db_root_id),
                        block_header::num_from_id(last_handshake.fork_db_head_id),
-                       last_handshake.fork_db_head_id.str().substr(8,16) );
+                       last_handshake.fork_db_head_id.short_id() );
             c->enqueue( last_handshake );
          }
       });
@@ -2265,14 +2265,14 @@ namespace sysio {
 
       if (chain_info.fork_db_head_id == msg.fork_db_head_id) {
          peer_dlog( p2p_blk_log, c, "handshake msg.froot {}, msg.fhead {}, msg.id {}.. sync 0, fhead {}, froot {}",
-                    msg_froot_num, msg_fhead_num, msg.fork_db_head_id.str().substr(8,16),
+                    msg_froot_num, msg_fhead_num, msg.fork_db_head_id.short_id(),
                     chain_info.fork_db_head_num, chain_info.fork_db_root_num);
          c->peer_syncing_from_us = false;
          return;
       }
       if (chain_info.fork_db_head_num < msg_froot_num) {
          peer_dlog( p2p_blk_log, c, "handshake msg.froot {}, msg.fhead {}, msg.id {}.. sync 1, fhead {}, froot {}",
-                    msg_froot_num, msg_fhead_num, msg.fork_db_head_id.str().substr(8,16),
+                    msg_froot_num, msg_fhead_num, msg.fork_db_head_id.short_id(),
                     chain_info.fork_db_head_num, chain_info.fork_db_root_num);
          c->peer_syncing_from_us = false;
          if (c->sent_handshake_count > 0) {
@@ -2282,7 +2282,7 @@ namespace sysio {
       }
       if (chain_info.fork_db_root_num > msg_fhead_num + nblk_combined_latency + min_blocks_distance) {
          peer_dlog( p2p_blk_log, c, "handshake msg.froot {}, msg.fhead {}, msg.id {}.. sync 2, fhead {}, froot {}",
-                    msg_froot_num, msg_fhead_num, msg.fork_db_head_id.str().substr(8,16),
+                    msg_froot_num, msg_fhead_num, msg.fork_db_head_id.short_id(),
                     chain_info.fork_db_head_num, chain_info.fork_db_root_num);
          controller& cc = my_impl->chain_plug->chain();
          peer_status_notice note;
@@ -2297,14 +2297,14 @@ namespace sysio {
 
       if (chain_info.fork_db_head_num + nblk_combined_latency < msg_fhead_num ) {
          peer_dlog( p2p_blk_log, c, "handshake msg.froot {}, msg.fhead {}, msg.id {}.. sync 3, fhead {}, froot {}",
-                    msg_froot_num, msg_fhead_num, msg.fork_db_head_id.str().substr(8,16),
+                    msg_froot_num, msg_fhead_num, msg.fork_db_head_id.short_id(),
                     chain_info.fork_db_head_num, chain_info.fork_db_root_num);
          c->peer_syncing_from_us = false;
          verify_catchup(c, msg_fhead_num, msg.fork_db_head_id);
          return;
       } else if(chain_info.fork_db_head_num >= msg_fhead_num + nblk_combined_latency) {
          peer_dlog( p2p_blk_log, c, "handshake msg.froot {}, msg.fhead {}, msg.id {}.. sync 4, fhead {}, froot {}",
-                    msg_froot_num, msg_fhead_num, msg.fork_db_head_id.str().substr(8,16),
+                    msg_froot_num, msg_fhead_num, msg.fork_db_head_id.short_id(),
                     chain_info.fork_db_head_num, chain_info.fork_db_root_num);
          controller& cc = my_impl->chain_plug->chain();
          peer_status_notice note;
@@ -2353,7 +2353,7 @@ namespace sysio {
             peer_ilog( p2p_blk_log, c, "catch_up while in {}, fhead = {} "
                           "target froot = {} next_expected = {}, id {}...",
                       stage_str( sync_state ), num, sync_known_fork_db_root_num,
-                      sync_next_expected_num, id.str().substr( 8, 16 ) );
+                      sync_next_expected_num, id.short_id() );
          }
          auto chain_info = my_impl->get_chain_info();
          if( sync_state == lib_catchup || num < chain_info.fork_db_root_num ) {
@@ -2372,7 +2372,7 @@ namespace sysio {
          c->enqueue( req );
       } else {
          peer_ilog( p2p_blk_log, c, "already have block while in {}, fhead = {}, id {}...",
-                  stage_str( sync_state ), num, id.str().substr(8,16) );
+                  stage_str( sync_state ), num, id.short_id() );
          {
             fc::lock_guard g_conn( c->conn_mtx );
             c->conn_fork_db_head = block_id_type();
@@ -2397,7 +2397,7 @@ namespace sysio {
          uint32_t head_num = block_header::num_from_id(msg.fork_db_head_id);
          peer_dlog( p2p_blk_log, c, "sync_manager got catch_up peer_status_notice" );
          peer_ilog( p2p_blk_log, c, "peer_status_notice, head_num {}, id {}...",
-                  head_num, msg.fork_db_head_id.str().substr(8,16) );
+                  head_num, msg.fork_db_head_id.short_id() );
          if( !my_impl->dispatcher.have_block( msg.fork_db_head_id ) ) {
             verify_catchup( c, head_num, msg.fork_db_head_id );
          } else {
@@ -2440,10 +2440,10 @@ namespace sysio {
 
       if (c) {
          peer_dlog(p2p_blk_log, c, "got block {}:{}.. latency {}ms",
-                   blk_num, blk_id.str().substr(8,16), blk_latency.count()/1000);
+                   blk_num, blk_id.short_id(), blk_latency.count()/1000);
       } else {
          fc_dlog(p2p_blk_log, "applied block {}:{}.. latency {}ms",
-                 blk_num, blk_id.str().substr(8,16), blk_latency.count()/1000);
+                 blk_num, blk_id.short_id(), blk_latency.count()/1000);
       }
       if( app().is_quiting() ) {
          if (c)
@@ -2743,7 +2743,7 @@ namespace sysio {
 
    // thread safe
    void dispatch_manager::bcast_block(const signed_block_ptr& b, const block_id_type& id) {
-      fc_dlog( p2p_blk_log, "bcast block {}:{}", b->block_num(), id.str().substr(8,16) );
+      fc_dlog( p2p_blk_log, "bcast block {}:{}", b->block_num(), id.short_id() );
 
       if(my_impl->sync_master->syncing_from_peer() ) return;
 
@@ -3184,13 +3184,13 @@ namespace sysio {
          send_block_nack(blk_id);
 
          peer_dlog( p2p_blk_log, this, "already received block {}, id {}..., latency {}ms",
-                    blk_num, blk_id.str().substr(8,16), age.count()/1000 );
+                    blk_num, blk_id.short_id(), age.count()/1000 );
          my_impl->sync_master->sync_recv_block( shared_from_this(), blk_id, blk_num, age );
 
          return true;
       }
       peer_dlog( p2p_blk_log, this, "received block {}, id {}..., latency: {}ms, head {}, fhead {}",
-                 bh.block_num(), blk_id.str().substr(8,16), age.count()/1000,
+                 bh.block_num(), blk_id.short_id(), age.count()/1000,
                  my_impl->get_chain_head_num(), my_impl->get_fork_db_head_num());
       if( !my_impl->sync_master->syncing_from_peer() ) { // guard against peer thinking it needs to send us old blocks
          block_num_type fork_db_root_num = my_impl->get_fork_db_root_num();
@@ -3549,7 +3549,7 @@ namespace sysio {
          log_p2p_address = msg.p2p_address;
          fc::unique_lock g_conn( conn_mtx );
          p2p_address = msg.p2p_address;
-         unique_conn_node_id = msg.node_id.str().substr( 0, 7 );
+         unique_conn_node_id = msg.node_id.short_id();
          g_conn.unlock();
 
          my_impl->mark_configured_bp_connection(this);
@@ -3616,7 +3616,7 @@ namespace sysio {
          }
 
          conn_node_id = msg.node_id;
-         short_conn_node_id = conn_node_id.str().substr( 0, 7 );
+         short_conn_node_id = conn_node_id.short_id();
 
          uint32_t fork_db_root_num = my_impl->get_fork_db_root_num();
 
@@ -3868,7 +3868,7 @@ namespace sysio {
    void connection::handle_message( const vote_message_ptr& msg ) {
       last_vote_received = fc::time_point::now();
       peer_dlog(vote_logger, this, "received vote: block #{}:{}.., {}, key {}..",
-                block_header::num_from_id(msg->block_id), msg->block_id.str().substr(8,16),
+                block_header::num_from_id(msg->block_id), msg->block_id.short_id(),
                 msg->strong ? "strong" : "weak", msg->finalizer_key.to_string().substr(8, 16));
       controller& cc = my_impl->chain_plug->chain();
       cc.process_vote_message(connection_id, msg);
@@ -4098,15 +4098,15 @@ namespace sysio {
          } catch( const invalid_qc_claim& ex) {
             exception = true;
             fc_wlog( p2p_blk_log, "invalid QC claim exception, connection - {}: #{} {}...: {}",
-                     cid, ptr->block_num(), id.str().substr(8,16), ex.to_string());
+                     cid, ptr->block_num(), id.short_id(), ex.to_string());
          } catch( const fc::exception& ex ) {
             exception = true;
             fc_ilog( p2p_blk_log, "bad block exception connection - {}: #{} {}...: {}",
-                     cid, ptr->block_num(), id.str().substr(8,16), ex.to_string());
+                     cid, ptr->block_num(), id.short_id(), ex.to_string());
          } catch( ... ) {
             exception = true;
             fc_wlog( p2p_blk_log, "bad block connection - {}: #{} {}...: unknown exception",
-                     cid, ptr->block_num(), id.str().substr(8,16));
+                     cid, ptr->block_num(), id.short_id());
          }
          if( exception || unlinkable) {
             if (unlinkable) {
@@ -4274,7 +4274,7 @@ namespace sysio {
 
       fc_dlog(vote_logger, "connection - {} on voted signal: {} block #{} {}.., {}, {}, key {}..",
               connection_id, status, block_header::num_from_id(msg->block_id),
-              msg->block_id.str().substr(8,16), msg->strong ? "strong" : "weak",
+              msg->block_id.short_id(), msg->strong ? "strong" : "weak",
               get_desc(), msg->finalizer_key.to_string().substr(8, 16));
 
       switch( status ) {
@@ -4295,7 +4295,7 @@ namespace sysio {
          break;
       case vote_result_t::unknown_block: // track the failure
          fc_dlog(vote_logger, "connection - {} vote unknown block #{}:{}..",
-                 connection_id, block_header::num_from_id(msg->block_id), msg->block_id.str().substr(8,16));
+                 connection_id, block_header::num_from_id(msg->block_id), msg->block_id.short_id());
          connections.any_of_connections([connection_id](const connection_ptr& c) {
             if (c->connection_id == connection_id) {
                boost::asio::post(c->strand, [c]() {
@@ -4319,7 +4319,7 @@ namespace sysio {
          return;
 
       fc_dlog(vote_logger, "bcast {} vote: block #{} {}.., {}, key {}..",
-              exclude_peer ? "received" : "our", block_header::num_from_id(msg->block_id), msg->block_id.str().substr(8,16),
+              exclude_peer ? "received" : "our", block_header::num_from_id(msg->block_id), msg->block_id.short_id(),
               msg->strong ? "strong" : "weak", msg->finalizer_key.to_string().substr(8,16));
 
       vote_buffer_factory buff_factory;
@@ -5197,11 +5197,11 @@ namespace sysio {
          fc::unique_lock g_conn(c->conn_mtx);
          if (c->unique_conn_node_id.empty()) { // still connecting, use temp id so that non-connected peers are reported
             if (!c->p2p_address.empty()) {
-               c->unique_conn_node_id = fc::sha256::hash(c->p2p_address).str().substr(0, 7);
+               c->unique_conn_node_id = fc::sha256::hash(c->p2p_address).short_id();
             } else if (!c->remote_endpoint_ip.empty()) {
-               c->unique_conn_node_id = fc::sha256::hash(c->remote_endpoint_ip).str().substr(0, 7);
+               c->unique_conn_node_id = fc::sha256::hash(c->remote_endpoint_ip).short_id();
             } else {
-               c->unique_conn_node_id = fc::sha256::hash(std::to_string(c->connection_id)).str().substr(0, 7);
+               c->unique_conn_node_id = fc::sha256::hash(std::to_string(c->connection_id)).short_id();
             }
          }
          std::string conn_node_id = c->unique_conn_node_id;
