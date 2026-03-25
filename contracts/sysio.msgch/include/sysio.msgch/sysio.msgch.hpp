@@ -5,8 +5,10 @@
 #include <sysio/asset.hpp>
 #include <sysio/crypto.hpp>
 #include <sysio/system.hpp>
+#include <sysio/opp/types/types.pb.hpp>
 
 namespace sysio {
+
 
    class [[sysio::contract("sysio.msgch")]] msgch : public contract {
    public:
@@ -16,26 +18,13 @@ namespace sysio {
       //  Actions
       // -----------------------------------------------------------------------
 
-      /// Main depot crank (permissionless, advances processing).
+      /// Batch operator delivers inbound OPP message data (protobuf wire format).
       [[sysio::action]]
-      void crank();
-
-      /// Create inbound chain request for an outpost.
-      [[sysio::action]]
-      void createreq(uint64_t outpost_id);
-
-      /// Batch operator delivers a chain.
-      [[sysio::action]]
-      void deliver(name operator_acct,
-                   uint64_t req_id,
-                   checksum256 chain_hash,
-                   checksum256 merkle_root,
-                   uint32_t msg_count,
-                   std::vector<char> raw_messages);
+      void deliver(name batch_op_name, std::vector<char> data);
 
       /// Evaluate consensus on a chain request.
       [[sysio::action]]
-      void evalcons(uint64_t req_id);
+      void evalcons(name batch_op_name, uint64_t req_id);
 
       /// Process a READY message (unpack attestations, route).
       [[sysio::action]]
@@ -44,7 +33,7 @@ namespace sysio {
       /// Queue an outbound message to an outpost.
       [[sysio::action]]
       void queueout(uint64_t outpost_id,
-                    uint16_t attest_type,
+                    opp::types::AttestationType attest_type,
                     std::vector<char> data);
 
       /// Build outbound envelope from queued messages.
@@ -61,7 +50,7 @@ namespace sysio {
          uint64_t    outpost_id;
          uint32_t    epoch_index;
          checksum256 expected_start_msg;
-         uint8_t     status;           // ChainRequestStatus protobuf enum
+         opp::types::ChainRequestStatus status;
          uint32_t    delivery_count = 0;
 
          uint64_t primary_key() const { return id; }
@@ -103,9 +92,9 @@ namespace sysio {
          uint32_t    epoch_index;
          checksum256 message_id;
          checksum256 previous_message_id;
-         uint8_t     direction;        // MessageDirection protobuf enum
-         uint8_t     status;           // MessageStatus protobuf enum
-         uint16_t    attestation_type; // AttestationType protobuf enum
+         opp::types::MessageDirection direction;
+         opp::types::MessageStatus   status;
+         opp::types::AttestationType attestation_type;
          std::vector<char> raw_payload;
          time_point  received_at;
          time_point  processed_at;
@@ -129,7 +118,7 @@ namespace sysio {
          checksum256 merkle_root;
          checksum256 start_message_id;
          checksum256 end_message_id;
-         uint8_t     status;           // EnvelopeStatus protobuf enum
+         opp::types::EnvelopeStatus status;
          std::vector<char> raw_envelope;
 
          uint64_t primary_key() const { return id; }
@@ -141,32 +130,12 @@ namespace sysio {
       >;
 
    private:
-      // Well-known accounts
-      static constexpr name EPOCH_ACCOUNT = "sysio.epoch"_n;
-      static constexpr name UWRIT_ACCOUNT = "sysio.uwrit"_n;
-      static constexpr name CHALG_ACCOUNT = "sysio.chalg"_n;
 
-      // ChainRequestStatus constants (match protobuf values)
-      static constexpr uint8_t REQ_PENDING        = 0;
-      static constexpr uint8_t REQ_COLLECTING      = 1;
-      static constexpr uint8_t REQ_CONSENSUS_OK    = 2;
-      static constexpr uint8_t REQ_CONSENSUS_FAIL  = 3;
-      static constexpr uint8_t REQ_CHALLENGED      = 4;
-
-      // MessageDirection constants
-      static constexpr uint8_t DIR_INBOUND  = 0;
-      static constexpr uint8_t DIR_OUTBOUND = 1;
-
-      // MessageStatus constants
-      static constexpr uint8_t MSG_PENDING   = 0;
-      static constexpr uint8_t MSG_READY     = 1;
-      static constexpr uint8_t MSG_PROCESSED = 2;
-      static constexpr uint8_t MSG_CANCELLED = 3;
-
-      // EnvelopeStatus constants
-      static constexpr uint8_t ENV_PENDING_DELIVERY = 0;
-      static constexpr uint8_t ENV_DELIVERED        = 1;
-      static constexpr uint8_t ENV_CONFIRMED        = 2;
+      using ChainRequestStatus = opp::types::ChainRequestStatus;
+      using MessageDirection   = opp::types::MessageDirection;
+      using MessageStatus      = opp::types::MessageStatus;
+      using EnvelopeStatus     = opp::types::EnvelopeStatus;
+      using AttestationType    = opp::types::AttestationType;
    };
 
 } // namespace sysio

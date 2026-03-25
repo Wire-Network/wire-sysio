@@ -3,12 +3,12 @@
     "version": "sysio::abi/1.2",
     "types": [
         {
-            "new_type_name": "B_pair_uint8_checksum256_E",
-            "type": "pair_uint8_checksum256"
+            "new_type_name": "B_pair_chain_kind_t_checksum256_E",
+            "type": "pair_chain_kind_t_checksum256"
         },
         {
-            "new_type_name": "B_pair_uint8_int64_E",
-            "type": "pair_uint8_int64"
+            "new_type_name": "B_pair_chain_kind_t_int64_E",
+            "type": "pair_chain_kind_t_int64"
         },
         {
             "new_type_name": "B_vector_name_E",
@@ -16,6 +16,16 @@
         }
     ],
     "structs": [
+        {
+            "name": "activateop",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                }
+            ]
+        },
         {
             "name": "advance",
             "base": "",
@@ -34,11 +44,11 @@
                     "type": "uint32"
                 },
                 {
-                    "name": "total_operators",
+                    "name": "batch_operator_minimum_active",
                     "type": "uint32"
                 },
                 {
-                    "name": "groups",
+                    "name": "batch_op_groups",
                     "type": "uint32"
                 },
                 {
@@ -68,11 +78,11 @@
                     "type": "time_point"
                 },
                 {
-                    "name": "current_group",
+                    "name": "current_batch_op_group",
                     "type": "uint8"
                 },
                 {
-                    "name": "groups",
+                    "name": "batch_op_groups",
                     "type": "B_vector_name_E[]"
                 },
                 {
@@ -112,14 +122,14 @@
                 },
                 {
                     "name": "chain_addresses",
-                    "type": "B_pair_uint8_checksum256_E[]"
+                    "type": "B_pair_chain_kind_t_checksum256_E[]"
                 },
                 {
                     "name": "collateral",
-                    "type": "B_pair_uint8_int64_E[]"
+                    "type": "B_pair_chain_kind_t_int64_E[]"
                 },
                 {
-                    "name": "assigned_group",
+                    "name": "assigned_batch_op_group",
                     "type": "uint8"
                 },
                 {
@@ -146,7 +156,7 @@
                 },
                 {
                     "name": "chain_kind",
-                    "type": "uint8"
+                    "type": "chain_kind_t"
                 },
                 {
                     "name": "chain_id",
@@ -171,12 +181,12 @@
             ]
         },
         {
-            "name": "pair_uint8_checksum256",
+            "name": "pair_chain_kind_t_checksum256",
             "base": "",
             "fields": [
                 {
                     "name": "first",
-                    "type": "uint8"
+                    "type": "chain_kind_t"
                 },
                 {
                     "name": "second",
@@ -185,12 +195,12 @@
             ]
         },
         {
-            "name": "pair_uint8_int64",
+            "name": "pair_chain_kind_t_int64",
             "base": "",
             "fields": [
                 {
                     "name": "first",
-                    "type": "uint8"
+                    "type": "chain_kind_t"
                 },
                 {
                     "name": "second",
@@ -223,7 +233,7 @@
             "fields": [
                 {
                     "name": "chain_kind",
-                    "type": "uint8"
+                    "type": "chain_kind_t"
                 },
                 {
                     "name": "chain_id",
@@ -258,11 +268,11 @@
                     "type": "uint32"
                 },
                 {
-                    "name": "total_operators",
+                    "name": "batch_operator_minimum_active",
                     "type": "uint32"
                 },
                 {
-                    "name": "groups",
+                    "name": "batch_op_groups",
                     "type": "uint32"
                 },
                 {
@@ -292,6 +302,11 @@
         }
     ],
     "actions": [
+        {
+            "name": "activateop",
+            "type": "activateop",
+            "ricardian_contract": ""
+        },
         {
             "name": "advance",
             "type": "advance",
@@ -357,18 +372,46 @@
             "name": "operators",
             "type": "operator_info",
             "index_type": "i64",
-            "key_names": [],
-            "key_types": []
+            "key_names": ["table_name","scope","primary_key"],
+            "key_types": ["name","name","uint64"]
         },
         {
             "name": "outposts",
             "type": "outpost_info",
             "index_type": "i64",
-            "key_names": [],
-            "key_types": []
+            "key_names": ["table_name","scope","primary_key"],
+            "key_types": ["name","name","uint64"]
         }
     ],
     "ricardian_clauses": [],
     "variants": [],
-    "action_results": []
+    "action_results": [],
+    "enums": [
+        {
+            "name": "chain_kind_t",
+            "type": "uint8",
+            "values": [
+                {
+                    "name": "chain_kind_unknown",
+                    "value": 0
+                },
+                {
+                    "name": "chain_kind_wire",
+                    "value": 1
+                },
+                {
+                    "name": "chain_kind_ethereum",
+                    "value": 2
+                },
+                {
+                    "name": "chain_kind_solana",
+                    "value": 3
+                },
+                {
+                    "name": "chain_kind_sui",
+                    "value": 4
+                }
+            ]
+        }
+    ]
 }

@@ -83,7 +83,7 @@ public:
       );
    }
 
-   action_result submitresp(uint64_t challenge_id, checksum256 response_hash,
+   action_result submitresp(uint64_t challenge_id, fc::sha256 response_hash,
                             std::vector<name> correct, std::vector<name> faulty) {
       return push_chalg_action(CHALG_ACCOUNT, "submitresp"_n, mvo()
          ("challenge_id", challenge_id)
@@ -100,7 +100,7 @@ public:
    }
 
    action_result submitres(name submitter, uint64_t challenge_id,
-                           checksum256 orig, checksum256 r1, checksum256 r2) {
+                           fc::sha256 orig, fc::sha256 r1, fc::sha256 r2) {
       return push_chalg_action(submitter, "submitres"_n, mvo()
          ("submitter", submitter)
          ("challenge_id", challenge_id)
@@ -123,7 +123,7 @@ public:
       );
    }
 
-   checksum256 make_hash(const std::string& seed) {
+   fc::sha256 make_hash(const std::string& seed) {
       return fc::sha256::hash(seed);
    }
 

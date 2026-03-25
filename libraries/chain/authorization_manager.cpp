@@ -292,7 +292,7 @@ namespace sysio { namespace chain {
 
       // Prevents users from updating / adding protected 'ex.*' permissions.
       if(update.permission.prefix() == name("ex")) {
-         SYS_ASSERT( auth.actor == name("sysio"), invalid_permission, "Protected permission namespace. Only 'sysio' can update or add 'ex.*' permissions." );
+         SYS_ASSERT( auth.actor == name("sysio") || auth.actor == name("sysio.authex"), invalid_permission, "Protected permission namespace. Only 'sysio' can update or add 'ex.*' permissions." );
       } else {
          SYS_ASSERT( (auth.actor == update.account), irrelevant_auth_exception,
                      "the owner of the affected permission needs to be the actor of the declared authorization" );

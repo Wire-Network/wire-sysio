@@ -1,5 +1,3 @@
 *.actions.cpp
 *.dispatch.cpp
-*_dispatch.cpp
-*_actions.cpp
 *.desc

@@ -3,6 +3,7 @@
 #include <sysio/chain/abi_serializer.hpp>
 
 #include <fc/variant_object.hpp>
+#include <fc-lite/crypto/chain_types.hpp>
 
 #include "contracts.hpp"
 
@@ -10,6 +11,7 @@ using namespace sysio::testing;
 using namespace sysio;
 using namespace sysio::chain;
 using namespace fc;
+using namespace fc::crypto;
 
 using mvo = fc::mutable_variant_object;
 
@@ -78,8 +80,8 @@ public:
       return push_epoch_action(EPOCH_ACCOUNT, "setconfig"_n, mvo()
          ("epoch_duration_sec", duration)
          ("operators_per_epoch", ops_per)
-         ("total_operators", total)
-         ("groups", grps)
+         ("batch_operator_minimum_active", total)
+         ("batch_op_groups", grps)
          ("warmup_epochs", warmup)
          ("cooldown_epochs", cooldown)
       );
@@ -113,7 +115,7 @@ public:
       );
    }
 
-   action_result regoutpost(uint8_t chain_kind, uint32_t chain_id) {
+   action_result regoutpost(chain_kind_t chain_kind, uint32_t chain_id) {
       return push_epoch_action(EPOCH_ACCOUNT, "regoutpost"_n, mvo()
          ("chain_kind", chain_kind)
          ("chain_id", chain_id)
@@ -129,15 +131,27 @@ public:
    }
 
    fc::variant get_epoch_config() {
-      return get_row_by_account(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "epochcfg"_n, "epochcfg"_n);
+      auto data = get_row_by_account(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "epochcfg"_n, "epochcfg"_n);
+      return data.empty() ? fc::variant() : abi_ser.binary_to_variant(
+         "epoch_config",
+         data,
+         abi_serializer::create_yield_function(abi_serializer_max_time) );
    }
 
    fc::variant get_epoch_state() {
-      return get_row_by_account(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "epochstate"_n, "epochstate"_n);
+      auto data = get_row_by_account(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "epochstate"_n, "epochstate"_n);
+      return data.empty() ? fc::variant() : abi_ser.binary_to_variant(
+         "epoch_state",
+         data,
+         abi_serializer::create_yield_function(abi_serializer_max_time) );
    }
 
    fc::variant get_operator(name account) {
-      return get_row_by_account(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "operators"_n, account);
+      auto data = get_row_by_account(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "operators"_n, account);
+      return data.empty() ? fc::variant() : abi_ser.binary_to_variant(
+         "operator_info",
+         data,
+         abi_serializer::create_yield_function(abi_serializer_max_time) );
    }
 
    abi_serializer abi_ser;
@@ -153,14 +167,14 @@ BOOST_FIXTURE_TEST_CASE(setconfig_basic, sysio_epoch_tester) { try {
    auto cfg = get_epoch_config();
    BOOST_REQUIRE_EQUAL(360, cfg["epoch_duration_sec"].as_uint64());
    BOOST_REQUIRE_EQUAL(7, cfg["operators_per_epoch"].as_uint64());
-   BOOST_REQUIRE_EQUAL(21, cfg["total_operators"].as_uint64());
-   BOOST_REQUIRE_EQUAL(3, cfg["groups"].as_uint64());
+   BOOST_REQUIRE_EQUAL(21, cfg["batch_operator_minimum_active"].as_uint64());
+   BOOST_REQUIRE_EQUAL(3, cfg["batch_op_groups"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(setconfig_validates_total, sysio_epoch_tester) { try {
-   // total_operators must equal operators_per_epoch * groups
+   // batch_operator_minimum_active must equal operators_per_epoch * batch_op_groups
    BOOST_REQUIRE_EQUAL(
-      error("assertion failure with message: total_operators must equal operators_per_epoch * groups"),
+      error("assertion failure with message: batch_operator_minimum_active must equal operators_per_epoch * batch_op_groups"),
       setconfig(360, 7, 20, 3)
    );
 } FC_LOG_AND_RETHROW() }
@@ -184,17 +198,16 @@ BOOST_FIXTURE_TEST_CASE(regoperator_invalid_type, sysio_epoch_tester) { try {
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(regoutpost_basic, sysio_epoch_tester) { try {
-   // ChainKind: ETHEREUM=2, chain_id=1
-   BOOST_REQUIRE_EQUAL(success(), regoutpost(2, 1));
+   BOOST_REQUIRE_EQUAL(success(), regoutpost(chain_kind_ethereum, 1));
 
    // Duplicate should fail
    BOOST_REQUIRE_EQUAL(
       error("assertion failure with message: outpost already registered"),
-      regoutpost(2, 1)
+      regoutpost(chain_kind_ethereum, 1)
    );
 
    // Different chain should succeed
-   BOOST_REQUIRE_EQUAL(success(), regoutpost(3, 1)); // SOLANA
+   BOOST_REQUIRE_EQUAL(success(), regoutpost(chain_kind_solana, 1));
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(advance_before_config, sysio_epoch_tester) { try {

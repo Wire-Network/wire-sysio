@@ -6,4 +6,9 @@ plugin_target(
         chain_plugin
         cron_plugin
         signature_provider_manager_plugin
+        outpost_client_plugin
+        outpost_ethereum_client_plugin
+        outpost_solana_client_plugin
+        fc
+        opp
         sysio_chain)

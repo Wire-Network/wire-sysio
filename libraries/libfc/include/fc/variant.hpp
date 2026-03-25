@@ -277,6 +277,25 @@ namespace fc
         fc::int256                  as_int256()const;
         fc::uint256                 as_uint256()const;
 
+        /**
+         * Convert variant to an enum value. Handles both integer and string
+         * representations (ABI serializer may return either depending on
+         * whether enum definitions are present).
+         *
+         * @tparam EnumType A C++ enum type (e.g., sysio::opp::types::ChainKind)
+         * @return The enum value cast from the variant's integer value
+         */
+        template<typename EnumType>
+        EnumType as_enum_value() const {
+           if (is_integer() || is_numeric())
+              return static_cast<EnumType>(as_int64());
+           if (is_string()) {
+              try { return static_cast<EnumType>(std::stoll(get_string())); }
+              catch (...) {}
+           }
+           throw std::runtime_error("Cannot convert variant to enum value");
+        }
+
         bool                        as_bool()const;
         double                      as_double()const;
 

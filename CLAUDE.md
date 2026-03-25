@@ -8,7 +8,7 @@ Wire Sysio is a C++ implementation of the AntelopeIO protocol (a fork of Spring)
 
 ## Build Commands
 
-**Note:** The build directory varies by developer (e.g. `cmake-build-debug`, `build`, `build/debug-claude`). Examples below use `$BUILD_DIR` — substitute your actual build path.
+**Note:** The build directory MUST be located under `<wire-sysio>/build/`, examples include `<wire-sysio>/build/claude`, `<wire-sysio>/build/debug-claude`, etc). Examples below use `$BUILD_DIR` — substitute your actual build path.
 
 ### Prerequisites (one-time setup)
 ```bash
@@ -22,6 +22,14 @@ sudo apt-get install -y build-essential binutils ccache cmake curl git ninja-bui
 
 ### Configure and Build
 ```bash
+
+# Clear `linuxbrew` from PATH (if present) to avoid conflicts with system libraries and compilers.
+# This is important for consistent builds.
+export PATH=$(echo "$PATH" | tr ':' '\n' | grep -v linuxbrew | tr '\n' ':' | sed 's/:$//')
+
+# Example build directory
+export BUILD_DIR=$PWD/build/claude
+
 # Set compiler environment
 export CC=/usr/bin/clang-18
 export CXX=/usr/bin/clang++-18
@@ -184,6 +192,16 @@ After updating the protobufs, before you can use them in the ethereum/solana con
   ./generate-opp-bundles.fish  --target=[solidity|solana]`. Additionally, WIRE contract code uses a C++ protoc plugin named `zpp_bits`, this is largely irrelevant,
 but keep in mind they are generated when the project is configured/built (CMake). Just an FYI.
 
+### TARGET: solidity
+
+**IMPORTANT** IF `<wire-sysio>/../wire-opp/solidity` exists, then run:
+```shell
+rm -Rf <wire-sysio>/../wire-opp/solidity/node_modules || true
+cp -R <wire-sysio>/build/opp/solidity/* <wire-sysio>/../wire-opp/solidity/ && \
+    cd <wire-sysio>/../wire-opp/solidity && \
+    pnpm i
+```
+
 ## Docker Build
 
 ```bash
@@ -204,56 +222,41 @@ cd $BUILD_DIR && python3 tests/<test_name>.py
 ```
 Do NOT run from the source root — that would use stale or missing binaries.
 
-## Smart Contract Compilation
+## Smart Contract Compilation (System Contracts specifically)
 
-Contracts are compiled with the Wire CDT (C/C++ Development Toolkit). The CDT repo is typically at `../wire-cdt-db-kv` (or `../wire-cdt`) with build dir `cmake-build-debug-vcpkg`.
+The system contracts are compiled via the `contracts_project` CMake target.
 
-```bash
-CDT=<path-to-wire-cdt>/cmake-build-debug-vcpkg
-
-# Production contracts
-$CDT/bin/cdt-cpp -abigen -I contracts -o contracts/sysio.token/sysio.token.wasm contracts/sysio.token/sysio.token.cpp
-$CDT/bin/cdt-cpp -abigen -I contracts/sysio.bios -I contracts -o contracts/sysio.bios/sysio.bios.wasm contracts/sysio.bios/sysio.bios.cpp
-$CDT/bin/cdt-cpp -abigen -I contracts -o contracts/sysio.msig/sysio.msig.wasm contracts/sysio.msig/sysio.msig.cpp
-$CDT/bin/cdt-cpp -abigen -I contracts -I contracts/sysio.system/include -o contracts/sysio.roa/sysio.roa.wasm contracts/sysio.roa/sysio.roa.cpp
-$CDT/bin/cdt-cpp -abigen -I contracts/sysio.system/include -I contracts -o contracts/sysio.system/sysio.system.wasm contracts/sysio.system/src/*.cpp
-
-# Test contracts (example)
-$CDT/bin/cdt-cpp -abigen -o unittests/test-contracts/<name>/<name>.wasm unittests/test-contracts/<name>/<name>.cpp
-```
-
-### After Recompiling Contracts
-
-Compiled WASMs must be copied to the build directory locations where tests load them from:
-
-```bash
-# Production contracts used by contract tests
-cp contracts/sysio.token/sysio.token.{wasm,abi} $BUILD_DIR/contracts/sysio.token/
-cp contracts/sysio.system/sysio.system.{wasm,abi} $BUILD_DIR/contracts/sysio.system/
-cp contracts/sysio.msig/sysio.msig.{wasm,abi} $BUILD_DIR/contracts/sysio.msig/
-cp contracts/sysio.roa/sysio.roa.{wasm,abi} $BUILD_DIR/contracts/sysio.roa/
-
-# Embedded contracts (INCBIN in libtester) — requires .o deletion to force rebuild
-cp contracts/sysio.bios/sysio.bios.{wasm,abi} $BUILD_DIR/libraries/testing/contracts/sysio.bios/
-cp contracts/sysio.roa/sysio.roa.{wasm,abi} $BUILD_DIR/libraries/testing/contracts/sysio.roa/
-rm -f $BUILD_DIR/libraries/testing/CMakeFiles/sysio_testing.dir/contracts.cpp.o
-
-# Test contracts
-cp unittests/test-contracts/<name>/<name>.wasm $BUILD_DIR/unittests/test-contracts/<name>/
-```
-
-Then rebuild: `ninja -C $BUILD_DIR -j6 unit_test contracts_unit_test`
+> DO NOT COMPILE THE SYSTEM CONTRACTS DIRECTLY! Always use the `contracts_project` target.
 
 ### CDT-Generated Artifacts
 
+> NOTE: There are `.gitignore` files specifically excluding the artifacts described below
+> but just in case, here are the details
+
 CDT generates `.actions.cpp`, `.dispatch.cpp`, and `.desc` files alongside compiled contracts. These are **not committed** — `.gitignore` files in `contracts/` and `unittests/test-contracts/` exclude them. If they appear as untracked, delete them:
+
 ```bash
 find contracts/ unittests/test-contracts/ -name "*.actions.cpp" -o -name "*.dispatch.cpp" -o -name "*.desc" | xargs rm -f
 ```
 
-### Action Name Constraints
+## Generate client types for system contracts
 
-SYSIO action names must be valid SYSIO names: max 13 characters, only `a-z`, `1-5`, `.`. CDT will error with "not a valid sysio name" if violated.
+> NOTE: In a dev environment, `pnpm link` should be configured to avoid the need to publish
+> the contract types changes until fully integrated. If the host OS system username is in
+> the following list, then packages have been linked and the following does not
+> require publishing [`jglanz`]
+
+To generate the client types for the system contracts,run the following commands.
+
+`<wire-sysio>/contracts/tools/generate-system-contract-types.py -B . -O /tmp/ctt -P snake -f` then `cp
+  /tmp/ctt/typescript/SystemContractTypes.ts  <wire-libraries-ts>/packages/sdk-core/src/types/` and lastly run `cd <wire-libraries-ts> &&
+  pnpm build`
+
+This makes the types available in the SDK as:
+```ts
+import { SystemContracts } from '@wire-libraries/sdk-core';
+```
+
 
 ## Regenerating Test Reference Data
 
@@ -288,8 +291,9 @@ cp $BUILD_DIR/unittests/snapshots/blocks.* $BUILD_DIR/unittests/snapshots/snap_v
 ```
 
 **Step 4:** Re-run CMake or ninja so `configure_file` picks up the new source-tree files:
+
 ```bash
-ninja -C $BUILD_DIR -j6 unit_test
+cmake --build $BUILD_DIR --target unit_test
 ```
 If CMake fails because snapshot files are missing from the source tree, run step 3 first.
 

@@ -2,6 +2,8 @@
 
 namespace sysio {
 
+using opp::types::UnderwriteStatus;
+
 // ---------------------------------------------------------------------------
 //  setconfig
 // ---------------------------------------------------------------------------
@@ -58,7 +60,7 @@ void uwrit::submituw(name underwriter, uint64_t msg_id,
       e.id = ledger.available_primary_key();
       e.underwriter = underwriter;
       e.message_id = msg_id;
-      e.status = UW_INTENT_SUBMITTED;
+      e.status = UnderwriteStatus::UNDERWRITE_STATUS_INTENT_SUBMITTED;
       e.intent_time = now;
       e.unlock_time = unlock;
       e.source_sig = source_sig;
@@ -78,13 +80,13 @@ void uwrit::confirmuw(uint64_t uw_entry_id) {
    uwledger_t ledger(get_self(), get_self().value);
    auto it = ledger.find(uw_entry_id);
    check(it != ledger.end(), "underwriting entry not found");
-   check(it->status == UW_INTENT_SUBMITTED, "entry not in INTENT_SUBMITTED state");
+   check(it->status == UnderwriteStatus::UNDERWRITE_STATUS_INTENT_SUBMITTED, "entry not in INTENT_SUBMITTED state");
 
    // TODO: Verify BOTH outpost confirmations have been received.
    //       Calculate exchange rate via reserve balances, verify threshold.
 
    ledger.modify(it, same_payer, [&](auto& e) {
-      e.status = UW_INTENT_CONFIRMED;
+      e.status = UnderwriteStatus::UNDERWRITE_STATUS_INTENT_CONFIRMED;
    });
 
    // TODO: Queue ATTESTATION_TYPE_REMIT to target outpost via sysio.msgch::queueout.
@@ -98,14 +100,14 @@ void uwrit::expirelock(uint64_t uw_entry_id) {
    uwledger_t ledger(get_self(), get_self().value);
    auto it = ledger.find(uw_entry_id);
    check(it != ledger.end(), "underwriting entry not found");
-   check(it->status != UW_COMPLETED && it->status != UW_SLASHED,
+   check(it->status != UnderwriteStatus::UNDERWRITE_STATUS_COMPLETED && it->status != UnderwriteStatus::UNDERWRITE_STATUS_SLASHED,
          "entry already finalized");
 
    auto now = current_time_point();
    check(now >= it->unlock_time, "lock has not expired yet");
 
    ledger.modify(it, same_payer, [&](auto& e) {
-      e.status = UW_EXPIRED;
+      e.status = UnderwriteStatus::UNDERWRITE_STATUS_EXPIRED;
    });
 
    // Release committed collateral
@@ -137,7 +139,7 @@ void uwrit::distfee(uint64_t uw_entry_id) {
    uwledger_t ledger(get_self(), get_self().value);
    auto it = ledger.find(uw_entry_id);
    check(it != ledger.end(), "underwriting entry not found");
-   check(it->status == UW_INTENT_CONFIRMED, "entry not confirmed");
+   check(it->status == UnderwriteStatus::UNDERWRITE_STATUS_INTENT_CONFIRMED, "entry not confirmed");
 
    uwconfig_t cfg_tbl(get_self(), get_self().value);
    auto cfg = cfg_tbl.get();
@@ -148,14 +150,14 @@ void uwrit::distfee(uint64_t uw_entry_id) {
    //       For now, mark as completed.
 
    ledger.modify(it, same_payer, [&](auto& e) {
-      e.status = UW_COMPLETED;
+      e.status = UnderwriteStatus::UNDERWRITE_STATUS_COMPLETED;
    });
 }
 
 // ---------------------------------------------------------------------------
 //  updcltrl
 // ---------------------------------------------------------------------------
-void uwrit::updcltrl(name underwriter, uint8_t chain_kind,
+void uwrit::updcltrl(name underwriter, fc::crypto::chain_kind_t chain_kind,
                      asset amount, bool is_increase) {
    require_auth(get_self());
 
@@ -202,7 +204,8 @@ void uwrit::slash(name underwriter, std::string reason) {
    auto uw_idx = collateral.get_index<"byuw"_n>();
    for (auto it = uw_idx.lower_bound(underwriter.value);
         it != uw_idx.end() && it->underwriter == underwriter;) {
-      auto current = it++;
+      auto current = it;
+      ++it;
       collateral.modify(*current, same_payer, [&](auto& c) {
          c.staked_amount = asset(0, c.staked_amount.symbol);
          c.locked_amount = asset(0, c.locked_amount.symbol);
@@ -215,9 +218,9 @@ void uwrit::slash(name underwriter, std::string reason) {
    auto uw_ledger_idx = ledger.get_index<"byuw"_n>();
    for (auto it = uw_ledger_idx.lower_bound(underwriter.value);
         it != uw_ledger_idx.end() && it->underwriter == underwriter; ++it) {
-      if (it->status == UW_INTENT_SUBMITTED || it->status == UW_INTENT_CONFIRMED) {
+      if (it->status == UnderwriteStatus::UNDERWRITE_STATUS_INTENT_SUBMITTED || it->status == UnderwriteStatus::UNDERWRITE_STATUS_INTENT_CONFIRMED) {
          ledger.modify(*it, same_payer, [&](auto& e) {
-            e.status = UW_SLASHED;
+            e.status = UnderwriteStatus::UNDERWRITE_STATUS_SLASHED;
          });
       }
    }
