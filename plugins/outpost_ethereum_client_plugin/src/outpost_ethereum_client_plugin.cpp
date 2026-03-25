@@ -122,15 +122,15 @@ void outpost_ethereum_client_plugin::plugin_shutdown() {
    ilog("Shutdown outpost client plugin");
 }
 
-std::vector<ethereum_client_entry_ptr> outpost_ethereum_client_plugin::get_clients() {
+std::vector<ethereum_client_entry_ptr> outpost_ethereum_client_plugin::get_clients() const {
    return my->get_clients();
 }
 
-ethereum_client_entry_ptr outpost_ethereum_client_plugin::get_client(const std::string& id) {
+ethereum_client_entry_ptr outpost_ethereum_client_plugin::get_client(const std::string& id) const {
    return my->get_client(id);
 }
 
-const std::vector<std::pair<std::filesystem::path, std::vector<fc::network::ethereum::abi::contract>>>& outpost_ethereum_client_plugin::get_abi_files() {
+const std::vector<std::pair<std::filesystem::path, std::vector<fc::network::ethereum::abi::contract>>>& outpost_ethereum_client_plugin::get_abi_files() const {
    return my->get_abi_files();
 }
 } // namespace sysio

@@ -5,4 +5,5 @@ plugin_target(
         LIBRARIES
         outpost_ethereum_client_plugin
         cron_plugin
+        CURL::libcurl
 )

@@ -32,9 +32,9 @@ public:
 
    virtual void plugin_shutdown();
 
-   std::vector<ethereum_client_entry_ptr> get_clients();
-   ethereum_client_entry_ptr get_client(const std::string& id);
-   const std::vector<std::pair<std::filesystem::path, std::vector<fc::network::ethereum::abi::contract>>>& get_abi_files();
+   std::vector<ethereum_client_entry_ptr> get_clients() const;
+   ethereum_client_entry_ptr get_client(const std::string& id) const;
+   const std::vector<std::pair<std::filesystem::path, std::vector<fc::network::ethereum::abi::contract>>>& get_abi_files() const;
 private:
    std::unique_ptr<class outpost_ethereum_client_plugin_impl> my;
 };

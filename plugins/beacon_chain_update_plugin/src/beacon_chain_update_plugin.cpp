@@ -1,3 +1,4 @@
+#include <curl/curl.h>
 #include <fc/io/json.hpp>
 #include <fc/log/logger.hpp>
 #include <fc/network/url.hpp>
@@ -5,6 +6,7 @@
 #include <unordered_map>
 #include <fc/network/ethereum/ethereum_abi.hpp>
 #include <fc/crypto/ethereum/ethereum_utils.hpp>
+#include <regex>
 #include <sysio/chain/exceptions.hpp>
 #include <sysio/cron_plugin.hpp>
 #include <sysio/services/cron_parser.hpp>
@@ -27,6 +29,7 @@ namespace sysio {
 // using namespace outpost_client::ethereum;
 
 struct OPP : fc::network::ethereum::ethereum_contract_client {
+   static constexpr auto contract_name = "OPP";
 
    ethereum_contract_tx_fn<fc::variant> finalizeEpoch;
    OPP(const ethereum_client_ptr& client,
@@ -39,25 +42,29 @@ struct OPP : fc::network::ethereum::ethereum_contract_client {
 };
 
 struct deposit_manager : fc::network::ethereum::ethereum_contract_client {
+   static constexpr auto contract_name = "DepositManager";
 
    ethereum_contract_tx_fn<fc::variant, uint64_t> setEntryQueue;
+   ethereum_contract_tx_fn<fc::variant, uint64_t> updateApyBPS;
    deposit_manager(const ethereum_client_ptr& client,
                    const address_compat_type& contract_address_compat,
                    const std::vector<fc::network::ethereum::abi::contract>& contracts)
       : ethereum_contract_client(client, contract_address_compat, contracts)
-      , setEntryQueue(create_tx<fc::variant, uint64_t>(get_abi("setEntryQueue"))) {
+      , setEntryQueue(create_tx<fc::variant, uint64_t>(get_abi("setEntryQueue")))
+      , updateApyBPS(create_tx<fc::variant, uint64_t>(get_abi("updateApyBPS"))) {
 
       };
 };
 
 struct withdrawal_queue : fc::network::ethereum::ethereum_contract_client {
+   static constexpr auto contract_name = "WithdrawalQueue";
 
-   ethereum_contract_tx_fn<fc::variant, uint64_t> setWithdrawalDelay;
+   ethereum_contract_tx_fn<fc::variant, uint64_t> setWithdrawDelay;
    withdrawal_queue(const ethereum_client_ptr& client,
                     const address_compat_type& contract_address_compat,
                     const std::vector<fc::network::ethereum::abi::contract>& contracts)
       : ethereum_contract_client(client, contract_address_compat, contracts)
-      , setWithdrawalDelay(create_tx<fc::variant, uint64_t>(get_abi("setWithdrawalDelay"))) {
+      , setWithdrawDelay(create_tx<fc::variant, uint64_t>(get_abi("setWithdrawDelay"))) {
 
       };
 };
@@ -67,18 +74,18 @@ namespace {
    constexpr auto beacon_chain_apy_url                  = "beacon-chain-apy-url";
    constexpr auto beacon_chain_default_apy_url          = "https://beaconcha.in/api/v1/ethstore/latest";
    constexpr auto beacon_chain_api_key                  = "beacon-chain-api-key";
-   constexpr auto beacon_chain_deployer                 = "beacon-chain-deployer";
    constexpr auto beacon_chain_contracts_addrs          = "beacon-chain-contracts-addrs";
-   constexpr auto beacon_chain_update_queue             = "beacon-chain-update-queue";
-   constexpr auto beacon_chain_update_apy               = "beacon-chain-update-apy";
+   constexpr auto beacon_chain_update_interval          = "beacon-chain-update-interval";
    constexpr auto beacon_chain_interval                 = "beacon-chain-interval";
    constexpr auto beacon_chain_finalize_epoch_interval  = "beacon-chain-finalize-epoch-interval";
 
-   namespace contracts {
-      constexpr auto OPP = "OPP";
-      constexpr auto deposit_manager = "DepositManager";
-      constexpr auto withdrawal_queue = "WithdrawalQueue";
-   }
+   constexpr auto client_target_chain                   = fc::crypto::chain_kind_t::chain_kind_ethereum;
+   constexpr auto abi_contract_name_field               = "contractName";
+
+   constexpr auto default_interval_schedule             = "* */1 * * *"; // every hour
+   constexpr auto default_interval_name                 = "default";
+
+   const std::regex regex(R"(^(.+?)(?:V\d+)?$)");
 
    [[maybe_unused]] inline fc::logger& logger() {
       static fc::logger log{"beacon_chain_update_plugin"};
@@ -91,7 +98,8 @@ namespace {
       namespace asio  = boost::asio;
       using tcp       = asio::ip::tcp;
 
-      FC_ASSERT(!api_key.empty(), "beacon-chain-api-key is required for queues API");
+      SYS_ASSERT(!api_key.empty(), sysio::chain::plugin_config_exception,
+                 "beacon-chain-api-key is required for queues API");
 
       fc::url url(queue_url);
       auto    host = url.host().value();
@@ -126,9 +134,10 @@ namespace {
       beast::error_code ec;
       stream.shutdown(ec);
 
-      FC_ASSERT(res.result() == http::status::ok,
-                "get_queues_mainnet HTTP error: {} {}",
-                static_cast<unsigned>(res.result()), std::string(res.reason()));
+      SYS_ASSERT(res.result() == http::status::ok,
+                 sysio::chain::plugin_config_exception,
+                 "get_queues_mainnet HTTP error: {} {}",
+                 static_cast<unsigned>(res.result()), std::string(res.reason()));
 
       auto response = fc::json::from_string(res.body());
       return response["data"];
@@ -140,16 +149,18 @@ namespace {
       namespace asio  = boost::asio;
       using tcp       = asio::ip::tcp;
 
-      std::string full_url = apy_url;
-      if (api_key && !api_key->empty())
-         full_url += "?apikey=" + *api_key;
-
-      fc::url url(full_url);
+      // Parse the base URL only — fc::url::query() is broken and never stores the query string
+      // during parsing, so appending ?apikey= before parsing would silently discard the key.
+      fc::url url(apy_url);
       auto    host = url.host().value();
       auto    port = std::to_string(url.port().value_or(443));
       auto    path = url.path().value_or(std::filesystem::path("/")).string();
-      if (auto query = url.query(); query && !query->empty())
-         path += "?" + *query;
+      if (api_key && !api_key->empty()) {
+         char* escaped = curl_easy_escape(nullptr, api_key->c_str(), static_cast<int>(api_key->size()));
+         path += "?apikey=";
+         path += escaped;
+         curl_free(escaped);
+      }
 
       asio::io_context    ioc;
       asio::ssl::context  ssl_ctx{asio::ssl::context::tlsv12_client};
@@ -177,9 +188,10 @@ namespace {
       beast::error_code ec;
       stream.shutdown(ec);
 
-      FC_ASSERT(res.result() == http::status::ok,
-                "get_ethstore_latest HTTP error: {} {}",
-                static_cast<unsigned>(res.result()), std::string(res.reason()));
+      SYS_ASSERT(res.result() == http::status::ok,
+                 sysio::chain::plugin_config_exception,
+                 "get_ethstore_latest HTTP error: {} {}",
+                 static_cast<unsigned>(res.result()), std::string(res.reason()));
 
       auto response = fc::json::from_string(res.body());
       return response["data"];
@@ -188,25 +200,132 @@ namespace {
 
 using namespace std;
 using addr_map_t = std::map<std::string, std::string>;
-using action = std::function<bool()>;
+using action = std::function<void()>;
 using interval_actions_t = vector<action>;
 using schedules_t = unordered_map<string, services::cron_service::job_schedule>;
+using ethereum_client_ptr = fc::network::ethereum::ethereum_client_ptr;
 
 class beacon_chain_update_plugin_impl {
 
 public:
    string beacon_chain_queue_url;
+   string beacon_chain_queue_interval;
    string beacon_chain_apy_url;
+   string beacon_chain_apy_interval;
    optional<string> beacon_chain_api_key;
-   optional<string> beacon_chain_deployer;
-   bool update_queue{false};
-   bool update_apy{false};
    schedules_t schedules;
+   string actual_default_schedule;
    unordered_map<string, interval_actions_t> intervals;
+
    addr_map_t outpost_addrs;
 
-};
+   interval_actions_t& find_interval_actions(string interval_name) {
+      // if the interval actions are already created, we can just use it
+      if(intervals.count(interval_name) > 0) {
+         return intervals[interval_name];
+      }
 
+      // This is used to make sure that there is a corresponding cron schedule associated with each collection of actions
+      if(schedules.count(interval_name) == 0) {
+         ilog("Could not find a schedule named {}, using {} interval", interval_name, default_interval_name);
+         interval_name = actual_default_schedule;
+      }
+
+      return intervals[interval_name];
+   }
+
+   template <typename C>
+   std::pair<std::shared_ptr<C>, ethereum_client_ptr> get_contract(const outpost_ethereum_client_plugin& oec_plugin) const {
+      constexpr auto desired_contract_name = C::contract_name;
+      const auto clients = oec_plugin.get_clients();
+      ethereum_client_ptr client;
+      for(const auto& client_entry : clients) {
+         ilog("id={}", client_entry->id);
+         if(client_target_chain == client_entry->signature_provider->target_chain) {
+            SYS_ASSERT(!client, sysio::chain::plugin_config_exception,
+                       "There should only be one ethereum client provided, but there were at least 2");
+            client = client_entry->client;
+            break;
+         }
+      }
+      SYS_ASSERT(!!client, sysio::chain::plugin_config_exception,
+                 "could not find any ethereum client for {}", desired_contract_name);
+
+      auto itr = outpost_addrs.find(desired_contract_name);
+      SYS_ASSERT(itr != outpost_addrs.end(), sysio::chain::plugin_config_exception,
+                 "contract {} address was not provided in an abi file", desired_contract_name );
+
+      const auto contract_addr = itr->second;
+      const auto abis = oec_plugin.get_abi_files();
+      std::vector<fc::network::ethereum::abi::contract> contract_abis;
+      for(const auto& abi_file_and_contracts : abis) {
+         const auto& [json_abi_file, abi_contracts] = abi_file_and_contracts;
+         auto json_var = fc::json::from_file(json_abi_file);
+         if(!json_var.is_object())
+            continue;
+
+         const auto var_obj = json_var.get_object();
+         if(!var_obj.contains(abi_contract_name_field))
+            continue;
+
+         const auto contract_name_var = var_obj[abi_contract_name_field];
+         if(contract_name_var.is_array())
+            continue;
+
+         const auto contract_name = contract_name_var.as<std::string>();
+
+         std::smatch matches;
+         if(!std::regex_search(contract_name, matches, regex))
+            continue;
+
+         if(matches[1].str() != desired_contract_name)
+            continue;
+
+         contract_abis.insert(contract_abis.end(), abi_contracts.begin(), abi_contracts.end());
+         break;
+      }
+
+      std::shared_ptr<C> contract;
+      if(contract_abis.size()) {
+         contract = client->get_contract<C>(contract_addr, contract_abis);
+      }
+
+      return { contract, client };
+   }
+
+   constexpr static auto epa_field = "estimated_processed_at";
+
+   static optional<fc::variant> get_field_from_object(const fc::variant& expected_obj, const string& expected_field) {
+      if (!expected_obj.is_object())
+         return {};
+
+      const auto actual_obj = expected_obj.get_object();
+      if (!actual_obj.contains(expected_field))
+         return {};
+
+      return actual_obj[expected_field];
+   }
+
+   // reported in seconds
+   static optional<uint64_t> get_queue_length(const fc::variant& queues, const string& queue_branch) {
+      const auto deposit_queue = get_field_from_object(queues, queue_branch);
+      SYS_ASSERT(!!deposit_queue, sysio::chain::plugin_config_exception,
+                 "Returned api request:\n{}\n doesn't contain the field {}",
+                 fc::json::to_string(queues, fc::time_point::maximum()), queue_branch);
+      const auto epa_var = get_field_from_object(*deposit_queue, epa_field);
+      SYS_ASSERT(!!epa_var, sysio::chain::plugin_config_exception,
+                 "{}:\n{}\n doesn't contain a key of {}",
+                 queue_branch, fc::json::to_string(queues, fc::time_point::maximum()), epa_field);
+      SYS_ASSERT(epa_var->is_numeric(), sysio::chain::plugin_config_exception,
+                 "queues[{}][{}]:\n{}\n doesn't contain a number",
+                 queue_branch, epa_field,
+                 fc::json::to_string(queues, fc::time_point::maximum()));
+
+      const auto now_sec = fc::time_point::now().sec_since_epoch();
+      const auto epa = epa_var->as_uint64();
+      return now_sec - epa;
+   }
+};
 
 void beacon_chain_update_plugin::plugin_initialize(const variables_map& options) {
    ilog("initializing beacon chain plugin");
@@ -215,14 +334,11 @@ void beacon_chain_update_plugin::plugin_initialize(const variables_map& options)
       auto client_specs    = options.at(beacon_chain_contracts_addrs).as<std::vector<std::string>>();
       for(const auto& client_spec : client_specs) {
          ilog("found beacon chain outpost addresses: {}", client_spec);
-         // auto& addrs_file = options.at(client_spec).as<std::string>();
-         // ilog("found - {}", addrs_file);
          fc::variant addrs = fc::json::from_file<fc::variant>(client_spec);
-         ilog("got it");
          const auto addrs_obj = addrs.get_object();
          for(const auto& entry : addrs_obj) {
-            const auto& name = entry.key();
-            const auto& addr = entry.value().as_string();
+            const auto name = entry.key();
+            const auto addr = entry.value().as_string();
             ilog("outpost address - {}: {}", name, addr);
             my->outpost_addrs.emplace(name, addr);
          }
@@ -233,75 +349,37 @@ void beacon_chain_update_plugin::plugin_initialize(const variables_map& options)
       ilog("initializing beacon chain intervals");
       auto client_specs    = options.at(beacon_chain_interval).as<std::vector<std::string>>();
       for (auto& client_spec : client_specs) {
-          auto parts = fc::split(client_spec, ',', 1);
-          auto schedule_inserted = my->schedules.emplace(parts[0], services::parse_cron_schedule_or_throw(parts[1]));
-          SYS_ASSERT(schedule_inserted.second, chain::plugin_config_exception,
-                     "Repeated interval spec name: {}, schedule: {}", parts[0], parts[1]);
+         auto parts = fc::split(client_spec, ',', 1);
+         auto schedule_inserted = my->schedules.emplace(parts[0], services::parse_cron_schedule_or_throw(parts[1]));
+         SYS_ASSERT(schedule_inserted.second, chain::plugin_config_exception,
+                    "Repeated interval spec name: `{}`, schedule: `{}`", parts[0], parts[1]);
+         if(my->actual_default_schedule.empty()) {
+            my->actual_default_schedule = parts[0];
+            ilog("Interval schedule name: `{}`, with schedule: `{}`, will be used for `{}`",
+                 parts[0], parts[1], default_interval_name);
+         }
       }
    }
    else {
-      if (my->schedules.empty()) {
-         ilog("No beacon chain intervals provided, using `default` interval of every 1 hour");
-         my->schedules.emplace("default", services::parse_cron_schedule_or_throw("*/6 * * * *"));
-      }
+      ilog("No beacon chain interval schedules provided, using `{}` schedule with name `{}`", default_interval_schedule, default_interval_name);
+      my->schedules.emplace(default_interval_name, services::parse_cron_schedule_or_throw(default_interval_schedule));
    }
 
-   auto& sig_plug = app().get_plugin<signature_provider_manager_plugin>();
-   auto& oec_plug = app().get_plugin<outpost_ethereum_client_plugin>();
-   const auto& clients = oec_plug.get_clients();
-   SYS_ASSERT(clients.size() > 0, sysio::chain::plugin_config_exception,
-      "At least one ethereum client must be configured for beacon chain update plugin");
-   const auto ethClient = clients.front()->client;
-   const auto dm_addr = my->outpost_addrs[contracts::deposit_manager];
-   ilog("dm_addr={}", dm_addr);
-   const auto wq_addr = my->outpost_addrs[contracts::withdrawal_queue];
-   ilog("wq_addr={}", wq_addr);
-   ilog("reading abis");
-   ilog("done reading abis");
-   ilog("oppContract");
-   auto dmContract = ethClient->get_contract<deposit_manager>(dm_addr, contract_abis);
-   ilog("dmContract");
-   auto wqContract = ethClient->get_contract<withdrawal_queue>(wq_addr, contract_abis);
-   ilog("wqContract");
+   auto& oec_plugin = app().get_plugin<outpost_ethereum_client_plugin>();
 
    if( options.contains(beacon_chain_finalize_epoch_interval) ) {
       ilog("initializing beacon chain finalize epoch interval");
-      SYS_ASSERT( my->outpost_addrs.size() > 0, sysio::chain::plugin_config_exception,
-         "finalize epoch option is only valid if outpost address file is provided" );
-      SYS_ASSERT( my->outpost_addrs.count(contracts::OPP) > 0, sysio::chain::plugin_config_exception,
-         "finalize epoch option is only valid if outpost address file is provided" );
-
-      const auto opp_addr = my->outpost_addrs[contracts::OPP];
-      ilog("opp_addr={}", opp_addr);
-      auto abis = oec_plug.get_abi_files();
-      ilog("determine size");
-      const auto add_size = [](std::size_t a, const auto& abi_file_and_contracts) {
-         const auto& [abi_file, abi_contracts] = abi_file_and_contracts;
-         return a + abi_contracts.size();
-      };
-
-      std::vector<fc::network::ethereum::abi::contract> contract_abis;
-      const auto collect_abis = [&contract_abis](const auto& abi_file_and_contracts) {
-         const auto& [abi_file, abi_contracts] = abi_file_and_contracts;
-         contract_abis.insert(contract_abis.end(), abi_contracts.begin(), abi_contracts.end());
-      };
-      const auto reserve_size = std::accumulate(abis.begin(), abis.end(), 0, add_size);
-      ilog("total={}", reserve_size);
-      contract_abis.clear();
-      contract_abis.reserve(reserve_size);
-      std::transform(abis.begin(), abis.end(), std::back_inserter(contract_abis), add_size);
-      std::for_each(abis.begin(), abis.end(), collect_abis);
-      auto oppContract = ethClient->get_contract<OPP>(opp_addr, contract_abis);
+      auto [ opp_contract, eth_client ] = my->get_contract<OPP>(oec_plugin);
 
       auto& finalize_epoch_interval = options.at(beacon_chain_finalize_epoch_interval).as<std::string>();
-      auto& actions = my->intervals[finalize_epoch_interval];
-      auto action = [&my_ = *my, oppContract, ethClient]() {
+      auto& actions = my->find_interval_actions(finalize_epoch_interval);
+      auto action = [&my_ = *my, opp_contract, eth_client]() {
          ilog("finalizing OPP epoch");
-         const auto bn = ethClient->get_block_number();
+         const auto bn = eth_client->get_block_number();
          ilog("Executing beacon chain update for interval bn {}", (uint64_t)bn);
          try {
-            ilog("Sending finalizeEpoch transaction to OPP contract at address {}", fc::to_hex(ethClient->get_address(), true));
-            auto res = oppContract->finalizeEpoch();
+            ilog("Sending finalizeEpoch transaction to OPP contract at address {}", fc::to_hex(eth_client->get_address(), true));
+            auto res = opp_contract->finalizeEpoch();
             ilog("finalizeEpoch tx sent, hash: {}", res.as_string());
          }
          catch (const std::exception& e) {
@@ -310,66 +388,129 @@ void beacon_chain_update_plugin::plugin_initialize(const variables_map& options)
          return true;
       };
       actions.emplace_back(std::move(action));
+      ilog("There are {} actions currently registered.", actions.size());
       
    }
 
-   my->beacon_chain_queue_url = options.at(beacon_chain_queue_url).as<std::string>();
-   my->beacon_chain_apy_url   = options.at(beacon_chain_apy_url).as<std::string>();
-
-   const optional<string> update_queue = options.contains(beacon_chain_update_queue)
-    ? optional<string>{options.at(beacon_chain_update_queue).as<string>()}
-    : optional<string>{};
-   const optional<string> update_apy   = options.contains(beacon_chain_update_apy)
-    ? optional<string>{options.at(beacon_chain_update_apy).as<string>()}
-    : optional<string>{};
    my->beacon_chain_api_key = options.contains(beacon_chain_api_key)
     ? optional<string>{options.at(beacon_chain_api_key).as<std::string>()}
     : optional<string>{};
 
-   if( update_queue.has_value() ) {
-      ilog("beacon chain queue update enabled");
-      FC_ASSERT(my->beacon_chain_api_key.has_value(), "beacon-chain-api-key is required for queue update");
-      auto& actions = my->intervals[*my->beacon_chain_api_key];
-      auto action = [&my_ = *my, oppContract, ethClient]() {
-         ilog("update Queue");
-         auto queues = get_queues_mainnet(my_.beacon_chain_queue_url, *(my_.beacon_chain_api_key));
-         ilog("queues: {}", fc::json::to_string(queues, fc::time_point::maximum()));
+   if( options.contains(beacon_chain_api_key) ) {
+      ilog("beacon chain queue/apy update enabled");
+      auto [ wq_contract, eth_client ] = my->get_contract<withdrawal_queue>(oec_plugin);
+      auto [ dm_contract, eth_client2 ] = my->get_contract<deposit_manager>(oec_plugin);
+      SYS_ASSERT(eth_client == eth_client2, sysio::chain::plugin_config_exception,
+                 "get_contract should be returning the same ethereum client for both contracts");
+      SYS_ASSERT(!!wq_contract || !!dm_contract, sysio::chain::plugin_config_exception,
+                 "If {} is set, then must provide at least {}'s or {}'s contract address",
+                 beacon_chain_api_key, withdrawal_queue::contract_name, deposit_manager::contract_name);
+      my->beacon_chain_queue_url = options.at(beacon_chain_queue_url).as<std::string>();
+      my->beacon_chain_queue_interval = options.at(beacon_chain_update_interval).as<std::string>();
+      my->beacon_chain_apy_url = options.at(beacon_chain_apy_url).as<std::string>();
+      auto& actions = my->find_interval_actions(my->beacon_chain_queue_interval);
+      auto action = [&my_ = *my, wq_contract, dm_contract, eth_client]() {
          try {
-            ilog("Sending finalizeEpoch transaction to OPP contract at address {}", fc::to_hex(ethClient->get_address(), true));
-//            ilog("finalizeEpoch tx sent, hash: {}", res.as_string());
+            ilog("update Queue");
+            auto queues = get_queues_mainnet(my_.beacon_chain_queue_url, *(my_.beacon_chain_api_key));
+            ilog("queues: {}", fc::json::to_string(queues, fc::time_point::maximum()));
+            constexpr auto exit_queue = "exit_queue";
+
+            const auto exit_queue_len_sec = my_.get_queue_length(queues, exit_queue);
+
+            constexpr auto nine_days = 9;
+            constexpr auto nine_days_in_sec = 60 * 60 * 24 * nine_days;
+            if(!exit_queue_len_sec)
+               wlog("defaulting the {} withdrawal delay to {} days since {}::{} was not a finite number",
+                     withdrawal_queue::contract_name, nine_days, exit_queue,
+                     beacon_chain_update_plugin_impl::epa_field);
+            auto exit_queue_delay_len_sec = nine_days_in_sec +
+               (!!exit_queue_len_sec ? *exit_queue_len_sec : 0);
+            ilog("Sending setWithdrawDelay transaction to {} contract at address {}",
+                 withdrawal_queue::contract_name, fc::to_hex(eth_client->get_address(), true));
+            if(!!wq_contract) {
+               auto res = wq_contract->setWithdrawDelay(exit_queue_delay_len_sec);
+               ilog("setWithdrawDelay tx sent, hash: {}", res.as_string());
+            }
+
+            if(!dm_contract)
+               return;
+
+            constexpr auto deposit_queue = "deposit_queue";
+            const auto deposit_queue_len_sec = my_.get_queue_length(queues, deposit_queue);
+            const auto default_days = 1;
+            uint64_t depositQDaysFl = !deposit_queue_len_sec
+               ? default_days
+               : *deposit_queue_len_sec / (60 * 60 * 24); // convert sec to min, min to hours, hours to days
+            if(!deposit_queue_len_sec)
+               wlog("defaulting the {} withdrawal delay to {} day since {} was not a finite number",
+                     deposit_manager::contract_name, depositQDaysFl, deposit_queue,
+                     beacon_chain_update_plugin_impl::epa_field);
+
+            ilog("Sending setEntryQueue transaction to {} contract at address {}",
+                 deposit_manager::contract_name, fc::to_hex(eth_client->get_address(), true));
+
+            auto res1 = dm_contract->setEntryQueue(depositQDaysFl);
+            ilog("setEntryQueue tx sent, hash: {}", res1.as_string());
+
+            auto ethstore = get_ethstore_latest(my_.beacon_chain_apy_url, *(my_.beacon_chain_api_key));
+            ilog("ethstore: {}", fc::json::to_string(ethstore, fc::time_point::maximum()));
+            ilog("Sending setEntryQueue transaction to DepositManager contract at address {}", fc::to_hex(eth_client->get_address(), true));
+            constexpr auto avgapr7d_field = "avgapr7d";
+            const auto apy = my_.get_field_from_object(ethstore, avgapr7d_field);
+            if(!apy) {
+               elog("ethstore:\n{}\n did not have a {} field, not setting the {} contract entry queue",
+                    fc::json::to_string(ethstore, fc::time_point::maximum()), avgapr7d_field, deposit_manager::contract_name);
+               return;
+            }
+            double aprFraction = 1.0;
+            if(apy->is_double())
+               aprFraction = apy->as_double();
+            auto scaled = static_cast<uint64_t>(aprFraction * 10000.0 + 1e-12);
+            auto res2 = dm_contract->updateApyBPS(scaled);
+            ilog("updateApyBPS tx sent, hash: {}", res2.as_string());
          }
          catch (const std::exception& e) {
             elog("Error executing beacon chain update for interval: {}", e.what());
          }
-         return true;
       };
       actions.emplace_back(std::move(action));
+      ilog("There are {} actions currently registered.", actions.size());
    }
-   if( update_apy.has_value() ) {
-      ilog("beacon chain APY update enabled");
-      auto ethstore = get_ethstore_latest(my->beacon_chain_apy_url, my->beacon_chain_api_key);
-//      ilog("ethstore: {}", fc::json::to_string(ethstore, fc::time_point::maximum()));
-   }
+
    ilog("initializing beacon chain plugin DONE");
 }
 
 void beacon_chain_update_plugin::plugin_startup() {
    ilog("Starting beacon chain update plugin");
    auto& cron = app().get_plugin<sysio::cron_plugin>();
-   auto& sig_plug = app().get_plugin<signature_provider_manager_plugin>();
-   auto& oec_plug = app().get_plugin<outpost_ethereum_client_plugin>();
-   const auto& clients = oec_plug.get_clients();
+   auto& oec_plugin = app().get_plugin<outpost_ethereum_client_plugin>();
+   const auto clients = oec_plugin.get_clients();
    SYS_ASSERT(clients.size() > 0, sysio::chain::plugin_config_exception,
-      "At least one ethereum client must be configured for beacon chain update plugin");
-   const auto ethClient = clients.front()->client;
+              "At least one ethereum client must be configured for beacon chain update plugin");
+   const auto eth_client = clients.front()->client;
+   ilog("There are {} schedule currently available.", my->schedules.size());
+   ilog("There are {} actions currently registered.", my->intervals.size());
    for (const auto& [name, schedule] : my->schedules) {
       ilog("Scheduling beacon chain update for interval {}", name);
-      cron.add_job(schedule, []() {
-         ilog("Executing beacon chain update for");
-         try {
-         }
-         catch (const std::exception& e) {
-            elog("Error executing beacon chain update for interval: {}", e.what());
+
+      auto& actions = my->find_interval_actions(name);
+      ilog("There are {} actions currently registered for this interval.", actions.size());
+      if(actions.empty()) {
+         ilog("No actions to register for interval {}", name);
+         continue;
+      }
+      ilog("{} actions to register for interval {}", actions.size(), name);
+
+      cron.add_job(schedule, [&name, &actions]() {
+         ilog("Executing beacon chain update for {}", name);
+         for(const auto& action : actions) {
+            try {
+               action();
+            }
+            catch (const std::exception& e) {
+               elog("Error executing beacon chain update for interval: {}", e.what());
+            }
          }
       },
       cron_service::job_metadata_t{
@@ -393,12 +534,9 @@ void beacon_chain_update_plugin::set_program_options(options_description& cli, o
       (beacon_chain_api_key,
        bpo::value<std::string>(),
        "API key for authenticating requests to the beacon chain endpoints.")
-      (beacon_chain_update_queue,
-       bpo::bool_switch()->default_value(false),
-       "Enable fetching the beacon chain deposit/exit queue data and updating on-chain contracts.")
-      (beacon_chain_update_apy,
-       bpo::bool_switch()->default_value(false),
-       "Enable fetching the beacon chain APY data and updating on-chain contracts.")
+      (beacon_chain_update_interval,
+       bpo::value<std::string>()->default_value(default_interval_name),
+       "Enable fetching the beacon chain deposit/exit queue data and updating on-chain contracts, using the indicated interval.")
       (beacon_chain_contracts_addrs,
        bpo::value<std::vector<std::string>>()->multitoken(),
        "filename to provide addresses for any needed contracts.")
