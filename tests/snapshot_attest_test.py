@@ -164,6 +164,8 @@ try:
     Print(f"Snapshot: block_num={snapBlockNum}, block_id={snapBlockId}, root_hash={snapRootHash}")
 
     assert snapRootHash is not None and snapRootHash != "", "Snapshot root_hash should not be empty"
+    assert len(snapRootHash) == 64 and all(c in '0123456789abcdef' for c in snapRootHash), \
+        f"Snapshot root_hash should be a 64-char hex string, got: {snapRootHash}"
 
     Print(f"Submit votesnaphash from {snapProv1.name}")
     success, trans = node0.pushMessage("sysio", "votesnaphash",

@@ -16,6 +16,10 @@ using sysio::name;
 // Max producer rank eligible to register as snapshot provider
 static constexpr uint32_t max_snap_provider_rank = 30;
 
+// Error code for snapshot hash disagreement — checked by nodeop to trigger shutdown.
+// If this value changes, update the corresponding check in producer_plugin.cpp.
+static constexpr uint64_t snap_hash_disagreement_error = 9001;
+
 // -------------------------------------------------------------------------------------------------
 // Snapshot attestation configuration (singleton)
 // -------------------------------------------------------------------------------------------------
@@ -69,12 +73,12 @@ using snap_votes_table = sysio::multi_index<
 // Attested snapshot records (quorum reached)
 // -------------------------------------------------------------------------------------------------
 struct [[sysio::table("snaprecords"), sysio::contract("sysio.system")]] snap_record {
-   uint64_t    block_num;
+   uint32_t    block_num;
    checksum256 block_id;
    checksum256 snapshot_hash;
    uint32_t    attested_at_block;
 
-   uint64_t primary_key() const { return block_num; }
+   uint64_t primary_key() const { return static_cast<uint64_t>(block_num); }
 
    SYSLIB_SERIALIZE(snap_record, (block_num)(block_id)(snapshot_hash)(attested_at_block))
 };

@@ -119,8 +119,9 @@ public:
       BOOST_REQUIRE_EQUAL("", result);
    }
 
-   // Read a snaprecord from the chain database for a given block_num
-   // Returns true if found, and fills in on_chain_hash
+   // Read a snaprecord from the chain database for a given block_num.
+   // Uses ABI-based deserialization to avoid hard-coded byte offsets.
+   // Returns true if found, and fills in on_chain_hash.
    bool read_snap_record(const chainbase::database& db, uint32_t block_num, fc::sha256& on_chain_hash) {
       const auto* t_id = db.find<table_id_object, by_code_scope_table>(
          boost::make_tuple(config::system_account_name, config::system_account_name, "snaprecords"_n));
@@ -130,12 +131,13 @@ public:
       auto it = kv_index.find(boost::make_tuple(t_id->id, static_cast<uint64_t>(block_num)));
       if (it == kv_index.end()) return false;
 
-      // snap_record layout: uint64_t block_num(8) + checksum256 block_id(32) + checksum256 snapshot_hash(32) + uint32_t attested_at_block(4)
-      constexpr size_t hash_offset = sizeof(uint64_t) + 32;
-      constexpr size_t hash_size = 32;
-      if (it->value.size() < hash_offset + hash_size) return false;
-
-      memcpy(on_chain_hash.data(), it->value.data() + hash_offset, hash_size);
+      // Deserialize via ABI to extract snapshot_hash field by name
+      vector<char> data(it->value.begin(), it->value.end());
+      auto row_var = sys_abi_ser.binary_to_variant("snap_record", data,
+                                                    abi_serializer::create_yield_function(abi_serializer_max_time));
+      auto hash_bytes = row_var["snapshot_hash"].as<bytes>();
+      if (hash_bytes.size() != sizeof(on_chain_hash)) return false;
+      memcpy(on_chain_hash.data(), hash_bytes.data(), hash_bytes.size());
       return true;
    }
 

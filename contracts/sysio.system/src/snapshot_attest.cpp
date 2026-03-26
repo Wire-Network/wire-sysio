@@ -35,6 +35,10 @@ void snapshot_attest::regsnapprov(name producer, name snap_account) {
 }
 
 // -------------------------------------------------------------------------------------------------
+// The `account` parameter is overloaded: it can be either a snap_account (primary key lookup)
+// or a producer (secondary index lookup). The primary key path takes precedence.
+// This means a producer can unregister their own provider, and a snap_account can unregister itself.
+// regsnapprov() enforces uniqueness of both snap_account and producer, so collisions cannot occur.
 void snapshot_attest::delsnapprov(name account) {
    require_auth(account);
 
@@ -67,12 +71,13 @@ void snapshot_attest::votesnaphash(name snap_account, checksum256 block_id, chec
    uint32_t block_num = block_info::block_height_from_id(block_id);
    check(block_num > 0, "invalid block_id");
 
-   // Check for disagreement against attested records
+   // Check for disagreement against attested records.
+   // Uses snap_hash_disagreement_error code so nodeop can detect this specific failure
+   // without fragile string matching (see producer_plugin.cpp::submit_snapshot_vote).
    snap_records_table records(get_self(), get_self().value);
    auto rec_itr = records.find(static_cast<uint64_t>(block_num));
    if (rec_itr != records.end()) {
-      check(rec_itr->snapshot_hash == snapshot_hash,
-            "snapshot hash disagrees with attested record for this block");
+      check(rec_itr->snapshot_hash == snapshot_hash, snap_hash_disagreement_error);
    }
 
    // Find or create vote entry for this block_num + snapshot_hash
@@ -117,7 +122,8 @@ void snapshot_attest::votesnaphash(name snap_account, checksum256 block_id, chec
    snap_config_singleton cfg_singleton(get_self(), get_self().value);
    snap_config cfg = cfg_singleton.get_or_default(snap_config{});
 
-   // Count total registered providers
+   // Count total registered providers.
+   // O(n) iteration is acceptable here: max_snap_provider_rank (30) bounds the table size.
    uint32_t provider_count = 0;
    for (auto itr = provs.begin(); itr != provs.end(); ++itr) {
       ++provider_count;
@@ -126,12 +132,14 @@ void snapshot_attest::votesnaphash(name snap_account, checksum256 block_id, chec
    uint32_t quorum = std::max(cfg.min_providers, (provider_count * cfg.threshold_pct + 99) / 100);
 
    if (voter_count >= quorum) {
-      // Attestation reached — create record
+      // Attestation reached — create record.
+      // rec_itr (from the records table find above) is still valid here because only
+      // the votes table was modified in between, not the records table.
       uint32_t current_block = static_cast<uint32_t>(sysio::current_block_number());
 
       if (rec_itr == records.end()) {
          records.emplace(get_self(), [&](auto& row) {
-            row.block_num        = static_cast<uint64_t>(block_num);
+            row.block_num        = block_num;
             row.block_id         = block_id;
             row.snapshot_hash    = snapshot_hash;
             row.attested_at_block = current_block;

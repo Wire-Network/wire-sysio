@@ -689,6 +689,8 @@ public:
          vote_action.account = chain::config::system_account_name;
          vote_action.name = chain::name("votesnaphash");
          vote_action.authorization = {{snap_account_name, chain::config::active_name}};
+         // Parameter order must match votesnaphash(name, checksum256, checksum256) in snapshot_attest.hpp.
+         // root_hash is fc::crypto::blake3 (32 bytes) which is binary-compatible with checksum256.
          vote_action.data = fc::raw::pack(
             std::make_tuple(snap_account_name, si.head_block_id, si.root_hash));
 
@@ -729,24 +731,33 @@ public:
 
          auto packed_trx = std::make_shared<chain::packed_transaction>(std::move(trx));
 
-         // Submit via incoming transaction async method
+         // Submit via incoming transaction async method.
+         // return_failure_traces=true so we can inspect trace->error_code on assertion failures.
          app().get_method<chain::plugin_interface::incoming::methods::transaction_async>()(
             packed_trx, true /*api_trx*/,
             chain::transaction_metadata::trx_type::input,
-            false /*return_failure_traces*/,
-            [this](const chain::next_function_variant<chain::transaction_trace_ptr>& result) {
+            true /*return_failure_traces*/,
+            [](const chain::next_function_variant<chain::transaction_trace_ptr>& result) {
                if (std::holds_alternative<fc::exception_ptr>(result)) {
                   auto& ex = std::get<fc::exception_ptr>(result);
-                  auto msg = ex->to_detail_string();
-                  if (msg.find("disagrees with attested record") != std::string::npos) {
-                     fc_elog(_log, "FATAL: Snapshot hash disagreement detected! This node's snapshot differs from the attested record. Shutting down.");
-                     app().quit();
-                  } else {
-                     fc_elog(_log, "Snapshot provider: votesnaphash transaction failed: {}", msg);
-                  }
+                  fc_elog(_log, "Snapshot provider: votesnaphash transaction failed: {}", ex->to_detail_string());
                } else {
                   auto trace = std::get<chain::transaction_trace_ptr>(result);
-                  if (trace && trace->receipt) {
+                  if (trace && trace->except) {
+                     // Check for snapshot hash disagreement via error code.
+                     // snap_hash_disagreement_error (9001) is defined in snapshot_attest.hpp
+                     // and emitted by the votesnaphash action's check() call.
+                     constexpr uint64_t snap_hash_disagreement_error = 9001;
+                     if (trace->error_code && *trace->error_code == snap_hash_disagreement_error) {
+                        fc_elog(_log, "FATAL: Snapshot hash disagreement detected (error code {})! "
+                                      "This node's snapshot differs from the attested record. Shutting down.",
+                                      snap_hash_disagreement_error);
+                        app().quit();
+                     } else {
+                        fc_elog(_log, "Snapshot provider: votesnaphash transaction failed: {}",
+                                 trace->except->to_detail_string());
+                     }
+                  } else if (trace && trace->receipt) {
                      fc_ilog(_log, "Snapshot provider: votesnaphash submitted successfully for block {}", trace->block_num);
                   }
                }

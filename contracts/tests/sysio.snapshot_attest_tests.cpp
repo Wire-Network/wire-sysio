@@ -100,6 +100,7 @@ public:
    // Make a fake block_id with a specific block number embedded in big-endian
    static fc::sha256 make_block_id(uint32_t block_num) {
       fc::sha256 id;
+      memset(id.data(), 0, id.data_size());
       auto* data = id.data();
       // block_num in big-endian in first 4 bytes
       data[0] = static_cast<char>((block_num >> 24) & 0xFF);
@@ -112,6 +113,7 @@ public:
    // Make a fake snapshot hash
    static fc::sha256 make_snap_hash(uint32_t seed) {
       fc::sha256 hash;
+      memset(hash.data(), 0, hash.data_size());
       auto* data = hash.data();
       // Put seed at end to differentiate from block_id
       data[28] = static_cast<char>((seed >> 24) & 0xFF);
@@ -351,7 +353,8 @@ BOOST_FIXTURE_TEST_CASE(disagreement_detection, snapshot_attest_tester) { try {
 
    // Second provider votes with different hash for same block — disagreement
    auto bad_hash = make_snap_hash(999);
-   BOOST_REQUIRE_EQUAL(wasm_assert_msg("snapshot hash disagrees with attested record for this block"),
+   // snap_hash_disagreement_error = 9001 (defined in snapshot_attest.hpp)
+   BOOST_REQUIRE_EQUAL(wasm_assert_code(9001),
                         votesnaphash("snapprov2"_n, bid, bad_hash));
 } FC_LOG_AND_RETHROW() }
 
@@ -392,6 +395,13 @@ BOOST_FIXTURE_TEST_CASE(vote_purging_on_attestation, snapshot_attest_tester) { t
 BOOST_FIXTURE_TEST_CASE(getsnaphash_not_found, snapshot_attest_tester) { try {
    auto rec = getsnaphash(99999);
    BOOST_REQUIRE_EQUAL(true, rec.is_null());
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(getsnaphash_action_not_found, snapshot_attest_tester) { try {
+   // Exercise the getsnaphash action's check() assertion for missing records
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("no attested snapshot record for this block number"),
+                        push_action(config::system_account_name, "getsnaphash"_n, mvo()
+                           ("block_num", 99999)));
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -1420,14 +1420,20 @@ void chain_plugin_impl::verify_snapshot_attestation() {
       auto row_var = abis.binary_to_variant("snap_record", data,
          chain::abi_serializer::create_yield_function(abi_serializer_max_time_us));
 
-      auto snapshot_hash_str = row_var["snapshot_hash"].as_string();
+      // Extract on-chain snapshot_hash as raw bytes for comparison.
+      // The ABI serializer stores checksum256 as vector<char> in the variant (not hex),
+      // so we extract bytes directly and use memcmp against the blake3 digest.
+      // blake3::data() always points to a fixed 32-byte internal array (safe for memcmp).
+      auto on_chain_hash = row_var["snapshot_hash"].as<bytes>();
+      bool hash_match = on_chain_hash.size() == fc::crypto::blake3::byte_size &&
+                        memcmp(on_chain_hash.data(), snapshot_loaded_root_hash.data(),
+                               fc::crypto::blake3::byte_size) == 0;
 
-      // Compare the on-chain snapshot_hash with our loaded root_hash
-      if (snapshot_hash_str != snapshot_loaded_root_hash.str()) {
+      if (!hash_match) {
          elog("FATAL: Snapshot hash mismatch for block #{}! "
               "On-chain attested hash: {}, loaded snapshot hash: {}. "
               "The snapshot file may be corrupted or tampered with. Do NOT use this snapshot.",
-              snap_block_num, snapshot_hash_str, snapshot_loaded_root_hash.str());
+              snap_block_num, fc::to_hex(on_chain_hash), snapshot_loaded_root_hash.str());
          app().quit();
          return;
       }
