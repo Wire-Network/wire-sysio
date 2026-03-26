@@ -129,15 +129,27 @@ public:
    }
 
    fc::variant get_epoch_config() {
-      return get_row_by_account(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "epochcfg"_n, "epochcfg"_n);
+      auto data = get_row_by_account(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "epochcfg"_n, "epochcfg"_n);
+      return data.empty() ? fc::variant() : abi_ser.binary_to_variant(
+         "epoch_config",
+         data,
+         abi_serializer::create_yield_function(abi_serializer_max_time) );
    }
 
    fc::variant get_epoch_state() {
-      return get_row_by_account(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "epochstate"_n, "epochstate"_n);
+      auto data = get_row_by_account(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "epochstate"_n, "epochstate"_n);
+      return data.empty() ? fc::variant() : abi_ser.binary_to_variant(
+         "epoch_state",
+         data,
+         abi_serializer::create_yield_function(abi_serializer_max_time) );
    }
 
    fc::variant get_operator(name account) {
-      return get_row_by_account(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "operators"_n, account);
+      auto data = get_row_by_account(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "operators"_n, account);
+      return data.empty() ? fc::variant() : abi_ser.binary_to_variant(
+         "operator_info",
+         data,
+         abi_serializer::create_yield_function(abi_serializer_max_time) );
    }
 
    abi_serializer abi_ser;
