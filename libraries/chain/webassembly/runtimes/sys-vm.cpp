@@ -143,7 +143,7 @@ class sys_vm_instantiated_module : public wasm_instantiated_module_interface {
          // set wasm allocator per apply data
          _runtime->_bkend.set_wasm_allocator(&context.control.get_wasm_allocator());
 
-         const wasm_config& config = context.control.get_global_properties().wasm_configuration;
+         const wasm_config& config = context.control.get_wasm_config();
          apply_options opts = {config.max_pages, config.max_call_depth};
          auto fn = [&]() {
             sysio::chain::webassembly::interface iface(context);
@@ -186,7 +186,7 @@ class sys_vm_profiling_module : public wasm_instantiated_module_interface {
 
       void apply(apply_context& context) override {
          _instantiated_module->set_wasm_allocator(&context.control.get_wasm_allocator());
-         const wasm_config& config = context.control.get_global_properties().wasm_configuration;
+         const wasm_config& config = context.control.get_wasm_config();
          apply_options opts = {config.max_pages, config.max_call_depth};
          auto fn = [&]() {
             sysio::chain::webassembly::interface iface(context);

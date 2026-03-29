@@ -287,7 +287,7 @@ BOOST_FIXTURE_TEST_CASE( propose_with_wrong_requested_auth, sysio_msig_tester ) 
 
 BOOST_FIXTURE_TEST_CASE( big_transaction, sysio_msig_tester ) try {
    //change `default_max_inline_action_size` to 512 KB
-   sysio::chain::chain_config params = control->get_global_properties().configuration;
+   sysio::chain::chain_config params = control->get_chain_config();
    params.max_inline_action_size = 512 * 1024;
    base_tester::push_action( config::system_account_name, "setparams"_n, config::system_account_name, mutable_variant_object()
                               ("params", params) );

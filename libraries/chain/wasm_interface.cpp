@@ -52,8 +52,7 @@ namespace sysio { namespace chain {
    void wasm_interface::validate(const controller& control, const bytes& code) {
       const auto& pso = control.db().get<protocol_state_object>();
 
-      const auto& gpo = control.get_global_properties();
-      webassembly::sys_vm_runtime::validate( code, gpo.wasm_configuration, pso.whitelisted_intrinsics );
+      webassembly::sys_vm_runtime::validate( code, control.get_wasm_config(), pso.whitelisted_intrinsics );
 
       //there are a couple opportunties for improvement here--
       //Easy: Cache the Module created here so it can be reused for instantiaion

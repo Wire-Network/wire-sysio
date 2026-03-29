@@ -133,7 +133,7 @@ namespace sysio::chain {
 
       published = control.pending_block_time();
 
-      const auto& cfg = control.get_global_properties().configuration;
+      const auto& cfg = control.get_chain_config();
       auto& rl = control.get_mutable_resource_limits_manager();
 
       //
@@ -566,7 +566,7 @@ namespace sysio::chain {
       // validate minimum must be done at the end of the trx because the trx might have modified the cfg.min_transaction_cpu_usage
       if (control.skip_trx_checks())
          return;
-      const auto& cfg = control.get_global_properties().configuration;
+      const auto& cfg = control.get_chain_config();
       SYS_ASSERT( trace->total_cpu_usage_us >= cfg.min_transaction_cpu_usage, transaction_exception,
                   "cannot bill CPU time {} less than the minimum of {} us",
                   trace->total_cpu_usage_us, cfg.min_transaction_cpu_usage );
@@ -691,7 +691,7 @@ namespace sysio::chain {
       if( explicit_billed_cpu_time || is_cpu_updated ) return; // updated in init() for explicit_billed_cpu
 
       trace->total_cpu_usage_us = std::ranges::fold_left(billed_cpu_us, 0l, std::plus());
-      const auto& cfg = control.get_global_properties().configuration;
+      const auto& cfg = control.get_chain_config();
       int64_t total_cpu_time_us = std::max( (now - pseudo_start).count(), static_cast<int64_t>(cfg.min_transaction_cpu_usage) );
       SYS_ASSERT(total_cpu_time_us - trace->total_cpu_usage_us >= 0, tx_cpu_usage_exceeded,
                  "Invalid CPU usage calculation {} - {}", total_cpu_time_us, trace->total_cpu_usage_us);

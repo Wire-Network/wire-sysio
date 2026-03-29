@@ -287,7 +287,7 @@ BOOST_AUTO_TEST_CASE(test_deltas_global_property_history) {
    chain.produce_block();
 
    // Change max_transaction_delay to 60 sec
-   auto params = chain.control->get_global_properties().configuration;
+   auto params = chain.control->get_chain_config();
    params.max_transaction_delay = 60;
    chain.push_action( config::system_account_name, "setparams"_n, config::system_account_name,
                              mutable_variant_object()

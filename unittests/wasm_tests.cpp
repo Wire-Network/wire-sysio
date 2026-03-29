@@ -1811,8 +1811,8 @@ BOOST_AUTO_TEST_CASE( billed_cpu_test ) try {
 
    chain.produce_block();
 
-   auto max_cpu_time_us = chain.control->get_global_properties().configuration.max_transaction_cpu_usage;
-   auto min_cpu_time_us = chain.control->get_global_properties().configuration.min_transaction_cpu_usage;
+   auto max_cpu_time_us = chain.control->get_chain_config().max_transaction_cpu_usage;
+   auto min_cpu_time_us = chain.control->get_chain_config().min_transaction_cpu_usage;
 
    auto cpu_limit = mgr.get_account_cpu_limit(acc).first; // huge limit ~17s
 
@@ -2119,7 +2119,7 @@ BOOST_AUTO_TEST_CASE( more_billed_cpu_test ) try {
    BOOST_TEST(user_net_limit1.available >= user_net_limit0.available - *trace->action_traces.at(2).net_usage);
 
    // bill at minimum
-   auto min_cpu_time_us = chain.control->get_global_properties().configuration.min_transaction_cpu_usage;
+   auto min_cpu_time_us = chain.control->get_chain_config().min_transaction_cpu_usage;
    BOOST_TEST_REQUIRE(min_cpu_time_us == 100u);
 
    ptrx = create_trx(0);

@@ -172,7 +172,7 @@ void executor::execute(const code_descriptor& code, memory& mem, apply_context& 
 
    uint64_t max_call_depth = sysio::chain::wasm_constraints::maximum_call_depth+1;
    uint64_t max_pages = sysio::chain::wasm_constraints::maximum_linear_memory/sysio::chain::wasm_constraints::wasm_page_size;
-   const wasm_config& config = context.control.get_global_properties().wasm_configuration;
+   const wasm_config& config = context.control.get_wasm_config();
    max_call_depth = config.max_call_depth;
    max_pages = config.max_pages;
    stack.reset(max_call_depth);

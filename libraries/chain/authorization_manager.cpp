@@ -410,7 +410,7 @@ namespace sysio { namespace chain {
                                           else
                                              return nullptr;
                                         },
-                                        _control.get_global_properties().configuration.max_authority_depth,
+                                        _control.get_chain_config().max_authority_depth,
                                         provided_keys,
                                         provided_permissions,
                                         checktime
@@ -524,7 +524,7 @@ namespace sysio { namespace chain {
                                           else
                                              return nullptr;
                                         },
-                                        _control.get_global_properties().configuration.max_authority_depth,
+                                        _control.get_chain_config().max_authority_depth,
                                         provided_keys,
                                         provided_permissions,
                                         checktime
@@ -555,7 +555,7 @@ namespace sysio { namespace chain {
                                           else
                                              return nullptr;
                                         },
-                                        _control.get_global_properties().configuration.max_authority_depth,
+                                        _control.get_chain_config().max_authority_depth,
                                         candidate_keys,
                                         {},
                                         _noop_checktime

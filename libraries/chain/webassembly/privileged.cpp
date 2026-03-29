@@ -113,6 +113,7 @@ namespace sysio { namespace chain { namespace webassembly {
             gprops.wasm_configuration = cfg;
          }
       );
+      context.control.invalidate_gpo_cache();
    }
    int64_t interface::set_proposed_producers( legacy_span<const char> packed_producer_schedule) {
       SYS_ASSERT(!context.trx_context.is_read_only(), wasm_execution_error, "set_proposed_producers not allowed in a readonly transaction");
@@ -227,8 +228,9 @@ namespace sysio { namespace chain { namespace webassembly {
          [&]( auto& gprops ) {
               gprops.configuration = cfg;
       });
+      context.control.invalidate_gpo_cache();
    }
-   
+
    uint32_t interface::get_parameters_packed( span<const char> packed_parameter_ids, span<char> packed_parameters) const{
       fc::datastream<const char*> ds_ids( packed_parameter_ids.data(), packed_parameter_ids.size() );
 
@@ -263,6 +265,7 @@ namespace sysio { namespace chain { namespace webassembly {
          [&]( auto& gprops ) {
               gprops.configuration = config_range.config;
       });
+      context.control.invalidate_gpo_cache();
    }
 
    bool interface::is_privileged( account_name n ) const {

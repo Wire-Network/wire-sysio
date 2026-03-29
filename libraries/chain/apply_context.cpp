@@ -244,7 +244,7 @@ void apply_context::exec()
    }
 
    if( !_cfa_inline_actions.empty() || !_inline_actions.empty() ) {
-      SYS_ASSERT( recurse_depth < control.get_global_properties().configuration.max_inline_action_depth,
+      SYS_ASSERT( recurse_depth < control.get_chain_config().max_inline_action_depth,
                   transaction_exception, "max inline action depth per transaction reached" );
 
       for( uint32_t ordinal : _cfa_inline_actions ) {

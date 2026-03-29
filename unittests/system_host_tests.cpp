@@ -118,8 +118,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(blockchain_parameters_golden, T, validating_tester
    T chain;
    chain.produce_block();
 
-   const auto& gpo = chain.control->get_global_properties();
-   const auto& cfg = gpo.configuration;
+   const auto& cfg = chain.control->get_chain_config();
 
    // Verify default parameters are non-zero and sensible
    BOOST_CHECK_GT(cfg.max_block_net_usage, 0u);
@@ -137,7 +136,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(blockchain_parameters_golden, T, validating_tester
    auto saved_max_block_cpu = cfg.max_block_cpu_usage;
    chain.produce_blocks(3);
 
-   const auto& cfg2 = chain.control->get_global_properties().configuration;
+   const auto& cfg2 = chain.control->get_chain_config();
    BOOST_CHECK_EQUAL(cfg2.max_block_net_usage, saved_max_block_net);
    BOOST_CHECK_EQUAL(cfg2.max_block_cpu_usage, saved_max_block_cpu);
 }
@@ -152,8 +151,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(wasm_parameters_golden, T, validating_testers) {
    T chain;
    chain.produce_block();
 
-   const auto& gpo = chain.control->get_global_properties();
-   const auto& wcfg = gpo.wasm_configuration;
+   const auto& wcfg = chain.control->get_wasm_config();
 
    // Verify default WASM parameters are set and sensible
    BOOST_CHECK_GT(wcfg.max_mutable_global_bytes, 0u);
@@ -169,7 +167,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(wasm_parameters_golden, T, validating_testers) {
    auto saved_max_call_depth = wcfg.max_call_depth;
    chain.produce_blocks(3);
 
-   const auto& wcfg2 = chain.control->get_global_properties().wasm_configuration;
+   const auto& wcfg2 = chain.control->get_wasm_config();
    BOOST_CHECK_EQUAL(wcfg2.max_pages, saved_max_pages);
    BOOST_CHECK_EQUAL(wcfg2.max_call_depth, saved_max_call_depth);
 }
@@ -213,7 +211,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(chain_config_packed_stability, T, validating_teste
    T chain;
    chain.produce_block();
 
-   const auto& cfg = chain.control->get_global_properties().configuration;
+   const auto& cfg = chain.control->get_chain_config();
 
    // Pack the v0 config
    auto v0 = cfg.v0();
@@ -257,7 +255,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(wasm_config_packed_stability, T, validating_tester
    T chain;
    chain.produce_block();
 
-   const auto& wcfg = chain.control->get_global_properties().wasm_configuration;
+   const auto& wcfg = chain.control->get_wasm_config();
 
    // Pack the wasm_config
    auto packed = fc::raw::pack(wcfg);

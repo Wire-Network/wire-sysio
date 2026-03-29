@@ -692,6 +692,10 @@ struct controller_impl {
    wasm_interface wasmif;
    app_window_type app_window = app_window_type::write;
 
+   mutable wasm_config  cached_wasm_config_;
+   mutable chain_config cached_chain_config_;
+   mutable bool         gpo_cached_ = false;
+
    typedef pair<scope_name,action_name>                   handler_key;
    map< account_name, map<handler_key, apply_handler> >   apply_handlers;
    unordered_map< builtin_protocol_feature_t, std::function<void(controller_impl&)>, enum_hash<builtin_protocol_feature_t> > protocol_feature_activation_handlers;
@@ -739,6 +743,15 @@ struct controller_impl {
       ilog("Replace producer keys with {}", fc::json::to_log_string(key));
 
       // TODO IF: add instant-finality implementation, will need to replace finalizers as well
+   }
+
+   void refresh_gpo_cache() const {
+      if (!gpo_cached_) {
+         const auto& gpo = db.get<global_property_object>();
+         cached_wasm_config_  = gpo.wasm_configuration;
+         cached_chain_config_ = gpo.configuration;
+         gpo_cached_ = true;
+      }
    }
 
    // --------------- access fork_db head ----------------------------------------------------------------------
@@ -4130,6 +4143,20 @@ const global_property_object& controller::get_global_properties()const {
   return my->db.get<global_property_object>();
 }
 
+const wasm_config& controller::get_wasm_config()const {
+   my->refresh_gpo_cache();
+   return my->cached_wasm_config_;
+}
+
+const chain_config& controller::get_chain_config()const {
+   my->refresh_gpo_cache();
+   return my->cached_chain_config_;
+}
+
+void controller::invalidate_gpo_cache() {
+   my->gpo_cached_ = false;
+}
+
 signed_block_ptr controller::fetch_block_by_id( const block_id_type& id )const {
    auto sb_ptr = my->fork_db_fetch_block_by_id(id);
    if( sb_ptr ) return sb_ptr;
@@ -4423,7 +4450,7 @@ uint32_t controller::configured_subjective_signature_length_limit()const {
 }
 
 void controller::validate_expiration( const transaction& trx )const { try {
-   const auto& chain_configuration = get_global_properties().configuration;
+   const auto& chain_configuration = get_chain_config();
 
    SYS_ASSERT( trx.expiration.to_time_point() >= pending_block_time(),
                expired_tx_exception,

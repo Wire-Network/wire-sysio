@@ -22,7 +22,7 @@ namespace sysio { namespace chain { namespace webassembly {
 
    void interface::set_action_return_value( span<const char> packed_blob ) {
       auto max_action_return_value_size = 
-         context.control.get_global_properties().configuration.max_action_return_value_size;
+         context.control.get_chain_config().max_action_return_value_size;
       if( !context.trx_context.is_read_only() )
          SYS_ASSERT(packed_blob.size() <= max_action_return_value_size,
                     action_return_value_exception,

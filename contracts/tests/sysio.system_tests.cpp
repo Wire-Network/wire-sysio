@@ -175,7 +175,7 @@ BOOST_FIXTURE_TEST_CASE(producers_upgrade_system_contract, sysio_system_tester) 
    add_roa_policy(NODE_DADDY, "alice1111111"_n, "32.0000 SYS", "32.0000 SYS", "500.0000 SYS", 0, 0);
 
    //change `default_max_inline_action_size` to 512 KB
-   sysio::chain::chain_config params = control->get_global_properties().configuration;
+   sysio::chain::chain_config params = control->get_chain_config();
    params.max_inline_action_size = 512 * 1024;
    base_tester::push_action( config::system_account_name, "setparams"_n, config::system_account_name, mutable_variant_object()
                               ("params", params) );
@@ -331,7 +331,7 @@ BOOST_FIXTURE_TEST_CASE( setparams, sysio_system_tester ) try {
    }
 
    sysio::chain::chain_config params;
-   params = control->get_global_properties().configuration;
+   params = control->get_chain_config();
    //change some values
    params.max_block_net_usage += 10;
    params.max_transaction_lifetime += 1;
@@ -396,7 +396,7 @@ BOOST_FIXTURE_TEST_CASE( setparams, sysio_system_tester ) try {
    produce_blocks( 250 );
 
    // make sure that changed parameters were applied
-   auto active_params = control->get_global_properties().configuration;
+   auto active_params = control->get_chain_config();
    BOOST_REQUIRE_EQUAL( params.max_block_net_usage, active_params.max_block_net_usage );
    BOOST_REQUIRE_EQUAL( params.max_transaction_lifetime, active_params.max_transaction_lifetime );
 
@@ -486,7 +486,7 @@ BOOST_FIXTURE_TEST_CASE( wasmcfg, sysio_system_tester ) try {
    produce_blocks( 250 );
 
    // make sure that changed parameters were applied
-   auto active_params = control->get_global_properties().wasm_configuration;
+   auto active_params = control->get_wasm_config();
    BOOST_REQUIRE_EQUAL( active_params.max_table_elements, 8192 );
 } FC_LOG_AND_RETHROW()
 

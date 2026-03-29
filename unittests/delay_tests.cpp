@@ -889,7 +889,7 @@ BOOST_AUTO_TEST_CASE( max_transaction_delay_execute ) { try {
    chain.produce_block();
 
    //change max_transaction_delay to 60 sec
-   auto params = chain.control->get_global_properties().configuration;
+   auto params = chain.control->get_chain_config();
    params.max_transaction_delay = 60;
    chain.push_action( config::system_account_name, "setparams"_n, config::system_account_name, mutable_variant_object()
                         ("params", params) );
@@ -916,14 +916,14 @@ BOOST_AUTO_TEST_CASE( test_blockchain_params_enabled ) { try {
    tester chain( setup_policy::preactivate_feature_and_new_bios );
 
    //change max_transaction_delay to 60 sec
-   auto params = chain.control->get_global_properties().configuration;
+   auto params = chain.control->get_chain_config();
    params.max_transaction_delay = 60;
    chain.push_action(config::system_account_name,
                      "setparams"_n,
                      config::system_account_name,
                      mutable_variant_object()("params", params) );
 
-   BOOST_CHECK_EQUAL(chain.control->get_global_properties().configuration.max_transaction_delay, 60u);
+   BOOST_CHECK_EQUAL(chain.control->get_chain_config().max_transaction_delay, 60u);
 
    chain.produce_block();
 
