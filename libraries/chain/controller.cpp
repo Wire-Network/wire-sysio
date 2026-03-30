@@ -1710,11 +1710,33 @@ struct controller_impl {
          // nothing to do
       });
 
+      // --- Snapshot state validation ---
+      // Singleton enforcement
+      SYS_ASSERT(db.get_index<global_property_multi_index>().size() == 1, snapshot_exception,
+                 "Expected exactly 1 global_property_object, found {}", db.get_index<global_property_multi_index>().size());
+      SYS_ASSERT(db.get_index<dynamic_global_property_multi_index>().size() == 1, snapshot_exception,
+                 "Expected exactly 1 dynamic_global_property_object, found {}", db.get_index<dynamic_global_property_multi_index>().size());
+      SYS_ASSERT(db.get_index<protocol_state_multi_index>().size() == 1, snapshot_exception,
+                 "Expected exactly 1 protocol_state_object, found {}", db.get_index<protocol_state_multi_index>().size());
+
+      // block_summary must be exactly 65536 rows
+      SYS_ASSERT(db.get_index<block_summary_multi_index>().size() == 0x10000, snapshot_exception,
+                 "Expected 65536 block_summary_object rows, found {}", db.get_index<block_summary_multi_index>().size());
+
       const auto& gpo = db.get<global_property_object>();
       SYS_ASSERT( gpo.chain_id == chain_id, chain_id_type_exception,
                   "chain ID in snapshot ({}) does not match the chain ID that controller was constructed with ({})",
                   gpo.chain_id, chain_id
       );
+
+      // Resource limits validation (denominators, window sizes, virtual limits)
+      resource_limits.validate_snapshot_state();
+
+      // preactivated_protocol_features should be empty in a finalized snapshot
+      const auto& pso = db.get<protocol_state_object>();
+      SYS_ASSERT(pso.preactivated_protocol_features.empty(), snapshot_exception,
+                 "Snapshot contains {} preactivated protocol features; finalized snapshots must have none",
+                 pso.preactivated_protocol_features.size());
 
       return result;
    }
