@@ -279,8 +279,8 @@ namespace sysio { namespace chain { namespace resource_limits {
        */
       usage_accumulator average_block_cpu_usage;
 
-      void update_virtual_net_limit( const resource_limits_config_object& cfg );
-      void update_virtual_cpu_limit( const resource_limits_config_object& cfg );
+      void update_virtual_net_limit( const elastic_limit_parameters& net_limit_parameters );
+      void update_virtual_cpu_limit( const elastic_limit_parameters& cpu_limit_parameters );
 
       uint64_t pending_net_usage = 0ULL;
       uint64_t pending_cpu_usage = 0ULL;

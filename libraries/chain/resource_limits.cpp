@@ -39,14 +39,12 @@ void elastic_limit_parameters::validate()const {
 }
 
 
-void resource_limits_state_object::update_virtual_cpu_limit( const resource_limits_config_object& cfg ) {
-   //idump((average_block_cpu_usage.average()));
-   virtual_cpu_limit = update_elastic_limit(virtual_cpu_limit, average_block_cpu_usage.average(), cfg.cpu_limit_parameters);
-   //idump((virtual_cpu_limit));
+void resource_limits_state_object::update_virtual_cpu_limit( const elastic_limit_parameters& cpu_limit_parameters ) {
+   virtual_cpu_limit = update_elastic_limit(virtual_cpu_limit, average_block_cpu_usage.average(), cpu_limit_parameters);
 }
 
-void resource_limits_state_object::update_virtual_net_limit( const resource_limits_config_object& cfg ) {
-   virtual_net_limit = update_elastic_limit(virtual_net_limit, average_block_net_usage.average(), cfg.net_limit_parameters);
+void resource_limits_state_object::update_virtual_net_limit( const elastic_limit_parameters& net_limit_parameters ) {
+   virtual_net_limit = update_elastic_limit(virtual_net_limit, average_block_net_usage.average(), net_limit_parameters);
 }
 
 void resource_limits_manager::add_indices() {
@@ -133,22 +131,23 @@ void resource_limits_manager::set_block_parameters(const elastic_limit_parameter
          dm_logger->on_update_resource_limits_config(c);
       }
    });
+   _config_cache.valid = false;
 }
 
 void resource_limits_manager::update_account_usage(const accounts_billing_t& accounts, uint32_t time_slot ) {
-   const auto& config = _db.get<resource_limits_config_object>();
+   const auto& cfg = get_config();
    for(const auto& a: accounts | std::views::keys) {
       const auto& usage = _db.get<resource_object,by_owner>( a );
       _db.modify( usage, [&]( auto& bu ){
-          bu.net_usage.add( 0, time_slot, config.account_net_usage_average_window );
-          bu.cpu_usage.add( 0, time_slot, config.account_cpu_usage_average_window );
+          bu.net_usage.add( 0, time_slot, cfg.account_net_usage_average_window );
+          bu.cpu_usage.add( 0, time_slot, cfg.account_cpu_usage_average_window );
       });
    }
 }
 
 void resource_limits_manager::add_transaction_usage(const accounts_billing_t& accounts, uint64_t total_cpu_usage, uint64_t total_net_usage, uint32_t time_slot, bool is_trx_transient ) {
    const auto& state = _db.get<resource_limits_state_object>();
-   const auto& config = _db.get<resource_limits_config_object>();
+   const auto& cfg = get_config();
 
    for( const auto& [a, billing] : accounts ) {
 
@@ -159,8 +158,8 @@ void resource_limits_manager::add_transaction_usage(const accounts_billing_t& ac
       get_account_limits( a, unused, net_weight, cpu_weight );
 
       _db.modify( usage, [&]( auto& bu ){
-          bu.net_usage.add( billing.net_usage, time_slot, config.account_net_usage_average_window );
-          bu.cpu_usage.add( billing.cpu_usage_us, time_slot, config.account_cpu_usage_average_window );
+          bu.net_usage.add( billing.net_usage, time_slot, cfg.account_net_usage_average_window );
+          bu.cpu_usage.add( billing.cpu_usage_us, time_slot, cfg.account_cpu_usage_average_window );
 
          if (auto dm_logger = _get_deep_mind_logger(is_trx_transient)) {
             dm_logger->on_update_account_usage(bu);
@@ -168,7 +167,7 @@ void resource_limits_manager::add_transaction_usage(const accounts_billing_t& ac
       });
 
       if( cpu_weight >= 0 && state.total_cpu_weight > 0 ) {
-         uint128_t window_size = config.account_cpu_usage_average_window;
+         uint128_t window_size = cfg.account_cpu_usage_average_window;
          auto virtual_network_capacity_in_window = (uint128_t)state.virtual_cpu_limit * window_size;
          auto cpu_used_in_window                 = ((uint128_t)usage.cpu_usage.value_ex * window_size) / (uint128_t)config::rate_limiting_precision;
 
@@ -188,7 +187,7 @@ void resource_limits_manager::add_transaction_usage(const accounts_billing_t& ac
 
       if( net_weight >= 0 && state.total_net_weight > 0) {
 
-         uint128_t window_size = config.account_net_usage_average_window;
+         uint128_t window_size = cfg.account_net_usage_average_window;
          auto virtual_network_capacity_in_window = (uint128_t)state.virtual_net_limit * window_size;
          auto net_used_in_window                 = ((uint128_t)usage.net_usage.value_ex * window_size) / (uint128_t)config::rate_limiting_precision;
 
@@ -214,8 +213,8 @@ void resource_limits_manager::add_transaction_usage(const accounts_billing_t& ac
       rls.pending_net_usage += total_net_usage;
    });
 
-   SYS_ASSERT( state.pending_cpu_usage <= config.cpu_limit_parameters.max, block_resource_exhausted, "Block has insufficient cpu resources" );
-   SYS_ASSERT( state.pending_net_usage <= config.net_limit_parameters.max, block_resource_exhausted, "Block has insufficient net resources" );
+   SYS_ASSERT( state.pending_cpu_usage <= cfg.cpu_limit_parameters.max, block_resource_exhausted, "Block has insufficient cpu resources" );
+   SYS_ASSERT( state.pending_net_usage <= cfg.net_limit_parameters.max, block_resource_exhausted, "Block has insufficient net resources" );
 }
 
 void resource_limits_manager::add_pending_ram_usage( const account_name account, int64_t ram_delta, bool is_trx_transient ) {
@@ -375,16 +374,16 @@ void resource_limits_manager::process_account_limit_updates() {
 
 void resource_limits_manager::process_block_usage(uint32_t block_num) {
    const auto& s = _db.get<resource_limits_state_object>();
-   const auto& config = _db.get<resource_limits_config_object>();
+   const auto& cfg = get_config();
    _db.modify(s, [&](resource_limits_state_object& state){
       // apply pending usage, update virtual limits and reset the pending
 
-      state.average_block_cpu_usage.add(state.pending_cpu_usage, block_num, config.cpu_limit_parameters.periods);
-      state.update_virtual_cpu_limit(config);
+      state.average_block_cpu_usage.add(state.pending_cpu_usage, block_num, cfg.cpu_limit_parameters.periods);
+      state.update_virtual_cpu_limit(cfg.cpu_limit_parameters);
       state.pending_cpu_usage = 0;
 
-      state.average_block_net_usage.add(state.pending_net_usage, block_num, config.net_limit_parameters.periods);
-      state.update_virtual_net_limit(config);
+      state.average_block_net_usage.add(state.pending_net_usage, block_num, cfg.net_limit_parameters.periods);
+      state.update_virtual_net_limit(cfg.net_limit_parameters);
       state.pending_net_usage = 0;
 
       // process_block_usage is called by controller::finish,
@@ -418,14 +417,12 @@ uint64_t resource_limits_manager::get_virtual_block_net_limit() const {
 
 uint64_t resource_limits_manager::get_block_cpu_limit() const {
    const auto& state = _db.get<resource_limits_state_object>();
-   const auto& config = _db.get<resource_limits_config_object>();
-   return config.cpu_limit_parameters.max - state.pending_cpu_usage;
+   return get_config().cpu_limit_parameters.max - state.pending_cpu_usage;
 }
 
 uint64_t resource_limits_manager::get_block_net_limit() const {
    const auto& state = _db.get<resource_limits_state_object>();
-   const auto& config = _db.get<resource_limits_config_object>();
-   return config.net_limit_parameters.max - state.pending_net_usage;
+   return get_config().net_limit_parameters.max - state.pending_net_usage;
 }
 
 std::pair<int64_t, bool> resource_limits_manager::get_account_cpu_limit( const account_name& name, uint32_t greylist_limit ) const {
@@ -438,7 +435,6 @@ resource_limits_manager::get_account_cpu_limit_ex( const account_name& name, uin
 
    const auto& state = _db.get<resource_limits_state_object>();
    const auto& usage = _db.get<resource_object, by_owner>(name);
-   const auto& config = _db.get<resource_limits_config_object>();
 
    int64_t cpu_weight, x, y;
    get_account_limits( name, x, y, cpu_weight );
@@ -449,12 +445,13 @@ resource_limits_manager::get_account_cpu_limit_ex( const account_name& name, uin
 
    account_resource_limit arl;
 
-   uint128_t window_size = config.account_cpu_usage_average_window;
+   const auto& cfg = get_config();
+   uint128_t window_size = cfg.account_cpu_usage_average_window;
 
    bool greylisted = false;
    uint128_t virtual_cpu_capacity_in_window = window_size;
    if( greylist_limit < config::maximum_elastic_resource_multiplier ) {
-      uint64_t greylisted_virtual_cpu_limit = config.cpu_limit_parameters.max * greylist_limit;
+      uint64_t greylisted_virtual_cpu_limit = cfg.cpu_limit_parameters.max * greylist_limit;
       if( greylisted_virtual_cpu_limit < state.virtual_cpu_limit ) {
          virtual_cpu_capacity_in_window *= greylisted_virtual_cpu_limit;
          greylisted = true;
@@ -497,7 +494,6 @@ std::pair<int64_t, bool> resource_limits_manager::get_account_net_limit( const a
 
 std::pair<account_resource_limit, bool>
 resource_limits_manager::get_account_net_limit_ex( const account_name& name, uint32_t greylist_limit, const std::optional<block_timestamp_type>& current_time) const {
-   const auto& config = _db.get<resource_limits_config_object>();
    const auto& state  = _db.get<resource_limits_state_object>();
    const auto& usage  = _db.get<resource_object, by_owner>(name);
 
@@ -510,12 +506,13 @@ resource_limits_manager::get_account_net_limit_ex( const account_name& name, uin
 
    account_resource_limit arl;
 
-   uint128_t window_size = config.account_net_usage_average_window;
+   const auto& cfg = get_config();
+   uint128_t window_size = cfg.account_net_usage_average_window;
 
    bool greylisted = false;
    uint128_t virtual_network_capacity_in_window = window_size;
    if( greylist_limit < config::maximum_elastic_resource_multiplier ) {
-      uint64_t greylisted_virtual_net_limit = config.net_limit_parameters.max * greylist_limit;
+      uint64_t greylisted_virtual_net_limit = cfg.net_limit_parameters.max * greylist_limit;
       if( greylisted_virtual_net_limit < state.virtual_net_limit ) {
          virtual_network_capacity_in_window *= greylisted_virtual_net_limit;
          greylisted = true;
@@ -549,6 +546,18 @@ resource_limits_manager::get_account_net_limit_ex( const account_name& name, uin
       }
    }
    return {arl, greylisted};
+}
+
+const resource_limits_manager::config_cache& resource_limits_manager::get_config() const {
+   if(!_config_cache.valid) {
+      const auto& c = _db.get<resource_limits_config_object>();
+      _config_cache.cpu_limit_parameters             = c.cpu_limit_parameters;
+      _config_cache.net_limit_parameters             = c.net_limit_parameters;
+      _config_cache.account_cpu_usage_average_window = c.account_cpu_usage_average_window;
+      _config_cache.account_net_usage_average_window = c.account_net_usage_average_window;
+      _config_cache.valid = true;
+   }
+   return _config_cache;
 }
 
 } } } /// sysio::chain::resource_limits

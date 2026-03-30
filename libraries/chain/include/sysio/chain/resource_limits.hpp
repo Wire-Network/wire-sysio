@@ -117,6 +117,17 @@ namespace sysio { namespace chain {
       private:
          chainbase::database&         _db;
          std::function<deep_mind_handler*(bool is_trx_transient)> _get_deep_mind_logger;
+
+         struct config_cache {
+            elastic_limit_parameters cpu_limit_parameters;
+            elastic_limit_parameters net_limit_parameters;
+            uint32_t account_cpu_usage_average_window = 0;
+            uint32_t account_net_usage_average_window = 0;
+            bool     valid = false;
+         };
+         mutable config_cache _config_cache;
+
+         const config_cache& get_config() const;
    };
 } } } /// sysio::chain
 
