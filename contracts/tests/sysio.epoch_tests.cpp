@@ -3,6 +3,7 @@
 #include <sysio/chain/abi_serializer.hpp>
 
 #include <fc/variant_object.hpp>
+#include <fc-lite/crypto/chain_types.hpp>
 
 #include "contracts.hpp"
 
@@ -10,6 +11,7 @@ using namespace sysio::testing;
 using namespace sysio;
 using namespace sysio::chain;
 using namespace fc;
+using namespace fc::crypto;
 
 using mvo = fc::mutable_variant_object;
 
@@ -113,7 +115,7 @@ public:
       );
    }
 
-   action_result regoutpost(uint8_t chain_kind, uint32_t chain_id) {
+   action_result regoutpost(chain_kind_t chain_kind, uint32_t chain_id) {
       return push_epoch_action(EPOCH_ACCOUNT, "regoutpost"_n, mvo()
          ("chain_kind", chain_kind)
          ("chain_id", chain_id)
@@ -196,17 +198,16 @@ BOOST_FIXTURE_TEST_CASE(regoperator_invalid_type, sysio_epoch_tester) { try {
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(regoutpost_basic, sysio_epoch_tester) { try {
-   // ChainKind: ETHEREUM=2, chain_id=1
-   BOOST_REQUIRE_EQUAL(success(), regoutpost(2, 1));
+   BOOST_REQUIRE_EQUAL(success(), regoutpost(chain_kind_ethereum, 1));
 
    // Duplicate should fail
    BOOST_REQUIRE_EQUAL(
       error("assertion failure with message: outpost already registered"),
-      regoutpost(2, 1)
+      regoutpost(chain_kind_ethereum, 1)
    );
 
    // Different chain should succeed
-   BOOST_REQUIRE_EQUAL(success(), regoutpost(3, 1)); // SOLANA
+   BOOST_REQUIRE_EQUAL(success(), regoutpost(chain_kind_solana, 1));
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(advance_before_config, sysio_epoch_tester) { try {

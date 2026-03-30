@@ -5,6 +5,7 @@
 #include <sysio/asset.hpp>
 #include <sysio/crypto.hpp>
 #include <sysio/system.hpp>
+#include <fc-lite/crypto/chain_types.hpp>
 
 namespace sysio {
 
@@ -43,7 +44,7 @@ namespace sysio {
 
       /// Update collateral from outpost attestations.
       [[sysio::action]]
-      void updcltrl(name underwriter, uint8_t chain_kind,
+      void updcltrl(name underwriter, fc::crypto::chain_kind_t chain_kind,
                     asset amount, bool is_increase);
 
       /// Slash underwriter (called by sysio.chalg).
@@ -58,7 +59,7 @@ namespace sysio {
       struct [[sysio::table, sysio::contract("sysio.uwrit")]] collateral_entry {
          uint64_t    id;
          name        underwriter;
-         uint8_t     chain_kind;       // ChainKind protobuf enum
+         fc::crypto::chain_kind_t chain_kind;
          asset       staked_amount;
          asset       locked_amount;
          asset       available_amount; // staked - locked (precomputed)
@@ -84,8 +85,8 @@ namespace sysio {
          uint8_t     status;           // UnderwriteStatus protobuf enum
          asset       source_amount;
          asset       target_amount;
-         uint8_t     source_chain;     // ChainKind
-         uint8_t     target_chain;     // ChainKind
+         fc::crypto::chain_kind_t source_chain;
+         fc::crypto::chain_kind_t target_chain;
          time_point  intent_time;
          time_point  unlock_time;
          asset       fee_earned;

@@ -5,6 +5,7 @@
 #include <sysio/asset.hpp>
 #include <sysio/crypto.hpp>
 #include <sysio/system.hpp>
+#include <fc-lite/crypto/chain_types.hpp>
 
 namespace sysio {
 
@@ -47,7 +48,7 @@ namespace sysio {
 
       /// Register an outpost chain.
       [[sysio::action]]
-      void regoutpost(uint8_t chain_kind, uint32_t chain_id);
+      void regoutpost(fc::crypto::chain_kind_t chain_kind, uint32_t chain_id);
 
       /// Set global pause (only callable by sysio.chalg).
       [[sysio::action]]
@@ -100,8 +101,8 @@ namespace sysio {
          uint8_t     type;              // OperatorType protobuf enum
          uint8_t     status;            // OperatorStatus protobuf enum
          uint32_t    registered_epoch;
-         std::vector<std::pair<uint8_t, checksum256>> chain_addresses; // ChainKind -> address
-         std::vector<std::pair<uint8_t, int64_t>>      collateral;      // ChainKind -> amounts
+         std::vector<std::pair<fc::crypto::chain_kind_t, checksum256>> chain_addresses;
+         std::vector<std::pair<fc::crypto::chain_kind_t, int64_t>>   collateral;
          uint8_t     assigned_batch_op_group; // 0, 1, or 2
          uint32_t    last_elected_epoch;
          uint32_t    slash_count = 0;
@@ -120,7 +121,7 @@ namespace sysio {
       /// Outpost registry table.
       struct [[sysio::table, sysio::contract("sysio.epoch")]] outpost_info {
          uint64_t    id;
-         uint8_t     chain_kind;        // ChainKind protobuf enum
+         fc::crypto::chain_kind_t chain_kind;
          uint32_t    chain_id;
          checksum256 last_inbound_msg_id;
          checksum256 last_outbound_msg_id;

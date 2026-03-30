@@ -30,6 +30,7 @@ if(BUILD_SYSTEM_CONTRACTS)
          PUBLIC
          $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
          $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/../../libraries/opp/generated-cdt>
+         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/libfc-lite/include>
          $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.system/include>
       )
 

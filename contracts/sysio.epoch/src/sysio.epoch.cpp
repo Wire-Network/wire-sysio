@@ -263,7 +263,7 @@ void epoch::replaceop(name old_op, name new_op) {
 // ---------------------------------------------------------------------------
 //  regoutpost
 // ---------------------------------------------------------------------------
-void epoch::regoutpost(uint8_t chain_kind, uint32_t chain_id) {
+void epoch::regoutpost(fc::crypto::chain_kind_t chain_kind, uint32_t chain_id) {
    require_auth(get_self());
 
    outposts_t outposts(get_self(), get_self().value);

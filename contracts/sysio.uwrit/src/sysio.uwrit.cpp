@@ -155,7 +155,7 @@ void uwrit::distfee(uint64_t uw_entry_id) {
 // ---------------------------------------------------------------------------
 //  updcltrl
 // ---------------------------------------------------------------------------
-void uwrit::updcltrl(name underwriter, uint8_t chain_kind,
+void uwrit::updcltrl(name underwriter, fc::crypto::chain_kind_t chain_kind,
                      asset amount, bool is_increase) {
    require_auth(get_self());
 
