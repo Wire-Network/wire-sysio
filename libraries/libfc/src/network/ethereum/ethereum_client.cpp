@@ -1,4 +1,6 @@
 #include <algorithm>
+#include <chrono>
+#include <thread>
 #include <ethash/keccak.hpp>
 #include <fc/crypto/ethereum/ethereum_utils.hpp>
 #include <fc/crypto/keccak256.hpp>
@@ -474,6 +476,43 @@ std::string ethereum_client::send_raw_transaction(const std::string& raw_tx_data
    fc::variants params{raw_tx_data};
    auto resp = execute("eth_sendRawTransaction", params);
    return resp.as_string();
+}
+
+/**
+ * @brief Sends a signed raw transaction and returns the tx hash plus a future for the block number
+ *
+ * Submits a pre-signed transaction via eth_sendRawTransaction, then spawns a background thread
+ * that polls eth_getTransactionReceipt once per second until the receipt is available. When the
+ * receipt arrives, the thread fulfills the promise with the block number (as uint64_t) of the
+ * block the transaction was included in.
+ *
+ * @param raw_tx_data The signed, RLP-encoded transaction data (hex string with "0x" prefix)
+ * @return A pair of the transaction hash string and a future<uint64_t> that resolves to the
+ *         block number once the transaction is mined
+ */
+std::future<uint64_t> ethereum_client::identify_block_for_transaction(const std::string& tx_hash) {
+   std::promise<uint64_t> promise;
+   std::future<uint64_t> future = promise.get_future();
+
+   std::thread([this, tx_hash, p = std::move(promise)]() mutable {
+      try {
+         while (true) {
+            auto receipt = get_transaction_receipt(tx_hash);
+            if (!receipt.is_null()) {
+               const auto& obj = receipt.get_object();
+               if (obj.contains("blockNumber") && !obj["blockNumber"].is_null()) {
+                  p.set_value(static_cast<uint64_t>(to_uint256(obj["blockNumber"])));
+                  return;
+               }
+            }
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+         }
+      } catch (...) {
+         p.set_exception(std::current_exception());
+      }
+   }).detach();
+
+   return std::move(future);
 }
 
 /**

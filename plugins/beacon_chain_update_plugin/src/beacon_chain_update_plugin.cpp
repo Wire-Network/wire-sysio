@@ -323,7 +323,10 @@ public:
 
       const auto now_sec = fc::time_point::now().sec_since_epoch();
       const auto epa = epa_var->as_uint64();
-      return now_sec - epa;
+      const auto eta = epa - now_sec;
+      ilog("Determined eta={} from now={} and epa={} on branch={}",
+           eta, now_sec, epa, queue_branch);
+      return eta;
    }
 };
 
@@ -378,7 +381,8 @@ void beacon_chain_update_plugin::plugin_initialize(const variables_map& options)
          const auto bn = eth_client->get_block_number();
          ilog("Executing beacon chain update for interval bn {}", (uint64_t)bn);
          try {
-            ilog("Sending finalizeEpoch transaction to OPP contract at address {}", fc::to_hex(eth_client->get_address(), true));
+            ilog("Sending finalizeEpoch transaction to OPP contract using address {}",
+                 fc::to_hex(eth_client->get_address(), true));
             auto res = opp_contract->finalizeEpoch();
             ilog("finalizeEpoch tx sent, hash: {}", res.as_string());
          }
@@ -426,11 +430,15 @@ void beacon_chain_update_plugin::plugin_initialize(const variables_map& options)
                      beacon_chain_update_plugin_impl::epa_field);
             auto exit_queue_delay_len_sec = nine_days_in_sec +
                (!!exit_queue_len_sec ? *exit_queue_len_sec : 0);
-            ilog("Sending setWithdrawDelay transaction to {} contract at address {}",
-                 withdrawal_queue::contract_name, fc::to_hex(eth_client->get_address(), true));
+            ilog("Sending setWithdrawDelay({} sec) transaction to {} contract using address {}",
+                 exit_queue_delay_len_sec, withdrawal_queue::contract_name,
+                 fc::to_hex(eth_client->get_address(), true));
             if(!!wq_contract) {
-               auto res = wq_contract->setWithdrawDelay(exit_queue_delay_len_sec);
-               ilog("setWithdrawDelay tx sent, hash: {}", res.as_string());
+               auto res1 = wq_contract->setWithdrawDelay(exit_queue_delay_len_sec);
+               const auto tx_hash1 = res1.as_string();
+               ilog("setWithdrawDelay tx sent, hash: {}", tx_hash1);
+               auto bn1 = eth_client->identify_block_for_transaction(tx_hash1);
+               ilog("tx in block number {}", bn1.get());
             }
 
             if(!dm_contract)
@@ -439,23 +447,30 @@ void beacon_chain_update_plugin::plugin_initialize(const variables_map& options)
             constexpr auto deposit_queue = "deposit_queue";
             const auto deposit_queue_len_sec = my_.get_queue_length(queues, deposit_queue);
             const auto default_days = 1;
+            const auto seconds_per_day = 60 * 60 * 24;
             uint64_t depositQDaysFl = !deposit_queue_len_sec
                ? default_days
-               : *deposit_queue_len_sec / (60 * 60 * 24); // convert sec to min, min to hours, hours to days
+               : *deposit_queue_len_sec / seconds_per_day; // convert sec to min, min to hours, hours to days
             if(!deposit_queue_len_sec)
                wlog("defaulting the {} withdrawal delay to {} day since {} was not a finite number",
                      deposit_manager::contract_name, depositQDaysFl, deposit_queue,
                      beacon_chain_update_plugin_impl::epa_field);
+            else
+               ilog("Queue len = {}, sec_per_day={}, depositQDaysFl={}",
+                    *deposit_queue_len_sec, seconds_per_day, depositQDaysFl);
 
-            ilog("Sending setEntryQueue transaction to {} contract at address {}",
-                 deposit_manager::contract_name, fc::to_hex(eth_client->get_address(), true));
+            ilog("Sending setEntryQueue({} days) transaction to {} contract using address {}",
+                 depositQDaysFl, deposit_manager::contract_name,
+                 fc::to_hex(eth_client->get_address(), true));
 
-            auto res1 = dm_contract->setEntryQueue(depositQDaysFl);
-            ilog("setEntryQueue tx sent, hash: {}", res1.as_string());
+            auto res2 = dm_contract->setEntryQueue(depositQDaysFl);
+            const auto tx_hash2 = res2.as_string();
+            ilog("setEntryQueue tx sent, hash: {}", tx_hash2);
+            auto bn2 = eth_client->identify_block_for_transaction(tx_hash2);
+            ilog("tx in block number {}", bn2.get());
 
             auto ethstore = get_ethstore_latest(my_.beacon_chain_apy_url, *(my_.beacon_chain_api_key));
             ilog("ethstore: {}", fc::json::to_string(ethstore, fc::time_point::maximum()));
-            ilog("Sending setEntryQueue transaction to DepositManager contract at address {}", fc::to_hex(eth_client->get_address(), true));
             constexpr auto avgapr7d_field = "avgapr7d";
             const auto apy = my_.get_field_from_object(ethstore, avgapr7d_field);
             if(!apy) {
@@ -467,8 +482,11 @@ void beacon_chain_update_plugin::plugin_initialize(const variables_map& options)
             if(apy->is_double())
                aprFraction = apy->as_double();
             auto scaled = static_cast<uint64_t>(aprFraction * 10000.0 + 1e-12);
-            auto res2 = dm_contract->updateApyBPS(scaled);
-            ilog("updateApyBPS tx sent, hash: {}", res2.as_string());
+            auto res3 = dm_contract->updateApyBPS(scaled);
+            const auto tx_hash3 = res3.as_string();
+            ilog("updateApyBPS tx sent, hash: {}", tx_hash3);
+            auto bn3 = eth_client->identify_block_for_transaction(tx_hash3);
+            ilog("tx in block number {}", bn3.get());
          }
          catch (const std::exception& e) {
             elog("Error executing beacon chain update for interval: {}", e.what());

@@ -12,6 +12,9 @@
 #include <fc/network/ethereum/ethereum_abi.hpp>
 #include <fc/network/json_rpc/json_rpc_client.hpp>
 
+#include <future>
+#include <utility>
+
 namespace fc::network::ethereum {
 using namespace fc::crypto;
 using namespace fc::crypto::ethereum;
@@ -354,6 +357,16 @@ public:
     * @throws fc::network::json_rpc::json_rpc_exception if the RPC call fails or returns an error.
     */
    std::string send_raw_transaction(const std::string& raw_tx_data);
+
+   /**
+    * @brief Receives a transaction hash that resolves to the block number once the transaction is included in a block.
+    * @param tx_hash The transaction hash
+    * @return A future<uint64_t> that resolves to the block number of the block
+    *         the transaction was included in. The future is fulfilled by a background
+    *         thread that polls eth_getTransactionReceipt until the receipt is available.
+    * @throws fc::network::json_rpc::json_rpc_exception if the initial RPC call fails.
+    */
+   std::future<uint64_t> identify_block_for_transaction(const std::string& tx_hash);
 
    /**
     * @brief Retrieves logs based on filter parameters.
