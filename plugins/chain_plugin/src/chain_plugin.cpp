@@ -194,6 +194,11 @@ public:
    fc::microseconds                  abi_serializer_max_time_us;
    std::optional<std::filesystem::path>          snapshot_path;
 
+   // Snapshot attestation verification: set when starting from a snapshot,
+   // checked once after syncing past the snapshot block.
+   std::optional<uint32_t>    snapshot_loaded_block_num;
+   fc::crypto::blake3         snapshot_loaded_root_hash;
+
    // --native-contract mappings: account -> path to .so
    std::vector<std::pair<chain::name, std::filesystem::path>> native_contracts;
 #ifdef SYSIO_NATIVE_MODULE_RUNTIME_ENABLED
@@ -232,6 +237,7 @@ public:
    void enable_accept_transactions();
    void plugin_initialize(const variables_map& options);
    void plugin_startup();
+   void verify_snapshot_attestation();
 
 private:
    static void log_guard_exception(const chain::guard_exception& e);
@@ -1165,6 +1171,11 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
             _get_info_db->on_irreversible_block(block, id);
          }
 
+         // One-time snapshot attestation verification after syncing past the snapshot block
+         if (snapshot_loaded_block_num && block->block_num() > *snapshot_loaded_block_num) {
+            verify_snapshot_attestation();
+         }
+
          irreversible_block_channel.publish( priority::low, t );
       } );
       
@@ -1226,9 +1237,14 @@ void chain_plugin_impl::plugin_startup()
          return app().quit();
       };
       auto check_shutdown = [](){ return app().is_quiting(); };
-      if (snapshot_path)
-         chain->startup(shutdown, check_shutdown, std::make_shared<threaded_snapshot_reader>(*snapshot_path));
-      else if( genesis )
+      if (snapshot_path) {
+         auto snapshot_reader = std::make_shared<threaded_snapshot_reader>(*snapshot_path);
+         chain->startup(shutdown, check_shutdown, snapshot_reader);
+         snapshot_loaded_block_num = chain->head().block_num();
+         snapshot_loaded_root_hash = snapshot_reader->get_root_hash();
+         ilog("Snapshot loaded at block #{} with root hash {}, will verify attestation after sync",
+              *snapshot_loaded_block_num, snapshot_loaded_root_hash.str());
+      } else if( genesis )
          chain->startup(shutdown, check_shutdown, *genesis);
       else
          chain->startup(shutdown, check_shutdown);
@@ -1349,6 +1365,93 @@ bool chain_plugin::api_accept_transactions() const{
 
 bool chain_plugin::accept_transactions() const {
    return my->accept_transactions;
+}
+
+void chain_plugin_impl::verify_snapshot_attestation() {
+   if (!snapshot_loaded_block_num) return;
+
+   auto snap_block_num = *snapshot_loaded_block_num;
+   // Clear so we only check once
+   snapshot_loaded_block_num.reset();
+
+   ilog("Verifying snapshot attestation for block #{}", snap_block_num);
+
+   try {
+      const auto& db = chain->db();
+
+      // Look up the snaprecords table: code=sysio, scope=sysio, table=snaprecords
+      const auto* t_id = db.find<chain::table_id_object, chain::by_code_scope_table>(
+         boost::make_tuple(config::system_account_name, config::system_account_name, "snaprecords"_n));
+
+      if (!t_id) {
+         wlog("No snapshot attestation records table found on chain. "
+              "Skipping snapshot verification for block #{}. "
+              "The system contract on this chain may not support snapshot attestation.",
+              snap_block_num);
+         return;
+      }
+
+      // Primary key is block_num (uint64_t)
+      const auto& kv_index = db.get_index<key_value_index, by_scope_primary>();
+      auto it = kv_index.find(boost::make_tuple(t_id->id, static_cast<uint64_t>(snap_block_num)));
+
+      if (it == kv_index.end()) {
+         wlog("No attested snapshot record found for block #{}. "
+              "Skipping snapshot verification. "
+              "Only snapshots taken at attested block heights can be verified.",
+              snap_block_num);
+         return;
+      }
+
+      // Deserialize the snap_record row via ABI to avoid hard-coded byte offsets
+      const auto* code_accnt = chain->find_account_metadata(config::system_account_name);
+      if (!code_accnt || code_accnt->abi.size() == 0) {
+         wlog("System contract ABI not found. Skipping snapshot attestation verification.");
+         return;
+      }
+
+      chain::abi_def abi;
+      chain::abi_serializer::to_abi(code_accnt->abi, abi);
+      chain::abi_serializer abis(std::move(abi),
+         chain::abi_serializer::create_yield_function(abi_serializer_max_time_us));
+
+      vector<char> data;
+      chain_apis::read_only::copy_inline_row(*it, data);
+      auto row_var = abis.binary_to_variant("snap_record", data,
+         chain::abi_serializer::create_yield_function(abi_serializer_max_time_us));
+
+      // Extract on-chain snapshot_hash as raw bytes for comparison.
+      // The ABI serializer stores checksum256 as vector<char> in the variant (not hex),
+      // so we extract bytes directly and use memcmp against the blake3 digest.
+      // blake3::data() always points to a fixed 32-byte internal array (safe for memcmp).
+      auto on_chain_hash = row_var["snapshot_hash"].as<bytes>();
+      bool hash_match = on_chain_hash.size() == fc::crypto::blake3::byte_size &&
+                        memcmp(on_chain_hash.data(), snapshot_loaded_root_hash.data(),
+                               fc::crypto::blake3::byte_size) == 0;
+
+      if (!hash_match) {
+         elog("FATAL: Snapshot hash mismatch for block #{}! "
+              "On-chain attested hash: {}, loaded snapshot hash: {}. "
+              "The snapshot file may be corrupted or tampered with. Do NOT use this snapshot.",
+              snap_block_num, fc::to_hex(on_chain_hash), snapshot_loaded_root_hash.str());
+         app().quit();
+         return;
+      }
+
+      ilog("Snapshot attestation verified successfully for block #{}: hash {} matches on-chain record",
+           snap_block_num, snapshot_loaded_root_hash.str());
+
+   } catch (const fc::exception& e) {
+      elog("Error verifying snapshot attestation for block #{}: {}. "
+           "To continue syncing without snapshot verification, restart without the --snapshot option.",
+           snap_block_num, e.to_detail_string());
+      app().quit();
+   } catch (const std::exception& e) {
+      elog("Error verifying snapshot attestation for block #{}: {}. "
+           "To continue syncing without snapshot verification, restart without the --snapshot option.",
+           snap_block_num, e.what());
+      app().quit();
+   }
 }
 
 void chain_plugin_impl::enable_accept_transactions() {

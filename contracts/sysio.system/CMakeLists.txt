@@ -10,12 +10,14 @@ set(SYSIO_SYSTEM_SOURCES
    ${CMAKE_CURRENT_SOURCE_DIR}/src/peer_keys.cpp
    ${CMAKE_CURRENT_SOURCE_DIR}/src/trx_priority.cpp
    ${CMAKE_CURRENT_SOURCE_DIR}/src/expandauth.cpp
-   ${CMAKE_CURRENT_SOURCE_DIR}/src/block_info.cpp)
+   ${CMAKE_CURRENT_SOURCE_DIR}/src/block_info.cpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/src/snapshot_attest.cpp)
 
 set(SYSIO_SYSTEM_HEADERS
    "sysio.system/sysio.system.hpp"
    "sysio.system/peer_keys.hpp"
-   "sysio.system/trx_priority.hpp")
+   "sysio.system/trx_priority.hpp"
+   "sysio.system/snapshot_attest.hpp")
 
 set(SYSIO_SYSTEM_INCLUDE_DIRS
    ${CMAKE_CURRENT_SOURCE_DIR}/include
@@ -39,5 +41,6 @@ if("native-module" IN_LIST SYSIO_WASM_RUNTIMES AND BUILD_SYSTEM_CONTRACTS)
       ABI_FILE       ${CMAKE_BINARY_DIR}/contracts/sysio.system/sysio.system.abi
       EXTRA_DISPATCH "sysiosystem::peer_keys:regpeerkey,delpeerkey,getpeerkeys"
                      "sysiosystem::trx_priority:addtrxp,deltrxp"
+                     "sysiosystem::snapshot_attest:regsnapprov,delsnapprov,votesnaphash,setsnpcfg,getsnaphash"
    )
 endif()

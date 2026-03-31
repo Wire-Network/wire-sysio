@@ -1,6 +1,7 @@
 #include <sysio/chain/controller.hpp>
 #include <sysio/chain/exceptions.hpp>
 #include <sysio/chain/pending_snapshot.hpp>
+#include <sysio/chain/snapshot.hpp>
 #include <sysio/chain/snapshot_scheduler.hpp>
 
 namespace sysio::chain {
@@ -148,6 +149,17 @@ void snapshot_scheduler::execute_snapshot(uint32_t srid, chain::controller& chai
                pending.erase(it, pending.end());
             });
          }
+
+         // Notify snapshot provider callback if registered
+         if (_snapshot_finalized_cb) {
+            try {
+               _snapshot_finalized_cb(snapshot_info);
+            } catch (const fc::exception& e) {
+               elog("Snapshot finalized callback error: {}", e.to_detail_string());
+            } catch (const std::exception& e) {
+               elog("Snapshot finalized callback error: {}", e.what());
+            }
+         }
       }
    };
    create_snapshot(next, chain, {});
@@ -167,12 +179,14 @@ void snapshot_scheduler::create_snapshot(next_function<snapshot_information> nex
       return;
    }
 
+   fc::crypto::blake3 captured_root_hash;
    auto write_snapshot = [&](const fs::path& p) -> void {
       if(predicate) predicate();
       fs::create_directory(p.parent_path());
       auto writer = std::make_shared<threaded_snapshot_writer>(p);
       chain.write_snapshot(writer);
       writer->finalize();
+      captured_root_hash = writer->get_root_hash();
    };
 
    // If in irreversible mode, create snapshot and return path to snapshot immediately.
@@ -187,7 +201,7 @@ void snapshot_scheduler::create_snapshot(next_function<snapshot_information> nex
                     head_block_num, ec.value(), ec.message());
 
          ilog("Snapshot creation at block {} complete; snapshot placed at {}", head_block_num, snapshot_path.string());
-         next(snapshot_information{head_id, head_block_num, head_block_time, chain_snapshot_header::current_version, snapshot_path.generic_string()});
+         next(snapshot_information{head_id, head_block_num, head_block_time, chain_snapshot_header::current_version, snapshot_path.generic_string(), captured_root_hash});
       }
       CATCH_AND_CALL(next);
       return;
@@ -220,8 +234,8 @@ void snapshot_scheduler::create_snapshot(next_function<snapshot_information> nex
                     temp_path.generic_string(), pending_path.generic_string(),
                     head_block_num, ec.value(), ec.message());
          ilog("Snapshot creation at block {} complete; snapshot will be available once block becomes irreversible", head_block_num);
-         _pending_snapshot_index.emplace(head_id, head_block_time, next, pending_path.generic_string(), snapshot_path.generic_string());
-         add_pending_snapshot_info(snapshot_information{head_id, head_block_num, head_block_time, chain_snapshot_header::current_version, pending_path.generic_string()});
+         _pending_snapshot_index.emplace(head_id, head_block_time, next, pending_path.generic_string(), snapshot_path.generic_string(), captured_root_hash);
+         add_pending_snapshot_info(snapshot_information{head_id, head_block_num, head_block_time, chain_snapshot_header::current_version, pending_path.generic_string(), captured_root_hash});
       }
       CATCH_AND_CALL(next);
    }
