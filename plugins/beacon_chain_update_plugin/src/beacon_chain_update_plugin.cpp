@@ -20,6 +20,7 @@
 
 
 #include <sysio/beacon_chain_update_plugin.hpp>
+#include <sysio/beacon_chain_update_detail.hpp>
 
 namespace bpo = boost::program_options;
 using namespace appbase;
@@ -199,6 +200,45 @@ namespace {
    }
 }
 
+namespace beacon_chain_detail {
+
+   std::optional<fc::variant> get_field_from_object(const fc::variant& expected_obj,
+                                                     const std::string& expected_field) {
+      if (!expected_obj.is_object())
+         return {};
+
+      const auto actual_obj = expected_obj.get_object();
+      if (!actual_obj.contains(expected_field))
+         return {};
+
+      return actual_obj[expected_field];
+   }
+
+   // reported in seconds
+   std::optional<uint64_t> get_queue_length(const fc::variant& queues, const std::string& queue_branch) {
+      const auto deposit_queue = get_field_from_object(queues, queue_branch);
+      SYS_ASSERT(!!deposit_queue, sysio::chain::plugin_config_exception,
+                 "Returned api request:\n{}\n doesn't contain the field {}",
+                 fc::json::to_string(queues, fc::time_point::maximum()), queue_branch);
+      const auto epa_var = get_field_from_object(*deposit_queue, epa_field);
+      SYS_ASSERT(!!epa_var, sysio::chain::plugin_config_exception,
+                 "{}:\n{}\n doesn't contain a key of {}",
+                 queue_branch, fc::json::to_string(queues, fc::time_point::maximum()), epa_field);
+      SYS_ASSERT(epa_var->is_numeric(), sysio::chain::plugin_config_exception,
+                 "queues[{}][{}]:\n{}\n doesn't contain a number",
+                 queue_branch, epa_field,
+                 fc::json::to_string(queues, fc::time_point::maximum()));
+
+      const auto now_sec = fc::time_point::now().sec_since_epoch();
+      const auto epa = epa_var->as_uint64();
+      const auto eta = epa - now_sec;
+      ilog("Determined eta={} from now={} and epa={} on branch={}",
+           eta, now_sec, epa, queue_branch);
+      return eta;
+   }
+
+} // namespace beacon_chain_detail
+
 using namespace std;
 using addr_map_t = std::map<std::string, std::string>;
 using action = std::function<void()>;
@@ -303,41 +343,6 @@ public:
       return { contract, client };
    }
 
-   constexpr static auto epa_field = "estimated_processed_at";
-
-   static optional<fc::variant> get_field_from_object(const fc::variant& expected_obj, const string& expected_field) {
-      if (!expected_obj.is_object())
-         return {};
-
-      const auto actual_obj = expected_obj.get_object();
-      if (!actual_obj.contains(expected_field))
-         return {};
-
-      return actual_obj[expected_field];
-   }
-
-   // reported in seconds
-   static optional<uint64_t> get_queue_length(const fc::variant& queues, const string& queue_branch) {
-      const auto deposit_queue = get_field_from_object(queues, queue_branch);
-      SYS_ASSERT(!!deposit_queue, sysio::chain::plugin_config_exception,
-                 "Returned api request:\n{}\n doesn't contain the field {}",
-                 fc::json::to_string(queues, fc::time_point::maximum()), queue_branch);
-      const auto epa_var = get_field_from_object(*deposit_queue, epa_field);
-      SYS_ASSERT(!!epa_var, sysio::chain::plugin_config_exception,
-                 "{}:\n{}\n doesn't contain a key of {}",
-                 queue_branch, fc::json::to_string(queues, fc::time_point::maximum()), epa_field);
-      SYS_ASSERT(epa_var->is_numeric(), sysio::chain::plugin_config_exception,
-                 "queues[{}][{}]:\n{}\n doesn't contain a number",
-                 queue_branch, epa_field,
-                 fc::json::to_string(queues, fc::time_point::maximum()));
-
-      const auto now_sec = fc::time_point::now().sec_since_epoch();
-      const auto epa = epa_var->as_uint64();
-      const auto eta = epa - now_sec;
-      ilog("Determined eta={} from now={} and epa={} on branch={}",
-           eta, now_sec, epa, queue_branch);
-      return eta;
-   }
 };
 
 void beacon_chain_update_plugin::plugin_initialize(const variables_map& options) {
@@ -431,14 +436,14 @@ void beacon_chain_update_plugin::plugin_initialize(const variables_map& options)
             ilog("queues: {}", fc::json::to_string(queues, fc::time_point::maximum()));
             constexpr auto exit_queue = "exit_queue";
 
-            const auto exit_queue_len_sec = my_.get_queue_length(queues, exit_queue);
+            const auto exit_queue_len_sec = beacon_chain_detail::get_queue_length(queues, exit_queue);
 
             constexpr auto nine_days = 9;
             constexpr auto nine_days_in_sec = 60 * 60 * 24 * nine_days;
             if(!exit_queue_len_sec)
                wlog("defaulting the {} withdrawal delay to {} days since {}::{} was not a finite number",
                      withdrawal_queue::contract_name, nine_days, exit_queue,
-                     beacon_chain_update_plugin_impl::epa_field);
+                     beacon_chain_detail::epa_field);
             auto exit_queue_delay_len_sec = nine_days_in_sec +
                (!!exit_queue_len_sec ? *exit_queue_len_sec : 0);
             ilog("Sending setWithdrawDelay({} sec) transaction to {} contract using address {}",
@@ -456,7 +461,7 @@ void beacon_chain_update_plugin::plugin_initialize(const variables_map& options)
                return;
 
             constexpr auto deposit_queue = "deposit_queue";
-            const auto deposit_queue_len_sec = my_.get_queue_length(queues, deposit_queue);
+            const auto deposit_queue_len_sec = beacon_chain_detail::get_queue_length(queues, deposit_queue);
             const auto default_days = 1;
             const auto seconds_per_day = 60 * 60 * 24;
             uint64_t depositQDaysFl = !deposit_queue_len_sec
@@ -465,7 +470,7 @@ void beacon_chain_update_plugin::plugin_initialize(const variables_map& options)
             if(!deposit_queue_len_sec)
                wlog("defaulting the {} withdrawal delay to {} day since {} was not a finite number",
                      deposit_manager::contract_name, depositQDaysFl, deposit_queue,
-                     beacon_chain_update_plugin_impl::epa_field);
+                     beacon_chain_detail::epa_field);
             else
                ilog("Queue len = {}, sec_per_day={}, depositQDaysFl={}",
                     *deposit_queue_len_sec, seconds_per_day, depositQDaysFl);
@@ -483,7 +488,7 @@ void beacon_chain_update_plugin::plugin_initialize(const variables_map& options)
             auto ethstore = get_ethstore_latest(my_.beacon_chain_apy_url, *(my_.beacon_chain_api_key));
             ilog("ethstore: {}", fc::json::to_string(ethstore, fc::time_point::maximum()));
             constexpr auto avgapr7d_field = "avgapr7d";
-            const auto apy = my_.get_field_from_object(ethstore, avgapr7d_field);
+            const auto apy = beacon_chain_detail::get_field_from_object(ethstore, avgapr7d_field);
             if(!apy) {
                elog("ethstore:\n{}\n did not have a {} field, not setting the {} contract entry queue",
                     fc::json::to_string(ethstore, fc::time_point::maximum()), avgapr7d_field, deposit_manager::contract_name);
@@ -492,7 +497,7 @@ void beacon_chain_update_plugin::plugin_initialize(const variables_map& options)
             double aprFraction = 1.0;
             if(apy->is_double())
                aprFraction = apy->as_double();
-            auto scaled = static_cast<uint64_t>(aprFraction * 10000.0 + 1e-12);
+            auto scaled = beacon_chain_detail::apy_fraction_to_bps(aprFraction);
             auto res3 = dm_contract->updateApyBPS(scaled);
             const auto tx_hash3 = res3.as_string();
             ilog("updateApyBPS tx sent, hash: {}", tx_hash3);
