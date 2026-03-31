@@ -12,7 +12,7 @@
 #include <sysio/chain/global_property_object.hpp>
 #include <sysio/chain/protocol_state_object.hpp>
 #include <sysio/chain/kv_table_objects.hpp>
-#include <sysio/chain/transaction_object.hpp>
+#include <sysio/chain/transaction_dedup.hpp>
 #include <sysio/chain/genesis_intrinsics.hpp>
 #include <sysio/chain/whitelisted_intrinsics.hpp>
 #include <sysio/chain/database_header_object.hpp>
@@ -59,7 +59,6 @@ using controller_index_set = index_set<
    protocol_state_multi_index,
    dynamic_global_property_multi_index,
    block_summary_multi_index,
-   transaction_multi_index,
    code_index,
    database_header_multi_index
 >;
@@ -717,6 +716,8 @@ struct controller_impl {
    controller::config              conf;
    // persist chain_head after vote_processor shutdown, avoids concurrent access, after chain_head & conf since this uses them
    fc::scoped_exit<std::function<void()>> write_chain_head = [&]() { chain_head.write(conf.state_dir / config::chain_head_filename); };
+   transaction_dedup               trx_dedup;
+   fc::scoped_exit<std::function<void()>> write_trx_dedup = [&]() { trx_dedup.write_to_file(conf.state_dir / config::transaction_dedup_filename); };
    const chain_id_type             chain_id; // read by thread_pool threads, value will not be changed
    std::atomic<bool>               replaying = false;
    bool                            is_producer_node = false; // true if node is configured as a block producer
@@ -904,6 +905,7 @@ struct controller_impl {
    void pop_block() {
       uint32_t prev_block_num = pop_prev_block();
       db.undo();
+      trx_dedup.pop_block_revision();
       protocol_features.popped_blocks_to(prev_block_num);
    }
 
@@ -1113,6 +1115,7 @@ struct controller_impl {
             blog.append( (*bitr)->block, (*bitr)->id(), (*bitr)->block->packed_signed_block() );
 
             db.commit( (*bitr)->block_num() );
+            trx_dedup.commit_to_lib( (*bitr)->block_num() );
             root_id = (*bitr)->id();
 
             if (irreversible_mode()) {
@@ -1406,6 +1409,8 @@ struct controller_impl {
       bool valid = chain_head.read(conf.state_dir / config::chain_head_filename);
       SYS_ASSERT( valid, database_exception, "No existing chain_head.dat file");
 
+      trx_dedup.read_from_file(conf.state_dir / config::transaction_dedup_filename);
+
       SYS_ASSERT(db.revision() == chain_head.block_num(), database_exception,
                  "chain_head block num {} does not match chainbase revision {}",
                  chain_head.block_num(), db.revision());
@@ -1579,9 +1584,6 @@ struct controller_impl {
    }
 
    void add_to_snapshot( const snapshot_writer_ptr& snapshot ) {
-      // clear in case the previous call to clear did not finish in time of deadline
-      clear_expired_input_transactions( fc::time_point::maximum() );
-
       snapshot_written_row_counter row_counter(expected_snapshot_row_count(), snapshot->name());
 
       snapshot->write_section<chain_snapshot_header>([this]( auto &section ){
@@ -1608,6 +1610,8 @@ struct controller_impl {
             });
          });
       });
+
+      trx_dedup.add_to_snapshot(snapshot, db);
 
       add_kv_rows_to_snapshot(snapshot, row_counter);
 
@@ -1682,6 +1686,8 @@ struct controller_impl {
       });
 
       read_kv_rows_from_snapshot(snapshot, rows_loaded, snapshot_load_ctx);
+
+      trx_dedup.read_from_snapshot(snapshot);
 
       authorization.read_from_snapshot(snapshot, rows_loaded, snapshot_load_ctx);
       resource_limits.read_from_snapshot(snapshot, rows_loaded, snapshot_load_ctx);
@@ -2048,8 +2054,9 @@ struct controller_impl {
       }
 
       auto guard_pending = fc::make_scoped_exit([this, head_block_num=chain_head.block_num()]() {
-         protocol_features.popped_blocks_to( head_block_num );
+         trx_dedup.abort_block_revision(); // no-op if no pending revision
          pending.reset();
+         protocol_features.popped_blocks_to( head_block_num );
       });
 
       SYS_ASSERT( skip_db_sessions(s) || db.revision() == chain_head.block_num(), database_exception,
@@ -2057,6 +2064,8 @@ struct controller_impl {
                   db.revision(), chain_head.block_num(), fork_db_head().block_num() );
 
       maybe_session        session = skip_db_sessions(s) ? maybe_session() : maybe_session(db);
+      if (!skip_db_sessions(s))
+         trx_dedup.start_block_revision(chain_head.block_num() + 1);
       building_block_input bbi{chain_head.id(), chain_head.timestamp(), when, chain_head.internal()->get_producer_for_block_at(when).producer_name,
                                new_protocol_feature_activations};
       pending.emplace(std::move(session), *chain_head.internal(), bbi);
@@ -2177,7 +2186,7 @@ struct controller_impl {
             elog( "on block transaction failed due to unknown exception" );
          }
 
-         clear_expired_input_transactions(deadline);
+         clear_expired_input_transactions();
          update_producers_authority();
       }
 
@@ -2333,6 +2342,7 @@ struct controller_impl {
 
       // push the state for pending.
       pending->push();
+      trx_dedup.commit_block_revision();
    }
 
    void log_applied(controller::block_status s) const {
@@ -3004,6 +3014,7 @@ struct controller_impl {
 
             if (!skip_db_sessions(controller::block_status::irreversible)) {
                db.commit(bsp->block_num());
+               trx_dedup.commit_to_lib(bsp->block_num());
             }
          }
 
@@ -3173,6 +3184,7 @@ struct controller_impl {
       deque<transaction_metadata_ptr> applied_trxs;
       if( pending ) {
          applied_trxs = pending->extract_trx_metas();
+         trx_dedup.abort_block_revision();
          pending.reset();
          protocol_features.popped_blocks_to( chain_head.block_num() );
       }
@@ -3257,23 +3269,14 @@ struct controller_impl {
    }
 
 
-   void clear_expired_input_transactions(const fc::time_point& deadline) {
-      //Look for expired transactions in the deduplication list, and remove them.
-      auto& transaction_idx = db.get_mutable_index<transaction_multi_index>();
-      const auto& dedupe_index = transaction_idx.indices().get<by_expiration>();
-      auto now = is_building_block() ? pending_block_time() : chain_head.timestamp().to_time_point();
-      const auto total = dedupe_index.size();
-      uint32_t num_removed = 0;
-      while( (!dedupe_index.empty()) && ( now > dedupe_index.begin()->expiration.to_time_point() ) ) {
-         transaction_idx.remove(*dedupe_index.begin());
-         ++num_removed;
-         if( deadline <= fc::time_point::now() ) {
-            break;
-         }
-      }
+   void clear_expired_input_transactions() {
+      fc::time_point block_time = is_building_block()
+         ? pending_block_time()
+         : chain_head.timestamp().to_time_point();
+      auto [num_removed, total] = trx_dedup.clear_expired(block_time);
       if (!replaying && total > 0) {
-         dlog("removed {} expired transactions of the {} input dedup list, pending block time {}",
-              num_removed, total, now);
+         dlog("removed {} expired transactions of the {} input dedup list, block time {}",
+              num_removed, total, block_time);
       }
    }
 
@@ -4442,7 +4445,23 @@ bool controller::is_builtin_activated( builtin_protocol_feature_t f )const {
 }
 
 bool controller::is_known_unexpired_transaction( const transaction_id_type& id) const {
-   return db().find<transaction_object, by_trx_id>(id);
+   return my->trx_dedup.is_known(id);
+}
+
+void controller::record_transaction( const transaction_id_type& id, fc::time_point_sec expire ) {
+   my->trx_dedup.record(id, expire);
+}
+
+void controller::push_dedup_session() {
+   my->trx_dedup.push_session();
+}
+
+void controller::squash_dedup_session() {
+   my->trx_dedup.squash_session();
+}
+
+void controller::undo_dedup_session() {
+   my->trx_dedup.undo_session();
 }
 
 void controller::set_subjective_cpu_leeway(fc::microseconds leeway) {

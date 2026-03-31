@@ -185,9 +185,26 @@ namespace sysio::chain {
       /// Fields:
       public:
 
-         controller&                                 control;
-         const packed_transaction&                   packed_trx;
-         std::optional<chainbase::database::session> undo_session;
+         /// RAII guard that manages both the chainbase undo session and the dedup
+         /// transaction-level session. On destruction, if neither squash() nor undo()
+         /// was called, both sessions are automatically undone.
+         struct trx_session {
+            chainbase::database::session db_session;
+            controller&                  ctrl;
+            bool                         active = true;
+
+            trx_session(chainbase::database& db, controller& c)
+               : db_session(db.start_undo_session(true)), ctrl(c) { ctrl.push_dedup_session(); }
+            trx_session(trx_session&&) = default;
+
+            void squash() { db_session.squash(); ctrl.squash_dedup_session(); active = false; }
+            void undo()   { db_session.undo();   ctrl.undo_dedup_session();   active = false; }
+            ~trx_session() { if (active) ctrl.undo_dedup_session(); }
+         };
+
+         controller&                    control;
+         const packed_transaction&      packed_trx;
+         std::optional<trx_session>     undo_session;
          transaction_trace_ptr                       trace;
          fc::time_point                              start;
 
