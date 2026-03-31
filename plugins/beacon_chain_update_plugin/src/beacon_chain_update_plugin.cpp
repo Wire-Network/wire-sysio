@@ -84,6 +84,7 @@ namespace {
 
    constexpr auto default_interval_schedule             = "* */1 * * *"; // every hour
    constexpr auto default_interval_name                 = "default";
+   constexpr auto just_once_interval_name               = "once";
 
    const std::regex regex(R"(^(.+?)(?:V\d+)?$)");
 
@@ -202,7 +203,8 @@ using namespace std;
 using addr_map_t = std::map<std::string, std::string>;
 using action = std::function<void()>;
 using interval_actions_t = vector<action>;
-using schedules_t = unordered_map<string, services::cron_service::job_schedule>;
+using job_schedule = services::cron_service::job_schedule;
+using schedules_t = unordered_map<string, job_schedule>;
 using ethereum_client_ptr = fc::network::ethereum::ethereum_client_ptr;
 
 class beacon_chain_update_plugin_impl {
@@ -216,6 +218,8 @@ public:
    schedules_t schedules;
    string actual_default_schedule;
    unordered_map<string, interval_actions_t> intervals;
+   interval_actions_t                        just_once_actions;
+   optional<cron_service::job_id_t>          just_once_jid;
 
    addr_map_t outpost_addrs;
 
@@ -223,6 +227,10 @@ public:
       // if the interval actions are already created, we can just use it
       if(intervals.count(interval_name) > 0) {
          return intervals[interval_name];
+      }
+
+      if(interval_name == just_once_interval_name) {
+         return just_once_actions;
       }
 
       // This is used to make sure that there is a corresponding cron schedule associated with each collection of actions
@@ -235,21 +243,23 @@ public:
    }
 
    template <typename C>
-   std::pair<std::shared_ptr<C>, ethereum_client_ptr> get_contract(const outpost_ethereum_client_plugin& oec_plugin) const {
+   std::pair<std::shared_ptr<C>, ethereum_client_ptr> get_contract(const outpost_ethereum_client_plugin& oec_plugin,
+                                                                   ethereum_client_ptr client = ethereum_client_ptr{}) const {
       constexpr auto desired_contract_name = C::contract_name;
       const auto clients = oec_plugin.get_clients();
-      ethereum_client_ptr client;
-      for(const auto& client_entry : clients) {
-         ilog("id={}", client_entry->id);
-         if(client_target_chain == client_entry->signature_provider->target_chain) {
-            SYS_ASSERT(!client, sysio::chain::plugin_config_exception,
-                       "There should only be one ethereum client provided, but there were at least 2");
-            client = client_entry->client;
-            break;
+      if(!client) {
+         for(const auto& client_entry : clients) {
+            ilog("id={}", client_entry->id);
+            if(client_target_chain == client_entry->signature_provider->target_chain) {
+               SYS_ASSERT(!client, sysio::chain::plugin_config_exception,
+                        "There should only be one ethereum client provided, but there were at least 2");
+               client = client_entry->client;
+               break;
+            }
          }
+         SYS_ASSERT(!!client, sysio::chain::plugin_config_exception,
+                    "could not find any ethereum client for {}", desired_contract_name);
       }
-      SYS_ASSERT(!!client, sysio::chain::plugin_config_exception,
-                 "could not find any ethereum client for {}", desired_contract_name);
 
       auto itr = outpost_addrs.find(desired_contract_name);
       SYS_ASSERT(itr != outpost_addrs.end(), sysio::chain::plugin_config_exception,
@@ -353,6 +363,9 @@ void beacon_chain_update_plugin::plugin_initialize(const variables_map& options)
       auto client_specs    = options.at(beacon_chain_interval).as<std::vector<std::string>>();
       for (auto& client_spec : client_specs) {
          auto parts = fc::split(client_spec, ',', 1);
+         SYS_ASSERT(parts[0] != just_once_interval_name, chain::plugin_config_exception,
+                    "Cannot use reserved interval spec name: `{}`, to store schedule: `{}`",
+                    just_once_interval_name, parts[1]);
          auto schedule_inserted = my->schedules.emplace(parts[0], services::parse_cron_schedule_or_throw(parts[1]));
          SYS_ASSERT(schedule_inserted.second, chain::plugin_config_exception,
                     "Repeated interval spec name: `{}`, schedule: `{}`", parts[0], parts[1]);
@@ -370,9 +383,9 @@ void beacon_chain_update_plugin::plugin_initialize(const variables_map& options)
 
    auto& oec_plugin = app().get_plugin<outpost_ethereum_client_plugin>();
 
-   if( options.contains(beacon_chain_finalize_epoch_interval) ) {
+   auto [ opp_contract, eth_client ] = my->get_contract<OPP>(oec_plugin);
+   if( opp_contract ) {
       ilog("initializing beacon chain finalize epoch interval");
-      auto [ opp_contract, eth_client ] = my->get_contract<OPP>(oec_plugin);
 
       auto& finalize_epoch_interval = options.at(beacon_chain_finalize_epoch_interval).as<std::string>();
       auto& actions = my->find_interval_actions(finalize_epoch_interval);
@@ -402,10 +415,8 @@ void beacon_chain_update_plugin::plugin_initialize(const variables_map& options)
 
    if( options.contains(beacon_chain_api_key) ) {
       ilog("beacon chain queue/apy update enabled");
-      auto [ wq_contract, eth_client ] = my->get_contract<withdrawal_queue>(oec_plugin);
-      auto [ dm_contract, eth_client2 ] = my->get_contract<deposit_manager>(oec_plugin);
-      SYS_ASSERT(eth_client == eth_client2, sysio::chain::plugin_config_exception,
-                 "get_contract should be returning the same ethereum client for both contracts");
+      auto wq_contract = my->get_contract<withdrawal_queue>(oec_plugin, eth_client).first;
+      auto dm_contract = my->get_contract<deposit_manager>(oec_plugin, eth_client).first;
       SYS_ASSERT(!!wq_contract || !!dm_contract, sysio::chain::plugin_config_exception,
                  "If {} is set, then must provide at least {}'s or {}'s contract address",
                  beacon_chain_api_key, withdrawal_queue::contract_name, deposit_manager::contract_name);
@@ -495,6 +506,10 @@ void beacon_chain_update_plugin::plugin_initialize(const variables_map& options)
       actions.emplace_back(std::move(action));
       ilog("There are {} actions currently registered.", actions.size());
    }
+   else {
+      SYS_ASSERT(!!opp_contract, sysio::chain::plugin_config_exception,
+                 "Nothing is configured to run in beacon_chain_update_plugin");
+   }
 
    ilog("initializing beacon chain plugin DONE");
 }
@@ -507,6 +522,32 @@ void beacon_chain_update_plugin::plugin_startup() {
    SYS_ASSERT(clients.size() > 0, sysio::chain::plugin_config_exception,
               "At least one ethereum client must be configured for beacon chain update plugin");
    const auto eth_client = clients.front()->client;
+
+   ilog("Scheduling {} to execute right after startup", just_once_interval_name);
+   job_schedule jo_schedule{.milliseconds = {job_schedule::exact_value{0}}};
+   my->just_once_jid =
+      cron.add_job(jo_schedule, [my_=my,cron=&cron]() {
+         ilog("Executing beacon chain update for the processes that run `{}`", just_once_interval_name);
+         for(const auto& action : my_->just_once_actions) {
+            try {
+               action();
+            }
+            catch (const std::exception& e) {
+               elog("Error executing beacon chain update for the just once actions: {}", e.what());
+            }
+         }
+         try {
+            if(!!my_->just_once_jid)
+               cron->cancel_job(*my_->just_once_jid);
+         }
+         catch (const std::exception& e) {
+            elog("Error cancelling the beacon chain update for the just once actions: {}", e.what());
+         }
+      },
+      cron_service::job_metadata_t{
+         .one_at_a_time = true, .tags = {"ethereum", "gas"}, .label = "cron_1min_heartbeat"
+      });
+
    ilog("There are {} schedule currently available.", my->schedules.size());
    ilog("There are {} actions currently registered.", my->intervals.size());
    for (const auto& [name, schedule] : my->schedules) {
@@ -539,7 +580,7 @@ void beacon_chain_update_plugin::plugin_startup() {
 
 
 beacon_chain_update_plugin::beacon_chain_update_plugin() : my(
-   std::make_unique<beacon_chain_update_plugin_impl>()) {}
+   std::make_shared<beacon_chain_update_plugin_impl>()) {}
 
 void beacon_chain_update_plugin::set_program_options(options_description& cli, options_description& cfg) {
    cfg.add_options()
@@ -553,7 +594,7 @@ void beacon_chain_update_plugin::set_program_options(options_description& cli, o
        bpo::value<std::string>(),
        "API key for authenticating requests to the beacon chain endpoints.")
       (beacon_chain_update_interval,
-       bpo::value<std::string>()->default_value(default_interval_name),
+       bpo::value<std::string>()->default_value(just_once_interval_name),
        "Enable fetching the beacon chain deposit/exit queue data and updating on-chain contracts, using the indicated interval.")
       (beacon_chain_contracts_addrs,
        bpo::value<std::vector<std::string>>()->multitoken(),
@@ -563,9 +604,10 @@ void beacon_chain_update_plugin::set_program_options(options_description& cli, o
        "Interval specification. Format is `<interval-name>,<cron-spec>`"
        " where cron-spec is in standard cron format (e.g. `*/5 * * * *` for every 5 minutes)."
        " If none are provided, a default interval with name `default` and schedule of every"
-       " 1 hour will be used (e.g. `default, * */1 * * *`).")
+       " 1 hour will be used (e.g. `default, * */1 * * *`). Also, a `once` interval is"
+       " automatically provided which will just execute immediately and then not run again.")
       (beacon_chain_finalize_epoch_interval,
-       bpo::value<std::string>(),
+       bpo::value<std::string>()->default_value(just_once_interval_name),
        "flag to indicate to finalize the OPP epoch, using the named interval.");
 }
 

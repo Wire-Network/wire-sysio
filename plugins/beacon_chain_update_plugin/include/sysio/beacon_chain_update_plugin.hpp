@@ -19,7 +19,7 @@ public:
    virtual void plugin_shutdown();
 
 private:
-   std::unique_ptr<class beacon_chain_update_plugin_impl> my;
+   std::shared_ptr<class beacon_chain_update_plugin_impl> my;
 };
 
 
