@@ -166,8 +166,8 @@ BOOST_FIXTURE_TEST_CASE(it_pool_full_16, kv_api_tester) {
    BOOST_CHECK_NO_THROW(run_action("tstitexhaust"_n));
 }
 
-BOOST_FIXTURE_TEST_CASE(it_pool_overflow_17, kv_api_tester) {
-   // 17th iterator allocation should throw kv_iterator_limit_exceeded
+BOOST_FIXTURE_TEST_CASE(it_pool_overflow_1025, kv_api_tester) {
+   // 1025th iterator allocation should throw kv_iterator_limit_exceeded
    BOOST_CHECK_THROW(run_action("tstitexhfail"_n), kv_iterator_limit_exceeded);
 }
 

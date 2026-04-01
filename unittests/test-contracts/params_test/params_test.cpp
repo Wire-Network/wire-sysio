@@ -109,43 +109,54 @@ public:
       ASSERT_EQ(params_object({1_ui, 0_ui}).get_size(), 10);
       //1 for size, 1 for id, 4 for data
       ASSERT_EQ(params_object({1_ui, 1_ui}).get_size(), 6);
-      //1 for size, 1 for id, 2 for data
-      ASSERT_EQ(params_object({1_ui, 16_ui}).get_size(), 4);
-      //1 for size, 3 for ids, 8+4+2 for data
-      ASSERT_EQ(params_object({3_ui, 0_ui, 1_ui, 16_ui}).get_size(), 18);
+      // id 15 = max_authority_depth (uint16): 1 for size, 1 for id, 2 for data
+      ASSERT_EQ(params_object({1_ui, 15_ui}).get_size(), 4);
+      // 3 ids: 8+4+2 for data + 1 for size + 3 for ids
+      ASSERT_EQ(params_object({3_ui, 0_ui, 1_ui, 15_ui}).get_size(), 18);
 
       blockchain_parameters old_way_params;
       params_object(1_ui)(0_ui)(1024*1024*2_64).set();
       get_blockchain_parameters(old_way_params);
-      ASSERT_EQ(params_object({1_ui,0_ui}).get(), 
+      ASSERT_EQ(params_object({1_ui,0_ui}).get(),
                 params_object(1_ui)(0_ui)(1024*1024*2_64));
       ASSERT_EQ(old_way_params.max_block_net_usage, 1024*1024*2);
 
       params_object(1_ui)(1_ui)(20*100_32).set();
       get_blockchain_parameters(old_way_params);
-      ASSERT_EQ(params_object({1_ui,1_ui}).get(), 
+      ASSERT_EQ(params_object({1_ui,1_ui}).get(),
                 params_object(1_ui)(1_ui)(20*100_32));
       ASSERT_EQ(old_way_params.target_block_net_usage_pct, 20*100);
-      
-      params_object(1_ui)(16_ui)(8_16).set();
+
+      // id 15 = max_authority_depth (uint16)
+      params_object(1_ui)(15_ui)(8_16).set();
       get_blockchain_parameters(old_way_params);
-      ASSERT_EQ(params_object({1_ui,16_ui}).get(), 
-                params_object(1_ui)(16_ui)(8_16));
+      ASSERT_EQ(params_object({1_ui,15_ui}).get(),
+                params_object(1_ui)(15_ui)(8_16));
       ASSERT_EQ(old_way_params.max_authority_depth, 8);
 
       params_object(3_ui)(0_ui)(1024*1024*3_64)
                          (1_ui)(30*100_32)
-                         (16_ui)(10_16).set();
+                         (15_ui)(10_16).set();
       get_blockchain_parameters(old_way_params);
-      ASSERT_EQ(params_object({3_ui, 0_ui, 1_ui, 16_ui}).get(), 
+      ASSERT_EQ(params_object({3_ui, 0_ui, 1_ui, 15_ui}).get(),
                 params_object(3_ui)(0_ui)(1024*1024*3_64)
                                    (1_ui)(30*100_32)
-                                   (16_ui)(10_16));
+                                   (15_ui)(10_16));
       ASSERT_EQ(old_way_params.max_block_net_usage, 1024*1024*3);
       ASSERT_EQ(old_way_params.target_block_net_usage_pct, 30*100);
       ASSERT_EQ(old_way_params.max_authority_depth, 10);
 
-      params_object(17_ui) (0_ui)(1024*1024*4_64)
+      // All 20 params (IDs 0-19, no deferred_trx_expiration_window)
+      // 0:max_block_net_usage 1:target_block_net_usage_pct 2:max_transaction_net_usage
+      // 3:base_per_transaction_net_usage 4:net_usage_leeway
+      // 5:context_free_discount_net_usage_num 6:context_free_discount_net_usage_den
+      // 7:max_block_cpu_usage 8:target_block_cpu_usage_pct
+      // 9:max_transaction_cpu_usage 10:min_transaction_cpu_usage
+      // 11:max_transaction_lifetime 12:max_transaction_delay
+      // 13:max_inline_action_size 14:max_inline_action_depth(u16) 15:max_authority_depth(u16)
+      // 16:max_action_return_value_size 17:max_kv_key_size 18:max_kv_value_size
+      // 19:max_kv_secondary_key_size
+      params_object(20_ui) (0_ui)(1024*1024*4_64)
                            (1_ui)(35*100_32)
                            (2_ui)(1024*1024*2_32)
                            (3_ui)(1024_32)
@@ -157,17 +168,21 @@ public:
                            (9_ui)(230'000_32)
                            (10_ui)(1000_32)
                            (11_ui)(30*60_32)
-                           (12_ui)(15*60_32)
-                           (13_ui)(30*24*3600_32)
-                           (14_ui)(1024*1024_32)
-                           (15_ui)(6_16)
-                           (16_ui)(9_16).set();
+                           (12_ui)(30*24*3600_32)
+                           (13_ui)(1024*1024_32)
+                           (14_ui)(6_16)
+                           (15_ui)(9_16)
+                           (16_ui)(1024_32)
+                           (17_ui)(256_32)
+                           (18_ui)(262144_32)
+                           (19_ui)(256_32).set();
       get_blockchain_parameters(old_way_params);
-      ASSERT_EQ(params_object({17_ui,0_ui,1_ui,2_ui,3_ui,4_ui,
+      ASSERT_EQ(params_object({20_ui,0_ui,1_ui,2_ui,3_ui,4_ui,
                                      5_ui,6_ui,7_ui,8_ui,9_ui,
                                      10_ui,11_ui,12_ui,13_ui,
-                                     14_ui,15_ui,16_ui}).get(), 
-                params_object(17_ui)(0_ui)(1024*1024*4_64)
+                                     14_ui,15_ui,16_ui,17_ui,
+                                     18_ui,19_ui}).get(),
+                params_object(20_ui)(0_ui)(1024*1024*4_64)
                                     (1_ui)(35*100_32)
                                     (2_ui)(1024*1024*2_32)
                                     (3_ui)(1024_32)
@@ -179,11 +194,14 @@ public:
                                     (9_ui)(230'000_32)
                                     (10_ui)(1000_32)
                                     (11_ui)(30*60_32)
-                                    (12_ui)(15*60_32)
-                                    (13_ui)(30*24*3600_32)
-                                    (14_ui)(1024*1024_32)
-                                    (15_ui)(6_16)
-                                    (16_ui)(9_16));
+                                    (12_ui)(30*24*3600_32)
+                                    (13_ui)(1024*1024_32)
+                                    (14_ui)(6_16)
+                                    (15_ui)(9_16)
+                                    (16_ui)(1024_32)
+                                    (17_ui)(256_32)
+                                    (18_ui)(262144_32)
+                                    (19_ui)(256_32));
       ASSERT_EQ(old_way_params.max_block_net_usage, 1024*1024*4);
       ASSERT_EQ(old_way_params.target_block_net_usage_pct, 35*100);
       ASSERT_EQ(old_way_params.max_transaction_net_usage, 1024*1024*2);
@@ -196,11 +214,14 @@ public:
       ASSERT_EQ(old_way_params.max_transaction_cpu_usage, 230'000);
       ASSERT_EQ(old_way_params.min_transaction_cpu_usage, 1000);
       ASSERT_EQ(old_way_params.max_transaction_lifetime, 30*60);
-      ASSERT_EQ(old_way_params.deferred_trx_expiration_window, 15*60);
       ASSERT_EQ(old_way_params.max_transaction_delay, 30*24*3600);
       ASSERT_EQ(old_way_params.max_inline_action_size, 1024*1024);
       ASSERT_EQ(old_way_params.max_inline_action_depth, 6);
       ASSERT_EQ(old_way_params.max_authority_depth, 9);
+      ASSERT_EQ(old_way_params.max_action_return_value_size, 1024);
+      ASSERT_EQ(old_way_params.max_kv_key_size, 256);
+      ASSERT_EQ(old_way_params.max_kv_value_size, 262144);
+      ASSERT_EQ(old_way_params.max_kv_secondary_key_size, 256);
 
       //v1 config, max_action_return_value_size
       ASSERT_EQ(params_object(1_ui)(17_ui).get(), 
