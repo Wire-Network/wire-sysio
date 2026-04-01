@@ -9,6 +9,8 @@
 
 using namespace sysio;
 
+static constexpr uint32_t kv_fmt_raw = 0;
+
 void test_action::read_action_normal() {
 
    char buffer[100];
@@ -120,17 +122,22 @@ void test_action::test_cf_action() {
       get_active_producers( nullptr, 0 );
       sysio_assert( false, "producer_api should not be allowed" );
    } else if ( cfa.payload == 202 ) {
-      // attempt to access non context free api, db_api
-      db_store_i64( "testapi"_n.value, "testapi"_n.value, "testapi"_n.value, 0, "test", 4 );
-      sysio_assert( false, "db_api should not be allowed" );
+      // attempt to access non context free api, kv_api
+      char key[24];
+      make_kv_key("testapi"_n.value, "testapi"_n.value, 0, key);
+      kv_set( kv_fmt_raw, "testapi"_n.value, key, 24, "test", 4 );
+      sysio_assert( false, "kv_api should not be allowed" );
    } else if ( cfa.payload == 203 ) {
-      // attempt to access non context free api, db_api
+      // attempt to access non context free api, kv_idx_api
       uint64_t i = 0;
-      db_idx64_store( "testapi"_n.value, "testapi"_n.value, "testapi"_n.value, 0, &i );
-      sysio_assert( false, "db_api should not be allowed" );
+      uint64_t pk = 0;
+      kv_idx_store( 0, "testapi"_n.value, 0, &pk, sizeof(pk), &i, sizeof(i) );
+      sysio_assert( false, "kv_api should not be allowed" );
    } else if ( cfa.payload == 204 ) {
-      db_find_i64( "testapi"_n.value, "testapi"_n.value, "testapi"_n.value, 1 );
-      sysio_assert( false, "db_api should not be allowed" );
+      char key[24];
+      make_kv_key("testapi"_n.value, "testapi"_n.value, 1, key);
+      kv_contains( kv_fmt_raw, "testapi"_n.value, key, 24 );
+      sysio_assert( false, "kv_api should not be allowed" );
    } else if ( cfa.payload == 205 ) {
       // attempt to access non context free api, send action
       sysio::action dum_act;
@@ -246,14 +253,15 @@ void test_action::test_ram_billing_in_notify( uint64_t receiver, uint64_t code, 
    } else {
       sysio_assert( to_notify == receiver, "notified recipient other than the one specified in to_notify" );
 
-      // Remove main table row if it already exists.
-      int itr = db_find_i64( receiver, "notifytest"_n.value, "notifytest"_n.value, "notifytest"_n.value );
-      if( itr >= 0 )
-         db_remove_i64( itr );
+      // Remove row if it already exists.
+      char key[24];
+      make_kv_key("notifytest"_n.value, "notifytest"_n.value, "notifytest"_n.value, key);
+      if( kv_contains( kv_fmt_raw, receiver, key, 24 ) )
+         kv_erase( kv_fmt_raw, key, 24 );
 
-      // Create the main table row simply for the purpose of charging code more RAM.
+      // Create the row simply for the purpose of charging code more RAM.
       if( payer != 0 )
-         db_store_i64( "notifytest"_n.value, "notifytest"_n.value, payer, "notifytest"_n.value, &to_notify, sizeof(to_notify) );
+         kv_set( kv_fmt_raw, payer, key, 24, &to_notify, sizeof(to_notify) );
    }
 }
 

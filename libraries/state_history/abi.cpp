@@ -312,14 +312,6 @@ extern const char* const state_history_plugin_abi = R"({
             ]
         },
         {
-            "name": "contract_table_v0", "fields": [
-                { "type": "name", "name": "code" },
-                { "type": "name", "name": "scope" },
-                { "type": "name", "name": "table" },
-                { "type": "name", "name": "payer" }
-            ]
-        },
-        {
             "name": "contract_row_v0", "fields": [
                 { "type": "name", "name": "code" },
                 { "type": "name", "name": "scope" },
@@ -330,53 +322,21 @@ extern const char* const state_history_plugin_abi = R"({
             ]
         },
         {
-            "name": "contract_index64_v0", "fields": [
+            "name": "contract_row_kv_v0", "fields": [
                 { "type": "name", "name": "code" },
-                { "type": "name", "name": "scope" },
-                { "type": "name", "name": "table" },
-                { "type": "uint64", "name": "primary_key" },
                 { "type": "name", "name": "payer" },
-                { "type": "uint64", "name": "secondary_key" }
+                { "type": "bytes", "name": "key" },
+                { "type": "bytes", "name": "value" }
             ]
         },
         {
-            "name": "contract_index128_v0", "fields": [
+            "name": "contract_index_kv_v0", "fields": [
                 { "type": "name", "name": "code" },
-                { "type": "name", "name": "scope" },
-                { "type": "name", "name": "table" },
-                { "type": "uint64", "name": "primary_key" },
                 { "type": "name", "name": "payer" },
-                { "type": "uint128", "name": "secondary_key" }
-            ]
-        },
-        {
-            "name": "contract_index256_v0", "fields": [
-                { "type": "name", "name": "code" },
-                { "type": "name", "name": "scope" },
                 { "type": "name", "name": "table" },
-                { "type": "uint64", "name": "primary_key" },
-                { "type": "name", "name": "payer" },
-                { "type": "checksum256", "name": "secondary_key" }
-            ]
-        },
-        {
-            "name": "contract_index_double_v0", "fields": [
-                { "type": "name", "name": "code" },
-                { "type": "name", "name": "scope" },
-                { "type": "name", "name": "table" },
-                { "type": "uint64", "name": "primary_key" },
-                { "type": "name", "name": "payer" },
-                { "type": "float64", "name": "secondary_key" }
-            ]
-        },
-        {
-            "name": "contract_index_long_double_v0", "fields": [
-                { "type": "name", "name": "code" },
-                { "type": "name", "name": "scope" },
-                { "type": "name", "name": "table" },
-                { "type": "uint64", "name": "primary_key" },
-                { "type": "name", "name": "payer" },
-                { "type": "float128", "name": "secondary_key" }
+                { "type": "uint8", "name": "index_id" },
+                { "type": "bytes", "name": "sec_key" },
+                { "type": "bytes", "name": "pri_key" }
             ]
         },
         {
@@ -423,33 +383,14 @@ extern const char* const state_history_plugin_abi = R"({
                 { "type": "uint32", "name": "max_transaction_cpu_usage" },
                 { "type": "uint32", "name": "min_transaction_cpu_usage" },
                 { "type": "uint32", "name": "max_transaction_lifetime" },
-                { "type": "uint32", "name": "deferred_trx_expiration_window" },
-                { "type": "uint32", "name": "max_transaction_delay" },
-                { "type": "uint32", "name": "max_inline_action_size" },
-                { "type": "uint16", "name": "max_inline_action_depth" },
-                { "type": "uint16", "name": "max_authority_depth" }
-            ]
-        },
-        {
-            "name": "chain_config_v1", "fields": [
-                { "type": "uint64", "name": "max_block_net_usage" },
-                { "type": "uint32", "name": "target_block_net_usage_pct" },
-                { "type": "uint32", "name": "max_transaction_net_usage" },
-                { "type": "uint32", "name": "base_per_transaction_net_usage" },
-                { "type": "uint32", "name": "net_usage_leeway" },
-                { "type": "uint32", "name": "context_free_discount_net_usage_num" },
-                { "type": "uint32", "name": "context_free_discount_net_usage_den" },
-                { "type": "uint32", "name": "max_block_cpu_usage" },
-                { "type": "uint32", "name": "target_block_cpu_usage_pct" },
-                { "type": "uint32", "name": "max_transaction_cpu_usage" },
-                { "type": "uint32", "name": "min_transaction_cpu_usage" },
-                { "type": "uint32", "name": "max_transaction_lifetime" },
-                { "type": "uint32", "name": "deferred_trx_expiration_window" },
                 { "type": "uint32", "name": "max_transaction_delay" },
                 { "type": "uint32", "name": "max_inline_action_size" },
                 { "type": "uint16", "name": "max_inline_action_depth" },
                 { "type": "uint16", "name": "max_authority_depth" },
-                { "type": "uint32", "name": "max_action_return_value_size" }
+                { "type": "uint32", "name": "max_action_return_value_size" },
+                { "type": "uint32", "name": "max_kv_key_size" },
+                { "type": "uint32", "name": "max_kv_value_size" },
+                { "type": "uint32", "name": "max_kv_secondary_key_size" }
             ]
         },
         {
@@ -718,14 +659,10 @@ extern const char* const state_history_plugin_abi = R"({
         { "name": "account", "types": ["account_v0"] },
         { "name": "account_metadata", "types": ["account_metadata_v0"] },
         { "name": "code", "types": ["code_v0"] },
-        { "name": "contract_table", "types": ["contract_table_v0"] },
         { "name": "contract_row", "types": ["contract_row_v0"] },
-        { "name": "contract_index64", "types": ["contract_index64_v0"] },
-        { "name": "contract_index128", "types": ["contract_index128_v0"] },
-        { "name": "contract_index256", "types": ["contract_index256_v0"] },
-        { "name": "contract_index_double", "types": ["contract_index_double_v0"] },
-        { "name": "contract_index_long_double", "types": ["contract_index_long_double_v0"] },
-        { "name": "chain_config", "types": ["chain_config_v0", "chain_config_v1"] },
+        { "name": "contract_row_kv", "types": ["contract_row_kv_v0"] },
+        { "name": "contract_index_kv", "types": ["contract_index_kv_v0"] },
+        { "name": "chain_config", "types": ["chain_config_v0"] },
         { "name": "wasm_config", "types": ["wasm_config_v0"] },
         { "name": "global_property", "types": ["global_property_v0", "global_property_v1"] },
         { "name": "generated_transaction", "types": ["generated_transaction_v0"] },
@@ -747,13 +684,9 @@ extern const char* const state_history_plugin_abi = R"({
         { "name": "account", "type": "account", "key_names": ["name"] },
         { "name": "account_metadata", "type": "account_metadata", "key_names": ["name"] },
         { "name": "code", "type": "code", "key_names": ["vm_type", "vm_version", "code_hash"] },
-        { "name": "contract_table", "type": "contract_table", "key_names": ["code", "scope", "table"] },
         { "name": "contract_row", "type": "contract_row", "key_names": ["code", "scope", "table", "primary_key"] },
-        { "name": "contract_index64", "type": "contract_index64", "key_names": ["code", "scope", "table", "primary_key"] },
-        { "name": "contract_index128", "type": "contract_index128", "key_names": ["code", "scope", "table", "primary_key"] },
-        { "name": "contract_index256", "type": "contract_index256", "key_names": ["code", "scope", "table", "primary_key"] },
-        { "name": "contract_index_double", "type": "contract_index_double", "key_names": ["code", "scope", "table", "primary_key"] },
-        { "name": "contract_index_long_double", "type": "contract_index_long_double", "key_names": ["code", "scope", "table", "primary_key"] },
+        { "name": "contract_row_kv", "type": "contract_row_kv", "key_names": ["code"] },
+        { "name": "contract_index_kv", "type": "contract_index_kv", "key_names": ["code", "table", "index_id"] },
         { "name": "global_property", "type": "global_property", "key_names": [] },
         { "name": "generated_transaction", "type": "generated_transaction", "key_names": ["sender", "sender_id"] },
         { "name": "protocol_state", "type": "protocol_state", "key_names": [] },

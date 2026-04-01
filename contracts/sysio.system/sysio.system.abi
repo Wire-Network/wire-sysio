@@ -111,6 +111,24 @@
             ]
         },
         {
+            "name": "block_info_record",
+            "base": "",
+            "fields": [
+                {
+                    "name": "version",
+                    "type": "uint8"
+                },
+                {
+                    "name": "block_height",
+                    "type": "uint32"
+                },
+                {
+                    "name": "block_timestamp",
+                    "type": "time_point"
+                }
+            ]
+        },
+        {
             "name": "block_signing_authority_v0",
             "base": "",
             "fields": [
@@ -177,10 +195,6 @@
                     "type": "uint32"
                 },
                 {
-                    "name": "deferred_trx_expiration_window",
-                    "type": "uint32"
-                },
-                {
                     "name": "max_transaction_delay",
                     "type": "uint32"
                 },
@@ -195,6 +209,22 @@
                 {
                     "name": "max_authority_depth",
                     "type": "uint16"
+                },
+                {
+                    "name": "max_action_return_value_size",
+                    "type": "uint32"
+                },
+                {
+                    "name": "max_kv_key_size",
+                    "type": "uint32"
+                },
+                {
+                    "name": "max_kv_value_size",
+                    "type": "uint32"
+                },
+                {
+                    "name": "max_kv_secondary_key_size",
+                    "type": "uint32"
                 }
             ]
         },
@@ -911,7 +941,7 @@
             ]
         },
         {
-            "name": "block_info_record",
+            "name": "limit_auth_change",
             "base": "",
             "fields": [
                 {
@@ -919,12 +949,16 @@
                     "type": "uint8"
                 },
                 {
-                    "name": "block_height",
-                    "type": "uint32"
+                    "name": "account",
+                    "type": "name"
                 },
                 {
-                    "name": "block_timestamp",
-                    "type": "time_point"
+                    "name": "allow_perms",
+                    "type": "name[]"
+                },
+                {
+                    "name": "disallow_perms",
+                    "type": "name[]"
                 }
             ]
         },
@@ -996,28 +1030,6 @@
                 {
                     "name": "pubkey",
                     "type": "public_key?"
-                }
-            ]
-        },
-        {
-            "name": "limit_auth_change",
-            "base": "",
-            "fields": [
-                {
-                    "name": "version",
-                    "type": "uint8"
-                },
-                {
-                    "name": "account",
-                    "type": "name"
-                },
-                {
-                    "name": "allow_perms",
-                    "type": "name[]"
-                },
-                {
-                    "name": "disallow_perms",
-                    "type": "name[]"
                 }
             ]
         },
@@ -1268,29 +1280,36 @@
             "name": "abihash",
             "type": "abi_hash",
             "index_type": "i64",
-            "key_names": [],
-            "key_types": []
+            "key_names": ["table_name","scope","primary_key"],
+            "key_types": ["name","name","uint64"]
+        },
+        {
+            "name": "blockinfo",
+            "type": "block_info_record",
+            "index_type": "i64",
+            "key_names": ["table_name","scope","primary_key"],
+            "key_types": ["name","name","uint64"]
         },
         {
             "name": "finalizers",
             "type": "finalizer_info",
             "index_type": "i64",
-            "key_names": [],
-            "key_types": []
+            "key_names": ["table_name","scope","primary_key"],
+            "key_types": ["name","name","uint64"]
         },
         {
             "name": "finkeyidgen",
             "type": "fin_key_id_generator_info",
             "index_type": "i64",
-            "key_names": [],
-            "key_types": []
+            "key_names": ["table_name","scope","primary_key"],
+            "key_types": ["name","name","uint64"]
         },
         {
             "name": "finkeys",
             "type": "finalizer_key_info",
             "index_type": "i64",
-            "key_names": [],
-            "key_types": []
+            "key_names": ["table_name","scope","primary_key"],
+            "key_types": ["name","name","uint64"]
         },
         {
             "name": "global",
@@ -1303,36 +1322,29 @@
             "name": "lastpropfins",
             "type": "last_prop_finalizers_info",
             "index_type": "i64",
-            "key_names": [],
-            "key_types": []
+            "key_names": ["table_name","scope","primary_key"],
+            "key_types": ["name","name","uint64"]
         },
         {
             "name": "producers",
             "type": "producer_info",
             "index_type": "i64",
-            "key_names": [],
-            "key_types": []
-        },
-        {
-            "name": "blockinfo",
-            "type": "block_info_record",
-            "index_type": "i64",
-            "key_names": [],
-            "key_types": []
-        },
-        {
-            "name": "peerkeys",
-            "type": "peer_key",
-            "index_type": "i64",
-            "key_names": [],
-            "key_types": []
+            "key_names": ["table_name","scope","primary_key"],
+            "key_types": ["name","name","uint64"]
         },
         {
             "name": "limitauthchg",
             "type": "limit_auth_change",
             "index_type": "i64",
-            "key_names": [],
-            "key_types": []
+            "key_names": ["table_name","scope","primary_key"],
+            "key_types": ["name","name","uint64"]
+        },
+        {
+            "name": "peerkeys",
+            "type": "peer_key",
+            "index_type": "i64",
+            "key_names": ["table_name","scope","primary_key"],
+            "key_types": ["name","name","uint64"]
         },
         {
             "name": "trxpglobal",
@@ -1345,8 +1357,8 @@
             "name": "trxpriority",
             "type": "trx_prio",
             "index_type": "i64",
-            "key_names": [],
-            "key_types": []
+            "key_names": ["table_name","scope","primary_key"],
+            "key_types": ["name","name","uint64"]
         }
     ],
     "ricardian_clauses": [],

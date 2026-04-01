@@ -221,7 +221,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(chain_config_packed_stability, T, validating_teste
 
    // Verify packed size is stable.
    // If this changes, the packed WASM intrinsic format has changed.
-   BOOST_CHECK_EQUAL(packed.size(), 68u);
+   // 80 = 8 (uint64) + 10×4 (uint32) + 4 (lifetime) + 4 (delay) + 4 (inline_size)
+   //    + 2 (inline_depth) + 2 (auth_depth) + 4×4 (action_return, kv_key, kv_value, kv_sec_key)
+   BOOST_CHECK_EQUAL(packed.size(), 80u);
 
    // Round-trip: unpack and verify all fields match
    chain_config_v0 unpacked;
@@ -240,7 +242,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(chain_config_packed_stability, T, validating_teste
    BOOST_CHECK_EQUAL(unpacked.max_transaction_cpu_usage, v0.max_transaction_cpu_usage);
    BOOST_CHECK_EQUAL(unpacked.min_transaction_cpu_usage, v0.min_transaction_cpu_usage);
    BOOST_CHECK_EQUAL(unpacked.max_transaction_lifetime, v0.max_transaction_lifetime);
-   BOOST_CHECK_EQUAL(unpacked.deferred_trx_expiration_window, v0.deferred_trx_expiration_window);
    BOOST_CHECK_EQUAL(unpacked.max_transaction_delay, v0.max_transaction_delay);
    BOOST_CHECK_EQUAL(unpacked.max_inline_action_size, v0.max_inline_action_size);
    BOOST_CHECK_EQUAL(unpacked.max_inline_action_depth, v0.max_inline_action_depth);

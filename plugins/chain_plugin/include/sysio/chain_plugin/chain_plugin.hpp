@@ -12,7 +12,7 @@
 #include <sysio/chain/account_object.hpp>
 #include <sysio/chain/block.hpp>
 #include <sysio/chain/controller.hpp>
-#include <sysio/chain/contract_table_objects.hpp>
+#include <sysio/chain/kv_table_objects.hpp>
 #include <sysio/chain/resource_limits.hpp>
 #include <sysio/chain/transaction.hpp>
 #include <sysio/chain/abi_serializer.hpp>
@@ -112,9 +112,6 @@ double convert_to_type(const string& str, const string& desc);
 
 template<typename Type>
 string convert_to_string(const Type& source, const string& key_type, const string& encode_type, const string& desc);
-
-template<>
-string convert_to_string(const chain::key256_t& source, const string& key_type, const string& encode_type, const string& desc);
 
 template<>
 string convert_to_string(const float128_t& source, const string& key_type, const string& encode_type, const string& desc);
@@ -428,6 +425,28 @@ public:
 
    get_table_rows_return_t get_table_rows( const get_table_rows_params& params, const fc::time_point& deadline )const;
 
+   // KV database query (format=0 / kv::raw_table)
+   struct get_kv_rows_params {
+      bool                 json = true;              ///< true = ABI-decode keys and values, false = return raw hex
+      name                 code;                     ///< contract account
+      name                 table;                    ///< table name from ABI (e.g. "geodata")
+      string               lower_bound;              ///< lower bound key: JSON object when json=true, hex when json=false (inclusive)
+      string               upper_bound;              ///< upper bound key: JSON object when json=true, hex when json=false (exclusive), empty = no upper bound
+      uint32_t             limit = 10;               ///< max rows to return
+      std::optional<bool>  reverse;                  ///< iterate in reverse
+      std::optional<uint32_t> time_limit_ms;
+   };
+
+   struct get_kv_rows_result {
+      fc::variants         rows;                     ///< array of {key: ..., value: ...} objects
+      bool                 more = false;
+      string               next_key;                 ///< next key for pagination (JSON object when json=true, hex when json=false)
+   };
+
+   using get_kv_rows_return_t = std::function<chain::t_or_exception<get_kv_rows_result>()>;
+
+   get_kv_rows_return_t get_kv_rows( const get_kv_rows_params& params, const fc::time_point& deadline ) const;
+
    struct get_table_by_scope_params {
       name                 code; // mandatory
       name                 table; // optional, act as filter
@@ -441,8 +460,6 @@ public:
       name        code;
       name        scope;
       name        table;
-      name        payer;
-      uint32_t    count = 0;
    };
    struct get_table_by_scope_result {
       vector<get_table_by_scope_result_row> rows;
@@ -534,166 +551,47 @@ public:
    };
    void send_read_only_transaction(send_read_only_transaction_params params, chain::plugin_interface::next_function<send_read_only_transaction_results> next );
 
-   static void copy_inline_row(const chain::key_value_object& obj, vector<char>& data) {
-      data.resize( obj.value.size() );
-      memcpy( data.data(), obj.value.data(), obj.value.size() );
-   }
-
    template<typename Function>
    void walk_key_value_table(const name& code, const name& scope, const name& table, Function f) const
    {
       const auto& d = db.db();
-      const auto* t_id = d.find<chain::table_id_object, chain::by_code_scope_table>(boost::make_tuple(code, scope, table));
-      if (t_id != nullptr) {
-         const auto &idx = d.get_index<chain::key_value_index, chain::by_scope_primary>();
-         decltype(t_id->id) next_tid(t_id->id._id + 1);
-         auto lower = idx.lower_bound(boost::make_tuple(t_id->id));
-         auto upper = idx.lower_bound(boost::make_tuple(next_tid));
 
-         for (auto itr = lower; itr != upper; ++itr) {
-            if (!f(*itr)) {
-               break;
-            }
-         }
+      // KV storage: iterate [table:8B BE][scope:8B BE] prefix
+      auto prefix = chain::make_kv_prefix(table, scope);
+
+      const auto& kv_idx = d.get_index<chain::kv_index, chain::by_code_key>();
+      auto itr = kv_idx.lower_bound(boost::make_tuple(code, chain::config::kv_format_standard, prefix.to_string_view()));
+
+      while (itr != kv_idx.end() && itr->code == code) {
+         auto kv = itr->key_view();
+         if (!prefix.matches(kv) || kv.size() != chain::kv_key_size) break;
+
+         // Create a temporary key_value_object-like view for the callback
+         struct kv_row_view {
+            uint64_t primary_key;
+            chain::name payer;
+            struct { const char* _data; size_t _size; const char* data() const { return _data; } size_t size() const { return _size; } } value;
+         };
+
+         kv_row_view row;
+         row.primary_key = chain::kv_decode_be64(kv.data() + 16);
+         row.payer = itr->payer;
+         row.value._data = itr->value.data();
+         row.value._size = itr->value.size();
+
+         if (!f(row)) break;
+         ++itr;
       }
    }
 
    static uint64_t get_table_index_name(const read_only::get_table_rows_params& p, bool& primary);
 
-   template <typename IndexType, typename SecKeyType, typename ConvFn>
    get_table_rows_return_t
    get_table_rows_by_seckey( const read_only::get_table_rows_params& p,
                              abi_def&& abi,
-                             const fc::time_point& deadline,
-                             ConvFn conv ) const {
+                             uint64_t index_position,
+                             const fc::time_point& deadline ) const;
 
-      fc::time_point params_deadline = p.time_limit_ms ? std::min(fc::time_point::now().safe_add(fc::milliseconds(*p.time_limit_ms)), deadline) : deadline;
-
-      struct http_params_t {
-         name table;
-         bool shorten_abi_errors;
-         bool json;
-         bool show_payer;
-         bool more;
-         std::string next_key;
-         vector<std::pair<vector<char>, name>> rows;
-      };
-
-      http_params_t http_params { p.table, shorten_abi_errors, p.json, p.show_payer && *p.show_payer, false  };
-
-      const auto& d = db.db();
-
-      name scope{ convert_to_type<uint64_t>(p.scope, "scope") };
-
-      bool primary = false;
-      const uint64_t table_with_index = get_table_index_name(p, primary);
-      const auto* t_id = d.find<chain::table_id_object, chain::by_code_scope_table>(boost::make_tuple(p.code, scope, p.table));
-      const auto* index_t_id = d.find<chain::table_id_object, chain::by_code_scope_table>(boost::make_tuple(p.code, scope, name(table_with_index)));
-      if( t_id != nullptr && index_t_id != nullptr ) {
-         using secondary_key_type = std::invoke_result_t<decltype(conv), SecKeyType>;
-         static_assert( std::is_same<typename IndexType::value_type::secondary_key_type, secondary_key_type>::value, "Return type of conv does not match type of secondary key for IndexType" );
-
-         const auto& secidx = d.get_index<IndexType, chain::by_secondary>();
-         auto lower_bound_lookup_tuple = std::make_tuple( index_t_id->id._id,
-                                                          sysio::chain::secondary_key_traits<secondary_key_type>::true_lowest(),
-                                                          std::numeric_limits<uint64_t>::lowest() );
-         auto upper_bound_lookup_tuple = std::make_tuple( index_t_id->id._id,
-                                                          sysio::chain::secondary_key_traits<secondary_key_type>::true_highest(),
-                                                          std::numeric_limits<uint64_t>::max() );
-
-         if( p.lower_bound.size() ) {
-            if( p.key_type == "name" ) {
-               if constexpr (std::is_same_v<uint64_t, SecKeyType>) {
-                  SecKeyType lv = convert_to_type(name{p.lower_bound}, "lower_bound name");
-                  std::get<1>(lower_bound_lookup_tuple) = conv(lv);
-               } else {
-                  SYS_ASSERT(false, chain::contract_table_query_exception, "Invalid key type of sysio::name {} for lower bound", p.lower_bound);
-               }
-            } else {
-               SecKeyType lv = convert_to_type<SecKeyType>( p.lower_bound, "lower_bound" );
-               std::get<1>(lower_bound_lookup_tuple) = conv( lv );
-            }
-         }
-
-         if( p.upper_bound.size() ) {
-            if( p.key_type == "name" ) {
-               if constexpr (std::is_same_v<uint64_t, SecKeyType>) {
-                  SecKeyType uv = convert_to_type(name{p.upper_bound}, "upper_bound name");
-                  std::get<1>(upper_bound_lookup_tuple) = conv(uv);
-               } else {
-                  SYS_ASSERT(false, chain::contract_table_query_exception, "Invalid key type of sysio::name {} for upper bound", p.upper_bound);
-               }
-            } else {
-               SecKeyType uv = convert_to_type<SecKeyType>( p.upper_bound, "upper_bound" );
-               std::get<1>(upper_bound_lookup_tuple) = conv( uv );
-            }
-         }
-
-         if( upper_bound_lookup_tuple < lower_bound_lookup_tuple )
-            return []() ->  chain::t_or_exception<read_only::get_table_rows_result> {
-               return read_only::get_table_rows_result();
-            };
-
-         auto walk_table_row_range = [&]( auto itr, auto end_itr ) {
-            vector<char> data;
-            uint32_t limit = p.limit;
-            if (deadline != fc::time_point::maximum() && limit > max_return_items)
-               limit = max_return_items;
-            for( unsigned int count = 0; count < limit && itr != end_itr; ++count, ++itr ) {
-               const auto* itr2 = d.find<chain::key_value_object, chain::by_scope_primary>( boost::make_tuple(t_id->id, itr->primary_key) );
-               if( itr2 == nullptr ) continue;
-               copy_inline_row(*itr2, data);
-               http_params.rows.emplace_back(std::move(data), itr->payer);
-               if (fc::time_point::now() >= params_deadline)
-                  break;
-            }
-            if( itr != end_itr ) {
-               http_params.more = true;
-               http_params.next_key = convert_to_string(itr->secondary_key, p.key_type, p.encode_type, "next_key - next lower bound");
-            }
-         };
-
-         auto lower = secidx.lower_bound( lower_bound_lookup_tuple );
-         auto upper = secidx.upper_bound( upper_bound_lookup_tuple );
-         if( p.reverse && *p.reverse ) {
-            walk_table_row_range( boost::make_reverse_iterator(upper), boost::make_reverse_iterator(lower) );
-         } else {
-            walk_table_row_range( lower, upper );
-         }
-      }
-
-      // not enforcing the deadline for that second processing part (the serialization), as it is not taking place
-      // on the main thread, but in the http thread pool.
-      return [p = std::move(http_params), abi=std::move(abi), abi_serializer_max_time=abi_serializer_max_time]() mutable ->
-         chain::t_or_exception<read_only::get_table_rows_result> {
-         read_only::get_table_rows_result result;
-         abi_serializer abis;
-         abis.set_abi(std::move(abi), abi_serializer::create_yield_function(abi_serializer_max_time));
-         auto table_type = abis.get_table_type(p.table);
-
-         for (auto& row : p.rows) {
-            fc::variant data_var;
-            if( p.json ) {
-               data_var = abis.binary_to_variant(table_type, row.first,
-                                                 abi_serializer::create_yield_function(abi_serializer_max_time),
-                                                 p.shorten_abi_errors );
-            } else {
-               data_var = fc::variant(row.first);
-            }
-
-            if (p.show_payer) {
-               result.rows.emplace_back(fc::mutable_variant_object("data", std::move(data_var))("payer", row.second));
-            } else {
-               result.rows.emplace_back(std::move(data_var));
-            }
-         }
-         result.more = p.more;
-         result.next_key = p.next_key;
-         return result;
-      };
-   }
-
-   template <typename IndexType>
    get_table_rows_return_t
    get_table_rows_ex( const read_only::get_table_rows_params& p,
                       abi_def&& abi,
@@ -717,61 +615,89 @@ public:
 
       uint64_t scope = convert_to_type<uint64_t>(p.scope, "scope");
 
-      const auto* t_id = d.find<chain::table_id_object, chain::by_code_scope_table>(boost::make_tuple(p.code, name(scope), p.table));
-      if( t_id != nullptr ) {
-         const auto& idx = d.get_index<IndexType, chain::by_scope_primary>();
-         auto lower_bound_lookup_tuple = std::make_tuple( t_id->id, std::numeric_limits<uint64_t>::lowest() );
-         auto upper_bound_lookup_tuple = std::make_tuple( t_id->id, std::numeric_limits<uint64_t>::max() );
+      // KV storage: contracts using wire::kv::table / kv_multi_index store
+      // rows in kv_object with 24-byte keys: [table:8B BE][scope:8B BE][pk:8B BE]
 
-         if( p.lower_bound.size() ) {
-            if( p.key_type == "name" ) {
-               name s(p.lower_bound);
-               std::get<1>(lower_bound_lookup_tuple) = s.to_uint64_t();
-            } else {
-               auto lv = convert_to_type<typename IndexType::value_type::key_type>( p.lower_bound, "lower_bound" );
-               std::get<1>(lower_bound_lookup_tuple) = lv;
-            }
+      // Build the 16-byte prefix: [table:8B BE][scope:8B BE]
+      auto prefix = chain::make_kv_prefix(p.table.to_uint64_t(), scope);
+
+      // Build 24-byte lower bound key
+      uint64_t lower_pk = std::numeric_limits<uint64_t>::lowest();
+      uint64_t upper_pk = std::numeric_limits<uint64_t>::max();
+
+      if( p.lower_bound.size() ) {
+         if( p.key_type == "name" ) {
+            lower_pk = name(p.lower_bound).to_uint64_t();
+         } else {
+            lower_pk = convert_to_type<uint64_t>( p.lower_bound, "lower_bound" );
          }
-
-         if( p.upper_bound.size() ) {
-            if( p.key_type == "name" ) {
-               name s(p.upper_bound);
-               std::get<1>(upper_bound_lookup_tuple) = s.to_uint64_t();
-            } else {
-               auto uv = convert_to_type<typename IndexType::value_type::key_type>( p.upper_bound, "upper_bound" );
-               std::get<1>(upper_bound_lookup_tuple) = uv;
-            }
+      }
+      if( p.upper_bound.size() ) {
+         if( p.key_type == "name" ) {
+            upper_pk = name(p.upper_bound).to_uint64_t();
+         } else {
+            upper_pk = convert_to_type<uint64_t>( p.upper_bound, "upper_bound" );
          }
+      }
 
-         if( upper_bound_lookup_tuple < lower_bound_lookup_tuple  )
-            return []() ->  chain::t_or_exception<read_only::get_table_rows_result> {
-               return read_only::get_table_rows_result();
-            };
-
-         auto walk_table_row_range = [&]( auto itr, auto end_itr ) {
-            vector<char> data;
-            uint32_t limit = p.limit;
-            if (deadline != fc::time_point::maximum() && limit > max_return_items)
-               limit = max_return_items;
-            for( unsigned int count = 0; count < limit && itr != end_itr; ++count, ++itr ) {
-               copy_inline_row(*itr, data);
-               http_params.rows.emplace_back(std::move(data), itr->payer);
-               if (fc::time_point::now() >= params_deadline)
-                  break;
-            }
-            if( itr != end_itr ) {
-               http_params.more = true;
-               http_params.next_key = convert_to_string(itr->primary_key, p.key_type, p.encode_type, "next_key - next lower bound");
-            }
+      if( upper_pk < lower_pk )
+         return []() -> chain::t_or_exception<read_only::get_table_rows_result> {
+            return read_only::get_table_rows_result();
          };
 
-         auto lower = idx.lower_bound( lower_bound_lookup_tuple );
-         auto upper = idx.upper_bound( upper_bound_lookup_tuple );
-         if( p.reverse && *p.reverse ) {
-            walk_table_row_range( boost::make_reverse_iterator(upper), boost::make_reverse_iterator(lower) );
-         } else {
-            walk_table_row_range( lower, upper );
+      auto lower_key = chain::make_kv_key(p.table.to_uint64_t(), scope, lower_pk);
+      auto upper_key = chain::make_kv_key(p.table.to_uint64_t(), scope, upper_pk);
+
+      auto lower_sv = lower_key.to_string_view();
+      auto upper_sv = upper_key.to_string_view();
+
+      const auto& kv_idx = d.get_index<chain::kv_index, chain::by_code_key>();
+
+      auto walk_kv_row_range = [&]( auto itr, auto end_itr, bool reverse ) {
+         vector<char> data;
+         uint32_t limit = p.limit;
+         if (deadline != fc::time_point::maximum() && limit > max_return_items)
+            limit = max_return_items;
+         for( unsigned int count = 0; count < limit && itr != end_itr; ++count, ++itr ) {
+            const auto& kv_row = *itr;
+            // Verify this row still belongs to our code and has the right prefix
+            if( kv_row.code != p.code ) break;
+            auto kv = kv_row.key_view();
+            if( kv.size() < chain::kv_key_size ) continue;
+            // Check table+scope prefix matches
+            if( !prefix.matches(kv) ) break;
+            // Check primary key bounds
+            uint64_t row_pk = chain::kv_decode_be64(kv.data() + 16);
+            if( !reverse ) {
+               if( row_pk > upper_pk ) break;
+            } else {
+               if( row_pk < lower_pk ) break;
+            }
+
+            data.resize( kv_row.value.size() );
+            memcpy( data.data(), kv_row.value.data(), kv_row.value.size() );
+            http_params.rows.emplace_back(std::move(data), kv_row.payer);
+            if (fc::time_point::now() >= params_deadline)
+               break;
          }
+         if( itr != end_itr && itr->code == p.code ) {
+            auto kv = itr->key_view();
+            if( prefix.matches(kv) && kv.size() >= chain::kv_key_size ) {
+               uint64_t next_pk = chain::kv_decode_be64(kv.data() + 16);
+               if( (!reverse && next_pk <= upper_pk) || (reverse && next_pk >= lower_pk) ) {
+                  http_params.more = true;
+                  http_params.next_key = convert_to_string(next_pk, p.key_type, p.encode_type, "next_key - next lower bound");
+               }
+            }
+         }
+      };
+
+      auto kv_lower = kv_idx.lower_bound( boost::make_tuple(p.code, chain::config::kv_format_standard, lower_sv) );
+      auto kv_upper = kv_idx.upper_bound( boost::make_tuple(p.code, chain::config::kv_format_standard, upper_sv) );
+      if( p.reverse && *p.reverse ) {
+         walk_kv_row_range( boost::make_reverse_iterator(kv_upper), boost::make_reverse_iterator(kv_lower), true );
+      } else {
+         walk_kv_row_range( kv_lower, kv_upper, false );
       }
 
       // not enforcing the deadline for that second processing part (the serialization), as it is not taking place
@@ -877,64 +803,6 @@ public:
  constexpr const char dec[]       = "dec";
  constexpr const char hex[]       = "hex";
 
-
- template<const char*key_type , const char *encoding=chain_apis::dec>
- struct keytype_converter ;
-
- template<>
- struct keytype_converter<chain_apis::sha256, chain_apis::hex> {
-     using input_type = chain::checksum256_type;
-     using index_type = chain::index256_index;
-     static auto function() {
-        return [](const input_type& v) {
-            // The input is in big endian, i.e. f58262c8005bb64b8f99ec6083faf050c502d099d9929ae37ffed2fe1bb954fb
-            // fixed_bytes will convert the input to array of 2 uint128_t in little endian, i.e. 50f0fa8360ec998f4bb65b00c86282f5 fb54b91bfed2fe7fe39a92d999d002c5
-            // which is the format used by secondary index
-            uint8_t buffer[32];
-            memcpy(buffer, v.data(), 32);
-            fixed_bytes<32> fb(buffer);
-            return chain::key256_t(fb.get_array());
-        };
-     }
- };
-
- //key160 support with padding zeros in the end of key256
- template<>
- struct keytype_converter<chain_apis::ripemd160, chain_apis::hex> {
-     using input_type = chain::checksum160_type;
-     using index_type = chain::index256_index;
-     static auto function() {
-        return [](const input_type& v) {
-            // The input is in big endian, i.e. 83a83a3876c64c33f66f33c54f1869edef5b5d4a000000000000000000000000
-            // fixed_bytes will convert the input to array of 2 uint128_t in little endian, i.e. ed69184fc5336ff6334cc676383aa883 0000000000000000000000004a5d5bef
-            // which is the format used by secondary index
-            uint8_t buffer[20];
-            memcpy(buffer, v.data(), 20);
-            fixed_bytes<20> fb(buffer);
-            return chain::key256_t(fb.get_array());
-        };
-     }
- };
-
- template<>
- struct keytype_converter<chain_apis::i256> {
-     using input_type = fc::uint256;
-     using index_type = chain::index256_index;
-     static auto function() {
-        return [](const input_type v) {
-            // The input is in little endian of uint256_t, i.e. fb54b91bfed2fe7fe39a92d999d002c550f0fa8360ec998f4bb65b00c86282f5
-            // the following will convert the input to array of 2 uint128_t in little endian, i.e. 50f0fa8360ec998f4bb65b00c86282f5 fb54b91bfed2fe7fe39a92d999d002c5
-            // which is the format used by secondary index
-            chain::key256_t k;
-            uint8_t buffer[32] = {};
-            boost::multiprecision::export_bits(v, buffer, 8, false);
-            memcpy(&k[0], buffer + 16, 16);
-            memcpy(&k[1], buffer, 16);
-            return k;
-        };
-     }
- };
-
 } // namespace chain_apis
 
 class chain_plugin : public plugin<chain_plugin> {
@@ -1008,9 +876,11 @@ FC_REFLECT( sysio::chain_apis::read_write::send_transaction2_params, (return_fai
 
 FC_REFLECT( sysio::chain_apis::read_only::get_table_rows_params, (json)(code)(scope)(table)(table_key)(lower_bound)(upper_bound)(limit)(key_type)(index_position)(encode_type)(reverse)(show_payer)(time_limit_ms) )
 FC_REFLECT( sysio::chain_apis::read_only::get_table_rows_result, (rows)(more)(next_key) );
+FC_REFLECT( sysio::chain_apis::read_only::get_kv_rows_params, (json)(code)(table)(lower_bound)(upper_bound)(limit)(reverse)(time_limit_ms) )
+FC_REFLECT( sysio::chain_apis::read_only::get_kv_rows_result, (rows)(more)(next_key) );
 
 FC_REFLECT( sysio::chain_apis::read_only::get_table_by_scope_params, (code)(table)(lower_bound)(upper_bound)(limit)(reverse)(time_limit_ms) )
-FC_REFLECT( sysio::chain_apis::read_only::get_table_by_scope_result_row, (code)(scope)(table)(payer)(count));
+FC_REFLECT( sysio::chain_apis::read_only::get_table_by_scope_result_row, (code)(scope)(table));
 FC_REFLECT( sysio::chain_apis::read_only::get_table_by_scope_result, (rows)(more) );
 
 FC_REFLECT( sysio::chain_apis::read_only::get_currency_balance_params, (code)(account)(symbol));

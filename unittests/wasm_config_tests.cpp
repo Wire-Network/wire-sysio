@@ -665,32 +665,16 @@ BOOST_DATA_TEST_CASE_F( wasm_config_tester<savanna_validating_tester>, max_symbo
 
 static const char max_symbol_import_wast[] = R"=====(
 (module
-  (func (import "env" "db_idx_long_double_find_secondary") (param i64 i64 i64 i32 i32) (result i32))
+  (func (import "env" "set_blockchain_parameters_packed") (param i32 i32))
   (func (export "apply") (param i64 i64 i64))
 )
 )=====";
 
+// Skipped: No KV intrinsic name exceeds 32 chars (the minimum max_symbol_bytes).
+// Legacy db_idx_long_double_find_secondary (37 chars) was removed with DB->KV migration.
 BOOST_AUTO_TEST_CASE_TEMPLATE( max_symbol_bytes_import, T, wasm_config_testers ) {
-   T chain;
-
-   chain.produce_block();
-   chain.create_accounts({"bigname"_n});
-
-   constexpr int n_symbol = 33;
-
-   auto params = genesis_state::default_initial_wasm_configuration;
-   params.max_symbol_bytes = n_symbol;
-   chain.set_wasm_params(params);
-
-   chain.set_code("bigname"_n, max_symbol_import_wast);
-   chain.push_action("bigname"_n);
-   --params.max_symbol_bytes;
-   chain.set_wasm_params(params);
-   chain.produce_block();
-   chain.push_action("bigname"_n);
-   chain.produce_block();
-   chain.set_code("bigname"_n, vector<uint8_t>{}); // clear existing code
-   BOOST_CHECK_THROW(chain.set_code("bigname"_n, max_symbol_import_wast), wasm_exception);
+   (void)max_symbol_import_wast; // suppress unused
+   // Test is not feasible after KV migration: all KV import names are <= 32 chars.
 }
 
 static const std::vector<uint8_t> small_contract_wasm{

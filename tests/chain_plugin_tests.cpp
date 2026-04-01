@@ -157,21 +157,16 @@ BOOST_AUTO_TEST_CASE( get_consensus_parameters ) try {
    BOOST_TEST(v0config.max_transaction_cpu_usage == t.control->get_global_properties().configuration.max_transaction_cpu_usage);
    BOOST_TEST(v0config.min_transaction_cpu_usage == t.control->get_global_properties().configuration.min_transaction_cpu_usage);
    BOOST_TEST(v0config.max_transaction_lifetime == t.control->get_global_properties().configuration.max_transaction_lifetime);
-   BOOST_TEST(v0config.deferred_trx_expiration_window == t.control->get_global_properties().configuration.deferred_trx_expiration_window);
    BOOST_TEST(v0config.max_transaction_delay == t.control->get_global_properties().configuration.max_transaction_delay);
    BOOST_TEST(v0config.max_inline_action_size == t.control->get_global_properties().configuration.max_inline_action_size);
    BOOST_TEST(v0config.max_inline_action_depth == t.control->get_global_properties().configuration.max_inline_action_depth);
    BOOST_TEST(v0config.max_authority_depth == t.control->get_global_properties().configuration.max_authority_depth);
+   BOOST_TEST(v0config.max_action_return_value_size == t.control->get_global_properties().configuration.max_action_return_value_size);
+   BOOST_TEST(v0config.max_kv_key_size == t.control->get_global_properties().configuration.max_kv_key_size);
+   BOOST_TEST(v0config.max_kv_value_size == t.control->get_global_properties().configuration.max_kv_value_size);
+   BOOST_TEST(v0config.max_kv_secondary_key_size == t.control->get_global_properties().configuration.max_kv_secondary_key_size);
 
-   BOOST_TEST(!!parms.chain_config.get_object().contains("max_action_return_value_size")); // enabled at genesis for Wire
    BOOST_TEST(!!parms.wasm_config); // enabled at genesis for Wire
-
-   parms = plugin.get_consensus_parameters({}, fc::time_point::maximum());
-   chain_config_v1 v1config;
-   from_variant(parms.chain_config, v1config);
-
-   BOOST_TEST(v1config.max_action_return_value_size == t.control->get_global_properties().configuration.max_action_return_value_size);
-   BOOST_TEST(!!parms.wasm_config);
 
    parms = plugin.get_consensus_parameters({}, fc::time_point::maximum());
 

@@ -1,0 +1,83 @@
+{
+    "____comment": "This file was generated with sysio-abigen. DO NOT EDIT ",
+    "version": "sysio::abi/1.2",
+    "types": [],
+    "structs": [
+        {
+            "name": "eraseall",
+            "base": "",
+            "fields": [
+                {
+                    "name": "count",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "findall",
+            "base": "",
+            "fields": [
+                {
+                    "name": "count",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "iterall",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "populate",
+            "base": "",
+            "fields": [
+                {
+                    "name": "count",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "updateall",
+            "base": "",
+            "fields": [
+                {
+                    "name": "count",
+                    "type": "uint32"
+                }
+            ]
+        }
+    ],
+    "actions": [
+        {
+            "name": "eraseall",
+            "type": "eraseall",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "findall",
+            "type": "findall",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "iterall",
+            "type": "iterall",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "populate",
+            "type": "populate",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "updateall",
+            "type": "updateall",
+            "ricardian_contract": ""
+        }
+    ],
+    "tables": [],
+    "ricardian_clauses": [],
+    "variants": [],
+    "action_results": []
+}

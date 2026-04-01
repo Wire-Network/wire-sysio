@@ -7,9 +7,7 @@
 
 namespace sysio::chain {
 
-class generated_transaction_object;
-class table_id_object;
-struct key_value_object;
+class kv_object;
 class permission_object;
 struct protocol_feature;
 struct signed_transaction;
@@ -73,11 +71,8 @@ public:
    void on_require_recipient();
    void on_send_inline();
    void on_send_context_free_inline();
-   void on_create_table(const table_id_object& tid);
-   void on_remove_table(const table_id_object& tid);
-   void on_db_store_i64(const table_id_object& tid, const key_value_object& kvo);
-   void on_db_update_i64(const table_id_object& tid, const key_value_object& kvo, account_name payer, const char* buffer, std::size_t buffer_size);
-   void on_db_remove_i64(const table_id_object& tid, const key_value_object& kvo);
+   void on_kv_set(const kv_object& obj, bool is_new, account_name old_payer = account_name(), const char* old_value = nullptr, std::size_t old_value_size = 0);
+   void on_kv_erase(const kv_object& obj);
    void on_init_resource_limits(const resource_limits::resource_limits_config_object& config, const resource_limits::resource_limits_state_object& state);
    void on_update_resource_limits_config(const resource_limits::resource_limits_config_object& config);
    void on_update_resource_limits_state(const resource_limits::resource_limits_state_object& state);

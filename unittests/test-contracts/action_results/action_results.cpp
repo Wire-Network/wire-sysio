@@ -20,34 +20,38 @@ class [[sysio::contract]] action_results : public contract {
          return 10;
       }
 
+      // Returns 1024+2 bytes serialized (over the 1024-byte limit)
       [[sysio::action]]
       vector<char> retoverlim() {
-         return vector<char>(512, '0');
+         return vector<char>(1024, '0');
       }
 
+      // Returns exactly 1024 bytes serialized (at the limit)
       [[sysio::action]]
       vector<char> retlim() {
          //2 is for size of type unsigned_int
-         return vector<char>(256 - 2, '0');
+         return vector<char>(1024 - 2, '0');
       }
 
+      // Returns 1025 bytes serialized (1 over the limit)
       [[sysio::action]]
       vector<char> ret1overlim() {
          //2 is for size of type unsigned_int
-         return vector<char>(257 - 2, '0');
+         return vector<char>(1025 - 2, '0');
       }
 
       /**
-       * required to be called as system contract for priviledged host function call  
+       * required to be called as system contract for priviledged host function call
        */
       [[sysio::action]]
       void retmaxlim() {
-         
+
          char buffer[12];
          datastream<char*> ds((char*)&buffer, sizeof(buffer));
          //20mb is MAX_SIZE_OF_BYTE_ARRAYS that is defined in fc.
          //we don't use fc in contracts so using hardcode here.
-         ds << unsigned_int(uint32_t(1)) << unsigned_int(uint32_t(17)) << uint32_t(20*1024*1024);
+         // ID 16 = max_action_return_value_size
+         ds << unsigned_int(uint32_t(1)) << unsigned_int(uint32_t(16)) << uint32_t(20*1024*1024);
          set_parameters_packed(buffer, ds.tellp());
 
          vector<char> ret_vec(20*1024*1024, '1');
@@ -57,11 +61,11 @@ class [[sysio::contract]] action_results : public contract {
 
       [[sysio::action]]
       void setliminv() {
-         
+
          char buffer[12];
          datastream<char*> ds((char*)&buffer, sizeof(buffer));
-         
-         ds << unsigned_int(uint32_t(1)) << unsigned_int(uint32_t(17)) << uint32_t(20*1024*1024 + 1);
+         // ID 16 = max_action_return_value_size
+         ds << unsigned_int(uint32_t(1)) << unsigned_int(uint32_t(16)) << uint32_t(20*1024*1024 + 1);
          //trying to set limit too large
          set_parameters_packed(buffer, ds.tellp());
       }

@@ -2,6 +2,7 @@
 #include <sysio/testing/tester.hpp>
 #include <sysio/chain/abi_serializer.hpp>
 #include <sysio/chain/global_property_object.hpp>
+#include <sysio/chain/kv_table_objects.hpp>
 #include <sysio/chain/wast_to_wasm.hpp>
 
 #include <fc/variant_object.hpp>
@@ -61,17 +62,15 @@ public:
       //temporary code. current get_currency_balancy uses table name "accounts"_n from currency.h
       //generic_currency table name is "account"_n.
       const auto& db  = control->db();
-      const auto* tbl = db.find<table_id_object, by_code_scope_table>(boost::make_tuple("sysio.token"_n, act, "accounts"_n));
       share_type result = 0;
 
-      // the balance is implied to be 0 if either the table or row does not exist
-      if (tbl) {
-         const auto *obj = db.find<key_value_object, by_scope_primary>(boost::make_tuple(tbl->id, symbol(CORE_SYM).to_symbol_code()));
-         if (obj) {
-            // balance is the first field in the serialization
-            fc::datastream<const char *> ds(obj->value.data(), obj->value.size());
-            fc::raw::unpack(ds, result);
-         }
+      auto key = chain::make_kv_key("accounts"_n, act, symbol(CORE_SYM).to_symbol_code());
+      const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
+      auto it = kv_idx.find(boost::make_tuple("sysio.token"_n, chain::config::kv_format_standard, key.to_string_view()));
+      if (it != kv_idx.end()) {
+         // balance is the first field in the serialization
+         fc::datastream<const char *> ds(it->value.data(), it->value.size());
+         fc::raw::unpack(ds, result);
       }
       return asset( result, symbol(CORE_SYM) );
    }
@@ -295,7 +294,7 @@ BOOST_FIXTURE_TEST_CASE( big_transaction, sysio_msig_tester ) try {
    produce_blocks();
 
    vector<permission_level> perm = { { "alice"_n, config::active_name }, { "bob"_n, config::active_name } };
-   auto wasm = contracts::util::exchange_wasm();
+   auto wasm = contracts::system_wasm();
 
    fc::variant pretty_trx = fc::mutable_variant_object()
       ("expiration", "2025-01-01T00:30")

@@ -191,11 +191,11 @@ static const char entry_import_wast[] = R"=====(
 static const char entry_db_wast[] = R"=====(
 (module
   (func $exit (import "env" "sysio_exit") (param i32))
-  (func $db_store_i64 (import "env" "db_store_i64") (param i64 i64 i64 i64 i32 i32) (result i32))
+  (func $kv_set (import "env" "kv_set") (param i32 i64 i32 i32 i32 i32) (result i64))
   (func $current_receiver (import "env" "current_receiver") (result i64))
   (memory 1)
   (func $start
-    (drop (call $db_store_i64 (i64.const 0) (i64.const 0) (call $current_receiver) (i64.const 0) (i32.const 0) (i32.const 0)))
+    (drop (call $kv_set (i32.const 0) (call $current_receiver) (i32.const 0) (i32.const 8) (i32.const 0) (i32.const 0)))
   )
   (func (export "apply") (param i64 i64 i64)
     (call $exit (i32.const 0))

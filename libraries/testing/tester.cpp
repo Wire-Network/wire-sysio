@@ -4,6 +4,7 @@
 #include <sysio/chain/block_log.hpp>
 #include <sysio/chain/wast_to_wasm.hpp>
 #include <sysio/chain/sysio_contract.hpp>
+#include <sysio/chain/kv_table_objects.hpp>
 #include <sysio/testing/bls_utils.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/copy.hpp>
@@ -133,11 +134,6 @@ namespace sysio::testing {
          res( it->key(), it->value() );
       }
       return res;
-   }
-
-   void copy_row(const chain::key_value_object& obj, vector<char>& data) {
-      data.resize( obj.value.size() );
-      memcpy( data.data(), obj.value.data(), obj.value.size() );
    }
 
    protocol_feature_set make_protocol_feature_set(const subjective_restriction_map& custom_subjective_restrictions) {
@@ -1214,18 +1210,18 @@ namespace sysio::testing {
                                        const symbol&       asset_symbol,
                                        const account_name& account ) const {
       const auto& db  = control->db();
-      const auto* tbl = db.template find<table_id_object, by_code_scope_table>(boost::make_tuple(code, account, "accounts"_n));
       share_type result = 0;
 
-      // the balance is implied to be 0 if either the table or row does not exist
-      if (tbl) {
-         const auto *obj = db.template find<key_value_object, by_scope_primary>(boost::make_tuple(tbl->id, asset_symbol.to_symbol_code().value));
-         if (obj) {
-            //balance is the first field in the serialization
-            fc::datastream<const char *> ds(obj->value.data(), obj->value.size());
-            fc::raw::unpack(ds, result);
-         }
+      // KV storage: key = [table("accounts"):8B BE][scope(account):8B BE][pk(sym_code):8B BE]
+      auto key = make_kv_key("accounts"_n, account, asset_symbol.to_symbol_code().value);
+
+      const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
+      auto kv_itr = kv_idx.find( boost::make_tuple( code, config::kv_format_standard, key.to_string_view() ) );
+      if ( kv_itr != kv_idx.end() ) {
+         fc::datastream<const char *> ds(kv_itr->value.data(), kv_itr->value.size());
+         fc::raw::unpack(ds, result);
       }
+
       return asset(result, asset_symbol);
    }
 
@@ -1236,21 +1232,20 @@ namespace sysio::testing {
    vector<char> base_tester::get_row_by_id( name code, name scope, name table, uint64_t id ) const {
       vector<char> data;
       const auto& db = control->db();
-      const auto* t_id = db.find<chain::table_id_object, chain::by_code_scope_table>( boost::make_tuple( code, scope, table ) );
-      if ( !t_id ) {
-         return data;
+
+      // KV storage: key = [table:8B BE][scope:8B BE][pk:8B BE]
+      {
+         auto key = make_kv_key(table, scope, id);
+
+         const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
+         auto kv_itr = kv_idx.find( boost::make_tuple( code, config::kv_format_standard, key.to_string_view() ) );
+         if ( kv_itr != kv_idx.end() ) {
+            data.resize( kv_itr->value.size() );
+            memcpy( data.data(), kv_itr->value.data(), data.size() );
+            return data;
+         }
       }
-      //FC_ASSERT( t_id != 0, "object not found" );
 
-      const auto& idx = db.get_index<chain::key_value_index, chain::by_scope_primary>();
-
-      auto itr = idx.lower_bound( boost::make_tuple( t_id->id, id ) );
-      if ( itr == idx.end() || itr->t_id != t_id->id || id != itr->primary_key ) {
-         return data;
-      }
-
-      data.resize( itr->value.size() );
-      memcpy( data.data(), itr->value.data(), data.size() );
       return data;
    }
 
@@ -1457,11 +1452,6 @@ namespace sysio::testing {
       // same as contracts/sysio.system/src/finalizer_key.cpp
       input.threshold = (names.size() * 2) / 3 + 1;
       return set_finalizers(input);
-   }
-
-   const table_id_object* base_tester::find_table( name code, name scope, name table ) {
-      auto tid = control->db().find<table_id_object, by_code_scope_table>(boost::make_tuple(code, scope, table));
-      return tid;
    }
 
    void base_tester::schedule_protocol_features_wo_preactivation(const vector<digest_type>& feature_digests) {

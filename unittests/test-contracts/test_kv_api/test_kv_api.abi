@@ -1,0 +1,1066 @@
+{
+    "____comment": "This file was generated with sysio-abigen. DO NOT EDIT ",
+    "version": "sysio::abi/1.2",
+    "types": [],
+    "structs": [
+        {
+            "name": "kvt_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "pk",
+                    "type": "uint64"
+                },
+                {
+                    "name": "val",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "mi_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "value",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "ramerase",
+            "base": "",
+            "fields": [
+                {
+                    "name": "key_id",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "ramstore",
+            "base": "",
+            "fields": [
+                {
+                    "name": "key_id",
+                    "type": "uint32"
+                },
+                {
+                    "name": "val_size",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "ramupdate",
+            "base": "",
+            "fields": [
+                {
+                    "name": "key_id",
+                    "type": "uint32"
+                },
+                {
+                    "name": "val_size",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "sec_big_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "pk",
+                    "type": "uint64"
+                },
+                {
+                    "name": "score",
+                    "type": "uint128"
+                }
+            ]
+        },
+        {
+            "name": "sec_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "pk",
+                    "type": "uint64"
+                },
+                {
+                    "name": "age",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "testbinround",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "testcrossrd",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "testemptyval",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "testidxdupsk",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "testidxempty",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "testidxfind",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "testidxkey",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "testidxlbnd",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "testidxmulti",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "testidxnext",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "testidxprev",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "testidxprik",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "testidxrange",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "testidxremov",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "testidxstore",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "testidxupdat",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "testitcreate",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "testitdestr",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "testitkey",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "testitlbound",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "testitnext",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "testitprefix",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "testitprev",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "testitreuse",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "testitubound",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "testitvalue",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "testitwritev",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "testkverase",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "testkvexist",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "testkvsetbt",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "testkvstord",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "testkvupdate",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "testlargepop",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "testmaxkey",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "testmaxval",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "testmultiit",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "testmultikey",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "testmultitbl",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "testnested",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "testpartread",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "testpayer",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "testscoped",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "testzeroval",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstbadfmt",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstbeginend",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstbigseckey",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstdecend",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstemplace",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstemptykey",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstenddestr",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tsterase",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tsterasedinv",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstfindmiss",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstfwditer",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstidxpayer",
+            "base": "",
+            "fields": [
+                {
+                    "name": "payer",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "tstitempttbl",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstitexhaust",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstitexhfail",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstkeyfrmt",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstkeyoffbnd",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstkvtbasic",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstkvtiter",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstkvtscope",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstlbound",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstmapcont",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstmapsetget",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstmapstrkey",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstmapupdate",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstmodify",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstnotifyram",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstovrszkey",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstpayeroth",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstpayerself",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstprevbgn",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstpreveras",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstrbegin",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstrbempty",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstrdonly",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstreraseins",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstreviter",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstsecclone",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstseccoerce",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstsecerase",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstsecersnxt",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstseciter",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstsecmod",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstsecrbegin",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstsecrbig",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstsendnotif",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstvalreplce",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstwriteperm",
+            "base": "",
+            "fields": []
+        }
+    ],
+    "actions": [
+        {
+            "name": "ramerase",
+            "type": "ramerase",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "ramstore",
+            "type": "ramstore",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "ramupdate",
+            "type": "ramupdate",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "testbinround",
+            "type": "testbinround",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "testcrossrd",
+            "type": "testcrossrd",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "testemptyval",
+            "type": "testemptyval",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "testidxdupsk",
+            "type": "testidxdupsk",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "testidxempty",
+            "type": "testidxempty",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "testidxfind",
+            "type": "testidxfind",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "testidxkey",
+            "type": "testidxkey",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "testidxlbnd",
+            "type": "testidxlbnd",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "testidxmulti",
+            "type": "testidxmulti",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "testidxnext",
+            "type": "testidxnext",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "testidxprev",
+            "type": "testidxprev",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "testidxprik",
+            "type": "testidxprik",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "testidxrange",
+            "type": "testidxrange",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "testidxremov",
+            "type": "testidxremov",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "testidxstore",
+            "type": "testidxstore",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "testidxupdat",
+            "type": "testidxupdat",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "testitcreate",
+            "type": "testitcreate",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "testitdestr",
+            "type": "testitdestr",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "testitkey",
+            "type": "testitkey",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "testitlbound",
+            "type": "testitlbound",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "testitnext",
+            "type": "testitnext",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "testitprefix",
+            "type": "testitprefix",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "testitprev",
+            "type": "testitprev",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "testitreuse",
+            "type": "testitreuse",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "testitubound",
+            "type": "testitubound",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "testitvalue",
+            "type": "testitvalue",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "testitwritev",
+            "type": "testitwritev",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "testkverase",
+            "type": "testkverase",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "testkvexist",
+            "type": "testkvexist",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "testkvsetbt",
+            "type": "testkvsetbt",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "testkvstord",
+            "type": "testkvstord",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "testkvupdate",
+            "type": "testkvupdate",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "testlargepop",
+            "type": "testlargepop",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "testmaxkey",
+            "type": "testmaxkey",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "testmaxval",
+            "type": "testmaxval",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "testmultiit",
+            "type": "testmultiit",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "testmultikey",
+            "type": "testmultikey",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "testmultitbl",
+            "type": "testmultitbl",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "testnested",
+            "type": "testnested",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "testpartread",
+            "type": "testpartread",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "testpayer",
+            "type": "testpayer",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "testscoped",
+            "type": "testscoped",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "testzeroval",
+            "type": "testzeroval",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstbadfmt",
+            "type": "tstbadfmt",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstbeginend",
+            "type": "tstbeginend",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstbigseckey",
+            "type": "tstbigseckey",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstdecend",
+            "type": "tstdecend",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstemplace",
+            "type": "tstemplace",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstemptykey",
+            "type": "tstemptykey",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstenddestr",
+            "type": "tstenddestr",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tsterase",
+            "type": "tsterase",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tsterasedinv",
+            "type": "tsterasedinv",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstfindmiss",
+            "type": "tstfindmiss",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstfwditer",
+            "type": "tstfwditer",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstidxpayer",
+            "type": "tstidxpayer",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstitempttbl",
+            "type": "tstitempttbl",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstitexhaust",
+            "type": "tstitexhaust",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstitexhfail",
+            "type": "tstitexhfail",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstkeyfrmt",
+            "type": "tstkeyfrmt",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstkeyoffbnd",
+            "type": "tstkeyoffbnd",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstkvtbasic",
+            "type": "tstkvtbasic",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstkvtiter",
+            "type": "tstkvtiter",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstkvtscope",
+            "type": "tstkvtscope",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstlbound",
+            "type": "tstlbound",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstmapcont",
+            "type": "tstmapcont",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstmapsetget",
+            "type": "tstmapsetget",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstmapstrkey",
+            "type": "tstmapstrkey",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstmapupdate",
+            "type": "tstmapupdate",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstmodify",
+            "type": "tstmodify",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstnotifyram",
+            "type": "tstnotifyram",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstovrszkey",
+            "type": "tstovrszkey",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstpayeroth",
+            "type": "tstpayeroth",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstpayerself",
+            "type": "tstpayerself",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstprevbgn",
+            "type": "tstprevbgn",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstpreveras",
+            "type": "tstpreveras",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstrbegin",
+            "type": "tstrbegin",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstrbempty",
+            "type": "tstrbempty",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstrdonly",
+            "type": "tstrdonly",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstreraseins",
+            "type": "tstreraseins",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstreviter",
+            "type": "tstreviter",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstsecclone",
+            "type": "tstsecclone",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstseccoerce",
+            "type": "tstseccoerce",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstsecerase",
+            "type": "tstsecerase",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstsecersnxt",
+            "type": "tstsecersnxt",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstseciter",
+            "type": "tstseciter",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstsecmod",
+            "type": "tstsecmod",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstsecrbegin",
+            "type": "tstsecrbegin",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstsecrbig",
+            "type": "tstsecrbig",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstsendnotif",
+            "type": "tstsendnotif",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstvalreplce",
+            "type": "tstvalreplce",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstwriteperm",
+            "type": "tstwriteperm",
+            "ricardian_contract": ""
+        }
+    ],
+    "tables": [
+        {
+            "name": "kvttable",
+            "type": "kvt_row",
+            "index_type": "i64",
+            "key_names": ["table_name","scope","primary_key"],
+            "key_types": ["name","name","uint64"]
+        },
+        {
+            "name": "mitable",
+            "type": "mi_row",
+            "index_type": "i64",
+            "key_names": ["table_name","scope","primary_key"],
+            "key_types": ["name","name","uint64"]
+        },
+        {
+            "name": "secbigtbl",
+            "type": "sec_big_row",
+            "index_type": "i64",
+            "key_names": ["table_name","scope","primary_key"],
+            "key_types": ["name","name","uint64"]
+        },
+        {
+            "name": "sectbl",
+            "type": "sec_row",
+            "index_type": "i64",
+            "key_names": ["table_name","scope","primary_key"],
+            "key_types": ["name","name","uint64"]
+        }
+    ],
+    "ricardian_clauses": [],
+    "variants": [],
+    "action_results": []
+}

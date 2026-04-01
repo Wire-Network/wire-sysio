@@ -1,6 +1,8 @@
 #pragma once
 
 #include <sysio/asset.hpp>
+#include <sysio/sysio.hpp>
+#include <sysio/multi_index.hpp>
 #include <sysio/binary_extension.hpp>
 #include <sysio/crypto.hpp>
 #include <sysio/privileged.hpp>
@@ -64,17 +66,9 @@ namespace sysiosystem {
    static constexpr int64_t  useconds_per_hour     = int64_t(seconds_per_hour) * 1000'000ll;
    static constexpr uint32_t blocks_per_day        = 2 * seconds_per_day; // half seconds per day
 
-#ifdef SYSTEM_BLOCKCHAIN_PARAMETERS
-   struct blockchain_parameters_v1 : sysio::blockchain_parameters
-   {
-      sysio::binary_extension<uint32_t> max_action_return_value_size;
-      SYSLIB_SERIALIZE_DERIVED( blockchain_parameters_v1, sysio::blockchain_parameters,
-                                (max_action_return_value_size) )
-   };
-   using blockchain_parameters_t = blockchain_parameters_v1;
-#else
+   // All fields (including max_action_return_value_size, KV limits) are now
+   // in the base sysio::blockchain_parameters struct.
    using blockchain_parameters_t = sysio::blockchain_parameters;
-#endif
 
    // Defines new global state parameters.
    struct [[sysio::table("global"), sysio::contract("sysio.system")]] sysio_global_state : sysio::blockchain_parameters {

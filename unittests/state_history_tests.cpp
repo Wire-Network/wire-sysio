@@ -299,7 +299,7 @@ BOOST_AUTO_TEST_CASE(test_deltas_global_property_history) {
    auto &it_global_property = result.second;
    BOOST_REQUIRE_EQUAL(it_global_property->rows.obj.size(), 1u);
    const variants global_properties = chain.deserialize_data(it_global_property, "global_property_v1", "global_property");
-   BOOST_REQUIRE_EQUAL(global_properties[0]["configuration"][0ul].get_string(), "chain_config_v1");
+   BOOST_REQUIRE_EQUAL(global_properties[0]["configuration"][0ul].get_string(), "chain_config_v0");
    BOOST_REQUIRE_EQUAL(global_properties[0]["configuration"][1ul]["max_transaction_delay"].as_uint64(), 60u);
 }
 
@@ -347,21 +347,10 @@ BOOST_AUTO_TEST_CASE(test_deltas_contract) {
 
    trace = chain.push_action("tester"_n, "addnumobj"_n, "tester"_n, mutable_variant_object()("input", 2));
 
-   // Spot onto contract_table
-   auto result = chain.find_table_delta("contract_table");
-   BOOST_REQUIRE(result.first);
-   auto &it_contract_table = result.second;
-   BOOST_REQUIRE_EQUAL(it_contract_table->rows.obj.size(), 6u);
-   const variants contract_tables = chain.deserialize_data(it_contract_table, "contract_table_v0", "contract_table");
-   BOOST_REQUIRE_EQUAL(contract_tables[0]["table"].get_string(), "hashobjs");
-   BOOST_REQUIRE_EQUAL(contract_tables[1]["table"].get_string(), "hashobjs....1");
-   BOOST_REQUIRE_EQUAL(contract_tables[2]["table"].get_string(), "numobjs");
-   BOOST_REQUIRE_EQUAL(contract_tables[3]["table"].get_string(), "numobjs.....1");
-   BOOST_REQUIRE_EQUAL(contract_tables[4]["table"].get_string(), "numobjs.....2");
-   BOOST_REQUIRE_EQUAL(contract_tables[5]["table"].get_string(), "numobjs.....3");
+   // Legacy contract_table delta no longer exists (KV has no separate table-of-tables).
 
-   // Spot onto contract_row
-   result = chain.find_table_delta("contract_row");
+   // Spot onto contract_row (KV rows emitted in legacy contract_row format)
+   auto result = chain.find_table_delta("contract_row");
    BOOST_REQUIRE(result.first);
    auto &it_contract_row = result.second;
    BOOST_REQUIRE_EQUAL(it_contract_row->rows.obj.size(), 2u);
@@ -369,17 +358,111 @@ BOOST_AUTO_TEST_CASE(test_deltas_contract) {
    BOOST_REQUIRE_EQUAL(contract_rows[0]["table"].get_string(), "hashobjs");
    BOOST_REQUIRE_EQUAL(contract_rows[1]["table"].get_string(), "numobjs");
 
-   // Spot onto contract_index256
-   result = chain.find_table_delta("contract_index256");
+   // Legacy contract_index256 delta no longer exists; KV secondary indices
+   // are emitted as "contract_index_kv" deltas instead.
+   result = chain.find_table_delta("contract_index_kv");
    BOOST_REQUIRE(result.first);
-   auto &it_contract_index256 = result.second;
-   BOOST_REQUIRE_EQUAL(it_contract_index256->rows.obj.size(), 2u);
-   const variants contract_indices = chain.deserialize_data(it_contract_index256, "contract_index256_v0", "contract_index256");
-   BOOST_REQUIRE_EQUAL(contract_indices[0]["table"].get_string(), "hashobjs");
-   BOOST_REQUIRE_EQUAL(contract_indices[1]["table"].get_string(), "hashobjs....1");
+   auto& it_contract_index_kv = result.second;
+   BOOST_REQUIRE_GT(it_contract_index_kv->rows.obj.size(), 0u);
+
+   // Deserialize and verify fields match legacy parity (code, payer, table, keys)
+   const variants kv_indices = chain.deserialize_data(it_contract_index_kv, "contract_index_kv_v0", "contract_index_kv");
+   for (auto& idx : kv_indices) {
+      BOOST_CHECK_EQUAL(idx["code"].as_string(), "tester");
+      BOOST_CHECK_EQUAL(idx["payer"].as_string(), "tester");
+      BOOST_CHECK(!idx["table"].as_string().empty());
+      BOOST_CHECK(!idx["pri_key"].as<bytes>().empty());
+      BOOST_CHECK(!idx["sec_key"].as<bytes>().empty());
+   }
 }
 
+// Verify format=1 (standard) KV rows appear in "contract_row" and NOT in "contract_row_kv"
+BOOST_AUTO_TEST_CASE(test_deltas_contract_row_format1_only) {
+   table_deltas_tester chain;
+   chain.produce_block();
 
+   // get_table_test uses multi_index → format=1 keys
+   chain.create_account("tester"_n, config::system_account_name, false, false, false, false);
+   chain.set_code("tester"_n, test_contracts::get_table_test_wasm());
+   chain.set_abi("tester"_n, test_contracts::get_table_test_abi());
+   chain.produce_block();
+
+   chain.push_action("tester"_n, "addnumobj"_n, "tester"_n, mutable_variant_object()("input", 1));
+
+   // format=1 rows should appear in "contract_row"
+   auto result = chain.find_table_delta("contract_row");
+   BOOST_REQUIRE(result.first);
+   BOOST_REQUIRE_GT(result.second->rows.obj.size(), 0u);
+
+   // "contract_row_kv" should NOT exist (no format=0 rows)
+   auto kv_result = chain.find_table_delta("contract_row_kv");
+   BOOST_CHECK(!kv_result.first);
+}
+
+// Verify format=0 (raw) KV rows appear in "contract_row_kv" and NOT in "contract_row"
+BOOST_AUTO_TEST_CASE(test_deltas_contract_row_kv_format0) {
+   table_deltas_tester chain;
+   chain.produce_block();
+
+   // Deploy test_kv_api which uses raw kv_set with format=0
+   chain.create_account("kvtest"_n, config::system_account_name, false, false, false, false);
+   chain.set_code("kvtest"_n, test_contracts::test_kv_api_wasm());
+   chain.set_abi("kvtest"_n, test_contracts::test_kv_api_abi());
+   chain.produce_block();
+
+   // testkvstord uses kv_set with key_format=0 (raw keys)
+   chain.push_action("kvtest"_n, "testkvstord"_n, "kvtest"_n, mutable_variant_object());
+
+   // format=0 rows should appear in "contract_row_kv"
+   auto kv_result = chain.find_table_delta("contract_row_kv");
+   BOOST_REQUIRE(kv_result.first);
+   BOOST_REQUIRE_GT(kv_result.second->rows.obj.size(), 0u);
+}
+
+// Verify kv::raw_table (format=0, BE keys) entries appear in contract_row_kv delta
+BOOST_AUTO_TEST_CASE(test_deltas_kv_map_format0) {
+   table_deltas_tester chain;
+   chain.produce_block();
+
+   chain.create_account("kvmap"_n, config::system_account_name, false, false, false, false);
+   chain.set_code("kvmap"_n, test_contracts::test_kv_map_wasm());
+   chain.set_abi("kvmap"_n, test_contracts::test_kv_map_abi());
+   chain.produce_block();
+
+   chain.push_action("kvmap"_n, "put"_n, "kvmap"_n,
+      mutable_variant_object()("region", "us-east")("id", 1)("payload", "test")("amount", 42));
+
+   // kv::raw_table uses format=0 → should appear in contract_row_kv
+   auto kv_result = chain.find_table_delta("contract_row_kv");
+   BOOST_REQUIRE(kv_result.first);
+   BOOST_REQUIRE_GT(kv_result.second->rows.obj.size(), 0u);
+}
+
+// Verify decoded fields for format=1 contract_row delta
+BOOST_AUTO_TEST_CASE(test_deltas_contract_row_fields) {
+   table_deltas_tester chain;
+   chain.produce_block();
+
+   chain.create_account("tester"_n, config::system_account_name, false, false, false, false);
+   chain.set_code("tester"_n, test_contracts::get_table_test_wasm());
+   chain.set_abi("tester"_n, test_contracts::get_table_test_abi());
+   chain.produce_block();
+
+   chain.push_action("tester"_n, "addnumobj"_n, "tester"_n, mutable_variant_object()("input", 42));
+
+   auto result = chain.find_table_delta("contract_row");
+   BOOST_REQUIRE(result.first);
+
+   const variants rows = chain.deserialize_data(result.second, "contract_row_v0", "contract_row");
+   BOOST_REQUIRE_GT(rows.size(), 0u);
+
+   // Verify decoded fields are populated (not zeroed)
+   auto& row = rows[0];
+   BOOST_CHECK_EQUAL(row["code"].get_string(), "tester");
+   BOOST_CHECK(!row["table"].get_string().empty());
+   // payer should be a valid account
+   BOOST_CHECK(!row["payer"].get_string().empty());
+}
 
    BOOST_AUTO_TEST_CASE(test_deltas) {
       table_deltas_tester main;
@@ -491,16 +574,8 @@ BOOST_AUTO_TEST_CASE(test_deltas_contract) {
          BOOST_REQUIRE_EQUAL(contract_rows[i]["table"].get_string(), "numobjs");
       }
 
-      result = chain.find_table_delta("contract_index_double");
-      BOOST_REQUIRE(result.first);
-      auto &it_contract_index_double = result.second;
-      BOOST_REQUIRE_EQUAL(it_contract_index_double->rows.obj.size(), 2u);
-      const variants contract_index_double_elems = chain.deserialize_data(it_contract_index_double, "contract_index_double_v0", "contract_index_double");
-
-      for(size_t i=0; i < contract_index_double_elems.size(); i++) {
-         BOOST_REQUIRE_EQUAL(it_contract_index_double->rows.obj[i].first, 0);
-         BOOST_REQUIRE_EQUAL(contract_index_double_elems[i]["table"].get_string(), "numobjs.....2");
-      }
+      // Legacy contract_index_double delta no longer exists; KV secondary indices
+      // are emitted as "contract_index_kv" deltas instead.
 
    }
 

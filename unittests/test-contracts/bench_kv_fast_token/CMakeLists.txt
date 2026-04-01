@@ -1,0 +1,6 @@
+if( BUILD_TEST_CONTRACTS )
+   add_contract( bench_kv_fast_token bench_kv_fast_token bench_kv_fast_token.cpp )
+else()
+   configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/bench_kv_fast_token.wasm ${CMAKE_CURRENT_BINARY_DIR}/bench_kv_fast_token.wasm COPYONLY )
+   configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/bench_kv_fast_token.abi  ${CMAKE_CURRENT_BINARY_DIR}/bench_kv_fast_token.abi  COPYONLY )
+endif()

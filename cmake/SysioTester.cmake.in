@@ -62,6 +62,32 @@ set(sysioIncludeDir ${sysioPrefixDir}/include)
 # SET PREFIX PATHS FOR CMAKE PACKAGES
 list(APPEND CMAKE_PREFIX_PATH "${sysioPrefixDir}" "${sysioLibDir}" "${sysioLibCmakeDir}")
 
+# Build-tree auto-discovery: when using an uninstalled wire-sysio build dir,
+# libraries live in ${sysioPrefixDir}/libraries/*/ and vcpkg_installed/*/ instead
+# of ${sysioPrefixDir}/lib/. Glob them so find_sysio_library works without
+# requiring callers to list every subdirectory manually.
+set(_sysio_build_tree_lib_dirs "")
+if(IS_DIRECTORY "${sysioPrefixDir}/libraries")
+    # Recursively collect all subdirectories under libraries/ that contain
+    # static libraries. This handles layouts like libraries/wasm-jit/Source/WASM/.
+    file(GLOB_RECURSE _all_static_libs "${sysioPrefixDir}/libraries/*.a")
+    foreach(_lib IN LISTS _all_static_libs)
+        get_filename_component(_dir "${_lib}" DIRECTORY)
+        list(APPEND _sysio_build_tree_lib_dirs "${_dir}")
+    endforeach()
+    list(REMOVE_DUPLICATES _sysio_build_tree_lib_dirs)
+endif()
+# Also add vcpkg dirs if present (for Boost, OpenSSL, etc.)
+foreach(_vcpkg_sub "vcpkg_installed/x64-linux/lib" "vcpkg_installed/x64-linux/debug/lib")
+    if(IS_DIRECTORY "${sysioPrefixDir}/${_vcpkg_sub}")
+        list(APPEND _sysio_build_tree_lib_dirs "${sysioPrefixDir}/${_vcpkg_sub}")
+    endif()
+endforeach()
+# Add vcpkg prefix to CMAKE_PREFIX_PATH so find_package(Boost) etc. work
+if(IS_DIRECTORY "${sysioPrefixDir}/vcpkg_installed/x64-linux")
+    list(APPEND CMAKE_PREFIX_PATH "${sysioPrefixDir}/vcpkg_installed/x64-linux")
+endif()
+
 # Helper macro to find sysio-provided libraries from ${sysioLibDir}
 option(SYSIO_TESTER_ALLOW_EXTRA_LIBRARY_DIRS "Allow adding extra library search paths for SysioTester" ON)
 set(SYSIO_TESTER_EXTRA_LIBRARY_DIRS "" CACHE PATH "Extra library directories to help SysioTester locate libs (build-tree)" )
@@ -71,13 +97,9 @@ macro(find_sysio_library VAR)
     if(NOT _FSL_NAMES)
         message(FATAL_ERROR "find_sysio_library(<var> NAMES <names...>) requires NAMES.")
     endif()
-    if(SYSIO_TESTER_ALLOW_EXTRA_LIBRARY_DIRS AND SYSIO_TESTER_EXTRA_LIBRARY_DIRS)
-        find_library(${VAR} NAMES ${_FSL_NAMES}
-                PATHS ${sysioLibDir} ${SYSIO_TESTER_EXTRA_LIBRARY_DIRS}
-                NO_DEFAULT_PATH REQUIRED)
-    else()
-        find_library(${VAR} NAMES ${_FSL_NAMES} PATHS ${sysioLibDir} NO_DEFAULT_PATH REQUIRED)
-    endif()
+    find_library(${VAR} NAMES ${_FSL_NAMES}
+            PATHS ${sysioLibDir} ${_sysio_build_tree_lib_dirs} ${SYSIO_TESTER_EXTRA_LIBRARY_DIRS}
+            NO_DEFAULT_PATH REQUIRED)
 endmacro()
 
 # Boost: robust discovery with fallback to synthesize imported targets
@@ -147,6 +169,8 @@ find_sysio_library(libbscrypto NAMES libbscrypto bscrypto)
 find_sysio_library(libdecrepit NAMES libdecrepit decrepit)
 find_sysio_library(libsodium NAMES libsodium sodium)
 find_sysio_library(libgmp NAMES libgmp gmp)
+find_sysio_library(libfmt NAMES libfmt libfmtd fmt fmtd)
+find_sysio_library(libkeccak NAMES libkeccak keccak)
 
 set(SYSIO_WASM_RUNTIMES @SYSIO_WASM_RUNTIMES@)
 set(WRAP_MAIN "")
@@ -173,6 +197,8 @@ target_link_libraries(SysioChain INTERFACE
         ${libsoftfloat}
         ${libbscrypto}
         ${libdecrepit}
+        ${libfmt}
+        ${libkeccak}
 
         Boost::date_time
         Boost::filesystem
@@ -195,9 +221,48 @@ target_link_libraries(SysioChain INTERFACE
         ${SYSIO_TESTER_ATOMIC_LINK}
 )
 
+# Build-tree vcpkg: link all static libraries from the vcpkg installed dir
+# so protobuf, abseil, fmt, keccak, etc. are available without listing each one.
+# Use only one variant (prefer non-debug, fall back to debug) to avoid duplicate symbols.
+set(_vcpkg_all_libs "")
+if(IS_DIRECTORY "${sysioPrefixDir}/vcpkg_installed/x64-linux/lib")
+    file(GLOB _vcpkg_all_libs "${sysioPrefixDir}/vcpkg_installed/x64-linux/lib/*.a")
+elseif(IS_DIRECTORY "${sysioPrefixDir}/vcpkg_installed/x64-linux/debug/lib")
+    file(GLOB _vcpkg_all_libs "${sysioPrefixDir}/vcpkg_installed/x64-linux/debug/lib/*.a")
+endif()
+if(_vcpkg_all_libs)
+    # Use linker group to resolve circular dependencies between vcpkg static libs
+    target_link_libraries(SysioChain INTERFACE -Wl,--start-group ${_vcpkg_all_libs} -Wl,--end-group)
+endif()
+
+# Build-tree include auto-discovery: find all include/ dirs under libraries/
+# by looking for header files and extracting their parent include/ directory.
+set(_sysio_build_tree_include_dirs "")
+set(_sysio_source_dir "@CMAKE_SOURCE_DIR@")
+# Source-tree includes (e.g. libraries/chain/include/)
+if(IS_DIRECTORY "${_sysio_source_dir}/libraries")
+    file(GLOB_RECURSE _all_headers "${_sysio_source_dir}/libraries/*/include/*.hpp" "${_sysio_source_dir}/libraries/*/include/*.h")
+    foreach(_hdr IN LISTS _all_headers)
+        string(REGEX REPLACE "(.*)/include/.*" "\\1/include" _inc_dir "${_hdr}")
+        list(APPEND _sysio_build_tree_include_dirs "${_inc_dir}")
+    endforeach()
+endif()
+# Build-tree includes for generated headers (e.g. cmake-build-debug/libraries/chain/include/)
+if(IS_DIRECTORY "${sysioPrefixDir}/libraries")
+    file(GLOB_RECURSE _gen_headers "${sysioPrefixDir}/libraries/*/include/*.hpp" "${sysioPrefixDir}/libraries/*/include/*.h")
+    foreach(_hdr IN LISTS _gen_headers)
+        string(REGEX REPLACE "(.*)/include/.*" "\\1/include" _inc_dir "${_hdr}")
+        list(APPEND _sysio_build_tree_include_dirs "${_inc_dir}")
+    endforeach()
+endif()
+if(_sysio_build_tree_include_dirs)
+    list(REMOVE_DUPLICATES _sysio_build_tree_include_dirs)
+endif()
+
 target_include_directories(SysioChain INTERFACE
         ${sysioIncludeDir}
         ${SYSIO_TESTER_EXTRA_INCLUDE_DIRS}
+        ${_sysio_build_tree_include_dirs}
         @OPENSSL_INCLUDE_DIR@
         @CMAKE_INSTALL_PREFIX@
         @CMAKE_INSTALL_FULL_INCLUDEDIR@

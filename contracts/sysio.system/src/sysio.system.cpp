@@ -52,12 +52,12 @@ namespace sysiosystem {
 #ifndef SYSTEM_BLOCKCHAIN_PARAMETERS
       set_blockchain_parameters( params );
 #else
-      constexpr size_t param_count = 18;
+      constexpr size_t param_count = 20;
       // an upper bound on the serialized size
       char buf[1 + sizeof(params) + param_count];
       datastream<char*> stream(buf, sizeof(buf));
 
-      stream << uint8_t(17);
+      stream << uint8_t(param_count);
       stream << uint8_t(0) << params.max_block_net_usage
              << uint8_t(1) << params.target_block_net_usage_pct
              << uint8_t(2) << params.max_transaction_net_usage
@@ -72,16 +72,15 @@ namespace sysiosystem {
              << uint8_t(10) << params.min_transaction_cpu_usage
 
              << uint8_t(11) << params.max_transaction_lifetime
-             << uint8_t(12) << params.deferred_trx_expiration_window
-             << uint8_t(13) << params.max_transaction_delay
-             << uint8_t(14) << params.max_inline_action_size
-             << uint8_t(15) << params.max_inline_action_depth
-             << uint8_t(16) << params.max_authority_depth;
-      if(params.max_action_return_value_size)
-      {
-         stream << uint8_t(17) << params.max_action_return_value_size.value();
-         ++buf[0];
-      }
+             << uint8_t(12) << params.max_transaction_delay
+             << uint8_t(13) << params.max_inline_action_size
+             << uint8_t(14) << params.max_inline_action_depth
+             << uint8_t(15) << params.max_authority_depth
+
+             << uint8_t(16) << params.max_action_return_value_size
+             << uint8_t(17) << params.max_kv_key_size
+             << uint8_t(18) << params.max_kv_value_size
+             << uint8_t(19) << params.max_kv_secondary_key_size;
 
       set_parameters_packed(buf, stream.tellp());
 #endif
