@@ -1,0 +1,161 @@
+{
+    "____comment": "This file was generated with sysio-abigen. DO NOT EDIT ",
+    "version": "sysio::abi/1.2",
+    "types": [],
+    "structs": [
+        {
+            "name": "chkintorder",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "count",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "erase",
+            "base": "",
+            "fields": [
+                {
+                    "name": "region",
+                    "type": "string"
+                },
+                {
+                    "name": "id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "get",
+            "base": "",
+            "fields": [
+                {
+                    "name": "region",
+                    "type": "string"
+                },
+                {
+                    "name": "id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "my_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "region",
+                    "type": "string"
+                },
+                {
+                    "name": "id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "my_value",
+            "base": "",
+            "fields": [
+                {
+                    "name": "payload",
+                    "type": "string"
+                },
+                {
+                    "name": "amount",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "put",
+            "base": "",
+            "fields": [
+                {
+                    "name": "region",
+                    "type": "string"
+                },
+                {
+                    "name": "id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "payload",
+                    "type": "string"
+                },
+                {
+                    "name": "amount",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "signed_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "val",
+                    "type": "int64"
+                }
+            ]
+        },
+        {
+            "name": "signed_value",
+            "base": "",
+            "fields": [
+                {
+                    "name": "original_key",
+                    "type": "int64"
+                }
+            ]
+        }
+    ],
+    "actions": [
+        {
+            "name": "chkintorder",
+            "type": "chkintorder",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "count",
+            "type": "count",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "erase",
+            "type": "erase",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "get",
+            "type": "get",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "put",
+            "type": "put",
+            "ricardian_contract": ""
+        }
+    ],
+    "tables": [
+        {
+            "name": "geodata",
+            "type": "my_value",
+            "index_type": "i64",
+            "key_names": ["region","id"],
+            "key_types": ["string","uint64"]
+        },
+        {
+            "name": "signeddata",
+            "type": "signed_value",
+            "index_type": "i64",
+            "key_names": ["val"],
+            "key_types": ["int64"]
+        }
+    ],
+    "ricardian_clauses": [],
+    "variants": [],
+    "action_results": []
+}

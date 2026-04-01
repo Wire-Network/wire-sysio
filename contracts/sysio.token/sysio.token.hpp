@@ -2,6 +2,7 @@
 
 #include <sysio/asset.hpp>
 #include <sysio/sysio.hpp>
+#include <sysio/kv_table.hpp>
 
 #include <string>
 
@@ -136,8 +137,8 @@ namespace sysio {
             uint64_t primary_key()const { return supply.symbol.code().raw(); }
          };
 
-         typedef sysio::multi_index< "accounts"_n, account > accounts;
-         typedef sysio::multi_index< "stat"_n, currency_stats > stats;
+         typedef sysio::kv::table< "accounts"_n, account > accounts;
+         typedef sysio::kv::table< "stat"_n, currency_stats > stats;
 
          void sub_balance( const name& owner, const asset& value );
          void add_balance( const name& owner, const asset& value, const name& ram_payer );

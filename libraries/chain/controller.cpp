@@ -11,7 +11,7 @@
 #include <sysio/chain/sysio_contract.hpp>
 #include <sysio/chain/global_property_object.hpp>
 #include <sysio/chain/protocol_state_object.hpp>
-#include <sysio/chain/contract_table_objects.hpp>
+#include <sysio/chain/kv_table_objects.hpp>
 #include <sysio/chain/transaction_object.hpp>
 #include <sysio/chain/genesis_intrinsics.hpp>
 #include <sysio/chain/whitelisted_intrinsics.hpp>
@@ -60,19 +60,75 @@ using controller_index_set = index_set<
    dynamic_global_property_multi_index,
    block_summary_multi_index,
    transaction_multi_index,
-   table_id_multi_index,
    code_index,
    database_header_multi_index
 >;
 
-using contract_database_index_set = index_set<
-   key_value_index,
-   index64_index,
-   index128_index,
-   index256_index,
-   index_double_index,
-   index_long_double_index
+// Legacy contract_database_index_set removed — all contract data uses kv_database_index_set.
+// SHiP "contract_table" deltas are synthesized from KV data in create_deltas.cpp.
+
+using kv_database_index_set = index_set<
+   kv_index,
+   kv_index_index
 >;
+
+namespace detail {
+   // ------------------------------------------------------------------
+   // snapshot_row_traits for kv_object  (SSO key → vector<char>)
+   // ------------------------------------------------------------------
+   template<>
+   struct snapshot_row_traits<kv_object> {
+      using value_type   = kv_object;
+      using snapshot_type = snapshot_kv_object;
+
+      static snapshot_kv_object to_snapshot_row(const kv_object& obj, const chainbase::database&) {
+         snapshot_kv_object row;
+         row.code       = obj.code;
+         row.payer      = obj.payer;
+         row.key_format = obj.key_format;
+         row.key.assign(obj.key_data(), obj.key_data() + obj.key_size);
+         row.value.assign(obj.value.data(), obj.value.data() + obj.value.size());
+         return row;
+      }
+
+      static void from_snapshot_row(snapshot_kv_object&& row, kv_object& obj, chainbase::database&) {
+         obj.code       = row.code;
+         obj.payer      = row.payer;
+         obj.key_format = row.key_format;
+         obj.key_assign(row.key.data(), row.key.size());
+         obj.value.assign(row.value.data(), row.value.size());
+      }
+   };
+
+   // ------------------------------------------------------------------
+   // snapshot_row_traits for kv_index_object  (SSO keys → vector<char>)
+   // ------------------------------------------------------------------
+   template<>
+   struct snapshot_row_traits<kv_index_object> {
+      using value_type   = kv_index_object;
+      using snapshot_type = snapshot_kv_index_object;
+
+      static snapshot_kv_index_object to_snapshot_row(const kv_index_object& obj, const chainbase::database&) {
+         snapshot_kv_index_object row;
+         row.code     = obj.code;
+         row.payer    = obj.payer;
+         row.table    = obj.table;
+         row.index_id = obj.index_id;
+         row.sec_key.assign(obj.sec_key_data(), obj.sec_key_data() + obj.sec_key_size);
+         row.pri_key.assign(obj.pri_key_data(), obj.pri_key_data() + obj.pri_key_size);
+         return row;
+      }
+
+      static void from_snapshot_row(snapshot_kv_index_object&& row, kv_index_object& obj, chainbase::database&) {
+         obj.code     = row.code;
+         obj.payer    = row.payer;
+         obj.table    = row.table;
+         obj.index_id = row.index_id;
+         obj.sec_key_assign(row.sec_key.data(), row.sec_key.size());
+         obj.pri_key_assign(row.pri_key.data(), row.pri_key.size());
+      }
+   };
+} // namespace detail
 
 class maybe_session {
    public:
@@ -1461,7 +1517,7 @@ struct controller_impl {
 
    void add_indices() {
       controller_index_set::add_indices(db);
-      contract_database_index_set::add_indices(db);
+      kv_database_index_set::add_indices(db);
 
       authorization.add_indices();
       resource_limits.add_indices();
@@ -1475,95 +1531,29 @@ struct controller_impl {
       db.undo_all();
    }
 
-   void add_contract_rows_to_snapshot( const snapshot_writer_ptr& snapshot, snapshot_written_row_counter& row_counter ) const {
-      contract_database_index_set::walk_indices([this, &snapshot, &row_counter]( auto utils ) {
-         using utils_t = decltype(utils);
+   void add_kv_rows_to_snapshot( const snapshot_writer_ptr& snapshot, snapshot_written_row_counter& row_counter ) const {
+      kv_database_index_set::walk_indices([this, &snapshot, &row_counter]( auto utils ) {
          using value_t = typename decltype(utils)::index_t::value_type;
-         using by_table_id = object_to_table_id_tag_t<value_t>;
-
          snapshot->write_section<value_t>([this, &row_counter]( auto& section ) {
-            table_id flattened_table_id = -1; //first table id will be assigned 0 by chainbase
-
-            index_utils<table_id_multi_index>::walk(db, [this, &section, &flattened_table_id, &row_counter](const table_id_object& table_row) {
-               auto tid_key = boost::make_tuple(table_row.id);
-               auto next_tid_key = boost::make_tuple(table_id_object::id_type(table_row.id._id + 1));
-
-               //Tables are stored in the snapshot by their sorted by-id walked order, but without record of their table id. On snapshot
-               // load, the table index will be reloaded in order, but all table ids flattened by chainbase to their insert order.
-               // e.g. if walking table ids 4,5,10,11,12 on creation, these will be reloaded as table ids 0,1,2,3,4. Track this
-               // flattened order here to know the "new" (upon snapshot load) table id a row belongs to
-               ++flattened_table_id;
-
-               unsigned_int size = utils_t::template size_range<by_table_id>(db, tid_key, next_tid_key);
-               if(size == 0u)
-                  return;
-
-               section.add_row(flattened_table_id, db); //indicate the new (flattened for load) table id for next...
-               section.add_row(size, db);               //...number of rows
-
-               utils_t::template walk_range<by_table_id>(db, tid_key, next_tid_key, [this, &section, &row_counter]( const auto &row ) {
-                  section.add_row(row, db);
-                  row_counter.progress();
-               });
+            decltype(utils)::walk(db, [this, &section, &row_counter]( const auto& row ) {
+               section.add_row(row, db);
+               row_counter.progress();
             });
          });
       });
    }
 
-   void read_contract_tables_from_preV7_snapshot( const snapshot_reader_ptr& snapshot, std::atomic_size_t& read_row_count ) {
-      snapshot->read_section("contract_tables", [this, &read_row_count]( auto& section ) {
-         bool more = !section.empty();
-         while (more) {
-            // read the row for the table
-            table_id_object::id_type t_id;
-            index_utils<table_id_multi_index>::create(db, [this, &section, &t_id](auto& row) {
-               section.read_row(row, db);
-               t_id = row.id;
-            });
-            read_row_count.fetch_add(1u, std::memory_order_relaxed);
-
-            // read the size and data rows for each type of table
-            contract_database_index_set::walk_indices([this, &section, &t_id, &more, &read_row_count](auto utils) {
-               using utils_t = decltype(utils);
-
-               unsigned_int size;
-               more = section.read_row(size, db);
-               read_row_count.fetch_add(1u, std::memory_order_relaxed);
-
-               for (size_t idx = 0; idx < size.value; idx++) {
-                  utils_t::create(db, [this, &section, &more, &t_id](auto& row) {
-                     row.t_id = t_id;
-                     more = section.read_row(row, db);
-                  });
-                  read_row_count.fetch_add(1u, std::memory_order_relaxed);
-               }
-            });
-         }
-      });
-   }
-
-   void read_contract_rows_from_V7plus_snapshot( const snapshot_reader_ptr& snapshot, std::atomic_size_t& read_row_count, boost::asio::io_context& ctx ) {
-      contract_database_index_set::walk_indices_via_post(ctx, [this, &snapshot, &read_row_count]( auto utils ) {
+   void read_kv_rows_from_snapshot( const snapshot_reader_ptr& snapshot, std::atomic_size_t& read_row_count, boost::asio::io_context& ctx ) {
+      kv_database_index_set::walk_indices_via_post(ctx, [this, &snapshot, &read_row_count]( auto utils ) {
          using utils_t = decltype(utils);
          using value_t = typename decltype(utils)::index_t::value_type;
-
          snapshot->read_section<value_t>([this, &read_row_count]( auto& section ) {
             bool more = !section.empty();
             while (more) {
-               table_id t_id;
-               unsigned_int rows_for_this_tid;
-
-               section.read_row(t_id, db);
-               section.read_row(rows_for_this_tid, db);
-               read_row_count.fetch_add(2u, std::memory_order_relaxed);
-
-               for(size_t idx = 0; idx < rows_for_this_tid.value; idx++) {
-                  utils_t::create(db, [this, &section, &more, &t_id](auto& row) {
-                     row.t_id = t_id;
-                     more = section.read_row(row, db);
-                  });
-                  read_row_count.fetch_add(1u, std::memory_order_relaxed);
-               }
+               utils_t::create(db, [this, &section, &more](auto& row) {
+                  more = section.read_row(row, db);
+               });
+               read_row_count.fetch_add(1u, std::memory_order_relaxed);
             }
          });
       });
@@ -1575,7 +1565,7 @@ struct controller_impl {
       controller_index_set::walk_indices([this, &ret](auto utils){
          ret += db.get_index<typename decltype(utils)::index_t>().size();
       });
-      contract_database_index_set::walk_indices([this, &ret](auto utils) {
+      kv_database_index_set::walk_indices([this, &ret](auto utils) {
          ret += db.get_index<typename decltype(utils)::index_t>().size();
       });
 
@@ -1619,7 +1609,7 @@ struct controller_impl {
          });
       });
 
-      add_contract_rows_to_snapshot(snapshot, row_counter);
+      add_kv_rows_to_snapshot(snapshot, row_counter);
 
       authorization.add_to_snapshot(snapshot, row_counter);
       resource_limits.add_to_snapshot(snapshot, row_counter);
@@ -1668,13 +1658,8 @@ struct controller_impl {
       sync_threaded_work<struct snapload> snapshot_load_workqueue;
       boost::asio::io_context& snapshot_load_ctx = snapshot_load_workqueue.io_context();
 
-      controller_index_set::walk_indices_via_post(snapshot_load_ctx, [this, &snapshot, &header, &rows_loaded]( auto utils ){
+      controller_index_set::walk_indices_via_post(snapshot_load_ctx, [this, &snapshot, &rows_loaded]( auto utils ){
          using value_t = typename decltype(utils)::index_t::value_type;
-
-         // prior to v7 snapshots, skip the table_id_object as it's inlined with contract tables section. for v7+ load the table_id table like any other
-         if (header.version < chain_snapshot_header::first_version_with_split_table_sections && std::is_same_v<value_t, table_id_object>) {
-            return;
-         }
 
          // skip the database_header as it is only relevant to in-memory database
          if (std::is_same_v<value_t, database_header_object>) {
@@ -1696,12 +1681,7 @@ struct controller_impl {
          });
       });
 
-      if(header.version < chain_snapshot_header::first_version_with_split_table_sections)
-         boost::asio::post(snapshot_load_ctx, [this,&snapshot,&rows_loaded]() {
-            read_contract_tables_from_preV7_snapshot(snapshot, rows_loaded);
-         });
-      else
-         read_contract_rows_from_V7plus_snapshot(snapshot, rows_loaded, snapshot_load_ctx);
+      read_kv_rows_from_snapshot(snapshot, rows_loaded, snapshot_load_ctx);
 
       authorization.read_from_snapshot(snapshot, rows_loaded, snapshot_load_ctx);
       resource_limits.read_from_snapshot(snapshot, rows_loaded, snapshot_load_ctx);

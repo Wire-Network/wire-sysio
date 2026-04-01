@@ -407,15 +407,15 @@
             "name": "lastproofs",
             "type": "lastproof",
             "index_type": "i64",
-            "key_names": [],
-            "key_types": []
+            "key_names": ["table_name","scope","primary_key"],
+            "key_types": ["name","name","uint64"]
         },
         {
             "name": "policies",
             "type": "storedpolicy",
             "index_type": "i64",
-            "key_names": [],
-            "key_types": []
+            "key_names": ["table_name","scope","primary_key"],
+            "key_types": ["name","name","uint64"]
         }
     ],
     "ricardian_clauses": [],

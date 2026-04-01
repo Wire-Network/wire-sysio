@@ -454,29 +454,29 @@
             "name": "nodeownerreg",
             "type": "nodeownerreg",
             "index_type": "i64",
-            "key_names": [],
-            "key_types": []
+            "key_names": ["table_name","scope","primary_key"],
+            "key_types": ["name","name","uint64"]
         },
         {
             "name": "nodeowners",
             "type": "nodeowners",
             "index_type": "i64",
-            "key_names": [],
-            "key_types": []
+            "key_names": ["table_name","scope","primary_key"],
+            "key_types": ["name","name","uint64"]
         },
         {
             "name": "policies",
             "type": "policies",
             "index_type": "i64",
-            "key_names": [],
-            "key_types": []
+            "key_names": ["table_name","scope","primary_key"],
+            "key_types": ["name","name","uint64"]
         },
         {
             "name": "reslimit",
             "type": "reslimit",
             "index_type": "i64",
-            "key_names": [],
-            "key_types": []
+            "key_names": ["table_name","scope","primary_key"],
+            "key_types": ["name","name","uint64"]
         },
         {
             "name": "roastate",
@@ -489,15 +489,15 @@
             "name": "sponsorcount",
             "type": "sponsorcount",
             "index_type": "i64",
-            "key_names": [],
-            "key_types": []
+            "key_names": ["table_name","scope","primary_key"],
+            "key_types": ["name","name","uint64"]
         },
         {
             "name": "sponsors",
             "type": "sponsor",
             "index_type": "i64",
-            "key_names": [],
-            "key_types": []
+            "key_names": ["table_name","scope","primary_key"],
+            "key_types": ["name","name","uint64"]
         }
     ],
     "ricardian_clauses": [],

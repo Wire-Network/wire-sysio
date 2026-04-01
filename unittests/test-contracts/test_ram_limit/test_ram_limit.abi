@@ -1,6 +1,7 @@
 {
-    "____comment": "This file was generated with sysio-abigen. DO NOT EDIT Fri Dec  7 11:56:43 2018",
-    "version": "sysio::abi/1.1",
+    "____comment": "This file was generated with sysio-abigen. DO NOT EDIT ",
+    "version": "sysio::abi/1.2",
+    "types": [],
     "structs": [
         {
             "name": "printentry",
@@ -67,7 +68,6 @@
             ]
         }
     ],
-    "types": [],
     "actions": [
         {
             "name": "printentry",
@@ -90,11 +90,11 @@
             "name": "test.table",
             "type": "test",
             "index_type": "i64",
-            "key_names": [],
-            "key_types": []
+            "key_names": ["table_name","scope","primary_key"],
+            "key_types": ["name","name","uint64"]
         }
     ],
     "ricardian_clauses": [],
     "variants": [],
-    "abi_extensions": []
+    "action_results": []
 }

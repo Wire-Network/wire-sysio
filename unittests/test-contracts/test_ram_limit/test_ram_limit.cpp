@@ -2,7 +2,8 @@
 #include <vector>
 #include <string>
 
-#include <sysiolib/sysio.hpp>
+#include <sysio/sysio.hpp>
+#include <sysio/multi_index.hpp>
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wsign-conversion"
@@ -42,7 +43,7 @@ CONTRACT test_ram_limit : public contract {
          test_table table( self, self.value );
          for ( int key = from; key <=to; ++key ) {
             auto itr = table.find(key);
-            sysio_assert ( itr != table.end(), "could not find test_table entry" );
+            check ( itr != table.end(), "could not find test_table entry" );
             table.erase(itr);
          }
       }
@@ -54,7 +55,7 @@ CONTRACT test_ram_limit : public contract {
          for ( int key = from; key <= to; ++key ) {
             auto itr = table.find(key);
             sysio::print("\nkey=", key);
-            sysio_assert ( itr != table.end(), "could not find test_table entry" );
+            check ( itr != table.end(), "could not find test_table entry" );
             sysio::print(" size=", itr->data.size());
          }
       }

@@ -242,7 +242,9 @@ void test_transaction::send_cf_action_fail() {
 
 void test_transaction::stateful_api() {
    char buf[4] = {1};
-   db_store_i64( sysio::name{"testtrans"}.value, sysio::name{"table"}.value, sysio::name{"testtrans"}.value, 0, buf, 4 );
+   char key[24];
+   make_kv_key(sysio::name{"table"}.value, sysio::name{"testtrans"}.value, 0, key);
+   kv_set( 0, sysio::name{"testtrans"}.value, key, 24, buf, 4 );
 }
 
 void test_transaction::context_free_api() {

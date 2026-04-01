@@ -44,7 +44,7 @@ output_type process_call(input_type input)
 
 } // namespace system_contracts::testing::test_contracts::blockinfo_tester
 
-[[sysio::wasm_entry]] extern "C" void apply(uint64_t receiver, uint64_t code, uint64_t action)
+extern "C" [[sysio::wasm_entry]] void apply(uint64_t receiver, uint64_t code, uint64_t action)
 {
    namespace ns = system_contracts::testing::test_contracts::blockinfo_tester;
 

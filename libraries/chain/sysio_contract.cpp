@@ -1,5 +1,4 @@
 #include <sysio/chain/sysio_contract.hpp>
-#include <sysio/chain/contract_table_objects.hpp>
 
 #include <sysio/chain/controller.hpp>
 #include <sysio/chain/transaction_context.hpp>

@@ -1,0 +1,6 @@
+if( BUILD_TEST_CONTRACTS )
+   add_contract( test_kv_map test_kv_map test_kv_map.cpp )
+else()
+   configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/test_kv_map.wasm ${CMAKE_CURRENT_BINARY_DIR}/test_kv_map.wasm COPYONLY )
+   configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/test_kv_map.abi ${CMAKE_CURRENT_BINARY_DIR}/test_kv_map.abi COPYONLY )
+endif()

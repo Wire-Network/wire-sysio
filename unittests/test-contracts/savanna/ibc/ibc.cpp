@@ -9,7 +9,7 @@ void ibc::_maybe_set_finalizer_policy(const finalizer_policy_input& policy, cons
         //if a previous policy was in force, it is now superseded by the newer one for any future proof verification
         if (itr!=_policies_table.rend()){
             auto fwd_itr = itr.base();
-            fwd_itr--;
+            --fwd_itr;
             _policies_table.modify( fwd_itr, same_payer, [&]( auto& sfp ) {
                 sfp.last_block_num = from_block_num;
            });

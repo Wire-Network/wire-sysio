@@ -1,0 +1,113 @@
+{
+    "____comment": "This file was generated with sysio-abigen. DO NOT EDIT ",
+    "version": "sysio::abi/1.2",
+    "types": [],
+    "structs": [
+        {
+            "name": "eraseall",
+            "base": "",
+            "fields": [
+                {
+                    "name": "count",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "findall",
+            "base": "",
+            "fields": [
+                {
+                    "name": "count",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "iterall",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "populate",
+            "base": "",
+            "fields": [
+                {
+                    "name": "count",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "value1",
+                    "type": "uint64"
+                },
+                {
+                    "name": "value2",
+                    "type": "uint64"
+                },
+                {
+                    "name": "data",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "updateall",
+            "base": "",
+            "fields": [
+                {
+                    "name": "count",
+                    "type": "uint32"
+                }
+            ]
+        }
+    ],
+    "actions": [
+        {
+            "name": "eraseall",
+            "type": "eraseall",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "findall",
+            "type": "findall",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "iterall",
+            "type": "iterall",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "populate",
+            "type": "populate",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "updateall",
+            "type": "updateall",
+            "ricardian_contract": ""
+        }
+    ],
+    "tables": [
+        {
+            "name": "rows",
+            "type": "row",
+            "index_type": "i64",
+            "key_names": ["table_name","scope","primary_key"],
+            "key_types": ["name","name","uint64"]
+        }
+    ],
+    "ricardian_clauses": [],
+    "variants": [],
+    "action_results": []
+}

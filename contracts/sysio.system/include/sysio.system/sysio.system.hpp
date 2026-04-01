@@ -1,6 +1,8 @@
 #pragma once
 
 #include <sysio/asset.hpp>
+#include <sysio/sysio.hpp>
+#include <sysio/multi_index.hpp>
 #include <sysio/binary_extension.hpp>
 #include <sysio/crypto.hpp>
 #include <sysio/privileged.hpp>

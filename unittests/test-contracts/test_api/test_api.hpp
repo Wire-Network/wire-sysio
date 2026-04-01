@@ -43,24 +43,23 @@ extern "C" {
     __attribute__((sysio_wasm_import))
     int get_action( uint32_t type, uint32_t index, char* buff, size_t size );
 
-    //db.h
+    //kv.h — replacements for legacy db_* intrinsics
     __attribute__((sysio_wasm_import))
-    int32_t db_store_i64(uint64_t scope, capi_name table, capi_name payer, uint64_t id,  const void* data, uint32_t len);
+    int64_t kv_set(uint32_t key_format, uint64_t payer, const void* key, uint32_t key_size, const void* value, uint32_t value_size);
 
     __attribute__((sysio_wasm_import))
-    int32_t db_find_i64(capi_name code, uint64_t scope, capi_name table, uint64_t id);
+    int32_t kv_get(uint32_t key_format, uint64_t code, const void* key, uint32_t key_size, void* value, uint32_t value_size);
 
     __attribute__((sysio_wasm_import))
-    int32_t db_idx64_store(uint64_t scope, capi_name table, capi_name payer, uint64_t id, const uint64_t* secondary);
+    int64_t kv_erase(uint32_t key_format, const void* key, uint32_t key_size);
 
     __attribute__((sysio_wasm_import))
-    void db_remove_i64(int32_t iterator);
+    int32_t kv_contains(uint32_t key_format, uint64_t code, const void* key, uint32_t key_size);
 
     __attribute__((sysio_wasm_import))
-    int32_t db_lowerbound_i64(capi_name code, uint64_t scope, capi_name table, uint64_t id);
-
-    __attribute__((sysio_wasm_import))
-    void db_update_i64(int32_t iterator, capi_name payer, const void* data, uint32_t len);
+    void kv_idx_store(uint64_t payer, uint64_t table, uint32_t index_id,
+                      const void* pri_key, uint32_t pri_key_size,
+                      const void* sec_key, uint32_t sec_key_size);
 
     //privilege.h
     __attribute__((sysio_wasm_import))
@@ -69,6 +68,17 @@ extern "C" {
     // chain.h
     __attribute__((sysio_wasm_import))
     uint32_t get_active_producers( capi_name* producers, uint32_t datalen );
+}
+
+// Helper: build a 24-byte KV key from (table, scope, id) in big-endian.
+// Layout: [table:8BE][scope:8BE][id:8BE]
+inline void make_kv_key(uint64_t table, uint64_t scope, uint64_t id, char out[24]) {
+   auto put_be = [](char* p, uint64_t v) {
+      for (int i = 7; i >= 0; --i) { p[i] = static_cast<char>(v & 0xff); v >>= 8; }
+   };
+   put_be(out,      table);
+   put_be(out + 8,  scope);
+   put_be(out + 16, id);
 }
 
 struct test_types {

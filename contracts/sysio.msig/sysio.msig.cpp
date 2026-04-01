@@ -95,7 +95,7 @@ void multisig::approve( name proposer, name proposal_name, permission_level leve
    require_auth( level );
 
    proposals proptable( get_self(), proposer.value );
-   auto& prop = proptable.get( proposal_name.value, "proposal not found" );
+   const auto& prop = proptable.get( proposal_name.value, "proposal not found" );
 
    if( proposal_hash ) {
       assert_sha256( prop.packed_transaction.data(), prop.packed_transaction.size(), *proposal_hash );
@@ -113,7 +113,7 @@ void multisig::approve( name proposer, name proposal_name, permission_level leve
       });
    } else {
       old_approvals old_apptable( get_self(), proposer.value );
-      auto& apps = old_apptable.get( proposal_name.value, "proposal not found" );
+      const auto& apps = old_apptable.get( proposal_name.value, "proposal not found" );
 
       auto itr = std::find( apps.requested_approvals.begin(), apps.requested_approvals.end(), level );
       check( itr != apps.requested_approvals.end(), "approval is not on the list of requested approvals" );
@@ -154,7 +154,7 @@ void multisig::unapprove( name proposer, name proposal_name, permission_level le
       });
    } else {
       old_approvals old_apptable( get_self(), proposer.value );
-      auto& apps = old_apptable.get( proposal_name.value, "proposal not found" );
+      const auto& apps = old_apptable.get( proposal_name.value, "proposal not found" );
       auto itr = std::find( apps.provided_approvals.begin(), apps.provided_approvals.end(), level );
       check( itr != apps.provided_approvals.end(), "no approval previously granted" );
       old_apptable.modify( apps, proposer, [&]( auto& a ) {
@@ -164,7 +164,7 @@ void multisig::unapprove( name proposer, name proposal_name, permission_level le
    }
 
    proposals proptable( get_self(), proposer.value );
-   auto& prop = proptable.get( proposal_name.value, "proposal not found" );
+   const auto& prop = proptable.get( proposal_name.value, "proposal not found" );
 
    if( prop.earliest_exec_time.has_value() ) {
       if( prop.earliest_exec_time->has_value() ) {
@@ -185,7 +185,7 @@ void multisig::cancel( name proposer, name proposal_name, name canceler ) {
    require_auth( canceler );
 
    proposals proptable( get_self(), proposer.value );
-   auto& prop = proptable.get( proposal_name.value, "proposal not found" );
+   const auto& prop = proptable.get( proposal_name.value, "proposal not found" );
 
    if( canceler != proposer ) {
       check( unpack<transaction_header>( prop.packed_transaction ).expiration < sysio::time_point_sec(current_time_point()), "cannot cancel until expiration" );
@@ -209,7 +209,7 @@ void multisig::exec( name proposer, name proposal_name, name executer ) {
    require_auth( executer );
 
    proposals proptable( get_self(), proposer.value );
-   auto& prop = proptable.get( proposal_name.value, "proposal not found" );
+   const auto& prop = proptable.get( proposal_name.value, "proposal not found" );
    transaction_header trx_header;
    std::vector<action> context_free_actions;
    std::vector<action> actions;
