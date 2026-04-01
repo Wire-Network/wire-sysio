@@ -2,20 +2,34 @@
 # -------------------
 
 # GLOBAL VARIABLES
+set(VCPKG_INSTALLED_TARGET_DIR "${CMAKE_BINARY_DIR}/${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}")
+message(NOTICE "VCPKG PREFIX Directory: ${VCPKG_INSTALLED_TARGET_DIR}")
 
-set(vcpkgPrefixDir "${CMAKE_BINARY_DIR}/vcpkg_installed/x64-linux")
-message(NOTICE "VCPKG PREFIX Directory: ${vcpkgPrefixDir}")
-list(APPEND CMAKE_PREFIX_PATH "${vcpkgPrefixDir}/lib/cmake" "${vcpkgPrefixDir}")
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+# CMAKE PATHS
+list(
+        PREPEND CMAKE_PREFIX_PATH
+        "${VCPKG_INSTALLED_TARGET_DIR}/lib/cmake"
+        "${VCPKG_INSTALLED_TARGET_DIR}"
+)
+list(PREPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
 # LOAD CMAKE TOOLS
 find_package(PkgConfig REQUIRED)
 
-# ZLIB, zstd, BZip2, LibLZMA (static via vcpkg, required by Boost::iostreams)
-find_package(ZLIB REQUIRED)
-find_package(zstd CONFIG REQUIRED)
-find_package(BZip2 REQUIRED)
-find_package(LibLZMA REQUIRED)
+# PkgConfig dependencies
+# ZLIB, BZip2 (static via vcpkg, required by Boost::iostreams)
+# Restrict search to vcpkg to avoid picking up system libraries
+set(ENV{PKG_CONFIG_PATH} "${VCPKG_INSTALLED_TARGET_DIR}/lib/pkgconfig")
+pkg_check_modules(zlib REQUIRED IMPORTED_TARGET zlib)
+pkg_check_modules(bzip2 REQUIRED IMPORTED_TARGET bzip2)
+pkg_check_modules(gmp REQUIRED IMPORTED_TARGET gmp)
+add_library(ZLIB::ZLIB ALIAS PkgConfig::zlib)
+add_library(BZip2::BZip2 ALIAS PkgConfig::bzip2)
+add_library(GMP::gmp ALIAS PkgConfig::gmp)
+
+# ZSTD, LibLZMA (static via vcpkg, required by Boost::iostreams)
+find_package(zstd CONFIG REQUIRED PATHS "${VCPKG_INSTALLED_TARGET_DIR}" NO_DEFAULT_PATH)
+find_package(LibLZMA REQUIRED PATHS "${VCPKG_INSTALLED_TARGET_DIR}" NO_DEFAULT_PATH)
 
 # FIND PACKAGES WITH VCPKG
 # LLVM
@@ -41,10 +55,6 @@ endif()
 
 # BOOST
 include(dependencies.boost NO_POLICY_SCOPE)
-
-# GMP
-pkg_check_modules(gmp REQUIRED IMPORTED_TARGET gmp)
-add_library(GMP::gmp ALIAS PkgConfig::gmp)
 
 # Catch2
 find_package(Catch2 CONFIG REQUIRED)
