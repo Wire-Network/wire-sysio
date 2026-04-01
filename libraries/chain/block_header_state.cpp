@@ -369,7 +369,7 @@ void finish_next(const block_header_state& prev,
    evaluate_finalizer_policies_for_promotion(prev, next_header_state);
 
    // Reuse previous digest when the underlying policy object hasn't changed.
-   // In steady state (no proposals/promotions), next and prev share the same shared_ptr
+   // In steady state (no proposals/promotions), next and prev point to the same policy object
    // so we skip serialization + SHA256.
    const finalizer_policy& next_last_pending = next_header_state.get_last_pending_finalizer_policy();
    const finalizer_policy& prev_last_pending = prev.get_last_pending_finalizer_policy();

@@ -151,9 +151,9 @@ void apply_context::exec_one()
       first_receiver_account_metadata = receiver_account_metadata;
       _first_receiver_metadata = receiver_account_metadata; // cache for subsequent notifications
    } else {
-      first_receiver_account_metadata = _first_receiver_metadata
-         ? _first_receiver_metadata
-         : db.find<account_metadata_object, by_name>(act->account);
+      if( !_first_receiver_metadata.has_value() )
+         _first_receiver_metadata = db.find<account_metadata_object, by_name>(act->account);
+      first_receiver_account_metadata = _first_receiver_metadata.value();
    }
 
    r.code_sequence    = first_receiver_account_metadata != nullptr ? first_receiver_account_metadata->code_sequence : 0; // could be modified by action execution above
