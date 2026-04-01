@@ -6,6 +6,7 @@
 #include <sysio/crypto.hpp>
 #include <sysio/system.hpp>
 #include <fc-lite/crypto/chain_types.hpp>
+#include <sysio/opp/types/types.pb.hpp>
 
 namespace sysio {
 
@@ -28,7 +29,7 @@ namespace sysio {
 
       /// Register operator (processes OperatorAction attestation).
       [[sysio::action]]
-      void regoperator(name account, uint8_t type);
+      void regoperator(name account, opp::types::OperatorType type);
 
       /// Begin operator deregistration (cooldown).
       [[sysio::action]]
@@ -37,6 +38,10 @@ namespace sysio {
       /// Advance epoch if duration elapsed (permissionless crank).
       [[sysio::action]]
       void advance();
+
+      /// Force-activate an operator (privileged, for bootstrap).
+      [[sysio::action]]
+      void activateop(name account);
 
       /// One-time group assignment when all batch operators are active.
       [[sysio::action]]
@@ -97,9 +102,9 @@ namespace sysio {
 
       /// Operator roster table.
       struct [[sysio::table, sysio::contract("sysio.epoch")]] operator_info {
-         name        account;
-         uint8_t     type;              // OperatorType protobuf enum
-         uint8_t     status;            // OperatorStatus protobuf enum
+         name                              account;
+         sysio::opp::types::OperatorType   type;
+         sysio::opp::types::OperatorStatus status;
          uint32_t    registered_epoch;
          std::vector<std::pair<fc::crypto::chain_kind_t, checksum256>> chain_addresses;
          std::vector<std::pair<fc::crypto::chain_kind_t, int64_t>>   collateral;
@@ -143,17 +148,9 @@ namespace sysio {
       static constexpr name CHALG_ACCOUNT = "sysio.chalg"_n;
       static constexpr name MSGCH_ACCOUNT = "sysio.msgch"_n;
 
-      // OperatorType constants (match protobuf values)
-      static constexpr uint8_t OP_TYPE_BATCH       = 2;
-      static constexpr uint8_t OP_TYPE_UNDERWRITER  = 3;
-      static constexpr uint8_t OP_TYPE_CHALLENGER   = 4;
-
-      // OperatorStatus constants (match protobuf values)
-      static constexpr uint8_t OP_STATUS_WARMUP     = 1;
-      static constexpr uint8_t OP_STATUS_COOLDOWN   = 2;
-      static constexpr uint8_t OP_STATUS_ACTIVE     = 3;
-      static constexpr uint8_t OP_STATUS_TERMINATED = 240;
-      static constexpr uint8_t OP_STATUS_SLASHED    = 241;
+      // Namespace alias for OPP protobuf enum types
+      using OperatorType   = sysio::opp::types::OperatorType;
+      using OperatorStatus = sysio::opp::types::OperatorStatus;
    };
 
 } // namespace sysio

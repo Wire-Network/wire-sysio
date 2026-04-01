@@ -5,6 +5,7 @@
 #include <sysio/asset.hpp>
 #include <sysio/crypto.hpp>
 #include <sysio/system.hpp>
+#include <sysio/opp/types/types.pb.hpp>
 
 namespace sysio {
 
@@ -57,7 +58,7 @@ namespace sysio {
          uint64_t    chain_request_id;
          uint32_t    epoch_index;
          uint8_t     round;            // 1 or 2
-         uint8_t     status;           // ChallengeStatus protobuf enum
+         opp::types::ChallengeStatus status;
          checksum256 challenge_hash;
          checksum256 response_hash;
          std::vector<name> correct_operators;
@@ -98,10 +99,7 @@ namespace sysio {
       static constexpr name MSIG_ACCOUNT  = "sysio.msig"_n;
 
       // ChallengeStatus constants (match protobuf values)
-      static constexpr uint8_t CHAL_CHALLENGE_SENT    = 0;
-      static constexpr uint8_t CHAL_RESPONSE_RECEIVED = 1;
-      static constexpr uint8_t CHAL_RESOLVED          = 2;
-      static constexpr uint8_t CHAL_ESCALATED         = 3;
+      using ChallengeStatus = opp::types::ChallengeStatus;
 
       static constexpr uint8_t MAX_AUTOMATIC_ROUNDS = 2;
    };

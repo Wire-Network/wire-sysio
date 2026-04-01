@@ -2,6 +2,9 @@
 
 namespace sysio {
 
+using opp::types::OperatorType;
+using opp::types::OperatorStatus;
+
 // ---------------------------------------------------------------------------
 //  setconfig
 // ---------------------------------------------------------------------------
@@ -36,10 +39,10 @@ void epoch::setconfig(uint32_t epoch_duration_sec,
 // ---------------------------------------------------------------------------
 //  regoperator
 // ---------------------------------------------------------------------------
-void epoch::regoperator(name account, uint8_t type) {
+void epoch::regoperator(name account, opp::types::OperatorType type) {
    require_auth(get_self());
 
-   check(type == OP_TYPE_BATCH || type == OP_TYPE_UNDERWRITER || type == OP_TYPE_CHALLENGER,
+   check(type == OperatorType::OPERATOR_TYPE_BATCH || type == OperatorType::OPERATOR_TYPE_UNDERWRITER || type == OperatorType::OPERATOR_TYPE_CHALLENGER,
          "invalid operator type");
 
    epochstate_t state_tbl(get_self(), get_self().value);
@@ -54,7 +57,7 @@ void epoch::regoperator(name account, uint8_t type) {
       ops.emplace(get_self(), [&](auto& o) {
          o.account = account;
          o.type = type;
-         o.status = OP_STATUS_WARMUP;
+         o.status = OperatorStatus::OPERATOR_STATUS_WARMUP;
          o.registered_epoch = state.current_epoch_index;
          o.assigned_batch_op_group = 255; // unassigned until initgroups
          o.last_elected_epoch = 0;
@@ -65,10 +68,26 @@ void epoch::regoperator(name account, uint8_t type) {
       check(!it->is_blacklisted, "operator is blacklisted");
       ops.modify(it, same_payer, [&](auto& o) {
          o.type = type;
-         o.status = OP_STATUS_WARMUP;
+         o.status = OperatorStatus::OPERATOR_STATUS_WARMUP;
          o.registered_epoch = state.current_epoch_index;
       });
    }
+}
+
+// ---------------------------------------------------------------------------
+//  activateop
+// ---------------------------------------------------------------------------
+void epoch::activateop(name account) {
+   require_auth(get_self());
+
+   operators_t ops(get_self(), get_self().value);
+   auto it = ops.find(account.value);
+   check(it != ops.end(), "operator not found");
+   check(it->status == OperatorStatus::OPERATOR_STATUS_WARMUP, "operator is not in warmup");
+
+   ops.modify(it, same_payer, [&](auto& o) {
+      o.status = OperatorStatus::OPERATOR_STATUS_ACTIVE;
+   });
 }
 
 // ---------------------------------------------------------------------------
@@ -80,10 +99,10 @@ void epoch::unregoper(name account) {
    operators_t ops(get_self(), get_self().value);
    auto it = ops.find(account.value);
    check(it != ops.end(), "operator not found");
-   check(it->status == OP_STATUS_ACTIVE, "operator must be active to deregister");
+   check(it->status == OperatorStatus::OPERATOR_STATUS_ACTIVE, "operator must be active to deregister");
 
    ops.modify(it, same_payer, [&](auto& o) {
-      o.status = OP_STATUS_COOLDOWN;
+      o.status = OperatorStatus::OPERATOR_STATUS_COOLDOWN;
    });
 }
 
@@ -146,9 +165,9 @@ void epoch::initgroups() {
    // Collect all ACTIVE batch operators ordered by registration epoch
    std::vector<name> active_batch;
    auto status_idx = ops.get_index<"bystatus"_n>();
-   for (auto it = status_idx.lower_bound(OP_STATUS_ACTIVE);
-        it != status_idx.end() && it->status == OP_STATUS_ACTIVE; ++it) {
-      if (it->type == OP_TYPE_BATCH && !it->is_blacklisted) {
+   for (auto it = status_idx.lower_bound(OperatorStatus::OPERATOR_STATUS_ACTIVE);
+        it != status_idx.end() && it->status == OperatorStatus::OPERATOR_STATUS_ACTIVE; ++it) {
+      if (it->type == OperatorType::OPERATOR_TYPE_BATCH && !it->is_blacklisted) {
          active_batch.push_back(it->account);
       }
    }
@@ -226,8 +245,8 @@ void epoch::replaceop(name old_op, name new_op) {
 
    auto new_it = ops.find(new_op.value);
    check(new_it != ops.end(), "new operator not found");
-   check(new_it->type == OP_TYPE_BATCH, "replacement must be a batch operator");
-   check(new_it->status == OP_STATUS_ACTIVE, "replacement must be active");
+   check(new_it->type == OperatorType::OPERATOR_TYPE_BATCH, "replacement must be a batch operator");
+   check(new_it->status == OperatorStatus::OPERATOR_STATUS_ACTIVE, "replacement must be active");
    check(!new_it->is_blacklisted, "replacement is blacklisted");
 
    uint8_t group = old_it->assigned_batch_op_group;

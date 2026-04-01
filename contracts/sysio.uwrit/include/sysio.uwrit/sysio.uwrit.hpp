@@ -6,6 +6,7 @@
 #include <sysio/crypto.hpp>
 #include <sysio/system.hpp>
 #include <fc-lite/crypto/chain_types.hpp>
+#include <sysio/opp/types/types.pb.hpp>
 
 namespace sysio {
 
@@ -82,7 +83,7 @@ namespace sysio {
          uint64_t    id;
          name        underwriter;
          uint64_t    message_id;       // FK to sysio.msgch message
-         uint8_t     status;           // UnderwriteStatus protobuf enum
+         opp::types::UnderwriteStatus status;
          asset       source_amount;
          asset       target_amount;
          fc::crypto::chain_kind_t source_chain;
@@ -129,11 +130,7 @@ namespace sysio {
       static constexpr name CHALG_ACCOUNT = "sysio.chalg"_n;
 
       // UnderwriteStatus constants (match protobuf values)
-      static constexpr uint8_t UW_INTENT_SUBMITTED = 0;
-      static constexpr uint8_t UW_INTENT_CONFIRMED = 1;
-      static constexpr uint8_t UW_COMPLETED        = 2;
-      static constexpr uint8_t UW_EXPIRED          = 3;
-      static constexpr uint8_t UW_SLASHED          = 4;
+      using UnderwriteStatus = opp::types::UnderwriteStatus;
    };
 
 } // namespace sysio

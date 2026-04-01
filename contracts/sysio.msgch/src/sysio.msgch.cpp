@@ -2,6 +2,12 @@
 
 namespace sysio {
 
+using opp::types::ChainRequestStatus;
+using opp::types::MessageDirection;
+using opp::types::MessageStatus;
+using opp::types::EnvelopeStatus;
+using opp::types::AttestationType;
+
 // ---------------------------------------------------------------------------
 //  crank — main depot crank
 // ---------------------------------------------------------------------------
@@ -23,7 +29,7 @@ void msgch::createreq(uint64_t outpost_id) {
       r.id = requests.available_primary_key();
       r.outpost_id = outpost_id;
       r.epoch_index = 0; // TODO: read from sysio.epoch
-      r.status = REQ_PENDING;
+      r.status = ChainRequestStatus::CHAIN_REQUEST_STATUS_PENDING;
       r.delivery_count = 0;
    });
 }
@@ -42,7 +48,7 @@ void msgch::deliver(name operator_acct,
    inchainreq_t requests(get_self(), get_self().value);
    auto req_it = requests.find(req_id);
    check(req_it != requests.end(), "chain request not found");
-   check(req_it->status == REQ_PENDING || req_it->status == REQ_COLLECTING,
+   check(req_it->status == ChainRequestStatus::CHAIN_REQUEST_STATUS_PENDING || req_it->status == ChainRequestStatus::CHAIN_REQUEST_STATUS_COLLECTING,
          "chain request is not accepting deliveries");
 
    deliveries_t deliveries(get_self(), get_self().value);
@@ -69,8 +75,8 @@ void msgch::deliver(name operator_acct,
    // Update request status and delivery count
    requests.modify(req_it, same_payer, [&](auto& r) {
       r.delivery_count++;
-      if (r.status == REQ_PENDING) {
-         r.status = REQ_COLLECTING;
+      if (r.status == ChainRequestStatus::CHAIN_REQUEST_STATUS_PENDING) {
+         r.status = ChainRequestStatus::CHAIN_REQUEST_STATUS_COLLECTING;
       }
    });
 
@@ -84,8 +90,8 @@ void msgch::deliver(name operator_acct,
          m.id = messages.available_primary_key();
          m.outpost_id = req_it->outpost_id;
          m.epoch_index = req_it->epoch_index;
-         m.direction = DIR_INBOUND;
-         m.status = MSG_PENDING;
+         m.direction = MessageDirection::MESSAGE_DIRECTION_INBOUND;
+         m.status = MessageStatus::MESSAGE_STATUS_PENDING;
          m.raw_payload = raw_messages;
          m.received_at = current_time_point();
       });
@@ -101,7 +107,7 @@ void msgch::evalcons(uint64_t req_id) {
    inchainreq_t requests(get_self(), get_self().value);
    auto req_it = requests.find(req_id);
    check(req_it != requests.end(), "chain request not found");
-   check(req_it->status == REQ_COLLECTING, "request not in collecting state");
+   check(req_it->status == ChainRequestStatus::CHAIN_REQUEST_STATUS_COLLECTING, "request not in collecting state");
 
    deliveries_t deliveries(get_self(), get_self().value);
    auto req_idx = deliveries.get_index<"byrequest"_n>();
@@ -170,11 +176,11 @@ void msgch::evalcons(uint64_t req_id) {
 
    if (consensus_reached) {
       requests.modify(req_it, same_payer, [&](auto& r) {
-         r.status = REQ_CONSENSUS_OK;
+         r.status = ChainRequestStatus::CHAIN_REQUEST_STATUS_CONSENSUS_OK;
       });
    } else {
       requests.modify(req_it, same_payer, [&](auto& r) {
-         r.status = REQ_CONSENSUS_FAIL;
+         r.status = ChainRequestStatus::CHAIN_REQUEST_STATUS_CONSENSUS_FAIL;
       });
       // Notify sysio.chalg to initiate challenge
       require_recipient(CHALG_ACCOUNT);
@@ -190,7 +196,7 @@ void msgch::processmsg(uint64_t msg_id) {
    messages_t messages(get_self(), get_self().value);
    auto it = messages.find(msg_id);
    check(it != messages.end(), "message not found");
-   check(it->status == MSG_READY, "message not in READY state");
+   check(it->status == MessageStatus::MESSAGE_STATUS_READY, "message not in READY state");
 
    // TODO: Deserialize raw_payload into MessagePayload (protobuf via opp_cdt_models).
    //       For each AttestationEntry, classify and route:
@@ -202,7 +208,7 @@ void msgch::processmsg(uint64_t msg_id) {
    //       For now, mark as processed.
 
    messages.modify(it, same_payer, [&](auto& m) {
-      m.status = MSG_PROCESSED;
+      m.status = MessageStatus::MESSAGE_STATUS_PROCESSED;
       m.processed_at = current_time_point();
    });
 }
@@ -211,7 +217,7 @@ void msgch::processmsg(uint64_t msg_id) {
 //  queueout
 // ---------------------------------------------------------------------------
 void msgch::queueout(uint64_t outpost_id,
-                     uint16_t attest_type,
+                     opp::types::AttestationType attest_type,
                      std::vector<char> data) {
    require_auth(get_self());
 
@@ -220,8 +226,8 @@ void msgch::queueout(uint64_t outpost_id,
       m.id = messages.available_primary_key();
       m.outpost_id = outpost_id;
       m.epoch_index = 0; // TODO: read from sysio.epoch
-      m.direction = DIR_OUTBOUND;
-      m.status = MSG_PENDING;
+      m.direction = MessageDirection::MESSAGE_DIRECTION_OUTBOUND;
+      m.status = MessageStatus::MESSAGE_STATUS_PENDING;
       m.attestation_type = attest_type;
       m.raw_payload = data;
       m.received_at = current_time_point();
@@ -244,7 +250,7 @@ void msgch::buildenv(uint64_t outpost_id) {
       e.id = envelopes.available_primary_key();
       e.outpost_id = outpost_id;
       e.epoch_index = 0; // TODO: read from sysio.epoch
-      e.status = ENV_PENDING_DELIVERY;
+      e.status = EnvelopeStatus::ENVELOPE_STATUS_PENDING_DELIVERY;
    });
 }
 
