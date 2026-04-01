@@ -73,7 +73,7 @@ using kv_database_index_set = index_set<
 
 namespace detail {
    // ------------------------------------------------------------------
-   // snapshot_row_traits for kv_object  (SSO key → vector<char>)
+   // snapshot_row_traits for kv_object  (shared_blob → vector<char>)
    // ------------------------------------------------------------------
    template<>
    struct snapshot_row_traits<kv_object> {
@@ -85,22 +85,23 @@ namespace detail {
          row.code       = obj.code;
          row.payer      = obj.payer;
          row.key_format = obj.key_format;
-         row.key.assign(obj.key_data(), obj.key_data() + obj.key_size);
+         row.key.assign(obj.key.data(), obj.key.data() + obj.key.size());
          row.value.assign(obj.value.data(), obj.value.data() + obj.value.size());
          return row;
       }
 
       static void from_snapshot_row(snapshot_kv_object&& row, kv_object& obj, chainbase::database&) {
+         SYS_ASSERT(!row.key.empty(), snapshot_validation_exception, "kv_object has empty key");
          obj.code       = row.code;
          obj.payer      = row.payer;
          obj.key_format = row.key_format;
-         obj.key_assign(row.key.data(), row.key.size());
+         obj.key.assign(row.key.data(), row.key.size());
          obj.value.assign(row.value.data(), row.value.size());
       }
    };
 
    // ------------------------------------------------------------------
-   // snapshot_row_traits for kv_index_object  (SSO keys → vector<char>)
+   // snapshot_row_traits for kv_index_object  (shared_blob → vector<char>)
    // ------------------------------------------------------------------
    template<>
    struct snapshot_row_traits<kv_index_object> {
@@ -113,18 +114,20 @@ namespace detail {
          row.payer    = obj.payer;
          row.table    = obj.table;
          row.index_id = obj.index_id;
-         row.sec_key.assign(obj.sec_key_data(), obj.sec_key_data() + obj.sec_key_size);
-         row.pri_key.assign(obj.pri_key_data(), obj.pri_key_data() + obj.pri_key_size);
+         row.sec_key.assign(obj.sec_key.data(), obj.sec_key.data() + obj.sec_key.size());
+         row.pri_key.assign(obj.pri_key.data(), obj.pri_key.data() + obj.pri_key.size());
          return row;
       }
 
       static void from_snapshot_row(snapshot_kv_index_object&& row, kv_index_object& obj, chainbase::database&) {
+         SYS_ASSERT(!row.sec_key.empty(), snapshot_validation_exception, "kv_index_object has empty secondary key");
+         SYS_ASSERT(!row.pri_key.empty(), snapshot_validation_exception, "kv_index_object has empty primary key");
          obj.code     = row.code;
          obj.payer    = row.payer;
          obj.table    = row.table;
          obj.index_id = row.index_id;
-         obj.sec_key_assign(row.sec_key.data(), row.sec_key.size());
-         obj.pri_key_assign(row.pri_key.data(), row.pri_key.size());
+         obj.sec_key.assign(row.sec_key.data(), row.sec_key.size());
+         obj.pri_key.assign(row.pri_key.data(), row.pri_key.size());
       }
    };
 } // namespace detail

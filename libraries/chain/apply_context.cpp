@@ -563,8 +563,8 @@ bool apply_context::should_use_sys_vm_oc()const {
 
 static bool key_has_prefix(const kv_object& obj, const std::vector<char>& prefix) {
    if (prefix.empty()) return true;
-   if (obj.key_size < prefix.size()) return false;
-   return memcmp(obj.key_data(), prefix.data(), prefix.size()) == 0;
+   if (obj.key.size() < prefix.size()) return false;
+   return memcmp(obj.key.data(), prefix.data(), prefix.size()) == 0;
 }
 
 static std::string_view to_sv(const char* data, uint32_t size) {
@@ -606,7 +606,7 @@ int64_t apply_context::kv_set(uint8_t key_format, uint64_t payer_val, const char
 
    if (itr != idx.end()) {
       // Update existing
-      int64_t old_billable = static_cast<int64_t>(itr->key_size + itr->value.size() + config::billable_size_v<kv_object>);
+      int64_t old_billable = static_cast<int64_t>(itr->key.size() + itr->value.size() + config::billable_size_v<kv_object>);
       int64_t new_billable = static_cast<int64_t>(key_size + value_size + config::billable_size_v<kv_object>);
 
       // Handle payer change
@@ -643,7 +643,7 @@ int64_t apply_context::kv_set(uint8_t key_format, uint64_t payer_val, const char
          o.code = receiver;
          o.payer = payer;
          o.key_format = key_format;
-         o.key_assign(key, key_size);
+         o.key.assign(key, key_size);
          o.value.assign(value, value_size);
       });
 
@@ -684,7 +684,7 @@ int64_t apply_context::kv_erase(uint8_t key_format, const char* key, uint32_t ke
 
    SYS_ASSERT( itr != idx.end(), kv_key_not_found, "KV key not found for erase" );
 
-   int64_t delta = -static_cast<int64_t>(itr->key_size + itr->value.size() + config::billable_size_v<kv_object>);
+   int64_t delta = -static_cast<int64_t>(itr->key.size() + itr->value.size() + config::billable_size_v<kv_object>);
 
    if (auto dm_logger = control.get_deep_mind_logger(trx_context.is_transient())) {
       dm_logger->on_kv_erase(*itr);
@@ -715,7 +715,7 @@ uint32_t apply_context::kv_it_create(uint8_t key_format, name code, const char* 
 
    if (itr != idx.end() && itr->code == code && itr->key_format == key_format && key_has_prefix(*itr, slot.prefix)) {
       slot.status = kv_it_stat::iterator_ok;
-      slot.current_key.assign(itr->key_data(), itr->key_data() + itr->key_size);
+      slot.current_key.assign(itr->key.data(), itr->key.data() + itr->key.size());
       slot.cached_id = itr->id._id;
    } else {
       slot.status = kv_it_stat::iterator_end;
@@ -759,7 +759,7 @@ int32_t apply_context::kv_it_next(uint32_t handle) {
 
    if (itr != idx.end() && itr->code == slot.code && itr->key_format == slot.key_format && key_has_prefix(*itr, slot.prefix)) {
       slot.status = kv_it_stat::iterator_ok;
-      slot.current_key.assign(itr->key_data(), itr->key_data() + itr->key_size);
+      slot.current_key.assign(itr->key.data(), itr->key.data() + itr->key.size());
       slot.cached_id = itr->id._id;
    } else {
       slot.status = kv_it_stat::iterator_end;
@@ -794,7 +794,7 @@ int32_t apply_context::kv_it_prev(uint32_t handle) {
 
       if (itr->code == slot.code && itr->key_format == slot.key_format && key_has_prefix(*itr, slot.prefix)) {
          slot.status = kv_it_stat::iterator_ok;
-         slot.current_key.assign(itr->key_data(), itr->key_data() + itr->key_size);
+         slot.current_key.assign(itr->key.data(), itr->key.data() + itr->key.size());
          slot.cached_id = itr->id._id;
       } else {
          slot.status = kv_it_stat::iterator_end;
@@ -826,7 +826,7 @@ int32_t apply_context::kv_it_prev(uint32_t handle) {
 
       if (itr->code == slot.code && itr->key_format == slot.key_format && key_has_prefix(*itr, slot.prefix)) {
          slot.status = kv_it_stat::iterator_ok;
-         slot.current_key.assign(itr->key_data(), itr->key_data() + itr->key_size);
+         slot.current_key.assign(itr->key.data(), itr->key.data() + itr->key.size());
          slot.cached_id = itr->id._id;
       } else {
          slot.status = kv_it_stat::iterator_end;
@@ -853,7 +853,7 @@ int32_t apply_context::kv_it_lower_bound(uint32_t handle, const char* key, uint3
 
    if (itr != idx.end() && itr->code == slot.code && itr->key_format == slot.key_format && key_has_prefix(*itr, slot.prefix)) {
       slot.status = kv_it_stat::iterator_ok;
-      slot.current_key.assign(itr->key_data(), itr->key_data() + itr->key_size);
+      slot.current_key.assign(itr->key.data(), itr->key.data() + itr->key.size());
       slot.cached_id = itr->id._id;
    } else {
       slot.status = kv_it_stat::iterator_end;
@@ -901,10 +901,10 @@ int32_t apply_context::kv_it_key(uint32_t handle, uint32_t offset, char* dest, u
       return static_cast<int32_t>(slot.status);
    }
 
-   actual_size = obj->key_size;
-   if (dest_size > 0 && offset < obj->key_size) {
-      auto copy_size = std::min(static_cast<size_t>(dest_size), static_cast<size_t>(obj->key_size) - offset);
-      memcpy(dest, obj->key_data() + offset, copy_size);
+   actual_size = static_cast<uint32_t>(obj->key.size());
+   if (dest_size > 0 && offset < obj->key.size()) {
+      auto copy_size = std::min(static_cast<size_t>(dest_size), obj->key.size() - offset);
+      memcpy(dest, obj->key.data() + offset, copy_size);
    }
 
    return static_cast<int32_t>(kv_it_stat::iterator_ok);
@@ -954,8 +954,8 @@ void apply_context::kv_idx_store(uint64_t payer_val, name table, uint8_t index_i
       o.payer = payer;
       o.table = table;
       o.index_id = index_id;
-      o.sec_key_assign(sec_key, sec_key_size);
-      o.pri_key_assign(pri_key, pri_key_size);
+      o.sec_key.assign(sec_key, sec_key_size);
+      o.pri_key.assign(pri_key, pri_key_size);
    });
 
    int64_t billable = static_cast<int64_t>(sec_key_size + pri_key_size + config::billable_size_v<kv_index_object>);
@@ -975,7 +975,7 @@ void apply_context::kv_idx_remove(name table, uint8_t index_id,
 
    SYS_ASSERT( itr != idx.end(), kv_key_not_found, "KV secondary index entry not found for remove" );
 
-   int64_t delta = -static_cast<int64_t>(itr->sec_key_size + itr->pri_key_size +
+   int64_t delta = -static_cast<int64_t>(itr->sec_key.size() + itr->pri_key.size() +
                                           config::billable_size_v<kv_index_object>);
    update_db_usage(itr->payer, delta);
    db.remove(*itr);
@@ -1000,7 +1000,7 @@ void apply_context::kv_idx_update(uint64_t payer_val, name table, uint8_t index_
    account_name payer = (payer_val == 0) ? receiver : account_name(payer_val);
    account_name old_payer = itr->payer;
 
-   int64_t old_billable = static_cast<int64_t>(itr->sec_key_size + itr->pri_key_size +
+   int64_t old_billable = static_cast<int64_t>(itr->sec_key.size() + itr->pri_key.size() +
                                                 config::billable_size_v<kv_index_object>);
    int64_t new_billable = static_cast<int64_t>(new_sec_key_size + pri_key_size +
                                                 config::billable_size_v<kv_index_object>);
@@ -1022,8 +1022,8 @@ void apply_context::kv_idx_update(uint64_t payer_val, name table, uint8_t index_
       o.payer = payer;
       o.table = table;
       o.index_id = index_id;
-      o.sec_key_assign(new_sec_key, new_sec_key_size);
-      o.pri_key_assign(pri_key, pri_key_size);
+      o.sec_key.assign(new_sec_key, new_sec_key_size);
+      o.pri_key.assign(pri_key, pri_key_size);
    });
 }
 
@@ -1041,8 +1041,8 @@ int32_t apply_context::kv_idx_find_secondary(name code, name table, uint8_t inde
    uint32_t handle = kv_iterators.allocate_secondary(code, table, index_id);
    auto& slot = kv_iterators.get(handle);
    slot.status = kv_it_stat::iterator_ok;
-   slot.current_sec_key.assign(itr->sec_key_data(), itr->sec_key_data() + itr->sec_key_size);
-   slot.current_pri_key.assign(itr->pri_key_data(), itr->pri_key_data() + itr->pri_key_size);
+   slot.current_sec_key.assign(itr->sec_key.data(), itr->sec_key.data() + itr->sec_key.size());
+   slot.current_pri_key.assign(itr->pri_key.data(), itr->pri_key.data() + itr->pri_key.size());
    slot.cached_id = itr->id._id;
    return static_cast<int32_t>(handle);
 }
@@ -1067,8 +1067,8 @@ int32_t apply_context::kv_idx_lower_bound(name code, name table, uint8_t index_i
    uint32_t handle = kv_iterators.allocate_secondary(code, table, index_id);
    auto& slot = kv_iterators.get(handle);
    slot.status = kv_it_stat::iterator_ok;
-   slot.current_sec_key.assign(itr->sec_key_data(), itr->sec_key_data() + itr->sec_key_size);
-   slot.current_pri_key.assign(itr->pri_key_data(), itr->pri_key_data() + itr->pri_key_size);
+   slot.current_sec_key.assign(itr->sec_key.data(), itr->sec_key.data() + itr->sec_key.size());
+   slot.current_pri_key.assign(itr->pri_key.data(), itr->pri_key.data() + itr->pri_key.size());
    slot.cached_id = itr->id._id;
    return static_cast<int32_t>(handle);
 }
@@ -1101,8 +1101,8 @@ int32_t apply_context::kv_idx_next(uint32_t handle) {
 
    if (itr != idx.end() && itr->code == slot.code && itr->table == slot.table && itr->index_id == slot.index_id) {
       slot.status = kv_it_stat::iterator_ok;
-      slot.current_sec_key.assign(itr->sec_key_data(), itr->sec_key_data() + itr->sec_key_size);
-      slot.current_pri_key.assign(itr->pri_key_data(), itr->pri_key_data() + itr->pri_key_size);
+      slot.current_sec_key.assign(itr->sec_key.data(), itr->sec_key.data() + itr->sec_key.size());
+      slot.current_pri_key.assign(itr->pri_key.data(), itr->pri_key.data() + itr->pri_key.size());
       slot.cached_id = itr->id._id;
    } else {
       slot.status = kv_it_stat::iterator_end;
@@ -1130,8 +1130,8 @@ int32_t apply_context::kv_idx_prev(uint32_t handle) {
 
       if (itr->code == slot.code && itr->table == slot.table && itr->index_id == slot.index_id) {
          slot.status = kv_it_stat::iterator_ok;
-         slot.current_sec_key.assign(itr->sec_key_data(), itr->sec_key_data() + itr->sec_key_size);
-         slot.current_pri_key.assign(itr->pri_key_data(), itr->pri_key_data() + itr->pri_key_size);
+         slot.current_sec_key.assign(itr->sec_key.data(), itr->sec_key.data() + itr->sec_key.size());
+         slot.current_pri_key.assign(itr->pri_key.data(), itr->pri_key.data() + itr->pri_key.size());
          slot.cached_id = itr->id._id;
       } else {
          slot.cached_id = -1;
@@ -1164,8 +1164,8 @@ int32_t apply_context::kv_idx_prev(uint32_t handle) {
 
       if (itr->code == slot.code && itr->table == slot.table && itr->index_id == slot.index_id) {
          slot.status = kv_it_stat::iterator_ok;
-         slot.current_sec_key.assign(itr->sec_key_data(), itr->sec_key_data() + itr->sec_key_size);
-         slot.current_pri_key.assign(itr->pri_key_data(), itr->pri_key_data() + itr->pri_key_size);
+         slot.current_sec_key.assign(itr->sec_key.data(), itr->sec_key.data() + itr->sec_key.size());
+         slot.current_pri_key.assign(itr->pri_key.data(), itr->pri_key.data() + itr->pri_key.size());
          slot.cached_id = itr->id._id;
       } else {
          slot.status = kv_it_stat::iterator_end;
@@ -1213,10 +1213,10 @@ int32_t apply_context::kv_idx_key(uint32_t handle, uint32_t offset, char* dest, 
       return static_cast<int32_t>(slot.status);
    }
 
-   actual_size = obj->sec_key_size;
-   if (dest_size > 0 && offset < obj->sec_key_size) {
-      auto copy_size = std::min(static_cast<size_t>(dest_size), static_cast<size_t>(obj->sec_key_size) - offset);
-      memcpy(dest, obj->sec_key_data() + offset, copy_size);
+   actual_size = static_cast<uint32_t>(obj->sec_key.size());
+   if (dest_size > 0 && offset < obj->sec_key.size()) {
+      auto copy_size = std::min(static_cast<size_t>(dest_size), obj->sec_key.size() - offset);
+      memcpy(dest, obj->sec_key.data() + offset, copy_size);
    }
 
    return static_cast<int32_t>(kv_it_stat::iterator_ok);
@@ -1238,10 +1238,10 @@ int32_t apply_context::kv_idx_primary_key(uint32_t handle, uint32_t offset, char
       return static_cast<int32_t>(slot.status);
    }
 
-   actual_size = obj->pri_key_size;
-   if (dest_size > 0 && offset < obj->pri_key_size) {
-      auto copy_size = std::min(static_cast<size_t>(dest_size), static_cast<size_t>(obj->pri_key_size) - offset);
-      memcpy(dest, obj->pri_key_data() + offset, copy_size);
+   actual_size = static_cast<uint32_t>(obj->pri_key.size());
+   if (dest_size > 0 && offset < obj->pri_key.size()) {
+      auto copy_size = std::min(static_cast<size_t>(dest_size), obj->pri_key.size() - offset);
+      memcpy(dest, obj->pri_key.data() + offset, copy_size);
    }
 
    return static_cast<int32_t>(kv_it_stat::iterator_ok);

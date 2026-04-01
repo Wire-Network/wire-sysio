@@ -162,10 +162,10 @@ namespace sysio::chain {
 
       kv_decoded_key decode_kv_key(const kv_object& obj) {
          kv_decoded_key dk;
-         if (obj.key_format == 1 && obj.key_size == chain::kv_key_size) {
-            dk.table_name = name(kv_decode_be64(obj.key_data()));
-            dk.scope      = name(kv_decode_be64(obj.key_data() + 8));
-            dk.primary_key = kv_decode_be64(obj.key_data() + 16);
+         if (obj.key_format == 1 && obj.key.size() == chain::kv_key_size) {
+            dk.table_name = name(kv_decode_be64(obj.key.data()));
+            dk.scope      = name(kv_decode_be64(obj.key.data() + 8));
+            dk.primary_key = kv_decode_be64(obj.key.data() + 16);
             dk.standard = true;
          }
          return dk;
@@ -196,13 +196,13 @@ namespace sysio::chain {
          if (is_new) {
             fc_dlog(_logger, "KV_OP INS {} {} {} {} {}",
                _action_id, obj.payer, obj.code,
-               fc::to_hex(obj.key_data(), obj.key_size),
+               fc::to_hex(obj.key.data(), obj.key.size()),
                fc::to_hex(obj.value.data(), obj.value.size())
             );
          } else {
             fc_dlog(_logger, "KV_OP UPD {} {}:{} {} {} {}:{}",
                _action_id, old_payer, obj.payer, obj.code,
-               fc::to_hex(obj.key_data(), obj.key_size),
+               fc::to_hex(obj.key.data(), obj.key.size()),
                fc::to_hex(old_value, old_value_size),
                fc::to_hex(obj.value.data(), obj.value.size())
             );
@@ -222,7 +222,7 @@ namespace sysio::chain {
       } else {
          fc_dlog(_logger, "KV_OP REM {} {} {} {} {}",
             _action_id, obj.payer, obj.code,
-            fc::to_hex(obj.key_data(), obj.key_size),
+            fc::to_hex(obj.key.data(), obj.key.size()),
             fc::to_hex(obj.value.data(), obj.value.size())
          );
       }

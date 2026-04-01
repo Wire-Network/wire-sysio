@@ -1833,7 +1833,7 @@ read_only::get_table_rows_by_seckey( const read_only::get_table_rows_params& p,
 
    auto collect_next = [&](const chain::kv_index_object& obj) {
       hp.more = true;
-      hp.next_key = decode_sec_key(p.key_type, obj.sec_key_data(), obj.sec_key_size, p.encode_type);
+      hp.next_key = decode_sec_key(p.key_type, obj.sec_key.data(), obj.sec_key.size(), p.encode_type);
    };
 
    bool reverse = p.reverse && *p.reverse;
@@ -1851,12 +1851,12 @@ read_only::get_table_rows_by_seckey( const read_only::get_table_rows_params& p,
          if (has_upper && itr->sec_key_view() > ub_sv)
             break;
          // Scope filter: first 8 bytes of pri_key must match scope
-         if (itr->pri_key_size < chain::kv_prefix_size) continue;
-         if (memcmp(itr->pri_key_data(), scope_be, chain::kv_table_prefix_size) != 0)
+         if (itr->pri_key.size() < chain::kv_prefix_size) continue;
+         if (memcmp(itr->pri_key.data(), scope_be, chain::kv_table_prefix_size) != 0)
             continue;
          if (count >= limit) { collect_next(*itr); break; }
          // Extract primary key (bytes 8-15 of pri_key)
-         uint64_t pk = chain::kv_decode_be64(itr->pri_key_data() + chain::kv_table_prefix_size);
+         uint64_t pk = chain::kv_decode_be64(itr->pri_key.data() + chain::kv_table_prefix_size);
          auto [data, payer] = fetch_value(pk);
          if (!data.empty()) {
             hp.rows.emplace_back(std::move(data), payer);
@@ -1884,11 +1884,11 @@ read_only::get_table_rows_by_seckey( const read_only::get_table_rows_params& p,
          if (ritr->code != p.code || ritr->table != p.table || ritr->index_id != index_id)
             break;
          // Scope filter
-         if (ritr->pri_key_size < chain::kv_prefix_size) continue;
-         if (memcmp(ritr->pri_key_data(), scope_be, chain::kv_table_prefix_size) != 0)
+         if (ritr->pri_key.size() < chain::kv_prefix_size) continue;
+         if (memcmp(ritr->pri_key.data(), scope_be, chain::kv_table_prefix_size) != 0)
             continue;
          if (count >= limit) { collect_next(*ritr); break; }
-         uint64_t pk = chain::kv_decode_be64(ritr->pri_key_data() + chain::kv_table_prefix_size);
+         uint64_t pk = chain::kv_decode_be64(ritr->pri_key.data() + chain::kv_table_prefix_size);
          auto [data, payer] = fetch_value(pk);
          if (!data.empty()) {
             hp.rows.emplace_back(std::move(data), payer);
@@ -2206,7 +2206,7 @@ read_only::get_table_by_scope_result read_only::get_table_by_scope( const read_o
    auto is_valid = [&](const auto& it) -> bool {
       return it != kv_idx.end() && it->code == p.code &&
              it->key_format == config::kv_format_standard &&
-             it->key_size == chain::kv_key_size;
+             it->key.size() == chain::kv_key_size;
    };
 
    bool reverse = p.reverse && *p.reverse;

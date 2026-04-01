@@ -20,12 +20,12 @@ BOOST_AUTO_TEST_CASE(kv_object_crud) {
    // CREATE
    const auto& obj = db.create<kv_object>([](auto& o) {
       o.code = "test"_n;
-      o.key_assign("hello", 5);
+      o.key.assign("hello", 5);
       o.value.assign("world", 5);
    });
 
    BOOST_CHECK_EQUAL(obj.code, "test"_n);
-   BOOST_CHECK_EQUAL(obj.key_size, 5);
+   BOOST_CHECK_EQUAL(obj.key.size(), 5u);
    BOOST_CHECK_EQUAL(obj.key_view(), std::string_view("hello", 5));
    BOOST_CHECK_EQUAL(std::string_view(obj.value.data(), obj.value.size()), "world");
 
@@ -67,7 +67,7 @@ BOOST_AUTO_TEST_CASE(kv_object_ordering) {
       auto k = make_key(v);
       db.create<kv_object>([&](auto& o) {
          o.code = "order"_n;
-         o.key_assign(k.data(), k.size());
+         o.key.assign(k.data(), k.size());
          o.value.assign("x", 1);
       });
    }
@@ -95,58 +95,58 @@ BOOST_AUTO_TEST_CASE(kv_key_size_limits) {
 
    auto session = db.start_undo_session(true);
 
-   // SSO path (8 bytes)
+   // Small key (8 bytes)
    {
       db.create<kv_object>([](auto& o) {
          o.code = "limits"_n;
-         o.key_assign("12345678", 8);
+         o.key.assign("12345678", 8);
          o.value.assign("v", 1);
       });
       auto& idx = db.get_index<kv_index, by_code_key>();
       auto itr = idx.find(boost::make_tuple(name("limits"), config::kv_format_raw, std::string_view("12345678", 8)));
       BOOST_REQUIRE(itr != idx.end());
-      BOOST_CHECK_EQUAL(itr->key_size, 8);
+      BOOST_CHECK_EQUAL(itr->key.size(), 8u);
    }
 
-   // SSO path (24 bytes, max inline)
+   // Standard key (24 bytes = kv_key_size)
    {
       std::string key24(24, 'A');
       db.create<kv_object>([&](auto& o) {
          o.code = "limits"_n;
-         o.key_assign(key24.data(), key24.size());
+         o.key.assign(key24.data(), key24.size());
          o.value.assign("v", 1);
       });
       auto& idx = db.get_index<kv_index, by_code_key>();
       auto itr = idx.find(boost::make_tuple(name("limits"), config::kv_format_raw, std::string_view(key24)));
       BOOST_REQUIRE(itr != idx.end());
-      BOOST_CHECK_EQUAL(itr->key_size, chain::kv_key_size);
+      BOOST_CHECK_EQUAL(itr->key.size(), chain::kv_key_size);
    }
 
-   // Heap path (32 bytes, exceeds SSO capacity)
+   // Large key (32 bytes)
    {
       std::string key32(32, 'B');
       db.create<kv_object>([&](auto& o) {
          o.code = "limits"_n;
-         o.key_assign(key32.data(), key32.size());
+         o.key.assign(key32.data(), key32.size());
          o.value.assign("v", 1);
       });
       auto& idx = db.get_index<kv_index, by_code_key>();
       auto itr = idx.find(boost::make_tuple(name("limits"), config::kv_format_raw, std::string_view(key32)));
       BOOST_REQUIRE(itr != idx.end());
-      BOOST_CHECK_EQUAL(itr->key_size, 32);
+      BOOST_CHECK_EQUAL(itr->key.size(), 32u);
    }
 
    // Empty key
    {
       db.create<kv_object>([](auto& o) {
          o.code = "limits"_n;
-         o.key_assign("", 0);
+         o.key.assign("", 0);
          o.value.assign("empty", 5);
       });
       auto& idx = db.get_index<kv_index, by_code_key>();
       auto itr = idx.find(boost::make_tuple(name("limits"), config::kv_format_raw, std::string_view("", 0)));
       BOOST_REQUIRE(itr != idx.end());
-      BOOST_CHECK_EQUAL(itr->key_size, 0);
+      BOOST_CHECK_EQUAL(itr->key.size(), 0u);
    }
 
    session.undo();
@@ -163,16 +163,16 @@ BOOST_AUTO_TEST_CASE(kv_index_object_crud) {
       o.code = "test"_n;
       o.table = "users"_n;
       o.index_id = 0;
-      o.sec_key_assign("alice", 5);
-      o.pri_key_assign("\x00\x01", 2);
+      o.sec_key.assign("alice", 5);
+      o.pri_key.assign("\x00\x01", 2);
    });
 
    db.create<kv_index_object>([](auto& o) {
       o.code = "test"_n;
       o.table = "users"_n;
       o.index_id = 0;
-      o.sec_key_assign("bob", 3);
-      o.pri_key_assign("\x00\x02", 2);
+      o.sec_key.assign("bob", 3);
+      o.pri_key.assign("\x00\x02", 2);
    });
 
    // Find by secondary key
@@ -180,12 +180,12 @@ BOOST_AUTO_TEST_CASE(kv_index_object_crud) {
    auto itr = sec_idx.lower_bound(boost::make_tuple(
       name("test"), name("users"), uint8_t(0), std::string_view("alice", 5)));
    BOOST_REQUIRE(itr != sec_idx.end());
-   BOOST_CHECK_EQUAL(std::string_view(itr->sec_key_data(), itr->sec_key_size), "alice");
+   BOOST_CHECK_EQUAL(std::string_view(itr->sec_key.data(), itr->sec_key.size()), "alice");
 
    // Verify ordering: alice < bob
    ++itr;
    BOOST_REQUIRE(itr != sec_idx.end());
-   BOOST_CHECK_EQUAL(std::string_view(itr->sec_key_data(), itr->sec_key_size), "bob");
+   BOOST_CHECK_EQUAL(std::string_view(itr->sec_key.data(), itr->sec_key.size()), "bob");
 
    session.undo();
 }
