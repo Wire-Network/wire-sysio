@@ -33,7 +33,7 @@ void auth_benchmarking() {
       });
    }
 
-   // --- Single-key authority NOT satisfied (exercises rollback) ---
+   // --- Single-key authority NOT satisfied (exercises fast-path miss) ---
    {
       auto auth = authority(1, {key_weight{pub_keys[0], 1}});
       flat_set<fc::crypto::public_key> provided{pub_keys[1]};
@@ -113,6 +113,27 @@ void auth_benchmarking() {
 
       benchmarking("auth_10keys_in_50_provided", [&]() {
          auto checker = make_auth_checker(get_null_authority, 2, provided);
+         checker.satisfied(auth);
+      });
+   }
+
+   // --- Mixed authority: 2-of-3 with keys + account (general path) ---
+   {
+      authority bob_auth(1, {key_weight{pub_keys[2], 1}});
+
+      auto auth = authority(2, {key_weight{pub_keys[0], 1}, key_weight{pub_keys[1], 1}},
+                            {permission_level_weight{{name("bob"), name("active")}, 1}});
+
+      auto get_auth = [&bob_auth](const permission_level& p) -> const authority* {
+         if (p.actor == name("bob") && p.permission == name("active"))
+            return &bob_auth;
+         return nullptr;
+      };
+
+      flat_set<fc::crypto::public_key> provided{pub_keys[0], pub_keys[2]};
+
+      benchmarking("auth_mixed_2of3_key_and_acct", [&]() {
+         auto checker = make_auth_checker(get_auth, 3, provided);
          checker.satisfied(auth);
       });
    }

@@ -113,7 +113,8 @@ namespace detail {
          }
 
       private:
-         // Overloaded key resolution: no-op for public_key_type, converts for shared_public_key
+         // Overloaded key resolution: returns reference for public_key_type, value for shared_public_key.
+         // Callers bind with `const auto&` which either aliases or extends the temporary's lifetime.
          static const public_key_type& resolve_key(const public_key_type& k) { return k; }
          static public_key_type resolve_key(const shared_public_key& k) { return k.to_public_key(); }
 
@@ -234,6 +235,7 @@ namespace detail {
 
                      // Re-lookup after recursive call (flat_map iterators may be invalidated)
                      auto cache_itr = cached_permissions.find( permission.permission );
+                     assert( cache_itr != cached_permissions.end() );
                      if( r ) {
                         total_weight += permission.weight;
                         cache_itr->second = permission_satisfied;
