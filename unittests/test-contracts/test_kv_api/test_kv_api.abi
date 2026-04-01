@@ -42,6 +42,142 @@
             ]
         },
         {
+            "name": "ramidxremov",
+            "base": "",
+            "fields": [
+                {
+                    "name": "sec_size",
+                    "type": "uint32"
+                },
+                {
+                    "name": "pri_size",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "ramidxstore",
+            "base": "",
+            "fields": [
+                {
+                    "name": "sec_size",
+                    "type": "uint32"
+                },
+                {
+                    "name": "pri_size",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "ramidxstpyr",
+            "base": "",
+            "fields": [
+                {
+                    "name": "payer",
+                    "type": "name"
+                },
+                {
+                    "name": "sec_size",
+                    "type": "uint32"
+                },
+                {
+                    "name": "pri_size",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "ramidxupdat",
+            "base": "",
+            "fields": [
+                {
+                    "name": "old_ss",
+                    "type": "uint32"
+                },
+                {
+                    "name": "new_ss",
+                    "type": "uint32"
+                },
+                {
+                    "name": "pri_size",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "ramidxuppyr",
+            "base": "",
+            "fields": [
+                {
+                    "name": "payer",
+                    "type": "name"
+                },
+                {
+                    "name": "old_ss",
+                    "type": "uint32"
+                },
+                {
+                    "name": "new_ss",
+                    "type": "uint32"
+                },
+                {
+                    "name": "pri_size",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "ramnotiferr",
+            "base": "",
+            "fields": [
+                {
+                    "name": "key_id",
+                    "type": "uint32"
+                },
+                {
+                    "name": "val_size",
+                    "type": "uint32"
+                },
+                {
+                    "name": "payer",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "ramnotify",
+            "base": "",
+            "fields": [
+                {
+                    "name": "key_id",
+                    "type": "uint32"
+                },
+                {
+                    "name": "val_size",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "rampyrset",
+            "base": "",
+            "fields": [
+                {
+                    "name": "key_id",
+                    "type": "uint32"
+                },
+                {
+                    "name": "val_size",
+                    "type": "uint32"
+                },
+                {
+                    "name": "payer",
+                    "type": "name"
+                }
+            ]
+        },
+        {
             "name": "ramstore",
             "base": "",
             "fields": [
@@ -353,7 +489,17 @@
             "fields": []
         },
         {
+            "name": "tsteraseall",
+            "base": "",
+            "fields": []
+        },
+        {
             "name": "tsterasedinv",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tsterasenext",
             "base": "",
             "fields": []
         },
@@ -364,6 +510,21 @@
         },
         {
             "name": "tstfwditer",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstidxerase",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstidxinsert",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstidxmutupd",
             "base": "",
             "fields": []
         },
@@ -443,7 +604,27 @@
             "fields": []
         },
         {
+            "name": "tstmaxkeyupd",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstmaxvalcr",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstmaxvalupd",
+            "base": "",
+            "fields": []
+        },
+        {
             "name": "tstmodify",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstmutupdval",
             "base": "",
             "fields": []
         },
@@ -453,7 +634,22 @@
             "fields": []
         },
         {
+            "name": "tstovrkyupd",
+            "base": "",
+            "fields": []
+        },
+        {
             "name": "tstovrszkey",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstovrvalcr",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstovrvalupd",
             "base": "",
             "fields": []
         },
@@ -484,6 +680,26 @@
         },
         {
             "name": "tstrbempty",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstrdoerase",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstrdoidxrm",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstrdoidxst",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstrdoidxup",
             "base": "",
             "fields": []
         },
@@ -556,12 +772,67 @@
             "name": "tstwriteperm",
             "base": "",
             "fields": []
+        },
+        {
+            "name": "xcidxread",
+            "base": "",
+            "fields": [
+                {
+                    "name": "other",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "xcsetup",
+            "base": "",
+            "fields": []
         }
     ],
     "actions": [
         {
             "name": "ramerase",
             "type": "ramerase",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "ramidxremov",
+            "type": "ramidxremov",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "ramidxstore",
+            "type": "ramidxstore",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "ramidxstpyr",
+            "type": "ramidxstpyr",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "ramidxupdat",
+            "type": "ramidxupdat",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "ramidxuppyr",
+            "type": "ramidxuppyr",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "ramnotiferr",
+            "type": "ramnotiferr",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "ramnotify",
+            "type": "ramnotify",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "rampyrset",
+            "type": "rampyrset",
             "ricardian_contract": ""
         },
         {
@@ -830,8 +1101,18 @@
             "ricardian_contract": ""
         },
         {
+            "name": "tsteraseall",
+            "type": "tsteraseall",
+            "ricardian_contract": ""
+        },
+        {
             "name": "tsterasedinv",
             "type": "tsterasedinv",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tsterasenext",
+            "type": "tsterasenext",
             "ricardian_contract": ""
         },
         {
@@ -842,6 +1123,21 @@
         {
             "name": "tstfwditer",
             "type": "tstfwditer",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstidxerase",
+            "type": "tstidxerase",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstidxinsert",
+            "type": "tstidxinsert",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstidxmutupd",
+            "type": "tstidxmutupd",
             "ricardian_contract": ""
         },
         {
@@ -915,8 +1211,28 @@
             "ricardian_contract": ""
         },
         {
+            "name": "tstmaxkeyupd",
+            "type": "tstmaxkeyupd",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstmaxvalcr",
+            "type": "tstmaxvalcr",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstmaxvalupd",
+            "type": "tstmaxvalupd",
+            "ricardian_contract": ""
+        },
+        {
             "name": "tstmodify",
             "type": "tstmodify",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstmutupdval",
+            "type": "tstmutupdval",
             "ricardian_contract": ""
         },
         {
@@ -925,8 +1241,23 @@
             "ricardian_contract": ""
         },
         {
+            "name": "tstovrkyupd",
+            "type": "tstovrkyupd",
+            "ricardian_contract": ""
+        },
+        {
             "name": "tstovrszkey",
             "type": "tstovrszkey",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstovrvalcr",
+            "type": "tstovrvalcr",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstovrvalupd",
+            "type": "tstovrvalupd",
             "ricardian_contract": ""
         },
         {
@@ -957,6 +1288,26 @@
         {
             "name": "tstrbempty",
             "type": "tstrbempty",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstrdoerase",
+            "type": "tstrdoerase",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstrdoidxrm",
+            "type": "tstrdoidxrm",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstrdoidxst",
+            "type": "tstrdoidxst",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstrdoidxup",
+            "type": "tstrdoidxup",
             "ricardian_contract": ""
         },
         {
@@ -1027,6 +1378,16 @@
         {
             "name": "tstwriteperm",
             "type": "tstwriteperm",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "xcidxread",
+            "type": "xcidxread",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "xcsetup",
+            "type": "xcsetup",
             "ricardian_contract": ""
         }
     ],
