@@ -41,12 +41,12 @@ namespace sysio { namespace chain {
    SYS_ASSERT( max_action_return_value_size <= MAX_SIZE_OF_BYTE_ARRAYS, action_validate_exception,
                "max action return value size should be less than MAX_SIZE_OF_BYTE_ARRAYS" );
 
-   SYS_ASSERT( max_kv_key_size >= 1 && max_kv_key_size <= 1024, action_validate_exception,
-               "max KV key size must be between 1 and 1024" );
-   SYS_ASSERT( max_kv_value_size >= 1 && max_kv_value_size <= 1024*1024, action_validate_exception,
-               "max KV value size must be between 1 and 1 MiB" );
-   SYS_ASSERT( max_kv_secondary_key_size >= 1 && max_kv_secondary_key_size <= 1024, action_validate_exception,
-               "max KV secondary key size must be between 1 and 1024" );
+   SYS_ASSERT( max_kv_key_size >= 1 && max_kv_key_size <= config::max_kv_key_size_limit, action_validate_exception,
+               "max KV key size must be between 1 and {}", config::max_kv_key_size_limit );
+   SYS_ASSERT( max_kv_value_size >= 1 && max_kv_value_size <= config::max_kv_value_size_limit, action_validate_exception,
+               "max KV value size must be between 1 and {}", config::max_kv_value_size_limit );
+   SYS_ASSERT( max_kv_secondary_key_size >= 1 && max_kv_secondary_key_size <= config::max_kv_key_size_limit, action_validate_exception,
+               "max KV secondary key size must be between 1 and {}", config::max_kv_key_size_limit );
 }
 
 bool config_entry_validator::operator()(uint32_t id) const {

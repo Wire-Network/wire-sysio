@@ -115,6 +115,9 @@ namespace sysio::chain::config {
   static constexpr uint32_t   default_max_kv_key_size           = 256;       ///< maximum KV primary key size in bytes
   static constexpr uint32_t   default_max_kv_value_size         = 256*1024;  ///< maximum KV value size (256 KiB)
   static constexpr uint32_t   default_max_kv_secondary_key_size = 256;       ///< maximum KV secondary key size in bytes
+  // KV absolute upper bounds (governance cannot exceed these)
+  static constexpr uint32_t   max_kv_key_size_limit             = 1024;      ///< absolute max for primary and secondary key sizes
+  static constexpr uint32_t   max_kv_value_size_limit           = 1024*1024; ///< absolute max for value size (1 MiB)
   // Iterator limit is hardcoded (ephemeral per-transaction, bounded by CPU)
   static constexpr uint32_t   max_kv_iterators                  = 1024;
   static constexpr uint8_t    kv_format_raw                     = 0;         ///< raw key bytes (variable-length, used by kv::raw_table)
