@@ -15,8 +15,8 @@ expected_results = [
         "file": "unittests/snapshots/snap_v1.bin.gz",
         "result": {
             "version": 1,
-            "chain_id": "PLACEHOLDER_NEEDS_REGENERATION",
-            "head_block_id": "PLACEHOLDER_NEEDS_REGENERATION",
+            "chain_id": "144035215e20fd016e2b4b065349c959a1070fcbb0dc3f4784f3130685e774fc",
+            "head_block_id": "0000001db8ed54f83aa97ed6112a0f39568705ead8d2c50ffe4c4c28e193aab3",
             "head_block_num": 29,
             "head_block_time": "2025-01-01T00:00:14.000"
         }
