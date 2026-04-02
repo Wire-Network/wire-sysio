@@ -405,6 +405,7 @@ void beacon_chain_update_plugin::plugin_initialize(const variables_map& options)
    }
    else {
       ilog("No beacon chain interval schedules provided, using `{}` schedule with name `{}`", default_interval_schedule, default_interval_name);
+      my->actual_default_schedule = default_interval_name;
       my->schedules.emplace(default_interval_name, services::parse_cron_schedule_or_throw(default_interval_schedule));
    }
 
