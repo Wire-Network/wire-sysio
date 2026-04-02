@@ -140,11 +140,16 @@ void apply_context::exec_one()
    r.global_sequence  = next_global_sequence();
    r.recv_sequence    = next_recv_sequence( *receiver_account );
 
+   // Use cached first-receiver metadata for notifications to avoid redundant DB lookups.
+   // act->account is invariant across the notification loop in exec().
    const account_metadata_object* first_receiver_account_metadata = nullptr;
    if( act->account == receiver ) {
       first_receiver_account_metadata = receiver_account_metadata;
+      _first_receiver_metadata = receiver_account_metadata; // cache for subsequent notifications
    } else {
-      first_receiver_account_metadata = db.find<account_metadata_object, by_name>(act->account);
+      if( !_first_receiver_metadata.has_value() )
+         _first_receiver_metadata = db.find<account_metadata_object, by_name>(act->account);
+      first_receiver_account_metadata = _first_receiver_metadata.value();
    }
 
    r.code_sequence    = first_receiver_account_metadata != nullptr ? first_receiver_account_metadata->code_sequence : 0; // could be modified by action execution above
