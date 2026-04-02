@@ -141,8 +141,7 @@ void transaction_dedup::commit_to_lib(uint32_t block_num) {
 // --- File persistence (uses snapshot format for integrity and code reuse) ---
 
 void transaction_dedup::write_to_file(const std::filesystem::path& filepath) const {
-   auto tmp = filepath;
-   tmp += ".tmp";
+   const auto tmp = filepath.string() + ".tmp";
 
    auto writer = std::make_shared<threaded_snapshot_writer>(tmp);
    add_to_snapshot(writer);
