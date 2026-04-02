@@ -125,6 +125,7 @@ namespace {
          throw beast::system_error(beast::error_code(static_cast<int>(::ERR_get_error()),
                                                      asio::error::get_ssl_category()));
 
+      beast::get_lowest_layer(stream).expires_after(std::chrono::seconds(120));
       beast::get_lowest_layer(stream).connect(dest);
       stream.handshake(asio::ssl::stream_base::client);
       http::write(stream, req);
