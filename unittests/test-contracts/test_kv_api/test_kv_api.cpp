@@ -1051,7 +1051,7 @@ public:
       memset(key, 0xB0, 256);
       kv_set(key_format, 0, key, 256, "v1", 2);  // create
       kv_set(key_format, 0, key, 256, "v2", 2);  // update — same key, different value
-      char buf[4]; uint32_t actual = 0;
+      char buf[4];
       check(kv_get(key_format, get_self().value, key, 256, buf, 4) == 2, "maxkeyupd: value size");
       check(memcmp(buf, "v2", 2) == 0, "maxkeyupd: value should be updated");
    }
@@ -2401,7 +2401,7 @@ public:
 
    // Send notification — receiver's on_notify handler does self-pay kv_set
    [[sysio::action]]
-   void ramnotify(uint32_t key_id, uint32_t val_size) {
+   void ramnotify([[maybe_unused]] uint32_t key_id, [[maybe_unused]] uint32_t val_size) {
       require_recipient("kvnotify"_n);
    }
 
@@ -2416,7 +2416,7 @@ public:
 
    // Send notification — receiver's handler tries third-party payer
    [[sysio::action]]
-   void ramnotiferr(uint32_t key_id, uint32_t val_size, sysio::name payer) {
+   void ramnotiferr([[maybe_unused]] uint32_t key_id, [[maybe_unused]] uint32_t val_size, [[maybe_unused]] sysio::name payer) {
       require_recipient("kvnotify"_n);
    }
 
