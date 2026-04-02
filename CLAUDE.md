@@ -204,11 +204,89 @@ cd $BUILD_DIR && python3 tests/<test_name>.py
 ```
 Do NOT run from the source root — that would use stale or missing binaries.
 
-## Smart Contract Compilation
+## Smart Contract Compilation (System Contracts specifically)
 
 The system contracts are compiled via the `contracts_project` CMake target.
 
 > DO NOT COMPILE THE SYSTEM CONTRACTS DIRECTLY! Always use the `contracts_project` target.
+
+### CDT-Generated Artifacts
+
+> NOTE: There are `.gitignore` files specifically excluding the artifacts described below
+> but just in case, here are the details
+
+CDT generates `.actions.cpp`, `.dispatch.cpp`, and `.desc` files alongside compiled contracts. These are **not committed** — `.gitignore` files in `contracts/` and `unittests/test-contracts/` exclude them. If they appear as untracked, delete them:
+
+```bash
+find contracts/ unittests/test-contracts/ -name "*.actions.cpp" -o -name "*.dispatch.cpp" -o -name "*.desc" | xargs rm -f
+```
+
+## Generate client types for system contracts
+
+> NOTE: In a dev environment, `pnpm link` should be configured to avoid the need to publish
+> the contract types changes until fully integrated. If the host OS system username is in
+> the following list, then packages have been linked and the following does not
+> require publishing [`jglanz`]
+
+To generate the client types for the system contracts,run the following commands.
+
+`<wire-sysio>/contracts/tools/generate-system-contract-types.py -B . -O /tmp/ctt -P snake -f` then `cp
+  /tmp/ctt/typescript/SystemContractTypes.ts  <wire-libraries-ts>/packages/sdk-core/src/types/` and lastly run `cd <wire-libraries-ts> &&
+  pnpm build`
+
+This makes the types available in the SDK as:
+```ts
+import { SystemContracts } from '@wire-libraries/sdk-core';
+```
+
+
+## Regenerating Test Reference Data
+
+Some tests compare against pre-generated reference data. When contracts are recompiled (different WASM = different action merkle roots), this data must be regenerated.
+
+### Deep Mind Log
+
+The `deep_mind_tests` compare against `unittests/deep-mind/deep-mind.log`. To regenerate:
+```bash
+$BUILD_DIR/unittests/unit_test --run_test=deep_mind_tests -- --sys-vm --save-dmlog
+```
+
+### Snapshot Compatibility Data
+
+The `snapshot_part2_tests/test_compatible_versions` test uses reference blockchain and snapshot files in `unittests/snapshots/`. To regenerate:
+
+**Step 1:** Delete stale files from BOTH source and build directories. The `--save-snapshot` run replays blocks.log if it exists — if it contains WASMs with old host function signatures, replay fails with `wasm_serialization_error: wrong type for imported function`. You must delete first:
+```bash
+rm -f unittests/snapshots/blocks.* unittests/snapshots/snap_v1.*
+rm -f $BUILD_DIR/unittests/snapshots/blocks.* $BUILD_DIR/unittests/snapshots/snap_v1.*
+```
+
+**Step 2:** Regenerate. This creates a fresh blockchain, deploys the current embedded contracts, and writes new reference files:
+```bash
+$BUILD_DIR/unittests/unit_test --run_test="snapshot_part2_tests/*" -- --sys-vm --save-snapshot --generate-snapshot-log
+```
+The test writes to `$BUILD_DIR/unittests/snapshots/` (NOT the source tree, despite the flag description).
+
+**Step 3:** Copy from build dir to source tree (for git), and ensure the build dir has them for subsequent test runs:
+```bash
+cp $BUILD_DIR/unittests/snapshots/blocks.* $BUILD_DIR/unittests/snapshots/snap_v1.* unittests/snapshots/
+```
+
+**Step 4:** Re-run CMake or ninja so `configure_file` picks up the new source-tree files:
+
+```bash
+cmake --build $BUILD_DIR --target unit_test
+```
+If CMake fails because snapshot files are missing from the source tree, run step 3 first.
+
+**Common pitfall:** If you only delete source-tree files but not build-dir files, the test replays the stale build-dir blocks.log and fails. Always delete from both locations.
+
+### Consensus Blockchain Data
+
+The `savanna_misc_tests/verify_block_compatibitity` test uses `unittests/test-data/consensus_blockchain/`. To regenerate:
+```bash
+$BUILD_DIR/unittests/unit_test -t "savanna_misc_tests/verify_block_compatibitity" -- --sys-vm --save-blockchain
+```
 
 ### When to Regenerate
 
@@ -216,10 +294,3 @@ Regenerate all reference data whenever:
 - Any production contract is recompiled (changes action merkle roots)
 - Chain-level serialization changes (block format, snapshot format)
 - Genesis intrinsics change (different genesis state)
-
-
-## Generate client types for system contracts
-
-`<wire-sysio>/contracts/tools/generate-system-contract-types.py -B . -O /tmp/ctt -P snake -f` then `cp
-  /tmp/ctt/typescript/SystemContractTypes.ts  <wire-libraries-ts>/packages/sdk-core/src/types/` and lastly run `cd <wire-libraries-ts> &&
-  pnpm build`
