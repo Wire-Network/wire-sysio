@@ -1611,7 +1611,7 @@ struct controller_impl {
          });
       });
 
-      trx_dedup.add_to_snapshot(snapshot, db);
+      trx_dedup.add_to_snapshot(snapshot);
 
       add_kv_rows_to_snapshot(snapshot, row_counter);
 

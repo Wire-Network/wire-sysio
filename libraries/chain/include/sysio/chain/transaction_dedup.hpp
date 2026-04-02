@@ -15,8 +15,8 @@ namespace sysio::chain {
 /// High-performance transaction deduplication index.
 /// Replaces the chainbase transaction_multi_index with O(1) amortized operations.
 ///
-/// Supports revision-based undo (like chainbase) so that pop_block during fork
-/// switches correctly restores the dedup state.
+/// Supports revision-based undo (like chainbase) so that pop_block during a fork
+/// switch correctly restores the dedup state.
 class transaction_dedup {
 public:
    using dedup_entry = std::pair<transaction_id_type, fc::time_point_sec>;
@@ -58,12 +58,12 @@ public:
    /// Called when LIB advances (mirrors chainbase db.commit(block_num)).
    void commit_to_lib(uint32_t block_num);
 
-   /// Persistence — clean shutdown file.
+   /// Persistence — uses snapshot format for integrity (BLAKE3) and code reuse.
    void write_to_file(const std::filesystem::path& filepath) const;
    bool read_from_file(const std::filesystem::path& filepath);
 
    /// Snapshot support.
-   void add_to_snapshot(const snapshot_writer_ptr& snapshot, const chainbase::database& db) const;
+   void add_to_snapshot(const snapshot_writer_ptr& snapshot) const;
    void read_from_snapshot(const snapshot_reader_ptr& snapshot);
 
    size_t size() const { return map_.size(); }

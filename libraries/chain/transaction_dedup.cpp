@@ -1,17 +1,12 @@
 #include <sysio/chain/transaction_dedup.hpp>
 #include <sysio/chain/exceptions.hpp>
 
-#include <fc/io/cfile.hpp>
-#include <fc/io/raw.hpp>
 #include <fc/log/logger.hpp>
 
 #include <filesystem>
 #include <ranges>
 
 namespace sysio::chain {
-
-static constexpr uint32_t dedup_file_magic   = 0x44454450; // "DEDP"
-static constexpr uint32_t dedup_file_version = 1;
 
 transaction_dedup::transaction_dedup() {
    map_.reserve(default_map_capacity);
@@ -137,30 +132,21 @@ void transaction_dedup::pop_block_revision() {
 
 void transaction_dedup::commit_to_lib(uint32_t block_num) {
    auto it = committed_revisions_.begin();
-   while (it != committed_revisions_.end() && it->block_num <= block_num)
+   while (it != committed_revisions_.end() && it->block_num <= block_num) {
       ++it;
+   }
    committed_revisions_.erase(committed_revisions_.begin(), it);
 }
 
-// --- File persistence ---
+// --- File persistence (uses snapshot format for integrity and code reuse) ---
 
 void transaction_dedup::write_to_file(const std::filesystem::path& filepath) const {
    auto tmp = filepath;
    tmp += ".tmp";
 
-   fc::cfile f;
-   f.set_file_path(tmp);
-   f.open("wb");
-
-   fc::raw::pack(f, dedup_file_magic);
-   fc::raw::pack(f, dedup_file_version);
-   uint64_t count = deque_.size();
-   fc::raw::pack(f, count);
-   for (const auto& [id, exp] : deque_) {
-      fc::raw::pack(f, id);
-      fc::raw::pack(f, exp);
-   }
-   f.close();
+   auto writer = std::make_shared<threaded_snapshot_writer>(tmp);
+   add_to_snapshot(writer);
+   writer->finalize();
 
    std::filesystem::rename(tmp, filepath);
 }
@@ -170,33 +156,10 @@ bool transaction_dedup::read_from_file(const std::filesystem::path& filepath) {
       return false;
 
    try {
-      fc::cfile f;
-      f.set_file_path(filepath);
-      f.open("rb");
+      auto reader = std::make_shared<threaded_snapshot_reader>(filepath);
+      reader->validate();
+      read_from_snapshot(reader);
 
-      uint32_t magic = 0, version = 0;
-      fc::raw::unpack(f, magic);
-      fc::raw::unpack(f, version);
-      SYS_ASSERT(magic == dedup_file_magic && version == dedup_file_version,
-                 chain_exception, "Invalid transaction_dedup file: magic={} version={}", magic, version);
-
-      uint64_t count = 0;
-      fc::raw::unpack(f, count);
-
-      reset();
-      map_.reserve(std::max(static_cast<size_t>(count), default_map_capacity));
-
-      for (uint64_t i = 0; i < count; ++i) {
-         transaction_id_type id;
-         fc::time_point_sec exp;
-         fc::raw::unpack(f, id);
-         fc::raw::unpack(f, exp);
-         map_.emplace(id, exp);
-         deque_.emplace_back(id, exp);
-      }
-      f.close();
-
-      ilog("Read {} transaction dedup entries from {}", count, filepath.generic_string());
       std::filesystem::remove(filepath);
       return true;
    } catch (const fc::exception& e) {
@@ -208,10 +171,10 @@ bool transaction_dedup::read_from_file(const std::filesystem::path& filepath) {
 
 // --- Snapshot support ---
 
-void transaction_dedup::add_to_snapshot(const snapshot_writer_ptr& snapshot, const chainbase::database& db) const {
-   snapshot->write_section("sysio::chain::transaction_dedup", [this, &db](auto& section) {
+void transaction_dedup::add_to_snapshot(const snapshot_writer_ptr& snapshot) const {
+   snapshot->write_section("sysio::chain::transaction_dedup", [this](auto& section) {
       for (const auto& [id, exp] : deque_) {
-         section.add_row(snapshot_transaction_dedup_entry{id, exp}, db);
+         section.add_row(snapshot_transaction_dedup_entry{id, exp});
       }
    });
 }
