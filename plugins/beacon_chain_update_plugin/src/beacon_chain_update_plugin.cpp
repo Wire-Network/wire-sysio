@@ -159,7 +159,18 @@ namespace {
       auto    port = std::to_string(url.port().value_or(443));
       auto    path = url.path().value_or(std::filesystem::path("/")).string();
       if (api_key && !api_key->empty()) {
+         static bool initialized = false;
+
+         if (!initialized) {
+            auto res = curl_global_init(CURL_GLOBAL_DEFAULT);
+            SYS_ASSERT(res == CURLE_OK, chain::http_exception, "{}", curl_easy_strerror(res));
+            initialized = true;
+         }
+
          char* escaped = curl_easy_escape(nullptr, api_key->c_str(), static_cast<int>(api_key->size()));
+         SYS_ASSERT(escaped != nullptr,
+                  sysio::chain::plugin_config_exception,
+                  "curl error occurred while performing curl_easy_escape");
          path += "?apikey=";
          path += escaped;
          curl_free(escaped);
