@@ -479,16 +479,15 @@ std::string ethereum_client::send_raw_transaction(const std::string& raw_tx_data
 }
 
 /**
- * @brief Sends a signed raw transaction and returns the tx hash plus a future for the block number
+ * @brief Returns a future that resolves to the block number for a given transaction hash
  *
- * Submits a pre-signed transaction via eth_sendRawTransaction, then spawns a background thread
- * that polls eth_getTransactionReceipt once per second until the receipt is available. When the
- * receipt arrives, the thread fulfills the promise with the block number (as uint64_t) of the
- * block the transaction was included in.
+ * Given a transaction hash for a previously submitted transaction, this method spawns a
+ * background thread that polls eth_getTransactionReceipt once per second until the receipt
+ * is available. When the receipt arrives, the thread fulfills the promise with the block
+ * number (as uint64_t) of the block the transaction was included in.
  *
- * @param raw_tx_data The signed, RLP-encoded transaction data (hex string with "0x" prefix)
- * @return A pair of the transaction hash string and a future<uint64_t> that resolves to the
- *         block number once the transaction is mined
+ * @param tx_hash The transaction hash (hex string with "0x" prefix) of the submitted transaction
+ * @return A std::future<uint64_t> that resolves to the block number once the transaction is mined
  */
 std::future<uint64_t> ethereum_client::identify_block_for_transaction(const std::string& tx_hash) {
    std::promise<uint64_t> promise;
