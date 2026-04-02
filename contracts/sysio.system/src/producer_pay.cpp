@@ -32,9 +32,28 @@ namespace sysiosystem {
        */
       auto prod = _producers.find( producer.value );
       if ( prod != _producers.end() ) {
+         uint32_t block_seq = _gstate.total_unpaid_blocks; // capture BEFORE increment
          _gstate.total_unpaid_blocks++;
-         _producers.modify( prod, same_payer, [&](auto& p ) {
-               p.unpaid_blocks++;
+         _producers.modify( prod, same_payer, [&](auto& p) {
+            p.unpaid_blocks++;
+
+            // Round boundary detection: gap in sequence = new round started
+            if (p.last_block_num != no_prev_block && block_seq != p.last_block_num + 1) {
+               // Previous round ended - check threshold
+               if (p.current_round_blocks >= min_blocks_per_round_for_pay) {
+                  p.eligible_rounds++;
+               }
+               p.current_round_blocks = 0;
+            }
+
+            p.current_round_blocks++;
+            p.last_block_num = block_seq;
+
+            // Full round always eligible
+            if (p.current_round_blocks >= blocks_per_round) {
+               p.eligible_rounds++;
+               p.current_round_blocks = 0;
+            }
          });
       }
 
