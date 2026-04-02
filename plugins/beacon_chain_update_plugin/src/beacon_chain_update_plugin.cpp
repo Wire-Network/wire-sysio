@@ -198,6 +198,13 @@ namespace {
       auto response = fc::json::from_string(res.body());
       return response["data"];
    }
+
+   uint64_t get_block_number(std::future<uint64_t>& bn_future) {
+      SYS_ASSERT(bn_future.wait_for(std::chrono::minutes(10)) == std::future_status::ready,
+                 sysio::chain::plugin_config_exception,
+                 "transaction has not made it into a block before reaching timeout");
+      return bn_future.get();
+   }
 }
 
 namespace beacon_chain_detail {
@@ -231,6 +238,10 @@ namespace beacon_chain_detail {
 
       const auto now_sec = fc::time_point::now().sec_since_epoch();
       const auto epa = epa_var->as_uint64();
+      if (epa <= now_sec) {
+         wlog("queue {} epa={} is in the past (now={}), returning nullopt", queue_branch, epa, now_sec);
+         return std::nullopt;
+      }
       const auto eta = epa - now_sec;
       ilog("Determined eta={} from now={} and epa={} on branch={}",
            eta, now_sec, epa, queue_branch);
@@ -294,7 +305,6 @@ public:
                SYS_ASSERT(!client, sysio::chain::plugin_config_exception,
                         "There should only be one ethereum client provided, but there were at least 2");
                client = client_entry->client;
-               break;
             }
          }
          SYS_ASSERT(!!client, sysio::chain::plugin_config_exception,
@@ -454,7 +464,7 @@ void beacon_chain_update_plugin::plugin_initialize(const variables_map& options)
                const auto tx_hash1 = res1.as_string();
                ilog("setWithdrawDelay tx sent, hash: {}", tx_hash1);
                auto bn1 = eth_client->identify_block_for_transaction(tx_hash1);
-               ilog("tx in block number {}", bn1.get());
+               ilog("tx in block number {}", get_block_number(bn1));
             }
 
             if(!dm_contract)
@@ -483,9 +493,10 @@ void beacon_chain_update_plugin::plugin_initialize(const variables_map& options)
             const auto tx_hash2 = res2.as_string();
             ilog("setEntryQueue tx sent, hash: {}", tx_hash2);
             auto bn2 = eth_client->identify_block_for_transaction(tx_hash2);
-            ilog("tx in block number {}", bn2.get());
 
             auto ethstore = get_ethstore_latest(my_.beacon_chain_apy_url, *(my_.beacon_chain_api_key));
+            // make request for ethstore before waiting for block
+            ilog("tx in block number {}", get_block_number(bn2));
             ilog("ethstore: {}", fc::json::to_string(ethstore, fc::time_point::maximum()));
             constexpr auto avgapr7d_field = "avgapr7d";
             const auto apy = beacon_chain_detail::get_field_from_object(ethstore, avgapr7d_field);
@@ -502,7 +513,7 @@ void beacon_chain_update_plugin::plugin_initialize(const variables_map& options)
             const auto tx_hash3 = res3.as_string();
             ilog("updateApyBPS tx sent, hash: {}", tx_hash3);
             auto bn3 = eth_client->identify_block_for_transaction(tx_hash3);
-            ilog("tx in block number {}", bn3.get());
+            ilog("tx in block number {}", get_block_number(bn3));
          }
          catch (const std::exception& e) {
             elog("Error executing beacon chain update for interval: {}", e.what());
@@ -566,9 +577,11 @@ void beacon_chain_update_plugin::plugin_startup() {
       }
       ilog("{} actions to register for interval {}", actions.size(), name);
 
-      cron.add_job(schedule, [&name, &actions]() {
+      cron.add_job(schedule, [my_=my, name=std::string{name}]() {
          ilog("Executing beacon chain update for {}", name);
-         for(const auto& action : actions) {
+         auto it = my_->intervals.find(name);
+         if (it == my_->intervals.end()) return;
+         for(const auto& action : it->second) {
             try {
                action();
             }

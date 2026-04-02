@@ -494,10 +494,17 @@ std::future<uint64_t> ethereum_client::identify_block_for_transaction(const std:
    std::promise<uint64_t> promise;
    std::future<uint64_t> future = promise.get_future();
 
-   std::thread([this, tx_hash, p = std::move(promise)]() mutable {
+   constexpr int max_retries = 600; // 10 minutes at 1s/poll
+   std::thread([weak=weak_from_this(), tx_hash, p = std::move(promise)]() mutable {
       try {
-         while (true) {
-            auto receipt = get_transaction_receipt(tx_hash);
+         for (int attempt = 0; attempt < max_retries; ++attempt) {
+            auto self = weak.lock();
+            if (!self) {
+               p.set_exception(std::make_exception_ptr(
+                  std::runtime_error("ethereum_client destroyed before transaction was mined")));
+               return;
+            }
+            auto receipt = self->get_transaction_receipt(tx_hash);
             if (!receipt.is_null()) {
                const auto& obj = receipt.get_object();
                if (obj.contains("blockNumber") && !obj["blockNumber"].is_null()) {
@@ -507,12 +514,14 @@ std::future<uint64_t> ethereum_client::identify_block_for_transaction(const std:
             }
             std::this_thread::sleep_for(std::chrono::seconds(1));
          }
+         p.set_exception(std::make_exception_ptr(
+            std::runtime_error("transaction not mined within timeout")));
       } catch (...) {
          p.set_exception(std::current_exception());
       }
    }).detach();
 
-   return std::move(future);
+   return future;
 }
 
 /**

@@ -7,6 +7,16 @@
 
 using namespace sysio::beacon_chain_detail;
 
+namespace {
+   constexpr uint64_t far_future_epa = 4102444800ull; // 2100-01-01 00:00:00 UTC
+
+   fc::variant make_queue(const char* branch_name) {
+      auto json = std::string("{\"") + branch_name + R"(": {"estimated_processed_at": )" +
+                  std::to_string(far_future_epa) + "}}";
+      return fc::json::from_string(json);
+   }
+}
+
 BOOST_AUTO_TEST_SUITE(beacon_chain_update_detail_tests)
 
 // ---------------------------------------------------------------------------
@@ -69,33 +79,29 @@ BOOST_AUTO_TEST_CASE(get_queue_length_non_numeric_epa_throws) {
 }
 
 BOOST_AUTO_TEST_CASE(get_queue_length_branch_not_object_throws) {
-   // branch present but is a scalar, not an object — get_field_from_object on it will return empty
    auto queues = fc::json::from_string(R"({"exit_queue": 12345})");
    BOOST_CHECK_THROW(get_queue_length(queues, "exit_queue"), sysio::chain::plugin_config_exception);
 }
 
 BOOST_AUTO_TEST_CASE(get_queue_length_valid_returns_eta) {
-   // Use a far-future epoch (year 2100) to guarantee epa > now_sec for the duration of any test run
-   constexpr uint64_t far_future_epa = 4102444800ull; // 2100-01-01 00:00:00 UTC
-   auto queues_str = std::string(R"({"exit_queue": {"estimated_processed_at": )") +
-                     std::to_string(far_future_epa) + "}}";
-   auto queues = fc::json::from_string(queues_str);
-   auto result = get_queue_length(queues, "exit_queue");
+   auto result = get_queue_length(make_queue("exit_queue"), "exit_queue");
    BOOST_REQUIRE(result.has_value());
-   // The ETA should be a large positive number (many seconds until year 2100)
    BOOST_CHECK_GT(*result, uint64_t{0});
-   // Sanity: eta must be less than far_future_epa itself (since now_sec > 0)
+   // eta must be less than the raw epoch (now_sec > 0, so delta < epa)
    BOOST_CHECK_LT(*result, far_future_epa);
 }
 
 BOOST_AUTO_TEST_CASE(get_queue_length_deposit_queue_branch) {
-   constexpr uint64_t far_future_epa = 4102444800ull;
-   auto queues_str = std::string(R"({"deposit_queue": {"estimated_processed_at": )") +
-                     std::to_string(far_future_epa) + "}}";
-   auto queues = fc::json::from_string(queues_str);
-   auto result = get_queue_length(queues, "deposit_queue");
+   auto result = get_queue_length(make_queue("deposit_queue"), "deposit_queue");
    BOOST_REQUIRE(result.has_value());
    BOOST_CHECK_GT(*result, uint64_t{0});
+}
+
+BOOST_AUTO_TEST_CASE(get_queue_length_past_epa_returns_empty) {
+   // epa=1 is in the past; should return nullopt rather than wrapping
+   auto queues = fc::json::from_string(R"({"exit_queue": {"estimated_processed_at": 1}})");
+   auto result = get_queue_length(queues, "exit_queue");
+   BOOST_CHECK(!result.has_value());
 }
 
 // ---------------------------------------------------------------------------
