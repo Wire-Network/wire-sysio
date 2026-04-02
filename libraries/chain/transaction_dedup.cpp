@@ -37,18 +37,25 @@ bool transaction_dedup::is_known(const transaction_id_type& id) const {
 }
 
 std::pair<uint32_t, size_t> transaction_dedup::clear_expired(fc::time_point block_time) {
+   // clear_expired must not be called after record() within the same block.
+   // If record() was called, deque_ would be larger than deque_size_at_start.
+   assert(!pending_revision_ || deque_.size() == pending_revision_->deque_size_at_start);
    const auto total = deque_.size();
-   uint32_t num_removed = 0;
-   while (!deque_.empty() && block_time > deque_.front().second.to_time_point()) {
-      auto entry = deque_.front();
-      map_.erase(entry.first);
-      deque_.pop_front();
+   // Scan for the expiration boundary so they can be removed in one erase call
+   auto it = deque_.begin();
+   while (it != deque_.end() && block_time > it->second.to_time_point())
+      ++it;
+   const auto num_removed = static_cast<uint32_t>(it - deque_.begin());
+   if (num_removed > 0) {
+      for (auto scan = deque_.begin(); scan != it; ++scan) {
+         map_.erase(scan->first);
+         if (pending_revision_)
+            pending_revision_->expired.push_back(*scan);
+      }
+      deque_.erase(deque_.begin(), it);
       if (pending_revision_)
-         pending_revision_->expired.push_back(std::move(entry));
-      ++num_removed;
+         pending_revision_->deque_size_at_start = deque_.size();
    }
-   if (pending_revision_ && num_removed > 0)
-      pending_revision_->deque_size_at_start = deque_.size();
    return {num_removed, total};
 }
 
@@ -68,10 +75,9 @@ void transaction_dedup::undo_session() {
       return;
    auto restore_size = session_stack_.back();
    session_stack_.pop_back();
-   while (deque_.size() > restore_size) {
-      map_.erase(deque_.back().first);
-      deque_.pop_back();
-   }
+   for (auto it = deque_.begin() + restore_size; it != deque_.end(); ++it)
+      map_.erase(it->first);
+   deque_.erase(deque_.begin() + restore_size, deque_.end());
    // Sessions are always pushed after clear_expired runs, so undo can never
    // shrink the deque below the block revision's start point. If this fires,
    // the call ordering in start_block has been broken.
@@ -100,11 +106,10 @@ void transaction_dedup::abort_block_revision() {
    if (!pending_revision_)
       return;
    session_stack_.clear();
-   // Undo entries added during this block (pop from back)
-   while (deque_.size() > pending_revision_->deque_size_at_start) {
-      map_.erase(deque_.back().first);
-      deque_.pop_back();
-   }
+   // Undo entries added during this block
+   for (auto it = deque_.begin() + pending_revision_->deque_size_at_start; it != deque_.end(); ++it)
+      map_.erase(it->first);
+   deque_.erase(deque_.begin() + pending_revision_->deque_size_at_start, deque_.end());
    // Restore entries that were cleared by clear_expired during this block (push to front)
    for (const auto& entry : std::views::reverse(pending_revision_->expired)) {
       deque_.push_front(entry);
@@ -118,11 +123,10 @@ void transaction_dedup::pop_block_revision() {
       return;
 
    const auto& rev = committed_revisions_.back();
-   // Undo entries added during this block (pop from back to the size at block start)
-   while (deque_.size() > rev.deque_size_at_start) {
-      map_.erase(deque_.back().first);
-      deque_.pop_back();
-   }
+   // Undo entries added during this block (back to the size at block start)
+   for (auto it = deque_.begin() + rev.deque_size_at_start; it != deque_.end(); ++it)
+      map_.erase(it->first);
+   deque_.erase(deque_.begin() + rev.deque_size_at_start, deque_.end());
    // Restore entries that were cleared by clear_expired during this block
    for (const auto& entry : std::views::reverse(rev.expired)) {
       deque_.push_front(entry);
@@ -132,9 +136,10 @@ void transaction_dedup::pop_block_revision() {
 }
 
 void transaction_dedup::commit_to_lib(uint32_t block_num) {
-   while (!committed_revisions_.empty() && committed_revisions_.front().block_num <= block_num) {
-      committed_revisions_.pop_front();
-   }
+   auto it = committed_revisions_.begin();
+   while (it != committed_revisions_.end() && it->block_num <= block_num)
+      ++it;
+   committed_revisions_.erase(committed_revisions_.begin(), it);
 }
 
 // --- File persistence ---
