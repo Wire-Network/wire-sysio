@@ -91,7 +91,15 @@ namespace detail {
       }
 
       static void from_snapshot_row(snapshot_kv_object&& row, kv_object& obj, chainbase::database&) {
+         static_assert(config::KV_FORMAT_COUNT == 2,
+                       "Update kv_object snapshot key_format validation when adding new formats");
+         SYS_ASSERT(row.key_format < config::KV_FORMAT_COUNT,
+                    snapshot_validation_exception, "kv_object has invalid key_format ({})", row.key_format);
          SYS_ASSERT(!row.key.empty(), snapshot_validation_exception, "kv_object has empty key");
+         SYS_ASSERT(row.key.size() <= config::max_kv_key_size_limit, snapshot_validation_exception,
+                    "kv_object key size ({}) exceeds absolute limit ({})", row.key.size(), config::max_kv_key_size_limit);
+         SYS_ASSERT(row.value.size() <= config::max_kv_value_size_limit, snapshot_validation_exception,
+                    "kv_object value size ({}) exceeds absolute limit ({})", row.value.size(), config::max_kv_value_size_limit);
          obj.code       = row.code;
          obj.payer      = row.payer;
          obj.key_format = row.key_format;
@@ -122,6 +130,10 @@ namespace detail {
       static void from_snapshot_row(snapshot_kv_index_object&& row, kv_index_object& obj, chainbase::database&) {
          SYS_ASSERT(!row.sec_key.empty(), snapshot_validation_exception, "kv_index_object has empty secondary key");
          SYS_ASSERT(!row.pri_key.empty(), snapshot_validation_exception, "kv_index_object has empty primary key");
+         SYS_ASSERT(row.sec_key.size() <= config::max_kv_key_size_limit, snapshot_validation_exception,
+                    "kv_index_object secondary key size ({}) exceeds absolute limit ({})", row.sec_key.size(), config::max_kv_key_size_limit);
+         SYS_ASSERT(row.pri_key.size() <= config::max_kv_key_size_limit, snapshot_validation_exception,
+                    "kv_index_object primary key size ({}) exceeds absolute limit ({})", row.pri_key.size(), config::max_kv_key_size_limit);
          obj.code     = row.code;
          obj.payer    = row.payer;
          obj.table    = row.table;

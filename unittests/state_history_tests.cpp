@@ -417,6 +417,10 @@ BOOST_AUTO_TEST_CASE(test_deltas_contract_row_kv_format0) {
    auto kv_result = chain.find_table_delta("contract_row_kv");
    BOOST_REQUIRE(kv_result.first);
    BOOST_REQUIRE_GT(kv_result.second->rows.obj.size(), 0u);
+
+   // and MUST NOT appear in the legacy "contract_row" delta
+   auto legacy_result = chain.find_table_delta("contract_row");
+   BOOST_CHECK(!legacy_result.first);
 }
 
 // Verify kv::raw_table (format=0, BE keys) entries appear in contract_row_kv delta
