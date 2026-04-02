@@ -7,9 +7,10 @@
 
 #include <fc/scoped_exit.hpp>
 
-#include <algorithm>
 #include <boost/algorithm/cxx11/all_of.hpp>
 
+#include <algorithm>
+#include <cassert>
 #include <functional>
 
 namespace sysio { namespace chain {
