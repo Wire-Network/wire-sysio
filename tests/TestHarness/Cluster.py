@@ -1336,6 +1336,17 @@ class Cluster(object):
             Utils.Print("ERROR: Failed to set sysio.roa as privileged")
             return None
 
+        if loadSystemContract:
+            Utils.Print("Set default emission config")
+            action="setemitcfg"
+            data='{"cfg":{"t1_allocation":"7500000000000000","t2_allocation":"1000000000000000","t3_allocation":"100000000000000","t1_duration":31104000,"t2_duration":62208000,"t3_duration":93312000,"min_claimable":"10000000000","t5_distributable":"375000000000000000","t5_floor":"125000000000000000","epoch_duration_secs":86400,"decay_numerator":"9990","decay_denominator":"10000","epoch_initial_emission":"563150000000000","epoch_max_emission":"3000000000000000","epoch_min_emission":"100000000000000","compute_bps":4000,"capital_bps":3000,"capex_bps":2000,"governance_bps":1000,"producer_bps":7000,"batch_op_bps":3000,"standby_end_rank":28}}'
+            opts="--permission %s@active" % (sysioAccount.name)
+            trans=biosNode.pushMessage(sysioAccount.name, action, data, opts)
+            transId=Node.getTransId(trans[1])
+            if not biosNode.waitForTransactionInBlock(transId):
+                Utils.Print("ERROR: Failed to set emission config (tx %s)" % transId)
+                return None
+
         Utils.Print("Activate ROA")
         action="activateroa"
         data="{\"total_sys\":\"75496.0000 SYS\",\"bytes_per_unit\":\"104\"}"
