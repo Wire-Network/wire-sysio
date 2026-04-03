@@ -850,8 +850,10 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
 
          auto shared_mem_path = chain_config->state_dir / "shared_memory.bin";
          auto chain_head_path = chain_config->state_dir / chain_head_filename;
+         auto dedup_path      = chain_config->state_dir / config::transaction_dedup_filename;
          SYS_ASSERT(!std::filesystem::is_regular_file(shared_mem_path) &&
-                    !std::filesystem::is_regular_file(chain_head_path),
+                    !std::filesystem::is_regular_file(chain_head_path) &&
+                    !std::filesystem::is_regular_file(dedup_path),
                     plugin_config_exception,
                     "Snapshot can only be used to initialize an empty database, remove directory: {}",
                     chain_config->state_dir.generic_string());

@@ -723,4 +723,94 @@ BOOST_FIXTURE_TEST_CASE( push_block_returns_forked_transactions_savanna, savanna
 
 } FC_LOG_AND_RETHROW()
 
+// Test that transaction dedup correctly handles fork switches.
+// Transactions recorded on the losing fork must be undone from the dedup table
+// so they can be re-applied (or re-pushed) on the winning fork without tx_duplicate errors.
+BOOST_FIXTURE_TEST_CASE( fork_switch_dedup_savanna, savanna_cluster::cluster_t ) try {
+   auto& A = _nodes[0]; auto& C = _nodes[2]; auto& D = _nodes[3];
+
+   A.produce_block();
+   A.create_accounts({"alice"_n});
+   A.produce_blocks(3);
+
+   auto fork_block_num = A.head().block_num();
+   dlog("fork point: block {} lib {}", fork_block_num, A.last_irreversible_block_num());
+
+   // Split the network so finality stops advancing
+   set_partition({&C, &D});
+
+   // --- Build the losing fork on A with a transaction ---
+   signed_block_ptr cb = A.produce_block();
+
+   // Create a transaction on A's fork
+   transaction_trace_ptr trace_alice_trx;
+   {
+      signed_transaction trx;
+      trx.actions.emplace_back(
+         vector<permission_level>{{config::system_account_name, config::active_name}},
+         newaccount{
+            .creator = config::system_account_name,
+            .name    = "bob"_n,
+            .owner   = authority(get_public_key("bob"_n, "owner")),
+            .active  = authority(get_public_key("bob"_n, "active")),
+         });
+      trx.expiration = fc::time_point_sec{A.head().block_time() + fc::seconds(60)};
+      trx.set_reference_block(cb->calculate_id());
+      trx.sign(get_private_key(config::system_account_name, "active"), A.get_chain_id());
+      trace_alice_trx = A.push_transaction(trx);
+      BOOST_REQUIRE(trace_alice_trx->receipt);
+   }
+   A.produce_block();
+   A.produce_blocks(2);
+
+   // Verify bob exists on A's fork and the trx is known
+   BOOST_CHECK_EQUAL(A.get_account("bob"_n).name, "bob"_n);
+   BOOST_CHECK(A.control->is_known_unexpired_transaction(trace_alice_trx->id));
+
+   // --- Build a longer winning fork on C ---
+   C.produce_block();
+   C.produce_block(fc::milliseconds(config::block_interval_ms * 14)); // skip blocks to get ahead
+   for (int i = 0; i < 25; ++i)
+      C.produce_block();
+
+   // --- Push C's blocks to A, triggering fork switch ---
+   // This calls pop_block for each block on A's fork, which must undo dedup entries
+   for (uint32_t n = fork_block_num + 1; n <= C.head().block_num(); ++n) {
+      auto fb = C.fetch_block_by_number(n);
+      push_block(0, fb);
+   }
+
+   // After fork switch:
+   // - bob should NOT exist (forked out)
+   BOOST_REQUIRE_EXCEPTION(A.get_account("bob"_n), fc::exception,
+                           [](const fc::exception& e) {
+                              return std::string(e.what()).find("bob") != std::string::npos;
+                           });
+   // - The transaction should no longer be known (dedup was undone)
+   BOOST_CHECK(!A.control->is_known_unexpired_transaction(trace_alice_trx->id));
+
+   // - The transaction should be in the unapplied queue (forked out transactions)
+   BOOST_CHECK_EQUAL(1u, A.get_unapplied_transaction_queue().size());
+   BOOST_CHECK_EQUAL(trace_alice_trx->id, A.get_unapplied_transaction_queue().begin()->id());
+
+   // - Producing a new block should re-apply the forked-out transaction
+   //   This will fail with tx_duplicate if the dedup was not properly undone
+   auto result = A.produce_block_ex(fc::milliseconds(config::block_interval_ms), true);
+   bool found_bob_trx = false;
+   for (auto& t : result.unapplied_transaction_traces) {
+      if (t->id == trace_alice_trx->id) {
+         BOOST_CHECK(!!t->receipt); // should succeed, not duplicate
+         found_bob_trx = true;
+      }
+   }
+   BOOST_CHECK(found_bob_trx);
+
+   // bob should now exist on the winning fork
+   BOOST_CHECK_EQUAL(A.get_account("bob"_n).name, "bob"_n);
+
+   // And the transaction should be known again (re-recorded in dedup)
+   BOOST_CHECK(A.control->is_known_unexpired_transaction(trace_alice_trx->id));
+
+} FC_LOG_AND_RETHROW()
+
 BOOST_AUTO_TEST_SUITE_END()
