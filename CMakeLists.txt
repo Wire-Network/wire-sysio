@@ -44,6 +44,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(GNUInstallDirs)
 include(MASSigning)
 include(AddTestHelpers)
+include(precompiled-headers)
 
 # Options
 option(ENABLE_WERROR "Enable `-Werror` compilation flag." Off)
