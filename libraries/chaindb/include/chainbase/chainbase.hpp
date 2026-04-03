@@ -132,34 +132,13 @@ namespace chainbase {
    template<typename MultiIndexType>
    using generic_index = multi_index_to_undo_index<MultiIndexType>;
 
-   class abstract_session {
-      public:
-         virtual ~abstract_session(){};
-         virtual void push()             = 0;
-         virtual void squash()           = 0;
-         virtual void undo()             = 0;
-   };
-
-   template<typename SessionType>
-   class session_impl : public abstract_session
-   {
-      public:
-         session_impl( SessionType&& s ):_session( std::move( s ) ){}
-
-         virtual void push() override  { _session.push();  }
-         virtual void squash() override{ _session.squash(); }
-         virtual void undo() override  { _session.undo();  }
-      private:
-         SessionType _session;
-   };
-
    class abstract_index
    {
       public:
          abstract_index( void* i ):_idx_ptr(i){}
          virtual ~abstract_index(){}
          virtual void     set_revision( uint64_t revision ) = 0;
-         virtual unique_ptr<abstract_session> start_undo_session( bool enabled ) = 0;
+         virtual void     add_undo_session() = 0;
 
          virtual int64_t revision()const = 0;
          virtual void    undo()const = 0;
@@ -184,9 +163,7 @@ namespace chainbase {
       public:
          index_impl( BaseIndex& base ):abstract_index( &base ),_base(base){}
 
-         virtual unique_ptr<abstract_session> start_undo_session( bool enabled ) override {
-            return unique_ptr<abstract_session>(new session_impl<typename BaseIndex::session>( _base.start_undo_session( enabled ) ) );
-         }
+         virtual void add_undo_session() override { _base.add_session(); }
 
          virtual void     set_revision( uint64_t revision ) override { _base.set_revision( revision ); }
          virtual int64_t  revision()const  override { return _base.revision(); }
@@ -273,38 +250,36 @@ namespace chainbase {
 
          struct session {
             public:
-               session( session&& s ):_index_sessions( std::move(s._index_sessions) ){}
-               session( vector<std::unique_ptr<abstract_session>>&& s ):_index_sessions( std::move(s) )
-               {
-               }
+               session( const session& ) = delete;
+               session& operator=( const session& ) = delete;
+
+               session( session&& s ) noexcept : _db(s._db), _apply(s._apply) { s._apply = false; }
+               explicit session( database& db ) : _db(&db), _apply(true) {}
 
                ~session() {
                   undo();
                }
 
-               void push()
-               {
-                  for( auto& i : _index_sessions ) i->push();
-                  _index_sessions.clear();
+               session& operator=(session&& s) noexcept {
+                  if (this != &s) {
+                     undo();
+                     _db = s._db;
+                     _apply = s._apply;
+                     s._apply = false;
+                  }
+                  return *this;
                }
 
-               void squash()
-               {
-                  for( auto& i : _index_sessions ) i->squash();
-                  _index_sessions.clear();
-               }
-
-               void undo()
-               {
-                  for( auto& i : _index_sessions ) i->undo();
-                  _index_sessions.clear();
-               }
+               void push()   { _apply = false; }
+               void squash() { if (_apply) _db->squash(); _apply = false; }
+               void undo()   { if (_apply) _db->undo();   _apply = false; }
 
             private:
                friend class database;
-               session(){}
+               session() : _db(nullptr), _apply(false) {}
 
-               vector< std::unique_ptr<abstract_session> > _index_sessions;
+               database* _db;
+               bool      _apply;
          };
 
          session start_undo_session( bool enabled );
