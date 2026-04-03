@@ -1,5 +1,5 @@
 #include <sysio.msgch/sysio.msgch.hpp>
-
+#include <sysio.epoch/sysio.epoch.hpp>
 namespace sysio {
 
 using opp::types::ChainRequestStatus;
@@ -7,6 +7,13 @@ using opp::types::MessageDirection;
 using opp::types::MessageStatus;
 using opp::types::EnvelopeStatus;
 using opp::types::AttestationType;
+
+namespace {
+constexpr auto EPOCH_ACCOUNT = "sysio.epoch"_n;
+constexpr auto UWRIT_ACCOUNT = "sysio.uwrit"_n;
+constexpr auto CHALG_ACCOUNT = "sysio.chalg"_n;
+
+}
 
 // ---------------------------------------------------------------------------
 //  crank — main depot crank
@@ -74,7 +81,7 @@ void msgch::deliver(name operator_acct,
 
    // Update request status and delivery count
    requests.modify(req_it, same_payer, [&](auto& r) {
-      r.delivery_count++;
+      r.delivery_count+=1;
       if (r.status == ChainRequestStatus::CHAIN_REQUEST_STATUS_PENDING) {
          r.status = ChainRequestStatus::CHAIN_REQUEST_STATUS_COLLECTING;
       }
@@ -237,8 +244,8 @@ void msgch::queueout(uint64_t outpost_id,
 // ---------------------------------------------------------------------------
 //  buildenv
 // ---------------------------------------------------------------------------
-void msgch::buildenv(uint64_t outpost_id) {
-   require_auth(get_self());
+void msgch::buildenv(name batch_op_name, uint64_t outpost_id) {
+   is_batch_operator_active(batch_op_name);
 
    // TODO: Collect all PENDING outbound messages for this outpost,
    //       build an OPP Envelope with merkle root, chain message IDs,

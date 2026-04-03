@@ -123,11 +123,16 @@ void epoch::advance() {
    check(!state.is_paused, "epoch advancement is paused");
 
    auto now = current_time_point();
-   check(now >= state.next_epoch_start, "epoch has not elapsed yet");
+   // If the epoch duration has not elapsed, return silently (idempotent no-op)
+   if (now < state.next_epoch_start) return;
 
    state.current_epoch_index++;
    state.current_batch_op_group = state.current_epoch_index % cfg.batch_op_groups;
-   state.current_epoch_start = state.next_epoch_start;
+
+   // On first advance, next_epoch_start is default (epoch 0). Use current
+   // block time as the epoch start instead of the uninitialized value.
+   state.current_epoch_start =
+      (state.next_epoch_start.sec_since_epoch() == 0) ? now : state.next_epoch_start;
    state.next_epoch_start = state.current_epoch_start +
       microseconds(static_cast<int64_t>(cfg.epoch_duration_sec) * 1'000'000);
 

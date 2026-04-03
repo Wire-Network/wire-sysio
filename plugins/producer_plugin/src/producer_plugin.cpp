@@ -1600,7 +1600,7 @@ void producer_plugin_impl::plugin_initialize(const boost::program_options::varia
    SYS_ASSERT(!is_configured_producer() || !irreversible_mode(), plugin_config_exception,
               "node cannot have any producer-name configured because block production is impossible when read_mode is \"irreversible\"");
 
-   SYS_ASSERT(!options.contains(signature_provider_manager_plugin::option_name_provider) || !irreversible_mode(), plugin_config_exception,
+   SYS_ASSERT(_finalizer_keys.empty() || !irreversible_mode(), plugin_config_exception,
               "node cannot have any finalizers configured because finalization is impossible when read_mode is \"irreversible\"");
 }
 

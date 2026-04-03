@@ -51,7 +51,7 @@ namespace sysio {
 
       /// Build outbound envelope from queued messages.
       [[sysio::action]]
-      void buildenv(uint64_t outpost_id);
+      void buildenv(name batch_op_name, uint64_t outpost_id);
 
       // -----------------------------------------------------------------------
       //  Tables
@@ -143,10 +143,6 @@ namespace sysio {
       >;
 
    private:
-      // Well-known accounts
-      static constexpr name EPOCH_ACCOUNT = "sysio.epoch"_n;
-      static constexpr name UWRIT_ACCOUNT = "sysio.uwrit"_n;
-      static constexpr name CHALG_ACCOUNT = "sysio.chalg"_n;
 
       using ChainRequestStatus = opp::types::ChainRequestStatus;
       using MessageDirection   = opp::types::MessageDirection;

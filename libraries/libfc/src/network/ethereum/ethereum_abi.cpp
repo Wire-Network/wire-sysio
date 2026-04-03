@@ -1053,10 +1053,7 @@ void fc::from_variant(const fc::variant& var, fc::network::ethereum::abi::contra
    vo.type = fc::reflector<fc::network::ethereum::abi::invoke_target_type>::from_string(type_str.c_str());
 
    auto parse_components = [&](std::vector<component_type>& vo_list, const std::string& list_name) {
-      auto list_prop_exists = obj.contains(list_name.c_str());
-      if (!list_prop_exists || !obj[list_name].is_array()) {
-         dlog("ABI property is not set or not array (name={},exists={},is_array={})", list_name, list_prop_exists,
-              obj[list_name].is_array(), "ABI contract inputs must be an array");
+      if (!obj.contains(list_name.c_str()) || !obj[list_name].is_array()) {
          return;
       }
 

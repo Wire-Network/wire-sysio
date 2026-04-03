@@ -142,15 +142,30 @@ namespace sysio {
       using outposts_t = multi_index<"outposts"_n, outpost_info,
          indexed_by<"bychain"_n, const_mem_fun<outpost_info, uint64_t, &outpost_info::by_chain>>
       >;
-
-   private:
       // Well-known accounts
       static constexpr name CHALG_ACCOUNT = "sysio.chalg"_n;
       static constexpr name MSGCH_ACCOUNT = "sysio.msgch"_n;
+      static constexpr name EPOCH_ACCOUNT = "sysio.epoch"_n;
+   private:
 
       // Namespace alias for OPP protobuf enum types
       using OperatorType   = sysio::opp::types::OperatorType;
       using OperatorStatus = sysio::opp::types::OperatorStatus;
    };
+
+   inline void is_batch_operator_active(const name& batch_op_name) {
+      require_auth(batch_op_name);
+      epoch::epochstate_t epoch_tbl(epoch::EPOCH_ACCOUNT, epoch::EPOCH_ACCOUNT.value);
+      check(epoch_tbl.exists(), "epoch state not initialized");
+      auto state = epoch_tbl.get();
+
+      auto cur_group = state.current_batch_op_group;
+      check(cur_group < state.batch_op_groups.size(), "active group index out of range");
+      auto& active_members = state.batch_op_groups[cur_group];
+      check(
+         std::find(active_members.begin(), active_members.end(), batch_op_name) != active_members.end(),
+         "caller is not in the active batch operator group"
+      );
+   }
 
 } // namespace sysio

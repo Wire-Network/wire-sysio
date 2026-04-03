@@ -4,6 +4,8 @@
 #include <boost/endian/conversion.hpp>
 
 #include <sysio/batch_operator_plugin/batch_operator_plugin.hpp>
+#include <sysio/chain/abi_serializer.hpp>
+#include <sysio/chain/transaction.hpp>
 #include <sysio/opp/types/types.pb.h>
 #include <sysio/opp/attestations/attestations.pb.h>
 
@@ -106,12 +108,15 @@ struct batch_operator_plugin::impl {
       } FC_LOG_AND_DROP();
    }
 
-   void do_poll_epoch_state() {
+   /**
+    * Parse epoch state into local fields.
+    * Returns {true, epoch_index} on success, {false, 0} if state is unavailable.
+    */
+   std::pair<bool, uint32_t> parse_epoch_state() {
       auto state_rows = read_table("sysio.epoch", "sysio.epoch", "epochstate", 1);
-      if (state_rows.rows.empty()) return;
+      if (state_rows.rows.empty()) return {false, 0};
 
-      auto& row = state_rows.rows[0];
-      auto obj = row.get_object();
+      auto obj = state_rows.rows[0].get_object();
       uint32_t epoch_index = static_cast<uint32_t>(obj["current_epoch_index"].as_uint64());
       uint8_t  cur_group   = static_cast<uint8_t>(obj["current_batch_op_group"].as_uint64());
       bool     paused      = obj["is_paused"].as_bool();
@@ -121,27 +126,19 @@ struct batch_operator_plugin::impl {
             ilog("batch_operator: epoch paused, suspending");
             is_elected = false;
          }
-         return;
+         return {false, 0};
       }
 
-      if (epoch_index == current_epoch && my_group != 255) {
-         return; // no epoch change
-      }
-
-      ilog("batch_operator: epoch advanced {} -> {}", current_epoch, epoch_index);
-      current_epoch = epoch_index;
-
-      // Parse groups to find our assignment
-      auto& groups_arr = obj["batch_op_groups"].get_array();
+      // Determine group assignment
       my_group = 255;
       current_group_members.clear();
+      auto groups_arr = obj["batch_op_groups"].get_array(); // copy, not reference
 
       for (uint8_t g = 0; g < groups_arr.size(); ++g) {
-         auto& grp = groups_arr[g].get_array();
+         auto grp = groups_arr[g].get_array(); // copy
          for (auto& member : grp) {
             if (chain::name(member.as_string()) == operator_account) {
                my_group = g;
-               break;
             }
          }
          if (g == cur_group) {
@@ -152,15 +149,36 @@ struct batch_operator_plugin::impl {
       }
 
       is_elected = (my_group == cur_group);
+      return {true, epoch_index};
+   }
 
+   void do_poll_epoch_state() {
+      auto [ok, epoch_index] = parse_epoch_state();
+      if (!ok) return;
+
+      // All elected operators call advance. The contract is idempotent:
+      // returns silently if epoch hasn't elapsed, cranks if it has.
       if (is_elected) {
-         ilog("batch_operator: ELECTED for epoch {} (group {}, {} members)",
-              current_epoch, my_group, current_group_members.size());
-         refresh_outposts();
-         run_epoch_cycle();
-      } else {
-         ilog("batch_operator: not elected (my_group={}, active_group={})", my_group, cur_group);
+         push_action("sysio.epoch", "advance", operator_account, fc::mutable_variant_object());
       }
+
+      if (!is_elected) {
+         if (epoch_index != current_epoch) {
+            ilog("batch_operator: not elected for epoch {} (my_group={}, active_group={})",
+                 epoch_index, my_group, (epoch_index % 3));
+         }
+         return;
+      }
+
+      // Already processed this epoch — wait for next poll to see the new state
+      if (epoch_index == current_epoch) return;
+
+      ilog("batch_operator: ELECTED for epoch {} (group {}, {} members)",
+           epoch_index, my_group, current_group_members.size());
+      current_epoch = epoch_index;
+
+      refresh_outposts();
+      run_epoch_cycle();
    }
 
    // -----------------------------------------------------------------------
@@ -173,9 +191,23 @@ struct batch_operator_plugin::impl {
       for (auto& row : rows.rows) {
          auto obj = row.get_object();
          outpost_descriptor od;
-         od.id         = obj["id"].as_uint64();
-         od.chain_kind = static_cast<uint8_t>(obj["chain_kind"].as_uint64());
-         od.chain_id   = static_cast<uint32_t>(obj["chain_id"].as_uint64());
+         od.id       = obj["id"].as_uint64();
+         od.chain_id = static_cast<uint32_t>(obj["chain_id"].as_uint64());
+
+         // chain_kind is an enum — ABI serializer returns it as a string
+         auto ck = obj["chain_kind"];
+         if (ck.is_uint64()) {
+            od.chain_kind = static_cast<uint8_t>(ck.as_uint64());
+         } else {
+            auto ck_str = ck.as_string();
+            if (ck_str == "chain_kind_ethereum" || ck_str == "CHAIN_KIND_ETHEREUM")
+               od.chain_kind = CHAIN_KIND_ETHEREUM;
+            else if (ck_str == "chain_kind_solana" || ck_str == "CHAIN_KIND_SOLANA")
+               od.chain_kind = CHAIN_KIND_SOLANA;
+            else
+               od.chain_kind = 0;
+         }
+
          outposts.push_back(std::move(od));
       }
       ilog("batch_operator: loaded {} outposts", outposts.size());
@@ -222,7 +254,9 @@ struct batch_operator_plugin::impl {
       ilog("batch_operator: cranking depot for outpost {}", op.id);
       push_action("sysio.msgch", "crank", operator_account, fc::mutable_variant_object());
       push_action("sysio.msgch", "buildenv", operator_account,
-                  fc::mutable_variant_object()("outpost_id", op.id));
+                  fc::mutable_variant_object()
+                     ("batch_op_name", operator_account.to_string())
+                     ("outpost_id", op.id));
    }
 
    void read_outbound_envelope(outpost_descriptor& op) {
@@ -594,39 +628,56 @@ struct batch_operator_plugin::impl {
                     const std::string& action_name,
                     chain::name auth_account,
                     const fc::variant_object& data) {
-      // Build action JSON
-      fc::mutable_variant_object action_obj;
-      action_obj("account", contract);
-      action_obj("name", action_name);
-      action_obj("authorization", fc::variants{
-         fc::variant(fc::mutable_variant_object()
-            ("actor", auth_account.to_string())
-            ("permission", "active"))
-      });
-      action_obj("data", data);
-
-      // Build transaction JSON
+      auto abi_max_time = fc::microseconds(delivery_timeout_ms * 1000);
       auto& chain = chain_plug->chain();
-      auto head_id = chain.head().id();
-      auto ref_block_num = boost::endian::endian_reverse(head_id._hash[0]);
-      auto ref_block_prefix = head_id._hash[1];
-      auto expiration = chain.head().block_time() + fc::seconds(30);
 
-      fc::mutable_variant_object trx_obj;
-      trx_obj("expiration", expiration);
-      trx_obj("ref_block_num", ref_block_num & 0xffff);
-      trx_obj("ref_block_prefix", ref_block_prefix);
-      trx_obj("actions", fc::variants{fc::variant(std::move(action_obj))});
+      // Resolve ABI and serialize action data
+      auto resolver = make_resolver(chain, abi_max_time, throw_on_yield::no);
+      auto abis_opt = resolver(chain::name(contract));
+      if (!abis_opt) {
+         elog("batch_operator: no ABI found for {}", contract);
+         return;
+      }
 
-      // Push through chain_plugin write API
-      auto rw = chain_plug->get_read_write_api(fc::microseconds(delivery_timeout_ms * 1000));
-      auto params = fc::variant(std::move(trx_obj)).get_object();
+      auto action_type = abis_opt->get_action_type(chain::name(action_name));
+      auto action_data = abis_opt->variant_to_binary(
+         action_type, fc::variant(data),
+         chain::abi_serializer::create_yield_function(abi_max_time));
+
+      // Build the signed transaction
+      chain::signed_transaction trx;
+      trx.actions.emplace_back(
+         std::vector<chain::permission_level>{{auth_account, chain::config::active_name}},
+         chain::name(contract), chain::name(action_name), std::move(action_data));
+
+      trx.set_reference_block(chain.head().id());
+      trx.expiration = fc::time_point_sec(chain.head().block_time() + fc::seconds(30));
+
+      // Sign with the operator's WIRE K1 key via signature_provider_manager
+      auto& sig_plug = app().get_plugin<signature_provider_manager_plugin>();
+      auto wire_providers = sig_plug.query_providers(
+         std::nullopt, fc::crypto::chain_kind_wire, fc::crypto::chain_key_type_wire);
+      if (wire_providers.empty()) {
+         elog("batch_operator: no WIRE K1 signature provider available");
+         return;
+      }
+
+      auto chain_id = chain.get_chain_id();
+      auto digest = trx.sig_digest(chain_id, trx.context_free_data);
+      trx.signatures.push_back(wire_providers.front()->sign(digest));
+
+      // Pack and push
+      auto packed = chain::packed_transaction(std::move(trx), chain::packed_transaction::compression_type::none);
+      auto rw = chain_plug->get_read_write_api(abi_max_time);
+
+      fc::variant packed_var;
+      chain::to_variant(packed, packed_var);
 
       std::promise<void> done;
       auto future = done.get_future();
 
       rw.push_transaction(
-         params,
+         packed_var.get_object(),
          [&done, &contract, &action_name](const auto& result) {
             if (auto* err = std::get_if<fc::exception_ptr>(&result)) {
                elog("batch_operator: push {}::{} failed — {}", contract, action_name, (*err)->to_string());
