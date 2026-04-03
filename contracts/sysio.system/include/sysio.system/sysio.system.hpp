@@ -12,6 +12,7 @@
 #include <sysio/time.hpp>
 #include <sysio/instant_finality.hpp>
 
+#include <sysio.system/emissions.hpp>
 #include <sysio.system/native.hpp>
 
 #include <limits>
@@ -65,6 +66,9 @@ namespace sysiosystem {
    static constexpr int64_t  useconds_per_day      = int64_t(seconds_per_day) * 1000'000ll;
    static constexpr int64_t  useconds_per_hour     = int64_t(seconds_per_hour) * 1000'000ll;
    static constexpr uint32_t blocks_per_day        = 2 * seconds_per_day; // half seconds per day
+   static constexpr uint32_t blocks_per_round      = 12; // sysio::chain::config::producer_repetitions
+   static constexpr uint32_t min_blocks_per_round_for_pay = 6;
+   static constexpr uint32_t no_prev_block        = std::numeric_limits<uint32_t>::max(); // sentinel: no previous block
 
    // All fields (including max_action_return_value_size, KV limits) are now
    // in the base sysio::blockchain_parameters struct.
@@ -105,6 +109,9 @@ namespace sysiosystem {
       time_point                                               last_claim_time;
       uint16_t                                                 location = 0;
       sysio::block_signing_authority                           producer_authority; // added in version 1.9.0
+      uint32_t                                                 last_block_num = no_prev_block;
+      uint16_t                                                 current_round_blocks = 0;   // blocks in current (in-progress) round
+      uint32_t                                                 eligible_rounds      = 0;   // rounds meeting >= min_blocks threshold (per epoch)
 
       uint64_t primary_key()const { return owner.value;                             }
       uint64_t by_rank()const     { return rank; }
@@ -115,7 +122,8 @@ namespace sysiosystem {
          return producer_authority;
       }
 
-      SYSLIB_SERIALIZE( producer_info, (owner)(producer_key)(rank)(is_active)(url)(unpaid_blocks)(last_claim_time)(location)(producer_authority) )
+      SYSLIB_SERIALIZE( producer_info, (owner)(producer_key)(rank)(is_active)(url)(unpaid_blocks)(last_claim_time)(location)(producer_authority)
+                         (last_block_num)(current_round_blocks)(eligible_rounds) )
    };
 
    typedef sysio::multi_index< "producers"_n, producer_info,
@@ -509,6 +517,66 @@ namespace sysiosystem {
           */
          [[sysio::on_notify("auth.msg::onlinkauth")]]
          void onlinkauth(const name &user, const name &permission, const sysio::public_key &pub_key);
+
+         // ---- Emissions actions (defined in emissions.cpp) ----
+
+         /**
+          * Set or update emission configuration parameters.
+          * Must be called before any other emissions actions.
+          */
+         [[sysio::action]]
+         void setemitcfg(const emissions::emission_config& cfg);
+
+         /**
+          * Sets the starting time for Node Owner distributions.
+          */
+         [[sysio::action]]
+         void setinittime(const sysio::time_point_sec& no_reward_init_time);
+
+         /**
+          * Called inline by sysio.roa when a Node Owner is registered.
+          */
+         [[sysio::action]]
+         void addnodeowner(const sysio::name& account_name, uint8_t tier);
+
+         /**
+          * Claim vested Node Owner distribution.
+          */
+         [[sysio::action]]
+         void claimnodedis(const sysio::name& account_name);
+
+         /**
+          * Read-only: view claimable Node Owner distributions.
+          */
+         [[sysio::action]]
+         emissions::node_claim_result viewnodedist(const sysio::name& account_name);
+
+         /**
+          * Initialize the T5 treasury emissions system.
+          */
+         [[sysio::action]]
+         void initt5(const sysio::time_point_sec& start_time);
+
+         /**
+          * Process the next T5 epoch. Distributes treasury emissions
+          * across categories when the epoch duration has elapsed.
+          * Permissionless — the caller cannot influence who receives
+          * funds; recipients are determined entirely by on-chain state.
+          */
+         [[sysio::action]]
+         void processepoch();
+
+         /**
+          * Read-only: current T5 treasury emission state.
+          */
+         [[sysio::action]]
+         emissions::epoch_info_result viewepoch();
+
+         /**
+          * Read-only: all emission configuration values.
+          */
+         [[sysio::action]]
+         emissions::emission_config viewemitcfg();
 
          using init_action = sysio::action_wrapper<"init"_n, &system_contract::init>;
          using setacctram_action = sysio::action_wrapper<"setacctram"_n, &system_contract::setacctram>;

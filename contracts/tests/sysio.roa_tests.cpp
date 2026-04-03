@@ -38,6 +38,69 @@ public:
       abi_def abi;
       BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt->abi, abi), true);
       abi_ser.set_abi(abi, abi_serializer::create_yield_function(abi_serializer_max_time));
+
+      // Deploy sysio.system, init, and set default emission config
+      set_code( config::system_account_name, test_contracts::sysio_system_wasm() );
+      set_abi ( config::system_account_name, test_contracts::sysio_system_abi() );
+      produce_blocks(1);
+
+      base_tester::push_action(config::system_account_name, "init"_n,
+                               config::system_account_name, mutable_variant_object()
+                               ("version", 0)
+                               ("core", symbol(CORE_SYMBOL).to_string()));
+      produce_blocks(1);
+
+      // Load system ABI serializer for setemitcfg
+      {
+         const auto* sys_accnt = control->find_account_metadata( config::system_account_name );
+         BOOST_REQUIRE( sys_accnt != nullptr );
+         abi_def sys_abi;
+         BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(sys_accnt->abi, sys_abi), true);
+         sys_abi_ser.set_abi(sys_abi, abi_serializer::create_yield_function(abi_serializer_max_time));
+      }
+
+      setup_emission_config();
+   }
+
+   void setup_emission_config() {
+      auto cfg = mvo()
+         ("t1_allocation",          int64_t(7500000000000000))
+         ("t2_allocation",          int64_t(1000000000000000))
+         ("t3_allocation",          int64_t(100000000000000))
+         ("t1_duration",            uint32_t(12u * 30u * 24u * 3600u))
+         ("t2_duration",            uint32_t(24u * 30u * 24u * 3600u))
+         ("t3_duration",            uint32_t(36u * 30u * 24u * 3600u))
+         ("min_claimable",          int64_t(10000000000))
+         ("t5_distributable",       int64_t(375000000000000000LL))
+         ("t5_floor",               int64_t(125000000000000000LL))
+         ("epoch_duration_secs",    uint32_t(86400))
+         ("decay_numerator",        int64_t(9990))
+         ("decay_denominator",      int64_t(10000))
+         ("epoch_initial_emission", int64_t(563150000000000LL))
+         ("epoch_max_emission",     int64_t(3000000000000000LL))
+         ("epoch_min_emission",     int64_t(100000000000000LL))
+         ("compute_bps",            uint16_t(4000))
+         ("capital_bps",            uint16_t(3000))
+         ("capex_bps",              uint16_t(2000))
+         ("governance_bps",         uint16_t(1000))
+         ("producer_bps",           uint16_t(7000))
+         ("batch_op_bps",           uint16_t(3000))
+         ("standby_end_rank",       uint32_t(28));
+
+      auto act_type = sys_abi_ser.get_action_type("setemitcfg"_n);
+      action act;
+      act.account = config::system_account_name;
+      act.name = "setemitcfg"_n;
+      act.authorization = {{config::system_account_name, config::active_name}};
+      act.data = sys_abi_ser.variant_to_binary(act_type, mvo()("cfg", cfg),
+         abi_serializer::create_yield_function(abi_serializer_max_time));
+
+      signed_transaction trx;
+      trx.actions.push_back(std::move(act));
+      set_transaction_headers(trx);
+      trx.sign(get_private_key(config::system_account_name, "active"), control->get_chain_id());
+      push_transaction(trx);
+      produce_blocks(1);
    }
 
    action_result push_action( const account_name& signer, const action_name &name, const variant_object &data ) {
@@ -170,6 +233,7 @@ public:
    }
 
    abi_serializer abi_ser;
+   abi_serializer sys_abi_ser;
 };
 
 BOOST_AUTO_TEST_SUITE(sysio_roa_tests)
@@ -401,15 +465,7 @@ BOOST_FIXTURE_TEST_CASE( newuser_tld_test, sysio_roa_tester ) try {
 
 
 BOOST_FIXTURE_TEST_CASE( verify_ram, sysio_roa_tester ) try {
-   // load system contract for newaccount functionality
-   set_code( config::system_account_name, test_contracts::sysio_system_wasm() );
-   set_abi( config::system_account_name, test_contracts::sysio_system_abi() );
-
-   base_tester::push_action(config::system_account_name, "init"_n,
-                            config::system_account_name, mutable_variant_object()
-                            ("version", 0)
-                            ("core", symbol(CORE_SYMBOL).to_string()));
-   produce_block();
+   // system contract + init + emission config already done in base constructor
 
    // roa has been activated with NODE_DADDY as a node owner
    // Accounts already created with ROA policy { "alice"_n, "bob"_n, "carol"_n, "darcy"_n }
@@ -647,14 +703,7 @@ BOOST_FIXTURE_TEST_CASE( extend_policy_test, sysio_roa_tester ) try {
 
 // Verifies that reducepolicy correctly decreases RAM bytes in the reslimit table.
 BOOST_FIXTURE_TEST_CASE( reducepolicy_ram_accounting, sysio_roa_tester ) try {
-   // Load system contract for newaccount + addpolicy/reducepolicy
-   set_code( config::system_account_name, test_contracts::sysio_system_wasm() );
-   set_abi( config::system_account_name, test_contracts::sysio_system_abi() );
-   base_tester::push_action(config::system_account_name, "init"_n,
-                            config::system_account_name, mutable_variant_object()
-                            ("version", 0)
-                            ("core", symbol(CORE_SYMBOL).to_string()));
-   produce_block();
+   // system contract + init + emission config already done in base constructor
 
    // Register node owners (need 21 for ROA activation)
    std::array<account_name, 21> node_owners = { NODE_DADDY };
@@ -716,13 +765,7 @@ BOOST_FIXTURE_TEST_CASE( reducepolicy_ram_accounting, sysio_roa_tester ) try {
 // Verifies that reducing an entire policy to zero correctly removes it and
 // that a second reducepolicy on a different policy also works correctly.
 BOOST_FIXTURE_TEST_CASE( reducepolicy_full_then_second, sysio_roa_tester ) try {
-   set_code( config::system_account_name, test_contracts::sysio_system_wasm() );
-   set_abi( config::system_account_name, test_contracts::sysio_system_abi() );
-   base_tester::push_action(config::system_account_name, "init"_n,
-                            config::system_account_name, mutable_variant_object()
-                            ("version", 0)
-                            ("core", symbol(CORE_SYMBOL).to_string()));
-   produce_block();
+   // system contract + init + emission config already done in base constructor
 
    std::array<account_name, 21> node_owners = { NODE_DADDY };
    for (size_t i = 1; i < node_owners.size(); i++) {
@@ -787,13 +830,7 @@ BOOST_FIXTURE_TEST_CASE( reducepolicy_full_then_second, sysio_roa_tester ) try {
 
 // Verifies that creating multiple users correctly decreases sysio's reslimit RAM.
 BOOST_FIXTURE_TEST_CASE( newuser_sysio_ram_decreases, sysio_roa_tester ) try {
-   set_code( config::system_account_name, test_contracts::sysio_system_wasm() );
-   set_abi( config::system_account_name, test_contracts::sysio_system_abi() );
-   base_tester::push_action(config::system_account_name, "init"_n,
-                            config::system_account_name, mutable_variant_object()
-                            ("version", 0)
-                            ("core", symbol(CORE_SYMBOL).to_string()));
-   produce_block();
+   // system contract + init + emission config already done in base constructor
 
    std::array<account_name, 21> node_owners = { NODE_DADDY };
    for (size_t i = 1; i < node_owners.size(); i++) {
@@ -836,13 +873,7 @@ public:
    std::array<account_name, 21> node_owners;
 
    sysio_roa_full_tester() {
-      set_code( config::system_account_name, test_contracts::sysio_system_wasm() );
-      set_abi( config::system_account_name, test_contracts::sysio_system_abi() );
-      base_tester::push_action(config::system_account_name, "init"_n,
-                               config::system_account_name, mutable_variant_object()
-                               ("version", 0)
-                               ("core", symbol(CORE_SYMBOL).to_string()));
-      produce_block();
+      // system contract + init + emission config already done in base constructor
 
       node_owners[0] = NODE_DADDY;
       for (size_t i = 1; i < node_owners.size(); i++) {

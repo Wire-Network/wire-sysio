@@ -661,6 +661,14 @@ namespace sysio {
             row.network_gen = state.network_gen;
         });
 
+        // Add user to sysio.system node_owner_dist table
+        action(
+           {get_self(), "active"_n},
+           "sysio"_n,
+           "addnodeowner"_n,
+           std::make_tuple(owner, tier)
+        ).send();
+
         // TODO: Notify Council contract if needed
     };
 
