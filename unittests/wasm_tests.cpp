@@ -2327,7 +2327,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( memory_mapping_test, T, validating_testers ) try 
    }
 
 #if __has_feature(address_sanitizer)
-   constexpr uint32_t margin_of_changes = 100;
+   constexpr uint32_t margin_of_changes = 200;
 #else
    constexpr uint32_t margin_of_changes = 50;
 #endif

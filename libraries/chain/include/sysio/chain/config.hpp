@@ -14,6 +14,7 @@ namespace sysio::chain::config {
   const static auto fork_db_filename            = "fork_db.dat";
   const static auto safety_filename             = "safety.dat";
   const static auto chain_head_filename         = "chain_head.dat";
+  const static auto transaction_dedup_filename  = "transaction_dedup.bin";
   static constexpr auto default_state_size            = 1*1024*1024*1024ll;
   static constexpr auto default_state_guard_size      =    128*1024*1024ll;
 

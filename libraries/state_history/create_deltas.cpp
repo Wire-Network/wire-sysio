@@ -166,8 +166,8 @@ void pack_deltas(boost::iostreams::filtering_ostreambuf& obuf, const chainbase::
 
    // Count KV tables separately since kv_index may produce 2 tables
    // (contract_row for format=1, contract_row_kv for format=0)
-   auto is_standard_kv = [](const chain::kv_object& o) { return o.key_format == 1 && o.key_size == chain::kv_key_size; };
-   auto is_raw_kv      = [](const chain::kv_object& o) { return o.key_format != 1 || o.key_size != chain::kv_key_size; };
+   auto is_standard_kv = [](const chain::kv_object& o) { return o.key_format == 1 && o.key.size() == chain::kv_key_size; };
+   auto is_raw_kv      = [](const chain::kv_object& o) { return o.key_format != 1 || o.key.size() != chain::kv_key_size; };
 
    auto count_kv_tables = [&]() -> int {
       auto& index = db.get_index<chain::kv_index>();

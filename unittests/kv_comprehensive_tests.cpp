@@ -31,7 +31,7 @@ BOOST_AUTO_TEST_CASE(kv_data_survives_block_production) {
       auto session = db.start_undo_session(true);
       db.create<kv_object>([](auto& o) {
          o.code = "persist"_n;
-         o.key_assign("mykey", 5);
+         o.key.assign("mykey", 5);
          o.value.assign("myvalue", 7);
       });
       session.push();
@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_CASE(kv_data_reverts_on_undo) {
       auto session = db.start_undo_session(true);
       db.create<kv_object>([](auto& o) {
          o.code = "undotest"_n;
-         o.key_assign("tempkey", 7);
+         o.key.assign("tempkey", 7);
          o.value.assign("tempval", 7);
       });
 
@@ -81,7 +81,7 @@ BOOST_AUTO_TEST_CASE(kv_ram_billing) {
    // Create a row and verify billable size is reasonable
    db.create<kv_object>([](auto& o) {
       o.code = "ramtest"_n;
-      o.key_assign("k", 1);
+      o.key.assign("k", 1);
       o.value.assign("value123", 8);
    });
 
@@ -104,14 +104,14 @@ BOOST_AUTO_TEST_CASE(kv_empty_key_and_value) {
    // Empty key
    db.create<kv_object>([](auto& o) {
       o.code = "edge"_n;
-      o.key_assign("", 0);
+      o.key.assign("", 0);
       o.value.assign("notempty", 8);
    });
 
    // Empty value
    db.create<kv_object>([](auto& o) {
       o.code = "edge"_n;
-      o.key_assign("haskey", 6);
+      o.key.assign("haskey", 6);
       o.value.assign("", 0);
    });
 
@@ -134,31 +134,31 @@ BOOST_AUTO_TEST_CASE(kv_max_key_size) {
 
    auto session = db.start_undo_session(true);
 
-   // SSO path (24 bytes)
-   std::string sso_key(24, 'A');
+   // 24-byte key (standard kv_key_size)
+   std::string std_key(24, 'A');
    db.create<kv_object>([&](auto& o) {
       o.code = "maxkey"_n;
-      o.key_assign(sso_key.data(), sso_key.size());
+      o.key.assign(std_key.data(), std_key.size());
       o.value.assign("v", 1);
    });
 
-   // Heap path (256 bytes = max)
+   // Large key (256 bytes = default max, on-chain config can raise up to 1024)
    std::string max_key(256, 'B');
    db.create<kv_object>([&](auto& o) {
       o.code = "maxkey"_n;
-      o.key_assign(max_key.data(), max_key.size());
+      o.key.assign(max_key.data(), max_key.size());
       o.value.assign("v", 1);
    });
 
    auto& idx = db.get_index<kv_index, by_code_key>();
 
-   auto itr1 = idx.find(boost::make_tuple(name("maxkey"), config::kv_format_raw, std::string_view(sso_key)));
+   auto itr1 = idx.find(boost::make_tuple(name("maxkey"), config::kv_format_raw, std::string_view(std_key)));
    BOOST_REQUIRE(itr1 != idx.end());
-   BOOST_CHECK_EQUAL(itr1->key_size, chain::kv_key_size);
+   BOOST_CHECK_EQUAL(itr1->key.size(), chain::kv_key_size);
 
    auto itr2 = idx.find(boost::make_tuple(name("maxkey"), config::kv_format_raw, std::string_view(max_key)));
    BOOST_REQUIRE(itr2 != idx.end());
-   BOOST_CHECK_EQUAL(itr2->key_size, 256u);
+   BOOST_CHECK_EQUAL(itr2->key.size(), 256u);
 
    session.undo();
 }
@@ -172,12 +172,12 @@ BOOST_AUTO_TEST_CASE(kv_cross_contract_isolation) {
    // Two contracts store same key
    db.create<kv_object>([](auto& o) {
       o.code = "contract.a"_n;
-      o.key_assign("shared", 6);
+      o.key.assign("shared", 6);
       o.value.assign("from_a", 6);
    });
    db.create<kv_object>([](auto& o) {
       o.code = "contract.b"_n;
-      o.key_assign("shared", 6);
+      o.key.assign("shared", 6);
       o.value.assign("from_b", 6);
    });
 
@@ -216,7 +216,7 @@ BOOST_AUTO_TEST_CASE(kv_ship_delta_format_24byte_key) {
       o.code = "sysio.token"_n;
          o.payer = "sysio.token"_n;
       o.key_format = 1; // standard [table:8B][scope:8B][pk:8B]
-      o.key_assign(key, chain::kv_key_size);
+      o.key.assign(key, chain::kv_key_size);
       o.value.assign("testvalue", 9);
    });
 
@@ -268,7 +268,7 @@ BOOST_AUTO_TEST_CASE(kv_ship_delta_format_nonstandard_key) {
 
    db.create<kv_object>([](auto& o) {
       o.code = "rawcontract"_n;
-      o.key_assign("short", 5);
+      o.key.assign("short", 5);
       o.value.assign("data", 4);
    });
 
@@ -343,8 +343,8 @@ BOOST_AUTO_TEST_CASE(kv_secondary_index_ordering) {
          o.code = "sectest"_n;
          o.table = "mytable"_n;
          o.index_id = 0;
-         o.sec_key_assign(sk.data(), sk.size());
-         o.pri_key_assign(pk.data(), pk.size());
+         o.sec_key.assign(sk.data(), sk.size());
+         o.pri_key.assign(pk.data(), pk.size());
       });
    }
 
@@ -354,12 +354,12 @@ BOOST_AUTO_TEST_CASE(kv_secondary_index_ordering) {
 
    std::vector<uint64_t> actual_order;
    while (itr != sec_idx.end() && itr->code == name("sectest")) {
-      auto decode = [](const char* data, uint16_t size) -> uint64_t {
+      auto decode = [](const char* data, size_t size) -> uint64_t {
          uint64_t v = 0;
          for (size_t i = 0; i < size && i < 8; ++i) v = (v << 8) | static_cast<uint8_t>(data[i]);
          return v;
       };
-      actual_order.push_back(decode(itr->sec_key_data(), itr->sec_key_size));
+      actual_order.push_back(decode(itr->sec_key.data(), itr->sec_key.size()));
       ++itr;
    }
 
@@ -394,7 +394,7 @@ BOOST_AUTO_TEST_CASE(kv_get_row_by_id_fallback) {
    db.create<kv_object>([&](auto& o) {
       o.code = "mycode"_n;
       o.key_format = 1;
-      o.key_assign(key, chain::kv_key_size);
+      o.key.assign(key, chain::kv_key_size);
       o.value.assign("hello_kv", 8);
    });
 

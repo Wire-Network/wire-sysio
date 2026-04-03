@@ -223,7 +223,6 @@ namespace sysio::chain {
       global_property_object_type,
       dynamic_global_property_object_type,
       block_summary_object_type,
-      transaction_object_type,
       resource_object_type,
       resource_pending_object_type,
       resource_limits_state_object_type,

@@ -722,7 +722,7 @@ public:
          check(memcmp(buf, val, sizeof(val)) == 0, "multikey: 8B data");
       }
 
-      // 24-byte key (SSO boundary)
+      // 24-byte key (standard format size)
       {
          char key[24];
          memset(key, 0x1A, 24);
@@ -734,7 +734,7 @@ public:
          check(memcmp(buf, val, sizeof(val)) == 0, "multikey: 24B data");
       }
 
-      // 100-byte key (heap path)
+      // 100-byte key (large key)
       {
          char key[100];
          memset(key, 0x1B, 100);
