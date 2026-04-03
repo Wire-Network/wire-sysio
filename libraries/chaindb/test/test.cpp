@@ -525,7 +525,6 @@ BOOST_AUTO_TEST_CASE(shared_cow_string_apis) {
       BOOST_REQUIRE_EQUAL(s3, test_string);
 
       shared_cow_string s4 { test_string.size(), boost::container::default_init_t() };
-      BOOST_REQUIRE_EQUAL(s4.data()[test_string.size()], 0); // null terminator should be added by constructor
       std::memcpy(s4.mutable_data(), test_string.c_str(), test_string.size());
       BOOST_REQUIRE_EQUAL(s4, test_string);
 

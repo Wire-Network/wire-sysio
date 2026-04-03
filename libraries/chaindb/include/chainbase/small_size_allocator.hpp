@@ -8,7 +8,6 @@
 #include <vector>
 #include <string>
 #include <functional>
-#include <mutex>
 #include <boost/interprocess/offset_ptr.hpp>
 
 namespace bip = boost::interprocess;
@@ -25,7 +24,7 @@ namespace detail {
 // - allocates in batch from `backing_allocator` (see `allocation_batch_size`)
 // - freed buffers are linked into a free list for fast further allocations
 // - allocated buffers are never returned to the `backing_allocator`
-// - thread-safe
+// - thread-safe via spinlock (required for parallel snapshot loading)
 // ---------------------------------------------------------------------------------------
 template <class backing_allocator>
 class allocator {
@@ -37,7 +36,7 @@ public:
       , _back_alloc(back_alloc) {}
 
    pointer allocate() {
-      std::lock_guard g(_m);
+      auto guard = spin_lock();
       if (_block_start == _block_end && _freelist == nullptr) {
          get_some();
       }
@@ -55,22 +54,30 @@ public:
    }
 
    void deallocate(const pointer& p) {
-      std::lock_guard g(_m);
+      auto guard = spin_lock();
       _freelist = new (&*p) list_item{_freelist};
       ++_freelist_size;
    }
 
    size_t freelist_memory_usage() const {
-      std::lock_guard g(_m);
+      auto guard = spin_lock();
       return _freelist_size * _sz + (_block_end - _block_start);
    }
 
    size_t num_blocks_allocated() const {
-      std::lock_guard g(_m);
+      auto guard = spin_lock();
       return _num_blocks_allocated;
    }
 
 private:
+   struct spin_guard {
+      std::atomic_flag& _flag;
+      spin_guard(std::atomic_flag& f) : _flag(f) { while (_flag.test_and_set(std::memory_order_acquire)); }
+      ~spin_guard() { _flag.clear(std::memory_order_release); }
+   };
+
+   spin_guard spin_lock() const { return spin_guard{_lock}; }
+
    struct list_item { bip::offset_ptr<list_item> _next; };
    static constexpr size_t max_allocation_batch_size = 512;
 
@@ -93,7 +100,7 @@ private:
    size_t                     _allocation_batch_size = 32;
    size_t                     _freelist_size         = 0;
    size_t                     _num_blocks_allocated  = 0; // number of blocks allocated from boost segment allocator
-   mutable std::mutex         _m;
+   mutable std::atomic_flag   _lock = ATOMIC_FLAG_INIT;
 };
 
 } // namespace detail
