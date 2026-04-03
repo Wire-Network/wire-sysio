@@ -195,7 +195,7 @@ namespace sysio::chain {
 
             trx_session(chainbase::database& db, controller& c)
                : db_session(db.start_undo_session(true)), ctrl(c) { ctrl.push_dedup_session(); }
-            trx_session(trx_session&&) = default;
+            trx_session(trx_session&&) = delete;
 
             void squash() { db_session.squash(); ctrl.squash_dedup_session(); active = false; }
             void undo()   { db_session.undo();   ctrl.undo_dedup_session();   active = false; }

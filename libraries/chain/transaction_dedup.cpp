@@ -1,17 +1,12 @@
 #include <sysio/chain/transaction_dedup.hpp>
 #include <sysio/chain/exceptions.hpp>
 
-#include <fc/io/cfile.hpp>
-#include <fc/io/raw.hpp>
 #include <fc/log/logger.hpp>
 
 #include <filesystem>
 #include <ranges>
 
 namespace sysio::chain {
-
-static constexpr uint32_t dedup_file_magic   = 0x44454450; // "DEDP"
-static constexpr uint32_t dedup_file_version = 1;
 
 transaction_dedup::transaction_dedup() {
    map_.reserve(default_map_capacity);
@@ -37,18 +32,25 @@ bool transaction_dedup::is_known(const transaction_id_type& id) const {
 }
 
 std::pair<uint32_t, size_t> transaction_dedup::clear_expired(fc::time_point block_time) {
+   // clear_expired must not be called after record() within the same block.
+   // If record() was called, deque_ would be larger than deque_size_at_start.
+   assert(!pending_revision_ || deque_.size() == pending_revision_->deque_size_at_start);
    const auto total = deque_.size();
-   uint32_t num_removed = 0;
-   while (!deque_.empty() && block_time > deque_.front().second.to_time_point()) {
-      auto entry = deque_.front();
-      map_.erase(entry.first);
-      deque_.pop_front();
+   // Scan for the expiration boundary so they can be removed in one erase call
+   auto it = deque_.begin();
+   while (it != deque_.end() && block_time > it->second.to_time_point())
+      ++it;
+   const auto num_removed = static_cast<uint32_t>(it - deque_.begin());
+   if (num_removed > 0) {
+      for (auto scan = deque_.begin(); scan != it; ++scan) {
+         map_.erase(scan->first);
+         if (pending_revision_)
+            pending_revision_->expired.push_back(*scan);
+      }
+      deque_.erase(deque_.begin(), it);
       if (pending_revision_)
-         pending_revision_->expired.push_back(std::move(entry));
-      ++num_removed;
+         pending_revision_->deque_size_at_start = deque_.size();
    }
-   if (pending_revision_ && num_removed > 0)
-      pending_revision_->deque_size_at_start = deque_.size();
    return {num_removed, total};
 }
 
@@ -68,10 +70,9 @@ void transaction_dedup::undo_session() {
       return;
    auto restore_size = session_stack_.back();
    session_stack_.pop_back();
-   while (deque_.size() > restore_size) {
-      map_.erase(deque_.back().first);
-      deque_.pop_back();
-   }
+   for (auto it = deque_.begin() + restore_size; it != deque_.end(); ++it)
+      map_.erase(it->first);
+   deque_.erase(deque_.begin() + restore_size, deque_.end());
    // Sessions are always pushed after clear_expired runs, so undo can never
    // shrink the deque below the block revision's start point. If this fires,
    // the call ordering in start_block has been broken.
@@ -100,11 +101,10 @@ void transaction_dedup::abort_block_revision() {
    if (!pending_revision_)
       return;
    session_stack_.clear();
-   // Undo entries added during this block (pop from back)
-   while (deque_.size() > pending_revision_->deque_size_at_start) {
-      map_.erase(deque_.back().first);
-      deque_.pop_back();
-   }
+   // Undo entries added during this block
+   for (auto it = deque_.begin() + pending_revision_->deque_size_at_start; it != deque_.end(); ++it)
+      map_.erase(it->first);
+   deque_.erase(deque_.begin() + pending_revision_->deque_size_at_start, deque_.end());
    // Restore entries that were cleared by clear_expired during this block (push to front)
    for (const auto& entry : std::views::reverse(pending_revision_->expired)) {
       deque_.push_front(entry);
@@ -118,11 +118,10 @@ void transaction_dedup::pop_block_revision() {
       return;
 
    const auto& rev = committed_revisions_.back();
-   // Undo entries added during this block (pop from back to the size at block start)
-   while (deque_.size() > rev.deque_size_at_start) {
-      map_.erase(deque_.back().first);
-      deque_.pop_back();
-   }
+   // Undo entries added during this block (back to the size at block start)
+   for (auto it = deque_.begin() + rev.deque_size_at_start; it != deque_.end(); ++it)
+      map_.erase(it->first);
+   deque_.erase(deque_.begin() + rev.deque_size_at_start, deque_.end());
    // Restore entries that were cleared by clear_expired during this block
    for (const auto& entry : std::views::reverse(rev.expired)) {
       deque_.push_front(entry);
@@ -132,30 +131,21 @@ void transaction_dedup::pop_block_revision() {
 }
 
 void transaction_dedup::commit_to_lib(uint32_t block_num) {
-   while (!committed_revisions_.empty() && committed_revisions_.front().block_num <= block_num) {
-      committed_revisions_.pop_front();
+   auto it = committed_revisions_.begin();
+   while (it != committed_revisions_.end() && it->block_num <= block_num) {
+      ++it;
    }
+   committed_revisions_.erase(committed_revisions_.begin(), it);
 }
 
-// --- File persistence ---
+// --- File persistence (uses snapshot format for integrity and code reuse) ---
 
 void transaction_dedup::write_to_file(const std::filesystem::path& filepath) const {
-   auto tmp = filepath;
-   tmp += ".tmp";
+   const auto tmp = filepath.string() + ".tmp";
 
-   fc::cfile f;
-   f.set_file_path(tmp);
-   f.open("wb");
-
-   fc::raw::pack(f, dedup_file_magic);
-   fc::raw::pack(f, dedup_file_version);
-   uint64_t count = deque_.size();
-   fc::raw::pack(f, count);
-   for (const auto& [id, exp] : deque_) {
-      fc::raw::pack(f, id);
-      fc::raw::pack(f, exp);
-   }
-   f.close();
+   auto writer = std::make_shared<threaded_snapshot_writer>(tmp);
+   add_to_snapshot(writer);
+   writer->finalize();
 
    std::filesystem::rename(tmp, filepath);
 }
@@ -165,33 +155,10 @@ bool transaction_dedup::read_from_file(const std::filesystem::path& filepath) {
       return false;
 
    try {
-      fc::cfile f;
-      f.set_file_path(filepath);
-      f.open("rb");
+      auto reader = std::make_shared<threaded_snapshot_reader>(filepath);
+      reader->validate();
+      read_from_snapshot(reader);
 
-      uint32_t magic = 0, version = 0;
-      fc::raw::unpack(f, magic);
-      fc::raw::unpack(f, version);
-      SYS_ASSERT(magic == dedup_file_magic && version == dedup_file_version,
-                 chain_exception, "Invalid transaction_dedup file: magic={} version={}", magic, version);
-
-      uint64_t count = 0;
-      fc::raw::unpack(f, count);
-
-      reset();
-      map_.reserve(std::max(static_cast<size_t>(count), default_map_capacity));
-
-      for (uint64_t i = 0; i < count; ++i) {
-         transaction_id_type id;
-         fc::time_point_sec exp;
-         fc::raw::unpack(f, id);
-         fc::raw::unpack(f, exp);
-         map_.emplace(id, exp);
-         deque_.emplace_back(id, exp);
-      }
-      f.close();
-
-      ilog("Read {} transaction dedup entries from {}", count, filepath.generic_string());
       std::filesystem::remove(filepath);
       return true;
    } catch (const fc::exception& e) {
@@ -203,10 +170,10 @@ bool transaction_dedup::read_from_file(const std::filesystem::path& filepath) {
 
 // --- Snapshot support ---
 
-void transaction_dedup::add_to_snapshot(const snapshot_writer_ptr& snapshot, const chainbase::database& db) const {
-   snapshot->write_section("sysio::chain::transaction_dedup", [this, &db](auto& section) {
+void transaction_dedup::add_to_snapshot(const snapshot_writer_ptr& snapshot) const {
+   snapshot->write_section("sysio::chain::transaction_dedup", [this](auto& section) {
       for (const auto& [id, exp] : deque_) {
-         section.add_row(snapshot_transaction_dedup_entry{id, exp}, db);
+         section.add_row(snapshot_transaction_dedup_entry{id, exp});
       }
    });
 }

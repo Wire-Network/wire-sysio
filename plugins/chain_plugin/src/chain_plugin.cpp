@@ -344,7 +344,7 @@ void chain_plugin::set_program_options(options_description& cli, options_descrip
           "Database read mode (\"head\", \"irreversible\", \"speculative\").\n"
           "In \"head\" mode: database contains state changes up to the head block; transactions received by the node are relayed if valid.\n"
           "In \"irreversible\" mode: database contains state changes up to the last irreversible block; "
-          "transactions received via the P2P network are not relayed and transactions cannot be pushed via the chain API.\n"
+          "transactions received by the node are speculatively executed and relayed if valid.\n"
           "In \"speculative\" mode: database contains state changes by transactions in the blockchain "
           "up to the head block as well as some transactions not yet included in the blockchain; transactions received by the node are relayed if valid.\n"
           )
