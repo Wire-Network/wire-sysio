@@ -70,6 +70,8 @@ public:
    }
 
 private:
+   // Parallel snapshot loading creates objects across multiple threads, each
+   // allocating shared_blob storage through different index types concurrently.
    struct spin_guard {
       std::atomic_flag& _flag;
       spin_guard(std::atomic_flag& f) : _flag(f) { while (_flag.test_and_set(std::memory_order_acquire)); }

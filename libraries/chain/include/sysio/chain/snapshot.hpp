@@ -320,6 +320,10 @@ namespace sysio { namespace chain {
                   return _reader.empty();
                }
 
+               size_t row_count() const {
+                  return _reader.section_row_count();
+               }
+
             private:
                friend class snapshot_reader;
                section_reader(snapshot_reader& _reader)
@@ -348,6 +352,7 @@ namespace sysio { namespace chain {
       virtual void return_to_header() = 0;
 
       virtual size_t total_row_count() = 0;
+      virtual size_t section_row_count() const = 0;
 
       virtual bool supports_threading() const {return false;}
 
@@ -391,6 +396,7 @@ namespace sysio { namespace chain {
          void clear_section() override;
          void return_to_header() override;
          size_t total_row_count() override;
+         size_t section_row_count() const override;
          bool has_section( const std::string& section_name ) const override;
 
       private:
@@ -494,6 +500,7 @@ namespace sysio { namespace chain {
          void clear_section() override;
          void return_to_header() override;
          size_t total_row_count() override;
+         size_t section_row_count() const override;
 
       private:
          bool validate_section() const;
@@ -519,6 +526,7 @@ namespace sysio { namespace chain {
          void clear_section() override;
          void return_to_header() override;
          size_t total_row_count() override;
+         size_t section_row_count() const override;
          bool supports_threading() const override {return true;}
 
          bool has_section( const std::string& section_name ) const override;
