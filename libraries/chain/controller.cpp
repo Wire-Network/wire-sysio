@@ -85,8 +85,10 @@ namespace detail {
          row.code       = obj.code;
          row.payer      = obj.payer;
          row.key_format = obj.key_format;
+         SYS_ASSERT(obj.key.size() > 0, snapshot_exception, "kv_object has empty key during snapshot write");
          row.key.assign(obj.key.data(), obj.key.data() + obj.key.size());
-         row.value.assign(obj.value.data(), obj.value.data() + obj.value.size());
+         if (obj.value.size() > 0)
+            row.value.assign(obj.value.data(), obj.value.data() + obj.value.size());
          return row;
       }
 
@@ -114,6 +116,8 @@ namespace detail {
          row.payer    = obj.payer;
          row.table    = obj.table;
          row.index_id = obj.index_id;
+         SYS_ASSERT(obj.sec_key.size() > 0, snapshot_exception, "kv_index_object has empty secondary key during snapshot write");
+         SYS_ASSERT(obj.pri_key.size() > 0, snapshot_exception, "kv_index_object has empty primary key during snapshot write");
          row.sec_key.assign(obj.sec_key.data(), obj.sec_key.data() + obj.sec_key.size());
          row.pri_key.assign(obj.pri_key.data(), obj.pri_key.data() + obj.pri_key.size());
          return row;
