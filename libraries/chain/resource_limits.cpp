@@ -105,6 +105,38 @@ void resource_limits_manager::read_from_snapshot( const snapshot_reader_ptr& sna
    });
 }
 
+void resource_limits_manager::validate_snapshot_state() const {
+   const auto& config_idx = _db.get_index<resource_limits_config_index>();
+   SYS_ASSERT(config_idx.size() == 1, snapshot_exception,
+              "Expected exactly 1 resource_limits_config_object, found {}", config_idx.size());
+
+   const auto& state_idx = _db.get_index<resource_limits_state_index>();
+   SYS_ASSERT(state_idx.size() == 1, snapshot_exception,
+              "Expected exactly 1 resource_limits_state_object, found {}", state_idx.size());
+
+   const auto& config = _db.get<resource_limits_config_object>();
+   config.cpu_limit_parameters.validate();
+   config.net_limit_parameters.validate();
+   SYS_ASSERT(config.cpu_limit_parameters.max > 0, snapshot_exception,
+              "resource_limits_config_object cpu_limit_parameters.max must be positive");
+   SYS_ASSERT(config.net_limit_parameters.max > 0, snapshot_exception,
+              "resource_limits_config_object net_limit_parameters.max must be positive");
+   SYS_ASSERT(config.cpu_limit_parameters.max_multiplier > 0, snapshot_exception,
+              "resource_limits_config_object cpu_limit_parameters.max_multiplier must be positive");
+   SYS_ASSERT(config.net_limit_parameters.max_multiplier > 0, snapshot_exception,
+              "resource_limits_config_object net_limit_parameters.max_multiplier must be positive");
+   SYS_ASSERT(config.account_cpu_usage_average_window > 0, snapshot_exception,
+              "resource_limits_config_object account_cpu_usage_average_window must be positive");
+   SYS_ASSERT(config.account_net_usage_average_window > 0, snapshot_exception,
+              "resource_limits_config_object account_net_usage_average_window must be positive");
+
+   const auto& state = _db.get<resource_limits_state_object>();
+   SYS_ASSERT(state.virtual_cpu_limit > 0, snapshot_exception,
+              "resource_limits_state_object virtual_cpu_limit must be positive");
+   SYS_ASSERT(state.virtual_net_limit > 0, snapshot_exception,
+              "resource_limits_state_object virtual_net_limit must be positive");
+}
+
 int64_t resource_limits_manager::initialize_account(const account_name& account, bool is_trx_transient) {
    const auto& usage = _db.create<resource_object>([&]( resource_object& bl ) {
       bl.owner = account;

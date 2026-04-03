@@ -97,8 +97,8 @@ public:
       uint32_t handle = kv_it_create(key_format, code, nullptr, 0);
 
       uint32_t count = 0;
-      int32_t status = 0; // 0 = OK
-      while (status == 0) {
+      int32_t status = kv_it_next(handle);
+      while (status == 0) { // 0 = iterator_ok
          ++count;
          status = kv_it_next(handle);
       }

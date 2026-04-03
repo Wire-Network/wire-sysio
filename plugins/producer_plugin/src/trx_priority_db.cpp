@@ -97,7 +97,9 @@ void trx_priority_db::load_trx_priority_map(const controller& control, trx_prior
       const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
       auto itr = kv_idx.lower_bound(boost::make_tuple(config::system_account_name, config::kv_format_standard, prefix.to_string_view()));
 
-      while (itr != kv_idx.end() && itr->code == config::system_account_name) {
+      while (itr != kv_idx.end()
+             && itr->code == config::system_account_name
+             && itr->key_format == config::kv_format_standard) {
          auto kv = itr->key_view();
          if (!prefix.matches(kv) || kv.size() != chain::kv_key_size) break;
 

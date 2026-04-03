@@ -242,7 +242,7 @@ template <typename ST>
 datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper<sysio::chain::kv_object>& obj) {
    fc::raw::pack(ds, fc::unsigned_int(0)); // struct_version
 
-   if (obj.obj.key_format == 1 && obj.obj.key.size() == sysio::chain::kv_key_size) {
+   if (obj.obj.key_format == sysio::chain::config::kv_format_standard && obj.obj.key.size() == sysio::chain::kv_key_size) {
       // SHiP-compatible key: decode to legacy contract_row fields
       uint64_t table_name  = sysio::chain::kv_decode_be64(obj.obj.key.data());
       uint64_t scope       = sysio::chain::kv_decode_be64(obj.obj.key.data() + 8);

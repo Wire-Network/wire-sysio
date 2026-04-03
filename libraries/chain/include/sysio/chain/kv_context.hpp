@@ -69,6 +69,7 @@ public:
       s.is_primary = false;
       s.status = kv_it_stat::iterator_end;
       s.code = code;
+      s.key_format = config::kv_format_raw;
       s.prefix.clear();
       s.table = table;
       s.index_id = index_id;

@@ -91,7 +91,15 @@ namespace detail {
       }
 
       static void from_snapshot_row(snapshot_kv_object&& row, kv_object& obj, chainbase::database&) {
+         static_assert(config::KV_FORMAT_COUNT == 2,
+                       "Update kv_object snapshot key_format validation when adding new formats");
+         SYS_ASSERT(row.key_format < config::KV_FORMAT_COUNT,
+                    snapshot_validation_exception, "kv_object has invalid key_format ({})", row.key_format);
          SYS_ASSERT(!row.key.empty(), snapshot_validation_exception, "kv_object has empty key");
+         SYS_ASSERT(row.key.size() <= config::max_kv_key_size_limit, snapshot_validation_exception,
+                    "kv_object key size ({}) exceeds absolute limit ({})", row.key.size(), config::max_kv_key_size_limit);
+         SYS_ASSERT(row.value.size() <= config::max_kv_value_size_limit, snapshot_validation_exception,
+                    "kv_object value size ({}) exceeds absolute limit ({})", row.value.size(), config::max_kv_value_size_limit);
          obj.code       = row.code;
          obj.payer      = row.payer;
          obj.key_format = row.key_format;
@@ -122,6 +130,10 @@ namespace detail {
       static void from_snapshot_row(snapshot_kv_index_object&& row, kv_index_object& obj, chainbase::database&) {
          SYS_ASSERT(!row.sec_key.empty(), snapshot_validation_exception, "kv_index_object has empty secondary key");
          SYS_ASSERT(!row.pri_key.empty(), snapshot_validation_exception, "kv_index_object has empty primary key");
+         SYS_ASSERT(row.sec_key.size() <= config::max_kv_key_size_limit, snapshot_validation_exception,
+                    "kv_index_object secondary key size ({}) exceeds absolute limit ({})", row.sec_key.size(), config::max_kv_key_size_limit);
+         SYS_ASSERT(row.pri_key.size() <= config::max_kv_key_size_limit, snapshot_validation_exception,
+                    "kv_index_object primary key size ({}) exceeds absolute limit ({})", row.pri_key.size(), config::max_kv_key_size_limit);
          obj.code     = row.code;
          obj.payer    = row.payer;
          obj.table    = row.table;
@@ -1710,11 +1722,33 @@ struct controller_impl {
          // nothing to do
       });
 
+      // --- Snapshot state validation ---
+      // Singleton enforcement
+      SYS_ASSERT(db.get_index<global_property_multi_index>().size() == 1, snapshot_exception,
+                 "Expected exactly 1 global_property_object, found {}", db.get_index<global_property_multi_index>().size());
+      SYS_ASSERT(db.get_index<dynamic_global_property_multi_index>().size() == 1, snapshot_exception,
+                 "Expected exactly 1 dynamic_global_property_object, found {}", db.get_index<dynamic_global_property_multi_index>().size());
+      SYS_ASSERT(db.get_index<protocol_state_multi_index>().size() == 1, snapshot_exception,
+                 "Expected exactly 1 protocol_state_object, found {}", db.get_index<protocol_state_multi_index>().size());
+
+      // block_summary must be exactly 65536 rows
+      SYS_ASSERT(db.get_index<block_summary_multi_index>().size() == 0x10000, snapshot_exception,
+                 "Expected 65536 block_summary_object rows, found {}", db.get_index<block_summary_multi_index>().size());
+
       const auto& gpo = db.get<global_property_object>();
       SYS_ASSERT( gpo.chain_id == chain_id, chain_id_type_exception,
                   "chain ID in snapshot ({}) does not match the chain ID that controller was constructed with ({})",
                   gpo.chain_id, chain_id
       );
+
+      // Resource limits validation (denominators, window sizes, virtual limits)
+      resource_limits.validate_snapshot_state();
+
+      // preactivated_protocol_features should be empty in a finalized snapshot
+      const auto& pso = db.get<protocol_state_object>();
+      SYS_ASSERT(pso.preactivated_protocol_features.empty(), snapshot_exception,
+                 "Snapshot contains {} preactivated protocol features; finalized snapshots must have none",
+                 pso.preactivated_protocol_features.size());
 
       return result;
    }
