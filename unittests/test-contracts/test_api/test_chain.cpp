@@ -46,9 +46,9 @@ void test_chain::test_get_ram_usage() {
     char key1[24];
     make_kv_key(table1, receiver, "tom"_n.value, key1);
     kv_set( 0, payer, key1, 24, info.c_str(), info.size() );
-    // KV billing: key_size(24) + value_size + kv_object overhead (144)
-    // billable_size_v<kv_object> = 80 (fixed fields + id + padding) + 32*2 (index overhead) = 144
-    int64_t billable_size_v_kv_object = 144;
+    // KV billing: key_size(24) + value_size + kv_object overhead (112)
+    // billable_size_v<kv_object> = 48 (fixed fields incl id) + 32*2 (index overhead) = 112
+    int64_t billable_size_v_kv_object = 112;
     int64_t billable_size = (int64_t)(24 + info.size() + billable_size_v_kv_object);
 
     int64_t expected_ram = ram_usage.ram_bytes + billable_size;

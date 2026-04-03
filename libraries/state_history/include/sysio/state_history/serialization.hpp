@@ -242,11 +242,11 @@ template <typename ST>
 datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper<sysio::chain::kv_object>& obj) {
    fc::raw::pack(ds, fc::unsigned_int(0)); // struct_version
 
-   if (obj.obj.key_format == 1 && obj.obj.key_size == sysio::chain::kv_key_size) {
+   if (obj.obj.key_format == 1 && obj.obj.key.size() == sysio::chain::kv_key_size) {
       // SHiP-compatible key: decode to legacy contract_row fields
-      uint64_t table_name  = sysio::chain::kv_decode_be64(obj.obj.key_data());
-      uint64_t scope       = sysio::chain::kv_decode_be64(obj.obj.key_data() + 8);
-      uint64_t primary_key = sysio::chain::kv_decode_be64(obj.obj.key_data() + 16);
+      uint64_t table_name  = sysio::chain::kv_decode_be64(obj.obj.key.data());
+      uint64_t scope       = sysio::chain::kv_decode_be64(obj.obj.key.data() + 8);
+      uint64_t primary_key = sysio::chain::kv_decode_be64(obj.obj.key.data() + 16);
 
       fc::raw::pack(ds, as_type<uint64_t>(obj.obj.code.to_uint64_t())); // code
       fc::raw::pack(ds, as_type<uint64_t>(scope));                       // scope
@@ -258,7 +258,7 @@ datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper<sysi
       // Non-standard key: emit as contract_row_kv_v0 {code, payer, key, value}
       fc::raw::pack(ds, as_type<uint64_t>(obj.obj.code.to_uint64_t()));
       fc::raw::pack(ds, as_type<uint64_t>(obj.obj.payer.to_uint64_t()));
-      std::vector<char> key_bytes(obj.obj.key_data(), obj.obj.key_data() + obj.obj.key_size);
+      std::vector<char> key_bytes(obj.obj.key.data(), obj.obj.key.data() + obj.obj.key.size());
       history_pack_big_bytes(ds, key_bytes);
       history_pack_big_bytes(ds, obj.obj.value);
    }
@@ -272,12 +272,12 @@ datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper<sysi
    fc::raw::pack(ds, as_type<uint64_t>(obj.obj.payer.to_uint64_t()));
    fc::raw::pack(ds, as_type<uint64_t>(obj.obj.table.to_uint64_t()));
    fc::raw::pack(ds, as_type<uint8_t>(obj.obj.index_id));
-   history_pack_varuint64(ds, obj.obj.sec_key_size);
-   if (obj.obj.sec_key_size > 0)
-      ds.write(obj.obj.sec_key_data(), obj.obj.sec_key_size);
-   history_pack_varuint64(ds, obj.obj.pri_key_size);
-   if (obj.obj.pri_key_size > 0)
-      ds.write(obj.obj.pri_key_data(), obj.obj.pri_key_size);
+   history_pack_varuint64(ds, obj.obj.sec_key.size());
+   if (obj.obj.sec_key.size() > 0)
+      ds.write(obj.obj.sec_key.data(), obj.obj.sec_key.size());
+   history_pack_varuint64(ds, obj.obj.pri_key.size());
+   if (obj.obj.pri_key.size() > 0)
+      ds.write(obj.obj.pri_key.data(), obj.obj.pri_key.size());
    return ds;
 }
 

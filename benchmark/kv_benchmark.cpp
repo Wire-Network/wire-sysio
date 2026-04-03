@@ -86,7 +86,7 @@ BOOST_AUTO_TEST_CASE(chainbase_micro_benchmark) {
 
          db.create<kv_object>([&](auto& o) {
             o.code = "benchmark"_n;
-            o.key_assign(kv_keys[i].data(), kv_keys[i].size());
+            o.key.assign(kv_keys[i].data(), kv_keys[i].size());
             o.value.assign(value.data(), value.size());
          });
       }, N);
@@ -199,7 +199,7 @@ BOOST_AUTO_TEST_CASE(full_intrinsic_path_benchmark) {
          // Create new
          db.create<kv_object>([&](auto& o) {
             o.code = "kvbench"_n;
-            o.key_assign(key_buf, 8);
+            o.key.assign(key_buf, 8);
             o.value.assign(value.data(), value.size());
          });
       }, N);
