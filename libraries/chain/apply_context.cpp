@@ -627,8 +627,9 @@ int64_t apply_context::kv_set(uint8_t key_format, uint64_t payer_val, const char
       }
 
       // Capture old value for deep_mind before modify (old_payer already captured above)
+      auto dm_logger = control.get_deep_mind_logger(trx_context.is_transient());
       std::string old_value_copy;
-      if (auto dm_logger = control.get_deep_mind_logger(trx_context.is_transient())) {
+      if (dm_logger) {
          old_value_copy.assign(itr->value.data(), itr->value.size());
       }
 
@@ -637,7 +638,7 @@ int64_t apply_context::kv_set(uint8_t key_format, uint64_t payer_val, const char
          o.value.assign(value, value_size);
       });
 
-      if (auto dm_logger = control.get_deep_mind_logger(trx_context.is_transient())) {
+      if (dm_logger) {
          dm_logger->on_kv_set(*itr, false, old_payer, old_value_copy.data(), old_value_copy.size());
       }
 
@@ -1020,15 +1021,11 @@ void apply_context::kv_idx_update(uint64_t payer_val, name table, uint8_t index_
       }
    }
 
-   // Remove old and create new (secondary_key is part of index key, can't modify in-place)
-   db.remove(*itr);
-   db.create<kv_index_object>([&](auto& o) {
-      o.code = receiver;
+   // undo_index::post_modify handles AVL tree rebalancing when composite
+   // index key fields change, avoiding node dealloc/realloc overhead.
+   db.modify(*itr, [&](auto& o) {
       o.payer = payer;
-      o.table = table;
-      o.index_id = index_id;
       o.sec_key.assign(new_sec_key, new_sec_key_size);
-      o.pri_key.assign(pri_key, pri_key_size);
    });
 }
 

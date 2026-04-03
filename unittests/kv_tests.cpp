@@ -190,6 +190,74 @@ BOOST_AUTO_TEST_CASE(kv_index_object_crud) {
    session.undo();
 }
 
+// Verify that db.modify() correctly rebalances AVL trees when a composite
+// index key field (sec_key) changes, as an alternative to remove+create.
+BOOST_AUTO_TEST_CASE(kv_index_modify_rekeys_correctly) {
+   validating_tester t;
+   auto& db = const_cast<chainbase::database&>(t.control->db());
+
+   auto session = db.start_undo_session(true);
+
+   // Create three entries: alice, bob, charlie
+   const auto& alice = db.create<kv_index_object>([](auto& o) {
+      o.code = "test"_n;
+      o.table = "users"_n;
+      o.index_id = 0;
+      o.sec_key.assign("alice", 5);
+      o.pri_key.assign("\x00\x01", 2);
+   });
+   db.create<kv_index_object>([](auto& o) {
+      o.code = "test"_n;
+      o.table = "users"_n;
+      o.index_id = 0;
+      o.sec_key.assign("bob", 3);
+      o.pri_key.assign("\x00\x02", 2);
+   });
+   db.create<kv_index_object>([](auto& o) {
+      o.code = "test"_n;
+      o.table = "users"_n;
+      o.index_id = 0;
+      o.sec_key.assign("charlie", 7);
+      o.pri_key.assign("\x00\x03", 2);
+   });
+
+   // Modify alice's sec_key to "zebra" — should move to end of ordering
+   db.modify(alice, [](auto& o) {
+      o.sec_key.assign("zebra", 5);
+   });
+
+   // Verify ordering in by_code_table_idx_seckey: bob < charlie < zebra
+   auto& sec_idx = db.get_index<kv_index_index, by_code_table_idx_seckey>();
+   auto itr = sec_idx.lower_bound(boost::make_tuple(
+      name("test"), name("users"), uint8_t(0)));
+   BOOST_REQUIRE(itr != sec_idx.end());
+   BOOST_CHECK_EQUAL(itr->sec_key_view(), "bob");
+   ++itr;
+   BOOST_REQUIRE(itr != sec_idx.end());
+   BOOST_CHECK_EQUAL(itr->sec_key_view(), "charlie");
+   ++itr;
+   BOOST_REQUIRE(itr != sec_idx.end());
+   BOOST_CHECK_EQUAL(itr->sec_key_view(), "zebra");
+   // Verify pri_key is preserved
+   BOOST_CHECK_EQUAL(itr->pri_key_view(), std::string_view("\x00\x01", 2));
+
+   // Also verify by_code_table_idx_prikey still finds the modified object
+   auto& pri_idx = db.get_index<kv_index_index, by_code_table_idx_prikey>();
+   auto pitr = pri_idx.find(boost::make_tuple(
+      name("test"), name("users"), uint8_t(0), std::string_view("\x00\x01", 2)));
+   BOOST_REQUIRE(pitr != pri_idx.end());
+   BOOST_CHECK_EQUAL(pitr->sec_key_view(), "zebra");
+
+   // Verify undo restores original ordering
+   session.undo();
+
+   auto& sec_idx2 = db.get_index<kv_index_index, by_code_table_idx_seckey>();
+   auto itr2 = sec_idx2.lower_bound(boost::make_tuple(
+      name("test"), name("users"), uint8_t(0)));
+   // After undo, all 3 entries should be gone (session created them all)
+   BOOST_CHECK(itr2 == sec_idx2.end() || itr2->code != name("test"));
+}
+
 BOOST_AUTO_TEST_CASE(kv_iterator_pool_basic) {
    kv_iterator_pool pool;
 
