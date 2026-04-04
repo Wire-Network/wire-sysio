@@ -1801,14 +1801,30 @@ read_only::get_table_rows_by_seckey( const read_only::get_table_rows_params& p,
    // Encode bounds
    auto lb_bytes = encode_sec_bound(p.key_type, p.lower_bound, p.encode_type);
    auto ub_bytes = encode_sec_bound(p.key_type, p.upper_bound, p.encode_type);
-   auto lb_sv = std::string_view(lb_bytes.data(), lb_bytes.size());
-   auto ub_sv = std::string_view(ub_bytes.data(), ub_bytes.size());
    bool has_lower = !lb_bytes.empty();
    bool has_upper = !ub_bytes.empty();
 
-   // CDT's kv_multi_index encodes secondary pri_key as [scope:8B BE][pk:8B BE]
-   char scope_be[chain::kv_table_prefix_size];
+   // CDT's kv_multi_index encodes sec_key as [scope:8B BE][secondary_value]
+   // and pri_key as [pk:8B BE].  Prepend scope to search bounds so that
+   // B-tree iteration is naturally scoped.
+   char scope_be[chain::kv_scope_prefix_size];
    chain::kv_encode_be64(scope_be, scope);
+
+   auto prepend_scope = [&](const vector<char>& bound) -> vector<char> {
+      vector<char> scoped(chain::kv_scope_prefix_size + bound.size());
+      memcpy(scoped.data(), scope_be, chain::kv_scope_prefix_size);
+      if (!bound.empty())
+         memcpy(scoped.data() + chain::kv_scope_prefix_size, bound.data(), bound.size());
+      return scoped;
+   };
+
+   // If lower bound specified, scope-prefix it; otherwise use bare scope prefix
+   // to position at the first entry in this scope.
+   auto scoped_lb = has_lower ? prepend_scope(lb_bytes)
+                              : vector<char>(scope_be, scope_be + chain::kv_scope_prefix_size);
+   auto scoped_ub = has_upper ? prepend_scope(ub_bytes) : vector<char>();
+   auto lb_sv = std::string_view(scoped_lb.data(), scoped_lb.size());
+   auto ub_sv = has_upper ? std::string_view(scoped_ub.data(), scoped_ub.size()) : std::string_view();
 
    const auto& sec_idx = d.get_index<chain::kv_index_index, chain::by_code_table_idx_seckey>();
 
@@ -1832,31 +1848,38 @@ read_only::get_table_rows_by_seckey( const read_only::get_table_rows_params& p,
    };
 
    auto collect_next = [&](const chain::kv_index_object& obj) {
+      // Validate sec_key has scope prefix and matches our scope
+      if (obj.sec_key.size() < chain::kv_scope_prefix_size ||
+          memcmp(obj.sec_key.data(), scope_be, chain::kv_scope_prefix_size) != 0)
+         return;
       hp.more = true;
-      hp.next_key = decode_sec_key(p.key_type, obj.sec_key.data(), obj.sec_key.size(), p.encode_type);
+      // sec_key is [scope:8B][value] — skip scope prefix for the API response
+      const char* sec_data = obj.sec_key.data() + chain::kv_scope_prefix_size;
+      size_t      sec_size = obj.sec_key.size() - chain::kv_scope_prefix_size;
+      hp.next_key = decode_sec_key(p.key_type, sec_data, sec_size, p.encode_type);
    };
 
    bool reverse = p.reverse && *p.reverse;
 
    if (!reverse) {
-      // Forward iteration
-      auto itr = has_lower
-         ? sec_idx.lower_bound(boost::make_tuple(p.code, p.table, index_id, lb_sv))
-         : sec_idx.lower_bound(boost::make_tuple(p.code, p.table, index_id));
+      // Forward iteration — lb_sv already includes [scope:8B] prefix
+      auto itr = sec_idx.lower_bound(boost::make_tuple(p.code, p.table, index_id, lb_sv));
       uint32_t count = 0;
       for (; itr != sec_idx.end(); ++itr) {
          if (itr->code != p.code || itr->table != p.table || itr->index_id != index_id)
             break;
-         // Upper bound check on secondary key
+         // Scope boundary: sec_key is [scope:8B][value]; entries are sorted,
+         // so once scope prefix differs we're past this scope.
+         if (itr->sec_key.size() < chain::kv_scope_prefix_size ||
+             memcmp(itr->sec_key.data(), scope_be, chain::kv_scope_prefix_size) != 0)
+            break;
+         // Upper bound check on scoped secondary key
          if (has_upper && itr->sec_key_view() > ub_sv)
             break;
-         // Scope filter: first 8 bytes of pri_key must match scope
-         if (itr->pri_key.size() < chain::kv_prefix_size) continue;
-         if (memcmp(itr->pri_key.data(), scope_be, chain::kv_table_prefix_size) != 0)
-            continue;
          if (count >= limit) { collect_next(*itr); break; }
-         // Extract primary key (bytes 8-15 of pri_key)
-         uint64_t pk = chain::kv_decode_be64(itr->pri_key.data() + chain::kv_table_prefix_size);
+         // pri_key is [pk:8B]
+         if (itr->pri_key.size() < chain::kv_pri_key_size) continue;
+         uint64_t pk = chain::kv_decode_be64(itr->pri_key.data());
          auto [data, payer] = fetch_value(pk);
          if (!data.empty()) {
             hp.rows.emplace_back(std::move(data), payer);
@@ -1870,25 +1893,35 @@ read_only::get_table_rows_by_seckey( const read_only::get_table_rows_params& p,
          }
       }
    } else {
-      // Reverse iteration
-      auto end_itr = has_upper
-         ? sec_idx.upper_bound(boost::make_tuple(p.code, p.table, index_id, ub_sv))
-         : sec_idx.upper_bound(boost::make_tuple(p.code, p.table, index_id));
-      auto begin_itr = has_lower
-         ? sec_idx.lower_bound(boost::make_tuple(p.code, p.table, index_id, lb_sv))
-         : sec_idx.lower_bound(boost::make_tuple(p.code, p.table, index_id));
+      // Reverse iteration — bounds already include [scope:8B] prefix.
+      // For no-upper-bound, position past the last entry in this scope
+      // by using scope+1 as the exclusive upper bound prefix.
+      auto end_itr = [&]() {
+         if (has_upper)
+            return sec_idx.upper_bound(boost::make_tuple(p.code, p.table, index_id, ub_sv));
+         if (scope < std::numeric_limits<uint64_t>::max()) {
+            char scope_next_be[chain::kv_scope_prefix_size];
+            chain::kv_encode_be64(scope_next_be, scope + 1);
+            return sec_idx.lower_bound(boost::make_tuple(p.code, p.table, index_id, std::string_view(scope_next_be, chain::kv_scope_prefix_size)));
+         }
+         return sec_idx.upper_bound(boost::make_tuple(p.code, p.table, index_id));
+      }();
+      auto begin_itr = sec_idx.lower_bound(boost::make_tuple(p.code, p.table, index_id, lb_sv));
       auto ritr = boost::make_reverse_iterator(end_itr);
       auto rend = boost::make_reverse_iterator(begin_itr);
       uint32_t count = 0;
       for (; ritr != rend; ++ritr) {
          if (ritr->code != p.code || ritr->table != p.table || ritr->index_id != index_id)
             break;
-         // Scope filter
-         if (ritr->pri_key.size() < chain::kv_prefix_size) continue;
-         if (memcmp(ritr->pri_key.data(), scope_be, chain::kv_table_prefix_size) != 0)
-            continue;
+         // Scope boundary: sec_key is [scope:8B][value]; entries are sorted,
+         // so once scope prefix differs we're past this scope.
+         if (ritr->sec_key.size() < chain::kv_scope_prefix_size ||
+             memcmp(ritr->sec_key.data(), scope_be, chain::kv_scope_prefix_size) != 0)
+            break;
          if (count >= limit) { collect_next(*ritr); break; }
-         uint64_t pk = chain::kv_decode_be64(ritr->pri_key.data() + chain::kv_table_prefix_size);
+         // pri_key is [pk:8B]
+         if (ritr->pri_key.size() < chain::kv_pri_key_size) continue;
+         uint64_t pk = chain::kv_decode_be64(ritr->pri_key.data());
          auto [data, payer] = fetch_value(pk);
          if (!data.empty()) {
             hp.rows.emplace_back(std::move(data), payer);

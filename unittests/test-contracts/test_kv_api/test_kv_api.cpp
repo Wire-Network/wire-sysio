@@ -2238,4 +2238,199 @@ public:
       kv_idx_store(payer.value, "idxpayer"_n.value, 0,
                    pk, sizeof(pk), sec_key, sizeof(sec_key));
    }
+
+   // ═══════════════════════════════════════════════════════════════════════════
+   // Cross-scope secondary index isolation tests
+   // Verify that secondary index iteration in one scope does not leak entries
+   // from another scope using the same table and overlapping primary keys.
+   // ═══════════════════════════════════════════════════════════════════════════
+
+   // ─── tstxscope: cross-scope isolation — iterate one scope, verify no leak ──
+   [[sysio::action]]
+   void tstxscope() {
+      sec_table ta(get_self(), "xscope.a"_n.value);
+      sec_table tb(get_self(), "xscope.b"_n.value);
+
+      // Same PKs, different ages in each scope
+      ta.emplace(get_self(), [](sec_row& r) { r.pk = 1; r.age = 100; });
+      ta.emplace(get_self(), [](sec_row& r) { r.pk = 2; r.age = 200; });
+
+      tb.emplace(get_self(), [](sec_row& r) { r.pk = 1; r.age = 300; });
+      tb.emplace(get_self(), [](sec_row& r) { r.pk = 2; r.age = 400; });
+
+      // Iterate scope A by secondary — should see exactly 100, 200
+      auto idxA = ta.get_index<"byage"_n>();
+      auto it = idxA.begin();
+      check(it != idxA.end(),   "tstxscope: A begin valid");
+      check(it->age == 100,     "tstxscope: A first age 100");
+      ++it;
+      check(it->age == 200,     "tstxscope: A second age 200");
+      ++it;
+      check(it == idxA.end(),   "tstxscope: A end after 2");
+
+      // Iterate scope B — should see exactly 300, 400
+      auto idxB = tb.get_index<"byage"_n>();
+      auto itb = idxB.begin();
+      check(itb != idxB.end(),  "tstxscope: B begin valid");
+      check(itb->age == 300,    "tstxscope: B first age 300");
+      ++itb;
+      check(itb->age == 400,    "tstxscope: B second age 400");
+      ++itb;
+      check(itb == idxB.end(),  "tstxscope: B end after 2");
+   }
+
+   // ─── tstxfind: cross-scope find — find in A must not return B's entry ──────
+   [[sysio::action]]
+   void tstxfind() {
+      sec_table ta(get_self(), "xfind.a"_n.value);
+      sec_table tb(get_self(), "xfind.b"_n.value);
+
+      ta.emplace(get_self(), [](sec_row& r) { r.pk = 1; r.age = 50; });
+      tb.emplace(get_self(), [](sec_row& r) { r.pk = 1; r.age = 99; });
+
+      auto idxA = ta.get_index<"byage"_n>();
+      // find(99) in scope A should miss (only scope B has age=99)
+      auto it = idxA.find(99);
+      check(it == idxA.end(), "tstxfind: find(99) in scope A should be end");
+
+      // find(50) in scope A should hit
+      auto it2 = idxA.find(50);
+      check(it2 != idxA.end(), "tstxfind: find(50) in scope A should exist");
+      check(it2->pk == 1,      "tstxfind: found pk should be 1");
+   }
+
+   // ─── tstxerase: erase from scope A must not affect scope B ─────────────────
+   [[sysio::action]]
+   void tstxerase() {
+      sec_table ta(get_self(), "xerase.a"_n.value);
+      sec_table tb(get_self(), "xerase.b"_n.value);
+
+      ta.emplace(get_self(), [](sec_row& r) { r.pk = 1; r.age = 77; });
+      tb.emplace(get_self(), [](sec_row& r) { r.pk = 1; r.age = 77; });
+
+      // Erase from scope A
+      auto idxA = ta.get_index<"byage"_n>();
+      auto it = idxA.find(77);
+      check(it != idxA.end(), "tstxerase: A find(77) should exist");
+      idxA.erase(it);
+
+      // Scope A should be empty
+      check(idxA.begin() == idxA.end(), "tstxerase: A should be empty");
+
+      // Scope B should still have the entry
+      auto idxB = tb.get_index<"byage"_n>();
+      auto itb = idxB.find(77);
+      check(itb != idxB.end(), "tstxerase: B find(77) should survive");
+      check(itb->pk == 1,      "tstxerase: B pk should be 1");
+   }
+
+   // ─── tstxdbl: cross-scope isolation with double secondary ──────────────────
+   struct [[sysio::table]] dbl_row {
+      uint64_t pk;
+      double   val;
+      uint64_t primary_key() const { return pk; }
+      double   by_val() const { return val; }
+      SYSLIB_SERIALIZE(dbl_row, (pk)(val))
+   };
+   using dbl_table = sysio::multi_index<"dbltbl"_n, dbl_row,
+      sysio::indexed_by<"byval"_n, sysio::const_mem_fun<dbl_row, double, &dbl_row::by_val>>
+   >;
+
+   [[sysio::action]]
+   void tstxdbl() {
+      dbl_table ta(get_self(), "xdbl.a"_n.value);
+      dbl_table tb(get_self(), "xdbl.b"_n.value);
+
+      ta.emplace(get_self(), [](dbl_row& r) { r.pk = 1; r.val = 1.5; });
+      ta.emplace(get_self(), [](dbl_row& r) { r.pk = 2; r.val = 3.14; });
+      tb.emplace(get_self(), [](dbl_row& r) { r.pk = 1; r.val = 2.71; });
+      tb.emplace(get_self(), [](dbl_row& r) { r.pk = 2; r.val = -0.5; });
+
+      // Iterate scope A by secondary — should see 1.5, 3.14 (sorted)
+      auto idxA = ta.get_index<"byval"_n>();
+      auto it = idxA.begin();
+      check(it != idxA.end(),   "tstxdbl: A begin valid");
+      check(it->val == 1.5,     "tstxdbl: A first 1.5");
+      ++it;
+      check(it->val == 3.14,    "tstxdbl: A second 3.14");
+      ++it;
+      check(it == idxA.end(),   "tstxdbl: A end after 2");
+
+      // Iterate scope B — should see -0.5, 2.71 (sorted)
+      auto idxB = tb.get_index<"byval"_n>();
+      auto itb = idxB.begin();
+      check(itb != idxB.end(),  "tstxdbl: B begin valid");
+      check(itb->val == -0.5,   "tstxdbl: B first -0.5");
+      ++itb;
+      check(itb->val == 2.71,   "tstxdbl: B second 2.71");
+      ++itb;
+      check(itb == idxB.end(),  "tstxdbl: B end after 2");
+
+      // Reverse iterate scope A — should see 3.14, 1.5
+      auto rit = idxA.rbegin();
+      check(rit != idxA.rend(), "tstxdbl: A rbegin valid");
+      check(rit->val == 3.14,   "tstxdbl: A rbegin 3.14");
+      ++rit;
+      check(rit->val == 1.5,    "tstxdbl: A rnext 1.5");
+      ++rit;
+      check(rit == idxA.rend(), "tstxdbl: A rend after 2");
+   }
+
+   // ─── tstxzero: cross-scope isolation with scope=0 (minimum prefix) ────────
+   [[sysio::action]]
+   void tstxzero() {
+      // scope 0 encodes as [0x00 x 8] prefix — lexicographic minimum
+      sec_table t0(get_self(), 0);
+      sec_table t1(get_self(), 1);
+
+      t0.emplace(get_self(), [](sec_row& r) { r.pk = 1; r.age = 10; });
+      t1.emplace(get_self(), [](sec_row& r) { r.pk = 1; r.age = 20; });
+
+      auto idx0 = t0.get_index<"byage"_n>();
+      auto it = idx0.begin();
+      check(it != idx0.end(), "tstxzero: scope 0 begin valid");
+      check(it->age == 10,    "tstxzero: scope 0 age 10");
+      ++it;
+      check(it == idx0.end(), "tstxzero: scope 0 only 1 entry");
+   }
+
+   // ─── tstxrev: reverse iteration must not leak across scopes ───────────────
+   [[sysio::action]]
+   void tstxrev() {
+      sec_table ta(get_self(), "xrev.a"_n.value);
+      sec_table tb(get_self(), "xrev.b"_n.value);
+
+      ta.emplace(get_self(), [](sec_row& r) { r.pk = 1; r.age = 10; });
+      ta.emplace(get_self(), [](sec_row& r) { r.pk = 2; r.age = 20; });
+      tb.emplace(get_self(), [](sec_row& r) { r.pk = 1; r.age = 30; });
+
+      // Reverse iterate scope A — should see 20, 10 only
+      auto idxA = ta.get_index<"byage"_n>();
+      auto rit = idxA.rbegin();
+      check(rit != idxA.rend(), "tstxrev: A rbegin valid");
+      check(rit->age == 20,     "tstxrev: A rbegin age 20");
+      ++rit;
+      check(rit->age == 10,     "tstxrev: A rnext age 10");
+      ++rit;
+      check(rit == idxA.rend(), "tstxrev: A rend after 2");
+   }
+
+   // ─── tstxubound: upper_bound in scope A stops at scope boundary ────────────
+   [[sysio::action]]
+   void tstxubound() {
+      sec_table ta(get_self(), "xubound.a"_n.value);
+      sec_table tb(get_self(), "xubound.b"_n.value);
+
+      ta.emplace(get_self(), [](sec_row& r) { r.pk = 1; r.age = 10; });
+      ta.emplace(get_self(), [](sec_row& r) { r.pk = 2; r.age = 20; });
+      tb.emplace(get_self(), [](sec_row& r) { r.pk = 1; r.age = 15; });
+
+      auto idxA = ta.get_index<"byage"_n>();
+      // upper_bound(10) in scope A should land on age=20, not on B's age=15
+      auto it = idxA.upper_bound(10);
+      check(it != idxA.end(), "tstxubound: upper_bound(10) should exist");
+      check(it->age == 20,    "tstxubound: should be age 20, not 15 from scope B");
+      ++it;
+      check(it == idxA.end(), "tstxubound: end after upper_bound advance");
+   }
 };
