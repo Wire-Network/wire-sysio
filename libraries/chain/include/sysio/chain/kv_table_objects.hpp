@@ -136,7 +136,6 @@ namespace sysio { namespace chain {
    };
 
    struct by_code_table_idx_seckey;
-   struct by_code_table_idx_prikey;
 
    using kv_index_index = chainbase::shared_multi_index_container<
       kv_index_object,
@@ -154,16 +153,6 @@ namespace sysio { namespace chain {
             >,
             composite_key_compare<std::less<account_name>, std::less<name>, std::less<uint8_t>,
                                   kv_key_less, kv_key_less>
-         >,
-         ordered_unique<tag<by_code_table_idx_prikey>,
-            composite_key<kv_index_object,
-               member<kv_index_object, account_name,  &kv_index_object::code>,
-               member<kv_index_object, name,           &kv_index_object::table>,
-               member<kv_index_object, uint8_t,        &kv_index_object::index_id>,
-               kv_pri_key_extractor
-            >,
-            composite_key_compare<std::less<account_name>, std::less<name>, std::less<uint8_t>,
-                                  kv_key_less>
          >
       >
    >;
@@ -180,7 +169,7 @@ namespace config {
 
    template<>
    struct billable_size<kv_index_object> {
-      static const uint64_t overhead = overhead_per_row_per_index_ram_bytes * 3;  ///< 3 indices: by_id, by_code_table_idx_seckey, by_code_table_idx_prikey
+      static const uint64_t overhead = overhead_per_row_per_index_ram_bytes * 2;  ///< 2 indices: by_id, by_code_table_idx_seckey
       // Fixed fields: 8 id + 8 code + 8 payer + 8 table + 8 sec_key (offset_ptr)
       //             + 8 pri_key (offset_ptr) + 1 index_id + 7 padding = 56
       // sec_key.size() and pri_key.size() are added separately at billing time.
