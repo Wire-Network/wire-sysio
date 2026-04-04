@@ -271,8 +271,8 @@ namespace chainbase {
                }
 
                void push()   { _apply = false; }
-               void squash() { if (_apply) _db->squash(); _apply = false; }
-               void undo()   { if (_apply) _db->undo();   _apply = false; }
+               void squash() { if (_apply) _db->squash_from_session(); _apply = false; }
+               void undo()   { if (_apply) _db->undo_from_session();   _apply = false; }
 
             private:
                friend class database;
@@ -534,6 +534,13 @@ namespace chainbase {
          }
 
       private:
+         // Session cleanup must work even when _read_only_mode is true (e.g. SIGTERM
+         // during a read window while a block-building session is still alive).
+         // The old per-index session design bypassed the read_only_mode check; these
+         // methods preserve that behavior.
+         void undo_from_session();
+         void squash_from_session();
+
          pinnable_mapped_file                                        _db_file;
          bool                                                        _read_only = false;
 
