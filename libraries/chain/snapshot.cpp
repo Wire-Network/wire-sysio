@@ -143,6 +143,11 @@ void variant_snapshot_reader::return_to_header() {
    clear_section();
 }
 
+size_t variant_snapshot_reader::section_row_count() const {
+   if (!cur_section) return 0;
+   return (*cur_section)["rows"].get_array().size();
+}
+
 size_t variant_snapshot_reader::total_row_count() {
    size_t total = 0;
 
@@ -436,6 +441,10 @@ void istream_json_snapshot_reader::return_to_header() {
    clear_section();
 }
 
+size_t istream_json_snapshot_reader::section_row_count() const {
+   return impl->num_rows;
+}
+
 size_t istream_json_snapshot_reader::total_row_count() {
    size_t total = 0;
 
@@ -608,6 +617,10 @@ void threaded_snapshot_reader::clear_section() {
 
 void threaded_snapshot_reader::return_to_header() {
    clear_section();
+}
+
+size_t threaded_snapshot_reader::section_row_count() const {
+   return num_rows;
 }
 
 size_t threaded_snapshot_reader::total_row_count() {

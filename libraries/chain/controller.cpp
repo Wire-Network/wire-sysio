@@ -1560,6 +1560,7 @@ struct controller_impl {
          using utils_t = decltype(utils);
          using value_t = typename decltype(utils)::index_t::value_type;
          snapshot->read_section<value_t>([this, &read_row_count]( auto& section ) {
+            utils_t::preallocate(db, section.row_count());
             bool more = !section.empty();
             while (more) {
                utils_t::create(db, [this, &section, &more](auto& row) {
@@ -1682,6 +1683,7 @@ struct controller_impl {
             // TODO:
          }
          snapshot->read_section<value_t>([this,&rows_loaded]( auto& section ) {
+            decltype(utils)::preallocate(db, section.row_count());
             bool more = !section.empty();
             while(more) {
                decltype(utils)::create(db, [this, &section, &more]( auto &row ) {
