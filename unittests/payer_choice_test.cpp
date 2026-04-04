@@ -88,9 +88,10 @@ BOOST_AUTO_TEST_SUITE(payer_choice_test)
         c.create_accounts({contract_account, alice_account, bob_account}, false, true, false, true);
         c.produce_block();
 
-        // ROA: give kvtest enough for contract deployment, alice enough for data
+        // ROA: give kvtest enough RAM for contract deployment (WASM × 10 multiplier),
+        // alice enough for data storage.
         c.register_node_owner(bob_account, 2);
-        c.add_roa_policy(bob_account, contract_account, "10.0000 SYS", "10.0000 SYS", "1.0000 SYS", 0, 0);
+        c.add_roa_policy(bob_account, contract_account, "10.0000 SYS", "10.0000 SYS", "1.1000 SYS", 0, 0);
         c.add_roa_policy(c.NODE_DADDY, alice_account, "100.0000 SYS", "100.0000 SYS", "100.0000 SYS", 0, 0);
         c.produce_block();
 
