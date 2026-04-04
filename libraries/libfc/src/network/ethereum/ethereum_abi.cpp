@@ -1048,7 +1048,12 @@ void fc::from_variant(const fc::variant& var, fc::network::ethereum::abi::contra
 
    FC_ASSERT(var.is_object(), "Variant must be an object to deserialize ABI contract");
    auto& obj = var.get_object();
-   vo.name = obj["name"].as_string();
+   const auto name_itr = obj.find("name");
+   const bool deferred_name = name_itr == obj.end();
+   if (!deferred_name) {
+      vo.name = name_itr->value().as_string();
+   }
+
    auto type_str = obj["type"].as_string();
    vo.type = fc::reflector<fc::network::ethereum::abi::invoke_target_type>::from_string(type_str.c_str());
 
@@ -1072,4 +1077,19 @@ void fc::from_variant(const fc::variant& var, fc::network::ethereum::abi::contra
 
    parse_components(vo.inputs, "inputs");
    parse_components(vo.outputs, "outputs");
+   bool missed = true;
+   if(deferred_name) {
+      if(type_str == "receive") {
+         auto state_mutability_str = obj["stateMutability"].as_string();
+         if (state_mutability_str == "payable") {
+            missed = false;
+         }
+      }
+      if(missed) {
+         elog("no name for:");
+         for(auto itr = obj.begin(); itr != obj.end(); ++itr) {
+            ilog("key: {}", itr->key());
+         }
+      }
+   }
 }

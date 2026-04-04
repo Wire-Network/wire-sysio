@@ -73,10 +73,15 @@ void outpost_ethereum_client_plugin::plugin_initialize(const variables_map& opti
       auto& id           = parts[0];
       auto& url          = parts[2];
       auto& sig_id       = parts[1];
-      fc::ostring chain_id_str = parts[3];
-      std::optional<fc::uint256> chain_id;
-      if (chain_id_str.has_value())
-         chain_id = std::make_optional<fc::uint256>(fc::to_uint256(chain_id_str.value()));
+      fc::uint256 chain_id;
+      fc::ostring chain_id_str;
+      if (parts.size() == 4) {
+         chain_id_str = parts[3];
+         if (chain_id_str.has_value())
+            chain_id = fc::to_uint256(chain_id_str.value());
+      } else {
+         ilog("chainId: none");
+      }
 
       auto  sig_provider = plug_sig->get_provider(sig_id);
       my->add_client(id,
@@ -117,15 +122,15 @@ void outpost_ethereum_client_plugin::plugin_shutdown() {
    ilog("Shutdown outpost client plugin");
 }
 
-std::vector<ethereum_client_entry_ptr> outpost_ethereum_client_plugin::get_clients() {
+std::vector<ethereum_client_entry_ptr> outpost_ethereum_client_plugin::get_clients() const {
    return my->get_clients();
 }
 
-ethereum_client_entry_ptr outpost_ethereum_client_plugin::get_client(const std::string& id) {
+ethereum_client_entry_ptr outpost_ethereum_client_plugin::get_client(const std::string& id) const {
    return my->get_client(id);
 }
 
-const std::vector<std::pair<std::filesystem::path, std::vector<fc::network::ethereum::abi::contract>>>& outpost_ethereum_client_plugin::get_abi_files() {
+const std::vector<std::pair<std::filesystem::path, std::vector<fc::network::ethereum::abi::contract>>>& outpost_ethereum_client_plugin::get_abi_files() const {
    return my->get_abi_files();
 }
 } // namespace sysio
