@@ -600,20 +600,12 @@ namespace sysio::chain {
          } SYS_RETHROW_EXCEPTIONS( unpack_exception, "Unable to unpack presence flag of optional '{}'", ctx.get_path_string() )
          return flag ? _binary_to_variant(ftype, stream, ctx) : fc::variant();
       } else if( auto e_itr = enums.find(rtype); e_itr != enums.end() ) {
-         // Enum type: read as underlying integer type, then convert to member name string if possible
+         // Enum type: read as underlying integer type, return the integer value.
+         // Callers that need the name can look it up from the ABI enum definition.
          auto btype = built_in_types.find(e_itr->second.type);
          SYS_ASSERT( btype != built_in_types.end(), invalid_type_inside_abi,
                      "Enum '{}' has unknown underlying type '{}'", impl::limit_size(rtype), impl::limit_size(e_itr->second.type) );
-         auto int_variant = btype->second.first(stream, false, false, ctx.get_yield_function());
-         auto int_val = int_variant.as_int64();
-         // Look up the enum member name for this value
-         for( const auto& ev : e_itr->second.values ) {
-            if( ev.value == int_val ) {
-               return fc::variant(ev.name);
-            }
-         }
-         // No matching member name, return as integer
-         return int_variant;
+         return btype->second.first(stream, false, false, ctx.get_yield_function());
       } else {
          auto v_itr = variants.find(rtype);
          if( v_itr != variants.end() ) {

@@ -1,0 +1,187 @@
+syntax = "proto3";
+
+package sysio.opp.attestations;
+
+import "sysio/opp/types/types.proto";
+import "sysio/opp/opp.proto";
+
+option cc_enable_arenas = true;
+
+// ---------------------------------------------------------------------------
+//  Common (Pre & Post Launch) Attestations
+// ---------------------------------------------------------------------------
+
+// Reserve balance snapshot for a given chain.
+message ChainReserveBalanceSheet {
+  sysio.opp.types.ChainKind               kind = 1;
+  repeated sysio.opp.types.TokenAmount amounts = 2;
+}
+
+// ---------------------------------------------------------------------------
+//  Pre-launch specific attestations
+// ---------------------------------------------------------------------------
+
+// Pre-token stake attestation.
+message PretokenStakeChange {
+  sysio.opp.types.ChainAddress actor = 1;
+  sysio.opp.types.TokenAmount amount = 2;
+  int64                index_at_mint = 10; // -1 == unstake action
+  int64                index_at_burn = 11; // -1 == stake action
+}
+
+// Pre-token purchase attestation.
+message PretokenPurchase {
+  sysio.opp.types.ChainAddress actor = 1;
+  sysio.opp.types.TokenAmount  amount = 2;
+  int64                        pretoken_count = 3;
+  int64                        index_at_mint = 10;
+}
+
+// Pre-token yield distribution.
+message PretokenYield {
+  sysio.opp.types.ChainAddress actor = 1;
+  sysio.opp.types.TokenAmount  amount = 2;
+  int64                        index_at_mint = 3;
+}
+
+// ---------------------------------------------------------------------------
+//  Post-launch attestations
+// ---------------------------------------------------------------------------
+
+// Stake status update.
+message StakeUpdate {
+  sysio.opp.types.ChainAddress actor = 1;
+  sysio.opp.types.StakeStatus  status = 2;
+  sysio.opp.types.TokenAmount  amount = 3;
+}
+
+// Wire token purchase.
+message WireTokenPurchase {
+  sysio.opp.types.ChainAddress actor = 1;
+  repeated sysio.opp.types.TokenAmount amounts = 2;
+}
+
+// Operator registration or deregistration.
+message OperatorAction {
+  enum ActionType {
+    ACTION_TYPE_UNKNOWN = 0;
+    ACTION_TYPE_DEPOSIT = 1;
+    ACTION_TYPE_WITHDRAW = 2;
+  };
+  ActionType action_type = 1;
+  sysio.opp.types.ChainAddress actor = 2;
+  sysio.opp.types.WireAccount wire_account = 3;
+  sysio.opp.types.OperatorType   type = 5;
+  sysio.opp.types.OperatorStatus status = 10;
+  sysio.opp.types.TokenAmount   amount = 20;
+}
+
+// Reserve fund disbursement.
+message ReserveDisbursement {
+  sysio.opp.types.ChainAddress actor = 1;
+  sysio.opp.types.TokenAmount  amount = 2;
+
+  repeated sysio.opp.types.ChainSignature signature = 3;
+}
+
+// ---------------------------------------------------------------------------
+//  Protocol state tracking
+// ---------------------------------------------------------------------------
+
+
+// Protocol state tracking for a message chain on a given chain.
+message ProtocolState {
+  sysio.opp.types.ChainId       chain_id = 1;
+  bytes                         current_message_id = 2; // 32 bytes
+  bytes                         processed_message_id = 3; // 32 bytes
+  repeated sysio.opp.Message   incoming_messages = 10;
+  repeated sysio.opp.Message    outgoing_messages = 11;
+}
+
+// ---------------------------------------------------------------------------
+//  Cross-chain swap & underwriting attestations
+// ---------------------------------------------------------------------------
+
+// Cross-chain swap request (source Outpost -> Depot).
+message Swap {
+  sysio.opp.types.ChainAddress actor = 1;
+  sysio.opp.types.TokenAmount  source_amount = 2;
+  sysio.opp.types.ChainId      target_chain = 3;
+  sysio.opp.types.ChainAddress recipient = 4;
+  sysio.opp.types.TokenKind    target_token = 5;
+}
+
+// Underwriting intent submission (Depot -> both Outposts).
+message UnderwriteIntent {
+  sysio.opp.types.ChainAddress    underwriter = 1;
+  sysio.opp.types.WireAccount     wire_account = 2;
+  bytes                           original_message_id = 3; // 32 bytes
+  sysio.opp.types.TokenAmount     source_amount = 4;
+  sysio.opp.types.TokenAmount     target_amount = 5;
+  sysio.opp.types.ChainId         target_chain = 6;
+  sysio.opp.types.ChainSignature  source_signature = 7;
+  sysio.opp.types.ChainSignature  target_signature = 8;
+  uint64                          unlock_timestamp = 9;
+}
+
+// Underwriting confirmation (Outpost -> Depot).
+message UnderwriteConfirm {
+  bytes                         original_message_id = 1; // 32 bytes
+  sysio.opp.types.ChainAddress  underwriter = 2;
+  bool                          confirmed = 3;
+  string                        error_reason = 4;
+}
+
+// Fund remittance (Depot -> target Outpost).
+message Remit {
+  sysio.opp.types.ChainAddress recipient = 1;
+  sysio.opp.types.TokenAmount  amount = 2;
+  bytes                        original_message_id = 3; // 32 bytes
+  sysio.opp.types.ChainAddress underwriter = 4;
+  uint64                       unlock_timestamp = 5;
+}
+
+// ---------------------------------------------------------------------------
+//  Challenge attestations
+// ---------------------------------------------------------------------------
+
+// Challenge request (Depot -> source Outpost).
+message ChallengeRequest {
+  uint32                            epoch_index = 1;
+  uint32                            round = 2;
+  bytes                             original_chain_hash = 3; // 32 bytes
+  repeated ChallengeOperatorHash    operator_hashes = 4;
+}
+
+// Per-operator hash submitted during a challenged epoch.
+message ChallengeOperatorHash {
+  sysio.opp.types.ChainAddress operator = 1;
+  bytes                        chain_hash = 2; // 32 bytes
+}
+
+// ---------------------------------------------------------------------------
+//  Epoch & roster management attestations
+// ---------------------------------------------------------------------------
+
+// Epoch sync notification (Depot -> Outpost).
+message EpochSync {
+  uint32 epoch_index = 1;
+  uint32 epoch_duration_sec = 2;
+  uint64 epoch_start_timestamp = 3;
+}
+
+// Roster update (Depot -> Outpost).
+message RosterUpdate {
+  sysio.opp.types.ChainAddress  operator = 1;
+  sysio.opp.types.OperatorType  type = 2;
+  sysio.opp.types.OperatorStatus new_status = 3;
+  string                        reason = 4;
+}
+
+
+// Batch operator next group assignment (Depot -> Outpost, every epoch).
+message BatchOperatorNextGroup {
+  repeated sysio.opp.types.ChainAddress operators = 1;
+  uint32                                group_index = 2;
+  uint32                                next_epoch_index = 3;
+}

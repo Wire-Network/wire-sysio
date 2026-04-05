@@ -1,0 +1,315 @@
+@startuml
+
+hide empty methods
+hide empty fields
+skinparam classBackgroundColor #EEEEEE
+skinparam classArrowColor black
+skinparam classBorderColor black
+skinparam packageBackgroundColor white
+skinparam packageBorderColor black
+
+
+sysio.opp.attestations.OperatorAction -- sysio.opp.types.OperatorStatus
+sysio.opp.attestations.OperatorAction -- sysio.opp.types.TokenAmount
+sysio.opp.attestations.OperatorAction -- sysio.opp.types.ChainAddress
+sysio.opp.attestations.OperatorAction -- sysio.opp.types.OperatorType
+sysio.opp.attestations.OperatorAction -- sysio.opp.attestations.OperatorAction::ActionType
+
+sysio.opp.types.ChainId -- sysio.opp.types.ChainKind
+
+sysio.opp.attestations.ChainReserveBalanceSheet -- sysio.opp.types.ChainKind
+sysio.opp.attestations.ChainReserveBalanceSheet -- sysio.opp.types.TokenAmount
+
+
+
+sysio.opp.attestations.PretokenPurchase -- sysio.opp.types.ChainAddress
+sysio.opp.attestations.PretokenPurchase -- sysio.opp.types.TokenAmount
+
+sysio.opp.types.TokenAmount -- sysio.opp.types.TokenKind
+
+sysio.opp.types.ChainAddress -- sysio.opp.types.ChainKind
+
+sysio.opp.attestations.ReserveDisbursement -- sysio.opp.types.ChainAddress
+sysio.opp.attestations.ReserveDisbursement -- sysio.opp.types.TokenAmount
+sysio.opp.attestations.ReserveDisbursement -- sysio.opp.types.ChainSignature
+
+
+sysio.opp.attestations.StakeUpdate -- sysio.opp.types.ChainAddress
+sysio.opp.attestations.StakeUpdate -- sysio.opp.types.StakeStatus
+sysio.opp.attestations.StakeUpdate -- sysio.opp.types.TokenAmount
+
+sysio.opp.MessagePayload -- sysio.opp.AttestationEntry
+
+
+
+
+
+sysio.opp.attestations.PretokenStakeChange -- sysio.opp.types.ChainAddress
+sysio.opp.attestations.PretokenStakeChange -- sysio.opp.types.TokenAmount
+
+
+
+sysio.opp.types.ChainSignature -- sysio.opp.types.ChainAddress
+sysio.opp.types.ChainSignature -- sysio.opp.types.ChainKeyType
+
+sysio.opp.Message -- sysio.opp.MessageHeader
+sysio.opp.Message -- sysio.opp.MessagePayload
+
+sysio.opp.AttestationEntry -- sysio.opp.types.AttestationType
+
+sysio.opp.attestations.TimestampedMessage -- sysio.opp.Message
+
+sysio.opp.Envelope -- sysio.opp.Endpoints
+sysio.opp.Envelope -- sysio.opp.types.ChainSignature
+
+sysio.opp.attestations.PretokenYield -- sysio.opp.types.ChainAddress
+sysio.opp.attestations.PretokenYield -- sysio.opp.types.TokenAmount
+
+
+sysio.opp.MessageHeader -- sysio.opp.Endpoints
+sysio.opp.MessageHeader -- sysio.opp.types.EncodingFlags
+
+sysio.opp.attestations.WireTokenPurchase -- sysio.opp.types.ChainAddress
+sysio.opp.attestations.WireTokenPurchase -- sysio.opp.types.TokenAmount
+
+sysio.opp.types.EncodingFlags -- sysio.opp.types.Endianness
+sysio.opp.types.EncodingFlags -- sysio.opp.types.HashAlgorithm
+sysio.opp.types.EncodingFlags -- sysio.opp.types.LengthEncoding
+
+
+sysio.opp.Endpoints -- sysio.opp.types.ChainId
+
+sysio.opp.attestations.ProtocolState -- sysio.opp.types.ChainId
+sysio.opp.attestations.ProtocolState -- sysio.opp.attestations.TimestampedMessage
+sysio.opp.attestations.ProtocolState -- sysio.opp.Message
+package sysio.opp.attestations {
+ class ChainReserveBalanceSheet {
+  kind: sysio.opp.types.ChainKind
+  amounts: sysio.opp.types.TokenAmount [*]
+ }
+
+ class OperatorAction {
+  action_type: OperatorAction::ActionType
+  actor: sysio.opp.types.ChainAddress
+  type: sysio.opp.types.OperatorType
+  status: sysio.opp.types.OperatorStatus
+  amount: sysio.opp.types.TokenAmount
+ }
+
+ enum OperatorAction::ActionType {
+  ACTION_TYPE_UNKNOWN
+  ACTION_TYPE_DEPOSIT
+  ACTION_TYPE_WITHDRAW
+ }
+
+ class PretokenPurchase {
+  actor: sysio.opp.types.ChainAddress
+  amount: sysio.opp.types.TokenAmount
+  pretoken_count: Long
+  index_at_mint: Long
+ }
+
+ class PretokenStakeChange {
+  actor: sysio.opp.types.ChainAddress
+  amount: sysio.opp.types.TokenAmount
+  index_at_mint: Long
+  index_at_burn: Long
+ }
+
+ class PretokenYield {
+  actor: sysio.opp.types.ChainAddress
+  amount: sysio.opp.types.TokenAmount
+  index_at_mint: Long
+ }
+
+ class ProtocolState {
+  chain_id: sysio.opp.types.ChainId
+  current_message_id: Bytes
+  processed_message_id: Bytes
+  incoming_messages: TimestampedMessage [*]
+  outgoing: sysio.opp.Message [*]
+ }
+
+ class ReserveDisbursement {
+  actor: sysio.opp.types.ChainAddress
+  amount: sysio.opp.types.TokenAmount
+  signature: sysio.opp.types.ChainSignature [*]
+ }
+
+ class StakeUpdate {
+  actor: sysio.opp.types.ChainAddress
+  status: sysio.opp.types.StakeStatus
+  amount: sysio.opp.types.TokenAmount
+ }
+
+ class TimestampedMessage {
+  timestamp: Long
+  message: sysio.opp.Message
+ }
+
+ class WireTokenPurchase {
+  actor: sysio.opp.types.ChainAddress
+  amounts: sysio.opp.types.TokenAmount [*]
+ }
+
+}
+package sysio.opp.types {
+ enum AttestationType {
+  ATTESTATION_TYPE_UNSPECIFIED
+  ATTESTATION_TYPE_STAKE
+  ATTESTATION_TYPE_UNSTAKE
+  ATTESTATION_TYPE_PRETOKEN_PURCHASE
+  ATTESTATION_TYPE_PRETOKEN_YIELD
+  ATTESTATION_TYPE_RESERVE_BALANCE_SHEET
+  ATTESTATION_TYPE_STAKE_UPDATE
+  ATTESTATION_TYPE_NATIVE_YIELD_REWARD
+  ATTESTATION_TYPE_WIRE_TOKEN_PURCHASE
+  ATTESTATION_TYPE_OPERATOR_REG_DEREG
+  ATTESTATION_TYPE_CHALLENGE_RESPONSE
+  ATTESTATION_TYPE_SLASH_OPERATOR
+ }
+
+ class ChainAddress {
+  kind: ChainKind
+  address: Bytes
+ }
+
+ class ChainId {
+  kind: ChainKind
+  id: Int
+ }
+
+ enum ChainKeyType {
+  CHAIN_KEY_TYPE_UNKNOWN
+  CHAIN_KEY_TYPE_WIRE
+  CHAIN_KEY_TYPE_WIRE_BLS
+  CHAIN_KEY_TYPE_ETHEREUM
+  CHAIN_KEY_TYPE_SOLANA
+  CHAIN_KEY_TYPE_SUI
+ }
+
+ enum ChainKind {
+  CHAIN_KIND_UNKNOWN
+  CHAIN_KIND_WIRE
+  CHAIN_KIND_ETHEREUM
+  CHAIN_KIND_SOLANA
+  CHAIN_KIND_SUI
+ }
+
+ class ChainSignature {
+  actor: ChainAddress
+  key_type: ChainKeyType
+  signature: Bytes
+ }
+
+ class EncodingFlags {
+  endianness: Endianness
+  hash_algorithm: HashAlgorithm
+  length_encoding: LengthEncoding
+ }
+
+ enum Endianness {
+  ENDIANNESS_BIG
+  ENDIANNESS_LITTLE
+ }
+
+ enum HashAlgorithm {
+  HASH_ALGORITHM_KECCAK256
+  HASH_ALGORITHM_SHA256
+  HASH_ALGORITHM_RESERVED_1
+  HASH_ALGORITHM_RESERVED_2
+ }
+
+ enum LengthEncoding {
+  LENGTH_ENCODING_VARUINT
+  LENGTH_ENCODING_UINT32
+ }
+
+ enum OperatorStatus {
+  OPERATOR_STATUS_UNKNOWN
+  OPERATOR_STATUS_WARMUP
+  OPERATOR_STATUS_COOLDOWN
+  OPERATOR_STATUS_ACTIVE
+  OPERATOR_STATUS_TERMINATED
+  OPERATOR_STATUS_SLASHED
+ }
+
+ enum OperatorType {
+  OPERATOR_TYPE_UNKNOWN
+  OPERATOR_TYPE_PRODUCER
+  OPERATOR_TYPE_BATCH
+  OPERATOR_TYPE_UNDERWRITER
+  OPERATOR_TYPE_CHALLENGER
+ }
+
+ enum StakeStatus {
+  STAKE_STATUS_UNKNOWN
+  STAKE_STATUS_WARMUP
+  STAKE_STATUS_COOLDOWN
+  STAKE_STATUS_ACTIVE
+  STAKE_STATUS_TERMINATED
+  STAKE_STATUS_SLASHED
+ }
+
+ class TokenAmount {
+  kind: TokenKind
+  amount: Long
+ }
+
+ enum TokenKind {
+  TOKEN_KIND_WIRE
+  TOKEN_KIND_ETH
+  TOKEN_KIND_LIQETH
+  TOKEN_KIND_SOL
+  TOKEN_KIND_LIQSOL
+ }
+
+}
+package sysio.opp {
+ class AttestationEntry {
+  type: sysio.opp.types.AttestationType
+  data_size: Int
+  data: Bytes
+ }
+
+ class Endpoints {
+  start: sysio.opp.types.ChainId
+  end: sysio.opp.types.ChainId
+ }
+
+ class Envelope {
+  envelope_hash: Bytes
+  endpoints: Endpoints
+  epoch_timestamp: Long
+  epoch_index: Int
+  epoch_envelope_index: Int
+  merkle: Bytes
+  previous_envelope_hash: Bytes
+  start_message_id: Bytes
+  end_message_id: Bytes
+  signatures: sysio.opp.types.ChainSignature [*]
+ }
+
+ class Message {
+  header: MessageHeader
+  payload: MessagePayload
+ }
+
+ class MessageHeader {
+  endpoints: Endpoints
+  message_id: Bytes
+  previous_message_id: Bytes
+  encoding_flags: sysio.opp.types.EncodingFlags
+  payload_size: Int
+  payload_checksum: Bytes
+  timestamp: Long
+  header_checksum: Bytes
+ }
+
+ class MessagePayload {
+  version: Int
+  attestations: AttestationEntry [*]
+ }
+
+}
+@enduml

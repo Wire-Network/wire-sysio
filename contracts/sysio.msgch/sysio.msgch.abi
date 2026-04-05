@@ -1,0 +1,518 @@
+{
+    "____comment": "This file was generated with sysio-abigen. DO NOT EDIT ",
+    "version": "sysio::abi/1.2",
+    "types": [],
+    "structs": [
+        {
+            "name": "buildenv",
+            "base": "",
+            "fields": [
+                {
+                    "name": "batch_op_name",
+                    "type": "name"
+                },
+                {
+                    "name": "outpost_id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "chain_delivery",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "chain_request_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "operator_account",
+                    "type": "name"
+                },
+                {
+                    "name": "chain_hash",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "merkle_root",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "message_count",
+                    "type": "uint32"
+                },
+                {
+                    "name": "delivered_at",
+                    "type": "time_point"
+                },
+                {
+                    "name": "matches_consensus",
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "crank",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "createreq",
+            "base": "",
+            "fields": [
+                {
+                    "name": "batch_op_name",
+                    "type": "name"
+                },
+                {
+                    "name": "outpost_id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "deliver",
+            "base": "",
+            "fields": [
+                {
+                    "name": "operator_acct",
+                    "type": "name"
+                },
+                {
+                    "name": "req_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "chain_hash",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "merkle_root",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "msg_count",
+                    "type": "uint32"
+                },
+                {
+                    "name": "raw_messages",
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
+            "name": "evalcons",
+            "base": "",
+            "fields": [
+                {
+                    "name": "batch_op_name",
+                    "type": "name"
+                },
+                {
+                    "name": "req_id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "inbound_chain_request",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "outpost_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "epoch_index",
+                    "type": "uint32"
+                },
+                {
+                    "name": "expected_start_msg",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "status",
+                    "type": "ChainRequestStatus"
+                },
+                {
+                    "name": "delivery_count",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "message_entry",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "outpost_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "epoch_index",
+                    "type": "uint32"
+                },
+                {
+                    "name": "message_id",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "previous_message_id",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "direction",
+                    "type": "MessageDirection"
+                },
+                {
+                    "name": "status",
+                    "type": "MessageStatus"
+                },
+                {
+                    "name": "attestation_type",
+                    "type": "AttestationType"
+                },
+                {
+                    "name": "raw_payload",
+                    "type": "bytes"
+                },
+                {
+                    "name": "received_at",
+                    "type": "time_point"
+                },
+                {
+                    "name": "processed_at",
+                    "type": "time_point"
+                }
+            ]
+        },
+        {
+            "name": "outbound_envelope",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "outpost_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "epoch_index",
+                    "type": "uint32"
+                },
+                {
+                    "name": "envelope_hash",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "merkle_root",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "start_message_id",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "end_message_id",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "status",
+                    "type": "EnvelopeStatus"
+                },
+                {
+                    "name": "raw_envelope",
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
+            "name": "processmsg",
+            "base": "",
+            "fields": [
+                {
+                    "name": "msg_id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "queueout",
+            "base": "",
+            "fields": [
+                {
+                    "name": "outpost_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "attest_type",
+                    "type": "AttestationType"
+                },
+                {
+                    "name": "data",
+                    "type": "bytes"
+                }
+            ]
+        }
+    ],
+    "actions": [
+        {
+            "name": "buildenv",
+            "type": "buildenv",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "crank",
+            "type": "crank",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "createreq",
+            "type": "createreq",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "deliver",
+            "type": "deliver",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "evalcons",
+            "type": "evalcons",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "processmsg",
+            "type": "processmsg",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "queueout",
+            "type": "queueout",
+            "ricardian_contract": ""
+        }
+    ],
+    "tables": [
+        {
+            "name": "deliveries",
+            "type": "chain_delivery",
+            "index_type": "i64",
+            "key_names": ["table_name","scope","primary_key"],
+            "key_types": ["name","name","uint64"]
+        },
+        {
+            "name": "inchainreq",
+            "type": "inbound_chain_request",
+            "index_type": "i64",
+            "key_names": ["table_name","scope","primary_key"],
+            "key_types": ["name","name","uint64"]
+        },
+        {
+            "name": "messages",
+            "type": "message_entry",
+            "index_type": "i64",
+            "key_names": ["table_name","scope","primary_key"],
+            "key_types": ["name","name","uint64"]
+        },
+        {
+            "name": "outenvelopes",
+            "type": "outbound_envelope",
+            "index_type": "i64",
+            "key_names": ["table_name","scope","primary_key"],
+            "key_types": ["name","name","uint64"]
+        }
+    ],
+    "ricardian_clauses": [],
+    "variants": [],
+    "action_results": [],
+    "enums": [
+        {
+            "name": "AttestationType",
+            "type": "int32",
+            "values": [
+                {
+                    "name": "ATTESTATION_TYPE_UNSPECIFIED",
+                    "value": 0
+                },
+                {
+                    "name": "ATTESTATION_TYPE_OPERATOR_ACTION",
+                    "value": 2001
+                },
+                {
+                    "name": "ATTESTATION_TYPE_STAKE",
+                    "value": 3001
+                },
+                {
+                    "name": "ATTESTATION_TYPE_UNSTAKE",
+                    "value": 3002
+                },
+                {
+                    "name": "ATTESTATION_TYPE_PRETOKEN_PURCHASE",
+                    "value": 3004
+                },
+                {
+                    "name": "ATTESTATION_TYPE_PRETOKEN_YIELD",
+                    "value": 3006
+                },
+                {
+                    "name": "ATTESTATION_TYPE_RESERVE_BALANCE_SHEET",
+                    "value": 43520
+                },
+                {
+                    "name": "ATTESTATION_TYPE_STAKE_UPDATE",
+                    "value": 60928
+                },
+                {
+                    "name": "ATTESTATION_TYPE_NATIVE_YIELD_REWARD",
+                    "value": 60929
+                },
+                {
+                    "name": "ATTESTATION_TYPE_WIRE_TOKEN_PURCHASE",
+                    "value": 60930
+                },
+                {
+                    "name": "ATTESTATION_TYPE_CHALLENGE_RESPONSE",
+                    "value": 60932
+                },
+                {
+                    "name": "ATTESTATION_TYPE_SLASH_OPERATOR",
+                    "value": 60933
+                },
+                {
+                    "name": "ATTESTATION_TYPE_SWAP",
+                    "value": 60934
+                },
+                {
+                    "name": "ATTESTATION_TYPE_UNDERWRITE_INTENT",
+                    "value": 60935
+                },
+                {
+                    "name": "ATTESTATION_TYPE_UNDERWRITE_CONFIRM",
+                    "value": 60936
+                },
+                {
+                    "name": "ATTESTATION_TYPE_UNDERWRITE_REJECT",
+                    "value": 60937
+                },
+                {
+                    "name": "ATTESTATION_TYPE_REMIT",
+                    "value": 60938
+                },
+                {
+                    "name": "ATTESTATION_TYPE_CHALLENGE_REQUEST",
+                    "value": 60939
+                },
+                {
+                    "name": "ATTESTATION_TYPE_EPOCH_SYNC",
+                    "value": 60940
+                },
+                {
+                    "name": "ATTESTATION_TYPE_ROSTER_UPDATE",
+                    "value": 60941
+                },
+                {
+                    "name": "ATTESTATION_TYPE_REMIT_CONFIRM",
+                    "value": 60942
+                },
+                {
+                    "name": "ATTESTATION_TYPE_BATCH_OPERATOR_NEXT_GROUP",
+                    "value": 60943
+                }
+            ]
+        },
+        {
+            "name": "ChainRequestStatus",
+            "type": "int32",
+            "values": [
+                {
+                    "name": "CHAIN_REQUEST_STATUS_PENDING",
+                    "value": 0
+                },
+                {
+                    "name": "CHAIN_REQUEST_STATUS_COLLECTING",
+                    "value": 1
+                },
+                {
+                    "name": "CHAIN_REQUEST_STATUS_CONSENSUS_OK",
+                    "value": 2
+                },
+                {
+                    "name": "CHAIN_REQUEST_STATUS_CONSENSUS_FAIL",
+                    "value": 3
+                },
+                {
+                    "name": "CHAIN_REQUEST_STATUS_CHALLENGED",
+                    "value": 4
+                }
+            ]
+        },
+        {
+            "name": "EnvelopeStatus",
+            "type": "int32",
+            "values": [
+                {
+                    "name": "ENVELOPE_STATUS_PENDING_DELIVERY",
+                    "value": 0
+                },
+                {
+                    "name": "ENVELOPE_STATUS_DELIVERED",
+                    "value": 1
+                },
+                {
+                    "name": "ENVELOPE_STATUS_CONFIRMED",
+                    "value": 2
+                }
+            ]
+        },
+        {
+            "name": "MessageDirection",
+            "type": "int32",
+            "values": [
+                {
+                    "name": "MESSAGE_DIRECTION_INBOUND",
+                    "value": 0
+                },
+                {
+                    "name": "MESSAGE_DIRECTION_OUTBOUND",
+                    "value": 1
+                }
+            ]
+        },
+        {
+            "name": "MessageStatus",
+            "type": "int32",
+            "values": [
+                {
+                    "name": "MESSAGE_STATUS_PENDING",
+                    "value": 0
+                },
+                {
+                    "name": "MESSAGE_STATUS_READY",
+                    "value": 1
+                },
+                {
+                    "name": "MESSAGE_STATUS_PROCESSED",
+                    "value": 2
+                },
+                {
+                    "name": "MESSAGE_STATUS_CANCELLED",
+                    "value": 3
+                }
+            ]
+        }
+    ]
+}
