@@ -1,8 +1,11 @@
 #include <sysio.epoch/sysio.epoch.hpp>
+#include <sysio/opp/attestations/attestations.pb.hpp>
+#include <zpp_bits.h>
 
 namespace sysio {
 
 using opp::types::OperatorType;
+using opp::types::AttestationType;
 using opp::types::OperatorStatus;
 
 // ---------------------------------------------------------------------------
@@ -150,6 +153,44 @@ void epoch::advance() {
    }
 
    state_tbl.set(state, get_self());
+
+   // Queue BATCH_OPERATOR_NEXT_GROUP attestation for each outpost.
+   // This tells outposts which batch operators will be active in the next epoch.
+   uint8_t next_group_idx = (state.current_epoch_index + 1) % cfg.batch_op_groups;
+   if (next_group_idx < state.batch_op_groups.size()) {
+      auto& next_group = state.batch_op_groups[next_group_idx];
+
+      // Build the protobuf attestation
+      opp::attestations::BatchOperatorNextGroup attest;
+      attest.group_index = zpp::bits::vuint32_t{next_group_idx};
+      attest.next_epoch_index = zpp::bits::vuint32_t{state.current_epoch_index + 1};
+      for (auto& op_name : next_group) {
+         opp::types::ChainAddress addr;
+         addr.kind = opp::types::CHAIN_KIND_WIRE;
+         auto name_str = op_name.to_string();
+         addr.address.assign(name_str.begin(), name_str.end());
+         attest.operators.push_back(std::move(addr));
+      }
+
+      // Serialize with zpp_bits (protobuf wire format)
+      auto [packed, out] = zpp::bits::data_out<char>();
+      (void)out(attest);
+
+      // Queue to sysio.msgch for each registered outpost
+      outposts_t outposts_tbl(get_self(), get_self().value);
+      for (auto it = outposts_tbl.begin(); it != outposts_tbl.end(); ++it) {
+         action(
+            permission_level{"sysio.epoch"_n, "owner"_n},
+            MSGCH_ACCOUNT,
+            "queueout"_n,
+            std::make_tuple(
+               it->id,
+               opp::types::ATTESTATION_TYPE_BATCH_OPERATOR_NEXT_GROUP,
+               packed
+            )
+         ).send();
+      }
+   }
 
    // Notify sysio.msgch to process pending consensus results
    require_recipient(MSGCH_ACCOUNT);

@@ -8,7 +8,7 @@ Wire Sysio is a C++ implementation of the AntelopeIO protocol (a fork of Spring)
 
 ## Build Commands
 
-**Note:** The build directory varies by developer (e.g. `cmake-build-debug`, `build`, `build/debug-claude`). Examples below use `$BUILD_DIR` — substitute your actual build path.
+**Note:** The build directory MUST be located under `<wire-sysio>/build/`, examples include `<wire-sysio>/build/claude`, `<wire-sysio>/build/debug-claude`, etc). Examples below use `$BUILD_DIR` — substitute your actual build path.
 
 ### Prerequisites (one-time setup)
 ```bash
@@ -22,6 +22,14 @@ sudo apt-get install -y build-essential binutils ccache cmake curl git ninja-bui
 
 ### Configure and Build
 ```bash
+
+# Clear `linuxbrew` from PATH (if present) to avoid conflicts with system libraries and compilers.
+# This is important for consistent builds.
+export PATH=$(echo "$PATH" | tr ':' '\n' | grep -v linuxbrew | tr '\n' ':' | sed 's/:$//')
+
+# Example build directory
+export BUILD_DIR=$PWD/build/claude
+
 # Set compiler environment
 export CC=/usr/bin/clang-18
 export CXX=/usr/bin/clang++-18
@@ -183,6 +191,16 @@ The protobufs are located at [libraries/opp/proto](libraries/opp/proto).
 After updating the protobufs, before you can use them in the ethereum/solana contract/program repos, you need to run `cd wire-sysio/libraries/opp/tools &&
   ./generate-opp-bundles.fish  --target=[solidity|solana]`. Additionally, WIRE contract code uses a C++ protoc plugin named `zpp_bits`, this is largely irrelevant,
 but keep in mind they are generated when the project is configured/built (CMake). Just an FYI.
+
+### TARGET: solidity
+
+**IMPORTANT** IF `<wire-sysio>/../wire-opp/solidity` exists, then run:
+```shell
+rm -Rf <wire-sysio>/../wire-opp/solidity/node_modules || true
+cp -R <wire-sysio>/build/opp/solidity/* <wire-sysio>/../wire-opp/solidity/ && \
+    cd <wire-sysio>/../wire-opp/solidity && \
+    pnpm i
+```
 
 ## Docker Build
 

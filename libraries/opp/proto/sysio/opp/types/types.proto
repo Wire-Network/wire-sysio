@@ -131,6 +131,7 @@ enum AttestationType {
    ATTESTATION_TYPE_EPOCH_SYNC          = 60940; // 0xEE0C
    ATTESTATION_TYPE_ROSTER_UPDATE       = 60941; // 0xEE0D
    ATTESTATION_TYPE_REMIT_CONFIRM       = 60942; // 0xEE0E
+   ATTESTATION_TYPE_BATCH_OPERATOR_NEXT_GROUP = 60943; // 0xEE0F
 }
 
 // ---------------------------------------------------------------------------

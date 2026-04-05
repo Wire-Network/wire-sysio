@@ -20,11 +20,11 @@ namespace sysio {
 
       /// Main depot crank (permissionless, advances processing).
       [[sysio::action]]
-      void crank();
+      void crank(name batch_op_name);
 
       /// Create inbound chain request for an outpost.
       [[sysio::action]]
-      void createreq(uint64_t outpost_id);
+      void createreq(name batch_op_name, uint64_t outpost_id);
 
       /// Batch operator delivers a chain.
       [[sysio::action]]
@@ -37,7 +37,7 @@ namespace sysio {
 
       /// Evaluate consensus on a chain request.
       [[sysio::action]]
-      void evalcons(uint64_t req_id);
+      void evalcons(name batch_op_name, uint64_t req_id);
 
       /// Process a READY message (unpack attestations, route).
       [[sysio::action]]

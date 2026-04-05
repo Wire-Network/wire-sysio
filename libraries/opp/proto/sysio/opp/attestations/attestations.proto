@@ -177,3 +177,11 @@ message RosterUpdate {
   sysio.opp.types.OperatorStatus new_status = 3;
   string                        reason = 4;
 }
+
+
+// Batch operator next group assignment (Depot -> Outpost, every epoch).
+message BatchOperatorNextGroup {
+  repeated sysio.opp.types.ChainAddress operators = 1;
+  uint32                                group_index = 2;
+  uint32                                next_epoch_index = 3;
+}

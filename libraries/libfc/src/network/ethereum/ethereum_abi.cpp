@@ -807,7 +807,15 @@ std::vector<abi::contract> abi::parse_contracts(const std::filesystem::path& jso
       json_var.is_object() && json_var.get_object().contains("abi") && json_var.get_object()["abi"].is_array(),
       "ABI file must contain either an array of contracts or an object with a member (\"abi\") with an array value");
    auto& json_obj = json_var.get_object();
-   return json_obj["abi"].as<std::vector<abi::contract>>();
+   auto contracts = json_obj["abi"].as<std::vector<abi::contract>>();
+
+   // Propagate file-level address to each contract entry if present
+   if (json_obj.contains("address") && json_obj["address"].is_string()) {
+      auto addr = json_obj["address"].as_string();
+      for (auto& c : contracts) c.contract_address = addr;
+   }
+
+   return contracts;
 }
 
 /**

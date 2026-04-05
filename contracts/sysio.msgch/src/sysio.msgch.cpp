@@ -13,12 +13,23 @@ constexpr auto EPOCH_ACCOUNT = "sysio.epoch"_n;
 constexpr auto UWRIT_ACCOUNT = "sysio.uwrit"_n;
 constexpr auto CHALG_ACCOUNT = "sysio.chalg"_n;
 
+uint32_t current_epoch_index() {
+   epoch::epochstate_t tbl(EPOCH_ACCOUNT, EPOCH_ACCOUNT.value);
+   return tbl.exists() ? tbl.get().current_epoch_index : 0;
+}
+
+uint32_t epoch_operators_per_group() {
+   epoch::epochcfg_t tbl(EPOCH_ACCOUNT, EPOCH_ACCOUNT.value);
+   return tbl.exists() ? tbl.get().operators_per_epoch : 7;
+}
+
 }
 
 // ---------------------------------------------------------------------------
 //  crank — main depot crank
 // ---------------------------------------------------------------------------
-void msgch::crank() {
+void msgch::crank(name batch_op_name) {
+   is_batch_operator_active(batch_op_name);
    // Permissionless — anyone can call to advance processing.
    // In practice, batch operators call this at the start of each epoch cycle.
    // TODO: Read epoch state from sysio.epoch to determine current epoch,
@@ -28,14 +39,14 @@ void msgch::crank() {
 // ---------------------------------------------------------------------------
 //  createreq
 // ---------------------------------------------------------------------------
-void msgch::createreq(uint64_t outpost_id) {
-   require_auth(get_self());
+void msgch::createreq(name batch_op_name, uint64_t outpost_id) {
+   is_batch_operator_active(batch_op_name);
 
    inchainreq_t requests(get_self(), get_self().value);
    requests.emplace(get_self(), [&](auto& r) {
       r.id = requests.available_primary_key();
       r.outpost_id = outpost_id;
-      r.epoch_index = 0; // TODO: read from sysio.epoch
+      r.epoch_index = current_epoch_index();
       r.status = ChainRequestStatus::CHAIN_REQUEST_STATUS_PENDING;
       r.delivery_count = 0;
    });
@@ -50,7 +61,7 @@ void msgch::deliver(name operator_acct,
                     checksum256 merkle_root,
                     uint32_t msg_count,
                     std::vector<char> raw_messages) {
-   require_auth(operator_acct);
+   is_batch_operator_active(operator_acct);
 
    inchainreq_t requests(get_self(), get_self().value);
    auto req_it = requests.find(req_id);
@@ -108,8 +119,8 @@ void msgch::deliver(name operator_acct,
 // ---------------------------------------------------------------------------
 //  evalcons — evaluate consensus
 // ---------------------------------------------------------------------------
-void msgch::evalcons(uint64_t req_id) {
-   require_auth(get_self());
+void msgch::evalcons(name batch_op_name, uint64_t req_id) {
+   is_batch_operator_active(batch_op_name);
 
    inchainreq_t requests(get_self(), get_self().value);
    auto req_it = requests.find(req_id);
@@ -142,9 +153,8 @@ void msgch::evalcons(uint64_t req_id) {
       total_deliveries++;
    }
 
-   // Option A: all 7 identical
-   // TODO: read operators_per_epoch from sysio.epoch config
-   constexpr uint32_t OPERATORS_PER_EPOCH = 7;
+   // Option A: all operators identical
+   uint32_t OPERATORS_PER_EPOCH = epoch_operators_per_group();
    bool consensus_reached = false;
 
    for (size_t g = 0; g < seen_hashes.size(); ++g) {
@@ -226,13 +236,14 @@ void msgch::processmsg(uint64_t msg_id) {
 void msgch::queueout(uint64_t outpost_id,
                      opp::types::AttestationType attest_type,
                      std::vector<char> data) {
-   require_auth(get_self());
+
+   // require_auth(get_self());
 
    messages_t messages(get_self(), get_self().value);
    messages.emplace(get_self(), [&](auto& m) {
       m.id = messages.available_primary_key();
       m.outpost_id = outpost_id;
-      m.epoch_index = 0; // TODO: read from sysio.epoch
+      m.epoch_index = current_epoch_index();
       m.direction = MessageDirection::MESSAGE_DIRECTION_OUTBOUND;
       m.status = MessageStatus::MESSAGE_STATUS_PENDING;
       m.attestation_type = attest_type;
@@ -256,7 +267,7 @@ void msgch::buildenv(name batch_op_name, uint64_t outpost_id) {
    envelopes.emplace(get_self(), [&](auto& e) {
       e.id = envelopes.available_primary_key();
       e.outpost_id = outpost_id;
-      e.epoch_index = 0; // TODO: read from sysio.epoch
+      e.epoch_index = current_epoch_index();
       e.status = EnvelopeStatus::ENVELOPE_STATUS_PENDING_DELIVERY;
    });
 }

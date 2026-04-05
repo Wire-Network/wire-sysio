@@ -16,12 +16,17 @@ using namespace sysio::opp::types;
 namespace eth = fc::network::ethereum;
 namespace sol = fc::network::solana;
 
+namespace {
+   constexpr auto DELIVERY_TIMEOUT_MS = 15000;
+   constexpr auto EPOCH_POLL_MS = 15000;
+}
+
 // ---------------------------------------------------------------------------
 //  Outpost descriptor — one per registered outpost
 // ---------------------------------------------------------------------------
 struct outpost_descriptor {
    uint64_t    id          = 0;
-   uint8_t     chain_kind  = 0;
+   ChainKind   chain_kind  = CHAIN_KIND_UNKNOWN;
    uint32_t    chain_id    = 0;
 
    // Per-epoch transient state
@@ -47,8 +52,8 @@ struct batch_operator_plugin::impl {
    // Configuration
    chain::name  operator_account;
    bool         enabled             = false;
-   uint32_t     epoch_poll_ms       = 5000;
-   uint32_t     delivery_timeout_ms = 30000;
+   uint32_t     epoch_poll_ms       = EPOCH_POLL_MS;
+   uint32_t     delivery_timeout_ms = DELIVERY_TIMEOUT_MS;
    std::string  eth_client_id;
    std::string  sol_client_id;
    std::string  eth_opp_inbound_addr;  // hex address of OPPInbound on ETH
@@ -149,6 +154,18 @@ struct batch_operator_plugin::impl {
       }
 
       is_elected = (my_group == cur_group);
+
+      // Ensure enough time remains in the epoch to complete delivery
+      if (is_elected) {
+         fc::time_point next_epoch_tp;
+         fc::from_variant(obj["next_epoch_start"], next_epoch_tp);
+         auto deadline = fc::time_point::now() + fc::milliseconds(delivery_timeout_ms);
+         if (deadline >= next_epoch_tp) {
+            ilog("batch_operator: elected but insufficient time before next epoch (need {}ms)", delivery_timeout_ms);
+            is_elected = false;
+         }
+      }
+
       return {true, epoch_index};
    }
 
@@ -175,10 +192,14 @@ struct batch_operator_plugin::impl {
 
       ilog("batch_operator: ELECTED for epoch {} (group {}, {} members)",
            epoch_index, my_group, current_group_members.size());
-      current_epoch = epoch_index;
 
       refresh_outposts();
       run_epoch_cycle();
+
+      // Only mark epoch as processed after the cycle completes successfully.
+      // If the cycle throws (e.g. ETH client not available), it will retry
+      // on the next poll.
+      current_epoch = epoch_index;
    }
 
    // -----------------------------------------------------------------------
@@ -191,23 +212,9 @@ struct batch_operator_plugin::impl {
       for (auto& row : rows.rows) {
          auto obj = row.get_object();
          outpost_descriptor od;
-         od.id       = obj["id"].as_uint64();
-         od.chain_id = static_cast<uint32_t>(obj["chain_id"].as_uint64());
-
-         // chain_kind is an enum — ABI serializer returns it as a string
-         auto ck = obj["chain_kind"];
-         if (ck.is_uint64()) {
-            od.chain_kind = static_cast<uint8_t>(ck.as_uint64());
-         } else {
-            auto ck_str = ck.as_string();
-            if (ck_str == "chain_kind_ethereum" || ck_str == "CHAIN_KIND_ETHEREUM")
-               od.chain_kind = CHAIN_KIND_ETHEREUM;
-            else if (ck_str == "chain_kind_solana" || ck_str == "CHAIN_KIND_SOLANA")
-               od.chain_kind = CHAIN_KIND_SOLANA;
-            else
-               od.chain_kind = 0;
-         }
-
+         od.id         = obj["id"].as_uint64();
+         od.chain_kind = obj["chain_kind"].as_enum_value<ChainKind>();
+         od.chain_id   = static_cast<uint32_t>(obj["chain_id"].as_uint64());
          outposts.push_back(std::move(od));
       }
       ilog("batch_operator: loaded {} outposts", outposts.size());
@@ -231,8 +238,9 @@ struct batch_operator_plugin::impl {
          }
 
          // PHASE 2 — INBOUND (Outposts -> WIRE)
+         // ETH OPP epoch advances as a consequence of inbound consensus
+         // on OPPInbound, NOT via a separate finalizeEpoch call.
          for (auto& op : outposts) {
-            crank_outpost_epoch(op);
             read_inbound_chain(op);
             deliver_to_depot(op);
          }
@@ -243,7 +251,7 @@ struct batch_operator_plugin::impl {
          }
 
          ilog("batch_operator: === EPOCH CYCLE COMPLETE (epoch {}) ===", current_epoch);
-      } FC_LOG_AND_DROP();
+      } FC_LOG_AND_RETHROW();
    }
 
    // -----------------------------------------------------------------------
@@ -265,7 +273,7 @@ struct batch_operator_plugin::impl {
          auto obj = row.get_object();
          uint64_t outpost_id  = obj["outpost_id"].as_uint64();
          uint32_t epoch_index = static_cast<uint32_t>(obj["epoch_index"].as_uint64());
-         uint8_t  status      = static_cast<uint8_t>(obj["status"].as_uint64());
+         auto status = obj["status"].as_enum_value<EnvelopeStatus>();
 
          if (outpost_id == op.id && epoch_index == current_epoch && status == ENVELOPE_STATUS_PENDING_DELIVERY) {
             auto raw_hex = obj["raw_envelope"].as_string();
@@ -283,9 +291,9 @@ struct batch_operator_plugin::impl {
    void deliver_to_outpost(outpost_descriptor& op) {
       if (op.outbound_raw_envelope.empty()) return;
 
-      if (static_cast<int>(op.chain_kind) == CHAIN_KIND_ETHEREUM) {
+      if (op.chain_kind == CHAIN_KIND_ETHEREUM) {
          deliver_to_eth_outpost(op);
-      } else if (static_cast<int>(op.chain_kind) == CHAIN_KIND_SOLANA) {
+      } else if (op.chain_kind == CHAIN_KIND_SOLANA) {
          deliver_to_sol_outpost(op);
       }
    }
@@ -370,9 +378,9 @@ struct batch_operator_plugin::impl {
    // -----------------------------------------------------------------------
 
    void crank_outpost_epoch(outpost_descriptor& op) {
-      if (static_cast<int>(op.chain_kind) == CHAIN_KIND_ETHEREUM) {
+      if (op.chain_kind == CHAIN_KIND_ETHEREUM) {
          crank_eth_outpost(op);
-      } else if (static_cast<int>(op.chain_kind) == CHAIN_KIND_SOLANA) {
+      } else if (op.chain_kind == CHAIN_KIND_SOLANA) {
          crank_sol_outpost(op);
       }
    }
@@ -388,10 +396,14 @@ struct batch_operator_plugin::impl {
          return;
       }
 
-      auto tx = entry->client->create_default_tx(eth_opp_addr, *finalize_abi,
-         {fc::variant(current_epoch)});
-      auto result = entry->client->execute_contract_tx_fn(tx, *finalize_abi);
-      ilog("batch_operator: ETH finalizeEpoch result={}", result.as_string());
+      try {
+         auto tx = entry->client->create_default_tx(eth_opp_addr, *finalize_abi, {});
+         auto result = entry->client->execute_contract_tx_fn(tx, *finalize_abi);
+         ilog("batch_operator: ETH finalizeEpoch result={}", result.as_string());
+      } catch (const fc::exception& e) {
+         // OPP_PreviousEpochSent is expected when no pending epoch exists
+         dlog("batch_operator: ETH finalizeEpoch skipped — {}", e.to_string());
+      }
    }
 
    void crank_sol_outpost(outpost_descriptor& op) {
@@ -424,9 +436,9 @@ struct batch_operator_plugin::impl {
    }
 
    void read_inbound_chain(outpost_descriptor& op) {
-      if (static_cast<int>(op.chain_kind) == CHAIN_KIND_ETHEREUM) {
+      if (op.chain_kind == CHAIN_KIND_ETHEREUM) {
          read_eth_inbound(op);
-      } else if (static_cast<int>(op.chain_kind) == CHAIN_KIND_SOLANA) {
+      } else if (op.chain_kind == CHAIN_KIND_SOLANA) {
          read_sol_inbound(op);
       }
    }
@@ -436,24 +448,42 @@ struct batch_operator_plugin::impl {
       if (!entry || !entry->client) return;
 
       auto& abis = eth_plug->get_abi_files();
-      // Collect all ABI contracts for event decoding
-      std::vector<eth::abi::contract> all_abis;
+      // Collect all ABI contracts that have the OPP contract address
+      std::vector<eth::abi::contract> opp_abis;
+      std::string opp_addr;
       for (auto& [path, contracts] : abis) {
-         for (auto& c : contracts) all_abis.push_back(c);
+         for (auto& c : contracts) {
+            if (!c.contract_address.empty() && opp_addr.empty()) {
+               // Use the first ABI entry that has an OPP-matching address
+               if (c.contract_address == eth_opp_addr) opp_addr = c.contract_address;
+            }
+            opp_abis.push_back(c);
+         }
       }
+      if (opp_addr.empty()) opp_addr = eth_opp_addr;
 
-      // Query OPPMessageEvent logs via ethereum_client
+      // Count event ABIs to verify they're loaded
+      uint32_t event_abi_count = 0;
+      for (auto& a : opp_abis) {
+         if (a.type == eth::abi::invoke_target_type::event) ++event_abi_count;
+      }
+      ilog("batch_operator: querying ETH events (addr={}, abis={}, events={}, opp_addr={})",
+           opp_addr, opp_abis.size(), event_abi_count, eth_opp_addr);
+
+      // Query OPPMessage logs via ethereum_client
       auto events = entry->client->get_events(
-         eth_opp_addr,
-         {"OPPMessageEvent", "OPPEpochEvent"},
-         all_abis,
+         opp_addr,
+         {"OPPMessage", "OPPEpoch"},
+         opp_abis,
          eth::block_tag_t{std::string("earliest")},
          eth::block_tag_t{std::string(eth::block_tag_latest)});
+
+      ilog("batch_operator: got {} events from ETH for outpost {}", events.size(), op.id);
 
       std::vector<char> combined_messages;
       uint32_t msg_count = 0;
       for (auto& evt : events) {
-         if (evt.event_name == "OPPMessageEvent" && !evt.data.empty()) {
+         if (evt.event_name == "OPPMessage" && !evt.data.empty()) {
             combined_messages.insert(combined_messages.end(),
                reinterpret_cast<const char*>(evt.data.data()),
                reinterpret_cast<const char*>(evt.data.data() + evt.data.size()));
@@ -550,7 +580,9 @@ struct batch_operator_plugin::impl {
 
       if (!found) {
          push_action("sysio.msgch", "createreq", operator_account,
-                     fc::mutable_variant_object()("outpost_id", op.id));
+                     fc::mutable_variant_object()
+                        ("batch_op_name", operator_account.to_string())
+                        ("outpost_id", op.id));
 
          // Re-read to get the id
          req_rows = read_table("sysio.msgch", "sysio.msgch", "inchainreq", 50);
@@ -593,14 +625,16 @@ struct batch_operator_plugin::impl {
          auto obj = row.get_object();
          if (obj["outpost_id"].as_uint64() == op.id &&
              static_cast<uint32_t>(obj["epoch_index"].as_uint64()) == current_epoch) {
-            uint8_t  status         = static_cast<uint8_t>(obj["status"].as_uint64());
+            auto status = obj["status"].as_enum_value<ChainRequestStatus>();
             uint32_t delivery_count = static_cast<uint32_t>(obj["delivery_count"].as_uint64());
 
-            // Need majority (4/7) before evaluating consensus
+            // Need majority before evaluating consensus
             if (status == CHAIN_REQUEST_STATUS_COLLECTING && delivery_count >= 4) {
                uint64_t req_id = obj["id"].as_uint64();
                push_action("sysio.msgch", "evalcons", operator_account,
-                           fc::mutable_variant_object()("req_id", req_id));
+                           fc::mutable_variant_object()
+                              ("batch_op_name", operator_account.to_string())
+                              ("req_id", req_id));
                ilog("batch_operator: triggered consensus eval for req {} ({} deliveries)",
                     req_id, delivery_count);
             }
@@ -706,9 +740,9 @@ void batch_operator_plugin::set_program_options(options_description& cli,
    auto opts = cfg.add_options();
    opts("batch-operator-account", bpo::value<std::string>(),
         "WIRE account name for this batch operator");
-   opts("batch-epoch-poll-ms", bpo::value<uint32_t>()->default_value(5000),
+   opts("batch-epoch-poll-ms", bpo::value<uint32_t>()->default_value(EPOCH_POLL_MS),
         "How often to check epoch state (ms)");
-   opts("batch-delivery-timeout-ms", bpo::value<uint32_t>()->default_value(30000),
+   opts("batch-delivery-timeout-ms", bpo::value<uint32_t>()->default_value(DELIVERY_TIMEOUT_MS),
         "Max time to wait for chain delivery confirmation (ms)");
    opts("batch-enabled", bpo::value<bool>()->default_value(false),
         "Enable batch operator functionality");
