@@ -1966,6 +1966,21 @@ read_only::get_table_rows_by_seckey( const read_only::get_table_rows_params& p,
    };
 }
 
+// Detect KV key format from ABI table definition.
+//   - Empty key_names: old ABI (pre-KV CDT), always format=1
+//   - ["table_name","scope","primary_key"] / ["name","name","uint64"]: format=1 (multi_index / kv::table)
+//   - Anything else: format=0 (raw_table / indexed_table / global)
+static uint8_t detect_kv_format(const table_def& tbl) {
+   if (tbl.key_names.empty())
+      return chain::config::kv_format_standard;
+   if (tbl.key_names.size() == 3 && tbl.key_types.size() == 3
+       && tbl.key_names[0] == "table_name" && tbl.key_names[1] == "scope" && tbl.key_names[2] == "primary_key"
+       && tbl.key_types[0] == "name"       && tbl.key_types[1] == "name"  && tbl.key_types[2] == "uint64") {
+      return chain::config::kv_format_standard;
+   }
+   return chain::config::kv_format_raw;
+}
+
 read_only::get_kv_rows_return_t
 read_only::get_kv_rows( const read_only::get_kv_rows_params& p, const fc::time_point& deadline ) const {
    abi_def abi = sysio::chain_apis::get_abi( db, p.code );
@@ -1974,6 +1989,7 @@ read_only::get_kv_rows( const read_only::get_kv_rows_params& p, const fc::time_p
    // Capture key metadata for use in both phases.
    auto key_names = tbl.key_names;
    auto key_types = tbl.key_types;
+   const uint8_t key_format = detect_kv_format(tbl);
 
    fc::time_point params_deadline = p.time_limit_ms
       ? std::min(fc::time_point::now().safe_add(fc::milliseconds(*p.time_limit_ms)), deadline)
@@ -2044,10 +2060,10 @@ read_only::get_kv_rows( const read_only::get_kv_rows_params& p, const fc::time_p
    };
 
    if (!reverse) {
-      auto itr = kv_idx.lower_bound(boost::make_tuple(p.code, chain::config::kv_format_raw, lb_sv));
+      auto itr = kv_idx.lower_bound(boost::make_tuple(p.code, key_format, lb_sv));
       uint32_t count = 0;
       while (itr != kv_idx.end() && itr->code == p.code &&
-             itr->key_format == chain::config::kv_format_raw) {
+             itr->key_format == key_format) {
          auto kv = itr->key_view();
          if (has_upper && kv >= ub_sv) break;
 
@@ -2066,7 +2082,7 @@ read_only::get_kv_rows( const read_only::get_kv_rows_params& p, const fc::time_p
          ++itr;
          if (fc::time_point::now() >= params_deadline) {
             if (itr != kv_idx.end() && itr->code == p.code &&
-                itr->key_format == chain::config::kv_format_raw) {
+                itr->key_format == key_format) {
                auto next_kv = itr->key_view();
                if (!has_upper || next_kv < ub_sv) {
                   hp.more = true;
@@ -2080,20 +2096,20 @@ read_only::get_kv_rows( const read_only::get_kv_rows_params& p, const fc::time_p
       // Reverse iteration
       decltype(kv_idx.end()) itr;
       if (has_upper) {
-         itr = kv_idx.lower_bound(boost::make_tuple(p.code, chain::config::kv_format_raw, ub_sv));
+         itr = kv_idx.lower_bound(boost::make_tuple(p.code, key_format, ub_sv));
       } else {
          itr = kv_idx.lower_bound(
-            boost::make_tuple(p.code, static_cast<uint8_t>(chain::config::kv_format_raw + 1), std::string_view()));
+            boost::make_tuple(p.code, static_cast<uint8_t>(key_format + 1), std::string_view()));
       }
 
       auto begin = kv_idx.lower_bound(
-         boost::make_tuple(p.code, chain::config::kv_format_raw, std::string_view()));
+         boost::make_tuple(p.code, key_format, std::string_view()));
 
       if (itr != begin) {
          uint32_t count = 0;
          do {
             --itr;
-            if (itr->code != p.code || itr->key_format != chain::config::kv_format_raw)
+            if (itr->code != p.code || itr->key_format != key_format)
                break;
 
             auto kv = itr->key_view();
@@ -2121,7 +2137,7 @@ read_only::get_kv_rows( const read_only::get_kv_rows_params& p, const fc::time_p
                if (itr != begin) {
                   auto prev = itr;
                   --prev;
-                  if (prev->code == p.code && prev->key_format == chain::config::kv_format_raw) {
+                  if (prev->code == p.code && prev->key_format == key_format) {
                      auto prev_kv = prev->key_view();
                      if (lb_bytes.empty() || prev_kv >= lb_sv) {
                         hp.more = true;
