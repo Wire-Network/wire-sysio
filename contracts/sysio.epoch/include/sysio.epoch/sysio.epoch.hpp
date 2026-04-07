@@ -25,7 +25,8 @@ namespace sysio {
                      uint32_t batch_operator_minimum_active,
                      uint32_t batch_op_groups,
                      uint32_t warmup_epochs,
-                     uint32_t cooldown_epochs);
+                     uint32_t cooldown_epochs,
+                     uint32_t attestation_retention_epoch_count);
 
       /// Register operator (processes OperatorAction attestation).
       [[sysio::action]]
@@ -75,10 +76,12 @@ namespace sysio {
          uint32_t    batch_op_groups = 3;          // rotation groups (21 / 7)
          uint32_t    warmup_epochs = 1;
          uint32_t    cooldown_epochs = 1;
+         uint32_t    attestation_retention_epoch_count = 1000;
 
          SYSLIB_SERIALIZE(epoch_config,
             (epoch_duration_sec)(operators_per_epoch)
-            (batch_operator_minimum_active)(batch_op_groups)(warmup_epochs)(cooldown_epochs))
+            (batch_operator_minimum_active)(batch_op_groups)
+            (warmup_epochs)(cooldown_epochs)(attestation_retention_epoch_count))
       };
 
       using epochcfg_t = sysio::singleton<"epochcfg"_n, epoch_config>;
