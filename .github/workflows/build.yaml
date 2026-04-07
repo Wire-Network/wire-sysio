@@ -130,7 +130,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: wire-sysio-dev-${{matrix.platform}}-amd64
-          path: build/wire-sysio-dev*.deb
+          path: build/wire-sysio_*.deb
 
   tests:
     name: Tests (${{matrix.cfg.name}})
