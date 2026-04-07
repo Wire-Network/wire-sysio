@@ -52,32 +52,19 @@ int trx_priority_db::get_trx_priority(const transaction& trx) const {
 // -----------------------------------------------------------------------------------------------------------------
 namespace {
 
-std::vector<char> get_row_by_id(const controller& control, name code, name scope, name table, uint64_t id ) {
-   const auto& db = control.db();
-
-   auto key = make_kv_key(table, scope, id);
-   auto key_sv = key.to_string_view();
-
-   const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
-   auto itr = kv_idx.find(boost::make_tuple(code, config::kv_format_standard, key_sv));
-   if (itr == kv_idx.end()) {
-      return {};
-   }
-
-   vector<char> data(itr->value.data(), itr->value.data() + itr->value.size());
-   return data;
-}
-
-vector<char> get_row_by_account(const controller& control, name code, name scope, name table, account_name act ) {
-   return get_row_by_id( control, code, scope, table, act.to_uint64_t() );
-}
-
 block_timestamp_type get_last_trx_priority_update(const controller& control) {
    try {
-      vector<char> data = get_row_by_account( control, config::system_account_name, config::system_account_name, "trxpglobal"_n, "trxpglobal"_n );
-      if (data.empty())
+      // trxpglobal is a kv::global (format=0) with an 8-byte name key
+      auto key = make_kv_global_key("trxpglobal"_n);
+      auto key_sv = key.to_string_view();
+
+      const auto& db = control.db();
+      const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
+      auto itr = kv_idx.find(boost::make_tuple(config::system_account_name, config::kv_format_raw, key_sv));
+      if (itr == kv_idx.end())
          return {};
-      return fc::raw::unpack<block_timestamp_type>(data);
+
+      return fc::raw::unpack<block_timestamp_type>(itr->value.data(), static_cast<uint32_t>(itr->value.size()));
    } FC_LOG_AND_DROP()
    return {};
 }
