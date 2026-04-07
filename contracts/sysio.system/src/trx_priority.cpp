@@ -5,9 +5,9 @@ namespace sysiosystem {
 
 trx_priority::trx_priority(name s, name code, sysio::datastream<const char*> ds)
    : sysio::contract(s, code, ds),
-     _global(get_self(), get_self().value)
+     _global(get_self())
 {
-   _gstate = _global.get_or_create(get_self());
+   _gstate = _global.get_or_create(get_self(), trx_prio_global{});
 }
 
 trx_priority::~trx_priority() {

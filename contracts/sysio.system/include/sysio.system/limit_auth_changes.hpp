@@ -1,6 +1,6 @@
 #pragma once
 
-#include <sysio/multi_index.hpp>
+#include <sysio/kv_table.hpp>
 
 namespace sysiosystem {
    using sysio::name;
@@ -16,5 +16,5 @@ namespace sysiosystem {
       SYSLIB_SERIALIZE(limit_auth_change, (version)(account)(allow_perms)(disallow_perms))
    };
 
-   typedef sysio::multi_index<"limitauthchg"_n, limit_auth_change> limit_auth_change_table;
+   typedef sysio::kv::table<"limitauthchg"_n, limit_auth_change> limit_auth_change_table;
 } // namespace sysiosystem

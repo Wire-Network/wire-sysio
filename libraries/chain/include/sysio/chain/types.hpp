@@ -141,6 +141,19 @@ namespace sysio::chain {
       return make_kv_prefix(table.to_uint64_t(), scope.to_uint64_t());
    }
 
+   /// Build an 8-byte format=0 global key: [name:8B BE]
+   struct kv_global_key_t {
+      static constexpr size_t size = kv_table_prefix_size;
+      char data[size];
+      std::string_view to_string_view() const { return {data, size}; }
+   };
+
+   inline kv_global_key_t make_kv_global_key(name n) {
+      kv_global_key_t key;
+      kv_encode_be64(key.data, n.to_uint64_t());
+      return key;
+   }
+
    /// Build an 8-byte KV table prefix: [table:8B BE]
    struct kv_table_prefix_t {
       static constexpr size_t size = kv_table_prefix_size;

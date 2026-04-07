@@ -1301,8 +1301,8 @@
             "name": "finkeyidgen",
             "type": "fin_key_id_generator_info",
             "index_type": "i64",
-            "key_names": ["table_name","scope","primary_key"],
-            "key_types": ["name","name","uint64"]
+            "key_names": ["name"],
+            "key_types": ["name"]
         },
         {
             "name": "finkeys",
@@ -1315,15 +1315,15 @@
             "name": "global",
             "type": "sysio_global_state",
             "index_type": "i64",
-            "key_names": [],
-            "key_types": []
+            "key_names": ["name"],
+            "key_types": ["name"]
         },
         {
             "name": "lastpropfins",
             "type": "last_prop_finalizers_info",
             "index_type": "i64",
-            "key_names": ["table_name","scope","primary_key"],
-            "key_types": ["name","name","uint64"]
+            "key_names": ["name"],
+            "key_types": ["name"]
         },
         {
             "name": "producers",
@@ -1350,8 +1350,8 @@
             "name": "trxpglobal",
             "type": "trx_prio_global",
             "index_type": "i64",
-            "key_names": [],
-            "key_types": []
+            "key_names": ["name"],
+            "key_types": ["name"]
         },
         {
             "name": "trxpriority",

@@ -6,6 +6,7 @@
 #include <sysio/crypto.hpp>
 #include <sysio/fixed_bytes.hpp>
 #include <sysio/ignore.hpp>
+#include <sysio/kv_table.hpp>
 #include <sysio/print.hpp>
 #include <sysio/privileged.hpp>
 #include <sysio/producer_schedule.hpp>

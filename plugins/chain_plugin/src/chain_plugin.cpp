@@ -1981,6 +1981,22 @@ static uint8_t detect_kv_format(const table_def& tbl) {
    return chain::config::kv_format_raw;
 }
 
+// ABI-driven KV row lookup. Auto-detects format from ABI key_names/key_types,
+// encodes the key using be_key_codec, and returns the raw value bytes.
+// Works for both format=0 (global, raw_table) and format=1 (kv::table, multi_index).
+static std::optional<std::vector<char>> lookup_kv_row(const database& db, name code, const abi_def& abi,
+                                                       name table, const fc::variant& key_var) {
+   const auto& tbl = get_kv_table_def(abi, table);
+   uint8_t key_format = detect_kv_format(tbl);
+   auto key_bytes = chain::be_key_codec::encode_key(key_var, tbl.key_names, tbl.key_types);
+   std::string_view key_sv(key_bytes.data(), key_bytes.size());
+
+   const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
+   auto it = kv_idx.find(boost::make_tuple(code, key_format, key_sv));
+   if (it == kv_idx.end()) return {};
+   return std::vector<char>(it->value.data(), it->value.data() + it->value.size());
+}
+
 read_only::get_kv_rows_return_t
 read_only::get_kv_rows( const read_only::get_kv_rows_params& p, const fc::time_point& deadline ) const {
    abi_def abi = sysio::chain_apis::get_abi( db, p.code );
@@ -2490,18 +2506,21 @@ fc::variant read_only::get_currency_stats( const read_only::get_currency_stats_p
 }
 
 fc::variant get_global_row( const database& db, const abi_def& abi, const abi_serializer& abis, const fc::microseconds& abi_serializer_max_time_us, bool shorten_abi_errors ) {
-   const auto table_type = get_table_type(abi, "global"_n);
-   SYS_ASSERT(table_type == read_only::KEYi64, chain::contract_table_query_exception, "Invalid table type {} for table global", table_type);
+   // Build the key object matching the ABI key_names for the "global" table.
+   // For kv::global (format=0): key_names=["name"], key encodes as {"name":"global"}
+   // For singleton (format=1): key_names=["table_name","scope","primary_key"]
+   fc::mutable_variant_object key_obj;
+   const auto& tbl = get_kv_table_def(abi, "global"_n);
+   if (detect_kv_format(tbl) == config::kv_format_raw) {
+      key_obj("name", "global");
+   } else {
+      key_obj("table_name", "global")("scope", config::system_account_name.to_string())("primary_key", name("global").to_uint64_t());
+   }
 
-   auto key = chain::make_kv_key("global"_n, config::system_account_name, name("global").to_uint64_t());
-   auto key_sv = key.to_string_view();
+   auto data = lookup_kv_row(db, config::system_account_name, abi, "global"_n, fc::variant(std::move(key_obj)));
+   SYS_ASSERT(data.has_value(), chain::contract_table_query_exception, "Missing row in table global");
 
-   const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
-   auto it = kv_idx.find(boost::make_tuple(config::system_account_name, config::kv_format_standard, key_sv));
-   SYS_ASSERT(it != kv_idx.end(), chain::contract_table_query_exception, "Missing row in table global");
-
-   vector<char> data(it->value.data(), it->value.data() + it->value.size());
-   return abis.binary_to_variant(abis.get_table_type("global"_n), data, abi_serializer::create_yield_function( abi_serializer_max_time_us ), shorten_abi_errors );
+   return abis.binary_to_variant(abis.get_table_type("global"_n), *data, abi_serializer::create_yield_function( abi_serializer_max_time_us ), shorten_abi_errors );
 }
 
 read_only::get_finalizer_info_result read_only::get_finalizer_info( const read_only::get_finalizer_info_params& p, const fc::time_point& ) const {

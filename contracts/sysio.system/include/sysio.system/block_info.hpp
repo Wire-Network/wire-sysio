@@ -1,6 +1,6 @@
 #pragma once
 
-#include <sysio/multi_index.hpp>
+#include <sysio/kv_table.hpp>
 #include <sysio/name.hpp>
 #include <sysio/time.hpp>
 
@@ -31,7 +31,7 @@ struct [[sysio::table, sysio::contract("sysio.system")]] block_info_record
    SYSLIB_SERIALIZE(block_info_record, (version)(block_height)(block_timestamp))
 };
 
-using block_info_table = sysio::multi_index<"blockinfo"_n, block_info_record>;
+using block_info_table = sysio::kv::table<"blockinfo"_n, block_info_record>;
 
 struct block_batch_info
 {
@@ -102,7 +102,9 @@ latest_block_batch_info_result get_latest_block_batch_info(uint32_t    batch_sta
       return result;
    }
 
-   auto latest_block_info_itr = --t.cend();
+   // lower_bound past any real key, then back up to the last element
+   auto latest_block_info_itr = t.lower_bound(std::numeric_limits<uint64_t>::max());
+   --latest_block_info_itr;
 
    if (latest_block_info_itr->version != 0) {
       // Compiled code for this function within the calling contract has not been updated to support new version of

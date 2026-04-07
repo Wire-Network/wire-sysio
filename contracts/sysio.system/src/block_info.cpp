@@ -40,7 +40,9 @@ void system_contract::add_to_blockinfo_table(const sysio::checksum256&    previo
         itr != end && itr->block_height <= last_prunable_block_height && 0 < count; //
         --count)                                                                    //
    {
-      itr = t.erase(itr);
+      auto pk = itr->primary_key();
+      ++itr;
+      t.erase(pk);
    }
 }
 
