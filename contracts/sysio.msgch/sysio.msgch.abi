@@ -4,122 +4,7 @@
     "types": [],
     "structs": [
         {
-            "name": "buildenv",
-            "base": "",
-            "fields": [
-                {
-                    "name": "batch_op_name",
-                    "type": "name"
-                },
-                {
-                    "name": "outpost_id",
-                    "type": "uint64"
-                }
-            ]
-        },
-        {
-            "name": "chain_delivery",
-            "base": "",
-            "fields": [
-                {
-                    "name": "id",
-                    "type": "uint64"
-                },
-                {
-                    "name": "chain_request_id",
-                    "type": "uint64"
-                },
-                {
-                    "name": "operator_account",
-                    "type": "name"
-                },
-                {
-                    "name": "chain_hash",
-                    "type": "checksum256"
-                },
-                {
-                    "name": "merkle_root",
-                    "type": "checksum256"
-                },
-                {
-                    "name": "message_count",
-                    "type": "uint32"
-                },
-                {
-                    "name": "delivered_at",
-                    "type": "time_point"
-                },
-                {
-                    "name": "matches_consensus",
-                    "type": "bool"
-                }
-            ]
-        },
-        {
-            "name": "crank",
-            "base": "",
-            "fields": []
-        },
-        {
-            "name": "createreq",
-            "base": "",
-            "fields": [
-                {
-                    "name": "batch_op_name",
-                    "type": "name"
-                },
-                {
-                    "name": "outpost_id",
-                    "type": "uint64"
-                }
-            ]
-        },
-        {
-            "name": "deliver",
-            "base": "",
-            "fields": [
-                {
-                    "name": "operator_acct",
-                    "type": "name"
-                },
-                {
-                    "name": "req_id",
-                    "type": "uint64"
-                },
-                {
-                    "name": "chain_hash",
-                    "type": "checksum256"
-                },
-                {
-                    "name": "merkle_root",
-                    "type": "checksum256"
-                },
-                {
-                    "name": "msg_count",
-                    "type": "uint32"
-                },
-                {
-                    "name": "raw_messages",
-                    "type": "bytes"
-                }
-            ]
-        },
-        {
-            "name": "evalcons",
-            "base": "",
-            "fields": [
-                {
-                    "name": "batch_op_name",
-                    "type": "name"
-                },
-                {
-                    "name": "req_id",
-                    "type": "uint64"
-                }
-            ]
-        },
-        {
-            "name": "inbound_chain_request",
+            "name": "attestation_entry",
             "base": "",
             "fields": [
                 {
@@ -135,15 +20,117 @@
                     "type": "uint32"
                 },
                 {
-                    "name": "expected_start_msg",
-                    "type": "checksum256"
+                    "name": "type",
+                    "type": "AttestationType"
                 },
                 {
                     "name": "status",
-                    "type": "ChainRequestStatus"
+                    "type": "AttestationStatus"
                 },
                 {
-                    "name": "delivery_count",
+                    "name": "data",
+                    "type": "bytes"
+                },
+                {
+                    "name": "pending_timestamp",
+                    "type": "uint64"
+                },
+                {
+                    "name": "ready_timestamp",
+                    "type": "uint64"
+                },
+                {
+                    "name": "processed_timestamp",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "buildenv",
+            "base": "",
+            "fields": [
+                {
+                    "name": "outpost_id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "cleanup",
+            "base": "",
+            "fields": [
+                {
+                    "name": "before_epoch",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "deliver",
+            "base": "",
+            "fields": [
+                {
+                    "name": "batch_op_name",
+                    "type": "name"
+                },
+                {
+                    "name": "outpost_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "data",
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
+            "name": "envelope_entry",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "outpost_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "epoch_index",
+                    "type": "uint32"
+                },
+                {
+                    "name": "batch_op_name",
+                    "type": "name"
+                },
+                {
+                    "name": "chain_kind",
+                    "type": "ChainKind"
+                },
+                {
+                    "name": "checksum",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "raw_data",
+                    "type": "bytes"
+                },
+                {
+                    "name": "received_at",
+                    "type": "time_point"
+                }
+            ]
+        },
+        {
+            "name": "evalcons",
+            "base": "",
+            "fields": [
+                {
+                    "name": "outpost_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "epoch_index",
                     "type": "uint32"
                 }
             ]
@@ -179,10 +166,6 @@
                 {
                     "name": "status",
                     "type": "MessageStatus"
-                },
-                {
-                    "name": "attestation_type",
-                    "type": "AttestationType"
                 },
                 {
                     "name": "raw_payload",
@@ -241,16 +224,6 @@
             ]
         },
         {
-            "name": "processmsg",
-            "base": "",
-            "fields": [
-                {
-                    "name": "msg_id",
-                    "type": "uint64"
-                }
-            ]
-        },
-        {
             "name": "queueout",
             "base": "",
             "fields": [
@@ -276,13 +249,8 @@
             "ricardian_contract": ""
         },
         {
-            "name": "crank",
-            "type": "crank",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "createreq",
-            "type": "createreq",
+            "name": "cleanup",
+            "type": "cleanup",
             "ricardian_contract": ""
         },
         {
@@ -296,11 +264,6 @@
             "ricardian_contract": ""
         },
         {
-            "name": "processmsg",
-            "type": "processmsg",
-            "ricardian_contract": ""
-        },
-        {
             "name": "queueout",
             "type": "queueout",
             "ricardian_contract": ""
@@ -308,15 +271,15 @@
     ],
     "tables": [
         {
-            "name": "deliveries",
-            "type": "chain_delivery",
+            "name": "attestations",
+            "type": "attestation_entry",
             "index_type": "i64",
             "key_names": ["table_name","scope","primary_key"],
             "key_types": ["name","name","uint64"]
         },
         {
-            "name": "inchainreq",
-            "type": "inbound_chain_request",
+            "name": "envelopes",
+            "type": "envelope_entry",
             "index_type": "i64",
             "key_names": ["table_name","scope","primary_key"],
             "key_types": ["name","name","uint64"]
@@ -340,6 +303,24 @@
     "variants": [],
     "action_results": [],
     "enums": [
+        {
+            "name": "AttestationStatus",
+            "type": "int32",
+            "values": [
+                {
+                    "name": "ATTESTATION_STATUS_PENDING",
+                    "value": 0
+                },
+                {
+                    "name": "ATTESTATION_STATUS_READY",
+                    "value": 1
+                },
+                {
+                    "name": "ATTESTATION_STATUS_PROCESSED",
+                    "value": 2
+                }
+            ]
+        },
         {
             "name": "AttestationType",
             "type": "int32",
@@ -409,24 +390,28 @@
                     "value": 60937
                 },
                 {
-                    "name": "ATTESTATION_TYPE_REMIT",
+                    "name": "ATTESTATION_TYPE_UNDERWRITE_UNLOCK",
                     "value": 60938
                 },
                 {
+                    "name": "ATTESTATION_TYPE_REMIT",
+                    "value": 60944
+                },
+                {
                     "name": "ATTESTATION_TYPE_CHALLENGE_REQUEST",
-                    "value": 60939
+                    "value": 60945
                 },
                 {
                     "name": "ATTESTATION_TYPE_EPOCH_SYNC",
-                    "value": 60940
+                    "value": 60946
                 },
                 {
                     "name": "ATTESTATION_TYPE_ROSTER_UPDATE",
-                    "value": 60941
+                    "value": 60947
                 },
                 {
                     "name": "ATTESTATION_TYPE_REMIT_CONFIRM",
-                    "value": 60942
+                    "value": 60948
                 },
                 {
                     "name": "ATTESTATION_TYPE_BATCH_OPERATOR_NEXT_GROUP",
@@ -435,27 +420,27 @@
             ]
         },
         {
-            "name": "ChainRequestStatus",
+            "name": "ChainKind",
             "type": "int32",
             "values": [
                 {
-                    "name": "CHAIN_REQUEST_STATUS_PENDING",
+                    "name": "CHAIN_KIND_UNKNOWN",
                     "value": 0
                 },
                 {
-                    "name": "CHAIN_REQUEST_STATUS_COLLECTING",
+                    "name": "CHAIN_KIND_WIRE",
                     "value": 1
                 },
                 {
-                    "name": "CHAIN_REQUEST_STATUS_CONSENSUS_OK",
+                    "name": "CHAIN_KIND_ETHEREUM",
                     "value": 2
                 },
                 {
-                    "name": "CHAIN_REQUEST_STATUS_CONSENSUS_FAIL",
+                    "name": "CHAIN_KIND_SOLANA",
                     "value": 3
                 },
                 {
-                    "name": "CHAIN_REQUEST_STATUS_CHALLENGED",
+                    "name": "CHAIN_KIND_SUI",
                     "value": 4
                 }
             ]

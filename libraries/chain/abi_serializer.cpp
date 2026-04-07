@@ -600,12 +600,19 @@ namespace sysio::chain {
          } SYS_RETHROW_EXCEPTIONS( unpack_exception, "Unable to unpack presence flag of optional '{}'", ctx.get_path_string() )
          return flag ? _binary_to_variant(ftype, stream, ctx) : fc::variant();
       } else if( auto e_itr = enums.find(rtype); e_itr != enums.end() ) {
-         // Enum type: read as underlying integer type, return the integer value.
-         // Callers that need the name can look it up from the ABI enum definition.
+         // Enum type: read as underlying integer, return member name string.
+         // Falls back to integer for values not in the enum definition.
          auto btype = built_in_types.find(e_itr->second.type);
          SYS_ASSERT( btype != built_in_types.end(), invalid_type_inside_abi,
                      "Enum '{}' has unknown underlying type '{}'", impl::limit_size(rtype), impl::limit_size(e_itr->second.type) );
-         return btype->second.first(stream, false, false, ctx.get_yield_function());
+         auto int_var = btype->second.first(stream, false, false, ctx.get_yield_function());
+         auto int_val = int_var.as_int64();
+         for( const auto& ev : e_itr->second.values ) {
+            if( ev.value == int_val ) {
+               return fc::variant(ev.name);
+            }
+         }
+         return int_var; // Unknown value — return as integer
       } else {
          auto v_itr = variants.find(rtype);
          if( v_itr != variants.end() ) {
@@ -705,7 +712,9 @@ namespace sysio::chain {
             _variant_to_binary(fundamental_type(rtype), var, ds, ctx);
          }
       } else if( auto e_itr = enums.find(rtype); e_itr != enums.end() ) {
-         // Enum type: accept string member name or integer value
+         // Enum type: accept string member name or integer value.
+         // For string matching, tries exact match first, then prefix-stripped match
+         // (e.g., "ethereum" matches "chain_kind_ethereum" by stripping the "chain_kind_" prefix).
          auto btype = built_in_types.find(e_itr->second.type);
          SYS_ASSERT( btype != built_in_types.end(), invalid_type_inside_abi,
                      "Enum '{}' has unknown underlying type '{}'", ctx.maybe_shorten(rtype), ctx.maybe_shorten(e_itr->second.type) );
@@ -713,11 +722,25 @@ namespace sysio::chain {
          if( var.is_string() ) {
             auto name_str = var.get_string();
             bool found = false;
+            // Pass 1: exact match
             for( const auto& ev : e_itr->second.values ) {
                if( ev.name == name_str ) {
                   val_to_pack = fc::variant(ev.value);
                   found = true;
                   break;
+               }
+            }
+            // Pass 2: prefix-stripped match — enum members often have a common prefix
+            // derived from the type name (e.g., "chain_kind_" for type "chain_kind_t").
+            // Try matching "name_str" as a suffix of each member name after a '_' separator.
+            if( !found ) {
+               for( const auto& ev : e_itr->second.values ) {
+                  auto pos = ev.name.rfind('_');
+                  if( pos != std::string::npos && ev.name.substr(pos + 1) == name_str ) {
+                     val_to_pack = fc::variant(ev.value);
+                     found = true;
+                     break;
+                  }
                }
             }
             SYS_ASSERT( found, pack_exception,
