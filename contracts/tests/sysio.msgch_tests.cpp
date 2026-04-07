@@ -25,8 +25,8 @@ public:
       create_accounts({
          MSGCH_ACCOUNT, EPOCH_ACCOUNT, CHALG_ACCOUNT,
          "batchop1"_n, "batchop2"_n, "batchop3"_n,
-         "batchop4"_n, "batchop5"_n, "batchop6"_n,
-         "batchop7"_n
+         "batchop4"_n, "batchop5"_n, "batchop.a"_n,
+         "batchop.b"_n
       });
       produce_blocks(2);
 
@@ -163,8 +163,8 @@ BOOST_FIXTURE_TEST_CASE(evalcons_consensus_ok_unanimous, sysio_msgch_tester) { t
    BOOST_REQUIRE_EQUAL(success(), deliver("batchop3"_n, 0, hash, merkle, 10));
    BOOST_REQUIRE_EQUAL(success(), deliver("batchop4"_n, 0, hash, merkle, 10));
    BOOST_REQUIRE_EQUAL(success(), deliver("batchop5"_n, 0, hash, merkle, 10));
-   BOOST_REQUIRE_EQUAL(success(), deliver("batchop6"_n, 0, hash, merkle, 10));
-   BOOST_REQUIRE_EQUAL(success(), deliver("batchop7"_n, 0, hash, merkle, 10));
+   BOOST_REQUIRE_EQUAL(success(), deliver("batchop.a"_n, 0, hash, merkle, 10));
+   BOOST_REQUIRE_EQUAL(success(), deliver("batchop.b"_n, 0, hash, merkle, 10));
 
    BOOST_REQUIRE_EQUAL(success(), evalcons(0));
 } FC_LOG_AND_RETHROW() }

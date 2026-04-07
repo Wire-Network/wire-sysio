@@ -58,6 +58,10 @@
                 {
                     "name": "cooldown_epochs",
                     "type": "uint32"
+                },
+                {
+                    "name": "attestation_retention_epoch_count",
+                    "type": "uint32"
                 }
             ]
         },
@@ -110,11 +114,11 @@
                 },
                 {
                     "name": "type",
-                    "type": "uint8"
+                    "type": "OperatorType"
                 },
                 {
                     "name": "status",
-                    "type": "uint8"
+                    "type": "OperatorStatus"
                 },
                 {
                     "name": "registered_epoch",
@@ -223,7 +227,7 @@
                 },
                 {
                     "name": "type",
-                    "type": "uint8"
+                    "type": "OperatorType"
                 }
             ]
         },
@@ -281,6 +285,10 @@
                 },
                 {
                     "name": "cooldown_epochs",
+                    "type": "uint32"
+                },
+                {
+                    "name": "attestation_retention_epoch_count",
                     "type": "uint32"
                 }
             ]
@@ -387,6 +395,62 @@
     "variants": [],
     "action_results": [],
     "enums": [
+        {
+            "name": "OperatorStatus",
+            "type": "int32",
+            "values": [
+                {
+                    "name": "OPERATOR_STATUS_UNKNOWN",
+                    "value": 0
+                },
+                {
+                    "name": "OPERATOR_STATUS_WARMUP",
+                    "value": 1
+                },
+                {
+                    "name": "OPERATOR_STATUS_COOLDOWN",
+                    "value": 2
+                },
+                {
+                    "name": "OPERATOR_STATUS_ACTIVE",
+                    "value": 3
+                },
+                {
+                    "name": "OPERATOR_STATUS_TERMINATED",
+                    "value": 240
+                },
+                {
+                    "name": "OPERATOR_STATUS_SLASHED",
+                    "value": 241
+                }
+            ]
+        },
+        {
+            "name": "OperatorType",
+            "type": "int32",
+            "values": [
+                {
+                    "name": "OPERATOR_TYPE_UNKNOWN",
+                    "value": 0
+                },
+                {
+                    "name": "OPERATOR_TYPE_PRODUCER",
+                    "value": 1
+                },
+                {
+                    "name": "OPERATOR_TYPE_BATCH",
+                    "value": 2
+                },
+                {
+                    "name": "OPERATOR_TYPE_UNDERWRITER",
+                    "value": 3
+                },
+                {
+                    "name": "OPERATOR_TYPE_CHALLENGER",
+                    "value": 4
+                }
+            ]
+        },
         {
             "name": "chain_kind_t",
             "type": "uint8",

@@ -6,7 +6,7 @@
 #include <sysio/batch_operator_plugin/batch_operator_plugin.hpp>
 #include <sysio/chain/abi_serializer.hpp>
 #include <sysio/chain/transaction.hpp>
-#include <sysio/opp/types/types.pb.h>
+#include <sysio/opp/opp.hpp>
 #include <sysio/opp/attestations/attestations.pb.h>
 
 namespace sysio {
@@ -62,6 +62,7 @@ struct batch_operator_plugin::impl {
 
    // Epoch state tracked across polls
    uint32_t                 current_epoch = 0;
+   uint32_t                 last_delivered_epoch = 0;
    uint8_t                  my_group = 255;
    bool                     is_elected = false;
    std::vector<chain::name> current_group_members;
@@ -197,20 +198,22 @@ struct batch_operator_plugin::impl {
          return;
       }
 
-      // Already processed this epoch — wait for next poll to see the new state
-      if (epoch_index == current_epoch) return;
+      // Already delivered successfully for this epoch — sleep until next poll
+      if (epoch_index == last_delivered_epoch) return;
 
       ilog("batch_operator: ELECTED for epoch {} (group {}, {} members)",
            epoch_index, my_group, current_group_members.size());
 
       refresh_outposts();
 
-      // Set current_epoch before the cycle so all functions see the correct epoch.
-      // Revert if the cycle fails so it retries on next poll.
+      // Track the epoch for the cycle, but only mark as successfully delivered
+      // after the cycle completes without error. If it fails, current_epoch
+      // stays at the previous value so the next poll retries.
       auto prev_epoch = current_epoch;
       current_epoch = epoch_index;
       try {
          run_epoch_cycle(epoch_index);
+         last_delivered_epoch = epoch_index;
       } catch (...) {
          current_epoch = prev_epoch;
          throw;
@@ -228,7 +231,7 @@ struct batch_operator_plugin::impl {
          auto obj = row.get_object();
          outpost_descriptor od;
          od.id         = obj["id"].as_uint64();
-         od.chain_kind = obj["chain_kind"].as_enum_value<ChainKind>();
+         od.chain_kind = obj["chain_kind"].as<ChainKind>();
          od.chain_id   = static_cast<uint32_t>(obj["chain_id"].as_uint64());
          outposts.push_back(std::move(od));
       }
@@ -292,7 +295,7 @@ struct batch_operator_plugin::impl {
          auto obj = row.get_object();
          uint64_t outpost_id  = obj["outpost_id"].as_uint64();
          uint32_t epoch_index = static_cast<uint32_t>(obj["epoch_index"].as_uint64());
-         auto status = obj["status"].as_enum_value<EnvelopeStatus>();
+         auto status = obj["status"].as<EnvelopeStatus>();
 
          if (outpost_id == op.id && epoch_index == current_epoch && status == ENVELOPE_STATUS_PENDING_DELIVERY) {
             auto raw_hex = obj["raw_envelope"].as_string();
