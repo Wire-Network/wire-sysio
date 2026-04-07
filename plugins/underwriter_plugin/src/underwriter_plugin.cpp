@@ -525,35 +525,22 @@ struct underwriter_plugin::impl {
          return;
       }
 
-      // Set wire_account
-      auto* wire_acct = intent.mutable_wire_account();
-      wire_acct->set_name(underwriter_account.to_string());
+      // Set uw_account
+      auto* uw_acct = intent.mutable_uw_account();
+      uw_acct->set_name(underwriter_account.to_string());
 
-      // Set original_message_id from hex
-      auto msg_id_bytes = fc::from_hex(sc.message_id_hex);
-      intent.set_original_message_id(
-         std::string(reinterpret_cast<const char*>(msg_id_bytes.data()), msg_id_bytes.size()));
+      // Set uw_request_id
+      intent.set_uw_request_id(sc.msg_id);
 
-      // Set source_amount
-      auto* src_amt = intent.mutable_source_amount();
-      src_amt->set_kind(sc.source_token);
-      src_amt->set_amount(sc.source_amount);
+      // Set amount (source amount)
+      auto* amt = intent.mutable_amount();
+      amt->set_kind(sc.source_token);
+      amt->set_amount(sc.source_amount);
 
-      // Set target_amount
-      auto* tgt_amt = intent.mutable_target_amount();
-      tgt_amt->set_kind(sc.target_token);
-      tgt_amt->set_amount(sc.target_amount);
-
-      // Set target_chain
-      auto* tgt_chain = intent.mutable_target_chain();
-      tgt_chain->set_kind(sc.target_chain);
-      tgt_chain->set_id(sc.target_chain_id);
-
-      // Set unlock_timestamp (current time + 24 hours)
-      auto now = fc::time_point::now();
-      auto unlock = now + fc::hours(24);
-      intent.set_unlock_timestamp(
-         static_cast<uint64_t>(unlock.sec_since_epoch()));
+      // Set chain_id (target chain)
+      auto* chain = intent.mutable_chain_id();
+      chain->set_kind(sc.target_chain);
+      chain->set_id(sc.target_chain_id);
 
       // Serialize the intent for signing
       std::string intent_bytes;

@@ -7,6 +7,7 @@
 #include <sysio/system.hpp>
 #include <fc-lite/crypto/chain_types.hpp>
 #include <sysio/opp/types/types.pb.hpp>
+#include <sysio.opp.common/opp_table_types.hpp>
 
 namespace sysio {
 
@@ -51,6 +52,12 @@ namespace sysio {
       /// Slash underwriter (called by sysio.chalg).
       [[sysio::action]]
       void slash(name underwriter, std::string reason);
+
+      /// Create underwrite request (called inline from sysio.msgch).
+      [[sysio::action]]
+      void createuwreq(uint64_t attestation_id,
+                       opp::types::AttestationType type,
+                       std::vector<char> data);
 
       // -----------------------------------------------------------------------
       //  Tables
@@ -122,6 +129,30 @@ namespace sysio {
       };
 
       using uwconfig_t = sysio::singleton<"uwconfig"_n, uw_config>;
+
+      /// Underwrite request — created when an attestation requires underwriting.
+      /// The attestation ID from sysio.msgch::attestations is used as primary key.
+      struct [[sysio::table, sysio::contract("sysio.uwrit")]] uw_request_t {
+         uint64_t                                id;
+         opp::types::AttestationType             type;
+         opp::types::UnderwriteRequestStatus     status;
+         name                                    uw_name;
+         std::vector<opp_table::locked_amount_t> locked_amounts;
+         uint64_t                                unlock_timestamp   = 0;
+         uint64_t                                released_timestamp = 0;
+         uint64_t                                slashed_timestamp  = 0;
+
+         uint64_t primary_key() const { return id; }
+         uint64_t by_status()   const { return static_cast<uint64_t>(status); }
+         uint64_t by_uw()       const { return uw_name.value; }
+      };
+
+      using uwreqs_t = multi_index<"uwreqs"_n, uw_request_t,
+         indexed_by<"bystatus"_n,
+            const_mem_fun<uw_request_t, uint64_t, &uw_request_t::by_status>>,
+         indexed_by<"byuw"_n,
+            const_mem_fun<uw_request_t, uint64_t, &uw_request_t::by_uw>>
+      >;
 
    private:
       // Well-known accounts

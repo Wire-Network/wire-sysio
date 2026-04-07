@@ -203,6 +203,12 @@ enum EnvelopeStatus {
   ENVELOPE_STATUS_CONFIRMED = 2;
 }
 
+enum AttestationStatus {
+  ATTESTATION_STATUS_PENDING   = 0; // Requires UnderwriteIntent before processing
+  ATTESTATION_STATUS_READY     = 1; // Ready to process or send outbound
+  ATTESTATION_STATUS_PROCESSED = 2; // Fully processed
+}
+
 enum UnderwriteStatus {
   UNDERWRITE_STATUS_INTENT_CREATED = 0;
   UNDERWRITE_STATUS_INTENT_SUBMITTED = 1;

@@ -76,7 +76,8 @@ public:
 
    action_result setconfig(uint32_t duration = 360, uint32_t ops_per = 7,
                            uint32_t total = 21, uint32_t grps = 3,
-                           uint32_t warmup = 1, uint32_t cooldown = 1) {
+                           uint32_t warmup = 1, uint32_t cooldown = 1,
+                           uint32_t retention = 1000) {
       return push_epoch_action(EPOCH_ACCOUNT, "setconfig"_n, mvo()
          ("epoch_duration_sec", duration)
          ("operators_per_epoch", ops_per)
@@ -84,6 +85,7 @@ public:
          ("batch_op_groups", grps)
          ("warmup_epochs", warmup)
          ("cooldown_epochs", cooldown)
+         ("attestation_retention_epoch_count", retention)
       );
    }
 

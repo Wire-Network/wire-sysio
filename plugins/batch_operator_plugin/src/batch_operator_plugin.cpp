@@ -247,10 +247,15 @@ struct batch_operator_plugin::impl {
          // PHASE 1 — OUTBOUND (WIRE -> Outposts)
          // Outbound envelopes are built by sysio.epoch::advance() via inline
          // action to sysio.msgch::buildenv(). Just read and deliver.
+         // Phase 1 failures must not block Phase 2 (inbound).
          for (auto& op : outposts) {
             op.reset_transient();
             read_outbound_envelope(op);
-            deliver_to_outpost(op);
+            try {
+               deliver_to_outpost(op);
+            } catch (const fc::exception& e) {
+               wlog("batch_operator: outbound delivery failed for outpost {}: {}", op.id, e.to_detail_string());
+            }
          }
 
          // PHASE 2 — INBOUND (Outposts -> WIRE)
@@ -261,10 +266,8 @@ struct batch_operator_plugin::impl {
             deliver_to_depot(op);
          }
 
-         // PHASE 3 — Consensus evaluation
-         for (auto& op : outposts) {
-            evaluate_consensus(op);
-         }
+         // PHASE 3 — Consensus is now evaluated inline by the contract
+         // via evalcons called from deliver. No plugin action needed.
 
          ilog("batch_operator: === EPOCH CYCLE COMPLETE (epoch {}) ===", current_epoch);
       } FC_LOG_AND_RETHROW();
@@ -323,12 +326,12 @@ struct batch_operator_plugin::impl {
 
       auto& abis = eth_plug->get_abi_files();
 
-      // Call epochIn via ethereum_client public API
+      // Call epochIn with raw protobuf wire-protocol bytes
       std::string envelope_hex = fc::to_hex(op.outbound_raw_envelope);
       auto epoch_in_abi = find_eth_abi(abis, "epochIn");
       if (epoch_in_abi) {
          auto tx = entry->client->create_default_tx(eth_opp_inbound_addr, *epoch_in_abi,
-            {fc::variant(current_epoch), fc::variant(envelope_hex)});
+            {fc::variant(envelope_hex)});
          auto result = entry->client->execute_contract_tx_fn(tx, *epoch_in_abi);
          ilog("batch_operator: ETH epochIn result={}", result.as_string());
       }
@@ -583,39 +586,14 @@ struct batch_operator_plugin::impl {
       push_action("sysio.msgch", "deliver", operator_account,
                   fc::mutable_variant_object()
                      ("batch_op_name", operator_account.to_string())
+                     ("outpost_id", op.id)
                      ("data", op.inbound_raw_messages));
 
       ilog("batch_operator: delivered {} inbound messages for outpost {}",
            op.inbound_msg_count, op.id);
    }
 
-   // -----------------------------------------------------------------------
-   //  Phase 3: Consensus
-   // -----------------------------------------------------------------------
-
-   void evaluate_consensus(outpost_descriptor& op) {
-      auto req_rows = read_table("sysio.msgch", "sysio.msgch", "inchainreq", 50);
-      for (auto& row : req_rows.rows) {
-         auto obj = row.get_object();
-         if (obj["outpost_id"].as_uint64() == op.id &&
-             static_cast<uint32_t>(obj["epoch_index"].as_uint64()) == current_epoch) {
-            auto status = obj["status"].as_enum_value<ChainRequestStatus>();
-            uint32_t delivery_count = static_cast<uint32_t>(obj["delivery_count"].as_uint64());
-
-            // Need majority before evaluating consensus
-            if (status == CHAIN_REQUEST_STATUS_COLLECTING && delivery_count >= 4) {
-               uint64_t req_id = obj["id"].as_uint64();
-               push_action("sysio.msgch", "evalcons", operator_account,
-                           fc::mutable_variant_object()
-                              ("batch_op_name", operator_account.to_string())
-                              ("req_id", req_id));
-               ilog("batch_operator: triggered consensus eval for req {} ({} deliveries)",
-                    req_id, delivery_count);
-            }
-            break;
-         }
-      }
-   }
+   // Phase 3 (Consensus) removed — now handled inline by sysio.msgch::evalcons
 
    // -----------------------------------------------------------------------
    //  Helpers

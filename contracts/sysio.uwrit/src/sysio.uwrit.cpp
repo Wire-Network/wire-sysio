@@ -100,14 +100,14 @@ void uwrit::expirelock(uint64_t uw_entry_id) {
    uwledger_t ledger(get_self(), get_self().value);
    auto it = ledger.find(uw_entry_id);
    check(it != ledger.end(), "underwriting entry not found");
-   check(it->status != UnderwriteStatus::UNDERWRITE_STATUS_COMPLETED && it->status != UnderwriteStatus::UNDERWRITE_STATUS_SLASHED,
+   check(it->status != UnderwriteStatus::UNDERWRITE_STATUS_RELEASED && it->status != UnderwriteStatus::UNDERWRITE_STATUS_SLASHED,
          "entry already finalized");
 
    auto now = current_time_point();
    check(now >= it->unlock_time, "lock has not expired yet");
 
    ledger.modify(it, same_payer, [&](auto& e) {
-      e.status = UnderwriteStatus::UNDERWRITE_STATUS_EXPIRED;
+      e.status = UnderwriteStatus::UNDERWRITE_STATUS_RELEASED;
    });
 
    // Release committed collateral
@@ -150,7 +150,7 @@ void uwrit::distfee(uint64_t uw_entry_id) {
    //       For now, mark as completed.
 
    ledger.modify(it, same_payer, [&](auto& e) {
-      e.status = UnderwriteStatus::UNDERWRITE_STATUS_COMPLETED;
+      e.status = UnderwriteStatus::UNDERWRITE_STATUS_RELEASED;
    });
 }
 
@@ -228,6 +228,30 @@ void uwrit::slash(name underwriter, std::string reason) {
    // TODO: Distribute seized collateral per slash distribution rules:
    //       50% to challenger, 25% to other underwriters, 25% to batch operators.
    //       Queue ATTESTATION_TYPE_SLASH_OPERATOR to all outposts.
+}
+
+// ---------------------------------------------------------------------------
+//  createuwreq — create underwrite request (called inline from sysio.msgch)
+// ---------------------------------------------------------------------------
+void uwrit::createuwreq(uint64_t attestation_id,
+                         opp::types::AttestationType type,
+                         std::vector<char> data) {
+   require_auth(MSGCH_ACCOUNT);
+
+   uwreqs_t reqs(get_self(), get_self().value);
+   check(reqs.find(attestation_id) == reqs.end(),
+         "underwrite request already exists for this attestation");
+
+   reqs.emplace(get_self(), [&](auto& r) {
+      r.id                 = attestation_id;
+      r.type               = type;
+      r.status             = opp::types::UNDERWRITE_REQUEST_STATUS_PENDING;
+      r.uw_name            = name{};
+      r.locked_amounts     = {};
+      r.unlock_timestamp   = 0;
+      r.released_timestamp = 0;
+      r.slashed_timestamp  = 0;
+   });
 }
 
 } // namespace sysio
