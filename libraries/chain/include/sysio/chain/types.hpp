@@ -96,9 +96,11 @@ namespace sysio::chain {
    }
 
    /// Standard KV key sizes (bytes)
-   inline constexpr size_t kv_key_size        = 24;  ///< [table:8B][scope:8B][pk:8B]
-   inline constexpr size_t kv_prefix_size     = 16;  ///< [table:8B][scope:8B]
-   inline constexpr size_t kv_table_prefix_size = 8; ///< [table:8B]
+   inline constexpr size_t kv_key_size          = 24; ///< [table:8B][scope:8B][pk:8B]
+   inline constexpr size_t kv_prefix_size       = 16; ///< [table:8B][scope:8B]
+   inline constexpr size_t kv_table_prefix_size = 8;  ///< [table:8B]
+   inline constexpr size_t kv_scope_prefix_size = kv_table_prefix_size; ///< [scope:8B] prefix in sec_key
+   inline constexpr size_t kv_pri_key_size      = sizeof(uint64_t); ///< [pk:8B] stored in kv_index_object
 
    /// Build a 24-byte KV key: [table:8B BE][scope:8B BE][pk:8B BE]
    struct kv_key_t {

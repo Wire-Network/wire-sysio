@@ -4,6 +4,20 @@
     "types": [],
     "structs": [
         {
+            "name": "dbl_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "pk",
+                    "type": "uint64"
+                },
+                {
+                    "name": "val",
+                    "type": "float64"
+                }
+            ]
+        },
+        {
             "name": "kvt_row",
             "base": "",
             "fields": [
@@ -556,6 +570,41 @@
             "name": "tstwriteperm",
             "base": "",
             "fields": []
+        },
+        {
+            "name": "tstxdbl",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstxerase",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstxfind",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstxrev",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstxscope",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstxubound",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstxzero",
+            "base": "",
+            "fields": []
         }
     ],
     "actions": [
@@ -1028,9 +1077,51 @@
             "name": "tstwriteperm",
             "type": "tstwriteperm",
             "ricardian_contract": ""
+        },
+        {
+            "name": "tstxdbl",
+            "type": "tstxdbl",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstxerase",
+            "type": "tstxerase",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstxfind",
+            "type": "tstxfind",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstxrev",
+            "type": "tstxrev",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstxscope",
+            "type": "tstxscope",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstxubound",
+            "type": "tstxubound",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstxzero",
+            "type": "tstxzero",
+            "ricardian_contract": ""
         }
     ],
     "tables": [
+        {
+            "name": "dbltbl",
+            "type": "dbl_row",
+            "index_type": "i64",
+            "key_names": ["table_name","scope","primary_key"],
+            "key_types": ["name","name","uint64"]
+        },
         {
             "name": "kvttable",
             "type": "kvt_row",
