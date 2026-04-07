@@ -1,8 +1,45 @@
 {
     "____comment": "This file was generated with sysio-abigen. DO NOT EDIT ",
     "version": "sysio::abi/1.2",
-    "types": [],
+    "types": [
+        {
+            "new_type_name": "vint64_t",
+            "type": "varint_int64"
+        },
+        {
+            "new_type_name": "vuint32_t",
+            "type": "varint_uint32"
+        }
+    ],
     "structs": [
+        {
+            "name": "ChainId",
+            "base": "",
+            "fields": [
+                {
+                    "name": "kind",
+                    "type": "ChainKind"
+                },
+                {
+                    "name": "id",
+                    "type": "vuint32_t"
+                }
+            ]
+        },
+        {
+            "name": "TokenAmount",
+            "base": "",
+            "fields": [
+                {
+                    "name": "kind",
+                    "type": "TokenKind"
+                },
+                {
+                    "name": "amount",
+                    "type": "vint64_t"
+                }
+            ]
+        },
         {
             "name": "collateral_entry",
             "base": "",
@@ -17,7 +54,7 @@
                 },
                 {
                     "name": "chain_kind",
-                    "type": "uint8"
+                    "type": "chain_kind_t"
                 },
                 {
                     "name": "staked_amount",
@@ -44,6 +81,24 @@
             ]
         },
         {
+            "name": "createuwreq",
+            "base": "",
+            "fields": [
+                {
+                    "name": "attestation_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "type",
+                    "type": "AttestationType"
+                },
+                {
+                    "name": "data",
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
             "name": "distfee",
             "base": "",
             "fields": [
@@ -59,6 +114,28 @@
             "fields": [
                 {
                     "name": "uw_entry_id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "locked_amount_t",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_id",
+                    "type": "ChainId"
+                },
+                {
+                    "name": "amount",
+                    "type": "TokenAmount"
+                },
+                {
+                    "name": "lock_id",
+                    "type": "uint128"
+                },
+                {
+                    "name": "lock_timestamp",
                     "type": "uint64"
                 }
             ]
@@ -143,7 +220,7 @@
                 },
                 {
                     "name": "status",
-                    "type": "uint8"
+                    "type": "UnderwriteStatus"
                 },
                 {
                     "name": "source_amount",
@@ -155,11 +232,11 @@
                 },
                 {
                     "name": "source_chain",
-                    "type": "uint8"
+                    "type": "chain_kind_t"
                 },
                 {
                     "name": "target_chain",
-                    "type": "uint8"
+                    "type": "chain_kind_t"
                 },
                 {
                     "name": "intent_time",
@@ -193,7 +270,7 @@
                 },
                 {
                     "name": "chain_kind",
-                    "type": "uint8"
+                    "type": "chain_kind_t"
                 },
                 {
                     "name": "amount",
@@ -230,12 +307,75 @@
                     "type": "uint32"
                 }
             ]
+        },
+        {
+            "name": "uw_request_t",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "type",
+                    "type": "AttestationType"
+                },
+                {
+                    "name": "status",
+                    "type": "UnderwriteRequestStatus"
+                },
+                {
+                    "name": "uw_name",
+                    "type": "name"
+                },
+                {
+                    "name": "locked_amounts",
+                    "type": "locked_amount_t[]"
+                },
+                {
+                    "name": "unlock_timestamp",
+                    "type": "uint64"
+                },
+                {
+                    "name": "released_timestamp",
+                    "type": "uint64"
+                },
+                {
+                    "name": "slashed_timestamp",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "varint_int64",
+            "base": "",
+            "fields": [
+                {
+                    "name": "value",
+                    "type": "int64"
+                }
+            ]
+        },
+        {
+            "name": "varint_uint32",
+            "base": "",
+            "fields": [
+                {
+                    "name": "value",
+                    "type": "uint32"
+                }
+            ]
         }
     ],
     "actions": [
         {
             "name": "confirmuw",
             "type": "confirmuw",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "createuwreq",
+            "type": "createuwreq",
             "ricardian_contract": ""
         },
         {
@@ -274,8 +414,8 @@
             "name": "collateral",
             "type": "collateral_entry",
             "index_type": "i64",
-            "key_names": [],
-            "key_types": []
+            "key_names": ["table_name","scope","primary_key"],
+            "key_types": ["name","name","uint64"]
         },
         {
             "name": "uwconfig",
@@ -288,11 +428,264 @@
             "name": "uwledger",
             "type": "underwriting_entry",
             "index_type": "i64",
-            "key_names": [],
-            "key_types": []
+            "key_names": ["table_name","scope","primary_key"],
+            "key_types": ["name","name","uint64"]
+        },
+        {
+            "name": "uwreqs",
+            "type": "uw_request_t",
+            "index_type": "i64",
+            "key_names": ["table_name","scope","primary_key"],
+            "key_types": ["name","name","uint64"]
         }
     ],
     "ricardian_clauses": [],
     "variants": [],
-    "action_results": []
+    "action_results": [],
+    "enums": [
+        {
+            "name": "AttestationType",
+            "type": "int32",
+            "values": [
+                {
+                    "name": "ATTESTATION_TYPE_UNSPECIFIED",
+                    "value": 0
+                },
+                {
+                    "name": "ATTESTATION_TYPE_OPERATOR_ACTION",
+                    "value": 2001
+                },
+                {
+                    "name": "ATTESTATION_TYPE_STAKE",
+                    "value": 3001
+                },
+                {
+                    "name": "ATTESTATION_TYPE_UNSTAKE",
+                    "value": 3002
+                },
+                {
+                    "name": "ATTESTATION_TYPE_PRETOKEN_PURCHASE",
+                    "value": 3004
+                },
+                {
+                    "name": "ATTESTATION_TYPE_PRETOKEN_YIELD",
+                    "value": 3006
+                },
+                {
+                    "name": "ATTESTATION_TYPE_RESERVE_BALANCE_SHEET",
+                    "value": 43520
+                },
+                {
+                    "name": "ATTESTATION_TYPE_STAKE_UPDATE",
+                    "value": 60928
+                },
+                {
+                    "name": "ATTESTATION_TYPE_NATIVE_YIELD_REWARD",
+                    "value": 60929
+                },
+                {
+                    "name": "ATTESTATION_TYPE_WIRE_TOKEN_PURCHASE",
+                    "value": 60930
+                },
+                {
+                    "name": "ATTESTATION_TYPE_CHALLENGE_RESPONSE",
+                    "value": 60932
+                },
+                {
+                    "name": "ATTESTATION_TYPE_SLASH_OPERATOR",
+                    "value": 60933
+                },
+                {
+                    "name": "ATTESTATION_TYPE_SWAP",
+                    "value": 60934
+                },
+                {
+                    "name": "ATTESTATION_TYPE_UNDERWRITE_INTENT",
+                    "value": 60935
+                },
+                {
+                    "name": "ATTESTATION_TYPE_UNDERWRITE_CONFIRM",
+                    "value": 60936
+                },
+                {
+                    "name": "ATTESTATION_TYPE_UNDERWRITE_REJECT",
+                    "value": 60937
+                },
+                {
+                    "name": "ATTESTATION_TYPE_UNDERWRITE_UNLOCK",
+                    "value": 60938
+                },
+                {
+                    "name": "ATTESTATION_TYPE_REMIT",
+                    "value": 60944
+                },
+                {
+                    "name": "ATTESTATION_TYPE_CHALLENGE_REQUEST",
+                    "value": 60945
+                },
+                {
+                    "name": "ATTESTATION_TYPE_EPOCH_SYNC",
+                    "value": 60946
+                },
+                {
+                    "name": "ATTESTATION_TYPE_ROSTER_UPDATE",
+                    "value": 60947
+                },
+                {
+                    "name": "ATTESTATION_TYPE_REMIT_CONFIRM",
+                    "value": 60948
+                },
+                {
+                    "name": "ATTESTATION_TYPE_BATCH_OPERATOR_NEXT_GROUP",
+                    "value": 60943
+                }
+            ]
+        },
+        {
+            "name": "ChainKind",
+            "type": "int32",
+            "values": [
+                {
+                    "name": "CHAIN_KIND_UNKNOWN",
+                    "value": 0
+                },
+                {
+                    "name": "CHAIN_KIND_WIRE",
+                    "value": 1
+                },
+                {
+                    "name": "CHAIN_KIND_ETHEREUM",
+                    "value": 2
+                },
+                {
+                    "name": "CHAIN_KIND_SOLANA",
+                    "value": 3
+                },
+                {
+                    "name": "CHAIN_KIND_SUI",
+                    "value": 4
+                }
+            ]
+        },
+        {
+            "name": "TokenKind",
+            "type": "int32",
+            "values": [
+                {
+                    "name": "TOKEN_KIND_WIRE",
+                    "value": 0
+                },
+                {
+                    "name": "TOKEN_KIND_ETH",
+                    "value": 256
+                },
+                {
+                    "name": "TOKEN_KIND_ERC20",
+                    "value": 257
+                },
+                {
+                    "name": "TOKEN_KIND_ERC721",
+                    "value": 258
+                },
+                {
+                    "name": "TOKEN_KIND_ERC1155",
+                    "value": 259
+                },
+                {
+                    "name": "TOKEN_KIND_LIQETH",
+                    "value": 496
+                },
+                {
+                    "name": "TOKEN_KIND_SOL",
+                    "value": 512
+                },
+                {
+                    "name": "TOKEN_KIND_LIQSOL",
+                    "value": 752
+                }
+            ]
+        },
+        {
+            "name": "UnderwriteRequestStatus",
+            "type": "int32",
+            "values": [
+                {
+                    "name": "UNDERWRITE_REQUEST_STATUS_PENDING",
+                    "value": 0
+                },
+                {
+                    "name": "UNDERWRITE_REQUEST_STATUS_CONFIRMED",
+                    "value": 1
+                },
+                {
+                    "name": "UNDERWRITE_REQUEST_STATUS_REJECTED",
+                    "value": 2
+                },
+                {
+                    "name": "UNDERWRITE_REQUEST_STATUS_COMPLETED",
+                    "value": 3
+                },
+                {
+                    "name": "UNDERWRITE_REQUEST_STATUS_EXPIRED",
+                    "value": 4
+                }
+            ]
+        },
+        {
+            "name": "UnderwriteStatus",
+            "type": "int32",
+            "values": [
+                {
+                    "name": "UNDERWRITE_STATUS_INTENT_CREATED",
+                    "value": 0
+                },
+                {
+                    "name": "UNDERWRITE_STATUS_INTENT_SUBMITTED",
+                    "value": 1
+                },
+                {
+                    "name": "UNDERWRITE_STATUS_INTENT_CONFIRMED",
+                    "value": 2
+                },
+                {
+                    "name": "UNDERWRITE_STATUS_READY",
+                    "value": 3
+                },
+                {
+                    "name": "UNDERWRITE_STATUS_RELEASED",
+                    "value": 5
+                },
+                {
+                    "name": "UNDERWRITE_STATUS_SLASHED",
+                    "value": 10
+                }
+            ]
+        },
+        {
+            "name": "chain_kind_t",
+            "type": "uint8",
+            "values": [
+                {
+                    "name": "chain_kind_unknown",
+                    "value": 0
+                },
+                {
+                    "name": "chain_kind_wire",
+                    "value": 1
+                },
+                {
+                    "name": "chain_kind_ethereum",
+                    "value": 2
+                },
+                {
+                    "name": "chain_kind_solana",
+                    "value": 3
+                },
+                {
+                    "name": "chain_kind_sui",
+                    "value": 4
+                }
+            ]
+        }
+    ]
 }

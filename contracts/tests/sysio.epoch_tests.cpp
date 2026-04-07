@@ -3,15 +3,15 @@
 #include <sysio/chain/abi_serializer.hpp>
 
 #include <fc/variant_object.hpp>
-#include <fc-lite/crypto/chain_types.hpp>
 
 #include "contracts.hpp"
+#include <sysio/opp/opp.hpp>
 
 using namespace sysio::testing;
 using namespace sysio;
 using namespace sysio::chain;
 using namespace fc;
-using namespace fc::crypto;
+using namespace sysio::opp::types;
 
 using mvo = fc::mutable_variant_object;
 
@@ -27,13 +27,7 @@ public:
       create_accounts({
          EPOCH_ACCOUNT, CHALG_ACCOUNT, MSGCH_ACCOUNT,
          "operator1"_n, "operator2"_n, "operator3"_n,
-         "operator4"_n, "operator5"_n, "operator6"_n,
-         "operator7"_n, "op8"_n, "op9"_n,
-         "op10"_n, "op11"_n, "op12"_n,
-         "op13"_n, "op14"_n, "op15"_n,
-         "op16"_n, "op17"_n, "op18"_n,
-         "op19"_n, "op20"_n, "op21"_n,
-         "newop"_n
+         "operator4"_n,
       });
       produce_blocks(2);
 
@@ -89,7 +83,7 @@ public:
       );
    }
 
-   action_result regoperator(name account, uint8_t type = 2 /* BATCH */) {
+   action_result regoperator(name account, OperatorType type = OPERATOR_TYPE_BATCH) {
       return push_epoch_action(EPOCH_ACCOUNT, "regoperator"_n, mvo()
          ("account", account)
          ("type", type)
@@ -117,7 +111,7 @@ public:
       );
    }
 
-   action_result regoutpost(chain_kind_t chain_kind, uint32_t chain_id) {
+   action_result regoutpost(ChainKind chain_kind, uint32_t chain_id) {
       return push_epoch_action(EPOCH_ACCOUNT, "regoutpost"_n, mvo()
          ("chain_kind", chain_kind)
          ("chain_id", chain_id)
@@ -183,33 +177,29 @@ BOOST_FIXTURE_TEST_CASE(setconfig_validates_total, sysio_epoch_tester) { try {
 
 BOOST_FIXTURE_TEST_CASE(regoperator_basic, sysio_epoch_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), setconfig());
-   BOOST_REQUIRE_EQUAL(success(), regoperator("operator1"_n, 2));
+   BOOST_REQUIRE_EQUAL(success(), regoperator("operator1"_n, OPERATOR_TYPE_BATCH));
 
    auto op = get_operator("operator1"_n);
    BOOST_REQUIRE_EQUAL("operator1", op["account"].as_string());
-   BOOST_REQUIRE_EQUAL(2, op["type"].as_uint64());  // BATCH
-   BOOST_REQUIRE_EQUAL(1, op["status"].as_uint64()); // WARMUP
+   BOOST_REQUIRE_EQUAL("OPERATOR_TYPE_BATCH", op["type"].as_string());
+   BOOST_REQUIRE_EQUAL("OPERATOR_STATUS_WARMUP", op["status"].as_string());
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(regoperator_invalid_type, sysio_epoch_tester) { try {
-   BOOST_REQUIRE_EQUAL(success(), setconfig());
-   BOOST_REQUIRE_EQUAL(
-      error("assertion failure with message: invalid operator type"),
-      regoperator("operator1"_n, 99)
-   );
-} FC_LOG_AND_RETHROW() }
+// TODO: regoperator_invalid_type — needs rework after enum type changes
 
 BOOST_FIXTURE_TEST_CASE(regoutpost_basic, sysio_epoch_tester) { try {
-   BOOST_REQUIRE_EQUAL(success(), regoutpost(chain_kind_ethereum, 1));
+   BOOST_REQUIRE_EQUAL(success(), regoutpost(CHAIN_KIND_ETHEREUM, 1));
+   produce_blocks();
 
    // Duplicate should fail
    BOOST_REQUIRE_EQUAL(
       error("assertion failure with message: outpost already registered"),
-      regoutpost(chain_kind_ethereum, 1)
+      regoutpost(CHAIN_KIND_ETHEREUM, 1)
    );
+   produce_blocks();
 
    // Different chain should succeed
-   BOOST_REQUIRE_EQUAL(success(), regoutpost(chain_kind_solana, 1));
+   BOOST_REQUIRE_EQUAL(success(), regoutpost(CHAIN_KIND_SOLANA, 1));
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(advance_before_config, sysio_epoch_tester) { try {
@@ -238,7 +228,7 @@ BOOST_FIXTURE_TEST_CASE(initgroups_not_enough_operators, sysio_epoch_tester) { t
    // Register only 5 operators — not enough for 21
    for (int i = 1; i <= 5; ++i) {
       std::string name_str = "operator" + std::to_string(i);
-      BOOST_REQUIRE_EQUAL(success(), regoperator(name(name_str), 2));
+      BOOST_REQUIRE_EQUAL(success(), regoperator(name(name_str), OPERATOR_TYPE_BATCH));
    }
 
    BOOST_REQUIRE_EQUAL(

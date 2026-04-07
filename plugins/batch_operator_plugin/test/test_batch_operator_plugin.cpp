@@ -32,7 +32,6 @@ BOOST_AUTO_TEST_CASE(plugin_options_are_registered) try {
    }
    BOOST_CHECK(option_names.count("batch-operator-account") > 0);
    BOOST_CHECK(option_names.count("batch-epoch-poll-ms") > 0);
-   BOOST_CHECK(option_names.count("batch-outpost-poll-ms") > 0);
    BOOST_CHECK(option_names.count("batch-delivery-timeout-ms") > 0);
    BOOST_CHECK(option_names.count("batch-enabled") > 0);
 } FC_LOG_AND_RETHROW();
@@ -48,9 +47,8 @@ BOOST_AUTO_TEST_CASE(default_options_are_correct) try {
       boost::program_options::parse_command_line(0, static_cast<char**>(nullptr), cfg), vm);
    boost::program_options::notify(vm);
 
-   BOOST_CHECK_EQUAL(vm["batch-epoch-poll-ms"].as<uint32_t>(), 5000u);
-   BOOST_CHECK_EQUAL(vm["batch-outpost-poll-ms"].as<uint32_t>(), 3000u);
-   BOOST_CHECK_EQUAL(vm["batch-delivery-timeout-ms"].as<uint32_t>(), 30000u);
+   BOOST_CHECK_EQUAL(vm["batch-epoch-poll-ms"].as<uint32_t>(), 15000u);
+   BOOST_CHECK_EQUAL(vm["batch-delivery-timeout-ms"].as<uint32_t>(), 15000u);
    BOOST_CHECK_EQUAL(vm["batch-enabled"].as<bool>(), false);
 } FC_LOG_AND_RETHROW();
 

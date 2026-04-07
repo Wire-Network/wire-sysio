@@ -25,7 +25,7 @@
                 },
                 {
                     "name": "status",
-                    "type": "uint8"
+                    "type": "ChallengeStatus"
                 },
                 {
                     "name": "challenge_hash",
@@ -217,18 +217,42 @@
             "name": "challenges",
             "type": "challenge_entry",
             "index_type": "i64",
-            "key_names": [],
-            "key_types": []
+            "key_names": ["table_name","scope","primary_key"],
+            "key_types": ["name","name","uint64"]
         },
         {
             "name": "resolutions",
             "type": "manual_resolution",
             "index_type": "i64",
-            "key_names": [],
-            "key_types": []
+            "key_names": ["table_name","scope","primary_key"],
+            "key_types": ["name","name","uint64"]
         }
     ],
     "ricardian_clauses": [],
     "variants": [],
-    "action_results": []
+    "action_results": [],
+    "enums": [
+        {
+            "name": "ChallengeStatus",
+            "type": "int32",
+            "values": [
+                {
+                    "name": "CHALLENGE_STATUS_CHALLENGE_SENT",
+                    "value": 0
+                },
+                {
+                    "name": "CHALLENGE_STATUS_RESPONSE_RECEIVED",
+                    "value": 1
+                },
+                {
+                    "name": "CHALLENGE_STATUS_RESOLVED",
+                    "value": 2
+                },
+                {
+                    "name": "CHALLENGE_STATUS_ESCALATED",
+                    "value": 3
+                }
+            ]
+        }
+    ]
 }

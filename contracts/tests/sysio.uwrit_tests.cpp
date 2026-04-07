@@ -26,7 +26,7 @@ public:
       create_accounts({
          UWRIT_ACCOUNT, CHALG_ACCOUNT,
          "sysio.epoch"_n, "sysio.msgch"_n,
-         "underwriter1"_n, "underwriter2"_n
+         "uwrit.a"_n, "uwrit.b"_n
       });
       produce_blocks(2);
 
@@ -139,7 +139,7 @@ BOOST_FIXTURE_TEST_CASE(updcltrl_increase, sysio_uwrit_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), setconfig());
 
    auto amount = asset::from_string("100.0000 SYS");
-   BOOST_REQUIRE_EQUAL(success(), updcltrl("underwriter1"_n, chain_kind_ethereum, amount, true));
+   BOOST_REQUIRE_EQUAL(success(), updcltrl("uwrit.a"_n, chain_kind_ethereum, amount, true));
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(updcltrl_decrease_nonexistent, sysio_uwrit_tester) { try {
@@ -148,28 +148,28 @@ BOOST_FIXTURE_TEST_CASE(updcltrl_decrease_nonexistent, sysio_uwrit_tester) { try
    auto amount = asset::from_string("50.0000 SYS");
    BOOST_REQUIRE_EQUAL(
       error("assertion failure with message: cannot decrease non-existent collateral"),
-      updcltrl("underwriter1"_n, chain_kind_ethereum, amount, false)
+      updcltrl("uwrit.a"_n, chain_kind_ethereum, amount, false)
    );
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(submituw_without_config, sysio_uwrit_tester) { try {
    BOOST_REQUIRE_EQUAL(
       error("assertion failure with message: underwriting config not initialized"),
-      submituw("underwriter1"_n, 42)
+      submituw("uwrit.a"_n, 42)
    );
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(submituw_basic, sysio_uwrit_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), setconfig());
-   BOOST_REQUIRE_EQUAL(success(), submituw("underwriter1"_n, 100));
+   BOOST_REQUIRE_EQUAL(success(), submituw("uwrit.a"_n, 100));
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(submituw_duplicate_message, sysio_uwrit_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), setconfig());
-   BOOST_REQUIRE_EQUAL(success(), submituw("underwriter1"_n, 100));
+   BOOST_REQUIRE_EQUAL(success(), submituw("uwrit.a"_n, 100));
    BOOST_REQUIRE_EQUAL(
       error("assertion failure with message: message already has underwriting entry"),
-      submituw("underwriter2"_n, 100)
+      submituw("uwrit.b"_n, 100)
    );
 } FC_LOG_AND_RETHROW() }
 

@@ -985,10 +985,14 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
                );
 
                ilog( "Starting fresh blockchain state using default genesis state." );
-               SYS_ASSERT(finalizer_sig_prov, plugin_config_exception,
-                           "Default genesis requires a BLS finalizer key but none is configured. "
-                           "Non-producer nodes must provide --genesis-json explicitly.");
-               genesis.emplace(producer_sig_prov->public_key, finalizer_sig_prov->public_key);
+               if (options.count("producer-name")) {
+                  SYS_ASSERT(finalizer_sig_prov, plugin_config_exception,
+                              "Default genesis requires a BLS finalizer key but none is configured. "
+                              "Producer nodes must provide a BLS key or use --genesis-json explicitly.");
+                  genesis.emplace(producer_sig_prov->public_key, finalizer_sig_prov->public_key);
+               } else {
+                  genesis.emplace();
+               }
                chain_id = genesis->compute_chain_id();
             }
          }

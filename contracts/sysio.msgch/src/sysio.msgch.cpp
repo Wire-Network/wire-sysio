@@ -62,7 +62,7 @@ void msgch::deliver(name batch_op_name, uint64_t outpost_id, std::vector<char> d
       e.outpost_id    = outpost_id;
       e.epoch_index   = epoch;
       e.batch_op_name = batch_op_name;
-      e.chain_kind    = static_cast<ChainKind>(op_it->chain_kind);
+      e.chain_kind    = op_it->chain_kind;
       e.checksum      = cs;
       e.raw_data      = data;
       e.received_at   = current_time_point();
