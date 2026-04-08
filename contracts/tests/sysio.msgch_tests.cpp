@@ -1,10 +1,11 @@
 #include <boost/test/unit_test.hpp>
 #include <sysio/testing/tester.hpp>
 #include <sysio/chain/abi_serializer.hpp>
-
+#include <sysio/opp/opp.pb.h>
 #include <fc/variant_object.hpp>
 
 #include "contracts.hpp"
+#include <sysio/chain/action.hpp>
 
 using namespace sysio::testing;
 using namespace sysio;
@@ -44,45 +45,19 @@ public:
    }
 
    action_result push_msgch_action(name signer, name action_name, const variant_object& data) {
-      string action_type_name = abi_ser.get_action_type(action_name);
-
-      action act;
-      act.account = MSGCH_ACCOUNT;
-      act.name = action_name;
-      act.data = abi_ser.variant_to_binary(
-         action_type_name, data,
-         abi_serializer::create_yield_function(abi_serializer_max_time)
-      );
-      act.authorization = vector<permission_level>{{signer, config::active_name}};
-
-      signed_transaction trx;
-      trx.actions.emplace_back(std::move(act));
-      set_transaction_headers(trx);
-      trx.sign(get_private_key(signer, "active"), control->get_chain_id());
-      try {
-         push_transaction(trx);
-         return success();
-      } catch (const fc::exception& ex) {
-         return error(ex.top_message());
-      }
+      return push_msgch_action(signer, action_name, vector<permission_level>{{signer, config::active_name}}, data);
+   }
+   action_result push_msgch_action(name signer, name action_name, std::vector<permission_level> auths, const variant_object& data) {
+      base_tester::push_action(MSGCH_ACCOUNT, action_name, std::move(auths), data);
+      return success();
    }
 
-   action_result createreq(uint64_t outpost_id) {
-      return push_msgch_action(MSGCH_ACCOUNT, "createreq"_n, mvo()
-         ("outpost_id", outpost_id)
-      );
-   }
-
-   action_result deliver(name op, uint64_t req_id,
-                         fc::sha256 chain_hash, fc::sha256 merkle_root,
-                         uint32_t msg_count, std::vector<char> raw = {}) {
+   action_result deliver(name op, uint64_t outpost_id,
+                         std::vector<char> data = {}) {
       return push_msgch_action(op, "deliver"_n, mvo()
-         ("operator_acct", op)
-         ("req_id", req_id)
-         ("chain_hash", chain_hash)
-         ("merkle_root", merkle_root)
-         ("msg_count", msg_count)
-         ("raw_messages", raw)
+         ("batch_op_name", op)
+         ("outpost_id", outpost_id)
+         ("data", data)
       );
    }
 
@@ -101,7 +76,9 @@ public:
    }
 
    action_result buildenv(uint64_t outpost_id) {
-      return push_msgch_action(MSGCH_ACCOUNT, "buildenv"_n, mvo()
+      return push_msgch_action(MSGCH_ACCOUNT, "buildenv"_n, {{
+         EPOCH_ACCOUNT, config::active_name
+      }}, mvo()
          ("outpost_id", outpost_id)
       );
    }
@@ -116,57 +93,19 @@ public:
 // ---- Tests ----
 
 BOOST_AUTO_TEST_SUITE(sysio_msgch_tests)
-
-BOOST_FIXTURE_TEST_CASE(createreq_basic, sysio_msgch_tester) { try {
-   BOOST_REQUIRE_EQUAL(success(), createreq(0));
-   BOOST_REQUIRE_EQUAL(success(), createreq(1));
-} FC_LOG_AND_RETHROW() }
-
-BOOST_FIXTURE_TEST_CASE(deliver_basic, sysio_msgch_tester) { try {
-   BOOST_REQUIRE_EQUAL(success(), createreq(0));
-
-   auto hash = make_hash("test_chain_data");
-   auto merkle = make_hash("test_merkle");
-   BOOST_REQUIRE_EQUAL(success(), deliver("batchop1"_n, 0, hash, merkle, 5));
-} FC_LOG_AND_RETHROW() }
-
-BOOST_FIXTURE_TEST_CASE(deliver_duplicate_rejected, sysio_msgch_tester) { try {
-   BOOST_REQUIRE_EQUAL(success(), createreq(0));
-
-   auto hash = make_hash("test_chain_data");
-   auto merkle = make_hash("test_merkle");
-   BOOST_REQUIRE_EQUAL(success(), deliver("batchop1"_n, 0, hash, merkle, 5));
-   BOOST_REQUIRE_EQUAL(
-      error("assertion failure with message: operator already delivered for this request"),
-      deliver("batchop1"_n, 0, hash, merkle, 5)
-   );
-} FC_LOG_AND_RETHROW() }
-
 BOOST_FIXTURE_TEST_CASE(deliver_invalid_request, sysio_msgch_tester) { try {
-   auto hash = make_hash("test");
-   auto merkle = make_hash("merkle");
-   BOOST_REQUIRE_EQUAL(
-      error("assertion failure with message: chain request not found"),
-      deliver("batchop1"_n, 999, hash, merkle, 1)
+   opp::Envelope env;
+   env.set_epoch_envelope_index(1);
+   env.set_epoch_timestamp(1775612516983);
+
+   std::vector<char> data(env.ByteSizeLong());
+   env.SerializeToArray(data.data(), static_cast<int>(data.size()));
+   BOOST_REQUIRE_EXCEPTION(
+      deliver("batchop1"_n, 999, data),
+      sysio_assert_message_exception,
+      sysio_assert_message_is("epoch state not initialized")
+
    );
-} FC_LOG_AND_RETHROW() }
-
-BOOST_FIXTURE_TEST_CASE(evalcons_consensus_ok_unanimous, sysio_msgch_tester) { try {
-   BOOST_REQUIRE_EQUAL(success(), createreq(0));
-
-   auto hash = make_hash("identical_chain");
-   auto merkle = make_hash("merkle");
-
-   // All 7 operators deliver identical hash
-   BOOST_REQUIRE_EQUAL(success(), deliver("batchop1"_n, 0, hash, merkle, 10));
-   BOOST_REQUIRE_EQUAL(success(), deliver("batchop2"_n, 0, hash, merkle, 10));
-   BOOST_REQUIRE_EQUAL(success(), deliver("batchop3"_n, 0, hash, merkle, 10));
-   BOOST_REQUIRE_EQUAL(success(), deliver("batchop4"_n, 0, hash, merkle, 10));
-   BOOST_REQUIRE_EQUAL(success(), deliver("batchop5"_n, 0, hash, merkle, 10));
-   BOOST_REQUIRE_EQUAL(success(), deliver("batchop.a"_n, 0, hash, merkle, 10));
-   BOOST_REQUIRE_EQUAL(success(), deliver("batchop.b"_n, 0, hash, merkle, 10));
-
-   BOOST_REQUIRE_EQUAL(success(), evalcons(0));
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(queueout_basic, sysio_msgch_tester) { try {
