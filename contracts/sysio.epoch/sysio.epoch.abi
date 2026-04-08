@@ -3,12 +3,12 @@
     "version": "sysio::abi/1.2",
     "types": [
         {
-            "new_type_name": "B_pair_chain_kind_t_checksum256_E",
-            "type": "pair_chain_kind_t_checksum256"
+            "new_type_name": "B_pair_ChainKind_checksum256_E",
+            "type": "pair_ChainKind_checksum256"
         },
         {
-            "new_type_name": "B_pair_chain_kind_t_int64_E",
-            "type": "pair_chain_kind_t_int64"
+            "new_type_name": "B_pair_ChainKind_int64_E",
+            "type": "pair_ChainKind_int64"
         },
         {
             "new_type_name": "B_vector_name_E",
@@ -126,11 +126,11 @@
                 },
                 {
                     "name": "chain_addresses",
-                    "type": "B_pair_chain_kind_t_checksum256_E[]"
+                    "type": "B_pair_ChainKind_checksum256_E[]"
                 },
                 {
                     "name": "collateral",
-                    "type": "B_pair_chain_kind_t_int64_E[]"
+                    "type": "B_pair_ChainKind_int64_E[]"
                 },
                 {
                     "name": "assigned_batch_op_group",
@@ -160,7 +160,7 @@
                 },
                 {
                     "name": "chain_kind",
-                    "type": "chain_kind_t"
+                    "type": "ChainKind"
                 },
                 {
                     "name": "chain_id",
@@ -185,12 +185,12 @@
             ]
         },
         {
-            "name": "pair_chain_kind_t_checksum256",
+            "name": "pair_ChainKind_checksum256",
             "base": "",
             "fields": [
                 {
                     "name": "first",
-                    "type": "chain_kind_t"
+                    "type": "ChainKind"
                 },
                 {
                     "name": "second",
@@ -199,12 +199,12 @@
             ]
         },
         {
-            "name": "pair_chain_kind_t_int64",
+            "name": "pair_ChainKind_int64",
             "base": "",
             "fields": [
                 {
                     "name": "first",
-                    "type": "chain_kind_t"
+                    "type": "ChainKind"
                 },
                 {
                     "name": "second",
@@ -237,7 +237,7 @@
             "fields": [
                 {
                     "name": "chain_kind",
-                    "type": "chain_kind_t"
+                    "type": "ChainKind"
                 },
                 {
                     "name": "chain_id",
@@ -396,6 +396,32 @@
     "action_results": [],
     "enums": [
         {
+            "name": "ChainKind",
+            "type": "int32",
+            "values": [
+                {
+                    "name": "CHAIN_KIND_UNKNOWN",
+                    "value": 0
+                },
+                {
+                    "name": "CHAIN_KIND_WIRE",
+                    "value": 1
+                },
+                {
+                    "name": "CHAIN_KIND_ETHEREUM",
+                    "value": 2
+                },
+                {
+                    "name": "CHAIN_KIND_SOLANA",
+                    "value": 3
+                },
+                {
+                    "name": "CHAIN_KIND_SUI",
+                    "value": 4
+                }
+            ]
+        },
+        {
             "name": "OperatorStatus",
             "type": "int32",
             "values": [
@@ -447,32 +473,6 @@
                 },
                 {
                     "name": "OPERATOR_TYPE_CHALLENGER",
-                    "value": 4
-                }
-            ]
-        },
-        {
-            "name": "chain_kind_t",
-            "type": "uint8",
-            "values": [
-                {
-                    "name": "chain_kind_unknown",
-                    "value": 0
-                },
-                {
-                    "name": "chain_kind_wire",
-                    "value": 1
-                },
-                {
-                    "name": "chain_kind_ethereum",
-                    "value": 2
-                },
-                {
-                    "name": "chain_kind_solana",
-                    "value": 3
-                },
-                {
-                    "name": "chain_kind_sui",
                     "value": 4
                 }
             ]
