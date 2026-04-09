@@ -79,9 +79,56 @@ namespace sysio::chain {
    template<typename T>
    using deque = boost::container::deque< T, void, block_1024_option_t >;
 
+   // ── KV table_id computation ─────────────────────────────────────────────────
+   // DJB2 hash truncated to uint16_t. Must match CDT's compute_table_id
+   // in sysiolib/contracts/sysio/kv_constants.hpp.
+
+   /// DJB2-hash a string.
+   inline constexpr uint64_t kv_djbh_hash(std::string_view s) {
+      uint64_t hash = 5381;
+      for (char c : s)
+         hash = ((hash << 5) + hash) + static_cast<uint8_t>(c);
+      return hash;
+   }
+
+   /// DJB2-hash the 8 big-endian bytes of a uint64_t.
+   /// Gives good distribution regardless of input bit patterns (unlike raw % 65536
+   /// which maps most name::raw values to 0 due to MSB-packed encoding).
+   inline constexpr uint64_t kv_djbh_hash_raw(uint64_t raw) {
+      uint64_t hash = 5381;
+      for (int i = 0; i < 8; ++i)
+         hash = ((hash << 5) + hash) + static_cast<uint8_t>(raw >> (56 - i * 8));
+      return hash;
+   }
+
+   /// Compute table_id from a string name (for test/tooling convenience).
+   inline constexpr uint16_t compute_table_id(std::string_view table_name) {
+      return static_cast<uint16_t>(kv_djbh_hash(table_name) % 65536);
+   }
+
+   /// Compute table_id from a raw uint64_t template parameter (name::raw or hash_id::raw).
+   /// This is the canonical form used by CDT — matches CDT's compute_table_id(uint64_t).
+   inline constexpr uint16_t compute_table_id(uint64_t raw) {
+      return static_cast<uint16_t>(kv_djbh_hash_raw(raw) % 65536);
+   }
+
+   /// Compute secondary index table_id from table + index raw uint64_t values.
+   inline constexpr uint16_t compute_sec_table_id(uint64_t table_raw, uint64_t index_raw) {
+      uint64_t hash = kv_djbh_hash_raw(table_raw);
+      for (int i = 0; i < 8; ++i)
+         hash = ((hash << 5) + hash) + static_cast<uint8_t>(index_raw >> (56 - i * 8));
+      return static_cast<uint16_t>(hash % 65536);
+   }
+
+   /// Compute secondary index table_id for multi_index (positional indices).
+   inline constexpr uint16_t compute_mi_sec_table_id(uint64_t table_raw, uint8_t index_pos) {
+      return compute_sec_table_id(table_raw, static_cast<uint64_t>(index_pos) + 1);
+   }
+
    // ── KV key encoding utilities ──────────────────────────────────────────────
-   // Used throughout chain, plugins, and tests for constructing KV 24-byte keys:
-   //   [table:8B BE][scope:8B BE][pk:8B BE]
+   // Used throughout chain, plugins, and tests for constructing KV keys.
+   // Legacy 24-byte layout: [table:8B BE][scope:8B BE][pk:8B BE]
+   // New layout (after CDT table_id update): [scope:8B BE][pk:8B BE] = 16B
 
    /// Encode a uint64_t as 8 bytes big-endian into buf.
    inline void kv_encode_be64(char* buf, uint64_t v) {
@@ -95,14 +142,35 @@ namespace sysio::chain {
       return v;
    }
 
-   /// Standard KV key sizes (bytes)
-   inline constexpr size_t kv_key_size          = 24; ///< [table:8B][scope:8B][pk:8B]
-   inline constexpr size_t kv_prefix_size       = 16; ///< [table:8B][scope:8B]
-   inline constexpr size_t kv_table_prefix_size = 8;  ///< [table:8B]
-   inline constexpr size_t kv_scope_prefix_size = kv_table_prefix_size; ///< [scope:8B] prefix in sec_key
-   inline constexpr size_t kv_pri_key_size      = sizeof(uint64_t); ///< [pk:8B] stored in kv_index_object
+   /// KV key component sizes (bytes) — parts first, then derived
+   inline constexpr size_t kv_pri_key_size       = sizeof(uint64_t); ///< [pk:8B]
+   inline constexpr size_t kv_scope_prefix_size  = sizeof(uint64_t); ///< [scope:8B BE]
+   inline constexpr size_t kv_scoped_key_size    = kv_scope_prefix_size + kv_pri_key_size; ///< [scope:8B][pk:8B] = 16B
 
-   /// Build a 24-byte KV key: [table:8B BE][scope:8B BE][pk:8B BE]
+   // Legacy 24-byte key constants — used by chain_plugin until step 5 migration
+   inline constexpr size_t kv_table_prefix_size = sizeof(uint64_t); ///< legacy [table:8B]
+   inline constexpr size_t kv_prefix_size       = kv_table_prefix_size + kv_scope_prefix_size; ///< legacy [table:8B][scope:8B] = 16B
+   inline constexpr size_t kv_key_size          = kv_table_prefix_size + kv_scope_prefix_size + kv_pri_key_size; ///< legacy 24B
+
+   /// Build a 16-byte scoped KV key: [scope:8B BE][pk:8B BE]
+   struct kv_scoped_key_t {
+      static constexpr size_t size = kv_scoped_key_size;
+      char data[size];
+      std::string_view to_string_view() const { return {data, size}; }
+   };
+
+   inline kv_scoped_key_t make_kv_scoped_key(uint64_t scope, uint64_t pk) {
+      kv_scoped_key_t key;
+      kv_encode_be64(key.data,     scope);
+      kv_encode_be64(key.data + 8, pk);
+      return key;
+   }
+
+   inline kv_scoped_key_t make_kv_scoped_key(name scope, uint64_t pk) {
+      return make_kv_scoped_key(scope.to_uint64_t(), pk);
+   }
+
+   /// Build a legacy 24-byte KV key: [table:8B BE][scope:8B BE][pk:8B BE]
    struct kv_key_t {
       static constexpr size_t size = kv_key_size;
       char data[size];

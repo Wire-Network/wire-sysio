@@ -64,9 +64,9 @@ public:
       const auto& db  = control->db();
       share_type result = 0;
 
-      auto key = chain::make_kv_key("accounts"_n, act, symbol(CORE_SYM).to_symbol_code());
+      auto key = sysio::chain::make_kv_scoped_key(act, symbol(CORE_SYM).to_symbol_code());
       const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
-      auto it = kv_idx.find(boost::make_tuple("sysio.token"_n, chain::config::kv_format_standard, key.to_string_view()));
+      auto it = kv_idx.find(boost::make_tuple("sysio.token"_n, sysio::chain::compute_table_id("accounts"_n.to_uint64_t()), key.to_string_view()));
       if (it != kv_idx.end()) {
          // balance is the first field in the serialization
          fc::datastream<const char *> ds(it->value.data(), it->value.size());

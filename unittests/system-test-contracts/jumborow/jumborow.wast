@@ -14,7 +14,7 @@
             (br_if $break (i32.ge_u (get_local $i) (i32.const 132)))
             ;; Write loop counter to memory[0..4] as the key
             (i32.store (i32.const 0) (get_local $i))
-            ;; kv_set(key_format=0, payer=0, key_ptr=0, key_size=4, value_ptr=4, value_size=262000)
+            ;; kv_set(table_id=0, payer=0, key_ptr=0, key_size=4, value_ptr=4, value_size=262000)
             (drop (call $kv_set (i32.const 0) (i64.const 0) (i32.const 0) (i32.const 4) (i32.const 4) (i32.const 262000)))
             (set_local $i (i32.add (get_local $i) (i32.const 1)))
             (br $loop)

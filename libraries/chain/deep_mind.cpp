@@ -151,81 +151,32 @@ namespace sysio::chain {
    {
       fc_dlog(_logger, "CREATION_OP CFA_INLINE {}", _action_id);
    }
-   // KV deep_mind hooks — format=1 (standard 24-byte keys) emit DB_OP, format=0 (raw) emit KV_OP
-   namespace {
-      struct kv_decoded_key {
-         name table_name;
-         name scope;
-         uint64_t primary_key = 0;
-         bool standard = false; // true if 24-byte key decoded successfully
-      };
-
-      kv_decoded_key decode_kv_key(const kv_object& obj) {
-         kv_decoded_key dk;
-         if (obj.key_format == 1 && obj.key.size() == chain::kv_key_size) {
-            dk.table_name = name(kv_decode_be64(obj.key.data()));
-            dk.scope      = name(kv_decode_be64(obj.key.data() + 8));
-            dk.primary_key = kv_decode_be64(obj.key.data() + 16);
-            dk.standard = true;
-         }
-         return dk;
-      }
-   }
-
+   // KV deep_mind hooks — unified KV_OP format with table_id
    void deep_mind_handler::on_kv_set(const kv_object& obj, bool is_new, account_name old_payer, const char* old_value, std::size_t old_value_size)
    {
-      auto dk = decode_kv_key(obj);
-      if (dk.standard) {
-         // Standard 24-byte key (format=1) — emit legacy DB_OP format
-         if (is_new) {
-            fc_dlog(_logger, "DB_OP INS {} {} {} {} {} {} {}",
-               _action_id, obj.payer, obj.code,
-               dk.scope, dk.table_name, name(dk.primary_key),
-               fc::to_hex(obj.value.data(), obj.value.size())
-            );
-         } else {
-            fc_dlog(_logger, "DB_OP UPD {} {}:{} {} {} {} {} {}:{}",
-               _action_id, old_payer, obj.payer, obj.code,
-               dk.scope, dk.table_name, name(dk.primary_key),
-               fc::to_hex(old_value, old_value_size),
-               fc::to_hex(obj.value.data(), obj.value.size())
-            );
-         }
+      if (is_new) {
+         fc_dlog(_logger, "KV_OP INS {} {} {} {} {} {}",
+            _action_id, obj.payer, obj.code, obj.table_id,
+            fc::to_hex(obj.key.data(), obj.key.size()),
+            fc::to_hex(obj.value.data(), obj.value.size())
+         );
       } else {
-         // Raw key (format=0) — emit KV_OP format with hex key
-         if (is_new) {
-            fc_dlog(_logger, "KV_OP INS {} {} {} {} {}",
-               _action_id, obj.payer, obj.code,
-               fc::to_hex(obj.key.data(), obj.key.size()),
-               fc::to_hex(obj.value.data(), obj.value.size())
-            );
-         } else {
-            fc_dlog(_logger, "KV_OP UPD {} {}:{} {} {} {}:{}",
-               _action_id, old_payer, obj.payer, obj.code,
-               fc::to_hex(obj.key.data(), obj.key.size()),
-               fc::to_hex(old_value, old_value_size),
-               fc::to_hex(obj.value.data(), obj.value.size())
-            );
-         }
+         fc_dlog(_logger, "KV_OP UPD {} {}:{} {} {} {} {}:{}",
+            _action_id, old_payer, obj.payer, obj.code, obj.table_id,
+            fc::to_hex(obj.key.data(), obj.key.size()),
+            fc::to_hex(old_value, old_value_size),
+            fc::to_hex(obj.value.data(), obj.value.size())
+         );
       }
    }
 
    void deep_mind_handler::on_kv_erase(const kv_object& obj)
    {
-      auto dk = decode_kv_key(obj);
-      if (dk.standard) {
-         fc_dlog(_logger, "DB_OP REM {} {} {} {} {} {} {}",
-            _action_id, obj.payer, obj.code,
-            dk.scope, dk.table_name, name(dk.primary_key),
-            fc::to_hex(obj.value.data(), obj.value.size())
-         );
-      } else {
-         fc_dlog(_logger, "KV_OP REM {} {} {} {} {}",
-            _action_id, obj.payer, obj.code,
-            fc::to_hex(obj.key.data(), obj.key.size()),
-            fc::to_hex(obj.value.data(), obj.value.size())
-         );
-      }
+      fc_dlog(_logger, "KV_OP REM {} {} {} {} {} {}",
+         _action_id, obj.payer, obj.code, obj.table_id,
+         fc::to_hex(obj.key.data(), obj.key.size()),
+         fc::to_hex(obj.value.data(), obj.value.size())
+      );
    }
    void deep_mind_handler::on_init_resource_limits(const resource_limits::resource_limits_config_object& config, const resource_limits::resource_limits_state_object& state)
    {

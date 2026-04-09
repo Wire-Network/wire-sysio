@@ -19,14 +19,10 @@ struct kv_iterator_slot {
    bool              is_primary = true;
    kv_it_stat        status = kv_it_stat::iterator_end;
    account_name      code;
-   uint8_t           key_format = 0;
+   uint16_t          table_id = 0;  ///< table namespace (primary or secondary index)
 
    // Primary iterator: prefix for bounded iteration
    std::vector<char>  prefix;
-
-   // Secondary iterator: table + index_id
-   name              table;
-   uint8_t           index_id = 0;
 
    // Current position key bytes (for re-seeking after invalidation)
    std::vector<char>  current_key;
@@ -44,17 +40,15 @@ class kv_iterator_pool {
 public:
    kv_iterator_pool() : _slots(config::max_kv_iterators) {}
 
-   uint32_t allocate_primary(uint8_t key_fmt, account_name code, const char* prefix, uint32_t prefix_size) {
+   uint32_t allocate_primary(uint16_t table_id, account_name code, const char* prefix, uint32_t prefix_size) {
       uint32_t idx = find_free();
       auto& s = _slots[idx];
       s.in_use = true;
       s.is_primary = true;
       s.status = kv_it_stat::iterator_end;
       s.code = code;
-      s.key_format = key_fmt;
+      s.table_id = table_id;
       s.prefix.assign(prefix, prefix + prefix_size);
-      s.table = name();
-      s.index_id = 0;
       s.current_key.clear();
       s.current_sec_key.clear();
       s.current_pri_key.clear();
@@ -62,16 +56,15 @@ public:
       return idx;
    }
 
-   uint32_t allocate_secondary(account_name code, name table, uint8_t index_id) {
+   uint32_t allocate_secondary(account_name code, uint16_t table_id) {
       uint32_t idx = find_free();
       auto& s = _slots[idx];
       s.in_use = true;
       s.is_primary = false;
       s.status = kv_it_stat::iterator_end;
       s.code = code;
+      s.table_id = table_id;
       s.prefix.clear();
-      s.table = table;
-      s.index_id = index_id;
       s.current_key.clear();
       s.current_sec_key.clear();
       s.current_pri_key.clear();

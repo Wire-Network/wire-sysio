@@ -1528,7 +1528,7 @@ BOOST_AUTO_TEST_CASE(setabi_test)
    BOOST_TEST("transfer" == abi.actions[0].type);
 
    BOOST_TEST_REQUIRE(1u == abi.tables.size());
-   BOOST_TEST(name("account") == abi.tables[0].name);
+   BOOST_TEST(std::string("account") == abi.tables[0].name);
    BOOST_TEST("account" == abi.tables[0].type);
    BOOST_TEST("i64" == abi.tables[0].index_type);
    BOOST_TEST_REQUIRE(1u == abi.tables[0].key_names.size());
@@ -4057,6 +4057,120 @@ BOOST_AUTO_TEST_CASE(protobuf_known_bytes_format)
    BOOST_TEST( var2["id"].as_int64() == 1 );
    BOOST_TEST( var2["type"].as_int64() == 2 );
    BOOST_TEST( var2["note"].as_string() == "hello" );
+} FC_LOG_AND_RETHROW() }
+
+// Test table_def with table_id and secondary_indexes
+BOOST_AUTO_TEST_CASE(abi_table_def_secondary_indexes) { try {
+   // Build an ABI with a table that has table_id and secondary_indexes
+   const char* abi_json = R"({
+      "version": "sysio::abi/1.2",
+      "structs": [
+         {"name": "user", "base": "", "fields": [
+            {"name": "id", "type": "uint64"},
+            {"name": "owner", "type": "name"},
+            {"name": "balance", "type": "uint64"}
+         ]}
+      ],
+      "actions": [],
+      "tables": [{
+         "name": "users",
+         "index_type": "i64",
+         "key_names": ["scope", "primary_key"],
+         "key_types": ["name", "uint64"],
+         "type": "user",
+         "table_id": 12345,
+         "secondary_indexes": [
+            {"name": "byowner", "key_type": "name", "table_id": 23456},
+            {"name": "bybal", "key_type": "uint64", "table_id": 34567}
+         ]
+      }]
+   })";
+
+   auto abi_var = fc::json::from_string(abi_json);
+   auto abi = abi_var.as<abi_def>();
+
+   // Verify table_def fields
+   BOOST_REQUIRE_EQUAL(abi.tables.size(), 1u);
+   BOOST_CHECK_EQUAL(abi.tables[0].name, "users");
+   BOOST_CHECK_EQUAL(abi.tables[0].table_id, 12345u);
+
+   // Verify secondary_indexes
+   BOOST_REQUIRE_EQUAL(abi.tables[0].secondary_indexes.size(), 2u);
+   BOOST_CHECK_EQUAL(abi.tables[0].secondary_indexes[0].name, "byowner");
+   BOOST_CHECK_EQUAL(abi.tables[0].secondary_indexes[0].key_type, "name");
+   BOOST_CHECK_EQUAL(abi.tables[0].secondary_indexes[0].table_id, 23456u);
+   BOOST_CHECK_EQUAL(abi.tables[0].secondary_indexes[1].name, "bybal");
+   BOOST_CHECK_EQUAL(abi.tables[0].secondary_indexes[1].key_type, "uint64");
+   BOOST_CHECK_EQUAL(abi.tables[0].secondary_indexes[1].table_id, 34567u);
+
+   // Verify JSON round-trip
+   auto json_out = fc::json::to_string(fc::variant(abi), fc::time_point::maximum());
+   auto abi_rt = fc::json::from_string(json_out).as<abi_def>();
+   BOOST_CHECK_EQUAL(abi_rt.tables[0].table_id, 12345u);
+   BOOST_REQUIRE_EQUAL(abi_rt.tables[0].secondary_indexes.size(), 2u);
+   BOOST_CHECK_EQUAL(abi_rt.tables[0].secondary_indexes[0].name, "byowner");
+   BOOST_CHECK_EQUAL(abi_rt.tables[0].secondary_indexes[0].table_id, 23456u);
+   BOOST_CHECK_EQUAL(abi_rt.tables[0].secondary_indexes[1].name, "bybal");
+   BOOST_CHECK_EQUAL(abi_rt.tables[0].secondary_indexes[1].table_id, 34567u);
+
+   // Verify backward compat: ABI without secondary_indexes still deserializes
+   const char* abi_no_sec = R"({
+      "version": "sysio::abi/1.2",
+      "structs": [],
+      "actions": [],
+      "tables": [{
+         "name": "accounts",
+         "index_type": "i64",
+         "key_names": [],
+         "key_types": [],
+         "type": "account"
+      }]
+   })";
+   auto abi2 = fc::json::from_string(abi_no_sec).as<abi_def>();
+   BOOST_CHECK_EQUAL(abi2.tables[0].table_id, 0u);
+   BOOST_CHECK(abi2.tables[0].secondary_indexes.empty());
+
+} FC_LOG_AND_RETHROW() }
+
+BOOST_AUTO_TEST_CASE(abi_serializer_long_table_name) { try {
+   // Verify abi_serializer::get_table_type works with table names longer than 13 characters
+   // (which cannot be represented as sysio::name)
+   const char* abi_json = R"({
+      "version": "sysio::abi/1.2",
+      "structs": [
+         {"name": "geo_record", "base": "", "fields": [
+            {"name": "latitude", "type": "float64"},
+            {"name": "longitude", "type": "float64"}
+         ]}
+      ],
+      "actions": [],
+      "tables": [{
+         "name": "geolocation_records",
+         "index_type": "i64",
+         "key_names": ["id"],
+         "key_types": ["uint64"],
+         "type": "geo_record",
+         "table_id": 42000
+      }]
+   })";
+
+   auto abi = fc::json::from_string(abi_json).as<abi_def>();
+
+   abi_serializer abis;
+   abis.set_abi(abi, abi_serializer::create_yield_function(fc::microseconds(1000000)));
+
+   // Long name lookup works
+   auto type = abis.get_table_type("geolocation_records");
+   BOOST_CHECK_EQUAL(type, "geo_record");
+
+   // Short name lookup still works
+   auto type2 = abis.get_table_type("accounts");
+   BOOST_CHECK(type2.empty()); // not in this ABI
+
+   // Verify table_def round-trips with long name
+   BOOST_CHECK_EQUAL(abi.tables[0].name, "geolocation_records");
+   BOOST_CHECK_EQUAL(abi.tables[0].table_id, 42000u);
+
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()

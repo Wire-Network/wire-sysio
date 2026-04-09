@@ -17,7 +17,8 @@ using namespace std;
 
 using mvo = fc::mutable_variant_object;
 
-using sysio::chain::make_kv_key;
+using sysio::chain::make_kv_scoped_key;
+using sysio::chain::compute_table_id;
 
 constexpr account_name ROA = "sysio.roa"_n;
 constexpr uint64_t NETWORK_GEN = 0;
@@ -60,9 +61,9 @@ public:
    fc::variant get_nodeowner( account_name acc )
    {
       const auto& db = control->db();
-      auto key = make_kv_key(name("nodeowners").to_uint64_t(), static_cast<uint64_t>(NETWORK_GEN), acc.to_uint64_t());
+      auto key = make_kv_scoped_key(static_cast<uint64_t>(NETWORK_GEN), acc.to_uint64_t());
       const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
-      auto it = kv_idx.find(boost::make_tuple(ROA, chain::config::kv_format_standard, key.to_string_view()));
+      auto it = kv_idx.find(boost::make_tuple(ROA, compute_table_id(name("nodeowners").to_uint64_t()), key.to_string_view()));
       if (it != kv_idx.end()) {
          const vector<char> data(it->value.data(), it->value.data() + it->value.size());
          if (!data.empty()) {
@@ -75,9 +76,9 @@ public:
    fc::variant get_sponsorship( account_name acc, account_name nonce)
    {
       const auto& db = control->db();
-      auto key = make_kv_key("sponsors"_n, acc, nonce.to_uint64_t());
+      auto key = make_kv_scoped_key(acc, nonce.to_uint64_t());
       const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
-      auto it = kv_idx.find(boost::make_tuple(ROA, chain::config::kv_format_standard, key.to_string_view()));
+      auto it = kv_idx.find(boost::make_tuple(ROA, compute_table_id("sponsors"_n.to_uint64_t()), key.to_string_view()));
       if (it != kv_idx.end()) {
          const vector<char> data(it->value.data(), it->value.data() + it->value.size());
          if (!data.empty()) {
@@ -90,9 +91,9 @@ public:
    uint64_t get_sponsor_count( account_name acc )
    {
       const auto& db = control->db();
-      auto key = make_kv_key(name("sponsorcount").to_uint64_t(), static_cast<uint64_t>(NETWORK_GEN), acc.to_uint64_t());
+      auto key = make_kv_scoped_key(static_cast<uint64_t>(NETWORK_GEN), acc.to_uint64_t());
       const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
-      auto it = kv_idx.find(boost::make_tuple(ROA, chain::config::kv_format_standard, key.to_string_view()));
+      auto it = kv_idx.find(boost::make_tuple(ROA, compute_table_id(name("sponsorcount").to_uint64_t()), key.to_string_view()));
       if (it != kv_idx.end()) {
          const vector<char> data(it->value.data(), it->value.data() + it->value.size());
          if (!data.empty()) {
@@ -106,9 +107,9 @@ public:
    fc::variant get_reslimit( account_name acc )
    {
       const auto& db = control->db();
-      auto key = make_kv_key("reslimit"_n, ROA, acc.to_uint64_t());
+      auto key = make_kv_scoped_key(ROA, acc.to_uint64_t());
       const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
-      auto it = kv_idx.find(boost::make_tuple(ROA, chain::config::kv_format_standard, key.to_string_view()));
+      auto it = kv_idx.find(boost::make_tuple(ROA, compute_table_id("reslimit"_n.to_uint64_t()), key.to_string_view()));
       if (it != kv_idx.end()) {
          const vector<char> data(it->value.data(), it->value.data() + it->value.size());
          if (!data.empty()) {
@@ -121,9 +122,9 @@ public:
    fc::variant get_policy( account_name acc, account_name owner )
    {
       const auto& db = control->db();
-      auto key = make_kv_key("policies"_n, owner, acc.to_uint64_t());
+      auto key = make_kv_scoped_key(owner, acc.to_uint64_t());
       const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
-      auto it = kv_idx.find(boost::make_tuple(ROA, chain::config::kv_format_standard, key.to_string_view()));
+      auto it = kv_idx.find(boost::make_tuple(ROA, compute_table_id("policies"_n.to_uint64_t()), key.to_string_view()));
       if (it != kv_idx.end()) {
          const vector<char> data(it->value.data(), it->value.data() + it->value.size());
          if (!data.empty()) {
