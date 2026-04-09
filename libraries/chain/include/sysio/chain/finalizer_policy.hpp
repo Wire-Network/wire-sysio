@@ -56,8 +56,8 @@ namespace sysio::chain {
             sum += f.weight;
          }
          SYS_ASSERT(threshold <= sum, snapshot_exception,
-                    "finalizer_policy generation {}: threshold ({}) exceeds sum of weights ({})",
-                    generation, threshold, sum);
+                    "finalizer_policy generation {}: sum of weights ({}) didn't meet the required threshold ({})",
+                    generation, sum, threshold);
       }
 
       // max accumulated weak weight before becoming weak_final

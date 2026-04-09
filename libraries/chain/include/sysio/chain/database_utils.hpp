@@ -298,6 +298,7 @@ inline fc::variant decode_key(const char* data, size_t size,
    for (size_t i = 0; i < key_names.size(); ++i) {
       obj(key_names[i], decode_field(r, key_types[i]));
    }
+   FC_ASSERT(r.remaining() == 0, "BE key has {} trailing bytes after decoding all fields", r.remaining());
    return fc::variant(std::move(obj));
 }
 
