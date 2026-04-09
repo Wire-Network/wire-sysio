@@ -44,7 +44,7 @@ jobs:
       packages: write
       contents: read
     with:
-      runs-on: '["self-hosted", "enf-x86-beefy"]'
+      runs-on: '{"group": "core-repo-group"}'
       platform-files: |
         .cicd/platforms
 
@@ -143,7 +143,8 @@ jobs:
           - cfg: {name: 'asan',          base: 'asan', builddir: 'asan'}
           - cfg: {name: 'asserton',      base: 'asserton', builddir: 'asserton'}
           - cfg: {name: 'gcc',      base: 'gcc', builddir: 'gcc'}
-    runs-on: ["self-hosted", "enf-x86-beefy"]
+    runs-on:
+      group: core-repo-group
     container:
       image: ${{fromJSON(needs.platform-cache.outputs.platforms)[matrix.cfg.base].image}}
       credentials:
@@ -265,42 +266,18 @@ jobs:
           - cfg: {name: 'asserton',      base: 'asserton', builddir: 'asserton'}
           - cfg: {name: 'gcc',      base: 'gcc', builddir: 'gcc'}
 
-    runs-on: ["self-hosted", "enf-x86-midtier"]
+    runs-on:
+      group: core-repo-group
 
     steps:
-      - name: Create ephemeral Docker context
-        id: docker-context
+      - name: Login to GHCR
+        run: echo "${{ secrets.GH_TOKEN_DEV }}" | docker login ghcr.io -u dev-wire --password-stdin
+
+      - name: Cleanup stale containers
         run: |
-            set -euo pipefail
-
-            echo "Detected runner name: $RUNNER_NAME"
-            name="${RUNNER_NAME,,}"
-
-            [[ $name =~ runner-([0-9]+) ]] || { echo "No runner number in '$RUNNER_NAME'"; exit 1; }
-            num="${BASH_REMATCH[1]}"
-            sock="/run/docker-runners/docker-runner${num}.sock"
-            [[ -S "$sock" ]] || { echo "Socket not found: $sock"; exit 1; }
-
-            echo "Using Docker socket: $sock"
-            echo "DOCKER_HOST=unix://$sock" >> "$GITHUB_ENV"
-
-            ctx="job-${{ github.run_id }}-${{ github.job }}-${{ matrix.cfg.name }}"
-            sudo docker context inspect "$ctx" >/dev/null 2>&1 || \
-              sudo docker context create "$ctx" --docker "host=unix://$sock"
-            echo "DOCKER_CONTEXT=$ctx" >> "$GITHUB_ENV"
-
-      - name: Cleanup stale containers (safety)
-        run: |
-          echo "Removing old containers for context $DOCKER_CONTEXT..."
-          sudo docker --context "$DOCKER_CONTEXT" ps -aq | xargs -r sudo docker --context "$DOCKER_CONTEXT" rm -f || true
+          echo "Removing old containers..."
+          docker ps -aq | xargs -r docker rm -f || true
           echo "Cleanup complete."
-
-      - name: Ensure writable workspace
-        run: |
-          echo "User is $USER"
-          echo "Fixing permissions on workspace for user $(whoami)"
-          sudo chown -R $USER:$USER "$GITHUB_WORKSPACE"
-          sudo chmod -R u+rwX "$GITHUB_WORKSPACE"
 
       - uses: actions/checkout@v4
 
@@ -311,9 +288,6 @@ jobs:
 
       - name: Run NP tests
         uses: ./.github/actions/parallel-ctest-containers
-        env:
-          DOCKER_HOST: ${{ env.DOCKER_HOST }}
-          DOCKER_CONTEXT: ${{ env.DOCKER_CONTEXT }}
         with:
           container: ${{ fromJSON(needs.platform-cache.outputs.platforms)[matrix.cfg.base].image }}
           error-log-paths: '["build/etc", "build/var", "build/sysio-ignition-wd", "build/TestLogs"]'
@@ -324,12 +298,10 @@ jobs:
 
       - name: Export core dumps
         if: failure()
-        env:
-          DOCKER_HOST: ${{ env.DOCKER_HOST }}
         run: |
-          sudo docker --host $DOCKER_HOST run --rm \
+          docker run --rm \
             --mount type=bind,source=/var/lib/systemd/coredump,target=/cores,readonly \
-            alpine sh -c 'tar -C /cores/ -c .' | tar x
+            alpine sh -c 'tar -C /cores/ -c .' | tar x || echo "No core dumps found"
 
       - name: Upload logs from failed tests
         if: failure()
@@ -343,25 +315,16 @@ jobs:
 
       - name: Cleanup Docker resources
         if: always()
-        env:
-          DOCKER_CONTEXT: ${{ env.DOCKER_CONTEXT }}
         run: |
           echo "=== Cleaning up Docker resources ==="
           JOB_PREFIX="base-${{ github.run_id }}-${{ github.job }}"
           echo "Removing containers matching: $JOB_PREFIX*"
-          sudo docker --context "$DOCKER_CONTEXT" ps -aq --filter "name=$JOB_PREFIX" | \
-            xargs -r sudo docker --context "$DOCKER_CONTEXT" rm -f || true
+          docker ps -aq --filter "name=$JOB_PREFIX" | xargs -r docker rm -f || true
 
           echo "Removing base images matching: baseimage-${{ github.run_id }}-${{ github.job }}*"
-          sudo docker --context "$DOCKER_CONTEXT" images --format "{{.Repository}}:{{.Tag}}" | \
+          docker images --format "{{.Repository}}:{{.Tag}}" | \
             grep "baseimage-${{ github.run_id }}-${{ github.job }}" | \
-            xargs -r sudo docker --context "$DOCKER_CONTEXT" rmi -f || true
-
-      - name: Cleanup Docker context
-        if: always()
-        run: |
-          echo "Removing Docker context..."
-          sudo docker context rm -f "$DOCKER_CONTEXT" || true
+            xargs -r docker rmi -f || true
 
   lr-tests:
     name: LR Tests (${{matrix.cfg.name}})
@@ -374,35 +337,18 @@ jobs:
           - cfg: {name: 'ubsan',         base: 'ubsan',    builddir: 'ubsan'}
           - cfg: {name: 'asserton',      base: 'asserton', builddir: 'asserton'}
           - cfg: {name: 'gcc',      base: 'gcc', builddir: 'gcc'}
-    runs-on: ["self-hosted", "enf-x86-lowtier"]
+    runs-on:
+      group: core-repo-group
 
     steps:
-      - name: Create ephemeral Docker context
-        id: docker-context
-        run: |
-          set -euo pipefail
-
-          echo "Detected runner name: $RUNNER_NAME"
-          name="${RUNNER_NAME,,}"
-
-          [[ $name =~ runner-([0-9]+) ]] || { echo "No runner number in '$RUNNER_NAME'"; exit 1; }
-          num="${BASH_REMATCH[1]}"
-          sock="/run/docker-runners/docker-runner${num}.sock"
-          [[ -S "$sock" ]] || { echo "Socket not found: $sock"; exit 1; }
-
-          echo "Using Docker socket: $sock"
-          echo "DOCKER_HOST=unix://$sock" >> "$GITHUB_ENV"
-
-          ctx="job-${{ github.run_id }}-${{ github.job }}-${{ matrix.cfg.name }}"
-          sudo docker context inspect "$ctx" >/dev/null 2>&1 || \
-            sudo docker context create "$ctx" --docker "host=unix://$sock"
-          echo "DOCKER_CONTEXT=$ctx" >> "$GITHUB_ENV"
+      - name: Login to GHCR
+        run: echo "${{ secrets.GH_TOKEN_DEV }}" | docker login ghcr.io -u dev-wire --password-stdin
 
       - name: Cleanup stale containers
         run: |
-          echo "Removing old containers for context $DOCKER_CONTEXT..."
-          sudo docker --context "$DOCKER_CONTEXT" ps -aq | xargs -r sudo docker --context "$DOCKER_CONTEXT" rm -f || true
-          echo "Cleanup complete"
+          echo "Removing old containers..."
+          docker ps -aq | xargs -r docker rm -f || true
+          echo "Cleanup complete."
 
       - uses: actions/checkout@v4
 
@@ -412,9 +358,6 @@ jobs:
           name: ${{matrix.cfg.builddir}}-build
 
       - name: Run tests in parallel containers
-        env:
-          DOCKER_HOST: ${{ env.DOCKER_HOST }}
-          DOCKER_CONTEXT: ${{ env.DOCKER_CONTEXT }}
         uses: ./.github/actions/parallel-ctest-containers
         with:
           container: ${{fromJSON(needs.platform-cache.outputs.platforms)[matrix.cfg.base].image}}
@@ -426,15 +369,11 @@ jobs:
 
       - name: Export core dumps
         if: failure()
-        env:
-          DOCKER_CONTEXT: ${{ env.DOCKER_CONTEXT }}
         run: |
           echo "Checking for core dumps..."
-          docker context ls
-          sudo docker --context "$DOCKER_CONTEXT" run --rm \
-            --mount type=bind,source=/var/lib/systemd/coredump,target=/cores \
+          docker run --rm \
+            --mount type=bind,source=/var/lib/systemd/coredump,target=/cores,readonly \
             alpine sh -c 'tar -C /cores/ -c .' | tar x || echo "No core dumps found"
-
 
       - name: Upload logs from failed tests
         uses: actions/upload-artifact@v4
@@ -446,29 +385,18 @@ jobs:
             core*.zst
           compression-level: 0
 
-
       - name: Cleanup Docker resources
         if: always()
-        env:
-          DOCKER_CONTEXT: ${{ env.DOCKER_CONTEXT }}
         run: |
           echo "=== Cleaning up Docker resources ==="
-          echo $DOCKER_CONTEXT
           JOB_PREFIX="base-${{ github.run_id }}-${{ github.job }}"
           echo "Removing containers matching: $JOB_PREFIX*"
-          sudo docker --context "$DOCKER_CONTEXT" ps -aq --filter "name=$JOB_PREFIX" | \
-            xargs -r sudo docker --context "$DOCKER_CONTEXT" rm -f || true
+          docker ps -aq --filter "name=$JOB_PREFIX" | xargs -r docker rm -f || true
 
           echo "Removing base images matching: baseimage-${{ github.run_id }}-${{ github.job }}*"
-          sudo docker --context "$DOCKER_CONTEXT" images --format "{{.Repository}}:{{.Tag}}" | \
+          docker images --format "{{.Repository}}:{{.Tag}}" | \
             grep "baseimage-${{ github.run_id }}-${{ github.job }}" | \
-            xargs -r sudo docker --context "$DOCKER_CONTEXT" rmi -f || true
-
-      - name: Cleanup Docker context
-        if: always()
-        run: |
-          echo "Removing Docker context: $DOCKER_CONTEXT"
-          sudo docker context rm -f "$DOCKER_CONTEXT" || true
+            xargs -r docker rmi -f || true
   # libtester-tests:
   #   name: libtester tests
   #   needs: [platform-cache, build-base, v, package]

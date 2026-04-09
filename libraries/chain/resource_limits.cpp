@@ -185,10 +185,19 @@ void resource_limits_manager::add_transaction_usage(const accounts_billing_t& ac
    for( const auto& [a, billing] : accounts ) {
 
       const auto& usage = _db.get<resource_object,by_owner>( a );
-      int64_t unused;
+
+      // Inline the net/cpu weight lookup to avoid the redundant resource_object fetch
+      // that get_account_limits() would perform (it re-fetches the same object we already have).
       int64_t net_weight;
       int64_t cpu_weight;
-      get_account_limits( a, unused, net_weight, cpu_weight );
+      const auto* pending = _db.find<resource_pending_object,by_owner>( a );
+      if( pending ) {
+         net_weight = pending->net_weight;
+         cpu_weight = pending->cpu_weight;
+      } else {
+         net_weight = usage.net_weight;
+         cpu_weight = usage.cpu_weight;
+      }
 
       _db.modify( usage, [&]( auto& bu ){
           bu.net_usage.add( billing.net_usage, time_slot, config.account_net_usage_average_window );

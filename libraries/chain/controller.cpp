@@ -85,8 +85,10 @@ namespace detail {
          row.code       = obj.code;
          row.payer      = obj.payer;
          row.key_format = obj.key_format;
+         SYS_ASSERT(obj.key.size() > 0, snapshot_exception, "kv_object has empty key during snapshot write");
          row.key.assign(obj.key.data(), obj.key.data() + obj.key.size());
-         row.value.assign(obj.value.data(), obj.value.data() + obj.value.size());
+         if (obj.value.size() > 0)
+            row.value.assign(obj.value.data(), obj.value.data() + obj.value.size());
          return row;
       }
 
@@ -122,6 +124,8 @@ namespace detail {
          row.payer    = obj.payer;
          row.table    = obj.table;
          row.index_id = obj.index_id;
+         SYS_ASSERT(obj.sec_key.size() > 0, snapshot_exception, "kv_index_object has empty secondary key during snapshot write");
+         SYS_ASSERT(obj.pri_key.size() > 0, snapshot_exception, "kv_index_object has empty primary key during snapshot write");
          row.sec_key.assign(obj.sec_key.data(), obj.sec_key.data() + obj.sec_key.size());
          row.pri_key.assign(obj.pri_key.data(), obj.pri_key.data() + obj.pri_key.size());
          return row;
@@ -1626,7 +1630,7 @@ struct controller_impl {
          });
       });
 
-      trx_dedup.add_to_snapshot(snapshot, db);
+      trx_dedup.add_to_snapshot(snapshot);
 
       add_kv_rows_to_snapshot(snapshot, row_counter);
 
@@ -2394,7 +2398,7 @@ struct controller_impl {
          const auto& new_b = chain_head.block();
          ilog("Produced block {}... #{} @ {} signed by {} "
               "[trxs: {}, lib: {}, net: {}, cpu: {} us, elapsed: {} us, producing time: {} us]",
-              chain_head.id().str().substr(8, 16), new_b->block_num(), new_b->timestamp, new_b->producer,
+              chain_head.id().short_id(), new_b->block_num(), new_b->timestamp, new_b->producer,
               new_b->transactions.size(), chain_head.irreversible_blocknum(),
               br.total_net_usage, br.total_cpu_usage_us, br.total_elapsed_time, now - br.start_time);
 
@@ -2416,7 +2420,7 @@ struct controller_impl {
 
       ilog("Received block {}... #{} @ {} signed by {} " // "Received" instead of "Applied" so it matches existing log output
            "[trxs: {}, lib: {}, net: {}, cpu: {} us, elapsed: {} us, applying time: {} us, latency: {} ms]",
-           chain_head.id().str().substr(8, 16), chain_head.block_num(), chain_head.timestamp(), chain_head.producer(),
+           chain_head.id().short_id(), chain_head.block_num(), chain_head.timestamp(), chain_head.producer(),
            chain_head.block()->transactions.size(), chain_head.irreversible_blocknum(),
            br.total_net_usage, br.total_cpu_usage_us,
            br.total_elapsed_time, now - br.start_time, (now - chain_head.timestamp()).count() / 1000);

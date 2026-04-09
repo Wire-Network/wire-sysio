@@ -39,7 +39,7 @@ namespace sysio::chain_apis {
                if (chain::vote_logger.is_enabled(fc::log_level::info)) {
                   chain::qc_claim_t claim = block->qc_claim;
                   fc_ilog(chain::vote_logger, "Block {}... #{} @ {} produced by {}, latency: {}ms has no qc, claim: {}",
-                          id.str().substr(8, 16), block->block_num(), block->timestamp, block->producer,
+                          id.short_id(), block->block_num(), block->timestamp, block->producer,
                           (now - block->timestamp).count() / 1000, claim);
                }
                return;
@@ -104,7 +104,7 @@ namespace sysio::chain_apis {
             for (const auto& f : missing_votes) {
                if (controller.is_node_finalizer_key(f.fin_auth->public_key)) {
                   fc_wlog(chain::vote_logger, "Local finalizer {} did not vote in block {} : {} for block {}",
-                          f.fin_auth->description, block->block_num(), id.str().substr(8,16), missed_block_num);
+                          f.fin_auth->description, block->block_num(), id.short_id(), missed_block_num);
                }
                not_voted += f.fin_auth->description;
                not_voted += ',';
@@ -112,7 +112,7 @@ namespace sysio::chain_apis {
             if (!not_voted.empty()) {
                not_voted.resize(not_voted.size() - 1); // remove ','
                fc_ilog(chain::vote_logger, "Block {}... #{} @ {} produced by {}, latency: {}ms has no votes for block #{} from finalizers: {}",
-                    id.str().substr(8, 16), block->block_num(), block->timestamp, block->producer,
+                    id.short_id(), block->block_num(), block->timestamp, block->producer,
                     (fc::time_point::now() - block->timestamp).count() / 1000, missed_block_num, not_voted);
             }
          }
