@@ -39,7 +39,7 @@ defaults:
 jobs:
   platform-cache:
     name: Platform Cache
-    uses: Wire-Network/platform-cache-workflow/.github/workflows/platformcache.yaml@v1
+    uses: Wire-Network/platform-cache-workflow/.github/workflows/platformcache.yaml@v2
     permissions:
       packages: write
       contents: read
@@ -102,10 +102,10 @@ jobs:
         username: dev-wire
         password: ${{ secrets.GH_TOKEN_DEV }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Download builddir
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: ${{matrix.platform}}-build
 
@@ -122,7 +122,7 @@ jobs:
           apt-get install -y ./build/wire-sysio_*.deb
 
       - name: Upload dev package
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: wire-sysio-dev-${{matrix.platform}}-amd64
           path: build/wire-sysio_*.deb
@@ -159,10 +159,10 @@ jobs:
           sudo chown -R $USER:$USER "$GITHUB_WORKSPACE"
           sudo chmod -R u+rwX "$GITHUB_WORKSPACE"
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Download builddir
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: ${{matrix.cfg.builddir}}-build
 
@@ -235,7 +235,7 @@ jobs:
           ctest --output-on-failure -j $(nproc) -LE "(nonparallelizable_tests|long_running_tests)" --timeout 1000
 
       - name: Upload core files from failed tests
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: failure()
         with:
           name: ${{matrix.cfg.name}}-tests-logs
@@ -275,10 +275,10 @@ jobs:
           docker ps -aq | xargs -r docker rm -f || true
           echo "Cleanup complete."
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Download builddir
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: ${{ matrix.cfg.builddir }}-build
 
@@ -301,7 +301,7 @@ jobs:
 
       - name: Upload logs from failed tests
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ${{ matrix.cfg.name }}-np-logs
           path: |
@@ -346,10 +346,10 @@ jobs:
           docker ps -aq | xargs -r docker rm -f || true
           echo "Cleanup complete."
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Download builddir
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: ${{matrix.cfg.builddir}}-build
 
@@ -372,7 +372,7 @@ jobs:
             alpine sh -c 'tar -C /cores/ -c .' | tar x || echo "No core dumps found"
 
       - name: Upload logs from failed tests
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: failure()
         with:
           name: ${{matrix.cfg.name}}-lr-logs
@@ -415,12 +415,12 @@ jobs:
   #     # wire-sysio
   #     - if: ${{ matrix.test != 'deb-install' }}
   #       name: Clone sysio
-  #       uses: actions/checkout@v4
+  #       uses: actions/checkout@v5
   #       with:
   #         submodules: recursive
   #     - if: ${{ matrix.test != 'deb-install' }}
   #       name: Download sysio builddir
-  #       uses: actions/download-artifact@v4
+  #       uses: actions/download-artifact@v5
   #       with:
   #         name: ${{matrix.platform}}-build
   #     - if: ${{ matrix.test != 'deb-install' }}
@@ -442,7 +442,7 @@ jobs:
   #         rm -r *
   #     # - if: ${{ matrix.test == 'deb-install' }}
   #     #   name: Download sysio-dev
-  #     #   uses: actions/download-artifact@v4
+  #     #   uses: actions/download-artifact@v5
   #     #   with:
   #     #     name: sysio-dev-${{matrix.platform}}-amd64
   #     # - if: ${{ matrix.test == 'deb-install' }}
@@ -476,7 +476,7 @@ jobs:
 
   #     # Reference Contracts
   #     - name: checkout wire-system-contracts
-  #       uses: actions/checkout@v4
+  #       uses: actions/checkout@v5
   #       with:
   #         repository: Wire-Network/wire-system-contracts
   #         path: wire-system-contracts
