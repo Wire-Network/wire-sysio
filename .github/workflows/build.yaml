@@ -86,50 +86,46 @@ jobs:
             echo wire-system-contracts-ref=${{inputs.override-wire-system-contracts}} >> $GITHUB_OUTPUT
           fi
 
-#  package:
-#    name: Build deb packages
-#    needs: [platform-cache, build-base]
-#    strategy:
-#      fail-fast: false
-#      matrix:
-#        platform: [ubuntu24, ubsan, asan, asserton, gcc]
-#    runs-on: ubuntu-latest
-#    container: ${{fromJSON(needs.platform-cache.outputs.platforms)[matrix.platform].image}}
-#    steps:
-#      - uses: actions/checkout@v4
-#        with:
-#          submodules: recursive
-#      - name: Download builddir
-#        uses: actions/download-artifact@v4
-#        with:
-#          name: ${{matrix.platform}}-build
-#      - name: Build packages
-#        run: |
-#          tar xzf build.tar.gz
-#          cd build
-#          cpack
-#          ../tools/tweak-deb.sh wire-sysio_*.deb
-#      - name: Install dev package
-#        if: matrix.platform != 'reproducible'
-#        run: |
-#          apt-get update && apt-get upgrade -y
-#          apt-get install -y ./build/wire-sysio_*.deb
-#      # - name: Test using TestHarness
-#      #   if: matrix.platform != 'reproducible'
-#      #   run: |
-#      #     python3 -c "import sys; sys.path.append('tests'); from TestHarness import Cluster; print('OK')"
-#      - name: Upload dev package
-#        uses: actions/upload-artifact@v4
-#        if: matrix.platform != 'reproducible'
-#        with:
-#          name: wire-sysio-dev-${{matrix.platform}}-amd64
-#          path: build/wire-sysio-dev*.deb
-#      - name: Upload sysio package
-#        uses: actions/upload-artifact@v4
-#        if: matrix.platform == 'reproducible'
-#        with:
-#          name: sysio-deb-amd64
-#          path: build/wire-sysio_*.deb
+  package:
+    name: Build deb packages (${{matrix.platform}})
+    needs: [platform-cache, build-base]
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [ubuntu24, ubsan, asan, asserton, gcc]
+    runs-on:
+      group: core-repo-group
+    timeout-minutes: 15
+    container:
+      image: ${{fromJSON(needs.platform-cache.outputs.platforms)[matrix.platform].image}}
+      credentials:
+        username: dev-wire
+        password: ${{ secrets.GH_TOKEN_DEV }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download builddir
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{matrix.platform}}-build
+
+      - name: Build packages
+        run: |
+          tar xzf build.tar.gz
+          cd build
+          cpack
+          ../tools/tweak-deb.sh wire-sysio_*.deb
+
+      - name: Install dev package
+        run: |
+          apt-get update && apt-get upgrade -y
+          apt-get install -y ./build/wire-sysio_*.deb
+
+      - name: Upload dev package
+        uses: actions/upload-artifact@v4
+        with:
+          name: wire-sysio-dev-${{matrix.platform}}-amd64
+          path: build/wire-sysio_*.deb
 
   tests:
     name: Tests (${{matrix.cfg.name}})
