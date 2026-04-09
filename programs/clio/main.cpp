@@ -2375,51 +2375,43 @@ int main( int argc, char** argv ) {
    string table;
    string lower;
    string upper;
-   string table_key;
-   string key_type;
-   string encode_type{"dec"};
+   string find_key;
+   string index_name;
    bool binary = false;
-   uint32_t limit = 10;
+   uint32_t limit = 50;
    uint32_t time_limit_ms = 0;
-   string index_position;
    bool reverse = false;
    bool show_payer = false;
    auto get_table_cmd = get_cmd->add_subcommand( "table", localized("Retrieve the contents of a database table"));
-   get_table_cmd->add_option( "account", code, localized("The account who owns the table") )->required();
-   get_table_cmd->add_option( "scope", scope, localized("The scope within the contract in which the table is found") )->required();
-   get_table_cmd->add_option( "table", table, localized("The name of the table as specified by the contract abi") )->required();
+   get_table_cmd->add_option( "account", code, localized("The contract account that owns the table") )->required();
+   get_table_cmd->add_option( "table", table, localized("The name of the table as specified by the contract ABI") )->required();
+   get_table_cmd->add_option( "-S,--scope", scope, localized("Scope for scoped tables (e.g., account name for token balances)") );
+   get_table_cmd->add_option( "-f,--find", find_key, localized("Exact key lookup (JSON key object). Cannot be combined with --lower/--upper") );
+   get_table_cmd->add_option( "--index", index_name, localized("Secondary index name (e.g., 'byowner') or position number (e.g., '2')") );
    get_table_cmd->add_option( "-l,--limit", limit, localized("The maximum number of rows to return") );
-   get_table_cmd->add_option( "--time-limit", time_limit_ms, localized("Limit time of execution in milliseconds"));
-   get_table_cmd->add_option( "-k,--key", table_key, localized("Deprecated") );
-   get_table_cmd->add_option( "-L,--lower", lower, localized("JSON representation of lower bound value of key, defaults to first") );
-   get_table_cmd->add_option( "-U,--upper", upper, localized("JSON representation of upper bound value of key, defaults to last") );
-   get_table_cmd->add_option( "--index", index_position,
-                         localized("Index number, 1 - primary (first), 2 - secondary index (in order defined by multi_index), 3 - third index, etc.\n"
-                                   "\t\t\t\tNumber or name of index can be specified, e.g. 'secondary' or '2'."));
-   get_table_cmd->add_option( "--key-type", key_type,
-                         localized("The key type of --index, primary only supports (i64), all others support (i64, i128, i256, float64, float128, ripemd160, sha256).\n"
-                                   "\t\t\t\tSpecial type 'name' indicates an account name."));
-   get_table_cmd->add_option( "--encode-type", encode_type,
-                         localized("The encoding type of key_type (i64 , i128 , float64, float128) only support decimal encoding e.g. 'dec'"
-                                    "i256 - supports both 'dec' and 'hex', ripemd160 and sha256 is 'hex' only"));
-   get_table_cmd->add_flag("-b,--binary", binary, localized("Return the value as BINARY rather than using abi to interpret as JSON"));
-   get_table_cmd->add_flag("-r,--reverse", reverse, localized("Iterate in reverse order"));
-   get_table_cmd->add_flag("--show-payer", show_payer, localized("Show RAM payer"));
-
+   get_table_cmd->add_option( "-L,--lower", lower, localized("JSON representation of lower bound key (inclusive)") );
+   get_table_cmd->add_option( "-U,--upper", upper, localized("JSON representation of upper bound key (exclusive)") );
+   get_table_cmd->add_option( "--time-limit", time_limit_ms, localized("Limit time of execution in milliseconds") );
+   get_table_cmd->add_flag( "-b,--binary", binary, localized("Return values as hex rather than ABI-decoded JSON") );
+   get_table_cmd->add_flag( "-r,--reverse", reverse, localized("Iterate in reverse order") );
+   get_table_cmd->add_flag( "--show-payer", show_payer, localized("Include RAM payer in each row") );
 
    get_table_cmd->callback([&] {
+      if( !find_key.empty() && (!lower.empty() || !upper.empty()) ) {
+         std::cerr << "ERROR: --find cannot be combined with --lower or --upper" << std::endl;
+         throw CLI::RuntimeError(1);
+      }
+
       fc::mutable_variant_object mo;
       mo( "json", !binary )
         ( "code", code )
-        ( "scope", scope )
-        ( "table", table )
-        ( "table_key", table_key ) // not used
-        ( "lower_bound", lower )
-        ( "upper_bound", upper )
-        ( "limit", limit )
-        ( "key_type", key_type )
-        ( "index_position", index_position )
-        ( "encode_type", encode_type )
+        ( "table", table );
+      if( !scope.empty() )     mo( "scope", scope );
+      if( !find_key.empty() )  mo( "find", find_key );
+      if( !index_name.empty()) mo( "index_name", index_name );
+      if( !lower.empty() )     mo( "lower_bound", lower );
+      if( !upper.empty() )     mo( "upper_bound", upper );
+      mo( "limit", limit )
         ( "reverse", reverse )
         ( "show_payer", show_payer );
       if( time_limit_ms != 0 ) mo( "time_limit_ms", time_limit_ms );
@@ -3309,23 +3301,16 @@ int main( int argc, char** argv ) {
                                  ("code", "sysio.msig")
                                  ("scope", proposer)
                                  ("table", "proposal")
-                                 ("table_key", "")
-                                 ("lower_bound", name(proposal_name).to_uint64_t())
-                                 ("upper_bound", name(proposal_name).to_uint64_t() + 1)
-                                 // Less than ideal upper_bound usage preserved so clio can still work with old buggy nodeop versions
-                                 // Change to name(proposal_name).value when clio no longer needs to support nodeop versions older than 1.5.0
-                                 ("limit", 1)
+                                 ("find", fc::json::to_string(fc::mutable_variant_object("primary_key", name(proposal_name).to_uint64_t()), fc::time_point::maximum()))
                            );
-      //std::cout << fc::json::to_pretty_string(result) << std::endl;
 
       const auto& rows1 = result1.get_object()["rows"].get_array();
-      // Condition in if statement below can simply be rows.empty() when clio no longer needs to support nodeop versions older than 1.5.0
-      if( rows1.empty() || rows1[0].get_object()["proposal_name"] != proposal_name ) {
+      if( rows1.empty() || rows1[0]["value"].get_object()["proposal_name"] != proposal_name ) {
          std::cerr << "Proposal not found" << std::endl;
          return;
       }
 
-      const auto& proposal_object = rows1[0].get_object();
+      const auto& proposal_object = rows1[0]["value"].get_object();
 
       enum class approval_status {
          unapproved,
@@ -3345,20 +3330,15 @@ int main( int argc, char** argv ) {
                                        ("code", "sysio.msig")
                                        ("scope", proposer)
                                        ("table", "approvals2")
-                                       ("table_key", "")
-                                       ("lower_bound", name(proposal_name).to_uint64_t())
-                                       ("upper_bound", name(proposal_name).to_uint64_t() + 1)
-                                       // Less than ideal upper_bound usage preserved so clio can still work with old buggy nodeop versions
-                                       // Change to name(proposal_name).value when clio no longer needs to support nodeop versions older than 1.5.0
-                                       ("limit", 1)
+                                       ("find", fc::json::to_string(fc::mutable_variant_object("primary_key", name(proposal_name).to_uint64_t()), fc::time_point::maximum()))
                                  );
             rows2 = result2.get_object()["rows"].get_array();
          } catch( ... ) {
             new_multisig = false;
          }
 
-         if( !rows2.empty() && rows2[0].get_object()["proposal_name"] == proposal_name ) {
-            const auto& approvals_object = rows2[0].get_object();
+         if( !rows2.empty() && rows2[0]["value"].get_object()["proposal_name"] == proposal_name ) {
+            const auto& approvals_object = rows2[0]["value"].get_object();
 
             for( const auto& ra : approvals_object["requested_approvals"].get_array() ) {
                auto pl = ra["level"].as<permission_level>();
@@ -3375,20 +3355,15 @@ int main( int argc, char** argv ) {
                                        ("code", "sysio.msig")
                                        ("scope", proposer)
                                        ("table", "approvals")
-                                       ("table_key", "")
-                                       ("lower_bound", name(proposal_name).to_uint64_t())
-                                       ("upper_bound", name(proposal_name).to_uint64_t() + 1)
-                                       // Less than ideal upper_bound usage preserved so clio can still work with old buggy nodeop versions
-                                       // Change to name(proposal_name).value when clio no longer needs to support nodeop versions older than 1.5.0
-                                       ("limit", 1)
+                                       ("find", fc::json::to_string(fc::mutable_variant_object("primary_key", name(proposal_name).to_uint64_t()), fc::time_point::maximum()))
                                  );
             const auto& rows3 = result3.get_object()["rows"].get_array();
-            if( rows3.empty() || rows3[0].get_object()["proposal_name"] != proposal_name ) {
+            if( rows3.empty() || rows3[0]["value"].get_object()["proposal_name"] != proposal_name ) {
                std::cerr << "Proposal not found" << std::endl;
                return;
             }
 
-            const auto& approvals_object = rows3[0].get_object();
+            const auto& approvals_object = rows3[0]["value"].get_object();
 
             for( const auto& ra : approvals_object["requested_approvals"].get_array() ) {
                auto pl = ra.as<permission_level>();
@@ -3408,19 +3383,14 @@ int main( int argc, char** argv ) {
                                           ("code", "sysio.msig")
                                           ("scope", "sysio.msig")
                                           ("table", "invals")
-                                          ("table_key", "")
-                                          ("lower_bound", a.first.to_uint64_t())
-                                          ("upper_bound", a.first.to_uint64_t() + 1)
-                                          // Less than ideal upper_bound usage preserved so clio can still work with old buggy nodeop versions
-                                          // Change to name(proposal_name).value when clio no longer needs to support nodeop versions older than 1.5.0
-                                          ("limit", 1)
+                                          ("find", fc::json::to_string(fc::mutable_variant_object("primary_key", a.first.to_uint64_t()), fc::time_point::maximum()))
                                     );
                const auto& rows4 = result4.get_object()["rows"].get_array();
-               if( rows4.empty() || rows4[0].get_object()["account"].as<sysio::name>() != a.first ) {
+               if( rows4.empty() || rows4[0]["value"].get_object()["account"].as<sysio::name>() != a.first ) {
                   continue;
                }
 
-               auto invalidation_time = rows4[0].get_object()["last_invalidation_time"].as<fc::time_point>();
+               auto invalidation_time = rows4[0]["value"].get_object()["last_invalidation_time"].as<fc::time_point>();
                a.second.first = invalidation_time;
 
                for( auto& itr : a.second.second ) {
