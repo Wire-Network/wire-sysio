@@ -153,7 +153,8 @@ void history_pack_big_bytes(datastream<ST>& ds, const sysio::chain::bytes& v) {
 template <typename ST>
 void history_pack_big_bytes(datastream<ST>& ds, const sysio::chain::shared_blob& b) {
    fc::raw::pack(ds, unsigned_int((uint32_t)b.size()));
-   ds.write(b.data(), b.size());
+   if (b.size())
+      ds.write(b.data(), b.size());
 }
 
 template <typename ST>
@@ -239,7 +240,7 @@ datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper<sysi
    fc::raw::pack(ds, as_type<uint64_t>(obj.obj.code.to_uint64_t()));
    fc::raw::pack(ds, as_type<uint64_t>(obj.obj.payer.to_uint64_t()));
    fc::raw::pack(ds, as_type<uint16_t>(obj.obj.table_id));
-   std::vector<char> key_bytes(obj.obj.key.data(), obj.obj.key.data() + obj.obj.key.size());
+   sysio::chain::bytes key_bytes(obj.obj.key.data(), obj.obj.key.data() + obj.obj.key.size());
    history_pack_big_bytes(ds, key_bytes);
    history_pack_big_bytes(ds, obj.obj.value);
    return ds;
