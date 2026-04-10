@@ -1616,6 +1616,10 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
    std::vector<char> scope_prefix_bytes; // encoded scope field (empty if unscoped)
    size_t scope_key_count = 0;          // number of key fields that form the scope prefix
 
+   SYS_ASSERT(!table_is_scoped || p.find.empty() || !p.scope.empty(),
+              chain::contract_table_query_exception,
+              "Cannot use 'find' on a scoped table without specifying 'scope'");
+
    if (table_is_scoped) {
       if (!p.scope.empty()) {
          // Parse scope using ABI type to avoid ambiguity (fixes Spring #1379).
