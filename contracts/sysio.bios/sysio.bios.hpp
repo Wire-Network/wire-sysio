@@ -3,7 +3,7 @@
 #include <sysio/action.hpp>
 #include <sysio/crypto.hpp>
 #include <sysio/sysio.hpp>
-#include <sysio/multi_index.hpp>
+#include <sysio/kv_table.hpp>
 #include <sysio/fixed_bytes.hpp>
 #include <sysio/privileged.hpp>
 #include <sysio/producer_schedule.hpp>
@@ -373,18 +373,26 @@ namespace sysiobios {
           *
           * @details Abi hash structure is defined by contract owner and the contract hash.
           */
-         struct [[sysio::table]] abi_hash {
+         struct abihash_key {
+            uint64_t owner;
+            SYSLIB_SERIALIZE( abihash_key, (owner) )
+         };
+
+         /**
+          * Abi hash structure
+          *
+          * @details Stores the contract ABI hash indexed by owner account.
+          */
+         struct [[sysio::table("abihash")]] abi_hash {
             name              owner;
             checksum256       hash;
-            uint64_t primary_key()const { return owner.value; }
-
             SYSLIB_SERIALIZE( abi_hash, (owner)(hash) )
          };
 
          /**
-          * Multi index table that stores the contracts' abi index by their owners/accounts.
+          * KV table that stores the contracts' abi index by their owners/accounts.
           */
-         typedef sysio::multi_index< "abihash"_n, abi_hash > abi_hash_table;
+         using abi_hash_table = sysio::kv::table<"abihash"_n, abihash_key, abi_hash>;
 
          using newaccount_action = action_wrapper<"newaccount"_n, &bios::newaccount>;
          using updateauth_action = action_wrapper<"updateauth"_n, &bios::updateauth>;

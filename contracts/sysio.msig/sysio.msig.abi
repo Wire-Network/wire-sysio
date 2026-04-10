@@ -40,6 +40,16 @@
             ]
         },
         {
+            "name": "approval_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "proposal_name",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "approvals_info",
             "base": "",
             "fields": [
@@ -134,6 +144,16 @@
             ]
         },
         {
+            "name": "inval_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "invalidate",
             "base": "",
             "fields": [
@@ -154,6 +174,16 @@
                 {
                     "name": "last_invalidation_time",
                     "type": "time_point"
+                }
+            ]
+        },
+        {
+            "name": "old_approval_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "proposal_name",
+                    "type": "uint64"
                 }
             ]
         },
@@ -204,6 +234,16 @@
                 {
                     "name": "earliest_exec_time",
                     "type": "time_point?$"
+                }
+            ]
+        },
+        {
+            "name": "proposal_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "proposal_name",
+                    "type": "uint64"
                 }
             ]
         },
@@ -333,7 +373,7 @@
             "name": "approvals",
             "type": "old_approvals_info",
             "index_type": "i64",
-            "key_names": ["scope","primary_key"],
+            "key_names": ["scope","proposal_name"],
             "key_types": ["name","uint64"],
             "table_id": 16476
         },
@@ -341,47 +381,23 @@
             "name": "approvals2",
             "type": "approvals_info",
             "index_type": "i64",
-            "key_names": ["scope","primary_key"],
+            "key_names": ["scope","proposal_name"],
             "key_types": ["name","uint64"],
             "table_id": 20700
-        },
-        {
-            "name": "approvals_info",
-            "type": "approvals_info",
-            "index_type": "i64",
-            "key_names": [],
-            "key_types": [],
-            "table_id": 32451
-        },
-        {
-            "name": "invalidation",
-            "type": "invalidation",
-            "index_type": "i64",
-            "key_names": [],
-            "key_types": [],
-            "table_id": 41978
         },
         {
             "name": "invals",
             "type": "invalidation",
             "index_type": "i64",
-            "key_names": ["scope","primary_key"],
-            "key_types": ["name","uint64"],
+            "key_names": ["account"],
+            "key_types": ["uint64"],
             "table_id": 5047
-        },
-        {
-            "name": "old_approvals_info",
-            "type": "old_approvals_info",
-            "index_type": "i64",
-            "key_names": [],
-            "key_types": [],
-            "table_id": 4688
         },
         {
             "name": "proposal",
             "type": "proposal",
             "index_type": "i64",
-            "key_names": ["scope","primary_key"],
+            "key_names": ["scope","proposal_name"],
             "key_types": ["name","uint64"],
             "table_id": 34278
         }

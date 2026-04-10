@@ -2,7 +2,7 @@
 
 #include <sysio/asset.hpp>
 #include <sysio/sysio.hpp>
-#include <sysio/multi_index.hpp>
+#include <sysio/kv_scoped_table.hpp>
 
 #include <string>
 
@@ -105,14 +105,14 @@ namespace sysio {
          static asset get_supply( const name& token_contract_account, const symbol_code& sym_code )
          {
             stats statstable( token_contract_account, sym_code.raw() );
-            const auto& st = statstable.get( sym_code.raw(), "invalid supply symbol code" );
+            const auto& st = statstable.get( stat_key{sym_code.raw()}, "invalid supply symbol code" );
             return st.supply;
          }
 
          static asset get_balance( const name& token_contract_account, const name& owner, const symbol_code& sym_code )
          {
             accounts accountstable( token_contract_account, owner.value );
-            const auto& ac = accountstable.get( sym_code.raw(), "no balance with specified symbol" );
+            const auto& ac = accountstable.get( acct_key{sym_code.raw()}, "no balance with specified symbol" );
             return ac.balance;
          }
 
@@ -123,22 +123,30 @@ namespace sysio {
          using open_action = sysio::action_wrapper<"open"_n, &token::open>;
          using close_action = sysio::action_wrapper<"close"_n, &token::close>;
       private:
-         struct [[sysio::table]] account {
-            asset    balance;
-
-            uint64_t primary_key()const { return balance.symbol.code().raw(); }
+         struct acct_key {
+            uint64_t sym_code;
+            SYSLIB_SERIALIZE(acct_key, (sym_code))
          };
 
-         struct [[sysio::table]] currency_stats {
+         struct stat_key {
+            uint64_t sym_code;
+            SYSLIB_SERIALIZE(stat_key, (sym_code))
+         };
+
+         struct [[sysio::table("accounts")]] account {
+            asset    balance;
+            SYSLIB_SERIALIZE(account, (balance))
+         };
+
+         struct [[sysio::table("stat")]] currency_stats {
             asset    supply;
             asset    max_supply;
             name     issuer;
-
-            uint64_t primary_key()const { return supply.symbol.code().raw(); }
+            SYSLIB_SERIALIZE(currency_stats, (supply)(max_supply)(issuer))
          };
 
-         typedef sysio::multi_index< "accounts"_n, account > accounts;
-         typedef sysio::multi_index< "stat"_n, currency_stats > stats;
+         using accounts = kv::scoped_table<"accounts"_n, acct_key, account>;
+         using stats    = kv::scoped_table<"stat"_n, stat_key, currency_stats>;
 
          void sub_balance( const name& owner, const asset& value );
          void add_balance( const name& owner, const asset& value, const name& ram_payer );

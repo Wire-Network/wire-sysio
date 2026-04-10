@@ -2,7 +2,8 @@
 
 #include <sysio/binary_extension.hpp>
 #include <sysio/sysio.hpp>
-#include <sysio/multi_index.hpp>
+#include <sysio/kv_scoped_table.hpp>
+#include <sysio/kv_table.hpp>
 #include <sysio/ignore.hpp>
 #include <sysio/transaction.hpp>
 
@@ -113,28 +114,45 @@ public:
    using exec_action = sysio::action_wrapper<"exec"_n, &multisig::exec>;
    using invalidate_action = sysio::action_wrapper<"invalidate"_n, &multisig::invalidate>;
 
-   struct [[sysio::table, sysio::contract("sysio.msig")]] proposal {
+   struct proposal_key {
+      uint64_t proposal_name;
+      SYSLIB_SERIALIZE(proposal_key, (proposal_name))
+   };
+
+   struct [[sysio::table("proposal"), sysio::contract("sysio.msig")]] proposal {
       name                                                            proposal_name;
       std::vector<char>                                               packed_transaction;
       sysio::binary_extension< std::optional<time_point> >            earliest_exec_time;
 
-      uint64_t primary_key()const { return proposal_name.value; }
+      SYSLIB_SERIALIZE(proposal, (proposal_name)(packed_transaction)(earliest_exec_time))
    };
-   typedef sysio::multi_index< "proposal"_n, proposal > proposals;
+   using proposals = sysio::kv::scoped_table< "proposal"_n, proposal_key, proposal >;
 
-   struct [[sysio::table, sysio::contract("sysio.msig")]] old_approvals_info {
+   struct old_approval_key {
+      uint64_t proposal_name;
+      SYSLIB_SERIALIZE(old_approval_key, (proposal_name))
+   };
+
+   struct [[sysio::table("approvals"), sysio::contract("sysio.msig")]] old_approvals_info {
       name                            proposal_name;
       std::vector<permission_level>   requested_approvals;
       std::vector<permission_level>   provided_approvals;
-      uint64_t primary_key()const { return proposal_name.value; }
+
+      SYSLIB_SERIALIZE(old_approvals_info, (proposal_name)(requested_approvals)(provided_approvals))
    };
-   typedef sysio::multi_index< "approvals"_n, old_approvals_info > old_approvals;
+   using old_approvals = sysio::kv::scoped_table< "approvals"_n, old_approval_key, old_approvals_info >;
+
    struct approval {
       permission_level level;
       time_point       time;
    };
 
-   struct [[sysio::table, sysio::contract("sysio.msig")]] approvals_info {
+   struct approval_key {
+      uint64_t proposal_name;
+      SYSLIB_SERIALIZE(approval_key, (proposal_name))
+   };
+
+   struct [[sysio::table("approvals2"), sysio::contract("sysio.msig")]] approvals_info {
       uint8_t                 version = 1;
       name                    proposal_name;
       //requested approval doesn't need to contain time, but we want requested approval
@@ -142,17 +160,23 @@ public:
       //doesn't change serialized data size. So, we use the same type.
       std::vector<approval>   requested_approvals;
       std::vector<approval>   provided_approvals;
-      uint64_t primary_key()const { return proposal_name.value; }
-   };
-   typedef sysio::multi_index< "approvals2"_n, approvals_info > approvals;
 
-   struct [[sysio::table, sysio::contract("sysio.msig")]] invalidation {
+      SYSLIB_SERIALIZE(approvals_info, (version)(proposal_name)(requested_approvals)(provided_approvals))
+   };
+   using approvals = sysio::kv::scoped_table< "approvals2"_n, approval_key, approvals_info >;
+
+   struct inval_key {
+      uint64_t account;
+      SYSLIB_SERIALIZE(inval_key, (account))
+   };
+
+   struct [[sysio::table("invals"), sysio::contract("sysio.msig")]] invalidation {
       name         account;
       time_point   last_invalidation_time;
 
-      uint64_t primary_key() const { return account.value; }
+      SYSLIB_SERIALIZE(invalidation, (account)(last_invalidation_time))
    };
 
-   typedef sysio::multi_index< "invals"_n, invalidation > invalidations;
+   using invalidations = sysio::kv::table< "invals"_n, inval_key, invalidation >;
 };
 } /// namespace sysio

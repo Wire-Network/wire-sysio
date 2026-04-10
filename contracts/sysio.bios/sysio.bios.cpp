@@ -8,18 +8,11 @@
 namespace sysiobios {
 
 void bios::setabi( name account, const std::vector<char>& abi ) {
-   abi_hash_table table(get_self(), get_self().value);
-   auto itr = table.find( account.value );
-   if( itr == table.end() ) {
-      table.emplace( account, [&]( auto& row ) {
-         row.owner = account;
-         row.hash  = sysio::sha256(const_cast<char*>(abi.data()), abi.size());
-      });
-   } else {
-      table.modify( itr, sysio::same_payer, [&]( auto& row ) {
-         row.hash = sysio::sha256(const_cast<char*>(abi.data()), abi.size());
-      });
-   }
+   abi_hash_table table(get_self());
+   auto new_hash = sysio::sha256(const_cast<char*>(abi.data()), abi.size());
+   table.upsert( account, abihash_key{account.value},
+      abi_hash{account, new_hash},                       // default if new
+      [&]( auto& row ) { row.hash = new_hash; } );      // updater if exists
 }
 
 void bios::setfinalizer( const finalizer_policy& finalizer_policy ) {
