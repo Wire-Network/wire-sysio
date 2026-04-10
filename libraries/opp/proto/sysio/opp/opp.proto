@@ -76,6 +76,6 @@ message Envelope {
 
    bytes          start_message_id       = 30; // 32 bytes
    bytes          end_message_id         = 31; // 32 bytes
-  // CLAUDE: THERE ARE NO SIGS IN AN ENVELOPE. REMOVE THIS.
-  //repeated types.ChainSignature signatures = 50;
+
+   repeated Message messages             = 40;
 }

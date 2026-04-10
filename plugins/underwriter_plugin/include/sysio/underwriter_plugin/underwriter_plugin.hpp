@@ -7,14 +7,16 @@
 
 namespace sysio {
 
-   /// Underwriter plugin — a separate daemon from the batch operator.
+   /// Underwriter plugin — polls for underwrite requests and submits intents.
    ///
-   /// Does NOT crank any contracts. Instead it:
-   /// 1. Reads PENDING messages from sysio.msgch filtered by ATTESTATION_TYPE_SWAP
-   /// 2. Independently verifies deposits on external chains (ETH/SOL)
-   /// 3. Selects swaps that maximize utilization of deposited collateral (greedy knapsack)
-   /// 4. Submits underwriting intent to sysio.uwrit
-   /// 5. Monitors uwledger for dual-outpost confirmation
+   /// The underwriter does NOT relay OPP envelopes (that's the batch operator's job).
+   /// Instead it:
+   /// 1. Polls sysio.uwrit::uwreqs for PENDING underwrite requests
+   /// 2. Reads its own credit lines from sysio.opreg::operators (aggregate stakes per chain)
+   /// 3. Selects requests where credit covers 100% of SWAP on both send and receive chains
+   /// 4. Submits underwrite intent to the relevant outpost contract (ETH/SOL)
+   ///    — the outpost locks capital and emits UNDERWRITE_INTENT via OPP
+   /// 5. Monitors uwreqs for status changes (assigned, confirmed, rejected)
    class underwriter_plugin : public appbase::plugin<underwriter_plugin> {
    public:
       APPBASE_PLUGIN_REQUIRES(

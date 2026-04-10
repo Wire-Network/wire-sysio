@@ -239,6 +239,17 @@ CDT generates `.actions.cpp`, `.dispatch.cpp`, and `.desc` files alongside compi
 find contracts/ unittests/test-contracts/ -name "*.actions.cpp" -o -name "*.dispatch.cpp" -o -name "*.desc" | xargs rm -f
 ```
 
+## Copy compiled contract artifacts to source tree
+
+After building contracts, you MUST copy the compiled `.wasm` and `.abi` files from the build directory back to the source tree. This is required before generating system contract types and before testing.
+
+```bash
+for c in epoch opreg msgch uwrit chalg authex; do
+  cp "$BUILD_DIR/contracts/sysio.$c/sysio.$c.wasm" "contracts/sysio.$c/" 2>/dev/null
+  cp "$BUILD_DIR/contracts/sysio.$c/sysio.$c.abi" "contracts/sysio.$c/" 2>/dev/null
+done
+```
+
 ## Generate client types for system contracts
 
 > NOTE: In a dev environment, `pnpm link` should be configured to avoid the need to publish

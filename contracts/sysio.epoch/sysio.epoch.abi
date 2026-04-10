@@ -3,29 +3,11 @@
     "version": "sysio::abi/1.2",
     "types": [
         {
-            "new_type_name": "B_pair_ChainKind_checksum256_E",
-            "type": "pair_ChainKind_checksum256"
-        },
-        {
-            "new_type_name": "B_pair_ChainKind_int64_E",
-            "type": "pair_ChainKind_int64"
-        },
-        {
             "new_type_name": "B_vector_name_E",
             "type": "name[]"
         }
     ],
     "structs": [
-        {
-            "name": "activateop",
-            "base": "",
-            "fields": [
-                {
-                    "name": "account",
-                    "type": "name"
-                }
-            ]
-        },
         {
             "name": "advance",
             "base": "",
@@ -49,14 +31,6 @@
                 },
                 {
                     "name": "batch_op_groups",
-                    "type": "uint32"
-                },
-                {
-                    "name": "warmup_epochs",
-                    "type": "uint32"
-                },
-                {
-                    "name": "cooldown_epochs",
                     "type": "uint32"
                 },
                 {
@@ -105,52 +79,6 @@
             "fields": []
         },
         {
-            "name": "operator_info",
-            "base": "",
-            "fields": [
-                {
-                    "name": "account",
-                    "type": "name"
-                },
-                {
-                    "name": "type",
-                    "type": "OperatorType"
-                },
-                {
-                    "name": "status",
-                    "type": "OperatorStatus"
-                },
-                {
-                    "name": "registered_epoch",
-                    "type": "uint32"
-                },
-                {
-                    "name": "chain_addresses",
-                    "type": "B_pair_ChainKind_checksum256_E[]"
-                },
-                {
-                    "name": "collateral",
-                    "type": "B_pair_ChainKind_int64_E[]"
-                },
-                {
-                    "name": "assigned_batch_op_group",
-                    "type": "uint8"
-                },
-                {
-                    "name": "last_elected_epoch",
-                    "type": "uint32"
-                },
-                {
-                    "name": "slash_count",
-                    "type": "uint32"
-                },
-                {
-                    "name": "is_blacklisted",
-                    "type": "bool"
-                }
-            ]
-        },
-        {
             "name": "outpost_info",
             "base": "",
             "fields": [
@@ -185,51 +113,9 @@
             ]
         },
         {
-            "name": "pair_ChainKind_checksum256",
-            "base": "",
-            "fields": [
-                {
-                    "name": "first",
-                    "type": "ChainKind"
-                },
-                {
-                    "name": "second",
-                    "type": "checksum256"
-                }
-            ]
-        },
-        {
-            "name": "pair_ChainKind_int64",
-            "base": "",
-            "fields": [
-                {
-                    "name": "first",
-                    "type": "ChainKind"
-                },
-                {
-                    "name": "second",
-                    "type": "int64"
-                }
-            ]
-        },
-        {
             "name": "pause",
             "base": "",
             "fields": []
-        },
-        {
-            "name": "regoperator",
-            "base": "",
-            "fields": [
-                {
-                    "name": "account",
-                    "type": "name"
-                },
-                {
-                    "name": "type",
-                    "type": "OperatorType"
-                }
-            ]
         },
         {
             "name": "regoutpost",
@@ -242,20 +128,6 @@
                 {
                     "name": "chain_id",
                     "type": "uint32"
-                }
-            ]
-        },
-        {
-            "name": "replaceop",
-            "base": "",
-            "fields": [
-                {
-                    "name": "old_op",
-                    "type": "name"
-                },
-                {
-                    "name": "new_op",
-                    "type": "name"
                 }
             ]
         },
@@ -280,14 +152,6 @@
                     "type": "uint32"
                 },
                 {
-                    "name": "warmup_epochs",
-                    "type": "uint32"
-                },
-                {
-                    "name": "cooldown_epochs",
-                    "type": "uint32"
-                },
-                {
                     "name": "attestation_retention_epoch_count",
                     "type": "uint32"
                 }
@@ -297,24 +161,9 @@
             "name": "unpause",
             "base": "",
             "fields": []
-        },
-        {
-            "name": "unregoper",
-            "base": "",
-            "fields": [
-                {
-                    "name": "account",
-                    "type": "name"
-                }
-            ]
         }
     ],
     "actions": [
-        {
-            "name": "activateop",
-            "type": "activateop",
-            "ricardian_contract": ""
-        },
         {
             "name": "advance",
             "type": "advance",
@@ -331,18 +180,8 @@
             "ricardian_contract": ""
         },
         {
-            "name": "regoperator",
-            "type": "regoperator",
-            "ricardian_contract": ""
-        },
-        {
             "name": "regoutpost",
             "type": "regoutpost",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "replaceop",
-            "type": "replaceop",
             "ricardian_contract": ""
         },
         {
@@ -353,11 +192,6 @@
         {
             "name": "unpause",
             "type": "unpause",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "unregoper",
-            "type": "unregoper",
             "ricardian_contract": ""
         }
     ],
@@ -375,13 +209,6 @@
             "index_type": "i64",
             "key_names": [],
             "key_types": []
-        },
-        {
-            "name": "operators",
-            "type": "operator_info",
-            "index_type": "i64",
-            "key_names": ["table_name","scope","primary_key"],
-            "key_types": ["name","name","uint64"]
         },
         {
             "name": "outposts",
@@ -417,62 +244,6 @@
                 },
                 {
                     "name": "CHAIN_KIND_SUI",
-                    "value": 4
-                }
-            ]
-        },
-        {
-            "name": "OperatorStatus",
-            "type": "int32",
-            "values": [
-                {
-                    "name": "OPERATOR_STATUS_UNKNOWN",
-                    "value": 0
-                },
-                {
-                    "name": "OPERATOR_STATUS_WARMUP",
-                    "value": 1
-                },
-                {
-                    "name": "OPERATOR_STATUS_COOLDOWN",
-                    "value": 2
-                },
-                {
-                    "name": "OPERATOR_STATUS_ACTIVE",
-                    "value": 3
-                },
-                {
-                    "name": "OPERATOR_STATUS_TERMINATED",
-                    "value": 240
-                },
-                {
-                    "name": "OPERATOR_STATUS_SLASHED",
-                    "value": 241
-                }
-            ]
-        },
-        {
-            "name": "OperatorType",
-            "type": "int32",
-            "values": [
-                {
-                    "name": "OPERATOR_TYPE_UNKNOWN",
-                    "value": 0
-                },
-                {
-                    "name": "OPERATOR_TYPE_PRODUCER",
-                    "value": 1
-                },
-                {
-                    "name": "OPERATOR_TYPE_BATCH",
-                    "value": 2
-                },
-                {
-                    "name": "OPERATOR_TYPE_UNDERWRITER",
-                    "value": 3
-                },
-                {
-                    "name": "OPERATOR_TYPE_CHALLENGER",
                     "value": 4
                 }
             ]

@@ -261,16 +261,24 @@ struct batch_operator_plugin::impl {
             }
          }
 
-         // PHASE 2 — INBOUND (Outposts -> WIRE)
-         // ETH OPP epoch advances as a consequence of inbound consensus
-         // on OPPInbound, NOT via a separate finalizeEpoch call.
+         // PHASE 2 — CRANK OUTPOSTS
+         // Drain queued messages on ETH (emitOutboundEnvelope) and
+         // finalize previous epoch (finalizeEpoch).
+         for (auto& op : outposts) {
+            try {
+               crank_outpost_epoch(op);
+            } catch (const fc::exception& e) {
+               wlog("batch_operator: crank failed for outpost {}: {}", op.id, e.to_detail_string());
+            }
+         }
+
+         // PHASE 3 — INBOUND (Outposts -> WIRE)
+         // Read OPPEnvelope events emitted by the crank, deliver to sysio.msgch.
+         // Consensus is evaluated inline by evalcons called from deliver.
          for (auto& op : outposts) {
             read_inbound_chain(op);
             deliver_to_depot(op);
          }
-
-         // PHASE 3 — Consensus is now evaluated inline by the contract
-         // via evalcons called from deliver. No plugin action needed.
 
          ilog("batch_operator: === EPOCH CYCLE COMPLETE (epoch {}) ===", current_epoch);
       } FC_LOG_AND_RETHROW();
@@ -412,6 +420,22 @@ struct batch_operator_plugin::impl {
       if (!entry || !entry->client) return;
 
       auto& abis = eth_plug->get_abi_files();
+
+      // Drain queued outbound messages into an OPPEnvelope
+      const eth::abi::contract* emit_abi = find_eth_abi(abis, "emitOutboundEnvelope");
+      if (!emit_abi) {
+         elog("batch_operator: emitOutboundEnvelope ABI not found for ETH");
+      } else {
+         try {
+            auto tx = entry->client->create_default_tx(eth_opp_addr, *emit_abi, {});
+            auto result = entry->client->execute_contract_tx_fn(tx, *emit_abi);
+            ilog("batch_operator: ETH emitOutboundEnvelope result={}", result.as_string());
+         } catch (const fc::exception& e) {
+            wlog("batch_operator: ETH emitOutboundEnvelope failed — {}", e.to_string());
+         }
+      }
+
+      // Finalize the previous epoch (merkle root + OPPEpoch event)
       const eth::abi::contract* finalize_abi = find_eth_abi(abis, "finalizeEpoch");
       if (!finalize_abi) {
          elog("batch_operator: finalizeEpoch ABI not found for ETH");
@@ -492,10 +516,10 @@ struct batch_operator_plugin::impl {
       ilog("batch_operator: querying ETH events (addr={}, abis={}, events={}, opp_addr={})",
            opp_addr, opp_abis.size(), event_abi_count, eth_opp_addr);
 
-      // Query OPPMessage logs via ethereum_client
+      // Query OPPEnvelope logs via ethereum_client
       auto events = entry->client->get_events(
          opp_addr,
-         {"OPPMessage"},
+         {"OPPEnvelope"},
          opp_abis,
          eth::block_tag_t{std::string("0x0")},
          eth::block_tag_t{std::string(eth::block_tag_latest)});
@@ -505,10 +529,28 @@ struct batch_operator_plugin::impl {
       std::vector<char> combined_messages;
       uint32_t msg_count = 0;
       for (auto& evt : events) {
-         if (evt.event_name == "OPPMessage" && !evt.data.empty()) {
+         if (evt.event_name == "OPPEnvelope" && !evt.data.empty()) {
+            // evt.data is raw ABI-encoded event data; decode via the event ABI
+            // to extract the protobuf bytes from the `bytes data` parameter
+            auto decoded = evt.decode<fc::variant>();
+            if (!decoded.has_value()) {
+               elog("batch_operator: failed to ABI-decode OPPEnvelope event: {}", decoded.error().what());
+               continue;
+            }
+            auto& v = decoded.value();
+            std::string hex_data;
+            if (v.is_object() && v.get_object().contains("data")) {
+               hex_data = v["data"].as_string();
+            } else if (v.is_string()) {
+               hex_data = v.as_string();
+            } else {
+               elog("batch_operator: unexpected ABI-decoded variant type for OPPEnvelope");
+               continue;
+            }
+            auto proto_bytes = fc::crypto::ethereum::hex_to_bytes(hex_data);
             combined_messages.insert(combined_messages.end(),
-               reinterpret_cast<const char*>(evt.data.data()),
-               reinterpret_cast<const char*>(evt.data.data() + evt.data.size()));
+               reinterpret_cast<const char*>(proto_bytes.data()),
+               reinterpret_cast<const char*>(proto_bytes.data() + proto_bytes.size()));
             ++msg_count;
          }
       }
@@ -586,6 +628,9 @@ struct batch_operator_plugin::impl {
          return;
       }
 
+      // Decode and log envelope contents before delivering
+      log_inbound_envelope(op);
+
       push_action("sysio.msgch", "deliver", operator_account,
                   fc::mutable_variant_object()
                      ("batch_op_name", operator_account.to_string())
@@ -594,6 +639,52 @@ struct batch_operator_plugin::impl {
 
       ilog("batch_operator: delivered {} inbound messages for outpost {}",
            op.inbound_msg_count, op.id);
+   }
+
+   void log_inbound_envelope(const outpost_descriptor& op) {
+      try {
+         auto& raw = op.inbound_raw_messages;
+         sysio::opp::Envelope envelope;
+         if (!envelope.ParseFromString(std::string(raw.begin(), raw.end()))) {
+            wlog("batch_operator: [outpost {}] failed to decode inbound data as Envelope ({} bytes), "
+                 "error={}, hex={}",
+                 op.id, raw.size(),
+                 envelope.InitializationErrorString(),
+                 fc::to_hex(raw.data(), std::min(raw.size(), size_t(64))));
+            return;
+         }
+
+         ilog("batch_operator: [outpost {}] inbound envelope: epoch_index={}, epoch_timestamp={}, "
+              "messages={}, start_message_id={} bytes, end_message_id={} bytes",
+              op.id,
+              envelope.epoch_index(),
+              envelope.epoch_timestamp(),
+              envelope.messages_size(),
+              envelope.start_message_id().size(),
+              envelope.end_message_id().size());
+
+         for (int m = 0; m < envelope.messages_size(); ++m) {
+            auto& message = envelope.messages(m);
+            auto& payload = message.payload();
+            int att_count = payload.attestations_size();
+            ilog("batch_operator: [outpost {}]   message[{}]: version={}, attestation_count={}",
+                 op.id, m, payload.version(), att_count);
+
+            for (int i = 0; i < att_count; ++i) {
+               auto& entry = payload.attestations(i);
+               auto type_val = entry.type();
+               auto type_name = sysio::opp::types::AttestationType_Name(
+                  static_cast<sysio::opp::types::AttestationType>(type_val));
+               ilog("batch_operator: [outpost {}]     attestation[{}]: type={} ({}) data_size={}",
+                    op.id, i,
+                    type_name.empty() ? "UNKNOWN" : type_name,
+                    type_val,
+                    entry.data_size());
+            }
+         }
+      } catch (const std::exception& e) {
+         wlog("batch_operator: [outpost {}] envelope decode error: {}", op.id, e.what());
+      }
    }
 
    // Phase 3 (Consensus) removed — now handled inline by sysio.msgch::evalcons

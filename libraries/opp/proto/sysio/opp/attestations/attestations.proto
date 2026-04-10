@@ -103,7 +103,7 @@ message ProtocolState {
 // ---------------------------------------------------------------------------
 
 // Cross-chain swap request (source Outpost -> Depot).
-message Swap {
+message SwapRequest {
   sysio.opp.types.ChainAddress actor = 1;
   sysio.opp.types.TokenAmount  source_amount = 2;
   sysio.opp.types.ChainId      target_chain = 3;
@@ -186,4 +186,40 @@ message BatchOperatorNextGroup {
   repeated sysio.opp.types.ChainAddress operators = 1;
   uint32                                group_index = 2;
   uint32                                next_epoch_index = 3;
+}
+
+// ---------------------------------------------------------------------------
+//  Operator Registry attestations
+// ---------------------------------------------------------------------------
+
+// NFT → WIRE token conversion (ETH BAR.sol → Depot).
+message NodeOwnerReg {
+  sysio.opp.types.ChainAddress owner_address = 1;
+  bytes                        token_id = 2;
+  sysio.opp.types.ChainAddress nft_address = 3;
+}
+
+// Staking reward distribution (Outpost → Depot). Stub — revisit.
+message StakingReward {
+  sysio.opp.types.ChainAddress recipient = 1;
+  sysio.opp.types.TokenAmount  reward_amount = 2;
+}
+
+// Stake result confirmation (Depot → Outpost).
+// Sent after processing a cross-chain stake attestation.
+message StakeResult {
+  sysio.opp.types.ChainAddress owner_address = 1;
+  sysio.opp.types.TokenAmount  amount = 2;
+  bool                         success = 3;
+  string                       error_reason = 4;
+}
+
+// Attestation processing error (Depot → Outpost).
+// Sent when an inbound attestation fails processing.
+// Prevents breaking the OPP message chain.
+message AttestationProcessingError {
+  uint64                           attestation_id = 1;
+  sysio.opp.types.AttestationType  original_type = 2;
+  bytes                            original_data = 3;
+  string                           error_message = 4;
 }

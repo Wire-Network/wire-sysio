@@ -45,23 +45,8 @@ public:
    }
 
    action_result push_epoch_action(name signer, name action_name, const variant_object& data) {
-      string action_type_name = abi_ser.get_action_type(action_name);
-
-      action act;
-      act.account = EPOCH_ACCOUNT;
-      act.name = action_name;
-      act.data = abi_ser.variant_to_binary(
-         action_type_name, data,
-         abi_serializer::create_yield_function(abi_serializer_max_time)
-      );
-      act.authorization = vector<permission_level>{{signer, config::active_name}};
-
-      signed_transaction trx;
-      trx.actions.emplace_back(std::move(act));
-      set_transaction_headers(trx);
-      trx.sign(get_private_key(signer, "active"), control->get_chain_id());
       try {
-         push_transaction(trx);
+         base_tester::push_action(EPOCH_ACCOUNT, action_name, signer, data);
          return success();
       } catch (const fc::exception& ex) {
          return error(ex.top_message());
@@ -70,29 +55,13 @@ public:
 
    action_result setconfig(uint32_t duration = 360, uint32_t ops_per = 7,
                            uint32_t total = 21, uint32_t grps = 3,
-                           uint32_t warmup = 1, uint32_t cooldown = 1,
                            uint32_t retention = 1000) {
       return push_epoch_action(EPOCH_ACCOUNT, "setconfig"_n, mvo()
          ("epoch_duration_sec", duration)
          ("operators_per_epoch", ops_per)
          ("batch_operator_minimum_active", total)
          ("batch_op_groups", grps)
-         ("warmup_epochs", warmup)
-         ("cooldown_epochs", cooldown)
          ("attestation_retention_epoch_count", retention)
-      );
-   }
-
-   action_result regoperator(name account, OperatorType type = OPERATOR_TYPE_BATCH) {
-      return push_epoch_action(EPOCH_ACCOUNT, "regoperator"_n, mvo()
-         ("account", account)
-         ("type", type)
-      );
-   }
-
-   action_result unregoper(name account) {
-      return push_epoch_action(account, "unregoper"_n, mvo()
-         ("account", account)
       );
    }
 
@@ -102,13 +71,6 @@ public:
 
    action_result initgroups() {
       return push_epoch_action(EPOCH_ACCOUNT, "initgroups"_n, mvo());
-   }
-
-   action_result replaceop(name old_op, name new_op) {
-      return push_epoch_action(EPOCH_ACCOUNT, "replaceop"_n, mvo()
-         ("old_op", old_op)
-         ("new_op", new_op)
-      );
    }
 
    action_result regoutpost(ChainKind chain_kind, uint32_t chain_id) {
@@ -142,14 +104,6 @@ public:
          abi_serializer::create_yield_function(abi_serializer_max_time) );
    }
 
-   fc::variant get_operator(name account) {
-      auto data = get_row_by_account(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "operators"_n, account);
-      return data.empty() ? fc::variant() : abi_ser.binary_to_variant(
-         "operator_info",
-         data,
-         abi_serializer::create_yield_function(abi_serializer_max_time) );
-   }
-
    abi_serializer abi_ser;
 };
 
@@ -165,40 +119,26 @@ BOOST_FIXTURE_TEST_CASE(setconfig_basic, sysio_epoch_tester) { try {
    BOOST_REQUIRE_EQUAL(7, cfg["operators_per_epoch"].as_uint64());
    BOOST_REQUIRE_EQUAL(21, cfg["batch_operator_minimum_active"].as_uint64());
    BOOST_REQUIRE_EQUAL(3, cfg["batch_op_groups"].as_uint64());
+   BOOST_REQUIRE_EQUAL(1000, cfg["attestation_retention_epoch_count"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(setconfig_validates_total, sysio_epoch_tester) { try {
-   // batch_operator_minimum_active must equal operators_per_epoch * batch_op_groups
    BOOST_REQUIRE_EQUAL(
       error("assertion failure with message: batch_operator_minimum_active must equal operators_per_epoch * batch_op_groups"),
       setconfig(360, 7, 20, 3)
    );
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(regoperator_basic, sysio_epoch_tester) { try {
-   BOOST_REQUIRE_EQUAL(success(), setconfig());
-   BOOST_REQUIRE_EQUAL(success(), regoperator("operator1"_n, OPERATOR_TYPE_BATCH));
-
-   auto op = get_operator("operator1"_n);
-   BOOST_REQUIRE_EQUAL("operator1", op["account"].as_string());
-   BOOST_REQUIRE_EQUAL("OPERATOR_TYPE_BATCH", op["type"].as_string());
-   BOOST_REQUIRE_EQUAL("OPERATOR_STATUS_WARMUP", op["status"].as_string());
-} FC_LOG_AND_RETHROW() }
-
-// TODO: regoperator_invalid_type — needs rework after enum type changes
-
 BOOST_FIXTURE_TEST_CASE(regoutpost_basic, sysio_epoch_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), regoutpost(CHAIN_KIND_ETHEREUM, 1));
    produce_blocks();
 
-   // Duplicate should fail
    BOOST_REQUIRE_EQUAL(
       error("assertion failure with message: outpost already registered"),
       regoutpost(CHAIN_KIND_ETHEREUM, 1)
    );
    produce_blocks();
 
-   // Different chain should succeed
    BOOST_REQUIRE_EQUAL(success(), regoutpost(CHAIN_KIND_SOLANA, 1));
 } FC_LOG_AND_RETHROW() }
 
@@ -213,7 +153,6 @@ BOOST_FIXTURE_TEST_CASE(pause_unpause, sysio_epoch_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), setconfig());
    BOOST_REQUIRE_EQUAL(success(), pause());
 
-   // advance should fail while paused
    BOOST_REQUIRE_EQUAL(
       error("assertion failure with message: epoch advancement is paused"),
       advance()
@@ -222,17 +161,13 @@ BOOST_FIXTURE_TEST_CASE(pause_unpause, sysio_epoch_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), unpause());
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(initgroups_not_enough_operators, sysio_epoch_tester) { try {
+BOOST_FIXTURE_TEST_CASE(initgroups_no_opreg, sysio_epoch_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), setconfig());
 
-   // Register only 5 operators — not enough for 21
-   for (int i = 1; i <= 5; ++i) {
-      std::string name_str = "operator" + std::to_string(i);
-      BOOST_REQUIRE_EQUAL(success(), regoperator(name(name_str), OPERATOR_TYPE_BATCH));
-   }
-
+   // initgroups reads from sysio.opreg — which is not deployed in this fixture.
+   // Should fail because there are no AVAILABLE batch operators.
    BOOST_REQUIRE_EQUAL(
-      error("assertion failure with message: not enough active batch operators for group assignment"),
+      error("assertion failure with message: not enough available batch operators for group assignment"),
       initgroups()
    );
 } FC_LOG_AND_RETHROW() }
