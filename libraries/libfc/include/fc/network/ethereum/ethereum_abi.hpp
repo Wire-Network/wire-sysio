@@ -194,7 +194,8 @@ using contract_invoke_data_items = std::vector<contract_invoke_data>;
  * Encode a contract call
  * @return hex string of encoded call `data` field in RLP format
  */
-std::string contract_encode_data(const abi::contract& contract, const contract_invoke_data_items& params);
+std::string contract_encode_data(const abi::contract& contract, const contract_invoke_data_items& params,
+                                 bool add_hex_prefix = false);
 
 template <typename T>
 concept not_abi_data_params_t = !std::is_same_v<std::decay_t<T>, contract_invoke_data_items>;

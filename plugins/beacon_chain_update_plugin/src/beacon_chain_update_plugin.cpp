@@ -39,7 +39,7 @@ struct OPP : fc::network::ethereum::ethereum_contract_client {
       : ethereum_contract_client(client, contract_address_compat, contracts)
       , finalizeEpoch(create_tx<fc::variant>(get_abi("finalizeEpoch"))) {
 
-      };
+   }
 };
 
 struct deposit_manager : fc::network::ethereum::ethereum_contract_client {
@@ -54,7 +54,7 @@ struct deposit_manager : fc::network::ethereum::ethereum_contract_client {
       , setEntryQueue(create_tx<fc::variant, uint64_t>(get_abi("setEntryQueue")))
       , updateApyBPS(create_tx<fc::variant, uint64_t>(get_abi("updateApyBPS"))) {
 
-      };
+   }
 };
 
 struct withdrawal_queue : fc::network::ethereum::ethereum_contract_client {
@@ -67,7 +67,7 @@ struct withdrawal_queue : fc::network::ethereum::ethereum_contract_client {
       : ethereum_contract_client(client, contract_address_compat, contracts)
       , setWithdrawDelay(create_tx<fc::variant, uint64_t>(get_abi("setWithdrawDelay"))) {
 
-      };
+   }
 };
 namespace {
    constexpr auto beacon_chain_queue_url                = "beacon-chain-queue-url";
@@ -87,87 +87,27 @@ namespace {
    constexpr auto default_interval_name                 = "default";
    constexpr auto just_once_interval_name               = "once";
 
-   const std::regex regex(R"(^(.+?)(?:V\d+)?$)");
-
-   [[maybe_unused]] inline fc::logger& logger() {
-      static fc::logger log{"beacon_chain_update_plugin"};
-      return log;
-   }
-
-   fc::variant get_queues_mainnet(const std::string& queue_url, const std::string& api_key) {
+   fc::variant https_request(const std::string& url_str,
+                             boost::beast::http::verb method,
+                             const std::string& request_body,
+                             const std::string& api_key,
+                             std::chrono::seconds timeout = std::chrono::seconds(120)) {
       namespace beast = boost::beast;
       namespace http  = beast::http;
       namespace asio  = boost::asio;
       using tcp       = asio::ip::tcp;
 
-      SYS_ASSERT(!api_key.empty(), sysio::chain::plugin_config_exception,
-                 "beacon-chain-api-key is required for queues API");
-
-      fc::url url(queue_url);
+      fc::url url(url_str);
       auto    host = url.host().value();
       auto    port = std::to_string(url.port().value_or(443));
       auto    path = url.path().value_or(std::filesystem::path("/")).string();
 
-      asio::io_context    ioc;
-      asio::ssl::context  ssl_ctx{asio::ssl::context::tlsv12_client};
-      tcp::resolver       resolver{ioc};
-      auto                dest = resolver.resolve(host, port);
-
-      http::request<http::string_body> req{http::verb::post, path, 11};
-      req.set(http::field::host, host);
-      req.set(http::field::content_type, "application/json");
-      req.set(http::field::authorization, "Bearer " + api_key);
-      req.body() = R"({"chain":"mainnet"})";
-      req.prepare_payload();
-
-      beast::ssl_stream<beast::tcp_stream> stream(ioc, ssl_ctx);
-      if (!SSL_set_tlsext_host_name(stream.native_handle(), host.c_str()))
-         throw beast::system_error(beast::error_code(static_cast<int>(::ERR_get_error()),
-                                                     asio::error::get_ssl_category()));
-
-      beast::get_lowest_layer(stream).expires_after(std::chrono::seconds(120));
-      beast::get_lowest_layer(stream).connect(dest);
-      stream.handshake(asio::ssl::stream_base::client);
-      http::write(stream, req);
-
-      beast::flat_buffer                buffer;
-      http::response<http::string_body> res;
-      http::read(stream, buffer, res);
-
-      beast::error_code ec;
-      stream.shutdown(ec);
-
-      SYS_ASSERT(res.result() == http::status::ok,
-                 sysio::chain::plugin_config_exception,
-                 "get_queues_mainnet HTTP error: {} {}",
-                 static_cast<unsigned>(res.result()), std::string(res.reason()));
-
-      auto response = fc::json::from_string(res.body());
-      return response["data"];
-   }
-
-   fc::variant get_ethstore_latest(const std::string& apy_url, const std::optional<std::string>& api_key) {
-      namespace beast = boost::beast;
-      namespace http  = beast::http;
-      namespace asio  = boost::asio;
-      using tcp       = asio::ip::tcp;
-
-      // Parse the base URL only — fc::url::query() is broken and never stores the query string
-      // during parsing, so appending ?apikey= before parsing would silently discard the key.
-      fc::url url(apy_url);
-      auto    host = url.host().value();
-      auto    port = std::to_string(url.port().value_or(443));
-      auto    path = url.path().value_or(std::filesystem::path("/")).string();
-      if (api_key && !api_key->empty()) {
-         static bool initialized = false;
-
-         if (!initialized) {
-            auto res = curl_global_init(CURL_GLOBAL_DEFAULT);
-            SYS_ASSERT(res == CURLE_OK, chain::http_exception, "{}", curl_easy_strerror(res));
-            initialized = true;
-         }
-
-         char* escaped = curl_easy_escape(nullptr, api_key->c_str(), static_cast<int>(api_key->size()));
+      asio::io_context   ioc;
+      asio::ssl::context ssl_ctx{asio::ssl::context::tlsv12_client};
+      tcp::resolver      resolver{ioc};
+      auto               dest = resolver.resolve(host, port);
+      if (method == boost::beast::http::verb::get) {
+         char* escaped = curl_easy_escape(nullptr, api_key.c_str(), static_cast<int>(api_key.size()));
          SYS_ASSERT(escaped != nullptr,
                   sysio::chain::plugin_config_exception,
                   "curl error occurred while performing curl_easy_escape");
@@ -176,21 +116,24 @@ namespace {
          curl_free(escaped);
       }
 
-      asio::io_context    ioc;
-      asio::ssl::context  ssl_ctx{asio::ssl::context::tlsv12_client};
-      tcp::resolver       resolver{ioc};
-      auto                dest = resolver.resolve(host, port);
+      ssl_ctx.set_default_verify_paths();
 
-      http::request<http::string_body> req{http::verb::get, path, 11};
+      http::request<http::string_body> req{method, path, 11};
       req.set(http::field::host, host);
       req.set(http::field::content_type, "application/json");
+      if (method == boost::beast::http::verb::post)
+         req.set(http::field::authorization, "Bearer " + api_key);
+      if (!request_body.empty())
+         req.body() = request_body;
       req.prepare_payload();
 
       beast::ssl_stream<beast::tcp_stream> stream(ioc, ssl_ctx);
+      stream.set_verify_mode(asio::ssl::verify_peer);
       if (!SSL_set_tlsext_host_name(stream.native_handle(), host.c_str()))
          throw beast::system_error(beast::error_code(static_cast<int>(::ERR_get_error()),
                                                      asio::error::get_ssl_category()));
 
+      beast::get_lowest_layer(stream).expires_after(timeout);
       beast::get_lowest_layer(stream).connect(dest);
       stream.handshake(asio::ssl::stream_base::client);
       http::write(stream, req);
@@ -204,11 +147,26 @@ namespace {
 
       SYS_ASSERT(res.result() == http::status::ok,
                  sysio::chain::plugin_config_exception,
-                 "get_ethstore_latest HTTP error: {} {}",
+                 "https_request HTTP error: {} {}",
                  static_cast<unsigned>(res.result()), std::string(res.reason()));
 
+      ilog("res.body=\n{}", res.body());
       auto response = fc::json::from_string(res.body());
       return response["data"];
+   }
+
+   fc::variant get_queues_mainnet(const std::string& queue_url, const std::string& api_key) {
+      SYS_ASSERT(!api_key.empty(), sysio::chain::plugin_config_exception,
+                 "beacon-chain-api-key is required for queues API");
+      return https_request(queue_url, boost::beast::http::verb::post,
+                           R"({"chain":"mainnet"})", api_key);
+   }
+
+   fc::variant get_ethstore_latest(const std::string& apy_url, const std::string& api_key) {
+      // Build the full URL with apikey query param — fc::url::query() is broken and never
+      // stores the query string during parsing, so we construct the URL string directly.
+      return https_request(apy_url, boost::beast::http::verb::get,
+                           {}, api_key, std::chrono::seconds{180});
    }
 
    uint64_t get_block_number(std::future<uint64_t>& bn_future) {
@@ -308,6 +266,7 @@ public:
    template <typename C>
    std::pair<std::shared_ptr<C>, ethereum_client_ptr> get_contract(const outpost_ethereum_client_plugin& oec_plugin,
                                                                    ethereum_client_ptr client = ethereum_client_ptr{}) const {
+      static const std::regex contract_regex(R"(^(.+?)(?:V\d+)?$)");
       constexpr auto desired_contract_name = C::contract_name;
       const auto clients = oec_plugin.get_clients();
       if(!client) {
@@ -347,7 +306,7 @@ public:
          const auto contract_name = contract_name_var.as<std::string>();
 
          std::smatch matches;
-         if(!std::regex_search(contract_name, matches, regex))
+         if(!std::regex_search(contract_name, matches, contract_regex))
             continue;
 
          if(matches[1].str() != desired_contract_name)
@@ -430,7 +389,6 @@ void beacon_chain_update_plugin::plugin_initialize(const variables_map& options)
          catch (const std::exception& e) {
             elog("Error executing beacon chain update for interval: {}", e.what());
          }
-         return true;
       };
       actions.emplace_back(std::move(action));
       ilog("There are {} actions currently registered.", actions.size());
@@ -485,24 +443,24 @@ void beacon_chain_update_plugin::plugin_initialize(const variables_map& options)
 
             constexpr auto deposit_queue = "deposit_queue";
             const auto deposit_queue_len_sec = beacon_chain_detail::get_queue_length(queues, deposit_queue);
-            const auto default_days = 1;
-            const auto seconds_per_day = 60 * 60 * 24;
-            uint64_t depositQDaysFl = !deposit_queue_len_sec
+            constexpr auto default_days = 1;
+            constexpr auto seconds_per_day = 60 * 60 * 24;
+            uint64_t deposit_q_days_fl = !deposit_queue_len_sec
                ? default_days
                : *deposit_queue_len_sec / seconds_per_day; // convert sec to min, min to hours, hours to days
             if(!deposit_queue_len_sec)
-               wlog("defaulting the {} withdrawal delay to {} day since {} was not a finite number",
-                     deposit_manager::contract_name, depositQDaysFl, deposit_queue,
+               wlog("defaulting the {} withdrawal delay of {} day(s) since {}::{} was not a finite number",
+                     deposit_manager::contract_name, deposit_q_days_fl, deposit_queue,
                      beacon_chain_detail::epa_field);
             else
-               ilog("Queue len = {}, sec_per_day={}, depositQDaysFl={}",
-                    *deposit_queue_len_sec, seconds_per_day, depositQDaysFl);
+               ilog("Queue len = {}, sec_per_day={}, deposit_q_days_fl={}",
+                    *deposit_queue_len_sec, seconds_per_day, deposit_q_days_fl);
 
             ilog("Sending setEntryQueue({} days) transaction to {} contract using address {}",
-                 depositQDaysFl, deposit_manager::contract_name,
+                 deposit_q_days_fl, deposit_manager::contract_name,
                  fc::to_hex(eth_client->get_address(), true));
 
-            auto res2 = dm_contract->setEntryQueue(depositQDaysFl);
+            auto res2 = dm_contract->setEntryQueue(deposit_q_days_fl);
             const auto tx_hash2 = res2.as_string();
             ilog("setEntryQueue tx sent, hash: {}", tx_hash2);
             auto bn2 = eth_client->identify_block_for_transaction(tx_hash2);
@@ -518,10 +476,13 @@ void beacon_chain_update_plugin::plugin_initialize(const variables_map& options)
                     fc::json::to_string(ethstore, fc::time_point::maximum()), avgapr7d_field, deposit_manager::contract_name);
                return;
             }
-            double aprFraction = 1.0;
+            double aprFraction = 0.0;
             if(apy->is_double())
                aprFraction = apy->as_double();
             auto scaled = beacon_chain_detail::apy_fraction_to_bps(aprFraction);
+            ilog("Sending updateApyBPS({} bps) transaction to {} contract using address {}",
+                 scaled, deposit_manager::contract_name,
+                 fc::to_hex(eth_client->get_address(), true));
             auto res3 = dm_contract->updateApyBPS(scaled);
             const auto tx_hash3 = res3.as_string();
             ilog("updateApyBPS tx sent, hash: {}", tx_hash3);
@@ -539,6 +500,9 @@ void beacon_chain_update_plugin::plugin_initialize(const variables_map& options)
       SYS_ASSERT(!!opp_contract, sysio::chain::plugin_config_exception,
                  "Nothing is configured to run in beacon_chain_update_plugin");
    }
+
+   auto res = curl_global_init(CURL_GLOBAL_DEFAULT);
+   SYS_ASSERT(res == CURLE_OK, chain::http_exception, "{}", curl_easy_strerror(res));
 
    ilog("initializing beacon chain plugin DONE");
 }
@@ -574,7 +538,7 @@ void beacon_chain_update_plugin::plugin_startup() {
          }
       },
       cron_service::job_metadata_t{
-         .one_at_a_time = true, .tags = {"ethereum", "gas"}, .label = "cron_1min_heartbeat"
+         .one_at_a_time = true, .tags = {"ethereum", "gas"}, .label = "beacon_chain_startup"
       });
 
    ilog("There are {} schedule currently available.", my->schedules.size());
@@ -604,7 +568,7 @@ void beacon_chain_update_plugin::plugin_startup() {
          }
       },
       cron_service::job_metadata_t{
-         .one_at_a_time = true, .tags = {"ethereum", "gas"}, .label = "cron_1min_heartbeat"
+         .one_at_a_time = true, .tags = {"ethereum", "gas"}, .label = "beacon_chain_update:" + name
       });
    }
 }

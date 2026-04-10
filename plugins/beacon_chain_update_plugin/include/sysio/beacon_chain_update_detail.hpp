@@ -22,6 +22,8 @@ std::optional<uint64_t> get_queue_length(const fc::variant& queues, const std::s
 /// Convert an APY fraction (e.g. 0.05 for 5%) to basis points (e.g. 500).
 /// Uses a small epsilon for floating-point robustness when the result should be a whole number.
 inline uint64_t apy_fraction_to_bps(double apr_fraction) {
+   if (apr_fraction < 0.0)
+      apr_fraction = 0.0;
    return static_cast<uint64_t>(apr_fraction * 10000.0 + 1e-12);
 }
 

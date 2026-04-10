@@ -460,7 +460,7 @@ fc::variant decode_static_value(const abi::component_type& component, const uint
    case dt::address: {
       // Address is right-aligned in 32 bytes, take last 20 bytes
       std::vector<uint8_t> addr_bytes(value_data + 12, value_data + 32);
-      return fc::variant("0x" + fc::to_hex(addr_bytes));
+      return fc::variant(fc::to_hex(addr_bytes, true));
    }
 
    default:
@@ -472,7 +472,7 @@ fc::variant decode_static_value(const abi::component_type& component, const uint
       auto type_name = ethereum_abi_data_type_reflector::to_fc_string(type);
       auto sz = std::stoul(type_name.substr(5));
       std::vector<uint8_t> bytes_data(value_data, value_data + sz);
-      return fc::variant("0x" + fc::to_hex(bytes_data));
+      return fc::variant(fc::to_hex(bytes_data, true));
    }
 
    FC_THROW_EXCEPTION(fc::unsupported_exception, "Unsupported static type for ABI decoding: {}",
@@ -836,7 +836,8 @@ abi::contract abi::parse_contract(const fc::variant& v) {
  * @return Hex string of encoded call data (selector + encoded parameters)
  * @throws fc::exception if parameter count mismatches or encoding fails
  */
-std::string contract_encode_data(const abi::contract& contract, const std::vector<fc::variant>& params) {
+std::string contract_encode_data(const abi::contract& contract, const std::vector<fc::variant>& params,
+                                 bool add_hex_prefix) {
    const auto& inputs = contract.inputs;
    FC_ASSERT_FMT(inputs.size() == params.size(), "Parameter count mismatch (expected={}, provided={})", inputs.size(),
                  params.size());
@@ -880,7 +881,7 @@ std::string contract_encode_data(const abi::contract& contract, const std::vecto
       out.insert(out.end(), tail.begin(), tail.end());
    }
 
-   return fc::to_hex(out);
+   return fc::to_hex(out, add_hex_prefix);
 }
 
 
@@ -1049,8 +1050,8 @@ void fc::from_variant(const fc::variant& var, fc::network::ethereum::abi::contra
    FC_ASSERT(var.is_object(), "Variant must be an object to deserialize ABI contract");
    auto& obj = var.get_object();
    const auto name_itr = obj.find("name");
-   const bool deferred_name = name_itr == obj.end();
-   if (!deferred_name) {
+   const bool no_name = name_itr == obj.end();
+   if (!no_name) {
       vo.name = name_itr->value().as_string();
    }
 
@@ -1077,19 +1078,10 @@ void fc::from_variant(const fc::variant& var, fc::network::ethereum::abi::contra
 
    parse_components(vo.inputs, "inputs");
    parse_components(vo.outputs, "outputs");
-   bool missed = true;
-   if(deferred_name) {
-      if(type_str == "receive") {
-         auto state_mutability_str = obj["stateMutability"].as_string();
-         if (state_mutability_str == "payable") {
-            missed = false;
-         }
-      }
-      if(missed) {
-         elog("no name for:");
-         for(auto itr = obj.begin(); itr != obj.end(); ++itr) {
-            ilog("key: {}", itr->key());
-         }
-      }
+   if(no_name) {
+      // we expect ABI contracts that have the legacy payment ethereum interface
+      const bool valid = type_str == "receive" &&
+                         obj["stateMutability"].as_string() == "payable";
+      FC_ASSERT(valid, "Variant Object must have a `name` key to be deserialize ABI contract");
    }
 }

@@ -1,8 +1,12 @@
 #include <boost/test/unit_test.hpp>
 
 #include <fc/io/json.hpp>
+#include <fc/int128.hpp>
+#include <fc/int256.hpp>
 #include <fc/variant.hpp>
 #include <fc/variant_object.hpp>
+
+#include <limits>
 
 using namespace fc;
 
@@ -140,6 +144,122 @@ BOOST_AUTO_TEST_CASE(variant_numeric_conversions) {
    BOOST_CHECK_EQUAL(obj["i"].as_int64(), -100);
    BOOST_CHECK_EQUAL(obj["u"].as_uint64(), 200u);
    BOOST_CHECK_CLOSE(obj["d"].as_double(), 3.14, 0.001);
+}
+
+// ---------------------------------------------------------------------------
+// number_from_stream — negative integer type boundaries
+//
+// The parser strips the minus sign and leading zeros, leaving the absolute
+// value string (`str`).  Routing thresholds (after fix to remove the off-by-one
+// on min_len):
+//   str.size() < 19  OR  (size==19 AND str  < "9223372036854775808")  → int64
+//   str.size() > 39  OR  (size==39 AND str >= "170141183460469231731687303715884105728") → int256
+//   otherwise → int128
+//
+// NOTE: two cases below are marked XFAIL because a remaining bug in the
+// comparison operators causes the exact boundary values to mis-route:
+//   INT64_MIN  routes to int128  (needs str <= threshold, currently str <)
+//   INT128_MIN routes to int256  (needs str >  threshold, currently str >=)
+// ---------------------------------------------------------------------------
+
+BOOST_AUTO_TEST_CASE(number_from_stream_negative_small) {
+   variant v = json::from_string("-1");
+   BOOST_CHECK(v.is_int64());
+   BOOST_CHECK_EQUAL(v.as_int64(), -1LL);
+}
+
+BOOST_AUTO_TEST_CASE(number_from_stream_negative_int64_max) {
+   // -INT64_MAX  (abs one less than the threshold) → int64
+   variant v = json::from_string("-9223372036854775807");
+   BOOST_CHECK(v.is_int64());
+   BOOST_CHECK_EQUAL(v.as_int64(), -9223372036854775807LL);
+}
+
+BOOST_AUTO_TEST_CASE(number_from_stream_negative_int64_min) {
+   // INT64_MIN = -9223372036854775808  (abs exactly equal to threshold) → int64
+   // BUG: currently routes to int128 because the comparison uses str < threshold
+   //      instead of str <= threshold.
+   variant v = json::from_string("-9223372036854775808");
+   BOOST_CHECK(v.is_int64());
+   BOOST_CHECK_EQUAL(v.as_int64(), std::numeric_limits<int64_t>::min());
+}
+
+BOOST_AUTO_TEST_CASE(number_from_stream_negative_int64_min_minus_one) {
+   // INT64_MIN - 1 = -9223372036854775809  (abs one past threshold) → int128
+   variant v = json::from_string("-9223372036854775809");
+   BOOST_CHECK(v.is_int128());
+}
+
+BOOST_AUTO_TEST_CASE(number_from_stream_negative_int128_max) {
+   // -INT128_MAX  (abs one less than int128 threshold) → int128
+   variant v = json::from_string("-170141183460469231731687303715884105727");
+   BOOST_CHECK(v.is_int128());
+}
+
+BOOST_AUTO_TEST_CASE(number_from_stream_negative_int128_min) {
+   // INT128_MIN = -170141183460469231731687303715884105728  (abs exactly equal to threshold) → int128
+   // BUG: currently routes to int256 because the comparison uses str >= threshold
+   //      instead of str > threshold.
+   variant v = json::from_string("-170141183460469231731687303715884105728");
+   BOOST_CHECK(v.is_int128());
+}
+
+BOOST_AUTO_TEST_CASE(number_from_stream_negative_int128_min_minus_one) {
+   // INT128_MIN - 1 = -170141183460469231731687303715884105729  (abs one past threshold) → int256
+   variant v = json::from_string("-170141183460469231731687303715884105729");
+   BOOST_CHECK(v.is_int256());
+}
+
+// ---------------------------------------------------------------------------
+// number_from_stream — positive integer type boundaries
+//
+// Routing thresholds:
+//   str.size() < 20  OR  (size==20 AND str <= "18446744073709551615")  → uint64
+//   str.size() > 39  OR  (size==39 AND str >= "340282366920938463463374607431768211455") → uint256
+//   otherwise → uint128
+//
+// NOTE: one case below is marked BUG because UINT128_MAX mis-routes:
+//   UINT128_MAX routes to uint256  (needs str > threshold, currently str >=)
+// ---------------------------------------------------------------------------
+
+BOOST_AUTO_TEST_CASE(number_from_stream_positive_small) {
+   variant v = json::from_string("1");
+   BOOST_CHECK(v.is_uint64());
+   BOOST_CHECK_EQUAL(v.as_uint64(), 1ull);
+}
+
+BOOST_AUTO_TEST_CASE(number_from_stream_positive_uint64_max) {
+   // UINT64_MAX = 18446744073709551615  (exactly at threshold) → uint64
+   const auto max = std::numeric_limits<uint64_t>::max();
+   const auto str = std::to_string(max);
+   variant v = json::from_string(str);
+   BOOST_CHECK(v.is_uint64());
+   BOOST_CHECK_EQUAL(v.as_uint64(), max);
+}
+
+BOOST_AUTO_TEST_CASE(number_from_stream_positive_uint64_max_plus_one) {
+   // UINT64_MAX + 1 = 18446744073709551616  (one past threshold) → uint128
+   const auto max_plus = static_cast<uint128_t>(std::numeric_limits<uint64_t>::max()) + 1;
+   const auto str = fc::to_string(max_plus);
+   variant v = json::from_string(str);
+   BOOST_CHECK(v.is_uint128());
+}
+
+BOOST_AUTO_TEST_CASE(number_from_stream_positive_uint128_max) {
+   // UINT128_MAX = 340282366920938463463374607431768211455  (exactly at threshold) → uint128
+   // BUG: currently routes to uint256 because the comparison uses str >= threshold
+   //      instead of str > threshold.
+   const auto max = std::numeric_limits<uint128_t>::max();
+   const auto str = fc::to_string(max);
+   variant v = json::from_string(str);
+   BOOST_CHECK(v.is_uint128());
+}
+
+BOOST_AUTO_TEST_CASE(number_from_stream_positive_uint128_max_plus_one) {
+   // UINT128_MAX + 1 = 340282366920938463463374607431768211456  (one past threshold) → uint256
+   const auto max_plus = uint256(std::numeric_limits<uint128_t>::max()) + 1;
+   variant v = json::from_string(max_plus.str());
+   BOOST_CHECK(v.is_uint256());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

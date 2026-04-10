@@ -10,6 +10,9 @@
 #include <fc/network/ethereum/ethereum_rlp_encoder.hpp>
 #include <iostream>
 
+namespace {
+   constexpr auto hex_prefix = "0x";
+}
 namespace fc::network::ethereum {
 
 namespace {
@@ -86,7 +89,8 @@ fc::variant ethereum_client::execute(const std::string& method, const fc::varian
 fc::variant ethereum_client::execute_contract_view_fn(const address& contract_address, const abi::contract& abi,
                                                       const std::string& block_tag,
                                                       const contract_invoke_data_items& params) {
-   auto abi_call_encoded = "0x" + contract_encode_data(abi, params);
+   const bool add_hex_prefix = true;
+   auto abi_call_encoded = contract_encode_data(abi, params, add_hex_prefix);
    auto to_data_mvo = fc::mutable_variant_object("to", to_hex(contract_address, true))("data", abi_call_encoded);
    fc::variants rpc_params = {to_data_mvo, fc::variant(block_tag)};
    return execute("eth_call", rpc_params);
@@ -250,8 +254,8 @@ std::string to_data_from_params(const abi::contract& contract, const data_or_par
       data = std::get<std::string>(params);
    }
 
-   if (add_prefix && !data.starts_with("0x")) {
-      data = "0x" + data;
+   if (add_prefix && !data.starts_with(hex_prefix)) {
+      data = hex_prefix + data;
    }
    return data;
 }
@@ -414,9 +418,9 @@ fc::uint256 ethereum_client::estimate_gas(const address_compat_type& to, const a
    std::string data = to_data_from_params(contract, data_or_params);;
    if (std::holds_alternative<fc::variants>(data_or_params)) {
       auto& params = std::get<fc::variants>(data_or_params);
-      data = "0x" + contract_encode_data(contract, params);
+      data = contract_encode_data(contract, params, true);
    } else {
-      data = "0x" + std::get<std::string>(data_or_params);
+      data = hex_prefix + std::get<std::string>(data_or_params);
    }
 
    tx("from", to_hex(get_address(), true))

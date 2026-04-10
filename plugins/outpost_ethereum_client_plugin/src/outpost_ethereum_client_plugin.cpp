@@ -73,7 +73,7 @@ void outpost_ethereum_client_plugin::plugin_initialize(const variables_map& opti
       auto& id           = parts[0];
       auto& url          = parts[2];
       auto& sig_id       = parts[1];
-      fc::uint256 chain_id;
+      std::optional<fc::uint256> chain_id;
       fc::ostring chain_id_str;
       if (parts.size() == 4) {
          chain_id_str = parts[3];
@@ -93,7 +93,7 @@ void outpost_ethereum_client_plugin::plugin_initialize(const variables_map& opti
                            chain_id)));
 
       ilog("Added ethereum client (id={},sig_id={},chainId={},url={})",
-           id,sig_id,url,chain_id_str.value_or("none"));
+           id,sig_id,chain_id_str.value_or("none"),url);
    }
 }
 

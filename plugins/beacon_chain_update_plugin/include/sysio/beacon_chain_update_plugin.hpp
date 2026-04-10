@@ -6,7 +6,7 @@ namespace sysio {
 
 class beacon_chain_update_plugin : public appbase::plugin<beacon_chain_update_plugin> {
 public:
-   APPBASE_PLUGIN_REQUIRES((outpost_ethereum_client_plugin)(signature_provider_manager_plugin))
+   APPBASE_PLUGIN_REQUIRES((outpost_ethereum_client_plugin)(signature_provider_manager_plugin)(cron_plugin))
    beacon_chain_update_plugin();
    virtual ~beacon_chain_update_plugin() = default;
 
