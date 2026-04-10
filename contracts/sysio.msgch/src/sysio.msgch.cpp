@@ -147,7 +147,14 @@ void msgch::evalcons(uint64_t outpost_id, uint32_t epoch_index) {
    auto  now_sec = static_cast<uint64_t>(now.sec_since_epoch());
    uint32_t epoch = current_epoch_index();
 
-   // Store as inbound message
+   // Decode protobuf Envelope from the consensus data
+   opp::Envelope envelope;
+   auto [in_data, in] = zpp::bits::data_in<char>();
+   in_data.assign(raw.begin(), raw.end());
+   auto decode_result = in(envelope);
+   check(decode_result == zpp::bits::errc{}, "failed to decode inbound OPP Envelope");
+
+   // Store the raw envelope as an inbound message
    messages_t msgs(get_self(), get_self().value);
    msgs.emplace(get_self(), [&](auto& m) {
       m.id            = msgs.available_primary_key();
@@ -160,23 +167,23 @@ void msgch::evalcons(uint64_t outpost_id, uint32_t epoch_index) {
       m.processed_at  = now;
    });
 
-   // Store as attestation
+   // Extract individual AttestationEntries from each Message in the Envelope
    attestations_t atts(get_self(), get_self().value);
-   uint64_t att_id = atts.available_primary_key();
-   atts.emplace(get_self(), [&](auto& a) {
-      a.id                  = att_id;
-      a.outpost_id          = outpost_id;
-      a.epoch_index         = epoch;
-      a.type                = AttestationType::ATTESTATION_TYPE_UNSPECIFIED;
-      a.status              = AttestationStatus::ATTESTATION_STATUS_READY;
-      a.data                = raw;
-      a.pending_timestamp   = 0;
-      a.ready_timestamp     = now_sec;
-      a.processed_timestamp = 0;
-   });
-
-   // If the attestation type requires underwriting, create uwreq
-   // (deferred — needs per-AttestationEntry parsing first)
+   for (auto& msg : envelope.messages) {
+      for (auto& entry : msg.payload.attestations) {
+         atts.emplace(get_self(), [&](auto& a) {
+            a.id                  = atts.available_primary_key();
+            a.outpost_id          = outpost_id;
+            a.epoch_index         = epoch;
+            a.type                = entry.type;
+            a.status              = AttestationStatus::ATTESTATION_STATUS_READY;
+            a.data                = entry.data;
+            a.pending_timestamp   = 0;
+            a.ready_timestamp     = now_sec;
+            a.processed_timestamp = 0;
+         });
+      }
+   }
 }
 
 // ---------------------------------------------------------------------------

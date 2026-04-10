@@ -23,33 +23,15 @@ namespace sysio {
                      uint32_t operators_per_epoch,
                      uint32_t batch_operator_minimum_active,
                      uint32_t batch_op_groups,
-                     uint32_t warmup_epochs,
-                     uint32_t cooldown_epochs,
                      uint32_t attestation_retention_epoch_count);
-
-      /// Register operator (processes OperatorAction attestation).
-      [[sysio::action]]
-      void regoperator(name account, opp::types::OperatorType type);
-
-      /// Begin operator deregistration (cooldown).
-      [[sysio::action]]
-      void unregoper(name account);
 
       /// Advance epoch if duration elapsed (permissionless crank).
       [[sysio::action]]
       void advance();
 
-      /// Force-activate an operator (privileged, for bootstrap).
-      [[sysio::action]]
-      void activateop(name account);
-
-      /// One-time group assignment when all batch operators are active.
+      /// Group assignment — reads AVAILABLE batch ops from sysio.opreg.
       [[sysio::action]]
       void initgroups();
-
-      /// Replace operator in-place within their group.
-      [[sysio::action]]
-      void replaceop(name old_op, name new_op);
 
       /// Register an outpost chain.
       [[sysio::action]]
@@ -73,14 +55,12 @@ namespace sysio {
          uint32_t    operators_per_epoch = 7;
          uint32_t    batch_operator_minimum_active = 21;
          uint32_t    batch_op_groups = 3;          // rotation groups (21 / 7)
-         uint32_t    warmup_epochs = 1;
-         uint32_t    cooldown_epochs = 1;
          uint32_t    attestation_retention_epoch_count = 1000;
 
          SYSLIB_SERIALIZE(epoch_config,
             (epoch_duration_sec)(operators_per_epoch)
             (batch_operator_minimum_active)(batch_op_groups)
-            (warmup_epochs)(cooldown_epochs)(attestation_retention_epoch_count))
+            (attestation_retention_epoch_count))
       };
 
       using epochcfg_t = sysio::singleton<"epochcfg"_n, epoch_config>;
@@ -102,29 +82,6 @@ namespace sysio {
 
       using epochstate_t = sysio::singleton<"epochstate"_n, epoch_state>;
 
-      /// Operator roster table.
-      struct [[sysio::table, sysio::contract("sysio.epoch")]] operator_info {
-         name                              account;
-         sysio::opp::types::OperatorType   type;
-         sysio::opp::types::OperatorStatus status;
-         uint32_t    registered_epoch;
-         std::vector<std::pair<sysio::opp::types::ChainKind, checksum256>> chain_addresses;
-         std::vector<std::pair<sysio::opp::types::ChainKind, int64_t>>   collateral;
-         uint8_t     assigned_batch_op_group; // 0, 1, or 2
-         uint32_t    last_elected_epoch;
-         uint32_t    slash_count = 0;
-         bool        is_blacklisted = false;
-
-         uint64_t primary_key() const { return account.value; }
-         uint64_t by_type() const { return static_cast<uint64_t>(type); }
-         uint64_t by_status() const { return static_cast<uint64_t>(status); }
-      };
-
-      using operators_t = multi_index<"operators"_n, operator_info,
-         indexed_by<"bytype"_n, const_mem_fun<operator_info, uint64_t, &operator_info::by_type>>,
-         indexed_by<"bystatus"_n, const_mem_fun<operator_info, uint64_t, &operator_info::by_status>>
-      >;
-
       /// Outpost registry table.
       struct [[sysio::table, sysio::contract("sysio.epoch")]] outpost_info {
          uint64_t    id;
@@ -144,10 +101,13 @@ namespace sysio {
       using outposts_t = multi_index<"outposts"_n, outpost_info,
          indexed_by<"bychain"_n, const_mem_fun<outpost_info, uint64_t, &outpost_info::by_chain>>
       >;
+
       // Well-known accounts
       static constexpr name CHALG_ACCOUNT = "sysio.chalg"_n;
       static constexpr name MSGCH_ACCOUNT = "sysio.msgch"_n;
       static constexpr name EPOCH_ACCOUNT = "sysio.epoch"_n;
+      static constexpr name OPREG_ACCOUNT = "sysio.opreg"_n;
+
    private:
 
       // Namespace alias for OPP protobuf enum types
