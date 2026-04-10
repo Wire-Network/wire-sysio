@@ -99,6 +99,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/plugin_http_api_test.py ${CMAKE_CURRE
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/plugin_http_api_test_savanna.py ${CMAKE_CURRENT_BINARY_DIR}/plugin_http_api_test_savanna.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/nodeop_contrl_c_test.py ${CMAKE_CURRENT_BINARY_DIR}/nodeop_contrl_c_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/read_only_trx_test.py ${CMAKE_CURRENT_BINARY_DIR}/read_only_trx_test.py COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/multisig_review_test.py ${CMAKE_CURRENT_BINARY_DIR}/multisig_review_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/interrupt_read_only_trx_test.py ${CMAKE_CURRENT_BINARY_DIR}/interrupt_read_only_trx_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/resource_monitor_plugin_test.py ${CMAKE_CURRENT_BINARY_DIR}/resource_monitor_plugin_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/light_validation_sync_test.py ${CMAKE_CURRENT_BINARY_DIR}/light_validation_sync_test.py COPYONLY)
@@ -178,6 +179,7 @@ add_np_test(NAME interrupt-read-only-trx-parallel-test COMMAND tests/interrupt_r
 add_np_test(NAME interrupt-read-only-trx-parallel-if-sys-vm-oc-test COMMAND tests/interrupt_read_only_trx_test.py -p 2 -n 3 --sys-vm-oc-enable all --read-only-threads 16 ${UNSHARE})
 add_np_test(NAME subjective_billing_test COMMAND tests/subjective_billing_test.py -v -p 2 -n 4 ${UNSHARE})
 add_np_test(NAME get_account_test COMMAND tests/get_account_test.py -v -p 2 -n 3 ${UNSHARE})
+add_np_test(NAME multisig_review_test COMMAND tests/multisig_review_test.py -v -p 1 -n 1 ${UNSHARE})
 add_np_test(NAME pause_at_block_test COMMAND tests/pause_at_block_test.py -v ${UNSHARE})
 
 add_np_test(NAME distributed-transactions-test COMMAND tests/distributed-transactions-test.py -d 2 -p 4 -n 6 -v ${UNSHARE})

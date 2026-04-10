@@ -871,4 +871,241 @@ BOOST_FIXTURE_TEST_CASE( sendinline, sysio_msig_tester ) try {
 
 } FC_LOG_AND_RETHROW()
 
+
+// ---------------------------------------------------------------------------
+// Chunked-storage tests for sysio.msig
+//
+// These exercise the path where a proposal's serialized inner transaction
+// exceeds the per-row KV value limit (default 256 KiB) and the contract
+// internally splits it across rows of the `propchunks` table. The chunk
+// threshold inside the contract is `proposal_chunk_size = 200 * 1024`, so
+// every test below builds an inner trx larger than that.
+//
+// We construct the large trx by stacking two `setcode` actions whose `code`
+// field carries the full sysio.system wasm (~134 KiB). Two of those puts the
+// serialized inner trx well above 200 KiB, while keeping each individual
+// dispatched action under `max_inline_action_size` so `exec` succeeds.
+// ---------------------------------------------------------------------------
+
+namespace {
+   // Build an inner transaction whose serialized form is larger than the contract's
+   // chunk threshold. Two setcode actions to two different accounts, each carrying
+   // the full sysio.system wasm. Total ≈ 270 KiB, which forces chunking.
+   transaction build_chunking_trx(const vector<permission_level>& perm,
+                                  sysio_msig_tester& t)
+   {
+      auto wasm = contracts::system_wasm();
+
+      auto make_setcode = [&](const char* account_name) {
+         return fc::mutable_variant_object()
+            ("account", name(config::system_account_name))
+            ("name",    "setcode")
+            ("authorization", perm)
+            ("data", fc::mutable_variant_object()
+               ("account",   account_name)
+               ("vmtype",    0)
+               ("vmversion", 0)
+               ("code",      bytes( wasm.begin(), wasm.end() )));
+      };
+
+      fc::variant pretty_trx = fc::mutable_variant_object()
+         ("expiration", "2025-01-01T00:30")
+         ("ref_block_num", 2)
+         ("ref_block_prefix", 3)
+         ("max_net_usage_words", 0)
+         ("max_cpu_usage_ms", 0)
+         ("delay_sec", 0)
+         ("actions", fc::variants({ make_setcode("alice"), make_setcode("bob") }));
+
+      transaction trx;
+      abi_serializer::from_variant(pretty_trx, trx, t.get_resolver(),
+                                   abi_serializer::create_yield_function(base_tester::abi_serializer_max_time));
+      return trx;
+   }
+}
+
+// End-to-end: propose a >200 KiB inner trx, approve from both signers (one of
+// them with the optional `proposal_hash` arg), then exec. This implicitly
+// tests three load-bearing paths in one: (1) propose chunks the blob, (2)
+// approve verifies the precomputed `trx_hash` for a chunked proposal — there
+// is no inline `packed_transaction` to re-hash from, so this is the only path
+// where the stored hash is load-bearing, (3) exec reassembles the chunks
+// before parsing and dispatching the inline actions.
+BOOST_FIXTURE_TEST_CASE( big_transaction_chunked, sysio_msig_tester ) try {
+   vector<permission_level> perm = { { "alice"_n, config::active_name },
+                                     { "bob"_n,   config::active_name } };
+   transaction trx = build_chunking_trx(perm, *this);
+   const auto trx_hash     = fc::sha256::hash( trx );
+   const auto not_trx_hash = fc::sha256::hash( trx_hash );
+
+   push_action( "alice"_n, "propose"_n, mvo()
+                  ("proposer",      "alice")
+                  ("proposal_name", "chunkprop")
+                  ("trx",           trx)
+                  ("requested",     perm)
+   );
+
+   // Wrong hash must be rejected against the contract's stored `trx_hash` —
+   // exercises the chunked-path branch in approve.
+   BOOST_REQUIRE_EXCEPTION( push_action( "alice"_n, "approve"_n, mvo()
+                                          ("proposer",      "alice")
+                                          ("proposal_name", "chunkprop")
+                                          ("level",         permission_level{ "alice"_n, config::active_name })
+                                          ("proposal_hash", not_trx_hash)
+                            ),
+                            sysio_assert_message_exception,
+                            sysio_assert_message_is("hash provided does not match stored proposal trx_hash")
+   );
+
+   // Correct hash must succeed — proves the precomputed trx_hash is being
+   // stored on the proposal row and read back equal to fc::sha256::hash(trx).
+   push_action( "alice"_n, "approve"_n, mvo()
+                  ("proposer",      "alice")
+                  ("proposal_name", "chunkprop")
+                  ("level",         permission_level{ "alice"_n, config::active_name })
+                  ("proposal_hash", trx_hash)
+   );
+   push_action( "bob"_n, "approve"_n, mvo()
+                  ("proposer",      "alice")
+                  ("proposal_name", "chunkprop")
+                  ("level",         permission_level{ "bob"_n,   config::active_name })
+   );
+
+   transaction_trace_ptr trace = push_action( "alice"_n, "exec"_n, mvo()
+                                               ("proposer",      "alice")
+                                               ("proposal_name", "chunkprop")
+                                               ("executer",      "alice")
+   );
+
+   // exec must dispatch both setcode actions in order — proves the contract
+   // assembled the chunks back into a single buffer before parsing.
+   check_traces( trace, {
+                        {{"receiver", "sysio.msig"_n},                  {"act_name", "exec"_n}},
+                        {{"receiver", config::system_account_name},     {"act_name", "setcode"_n}},
+                        {{"receiver", config::system_account_name},     {"act_name", "setcode"_n}}
+                        } );
+} FC_LOG_AND_RETHROW()
+
+// Verifies the read-only `getproposal` action: it must reassemble the chunked
+// blob and return a `proposal` struct whose `packed_transaction` byte-equals
+// the original serialized inner trx the user passed to `propose`. The trace's
+// `action_traces[0].return_value` is the packed `proposal` struct returned by
+// the action; we ABI-decode it via the cached msig abi_serializer and pull
+// out the `packed_transaction` field for the byte-level equality check.
+BOOST_FIXTURE_TEST_CASE( getproposal_read_only_returns_assembled, sysio_msig_tester ) try {
+   vector<permission_level> perm = { { "alice"_n, config::active_name },
+                                     { "bob"_n,   config::active_name } };
+   transaction trx = build_chunking_trx(perm, *this);
+   const bytes original_packed = fc::raw::pack(trx);
+
+   push_action( "alice"_n, "propose"_n, mvo()
+                  ("proposer",      "alice")
+                  ("proposal_name", "chunkprop")
+                  ("trx",           trx)
+                  ("requested",     perm)
+   );
+
+   // Build and push a read-only transaction that calls sysio.msig::getproposal.
+   action getproposal_act;
+   getproposal_act.account = "sysio.msig"_n;
+   getproposal_act.name    = "getproposal"_n;
+   getproposal_act.authorization = {};
+   getproposal_act.data = abi_ser.variant_to_binary(
+      "get_proposal",
+      mvo()("proposer", "alice")("proposal_name", "chunkprop"),
+      abi_serializer::create_yield_function(abi_serializer_max_time));
+
+   signed_transaction ro_trx;
+   ro_trx.actions.push_back(getproposal_act);
+   set_transaction_headers(ro_trx);
+   auto trace = push_transaction( ro_trx, fc::time_point::maximum(),
+                                  DEFAULT_BILLED_CPU_TIME_US, false,
+                                  transaction_metadata::trx_type::read_only );
+
+   BOOST_REQUIRE( bool(trace) );
+   BOOST_REQUIRE_EQUAL( trace->action_traces.size(), 1u );
+   const auto& return_value = trace->action_traces[0].return_value;
+   BOOST_REQUIRE( !return_value.empty() );
+
+   // Decode the action_results entry "proposal" and pull out packed_transaction.
+   fc::variant decoded = abi_ser.binary_to_variant(
+      "proposal", return_value,
+      abi_serializer::create_yield_function(abi_serializer_max_time));
+
+   const auto& obj = decoded.get_object();
+   const auto& packed_var = obj["packed_transaction"];
+   const bytes returned_packed = packed_var.as<bytes>();
+
+   // The reassembled blob must byte-equal what we originally passed to propose.
+   BOOST_REQUIRE_EQUAL( returned_packed.size(), original_packed.size() );
+   BOOST_REQUIRE( std::equal(returned_packed.begin(), returned_packed.end(), original_packed.begin()) );
+
+   // chunk_count should be > 0 since the proposal exceeded the threshold.
+   const uint32_t chunk_count = obj["chunk_count"].as<uint32_t>();
+   BOOST_REQUIRE_GT( chunk_count, 0u );
+
+   // total_size should match the original blob length.
+   const uint32_t total_size = obj["total_size"].as<uint32_t>();
+   BOOST_REQUIRE_EQUAL( total_size, original_packed.size() );
+} FC_LOG_AND_RETHROW()
+
+// Cancel must erase every `propchunks` row associated with the proposal so
+// the proposer is not billed for orphaned RAM and the same proposal_name can
+// be reused. We verify by re-proposing under the same name after cancel: this
+// would fail with "proposal with the same name exists" if the parent row was
+// not removed, and would silently leave dead chunks if the chunk-cleanup were
+// missing — exec on the second proposal would then read stale chunk data.
+BOOST_FIXTURE_TEST_CASE( cancel_chunked_proposal_cleans_chunks, sysio_msig_tester ) try {
+   vector<permission_level> perm = { { "alice"_n, config::active_name },
+                                     { "bob"_n,   config::active_name } };
+   transaction trx = build_chunking_trx(perm, *this);
+
+   push_action( "alice"_n, "propose"_n, mvo()
+                  ("proposer",      "alice")
+                  ("proposal_name", "chunkprop")
+                  ("trx",           trx)
+                  ("requested",     perm)
+   );
+
+   // Proposer can cancel their own proposal at any time without waiting for expiration.
+   push_action( "alice"_n, "cancel"_n, mvo()
+                  ("proposer",      "alice")
+                  ("proposal_name", "chunkprop")
+                  ("canceler",      "alice")
+   );
+
+   // Re-propose under the same name. Succeeds only if the parent proposal row
+   // and all of its chunk rows were erased by cancel.
+   push_action( "alice"_n, "propose"_n, mvo()
+                  ("proposer",      "alice")
+                  ("proposal_name", "chunkprop")
+                  ("trx",           trx)
+                  ("requested",     perm)
+   );
+
+   // And the new proposal must be exec-able end-to-end with no contamination
+   // from the prior chunks. If chunk cleanup left orphans, the chunktable.emplace
+   // calls inside the second propose would have asserted "key already exists".
+   push_action( "alice"_n, "approve"_n, mvo()
+                  ("proposer",      "alice")
+                  ("proposal_name", "chunkprop")
+                  ("level",         permission_level{ "alice"_n, config::active_name })
+   );
+   push_action( "bob"_n, "approve"_n, mvo()
+                  ("proposer",      "alice")
+                  ("proposal_name", "chunkprop")
+                  ("level",         permission_level{ "bob"_n,   config::active_name })
+   );
+   transaction_trace_ptr trace = push_action( "alice"_n, "exec"_n, mvo()
+                                               ("proposer",      "alice")
+                                               ("proposal_name", "chunkprop")
+                                               ("executer",      "alice")
+   );
+   check_traces( trace, {
+                        {{"receiver", "sysio.msig"_n},                  {"act_name", "exec"_n}},
+                        {{"receiver", config::system_account_name},     {"act_name", "setcode"_n}},
+                        {{"receiver", config::system_account_name},     {"act_name", "setcode"_n}}
+                        } );
+} FC_LOG_AND_RETHROW()
+
 BOOST_AUTO_TEST_SUITE_END()
