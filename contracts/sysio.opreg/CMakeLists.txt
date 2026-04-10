@@ -1,4 +1,4 @@
-set(contract_name sysio.epoch)
+set(contract_name sysio.opreg)
 bootstrap_contract(${contract_name})
 
 if(BUILD_SYSTEM_CONTRACTS)
@@ -14,7 +14,7 @@ if(BUILD_SYSTEM_CONTRACTS)
                 TARGET ${contract_name}_native
                 SOURCES ${SOURCES}
                 INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include
-                CONTRACT_CLASS "sysio::epoch"
+                CONTRACT_CLASS "sysio::opreg"
                 HEADERS ${HEADERS}
                 ABI_FILE ${CMAKE_BINARY_DIR}/contracts/${contract_name}/${contract_name}.abi
         )
@@ -31,9 +31,10 @@ if(BUILD_SYSTEM_CONTRACTS)
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/../../libraries/opp/generated-cdt>
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/libfc-lite/include>
-                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.system/include>
-                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.opreg/include>
+                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.epoch/include>
+                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.authex/include>
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.opp.common/include>
+                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.system/include>
         )
 
         target_link_libraries(${target}

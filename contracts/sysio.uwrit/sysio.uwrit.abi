@@ -538,6 +538,22 @@
                 {
                     "name": "ATTESTATION_TYPE_BATCH_OPERATOR_NEXT_GROUP",
                     "value": 60943
+                },
+                {
+                    "name": "ATTESTATION_TYPE_NODE_OWNER_REG",
+                    "value": 60949
+                },
+                {
+                    "name": "ATTESTATION_TYPE_STAKING_REWARD",
+                    "value": 60950
+                },
+                {
+                    "name": "ATTESTATION_TYPE_STAKE_RESULT",
+                    "value": 60951
+                },
+                {
+                    "name": "ATTESTATION_TYPE_ATTESTATION_PROCESSING_ERROR",
+                    "value": 60952
                 }
             ]
         },
