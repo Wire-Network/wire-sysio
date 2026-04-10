@@ -1583,6 +1583,20 @@ const chain::table_def& get_kv_table_def( const abi_def& abi, const string& tabl
    SYS_ASSERT( false, chain::contract_table_query_exception, "Table {} is not specified in the ABI", table_name );
 }
 
+/// Strip the first \p count fields from a decoded key variant object.
+/// Used to remove the scope prefix from keys returned to the client.
+fc::variant strip_scope_fields(fc::variant&& full_key, size_t count) {
+   if (count == 0) return std::move(full_key);
+   auto& key_obj = full_key.get_object();
+   fc::mutable_variant_object stripped;
+   size_t idx = 0;
+   for (auto it = key_obj.begin(); it != key_obj.end(); ++it, ++idx) {
+      if (idx >= count)
+         stripped(it->key(), it->value());
+   }
+   return fc::variant(std::move(stripped));
+}
+
 read_only::get_table_rows_return_t
 read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::time_point& deadline ) const {
    abi_def abi = sysio::chain_apis::get_abi( db, p.code );
@@ -1894,19 +1908,7 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
                try {
                   auto full_key = chain::be_key_codec::decode_key(
                      row.key.data(), row.key.size(), key_names, key_types);
-                  // Strip scope prefix from key if scoped
-                  if (scope_key_count > 0) {
-                     auto& key_obj = full_key.get_object();
-                     fc::mutable_variant_object stripped;
-                     size_t idx = 0;
-                     for (auto it = key_obj.begin(); it != key_obj.end(); ++it, ++idx) {
-                        if (idx >= scope_key_count)
-                           stripped(it->key(), it->value());
-                     }
-                     obj["key"] = fc::variant(std::move(stripped));
-                  } else {
-                     obj["key"] = std::move(full_key);
-                  }
+                  obj["key"] = strip_scope_fields(std::move(full_key), scope_key_count);
                } catch (...) {
                   obj["key"] = fc::to_hex(row.key.data(), row.key.size());
                }
@@ -1939,20 +1941,8 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
       if (p.json) {
          try {
             auto full_key = chain::be_key_codec::decode_key(kv.data(), kv.size(), key_names, key_types);
-            // Strip scope prefix from next_key
-            if (scope_key_count > 0) {
-               auto& key_obj = full_key.get_object();
-               fc::mutable_variant_object stripped;
-               size_t idx = 0;
-               for (auto it = key_obj.begin(); it != key_obj.end(); ++it, ++idx) {
-                  if (idx >= scope_key_count)
-                     stripped(it->key(), it->value());
-               }
-               hp.next_key = fc::json::to_string(fc::variant(std::move(stripped)),
-                                                  fc::time_point::maximum());
-            } else {
-               hp.next_key = fc::json::to_string(full_key, fc::time_point::maximum());
-            }
+            auto stripped = strip_scope_fields(std::move(full_key), scope_key_count);
+            hp.next_key = fc::json::to_string(stripped, fc::time_point::maximum());
          } catch (...) {
             hp.next_key = fc::to_hex(kv.data(), static_cast<uint32_t>(kv.size()));
          }
@@ -2076,19 +2066,7 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
             try {
                auto full_key = chain::be_key_codec::decode_key(
                   row.key.data(), row.key.size(), key_names, key_types);
-               // Strip scope prefix from key if scoped
-               if (scope_key_count > 0) {
-                  auto& key_obj = full_key.get_object();
-                  fc::mutable_variant_object stripped;
-                  size_t idx = 0;
-                  for (auto it = key_obj.begin(); it != key_obj.end(); ++it, ++idx) {
-                     if (idx >= scope_key_count)
-                        stripped(it->key(), it->value());
-                  }
-                  obj("key", fc::variant(std::move(stripped)));
-               } else {
-                  obj("key", std::move(full_key));
-               }
+               obj("key", strip_scope_fields(std::move(full_key), scope_key_count));
             } catch (...) {
                obj("key", fc::to_hex(row.key.data(), static_cast<uint32_t>(row.key.size())));
             }
