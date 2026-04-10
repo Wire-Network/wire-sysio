@@ -1813,11 +1813,23 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
       const auto& sec_idx = d.get_index<chain::kv_index_index, chain::by_code_table_id_seckey>();
       const auto& pri_idx = d.get_index<chain::kv_index, chain::by_code_key>();
 
+      // For scoped tables (multi_index, kv_multi_index, kv::scoped_table), the
+      // contract stores pri_key as the in-scope portion only — the chain's
+      // primary index keys these rows under [scope:8B BE][pri_key]. To look up
+      // the primary row we must prepend the scope prefix; we also store the
+      // full key in r.key so the downstream ABI decoder (which expects scope +
+      // pk fields) can decode it. For unscoped kv::table, scope_prefix_bytes
+      // is empty and the pri_key already represents the full primary key.
       auto fetch_primary = [&](const chain::kv_index_object& sec_obj) -> raw_row {
-         auto pri_sv = sec_obj.pri_key_view();
-         auto itr = pri_idx.find(boost::make_tuple(p.code, table_id, pri_sv));
+         std::vector<char> full_key;
+         full_key.reserve(scope_prefix_bytes.size() + sec_obj.pri_key.size());
+         full_key.insert(full_key.end(), scope_prefix_bytes.begin(), scope_prefix_bytes.end());
+         full_key.insert(full_key.end(), sec_obj.pri_key.data(),
+                         sec_obj.pri_key.data() + sec_obj.pri_key.size());
+         std::string_view full_sv(full_key.data(), full_key.size());
+         auto itr = pri_idx.find(boost::make_tuple(p.code, table_id, full_sv));
          raw_row r;
-         r.key.assign(sec_obj.pri_key.data(), sec_obj.pri_key.data() + sec_obj.pri_key.size());
+         r.key = std::move(full_key);
          if (itr != pri_idx.end()) {
             r.value.assign(itr->value.data(), itr->value.data() + itr->value.size());
             r.payer = itr->payer;
@@ -2436,12 +2448,11 @@ fc::variant read_only::get_currency_stats( const read_only::get_currency_stats_p
 }
 
 fc::variant get_global_row( const database& db, const abi_def& abi, const abi_serializer& abis, const fc::microseconds& abi_serializer_max_time_us, bool shorten_abi_errors ) {
-   const auto table_type = get_table_type(abi, "global");
-   SYS_ASSERT(table_type == read_only::KEYi64, chain::contract_table_query_exception, "Invalid table type {} for table global", table_type);
-
-   auto key = chain::make_kv_scoped_key(config::system_account_name, name("global").to_uint64_t());
-   auto key_sv = key.to_string_view();
+   // kv::global stores under key = [Name:8B BE] with table_id from Name
    const uint16_t global_tid = chain::compute_table_id("global"_n.to_uint64_t());
+   char key_buf[chain::kv_pri_key_size];
+   chain::kv_encode_be64(key_buf, "global"_n.to_uint64_t());
+   std::string_view key_sv(key_buf, chain::kv_pri_key_size);
 
    const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
    auto it = kv_idx.find(boost::make_tuple(config::system_account_name, global_tid, key_sv));
@@ -3103,10 +3114,12 @@ read_only::get_account_return_t read_only::get_account( const get_account_params
          }
       }
 
+      // ROA tables use kv::table (unscoped) — key is [pk:8B BE] only
       auto lookup_object = [&](const name& table_name, const name& account_name) -> std::optional<vector<char>> {
-         auto key = chain::make_kv_scoped_key(config::roa_account_name, account_name.to_uint64_t());
-         auto key_sv = key.to_string_view();
          const uint16_t tid = chain::compute_table_id(table_name.to_uint64_t());
+         char key_buf[chain::kv_pri_key_size];
+         chain::kv_encode_be64(key_buf, account_name.to_uint64_t());
+         std::string_view key_sv(key_buf, chain::kv_pri_key_size);
          const auto& kv_idx = d.get_index<chain::kv_index, chain::by_code_key>();
          auto it = kv_idx.find(boost::make_tuple(config::roa_account_name, tid, key_sv));
          if (it != kv_idx.end()) {

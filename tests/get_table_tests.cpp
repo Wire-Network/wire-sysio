@@ -529,14 +529,271 @@ BOOST_FIXTURE_TEST_CASE( get_table_next_key_test, validating_tester ) try {
    BOOST_REQUIRE(more2_res_1.rows.size() > 0u);
    BOOST_TEST(more2_res_1.rows[0].get_object()["value"].get_object()["key"].as<uint64_t>() == 1u);
 
-   // NOTE: Secondary index tests for get_table_test contract are disabled because
-   // the contract's ABI does not declare secondary_indexes in the new KV format.
-   // Secondary index queries through the unified get_table_rows API require
-   // secondary_indexes to be declared in the ABI table definition.
-   // See get_kv_rows_index_name_test for secondary index query tests using
-   // the test_kv_map contract which has proper ABI secondary_indexes.
+   // ─────────────────────────────────────────────────────────────────────────
+   // Secondary index queries on a multi_index table.
+   //
+   // get_table_test uses sysio::multi_index<"numobjs"_n, ...> with four
+   // secondary indices and sysio::multi_index<"hashobjs"_n, ...> with two
+   // checksum256 secondary indices. CDT abigen now emits the matching
+   // `secondary_indexes` array in the table_def, so the unified
+   // get_table_rows API can resolve them by name (or by numeric position
+   // for backward compatibility with the legacy index_position parameter).
+   // ─────────────────────────────────────────────────────────────────────────
+
+   // (sec-1) numobjs by name index "bysec1" (uint64) — should return all 3 rows
+   //         ordered by sec64 ascending (2, 5, 7).
+   {
+      chain_apis::read_only::get_table_rows_params p;
+      p.json = true;
+      p.code = "test"_n;
+      p.scope = "test";
+      p.table = "numobjs";
+      p.index_name = "bysec1";
+      auto result = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(result.rows.size(), 3u);
+      BOOST_CHECK_EQUAL(result.rows[0].get_object()["value"].get_object()["sec64"].as_uint64(), 2u);
+      BOOST_CHECK_EQUAL(result.rows[1].get_object()["value"].get_object()["sec64"].as_uint64(), 5u);
+      BOOST_CHECK_EQUAL(result.rows[2].get_object()["value"].get_object()["sec64"].as_uint64(), 7u);
+   }
+
+   // (sec-2) numobjs by numeric index position "1" — same result as "bysec1".
+   //         Numeric positions resolve to the Nth secondary index, preserving
+   //         the legacy `index_position` semantics on the unified endpoint.
+   {
+      chain_apis::read_only::get_table_rows_params p;
+      p.json = true;
+      p.code = "test"_n;
+      p.scope = "test";
+      p.table = "numobjs";
+      p.index_name = "1";
+      auto result = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(result.rows.size(), 3u);
+      BOOST_CHECK_EQUAL(result.rows[0].get_object()["value"].get_object()["sec64"].as_uint64(), 2u);
+      BOOST_CHECK_EQUAL(result.rows[2].get_object()["value"].get_object()["sec64"].as_uint64(), 7u);
+   }
+
+   // (sec-3) numobjs by name index "bysec2" (uint128) — verify the wider key
+   //         type round-trips through the API.
+   {
+      chain_apis::read_only::get_table_rows_params p;
+      p.json = true;
+      p.code = "test"_n;
+      p.scope = "test";
+      p.table = "numobjs";
+      p.index_name = "bysec2";
+      auto result = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(result.rows.size(), 3u);
+      // sec128 mirrors sec64 (2, 5, 7) in the contract's add path.
+      BOOST_CHECK_EQUAL(result.rows[0].get_object()["value"].get_object()["sec64"].as_uint64(), 2u);
+      BOOST_CHECK_EQUAL(result.rows[2].get_object()["value"].get_object()["sec64"].as_uint64(), 7u);
+   }
+
+   // (sec-4) hashobjs by name index "bysec1" (checksum256) — exercises the
+   //         canonical-RecordType translation path that was the motivating
+   //         abigen fix. All three rows must come back, ABI-decoded.
+   {
+      chain_apis::read_only::get_table_rows_params p;
+      p.json = true;
+      p.code = "test"_n;
+      p.scope = "test";
+      p.table = "hashobjs";
+      p.index_name = "bysec1";
+      auto result = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(result.rows.size(), 3u);
+      // Each row must contain the original hash_input string, decoded via the ABI.
+      std::set<std::string> inputs;
+      for (auto& row : result.rows) {
+         inputs.insert(row.get_object()["value"].get_object()["hash_input"].as_string());
+      }
+      BOOST_CHECK(inputs.count("firstinput"));
+      BOOST_CHECK(inputs.count("secondinput"));
+      BOOST_CHECK(inputs.count("thirdinput"));
+   }
+
+   // (sec-5) Invalid index name on multi_index — should throw, not silently
+   //         return primary rows.
+   {
+      chain_apis::read_only::get_table_rows_params p;
+      p.json = true;
+      p.code = "test"_n;
+      p.scope = "test";
+      p.table = "numobjs";
+      p.index_name = "nonexistent";
+      BOOST_CHECK_THROW(
+         get_table_rows_full(plugin, p, fc::time_point::maximum()),
+         chain::contract_table_query_exception
+      );
+   }
+
+   // (sec-6) multi_index secondary pagination: limit=2 yields 2 rows + next_key,
+   //         and following next_key returns the third row.  Verifies that the
+   //         secondary index stream stays in sync with the primary fetch path.
+   {
+      chain_apis::read_only::get_table_rows_params p;
+      p.json = true;
+      p.code = "test"_n;
+      p.scope = "test";
+      p.table = "numobjs";
+      p.index_name = "bysec1";
+      p.limit = 2;
+      auto page1 = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(page1.rows.size(), 2u);
+      BOOST_REQUIRE_EQUAL(page1.more, true);
+      BOOST_REQUIRE(!page1.next_key.empty());
+      BOOST_CHECK_EQUAL(page1.rows[0].get_object()["value"].get_object()["sec64"].as_uint64(), 2u);
+      BOOST_CHECK_EQUAL(page1.rows[1].get_object()["value"].get_object()["sec64"].as_uint64(), 5u);
+
+      // next_key for secondary queries is the secondary key bytes (hex). Use
+      // it as lower_bound on a json=false call so the bytes are interpreted
+      // directly without re-encoding.
+      chain_apis::read_only::get_table_rows_params p2;
+      p2.json = false;
+      p2.code = "test"_n;
+      p2.scope = "test";
+      p2.table = "numobjs";
+      p2.index_name = "bysec1";
+      p2.lower_bound = page1.next_key;
+      p2.limit = 50;
+      auto page2 = get_table_rows_full(plugin, p2, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(page2.rows.size(), 1u);
+      BOOST_REQUIRE_EQUAL(page2.more, false);
+   }
+
+   // (sec-7) multi_index secondary reverse: bysec1 in descending order (7,5,2)
+   {
+      chain_apis::read_only::get_table_rows_params p;
+      p.json = true;
+      p.code = "test"_n;
+      p.scope = "test";
+      p.table = "numobjs";
+      p.index_name = "bysec1";
+      p.reverse = true;
+      auto result = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(result.rows.size(), 3u);
+      BOOST_CHECK_EQUAL(result.rows[0].get_object()["value"].get_object()["sec64"].as_uint64(), 7u);
+      BOOST_CHECK_EQUAL(result.rows[1].get_object()["value"].get_object()["sec64"].as_uint64(), 5u);
+      BOOST_CHECK_EQUAL(result.rows[2].get_object()["value"].get_object()["sec64"].as_uint64(), 2u);
+   }
+
+   // (sec-8) multi_index secondary with hex bounds: filter to sec64 == 5 only.
+   //         multi_index/kv_multi_index encodes secondary keys as
+   //         [scope:8B BE][sec_value:N] so the caller-supplied bounds must
+   //         include the scope prefix bytes too.  (kv::table is unscoped and
+   //         omits the prefix — see get_kv_rows_index_name_test case (d).)
+   {
+      char bound_lb[chain::kv_scoped_key_size];
+      char bound_ub[chain::kv_scoped_key_size];
+      chain::kv_encode_be64(bound_lb,                                name("test").to_uint64_t());
+      chain::kv_encode_be64(bound_lb + chain::kv_scope_prefix_size,  5);
+      chain::kv_encode_be64(bound_ub,                                name("test").to_uint64_t());
+      chain::kv_encode_be64(bound_ub + chain::kv_scope_prefix_size,  6);
+      chain_apis::read_only::get_table_rows_params p;
+      p.json = false;
+      p.code = "test"_n;
+      p.scope = "test";
+      p.table = "numobjs";
+      p.index_name = "bysec1";
+      p.lower_bound = fc::to_hex(bound_lb, chain::kv_scoped_key_size);
+      p.upper_bound = fc::to_hex(bound_ub, chain::kv_scoped_key_size);
+      auto result = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(result.rows.size(), 1u);
+   }
+
+   // (sec-9) multi_index secondary with show_payer: every row must include
+   //         the payer field, and it must be the action signer ("test").
+   {
+      chain_apis::read_only::get_table_rows_params p;
+      p.json = true;
+      p.code = "test"_n;
+      p.scope = "test";
+      p.table = "numobjs";
+      p.index_name = "bysec1";
+      p.show_payer = true;
+      auto result = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(result.rows.size(), 3u);
+      for (auto& row : result.rows) {
+         auto& obj = row.get_object();
+         BOOST_REQUIRE(obj.contains("payer"));
+         BOOST_CHECK_EQUAL(obj["payer"].as_string(), "test");
+      }
+   }
 
 } FC_LOG_AND_RETHROW() /// get_table_next_key_test
+
+// Verify the find-on-scoped-table contract: scope is required, and when
+// supplied, find returns exactly the matching row (or zero rows for misses).
+BOOST_FIXTURE_TEST_CASE( get_table_find_scoped_test, validating_tester ) try {
+   produce_block();
+   create_accounts({ "sysio.token"_n, "sysio.ram"_n, "sysio.ramfee"_n, "sysio.stake"_n,
+      "sysio.bpay"_n, "sysio.vpay"_n, "sysio.saving"_n, "sysio.names"_n });
+   create_accounts({"inita"_n});
+   produce_block();
+
+   set_code("sysio.token"_n, test_contracts::sysio_token_wasm());
+   set_abi("sysio.token"_n, test_contracts::sysio_token_abi());
+   set_privileged("sysio.token"_n);
+   produce_block();
+
+   push_action("sysio.token"_n, "create"_n, "sysio.token"_n, mutable_variant_object()
+      ("issuer", "sysio")("maximum_supply", "1000000000.0000 SYS"));
+   issue_tokens(*this, config::system_account_name, "inita"_n,
+                chain::asset::from_string("100.0000 SYS"));
+   produce_block();
+
+   std::optional<sysio::chain_apis::tracked_votes> _tracked_votes;
+   chain_apis::read_only plugin(*(this->control), {}, {}, _tracked_votes,
+                                fc::microseconds::maximum(), fc::microseconds::maximum(), {});
+
+   const uint64_t sys_code = chain::symbol(0, "SYS").to_symbol_code();
+
+   // (a) find on scoped table WITHOUT specifying scope must error.
+   //     The chain_plugin asserts !table_is_scoped || p.find.empty() || !p.scope.empty().
+   //     Without scope, the find target would be ambiguous across all scopes.
+   {
+      chain_apis::read_only::get_table_rows_params p;
+      p.json = true;
+      p.code = "sysio.token"_n;
+      p.table = "accounts";
+      p.find = R"({"sym_code": )" + std::to_string(sys_code) + "}";
+      // p.scope intentionally left empty
+      BOOST_CHECK_EXCEPTION(
+         get_table_rows_full(plugin, p, fc::time_point::maximum()),
+         chain::contract_table_query_exception,
+         [](const auto& e) {
+            return std::string(e.what()).find("scope") != std::string::npos;
+         }
+      );
+   }
+
+   // (b) find on scoped table WITH scope returns exactly the matching row.
+   {
+      chain_apis::read_only::get_table_rows_params p;
+      p.json = true;
+      p.code = "sysio.token"_n;
+      p.table = "accounts";
+      p.scope = "inita";
+      p.find = R"({"sym_code": )" + std::to_string(sys_code) + "}";
+      auto result = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(result.rows.size(), 1u);
+      BOOST_REQUIRE_EQUAL(result.more, false);
+      BOOST_REQUIRE_EQUAL("100.0000 SYS",
+                          result.rows[0]["value"]["balance"].as_string());
+   }
+
+   // (c) find on scoped table with scope but a non-matching key → 0 rows.
+   {
+      chain_apis::read_only::get_table_rows_params p;
+      p.json = true;
+      p.code = "sysio.token"_n;
+      p.table = "accounts";
+      p.scope = "inita";
+      p.find = R"({"sym_code": 99999})";
+      auto result = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(result.rows.size(), 0u);
+      BOOST_REQUIRE_EQUAL(result.more, false);
+   }
+
+} FC_LOG_AND_RETHROW() /// get_table_find_scoped_test
 
 // ─────────────────────────────────────────────────────────────────────────────
 // get_table_rows KV tests — exercise the /v1/chain/get_table_rows API endpoint
@@ -1080,7 +1337,7 @@ BOOST_FIXTURE_TEST_CASE( get_table_find_test, validating_tester ) try {
       p.code = "sysio.token"_n;
       p.table = "accounts";
       p.scope = "inita";
-      p.find = R"({"primary_key": 9999999})";
+      p.find = R"({"sym_code": 9999999})";
       auto result = get_table_rows_full(plugin, p, fc::time_point::maximum());
       BOOST_REQUIRE_EQUAL(0u, result.rows.size());
    }
@@ -1092,12 +1349,129 @@ BOOST_FIXTURE_TEST_CASE( get_table_find_test, validating_tester ) try {
       p.code = "sysio.token"_n;
       p.table = "accounts";
       p.scope = "inita";
-      p.find = R"({"primary_key": 1397703940})";
-      p.lower_bound = R"({"primary_key": 0})";
+      p.find = R"({"sym_code": 1397703940})";
+      p.lower_bound = R"({"sym_code": 0})";
       BOOST_CHECK_THROW(
          get_table_rows_full(plugin, p, fc::time_point::maximum()),
          chain::contract_table_query_exception
       );
+   }
+
+} FC_LOG_AND_RETHROW()
+
+// Test scoped query with explicit bounds (within-scope key range)
+BOOST_FIXTURE_TEST_CASE( get_table_scoped_bounds_test, validating_tester ) try {
+   produce_block();
+   create_accounts({ "sysio.token"_n, "sysio.ram"_n, "sysio.ramfee"_n, "sysio.stake"_n,
+      "sysio.bpay"_n, "sysio.vpay"_n, "sysio.saving"_n, "sysio.names"_n });
+   create_accounts({"inita"_n});
+   produce_block();
+
+   set_code("sysio.token"_n, test_contracts::sysio_token_wasm());
+   set_abi("sysio.token"_n, test_contracts::sysio_token_abi());
+   set_privileged("sysio.token"_n);
+   produce_block();
+
+   // Create 4 currencies in alphabetical order: AAA, BBB, CCC, SYS
+   for (auto sym : {"AAA", "BBB", "CCC", "SYS"}) {
+      push_action("sysio.token"_n, "create"_n, "sysio.token"_n, mutable_variant_object()
+         ("issuer", "sysio")("maximum_supply", std::string("1000000000.0000 ") + sym));
+      issue_tokens(*this, config::system_account_name, "inita"_n,
+                   chain::asset::from_string(std::string("100.0000 ") + sym));
+   }
+   produce_block();
+
+   std::optional<sysio::chain_apis::tracked_votes> _tracked_votes;
+   chain_apis::read_only plugin(*(this->control), {}, {}, _tracked_votes,
+                                fc::microseconds::maximum(), fc::microseconds::maximum(), {});
+
+   const uint64_t aaa_code = chain::symbol(0, "AAA").to_symbol_code();
+   const uint64_t bbb_code = chain::symbol(0, "BBB").to_symbol_code();
+   const uint64_t ccc_code = chain::symbol(0, "CCC").to_symbol_code();
+   const uint64_t sys_code = chain::symbol(0, "SYS").to_symbol_code();
+
+   // (a) scoped + bounds: bbb_code <= sym_code < ccc_code+1 → 2 rows (BBB, CCC)
+   {
+      chain_apis::read_only::get_table_rows_params p;
+      p.json = true;
+      p.code = "sysio.token"_n;
+      p.table = "accounts";
+      p.scope = "inita";
+      p.lower_bound = R"({"sym_code": )" + std::to_string(bbb_code) + "}";
+      p.upper_bound = R"({"sym_code": )" + std::to_string(ccc_code + 1) + "}";
+      auto result = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(2u, result.rows.size());
+      BOOST_REQUIRE_EQUAL("100.0000 BBB", result.rows[0]["value"]["balance"].as_string());
+      BOOST_REQUIRE_EQUAL("100.0000 CCC", result.rows[1]["value"]["balance"].as_string());
+   }
+
+   // (b) scoped + bounds + reverse
+   {
+      chain_apis::read_only::get_table_rows_params p;
+      p.json = true;
+      p.code = "sysio.token"_n;
+      p.table = "accounts";
+      p.scope = "inita";
+      p.lower_bound = R"({"sym_code": )" + std::to_string(bbb_code) + "}";
+      p.upper_bound = R"({"sym_code": )" + std::to_string(ccc_code + 1) + "}";
+      p.reverse = true;
+      auto result = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(2u, result.rows.size());
+      BOOST_REQUIRE_EQUAL("100.0000 CCC", result.rows[0]["value"]["balance"].as_string());
+      BOOST_REQUIRE_EQUAL("100.0000 BBB", result.rows[1]["value"]["balance"].as_string());
+   }
+
+   // (c) scoped + bounds + limit + pagination
+   {
+      chain_apis::read_only::get_table_rows_params p;
+      p.json = true;
+      p.code = "sysio.token"_n;
+      p.table = "accounts";
+      p.scope = "inita";
+      p.lower_bound = R"({"sym_code": )" + std::to_string(aaa_code) + "}";
+      p.upper_bound = R"({"sym_code": )" + std::to_string(sys_code + 1) + "}";
+      p.limit = 2;
+      auto result = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(2u, result.rows.size());
+      BOOST_REQUIRE_EQUAL(true, result.more);
+      BOOST_REQUIRE_EQUAL("100.0000 AAA", result.rows[0]["value"]["balance"].as_string());
+      BOOST_REQUIRE_EQUAL("100.0000 BBB", result.rows[1]["value"]["balance"].as_string());
+
+      // Page 2: use next_key
+      p.lower_bound = result.next_key;
+      result = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(2u, result.rows.size());
+      BOOST_REQUIRE_EQUAL(false, result.more);
+      BOOST_REQUIRE_EQUAL("100.0000 CCC", result.rows[0]["value"]["balance"].as_string());
+      BOOST_REQUIRE_EQUAL("100.0000 SYS", result.rows[1]["value"]["balance"].as_string());
+   }
+
+   // (d) scoped + upper_bound only (lower defaults to start of scope)
+   {
+      chain_apis::read_only::get_table_rows_params p;
+      p.json = true;
+      p.code = "sysio.token"_n;
+      p.table = "accounts";
+      p.scope = "inita";
+      p.upper_bound = R"({"sym_code": )" + std::to_string(bbb_code + 1) + "}";
+      auto result = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(2u, result.rows.size());
+      BOOST_REQUIRE_EQUAL("100.0000 AAA", result.rows[0]["value"]["balance"].as_string());
+      BOOST_REQUIRE_EQUAL("100.0000 BBB", result.rows[1]["value"]["balance"].as_string());
+   }
+
+   // (e) scoped + lower_bound only (upper defaults to end of scope)
+   {
+      chain_apis::read_only::get_table_rows_params p;
+      p.json = true;
+      p.code = "sysio.token"_n;
+      p.table = "accounts";
+      p.scope = "inita";
+      p.lower_bound = R"({"sym_code": )" + std::to_string(ccc_code) + "}";
+      auto result = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(2u, result.rows.size());
+      BOOST_REQUIRE_EQUAL("100.0000 CCC", result.rows[0]["value"]["balance"].as_string());
+      BOOST_REQUIRE_EQUAL("100.0000 SYS", result.rows[1]["value"]["balance"].as_string());
    }
 
 } FC_LOG_AND_RETHROW()
@@ -1628,5 +2002,77 @@ BOOST_FIXTURE_TEST_CASE( get_table_scoped_secondary_test, validating_tester ) tr
    }
 
 } FC_LOG_AND_RETHROW()
+
+// Corner cases: missing contract / missing table.  These error paths must
+// surface a clear `contract_table_query_exception` rather than crashing or
+// returning misleading results.
+BOOST_FIXTURE_TEST_CASE( get_table_missing_contract_test, validating_tester ) try {
+   produce_block();
+   create_accounts({"noabi"_n});
+   produce_block();
+   // Note: noabi has no code/abi deployed.
+
+   create_accounts({"hasabi"_n});
+   set_code("hasabi"_n, test_contracts::test_kv_map_wasm());
+   set_abi("hasabi"_n, test_contracts::test_kv_map_abi());
+   produce_block();
+
+   std::optional<sysio::chain_apis::tracked_votes> _tracked_votes;
+   chain_apis::read_only plugin(*(this->control), {}, {}, _tracked_votes,
+                                fc::microseconds::maximum(), fc::microseconds::maximum(), {});
+
+   // (a) get_table_rows on an account with NO contract: get_abi() throws —
+   //     the plugin must propagate that as a contract_table_query_exception
+   //     (caller-friendly) rather than the raw fc::exception.
+   {
+      chain_apis::read_only::get_table_rows_params p;
+      p.json = true;
+      p.code = "noabi"_n;
+      p.table = "geodata";
+      BOOST_CHECK_THROW(
+         get_table_rows_full(plugin, p, fc::time_point::maximum()),
+         fc::exception);
+   }
+
+   // (b) get_table_rows with a table name that does NOT appear in the
+   //     deployed ABI must throw contract_table_query_exception with the
+   //     message "Table {} is not specified in the ABI".
+   {
+      chain_apis::read_only::get_table_rows_params p;
+      p.json = true;
+      p.code = "hasabi"_n;
+      p.table = "doesnotexist";
+      BOOST_CHECK_EXCEPTION(
+         get_table_rows_full(plugin, p, fc::time_point::maximum()),
+         chain::contract_table_query_exception,
+         [](const auto& e) {
+            return std::string(e.what()).find("not specified in the ABI") != std::string::npos;
+         });
+   }
+
+   // (c) get_table_by_scope on an account with NO contract: get_abi() throws
+   //     internally but is caught silently — the function must return an empty
+   //     result, not propagate the exception.
+   {
+      chain_apis::read_only::get_table_by_scope_params p;
+      p.code = "noabi"_n;
+      p.limit = 100;
+      auto result = plugin.get_table_by_scope(p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(0u, result.rows.size());
+      BOOST_REQUIRE_EQUAL("", result.more);
+   }
+
+   // (d) get_table_by_scope on a deployed contract with NO data must also
+   //     return empty rows (no exception, no spurious data from other codes).
+   {
+      chain_apis::read_only::get_table_by_scope_params p;
+      p.code = "hasabi"_n;
+      p.limit = 100;
+      auto result = plugin.get_table_by_scope(p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(0u, result.rows.size());
+      BOOST_REQUIRE_EQUAL("", result.more);
+   }
+
+} FC_LOG_AND_RETHROW() /// get_table_missing_contract_test
 
 BOOST_AUTO_TEST_SUITE_END()
