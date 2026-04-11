@@ -365,7 +365,7 @@ try:
     row0=node.getTableRow(contract, currencyAccount.name, table, 0)
     try:
         assert(row0)
-        assert(row0["balance"] == "100000.0000 CUR")
+        assert(row0["value"]["balance"] == "100000.0000 CUR")
     except (AssertionError, KeyError) as _:
         Print("ERROR: Failed get table row assertion. %s" % (row0))
         raise

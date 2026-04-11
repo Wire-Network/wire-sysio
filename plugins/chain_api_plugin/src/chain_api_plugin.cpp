@@ -142,7 +142,6 @@ void chain_api_plugin::plugin_startup() {
       CHAIN_RO_CALL(get_raw_abi, 200, http_params_types::params_required),
       CHAIN_RO_CALL(get_finalizer_info, 200, http_params_types::no_params),
       CHAIN_RO_CALL_POST(get_table_rows, chain_apis::read_only::get_table_rows_result, 200, http_params_types::params_required),
-      CHAIN_RO_CALL_POST(get_kv_rows, chain_apis::read_only::get_kv_rows_result, 200, http_params_types::params_required),
       CHAIN_RO_CALL(get_table_by_scope, 200, http_params_types::params_required),
       CHAIN_RO_CALL(get_currency_balance, 200, http_params_types::params_required),
       CHAIN_RO_CALL(get_currency_stats, 200, http_params_types::params_required),

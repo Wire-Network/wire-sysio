@@ -129,7 +129,19 @@
             "index_type": "i64",
             "key_names": ["scope","primary_key"],
             "key_types": ["name","uint64"],
-            "table_id": 48301
+            "table_id": 48301,
+            "secondary_indexes": [
+                {
+                    "name": "bysec1",
+                    "key_type": "checksum256",
+                    "table_id": 6574
+                },
+                {
+                    "name": "bysec2",
+                    "key_type": "checksum256",
+                    "table_id": 6575
+                }
+            ]
         },
         {
             "name": "numobj",
@@ -145,7 +157,29 @@
             "index_type": "i64",
             "key_names": ["scope","primary_key"],
             "key_types": ["name","uint64"],
-            "table_id": 49066
+            "table_id": 49066,
+            "secondary_indexes": [
+                {
+                    "name": "bysec1",
+                    "key_type": "uint64",
+                    "table_id": 51627
+                },
+                {
+                    "name": "bysec2",
+                    "key_type": "uint128",
+                    "table_id": 51628
+                },
+                {
+                    "name": "bysec3",
+                    "key_type": "float64",
+                    "table_id": 51629
+                },
+                {
+                    "name": "bysec4",
+                    "key_type": "float128",
+                    "table_id": 51630
+                }
+            ]
         }
     ],
     "ricardian_clauses": [],

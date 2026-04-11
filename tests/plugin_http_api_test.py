@@ -524,8 +524,6 @@ class PluginHttpTest(unittest.TestCase):
                    "code":"cancancan345",
                    "scope":"cancancan345",
                    "table":"vote",
-                   "index_position":2,
-                   "key_type":"i128",
                    "lower_bound":"0x0000000000000000D0F2A472A8EB6A57",
                    "upper_bound":"0xFFFFFFFFFFFFFFFFD0F2A472A8EB6A57"}
         ret_json = self.nodeop.processUrllibRequest(resource, command, payload, endpoint=endpoint)
