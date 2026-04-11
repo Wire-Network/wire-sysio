@@ -167,22 +167,24 @@ namespace sysio { namespace chain {
 namespace config {
    template<>
    struct billable_size<kv_object> {
+      // protocol feature will be needed if this increases
+      static_assert(sizeof(kv_object) == 48, "kv_object size changed");
       static const uint64_t overhead = overhead_per_row_per_index_ram_bytes * 2;  ///< 2 indices: by_id, by_code_key
       // Fixed fields: 8 id + 8 code + 8 payer + 8 key (offset_ptr) + 8 value (offset_ptr)
       //             + 2 table_id + 6 padding = 48
       // key.size() and value.size() are added separately at billing time.
       static const uint64_t value = 48 + overhead;
-      static_assert(sizeof(kv_object) <= value, "billable_size<kv_object> must be >= sizeof(kv_object)");
    };
 
    template<>
    struct billable_size<kv_index_object> {
+      // protocol feature will be needed if this increases
+      static_assert(sizeof(kv_index_object) == 48, "kv_index_object size changed");
       static const uint64_t overhead = overhead_per_row_per_index_ram_bytes * 2;  ///< 2 indices: by_id, by_code_table_id_seckey
       // Fixed fields: 8 id + 8 code + 8 payer + 8 sec_key (offset_ptr)
       //             + 8 pri_key (offset_ptr) + 2 table_id + 6 padding = 48
       // sec_key.size() and pri_key.size() are added separately at billing time.
       static const uint64_t value = 48 + overhead;
-      static_assert(sizeof(kv_index_object) <= value, "billable_size<kv_index_object> must be >= sizeof(kv_index_object)");
    };
 } // namespace config
 

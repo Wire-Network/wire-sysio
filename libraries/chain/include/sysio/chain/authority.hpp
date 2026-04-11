@@ -184,10 +184,14 @@ namespace config {
    template<>
    struct billable_size<permission_level_weight> {
       static const uint64_t value = 24; ///< over value of weight for safety
+      static_assert(sizeof(permission_level_weight) <= value, "billable_size<permission_level_weight> must be >= sizeof(permission_level_weight)");
    };
 
    template<>
    struct billable_size<key_weight> {
+      // Note: no sizeof guard here — value=8 covers only the weight_type field;
+      // the public_key_type is billed dynamically via fc::raw::pack_size() in
+      // shared_authority::get_billable_size().
       static const uint64_t value = 8; ///< over value of weight for safety, dynamically sizing key
    };
 }

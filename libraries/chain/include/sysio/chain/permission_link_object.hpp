@@ -67,9 +67,10 @@ namespace sysio { namespace chain {
    namespace config {
       template<>
       struct billable_size<permission_link_object> {
+         // protocol feature will be needed if this increases
+         static_assert(sizeof(permission_link_object) == 40, "permission_link_object size changed");
          static const uint64_t overhead = overhead_per_row_per_index_ram_bytes * 3; ///< 3x indices id, action, permission
          static const uint64_t value = 40 + overhead; ///< fixed field + overhead
-         static_assert(sizeof(permission_link_object) <= value, "billable_size<permission_link_object> must be >= sizeof(permission_link_object)");
       };
    }
 } } // sysio::chain
