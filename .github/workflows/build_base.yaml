@@ -30,8 +30,8 @@ jobs:
       fail-fast: false
       matrix:
         platform: ${{fromJSON(inputs.platform-list)}}
-    runs-on:
-      group: core-repo-group
+    runs-on: blacksmith-16vcpu-ubuntu-2404
+    timeout-minutes: 60
     container:
       image: ${{ fromJSON(inputs.platforms)[matrix.platform].image }}
       credentials:
@@ -129,9 +129,8 @@ jobs:
 #            curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
 #            sudo apt install -y nodejs
 
-        - name: Upload builddir
-          uses: actions/upload-artifact@v4
+        - name: Save build tarball to cache
+          uses: actions/cache/save@v4
           with:
-            name: ${{matrix.platform}}-build
             path: build.tar.gz
-            compression-level: 0
+            key: build-tarball-${{ matrix.platform }}-${{ github.sha }}

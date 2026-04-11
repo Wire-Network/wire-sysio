@@ -25,6 +25,10 @@ on:
         description: 'Override sys-system-contracts ref'
         type: string
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 permissions:
   packages: read
   contents: read
@@ -44,7 +48,7 @@ jobs:
       packages: write
       contents: read
     with:
-      runs-on: '{"group": "core-repo-group"}'
+      runs-on: '"blacksmith-16vcpu-ubuntu-2404"'
       platform-files: |
         .cicd/platforms
 
@@ -60,7 +64,7 @@ jobs:
 
   v:
     name: Discover Versions
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-2vcpu-ubuntu-2404
     outputs:
       cdt-target: ${{steps.versions.outputs.cdt-target}}
       cdt-prerelease: ${{steps.versions.outputs.cdt-prerelease}}
@@ -86,50 +90,47 @@ jobs:
             echo wire-system-contracts-ref=${{inputs.override-wire-system-contracts}} >> $GITHUB_OUTPUT
           fi
 
-#  package:
-#    name: Build deb packages
-#    needs: [platform-cache, build-base]
-#    strategy:
-#      fail-fast: false
-#      matrix:
-#        platform: [ubuntu24, ubsan, asan, asserton, gcc]
-#    runs-on: ubuntu-latest
-#    container: ${{fromJSON(needs.platform-cache.outputs.platforms)[matrix.platform].image}}
-#    steps:
-#      - uses: actions/checkout@v4
-#        with:
-#          submodules: recursive
-#      - name: Download builddir
-#        uses: actions/download-artifact@v4
-#        with:
-#          name: ${{matrix.platform}}-build
-#      - name: Build packages
-#        run: |
-#          tar xzf build.tar.gz
-#          cd build
-#          cpack
-#          ../tools/tweak-deb.sh wire-sysio_*.deb
-#      - name: Install dev package
-#        if: matrix.platform != 'reproducible'
-#        run: |
-#          apt-get update && apt-get upgrade -y
-#          apt-get install -y ./build/wire-sysio_*.deb
-#      # - name: Test using TestHarness
-#      #   if: matrix.platform != 'reproducible'
-#      #   run: |
-#      #     python3 -c "import sys; sys.path.append('tests'); from TestHarness import Cluster; print('OK')"
-#      - name: Upload dev package
-#        uses: actions/upload-artifact@v4
-#        if: matrix.platform != 'reproducible'
-#        with:
-#          name: wire-sysio-dev-${{matrix.platform}}-amd64
-#          path: build/wire-sysio-dev*.deb
-#      - name: Upload sysio package
-#        uses: actions/upload-artifact@v4
-#        if: matrix.platform == 'reproducible'
-#        with:
-#          name: sysio-deb-amd64
-#          path: build/wire-sysio_*.deb
+  package:
+    name: Build deb packages (${{matrix.platform}})
+    needs: [platform-cache, build-base]
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [ubuntu24, ubsan, asan, asserton, gcc]
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    timeout-minutes: 15
+    container:
+      image: ${{fromJSON(needs.platform-cache.outputs.platforms)[matrix.platform].image}}
+      credentials:
+        username: dev-wire
+        password: ${{ secrets.GH_TOKEN_DEV }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Restore build tarball from cache
+        uses: actions/cache/restore@v4
+        with:
+          path: build.tar.gz
+          key: build-tarball-${{ matrix.platform }}-${{ github.sha }}
+          fail-on-cache-miss: true
+
+      - name: Build packages
+        run: |
+          tar xzf build.tar.gz
+          cd build
+          cpack
+          ../tools/tweak-deb.sh wire-sysio_*.deb
+
+      - name: Install dev package
+        run: |
+          apt-get update && apt-get upgrade -y
+          apt-get install -y ./build/wire-sysio_*.deb
+
+      - name: Upload dev package
+        uses: actions/upload-artifact@v4
+        with:
+          name: wire-sysio-dev-${{matrix.platform}}-amd64
+          path: build/wire-sysio_*.deb
 
   tests:
     name: Tests (${{matrix.cfg.name}})
@@ -143,8 +144,8 @@ jobs:
           - cfg: {name: 'asan',          base: 'asan', builddir: 'asan'}
           - cfg: {name: 'asserton',      base: 'asserton', builddir: 'asserton'}
           - cfg: {name: 'gcc',      base: 'gcc', builddir: 'gcc'}
-    runs-on:
-      group: core-repo-group
+    runs-on: blacksmith-16vcpu-ubuntu-2404
+    timeout-minutes: 90
     container:
       image: ${{fromJSON(needs.platform-cache.outputs.platforms)[matrix.cfg.base].image}}
       credentials:
@@ -154,78 +155,34 @@ jobs:
       volumes:
       - ${{ github.workspace }}:/__w/wire-sysio/wire-sysio
 
-
     steps:
       - name: Ensure writable workspace
         run: |
-          echo "User is $USER"
           echo "Fixing permissions on workspace for user $(whoami)"
           sudo chown -R $USER:$USER "$GITHUB_WORKSPACE"
           sudo chmod -R u+rwX "$GITHUB_WORKSPACE"
 
       - uses: actions/checkout@v4
 
-      - name: Download builddir
-        uses: actions/download-artifact@v4
+      - name: Restore build tarball from cache
+        uses: actions/cache/restore@v4
         with:
-          name: ${{matrix.cfg.builddir}}-build
+          path: build.tar.gz
+          key: build-tarball-${{ matrix.cfg.builddir }}-${{ github.sha }}
+          fail-on-cache-miss: true
 
       - name: Debug environment and workspace
+        if: runner.debug == '1'
         run: |
           echo "=== SYSTEM INFO ==="
-          whoami
-          id
-          hostname
-
-          echo
-          echo "=== ENVIRONMENT ==="
-          env | sort
-
-          echo
-          echo "=== DOCKER CONTEXT INFO ==="
-          docker context ls || true
-          echo "Current DOCKER_HOST: $DOCKER_HOST"
-          echo "Current DOCKER_CONTEXT: $DOCKER_CONTEXT"
-
-          echo
+          whoami && id && hostname
           echo "=== GITHUB WORKSPACE ==="
           echo "GITHUB_WORKSPACE: $GITHUB_WORKSPACE"
-          echo "Current directory: $PWD"
           ls -la "$GITHUB_WORKSPACE" || true
-
-          echo
           echo "=== PATHS & PERMISSIONS ==="
-          echo "--- /github ---"
-          ls -ld /github || true
-          echo "--- /github/home ---"
-          ls -ld /github/home || true
-          echo "--- Current workspace ---"
-          ls -ld "$GITHUB_WORKSPACE" || true
-          echo "--- ./build ---"
           ls -ld build || true
-          ls -ld "$GITHUB_WORKSPACE/build" || true
-          echo "--- ./build/Testing ---"
-          ls -ld build/Testing || true
-          echo "--- ./build/Testing/Temporary ---"
-          ls -ld build/Testing/Temporary || true
-
-          echo
-          echo "=== FILE OWNERSHIP TOP 20 ==="
-          find "$GITHUB_WORKSPACE" -maxdepth 2 -type d -printf '%u:%g %p\n' 2>/dev/null | sort | uniq -c | sort -nr | head -n 20
-
-          echo
           echo "=== MOUNTED FILESYSTEMS ==="
           df -h
-          mount | grep "$GITHUB_WORKSPACE" || true
-
-          echo
-          echo "=== GIT CONFIG LOCATIONS ==="
-          git config --list --show-origin || true
-
-          echo
-          echo "=== CHECK WRITABILITY OF BUILD DIR ==="
-          touch build/debug_write_test 2>&1 || echo "❌ Cannot write to build/"
-          rm -f build/debug_write_test || true
 
       - name: Run Parallel Tests
         env:
@@ -266,8 +223,8 @@ jobs:
           - cfg: {name: 'asserton',      base: 'asserton', builddir: 'asserton'}
           - cfg: {name: 'gcc',      base: 'gcc', builddir: 'gcc'}
 
-    runs-on:
-      group: core-repo-group
+    runs-on: blacksmith-16vcpu-ubuntu-2404
+    timeout-minutes: 90
 
     steps:
       - name: Login to GHCR
@@ -281,10 +238,12 @@ jobs:
 
       - uses: actions/checkout@v4
 
-      - name: Download builddir
-        uses: actions/download-artifact@v4
+      - name: Restore build tarball from cache
+        uses: actions/cache/restore@v4
         with:
-          name: ${{ matrix.cfg.builddir }}-build
+          path: build.tar.gz
+          key: build-tarball-${{ matrix.cfg.builddir }}-${{ github.sha }}
+          fail-on-cache-miss: true
 
       - name: Run NP tests
         uses: ./.github/actions/parallel-ctest-containers
@@ -337,8 +296,8 @@ jobs:
           - cfg: {name: 'ubsan',         base: 'ubsan',    builddir: 'ubsan'}
           - cfg: {name: 'asserton',      base: 'asserton', builddir: 'asserton'}
           - cfg: {name: 'gcc',      base: 'gcc', builddir: 'gcc'}
-    runs-on:
-      group: core-repo-group
+    runs-on: blacksmith-16vcpu-ubuntu-2404
+    timeout-minutes: 120
 
     steps:
       - name: Login to GHCR
@@ -352,10 +311,12 @@ jobs:
 
       - uses: actions/checkout@v4
 
-      - name: Download builddir
-        uses: actions/download-artifact@v4
+      - name: Restore build tarball from cache
+        uses: actions/cache/restore@v4
         with:
-          name: ${{matrix.cfg.builddir}}-build
+          path: build.tar.gz
+          key: build-tarball-${{ matrix.cfg.builddir }}-${{ github.sha }}
+          fail-on-cache-miss: true
 
       - name: Run tests in parallel containers
         uses: ./.github/actions/parallel-ctest-containers
@@ -500,7 +461,7 @@ jobs:
     name: All Required Tests Passed
     needs: [ tests, np-tests, lr-tests ]
     if: always()
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-2vcpu-ubuntu-2404
     steps:
       - name: Send Notification
         if: always()
