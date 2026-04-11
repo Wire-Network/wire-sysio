@@ -513,8 +513,10 @@ BOOST_FIXTURE_TEST_CASE(sec_cross_scope_upper_bound, kv_api_fresh_tester) {
 // RAM billing tests — verify correct billing on create, update, erase
 // ════════════════════════════════════════════════════════════════════════════
 
-// billable_size_v<kv_object> from config — use the actual compile-time constant
+// billable_size_v<kv_object> / <kv_index_object> from config — use the actual
+// compile-time constants so these tests catch any drift in the billing formula.
 static constexpr int64_t KV_OVERHEAD = config::billable_size_v<kv_object>;
+static constexpr int64_t KV_INDEX_OVERHEAD = config::billable_size_v<kv_index_object>;
 
 struct kv_billing_tester : validating_tester {
    kv_billing_tester() {
@@ -632,6 +634,52 @@ BOOST_FIXTURE_TEST_CASE(billing_multiple_rows, kv_billing_tester) {
    int64_t expected = 3 * (4 + KV_OVERHEAD) + 100 + 200 + 300; // 3 rows, different values
    int64_t actual = after - before;
    BOOST_TEST_MESSAGE("billing_multiple_rows: expected=" << expected << " actual=" << actual);
+   BOOST_REQUIRE_EQUAL(actual, expected);
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// Secondary index (kv_index_object) billing tests — exact-delta coverage so
+// drift in kv_index_object_ram() cannot pass silently.
+// ════════════════════════════════════════════════════════════════════════════
+
+BOOST_FIXTURE_TEST_CASE(billing_idx_create_row, kv_billing_tester) {
+   // testidxstore calls kv_idx_store with sec="alice" (5 bytes), pri=3 bytes.
+   auto before = get_ram_usage();
+   push_action(test_account, "testidxstore"_n, test_account, mutable_variant_object());
+   produce_block();
+   auto after = get_ram_usage();
+
+   int64_t expected = 3 + 5 + KV_INDEX_OVERHEAD;
+   int64_t actual = after - before;
+   BOOST_TEST_MESSAGE("billing_idx_create_row: expected=" << expected << " actual=" << actual);
+   BOOST_REQUIRE_EQUAL(actual, expected);
+}
+
+BOOST_FIXTURE_TEST_CASE(billing_idx_create_erase_net_zero, kv_billing_tester) {
+   // testidxremov calls kv_idx_store then kv_idx_remove on the same row.
+   // If store and remove bill the same formula, the net delta is zero.
+   auto before = get_ram_usage();
+   push_action(test_account, "testidxremov"_n, test_account, mutable_variant_object());
+   produce_block();
+   auto after = get_ram_usage();
+
+   BOOST_TEST_MESSAGE("billing_idx_create_erase_net_zero: delta=" << (after - before));
+   BOOST_REQUIRE_EQUAL(after - before, 0);
+}
+
+BOOST_FIXTURE_TEST_CASE(billing_idx_update_shrink, kv_billing_tester) {
+   // testidxupdat: kv_idx_store(sec="charlie"/7, pri=3) then
+   //               kv_idx_update(old_sec="charlie"/7 → new_sec="david"/5).
+   // Total bill = store + update_delta = (3 + 7 + KV_INDEX_OVERHEAD) + (5 - 7)
+   //            = 3 + 5 + KV_INDEX_OVERHEAD.
+   auto before = get_ram_usage();
+   push_action(test_account, "testidxupdat"_n, test_account, mutable_variant_object());
+   produce_block();
+   auto after = get_ram_usage();
+
+   int64_t expected = 3 + 5 + KV_INDEX_OVERHEAD;
+   int64_t actual = after - before;
+   BOOST_TEST_MESSAGE("billing_idx_update_shrink: expected=" << expected << " actual=" << actual);
    BOOST_REQUIRE_EQUAL(actual, expected);
 }
 
