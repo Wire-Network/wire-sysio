@@ -17,7 +17,7 @@
 namespace fc::network::ethereum {
 
 namespace abi {
-enum class invoke_target_type { function, constructor, event, error };
+enum class invoke_target_type { function, constructor, event, error, receive };
 
 enum class data_type : int64_t {
    boolean,
@@ -295,7 +295,7 @@ struct get_typename<fc::network::ethereum::abi::data_type> {
 };
 }; // namespace fc
 
-FC_REFLECT_ENUM(fc::network::ethereum::abi::invoke_target_type, (function)(constructor)(event)(error));
+FC_REFLECT_ENUM(fc::network::ethereum::abi::invoke_target_type, (function)(constructor)(event)(error)(receive));
 
 FC_REFLECT(fc::network::ethereum::abi::component_type::list_config_type, (is_list)(size));
 FC_REFLECT(fc::network::ethereum::abi::component_type, (name)(type)(list_config)(components)(internal_type));

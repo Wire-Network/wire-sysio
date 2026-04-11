@@ -1,6 +1,8 @@
 #include <fc/io/json.hpp>
 //#include <fc/io/fstream.hpp>
 //#include <fc/io/sstream.hpp>
+#include <fc/int128.hpp>
+#include <fc/int256.hpp>
 #include <fc/log/logger.hpp>
 //#include <utfcpp/utf8.h>
 #include <fc/utf8.hpp>
@@ -27,6 +29,41 @@ namespace fc
 }
 
 #include <fc/io/json_relaxed.hpp>
+
+namespace
+{
+
+   template<typename I>
+   struct big_int_as_str;
+
+   template<>
+   struct big_int_as_str<fc::int128> {
+      static constexpr std::string_view min_str = "9223372036854775808";
+      static constexpr auto min_len = min_str.size();
+   };
+   big_int_as_str<fc::int128> check_int128;
+
+   template<>
+   struct big_int_as_str<fc::int256> {
+      static constexpr std::string_view min_str = "170141183460469231731687303715884105728";
+      static constexpr auto min_len = min_str.size();
+   };
+   big_int_as_str<fc::int256> check_int256;
+
+   template<>
+   struct big_int_as_str<fc::uint128> {
+      static constexpr std::string_view min_str = "18446744073709551615";
+      static constexpr auto min_len = min_str.size();
+   };
+   big_int_as_str<fc::uint128> check_uint128;
+
+   template<>
+   struct big_int_as_str<fc::uint256> {
+      static constexpr std::string_view min_str = "340282366920938463463374607431768211455";
+      static constexpr auto min_len = min_str.size();
+   };
+   big_int_as_str<fc::uint256> check_uint256;
+}
 
 namespace fc
 {
@@ -293,14 +330,40 @@ namespace fc
       catch (const std::ios_base::failure&)
       {
       }
-      const std::string& str = s;
-      if (str == "-." || str == "." || str == "-") // check the obviously wrong things we could have encountered
+
+      const std::string& const_s = s;
+      const auto no_neg_start = neg ? 1 : 0;
+      const auto start = s.find_first_not_of('0', no_neg_start);
+      const auto str = (start != std::string::npos) ? std::string_view(const_s).substr(start) : std::string_view(const_s);
+
+      // if the string is empty and we dropped zeros
+      if (str.empty() && no_neg_start < start)
+        return 0;
+      // check for s== ".", "-","-.", since "[-]0*" is checked above
+      if (str == "." || str.empty()) // check the obviously wrong things we could have encountered
         FC_THROW_EXCEPTION(parse_error_exception, "Can't parse token \"{}\" as a JSON numeric constant", str);
       if( dot )
-        return parser_type == json::parse_type::legacy_parser_with_string_doubles ? variant(str) : variant(to_double(str));
-      if( neg )
-        return to_int64(str);
-      return to_uint64(str);
+        return parser_type == json::parse_type::legacy_parser_with_string_doubles ? variant(s) : variant(to_double(s));
+      if( neg ) {
+        if( str.size() < check_int128.min_len ||
+           (str.size() == check_int128.min_len && str < check_int128.min_str) )
+          return to_int64(s);
+
+        if( str.size() > check_int256.min_len ||
+           (str.size() == check_int256.min_len && str >= check_int256.min_str) )
+          return variant(fc::int256(s));
+
+        return variant(fc::int128_from_string(s));
+      }
+      if( str.size() < check_uint128.min_len ||
+         (str.size() == check_uint128.min_len && str <= check_uint128.min_str) )
+        return to_uint64(s);
+
+      if( str.size() > check_uint256.min_len ||
+         (str.size() == check_uint256.min_len && str >= check_uint256.min_str) )
+        return variant(fc::uint256(s));
+
+      return variant(fc::uint128_from_string(s));
    }
 
    template<typename T>

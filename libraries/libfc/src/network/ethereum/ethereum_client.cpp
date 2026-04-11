@@ -1,4 +1,6 @@
 #include <algorithm>
+#include <chrono>
+#include <thread>
 #include <ethash/keccak.hpp>
 #include <fc/crypto/ethereum/ethereum_utils.hpp>
 #include <fc/crypto/keccak256.hpp>
@@ -84,7 +86,7 @@ fc::variant ethereum_client::execute(const std::string& method, const fc::varian
 fc::variant ethereum_client::execute_contract_view_fn(const address& contract_address, const abi::contract& abi,
                                                       const std::string& block_tag,
                                                       const contract_invoke_data_items& params) {
-   auto abi_call_encoded = contract_encode_data(abi, params);
+   auto abi_call_encoded = "0x" + contract_encode_data(abi, params);
    auto to_data_mvo = fc::mutable_variant_object("to", to_hex(contract_address, true))("data", abi_call_encoded);
    fc::variants rpc_params = {to_data_mvo, fc::variant(block_tag)};
    return execute("eth_call", rpc_params);
@@ -118,7 +120,7 @@ fc::variant ethereum_client::execute_contract_tx_fn(const eip1559_tx& source_tx,
       tx_encoded = rlp::encode_eip1559_signed_typed(tx);
    }
 
-   return send_raw_transaction(to_hex(tx_encoded));
+   return send_raw_transaction(to_hex(tx_encoded, true));
 }
 
 
@@ -474,6 +476,51 @@ std::string ethereum_client::send_raw_transaction(const std::string& raw_tx_data
    fc::variants params{raw_tx_data};
    auto resp = execute("eth_sendRawTransaction", params);
    return resp.as_string();
+}
+
+/**
+ * @brief Returns a future that resolves to the block number for a given transaction hash
+ *
+ * Given a transaction hash for a previously submitted transaction, this method spawns a
+ * background thread that polls eth_getTransactionReceipt once per second until the receipt
+ * is available. When the receipt arrives, the thread fulfills the promise with the block
+ * number (as uint64_t) of the block the transaction was included in.
+ *
+ * @param tx_hash The transaction hash (hex string with "0x" prefix) of the submitted transaction
+ * @return A std::future<uint64_t> that resolves to the block number once the transaction is mined
+ */
+std::future<uint64_t> ethereum_client::identify_block_for_transaction(const std::string& tx_hash) {
+   std::promise<uint64_t> promise;
+   std::future<uint64_t> future = promise.get_future();
+
+   constexpr int max_retries = 600; // 10 minutes at 1s/poll
+   std::thread([weak=weak_from_this(), tx_hash, p = std::move(promise)]() mutable {
+      try {
+         for (int attempt = 0; attempt < max_retries; ++attempt) {
+            auto self = weak.lock();
+            if (!self) {
+               p.set_exception(std::make_exception_ptr(
+                  std::runtime_error("ethereum_client destroyed before transaction was mined")));
+               return;
+            }
+            auto receipt = self->get_transaction_receipt(tx_hash);
+            if (!receipt.is_null()) {
+               const auto& obj = receipt.get_object();
+               if (obj.contains("blockNumber") && !obj["blockNumber"].is_null()) {
+                  p.set_value(static_cast<uint64_t>(to_uint256(obj["blockNumber"])));
+                  return;
+               }
+            }
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+         }
+         p.set_exception(std::make_exception_ptr(
+            std::runtime_error("transaction not mined within timeout")));
+      } catch (...) {
+         p.set_exception(std::current_exception());
+      }
+   }).detach();
+
+   return future;
 }
 
 /**
