@@ -78,8 +78,8 @@ namespace sysio {
     void roa::activateroa(const asset& total_sys, const uint64_t& bytes_per_unit) {
         require_auth(get_self());
 
-        roastate_t roastate(get_self(), get_self().value);
-        auto state = roastate.get_or_default();
+        roastate_t roastate(get_self());
+        auto state = roastate.get_or_default(roa_state{});
 
         check(!state.is_active, "Contract already activated.");
         check(total_sys.symbol == symbol("SYS", 4), "Total SYS must be SYS.");
@@ -158,7 +158,7 @@ namespace sysio {
         require_auth(get_self());
 
         //Singelton index
-        roastate_t roastate(get_self(), get_self().value);
+        roastate_t roastate(get_self());
 
         // Gets values in the table.
         auto state = roastate.get();
@@ -202,7 +202,7 @@ namespace sysio {
         require_auth(issuer);
 
         // Ensure ROA is active
-        roastate_t roastate(get_self(), get_self().value);
+        roastate_t roastate(get_self());
         auto state = roastate.get();
         check(state.is_active, "ROA is not currently active");
         check(network_gen <= state.network_gen, "Invalid network generation.");
@@ -454,7 +454,7 @@ namespace sysio {
 
         require_auth(permission_level{owner, "auth.ext"_n});
 
-        roastate_t roastate(get_self(), get_self().value);
+        roastate_t roastate(get_self());
         auto state = roastate.get();
         check(state.is_active, "ROA is not active yet");
 
@@ -492,7 +492,7 @@ namespace sysio {
 
         require_auth(permission_level{owner, "auth.ext"_n});
 
-        roastate_t roastate(get_self(), get_self().value);
+        roastate_t roastate(get_self());
         auto state = roastate.get();
         check(state.is_active, "ROA is not active yet");
 
@@ -526,7 +526,7 @@ namespace sysio {
         // TODO -> Require authorization for validator !!!
         // require_auth();
 
-        roastate_t roastate(get_self(), get_self().value);
+        roastate_t roastate(get_self());
         auto state = roastate.get();
         check(state.is_active, "ROA is not active yet");
 
@@ -570,7 +570,7 @@ namespace sysio {
 
     void roa::regnodeowner(const name& owner, const uint8_t& tier) {
 
-        roastate_t roastate(get_self(), get_self().value);
+        roastate_t roastate(get_self());
         auto state = roastate.get();
         check(state.is_active, "ROA is not active yet");
 
@@ -667,7 +667,7 @@ namespace sysio {
 
     asset roa::get_allocation_for_tier(uint8_t tier) {
         // Retrieve the current roastate
-        roastate_t roastate(get_self(), get_self().value);
+        roastate_t roastate(get_self());
         auto state = roastate.get();
 
         // Ensure the contract is active
@@ -702,7 +702,7 @@ namespace sysio {
     name roa::newuser(const name& creator, const name& nonce, const public_key& pubkey) {
        require_auth(creator);
 
-       roastate_t roastate(get_self(), get_self().value);
+       roastate_t roastate(get_self());
        auto state = roastate.get();
        check(state.is_active, "ROA is not active yet");
 

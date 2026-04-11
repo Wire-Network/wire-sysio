@@ -14,9 +14,9 @@ namespace sysiosystem {
     _producers(get_self(), get_self().value),
     _finalizer_keys(get_self(), get_self().value),
     _finalizers(get_self(), get_self().value),
-    _last_prop_finalizers(get_self(), get_self().value),
-    _fin_key_id_generator(get_self(), get_self().value),
-    _global(get_self(), get_self().value)
+    _last_prop_finalizers(get_self()),
+    _fin_key_id_generator(get_self()),
+    _global(get_self())
    {
       _gstate  = _global.exists() ? _global.get() : get_default_parameters();
    }
@@ -298,7 +298,7 @@ namespace sysiosystem {
 
    void native::setabi( const name& acnt, const std::vector<char>& abi,
                         const binary_extension<std::string>& memo ) {
-      sysio::multi_index< "abihash"_n, abi_hash >  table(get_self(), get_self().value);
+      sysio::kv::table< "abihash"_n, abi_hash >  table(get_self(), get_self().value);
       auto itr = table.find( acnt.value );
       if( itr == table.end() ) {
          table.emplace( acnt, [&]( auto& row ) {

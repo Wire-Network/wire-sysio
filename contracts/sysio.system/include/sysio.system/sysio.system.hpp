@@ -5,9 +5,9 @@
 #include <sysio/multi_index.hpp>
 #include <sysio/binary_extension.hpp>
 #include <sysio/crypto.hpp>
+#include <sysio/kv_global.hpp>
 #include <sysio/privileged.hpp>
 #include <sysio/producer_schedule.hpp>
-#include <sysio/singleton.hpp>
 #include <sysio/system.hpp>
 #include <sysio/time.hpp>
 #include <sysio/instant_finality.hpp>
@@ -155,7 +155,7 @@ namespace sysiosystem {
 
       uint64_t primary_key() const { return finalizer_name.value; }
    };
-   typedef sysio::multi_index< "finalizers"_n, finalizer_info > finalizers_table;
+   typedef sysio::kv::table< "finalizers"_n, finalizer_info > finalizers_table;
 
    // finalizer_auth_info stores a finalizer's key id and its finalizer authority
    struct finalizer_auth_info {
@@ -187,7 +187,7 @@ namespace sysiosystem {
       SYSLIB_SERIALIZE( last_prop_finalizers_info, (last_proposed_finalizers) )
    };
 
-   typedef sysio::multi_index< "lastpropfins"_n, last_prop_finalizers_info >  last_prop_fins_table;
+   typedef sysio::kv::global< "lastpropfins"_n, last_prop_finalizers_info >  last_prop_fins_table;
 
    // A single entry storing next available finalizer key_id to make sure
    // key_id in finalizers_table will never be reused.
@@ -198,9 +198,9 @@ namespace sysiosystem {
       SYSLIB_SERIALIZE( fin_key_id_generator_info, (next_finalizer_key_id) )
    };
 
-   typedef sysio::multi_index< "finkeyidgen"_n, fin_key_id_generator_info >  fin_key_id_gen_table;
+   typedef sysio::kv::global< "finkeyidgen"_n, fin_key_id_generator_info >  fin_key_id_gen_table;
 
-   typedef sysio::singleton< "global"_n, sysio_global_state >   global_state_singleton;
+   typedef sysio::kv::global< "global"_n, sysio_global_state >   global_state_singleton;
 
    /**
     * The `sysio.system` smart contract is provided by `Wire.Network` as a sample system contract, and it defines the

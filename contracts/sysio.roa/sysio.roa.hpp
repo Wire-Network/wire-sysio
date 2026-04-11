@@ -1,9 +1,10 @@
 #pragma once
 
 #include <sysio/sysio.hpp>
-#include <sysio/multi_index.hpp>
+#include <sysio/kv_table.hpp>
+#include <sysio/kv_global.hpp>
+#include <sysio/multi_index.hpp>  // nodeownerreg only (has used secondary index)
 #include <sysio/system.hpp> // For current_block_number
-#include <sysio/singleton.hpp>
 #include <sysio/asset.hpp>
 #include <sysio/dispatcher.hpp> // For SYSIO_DISPATCH of native action
 #include <sysio/privileged.hpp>
@@ -172,7 +173,7 @@ namespace sysio {
                 SYSLIB_SERIALIZE(roa_state, (is_active)(total_sys)(bytes_per_unit)(network_gen))
             };
 
-            typedef sysio::singleton<"roastate"_n, roa_state> roastate_t;
+            typedef sysio::kv::global<"roastate"_n, roa_state> roastate_t;
 
             /**
              * Scoped to network_gen
@@ -192,9 +193,7 @@ namespace sysio {
                 uint64_t by_tier() const { return static_cast<uint64_t>(tier); }
             };
 
-            typedef multi_index<"nodeowners"_n, nodeowners, 
-                indexed_by<"bytier"_n, const_mem_fun<nodeowners, uint64_t, &nodeowners::by_tier>>
-            > nodeowners_t;
+            typedef kv::table<"nodeowners"_n, nodeowners> nodeowners_t;
 
             /**
              * This table is scoped to Node Owner's account names and is used to track all policies issued by Node Owners.
@@ -211,7 +210,7 @@ namespace sysio {
                 uint64_t primary_key() const { return owner.value; }
             };
 
-            typedef multi_index<"policies"_n, policies> policies_t;
+            typedef kv::table<"policies"_n, policies> policies_t;
 
             /**
              * Scoped to Owner: Holds upper limits of resources an account has access to. This table is used by the Node Operators to maintain usage metrics, replaces 'userres' on sysio.
@@ -225,7 +224,7 @@ namespace sysio {
                 uint64_t primary_key() const { return owner.value; }
             };
 
-            typedef sysio::multi_index<"reslimit"_n, reslimit> reslimit_t;
+            typedef kv::table<"reslimit"_n, reslimit> reslimit_t;
 
             /**
              * This table is scoped to Node Owner's acoount names and is used to track all the node registration actions.
@@ -262,10 +261,7 @@ namespace sysio {
                 uint64_t by_username() const { return username.value; }
             };
 
-            typedef sysio::multi_index<
-                "sponsors"_n, sponsor,
-                indexed_by<"byusername"_n, const_mem_fun<sponsor, uint64_t, &sponsor::by_username>>
-            > sponsors_t;
+            typedef kv::table<"sponsors"_n, sponsor> sponsors_t;
 
             /**
              * @brief Table tracking how many new users a node owner has sponsored.
@@ -277,7 +273,7 @@ namespace sysio {
                 uint64_t primary_key() const { return owner.value; }
             };
 
-            typedef sysio::multi_index<"sponsorcount"_n, sponsorcount> sponsorcount_t;
+            typedef kv::table<"sponsorcount"_n, sponsorcount> sponsorcount_t;
 
             // ---- Private Functions ----
 

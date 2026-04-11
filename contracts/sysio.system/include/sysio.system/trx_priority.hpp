@@ -1,10 +1,11 @@
 #pragma once
 
 #include <sysio/contract.hpp>
-#include <sysio/multi_index.hpp>
+#include <sysio/kv_global.hpp>
+#include <sysio/kv_table.hpp>
 #include <sysio/name.hpp>
-#include <sysio/singleton.hpp>
 #include <sysio/time.hpp>
+#include <sysio/system.hpp>
 
 namespace sysiosystem {
 
@@ -35,8 +36,8 @@ struct [[sysio::table("trxpglobal"), sysio::contract("sysio.system")]] trx_prio_
 };
 
 // -------------------------------------------------------------------------------------------------
-using trx_priority_table = sysio::multi_index<"trxpriority"_n, trx_prio>;
-using global_trx_prio_singleton = sysio::singleton< "trxpglobal"_n, trx_prio_global >;
+using trx_priority_table = sysio::kv::table<"trxpriority"_n, trx_prio>;
+using global_trx_prio_singleton = sysio::kv::global< "trxpglobal"_n, trx_prio_global >;
 
 // -------------------------------------------------------------------------------------------------
 struct [[sysio::contract("sysio.system")]] trx_priority : public sysio::contract {

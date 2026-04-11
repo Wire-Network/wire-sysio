@@ -78,16 +78,10 @@ namespace sysiosystem {
       sysio::set_finalizers(std::move(fin_policy)); // call host function
 
       // Store last proposed policy in both cache and DB table
-      auto itr = _last_prop_finalizers.begin();
-      if( itr == _last_prop_finalizers.end() ) {
-         _last_prop_finalizers.emplace( get_self(), [&]( auto& f ) {
-            f.last_proposed_finalizers = proposed_finalizers;
-         });
-      } else {
-         _last_prop_finalizers.modify(itr, same_payer, [&]( auto& f ) {
-            f.last_proposed_finalizers = proposed_finalizers;
-         });
-      }
+      _last_prop_finalizers.set(
+         last_prop_finalizers_info{ .last_proposed_finalizers = proposed_finalizers },
+         get_self()
+      );
       // Ensure not invalidate anyone holding the references to the vector
       // that was returned earlier by get_last_proposed_finalizer
       if (_last_prop_finalizers_cached.has_value()) {
@@ -100,11 +94,10 @@ namespace sysiosystem {
    // Returns last proposed finalizers
    const std::vector<finalizer_auth_info>& system_contract::get_last_proposed_finalizers() {
       if( !_last_prop_finalizers_cached.has_value() ) {
-         const auto finalizers_itr = _last_prop_finalizers.begin();
-         if( finalizers_itr == _last_prop_finalizers.end() ) {
+         if( !_last_prop_finalizers.exists() ) {
             _last_prop_finalizers_cached = {};
          } else {
-            _last_prop_finalizers_cached = finalizers_itr->last_proposed_finalizers;
+            _last_prop_finalizers_cached = _last_prop_finalizers.get().last_proposed_finalizers;
          }
       }
 
@@ -115,17 +108,18 @@ namespace sysiosystem {
    // It may never be reused.
    uint64_t system_contract::get_next_finalizer_key_id() {
       uint64_t next_id = 0;
-      auto itr = _fin_key_id_generator.begin();
 
-      if( itr == _fin_key_id_generator.end() ) {
-         _fin_key_id_generator.emplace( get_self(), [&]( auto& f ) {
-            f.next_finalizer_key_id = next_id;
-         });
+      if( !_fin_key_id_generator.exists() ) {
+         _fin_key_id_generator.set(
+            fin_key_id_generator_info{ .next_finalizer_key_id = next_id },
+            get_self()
+         );
       } else {
-         next_id = itr->next_finalizer_key_id  + 1;
-         _fin_key_id_generator.modify(itr, same_payer, [&]( auto& f ) {
-            f.next_finalizer_key_id = next_id;
-         });
+         next_id = _fin_key_id_generator.get().next_finalizer_key_id + 1;
+         _fin_key_id_generator.set(
+            fin_key_id_generator_info{ .next_finalizer_key_id = next_id },
+            get_self()
+         );
       }
 
       return next_id;

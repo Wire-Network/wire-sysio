@@ -2,6 +2,7 @@
 
 #include <sysio/contract.hpp>
 #include <sysio/crypto.hpp>
+#include <sysio/kv_table.hpp>
 #include <sysio/name.hpp>
 
 #include <string>
@@ -35,7 +36,7 @@ struct [[sysio::table("peerkeys"), sysio::contract("sysio.system")]] peer_key {
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
-typedef sysio::multi_index<"peerkeys"_n, peer_key> peer_keys_table;
+typedef sysio::kv::table<"peerkeys"_n, peer_key> peer_keys_table;
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
