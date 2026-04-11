@@ -594,7 +594,7 @@ static std::optional<std::string> byte_successor(std::string_view bytes) {
 int64_t apply_context::kv_set(uint8_t key_format, uint64_t payer_val, const char* key, uint32_t key_size, const char* value, uint32_t value_size) {
    SYS_ASSERT( !trx_context.is_read_only(), table_operation_not_permitted,
                "cannot store a KV record when executing a readonly transaction" );
-   SYS_ASSERT( key_format <= 1, kv_key_too_large, "KV key_format must be 0 (raw) or 1 (standard)" );
+   SYS_ASSERT( key_format < config::KV_FORMAT_COUNT, kv_key_too_large, "KV key_format must be 0 (raw) or 1 (standard)" );
    SYS_ASSERT( key_size > 0, kv_key_too_large, "KV key must not be empty" );
    SYS_ASSERT( key_size <= control.get_global_properties().configuration.max_kv_key_size, kv_key_too_large,
                "KV key size {} exceeds maximum {}", key_size, control.get_global_properties().configuration.max_kv_key_size );
@@ -710,7 +710,7 @@ int32_t apply_context::kv_contains(uint8_t key_format, name code, const char* ke
 // --- Primary KV iterators ---
 
 uint32_t apply_context::kv_it_create(uint8_t key_format, name code, const char* prefix, uint32_t prefix_size) {
-   SYS_ASSERT( key_format <= 1, kv_key_too_large, "KV key_format must be 0 (raw) or 1 (standard)" );
+   SYS_ASSERT( key_format < config::KV_FORMAT_COUNT, kv_key_too_large, "KV key_format must be 0 (raw) or 1 (standard)" );
    uint32_t handle = kv_iterators.allocate_primary(key_format, code, prefix, prefix_size);
    auto& slot = kv_iterators.get(handle);
 

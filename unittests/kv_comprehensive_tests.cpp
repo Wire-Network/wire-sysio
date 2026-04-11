@@ -215,7 +215,7 @@ BOOST_AUTO_TEST_CASE(kv_ship_delta_format_24byte_key) {
    db.create<kv_object>([&](auto& o) {
       o.code = "sysio.token"_n;
          o.payer = "sysio.token"_n;
-      o.key_format = 1; // standard [table:8B][scope:8B][pk:8B]
+      o.key_format = config::kv_format_standard;
       o.key.assign(key, chain::kv_key_size);
       o.value.assign("testvalue", 9);
    });
@@ -393,7 +393,7 @@ BOOST_AUTO_TEST_CASE(kv_get_row_by_id_fallback) {
 
    db.create<kv_object>([&](auto& o) {
       o.code = "mycode"_n;
-      o.key_format = 1;
+      o.key_format = config::kv_format_standard;
       o.key.assign(key, chain::kv_key_size);
       o.value.assign("hello_kv", 8);
    });

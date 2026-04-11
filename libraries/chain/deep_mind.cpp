@@ -162,7 +162,7 @@ namespace sysio::chain {
 
       kv_decoded_key decode_kv_key(const kv_object& obj) {
          kv_decoded_key dk;
-         if (obj.key_format == 1 && obj.key.size() == chain::kv_key_size) {
+         if (obj.key_format == config::kv_format_standard && obj.key.size() == chain::kv_key_size) {
             dk.table_name = name(kv_decode_be64(obj.key.data()));
             dk.scope      = name(kv_decode_be64(obj.key.data() + 8));
             dk.primary_key = kv_decode_be64(obj.key.data() + 16);
