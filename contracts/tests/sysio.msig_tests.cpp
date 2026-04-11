@@ -891,8 +891,14 @@ namespace {
    // Build an inner transaction whose serialized form is larger than the contract's
    // chunk threshold. Two setcode actions to two different accounts, each carrying
    // the full sysio.system wasm. Total ≈ 270 KiB, which forces chunking.
+   //
+   // `expiration_iso` controls the wrapped trx's expiration; defaults to far-future so
+   // the common happy-path tests don't have to reason about block time. Tests that
+   // need the proposal to actually expire (e.g. cancel-by-non-proposer) override it
+   // with a near-future value computed from `control->head_block_time()`.
    transaction build_chunking_trx(const vector<permission_level>& perm,
-                                  sysio_msig_tester& t)
+                                  sysio_msig_tester& t,
+                                  const std::string& expiration_iso = "2025-01-01T00:30")
    {
       auto wasm = contracts::system_wasm();
 
@@ -909,7 +915,7 @@ namespace {
       };
 
       fc::variant pretty_trx = fc::mutable_variant_object()
-         ("expiration", "2025-01-01T00:30")
+         ("expiration", expiration_iso)
          ("ref_block_num", 2)
          ("ref_block_prefix", 3)
          ("max_net_usage_words", 0)
@@ -1037,8 +1043,10 @@ BOOST_FIXTURE_TEST_CASE( getproposal_read_only_returns_assembled, sysio_msig_tes
    const bytes returned_packed = packed_var.as<bytes>();
 
    // The reassembled blob must byte-equal what we originally passed to propose.
-   BOOST_REQUIRE_EQUAL( returned_packed.size(), original_packed.size() );
-   BOOST_REQUIRE( std::equal(returned_packed.begin(), returned_packed.end(), original_packed.begin()) );
+   // BOOST_REQUIRE_EQUAL_COLLECTIONS reports the first mismatching index on
+   // failure, which is invaluable for debugging a broken chunk-reassembly path.
+   BOOST_REQUIRE_EQUAL_COLLECTIONS( returned_packed.begin(), returned_packed.end(),
+                                    original_packed.begin(), original_packed.end() );
 
    // chunk_count should be > 0 since the proposal exceeded the threshold.
    const uint32_t chunk_count = obj["chunk_count"].as<uint32_t>();
@@ -1047,6 +1055,151 @@ BOOST_FIXTURE_TEST_CASE( getproposal_read_only_returns_assembled, sysio_msig_tes
    // total_size should match the original blob length.
    const uint32_t total_size = obj["total_size"].as<uint32_t>();
    BOOST_REQUIRE_EQUAL( total_size, original_packed.size() );
+} FC_LOG_AND_RETHROW()
+
+// Sibling of `getproposal_read_only_returns_assembled` for the *inline* path —
+// proves the read-only `getproposal` action also works for proposals small
+// enough to live in a single `proposal` row (chunk_count == 0). The contract
+// branch under test (`get_proposal` line ~395 — the "not is_chunked" leg that
+// returns `prop` directly without touching `read_proposal_chunks`) had no
+// direct coverage in the chunked-only sibling test.
+BOOST_FIXTURE_TEST_CASE( getproposal_read_only_inline, sysio_msig_tester ) try {
+   // A reqauth-based trx is well under the chunk threshold (200 KiB), so this
+   // exercises the inline storage path.
+   auto trx = reqauth( "alice"_n, {permission_level{"alice"_n, config::active_name}}, abi_serializer_max_time );
+   const bytes original_packed = fc::raw::pack(trx);
+   BOOST_REQUIRE_LT( original_packed.size(), 200u * 1024u );  // sanity: must be inline
+
+   push_action( "alice"_n, "propose"_n, mvo()
+                  ("proposer",      "alice")
+                  ("proposal_name", "smallprop")
+                  ("trx",           trx)
+                  ("requested",     vector<permission_level>{{ "alice"_n, config::active_name }})
+   );
+
+   action getproposal_act;
+   getproposal_act.account = "sysio.msig"_n;
+   getproposal_act.name    = "getproposal"_n;
+   getproposal_act.authorization = {};
+   getproposal_act.data = abi_ser.variant_to_binary(
+      "get_proposal",
+      mvo()("proposer", "alice")("proposal_name", "smallprop"),
+      abi_serializer::create_yield_function(abi_serializer_max_time));
+
+   signed_transaction ro_trx;
+   ro_trx.actions.push_back(getproposal_act);
+   set_transaction_headers(ro_trx);
+   auto trace = push_transaction( ro_trx, fc::time_point::maximum(),
+                                  DEFAULT_BILLED_CPU_TIME_US, false,
+                                  transaction_metadata::trx_type::read_only );
+
+   BOOST_REQUIRE( bool(trace) );
+   BOOST_REQUIRE_EQUAL( trace->action_traces.size(), 1u );
+   const auto& return_value = trace->action_traces[0].return_value;
+   BOOST_REQUIRE( !return_value.empty() );
+
+   fc::variant decoded = abi_ser.binary_to_variant(
+      "proposal", return_value,
+      abi_serializer::create_yield_function(abi_serializer_max_time));
+
+   const auto& obj = decoded.get_object();
+   const bytes returned_packed = obj["packed_transaction"].as<bytes>();
+
+   // The returned blob must byte-equal what we originally passed to propose.
+   BOOST_REQUIRE_EQUAL_COLLECTIONS( returned_packed.begin(), returned_packed.end(),
+                                    original_packed.begin(), original_packed.end() );
+
+   // chunk_count must be 0 (or absent) on the inline path.
+   const uint32_t chunk_count = obj["chunk_count"].as<uint32_t>();
+   BOOST_REQUIRE_EQUAL( chunk_count, 0u );
+
+   // total_size is still populated by propose for inline proposals — verify it.
+   const uint32_t total_size = obj["total_size"].as<uint32_t>();
+   BOOST_REQUIRE_EQUAL( total_size, original_packed.size() );
+
+   // trx_hash is also populated for inline proposals — verify it round-trips.
+   BOOST_REQUIRE( obj.contains("trx_hash") );
+} FC_LOG_AND_RETHROW()
+
+// Exercises the chunked-trx-recheck path in `unapprove` (sysio.msig.cpp:297 —
+// the `const auto packed = assemble_packed_trx(std::move(prop), ...)` call).
+// That branch fires only when the proposal's earliest_exec_time inner optional
+// has a value, which happens after the proposal has been fully authorized once
+// via approve. For chunked proposals that reassembly path is not exercised
+// by the existing `big_transaction_chunked` test, which only walks the
+// approve + exec path.
+//
+// Sequence: propose chunked -> approve1 -> approve2 (sets earliest_exec_time
+// via the approve-side recheck) -> unapprove2 (triggers the unapprove-side
+// recheck, which reassembles chunks and clears earliest_exec_time because
+// the proposal is no longer fully authorized) -> exec (must fail because
+// the proposal lost an approval).
+BOOST_FIXTURE_TEST_CASE( unapprove_chunked_past_threshold, sysio_msig_tester ) try {
+   vector<permission_level> perm = { { "alice"_n, config::active_name },
+                                     { "bob"_n,   config::active_name } };
+   transaction trx = build_chunking_trx(perm, *this);
+
+   push_action( "alice"_n, "propose"_n, mvo()
+                  ("proposer",      "alice")
+                  ("proposal_name", "chunkprop")
+                  ("trx",           trx)
+                  ("requested",     perm)
+   );
+
+   // First approve: not yet fully authorized; earliest_exec_time inner optional stays empty.
+   push_action( "alice"_n, "approve"_n, mvo()
+                  ("proposer",      "alice")
+                  ("proposal_name", "chunkprop")
+                  ("level",         permission_level{ "alice"_n, config::active_name })
+   );
+
+   // Second approve: the approve-side recheck reassembles the chunked blob and
+   // sets earliest_exec_time on the proposal row because the 2-of-2 threshold
+   // is now met.
+   push_action( "bob"_n, "approve"_n, mvo()
+                  ("proposer",      "alice")
+                  ("proposal_name", "chunkprop")
+                  ("level",         permission_level{ "bob"_n,   config::active_name })
+   );
+
+   // Unapprove by bob: the unapprove-side recheck reassembles the chunked blob
+   // (the path under test), observes that authorization is no longer satisfied,
+   // and clears the earliest_exec_time inner optional back to empty. If the
+   // reassembly were broken, this action would either throw or leave stale
+   // state that the follow-up exec would silently accept.
+   push_action( "bob"_n, "unapprove"_n, mvo()
+                  ("proposer",      "alice")
+                  ("proposal_name", "chunkprop")
+                  ("level",         permission_level{ "bob"_n,   config::active_name })
+   );
+
+   // exec must now reject — bob's approval was removed, so the auth check fails.
+   BOOST_REQUIRE_EXCEPTION( push_action( "alice"_n, "exec"_n, mvo()
+                                          ("proposer",      "alice")
+                                          ("proposal_name", "chunkprop")
+                                          ("executer",      "alice")
+                            ),
+                            sysio_assert_message_exception,
+                            sysio_assert_message_is("transaction authorization failed")
+   );
+
+   // Re-approving bob and then exec'ing should succeed — proves the proposal
+   // wasn't corrupted by the unapprove path.
+   push_action( "bob"_n, "approve"_n, mvo()
+                  ("proposer",      "alice")
+                  ("proposal_name", "chunkprop")
+                  ("level",         permission_level{ "bob"_n,   config::active_name })
+   );
+   transaction_trace_ptr trace = push_action( "alice"_n, "exec"_n, mvo()
+                                               ("proposer",      "alice")
+                                               ("proposal_name", "chunkprop")
+                                               ("executer",      "alice")
+   );
+   check_traces( trace, {
+                        {{"receiver", "sysio.msig"_n},                  {"act_name", "exec"_n}},
+                        {{"receiver", config::system_account_name},     {"act_name", "setcode"_n}},
+                        {{"receiver", config::system_account_name},     {"act_name", "setcode"_n}}
+                        } );
 } FC_LOG_AND_RETHROW()
 
 // Cancel must erase every `propchunks` row associated with the proposal so
@@ -1106,6 +1259,76 @@ BOOST_FIXTURE_TEST_CASE( cancel_chunked_proposal_cleans_chunks, sysio_msig_teste
                         {{"receiver", config::system_account_name},     {"act_name", "setcode"_n}},
                         {{"receiver", config::system_account_name},     {"act_name", "setcode"_n}}
                         } );
+} FC_LOG_AND_RETHROW()
+
+// Exercises the chunked-proposal expiration-check path in `cancel`:
+// sysio.msig.cpp:319 — the `if (canceler != proposer)` branch that calls
+// `read_trx_header(prop, ...)` to compare the proposal's expiration against
+// the current time. For chunked proposals `read_trx_header` takes its chunk-0
+// fast path (sysio.msig.cpp:63-65), which is not exercised by the other
+// chunked tests: `big_transaction_chunked` and the unapprove variant only
+// cancel via the proposer path, and `cancel_chunked_proposal_cleans_chunks`
+// cancels as the proposer so it never enters the expiration check.
+//
+// Sequence: propose chunked with a near-future expiration -> try to cancel
+// as bob (non-proposer) before expiration (must fail with "cannot cancel
+// until expiration") -> advance chain past expiration -> cancel as bob
+// (must succeed and exercise the chunk-0 read path) -> re-propose under the
+// same name (would fail if cancel did not also clean up the chunks).
+BOOST_FIXTURE_TEST_CASE( cancel_chunked_by_non_proposer_past_expiration, sysio_msig_tester ) try {
+   vector<permission_level> perm = { { "alice"_n, config::active_name },
+                                     { "bob"_n,   config::active_name } };
+
+   // Compute a near-future expiration so we can advance the chain past it in
+   // a handful of blocks. head_block_time() + 5 seconds gives the propose
+   // action plenty of room and lets us expire in ~10 blocks of produce_blocks.
+   const fc::time_point_sec near_future_exp(
+      control->head().block_time() + fc::seconds(5) );
+   transaction trx = build_chunking_trx(perm, *this, near_future_exp.to_iso_string());
+
+   push_action( "alice"_n, "propose"_n, mvo()
+                  ("proposer",      "alice")
+                  ("proposal_name", "chunkprop")
+                  ("trx",           trx)
+                  ("requested",     perm)
+   );
+
+   // Non-proposer cancel attempt before expiration must be rejected. This
+   // enters `read_trx_header` on the chunked proposal (chunk-0 fast path)
+   // and compares the parsed expiration against `current_time_point()`.
+   BOOST_REQUIRE_EXCEPTION( push_action( "bob"_n, "cancel"_n, mvo()
+                                          ("proposer",      "alice")
+                                          ("proposal_name", "chunkprop")
+                                          ("canceler",      "bob")
+                            ),
+                            sysio_assert_message_exception,
+                            sysio_assert_message_is("cannot cancel until expiration")
+   );
+
+   // Advance the chain past the proposal's expiration. 20 * 500ms = 10s > 5s.
+   produce_blocks(20);
+
+   // Same cancel now succeeds. Exercises the chunk-0 read_trx_header path AND
+   // the chunk cleanup path (the proposal is chunked, so `erase_proposal_chunks`
+   // has work to do).
+   push_action( "bob"_n, "cancel"_n, mvo()
+                  ("proposer",      "alice")
+                  ("proposal_name", "chunkprop")
+                  ("canceler",      "bob")
+   );
+
+   // Re-propose under the same name to prove the chunks were erased: the
+   // `propchunks` emplace inside `propose` would assert "key already exists"
+   // if any of the prior chunk rows were still in the table.
+   const fc::time_point_sec fresh_exp(
+      control->head().block_time() + fc::seconds(60) );
+   auto fresh_trx = build_chunking_trx(perm, *this, fresh_exp.to_iso_string());
+   push_action( "alice"_n, "propose"_n, mvo()
+                  ("proposer",      "alice")
+                  ("proposal_name", "chunkprop")
+                  ("trx",           fresh_trx)
+                  ("requested",     perm)
+   );
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_SUITE_END()

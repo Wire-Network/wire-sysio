@@ -3355,11 +3355,22 @@ int main( int argc, char** argv ) {
                             packed_transaction( ro_trx, packed_transaction::compression_type::none )) );
       } catch( chain::missing_chain_api_plugin_exception& ) {
          std::cerr << "send_read_only_transaction RPC is not supported by this node — "
-                      "multisig review needs a node that exposes /v1/chain/send_read_only_transaction." << std::endl;
+                      "ensure the API node is started with --read-only-threads N (N >= 1) and is "
+                      "not a producer node." << std::endl;
          throw;
-      } catch( ... ) {
-         std::cerr << "Proposal not found" << std::endl;
-         return;
+      } catch( const fc::exception& e ) {
+         // The contract's `proptable.get(..., "proposal not found")` assertion surfaces
+         // here as a generic fc::exception (do_http_call constructs one from the chain's
+         // error envelope at httpc.cpp:83) with code 3050003 / sysio_assert_message
+         // and "proposal not found" embedded in the log message. Print the historical
+         // friendly message for that specific case and rethrow everything else, so
+         // network errors, server errors, parse failures, and unrelated contract
+         // assertions are not silently masked as a missing proposal.
+         if( e.to_string().find("proposal not found") != std::string::npos ) {
+            std::cerr << "Proposal not found" << std::endl;
+            return;
+         }
+         throw;
       }
 
       // The action's return value is the assembled `proposal` struct. chain_plugin
@@ -3367,24 +3378,43 @@ int main( int argc, char** argv ) {
       // `action_results` entry for the action — which sysio.msig's ABI does. Pull
       // the decoded variant out of the trace and use it the same way the old
       // get_table_rows code path used the row's "value" field.
-      const auto& processed = result1.get_object()["processed"].get_object();
-      const auto& action_traces = processed["action_traces"].get_array();
-      if( action_traces.empty() ) {
-         std::cerr << "Proposal not found" << std::endl;
+      //
+      // The envelope walk is wrapped in a try/catch because any of the
+      // `get_object()` / `get_array()` / `operator[]` accesses can throw on a
+      // misshapen response (bad_cast_exception for wrong types,
+      // key_not_found_exception for missing fields). We take the address of the
+      // final decoded object so `proposal_object` can be used by the downstream
+      // code without duplicating the ~200 KiB packed_transaction field — the
+      // pointed-to variant_object lives inside `result1`, which outlives the try
+      // block. On any parse failure we print the raw response so the user can
+      // diagnose what the node actually returned.
+      const fc::variant_object* proposal_object_ptr = nullptr;
+      try {
+         const auto& processed = result1.get_object()["processed"].get_object();
+         const auto& action_traces = processed["action_traces"].get_array();
+         if( action_traces.empty() ) {
+            std::cerr << "Proposal not found" << std::endl;
+            return;
+         }
+         const auto& first_trace = action_traces[0].get_object();
+         if( !first_trace.contains("return_value_data") ) {
+            std::cerr << "Node returned no decoded action_results for sysio.msig::getproposal — "
+                         "the chain may be running a sysio.msig version that does not expose this action." << std::endl;
+            return;
+         }
+         proposal_object_ptr = &first_trace["return_value_data"].get_object();
+         if( (*proposal_object_ptr)["proposal_name"] != proposal_name ) {
+            std::cerr << "Proposal not found" << std::endl;
+            return;
+         }
+      } catch( const fc::exception& e ) {
+         std::cerr << "Unexpected shape in send_read_only_transaction response from node for "
+                      "sysio.msig::getproposal on " << proposer << "/" << proposal_name << ".\n"
+                      "Error: " << e.to_string() << "\n"
+                      "Response: " << fc::json::to_pretty_string( result1 ) << std::endl;
          return;
       }
-      const auto& first_trace = action_traces[0].get_object();
-      if( !first_trace.contains("return_value_data") ) {
-         std::cerr << "Node returned no decoded action_results for sysio.msig::getproposal — "
-                      "the chain may be running a different sysio.msig that does not expose this action." << std::endl;
-         return;
-      }
-
-      const auto& proposal_object = first_trace["return_value_data"].get_object();
-      if( proposal_object["proposal_name"] != proposal_name ) {
-         std::cerr << "Proposal not found" << std::endl;
-         return;
-      }
+      const auto& proposal_object = *proposal_object_ptr;
 
       enum class approval_status {
          unapproved,

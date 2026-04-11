@@ -117,7 +117,14 @@ public:
    /// Maximum number of bytes of inner-trx data stored in a single `propchunks` row.
    /// Must leave headroom under `max_kv_value_size` (256 KiB default) for the row's other
    /// fields and the KV layer's per-row overhead. 200 KiB is a comfortable safe choice.
+   ///
+   /// `read_trx_header`'s chunk-0 fast path requires chunk 0 to hold at least one
+   /// serialized `transaction_header` (max ~21 bytes: 4 + 2 + 4 + varint32 + 1 + varint32).
+   /// 128 is a comfortable lower bound that anyone reducing this constant would have to
+   /// confront at compile time before silently breaking the fast path.
    static constexpr size_t proposal_chunk_size = 200 * 1024;
+   static_assert(proposal_chunk_size >= 128,
+                 "proposal_chunk_size must hold a serialized transaction_header for read_trx_header's chunk-0 fast path");
 
    struct proposal_key {
       uint64_t proposal_name;
@@ -183,28 +190,6 @@ public:
    };
    using propchunks = sysio::kv::scoped_table< "propchunks"_n, propchunk_key, propchunk >;
 
-   /**
-    * Read-only `getproposal` action returns the assembled proposal for `(proposer, proposal_name)`.
-    *
-    * For non-chunked proposals this is a thin wrapper around the `proposal` row. For chunked
-    * proposals — those whose serialized inner transaction exceeds `proposal_chunk_size` and is
-    * stored split across the `propchunks` table — the action reassembles the full
-    * `packed_transaction` blob in WASM linear memory and returns the complete struct so callers
-    * never have to know whether the proposal was chunked.
-    *
-    * Intended to be invoked via `/v1/chain/send_read_only_transaction` so the action's return
-    * value is not bounded by `max_action_return_value_size` (the chain skips that check in
-    * read-only context). This is the storage-layout-agnostic way for tooling to read proposals.
-    *
-    * @param proposer - The proposing account that scopes the proposal table
-    * @param proposal_name - The name of the proposal to fetch
-    * @return The fully assembled proposal struct with `packed_transaction` populated.
-    */
-   [[sysio::action("getproposal"), sysio::read_only]]
-   proposal get_proposal( name proposer, name proposal_name );
-
-   using getproposal_action = sysio::action_wrapper<"getproposal"_n, &multisig::get_proposal>;
-
    struct old_approval_key {
       uint64_t proposal_name;
       SYSLIB_SERIALIZE(old_approval_key, (proposal_name))
@@ -255,5 +240,30 @@ public:
    };
 
    using invalidations = sysio::kv::table< "invals"_n, inval_key, invalidation >;
+
+   /**
+    * Read-only `getproposal` action returns the assembled proposal for `(proposer, proposal_name)`.
+    *
+    * For non-chunked proposals this is a thin wrapper around the `proposal` row. For chunked
+    * proposals — those whose serialized inner transaction exceeds `proposal_chunk_size` and is
+    * stored split across the `propchunks` table — the action reassembles the full
+    * `packed_transaction` blob in WASM linear memory and returns the complete struct so callers
+    * never have to know whether the proposal was chunked.
+    *
+    * Intended to be invoked via `/v1/chain/send_read_only_transaction` so the action's return
+    * value is not bounded by `max_action_return_value_size` (the chain skips that check in
+    * read-only context). This is the storage-layout-agnostic way for tooling to read proposals.
+    *
+    * Declared after all tables because it returns `proposal` by value — the return type must
+    * be fully defined at the point of declaration.
+    *
+    * @param proposer - The proposing account that scopes the proposal table
+    * @param proposal_name - The name of the proposal to fetch
+    * @return The fully assembled proposal struct with `packed_transaction` populated.
+    */
+   [[sysio::action("getproposal"), sysio::read_only]]
+   proposal get_proposal( name proposer, name proposal_name );
+
+   using getproposal_action = sysio::action_wrapper<"getproposal"_n, &multisig::get_proposal>;
 };
 } /// namespace sysio
