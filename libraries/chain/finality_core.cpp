@@ -1,8 +1,73 @@
 #include <sysio/chain/finality_core.hpp>
 #include <sysio/chain/block_header.hpp>
 #include <sysio/chain/merkle.hpp>
+#include <sysio/chain/exceptions.hpp>
 
 namespace sysio::chain {
+
+void finality_core::validate_snapshot() const {
+   // Invariant 1: links must not be empty
+   SYS_ASSERT(!links.empty(), snapshot_exception, "finality_core: links must not be empty");
+
+   auto lfbn = links.front().target_block_num;
+   auto cur  = links.back().source_block_num;
+   auto qc   = links.back().target_block_num; // latest_qc_claim target
+
+   // Invariant 2: last_final_block_num <= links.front().source_block_num <= latest_qc_claim().block_num
+   SYS_ASSERT(lfbn <= links.front().source_block_num, snapshot_exception,
+              "finality_core: last_final_block_num ({}) > links.front().source_block_num ({})",
+              lfbn, links.front().source_block_num);
+   SYS_ASSERT(links.front().source_block_num <= qc, snapshot_exception,
+              "finality_core: links.front().source_block_num ({}) > latest_qc_claim().block_num ({})",
+              links.front().source_block_num, qc);
+
+   if (refs.empty()) {
+      // Invariant 3: genesis core — links.size() == 1 and source == target == last_final
+      SYS_ASSERT(links.size() == 1, snapshot_exception,
+                 "finality_core: genesis core must have exactly 1 link, has {}", links.size());
+      SYS_ASSERT(links.back().target_block_num == links.back().source_block_num, snapshot_exception,
+                 "finality_core: genesis core link target ({}) != source ({})",
+                 links.back().target_block_num, links.back().source_block_num);
+   } else {
+      // Invariant 4: refs.front().block_num() == last_final_block_num
+      SYS_ASSERT(refs.front().block_num() == lfbn, snapshot_exception,
+                 "finality_core: refs.front().block_num() ({}) != last_final_block_num ({})",
+                 refs.front().block_num(), lfbn);
+
+      // Invariant 5: refs.back().block_num() + 1 == current_block_num
+      SYS_ASSERT(refs.back().block_num() + 1 == cur, snapshot_exception,
+                 "finality_core: refs.back().block_num() + 1 ({}) != current_block_num ({})",
+                 refs.back().block_num() + 1, cur);
+
+      // Invariant 6: refs contiguous and timestamps strictly increasing
+      for (size_t i = 0; i + 1 < refs.size(); ++i) {
+         SYS_ASSERT(refs[i].block_num() + 1 == refs[i+1].block_num(), snapshot_exception,
+                    "finality_core: refs[{}].block_num() + 1 ({}) != refs[{}].block_num() ({})",
+                    i, refs[i].block_num() + 1, i+1, refs[i+1].block_num());
+         SYS_ASSERT(refs[i].timestamp < refs[i+1].timestamp, snapshot_exception,
+                    "finality_core: refs timestamps not strictly increasing at index {}", i);
+      }
+   }
+
+   // Invariant 7: links contiguous source_block_num, monotonic target_block_num
+   for (size_t i = 0; i + 1 < links.size(); ++i) {
+      SYS_ASSERT(links[i].source_block_num + 1 == links[i+1].source_block_num, snapshot_exception,
+                 "finality_core: links[{}].source_block_num + 1 ({}) != links[{}].source_block_num ({})",
+                 i, links[i].source_block_num + 1, i+1, links[i+1].source_block_num);
+      SYS_ASSERT(links[i].target_block_num <= links[i+1].target_block_num, snapshot_exception,
+                 "finality_core: links target_block_num not monotonically increasing at index {}", i);
+   }
+
+   // Invariant 8 (implied by 3-6): current_block_num - last_final_block_num == refs.size()
+   SYS_ASSERT(cur - lfbn == refs.size(), snapshot_exception,
+              "finality_core: current_block_num ({}) - last_final_block_num ({}) != refs.size() ({})",
+              cur, lfbn, refs.size());
+
+   // Invariant 9 (implied by 1,7): current_block_num - links.front().source_block_num == links.size() - 1
+   SYS_ASSERT(cur - links.front().source_block_num == links.size() - 1, snapshot_exception,
+              "finality_core: link count mismatch: current_block_num ({}) - front source ({}) != links.size()-1 ({})",
+              cur, links.front().source_block_num, links.size() - 1);
+}
 
 /**
  *  @pre block_id is not null
