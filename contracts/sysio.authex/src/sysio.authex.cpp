@@ -101,7 +101,7 @@ namespace sysio {
          "Invalid chain_kind. Supported: chain_kind_ethereum(2), chain_kind_solana(3), chain_kind_sui(4).");
 
    // ——— Table & indices ———
-   links_t links(get_self(), get_self().value);
+   links_t links(get_self());
    auto by_namechain = links.get_index<"bynamechain"_n>();
    uint128_t name_chain = (static_cast<uint128_t>(account.value) << 64) | static_cast<uint64_t>(chain_kind);
    check(by_namechain.find(name_chain) == by_namechain.end(), "Account already has a link for this chain.");
@@ -168,11 +168,16 @@ namespace sysio {
    sysio::check(ex_permission.has_value(), "Internal error: ex_permission not set");
 
    // CREATE LINK RECORD
-   links.emplace("sysio"_n, [&](auto& a) {
-      a.key = links.available_primary_key();
-      a.username = account;
-      a.chain_kind = chain_kind;
-      a.pub_key = pub_key;
+   uint64_t next_key = 0;
+   if (links.cbegin() != links.cend()) {
+      auto last = --links.cend();
+      next_key = last->key + 1;
+   }
+   links.emplace("sysio"_n, links_key{next_key}, links_s{
+      .key = next_key,
+      .username = account,
+      .chain_kind = chain_kind,
+      .pub_key = pub_key,
    });
 
    // PUSH `ex.<chain_prefix>` TO PERMISSIONS
@@ -204,7 +209,7 @@ namespace sysio {
 [[sysio::action]] void authex::clearlinks() {
    require_auth(get_self());
 
-   links_t links(get_self(), get_self().value);
+   links_t links(get_self());
 
    // Delete all entries in the links table.
    auto itr = links.begin();
@@ -235,14 +240,14 @@ void authex::onmanualrmv(const name& account, const name& permission) {
    }
 
    // Find reference to 'account' in links table via namechain index
-   links_t links(get_self(), get_self().value);
+   links_t links(get_self());
    auto by_namechain = links.get_index<"bynamechain"_n>();
    uint128_t name_chain = to_namechain_key(account, kind);
    auto itr = by_namechain.find(name_chain);
    if (itr == by_namechain.end())
       return;
 
-   by_namechain.erase(itr);
+   by_namechain.erase(std::move(itr));
 };
 
 // ----- PRIVATE HELPER METHODS -----

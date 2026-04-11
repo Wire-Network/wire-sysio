@@ -31,6 +31,16 @@
             ]
         },
         {
+            "name": "abihash_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "actfinkey",
             "base": "",
             "fields": [
@@ -229,6 +239,16 @@
             ]
         },
         {
+            "name": "blockinfo_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "block_height",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "deleteauth",
             "base": "",
             "fields": [
@@ -365,6 +385,26 @@
                 {
                     "name": "finalizer_key_binary",
                     "type": "bytes"
+                }
+            ]
+        },
+        {
+            "name": "finalizer_key_t",
+            "base": "",
+            "fields": [
+                {
+                    "name": "finalizer_name",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "finkey_key_t",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
                 }
             ]
         },
@@ -577,6 +617,16 @@
                 {
                     "name": "block_signing_key",
                     "type": "public_key"
+                }
+            ]
+        },
+        {
+            "name": "producer_key_t",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "uint64"
                 }
             ]
         },
@@ -963,6 +1013,16 @@
             ]
         },
         {
+            "name": "limitauthchg_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "delpeerkey",
             "base": "",
             "fields": [
@@ -992,6 +1052,16 @@
                 {
                     "name": "data",
                     "type": "variant_v0_data"
+                }
+            ]
+        },
+        {
+            "name": "peerkey_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "uint64"
                 }
             ]
         },
@@ -1094,6 +1164,16 @@
                 {
                     "name": "last_trx_priority_update",
                     "type": "block_timestamp_type"
+                }
+            ]
+        },
+        {
+            "name": "trxprio_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "priority",
+                    "type": "uint64"
                 }
             ]
         }
@@ -1280,112 +1360,115 @@
             "name": "abihash",
             "type": "abi_hash",
             "index_type": "i64",
-            "key_names": ["scope","primary_key"],
-            "key_types": ["name","uint64"],
+            "key_names": ["owner"],
+            "key_types": ["uint64"],
             "table_id": 49446
-        },
-        {
-            "name": "block_info_record",
-            "type": "block_info_record",
-            "index_type": "i64",
-            "key_names": [],
-            "key_types": [],
-            "table_id": 15891
         },
         {
             "name": "blockinfo",
             "type": "block_info_record",
             "index_type": "i64",
-            "key_names": ["scope","primary_key"],
-            "key_types": ["name","uint64"],
+            "key_names": ["block_height"],
+            "key_types": ["uint64"],
             "table_id": 21782
         },
         {
             "name": "finalizers",
             "type": "finalizer_info",
             "index_type": "i64",
-            "key_names": ["scope","primary_key"],
-            "key_types": ["name","uint64"],
+            "key_names": ["finalizer_name"],
+            "key_types": ["uint64"],
             "table_id": 15281
         },
         {
             "name": "finkeyidgen",
             "type": "fin_key_id_generator_info",
             "index_type": "i64",
-            "key_names": ["scope","primary_key"],
-            "key_types": ["name","uint64"],
+            "key_names": ["name"],
+            "key_types": ["name"],
             "table_id": 58998
         },
         {
             "name": "finkeys",
             "type": "finalizer_key_info",
             "index_type": "i64",
-            "key_names": ["scope","primary_key"],
-            "key_types": ["name","uint64"],
-            "table_id": 10503
+            "key_names": ["id"],
+            "key_types": ["uint64"],
+            "table_id": 10503,
+            "secondary_indexes": [
+                {
+                    "name": "byfinname",
+                    "key_type": "uint64",
+                    "table_id": 14771
+                },
+                {
+                    "name": "byfinkey",
+                    "key_type": "checksum256",
+                    "table_id": 15332
+                }
+            ]
         },
         {
             "name": "global",
             "type": "sysio_global_state",
             "index_type": "i64",
-            "key_names": [],
-            "key_types": [],
+            "key_names": ["name"],
+            "key_types": ["name"],
             "table_id": 58088
         },
         {
             "name": "lastpropfins",
             "type": "last_prop_finalizers_info",
             "index_type": "i64",
-            "key_names": ["scope","primary_key"],
-            "key_types": ["name","uint64"],
+            "key_names": ["name"],
+            "key_types": ["name"],
             "table_id": 13870
-        },
-        {
-            "name": "producer_info",
-            "type": "producer_info",
-            "index_type": "i64",
-            "key_names": [],
-            "key_types": [],
-            "table_id": 8236
         },
         {
             "name": "producers",
             "type": "producer_info",
             "index_type": "i64",
-            "key_names": ["scope","primary_key"],
-            "key_types": ["name","uint64"],
-            "table_id": 11791
+            "key_names": ["owner"],
+            "key_types": ["uint64"],
+            "table_id": 11791,
+            "secondary_indexes": [
+                {
+                    "name": "prodrank",
+                    "key_type": "uint64",
+                    "table_id": 31113
+                }
+            ]
         },
         {
             "name": "limitauthchg",
             "type": "limit_auth_change",
             "index_type": "i64",
-            "key_names": ["scope","primary_key"],
-            "key_types": ["name","uint64"],
+            "key_names": ["account"],
+            "key_types": ["uint64"],
             "table_id": 43800
         },
         {
             "name": "peerkeys",
             "type": "peer_key",
             "index_type": "i64",
-            "key_names": ["scope","primary_key"],
-            "key_types": ["name","uint64"],
+            "key_names": ["account"],
+            "key_types": ["uint64"],
             "table_id": 40639
         },
         {
             "name": "trxpglobal",
             "type": "trx_prio_global",
             "index_type": "i64",
-            "key_names": [],
-            "key_types": [],
+            "key_names": ["name"],
+            "key_types": ["name"],
             "table_id": 39268
         },
         {
             "name": "trxpriority",
             "type": "trx_prio",
             "index_type": "i64",
-            "key_names": ["scope","primary_key"],
-            "key_types": ["name","uint64"],
+            "key_names": ["priority"],
+            "key_types": ["uint64"],
             "table_id": 25995
         }
     ],

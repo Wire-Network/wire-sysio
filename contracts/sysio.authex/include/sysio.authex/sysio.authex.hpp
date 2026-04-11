@@ -6,7 +6,7 @@
 
 #include <fc-lite/crypto/chain_types.hpp>
 #include <sysio/name.hpp>
-#include <sysio/singleton.hpp>
+#include <sysio/kv_table.hpp>
 #include <sysio/sysio.hpp>
 #include <sysio/system.hpp>
 #include <sysio/crypto.hpp>
@@ -58,30 +58,35 @@ namespace sysio {
     private:
     // ----- Tables -----
 
+    struct links_key {
+      uint64_t key;
+      SYSLIB_SERIALIZE(links_key, (key))
+    };
+
     /**
      * @brief The links table stores the mapping between the WIRE account name and their external chain identity. SCOPE: Default
      */
-    TABLE links_s {
+    struct [[sysio::table("links")]] links_s {
       uint64_t key;
       name username;                       // Wire account name of the user
       fc::crypto::chain_kind_t chain_kind; // The external chain identifier
       public_key pub_key;                  // External chain's Public key in PUB_XX_ format.
 
-
-      uint64_t primary_key() const { return key; }
       uint128_t by_namechain() const { return to_namechain_key(username, chain_kind); }
       uint64_t by_name() const { return username.value; }
       checksum256 by_pub_key() const {
         return pubkey_to_checksum256(pub_key);
       }
       uint64_t by_chain() const { return static_cast<uint64_t>(chain_kind); }
+
+      SYSLIB_SERIALIZE(links_s, (key)(username)(chain_kind)(pub_key))
     };
 
-    using links_t = multi_index<"links"_n, links_s,
-        indexed_by<"bynamechain"_n, const_mem_fun<links_s, uint128_t, &links_s::by_namechain>>,
-        indexed_by<"byname"_n, const_mem_fun<links_s, uint64_t, &links_s::by_name>>,
-        indexed_by<"bypubkey"_n, const_mem_fun<links_s, checksum256, &links_s::by_pub_key>>,
-        indexed_by<"bychain"_n, const_mem_fun<links_s, uint64_t, &links_s::by_chain>>
+    using links_t = kv::table<"links"_n, links_key, links_s,
+        kv::index<"bynamechain"_n, const_mem_fun<links_s, uint128_t, &links_s::by_namechain>>,
+        kv::index<"byname"_n, const_mem_fun<links_s, uint64_t, &links_s::by_name>>,
+        kv::index<"bypubkey"_n, const_mem_fun<links_s, checksum256, &links_s::by_pub_key>>,
+        kv::index<"bychain"_n, const_mem_fun<links_s, uint64_t, &links_s::by_chain>>
     >;
     // ----- Helper methods -----
 

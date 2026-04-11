@@ -9,20 +9,20 @@ namespace sysiosystem {
 
 void peer_keys::regpeerkey(const name& proposer_finalizer_name, const public_key& key) {
    require_auth(proposer_finalizer_name);
-   peer_keys_table peer_keys_table(get_self(), get_self().value);
+   peer_keys_table pkt(get_self());
    check(!std::holds_alternative<sysio::webauthn_public_key>(key), "webauthn keys not allowed in regpeerkey action");
 
-   auto peers_itr = peer_keys_table.find(proposer_finalizer_name.value);
-   if (peers_itr == peer_keys_table.end()) {
-      peer_keys_table.emplace(proposer_finalizer_name, [&](auto& row) {
-         row.init_row(proposer_finalizer_name);
-         row.set_public_key(key);
+   auto pk = peerkey_key{proposer_finalizer_name.value};
+   if( !pkt.contains(pk) ) {
+      pkt.emplace(proposer_finalizer_name, pk, peer_key{
+         .account = proposer_finalizer_name,
+         .data = peer_key::v0_data{key},
       });
    } else {
-      const auto& prev_key = peers_itr->get_public_key();
+      auto row = pkt.get(pk);
+      const auto& prev_key = row.get_public_key();
       check(!prev_key || *prev_key != key, "Provided key is the same as currently stored one");
-      peer_keys_table.modify(peers_itr, same_payer, [&](auto& row) {
-         row.update_row();
+      pkt.modify(same_payer, pk, [&](auto& row) {
          row.set_public_key(key);
       });
    }
@@ -30,30 +30,31 @@ void peer_keys::regpeerkey(const name& proposer_finalizer_name, const public_key
 
 void peer_keys::delpeerkey(const name& proposer_finalizer_name, const public_key& key) {
    require_auth(proposer_finalizer_name);
-   peer_keys_table peer_keys_table(get_self(), get_self().value);
+   peer_keys_table pkt(get_self());
 
-   auto peers_itr = peer_keys_table.find(proposer_finalizer_name.value);
-   check(peers_itr != peer_keys_table.end(), "Key not present for name: " + proposer_finalizer_name.to_string());
-   const auto& prev_key = peers_itr->get_public_key();
+   auto pk = peerkey_key{proposer_finalizer_name.value};
+   check(pkt.contains(pk), "Key not present for name: " + proposer_finalizer_name.to_string());
+   auto row = pkt.get(pk);
+   const auto& prev_key = row.get_public_key();
    check(prev_key && *prev_key == key, "Current key does not match the provided one");
-   peer_keys_table.erase(peers_itr);
+   pkt.erase(pk);
 }
 
 peer_keys::getpeerkeys_res_t peer_keys::getpeerkeys() {
-   peer_keys_table  peer_keys_table(get_self(), get_self().value);
-   producers_table  producers(get_self(), get_self().value);
+   peer_keys_table  pkt(get_self());
+   producers_table  producers(get_self());
    constexpr size_t max_return = 50;
    constexpr uint32_t max_rank = 30;
 
    getpeerkeys_res_t resp;
    resp.reserve(max_return);
 
-   auto add_peer = [&](auto it) {
-      auto peers_itr = peer_keys_table.find(it->owner.value);
-      if (peers_itr == peer_keys_table.end())
-         resp.push_back(peerkeys_t{it->owner, {}});
+   auto add_peer = [&](const producer_info& p) {
+      auto pk = peerkey_key{p.owner.value};
+      if (!pkt.contains(pk))
+         resp.push_back(peerkeys_t{p.owner, {}});
       else
-         resp.push_back(peerkeys_t{it->owner, peers_itr->get_public_key()});
+         resp.push_back(peerkeys_t{p.owner, pkt.get(pk).get_public_key()});
    };
 
    auto idx = producers.get_index<"prodrank"_n>();
@@ -61,7 +62,7 @@ peer_keys::getpeerkeys_res_t peer_keys::getpeerkeys() {
    for (auto i = idx.cbegin(); i != idx.cend() && resp.size() < max_return; ++i) {
       if (i->rank > max_rank)
          break;
-      add_peer(i);
+      add_peer(*i);
    }
 
    return resp;

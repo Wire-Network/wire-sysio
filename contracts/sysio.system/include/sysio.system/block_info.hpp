@@ -1,6 +1,6 @@
 #pragma once
 
-#include <sysio/multi_index.hpp>
+#include <sysio/kv_table.hpp>
 #include <sysio/name.hpp>
 #include <sysio/time.hpp>
 
@@ -11,6 +11,11 @@ namespace sysiosystem::block_info {
 
 static constexpr uint32_t rolling_window_size = 10;
 
+struct blockinfo_key {
+   uint64_t block_height;
+   SYSLIB_SERIALIZE(blockinfo_key, (block_height))
+};
+
 /**
  * The blockinfo table holds a rolling window of records containing information for recent blocks.
  *
@@ -20,18 +25,16 @@ static constexpr uint32_t rolling_window_size = 10;
  * records for blocks going back a particular block height difference backward from the most recent block.
  * Currently that block height difference is hardcoded to 10.
  */
-struct [[sysio::table, sysio::contract("sysio.system")]] block_info_record
+struct [[sysio::table("blockinfo"), sysio::contract("sysio.system")]] block_info_record
 {
    uint8_t           version = 0;
    uint32_t          block_height;
    sysio::time_point block_timestamp;
 
-   uint64_t primary_key() const { return block_height; }
-
    SYSLIB_SERIALIZE(block_info_record, (version)(block_height)(block_timestamp))
 };
 
-using block_info_table = sysio::multi_index<"blockinfo"_n, block_info_record>;
+using block_info_table = sysio::kv::table<"blockinfo"_n, blockinfo_key, block_info_record>;
 
 struct block_batch_info
 {
@@ -92,7 +95,7 @@ latest_block_batch_info_result get_latest_block_batch_info(uint32_t    batch_sta
       return result;
    }
 
-   block_info_table t(system_account_name, 0);
+   block_info_table t(system_account_name);
 
    // Find information on latest block recorded in the blockinfo table.
 
@@ -141,8 +144,8 @@ latest_block_batch_info_result get_latest_block_batch_info(uint32_t    batch_sta
 
    // Find information on start block of the latest block batch recorded in the blockinfo table.
 
-   auto start_block_info_itr = t.find(latest_block_batch_start_height);
-   if (start_block_info_itr == t.cend() || start_block_info_itr->block_height != latest_block_batch_start_height) {
+   auto start_block_info_key = blockinfo_key{latest_block_batch_start_height};
+   if (!t.contains(start_block_info_key)) {
       // Record for information on start block of the latest block batch could not be found in blockinfo table.
       // This is either because of:
       //    * a gap in recording info due to a failed onblock action;
@@ -154,7 +157,9 @@ latest_block_batch_info_result get_latest_block_batch_info(uint32_t    batch_sta
       return result;
    }
 
-   if (start_block_info_itr->version != 0) {
+   auto start_block_info = t.get(start_block_info_key);
+
+   if (start_block_info.version != 0) {
       // Compiled code for this function within the calling contract has not been updated to support new version of
       // the blockinfo table.
       result.error_code = latest_block_batch_info_result::unsupported_version;
@@ -165,7 +170,7 @@ latest_block_batch_info_result get_latest_block_batch_info(uint32_t    batch_sta
 
    result.result.emplace(block_batch_info{
       .batch_start_height          = latest_block_batch_start_height,
-      .batch_start_timestamp       = start_block_info_itr->block_timestamp,
+      .batch_start_timestamp       = start_block_info.block_timestamp,
       .batch_current_end_height    = latest_block_batch_end_height,
       .batch_current_end_timestamp = latest_block_info_itr->block_timestamp,
    });

@@ -10,46 +10,47 @@ namespace sysio {
     void roa::set_reslimit(const name& owner, const asset& net_weight, const asset& cpu_weight, int64_t ram_bytes) {
         bool sysio_acct = is_sysio_account(owner);
 
-        reslimit_t reslimit(get_self(), get_self().value);
-        auto res_itr = reslimit.find(owner.value);
-        check(res_itr == reslimit.end(), "Resource limit already exist for this owner");
+        reslimit_t reslimit(get_self());
+        auto key = reslimit_key{owner.value};
+        check(!reslimit.contains(key), "Resource limit already exist for this owner");
 
         resources_t res = {
             .net = sysio_acct ? asset(0, net_weight.symbol) : net_weight,
             .cpu = sysio_acct ? asset(0, cpu_weight.symbol) : cpu_weight,
             .ram_bytes = (uint64_t)ram_bytes
         };
-        reslimit.emplace(get_self(), [&](auto& row) {
-            row.owner = owner;
-            row.net_weight = res.net;
-            row.cpu_weight = res.cpu;
-            row.ram_bytes = res.ram_bytes;
+        reslimit.emplace(get_self(), key, roa::reslimit{
+            .owner = owner,
+            .net_weight = res.net,
+            .cpu_weight = res.cpu,
+            .ram_bytes = res.ram_bytes,
         });
     }
 
     roa::resources_t roa::increase_reslimit(const name& owner, const asset& net_weight, const asset& cpu_weight, int64_t ram_bytes, bool require_to_exist) {
         bool sysio_acct = is_sysio_account(owner);
 
-        reslimit_t reslimit(get_self(), get_self().value);
-        auto res_itr = reslimit.find(owner.value);
-        check(!require_to_exist || res_itr != reslimit.end(), "No resource limit exists for this account.");
+        reslimit_t reslimit(get_self());
+        auto key = reslimit_key{owner.value};
+        bool exists = reslimit.contains(key);
+        check(!require_to_exist || exists, "No resource limit exists for this account.");
 
-        if (res_itr == reslimit.end()) {
+        if (!exists) {
             // add newaccount_ram for reslimit when created to account for gifted ram when created
             resources_t res = {
                 .net = sysio_acct ? asset(0, net_weight.symbol) : net_weight,
                 .cpu = sysio_acct ? asset(0, cpu_weight.symbol) : cpu_weight,
                 .ram_bytes = (uint64_t)ram_bytes + sysiosystem::newaccount_ram
             };
-            reslimit.emplace(get_self(), [&](auto& row) {
-                row.owner = owner;
-                row.net_weight = res.net;
-                row.cpu_weight = res.cpu;
-                row.ram_bytes = res.ram_bytes;
+            reslimit.emplace(get_self(), key, roa::reslimit{
+                .owner = owner,
+                .net_weight = res.net,
+                .cpu_weight = res.cpu,
+                .ram_bytes = res.ram_bytes,
             });
             return res;
         } else {
-            reslimit.modify(res_itr, get_self(), [&](auto& row) {
+            reslimit.modify(get_self(), key, [&](auto& row) {
                 if (!sysio_acct) {
                     row.net_weight.amount += net_weight.amount;
                     row.cpu_weight.amount += cpu_weight.amount;
@@ -57,20 +58,21 @@ namespace sysio {
                 check(ram_bytes >= 0, "increase_reslimit does not allow negative ram_bytes");
                 row.ram_bytes += static_cast<uint64_t>(ram_bytes);
             });
+            auto updated = reslimit.get(key);
             return resources_t{
-                .net = res_itr->net_weight,
-                .cpu = res_itr->cpu_weight,
-                .ram_bytes = res_itr->ram_bytes
+                .net = updated.net_weight,
+                .cpu = updated.cpu_weight,
+                .ram_bytes = updated.ram_bytes
             };
         }
     }
 
     void roa::decrease_reslimit(const name& owner, uint64_t ram_bytes) {
-        reslimit_t reslimit(get_self(), get_self().value);
-        auto res_itr = reslimit.find(owner.value);
-        check(res_itr != reslimit.end(), "No resource limit exists for this account.");
-        check(res_itr->ram_bytes >= ram_bytes, "reslimit ram underflow");
-        reslimit.modify(res_itr, get_self(), [&](auto& row) {
+        reslimit_t reslimit(get_self());
+        auto key = reslimit_key{owner.value};
+        auto row = reslimit.get(key, "No resource limit exists for this account.");
+        check(row.ram_bytes >= ram_bytes, "reslimit ram underflow");
+        reslimit.modify(get_self(), key, [&](auto& row) {
             row.ram_bytes -= ram_bytes;
         });
     }
@@ -78,8 +80,8 @@ namespace sysio {
     void roa::activateroa(const asset& total_sys, const uint64_t& bytes_per_unit) {
         require_auth(get_self());
 
-        roastate_t roastate(get_self(), get_self().value);
-        auto state = roastate.get_or_default();
+        roastate_t roastate(get_self());
+        auto state = roastate.get_or_default(roa_state{});
 
         check(!state.is_active, "Contract already activated.");
         check(total_sys.symbol == symbol("SYS", 4), "Total SYS must be SYS.");
@@ -138,14 +140,14 @@ namespace sysio {
 
         // Add policy for sys_account for tracking RAM provided to accounts for account creation
         policies_t policies(get_self(), sys_account.value);
-        policies.emplace(get_self(), [&](auto& row) {
-            row.owner = "sysio.acct"_n;
-            row.issuer = sys_account;
-            row.net_weight = asset(0, total_sys.symbol);
-            row.cpu_weight = asset(0, total_sys.symbol);
-            row.ram_weight = asset(0, total_sys.symbol);
-            row.bytes_per_unit = state.bytes_per_unit;
-            row.time_block = 0;
+        policies.emplace(get_self(), policy_key{"sysio.acct"_n.value}, roa::policies{
+            .owner = "sysio.acct"_n,
+            .issuer = sys_account,
+            .net_weight = asset(0, total_sys.symbol),
+            .cpu_weight = asset(0, total_sys.symbol),
+            .ram_weight = asset(0, total_sys.symbol),
+            .bytes_per_unit = state.bytes_per_unit,
+            .time_block = 0,
         });
         // Provide RAM for sysio.acct itself, but provide no CPU/NET
         set_reslimit("sysio.acct"_n, asset(0, total_sys.symbol), asset(0, total_sys.symbol), sysiosystem::newaccount_ram);
@@ -157,8 +159,7 @@ namespace sysio {
     void roa::setbyteprice(const uint64_t& bytes_per_unit) {
         require_auth(get_self());
 
-        //Singelton index
-        roastate_t roastate(get_self(), get_self().value);
+        roastate_t roastate(get_self());
 
         // Gets values in the table.
         auto state = roastate.get();
@@ -202,15 +203,16 @@ namespace sysio {
         require_auth(issuer);
 
         // Ensure ROA is active
-        roastate_t roastate(get_self(), get_self().value);
+        roastate_t roastate(get_self());
         auto state = roastate.get();
         check(state.is_active, "ROA is not currently active");
         check(network_gen <= state.network_gen, "Invalid network generation.");
 
         // Ensure issuer is a node owner for the specified network_gen
         nodeowners_t nodeowners(get_self(), network_gen);
-        auto node_itr = nodeowners.find(issuer.value);
-        check(node_itr != nodeowners.end(), "Only Node Owners can issue policies for this generation.");
+        auto node_key = nodeowner_key{issuer.value};
+        check(nodeowners.contains(node_key), "Only Node Owners can issue policies for this generation.");
+        auto node = nodeowners.get(node_key);
 
         // Validate weights
         check(net_weight.amount >= 0, "NET weight cannot be negative");
@@ -230,7 +232,7 @@ namespace sysio {
         asset total_new_allocation = net_weight + cpu_weight + ram_weight;
 
         // Ensure issuer has enough unallocated SYS
-        asset free_sys = node_itr->total_sys - node_itr->allocated_sys;
+        asset free_sys = node.total_sys - node.allocated_sys;
         check(total_new_allocation.amount <= free_sys.amount, "Not enough unallocated SYS for this policy.");
 
         // Calculate RAM bytes
@@ -238,8 +240,8 @@ namespace sysio {
 
         // Check if a policy already exists for this owner from this issuer
         policies_t policies(get_self(), issuer.value);
-        auto pol_iter = policies.find(owner.value);
-        check(pol_iter == policies.end(), "A policy for this owner already exists from this issuer. Use expandpolicy instead.");
+        auto pol_key = policy_key{owner.value};
+        check(!policies.contains(pol_key), "A policy for this owner already exists from this issuer. Use expandpolicy instead.");
 
         // Create/set reslimit for the 'owner', add newaccount_ram since reslimit is being created for the user
         increase_reslimit(owner, net_weight, cpu_weight, ram_bytes_to_allocate, false);
@@ -248,18 +250,18 @@ namespace sysio {
         add_system_resources(owner, net_weight.amount, cpu_weight.amount, ram_bytes_to_allocate);
 
         // Add the new policy
-        policies.emplace(get_self(), [&](auto& row) {
-            row.owner = owner;
-            row.issuer = issuer;
-            row.net_weight = net_weight;
-            row.cpu_weight = cpu_weight;
-            row.ram_weight = ram_weight;
-            row.bytes_per_unit = state.bytes_per_unit;
-            row.time_block = time_block;
+        policies.emplace(get_self(), pol_key, roa::policies{
+            .owner = owner,
+            .issuer = issuer,
+            .net_weight = net_weight,
+            .cpu_weight = cpu_weight,
+            .ram_weight = ram_weight,
+            .bytes_per_unit = state.bytes_per_unit,
+            .time_block = time_block,
         });
 
         // Update the issuer's allocations
-        nodeowners.modify(node_itr, get_self(), [&](auto& row) {
+        nodeowners.modify(get_self(), node_key, [&](auto& row) {
             row.allocated_sys.amount += total_new_allocation.amount;
             row.allocated_bw.amount += (net_weight.amount + cpu_weight.amount);
             row.allocated_ram.amount += ram_weight.amount;
@@ -273,13 +275,14 @@ namespace sysio {
 
         // Ensure issuer is a node owner in the given generation
         nodeowners_t nodeowners(get_self(), network_gen);
-        auto node_itr = nodeowners.find(issuer.value);
-        check(node_itr != nodeowners.end(), "Only Node Owners can manage policies.");
+        auto node_key = nodeowner_key{issuer.value};
+        check(nodeowners.contains(node_key), "Only Node Owners can manage policies.");
+        auto node = nodeowners.get(node_key);
 
         // Fetch issuer's policies scoped by issuer
         policies_t policies(get_self(), issuer.value);
-        auto pol_itr = policies.find(owner.value);
-        check(pol_itr != policies.end(), "You have no policy for this owner.");
+        auto pol_key = policy_key{owner.value};
+        auto pol = policies.get(pol_key, "You have no policy for this owner.");
 
         // Validate weights (zero increments allowed)
         check(net_weight.amount >= 0, "NET weight cannot be negative");
@@ -301,14 +304,14 @@ namespace sysio {
         asset total_new_allocation = net_weight + cpu_weight + ram_weight;
 
         // Ensure the issuer has enough unallocated SYS
-        asset free_sys = node_itr->total_sys - node_itr->allocated_sys;
+        asset free_sys = node.total_sys - node.allocated_sys;
         check(total_new_allocation.amount <= free_sys.amount, "Issuer does not have enough unallocated SYS for this policy expansion.");
 
         // Convert RAM weight to bytes
-        int64_t ram_bytes_to_allocate = (int64_t)ram_weight.amount * (int64_t)pol_itr->bytes_per_unit;
+        int64_t ram_bytes_to_allocate = (int64_t)ram_weight.amount * (int64_t)pol.bytes_per_unit;
 
         // Update the policy weights
-        policies.modify(pol_itr, get_self(), [&](auto& row) {
+        policies.modify(get_self(), pol_key, [&](auto& row) {
             if (!sysio_acct) {
                 row.net_weight.amount += net_weight.amount;
                 row.cpu_weight.amount += cpu_weight.amount;
@@ -317,7 +320,7 @@ namespace sysio {
         });
 
         // Update issuer's allocations in nodeowners
-        nodeowners.modify(node_itr, get_self(), [&](auto& row) {
+        nodeowners.modify(get_self(), node_key, [&](auto& row) {
             row.allocated_sys.amount += total_new_allocation.amount;
             row.allocated_bw.amount += (net_weight.amount + cpu_weight.amount);
             row.allocated_ram.amount += ram_weight.amount;
@@ -334,13 +337,13 @@ namespace sysio {
 
         // Pointer to Policies table
         policies_t policies(get_self(), issuer.value);
-        auto pol_itr = policies.find(owner.value);
+        auto pol_key = policy_key{owner.value};
+        auto pol = policies.get(pol_key, "Policy does not exist under this issuer for this owner");
 
-        check(pol_itr != policies.end(), "Policy does not exist under this issuer for this owner");
-        check(new_time_block > pol_itr->time_block, "Cannot reduce a policies existing time_block");
+        check(new_time_block > pol.time_block, "Cannot reduce a policies existing time_block");
         check(new_time_block > current_block_number(), "You cannot set a time_block lower than the current block");
 
-        policies.modify(pol_itr, get_self(), [&](auto& row) {
+        policies.modify(get_self(), pol_key, [&](auto& row) {
             row.time_block = new_time_block;
         });
     };
@@ -352,15 +355,13 @@ namespace sysio {
 
         // Ensure issuer is a node owner in the given generation
         nodeowners_t nodeowners(get_self(), network_gen);
-        auto node_itr = nodeowners.find(issuer.value);
-        check(node_itr != nodeowners.end(), "Only Node Owners can manage policies.");
+        auto node_key = nodeowner_key{issuer.value};
+        check(nodeowners.contains(node_key), "Only Node Owners can manage policies.");
 
         // Fetch issuer's policies scoped by issuer
         policies_t policies(get_self(), issuer.value);
-        auto pol_itr = policies.find(owner.value);
-        check(pol_itr != policies.end(), "You have no policy for this owner.");
-
-        auto pol_row = *pol_itr;
+        auto pol_key = policy_key{owner.value};
+        auto pol_row = policies.get(pol_key, "You have no policy for this owner.");
 
         // Validate time block
         uint32_t current_block = current_block_number();
@@ -374,9 +375,9 @@ namespace sysio {
         // Special sysio check
         bool sysio_acct = is_sysio_account(owner);
 
-        reslimit_t reslimit(get_self(), get_self().value);
-        auto res_itr = reslimit.find(owner.value);
-        check(res_itr != reslimit.end(), "reslimit row does not exist for this owner");
+        reslimit_t reslimit(get_self());
+        auto res_key = reslimit_key{owner.value};
+        auto res = reslimit.get(res_key, "reslimit row does not exist for this owner");
 
         // Adjust resource limits
         int64_t ram_bytes, net_limit, cpu_limit;
@@ -413,7 +414,7 @@ namespace sysio {
         );
 
         // Update reslimit row
-        reslimit.modify(res_itr, get_self(), [&](auto& row) {
+        reslimit.modify(get_self(), res_key, [&](auto& row) {
             if (!sysio_acct) {
                 row.net_weight.amount -= net_weight.amount;
                 row.cpu_weight.amount -= cpu_weight.amount;
@@ -430,9 +431,9 @@ namespace sysio {
                          pol_row.cpu_weight.amount == 0 &&
                          pol_row.ram_weight.amount == 0);
         if (all_zero) {
-            policies.erase(pol_itr);
+            policies.erase(pol_key);
         } else {
-            policies.modify(pol_itr, get_self(), [&](auto& row) {
+            policies.modify(get_self(), pol_key, [&](auto& row) {
                 if (!sysio_acct) {
                     row.net_weight.amount = pol_row.net_weight.amount;
                     row.cpu_weight.amount = pol_row.cpu_weight.amount;
@@ -443,7 +444,7 @@ namespace sysio {
 
         // Update nodeowners row
         int64_t total_reclaimed_sys_amount = net_weight.amount + cpu_weight.amount + reclaimed_ram_weight.amount;
-        nodeowners.modify(node_itr, get_self(), [&](auto &row) {
+        nodeowners.modify(get_self(), node_key, [&](auto &row) {
             row.allocated_sys.amount -= total_reclaimed_sys_amount;
             row.allocated_bw.amount -= (net_weight.amount + cpu_weight.amount);
             row.allocated_ram.amount -= reclaimed_ram_weight.amount;
@@ -454,21 +455,22 @@ namespace sysio {
 
         require_auth(permission_level{owner, "auth.ext"_n});
 
-        roastate_t roastate(get_self(), get_self().value);
+        roastate_t roastate(get_self());
         auto state = roastate.get();
         check(state.is_active, "ROA is not active yet");
 
         nodeowners_t nodeowners(get_self(), state.network_gen);
-        auto node_itr = nodeowners.find(owner.value);
-        check(node_itr == nodeowners.end(), "This account is already registered.");
+        auto node_key = nodeowner_key{owner.value};
+        check(!nodeowners.contains(node_key), "This account is already registered.");
 
         nodeownerreg_t nodereg(get_self(), state.network_gen);
-        auto nodereg_itr = nodereg.find(owner.value);
+        auto reg_key = nodeownerreg_key{owner.value};
 
-        if (nodereg_itr != nodereg.end()) {
-            check(nodereg_itr->status == 3, "A registration is already pending or confirmed.");
+        if (nodereg.contains(reg_key)) {
+            auto existing = nodereg.get(reg_key);
+            check(existing.status == 3, "A registration is already pending or confirmed.");
 
-            nodereg.modify(nodereg_itr,get_self(), [&](auto &row){
+            nodereg.modify(get_self(), reg_key, [&](auto &row){
                 row.status = 0;
                 row.trx_id = {};
                 row.trx_signature = {};
@@ -477,13 +479,13 @@ namespace sysio {
             });
 
         } else {
-            nodereg.emplace(get_self(), [&](auto &row){
-                row.owner = owner;
-                row.status = 0;
-                row.trx_id = {};
-                row.trx_signature = {};
-                row.tier = 0;
-                row.block_num = 0;
+            nodereg.emplace(get_self(), reg_key, nodeownerreg{
+                .owner = owner,
+                .status = 0,
+                .trx_id = {},
+                .trx_signature = {},
+                .tier = 0,
+                .block_num = 0,
             });
         }
     };
@@ -492,67 +494,61 @@ namespace sysio {
 
         require_auth(permission_level{owner, "auth.ext"_n});
 
-        roastate_t roastate(get_self(), get_self().value);
+        roastate_t roastate(get_self());
         auto state = roastate.get();
         check(state.is_active, "ROA is not active yet");
 
         nodeownerreg_t nodereg(get_self(), state.network_gen);
-        auto nodereg_itr = nodereg.find(owner.value);
+        auto reg_key = nodeownerreg_key{owner.value};
 
-        check(nodereg_itr != nodereg.end(),"Registration not initialized yet");
+        check(nodereg.contains(reg_key),"Registration not initialized yet");
+        auto existing = nodereg.get(reg_key);
 
         check(tier > 0 && tier <= 3 , "Tier level must be between 1 and 3");
 
-        check(nodereg_itr->status == 0, "Registration status must be 0 ( INTENT ) to set PENDING.");
+        check(existing.status == 0, "Registration status must be 0 ( INTENT ) to set PENDING.");
 
 
         auto bytrxid_index = nodereg.get_index<"bytrxid"_n>();
         auto foundtrxId = bytrxid_index.find(trx_id);
         check(foundtrxId == bytrxid_index.end(),"This trx Id is already used");
 
-        nodereg.modify(nodereg_itr,get_self(),[&](auto &row){
+        nodereg.modify(get_self(), reg_key, [&](auto &row){
             row.status = 1;
             row.trx_id = trx_id;
             row.trx_signature = sig;
             row.tier = tier;
             row.block_num = block_num;
         });
-        // TODO: might need to add require_receipient(account_name) call to notify validators of a new pending transaction
-        // require_recipient("Validator");
     };
 
     void roa::finalizereg(const name& owner,const uint8_t& status) {
 
-        // TODO -> Require authorization for validator !!!
-        // require_auth();
-
-        roastate_t roastate(get_self(), get_self().value);
+        roastate_t roastate(get_self());
         auto state = roastate.get();
         check(state.is_active, "ROA is not active yet");
 
 
         nodeownerreg_t nodereg(get_self(), state.network_gen);
-        auto nodereg_itr = nodereg.find(owner.value);
+        auto reg_key = nodeownerreg_key{owner.value};
 
-        check(nodereg_itr != nodereg.end(),"No registration record found !");
+        check(nodereg.contains(reg_key),"No registration record found !");
+        auto existing = nodereg.get(reg_key);
 
-        check(nodereg_itr->status == 1, "Registration is not in 1 ( PENDING ) state.");
+        check(existing.status == 1, "Registration is not in 1 ( PENDING ) state.");
 
         check(status == 3 || status == 4, "Invalid status: Can only confirm (2) or reject (3)");
 
         if(status == 2){
 
-            regnodeowner(owner,nodereg_itr->tier);
+            regnodeowner(owner, existing.tier);
 
-            nodereg.modify(nodereg_itr,get_self(),[&](auto &row){
+            nodereg.modify(get_self(), reg_key, [&](auto &row){
                 row.status = 2;
             });
 
-            //TODO -> Add require_receipient(account_name) call to notify council contract
-            // require_receipient("Council");
-
         } else {
-            nodereg.modify(nodereg_itr,get_self(),[&](auto &row){
+            nodereg.modify(get_self(), reg_key, [&](auto &row){
                 row.status = 3;
             });
         }
@@ -570,13 +566,13 @@ namespace sysio {
 
     void roa::regnodeowner(const name& owner, const uint8_t& tier) {
 
-        roastate_t roastate(get_self(), get_self().value);
+        roastate_t roastate(get_self());
         auto state = roastate.get();
         check(state.is_active, "ROA is not active yet");
 
         nodeowners_t nodeowners(get_self(), state.network_gen);
-        auto node_itr = nodeowners.find(owner.value);
-        check(node_itr == nodeowners.end(), "This account is already registered.");
+        auto node_key = nodeowner_key{owner.value};
+        check(!nodeowners.contains(node_key), "This account is already registered.");
 
         // Get the total SYS allocation for this tier
         asset total_sys_allocation = get_allocation_for_tier(tier);
@@ -604,32 +600,32 @@ namespace sysio {
         allocated_bw += (net_cpu_weight + net_cpu_weight); // CPU/NET allocation
 
         policies_t policies(get_self(), owner.value);
-        auto pol_itr = policies.find(owner.value);
+        auto pol_key = policy_key{owner.value};
 
         name sysio_account = "sysio"_n;
         asset zero_asset(0, state.total_sys.symbol);
 
-        if (pol_itr == policies.end()) {
+        if (!policies.contains(pol_key)) {
             // Create personal policy
-            policies.emplace(get_self(), [&](auto& row) {
-                row.owner = owner;
-                row.issuer = owner;
-                row.net_weight = net_cpu_weight;
-                row.cpu_weight = net_cpu_weight;
-                row.ram_weight = personal_ram_weight;
-                row.bytes_per_unit = state.bytes_per_unit;
-                row.time_block = 1;
+            policies.emplace(get_self(), pol_key, roa::policies{
+                .owner = owner,
+                .issuer = owner,
+                .net_weight = net_cpu_weight,
+                .cpu_weight = net_cpu_weight,
+                .ram_weight = personal_ram_weight,
+                .bytes_per_unit = state.bytes_per_unit,
+                .time_block = 1,
             });
 
             // Create sysio policy for RAM
-            policies.emplace(get_self(), [&](auto& row) {
-                row.owner = sysio_account;
-                row.issuer = owner;
-                row.net_weight = zero_asset;
-                row.cpu_weight = zero_asset;
-                row.ram_weight = sysio_allocation;
-                row.bytes_per_unit = state.bytes_per_unit;
-                row.time_block = UINT32_MAX; // do not allow to be extended
+            policies.emplace(get_self(), policy_key{sysio_account.value}, roa::policies{
+                .owner = sysio_account,
+                .issuer = owner,
+                .net_weight = zero_asset,
+                .cpu_weight = zero_asset,
+                .ram_weight = sysio_allocation,
+                .bytes_per_unit = state.bytes_per_unit,
+                .time_block = UINT32_MAX, // do not allow to be extended
             });
         }
 
@@ -638,27 +634,30 @@ namespace sysio {
         set_resource_limits(owner, personal_ram_bytes, net_cpu_weight.amount, net_cpu_weight.amount);
 
         // Sysio reslimit
-        reslimit_t sysioreslimit(get_self(), get_self().value);
-        auto sysio_res_itr = sysioreslimit.find(sysio_account.value);
-        check(sysio_res_itr != sysioreslimit.end(), "sysio reslimit does not exist.");
+        reslimit_t sysioreslimit(get_self());
+        auto sysio_res_key = reslimit_key{sysio_account.value};
+        auto sysio_res = sysioreslimit.get(sysio_res_key, "sysio reslimit does not exist.");
 
         uint64_t sysio_bytes = sysio_allocation.amount * state.bytes_per_unit;
-        sysioreslimit.modify(sysio_res_itr, get_self(), [&](auto& row) {
+        sysioreslimit.modify(get_self(), sysio_res_key, [&](auto& row) {
             row.ram_bytes += sysio_bytes;
         });
 
+        // Re-read to get updated value for set_resource_limits
+        sysio_res = sysioreslimit.get(sysio_res_key);
+
         // Update the RAM allocation, sysio is a system account so -1, -1 for net and cpu to maintain unlimited.
-        set_resource_limits(sysio_account, sysio_res_itr->ram_bytes, -1, -1);
+        set_resource_limits(sysio_account, sysio_res.ram_bytes, -1, -1);
 
         // Finally, record the node owner entry with the new fields
-        nodeowners.emplace(get_self(), [&](auto& row) {
-            row.owner = owner;
-            row.tier = tier;
-            row.total_sys = total_sys_allocation;
-            row.allocated_sys = allocated_sys;
-            row.allocated_bw = allocated_bw;
-            row.allocated_ram = allocated_ram;
-            row.network_gen = state.network_gen;
+        nodeowners.emplace(get_self(), node_key, roa::nodeowners{
+            .owner = owner,
+            .tier = tier,
+            .total_sys = total_sys_allocation,
+            .allocated_sys = allocated_sys,
+            .allocated_bw = allocated_bw,
+            .allocated_ram = allocated_ram,
+            .network_gen = state.network_gen,
         });
 
         // TODO: Notify Council contract if needed
@@ -667,7 +666,7 @@ namespace sysio {
 
     asset roa::get_allocation_for_tier(uint8_t tier) {
         // Retrieve the current roastate
-        roastate_t roastate(get_self(), get_self().value);
+        roastate_t roastate(get_self());
         auto state = roastate.get();
 
         // Ensure the contract is active
@@ -702,19 +701,21 @@ namespace sysio {
     name roa::newuser(const name& creator, const name& nonce, const public_key& pubkey) {
        require_auth(creator);
 
-       roastate_t roastate(get_self(), get_self().value);
+       roastate_t roastate(get_self());
        auto state = roastate.get();
        check(state.is_active, "ROA is not active yet");
 
        // Check if creator is a tier-1 node owner
        nodeowners_t nodeowners(get_self(), state.network_gen);
-       auto node_itr = nodeowners.find(creator.value);
-       check(node_itr != nodeowners.end() && node_itr->tier == 1, "Creator is not a registered tier-1 node owner");
+       auto node_key = nodeowner_key{creator.value};
+       check(nodeowners.contains(node_key), "Creator is not a registered tier-1 node owner");
+       auto node = nodeowners.get(node_key);
+       check(node.tier == 1, "Creator is not a registered tier-1 node owner");
 
         // Check if nonce already exists in sponsors table for this creator
         sponsors_t sponsors(get_self(), creator.value);
-        auto sponsor_itr = sponsors.find(nonce.value);
-        check(sponsor_itr == sponsors.end(), "Sponsor entry for this nonce already exists");
+        auto sp_key = sponsor_key{nonce.value};
+        check(!sponsors.contains(sp_key), "Sponsor entry for this nonce already exists");
 
         // Get the creator's suffix (e.g., "com" from "node.com", or "myname" from "myname")
         name creator_suffix = creator.suffix();
@@ -782,24 +783,17 @@ namespace sysio {
         ).send();
 
         // Record sponsor mapping
-        sponsors.emplace(creator, [&](auto& row) {
-            row.nonce = nonce;
-            row.username = new_username;
+        sponsors.emplace(creator, sp_key, sponsor{
+            .nonce = nonce,
+            .username = new_username,
         });
 
         // Update sponsor count for creator
         sponsorcount_t sponsorcount(get_self(), state.network_gen);
-        auto count_itr = sponsorcount.find(creator.value);
-        if (count_itr == sponsorcount.end()) {
-            sponsorcount.emplace(get_self(), [&](auto& row) {
-                row.owner = creator;
-                row.count = 1;
-            });
-        } else {
-            sponsorcount.modify(count_itr, get_self(), [&](auto& row) {
-                row.count += 1;
-            });
-        }
+        auto sc_key = sponsorcount_key{creator.value};
+        sponsorcount.upsert(get_self(), sc_key,
+            roa::sponsorcount{.owner = creator, .count = 1},
+            [&](auto& row) { row.count += 1; });
 
         // Update roa policy for sys_account for tracking RAM provided to accounts for account creation
         // It is not expected that sysio.acct will use the RAM. Instead sysio.acct is a placeholder for
@@ -807,9 +801,9 @@ namespace sysio {
         auto sys_symbol = state.total_sys.symbol;
         int64_t ram_weight_amount = sysiosystem::newaccount_ram / state.bytes_per_unit;
         policies_t policies(get_self(), "sysio"_n.value);
-        auto pol_itr = policies.find("sysio.acct"_n.value);
-        check(pol_itr != policies.end(), "Missing sysio.acct policy");
-        policies.modify(pol_itr, get_self(), [&](auto& row) {
+        auto pol_key = policy_key{"sysio.acct"_n.value};
+        policies.get(pol_key, "Missing sysio.acct policy");
+        policies.modify(get_self(), pol_key, [&](auto& row) {
             row.ram_weight.amount += ram_weight_amount;
         });
 

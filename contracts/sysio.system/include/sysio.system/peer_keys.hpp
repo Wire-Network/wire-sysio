@@ -2,6 +2,7 @@
 
 #include <sysio/contract.hpp>
 #include <sysio/crypto.hpp>
+#include <sysio/kv_table.hpp>
 #include <sysio/name.hpp>
 
 #include <string>
@@ -11,6 +12,11 @@ namespace sysiosystem {
 
 using sysio::name;
 using sysio::public_key;
+
+struct peerkey_key {
+   uint64_t account;
+   SYSLIB_SERIALIZE(peerkey_key, (account))
+};
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -23,19 +29,17 @@ struct [[sysio::table("peerkeys"), sysio::contract("sysio.system")]] peer_key {
    name                  account;
    std::variant<v0_data> data;
 
-   uint64_t primary_key() const { return account.value; }
-
    void                                    set_public_key(const public_key& key) { data = v0_data{key}; }
    const std::optional<sysio::public_key>& get_public_key() const {
       return std::visit([](auto& v) -> const std::optional<sysio::public_key>& { return v.pubkey; }, data);
    }
-   void update_row() {}
-   void init_row(name n) { *this = peer_key{n, v0_data{}}; }
+
+   SYSLIB_SERIALIZE(peer_key, (account)(data))
 };
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
-typedef sysio::multi_index<"peerkeys"_n, peer_key> peer_keys_table;
+using peer_keys_table = sysio::kv::table<"peerkeys"_n, peerkey_key, peer_key>;
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------

@@ -20,13 +20,14 @@ void system_contract::add_to_blockinfo_table(const sysio::checksum256&    previo
    const uint32_t new_block_height    = block_height_from_id(previous_block_id) + 1;
    const auto     new_block_timestamp = static_cast<sysio::time_point>(timestamp);
 
-   block_info::block_info_table t(get_self(), 0);
+   block_info::block_info_table t(get_self());
 
    if (block_info::rolling_window_size > 0) {
       // Add new entry to blockinfo table for the new block.
-      t.emplace(get_self(), [&](block_info::block_info_record& r) {
-         r.block_height    = new_block_height;
-         r.block_timestamp = new_block_timestamp;
+      t.emplace(get_self(), block_info::blockinfo_key{new_block_height}, block_info::block_info_record{
+         .version = 0,
+         .block_height    = new_block_height,
+         .block_timestamp = new_block_timestamp,
       });
    }
 

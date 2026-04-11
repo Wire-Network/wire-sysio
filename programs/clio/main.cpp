@@ -3301,7 +3301,7 @@ int main( int argc, char** argv ) {
                                  ("code", "sysio.msig")
                                  ("scope", proposer)
                                  ("table", "proposal")
-                                 ("find", fc::json::to_string(fc::mutable_variant_object("primary_key", name(proposal_name).to_uint64_t()), fc::time_point::maximum()))
+                                 ("find", fc::json::to_string(fc::mutable_variant_object("proposal_name", name(proposal_name).to_uint64_t()), fc::time_point::maximum()))
                            );
 
       const auto& rows1 = result1.get_object()["rows"].get_array();
@@ -3330,7 +3330,7 @@ int main( int argc, char** argv ) {
                                        ("code", "sysio.msig")
                                        ("scope", proposer)
                                        ("table", "approvals2")
-                                       ("find", fc::json::to_string(fc::mutable_variant_object("primary_key", name(proposal_name).to_uint64_t()), fc::time_point::maximum()))
+                                       ("find", fc::json::to_string(fc::mutable_variant_object("proposal_name", name(proposal_name).to_uint64_t()), fc::time_point::maximum()))
                                  );
             rows2 = result2.get_object()["rows"].get_array();
          } catch( ... ) {
@@ -3355,7 +3355,7 @@ int main( int argc, char** argv ) {
                                        ("code", "sysio.msig")
                                        ("scope", proposer)
                                        ("table", "approvals")
-                                       ("find", fc::json::to_string(fc::mutable_variant_object("primary_key", name(proposal_name).to_uint64_t()), fc::time_point::maximum()))
+                                       ("find", fc::json::to_string(fc::mutable_variant_object("proposal_name", name(proposal_name).to_uint64_t()), fc::time_point::maximum()))
                                  );
             const auto& rows3 = result3.get_object()["rows"].get_array();
             if( rows3.empty() || rows3[0]["value"].get_object()["proposal_name"] != proposal_name ) {
@@ -3383,7 +3383,7 @@ int main( int argc, char** argv ) {
                                           ("code", "sysio.msig")
                                           ("scope", "sysio.msig")
                                           ("table", "invals")
-                                          ("find", fc::json::to_string(fc::mutable_variant_object("primary_key", a.first.to_uint64_t()), fc::time_point::maximum()))
+                                          ("find", fc::json::to_string(fc::mutable_variant_object("account", a.first.to_uint64_t()), fc::time_point::maximum()))
                                     );
                const auto& rows4 = result4.get_object()["rows"].get_array();
                if( rows4.empty() || rows4[0]["value"].get_object()["account"].as<sysio::name>() != a.first ) {
