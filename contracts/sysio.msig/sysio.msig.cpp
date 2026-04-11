@@ -9,6 +9,74 @@ namespace sysio {
 transaction_header get_trx_header(const char* ptr, size_t sz);
 bool trx_is_authorized(const std::vector<permission_level>& approvals, const std::vector<char>& packed_trx);
 
+/// Returns true if `prop` was stored as a chunked proposal (its `packed_transaction` lives
+/// in the `propchunks` table). Treats absent / zero `chunk_count` as not chunked.
+static bool is_chunked(const multisig::proposal& prop) {
+   return prop.chunk_count.has_value() && *prop.chunk_count > 0;
+}
+
+/// Reads every row of the `propchunks` table for a chunked proposal and concatenates
+/// the chunks in `chunk_index` order. Caller must already know the proposal is chunked
+/// (`is_chunked(prop) == true`). Asserts on missing chunks or size mismatch — both
+/// indicate corrupted state.
+static std::vector<char> read_proposal_chunks(const multisig::proposal& prop, name self, name proposer) {
+   const uint32_t n     = *prop.chunk_count;
+   const uint32_t total = prop.total_size.has_value() ? *prop.total_size : 0;
+   std::vector<char> out;
+   out.reserve(total);
+   multisig::propchunks chunktable(self, proposer.value);
+   for (uint32_t i = 0; i < n; ++i) {
+      const auto c = chunktable.get(multisig::propchunk_key{prop.proposal_name.value, i}, "missing proposal chunk");
+      out.insert(out.end(), c.data.begin(), c.data.end());
+   }
+   check(out.size() == total, "chunk reassembly size mismatch");
+   return out;
+}
+
+/// Returns the fully assembled inner trx for `prop`. **Consumes** `prop` — the caller
+/// passes `std::move(prop)` and must not touch `prop.packed_transaction` afterward.
+///
+/// - Inline proposals: moves the existing blob out of `prop.packed_transaction`, so no
+///   copy of the (potentially ~200 KiB) vector is performed.
+/// - Chunked proposals: delegates to `read_proposal_chunks` to assemble the blob from
+///   the `propchunks` table.
+///
+/// Used by approve / unapprove / exec, where the proposal is consumed and chunked
+/// metadata fields the caller still needs (e.g. chunk_count) should be snapshotted
+/// into locals before the std::move at the call site. `get_proposal` uses
+/// `read_proposal_chunks` directly because it preserves `prop` for return.
+static std::vector<char> assemble_packed_trx(multisig::proposal&& prop, name self, name proposer) {
+   if (!is_chunked(prop)) {
+      return std::move(prop.packed_transaction);
+   }
+   return read_proposal_chunks(prop, self, proposer);
+}
+
+/// Returns the transaction_header for `prop` without reassembling the entire blob: pulls it
+/// from `prop.packed_transaction` for non-chunked proposals, or from chunk 0 alone (the header
+/// always lives within the first ~80 bytes, well under `proposal_chunk_size`) for chunked
+/// proposals. Avoids the cost of reading every chunk just to check expiration / delay_sec.
+static transaction_header read_trx_header(const multisig::proposal& prop, name self, name proposer) {
+   if (!is_chunked(prop)) {
+      return get_trx_header(prop.packed_transaction.data(), prop.packed_transaction.size());
+   }
+   multisig::propchunks chunktable(self, proposer.value);
+   const auto c = chunktable.get(multisig::propchunk_key{prop.proposal_name.value, 0}, "missing proposal chunk 0");
+   return get_trx_header(c.data.data(), c.data.size());
+}
+
+/// Erases all `propchunks` rows for a chunked proposal. No-op when `chunk_count == 0`.
+/// Takes primitives instead of a `proposal&` so the caller can call this AFTER the
+/// proposal has been moved into `assemble_packed_trx` — both `exec` and `cancel`
+/// only need a small `chunk_count` saved out before the move.
+static void erase_proposal_chunks(uint32_t chunk_count, name proposal_name, name self, name proposer) {
+   if (chunk_count == 0) return;
+   multisig::propchunks chunktable(self, proposer.value);
+   for (uint32_t i = 0; i < chunk_count; ++i) {
+      chunktable.erase(multisig::propchunk_key{proposal_name.value, i});
+   }
+}
+
 template<typename Function>
 std::vector<permission_level> get_approvals_and_adjust_table(name self, name proposer, name proposal_name, Function&& table_op) {
    multisig::approvals approval_table( self, proposer.value );
@@ -77,15 +145,55 @@ void multisig::propose( name proposer,
 
    check( res > 0, "transaction authorization failed" );
 
-   std::vector<char> pkd_trans;
-   pkd_trans.resize(size);
-   memcpy((char*)pkd_trans.data(), trx_pos, size);
+   // Hash the inner trx once at propose time so `approve --proposal-hash` does not need to
+   // reassemble chunks on every call. Same value regardless of chunked vs inline storage.
+   const sysio::checksum256 trx_hash = sysio::sha256(trx_pos, static_cast<uint32_t>(size));
 
-   proptable.emplace( proposer, pk, proposal{
-      .proposal_name      = proposal_name,
-      .packed_transaction = pkd_trans,
-      .earliest_exec_time = binary_extension< std::optional<time_point> >{},
-   });
+   if (size <= proposal_chunk_size) {
+      // Inline path: small proposal stored as a single `proposal` row exactly as before.
+      // External tooling that reads `packed_transaction` directly via `get_table_rows`
+      // continues to work for this case.
+      std::vector<char> pkd_trans;
+      pkd_trans.resize(size);
+      memcpy(pkd_trans.data(), trx_pos, size);
+
+      proptable.emplace( proposer, pk, proposal{
+         .proposal_name      = proposal_name,
+         .packed_transaction = std::move(pkd_trans),
+         .earliest_exec_time = binary_extension< std::optional<time_point> >{},
+         .chunk_count        = uint32_t{0},
+         .total_size         = static_cast<uint32_t>(size),
+         .trx_hash           = trx_hash,
+      });
+   } else {
+      // Chunked path: split the inner trx across N rows of `propchunks`. The parent
+      // `proposal` row carries an empty `packed_transaction` plus the chunk metadata
+      // and the precomputed hash; clients use `getproposal` to retrieve the full blob.
+      const uint32_t n_chunks = static_cast<uint32_t>((size + proposal_chunk_size - 1) / proposal_chunk_size);
+
+      propchunks chunktable( get_self(), proposer.value );
+      for (uint32_t i = 0; i < n_chunks; ++i) {
+         const size_t off = static_cast<size_t>(i) * proposal_chunk_size;
+         const size_t len = std::min(size - off, proposal_chunk_size);
+         std::vector<char> chunk_data;
+         chunk_data.resize(len);
+         memcpy(chunk_data.data(), trx_pos + off, len);
+         chunktable.emplace( proposer, propchunk_key{proposal_name.value, i}, propchunk{
+            .proposal_name = proposal_name,
+            .chunk_index   = i,
+            .data          = std::move(chunk_data),
+         });
+      }
+
+      proptable.emplace( proposer, pk, proposal{
+         .proposal_name      = proposal_name,
+         .packed_transaction = {},                       // empty: signals chunked storage
+         .earliest_exec_time = binary_extension< std::optional<time_point> >{},
+         .chunk_count        = n_chunks,
+         .total_size         = static_cast<uint32_t>(size),
+         .trx_hash           = trx_hash,
+      });
+   }
 
    approvals apptable( get_self(), proposer.value );
    std::vector<multisig::approval> req_approvals;
@@ -108,10 +216,22 @@ void multisig::approve( name proposer, name proposal_name, permission_level leve
 
    proposals proptable( get_self(), proposer.value );
    auto pk = proposal_key{proposal_name.value};
-   const auto prop = proptable.get( pk, "proposal not found" );
+   // Non-const so we can std::move into `assemble_packed_trx` below.
+   auto prop = proptable.get( pk, "proposal not found" );
 
    if( proposal_hash ) {
-      assert_sha256( prop.packed_transaction.data(), prop.packed_transaction.size(), *proposal_hash );
+      if (is_chunked(prop)) {
+         // Chunked proposals have an empty `packed_transaction` field — can't re-hash from
+         // it, so use the precomputed `trx_hash` stored at propose time. This avoids the
+         // cost of reassembling the chunks on every approve call.
+         check( prop.trx_hash.has_value() && *prop.trx_hash == *proposal_hash,
+                "hash provided does not match stored proposal trx_hash" );
+      } else {
+         // Inline proposals: hash the inline blob directly. Same path the contract took
+         // before chunked storage was introduced; `assert_sha256` is the chain intrinsic
+         // and is the historical hash semantic external tooling depends on.
+         assert_sha256( prop.packed_transaction.data(), prop.packed_transaction.size(), *proposal_hash );
+      }
    }
 
    approvals apptable( get_self(), proposer.value );
@@ -139,12 +259,20 @@ void multisig::approve( name proposer, name proposal_name, permission_level leve
       });
    }
 
-   transaction_header trx_header = get_trx_header(prop.packed_transaction.data(), prop.packed_transaction.size());
+   // Header parse only needs ~80 bytes — read from the inline blob or chunk 0 to avoid
+   // reassembling the entire packed_transaction just to inspect delay_sec/expiration.
+   transaction_header trx_header = read_trx_header(prop, get_self(), proposer);
 
    if( prop.earliest_exec_time.has_value() ) {
       if( !prop.earliest_exec_time->has_value() ) {
          auto table_op = [](auto&&, auto&&){};
-         if( trx_is_authorized(get_approvals_and_adjust_table(get_self(), proposer, proposal_name, table_op), prop.packed_transaction) ) {
+         // The auth recheck needs the full blob. For inline proposals `assemble_packed_trx`
+         // moves the existing buffer out of `prop` (no copy); for chunked it reassembles
+         // from the propchunks table. Either way the cost is incurred at most once per
+         // proposal — the first approve that pushes it over the threshold. `prop` must
+         // not be read after this point.
+         const auto packed = assemble_packed_trx(std::move(prop), get_self(), proposer);
+         if( trx_is_authorized(get_approvals_and_adjust_table(get_self(), proposer, proposal_name, table_op), packed) ) {
             proptable.modify( proposer, pk, [&]( auto& p ) {
                p.earliest_exec_time.emplace(time_point{ current_time_point() + sysio::seconds(trx_header.delay_sec.value)});
             });
@@ -182,19 +310,24 @@ void multisig::unapprove( name proposer, name proposal_name, permission_level le
 
    proposals proptable( get_self(), proposer.value );
    auto pk = proposal_key{proposal_name.value};
-   const auto prop = proptable.get( pk, "proposal not found" );
+   // Non-const so we can std::move into `assemble_packed_trx` below.
+   auto prop = proptable.get( pk, "proposal not found" );
 
    if( prop.earliest_exec_time.has_value() ) {
       if( prop.earliest_exec_time->has_value() ) {
          auto table_op = [](auto&&, auto&&){};
-         if( !trx_is_authorized(get_approvals_and_adjust_table(get_self(), proposer, proposal_name, table_op), prop.packed_transaction) ) {
+         // Reassemble for chunked proposals — same one-time cost pattern as approve.
+         // For inline proposals this moves the existing buffer out of `prop` rather
+         // than copying it. `prop` must not be read after this point in this branch.
+         const auto packed = assemble_packed_trx(std::move(prop), get_self(), proposer);
+         if( !trx_is_authorized(get_approvals_and_adjust_table(get_self(), proposer, proposal_name, table_op), packed) ) {
             proptable.modify( proposer, pk, [&]( auto& p ) {
                p.earliest_exec_time.emplace();
             });
          }
       }
    } else {
-      transaction_header trx_header = get_trx_header(prop.packed_transaction.data(), prop.packed_transaction.size());
+      transaction_header trx_header = read_trx_header(prop, get_self(), proposer);
       check( trx_header.delay_sec.value == 0, "old proposals are not allowed to have non-zero `delay_sec`; cancel and retry" );
    }
 }
@@ -207,9 +340,19 @@ void multisig::cancel( name proposer, name proposal_name, name canceler ) {
    const auto prop = proptable.get( pk, "proposal not found" );
 
    if( canceler != proposer ) {
-      check( unpack<transaction_header>( prop.packed_transaction ).expiration < sysio::time_point_sec(current_time_point()), "cannot cancel until expiration" );
+      // Header parse is chunk-aware: pulls from the inline blob if present, otherwise
+      // from chunk 0.
+      check( read_trx_header(prop, get_self(), proposer).expiration < sysio::time_point_sec(current_time_point()),
+             "cannot cancel until expiration" );
    }
+
+   // Snapshot chunk_count before erasing the parent row so chunk cleanup below has the
+   // metadata it needs without re-reading the proposal.
+   const uint32_t chunk_count = prop.chunk_count.has_value() ? *prop.chunk_count : 0;
    proptable.erase(pk);
+
+   // Free chunk rows so they never outlive the parent proposal. No-op for inline proposals.
+   erase_proposal_chunks(chunk_count, proposal_name, get_self(), proposer);
 
    //remove from new table
    approvals apptable( get_self(), proposer.value );
@@ -229,11 +372,24 @@ void multisig::exec( name proposer, name proposal_name, name executer ) {
 
    proposals proptable( get_self(), proposer.value );
    auto pk = proposal_key{proposal_name.value};
-   const auto prop = proptable.get( pk, "proposal not found" );
+   // Non-const so we can std::move into `assemble_packed_trx` below.
+   auto prop = proptable.get( pk, "proposal not found" );
+
+   // Snapshot the small fields we still need after `prop` is consumed by
+   // `assemble_packed_trx`. After the std::move below, `prop` must not be read.
+   const auto earliest_exec_time = prop.earliest_exec_time;
+   const uint32_t chunk_count    = prop.chunk_count.has_value() ? *prop.chunk_count : 0;
+
+   // Reassemble the inner trx from chunks, or move the inline blob out of `prop`,
+   // so we have one contiguous buffer to feed into the deserializer. This is the
+   // only place in `exec` that touches the chunked storage layout — everything
+   // below operates on `packed`.
+   const auto packed = assemble_packed_trx(std::move(prop), get_self(), proposer);
+
    transaction_header trx_header;
    std::vector<action> context_free_actions;
    std::vector<action> actions;
-   datastream<const char*> ds( prop.packed_transaction.data(), prop.packed_transaction.size() );
+   datastream<const char*> ds( packed.data(), packed.size() );
    ds >> trx_header;
    check( trx_header.expiration >= sysio::time_point_sec(current_time_point()), "transaction expired" );
    ds >> context_free_actions;
@@ -241,11 +397,11 @@ void multisig::exec( name proposer, name proposal_name, name executer ) {
    ds >> actions;
 
    auto table_op = [](auto&& table, auto&& key) { table.erase(key); };
-   bool ok = trx_is_authorized(get_approvals_and_adjust_table(get_self(), proposer, proposal_name, table_op), prop.packed_transaction);
+   bool ok = trx_is_authorized(get_approvals_and_adjust_table(get_self(), proposer, proposal_name, table_op), packed);
    check( ok, "transaction authorization failed" );
 
-   if ( prop.earliest_exec_time.has_value() && prop.earliest_exec_time->has_value() ) {
-      check( **prop.earliest_exec_time <= current_time_point(), "too early to execute" );
+   if ( earliest_exec_time.has_value() && earliest_exec_time->has_value() ) {
+      check( **earliest_exec_time <= current_time_point(), "too early to execute" );
    } else {
       check( trx_header.delay_sec.value == 0, "old proposals are not allowed to have non-zero `delay_sec`; cancel and retry" );
    }
@@ -255,6 +411,8 @@ void multisig::exec( name proposer, name proposal_name, name executer ) {
    }
 
    proptable.erase(pk);
+   // Free chunk rows after successful exec — same RAM-cleanup contract as cancel.
+   erase_proposal_chunks(chunk_count, proposal_name, get_self(), proposer);
 }
 
 void multisig::invalidate( name account ) {
@@ -264,6 +422,24 @@ void multisig::invalidate( name account ) {
    inv_table.upsert( account, ik,
       invalidation{ .account = account, .last_invalidation_time = current_time_point() },
       [&](auto& i) { i.last_invalidation_time = current_time_point(); } );
+}
+
+multisig::proposal multisig::get_proposal( name proposer, name proposal_name ) {
+   // Read-only action: invoked via /v1/chain/send_read_only_transaction. The chain skips
+   // `max_action_return_value_size` in read-only context, so we can return arbitrarily
+   // large reassembled blobs without bumping any chain limit.
+   proposals proptable( get_self(), proposer.value );
+   auto prop = proptable.get( proposal_key{proposal_name.value}, "proposal not found" );
+
+   if (is_chunked(prop)) {
+      // For chunked proposals the parent row's `packed_transaction` is empty; reassemble
+      // the chunks and slot the result in. We use `read_proposal_chunks` directly here
+      // (rather than the consume-prop `assemble_packed_trx`) so we can return `prop` by
+      // value via NRVO without the moved-from-then-write subtlety that would require.
+      prop.packed_transaction = read_proposal_chunks(prop, get_self(), proposer);
+   }
+   // chunk_count / total_size / trx_hash stay populated so callers can verify what they got.
+   return prop;
 }
 
 transaction_header get_trx_header(const char* ptr, size_t sz) {

@@ -3267,6 +3267,31 @@ int main( int argc, char** argv ) {
       fc::variant requested_perm_var = json_from_file_or_string(requested_perm);
       fc::variant trx_var = json_from_file_or_string(trx_to_push);
 
+      // The propose action takes the inner trx as a `transaction`, and the
+      // chain `transaction` ABI types `action.data` as `bytes`. variant_to_bin
+      // (below) only handles the case where each action's `data` is already a
+      // hex string. If the user handed us structured `data` objects — the
+      // natural shape, the same one `clio push transaction` accepts — the
+      // literal cast below throws "Bad Cast — Invalid cast from object_type to
+      // string" and we fall through to the ABI-resolver-aware decoder, which
+      // fetches each contract's ABI on demand and recursively encodes the
+      // inner action data. Mirrors the fallback in the `push transaction`
+      // callback (~line 3145). Strict superset of the old behavior: if the
+      // input is already in the legacy hex-data form, the literal cast
+      // succeeds and we never enter the catch.
+      try {
+         (void)trx_var.as<transaction>();
+      } catch ( const std::exception& ) {
+         transaction trx;
+         try {
+            abi_serializer::from_variant( trx_var, trx, abi_serializer_resolver,
+                                          abi_serializer::create_yield_function( abi_serializer_max_time ) );
+         } SYS_RETHROW_EXCEPTIONS( transaction_type_exception,
+                                   "Failed to encode proposed transaction. If actions reference contracts whose ABI cannot be fetched, "
+                                   "either deploy them first or pre-encode action data as hex." )
+         trx_var = trx; // implicit conversion serializes vector<char> action data as hex
+      }
+
       auto account_permissions = get_account_permissions(tx_permission);
       if (account_permissions.empty()) {
          if (!proposer.empty()) {
@@ -3297,20 +3322,99 @@ int main( int argc, char** argv ) {
    review_cmd->add_flag( "--show-approvals", show_approvals_in_multisig_review, localized("Show the status of the approvals requested within the proposal") );
 
    review_cmd->callback([&] {
-      const auto result1 = call(get_table_func, fc::mutable_variant_object("json", true)
-                                 ("code", "sysio.msig")
-                                 ("scope", proposer)
-                                 ("table", "proposal")
-                                 ("find", fc::json::to_string(fc::mutable_variant_object("proposal_name", name(proposal_name).to_uint64_t()), fc::time_point::maximum()))
-                           );
+      // Fetch the proposal via the contract's read-only `getproposal` action instead of
+      // reaching into the `proposal` KV row directly. The contract reassembles chunked
+      // proposals on its side and returns a single struct with `packed_transaction`
+      // populated regardless of how the bytes are physically laid out on disk. This
+      // makes clio storage-layout-agnostic — if sysio.msig refactors its tables again
+      // in the future, this code keeps working as long as `getproposal`'s signature
+      // is preserved.
+      auto getproposal_args = fc::mutable_variant_object()
+         ("proposer",      proposer)
+         ("proposal_name", proposal_name);
 
-      const auto& rows1 = result1.get_object()["rows"].get_array();
-      if( rows1.empty() || rows1[0]["value"].get_object()["proposal_name"] != proposal_name ) {
-         std::cerr << "Proposal not found" << std::endl;
-         return;
+      chain::action getproposal_act{
+         {},                                  // no authorization needed for a read-only call
+         "sysio.msig"_n, "getproposal"_n,
+         variant_to_bin( "sysio.msig"_n, "getproposal"_n, fc::variant(getproposal_args) )
+      };
+
+      signed_transaction ro_trx;
+      ro_trx.actions.push_back( getproposal_act );
+
+      // Tapos / expiration: read-only trxs are never broadcast or persisted, but the
+      // chain still validates the header. Use the same defaults `push_transaction` uses.
+      auto info = get_info();
+      ro_trx.expiration = fc::time_point_sec{ info.head_block_time + tx_expiration };
+      ro_trx.set_reference_block( info.last_irreversible_block_id );
+
+      fc::variant result1;
+      try {
+         result1 = call( send_read_only_txn_func,
+                         fc::mutable_variant_object("transaction",
+                            packed_transaction( ro_trx, packed_transaction::compression_type::none )) );
+      } catch( chain::missing_chain_api_plugin_exception& ) {
+         std::cerr << "send_read_only_transaction RPC is not supported by this node — "
+                      "ensure the API node is started with --read-only-threads N (N >= 1) and is "
+                      "not a producer node." << std::endl;
+         throw;
+      } catch( const fc::exception& e ) {
+         // The contract's `proptable.get(..., "proposal not found")` assertion surfaces
+         // here as a generic fc::exception (do_http_call constructs one from the chain's
+         // error envelope at httpc.cpp:83) with code 3050003 / sysio_assert_message
+         // and "proposal not found" embedded in the log message. Print the historical
+         // friendly message for that specific case and rethrow everything else, so
+         // network errors, server errors, parse failures, and unrelated contract
+         // assertions are not silently masked as a missing proposal.
+         if( e.to_string().find("proposal not found") != std::string::npos ) {
+            std::cerr << "Proposal not found" << std::endl;
+            return;
+         }
+         throw;
       }
 
-      const auto& proposal_object = rows1[0]["value"].get_object();
+      // The action's return value is the assembled `proposal` struct. chain_plugin
+      // ABI-decodes it into `return_value_data` when the contract's ABI has an
+      // `action_results` entry for the action — which sysio.msig's ABI does. Pull
+      // the decoded variant out of the trace and use it the same way the old
+      // get_table_rows code path used the row's "value" field.
+      //
+      // The envelope walk is wrapped in a try/catch because any of the
+      // `get_object()` / `get_array()` / `operator[]` accesses can throw on a
+      // misshapen response (bad_cast_exception for wrong types,
+      // key_not_found_exception for missing fields). We take the address of the
+      // final decoded object so `proposal_object` can be used by the downstream
+      // code without duplicating the ~200 KiB packed_transaction field — the
+      // pointed-to variant_object lives inside `result1`, which outlives the try
+      // block. On any parse failure we print the raw response so the user can
+      // diagnose what the node actually returned.
+      const fc::variant_object* proposal_object_ptr = nullptr;
+      try {
+         const auto& processed = result1.get_object()["processed"].get_object();
+         const auto& action_traces = processed["action_traces"].get_array();
+         if( action_traces.empty() ) {
+            std::cerr << "Proposal not found" << std::endl;
+            return;
+         }
+         const auto& first_trace = action_traces[0].get_object();
+         if( !first_trace.contains("return_value_data") ) {
+            std::cerr << "Node returned no decoded action_results for sysio.msig::getproposal — "
+                         "the chain may be running a sysio.msig version that does not expose this action." << std::endl;
+            return;
+         }
+         proposal_object_ptr = &first_trace["return_value_data"].get_object();
+         if( (*proposal_object_ptr)["proposal_name"] != proposal_name ) {
+            std::cerr << "Proposal not found" << std::endl;
+            return;
+         }
+      } catch( const fc::exception& e ) {
+         std::cerr << "Unexpected shape in send_read_only_transaction response from node for "
+                      "sysio.msig::getproposal on " << proposer << "/" << proposal_name << ".\n"
+                      "Error: " << e.to_string() << "\n"
+                      "Response: " << fc::json::to_pretty_string( result1 ) << std::endl;
+         return;
+      }
+      const auto& proposal_object = *proposal_object_ptr;
 
       enum class approval_status {
          unapproved,
