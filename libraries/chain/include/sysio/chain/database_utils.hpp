@@ -166,18 +166,20 @@ struct reader {
    // NUL-escape decoding: 0x00,0x01 = literal NUL byte, 0x00,0x00 = end of string.
    std::string read_nul_escaped_string() {
       std::string s;
+      bool terminated = false;
       while (pos < end) {
          char c = *pos++;
          if (c == '\0') {
             FC_ASSERT(pos < end, "BE key underflow reading string terminator");
             char next = *pos++;
-            if (next == '\0') break;          // 0x00,0x00 = end
-            FC_ASSERT(next == '\x01', "Invalid NUL-escape sequence in BE key string");
+            if (next == '\0') { terminated = true; break; } // 0x00,0x00 = end
+            FC_ASSERT(next == '\x01', "Invalid NUL-escape sequence in BE key string: 0x00,0x{}", next);
             s.push_back('\0');                 // 0x00,0x01 = literal NUL
          } else {
             s.push_back(c);
          }
       }
+      FC_ASSERT(terminated, "Unterminated NUL-escaped string in BE key");
       return s;
    }
 
@@ -296,6 +298,7 @@ inline fc::variant decode_key(const char* data, size_t size,
    for (size_t i = 0; i < key_names.size(); ++i) {
       obj(key_names[i], decode_field(r, key_types[i]));
    }
+   FC_ASSERT(r.remaining() == 0, "BE key has {} trailing bytes after decoding all fields", r.remaining());
    return fc::variant(std::move(obj));
 }
 

@@ -67,11 +67,40 @@ namespace sysio { namespace chain {
                SYS_ASSERT(row.auth.threshold == 0,  snapshot_exception, "Unexpected auth threshold on reserved permission 0");
                SYS_ASSERT(row.last_updated == time_point(),  snapshot_exception, "Unexpected auth last updated on reserved permission 0");
                value.parent = 0;
-            } else if ( row.parent != permission_name()){
-               const auto& parent = db.get<permission_object, by_owner>(boost::make_tuple(row.owner, row.parent));
+            } else {
+               // Validate authority threshold > 0 for non-reserved permissions
+               SYS_ASSERT(row.auth.threshold > 0, snapshot_exception,
+                          "Permission {}@{} has threshold 0, which allows unauthorized transactions",
+                          row.owner, row.name);
 
-               SYS_ASSERT(parent.id != 0, snapshot_exception, "Unexpected mapping to reserved permission 0");
-               value.parent = parent.id;
+               // Validate key types
+               using key_type = fc::crypto::public_key::key_type;
+               for (const key_weight& k : row.auth.keys) {
+                  SYS_ASSERT(k.key.contains_type(key_type::k1, key_type::r1, key_type::wa, key_type::em, key_type::ed),
+                             snapshot_exception,
+                             "Permission {}@{} contains unactivated key type", row.owner, row.name);
+               }
+
+               if (row.parent != permission_name()) {
+                  const auto& parent = db.get<permission_object, by_owner>(boost::make_tuple(row.owner, row.parent));
+                  SYS_ASSERT(parent.id != 0, snapshot_exception, "Unexpected mapping to reserved permission 0");
+                  value.parent = parent.id;
+
+                  // Walk parent chain to root -- parents have lower IDs so are already loaded
+                  uint32_t depth = 1;
+                  auto cur_parent = parent.parent;
+                  while (cur_parent._id != 0) {
+                     ++depth;
+                     SYS_ASSERT(depth <= config::default_max_auth_depth, snapshot_exception, // 6
+                                "Permission {}@{} exceeds max authority depth -- possible circular parent",
+                                row.owner, row.name);
+                     const auto* pp = db.find<permission_object>(cur_parent);
+                     SYS_ASSERT(pp != nullptr, snapshot_exception,
+                                "Permission {}@{} parent chain references non-existent permission",
+                                row.owner, row.name);
+                     cur_parent = pp->parent;
+                  }
+               }
             }
          }
       };
