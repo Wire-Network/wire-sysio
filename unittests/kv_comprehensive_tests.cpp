@@ -23,7 +23,7 @@ BOOST_AUTO_TEST_SUITE(kv_comprehensive_tests)
 // ========== State Persistence Tests ==========
 
 BOOST_AUTO_TEST_CASE(kv_data_survives_block_production) {
-   validating_tester t;
+   validating_tester t( flat_set<account_name>(), nullptr, setup_policy::none );
    auto& db = const_cast<chainbase::database&>(t.control->db());
 
    // Write data in one session
@@ -39,13 +39,13 @@ BOOST_AUTO_TEST_CASE(kv_data_survives_block_production) {
 
    // Verify data is readable
    auto& idx = db.get_index<kv_index, by_code_key>();
-   auto itr = idx.find(boost::make_tuple(name("persist"), config::kv_format_raw, std::string_view("mykey", 5)));
+   auto itr = idx.find(boost::make_tuple(name("persist"), uint16_t(0), std::string_view("mykey", 5)));
    BOOST_REQUIRE(itr != idx.end());
    BOOST_CHECK_EQUAL(std::string_view(itr->value.data(), itr->value.size()), "myvalue");
 }
 
 BOOST_AUTO_TEST_CASE(kv_data_reverts_on_undo) {
-   validating_tester t;
+   validating_tester t( flat_set<account_name>(), nullptr, setup_policy::none );
    auto& db = const_cast<chainbase::database&>(t.control->db());
 
    auto& idx = db.get_index<kv_index, by_code_key>();
@@ -59,21 +59,21 @@ BOOST_AUTO_TEST_CASE(kv_data_reverts_on_undo) {
       });
 
       // Data exists within session
-      auto itr = idx.find(boost::make_tuple(name("undotest"), config::kv_format_raw, std::string_view("tempkey", 7)));
+      auto itr = idx.find(boost::make_tuple(name("undotest"), uint16_t(0), std::string_view("tempkey", 7)));
       BOOST_REQUIRE(itr != idx.end());
 
       session.undo();
    }
 
    // Data reverted after undo
-   auto itr = idx.find(boost::make_tuple(name("undotest"), config::kv_format_raw, std::string_view("tempkey", 7)));
+   auto itr = idx.find(boost::make_tuple(name("undotest"), uint16_t(0), std::string_view("tempkey", 7)));
    BOOST_CHECK(itr == idx.end());
 }
 
 // ========== RAM Accounting Tests ==========
 
 BOOST_AUTO_TEST_CASE(kv_ram_billing) {
-   validating_tester t;
+   validating_tester t( flat_set<account_name>(), nullptr, setup_policy::none );
    auto& db = const_cast<chainbase::database&>(t.control->db());
 
    auto session = db.start_undo_session(true);
@@ -96,7 +96,7 @@ BOOST_AUTO_TEST_CASE(kv_ram_billing) {
 // ========== Edge Case Tests ==========
 
 BOOST_AUTO_TEST_CASE(kv_empty_key_and_value) {
-   validating_tester t;
+   validating_tester t( flat_set<account_name>(), nullptr, setup_policy::none );
    auto& db = const_cast<chainbase::database&>(t.control->db());
 
    auto session = db.start_undo_session(true);
@@ -117,11 +117,11 @@ BOOST_AUTO_TEST_CASE(kv_empty_key_and_value) {
 
    auto& idx = db.get_index<kv_index, by_code_key>();
 
-   auto itr1 = idx.find(boost::make_tuple(name("edge"), config::kv_format_raw, std::string_view("", 0)));
+   auto itr1 = idx.find(boost::make_tuple(name("edge"), uint16_t(0), std::string_view("", 0)));
    BOOST_REQUIRE(itr1 != idx.end());
    BOOST_CHECK_EQUAL(itr1->value.size(), 8u);
 
-   auto itr2 = idx.find(boost::make_tuple(name("edge"), config::kv_format_raw, std::string_view("haskey", 6)));
+   auto itr2 = idx.find(boost::make_tuple(name("edge"), uint16_t(0), std::string_view("haskey", 6)));
    BOOST_REQUIRE(itr2 != idx.end());
    BOOST_CHECK_EQUAL(itr2->value.size(), 0u);
 
@@ -129,7 +129,7 @@ BOOST_AUTO_TEST_CASE(kv_empty_key_and_value) {
 }
 
 BOOST_AUTO_TEST_CASE(kv_max_key_size) {
-   validating_tester t;
+   validating_tester t( flat_set<account_name>(), nullptr, setup_policy::none );
    auto& db = const_cast<chainbase::database&>(t.control->db());
 
    auto session = db.start_undo_session(true);
@@ -152,11 +152,11 @@ BOOST_AUTO_TEST_CASE(kv_max_key_size) {
 
    auto& idx = db.get_index<kv_index, by_code_key>();
 
-   auto itr1 = idx.find(boost::make_tuple(name("maxkey"), config::kv_format_raw, std::string_view(std_key)));
+   auto itr1 = idx.find(boost::make_tuple(name("maxkey"), uint16_t(0), std::string_view(std_key)));
    BOOST_REQUIRE(itr1 != idx.end());
    BOOST_CHECK_EQUAL(itr1->key.size(), chain::kv_key_size);
 
-   auto itr2 = idx.find(boost::make_tuple(name("maxkey"), config::kv_format_raw, std::string_view(max_key)));
+   auto itr2 = idx.find(boost::make_tuple(name("maxkey"), uint16_t(0), std::string_view(max_key)));
    BOOST_REQUIRE(itr2 != idx.end());
    BOOST_CHECK_EQUAL(itr2->key.size(), 256u);
 
@@ -164,7 +164,7 @@ BOOST_AUTO_TEST_CASE(kv_max_key_size) {
 }
 
 BOOST_AUTO_TEST_CASE(kv_cross_contract_isolation) {
-   validating_tester t;
+   validating_tester t( flat_set<account_name>(), nullptr, setup_policy::none );
    auto& db = const_cast<chainbase::database&>(t.control->db());
 
    auto session = db.start_undo_session(true);
@@ -183,8 +183,8 @@ BOOST_AUTO_TEST_CASE(kv_cross_contract_isolation) {
 
    auto& idx = db.get_index<kv_index, by_code_key>();
 
-   auto itr_a = idx.find(boost::make_tuple(name("contract.a"), config::kv_format_raw, std::string_view("shared", 6)));
-   auto itr_b = idx.find(boost::make_tuple(name("contract.b"), config::kv_format_raw, std::string_view("shared", 6)));
+   auto itr_a = idx.find(boost::make_tuple(name("contract.a"), uint16_t(0), std::string_view("shared", 6)));
+   auto itr_b = idx.find(boost::make_tuple(name("contract.b"), uint16_t(0), std::string_view("shared", 6)));
 
    BOOST_REQUIRE(itr_a != idx.end());
    BOOST_REQUIRE(itr_b != idx.end());
@@ -196,121 +196,116 @@ BOOST_AUTO_TEST_CASE(kv_cross_contract_isolation) {
 
 // ========== SHiP ABI Translation Tests ==========
 
-BOOST_AUTO_TEST_CASE(kv_ship_delta_format_24byte_key) {
-   // Verify that kv_object with 24-byte key serializes in legacy contract_row format
-   validating_tester t;
-   auto& db = const_cast<chainbase::database&>(t.control->db());
-
-   auto session = db.start_undo_session(true);
-
-   // Create a row with SHiP-compatible 24-byte key: [table:8B][scope:8B][pk:8B]
-   auto encode_be64 = [](char* buf, uint64_t v) {
-      for (int i = 7; i >= 0; --i) { buf[i] = static_cast<char>(v & 0xFF); v >>= 8; }
-   };
-   char key[24];
-   encode_be64(key,      name("accounts").to_uint64_t());
-   encode_be64(key + 8,  name("alice").to_uint64_t());
-   encode_be64(key + 16, 1234567890ULL);
-
-   db.create<kv_object>([&](auto& o) {
-      o.code = "sysio.token"_n;
-         o.payer = "sysio.token"_n;
-      o.key_format = config::kv_format_standard;
-      o.key.assign(key, chain::kv_key_size);
-      o.value.assign("testvalue", 9);
-   });
-
-   // Serialize using the SHiP serializer
-   auto& idx = db.get_index<kv_index, by_code_key>();
-   auto itr = idx.find(boost::make_tuple(name("sysio.token"), config::kv_format_standard, std::string_view(key, chain::kv_key_size)));
-   BOOST_REQUIRE(itr != idx.end());
-
-   // Pack using history_serial_wrapper (same path as create_deltas)
+// Helper: serialize kv_object via SHiP history_serial_wrapper, then deserialize
+// and verify contract_row_kv_v0 {code, payer, table_id, key, value}.
+static void verify_ship_kv_roundtrip(const chainbase::database& db, const kv_object& obj,
+                                     uint16_t expected_tid, const char* expected_key, size_t expected_key_len,
+                                     const char* expected_val, size_t expected_val_len) {
    fc::datastream<size_t> ps;
-   fc::raw::pack(ps, make_history_serial_wrapper(db, *itr));
-   size_t packed_size = ps.tellp();
-   BOOST_CHECK(packed_size > 0);
-
-   std::vector<char> buf(packed_size);
+   fc::raw::pack(ps, make_history_serial_wrapper(db, obj));
+   std::vector<char> buf(ps.tellp());
    fc::datastream<char*> ds(buf.data(), buf.size());
-   fc::raw::pack(ds, make_history_serial_wrapper(db, *itr));
+   fc::raw::pack(ds, make_history_serial_wrapper(db, obj));
 
-   // Deserialize and verify legacy contract_row fields
    fc::datastream<const char*> rds(buf.data(), buf.size());
-
    fc::unsigned_int struct_version;
-   uint64_t code, scope, table, primary_key, payer;
+   uint64_t code, payer;
+   uint16_t table_id;
    fc::raw::unpack(rds, struct_version);
    fc::raw::unpack(rds, code);
-   fc::raw::unpack(rds, scope);
-   fc::raw::unpack(rds, table);
-   fc::raw::unpack(rds, primary_key);
    fc::raw::unpack(rds, payer);
+   fc::raw::unpack(rds, table_id);
 
    BOOST_CHECK_EQUAL(struct_version.value, 0u);
-   BOOST_CHECK_EQUAL(code, name("sysio.token").to_uint64_t());
-   BOOST_CHECK_EQUAL(scope, name("alice").to_uint64_t());
-   BOOST_CHECK_EQUAL(table, name("accounts").to_uint64_t());
-   BOOST_CHECK_EQUAL(primary_key, 1234567890ULL);
-   BOOST_CHECK_EQUAL(payer, name("sysio.token").to_uint64_t()); // payer = contract
+   BOOST_CHECK_EQUAL(code, obj.code.to_uint64_t());
+   BOOST_CHECK_EQUAL(payer, obj.payer.to_uint64_t());
+   BOOST_CHECK_EQUAL(table_id, expected_tid);
 
-   BOOST_TEST_MESSAGE("SHiP delta: 24-byte key correctly decoded to (code, scope, table, pk)");
-
-   session.undo();
+   std::vector<char> key_bytes, value_bytes;
+   fc::raw::unpack(rds, key_bytes);
+   fc::raw::unpack(rds, value_bytes);
+   BOOST_CHECK_EQUAL(key_bytes.size(), expected_key_len);
+   if (expected_key_len > 0)
+      BOOST_CHECK(memcmp(key_bytes.data(), expected_key, expected_key_len) == 0);
+   BOOST_CHECK_EQUAL(value_bytes.size(), expected_val_len);
+   if (expected_val_len > 0)
+      BOOST_CHECK(memcmp(value_bytes.data(), expected_val, expected_val_len) == 0);
 }
 
-BOOST_AUTO_TEST_CASE(kv_ship_delta_format_nonstandard_key) {
-   // Verify that kv_object with non-24-byte key is handled gracefully
-   validating_tester t;
+BOOST_AUTO_TEST_CASE(kv_ship_delta_format_contract_row_kv) {
+   // All kv_objects serialize as contract_row_kv_v0 {code, payer, table_id, key, value}
+   // regardless of key size or content. Verify with multiple key shapes.
+   validating_tester t( flat_set<account_name>(), nullptr, setup_policy::none );
    auto& db = const_cast<chainbase::database&>(t.control->db());
 
    auto session = db.start_undo_session(true);
 
-   db.create<kv_object>([](auto& o) {
+   // --- Case 1: short key (5 bytes) ---
+   const uint16_t tid_short = compute_table_id("geodata");
+   const auto& obj_short = db.create<kv_object>([&](auto& o) {
       o.code = "rawcontract"_n;
+      o.payer = "rawcontract"_n;
+      o.table_id = tid_short;
       o.key.assign("short", 5);
       o.value.assign("data", 4);
    });
+   verify_ship_kv_roundtrip(db, obj_short, tid_short, "short", 5, "data", 4);
 
-   auto& idx = db.get_index<kv_index, by_code_key>();
-   auto itr = idx.find(boost::make_tuple(name("rawcontract"), config::kv_format_raw, std::string_view("short", 5)));
-   BOOST_REQUIRE(itr != idx.end());
+   // --- Case 2: 24-byte key (old standard layout, now just opaque bytes) ---
+   auto encode_be64 = [](char* buf, uint64_t v) {
+      for (int i = 7; i >= 0; --i) { buf[i] = static_cast<char>(v & 0xFF); v >>= 8; }
+   };
+   char key24[24];
+   encode_be64(key24,      name("accounts").to_uint64_t());
+   encode_be64(key24 + 8,  name("alice").to_uint64_t());
+   encode_be64(key24 + 16, 1234567890ULL);
 
-   // Serialize — should use the contract_row_kv_v0 path {code, payer, key, value}
-   fc::datastream<size_t> ps;
-   fc::raw::pack(ps, make_history_serial_wrapper(db, *itr));
-   size_t packed_size = ps.tellp();
-   BOOST_CHECK(packed_size > 0);
+   const uint16_t tid_accts = compute_table_id("accounts");
+   const auto& obj_24 = db.create<kv_object>([&](auto& o) {
+      o.code = "sysio.token"_n;
+      o.payer = "sysio.token"_n;
+      o.table_id = tid_accts;
+      o.key.assign(key24, 24);
+      o.value.assign("testvalue", 9);
+   });
+   verify_ship_kv_roundtrip(db, obj_24, tid_accts, key24, 24, "testvalue", 9);
 
-   std::vector<char> buf(packed_size);
-   fc::datastream<char*> ds(buf.data(), buf.size());
-   fc::raw::pack(ds, make_history_serial_wrapper(db, *itr));
+   // --- Case 3: 16-byte key (new standard scope+pk layout) ---
+   char key16[16];
+   encode_be64(key16,     name("alice").to_uint64_t());
+   encode_be64(key16 + 8, 42ULL);
 
-   fc::datastream<const char*> rds(buf.data(), buf.size());
+   const auto& obj_16 = db.create<kv_object>([&](auto& o) {
+      o.code = "sysio.token"_n;
+      o.payer = "sysio.token"_n;
+      o.table_id = tid_accts;
+      o.key.assign(key16, 16);
+      o.value.assign("balance", 7);
+   });
+   verify_ship_kv_roundtrip(db, obj_16, tid_accts, key16, 16, "balance", 7);
 
-   fc::unsigned_int struct_version;
-   uint64_t code, payer;
-   fc::raw::unpack(rds, struct_version);
-   fc::raw::unpack(rds, code);
-   fc::raw::unpack(rds, payer);
+   // --- Case 4: empty value ---
+   const uint16_t tid_flags = compute_table_id("flags");
+   const auto& obj_empty = db.create<kv_object>([&](auto& o) {
+      o.code = "flagtest"_n;
+      o.payer = "flagtest"_n;
+      o.table_id = tid_flags;
+      o.key.assign("present", 7);
+      // value left empty
+   });
+   verify_ship_kv_roundtrip(db, obj_empty, tid_flags, "present", 7, nullptr, 0);
 
-   BOOST_CHECK_EQUAL(struct_version.value, 0u);
-   BOOST_CHECK_EQUAL(code, name("rawcontract").to_uint64_t());
-   BOOST_CHECK_EQUAL(payer, 0u); // default-constructed payer
-
-   // Unpack key bytes
-   std::vector<char> key_bytes;
-   fc::raw::unpack(rds, key_bytes);
-   BOOST_CHECK_EQUAL(key_bytes.size(), 5u);
-   BOOST_CHECK(std::string(key_bytes.data(), key_bytes.size()) == "short");
-
-   // Unpack value bytes
-   std::vector<char> value_bytes;
-   fc::raw::unpack(rds, value_bytes);
-   BOOST_CHECK_EQUAL(value_bytes.size(), 4u);
-   BOOST_CHECK(std::string(value_bytes.data(), value_bytes.size()) == "data");
-
-   BOOST_TEST_MESSAGE("SHiP delta: non-24-byte key serialized as contract_row_kv_v0 {code, payer, key, value}");
+   // --- Case 5: large key (256 bytes) ---
+   std::string big_key(256, '\xAB');
+   const uint16_t tid_big = compute_table_id("bigkeys");
+   const auto& obj_big = db.create<kv_object>([&](auto& o) {
+      o.code = "bigtest"_n;
+      o.payer = "bigtest"_n;
+      o.table_id = tid_big;
+      o.key.assign(big_key.data(), big_key.size());
+      o.value.assign("v", 1);
+   });
+   verify_ship_kv_roundtrip(db, obj_big, tid_big, big_key.data(), 256, "v", 1);
 
    session.undo();
 }
@@ -318,7 +313,7 @@ BOOST_AUTO_TEST_CASE(kv_ship_delta_format_nonstandard_key) {
 // ========== Secondary Index Tests ==========
 
 BOOST_AUTO_TEST_CASE(kv_secondary_index_ordering) {
-   validating_tester t;
+   validating_tester t( flat_set<account_name>(), nullptr, setup_policy::none );
    auto& db = const_cast<chainbase::database&>(t.control->db());
 
    auto session = db.start_undo_session(true);
@@ -341,16 +336,15 @@ BOOST_AUTO_TEST_CASE(kv_secondary_index_ordering) {
       auto pk = make_pri(pri);
       db.create<kv_index_object>([&](auto& o) {
          o.code = "sectest"_n;
-         o.table = "mytable"_n;
-         o.index_id = 0;
+         o.table_id = compute_table_id("mytable.idx0");
          o.sec_key.assign(sk.data(), sk.size());
          o.pri_key.assign(pk.data(), pk.size());
       });
    }
 
    // Verify iteration is sorted by secondary key
-   auto& sec_idx = db.get_index<kv_index_index, by_code_table_idx_seckey>();
-   auto itr = sec_idx.lower_bound(boost::make_tuple(name("sectest"), name("mytable"), uint8_t(0)));
+   auto& sec_idx = db.get_index<kv_index_index, by_code_table_id_seckey>();
+   auto itr = sec_idx.lower_bound(boost::make_tuple(name("sectest"), compute_table_id("mytable.idx0")));
 
    std::vector<uint64_t> actual_order;
    while (itr != sec_idx.end() && itr->code == name("sectest")) {
@@ -376,25 +370,19 @@ BOOST_AUTO_TEST_CASE(kv_secondary_index_ordering) {
 
 BOOST_AUTO_TEST_CASE(kv_get_row_by_id_fallback) {
    // Verify the tester's get_row_by_id finds data in KV storage
-   validating_tester t;
+   validating_tester t( flat_set<account_name>(), nullptr, setup_policy::none );
    auto& db = const_cast<chainbase::database&>(t.control->db());
 
    auto session = db.start_undo_session(true);
 
-   // Store data using KV key encoding: [table:8B][scope:8B][pk:8B]
-   auto encode_be64 = [](char* buf, uint64_t v) {
-      for (int i = 7; i >= 0; --i) { buf[i] = static_cast<char>(v & 0xFF); v >>= 8; }
-   };
-
-   char key[24];
-   encode_be64(key,      name("mytable").to_uint64_t());
-   encode_be64(key + 8,  name("myscope").to_uint64_t());
-   encode_be64(key + 16, 42);
+   // Store data using new KV key encoding: [scope:8B][pk:8B] with table_id
+   auto scoped_key = chain::make_kv_scoped_key("myscope"_n, 42);
+   auto tid = chain::compute_table_id("mytable"_n.to_uint64_t());
 
    db.create<kv_object>([&](auto& o) {
       o.code = "mycode"_n;
-      o.key_format = config::kv_format_standard;
-      o.key.assign(key, chain::kv_key_size);
+      o.table_id = tid;
+      o.key.assign(scoped_key.data, chain::kv_scoped_key_size);
       o.value.assign("hello_kv", 8);
    });
 
@@ -444,7 +432,7 @@ BOOST_AUTO_TEST_CASE(billable_size_covers_all_objects) {
 // ========== kv::raw_table Tests (format=0, BE keys) ==========
 
 BOOST_AUTO_TEST_CASE(kv_map_store_and_get) {
-   validating_tester t;
+   validating_tester t( flat_set<account_name>(), nullptr, setup_policy::none );
    t.produce_block();
 
    t.create_accounts({"kvmap"_n});
@@ -467,7 +455,7 @@ BOOST_AUTO_TEST_CASE(kv_map_store_and_get) {
 }
 
 BOOST_AUTO_TEST_CASE(kv_map_erase) {
-   validating_tester t;
+   validating_tester t( flat_set<account_name>(), nullptr, setup_policy::none );
    t.produce_block();
 
    t.create_accounts({"kvmap"_n});
@@ -489,7 +477,7 @@ BOOST_AUTO_TEST_CASE(kv_map_erase) {
 }
 
 BOOST_AUTO_TEST_CASE(kv_map_iteration) {
-   validating_tester t;
+   validating_tester t( flat_set<account_name>(), nullptr, setup_policy::none );
    t.produce_block();
 
    t.create_accounts({"kvmap"_n});
@@ -513,7 +501,7 @@ BOOST_AUTO_TEST_CASE(kv_map_iteration) {
 
 // int64_t key ordering: negatives must sort before positives
 BOOST_AUTO_TEST_CASE(kv_map_signed_key_ordering) {
-   validating_tester t;
+   validating_tester t( flat_set<account_name>(), nullptr, setup_policy::none );
    t.produce_block();
 
    t.create_accounts({"kvmap"_n});
@@ -535,7 +523,7 @@ BOOST_AUTO_TEST_CASE(kv_map_abi_key_metadata) {
    // Find the "geodata" table
    bool found = false;
    for (const auto& tbl : abi.tables) {
-      if (tbl.name == "geodata"_n) {
+      if (tbl.name == "geodata") {
          found = true;
 
          // Verify key_names from the my_key struct
@@ -569,6 +557,78 @@ BOOST_AUTO_TEST_CASE(kv_map_abi_key_metadata) {
       }
    }
    BOOST_CHECK(key_struct_found);
+}
+
+// Test secondary index lookup via chainbase (simulates chain_plugin get_kv_rows with index_name)
+BOOST_AUTO_TEST_CASE(kv_secondary_index_lookup_by_table_id) {
+   validating_tester t( flat_set<account_name>(), nullptr, setup_policy::none );
+   auto& db = const_cast<chainbase::database&>(t.control->db());
+
+   auto session = db.start_undo_session(true);
+
+   // Simulate a kv::table with a secondary index:
+   // Primary table: table_id = compute_table_id("users"_n)
+   // Secondary index "byowner": sec_table_id = compute_sec_table_id("users"_n, "byowner"_n)
+   const uint16_t pri_tid = chain::compute_table_id("users"_n.to_uint64_t());
+   const uint16_t sec_tid = chain::compute_sec_table_id("users"_n.to_uint64_t(), "byowner"_n.to_uint64_t());
+
+   // Insert primary rows: key=[id:8B BE], value=some data
+   auto make_pri_key = [](uint64_t id) {
+      char buf[8]; chain::kv_encode_be64(buf, id); return std::string(buf, 8);
+   };
+
+   for (uint64_t id : {1, 2, 3}) {
+      auto pk = make_pri_key(id);
+      db.create<kv_object>([&](auto& o) {
+         o.code = "mycontract"_n;
+         o.table_id = pri_tid;
+         o.key.assign(pk.data(), pk.size());
+         o.value.assign("data", 4);
+      });
+   }
+
+   // Insert secondary index entries: sec_key=[owner:8B BE], pri_key=[id:8B BE]
+   auto make_owner_key = [](name owner) {
+      char buf[8]; chain::kv_encode_be64(buf, owner.to_uint64_t()); return std::string(buf, 8);
+   };
+
+   struct sec_entry { uint64_t id; name owner; };
+   std::vector<sec_entry> entries = {{1, "alice"_n}, {2, "bob"_n}, {3, "alice"_n}};
+   for (auto& e : entries) {
+      auto sk = make_owner_key(e.owner);
+      auto pk = make_pri_key(e.id);
+      db.create<kv_index_object>([&](auto& o) {
+         o.code = "mycontract"_n;
+         o.table_id = sec_tid;
+         o.sec_key.assign(sk.data(), sk.size());
+         o.pri_key.assign(pk.data(), pk.size());
+      });
+   }
+
+   // Query secondary index by owner="alice" — should find entries with id=1 and id=3
+   auto alice_key = make_owner_key("alice"_n);
+   auto alice_sv = std::string_view(alice_key.data(), alice_key.size());
+
+   const auto& sec_idx = db.get_index<kv_index_index, by_code_table_id_seckey>();
+   auto itr = sec_idx.lower_bound(boost::make_tuple("mycontract"_n, sec_tid, alice_sv));
+
+   std::vector<uint64_t> found_ids;
+   while (itr != sec_idx.end() && itr->code == "mycontract"_n && itr->table_id == sec_tid) {
+      if (itr->sec_key_view() != alice_sv) break;
+      // Look up primary row using raw pri_key bytes
+      auto pri_sv = itr->pri_key_view();
+      const auto& pri_idx = db.get_index<kv_index, by_code_key>();
+      auto pri_itr = pri_idx.find(boost::make_tuple("mycontract"_n, pri_tid, pri_sv));
+      BOOST_REQUIRE(pri_itr != pri_idx.end());
+      found_ids.push_back(chain::kv_decode_be64(itr->pri_key.data()));
+      ++itr;
+   }
+
+   BOOST_REQUIRE_EQUAL(found_ids.size(), 2u);
+   BOOST_CHECK_EQUAL(found_ids[0], 1u);
+   BOOST_CHECK_EQUAL(found_ids[1], 3u);
+
+   session.undo();
 }
 
 BOOST_AUTO_TEST_SUITE_END()

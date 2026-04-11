@@ -2,7 +2,7 @@
 
 #include <sysio/binary_extension.hpp>
 #include <sysio/sysio.hpp>
-#include <sysio/kv_table.hpp>
+#include <sysio/multi_index.hpp>
 #include <sysio/ignore.hpp>
 #include <sysio/transaction.hpp>
 
@@ -120,7 +120,7 @@ public:
 
       uint64_t primary_key()const { return proposal_name.value; }
    };
-   typedef sysio::kv::table< "proposal"_n, proposal > proposals;
+   typedef sysio::multi_index< "proposal"_n, proposal > proposals;
 
    struct [[sysio::table, sysio::contract("sysio.msig")]] old_approvals_info {
       name                            proposal_name;
@@ -128,7 +128,7 @@ public:
       std::vector<permission_level>   provided_approvals;
       uint64_t primary_key()const { return proposal_name.value; }
    };
-   typedef sysio::kv::table< "approvals"_n, old_approvals_info > old_approvals;
+   typedef sysio::multi_index< "approvals"_n, old_approvals_info > old_approvals;
    struct approval {
       permission_level level;
       time_point       time;
@@ -144,7 +144,7 @@ public:
       std::vector<approval>   provided_approvals;
       uint64_t primary_key()const { return proposal_name.value; }
    };
-   typedef sysio::kv::table< "approvals2"_n, approvals_info > approvals;
+   typedef sysio::multi_index< "approvals2"_n, approvals_info > approvals;
 
    struct [[sysio::table, sysio::contract("sysio.msig")]] invalidation {
       name         account;
@@ -153,6 +153,6 @@ public:
       uint64_t primary_key() const { return account.value; }
    };
 
-   typedef sysio::kv::table< "invals"_n, invalidation > invalidations;
+   typedef sysio::multi_index< "invals"_n, invalidation > invalidations;
 };
 } /// namespace sysio

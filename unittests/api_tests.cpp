@@ -1579,7 +1579,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(permission_tests, T, validating_testers) { try {
 
       // The test contract stores its result under its own code with a fixed key.
       // Use lower_bound on the contract's code to find its first (and only) KV row.
-      auto itr = idx.lower_bound(boost::make_tuple("testapi"_n, chain::config::kv_format_raw));
+      auto itr = idx.lower_bound(boost::make_tuple("testapi"_n, uint16_t(0)));
       FC_ASSERT( itr != idx.end() && itr->code == "testapi"_n, "KV row not found for testapi");
 
       FC_ASSERT( 0 != itr->value.size(), "unexpected result size");

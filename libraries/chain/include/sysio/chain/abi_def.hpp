@@ -57,17 +57,25 @@ struct action_def {
    string      ricardian_contract;
 };
 
+struct index_def {
+   string    name;          // e.g. "byowner", "bybalance"
+   string    key_type;      // e.g. "uint64", "name", "float64"
+   uint16_t  table_id = 0;  // unique table_id for this secondary index
+};
+
 struct table_def {
    table_def() = default;
-   table_def(const table_name& name, const type_name& index_type, const vector<field_name>& key_names, const vector<type_name>& key_types, const type_name& type)
-   :name(name), index_type(index_type), key_names(key_names), key_types(key_types), type(type)
+   table_def(const string& name, const type_name& index_type, const vector<field_name>& key_names, const vector<type_name>& key_types, const type_name& type, uint16_t table_id = 0)
+   :name(name), index_type(index_type), key_names(key_names), key_types(key_types), type(type), table_id(table_id)
    {}
 
-   table_name         name;        // the name of the table
-   type_name          index_type;  // the kind of index, i64, i128i128, etc
-   vector<field_name> key_names;   // names for the keys defined by key_types
-   vector<type_name>  key_types;   // the type of key parameters
-   type_name          type;        // type of binary data stored in this table
+   string              name;              // table name (free-form string)
+   type_name           index_type;        // the kind of index, i64, i128i128, etc
+   vector<field_name>  key_names;         // names for the keys defined by key_types
+   vector<type_name>   key_types;         // the type of key parameters
+   type_name           type;              // type of binary data stored in this table
+   uint16_t            table_id = 0;      // table namespace identifier
+   vector<index_def>   secondary_indexes; // secondary index definitions
 };
 
 struct clause_pair {
@@ -184,7 +192,8 @@ FC_REFLECT( sysio::chain::type_def                         , (new_type_name)(typ
 FC_REFLECT( sysio::chain::field_def                        , (name)(type) )
 FC_REFLECT( sysio::chain::struct_def                       , (name)(base)(fields) )
 FC_REFLECT( sysio::chain::action_def                       , (name)(type)(ricardian_contract) )
-FC_REFLECT( sysio::chain::table_def                        , (name)(index_type)(key_names)(key_types)(type) )
+FC_REFLECT( sysio::chain::index_def                        , (name)(key_type)(table_id) )
+FC_REFLECT( sysio::chain::table_def                        , (name)(index_type)(key_names)(key_types)(type)(table_id)(secondary_indexes) )
 FC_REFLECT( sysio::chain::clause_pair                      , (id)(body) )
 FC_REFLECT( sysio::chain::error_message                    , (error_code)(error_msg) )
 FC_REFLECT( sysio::chain::variant_def                      , (name)(types) )

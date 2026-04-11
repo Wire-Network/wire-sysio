@@ -1,0 +1,76 @@
+{
+    "____comment": "This file was generated with sysio-abigen. DO NOT EDIT ",
+    "version": "sysio::abi/1.2",
+    "types": [],
+    "structs": [
+        {
+            "name": "adduser",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "owner",
+                    "type": "name"
+                },
+                {
+                    "name": "balance",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "user_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "user_val",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "name"
+                },
+                {
+                    "name": "balance",
+                    "type": "uint64"
+                }
+            ]
+        }
+    ],
+    "actions": [
+        {
+            "name": "adduser",
+            "type": "adduser",
+            "ricardian_contract": ""
+        }
+    ],
+    "tables": [
+        {
+            "name": "users",
+            "type": "user_val",
+            "index_type": "i64",
+            "key_names": ["id"],
+            "key_types": ["uint64"],
+            "table_id": 59372,
+            "secondary_indexes": [
+                {
+                    "name": "byowner",
+                    "key_type": "name",
+                    "table_id": 37799
+                }
+            ]
+        }
+    ],
+    "ricardian_clauses": [],
+    "variants": [],
+    "action_results": []
+}

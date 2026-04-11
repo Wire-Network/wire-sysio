@@ -32,6 +32,11 @@ namespace sysio { namespace chain {
     * Stores arbitrary variable-length keys and values as shared_blobs in
     * chainbase shared memory. key_size and value_size are billed separately
     * at billing time on top of the fixed struct overhead.
+    *
+    * table_id is a uint16 namespace identifier (DJB2 hash of the table name
+    * string, truncated to 16 bits). Each table and each secondary index gets
+    * a unique table_id, providing automatic partition in the composite index
+    * with zero per-row key overhead.
     */
    class kv_object : public chainbase::object<kv_object_type, kv_object> {
       OBJECT_CTOR(kv_object, (key)(value))
@@ -40,9 +45,9 @@ namespace sysio { namespace chain {
       id_type        id;
       account_name   code;          ///< contract account owning this row
       account_name   payer;         ///< RAM payer (default=code, privileged contracts can set to other accounts)
-      shared_blob    key;           ///< primary key bytes
+      shared_blob    key;           ///< primary key bytes (opaque, layout determined by CDT)
       shared_blob    value;         ///< arbitrary byte value
-      uint8_t        key_format = 0;///< 0=raw, 1=standard [table:8B][scope:8B][pk:8B]
+      uint16_t       table_id = 0;  ///< table namespace (DJB2 hash of table name % 65536)
 
       std::string_view key_view() const {
          return {key.data(), key.size()};
@@ -93,10 +98,10 @@ namespace sysio { namespace chain {
          ordered_unique<tag<by_code_key>,
             composite_key<kv_object,
                member<kv_object, account_name, &kv_object::code>,
-               member<kv_object, uint8_t, &kv_object::key_format>,
+               member<kv_object, uint16_t, &kv_object::table_id>,
                kv_key_extractor
             >,
-            composite_key_compare<std::less<account_name>, std::less<uint8_t>, kv_key_less>
+            composite_key_compare<std::less<account_name>, std::less<uint16_t>, kv_key_less>
          >
       >
    >;
@@ -107,6 +112,10 @@ namespace sysio { namespace chain {
     *
     * Uses shared_blob for both key fields. sec_key_size and pri_key_size are
     * billed separately at billing time on top of the fixed struct overhead.
+    *
+    * table_id identifies this secondary index's namespace (DJB2 hash of
+    * "tablename.indexname" % 65536). Each secondary index gets its own
+    * table_id, separate from the primary table's table_id.
     */
    class kv_index_object : public chainbase::object<kv_index_object_type, kv_index_object> {
       OBJECT_CTOR(kv_index_object, (sec_key)(pri_key))
@@ -115,10 +124,9 @@ namespace sysio { namespace chain {
       id_type        id;
       account_name   code;
       account_name   payer;         ///< RAM payer (mirrors kv_object::payer)
-      name           table;
       shared_blob    sec_key;       ///< secondary key bytes
       shared_blob    pri_key;       ///< primary key bytes
-      uint8_t        index_id = 0;
+      uint16_t       table_id = 0;  ///< secondary index namespace (DJB2 hash of "table.index" % 65536)
 
       std::string_view sec_key_view() const { return {sec_key.data(), sec_key.size()}; }
       std::string_view pri_key_view() const { return {pri_key.data(), pri_key.size()}; }
@@ -135,7 +143,7 @@ namespace sysio { namespace chain {
       result_type operator()(const kv_index_object& o) const { return o.pri_key_view(); }
    };
 
-   struct by_code_table_idx_seckey;
+   struct by_code_table_id_seckey;
 
    using kv_index_index = chainbase::shared_multi_index_container<
       kv_index_object,
@@ -143,15 +151,14 @@ namespace sysio { namespace chain {
          ordered_unique<tag<by_id>,
             member<kv_index_object, kv_index_object::id_type, &kv_index_object::id>
          >,
-         ordered_unique<tag<by_code_table_idx_seckey>,
+         ordered_unique<tag<by_code_table_id_seckey>,
             composite_key<kv_index_object,
-               member<kv_index_object, account_name,  &kv_index_object::code>,
-               member<kv_index_object, name,           &kv_index_object::table>,
-               member<kv_index_object, uint8_t,        &kv_index_object::index_id>,
+               member<kv_index_object, account_name, &kv_index_object::code>,
+               member<kv_index_object, uint16_t,     &kv_index_object::table_id>,
                kv_sec_key_extractor,
                kv_pri_key_extractor
             >,
-            composite_key_compare<std::less<account_name>, std::less<name>, std::less<uint8_t>,
+            composite_key_compare<std::less<account_name>, std::less<uint16_t>,
                                   kv_key_less, kv_key_less>
          >
       >
@@ -162,18 +169,18 @@ namespace config {
    struct billable_size<kv_object> {
       static const uint64_t overhead = overhead_per_row_per_index_ram_bytes * 2;  ///< 2 indices: by_id, by_code_key
       // Fixed fields: 8 id + 8 code + 8 payer + 8 key (offset_ptr) + 8 value (offset_ptr)
-      //             + 1 key_format + 7 padding = 48
+      //             + 2 table_id + 6 padding = 48
       // key.size() and value.size() are added separately at billing time.
       static const uint64_t value = 48 + overhead;
    };
 
    template<>
    struct billable_size<kv_index_object> {
-      static const uint64_t overhead = overhead_per_row_per_index_ram_bytes * 2;  ///< 2 indices: by_id, by_code_table_idx_seckey
-      // Fixed fields: 8 id + 8 code + 8 payer + 8 table + 8 sec_key (offset_ptr)
-      //             + 8 pri_key (offset_ptr) + 1 index_id + 7 padding = 56
+      static const uint64_t overhead = overhead_per_row_per_index_ram_bytes * 2;  ///< 2 indices: by_id, by_code_table_id_seckey
+      // Fixed fields: 8 id + 8 code + 8 payer + 8 sec_key (offset_ptr)
+      //             + 8 pri_key (offset_ptr) + 2 table_id + 6 padding = 48
       // sec_key.size() and pri_key.size() are added separately at billing time.
-      static const uint64_t value = 56 + overhead;
+      static const uint64_t value = 48 + overhead;
    };
 } // namespace config
 
@@ -185,18 +192,17 @@ namespace config {
    struct snapshot_kv_object {
       account_name        code;
       account_name        payer;
-      uint8_t             key_format = 0;
       std::vector<char>   key;
       std::vector<char>   value;
+      uint16_t            table_id = 0;
    };
 
    struct snapshot_kv_index_object {
       account_name        code;
       account_name        payer;
-      name                table;
-      uint8_t             index_id = 0;
       std::vector<char>   sec_key;
       std::vector<char>   pri_key;
+      uint16_t            table_id = 0;
    };
 
 } } // namespace sysio::chain
@@ -204,5 +210,5 @@ namespace config {
 CHAINBASE_SET_INDEX_TYPE(sysio::chain::kv_object, sysio::chain::kv_index)
 CHAINBASE_SET_INDEX_TYPE(sysio::chain::kv_index_object, sysio::chain::kv_index_index)
 
-FC_REFLECT(sysio::chain::snapshot_kv_object, (code)(payer)(key_format)(key)(value))
-FC_REFLECT(sysio::chain::snapshot_kv_index_object, (code)(payer)(table)(index_id)(sec_key)(pri_key))
+FC_REFLECT(sysio::chain::snapshot_kv_object, (code)(payer)(key)(value)(table_id))
+FC_REFLECT(sysio::chain::snapshot_kv_index_object, (code)(payer)(sec_key)(pri_key)(table_id))

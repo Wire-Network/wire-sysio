@@ -131,7 +131,7 @@ void test_action::test_cf_action() {
       // attempt to access non context free api, kv_idx_api
       uint64_t i = 0;
       uint64_t pk = 0;
-      kv_idx_store( 0, "testapi"_n.value, 0, &pk, sizeof(pk), &i, sizeof(i) );
+      kv_idx_store( 0, 100, &pk, sizeof(pk), &i, sizeof(i) );
       sysio_assert( false, "kv_api should not be allowed" );
    } else if ( cfa.payload == 204 ) {
       char key[24];

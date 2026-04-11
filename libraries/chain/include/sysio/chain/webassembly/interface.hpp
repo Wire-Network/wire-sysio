@@ -782,8 +782,7 @@ namespace webassembly {
           * write to another contract's namespace. Keys are arbitrary byte sequences
           * (max 256 bytes), values up to 256 KiB.
           *
-          * @param key_format - encoding hint: 0 = raw bytes, 1 = standard 24-byte
-          *   `[table:8B][scope:8B][pk:8B]` layout used by `multi_index`
+          * @param table_id - table namespace identifier (DJB2 hash of table name % 65536)
           * @param payer - account to bill for RAM. Pass 0 to bill the executing
           *   contract. Non-zero payer is accepted but the transaction-level
           *   `unauthorized_ram_usage_increase` check requires the payer to have
@@ -792,7 +791,7 @@ namespace webassembly {
           * @param value - the value bytes
           * @return RAM byte delta (positive on growth, negative on shrink, 0 on same-size update)
           */
-         int64_t  kv_set(uint32_t key_format, uint64_t payer, legacy_span<const char> key, legacy_span<const char> value);
+         int64_t  kv_set(uint32_t table_id, uint64_t payer, legacy_span<const char> key, legacy_span<const char> value);
 
          /**
           * Read a value by key from any contract's KV table.
@@ -801,14 +800,13 @@ namespace webassembly {
           * truncated but the full size is still returned, allowing the caller to
           * allocate and retry. Pass a zero-length buffer to probe the size.
           *
-          * @param key_format - encoding hint: 0 = raw bytes, 1 = standard 24-byte
-          *   `[table:8B][scope:8B][pk:8B]` layout used by `multi_index`
+          * @param table_id - table namespace identifier (DJB2 hash of table name % 65536)
           * @param code - account whose KV table to read from
           * @param key - the key bytes to look up
           * @param value - destination buffer for the value
           * @return actual value size in bytes, or -1 if the key does not exist
           */
-         int32_t  kv_get(uint32_t key_format, uint64_t code, legacy_span<const char> key, legacy_span<char> value);
+         int32_t  kv_get(uint32_t table_id, uint64_t code, legacy_span<const char> key, legacy_span<char> value);
 
          /**
           * Erase a key-value pair from the executing contract's KV table.
@@ -816,23 +814,21 @@ namespace webassembly {
           * The RAM charged for the row is refunded to the original payer.
           * No-op if the key does not exist (returns 0).
           *
-          * @param key_format - encoding hint: 0 = raw bytes, 1 = standard 24-byte
-          *   `[table:8B][scope:8B][pk:8B]` layout used by `multi_index`
+          * @param table_id - table namespace identifier (DJB2 hash of table name % 65536)
           * @param key - the key bytes to erase
           * @return negative RAM byte delta (refund amount), or 0 if key not found
           */
-         int64_t  kv_erase(uint32_t key_format, legacy_span<const char> key);
+         int64_t  kv_erase(uint32_t table_id, legacy_span<const char> key);
 
          /**
           * Test whether a key exists in a contract's KV table without reading the value.
           *
-          * @param key_format - encoding hint: 0 = raw bytes, 1 = standard 24-byte
-          *   `[table:8B][scope:8B][pk:8B]` layout used by `multi_index`
+          * @param table_id - table namespace identifier (DJB2 hash of table name % 65536)
           * @param code - account whose KV table to check
           * @param key - the key bytes to look up
           * @return 1 if the key exists, 0 otherwise
           */
-         int32_t  kv_contains(uint32_t key_format, uint64_t code, legacy_span<const char> key);
+         int32_t  kv_contains(uint32_t table_id, uint64_t code, legacy_span<const char> key);
 
          // ---- KV Database API — Primary Iterators ----
          //
@@ -849,14 +845,13 @@ namespace webassembly {
           * The iterator is initially positioned *before* the first matching key;
           * call kv_it_next() to advance to the first result.
           *
-          * @param key_format - encoding hint: 0 = raw bytes, 1 = standard 24-byte
-          *   `[table:8B][scope:8B][pk:8B]` layout used by `multi_index`
+          * @param table_id - table namespace identifier (DJB2 hash of table name % 65536)
           * @param code - account whose KV table to iterate
           * @param prefix - key prefix to scope the iteration (may be empty for all keys)
           * @return iterator handle (0–15)
           * @throws kv_iterator_exception if the iterator pool is exhausted
           */
-         uint32_t kv_it_create(uint32_t key_format, uint64_t code, legacy_span<const char> prefix);
+         uint32_t kv_it_create(uint32_t table_id, uint64_t code, legacy_span<const char> prefix);
 
          /**
           * Release an iterator handle back to the pool.
@@ -931,60 +926,55 @@ namespace webassembly {
          /**
           * Insert a secondary index entry mapping a secondary key to a primary key.
           *
-          * @param table - table name (as uint64_t)
-          * @param index_id - numeric index identifier (distinguishes multiple indices)
           * @param payer - account to bill for RAM (0 = receiver)
+          * @param table_id - secondary index identifier
           * @param pri_key - primary key bytes this entry points to
           * @param sec_key - secondary key bytes (order-preserving encoded)
           */
-         void     kv_idx_store(uint64_t payer, uint64_t table, uint32_t index_id, legacy_span<const char> pri_key, legacy_span<const char> sec_key);
+         void     kv_idx_store(uint64_t payer, uint32_t table_id, legacy_span<const char> pri_key, legacy_span<const char> sec_key);
 
          /**
           * Remove a secondary index entry.
           *
-          * @param table - table name
-          * @param index_id - numeric index identifier
+          * @param table_id - secondary index identifier
           * @param pri_key - primary key associated with the entry
           * @param sec_key - secondary key to remove
           */
-         void     kv_idx_remove(uint64_t table, uint32_t index_id, legacy_span<const char> pri_key, legacy_span<const char> sec_key);
+         void     kv_idx_remove(uint32_t table_id, legacy_span<const char> pri_key, legacy_span<const char> sec_key);
 
          /**
           * Update a secondary index entry's key (remove old, insert new).
           *
-          * @param table - table name
-          * @param index_id - numeric index identifier
           * @param payer - account to bill for RAM (0 = receiver)
+          * @param table_id - secondary index identifier
           * @param pri_key - primary key (unchanged)
           * @param old_sec_key - current secondary key to replace
           * @param new_sec_key - new secondary key value
           */
-         void     kv_idx_update(uint64_t payer, uint64_t table, uint32_t index_id, legacy_span<const char> pri_key,
+         void     kv_idx_update(uint64_t payer, uint32_t table_id, legacy_span<const char> pri_key,
                                 legacy_span<const char> old_sec_key, legacy_span<const char> new_sec_key);
 
          /**
           * Find an exact secondary key match and return an iterator handle.
           *
           * @param code - account whose indices to search
-          * @param table - table name
-          * @param index_id - numeric index identifier
+          * @param table_id - secondary index identifier
           * @param sec_key - secondary key to find
           * @return iterator handle (>= 0) positioned on the match, or -1 if not found
           */
-         int32_t kv_idx_find_secondary(uint64_t code, uint64_t table, uint32_t index_id, legacy_span<const char> sec_key);
+         int32_t kv_idx_find_secondary(uint64_t code, uint32_t table_id, legacy_span<const char> sec_key);
 
          /**
           * Find the first secondary key >= the given key and return an iterator handle.
           *
           * @param code - account whose indices to search
-          * @param table - table name
-          * @param index_id - numeric index identifier
+          * @param table_id - secondary index identifier
           * @param sec_key - secondary key lower bound
           * @return handle >= 0 on match or in iterator_end state (bound past all
           *   entries but table non-empty, enables kv_idx_prev). Returns -1 only when
-          *   the table has no entries for this (code, table, index_id).
+          *   the table has no entries for this (code, table_id).
           */
-         int32_t kv_idx_lower_bound(uint64_t code, uint64_t table, uint32_t index_id, legacy_span<const char> sec_key);
+         int32_t kv_idx_lower_bound(uint64_t code, uint32_t table_id, legacy_span<const char> sec_key);
 
          /**
           * Advance a secondary index iterator to the next entry.

@@ -3,7 +3,7 @@
  * Same clean API as multi_index, raw KV performance for trivially_copyable types.
  */
 #include <sysio/sysio.hpp>
-#include <sysio/kv_table.hpp>
+#include <sysio/multi_index.hpp>
 
 using namespace sysio;
 
@@ -22,7 +22,7 @@ public:
    [[sysio::action]]
    void setup(uint32_t num_accounts) {
       for (uint32_t i = 0; i < num_accounts; ++i) {
-         sysio::kv::table<"accounts"_n, account> acnts(get_self(), i);
+         sysio::multi_index<"accounts"_n, account> acnts(get_self(), i);
          acnts.emplace(get_self(), [&](auto& a) {
             a.sym_code = 1;
             a.balance = 1000000;
@@ -37,7 +37,7 @@ public:
          uint64_t to_scope   = (i + 1) % 100;
 
          // sub_balance
-         sysio::kv::table<"accounts"_n, account> from_acnts(get_self(), from_scope);
+         sysio::multi_index<"accounts"_n, account> from_acnts(get_self(), from_scope);
          auto from_itr = from_acnts.find(1);
          check(from_itr != from_acnts.end(), "no balance");
          check(from_itr->balance >= 1, "overdrawn");
@@ -46,7 +46,7 @@ public:
          });
 
          // add_balance
-         sysio::kv::table<"accounts"_n, account> to_acnts(get_self(), to_scope);
+         sysio::multi_index<"accounts"_n, account> to_acnts(get_self(), to_scope);
          auto to_itr = to_acnts.find(1);
          check(to_itr != to_acnts.end(), "no balance");
          to_acnts.modify(to_itr, same_payer, [&](auto& a) {

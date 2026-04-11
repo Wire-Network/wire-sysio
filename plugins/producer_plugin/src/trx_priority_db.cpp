@@ -55,11 +55,11 @@ namespace {
 std::vector<char> get_row_by_id(const controller& control, name code, name scope, name table, uint64_t id ) {
    const auto& db = control.db();
 
-   auto key = make_kv_key(table, scope, id);
+   auto key = make_kv_scoped_key(scope, id);
    auto key_sv = key.to_string_view();
 
    const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
-   auto itr = kv_idx.find(boost::make_tuple(code, config::kv_format_standard, key_sv));
+   auto itr = kv_idx.find(boost::make_tuple(code, compute_table_id(table.to_uint64_t()), key_sv));
    if (itr == kv_idx.end()) {
       return {};
    }
@@ -91,17 +91,18 @@ void trx_priority_db::load_trx_priority_map(const controller& control, trx_prior
 
       const auto& db = control.db();
 
-      // Build 16-byte prefix: [table("trxpriority"):8B BE][scope(sysio):8B BE]
-      auto prefix = make_kv_prefix("trxpriority"_n, config::system_account_name);
+      // Scope-only prefix: [scope(sysio):8B BE]; table_id provides isolation
+      auto trx_tid = compute_table_id("trxpriority"_n.to_uint64_t());
+      char scope_prefix[chain::kv_scope_prefix_size];
+      chain::kv_encode_be64(scope_prefix, config::system_account_name.to_uint64_t());
+      auto scope_sv = std::string_view(scope_prefix, chain::kv_scope_prefix_size);
 
       const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
-      auto itr = kv_idx.lower_bound(boost::make_tuple(config::system_account_name, config::kv_format_standard, prefix.to_string_view()));
+      auto itr = kv_idx.lower_bound(boost::make_tuple(config::system_account_name, trx_tid, scope_sv));
 
-      while (itr != kv_idx.end()
-             && itr->code == config::system_account_name
-             && itr->key_format == config::kv_format_standard) {
+      while (itr != kv_idx.end() && itr->code == config::system_account_name && itr->table_id == trx_tid) {
          auto kv = itr->key_view();
-         if (!prefix.matches(kv) || kv.size() != chain::kv_key_size) break;
+         if (kv.size() < chain::kv_scope_prefix_size || memcmp(kv.data(), scope_prefix, chain::kv_scope_prefix_size) != 0 || kv.size() != chain::kv_scoped_key_size) break;
 
          trx_prio tmp;
          datastream<const char*> ds(itr->value.data(), itr->value.size());

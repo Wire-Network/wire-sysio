@@ -454,10 +454,11 @@ namespace sysio::testing {
          // method treats key as a name type, if this is not appropriate in your case, pass require == false and report the correct behavior
          template<typename Object>
          bool get_table_entry(Object& obj, account_name code, account_name scope, account_name table, uint64_t key, bool require = true) {
-            auto kv_key = chain::make_kv_key(table.to_uint64_t(), scope.to_uint64_t(), key);
+            auto kv_key = chain::make_kv_scoped_key(scope.to_uint64_t(), key);
+            auto table_id = chain::compute_table_id(table.to_uint64_t());
 
             const auto& kv_idx = control->db().get_index<chain::kv_index, chain::by_code_key>();
-            auto it = kv_idx.find(boost::make_tuple(code, chain::config::kv_format_standard, kv_key.to_string_view()));
+            auto it = kv_idx.find(boost::make_tuple(code, table_id, kv_key.to_string_view()));
             if( it == kv_idx.end() ) {
                if( require )
                   BOOST_FAIL("object does not exist for code=\"" + code.to_string()

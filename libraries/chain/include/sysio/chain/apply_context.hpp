@@ -83,13 +83,13 @@ class apply_context {
    public:
 
       // Primary KV operations
-      int64_t  kv_set(uint8_t key_format, uint64_t payer, const char* key, uint32_t key_size, const char* value, uint32_t value_size);
-      int32_t  kv_get(uint8_t key_format, name code, const char* key, uint32_t key_size, char* value, uint32_t value_size);
-      int64_t  kv_erase(uint8_t key_format, const char* key, uint32_t key_size);
-      int32_t  kv_contains(uint8_t key_format, name code, const char* key, uint32_t key_size);
+      int64_t  kv_set(uint16_t table_id, uint64_t payer, const char* key, uint32_t key_size, const char* value, uint32_t value_size);
+      int32_t  kv_get(uint16_t table_id, name code, const char* key, uint32_t key_size, char* value, uint32_t value_size);
+      int64_t  kv_erase(uint16_t table_id, const char* key, uint32_t key_size);
+      int32_t  kv_contains(uint16_t table_id, name code, const char* key, uint32_t key_size);
 
       // Primary KV iterators
-      uint32_t kv_it_create(uint8_t key_format, name code, const char* prefix, uint32_t prefix_size);
+      uint32_t kv_it_create(uint16_t table_id, name code, const char* prefix, uint32_t prefix_size);
       void     kv_it_destroy(uint32_t handle);
       int32_t  kv_it_status(uint32_t handle);
       int32_t  kv_it_next(uint32_t handle);
@@ -99,19 +99,19 @@ class apply_context {
       int32_t  kv_it_value(uint32_t handle, uint32_t offset, char* dest, uint32_t dest_size, uint32_t& actual_size);
 
       // Secondary KV index operations
-      void     kv_idx_store(uint64_t payer, name table, uint8_t index_id,
+      void     kv_idx_store(uint64_t payer, uint16_t table_id,
                             const char* pri_key, uint32_t pri_key_size,
                             const char* sec_key, uint32_t sec_key_size);
-      void     kv_idx_remove(name table, uint8_t index_id,
+      void     kv_idx_remove(uint16_t table_id,
                              const char* pri_key, uint32_t pri_key_size,
                              const char* sec_key, uint32_t sec_key_size);
-      void     kv_idx_update(uint64_t payer, name table, uint8_t index_id,
+      void     kv_idx_update(uint64_t payer, uint16_t table_id,
                              const char* pri_key, uint32_t pri_key_size,
                              const char* old_sec_key, uint32_t old_sec_key_size,
                              const char* new_sec_key, uint32_t new_sec_key_size);
-      int32_t  kv_idx_find_secondary(name code, name table, uint8_t index_id,
+      int32_t  kv_idx_find_secondary(name code, uint16_t table_id,
                                      const char* sec_key, uint32_t sec_key_size);
-      int32_t  kv_idx_lower_bound(name code, name table, uint8_t index_id,
+      int32_t  kv_idx_lower_bound(name code, uint16_t table_id,
                                   const char* sec_key, uint32_t sec_key_size);
       int32_t  kv_idx_next(uint32_t handle);
       int32_t  kv_idx_prev(uint32_t handle);

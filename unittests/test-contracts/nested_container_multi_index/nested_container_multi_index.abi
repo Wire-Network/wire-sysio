@@ -1184,8 +1184,17 @@
             "name": "people2",
             "type": "person2",
             "index_type": "i64",
+            "key_names": ["scope","primary_key"],
+            "key_types": ["name","uint64"],
+            "table_id": 59160
+        },
+        {
+            "name": "person2",
+            "type": "person2",
+            "index_type": "i64",
             "key_names": [],
-            "key_types": []
+            "key_types": [],
+            "table_id": 29876
         }
     ],
     "ricardian_clauses": [],

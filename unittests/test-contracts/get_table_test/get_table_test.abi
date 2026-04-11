@@ -116,18 +116,36 @@
     ],
     "tables": [
         {
+            "name": "hashobj",
+            "type": "hashobj",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": [],
+            "table_id": 37781
+        },
+        {
             "name": "hashobjs",
             "type": "hashobj",
             "index_type": "i64",
-            "key_names": ["table_name","scope","primary_key"],
-            "key_types": ["name","name","uint64"]
+            "key_names": ["scope","primary_key"],
+            "key_types": ["name","uint64"],
+            "table_id": 48301
+        },
+        {
+            "name": "numobj",
+            "type": "numobj",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": [],
+            "table_id": 30247
         },
         {
             "name": "numobjs",
             "type": "numobj",
             "index_type": "i64",
-            "key_names": ["table_name","scope","primary_key"],
-            "key_types": ["name","name","uint64"]
+            "key_names": ["scope","primary_key"],
+            "key_types": ["name","uint64"],
+            "table_id": 49066
         }
     ],
     "ricardian_clauses": [],

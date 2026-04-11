@@ -368,35 +368,7 @@ BOOST_FIXTURE_TEST_CASE(sec_erase_returns_next, kv_api_fresh_tester) {
    BOOST_CHECK_NO_THROW(run_action("tstsecersnxt"_n));
 }
 
-// kv::raw_table tests
-BOOST_FIXTURE_TEST_CASE(mapping_set_get, kv_api_tester) {
-   BOOST_CHECK_NO_THROW(run_action("tstmapsetget"_n));
-}
-
-BOOST_FIXTURE_TEST_CASE(mapping_contains_erase, kv_api_tester) {
-   BOOST_CHECK_NO_THROW(run_action("tstmapcont"_n));
-}
-
-BOOST_FIXTURE_TEST_CASE(mapping_update, kv_api_tester) {
-   BOOST_CHECK_NO_THROW(run_action("tstmapupdate"_n));
-}
-
-BOOST_FIXTURE_TEST_CASE(mapping_name_key, kv_api_tester) {
-   BOOST_CHECK_NO_THROW(run_action("tstmapstrkey"_n));
-}
-
-// kv::table tests
-BOOST_FIXTURE_TEST_CASE(kvtable_basic, kv_api_tester) {
-   BOOST_CHECK_NO_THROW(run_action("tstkvtbasic"_n));
-}
-
-BOOST_FIXTURE_TEST_CASE(kvtable_iterate, kv_api_tester) {
-   BOOST_CHECK_NO_THROW(run_action("tstkvtiter"_n));
-}
-
-BOOST_FIXTURE_TEST_CASE(kvtable_begin_all_scopes, kv_api_fresh_tester) {
-   BOOST_CHECK_NO_THROW(run_action("tstkvtscope"_n));
-}
+// (kv::raw_table and old kv::table tests removed — types dropped in table_id migration)
 
 // payer validation tests
 BOOST_FIXTURE_TEST_CASE(payer_self_allowed, kv_api_tester) {
@@ -416,8 +388,8 @@ BOOST_FIXTURE_TEST_CASE(empty_key_rejected_kv_set, kv_api_tester) {
    BOOST_CHECK_THROW(run_action("tstemptykey"_n), fc::exception);
 }
 
-// invalid key_format rejection tests
-BOOST_FIXTURE_TEST_CASE(bad_key_format_rejected_kv_set, kv_api_tester) {
+// table_id > UINT16_MAX is rejected
+BOOST_FIXTURE_TEST_CASE(table_id_overflow_rejected, kv_api_tester) {
    BOOST_CHECK_THROW(run_action("tstbadfmt"_n), fc::exception);
 }
 

@@ -127,14 +127,14 @@ BOOST_AUTO_TEST_CASE( check_config_default_vm_limit ) { try {
 BOOST_AUTO_TEST_CASE( stack_limit ) { try {
    sysvmoc::config sysvmoc_config = make_sysvmoc_config_without_limits();
 
-   // The stack size of the compiled WASM in the test is 39.
+   // The stack size of the compiled WASM in the test is 23.
    // Set stack_size_limit one less than the actual needed stack size
-   sysvmoc_config.non_whitelisted_limits.stack_size_limit = 39;
+   sysvmoc_config.non_whitelisted_limits.stack_size_limit = 23;
    limit_violated_test(sysvmoc_config, "test", true);
    limit_violated_test(sysvmoc_config, "sysio.test", false); // whitelisted account, no exception
 
    // set stack_size_limit to the actual needed stack size
-   sysvmoc_config.non_whitelisted_limits.stack_size_limit = 40;
+   sysvmoc_config.non_whitelisted_limits.stack_size_limit = 24;
    limit_not_violated_test(sysvmoc_config);
 } FC_LOG_AND_RETHROW() }
 

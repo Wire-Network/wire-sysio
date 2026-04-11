@@ -145,14 +145,16 @@
             "type": "my_value",
             "index_type": "i64",
             "key_names": ["region","id"],
-            "key_types": ["string","uint64"]
+            "key_types": ["string","uint64"],
+            "table_id": 54886
         },
         {
             "name": "signeddata",
             "type": "signed_value",
             "index_type": "i64",
             "key_names": ["val"],
-            "key_types": ["int64"]
+            "key_types": ["int64"],
+            "table_id": 62122
         }
     ],
     "ricardian_clauses": [],

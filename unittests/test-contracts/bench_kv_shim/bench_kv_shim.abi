@@ -100,11 +100,20 @@
     ],
     "tables": [
         {
+            "name": "row",
+            "type": "row",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": [],
+            "table_id": 48730
+        },
+        {
             "name": "rows",
             "type": "row",
             "index_type": "i64",
-            "key_names": ["table_name","scope","primary_key"],
-            "key_types": ["name","name","uint64"]
+            "key_names": ["scope","primary_key"],
+            "key_types": ["name","uint64"],
+            "table_id": 19355
         }
     ],
     "ricardian_clauses": [],

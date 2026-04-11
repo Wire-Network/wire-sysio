@@ -4,8 +4,7 @@
 #include <sysio/sysio.hpp>
 #include <cstring>
 
-// key_format 0 = raw bytes (used by all operations in this contract)
-static constexpr uint32_t key_format = 0;
+static constexpr uint32_t bench_table_id = 42;
 
 // Hand-written KV intrinsic declarations matching host interface.hpp signatures.
 // legacy_span<T> maps to (ptr, size) pair in WASM ABI.
@@ -85,7 +84,7 @@ public:
          encode_key(i, key);
 
          row_payload payload;
-         int32_t sz = kv_get(key_format, code, key, 8, &payload, sizeof(payload));
+         int32_t sz = kv_get(bench_table_id, code, key, 8, &payload, sizeof(payload));
          check(sz > 0, "row not found");
          check(payload.value2 == i * 7, "bad value");
       }
@@ -94,7 +93,7 @@ public:
    [[sysio::action]]
    void iterall() {
       uint64_t code = get_self().value;
-      uint32_t handle = kv_it_create(key_format, code, nullptr, 0);
+      uint32_t handle = kv_it_create(bench_table_id, code, nullptr, 0);
 
       uint32_t count = 0;
       int32_t status = kv_it_next(handle);
@@ -116,7 +115,7 @@ public:
 
          // Read existing
          row_payload payload;
-         kv_get(key_format, code, key, 8, &payload, sizeof(payload));
+         kv_get(bench_table_id, code, key, 8, &payload, sizeof(payload));
 
          // Modify and write back
          payload.value2 = i * 13;
@@ -129,7 +128,7 @@ public:
       for (uint32_t i = 0; i < count; ++i) {
          char key[8];
          encode_key(i, key);
-         kv_erase(key_format, key, 8);
+         kv_erase(bench_table_id, key, 8);
       }
    }
 };

@@ -48,8 +48,9 @@
             "name": "payloads",
             "type": "payload",
             "index_type": "i64",
-            "key_names": ["table_name","scope","primary_key"],
-            "key_types": ["name","name","uint64"]
+            "key_names": ["scope","primary_key"],
+            "key_types": ["name","uint64"],
+            "table_id": 59190
         }
     ],
     "ricardian_clauses": [],
