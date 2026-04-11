@@ -482,12 +482,15 @@ namespace sysio { namespace chain {
             if( !special_case ) {
                auto min_permission_name = lookup_minimum_permission(declared_auth.actor, act.account, act.name);
                if( min_permission_name ) { // since special cases were already handled, it should only be false if the permission is sysio.any
-                  const auto& min_permission = get_permission({declared_auth.actor, *min_permission_name});
-                  SYS_ASSERT( get_permission(declared_auth).satisfies( min_permission,
-                                                                       _db.get_index<permission_index>().indices() ),
-                              irrelevant_auth_exception,
-                              "action declares irrelevant authority '{}'; minimum authority is {}",
-                              declared_auth, permission_level{min_permission.owner, min_permission.name} );
+                  // If the declared permission matches the minimum, it trivially satisfies — skip DB lookups and hierarchy walk
+                  if( declared_auth.permission != *min_permission_name ) {
+                     const auto& min_permission = get_permission({declared_auth.actor, *min_permission_name});
+                     SYS_ASSERT( get_permission(declared_auth).satisfies( min_permission,
+                                                                          _db.get_index<permission_index>().indices() ),
+                                 irrelevant_auth_exception,
+                                 "action declares irrelevant authority '{}'; minimum authority is {}",
+                                 declared_auth, permission_level{min_permission.owner, min_permission.name} );
+                  }
                }
             }
 
