@@ -489,6 +489,18 @@ namespace chainbase {
          return session{*this, enabled};
       }
 
+      // Starts a new undo session without creating a session RAII object.
+      // Used by database::start_undo_session to avoid per-index heap allocations.
+      // Exception safety: strong
+      int64_t add_session() {
+         _undo_stack.emplace_back();
+         _undo_stack.back().old_values_end = _old_values.empty()?nullptr:&*_old_values.begin();
+         _undo_stack.back().removed_values_end = _removed_values.empty()?nullptr:&*_removed_values.begin();
+         _undo_stack.back().old_next_id = _next_id;
+         _undo_stack.back().ctime = ++_monotonic_revision;
+         return ++_revision;
+      }
+
       void set_revision( uint64_t revision ) {
          if( _undo_stack.size() != 0 )
             BOOST_THROW_EXCEPTION( std::logic_error("cannot set revision while there is an existing undo stack") );
@@ -678,17 +690,6 @@ namespace chainbase {
                                         return v.id >= old_next_id;
                                      },
                                      [this](pointer p) { dispose_node(*p); });
-      }
-
-      // starts a new undo session.
-      // Exception safety: strong
-      int64_t add_session() {
-         _undo_stack.emplace_back();
-         _undo_stack.back().old_values_end = _old_values.empty()?nullptr:&*_old_values.begin();
-         _undo_stack.back().removed_values_end = _removed_values.empty()?nullptr:&*_removed_values.begin();
-         _undo_stack.back().old_next_id = _next_id;
-         _undo_stack.back().ctime = ++_monotonic_revision;
-         return ++_revision;
       }
 
       template<int N = 0>
