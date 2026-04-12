@@ -5,40 +5,24 @@
 
 set -l script_dir (status dirname)
 set -l repo_root (realpath "$script_dir/../../..")
+set -l repo_proto_src_path "$repo_root/libraries/opp/proto"
+
+set -l repo_output_path1 "$repo_root/build/opp/"
+set -l repo_output_path2 (realpath "$repo_root/../wire-opp/")
 
 # --- Defaults ---
-set -l target ""
 set -l publish false
 
 # --- Parse arguments ---
 for arg in $argv
    switch $arg
-      case '--target=*'
-         set target (string replace -- '--target=' '' $arg)
       case '--publish'
          set publish true
       case '*'
          echo "Unknown argument: $arg" >&2
-         echo "Usage: generate-opp-bundles.fish --target=[solidity|solana] [--publish]" >&2
+         echo "Usage: generate-opp-bundles.fish [--publish]" >&2
          exit 1
    end
-end
-
-# --- Validate target ---
-if test -z "$target"
-   echo "Error: --target is required. Must be 'solidity' or 'solana'." >&2
-   exit 1
-end
-
-if not contains -- $target solidity solana
-   echo "Error: --target must be 'solidity' or 'solana'. Got: '$target'" >&2
-   exit 1
-end
-
-# --- Validate --publish is only used with solidity ---
-if test "$publish" = true; and test "$target" != solidity
-   echo "Error: --publish is only supported for --target=solidity at the moment." >&2
-   exit 1
 end
 
 # --- Check required tools on PATH ---
@@ -61,19 +45,22 @@ end
 
 # --- Build command ---
 set -l cmd wire-protobuf-bundler \
-   --repo "file://$repo_root/libraries/opp/proto" \
-   --target $target \
-   --output "$repo_root/build/opp/$target/" \
-   --package-name "@wireio/opp-$target-models"
+   --repo "file://$repo_proto_src_path" \
+   --output "$repo_output_path1"
+
+# --- Run ---
+echo "Running wire-protobuf-bundler for all targets..."
+echo "  repo root: $repo_root"
+echo "  output:    $repo_output_path1"
+if test -d "$repo_output_path2"
+    set -a cmd --output "$repo_output_path2/"
+    echo "  repo opp root: $repo_output_path2"
+end
 
 if test "$publish" = true
    set -a cmd --publish
 end
 
-# --- Run ---
-echo "Running wire-protobuf-bundler for target '$target'..."
-echo "  repo root: $repo_root"
-echo "  output:    $repo_root/build/opp/$target/"
-
 cd $repo_root; or exit 1
+echo "Executing command: $cmd"
 $cmd

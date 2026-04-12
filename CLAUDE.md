@@ -189,18 +189,17 @@ OPP is a protocol (encoding scheme) that uses protobufs; the library is located 
 The protobufs are located at [libraries/opp/proto](libraries/opp/proto).
 
 After updating the protobufs, before you can use them in the ethereum/solana contract/program repos, you need to run `cd wire-sysio/libraries/opp/tools &&
-  ./generate-opp-bundles.fish  --target=[solidity|solana]`. Additionally, WIRE contract code uses a C++ protoc plugin named `zpp_bits`, this is largely irrelevant,
+  ./generate-opp-bundles.fish`. Additionally, WIRE contract code uses a C++ protoc plugin named `zpp_bits`, this is largely irrelevant,
 but keep in mind they are generated when the project is configured/built (CMake). Just an FYI.
 
-### TARGET: solidity
+### Local OPP Model Location (Optional in development environments)
 
-**IMPORTANT** IF `<wire-sysio>/../wire-opp/solidity` exists, then run:
-```shell
-rm -Rf <wire-sysio>/../wire-opp/solidity/node_modules || true
-cp -R <wire-sysio>/build/opp/solidity/* <wire-sysio>/../wire-opp/solidity/ && \
-    cd <wire-sysio>/../wire-opp/solidity && \
-    pnpm i
-```
+If you are developing on a local machine and `<wire-sysio>/../wire-opp` exists,
+then PNPM/NPM & other repos (i.e. `wire-ethereum`, `wire-e2e-tests`, etc.) will look for the OPP protobufs
+and generated types in that location.
+
+If the directory exists, when `./generate-opp-bundles.fish` is run, the generated protobuf bundles will be copied to
+`<wire-sysio>/../wire-opp/{typescript,solidity,solana}/`.
 
 ## Docker Build
 
