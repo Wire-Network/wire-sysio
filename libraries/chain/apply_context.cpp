@@ -16,6 +16,21 @@ using boost::container::flat_set;
 
 namespace sysio::chain {
 
+// RAM billing formulas for kv primary rows and secondary index rows. Variable
+// key/value bytes plus a fixed-field overhead defined by billable_size<>.
+static inline int64_t kv_object_ram(uint64_t key_size, uint64_t value_size) {
+   return static_cast<int64_t>(key_size + value_size + config::billable_size_v<kv_object>);
+}
+static inline int64_t kv_object_ram(const kv_object& o) {
+   return kv_object_ram(o.key.size(), o.value.size());
+}
+static inline int64_t kv_index_object_ram(uint64_t sec_key_size, uint64_t pri_key_size) {
+   return static_cast<int64_t>(sec_key_size + pri_key_size + config::billable_size_v<kv_index_object>);
+}
+static inline int64_t kv_index_object_ram(const kv_index_object& o) {
+   return kv_index_object_ram(o.sec_key.size(), o.pri_key.size());
+}
+
 static inline void print_debug(account_name receiver, const action_trace& ar) {
    if (!ar.console.empty()) {
       if (fc::logger::default_logger().is_enabled( fc::log_level::debug )) {
@@ -610,8 +625,8 @@ int64_t apply_context::kv_set(uint16_t table_id, uint64_t payer_val, const char*
 
    if (itr != idx.end()) {
       // Update existing
-      int64_t old_billable = static_cast<int64_t>(itr->key.size() + itr->value.size() + config::billable_size_v<kv_object>);
-      int64_t new_billable = static_cast<int64_t>(key_size + value_size + config::billable_size_v<kv_object>);
+      int64_t old_billable = kv_object_ram(*itr);
+      int64_t new_billable = kv_object_ram(key_size, value_size);
 
       // Handle payer change
       account_name old_payer = itr->payer;
@@ -655,7 +670,7 @@ int64_t apply_context::kv_set(uint16_t table_id, uint64_t payer_val, const char*
          dm_logger->on_kv_set(obj, true);
       }
 
-      int64_t billable = static_cast<int64_t>(key_size + value_size + config::billable_size_v<kv_object>);
+      int64_t billable = kv_object_ram(key_size, value_size);
       update_db_usage(payer, billable);
       return billable;
    }
@@ -688,7 +703,7 @@ int64_t apply_context::kv_erase(uint16_t table_id, const char* key, uint32_t key
 
    SYS_ASSERT( itr != idx.end(), kv_key_not_found, "KV key not found for erase" );
 
-   int64_t delta = -static_cast<int64_t>(itr->key.size() + itr->value.size() + config::billable_size_v<kv_object>);
+   int64_t delta = -kv_object_ram(*itr);
 
    if (auto dm_logger = control.get_deep_mind_logger(trx_context.is_transient())) {
       dm_logger->on_kv_erase(*itr);
@@ -960,7 +975,7 @@ void apply_context::kv_idx_store(uint64_t payer_val, uint16_t table_id,
       o.pri_key.assign(pri_key, pri_key_size);
    });
 
-   int64_t billable = static_cast<int64_t>(sec_key_size + pri_key_size + config::billable_size_v<kv_index_object>);
+   int64_t billable = kv_index_object_ram(sec_key_size, pri_key_size);
    update_db_usage(payer, billable);
 }
 
@@ -977,8 +992,7 @@ void apply_context::kv_idx_remove(uint16_t table_id,
 
    SYS_ASSERT( itr != idx.end(), kv_key_not_found, "KV secondary index entry not found for remove" );
 
-   int64_t delta = -static_cast<int64_t>(itr->sec_key.size() + itr->pri_key.size() +
-                                          config::billable_size_v<kv_index_object>);
+   int64_t delta = -kv_index_object_ram(*itr);
    update_db_usage(itr->payer, delta);
    db.remove(*itr);
 }
@@ -1002,10 +1016,8 @@ void apply_context::kv_idx_update(uint64_t payer_val, uint16_t table_id,
    account_name payer = (payer_val == 0) ? receiver : account_name(payer_val);
    account_name old_payer = itr->payer;
 
-   int64_t old_billable = static_cast<int64_t>(itr->sec_key.size() + itr->pri_key.size() +
-                                                config::billable_size_v<kv_index_object>);
-   int64_t new_billable = static_cast<int64_t>(new_sec_key_size + pri_key_size +
-                                                config::billable_size_v<kv_index_object>);
+   int64_t old_billable = kv_index_object_ram(*itr);
+   int64_t new_billable = kv_index_object_ram(new_sec_key_size, pri_key_size);
 
    if (payer != old_payer) {
       update_db_usage(old_payer, -old_billable);

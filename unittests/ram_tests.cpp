@@ -5,6 +5,9 @@
 
 #include <sysio/chain/exceptions.hpp>
 #include <sysio/chain/resource_limits.hpp>
+#include <sysio/chain/account_object.hpp>
+#include <sysio/chain/permission_object.hpp>
+#include <sysio/chain/permission_link_object.hpp>
 #include <sysio/testing/tester.hpp>
 
 #include <fc/exception/exception.hpp>
@@ -147,6 +150,216 @@ BOOST_FIXTURE_TEST_CASE(auth_ram_tests, validating_tester) { try {
     BOOST_TEST(alice_net_limit2 < alice_net_limit3);
     BOOST_TEST(noauthtable_ram_usage2 < noauthtable_ram_usage3);
     BOOST_TEST(alice_ram_usage2 == alice_ram_usage3);
+} FC_LOG_AND_RETHROW() }
+
+// Permission lifecycle RAM billing -- exact-delta tests that verify the
+// sysio_contract.cpp billing flows use billable_size_v<permission_object>,
+// billable_size_v<permission_link_object>, and shared_authority::get_billable_size()
+// correctly.
+
+BOOST_FIXTURE_TEST_CASE(linkauth_unlinkauth_ram_billing, validating_tester) { try {
+    create_account("alice"_n);
+    produce_block();
+
+    // Alice needs a non-active permission to link.
+    const auto spending_pub_key = get_public_key("alice"_n, "spending");
+    set_authority("alice"_n, "spending"_n, authority(spending_pub_key), "active"_n);
+    produce_block();
+
+    const auto& rlm = control->get_resource_limits_manager();
+    auto before_link = rlm.get_account_ram_usage("alice"_n);
+
+    link_authority("alice"_n, "sysio"_n, "spending"_n, "reqauth"_n);
+    produce_block();
+
+    auto after_link = rlm.get_account_ram_usage("alice"_n);
+    BOOST_REQUIRE_EQUAL(after_link - before_link,
+                        static_cast<int64_t>(config::billable_size_v<permission_link_object>));
+
+    unlink_authority("alice"_n, "sysio"_n, "reqauth"_n);
+    produce_block();
+
+    auto after_unlink = rlm.get_account_ram_usage("alice"_n);
+    BOOST_REQUIRE_EQUAL(after_unlink - after_link,
+                        -static_cast<int64_t>(config::billable_size_v<permission_link_object>));
+    BOOST_REQUIRE_EQUAL(after_unlink, before_link); // full roundtrip
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(createauth_deleteauth_ram_billing, validating_tester) { try {
+    create_account("alice"_n);
+    produce_block();
+
+    const auto& rlm = control->get_resource_limits_manager();
+    auto before_create = rlm.get_account_ram_usage("alice"_n);
+
+    const auto spending_pub_key = get_public_key("alice"_n, "spending");
+    set_authority("alice"_n, "spending"_n, authority(spending_pub_key), "active"_n);
+    produce_block();
+
+    // Fetch the freshly created permission to compute its exact billable size.
+    const auto* perm = control->db().find<permission_object, by_owner>(
+        boost::make_tuple("alice"_n, "spending"_n));
+    BOOST_REQUIRE(perm != nullptr);
+
+    const int64_t expected_create_bill =
+        static_cast<int64_t>(config::billable_size_v<permission_object> + perm->auth.get_billable_size());
+
+    auto after_create = rlm.get_account_ram_usage("alice"_n);
+    BOOST_REQUIRE_EQUAL(after_create - before_create, expected_create_bill);
+
+    delete_authority("alice"_n, "spending"_n);
+    produce_block();
+
+    auto after_delete = rlm.get_account_ram_usage("alice"_n);
+    BOOST_REQUIRE_EQUAL(after_delete - after_create, -expected_create_bill);
+    BOOST_REQUIRE_EQUAL(after_delete, before_create); // full roundtrip
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(updateauth_ram_billing, validating_tester) { try {
+    create_account("alice"_n);
+    produce_block();
+
+    // Start with a single-key spending permission.
+    const auto key1 = get_public_key("alice"_n, "spending1");
+    set_authority("alice"_n, "spending"_n, authority(key1), "active"_n);
+    produce_block();
+
+    const auto* perm_before = control->db().find<permission_object, by_owner>(
+        boost::make_tuple("alice"_n, "spending"_n));
+    BOOST_REQUIRE(perm_before != nullptr);
+    const int64_t old_auth_bill = perm_before->auth.get_billable_size();
+
+    const auto& rlm = control->get_resource_limits_manager();
+    auto before_update = rlm.get_account_ram_usage("alice"_n);
+
+    // Grow the authority to two keys. permission_object fixed size is
+    // unchanged; only the auth bill should grow.
+    const auto key2 = get_public_key("alice"_n, "spending2");
+    authority two_key_auth(1,
+                           { key_weight{key1, 1}, key_weight{key2, 1} },
+                           {});
+    two_key_auth.sort_fields(); // validate() requires keys in strict order
+    set_authority("alice"_n, "spending"_n, two_key_auth, "active"_n);
+    produce_block();
+
+    const auto* perm_after = control->db().find<permission_object, by_owner>(
+        boost::make_tuple("alice"_n, "spending"_n));
+    BOOST_REQUIRE(perm_after != nullptr);
+    const int64_t new_auth_bill = perm_after->auth.get_billable_size();
+
+    auto after_update = rlm.get_account_ram_usage("alice"_n);
+    BOOST_REQUIRE_EQUAL(after_update - before_update, new_auth_bill - old_auth_bill);
+    BOOST_REQUIRE_GT(new_auth_bill, old_auth_bill); // sanity: growing added bytes
+} FC_LOG_AND_RETHROW() }
+
+// setcode / setabi RAM billing -- exact-delta tests covering
+// billable_size_v<account_metadata_object> and setcode_ram_bytes_multiplier.
+
+BOOST_FIXTURE_TEST_CASE(setcode_first_time_ram_billing, validating_tester) { try {
+    create_account("alice"_n);
+    produce_block();
+
+    // Confirm precondition: no account_metadata_object yet.
+    const auto* md_before = control->db().find<account_metadata_object, by_name>("alice"_n);
+    BOOST_REQUIRE(md_before == nullptr);
+
+    const auto& rlm = control->get_resource_limits_manager();
+    auto before = rlm.get_account_ram_usage("alice"_n);
+
+    const auto& wasm = test_contracts::no_auth_table_wasm();
+    set_code("alice"_n, wasm);
+    produce_block();
+
+    auto after = rlm.get_account_ram_usage("alice"_n);
+
+    // First setcode on an account: bill = wasm.size() * multiplier + metadata.
+    int64_t expected =
+          static_cast<int64_t>(wasm.size()) * static_cast<int64_t>(config::setcode_ram_bytes_multiplier)
+        + static_cast<int64_t>(config::billable_size_v<account_metadata_object>);
+    BOOST_REQUIRE_EQUAL(after - before, expected);
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(setcode_update_ram_billing, validating_tester) { try {
+    create_account("alice"_n);
+    produce_block();
+
+    // First deploy establishes the metadata object and the initial code bill.
+    const auto& old_wasm = test_contracts::no_auth_table_wasm();
+    set_code("alice"_n, old_wasm);
+    produce_block();
+    const int64_t old_code_size = static_cast<int64_t>(old_wasm.size());
+
+    const auto& rlm = control->get_resource_limits_manager();
+    auto before_update = rlm.get_account_ram_usage("alice"_n);
+
+    // Second deploy swaps to a different contract -- metadata already exists,
+    // so only the (new_code - old_code) * multiplier delta is billed.
+    const auto& new_wasm = test_contracts::noop_wasm();
+    set_code("alice"_n, new_wasm);
+    produce_block();
+
+    auto after_update = rlm.get_account_ram_usage("alice"_n);
+
+    int64_t expected =
+        (static_cast<int64_t>(new_wasm.size()) - old_code_size)
+      * static_cast<int64_t>(config::setcode_ram_bytes_multiplier);
+    BOOST_REQUIRE_EQUAL(after_update - before_update, expected);
+} FC_LOG_AND_RETHROW() }
+
+BOOST_AUTO_TEST_CASE(setabi_first_time_ram_billing) { try {
+    // Use preactivate_feature_only so the bios contract is NOT deployed at
+    // sysio -- the bios setabi handler inserts an abi_hash_table row which
+    // would double-bill alice through its own kv_object ram usage.
+    validating_tester t(flat_set<account_name>{}, nullptr, setup_policy::preactivate_feature_only);
+    t.create_account("alice"_n);
+    t.produce_block();
+
+    // Confirm precondition: no account_metadata_object yet.
+    const auto* md_before = t.control->db().find<account_metadata_object, by_name>("alice"_n);
+    BOOST_REQUIRE(md_before == nullptr);
+
+    const auto& rlm = t.control->get_resource_limits_manager();
+    auto before = rlm.get_account_ram_usage("alice"_n);
+
+    t.set_abi("alice"_n, test_contracts::no_auth_table_abi());
+    t.produce_block();
+
+    const auto* md = t.control->db().find<account_metadata_object, by_name>("alice"_n);
+    BOOST_REQUIRE(md != nullptr);
+    const int64_t stored_abi_size = static_cast<int64_t>(md->abi.size());
+
+    auto after = rlm.get_account_ram_usage("alice"_n);
+    int64_t expected = stored_abi_size + static_cast<int64_t>(config::billable_size_v<account_metadata_object>);
+    BOOST_REQUIRE_EQUAL(after - before, expected);
+} FC_LOG_AND_RETHROW() }
+
+BOOST_AUTO_TEST_CASE(setabi_update_ram_billing) { try {
+    // See setabi_first_time_ram_billing for why setup_policy::full would
+    // double-bill through the bios setabi notification handler.
+    validating_tester t(flat_set<account_name>{}, nullptr, setup_policy::preactivate_feature_only);
+    t.create_account("alice"_n);
+    t.produce_block();
+
+    t.set_abi("alice"_n, test_contracts::no_auth_table_abi());
+    t.produce_block();
+    const auto* md1 = t.control->db().find<account_metadata_object, by_name>("alice"_n);
+    BOOST_REQUIRE(md1 != nullptr);
+    const int64_t old_abi_size = static_cast<int64_t>(md1->abi.size());
+
+    const auto& rlm = t.control->get_resource_limits_manager();
+    auto before_update = rlm.get_account_ram_usage("alice"_n);
+
+    t.set_abi("alice"_n, test_contracts::noop_abi());
+    t.produce_block();
+    const auto* md2 = t.control->db().find<account_metadata_object, by_name>("alice"_n);
+    BOOST_REQUIRE(md2 != nullptr);
+    const int64_t new_abi_size = static_cast<int64_t>(md2->abi.size());
+
+    auto after_update = rlm.get_account_ram_usage("alice"_n);
+
+    // Metadata already exists from the first setabi, so the update only bills
+    // the raw serialized-size delta.
+    BOOST_REQUIRE_EQUAL(after_update - before_update, new_abi_size - old_abi_size);
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()
