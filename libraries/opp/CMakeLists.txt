@@ -99,6 +99,13 @@ if (TARGET cdt::protoc-gen-zpp)
             $<BUILD_INTERFACE:${PROTO_CDT_GEN_DIR}>
             $<INSTALL_INTERFACE:include>
     )
+
+    if(BUILD_SYSTEM_CONTRACTS AND TARGET contracts_project)
+        message(NOTICE "BUILD_SYSTEM_CONTRACTS is enabled AND contracts_project is a target, attaching dependency on ${TARGET_CDT_MODELS_NAME} to contracts_project")
+        add_dependencies(contracts_project ${TARGET_CDT_MODELS_NAME})
+    else()
+        message(NOTICE "Either BUILD_SYSTEM_CONTRACTS is NOT enabled OR contracts_project is NOT a target, not attaching dependency on ${TARGET_CDT_MODELS_NAME} to contracts_project")
+    endif()
 endif()
 
 if(ENABLE_TESTS)
