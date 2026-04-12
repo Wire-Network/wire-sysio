@@ -18,13 +18,13 @@ namespace sysio::chain {
 
 // RAM billing formulas for kv primary rows and secondary index rows. Variable
 // key/value bytes plus a fixed-field overhead defined by billable_size<>.
-static inline int64_t kv_object_ram(uint32_t key_size, uint32_t value_size) {
+static inline int64_t kv_object_ram(uint64_t key_size, uint64_t value_size) {
    return static_cast<int64_t>(key_size + value_size + config::billable_size_v<kv_object>);
 }
 static inline int64_t kv_object_ram(const kv_object& o) {
    return kv_object_ram(o.key.size(), o.value.size());
 }
-static inline int64_t kv_index_object_ram(uint32_t sec_key_size, uint32_t pri_key_size) {
+static inline int64_t kv_index_object_ram(uint64_t sec_key_size, uint64_t pri_key_size) {
    return static_cast<int64_t>(sec_key_size + pri_key_size + config::billable_size_v<kv_index_object>);
 }
 static inline int64_t kv_index_object_ram(const kv_index_object& o) {
