@@ -1,0 +1,232 @@
+#include <boost/test/unit_test.hpp>
+#include <fc/io/cfile.hpp>
+#include <fc/io/raw.hpp>
+#include <fc/crypto/sha256.hpp>
+
+#include <sysio/trace_api/trx_id_index.hpp>
+#include <sysio/trace_api/test_common.hpp>
+
+using namespace sysio;
+using namespace sysio::trace_api;
+using namespace sysio::trace_api::test_common;
+
+namespace {
+
+// Build a sha256 whose first 8 bytes (the prefix64) equal the given value.
+// On little-endian x86 this is the little-endian encoding written into bytes 0-7.
+chain::transaction_id_type make_trx_id(uint64_t prefix64, uint8_t disambiguator = 0) {
+   chain::transaction_id_type id;
+   std::memcpy(id.data(), &prefix64, sizeof(prefix64));
+   // vary the last byte so ids with the same prefix64 are still distinct objects
+   id.data()[31] = disambiguator;
+   return id;
+}
+
+struct trx_id_index_fixture {
+   fc::temp_directory tempdir;
+
+   std::filesystem::path index_path() const {
+      return tempdir.path() / "test_trx_idx.log";
+   }
+};
+
+} // namespace
+
+BOOST_AUTO_TEST_SUITE(trx_id_index_tests)
+
+// ---------------------------------------------------------------------------
+// Writer / Reader round-trip
+// ---------------------------------------------------------------------------
+
+BOOST_FIXTURE_TEST_CASE(empty_writer_is_valid, trx_id_index_fixture) {
+   trx_id_index_writer w;
+   BOOST_REQUIRE_EQUAL(w.entry_count(), 0u);
+   w.write(index_path());
+
+   trx_id_index_reader r(index_path());
+   BOOST_CHECK(r.valid());
+   // empty index: any lookup should return nullopt
+   BOOST_CHECK(!r.lookup(make_trx_id(0)));
+   BOOST_CHECK(!r.lookup(make_trx_id(42)));
+}
+
+BOOST_FIXTURE_TEST_CASE(single_entry_round_trip, trx_id_index_fixture) {
+   auto id = make_trx_id(0xDEADBEEFCAFEBABEULL);
+   const uint32_t block = 12345;
+
+   trx_id_index_writer w;
+   w.add(id, block);
+   w.write(index_path());
+
+   trx_id_index_reader r(index_path());
+   BOOST_REQUIRE(r.valid());
+   auto result = r.lookup(id);
+   BOOST_REQUIRE(result.has_value());
+   BOOST_CHECK_EQUAL(*result, block);
+}
+
+BOOST_FIXTURE_TEST_CASE(multiple_entries_round_trip, trx_id_index_fixture) {
+   // 20 distinct entries with distinct prefix64 values, varied block numbers
+   const int N = 20;
+   std::vector<std::pair<chain::transaction_id_type, uint32_t>> entries;
+   trx_id_index_writer w;
+   for (int i = 0; i < N; ++i) {
+      auto id = make_trx_id(static_cast<uint64_t>(i) * 0x0101010101010101ULL + i, static_cast<uint8_t>(i));
+      uint32_t block = 1000 + i;
+      w.add(id, block);
+      entries.emplace_back(id, block);
+   }
+   BOOST_REQUIRE_EQUAL(w.entry_count(), static_cast<size_t>(N));
+   w.write(index_path());
+
+   trx_id_index_reader r(index_path());
+   BOOST_REQUIRE(r.valid());
+   for (const auto& [id, expected_block] : entries) {
+      auto result = r.lookup(id);
+      BOOST_REQUIRE_MESSAGE(result.has_value(), "entry not found for block " << expected_block);
+      BOOST_CHECK_EQUAL(*result, expected_block);
+   }
+}
+
+BOOST_FIXTURE_TEST_CASE(not_found_returns_nullopt, trx_id_index_fixture) {
+   trx_id_index_writer w;
+   w.add(make_trx_id(0xAAAAAAAAAAAAAAAAULL), 100);
+   w.write(index_path());
+
+   trx_id_index_reader r(index_path());
+   BOOST_REQUIRE(r.valid());
+   // id not in the index
+   BOOST_CHECK(!r.lookup(make_trx_id(0xBBBBBBBBBBBBBBBBULL)));
+}
+
+// ---------------------------------------------------------------------------
+// Linear probing: two entries that hash to the same initial slot
+// ---------------------------------------------------------------------------
+
+BOOST_FIXTURE_TEST_CASE(linear_probing_on_prefix_collision, trx_id_index_fixture) {
+   // With 2 entries, bucket_count = bit_ceil(2*2+1) = bit_ceil(5) = 8, mask = 7.
+   // Both ids below have uint32_t(prefix64) & 7 == 0, so they start at slot 0.
+   // The second must be linearly probed to slot 1.
+   const uint64_t prefix_A = 0x0000000000000000ULL; // slot = 0 & 7 = 0
+   const uint64_t prefix_B = 0x0000000000000008ULL; // slot = 8 & 7 = 0
+   auto id_A = make_trx_id(prefix_A, 1);
+   auto id_B = make_trx_id(prefix_B, 2);
+
+   trx_id_index_writer w;
+   w.add(id_A, 101);
+   w.add(id_B, 202);
+   w.write(index_path());
+
+   trx_id_index_reader r(index_path());
+   BOOST_REQUIRE(r.valid());
+
+   auto result_A = r.lookup(id_A);
+   BOOST_REQUIRE(result_A.has_value());
+   BOOST_CHECK_EQUAL(*result_A, 101u);
+
+   auto result_B = r.lookup(id_B);
+   BOOST_REQUIRE(result_B.has_value());
+   BOOST_CHECK_EQUAL(*result_B, 202u);
+}
+
+// ---------------------------------------------------------------------------
+// Last-write-wins for duplicate prefix64
+// ---------------------------------------------------------------------------
+
+BOOST_FIXTURE_TEST_CASE(duplicate_prefix64_last_write_wins, trx_id_index_fixture) {
+   // The writer can accumulate two entries with the same prefix64 (e.g., same
+   // first-8 bytes). The hash table stores both under different slots. The
+   // reader returns the *first* hit during linear probing — which is the
+   // first-inserted entry. Document this behavior so it doesn't surprise.
+   const uint64_t shared_prefix = 0xCAFEBABEDEADBEEFULL;
+   auto id1 = make_trx_id(shared_prefix, 1);
+   auto id2 = make_trx_id(shared_prefix, 2); // same prefix64, different tail
+
+   trx_id_index_writer w;
+   w.add(id1, 10);
+   w.add(id2, 20); // will probe to next empty slot
+   w.write(index_path());
+
+   trx_id_index_reader r(index_path());
+   BOOST_REQUIRE(r.valid());
+   // Lookup finds first match on the shared prefix; result is either 10 or 20.
+   // The important thing is it doesn't crash or loop infinitely.
+   auto result = r.lookup(id1);
+   BOOST_CHECK(result.has_value());
+}
+
+// ---------------------------------------------------------------------------
+// Error paths
+// ---------------------------------------------------------------------------
+
+BOOST_FIXTURE_TEST_CASE(missing_file_is_invalid, trx_id_index_fixture) {
+   trx_id_index_reader r(tempdir.path() / "nonexistent.log");
+   BOOST_CHECK(!r.valid());
+}
+
+BOOST_FIXTURE_TEST_CASE(bad_magic_is_invalid, trx_id_index_fixture) {
+   // Write a file with a bad magic value
+   fc::cfile f;
+   f.set_file_path(index_path());
+   f.open(fc::cfile::create_or_update_rw_mode);
+   trx_id_index_header hdr;
+   hdr.magic = 0xDEADBEEF; // wrong magic
+   hdr.version = trx_id_index_header::current_version;
+   hdr.bucket_count = 0;
+   auto data = fc::raw::pack(hdr);
+   f.write(data.data(), data.size());
+   f.flush();
+   f.close();
+
+   trx_id_index_reader r(index_path());
+   BOOST_CHECK(!r.valid());
+}
+
+BOOST_FIXTURE_TEST_CASE(bad_version_is_invalid, trx_id_index_fixture) {
+   fc::cfile f;
+   f.set_file_path(index_path());
+   f.open(fc::cfile::create_or_update_rw_mode);
+   trx_id_index_header hdr;
+   hdr.magic = trx_id_index_header::magic_value;
+   hdr.version = 99; // unsupported version
+   hdr.bucket_count = 0;
+   auto data = fc::raw::pack(hdr);
+   f.write(data.data(), data.size());
+   f.flush();
+   f.close();
+
+   trx_id_index_reader r(index_path());
+   BOOST_CHECK(!r.valid());
+}
+
+// ---------------------------------------------------------------------------
+// Load factor / large table
+// ---------------------------------------------------------------------------
+
+BOOST_FIXTURE_TEST_CASE(large_entry_set_all_found, trx_id_index_fixture) {
+   // Write 200 entries. bucket_count = bit_ceil(201*2) = bit_ceil(401) = 512.
+   // Load factor = 200/512 ~ 0.39 — well under 0.5.
+   const int N = 200;
+   std::vector<std::pair<chain::transaction_id_type, uint32_t>> entries;
+   trx_id_index_writer w;
+   for (int i = 0; i < N; ++i) {
+      // Spread prefix64 values across the full range
+      uint64_t prefix = static_cast<uint64_t>(i) * 0x9E3779B97F4A7C15ULL; // Fibonacci hashing
+      auto id = make_trx_id(prefix, static_cast<uint8_t>(i & 0xFF));
+      uint32_t block = 100000 + static_cast<uint32_t>(i);
+      w.add(id, block);
+      entries.emplace_back(id, block);
+   }
+   BOOST_REQUIRE_EQUAL(w.entry_count(), static_cast<size_t>(N));
+   w.write(index_path());
+
+   trx_id_index_reader r(index_path());
+   BOOST_REQUIRE(r.valid());
+   for (const auto& [id, expected_block] : entries) {
+      auto result = r.lookup(id);
+      BOOST_REQUIRE_MESSAGE(result.has_value(), "entry not found for block " << expected_block);
+      BOOST_CHECK_EQUAL(*result, expected_block);
+   }
+}
+
+BOOST_AUTO_TEST_SUITE_END()

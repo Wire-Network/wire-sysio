@@ -10,6 +10,7 @@
 #include <sysio/trace_api/metadata_log.hpp>
 #include <sysio/trace_api/data_log.hpp>
 #include <sysio/trace_api/compressed_file.hpp>
+#include <sysio/trace_api/trx_id_index.hpp>
 
 namespace sysio::trace_api {
 
@@ -210,6 +211,23 @@ namespace sysio::trace_api {
       void for_each_trx_id_slice(std::function<bool(fc::cfile&)> callback) const;
 
       /**
+       * Derive the slice number from a trx_id slice file path.
+       * Parses the block-range start from the filename.
+       */
+      uint32_t slice_number_from_path(const std::filesystem::path& trx_id_path) const;
+
+      /**
+       * Find the trx_id index file for a given slice number (or return nullopt if not present).
+       */
+      std::optional<trx_id_index_reader> find_trx_id_index_slice(uint32_t slice_number) const;
+
+      /**
+       * Build the trx_id index for a given slice from its trx_id log file.
+       * No-op if the index already exists for that slice.
+       */
+      void build_trx_id_index(uint32_t slice_number, const log_handler& log);
+
+      /**
        * Return the lowest block number recorded in any index slice file, or nullopt if no data exists.
        */
       std::optional<uint32_t> first_recorded_block() const;
@@ -265,6 +283,7 @@ namespace sysio::trace_api {
       std::optional<uint32_t> _last_cleaned_up_slice;
       const std::optional<uint32_t> _minimum_uncompressed_irreversible_history_blocks;
       std::optional<uint32_t> _last_compressed_slice;
+      std::optional<uint32_t> _last_indexed_slice;
       const size_t _compression_seek_point_stride;
 
       std::mutex _maintenance_mtx;

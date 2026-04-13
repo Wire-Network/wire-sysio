@@ -1,5 +1,6 @@
 #include <sysio/trace_api/store_provider.hpp>
 
+#include <fc/io/raw.hpp>
 #include <fc/variant_object.hpp>
 #include <fc/log/logger_config.hpp>
 
@@ -8,9 +9,11 @@ namespace {
       static constexpr const char* _trace_prefix = "trace_";
       static constexpr const char* _trace_index_prefix = "trace_index_";
       static constexpr const char* _trace_trx_id_prefix = "trace_trx_id_";
+      static constexpr const char* _trace_trx_id_index_prefix = "trace_trx_idx_";
       static constexpr const char* _trace_ext = ".log";
       static constexpr const char* _compressed_trace_ext = ".clog";
-      static constexpr int _max_filename_size = std::char_traits<char>::length(_trace_index_prefix) + 10 + 1 + 10 + std::char_traits<char>::length(_compressed_trace_ext) + 1; // "trace_index_" + 10-digits + '-' + 10-digits + ".clog" + null-char
+      // longest prefix is "trace_trx_idx_" (14), then 10+1+10 digits, then ".clog" extension, then null
+      static constexpr int _max_filename_size = std::char_traits<char>::length(_trace_trx_id_index_prefix) + 10 + 1 + 10 + std::char_traits<char>::length(_compressed_trace_ext) + 1;
 
       std::string make_filename(const char* slice_prefix, const char* slice_ext, uint32_t slice_number, uint32_t slice_width) {
          char filename[_max_filename_size] = {};
@@ -98,11 +101,26 @@ namespace sysio::trace_api {
    }
 
    get_block_n store_provider::get_trx_block_number(const chain::transaction_id_type& trx_id, const yield_function& yield) {
-      // traversing from last stride to first
-      // if we find a trx it is either LIB or it is the latest fork, either way we are done
+      // Fast path: probe the per-slice hash index for each slice newest-to-oldest.
+      // The index covers only irreversible slices; reversible blocks fall through to
+      // the linear scan below.
       std::set<uint32_t> trx_block_nums;
 
       _slice_directory.for_each_trx_id_slice([&](fc::cfile& trx_id_file) -> bool {
+         yield();
+
+         // Derive the slice number from the file path and try the index first.
+         const uint32_t slice_number = _slice_directory.slice_number_from_path(trx_id_file.get_file_path());
+         if (auto reader = _slice_directory.find_trx_id_index_slice(slice_number)) {
+            if (auto block_num = reader->lookup(trx_id)) {
+               trx_block_nums.insert(*block_num);
+               return false; // found in an irreversible slice; stop
+            }
+            return true; // not in this indexed slice; continue to next
+         }
+
+         // No index for this slice (reversible window or index not yet built):
+         // fall back to linear scan.
          metadata_log_entry entry;
          auto ds = trx_id_file.create_datastream();
          const uint64_t end = file_size(trx_id_file.get_file_path());
@@ -120,21 +138,18 @@ namespace sysio::trace_api {
                      break;
                   }
                }
-               // block can be seen again when a fork happens, if not in the new block remove it from blocks that have the trx
                if (!found_in_block)
                   trx_block_nums.erase(trxs_entry.block_num);
             } else if (std::holds_alternative<lib_entry_v0>(entry)) {
                auto lib = std::get<lib_entry_v0>(entry).lib;
                if (!trx_block_nums.empty() && lib >= *(--trx_block_nums.end())) {
-                  return false; // *(--trx_block_nums.end()) is the block with highest block number which is final
+                  return false;
                }
             } else {
-               FC_ASSERT( false, "unpacked data should be a block_trxs_entry or a lib_entry_v0" );;
+               FC_ASSERT(false, "unpacked data should be a block_trxs_entry or a lib_entry_v0");
             }
             offset = trx_id_file.tellp();
          }
-         // if empty() keep searching
-         // if not empty() then we have found the trx and since traversing in reverse order this should be the latest
          return trx_block_nums.empty();
       });
 
@@ -383,6 +398,60 @@ namespace sysio::trace_api {
       return _slice_directory.last_recorded_block();
    }
 
+   uint32_t slice_directory::slice_number_from_path(const std::filesystem::path& trx_id_path) const {
+      // Filename format: trace_trx_id_XXXXXXXXXX-YYYYYYYYYY.log
+      // Parse the start block number (XXXXXXXXXX) and divide by _width.
+      const auto name = trx_id_path.filename().string();
+      const auto prefix_len = std::char_traits<char>::length(_trace_trx_id_prefix);
+      const uint32_t start_block = static_cast<uint32_t>(std::stoul(name.substr(prefix_len, 10)));
+      return start_block / _width;
+   }
+
+   std::optional<trx_id_index_reader> slice_directory::find_trx_id_index_slice(uint32_t slice_number) const {
+      auto filename = make_filename(_trace_trx_id_index_prefix, _trace_ext, slice_number, _width);
+      const auto path = _slice_dir / filename;
+      if (!std::filesystem::exists(path))
+         return std::nullopt;
+      trx_id_index_reader reader(path);
+      if (!reader.valid())
+         return std::nullopt;
+      return reader;
+   }
+
+   void slice_directory::build_trx_id_index(uint32_t slice_number, const log_handler& log) {
+      auto idx_filename = make_filename(_trace_trx_id_index_prefix, _trace_ext, slice_number, _width);
+      const auto idx_path = _slice_dir / idx_filename;
+      if (std::filesystem::exists(idx_path))
+         return; // already built
+
+      fc::cfile trx_id_file;
+      if (!find_trx_id_slice(slice_number, open_state::read, trx_id_file))
+         return; // no source data
+
+      log(std::string("Building trx_id index for slice: ") + std::to_string(slice_number));
+
+      trx_id_index_writer writer;
+      const uint64_t end = file_size(trx_id_file.get_file_path());
+      while (trx_id_file.tellp() < end) {
+         metadata_log_entry entry;
+         auto ds = trx_id_file.create_datastream();
+         fc::raw::unpack(ds, entry);
+         if (std::holds_alternative<block_trxs_entry>(entry)) {
+            const auto& te = std::get<block_trxs_entry>(entry);
+            for (const auto& id : te.ids)
+               writer.add(id, te.block_num);
+         }
+      }
+
+      // Write to a temp path and atomically rename so concurrent readers never
+      // see a partially written index file.
+      const auto tmp_path = idx_path.parent_path() / (idx_path.filename().string() + ".tmp");
+      writer.write(tmp_path);
+      std::filesystem::rename(tmp_path, idx_path);
+      log(std::string("Built trx_id index for slice: ") + std::to_string(slice_number) +
+          " (" + std::to_string(writer.entry_count()) + " entries)");
+   }
+
    void slice_directory::set_lib(uint32_t lib) {
       {
          std::scoped_lock lock(_maintenance_mtx);
@@ -448,6 +517,14 @@ namespace sysio::trace_api {
    }
 
    void slice_directory::run_maintenance_tasks(uint32_t lib, const log_handler& log) {
+      // Build trx_id indexes for all newly irreversible slices (min_irreversible=0:
+      // index as soon as a slice's block range is fully below LIB).
+      process_irreversible_slice_range(lib, 0, _last_indexed_slice, [this, &log](uint32_t slice_to_index){
+         try {
+            build_trx_id_index(slice_to_index, log);
+         } FC_LOG_AND_DROP();
+      });
+
       if (_minimum_irreversible_history_blocks) {
          process_irreversible_slice_range(lib, *_minimum_irreversible_history_blocks, _last_cleaned_up_slice, [this, &log](uint32_t slice_to_clean){
             fc::cfile trace;
@@ -472,6 +549,12 @@ namespace sysio::trace_api {
             if (trx_id_found) {
                log(std::string("Removing: ") + trx_id.get_file_path().generic_string());
                std::filesystem::remove(trx_id.get_file_path());
+            }
+            auto idx_filename = make_filename(_trace_trx_id_index_prefix, _trace_ext, slice_to_clean, _width);
+            const auto idx_path = _slice_dir / idx_filename;
+            if (std::filesystem::exists(idx_path)) {
+               log(std::string("Removing: ") + idx_path.generic_string());
+               std::filesystem::remove(idx_path);
             }
 
             auto ctrace = find_compressed_trace_slice(slice_to_clean, dont_open_file);
