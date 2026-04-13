@@ -48,6 +48,7 @@ Res execute(rpc::json_rpc_client& client, const std::string& method, const Req& 
    FC_ASSERT(status.ok(), "protobuf MessageToJsonString failed: {}",
              std::string(status.message()));
 
+   ilog("rpc_client::execute: method={} request={}", method, req_json);
    fc::variant params = fc::json::from_string(req_json);
 
    // call() wraps in {"jsonrpc":"2.0","method":...,"params":...,"id":N}
@@ -56,13 +57,15 @@ Res execute(rpc::json_rpc_client& client, const std::string& method, const Req& 
 
    // Convert result variant back to JSON string, then deserialize into protobuf
    std::string result_json = fc::json::to_string(result, fc::json::yield_function_t{});
+   ilog("rpc_client::execute: method={},req={},res={}", method, req_json, result_json);
 
-   Res response;
-   status = google::protobuf::util::JsonStringToMessage(result_json, &response);
+   Res resp_message;
+   status = google::protobuf::util::JsonStringToMessage(result_json, &resp_message);
    FC_ASSERT(status.ok(), "protobuf JsonStringToMessage failed: {}",
              std::string(status.message()));
+   ilog("rpc_client::execute: method={},req={},res={}", method, req_json, resp_message.DebugString());
+   return resp_message;
 
-   return response;
 }
 
 } // namespace sysio::opp::debugging

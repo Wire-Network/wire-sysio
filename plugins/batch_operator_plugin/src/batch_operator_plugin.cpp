@@ -2,6 +2,7 @@
 #include <fc/crypto/sha256.hpp>
 #include <fc/variant_object.hpp>
 #include <boost/endian/conversion.hpp>
+#include <functional>
 
 #include <sysio/batch_operator_plugin/batch_operator_plugin.hpp>
 #include <sysio/chain/abi_serializer.hpp>
@@ -86,10 +87,20 @@ struct batch_operator_plugin::impl {
    //  Table read helper
    // -----------------------------------------------------------------------
 
+   struct read_table_options {
+      std::optional<std::string>                              lower_bound;
+      std::optional<std::string>                              upper_bound;
+      std::optional<std::string>                              key_type;
+      std::optional<std::string>                              index_position;
+      std::optional<std::function<bool(const fc::variant&)>>  filter;
+      bool                                                    get_all = false;
+   };
+
    read_only::get_table_rows_result read_table(const std::string& code,
                                                 const std::string& scope,
                                                 const std::string& table,
-                                                uint32_t limit = 100) {
+                                                uint32_t limit = 100,
+                                                std::optional<read_table_options> opts = std::nullopt) {
       auto ro = chain_plug->get_read_only_api(fc::microseconds(200000));
       read_only::get_table_rows_params p;
       p.json  = true;
@@ -97,14 +108,62 @@ struct batch_operator_plugin::impl {
       p.scope = scope;
       p.table = chain::name(table);
       p.limit = limit;
-      auto deadline = fc::time_point::now() + fc::milliseconds(delivery_timeout_ms);
-      auto result_fn = ro.get_table_rows(p, deadline);
-      auto result = result_fn();
-      if (auto* err = std::get_if<fc::exception_ptr>(&result)) {
-         elog("batch_operator: table read failed {}::{} — {}", code, table, (*err)->to_string());
-         return {};
+
+      if (opts) {
+         if (opts->lower_bound)    p.lower_bound    = *opts->lower_bound;
+         if (opts->upper_bound)    p.upper_bound    = *opts->upper_bound;
+         if (opts->key_type)       p.key_type       = *opts->key_type;
+         if (opts->index_position) p.index_position = *opts->index_position;
       }
-      return std::get<read_only::get_table_rows_result>(result);
+
+      auto deadline = fc::time_point::now() + fc::milliseconds(delivery_timeout_ms);
+
+      read_only::get_table_rows_result combined;
+      while (true) {
+         auto result_fn = ro.get_table_rows(p, deadline);
+         auto result = result_fn();
+         if (auto* err = std::get_if<fc::exception_ptr>(&result)) {
+            elog("batch_operator: table read failed {}::{} — {}", code, table, (*err)->to_string());
+            return combined;
+         }
+         auto page = std::get<read_only::get_table_rows_result>(result);
+         combined.rows.insert(combined.rows.end(),
+            std::make_move_iterator(page.rows.begin()),
+            std::make_move_iterator(page.rows.end()));
+
+         if (!opts || !opts->get_all || !page.more || page.next_key.empty()) {
+            combined.more = page.more;
+            combined.next_key = page.next_key;
+            break;
+         }
+         p.lower_bound = page.next_key;
+      }
+
+      if (opts && opts->filter) {
+         std::erase_if(combined.rows, [&](const fc::variant& row) {
+            return !(*opts->filter)(row);
+         });
+      }
+      return combined;
+   }
+
+   /// Check if this operator already delivered an envelope for the
+   /// given outpost + epoch by querying msgch::envelopes via the
+   /// byoutepoch secondary index.
+   bool has_delivered_envelope(uint64_t outpost_id, uint32_t epoch_index) {
+      uint64_t key = (static_cast<uint64_t>(outpost_id) << 32) | epoch_index;
+      auto op_account = operator_account;
+      auto rows = read_table("sysio.msgch", "sysio.msgch", "envelopes", 50,
+         read_table_options{
+            .lower_bound    = std::to_string(key),
+            .upper_bound    = std::to_string(key),
+            .key_type       = "i64",
+            .index_position = "2",
+            .filter         = [op_account](const fc::variant& row) {
+               return chain::name(row["batch_op_name"].as_string()) == op_account;
+            }
+         });
+      return !rows.rows.empty();
    }
 
    // -----------------------------------------------------------------------
@@ -236,6 +295,9 @@ struct batch_operator_plugin::impl {
          outpost_descriptor od;
          od.id         = obj["id"].as_uint64();
          od.chain_kind = obj["chain_kind"].as<ChainKind>();
+         // TODO: When solana is implemented, enable this
+         if (od.chain_kind == CHAIN_KIND_SOLANA)
+            continue;
          od.chain_id   = static_cast<uint32_t>(obj["chain_id"].as_uint64());
          outposts.push_back(std::move(od));
       }
@@ -265,20 +327,9 @@ struct batch_operator_plugin::impl {
             }
          }
 
-         // PHASE 2 — CRANK OUTPOSTS
-         // Drain queued messages on ETH (emitOutboundEnvelope) and
-         // finalize previous epoch (finalizeEpoch).
-         for (auto& op : outposts) {
-            try {
-               crank_outpost_epoch(op);
-            } catch (const fc::exception& e) {
-               wlog("batch_operator: crank failed for outpost {}: {}", op.id, e.to_detail_string());
-            }
-         }
-
-         // PHASE 3 — INBOUND (Outposts -> WIRE)
-         // Read OPPEnvelope events emitted by the crank, deliver to sysio.msgch.
-         // Consensus is evaluated inline by evalcons called from deliver.
+         // PHASE 2 — INBOUND (Outposts -> WIRE)
+         // ETHEREUM Read OPPEnvelope events emitted by the crank, deliver to sysio.msgch.
+         //   Consensus is evaluated inline by evalcons called from deliver.
          for (auto& op : outposts) {
             read_inbound_chain(op);
             deliver_to_depot(op);
@@ -351,23 +402,17 @@ struct batch_operator_plugin::impl {
 
       auto& abis = eth_plug->get_abi_files();
 
-      // Call epochIn with raw protobuf wire-protocol bytes
+      // Call epochIn with raw protobuf wire-protocol bytes.
+      // The Envelope contains messages, so no separate messagesIn call is needed.
       std::string envelope_hex = fc::to_hex(op.outbound_raw_envelope);
+
       auto epoch_in_abi = find_eth_abi(abis, "epochIn");
+      ilog("batch_operator: ETH epochIn epoch_in_abi={},envelope_hex={}", epoch_in_abi ? epoch_in_abi->name : "not found", envelope_hex);
       if (epoch_in_abi) {
          auto tx = entry->client->create_default_tx(eth_opp_inbound_addr, *epoch_in_abi,
             {fc::variant(envelope_hex)});
          auto result = entry->client->execute_contract_tx_fn(tx, *epoch_in_abi);
          ilog("batch_operator: ETH epochIn result={}", result.as_string());
-      }
-
-      // Call messagesIn
-      auto messages_in_abi = find_eth_abi(abis, "messagesIn");
-      if (messages_in_abi) {
-         auto tx = entry->client->create_default_tx(eth_opp_inbound_addr, *messages_in_abi,
-            {fc::variant(envelope_hex)});
-         auto result = entry->client->execute_contract_tx_fn(tx, *messages_in_abi);
-         ilog("batch_operator: ETH messagesIn result={}", result.as_string());
       }
    }
 
@@ -414,84 +459,6 @@ struct batch_operator_plugin::impl {
             {fc::variant(fc::mutable_variant_object()
                ("messages", op.outbound_raw_envelope))});
          ilog("batch_operator: SOL messages_in sent for outpost {}", op.id);
-      }
-   }
-
-   // -----------------------------------------------------------------------
-   //  Phase 2: Inbound (Outposts -> WIRE)
-   // -----------------------------------------------------------------------
-
-   void crank_outpost_epoch(outpost_descriptor& op) {
-      if (op.chain_kind == CHAIN_KIND_ETHEREUM) {
-         crank_eth_outpost(op);
-      } else if (op.chain_kind == CHAIN_KIND_SOLANA) {
-         crank_sol_outpost(op);
-      }
-   }
-
-   void crank_eth_outpost(outpost_descriptor& op) {
-      auto entry = eth_plug->get_client(eth_client_id);
-      if (!entry || !entry->client) return;
-
-      auto& abis = eth_plug->get_abi_files();
-
-      // Drain queued outbound messages into an OPPEnvelope
-      const eth::abi::contract* emit_abi = find_eth_abi(abis, "emitOutboundEnvelope");
-      if (!emit_abi) {
-         elog("batch_operator: emitOutboundEnvelope ABI not found for ETH");
-      } else {
-         try {
-            auto tx = entry->client->create_default_tx(eth_opp_addr, *emit_abi, {});
-            auto result = entry->client->execute_contract_tx_fn(tx, *emit_abi);
-            ilog("batch_operator: ETH emitOutboundEnvelope result={}", result.as_string());
-         } catch (const fc::exception& e) {
-            wlog("batch_operator: ETH emitOutboundEnvelope failed — {}", e.to_string());
-         }
-      }
-
-      // Finalize the previous epoch (merkle root + OPPEpoch event)
-      const eth::abi::contract* finalize_abi = find_eth_abi(abis, "finalizeEpoch");
-      if (!finalize_abi) {
-         elog("batch_operator: finalizeEpoch ABI not found for ETH");
-         return;
-      }
-
-      try {
-         auto tx = entry->client->create_default_tx(eth_opp_addr, *finalize_abi, {});
-         auto result = entry->client->execute_contract_tx_fn(tx, *finalize_abi);
-         ilog("batch_operator: ETH finalizeEpoch result={}", result.as_string());
-      } catch (const fc::exception& e) {
-         // OPP_PreviousEpochSent is expected when no pending epoch exists
-         dlog("batch_operator: ETH finalizeEpoch skipped — {}", e.to_string());
-      }
-   }
-
-   void crank_sol_outpost(outpost_descriptor& op) {
-      auto entry = sol_plug->get_client(sol_client_id);
-      if (!entry || !entry->client) return;
-
-      auto program_key = sol::solana_public_key::from_base58(sol_program_id);
-      auto& idls = sol_plug->get_idl_files();
-
-      std::vector<sol::idl::program> program_idls;
-      for (auto& [path, programs] : idls) {
-         for (auto& p : programs) {
-            if (p.name == "opp_solana_outpost") {
-               program_idls.push_back(p);
-               break;
-            }
-         }
-      }
-
-      auto program_client = std::make_shared<sol::solana_program_client>(
-         entry->client, program_key, program_idls);
-
-      if (program_client->has_idl("finalize_epoch")) {
-         auto& instr = program_client->get_idl("finalize_epoch");
-         auto accounts = program_client->resolve_accounts(instr);
-         program_client->execute_tx(instr, accounts,
-            {fc::variant(fc::mutable_variant_object()("epoch_index", current_epoch))});
-         ilog("batch_operator: SOL finalize_epoch sent for outpost {}", op.id);
       }
    }
 
@@ -590,7 +557,9 @@ struct batch_operator_plugin::impl {
    void read_sol_inbound(outpost_descriptor& op) {
       auto entry = sol_plug->get_client(sol_client_id);
       if (!entry || !entry->client) return;
+      if (sol_program_id.empty()) return;
 
+      try {
       // Query recent transaction signatures for the program
       auto sigs_result = entry->client->execute(
          "getSignaturesForAddress",
@@ -652,11 +621,21 @@ struct batch_operator_plugin::impl {
                op.inbound_raw_messages});
          }
       }
+      } catch (const fc::exception& e) {
+         wlog("batch_operator: SOL inbound read failed for outpost {}: {}", op.id, e.to_string());
+      } catch (const std::exception& e) {
+         wlog("batch_operator: SOL inbound read failed for outpost {}: {}", op.id, e.what());
+      }
    }
 
    void deliver_to_depot(outpost_descriptor& op) {
       if (op.inbound_raw_messages.empty()) {
          ilog("batch_operator: no inbound messages for outpost {}", op.id);
+         return;
+      }
+
+      if (has_delivered_envelope(op.id, current_epoch)) {
+         ilog("batch_operator: already delivered for outpost {} epoch {}, skipping", op.id, current_epoch);
          return;
       }
 
