@@ -3,14 +3,19 @@
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
+#include <fc-lite/expected.hpp>
 #include <fc-lite/threadsafe_map.hpp>
+#include <fc/exception/exception.hpp>
 #include <functional>
 #include <memory>
+#include <optional>
 #include <set>
 #include <ranges>
 #include <boost/asio/thread_pool.hpp>
 #include <thread>
+#include <type_traits>
 #include <unordered_map>
+#include <utility>
 #include <variant>
 #include <algorithm>
 #include <concepts>
@@ -186,6 +191,83 @@ public:
    void cancel(job_id_t id);
 
    void cancel_all();
+
+   /**
+    * Options controlling retry() behavior.
+    *
+    * retry_schedule drives how often the retry callback is re-invoked after
+    * the initial call fails. max_retries caps the total number of retry
+    * attempts (not counting the initial call). on_exhaustion produces the
+    * fc::exception surfaced when the retry budget is exhausted without a
+    * successful result.
+    */
+   struct retry_options {
+      job_schedule retry_schedule;
+      int max_retries{600};
+      std::function<fc::exception()> on_exhaustion;
+   };
+
+   /**
+    * Synchronously invoke `fn(args...)`, retrying on empty/unsuccessful
+    * results via a scheduled cron job until the call succeeds, the retry
+    * budget is exhausted, or `fn` throws an fc::exception.
+    *
+    * `fn` must return a type whose `has_value()` / `operator*` semantics
+    * match std::optional or std::expected. On success the contained value is
+    * returned; on retry exhaustion `opts.on_exhaustion()` supplies the error.
+    */
+   template <typename Fn, typename... Args>
+   auto retry(const retry_options& opts, Fn fn, Args&&... args)
+      -> std::expected<typename std::invoke_result_t<Fn, Args...>::value_type, fc::exception> {
+      FC_ASSERT_FMT(_options.num_threads > 1,
+                    "cron_service::retry() logic requires configuring the cron_service with more than one thread");
+      auto ret = fn(std::forward<Args>(args)...);
+      if (ret.has_value())
+         return std::move(*ret);
+
+      std::atomic<bool> complete{false};
+      std::optional<job_id_t> scheduled_id;
+      std::optional<fc::exception> error;
+
+      auto retry_fn = [&, attempt = 0]() mutable {
+         if (complete.load(std::memory_order_acquire))
+            return;
+
+         try {
+            ret = fn(std::forward<Args>(args)...);
+            bool exiting = false;
+            if (ret.has_value()) {
+               complete.store(true, std::memory_order_release);
+               exiting = true;
+            } else if (++attempt >= opts.max_retries) {
+               complete.store(true, std::memory_order_release);
+               exiting = true;
+            }
+
+            if (exiting && scheduled_id.has_value())
+               this->cancel(*scheduled_id);
+         } catch (const fc::exception& e) {
+            error = e;
+            complete.store(true, std::memory_order_release);
+         }
+      };
+
+      scheduled_id = this->add(opts.retry_schedule, retry_fn);
+
+      while (!complete.load(std::memory_order_acquire))
+         std::this_thread::yield();
+
+      if (scheduled_id.has_value())
+         this->cancel(*scheduled_id);
+
+      if (error.has_value())
+         return std::unexpected(std::move(*error));
+
+      if (ret.has_value())
+         return std::move(*ret);
+
+      return std::unexpected(opts.on_exhaustion());
+   }
 
    explicit cron_service(const options& options);
 

@@ -168,8 +168,6 @@ namespace {
       return https_request(apy_url, boost::beast::http::verb::get,
                            {}, api_key, std::chrono::seconds{180});
    }
-
-   using retry_config_t = beacon_chain_detail::retry_config_t;
 }
 
 namespace beacon_chain_detail {
@@ -179,7 +177,7 @@ namespace beacon_chain_detail {
       if (!expected_obj.is_object())
          return {};
 
-      const auto actual_obj = expected_obj.get_object();
+      const auto& actual_obj = expected_obj.get_object();
       if (!actual_obj.contains(expected_field))
          return {};
 
@@ -406,16 +404,11 @@ void beacon_chain_update_plugin::plugin_initialize(const variables_map& options)
       my->beacon_chain_apy_url = options.at(beacon_chain_apy_url).as<std::string>();
       auto& actions = my->find_interval_actions(my->beacon_chain_queue_interval);
       auto action = [&my_ = *my, wq_contract, dm_contract, eth_client, &app_ref = app()]() {
-         auto& cron = app_ref.get_plugin<sysio::cron_plugin>();
-         auto make_retry_config = [&cron]() -> retry_config_t {
-            using job_id_t = beacon_chain_detail::cron_job_id_t;
-            return retry_config_t{
+         auto& cron_svc = app_ref.get_plugin<sysio::cron_plugin>().cron_service();
+         auto make_retry_opts = []() -> cron_service::retry_options {
+            return cron_service::retry_options{
+               .retry_schedule = job_schedule{.milliseconds = {job_schedule::step_value{5000}}},
                .max_retries = 600,
-               .schedule = [&cron](std::function<void()> fn) -> job_id_t {
-                  job_schedule sched{.milliseconds = {job_schedule::step_value{5000}}};
-                  return cron.add_job(sched, std::move(fn));
-               },
-               .cancel = [&cron](job_id_t id) { cron.cancel_job(id); },
                .on_exhaustion = []() -> fc::exception {
                   return fc::ethereum_abi_decode_exception(
                      FC_LOG_MESSAGE(error, "transaction not mined within retry timeout"),
@@ -448,7 +441,7 @@ void beacon_chain_update_plugin::plugin_initialize(const variables_map& options)
                auto res1 = wq_contract->setWithdrawDelay(exit_queue_delay_len_sec);
                const auto tx_hash1 = res1.as_string();
                ilog("setWithdrawDelay tx sent, hash: {}", tx_hash1);
-               auto bn1 = beacon_chain_detail::retry(make_retry_config(),
+               auto bn1 = cron_svc.retry(make_retry_opts(),
                   [&]() { return eth_client->get_block_for_transaction(tx_hash1); });
                if (bn1.has_value())
                   ilog("tx in block number {}", *bn1);
@@ -481,7 +474,7 @@ void beacon_chain_update_plugin::plugin_initialize(const variables_map& options)
             auto res2 = dm_contract->setEntryQueue(deposit_q_days_fl);
             const auto tx_hash2 = res2.as_string();
             ilog("setEntryQueue tx sent, hash: {}", tx_hash2);
-            auto bn2 = beacon_chain_detail::retry(make_retry_config(),
+            auto bn2 = cron_svc.retry(make_retry_opts(),
                [&]() { return eth_client->get_block_for_transaction(tx_hash2); });
 
             auto ethstore = get_ethstore_latest(my_.beacon_chain_apy_url, *(my_.beacon_chain_api_key));
@@ -508,7 +501,7 @@ void beacon_chain_update_plugin::plugin_initialize(const variables_map& options)
             auto res3 = dm_contract->updateApyBPS(scaled);
             const auto tx_hash3 = res3.as_string();
             ilog("updateApyBPS tx sent, hash: {}", tx_hash3);
-            auto bn3 = beacon_chain_detail::retry(make_retry_config(),
+            auto bn3 = cron_svc.retry(make_retry_opts(),
                [&]() { return eth_client->get_block_for_transaction(tx_hash3); });
             if (bn3.has_value())
                ilog("tx in block number {}", *bn3);
