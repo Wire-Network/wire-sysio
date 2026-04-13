@@ -210,6 +210,17 @@ namespace sysio::trace_api {
       void for_each_trx_id_slice(std::function<bool(fc::cfile&)> callback) const;
 
       /**
+       * Return the lowest block number recorded in any index slice file, or nullopt if no data exists.
+       */
+      std::optional<uint32_t> first_recorded_block() const;
+
+      /**
+       * Return the highest block number recorded in any index slice file, or nullopt if no data exists.
+       * Used at startup to detect gaps between existing trace data and the current chain head.
+       */
+      std::optional<uint32_t> last_recorded_block() const;
+
+      /**
        * set the LIB for maintenance
        * @param lib
        */
@@ -287,6 +298,17 @@ namespace sysio::trace_api {
       get_block_t get_block(uint32_t block_height, const yield_function& yield= {});
 
       get_block_n get_trx_block_number(const chain::transaction_id_type& trx_id, const yield_function& yield= {});
+
+      /**
+       * Return the lowest block number recorded in any index slice file, or nullopt if no data exists.
+       */
+      std::optional<uint32_t> first_recorded_block() const;
+
+      /**
+       * Return the highest block number recorded in any index slice file, or nullopt if the slice directory
+       * is empty. Used at startup to verify continuity between existing trace data and the current chain head.
+       */
+      std::optional<uint32_t> last_recorded_block() const;
 
       void start_maintenance_thread( log_handler log ) {
          _slice_directory.start_maintenance_thread( std::move(log) );

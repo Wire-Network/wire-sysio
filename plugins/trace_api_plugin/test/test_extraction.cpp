@@ -105,12 +105,24 @@ struct extraction_test_fixture {
          fixture.id_log[tt.block_num] = tt.ids;
       }
 
+      std::optional<uint32_t> first_recorded_block() const {
+         return std::nullopt; // no prior data in unit tests
+      }
+
+      std::optional<uint32_t> last_recorded_block() const {
+         return std::nullopt; // no prior data in unit tests
+      }
+
       extraction_test_fixture& fixture;
    };
 
    extraction_test_fixture()
    : extraction_impl(mock_logfile_provider_type(*this), exception_handler{} )
    {
+   }
+
+   void signal_block_start( uint32_t block_num ) {
+      extraction_impl.signal_block_start(block_num);
    }
 
    void signal_applied_transaction( const chain::transaction_trace_ptr& trace, const chain::packed_transaction_ptr& ptrx ) {

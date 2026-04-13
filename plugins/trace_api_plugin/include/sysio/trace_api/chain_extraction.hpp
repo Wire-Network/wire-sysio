@@ -3,6 +3,7 @@
 #include <sysio/trace_api/common.hpp>
 #include <sysio/trace_api/trace.hpp>
 #include <sysio/trace_api/extract_util.hpp>
+#include <fc/log/logger.hpp>
 #include <exception>
 #include <functional>
 #include <map>
@@ -65,7 +66,43 @@ private:
    }
 
    void on_block_start( uint32_t block_num ) {
+      if (!_startup_checked) {
+         _startup_checked = true;
+         check_continuity(block_num);
+      }
       clear_caches();
+   }
+
+   void check_continuity(uint32_t block_num) {
+      try {
+         const auto first = store.first_recorded_block();
+         const auto last  = store.last_recorded_block();
+         if (!first) {
+            ilog("trace_api: no prior trace data found, starting fresh at block {}", block_num);
+            return;
+         }
+         // Overlap or exact continuation: chain head is within or just past existing data.
+         // Re-applied blocks will overwrite existing slice entries as they are re-recorded.
+         if (block_num >= *first && block_num <= *last + 1)
+            return;
+
+         if (block_num < *first) {
+            throw std::runtime_error(
+               std::string("trace_api: chain head (") + std::to_string(block_num) +
+               ") is before the first recorded trace block (" + std::to_string(*first) +
+               "). Delete the trace directory and restart to record from the snapshot point.");
+         }
+         // block_num > last + 1: forward gap
+         throw std::runtime_error(
+            std::string("trace_api: gap detected in trace data. Last recorded block: ") +
+            std::to_string(*last) + ", current block: " + std::to_string(block_num) +
+            ". Delete the trace directory and restart to begin fresh, or load a snapshot "
+            "that continues from or before block " + std::to_string(*last + 1) + ".");
+      } catch (const yield_exception&) {
+         throw;
+      } catch (...) {
+         except_handler(MAKE_EXCEPTION_WITH_CONTEXT(std::current_exception()));
+      }
    }
 
    void clear_caches() {
@@ -118,6 +155,7 @@ private:
    exception_handler                                            except_handler;
    std::map<transaction_id_type, cache_trace>                   cached_traces;
    std::optional<cache_trace>                                   onblock_trace;
+   bool                                                         _startup_checked{false};
 
 };
 

@@ -91,6 +91,14 @@ namespace {
          store->append_trx_ids(std::move(tt));
       }
 
+      std::optional<uint32_t> first_recorded_block() const {
+         return store->first_recorded_block();
+      }
+
+      std::optional<uint32_t> last_recorded_block() const {
+         return store->last_recorded_block();
+      }
+
       std::shared_ptr<Store> store;
    };
 }

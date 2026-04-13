@@ -1,4 +1,5 @@
 add_executable( test_trace_api_plugin
+        test_continuity.cpp
         test_extraction.cpp
         test_responses.cpp
         test_trace_file.cpp

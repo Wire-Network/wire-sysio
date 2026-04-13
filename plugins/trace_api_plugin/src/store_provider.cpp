@@ -312,6 +312,77 @@ namespace sysio::trace_api {
       }
    }
 
+   namespace {
+      // Collect and sort all trace_index_*.log paths; ascending=true gives lowest slice first.
+      std::vector<std::filesystem::path> collect_index_paths(const std::filesystem::path& slice_dir, bool ascending) {
+         namespace fs = std::filesystem;
+         std::vector<fs::path> paths;
+         for (const auto& entry : fs::directory_iterator(slice_dir)) {
+            if (!entry.is_regular_file()) continue;
+            const auto name = entry.path().filename().string();
+            if (name.rfind(_trace_index_prefix, 0) == 0 && entry.path().extension() == _trace_ext)
+               paths.push_back(entry.path());
+         }
+         if (ascending)
+            std::sort(paths.begin(), paths.end());
+         else
+            std::sort(paths.begin(), paths.end(), std::greater<>());
+         return paths;
+      }
+
+      // Scan a single index slice file and return the min and max block numbers found.
+      std::optional<std::pair<uint32_t,uint32_t>> scan_index_slice(const std::filesystem::path& path, uint32_t current_version) {
+         try {
+            fc::cfile index;
+            index.set_file_path(path);
+            index.open("rb");
+            index.seek(0);
+            const auto header = extract_store<slice_directory::index_header>(index);
+            if (header.version != current_version)
+               return std::nullopt;
+            const uint64_t end = file_size(path);
+            std::optional<uint32_t> lo, hi;
+            while (index.tellp() < end) {
+               const auto e = extract_store<metadata_log_entry>(index);
+               if (std::holds_alternative<block_entry_v0>(e)) {
+                  const auto num = std::get<block_entry_v0>(e).number;
+                  if (!lo || num < *lo) lo = num;
+                  if (!hi || num > *hi) hi = num;
+               }
+            }
+            if (lo && hi)
+               return std::make_pair(*lo, *hi);
+         } catch (...) {
+            // malformed or partially written slice
+         }
+         return std::nullopt;
+      }
+   } // anonymous namespace
+
+   std::optional<uint32_t> slice_directory::first_recorded_block() const {
+      for (const auto& path : collect_index_paths(_slice_dir, /*ascending=*/true)) {
+         if (const auto r = scan_index_slice(path, _current_version))
+            return r->first;
+      }
+      return std::nullopt;
+   }
+
+   std::optional<uint32_t> slice_directory::last_recorded_block() const {
+      for (const auto& path : collect_index_paths(_slice_dir, /*ascending=*/false)) {
+         if (const auto r = scan_index_slice(path, _current_version))
+            return r->second;
+      }
+      return std::nullopt;
+   }
+
+   std::optional<uint32_t> store_provider::first_recorded_block() const {
+      return _slice_directory.first_recorded_block();
+   }
+
+   std::optional<uint32_t> store_provider::last_recorded_block() const {
+      return _slice_directory.last_recorded_block();
+   }
+
    void slice_directory::set_lib(uint32_t lib) {
       {
          std::scoped_lock lock(_maintenance_mtx);
