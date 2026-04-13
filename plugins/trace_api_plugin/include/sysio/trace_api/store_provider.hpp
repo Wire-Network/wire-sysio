@@ -1,15 +1,17 @@
 #pragma once
 
 #include <ios>
-#include <thread>
+#include <memory>
 #include <mutex>
+#include <thread>
 #include <condition_variable>
 #include <fc/io/cfile.hpp>
 #include <fc/variant.hpp>
+#include <sysio/trace_api/abi_store.hpp>
 #include <sysio/trace_api/common.hpp>
-#include <sysio/trace_api/metadata_log.hpp>
-#include <sysio/trace_api/data_log.hpp>
 #include <sysio/trace_api/compressed_file.hpp>
+#include <sysio/trace_api/data_log.hpp>
+#include <sysio/trace_api/metadata_log.hpp>
 #include <sysio/trace_api/trx_id_index.hpp>
 
 namespace sysio::trace_api {
@@ -309,6 +311,20 @@ namespace sysio::trace_api {
       void append_trx_ids(block_trxs_entry tt);
 
       /**
+       * Record an ABI version for an account at a given global_sequence.
+       * global_seq == 0 means "captured lazily; exact seq unknown".
+       * Thread-safe; may be called from the extraction thread.
+       */
+      void append_abi(chain::name account, uint64_t global_seq, std::vector<char> abi_bytes);
+
+      /**
+       * Return the ABI bytes in effect for account at global_seq (the ABI with the
+       * largest recorded global_seq <= the query), or nullopt if none is found.
+       * Thread-safe; may be called from the HTTP thread.
+       */
+      std::optional<std::vector<char>> lookup_abi(chain::name account, uint64_t global_seq) const;
+
+      /**
        * Read the trace for a given block
        * @param block_height : the height of the data being read
        * @return empty optional if the data cannot be read OTHERWISE
@@ -422,6 +438,15 @@ namespace sysio::trace_api {
       void validate_existing_index_slice_file(fc::cfile& index, open_state state);
 
       slice_directory _slice_directory;
+
+   private:
+      // ABI sidecar: one global file in the slice directory.
+      // _abi_write_mutex serialises writes (extraction thread).
+      // _abi_reader is atomically swapped after each write for lock-free reads (HTTP thread).
+      mutable std::mutex                                   _abi_write_mutex;
+      abi_store_writer                                     _abi_writer;
+      std::atomic<std::shared_ptr<abi_store_reader>>       _abi_reader;
+      std::filesystem::path                                _abi_store_path;
    };
 
 }

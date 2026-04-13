@@ -1,6 +1,10 @@
 #pragma once
 
+#include <functional>
+#include <optional>
+#include <vector>
 #include <sysio/chain/abi_def.hpp>
+#include <sysio/chain/name.hpp>
 #include <sysio/trace_api/trace.hpp>
 #include <sysio/trace_api/common.hpp>
 
@@ -12,29 +16,34 @@ namespace sysio {
    namespace trace_api {
 
    /**
-    * Data Handler that uses sysio::chain::abi_serializer to decode data with a known set of ABI's
-    * Can be used directly as a Data_handler_provider OR shared between request_handlers using the
-    * ::shared_provider abstraction.
+    * Data Handler that uses sysio::chain::abi_serializer to decode action data.
+    *
+    * ABIs are resolved dynamically via an abi_lookup_fn callback, typically backed
+    * by the abi_store on disk.  Given (account, global_sequence) it returns the raw
+    * ABI bytes that were in effect at that point in chain history, or nullopt.
+    *
+    * Can be used directly as a Data_handler_provider OR shared between request_handlers
+    * using the ::shared_provider abstraction.
     */
    class abi_data_handler {
    public:
-      explicit abi_data_handler( exception_handler except_handler )
-      :except_handler( std::move( except_handler ) )
-      {
-      }
+      /// Callback: (account, global_sequence) -> raw ABI bytes in effect at that sequence, or nullopt.
+      /// Called on the HTTP thread; must be thread-safe.
+      using abi_lookup_fn = std::function<std::optional<std::vector<char>>(chain::name, uint64_t)>;
+
+      explicit abi_data_handler( exception_handler except_handler, abi_lookup_fn lookup_fn = {} )
+      :_abi_lookup_fn( std::move( lookup_fn ) )
+      ,except_handler( std::move( except_handler ) )
+      {}
 
       /**
-       * Add an ABI definition to this data handler
-       * @param name - the name of the account/contract that this ABI belongs to
-       * @param abi - the ABI definition of that ABI
-       */
-      void add_abi( const chain::name& name, chain::abi_def&& abi );
-
-      /**
-       * Given an action trace, produce a tuple representing the `data` and `return_value` fields in the trace
+       * Given an action trace, produce a tuple representing the `data` and `return_value` fields
+       * in the trace, decoded via the ABI in effect at that action's global_sequence.
        *
        * @param action - trace of the action including metadata necessary for finding the ABI
-       * @return tuple where the first element is a variant representing the `data` field of the action interpreted by known ABIs OR an empty variant, and the second element represents the `return_value` field of the trace.
+       * @return tuple where the first element is a variant representing the decoded `data` field,
+       *         and the second element represents the decoded `return_value` field.
+       *         Both are empty variants when the ABI is unavailable or decoding fails.
        */
       std::tuple<fc::variant, std::optional<fc::variant>> serialize_to_variant(const std::variant<action_trace_v0>& action);
 
@@ -55,7 +64,7 @@ namespace sysio {
       };
 
    private:
-      std::map<chain::name, std::shared_ptr<chain::abi_serializer>> abi_serializer_by_account;
+      abi_lookup_fn _abi_lookup_fn;
       exception_handler except_handler;
    };
 } }

@@ -113,6 +113,10 @@ struct extraction_test_fixture {
          return std::nullopt; // no prior data in unit tests
       }
 
+      void append_abi(chain::name, uint64_t, std::vector<char>) {
+         // not tested here; abi_store tests cover this
+      }
+
       extraction_test_fixture& fixture;
    };
 

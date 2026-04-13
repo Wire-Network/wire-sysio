@@ -1,12 +1,15 @@
 #pragma once
 
 #include <sysio/trace_api/common.hpp>
-#include <sysio/trace_api/trace.hpp>
 #include <sysio/trace_api/extract_util.hpp>
+#include <sysio/trace_api/trace.hpp>
+#include <sysio/chain/config.hpp>
+#include <fc/io/raw.hpp>
 #include <fc/log/logger.hpp>
 #include <exception>
 #include <functional>
 #include <map>
+#include <unordered_set>
 
 namespace sysio { namespace trace_api {
 
@@ -17,13 +20,23 @@ template <typename StoreProvider>
 class chain_extraction_impl_type {
 public:
    /**
-    * Chain Extractor for capturing transaction traces, action traces, and block info.
-    * @param store provider of append & append_lib
-    * @param except_handler called on exceptions, logging if any is left to the user
+    * Called to fetch the current ABI bytes for an account (lazy init on first encounter).
+    * Returns nullopt if the account has no ABI.
     */
-   chain_extraction_impl_type( StoreProvider store, exception_handler except_handler )
+   using abi_fetcher_t = std::function<std::optional<std::vector<char>>(chain::name)>;
+
+   /**
+    * Chain Extractor for capturing transaction traces, action traces, and block info.
+    * @param store provider of append, append_lib, and append_abi
+    * @param except_handler called on exceptions, logging if any is left to the user
+    * @param abi_fetcher optional callback to lazily fetch the current ABI for an account;
+    *                    called on first encounter of each account; receives global_seq 0
+    */
+   chain_extraction_impl_type( StoreProvider store, exception_handler except_handler,
+                                abi_fetcher_t abi_fetcher = {} )
    : store(std::move(store))
    , except_handler(std::move(except_handler))
+   , _abi_fetcher(std::move(abi_fetcher))
    {}
 
    /// connect to chain controller applied_transaction signal
@@ -54,6 +67,37 @@ private:
          onblock_trace.emplace( cache_trace{trace, t} );
       } else {
          cached_traces[trace->id] = {trace, t};
+      }
+
+      // ABI capture: scan all action traces (including inlines) in this transaction.
+      for (const auto& at : trace->action_traces) {
+         if (!at.receipt) continue; // skip context-free or failed actions
+
+         // Lazy ABI fetch: on first encounter of any account, record its current ABI at
+         // global_seq 0 ("captured before tracing began; exact version unknown").
+         if (_abi_fetcher && _seen_accounts.insert(at.act.account.to_uint64_t()).second) {
+            try {
+               if (auto abi = _abi_fetcher(at.act.account))
+                  store.append_abi(at.act.account, 0, std::move(*abi));
+            } catch (...) {}
+         }
+
+         // setabi: record the new ABI with its exact global_sequence.
+         if (at.act.account == chain::config::system_account_name &&
+             at.act.name    == chain::name("setabi")) {
+            try {
+               chain::name target_account;
+               chain::bytes abi_bytes;
+               auto ds = fc::datastream<const char*>(at.act.data.data(), at.act.data.size());
+               fc::raw::unpack(ds, target_account);
+               fc::raw::unpack(ds, abi_bytes);
+               store.append_abi(target_account,
+                                at.receipt->global_sequence,
+                                std::vector<char>(abi_bytes.begin(), abi_bytes.end()));
+               // Mark target as seen so lazy fetch doesn't later overwrite with a stale entry.
+               _seen_accounts.insert(target_account.to_uint64_t());
+            } catch (...) {}
+         }
       }
    }
 
@@ -153,8 +197,11 @@ private:
 private:
    StoreProvider                                                store;
    exception_handler                                            except_handler;
+   abi_fetcher_t                                                _abi_fetcher;
    std::map<transaction_id_type, cache_trace>                   cached_traces;
    std::optional<cache_trace>                                   onblock_trace;
+   // Track seen accounts (by raw uint64 name value) to avoid redundant lazy ABI fetches.
+   std::unordered_set<uint64_t>                                 _seen_accounts;
    bool                                                         _startup_checked{false};
 
 };

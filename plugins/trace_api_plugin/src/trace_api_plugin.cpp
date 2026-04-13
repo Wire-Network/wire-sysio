@@ -99,6 +99,14 @@ namespace {
          return store->last_recorded_block();
       }
 
+      void append_abi(chain::name account, uint64_t global_seq, std::vector<char> abi_bytes) {
+         store->append_abi(account, global_seq, std::move(abi_bytes));
+      }
+
+      std::optional<std::vector<char>> lookup_abi(chain::name account, uint64_t global_seq) const {
+         return store->lookup_abi(account, global_seq);
+      }
+
       std::shared_ptr<Store> store;
    };
 }
@@ -189,51 +197,21 @@ struct trace_api_rpc_plugin_impl : public std::enable_shared_from_this<trace_api
    explicit trace_api_rpc_plugin_impl( const std::shared_ptr<trace_api_common_impl>& common )
    :common(common) {}
 
-   static void set_program_options(appbase::options_description& cli, appbase::options_description& cfg) {
-      auto cfg_options = cfg.add_options();
-      cfg_options("trace-rpc-abi", bpo::value<vector<string>>()->composing(),
-                  "ABIs used when decoding trace RPC responses.\n"
-                  "There must be at least one ABI specified OR the flag trace-no-abis must be used.\n"
-                  "ABIs are specified as \"Key=Value\" pairs in the form <account-name>=<abi-def>\n"
-                  "Where <abi-def> can be:\n"
-                  "   an absolute path to a file containing a valid JSON-encoded ABI\n"
-                  "   a relative path from `data-dir` to a file containing a valid JSON-encoded ABI\n"
-                  );
-      cfg_options("trace-no-abis",
-            "Use to indicate that the RPC responses will not use ABIs.\n"
-            "Failure to specify this option when there are no trace-rpc-abi configuations will result in an Error.\n"
-            "This option is mutually exclusive with trace-rpc-api"
-      );
-   }
+   static void set_program_options(appbase::options_description&, appbase::options_description&) {}
 
-   void plugin_initialize(const appbase::variables_map& options) {
+   void plugin_initialize(const appbase::variables_map&) {
       ilog("initializing trace api rpc plugin");
-      std::shared_ptr<abi_data_handler> data_handler = std::make_shared<abi_data_handler>([](const exception_with_context& e){
-         log_exception(e, fc::log_level::debug);
-         if (std::get<0>(e)) { // rethrow so caller is notified of error
-            std::rethrow_exception(std::get<0>(e));
+      auto store = common->store;
+      auto data_handler = std::make_shared<abi_data_handler>(
+         [](const exception_with_context& e) {
+            // Log at debug and fall back to raw hex — do not rethrow, since
+            // ABI capture is automatic and decoding failures should be soft.
+            log_exception(e, fc::log_level::debug);
+         },
+         [store](chain::name account, uint64_t global_seq) {
+            return store->lookup_abi(account, global_seq);
          }
-      });
-
-      if( options.count("trace-rpc-abi") ) {
-         SYS_ASSERT(options.count("trace-no-abis") == 0, chain::plugin_config_exception,
-                    "Trace API is configured with ABIs however trace-no-abis is set");
-         const std::vector<std::string> key_value_pairs = options["trace-rpc-abi"].as<std::vector<std::string>>();
-         for (const auto& entry : key_value_pairs) {
-            try {
-               auto kv = parse_kv_pairs(entry);
-               auto account = chain::name(kv.first);
-               auto abi = abi_def_from_file(kv.second, app().data_dir());
-               data_handler->add_abi(account, std::move(abi));
-            } catch (...) {
-               elog("Malformed trace-rpc-abi provider: \"{}\"", entry);
-               throw;
-            }
-         }
-      } else {
-         SYS_ASSERT(options.count("trace-no-abis") != 0, chain::plugin_config_exception,
-                    "Trace API is not configured with ABIs and trace-no-abis is not set");
-      }
+      );
 
       req_handler = std::make_shared<request_handler_t>(
          shared_store_provider<store_provider>(common->store),
@@ -356,9 +334,25 @@ struct trace_api_plugin_impl {
          app().quit();
          throw yield_exception("shutting down");
       };
-      extraction = std::make_shared<chain_extraction_t>(shared_store_provider<store_provider>(common->store), log_exceptions_and_shutdown);
-
       auto& chain = app().find_plugin<chain_plugin>()->chain();
+
+      // Lazy ABI fetcher: called from applied_transaction (chain write thread) on first
+      // encounter of each account. Captures current ABI from the chain DB at that point.
+      chain_extraction_t::abi_fetcher_t abi_fetcher = [&chain](chain::name account)
+            -> std::optional<std::vector<char>> {
+         std::optional<std::vector<char>> result;
+         try {
+            const auto* meta = chain.find_account_metadata(account);
+            if (meta && meta->abi.size() > 0)
+               result.emplace(meta->abi.data(), meta->abi.data() + meta->abi.size());
+         } catch (...) {}
+         return result;
+      };
+
+      extraction = std::make_shared<chain_extraction_t>(
+         shared_store_provider<store_provider>(common->store),
+         log_exceptions_and_shutdown,
+         std::move(abi_fetcher));
 
       applied_transaction_connection.emplace(
          chain.applied_transaction().connect([this](std::tuple<const chain::transaction_trace_ptr&, const chain::packed_transaction_ptr&> t) {

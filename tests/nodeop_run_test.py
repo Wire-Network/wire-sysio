@@ -60,8 +60,7 @@ try:
     if localTest and not dontLaunch:
         Print("Stand up cluster")
 
-        abs_path = os.path.abspath(os.getcwd() + '/contracts/sysio.token/sysio.token.abi')
-        traceNodeopArgs=" --http-max-response-time-ms 990000 --trace-rpc-abi sysio.token=" + abs_path
+        traceNodeopArgs=" --http-max-response-time-ms 990000"
         extraNodeopArgs=traceNodeopArgs + " --plugin sysio::prometheus_plugin --database-map-mode mapped_private "
         specificNodeopInstances={0: "bin/nodeop"}
         if cluster.launch(totalNodes=2, prodCount=prodCount, activateIF=activateIF, onlyBios=onlyBios, dontBootstrap=dontBootstrap, extraNodeopArgs=extraNodeopArgs, specificNodeopInstances=specificNodeopInstances) is False:

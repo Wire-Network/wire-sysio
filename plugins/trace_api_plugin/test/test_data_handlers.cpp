@@ -3,10 +3,26 @@
 #include <sysio/trace_api/abi_data_handler.hpp>
 
 #include <sysio/trace_api/test_common.hpp>
+#include <fc/io/raw.hpp>
 
 using namespace sysio;
 using namespace sysio::trace_api;
 using namespace sysio::trace_api::test_common;
+
+namespace {
+   // Pack an abi_def into raw bytes that abi_data_handler can unpack
+   std::vector<char> pack_abi(const chain::abi_def& abi) {
+      return fc::raw::pack(abi);
+   }
+
+   // Build a lookup_fn that returns packed ABI bytes for a given account
+   abi_data_handler::abi_lookup_fn make_lookup(chain::name account, std::vector<char> abi_bytes) {
+      return [account, bytes = std::move(abi_bytes)](chain::name a, uint64_t) -> std::optional<std::vector<char>> {
+         if (a == account) return bytes;
+         return std::nullopt;
+      };
+   }
+}
 
 BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
    BOOST_AUTO_TEST_CASE(empty_data)
@@ -76,8 +92,7 @@ BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
       );
       abi.version = "sysio::abi/1.";
 
-      abi_data_handler handler(exception_handler{});
-      handler.add_abi("alice"_n, std::move(abi));
+      abi_data_handler handler(exception_handler{}, make_lookup("alice"_n, pack_abi(abi)));
 
       fc::variant expected = fc::mutable_variant_object()
          ("a", 0)
@@ -112,8 +127,7 @@ BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
       abi.version = "sysio::abi/1.";
       abi.action_results = { std::vector<chain::action_result_def>{ chain::action_result_def{ "foo"_n, "foor"} } };
 
-      abi_data_handler handler(exception_handler{});
-      handler.add_abi("alice"_n, std::move(abi));
+      abi_data_handler handler(exception_handler{}, make_lookup("alice"_n, pack_abi(abi)));
 
       fc::variant expected = fc::mutable_variant_object()
             ("a", 0)
@@ -151,8 +165,7 @@ BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
       );
       abi.version = "sysio::abi/1.";
 
-      abi_data_handler handler(exception_handler{});
-      handler.add_abi("alice"_n, std::move(abi));
+      abi_data_handler handler(exception_handler{}, make_lookup("alice"_n, pack_abi(abi)));
 
       auto expected = fc::variant();
 
@@ -182,8 +195,10 @@ BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
       abi.version = "sysio::abi/1.";
 
       bool log_called = false;
-      abi_data_handler handler([&log_called](const exception_with_context& ){log_called = true;});
-      handler.add_abi("alice"_n, std::move(abi));
+      abi_data_handler handler(
+         [&log_called](const exception_with_context& ){log_called = true;},
+         make_lookup("alice"_n, pack_abi(abi))
+      );
 
       auto expected = fc::variant();
 
@@ -214,8 +229,7 @@ BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
       );
       abi.version = "sysio::abi/1.";
 
-      abi_data_handler handler(exception_handler{});
-      handler.add_abi("alice"_n, std::move(abi));
+      abi_data_handler handler(exception_handler{}, make_lookup("alice"_n, pack_abi(abi)));
 
       fc::variant expected = fc::mutable_variant_object()
             ("a", 0)
