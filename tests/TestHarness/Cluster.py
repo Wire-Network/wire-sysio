@@ -283,7 +283,7 @@ class Cluster(object):
         if Utils.Debug and "--contracts-console" not in extraNodeopArgs:
             nodeopArgs += " --contracts-console"
         if PFSetupPolicy.hasPreactivateFeature(pfSetupPolicy):
-            nodeopArgs += " --plugin sysio::producer_api_plugin"
+            nodeopArgs += " --plugin sysio::producer_api_plugin "
         if prodsEnableTraceApi:
             nodeopArgs += " --plugin sysio::trace_api_plugin "
         httpMaxResponseTimeSet = False
