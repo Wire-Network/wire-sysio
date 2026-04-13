@@ -74,6 +74,10 @@ struct batch_operator_plugin::impl {
    outpost_ethereum_client_plugin*   eth_plug   = nullptr;
    outpost_solana_client_plugin*     sol_plug   = nullptr;
 
+   // Debugging signal — emitted when an OPP envelope is computed.
+   // Only fires when num_slots() > 0 (i.e. external_debugging_plugin is connected).
+   signal<void(const opp::debugging::DebugEnvelopeEvent&)> debug_envelope_signal;
+
    // Cron job handle
    cron_service::job_id_t            epoch_poll_job_id = 0;
    bool                              shutting_down = false;
@@ -312,6 +316,16 @@ struct batch_operator_plugin::impl {
             op.outbound_envelope_hash_hex = obj["envelope_hash"].as_string();
             ilog("batch_operator: read outbound envelope for outpost {} ({} bytes)",
                  op.id, op.outbound_raw_envelope.size());
+
+            // Emit debugging signal (WIRE -> Outpost direction)
+            if (debug_envelope_signal.num_slots() > 0) {
+               auto ep_type = (op.chain_kind == CHAIN_KIND_ETHEREUM)
+                  ? opp::debugging::DEBUG_OUTPOST_ENDPOINTS_TYPE_DEPOT_OUTPOST_ETHEREUM
+                  : opp::debugging::DEBUG_OUTPOST_ENDPOINTS_TYPE_DEPOT_OUTPOST_SOLANA;
+               debug_envelope_signal(opp::debugging::DebugEnvelopeEvent{
+                  current_epoch, ep_type, operator_account, op.outbound_raw_envelope});
+            }
+
             return;
          }
       }
@@ -561,6 +575,15 @@ struct batch_operator_plugin::impl {
          op.inbound_chain_hash_hex = fc::sha256::hash(
             op.inbound_raw_messages.data(), op.inbound_raw_messages.size()).str();
          ilog("batch_operator: read {} ETH inbound messages for outpost {}", msg_count, op.id);
+
+         // Emit debugging signal (Outpost ETH -> WIRE direction)
+         if (debug_envelope_signal.num_slots() > 0) {
+            debug_envelope_signal(opp::debugging::DebugEnvelopeEvent{
+               current_epoch,
+               opp::debugging::DEBUG_OUTPOST_ENDPOINTS_TYPE_OUTPOST_ETHEREUM_DEPOT,
+               operator_account,
+               op.inbound_raw_messages});
+         }
       }
    }
 
@@ -619,6 +642,15 @@ struct batch_operator_plugin::impl {
          op.inbound_chain_hash_hex = fc::sha256::hash(
             op.inbound_raw_messages.data(), op.inbound_raw_messages.size()).str();
          ilog("batch_operator: read {} SOL inbound messages for outpost {}", msg_count, op.id);
+
+         // Emit debugging signal (Outpost SOL -> WIRE direction)
+         if (debug_envelope_signal.num_slots() > 0) {
+            debug_envelope_signal(opp::debugging::DebugEnvelopeEvent{
+               current_epoch,
+               opp::debugging::DEBUG_OUTPOST_ENDPOINTS_TYPE_OUTPOST_SOLANA_DEPOT,
+               operator_account,
+               op.inbound_raw_messages});
+         }
       }
    }
 
@@ -780,6 +812,10 @@ batch_operator_plugin::batch_operator_plugin()
    : _impl(std::make_unique<impl>()) {}
 
 batch_operator_plugin::~batch_operator_plugin() = default;
+
+signal<void(const opp::debugging::DebugEnvelopeEvent&)>& batch_operator_plugin::debugging_opp_envelope() {
+   return _impl->debug_envelope_signal;
+}
 
 void batch_operator_plugin::set_program_options(options_description& cli,
                                                  options_description& cfg) {
