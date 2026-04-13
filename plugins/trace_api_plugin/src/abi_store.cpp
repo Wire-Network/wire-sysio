@@ -27,11 +27,11 @@ void abi_store_writer::write(const std::filesystem::path& path) const {
    });
 
    // Compute blob offsets (relative to blob area start).
-   uint32_t running_offset = 0;
-   std::vector<uint32_t> blob_offsets(order.size());
+   uint64_t running_offset = 0;
+   std::vector<uint64_t> blob_offsets(order.size());
    for (size_t i = 0; i < order.size(); ++i) {
       blob_offsets[i] = running_offset;
-      running_offset += static_cast<uint32_t>(_entries[order[i]].abi_bytes.size());
+      running_offset += _entries[order[i]].abi_bytes.size();
    }
 
    const auto tmp_path = std::filesystem::path(path).replace_extension(".tmp");
@@ -53,7 +53,7 @@ void abi_store_writer::write(const std::filesystem::path& path) const {
       ie.account     = e.account;
       ie.global_seq  = e.global_seq;
       ie.blob_offset = blob_offsets[i];
-      ie.blob_size   = static_cast<uint32_t>(e.abi_bytes.size());
+      ie.blob_size   = e.abi_bytes.size();
       auto ie_data = fc::raw::pack(ie);
       f.write(ie_data.data(), ie_data.size());
    }

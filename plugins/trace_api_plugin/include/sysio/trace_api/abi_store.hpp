@@ -15,8 +15,8 @@ namespace sysio::trace_api {
 // Single-file layout (written atomically via .tmp + rename):
 //
 //   Header         (16 bytes): magic, version, entry_count, reserved
-//   Index          (entry_count * 24 bytes, sorted by account ASC, global_seq ASC):
-//                    account(8) + global_seq(8) + blob_offset(4) + blob_size(4)
+//   Index          (entry_count * 32 bytes, sorted by account ASC, global_seq ASC):
+//                    account(8) + global_seq(8) + blob_offset(8) + blob_size(8)
 //                    blob_offset is relative to the start of the blob area.
 //   Blob area      (variable): raw ABI bytes concatenated in index order
 //
@@ -41,10 +41,10 @@ static_assert(sizeof(abi_store_header) == 16);
 struct abi_store_index_entry {
    uint64_t account;     // chain::name value
    uint64_t global_seq;
-   uint32_t blob_offset; // relative to blob area start
-   uint32_t blob_size;
+   uint64_t blob_offset; // relative to blob area start
+   uint64_t blob_size;
 };
-static_assert(sizeof(abi_store_index_entry) == 24);
+static_assert(sizeof(abi_store_index_entry) == 32);
 
 // ---------------------------------------------------------------------------
 // Writer: accumulate (account, global_seq, abi_bytes) triples; write atomically.
