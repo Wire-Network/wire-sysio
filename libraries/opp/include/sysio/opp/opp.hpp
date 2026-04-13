@@ -12,6 +12,7 @@
  * and any host-side code that needs to serialize OPP enum values.
  */
 
+#include <sysio/opp/debugging/debugging.pb.h>
 #include <sysio/opp/types/types.pb.h>
 #include <fc/reflect/reflect.hpp>
 
@@ -177,6 +178,13 @@ FC_REFLECT_ENUM(sysio::opp::types::StakeStatus,
    (STAKE_STATUS_ACTIVE)
    (STAKE_STATUS_TERMINATED)
    (STAKE_STATUS_SLASHED))
+
+FC_REFLECT_ENUM(sysio::opp::debugging::DebugOutpostEndpointsType,
+   (DEBUG_OUTPOST_ENDPOINTS_TYPE_UNKNOWN)
+   (DEBUG_OUTPOST_ENDPOINTS_TYPE_OUTPOST_ETHEREUM_DEPOT)
+   (DEBUG_OUTPOST_ENDPOINTS_TYPE_OUTPOST_SOLANA_DEPOT)
+   (DEBUG_OUTPOST_ENDPOINTS_TYPE_DEPOT_OUTPOST_ETHEREUM)
+   (DEBUG_OUTPOST_ENDPOINTS_TYPE_DEPOT_OUTPOST_SOLANA));
 
 namespace sysio::opp {
    struct opp {};

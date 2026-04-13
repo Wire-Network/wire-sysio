@@ -52,8 +52,10 @@ void msgch::deliver(name batch_op_name, uint64_t outpost_id, std::vector<char> d
    uint64_t composite = (static_cast<uint64_t>(outpost_id) << 32) | epoch;
    for (auto it = oe_idx.lower_bound(composite);
         it != oe_idx.end() && it->by_outpost_epoch() == composite; ++it) {
-      check(it->batch_op_name != batch_op_name,
-            "operator already delivered for this outpost+epoch");
+      if (it->batch_op_name == batch_op_name) {
+         sysio::print_f("operator already delivered for this outpost+epoch: %s", batch_op_name.to_string().c_str());
+         return;
+      }
    }
 
    // Store envelope
@@ -147,10 +149,9 @@ void msgch::evalcons(uint64_t outpost_id, uint32_t epoch_index) {
    auto  now_sec = static_cast<uint64_t>(now.sec_since_epoch());
    uint32_t epoch = current_epoch_index();
 
-   // Decode protobuf Envelope from the consensus data
+   // Decode protobuf Envelope from the consensus data (raw protobuf, no size prefix)
    opp::Envelope envelope;
-   auto [in_data, in] = zpp::bits::data_in<char>();
-   in_data.assign(raw.begin(), raw.end());
+   auto in = zpp::bits::in{std::span{raw.data(), raw.size()}, zpp::bits::no_size{}};
    auto decode_result = in(envelope);
    check(decode_result == zpp::bits::errc{}, "failed to decode inbound OPP Envelope");
 
@@ -251,13 +252,27 @@ void msgch::buildenv(uint64_t outpost_id) {
       }
    }
 
-   // Build OPP Envelope
+   // Build a Message containing the collected attestations
+   opp::MessagePayload payload;
+   payload.version = zpp::bits::vuint32_t{1};
+   payload.attestations = std::move(entries);
+
+   opp::MessageHeader header;
+   header.timestamp = zpp::bits::vuint64_t{now_sec};
+
+   opp::Message msg;
+   msg.header = std::move(header);
+   msg.payload = std::move(payload);
+
+   // Build OPP Envelope wrapping the message
    opp::Envelope env;
    env.epoch_index = zpp::bits::vuint32_t{epoch};
    env.epoch_timestamp = zpp::bits::vuint64_t{now_sec};
+   env.messages.push_back(std::move(msg));
 
-   // Serialize envelope
-   auto [packed, out] = zpp::bits::data_out<char>();
+   // Serialize envelope (no size prefix — raw protobuf wire format)
+   std::vector<char> packed;
+   auto out = zpp::bits::out{packed, zpp::bits::no_size{}};
    (void)out(env);
 
    // Store outbound envelope

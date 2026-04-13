@@ -6,6 +6,7 @@
 #include <sysio/external_debugging_plugin/external_debugging_plugin.hpp>
 #include <sysio/external_debugging_plugin/external_debugging_rpc_client.hpp>
 #include <sysio/opp/debugging/debugging.pb.h>
+#include <sysio/opp/opp.pb.h>
 
 namespace sysio {
 
@@ -105,9 +106,25 @@ void external_debugging_plugin::plugin_startup() {
    _impl->event_queue = fc::parallel::worker_task_queue<opp::debugging::DebugEnvelopeEvent>::create(
       {.max_threads = 1},
       [impl = _impl.get()](opp::debugging::DebugEnvelopeEvent& event) {
+         std::vector<char>& event_data = std::get<3>(event);
+         opp::Envelope envelope;
+         if (!envelope.ParseFromArray(event_data.data(), event_data.size())) {
+            elog("external_debugging_plugin: failed to parse envelope data for event from batch_op={}, skipping",
+                 std::get<2>(event).to_string());
+            return;
+         };
+
+         std::string event_json;
+         if (auto res = google::protobuf::json::MessageToJsonString(envelope, &event_json); !res.ok()) {
+            elog("external_debugging_plugin: failed to unpack DebugEnvelope for event from batch_op={}: code={}, message={}",
+                 std::get<2>(event).to_string(), res.raw_code(), res.message());
+            return;
+         }
+
          try {
             impl->send_envelope(event);
-         } FC_LOG_AND_DROP("external_debugging_plugin: error sending envelope to {}", impl->server_url)
+
+         } FC_LOG_AND_DROP("external_debugging_plugin: error sending envelope to {}: {}", impl->server_url, event_json);
       });
 
    // Connect to batch_operator_plugin signal
