@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
+#include <thread>
 #include <vector>
 #include <string>
 #include <functional>
@@ -72,9 +73,26 @@ public:
 private:
    // Parallel snapshot loading creates objects across multiple threads, each
    // allocating shared_blob storage through different index types concurrently.
+   // TTAS with bounded pause then yield: avoids cache-line ping-pong on the
+   // test_and_set and prevents livelock when the holder is preempted (common
+   // under ASan / heavily-loaded CI runners).
    struct spin_guard {
       std::atomic_flag& _flag;
-      spin_guard(std::atomic_flag& f) : _flag(f) { while (_flag.test_and_set(std::memory_order_acquire)); }
+      spin_guard(std::atomic_flag& f) : _flag(f) {
+         while (_flag.test_and_set(std::memory_order_acquire)) {
+            for (unsigned spins = 0; _flag.test(std::memory_order_relaxed); ++spins) {
+               if (spins < 16) {
+#if defined(__x86_64__) || defined(__i386__)
+                  __builtin_ia32_pause();
+#elif defined(__aarch64__)
+                  asm volatile("yield" ::: "memory");
+#endif
+               } else {
+                  std::this_thread::yield();
+               }
+            }
+         }
+      }
       ~spin_guard() { _flag.clear(std::memory_order_release); }
    };
 
