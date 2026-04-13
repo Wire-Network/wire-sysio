@@ -1,3 +1,4 @@
+.remember
 *.tsbuildinfo
 .env
 .local*/
@@ -43,6 +44,7 @@ libraries/types/type_generator
 libraries/types/types_test
 libraries/fc/test/crypto/test_cypher_suites
 libraries/testing/chain_tester
+
 
 libraries/wallet/Doxyfile
 libraries/wallet/api_documentation.cpp

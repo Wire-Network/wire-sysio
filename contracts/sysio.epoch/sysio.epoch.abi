@@ -1,0 +1,252 @@
+{
+    "____comment": "This file was generated with sysio-abigen. DO NOT EDIT ",
+    "version": "sysio::abi/1.2",
+    "types": [
+        {
+            "new_type_name": "B_vector_name_E",
+            "type": "name[]"
+        }
+    ],
+    "structs": [
+        {
+            "name": "advance",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "epoch_config",
+            "base": "",
+            "fields": [
+                {
+                    "name": "epoch_duration_sec",
+                    "type": "uint32"
+                },
+                {
+                    "name": "operators_per_epoch",
+                    "type": "uint32"
+                },
+                {
+                    "name": "batch_operator_minimum_active",
+                    "type": "uint32"
+                },
+                {
+                    "name": "batch_op_groups",
+                    "type": "uint32"
+                },
+                {
+                    "name": "attestation_retention_epoch_count",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "epoch_state",
+            "base": "",
+            "fields": [
+                {
+                    "name": "current_epoch_index",
+                    "type": "uint32"
+                },
+                {
+                    "name": "current_epoch_start",
+                    "type": "time_point"
+                },
+                {
+                    "name": "next_epoch_start",
+                    "type": "time_point"
+                },
+                {
+                    "name": "current_batch_op_group",
+                    "type": "uint8"
+                },
+                {
+                    "name": "batch_op_groups",
+                    "type": "B_vector_name_E[]"
+                },
+                {
+                    "name": "last_consensus_hash",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "is_paused",
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "initgroups",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "outpost_info",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "chain_kind",
+                    "type": "ChainKind"
+                },
+                {
+                    "name": "chain_id",
+                    "type": "uint32"
+                },
+                {
+                    "name": "last_inbound_msg_id",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "last_outbound_msg_id",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "last_inbound_epoch",
+                    "type": "uint32"
+                },
+                {
+                    "name": "last_outbound_epoch",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "pause",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "regoutpost",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_kind",
+                    "type": "ChainKind"
+                },
+                {
+                    "name": "chain_id",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "setconfig",
+            "base": "",
+            "fields": [
+                {
+                    "name": "epoch_duration_sec",
+                    "type": "uint32"
+                },
+                {
+                    "name": "operators_per_epoch",
+                    "type": "uint32"
+                },
+                {
+                    "name": "batch_operator_minimum_active",
+                    "type": "uint32"
+                },
+                {
+                    "name": "batch_op_groups",
+                    "type": "uint32"
+                },
+                {
+                    "name": "attestation_retention_epoch_count",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "unpause",
+            "base": "",
+            "fields": []
+        }
+    ],
+    "actions": [
+        {
+            "name": "advance",
+            "type": "advance",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "initgroups",
+            "type": "initgroups",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "pause",
+            "type": "pause",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "regoutpost",
+            "type": "regoutpost",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "setconfig",
+            "type": "setconfig",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "unpause",
+            "type": "unpause",
+            "ricardian_contract": ""
+        }
+    ],
+    "tables": [
+        {
+            "name": "epochcfg",
+            "type": "epoch_config",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
+            "name": "epochstate",
+            "type": "epoch_state",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
+            "name": "outposts",
+            "type": "outpost_info",
+            "index_type": "i64",
+            "key_names": ["table_name","scope","primary_key"],
+            "key_types": ["name","name","uint64"]
+        }
+    ],
+    "ricardian_clauses": [],
+    "variants": [],
+    "action_results": [],
+    "enums": [
+        {
+            "name": "ChainKind",
+            "type": "int32",
+            "values": [
+                {
+                    "name": "CHAIN_KIND_UNKNOWN",
+                    "value": 0
+                },
+                {
+                    "name": "CHAIN_KIND_WIRE",
+                    "value": 1
+                },
+                {
+                    "name": "CHAIN_KIND_ETHEREUM",
+                    "value": 2
+                },
+                {
+                    "name": "CHAIN_KIND_SOLANA",
+                    "value": 3
+                },
+                {
+                    "name": "CHAIN_KIND_SUI",
+                    "value": 4
+                }
+            ]
+        }
+    ]
+}

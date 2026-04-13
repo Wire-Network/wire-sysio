@@ -1,0 +1,108 @@
+syntax = "proto3";
+
+package sysio.opp.debugging;
+
+option cc_enable_arenas = true;
+
+// ---------------------------------------------------------------------------
+//  OPP Debugging endpoint direction
+// ---------------------------------------------------------------------------
+
+enum DebugOutpostEndpointsType {
+  DEBUG_OUTPOST_ENDPOINTS_TYPE_UNKNOWN = 0;
+  DEBUG_OUTPOST_ENDPOINTS_TYPE_OUTPOST_ETHEREUM_DEPOT = 1;
+  DEBUG_OUTPOST_ENDPOINTS_TYPE_OUTPOST_SOLANA_DEPOT = 2;
+  DEBUG_OUTPOST_ENDPOINTS_TYPE_DEPOT_OUTPOST_ETHEREUM = 3;
+  DEBUG_OUTPOST_ENDPOINTS_TYPE_DEPOT_OUTPOST_SOLANA = 4;
+}
+
+// ---------------------------------------------------------------------------
+//  Envelope data record — sent by opp_tracking_plugin to debugging server
+// ---------------------------------------------------------------------------
+
+message DebugEnvelopeDataRecord {
+  string                       batch_op_name   = 1;
+  DebugOutpostEndpointsType    endpoints_type  = 2;
+  bytes                        envelope_data   = 3;
+}
+
+// ---------------------------------------------------------------------------
+//  Envelope metadata record — stored alongside data files on the server
+// ---------------------------------------------------------------------------
+
+message DebugEnvelopeMetadataRecord {
+  int64           checksum       = 1;
+  repeated string batch_op_names = 2;
+}
+
+// ---------------------------------------------------------------------------
+//  API request/response messages — used as JSON-encoded bodies for all
+//  debugging server endpoints. Both C++ and TS use protobuf's JSON
+//  serialization (MessageToJsonString / toJson) instead of hand-building.
+// ---------------------------------------------------------------------------
+
+// PUT /api/opp/envelope — request
+message PutEnvelopeRequest {
+  string                       batch_op_name      = 1;
+  DebugOutpostEndpointsType    endpoints_type     = 2;
+  bytes                        envelope_data      = 3;
+}
+
+// PUT /api/opp/envelope — response
+message PutEnvelopeResponse {
+  string          key            = 1;
+  bool            data_existed   = 2;
+  repeated string batch_op_names = 3;
+}
+
+// ---------------------------------------------------------------------------
+//  List envelopes — query stored envelopes with optional filters
+// ---------------------------------------------------------------------------
+
+// POST /api/opp/envelope/list — request
+message ListEnvelopesRequest {
+  // Optional filters — omit or zero-value to skip
+  uint32                    epoch_start      = 1;  // inclusive, 0 = no lower bound
+  uint32                    epoch_end        = 2;  // inclusive, 0 = no upper bound
+  DebugOutpostEndpointsType endpoints_type   = 3;  // UNKNOWN = no filter
+  int64                     timestamp_start  = 4;  // unix ms, 0 = no lower bound
+  int64                     timestamp_end    = 5;  // unix ms, 0 = no upper bound
+}
+
+// A single entry in a list response
+message EnvelopeListEntry {
+  string                    key              = 1;
+  uint32                    epoch_index      = 2;
+  DebugOutpostEndpointsType endpoints_type   = 3;
+  string                    checksum         = 4;
+  repeated string           batch_op_names   = 5;
+  int64                     timestamp        = 6;  // file mtime, unix ms
+  uint32                    data_size        = 7;  // envelope data size in bytes
+}
+
+// POST /api/opp/envelope/list — response
+message ListEnvelopesResponse {
+  repeated EnvelopeListEntry entries = 1;
+  uint32                     total   = 2;
+}
+
+// ---------------------------------------------------------------------------
+//  Get envelope — retrieve a specific stored envelope by key
+// ---------------------------------------------------------------------------
+
+// POST /api/opp/envelope/get — request
+message GetEnvelopeRequest {
+  string key = 1;
+}
+
+// POST /api/opp/envelope/get — response
+message GetEnvelopeResponse {
+  string                    key              = 1;
+  uint32                    epoch_index      = 2;
+  DebugOutpostEndpointsType endpoints_type   = 3;
+  string                    checksum         = 4;
+  repeated string           batch_op_names   = 5;
+  int64                     timestamp        = 6;
+  uint32                    data_size        = 7;
+  bytes                     envelope_data    = 8;  // raw protobuf Envelope bytes
+}

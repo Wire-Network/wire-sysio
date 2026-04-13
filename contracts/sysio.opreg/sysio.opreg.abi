@@ -1,0 +1,476 @@
+{
+    "____comment": "This file was generated with sysio-abigen. DO NOT EDIT ",
+    "version": "sysio::abi/1.2",
+    "types": [
+        {
+            "new_type_name": "vint64_t",
+            "type": "varint_int64"
+        }
+    ],
+    "structs": [
+        {
+            "name": "ChainAddress",
+            "base": "",
+            "fields": [
+                {
+                    "name": "kind",
+                    "type": "ChainKind"
+                },
+                {
+                    "name": "address",
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
+            "name": "TokenAmount",
+            "base": "",
+            "fields": [
+                {
+                    "name": "kind",
+                    "type": "TokenKind"
+                },
+                {
+                    "name": "amount",
+                    "type": "vint64_t"
+                }
+            ]
+        },
+        {
+            "name": "op_config",
+            "base": "",
+            "fields": [
+                {
+                    "name": "req_prod_stakes",
+                    "type": "stake_requirement[]"
+                },
+                {
+                    "name": "req_batchop_stakes",
+                    "type": "stake_requirement[]"
+                },
+                {
+                    "name": "req_uw_stakes",
+                    "type": "stake_requirement[]"
+                },
+                {
+                    "name": "max_available_producers",
+                    "type": "uint32"
+                },
+                {
+                    "name": "max_available_batch_ops",
+                    "type": "uint32"
+                },
+                {
+                    "name": "max_available_underwriters",
+                    "type": "uint32"
+                },
+                {
+                    "name": "terminate_prune_delay_ms",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "operator_entry",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "type",
+                    "type": "OperatorType"
+                },
+                {
+                    "name": "status",
+                    "type": "OperatorStatus"
+                },
+                {
+                    "name": "is_bootstrapped",
+                    "type": "bool"
+                },
+                {
+                    "name": "stakes",
+                    "type": "stake_entry[]"
+                },
+                {
+                    "name": "registered_at",
+                    "type": "uint64"
+                },
+                {
+                    "name": "available_at",
+                    "type": "uint64"
+                },
+                {
+                    "name": "slashed_at",
+                    "type": "uint64"
+                },
+                {
+                    "name": "terminated_at",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "processbatch",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "was_eligible",
+                    "type": "bool"
+                },
+                {
+                    "name": "is_eligible",
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "processprod",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "was_eligible",
+                    "type": "bool"
+                },
+                {
+                    "name": "is_eligible",
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "processuw",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "was_eligible",
+                    "type": "bool"
+                },
+                {
+                    "name": "is_eligible",
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "prune",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "regoperator",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "type",
+                    "type": "OperatorType"
+                },
+                {
+                    "name": "is_bootstrapped",
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "setconfig",
+            "base": "",
+            "fields": [
+                {
+                    "name": "max_available_producers",
+                    "type": "uint32"
+                },
+                {
+                    "name": "max_available_batch_ops",
+                    "type": "uint32"
+                },
+                {
+                    "name": "max_available_underwriters",
+                    "type": "uint32"
+                },
+                {
+                    "name": "terminate_prune_delay_ms",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "slash",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "reason",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "stake",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "chain_addr",
+                    "type": "ChainAddress"
+                },
+                {
+                    "name": "amount",
+                    "type": "TokenAmount"
+                }
+            ]
+        },
+        {
+            "name": "stake_entry",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_addr",
+                    "type": "ChainAddress"
+                },
+                {
+                    "name": "amount",
+                    "type": "TokenAmount"
+                },
+                {
+                    "name": "timestamp_ms",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "stake_requirement",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_addr",
+                    "type": "ChainAddress"
+                },
+                {
+                    "name": "min_amount",
+                    "type": "TokenAmount"
+                },
+                {
+                    "name": "config_timestamp_ms",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "varint_int64",
+            "base": "",
+            "fields": [
+                {
+                    "name": "value",
+                    "type": "int64"
+                }
+            ]
+        }
+    ],
+    "actions": [
+        {
+            "name": "processbatch",
+            "type": "processbatch",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "processprod",
+            "type": "processprod",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "processuw",
+            "type": "processuw",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "prune",
+            "type": "prune",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "regoperator",
+            "type": "regoperator",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "setconfig",
+            "type": "setconfig",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "slash",
+            "type": "slash",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "stake",
+            "type": "stake",
+            "ricardian_contract": ""
+        }
+    ],
+    "tables": [
+        {
+            "name": "opconfig",
+            "type": "op_config",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
+            "name": "operators",
+            "type": "operator_entry",
+            "index_type": "i64",
+            "key_names": ["table_name","scope","primary_key"],
+            "key_types": ["name","name","uint64"]
+        }
+    ],
+    "ricardian_clauses": [],
+    "variants": [],
+    "action_results": [],
+    "enums": [
+        {
+            "name": "ChainKind",
+            "type": "int32",
+            "values": [
+                {
+                    "name": "CHAIN_KIND_UNKNOWN",
+                    "value": 0
+                },
+                {
+                    "name": "CHAIN_KIND_WIRE",
+                    "value": 1
+                },
+                {
+                    "name": "CHAIN_KIND_ETHEREUM",
+                    "value": 2
+                },
+                {
+                    "name": "CHAIN_KIND_SOLANA",
+                    "value": 3
+                },
+                {
+                    "name": "CHAIN_KIND_SUI",
+                    "value": 4
+                }
+            ]
+        },
+        {
+            "name": "OperatorStatus",
+            "type": "int32",
+            "values": [
+                {
+                    "name": "OPERATOR_STATUS_UNKNOWN",
+                    "value": 0
+                },
+                {
+                    "name": "OPERATOR_STATUS_WARMUP",
+                    "value": 1
+                },
+                {
+                    "name": "OPERATOR_STATUS_COOLDOWN",
+                    "value": 2
+                },
+                {
+                    "name": "OPERATOR_STATUS_ACTIVE",
+                    "value": 3
+                },
+                {
+                    "name": "OPERATOR_STATUS_TERMINATED",
+                    "value": 240
+                },
+                {
+                    "name": "OPERATOR_STATUS_SLASHED",
+                    "value": 241
+                }
+            ]
+        },
+        {
+            "name": "OperatorType",
+            "type": "int32",
+            "values": [
+                {
+                    "name": "OPERATOR_TYPE_UNKNOWN",
+                    "value": 0
+                },
+                {
+                    "name": "OPERATOR_TYPE_PRODUCER",
+                    "value": 1
+                },
+                {
+                    "name": "OPERATOR_TYPE_BATCH",
+                    "value": 2
+                },
+                {
+                    "name": "OPERATOR_TYPE_UNDERWRITER",
+                    "value": 3
+                },
+                {
+                    "name": "OPERATOR_TYPE_CHALLENGER",
+                    "value": 4
+                }
+            ]
+        },
+        {
+            "name": "TokenKind",
+            "type": "int32",
+            "values": [
+                {
+                    "name": "TOKEN_KIND_WIRE",
+                    "value": 0
+                },
+                {
+                    "name": "TOKEN_KIND_ETH",
+                    "value": 256
+                },
+                {
+                    "name": "TOKEN_KIND_ERC20",
+                    "value": 257
+                },
+                {
+                    "name": "TOKEN_KIND_ERC721",
+                    "value": 258
+                },
+                {
+                    "name": "TOKEN_KIND_ERC1155",
+                    "value": 259
+                },
+                {
+                    "name": "TOKEN_KIND_LIQETH",
+                    "value": 496
+                },
+                {
+                    "name": "TOKEN_KIND_SOL",
+                    "value": 512
+                },
+                {
+                    "name": "TOKEN_KIND_LIQSOL",
+                    "value": 752
+                }
+            ]
+        }
+    ]
+}

@@ -784,7 +784,9 @@ std::string abi::to_event_signature(const contract& contract) {
 fc::crypto::keccak256 abi::to_event_topic(const contract& contract) {
    FC_ASSERT(contract.type == invoke_target_type::event, "ABI contract must be an event");
    auto signature = abi::to_event_signature(contract);
-   return fc::crypto::keccak256::hash(signature);
+   auto topic = fc::crypto::keccak256::hash(signature);
+   dlog("abi::to_event_topic: name={}, signature={}, topic=0x{}", contract.name, signature, topic.str());
+   return topic;
 }
 
 /**
@@ -807,7 +809,15 @@ std::vector<abi::contract> abi::parse_contracts(const std::filesystem::path& jso
       json_var.is_object() && json_var.get_object().contains("abi") && json_var.get_object()["abi"].is_array(),
       "ABI file must contain either an array of contracts or an object with a member (\"abi\") with an array value");
    auto& json_obj = json_var.get_object();
-   return json_obj["abi"].as<std::vector<abi::contract>>();
+   auto contracts = json_obj["abi"].as<std::vector<abi::contract>>();
+
+   // Propagate file-level address to each contract entry if present
+   if (json_obj.contains("address") && json_obj["address"].is_string()) {
+      auto addr = json_obj["address"].as_string();
+      for (auto& c : contracts) c.contract_address = addr;
+   }
+
+   return contracts;
 }
 
 /**
@@ -1053,10 +1063,7 @@ void fc::from_variant(const fc::variant& var, fc::network::ethereum::abi::contra
    vo.type = fc::reflector<fc::network::ethereum::abi::invoke_target_type>::from_string(type_str.c_str());
 
    auto parse_components = [&](std::vector<component_type>& vo_list, const std::string& list_name) {
-      auto list_prop_exists = obj.contains(list_name.c_str());
-      if (!list_prop_exists || !obj[list_name].is_array()) {
-         dlog("ABI property is not set or not array (name={},exists={},is_array={})", list_name, list_prop_exists,
-              obj[list_name].is_array(), "ABI contract inputs must be an array");
+      if (!obj.contains(list_name.c_str()) || !obj[list_name].is_array()) {
          return;
       }
 

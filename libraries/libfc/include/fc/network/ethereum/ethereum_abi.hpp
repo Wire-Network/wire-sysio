@@ -171,6 +171,8 @@ struct contract {
    abi::invoke_target_type type;
    std::vector<component_type> inputs;
    std::vector<component_type> outputs;
+   /** Deployed contract address (hex string, optional — populated from ABI file metadata). */
+   std::string contract_address;
 };
 
 std::string to_contract_component_signature(const component_type& component);

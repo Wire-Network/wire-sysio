@@ -113,7 +113,7 @@ int main(int argc, char* argv[]) {
       {
          FC_ASSERT(eth_abi_files.size() >= 2, "2+ ABI file is required (--ethereum-abi-file <json-array-file>)");
          auto& [eth_abi_file, eth_abi_contracts] = eth_abi_files[1];
-         auto opp_events = client->get_events("0x26B8d2fD1091b1B13a294791700FBEb0C152dF4b", {"OPPMessage"},
+         auto opp_events = client->get_events("0x26B8d2fD1091b1B13a294791700FBEb0C152dF4b", {"OPPEnvelope"},
                                               eth_abi_contracts, block_tag_latest);
          for (auto& opp_event : opp_events) {
             auto json_str = fc::json::to_pretty_string(opp_event, time_point::maximum());
@@ -123,7 +123,7 @@ int main(int argc, char* argv[]) {
             if (!decoded_event_res) {
                elog("FAILED event_decode: {}", decoded_event_res.error().to_detail_string());
             } else {
-               ilog("event_decoded(OPPMessage): {}", fc::json::to_pretty_string(
+               ilog("event_decoded(OPPEnvelope): {}", fc::json::to_pretty_string(
                   decoded_event_res.value(), time_point::maximum()));
             }
          }

@@ -1,0 +1,258 @@
+{
+    "____comment": "This file was generated with sysio-abigen. DO NOT EDIT ",
+    "version": "sysio::abi/1.2",
+    "types": [],
+    "structs": [
+        {
+            "name": "challenge_entry",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "chain_request_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "epoch_index",
+                    "type": "uint32"
+                },
+                {
+                    "name": "round",
+                    "type": "uint8"
+                },
+                {
+                    "name": "status",
+                    "type": "ChallengeStatus"
+                },
+                {
+                    "name": "challenge_hash",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "response_hash",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "correct_operators",
+                    "type": "name[]"
+                },
+                {
+                    "name": "faulty_operators",
+                    "type": "name[]"
+                },
+                {
+                    "name": "challenged_at",
+                    "type": "time_point"
+                },
+                {
+                    "name": "responded_at",
+                    "type": "time_point"
+                }
+            ]
+        },
+        {
+            "name": "enforce",
+            "base": "",
+            "fields": [
+                {
+                    "name": "resolution_id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "escalate",
+            "base": "",
+            "fields": [
+                {
+                    "name": "challenge_id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "initchal",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_req_id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "manual_resolution",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "challenge_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "original_chain_hash",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "round1_chain_hash",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "round2_chain_hash",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "msig_proposal",
+                    "type": "name"
+                },
+                {
+                    "name": "is_resolved",
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "slashop",
+            "base": "",
+            "fields": [
+                {
+                    "name": "operator_acct",
+                    "type": "name"
+                },
+                {
+                    "name": "reason",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "submitres",
+            "base": "",
+            "fields": [
+                {
+                    "name": "submitter",
+                    "type": "name"
+                },
+                {
+                    "name": "challenge_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "orig_hash",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "r1_hash",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "r2_hash",
+                    "type": "checksum256"
+                }
+            ]
+        },
+        {
+            "name": "submitresp",
+            "base": "",
+            "fields": [
+                {
+                    "name": "challenge_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "response_hash",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "correct_ops",
+                    "type": "name[]"
+                },
+                {
+                    "name": "faulty_ops",
+                    "type": "name[]"
+                }
+            ]
+        }
+    ],
+    "actions": [
+        {
+            "name": "enforce",
+            "type": "enforce",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "escalate",
+            "type": "escalate",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "initchal",
+            "type": "initchal",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "slashop",
+            "type": "slashop",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "submitres",
+            "type": "submitres",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "submitresp",
+            "type": "submitresp",
+            "ricardian_contract": ""
+        }
+    ],
+    "tables": [
+        {
+            "name": "challenges",
+            "type": "challenge_entry",
+            "index_type": "i64",
+            "key_names": ["table_name","scope","primary_key"],
+            "key_types": ["name","name","uint64"]
+        },
+        {
+            "name": "resolutions",
+            "type": "manual_resolution",
+            "index_type": "i64",
+            "key_names": ["table_name","scope","primary_key"],
+            "key_types": ["name","name","uint64"]
+        }
+    ],
+    "ricardian_clauses": [],
+    "variants": [],
+    "action_results": [],
+    "enums": [
+        {
+            "name": "ChallengeStatus",
+            "type": "int32",
+            "values": [
+                {
+                    "name": "CHALLENGE_STATUS_CHALLENGE_SENT",
+                    "value": 0
+                },
+                {
+                    "name": "CHALLENGE_STATUS_RESPONSE_RECEIVED",
+                    "value": 1
+                },
+                {
+                    "name": "CHALLENGE_STATUS_RESOLVED",
+                    "value": 2
+                },
+                {
+                    "name": "CHALLENGE_STATUS_ESCALATED",
+                    "value": 3
+                }
+            ]
+        }
+    ]
+}

@@ -25,8 +25,8 @@ endif()
 project(wire-sysio)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-include(build-init NO_POLICY_SCOPE)
 include(build-options NO_POLICY_SCOPE)
+include(build-init NO_POLICY_SCOPE)
 include(compiler-config NO_POLICY_SCOPE)
 include(dependencies NO_POLICY_SCOPE)
 include(linker-config NO_POLICY_SCOPE)
@@ -39,15 +39,9 @@ include(contract-tools NO_POLICY_SCOPE)
 include(CTest) # suppresses DartConfiguration.tcl error
 enable_testing()
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-
 include(GNUInstallDirs)
 include(MASSigning)
 include(AddTestHelpers)
-
-# Options
-option(ENABLE_WERROR "Enable `-Werror` compilation flag." Off)
-option(ENABLE_WEXTRA "Enable `-Wextra` compilation flag." Off)
 
 set(CLI_CLIENT_EXECUTABLE_NAME clio)
 set(NODE_EXECUTABLE_NAME nodeop)
@@ -73,7 +67,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS "ON")
 set(BUILD_DOXYGEN FALSE CACHE BOOL "Build doxygen documentation on every make")
 set(ENABLE_MULTIVERSION_PROTOCOL_TEST FALSE CACHE BOOL "Enable nodeop multiversion protocol test")
 
-option(ENABLE_OC "Enable sysvm-oc on supported platforms" ON)
+
 
 # WASM runtimes to enable. Each runtime in this list will have:
 #  * definition SYSIO_<RUNTIME>_RUNTIME_ENABLED defined in public libchain interface
@@ -93,50 +87,10 @@ if(CMAKE_SIZEOF_VOID_P EQUAL 8 AND NOT WIN32)
 endif()
 
 # Native-module runtime: only in Debug builds (used for debugger-attached contract execution)
-if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND CMAKE_SIZEOF_VOID_P EQUAL 8 AND NOT WIN32)
+if(DEBUG_ENABLED AND CMAKE_SIZEOF_VOID_P EQUAL 8 AND NOT WIN32)
   list(APPEND SYSIO_WASM_RUNTIMES native-module)
 endif()
 
-if(UNIX)
-  if(APPLE)
-    set(whole_archive_flag "-force_load")
-    set(no_whole_archive_flag "")
-  else()
-    set(whole_archive_flag "--whole-archive")
-    set(no_whole_archive_flag "--no-whole-archive")
-  endif()
-else()
-  set(whole_archive_flag "--whole-archive")
-  set(no_whole_archive_flag "--no-whole-archive")
-endif()
-
-if(APPLE AND UNIX)
-  # Apple Specific Options Here
-  message(STATUS "Configuring WIRE on macOS")
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}   -Wall -Wno-deprecated-declarations")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-deprecated-declarations")
-else()
-  # Linux Specific Options Here
-  message(STATUS "Configuring WIRE on Linux")
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}   -Wall")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
-  if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-    if(CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 4.0.0 OR CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 4.0.0)
-      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-invalid-partial-specialization")
-    endif()
-  endif()
-endif()
-
-if(ENABLE_WERROR)
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}   -Werror")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
-endif()
-if(ENABLE_WEXTRA)
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}   -Wextra")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra")
-endif()
-
-option(SYSIO_ENABLE_DEVELOPER_OPTIONS "enable developer options for WIRE" OFF)
 
 # based on http://www.delorie.com/gnu/docs/gdb/gdb_70.html
 # uncomment this line to tell GDB about macros (slows compile times)
@@ -242,10 +196,6 @@ install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/tests/TestHarness DESTINATION ${CM
   PATTERN "*.json"
   PATTERN "__pycache__" EXCLUDE
   PATTERN "CMakeFiles" EXCLUDE)
-
-# install(DIRECTORY "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/share/softfloat/" DESTINATION share/softfloat)
-install(DIRECTORY "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/include/" DESTINATION include)
-install(DIRECTORY "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/lib/" DESTINATION lib)
 
 if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.21)
   # Cmake versions < 3.21 did not support installing symbolic links to a directory via install(FILES ...)

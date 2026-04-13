@@ -6,6 +6,7 @@
 #include <boost/asio/io_context.hpp>
 
 #include <string>
+#include <variant>
 #include <vector>
 #include <optional>
 #include <fc/network/url.hpp>
@@ -13,6 +14,13 @@
 namespace fc::network::json_rpc {
 
 namespace asio = boost::asio;
+
+// -----------------------------------------------------------------------
+//  HTTP verb — used by send_http and typed REST methods.
+//  Existing JSON-RPC methods (call, notify, call_batch) are unchanged
+//  and always use POST internally.
+// -----------------------------------------------------------------------
+enum class http_verb { GET, PUT, POST, DELETE_ };
 
 // JSON-RPC error type
 struct json_rpc_error : fc::exception {
@@ -22,11 +30,17 @@ struct json_rpc_error : fc::exception {
    json_rpc_error(int code_in, const std::string& message, const variant& data_in = {});
 };
 
-// Simple synchronous JSON-RPC 2.0 client over HTTP/1.1
+// Simple synchronous JSON-RPC 2.0 client over HTTP/1.1, extended with
+// raw HTTP verb support for REST-style endpoints.
 class json_rpc_client {
 public:
    explicit json_rpc_client(fc::url                           url,
                             const std::optional<std::string>& user_agent = std::nullopt);
+
+   // -----------------------------------------------------------------------
+   //  JSON-RPC 2.0 methods (unchanged, backwards compatible)
+   // -----------------------------------------------------------------------
+
    // Perform a JSON-RPC request and return the "result" member.
    // Throws json_rpc_error for JSON-RPC error and std::runtime_error for transport/protocol issues.
    fc::variant call(const std::string& method, const fc::variant& params = variants{});
@@ -36,11 +50,17 @@ public:
    void notify(const std::string& method, const fc::variant& params = variants{});
 
    // Batch call. 'requests' is an array of JSON-RPC request/notification objects.
-   // For convenience, this method will:
-   //  - Assign ids to any requests (objects with "method" but no "id") and
-   //    track them so you can match responses.
-   // Returns the raw JSON array of responses.
    variant call_batch(const std::vector<variant>& requests);
+
+   // -----------------------------------------------------------------------
+   //  Raw HTTP verb support — for REST-style endpoints.
+   //  Does NOT wrap in JSON-RPC envelope.
+   // -----------------------------------------------------------------------
+
+   /// Raw HTTP with verb + path + body. Returns the response body string.
+   std::string send_http(http_verb verb, const std::string& path,
+                         const std::string& body = "",
+                         const std::string& content_type = "application/json");
 
    static json_rpc_client create(const std::variant<std::string, fc::url>& source);
 
