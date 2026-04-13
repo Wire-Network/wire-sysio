@@ -312,6 +312,109 @@ struct trace_api_rpc_plugin_impl : public std::enable_shared_from_this<trace_api
              http_plugin::handle_exception("trace_api", "get_transaction", body, cb);
           }
       }});
+
+      http.add_async_handler({"/v1/trace_api/get_actions",
+            api_category::trace_api,
+            [this](std::string, std::string body, url_response_callback cb)
+      {
+         action_query query;
+         if (!body.empty()) {
+            try {
+               auto input = fc::json::from_string(body);
+               const auto& obj = input.get_object();
+               if (obj.contains("receiver"))
+                  query.receiver = chain::name(obj["receiver"].as_string());
+               if (obj.contains("account"))
+                  query.account = chain::name(obj["account"].as_string());
+               if (obj.contains("action"))
+                  query.action = chain::name(obj["action"].as_string());
+               if (obj.contains("block_num_start"))
+                  query.block_num_start = obj["block_num_start"].as<uint32_t>();
+               if (obj.contains("block_num_end"))
+                  query.block_num_end = obj["block_num_end"].as<uint32_t>();
+               if (obj.contains("after_global_seq"))
+                  query.after_global_seq = obj["after_global_seq"].as_uint64();
+               if (obj.contains("limit"))
+                  query.limit = std::min(obj["limit"].as<uint32_t>(), 1000u);
+            } catch (...) {
+               error_results results{400, "Bad request body"};
+               cb( 400, fc::variant( results ));
+               return;
+            }
+         }
+
+         if (query.block_num_start > query.block_num_end) {
+            error_results results{400, "block_num_start must be <= block_num_end"};
+            cb( 400, fc::variant( results ));
+            return;
+         }
+
+         try {
+            auto result = req_handler->get_actions(query);
+            cb( 200, fc::mutable_variant_object()
+               ("actions",         result.actions)
+               ("more",            result.more)
+               ("last_global_seq", result.last_global_seq)
+            );
+         } catch (...) {
+            http_plugin::handle_exception("trace_api", "get_actions", body, cb);
+         }
+      }});
+
+      http.add_async_handler({"/v1/trace_api/get_token_transfers",
+            api_category::trace_api,
+            [this](std::string, std::string body, url_response_callback cb)
+      {
+         // Convenience wrapper: receiver=account=token_contract, action=transfer.
+         // Using receiver=token_contract ensures exactly one result per transfer
+         // (no duplicate inline-notification entries for the recipient).
+         action_query query;
+         query.action = chain::name("transfer");
+
+         if (!body.empty()) {
+            try {
+               auto input = fc::json::from_string(body);
+               const auto& obj = input.get_object();
+               chain::name token_contract("sysio.token");
+               if (obj.contains("token_contract"))
+                  token_contract = chain::name(obj["token_contract"].as_string());
+               query.receiver = token_contract;
+               query.account  = token_contract;
+               if (obj.contains("block_num_start"))
+                  query.block_num_start = obj["block_num_start"].as<uint32_t>();
+               if (obj.contains("block_num_end"))
+                  query.block_num_end = obj["block_num_end"].as<uint32_t>();
+               if (obj.contains("after_global_seq"))
+                  query.after_global_seq = obj["after_global_seq"].as_uint64();
+               if (obj.contains("limit"))
+                  query.limit = std::min(obj["limit"].as<uint32_t>(), 1000u);
+            } catch (...) {
+               error_results results{400, "Bad request body"};
+               cb( 400, fc::variant( results ));
+               return;
+            }
+         } else {
+            query.receiver = chain::name("sysio.token");
+            query.account  = chain::name("sysio.token");
+         }
+
+         if (query.block_num_start > query.block_num_end) {
+            error_results results{400, "block_num_start must be <= block_num_end"};
+            cb( 400, fc::variant( results ));
+            return;
+         }
+
+         try {
+            auto result = req_handler->get_actions(query);
+            cb( 200, fc::mutable_variant_object()
+               ("transfers",       result.actions)
+               ("more",            result.more)
+               ("last_global_seq", result.last_global_seq)
+            );
+         } catch (...) {
+            http_plugin::handle_exception("trace_api", "get_token_transfers", body, cb);
+         }
+      }});
    }
 
    void plugin_shutdown() {

@@ -8,6 +8,7 @@ add_executable( test_trace_api_plugin
         test_compressed_file.cpp
         test_trx_id_index.cpp
         test_abi_store.cpp
+        test_get_actions.cpp
         main.cpp
         )
 target_link_libraries( test_trace_api_plugin trace_api_plugin )
