@@ -237,9 +237,11 @@ namespace sysio::trace_api {
 
       /**
        * Derive the slice number from a trx_id slice file path.
-       * Parses the block-range start from the filename.
+       * Parses the block-range start from the filename.  Returns nullopt if
+       * the filename does not parse (callers should fall back to a slower
+       * lookup path rather than skipping the file silently).
        */
-      uint32_t slice_number_from_path(const std::filesystem::path& trx_id_path) const;
+      std::optional<uint32_t> slice_number_from_path(const std::filesystem::path& trx_id_path) const;
 
       /**
        * Find the trx_id index file for a given slice number (or return nullopt if not present).

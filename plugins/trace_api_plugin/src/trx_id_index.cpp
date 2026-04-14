@@ -1,8 +1,8 @@
 #include <sysio/trace_api/trx_id_index.hpp>
+#include <sysio/trace_api/logging.hpp>
 #include <sysio/trace_api/store_provider.hpp>
 
 #include <fc/io/raw.hpp>
-#include <fc/log/logger.hpp>
 
 #include <bit>
 #include <cstring>
@@ -84,11 +84,11 @@ trx_id_index_reader::trx_id_index_reader(const std::filesystem::path& path) {
 
       const auto header = extract_store<trx_id_index_header>(f);
       if (header.magic != trx_id_index_header::magic_value) {
-         wlog("trace_api: trx_id index {} has wrong magic, ignoring", path.generic_string());
+         fc_wlog(_log,"trace_api: trx_id index {} has wrong magic, ignoring", path.generic_string());
          return;
       }
       if (header.version != trx_id_index_header::current_version) {
-         wlog("trace_api: trx_id index {} has unsupported version {}, ignoring",
+         fc_wlog(_log,"trace_api: trx_id index {} has unsupported version {}, ignoring",
               path.generic_string(), header.version);
          return;
       }
@@ -99,13 +99,13 @@ trx_id_index_reader::trx_id_index_reader(const std::filesystem::path& path) {
 
       // Open-addressing math (mask = bucket_count - 1) requires a power of two.
       if (!std::has_single_bit(header.bucket_count)) {
-         wlog("trace_api: trx_id index {} bucket_count {} is not a power of two, ignoring",
+         fc_wlog(_log,"trace_api: trx_id index {} bucket_count {} is not a power of two, ignoring",
               path.generic_string(), header.bucket_count);
          return;
       }
       // Cap allocation against malicious / corrupt headers.
       if (header.bucket_count > max_bucket_count) {
-         wlog("trace_api: trx_id index {} bucket_count {} exceeds cap {}, ignoring",
+         fc_wlog(_log,"trace_api: trx_id index {} bucket_count {} exceeds cap {}, ignoring",
               path.generic_string(), header.bucket_count, max_bucket_count);
          return;
       }
@@ -114,7 +114,7 @@ trx_id_index_reader::trx_id_index_reader(const std::filesystem::path& path) {
                                      uint64_t{header.bucket_count} * sizeof(trx_id_bucket);
       const uint64_t actual_size = std::filesystem::file_size(path);
       if (actual_size != expected_size) {
-         wlog("trace_api: trx_id index {} size {} != expected {}, ignoring",
+         fc_wlog(_log,"trace_api: trx_id index {} size {} != expected {}, ignoring",
               path.generic_string(), actual_size, expected_size);
          return;
       }
@@ -126,7 +126,7 @@ trx_id_index_reader::trx_id_index_reader(const std::filesystem::path& path) {
       }
       _valid = true;
    } catch (...) {
-      wlog("trace_api: failed to load trx_id index from {}", path.generic_string());
+      fc_wlog(_log,"trace_api: failed to load trx_id index from {}", path.generic_string());
    }
 }
 

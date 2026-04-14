@@ -2,10 +2,10 @@
 
 #include <sysio/trace_api/common.hpp>
 #include <sysio/trace_api/extract_util.hpp>
+#include <sysio/trace_api/logging.hpp>
 #include <sysio/trace_api/trace.hpp>
 #include <sysio/chain/config.hpp>
 #include <fc/io/raw.hpp>
-#include <fc/log/logger.hpp>
 #include <exception>
 #include <functional>
 #include <map>
@@ -90,7 +90,10 @@ private:
                fc::raw::unpack(ds, target);
                fc::raw::unpack(ds, abi_bytes);
                setabi_targets_this_trx.insert(target);
-            } catch (...) {}
+            } catch (const std::exception& e) {
+               fc_wlog(_log, "trace_api: failed to unpack setabi data (collecting targets) at global_seq {}: {}",
+                       at.receipt->global_sequence, e.what());
+            }
          }
       }
 
@@ -116,7 +119,9 @@ private:
             try {
                if (auto abi = _abi_fetcher(account))
                   store.append_abi(account, 0, std::move(*abi));
-            } catch (...) {}
+            } catch (const std::exception& e) {
+               fc_dlog(_log, "trace_api: lazy ABI fetch for {} failed: {}", account, e.what());
+            }
          }
 
          // setabi: record the new ABI with its exact global_sequence.
@@ -131,7 +136,10 @@ private:
                store.append_abi(target_account,
                                 at.receipt->global_sequence,
                                 std::vector<char>(abi_bytes.begin(), abi_bytes.end()));
-            } catch (...) {}
+            } catch (const std::exception& e) {
+               fc_wlog(_log, "trace_api: failed to record setabi at global_seq {}: {}",
+                       at.receipt->global_sequence, e.what());
+            }
          }
       }
    }
@@ -157,7 +165,7 @@ private:
          const auto first = store.first_recorded_block();
          const auto last  = store.last_recorded_block();
          if (!first) {
-            ilog("trace_api: no prior trace data found, starting fresh at block {}", block_num);
+            fc_ilog(_log, "trace_api: no prior trace data found, starting fresh at block {}", block_num);
             return;
          }
          // Overlap or exact continuation: chain head is within or just past existing data.

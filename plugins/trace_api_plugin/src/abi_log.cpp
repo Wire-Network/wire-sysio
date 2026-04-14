@@ -1,7 +1,7 @@
 #include <sysio/trace_api/abi_log.hpp>
+#include <sysio/trace_api/logging.hpp>
 
 #include <fc/io/raw.hpp>
-#include <fc/log/logger.hpp>
 
 #include <boost/crc.hpp>
 
@@ -54,7 +54,7 @@ abi_log::abi_log(const std::filesystem::path& path) {
    try {
       _cfile.open(fc::cfile::create_or_update_rw_mode);
    } catch (...) {
-      wlog("trace_api: abi_log failed to open {}", path.generic_string());
+      fc_wlog(_log, "trace_api: abi_log failed to open {}", path.generic_string());
       return;
    }
 
@@ -67,7 +67,7 @@ abi_log::abi_log(const std::filesystem::path& path) {
          _cfile.write(data.data(), data.size());
          _cfile.flush();
       } catch (...) {
-         wlog("trace_api: abi_log failed to write header to {}", path.generic_string());
+         fc_wlog(_log, "trace_api: abi_log failed to write header to {}", path.generic_string());
          return;
       }
       _end_offset = data.size();
@@ -82,17 +82,17 @@ abi_log::abi_log(const std::filesystem::path& path) {
       abi_log_header hdr;
       fc::raw::unpack(ds, hdr);
       if (hdr.magic != abi_log_header::magic_value) {
-         wlog("trace_api: abi_log {} has wrong magic {:#x}, ignoring",
+         fc_wlog(_log, "trace_api: abi_log {} has wrong magic {:#x}, ignoring",
               path.generic_string(), hdr.magic);
          return;
       }
       if (hdr.version != abi_log_header::current_version) {
-         wlog("trace_api: abi_log {} has unsupported version {}, ignoring",
+         fc_wlog(_log, "trace_api: abi_log {} has unsupported version {}, ignoring",
               path.generic_string(), hdr.version);
          return;
       }
    } catch (...) {
-      wlog("trace_api: abi_log {} header read failed", path.generic_string());
+      fc_wlog(_log, "trace_api: abi_log {} header read failed", path.generic_string());
       return;
    }
 
@@ -110,14 +110,14 @@ uint64_t abi_log::recover_from_disk(const std::filesystem::path& path) {
 
       // Need at least record_header + crc trailer.
       if (file_size - record_start < sizeof(record_header) + record_trailer_size) {
-         wlog("trace_api: abi_log {} torn tail at offset {} (less than minimal record), truncating",
+         fc_wlog(_log, "trace_api: abi_log {} torn tail at offset {} (less than minimal record), truncating",
               path.generic_string(), record_start);
          break;
       }
 
       record_header rh{};
       if (!pread_all(_cfile.fileno(), &rh, sizeof(rh), record_start)) {
-         wlog("trace_api: abi_log {} failed to read record header at offset {}, truncating",
+         fc_wlog(_log, "trace_api: abi_log {} failed to read record header at offset {}, truncating",
               path.generic_string(), record_start);
          break;
       }
@@ -127,7 +127,7 @@ uint64_t abi_log::recover_from_disk(const std::filesystem::path& path) {
       const uint64_t record_end  = crc_offset + record_trailer_size;
 
       if (record_end > file_size) {
-         wlog("trace_api: abi_log {} record at {} claims blob_size {} but file has only {} bytes remaining, truncating",
+         fc_wlog(_log, "trace_api: abi_log {} record at {} claims blob_size {} but file has only {} bytes remaining, truncating",
               path.generic_string(), record_start, rh.blob_size, file_size - blob_offset);
          break;
       }
@@ -136,7 +136,7 @@ uint64_t abi_log::recover_from_disk(const std::filesystem::path& path) {
       if (rh.blob_size > 0) {
          blob.resize(rh.blob_size);
          if (!pread_all(_cfile.fileno(), blob.data(), rh.blob_size, blob_offset)) {
-            wlog("trace_api: abi_log {} failed to read blob at offset {}, truncating",
+            fc_wlog(_log, "trace_api: abi_log {} failed to read blob at offset {}, truncating",
                  path.generic_string(), blob_offset);
             break;
          }
@@ -144,14 +144,14 @@ uint64_t abi_log::recover_from_disk(const std::filesystem::path& path) {
 
       uint32_t stored_crc = 0;
       if (!pread_all(_cfile.fileno(), &stored_crc, sizeof(stored_crc), crc_offset)) {
-         wlog("trace_api: abi_log {} failed to read crc at offset {}, truncating",
+         fc_wlog(_log, "trace_api: abi_log {} failed to read crc at offset {}, truncating",
               path.generic_string(), crc_offset);
          break;
       }
 
       const uint32_t computed_crc = compute_record_crc(rh, blob.data(), rh.blob_size);
       if (computed_crc != stored_crc) {
-         wlog("trace_api: abi_log {} crc mismatch at record offset {} (stored {:#x} vs computed {:#x}), truncating",
+         fc_wlog(_log, "trace_api: abi_log {} crc mismatch at record offset {} (stored {:#x} vs computed {:#x}), truncating",
               path.generic_string(), record_start, stored_crc, computed_crc);
          break;
       }
@@ -167,7 +167,7 @@ uint64_t abi_log::recover_from_disk(const std::filesystem::path& path) {
       std::error_code ec;
       std::filesystem::resize_file(path, offset, ec);
       if (ec) {
-         wlog("trace_api: abi_log {} failed to truncate to {}: {}",
+         fc_wlog(_log, "trace_api: abi_log {} failed to truncate to {}: {}",
               path.generic_string(), offset, ec.message());
       }
    }
@@ -192,7 +192,7 @@ void abi_log::append(chain::name account, uint64_t global_seq, std::vector<char>
          _cfile.write(reinterpret_cast<const char*>(&crc), sizeof(crc));
          _cfile.flush();
       } catch (...) {
-         wlog("trace_api: abi_log append failed at offset {}", _end_offset);
+         fc_wlog(_log, "trace_api: abi_log append failed at offset {}", _end_offset);
          return;
       }
 
@@ -236,7 +236,7 @@ std::optional<std::vector<char>> abi_log::lookup(chain::name account, uint64_t g
 
    std::vector<char> out(blob_size);
    if (!pread_all(_cfile.fileno(), out.data(), blob_size, blob_offset)) {
-      wlog("trace_api: abi_log pread of {} bytes at {} failed", blob_size, blob_offset);
+      fc_wlog(_log, "trace_api: abi_log pread of {} bytes at {} failed", blob_size, blob_offset);
       return std::nullopt;
    }
    return out;

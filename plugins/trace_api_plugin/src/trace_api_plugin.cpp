@@ -1,8 +1,9 @@
 #include <sysio/trace_api/trace_api_plugin.hpp>
 
 #include <sysio/trace_api/abi_data_handler.hpp>
-#include <sysio/trace_api/request_handler.hpp>
 #include <sysio/trace_api/chain_extraction.hpp>
+#include <sysio/trace_api/logging.hpp>
+#include <sysio/trace_api/request_handler.hpp>
 #include <sysio/trace_api/store_provider.hpp>
 
 #include <sysio/trace_api/configuration_utils.hpp>
@@ -16,9 +17,6 @@ using namespace sysio::trace_api::configuration_utils;
 using boost::signals2::scoped_connection;
 
 namespace {
-
-   const std::string logger_name("trace_api");
-   fc::logger _log;
 
    std::string to_detail_string(const std::exception_ptr& e) {
       try {
@@ -220,7 +218,7 @@ struct trace_api_rpc_plugin_impl : public std::enable_shared_from_this<trace_api
    static void set_program_options(appbase::options_description&, appbase::options_description&) {}
 
    void plugin_initialize(const appbase::variables_map&) {
-      ilog("initializing trace api rpc plugin");
+      fc_ilog(_log, "initializing trace api rpc plugin");
       max_block_range = common->max_block_range;
       auto store = common->store;
       auto data_handler = std::make_shared<abi_data_handler>(
@@ -450,7 +448,7 @@ struct trace_api_plugin_impl {
    :common(common) {}
 
    void plugin_initialize(const appbase::variables_map& options) {
-      ilog("initializing trace api plugin");
+      fc_ilog(_log, "initializing trace api plugin");
       auto log_exceptions_and_shutdown = [](const exception_with_context& e) {
          log_exception(e, fc::log_level::error);
          app().quit();

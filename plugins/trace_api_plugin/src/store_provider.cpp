@@ -1,4 +1,5 @@
 #include <sysio/trace_api/store_provider.hpp>
+#include <sysio/trace_api/logging.hpp>
 
 #include <fc/io/raw.hpp>
 #include <fc/variant_object.hpp>
@@ -120,13 +121,18 @@ namespace sysio::trace_api {
          yield();
 
          // Derive the slice number from the file path and try the index first.
-         const uint32_t slice_number = _slice_directory.slice_number_from_path(trx_id_file.get_file_path());
-         if (auto reader = _slice_directory.find_trx_id_index_slice(slice_number)) {
-            if (auto block_num = reader->lookup(trx_id)) {
-               trx_block_nums.insert(*block_num);
-               return false; // found in an irreversible slice; stop
+         // If the filename can't be parsed (slice_number_from_path returns nullopt),
+         // fall through to the linear scan below.
+         const std::optional<uint32_t> slice_number =
+            _slice_directory.slice_number_from_path(trx_id_file.get_file_path());
+         if (slice_number) {
+            if (auto reader = _slice_directory.find_trx_id_index_slice(*slice_number)) {
+               if (auto block_num = reader->lookup(trx_id)) {
+                  trx_block_nums.insert(*block_num);
+                  return false; // found in an irreversible slice; stop
+               }
+               return true; // not in this indexed slice; continue to next
             }
-            return true; // not in this indexed slice; continue to next
          }
 
          // No index for this slice (reversible window or index not yet built):
@@ -284,7 +290,7 @@ namespace sysio::trace_api {
       if (trace_found != index_found) {
          const std::string trace_status = trace_found ? "existing" : "new";
          const std::string index_status = index_found ? "existing" : "new";
-         elog("Trace file is {}, but it's metadata file is {}. This means the files are not consistent.", trace_status, index_status);
+         fc_elog(_log, "Trace file is {}, but it's metadata file is {}. This means the files are not consistent.", trace_status, index_status);
       }
    }
 
@@ -420,13 +426,21 @@ namespace sysio::trace_api {
       return _abi_log.has_entry(account);
    }
 
-   uint32_t slice_directory::slice_number_from_path(const std::filesystem::path& trx_id_path) const {
+   std::optional<uint32_t> slice_directory::slice_number_from_path(const std::filesystem::path& trx_id_path) const {
       // Filename format: trace_trx_id_XXXXXXXXXX-YYYYYYYYYY.log
       // Parse the start block number (XXXXXXXXXX) and divide by _width.
+      // Named local matching the return type so the compiler can NRVO the
+      // optional directly into the caller's slot.
       const auto name = trx_id_path.filename().string();
       const auto prefix_len = std::char_traits<char>::length(_trace_trx_id_prefix);
-      const uint32_t start_block = static_cast<uint32_t>(std::stoul(name.substr(prefix_len, 10)));
-      return start_block / _width;
+      std::optional<uint32_t> result;
+      try {
+         const uint32_t start_block = static_cast<uint32_t>(std::stoul(name.substr(prefix_len, 10)));
+         result = start_block / _width;
+      } catch (...) {
+         fc_wlog(_log, "trace_api: cannot parse slice start-block from filename '{}'", name);
+      }
+      return result;
    }
 
    std::optional<trx_id_index_reader> slice_directory::find_trx_id_index_slice(uint32_t slice_number) const {
