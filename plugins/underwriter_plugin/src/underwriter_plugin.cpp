@@ -50,9 +50,9 @@ struct credit_line {
 struct underwriter_plugin::impl {
    // Configuration
    chain::name  underwriter_account;
-   bool         enabled             = false;
-   uint32_t     scan_interval_ms    = 5000;
-   uint32_t     action_timeout_ms   = 15000;
+   bool         enabled             = underwriter_defaults::enabled;
+   uint32_t     scan_interval_ms    = underwriter_defaults::scan_interval_ms;
+   uint32_t     action_timeout_ms   = underwriter_defaults::action_timeout_ms;
    std::string  eth_client_id;
    std::string  sol_client_id;
    std::string  eth_opreg_addr;        // OperatorRegistry contract address on ETH
@@ -600,15 +600,15 @@ void underwriter_plugin::set_program_options(options_description& cli,
    auto opts = cfg.add_options();
    opts("underwriter-account", bpo::value<std::string>(),
         "WIRE account name for this underwriter");
-   opts("underwriter-scan-interval-ms", bpo::value<uint32_t>()->default_value(5000),
+   opts("underwriter-scan-interval-ms", bpo::value<uint32_t>()->default_value(underwriter_defaults::scan_interval_ms),
         "How often to scan for pending underwrite requests (ms)");
-   opts("underwriter-action-timeout-ms", bpo::value<uint32_t>()->default_value(15000),
+   opts("underwriter-action-timeout-ms", bpo::value<uint32_t>()->default_value(underwriter_defaults::action_timeout_ms),
         "Timeout for outpost contract calls and table reads (ms)");
-   opts("underwriter-enabled", bpo::value<bool>()->default_value(false),
+   opts("underwriter-enabled", bpo::value<bool>()->default_value(underwriter_defaults::enabled),
         "Enable underwriter functionality");
-   opts("underwriter-eth-client-id", bpo::value<std::string>()->default_value("eth-default"),
+   opts("underwriter-eth-client-id", bpo::value<std::string>()->default_value(underwriter_defaults::eth_client_id),
         "Ethereum outpost client ID");
-   opts("underwriter-sol-client-id", bpo::value<std::string>()->default_value("sol-default"),
+   opts("underwriter-sol-client-id", bpo::value<std::string>()->default_value(underwriter_defaults::sol_client_id),
         "Solana outpost client ID");
    opts("underwriter-eth-opreg-addr", bpo::value<std::string>(),
         "OperatorRegistry contract address on Ethereum (hex)");

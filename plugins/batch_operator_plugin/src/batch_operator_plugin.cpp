@@ -272,16 +272,11 @@ struct batch_operator_plugin::impl {
       refresh_outposts();
 
       // Track the epoch for the cycle, but only mark as successfully delivered
-      // after the cycle completes without error. If it fails, current_epoch
-      // stays at the previous value so the next poll retries.
-      auto prev_epoch = current_epoch;
+      // after the cycle completes AND delivery was actually attempted.
+      // If skipped (epoch boundary) or failed, the next poll retries.
       current_epoch = epoch_index;
-      try {
-         run_epoch_cycle(epoch_index);
+      if (run_epoch_cycle(epoch_index)) {
          last_delivered_epoch = epoch_index;
-      } catch (...) {
-         current_epoch = prev_epoch;
-         throw;
       }
    }
 
@@ -310,27 +305,31 @@ struct batch_operator_plugin::impl {
    //  Epoch cycle orchestration
    // -----------------------------------------------------------------------
 
-   void run_epoch_cycle(uint32_t cycle_epoch = 0) {
-      if (shutting_down) return;
+   /// Returns true if delivery was actually attempted, false if skipped.
+   bool run_epoch_cycle(uint32_t cycle_epoch = 0) {
+      if (shutting_down) return false;
       if (!within_epoch_window()) {
          dlog("batch_operator: skipping epoch cycle — too close to epoch boundary");
-         return;
+         return false;
       }
       ilog("batch_operator: === EPOCH CYCLE START (epoch {}) ===", current_epoch);
 
-      try {
-         // OUTBOUND (WIRE -> Outposts)
-         for (auto& op : outposts) {
-            op.reset_transient();
-            read_outbound_envelope(op);
-            try {
-               deliver_to_outpost(op);
-            } catch (const fc::exception& e) {
-               wlog("batch_operator: outbound delivery failed for outpost {}: {}", op.id, e.to_detail_string());
-            }
+      bool any_delivered = false;
+      // OUTBOUND (WIRE -> Outposts)
+      for (auto& op : outposts) {
+         op.reset_transient();
+         read_outbound_envelope(op);
+         try {
+            deliver_to_outpost(op);
+            any_delivered = true;
+         } catch (const std::exception& e) {
+            wlog("batch_operator: outbound delivery failed for outpost {}: {}", op.id, e.what());
+         } catch (...) {
+            wlog("batch_operator: outbound delivery failed for outpost {} (unknown error)", op.id);
          }
-         ilog("batch_operator: === EPOCH CYCLE COMPLETE (epoch {}) ===", current_epoch);
-      } FC_LOG_AND_RETHROW();
+      }
+      ilog("batch_operator: === EPOCH CYCLE COMPLETE (epoch {}, delivered={}) ===", current_epoch, any_delivered);
+      return any_delivered;
    }
 
    /// Returns true if we are within the safe operating window for this epoch.
@@ -510,7 +509,7 @@ struct batch_operator_plugin::impl {
 
       auto events = opp_client->query_events(
          {"OPPEnvelope"},
-         eth::block_tag_t{std::string("0x0")},
+         eth::block_tag_t{std::string(eth::block_tag_latest)},
          eth::block_tag_t{std::string(eth::block_tag_latest)});
 
       ilog("batch_operator: got {} events from ETH for outpost {}", events.size(), op.id);

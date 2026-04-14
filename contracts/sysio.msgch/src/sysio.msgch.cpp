@@ -58,9 +58,21 @@ void msgch::deliver(name batch_op_name, uint64_t outpost_id, std::vector<char> d
    auto op_it = outposts.find(outpost_id);
    check(op_it != outposts.end(), "outpost not found");
 
+   // Decode envelope to validate epoch_index matches current WIRE epoch
+   uint32_t epoch = current_epoch_index();
+   {
+      opp::Envelope env_check;
+      auto in = zpp::bits::in{std::span{data.data(), data.size()}, zpp::bits::no_size{}};
+      auto result = in(env_check);
+      check(result == zpp::bits::errc{}, "failed to decode inbound envelope");
+      uint32_t env_epoch = static_cast<uint32_t>(env_check.epoch_index);
+      check(env_epoch == epoch,
+         "envelope epoch_index mismatch: envelope=" + std::to_string(env_epoch) +
+         " current=" + std::to_string(epoch));
+   }
+
    // Compute checksum trustlessly inside the contract
    checksum256 cs = sha256(data.data(), data.size());
-   uint32_t epoch = current_epoch_index();
 
    // Prevent duplicate delivery from same operator for same outpost+epoch
    envelopes_t envs(get_self(), get_self().value);

@@ -1,5 +1,6 @@
 #include <sysio.epoch/sysio.epoch.hpp>
 #include <sysio.opreg/sysio.opreg.hpp>
+#include <sysio.authex/sysio.authex.hpp>
 #include <sysio/opp/attestations/attestations.pb.hpp>
 #include <zpp_bits.h>
 
@@ -8,6 +9,29 @@ namespace sysio {
 using opp::types::OperatorType;
 using opp::types::AttestationType;
 using opp::types::OperatorStatus;
+
+// Read-only mirror of sysio.authex::links table for cross-contract reads.
+namespace authex_readonly {
+
+struct links_row {
+   uint64_t                 key;
+   name                     username;
+   fc::crypto::chain_kind_t chain_kind;
+   public_key               pub_key;
+
+   uint64_t  primary_key()   const { return key; }
+   uint128_t by_namechain()  const { return to_namechain_key(username, chain_kind); }
+   uint64_t  by_name()       const { return username.value; }
+   uint64_t  by_chain()      const { return static_cast<uint64_t>(chain_kind); }
+};
+
+using links_t = multi_index<"links"_n, links_row,
+   indexed_by<"bynamechain"_n, const_mem_fun<links_row, uint128_t, &links_row::by_namechain>>,
+   indexed_by<"byname"_n,      const_mem_fun<links_row, uint64_t,  &links_row::by_name>>,
+   indexed_by<"bychain"_n,     const_mem_fun<links_row, uint64_t,  &links_row::by_chain>>
+>;
+
+} // namespace authex_readonly
 
 // ---------------------------------------------------------------------------
 //  setconfig
@@ -80,6 +104,73 @@ void epoch::advance() {
 
    state_tbl.set(state, get_self());
 
+   // Queue OPERATORS attestation (full roster with authex chain addresses) for each outpost.
+   // IMPORTANT: Must come before BATCH_OPERATOR_GROUPS so that the ETH outpost's
+   // _handleOperators populates operatorEthAddress before _handleBatchOperatorGroups
+   // looks up those addresses.
+   {
+      opp::attestations::Operators ops_attest;
+      opreg::operators_t opreg_ops(OPREG_ACCOUNT, OPREG_ACCOUNT.value);
+      authex_readonly::links_t authex_links(AUTHEX_ACCOUNT, AUTHEX_ACCOUNT.value);
+      auto links_by_name = authex_links.get_index<"byname"_n>();
+
+      for (auto it = opreg_ops.begin(); it != opreg_ops.end(); ++it) {
+         opp::attestations::OperatorEntry entry;
+         entry.account.name = it->account.to_string();
+         entry.type = it->type;
+         entry.status = it->status;
+
+         // Collect all authex-linked chain addresses for this operator.
+         // Store raw public key bytes from the variant (33 bytes for EM/secp256k1,
+         // 32 bytes for ED/Ed25519).
+         auto link_it = links_by_name.lower_bound(it->account.value);
+         while (link_it != links_by_name.end() && link_it->username == it->account) {
+            opp::types::ChainAddress chain_addr;
+            chain_addr.kind = static_cast<opp::types::ChainKind>(link_it->chain_kind);
+
+            std::visit([&](const auto& key_data) {
+               using T = std::decay_t<decltype(key_data)>;
+               if constexpr (std::is_same_v<T, webauthn_public_key>) {
+                  // EM (secp256k1 compressed) — 33 bytes in key.key
+                  chain_addr.address.assign(key_data.key.begin(), key_data.key.end());
+               } else if constexpr (std::is_same_v<T, ed_public_key>) {
+                  // ED (Ed25519) — 32 bytes
+                  chain_addr.address.assign(
+                     reinterpret_cast<const char*>(key_data.data()),
+                     reinterpret_cast<const char*>(key_data.data() + key_data.size()));
+               } else if constexpr (std::is_same_v<T, ecc_public_key>) {
+                  // K1/R1 (secp256k1/P-256 compressed) — 33 bytes
+                  chain_addr.address.assign(key_data.begin(), key_data.end());
+               }
+               // Skip BLS keys — not used for chain address linking
+            }, link_it->pub_key);
+
+            entry.addresses.push_back(std::move(chain_addr));
+            ++link_it;
+         }
+
+         ops_attest.operators.push_back(std::move(entry));
+      }
+
+      std::vector<char> encoded;
+      auto out = zpp::bits::out{encoded, zpp::bits::no_size{}};
+      (void)out(ops_attest);
+
+      outposts_t outposts_tbl(get_self(), get_self().value);
+      for (auto it = outposts_tbl.begin(); it != outposts_tbl.end(); ++it) {
+         action(
+            permission_level{"sysio.epoch"_n, "owner"_n},
+            MSGCH_ACCOUNT,
+            "queueout"_n,
+            std::make_tuple(
+               it->id,
+               opp::types::ATTESTATION_TYPE_OPERATORS,
+               encoded
+            )
+         ).send();
+      }
+   }
+
    // Queue BATCH_OPERATOR_GROUPS attestation for each outpost.
    // Includes ALL groups and the active group index for the new epoch.
    {
@@ -111,41 +202,6 @@ void epoch::advance() {
             std::make_tuple(
                it->id,
                opp::types::ATTESTATION_TYPE_BATCH_OPERATOR_GROUPS,
-               encoded
-            )
-         ).send();
-      }
-   }
-
-   // Queue OPERATORS attestation (full roster) for each outpost.
-   {
-      opp::attestations::Operators ops_attest;
-      opreg::operators_t opreg_ops(OPREG_ACCOUNT, OPREG_ACCOUNT.value);
-      for (auto it = opreg_ops.begin(); it != opreg_ops.end(); ++it) {
-         opp::attestations::OperatorEntry entry;
-         opp::types::ChainAddress addr;
-         addr.kind = opp::types::CHAIN_KIND_WIRE;
-         auto name_str = it->account.to_string();
-         addr.address.assign(name_str.begin(), name_str.end());
-         entry.address = std::move(addr);
-         entry.type = it->type;
-         entry.status = it->status;
-         ops_attest.operators.push_back(std::move(entry));
-      }
-
-      std::vector<char> encoded;
-      auto out = zpp::bits::out{encoded, zpp::bits::no_size{}};
-      (void)out(ops_attest);
-
-      outposts_t outposts_tbl(get_self(), get_self().value);
-      for (auto it = outposts_tbl.begin(); it != outposts_tbl.end(); ++it) {
-         action(
-            permission_level{"sysio.epoch"_n, "owner"_n},
-            MSGCH_ACCOUNT,
-            "queueout"_n,
-            std::make_tuple(
-               it->id,
-               opp::types::ATTESTATION_TYPE_OPERATORS,
                encoded
             )
          ).send();
