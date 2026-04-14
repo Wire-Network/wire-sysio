@@ -82,7 +82,7 @@ default).
 | `trace-slice-stride` | `10000` | Number of blocks per slice file. Larger values reduce file count but increase the amount of data re-scanned when a single slice is accessed. |
 | `trace-minimum-irreversible-history-blocks` | `-1` | Blocks past LIB to retain before old slices can be auto-deleted. `-1` disables automatic deletion (keep forever). |
 | `trace-minimum-uncompressed-irreversible-history-blocks` | `-1` | Blocks past LIB to keep uncompressed. Slices older than this threshold are transparently compressed. `-1` disables automatic compression. |
-| `trace-max-query-limit` | `1000` | Maximum number of results a single `get_actions` or `get_token_transfers` request may return. Client-supplied `limit` values are clamped to this. Set to `-1` to remove the server-side cap entirely. |
+| `trace-max-block-range` | `100` | Maximum number of blocks scanned by a single `get_actions` or `get_token_transfers` request. `block_num_end` is silently clamped to `block_num_start + trace-max-block-range - 1`.  Clients paginate by advancing `block_num_start` by this amount on each call. Set to `-1` to remove the cap entirely. |
 
 ### Recommended production settings
 
@@ -185,9 +185,9 @@ started (or since the file was first written).
 Format:
 
 ```
-Header     (16 bytes): magic "ABIB", version 1, entry_count, reserved
-Index      (entry_count × 24 bytes, sorted account ASC, global_seq ASC):
-             account(u64) | global_seq(u64) | blob_offset(u32) | blob_size(u32)
+Header     (16 bytes): magic "ABIB" (u32), version 1 (u32), entry_count (u64)
+Index      (entry_count × 32 bytes, sorted account ASC, global_seq ASC):
+             account(u64) | global_seq(u64) | blob_offset(u64) | blob_size(u64)
 Blob area  (variable): raw fc::raw-packed abi_def bytes in index order
 ```
 
@@ -368,12 +368,15 @@ on receiver, account (contract code), and action name.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `block_num_start` | uint32 | `0` | First block to scan (inclusive). |
-| `block_num_end` | uint32 | `UINT32_MAX` | Last block to scan (inclusive). |
+| `block_num_end` | uint32 | `UINT32_MAX` | Last block to scan (inclusive). Silently clamped server-side to `block_num_start + trace-max-block-range - 1`. |
 | `receiver` | string | *(any)* | Filter: only actions where `receiver` matches. |
 | `account` | string | *(any)* | Filter: only actions where `account` (code account) matches. |
 | `action` | string | *(any)* | Filter: only actions where the action name matches. |
-| `after_global_seq` | uint64 | `0` | Pagination cursor — skip actions with `global_sequence <= this`. |
-| `limit` | uint32 | `100` | Maximum results to return (clamped to `trace-max-query-limit`, default 1000). |
+
+Returned actions within a transaction are sorted by `global_sequence`
+(execution order), matching the behavior of `get_block` and chain_plugin's
+`push_transaction` response.  See the Pagination guide below for the cursor
+pattern.
 
 **Request example:**
 
@@ -382,8 +385,7 @@ on receiver, account (contract code), and action name.
   "block_num_start": 1,
   "block_num_end": 10000,
   "account": "sysio.token",
-  "action": "transfer",
-  "limit": 50
+  "action": "transfer"
 }
 ```
 
@@ -421,9 +423,7 @@ on receiver, account (contract code), and action name.
       "block_time": "2025-01-01T00:05:00.000Z",
       "producer_block_id": "000003e8..."
     }
-  ],
-  "more": true,
-  "last_global_seq": 101
+  ]
 }
 ```
 
@@ -431,9 +431,7 @@ on receiver, account (contract code), and action name.
 
 | Field | Description |
 |-------|-------------|
-| `actions` | Array of matching action objects. |
-| `more` | `true` if there are more results beyond `limit`; use `last_global_seq` as the cursor for the next page. |
-| `last_global_seq` | `global_sequence` of the last returned action; pass as `after_global_seq` on the next request. |
+| `actions` | Array of matching action objects, ordered by `(block_num, global_sequence)`. |
 
 **Action object fields:**
 
@@ -507,9 +505,7 @@ to recipients are excluded).
 |-------|------|---------|-------------|
 | `token_contract` | string | `sysio.token` | Contract account to filter on. |
 | `block_num_start` | uint32 | `0` | First block to scan (inclusive). |
-| `block_num_end` | uint32 | `UINT32_MAX` | Last block to scan (inclusive). |
-| `after_global_seq` | uint64 | `0` | Pagination cursor. |
-| `limit` | uint32 | `100` | Maximum results (clamped to 1000). |
+| `block_num_end` | uint32 | `UINT32_MAX` | Last block to scan (inclusive). Silently clamped server-side to `block_num_start + trace-max-block-range - 1`. |
 
 **Request example:**
 
@@ -517,8 +513,7 @@ to recipients are excluded).
 {
   "token_contract": "sysio.token",
   "block_num_start": 1,
-  "block_num_end": 50000,
-  "limit": 100
+  "block_num_end": 50000
 }
 ```
 
@@ -546,9 +541,7 @@ to recipients are excluded).
       "block_time": "2025-01-01T00:05:00.000Z",
       "producer_block_id": "000003e8..."
     }
-  ],
-  "more": false,
-  "last_global_seq": 101
+  ]
 }
 ```
 
@@ -569,54 +562,60 @@ call `get_actions` with `receiver=account=<token_contract>, action=transfer` ins
 
 ## Pagination guide
 
-All scan endpoints (`get_actions`, `get_token_transfers`) use a forward
-cursor based on `global_sequence`:
+`get_actions` and `get_token_transfers` cap the per-request scan window at
+`trace-max-block-range` blocks (default 100).  `block_num_end` is silently
+clamped to `block_num_start + trace-max-block-range - 1` if the client asks
+for more.  Within that window, ALL matching actions are returned — there
+is no per-result limit and no in-window cursor.
+
+To page across a wide range, advance `block_num_start` by
+`trace-max-block-range` on each call:
 
 ```
-# Page 1
+# Page 1: blocks 1..100 (assuming trace-max-block-range = 100)
 POST /v1/trace_api/get_actions
 { "account": "sysio.token", "action": "transfer",
-  "block_num_start": 1, "block_num_end": 1000000,
-  "limit": 100 }
+  "block_num_start": 1, "block_num_end": 1000000 }
 
-# Page 2 — use last_global_seq from page 1 response
+# Page 2: blocks 101..200
 POST /v1/trace_api/get_actions
 { "account": "sysio.token", "action": "transfer",
-  "block_num_start": 1, "block_num_end": 1000000,
-  "after_global_seq": <last_global_seq from page 1>,
-  "limit": 100 }
+  "block_num_start": 101, "block_num_end": 1000000 }
 ```
 
-Continue until `"more": false`.
+Continue until the response `actions` array is empty AND
+`block_num_start > tail of recorded data`.  Use the `get_block` endpoint or
+out-of-band knowledge of head block to know when to stop.
 
 Notes:
-- `block_num_start` and `block_num_end` must remain the same across pages
-  of the same scan.
-- The cursor is global_sequence-based, not block-based, so pages never
-  overlap or skip actions even when multiple actions share a block.
-- An empty `actions` array with `"more": false` means no matching actions
-  exist in the range.
+- Within each transaction, actions are sorted by `global_sequence`
+  (execution order, not schedule order).  See "Receiver vs account" for why
+  this matters when an action queues both inlines and notifications.
+- Operators on private/trusted nodes who want to scan large windows in a
+  single request can set `trace-max-block-range = -1` in config.ini to
+  remove the cap entirely.  Do NOT set this on a public RPC node.
 
 ---
 
 ## Exchange / indexer integration guide
 
-### Removing the per-request limit
+### Widening the per-request scan window
 
-Exchanges running their own private nodeop should set
-`trace-max-query-limit = -1` in `config.ini` to remove the server-side cap
-entirely.  This allows a single request to return all transfers in a block
-range without pagination, which simplifies indexing pipelines that process
-blocks in bulk.
+Exchanges running their own private nodeop can raise
+`trace-max-block-range` in `config.ini` to reduce the number of round
+trips per backfill:
 
 ```ini
 # config.ini — safe on a private/trusted node
-trace-max-query-limit = -1
+trace-max-block-range = 1000
 ```
 
-With this setting, the client controls page size through the `limit` field
-(or omits it to get all matching results).  Do **not** set this on a public
-RPC node — unbounded scans over large block ranges can exhaust server memory.
+`1000` is a sane upper bound for most workloads.  Larger values risk
+producing multi-MB responses that hit HTTP body / response-time limits
+(`http-max-response-time-ms`, `http-max-body-size`) and tie up an HTTP
+thread for seconds at a time on busy contracts.  `-1` (unlimited) is
+available for fully trusted operator-only deployments but is not
+recommended even on private nodes — pick an explicit cap instead.
 
 ### Detecting deposits
 
@@ -624,13 +623,12 @@ To find all incoming transfers to your account (`exchange1111`) on
 `sysio.token`:
 
 ```bash
-# Scan the last 10000 blocks
+# Scan a 1000-block window (assumes trace-max-block-range = 1000)
 curl -s -X POST http://127.0.0.1:8888/v1/trace_api/get_token_transfers \
   -H 'Content-Type: application/json' \
   -d '{
     "block_num_start": 100000,
-    "block_num_end":   110000,
-    "limit": 1000
+    "block_num_end":   100999
   }' | jq '.transfers[] | select(.params.to == "exchange1111")'
 ```
 

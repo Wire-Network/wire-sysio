@@ -129,9 +129,11 @@ struct trace_api_common_impl {
       cfg_options("trace-minimum-uncompressed-irreversible-history-blocks", boost::program_options::value<int32_t>()->default_value(-1),
                   "Number of blocks to ensure are uncompressed past LIB. Compressed \"slice\" files are still accessible but may carry a performance loss on retrieval\n"
                   "A value of -1 indicates that automatic compression of \"slice\" files will be turned off.");
-      cfg_options("trace-max-query-limit", bpo::value<int32_t>()->default_value(1000),
-                  "Maximum number of results returned by a single get_actions or get_token_transfers request.\n"
-                  "A value of -1 removes the limit (use with caution on public nodes).");
+      cfg_options("trace-max-block-range", bpo::value<int32_t>()->default_value(100),
+                  "Maximum number of blocks scanned by a single get_actions or get_token_transfers request.\n"
+                  "block_num_end is silently clamped to block_num_start + this - 1.\n"
+                  "Clients paginate by advancing block_num_start by this amount each call.\n"
+                  "A value of -1 removes the cap (use with caution on public nodes).");
    }
 
    void plugin_initialize(const appbase::variables_map& options) {
@@ -160,11 +162,11 @@ struct trace_api_common_impl {
          minimum_uncompressed_irreversible_history_blocks = uncompressed_blocks;
       }
 
-      const int32_t query_limit = options.at("trace-max-query-limit").as<int32_t>();
-      SYS_ASSERT(query_limit >= -1, chain::plugin_config_exception,
-                 "\"trace-max-query-limit\" must be -1 (unlimited) or a positive value.");
-      max_query_limit = (query_limit == -1) ? std::numeric_limits<uint32_t>::max()
-                                            : static_cast<uint32_t>(query_limit);
+      const int32_t block_range = options.at("trace-max-block-range").as<int32_t>();
+      SYS_ASSERT(block_range == -1 || block_range > 0, chain::plugin_config_exception,
+                 "\"trace-max-block-range\" must be -1 (unlimited) or a positive value.");
+      max_block_range = (block_range == -1) ? std::numeric_limits<uint32_t>::max()
+                                            : static_cast<uint32_t>(block_range);
 
       store = std::make_shared<store_provider>(
          trace_dir,
@@ -195,7 +197,7 @@ struct trace_api_common_impl {
    static constexpr int32_t manual_slice_file_value = -1;
    static constexpr uint32_t compression_seek_point_stride = 6 * 1024 * 1024; // 6 MiB strides for clog seek points
 
-   uint32_t max_query_limit = 1000;
+   uint32_t max_block_range = 100;
    std::shared_ptr<store_provider> store;
 };
 
@@ -211,7 +213,7 @@ struct trace_api_rpc_plugin_impl : public std::enable_shared_from_this<trace_api
 
    void plugin_initialize(const appbase::variables_map&) {
       ilog("initializing trace api rpc plugin");
-      max_query_limit = common->max_query_limit;
+      max_block_range = common->max_block_range;
       auto store = common->store;
       auto data_handler = std::make_shared<abi_data_handler>(
          [](const exception_with_context& e) {
@@ -343,10 +345,6 @@ struct trace_api_rpc_plugin_impl : public std::enable_shared_from_this<trace_api
                   query.block_num_start = obj["block_num_start"].as<uint32_t>();
                if (obj.contains("block_num_end"))
                   query.block_num_end = obj["block_num_end"].as<uint32_t>();
-               if (obj.contains("after_global_seq"))
-                  query.after_global_seq = obj["after_global_seq"].as_uint64();
-               if (obj.contains("limit"))
-                  query.limit = std::min(obj["limit"].as<uint32_t>(), max_query_limit);
             } catch (...) {
                error_results results{400, "Bad request body"};
                cb( 400, fc::variant( results ));
@@ -360,13 +358,11 @@ struct trace_api_rpc_plugin_impl : public std::enable_shared_from_this<trace_api
             return;
          }
 
+         clamp_block_end(query);
+
          try {
             auto result = req_handler->get_actions(query);
-            cb( 200, fc::mutable_variant_object()
-               ("actions",         result.actions)
-               ("more",            result.more)
-               ("last_global_seq", result.last_global_seq)
-            );
+            cb( 200, fc::mutable_variant_object()("actions", result.actions) );
          } catch (...) {
             http_plugin::handle_exception("trace_api", "get_actions", body, cb);
          }
@@ -395,10 +391,6 @@ struct trace_api_rpc_plugin_impl : public std::enable_shared_from_this<trace_api
                   query.block_num_start = obj["block_num_start"].as<uint32_t>();
                if (obj.contains("block_num_end"))
                   query.block_num_end = obj["block_num_end"].as<uint32_t>();
-               if (obj.contains("after_global_seq"))
-                  query.after_global_seq = obj["after_global_seq"].as_uint64();
-               if (obj.contains("limit"))
-                  query.limit = std::min(obj["limit"].as<uint32_t>(), max_query_limit);
             } catch (...) {
                error_results results{400, "Bad request body"};
                cb( 400, fc::variant( results ));
@@ -415,13 +407,11 @@ struct trace_api_rpc_plugin_impl : public std::enable_shared_from_this<trace_api
             return;
          }
 
+         clamp_block_end(query);
+
          try {
             auto result = req_handler->get_token_transfer_actions(query);
-            cb( 200, fc::mutable_variant_object()
-               ("transfers",       result.actions)
-               ("more",            result.more)
-               ("last_global_seq", result.last_global_seq)
-            );
+            cb( 200, fc::mutable_variant_object()("transfers", result.actions) );
          } catch (...) {
             http_plugin::handle_exception("trace_api", "get_token_transfers", body, cb);
          }
@@ -431,8 +421,17 @@ struct trace_api_rpc_plugin_impl : public std::enable_shared_from_this<trace_api
    void plugin_shutdown() {
    }
 
+   // Silently clamp block_num_end so the scan spans at most max_block_range blocks.
+   // No 400 returned — wide-range requests are a normal pagination pattern.
+   void clamp_block_end(action_query& query) const {
+      if (max_block_range == std::numeric_limits<uint32_t>::max()) return;
+      const uint64_t max_end = uint64_t{query.block_num_start} + max_block_range - 1;
+      if (max_end < query.block_num_end)
+         query.block_num_end = static_cast<uint32_t>(max_end);
+   }
+
    std::shared_ptr<trace_api_common_impl> common;
-   uint32_t max_query_limit = 1000;
+   uint32_t max_block_range = 100;
 
    using request_handler_t = request_handler<shared_store_provider<store_provider>, abi_data_handler::shared_provider>;
    std::shared_ptr<request_handler_t> req_handler;

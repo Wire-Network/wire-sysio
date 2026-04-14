@@ -116,8 +116,6 @@ BOOST_FIXTURE_TEST_CASE(empty_range, get_actions_fixture)
    auto r = get_actions(q);
 
    BOOST_TEST(r.actions.empty());
-   BOOST_TEST(!r.more);
-   BOOST_TEST(r.last_global_seq == 0u);
 }
 
 // Filter that matches nothing returns empty result
@@ -135,7 +133,6 @@ BOOST_FIXTURE_TEST_CASE(no_matching_filter, get_actions_fixture)
    auto r = get_actions(q);
 
    BOOST_TEST(r.actions.empty());
-   BOOST_TEST(!r.more);
 }
 
 // receiver filter: keeps only actions where receiver matches
@@ -159,8 +156,6 @@ BOOST_FIXTURE_TEST_CASE(filter_by_receiver, get_actions_fixture)
    BOOST_REQUIRE_EQUAL(r.actions.size(), 1u);
    BOOST_TEST(r.actions[0].get_object()["receiver"].as_string() == "sysio.token");
    BOOST_TEST(r.actions[0].get_object()["global_sequence"].as_uint64() == 1u);
-   BOOST_TEST(!r.more);
-   BOOST_TEST(r.last_global_seq == 1u);
 }
 
 // account filter: keeps only actions where account (code) matches
@@ -206,58 +201,6 @@ BOOST_FIXTURE_TEST_CASE(filter_by_action_name, get_actions_fixture)
    BOOST_TEST(r.actions[0].get_object()["name"].as_string() == "transfer");
 }
 
-// limit caps the number of returned results; more=true when there are additional results
-BOOST_FIXTURE_TEST_CASE(pagination_limit, get_actions_fixture)
-{
-   blocks[1] = make_block(1, {
-      make_trx(TRX1, 1, {
-         make_action(1, "a"_n, "tok"_n, "transfer"_n),
-         make_action(2, "a"_n, "tok"_n, "transfer"_n),
-         make_action(3, "a"_n, "tok"_n, "transfer"_n),
-         make_action(4, "a"_n, "tok"_n, "transfer"_n),
-         make_action(5, "a"_n, "tok"_n, "transfer"_n)
-      })
-   });
-
-   action_query q;
-   q.block_num_start = 1;
-   q.block_num_end   = 1;
-   q.limit           = 3;
-
-   auto r = get_actions(q);
-
-   BOOST_REQUIRE_EQUAL(r.actions.size(), 3u);
-   BOOST_TEST(r.more);
-   BOOST_TEST(r.last_global_seq == 3u);
-}
-
-// after_global_seq skips already-seen actions for cursor-based pagination
-BOOST_FIXTURE_TEST_CASE(pagination_after_global_seq, get_actions_fixture)
-{
-   blocks[1] = make_block(1, {
-      make_trx(TRX1, 1, {
-         make_action(1, "a"_n, "tok"_n, "transfer"_n),
-         make_action(2, "a"_n, "tok"_n, "transfer"_n),
-         make_action(3, "a"_n, "tok"_n, "transfer"_n),
-         make_action(4, "a"_n, "tok"_n, "transfer"_n),
-         make_action(5, "a"_n, "tok"_n, "transfer"_n)
-      })
-   });
-
-   action_query q;
-   q.block_num_start  = 1;
-   q.block_num_end    = 1;
-   q.after_global_seq = 3;  // skip seq 1-3
-
-   auto r = get_actions(q);
-
-   BOOST_REQUIRE_EQUAL(r.actions.size(), 2u);
-   BOOST_TEST(r.actions[0].get_object()["global_sequence"].as_uint64() == 4u);
-   BOOST_TEST(r.actions[1].get_object()["global_sequence"].as_uint64() == 5u);
-   BOOST_TEST(!r.more);
-   BOOST_TEST(r.last_global_seq == 5u);
-}
-
 // Actions are returned across multiple blocks; missing blocks in the log are skipped
 BOOST_FIXTURE_TEST_CASE(multi_block_scan, get_actions_fixture)
 {
@@ -276,8 +219,6 @@ BOOST_FIXTURE_TEST_CASE(multi_block_scan, get_actions_fixture)
    BOOST_TEST(r.actions[0].get_object()["block_num"].as<uint32_t>() == 1u);
    BOOST_TEST(r.actions[1].get_object()["block_num"].as<uint32_t>() == 2u);
    BOOST_TEST(r.actions[2].get_object()["block_num"].as<uint32_t>() == 4u);
-   BOOST_TEST(!r.more);
-   BOOST_TEST(r.last_global_seq == 3u);
 }
 
 // ABI-decoded params are included in the result when the data handler returns them
@@ -351,15 +292,19 @@ BOOST_FIXTURE_TEST_CASE(token_transfer_filter_excludes_notifications, get_action
    BOOST_TEST(r.actions[0].get_object()["receiver"].as_string() == "sysio.token");
 }
 
-// Actions within a transaction are visited in ascending global_sequence order
-// regardless of their storage order in the vector
+// Actions within a transaction are returned sorted by global_sequence (execution order),
+// not the schedule order in which the chain stored them.  The divergence matters when
+// an action queues both an inline AND a require_recipient notification — notifications
+// execute before inlines, so the inline's global_sequence is higher than later-scheduled
+// notifications'.  Sorting gives clients a consistent execution view matching what
+// chain_plugin's push_transaction does and what the legacy get_block response returned.
 BOOST_FIXTURE_TEST_CASE(actions_sorted_by_global_sequence, get_actions_fixture)
 {
    blocks[1] = make_block(1, {
       make_trx(TRX1, 1, {
-         make_action(5, "a"_n, "tok"_n, "transfer"_n),  // out of order
-         make_action(1, "a"_n, "tok"_n, "transfer"_n),
-         make_action(3, "a"_n, "tok"_n, "transfer"_n)
+         make_action(5, "a"_n, "tok"_n, "transfer"_n),  // schedule order: 5
+         make_action(1, "a"_n, "tok"_n, "transfer"_n),  // schedule order: 1
+         make_action(3, "a"_n, "tok"_n, "transfer"_n)   // schedule order: 3
       })
    });
 
@@ -373,6 +318,110 @@ BOOST_FIXTURE_TEST_CASE(actions_sorted_by_global_sequence, get_actions_fixture)
    BOOST_TEST(r.actions[0].get_object()["global_sequence"].as_uint64() == 1u);
    BOOST_TEST(r.actions[1].get_object()["global_sequence"].as_uint64() == 3u);
    BOOST_TEST(r.actions[2].get_object()["global_sequence"].as_uint64() == 5u);
+}
+
+// Realistic scenario exercising top-level actions, notifications (receiver != account),
+// inline actions triggered by a notification handler, and the inline's own notifications.
+//
+// Scenario: alice transfers 1 SYS to bob.contract via sysio.token::transfer.
+//   bob.contract has a notif handler that fires an inline logger::log action.
+//   logger::log has an audit account notification handler.
+//
+// Expected global_sequence order (chain-assigned, monotonic):
+//   100: sysio.token::transfer     (receiver=sysio.token, account=sysio.token)  <- original
+//   101: sysio.token::transfer     (receiver=alice,       account=sysio.token)  <- notif to sender
+//   102: sysio.token::transfer     (receiver=bob.contract,account=sysio.token)  <- notif to recipient
+//   103: logger::log               (receiver=logger,      account=logger)       <- inline from 102
+//   104: logger::log               (receiver=audit,       account=logger)       <- notif from 103
+BOOST_FIXTURE_TEST_CASE(complex_inline_and_notification_ordering, get_actions_fixture)
+{
+   blocks[1] = make_block(1, {
+      make_trx(TRX1, 1, {
+         make_action(100, "sysio.token"_n,  "sysio.token"_n, "transfer"_n),
+         make_action(101, "alice"_n,        "sysio.token"_n, "transfer"_n),
+         make_action(102, "bob.contract"_n, "sysio.token"_n, "transfer"_n),
+         make_action(103, "logger"_n,       "logger"_n,      "log"_n),
+         make_action(104, "audit"_n,        "logger"_n,      "log"_n)
+      })
+   });
+
+   // No filter: all 5 actions in global_sequence order.
+   {
+      action_query q;
+      q.block_num_start = 1;
+      q.block_num_end   = 1;
+
+      auto r = get_actions(q);
+
+      BOOST_REQUIRE_EQUAL(r.actions.size(), 5u);
+      BOOST_TEST(r.actions[0].get_object()["global_sequence"].as_uint64() == 100u);
+      BOOST_TEST(r.actions[1].get_object()["global_sequence"].as_uint64() == 101u);
+      BOOST_TEST(r.actions[2].get_object()["global_sequence"].as_uint64() == 102u);
+      BOOST_TEST(r.actions[3].get_object()["global_sequence"].as_uint64() == 103u);
+      BOOST_TEST(r.actions[4].get_object()["global_sequence"].as_uint64() == 104u);
+   }
+
+   // receiver=sysio.token: only the original execution; notifications to alice/bob excluded.
+   {
+      action_query q;
+      q.block_num_start = 1;
+      q.block_num_end   = 1;
+      q.receiver        = "sysio.token"_n;
+
+      auto r = get_actions(q);
+
+      BOOST_REQUIRE_EQUAL(r.actions.size(), 1u);
+      BOOST_TEST(r.actions[0].get_object()["global_sequence"].as_uint64() == 100u);
+      BOOST_TEST(r.actions[0].get_object()["receiver"].as_string() == "sysio.token");
+   }
+
+   // account=sysio.token: original + both notifications (3 rows), ordered by global_seq.
+   {
+      action_query q;
+      q.block_num_start = 1;
+      q.block_num_end   = 1;
+      q.account         = "sysio.token"_n;
+
+      auto r = get_actions(q);
+
+      BOOST_REQUIRE_EQUAL(r.actions.size(), 3u);
+      BOOST_TEST(r.actions[0].get_object()["global_sequence"].as_uint64() == 100u);
+      BOOST_TEST(r.actions[1].get_object()["global_sequence"].as_uint64() == 101u);
+      BOOST_TEST(r.actions[2].get_object()["global_sequence"].as_uint64() == 102u);
+      BOOST_TEST(r.actions[0].get_object()["receiver"].as_string() == "sysio.token");
+      BOOST_TEST(r.actions[1].get_object()["receiver"].as_string() == "alice");
+      BOOST_TEST(r.actions[2].get_object()["receiver"].as_string() == "bob.contract");
+   }
+
+   // account=logger: the inline from bob.contract's notif handler + its notification to audit.
+   {
+      action_query q;
+      q.block_num_start = 1;
+      q.block_num_end   = 1;
+      q.account         = "logger"_n;
+
+      auto r = get_actions(q);
+
+      BOOST_REQUIRE_EQUAL(r.actions.size(), 2u);
+      BOOST_TEST(r.actions[0].get_object()["global_sequence"].as_uint64() == 103u);
+      BOOST_TEST(r.actions[1].get_object()["global_sequence"].as_uint64() == 104u);
+      BOOST_TEST(r.actions[0].get_object()["receiver"].as_string() == "logger");
+      BOOST_TEST(r.actions[1].get_object()["receiver"].as_string() == "audit");
+   }
+
+   // receiver=bob.contract + action=transfer: exactly the one notification to the recipient.
+   {
+      action_query q;
+      q.block_num_start = 1;
+      q.block_num_end   = 1;
+      q.receiver        = "bob.contract"_n;
+      q.action          = "transfer"_n;
+
+      auto r = get_actions(q);
+
+      BOOST_REQUIRE_EQUAL(r.actions.size(), 1u);
+      BOOST_TEST(r.actions[0].get_object()["global_sequence"].as_uint64() == 102u);
+   }
 }
 
 BOOST_AUTO_TEST_SUITE_END()

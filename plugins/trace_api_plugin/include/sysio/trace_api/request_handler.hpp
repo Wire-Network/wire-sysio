@@ -28,8 +28,6 @@ namespace sysio::trace_api {
       std::optional<chain::name> action;        ///< filter by action name (any if unset)
       uint32_t block_num_start = 0;
       uint32_t block_num_end   = std::numeric_limits<uint32_t>::max();
-      uint64_t after_global_seq = 0;            ///< pagination cursor: skip actions with global_seq <= this
-      uint32_t limit = 100;                     ///< max results per request (clamped to 1000 by the handler)
    };
 
    /**
@@ -37,8 +35,6 @@ namespace sysio::trace_api {
     */
    struct actions_result {
       fc::variants actions;
-      bool     more = false;          ///< true if there are more results past 'limit'
-      uint64_t last_global_seq = 0;   ///< global_seq of the last returned action; use as after_global_seq for the next page
    };
 
    template<typename LogfileProvider, typename DataHandlerProvider>
@@ -116,17 +112,14 @@ namespace sysio::trace_api {
       }
 
       /**
-       * Scan a block range for action traces matching the given filter and return paginated results.
+       * Scan a block range for action traces matching the given filter.
        *
        * Blocks are scanned in ascending order.  Within each block, actions are visited in ascending
-       * global_sequence order.  Scanning stops as soon as 'limit' matching actions are found, and
-       * 'more' is set to true to signal that the caller should paginate.
+       * global_sequence order.  All matching actions in the (caller-clamped) range are returned;
+       * the caller is responsible for capping block_num_end so that the response stays bounded.
        *
-       * Use the returned 'last_global_seq' as 'after_global_seq' on the next call to continue from
-       * where this call left off.
-       *
-       * @param query - filter and pagination parameters
-       * @return actions_result containing the matching actions and pagination state
+       * @param query - filter parameters
+       * @return actions_result containing the matching actions
        */
       actions_result get_actions(const action_query& query) {
          return get_actions_impl(query, [this](const action_trace_v0& a,
@@ -227,6 +220,13 @@ namespace sysio::trace_api {
 
             std::visit([&](const auto& bt) {
                for (const auto& trx : bt.transactions) {
+                  // trx.actions is stored in schedule order (how the chain's apply_context
+                  // scheduled action slots), which is NOT global_sequence order when an
+                  // action queues both inline actions and require_recipient notifications:
+                  // notifications run before inlines, so the inline's global_sequence is
+                  // higher than later-scheduled notifications'.  Sort pointers by
+                  // global_sequence so clients always see execution order (matches
+                  // chain_plugin's push_transaction and the legacy get_block response).
                   std::vector<const action_trace_v0*> sorted;
                   sorted.reserve(trx.actions.size());
                   for (const auto& a : trx.actions)
@@ -237,24 +237,14 @@ namespace sysio::trace_api {
 
                   for (const action_trace_v0* ap : sorted) {
                      const auto& a = *ap;
-                     if (a.global_sequence <= query.after_global_seq) continue;
                      if (query.receiver && a.receiver != *query.receiver) continue;
                      if (query.account  && a.account  != *query.account)  continue;
                      if (query.action   && a.action   != *query.action)   continue;
 
-                     result.last_global_seq = a.global_sequence;
                      result.actions.push_back(build_action_var(a, trx));
-
-                     if (result.actions.size() >= query.limit) {
-                        result.more = true;
-                        return;
-                     }
                   }
-                  if (result.more) return;
                }
             }, std::get<0>(*data));
-
-            if (result.more) break;
          }
 
          return result;
