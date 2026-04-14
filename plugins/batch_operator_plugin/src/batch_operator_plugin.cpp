@@ -333,13 +333,18 @@ struct batch_operator_plugin::impl {
       } FC_LOG_AND_RETHROW();
    }
 
-   /// Returns true if we are within the safe operating window for this epoch
-   /// (not too close to the start or end boundary).
+   /// Returns true if we are within the safe operating window for this epoch.
+   /// Blocks operations only in the narrow buffer zones at epoch boundaries.
+   /// Once past next_epoch_start, operations are allowed (epoch is overdue).
    bool within_epoch_window() {
       auto now = fc::time_point::now();
       auto buffer = fc::milliseconds(EPOCH_EDGE_BUFFER_MS);
       if (now < epoch_start + buffer) return false;  // too close to epoch start
-      if (next_epoch_start != fc::time_point() && now > next_epoch_start - buffer) return false; // too close to epoch end
+      // Only block in the narrow window BEFORE next_epoch_start.
+      // Once past next_epoch_start, the epoch is overdue — allow operations.
+      if (next_epoch_start != fc::time_point() &&
+          now > next_epoch_start - buffer &&
+          now < next_epoch_start) return false;
       return true;
    }
 
