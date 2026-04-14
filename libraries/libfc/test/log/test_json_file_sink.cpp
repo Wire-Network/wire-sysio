@@ -5,6 +5,7 @@
 #include <fc/log/logger.hpp>
 #include <fc/log/logger_config.hpp>
 #include <fc/reflect/variant.hpp>
+#include <fc/scoped_exit.hpp>
 #include <fc/variant_object.hpp>
 
 #include <spdlog/logger.h>
@@ -12,6 +13,7 @@
 #include <atomic>
 #include <filesystem>
 #include <fstream>
+#include <functional>
 #include <regex>
 #include <sstream>
 #include <thread>
@@ -23,9 +25,9 @@ namespace {
 
 fs::path make_temp_dir(const std::string& prefix) {
    static std::atomic<int> counter{0};
-   auto pid = static_cast<long>(::getpid());
+   auto uniq = std::hash<std::thread::id>{}(std::this_thread::get_id());
    fs::path p = fs::temp_directory_path()
-      / ("fc_json_sink_" + prefix + "_" + std::to_string(pid) + "_" + std::to_string(counter++));
+      / ("fc_json_sink_" + prefix + "_" + std::to_string(uniq) + "_" + std::to_string(counter++));
    fs::create_directories(p);
    return p;
 }
@@ -44,23 +46,37 @@ fc::variant parse_json(const std::string& s) {
    return fc::json::from_string(s);
 }
 
+// Create a temp dir, spin up a rotating JSON sink, run log_fn against it,
+// tear everything down, and return the JSONL lines that were written. The
+// temp dir is removed even if log_fn throws.
+std::vector<std::string> sink_write_read(
+   const std::string& prefix,
+   std::map<std::string, std::string> extras,
+   const std::function<void(spdlog::logger&)>& log_fn)
+{
+   auto dir     = make_temp_dir(prefix);
+   auto cleanup = fc::make_scoped_exit([&]{ fs::remove_all(dir); });
+   auto file    = dir / "out.jsonl";
+   {
+      auto sink = std::make_shared<fc::json_rotating_file_sink_mt>(
+         file.string(), 100*1024*1024, 3, std::move(extras));
+      spdlog::logger lgr("test_logger", {sink});
+      lgr.set_level(spdlog::level::trace);
+      log_fn(lgr);
+   }
+   return read_lines(file);
+}
+
 } // anonymous namespace
 
 BOOST_AUTO_TEST_SUITE(json_file_sink_tests)
 
 BOOST_AUTO_TEST_CASE(writes_one_json_object_per_line) try {
-   auto dir  = make_temp_dir("basic");
-   auto file = dir / "out.jsonl";
-   {
-      auto sink = std::make_shared<fc::json_rotating_file_sink_mt>(
-         file.string(), 100*1024*1024, 3, std::map<std::string, std::string>{});
-      spdlog::logger lgr("test_logger", {sink});
-      lgr.set_level(spdlog::level::trace);
+   auto lines = sink_write_read("basic", {}, [](spdlog::logger& lgr) {
       for (int i = 0; i < 5; ++i) {
          SPDLOG_LOGGER_INFO(&lgr, "message {}", i);
       }
-   }
-   auto lines = read_lines(file);
+   });
    BOOST_REQUIRE_EQUAL(lines.size(), 5u);
    for (size_t i = 0; i < lines.size(); ++i) {
       auto v = parse_json(lines[i]);
@@ -77,65 +93,41 @@ BOOST_AUTO_TEST_CASE(writes_one_json_object_per_line) try {
       BOOST_CHECK_EQUAL(obj["logger"].as_string(), "test_logger");
       BOOST_CHECK_EQUAL(obj["lvl"].as_string(), "info");
    }
-   fs::remove_all(dir);
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_CASE(timestamp_iso8601_microseconds) try {
-   auto dir  = make_temp_dir("ts");
-   auto file = dir / "out.jsonl";
-   {
-      auto sink = std::make_shared<fc::json_rotating_file_sink_mt>(
-         file.string(), 100*1024*1024, 3, std::map<std::string, std::string>{});
-      spdlog::logger lgr("test_logger", {sink});
-      lgr.set_level(spdlog::level::trace);
+   auto lines = sink_write_read("ts", {}, [](spdlog::logger& lgr) {
       SPDLOG_LOGGER_INFO(&lgr, "ts check");
-   }
-   auto lines = read_lines(file);
+   });
    BOOST_REQUIRE_EQUAL(lines.size(), 1u);
    auto v = parse_json(lines[0]);
    std::string ts = v.get_object()["ts"].as_string();
    std::regex iso_re{R"(^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}Z$)"};
    BOOST_CHECK_MESSAGE(std::regex_match(ts, iso_re),
       "timestamp did not match ISO-8601 microsecond pattern: " + ts);
-   fs::remove_all(dir);
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_CASE(levels_match_spdlog) try {
-   auto dir  = make_temp_dir("levels");
-   auto file = dir / "out.jsonl";
-   {
-      auto sink = std::make_shared<fc::json_rotating_file_sink_mt>(
-         file.string(), 100*1024*1024, 3, std::map<std::string, std::string>{});
-      spdlog::logger lgr("test_logger", {sink});
-      lgr.set_level(spdlog::level::trace);
+   auto lines = sink_write_read("levels", {}, [](spdlog::logger& lgr) {
       SPDLOG_LOGGER_TRACE(&lgr, "t");
       SPDLOG_LOGGER_DEBUG(&lgr, "d");
       SPDLOG_LOGGER_INFO (&lgr, "i");
       SPDLOG_LOGGER_WARN (&lgr, "w");
       SPDLOG_LOGGER_ERROR(&lgr, "e");
-   }
-   auto lines = read_lines(file);
+   });
    BOOST_REQUIRE_EQUAL(lines.size(), 5u);
    BOOST_CHECK_EQUAL(parse_json(lines[0]).get_object()["lvl"].as_string(), "trace");
    BOOST_CHECK_EQUAL(parse_json(lines[1]).get_object()["lvl"].as_string(), "debug");
    BOOST_CHECK_EQUAL(parse_json(lines[2]).get_object()["lvl"].as_string(), "info");
    BOOST_CHECK_EQUAL(parse_json(lines[3]).get_object()["lvl"].as_string(), "warn");
    BOOST_CHECK_EQUAL(parse_json(lines[4]).get_object()["lvl"].as_string(), "error");
-   fs::remove_all(dir);
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_CASE(escapes_special_and_control_chars) try {
-   auto dir  = make_temp_dir("escape");
-   auto file = dir / "out.jsonl";
    const std::string payload = "a\"b\\c\nd\te\rf\x01g\x1fh";
-   {
-      auto sink = std::make_shared<fc::json_rotating_file_sink_mt>(
-         file.string(), 100*1024*1024, 3, std::map<std::string, std::string>{});
-      spdlog::logger lgr("test_logger", {sink});
-      lgr.set_level(spdlog::level::trace);
+   auto lines = sink_write_read("escape", {}, [&](spdlog::logger& lgr) {
       SPDLOG_LOGGER_INFO(&lgr, "{}", payload);
-   }
-   auto lines = read_lines(file);
+   });
    BOOST_REQUIRE_EQUAL(lines.size(), 1u);
    // Raw line contains JSON-escaped sequences verbatim.
    BOOST_CHECK(lines[0].find(R"(\")")     != std::string::npos);
@@ -148,26 +140,17 @@ BOOST_AUTO_TEST_CASE(escapes_special_and_control_chars) try {
    // Full round-trip through fc::json (exercises fixed parse_escape).
    auto v = parse_json(lines[0]);
    BOOST_CHECK_EQUAL(v.get_object()["msg"].as_string(), payload);
-   fs::remove_all(dir);
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_CASE(utf8_preserved_raw) try {
-   auto dir  = make_temp_dir("utf8");
-   auto file = dir / "out.jsonl";
    const std::string payload = "na\xc3\xafve \xe6\x97\xa5\xe6\x9c\xac\xe8\xaa\x9e";
-   {
-      auto sink = std::make_shared<fc::json_rotating_file_sink_mt>(
-         file.string(), 100*1024*1024, 3, std::map<std::string, std::string>{});
-      spdlog::logger lgr("test_logger", {sink});
-      lgr.set_level(spdlog::level::trace);
+   auto lines = sink_write_read("utf8", {}, [&](spdlog::logger& lgr) {
       SPDLOG_LOGGER_INFO(&lgr, "{}", payload);
-   }
-   auto lines = read_lines(file);
+   });
    BOOST_REQUIRE_EQUAL(lines.size(), 1u);
    BOOST_CHECK(lines[0].find("\\u") == std::string::npos);
    auto v = parse_json(lines[0]);
    BOOST_CHECK_EQUAL(v.get_object()["msg"].as_string(), payload);
-   fs::remove_all(dir);
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_CASE(source_loc_captured) try {
@@ -202,8 +185,8 @@ BOOST_AUTO_TEST_CASE(extra_fields_emitted_and_omitted) try {
          std::map<std::string, std::string>{{"env", "prod"}, {"region", "us-east-1"}});
       auto sink_off = std::make_shared<fc::json_rotating_file_sink_mt>(
          file_off.string(), 100*1024*1024, 3, std::map<std::string, std::string>{});
-      spdlog::logger lgr_on("test_logger", {sink_on});
-      spdlog::logger lgr_off("test_logger", {sink_off});
+      spdlog::logger lgr_on("extras_on", {sink_on});
+      spdlog::logger lgr_off("extras_off", {sink_off});
       lgr_on.set_level(spdlog::level::trace);
       lgr_off.set_level(spdlog::level::trace);
       SPDLOG_LOGGER_INFO(&lgr_on,  "m");
@@ -227,7 +210,8 @@ BOOST_AUTO_TEST_CASE(rotating_size_triggers_rollover) try {
    auto dir  = make_temp_dir("rotate");
    auto file = dir / "out.jsonl";
    {
-      // 1 byte max -> every write rotates
+      // 1 byte max -> every write rotates. (spdlog rejects max_size == 0,
+      // so 1 is the smallest valid value that forces a rollover each line.)
       auto sink = std::make_shared<fc::json_rotating_file_sink_mt>(
          file.string(), 1, 3, std::map<std::string, std::string>{});
       spdlog::logger lgr("test_logger", {sink});
@@ -273,6 +257,9 @@ BOOST_AUTO_TEST_CASE(parse_config_from_json_text) try {
 
 BOOST_AUTO_TEST_CASE(configure_logging_accepts_json_sinks) try {
    auto dir = make_temp_dir("cfg");
+   auto restore = fc::make_scoped_exit([]() {
+      fc::configure_logging(fc::logging_config::default_config());
+   });
    fc::logging_config cfg;
 
    fc::sink_config s1;
@@ -304,7 +291,6 @@ BOOST_AUTO_TEST_CASE(configure_logging_accepts_json_sinks) try {
    auto lgr = fc::log_config::get_logger("test_cfg_logger");
    fc_ilog(lgr, "configured message");
 
-   fc::configure_logging(fc::logging_config::default_config());
    fs::remove_all(dir);
 } FC_LOG_AND_RETHROW()
 

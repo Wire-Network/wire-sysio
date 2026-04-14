@@ -10,6 +10,7 @@
 #include <spdlog/sinks/daily_file_sink.h>
 #include <spdlog/sinks/rotating_file_sink.h>
 
+#include <limits>
 #include <unordered_map>
 #include <string>
 
@@ -102,13 +103,16 @@ namespace fc {
                log_config::get().sink_map[cfg.sinks[i].name] = sink;
             } else if (cfg.sinks[i].type == "daily_file_sink") {
                auto config = cfg.sinks[i].args.as<sink::daily_file_sink_config>();
+               FC_ASSERT(config.max_files <= std::numeric_limits<uint16_t>::max(),
+                         "daily_file_sink max_files {} exceeds uint16_t max", config.max_files);
                auto sink = std::make_shared<spdlog::sinks::daily_file_sink_mt>(
-                       config.base_filename, config.rotation_hour, config.rotation_minute, config.truncate, config.max_files);
+                       config.base_filename, config.rotation_hour, config.rotation_minute,
+                       config.truncate, static_cast<uint16_t>(config.max_files));
                log_config::get().sink_map[cfg.sinks[i].name] = sink;
             } else if (cfg.sinks[i].type == "rotating_file_sink") {
                auto config = cfg.sinks[i].args.as<sink::rotating_file_sink_config>();
                auto sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(
-                       config.base_filename, config.max_size*1024*1024, config.max_files);
+                       config.base_filename, std::size_t{config.max_size}*1024*1024, config.max_files);
                log_config::get().sink_map[cfg.sinks[i].name] = sink;
             } else if (cfg.sinks[i].type == "dmlog_sink") {
                auto config = cfg.sinks[i].args.as<sink::dmlog_sink_config>();
@@ -120,11 +124,13 @@ namespace fc {
                for (const auto& kv : config.extra_fields)
                   extras[kv.key()] = kv.value().as_string();
                auto sink = std::make_shared<fc::json_rotating_file_sink_mt>(
-                       config.base_filename, config.max_size*1024*1024, config.max_files,
+                       config.base_filename, std::size_t{config.max_size}*1024*1024, config.max_files,
                        std::move(extras));
                log_config::get().sink_map[cfg.sinks[i].name] = sink;
             } else if (cfg.sinks[i].type == "json_daily_file_sink") {
                auto config = cfg.sinks[i].args.as<sink::json_daily_file_sink_config>();
+               FC_ASSERT(config.max_files <= std::numeric_limits<uint16_t>::max(),
+                         "json_daily_file_sink max_files {} exceeds uint16_t max", config.max_files);
                std::map<std::string, std::string> extras;
                for (const auto& kv : config.extra_fields)
                   extras[kv.key()] = kv.value().as_string();
@@ -178,6 +184,8 @@ namespace fc {
          return true;
       } catch ( exception& e ) {
          std::cerr<<e.to_detail_string()<<"\n";
+      } catch ( std::exception& e ) {
+         std::cerr<<"Failed to configure logging: "<<e.what()<<"\n";
       }
       return false;
    }

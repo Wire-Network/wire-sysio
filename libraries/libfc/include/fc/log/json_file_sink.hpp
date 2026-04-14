@@ -17,15 +17,20 @@ namespace fc {
    namespace sink {
       // extra_fields is a variant_object so operators can write `{"env":"prod"}`
       // natively in logging.json. (fc serializes std::map as an array of pairs,
-      // which is unfriendly in hand-edited config.) Values are coerced to string
-      // at load time.
+      // which is unfriendly in hand-edited config.) Primitive values (string,
+      // number, bool, null) are coerced to string at load time; nested objects
+      // or arrays throw on configure.
       struct json_rotating_file_sink_config {
          std::string          base_filename;
-         uint32_t             max_size  = 10;  // MB
+         uint32_t             max_size  = 10;  // megabytes (multiplied by 1024*1024 at load time)
          uint32_t             max_files = 10;
          fc::variant_object   extra_fields;
       };
 
+      // Note: rotation_hour/rotation_minute are interpreted in the node's local
+      // time (spdlog uses localtime_r for rotation scheduling), but the emitted
+      // "ts" field is always UTC. A line with ts=2026-04-14T23:30:00Z may land
+      // in the file dated 2026-04-15 if the operator's timezone is east of UTC.
       struct json_daily_file_sink_config {
          std::string          base_filename;
          int32_t              rotation_hour   = 0;
@@ -37,9 +42,10 @@ namespace fc {
    } // namespace sink
 
    /// JSONL (one JSON object per line) sink with size-based rotation.
-   /// Inner rotator uses null_mutex — the outer std::mutex serializes all access.
+   /// Inner rotator uses null_mutex -- the outer std::mutex serializes all access.
    class json_rotating_file_sink_mt : public spdlog::sinks::base_sink<std::mutex> {
    public:
+      /// @param max_size_bytes rotation threshold in bytes (config converts MB -> bytes)
       json_rotating_file_sink_mt(const std::string& base_filename,
                                  std::size_t        max_size_bytes,
                                  std::size_t        max_files,

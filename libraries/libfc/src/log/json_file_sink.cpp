@@ -1,5 +1,6 @@
 #include <fc/log/json_file_sink.hpp>
 #include <fc/log/logger_config.hpp>
+#include <fc/time.hpp>
 
 #include <spdlog/common.h>
 #include <spdlog/pattern_formatter.h>
@@ -46,13 +47,12 @@ void format_json_line(const spdlog::details::log_msg& msg,
    auto secs = std::chrono::time_point_cast<std::chrono::seconds>(tp);
    auto us   = std::chrono::duration_cast<std::chrono::microseconds>(tp - secs).count();
    std::time_t tt = std::chrono::system_clock::to_time_t(secs);
-   std::tm tm_utc{};
-   gmtime_r(&tt, &tm_utc);
+   std::tm tm_utc = fc::to_utc_tm(tt);
 
    append_sv(out, R"({"ts":")");
    fmt::format_to(oi, "{:04d}-{:02d}-{:02d}T{:02d}:{:02d}:{:02d}.{:06d}Z",
       tm_utc.tm_year + 1900, tm_utc.tm_mon + 1, tm_utc.tm_mday,
-      tm_utc.tm_hour, tm_utc.tm_min, tm_utc.tm_sec, static_cast<int>(us));
+      tm_utc.tm_hour, tm_utc.tm_min, tm_utc.tm_sec, us);
    out.push_back('"');
 
    const auto& lvl_sv = spdlog::level::to_string_view(msg.level);
@@ -114,7 +114,6 @@ std::unique_ptr<spdlog::pattern_formatter> make_passthrough_formatter() {
 
 } // anonymous namespace
 
-
 json_rotating_file_sink_mt::json_rotating_file_sink_mt(
       const std::string& base_filename,
       std::size_t        max_size_bytes,
@@ -130,6 +129,7 @@ json_rotating_file_sink_mt::json_rotating_file_sink_mt(
 json_rotating_file_sink_mt::~json_rotating_file_sink_mt() = default;
 
 void json_rotating_file_sink_mt::sink_it_(const spdlog::details::log_msg& msg) {
+   // buf backs synthetic.payload; inner_->log() must consume it synchronously.
    thread_local spdlog::memory_buf_t buf;
    format_json_line(msg, extra_fields_, buf);
    spdlog::details::log_msg synthetic = msg;
@@ -143,7 +143,6 @@ void json_rotating_file_sink_mt::flush_() {
 
 void json_rotating_file_sink_mt::set_formatter_(std::unique_ptr<spdlog::formatter>) {
 }
-
 
 json_daily_file_sink_mt::json_daily_file_sink_mt(
       const std::string& base_filename,
@@ -162,6 +161,7 @@ json_daily_file_sink_mt::json_daily_file_sink_mt(
 json_daily_file_sink_mt::~json_daily_file_sink_mt() = default;
 
 void json_daily_file_sink_mt::sink_it_(const spdlog::details::log_msg& msg) {
+   // buf backs synthetic.payload; inner_->log() must consume it synchronously.
    thread_local spdlog::memory_buf_t buf;
    format_json_line(msg, extra_fields_, buf);
    spdlog::details::log_msg synthetic = msg;

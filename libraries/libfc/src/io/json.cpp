@@ -30,60 +30,62 @@ namespace fc
 
 namespace fc
 {
-   inline void append_utf8( std::string& out, uint32_t cp )
-   {
-      if( cp < 0x80 ) {
-         out.push_back( static_cast<char>(cp) );
-      } else if( cp < 0x800 ) {
-         out.push_back( static_cast<char>(0xC0 | (cp >> 6)) );
-         out.push_back( static_cast<char>(0x80 | (cp & 0x3F)) );
-      } else if( cp < 0x10000 ) {
-         out.push_back( static_cast<char>(0xE0 | (cp >> 12)) );
-         out.push_back( static_cast<char>(0x80 | ((cp >> 6) & 0x3F)) );
-         out.push_back( static_cast<char>(0x80 | (cp & 0x3F)) );
-      } else {
-         out.push_back( static_cast<char>(0xF0 | (cp >> 18)) );
-         out.push_back( static_cast<char>(0x80 | ((cp >> 12) & 0x3F)) );
-         out.push_back( static_cast<char>(0x80 | ((cp >> 6) & 0x3F)) );
-         out.push_back( static_cast<char>(0x80 | (cp & 0x3F)) );
+   namespace {
+      void append_utf8( std::string& out, uint32_t cp )
+      {
+         if( cp < 0x80 ) {
+            out.push_back( static_cast<char>(cp) );
+         } else if( cp < 0x800 ) {
+            out.push_back( static_cast<char>(0xC0 | (cp >> 6)) );
+            out.push_back( static_cast<char>(0x80 | (cp & 0x3F)) );
+         } else if( cp < 0x10000 ) {
+            out.push_back( static_cast<char>(0xE0 | (cp >> 12)) );
+            out.push_back( static_cast<char>(0x80 | ((cp >> 6) & 0x3F)) );
+            out.push_back( static_cast<char>(0x80 | (cp & 0x3F)) );
+         } else {
+            out.push_back( static_cast<char>(0xF0 | (cp >> 18)) );
+            out.push_back( static_cast<char>(0x80 | ((cp >> 12) & 0x3F)) );
+            out.push_back( static_cast<char>(0x80 | ((cp >> 6) & 0x3F)) );
+            out.push_back( static_cast<char>(0x80 | (cp & 0x3F)) );
+         }
       }
-   }
 
-   template<typename T>
-   uint32_t read_hex4( T& in )
-   {
-      uint32_t v = 0;
-      for( int i = 0; i < 4; ++i ) {
-         char h = in.get();
-         uint32_t d;
-         if( h >= '0' && h <= '9' )      d = h - '0';
-         else if( h >= 'a' && h <= 'f' ) d = 10 + (h - 'a');
-         else if( h >= 'A' && h <= 'F' ) d = 10 + (h - 'A');
-         else FC_THROW_EXCEPTION( parse_error_exception, "Invalid hex digit in \\u escape" );
-         v = (v << 4) | d;
+      template<typename T>
+      uint32_t read_hex4( T& in )
+      {
+         uint32_t v = 0;
+         for( int i = 0; i < 4; ++i ) {
+            char h = in.get();
+            uint32_t d;
+            if( h >= '0' && h <= '9' )      d = h - '0';
+            else if( h >= 'a' && h <= 'f' ) d = 10 + (h - 'a');
+            else if( h >= 'A' && h <= 'F' ) d = 10 + (h - 'A');
+            else FC_THROW_EXCEPTION( parse_error_exception, "Invalid hex digit in \\u escape" );
+            v = (v << 4) | d;
+         }
+         return v;
       }
-      return v;
-   }
 
-   template<typename T>
-   void append_unicode_escape( std::string& out, T& in )
-   {
-      // called with 'u' still in the stream
-      in.get(); // consume 'u'
-      uint32_t cp = read_hex4( in );
-      if( cp >= 0xD800 && cp <= 0xDBFF ) {
-         // high surrogate -- must be followed by \uXXXX low surrogate
-         if( in.get() != '\\' || in.get() != 'u' )
-            FC_THROW_EXCEPTION( parse_error_exception, "Unpaired high surrogate in \\u escape" );
-         uint32_t low = read_hex4( in );
-         if( low < 0xDC00 || low > 0xDFFF )
-            FC_THROW_EXCEPTION( parse_error_exception, "Invalid low surrogate in \\u escape" );
-         cp = 0x10000 + ((cp - 0xD800) << 10) + (low - 0xDC00);
-      } else if( cp >= 0xDC00 && cp <= 0xDFFF ) {
-         FC_THROW_EXCEPTION( parse_error_exception, "Orphan low surrogate in \\u escape" );
+      template<typename T>
+      void append_unicode_escape( std::string& out, T& in )
+      {
+         // called with 'u' still in the stream
+         in.get(); // consume 'u'
+         uint32_t cp = read_hex4( in );
+         if( cp >= 0xD800 && cp <= 0xDBFF ) {
+            // high surrogate -- must be followed by \uXXXX low surrogate
+            if( in.get() != '\\' || in.get() != 'u' )
+               FC_THROW_EXCEPTION( parse_error_exception, "Unpaired high surrogate in \\u escape" );
+            uint32_t low = read_hex4( in );
+            if( low < 0xDC00 || low > 0xDFFF )
+               FC_THROW_EXCEPTION( parse_error_exception, "Invalid low surrogate in \\u escape" );
+            cp = 0x10000 + ((cp - 0xD800) << 10) + (low - 0xDC00);
+         } else if( cp >= 0xDC00 && cp <= 0xDFFF ) {
+            FC_THROW_EXCEPTION( parse_error_exception, "Orphan low surrogate in \\u escape" );
+         }
+         append_utf8( out, cp );
       }
-      append_utf8( out, cp );
-   }
+   } // anonymous namespace
 
    template<typename T>
    std::string parse_escape( T& in )
