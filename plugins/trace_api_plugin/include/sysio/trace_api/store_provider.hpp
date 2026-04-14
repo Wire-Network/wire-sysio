@@ -89,6 +89,29 @@ namespace sysio::trace_api {
 
    class store_provider;
 
+   // On-disk format: trace_blk_idx_<range>.log
+   //
+   // Layout: blk_offset_index_header (16 bytes) followed by a flat array of
+   // width uint64_t slots.  Slot (block_num - slice_base) holds offset+1,
+   // where offset is the position in trace_<range>.log of that block's trace
+   // data.  Slot value 0 means "not present"; this distinguishes a missing
+   // block from a block stored at offset 0 (the first block in a slice).
+   //
+   // The file is pre-allocated sparse at creation, so any slot write is a
+   // single 8-byte in-place update.  Forks naturally overwrite the slot.
+   //
+   // Native-endian, x86_64 Linux only (same convention as other slice files).
+   struct blk_offset_index_header {
+      static constexpr uint32_t magic_value     = 0x424C4958; // "BLIX"
+      static constexpr uint32_t current_version = 1;
+
+      uint32_t magic     = magic_value;
+      uint32_t version   = current_version;
+      uint32_t width     = 0; // slice width (block count per slice)
+      uint32_t _reserved = 0;
+   };
+   static_assert(sizeof(blk_offset_index_header) == 16);
+
    /**
     * Provides access to the slice directory.  It is only intended to be used by store_provider
     * and unit tests.
@@ -241,6 +264,26 @@ namespace sysio::trace_api {
       std::optional<uint32_t> last_recorded_block() const;
 
       /**
+       * Record the offset of a block's trace data in trace_<range>.log, via the block-offset
+       * sidecar trace_blk_idx_<range>.log.  Creates the sidecar on first write to a new slice.
+       * Writes to an existing slot naturally overwrite it (fork re-writes).
+       */
+      void write_block_offset(uint32_t block_height, uint64_t trace_offset) const;
+
+      /**
+       * O(1) lookup of the trace-log offset for a block via the block-offset sidecar.
+       * Returns nullopt when the sidecar is missing, the slot is empty, or the file is invalid.
+       * Callers should fall back to scanning the metadata log in that case.
+       */
+      std::optional<uint64_t> lookup_block_offset(uint32_t block_height) const;
+
+      /**
+       * Current best-known LIB as reported by append_lib.  Thread-safe; used by readers to
+       * determine whether a given block is irreversible without scanning the metadata log.
+       */
+      uint32_t best_known_lib() const;
+
+      /**
        * set the LIB for maintenance
        * @param lib
        */
@@ -275,6 +318,11 @@ namespace sysio::trace_api {
       // take an open index slice file and verify its header is valid and prepare the file to be appended to (or read from)
       void validate_existing_index_slice_file(fc::cfile& index_file, open_state state) const;
 
+      // Open the block-offset sidecar for a slice; creates and pre-allocates if missing.
+      // Validates the header on open.  Returns false + leaves blk_idx at the sidecar path
+      // (unopened) if the existing file has a wrong magic/version/width.
+      bool open_or_create_blk_offset_slice(uint32_t slice_number, fc::cfile& blk_idx) const;
+
       // helper for methods that process irreversible slice files
       template<typename F>
       void process_irreversible_slice_range(uint32_t lib, uint32_t upper_bound_block, std::optional<uint32_t>& lower_bound_slice, F&& f);
@@ -288,7 +336,7 @@ namespace sysio::trace_api {
       std::optional<uint32_t> _last_indexed_slice;
       const size_t _compression_seek_point_stride;
 
-      std::mutex _maintenance_mtx;
+      mutable std::mutex _maintenance_mtx;
       std::condition_variable _maintenance_condition;
       std::thread _maintenance_thread;
       bool _maintenance_shutdown{false};
@@ -452,3 +500,4 @@ namespace sysio::trace_api {
 }
 
 FC_REFLECT(sysio::trace_api::slice_directory::index_header, (version))
+FC_REFLECT(sysio::trace_api::blk_offset_index_header, (magic)(version)(width)(_reserved))

@@ -821,46 +821,66 @@ BOOST_AUTO_TEST_SUITE(slice_tests)
       sp.append(block_trace1);
       sp.append_lib(1);
       sp.append(block_trace2);
-      int count = 0;
-      get_block_t block1 = sp.get_block(1, [&count]() {
-         if (++count >= 3) {
-            throw yield_exception("");
-         }
-      });
+
+      // get_block uses the trace_blk_idx_<range>.log sidecar for O(1) lookup and does
+      // not iterate, so the yield callback is not invoked on the fast path.
+      get_block_t block1 = sp.get_block(1, [](){ BOOST_FAIL("yield must not be called on sidecar fast path"); });
       BOOST_REQUIRE(block1);
       BOOST_REQUIRE(std::get<1>(*block1));
       const auto block1_bt = std::get<0>(*block1);
       BOOST_REQUIRE_EQUAL(std::get<block_trace_v0>(block1_bt), block_trace1);
 
-      count = 0;
-      get_block_t block2 = sp.get_block(5, [&count]() {
-         if (++count >= 4) {
-            throw yield_exception("");
-         }
-      });
+      get_block_t block2 = sp.get_block(5, [](){ BOOST_FAIL("yield must not be called on sidecar fast path"); });
       BOOST_REQUIRE(block2);
       BOOST_REQUIRE(!std::get<1>(*block2));
       const auto block2_bt = std::get<0>(*block2);
       BOOST_REQUIRE_EQUAL(std::get<block_trace_v0>(block2_bt), block_trace2);
 
-      count = 0;
-      try {
-         sp.get_block(5,[&count]() {
-            if (++count >= 3) {
-               throw yield_exception("");
-            }
-         });
-         BOOST_FAIL("Should not have completed scan");
-      } catch (const yield_exception& ex) {
-      }
+      // Missing block: sidecar slot is empty, we fall back to scanning the metadata log.
+      get_block_t block_missing = sp.get_block(2);
+      BOOST_REQUIRE(!block_missing);
+   }
 
-      count = 0;
-      block2 = sp.get_block(2,[&count]() {
-         if (++count >= 4) {
-            throw yield_exception("");
-         }
-      });
-      BOOST_REQUIRE(!block2);
+   // Sidecar must be removed when its slice is cleaned up.
+   BOOST_FIXTURE_TEST_CASE(test_blk_offset_sidecar_cleanup, test_fixture)
+   {
+      fc::temp_directory tempdir;
+      const uint32_t width = 100;
+      slice_directory sd(tempdir.path(), width, /*min_irr=*/0u, std::optional<uint32_t>(), 0);
+
+      // Create sidecar + matching trace/index for slice 0 so cleanup has something to do.
+      sd.write_block_offset(1, 0);
+      fc::cfile f;
+      sd.find_or_create_trace_slice(0, open_state::read, f);
+      sd.find_or_create_index_slice(0, open_state::read, f);
+
+      const auto sidecar = tempdir.path() / "trace_blk_idx_0000000000-0000000100.log";
+      BOOST_REQUIRE(std::filesystem::exists(sidecar));
+
+      // Advance LIB several slices past 0 so slice 0 is rotated out.
+      sd.run_maintenance_tasks(width * 5, [](auto&&){});
+
+      BOOST_REQUIRE(!std::filesystem::exists(sidecar));
+   }
+
+   // Fork re-writes the block to a new offset.  The sidecar slot must be overwritten so
+   // get_block returns the latest (fork-resolved) copy, matching the scan-based "last wins".
+   BOOST_FIXTURE_TEST_CASE(test_blk_offset_fork_rewrite, test_fixture)
+   {
+      fc::temp_directory tempdir;
+      store_provider sp(tempdir.path(), 100, std::optional<uint32_t>(), std::optional<uint32_t>(), 0);
+
+      // Different block bodies but same block number.  Simulates a fork re-applying block 1.
+      block_trace_v0 forked = block_trace1;
+      forked.producer = "bp.two"_n;
+
+      sp.append(block_trace1);
+      sp.append(forked);
+
+      auto result = sp.get_block(1);
+      BOOST_REQUIRE(result);
+      const auto bt = std::get<block_trace_v0>(std::get<0>(*result));
+      BOOST_REQUIRE_EQUAL(bt, forked);
    }
 
 // Verify basics of get_trx_block_number()

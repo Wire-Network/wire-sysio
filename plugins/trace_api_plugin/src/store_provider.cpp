@@ -10,9 +10,10 @@ namespace {
       static constexpr const char* _trace_index_prefix = "trace_index_";
       static constexpr const char* _trace_trx_id_prefix = "trace_trx_id_";
       static constexpr const char* _trace_trx_id_index_prefix = "trace_trx_idx_";
+      static constexpr const char* _trace_blk_idx_prefix = "trace_blk_idx_";
       static constexpr const char* _trace_ext = ".log";
       static constexpr const char* _compressed_trace_ext = ".clog";
-      // longest prefix is "trace_trx_idx_" (14), then 10+1+10 digits, then ".clog" extension, then null
+      // longest prefix is "trace_trx_idx_" or "trace_blk_idx_" (14), then 10+1+10 digits, then ".clog" extension, then null
       static constexpr int _max_filename_size = std::char_traits<char>::length(_trace_trx_id_index_prefix) + 10 + 1 + 10 + std::char_traits<char>::length(_compressed_trace_ext) + 1;
 
       std::string make_filename(const char* slice_prefix, const char* slice_ext, uint32_t slice_number, uint32_t slice_width) {
@@ -54,6 +55,11 @@ namespace sysio::trace_api {
 
       auto be = metadata_log_entry { block_entry_v0 { .id = bt.id, .number = bt.number, .offset = offset }};
       append_store(be, index);
+
+      // Record in the block-offset sidecar for O(1) get_block lookups.  Fork re-writes
+      // overwrite the slot; if this step throws the metadata log remains the source of
+      // truth and get_block falls back to the linear scan.
+      _slice_directory.write_block_offset(bt.number, offset);
    }
 
    template void store_provider::append<block_trace_v0>(const block_trace_v0& bt);
@@ -78,26 +84,30 @@ namespace sysio::trace_api {
    }
 
    get_block_t store_provider::get_block(uint32_t block_height, const yield_function& yield) {
-      std::optional<uint64_t> trace_offset;
-      bool irreversible = false;
-      scan_metadata_log_from(block_height, 0, [&block_height, &trace_offset, &irreversible](const metadata_log_entry& e) -> bool {
-         if (std::holds_alternative<block_entry_v0>(e)) {
-            const auto& block = std::get<block_entry_v0>(e);
-            if (block.number == block_height) {
-               trace_offset = block.offset;
+      // Fast path: O(1) random-access lookup of the trace offset via the block-offset sidecar.
+      std::optional<uint64_t> trace_offset = _slice_directory.lookup_block_offset(block_height);
+
+      if (!trace_offset) {
+         // Fallback: scan the metadata log.  Covers slices without a sidecar (e.g. corruption,
+         // missing sidecar file) or the rare case where a block exists in the metadata log but
+         // the sidecar write was interrupted.
+         scan_metadata_log_from(block_height, 0, [&block_height, &trace_offset](const metadata_log_entry& e) -> bool {
+            if (std::holds_alternative<block_entry_v0>(e)) {
+               const auto& block = std::get<block_entry_v0>(e);
+               if (block.number == block_height) {
+                  trace_offset = block.offset;
+               }
             }
-         } else if (std::holds_alternative<lib_entry_v0>(e)) {
-            auto lib = std::get<lib_entry_v0>(e).lib;
-            if (lib >= block_height) {
-               irreversible = true;
-               return false;
-            }
-         }
-         return true;
-      }, yield);
+            return true;
+         }, yield);
+      }
+
       if (!trace_offset) {
          return get_block_t{};
       }
+
+      const bool irreversible = block_height <= _slice_directory.best_known_lib();
+
       std::optional<data_log_entry> entry = read_data_log(block_height, *trace_offset);
       if (!entry) {
          return get_block_t{};
@@ -478,6 +488,96 @@ namespace sysio::trace_api {
       _maintenance_condition.notify_one();
    }
 
+   uint32_t slice_directory::best_known_lib() const {
+      std::scoped_lock lock(_maintenance_mtx);
+      return _best_known_lib;
+   }
+
+   bool slice_directory::open_or_create_blk_offset_slice(uint32_t slice_number, fc::cfile& blk_idx) const {
+      const bool found = find_slice(_trace_blk_idx_prefix, slice_number, blk_idx, /*open_file=*/false);
+      if (found) {
+         // Existing file: open for random-access read/write ("rb+").
+         blk_idx.open(fc::cfile::update_rw_mode);
+         blk_offset_index_header header{};
+         try {
+            blk_idx.seek(0);
+            blk_idx.read(reinterpret_cast<char*>(&header), sizeof(header));
+         } catch (...) {
+            blk_idx.close();
+            return false;
+         }
+         if (header.magic != blk_offset_index_header::magic_value ||
+             header.version != blk_offset_index_header::current_version ||
+             header.width != _width) {
+            blk_idx.close();
+            return false;
+         }
+         return true;
+      }
+
+      // New file: create with truncate+read/write ("wb+") so subsequent seek()+write()
+      // behave as random-access (append mode "ab+" would ignore the seek on writes).
+      blk_idx.open(fc::cfile::truncate_rw_mode);
+      blk_offset_index_header header{};
+      header.width = _width;
+      blk_idx.seek(0);
+      blk_idx.write(reinterpret_cast<const char*>(&header), sizeof(header));
+      // Pre-allocate by writing the final byte.  Linux fills the gap sparsely.
+      const uint64_t final_byte = sizeof(blk_offset_index_header) + uint64_t{_width} * sizeof(uint64_t) - 1;
+      const char zero = 0;
+      blk_idx.seek(final_byte);
+      blk_idx.write(&zero, 1);
+      blk_idx.flush();
+      return true;
+   }
+
+   void slice_directory::write_block_offset(uint32_t block_height, uint64_t trace_offset) const {
+      const uint32_t slice_number = this->slice_number(block_height);
+      fc::cfile blk_idx;
+      if (!open_or_create_blk_offset_slice(slice_number, blk_idx)) {
+         // Existing sidecar is unusable (wrong magic/version/width).  Remove and recreate;
+         // readers fall back to the metadata-log scan in the meantime.
+         std::filesystem::remove(blk_idx.get_file_path());
+         if (!open_or_create_blk_offset_slice(slice_number, blk_idx)) {
+            return;
+         }
+      }
+      const uint32_t slot = block_height % _width;
+      const uint64_t slot_pos = sizeof(blk_offset_index_header) + uint64_t{slot} * sizeof(uint64_t);
+      const uint64_t encoded = trace_offset + 1; // 0 reserved as "empty"
+      blk_idx.seek(slot_pos);
+      blk_idx.write(reinterpret_cast<const char*>(&encoded), sizeof(encoded));
+      blk_idx.flush();
+   }
+
+   std::optional<uint64_t> slice_directory::lookup_block_offset(uint32_t block_height) const {
+      const uint32_t slice_number = this->slice_number(block_height);
+      fc::cfile blk_idx;
+      const bool found = find_slice(_trace_blk_idx_prefix, slice_number, blk_idx, /*open_file=*/false);
+      if (!found) return std::nullopt;
+
+      try {
+         blk_idx.open(fc::cfile::update_rw_mode);
+         blk_offset_index_header header{};
+         blk_idx.seek(0);
+         blk_idx.read(reinterpret_cast<char*>(&header), sizeof(header));
+         if (header.magic != blk_offset_index_header::magic_value ||
+             header.version != blk_offset_index_header::current_version ||
+             header.width != _width) {
+            return std::nullopt;
+         }
+         const uint32_t slot = block_height % _width;
+         const uint64_t slot_pos = sizeof(blk_offset_index_header) + uint64_t{slot} * sizeof(uint64_t);
+         uint64_t encoded = 0;
+         blk_idx.seek(slot_pos);
+         blk_idx.read(reinterpret_cast<char*>(&encoded), sizeof(encoded));
+         if (encoded == 0) return std::nullopt;
+         return encoded - 1;
+      } catch (...) {
+         return std::nullopt;
+      }
+   }
+
    void slice_directory::start_maintenance_thread(log_handler log) {
       _maintenance_thread = std::thread([this, log=std::move(log)](){
          fc::set_thread_name( "trace-mx" );
@@ -573,6 +673,13 @@ namespace sysio::trace_api {
             if (std::filesystem::exists(idx_path)) {
                log(std::string("Removing: ") + idx_path.generic_string());
                std::filesystem::remove(idx_path);
+            }
+
+            auto blk_idx_filename = make_filename(_trace_blk_idx_prefix, _trace_ext, slice_to_clean, _width);
+            const auto blk_idx_path = _slice_dir / blk_idx_filename;
+            if (std::filesystem::exists(blk_idx_path)) {
+               log(std::string("Removing: ") + blk_idx_path.generic_string());
+               std::filesystem::remove(blk_idx_path);
             }
 
             auto ctrace = find_compressed_trace_slice(slice_to_clean, dont_open_file);

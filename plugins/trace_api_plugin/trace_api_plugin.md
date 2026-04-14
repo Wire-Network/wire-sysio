@@ -108,13 +108,14 @@ All files live inside `trace-dir`. The directory is monitored by
 ### Slice files
 
 Blocks are grouped into contiguous slices of `trace-slice-stride` blocks
-each. Each slice is represented by three files that share a common range
+each. Each slice is represented by four files that share a common range
 suffix `<start>-<end>` (zero-padded to 10 digits):
 
 | File | Description |
 |------|-------------|
 | `trace_<start>-<end>.log` | Serialized `block_trace_v0` records (action data). |
-| `trace_index_<start>-<end>.log` | Metadata index: block number → byte offset in the trace file. Enables random access without scanning the full trace file. |
+| `trace_index_<start>-<end>.log` | Append-only metadata log of `block_entry_v0` and `lib_entry_v0` records. Source of truth; used as a fallback for `get_block` and to track LIB advancement within the slice. |
+| `trace_blk_idx_<start>-<end>.log` | Block-offset sidecar (see below).  Enables O(1) `get_block` lookups regardless of the block's position within the slice. |
 | `trace_trx_idx_<start>-<end>.log` | Transaction-id hash index (see below). |
 
 When a slice is compressed the trace file is replaced by:
@@ -131,15 +132,34 @@ The index and trx_id index files are not compressed.
 traces/
   trace_0000000000-0000010000.log
   trace_index_0000000000-0000010000.log
+  trace_blk_idx_0000000000-0000010000.log
   trace_trx_idx_0000000000-0000010000.log
   trace_0000010000-0000020000.log
   trace_index_0000010000-0000020000.log
+  trace_blk_idx_0000010000-0000020000.log
   trace_trx_idx_0000010000-0000020000.log
   trace_0000020000-0000030000.clog        <- compressed
   trace_index_0000020000-0000030000.log
+  trace_blk_idx_0000020000-0000030000.log
   trace_trx_idx_0000020000-0000030000.log
   abi_store.log
 ```
+
+### Block-offset index
+
+`trace_blk_idx_<start>-<end>.log` is a flat fixed-size array of 64-bit
+trace-log offsets, one entry per block in the slice, used by
+`/v1/trace_api/get_block` for O(1) block lookups.
+
+- **Header** (16 bytes): magic `BLIX`, version 1, slice width, reserved.
+- **Slots** (8 bytes each): `offset + 1` into `trace_<start>-<end>.log`,
+  or 0 when the slot is empty.  The `+1` encoding reserves 0 as an empty
+  sentinel since a block's trace data can legitimately live at offset 0.
+
+The sidecar is written synchronously alongside the metadata log as each
+block is persisted.  Forks that re-apply the same block number overwrite
+the slot naturally.  If the sidecar is missing or reports an empty slot,
+`get_block` falls back to scanning the metadata log.
 
 ### Transaction-id index
 
@@ -661,10 +681,11 @@ compressed but random-access reads may be slightly slower.
 
 ### Manual deletion
 
-Stop nodeop before deleting trace files manually.  Delete entire slice
-triplets (`trace_*`, `trace_index_*`, `trace_trx_idx_*` for the same
-range).  Partial deletion (e.g. deleting only the trace file but not the
-index) will cause `bad_data_exception` errors on the next startup.
+Stop nodeop before deleting trace files manually.  Delete the full set of
+slice files for a given range (`trace_*`, `trace_index_*`,
+`trace_blk_idx_*`, `trace_trx_idx_*`).  Partial deletion (e.g. deleting
+only the trace file but not the index) will cause `bad_data_exception`
+errors on the next startup.
 
 ### Snapshot restores
 
