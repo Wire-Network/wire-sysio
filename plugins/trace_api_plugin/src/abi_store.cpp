@@ -42,7 +42,7 @@ void abi_store_writer::write(const std::filesystem::path& path) const {
 
    // Header
    abi_store_header hdr;
-   hdr.entry_count = static_cast<uint32_t>(order.size());
+   hdr.entry_count = order.size();
    auto hdr_data = fc::raw::pack(hdr);
    f.write(hdr_data.data(), hdr_data.size());
 
@@ -75,39 +75,57 @@ void abi_store_writer::write(const std::filesystem::path& path) const {
 // abi_store_reader
 // ---------------------------------------------------------------------------
 
-abi_store_reader::abi_store_reader(const std::filesystem::path& path)
-   : _path(path) {
+abi_store_reader::abi_store_reader(const std::filesystem::path& path) {
+   if (!std::filesystem::exists(path))
+      return;
+
    try {
-      fc::cfile f;
-      f.set_file_path(path);
-      f.open("rb");
-      f.seek(0);
-      auto ds = f.create_datastream();
-
-      abi_store_header hdr;
-      fc::raw::unpack(ds, hdr);
-
-      if (hdr.magic != abi_store_header::magic_value) {
-         wlog("trace_api: abi_store {} has wrong magic, ignoring", path.generic_string());
-         return;
-      }
-      if (hdr.version != abi_store_header::current_version) {
-         wlog("trace_api: abi_store {} has unsupported version {}, ignoring",
-              path.generic_string(), hdr.version);
-         return;
-      }
-
-      _index.resize(hdr.entry_count);
-      for (auto& e : _index)
-         fc::raw::unpack(ds, e);
-
-      // Blob area starts immediately after header + index.
-      _blob_area_offset = sizeof(abi_store_header) +
-                          static_cast<uint64_t>(hdr.entry_count) * sizeof(abi_store_index_entry);
-      _valid = true;
+      _file.open(path.string());
    } catch (...) {
-      wlog("trace_api: failed to load abi_store from {}", path.generic_string());
+      wlog("trace_api: failed to mmap abi_store from {}", path.generic_string());
+      return;
    }
+   if (!_file.is_open() || _file.size() < sizeof(abi_store_header)) {
+      wlog("trace_api: abi_store {} too small for header, ignoring", path.generic_string());
+      return;
+   }
+
+   // fc::raw::pack uses little-endian for fixed-size integers and the structs
+   // are packed plain (no padding).  On x86_64 (little-endian native) the on-disk
+   // bytes match the in-memory struct layout, so reinterpret_cast is safe.
+   // The trace_api_plugin is x86_64 Linux only; documented in the slice-file
+   // header comments throughout this directory.
+   const char* base = _file.data();
+   abi_store_header hdr;
+   std::memcpy(&hdr, base, sizeof(hdr));
+
+   if (hdr.magic != abi_store_header::magic_value) {
+      wlog("trace_api: abi_store {} has wrong magic, ignoring", path.generic_string());
+      return;
+   }
+   if (hdr.version != abi_store_header::current_version) {
+      wlog("trace_api: abi_store {} has unsupported version {}, ignoring",
+           path.generic_string(), hdr.version);
+      return;
+   }
+
+   const uint64_t expected_min_size = sizeof(abi_store_header) +
+                                      static_cast<uint64_t>(hdr.entry_count) * sizeof(abi_store_index_entry);
+   if (_file.size() < expected_min_size) {
+      wlog("trace_api: abi_store {} truncated (size {} < expected min {}), ignoring",
+           path.generic_string(), _file.size(), expected_min_size);
+      return;
+   }
+
+   _index.resize(hdr.entry_count);
+   if (hdr.entry_count > 0) {
+      std::memcpy(_index.data(),
+                  base + sizeof(abi_store_header),
+                  static_cast<size_t>(hdr.entry_count) * sizeof(abi_store_index_entry));
+   }
+
+   _blob_area_offset = expected_min_size;
+   _valid = true;
 }
 
 std::optional<std::vector<char>> abi_store_reader::lookup(chain::name account, uint64_t global_seq) const {
@@ -131,21 +149,16 @@ std::optional<std::vector<char>> abi_store_reader::lookup(chain::name account, u
    if (it->account != acct)
       return std::nullopt;
 
-   std::optional<std::vector<char>> result;
-   result.emplace(it->blob_size);
-   try {
-      if (it->blob_size > 0) {
-         fc::cfile f;
-         f.set_file_path(_path);
-         f.open("rb");
-         f.seek(static_cast<long>(_blob_area_offset + it->blob_offset));
-         f.read(result->data(), it->blob_size);
-      }
-   } catch (...) {
-      wlog("trace_api: failed to read ABI blob from {}", _path.generic_string());
+   if (it->blob_size == 0)
+      return std::vector<char>{};
+
+   const uint64_t blob_start = _blob_area_offset + it->blob_offset;
+   if (blob_start + it->blob_size > _file.size()) {
+      // Truncated or corrupt index — refuse rather than read past the mapping.
       return std::nullopt;
    }
-   return result;
+   const char* blob_ptr = _file.data() + blob_start;
+   return std::vector<char>(blob_ptr, blob_ptr + it->blob_size);
 }
 
 // ---------------------------------------------------------------------------

@@ -3,6 +3,7 @@
 #include <sysio/chain/types.hpp>
 #include <fc/io/cfile.hpp>
 #include <fc/reflect/reflect.hpp>
+#include <boost/iostreams/device/mapped_file.hpp>
 #include <filesystem>
 #include <optional>
 #include <vector>
@@ -33,8 +34,7 @@ struct abi_store_header {
 
    uint32_t magic       = magic_value;
    uint32_t version     = current_version;
-   uint32_t entry_count = 0;
-   uint32_t _reserved   = 0;
+   uint64_t entry_count = 0;
 };
 static_assert(sizeof(abi_store_header) == 16);
 
@@ -71,7 +71,11 @@ private:
 
 // ---------------------------------------------------------------------------
 // Reader: load the index from disk, answer (account, global_seq) lookups.
-// The index is held in memory; ABI bytes are read from the file on demand.
+// The file is mmap'd for the lifetime of the reader so that:
+//  - blob reads are zero-copy memcpy from the page cache (no syscall per query),
+//  - a concurrent writer's atomic rename swaps the path to a new inode without
+//    invalidating this reader's view (we still hold the old inode via mmap).
+// The index is copied into a vector for binary_search.
 // ---------------------------------------------------------------------------
 
 class abi_store_reader {
@@ -85,13 +89,13 @@ public:
    std::optional<std::vector<char>> lookup(chain::name account, uint64_t global_seq) const;
 
 private:
-   std::filesystem::path              _path;
-   std::vector<abi_store_index_entry> _index; // sorted by (account, global_seq)
-   uint64_t                           _blob_area_offset{0};
-   bool                               _valid{false};
+   boost::iostreams::mapped_file_source _file;
+   std::vector<abi_store_index_entry>   _index; // sorted by (account, global_seq)
+   uint64_t                             _blob_area_offset{0};
+   bool                                 _valid{false};
 };
 
 } // namespace sysio::trace_api
 
-FC_REFLECT(sysio::trace_api::abi_store_header,      (magic)(version)(entry_count)(_reserved))
+FC_REFLECT(sysio::trace_api::abi_store_header,      (magic)(version)(entry_count))
 FC_REFLECT(sysio::trace_api::abi_store_index_entry, (account)(global_seq)(blob_offset)(blob_size))
