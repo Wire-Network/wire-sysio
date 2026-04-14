@@ -241,6 +241,21 @@ and `return_value` bytes of each action using the ABI captured in
   prevents a malformed ABI in one contract from breaking queries for
   unrelated actions in the same block.
 
+### First-observation + same-trx setabi caveat
+
+If the plugin observes a contract for the *first* time via a transaction
+that *also* contains a `setabi` for that same contract, actions on that
+contract which executed *before* the setabi within that transaction cannot
+be decoded and are returned as raw hex.  The pre-setabi ABI is no longer
+reachable from the post-apply chain state, so the plugin deliberately does
+not record the post-apply (new) ABI as the contract's pre-observation
+baseline — doing so would decode pre-setabi actions with the wrong schema.
+
+Once the contract has been observed at least once (via any earlier
+transaction, or via a setabi-free transaction), later same-trx setabis do
+not have this limitation: pre-setabi actions decode correctly with the
+previously-recorded ABI.
+
 When decoded `params` and `return_data` are present they appear alongside the
 raw `data` and `return_value` hex fields.
 

@@ -70,12 +70,42 @@ private:
       }
 
       // ABI capture: scan all action traces (including inlines) in this transaction.
+      //
+      // First pass: collect setabi targets in this trx so the second pass can
+      // skip the lazy fetch for any account whose ABI is being replaced here.
+      // on_applied_transaction runs AFTER all actions in the trx have applied,
+      // so the chain DB already reflects the new ABI; doing a lazy fetch and
+      // recording it as target@0 would poison lookups for actions on target
+      // that executed earlier in this same trx (they need the OLD ABI, which
+      // is no longer reachable from post-apply state).
+      std::unordered_set<uint64_t> setabi_targets_this_trx;
+      for (const auto& at : trace->action_traces) {
+         if (!at.receipt) continue;
+         if (at.act.account == chain::config::system_account_name &&
+             at.act.name    == chain::name("setabi")) {
+            try {
+               chain::name target;
+               chain::bytes abi_bytes;
+               auto ds = fc::datastream<const char*>(at.act.data.data(), at.act.data.size());
+               fc::raw::unpack(ds, target);
+               fc::raw::unpack(ds, abi_bytes);
+               setabi_targets_this_trx.insert(target.to_uint64_t());
+            } catch (...) {}
+         }
+      }
+
+      // Second pass: lazy fetch + setabi record, skipping lazy fetch for any
+      // account whose ABI is being replaced in this trx.
       for (const auto& at : trace->action_traces) {
          if (!at.receipt) continue; // skip context-free or failed actions
 
-         // Lazy ABI fetch: on first encounter of any account, record its current ABI at
-         // global_seq 0 ("captured before tracing began; exact version unknown").
-         if (_abi_fetcher && _seen_accounts.insert(at.act.account.to_uint64_t()).second) {
+         const uint64_t account = at.act.account.to_uint64_t();
+         const bool newly_seen = _seen_accounts.insert(account).second;
+
+         // Lazy ABI fetch: on first encounter of an account (that isn't having
+         // its ABI replaced in this same trx), record its current ABI at
+         // global_seq 0 so pre-plugin-start actions still decode.
+         if (_abi_fetcher && newly_seen && setabi_targets_this_trx.count(account) == 0) {
             try {
                if (auto abi = _abi_fetcher(at.act.account))
                   store.append_abi(at.act.account, 0, std::move(*abi));
@@ -94,7 +124,7 @@ private:
                store.append_abi(target_account,
                                 at.receipt->global_sequence,
                                 std::vector<char>(abi_bytes.begin(), abi_bytes.end()));
-               // Mark target as seen so lazy fetch doesn't later overwrite with a stale entry.
+               // Mark target as seen so any later-trx lazy fetch doesn't overwrite.
                _seen_accounts.insert(target_account.to_uint64_t());
             } catch (...) {}
          }
