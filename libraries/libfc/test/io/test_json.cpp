@@ -242,4 +242,66 @@ BOOST_AUTO_TEST_CASE(escape_string_test)
    }
 }
 
+BOOST_AUTO_TEST_CASE(parse_escape_all_json_escapes) {
+   // Every RFC 8259 string escape must decode correctly.
+   auto parse = [](const std::string& s) {
+      return json::from_string("\"" + s + "\"").as_string();
+   };
+   BOOST_CHECK_EQUAL(parse(R"(\")"),     "\"");
+   BOOST_CHECK_EQUAL(parse(R"(\\)"),     "\\");
+   BOOST_CHECK_EQUAL(parse(R"(\/)"),     "/");
+   BOOST_CHECK_EQUAL(parse(R"(\b)"),     "\b");
+   BOOST_CHECK_EQUAL(parse(R"(\f)"),     "\f");
+   BOOST_CHECK_EQUAL(parse(R"(\n)"),     "\n");
+   BOOST_CHECK_EQUAL(parse(R"(\r)"),     "\r");
+   BOOST_CHECK_EQUAL(parse(R"(\t)"),     "\t");
+}
+
+BOOST_AUTO_TEST_CASE(parse_escape_unicode_ascii) {
+   auto parse = [](const std::string& s) {
+      return json::from_string("\"" + s + "\"").as_string();
+   };
+   BOOST_CHECK_EQUAL(parse(R"(\u0041)"), "A");
+   BOOST_CHECK_EQUAL(parse(R"(\u0001)"), std::string(1, '\x01'));
+   BOOST_CHECK_EQUAL(parse(R"(\u001f)"), std::string(1, '\x1f'));
+   BOOST_CHECK_EQUAL(parse(R"(\u007f)"), std::string(1, '\x7f'));
+   // case insensitivity of hex digits
+   BOOST_CHECK_EQUAL(parse(R"(\u00E9)"), parse(R"(\u00e9)"));
+}
+
+BOOST_AUTO_TEST_CASE(parse_escape_unicode_multibyte) {
+   auto parse = [](const std::string& s) {
+      return json::from_string("\"" + s + "\"").as_string();
+   };
+   // U+00E9 (é)  -> 2-byte UTF-8: 0xC3 0xA9
+   BOOST_CHECK_EQUAL(parse(R"(\u00E9)"), "\xC3\xA9");
+   // U+20AC (€)  -> 3-byte UTF-8: 0xE2 0x82 0xAC
+   BOOST_CHECK_EQUAL(parse(R"(\u20AC)"), "\xE2\x82\xAC");
+   // U+D83D U+DE00 (emoji 😀) -> 4-byte UTF-8: 0xF0 0x9F 0x98 0x80
+   BOOST_CHECK_EQUAL(parse(R"(\uD83D\uDE00)"), "\xF0\x9F\x98\x80");
+}
+
+BOOST_AUTO_TEST_CASE(parse_escape_unicode_errors) {
+   auto parse_throws = [](const std::string& s) {
+      BOOST_CHECK_THROW(json::from_string("\"" + s + "\""), fc::exception);
+   };
+   // invalid hex digit
+   parse_throws(R"(\uZZZZ)");
+   // orphan low surrogate
+   parse_throws(R"(\uDE00)");
+   // high surrogate not followed by \u
+   parse_throws(R"(\uD83D XY)");
+   // high surrogate followed by non-low-surrogate
+   parse_throws(R"(\uD83D\u0041)");
+}
+
+BOOST_AUTO_TEST_CASE(parse_escape_lenient_fallback) {
+   // Unknown escapes fall through verbatim (non-strict but preserves historical behavior).
+   auto parse = [](const std::string& s) {
+      return json::from_string("\"" + s + "\"").as_string();
+   };
+   BOOST_CHECK_EQUAL(parse(R"(\z)"), "z");
+   BOOST_CHECK_EQUAL(parse(R"(\q)"), "q");
+}
+
 BOOST_AUTO_TEST_SUITE_END()
