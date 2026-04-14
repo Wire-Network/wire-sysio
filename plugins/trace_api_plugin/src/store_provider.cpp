@@ -37,12 +37,7 @@ namespace sysio::trace_api {
       store_provider::store_provider(const std::filesystem::path& slice_dir, uint32_t stride_width, std::optional<uint32_t> minimum_irreversible_history_blocks,
                                   std::optional<uint32_t> minimum_uncompressed_irreversible_history_blocks, size_t compression_seek_point_stride)
    : _slice_directory(slice_dir, stride_width, minimum_irreversible_history_blocks, minimum_uncompressed_irreversible_history_blocks, compression_seek_point_stride)
-   , _abi_store_path(slice_dir / "abi_store.log") {
-      if (std::filesystem::exists(_abi_store_path)) {
-         _abi_writer.load(_abi_store_path);
-         _abi_reader.store(std::make_shared<abi_store_reader>(_abi_store_path));
-      }
-   }
+   , _abi_log(slice_dir / "abi_log.log") {}
 
    template<typename BlockTrace>
    void store_provider::append(const BlockTrace& bt) {
@@ -414,16 +409,11 @@ namespace sysio::trace_api {
    }
 
    void store_provider::append_abi(chain::name account, uint64_t global_seq, std::vector<char> abi_bytes) {
-      std::lock_guard lock(_abi_write_mutex);
-      _abi_writer.add(account, global_seq, std::move(abi_bytes));
-      _abi_writer.write(_abi_store_path);
-      _abi_reader.store(std::make_shared<abi_store_reader>(_abi_store_path));
+      _abi_log.append(account, global_seq, std::move(abi_bytes));
    }
 
    std::optional<std::vector<char>> store_provider::lookup_abi(chain::name account, uint64_t global_seq) const {
-      auto reader = _abi_reader.load();
-      if (!reader) return std::nullopt;
-      return reader->lookup(account, global_seq);
+      return _abi_log.lookup(account, global_seq);
    }
 
    uint32_t slice_directory::slice_number_from_path(const std::filesystem::path& trx_id_path) const {

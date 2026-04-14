@@ -7,7 +7,7 @@
 #include <condition_variable>
 #include <fc/io/cfile.hpp>
 #include <fc/variant.hpp>
-#include <sysio/trace_api/abi_store.hpp>
+#include <sysio/trace_api/abi_log.hpp>
 #include <sysio/trace_api/common.hpp>
 #include <sysio/trace_api/compressed_file.hpp>
 #include <sysio/trace_api/data_log.hpp>
@@ -488,13 +488,9 @@ namespace sysio::trace_api {
       slice_directory _slice_directory;
 
    private:
-      // ABI sidecar: one global file in the slice directory.
-      // _abi_write_mutex serialises writes (extraction thread).
-      // _abi_reader is atomically swapped after each write for lock-free reads (HTTP thread).
-      mutable std::mutex                                   _abi_write_mutex;
-      abi_store_writer                                     _abi_writer;
-      std::atomic<std::shared_ptr<abi_store_reader>>       _abi_reader;
-      std::filesystem::path                                _abi_store_path;
+      // ABI sidecar: one global append-only log in the slice directory.
+      // abi_log serialises its own writes and allows concurrent lookups.
+      abi_log _abi_log;
    };
 
 }

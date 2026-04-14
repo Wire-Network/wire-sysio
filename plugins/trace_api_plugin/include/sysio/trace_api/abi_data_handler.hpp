@@ -23,7 +23,7 @@ namespace sysio {
     * Data Handler that uses sysio::chain::abi_serializer to decode action data.
     *
     * ABIs are resolved dynamically via an abi_lookup_fn callback, typically backed
-    * by the abi_store on disk.  Given (account, global_sequence) it returns the raw
+    * by the abi_log on disk.  Given (account, global_sequence) it returns the raw
     * ABI bytes that were in effect at that point in chain history, or nullopt.
     *
     * A bounded LRU caches constructed abi_serializers by (account, global_seq) so

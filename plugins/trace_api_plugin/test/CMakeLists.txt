@@ -7,7 +7,7 @@ add_executable( test_trace_api_plugin
         test_configuration_utils.cpp
         test_compressed_file.cpp
         test_trx_id_index.cpp
-        test_abi_store.cpp
+        test_abi_log.cpp
         test_get_actions.cpp
         main.cpp
         )

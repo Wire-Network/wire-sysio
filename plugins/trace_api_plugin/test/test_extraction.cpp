@@ -114,7 +114,7 @@ struct extraction_test_fixture {
       }
 
       void append_abi(chain::name, uint64_t, std::vector<char>) {
-         // not tested here; abi_store tests cover this
+         // not tested here; abi_log tests cover this
       }
 
       extraction_test_fixture& fixture;

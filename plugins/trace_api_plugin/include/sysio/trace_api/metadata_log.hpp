@@ -7,12 +7,12 @@
 namespace sysio { namespace trace_api {
    struct block_entry_v0 {
       chain::block_id_type   id;
-      uint32_t               number;
-      uint64_t               offset;
+      uint32_t               number = 0;
+      uint64_t               offset = 0;
    };
 
    struct lib_entry_v0 {
-      uint32_t               lib;
+      uint32_t               lib    = 0;
    };
 
    using metadata_log_entry = std::variant<

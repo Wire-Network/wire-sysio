@@ -46,7 +46,7 @@ Key design points:
   action_traces` is stored, so inline notifications are captured alongside
   the originating action.
 - **Versioned ABI decoding** — the ABI in effect at the moment each
-  `setcode`/`setabi` transaction was applied is captured in `abi_store.log`.
+  `setcode`/`setabi` transaction was applied is captured in `abi_log.log`.
   Queries decode `data` and `return_value` fields using the historically
   correct ABI, not the current on-chain ABI.
 - **O(1) transaction lookup** — a per-slice hash index maps `trx_id` to
@@ -142,7 +142,7 @@ traces/
   trace_index_0000020000-0000030000.log
   trace_blk_idx_0000020000-0000030000.log
   trace_trx_idx_0000020000-0000030000.log
-  abi_store.log
+  abi_log.log
 ```
 
 ### Block-offset index
@@ -176,28 +176,35 @@ irreversible.  Queries against `/v1/trace_api/get_transaction_trace` use
 this index for O(1) `trx_id → block_num` resolution instead of scanning
 the chain.
 
-### ABI store
+### ABI log
 
-`abi_store.log` is a single file that persists the ABI published by each
+`abi_log.log` is an append-only file that persists the ABI published by each
 contract account across all `setabi` transactions observed since the node
 started (or since the file was first written).
 
 Format:
 
 ```
-Header     (16 bytes): magic "ABIB" (u32), version 1 (u32), entry_count (u64)
-Index      (entry_count × 32 bytes, sorted account ASC, global_seq ASC):
-             account(u64) | global_seq(u64) | blob_offset(u64) | blob_size(u64)
-Blob area  (variable): raw fc::raw-packed abi_def bytes in index order
+Header     (16 bytes): magic "ABIL" (u32), version 1 (u32), reserved (u64)
+Records (repeated until EOF):
+             account    (u64)
+             global_seq (u64)
+             blob_size  (u64)
+             blob_bytes (blob_size bytes)
+             crc32      (u32) over (account, global_seq, blob_size, blob_bytes)
 ```
 
-To find the ABI for contract `A` in effect at `global_seq Q`: binary-search
-the index for the last entry where `account == A && global_seq <= Q`, then
-read the referenced blob.
+An in-memory index keyed by `(account, global_sequence)` is built at startup
+by walking the file record-by-record and validating each CRC.  Runtime
+lookups go through the index; the matching blob is then read from the file
+via `pread()`.  Appends stream new records to the end of the file under a
+mutex, with no rewrite of existing records.
 
-The file is written atomically (write to `.tmp`, then rename) after each
-block.  On node restart it is loaded into the writer so previously captured
-ABIs survive across restarts.
+Writes are not fsync'd; the on-disk tail may lose the last few records on a
+kernel crash.  On startup the recovery scan detects torn or CRC-mismatched
+records and truncates the file at the first bad one — any lost records are
+rebuilt the next time their contract is touched (via observed `setabi` or
+the lazy current-ABI fetch).
 
 ---
 
@@ -222,7 +229,7 @@ A continuity gap does not prevent the node from running, but `get_block` and
 
 When serving any trace endpoint the plugin attempts to decode the raw `data`
 and `return_value` bytes of each action using the ABI captured in
-`abi_store.log`.
+`abi_log.log`.
 
 - The lookup key is `(account, global_sequence)` — the ABI that was in
   effect when that specific action executed is used, not the current ABI.
@@ -696,11 +703,12 @@ continues. If the gap is large, consider either:
 2. Deleting the trace directory entirely and re-syncing from genesis (only
    practical for newer chains).
 
-### abi_store.log
+### abi_log.log
 
-`abi_store.log` is rewritten after every block. If it is lost or corrupted,
-delete it and restart nodeop.  The plugin will rebuild it as new `setabi`
-transactions are applied; historical ABI lookup for events before the loss
+`abi_log.log` is append-only.  If it is lost or corrupted, delete it and
+restart nodeop.  The plugin will rebuild it as new `setabi` transactions are
+applied or previously-unseen contracts are touched (lazy current-ABI fetch);
+historical ABI lookup for events before the loss
 will fall back to raw hex.
 
 ---
