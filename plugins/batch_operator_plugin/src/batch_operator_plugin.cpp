@@ -20,6 +20,7 @@ namespace sol = fc::network::solana;
 namespace {
    constexpr auto DELIVERY_TIMEOUT_MS = 15000;
    constexpr auto EPOCH_POLL_MS = 15000;
+   constexpr auto EPOCH_EDGE_BUFFER_MS = 2500;
 }
 
 // ---------------------------------------------------------------------------
@@ -66,6 +67,8 @@ struct batch_operator_plugin::impl {
    uint32_t                 last_delivered_epoch = 0;
    uint8_t                  my_group = 255;
    bool                     is_elected = false;
+   fc::time_point           epoch_start;
+   fc::time_point           next_epoch_start;
    std::vector<chain::name> current_group_members;
    std::vector<outpost_descriptor> outposts;
 
@@ -75,12 +78,17 @@ struct batch_operator_plugin::impl {
    outpost_ethereum_client_plugin*   eth_plug   = nullptr;
    outpost_solana_client_plugin*     sol_plug   = nullptr;
 
+   // Typed ETH contract clients (lazy-initialized)
+   std::shared_ptr<opp_contract_client>         opp_client;
+   std::shared_ptr<opp_inbound_contract_client> opp_inbound_client;
+
    // Debugging signal — emitted when an OPP envelope is computed.
    // Only fires when num_slots() > 0 (i.e. external_debugging_plugin is connected).
    signal<void(const opp::debugging::DebugEnvelopeEvent&)> debug_envelope_signal;
 
-   // Cron job handle
+   // Cron job handles
    cron_service::job_id_t            epoch_poll_job_id = 0;
+   cron_service::job_id_t            inbound_poll_job_id = 0;
    bool                              shutting_down = false;
 
    // -----------------------------------------------------------------------
@@ -219,21 +227,12 @@ struct batch_operator_plugin::impl {
 
       is_elected = (my_group == cur_group);
 
-      // Ensure enough time remains in the epoch to complete delivery.
-      // Skip this check if next_epoch_start is 0 (epoch not yet advanced).
+      // Parse epoch timing
+      fc::from_variant(obj["current_epoch_start"], epoch_start);
+      fc::from_variant(obj["next_epoch_start"], next_epoch_start);
+
       if (is_elected) {
-         fc::time_point next_epoch_tp;
-         fc::from_variant(obj["next_epoch_start"], next_epoch_tp);
-         if (next_epoch_tp != fc::time_point()) {
-            auto deadline = (fc::time_point::now() + fc::milliseconds(delivery_timeout_ms)).time_since_epoch().count() / 1000;
-            auto next_epoch_ms = next_epoch_tp.time_since_epoch().count() / 1000; // convert to ms
-            ilog("batch_operator: current_epoch={}, next_epoch_ms={}, deadline={}",
-                 epoch_index, next_epoch_ms, deadline);
-            if (deadline >= next_epoch_ms) {
-               ilog("batch_operator: elected but insufficient time before next epoch (need {}ms)", delivery_timeout_ms);
-               is_elected = false;
-            }
-         }
+         ilog("batch_operator: current_epoch={}", epoch_index);
       }
 
       return {true, epoch_index};
@@ -243,15 +242,18 @@ struct batch_operator_plugin::impl {
       auto [ok, epoch_index] = parse_epoch_state();
       if (!ok) return;
 
-      // ALL operators call advance regardless of election status.
-      // The contract is idempotent: returns silently if epoch hasn't elapsed.
-      // This ensures the chain can recover from downtime — any operator can
-      // crank the epoch forward, not just the elected group.
-      push_action("sysio.epoch", "advance", operator_account, fc::mutable_variant_object());
-
-      // Re-read state after advance (epoch may have moved forward)
-      auto [ok2, epoch_index2] = parse_epoch_state();
-      if (ok2) epoch_index = epoch_index2;
+      // Genesis bootstrap: if epoch has never been advanced (epoch == 0),
+      // trigger the first advance via msgch::bootstrap.
+      // Post-genesis: advance is triggered by evalcons consensus, not by batch operators.
+      if (epoch_index == 0) {
+         try {
+            push_action("sysio.msgch", "bootstrap", operator_account, fc::mutable_variant_object());
+            auto [ok2, epoch_index2] = parse_epoch_state();
+            if (ok2) epoch_index = epoch_index2;
+         } catch (const fc::exception& e) {
+            dlog("batch_operator: bootstrap skipped — {}", e.to_string());
+         }
+      }
 
       if (!is_elected) {
          if (epoch_index != current_epoch) {
@@ -310,13 +312,14 @@ struct batch_operator_plugin::impl {
 
    void run_epoch_cycle(uint32_t cycle_epoch = 0) {
       if (shutting_down) return;
+      if (!within_epoch_window()) {
+         dlog("batch_operator: skipping epoch cycle — too close to epoch boundary");
+         return;
+      }
       ilog("batch_operator: === EPOCH CYCLE START (epoch {}) ===", current_epoch);
 
       try {
-         // PHASE 1 — OUTBOUND (WIRE -> Outposts)
-         // Outbound envelopes are built by sysio.epoch::advance() via inline
-         // action to sysio.msgch::buildenv(). Just read and deliver.
-         // Phase 1 failures must not block Phase 2 (inbound).
+         // OUTBOUND (WIRE -> Outposts)
          for (auto& op : outposts) {
             op.reset_transient();
             read_outbound_envelope(op);
@@ -326,17 +329,47 @@ struct batch_operator_plugin::impl {
                wlog("batch_operator: outbound delivery failed for outpost {}: {}", op.id, e.to_detail_string());
             }
          }
-
-         // PHASE 2 — INBOUND (Outposts -> WIRE)
-         // ETHEREUM Read OPPEnvelope events emitted by the crank, deliver to sysio.msgch.
-         //   Consensus is evaluated inline by evalcons called from deliver.
-         for (auto& op : outposts) {
-            read_inbound_chain(op);
-            deliver_to_depot(op);
-         }
-
          ilog("batch_operator: === EPOCH CYCLE COMPLETE (epoch {}) ===", current_epoch);
       } FC_LOG_AND_RETHROW();
+   }
+
+   /// Returns true if we are within the safe operating window for this epoch
+   /// (not too close to the start or end boundary).
+   bool within_epoch_window() {
+      auto now = fc::time_point::now();
+      auto buffer = fc::milliseconds(EPOCH_EDGE_BUFFER_MS);
+      if (now < epoch_start + buffer) return false;  // too close to epoch start
+      if (next_epoch_start != fc::time_point() && now > next_epoch_start - buffer) return false; // too close to epoch end
+      return true;
+   }
+
+   /// Inbound poll — runs on a separate cron job from the epoch cycle.
+   /// Reads OPPEnvelope events from outposts, delivers to sysio.msgch,
+   /// and calls chkcons to advance the epoch once the time window passes.
+   void poll_inbound() {
+      if (shutting_down || outposts.empty()) return;
+
+      // Re-check election status — epoch may have advanced since last outbound cycle
+      auto [ok, epoch_index] = parse_epoch_state();
+      if (!ok || !is_elected) return;
+
+      if (within_epoch_window()) {
+         for (auto& op : outposts) {
+            try {
+               read_inbound_chain(op);
+               deliver_to_depot(op);
+            } catch (const fc::exception& e) {
+               wlog("batch_operator: inbound poll failed for outpost {}: {}", op.id, e.to_string());
+            }
+         }
+      }
+
+      // chkcons is safe to call regardless of window — it checks its own time gate.
+      try {
+         push_action("sysio.msgch", "chkcons", operator_account, fc::mutable_variant_object());
+      } catch (const fc::exception& e) {
+         dlog("batch_operator: chkcons: {}", e.to_string());
+      }
    }
 
    // -----------------------------------------------------------------------
@@ -393,27 +426,24 @@ struct batch_operator_plugin::impl {
       }
    }
 
-   void deliver_to_eth_outpost(outpost_descriptor& op) {
+   void ensure_eth_clients() {
+      if (opp_client && opp_inbound_client) return;
       auto entry = eth_plug->get_client(eth_client_id);
-      if (!entry || !entry->client) {
-         elog("batch_operator: ETH client '{}' not found", eth_client_id);
-         return;
-      }
-
+      FC_ASSERT(entry && entry->client, "ETH client '{}' not available", eth_client_id);
       auto& abis = eth_plug->get_abi_files();
-
-      // Call epochIn with raw protobuf wire-protocol bytes.
-      // The Envelope contains messages, so no separate messagesIn call is needed.
-      std::string envelope_hex = fc::to_hex(op.outbound_raw_envelope);
-
-      auto epoch_in_abi = find_eth_abi(abis, "epochIn");
-      ilog("batch_operator: ETH epochIn epoch_in_abi={},envelope_hex={}", epoch_in_abi ? epoch_in_abi->name : "not found", envelope_hex);
-      if (epoch_in_abi) {
-         auto tx = entry->client->create_default_tx(eth_opp_inbound_addr, *epoch_in_abi,
-            {fc::variant(envelope_hex)});
-         auto result = entry->client->execute_contract_tx_fn(tx, *epoch_in_abi);
-         ilog("batch_operator: ETH epochIn result={}", result.as_string());
+      std::vector<eth::abi::contract> all_abis;
+      for (auto& [path, contracts] : abis) {
+         all_abis.insert(all_abis.end(), contracts.begin(), contracts.end());
       }
+      opp_client = entry->client->get_contract<opp_contract_client>(eth_opp_addr, all_abis);
+      opp_inbound_client = entry->client->get_contract<opp_inbound_contract_client>(eth_opp_inbound_addr, all_abis);
+   }
+
+   void deliver_to_eth_outpost(outpost_descriptor& op) {
+      ensure_eth_clients();
+      std::string envelope_hex = fc::to_hex(op.outbound_raw_envelope);
+      auto result = opp_inbound_client->epoch_in(envelope_hex);
+      ilog("batch_operator: ETH epochIn result={}", result.as_string());
    }
 
    void deliver_to_sol_outpost(outpost_descriptor& op) {
@@ -471,37 +501,10 @@ struct batch_operator_plugin::impl {
    }
 
    void read_eth_inbound(outpost_descriptor& op) {
-      auto entry = eth_plug->get_client(eth_client_id);
-      if (!entry || !entry->client) return;
+      ensure_eth_clients();
 
-      auto& abis = eth_plug->get_abi_files();
-      // Collect all ABI contracts that have the OPP contract address
-      std::vector<eth::abi::contract> opp_abis;
-      std::string opp_addr;
-      for (auto& [path, contracts] : abis) {
-         for (auto& c : contracts) {
-            if (!c.contract_address.empty() && opp_addr.empty()) {
-               // Use the first ABI entry that has an OPP-matching address
-               if (c.contract_address == eth_opp_addr) opp_addr = c.contract_address;
-            }
-            opp_abis.push_back(c);
-         }
-      }
-      if (opp_addr.empty()) opp_addr = eth_opp_addr;
-
-      // Count event ABIs to verify they're loaded
-      uint32_t event_abi_count = 0;
-      for (auto& a : opp_abis) {
-         if (a.type == eth::abi::invoke_target_type::event) ++event_abi_count;
-      }
-      ilog("batch_operator: querying ETH events (addr={}, abis={}, events={}, opp_addr={})",
-           opp_addr, opp_abis.size(), event_abi_count, eth_opp_addr);
-
-      // Query OPPEnvelope logs via ethereum_client
-      auto events = entry->client->get_events(
-         opp_addr,
+      auto events = opp_client->query_events(
          {"OPPEnvelope"},
-         opp_abis,
          eth::block_tag_t{std::string("0x0")},
          eth::block_tag_t{std::string(eth::block_tag_latest)});
 
@@ -704,17 +707,6 @@ struct batch_operator_plugin::impl {
    //  Helpers
    // -----------------------------------------------------------------------
 
-   static const eth::abi::contract* find_eth_abi(
-      const std::vector<std::pair<std::filesystem::path, std::vector<eth::abi::contract>>>& abi_files,
-      const std::string& name) {
-      for (auto& [path, contracts] : abi_files) {
-         for (auto& c : contracts) {
-            if (c.name == name) return &c;
-         }
-      }
-      return nullptr;
-   }
-
    void push_action(const std::string& contract,
                     const std::string& action_name,
                     chain::name auth_account,
@@ -866,14 +858,36 @@ void batch_operator_plugin::plugin_startup() {
 
    ilog("batch_operator_plugin: scheduled epoch poll (id={}, interval={}ms)",
         _impl->epoch_poll_job_id, _impl->epoch_poll_ms);
+
+   // Schedule inbound polling on a separate cron job.
+   // Runs independently of the outbound epoch cycle so eth_getLogs
+   // doesn't race against the same-block epochIn delivery.
+   cron_service::job_schedule inbound_sched;
+   inbound_sched.milliseconds = {cron_service::job_schedule::step_value{_impl->epoch_poll_ms}};
+
+   cron_service::job_metadata_t inbound_meta;
+   inbound_meta.label = "batch_operator_inbound_poll";
+   inbound_meta.one_at_a_time = true;
+
+   _impl->inbound_poll_job_id = cron.add_job(
+      inbound_sched,
+      [this]() { _impl->poll_inbound(); },
+      inbound_meta
+   );
+
+   ilog("batch_operator_plugin: scheduled inbound poll (id={}, interval={}ms)",
+        _impl->inbound_poll_job_id, _impl->epoch_poll_ms);
 }
 
 void batch_operator_plugin::plugin_shutdown() {
    _impl->shutting_down = true;
 
+   auto& cron = app().get_plugin<cron_plugin>();
    if (_impl->epoch_poll_job_id != 0) {
-      auto& cron = app().get_plugin<cron_plugin>();
       cron.cancel_job(_impl->epoch_poll_job_id);
+   }
+   if (_impl->inbound_poll_job_id != 0) {
+      cron.cancel_job(_impl->inbound_poll_job_id);
    }
 
    ilog("batch_operator_plugin: shutdown complete");

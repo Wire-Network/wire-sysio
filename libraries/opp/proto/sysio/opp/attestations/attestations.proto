@@ -172,20 +172,34 @@ message EpochSync {
   uint64 epoch_start_timestamp = 3;
 }
 
-// Roster update (Depot -> Outpost).
-message RosterUpdate {
-  sysio.opp.types.ChainAddress  operator = 1;
-  sysio.opp.types.OperatorType  type = 2;
-  sysio.opp.types.OperatorStatus new_status = 3;
-  string                        reason = 4;
+// Operator roster (Depot -> Outpost, every epoch).
+message Operators {
+  repeated OperatorEntry operators = 1;
 }
 
+message OperatorEntry {
+  sysio.opp.types.ChainAddress  address = 1;
+  sysio.opp.types.OperatorType  type = 2;
+  sysio.opp.types.OperatorStatus status = 3;
+}
 
-// Batch operator next group assignment (Depot -> Outpost, every epoch).
-message BatchOperatorNextGroup {
+// Batch operator group assignments (Depot -> Outpost, every epoch).
+// Contains all groups and the index of the active group for the current epoch.
+message BatchOperatorGroups {
+  uint32 active_group_index = 1;
+  uint32 epoch_index = 2;
+  repeated BatchOperatorGroup groups = 3;
+}
+
+message BatchOperatorGroup {
   repeated sysio.opp.types.ChainAddress operators = 1;
-  uint32                                group_index = 2;
-  uint32                                next_epoch_index = 3;
+}
+
+// Slash operator (Depot -> Outpost).
+message SlashOperator {
+  sysio.opp.types.ChainAddress  operator = 1;
+  sysio.opp.types.OperatorType  type = 2;
+  string                        reason = 3;
 }
 
 // ---------------------------------------------------------------------------

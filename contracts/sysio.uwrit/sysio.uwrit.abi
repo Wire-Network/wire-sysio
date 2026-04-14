@@ -528,7 +528,7 @@
                     "value": 60946
                 },
                 {
-                    "name": "ATTESTATION_TYPE_ROSTER_UPDATE",
+                    "name": "ATTESTATION_TYPE_OPERATORS",
                     "value": 60947
                 },
                 {
@@ -536,7 +536,7 @@
                     "value": 60948
                 },
                 {
-                    "name": "ATTESTATION_TYPE_BATCH_OPERATOR_NEXT_GROUP",
+                    "name": "ATTESTATION_TYPE_BATCH_OPERATOR_GROUPS",
                     "value": 60943
                 },
                 {

@@ -18,6 +18,32 @@ struct ethereum_client_entry_t {
 
 using ethereum_client_entry_ptr = std::shared_ptr<ethereum_client_entry_t>;
 
+/// Typed contract client for OPP.sol
+struct opp_contract_client : ethereum_contract_client {
+   ethereum_contract_tx_fn<fc::variant> emit_outbound_envelope;
+   ethereum_contract_tx_fn<fc::variant> finalize_epoch;
+
+   opp_contract_client(const ethereum_client_ptr& client,
+                       const address_compat_type& contract_address,
+                       const std::vector<fc::network::ethereum::abi::contract>& contracts)
+      : ethereum_contract_client(client, contract_address, contracts)
+      , emit_outbound_envelope(create_tx<fc::variant>(get_abi("emitOutboundEnvelope")))
+      , finalize_epoch(create_tx<fc::variant>(get_abi("finalizeEpoch"))) {}
+};
+
+/// Typed contract client for OPPInbound.sol
+struct opp_inbound_contract_client : ethereum_contract_client {
+   ethereum_contract_tx_fn<fc::variant, std::string> epoch_in;
+   ethereum_contract_call_fn<fc::variant> next_epoch_index;
+
+   opp_inbound_contract_client(const ethereum_client_ptr& client,
+                               const address_compat_type& contract_address,
+                               const std::vector<fc::network::ethereum::abi::contract>& contracts)
+      : ethereum_contract_client(client, contract_address, contracts)
+      , epoch_in(create_tx<fc::variant, std::string>(get_abi("epochIn")))
+      , next_epoch_index(create_call<fc::variant>(get_abi("nextEpochIndex"))) {}
+};
+
 class outpost_ethereum_client_plugin : public appbase::plugin<outpost_ethereum_client_plugin> {
 public:
    APPBASE_PLUGIN_REQUIRES((outpost_client_plugin)(signature_provider_manager_plugin))

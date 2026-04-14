@@ -19,6 +19,10 @@ namespace sysio {
       //  Actions
       // -----------------------------------------------------------------------
 
+      /// Bootstrap: call at epoch 0 to trigger the first advance.
+      [[sysio::action]]
+      void bootstrap();
+
       /// Batch operator delivers inbound OPP data for a specific outpost.
       /// Computes sha256 checksum trustlessly, stores in envelopes table,
       /// then calls evalcons inline to check consensus.
@@ -27,9 +31,15 @@ namespace sysio {
 
       /// Evaluate consensus on inbound envelopes for an outpost+epoch.
       /// Called inline from deliver. On consensus: unpacks envelope,
-      /// stores messages + attestations, routes attestations.
+      /// stores messages + attestations, records per-outpost consensus.
       [[sysio::action]]
       void evalcons(uint64_t outpost_id, uint32_t epoch_index);
+
+      /// Check if all-outpost consensus is reached AND next_epoch_start
+      /// has passed. If yes, reset consensus and call advance.
+      /// Called by the batch operator after the time window elapses.
+      [[sysio::action]]
+      void chkcons();
 
       /// Queue an outbound attestation for an outpost.
       /// Writes to the attestations table with status READY.
@@ -134,7 +144,7 @@ namespace sysio {
             const_mem_fun<attestation_entry, uint64_t, &attestation_entry::by_epoch>>
       >;
 
-      /// Outbound envelope table (unchanged).
+      /// Outbound envelope table.
       struct [[sysio::table, sysio::contract("sysio.msgch")]] outbound_envelope {
          uint64_t    id;
          uint64_t    outpost_id;
@@ -148,12 +158,29 @@ namespace sysio {
 
          uint64_t primary_key() const { return id; }
          uint64_t by_outpost() const { return outpost_id; }
+         uint64_t by_outpost_epoch() const {
+            return (static_cast<uint64_t>(outpost_id) << 32) | epoch_index;
+         }
       };
 
       using outenvelopes_t = multi_index<"outenvelopes"_n, outbound_envelope,
          indexed_by<"byoutpost"_n,
-            const_mem_fun<outbound_envelope, uint64_t, &outbound_envelope::by_outpost>>
+            const_mem_fun<outbound_envelope, uint64_t, &outbound_envelope::by_outpost>>,
+         indexed_by<"byoutepoch"_n,
+            const_mem_fun<outbound_envelope, uint64_t, &outbound_envelope::by_outpost_epoch>>
       >;
+
+      /// Per-outpost consensus tracking for the current epoch.
+      /// One row per outpost. Rows reused (not erased) to avoid RAM churn.
+      struct [[sysio::table, sysio::contract("sysio.msgch")]] outpost_consensus_entry {
+         uint64_t outpost_id;
+         uint32_t epoch_index;
+         bool     consensus_reached;
+
+         uint64_t primary_key() const { return outpost_id; }
+      };
+
+      using outpost_consensus_t = multi_index<"outpcons"_n, outpost_consensus_entry>;
 
    private:
 
