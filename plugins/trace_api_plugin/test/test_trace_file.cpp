@@ -153,6 +153,7 @@ namespace {
       }
       using store_provider::scan_metadata_log_from;
       using store_provider::read_data_log;
+      using store_provider::_slice_directory;
    };
 
    class vslice_datastream;
@@ -1181,6 +1182,62 @@ BOOST_AUTO_TEST_SUITE(slice_tests)
       block_num = sp.get_trx_block_number(target_trx_id, {});
       BOOST_REQUIRE(block_num);
       BOOST_REQUIRE_EQUAL(*block_num, trx_block_num); // target trx is in final block
+   }
+
+   // build_trx_id_index must apply the same fork-resolution logic as the linear
+   // scan in get_trx_block_number: when the trx_id log holds multiple
+   // block_trxs_entry records for the same block_num (one per accepted block at
+   // that height, including forked-out ones), only the LAST entry per block_num
+   // reflects the canonical post-fork state.  Trxs that appeared in an earlier
+   // entry for that block_num but not the last one were forked out and must NOT
+   // appear in the index.  Trxs that moved to a different block in the canonical
+   // fork must resolve to the new block_num.
+   BOOST_FIXTURE_TEST_CASE(test_build_trx_id_index_dedups_forked_trxs, test_fixture)
+   {
+      // Distinct first-8-byte prefixes so each trx maps to a unique bucket
+      // (the writer's prefix64 = first 8 bytes of the trx_id).
+      const chain::transaction_id_type trx_a =
+         "a1a2a3a4a5a6a7a8000000000000000000000000000000000000000000000001"_h;
+      const chain::transaction_id_type trx_b =
+         "b1b2b3b4b5b6b7b8000000000000000000000000000000000000000000000002"_h;
+      const chain::transaction_id_type trx_c =
+         "c1c2c3c4c5c6c7c8000000000000000000000000000000000000000000000003"_h;
+
+      fc::temp_directory tempdir;
+      const uint32_t width = 100;
+      test_store_provider sp(tempdir.path(), width);
+
+      // First accepted block at height 1: contains trx_a + trx_b.
+      sp.append_trx_ids(block_trxs_entry{ .ids = {trx_a, trx_b}, .block_num = 1 });
+      // Block 1 forks out and is replaced by a different block at height 1:
+      // canonical block 1 contains only trx_c (trx_a moved, trx_b removed).
+      sp.append_trx_ids(block_trxs_entry{ .ids = {trx_c},        .block_num = 1 });
+      // trx_a re-appears at block 2 in the canonical chain.
+      sp.append_trx_ids(block_trxs_entry{ .ids = {trx_a},        .block_num = 2 });
+
+      // Build the index for slice 0 directly (bypass the maintenance thread).
+      sp._slice_directory.build_trx_id_index(0, [](const std::string&){});
+
+      // Open the resulting on-disk index and verify lookups.
+      auto reader = sp._slice_directory.find_trx_id_index_slice(0);
+      BOOST_REQUIRE(reader.has_value());
+      BOOST_REQUIRE(reader->valid());
+
+      // trx_a moved to block 2 in the canonical chain -> lookup returns 2,
+      // NOT 1 (the forked-out occurrence).
+      auto a = reader->lookup(trx_a);
+      BOOST_REQUIRE(a.has_value());
+      BOOST_CHECK_EQUAL(*a, 2u);
+
+      // trx_b was removed entirely (only present in the forked-out block 1).
+      // Its bucket must be empty.
+      auto b = reader->lookup(trx_b);
+      BOOST_CHECK(!b.has_value());
+
+      // trx_c is in canonical block 1.
+      auto c = reader->lookup(trx_c);
+      BOOST_REQUIRE(c.has_value());
+      BOOST_CHECK_EQUAL(*c, 1u);
    }
 
 BOOST_AUTO_TEST_SUITE_END()

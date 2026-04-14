@@ -452,7 +452,15 @@ namespace sysio::trace_api {
 
       log(std::string("Building trx_id index for slice: ") + std::to_string(slice_number));
 
-      trx_id_index_writer writer;
+      // Dedup pass: the trx_id log can hold MULTIPLE block_trxs_entry records
+      // with the same block_num when the chain forks at that height (each
+      // accepted block, including forked-out ones, writes one entry).  The
+      // last entry for each block_num reflects the canonical post-fork-
+      // resolution state, matching the semantics of the linear-scan path in
+      // get_trx_block_number which uses trx_block_nums.erase to drop forked-
+      // out entries.  Build a canonical map first, then feed it to the
+      // writer (which itself does last-write-wins per prefix).
+      std::map<uint32_t /*block_num*/, std::vector<chain::transaction_id_type>> canonical;
       const uint64_t end = file_size(trx_id_file.get_file_path());
       while (trx_id_file.tellp() < end) {
          metadata_log_entry entry;
@@ -460,9 +468,14 @@ namespace sysio::trace_api {
          fc::raw::unpack(ds, entry);
          if (std::holds_alternative<block_trxs_entry>(entry)) {
             const auto& te = std::get<block_trxs_entry>(entry);
-            for (const auto& id : te.ids)
-               writer.add(id, te.block_num);
+            canonical[te.block_num] = te.ids; // last entry per block_num wins
          }
+      }
+
+      trx_id_index_writer writer;
+      for (const auto& [block_num, ids] : canonical) {
+         for (const auto& id : ids)
+            writer.add(id, block_num);
       }
 
       // Write to a temp path and atomically rename so concurrent readers never

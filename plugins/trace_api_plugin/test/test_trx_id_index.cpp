@@ -134,25 +134,31 @@ BOOST_FIXTURE_TEST_CASE(linear_probing_on_prefix_collision, trx_id_index_fixture
 // ---------------------------------------------------------------------------
 
 BOOST_FIXTURE_TEST_CASE(duplicate_prefix64_last_write_wins, trx_id_index_fixture) {
-   // The writer can accumulate two entries with the same prefix64 (e.g., same
-   // first-8 bytes). The hash table stores both under different slots. The
-   // reader returns the *first* hit during linear probing — which is the
-   // first-inserted entry. Document this behavior so it doesn't surprise.
+   // Two adds with the same prefix64 should result in the second's block_num
+   // overwriting the first.  Combined with build_trx_id_index's per-block_num
+   // dedup, this gives lookups the same "latest fork wins" semantic as the
+   // linear scan in get_trx_block_number.
    const uint64_t shared_prefix = 0xCAFEBABEDEADBEEFULL;
    auto id1 = make_trx_id(shared_prefix, 1);
    auto id2 = make_trx_id(shared_prefix, 2); // same prefix64, different tail
 
    trx_id_index_writer w;
    w.add(id1, 10);
-   w.add(id2, 20); // will probe to next empty slot
+   w.add(id2, 20);
    w.write(index_path());
 
    trx_id_index_reader r(index_path());
    BOOST_REQUIRE(r.valid());
-   // Lookup finds first match on the shared prefix; result is either 10 or 20.
-   // The important thing is it doesn't crash or loop infinitely.
-   auto result = r.lookup(id1);
-   BOOST_CHECK(result.has_value());
+
+   // Both id1 and id2 share the prefix, so a lookup of either resolves the
+   // single bucket — and that bucket holds the LATEST value (20).
+   auto result1 = r.lookup(id1);
+   BOOST_REQUIRE(result1.has_value());
+   BOOST_CHECK_EQUAL(*result1, 20u);
+
+   auto result2 = r.lookup(id2);
+   BOOST_REQUIRE(result2.has_value());
+   BOOST_CHECK_EQUAL(*result2, 20u);
 }
 
 // ---------------------------------------------------------------------------

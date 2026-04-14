@@ -55,7 +55,9 @@ public:
 private:
    static uint64_t prefix_of(const chain::transaction_id_type& id);
 
-   // last write wins per prefix (latest fork block overwrites earlier entries)
+   // (prefix64, block_num) pairs in insertion order.  write() applies last-
+   // write-wins per prefix64 when populating the bucket array, so the latest
+   // add for a given prefix is what ends up in the on-disk hash table.
    std::vector<std::pair<uint64_t, uint32_t>> _entries;
 };
 

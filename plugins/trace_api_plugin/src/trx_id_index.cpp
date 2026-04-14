@@ -30,9 +30,15 @@ void trx_id_index_writer::write(const std::filesystem::path& path) const {
 
    std::vector<trx_id_bucket> buckets(bucket_count); // zero-initialized = all empty
 
+   // Last-write-wins per prefix: probe forward until either an empty bucket
+   // (fresh insert) OR a bucket already holding this prefix (overwrite).
+   // Combined with the index-builder's per-block_num dedup pass, this means a
+   // trx that's been re-recorded under a different block_num after a fork
+   // resolves to the latest entry, matching the linear-scan get_trx_block_number
+   // path which returns *(--trx_block_nums.end()) (highest/most recent).
    for (const auto& [prefix, block_num] : _entries) {
       uint32_t idx = static_cast<uint32_t>(prefix) & mask;
-      while (buckets[idx].block_num != 0) {
+      while (buckets[idx].block_num != 0 && buckets[idx].prefix64 != prefix) {
          idx = (idx + 1) & mask;
       }
       buckets[idx].prefix64  = prefix;
