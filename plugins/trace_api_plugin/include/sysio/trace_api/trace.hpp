@@ -19,23 +19,23 @@ namespace sysio::trace_api {
    };
 
    struct action_trace_v0 {
-      fc::unsigned_int                               action_ordinal = {};
-      fc::unsigned_int                               creator_action_ordinal = {};
-      fc::unsigned_int                               closest_unnotified_ancestor_action_ordinal = {};
-      uint64_t                                       global_sequence = {};
-      uint64_t                                       recv_sequence = {};
-      boost::container::flat_map<chain::name, uint64_t> auth_sequence = {};
-      fc::unsigned_int                               code_sequence = {};
-      fc::unsigned_int                               abi_sequence = {};
-      chain::name                                    receiver = {};
-      chain::name                                    account = {};
-      chain::name                                    action = {};
-      std::vector<authorization_trace_v0>            authorization = {};
-      chain::bytes                                   data = {};
-      chain::bytes                                   return_value = {};
-      std::vector<account_delta_v0>                  account_ram_deltas = {};
-      std::optional<fc::unsigned_int>                cpu_usage_us = {};
-      std::optional<fc::unsigned_int>                net_usage = {};
+      fc::unsigned_int                                   action_ordinal = {};
+      fc::unsigned_int                                   creator_action_ordinal = {};
+      fc::unsigned_int                                   closest_unnotified_ancestor_action_ordinal = {};
+      uint64_t                                           global_sequence = {};
+      uint64_t                                           recv_sequence = {};
+      boost::container::flat_map<chain::name, uint64_t>  auth_sequence = {};
+      fc::unsigned_int                                   code_sequence = {};
+      fc::unsigned_int                                   abi_sequence = {};
+      chain::name                                        receiver = {};
+      chain::name                                        account = {};
+      chain::name                                        action = {};
+      std::vector<authorization_trace_v0>                authorization = {};
+      chain::bytes                                       data = {};
+      chain::bytes                                       return_value = {};
+      std::vector<account_delta_v0>                      account_ram_deltas = {};
+      std::optional<fc::unsigned_int>                    cpu_usage_us = {};
+      std::optional<fc::unsigned_int>                    net_usage = {};
    };
 
   struct transaction_trace_v0 {

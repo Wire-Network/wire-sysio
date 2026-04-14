@@ -200,18 +200,21 @@ namespace sysio::trace_api {
                      break;
                   }
                }
+               // block can be seen again when a fork happens, if not in the new block remove it from blocks that have the trx
                if (!found_in_block)
                   trx_block_nums.erase(trxs_entry.block_num);
             } else if (std::holds_alternative<lib_entry_v0>(entry)) {
                auto lib = std::get<lib_entry_v0>(entry).lib;
                if (!trx_block_nums.empty() && lib >= *(--trx_block_nums.end())) {
-                  return false;
+                  return false; // *(--trx_block_nums.end()) is the block with highest block number which is final
                }
             } else {
-               FC_ASSERT(false, "unpacked data should be a block_trxs_entry or a lib_entry_v0");
+               FC_ASSERT( false, "unpacked data should be a block_trxs_entry or a lib_entry_v0" );
             }
             offset = trx_id_file.tellp();
          }
+         // if empty() keep searching
+         // if not empty() then we have found the trx and since traversing in reverse order this should be the latest
          return trx_block_nums.empty();
       });
 
@@ -400,10 +403,11 @@ namespace sysio::trace_api {
             if (name.rfind(_trace_index_prefix, 0) == 0 && entry.path().extension() == _trace_ext)
                paths.push_back(entry.path());
          }
-         if (ascending)
+         if (ascending) {
             std::sort(paths.begin(), paths.end());
-         else
+         } else {
             std::sort(paths.begin(), paths.end(), std::greater<>());
+         }
          return paths;
       }
 
@@ -431,6 +435,7 @@ namespace sysio::trace_api {
                return std::make_pair(*lo, *hi);
          } catch (...) {
             // malformed or partially written slice
+            fc_wlog(_log, "trace_api: cannot scan index slice '{}'", path.string());
          }
          return std::nullopt;
       }

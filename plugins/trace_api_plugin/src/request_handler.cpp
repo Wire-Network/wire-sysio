@@ -7,8 +7,8 @@
 namespace sysio::trace_api {
 
 fc::mutable_variant_object build_action_variant(const action_trace_v0& a,
-                                                 const decoded_action& decoded,
-                                                 variant_shape shape) {
+                                                const decoded_action& decoded,
+                                                variant_shape shape) {
    fc::mutable_variant_object v;
    // Fields common to all shapes.
    v("global_sequence",  a.global_sequence)
@@ -65,8 +65,7 @@ namespace {
    fc::variants process_actions(const std::vector<action_trace_v0>& actions, const data_handler_function& data_handler) {
       fc::variants result;
       result.reserve(actions.size());
-      // global_sequence is unique per action (chain invariant), so sort stability
-      // is not required.
+      // global_sequence is unique per action (chain invariant), so sort stability is not required.
       std::vector<const action_trace_v0*> sorted;
       sorted.reserve(actions.size());
       for (const auto& a : actions) sorted.push_back(&a);

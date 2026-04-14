@@ -81,9 +81,11 @@ namespace sysio {
       decode_result decode(const action_trace_v0& action);
 
       /**
-       * Legacy convenience wrapper: returns only {params, return_data} and drops
-       * the status/error fields.  Retained for callers that still expect the
-       * tuple shape; prefer decode() for new code.
+       * Tuple-shape wrapper used by the response_formatter::process_block pipeline
+       * (get_block / get_transaction_trace), whose data_handler_function is keyed
+       * to the {params, return_data} tuple.  Returns empty variants on decode
+       * failure -- callers that need the decode error surfaced (get_actions /
+       * get_token_transfers) use decode() directly.
        */
       std::tuple<fc::variant, std::optional<fc::variant>> serialize_to_variant(const std::variant<action_trace_v0>& action);
 

@@ -7,6 +7,7 @@
 #include <sysio/chain/config.hpp>
 #include <sysio/chain/name.hpp>
 #include <fc/io/raw.hpp>
+#include <fmt/format.h>
 #include <exception>
 #include <functional>
 #include <map>
@@ -42,7 +43,7 @@ public:
                                 abi_fetcher_t abi_fetcher = {} )
    : store(std::move(store))
    , except_handler(std::move(except_handler))
-   , _abi_fetcher(std::move(abi_fetcher))
+   , abi_fetcher(std::move(abi_fetcher))
    {}
 
    /// connect to chain controller applied_transaction signal
@@ -118,12 +119,12 @@ private:
          // (lazy or setabi), we never re-fetch.  Using the log as
          // source-of-truth avoids holding a per-node-lifetime set of all
          // accounts ever observed.
-         if (_abi_fetcher
+         if (abi_fetcher
              && setabi_targets_this_trx.count(account) == 0
              && !store.has_abi_entry(account))
          {
             try {
-               if (auto abi = _abi_fetcher(account))
+               if (auto abi = abi_fetcher(account))
                   store.append_abi(account, 0, std::move(*abi));
             } catch (const std::exception& e) {
                fc_dlog(_log, "trace_api: lazy ABI fetch for {} failed: {}", account, e.what());
@@ -159,8 +160,8 @@ private:
    }
 
    void on_block_start( uint32_t block_num ) {
-      if (!_startup_checked) {
-         _startup_checked = true;
+      if (!startup_checked) {
+         startup_checked = true;
          check_continuity(block_num);
       }
       clear_caches();
@@ -181,24 +182,20 @@ private:
             return;
 
          if (block_num < first) {
-            throw std::runtime_error(
-               std::string("trace_api: chain head (") + std::to_string(block_num) +
-               ") is before the first recorded trace block (" + std::to_string(first) +
-               "). To recover: load a snapshot whose chain head is within [" +
-               std::to_string(first) + ", " + std::to_string(last + 1) +
-               "], or copy the trace files covering blocks " + std::to_string(block_num) +
-               ".." + std::to_string(first - 1) + " from another node, or delete the "
-               "trace directory to start fresh (loses historical traces).");
+            throw std::runtime_error(fmt::format(
+               "trace_api: chain head ({}) is before the first recorded trace block ({}). "
+               "To recover: load a snapshot whose chain head is within [{}, {}], "
+               "or copy the trace files covering blocks {}..{} from another node, "
+               "or delete the trace directory to start fresh (loses historical traces).",
+               block_num, first, first, last + 1, block_num, first - 1));
          }
          // block_num > last + 1: forward gap
-         throw std::runtime_error(
-            std::string("trace_api: gap detected in trace data. Last recorded block: ") +
-            std::to_string(last) + ", current block: " + std::to_string(block_num) +
-            ". To recover: load a snapshot covering block " + std::to_string(last + 1) +
-            " (or earlier within the recorded range), or copy the trace files covering "
-            "blocks " + std::to_string(last + 1) + ".." + std::to_string(block_num - 1) +
-            " from another node, or delete the trace directory to start fresh "
-            "(loses historical traces).");
+         throw std::runtime_error(fmt::format(
+            "trace_api: gap detected in trace data. Last recorded block: {}, current block: {}. "
+            "To recover: load a snapshot covering block {} (or earlier within the recorded range), "
+            "or copy the trace files covering blocks {}..{} from another node, "
+            "or delete the trace directory to start fresh (loses historical traces).",
+            last, block_num, last + 1, last + 1, block_num - 1));
       } catch (const yield_exception&) {
          // Order matters: yield_exception propagates (it's the signal that the
          // plugin's own except_handler uses to unwind the controller), while
@@ -258,10 +255,10 @@ private:
 private:
    StoreProvider                                                store;
    exception_handler                                            except_handler;
-   abi_fetcher_t                                                _abi_fetcher;
+   abi_fetcher_t                                                abi_fetcher;
    std::map<transaction_id_type, cache_trace>                   cached_traces;
    std::optional<cache_trace>                                   onblock_trace;
-   bool                                                         _startup_checked{false};
+   bool                                                         startup_checked{false};
 
 };
 
