@@ -178,9 +178,10 @@ message Operators {
 }
 
 message OperatorEntry {
-  sysio.opp.types.ChainAddress  address = 1;
-  sysio.opp.types.OperatorType  type = 2;
-  sysio.opp.types.OperatorStatus status = 3;
+  sysio.opp.types.WireAccount    account = 1;
+  repeated sysio.opp.types.ChainAddress addresses = 2;
+  sysio.opp.types.OperatorType   type = 3;
+  sysio.opp.types.OperatorStatus status = 4;
 }
 
 // Batch operator group assignments (Depot -> Outpost, every epoch).

@@ -45,7 +45,7 @@ struct external_debugging_plugin::impl {
       auto res =
          sysio::debugging::rpc_client::execute<opp::debugging::PutEnvelopeResponse>(*rpc_client, debugging::rpc_client::api_paths::opp_envelope, req);
 
-      ilog("opp_tracking: delivered epoch={} endpoints={} batch_op={} "
+      ilog("external_debugging_pplugin: send_envelope: delivered epoch={} endpoints={} batch_op={} "
            "({} bytes) -> key={} existed={}",
            epoch_index, opp::debugging::DebugOutpostEndpointsType_Name(endpoints_type), batch_op_name.to_string(),
            envelope_data.size(), res.key(), res.data_existed());

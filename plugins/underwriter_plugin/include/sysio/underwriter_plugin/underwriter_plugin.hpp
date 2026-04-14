@@ -17,6 +17,14 @@ namespace sysio {
    /// 4. Submits underwrite intent to the relevant outpost contract (ETH/SOL)
    ///    — the outpost locks capital and emits UNDERWRITE_INTENT via OPP
    /// 5. Monitors uwreqs for status changes (assigned, confirmed, rejected)
+   namespace underwriter_defaults {
+      constexpr uint32_t scan_interval_ms    = 5000;
+      constexpr uint32_t action_timeout_ms   = 15000;
+      constexpr bool     enabled             = false;
+      constexpr const char* eth_client_id    = "eth-default";
+      constexpr const char* sol_client_id    = "sol-default";
+   }
+
    class underwriter_plugin : public appbase::plugin<underwriter_plugin> {
    public:
       APPBASE_PLUGIN_REQUIRES(

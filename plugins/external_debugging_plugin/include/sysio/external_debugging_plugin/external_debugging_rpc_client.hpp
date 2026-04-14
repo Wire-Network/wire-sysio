@@ -25,7 +25,7 @@ namespace sysio::debugging::rpc_client {
 namespace api_paths {
 static constexpr auto ping = "/api/ping";
 static constexpr auto opp_base = "/api/opp";
-static constexpr auto opp_envelope = "/api/opp/envelope";
+static constexpr auto opp_envelope = "Envelope";
 } // namespace api_paths
 
 using namespace sysio::opp;
@@ -44,6 +44,8 @@ Res execute(rpc::json_rpc_client& client, const std::string& method, const Req& 
 
    // Serialize request protobuf to JSON, then parse as fc::variant for json_rpc_client
    std::string req_json;
+   google::protobuf::json::PrintOptions json_options;
+   json_options.always_print_enums_as_ints = true;
    auto status = google::protobuf::util::MessageToJsonString(request, &req_json);
    FC_ASSERT(status.ok(), "protobuf MessageToJsonString failed: {}",
              std::string(status.message()));

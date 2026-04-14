@@ -207,7 +207,7 @@ BOOST_AUTO_TEST_CASE(epoch_in_abi_encoding_with_bytes_param) try {
 
    // Encode with 1 param (hex-encoded bytes) — this is what the batch operator does
    std::string test_envelope_hex = "120c0a040800100012040800100028deeef5ce06300138";
-   auto encoded = contract_encode_data(*epoch_in_abi, {fc::variant(test_envelope_hex)});
+   auto encoded = contract_encode_data(*epoch_in_abi, std::vector<fc::variant>{fc::variant(test_envelope_hex)});
    BOOST_CHECK(!encoded.empty());
 
    // The encoded data should start with the epochIn selector (0xcfae3118)
@@ -215,7 +215,7 @@ BOOST_AUTO_TEST_CASE(epoch_in_abi_encoding_with_bytes_param) try {
 
    // Verify that encoding with 0 params throws (the bug we fixed)
    BOOST_CHECK_THROW(
-      contract_encode_data(*epoch_in_abi, {}),
+      contract_encode_data(*epoch_in_abi, std::vector<fc::variant>{}),
       fc::assert_exception
    );
 } FC_LOG_AND_RETHROW();
@@ -231,7 +231,7 @@ BOOST_AUTO_TEST_CASE(emit_outbound_envelope_abi_encoding_zero_params) try {
    BOOST_CHECK_EQUAL(emit_abi->inputs.size(), 0u);
 
    // Encoding with 0 params should succeed (no inputs expected)
-   auto encoded = contract_encode_data(*emit_abi, {});
+   auto encoded = contract_encode_data(*emit_abi, std::vector<fc::variant>{});
    BOOST_CHECK(!encoded.empty());
    // Should be just the 4-byte selector
    BOOST_CHECK_EQUAL(encoded.size(), 8u); // hex chars = 4 bytes * 2
