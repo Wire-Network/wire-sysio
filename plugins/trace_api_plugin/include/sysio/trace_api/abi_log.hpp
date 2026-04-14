@@ -46,11 +46,12 @@ namespace sysio::trace_api {
 // ---------------------------------------------------------------------------
 
 struct abi_log_header {
-   static constexpr uint32_t magic_value     = 0x414C4942;
+   // Stored little-endian on disk so a hex dump of the first 4 bytes reads "ABIL".
+   static constexpr uint32_t magic_value     = 0x4C494241; // bytes on disk: 'A','B','I','L'
    static constexpr uint32_t current_version = 1;
 
-   uint32_t magic     = magic_value;
-   uint32_t version   = current_version;
+   uint32_t magic    = magic_value;
+   uint32_t version  = current_version;
    uint64_t reserved = 0;
 };
 static_assert(sizeof(abi_log_header) == 16);
@@ -68,10 +69,17 @@ public:
    // (account, global_seq) keys.
    void append(chain::name account, uint64_t global_seq, std::vector<char> abi_bytes);
 
+   struct lookup_result {
+      uint64_t          effective_global_seq = 0; // global_seq of the ABI record that matched
+      std::vector<char> abi_bytes;
+   };
+
    // Look up the ABI in effect for account at the largest recorded
    // global_seq <= the query.  Returns nullopt if no record matches.
+   // The returned effective_global_seq is the global_seq the ABI was
+   // recorded at (used as a stable cache key by decoders).
    // Thread-safe; may run concurrently with append().
-   std::optional<std::vector<char>> lookup(chain::name account, uint64_t global_seq) const;
+   std::optional<lookup_result> lookup(chain::name account, uint64_t global_seq) const;
 
    // Returns true if at least one record exists for the account at any
    // global_sequence.  Used by chain extraction to decide whether to lazy-
@@ -91,8 +99,8 @@ private:
    static_assert(sizeof(record_header) == 24);
 
    struct index_entry {
-      uint64_t blob_offset = 0; // file offset of blob_bytes (not the record_header)
-      uint64_t blob_size   = 0;
+      uint64_t blob_file_offset = 0; // file offset of blob_bytes (not the record_header)
+      uint64_t blob_size        = 0;
    };
    using index_key = std::pair<chain::name /*account*/, uint64_t /*global_seq*/>;
 

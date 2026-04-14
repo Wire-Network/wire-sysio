@@ -1,5 +1,6 @@
 #include <boost/test/unit_test.hpp>
 
+#include <sysio/trace_api/abi_data_handler.hpp>
 #include <sysio/trace_api/request_handler.hpp>
 #include <sysio/trace_api/test_common.hpp>
 
@@ -31,6 +32,21 @@ struct get_actions_fixture {
 
       std::tuple<fc::variant, std::optional<fc::variant>> serialize_to_variant(const action_trace_v0& a) {
          return fixture.mock_data_handler(a);
+      }
+
+      // Production shared_provider exposes decode(); the request_handler's
+      // get_actions path calls decode() directly so a decode_error field can
+      // be surfaced on failure.  The mock builds a decode_result from the
+      // tuple returned by mock_data_handler -- decode never fails in tests.
+      abi_data_handler::decode_result decode(const action_trace_v0& a) {
+         auto [params, return_data] = fixture.mock_data_handler(a);
+         abi_data_handler::decode_result r;
+         r.params      = std::move(params);
+         r.return_data = std::move(return_data);
+         r.status      = r.params.is_null()
+                           ? abi_data_handler::decode_status::not_attempted
+                           : abi_data_handler::decode_status::ok;
+         return r;
       }
 
       get_actions_fixture& fixture;

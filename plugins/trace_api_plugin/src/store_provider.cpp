@@ -142,10 +142,42 @@ namespace sysio::trace_api {
          if (slice_number) {
             if (auto reader = _slice_directory.find_trx_id_index_slice(*slice_number)) {
                if (auto block_num = reader->lookup(trx_id)) {
-                  trx_block_nums.insert(*block_num);
-                  return false; // found in an irreversible slice; stop
+                  // Confirm the hit by scanning the candidate block's
+                  // block_trxs_entry for a full trx_id match.  A naked 64-bit
+                  // prefix collision (extremely rare with natural sha256 ids,
+                  // but findable in ~2^32 GPU work adversarially) would otherwise
+                  // return the wrong block_num and the downstream get_block
+                  // scan would 404 the real trx.  On confirm failure, reset the
+                  // file to offset 0 and fall through to the linear scan below.
+                  bool confirmed = false;
+                  {
+                     metadata_log_entry entry;
+                     auto ds = trx_id_file.create_datastream();
+                     const uint64_t end = file_size(trx_id_file.get_file_path());
+                     while (trx_id_file.tellp() < end) {
+                        yield();
+                        fc::raw::unpack(ds, entry);
+                        if (!std::holds_alternative<block_trxs_entry>(entry)) continue;
+                        const auto& te = std::get<block_trxs_entry>(entry);
+                        if (te.block_num != *block_num) continue;
+                        for (const auto& id : te.ids) {
+                           if (id == trx_id) { confirmed = true; break; }
+                        }
+                        if (confirmed) break;
+                     }
+                  }
+                  if (confirmed) {
+                     trx_block_nums.insert(*block_num);
+                     return false; // found in an irreversible slice; stop
+                  }
+                  // Prefix collision: reset the file so the linear scan starts
+                  // from offset 0 -- the target trx may still be in a DIFFERENT
+                  // block whose trxs entry we passed over during confirmation.
+                  trx_id_file.seek(0);
+                  // fall through to linear scan
+               } else {
+                  return true; // not in this indexed slice; continue to next
                }
-               return true; // not in this indexed slice; continue to next
             }
          }
 
@@ -404,35 +436,47 @@ namespace sysio::trace_api {
       }
    } // anonymous namespace
 
-   std::optional<uint32_t> slice_directory::first_recorded_block() const {
-      for (const auto& path : collect_index_paths(_slice_dir, /*ascending=*/true)) {
-         if (const auto r = scan_index_slice(path, _current_version))
-            return r->first;
+   std::optional<std::pair<uint32_t,uint32_t>> slice_directory::first_and_last_recorded_blocks() const {
+      // Named local with the exact return type so the compiler can NRVO it directly
+      // into the caller's slot.  Single directory scan: collect ascending paths,
+      // walk from both ends.  Returning both bounds from one call guarantees callers
+      // see a consistent view -- either both values are present or neither is.
+      std::optional<std::pair<uint32_t,uint32_t>> result;
+
+      const auto paths = collect_index_paths(_slice_dir, /*ascending=*/true);
+      std::optional<uint32_t> first_block;
+      for (const auto& path : paths) {
+         if (const auto r = scan_index_slice(path, _current_version)) {
+            first_block = r->first;
+            break;
+         }
       }
-      return std::nullopt;
-   }
+      if (!first_block)
+         return result;
 
-   std::optional<uint32_t> slice_directory::last_recorded_block() const {
-      for (const auto& path : collect_index_paths(_slice_dir, /*ascending=*/false)) {
-         if (const auto r = scan_index_slice(path, _current_version))
-            return r->second;
+      // first_block was found, so at least one slice has block entries; the reverse
+      // pass is guaranteed to find at least one (worst case, the same slice).
+      uint32_t last_block = *first_block;
+      for (auto it = paths.rbegin(); it != paths.rend(); ++it) {
+         if (const auto r = scan_index_slice(*it, _current_version)) {
+            last_block = r->second;
+            break;
+         }
       }
-      return std::nullopt;
+
+      result.emplace(*first_block, last_block);
+      return result;
    }
 
-   std::optional<uint32_t> store_provider::first_recorded_block() const {
-      return _slice_directory.first_recorded_block();
-   }
-
-   std::optional<uint32_t> store_provider::last_recorded_block() const {
-      return _slice_directory.last_recorded_block();
+   std::optional<std::pair<uint32_t,uint32_t>> store_provider::first_and_last_recorded_blocks() const {
+      return _slice_directory.first_and_last_recorded_blocks();
    }
 
    void store_provider::append_abi(chain::name account, uint64_t global_seq, std::vector<char> abi_bytes) {
       _abi_log.append(account, global_seq, std::move(abi_bytes));
    }
 
-   std::optional<std::vector<char>> store_provider::lookup_abi(chain::name account, uint64_t global_seq) const {
+   std::optional<abi_log::lookup_result> store_provider::lookup_abi(chain::name account, uint64_t global_seq) const {
       return _abi_log.lookup(account, global_seq);
    }
 

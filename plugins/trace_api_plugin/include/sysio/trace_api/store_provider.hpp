@@ -102,12 +102,13 @@ namespace sysio::trace_api {
    //
    // Native-endian, x86_64 Linux only (same convention as other slice files).
    struct blk_offset_index_header {
-      static constexpr uint32_t magic_value     = 0x424C4958; // "BLIX"
+      // Stored little-endian on disk so a hex dump of the first 4 bytes reads "BLIX".
+      static constexpr uint32_t magic_value     = 0x58494C42; // bytes on disk: 'B','L','I','X'
       static constexpr uint32_t current_version = 1;
 
-      uint32_t magic     = magic_value;
-      uint32_t version   = current_version;
-      uint32_t width     = 0; // slice width (block count per slice)
+      uint32_t magic    = magic_value;
+      uint32_t version  = current_version;
+      uint32_t width    = 0; // slice width (block count per slice)
       uint32_t reserved = 0;
    };
    static_assert(sizeof(blk_offset_index_header) == 16);
@@ -255,15 +256,12 @@ namespace sysio::trace_api {
       void build_trx_id_index(uint32_t slice_number, const log_handler& log);
 
       /**
-       * Return the lowest block number recorded in any index slice file, or nullopt if no data exists.
+       * Return {first, last} block numbers recorded across all index slice files, or nullopt
+       * if no data exists.  Used at startup to detect gaps between existing trace data and the
+       * current chain head.  Atomic in the sense that both values come from a single directory
+       * scan, so callers don't need to guard against seeing `first` but not `last`.
        */
-      std::optional<uint32_t> first_recorded_block() const;
-
-      /**
-       * Return the highest block number recorded in any index slice file, or nullopt if no data exists.
-       * Used at startup to detect gaps between existing trace data and the current chain head.
-       */
-      std::optional<uint32_t> last_recorded_block() const;
+      std::optional<std::pair<uint32_t,uint32_t>> first_and_last_recorded_blocks() const;
 
       /**
        * Record the offset of a block's trace data in trace_<range>.log, via the block-offset
@@ -368,11 +366,15 @@ namespace sysio::trace_api {
       void append_abi(chain::name account, uint64_t global_seq, std::vector<char> abi_bytes);
 
       /**
-       * Return the ABI bytes in effect for account at global_seq (the ABI with the
+       * Return the ABI in effect for account at global_seq (the ABI with the
        * largest recorded global_seq <= the query), or nullopt if none is found.
+       * The returned pair is {effective_global_seq, abi_bytes} where
+       * effective_global_seq is the recorded setabi's global_seq (0 for the
+       * lazy-capture sentinel).  Decoders use effective_global_seq as a stable
+       * cache key so actions that share an ABI version all hit the same entry.
        * Thread-safe; may be called from the HTTP thread.
        */
-      std::optional<std::vector<char>> lookup_abi(chain::name account, uint64_t global_seq) const;
+      std::optional<abi_log::lookup_result> lookup_abi(chain::name account, uint64_t global_seq) const;
 
       /**
        * Return true if any ABI record exists for the account.  Used by extraction
@@ -392,15 +394,11 @@ namespace sysio::trace_api {
       get_block_n get_trx_block_number(const chain::transaction_id_type& trx_id, const yield_function& yield= {});
 
       /**
-       * Return the lowest block number recorded in any index slice file, or nullopt if no data exists.
+       * Return {first, last} block numbers recorded across all index slice files, or nullopt
+       * if the slice directory is empty.  Used at startup to verify continuity between existing
+       * trace data and the current chain head.
        */
-      std::optional<uint32_t> first_recorded_block() const;
-
-      /**
-       * Return the highest block number recorded in any index slice file, or nullopt if the slice directory
-       * is empty. Used at startup to verify continuity between existing trace data and the current chain head.
-       */
-      std::optional<uint32_t> last_recorded_block() const;
+      std::optional<std::pair<uint32_t,uint32_t>> first_and_last_recorded_blocks() const;
 
       void start_maintenance_thread( log_handler log ) {
          _slice_directory.start_maintenance_thread( std::move(log) );

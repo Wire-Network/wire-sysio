@@ -19,15 +19,22 @@ struct continuity_mock_store {
    void append_lib(uint32_t) {}
    void append_trx_ids(block_trxs_entry) {}
 
-   std::optional<uint32_t> first_recorded_block() const { return _first_block; }
-   std::optional<uint32_t> last_recorded_block()  const { return _last_block;  }
+   std::optional<std::pair<uint32_t,uint32_t>> first_and_last_recorded_blocks() const {
+      if (!_first_block) return std::nullopt;
+      return std::make_pair(*_first_block, _last_block.value_or(*_first_block));
+   }
 
    std::optional<uint32_t> _first_block;
    std::optional<uint32_t> _last_block;
 };
 
 struct continuity_fixture {
-   // Convenience: data [first, last] exists, or nullopt for empty store
+   // Convenience: data [first, last] exists, or nullopt for empty store.
+   // Each try_block_start() constructs a fresh extractor instance -- models
+   // an independent node startup.  For tests that need to assert the check
+   // fires only once across multiple block_start signals on the SAME
+   // extractor, do not use this fixture; build the extractor inline (see
+   // check_only_on_first_block_start below).
    continuity_fixture(std::optional<uint32_t> first_block, std::optional<uint32_t> last_block)
    : store_first(first_block), store_last(last_block)
    {}
@@ -134,6 +141,28 @@ BOOST_AUTO_TEST_SUITE(continuity_tests)
 
       impl.signal_block_start(200); // second call: no re-check, also succeeds
       BOOST_CHECK(!threw);
+   }
+
+   // The continuity check flips its "already checked" flag BEFORE running, so
+   // subsequent block_start signals skip the check regardless of what the
+   // except_handler did on the first one.  Verify via a non-throwing handler
+   // (which would otherwise re-enter the check if the flag weren't set early).
+   BOOST_AUTO_TEST_CASE(check_not_rerun_after_non_throwing_except_handler) {
+      int handler_calls = 0;
+      auto except = exception_handler{[&handler_calls](const exception_with_context&) {
+         ++handler_calls;
+         // deliberately do NOT throw -- simulates a handler that just logs
+      }};
+
+      // Prior data ending at 100; first block_start at 200 is a forward gap.
+      chain_extraction_impl_type<continuity_mock_store> impl(
+         continuity_mock_store{1, 100}, std::move(except));
+
+      impl.signal_block_start(200); // gap detected; handler called once
+      BOOST_CHECK_EQUAL(handler_calls, 1);
+
+      impl.signal_block_start(300); // second call must NOT re-invoke the check
+      BOOST_CHECK_EQUAL(handler_calls, 1);
    }
 
 BOOST_AUTO_TEST_SUITE_END()

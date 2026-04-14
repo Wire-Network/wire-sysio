@@ -4,8 +4,10 @@
 #include <sysio/chain/types.hpp>
 #include <fc/io/cfile.hpp>
 #include <fc/reflect/reflect.hpp>
+#include <deque>
 #include <filesystem>
 #include <optional>
+#include <utility>
 #include <vector>
 
 namespace sysio::trace_api {
@@ -25,20 +27,21 @@ namespace sysio::trace_api {
 // ---------------------------------------------------------------------------
 
 struct trx_id_index_header {
-   static constexpr uint32_t magic_value    = 0x54524958; // "TRIX"
+   // Stored little-endian on disk so a hex dump of the first 4 bytes reads "TRIX".
+   static constexpr uint32_t magic_value     = 0x58495254; // bytes on disk: 'T','R','I','X'
    static constexpr uint32_t current_version = 1;
 
    uint32_t magic        = magic_value;
    uint32_t version      = current_version;
    uint32_t bucket_count = 0;
-   uint32_t reserved    = 0;
+   uint32_t reserved     = 0;
 };
 static_assert(sizeof(trx_id_index_header) == 16);
 
 struct trx_id_bucket {
-   uint64_t prefix64 = 0;  // first 8 bytes of trx sha256 interpreted as uint64_t
+   uint64_t prefix64  = 0; // first 8 bytes of trx sha256 interpreted as uint64_t
    uint32_t block_num = 0; // 0 = empty; SYSIO block numbers start at 1
-   uint32_t reserved = 0;
+   uint32_t reserved  = 0;
 };
 static_assert(sizeof(trx_id_bucket) == 16);
 
@@ -58,7 +61,9 @@ private:
    // (prefix64, block_num) pairs in insertion order.  write() applies last-
    // write-wins per prefix64 when populating the bucket array, so the latest
    // add for a given prefix is what ends up in the on-disk hash table.
-   std::vector<std::pair<uint64_t, uint32_t>> _entries;
+   // std::deque avoids the O(N) reallocation+copy of std::vector growth for
+   // multi-million-entry slices without needing an up-front reserve hint.
+   std::deque<std::pair<uint64_t, uint32_t>> _entries;
 };
 
 // ---------------------------------------------------------------------------

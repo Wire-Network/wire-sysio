@@ -18,7 +18,7 @@ chain::transaction_id_type make_trx_id(uint64_t prefix64, uint8_t disambiguator 
    chain::transaction_id_type id;
    std::memcpy(id.data(), &prefix64, sizeof(prefix64));
    // vary the last byte so ids with the same prefix64 are still distinct objects
-   id.data()[31] = disambiguator;
+   id.data()[id.data_size() - 1] = disambiguator;
    return id;
 }
 

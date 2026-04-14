@@ -55,15 +55,22 @@ abi_log::abi_log(const std::filesystem::path& path) {
       _cfile.open(fc::cfile::create_or_update_rw_mode);
    } catch (...) {
       fc_wlog(_log, "trace_api: abi_log failed to open {}", path.generic_string());
+      // Best-effort clean-up: a failed open on some libc versions leaves a zero-byte
+      // file behind, which would look like a valid-but-header-less log on the next
+      // start and fail an unpack inside the existing-file branch.
+      std::error_code ec;
+      if (!existed)
+         std::filesystem::remove(path, ec);
       return;
    }
 
    if (!existed) {
-      // Fresh file: write header, no records yet.
+      // Fresh file: write header, no records yet.  "ab+" mode always writes at
+      // EOF, so the seek below is advisory for the position indicator; the
+      // write lands at offset 0 by construction (file is freshly opened, EOF = 0).
       abi_log_header hdr;
       auto data = fc::raw::pack(hdr);
       try {
-         _cfile.seek(0);
          _cfile.write(data.data(), data.size());
          _cfile.flush();
       } catch (...) {
@@ -104,6 +111,10 @@ uint64_t abi_log::recover_from_disk(const std::filesystem::path& path) {
    const uint64_t header_size = sizeof(abi_log_header);
    const uint64_t file_size = std::filesystem::file_size(path);
 
+   // pread correctness: fc::cfile is backed by buffered stdio (FILE*), but
+   // every append() flushes before returning, and the recover scan only runs
+   // during the constructor (before any concurrent append).  Never introduce
+   // unflushed buffered writes on the same cfile or pread may see stale data.
    uint64_t offset = header_size;
    while (offset < file_size) {
       const uint64_t record_start = offset;
@@ -122,22 +133,22 @@ uint64_t abi_log::recover_from_disk(const std::filesystem::path& path) {
          break;
       }
 
-      const uint64_t blob_offset = record_start + sizeof(record_header);
-      const uint64_t crc_offset  = blob_offset + rh.blob_size;
-      const uint64_t record_end  = crc_offset + record_trailer_size;
+      const uint64_t blob_file_offset = record_start + sizeof(record_header);
+      const uint64_t crc_offset       = blob_file_offset + rh.blob_size;
+      const uint64_t record_end       = crc_offset + record_trailer_size;
 
       if (record_end > file_size) {
          fc_wlog(_log, "trace_api: abi_log {} record at {} claims blob_size {} but file has only {} bytes remaining, truncating",
-              path.generic_string(), record_start, rh.blob_size, file_size - blob_offset);
+              path.generic_string(), record_start, rh.blob_size, file_size - blob_file_offset);
          break;
       }
 
       std::vector<char> blob;
       if (rh.blob_size > 0) {
          blob.resize(rh.blob_size);
-         if (!pread_all(_cfile.fileno(), blob.data(), rh.blob_size, blob_offset)) {
+         if (!pread_all(_cfile.fileno(), blob.data(), rh.blob_size, blob_file_offset)) {
             fc_wlog(_log, "trace_api: abi_log {} failed to read blob at offset {}, truncating",
-                 path.generic_string(), blob_offset);
+                 path.generic_string(), blob_file_offset);
             break;
          }
       }
@@ -156,7 +167,8 @@ uint64_t abi_log::recover_from_disk(const std::filesystem::path& path) {
          break;
       }
 
-      _index[{rh.account, rh.global_seq}] = index_entry{blob_offset, rh.blob_size};
+      // std::map::operator[] — duplicate (account, global_seq) silently overwrites (last-write-wins).
+      _index[{rh.account, rh.global_seq}] = index_entry{blob_file_offset, rh.blob_size};
       offset = record_end;
    }
 
@@ -175,17 +187,22 @@ uint64_t abi_log::recover_from_disk(const std::filesystem::path& path) {
    return offset;
 }
 
+// NOTE: callers of append()/has_entry() are expected to be single-threaded
+// (the chain extraction thread).  The append+index-insert sequence is not
+// strictly atomic across the two mutexes; a concurrent caller could slip an
+// insert for the same key between our write and our index update, producing
+// a duplicate record.  This is harmless given last-write-wins but not obvious.
 void abi_log::append(chain::name account, uint64_t global_seq, std::vector<char> abi_bytes) {
    if (!_valid) return;
 
    record_header rh{ account, global_seq, abi_bytes.size() };
    const uint32_t crc = compute_record_crc(rh, abi_bytes.data(), abi_bytes.size());
 
-   uint64_t blob_offset = 0;
+   uint64_t blob_file_offset = 0;
    {
       std::lock_guard<std::mutex> lock(_append_mtx);
       try {
-         _cfile.seek(_end_offset);
+         // "ab+" mode always writes at EOF; explicit seek would be a no-op here.
          _cfile.write(reinterpret_cast<const char*>(&rh), sizeof(rh));
          if (rh.blob_size > 0)
             _cfile.write(abi_bytes.data(), abi_bytes.size());
@@ -196,13 +213,14 @@ void abi_log::append(chain::name account, uint64_t global_seq, std::vector<char>
          return;
       }
 
-      blob_offset = _end_offset + sizeof(rh);
+      blob_file_offset = _end_offset + sizeof(rh);
       _end_offset += sizeof(rh) + rh.blob_size + record_trailer_size;
    }
 
    {
       std::lock_guard<std::mutex> lock(_index_mtx);
-      _index[{rh.account, rh.global_seq}] = index_entry{blob_offset, rh.blob_size};
+      // std::map::operator[] — duplicate (account, global_seq) silently overwrites (last-write-wins).
+      _index[{rh.account, rh.global_seq}] = index_entry{blob_file_offset, rh.blob_size};
    }
 }
 
@@ -213,33 +231,44 @@ bool abi_log::has_entry(chain::name account) const {
    return it != _index.end() && it->first.first == account;
 }
 
-std::optional<std::vector<char>> abi_log::lookup(chain::name account, uint64_t global_seq) const {
-   if (!_valid) return std::nullopt;
+std::optional<abi_log::lookup_result> abi_log::lookup(chain::name account, uint64_t global_seq) const {
+   // Named local return type so the compiler can NRVO it straight into the
+   // caller's slot.
+   std::optional<lookup_result> result;
+   if (!_valid) return result;
 
-   uint64_t blob_offset = 0;
-   uint64_t blob_size   = 0;
+   uint64_t blob_file_offset = 0;
+   uint64_t blob_size        = 0;
+   uint64_t effective_seq    = 0;
 
    {
       std::lock_guard<std::mutex> lock(_index_mtx);
       auto it = _index.upper_bound({account, global_seq});
       if (it == _index.begin())
-         return std::nullopt;
+         return result;
       --it;
       if (it->first.first != account)
-         return std::nullopt;
-      blob_offset = it->second.blob_offset;
-      blob_size   = it->second.blob_size;
+         return result;
+      blob_file_offset = it->second.blob_file_offset;
+      blob_size        = it->second.blob_size;
+      effective_seq    = it->first.second;
    }
 
-   if (blob_size == 0)
-      return std::vector<char>{};
+   if (blob_size == 0) {
+      result.emplace(lookup_result{effective_seq, {}});
+      return result;
+   }
 
+   // pread correctness: every append() flushes before returning, so the bytes
+   // we're about to read are visible to the underlying fd.  Don't introduce
+   // unflushed buffered writes on the same cfile.
    std::vector<char> out(blob_size);
-   if (!pread_all(_cfile.fileno(), out.data(), blob_size, blob_offset)) {
-      fc_wlog(_log, "trace_api: abi_log pread of {} bytes at {} failed", blob_size, blob_offset);
-      return std::nullopt;
+   if (!pread_all(_cfile.fileno(), out.data(), blob_size, blob_file_offset)) {
+      fc_wlog(_log, "trace_api: abi_log pread of {} bytes at {} failed", blob_size, blob_file_offset);
+      return result;
    }
-   return out;
+   result.emplace(lookup_result{effective_seq, std::move(out)});
+   return result;
 }
 
 } // namespace sysio::trace_api

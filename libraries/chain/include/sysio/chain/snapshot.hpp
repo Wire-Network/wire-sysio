@@ -30,7 +30,7 @@ namespace sysio { namespace chain {
     *
     * File format v1:
     *   [Header]  (8 bytes)
-    *     magic:        uint32_t  (0x57495245 "WIRE")
+    *     magic:        uint32_t  (0x45524957 "WIRE" — bytes 'W','I','R','E' on disk)
     *     version:      uint32_t  (1)
     *
     *   [Section Data]
@@ -158,7 +158,8 @@ namespace sysio { namespace chain {
 
    class snapshot_writer {
       public:
-         static constexpr uint32_t magic_number = 0x57495245; // WIRE in ASCII
+         // Stored little-endian; bytes on disk are 'W','I','R','E' so a hex dump reads "WIRE".
+         static constexpr uint32_t magic_number = 0x45524957;
          static constexpr uint32_t max_threads  = 4;
 
          class section_writer {

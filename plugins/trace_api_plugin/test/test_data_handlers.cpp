@@ -15,10 +15,12 @@ namespace {
       return fc::raw::pack(abi);
    }
 
-   // Build a lookup_fn that returns packed ABI bytes for a given account
+   // Build a lookup_fn that returns packed ABI bytes for a given account.
+   // effective_global_seq is fixed at 0 for test purposes -- the handler's
+   // cache key becomes (account, 0) regardless of the action's global_seq.
    abi_data_handler::abi_lookup_fn make_lookup(chain::name account, std::vector<char> abi_bytes) {
-      return [account, bytes = std::move(abi_bytes)](chain::name a, uint64_t) -> std::optional<std::vector<char>> {
-         if (a == account) return bytes;
+      return [account, bytes = std::move(abi_bytes)](chain::name a, uint64_t) -> std::optional<abi_data_handler::lookup_entry> {
+         if (a == account) return abi_data_handler::lookup_entry{0, bytes};
          return std::nullopt;
       };
    }

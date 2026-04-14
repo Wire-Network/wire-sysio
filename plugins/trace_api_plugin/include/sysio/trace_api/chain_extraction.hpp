@@ -5,6 +5,7 @@
 #include <sysio/trace_api/logging.hpp>
 #include <sysio/trace_api/trace.hpp>
 #include <sysio/chain/config.hpp>
+#include <sysio/chain/name.hpp>
 #include <fc/io/raw.hpp>
 #include <exception>
 #include <functional>
@@ -15,6 +16,11 @@ namespace sysio::trace_api {
 
 using chain::transaction_id_type;
 using chain::packed_transaction;
+using namespace sysio::chain::literals;
+
+// Compile-time constants for setabi detection: built from constexpr _n
+// literals so we don't pay a chain::name construction cost on every action.
+inline constexpr chain::name setabi_action_name = "setabi"_n;
 
 template <typename StoreProvider>
 class chain_extraction_impl_type {
@@ -82,7 +88,7 @@ private:
       for (const auto& at : trace->action_traces) {
          if (!at.receipt) continue;
          if (at.act.account == chain::config::system_account_name &&
-             at.act.name    == chain::name("setabi")) {
+             at.act.name    == setabi_action_name) {
             try {
                chain::name target;
                chain::bytes abi_bytes;
@@ -126,7 +132,7 @@ private:
 
          // setabi: record the new ABI with its exact global_sequence.
          if (at.act.account == chain::config::system_account_name &&
-             at.act.name    == chain::name("setabi")) {
+             at.act.name    == setabi_action_name) {
             try {
                chain::name target_account;
                chain::bytes abi_bytes;
@@ -162,30 +168,42 @@ private:
 
    void check_continuity(uint32_t block_num) {
       try {
-         const auto first = store.first_recorded_block();
-         const auto last  = store.last_recorded_block();
-         if (!first) {
+         const auto recorded = store.first_and_last_recorded_blocks();
+         if (!recorded) {
             fc_ilog(_log, "trace_api: no prior trace data found, starting fresh at block {}", block_num);
             return;
          }
+         const uint32_t first = recorded->first;
+         const uint32_t last  = recorded->second;
          // Overlap or exact continuation: chain head is within or just past existing data.
          // Re-applied blocks will overwrite existing slice entries as they are re-recorded.
-         if (block_num >= *first && block_num <= *last + 1)
+         if (block_num >= first && block_num <= last + 1)
             return;
 
-         if (block_num < *first) {
+         if (block_num < first) {
             throw std::runtime_error(
                std::string("trace_api: chain head (") + std::to_string(block_num) +
-               ") is before the first recorded trace block (" + std::to_string(*first) +
-               "). Delete the trace directory and restart to record from the snapshot point.");
+               ") is before the first recorded trace block (" + std::to_string(first) +
+               "). To recover: load a snapshot whose chain head is within [" +
+               std::to_string(first) + ", " + std::to_string(last + 1) +
+               "], or copy the trace files covering blocks " + std::to_string(block_num) +
+               ".." + std::to_string(first - 1) + " from another node, or delete the "
+               "trace directory to start fresh (loses historical traces).");
          }
          // block_num > last + 1: forward gap
          throw std::runtime_error(
             std::string("trace_api: gap detected in trace data. Last recorded block: ") +
-            std::to_string(*last) + ", current block: " + std::to_string(block_num) +
-            ". Delete the trace directory and restart to begin fresh, or load a snapshot "
-            "that continues from or before block " + std::to_string(*last + 1) + ".");
+            std::to_string(last) + ", current block: " + std::to_string(block_num) +
+            ". To recover: load a snapshot covering block " + std::to_string(last + 1) +
+            " (or earlier within the recorded range), or copy the trace files covering "
+            "blocks " + std::to_string(last + 1) + ".." + std::to_string(block_num - 1) +
+            " from another node, or delete the trace directory to start fresh "
+            "(loses historical traces).");
       } catch (const yield_exception&) {
+         // Order matters: yield_exception propagates (it's the signal that the
+         // plugin's own except_handler uses to unwind the controller), while
+         // other exceptions from store.* calls or the throws above go through
+         // except_handler so the operator sees a properly formatted message.
          throw;
       } catch (...) {
          except_handler(MAKE_EXCEPTION_WITH_CONTEXT(std::current_exception()));

@@ -127,11 +127,7 @@ struct extraction_test_fixture {
          fixture.id_log[tt.block_num] = tt.ids;
       }
 
-      std::optional<uint32_t> first_recorded_block() const {
-         return std::nullopt; // no prior data in unit tests
-      }
-
-      std::optional<uint32_t> last_recorded_block() const {
+      std::optional<std::pair<uint32_t,uint32_t>> first_and_last_recorded_blocks() const {
          return std::nullopt; // no prior data in unit tests
       }
 
@@ -398,8 +394,7 @@ struct abi_capture_fixture {
       template <typename BT> void append(const BT&) {}
       void append_lib(uint32_t) {}
       void append_trx_ids(const block_trxs_entry&) {}
-      std::optional<uint32_t> first_recorded_block() const { return std::nullopt; }
-      std::optional<uint32_t> last_recorded_block()  const { return std::nullopt; }
+      std::optional<std::pair<uint32_t,uint32_t>> first_and_last_recorded_blocks() const { return std::nullopt; }
 
       void append_abi(chain::name account, uint64_t global_seq, std::vector<char> abi_bytes) {
          fixture.abi_calls.push_back({account, global_seq, std::move(abi_bytes)});

@@ -14,6 +14,7 @@
 
 using namespace sysio::trace_api;
 using namespace sysio::trace_api::configuration_utils;
+using namespace sysio::chain::literals;
 using boost::signals2::scoped_connection;
 
 namespace {
@@ -89,19 +90,15 @@ namespace {
          store->append_trx_ids(std::move(tt));
       }
 
-      std::optional<uint32_t> first_recorded_block() const {
-         return store->first_recorded_block();
-      }
-
-      std::optional<uint32_t> last_recorded_block() const {
-         return store->last_recorded_block();
+      std::optional<std::pair<uint32_t,uint32_t>> first_and_last_recorded_blocks() const {
+         return store->first_and_last_recorded_blocks();
       }
 
       void append_abi(chain::name account, uint64_t global_seq, std::vector<char> abi_bytes) {
          store->append_abi(account, global_seq, std::move(abi_bytes));
       }
 
-      std::optional<std::vector<char>> lookup_abi(chain::name account, uint64_t global_seq) const {
+      std::optional<abi_log::lookup_result> lookup_abi(chain::name account, uint64_t global_seq) const {
          return store->lookup_abi(account, global_seq);
       }
 
@@ -133,11 +130,11 @@ struct trace_api_common_impl {
       cfg_options("trace-minimum-uncompressed-irreversible-history-blocks", boost::program_options::value<int32_t>()->default_value(-1),
                   "Number of blocks to ensure are uncompressed past LIB. Compressed \"slice\" files are still accessible but may carry a performance loss on retrieval\n"
                   "A value of -1 indicates that automatic compression of \"slice\" files will be turned off.");
-      cfg_options("trace-max-block-range", bpo::value<int32_t>()->default_value(100),
+      cfg_options("trace-max-block-range", bpo::value<uint32_t>()->default_value(1000),
                   "Maximum number of blocks scanned by a single get_actions or get_token_transfers request.\n"
-                  "block_num_end is silently clamped to block_num_start + this - 1.\n"
-                  "Clients paginate by advancing block_num_start by this amount each call.\n"
-                  "A value of -1 removes the cap (use with caution on public nodes).");
+                  "Must be in [1, 10000]. block_num_end is silently clamped to block_num_start + this - 1.\n"
+                  "Clients paginate by advancing block_num_start by this amount each call. The response\n"
+                  "envelope reports the actual range scanned.");
    }
 
    void plugin_initialize(const appbase::variables_map& options) {
@@ -168,11 +165,10 @@ struct trace_api_common_impl {
          minimum_uncompressed_irreversible_history_blocks = uncompressed_blocks;
       }
 
-      const int32_t block_range = options.at("trace-max-block-range").as<int32_t>();
-      SYS_ASSERT(block_range == -1 || block_range > 0, chain::plugin_config_exception,
-                 "\"trace-max-block-range\" must be -1 (unlimited) or a positive value.");
-      max_block_range = (block_range == -1) ? std::numeric_limits<uint32_t>::max()
-                                            : static_cast<uint32_t>(block_range);
+      const uint32_t block_range = options.at("trace-max-block-range").as<uint32_t>();
+      SYS_ASSERT(block_range >= 1 && block_range <= 10'000, chain::plugin_config_exception,
+                 "\"trace-max-block-range\" must be in [1, 10000]; got {}", block_range);
+      max_block_range = block_range;
 
       store = std::make_shared<store_provider>(
          trace_dir,
@@ -215,20 +211,22 @@ struct trace_api_rpc_plugin_impl : public std::enable_shared_from_this<trace_api
    explicit trace_api_rpc_plugin_impl( const std::shared_ptr<trace_api_common_impl>& common )
    :common(common) {}
 
-   static void set_program_options(appbase::options_description&, appbase::options_description&) {}
-
    void plugin_initialize(const appbase::variables_map&) {
-      fc_ilog(_log, "initializing trace api rpc plugin");
+      fc_ilog(_log, "trace_api: initializing trace api rpc plugin");
       max_block_range = common->max_block_range;
       auto store = common->store;
       auto data_handler = std::make_shared<abi_data_handler>(
          [](const exception_with_context& e) {
-            // Log at debug and fall back to raw hex — do not rethrow, since
+            // Log at debug and fall back to raw hex -- do not rethrow, since
             // ABI capture is automatic and decoding failures should be soft.
             log_exception(e, fc::log_level::debug);
          },
-         [store](chain::name account, uint64_t global_seq) {
-            return store->lookup_abi(account, global_seq);
+         [store](chain::name account, uint64_t global_seq) -> std::optional<abi_data_handler::lookup_entry> {
+            std::optional<abi_data_handler::lookup_entry> out;
+            if (auto r = store->lookup_abi(account, global_seq)) {
+               out.emplace(abi_data_handler::lookup_entry{r->effective_global_seq, std::move(r->abi_bytes)});
+            }
+            return out;
          }
       );
 
@@ -337,6 +335,7 @@ struct trace_api_rpc_plugin_impl : public std::enable_shared_from_this<trace_api
             [this](std::string, std::string body, url_response_callback cb)
       {
          action_query query;
+         bool include_notifications = false;
          if (!body.empty()) {
             try {
                auto input = fc::json::from_string(body);
@@ -351,11 +350,23 @@ struct trace_api_rpc_plugin_impl : public std::enable_shared_from_this<trace_api
                   query.block_num_start = obj["block_num_start"].as<uint32_t>();
                if (obj.contains("block_num_end"))
                   query.block_num_end = obj["block_num_end"].as<uint32_t>();
+               if (obj.contains("include_notifications"))
+                  include_notifications = obj["include_notifications"].as_bool();
             } catch (...) {
                error_results results{400, "Bad request body"};
                cb( 400, fc::variant( results ));
                return;
             }
+         }
+
+         // Default = canonical actions only (receiver == account).  When the caller
+         // specifies exactly one of receiver/account and does not opt in to
+         // notifications, mirror the specified value onto the missing one.
+         if (!include_notifications) {
+            if (query.account && !query.receiver)
+               query.receiver = query.account;
+            else if (query.receiver && !query.account)
+               query.account = query.receiver;
          }
 
          if (query.block_num_start > query.block_num_end) {
@@ -368,7 +379,10 @@ struct trace_api_rpc_plugin_impl : public std::enable_shared_from_this<trace_api
 
          try {
             auto result = req_handler->get_actions(query);
-            cb( 200, fc::mutable_variant_object()("actions", result.actions) );
+            cb( 200, fc::mutable_variant_object()
+                        ("block_num_start", query.block_num_start)
+                        ("block_num_end",   query.block_num_end)
+                        ("actions",         result.actions) );
          } catch (...) {
             http_plugin::handle_exception("trace_api", "get_actions", body, cb);
          }
@@ -378,21 +392,24 @@ struct trace_api_rpc_plugin_impl : public std::enable_shared_from_this<trace_api
             api_category::trace_api,
             [this](std::string, std::string body, url_response_callback cb)
       {
-         // Convenience wrapper: receiver=account=token_contract, action=transfer.
-         // Using receiver=token_contract ensures exactly one result per transfer
-         // (no duplicate inline-notification entries for the recipient).
+         // Convenience wrapper: receiver==account==token_contract, action="transfer"
+         // gives exactly one result per transfer (inline notifications excluded).
+         static constexpr chain::name default_token_contract = "sysio.token"_n;
+         static constexpr chain::name transfer_action_name   = "transfer"_n;
          action_query query;
-         query.action = chain::name("transfer");
+         query.action   = transfer_action_name;
+         query.receiver = default_token_contract;
+         query.account  = default_token_contract;
 
          if (!body.empty()) {
             try {
                auto input = fc::json::from_string(body);
                const auto& obj = input.get_object();
-               chain::name token_contract("sysio.token");
-               if (obj.contains("token_contract"))
-                  token_contract = chain::name(obj["token_contract"].as_string());
-               query.receiver = token_contract;
-               query.account  = token_contract;
+               if (obj.contains("token_contract")) {
+                  chain::name tc = chain::name(obj["token_contract"].as_string());
+                  query.receiver = tc;
+                  query.account  = tc;
+               }
                if (obj.contains("block_num_start"))
                   query.block_num_start = obj["block_num_start"].as<uint32_t>();
                if (obj.contains("block_num_end"))
@@ -402,9 +419,6 @@ struct trace_api_rpc_plugin_impl : public std::enable_shared_from_this<trace_api
                cb( 400, fc::variant( results ));
                return;
             }
-         } else {
-            query.receiver = chain::name("sysio.token");
-            query.account  = chain::name("sysio.token");
          }
 
          if (query.block_num_start > query.block_num_end) {
@@ -417,7 +431,10 @@ struct trace_api_rpc_plugin_impl : public std::enable_shared_from_this<trace_api
 
          try {
             auto result = req_handler->get_token_transfer_actions(query);
-            cb( 200, fc::mutable_variant_object()("transfers", result.actions) );
+            cb( 200, fc::mutable_variant_object()
+                        ("block_num_start", query.block_num_start)
+                        ("block_num_end",   query.block_num_end)
+                        ("transfers",       result.actions) );
          } catch (...) {
             http_plugin::handle_exception("trace_api", "get_token_transfers", body, cb);
          }
@@ -428,9 +445,9 @@ struct trace_api_rpc_plugin_impl : public std::enable_shared_from_this<trace_api
    }
 
    // Silently clamp block_num_end so the scan spans at most max_block_range blocks.
-   // No 400 returned — wide-range requests are a normal pagination pattern.
+   // No 400 returned -- wide-range requests are a normal pagination pattern.
+   // The response envelope reports the actual range so clients can detect the clamp.
    void clamp_block_end(action_query& query) const {
-      if (max_block_range == std::numeric_limits<uint32_t>::max()) return;
       const uint64_t max_end = uint64_t{query.block_num_start} + max_block_range - 1;
       if (max_end < query.block_num_end)
          query.block_num_end = static_cast<uint32_t>(max_end);
@@ -448,7 +465,7 @@ struct trace_api_plugin_impl {
    :common(common) {}
 
    void plugin_initialize(const appbase::variables_map& options) {
-      fc_ilog(_log, "initializing trace api plugin");
+      fc_ilog(_log, "trace_api: initializing trace api plugin");
       auto log_exceptions_and_shutdown = [](const exception_with_context& e) {
          log_exception(e, fc::log_level::error);
          app().quit();
@@ -465,7 +482,11 @@ struct trace_api_plugin_impl {
             const auto* meta = chain.find_account_metadata(account);
             if (meta && meta->abi.size() > 0)
                result.emplace(meta->abi.data(), meta->abi.data() + meta->abi.size());
-         } catch (...) {}
+         } catch (const std::exception& e) {
+            fc_dlog(_log, "trace_api: lazy ABI fetch for {} failed: {}", account, e.what());
+         } catch (...) {
+            fc_dlog(_log, "trace_api: lazy ABI fetch for {} failed: unknown", account);
+         }
          return result;
       };
 
@@ -531,7 +552,6 @@ trace_api_plugin::~trace_api_plugin() = default;
 
 void trace_api_plugin::set_program_options(appbase::options_description& cli, appbase::options_description& cfg) {
    trace_api_common_impl::set_program_options(cli, cfg);
-   trace_api_rpc_plugin_impl::set_program_options(cli, cfg);
 }
 
 void trace_api_plugin::plugin_initialize(const appbase::variables_map& options) {
@@ -568,7 +588,6 @@ trace_api_rpc_plugin::~trace_api_rpc_plugin() = default;
 
 void trace_api_rpc_plugin::set_program_options(appbase::options_description& cli, appbase::options_description& cfg) {
    trace_api_common_impl::set_program_options(cli, cfg);
-   trace_api_rpc_plugin_impl::set_program_options(cli, cfg);
 }
 
 void trace_api_rpc_plugin::plugin_initialize(const appbase::variables_map& options) {

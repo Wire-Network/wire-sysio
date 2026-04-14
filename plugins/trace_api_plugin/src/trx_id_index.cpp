@@ -2,10 +2,13 @@
 #include <sysio/trace_api/logging.hpp>
 #include <sysio/trace_api/store_provider.hpp>
 
+#include <sysio/chain/exceptions.hpp>
+
 #include <fc/io/raw.hpp>
 
 #include <bit>
 #include <cstring>
+#include <limits>
 
 namespace sysio::trace_api {
 
@@ -24,6 +27,11 @@ void trx_id_index_writer::add(const chain::transaction_id_type& trx_id, uint32_t
 
 void trx_id_index_writer::write(const std::filesystem::path& path) const {
    // Target load factor <= 0.5; bucket_count is a power of two for fast modulo.
+   // Guard the uint32_t cast: in practice a slice holds at most ~10M trxs,
+   // but a future regression could exceed UINT32_MAX and silently truncate.
+   SYS_ASSERT(_entries.size() <= std::numeric_limits<uint32_t>::max() / 2 - 1,
+              chain::plugin_exception,
+              "trx_id_index entry count {} exceeds uint32 range", _entries.size());
    const uint32_t n = static_cast<uint32_t>(_entries.size());
    const uint32_t bucket_count = std::max<uint32_t>(4u, std::bit_ceil(n * 2 + 1));
    const uint32_t mask = bucket_count - 1;

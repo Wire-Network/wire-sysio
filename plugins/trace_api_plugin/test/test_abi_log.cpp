@@ -56,7 +56,7 @@ BOOST_FIXTURE_TEST_CASE(single_entry_round_trip, abi_log_fixture) {
 
    auto result = log.lookup("sysio.token"_n, 100);
    BOOST_REQUIRE(result.has_value());
-   BOOST_CHECK_EQUAL_COLLECTIONS(result->begin(), result->end(), blob.begin(), blob.end());
+   BOOST_CHECK_EQUAL_COLLECTIONS(result->abi_bytes.begin(), result->abi_bytes.end(), blob.begin(), blob.end());
 }
 
 BOOST_FIXTURE_TEST_CASE(multiple_accounts_round_trip, abi_log_fixture) {
@@ -68,11 +68,11 @@ BOOST_FIXTURE_TEST_CASE(multiple_accounts_round_trip, abi_log_fixture) {
 
    auto r1 = log.lookup("sysio.token"_n, 50);
    BOOST_REQUIRE(r1.has_value());
-   BOOST_CHECK_EQUAL_COLLECTIONS(r1->begin(), r1->end(), blob1.begin(), blob1.end());
+   BOOST_CHECK_EQUAL_COLLECTIONS(r1->abi_bytes.begin(), r1->abi_bytes.end(), blob1.begin(), blob1.end());
 
    auto r2 = log.lookup("sysio"_n, 200);
    BOOST_REQUIRE(r2.has_value());
-   BOOST_CHECK_EQUAL_COLLECTIONS(r2->begin(), r2->end(), blob2.begin(), blob2.end());
+   BOOST_CHECK_EQUAL_COLLECTIONS(r2->abi_bytes.begin(), r2->abi_bytes.end(), blob2.begin(), blob2.end());
 }
 
 // ---------------------------------------------------------------------------
@@ -95,22 +95,22 @@ BOOST_FIXTURE_TEST_CASE(returns_abi_in_effect_at_global_seq, abi_log_fixture) {
    // Exactly at v1
    auto at100 = log.lookup("sysio.token"_n, 100);
    BOOST_REQUIRE(at100.has_value());
-   BOOST_CHECK_EQUAL_COLLECTIONS(at100->begin(), at100->end(), v1.begin(), v1.end());
+   BOOST_CHECK_EQUAL_COLLECTIONS(at100->abi_bytes.begin(), at100->abi_bytes.end(), v1.begin(), v1.end());
 
    // Between v1 and v2 -> v1
    auto at150 = log.lookup("sysio.token"_n, 150);
    BOOST_REQUIRE(at150.has_value());
-   BOOST_CHECK_EQUAL_COLLECTIONS(at150->begin(), at150->end(), v1.begin(), v1.end());
+   BOOST_CHECK_EQUAL_COLLECTIONS(at150->abi_bytes.begin(), at150->abi_bytes.end(), v1.begin(), v1.end());
 
    // Exactly at v2
    auto at200 = log.lookup("sysio.token"_n, 200);
    BOOST_REQUIRE(at200.has_value());
-   BOOST_CHECK_EQUAL_COLLECTIONS(at200->begin(), at200->end(), v2.begin(), v2.end());
+   BOOST_CHECK_EQUAL_COLLECTIONS(at200->abi_bytes.begin(), at200->abi_bytes.end(), v2.begin(), v2.end());
 
    // After v3
    auto at500 = log.lookup("sysio.token"_n, 500);
    BOOST_REQUIRE(at500.has_value());
-   BOOST_CHECK_EQUAL_COLLECTIONS(at500->begin(), at500->end(), v3.begin(), v3.end());
+   BOOST_CHECK_EQUAL_COLLECTIONS(at500->abi_bytes.begin(), at500->abi_bytes.end(), v3.begin(), v3.end());
 }
 
 BOOST_FIXTURE_TEST_CASE(lookup_wrong_account_returns_nullopt, abi_log_fixture) {
@@ -126,7 +126,7 @@ BOOST_FIXTURE_TEST_CASE(accounts_do_not_bleed_into_each_other, abi_log_fixture) 
 
    auto token_result = log.lookup("sysio.token"_n, 250);
    BOOST_REQUIRE(token_result.has_value());
-   BOOST_CHECK(*token_result == make_abi("token-100"));
+   BOOST_CHECK(token_result->abi_bytes == make_abi("token-100"));
 
    BOOST_CHECK(!log.lookup("sysio.token"_n, 50));
 }
@@ -137,7 +137,7 @@ BOOST_FIXTURE_TEST_CASE(empty_blob_round_trip, abi_log_fixture) {
 
    auto result = log.lookup("clearme"_n, 999);
    BOOST_REQUIRE(result.has_value());
-   BOOST_CHECK(result->empty());
+   BOOST_CHECK(result->abi_bytes.empty());
 }
 
 BOOST_FIXTURE_TEST_CASE(last_write_wins_for_duplicate_key, abi_log_fixture) {
@@ -147,7 +147,7 @@ BOOST_FIXTURE_TEST_CASE(last_write_wins_for_duplicate_key, abi_log_fixture) {
 
    auto result = log.lookup("acct"_n, 100);
    BOOST_REQUIRE(result.has_value());
-   BOOST_CHECK(*result == make_abi("second"));
+   BOOST_CHECK(result->abi_bytes == make_abi("second"));
 }
 
 // ---------------------------------------------------------------------------
@@ -168,17 +168,17 @@ BOOST_FIXTURE_TEST_CASE(append_after_restart, abi_log_fixture) {
 
    auto r1 = log.lookup("sysio.token"_n, 100);
    BOOST_REQUIRE(r1.has_value());
-   BOOST_CHECK(*r1 == make_abi("token-100"));
+   BOOST_CHECK(r1->abi_bytes == make_abi("token-100"));
 
    auto r2 = log.lookup("sysio"_n, 200);
    BOOST_REQUIRE(r2.has_value());
-   BOOST_CHECK(*r2 == make_abi("sysio-200"));
+   BOOST_CHECK(r2->abi_bytes == make_abi("sysio-200"));
 
    log.append("newacct"_n, 300, make_abi("new-300"));
 
    auto r3 = log.lookup("newacct"_n, 300);
    BOOST_REQUIRE(r3.has_value());
-   BOOST_CHECK(*r3 == make_abi("new-300"));
+   BOOST_CHECK(r3->abi_bytes == make_abi("new-300"));
 }
 
 // ---------------------------------------------------------------------------
@@ -240,7 +240,7 @@ BOOST_FIXTURE_TEST_CASE(truncated_tail_is_recovered, abi_log_fixture) {
    log.append("d"_n, 400, make_abi("d-400"));
    auto r = log.lookup("d"_n, 400);
    BOOST_REQUIRE(r.has_value());
-   BOOST_CHECK(*r == make_abi("d-400"));
+   BOOST_CHECK(r->abi_bytes == make_abi("d-400"));
 }
 
 // Flip a byte inside record-b's blob so its CRC fails.  Recovery truncates
@@ -277,7 +277,7 @@ BOOST_FIXTURE_TEST_CASE(crc_mismatch_drops_record_and_tail, abi_log_fixture) {
    log.append("d"_n, 400, make_abi("d-blob"));
    auto r = log.lookup("d"_n, 400);
    BOOST_REQUIRE(r.has_value());
-   BOOST_CHECK(*r == make_abi("d-blob"));
+   BOOST_CHECK(r->abi_bytes == make_abi("d-blob"));
 }
 
 // ---------------------------------------------------------------------------
@@ -306,7 +306,7 @@ BOOST_FIXTURE_TEST_CASE(many_accounts_many_versions, abi_log_fixture) {
       auto result = log.lookup(acct, seq);
       BOOST_REQUIRE_MESSAGE(result.has_value(), "missing entry for account " << a << " version " << v);
       auto expected = make_abi("a" + std::to_string(a) + "v" + std::to_string(v));
-      BOOST_CHECK_EQUAL_COLLECTIONS(result->begin(), result->end(), expected.begin(), expected.end());
+      BOOST_CHECK_EQUAL_COLLECTIONS(result->abi_bytes.begin(), result->abi_bytes.end(), expected.begin(), expected.end());
    }
 }
 
