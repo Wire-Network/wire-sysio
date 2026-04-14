@@ -1,5 +1,6 @@
 #pragma once
 
+#include <fc/log/json_file_sink.hpp>
 #include <fc/log/logger.hpp>
 #include <fc/variant.hpp>
 #include <filesystem>
@@ -104,5 +105,7 @@ FC_REFLECT( fc::sink::console_sink_config, (color)(level_colors)(output_type) )
 FC_REFLECT( fc::sink::daily_file_sink_config, (base_filename)(rotation_hour)(rotation_minute)(truncate)(max_files) )
 FC_REFLECT( fc::sink::rotating_file_sink_config, (base_filename)(max_size)(max_files) )
 FC_REFLECT( fc::sink::dmlog_sink_config, (file) )
+FC_REFLECT( fc::sink::json_rotating_file_sink_config, (base_filename)(max_size)(max_files)(extra_fields) )
+FC_REFLECT( fc::sink::json_daily_file_sink_config, (base_filename)(rotation_hour)(rotation_minute)(truncate)(max_files)(extra_fields) )
 FC_REFLECT( fc::logger_config, (name)(level)(enabled)(sinks) )
 FC_REFLECT( fc::logging_config, (includes)(sinks)(loggers) )

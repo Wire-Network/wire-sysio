@@ -19,6 +19,7 @@ set(fc_sources
         src/log/log_message.cpp
         src/log/logger.cpp
         src/log/dmlog_sink.cpp
+        src/log/json_file_sink.cpp
         src/log/logger_config.cpp
         src/crypto/_digest_common.cpp
         src/crypto/aes.cpp

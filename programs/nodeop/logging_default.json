@@ -37,8 +37,8 @@
     "args": {
       "base_filename": "./logs/rotate.log",
       "max_size": 10,
-      "max_file": 10,
-      "_comment": "max_size is in MB, max_file is the max number of rotated files"
+      "max_files": 10,
+      "_comment": "max_size is in MB, max_files is the max number of rotated files"
     }
   },{
     "name" : "dmlog",

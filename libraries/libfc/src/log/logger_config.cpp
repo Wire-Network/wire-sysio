@@ -4,6 +4,7 @@
 #include <fc/reflect/variant.hpp>
 #include <fc/exception/exception.hpp>
 #include <fc/log/dmlog_sink.hpp>
+#include <fc/log/json_file_sink.hpp>
 #include <spdlog/sinks/stdout_sinks.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/sinks/daily_file_sink.h>
@@ -113,6 +114,25 @@ namespace fc {
                auto config = cfg.sinks[i].args.as<sink::dmlog_sink_config>();
                auto sink = std::make_shared<fc::dmlog_sink_mt>(config.file);
                log_config::get().sink_map[cfg.sinks[i].name] = sink;
+            } else if (cfg.sinks[i].type == "json_rotating_file_sink") {
+               auto config = cfg.sinks[i].args.as<sink::json_rotating_file_sink_config>();
+               std::map<std::string, std::string> extras;
+               for (const auto& kv : config.extra_fields)
+                  extras[kv.key()] = kv.value().as_string();
+               auto sink = std::make_shared<fc::json_rotating_file_sink_mt>(
+                       config.base_filename, config.max_size*1024*1024, config.max_files,
+                       std::move(extras));
+               log_config::get().sink_map[cfg.sinks[i].name] = sink;
+            } else if (cfg.sinks[i].type == "json_daily_file_sink") {
+               auto config = cfg.sinks[i].args.as<sink::json_daily_file_sink_config>();
+               std::map<std::string, std::string> extras;
+               for (const auto& kv : config.extra_fields)
+                  extras[kv.key()] = kv.value().as_string();
+               auto sink = std::make_shared<fc::json_daily_file_sink_mt>(
+                       config.base_filename, config.rotation_hour, config.rotation_minute,
+                       config.truncate, static_cast<uint16_t>(config.max_files),
+                       std::move(extras));
+               log_config::get().sink_map[cfg.sinks[i].name] = sink;
             } else {
                std::cerr << "\nWARNING: Unknown sink type: " << cfg.sinks[i].type << std::endl;
             }
@@ -149,7 +169,7 @@ namespace fc {
                }
                if (cfg.loggers[i].sinks.size() > 0)
                   lgr.update_agent_logger(
-                     std::make_unique<spdlog::logger>("", lgr.get_sinks().begin(), lgr.get_sinks().end()));
+                     std::make_unique<spdlog::logger>(cfg.loggers[i].name, lgr.get_sinks().begin(), lgr.get_sinks().end()));
             }
             if (!first_pass)
                break;
