@@ -210,18 +210,34 @@ the lazy current-ABI fetch).
 
 ## Startup continuity check
 
-On plugin startup the trace store's recorded block range is compared against
-the chain's current head.  Three outcomes are logged:
+On the first `block_start` signal after plugin startup the trace store's
+recorded block range is compared against the chain's current head, and the
+plugin chooses one of four outcomes:
 
-| Situation | Log level | Description |
-|-----------|-----------|-------------|
-| No prior trace data | `info` | Fresh start; tracing begins at the current head. |
-| Snapshot restore detected | `warning` | The snapshot skips blocks already in the trace store, creating a gap. Trace data for the skipped range is inaccessible. |
-| Normal restart | `info` | Store is contiguous with the chain head; tracing resumes normally. |
+| Situation | Behavior |
+|-----------|----------|
+| No prior trace data (empty slice dir) | `info` log, fresh start; tracing begins at the current head. |
+| Chain head is within `[first_recorded, last_recorded + 1]` (exact continuation OR overlap from a snapshot replay) | Silent — re-applied blocks naturally overwrite existing slice entries. |
+| Chain head is **before** the first recorded block | Plugin throws; `error` log, **node shuts down**. |
+| Chain head is **after** `last_recorded + 1` (forward gap) | Plugin throws; `error` log, **node shuts down**. |
 
-A continuity gap does not prevent the node from running, but `get_block` and
-`get_transaction_trace` requests for block numbers inside the gap will return
-404.
+The shutdown is intentional: a gap means the trace store is no longer a
+faithful continuous record of chain history, and silently accepting it would
+let `get_block` / `get_transaction_trace` return inconsistent data for blocks
+on either side of the gap.
+
+To recover, pick one:
+
+- **Delete the trace directory and start fresh.** Tracing resumes from the
+  current chain head; old block traces are lost.
+- **Load a snapshot whose chain head is within the existing recorded range
+  (or one block past it).** Replay covers the existing slice entries; tracing
+  continues with no gap.
+- **Copy the missing slice files from another node** that has the missing
+  range, then restart.
+
+The check fires only on the first `block_start` after the plugin loads, so
+recovery actions take effect on the next startup.
 
 ---
 
