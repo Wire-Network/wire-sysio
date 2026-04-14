@@ -108,7 +108,7 @@ namespace sysio::trace_api {
       uint32_t magic     = magic_value;
       uint32_t version   = current_version;
       uint32_t width     = 0; // slice width (block count per slice)
-      uint32_t _reserved = 0;
+      uint32_t reserved = 0;
    };
    static_assert(sizeof(blk_offset_index_header) == 16);
 
@@ -505,4 +505,4 @@ namespace sysio::trace_api {
 }
 
 FC_REFLECT(sysio::trace_api::slice_directory::index_header, (version))
-FC_REFLECT(sysio::trace_api::blk_offset_index_header, (magic)(version)(width)(_reserved))
+FC_REFLECT(sysio::trace_api::blk_offset_index_header, (magic)(version)(width)(reserved))

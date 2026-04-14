@@ -12,28 +12,35 @@ using open_state = slice_directory::open_state;
 namespace {
    struct test_fixture {
 
-      std::vector<action_trace_v0> actions = []{
-         action_trace_v0 a0, a1, a2;
-         a0.global_sequence = 1;
-         a0.receiver = "receiver"_n; a0.account = "contract"_n; a0.action = "action"_n;
-         a0.authorization = {{ "alice"_n, "active"_n }};
-         a0.data = { 0x01, 0x01, 0x01, 0x01 };
-         a0.return_value = { 0x05, 0x05, 0x05, 0x05 };
-
-         a1.global_sequence = 0;
-         a1.receiver = "receiver"_n; a1.account = "contract"_n; a1.action = "action"_n;
-         a1.authorization = {{ "alice"_n, "active"_n }};
-         a1.data = { 0x00, 0x00, 0x00, 0x00 };
-         a1.return_value = { 0x04, 0x04, 0x04, 0x04 };
-
-         a2.global_sequence = 2;
-         a2.receiver = "receiver"_n; a2.account = "contract"_n; a2.action = "action"_n;
-         a2.authorization = {{ "alice"_n, "active"_n }};
-         a2.data = { 0x02, 0x02, 0x02, 0x02 };
-         a2.return_value = { 0x06, 0x06, 0x06, 0x06 };
-
-         return std::vector<action_trace_v0>{a0, a1, a2};
-      }();
+      std::vector<action_trace_v0> actions {
+         {
+            .global_sequence = 1,
+            .receiver        = "receiver"_n,
+            .account         = "contract"_n,
+            .action          = "action"_n,
+            .authorization   = {{ "alice"_n, "active"_n }},
+            .data            = { 0x01, 0x01, 0x01, 0x01 },
+            .return_value    = { 0x05, 0x05, 0x05, 0x05 }
+         },
+         {
+            .global_sequence = 0,
+            .receiver        = "receiver"_n,
+            .account         = "contract"_n,
+            .action          = "action"_n,
+            .authorization   = {{ "alice"_n, "active"_n }},
+            .data            = { 0x00, 0x00, 0x00, 0x00 },
+            .return_value    = { 0x04, 0x04, 0x04, 0x04 }
+         },
+         {
+            .global_sequence = 2,
+            .receiver        = "receiver"_n,
+            .account         = "contract"_n,
+            .action          = "action"_n,
+            .authorization   = {{ "alice"_n, "active"_n }},
+            .data            = { 0x02, 0x02, 0x02, 0x02 },
+            .return_value    = { 0x06, 0x06, 0x06, 0x06 }
+         }
+      };
 
       transaction_trace_v0 transaction_trace {
          "0000000000000000000000000000000000000000000000000000000000000001"_h,
@@ -70,42 +77,50 @@ namespace {
          }
       };
 
-      const block_trace_v0 bt1 = []{
-         action_trace_v0 at0, at1, at2;
-         at0.global_sequence = 0;
-         at0.receiver = "sysio.token"_n; at0.account = "sysio.token"_n; at0.action = "transfer"_n;
-         at0.authorization = {{ "alice"_n, "active"_n }};
-         at0.data = make_transfer_data( "alice"_n, "bob"_n, "0.0001 SYS"_t, "Memo!" );
-
-         at1.global_sequence = 1;
-         at1.receiver = "alice"_n; at1.account = "sysio.token"_n; at1.action = "transfer"_n;
-         at1.authorization = {{ "alice"_n, "active"_n }};
-         at1.data = make_transfer_data( "alice"_n, "bob"_n, "0.0001 SYS"_t, "Memo!" );
-
-         at2.global_sequence = 2;
-         at2.receiver = "bob"_n; at2.account = "sysio.token"_n; at2.action = "transfer"_n;
-         at2.authorization = {{ "alice"_n, "active"_n }};
-         at2.data = make_transfer_data( "alice"_n, "bob"_n, "0.0001 SYS"_t, "Memo!" );
-
-         transaction_trace_v0 trx;
-         trx.id = "0000000000000000000000000000000000000000000000000000000000000001"_h;
-         trx.actions = {at0, at1, at2};
-         trx.cpu_usage_us = 10;
-         trx.net_usage_words = 5;
-         trx.signatures = {chain::signature_type()};
-         trx.trx_header = chain::transaction_header{chain::time_point_sec(), 1, 0, 100, 50, 0};
-
-         block_trace_v0 b;
-         b.id = "0000000000000000000000000000000000000000000000000000000000000001"_h;
-         b.number = 1;
-         b.previous_id = "0000000000000000000000000000000000000000000000000000000000000003"_h;
-         b.timestamp = chain::block_timestamp_type(1);
-         b.producer = "bp.one"_n;
-         b.transaction_mroot = "0000000000000000000000000000000000000000000000000000000000000000"_h;
-         b.finality_mroot    = "0000000000000000000000000000000000000000000000000000000000000000"_h;
-         b.transactions = {trx};
-         return b;
-      }();
+      const block_trace_v0 bt1 {
+         .id                = "0000000000000000000000000000000000000000000000000000000000000001"_h,
+         .number            = 1,
+         .previous_id       = "0000000000000000000000000000000000000000000000000000000000000003"_h,
+         .timestamp         = chain::block_timestamp_type(1),
+         .producer          = "bp.one"_n,
+         .transaction_mroot = "0000000000000000000000000000000000000000000000000000000000000000"_h,
+         .finality_mroot    = "0000000000000000000000000000000000000000000000000000000000000000"_h,
+         .transactions = {
+            transaction_trace_v0 {
+               .id              = "0000000000000000000000000000000000000000000000000000000000000001"_h,
+               .actions = {
+                  {
+                     .global_sequence = 0,
+                     .receiver        = "sysio.token"_n,
+                     .account         = "sysio.token"_n,
+                     .action          = "transfer"_n,
+                     .authorization   = {{ "alice"_n, "active"_n }},
+                     .data            = make_transfer_data( "alice"_n, "bob"_n, "0.0001 SYS"_t, "Memo!" )
+                  },
+                  {
+                     .global_sequence = 1,
+                     .receiver        = "alice"_n,
+                     .account         = "sysio.token"_n,
+                     .action          = "transfer"_n,
+                     .authorization   = {{ "alice"_n, "active"_n }},
+                     .data            = make_transfer_data( "alice"_n, "bob"_n, "0.0001 SYS"_t, "Memo!" )
+                  },
+                  {
+                     .global_sequence = 2,
+                     .receiver        = "bob"_n,
+                     .account         = "sysio.token"_n,
+                     .action          = "transfer"_n,
+                     .authorization   = {{ "alice"_n, "active"_n }},
+                     .data            = make_transfer_data( "alice"_n, "bob"_n, "0.0001 SYS"_t, "Memo!" )
+                  }
+               },
+               .cpu_usage_us    = 10,
+               .net_usage_words = 5,
+               .signatures      = {chain::signature_type()},
+               .trx_header      = chain::transaction_header{chain::time_point_sec(), 1, 0, 100, 50, 0}
+            }
+         }
+      };
 
       const block_trace_v0 bt2 {
          "0000000000000000000000000000000000000000000000000000000000000002"_h,

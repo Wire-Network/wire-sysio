@@ -28,7 +28,10 @@ void trx_id_index_writer::write(const std::filesystem::path& path) const {
    const uint32_t bucket_count = std::max<uint32_t>(4u, std::bit_ceil(n * 2 + 1));
    const uint32_t mask = bucket_count - 1;
 
-   std::vector<trx_id_bucket> buckets(bucket_count); // zero-initialized = all empty
+   // Value-initialize all buckets to zero.  block_num == 0 is the empty-slot
+   // sentinel that terminates the probe loop below; do NOT replace this with
+   // reserve()+emplace_back() or any path that leaves block_num uninitialized.
+   std::vector<trx_id_bucket> buckets(bucket_count);
 
    // Last-write-wins per prefix: probe forward until either an empty bucket
    // (fresh insert) OR a bucket already holding this prefix (overwrite).
@@ -54,10 +57,10 @@ void trx_id_index_writer::write(const std::filesystem::path& path) const {
    auto hdr_data = fc::raw::pack(header);
    f.write(hdr_data.data(), hdr_data.size());
 
-   for (const auto& b : buckets) {
-      auto bkt_data = fc::raw::pack(b);
-      f.write(bkt_data.data(), bkt_data.size());
-   }
+   // Bulk write: see the bulk-read note in trx_id_index_reader's constructor
+   // for the layout-equivalence rationale.
+   f.write(reinterpret_cast<const char*>(buckets.data()),
+           buckets.size() * sizeof(trx_id_bucket));
    f.flush();
 }
 
@@ -120,10 +123,13 @@ trx_id_index_reader::trx_id_index_reader(const std::filesystem::path& path) {
       }
 
       _buckets.resize(header.bucket_count);
-      for (auto& b : _buckets) {
-         auto ds = f.create_datastream();
-         fc::raw::unpack(ds, b);
-      }
+      // Bulk read: trx_id_bucket is {u64, u32, u32} with no padding and
+      // static_assert(sizeof(trx_id_bucket) == 16) in the header.  fc::raw::pack
+      // writes those fields little-endian, identical to the in-memory layout on
+      // x86_64 LE -- so a single read into the contiguous vector is equivalent
+      // to the field-by-field unpack and avoids the per-bucket call overhead.
+      f.read(reinterpret_cast<char*>(_buckets.data()),
+             static_cast<size_t>(header.bucket_count) * sizeof(trx_id_bucket));
       _valid = true;
    } catch (...) {
       fc_wlog(_log,"trace_api: failed to load trx_id index from {}", path.generic_string());

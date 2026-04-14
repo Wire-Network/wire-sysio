@@ -19,6 +19,19 @@ namespace sysio::trace_api {
       };
    }
 
+   // Serialise an action's authorization vector to {actor, permission} JSON
+   // objects.  Shared by get_block (response_formatter) and the get_actions
+   // / get_token_transfers handlers below.
+   inline fc::variants serialize_authorizations(const std::vector<authorization_trace_v0>& auths) {
+      fc::variants result;
+      result.reserve(auths.size());
+      for (const auto& a : auths)
+         result.emplace_back(fc::mutable_variant_object()
+            ("actor",      a.actor.to_string())
+            ("permission", a.permission.to_string()));
+      return result;
+   }
+
    /**
     * Filter parameters for the get_actions endpoint.
     */
@@ -137,8 +150,8 @@ namespace sysio::trace_api {
                ("account",                                    a.account.to_string())
                ("name",                                       a.action.to_string())
                ("authorization",                              serialize_authorizations(a.authorization))
-               ("data",                                       a.data.empty() ? "" : fc::to_hex(a.data.data(), a.data.size()))
-               ("return_value",                               a.return_value.empty() ? "" : fc::to_hex(a.return_value.data(), a.return_value.size()))
+               ("data",                                       fc::to_hex(a.data.data(), a.data.size()))
+               ("return_value",                               fc::to_hex(a.return_value.data(), a.return_value.size()))
                ("trx_id",                                     trx.id.str())
                ("block_num",                                  trx.block_num)
                ("block_time",                                 trx.block_time)
@@ -181,8 +194,8 @@ namespace sysio::trace_api {
                ("account",          a.account.to_string())
                ("name",             a.action.to_string())
                ("authorization",    serialize_authorizations(a.authorization))
-               ("data",             a.data.empty() ? "" : fc::to_hex(a.data.data(), a.data.size()))
-               ("return_value",     a.return_value.empty() ? "" : fc::to_hex(a.return_value.data(), a.return_value.size()))
+               ("data",             fc::to_hex(a.data.data(), a.data.size()))
+               ("return_value",     fc::to_hex(a.return_value.data(), a.return_value.size()))
                ("trx_id",           trx.id.str())
                ("block_num",        trx.block_num)
                ("block_time",       trx.block_time)
@@ -199,16 +212,6 @@ namespace sysio::trace_api {
       }
 
    private:
-      static fc::variants serialize_authorizations(const std::vector<authorization_trace_v0>& auths) {
-         fc::variants result;
-         result.reserve(auths.size());
-         for (const auto& a : auths)
-            result.emplace_back(fc::mutable_variant_object()
-               ("actor",      a.actor.to_string())
-               ("permission", a.permission.to_string()));
-         return result;
-      }
-
       template<typename ActionVariantBuilder>
       actions_result get_actions_impl(const action_query& query, ActionVariantBuilder&& build_action_var) {
          actions_result result;

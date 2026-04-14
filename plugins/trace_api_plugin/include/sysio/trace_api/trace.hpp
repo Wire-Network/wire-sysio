@@ -6,7 +6,7 @@
 #include <boost/container/flat_map.hpp>
 #include <utility>
 
-namespace sysio { namespace trace_api {
+namespace sysio::trace_api {
 
    struct authorization_trace_v0 {
       chain::name actor;
@@ -71,7 +71,7 @@ namespace sysio { namespace trace_api {
       uint32_t                                block_num = 0;
   };
 
-} }
+} // namespace sysio::trace_api
 
 FC_REFLECT(sysio::trace_api::authorization_trace_v0, (actor)(permission))
 FC_REFLECT(sysio::trace_api::account_delta_v0, (account)(delta))

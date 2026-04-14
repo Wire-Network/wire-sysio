@@ -31,14 +31,14 @@ struct trx_id_index_header {
    uint32_t magic        = magic_value;
    uint32_t version      = current_version;
    uint32_t bucket_count = 0;
-   uint32_t _reserved    = 0;
+   uint32_t reserved    = 0;
 };
 static_assert(sizeof(trx_id_index_header) == 16);
 
 struct trx_id_bucket {
    uint64_t prefix64 = 0;  // first 8 bytes of trx sha256 interpreted as uint64_t
    uint32_t block_num = 0; // 0 = empty; SYSIO block numbers start at 1
-   uint32_t _reserved = 0;
+   uint32_t reserved = 0;
 };
 static_assert(sizeof(trx_id_bucket) == 16);
 
@@ -85,5 +85,5 @@ private:
 
 } // namespace sysio::trace_api
 
-FC_REFLECT(sysio::trace_api::trx_id_index_header, (magic)(version)(bucket_count)(_reserved))
-FC_REFLECT(sysio::trace_api::trx_id_bucket, (prefix64)(block_num)(_reserved))
+FC_REFLECT(sysio::trace_api::trx_id_index_header, (magic)(version)(bucket_count)(reserved))
+FC_REFLECT(sysio::trace_api::trx_id_bucket, (prefix64)(block_num)(reserved))

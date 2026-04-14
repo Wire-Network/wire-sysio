@@ -11,19 +11,6 @@ namespace {
       return t.to_iso_string() + "Z";
    }
 
-   fc::variants process_authorizations(const std::vector<authorization_trace_v0>& authorizations) {
-      fc::variants result;
-      result.reserve(authorizations.size());
-      for ( const auto& a: authorizations) {
-         result.emplace_back(fc::mutable_variant_object()
-            ("actor", a.actor.to_string())
-            ("permission", a.permission.to_string())
-         );
-      }
-
-      return result;
-   }
-
    fc::variants process_actions(const std::vector<action_trace_v0>& actions, const data_handler_function& data_handler) {
       fc::variants result;
       result.reserve(actions.size());
@@ -48,7 +35,7 @@ namespace {
             ("receiver",                                     a.receiver.to_string())
             ("account",                                      a.account.to_string())
             ("name",                                         a.action.to_string())
-            ("authorization",                                process_authorizations(a.authorization))
+            ("authorization",                                serialize_authorizations(a.authorization))
             ("data",                                         fc::to_hex(a.data.data(), a.data.size()))
             ("return_value",                                 fc::to_hex(a.return_value.data(), a.return_value.size()));
 

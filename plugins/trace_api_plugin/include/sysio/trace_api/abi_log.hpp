@@ -51,7 +51,7 @@ struct abi_log_header {
 
    uint32_t magic     = magic_value;
    uint32_t version   = current_version;
-   uint64_t _reserved = 0;
+   uint64_t reserved = 0;
 };
 static_assert(sizeof(abi_log_header) == 16);
 
@@ -118,4 +118,4 @@ private:
 
 } // namespace sysio::trace_api
 
-FC_REFLECT(sysio::trace_api::abi_log_header, (magic)(version)(_reserved))
+FC_REFLECT(sysio::trace_api::abi_log_header, (magic)(version)(reserved))

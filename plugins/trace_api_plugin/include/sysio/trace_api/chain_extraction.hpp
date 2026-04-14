@@ -11,7 +11,7 @@
 #include <map>
 #include <unordered_set>
 
-namespace sysio { namespace trace_api {
+namespace sysio::trace_api {
 
 using chain::transaction_id_type;
 using chain::packed_transaction;
@@ -247,4 +247,4 @@ private:
 
 };
 
-}}
+} // namespace sysio::trace_api

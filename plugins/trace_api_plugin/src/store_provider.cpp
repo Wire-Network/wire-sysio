@@ -14,8 +14,22 @@ namespace {
       static constexpr const char* _trace_blk_idx_prefix = "trace_blk_idx_";
       static constexpr const char* _trace_ext = ".log";
       static constexpr const char* _compressed_trace_ext = ".clog";
-      // longest prefix is "trace_trx_idx_" or "trace_blk_idx_" (14), then 10+1+10 digits, then ".clog" extension, then null
-      static constexpr int _max_filename_size = std::char_traits<char>::length(_trace_trx_id_index_prefix) + 10 + 1 + 10 + std::char_traits<char>::length(_compressed_trace_ext) + 1;
+      // Sized for the longest possible filename across every prefix and
+      // extension known to this file.  Adding a longer prefix above
+      // automatically grows the buffer; no manual recount needed.
+      static constexpr size_t _max_prefix_length = std::max({
+         std::char_traits<char>::length(_trace_prefix),
+         std::char_traits<char>::length(_trace_index_prefix),
+         std::char_traits<char>::length(_trace_trx_id_prefix),
+         std::char_traits<char>::length(_trace_trx_id_index_prefix),
+         std::char_traits<char>::length(_trace_blk_idx_prefix),
+      });
+      static constexpr size_t _max_ext_length = std::max(
+         std::char_traits<char>::length(_trace_ext),
+         std::char_traits<char>::length(_compressed_trace_ext)
+      );
+      // prefix + 10-digit start + '-' + 10-digit end + ext + '\0'
+      static constexpr int _max_filename_size = _max_prefix_length + 10 + 1 + 10 + _max_ext_length + 1;
 
       std::string make_filename(const char* slice_prefix, const char* slice_ext, uint32_t slice_number, uint32_t slice_width) {
          char filename[_max_filename_size] = {};

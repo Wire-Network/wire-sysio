@@ -2,7 +2,7 @@
 
 #include <sysio/trace_api/trace.hpp>
 
-namespace sysio { namespace trace_api {
+namespace sysio::trace_api {
 
 inline action_trace_v0 to_action_trace( const chain::action_trace& at ) {
    action_trace_v0 r;
@@ -68,4 +68,4 @@ inline block_trace_v0 create_block_trace( const chain::signed_block_ptr& block, 
    return r;
 }
 
-} }
+} // namespace sysio::trace_api
