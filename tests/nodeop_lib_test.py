@@ -289,8 +289,8 @@ try:
     amountVal=None
     key=""
     try:
-        key = "[actions][0][action]"
-        typeVal = transaction["actions"][0]["action"]
+        key = "[actions][0][name]"
+        typeVal = transaction["actions"][0]["name"]
         key = "[actions][0][params][quantity]"
         amountVal = transaction["actions"][0]["params"]["quantity"]
         amountVal = int(decimal.Decimal(amountVal.split()[0]) * 10000)

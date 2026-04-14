@@ -300,7 +300,7 @@ class PerformanceTestBasic:
         return append_write
 
     def isOnBlockTransaction(self, transaction):
-        if transaction['actions'][0]['account'] != 'sysio' or transaction['actions'][0]['action'] != 'onblock':
+        if transaction['actions'][0]['account'] != 'sysio' or transaction['actions'][0]['name'] != 'onblock':
             return False
         return True
 
