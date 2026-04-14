@@ -79,10 +79,10 @@ namespace sysio {
       // Returns nullptr if no ABI is available or construction failed.
       std::shared_ptr<chain::abi_serializer> get_serializer(chain::name account, uint64_t global_seq);
 
-      using cache_key = std::pair<uint64_t /*account*/, uint64_t /*global_seq*/>;
+      using cache_key = std::pair<chain::name /*account*/, uint64_t /*global_seq*/>;
       struct cache_key_hash {
          size_t operator()(const cache_key& k) const noexcept {
-            return std::hash<uint64_t>{}(k.first) ^ (std::hash<uint64_t>{}(k.second) << 1);
+            return std::hash<chain::name>{}(k.first) ^ (std::hash<uint64_t>{}(k.second) << 1);
          }
       };
 

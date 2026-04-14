@@ -139,6 +139,12 @@ struct extraction_test_fixture {
          fixture.abi_calls.push_back({account, global_seq, std::move(abi_bytes)});
       }
 
+      bool has_abi_entry(chain::name account) const {
+         for (const auto& c : fixture.abi_calls)
+            if (c.account == account) return true;
+         return false;
+      }
+
       extraction_test_fixture& fixture;
    };
 
@@ -397,6 +403,12 @@ struct abi_capture_fixture {
 
       void append_abi(chain::name account, uint64_t global_seq, std::vector<char> abi_bytes) {
          fixture.abi_calls.push_back({account, global_seq, std::move(abi_bytes)});
+      }
+
+      bool has_abi_entry(chain::name account) const {
+         for (const auto& c : fixture.abi_calls)
+            if (c.account == account) return true;
+         return false;
       }
 
       abi_capture_fixture& fixture;

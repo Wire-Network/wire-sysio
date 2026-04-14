@@ -373,6 +373,13 @@ namespace sysio::trace_api {
       std::optional<std::vector<char>> lookup_abi(chain::name account, uint64_t global_seq) const;
 
       /**
+       * Return true if any ABI record exists for the account.  Used by extraction
+       * to decide whether to trigger a lazy ABI fetch on first encounter.
+       * Thread-safe.
+       */
+      bool has_abi_entry(chain::name account) const;
+
+      /**
        * Read the trace for a given block
        * @param block_height : the height of the data being read
        * @return empty optional if the data cannot be read OTHERWISE

@@ -73,13 +73,20 @@ public:
    // Thread-safe; may run concurrently with append().
    std::optional<std::vector<char>> lookup(chain::name account, uint64_t global_seq) const;
 
+   // Returns true if at least one record exists for the account at any
+   // global_sequence.  Used by chain extraction to decide whether to lazy-
+   // fetch an ABI on first encounter.  Thread-safe.
+   bool has_entry(chain::name account) const;
+
 private:
    // Fixed-size record header on disk: (account, global_seq, blob_size).
    // Trailer is a u32 crc32 over (header + blob_bytes).
+   // chain::name is a uint64_t-wrapping struct, so this is 24 bytes with no
+   // padding and the on-disk wire format is identical to (u64, u64, u64).
    struct record_header {
-      uint64_t account    = 0;
-      uint64_t global_seq = 0;
-      uint64_t blob_size  = 0;
+      chain::name account;
+      uint64_t    global_seq = 0;
+      uint64_t    blob_size  = 0;
    };
    static_assert(sizeof(record_header) == 24);
 
@@ -87,7 +94,7 @@ private:
       uint64_t blob_offset = 0; // file offset of blob_bytes (not the record_header)
       uint64_t blob_size   = 0;
    };
-   using index_key = std::pair<uint64_t /*account*/, uint64_t /*global_seq*/>;
+   using index_key = std::pair<chain::name /*account*/, uint64_t /*global_seq*/>;
 
    // Walk the log file from the header onwards.  Returns the offset of the
    // end of the last valid record.  The file is truncated at that offset if

@@ -178,7 +178,7 @@ uint64_t abi_log::recover_from_disk(const std::filesystem::path& path) {
 void abi_log::append(chain::name account, uint64_t global_seq, std::vector<char> abi_bytes) {
    if (!_valid) return;
 
-   record_header rh{ account.to_uint64_t(), global_seq, abi_bytes.size() };
+   record_header rh{ account, global_seq, abi_bytes.size() };
    const uint32_t crc = compute_record_crc(rh, abi_bytes.data(), abi_bytes.size());
 
    uint64_t blob_offset = 0;
@@ -206,20 +206,26 @@ void abi_log::append(chain::name account, uint64_t global_seq, std::vector<char>
    }
 }
 
+bool abi_log::has_entry(chain::name account) const {
+   if (!_valid) return false;
+   std::lock_guard<std::mutex> lock(_index_mtx);
+   auto it = _index.lower_bound({account, 0});
+   return it != _index.end() && it->first.first == account;
+}
+
 std::optional<std::vector<char>> abi_log::lookup(chain::name account, uint64_t global_seq) const {
    if (!_valid) return std::nullopt;
 
-   const uint64_t acct = account.to_uint64_t();
    uint64_t blob_offset = 0;
    uint64_t blob_size   = 0;
 
    {
       std::lock_guard<std::mutex> lock(_index_mtx);
-      auto it = _index.upper_bound({acct, global_seq});
+      auto it = _index.upper_bound({account, global_seq});
       if (it == _index.begin())
          return std::nullopt;
       --it;
-      if (it->first.first != acct)
+      if (it->first.first != account)
          return std::nullopt;
       blob_offset = it->second.blob_offset;
       blob_size   = it->second.blob_size;

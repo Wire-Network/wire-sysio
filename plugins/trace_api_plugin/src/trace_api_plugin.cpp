@@ -107,6 +107,10 @@ namespace {
          return store->lookup_abi(account, global_seq);
       }
 
+      bool has_abi_entry(chain::name account) const {
+         return store->has_abi_entry(account);
+      }
+
       std::shared_ptr<Store> store;
    };
 }

@@ -5,7 +5,7 @@
 namespace sysio::trace_api {
 
    std::shared_ptr<chain::abi_serializer> abi_data_handler::get_serializer(chain::name account, uint64_t global_seq) {
-      const cache_key key{account.to_uint64_t(), global_seq};
+      const cache_key key{account, global_seq};
 
       {
          std::lock_guard lock(_cache_mtx);

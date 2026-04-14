@@ -416,6 +416,10 @@ namespace sysio::trace_api {
       return _abi_log.lookup(account, global_seq);
    }
 
+   bool store_provider::has_abi_entry(chain::name account) const {
+      return _abi_log.has_entry(account);
+   }
+
    uint32_t slice_directory::slice_number_from_path(const std::filesystem::path& trx_id_path) const {
       // Filename format: trace_trx_id_XXXXXXXXXX-YYYYYYYYYY.log
       // Parse the start block number (XXXXXXXXXX) and divide by _width.
