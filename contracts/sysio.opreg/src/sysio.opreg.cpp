@@ -296,7 +296,7 @@ void opreg::stake(name account,
          o.status = OperatorStatus::OPERATOR_STATUS_TERMINATED;
          o.terminated_at = now;
       });
-      // Queue ROSTER_UPDATE(TERMINATED) to all outposts
+      // Queue OPERATORS(TERMINATED) to all outposts
       // TODO: implement queue_roster_update helper
       return;
    }
@@ -344,12 +344,12 @@ void opreg::processprod(name account, bool was_eligible, bool is_eligible) {
       });
       // For producers: notify system contract
       require_recipient(SYSTEM_ACCOUNT);
-      // TODO: queue ROSTER_UPDATE(AVAILABLE) to all outposts
+      // TODO: queue OPERATORS(AVAILABLE) to all outposts
    } else if (was_eligible && !is_eligible) {
       ops.modify(it, same_payer, [&](auto& o) {
          o.status = OperatorStatus::OPERATOR_STATUS_UNKNOWN; // PENDING
       });
-      // TODO: queue ROSTER_UPDATE(PENDING) to all outposts
+      // TODO: queue OPERATORS(PENDING) to all outposts
    }
 }
 
@@ -366,12 +366,12 @@ void opreg::processbatch(name account, bool was_eligible, bool is_eligible) {
          o.status = OperatorStatus::OPERATOR_STATUS_ACTIVE; // AVAILABLE
          o.available_at = now;
       });
-      // TODO: queue ROSTER_UPDATE(AVAILABLE) to all outposts
+      // TODO: queue OPERATORS(AVAILABLE) to all outposts
    } else if (was_eligible && !is_eligible) {
       ops.modify(it, same_payer, [&](auto& o) {
          o.status = OperatorStatus::OPERATOR_STATUS_UNKNOWN; // PENDING
       });
-      // TODO: queue ROSTER_UPDATE(PENDING) to all outposts
+      // TODO: queue OPERATORS(PENDING) to all outposts
    }
 }
 
@@ -388,12 +388,12 @@ void opreg::processuw(name account, bool was_eligible, bool is_eligible) {
          o.status = OperatorStatus::OPERATOR_STATUS_ACTIVE; // AVAILABLE
          o.available_at = now;
       });
-      // TODO: queue ROSTER_UPDATE(AVAILABLE) to all outposts
+      // TODO: queue OPERATORS(AVAILABLE) to all outposts
    } else if (was_eligible && !is_eligible) {
       ops.modify(it, same_payer, [&](auto& o) {
          o.status = OperatorStatus::OPERATOR_STATUS_UNKNOWN; // PENDING
       });
-      // TODO: queue ROSTER_UPDATE(PENDING) to all outposts
+      // TODO: queue OPERATORS(PENDING) to all outposts
    }
 }
 
@@ -418,18 +418,17 @@ void opreg::slash(name account, std::string reason) {
    // Queue SLASH_OPERATOR to all outposts
    epoch::outposts_t outposts(EPOCH_ACCOUNT, EPOCH_ACCOUNT.value);
    for (auto op_it = outposts.begin(); op_it != outposts.end(); ++op_it) {
-      opp::attestations::RosterUpdate ru;
+      opp::attestations::SlashOperator so;
       opp::types::ChainAddress addr;
       addr.kind = opp::types::ChainKind::CHAIN_KIND_WIRE;
       auto name_str = account.to_string();
       addr.address.assign(name_str.begin(), name_str.end());
-      ru.operator_ = addr;
-      ru.type = it->type;
-      ru.new_status = OperatorStatus::OPERATOR_STATUS_SLASHED;
-      ru.reason = reason;
+      so.operator_ = addr;
+      so.type = it->type;
+      so.reason = reason;
 
       auto [encoded, out] = zpp::bits::data_out<char>();
-      (void)out(ru);
+      (void)out(so);
 
       action(
          permission_level{get_self(), "active"_n},

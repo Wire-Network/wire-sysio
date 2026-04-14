@@ -56,6 +56,14 @@ void epoch::advance() {
 
    check(!state.is_paused, "epoch advancement is paused");
 
+   // Post-genesis: only sysio.msgch (via evalcons consensus) may advance.
+   // Genesis (epoch 0→1): permissionless for bootstrap.
+   if (state.current_epoch_index > 0) {
+      check(has_auth(MSGCH_ACCOUNT) || has_auth(get_self()),
+            "only sysio.msgch may advance the epoch after genesis");
+   }
+
+   // Wall-clock minimum: don't advance before next_epoch_start
    auto now = current_time_point();
    if (now < state.next_epoch_start) return;
 
@@ -72,23 +80,26 @@ void epoch::advance() {
 
    state_tbl.set(state, get_self());
 
-   // Queue BATCH_OPERATOR_NEXT_GROUP attestation for each outpost.
-   uint8_t next_group_idx = (state.current_epoch_index + 1) % cfg.batch_op_groups;
-   if (next_group_idx < state.batch_op_groups.size()) {
-      auto& next_group = state.batch_op_groups[next_group_idx];
-
-      opp::attestations::BatchOperatorNextGroup attest;
-      attest.group_index = zpp::bits::vuint32_t{next_group_idx};
-      attest.next_epoch_index = zpp::bits::vuint32_t{state.current_epoch_index + 1};
-      for (auto& op_name : next_group) {
-         opp::types::ChainAddress addr;
-         addr.kind = opp::types::CHAIN_KIND_WIRE;
-         auto name_str = op_name.to_string();
-         addr.address.assign(name_str.begin(), name_str.end());
-         attest.operators.push_back(std::move(addr));
+   // Queue BATCH_OPERATOR_GROUPS attestation for each outpost.
+   // Includes ALL groups and the active group index for the new epoch.
+   {
+      opp::attestations::BatchOperatorGroups attest;
+      attest.active_group_index = zpp::bits::vuint32_t{state.current_batch_op_group};
+      attest.epoch_index = zpp::bits::vuint32_t{state.current_epoch_index};
+      for (auto& group : state.batch_op_groups) {
+         opp::attestations::BatchOperatorGroup grp;
+         for (auto& op_name : group) {
+            opp::types::ChainAddress addr;
+            addr.kind = opp::types::CHAIN_KIND_WIRE;
+            auto name_str = op_name.to_string();
+            addr.address.assign(name_str.begin(), name_str.end());
+            grp.operators.push_back(std::move(addr));
+         }
+         attest.groups.push_back(std::move(grp));
       }
 
-      auto [encoded, out] = zpp::bits::data_out<char>();
+      std::vector<char> encoded;
+      auto out = zpp::bits::out{encoded, zpp::bits::no_size{}};
       (void)out(attest);
 
       outposts_t outposts_tbl(get_self(), get_self().value);
@@ -99,7 +110,42 @@ void epoch::advance() {
             "queueout"_n,
             std::make_tuple(
                it->id,
-               opp::types::ATTESTATION_TYPE_BATCH_OPERATOR_NEXT_GROUP,
+               opp::types::ATTESTATION_TYPE_BATCH_OPERATOR_GROUPS,
+               encoded
+            )
+         ).send();
+      }
+   }
+
+   // Queue OPERATORS attestation (full roster) for each outpost.
+   {
+      opp::attestations::Operators ops_attest;
+      opreg::operators_t opreg_ops(OPREG_ACCOUNT, OPREG_ACCOUNT.value);
+      for (auto it = opreg_ops.begin(); it != opreg_ops.end(); ++it) {
+         opp::attestations::OperatorEntry entry;
+         opp::types::ChainAddress addr;
+         addr.kind = opp::types::CHAIN_KIND_WIRE;
+         auto name_str = it->account.to_string();
+         addr.address.assign(name_str.begin(), name_str.end());
+         entry.address = std::move(addr);
+         entry.type = it->type;
+         entry.status = it->status;
+         ops_attest.operators.push_back(std::move(entry));
+      }
+
+      std::vector<char> encoded;
+      auto out = zpp::bits::out{encoded, zpp::bits::no_size{}};
+      (void)out(ops_attest);
+
+      outposts_t outposts_tbl(get_self(), get_self().value);
+      for (auto it = outposts_tbl.begin(); it != outposts_tbl.end(); ++it) {
+         action(
+            permission_level{"sysio.epoch"_n, "owner"_n},
+            MSGCH_ACCOUNT,
+            "queueout"_n,
+            std::make_tuple(
+               it->id,
+               opp::types::ATTESTATION_TYPE_OPERATORS,
                encoded
             )
          ).send();

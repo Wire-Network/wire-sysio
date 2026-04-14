@@ -1,0 +1,48 @@
+{
+  "address": "11111111111111111111111111111111",
+  "metadata": {
+    "name": "opp_solana_outpost",
+    "version": "0.1.0",
+    "spec": "0.1.0"
+  },
+  "instructions": [
+    {
+      "name": "epoch_in",
+      "discriminator": [1, 0, 0, 0, 0, 0, 0, 0],
+      "accounts": [
+        { "name": "authority", "signer": true, "writable": false },
+        { "name": "outpost_state", "writable": true, "pda": { "seeds": [{ "kind": "const", "value": [111, 112, 112, 95, 115, 116, 97, 116, 101] }] } }
+      ],
+      "args": [
+        { "name": "envelope_data", "type": "bytes" }
+      ]
+    },
+    {
+      "name": "emit_outbound_envelope",
+      "discriminator": [2, 0, 0, 0, 0, 0, 0, 0],
+      "accounts": [
+        { "name": "authority", "signer": true, "writable": false },
+        { "name": "outpost_state", "writable": true, "pda": { "seeds": [{ "kind": "const", "value": [111, 112, 112, 95, 115, 116, 97, 116, 101] }] } }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "OutpostState",
+      "discriminator": [0, 0, 0, 0, 0, 0, 0, 0]
+    }
+  ],
+  "types": [
+    {
+      "name": "OutpostState",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          { "name": "epoch_index", "type": "u32" },
+          { "name": "bump", "type": "u8" }
+        ]
+      }
+    }
+  ]
+}

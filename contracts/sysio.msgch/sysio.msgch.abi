@@ -46,6 +46,11 @@
             ]
         },
         {
+            "name": "bootstrap",
+            "base": "",
+            "fields": []
+        },
+        {
             "name": "buildenv",
             "base": "",
             "fields": [
@@ -54,6 +59,11 @@
                     "type": "uint64"
                 }
             ]
+        },
+        {
+            "name": "chkcons",
+            "base": "",
+            "fields": []
         },
         {
             "name": "cleanup",
@@ -224,6 +234,24 @@
             ]
         },
         {
+            "name": "outpost_consensus_entry",
+            "base": "",
+            "fields": [
+                {
+                    "name": "outpost_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "epoch_index",
+                    "type": "uint32"
+                },
+                {
+                    "name": "consensus_reached",
+                    "type": "bool"
+                }
+            ]
+        },
+        {
             "name": "queueout",
             "base": "",
             "fields": [
@@ -244,8 +272,18 @@
     ],
     "actions": [
         {
+            "name": "bootstrap",
+            "type": "bootstrap",
+            "ricardian_contract": ""
+        },
+        {
             "name": "buildenv",
             "type": "buildenv",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "chkcons",
+            "type": "chkcons",
             "ricardian_contract": ""
         },
         {
@@ -294,6 +332,13 @@
         {
             "name": "outenvelopes",
             "type": "outbound_envelope",
+            "index_type": "i64",
+            "key_names": ["table_name","scope","primary_key"],
+            "key_types": ["name","name","uint64"]
+        },
+        {
+            "name": "outpcons",
+            "type": "outpost_consensus_entry",
             "index_type": "i64",
             "key_names": ["table_name","scope","primary_key"],
             "key_types": ["name","name","uint64"]
@@ -406,7 +451,7 @@
                     "value": 60946
                 },
                 {
-                    "name": "ATTESTATION_TYPE_ROSTER_UPDATE",
+                    "name": "ATTESTATION_TYPE_OPERATORS",
                     "value": 60947
                 },
                 {
@@ -414,7 +459,7 @@
                     "value": 60948
                 },
                 {
-                    "name": "ATTESTATION_TYPE_BATCH_OPERATOR_NEXT_GROUP",
+                    "name": "ATTESTATION_TYPE_BATCH_OPERATOR_GROUPS",
                     "value": 60943
                 },
                 {

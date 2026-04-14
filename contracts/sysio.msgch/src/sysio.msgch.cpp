@@ -17,6 +17,7 @@ namespace {
 constexpr auto EPOCH_ACCOUNT = "sysio.epoch"_n;
 constexpr auto UWRIT_ACCOUNT = "sysio.uwrit"_n;
 constexpr auto CHALG_ACCOUNT = "sysio.chalg"_n;
+constexpr uint32_t CLEANUP_BATCH_SIZE = 50;
 
 uint32_t current_epoch_index() {
    epoch::epochstate_t tbl(EPOCH_ACCOUNT, EPOCH_ACCOUNT.value);
@@ -29,6 +30,21 @@ uint32_t epoch_operators_per_group() {
 }
 
 } // anonymous namespace
+
+// ---------------------------------------------------------------------------
+//  bootstrap — trigger first advance at epoch 0
+// ---------------------------------------------------------------------------
+void msgch::bootstrap() {
+   require_auth(get_self());
+   uint32_t epoch = current_epoch_index();
+   check(epoch == 0, "bootstrap can only be called at epoch 0");
+   action(
+      permission_level{get_self(), "active"_n},
+      EPOCH_ACCOUNT,
+      "advance"_n,
+      std::make_tuple()
+   ).send();
+}
 
 // ---------------------------------------------------------------------------
 //  deliver — batch operator delivers inbound OPP data for a specific outpost
@@ -185,6 +201,81 @@ void msgch::evalcons(uint64_t outpost_id, uint32_t epoch_index) {
          });
       }
    }
+
+   // === RECORD PER-OUTPOST CONSENSUS ===
+   outpost_consensus_t opcons(get_self(), get_self().value);
+   auto opc_it = opcons.find(outpost_id);
+   if (opc_it == opcons.end()) {
+      opcons.emplace(get_self(), [&](auto& r) {
+         r.outpost_id        = outpost_id;
+         r.epoch_index       = epoch_index;
+         r.consensus_reached = true;
+      });
+   } else {
+      opcons.modify(opc_it, same_payer, [&](auto& r) {
+         r.epoch_index       = epoch_index;
+         r.consensus_reached = true;
+      });
+   }
+
+   // === CHECK ALL-OUTPOST CONSENSUS ===
+   epoch::outposts_t outposts(EPOCH_ACCOUNT, EPOCH_ACCOUNT.value);
+   bool all_consensus = true;
+   uint32_t outpost_count = 0;
+
+   for (auto it = outposts.begin(); it != outposts.end(); ++it) {
+      ++outpost_count;
+      auto opc = opcons.find(it->id);
+      if (opc == opcons.end() || !opc->consensus_reached || opc->epoch_index != epoch_index) {
+         all_consensus = false;
+         break;
+      }
+   }
+
+   // Consensus state recorded — advance is triggered by chkcons
+   // once next_epoch_start has passed.
+}
+
+// ---------------------------------------------------------------------------
+//  chkcons — check all-outpost consensus + time gate, trigger advance
+// ---------------------------------------------------------------------------
+void msgch::chkcons() {
+   uint32_t epoch = current_epoch_index();
+
+   // Check all outposts have consensus for the current epoch
+   outpost_consensus_t opcons(get_self(), get_self().value);
+   epoch::outposts_t outposts(EPOCH_ACCOUNT, EPOCH_ACCOUNT.value);
+   bool all_consensus = true;
+   uint32_t outpost_count = 0;
+
+   for (auto it = outposts.begin(); it != outposts.end(); ++it) {
+      ++outpost_count;
+      auto opc = opcons.find(it->id);
+      if (opc == opcons.end() || !opc->consensus_reached || opc->epoch_index != epoch) {
+         all_consensus = false;
+         break;
+      }
+   }
+
+   if (outpost_count == 0 || !all_consensus) return;
+
+   // Check wall-clock: next_epoch_start must be in the past
+   epoch::epochstate_t estate(EPOCH_ACCOUNT, EPOCH_ACCOUNT.value);
+   if (!estate.exists()) return;
+   auto state = estate.get();
+   if (current_time_point() < state.next_epoch_start) return;
+
+   // All conditions met — reset consensus and advance
+   for (auto it = opcons.begin(); it != opcons.end(); ++it) {
+      opcons.modify(it, same_payer, [&](auto& r) { r.consensus_reached = false; });
+   }
+
+   action(
+      permission_level{get_self(), "active"_n},
+      EPOCH_ACCOUNT,
+      "advance"_n,
+      std::make_tuple()
+   ).send();
 }
 
 // ---------------------------------------------------------------------------
@@ -297,7 +388,7 @@ void msgch::cleanup(uint32_t before_epoch) {
    for (auto it = epoch_idx.begin();
         it != epoch_idx.end() && it->epoch_index < before_epoch;) {
       it = epoch_idx.erase(it);
-      if (++removed >= 50) break;
+      if (++removed >= CLEANUP_BATCH_SIZE) break;
    }
 
    envelopes_t envs(get_self(), get_self().value);
@@ -306,7 +397,16 @@ void msgch::cleanup(uint32_t before_epoch) {
    for (auto it = env_oe_idx.begin();
         it != env_oe_idx.end() && it->epoch_index < before_epoch;) {
       it = env_oe_idx.erase(it);
-      if (++removed >= 50) break;
+      if (++removed >= CLEANUP_BATCH_SIZE) break;
+   }
+
+   outenvelopes_t outenvs(get_self(), get_self().value);
+   auto out_oe_idx = outenvs.get_index<"byoutepoch"_n>();
+   removed = 0;
+   for (auto it = out_oe_idx.begin();
+        it != out_oe_idx.end() && it->epoch_index < before_epoch;) {
+      it = out_oe_idx.erase(it);
+      if (++removed >= CLEANUP_BATCH_SIZE) break;
    }
 }
 

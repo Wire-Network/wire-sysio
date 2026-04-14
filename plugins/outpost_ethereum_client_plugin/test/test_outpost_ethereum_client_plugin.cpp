@@ -30,6 +30,7 @@ using namespace std::literals;
 using namespace fc::crypto;
 using namespace fc::crypto::ethereum;
 using namespace fc::network::ethereum;
+namespace eth = fc::network::ethereum;
 
 using namespace fc::test;
 
@@ -147,7 +148,98 @@ struct ethereum_contract_test_counter_client : fc::network::ethereum::ethereum_c
 
 }
 
+namespace {
+
+constexpr std::string_view opp_abi_fixture = "ethereum-abi-opp-current.json";
+constexpr std::string_view opp_inbound_abi_fixture = "ethereum-abi-opp-inbound-current.json";
+
+auto load_abi_fixture(std::string_view filename) {
+   auto path = fc::test::get_test_fixtures_path() / bfs::path(filename);
+   return fc::network::ethereum::abi::parse_contracts(std::filesystem::path(path.generic_string()));
+}
+
+} // anonymous namespace
+
 BOOST_AUTO_TEST_SUITE(outpost_ethereum_client_plugin)
+
+// ---------------------------------------------------------------------------
+//  OPP typed contract client tests
+// ---------------------------------------------------------------------------
+
+BOOST_AUTO_TEST_CASE(opp_contract_client_construction) try {
+   auto abis = load_abi_fixture(opp_abi_fixture);
+   BOOST_CHECK(!abis.empty());
+
+   // Verify the expected function ABIs are found
+   bool has_emit = false, has_finalize = false;
+   for (auto& c : abis) {
+      if (c.name == "emitOutboundEnvelope") has_emit = true;
+      if (c.name == "finalizeEpoch") has_finalize = true;
+   }
+   BOOST_CHECK(has_emit);
+   BOOST_CHECK(has_finalize);
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(opp_inbound_contract_client_construction) try {
+   auto abis = load_abi_fixture(opp_inbound_abi_fixture);
+   BOOST_CHECK(!abis.empty());
+
+   bool has_epoch_in = false, has_next_epoch = false;
+   for (auto& c : abis) {
+      if (c.name == "epochIn") has_epoch_in = true;
+      if (c.name == "nextEpochIndex") has_next_epoch = true;
+   }
+   BOOST_CHECK(has_epoch_in);
+   BOOST_CHECK(has_next_epoch);
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(epoch_in_abi_encoding_with_bytes_param) try {
+   auto abis = load_abi_fixture(opp_inbound_abi_fixture);
+
+   // Find the epochIn ABI entry
+   const eth::abi::contract* epoch_in_abi = nullptr;
+   for (auto& c : abis) {
+      if (c.name == "epochIn") { epoch_in_abi = &c; break; }
+   }
+   BOOST_REQUIRE(epoch_in_abi != nullptr);
+   BOOST_CHECK_EQUAL(epoch_in_abi->inputs.size(), 1u);
+   BOOST_CHECK(epoch_in_abi->inputs[0].type == eth::abi::data_type::bytes);
+
+   // Encode with 1 param (hex-encoded bytes) — this is what the batch operator does
+   std::string test_envelope_hex = "120c0a040800100012040800100028deeef5ce06300138";
+   auto encoded = contract_encode_data(*epoch_in_abi, {fc::variant(test_envelope_hex)});
+   BOOST_CHECK(!encoded.empty());
+
+   // The encoded data should start with the epochIn selector (0xcfae3118)
+   BOOST_CHECK(encoded.substr(0, 8) == "cfae3118");
+
+   // Verify that encoding with 0 params throws (the bug we fixed)
+   BOOST_CHECK_THROW(
+      contract_encode_data(*epoch_in_abi, {}),
+      fc::assert_exception
+   );
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(emit_outbound_envelope_abi_encoding_zero_params) try {
+   auto abis = load_abi_fixture(opp_abi_fixture);
+
+   const eth::abi::contract* emit_abi = nullptr;
+   for (auto& c : abis) {
+      if (c.name == "emitOutboundEnvelope") { emit_abi = &c; break; }
+   }
+   BOOST_REQUIRE(emit_abi != nullptr);
+   BOOST_CHECK_EQUAL(emit_abi->inputs.size(), 0u);
+
+   // Encoding with 0 params should succeed (no inputs expected)
+   auto encoded = contract_encode_data(*emit_abi, {});
+   BOOST_CHECK(!encoded.empty());
+   // Should be just the 4-byte selector
+   BOOST_CHECK_EQUAL(encoded.size(), 8u); // hex chars = 4 bytes * 2
+} FC_LOG_AND_RETHROW();
+
+// ---------------------------------------------------------------------------
+//  Original tests
+// ---------------------------------------------------------------------------
 
 BOOST_AUTO_TEST_CASE(can_encode_tx_01) try {
    using namespace fc::crypto;
