@@ -258,13 +258,23 @@ Retrieve the full action trace for a single block.
       "producer_block_id": "000003e8...",
       "actions": [
         {
+          "action_ordinal": 1,
+          "creator_action_ordinal": 0,
+          "closest_unnotified_ancestor_action_ordinal": 0,
           "global_sequence": 12345,
+          "recv_sequence": 55,
+          "auth_sequence": [["alice", 42]],
+          "code_sequence": 3,
+          "abi_sequence": 3,
           "receiver": "sysio.token",
           "account": "sysio.token",
-          "action": "transfer",
-          "authorization": [{ "account": "alice", "permission": "active" }],
+          "name": "transfer",
+          "authorization": [{ "actor": "alice", "permission": "active" }],
           "data": "0000000000855c34...",
           "return_value": "",
+          "account_ram_deltas": [],
+          "cpu_usage_us": 100,
+          "net_usage": 16,
           "params": {
             "from": "alice",
             "to": "bob",
@@ -273,7 +283,6 @@ Retrieve the full action trace for a single block.
           }
         }
       ],
-      "status": "executed",
       "cpu_usage_us": 200,
       "net_usage_words": 16,
       "signatures": ["SIG_K1_..."],
@@ -364,12 +373,23 @@ on receiver, account (contract code), and action name.
 {
   "actions": [
     {
+      "action_ordinal": 1,
+      "creator_action_ordinal": 0,
+      "closest_unnotified_ancestor_action_ordinal": 0,
       "global_sequence": 101,
+      "recv_sequence": 55,
+      "auth_sequence": [["alice", 42]],
+      "code_sequence": 3,
+      "abi_sequence": 3,
       "receiver": "sysio.token",
       "account": "sysio.token",
-      "action": "transfer",
+      "name": "transfer",
+      "authorization": [{"actor": "alice", "permission": "active"}],
       "data": "0000000000855c34...",
       "return_value": "",
+      "account_ram_deltas": [],
+      "cpu_usage_us": 100,
+      "net_usage": 16,
       "params": {
         "from": "alice",
         "to": "bob",
@@ -399,12 +419,23 @@ on receiver, account (contract code), and action name.
 
 | Field | Description |
 |-------|-------------|
+| `action_ordinal` | Position of this action in the transaction's execution tree (1-based). |
+| `creator_action_ordinal` | Ordinal of the action that created this one (0 for top-level actions). |
+| `closest_unnotified_ancestor_action_ordinal` | Ordinal of the nearest ancestor whose receiver has not already been notified. |
 | `global_sequence` | Monotonically increasing sequence number across the entire chain. |
+| `recv_sequence` | Per-receiver sequence number. |
+| `auth_sequence` | Array of `[actor, sequence]` pairs, one per authorizing account. |
+| `code_sequence` | Number of times the contract's code has been updated up to this action. |
+| `abi_sequence` | Number of times the contract's ABI has been updated up to this action. |
 | `receiver` | The account that received (and may have processed) the action. |
 | `account` | The contract account whose code was executed. |
-| `action` | The action name. |
+| `name` | The action name. |
+| `authorization` | Array of `{actor, permission}` objects. |
 | `data` | Raw action payload as hex. |
 | `return_value` | Raw return value as hex (empty string when none). |
+| `account_ram_deltas` | Array of `{account, delta}` objects capturing RAM allocation changes. |
+| `cpu_usage_us` | Producer-set CPU in microseconds (present only for input/top-level actions). |
+| `net_usage` | Producer-set NET usage in bytes (present only for input/top-level actions). |
 | `params` | ABI-decoded action payload (omitted when ABI unavailable). |
 | `return_data` | ABI-decoded return value (omitted when ABI unavailable or no return type defined). |
 | `trx_id` | ID of the transaction that contains this action. |
@@ -480,8 +511,10 @@ to recipients are excluded).
       "global_sequence": 101,
       "receiver": "sysio.token",
       "account": "sysio.token",
-      "action": "transfer",
+      "name": "transfer",
+      "authorization": [{"actor": "alice", "permission": "active"}],
       "data": "...",
+      "return_value": "",
       "params": {
         "from": "alice",
         "to": "bob",
@@ -500,7 +533,11 @@ to recipients are excluded).
 ```
 
 The response uses `"transfers"` as the array key instead of `"actions"`.
-All other fields are identical to `get_actions`.
+`get_token_transfers` returns a **slim subset** of the fields that `get_actions` returns — it omits execution-tree ordinals
+(`action_ordinal`, `creator_action_ordinal`, `closest_unnotified_ancestor_action_ordinal`), per-receipt sequence numbers
+(`recv_sequence`, `auth_sequence`, `code_sequence`, `abi_sequence`), `account_ram_deltas`, and the resource usage fields
+(`cpu_usage_us`, `net_usage`). These are rarely useful for token-transfer exchange/indexer workflows. If you need them,
+call `get_actions` with `receiver=account=<token_contract>, action=transfer` instead.
 
 **Error responses:**
 

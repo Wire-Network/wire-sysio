@@ -63,7 +63,13 @@ struct get_actions_fixture {
 
 action_trace_v0 make_action(uint64_t seq, chain::name receiver, chain::name account,
                              chain::name act, chain::bytes data = {}) {
-   return { seq, receiver, account, act, {}, std::move(data), {} };
+   action_trace_v0 a{};
+   a.global_sequence = seq;
+   a.receiver        = receiver;
+   a.account         = account;
+   a.action          = act;
+   a.data            = std::move(data);
+   return a;
 }
 
 transaction_trace_v0 make_trx(chain::transaction_id_type id, uint32_t block_num,
@@ -71,8 +77,6 @@ transaction_trace_v0 make_trx(chain::transaction_id_type id, uint32_t block_num,
    transaction_trace_v0 trx;
    trx.id       = id;
    trx.actions  = std::move(actions);
-   trx.status   = fc::enum_type<uint8_t, chain::transaction_receipt_header::status_enum>{
-                     chain::transaction_receipt_header::status_enum::executed};
    trx.block_num  = block_num;
    trx.block_time = chain::block_timestamp_type(0);
    return trx;
@@ -199,7 +203,7 @@ BOOST_FIXTURE_TEST_CASE(filter_by_action_name, get_actions_fixture)
    auto r = get_actions(q);
 
    BOOST_REQUIRE_EQUAL(r.actions.size(), 1u);
-   BOOST_TEST(r.actions[0].get_object()["action"].as_string() == "transfer");
+   BOOST_TEST(r.actions[0].get_object()["name"].as_string() == "transfer");
 }
 
 // limit caps the number of returned results; more=true when there are additional results

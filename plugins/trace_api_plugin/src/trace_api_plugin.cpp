@@ -416,7 +416,7 @@ struct trace_api_rpc_plugin_impl : public std::enable_shared_from_this<trace_api
          }
 
          try {
-            auto result = req_handler->get_actions(query);
+            auto result = req_handler->get_token_transfer_actions(query);
             cb( 200, fc::mutable_variant_object()
                ("transfers",       result.actions)
                ("more",            result.more)

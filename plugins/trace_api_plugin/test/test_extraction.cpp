@@ -169,34 +169,41 @@ BOOST_AUTO_TEST_SUITE(block_extraction)
             { chain::packed_transaction(ptrx1) } );
       signal_accepted_block( bp1 );
 
-      const std::vector<action_trace_v0> expected_action_traces {
-         {
-            0,
-            "sysio.token"_n, "sysio.token"_n, "transfer"_n,
-            {{"alice"_n, "active"_n}},
-            make_transfer_data("alice"_n, "bob"_n, "0.0001 SYS"_t, "Memo!"),
-            {}
-         },
-         {
-            1,
-            "alice"_n, "sysio.token"_n, "transfer"_n,
-            {{"alice"_n, "active"_n}},
-            make_transfer_data("alice"_n, "bob"_n, "0.0001 SYS"_t, "Memo!"),
-            {}
-         },
-         {
-            2,
-            "bob"_n, "sysio.token"_n, "transfer"_n,
-            {{"alice"_n, "active"_n}},
-            make_transfer_data("alice"_n, "bob"_n, "0.0001 SYS"_t, "Memo!"),
-            {}
-         }
-      };
+      action_trace_v0 eat1{};
+      eat1.global_sequence = 0;
+      eat1.receiver        = "sysio.token"_n;
+      eat1.account         = "sysio.token"_n;
+      eat1.action          = "transfer"_n;
+      eat1.authorization   = {{"alice"_n, "active"_n}};
+      eat1.data            = make_transfer_data("alice"_n, "bob"_n, "0.0001 SYS"_t, "Memo!");
+      eat1.cpu_usage_us    = fc::unsigned_int{0};
+      eat1.net_usage       = fc::unsigned_int{0};
+
+      action_trace_v0 eat2{};
+      eat2.global_sequence = 1;
+      eat2.receiver        = "alice"_n;
+      eat2.account         = "sysio.token"_n;
+      eat2.action          = "transfer"_n;
+      eat2.authorization   = {{"alice"_n, "active"_n}};
+      eat2.data            = make_transfer_data("alice"_n, "bob"_n, "0.0001 SYS"_t, "Memo!");
+      eat2.cpu_usage_us    = fc::unsigned_int{0};
+      eat2.net_usage       = fc::unsigned_int{0};
+
+      action_trace_v0 eat3{};
+      eat3.global_sequence = 2;
+      eat3.receiver        = "bob"_n;
+      eat3.account         = "sysio.token"_n;
+      eat3.action          = "transfer"_n;
+      eat3.authorization   = {{"alice"_n, "active"_n}};
+      eat3.data            = make_transfer_data("alice"_n, "bob"_n, "0.0001 SYS"_t, "Memo!");
+      eat3.cpu_usage_us    = fc::unsigned_int{0};
+      eat3.net_usage       = fc::unsigned_int{0};
+
+      const std::vector<action_trace_v0> expected_action_traces { eat1, eat2, eat3 };
 
       const transaction_trace_v0 expected_transaction_trace {
          ptrx1.id(),
          expected_action_traces,
-         fc::enum_type<uint8_t, chain::transaction_receipt_header::status_enum>{0},
          0,
          0,
          ptrx1.get_signatures(),
@@ -255,41 +262,44 @@ BOOST_AUTO_TEST_SUITE(block_extraction)
             { chain::packed_transaction(ptrx1), chain::packed_transaction(ptrx2), chain::packed_transaction(ptrx3) } );
       signal_accepted_block( bp1 );
 
-      const std::vector<action_trace_v0> expected_action_trace1 {
-         {
-            0,
-            "sysio.token"_n, "sysio.token"_n, "transfer"_n,
-            {{"alice"_n, "active"_n}},
-            make_transfer_data("alice"_n, "bob"_n, "0.0001 SYS"_t, "Memo!"),
-            {}
-         }
-      };
+      action_trace_v0 eat1{};
+      eat1.global_sequence = 0;
+      eat1.receiver        = "sysio.token"_n;
+      eat1.account         = "sysio.token"_n;
+      eat1.action          = "transfer"_n;
+      eat1.authorization   = {{"alice"_n, "active"_n}};
+      eat1.data            = make_transfer_data("alice"_n, "bob"_n, "0.0001 SYS"_t, "Memo!");
+      eat1.cpu_usage_us    = fc::unsigned_int{0};
+      eat1.net_usage       = fc::unsigned_int{0};
 
-      const std::vector<action_trace_v0> expected_action_trace2 {
-         {
-            1,
-            "bob"_n, "sysio.token"_n, "transfer"_n,
-            {{ "bob"_n, "active"_n }},
-            make_transfer_data( "bob"_n, "alice"_n, "0.0001 SYS"_t, "Memo!" ),
-            {}
-         }
-      };
+      action_trace_v0 eat2{};
+      eat2.global_sequence = 1;
+      eat2.receiver        = "bob"_n;
+      eat2.account         = "sysio.token"_n;
+      eat2.action          = "transfer"_n;
+      eat2.authorization   = {{ "bob"_n, "active"_n }};
+      eat2.data            = make_transfer_data( "bob"_n, "alice"_n, "0.0001 SYS"_t, "Memo!" );
+      eat2.cpu_usage_us    = fc::unsigned_int{0};
+      eat2.net_usage       = fc::unsigned_int{0};
 
-      const std::vector<action_trace_v0> expected_action_trace3 {
-         {
-            2,
-            "fred"_n, "sysio.token"_n, "transfer"_n,
-            {{ "fred"_n, "active"_n }},
-            make_transfer_data( "fred"_n, "bob"_n, "0.0001 SYS"_t, "Memo!" ),
-            {}
-         }
-      };
+      action_trace_v0 eat3{};
+      eat3.global_sequence = 2;
+      eat3.receiver        = "fred"_n;
+      eat3.account         = "sysio.token"_n;
+      eat3.action          = "transfer"_n;
+      eat3.authorization   = {{ "fred"_n, "active"_n }};
+      eat3.data            = make_transfer_data( "fred"_n, "bob"_n, "0.0001 SYS"_t, "Memo!" );
+      eat3.cpu_usage_us    = fc::unsigned_int{0};
+      eat3.net_usage       = fc::unsigned_int{0};
+
+      const std::vector<action_trace_v0> expected_action_trace1 { eat1 };
+      const std::vector<action_trace_v0> expected_action_trace2 { eat2 };
+      const std::vector<action_trace_v0> expected_action_trace3 { eat3 };
 
       const std::vector<transaction_trace_v0> expected_transaction_traces {
          {
             ptrx1.id(),
             expected_action_trace1,
-            fc::enum_type<uint8_t, chain::transaction_receipt_header::status_enum>{chain::transaction_receipt_header::status_enum::executed},
             0,
             0,
             ptrx1.get_signatures(),
@@ -301,7 +311,6 @@ BOOST_AUTO_TEST_SUITE(block_extraction)
          {
             ptrx2.id(),
             expected_action_trace2,
-            fc::enum_type<uint8_t, chain::transaction_receipt_header::status_enum>{chain::transaction_receipt_header::status_enum::executed},
             0,
             0,
             ptrx2.get_signatures(),
@@ -313,7 +322,6 @@ BOOST_AUTO_TEST_SUITE(block_extraction)
          {
             ptrx3.id(),
             expected_action_trace3,
-            fc::enum_type<uint8_t, chain::transaction_receipt_header::status_enum>{chain::transaction_receipt_header::status_enum::executed},
             0,
             0,
             ptrx3.get_signatures(),

@@ -129,6 +129,95 @@ namespace sysio::trace_api {
        * @return actions_result containing the matching actions and pagination state
        */
       actions_result get_actions(const action_query& query) {
+         return get_actions_impl(query, [this](const action_trace_v0& a,
+                                               const transaction_trace_v0& trx) {
+            auto action_var = fc::mutable_variant_object()
+               ("action_ordinal",                             a.action_ordinal)
+               ("creator_action_ordinal",                     a.creator_action_ordinal)
+               ("closest_unnotified_ancestor_action_ordinal", a.closest_unnotified_ancestor_action_ordinal)
+               ("global_sequence",                            a.global_sequence)
+               ("recv_sequence",                              a.recv_sequence)
+               ("auth_sequence",                              a.auth_sequence)
+               ("code_sequence",                              a.code_sequence)
+               ("abi_sequence",                               a.abi_sequence)
+               ("receiver",                                   a.receiver.to_string())
+               ("account",                                    a.account.to_string())
+               ("name",                                       a.action.to_string())
+               ("authorization",                              serialize_authorizations(a.authorization))
+               ("data",                                       a.data.empty() ? "" : fc::to_hex(a.data.data(), a.data.size()))
+               ("return_value",                               a.return_value.empty() ? "" : fc::to_hex(a.return_value.data(), a.return_value.size()))
+               ("trx_id",                                     trx.id.str())
+               ("block_num",                                  trx.block_num)
+               ("block_time",                                 trx.block_time)
+               ("producer_block_id",                          trx.producer_block_id);
+
+            // account_ram_deltas
+            {
+               fc::variants deltas;
+               deltas.reserve(a.account_ram_deltas.size());
+               for (const auto& d : a.account_ram_deltas)
+                  deltas.emplace_back(fc::mutable_variant_object()
+                     ("account", d.account.to_string())
+                     ("delta",   d.delta));
+               action_var("account_ram_deltas", std::move(deltas));
+            }
+
+            if (a.cpu_usage_us.has_value())
+               action_var("cpu_usage_us", *a.cpu_usage_us);
+            if (a.net_usage.has_value())
+               action_var("net_usage", *a.net_usage);
+
+            auto [params, return_data] = data_handler_provider.serialize_to_variant(a);
+            if (!params.is_null())
+               action_var("params", params);
+            if (return_data.has_value())
+               action_var("return_data", *return_data);
+
+            return action_var;
+         });
+      }
+
+      /// Slim response for get_token_transfers: transfer-relevant fields only.
+      /// Omits execution-tree ordinals, receipt sequences, ram_deltas, and resource usage.
+      actions_result get_token_transfer_actions(const action_query& query) {
+         return get_actions_impl(query, [this](const action_trace_v0& a,
+                                               const transaction_trace_v0& trx) {
+            auto action_var = fc::mutable_variant_object()
+               ("global_sequence",  a.global_sequence)
+               ("receiver",         a.receiver.to_string())
+               ("account",          a.account.to_string())
+               ("name",             a.action.to_string())
+               ("authorization",    serialize_authorizations(a.authorization))
+               ("data",             a.data.empty() ? "" : fc::to_hex(a.data.data(), a.data.size()))
+               ("return_value",     a.return_value.empty() ? "" : fc::to_hex(a.return_value.data(), a.return_value.size()))
+               ("trx_id",           trx.id.str())
+               ("block_num",        trx.block_num)
+               ("block_time",       trx.block_time)
+               ("producer_block_id", trx.producer_block_id);
+
+            auto [params, return_data] = data_handler_provider.serialize_to_variant(a);
+            if (!params.is_null())
+               action_var("params", params);
+            if (return_data.has_value())
+               action_var("return_data", *return_data);
+
+            return action_var;
+         });
+      }
+
+   private:
+      static fc::variants serialize_authorizations(const std::vector<authorization_trace_v0>& auths) {
+         fc::variants result;
+         result.reserve(auths.size());
+         for (const auto& a : auths)
+            result.emplace_back(fc::mutable_variant_object()
+               ("actor",      a.actor.to_string())
+               ("permission", a.permission.to_string()));
+         return result;
+      }
+
+      template<typename ActionVariantBuilder>
+      actions_result get_actions_impl(const action_query& query, ActionVariantBuilder&& build_action_var) {
          actions_result result;
 
          const uint32_t end = query.block_num_end;
@@ -138,8 +227,6 @@ namespace sysio::trace_api {
 
             std::visit([&](const auto& bt) {
                for (const auto& trx : bt.transactions) {
-                  // actions within a transaction are already in global_sequence order after
-                  // process_actions sorts them, but the raw vector may not be — sort here
                   std::vector<const action_trace_v0*> sorted;
                   sorted.reserve(trx.actions.size());
                   for (const auto& a : trx.actions)
@@ -155,30 +242,12 @@ namespace sysio::trace_api {
                      if (query.account  && a.account  != *query.account)  continue;
                      if (query.action   && a.action   != *query.action)   continue;
 
-                     auto action_var = fc::mutable_variant_object()
-                        ("global_sequence",  a.global_sequence)
-                        ("receiver",         a.receiver.to_string())
-                        ("account",          a.account.to_string())
-                        ("action",           a.action.to_string())
-                        ("data",             a.data.empty() ? "" : fc::to_hex(a.data.data(), a.data.size()))
-                        ("return_value",     a.return_value.empty() ? "" : fc::to_hex(a.return_value.data(), a.return_value.size()))
-                        ("trx_id",           trx.id.str())
-                        ("block_num",        trx.block_num)
-                        ("block_time",       trx.block_time)
-                        ("producer_block_id", trx.producer_block_id);
-
-                     auto [params, return_data] = data_handler_provider.serialize_to_variant(a);
-                     if (!params.is_null())
-                        action_var("params", params);
-                     if (return_data.has_value())
-                        action_var("return_data", *return_data);
-
                      result.last_global_seq = a.global_sequence;
-                     result.actions.push_back(std::move(action_var));
+                     result.actions.push_back(build_action_var(a, trx));
 
                      if (result.actions.size() >= query.limit) {
                         result.more = true;
-                        return;   // exits the lambda; outer loop will also check result.more
+                        return;
                      }
                   }
                   if (result.more) return;
@@ -191,7 +260,6 @@ namespace sysio::trace_api {
          return result;
       }
 
-   private:
       LogfileProvider logfile_provider;
       DataHandlerProvider data_handler_provider;
       log_handler _log;

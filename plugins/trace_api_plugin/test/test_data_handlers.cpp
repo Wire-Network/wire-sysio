@@ -27,9 +27,11 @@ namespace {
 BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
    BOOST_AUTO_TEST_CASE(empty_data)
    {
-      auto action = action_trace_v0 {
-         0, "alice"_n, "alice"_n, "foo"_n, {}, {}, {}
-      };
+      action_trace_v0 action;
+      action.global_sequence = 0;
+      action.receiver = "alice"_n;
+      action.account  = "alice"_n;
+      action.action   = "foo"_n;
       std::variant<action_trace_v0> action_trace_t = action;
       abi_data_handler handler(exception_handler{});
 
@@ -44,9 +46,12 @@ BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
    {
       // Without return_value
       {
-         auto action = action_trace_v0 {
-            0, "alice"_n, "alice"_n, "foo"_n, {}, {0x00, 0x01, 0x02, 0x03}, {}
-         };
+         action_trace_v0 action;
+         action.global_sequence = 0;
+         action.receiver = "alice"_n;
+         action.account  = "alice"_n;
+         action.action   = "foo"_n;
+         action.data     = {0x00, 0x01, 0x02, 0x03};
          std::variant<action_trace_v0> action_trace_t = action;
          abi_data_handler handler(exception_handler{});
 
@@ -59,9 +64,13 @@ BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
 
       // With return_value
       {
-         auto action = action_trace_v0 {
-            0, "alice"_n, "alice"_n, "foo"_n, {}, {0x00, 0x01, 0x02, 0x03}, {0x04, 0x05, 0x06, 0x07}
-         };
+         action_trace_v0 action;
+         action.global_sequence = 0;
+         action.receiver      = "alice"_n;
+         action.account       = "alice"_n;
+         action.action        = "foo"_n;
+         action.data          = {0x00, 0x01, 0x02, 0x03};
+         action.return_value  = {0x04, 0x05, 0x06, 0x07};
          std::variant<action_trace_v0> action_trace_t = action;
          abi_data_handler handler(exception_handler{});
 
@@ -75,9 +84,12 @@ BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
 
    BOOST_AUTO_TEST_CASE(basic_abi)
    {
-      auto action = action_trace_v0 {
-            0, "alice"_n, "alice"_n, "foo"_n, {}, {0x00, 0x01, 0x02, 0x03}, {}
-      };
+      action_trace_v0 action;
+      action.global_sequence = 0;
+      action.receiver = "alice"_n;
+      action.account  = "alice"_n;
+      action.action   = "foo"_n;
+      action.data     = {0x00, 0x01, 0x02, 0x03};
 
       std::variant<action_trace_v0> action_trace_t = action;
 
@@ -108,9 +120,13 @@ BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
 
    BOOST_AUTO_TEST_CASE(basic_abi_with_return_value)
    {
-      auto action = action_trace_v0 {
-         0, "alice"_n, "alice"_n, "foo"_n, {}, {0x00, 0x01, 0x02, 0x03}, {0x04, 0x05, 0x06}
-      };
+      action_trace_v0 action;
+      action.global_sequence = 0;
+      action.receiver      = "alice"_n;
+      action.account       = "alice"_n;
+      action.action        = "foo"_n;
+      action.data          = {0x00, 0x01, 0x02, 0x03};
+      action.return_value  = {0x04, 0x05, 0x06};
 
       std::variant<action_trace_v0> action_trace_t = action;
 
@@ -148,9 +164,13 @@ BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
 
    BOOST_AUTO_TEST_CASE(basic_abi_wrong_type)
    {
-      auto action = action_trace_v0 {
-            0, "alice"_n, "alice"_n, "foo"_n, {}, {0x00, 0x01, 0x02, 0x03}, {0x04, 0x05, 0x06, 0x07}
-      };
+      action_trace_v0 action;
+      action.global_sequence = 0;
+      action.receiver      = "alice"_n;
+      action.account       = "alice"_n;
+      action.action        = "foo"_n;
+      action.data          = {0x00, 0x01, 0x02, 0x03};
+      action.return_value  = {0x04, 0x05, 0x06, 0x07};
 
       std::variant<action_trace_v0> action_trace_t = action;
 
@@ -177,9 +197,12 @@ BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
 
    BOOST_AUTO_TEST_CASE(basic_abi_insufficient_data)
    {
-      auto action = action_trace_v0 {
-            0, "alice"_n, "alice"_n, "foo"_n, {}, {0x00, 0x01, 0x02}, {}
-      };
+      action_trace_v0 action;
+      action.global_sequence = 0;
+      action.receiver = "alice"_n;
+      action.account  = "alice"_n;
+      action.action   = "foo"_n;
+      action.data     = {0x00, 0x01, 0x02};
 
       std::variant<action_trace_v0> action_trace_t = action;
 
@@ -212,9 +235,13 @@ BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
    // If no ABI provided for return type then do not attempt to decode it
    BOOST_AUTO_TEST_CASE(basic_abi_no_return_abi_when_return_value_provided)
    {
-      auto action = action_trace_v0 {
-         0, "alice"_n, "alice"_n, "foo"_n, {}, {0x00, 0x01, 0x02, 0x03}, {0x04, 0x05, 0x06}
-      };
+      action_trace_v0 action;
+      action.global_sequence = 0;
+      action.receiver      = "alice"_n;
+      action.account       = "alice"_n;
+      action.action        = "foo"_n;
+      action.data          = {0x00, 0x01, 0x02, 0x03};
+      action.return_value  = {0x04, 0x05, 0x06};
 
       std::variant<action_trace_v0> action_trace_t = action;
 

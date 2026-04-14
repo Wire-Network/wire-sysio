@@ -3,30 +3,44 @@
 #include <sysio/chain/trace.hpp>
 #include <sysio/chain/types.hpp>
 #include <sysio/chain/block.hpp>
+#include <boost/container/flat_map.hpp>
 #include <utility>
 
 namespace sysio { namespace trace_api {
 
    struct authorization_trace_v0 {
-      chain::name account;
+      chain::name actor;
       chain::name permission;
    };
 
+   struct account_delta_v0 {
+      chain::name account;
+      int64_t     delta = 0;
+   };
+
    struct action_trace_v0 {
-      uint64_t                               global_sequence = {};
-      chain::name                            receiver = {};
-      chain::name                            account = {};
-      chain::name                            action = {};
-      std::vector<authorization_trace_v0>    authorization = {};
-      chain::bytes                           data = {};
-      chain::bytes                           return_value = {};
+      fc::unsigned_int                               action_ordinal = {};
+      fc::unsigned_int                               creator_action_ordinal = {};
+      fc::unsigned_int                               closest_unnotified_ancestor_action_ordinal = {};
+      uint64_t                                       global_sequence = {};
+      uint64_t                                       recv_sequence = {};
+      boost::container::flat_map<chain::name, uint64_t> auth_sequence = {};
+      fc::unsigned_int                               code_sequence = {};
+      fc::unsigned_int                               abi_sequence = {};
+      chain::name                                    receiver = {};
+      chain::name                                    account = {};
+      chain::name                                    action = {};
+      std::vector<authorization_trace_v0>            authorization = {};
+      chain::bytes                                   data = {};
+      chain::bytes                                   return_value = {};
+      std::vector<account_delta_v0>                  account_ram_deltas = {};
+      std::optional<fc::unsigned_int>                cpu_usage_us = {};
+      std::optional<fc::unsigned_int>                net_usage = {};
    };
 
   struct transaction_trace_v0 {
-     using status_type = chain::transaction_receipt_header::status_enum;
      chain::transaction_id_type                 id = {};
      std::vector<action_trace_v0>               actions = {};
-     fc::enum_type<uint8_t,status_type>         status = {};
      uint32_t                                   cpu_usage_us = 0;
      fc::unsigned_int                           net_usage_words;
      std::vector<chain::signature_type>         signatures = {};
@@ -59,9 +73,14 @@ namespace sysio { namespace trace_api {
 
 } }
 
-FC_REFLECT(sysio::trace_api::authorization_trace_v0, (account)(permission))
-FC_REFLECT(sysio::trace_api::action_trace_v0, (global_sequence)(receiver)(account)(action)(authorization)(data)(return_value))
-FC_REFLECT(sysio::trace_api::transaction_trace_v0, (id)(actions)(status)(cpu_usage_us)(net_usage_words)(signatures)(trx_header)(block_num)(block_time)(producer_block_id))
+FC_REFLECT(sysio::trace_api::authorization_trace_v0, (actor)(permission))
+FC_REFLECT(sysio::trace_api::account_delta_v0, (account)(delta))
+FC_REFLECT(sysio::trace_api::action_trace_v0,
+   (action_ordinal)(creator_action_ordinal)(closest_unnotified_ancestor_action_ordinal)
+   (global_sequence)(recv_sequence)(auth_sequence)(code_sequence)(abi_sequence)
+   (receiver)(account)(action)(authorization)(data)(return_value)
+   (account_ram_deltas)(cpu_usage_us)(net_usage))
+FC_REFLECT(sysio::trace_api::transaction_trace_v0, (id)(actions)(cpu_usage_us)(net_usage_words)(signatures)(trx_header)(block_num)(block_time)(producer_block_id))
 FC_REFLECT(sysio::trace_api::block_trace_v0, (id)(number)(previous_id)(timestamp)(producer)(transaction_mroot)(finality_mroot)(transactions))
 FC_REFLECT(sysio::trace_api::cache_trace, (trace)(trx))
 FC_REFLECT(sysio::trace_api::block_trxs_entry, (ids)(block_num))
