@@ -126,7 +126,9 @@ struct trace_api_common_impl {
       cfg_options("trace-dir", bpo::value<std::filesystem::path>()->default_value("traces"),
                   "the location of the trace directory (absolute path or relative to application data dir)");
       cfg_options("trace-slice-stride", bpo::value<uint32_t>()->default_value(10'000),
-                  "the number of blocks each \"slice\" of trace data will contain on the filesystem");
+                  "Number of blocks each \"slice\" of trace data will contain on the filesystem.\n"
+                  "Must be in the range [1, 1000000].  Larger values reduce file count but bloat the\n"
+                  "block-offset sidecar pre-allocation and stress the per-slice trx_id hash index.");
       cfg_options("trace-minimum-irreversible-history-blocks", boost::program_options::value<int32_t>()->default_value(-1),
                   "Number of blocks to ensure are kept past LIB for retrieval before \"slice\" files can be automatically removed.\n"
                   "A value of -1 indicates that automatic removal of \"slice\" files will be turned off.");
@@ -150,6 +152,8 @@ struct trace_api_common_impl {
         resmon_plugin->monitor_directory(trace_dir);
 
       slice_stride = options.at("trace-slice-stride").as<uint32_t>();
+      SYS_ASSERT(slice_stride >= 1 && slice_stride <= 1'000'000, chain::plugin_config_exception,
+                 "\"trace-slice-stride\" must be in [1, 1000000]; got {}", slice_stride);
 
       const int32_t blocks = options.at("trace-minimum-irreversible-history-blocks").as<int32_t>();
       SYS_ASSERT(blocks >= -1, chain::plugin_config_exception,

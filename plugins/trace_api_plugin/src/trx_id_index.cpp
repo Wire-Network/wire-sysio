@@ -63,6 +63,12 @@ uint64_t trx_id_index_reader::prefix_of(const chain::transaction_id_type& id) {
    return p;
 }
 
+// Hard cap on bucket_count read from disk.  At 16 bytes per bucket, 2^28
+// buckets = 4 GB.  A realistic worst-case slice (default 10K blocks at
+// ~1K trxs/block = 10M trxs at load factor 0.5 = 2^25 buckets) fits 8x
+// inside this cap.  Anything larger is treated as a corrupt/malicious file.
+static constexpr uint32_t max_bucket_count = 1u << 28;
+
 trx_id_index_reader::trx_id_index_reader(const std::filesystem::path& path) {
    try {
       fc::cfile f;
@@ -85,6 +91,28 @@ trx_id_index_reader::trx_id_index_reader(const std::filesystem::path& path) {
          return;
       }
 
+      // Open-addressing math (mask = bucket_count - 1) requires a power of two.
+      if (!std::has_single_bit(header.bucket_count)) {
+         wlog("trace_api: trx_id index {} bucket_count {} is not a power of two, ignoring",
+              path.generic_string(), header.bucket_count);
+         return;
+      }
+      // Cap allocation against malicious / corrupt headers.
+      if (header.bucket_count > max_bucket_count) {
+         wlog("trace_api: trx_id index {} bucket_count {} exceeds cap {}, ignoring",
+              path.generic_string(), header.bucket_count, max_bucket_count);
+         return;
+      }
+      // File length must equal header + bucket_count * sizeof(bucket).
+      const uint64_t expected_size = sizeof(trx_id_index_header) +
+                                     uint64_t{header.bucket_count} * sizeof(trx_id_bucket);
+      const uint64_t actual_size = std::filesystem::file_size(path);
+      if (actual_size != expected_size) {
+         wlog("trace_api: trx_id index {} size {} != expected {}, ignoring",
+              path.generic_string(), actual_size, expected_size);
+         return;
+      }
+
       _buckets.resize(header.bucket_count);
       for (auto& b : _buckets) {
          auto ds = f.create_datastream();
@@ -100,11 +128,17 @@ std::optional<uint32_t> trx_id_index_reader::lookup(const chain::transaction_id_
    if (!_valid || _buckets.empty())
       return std::nullopt;
 
-   const uint64_t prefix = prefix_of(trx_id);
-   const uint32_t mask   = static_cast<uint32_t>(_buckets.size()) - 1;
-   uint32_t idx          = static_cast<uint32_t>(prefix) & mask;
+   const uint64_t prefix       = prefix_of(trx_id);
+   const uint32_t bucket_count = static_cast<uint32_t>(_buckets.size());
+   const uint32_t mask         = bucket_count - 1;
+   uint32_t idx                = static_cast<uint32_t>(prefix) & mask;
 
-   while (_buckets[idx].block_num != 0) {
+   // Bounded probe loop: a well-formed index has load factor <= 0.5 and an
+   // empty bucket terminates the chain.  The bound guards against a corrupt
+   // file with no empty buckets at all (would otherwise loop forever).
+   for (uint32_t probes = 0; probes < bucket_count; ++probes) {
+      if (_buckets[idx].block_num == 0)
+         return std::nullopt;
       if (_buckets[idx].prefix64 == prefix)
          return _buckets[idx].block_num;
       idx = (idx + 1) & mask;

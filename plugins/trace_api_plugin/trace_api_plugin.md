@@ -79,7 +79,7 @@ default).
 | Option | Default | Description |
 |--------|---------|-------------|
 | `trace-dir` | `traces` | Directory for trace files. Relative paths are resolved from the node's data directory. |
-| `trace-slice-stride` | `10000` | Number of blocks per slice file. Larger values reduce file count but increase the amount of data re-scanned when a single slice is accessed. |
+| `trace-slice-stride` | `10000` | Number of blocks per slice file. Must be in `[1, 1000000]`. Larger values reduce file count but bloat the block-offset sidecar's per-slice pre-allocation (`stride * 8` bytes, sparse) and stress the per-slice trx_id hash index (rejected if it would need more than 2^28 buckets). |
 | `trace-minimum-irreversible-history-blocks` | `-1` | Blocks past LIB to retain before old slices can be auto-deleted. `-1` disables automatic deletion (keep forever). |
 | `trace-minimum-uncompressed-irreversible-history-blocks` | `-1` | Blocks past LIB to keep uncompressed. Slices older than this threshold are transparently compressed. `-1` disables automatic compression. |
 | `trace-max-block-range` | `100` | Maximum number of blocks scanned by a single `get_actions` or `get_token_transfers` request. `block_num_end` is silently clamped to `block_num_start + trace-max-block-range - 1`.  Clients paginate by advancing `block_num_start` by this amount on each call. Set to `-1` to remove the cap entirely. |

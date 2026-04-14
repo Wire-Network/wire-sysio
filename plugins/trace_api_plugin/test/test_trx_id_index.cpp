@@ -229,4 +229,105 @@ BOOST_FIXTURE_TEST_CASE(large_entry_set_all_found, trx_id_index_fixture) {
    }
 }
 
+// ---------------------------------------------------------------------------
+// Defensive validation of corrupt / hostile index files
+// ---------------------------------------------------------------------------
+
+BOOST_FIXTURE_TEST_CASE(bucket_count_not_power_of_two_is_invalid, trx_id_index_fixture) {
+   fc::cfile f;
+   f.set_file_path(index_path());
+   f.open(fc::cfile::create_or_update_rw_mode);
+   trx_id_index_header hdr;
+   hdr.bucket_count = 5; // not a power of two
+   auto data = fc::raw::pack(hdr);
+   f.write(data.data(), data.size());
+   // Pad to expected size so the file-size check would otherwise pass.
+   trx_id_bucket empty{};
+   for (int i = 0; i < 5; ++i) {
+      auto bdata = fc::raw::pack(empty);
+      f.write(bdata.data(), bdata.size());
+   }
+   f.flush();
+   f.close();
+
+   trx_id_index_reader r(index_path());
+   BOOST_CHECK(!r.valid());
+}
+
+BOOST_FIXTURE_TEST_CASE(bucket_count_above_cap_is_invalid, trx_id_index_fixture) {
+   // Just write the header claiming an absurd bucket_count.  We intentionally
+   // do NOT write the buckets payload (that would be ~4GB); the reader must
+   // reject the header before attempting to allocate.
+   fc::cfile f;
+   f.set_file_path(index_path());
+   f.open(fc::cfile::create_or_update_rw_mode);
+   trx_id_index_header hdr;
+   hdr.bucket_count = (1u << 29); // beyond the cap of 1<<28
+   auto data = fc::raw::pack(hdr);
+   f.write(data.data(), data.size());
+   f.flush();
+   f.close();
+
+   trx_id_index_reader r(index_path());
+   BOOST_CHECK(!r.valid());
+}
+
+BOOST_FIXTURE_TEST_CASE(file_size_mismatch_is_invalid, trx_id_index_fixture) {
+   // Header claims 8 buckets but file only contains 2.
+   fc::cfile f;
+   f.set_file_path(index_path());
+   f.open(fc::cfile::create_or_update_rw_mode);
+   trx_id_index_header hdr;
+   hdr.bucket_count = 8;
+   auto data = fc::raw::pack(hdr);
+   f.write(data.data(), data.size());
+   trx_id_bucket empty{};
+   for (int i = 0; i < 2; ++i) {
+      auto bdata = fc::raw::pack(empty);
+      f.write(bdata.data(), bdata.size());
+   }
+   f.flush();
+   f.close();
+
+   trx_id_index_reader r(index_path());
+   BOOST_CHECK(!r.valid());
+}
+
+// Hand-craft a fully populated bucket array (load factor 1.0).  A naive probe
+// loop would spin forever looking for an empty slot.  The bounded probe must
+// terminate and return nullopt for a missing prefix.
+BOOST_FIXTURE_TEST_CASE(lookup_terminates_on_full_table, trx_id_index_fixture) {
+   constexpr uint32_t bucket_count = 8; // power of two, small for the test
+   fc::cfile f;
+   f.set_file_path(index_path());
+   f.open(fc::cfile::create_or_update_rw_mode);
+   trx_id_index_header hdr;
+   hdr.bucket_count = bucket_count;
+   auto hdr_data = fc::raw::pack(hdr);
+   f.write(hdr_data.data(), hdr_data.size());
+
+   // Fill EVERY bucket with a non-zero block_num and a unique non-matching
+   // prefix.  Choose prefixes whose initial slot is bucket 0 so the probe
+   // walks the whole table looking for prefix 0xCAFEBABE...
+   for (uint32_t i = 0; i < bucket_count; ++i) {
+      trx_id_bucket b{};
+      // (bucket_count is a power of two, so any prefix64 value has its slot
+      // determined by the low log2(bucket_count) bits — set those to 0.)
+      b.prefix64  = (uint64_t{i} << 8); // all start at slot 0, distinct values
+      b.block_num = 1000 + i;           // non-zero
+      auto bdata = fc::raw::pack(b);
+      f.write(bdata.data(), bdata.size());
+   }
+   f.flush();
+   f.close();
+
+   trx_id_index_reader r(index_path());
+   BOOST_REQUIRE(r.valid());
+
+   // Lookup a prefix that isn't stored.  Must terminate (not hang) and return nullopt.
+   auto missing = make_trx_id(0xDEADBEEFCAFEBABEULL);
+   auto result = r.lookup(missing);
+   BOOST_CHECK(!result.has_value());
+}
+
 BOOST_AUTO_TEST_SUITE_END()
