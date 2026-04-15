@@ -19,6 +19,27 @@ using namespace fc::crypto::ethereum;
 using namespace fc::network::json_rpc;
 } // namespace
 
+block_tag::block_tag(labeled name): block(name), number(0) { }
+
+block_tag::block_tag(uint64_t bn)
+: block(not_valid),
+  number(0) { }
+
+bool block_tag::valid_label() const { return block != not_valid; }
+
+std::string block_tag::to_string() const {
+   switch(block) {
+      case latest:
+         return "latest";
+      case pending:
+         return "pending";
+      case earliest:
+         return "earliest";
+      case not_valid:
+         return std::to_string(number);
+   };
+}
+
 /**
  * @brief Checks if an ABI definition exists for the given contract name
  *
@@ -85,12 +106,12 @@ fc::variant ethereum_client::execute(const std::string& method, const fc::varian
  * @throws fc::network::json_rpc::json_rpc_exception if the call fails
  */
 fc::variant ethereum_client::execute_contract_view_fn(const address& contract_address, const abi::contract& abi,
-                                                      const std::string& block_tag,
+                                                      const block_tag& block_tag,
                                                       const contract_invoke_data_items& params) {
    const bool add_hex_prefix = true;
    auto abi_call_encoded = contract_encode_data(abi, params, add_hex_prefix);
    auto to_data_mvo = fc::mutable_variant_object("to", to_hex(contract_address, true))("data", abi_call_encoded);
-   fc::variants rpc_params = {to_data_mvo, fc::variant(block_tag)};
+   fc::variants rpc_params = {to_data_mvo, fc::variant(block_tag.to_string())};
    return execute("eth_call", rpc_params);
 }
 
@@ -139,13 +160,21 @@ fc::variant ethereum_client::execute_contract_tx_fn(const eip1559_tx& source_tx,
  * @return The transaction count as a uint256
  * @throws fc::network::json_rpc::json_rpc_exception if the RPC call fails
  */
-fc::uint256 ethereum_client::get_transaction_count(const address_compat_type& address, const std::string& block_tag) {
+fc::uint256 ethereum_client::get_transaction_count(const address_compat_type& address, const block_tag& block_tag) {
    auto from_addr = fc::crypto::ethereum::to_address(address);
    auto from_addr_hex = to_hex(from_addr, true);
-   fc::variants params{from_addr_hex, block_tag};
+   fc::variants params{from_addr_hex, block_tag.to_string()};
    auto res = execute("eth_getTransactionCount", params);
    dlog("tx_count: {}", res.as_string());
-   return to_uint256(res);
+   const auto count = to_uint256(res);
+   std::scoped_lock<std::mutex> lock(_contracts_map_mutex);
+   if(_nonce < count) {
+      _nonce = count;
+   }
+   else {
+      ++_nonce;
+   }
+   return _nonce;
 }
 
 /**
@@ -222,7 +251,7 @@ eip1559_tx ethereum_client::create_default_tx(const address_compat_type& to, con
    auto gas_limit = (estimated_gas * 6) /5;
 
    return eip1559_tx{.chain_id = get_chain_id(),
-                     .nonce = get_transaction_count(get_signer_address(), "pending"),
+                     .nonce = get_transaction_count(get_signer_address(), block_tag_latest),
                      .max_priority_fee_per_gas = gc.tip,
                      .max_fee_per_gas = gc.max_fee_per_gas,
                      .gas_limit = gas_limit,
@@ -284,9 +313,9 @@ fc::uint256 ethereum_client::get_block_number() {
  * @return Block data as a variant_object
  * @throws fc::network::json_rpc::json_rpc_exception if the RPC call fails
  */
-fc::variant_object ethereum_client::get_block_by_number(const block_tag_t& block_number_or_tag,
+fc::variant_object ethereum_client::get_block_by_number(const block_tag& block_number_or_tag,
                                                         bool full_transaction_data) {
-   auto block_number = to_block_tag(block_number_or_tag);
+   auto block_number = block_number_or_tag.to_string();
    fc::variants params{block_number, full_transaction_data};
    return execute("eth_getBlockByNumber", params).get_object();
 }
@@ -332,7 +361,7 @@ fc::variant ethereum_client::get_transaction_by_hash(const std::string& tx_hash)
  */
 fc::uint256 ethereum_client::get_base_fee_per_gas() {
    auto block = get_block_by_number(block_tag_latest);
-   FC_ASSERT_FMT(block.contains("baseFeePerGas"), "Block {} does not contain baseFeePerGas", block_tag_latest);
+   FC_ASSERT_FMT(block.contains("baseFeePerGas"), "Block {} does not contain baseFeePerGas", block_tag_latest.to_string());
    return block["baseFeePerGas"].as_uint256();
 }
 
@@ -541,8 +570,8 @@ fc::variant ethereum_client::get_transaction_receipt(const std::string& tx_hash)
 std::vector<ethereum_event_data> ethereum_client::get_events(const address_compat_type& contract_addr,
                                                               const std::vector<std::string>& event_names,
                                                               const std::vector<abi::contract>& event_abis,
-                                                              const block_tag_t& from_block,
-                                                              const block_tag_t& to_block) {
+                                                              const block_tag& from_block,
+                                                              const block_tag& to_block) {
    // Build a map from topic hash hex -> abi::contract for decoding and name lookup
    std::map<std::string, const abi::contract*> topic_to_abi;
    fc::variants topic_hashes;
@@ -566,8 +595,8 @@ std::vector<ethereum_event_data> ethereum_client::get_events(const address_compa
    auto addr = to_address(contract_addr);
    fc::mutable_variant_object filter;
    filter("address", to_hex(addr, true));
-   filter("fromBlock", to_block_tag(from_block));
-   filter("toBlock", to_block_tag(to_block));
+   filter("fromBlock", from_block.to_string());
+   filter("toBlock", to_block.to_string());
    // topics[0] is an OR-array of event signature hashes
    filter("topics", fc::variants{topic_hashes});
 
@@ -646,8 +675,8 @@ std::vector<ethereum_event_data> ethereum_client::get_events(const address_compa
  * delegates to ethereum_client::get_events.
  */
 std::vector<ethereum_event_data> ethereum_contract_client::query_events(const std::vector<std::string>& event_names,
-                                                                        const block_tag_t& from_block,
-                                                                        const block_tag_t& to_block) {
+                                                                        const block_tag& from_block,
+                                                                        const block_tag& to_block) {
    std::vector<abi::contract> event_abis;
    auto abi_map = _abi_map.readable();
    for (const auto& name : event_names) {
