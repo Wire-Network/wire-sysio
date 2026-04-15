@@ -1,5 +1,8 @@
 #include <fc/log/dmlog_sink.hpp>
+#include <fc/log/dmlog_formatter.hpp>
 #include <fc/exception/exception.hpp>
+
+#include <spdlog/details/log_msg.h>
 
 #include <unistd.h>
 #include <signal.h>
@@ -8,7 +11,9 @@
 
 namespace fc {
 
-   dmlog_sink_mt::dmlog_sink_mt(const std::string& file) {
+   dmlog_sink_mt::dmlog_sink_mt(const std::string& file)
+      : spdlog::sinks::base_sink<std::mutex>(std::make_unique<dmlog_formatter>())
+   {
       if (file.empty() || file == "-" || file == "-stdout") {
          out = stdout;
       } else if (file == "-stderr") {
@@ -31,18 +36,11 @@ namespace fc {
    }
 
    void dmlog_sink_mt::sink_it_(const spdlog::details::log_msg& msg) {
-      // log_msg is a struct containing the log entry info like level, timestamp, thread id etc.
-      // msg.payload (before v1.3.0: msg.raw) contains pre formatted log
+      spdlog::memory_buf_t formatted;
+      formatter_->format(msg, formatted);
 
-      // If needed (very likely but not mandatory), the sink formats the message before sending it to its final destination:
-      // spdlog::memory_buf_t formatted;
-      // spdlog::sinks::base_sink<Mutex>::formatter_->format(msg, formatted);
-      // std::cout << fmt::to_string(formatted);
-
-      std::string message = "DMLOG " + fmt::to_string(msg.payload) + "\n";
-
-      auto remaining_size = message.size();
-      auto message_ptr = message.c_str();
+      auto remaining_size = formatted.size();
+      const char* message_ptr = formatted.data();
       while (!is_stopped && remaining_size) {
          auto written = fwrite(message_ptr, sizeof(char), remaining_size, out);
 
@@ -52,12 +50,12 @@ namespace fc {
          }
 
          if(written != remaining_size) {
-            fprintf(stderr, "DMLOG FPRINTF_FAILED failed written=%lu remaining=%lu %d %s\n", written, remaining_size, ferror(out), strerror(errno));
+            fprintf(stderr, "DMLOG WRITE_FAILED written=%zu remaining=%zu %d %s\n", written, remaining_size, ferror(out), strerror(errno));
             clearerr(out);
          }
 
          if(is_stopped) {
-            fprintf(stderr, "DMLOG FPRINTF_FAILURE_TERMINATED\n");
+            fprintf(stderr, "DMLOG WRITE_FAILURE_TERMINATED\n");
             // Depending on the error, we might have already gotten a SIGPIPE
             // An extra signal is harmless, though.  Use a process targeted
             // signal (not raise) because the SIGTERM may be blocked in this
@@ -65,7 +63,7 @@ namespace fc {
             kill(getpid(), SIGTERM);
          }
 
-         message_ptr = &message_ptr[written];
+         message_ptr += written;
          remaining_size -= written;
       }
       // attempt a flush, ignore any error

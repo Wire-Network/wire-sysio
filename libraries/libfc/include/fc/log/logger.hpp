@@ -44,6 +44,12 @@ namespace fc
          logger     get_parent()const;
 
          std::unique_ptr<spdlog::logger>& get_agent_logger()const;
+         /// Installs the given spdlog::logger. Does NOT broadcast a formatter
+         /// to its sinks -- each sink must have been configured with its own
+         /// formatter beforehand (fc::configure_logging does this via
+         /// sink->set_formatter(fc::make_pattern_formatter()) by default).
+         /// Callers constructing sinks directly and bypassing
+         /// fc::configure_logging are responsible for attaching a formatter.
          void update_agent_logger(std::unique_ptr<spdlog::logger>&& al);
 
          void  set_name( const std::string& n );

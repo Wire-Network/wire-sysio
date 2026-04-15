@@ -2,8 +2,8 @@
 #include <fc/log/log_message.hpp>
 #include <fc/log/logger_config.hpp>
 #include <fc/log/dmlog_sink.hpp>
+#include <fc/log/pattern_formatter.hpp>
 #include <spdlog/sinks/sink.h>
-#include <spdlog/pattern_formatter.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
 #include <memory>
@@ -12,24 +12,7 @@
 
 namespace fc {
 
-   inline static logger the_default_logger;
-
-   constexpr const char* DEFAULT_PATTERN = "%^%-5l %Y-%m-%dT%T.%f %-9!k %20!s:%-5# %-20!! ] %v%$";
-
-   class thread_name_formatter_flag : public spdlog::custom_flag_formatter {
-      public:
-         void format(const spdlog::details::log_msg&, const std::tm&, spdlog::memory_buf_t& dest) override {
-            const std::string& some_txt = fc::get_thread_name();
-            // Use spdlog::details::scoped_padder to apply alignment
-            // The padinfo_ member holds the width and alignment settings from the pattern
-            spdlog::details::scoped_padder p(some_txt.size(), padinfo_, dest);
-            spdlog::details::fmt_helper::append_string_view(some_txt, dest);
-         }
-
-         std::unique_ptr<custom_flag_formatter> clone() const override {
-            return spdlog::details::make_unique<thread_name_formatter_flag>();
-         }
-   };
+   static logger the_default_logger;
 
    logger::impl::impl() :_parent(nullptr) {
       auto sink = std::make_shared<spdlog::sinks::stderr_color_sink_st>();
@@ -37,12 +20,8 @@ namespace fc {
       sink->set_color(spdlog::level::info, sink->reset);
       sink->set_color(spdlog::level::warn, sink->yellow);
       sink->set_color(spdlog::level::err, sink->red);
+      sink->set_formatter(fc::make_pattern_formatter());
       _agent_logger = std::make_unique<spdlog::logger>( "", sink );
-
-      auto formatter = std::make_unique<spdlog::pattern_formatter>(spdlog::pattern_time_type::utc);
-      formatter->add_flag<thread_name_formatter_flag>('k').set_pattern(DEFAULT_PATTERN);
-      _agent_logger->set_formatter(std::move(formatter));
-
       _agent_logger->set_level(spdlog::level::info);
    }
 
@@ -101,9 +80,6 @@ namespace fc {
 
     void logger::update_agent_logger(std::unique_ptr<spdlog::logger>&& al) {
        my->_agent_logger = std::move(al);
-       auto formatter = std::make_unique<spdlog::pattern_formatter>(spdlog::pattern_time_type::utc);
-       formatter->add_flag<thread_name_formatter_flag>('k').set_pattern(DEFAULT_PATTERN);
-       my->_agent_logger->set_formatter(std::move(formatter));
        set_log_level(my->_level);
     };
 

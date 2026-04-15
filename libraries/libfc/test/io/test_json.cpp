@@ -293,6 +293,8 @@ BOOST_AUTO_TEST_CASE(parse_escape_unicode_errors) {
    parse_throws(R"(\uD83D XY)");
    // high surrogate followed by non-low-surrogate
    parse_throws(R"(\uD83D\u0041)");
+   // high surrogate immediately followed by closing quote (end of string)
+   parse_throws(R"(\uD83D)");
 }
 
 BOOST_AUTO_TEST_CASE(parse_escape_lenient_fallback) {
