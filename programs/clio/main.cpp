@@ -2085,6 +2085,32 @@ int main( int argc, char** argv ) {
       std::cout << localized("Public key: ${key}", ("key", pubk.to_string({}, true) ) ) << std::endl;
    });
 
+   string name_input;
+   auto name_cmd = convert_cmd->add_subcommand("name", localized("Convert between sysio::name and uint64_t, printing both interpretations"));
+   name_cmd->add_option("input", name_input, localized("A sysio name or uint64_t value (decimal, or 0x-prefixed hex)"))->required();
+   name_cmd->callback([&name_input] {
+      bool any_success = false;
+      try {
+         name n{name_input};
+         std::cout << localized("As sysio::name : \"${name}\" -> uint64_t: ${value}",
+                                ("name", n.to_string())("value", n.to_uint64_t())) << std::endl;
+         any_success = true;
+      } catch (const std::exception&) {}
+      try {
+         size_t pos = 0;
+         uint64_t v = std::stoull(name_input, &pos, 0);
+         if (pos != name_input.size())
+            throw std::invalid_argument("trailing characters after number");
+         name n{v};
+         std::cout << localized("As uint64_t    : ${value} -> sysio::name: \"${name}\"",
+                                ("value", v)("name", n.to_string())) << std::endl;
+         any_success = true;
+      } catch (const std::exception&) {}
+      if (!any_success) {
+         std::cerr << "ERROR: Input is neither a valid sysio::name nor a uint64_t" << std::endl;
+      }
+   });
+
    // pack hex
    using try_types = std::tuple<signed_block, transaction_trace, action_trace, transaction_receipt,
                                 packed_transaction, signed_transaction, transaction, abi_def, action>;
