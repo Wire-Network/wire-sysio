@@ -148,7 +148,7 @@ int main(int argc, char* argv[]) {
 
          auto counter_contract =
          client->get_contract<ethereum_contract_test_counter_client>("0x5FbDB2315678afecb367f032d93F642f64180aa3",eth_abi_contracts);
-         auto counter_contract_num_res = counter_contract->get_number("pending");
+         auto counter_contract_num_res = counter_contract->get_number(block_tag_pending);
          auto counter_contract_num = fc::hex_to_number<fc::uint256>(counter_contract_num_res.as_string());
          ilog("Current counter value: {}", counter_contract_num.str());
 
@@ -157,7 +157,7 @@ int main(int argc, char* argv[]) {
          auto counter_contract_set_num_receipt = counter_contract->set_number(new_num);
          ilog("Counter set number receipt: {}", counter_contract_set_num_receipt.as_string());
 
-         counter_contract_num_res = counter_contract->get_number("pending");
+         counter_contract_num_res = counter_contract->get_number(block_tag_pending);
          counter_contract_num = fc::hex_to_number<fc::uint256>(counter_contract_num_res.as_string());
          ilog("New counter value: {}", counter_contract_num.str());
 

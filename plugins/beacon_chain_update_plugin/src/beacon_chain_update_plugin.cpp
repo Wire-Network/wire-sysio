@@ -418,6 +418,12 @@ void beacon_chain_update_plugin::plugin_initialize(const variables_map& options)
                }
             };
          };
+
+         std::unordered_map<std::string, std::string> hashes; // hash string => description
+         const auto track_hash = [&hashes](const std::string& method_desc, const std::string& tx_hash) {
+               ilog("{} tx sent, hash: {}", method_desc, tx_hash);
+               hashes.emplace(tx_hash, method_desc);
+         };
          try {
             ilog("update Queue");
             auto queues = get_queues_mainnet(my_.beacon_chain_queue_url, *(my_.beacon_chain_api_key));
@@ -434,19 +440,13 @@ void beacon_chain_update_plugin::plugin_initialize(const variables_map& options)
                      beacon_chain_detail::epa_field);
             auto exit_queue_delay_len_sec = nine_days_in_sec +
                (!!exit_queue_len_sec ? *exit_queue_len_sec : 0);
-            ilog("Sending setWithdrawDelay({} sec) transaction to {} contract using address {}",
-                 exit_queue_delay_len_sec, withdrawal_queue::contract_name,
+            auto method = "setWithdrawDelay";
+            ilog("Sending {}({} sec) transaction to {} contract using address {}",
+                 method, exit_queue_delay_len_sec, withdrawal_queue::contract_name,
                  fc::to_hex(eth_client->get_address(), true));
             if(!!wq_contract) {
                auto res1 = wq_contract->setWithdrawDelay(exit_queue_delay_len_sec);
-               const auto tx_hash1 = res1.as_string();
-               ilog("setWithdrawDelay tx sent, hash: {}", tx_hash1);
-               auto bn1 = cron_svc.retry(make_retry_opts(),
-                  [&]() { return eth_client->get_block_for_transaction(tx_hash1); });
-               if (bn1.has_value())
-                  ilog("tx in block number {}", *bn1);
-               else
-                  elog("failed to identify block for tx {}: {}", tx_hash1, bn1.error().what());
+               track_hash(method, res1.as_string());
             }
 
             if(!dm_contract)
@@ -467,22 +467,15 @@ void beacon_chain_update_plugin::plugin_initialize(const variables_map& options)
                ilog("Queue len = {}, sec_per_day={}, deposit_q_days_fl={}",
                     *deposit_queue_len_sec, seconds_per_day, deposit_q_days_fl);
 
-            ilog("Sending setEntryQueue({} days) transaction to {} contract using address {}",
-                 deposit_q_days_fl, deposit_manager::contract_name,
+            method = "setEntryQueue";
+            ilog("Sending {}({} days) transaction to {} contract using address {}",
+                 method, deposit_q_days_fl, deposit_manager::contract_name,
                  fc::to_hex(eth_client->get_address(), true));
 
             auto res2 = dm_contract->setEntryQueue(deposit_q_days_fl);
-            const auto tx_hash2 = res2.as_string();
-            ilog("setEntryQueue tx sent, hash: {}", tx_hash2);
-            auto bn2 = cron_svc.retry(make_retry_opts(),
-               [&]() { return eth_client->get_block_for_transaction(tx_hash2); });
+            track_hash(method, res2.as_string());
 
             auto ethstore = get_ethstore_latest(my_.beacon_chain_apy_url, *(my_.beacon_chain_api_key));
-            // make request for ethstore before waiting for block
-            if (bn2.has_value())
-               ilog("tx in block number {}", *bn2);
-            else
-               elog("failed to identify block for tx {}: {}", tx_hash2, bn2.error().what());
             ilog("ethstore: {}", fc::json::to_string(ethstore, fc::time_point::maximum()));
             constexpr auto avgapr7d_field = "avgapr7d";
             const auto apy = beacon_chain_detail::get_field_from_object(ethstore, avgapr7d_field);
@@ -495,18 +488,31 @@ void beacon_chain_update_plugin::plugin_initialize(const variables_map& options)
             if(apy->is_double())
                aprFraction = apy->as_double();
             auto scaled = beacon_chain_detail::apy_fraction_to_bps(aprFraction);
-            ilog("Sending updateApyBPS({} bps) transaction to {} contract using address {}",
-                 scaled, deposit_manager::contract_name,
+            method = "updateApyBPS";
+            ilog("Sending {}({} bps) transaction to {} contract using address {}",
+                 method, scaled, deposit_manager::contract_name,
                  fc::to_hex(eth_client->get_address(), true));
             auto res3 = dm_contract->updateApyBPS(scaled);
-            const auto tx_hash3 = res3.as_string();
-            ilog("updateApyBPS tx sent, hash: {}", tx_hash3);
-            auto bn3 = cron_svc.retry(make_retry_opts(),
-               [&]() { return eth_client->get_block_for_transaction(tx_hash3); });
-            if (bn3.has_value())
-               ilog("tx in block number {}", *bn3);
-            else
-               elog("failed to identify block for tx {}: {}", tx_hash3, bn3.error().what());
+            track_hash(method, res3.as_string());
+
+            const auto print = [](const std::string& desc, const std::string& hash, auto bn) {
+               ilog("tx for {} ({}) in block number {}", desc, hash, bn);
+            };
+            for(const auto& hash  : hashes) {
+               const auto bn = eth_client->get_block_for_transaction(hash.first);
+               if(bn) {
+                  print(hash.second, hash.first, *bn);
+                  continue;
+               }
+
+               const auto bn_timeout = cron_svc.blocking_retry(make_retry_opts(),
+                  [&]() { return eth_client->get_block_for_transaction(hash.first); });
+               if (bn_timeout.has_value())
+                  print(hash.second, hash.first, *bn_timeout);
+               else
+                  elog("failed to identify block for tx {}: {}", hash.first, bn_timeout.error().what());
+
+            }
          }
          catch (const std::exception& e) {
             elog("Error executing beacon chain update for interval: {}", e.what());

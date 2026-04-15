@@ -193,9 +193,9 @@ public:
    void cancel_all();
 
    /**
-    * Options controlling retry() behavior.
+    * Options controlling blocking_retry() behavior.
     *
-    * retry_schedule drives how often the retry callback is re-invoked after
+    * retry_schedule drives how often the blocking_retry callback is re-invoked after
     * the initial call fails. max_retries caps the total number of retry
     * attempts (not counting the initial call). on_exhaustion produces the
     * fc::exception surfaced when the retry budget is exhausted without a
@@ -217,10 +217,10 @@ public:
     * returned; on retry exhaustion `opts.on_exhaustion()` supplies the error.
     */
    template <typename Fn, typename... Args>
-   auto retry(const retry_options& opts, Fn fn, Args&&... args)
+   auto blocking_retry(const retry_options& opts, Fn fn, Args&&... args)
       -> std::expected<typename std::invoke_result_t<Fn, Args...>::value_type, fc::exception> {
       FC_ASSERT_FMT(_options.num_threads > 1,
-                    "cron_service::retry() logic requires configuring the cron_service with more than one thread");
+                    "cron_service::blocking_retry() logic requires configuring the cron_service with more than one thread");
       auto ret = fn(std::forward<Args>(args)...);
       if (ret.has_value())
          return std::move(*ret);
