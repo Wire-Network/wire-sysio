@@ -83,41 +83,44 @@ namespace sysio::chain {
    // DJB2 hash truncated to uint16_t. Must match CDT's compute_table_id
    // in sysiolib/contracts/sysio/kv_constants.hpp.
 
+   /// DJB2 initial hash seed (canonical value from Daniel J. Bernstein's hash function).
+   inline constexpr uint64_t djbh_seed = 5381;
+
    /// DJB2-hash a string.
    inline constexpr uint64_t kv_djbh_hash(std::string_view s) {
-      uint64_t hash = 5381;
+      uint64_t hash = djbh_seed;
       for (char c : s)
+         // hash * 33 (2^5 + 1), then add byte
          hash = ((hash << 5) + hash) + static_cast<uint8_t>(c);
       return hash;
    }
 
-   /// DJB2-hash the 8 big-endian bytes of a uint64_t.
+   /// DJB2-hash the 8 big-endian bytes of a uint64_t, optionally continuing from an existing hash.
    /// Gives good distribution regardless of input bit patterns (unlike raw % 65536
    /// which maps most name::raw values to 0 due to MSB-packed encoding).
-   inline constexpr uint64_t kv_djbh_hash_raw(uint64_t raw) {
-      uint64_t hash = 5381;
+   inline constexpr uint64_t kv_djbh_hash_raw(uint64_t raw, uint64_t hash = djbh_seed) {
       for (int i = 0; i < 8; ++i)
+         // hash * 33 (2^5 + 1), then add byte
          hash = ((hash << 5) + hash) + static_cast<uint8_t>(raw >> (56 - i * 8));
       return hash;
    }
 
    /// Compute table_id from a string name (for test/tooling convenience).
+   /// Narrowing cast to uint16_t truncates to the low 16 bits (well-defined for unsigned).
    inline constexpr uint16_t compute_table_id(std::string_view table_name) {
-      return static_cast<uint16_t>(kv_djbh_hash(table_name) % 65536);
+      return static_cast<uint16_t>(kv_djbh_hash(table_name));
    }
 
    /// Compute table_id from a raw uint64_t template parameter (name::raw or hash_id::raw).
    /// This is the canonical form used by CDT — matches CDT's compute_table_id(uint64_t).
    inline constexpr uint16_t compute_table_id(uint64_t raw) {
-      return static_cast<uint16_t>(kv_djbh_hash_raw(raw) % 65536);
+      return static_cast<uint16_t>(kv_djbh_hash_raw(raw));
    }
 
    /// Compute secondary index table_id from table + index raw uint64_t values.
+   /// Chains two 8-byte DJB2 passes: first the table bytes, then the index bytes.
    inline constexpr uint16_t compute_sec_table_id(uint64_t table_raw, uint64_t index_raw) {
-      uint64_t hash = kv_djbh_hash_raw(table_raw);
-      for (int i = 0; i < 8; ++i)
-         hash = ((hash << 5) + hash) + static_cast<uint8_t>(index_raw >> (56 - i * 8));
-      return static_cast<uint16_t>(hash % 65536);
+      return static_cast<uint16_t>(kv_djbh_hash_raw(index_raw, kv_djbh_hash_raw(table_raw)));
    }
 
    /// Compute secondary index table_id for multi_index (positional indices).
@@ -161,8 +164,8 @@ namespace sysio::chain {
 
    inline kv_scoped_key_t make_kv_scoped_key(uint64_t scope, uint64_t pk) {
       kv_scoped_key_t key;
-      kv_encode_be64(key.data,     scope);
-      kv_encode_be64(key.data + 8, pk);
+      kv_encode_be64(key.data,                         scope);
+      kv_encode_be64(key.data + kv_scope_prefix_size,  pk);
       return key;
    }
 
@@ -179,9 +182,9 @@ namespace sysio::chain {
 
    inline kv_key_t make_kv_key(uint64_t table, uint64_t scope, uint64_t pk) {
       kv_key_t key;
-      kv_encode_be64(key.data,      table);
-      kv_encode_be64(key.data + 8,  scope);
-      kv_encode_be64(key.data + 16, pk);
+      kv_encode_be64(key.data,                                               table);
+      kv_encode_be64(key.data + kv_table_prefix_size,                        scope);
+      kv_encode_be64(key.data + kv_table_prefix_size + kv_scope_prefix_size, pk);
       return key;
    }
 
