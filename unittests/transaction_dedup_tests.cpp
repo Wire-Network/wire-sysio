@@ -4,6 +4,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include <fc/crypto/sha256.hpp>
+#include <fc/filesystem.hpp>
 
 using namespace sysio::chain;
 
@@ -376,7 +377,10 @@ BOOST_AUTO_TEST_CASE(fork_switch_reapply) {
 // ---- File persistence ----
 
 BOOST_AUTO_TEST_CASE(file_round_trip) {
-   auto tmp = std::filesystem::temp_directory_path() / "test_dedup.bin";
+   // Unique per-invocation directory to avoid races when parallel ctest runs
+   // the three sys-vm variants of this test binary concurrently.
+   fc::temp_directory tmp_dir;
+   auto tmp = tmp_dir.path() / "test_dedup.bin";
 
    {
       transaction_dedup d;
