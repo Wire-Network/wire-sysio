@@ -1136,8 +1136,8 @@ BOOST_AUTO_TEST_CASE(test_trace_abi_roundtrip) {
       BOOST_CHECK_EQUAL(t["id"].as<transaction_id_type>(), cpp.id);
       BOOST_CHECK_EQUAL(t["status"].as_uint64(), 0u); // executed
       BOOST_CHECK_EQUAL(t["cpu_usage_us"].as_uint64(), (uint64_t)cpp.total_cpu_usage_us);
-      // net_usage_words is rounded up to the nearest multiple of 8 bytes
-      uint32_t expected_net_words = ((cpp.net_usage + 7) / 8) * 8;
+      // net_usage_words: number of 8-byte words, rounded up
+      uint32_t expected_net_words = (cpp.net_usage + 7) / 8;
       BOOST_CHECK_EQUAL(t["net_usage_words"].as_uint64(), expected_net_words);
       BOOST_CHECK_EQUAL(t["elapsed"].as_int64(), 0); // 0 in non-debug mode
       BOOST_CHECK_EQUAL(t["net_usage"].as_uint64(), cpp.net_usage);
