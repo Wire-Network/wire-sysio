@@ -1,6 +1,6 @@
 #include <fc/log/logger.hpp>
-#include <ranges>
 #include <fc/network/ethereum/ethereum_rlp_encoder.hpp>
+#include <ranges>
 
 namespace fc::network::ethereum::rlp {
 namespace {
@@ -11,7 +11,8 @@ struct rlp_visitor {
    bytes& out;
 
    rlp_visitor() = delete;
-   explicit rlp_visitor(bytes& out) : out(out) {}
+   explicit rlp_visitor(bytes& out)
+      : out(out) {}
 
    void operator()(auto&& arg) {
       using T = std::decay_t<decltype(arg)>;
@@ -24,7 +25,22 @@ struct rlp_visitor {
       }
    }
 };
+
+// RLP-encode a bytes32 as an unsigned integer with leading zero bytes stripped.
+// The Ethereum Yellow Paper / EIP-2718 require signature r and s to be encoded
+// as minimal big-endian integers; fixed 32-byte byte-string encoding is rejected
+// by strict decoders (e.g. alloy-rs in reth/anvil) with "leading zero" when the
+// most significant byte is 0x00.
+bytes encode_sig_scalar(const bytes32& b) {
+   std::size_t offset = 0;
+   while (offset < b.size() && b[offset] == 0)
+      ++offset;
+   // All-zero scalar encodes as the empty byte string (0x80), matching
+   // encode_uint(0). This is only a theoretical case for a valid signature.
+   return encode_bytes(b.data() + offset, b.size() - offset);
 }
+
+} // namespace
 void append(bytes& out, const std::vector<rlp_input_variant>& in_vars) {
    rlp_visitor visitor{out};
    for (auto& in_var : in_vars) {
@@ -40,7 +56,7 @@ void append_byte(bytes& out, std::uint8_t b) {
    out.push_back(b);
 }
 
-bytes encode_length(std::size_t len,std::size_t offset) {
+bytes encode_length(std::size_t len, std::size_t offset) {
    if (len < 56)
       return bytes{static_cast<std::uint8_t>(len + offset)};
 
@@ -76,7 +92,7 @@ bytes encode_bytes(const std::uint8_t* data, std::size_t len) {
 }
 
 bytes encode_bytes(const bytes& b) {
-   return encode_bytes(const_cast<std::uint8_t *>(b.data()), b.size());
+   return encode_bytes(const_cast<std::uint8_t*>(b.data()), b.size());
 }
 
 
@@ -98,10 +114,10 @@ bytes encode_list(const std::vector<rlp_input_variant>& items) {
    append(payload, items);
 
    const std::size_t len = payload.size();
-   bytes             out;
+   bytes out;
 
-   bytes len_enc = encode_length(len,192);
-   append(out, len_enc,payload);
+   bytes len_enc = encode_length(len, 192);
+   append(out, len_enc, payload);
 
 
    return out;
@@ -112,8 +128,7 @@ std::string to_hex(const bytes32& b, bool prefixed) {
    if (prefixed)
       oss << "0x";
    for (auto v : b) {
-      oss << std::hex << std::setw(2) << std::setfill('0')
-         << static_cast<int>(v);
+      oss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(v);
    }
    return oss.str();
 }
@@ -123,8 +138,7 @@ std::string to_hex(const bytes& b, bool prefixed) {
    if (prefixed)
       oss << "0x";
    for (auto v : b) {
-      oss << std::hex << std::setw(2) << std::setfill('0')
-         << static_cast<int>(v);
+      oss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(v);
    }
    return oss.str();
 }
@@ -174,39 +188,26 @@ bytes from_hex_any(const std::string& hex) {
 }
 
 bytes encode_access_list(const std::vector<access_list_entry>& access_list) {
-   auto access_list_items =
-      access_list | std::views::transform([](const auto& v) {
-         auto storage_key_bytes = encode_list(v.storage_keys |
-                                                   std::views::transform([](auto key) {
-                                                      return encode_bytes(key);
-                                                   }) | std::ranges::to<std::vector<rlp_input_variant>>());
-         return rlp_input_variant(encode_list({
-            v.addr,
-            storage_key_bytes
-         }));
-      }) |
-      std::ranges::to<std::vector>();
+   auto access_list_items = access_list | std::views::transform([](const auto& v) {
+                               auto storage_key_bytes = encode_list(
+                                  v.storage_keys | std::views::transform([](auto key) { return encode_bytes(key); }) |
+                                  std::ranges::to<std::vector<rlp_input_variant>>());
+                               return rlp_input_variant(encode_list({v.addr, storage_key_bytes}));
+                            }) |
+                            std::ranges::to<std::vector>();
 
    return encode_list(access_list_items);
 }
 
 bytes encode_eip1559_unsigned(const eip1559_tx& tx) {
-   bytes to_bytes   = encode_bytes(tx.to);
+   bytes to_bytes = encode_bytes(tx.to);
    bytes data_bytes = encode_bytes(tx.data);
 
    // std::vector<rlp_input_variant>
 
-   return encode_list({
-      encode_uint(tx.chain_id),
-      encode_uint(tx.nonce),
-      encode_uint(tx.max_priority_fee_per_gas),
-      encode_uint(tx.max_fee_per_gas),
-      encode_uint(tx.gas_limit),
-      to_bytes,
-      encode_uint(tx.value),
-      data_bytes,
-      encode_access_list(tx.access_list)
-   });
+   return encode_list({encode_uint(tx.chain_id), encode_uint(tx.nonce), encode_uint(tx.max_priority_fee_per_gas),
+                       encode_uint(tx.max_fee_per_gas), encode_uint(tx.gas_limit), to_bytes, encode_uint(tx.value),
+                       data_bytes, encode_access_list(tx.access_list)});
 }
 
 
@@ -221,31 +222,19 @@ bytes encode_eip1559_unsigned_typed(const eip1559_tx& tx) {
 }
 
 bytes encode_eip1559_signed(const eip1559_tx& tx) {
-   bytes to_bytes   = encode_bytes(tx.to);
+   bytes to_bytes = encode_bytes(tx.to);
    bytes data_bytes = encode_bytes(tx.data);
 
    auto v = encode_uint(tx.v);
-   auto r = encode_bytes(tx.r);
-   auto s = encode_bytes(tx.s);
+   auto r = encode_sig_scalar(tx.r);
+   auto s = encode_sig_scalar(tx.s);
 
-   return encode_list({
-      encode_uint(tx.chain_id),
-      encode_uint(tx.nonce),
-      encode_uint(tx.max_priority_fee_per_gas),
-      encode_uint(tx.max_fee_per_gas),
-      encode_uint(tx.gas_limit),
-      to_bytes,
-      encode_uint(tx.value),
-      data_bytes,
-      encode_access_list(tx.access_list),
-      v,
-       r,
-       s
-   });
+   return encode_list({encode_uint(tx.chain_id), encode_uint(tx.nonce), encode_uint(tx.max_priority_fee_per_gas),
+                       encode_uint(tx.max_fee_per_gas), encode_uint(tx.gas_limit), to_bytes, encode_uint(tx.value),
+                       data_bytes, encode_access_list(tx.access_list), v, r, s});
 }
 
-bytes encode_eip1559_signed_typed(
-   const eip1559_tx& tx) {
+bytes encode_eip1559_signed_typed(const eip1559_tx& tx) {
    bytes body = encode_eip1559_signed(tx);
    bytes out;
    out.reserve(1 + body.size());
@@ -254,4 +243,4 @@ bytes encode_eip1559_signed_typed(
    return out;
 }
 
-}
+} // namespace fc::network::ethereum::rlp

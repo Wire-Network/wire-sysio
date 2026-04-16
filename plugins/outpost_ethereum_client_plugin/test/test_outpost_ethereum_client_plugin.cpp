@@ -295,4 +295,85 @@ BOOST_AUTO_TEST_CASE(can_encode_tx_01) try {
 
 } FC_LOG_AND_RETHROW();
 
+// ---------------------------------------------------------------------------
+//  Regression: signed EIP-1559 RLP must strip leading zero bytes from r/s
+//
+//  Captured from a live dev cluster run where the batch operator's signed
+//  envelope transaction was rejected by anvil/reth with:
+//      -32602 Failed to decode transaction
+//      (alloy reported: "leading zero")
+//
+//  The captured raw tx had signature s = 0x00 9b bd d7 ... — its most
+//  significant byte was 0x00. The EIP-1559 RLP encoder emitted r/s as
+//  fixed-width 32-byte strings (0xa0 || 32 bytes), which is a non-minimal
+//  integer encoding per Ethereum Yellow Paper / EIP-2718 and is rejected by
+//  strict decoders.
+//
+//  This test reconstructs the exact failing tx (same chain_id, nonce, fees,
+//  to, data payload, access_list, v, r, s) and asserts the encoder produces
+//  the minimally-encoded canonical wire form anvil accepts.
+// ---------------------------------------------------------------------------
+BOOST_AUTO_TEST_CASE(eip1559_signed_rlp_strips_leading_zero_in_s) try {
+   // Exact envelope tx data from the cluster log — the 612-byte calldata
+   // emitted by the batch operator plugin calling epochIn(bytes).
+   const std::string failing_tx_data_hex =
+      "cfae31180000000000000000000000000000000000000000000000000000000000000020"
+      "000000000000000000000000000000000000000000000000000000000000020d120c0a04"
+      "080010001204080010002894df84cf06300b3800c202f1030a1e0a0c0a04080010001204"
+      "08001000220608001000180028003894df84cf0612ce0308011288030893dc0310fe021a"
+      "fe020a5e0a0b0a0962617463686f702e6112250802122102ba5734d8f7091719471e7f7e"
+      "d6b9df170dc70cc661ca05e688601ad984f068b0122408031220d1add206fd583eb3f410"
+      "272cfdab07822e6a90ca104457b89d1a86df858a3f2b180220030a5e0a0b0a0962617463"
+      "686f702e62122508021221039d9031e97dd78ff8c15aa86939de9b1e791066a0224e331b"
+      "c962a2099a7b1f0412240803122087c4b5c0029c4e1f3085f57aa814f7042f212de28f26"
+      "ca4932e7c948a1347f37180220030a5e0a0b0a0962617463686f702e6312250802122102"
+      "20b871f3ced029e14472ec4ebc3c0448164942b123aa6af91a3386c1c403e0eb12240803"
+      "1220e05be92e22b4f0dc862c98f909317b59e60d1ab17860bc9d8d25745976b97f0f1802"
+      "20030a5c0a090a0775777269742e6112250802122103bf6ee64a8d2fdc551ec8bb9ef862"
+      "ef6b4bcb1805cdc520c3aa5866c0575fd3b512240803122051639799f4dfc297a0b08405"
+      "6e6b69349cf0b6c6800a108afc74fc37d2e49fde18032000123f088fdc0310371a370802"
+      "100b1a0f0a0d0801120962617463686f702e611a0f0a0d0801120962617463686f702e63"
+      "1a0f0a0d0801120962617463686f702e6200000000000000000000000000000000000000";
+   auto failing_tx_data = fc::from_hex(failing_tx_data_hex);
+   BOOST_REQUIRE_EQUAL(failing_tx_data.size(), 612u);
+
+   eip1559_tx failing_tx{
+      .chain_id = 31337, // anvil default
+      .nonce = 3,
+      .max_priority_fee_per_gas = 1000000000,
+      .max_fee_per_gas = 1000000016,
+      .gas_limit = 0xac2e4,
+      .to = to_address("f953b3a269d80e3eb0f2947630da976b896a8c5b"),
+      .value = 0,
+      .data = failing_tx_data,
+      .access_list = {},
+      .v = 1, // y_parity
+   };
+   // Signature s starting with a 0x00 byte — the case that triggered the bug.
+   auto r_bytes = fc::from_hex("bfb585dea94d9c84f7d43779800f87c21eae3f5288a1234ce079c3d44bfe5d8f");
+   auto s_bytes = fc::from_hex("009bbdd7843fc8c472bb43782c0d06979a532783a02fe3aa5e6e1477530521f0");
+   BOOST_REQUIRE_EQUAL(r_bytes.size(), 32u);
+   BOOST_REQUIRE_EQUAL(s_bytes.size(), 32u);
+   BOOST_REQUIRE_EQUAL(static_cast<uint8_t>(s_bytes[0]), 0x00u);
+   std::copy_n(r_bytes.begin(), 32, failing_tx.r.begin());
+   std::copy_n(s_bytes.begin(), 32, failing_tx.s.begin());
+
+   auto encoded = rlp::encode_eip1559_signed_typed(failing_tx);
+   auto encoded_hex = rlp::to_hex(encoded, false);
+
+   // The canonical/minimal wire form: outer list length 0x2d2 (not 0x2d3 that
+   // the buggy fixed-width encoding produces); s encoded as 31-byte integer
+   // (prefix 0x9f), leading 0x00 byte stripped.
+   const std::string expected_fixed_hex =
+      "02f902d2827a6903843b9aca00843b9aca10830ac2e4"
+      "94f953b3a269d80e3eb0f2947630da976b896a8c5b"
+      "80"
+      "b90264" + failing_tx_data_hex +
+      "c001"
+      "a0bfb585dea94d9c84f7d43779800f87c21eae3f5288a1234ce079c3d44bfe5d8f"
+      "9f9bbdd7843fc8c472bb43782c0d06979a532783a02fe3aa5e6e1477530521f0";
+
+   BOOST_CHECK_EQUAL(encoded_hex, expected_fixed_hex);
+} FC_LOG_AND_RETHROW();
+
 BOOST_AUTO_TEST_SUITE_END()
