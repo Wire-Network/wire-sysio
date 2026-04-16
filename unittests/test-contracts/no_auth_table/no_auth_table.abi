@@ -154,8 +154,17 @@
             "name": "people",
             "type": "person",
             "index_type": "i64",
-            "key_names": ["table_name","scope","primary_key"],
-            "key_types": ["name","name","uint64"]
+            "key_names": ["scope","primary_key"],
+            "key_types": ["name","uint64"],
+            "table_id": 52952
+        },
+        {
+            "name": "person",
+            "type": "person",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": [],
+            "table_id": 23668
         }
     ],
     "ricardian_clauses": [],

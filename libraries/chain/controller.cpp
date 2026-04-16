@@ -82,9 +82,9 @@ namespace detail {
 
       static snapshot_kv_object to_snapshot_row(const kv_object& obj, const chainbase::database&) {
          snapshot_kv_object row;
-         row.code       = obj.code;
-         row.payer      = obj.payer;
-         row.key_format = obj.key_format;
+         row.code     = obj.code;
+         row.payer    = obj.payer;
+         row.table_id = obj.table_id;
          SYS_ASSERT(obj.key.size() > 0, snapshot_exception, "kv_object has empty key during snapshot write");
          row.key.assign(obj.key.data(), obj.key.data() + obj.key.size());
          if (obj.value.size() > 0)
@@ -93,18 +93,14 @@ namespace detail {
       }
 
       static void from_snapshot_row(snapshot_kv_object&& row, kv_object& obj, chainbase::database&) {
-         static_assert(config::KV_FORMAT_COUNT == 2,
-                       "Update kv_object snapshot key_format validation when adding new formats");
-         SYS_ASSERT(row.key_format < config::KV_FORMAT_COUNT,
-                    snapshot_validation_exception, "kv_object has invalid key_format ({})", row.key_format);
          SYS_ASSERT(!row.key.empty(), snapshot_validation_exception, "kv_object has empty key");
          SYS_ASSERT(row.key.size() <= config::max_kv_key_size_limit, snapshot_validation_exception,
                     "kv_object key size ({}) exceeds absolute limit ({})", row.key.size(), config::max_kv_key_size_limit);
          SYS_ASSERT(row.value.size() <= config::max_kv_value_size_limit, snapshot_validation_exception,
                     "kv_object value size ({}) exceeds absolute limit ({})", row.value.size(), config::max_kv_value_size_limit);
-         obj.code       = row.code;
-         obj.payer      = row.payer;
-         obj.key_format = row.key_format;
+         obj.code     = row.code;
+         obj.payer    = row.payer;
+         obj.table_id = row.table_id;
          obj.key.assign(row.key.data(), row.key.size());
          obj.value.assign(row.value.data(), row.value.size());
       }
@@ -122,8 +118,7 @@ namespace detail {
          snapshot_kv_index_object row;
          row.code     = obj.code;
          row.payer    = obj.payer;
-         row.table    = obj.table;
-         row.index_id = obj.index_id;
+         row.table_id = obj.table_id;
          SYS_ASSERT(obj.sec_key.size() > 0, snapshot_exception, "kv_index_object has empty secondary key during snapshot write");
          SYS_ASSERT(obj.pri_key.size() > 0, snapshot_exception, "kv_index_object has empty primary key during snapshot write");
          row.sec_key.assign(obj.sec_key.data(), obj.sec_key.data() + obj.sec_key.size());
@@ -140,8 +135,7 @@ namespace detail {
                     "kv_index_object primary key size ({}) exceeds absolute limit ({})", row.pri_key.size(), config::max_kv_key_size_limit);
          obj.code     = row.code;
          obj.payer    = row.payer;
-         obj.table    = row.table;
-         obj.index_id = row.index_id;
+         obj.table_id = row.table_id;
          obj.sec_key.assign(row.sec_key.data(), row.sec_key.size());
          obj.pri_key.assign(row.pri_key.data(), row.pri_key.size());
       }

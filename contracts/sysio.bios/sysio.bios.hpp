@@ -3,7 +3,7 @@
 #include <sysio/action.hpp>
 #include <sysio/crypto.hpp>
 #include <sysio/sysio.hpp>
-#include <sysio/kv_table.hpp>
+#include <sysio/multi_index.hpp>
 #include <sysio/fixed_bytes.hpp>
 #include <sysio/privileged.hpp>
 #include <sysio/producer_schedule.hpp>
@@ -384,7 +384,7 @@ namespace sysiobios {
          /**
           * Multi index table that stores the contracts' abi index by their owners/accounts.
           */
-         typedef sysio::kv::table< "abihash"_n, abi_hash > abi_hash_table;
+         typedef sysio::multi_index< "abihash"_n, abi_hash > abi_hash_table;
 
          using newaccount_action = action_wrapper<"newaccount"_n, &bios::newaccount>;
          using updateauth_action = action_wrapper<"updateauth"_n, &bios::updateauth>;

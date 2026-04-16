@@ -102,7 +102,7 @@ BOOST_FIXTURE_TEST_CASE( get_scope_test, validating_tester ) try {
    BOOST_REQUIRE_EQUAL("", result.more);
    if (result.rows.size() >= 5u) {
       BOOST_REQUIRE_EQUAL(name("sysio.token"_n), result.rows[0].code);
-      BOOST_REQUIRE_EQUAL(name("accounts"_n), result.rows[0].table);
+      BOOST_REQUIRE_EQUAL(string("accounts"), result.rows[0].table);
       // Scope order within the "accounts" table
       BOOST_REQUIRE_EQUAL(name("inita"_n), result.rows[0].scope);
       BOOST_REQUIRE_EQUAL(name("initb"_n), result.rows[1].scope);
@@ -137,15 +137,39 @@ BOOST_FIXTURE_TEST_CASE( get_scope_test, validating_tester ) try {
    BOOST_REQUIRE_EQUAL(name("initc"_n), result.rows[0].scope);
    BOOST_REQUIRE_EQUAL("", result.more);
 
-   // No table filter — returns all tables for this code
+   // No table filter — returns all tables for this code with resolved names
    param.table = name(0);
    param.lower_bound = "";
    param.upper_bound = "";
    param.limit = 100;
    result = plugin.read_only::get_table_by_scope(param, fc::time_point::maximum());
    // sysio.token has "accounts" table and "stat" table
-   // Should have entries for both, ordered by (table, scope)
+   // Should have entries for both, ordered by (table_id, scope)
    BOOST_REQUIRE(result.rows.size() >= 5u);
+   // Verify that table names are resolved from ABI — now that the response
+   // uses string, all table names (including "currency_stats") should resolve.
+   for (const auto& row : result.rows) {
+      BOOST_REQUIRE(!row.table.empty());
+      BOOST_REQUIRE(row.table == "accounts" || row.table == "stat" ||
+                    row.table == "account" || row.table == "currency_stats");
+   }
+
+   // Unfiltered pagination — verify "more" token has colon format and
+   // following the token returns remaining rows
+   param.limit = 1;
+   result = plugin.read_only::get_table_by_scope(param, fc::time_point::maximum());
+   BOOST_REQUIRE_EQUAL(1u, result.rows.size());
+   BOOST_REQUIRE(!result.more.empty());
+   auto colon_pos = result.more.find(':');
+   BOOST_REQUIRE(colon_pos != std::string::npos);
+   // Follow the pagination token — should get remaining rows
+   auto total_first = result.rows.size();
+   param.lower_bound = result.more;
+   param.limit = 100;
+   result = plugin.read_only::get_table_by_scope(param, fc::time_point::maximum());
+   BOOST_REQUIRE(result.rows.size() >= 1u);
+   // Total across pages should cover at least the 5 "accounts" scopes
+   BOOST_REQUIRE(total_first + result.rows.size() >= 5u);
 
    // Invalid table filter returns empty
    param.table = "invalid"_n;
@@ -703,7 +727,7 @@ BOOST_FIXTURE_TEST_CASE( get_kv_rows_basic_test, validating_tester ) try {
       chain_apis::read_only::get_kv_rows_params p;
       p.json = true;
       p.code = "kvtest"_n;
-      p.table = "geodata"_n;
+      p.table = "geodata";
       p.limit = 100;
 
       auto result = get_kv_rows_full(plugin, p, fc::time_point::maximum());
@@ -735,7 +759,7 @@ BOOST_FIXTURE_TEST_CASE( get_kv_rows_basic_test, validating_tester ) try {
       chain_apis::read_only::get_kv_rows_params p;
       p.json = true;
       p.code = "kvtest"_n;
-      p.table = "geodata"_n;
+      p.table = "geodata";
       p.limit = 2;
 
       // Page 1: first 2 rows
@@ -773,7 +797,7 @@ BOOST_FIXTURE_TEST_CASE( get_kv_rows_basic_test, validating_tester ) try {
       chain_apis::read_only::get_kv_rows_params p;
       p.json = true;
       p.code = "kvtest"_n;
-      p.table = "geodata"_n;
+      p.table = "geodata";
       p.limit = 100;
       // lower_bound is inclusive, upper_bound is exclusive.
       // Set lower = europe/0 (before any europe entry), upper = europe+1 char.
@@ -797,7 +821,7 @@ BOOST_FIXTURE_TEST_CASE( get_kv_rows_basic_test, validating_tester ) try {
       chain_apis::read_only::get_kv_rows_params p;
       p.json = true;
       p.code = "kvtest"_n;
-      p.table = "geodata"_n;
+      p.table = "geodata";
       p.limit = 100;
       p.reverse = true;
 
@@ -823,7 +847,7 @@ BOOST_FIXTURE_TEST_CASE( get_kv_rows_basic_test, validating_tester ) try {
       chain_apis::read_only::get_kv_rows_params p;
       p.json = false;
       p.code = "kvtest"_n;
-      p.table = "geodata"_n;
+      p.table = "geodata";
       p.limit = 100;
 
       auto result = get_kv_rows_full(plugin, p, fc::time_point::maximum());
@@ -858,7 +882,7 @@ BOOST_FIXTURE_TEST_CASE( get_kv_rows_basic_test, validating_tester ) try {
       chain_apis::read_only::get_kv_rows_params p;
       p.json = true;
       p.code = "emptyacc"_n;
-      p.table = "geodata"_n;
+      p.table = "geodata";
       p.limit = 100;
 
       auto result = get_kv_rows_full(plugin, p, fc::time_point::maximum());
@@ -888,7 +912,7 @@ BOOST_FIXTURE_TEST_CASE( get_kv_rows_basic_test, validating_tester ) try {
       chain_apis::read_only::get_kv_rows_params p;
       p.json = true;
       p.code = "kvorder"_n;
-      p.table = "geodata"_n;
+      p.table = "geodata";
       p.limit = 100;
 
       auto result = get_kv_rows_full(plugin, p, fc::time_point::maximum());
@@ -937,7 +961,7 @@ BOOST_FIXTURE_TEST_CASE( get_kv_rows_reverse_pagination_test, validating_tester 
    chain_apis::read_only::get_kv_rows_params p;
    p.json = true;
    p.code = "kvrev"_n;
-   p.table = "geodata"_n;
+   p.table = "geodata";
    p.limit = 2;
    p.reverse = true;
 
@@ -957,6 +981,180 @@ BOOST_FIXTURE_TEST_CASE( get_kv_rows_reverse_pagination_test, validating_tester 
    BOOST_REQUIRE_EQUAL(false, page2.more); // only b, a remain
    BOOST_REQUIRE_EQUAL("b", page2.rows[0]["key"].get_object()["region"].as_string());
    BOOST_REQUIRE_EQUAL("a", page2.rows[1]["key"].get_object()["region"].as_string());
+
+} FC_LOG_AND_RETHROW()
+
+// Test get_kv_rows with index_name parameter — full secondary index query
+BOOST_FIXTURE_TEST_CASE( get_kv_rows_index_name_test, validating_tester ) try {
+   produce_block();
+   create_accounts({"sectest"_n});
+   produce_block();
+   set_code("sectest"_n, test_contracts::test_kv_sec_query_wasm());
+   set_abi("sectest"_n, test_contracts::test_kv_sec_query_abi());
+   produce_block();
+
+   // Add users: id=1 owner=alice bal=100, id=2 owner=bob bal=200, id=3 owner=alice bal=300
+   push_action("sectest"_n, "adduser"_n, "sectest"_n, mutable_variant_object()("id", 1)("owner", "alice")("balance", 100));
+   push_action("sectest"_n, "adduser"_n, "sectest"_n, mutable_variant_object()("id", 2)("owner", "bob")("balance", 200));
+   push_action("sectest"_n, "adduser"_n, "sectest"_n, mutable_variant_object()("id", 3)("owner", "alice")("balance", 300));
+   produce_block();
+
+   std::optional<sysio::chain_apis::tracked_votes> _tracked_votes;
+   chain_apis::read_only plugin(*(this->control), {}, {}, _tracked_votes,
+                                fc::microseconds::maximum(), fc::microseconds::maximum(), {});
+
+   // (a) Primary query — all 3 rows
+   {
+      chain_apis::read_only::get_kv_rows_params p;
+      p.json = false;
+      p.code = "sectest"_n;
+      p.table = "users";
+      auto result = get_kv_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_CHECK_EQUAL(result.rows.size(), 3u);
+   }
+
+   // (b) Secondary index query by owner — should return rows for matching owner
+   {
+      chain_apis::read_only::get_kv_rows_params p;
+      p.json = false;
+      p.code = "sectest"_n;
+      p.table = "users";
+      p.index_name = "byowner";
+      auto result = get_kv_rows_full(plugin, p, fc::time_point::maximum());
+      // All 3 rows should be returned (alice, alice, bob — sorted by sec key)
+      BOOST_CHECK_EQUAL(result.rows.size(), 3u);
+   }
+
+   // (c) Non-existent index name — should throw
+   {
+      chain_apis::read_only::get_kv_rows_params p;
+      p.json = false;
+      p.code = "sectest"_n;
+      p.table = "users";
+      p.index_name = "nonexistent";
+      BOOST_CHECK_THROW(
+         get_kv_rows_full(plugin, p, fc::time_point::maximum()),
+         chain::contract_table_query_exception
+      );
+   }
+
+   // (d) Secondary query with bounds — filter to specific owner (hex mode)
+   {
+      chain_apis::read_only::get_kv_rows_params p;
+      p.json = false;
+      p.code = "sectest"_n;
+      p.table = "users";
+      p.index_name = "byowner";
+      char alice_be[8]; chain::kv_encode_be64(alice_be, name("alice").to_uint64_t());
+      p.lower_bound = fc::to_hex(alice_be, 8);
+      uint64_t alice_plus_one = name("alice").to_uint64_t() + 1;
+      char alice_ub[8]; chain::kv_encode_be64(alice_ub, alice_plus_one);
+      p.upper_bound = fc::to_hex(alice_ub, 8);
+      auto result = get_kv_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_CHECK_EQUAL(result.rows.size(), 2u);
+   }
+
+   // (e) json=true primary query — verify ABI-decoded output
+   {
+      chain_apis::read_only::get_kv_rows_params p;
+      p.json = true;
+      p.code = "sectest"_n;
+      p.table = "users";
+      auto result = get_kv_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(result.rows.size(), 3u);
+      // Rows should have "key" and "value" fields
+      // value should be ABI-decoded with owner and balance fields
+      auto& v0 = result.rows[0].get_object();
+      BOOST_CHECK(v0.contains("value"));
+      auto& val = v0["value"].get_object();
+      BOOST_CHECK(val.contains("owner"));
+      BOOST_CHECK(val.contains("balance"));
+   }
+
+   // (f) json=true secondary query — verify results
+   {
+      chain_apis::read_only::get_kv_rows_params p;
+      p.json = true;
+      p.code = "sectest"_n;
+      p.table = "users";
+      p.index_name = "byowner";
+      auto result = get_kv_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(result.rows.size(), 3u);
+      // Verify ABI-decoded values are present
+      for (auto& row : result.rows) {
+         auto& obj = row.get_object();
+         BOOST_CHECK(obj.contains("value"));
+         if (obj["value"].is_object()) {
+            auto& val = obj["value"].get_object();
+            BOOST_CHECK(val.contains("owner"));
+            BOOST_CHECK(val.contains("balance"));
+         }
+      }
+   }
+
+   // (g) json=true secondary query with JSON bounds — filter to bob
+   {
+      chain_apis::read_only::get_kv_rows_params p;
+      p.json = true;
+      p.code = "sectest"_n;
+      p.table = "users";
+      p.index_name = "byowner";
+      // JSON bounds: key object with the index field name and value
+      p.lower_bound = R"({"byowner": "bob"})";
+      p.upper_bound = R"({"byowner": "boc"})";
+      auto result = get_kv_rows_full(plugin, p, fc::time_point::maximum());
+      // Bob has exactly 1 row (id=2, balance=200)
+      BOOST_REQUIRE_EQUAL(result.rows.size(), 1u);
+      auto& val = result.rows[0].get_object()["value"];
+      if (val.is_object()) {
+         BOOST_CHECK_EQUAL(val.get_object()["owner"].as_string(), "bob");
+         BOOST_CHECK_EQUAL(val.get_object()["balance"].as_uint64(), 200u);
+      }
+   }
+
+   // (h) json=true secondary query with JSON bounds — filter to alice (2 results)
+   {
+      chain_apis::read_only::get_kv_rows_params p;
+      p.json = true;
+      p.code = "sectest"_n;
+      p.table = "users";
+      p.index_name = "byowner";
+      p.lower_bound = R"({"byowner": "alice"})";
+      p.upper_bound = R"({"byowner": "alicf"})";
+      auto result = get_kv_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(result.rows.size(), 2u);
+   }
+
+   // (i) reverse=true secondary query — all rows in reverse order
+   {
+      chain_apis::read_only::get_kv_rows_params p;
+      p.json = true;
+      p.code = "sectest"_n;
+      p.table = "users";
+      p.index_name = "byowner";
+      p.reverse = true;
+      auto result = get_kv_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(result.rows.size(), 3u);
+      // Reverse order: bob first (higher name value), then alice entries
+      auto& first_val = result.rows[0].get_object()["value"];
+      if (first_val.is_object()) {
+         BOOST_CHECK_EQUAL(first_val.get_object()["owner"].as_string(), "bob");
+      }
+   }
+
+   // (j) reverse=true secondary with bounds — alice only, reversed
+   {
+      chain_apis::read_only::get_kv_rows_params p;
+      p.json = true;
+      p.code = "sectest"_n;
+      p.table = "users";
+      p.index_name = "byowner";
+      p.reverse = true;
+      p.lower_bound = R"({"byowner": "alice"})";
+      p.upper_bound = R"({"byowner": "alicf"})";
+      auto result = get_kv_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(result.rows.size(), 2u);
+   }
 
 } FC_LOG_AND_RETHROW()
 

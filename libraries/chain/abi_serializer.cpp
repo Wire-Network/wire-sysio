@@ -853,8 +853,8 @@ namespace sysio::chain {
       if( itr != actions.end() ) return itr->second;
       return type_name();
    }
-   type_name abi_serializer::get_table_type(name action)const {
-      auto itr = tables.find(action);
+   type_name abi_serializer::get_table_type(const string_view& table)const {
+      auto itr = tables.find(table);
       if( itr != tables.end() ) return itr->second;
       return type_name();
    }
