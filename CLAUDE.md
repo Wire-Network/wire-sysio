@@ -2,6 +2,18 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Code Quality Standards
+
+This is blockchain infrastructure code. **Prefer the best solution over the simplest one.** Correctness, robustness, and consensus safety always take priority over brevity or speed of implementation.
+
+- **Consensus determinism**: All code that executes on-chain must produce identical results across all nodes. No floating point, no uninitialized memory reads, no undefined behavior, no platform-dependent behavior.
+- **Thoroughness over shortcuts**: Take the time to understand the full problem. Read all relevant code before proposing changes. Do not suggest partial or "quick fix" solutions when a complete, well-designed solution is achievable.
+- **Complete test coverage**: Every change should include tests that cover normal paths, edge cases, and error conditions. Tests should verify behavior, not just that code compiles.
+- **Robustness**: Handle error conditions properly. Validate inputs at system boundaries. Prefer compile-time checks over runtime checks where possible.
+- **Clean code**: Use clear naming, consistent patterns, and appropriate abstractions. Code should be easy to audit and review.
+
+Do not optimize for token economy or response brevity at the expense of code quality. A longer, more thorough response that produces correct, well-tested code is always preferred.
+
 ## Project Overview
 
 Wire Sysio is a C++ implementation of the AntelopeIO protocol (a fork of Spring), containing blockchain node software and supporting tools. The main executable is `nodeop` (blockchain node), with supporting tools `clio` (CLI client), `kiod` (key store daemon), and `sys-util`.

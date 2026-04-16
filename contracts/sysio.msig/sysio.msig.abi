@@ -333,29 +333,57 @@
             "name": "approvals",
             "type": "old_approvals_info",
             "index_type": "i64",
-            "key_names": ["table_name","scope","primary_key"],
-            "key_types": ["name","name","uint64"]
+            "key_names": ["scope","primary_key"],
+            "key_types": ["name","uint64"],
+            "table_id": 16476
         },
         {
             "name": "approvals2",
             "type": "approvals_info",
             "index_type": "i64",
-            "key_names": ["table_name","scope","primary_key"],
-            "key_types": ["name","name","uint64"]
+            "key_names": ["scope","primary_key"],
+            "key_types": ["name","uint64"],
+            "table_id": 20700
+        },
+        {
+            "name": "approvals_info",
+            "type": "approvals_info",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": [],
+            "table_id": 32451
+        },
+        {
+            "name": "invalidation",
+            "type": "invalidation",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": [],
+            "table_id": 41978
         },
         {
             "name": "invals",
             "type": "invalidation",
             "index_type": "i64",
-            "key_names": ["table_name","scope","primary_key"],
-            "key_types": ["name","name","uint64"]
+            "key_names": ["scope","primary_key"],
+            "key_types": ["name","uint64"],
+            "table_id": 5047
+        },
+        {
+            "name": "old_approvals_info",
+            "type": "old_approvals_info",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": [],
+            "table_id": 4688
         },
         {
             "name": "proposal",
             "type": "proposal",
             "index_type": "i64",
-            "key_names": ["table_name","scope","primary_key"],
-            "key_types": ["name","name","uint64"]
+            "key_names": ["scope","primary_key"],
+            "key_types": ["name","uint64"],
+            "table_id": 34278
         }
     ],
     "ricardian_clauses": [],

@@ -429,7 +429,8 @@ public:
    struct get_kv_rows_params {
       bool                 json = true;              ///< true = ABI-decode keys and values, false = return raw hex
       name                 code;                     ///< contract account
-      name                 table;                    ///< table name from ABI (e.g. "geodata")
+      string               table;                    ///< table name from ABI (e.g. "geodata")
+      string               index_name;               ///< secondary index name (e.g. "byowner"); empty = primary key query
       string               lower_bound;              ///< lower bound key: JSON object when json=true, hex when json=false (inclusive)
       string               upper_bound;              ///< upper bound key: JSON object when json=true, hex when json=false (exclusive), empty = no upper bound
       uint32_t             limit = 10;               ///< max rows to return
@@ -459,7 +460,7 @@ public:
    struct get_table_by_scope_result_row {
       name        code;
       name        scope;
-      name        table;
+      string      table;
    };
    struct get_table_by_scope_result {
       vector<get_table_by_scope_result_row> rows;
@@ -556,15 +557,19 @@ public:
    {
       const auto& d = db.db();
 
-      // KV storage: iterate [table:8B BE][scope:8B BE] prefix
-      auto prefix = chain::make_kv_prefix(table, scope);
+      // KV storage: iterate [scope:8B BE] prefix within table_id partition
+      const auto table_id = chain::compute_table_id(table.to_uint64_t());
+      char scope_prefix[chain::kv_scope_prefix_size];
+      chain::kv_encode_be64(scope_prefix, scope.to_uint64_t());
+      std::string_view scope_sv(scope_prefix, chain::kv_scope_prefix_size);
 
       const auto& kv_idx = d.get_index<chain::kv_index, chain::by_code_key>();
-      auto itr = kv_idx.lower_bound(boost::make_tuple(code, chain::config::kv_format_standard, prefix.to_string_view()));
+      auto itr = kv_idx.lower_bound(boost::make_tuple(code, table_id, scope_sv));
 
-      while (itr != kv_idx.end() && itr->code == code) {
+      while (itr != kv_idx.end() && itr->code == code && itr->table_id == table_id) {
          auto kv = itr->key_view();
-         if (!prefix.matches(kv) || kv.size() != chain::kv_key_size) break;
+         if (kv.size() != chain::kv_scoped_key_size ||
+             memcmp(kv.data(), scope_prefix, chain::kv_scope_prefix_size) != 0) break;
 
          // Create a temporary key_value_object-like view for the callback
          struct kv_row_view {
@@ -574,7 +579,7 @@ public:
          };
 
          kv_row_view row;
-         row.primary_key = chain::kv_decode_be64(kv.data() + 16);
+         row.primary_key = chain::kv_decode_be64(kv.data() + chain::kv_scope_prefix_size);
          row.payer = itr->payer;
          row.value._data = itr->value.data();
          row.value._size = itr->value.size();
@@ -600,7 +605,7 @@ public:
       fc::time_point params_deadline = p.time_limit_ms ? std::min(fc::time_point::now().safe_add(fc::milliseconds(*p.time_limit_ms)), deadline) : deadline;
 
       struct http_params_t {
-         name table;
+         string table;
          bool shorten_abi_errors;
          bool json;
          bool show_payer;
@@ -609,19 +614,22 @@ public:
          vector<std::pair<vector<char>, name>> rows;
       };
 
-      http_params_t http_params { p.table, shorten_abi_errors, p.json, p.show_payer && *p.show_payer, false  };
+      http_params_t http_params { p.table.to_string(), shorten_abi_errors, p.json, p.show_payer && *p.show_payer, false  };
 
       const auto& d = db.db();
 
       uint64_t scope = convert_to_type<uint64_t>(p.scope, "scope");
 
       // KV storage: contracts using wire::kv::table / kv_multi_index store
-      // rows in kv_object with 24-byte keys: [table:8B BE][scope:8B BE][pk:8B BE]
+      // rows in kv_object with 16-byte keys: [scope:8B BE][pk:8B BE]
+      // table_id (DJB2 hash) provides table-level isolation in the index.
 
-      // Build the 16-byte prefix: [table:8B BE][scope:8B BE]
-      auto prefix = chain::make_kv_prefix(p.table.to_uint64_t(), scope);
+      const auto table_id = chain::compute_table_id(p.table.to_uint64_t());
+      char scope_prefix[chain::kv_scope_prefix_size];
+      chain::kv_encode_be64(scope_prefix, scope);
+      std::string_view scope_sv(scope_prefix, chain::kv_scope_prefix_size);
 
-      // Build 24-byte lower bound key
+      // Build 16-byte lower/upper bound keys
       uint64_t lower_pk = std::numeric_limits<uint64_t>::lowest();
       uint64_t upper_pk = std::numeric_limits<uint64_t>::max();
 
@@ -645,8 +653,8 @@ public:
             return read_only::get_table_rows_result();
          };
 
-      auto lower_key = chain::make_kv_key(p.table.to_uint64_t(), scope, lower_pk);
-      auto upper_key = chain::make_kv_key(p.table.to_uint64_t(), scope, upper_pk);
+      auto lower_key = chain::make_kv_scoped_key(scope, lower_pk);
+      auto upper_key = chain::make_kv_scoped_key(scope, upper_pk);
 
       auto lower_sv = lower_key.to_string_view();
       auto upper_sv = upper_key.to_string_view();
@@ -660,14 +668,14 @@ public:
             limit = max_return_items;
          for( unsigned int count = 0; count < limit && itr != end_itr; ++count, ++itr ) {
             const auto& kv_row = *itr;
-            // Verify this row still belongs to our code and has the right prefix
-            if( kv_row.code != p.code ) break;
+            // Verify this row still belongs to our code and table_id
+            if( kv_row.code != p.code || kv_row.table_id != table_id ) break;
             auto kv = kv_row.key_view();
-            if( kv.size() < chain::kv_key_size ) continue;
-            // Check table+scope prefix matches
-            if( !prefix.matches(kv) ) break;
+            if( kv.size() < chain::kv_scoped_key_size ) continue;
+            // Check scope prefix matches
+            if( memcmp(kv.data(), scope_prefix, chain::kv_scope_prefix_size) != 0 ) break;
             // Check primary key bounds
-            uint64_t row_pk = chain::kv_decode_be64(kv.data() + 16);
+            uint64_t row_pk = chain::kv_decode_be64(kv.data() + chain::kv_scope_prefix_size);
             if( !reverse ) {
                if( row_pk > upper_pk ) break;
             } else {
@@ -680,10 +688,11 @@ public:
             if (fc::time_point::now() >= params_deadline)
                break;
          }
-         if( itr != end_itr && itr->code == p.code ) {
+         if( itr != end_itr && itr->code == p.code && itr->table_id == table_id ) {
             auto kv = itr->key_view();
-            if( prefix.matches(kv) && kv.size() >= chain::kv_key_size ) {
-               uint64_t next_pk = chain::kv_decode_be64(kv.data() + 16);
+            if( memcmp(kv.data(), scope_prefix, chain::kv_scope_prefix_size) == 0 &&
+                kv.size() >= chain::kv_scoped_key_size ) {
+               uint64_t next_pk = chain::kv_decode_be64(kv.data() + chain::kv_scope_prefix_size);
                if( (!reverse && next_pk <= upper_pk) || (reverse && next_pk >= lower_pk) ) {
                   http_params.more = true;
                   http_params.next_key = convert_to_string(next_pk, p.key_type, p.encode_type, "next_key - next lower bound");
@@ -692,8 +701,8 @@ public:
          }
       };
 
-      auto kv_lower = kv_idx.lower_bound( boost::make_tuple(p.code, chain::config::kv_format_standard, lower_sv) );
-      auto kv_upper = kv_idx.upper_bound( boost::make_tuple(p.code, chain::config::kv_format_standard, upper_sv) );
+      auto kv_lower = kv_idx.lower_bound( boost::make_tuple(p.code, table_id, lower_sv) );
+      auto kv_upper = kv_idx.upper_bound( boost::make_tuple(p.code, table_id, upper_sv) );
       if( p.reverse && *p.reverse ) {
          walk_kv_row_range( boost::make_reverse_iterator(kv_upper), boost::make_reverse_iterator(kv_lower), true );
       } else {
@@ -876,7 +885,7 @@ FC_REFLECT( sysio::chain_apis::read_write::send_transaction2_params, (return_fai
 
 FC_REFLECT( sysio::chain_apis::read_only::get_table_rows_params, (json)(code)(scope)(table)(table_key)(lower_bound)(upper_bound)(limit)(key_type)(index_position)(encode_type)(reverse)(show_payer)(time_limit_ms) )
 FC_REFLECT( sysio::chain_apis::read_only::get_table_rows_result, (rows)(more)(next_key) );
-FC_REFLECT( sysio::chain_apis::read_only::get_kv_rows_params, (json)(code)(table)(lower_bound)(upper_bound)(limit)(reverse)(time_limit_ms) )
+FC_REFLECT( sysio::chain_apis::read_only::get_kv_rows_params, (json)(code)(table)(index_name)(lower_bound)(upper_bound)(limit)(reverse)(time_limit_ms) )
 FC_REFLECT( sysio::chain_apis::read_only::get_kv_rows_result, (rows)(more)(next_key) );
 
 FC_REFLECT( sysio::chain_apis::read_only::get_table_by_scope_params, (code)(table)(lower_bound)(upper_bound)(limit)(reverse)(time_limit_ms) )
