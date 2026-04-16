@@ -273,7 +273,10 @@ BOOST_FIXTURE_TEST_CASE(action_verification_tests, validating_tester) { try {
       trx.actions.push_back(act1);
       set_transaction_headers(trx);
       auto sigs = trx.sign(get_private_key("testapi"_n, "active"), control->get_chain_id());
-      BOOST_CHECK_EXCEPTION(push_transaction(trx), sysio::chain::irrelevant_auth_exception,
+      // validate_referenced_accounts enforces payer-at-position-0 earlier than
+      // authorization_manager::check_authorization, so we get transaction_exception
+      // (not irrelevant_auth_exception). This is the defense-in-depth path.
+      BOOST_CHECK_EXCEPTION(push_transaction(trx), sysio::chain::transaction_exception,
                             fc_exception_message_is("Explicit payer must be the first declared authorization"));
    }
    {
