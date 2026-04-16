@@ -2095,7 +2095,7 @@ int main( int argc, char** argv ) {
          std::cout << localized("As sysio::name : \"${name}\" -> uint64_t: ${value}",
                                 ("name", n.to_string())("value", n.to_uint64_t())) << std::endl;
          any_success = true;
-      } catch (const std::exception&) {}
+      } catch (const fc::exception&) {}
       try {
          size_t pos = 0;
          uint64_t v = std::stoull(name_input, &pos, 0);
@@ -2105,9 +2105,11 @@ int main( int argc, char** argv ) {
          std::cout << localized("As uint64_t    : ${value} -> sysio::name: \"${name}\"",
                                 ("value", v)("name", n.to_string())) << std::endl;
          any_success = true;
-      } catch (const std::exception&) {}
+      } catch (const std::invalid_argument&) {
+      } catch (const std::out_of_range&) {}
       if (!any_success) {
-         std::cerr << "ERROR: Input is neither a valid sysio::name nor a uint64_t" << std::endl;
+         std::cerr << localized("ERROR: Input is neither a valid sysio::name nor a uint64_t") << std::endl;
+         FC_THROW_EXCEPTION(explained_exception, "invalid name input");
       }
    });
 
