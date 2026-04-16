@@ -43,6 +43,16 @@ if test (count $missing_tools) -gt 0
    exit 1
 end
 
+if set -q IN_DEVCONTAINER && test "$IN_DEVCONTAINER" = "1"
+    echo "Detected running in devcontainer."
+    if not test -d "$repo_output_path2"
+        echo "Creating output directory for wire-opp: $repo_output_path2"
+        mkdir -p "$repo_output_path2"
+    end
+else
+    echo "Did NOT detect devcontainer."
+end
+
 # --- Build command ---
 set -l cmd wire-protobuf-bundler \
    --repo "file://$repo_proto_src_path" \
@@ -52,6 +62,8 @@ set -l cmd wire-protobuf-bundler \
 echo "Running wire-protobuf-bundler for all targets..."
 echo "  repo root: $repo_root"
 echo "  output:    $repo_output_path1"
+
+
 if test -d "$repo_output_path2"
     set -a cmd --output "$repo_output_path2/"
     echo "  repo opp root: $repo_output_path2"

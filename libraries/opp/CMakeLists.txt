@@ -27,7 +27,7 @@ protobuf_generate(
 )
 
 # After protobuf generation, regenerate OPP bundles (TS/Solidity/Solana models)
-set(_required_progs fish npm node wire-protobuf-bundler protoc-gen-solidity protoc-gen-solana)
+set(_required_progs fish npm pnpm node wire-protobuf-bundler protoc-gen-solidity protoc-gen-solana)
 set(_missing_progs)
 foreach(_prog ${_required_progs})
     find_program(_found_prog ${_prog})
