@@ -263,6 +263,269 @@ BOOST_AUTO_TEST_CASE( subjective_bill_multiple_accounts_test ) {
    }
 }
 
+BOOST_AUTO_TEST_CASE( subjective_bill_account_in_both_maps_test ) {
+   // Regression: when the same account appears in both accounts_billing (as a payer)
+   // and auth_cpu (as a non-payer first_authorizer), subjective_bill must track the
+   // sum of both contributions in the per-trx entry. Otherwise the cache accumulator
+   // leaks the earlier contribution permanently when the trx is later removed.
+   //
+   // This models a multi-action trx where account 'a' is the explicit payer of one
+   // action and the first_authorizer of another action whose payer is a different
+   // account or the contract.
+
+   transaction_id_type id1 = sha256::hash( "1" );
+   account_name a = "a"_n;
+
+   const auto now = time_point::now();
+   const fc::time_point_sec now_sec{now};
+
+   {  // Removal via block inclusion
+      subjective_billing sub_bill;
+
+      sub_bill.subjective_bill( id1, now_sec, {{a, {.cpu_usage_us = 10}}}, {{a, fc::microseconds(5)}} );
+
+      BOOST_CHECK_EQUAL( 10 + 5, sub_bill.get_subjective_bill(a, now).count() );
+
+      // Simulate id1 landing in a block.
+      sub_bill.remove_subjective_billing( id1, 0 );
+
+      // Full contribution must be cleared; with the overlap bug only 5 would be
+      // subtracted, leaving 10 stuck in the cache.
+      BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(a, now).count() );
+   }
+   {  // Same check, but with auth_cpu listed first — verify order-independence.
+      subjective_billing sub_bill;
+
+      sub_bill.subjective_bill( id1, now_sec, {{a, {.cpu_usage_us = 7}}}, {{a, fc::microseconds(3)}} );
+
+      BOOST_CHECK_EQUAL( 7 + 3, sub_bill.get_subjective_bill(a, now).count() );
+
+      sub_bill.remove_subjective_billing( id1, 0 );
+
+      BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(a, now).count() );
+   }
+}
+
+BOOST_AUTO_TEST_CASE( disable_payer_billing_test ) {
+   // When payer billing is disabled, subjective_bill must skip the accounts_billing
+   // loop entirely; only auth_cpu contributions accumulate.
+
+   transaction_id_type id1 = sha256::hash( "1" );
+   account_name a = "a"_n;
+   account_name b = "b"_n;
+
+   const auto now = time_point::now();
+   const fc::time_point_sec now_sec{now};
+
+   subjective_billing sub_bill;
+   BOOST_CHECK( !sub_bill.is_payer_billing_disabled() );
+
+   sub_bill.disable_payer_billing( true );
+   BOOST_CHECK( sub_bill.is_payer_billing_disabled() );
+
+   sub_bill.subjective_bill( id1, now_sec, {{a, {.cpu_usage_us = 100}}}, {{b, fc::microseconds(5)}} );
+
+   // 'a' from accounts_billing is skipped; 'b' from auth_cpu accumulates.
+   BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(a, now).count() );
+   BOOST_CHECK_EQUAL( 5, sub_bill.get_subjective_bill(b, now).count() );
+
+   // Same for the failure path.
+   sub_bill.subjective_bill_failure( {{a, {.cpu_usage_us = 100}}}, {{b, fc::microseconds(5)}}, now );
+   BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(a, now).count() );
+   BOOST_CHECK_EQUAL( 10, sub_bill.get_subjective_bill(b, now).count() );
+
+   // Re-enable payer billing; future bills do accumulate 'a'.
+   sub_bill.disable_payer_billing( false );
+   BOOST_CHECK( !sub_bill.is_payer_billing_disabled() );
+   transaction_id_type id2 = sha256::hash( "2" );
+   sub_bill.subjective_bill( id2, now_sec, {{a, {.cpu_usage_us = 7}}}, {} );
+   BOOST_CHECK_EQUAL( 7, sub_bill.get_subjective_bill(a, now).count() );
+}
+
+BOOST_AUTO_TEST_CASE( disable_account_test ) {
+   // disable_account should exclude an account from all subjective billing
+   // accumulation and report disabled status via getters.
+
+   transaction_id_type id1 = sha256::hash( "1" );
+   account_name a = "a"_n;
+   account_name b = "b"_n;
+   account_name c = "c"_n;
+
+   const auto now = time_point::now();
+   const fc::time_point_sec now_sec{now};
+
+   subjective_billing sub_bill;
+   BOOST_CHECK( !sub_bill.is_account_disabled( a ) );
+
+   sub_bill.disable_account( a );
+   BOOST_CHECK( sub_bill.is_account_disabled( a ) );
+   BOOST_CHECK( !sub_bill.is_account_disabled( b ) );
+
+   // is_any_account_disabled is true if any listed account is disabled.
+   action_payers_t has_a{a, b};
+   action_payers_t no_a{b, c};
+   BOOST_CHECK( sub_bill.is_any_account_disabled( has_a ) );
+   BOOST_CHECK( !sub_bill.is_any_account_disabled( no_a ) );
+
+   // Disabled account is skipped in subjective_bill (both maps).
+   sub_bill.subjective_bill( id1, now_sec,
+                             {{a, {.cpu_usage_us = 100}}, {b, {.cpu_usage_us = 11}}},
+                             {{a, fc::microseconds(50)}, {c, fc::microseconds(3)}} );
+   BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(a, now).count() );
+   BOOST_CHECK_EQUAL( 11, sub_bill.get_subjective_bill(b, now).count() );
+   BOOST_CHECK_EQUAL( 3, sub_bill.get_subjective_bill(c, now).count() );
+
+   // Disabled account is skipped in subjective_bill_failure as well.
+   sub_bill.subjective_bill_failure( {{a, {.cpu_usage_us = 100}}},
+                                     {{a, fc::microseconds(50)}}, now );
+   BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(a, now).count() );
+
+   // get_subjective_bill for a disabled account is always zero, even if the cache
+   // happened to contain an entry from before the account was disabled.
+   transaction_id_type id2 = sha256::hash( "2" );
+   subjective_billing sub_bill2;
+   sub_bill2.subjective_bill( id2, now_sec, {{a, {.cpu_usage_us = 9}}}, {} );
+   BOOST_CHECK_EQUAL( 9, sub_bill2.get_subjective_bill(a, now).count() );
+   sub_bill2.disable_account( a );
+   BOOST_CHECK_EQUAL( 0, sub_bill2.get_subjective_bill(a, now).count() );
+}
+
+BOOST_AUTO_TEST_CASE( set_disabled_test ) {
+   // When globally disabled, all billing operations are no-ops and getters return
+   // neutral values.
+
+   fc::logger log;
+   transaction_id_type id1 = sha256::hash( "1" );
+   account_name a = "a"_n;
+
+   const auto now = time_point::now();
+   const fc::time_point_sec now_sec{now};
+
+   subjective_billing sub_bill;
+   BOOST_CHECK( !sub_bill.is_disabled() );
+
+   sub_bill.set_disabled( true );
+   BOOST_CHECK( sub_bill.is_disabled() );
+   BOOST_CHECK( sub_bill.is_account_disabled( a ) );          // globally disabled implies per-account disabled
+   BOOST_CHECK( sub_bill.is_any_account_disabled( {a} ) );
+
+   sub_bill.subjective_bill( id1, now_sec, {{a, {.cpu_usage_us = 100}}}, {} );
+   sub_bill.subjective_bill_failure( {{a, {.cpu_usage_us = 100}}}, {}, now );
+   BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(a, now).count() );
+   BOOST_CHECK_EQUAL( 0, sub_bill.get_account_cache_size() );
+
+   // on_block / remove_expired are no-ops.
+   sub_bill.on_block( log, {}, now );
+   auto [completed, num_expired] = sub_bill.remove_expired( log, now, now, [](){ return false; } );
+   BOOST_CHECK( completed );
+   BOOST_CHECK_EQUAL( 0u, num_expired );
+
+   // Re-enabling does not resurrect the skipped bills (they were never recorded).
+   sub_bill.set_disabled( false );
+   BOOST_CHECK( !sub_bill.is_disabled() );
+   BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(a, now).count() );
+}
+
+BOOST_AUTO_TEST_CASE( subjective_bill_duplicate_id_test ) {
+   // Calling subjective_bill twice with the same id must be idempotent; the second
+   // call is silently ignored so the trx is not double-billed.
+
+   transaction_id_type id1 = sha256::hash( "1" );
+   account_name a = "a"_n;
+
+   const auto now = time_point::now();
+   const fc::time_point_sec now_sec{now};
+
+   subjective_billing sub_bill;
+
+   sub_bill.subjective_bill( id1, now_sec, {{a, {.cpu_usage_us = 13}}}, {} );
+   BOOST_CHECK_EQUAL( 13, sub_bill.get_subjective_bill(a, now).count() );
+
+   // Second call with same id - different amount; must be ignored.
+   sub_bill.subjective_bill( id1, now_sec, {{a, {.cpu_usage_us = 500}}}, {} );
+   BOOST_CHECK_EQUAL( 13, sub_bill.get_subjective_bill(a, now).count() );
+
+   // Single removal clears it entirely.
+   sub_bill.remove_subjective_billing( id1, 0 );
+   BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(a, now).count() );
+}
+
+BOOST_AUTO_TEST_CASE( on_block_nullptr_test ) {
+   // on_block with a null block is a no-op; existing state is preserved.
+
+   fc::logger log;
+   transaction_id_type id1 = sha256::hash( "1" );
+   account_name a = "a"_n;
+
+   const auto now = time_point::now();
+   const fc::time_point_sec now_sec{now};
+
+   subjective_billing sub_bill;
+   sub_bill.subjective_bill( id1, now_sec, {{a, {.cpu_usage_us = 17}}}, {} );
+   BOOST_CHECK_EQUAL( 17, sub_bill.get_subjective_bill(a, now).count() );
+
+   sub_bill.on_block( log, {}, now );  // signed_block_ptr default is null
+   BOOST_CHECK_EQUAL( 17, sub_bill.get_subjective_bill(a, now).count() );
+   BOOST_CHECK_EQUAL( 1u, sub_bill.get_account_cache_size() );
+}
+
+BOOST_AUTO_TEST_CASE( is_any_account_disabled_test ) {
+   account_name a = "a"_n;
+   account_name b = "b"_n;
+   account_name c = "c"_n;
+
+   subjective_billing sub_bill;
+   BOOST_CHECK( !sub_bill.is_any_account_disabled( {a, b, c} ) );
+   BOOST_CHECK( !sub_bill.is_any_account_disabled( {} ) );
+
+   sub_bill.disable_account( b );
+   BOOST_CHECK( !sub_bill.is_any_account_disabled( {a, c} ) );
+   BOOST_CHECK( sub_bill.is_any_account_disabled( {a, b} ) );
+   BOOST_CHECK( sub_bill.is_any_account_disabled( {b} ) );
+   BOOST_CHECK( !sub_bill.is_any_account_disabled( {} ) );
+
+   // Global disable flips it on regardless of account set.
+   sub_bill.set_disabled( true );
+   BOOST_CHECK( sub_bill.is_any_account_disabled( {a, c} ) );
+   BOOST_CHECK( sub_bill.is_any_account_disabled( {} ) );
+}
+
+BOOST_AUTO_TEST_CASE( reset_clears_all_state_test ) {
+   // reset() must clear every piece of persistent state so the instance is
+   // indistinguishable from a freshly-constructed one.
+
+   transaction_id_type id1 = sha256::hash( "1" );
+   account_name a = "a"_n;
+
+   const auto now = time_point::now();
+   const fc::time_point_sec now_sec{now};
+
+   subjective_billing sub_bill;
+   const auto default_allowed = sub_bill.get_subjective_account_cpu_allowed();
+   const auto default_window = sub_bill.get_expired_accumulator_average_window();
+
+   // Populate every field reset() is supposed to clear.
+   sub_bill.set_disabled( true );
+   sub_bill.disable_payer_billing( true );
+   sub_bill.disable_account( a );
+   sub_bill.set_subjective_account_cpu_allowed( fc::microseconds{42} );
+   sub_bill.set_expired_accumulator_average_window( fc::microseconds{30 * 1000 * 1000} ); // 30s worth
+   // Re-enable briefly to record a bill, then flip the disable back on.
+   sub_bill.set_disabled( false );
+   sub_bill.subjective_bill( id1, now_sec, {{a, {.cpu_usage_us = 17}}}, {} );
+   sub_bill.set_disabled( true );
+
+   sub_bill.reset();
+
+   BOOST_CHECK( !sub_bill.is_disabled() );
+   BOOST_CHECK( !sub_bill.is_payer_billing_disabled() );
+   BOOST_CHECK( !sub_bill.is_account_disabled( a ) );
+   BOOST_CHECK_EQUAL( default_allowed.count(), sub_bill.get_subjective_account_cpu_allowed().count() );
+   BOOST_CHECK_EQUAL( default_window, sub_bill.get_expired_accumulator_average_window() );
+   BOOST_CHECK_EQUAL( 0u, sub_bill.get_account_cache_size() );
+   BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(a, now).count() );
+}
+
 BOOST_AUTO_TEST_CASE( subjective_billing_integration_test ) {
    tester chain( setup_policy::full, db_read_mode::SPECULATIVE );
 
