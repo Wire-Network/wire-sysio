@@ -473,14 +473,14 @@ def clio_protobuf_abi_test():
 
 def clio_convert_name_test():
     """Test 'clio convert name' prints both interpretations and exits non-zero on bad input"""
-    # Valid sysio::name only ("sysio" is 5 lowercase chars; decimal value is 20 digits, > uint64_t max)
+    # Valid sysio::name only ("sysio" contains letters, so stoull throws std::invalid_argument)
     completed = subprocess.run(['./programs/clio/clio', '--no-auto-kiod', 'convert', 'name', 'sysio'],
                                check=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     assert completed.returncode == 0, f"stderr={completed.stderr!r}"
     assert b'As sysio::name : "sysio" -> uint64_t: 14389258095169634304' in completed.stdout
     assert b'As uint64_t' not in completed.stdout
 
-    # Valid uint64_t only (16 digits, too long to parse as a sysio::name)
+    # Valid uint64_t only (20 digits, exceeds sysio::name's 13-char limit)
     completed = subprocess.run(['./programs/clio/clio', '--no-auto-kiod', 'convert', 'name', '14389258095169634304'],
                                check=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     assert completed.returncode == 0, f"stderr={completed.stderr!r}"
