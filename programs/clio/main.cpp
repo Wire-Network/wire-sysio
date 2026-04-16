@@ -304,6 +304,7 @@ vector<chain::permission_level> get_account_permissions(const vector<string>& pe
    vector<chain::permission_level> accountPermissions;
    boost::range::copy(fixedPermissions, back_inserter(accountPermissions));
    if (!tx_payer.empty()) {
+      // sysio.payer must be the first authorization; action::payer() only inspects position 0.
       accountPermissions.insert(accountPermissions.begin(), chain::permission_level{ .actor = name(tx_payer), .permission = name("sysio.payer") });
    }
    return accountPermissions;
@@ -313,6 +314,7 @@ vector<chain::permission_level> get_account_permissions(const vector<string>& pe
    if (permissions.empty()) {
       vector<chain::permission_level> accountPermissions{default_permission};
       if (!tx_payer.empty()) {
+         // sysio.payer must be the first authorization; action::payer() only inspects position 0.
          accountPermissions.insert(accountPermissions.begin(), chain::permission_level{ .actor = name(tx_payer), .permission = name("sysio.payer") });
       }
       return accountPermissions;
