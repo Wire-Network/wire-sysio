@@ -20,22 +20,15 @@ using namespace fc::crypto;
 using namespace fc::crypto::ethereum;
 using namespace fc::network::json_rpc;
 
-/**
- * @brief Type alias for Ethereum block tag or block number
- *
- * Can hold either a string (for block numbers) or string_view (for tags like "latest", "pending")
- */
-using block_tag_t = std::variant<std::string, std::string_view>;
 class block_tag {
 public:
-   enum labeled { latest, pending, earliest, not_valid };
-   block_tag(labeled name);
-   block_tag(uint64_t bn);
-   bool valid_label() const;
+   enum class labeled { latest, pending, earliest, not_valid };
+   explicit block_tag(labeled name);
+   explicit block_tag(uint64_t bn);
    std::string to_string() const;
 
-   const labeled   block;
-   const uint64_t number;
+   labeled  kind;
+   uint64_t number;
 };
 
 const block_tag block_tag_latest(block_tag::labeled::latest);
@@ -96,7 +89,7 @@ using ethereum_client_ptr = std::shared_ptr<ethereum_client>;
  * @tparam Args Argument types for the contract function
  */
 template <typename RT, typename... Args>
-using ethereum_contract_call_fn = std::function<RT(const block_tag& block_tag, Args&...)>;
+using ethereum_contract_call_fn = std::function<RT(const block_tag& tag, Args&...)>;
 
 /**
  * @brief Function type for Ethereum contract transaction functions
@@ -270,7 +263,7 @@ public:
    fc::variant execute(const std::string& method, const fc::variant& params);
 
    fc::variant execute_contract_view_fn(const address& contract_address, const abi::contract& abi,
-                                        const block_tag& block_tag, const contract_invoke_data_items& params);
+                                        const block_tag& tag, const contract_invoke_data_items& params);
 
    fc::variant execute_contract_tx_fn(const eip1559_tx& tx, const abi::contract& abi,
                                       const contract_invoke_data_items& params = {}, bool sign = true);
@@ -396,12 +389,17 @@ public:
    // Additional Methods
 
    /**
-    * @brief Retrieves the transaction count (nonce) for an address.
+    * @brief Retrieves the raw transaction count (nonce) for an address via RPC.
+    *
+    * This is an uncached lookup. For obtaining the next nonce to use for this
+    * client's own signer, use the internal cached path via create_default_tx.
+    *
     * @param address The address for which to fetch the transaction count.
-    * @param block_tag
+    * @param block_tag Block tag at which to query.
     * @return The transaction count (nonce).
     */
-   fc::uint256 get_transaction_count(const address_compat_type& address, const block_tag& block_tag = block_tag_pending);
+   fc::uint256 raw_get_transaction_count(const address_compat_type& address,
+                                         const block_tag& tag = block_tag_pending);
 
    /**
     * @brief Retrieves the chain ID of the connected Ethereum network.
@@ -470,6 +468,12 @@ public:
 
 private:
    /**
+    * @brief Returns the next nonce to use for this client's signer,
+    * monotonically advancing past any on-chain count.
+    */
+   fc::uint256 get_signer_nonce();
+
+   /**
     * @brief Signature provider for signing transactions
     */
    const signature_provider_ptr _signature_provider;
@@ -527,9 +531,9 @@ ethereum_contract_call_fn<RT, Args...> ethereum_contract_client::create_call(con
    }
 
    abi::contract& abi = abi_map[contract.name];
-   return [this, &abi](const block_tag& block_tag, Args&... args) -> RT {
+   return [this, &abi](const block_tag& tag, Args&... args) -> RT {
       contract_invoke_data_items params = {args...};
-      auto res_var = client->execute_contract_view_fn(contract_address, abi, block_tag, params);
+      auto res_var = client->execute_contract_view_fn(contract_address, abi, tag, params);
 
       if constexpr (std::is_same_v<std::decay_t<RT>, fc::variant>) {
          return res_var;

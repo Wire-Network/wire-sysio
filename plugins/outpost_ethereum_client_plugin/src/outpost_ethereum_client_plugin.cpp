@@ -83,7 +83,11 @@ void outpost_ethereum_client_plugin::plugin_initialize(const variables_map& opti
          if (chain_id_str.has_value())
             chain_id = fc::to_uint256(chain_id_str.value());
       } else {
-         ilog("chainId: none");
+         wlog("ethereum client `{}` has no chain-id pinned in its spec; the client will accept"
+              " whatever chainId the RPC returns. For a signing daemon this is a replay-attack"
+              " surface if the RPC is compromised or misconfigured. Consider adding a fourth"
+              " comma-separated field to --outpost-ethereum-client to pin the expected chain-id.",
+              id);
       }
 
       auto  sig_provider = plug_sig->get_provider(sig_id);

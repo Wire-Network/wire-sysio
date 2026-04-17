@@ -1,6 +1,8 @@
 #pragma once
 
+#include <sysio/cron_plugin.hpp>
 #include <sysio/outpost_ethereum_client_plugin.hpp>
+#include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
 
 namespace sysio {
 

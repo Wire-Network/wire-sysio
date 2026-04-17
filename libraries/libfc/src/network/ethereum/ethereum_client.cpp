@@ -19,25 +19,25 @@ using namespace fc::crypto::ethereum;
 using namespace fc::network::json_rpc;
 } // namespace
 
-block_tag::block_tag(labeled name): block(name), number(0) { }
+block_tag::block_tag(labeled name): kind(name), number(0) { }
 
 block_tag::block_tag(uint64_t bn)
-: block(not_valid),
-  number(0) { }
-
-bool block_tag::valid_label() const { return block != not_valid; }
+: kind(labeled::not_valid),
+  number(bn) { }
 
 std::string block_tag::to_string() const {
-   switch(block) {
-      case latest:
+   switch(kind) {
+      case labeled::latest:
          return "latest";
-      case pending:
+      case labeled::pending:
          return "pending";
-      case earliest:
+      case labeled::earliest:
          return "earliest";
-      case not_valid:
+      case labeled::not_valid:
          return std::to_string(number);
-   };
+   }
+   FC_THROW_EXCEPTION(fc::assert_exception, "block_tag has out-of-range label value: {}",
+                      static_cast<int>(kind));
 }
 
 /**
@@ -106,12 +106,12 @@ fc::variant ethereum_client::execute(const std::string& method, const fc::varian
  * @throws fc::network::json_rpc::json_rpc_exception if the call fails
  */
 fc::variant ethereum_client::execute_contract_view_fn(const address& contract_address, const abi::contract& abi,
-                                                      const block_tag& block_tag,
+                                                      const block_tag& tag,
                                                       const contract_invoke_data_items& params) {
    const bool add_hex_prefix = true;
    auto abi_call_encoded = contract_encode_data(abi, params, add_hex_prefix);
    auto to_data_mvo = fc::mutable_variant_object("to", to_hex(contract_address, true))("data", abi_call_encoded);
-   fc::variants rpc_params = {to_data_mvo, fc::variant(block_tag.to_string())};
+   fc::variants rpc_params = {to_data_mvo, fc::variant(tag.to_string())};
    return execute("eth_call", rpc_params);
 }
 
@@ -160,18 +160,22 @@ fc::variant ethereum_client::execute_contract_tx_fn(const eip1559_tx& source_tx,
  * @return The transaction count as a uint256
  * @throws fc::network::json_rpc::json_rpc_exception if the RPC call fails
  */
-fc::uint256 ethereum_client::get_transaction_count(const address_compat_type& address, const block_tag& block_tag) {
+fc::uint256 ethereum_client::raw_get_transaction_count(const address_compat_type& address,
+                                                       const block_tag& tag) {
    auto from_addr = fc::crypto::ethereum::to_address(address);
    auto from_addr_hex = to_hex(from_addr, true);
-   fc::variants params{from_addr_hex, block_tag.to_string()};
+   fc::variants params{from_addr_hex, tag.to_string()};
    auto res = execute("eth_getTransactionCount", params);
    dlog("tx_count: {}", res.as_string());
-   const auto count = to_uint256(res);
+   return to_uint256(res);
+}
+
+fc::uint256 ethereum_client::get_signer_nonce() {
+   const auto count = raw_get_transaction_count(get_signer_address(), block_tag_latest);
    std::scoped_lock<std::mutex> lock(_contracts_map_mutex);
-   if(_nonce < count) {
+   if (_nonce < count) {
       _nonce = count;
-   }
-   else {
+   } else {
       ++_nonce;
    }
    return _nonce;
@@ -251,7 +255,7 @@ eip1559_tx ethereum_client::create_default_tx(const address_compat_type& to, con
    auto gas_limit = (estimated_gas * 6) /5;
 
    return eip1559_tx{.chain_id = get_chain_id(),
-                     .nonce = get_transaction_count(get_signer_address(), block_tag_latest),
+                     .nonce = get_signer_nonce(),
                      .max_priority_fee_per_gas = gc.tip,
                      .max_fee_per_gas = gc.max_fee_per_gas,
                      .gas_limit = gas_limit,

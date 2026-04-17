@@ -23,9 +23,6 @@ struct apy_updates {
    std::optional<uint64_t> apy_bps;
 };
 
-queue_updates compute_queue_updates(const fc::variant& queues_response);
-apy_updates compute_apy_updates(const fc::variant& ethstore_response);
-
 struct pending_tx {
    std::string method;
    std::string tx_hash;
@@ -42,11 +39,15 @@ struct beacon_chain_config_updates_deps {
 
 class beacon_chain_config_updates {
 public:
-   explicit beacon_chain_config_updates(beacon_chain_config_updates_deps deps);
+   beacon_chain_config_updates(beacon_chain_config_updates_deps deps, uint64_t exit_queue_buffer_days);
    void operator()() const;
+
+   queue_updates compute_queue_updates(const fc::variant& queues_response) const;
+   apy_updates   compute_apy_updates(const fc::variant& ethstore_response) const;
 
 private:
    beacon_chain_config_updates_deps deps_;
+   const uint64_t exit_queue_buffer_days_;
 };
 
 } // namespace sysio

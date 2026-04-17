@@ -422,8 +422,14 @@ void signature_provider_manager_plugin::plugin_initialize(const variables_map& o
 
    if (options.contains(option_name_provider)) {
       auto specs = options.at(option_name_provider).as<std::vector<std::string>>();
+      auto mask_spec = [](const std::string& s) {
+         auto pos = s.find_last_of(',');
+         if (pos == std::string::npos)
+            return std::string("***");
+         return s.substr(0, pos + 1) + "***";
+      };
       for (const auto& spec : specs) {
-         dlog("Registering signature provider from spec: {}", spec);
+         dlog("Registering signature provider from spec: {}", mask_spec(spec));
          auto provider = create_provider(spec);
          dlog("Registered signature provider ({}): {}",
               provider->key_name, provider->public_key.to_string({}));

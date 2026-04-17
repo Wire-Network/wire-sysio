@@ -50,6 +50,24 @@ namespace
       static constexpr auto max_len = max_str.size();
    };
    big_int_as_str<uint64_t> check_uint64;
+
+   template<>
+   struct big_int_as_str<fc::int256> {
+      // magnitude of INT256_MIN (2^255), 78 digits
+      static constexpr std::string_view max_str =
+         "57896044618658097711785492504343953926634992332820282019728792003956564819968";
+      static constexpr auto max_len = max_str.size();
+   };
+   big_int_as_str<fc::int256> check_int256;
+
+   template<>
+   struct big_int_as_str<fc::uint256> {
+      // UINT256_MAX (2^256 - 1), 78 digits
+      static constexpr std::string_view max_str =
+         "115792089237316195423570985008687907853269984665640564039457584007913129639935";
+      static constexpr auto max_len = max_str.size();
+   };
+   big_int_as_str<fc::uint256> check_uint256;
 }
 
 namespace fc
@@ -318,10 +336,11 @@ namespace fc
       {
       }
 
-      const std::string& const_s = s;
       const auto no_neg_start = neg ? 1 : 0;
       const auto start = s.find_first_not_of('0', no_neg_start);
-      const auto str = (start != std::string::npos) ? std::string_view(const_s).substr(start) : std::string_view(const_s);
+      const auto str = (start != std::string::npos)
+         ? std::string_view(s).substr(start)
+         : std::string_view{};
 
       // if the string is empty and we dropped zeros
       if (str.empty() && no_neg_start < start)
@@ -336,12 +355,20 @@ namespace fc
            (str.size() == check_int64.max_len && str <= check_int64.max_str) )
           return to_int64(s);
 
+        if (str.size() > check_int256.max_len ||
+           (str.size() == check_int256.max_len && str > check_int256.max_str))
+          FC_THROW_EXCEPTION(parse_error_exception,
+                             "Negative numeric token \"{}\" exceeds int256 range", s);
         return variant(fc::int256(s));
       }
       if( str.size() < check_uint64.max_len ||
          (str.size() == check_uint64.max_len && str <= check_uint64.max_str) )
         return to_uint64(s);
 
+      if (str.size() > check_uint256.max_len ||
+         (str.size() == check_uint256.max_len && str > check_uint256.max_str))
+        FC_THROW_EXCEPTION(parse_error_exception,
+                           "Numeric token \"{}\" exceeds uint256 range", s);
       return variant(fc::uint256(s));
    }
 

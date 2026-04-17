@@ -80,9 +80,10 @@ namespace {
    constexpr auto beacon_chain_interval                 = "beacon-chain-interval";
    constexpr auto beacon_chain_finalize_epoch_interval  = "beacon-chain-finalize-epoch-interval";
    constexpr auto beacon_chain_network                  = "beacon-chain-network";
+   constexpr auto beacon_chain_exit_buffer_days         = "beacon-chain-exit-buffer-days";
 
    constexpr auto client_target_chain                   = fc::crypto::chain_kind_t::chain_kind_ethereum;
-   constexpr auto default_interval_schedule             = "* */1 * * *"; // every hour
+   constexpr auto default_interval_schedule             = "0 * * * *"; // every hour at :00
    constexpr auto default_interval_name                 = "default";
    constexpr auto just_once_interval_name               = "once";
 
@@ -96,7 +97,6 @@ namespace {
       namespace asio  = boost::asio;
       using tcp       = asio::ip::tcp;
 
-      ilog("url = {}", url_str);
       fc::url url(url_str);
       auto    host = url.host().value();
       auto    port = std::to_string(url.port().value_or(443));
@@ -115,7 +115,6 @@ namespace {
          path += "?apikey=";
          path += escaped;
          curl_free(escaped);
-         ilog("path = {}", path);
       }
 
       ssl_ctx.set_default_verify_paths();
@@ -131,6 +130,7 @@ namespace {
 
       beast::ssl_stream<beast::tcp_stream> stream(ioc, ssl_ctx);
       stream.set_verify_mode(asio::ssl::verify_peer);
+      stream.set_verify_callback(asio::ssl::host_name_verification(host));
       if (!SSL_set_tlsext_host_name(stream.native_handle(), host.c_str()))
          throw beast::system_error(beast::error_code(static_cast<int>(::ERR_get_error()),
                                                      asio::error::get_ssl_category()));
@@ -140,9 +140,11 @@ namespace {
       stream.handshake(asio::ssl::stream_base::client);
       http::write(stream, req);
 
-      beast::flat_buffer                buffer;
-      http::response<http::string_body> res;
-      http::read(stream, buffer, res);
+      beast::flat_buffer                        buffer;
+      http::response_parser<http::string_body>  parser;
+      parser.body_limit(8ull * 1024 * 1024); // 8 MiB cap on response body
+      http::read(stream, buffer, parser);
+      auto& res = parser.get();
 
       beast::error_code ec;
       stream.shutdown(ec);
@@ -171,8 +173,9 @@ namespace {
                                   const std::string& network) {
       SYS_ASSERT(!api_key.empty(), sysio::chain::plugin_config_exception,
                  "beacon-chain-api-key is required for queues API");
-      return https_request(queue_url, boost::beast::http::verb::post,
-                           R"({"chain":")" + network + R"("})", api_key);
+      const auto body = fc::json::to_string(
+         fc::mutable_variant_object("chain", network), fc::time_point::maximum());
+      return https_request(queue_url, boost::beast::http::verb::post, body, api_key);
    }
 
    fc::variant get_ethstore_latest(const std::string& apy_url, const std::string& api_key) {
@@ -207,10 +210,16 @@ namespace beacon_chain_detail {
       SYS_ASSERT(!!epa_var, sysio::chain::plugin_config_exception,
                  "{}:\n{}\n doesn't contain a key of {}",
                  queue_branch, fc::json::to_string(queues, fc::time_point::maximum()), epa_field);
-      SYS_ASSERT(epa_var->is_numeric(), sysio::chain::plugin_config_exception,
-                 "queues[{}][{}]:\n{}\n doesn't contain a number",
+      SYS_ASSERT(epa_var->is_uint64() || epa_var->is_int64(),
+                 sysio::chain::plugin_config_exception,
+                 "queues[{}][{}]:\n{}\n is not an integer",
                  queue_branch, epa_field,
                  fc::json::to_string(queues, fc::time_point::maximum()));
+      if (epa_var->is_int64()) {
+         const auto signed_epa = epa_var->as_int64();
+         SYS_ASSERT(signed_epa >= 0, sysio::chain::plugin_config_exception,
+                    "queues[{}][{}] is negative: {}", queue_branch, epa_field, signed_epa);
+      }
 
       const auto now_sec = fc::time_point::now().sec_since_epoch();
       const auto epa = epa_var->as_uint64();
@@ -309,6 +318,8 @@ void wire_eth_maintenance_plugin::plugin_initialize(const variables_map& options
       auto client_specs    = options.at(beacon_chain_interval).as<std::vector<std::string>>();
       for (auto& client_spec : client_specs) {
          auto parts = fc::split(client_spec, ',', 1);
+         SYS_ASSERT(parts.size() == 2, chain::plugin_config_exception,
+                    "Interval spec `{}` must be of form `<name>,<cron-spec>`", client_spec);
          SYS_ASSERT(parts[0] != just_once_interval_name, chain::plugin_config_exception,
                     "Cannot use reserved interval spec name: `{}`, to store schedule: `{}`",
                     just_once_interval_name, parts[1]);
@@ -368,6 +379,7 @@ void wire_eth_maintenance_plugin::plugin_initialize(const variables_map& options
       auto api_key_val = options.at(beacon_chain_api_key).as<std::string>();
       auto network_val = options.at(beacon_chain_network).as<std::string>();
       auto update_interval = options.at(beacon_chain_update_interval).as<std::string>();
+      auto exit_buffer_days = options.at(beacon_chain_exit_buffer_days).as<uint64_t>();
 
       auto& actions = my->find_interval_actions(update_interval);
       actions.emplace_back(beacon_chain_config_updates({
@@ -418,7 +430,7 @@ void wire_eth_maintenance_plugin::plugin_initialize(const variables_map& options
                   elog("failed to identify block for tx {}: {}", tx.tx_hash, bn_retry.error().what());
             }
          }
-      }));
+      }, exit_buffer_days));
       ilog("There are {} actions currently registered.", actions.size());
    }
    else {
@@ -435,6 +447,9 @@ void wire_eth_maintenance_plugin::plugin_initialize(const variables_map& options
 void wire_eth_maintenance_plugin::plugin_startup() {
    ilog("Starting beacon chain update plugin");
    auto& cron = app().get_plugin<sysio::cron_plugin>();
+   SYS_ASSERT(cron.cron_service().num_threads() > 1, sysio::chain::plugin_config_exception,
+              "wire_eth_maintenance_plugin uses cron_service::blocking_retry for tx confirmation;"
+              " --cron-threads must be >= 2");
    auto& oec_plugin = app().get_plugin<outpost_ethereum_client_plugin>();
    const auto clients = oec_plugin.get_clients();
    SYS_ASSERT(clients.size() > 0, sysio::chain::plugin_config_exception,
@@ -531,12 +546,24 @@ void wire_eth_maintenance_plugin::set_program_options(options_description& cli, 
        "flag to indicate to finalize the OPP epoch, using the named interval.")
       (beacon_chain_network,
        bpo::value<std::string>()->default_value("mainnet"),
-       "The beacon chain network name passed to the queues API (e.g. mainnet, holesky).");
+       "The beacon chain network name passed to the queues API (e.g. mainnet, holesky).")
+      (beacon_chain_exit_buffer_days,
+       bpo::value<uint64_t>()->default_value(9),
+       "Buffer in days added to the exit queue ETA when computing withdraw delay;"
+       " also used as the fallback delay when the ETA is unavailable or in the past.");
 }
 
 
 void wire_eth_maintenance_plugin::plugin_shutdown() {
    ilog("Shutdown beacon chain update plugin");
+   if (my && my->just_once_jid.has_value()) {
+      auto* cron = app().find_plugin<sysio::cron_plugin>();
+      if (cron) {
+         cron->cancel_job(*my->just_once_jid);
+      }
+      my->just_once_jid.reset();
+   }
+   curl_global_cleanup();
 }
 
 } // namespace sysio

@@ -7,7 +7,9 @@
 #include <fc-lite/threadsafe_map.hpp>
 #include <fc/exception/exception.hpp>
 #include <functional>
+#include <future>
 #include <memory>
+#include <mutex>
 #include <optional>
 #include <set>
 #include <ranges>
@@ -107,7 +109,7 @@ public:
 
    struct options {
       std::string name{"cron_service"};
-      std::size_t num_threads{1};
+      std::size_t num_threads{2};
       bool autostart{true};
    };
 
@@ -225,40 +227,29 @@ public:
       if (ret.has_value())
          return std::move(*ret);
 
-      std::atomic<bool> complete{false};
-      std::optional<job_id_t> scheduled_id;
+      std::promise<void> done_promise;
+      auto done_future = done_promise.get_future();
+      std::once_flag fired;
       std::optional<fc::exception> error;
 
-      auto retry_fn = [&, attempt = 0]() mutable {
-         if (complete.load(std::memory_order_acquire))
-            return;
+      auto signal_done = [&]() {
+         std::call_once(fired, [&]() { done_promise.set_value(); });
+      };
 
+      auto retry_fn = [&, attempt = 0]() mutable {
          try {
             ret = fn(std::forward<Args>(args)...);
-            bool exiting = false;
-            if (ret.has_value()) {
-               complete.store(true, std::memory_order_release);
-               exiting = true;
-            } else if (++attempt >= opts.max_retries) {
-               complete.store(true, std::memory_order_release);
-               exiting = true;
-            }
-
-            if (exiting && scheduled_id.has_value())
-               this->cancel(*scheduled_id);
+            if (ret.has_value() || ++attempt >= opts.max_retries)
+               signal_done();
          } catch (const fc::exception& e) {
             error = e;
-            complete.store(true, std::memory_order_release);
+            signal_done();
          }
       };
 
-      scheduled_id = this->add(opts.retry_schedule, retry_fn);
-
-      while (!complete.load(std::memory_order_acquire))
-         std::this_thread::yield();
-
-      if (scheduled_id.has_value())
-         this->cancel(*scheduled_id);
+      auto scheduled_id = this->add(opts.retry_schedule, retry_fn);
+      done_future.wait();
+      this->cancel(scheduled_id);
 
       if (error.has_value())
          return std::unexpected(std::move(*error));
@@ -272,6 +263,9 @@ public:
    explicit cron_service(const options& options);
 
    bool is_running() const;
+
+   /// Number of worker threads this service was configured with.
+   std::size_t num_threads() const { return _options.num_threads; }
 
    bool start();
 

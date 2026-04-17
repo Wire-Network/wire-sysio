@@ -2,6 +2,7 @@
 
 #include <fc/variant.hpp>
 
+#include <cmath>
 #include <cstdint>
 #include <optional>
 #include <string>
@@ -22,9 +23,13 @@ std::optional<uint64_t> get_queue_length(const fc::variant& queues, const std::s
 
 /// Convert an APY fraction (e.g. 0.05 for 5%) to basis points (e.g. 500).
 /// Uses a small epsilon for floating-point robustness when the result should be a whole number.
+/// NaN, Inf, and negative values are clamped to 0; extreme positive values are clamped at 100 (= 1,000,000 bps).
 inline uint64_t apy_fraction_to_bps(double apr_fraction) {
-   if (apr_fraction < 0.0)
+   if (!std::isfinite(apr_fraction) || apr_fraction < 0.0)
       apr_fraction = 0.0;
+   constexpr double max_fraction = 100.0;
+   if (apr_fraction > max_fraction)
+      apr_fraction = max_fraction;
    return static_cast<uint64_t>(apr_fraction * 10000.0 + 1e-12);
 }
 

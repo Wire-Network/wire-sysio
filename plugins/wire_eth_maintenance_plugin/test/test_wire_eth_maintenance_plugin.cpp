@@ -145,6 +145,12 @@ namespace {
    constexpr uint64_t seconds_per_day = 60 * 60 * 24;
    constexpr uint64_t nine_days_sec = seconds_per_day * 9;
 
+   // Near-future EPA helpers chosen to fit under the sanity caps enforced by
+   // beacon_chain_config_updates (180-day withdraw cap, 365-day entry cap).
+   uint64_t near_future_epa(uint64_t days_from_now) {
+      return fc::time_point::now().sec_since_epoch() + days_from_now * seconds_per_day + 100;
+   }
+
    fc::variant make_queues_response(std::optional<uint64_t> exit_epa,
                                     std::optional<uint64_t> deposit_epa) {
       auto exit_val = exit_epa ? std::to_string(*exit_epa) : "1";
@@ -160,20 +166,24 @@ namespace {
       auto json = R"({"avgapr7d": )" + std::to_string(*avgapr7d) + "}";
       return fc::json::from_string(json);
    }
+
+   beacon_chain_config_updates make_crank(uint64_t exit_buffer_days = 9) {
+      return beacon_chain_config_updates({}, exit_buffer_days);
+   }
 }
 
 BOOST_AUTO_TEST_SUITE(compute_queue_updates_tests)
 
 BOOST_AUTO_TEST_CASE(exit_queue_with_valid_eta) {
-   auto queues = make_queues_response(far_future_epa, far_future_epa);
-   auto result = compute_queue_updates(queues);
+   auto queues = make_queues_response(near_future_epa(7), near_future_epa(3));
+   auto result = make_crank().compute_queue_updates(queues);
    BOOST_REQUIRE(result.withdraw_delay_sec.has_value());
    BOOST_CHECK_GT(*result.withdraw_delay_sec, nine_days_sec);
 }
 
 BOOST_AUTO_TEST_CASE(exit_queue_past_epa_defaults_to_nine_days) {
    auto queues = make_queues_response(1, far_future_epa);
-   auto result = compute_queue_updates(queues);
+   auto result = make_crank().compute_queue_updates(queues);
    BOOST_REQUIRE(result.withdraw_delay_sec.has_value());
    BOOST_CHECK_EQUAL(*result.withdraw_delay_sec, nine_days_sec);
 }
@@ -182,7 +192,7 @@ BOOST_AUTO_TEST_CASE(deposit_queue_valid_eta_converts_to_days) {
    uint64_t three_days_from_now_epa =
       fc::time_point::now().sec_since_epoch() + 3 * seconds_per_day + 100;
    auto queues = make_queues_response(far_future_epa, three_days_from_now_epa);
-   auto result = compute_queue_updates(queues);
+   auto result = make_crank().compute_queue_updates(queues);
    BOOST_REQUIRE(result.entry_queue_days.has_value());
    BOOST_CHECK_GE(*result.entry_queue_days, 2u);
    BOOST_CHECK_LE(*result.entry_queue_days, 4u);
@@ -190,16 +200,23 @@ BOOST_AUTO_TEST_CASE(deposit_queue_valid_eta_converts_to_days) {
 
 BOOST_AUTO_TEST_CASE(deposit_queue_past_epa_defaults_to_one_day) {
    auto queues = make_queues_response(far_future_epa, 1);
-   auto result = compute_queue_updates(queues);
+   auto result = make_crank().compute_queue_updates(queues);
    BOOST_REQUIRE(result.entry_queue_days.has_value());
    BOOST_CHECK_EQUAL(*result.entry_queue_days, 1u);
 }
 
 BOOST_AUTO_TEST_CASE(all_queue_fields_populated) {
-   auto queues = make_queues_response(far_future_epa, far_future_epa);
-   auto result = compute_queue_updates(queues);
+   auto queues = make_queues_response(near_future_epa(7), near_future_epa(3));
+   auto result = make_crank().compute_queue_updates(queues);
    BOOST_CHECK(result.withdraw_delay_sec.has_value());
    BOOST_CHECK(result.entry_queue_days.has_value());
+}
+
+BOOST_AUTO_TEST_CASE(exit_queue_buffer_days_is_configurable) {
+   auto queues = make_queues_response(1, far_future_epa); // past ETA, uses pure buffer
+   auto result = make_crank(14).compute_queue_updates(queues);
+   BOOST_REQUIRE(result.withdraw_delay_sec.has_value());
+   BOOST_CHECK_EQUAL(*result.withdraw_delay_sec, 14u * seconds_per_day);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -212,20 +229,20 @@ BOOST_AUTO_TEST_SUITE(compute_apy_updates_tests)
 
 BOOST_AUTO_TEST_CASE(apy_present_and_numeric) {
    auto ethstore = make_ethstore_response(0.05);
-   auto result = compute_apy_updates(ethstore);
+   auto result = make_crank().compute_apy_updates(ethstore);
    BOOST_REQUIRE(result.apy_bps.has_value());
    BOOST_CHECK_EQUAL(*result.apy_bps, 500u);
 }
 
 BOOST_AUTO_TEST_CASE(apy_missing_field_returns_nullopt) {
    auto ethstore = make_ethstore_response(std::nullopt);
-   auto result = compute_apy_updates(ethstore);
+   auto result = make_crank().compute_apy_updates(ethstore);
    BOOST_CHECK(!result.apy_bps.has_value());
 }
 
 BOOST_AUTO_TEST_CASE(apy_three_point_four_two_percent) {
    auto ethstore = make_ethstore_response(0.0342);
-   auto result = compute_apy_updates(ethstore);
+   auto result = make_crank().compute_apy_updates(ethstore);
    BOOST_REQUIRE(result.apy_bps.has_value());
    BOOST_CHECK_EQUAL(*result.apy_bps, 342u);
 }
@@ -243,13 +260,13 @@ BOOST_AUTO_TEST_CASE(happy_path_all_txs_sent_and_confirmed) {
    std::vector<pending_tx> confirmed_txs;
 
    beacon_chain_config_updates crank({
-      .fetch_queues = []() { return make_queues_response(far_future_epa, far_future_epa); },
+      .fetch_queues = []() { return make_queues_response(near_future_epa(7), near_future_epa(3)); },
       .fetch_apy = []() { return make_ethstore_response(0.05); },
       .send_set_withdraw_delay = [&](uint64_t v) { ++withdraw_called; return "0xhash1"; },
       .send_set_entry_queue = [&](uint64_t v) { ++entry_called; return "0xhash2"; },
       .send_update_apy_bps = [&](uint64_t v) { ++apy_called; return "0xhash3"; },
       .confirm_txs = [&](const std::vector<pending_tx>& txs) { confirmed_txs = txs; }
-   });
+   }, 9);
    crank();
 
    BOOST_CHECK_EQUAL(withdraw_called, 1);
@@ -263,13 +280,13 @@ BOOST_AUTO_TEST_CASE(null_withdraw_contract_skips_set_withdraw_delay) {
    std::vector<pending_tx> confirmed_txs;
 
    beacon_chain_config_updates crank({
-      .fetch_queues = []() { return make_queues_response(far_future_epa, far_future_epa); },
+      .fetch_queues = []() { return make_queues_response(near_future_epa(7), near_future_epa(3)); },
       .fetch_apy = []() { return make_ethstore_response(0.05); },
       .send_set_withdraw_delay = {},
       .send_set_entry_queue = [](uint64_t) { return "0xhash"; },
       .send_update_apy_bps = [](uint64_t) { return "0xhash"; },
       .confirm_txs = [&](const std::vector<pending_tx>& txs) { confirmed_txs = txs; }
-   });
+   }, 9);
    crank();
 
    BOOST_CHECK_EQUAL(withdraw_called, 0);
@@ -281,13 +298,13 @@ BOOST_AUTO_TEST_CASE(null_deposit_manager_skips_entry_and_apy) {
    std::vector<pending_tx> confirmed_txs;
 
    beacon_chain_config_updates crank({
-      .fetch_queues = []() { return make_queues_response(far_future_epa, far_future_epa); },
+      .fetch_queues = []() { return make_queues_response(near_future_epa(7), near_future_epa(3)); },
       .fetch_apy = []() { return make_ethstore_response(0.05); },
       .send_set_withdraw_delay = [](uint64_t) { return "0xhash"; },
       .send_set_entry_queue = {},
       .send_update_apy_bps = {},
       .confirm_txs = [&](const std::vector<pending_tx>& txs) { confirmed_txs = txs; }
-   });
+   }, 9);
    crank();
 
    BOOST_CHECK_EQUAL(entry_called, 0);
@@ -300,13 +317,13 @@ BOOST_AUTO_TEST_CASE(apy_missing_skips_update_apy_bps) {
    std::vector<pending_tx> confirmed_txs;
 
    beacon_chain_config_updates crank({
-      .fetch_queues = []() { return make_queues_response(far_future_epa, far_future_epa); },
+      .fetch_queues = []() { return make_queues_response(near_future_epa(7), near_future_epa(3)); },
       .fetch_apy = []() { return make_ethstore_response(std::nullopt); },
       .send_set_withdraw_delay = [](uint64_t) { return "0xhash1"; },
       .send_set_entry_queue = [](uint64_t) { return "0xhash2"; },
       .send_update_apy_bps = [&](uint64_t) { ++apy_called; return "0xhash3"; },
       .confirm_txs = [&](const std::vector<pending_tx>& txs) { confirmed_txs = txs; }
-   });
+   }, 9);
    crank();
 
    BOOST_CHECK_EQUAL(apy_called, 0);
@@ -321,7 +338,7 @@ BOOST_AUTO_TEST_CASE(fetch_throws_does_not_crash) {
       .send_set_entry_queue = [](uint64_t) { return "0xhash"; },
       .send_update_apy_bps = [](uint64_t) { return "0xhash"; },
       .confirm_txs = [](const std::vector<pending_tx>&) {}
-   });
+   }, 9);
    BOOST_CHECK_NO_THROW(crank());
 }
 

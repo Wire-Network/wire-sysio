@@ -36,8 +36,8 @@ cron_plugin::cron_plugin()
    : my(std::make_unique<cron_plugin_impl>()) {}
 
 void cron_plugin::set_program_options(options_description& cli, options_description& cfg) {
-   cfg.add_options()(option_cron_threads, boost::program_options::value<std::size_t>()->default_value(1),
-                     "# of worker threads to use for cron job processing");
+   cfg.add_options()(option_cron_threads, boost::program_options::value<std::size_t>()->default_value(2),
+                     "# of worker threads to use for cron job processing (must be >= 2 if any plugin uses cron_service::blocking_retry)");
 }
 
 void cron_plugin::plugin_initialize(const variables_map& options) {
