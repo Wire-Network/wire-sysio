@@ -37,34 +37,19 @@ namespace
    struct big_int_as_str;
 
    template<>
-   struct big_int_as_str<fc::int128> {
-      // since this is signed, it is the MIN negative number
-      static constexpr std::string_view min_str = "9223372036854775809";
-      static constexpr auto min_len = min_str.size();
+   struct big_int_as_str<int64_t> {
+      // since this is signed, it is the MAX negative number
+      static constexpr std::string_view max_str = "9223372036854775808";
+      static constexpr auto max_len = max_str.size();
    };
-   big_int_as_str<fc::int128> check_int128;
+   big_int_as_str<int64_t> check_int64;
 
    template<>
-   struct big_int_as_str<fc::int256> {
-      // since this is signed, it is the MIN negative number
-      static constexpr std::string_view min_str = "170141183460469231731687303715884105729";
-      static constexpr auto min_len = min_str.size();
+   struct big_int_as_str<uint64_t> {
+      static constexpr std::string_view max_str = "18446744073709551615";
+      static constexpr auto max_len = max_str.size();
    };
-   big_int_as_str<fc::int256> check_int256;
-
-   template<>
-   struct big_int_as_str<fc::uint128> {
-      static constexpr std::string_view min_str = "18446744073709551616";
-      static constexpr auto min_len = min_str.size();
-   };
-   big_int_as_str<fc::uint128> check_uint128;
-
-   template<>
-   struct big_int_as_str<fc::uint256> {
-      static constexpr std::string_view min_str = "340282366920938463463374607431768211456";
-      static constexpr auto min_len = min_str.size();
-   };
-   big_int_as_str<fc::uint256> check_uint256;
+   big_int_as_str<uint64_t> check_uint64;
 }
 
 namespace fc
@@ -347,25 +332,17 @@ namespace fc
       if( dot )
         return parser_type == json::parse_type::legacy_parser_with_string_doubles ? variant(s) : variant(to_double(s));
       if( neg ) {
-        if( str.size() < check_int128.min_len ||
-           (str.size() == check_int128.min_len && str < check_int128.min_str) )
+        if( str.size() < check_int64.max_len ||
+           (str.size() == check_int64.max_len && str <= check_int64.max_str) )
           return to_int64(s);
 
-        if( str.size() > check_int256.min_len ||
-           (str.size() == check_int256.min_len && str >= check_int256.min_str) )
-          return variant(fc::int256(s));
-
-        return variant(fc::int128_from_string(s));
+        return variant(fc::int256(s));
       }
-      if( str.size() < check_uint128.min_len ||
-         (str.size() == check_uint128.min_len && str < check_uint128.min_str) )
+      if( str.size() < check_uint64.max_len ||
+         (str.size() == check_uint64.max_len && str <= check_uint64.max_str) )
         return to_uint64(s);
 
-      if( str.size() > check_uint256.min_len ||
-         (str.size() == check_uint256.min_len && str >= check_uint256.min_str) )
-        return variant(fc::uint256(s));
-
-      return variant(fc::uint128_from_string(s));
+      return variant(fc::uint256(s));
    }
 
    template<typename T>

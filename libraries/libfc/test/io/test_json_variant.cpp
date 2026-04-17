@@ -176,7 +176,7 @@ BOOST_AUTO_TEST_CASE(number_from_stream_negative_int64_max) {
 }
 
 BOOST_AUTO_TEST_CASE(number_from_stream_negative_int64_min) {
-   // INT64_MIN = -9223372036854775808  (abs exactly equal to threshold) → int64
+   // INT64_MAX = -9223372036854775808  (abs exactly equal to threshold) → int64
    // BUG: currently routes to int128 because the comparison uses str < threshold
    //      instead of str <= threshold.
    variant v = json::from_string("-9223372036854775808");
@@ -185,27 +185,25 @@ BOOST_AUTO_TEST_CASE(number_from_stream_negative_int64_min) {
 }
 
 BOOST_AUTO_TEST_CASE(number_from_stream_negative_int64_min_minus_one) {
-   // INT64_MIN - 1 = -9223372036854775809  (abs one past threshold) → int128
+   // INT64_MIN - 1 = -9223372036854775809  (abs one past threshold) → int256
    variant v = json::from_string("-9223372036854775809");
-   BOOST_CHECK(v.is_int128());
+   BOOST_CHECK(v.is_int256());
 }
 
 BOOST_AUTO_TEST_CASE(number_from_stream_negative_int128_max) {
-   // -INT128_MAX  (abs one less than int128 threshold) → int128
+   // -INT64_MIN  (abs one less than int128 threshold) → int128
    variant v = json::from_string("-170141183460469231731687303715884105727");
-   BOOST_CHECK(v.is_int128());
+   BOOST_CHECK(v.is_int256());
 }
 
 BOOST_AUTO_TEST_CASE(number_from_stream_negative_int128_min) {
-   // INT128_MIN = -170141183460469231731687303715884105728  (abs exactly equal to threshold) → int128
-   // BUG: currently routes to int256 because the comparison uses str >= threshold
-   //      instead of str > threshold.
+   // INT128 MIN = -170141183460469231731687303715884105728  (abs exactly equal to threshold) → int256
    variant v = json::from_string("-170141183460469231731687303715884105728");
-   BOOST_CHECK(v.is_int128());
+   BOOST_CHECK(v.is_int256());
 }
 
 BOOST_AUTO_TEST_CASE(number_from_stream_negative_int128_min_minus_one) {
-   // INT128_MIN - 1 = -170141183460469231731687303715884105729  (abs one past threshold) → int256
+   // INT128 MIN - 1 = -170141183460469231731687303715884105729  (abs one past threshold) → int256
    variant v = json::from_string("-170141183460469231731687303715884105729");
    BOOST_CHECK(v.is_int256());
 }
@@ -238,21 +236,19 @@ BOOST_AUTO_TEST_CASE(number_from_stream_positive_uint64_max) {
 }
 
 BOOST_AUTO_TEST_CASE(number_from_stream_positive_uint64_max_plus_one) {
-   // UINT64_MAX + 1 = 18446744073709551616  (one past threshold) → uint128
+   // UINT64_MAX + 1 = 18446744073709551616  (one past threshold) → uint256
    const auto max_plus = static_cast<uint128_t>(std::numeric_limits<uint64_t>::max()) + 1;
    const auto str = fc::to_string(max_plus);
    variant v = json::from_string(str);
-   BOOST_CHECK(v.is_uint128());
+   BOOST_CHECK(v.is_uint256());
 }
 
 BOOST_AUTO_TEST_CASE(number_from_stream_positive_uint128_max) {
-   // UINT128_MAX = 340282366920938463463374607431768211455  (exactly at threshold) → uint128
-   // BUG: currently routes to uint256 because the comparison uses str >= threshold
-   //      instead of str > threshold.
+   // UINT128 MAX = 340282366920938463463374607431768211455  (exactly at threshold) → uint256
    const auto max = std::numeric_limits<uint128_t>::max();
    const auto str = fc::to_string(max);
    variant v = json::from_string(str);
-   BOOST_CHECK(v.is_uint128());
+   BOOST_CHECK(v.is_uint256());
 }
 
 BOOST_AUTO_TEST_CASE(number_from_stream_positive_uint128_max_plus_one) {
