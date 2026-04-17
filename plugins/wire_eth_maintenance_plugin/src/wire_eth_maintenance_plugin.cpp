@@ -18,7 +18,7 @@
 #include <boost/beast/ssl.hpp>
 
 
-#include <sysio/beacon_chain_update_plugin.hpp>
+#include <sysio/wire_eth_maintenance_plugin.hpp>
 #include <sysio/beacon_chain_update_detail.hpp>
 #include <sysio/beacon_chain_config_updates.hpp>
 
@@ -234,7 +234,7 @@ using job_schedule = services::cron_service::job_schedule;
 using schedules_t = unordered_map<string, job_schedule>;
 using ethereum_client_ptr = fc::network::ethereum::ethereum_client_ptr;
 
-class beacon_chain_update_plugin_impl {
+class wire_eth_maintenance_plugin_impl {
 
 public:
    schedules_t schedules;
@@ -286,7 +286,7 @@ public:
 
 };
 
-void beacon_chain_update_plugin::plugin_initialize(const variables_map& options) {
+void wire_eth_maintenance_plugin::plugin_initialize(const variables_map& options) {
    ilog("initializing beacon chain plugin");
 
    if( options.contains(beacon_chain_contracts_addrs) ) {
@@ -423,7 +423,7 @@ void beacon_chain_update_plugin::plugin_initialize(const variables_map& options)
    }
    else {
       SYS_ASSERT(!!opp_contract, sysio::chain::plugin_config_exception,
-                 "Nothing is configured to run in beacon_chain_update_plugin");
+                 "Nothing is configured to run in wire_eth_maintenance_plugin");
    }
 
    auto res = curl_global_init(CURL_GLOBAL_DEFAULT);
@@ -432,7 +432,7 @@ void beacon_chain_update_plugin::plugin_initialize(const variables_map& options)
    ilog("initializing beacon chain plugin DONE");
 }
 
-void beacon_chain_update_plugin::plugin_startup() {
+void wire_eth_maintenance_plugin::plugin_startup() {
    ilog("Starting beacon chain update plugin");
    auto& cron = app().get_plugin<sysio::cron_plugin>();
    auto& oec_plugin = app().get_plugin<outpost_ethereum_client_plugin>();
@@ -499,10 +499,10 @@ void beacon_chain_update_plugin::plugin_startup() {
 }
 
 
-beacon_chain_update_plugin::beacon_chain_update_plugin() : my(
-   std::make_shared<beacon_chain_update_plugin_impl>()) {}
+wire_eth_maintenance_plugin::wire_eth_maintenance_plugin() : my(
+   std::make_shared<wire_eth_maintenance_plugin_impl>()) {}
 
-void beacon_chain_update_plugin::set_program_options(options_description& cli, options_description& cfg) {
+void wire_eth_maintenance_plugin::set_program_options(options_description& cli, options_description& cfg) {
    cfg.add_options()
       (beacon_chain_queue_url,
        bpo::value<std::string>()->default_value(beacon_chain_default_queue_url),
@@ -535,7 +535,7 @@ void beacon_chain_update_plugin::set_program_options(options_description& cli, o
 }
 
 
-void beacon_chain_update_plugin::plugin_shutdown() {
+void wire_eth_maintenance_plugin::plugin_shutdown() {
    ilog("Shutdown beacon chain update plugin");
 }
 
