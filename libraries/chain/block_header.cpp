@@ -21,7 +21,10 @@ namespace sysio { namespace chain {
       // Do not include signed_block_header attributes in id, specifically exclude producer_signature.
       block_id_type result = digest(); //fc::sha256::hash(*static_cast<const block_header*>(this));
       result._hash[0] &= 0xffffffff00000000;
-      result._hash[0] += fc::endian_reverse_u32(block_num()); // store the block num in the ID, 160 bits is plenty for the hash
+      // Store the block num in the low 32 bits. Use |= rather than += to make it
+      // explicit that this is bit-insertion into pre-cleared bits — no carry into
+      // the hash bytes is possible regardless of future mask changes.
+      result._hash[0] |= fc::endian_reverse_u32(block_num());
       return result;
    }
 
