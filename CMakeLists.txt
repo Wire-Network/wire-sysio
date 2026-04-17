@@ -40,8 +40,7 @@ include(CTest) # suppresses DartConfiguration.tcl error
 enable_testing()
 
 include(GNUInstallDirs)
-include(MASSigning)
-include(AddTestHelpers)
+include(test-helpers)
 
 set(CLI_CLIENT_EXECUTABLE_NAME clio)
 set(NODE_EXECUTABLE_NAME nodeop)
