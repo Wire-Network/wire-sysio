@@ -92,8 +92,8 @@ public:
 
    [[sysio::action]]
    void iterall() {
-      uint64_t code = get_self().value;
-      uint32_t handle = kv_it_create(bench_table_id, code, nullptr, 0);
+      const uint64_t code = get_self().value;
+      const uint32_t handle = kv_it_create(bench_table_id, code, nullptr, 0);
 
       uint32_t count = 0;
       int32_t status = kv_it_next(handle);
