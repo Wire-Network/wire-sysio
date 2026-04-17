@@ -85,6 +85,14 @@ target_link_libraries(
         ${TARGET_MODELS_NAME}
 )
 
+if (NOT TARGET cdt::protoc-gen-zpp)
+    if (BUILD_SYSTEM_CONTRACTS)
+        message(FATAL_ERROR "cdt::protoc-gen-zpp target not found, CDT protobuf support is required.")
+    else()
+        message(STATUS "cdt::protoc-gen-zpp target not found, but BUILD_SYSTEM_CONTRACTS is disabled, so skipping CDT protobuf generation as expected.")
+    endif()
+endif()
+
 if (TARGET cdt::protoc-gen-zpp)
     find_cdt_magic_enum()
 
@@ -124,7 +132,7 @@ if (TARGET cdt::protoc-gen-zpp)
 
     if(BUILD_SYSTEM_CONTRACTS AND TARGET contracts_project)
         message(NOTICE "BUILD_SYSTEM_CONTRACTS is enabled AND contracts_project is a target, attaching dependency on ${TARGET_CDT_MODELS_NAME} to contracts_project")
-        add_dependencies(contracts_project ${TARGET_CDT_MODELS_NAME})
+        add_dependencies(contracts_project ${TARGET_CDT_MODELS_NAME} ${TARGET_CDT_MODELS_NAME}.protos)
     else()
         message(NOTICE "Either BUILD_SYSTEM_CONTRACTS is NOT enabled OR contracts_project is NOT a target, not attaching dependency on ${TARGET_CDT_MODELS_NAME} to contracts_project")
     endif()
