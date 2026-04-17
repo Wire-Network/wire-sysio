@@ -62,8 +62,8 @@ public:
     * For each row visited, its deserialized block_info_record structure is passed into the visitor function.
     * If a call to the visitor function returns false, scanning will stop and this function will return.
     *
-    * KV key layout: [table:8B BE][scope:8B BE][pk:8B BE]
-    * blockinfo table uses scope=0, table=blockinfo_table_name, pk=block_height
+    * KV key layout: [scope:8B BE][pk:8B BE]
+    * blockinfo table uses scope=0, pk=block_height
     *
     * @pre start_block_height <= end_block_height
     * @returns number of rows visited
@@ -76,20 +76,21 @@ public:
 
       const auto& kv_idx = control->db().get_index<sysio::chain::kv_index, sysio::chain::by_code_key>();
 
-      // Build lower-bound key: [blockinfo_table_name][scope=0][start_block_height]
-      auto lo_key = sysio::chain::make_kv_key(blockinfo_table_name, sysio::chain::name(0), static_cast<uint64_t>(start_block_height));
+      // Build lower-bound key: [scope=0][start_block_height]
+      const auto blockinfo_tid = sysio::chain::compute_table_id(blockinfo_table_name.to_uint64_t());
+      auto lo_key = sysio::chain::make_kv_scoped_key(sysio::chain::name(0), static_cast<uint64_t>(start_block_height));
 
       unsigned int rows_visited = 0;
       block_info_record r;
 
-      auto itr = kv_idx.lower_bound(boost::make_tuple(config::system_account_name, sysio::chain::config::kv_format_standard, lo_key.to_string_view()));
-      for (; itr != kv_idx.end() && itr->code == config::system_account_name && itr->key_format == sysio::chain::config::kv_format_standard; ++itr) {
+      auto itr = kv_idx.lower_bound(boost::make_tuple(config::system_account_name, blockinfo_tid, lo_key.to_string_view()));
+      for (; itr != kv_idx.end() && itr->code == config::system_account_name && itr->table_id == blockinfo_tid; ++itr) {
          auto kv = itr->key_view();
-         if (kv.size() != sysio::chain::kv_key_size) break;
-         // Verify table and scope portions match
-         if (kv.substr(0, sysio::chain::kv_prefix_size) != lo_key.to_string_view().substr(0, sysio::chain::kv_prefix_size)) break;
+         if (kv.size() != sysio::chain::kv_scoped_key_size) break;
+         // Verify scope portion matches
+         if (kv.substr(0, sysio::chain::kv_scope_prefix_size) != lo_key.to_string_view().substr(0, sysio::chain::kv_scope_prefix_size)) break;
          // Extract primary key (block height)
-         uint64_t pk = sysio::chain::kv_decode_be64(kv.data() + 16);
+         uint64_t pk = sysio::chain::kv_decode_be64(kv.data() + 8);
          if (pk > end_block_height) break;
 
          fc::datastream<const char*> ds(itr->value.data(), itr->value.size());

@@ -571,11 +571,20 @@
     ],
     "tables": [
         {
+            "name": "abi_hash",
+            "type": "abi_hash",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": [],
+            "table_id": 10688
+        },
+        {
             "name": "abihash",
             "type": "abi_hash",
             "index_type": "i64",
-            "key_names": ["table_name","scope","primary_key"],
-            "key_types": ["name","name","uint64"]
+            "key_names": ["scope","primary_key"],
+            "key_types": ["name","uint64"],
+            "table_id": 49446
         }
     ],
     "ricardian_clauses": [],

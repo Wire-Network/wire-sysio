@@ -6,13 +6,13 @@
 #include <sysio/sysio.hpp>
 #include <cstring>
 
-using sysio::kv::kv_format_raw;
+static constexpr uint32_t bench_table_id = 42;
 
 extern "C" {
    __attribute__((sysio_wasm_import))
-   int64_t kv_set(uint32_t key_format, uint64_t payer, const void* key, uint32_t key_size, const void* value, uint32_t value_size);
+   int64_t kv_set(uint32_t table_id, uint64_t payer, const void* key, uint32_t key_size, const void* value, uint32_t value_size);
    __attribute__((sysio_wasm_import))
-   int32_t kv_get(uint32_t key_format, uint64_t code, const void* key, uint32_t key_size, void* value, uint32_t value_size);
+   int32_t kv_get(uint32_t table_id, uint64_t code, const void* key, uint32_t key_size, void* value, uint32_t value_size);
    __attribute__((sysio_wasm_import))
    int64_t kv_erase(uint32_t key_format, const void* key, uint32_t key_size);
    __attribute__((sysio_wasm_import))
@@ -67,7 +67,7 @@ public:
 
          // sub_balance: read, subtract, write
          make_key(from_key, from_scope, 1);
-         int32_t sz = kv_get(kv_format_raw, code, from_key, 24, &from_bal, 16);
+         int32_t sz = kv_get(bench_table_id, code, from_key, 24, &from_bal, 16);
          check(sz == 16, "no balance");
          check(from_bal.amount >= 1, "overdrawn");
          from_bal.amount -= 1;
@@ -75,7 +75,7 @@ public:
 
          // add_balance: read, add, write
          make_key(to_key, to_scope, 1);
-         sz = kv_get(kv_format_raw, code, to_key, 24, &to_bal, 16);
+         sz = kv_get(bench_table_id, code, to_key, 24, &to_bal, 16);
          check(sz == 16, "no balance");
          to_bal.amount += 1;
          kv_set(0, get_self().value, to_key, 24, &to_bal, 16);
