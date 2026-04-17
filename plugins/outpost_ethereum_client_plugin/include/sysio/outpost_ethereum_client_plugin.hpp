@@ -34,6 +34,8 @@ public:
 
    std::vector<ethereum_client_entry_ptr> get_clients() const;
    ethereum_client_entry_ptr get_client(const std::string& id) const;
+   ethereum_client_ptr get_client_for_chain(fc::crypto::chain_kind_t target_chain) const;
+   std::vector<fc::network::ethereum::abi::contract> get_abis_for_contract(const std::string& contract_name) const;
    const std::vector<std::pair<std::filesystem::path, std::vector<fc::network::ethereum::abi::contract>>>& get_abi_files() const;
 private:
    std::unique_ptr<class outpost_ethereum_client_plugin_impl> my;

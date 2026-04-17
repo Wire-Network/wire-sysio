@@ -1,5 +1,8 @@
 #include <ranges>
+#include <regex>
+#include <fc/io/json.hpp>
 #include <fc/log/logger.hpp>
+#include <sysio/chain/exceptions.hpp>
 
 #include <sysio/outpost_ethereum_client_plugin.hpp>
 
@@ -128,6 +131,55 @@ std::vector<ethereum_client_entry_ptr> outpost_ethereum_client_plugin::get_clien
 
 ethereum_client_entry_ptr outpost_ethereum_client_plugin::get_client(const std::string& id) const {
    return my->get_client(id);
+}
+
+ethereum_client_ptr outpost_ethereum_client_plugin::get_client_for_chain(fc::crypto::chain_kind_t target_chain) const {
+   ethereum_client_ptr result;
+   for (const auto& entry : my->get_clients()) {
+      if (target_chain == entry->signature_provider->target_chain) {
+         SYS_ASSERT(!result, sysio::chain::plugin_config_exception,
+                    "There should only be one ethereum client for chain kind {}, but there were at least 2",
+                    static_cast<int>(target_chain));
+         result = entry->client;
+      }
+   }
+   SYS_ASSERT(!!result, sysio::chain::plugin_config_exception,
+              "could not find any ethereum client for chain kind {}", static_cast<int>(target_chain));
+   return result;
+}
+
+std::vector<fc::network::ethereum::abi::contract> outpost_ethereum_client_plugin::get_abis_for_contract(const std::string& contract_name) const {
+   static const std::regex contract_regex(R"(^(.+?)(?:V\d+)?$)");
+   constexpr auto contract_name_field = "contractName";
+   std::vector<fc::network::ethereum::abi::contract> result;
+
+   for (const auto& [json_abi_file, abi_contracts] : my->get_abi_files()) {
+      auto json_var = fc::json::from_file(json_abi_file);
+      if (!json_var.is_object())
+         continue;
+
+      const auto var_obj = json_var.get_object();
+      if (!var_obj.contains(contract_name_field))
+         continue;
+
+      const auto name_var = var_obj[contract_name_field];
+      if (name_var.is_array())
+         continue;
+
+      const auto name = name_var.as<std::string>();
+
+      std::smatch matches;
+      if (!std::regex_search(name, matches, contract_regex))
+         continue;
+
+      if (matches[1].str() != contract_name)
+         continue;
+
+      result.insert(result.end(), abi_contracts.begin(), abi_contracts.end());
+      break;
+   }
+
+   return result;
 }
 
 const std::vector<std::pair<std::filesystem::path, std::vector<fc::network::ethereum::abi::contract>>>& outpost_ethereum_client_plugin::get_abi_files() const {
