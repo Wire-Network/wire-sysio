@@ -105,7 +105,7 @@ jobs:
       - uses: actions/checkout@v5
 
       - name: Download builddir
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: ${{matrix.platform}}-build
 
@@ -162,7 +162,7 @@ jobs:
       - uses: actions/checkout@v5
 
       - name: Download builddir
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: ${{matrix.cfg.builddir}}-build
 
@@ -278,7 +278,7 @@ jobs:
       - uses: actions/checkout@v5
 
       - name: Download builddir
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: ${{ matrix.cfg.builddir }}-build
 
@@ -349,7 +349,7 @@ jobs:
       - uses: actions/checkout@v5
 
       - name: Download builddir
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: ${{matrix.cfg.builddir}}-build
 
