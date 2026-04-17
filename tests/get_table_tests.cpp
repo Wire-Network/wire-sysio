@@ -754,7 +754,7 @@ BOOST_FIXTURE_TEST_CASE( get_table_find_scoped_test, validating_tester ) try {
       p.json = true;
       p.code = "sysio.token"_n;
       p.table = "accounts";
-      p.find = R"({"primary_key": )" + std::to_string(sys_code) + "}";
+      p.find = R"({"sym_code":)" + std::to_string(sys_code) + "}";
       // p.scope intentionally left empty
       BOOST_CHECK_EXCEPTION(
          get_table_rows_full(plugin, p, fc::time_point::maximum()),
@@ -772,7 +772,7 @@ BOOST_FIXTURE_TEST_CASE( get_table_find_scoped_test, validating_tester ) try {
       p.code = "sysio.token"_n;
       p.table = "accounts";
       p.scope = "inita";
-      p.find = R"({"primary_key": )" + std::to_string(sys_code) + "}";
+      p.find = R"({"sym_code":)" + std::to_string(sys_code) + "}";
       auto result = get_table_rows_full(plugin, p, fc::time_point::maximum());
       BOOST_REQUIRE_EQUAL(result.rows.size(), 1u);
       BOOST_REQUIRE_EQUAL(result.more, false);
@@ -787,7 +787,7 @@ BOOST_FIXTURE_TEST_CASE( get_table_find_scoped_test, validating_tester ) try {
       p.code = "sysio.token"_n;
       p.table = "accounts";
       p.scope = "inita";
-      p.find = R"({"primary_key": 99999})";
+      p.find = R"({"sym_code":99999})";
       auto result = get_table_rows_full(plugin, p, fc::time_point::maximum());
       BOOST_REQUIRE_EQUAL(result.rows.size(), 0u);
       BOOST_REQUIRE_EQUAL(result.more, false);
@@ -1337,7 +1337,7 @@ BOOST_FIXTURE_TEST_CASE( get_table_find_test, validating_tester ) try {
       p.code = "sysio.token"_n;
       p.table = "accounts";
       p.scope = "inita";
-      p.find = R"({"primary_key": 9999999})";
+      p.find = R"({"sym_code":9999999})";
       auto result = get_table_rows_full(plugin, p, fc::time_point::maximum());
       BOOST_REQUIRE_EQUAL(0u, result.rows.size());
    }
@@ -1349,8 +1349,8 @@ BOOST_FIXTURE_TEST_CASE( get_table_find_test, validating_tester ) try {
       p.code = "sysio.token"_n;
       p.table = "accounts";
       p.scope = "inita";
-      p.find = R"({"primary_key": 1397703940})";
-      p.lower_bound = R"({"primary_key": 0})";
+      p.find = R"({"sym_code":1397703940})";
+      p.lower_bound = R"({"sym_code":0})";
       BOOST_CHECK_THROW(
          get_table_rows_full(plugin, p, fc::time_point::maximum()),
          chain::contract_table_query_exception
@@ -1397,8 +1397,8 @@ BOOST_FIXTURE_TEST_CASE( get_table_scoped_bounds_test, validating_tester ) try {
       p.code = "sysio.token"_n;
       p.table = "accounts";
       p.scope = "inita";
-      p.lower_bound = R"({"primary_key": )" + std::to_string(bbb_code) + "}";
-      p.upper_bound = R"({"primary_key": )" + std::to_string(ccc_code + 1) + "}";
+      p.lower_bound = R"({"sym_code":)" + std::to_string(bbb_code) + "}";
+      p.upper_bound = R"({"sym_code":)" + std::to_string(ccc_code + 1) + "}";
       auto result = get_table_rows_full(plugin, p, fc::time_point::maximum());
       BOOST_REQUIRE_EQUAL(2u, result.rows.size());
       BOOST_REQUIRE_EQUAL("100.0000 BBB", result.rows[0]["value"]["balance"].as_string());
@@ -1412,8 +1412,8 @@ BOOST_FIXTURE_TEST_CASE( get_table_scoped_bounds_test, validating_tester ) try {
       p.code = "sysio.token"_n;
       p.table = "accounts";
       p.scope = "inita";
-      p.lower_bound = R"({"primary_key": )" + std::to_string(bbb_code) + "}";
-      p.upper_bound = R"({"primary_key": )" + std::to_string(ccc_code + 1) + "}";
+      p.lower_bound = R"({"sym_code":)" + std::to_string(bbb_code) + "}";
+      p.upper_bound = R"({"sym_code":)" + std::to_string(ccc_code + 1) + "}";
       p.reverse = true;
       auto result = get_table_rows_full(plugin, p, fc::time_point::maximum());
       BOOST_REQUIRE_EQUAL(2u, result.rows.size());
@@ -1428,8 +1428,8 @@ BOOST_FIXTURE_TEST_CASE( get_table_scoped_bounds_test, validating_tester ) try {
       p.code = "sysio.token"_n;
       p.table = "accounts";
       p.scope = "inita";
-      p.lower_bound = R"({"primary_key": )" + std::to_string(aaa_code) + "}";
-      p.upper_bound = R"({"primary_key": )" + std::to_string(sys_code + 1) + "}";
+      p.lower_bound = R"({"sym_code":)" + std::to_string(aaa_code) + "}";
+      p.upper_bound = R"({"sym_code":)" + std::to_string(sys_code + 1) + "}";
       p.limit = 2;
       auto result = get_table_rows_full(plugin, p, fc::time_point::maximum());
       BOOST_REQUIRE_EQUAL(2u, result.rows.size());
@@ -1453,7 +1453,7 @@ BOOST_FIXTURE_TEST_CASE( get_table_scoped_bounds_test, validating_tester ) try {
       p.code = "sysio.token"_n;
       p.table = "accounts";
       p.scope = "inita";
-      p.upper_bound = R"({"primary_key": )" + std::to_string(bbb_code + 1) + "}";
+      p.upper_bound = R"({"sym_code":)" + std::to_string(bbb_code + 1) + "}";
       auto result = get_table_rows_full(plugin, p, fc::time_point::maximum());
       BOOST_REQUIRE_EQUAL(2u, result.rows.size());
       BOOST_REQUIRE_EQUAL("100.0000 AAA", result.rows[0]["value"]["balance"].as_string());
@@ -1467,7 +1467,7 @@ BOOST_FIXTURE_TEST_CASE( get_table_scoped_bounds_test, validating_tester ) try {
       p.code = "sysio.token"_n;
       p.table = "accounts";
       p.scope = "inita";
-      p.lower_bound = R"({"primary_key": )" + std::to_string(ccc_code) + "}";
+      p.lower_bound = R"({"sym_code":)" + std::to_string(ccc_code) + "}";
       auto result = get_table_rows_full(plugin, p, fc::time_point::maximum());
       BOOST_REQUIRE_EQUAL(2u, result.rows.size());
       BOOST_REQUIRE_EQUAL("100.0000 CCC", result.rows[0]["value"]["balance"].as_string());

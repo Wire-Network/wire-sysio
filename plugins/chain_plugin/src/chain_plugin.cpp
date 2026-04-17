@@ -3114,13 +3114,13 @@ read_only::get_account_return_t read_only::get_account( const get_account_params
          }
       }
 
-      // ROA reslimit is a multi_index scoped to the ROA contract itself:
-      //   reslimit_t reslimit(get_self(), get_self().value);
-      // So the KV key layout is [scope=roa_account_name:8B BE][pk=owner:8B BE].
+      // ROA reslimit is a flat kv::table (no scope): reslimit_t reslimit(get_self()).
+      // KV key layout is [pk=owner:8B BE].
       auto lookup_object = [&](const name& table_name, const name& account_name) -> std::optional<vector<char>> {
          const uint16_t tid = chain::compute_table_id(table_name.to_uint64_t());
-         auto key = chain::make_kv_scoped_key(config::roa_account_name, account_name.to_uint64_t());
-         auto key_sv = key.to_string_view();
+         char key_buf[chain::kv_pri_key_size];
+         chain::kv_encode_be64(key_buf, account_name.to_uint64_t());
+         std::string_view key_sv(key_buf, chain::kv_pri_key_size);
          const auto& kv_idx = d.get_index<chain::kv_index, chain::by_code_key>();
          auto it = kv_idx.find(boost::make_tuple(config::roa_account_name, tid, key_sv));
          if (it != kv_idx.end()) {
