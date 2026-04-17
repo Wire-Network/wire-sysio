@@ -559,7 +559,7 @@ BOOST_AUTO_TEST_CASE(kv_map_abi_key_metadata) {
    BOOST_CHECK(key_struct_found);
 }
 
-// Test secondary index lookup via chainbase (simulates chain_plugin get_kv_rows with index_name)
+// Test secondary index lookup via chainbase (simulates chain_plugin get_table_rows with index_name)
 BOOST_AUTO_TEST_CASE(kv_secondary_index_lookup_by_table_id) {
    validating_tester t( flat_set<account_name>(), nullptr, setup_policy::none );
    auto& db = const_cast<chainbase::database&>(t.control->db());

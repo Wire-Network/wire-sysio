@@ -9,12 +9,12 @@ from TestHarness import Account, Cluster, TestHelper, Utils, WalletMgr
 ###############################################################
 # get_kv_rows_test
 #
-# Verifies the /v1/chain/get_kv_rows API endpoint for
+# Verifies the /v1/chain/get_table_rows API endpoint for
 # kv::raw_table (format=0) data.
 #
 # 1. Deploys test_kv_map contract (format=0 / kv::raw_table)
 # 2. Pushes several put actions to store data
-# 3. Calls get_kv_rows and verifies ABI-decoded keys and values
+# 3. Calls get_table_rows and verifies ABI-decoded keys and values
 # 4. Tests pagination (limit + next_key)
 # 5. Tests lower_bound / upper_bound filtering
 # 6. Tests reverse iteration
@@ -86,18 +86,18 @@ try:
     node.waitForHeadToAdvance()
 
     # ---------------------------------------------------------------
-    # Helper to call get_kv_rows
+    # Helper to call get_table_rows
     # ---------------------------------------------------------------
-    def get_kv_rows(payload):
-        resp = node.processUrllibRequest("chain", "get_kv_rows", payload)
-        assert resp["code"] == 200, f"get_kv_rows returned {resp['code']}: {resp}"
+    def get_table_rows(payload):
+        resp = node.processUrllibRequest("chain", "get_table_rows", payload)
+        assert resp["code"] == 200, f"get_table_rows returned {resp['code']}: {resp}"
         return resp["payload"]
 
     # ---------------------------------------------------------------
     # Test 1: Basic query -- all rows, json=true
     # ---------------------------------------------------------------
-    Print("Test 1: Basic query -- all rows with ABI decoding")
-    result = get_kv_rows({"code": "kvmap", "table": "geodata", "limit": 100})
+    Print("Test 1: Basic query -- all rows with ABI decoding (via get_table_rows)")
+    result = get_table_rows({"code": "kvmap", "table": "geodata", "limit": 100})
     rows = result["rows"]
     Print(f"  Got {len(rows)} rows")
     assert len(rows) == 4, f"Expected 4 rows, got {len(rows)}"
@@ -121,14 +121,14 @@ try:
     # Test 2: Pagination -- limit=2 and follow next_key
     # ---------------------------------------------------------------
     Print("Test 2: Pagination with limit=2")
-    page1 = get_kv_rows({"code": "kvmap", "table": "geodata", "limit": 2})
+    page1 = get_table_rows({"code": "kvmap", "table": "geodata", "limit": 2})
     assert len(page1["rows"]) == 2, f"Page 1 expected 2 rows, got {len(page1['rows'])}"
     assert page1["more"] == True, "Page 1 should have more=true"
     assert page1["next_key"] != "", "Page 1 should have next_key"
     Print(f"  Page 1: {[r['key']['region'] for r in page1['rows']]}, next_key={page1['next_key']}")
 
     # Use next_key as lower_bound for page 2
-    page2 = get_kv_rows({"code": "kvmap", "table": "geodata", "limit": 2,
+    page2 = get_table_rows({"code": "kvmap", "table": "geodata", "limit": 2,
                           "lower_bound": page1["next_key"]})
     assert len(page2["rows"]) == 2, f"Page 2 expected 2 rows, got {len(page2['rows'])}"
     assert page2["more"] == False, "Page 2 should have more=false"
@@ -147,7 +147,7 @@ try:
     # Query rows with keys >= {"region":"eu-west","id":2} and < {"region":"us-west","id":4}
     lb = json.dumps({"region": "eu-west", "id": 2})
     ub = json.dumps({"region": "us-west", "id": 4})
-    result = get_kv_rows({"code": "kvmap", "table": "geodata", "limit": 100,
+    result = get_table_rows({"code": "kvmap", "table": "geodata", "limit": 100,
                            "lower_bound": lb, "upper_bound": ub})
     rows = result["rows"]
     Print(f"  Got {len(rows)} rows: {[r['key']['region'] for r in rows]}")
@@ -160,7 +160,7 @@ try:
     # Test 4: Reverse iteration
     # ---------------------------------------------------------------
     Print("Test 4: Reverse iteration")
-    result = get_kv_rows({"code": "kvmap", "table": "geodata", "limit": 100, "reverse": True})
+    result = get_table_rows({"code": "kvmap", "table": "geodata", "limit": 100, "reverse": True})
     rows = result["rows"]
     Print(f"  Got {len(rows)} rows: {[r['key']['region'] for r in rows]}")
     assert len(rows) == 4, f"Expected 4 rows, got {len(rows)}"
@@ -174,7 +174,7 @@ try:
     # Test 5: json=false (raw hex mode)
     # ---------------------------------------------------------------
     Print("Test 5: json=false (raw hex mode)")
-    result = get_kv_rows({"json": False, "code": "kvmap", "table": "geodata", "limit": 2})
+    result = get_table_rows({"json": False, "code": "kvmap", "table": "geodata", "limit": 2})
     rows = result["rows"]
     Print(f"  Got {len(rows)} rows")
     assert len(rows) == 2
@@ -192,13 +192,13 @@ try:
     # Test 6: Reverse pagination
     # ---------------------------------------------------------------
     Print("Test 6: Reverse pagination with limit=2")
-    page1 = get_kv_rows({"code": "kvmap", "table": "geodata", "limit": 2, "reverse": True})
+    page1 = get_table_rows({"code": "kvmap", "table": "geodata", "limit": 2, "reverse": True})
     assert len(page1["rows"]) == 2
     assert page1["more"] == True
     Print(f"  Page 1 (reverse): {[r['key']['region'] for r in page1['rows']]}, next_key={page1['next_key']}")
 
     # In reverse mode, next_key is the key we stopped at; use it as upper_bound for next page
-    page2 = get_kv_rows({"code": "kvmap", "table": "geodata", "limit": 2,
+    page2 = get_table_rows({"code": "kvmap", "table": "geodata", "limit": 2,
                           "reverse": True, "upper_bound": page1["next_key"]})
     Print(f"  Page 2 (reverse): {[r['key']['region'] for r in page2['rows']]}")
     assert len(page2["rows"]) == 1, f"Page 2 expected 1 row, got {len(page2['rows'])}"
@@ -209,7 +209,7 @@ try:
     Print("  PASSED")
 
     testSuccessful = True
-    Print("All get_kv_rows tests passed")
+    Print("All get_table_rows tests passed")
 
 finally:
     TestHelper.shutdown(cluster, walletMgr, testSuccessful=testSuccessful, dumpErrorDetails=dumpErrorDetails)
