@@ -1,18 +1,15 @@
 #pragma once
+
 #include <sysio/chain/application.hpp>
 
-namespace sysio {
+namespace {{namespace}} {
 
-using namespace appbase;
-
-/// Template plugin — starting point for new plugins.
-/// See also: `npx plop create-cxx-plugin`
-class template_plugin : public appbase::plugin<template_plugin> {
+class {{name}} : public appbase::plugin<{{name}}> {
 public:
    APPBASE_PLUGIN_REQUIRES()
 
-   template_plugin();
-   virtual ~template_plugin();
+   {{name}}();
+   virtual ~{{name}}();
 
    virtual void set_program_options(options_description& cli, options_description& cfg) override;
    void plugin_initialize(const variables_map& options);
@@ -24,4 +21,4 @@ private:
    std::unique_ptr<impl> _impl;
 };
 
-} // namespace sysio
+} // namespace {{namespace}}
