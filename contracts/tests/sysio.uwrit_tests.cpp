@@ -117,6 +117,29 @@ public:
       );
    }
 
+   // ── Table read helpers ──
+
+   fc::variant get_uwconfig() {
+      auto data = get_row_by_account(UWRIT_ACCOUNT, UWRIT_ACCOUNT, "uwconfig"_n, "uwconfig"_n);
+      return data.empty() ? fc::variant() : abi_ser.binary_to_variant(
+         "uw_config", data,
+         abi_serializer::create_yield_function(abi_serializer_max_time));
+   }
+
+   fc::variant get_collateral(uint64_t id) {
+      auto data = get_row_by_id(UWRIT_ACCOUNT, UWRIT_ACCOUNT, "collateral"_n, id);
+      return data.empty() ? fc::variant() : abi_ser.binary_to_variant(
+         "collateral_entry", data,
+         abi_serializer::create_yield_function(abi_serializer_max_time));
+   }
+
+   fc::variant get_uwreq(uint64_t id) {
+      auto data = get_row_by_id(UWRIT_ACCOUNT, UWRIT_ACCOUNT, "uwreqs"_n, id);
+      return data.empty() ? fc::variant() : abi_ser.binary_to_variant(
+         "uw_request_t", data,
+         abi_serializer::create_yield_function(abi_serializer_max_time));
+   }
+
    abi_serializer abi_ser;
 };
 
@@ -126,6 +149,13 @@ BOOST_AUTO_TEST_SUITE(sysio_uwrit_tests)
 
 BOOST_FIXTURE_TEST_CASE(setconfig_basic, sysio_uwrit_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), setconfig());
+
+   auto cfg = get_uwconfig();
+   BOOST_REQUIRE_EQUAL(10, cfg["fee_bps"].as_uint64());
+   BOOST_REQUIRE_EQUAL(86400, cfg["confirm_lock_sec"].as_uint64());
+   BOOST_REQUIRE_EQUAL(50, cfg["uw_fee_share_pct"].as_uint64());
+   BOOST_REQUIRE_EQUAL(25, cfg["other_uw_share_pct"].as_uint64());
+   BOOST_REQUIRE_EQUAL(25, cfg["batch_op_share_pct"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(setconfig_validates_percentages, sysio_uwrit_tester) { try {
@@ -140,6 +170,12 @@ BOOST_FIXTURE_TEST_CASE(updcltrl_increase, sysio_uwrit_tester) { try {
 
    auto amount = asset::from_string("100.0000 SYS");
    BOOST_REQUIRE_EQUAL(success(), updcltrl("uwrit.a"_n, chain_kind_ethereum, amount, true));
+
+   // Verify collateral entry written to table (first entry, id=0)
+   auto col = get_collateral(0);
+   BOOST_REQUIRE(!col.is_null());
+   BOOST_REQUIRE_EQUAL("uwrit.a", col["underwriter"].as_string());
+   BOOST_REQUIRE_EQUAL("100.0000 SYS", col["staked_amount"].as_string());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(updcltrl_decrease_nonexistent, sysio_uwrit_tester) { try {
@@ -162,6 +198,15 @@ BOOST_FIXTURE_TEST_CASE(submituw_without_config, sysio_uwrit_tester) { try {
 BOOST_FIXTURE_TEST_CASE(submituw_basic, sysio_uwrit_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), setconfig());
    BOOST_REQUIRE_EQUAL(success(), submituw("uwrit.a"_n, 100));
+
+   // submituw writes to uwledger (not uwreqs); verify ledger entry
+   auto data = get_row_by_id(UWRIT_ACCOUNT, UWRIT_ACCOUNT, "uwledger"_n, 0);
+   BOOST_REQUIRE(!data.empty());
+   auto entry = abi_ser.binary_to_variant(
+      "underwriting_entry", data,
+      abi_serializer::create_yield_function(abi_serializer_max_time));
+   BOOST_REQUIRE_EQUAL("uwrit.a", entry["underwriter"].as_string());
+   BOOST_REQUIRE_EQUAL(100, entry["message_id"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(submituw_duplicate_message, sysio_uwrit_tester) { try {

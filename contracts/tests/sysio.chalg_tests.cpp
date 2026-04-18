@@ -127,6 +127,22 @@ public:
       return fc::sha256::hash(seed);
    }
 
+   // ── Table read helpers ──
+
+   fc::variant get_challenge(uint64_t id) {
+      auto data = get_row_by_id(CHALG_ACCOUNT, CHALG_ACCOUNT, "challenges"_n, id);
+      return data.empty() ? fc::variant() : abi_ser.binary_to_variant(
+         "challenge_entry", data,
+         abi_serializer::create_yield_function(abi_serializer_max_time));
+   }
+
+   fc::variant get_resolution(uint64_t id) {
+      auto data = get_row_by_id(CHALG_ACCOUNT, CHALG_ACCOUNT, "resolutions"_n, id);
+      return data.empty() ? fc::variant() : abi_ser.binary_to_variant(
+         "manual_resolution", data,
+         abi_serializer::create_yield_function(abi_serializer_max_time));
+   }
+
    abi_serializer abi_ser;
 };
 
@@ -136,6 +152,12 @@ BOOST_AUTO_TEST_SUITE(sysio_chalg_tests)
 
 BOOST_FIXTURE_TEST_CASE(initchal_basic, sysio_chalg_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), initchal(0));
+
+   // Verify challenge entry written to table (first entry, id=0)
+   auto chal = get_challenge(0);
+   BOOST_REQUIRE(!chal.is_null());
+   BOOST_REQUIRE_EQUAL(0, chal["chain_request_id"].as_uint64());
+   BOOST_REQUIRE_EQUAL("CHALLENGE_STATUS_CHALLENGE_SENT", chal["status"].as_string());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(initchal_requires_msgch_auth, sysio_chalg_tester) { try {

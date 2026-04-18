@@ -87,6 +87,36 @@ public:
       return fc::sha256::hash(seed);
    }
 
+   // ── Table read helpers ──
+
+   fc::variant get_message(uint64_t id) {
+      auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "messages"_n, id);
+      return data.empty() ? fc::variant() : abi_ser.binary_to_variant(
+         "message_entry", data,
+         abi_serializer::create_yield_function(abi_serializer_max_time));
+   }
+
+   fc::variant get_outbound_envelope(uint64_t id) {
+      auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "outenvelopes"_n, id);
+      return data.empty() ? fc::variant() : abi_ser.binary_to_variant(
+         "outbound_envelope", data,
+         abi_serializer::create_yield_function(abi_serializer_max_time));
+   }
+
+   fc::variant get_envelope(uint64_t id) {
+      auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "envelopes"_n, id);
+      return data.empty() ? fc::variant() : abi_ser.binary_to_variant(
+         "envelope_entry", data,
+         abi_serializer::create_yield_function(abi_serializer_max_time));
+   }
+
+   fc::variant get_attestation(uint64_t id) {
+      auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "attestations"_n, id);
+      return data.empty() ? fc::variant() : abi_ser.binary_to_variant(
+         "attestation_entry", data,
+         abi_serializer::create_yield_function(abi_serializer_max_time));
+   }
+
    abi_serializer abi_ser;
 };
 
@@ -111,10 +141,16 @@ BOOST_FIXTURE_TEST_CASE(deliver_invalid_request, sysio_msgch_tester) { try {
 BOOST_FIXTURE_TEST_CASE(queueout_basic, sysio_msgch_tester) { try {
    // AttestationType: EPOCH_SYNC = 60940
    BOOST_REQUIRE_EQUAL(success(), queueout(0, 60940));
+
+   // Verify attestation written to table (first entry, id=0)
+   auto attest = get_attestation(0);
+   BOOST_REQUIRE(!attest.is_null());
+   BOOST_REQUIRE_EQUAL(0, attest["outpost_id"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(buildenv_basic, sysio_msgch_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), buildenv(0));
+   // buildenv with no queued messages produces an empty envelope — no row written
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()

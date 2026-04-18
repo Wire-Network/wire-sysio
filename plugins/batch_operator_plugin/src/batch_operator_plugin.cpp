@@ -103,8 +103,7 @@ struct batch_operator_plugin::impl {
    struct read_table_options {
       std::optional<std::string>                              lower_bound;
       std::optional<std::string>                              upper_bound;
-      std::optional<std::string>                              key_type;
-      std::optional<std::string>                              index_position;
+      std::optional<std::string>                              index_name;
       std::optional<std::function<bool(const fc::variant&)>>  filter;
       bool                                                    get_all = false;
    };
@@ -119,14 +118,13 @@ struct batch_operator_plugin::impl {
       p.json  = true;
       p.code  = chain::name(code);
       p.scope = scope;
-      p.table = chain::name(table);
+      p.table = table;
       p.limit = limit;
 
       if (opts) {
          if (opts->lower_bound)    p.lower_bound    = *opts->lower_bound;
          if (opts->upper_bound)    p.upper_bound    = *opts->upper_bound;
-         if (opts->key_type)       p.key_type       = *opts->key_type;
-         if (opts->index_position) p.index_position = *opts->index_position;
+         if (opts->index_name)     p.index_name     = *opts->index_name;
       }
 
       auto deadline = fc::time_point::now() + fc::milliseconds(delivery_timeout_ms);
@@ -170,8 +168,7 @@ struct batch_operator_plugin::impl {
          read_table_options{
             .lower_bound    = std::to_string(key),
             .upper_bound    = std::to_string(key),
-            .key_type       = "i64",
-            .index_position = "2",
+            .index_name     = "2",
             .filter         = [op_account](const fc::variant& row) {
                return chain::name(row["batch_op_name"].as_string()) == op_account;
             }

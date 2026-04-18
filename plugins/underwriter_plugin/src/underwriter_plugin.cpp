@@ -87,7 +87,7 @@ struct underwriter_plugin::impl {
       p.json  = true;
       p.code  = chain::name(code);
       p.scope = scope;
-      p.table = chain::name(table);
+      p.table = table;
       p.limit = limit;
       auto deadline = fc::time_point::now() + fc::milliseconds(action_timeout_ms);
       auto result_fn = ro.get_table_rows(p, deadline);

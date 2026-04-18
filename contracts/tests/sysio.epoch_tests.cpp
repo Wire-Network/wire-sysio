@@ -104,6 +104,14 @@ public:
          abi_serializer::create_yield_function(abi_serializer_max_time) );
    }
 
+   fc::variant get_outpost(uint64_t id) {
+      auto data = get_row_by_id(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "outposts"_n, id);
+      return data.empty() ? fc::variant() : abi_ser.binary_to_variant(
+         "outpost_info",
+         data,
+         abi_serializer::create_yield_function(abi_serializer_max_time) );
+   }
+
    abi_serializer abi_ser;
 };
 
@@ -133,6 +141,12 @@ BOOST_FIXTURE_TEST_CASE(regoutpost_basic, sysio_epoch_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), regoutpost(CHAIN_KIND_ETHEREUM, 1));
    produce_blocks();
 
+   // Verify outpost row written to table (first entry, id=0)
+   auto op = get_outpost(0);
+   BOOST_REQUIRE(!op.is_null());
+   BOOST_REQUIRE_EQUAL("CHAIN_KIND_ETHEREUM", op["chain_kind"].as_string());
+   BOOST_REQUIRE_EQUAL(1, op["chain_id"].as_uint64());
+
    BOOST_REQUIRE_EQUAL(
       error("assertion failure with message: outpost already registered"),
       regoutpost(CHAIN_KIND_ETHEREUM, 1)
@@ -140,6 +154,12 @@ BOOST_FIXTURE_TEST_CASE(regoutpost_basic, sysio_epoch_tester) { try {
    produce_blocks();
 
    BOOST_REQUIRE_EQUAL(success(), regoutpost(CHAIN_KIND_SOLANA, 1));
+   produce_blocks();
+
+   // Verify second outpost (id=1)
+   auto op2 = get_outpost(1);
+   BOOST_REQUIRE(!op2.is_null());
+   BOOST_REQUIRE_EQUAL("CHAIN_KIND_SOLANA", op2["chain_kind"].as_string());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(advance_before_config, sysio_epoch_tester) { try {
