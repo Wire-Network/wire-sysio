@@ -1,8 +1,10 @@
 #include <fc/log/logger.hpp>
 #include <fc/crypto/sha256.hpp>
+#include <fc/io/json.hpp>
 #include <fc/variant_object.hpp>
 #include <boost/endian/conversion.hpp>
 #include <functional>
+#include <optional>
 
 #include <sysio/batch_operator_plugin/batch_operator_plugin.hpp>
 #include <sysio/chain/abi_serializer.hpp>
@@ -81,6 +83,9 @@ struct batch_operator_plugin::impl {
    // Typed ETH contract clients (lazy-initialized)
    std::shared_ptr<opp_contract_client>         opp_client;
    std::shared_ptr<opp_inbound_contract_client> opp_inbound_client;
+
+   // Typed SOL contract client (lazy-initialized)
+   std::shared_ptr<opp_solana_outpost_client>   sol_outpost_client;
 
    // Debugging signal — emitted when an OPP envelope is computed.
    // Only fires when num_slots() > 0 (i.e. external_debugging_plugin is connected).
@@ -292,9 +297,6 @@ struct batch_operator_plugin::impl {
          outpost_descriptor od;
          od.id         = obj["id"].as_uint64();
          od.chain_kind = obj["chain_kind"].as<ChainKind>();
-         // TODO: When solana is implemented, enable this
-         if (od.chain_kind == CHAIN_KIND_SOLANA)
-            continue;
          od.chain_id   = static_cast<uint32_t>(obj["chain_id"].as_uint64());
          outposts.push_back(std::move(od));
       }
@@ -450,50 +452,53 @@ struct batch_operator_plugin::impl {
       ilog("batch_operator: ETH epochIn result={}", result.as_string());
    }
 
-   void deliver_to_sol_outpost(outpost_descriptor& op) {
+   /// Build the typed opp_solana_outpost_client on first use. Mirrors the
+   /// ETH side's ensure_eth_clients — cached so subsequent calls reuse the
+   /// same IDL resolution.
+   void ensure_sol_clients() {
+      if (sol_outpost_client) return;
+
       auto entry = sol_plug->get_client(sol_client_id);
-      if (!entry || !entry->client) {
-         elog("batch_operator: SOL client '{}' not found", sol_client_id);
-         return;
-      }
+      FC_ASSERT(entry && entry->client, "SOL client '{}' not available", sol_client_id);
+      FC_ASSERT(!sol_program_id.empty(), "SOL program id not configured (batch-sol-program-id)");
 
-      auto program_key = sol::solana_public_key::from_base58(sol_program_id);
-      auto& idls = sol_plug->get_idl_files();
+      auto program_key = fc::crypto::solana::solana_public_key::from_base58_string(sol_program_id);
 
-      // Find opp_solana_outpost IDL
+      // Collect every IDL the outpost_solana_client_plugin has loaded whose
+      // program name matches the outpost program.
       std::vector<sol::idl::program> program_idls;
-      for (auto& [path, programs] : idls) {
+      for (auto& [path, programs] : sol_plug->get_idl_files()) {
          for (auto& p : programs) {
-            if (p.name == "opp_solana_outpost") {
+            if (p.name == OPP_SOLANA_OUTPOST_PROGRAM_NAME) {
                program_idls.push_back(p);
-               break;
             }
          }
       }
+      FC_ASSERT(!program_idls.empty(),
+                "IDL for program '{}' not loaded — pass --solana-idl-file",
+                OPP_SOLANA_OUTPOST_PROGRAM_NAME);
 
-      auto program_client = std::make_shared<sol::solana_program_client>(
+      sol_outpost_client = std::make_shared<opp_solana_outpost_client>(
          entry->client, program_key, program_idls);
+   }
 
-      // Call epoch_in instruction
-      if (program_client->has_idl("epoch_in")) {
-         auto& instr = program_client->get_idl("epoch_in");
-         auto accounts = program_client->resolve_accounts(instr);
-         program_client->execute_tx(instr, accounts,
-            {fc::variant(fc::mutable_variant_object()
-               ("epoch_index", current_epoch)
-               ("envelope", op.outbound_raw_envelope))});
-         ilog("batch_operator: SOL epoch_in sent for outpost {}", op.id);
-      }
+   void deliver_to_sol_outpost(outpost_descriptor& op) {
+      ensure_sol_clients();
 
-      // Call messages_in instruction
-      if (program_client->has_idl("messages_in")) {
-         auto& instr = program_client->get_idl("messages_in");
-         auto accounts = program_client->resolve_accounts(instr);
-         program_client->execute_tx(instr, accounts,
-            {fc::variant(fc::mutable_variant_object()
-               ("messages", op.outbound_raw_envelope))});
-         ilog("batch_operator: SOL messages_in sent for outpost {}", op.id);
-      }
+      std::vector<uint8_t> envelope_bytes(op.outbound_raw_envelope.begin(),
+                                          op.outbound_raw_envelope.end());
+
+      auto signature = sol_outpost_client->epoch_in(current_epoch, envelope_bytes);
+      ilog("batch_operator: SOL epoch_in sent for outpost {} ({} bytes) sig={}",
+           op.id, envelope_bytes.size(), signature);
+
+      // Drain queued outbound attestations on the Solana side. ETH triggers
+      // its equivalent (OPP.emitOutboundEnvelope) from inside OPPInbound on
+      // consensus; on Solana the counterpart is a separate instruction so
+      // the batch operator must invoke it explicitly after epoch_in.
+      auto emit_signature = sol_outpost_client->emit_outbound_envelope(current_epoch);
+      ilog("batch_operator: SOL emit_outbound_envelope sent for outpost {} sig={}",
+           op.id, emit_signature);
    }
 
    void read_inbound_chain(outpost_descriptor& op) {
@@ -536,6 +541,29 @@ struct batch_operator_plugin::impl {
                continue;
             }
             auto proto_bytes = fc::crypto::ethereum::hex_to_bytes(hex_data);
+
+            /**
+             * Validate the payload is a well-formed opp::Envelope and that its
+             * epoch_index matches the current WIRE epoch. The ETH contract's
+             * event log retains OPPEnvelope emissions from prior epochs, so a
+             * block-range query for "latest" can surface stale envelopes that
+             * would otherwise be delivered to sysio.msgch::deliver and rejected
+             * with "envelope epoch_index mismatch". Mirrors the SOL-side guard
+             * in read_sol_inbound.
+             */
+            sysio::opp::Envelope envelope;
+            if (!envelope.ParseFromArray(proto_bytes.data(), static_cast<int>(proto_bytes.size()))) {
+               wlog("batch_operator: [outpost {}] skipping non-Envelope ETH event payload ({} bytes)",
+                    op.id, proto_bytes.size());
+               continue;
+            }
+
+            if (static_cast<uint32_t>(envelope.epoch_index()) != current_epoch) {
+               dlog("batch_operator: [outpost {}] skipping ETH envelope for epoch {} (current {})",
+                    op.id, envelope.epoch_index(), current_epoch);
+               continue;
+            }
+
             combined_messages.insert(combined_messages.end(),
                reinterpret_cast<const char*>(proto_bytes.data()),
                reinterpret_cast<const char*>(proto_bytes.data() + proto_bytes.size()));
@@ -567,67 +595,98 @@ struct batch_operator_plugin::impl {
       if (sol_program_id.empty()) return;
 
       try {
-      // Query recent transaction signatures for the program
-      auto sigs_result = entry->client->execute(
-         "getSignaturesForAddress",
-         fc::variants{
-            fc::variant(sol_program_id),
-            fc::variant(fc::mutable_variant_object()("limit", 20))
-         });
-
-      if (!sigs_result.is_array()) return;
-
-      std::vector<char> combined_messages;
-      uint32_t msg_count = 0;
-
-      for (auto& sig_entry : sigs_result.get_array()) {
-         if (!sig_entry.is_object()) continue;
-         auto sig = sig_entry.get_object()["signature"].as_string();
-         auto tx_result = entry->client->execute(
-            "getTransaction",
+         // Query recent transaction signatures for the program
+         auto sigs_result = entry->client->execute(
+            "getSignaturesForAddress",
             fc::variants{
-               fc::variant(sig),
-               fc::variant(fc::mutable_variant_object()
-                  ("encoding", "json")
-                  ("maxSupportedTransactionVersion", 0))
+               fc::variant(sol_program_id),
+               fc::variant(fc::mutable_variant_object()("limit", 20))
             });
 
-         if (!tx_result.is_object()) continue;
-         auto& meta = tx_result.get_object()["meta"];
-         if (!meta.is_object()) continue;
+         if (!sigs_result.is_array()) return;
 
-         auto& log_messages = meta.get_object()["logMessages"];
-         if (!log_messages.is_array()) continue;
+         std::vector<char> combined_messages;
+         uint32_t msg_count = 0;
 
-         for (auto& log : log_messages.get_array()) {
-            auto log_str = log.as_string();
-            // sol_log_data emits base64 encoded program data prefixed with "Program data: "
-            auto pos = log_str.find("Program data: ");
-            if (pos != std::string::npos) {
-               auto b64_data = log_str.substr(pos + 14);
-               auto decoded = fc::base64_decode(b64_data);
-               combined_messages.insert(combined_messages.end(), decoded.begin(), decoded.end());
-               ++msg_count;
+         for (auto& sig_entry : sigs_result.get_array()) {
+            if (!sig_entry.is_object()) continue;
+            auto sig = sig_entry.get_object()["signature"].as_string();
+
+            auto tx_result = entry->client->execute(
+               "getTransaction",
+               fc::variants{
+                  fc::variant(sig),
+                  fc::variant(fc::mutable_variant_object()
+                     ("encoding", "json")
+                     ("maxSupportedTransactionVersion", 0))
+               });
+
+            if (!tx_result.is_object()) continue;
+            auto& meta = tx_result.get_object()["meta"];
+            if (!meta.is_object()) continue;
+
+            // Skip failed transactions — ETH inbound already filters on event
+            // success via revert semantics; Solana reports failure out-of-band
+            // in `meta.err`. A non-null value means the tx reverted and any
+            // emitted "Program data:" is garbage from the partial execution.
+            auto& err_field = meta.get_object()["err"];
+            if (!err_field.is_null()) continue;
+
+            auto& log_messages = meta.get_object()["logMessages"];
+            if (!log_messages.is_array()) continue;
+
+            // Take only the most recent "Program data:" line per transaction.
+            // emit_outbound_envelope is a single instruction → at most one
+            // sol_log_data payload per invocation. Concatenating every match
+            // would mis-count envelopes on transactions that bundle multiple
+            // program calls.
+            std::optional<std::string> last_b64;
+            for (auto& log : log_messages.get_array()) {
+               auto log_str = log.as_string();
+               auto pos = log_str.find("Program data: ");
+               if (pos != std::string::npos) {
+                  last_b64 = log_str.substr(pos + 14);
+               }
+            }
+            if (!last_b64) continue;
+
+            auto decoded = fc::base64_decode(*last_b64);
+            // Validate as a protobuf Envelope before accepting. Bad bytes
+            // would otherwise propagate into sysio.msgch::deliver and poison
+            // the epoch's inbound chain.
+            sysio::opp::Envelope envelope;
+            if (!envelope.ParseFromArray(decoded.data(), decoded.size())) {
+               wlog("batch_operator: [outpost {}] skipping non-Envelope program data ({} bytes)",
+                    op.id, decoded.size());
+               continue;
+            }
+
+            if (static_cast<uint32_t>(envelope.epoch_index()) != current_epoch) {
+               dlog("batch_operator: [outpost {}] skipping SOL envelope for epoch {} (current {})",
+                    op.id, envelope.epoch_index(), current_epoch);
+               continue;
+            }
+
+            combined_messages.insert(combined_messages.end(), decoded.begin(), decoded.end());
+            ++msg_count;
+         }
+
+         if (msg_count > 0) {
+            op.inbound_raw_messages = std::move(combined_messages);
+            op.inbound_msg_count = msg_count;
+            op.inbound_chain_hash_hex = fc::sha256::hash(
+               op.inbound_raw_messages.data(), op.inbound_raw_messages.size()).str();
+            ilog("batch_operator: read {} SOL inbound envelopes for outpost {}", msg_count, op.id);
+
+            // Emit debugging signal (Outpost SOL -> WIRE direction)
+            if (debug_envelope_signal.num_slots() > 0) {
+               debug_envelope_signal(opp::debugging::DebugEnvelopeEvent{
+                  current_epoch,
+                  opp::debugging::DEBUG_OUTPOST_ENDPOINTS_TYPE_OUTPOST_SOLANA_DEPOT,
+                  operator_account,
+                  op.inbound_raw_messages});
             }
          }
-      }
-
-      if (msg_count > 0) {
-         op.inbound_raw_messages = std::move(combined_messages);
-         op.inbound_msg_count = msg_count;
-         op.inbound_chain_hash_hex = fc::sha256::hash(
-            op.inbound_raw_messages.data(), op.inbound_raw_messages.size()).str();
-         ilog("batch_operator: read {} SOL inbound messages for outpost {}", msg_count, op.id);
-
-         // Emit debugging signal (Outpost SOL -> WIRE direction)
-         if (debug_envelope_signal.num_slots() > 0) {
-            debug_envelope_signal(opp::debugging::DebugEnvelopeEvent{
-               current_epoch,
-               opp::debugging::DEBUG_OUTPOST_ENDPOINTS_TYPE_OUTPOST_SOLANA_DEPOT,
-               operator_account,
-               op.inbound_raw_messages});
-         }
-      }
       } catch (const fc::exception& e) {
          wlog("batch_operator: SOL inbound read failed for outpost {}: {}", op.id, e.to_string());
       } catch (const std::exception& e) {

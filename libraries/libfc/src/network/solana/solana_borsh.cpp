@@ -90,7 +90,7 @@ void encoder::write_fixed_bytes(const uint8_t* data, size_t len) {
 }
 
 void encoder::write_pubkey(const solana_public_key& pk) {
-   _buffer.insert(_buffer.end(), pk.data.begin(), pk.data.end());
+   _buffer.insert(_buffer.end(), pk._data.begin(), pk._data.end());
 }
 
 //=============================================================================
@@ -203,7 +203,7 @@ std::vector<uint8_t> decoder::read_fixed_bytes(size_t len) {
 
 solana_public_key decoder::read_pubkey() {
    solana_public_key pk;
-   read_fixed_bytes(pk.data.data(), solana_public_key::SIZE);
+   read_fixed_bytes(pk._data.data(), solana_public_key::size);
    return pk;
 }
 

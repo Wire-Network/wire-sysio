@@ -487,7 +487,7 @@ struct underwriter_plugin::impl {
       // 2. Lock the collateral amount
       // 3. Emit UNDERWRITE_INTENT via sol_log_data
       try {
-         auto program_key = sol::solana_public_key::from_base58(sol_program_id);
+         auto program_key = fc::crypto::solana::solana_public_key::from_base58_string(sol_program_id);
          auto& idl_files = sol_plug->get_idl_files();
 
          // Find the opp_solana_outpost program IDL
