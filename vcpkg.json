@@ -21,6 +21,7 @@
     "spdlog",
     "magic-enum",
     "protobuf",
+    "jemalloc",
     {
       "name": "curl",
       "features": ["boringssl-custom"]

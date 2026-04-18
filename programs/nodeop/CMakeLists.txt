@@ -3,6 +3,12 @@ configure_file(config.hpp.in config.hpp ESCAPE_QUOTES)
 
 chain_target(${NODE_EXECUTABLE_NAME} SOURCE_FILES main.cpp)
 
+if(ENABLE_JEMALLOC)
+  # --whole-archive forces all jemalloc symbols in so malloc/free override libc.
+  target_link_options(${NODE_EXECUTABLE_NAME} PRIVATE
+    "LINKER:--whole-archive" "${JEMALLOC_LIB_PATH}" "LINKER:--no-whole-archive")
+endif()
+
 macro(sysio_additional_plugin)
     set(ADDITIONAL_PLUGINS_TARGET "${ADDITIONAL_PLUGINS_TARGET};${ARGN}" PARENT_SCOPE)
 endmacro()

@@ -178,6 +178,19 @@ if(ENABLE_TCMALLOC)
   set(CMAKE_CXX_STANDARD_LIBRARIES "${CMAKE_CXX_STANDARD_LIBRARIES} ${GPERFTOOLS_TCMALLOC}")
 endif()
 
+option(ENABLE_JEMALLOC "link jemalloc statically into nodeop (via vcpkg)" ON)
+if(ENABLE_JEMALLOC)
+  if(ENABLE_TCMALLOC)
+    message(FATAL_ERROR "ENABLE_JEMALLOC and ENABLE_TCMALLOC are mutually exclusive")
+  endif()
+  # vcpkg jemalloc port only ships .a + pkg-config (no CMake config), so find by name.
+  # Only the nodeop target links jemalloc (see programs/nodeop/CMakeLists.txt) —
+  # auxiliary binaries (clio/kiod/trx_generator) stay on libc malloc to avoid
+  # unexpected interactions with short-lived processes.
+  find_library(JEMALLOC_LIB_PATH NAMES jemalloc_pic jemalloc REQUIRED)
+  message(STATUS "Compiling Wire with jemalloc (nodeop-only): ${JEMALLOC_LIB_PATH}")
+endif()
+
 # sysio includes a bundled BoringSSL which conflicts with OpenSSL. Make sure any other bundled libraries (such as boost)
 # do not attempt to use an external OpenSSL in any manner
 set(CMAKE_DISABLE_FIND_PACKAGE_OpenSSL On)
