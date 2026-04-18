@@ -19,6 +19,8 @@ target_link_libraries(
         magic_enum::magic_enum
 )
 
+file(MAKE_DIRECTORY ${PROTO_GEN_DIR})
+
 protobuf_generate(
         TARGET ${TARGET_MODELS_NAME}
         PROTOS ${PROTO_FILES}
@@ -26,27 +28,6 @@ protobuf_generate(
         PROTOC_OUT_DIR ${PROTO_GEN_DIR}
 )
 
-# After protobuf generation, regenerate OPP bundles (TS/Solidity/Solana models)
-set(_required_progs fish npm pnpm node wire-protobuf-bundler protoc-gen-solidity protoc-gen-solana)
-set(_missing_progs)
-foreach(_prog ${_required_progs})
-    find_program(_found_prog ${_prog})
-    if (NOT _found_prog)
-        list(APPEND _missing_progs ${_prog})
-    endif()
-endforeach()
-if (_missing_progs)
-    message(WARNING "The following programs were not found in PATH: ${_missing_progs}. OPP bundles (TypeScript, Solidity, Solana) will NOT be generated.")
-else()
-    message(STATUS "All required programs found: ${_required_progs}. OPP bundles (TypeScript, Solidity, Solana) will be generated after protobuf generation.")
-    add_custom_command(
-            TARGET ${TARGET_MODELS_NAME}
-            POST_BUILD
-            COMMENT "Generating OPP bundles (TypeScript, Solidity, Solana)"
-            COMMAND fish ${CMAKE_CURRENT_SOURCE_DIR}/tools/generate-opp-bundles.fish
-            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tools
-    )
-endif ()
 
 file(GLOB_RECURSE SRC_FILES src/*.cpp src/*.hpp)
 file(GLOB_RECURSE HEADER_FILES include/*.hpp)
@@ -84,6 +65,29 @@ target_link_libraries(
         magic_enum::magic_enum
         ${TARGET_MODELS_NAME}
 )
+
+
+# After protobuf generation, regenerate OPP bundles (TS/Solidity/Solana models)
+set(_required_progs fish npm pnpm node wire-protobuf-bundler protoc-gen-solidity protoc-gen-solana)
+set(_missing_progs)
+foreach(_prog ${_required_progs})
+    find_program(_found_prog ${_prog})
+    if (NOT _found_prog)
+        list(APPEND _missing_progs ${_prog})
+    endif()
+endforeach()
+if (_missing_progs)
+    message(WARNING "The following programs were not found in PATH: ${_missing_progs}. OPP bundles (TypeScript, Solidity, Solana) will NOT be generated.")
+else()
+    message(STATUS "All required programs found: ${_required_progs}. OPP bundles (TypeScript, Solidity, Solana) will be generated after protobuf generation.")
+    add_custom_command(
+            TARGET ${TARGET_NAME}
+            POST_BUILD
+            COMMENT "Generating OPP bundles (TypeScript, Solidity, Solana)"
+            COMMAND fish ${CMAKE_CURRENT_SOURCE_DIR}/tools/generate-opp-bundles.fish
+            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tools
+    )
+endif ()
 
 if (NOT TARGET cdt::protoc-gen-zpp)
     if (BUILD_SYSTEM_CONTRACTS)

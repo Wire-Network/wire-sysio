@@ -227,16 +227,16 @@ solana_public_key create_program_address(const std::vector<std::vector<uint8_t>>
       enc.write(reinterpret_cast<const char*>(seed.data()), seed.size());
    }
 
-   enc.write(reinterpret_cast<const char*>(program_id.data.data()), solana_public_key::SIZE);
+   enc.write(reinterpret_cast<const char*>(program_id._data.data()), solana_public_key::size);
    enc.write(PDA_MARKER.data(), PDA_MARKER.size());
 
    fc::sha256 hash = enc.result();
 
    solana_public_key result;
-   std::memcpy(result.data.data(), hash.data(), solana_public_key::SIZE);
+   std::memcpy(result._data.data(), hash.data(), solana_public_key::size);
 
    // The derived address must NOT be on the ed25519 curve
-   FC_ASSERT(!is_on_curve(result), "Derived address is on the ed25519 curve - invalid PDA");
+   FC_ASSERT(!fc::crypto::ed::is_on_curve(result), "Derived address is on the ed25519 curve - invalid PDA");
 
    return result;
 }
@@ -262,9 +262,9 @@ std::pair<solana_public_key, uint8_t> find_program_address(const std::vector<std
 
 solana_public_key get_associated_token_address(const solana_public_key& owner, const solana_public_key& mint, const solana_public_key& token_program) {
    std::vector<std::vector<uint8_t>> seeds = {
-      std::vector<uint8_t>(owner.data.begin(), owner.data.end()),
-      std::vector<uint8_t>(token_program.data.begin(), token_program.data.end()),
-      std::vector<uint8_t>(mint.data.begin(), mint.data.end())};
+      std::vector<uint8_t>(owner._data.begin(), owner._data.end()),
+      std::vector<uint8_t>(token_program._data.begin(), token_program._data.end()),
+      std::vector<uint8_t>(mint._data.begin(), mint._data.end())};
 
    auto [address, bump] = find_program_address(seeds, program_ids::ASSOCIATED_TOKEN_PROGRAM);
    return address;
@@ -275,14 +275,14 @@ solana_public_key create_with_seed(const solana_public_key& base, const std::str
    FC_ASSERT(seed.size() <= 32, "Seed exceeds maximum length of 32 characters");
 
    fc::sha256::encoder enc;
-   enc.write(reinterpret_cast<const char*>(base.data.data()), solana_public_key::SIZE);
+   enc.write(reinterpret_cast<const char*>(base._data.data()), solana_public_key::size);
    enc.write(seed.data(), seed.size());
-   enc.write(reinterpret_cast<const char*>(program_id.data.data()), solana_public_key::SIZE);
+   enc.write(reinterpret_cast<const char*>(program_id._data.data()), solana_public_key::size);
 
    fc::sha256 hash = enc.result();
 
    solana_public_key result;
-   std::memcpy(result.data.data(), hash.data(), solana_public_key::SIZE);
+   std::memcpy(result._data.data(), hash.data(), solana_public_key::size);
    return result;
 }
 

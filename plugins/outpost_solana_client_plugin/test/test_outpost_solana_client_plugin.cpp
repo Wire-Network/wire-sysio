@@ -65,7 +65,7 @@ BOOST_AUTO_TEST_CASE(opp_outpost_epoch_in_has_bytes_arg) try {
    BOOST_CHECK(epoch_in->accounts[0].is_signer);
 } FC_LOG_AND_RETHROW();
 
-BOOST_AUTO_TEST_CASE(opp_outpost_emit_has_no_args) try {
+BOOST_AUTO_TEST_CASE(opp_outpost_emit_has_wire_epoch_arg) try {
    auto prog = load_idl_fixture(opp_outpost_idl_fixture);
 
    const idl::instruction* emit = nullptr;
@@ -73,7 +73,22 @@ BOOST_AUTO_TEST_CASE(opp_outpost_emit_has_no_args) try {
       if (instr.name == "emit_outbound_envelope") { emit = &instr; break; }
    }
    BOOST_REQUIRE(emit != nullptr);
-   BOOST_CHECK_EQUAL(emit->args.size(), 0u);
+   BOOST_CHECK_EQUAL(emit->args.size(), 1u);
+   BOOST_CHECK_EQUAL(emit->args[0].name, "wire_epoch_index");
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(opp_outpost_has_initialize_and_add_attestation) try {
+   auto prog = load_idl_fixture(opp_outpost_idl_fixture);
+
+   bool has_initialize = false, has_add = false, has_deposit = false;
+   for (auto& instr : prog.instructions) {
+      if (instr.name == "initialize")       has_initialize = true;
+      if (instr.name == "add_attestation")  has_add        = true;
+      if (instr.name == "deposit")          has_deposit    = true;
+   }
+   BOOST_CHECK(has_initialize);
+   BOOST_CHECK(has_add);
+   BOOST_CHECK(has_deposit);
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE(borsh_encode_u32_roundtrip) try {

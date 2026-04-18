@@ -185,6 +185,14 @@ FC_REFLECT_ENUM(my_namespace::my_enum, (value1)(value2)(value3))
 
 **NEVER use `git add -A` or `git add .`** — these will stage build artifacts, core dumps, submodules, and other untracked files. Always stage specific files by name.
 
+## Documentation Comments
+
+All generated or modified code **must** include documentation comments.
+
+- **C/C++**: Use Doxygen-style comments (`/** ... */` or `/// ...`). Place doc comments in header files when the declaration lives in a header; use implementation-file comments only for internal/static functions with no header declaration.
+- **Python**: Use docstrings (triple-quoted `"""..."""`), compatible with Sphinx or MkDocs. Not JSDoc.
+- **TypeScript/JavaScript**: Use JSDoc comments (`/** ... */`), compatible with Docusaurus.
+
 ## Code Style
 
 Uses `.clang-format` with LLVM base style and these key differences:
