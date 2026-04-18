@@ -77,7 +77,7 @@ namespace sysio::chain::config {
   static constexpr uint32_t   default_sig_cpu_bill_pct                     = 50 * percent_1; // billable percentage of signature recovery
   static constexpr uint32_t   default_produce_block_offset_ms              = 450;
   static constexpr uint32_t   default_production_pause_vote_timeout_ms     = 6u*1000u; // 6 seconds
-  static constexpr uint16_t   default_controller_thread_pool_size          = 2;
+  static constexpr uint16_t   default_controller_thread_pool_size          = 4;
   static constexpr uint16_t   default_vote_thread_pool_size                = 4;
   static constexpr uint32_t   default_max_variable_signature_length        = 16384u;
   static constexpr uint32_t   default_max_action_return_value_size         = 1024;
