@@ -1,6 +1,6 @@
 // Build command:
 // npx esbuild .github/actions/parallel-ctest-containers/main.mjs \
-//   --bundle --platform=node --target=node20 --format=cjs \
+//   --bundle --platform=node --target=node24 --format=cjs \
 //   --outfile=.github/actions/parallel-ctest-containers/dist/index.js
 
 import child_process from 'node:child_process';
