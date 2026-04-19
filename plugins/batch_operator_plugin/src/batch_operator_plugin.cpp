@@ -150,6 +150,19 @@ struct batch_operator_plugin::impl {
          p.lower_bound = page.next_key;
       }
 
+      // chain_plugin::get_table_rows wraps every row as {"key", "value", [payer]}.
+      // Callers of this helper read contract fields directly, so unwrap to value.
+      // variant::operator=(const variant&) calls clear() before reading the source,
+      // so a direct `row = row.get_object()["value"]` would destroy the source ref
+      // mid-assignment. Copy into an independent variant first, then move-assign.
+      for (auto& row : combined.rows) {
+         if (!row.is_object()) continue;
+         const auto& row_obj = row.get_object();
+         if (!row_obj.contains("value")) continue;
+         fc::variant value{row_obj["value"]};
+         row = std::move(value);
+      }
+
       if (opts && opts->filter) {
          std::erase_if(combined.rows, [&](const fc::variant& row) {
             return !(*opts->filter)(row);
@@ -164,11 +177,17 @@ struct batch_operator_plugin::impl {
    bool has_delivered_envelope(uint64_t outpost_id, uint32_t epoch_index) {
       uint64_t key = (static_cast<uint64_t>(outpost_id) << 32) | epoch_index;
       auto op_account = operator_account;
+      // chain_plugin::get_table_rows forwards secondary-index bounds through
+      // be_key_codec::encode_key, which unconditionally calls get_object() on
+      // the JSON-parsed bound. A bare scalar like "5" therefore throws
+      // bad_cast. Wrap the composite key under the "byoutepoch" field to
+      // satisfy the codec.
+      std::string bound_json = "{\"byoutepoch\":" + std::to_string(key) + "}";
       auto rows = read_table("sysio.msgch", "sysio.msgch", "envelopes", 50,
          read_table_options{
-            .lower_bound    = std::to_string(key),
-            .upper_bound    = std::to_string(key),
-            .index_name     = "2",
+            .lower_bound    = bound_json,
+            .upper_bound    = bound_json,
+            .index_name     = "byoutepoch",
             .filter         = [op_account](const fc::variant& row) {
                return chain::name(row["batch_op_name"].as_string()) == op_account;
             }
