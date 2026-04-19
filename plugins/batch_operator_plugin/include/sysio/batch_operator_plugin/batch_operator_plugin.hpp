@@ -1,26 +1,16 @@
 #pragma once
 
+#include <sysio/batch_operator_plugin/debug_envelope_event.hpp>
 #include <sysio/chain_plugin/chain_plugin.hpp>
 #include <sysio/cron_plugin.hpp>
 #include <sysio/outpost_ethereum_client_plugin.hpp>
 #include <sysio/outpost_solana_client_plugin.hpp>
-#include <sysio/opp/debugging/debugging.pb.h>
 
 #include <boost/signals2/signal.hpp>
 
 namespace sysio {
 
    using boost::signals2::signal;
-
-   namespace opp::debugging {
-      /// Signal data: (epoch_index, endpoints_type, batch_op_name, envelope_data)
-      using DebugEnvelopeEvent = std::tuple<
-         uint64_t,
-         ::sysio::opp::debugging::DebugOutpostEndpointsType,
-         name,
-         std::vector<char>
-      >;
-   }
 
    /// Batch operator plugin — cranks Depot and Outpost contracts, ferries OPP
    /// message chains between WIRE chain and external blockchains (ETH, SOL).

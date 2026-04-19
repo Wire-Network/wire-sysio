@@ -14,6 +14,48 @@ This is blockchain infrastructure code. **Prefer the best solution over the simp
 
 Do not optimize for token economy or response brevity at the expense of code quality. A longer, more thorough response that produces correct, well-tested code is always preferred.
 
+## Code Quality Invariants
+
+Apply these to every change in this repo. Check them before declaring a task complete — they are not optional polish.
+
+### 1. No duplicated helpers
+
+If the same helper / check / calculation appears in two translation units, extract it. Pick the home by scope:
+
+- **One plugin, internal:** anonymous namespace in the `.cpp`, or a `private`/`protected` member on the owning class.
+- **Shared across plugins:** public header under the owning plugin's `include/sysio/<plugin>/` tree, or `libraries/libfc/` when it has no plugin dependency.
+- **Common behaviour every subclass of an abstract base needs:** `protected` member (or `static` if stateless) on the base, NOT repeated in every concrete.
+
+Example: `check_deadline` used to live verbatim in both `outpost_ethereum_client.cpp` and `outpost_solana_client.cpp`. It now lives as `outpost_client::throw_if_past_deadline` and uses the client's own `to_string()` for the error label — one place to change, and the concretes get a more specific diagnostic for free.
+
+### 2. No magic literals
+
+Every string or numeric value that isn't a trivial array index / loop bound lives behind a named `constexpr`:
+
+- **File-local:** `constexpr std::string_view` / `constexpr auto` in the anonymous namespace at the top of the `.cpp`.
+- **Shared:** `inline constexpr` in a header (`constexpr` variables are implicitly inline since C++17 — being explicit never hurts).
+- **Contract-related identifiers (account names, table names, action names, secondary-index names, field keys):** group by contract in a nested `namespace`, e.g.
+  ```cpp
+  namespace msgch {
+     constexpr auto account          = "sysio.msgch";
+     constexpr auto table_envelopes  = "envelopes";
+     constexpr auto action_deliver   = "deliver";
+     constexpr auto index_byoutepoch = "byoutepoch";
+     namespace field { constexpr auto batch_op_name = "batch_op_name"; }
+  }
+  ```
+  A contract rename becomes one grep-and-change, not twenty scattered literals.
+
+### 3. Enums over raw values
+
+Any value drawn from a closed set — chain kind, envelope status, operator type, message direction — uses the enum member, never the underlying `int` or `string`.
+
+- Prefer `FC_REFLECT_ENUM`-reflected protobuf enums (`sysio::opp::types::ChainKind`, `sysio::opp::types::EnvelopeStatus`) over hand-rolled sentinels.
+- Decode variants as the enum type: `obj["status"].as<EnvelopeStatus>()`, never `static_cast<EnvelopeStatus>(obj["status"].as_uint64())`.
+- Enum-to-string: `sysio::opp::types::ChainKind_Name(kind)`. Don't hand-roll switches for human-readable names.
+
+A rename of `CHAIN_KIND_ETHEREUM` propagates through the compiler automatically when the code holds the enum. It doesn't when the code holds the bare string `"CHAIN_KIND_ETHEREUM"` or the integer `2`.
+
 ## Project Overview
 
 Wire Sysio is a C++ implementation of the AntelopeIO protocol (a fork of Spring), containing blockchain node software and supporting tools. The main executable is `nodeop` (blockchain node), with supporting tools `clio` (CLI client), `kiod` (key store daemon), and `sys-util`.

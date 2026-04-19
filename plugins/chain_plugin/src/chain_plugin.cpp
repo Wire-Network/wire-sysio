@@ -1772,9 +1772,26 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
    }
 
    // When scope is set on a primary query, prepend scope prefix to bounds.
-   if (!resolved_index_name.empty()) {
-      // Secondary index path: scope prefix is not prepended to bounds (secondary
-      // keys already contain scope internally in their encoding).
+   if (!resolved_index_name.empty() && !scope_prefix_bytes.empty()) {
+      // Secondary index keys on scoped tables (multi_index / kv_multi_index)
+      // are stored as [scope:8B BE][sec_value:N]. For json=false the caller
+      // supplies the full [scope][value] bytes via hex, but for json=true
+      // `encode_key` produced only the sec_value portion (since bound_key_names
+      // is just the index name). Prepend the scope prefix so the bound
+      // compares byte-for-byte against the stored sec_key.
+      if (p.json) {
+         auto prepend_scope_sec = [&](const std::vector<char>& bound) -> std::vector<char> {
+            std::vector<char> scoped;
+            scoped.reserve(scope_prefix_bytes.size() + bound.size());
+            scoped.insert(scoped.end(), scope_prefix_bytes.begin(), scope_prefix_bytes.end());
+            scoped.insert(scoped.end(), bound.begin(), bound.end());
+            return scoped;
+         };
+         if (!lb_bytes.empty()) lb_bytes = prepend_scope_sec(lb_bytes);
+         if (has_upper)         ub_bytes = prepend_scope_sec(ub_bytes);
+      }
+   } else if (!resolved_index_name.empty()) {
+      // Secondary index on an unscoped kv::table: nothing to prepend.
    } else if (!scope_prefix_bytes.empty()) {
       auto prepend_scope = [&](const std::vector<char>& bound) -> std::vector<char> {
          std::vector<char> scoped(scope_prefix_bytes.size() + bound.size());

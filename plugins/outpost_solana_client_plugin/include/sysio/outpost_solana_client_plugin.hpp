@@ -1,6 +1,7 @@
 #pragma once
 
 #include <sysio/outpost_client_plugin.hpp>
+#include <sysio/outpost_client/outpost_client.hpp>
 #include <sysio/chain_plugin/chain_plugin.hpp>
 #include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
 
@@ -121,6 +122,24 @@ public:
    std::vector<solana_client_entry_ptr> get_clients();
    solana_client_entry_ptr get_client(const std::string& id);
    const std::vector<std::pair<std::filesystem::path, std::vector<fc::network::solana::idl::program>>>& get_idl_files();
+
+   /**
+    * @brief Build an `outpost_client` concrete for a Solana outpost.
+    *
+    * Resolves the shared chain-connection entry by id, filters the plugin's
+    * loaded IDLs down to those matching `OPP_SOLANA_OUTPOST_PROGRAM_NAME`,
+    * and constructs an `outpost_solana_client` bound to the given program id.
+    *
+    * @param sol_client_id  Id passed to `--outpost-solana-client`.
+    * @param outpost_id     Outpost id from `sysio.epoch::outposts`.
+    * @param chain_id       Numeric chain id from the outpost row (Solana = 0).
+    * @param program_id     Base58 address of the deployed OPP outpost program.
+    * @throws fc::exception if the client id is unknown or no matching IDL is loaded.
+    */
+   std::shared_ptr<outpost_client> create_outpost_client(const std::string& sol_client_id,
+                                                       uint64_t           outpost_id,
+                                                       uint32_t           chain_id,
+                                                       const std::string& program_id);
 
 private:
    std::unique_ptr<class outpost_solana_client_plugin_impl> my;
