@@ -16,7 +16,8 @@ std::map<std::string, std::function<void()>> features {
    { "hash", hash_benchmarking },
    { "blake2", blake2_benchmarking },
    { "bls", bls_benchmarking },
-   { "merkle", merkle_benchmarking }
+   { "merkle", merkle_benchmarking },
+   { "trace_api_json", trace_api_json_benchmarking }
 };
 
 // values to control cout format
