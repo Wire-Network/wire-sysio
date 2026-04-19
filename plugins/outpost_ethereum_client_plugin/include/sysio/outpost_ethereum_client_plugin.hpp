@@ -1,6 +1,7 @@
 #pragma once
 
 #include <sysio/outpost_client_plugin.hpp>
+#include <sysio/outpost_client/outpost_client.hpp>
 #include <sysio/chain_plugin/chain_plugin.hpp>
 #include <fc/network/ethereum/ethereum_abi.hpp>
 #include <fc/network/ethereum/ethereum_client.hpp>
@@ -61,6 +62,27 @@ public:
    std::vector<ethereum_client_entry_ptr> get_clients();
    ethereum_client_entry_ptr get_client(const std::string& id);
    const std::vector<std::pair<std::filesystem::path, std::vector<fc::network::ethereum::abi::contract>>>& get_abi_files();
+
+   /**
+    * @brief Build an `outpost_client` concrete for an ETH outpost.
+    *
+    * Resolves the shared chain-connection entry by id, flattens the plugin's
+    * loaded ABI set, and constructs an `outpost_ethereum_client` bound to the
+    * given OPP / OPPInbound contract addresses.
+    *
+    * @param eth_client_id     Id passed to `--outpost-ethereum-client`.
+    * @param outpost_id        Outpost id from `sysio.epoch::outposts`.
+    * @param chain_id          Numeric chain id from the outpost row (e.g. 31337, 1).
+    * @param opp_addr          Hex address of the `OPP.sol` contract.
+    * @param opp_inbound_addr  Hex address of the `OPPInbound.sol` contract.
+    * @throws fc::exception if the client id is unknown or addresses are empty.
+    */
+   std::shared_ptr<outpost_client> create_outpost_client(const std::string& eth_client_id,
+                                                       uint64_t           outpost_id,
+                                                       uint32_t           chain_id,
+                                                       const std::string& opp_addr,
+                                                       const std::string& opp_inbound_addr);
+
 private:
    std::unique_ptr<class outpost_ethereum_client_plugin_impl> my;
 };

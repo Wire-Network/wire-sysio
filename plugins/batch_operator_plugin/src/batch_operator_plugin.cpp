@@ -7,10 +7,14 @@
 #include <optional>
 
 #include <sysio/batch_operator_plugin/batch_operator_plugin.hpp>
+#include <sysio/batch_operator_plugin/depot_ops.hpp>
+#include <sysio/batch_operator_plugin/outpost_opp_job.hpp>
 #include <sysio/chain/abi_serializer.hpp>
 #include <sysio/chain/transaction.hpp>
 #include <sysio/opp/opp.hpp>
 #include <sysio/opp/attestations/attestations.pb.h>
+#include <sysio/outpost_ethereum_client_plugin/outpost_ethereum_client.hpp>
+#include <sysio/outpost_solana_client_plugin/outpost_solana_client.hpp>
 
 namespace sysio {
 
@@ -20,33 +24,76 @@ namespace eth = fc::network::ethereum;
 namespace sol = fc::network::solana;
 
 namespace {
-   constexpr auto DELIVERY_TIMEOUT_MS = 15000;
-   constexpr auto EPOCH_POLL_MS = 15000;
+   constexpr auto DELIVERY_TIMEOUT_MS  = 15000;
+   constexpr auto EPOCH_POLL_MS        = 15000;
    constexpr auto EPOCH_EDGE_BUFFER_MS = 2500;
+
+   /// Minimum private cron-service thread count even when 0 outposts are
+   /// discovered at startup — keeps `epoch_tick` viable so a cold-sync node
+   /// that finds outposts later still responds.
+   constexpr std::size_t MIN_CRON_THREADS = 5;
+
+   /// `chain_plug->get_read_only_api(...)` timeout. Covers ABI loading plus
+   /// the table scan; should not dominate the tick.
+   constexpr auto READ_ONLY_API_TIMEOUT_US = 200000;
+
+   /// my_group sentinel meaning "we are not in any batch-op group".
+   constexpr uint8_t GROUP_NONE = 255;
+
+   // ── WIRE contract identifiers (actions, tables, indexes, field names) ──
+   // Centralised so a contract rename/refactor shows up as one search hit,
+   // and so we can't accidentally query "envelopes" when the contract was
+   // renamed to something else.
+
+   namespace msgch {
+      constexpr auto account             = "sysio.msgch";
+      constexpr auto table_envelopes     = "envelopes";
+      constexpr auto table_outenvelopes  = "outenvelopes";
+      constexpr auto index_byoutepoch    = "byoutepoch";
+      constexpr auto action_deliver      = "deliver";
+      constexpr auto action_chkcons      = "chkcons";
+      constexpr auto action_bootstrap    = "bootstrap";
+      /// Field names on `envelope_entry` / `outbound_envelope` rows.
+      namespace field {
+         constexpr auto outpost_id     = "outpost_id";
+         constexpr auto epoch_index    = "epoch_index";
+         constexpr auto status         = "status";
+         constexpr auto raw_envelope   = "raw_envelope";
+         constexpr auto envelope_hash  = "envelope_hash";
+         constexpr auto batch_op_name  = "batch_op_name";
+         constexpr auto data           = "data";
+      }
+   }
+
+   namespace epoch {
+      constexpr auto account            = "sysio.epoch";
+      constexpr auto table_epochstate   = "epochstate";
+      constexpr auto table_outposts     = "outposts";
+      /// Field names on `epoch_state` singleton.
+      namespace field {
+         constexpr auto current_epoch_index    = "current_epoch_index";
+         constexpr auto current_batch_op_group = "current_batch_op_group";
+         constexpr auto is_paused              = "is_paused";
+         constexpr auto batch_op_groups        = "batch_op_groups";
+         constexpr auto current_epoch_start    = "current_epoch_start";
+         constexpr auto next_epoch_start       = "next_epoch_start";
+      }
+      /// Field names on `outpost_info` rows.
+      namespace outpost_field {
+         constexpr auto id         = "id";
+         constexpr auto chain_kind = "chain_kind";
+         constexpr auto chain_id   = "chain_id";
+      }
+   }
 }
 
 // ---------------------------------------------------------------------------
 //  Outpost descriptor — one per registered outpost
 // ---------------------------------------------------------------------------
 struct outpost_descriptor {
-   uint64_t    id          = 0;
-   ChainKind   chain_kind  = CHAIN_KIND_UNKNOWN;
-   uint32_t    chain_id    = 0;
-
-   // Per-epoch transient state
-   std::string           outbound_envelope_hash_hex;
-   std::vector<char>     outbound_raw_envelope;
-   std::string           inbound_chain_hash_hex;
-   std::vector<char>     inbound_raw_messages;
-   uint32_t              inbound_msg_count = 0;
-
-   void reset_transient() {
-      outbound_envelope_hash_hex.clear();
-      outbound_raw_envelope.clear();
-      inbound_chain_hash_hex.clear();
-      inbound_raw_messages.clear();
-      inbound_msg_count = 0;
-   }
+   uint64_t  id          = 0;
+   ChainKind chain_kind  = CHAIN_KIND_UNKNOWN;
+   uint32_t  chain_id    = 0;
 };
 
 // ---------------------------------------------------------------------------
@@ -66,7 +113,6 @@ struct batch_operator_plugin::impl {
 
    // Epoch state tracked across polls
    uint32_t                 current_epoch = 0;
-   uint32_t                 last_delivered_epoch = 0;
    uint8_t                  my_group = 255;
    bool                     is_elected = false;
    fc::time_point           epoch_start;
@@ -80,21 +126,84 @@ struct batch_operator_plugin::impl {
    outpost_ethereum_client_plugin*   eth_plug   = nullptr;
    outpost_solana_client_plugin*     sol_plug   = nullptr;
 
-   // Typed ETH contract clients (lazy-initialized)
-   std::shared_ptr<opp_contract_client>         opp_client;
-   std::shared_ptr<opp_inbound_contract_client> opp_inbound_client;
-
-   // Typed SOL contract client (lazy-initialized)
-   std::shared_ptr<opp_solana_outpost_client>   sol_outpost_client;
-
    // Debugging signal — emitted when an OPP envelope is computed.
    // Only fires when num_slots() > 0 (i.e. external_debugging_plugin is connected).
    signal<void(const opp::debugging::DebugEnvelopeEvent&)> debug_envelope_signal;
 
-   // Cron job handles
-   cron_service::job_id_t            epoch_poll_job_id = 0;
-   cron_service::job_id_t            inbound_poll_job_id = 0;
+   /// Private cron_service owned by this plugin. Sized from the outpost
+   /// count at plugin_startup so per-outpost jobs run in parallel without
+   /// fighting over the shared cron_plugin pool. Lifecycle tied to the
+   /// plugin's startup/shutdown.
+   sysio::services::cron_service_ptr cron_svc;
+   std::vector<cron_service::job_id_t> cron_job_ids;
    bool                              shutting_down = false;
+
+   // -----------------------------------------------------------------------
+   //  Chain-agnostic orchestration layer
+   // -----------------------------------------------------------------------
+
+   /// Concrete `sysio::depot_ops` backed by this impl. Lets an
+   /// `outpost_opp_job` reach WIRE's read_table / push_action /
+   /// debug_envelope_signal without knowing it's embedded in
+   /// `batch_operator_plugin`.
+   class depot_ops_impl_t : public sysio::depot_ops {
+      impl& _impl;
+   public:
+      explicit depot_ops_impl_t(impl& i) : _impl(i) {}
+
+      std::optional<sysio::outbound_envelope_record>
+      read_pending_outbound(uint64_t outpost_id, uint32_t epoch_index) override {
+         auto rows = _impl.read_table(msgch::account, msgch::account, msgch::table_outenvelopes, 50);
+         for (auto& row : rows.rows) {
+            auto     obj         = row.get_object();
+            uint64_t row_outpost = obj[msgch::field::outpost_id].as_uint64();
+            auto     row_epoch   = static_cast<uint32_t>(obj[msgch::field::epoch_index].as_uint64());
+            auto     status      = obj[msgch::field::status].as<EnvelopeStatus>();
+            if (row_outpost != outpost_id || row_epoch != epoch_index
+                || status != ENVELOPE_STATUS_PENDING_DELIVERY) continue;
+
+            sysio::outbound_envelope_record rec;
+            rec.outpost_id        = row_outpost;
+            rec.epoch_index       = row_epoch;
+            rec.envelope_hash_hex = obj[msgch::field::envelope_hash].as_string();
+            auto raw_bytes        = fc::from_hex(obj[msgch::field::raw_envelope].as_string());
+            rec.raw_envelope.assign(raw_bytes.begin(), raw_bytes.end());
+            return rec;
+         }
+         return std::nullopt;
+      }
+
+      bool has_delivered_envelope(uint64_t outpost_id, uint32_t epoch_index) override {
+         return _impl.has_delivered_envelope(outpost_id, epoch_index);
+      }
+
+      void deliver_to_depot(uint64_t outpost_id,
+                            const std::vector<char>& raw_messages) override {
+         _impl.push_action(
+            msgch::account, msgch::action_deliver, _impl.operator_account,
+            fc::mutable_variant_object()
+               (msgch::field::batch_op_name, _impl.operator_account.to_string())
+               (msgch::field::outpost_id,    outpost_id)
+               (msgch::field::data,          raw_messages));
+      }
+
+      void emit_debug_envelope(sysio::opp::debugging::DebugEnvelopeEvent event) override {
+         if (_impl.debug_envelope_signal.num_slots() == 0) return;
+         // The orchestrating job emits with `name{}` for the batch_op_name
+         // slot because it doesn't know the operator identity; fill it in
+         // before publishing to slots.
+         std::get<2>(event) = _impl.operator_account;
+         _impl.debug_envelope_signal(event);
+      }
+
+      bool     within_epoch_window() const override { return _impl.within_epoch_window(); }
+      bool     is_elected()         const override { return _impl.is_elected; }
+      uint32_t current_epoch()      const override { return _impl.current_epoch; }
+   };
+
+   std::unique_ptr<depot_ops_impl_t>                              depot_ops_backing{
+      std::make_unique<depot_ops_impl_t>(*this)};
+   std::map<uint64_t, std::shared_ptr<sysio::outpost_opp_job>>    opp_jobs;
 
    // -----------------------------------------------------------------------
    //  Table read helper
@@ -103,6 +212,14 @@ struct batch_operator_plugin::impl {
    struct read_table_options {
       std::optional<std::string>                              lower_bound;
       std::optional<std::string>                              upper_bound;
+      /// Exact-match key lookup. When set, the chain plugin treats the value as
+      /// both lower and upper bound AND appends a null byte to the upper bound
+      /// so the iterator includes the target row. Use this (not `lower_bound ==
+      /// upper_bound`) for secondary-index lookups on `multi_index` tables —
+      /// those store the secondary key bytes alone and compare with `sk >=
+      /// ub_sv`, so an identical upper-bound breaks out of the loop before the
+      /// match is emitted.
+      std::optional<std::string>                              find;
       std::optional<std::string>                              index_name;
       std::optional<std::function<bool(const fc::variant&)>>  filter;
       bool                                                    get_all = false;
@@ -113,7 +230,7 @@ struct batch_operator_plugin::impl {
                                                 const std::string& table,
                                                 uint32_t limit = 100,
                                                 std::optional<read_table_options> opts = std::nullopt) {
-      auto ro = chain_plug->get_read_only_api(fc::microseconds(200000));
+      auto ro = chain_plug->get_read_only_api(fc::microseconds(READ_ONLY_API_TIMEOUT_US));
       read_only::get_table_rows_params p;
       p.json  = true;
       p.code  = chain::name(code);
@@ -124,6 +241,7 @@ struct batch_operator_plugin::impl {
       if (opts) {
          if (opts->lower_bound)    p.lower_bound    = *opts->lower_bound;
          if (opts->upper_bound)    p.upper_bound    = *opts->upper_bound;
+         if (opts->find)           p.find           = *opts->find;
          if (opts->index_name)     p.index_name     = *opts->index_name;
       }
 
@@ -180,16 +298,18 @@ struct batch_operator_plugin::impl {
       // chain_plugin::get_table_rows forwards secondary-index bounds through
       // be_key_codec::encode_key, which unconditionally calls get_object() on
       // the JSON-parsed bound. A bare scalar like "5" therefore throws
-      // bad_cast. Wrap the composite key under the "byoutepoch" field to
-      // satisfy the codec.
-      std::string bound_json = "{\"byoutepoch\":" + std::to_string(key) + "}";
-      auto rows = read_table("sysio.msgch", "sysio.msgch", "envelopes", 50,
+      // bad_cast. Wrap the composite key under the `byoutepoch` field to
+      // satisfy the codec. Use `find=` rather than equal lower/upper bounds
+      // because chain_plugin's secondary-index iteration breaks on
+      // `sk >= ub_sv` — `find` mode appends a null byte to the upper bound
+      // so the secondary key compares strictly less than it.
+      std::string key_json = std::format("{{\"{}\":{}}}", msgch::index_byoutepoch, key);
+      auto rows = read_table(msgch::account, msgch::account, msgch::table_envelopes, 50,
          read_table_options{
-            .lower_bound    = bound_json,
-            .upper_bound    = bound_json,
-            .index_name     = "byoutepoch",
+            .find           = key_json,
+            .index_name     = msgch::index_byoutepoch,
             .filter         = [op_account](const fc::variant& row) {
-               return chain::name(row["batch_op_name"].as_string()) == op_account;
+               return chain::name(row[msgch::field::batch_op_name].as_string()) == op_account;
             }
          });
       return !rows.rows.empty();
@@ -204,6 +324,17 @@ struct batch_operator_plugin::impl {
       try {
          do_poll_epoch_state();
       } FC_LOG_AND_DROP();
+      // chkcons advances the epoch on consensus. Only the elected operator
+      // should push it — the contract verifies authorization regardless,
+      // but pushing from every batch op wastes trx slots.
+      if (is_elected) {
+         try {
+            push_action(msgch::account, msgch::action_chkcons, operator_account,
+                        fc::mutable_variant_object());
+         } catch (const fc::exception& e) {
+            dlog("batch_operator: chkcons: {}", e.to_string());
+         }
+      }
    }
 
    /**
@@ -211,13 +342,13 @@ struct batch_operator_plugin::impl {
     * Returns {true, epoch_index} on success, {false, 0} if state is unavailable.
     */
    std::pair<bool, uint32_t> parse_epoch_state() {
-      auto state_rows = read_table("sysio.epoch", "sysio.epoch", "epochstate", 1);
+      auto state_rows = read_table(epoch::account, epoch::account, epoch::table_epochstate, 1);
       if (state_rows.rows.empty()) return {false, 0};
 
       auto obj = state_rows.rows[0].get_object();
-      uint32_t epoch_index = static_cast<uint32_t>(obj["current_epoch_index"].as_uint64());
-      uint8_t  cur_group   = static_cast<uint8_t>(obj["current_batch_op_group"].as_uint64());
-      bool     paused      = obj["is_paused"].as_bool();
+      uint32_t epoch_index = static_cast<uint32_t>(obj[epoch::field::current_epoch_index].as_uint64());
+      uint8_t  cur_group   = static_cast<uint8_t>(obj[epoch::field::current_batch_op_group].as_uint64());
+      bool     paused      = obj[epoch::field::is_paused].as_bool();
 
       if (paused) {
          if (is_elected) {
@@ -228,9 +359,9 @@ struct batch_operator_plugin::impl {
       }
 
       // Determine group assignment
-      my_group = 255;
+      my_group = GROUP_NONE;
       current_group_members.clear();
-      auto groups_arr = obj["batch_op_groups"].get_array(); // copy, not reference
+      auto groups_arr = obj[epoch::field::batch_op_groups].get_array(); // copy, not reference
 
       for (uint8_t g = 0; g < groups_arr.size(); ++g) {
          auto grp = groups_arr[g].get_array(); // copy
@@ -249,8 +380,8 @@ struct batch_operator_plugin::impl {
       is_elected = (my_group == cur_group);
 
       // Parse epoch timing
-      fc::from_variant(obj["current_epoch_start"], epoch_start);
-      fc::from_variant(obj["next_epoch_start"], next_epoch_start);
+      fc::from_variant(obj[epoch::field::current_epoch_start], epoch_start);
+      fc::from_variant(obj[epoch::field::next_epoch_start],    next_epoch_start);
 
       if (is_elected) {
          ilog("batch_operator: current_epoch={}", epoch_index);
@@ -268,7 +399,8 @@ struct batch_operator_plugin::impl {
       // Post-genesis: advance is triggered by evalcons consensus, not by batch operators.
       if (epoch_index == 0) {
          try {
-            push_action("sysio.msgch", "bootstrap", operator_account, fc::mutable_variant_object());
+            push_action(msgch::account, msgch::action_bootstrap, operator_account,
+                        fc::mutable_variant_object());
             auto [ok2, epoch_index2] = parse_epoch_state();
             if (ok2) epoch_index = epoch_index2;
          } catch (const fc::exception& e) {
@@ -281,24 +413,21 @@ struct batch_operator_plugin::impl {
             ilog("batch_operator: not elected for epoch {} (my_group={}, active_group={})",
                  epoch_index, my_group, (epoch_index % 3));
          }
+         // Keep current_epoch fresh even when not elected: per-outpost jobs
+         // consult it via depot_ops, and they bail on !is_elected anyway.
+         current_epoch = epoch_index;
          return;
       }
 
-      // Already delivered successfully for this epoch — sleep until next poll
-      if (epoch_index == last_delivered_epoch) return;
-
-      ilog("batch_operator: ELECTED for epoch {} (group {}, {} members)",
-           epoch_index, my_group, current_group_members.size());
-
-      refresh_outposts();
-
-      // Track the epoch for the cycle, but only mark as successfully delivered
-      // after the cycle completes AND delivery was actually attempted.
-      // If skipped (epoch boundary) or failed, the next poll retries.
-      current_epoch = epoch_index;
-      if (run_epoch_cycle(epoch_index)) {
-         last_delivered_epoch = epoch_index;
+      if (epoch_index != current_epoch) {
+         ilog("batch_operator: ELECTED for epoch {} (group {}, {} members)",
+              epoch_index, my_group, current_group_members.size());
       }
+      current_epoch = epoch_index;
+      // Refresh the outpost list so governance-added outposts become visible.
+      // Job scheduling is fixed at plugin_startup; a genuine governance change
+      // still requires a batch_operator restart to size the cron pool.
+      refresh_outposts();
    }
 
    // -----------------------------------------------------------------------
@@ -307,53 +436,58 @@ struct batch_operator_plugin::impl {
 
    void refresh_outposts() {
       outposts.clear();
-      auto rows = read_table("sysio.epoch", "sysio.epoch", "outposts", 50);
+      auto rows = read_table(epoch::account, epoch::account, epoch::table_outposts, 50);
       for (auto& row : rows.rows) {
          auto obj = row.get_object();
          outpost_descriptor od;
-         od.id         = obj["id"].as_uint64();
-         od.chain_kind = obj["chain_kind"].as<ChainKind>();
-         od.chain_id   = static_cast<uint32_t>(obj["chain_id"].as_uint64());
+         od.id         = obj[epoch::outpost_field::id].as_uint64();
+         od.chain_kind = obj[epoch::outpost_field::chain_kind].as<ChainKind>();
+         od.chain_id   = static_cast<uint32_t>(obj[epoch::outpost_field::chain_id].as_uint64());
          outposts.push_back(std::move(od));
       }
       ilog("batch_operator: loaded {} outposts", outposts.size());
+      build_opp_jobs();
    }
 
-   // -----------------------------------------------------------------------
-   //  Epoch cycle orchestration
-   // -----------------------------------------------------------------------
-
-   /// Returns true if delivery was actually attempted, false if skipped.
-   bool run_epoch_cycle(uint32_t cycle_epoch = 0) {
-      if (shutting_down) return false;
-      if (!within_epoch_window()) {
-         dlog("batch_operator: skipping epoch cycle — too close to epoch boundary");
-         return false;
-      }
-      ilog("batch_operator: === EPOCH CYCLE START (epoch {}) ===", current_epoch);
-
-      bool any_delivered = false;
-      // OUTBOUND (WIRE -> Outposts)
+   /// Construct an `outpost_opp_job` per registered outpost using the
+   /// chain-specific plugin factories. Idempotent: already-built jobs stay.
+   /// Called from `refresh_outposts`; jobs only run if USE_OUTPOST_OPP_JOB
+   /// is on (guarded at each use site).
+   void build_opp_jobs() {
+      if (!depot_ops_backing) return; // plugin not initialized yet
       for (auto& op : outposts) {
-         op.reset_transient();
-         read_outbound_envelope(op);
+         if (opp_jobs.contains(op.id)) continue;
+
+         std::shared_ptr<sysio::outpost_client> client;
          try {
-            deliver_to_outpost(op);
-            any_delivered = true;
-         } catch (const std::exception& e) {
-            wlog("batch_operator: outbound delivery failed for outpost {}: {}", op.id, e.what());
-         } catch (...) {
-            wlog("batch_operator: outbound delivery failed for outpost {} (unknown error)", op.id);
+            if (op.chain_kind == CHAIN_KIND_ETHEREUM) {
+               client = eth_plug->create_outpost_client(eth_client_id, op.id, op.chain_id,
+                                                     eth_opp_addr, eth_opp_inbound_addr);
+            } else if (op.chain_kind == CHAIN_KIND_SOLANA) {
+               client = sol_plug->create_outpost_client(sol_client_id, op.id, op.chain_id,
+                                                     sol_program_id);
+            } else {
+               wlog("batch_operator: outpost {} has unsupported chain_kind, skipping job build",
+                    op.id);
+               continue;
+            }
+         } catch (const fc::exception& e) {
+            wlog("batch_operator: failed to build outpost_client for outpost {}: {}",
+                 op.id, e.to_string());
+            continue;
          }
+
+         auto job = std::make_shared<sysio::outpost_opp_job>(
+            client, *depot_ops_backing, fc::milliseconds(delivery_timeout_ms));
+         opp_jobs.emplace(op.id, std::move(job));
+         ilog("batch_operator: built outpost_opp_job for {}", client->to_string());
       }
-      ilog("batch_operator: === EPOCH CYCLE COMPLETE (epoch {}, delivered={}) ===", current_epoch, any_delivered);
-      return any_delivered;
    }
 
    /// Returns true if we are within the safe operating window for this epoch.
    /// Blocks operations only in the narrow buffer zones at epoch boundaries.
    /// Once past next_epoch_start, operations are allowed (epoch is overdue).
-   bool within_epoch_window() {
+   bool within_epoch_window() const {
       auto now = fc::time_point::now();
       auto buffer = fc::milliseconds(EPOCH_EDGE_BUFFER_MS);
       if (now < epoch_start + buffer) return false;  // too close to epoch start
@@ -365,422 +499,7 @@ struct batch_operator_plugin::impl {
       return true;
    }
 
-   /// Inbound poll — runs on a separate cron job from the epoch cycle.
-   /// Reads OPPEnvelope events from outposts, delivers to sysio.msgch,
-   /// and calls chkcons to advance the epoch once the time window passes.
-   void poll_inbound() {
-      if (shutting_down || outposts.empty()) return;
 
-      // Re-check election status — epoch may have advanced since last outbound cycle
-      auto [ok, epoch_index] = parse_epoch_state();
-      if (!ok || !is_elected) return;
-
-      if (within_epoch_window()) {
-         for (auto& op : outposts) {
-            try {
-               read_inbound_chain(op);
-               deliver_to_depot(op);
-            } catch (const fc::exception& e) {
-               wlog("batch_operator: inbound poll failed for outpost {}: {}", op.id, e.to_string());
-            }
-         }
-      }
-
-      // chkcons is safe to call regardless of window — it checks its own time gate.
-      try {
-         push_action("sysio.msgch", "chkcons", operator_account, fc::mutable_variant_object());
-      } catch (const fc::exception& e) {
-         dlog("batch_operator: chkcons: {}", e.to_string());
-      }
-   }
-
-   // -----------------------------------------------------------------------
-   //  Phase 1: Outbound (WIRE -> Outposts)
-   // -----------------------------------------------------------------------
-
-   void crank_depot_outbound(outpost_descriptor& op) {
-      ilog("batch_operator: cranking depot for outpost {}", op.id);
-      push_action("sysio.msgch", "crank", operator_account, fc::mutable_variant_object());
-      push_action("sysio.msgch", "buildenv", operator_account,
-                  fc::mutable_variant_object()
-                     ("batch_op_name", operator_account.to_string())
-                     ("outpost_id", op.id));
-   }
-
-   void read_outbound_envelope(outpost_descriptor& op) {
-      auto rows = read_table("sysio.msgch", "sysio.msgch", "outenvelopes", 50);
-      for (auto& row : rows.rows) {
-         auto obj = row.get_object();
-         uint64_t outpost_id  = obj["outpost_id"].as_uint64();
-         uint32_t epoch_index = static_cast<uint32_t>(obj["epoch_index"].as_uint64());
-         auto status = obj["status"].as<EnvelopeStatus>();
-
-         if (outpost_id == op.id && epoch_index == current_epoch && status == ENVELOPE_STATUS_PENDING_DELIVERY) {
-            auto raw_hex = obj["raw_envelope"].as_string();
-            auto raw_bytes = fc::from_hex(raw_hex);
-            op.outbound_raw_envelope.assign(raw_bytes.begin(), raw_bytes.end());
-            op.outbound_envelope_hash_hex = obj["envelope_hash"].as_string();
-            ilog("batch_operator: read outbound envelope for outpost {} ({} bytes)",
-                 op.id, op.outbound_raw_envelope.size());
-
-            // Emit debugging signal (WIRE -> Outpost direction)
-            if (debug_envelope_signal.num_slots() > 0) {
-               auto ep_type = (op.chain_kind == CHAIN_KIND_ETHEREUM)
-                  ? opp::debugging::DEBUG_OUTPOST_ENDPOINTS_TYPE_DEPOT_OUTPOST_ETHEREUM
-                  : opp::debugging::DEBUG_OUTPOST_ENDPOINTS_TYPE_DEPOT_OUTPOST_SOLANA;
-               debug_envelope_signal(opp::debugging::DebugEnvelopeEvent{
-                  current_epoch, ep_type, operator_account, op.outbound_raw_envelope});
-            }
-
-            return;
-         }
-      }
-      ilog("batch_operator: no outbound envelope for outpost {} this epoch", op.id);
-   }
-
-   void deliver_to_outpost(outpost_descriptor& op) {
-      if (op.outbound_raw_envelope.empty()) return;
-
-      if (op.chain_kind == CHAIN_KIND_ETHEREUM) {
-         deliver_to_eth_outpost(op);
-      } else if (op.chain_kind == CHAIN_KIND_SOLANA) {
-         deliver_to_sol_outpost(op);
-      }
-   }
-
-   void ensure_eth_clients() {
-      if (opp_client && opp_inbound_client) return;
-      auto entry = eth_plug->get_client(eth_client_id);
-      FC_ASSERT(entry && entry->client, "ETH client '{}' not available", eth_client_id);
-      auto& abis = eth_plug->get_abi_files();
-      std::vector<eth::abi::contract> all_abis;
-      for (auto& [path, contracts] : abis) {
-         all_abis.insert(all_abis.end(), contracts.begin(), contracts.end());
-      }
-      opp_client = entry->client->get_contract<opp_contract_client>(eth_opp_addr, all_abis);
-      opp_inbound_client = entry->client->get_contract<opp_inbound_contract_client>(eth_opp_inbound_addr, all_abis);
-   }
-
-   void deliver_to_eth_outpost(outpost_descriptor& op) {
-      ensure_eth_clients();
-      std::string envelope_hex = fc::to_hex(op.outbound_raw_envelope);
-      auto result = opp_inbound_client->epoch_in(envelope_hex);
-      ilog("batch_operator: ETH epochIn result={}", result.as_string());
-   }
-
-   /// Build the typed opp_solana_outpost_client on first use. Mirrors the
-   /// ETH side's ensure_eth_clients — cached so subsequent calls reuse the
-   /// same IDL resolution.
-   void ensure_sol_clients() {
-      if (sol_outpost_client) return;
-
-      auto entry = sol_plug->get_client(sol_client_id);
-      FC_ASSERT(entry && entry->client, "SOL client '{}' not available", sol_client_id);
-      FC_ASSERT(!sol_program_id.empty(), "SOL program id not configured (batch-sol-program-id)");
-
-      auto program_key = fc::crypto::solana::solana_public_key::from_base58_string(sol_program_id);
-
-      // Collect every IDL the outpost_solana_client_plugin has loaded whose
-      // program name matches the outpost program.
-      std::vector<sol::idl::program> program_idls;
-      for (auto& [path, programs] : sol_plug->get_idl_files()) {
-         for (auto& p : programs) {
-            if (p.name == OPP_SOLANA_OUTPOST_PROGRAM_NAME) {
-               program_idls.push_back(p);
-            }
-         }
-      }
-      FC_ASSERT(!program_idls.empty(),
-                "IDL for program '{}' not loaded — pass --solana-idl-file",
-                OPP_SOLANA_OUTPOST_PROGRAM_NAME);
-
-      sol_outpost_client = std::make_shared<opp_solana_outpost_client>(
-         entry->client, program_key, program_idls);
-   }
-
-   void deliver_to_sol_outpost(outpost_descriptor& op) {
-      ensure_sol_clients();
-
-      std::vector<uint8_t> envelope_bytes(op.outbound_raw_envelope.begin(),
-                                          op.outbound_raw_envelope.end());
-
-      auto signature = sol_outpost_client->epoch_in(current_epoch, envelope_bytes);
-      ilog("batch_operator: SOL epoch_in sent for outpost {} ({} bytes) sig={}",
-           op.id, envelope_bytes.size(), signature);
-
-      // Drain queued outbound attestations on the Solana side. ETH triggers
-      // its equivalent (OPP.emitOutboundEnvelope) from inside OPPInbound on
-      // consensus; on Solana the counterpart is a separate instruction so
-      // the batch operator must invoke it explicitly after epoch_in.
-      auto emit_signature = sol_outpost_client->emit_outbound_envelope(current_epoch);
-      ilog("batch_operator: SOL emit_outbound_envelope sent for outpost {} sig={}",
-           op.id, emit_signature);
-   }
-
-   void read_inbound_chain(outpost_descriptor& op) {
-      if (op.chain_kind == CHAIN_KIND_ETHEREUM) {
-         read_eth_inbound(op);
-      } else if (op.chain_kind == CHAIN_KIND_SOLANA) {
-         read_sol_inbound(op);
-      }
-   }
-
-   void read_eth_inbound(outpost_descriptor& op) {
-      ensure_eth_clients();
-
-      auto events = opp_client->query_events(
-         {"OPPEnvelope"},
-         eth::block_tag_t{std::string(eth::block_tag_latest)},
-         eth::block_tag_t{std::string(eth::block_tag_latest)});
-
-      ilog("batch_operator: got {} events from ETH for outpost {}", events.size(), op.id);
-
-      std::vector<char> combined_messages;
-      uint32_t msg_count = 0;
-      for (auto& evt : events) {
-         if (evt.event_name == "OPPEnvelope" && !evt.data.empty()) {
-            // evt.data is raw ABI-encoded event data; decode via the event ABI
-            // to extract the protobuf bytes from the `bytes data` parameter
-            auto decoded = evt.decode<fc::variant>();
-            if (!decoded.has_value()) {
-               elog("batch_operator: failed to ABI-decode OPPEnvelope event: {}", decoded.error().what());
-               continue;
-            }
-            auto& v = decoded.value();
-            std::string hex_data;
-            if (v.is_object() && v.get_object().contains("data")) {
-               hex_data = v["data"].as_string();
-            } else if (v.is_string()) {
-               hex_data = v.as_string();
-            } else {
-               elog("batch_operator: unexpected ABI-decoded variant type for OPPEnvelope");
-               continue;
-            }
-            auto proto_bytes = fc::crypto::ethereum::hex_to_bytes(hex_data);
-
-            /**
-             * Validate the payload is a well-formed opp::Envelope and that its
-             * epoch_index matches the current WIRE epoch. The ETH contract's
-             * event log retains OPPEnvelope emissions from prior epochs, so a
-             * block-range query for "latest" can surface stale envelopes that
-             * would otherwise be delivered to sysio.msgch::deliver and rejected
-             * with "envelope epoch_index mismatch". Mirrors the SOL-side guard
-             * in read_sol_inbound.
-             */
-            sysio::opp::Envelope envelope;
-            if (!envelope.ParseFromArray(proto_bytes.data(), static_cast<int>(proto_bytes.size()))) {
-               wlog("batch_operator: [outpost {}] skipping non-Envelope ETH event payload ({} bytes)",
-                    op.id, proto_bytes.size());
-               continue;
-            }
-
-            if (static_cast<uint32_t>(envelope.epoch_index()) != current_epoch) {
-               dlog("batch_operator: [outpost {}] skipping ETH envelope for epoch {} (current {})",
-                    op.id, envelope.epoch_index(), current_epoch);
-               continue;
-            }
-
-            combined_messages.insert(combined_messages.end(),
-               reinterpret_cast<const char*>(proto_bytes.data()),
-               reinterpret_cast<const char*>(proto_bytes.data() + proto_bytes.size()));
-            ++msg_count;
-         }
-      }
-
-      if (msg_count > 0) {
-         op.inbound_raw_messages = std::move(combined_messages);
-         op.inbound_msg_count = msg_count;
-         op.inbound_chain_hash_hex = fc::sha256::hash(
-            op.inbound_raw_messages.data(), op.inbound_raw_messages.size()).str();
-         ilog("batch_operator: read {} ETH inbound messages for outpost {}", msg_count, op.id);
-
-         // Emit debugging signal (Outpost ETH -> WIRE direction)
-         if (debug_envelope_signal.num_slots() > 0) {
-            debug_envelope_signal(opp::debugging::DebugEnvelopeEvent{
-               current_epoch,
-               opp::debugging::DEBUG_OUTPOST_ENDPOINTS_TYPE_OUTPOST_ETHEREUM_DEPOT,
-               operator_account,
-               op.inbound_raw_messages});
-         }
-      }
-   }
-
-   void read_sol_inbound(outpost_descriptor& op) {
-      auto entry = sol_plug->get_client(sol_client_id);
-      if (!entry || !entry->client) return;
-      if (sol_program_id.empty()) return;
-
-      try {
-         // Query recent transaction signatures for the program
-         auto sigs_result = entry->client->execute(
-            "getSignaturesForAddress",
-            fc::variants{
-               fc::variant(sol_program_id),
-               fc::variant(fc::mutable_variant_object()("limit", 20))
-            });
-
-         if (!sigs_result.is_array()) return;
-
-         std::vector<char> combined_messages;
-         uint32_t msg_count = 0;
-
-         for (auto& sig_entry : sigs_result.get_array()) {
-            if (!sig_entry.is_object()) continue;
-            auto sig = sig_entry.get_object()["signature"].as_string();
-
-            auto tx_result = entry->client->execute(
-               "getTransaction",
-               fc::variants{
-                  fc::variant(sig),
-                  fc::variant(fc::mutable_variant_object()
-                     ("encoding", "json")
-                     ("maxSupportedTransactionVersion", 0))
-               });
-
-            if (!tx_result.is_object()) continue;
-            auto& meta = tx_result.get_object()["meta"];
-            if (!meta.is_object()) continue;
-
-            // Skip failed transactions — ETH inbound already filters on event
-            // success via revert semantics; Solana reports failure out-of-band
-            // in `meta.err`. A non-null value means the tx reverted and any
-            // emitted "Program data:" is garbage from the partial execution.
-            auto& err_field = meta.get_object()["err"];
-            if (!err_field.is_null()) continue;
-
-            auto& log_messages = meta.get_object()["logMessages"];
-            if (!log_messages.is_array()) continue;
-
-            // Take only the most recent "Program data:" line per transaction.
-            // emit_outbound_envelope is a single instruction → at most one
-            // sol_log_data payload per invocation. Concatenating every match
-            // would mis-count envelopes on transactions that bundle multiple
-            // program calls.
-            std::optional<std::string> last_b64;
-            for (auto& log : log_messages.get_array()) {
-               auto log_str = log.as_string();
-               auto pos = log_str.find("Program data: ");
-               if (pos != std::string::npos) {
-                  last_b64 = log_str.substr(pos + 14);
-               }
-            }
-            if (!last_b64) continue;
-
-            auto decoded = fc::base64_decode(*last_b64);
-            // Validate as a protobuf Envelope before accepting. Bad bytes
-            // would otherwise propagate into sysio.msgch::deliver and poison
-            // the epoch's inbound chain.
-            sysio::opp::Envelope envelope;
-            if (!envelope.ParseFromArray(decoded.data(), decoded.size())) {
-               wlog("batch_operator: [outpost {}] skipping non-Envelope program data ({} bytes)",
-                    op.id, decoded.size());
-               continue;
-            }
-
-            if (static_cast<uint32_t>(envelope.epoch_index()) != current_epoch) {
-               dlog("batch_operator: [outpost {}] skipping SOL envelope for epoch {} (current {})",
-                    op.id, envelope.epoch_index(), current_epoch);
-               continue;
-            }
-
-            combined_messages.insert(combined_messages.end(), decoded.begin(), decoded.end());
-            ++msg_count;
-         }
-
-         if (msg_count > 0) {
-            op.inbound_raw_messages = std::move(combined_messages);
-            op.inbound_msg_count = msg_count;
-            op.inbound_chain_hash_hex = fc::sha256::hash(
-               op.inbound_raw_messages.data(), op.inbound_raw_messages.size()).str();
-            ilog("batch_operator: read {} SOL inbound envelopes for outpost {}", msg_count, op.id);
-
-            // Emit debugging signal (Outpost SOL -> WIRE direction)
-            if (debug_envelope_signal.num_slots() > 0) {
-               debug_envelope_signal(opp::debugging::DebugEnvelopeEvent{
-                  current_epoch,
-                  opp::debugging::DEBUG_OUTPOST_ENDPOINTS_TYPE_OUTPOST_SOLANA_DEPOT,
-                  operator_account,
-                  op.inbound_raw_messages});
-            }
-         }
-      } catch (const fc::exception& e) {
-         wlog("batch_operator: SOL inbound read failed for outpost {}: {}", op.id, e.to_string());
-      } catch (const std::exception& e) {
-         wlog("batch_operator: SOL inbound read failed for outpost {}: {}", op.id, e.what());
-      }
-   }
-
-   void deliver_to_depot(outpost_descriptor& op) {
-      if (op.inbound_raw_messages.empty()) {
-         ilog("batch_operator: no inbound messages for outpost {}", op.id);
-         return;
-      }
-
-      if (has_delivered_envelope(op.id, current_epoch)) {
-         ilog("batch_operator: already delivered for outpost {} epoch {}, skipping", op.id, current_epoch);
-         return;
-      }
-
-      // Decode and log envelope contents before delivering
-      log_inbound_envelope(op);
-
-      push_action("sysio.msgch", "deliver", operator_account,
-                  fc::mutable_variant_object()
-                     ("batch_op_name", operator_account.to_string())
-                     ("outpost_id", op.id)
-                     ("data", op.inbound_raw_messages));
-
-      ilog("batch_operator: delivered {} inbound messages for outpost {}",
-           op.inbound_msg_count, op.id);
-   }
-
-   void log_inbound_envelope(const outpost_descriptor& op) {
-      try {
-         auto& raw = op.inbound_raw_messages;
-         sysio::opp::Envelope envelope;
-         if (!envelope.ParseFromString(std::string(raw.begin(), raw.end()))) {
-            wlog("batch_operator: [outpost {}] failed to decode inbound data as Envelope ({} bytes), "
-                 "error={}, hex={}",
-                 op.id, raw.size(),
-                 envelope.InitializationErrorString(),
-                 fc::to_hex(raw.data(), std::min(raw.size(), size_t(64))));
-            return;
-         }
-
-         ilog("batch_operator: [outpost {}] inbound envelope: epoch_index={}, epoch_timestamp={}, "
-              "messages={}, start_message_id={} bytes, end_message_id={} bytes",
-              op.id,
-              envelope.epoch_index(),
-              envelope.epoch_timestamp(),
-              envelope.messages_size(),
-              envelope.start_message_id().size(),
-              envelope.end_message_id().size());
-
-         for (int m = 0; m < envelope.messages_size(); ++m) {
-            auto& message = envelope.messages(m);
-            auto& payload = message.payload();
-            int att_count = payload.attestations_size();
-            ilog("batch_operator: [outpost {}]   message[{}]: version={}, attestation_count={}",
-                 op.id, m, payload.version(), att_count);
-
-            for (int i = 0; i < att_count; ++i) {
-               auto& entry = payload.attestations(i);
-               auto type_val = entry.type();
-               auto type_name = sysio::opp::types::AttestationType_Name(
-                  static_cast<sysio::opp::types::AttestationType>(type_val));
-               ilog("batch_operator: [outpost {}]     attestation[{}]: type={} ({}) data_size={}",
-                    op.id, i,
-                    type_name.empty() ? "UNKNOWN" : type_name,
-                    type_val,
-                    entry.data_size());
-            }
-         }
-      } catch (const std::exception& e) {
-         wlog("batch_operator: [outpost {}] envelope decode error: {}", op.id, e.what());
-      }
-   }
-
-   // Phase 3 (Consensus) removed — now handled inline by sysio.msgch::evalcons
 
    // -----------------------------------------------------------------------
    //  Helpers
@@ -919,56 +638,96 @@ void batch_operator_plugin::plugin_startup() {
 
    ilog("batch_operator_plugin: starting for account {}", _impl->operator_account.to_string());
 
-   // Schedule epoch polling via cron_plugin
-   // milliseconds step: poll every epoch_poll_ms within each minute
-   auto& cron = app().get_plugin<cron_plugin>();
-   cron_service::job_schedule sched;
-   sched.milliseconds = {cron_service::job_schedule::step_value{_impl->epoch_poll_ms}};
+   // Discover outposts once so we can size the private cron_service thread
+   // pool to match. A governance change that adds or removes an outpost
+   // requires a batch operator restart — the set is fixed here.
+   try {
+      _impl->refresh_outposts();
+   } catch (const fc::exception& e) {
+      wlog("batch_operator_plugin: initial outpost discovery failed: {}. "
+           "Starting with 0 per-outpost jobs; restart batch_operator after "
+           "the chain has caught up.", e.to_string());
+   }
 
-   cron_service::job_metadata_t meta;
-   meta.label = "batch_operator_epoch_poll";
-   meta.one_at_a_time = true;
+   // Size the pool: two jobs per outpost (outbound + inbound) plus one
+   // epoch_tick. A minimum floor of 3 keeps the service viable even when
+   // no outposts are known yet (so epoch_tick can still run).
+   const std::size_t outpost_count   = _impl->opp_jobs.size();
+   const std::size_t required_threads = outpost_count * 2 + 1;
+   const std::size_t thread_count    = std::max(required_threads, MIN_CRON_THREADS);
 
-   _impl->epoch_poll_job_id = cron.add_job(
-      sched,
-      [this]() { _impl->poll_epoch_state(); },
-      meta
-   );
+   sysio::services::cron_service::options svc_opts;
+   svc_opts.name        = "batch_operator";
+   svc_opts.num_threads = thread_count;
+   svc_opts.autostart   = true;
 
-   ilog("batch_operator_plugin: scheduled epoch poll (id={}, interval={}ms)",
-        _impl->epoch_poll_job_id, _impl->epoch_poll_ms);
+   _impl->cron_svc = sysio::services::cron_service::create(svc_opts);
+   ilog("batch_operator_plugin: cron_service started with {} thread(s) ({} outpost(s) discovered)",
+        thread_count, outpost_count);
 
-   // Schedule inbound polling on a separate cron job.
-   // Runs independently of the outbound epoch cycle so eth_getLogs
-   // doesn't race against the same-block epochIn delivery.
-   cron_service::job_schedule inbound_sched;
-   inbound_sched.milliseconds = {cron_service::job_schedule::step_value{_impl->epoch_poll_ms}};
+   const auto poll_ms = _impl->epoch_poll_ms;
 
-   cron_service::job_metadata_t inbound_meta;
-   inbound_meta.label = "batch_operator_inbound_poll";
-   inbound_meta.one_at_a_time = true;
+   // epoch_tick — refresh epoch state + election. Keeps `current_epoch`
+   // and `within_epoch_window` accurate for every per-outpost job.
+   {
+      sysio::services::cron_service::job_schedule sched;
+      sched.milliseconds = {sysio::services::cron_service::job_schedule::step_value{poll_ms}};
+      sysio::services::cron_service::job_metadata_t meta;
+      meta.label          = "batch_operator_epoch_tick";
+      meta.one_at_a_time  = true;
+      auto id = _impl->cron_svc->add(sched,
+                                     [impl = _impl.get()]() { impl->poll_epoch_state(); },
+                                     meta);
+      _impl->cron_job_ids.push_back(id);
+      ilog("batch_operator_plugin: scheduled {} (id={}, every {}ms)", meta.label, id, poll_ms);
+   }
 
-   _impl->inbound_poll_job_id = cron.add_job(
-      inbound_sched,
-      [this]() { _impl->poll_inbound(); },
-      inbound_meta
-   );
-
-   ilog("batch_operator_plugin: scheduled inbound poll (id={}, interval={}ms)",
-        _impl->inbound_poll_job_id, _impl->epoch_poll_ms);
+   // Per-outpost outbound + inbound. Each pair targets the same
+   // outpost_opp_job instance; the job's internal mutex serializes them
+   // when they run on different worker threads concurrently.
+   for (auto& [outpost_id, job] : _impl->opp_jobs) {
+      const auto identifier = job->client().to_string();
+      {
+         sysio::services::cron_service::job_schedule sched;
+         sched.milliseconds = {sysio::services::cron_service::job_schedule::step_value{poll_ms}};
+         sysio::services::cron_service::job_metadata_t meta;
+         meta.label         = std::format("outpost_opp_outbound_{}", outpost_id);
+         meta.one_at_a_time = true;
+         auto id = _impl->cron_svc->add(sched,
+                                        [job_wp = std::weak_ptr(job)]() {
+                                           if (auto j = job_wp.lock()) j->run_outbound();
+                                        },
+                                        meta);
+         _impl->cron_job_ids.push_back(id);
+         ilog("batch_operator_plugin: scheduled {} for {} (id={}, every {}ms)",
+              meta.label, identifier, id, poll_ms);
+      }
+      {
+         sysio::services::cron_service::job_schedule sched;
+         sched.milliseconds = {sysio::services::cron_service::job_schedule::step_value{poll_ms}};
+         sysio::services::cron_service::job_metadata_t meta;
+         meta.label         = std::format("outpost_opp_inbound_{}", outpost_id);
+         meta.one_at_a_time = true;
+         auto id = _impl->cron_svc->add(sched,
+                                        [job_wp = std::weak_ptr(job)]() {
+                                           if (auto j = job_wp.lock()) j->run_inbound();
+                                        },
+                                        meta);
+         _impl->cron_job_ids.push_back(id);
+         ilog("batch_operator_plugin: scheduled {} for {} (id={}, every {}ms)",
+              meta.label, identifier, id, poll_ms);
+      }
+   }
 }
 
 void batch_operator_plugin::plugin_shutdown() {
    _impl->shutting_down = true;
-
-   auto& cron = app().get_plugin<cron_plugin>();
-   if (_impl->epoch_poll_job_id != 0) {
-      cron.cancel_job(_impl->epoch_poll_job_id);
+   if (_impl->cron_svc) {
+      _impl->cron_svc->cancel_all();
+      _impl->cron_svc->stop();
+      _impl->cron_svc.reset();
    }
-   if (_impl->inbound_poll_job_id != 0) {
-      cron.cancel_job(_impl->inbound_poll_job_id);
-   }
-
+   _impl->cron_job_ids.clear();
    ilog("batch_operator_plugin: shutdown complete");
 }
 
