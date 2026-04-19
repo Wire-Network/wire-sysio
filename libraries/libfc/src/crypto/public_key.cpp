@@ -3,6 +3,7 @@
 #include <fc/crypto/common.hpp>
 #include <fc/crypto/key_serdes.hpp>
 #include <fc/exception/exception.hpp>
+#include <fc/io/json_stream.hpp>
 
 #include <variant>
 
@@ -129,5 +130,11 @@ namespace fc
    void from_variant(const fc::variant& var, fc::crypto::public_key& vo)
    {
       vo = fc::crypto::public_key::from_string(var.as_string());
+   }
+
+   void to_json_stream(const fc::crypto::public_key& var, json_writer& w)
+   {
+      // Match to_variant's include-prefix=true output (eg "PUB_K1_..." / "PUB_WA_...").
+      w.value_string(var.to_string(fc::yield_function_t(), true));
    }
 } // fc

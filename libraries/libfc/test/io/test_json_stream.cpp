@@ -1,12 +1,16 @@
 #include <boost/test/unit_test.hpp>
 
+#include <fc/crypto/public_key.hpp>
+#include <fc/crypto/private_key.hpp>
 #include <fc/crypto/sha256.hpp>
+#include <fc/crypto/signature.hpp>
 #include <fc/io/json.hpp>
 #include <fc/reflect/json_stream.hpp>
 #include <fc/reflect/variant.hpp>
 #include <fc/time.hpp>
 #include <fc/variant.hpp>
 
+#include <cstring>
 #include <map>
 #include <optional>
 #include <string>
@@ -231,6 +235,26 @@ BOOST_AUTO_TEST_CASE(reflector_with_fc_types) {
    fc::to_variant(b, v);
    std::string variant_out = fc::json::to_string(v, fc::json::yield_function_t());
    BOOST_CHECK_EQUAL(stream_out, variant_out);
+}
+
+BOOST_AUTO_TEST_CASE(fc_public_key_and_signature) {
+   // Signatures + public keys serialize as their prefixed base58 string form ("PUB_K1_...",
+   // "SIG_K1_...") in existing JSON output.  Round-trip via the streaming path and
+   // compare against the to_variant + json::to_string output.
+   const fc::crypto::private_key priv = fc::crypto::private_key::generate();
+   const fc::crypto::public_key pub = priv.get_public_key();
+
+   fc::variant v_pub;
+   fc::to_variant(pub, v_pub);
+   BOOST_CHECK_EQUAL(fc::to_json_string(pub),
+                     fc::json::to_string(v_pub, fc::json::yield_function_t()));
+
+   const char* msg = "some-digest";
+   const fc::crypto::signature sig = priv.sign(fc::sha256::hash(msg, std::strlen(msg)));
+   fc::variant v_sig;
+   fc::to_variant(sig, v_sig);
+   BOOST_CHECK_EQUAL(fc::to_json_string(sig),
+                     fc::json::to_string(v_sig, fc::json::yield_function_t()));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
