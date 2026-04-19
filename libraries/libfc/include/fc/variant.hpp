@@ -46,6 +46,16 @@ namespace fc
    class microseconds;
    template<typename T> struct safe;
 
+   // Streaming JSON writer overloads for variant / variant_object; implemented in
+   // variant.cpp / variant_object.cpp.  Provides a seamless path for reflected structs
+   // that embed a fc::variant or variant_object field.  Performance is bounded by the
+   // underlying fc::json::to_string since variants can hold arbitrary shapes; callers
+   // that want the full allocation-free path should flatten variant usage out of their
+   // hot endpoints.
+   void to_json_stream( const variant& v, json_writer& w );
+   void to_json_stream( const variant_object& vo, json_writer& w );
+   void to_json_stream( const mutable_variant_object& vo, json_writer& w );
+
    struct blob { std::vector<char> data; };
 
    void to_variant( const blob& var,  fc::variant& vo );
@@ -132,9 +142,11 @@ namespace fc
 
    void to_variant( const time_point& var,  fc::variant& vo );
    void from_variant( const fc::variant& var,  time_point& vo );
+   void to_json_stream( const time_point& var, json_writer& w );
 
    void to_variant( const time_point_sec& var,  fc::variant& vo );
    void from_variant( const fc::variant& var,  time_point_sec& vo );
+   void to_json_stream( const time_point_sec& var, json_writer& w );
 
    void to_variant( const microseconds& input_microseconds,  fc::variant& output_variant );
    void from_variant( const fc::variant& input_variant,  microseconds& output_microseconds );

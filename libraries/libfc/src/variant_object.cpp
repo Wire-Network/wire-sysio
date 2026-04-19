@@ -1,6 +1,7 @@
 #include <fc/variant_object.hpp>
 #include <fc/exception/exception.hpp>
-
+#include <fc/io/json.hpp>
+#include <fc/io/json_stream.hpp>
 
 namespace fc
 {
@@ -494,6 +495,22 @@ namespace fc
    void to_variant( const mutable_variant_object& var,  variant& vo )
    {
       vo = variant(var);
+   }
+
+   void to_json_stream( const variant_object& vo, json_writer& w )
+   {
+      // variant_object already is an fc::variant's payload; defer to fc::json::to_string
+      // and splice the serialized form.  Avoids rebuilding the object field-by-field on
+      // the stream path when the caller is handing us a prebuilt object (eg legacy code
+      // that produced a variant_object it wants to embed into a streaming response).
+      variant tmp = variant(vo);
+      w.raw_value( fc::json::to_string( tmp, fc::json::yield_function_t() ) );
+   }
+
+   void to_json_stream( const mutable_variant_object& vo, json_writer& w )
+   {
+      variant tmp = variant(vo);
+      w.raw_value( fc::json::to_string( tmp, fc::json::yield_function_t() ) );
    }
 
    void from_variant( const variant& var,  mutable_variant_object& vo )

@@ -6,6 +6,7 @@
 #include <cmath>
 #include <fc/crypto/sha256.hpp>
 #include <fc/variant.hpp>
+#include <fc/io/json_stream.hpp>
 #include <fc/exception/exception.hpp>
 #include "_digest_common.hpp"
 
@@ -211,6 +212,13 @@ namespace fc {
     }
     else
         memset( bi.data(), char(0), sizeof(bi) );
+  }
+  void to_json_stream( const sha256& bi, json_writer& w )
+  {
+    // Emit the canonical lowercase hex form.  The existing to_variant stores raw bytes
+    // and lets fc::json::to_string base16-encode the blob at serialize time; this path
+    // shortcuts that by writing the hex string directly into the output buffer.
+    w.value_string( bi.str() );
   }
 
   uint64_t hash64(const char* buf, size_t len)

@@ -7,6 +7,7 @@
 #include <fc/platform_independence.hpp>
 #include <fc/crypto/packhash.hpp>
 #include <fc/io/raw_fwd.hpp>
+#include <fc/io/json_stream_fwd.hpp>
 #include <boost/functional/hash.hpp>
 
 namespace fc
@@ -131,6 +132,7 @@ class sha256 : public add_packhash_to_hash<sha256>
 class variant;
 void to_variant( const sha256& bi, variant& v );
 void from_variant( const variant& v, sha256& bi );
+void to_json_stream( const sha256& bi, json_writer& w );
 
 uint64_t hash64(const char* buf, size_t len);
 

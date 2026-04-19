@@ -1,6 +1,11 @@
 #include <boost/test/unit_test.hpp>
 
+#include <fc/crypto/sha256.hpp>
+#include <fc/io/json.hpp>
 #include <fc/reflect/json_stream.hpp>
+#include <fc/reflect/variant.hpp>
+#include <fc/time.hpp>
+#include <fc/variant.hpp>
 
 #include <map>
 #include <optional>
@@ -33,6 +38,12 @@ struct with_map_t {
    std::map<std::string, int32_t> counts;
 };
 
+struct block_like_t {
+   fc::time_point timestamp;
+   fc::sha256     digest;
+   std::string    producer;
+};
+
 } // namespace
 
 FC_REFLECT(point_t, (x)(y)(label))
@@ -40,6 +51,7 @@ FC_REFLECT(nested_t, (name)(values)(maybe)(where))
 FC_REFLECT_ENUM(color_t, (red)(green)(blue))
 FC_REFLECT(with_optional_t, (id)(note))
 FC_REFLECT(with_map_t, (counts))
+FC_REFLECT(block_like_t, (timestamp)(digest)(producer))
 
 BOOST_AUTO_TEST_SUITE(json_stream_test)
 
@@ -144,6 +156,81 @@ BOOST_AUTO_TEST_CASE(array_of_reflected) {
    BOOST_CHECK_EQUAL(
       fc::to_json_string(pts),
       "[{\"x\":1,\"y\":2,\"label\":\"a\"},{\"x\":3,\"y\":4,\"label\":\"b\"}]");
+}
+
+// -- fc type overloads --------------------------------------------------------------------
+
+BOOST_AUTO_TEST_CASE(fc_microseconds) {
+   // fc::to_variant renders microseconds as the int64 count; match that here.
+   BOOST_CHECK_EQUAL(fc::to_json_string(fc::microseconds{0}),        "0");
+   BOOST_CHECK_EQUAL(fc::to_json_string(fc::microseconds{1'234'567}), "1234567");
+   BOOST_CHECK_EQUAL(fc::to_json_string(fc::microseconds{-5}),       "-5");
+}
+
+BOOST_AUTO_TEST_CASE(fc_time_point_roundtrip_vs_variant) {
+   // Golden: JSON form must be identical to the existing to_variant -> json::to_string path
+   // so clients see no change when an endpoint migrates to the streaming writer.
+   const fc::time_point tp = fc::time_point::from_iso_string("2024-07-01T12:34:56.789");
+   std::string stream_out = fc::to_json_string(tp);
+   fc::variant v;
+   fc::to_variant(tp, v);
+   std::string variant_out = fc::json::to_string(v, fc::json::yield_function_t());
+   BOOST_CHECK_EQUAL(stream_out, variant_out);
+}
+
+BOOST_AUTO_TEST_CASE(fc_time_point_sec_roundtrip_vs_variant) {
+   const fc::time_point_sec tps{ 1'720'000'000u };
+   std::string stream_out = fc::to_json_string(tps);
+   fc::variant v;
+   fc::to_variant(tps, v);
+   std::string variant_out = fc::json::to_string(v, fc::json::yield_function_t());
+   BOOST_CHECK_EQUAL(stream_out, variant_out);
+}
+
+BOOST_AUTO_TEST_CASE(fc_sha256_hex_form) {
+   // sha256's canonical JSON form is its lowercase hex string (what .str() returns).
+   // to_variant stores raw bytes and relies on json::to_string base16-encoding at write
+   // time; to_json_stream shortcuts straight to the hex string, which must match.
+   const fc::sha256 h{ "0000000000000000000000000000000000000000000000000000000000000abc" };
+   BOOST_CHECK_EQUAL(
+      fc::to_json_string(h),
+      "\"0000000000000000000000000000000000000000000000000000000000000abc\"");
+}
+
+BOOST_AUTO_TEST_CASE(fc_variant_fallback) {
+   // fc::variant overload defers to fc::json::to_string; result must match the existing
+   // path byte-for-byte.
+   fc::variant v{ int64_t{42} };
+   BOOST_CHECK_EQUAL(fc::to_json_string(v),
+                     fc::json::to_string(v, fc::json::yield_function_t()));
+   v = std::string{"hello"};
+   BOOST_CHECK_EQUAL(fc::to_json_string(v),
+                     fc::json::to_string(v, fc::json::yield_function_t()));
+}
+
+BOOST_AUTO_TEST_CASE(fc_variant_object_fallback) {
+   fc::mutable_variant_object mvo;
+   mvo("a", 1)("b", "two");
+   fc::variant as_var = fc::variant(mvo);
+   BOOST_CHECK_EQUAL(fc::to_json_string(mvo),
+                     fc::json::to_string(as_var, fc::json::yield_function_t()));
+}
+
+// Composition test: a reflected struct that has fc::time_point and fc::sha256 fields.
+BOOST_AUTO_TEST_CASE(reflector_with_fc_types) {
+   // The reflector-based path must find the to_json_stream overloads for fc::time_point
+   // and fc::sha256 via ordinary (namespace-scope) lookup.  Without them, compilation
+   // would fail; with them, output matches the to_variant -> json::to_string golden path.
+   block_like_t b{
+      .timestamp = fc::time_point::from_iso_string("2024-07-01T00:00:00.000"),
+      .digest    = fc::sha256{ "deadbeef00000000000000000000000000000000000000000000000000000000" },
+      .producer  = "producer1",
+   };
+   std::string stream_out = fc::to_json_string(b);
+   fc::variant v;
+   fc::to_variant(b, v);
+   std::string variant_out = fc::json::to_string(v, fc::json::yield_function_t());
+   BOOST_CHECK_EQUAL(stream_out, variant_out);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

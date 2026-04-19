@@ -8,6 +8,7 @@
 #include <boost/scoped_array.hpp>
 #include <fc/reflect/variant.hpp>
 #include <fc/io/json.hpp>
+#include <fc/io/json_stream.hpp>
 #include <fc/utf8.hpp>
 #include <algorithm>
 #include <fc/int256.hpp>
@@ -1198,4 +1199,12 @@ std::string format_string( const std::string& frmt, const variant_object& args, 
    }
 
 
+   void to_json_stream( const variant& v, json_writer& w ) {
+      // variants hold arbitrary nested structures; emit via the existing JSON serializer
+      // and splice the result as a raw value.  No intermediate variant allocation is
+      // saved here (the variant already exists); the win is that reflected structs with
+      // a variant field participate in the streaming path instead of falling back to a
+      // full mutable_variant_object rebuild at the caller.
+      w.raw_value( fc::json::to_string( v, fc::json::yield_function_t() ) );
+   }
 } // namespace fc
