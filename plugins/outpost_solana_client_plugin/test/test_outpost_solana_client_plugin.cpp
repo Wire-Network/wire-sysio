@@ -60,8 +60,9 @@ BOOST_AUTO_TEST_CASE(opp_outpost_epoch_in_has_bytes_arg) try {
    BOOST_CHECK_EQUAL(epoch_in->args.size(), 1u);
    BOOST_CHECK_EQUAL(epoch_in->args[0].name, "envelope_data");
 
-   // Accounts: authority (signer) + outpost_state (PDA)
-   BOOST_CHECK_EQUAL(epoch_in->accounts.size(), 2u);
+   // Accounts: operator (signer), config (PDA), operator_registry (PDA),
+   //           epoch_deliveries, system_program
+   BOOST_CHECK_EQUAL(epoch_in->accounts.size(), 5u);
    BOOST_CHECK(epoch_in->accounts[0].is_signer);
 } FC_LOG_AND_RETHROW();
 

@@ -76,7 +76,29 @@
             "index_type": "i64",
             "key_names": ["scope","primary_key"],
             "key_types": ["name","uint64"],
-            "table_id": 27043
+            "table_id": 27043,
+            "secondary_indexes": [
+                {
+                    "name": "bynamechain",
+                    "key_type": "uint128",
+                    "table_id": 23716
+                },
+                {
+                    "name": "byname",
+                    "key_type": "uint64",
+                    "table_id": 23717
+                },
+                {
+                    "name": "bypubkey",
+                    "key_type": "checksum256",
+                    "table_id": 23718
+                },
+                {
+                    "name": "bychain",
+                    "key_type": "uint64",
+                    "table_id": 23719
+                }
+            ]
         },
         {
             "name": "links_s",

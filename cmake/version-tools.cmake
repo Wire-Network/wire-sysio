@@ -1,5 +1,5 @@
 function(generate_version_metadata)
-    if(IS_DIRECTORY ${CMAKE_SOURCE_DIR}/.git)
+    if(NOT "$ENV{IN_DEVCONTAINER}" STREQUAL "1")
         # Execute `git` to grab the corresponding data.
         execute_process(
                 COMMAND ${GIT_EXEC} rev-parse HEAD

@@ -201,21 +201,39 @@
             "type": "epoch_config",
             "index_type": "i64",
             "key_names": [],
-            "key_types": []
+            "key_types": [],
+            "table_id": 36213
         },
         {
             "name": "epochstate",
             "type": "epoch_state",
             "index_type": "i64",
             "key_names": [],
-            "key_types": []
+            "key_types": [],
+            "table_id": 59387
+        },
+        {
+            "name": "outpost_info",
+            "type": "outpost_info",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": [],
+            "table_id": 9958
         },
         {
             "name": "outposts",
             "type": "outpost_info",
             "index_type": "i64",
-            "key_names": ["table_name","scope","primary_key"],
-            "key_types": ["name","name","uint64"]
+            "key_names": ["scope","primary_key"],
+            "key_types": ["name","uint64"],
+            "table_id": 18067,
+            "secondary_indexes": [
+                {
+                    "name": "bychain",
+                    "key_type": "uint64",
+                    "table_id": 10644
+                }
+            ]
         }
     ],
     "ricardian_clauses": [],
