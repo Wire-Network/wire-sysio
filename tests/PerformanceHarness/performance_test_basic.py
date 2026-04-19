@@ -305,24 +305,50 @@ class PerformanceTestBasic:
         return True
 
     def queryBlockTrxData(self, node, blockDataPath, blockTrxDataPath, startBlockNum, endBlockNum):
+        # Use trace_api/get_actions for trx-level data and chain/get_block_info for block metadata.
+        # The old trace_api/get_block serialized the entire block (including base58-encoded
+        # signatures - OpenSSL BN_div alloc storm) even though the harness only needs trx id,
+        # block num/time, cpu/net usage, and the block header.
+        # Filter by the configured action name (transfer/cpu/ram/net/newaccount/doit/...) so
+        # onblock and other unrelated trxs are skipped server-side without base58 work.
+        actionFilter = None
+        if getattr(self, 'userTrxDataDict', None):
+            cfgActions = self.userTrxDataDict.get('actions') or []
+            if cfgActions:
+                actionFilter = cfgActions[0].get('actionName')
         for blockNum in range(startBlockNum, endBlockNum + 1):
             blockCpuTotal, blockNetTotal, blockTransactionTotal = 0, 0, 0
-            block = node.processUrllibRequest("trace_api", "get_block", {"block_num":blockNum}, silentErrors=False, exitOnError=True)
+            blockInfo = node.processUrllibRequest("chain", "get_block_info", {"block_num":blockNum}, silentErrors=False, exitOnError=True)
+            actionsQuery = {"block_num_start": blockNum, "block_num_end": blockNum}
+            if actionFilter:
+                actionsQuery["action"] = actionFilter
+            actionsResp = node.processUrllibRequest("trace_api", "get_actions", actionsQuery, silentErrors=False, exitOnError=True)
             btdf_append_write = self.fileOpenMode(blockTrxDataPath)
             with open(blockTrxDataPath, btdf_append_write) as trxDataFile:
-                for trx in block['payload']['transactions']:
-                    if not self.isOnBlockTransaction(trx):
-                        trx_data = trxData(blockNum=trx["block_num"], cpuUsageUs=trx["cpu_usage_us"],
-                                           netUsageUs=trx["net_usage_words"], blockTime=trx["block_time"])
-                        self.data.trxDict.update(dict([(trx["id"], trx_data)]))
-                        [ trxDataFile.write(f"{trx['id']},{trx['block_num']},{trx['block_time']},{trx['cpu_usage_us']},{trx['net_usage_words']},{trx['actions']}\n") ]
-                        blockCpuTotal += trx["cpu_usage_us"]
-                        blockNetTotal += trx["net_usage_words"]
-                        blockTransactionTotal += 1
-            block_data = blockData(blockId=block["payload"]["id"], blockNum=block['payload']['number'],
+                seen = set()  # dedup if a trx somehow has multiple matching actions
+                for action in actionsResp['payload']['actions']:
+                    # If no action filter configured, still skip onblock explicitly.
+                    if not actionFilter and action.get('account') == 'sysio' and action.get('name') == 'onblock':
+                        continue
+                    trxId = action['trx_id']
+                    if trxId in seen:
+                        continue
+                    seen.add(trxId)
+                    cpu = action.get('cpu_usage_us', 0) or 0
+                    net = action.get('net_usage', 0) or 0
+                    trx_data = trxData(blockNum=action['block_num'], cpuUsageUs=cpu,
+                                       netUsageUs=net, blockTime=action['block_time'])
+                    self.data.trxDict.update({trxId: trx_data})
+                    trxDataFile.write(f"{trxId},{action['block_num']},{action['block_time']},{cpu},{net},\n")
+                    blockCpuTotal += cpu
+                    blockNetTotal += net
+                    blockTransactionTotal += 1
+            block_data = blockData(blockId=blockInfo["payload"]["id"],
+                                   blockNum=blockInfo['payload']['block_num'],
                                    transactions=blockTransactionTotal, net=blockNetTotal, cpu=blockCpuTotal,
-                                   producer=block["payload"]["producer"], status=block["payload"]["status"],
-                                   _timestamp=block["payload"]["timestamp"])
+                                   producer=blockInfo["payload"]["producer"],
+                                   status="executed",
+                                   _timestamp=blockInfo["payload"]["timestamp"])
             self.data.blockList.append(block_data)
             self.data.blockDict[str(blockNum)] = block_data
             bdf_append_write = self.fileOpenMode(blockDataPath)
