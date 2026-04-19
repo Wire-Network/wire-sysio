@@ -179,12 +179,21 @@ if(ENABLE_TCMALLOC)
 endif()
 
 option(ENABLE_JEMALLOC "link jemalloc statically into nodeop (via vcpkg)" ON)
+# ASan/UBSan ship their own malloc interceptors; linking jemalloc's overrides on top produces undefined
+# behavior (double-interception, heap metadata mismatch) that makes nodeop crash on startup. The sanitizer
+# CI platforms inject -fsanitize=... via CMAKE_{C,CXX}_FLAGS (see .cicd/platforms/{asan,ubsan}.Dockerfile)
+# rather than toggling the ENABLE_*_SANITIZER options, so detect either path.
+if(ENABLE_JEMALLOC AND (ENABLE_ADDRESS_SANITIZER OR ENABLE_UNDEFINED_BEHAVIOR_SANITIZER
+                        OR "${CMAKE_C_FLAGS}${CMAKE_CXX_FLAGS}" MATCHES "-fsanitize="))
+  message(STATUS "ENABLE_JEMALLOC disabled: sanitizer detected (ENABLE_*_SANITIZER option or -fsanitize= flag)")
+  set(ENABLE_JEMALLOC OFF CACHE BOOL "" FORCE)
+endif()
 if(ENABLE_JEMALLOC)
   if(ENABLE_TCMALLOC)
     message(FATAL_ERROR "ENABLE_JEMALLOC and ENABLE_TCMALLOC are mutually exclusive")
   endif()
   # vcpkg jemalloc port only ships .a + pkg-config (no CMake config), so find by name.
-  # Only the nodeop target links jemalloc (see programs/nodeop/CMakeLists.txt) —
+  # Only the nodeop target links jemalloc (see programs/nodeop/CMakeLists.txt);
   # auxiliary binaries (clio/kiod/trx_generator) stay on libc malloc to avoid
   # unexpected interactions with short-lived processes.
   find_library(JEMALLOC_LIB_PATH NAMES jemalloc_pic jemalloc REQUIRED)
