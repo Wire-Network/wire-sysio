@@ -214,18 +214,48 @@
     ],
     "tables": [
         {
+            "name": "challenge_entry",
+            "type": "challenge_entry",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": [],
+            "table_id": 63857
+        },
+        {
             "name": "challenges",
             "type": "challenge_entry",
             "index_type": "i64",
-            "key_names": ["table_name","scope","primary_key"],
-            "key_types": ["name","name","uint64"]
+            "key_names": ["scope","primary_key"],
+            "key_types": ["name","uint64"],
+            "table_id": 633,
+            "secondary_indexes": [
+                {
+                    "name": "byrequest",
+                    "key_type": "uint64",
+                    "table_id": 27514
+                },
+                {
+                    "name": "byepoch",
+                    "key_type": "uint64",
+                    "table_id": 27515
+                }
+            ]
+        },
+        {
+            "name": "manual_resolution",
+            "type": "manual_resolution",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": [],
+            "table_id": 34787
         },
         {
             "name": "resolutions",
             "type": "manual_resolution",
             "index_type": "i64",
-            "key_names": ["table_name","scope","primary_key"],
-            "key_types": ["name","name","uint64"]
+            "key_names": ["scope","primary_key"],
+            "key_types": ["name","uint64"],
+            "table_id": 62629
         }
     ],
     "ricardian_clauses": [],
