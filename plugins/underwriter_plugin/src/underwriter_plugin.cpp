@@ -96,7 +96,21 @@ struct underwriter_plugin::impl {
          elog("underwriter: table read failed {}::{} — {}", code, table, (*err)->to_string());
          return {};
       }
-      return std::get<read_only::get_table_rows_result>(result);
+      auto res = std::get<read_only::get_table_rows_result>(result);
+
+      // chain_plugin::get_table_rows wraps every row as {"key", "value", [payer]}.
+      // Callers of this helper read contract fields directly, so unwrap to value.
+      // variant::operator=(const variant&) calls clear() before reading the source,
+      // so a direct `row = row.get_object()["value"]` would destroy the source ref
+      // mid-assignment. Copy into an independent variant first, then move-assign.
+      for (auto& row : res.rows) {
+         if (!row.is_object()) continue;
+         const auto& row_obj = row.get_object();
+         if (!row_obj.contains("value")) continue;
+         fc::variant value{row_obj["value"]};
+         row = std::move(value);
+      }
+      return res;
    }
 
    // -----------------------------------------------------------------------
