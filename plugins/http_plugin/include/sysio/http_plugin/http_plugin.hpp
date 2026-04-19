@@ -46,7 +46,13 @@ namespace sysio {
 
    enum class http_content_type {
       json = 1,
-      plaintext = 2
+      plaintext = 2,
+      // Handler returns a fc::variant whose string payload is already a JSON document.
+      // Skips fc::json::to_string on the response path and sends the raw bytes with
+      // Content-Type: application/json.  Used by endpoints that build their response via
+      // fc::json_writer instead of fc::mutable_variant_object to avoid the
+      // variant-tree -> JSON-string round trip.
+      json_raw = 3
    };
 
    struct http_plugin_defaults {

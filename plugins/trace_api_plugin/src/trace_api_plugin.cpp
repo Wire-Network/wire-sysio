@@ -239,6 +239,10 @@ struct trace_api_rpc_plugin_impl : public std::enable_shared_from_this<trace_api
    void plugin_startup() {
       auto& http = app().get_plugin<http_plugin>();
 
+      // Content-Type: application/json, but response body is built via the streaming
+      // fc::json_writer path and passed through as-is.  Skips the fc::variant tree
+      // build + fc::json::to_string on the 200 response.  Error responses still go via
+      // the fc::variant path (they're tiny and infrequent).
       http.add_async_handler({"/v1/trace_api/get_block",
             api_category::trace_api,
             [this](std::string, std::string body, url_response_callback cb)
@@ -267,18 +271,22 @@ struct trace_api_rpc_plugin_impl : public std::enable_shared_from_this<trace_api
          }
 
          try {
-
-            auto resp = req_handler->get_block_trace(*block_number);
-            if (resp.is_null()) {
+            std::string resp = req_handler->get_block_trace_json(*block_number);
+            if (resp.empty()) {
                error_results results{404, "Trace API: block trace missing"};
                cb( 404, fc::variant( results ));
             } else {
-               cb( 200, std::move(resp) );
+               // Pre-serialized JSON body: wrap in a string-valued variant so the
+               // json_raw content-type path sends it verbatim.  Error responses in
+               // this handler (and anything routed through http_plugin::handle_exception)
+               // stay as object-valued variants; common.hpp detects that and falls
+               // back to fc::json::to_string.
+               cb( 200, fc::variant( std::move(resp) ) );
             }
          } catch (...) {
             http_plugin::handle_exception("trace_api", "get_block", body, cb);
          }
-      }});
+      }}, http_content_type::json_raw);
 
 
       http.add_async_handler({"/v1/trace_api/get_transaction_trace",

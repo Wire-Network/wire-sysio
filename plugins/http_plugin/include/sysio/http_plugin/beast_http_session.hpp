@@ -97,6 +97,7 @@ class beast_http_session : public detail::abstract_conn,
             break;
 
          case http_content_type::json:
+         case http_content_type::json_raw:
          default:
             res_->set(http::field::content_type, "application/json");
       }

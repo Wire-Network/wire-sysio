@@ -171,7 +171,22 @@ inline auto make_http_response_handler(http_plugin_state& plugin_state, detail::
 
                            try {
                               if (response.has_value()) {
-                                 std::string json = (content_type == http_content_type::plaintext) ? response->as_string() : fc::json::to_string(*response, fc::time_point::maximum());
+                                 // plaintext path: the variant's string payload is the literal
+                                 // response body.
+                                 // json_raw path: the variant's string payload is pre-serialized
+                                 // JSON (built via fc::json_writer) and passed through as-is.
+                                 // json_raw still tolerates non-string variants (eg error
+                                 // responses produced by http_plugin::handle_exception) by
+                                 // falling through to fc::json::to_string; the content-type
+                                 // header stays "application/json" either way.
+                                 std::string json;
+                                 if (content_type == http_content_type::plaintext) {
+                                    json = response->as_string();
+                                 } else if (content_type == http_content_type::json_raw && response->is_string()) {
+                                    json = response->as_string();
+                                 } else {
+                                    json = fc::json::to_string(*response, fc::time_point::maximum());
+                                 }
                                  if (auto error_str = session_ptr->verify_max_bytes_in_flight(json.size()); error_str.empty())
                                     session_ptr->send_response(std::move(json), code);
                                  else

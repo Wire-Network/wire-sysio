@@ -12,6 +12,12 @@ namespace sysio::trace_api {
       class response_formatter {
       public:
          static fc::variant process_block( const data_log_entry& trace, bool irreversible, const data_handler_function& data_handler );
+
+         // Streaming counterpart: emit the same JSON payload as process_block but write it
+         // directly into an output std::string via fc::json_writer, skipping the
+         // fc::mutable_variant_object tree entirely.  Output is byte-for-byte identical
+         // to fc::json::to_string(process_block(...)).
+         static std::string process_block_to_json( const data_log_entry& trace, bool irreversible, const data_handler_function& data_handler );
       };
    }
 
@@ -49,6 +55,30 @@ namespace sysio::trace_api {
          };
 
          return detail::response_formatter::process_block(std::get<0>(*data), std::get<1>(*data), data_handler);
+      }
+
+      /**
+       * Streaming variant of get_block_trace: emits the JSON response body directly into
+       * a std::string via fc::json_writer instead of building an intermediate
+       * fc::mutable_variant_object tree.  Returned string is empty if the block does not
+       * exist; callers should check empty() before dispatching the 200 response.
+       * Skips the fc::variant -> fc::json::to_string copy on the response path when paired
+       * with http_content_type::json_raw.
+       */
+      std::string get_block_trace_json( uint32_t block_height ) {
+         auto data = logfile_provider.get_block(block_height);
+         if (!data) {
+            _log("No block found at block height " + std::to_string(block_height) );
+            return {};
+         }
+
+         auto data_handler = [this](const std::variant<action_trace_v0>& action) -> std::tuple<fc::variant, std::optional<fc::variant>> {
+            return std::visit([&](const auto& a) {
+               return data_handler_provider.serialize_to_variant(a);
+            }, action);
+         };
+
+         return detail::response_formatter::process_block_to_json(std::get<0>(*data), std::get<1>(*data), data_handler);
       }
 
       /**
