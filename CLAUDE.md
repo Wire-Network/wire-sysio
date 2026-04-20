@@ -157,7 +157,13 @@ Tests are split across **multiple binaries** depending on which CMake target own
 | `$BUILD_DIR/contracts/tests/contracts_unit_test` | `contracts/tests/*.cpp` | System contract Boost tests (sysio.system, sysio.token, sysio.msig, sysio.roa, sysio.authex, sysio.bios) |
 | `$BUILD_DIR/libraries/libfc/test/test_fc` | `libraries/libfc/test/*.cpp` | libfc unit tests (crypto, serialization, clients) |
 
-If `unit_test --run_test=foo` reports `no test cases matching filter`, the test almost certainly lives in a different binary — try `plugin_test` first, then `contracts_unit_test`.
+**Boost.Test naming — common pitfall:**
+- The `--run_test=<suite>` filter uses the suite name declared by `BOOST_AUTO_TEST_SUITE(<name>)` in the source — **NOT the filename**. Example: `libraries/libfc/test/io/test_json.cpp` declares `BOOST_AUTO_TEST_SUITE(json_test_suite)`, so run it with `--run_test=json_test_suite`, not `--run_test=json_tests` or `--run_test=test_json`.
+- To find the suite name: `grep "BOOST_AUTO_TEST_SUITE(" <file.cpp>` (first match is the top-level suite). Or list everything with `./test_fc --list_content` and scan for your case name — the suite is the parent entry.
+- Suite-name != test-binary: `test_fc` is the binary that contains many suites; a single suite lives in one `.cpp` file but the filename and suite name can diverge.
+- Full path for a single case: `--run_test=<suite>/<case>` (e.g. `--run_test=json_test_suite/parse_escape_unicode_errors`).
+- Output convention: a green `*** No errors detected` line means all filtered cases passed; red `*** N failures are detected` means N failed and test-case lines above identify which.
+- If `unit_test --run_test=foo` reports `no test cases matching filter`, the test almost certainly lives in a different binary — try `plugin_test` first, then `contracts_unit_test`.
 
 **Standard pre-PR test sweep** — both `unit_test` AND `plugin_test` (and ideally `contracts_unit_test` and `test_fc`) should be built and run before creating a PR:
 ```bash
@@ -167,7 +173,6 @@ ninja -C $BUILD_DIR -j6 unit_test plugin_test contracts_unit_test test_fc
 ./$BUILD_DIR/contracts/tests/contracts_unit_test -- --sys-vm
 ./$BUILD_DIR/libraries/libfc/test/test_fc
 ```
-
 ### Test Categories
 ```bash
 # Run from $BUILD_DIR
