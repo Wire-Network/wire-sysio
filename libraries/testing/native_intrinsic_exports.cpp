@@ -339,18 +339,18 @@ int32_t kv_it_value(uint32_t handle, uint32_t offset, char* dest, uint32_t dest_
 }
 
 INTRINSIC_EXPORT
-void kv_idx_store(uint64_t payer, uint32_t table_id, const char* pri_key, uint32_t pri_key_len, const char* sec_key, uint32_t sec_key_len) {
-   native_context_stack::current()->kv_idx_store(payer, table_id, legacy_span<const char>{(void*)pri_key, pri_key_len}, legacy_span<const char>{(void*)sec_key, sec_key_len});
+void kv_idx_store(uint64_t payer, uint32_t table_id, int64_t primary_id, const char* sec_key, uint32_t sec_key_len) {
+   native_context_stack::current()->kv_idx_store(payer, table_id, primary_id, legacy_span<const char>{(void*)sec_key, sec_key_len});
 }
 
 INTRINSIC_EXPORT
-void kv_idx_remove(uint32_t table_id, const char* pri_key, uint32_t pri_key_len, const char* sec_key, uint32_t sec_key_len) {
-   native_context_stack::current()->kv_idx_remove(table_id, legacy_span<const char>{(void*)pri_key, pri_key_len}, legacy_span<const char>{(void*)sec_key, sec_key_len});
+void kv_idx_remove(uint32_t table_id, int64_t primary_id, const char* sec_key, uint32_t sec_key_len) {
+   native_context_stack::current()->kv_idx_remove(table_id, primary_id, legacy_span<const char>{(void*)sec_key, sec_key_len});
 }
 
 INTRINSIC_EXPORT
-void kv_idx_update(uint64_t payer, uint32_t table_id, const char* pri_key, uint32_t pri_key_len, const char* old_sec_key, uint32_t old_sec_key_len, const char* new_sec_key, uint32_t new_sec_key_len) {
-   native_context_stack::current()->kv_idx_update(payer, table_id, legacy_span<const char>{(void*)pri_key, pri_key_len}, legacy_span<const char>{(void*)old_sec_key, old_sec_key_len}, legacy_span<const char>{(void*)new_sec_key, new_sec_key_len});
+void kv_idx_update(uint64_t payer, uint32_t table_id, int64_t primary_id, const char* old_sec_key, uint32_t old_sec_key_len, const char* new_sec_key, uint32_t new_sec_key_len) {
+   native_context_stack::current()->kv_idx_update(payer, table_id, primary_id, legacy_span<const char>{(void*)old_sec_key, old_sec_key_len}, legacy_span<const char>{(void*)new_sec_key, new_sec_key_len});
 }
 
 INTRINSIC_EXPORT

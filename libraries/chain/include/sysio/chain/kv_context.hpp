@@ -28,12 +28,22 @@ struct kv_iterator_slot {
    std::vector<char>  current_key;
    // For secondary iterators: current secondary key
    std::vector<char>  current_sec_key;
-   // For secondary iterators: current primary key
+   // For secondary iterators: lazy cache of primary-key bytes, populated only
+   // when kv_idx_primary_key materializes them from the referenced kv_object.
+   // Empty otherwise so iteration does not pay the by_id materialization cost.
    std::vector<char>  current_pri_key;
 
    // Cached chainbase ID for O(1) iterator_to fast path.
    // -1 means no cached ID; falls back to lower_bound re-seek.
+   //   - primary iterator: kv_object id
+   //   - secondary iterator: kv_index_object id
    int64_t           cached_id = -1;
+
+   // Secondary iterator only: id of the kv_object referenced by the current
+   // secondary row, used for pri_key/value materialization and as the
+   // composite-key tiebreaker for re-seeking after invalidation.
+   // -1 when not at a valid secondary position.
+   int64_t           primary_id = -1;
 };
 
 class kv_iterator_pool {
@@ -53,6 +63,7 @@ public:
       s.current_sec_key.clear();
       s.current_pri_key.clear();
       s.cached_id = -1;
+      s.primary_id = -1;
       return idx;
    }
 
@@ -69,6 +80,7 @@ public:
       s.current_sec_key.clear();
       s.current_pri_key.clear();
       s.cached_id = -1;
+      s.primary_id = -1;
       return idx;
    }
 
@@ -82,6 +94,7 @@ public:
       s.current_sec_key.clear();
       s.current_pri_key.clear();
       s.cached_id = -1;
+      s.primary_id = -1;
       if (handle < _next_free) _next_free = handle;
    }
 

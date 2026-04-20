@@ -789,7 +789,8 @@ namespace webassembly {
           *   authorized the action (or net RAM usage must not increase).
           * @param key - the key bytes
           * @param value - the value bytes
-          * @return RAM byte delta (positive on growth, negative on shrink, 0 on same-size update)
+          * @return chainbase id of the primary row (thread into kv_idx_store/remove/update
+          *   for secondary index maintenance)
           */
          int64_t  kv_set(uint32_t table_id, uint64_t payer, legacy_span<const char> key, legacy_span<const char> value);
 
@@ -812,11 +813,13 @@ namespace webassembly {
           * Erase a key-value pair from the executing contract's KV table.
           *
           * The RAM charged for the row is refunded to the original payer.
-          * No-op if the key does not exist (returns 0).
+          * Throws kv_key_not_found if the key does not exist.
           *
           * @param table_id - table namespace identifier (DJB2 hash of table name % 65536)
           * @param key - the key bytes to erase
-          * @return negative RAM byte delta (refund amount), or 0 if key not found
+          * @return chainbase id of the deleted primary row. Callers with secondary
+          *   indexes should call kv_erase BEFORE kv_idx_remove so the returned id
+          *   can be threaded into each secondary removal.
           */
          int64_t  kv_erase(uint32_t table_id, legacy_span<const char> key);
 
@@ -907,7 +910,11 @@ namespace webassembly {
          int32_t  kv_it_key(uint32_t handle, uint32_t offset, legacy_span<char> dest, legacy_ptr<uint32_t> actual_size);
 
          /**
-          * Read the value at the iterator's current position.
+          * Read the value at the iterator's current position. Accepts both
+          * primary and secondary iterator handles; for secondary iterators the
+          * value is fetched from the referenced primary kv_object via its
+          * cached primary_id (O(1) by_id lookup), so contracts can read values
+          * directly from a secondary iterator without a separate kv_get call.
           *
           * @param handle - iterator handle (must be status 0)
           * @param offset - byte offset within the value to start reading
@@ -919,39 +926,42 @@ namespace webassembly {
 
          // ---- KV Database API — Secondary Index Operations ----
          //
-         // Secondary indices map (sec_key → pri_key) within a table namespace.
-         // The executing contract manages index entries explicitly; the CDT
-         // `kv_multi_index` wrapper automates this.
+         // Secondary indices map (sec_key -> primary_id) within a table namespace.
+         // primary_id is the chainbase id of the referenced primary row, returned
+         // by kv_set (insert/update) and kv_erase (delete). The CDT
+         // `kv_multi_index` wrapper threads primary_id through automatically.
 
          /**
-          * Insert a secondary index entry mapping a secondary key to a primary key.
+          * Insert a secondary index entry referencing a primary row by id.
           *
           * @param payer - account to bill for RAM (0 = receiver)
           * @param table_id - secondary index identifier
-          * @param pri_key - primary key bytes this entry points to
+          * @param primary_id - chainbase id of the primary kv_object this entry points to
+          *                     (obtained from the most recent kv_set on the primary row)
           * @param sec_key - secondary key bytes (order-preserving encoded)
           */
-         void     kv_idx_store(uint64_t payer, uint32_t table_id, legacy_span<const char> pri_key, legacy_span<const char> sec_key);
+         void     kv_idx_store(uint64_t payer, uint32_t table_id, int64_t primary_id, legacy_span<const char> sec_key);
 
          /**
           * Remove a secondary index entry.
           *
           * @param table_id - secondary index identifier
-          * @param pri_key - primary key associated with the entry
+          * @param primary_id - chainbase id of the primary row previously referenced
+          *                     by this entry
           * @param sec_key - secondary key to remove
           */
-         void     kv_idx_remove(uint32_t table_id, legacy_span<const char> pri_key, legacy_span<const char> sec_key);
+         void     kv_idx_remove(uint32_t table_id, int64_t primary_id, legacy_span<const char> sec_key);
 
          /**
           * Update a secondary index entry's key (remove old, insert new).
           *
           * @param payer - account to bill for RAM (0 = receiver)
           * @param table_id - secondary index identifier
-          * @param pri_key - primary key (unchanged)
+          * @param primary_id - chainbase id of the primary row (unchanged)
           * @param old_sec_key - current secondary key to replace
           * @param new_sec_key - new secondary key value
           */
-         void     kv_idx_update(uint64_t payer, uint32_t table_id, legacy_span<const char> pri_key,
+         void     kv_idx_update(uint64_t payer, uint32_t table_id, int64_t primary_id,
                                 legacy_span<const char> old_sec_key, legacy_span<const char> new_sec_key);
 
          /**

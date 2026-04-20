@@ -98,15 +98,15 @@ class apply_context {
       int32_t  kv_it_key(uint32_t handle, uint32_t offset, char* dest, uint32_t dest_size, uint32_t& actual_size);
       int32_t  kv_it_value(uint32_t handle, uint32_t offset, char* dest, uint32_t dest_size, uint32_t& actual_size);
 
-      // Secondary KV index operations
-      void     kv_idx_store(uint64_t payer, uint16_t table_id,
-                            const char* pri_key, uint32_t pri_key_size,
+      // Secondary KV index operations.
+      // primary_id is the chainbase id of the referenced kv_object, returned by
+      // kv_set (insert/update) or kv_erase (delete). Callers are expected to
+      // thread it through from the primary-row operation.
+      void     kv_idx_store(uint64_t payer, uint16_t table_id, int64_t primary_id,
                             const char* sec_key, uint32_t sec_key_size);
-      void     kv_idx_remove(uint16_t table_id,
-                             const char* pri_key, uint32_t pri_key_size,
+      void     kv_idx_remove(uint16_t table_id, int64_t primary_id,
                              const char* sec_key, uint32_t sec_key_size);
-      void     kv_idx_update(uint64_t payer, uint16_t table_id,
-                             const char* pri_key, uint32_t pri_key_size,
+      void     kv_idx_update(uint64_t payer, uint16_t table_id, int64_t primary_id,
                              const char* old_sec_key, uint32_t old_sec_key_size,
                              const char* new_sec_key, uint32_t new_sec_key_size);
       int32_t  kv_idx_find_secondary(name code, uint16_t table_id,

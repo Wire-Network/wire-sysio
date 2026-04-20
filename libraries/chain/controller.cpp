@@ -73,7 +73,12 @@ using kv_database_index_set = index_set<
 
 namespace detail {
    // ------------------------------------------------------------------
-   // snapshot_row_traits for kv_object  (shared_blob → vector<char>)
+   // snapshot_row_traits for kv_object. Preserves chainbase id so that
+   // kv_index_object::primary_id references stay valid across save+load.
+   // The loader in read_kv_rows_from_snapshot calls emplace_with_id using
+   // snapshot_kv_object::id; from_snapshot_row just populates the value
+   // fields.
+   //   (shared_blob -> vector<char>)
    // ------------------------------------------------------------------
    template<>
    struct snapshot_row_traits<kv_object> {
@@ -82,6 +87,7 @@ namespace detail {
 
       static snapshot_kv_object to_snapshot_row(const kv_object& obj, const chainbase::database&) {
          snapshot_kv_object row;
+         row.id       = obj.id._id;
          row.code     = obj.code;
          row.payer    = obj.payer;
          row.table_id = obj.table_id;
@@ -107,7 +113,11 @@ namespace detail {
    };
 
    // ------------------------------------------------------------------
-   // snapshot_row_traits for kv_index_object  (shared_blob → vector<char>)
+   // snapshot_row_traits for kv_index_object
+   //
+   // primary_id is snapshotted verbatim; chainbase ids are preserved across
+   // save+load (see emplace_with_id) so the reference remains valid without
+   // any resolution pass. This also lets the kv sections load in parallel.
    // ------------------------------------------------------------------
    template<>
    struct snapshot_row_traits<kv_index_object> {
@@ -116,28 +126,25 @@ namespace detail {
 
       static snapshot_kv_index_object to_snapshot_row(const kv_index_object& obj, const chainbase::database&) {
          snapshot_kv_index_object row;
-         row.code     = obj.code;
-         row.payer    = obj.payer;
-         row.table_id = obj.table_id;
+         row.id         = obj.id._id;
+         row.code       = obj.code;
+         row.payer      = obj.payer;
+         row.table_id   = obj.table_id;
          SYS_ASSERT(obj.sec_key.size() > 0, snapshot_exception, "kv_index_object has empty secondary key during snapshot write");
-         SYS_ASSERT(obj.pri_key.size() > 0, snapshot_exception, "kv_index_object has empty primary key during snapshot write");
          row.sec_key.assign(obj.sec_key.data(), obj.sec_key.data() + obj.sec_key.size());
-         row.pri_key.assign(obj.pri_key.data(), obj.pri_key.data() + obj.pri_key.size());
+         row.primary_id = obj.primary_id._id;
          return row;
       }
 
       static void from_snapshot_row(snapshot_kv_index_object&& row, kv_index_object& obj, chainbase::database&) {
          SYS_ASSERT(!row.sec_key.empty(), snapshot_validation_exception, "kv_index_object has empty secondary key");
-         SYS_ASSERT(!row.pri_key.empty(), snapshot_validation_exception, "kv_index_object has empty primary key");
          SYS_ASSERT(row.sec_key.size() <= config::max_kv_key_size_limit, snapshot_validation_exception,
                     "kv_index_object secondary key size ({}) exceeds absolute limit ({})", row.sec_key.size(), config::max_kv_key_size_limit);
-         SYS_ASSERT(row.pri_key.size() <= config::max_kv_key_size_limit, snapshot_validation_exception,
-                    "kv_index_object primary key size ({}) exceeds absolute limit ({})", row.pri_key.size(), config::max_kv_key_size_limit);
-         obj.code     = row.code;
-         obj.payer    = row.payer;
-         obj.table_id = row.table_id;
+         obj.code       = row.code;
+         obj.payer      = row.payer;
+         obj.table_id   = row.table_id;
          obj.sec_key.assign(row.sec_key.data(), row.sec_key.size());
-         obj.pri_key.assign(row.pri_key.data(), row.pri_key.size());
+         obj.primary_id = kv_object::id_type(row.primary_id);
       }
    };
 } // namespace detail
@@ -1562,15 +1569,24 @@ struct controller_impl {
    }
 
    void read_kv_rows_from_snapshot( const snapshot_reader_ptr& snapshot, std::atomic_size_t& read_row_count, boost::asio::io_context& ctx ) {
+      // Both kv sections can load independently: primary_id references are
+      // snapshot-stable because emplace_with_id reinstates each object at its
+      // original chainbase id. Sections load in parallel via ctx worker threads.
       kv_database_index_set::walk_indices_via_post(ctx, [this, &snapshot, &read_row_count]( auto utils ) {
-         using utils_t = decltype(utils);
-         using value_t = typename decltype(utils)::index_t::value_type;
+         using index_t = typename decltype(utils)::index_t;
+         using value_t = typename index_t::value_type;
+         using snap_t  = typename detail::snapshot_row_traits<value_t>::snapshot_type;
          snapshot->read_section<value_t>([this, &read_row_count]( auto& section ) {
+            snap_t snap_row{};
             bool more = !section.empty();
             while (more) {
-               utils_t::create(db, [this, &section, &more](auto& row) {
-                  more = section.read_row(row, db);
-               });
+               more = section.read_row(snap_row);
+               db.get_mutable_index<index_t>().emplace_with_id(
+                  typename value_t::id_type(snap_row.id),
+                  [&](value_t& obj) {
+                     detail::snapshot_row_traits<value_t>::from_snapshot_row(std::move(snap_row), obj, db);
+                  });
+               snap_row = snap_t{};
                read_row_count.fetch_add(1u, std::memory_order_relaxed);
             }
          });

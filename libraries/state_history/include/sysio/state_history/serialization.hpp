@@ -255,9 +255,15 @@ datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper<sysi
    history_pack_varuint64(ds, obj.obj.sec_key.size());
    if (obj.obj.sec_key.size() > 0)
       ds.write(obj.obj.sec_key.data(), obj.obj.sec_key.size());
-   history_pack_varuint64(ds, obj.obj.pri_key.size());
-   if (obj.obj.pri_key.size() > 0)
-      ds.write(obj.obj.pri_key.data(), obj.obj.pri_key.size());
+   // Resolve primary_id -> primary kv_object and emit its key bytes so SHiP
+   // consumers continue to see pri_key bytes in the stream. The wire format
+   // for secondary rows is unchanged (struct_version 0 still ends with
+   // a length-prefixed pri_key byte string).
+   const auto* primary = obj.db.find<sysio::chain::kv_object>(obj.obj.primary_id);
+   uint64_t pri_key_size = primary ? primary->key.size() : 0;
+   history_pack_varuint64(ds, pri_key_size);
+   if (pri_key_size > 0)
+      ds.write(primary->key.data(), pri_key_size);
    return ds;
 }
 

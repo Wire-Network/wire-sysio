@@ -1811,28 +1811,17 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
          "Secondary index '{}' not found in ABI for table '{}'", resolved_index_name, p.table);
 
       const auto& sec_idx = d.get_index<chain::kv_index_index, chain::by_code_table_id_seckey>();
-      const auto& pri_idx = d.get_index<chain::kv_index, chain::by_code_key>();
 
-      // For scoped tables (multi_index, kv_multi_index, kv::scoped_table), the
-      // contract stores pri_key as the in-scope portion only — the chain's
-      // primary index keys these rows under [scope:8B BE][pri_key]. To look up
-      // the primary row we must prepend the scope prefix; we also store the
-      // full key in r.key so the downstream ABI decoder (which expects scope +
-      // pk fields) can decode it. For unscoped kv::table, scope_prefix_bytes
-      // is empty and the pri_key already represents the full primary key.
+      // Secondary rows reference the primary row directly by chainbase id, so
+      // the full primary key (including any scope prefix) is available from
+      // the kv_object via a single by_id lookup.
       auto fetch_primary = [&](const chain::kv_index_object& sec_obj) -> raw_row {
-         std::vector<char> full_key;
-         full_key.reserve(scope_prefix_bytes.size() + sec_obj.pri_key.size());
-         full_key.insert(full_key.end(), scope_prefix_bytes.begin(), scope_prefix_bytes.end());
-         full_key.insert(full_key.end(), sec_obj.pri_key.data(),
-                         sec_obj.pri_key.data() + sec_obj.pri_key.size());
-         std::string_view full_sv(full_key.data(), full_key.size());
-         auto itr = pri_idx.find(boost::make_tuple(p.code, table_id, full_sv));
          raw_row r;
-         r.key = std::move(full_key);
-         if (itr != pri_idx.end()) {
-            r.value.assign(itr->value.data(), itr->value.data() + itr->value.size());
-            r.payer = itr->payer;
+         const auto* primary = d.find<chain::kv_object>(sec_obj.primary_id);
+         if (primary) {
+            r.key.assign(primary->key.data(), primary->key.data() + primary->key.size());
+            r.value.assign(primary->value.data(), primary->value.data() + primary->value.size());
+            r.payer = primary->payer;
          }
          return r;
       };

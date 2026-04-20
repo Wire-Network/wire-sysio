@@ -66,20 +66,19 @@ namespace sysio { namespace chain { namespace webassembly {
    }
 
    // KV secondary index operations
-   void interface::kv_idx_store(uint64_t payer, uint32_t table_id, legacy_span<const char> pri_key, legacy_span<const char> sec_key) {
-      context.kv_idx_store(payer, checked_table_id(table_id),
-                           pri_key.data(), pri_key.size(), sec_key.data(), sec_key.size());
+   void interface::kv_idx_store(uint64_t payer, uint32_t table_id, int64_t primary_id, legacy_span<const char> sec_key) {
+      context.kv_idx_store(payer, checked_table_id(table_id), primary_id,
+                           sec_key.data(), sec_key.size());
    }
 
-   void interface::kv_idx_remove(uint32_t table_id, legacy_span<const char> pri_key, legacy_span<const char> sec_key) {
-      context.kv_idx_remove(checked_table_id(table_id),
-                            pri_key.data(), pri_key.size(), sec_key.data(), sec_key.size());
+   void interface::kv_idx_remove(uint32_t table_id, int64_t primary_id, legacy_span<const char> sec_key) {
+      context.kv_idx_remove(checked_table_id(table_id), primary_id,
+                            sec_key.data(), sec_key.size());
    }
 
-   void interface::kv_idx_update(uint64_t payer, uint32_t table_id, legacy_span<const char> pri_key,
+   void interface::kv_idx_update(uint64_t payer, uint32_t table_id, int64_t primary_id,
                                  legacy_span<const char> old_sec_key, legacy_span<const char> new_sec_key) {
-      context.kv_idx_update(payer, checked_table_id(table_id),
-                            pri_key.data(), pri_key.size(),
+      context.kv_idx_update(payer, checked_table_id(table_id), primary_id,
                             old_sec_key.data(), old_sec_key.size(),
                             new_sec_key.data(), new_sec_key.size());
    }

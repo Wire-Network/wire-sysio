@@ -24,11 +24,11 @@ static inline int64_t kv_object_ram(uint64_t key_size, uint64_t value_size) {
 static inline int64_t kv_object_ram(const kv_object& o) {
    return kv_object_ram(o.key.size(), o.value.size());
 }
-static inline int64_t kv_index_object_ram(uint64_t sec_key_size, uint64_t pri_key_size) {
-   return static_cast<int64_t>(sec_key_size + pri_key_size + config::billable_size_v<kv_index_object>);
+static inline int64_t kv_index_object_ram(uint64_t sec_key_size) {
+   return static_cast<int64_t>(sec_key_size + config::billable_size_v<kv_index_object>);
 }
 static inline int64_t kv_index_object_ram(const kv_index_object& o) {
-   return kv_index_object_ram(o.sec_key.size(), o.pri_key.size());
+   return kv_index_object_ram(o.sec_key.size());
 }
 
 static inline void print_debug(account_name receiver, const action_trace& ar) {
@@ -655,7 +655,7 @@ int64_t apply_context::kv_set(uint16_t table_id, uint64_t payer_val, const char*
          dm_logger->on_kv_set(*itr, false, old_payer, old_value_copy.data(), old_value_copy.size());
       }
 
-      return new_billable - old_billable;
+      return static_cast<int64_t>(itr->id._id);
    } else {
       // Create new
       const auto& obj = db.create<kv_object>([&](auto& o) {
@@ -672,7 +672,7 @@ int64_t apply_context::kv_set(uint16_t table_id, uint64_t payer_val, const char*
 
       int64_t billable = kv_object_ram(key_size, value_size);
       update_db_usage(payer, billable);
-      return billable;
+      return static_cast<int64_t>(obj.id._id);
    }
 }
 
@@ -703,6 +703,7 @@ int64_t apply_context::kv_erase(uint16_t table_id, const char* key, uint32_t key
 
    SYS_ASSERT( itr != idx.end(), kv_key_not_found, "KV key not found for erase" );
 
+   int64_t primary_id = static_cast<int64_t>(itr->id._id);
    int64_t delta = -kv_object_ram(*itr);
 
    if (auto dm_logger = control.get_deep_mind_logger(trx_context.is_transient())) {
@@ -711,7 +712,7 @@ int64_t apply_context::kv_erase(uint16_t table_id, const char* key, uint32_t key
 
    update_db_usage(itr->payer, delta);
    db.remove(*itr);
-   return delta;
+   return primary_id;
 }
 
 int32_t apply_context::kv_contains(uint16_t table_id, name code, const char* key, uint32_t key_size) {
@@ -930,14 +931,26 @@ int32_t apply_context::kv_it_key(uint32_t handle, uint32_t offset, char* dest, u
 
 int32_t apply_context::kv_it_value(uint32_t handle, uint32_t offset, char* dest, uint32_t dest_size, uint32_t& actual_size) {
    auto& slot = kv_iterators.get(handle);
-   SYS_ASSERT(slot.is_primary, kv_invalid_iterator, "kv_it_value called on secondary iterator");
 
    if (slot.status != kv_it_stat::iterator_ok) {
       actual_size = 0;
       return static_cast<int32_t>(slot.status);
    }
 
-   const kv_object* obj = find_current_primary(db, slot);
+   const kv_object* obj;
+   if (slot.is_primary) {
+      obj = find_current_primary(db, slot);
+   } else {
+      // Secondary iterator: resolve the referenced primary kv_object via the
+      // cached primary_id (O(1) by_id lookup). This lets contracts fetch the
+      // value directly from a secondary iterator without a separate kv_get call.
+      if (slot.primary_id < 0) {
+         slot.status = kv_it_stat::iterator_erased;
+         actual_size = 0;
+         return static_cast<int32_t>(slot.status);
+      }
+      obj = db.find<kv_object>(kv_object::id_type(slot.primary_id));
+   }
    if (!obj) {
       slot.status = kv_it_stat::iterator_erased;
       actual_size = 0;
@@ -955,15 +968,23 @@ int32_t apply_context::kv_it_value(uint32_t handle, uint32_t offset, char* dest,
 
 // --- Secondary KV index operations ---
 
-void apply_context::kv_idx_store(uint64_t payer_val, uint16_t table_id,
-                                 const char* pri_key, uint32_t pri_key_size,
+void apply_context::kv_idx_store(uint64_t payer_val, uint16_t table_id, int64_t primary_id,
                                  const char* sec_key, uint32_t sec_key_size) {
    SYS_ASSERT( !trx_context.is_read_only(), table_operation_not_permitted,
                "cannot store a KV index when executing a readonly transaction" );
    SYS_ASSERT( sec_key_size <= control.get_global_properties().configuration.max_kv_secondary_key_size, kv_secondary_key_too_large,
                "KV secondary key size {} exceeds maximum {}", sec_key_size, control.get_global_properties().configuration.max_kv_secondary_key_size );
-   SYS_ASSERT( pri_key_size <= control.get_global_properties().configuration.max_kv_key_size, kv_key_too_large,
-               "KV primary key size {} exceeds maximum {}", pri_key_size, control.get_global_properties().configuration.max_kv_key_size );
+   SYS_ASSERT( primary_id >= 0, kv_key_not_found, "KV secondary index store requires a non-negative primary_id" );
+
+   // Validate that primary_id refers to an existing kv_object owned by the
+   // current receiver. This prevents a contract from creating a dangling
+   // secondary entry that points at another contract's row.
+   const auto* primary = db.find<kv_object>(kv_object::id_type(primary_id));
+   SYS_ASSERT( primary != nullptr, kv_key_not_found,
+               "KV secondary index store references non-existent primary_id {}", primary_id );
+   SYS_ASSERT( primary->code == receiver, table_operation_not_permitted,
+               "KV secondary index store references primary row owned by {} but receiver is {}",
+               primary->code, receiver );
 
    account_name payer = (payer_val == 0) ? receiver : account_name(payer_val);
 
@@ -972,23 +993,22 @@ void apply_context::kv_idx_store(uint64_t payer_val, uint16_t table_id,
       o.payer = payer;
       o.table_id = table_id;
       o.sec_key.assign(sec_key, sec_key_size);
-      o.pri_key.assign(pri_key, pri_key_size);
+      o.primary_id = kv_object::id_type(primary_id);
    });
 
-   int64_t billable = kv_index_object_ram(sec_key_size, pri_key_size);
+   int64_t billable = kv_index_object_ram(sec_key_size);
    update_db_usage(payer, billable);
 }
 
-void apply_context::kv_idx_remove(uint16_t table_id,
-                                  const char* pri_key, uint32_t pri_key_size,
+void apply_context::kv_idx_remove(uint16_t table_id, int64_t primary_id,
                                   const char* sec_key, uint32_t sec_key_size) {
    SYS_ASSERT( !trx_context.is_read_only(), table_operation_not_permitted,
                "cannot remove a KV index when executing a readonly transaction" );
+   SYS_ASSERT( primary_id >= 0, kv_key_not_found, "KV secondary index remove requires a non-negative primary_id" );
 
    auto sv_sec = to_sv(sec_key, sec_key_size);
-   auto sv_pri = to_sv(pri_key, pri_key_size);
    const auto& idx = db.get_index<kv_index_index, by_code_table_id_seckey>();
-   auto itr = idx.find(boost::make_tuple(receiver, table_id, sv_sec, sv_pri));
+   auto itr = idx.find(boost::make_tuple(receiver, table_id, sv_sec, kv_object::id_type(primary_id)));
 
    SYS_ASSERT( itr != idx.end(), kv_key_not_found, "KV secondary index entry not found for remove" );
 
@@ -997,19 +1017,18 @@ void apply_context::kv_idx_remove(uint16_t table_id,
    db.remove(*itr);
 }
 
-void apply_context::kv_idx_update(uint64_t payer_val, uint16_t table_id,
-                                  const char* pri_key, uint32_t pri_key_size,
+void apply_context::kv_idx_update(uint64_t payer_val, uint16_t table_id, int64_t primary_id,
                                   const char* old_sec_key, uint32_t old_sec_key_size,
                                   const char* new_sec_key, uint32_t new_sec_key_size) {
    SYS_ASSERT( !trx_context.is_read_only(), table_operation_not_permitted,
                "cannot update a KV index when executing a readonly transaction" );
    SYS_ASSERT( new_sec_key_size <= control.get_global_properties().configuration.max_kv_secondary_key_size, kv_secondary_key_too_large,
                "KV secondary key size {} exceeds maximum {}", new_sec_key_size, control.get_global_properties().configuration.max_kv_secondary_key_size );
+   SYS_ASSERT( primary_id >= 0, kv_key_not_found, "KV secondary index update requires a non-negative primary_id" );
 
    auto sv_old_sec = to_sv(old_sec_key, old_sec_key_size);
-   auto sv_pri = to_sv(pri_key, pri_key_size);
    const auto& idx = db.get_index<kv_index_index, by_code_table_id_seckey>();
-   auto itr = idx.find(boost::make_tuple(receiver, table_id, sv_old_sec, sv_pri));
+   auto itr = idx.find(boost::make_tuple(receiver, table_id, sv_old_sec, kv_object::id_type(primary_id)));
 
    SYS_ASSERT( itr != idx.end(), kv_key_not_found, "KV secondary index entry not found for update" );
 
@@ -1017,7 +1036,7 @@ void apply_context::kv_idx_update(uint64_t payer_val, uint16_t table_id,
    account_name old_payer = itr->payer;
 
    int64_t old_billable = kv_index_object_ram(*itr);
-   int64_t new_billable = kv_index_object_ram(new_sec_key_size, pri_key_size);
+   int64_t new_billable = kv_index_object_ram(new_sec_key_size);
 
    if (payer != old_payer) {
       update_db_usage(old_payer, -old_billable);
@@ -1029,14 +1048,15 @@ void apply_context::kv_idx_update(uint64_t payer_val, uint16_t table_id,
       }
    }
 
-   // Remove old and create new (secondary_key is part of index key, can't modify in-place)
+   // Remove old and create new (secondary_key is part of index key, can't modify in-place).
+   // primary_id is reused — both old and new sec rows point at the same kv_object.
    db.remove(*itr);
    db.create<kv_index_object>([&](auto& o) {
       o.code = receiver;
       o.payer = payer;
       o.table_id = table_id;
       o.sec_key.assign(new_sec_key, new_sec_key_size);
-      o.pri_key.assign(pri_key, pri_key_size);
+      o.primary_id = kv_object::id_type(primary_id);
    });
 }
 
@@ -1055,8 +1075,8 @@ int32_t apply_context::kv_idx_find_secondary(name code, uint16_t table_id,
    auto& slot = kv_iterators.get(handle);
    slot.status = kv_it_stat::iterator_ok;
    slot.current_sec_key.assign(itr->sec_key.data(), itr->sec_key.data() + itr->sec_key.size());
-   slot.current_pri_key.assign(itr->pri_key.data(), itr->pri_key.data() + itr->pri_key.size());
    slot.cached_id = itr->id._id;
+   slot.primary_id = static_cast<int64_t>(itr->primary_id._id);
    return static_cast<int32_t>(handle);
 }
 
@@ -1067,8 +1087,17 @@ int32_t apply_context::kv_idx_lower_bound(name code, uint16_t table_id,
    auto itr = idx.lower_bound(boost::make_tuple(code, table_id, sv_sec));
 
    if (itr == idx.end() || itr->code != code || itr->table_id != table_id) {
-      auto first = idx.lower_bound(boost::make_tuple(code, table_id));
-      if (first != idx.end() && first->code == code && first->table_id == table_id) {
+      // Past the end of this table's entries. Detect "table non-empty" by stepping
+      // back one position from the returned iterator — if the previous row is in
+      // this table, it has rows and we return a valid end-state iterator so
+      // contracts can kv_idx_prev into it. Avoids a second full lower_bound.
+      bool table_has_rows = false;
+      if (itr != idx.begin()) {
+         auto prev = itr;
+         --prev;
+         table_has_rows = (prev->code == code && prev->table_id == table_id);
+      }
+      if (table_has_rows) {
          uint32_t handle = kv_iterators.allocate_secondary(code, table_id);
          auto& slot = kv_iterators.get(handle);
          slot.status = kv_it_stat::iterator_end;
@@ -1081,8 +1110,8 @@ int32_t apply_context::kv_idx_lower_bound(name code, uint16_t table_id,
    auto& slot = kv_iterators.get(handle);
    slot.status = kv_it_stat::iterator_ok;
    slot.current_sec_key.assign(itr->sec_key.data(), itr->sec_key.data() + itr->sec_key.size());
-   slot.current_pri_key.assign(itr->pri_key.data(), itr->pri_key.data() + itr->pri_key.size());
    slot.cached_id = itr->id._id;
+   slot.primary_id = static_cast<int64_t>(itr->primary_id._id);
    return static_cast<int32_t>(handle);
 }
 
@@ -1105,23 +1134,25 @@ int32_t apply_context::kv_idx_next(uint32_t handle) {
          advanced = true;
       }
    }
-   // Slow path: re-seek by key bytes
+   // Slow path: re-seek by (sec_key, primary_id) composite after slot cache invalidation.
    if (!advanced) {
       auto sv_sec = to_sv(slot.current_sec_key.data(), slot.current_sec_key.size());
-      auto sv_pri = to_sv(slot.current_pri_key.data(), slot.current_pri_key.size());
-      itr = idx.lower_bound(boost::make_tuple(slot.code, slot.table_id, sv_sec, sv_pri));
+      itr = idx.lower_bound(boost::make_tuple(slot.code, slot.table_id, sv_sec,
+                                              kv_object::id_type(slot.primary_id < 0 ? 0 : slot.primary_id)));
    }
 
    if (itr != idx.end() && itr->code == slot.code && itr->table_id == slot.table_id) {
       slot.status = kv_it_stat::iterator_ok;
       slot.current_sec_key.assign(itr->sec_key.data(), itr->sec_key.data() + itr->sec_key.size());
-      slot.current_pri_key.assign(itr->pri_key.data(), itr->pri_key.data() + itr->pri_key.size());
+      slot.current_pri_key.clear(); // lazy cache; populated by kv_idx_primary_key on demand
       slot.cached_id = itr->id._id;
+      slot.primary_id = static_cast<int64_t>(itr->primary_id._id);
    } else {
       slot.status = kv_it_stat::iterator_end;
       slot.current_sec_key.clear();
       slot.current_pri_key.clear();
       slot.cached_id = -1;
+      slot.primary_id = -1;
    }
 
    return static_cast<int32_t>(slot.status);
@@ -1144,10 +1175,12 @@ int32_t apply_context::kv_idx_prev(uint32_t handle) {
       if (itr->code == slot.code && itr->table_id == slot.table_id) {
          slot.status = kv_it_stat::iterator_ok;
          slot.current_sec_key.assign(itr->sec_key.data(), itr->sec_key.data() + itr->sec_key.size());
-         slot.current_pri_key.assign(itr->pri_key.data(), itr->pri_key.data() + itr->pri_key.size());
+         slot.current_pri_key.clear();
          slot.cached_id = itr->id._id;
+         slot.primary_id = static_cast<int64_t>(itr->primary_id._id);
       } else {
          slot.cached_id = -1;
+         slot.primary_id = -1;
       }
    } else {
       // Fast path: find current entry by cached ID, then decrement
@@ -1162,8 +1195,8 @@ int32_t apply_context::kv_idx_prev(uint32_t handle) {
       }
       if (!found_current) {
          auto sv_sec = to_sv(slot.current_sec_key.data(), slot.current_sec_key.size());
-         auto sv_pri = to_sv(slot.current_pri_key.data(), slot.current_pri_key.size());
-         itr = idx.lower_bound(boost::make_tuple(slot.code, slot.table_id, sv_sec, sv_pri));
+         itr = idx.lower_bound(boost::make_tuple(slot.code, slot.table_id, sv_sec,
+                                                 kv_object::id_type(slot.primary_id < 0 ? 0 : slot.primary_id)));
       }
 
       if (itr == idx.begin()) {
@@ -1171,6 +1204,7 @@ int32_t apply_context::kv_idx_prev(uint32_t handle) {
          slot.current_sec_key.clear();
          slot.current_pri_key.clear();
          slot.cached_id = -1;
+         slot.primary_id = -1;
          return static_cast<int32_t>(slot.status);
       }
       --itr;
@@ -1178,30 +1212,38 @@ int32_t apply_context::kv_idx_prev(uint32_t handle) {
       if (itr->code == slot.code && itr->table_id == slot.table_id) {
          slot.status = kv_it_stat::iterator_ok;
          slot.current_sec_key.assign(itr->sec_key.data(), itr->sec_key.data() + itr->sec_key.size());
-         slot.current_pri_key.assign(itr->pri_key.data(), itr->pri_key.data() + itr->pri_key.size());
+         slot.current_pri_key.clear();
          slot.cached_id = itr->id._id;
+         slot.primary_id = static_cast<int64_t>(itr->primary_id._id);
       } else {
          slot.status = kv_it_stat::iterator_end;
          slot.current_sec_key.clear();
          slot.current_pri_key.clear();
          slot.cached_id = -1;
+         slot.primary_id = -1;
       }
    }
 
    return static_cast<int32_t>(slot.status);
 }
 
-// Helper: find the current secondary entry by cached ID (fast) or key bytes (slow).
+// Helper: find the current secondary entry by cached ID (fast) or composite key (slow).
+// The composite key uses (code, table_id, sec_key, primary_id); re-seeking is only
+// possible when primary_id is still known from the slot.
 static const kv_index_object* find_current_secondary(const chainbase::database& db, kv_iterator_slot& slot) {
    if (slot.cached_id >= 0) {
       const auto* obj = db.find<kv_index_object>(kv_index_object::id_type(slot.cached_id));
       if (obj && obj->code == slot.code && obj->table_id == slot.table_id)
          return obj;
    }
+   if (slot.primary_id < 0) {
+      slot.cached_id = -1;
+      return nullptr;
+   }
    const auto& idx = db.get_index<kv_index_index, by_code_table_id_seckey>();
    auto sv_sec = to_sv(slot.current_sec_key.data(), slot.current_sec_key.size());
-   auto sv_pri = to_sv(slot.current_pri_key.data(), slot.current_pri_key.size());
-   auto itr = idx.find(boost::make_tuple(slot.code, slot.table_id, sv_sec, sv_pri));
+   auto itr = idx.find(boost::make_tuple(slot.code, slot.table_id, sv_sec,
+                                         kv_object::id_type(slot.primary_id)));
    if (itr != idx.end()) {
       slot.cached_id = itr->id._id;
       return &*itr;
@@ -1244,17 +1286,28 @@ int32_t apply_context::kv_idx_primary_key(uint32_t handle, uint32_t offset, char
       return static_cast<int32_t>(slot.status);
    }
 
-   const kv_index_object* obj = find_current_secondary(db, slot);
-   if (!obj) {
-      slot.status = kv_it_stat::iterator_erased;
-      actual_size = 0;
-      return static_cast<int32_t>(slot.status);
+   // Lazy-materialize pri_key bytes into the slot cache on first access.
+   // Subsequent reads at the same iterator position are served from the cache.
+   if (slot.current_pri_key.empty()) {
+      const kv_index_object* sec = find_current_secondary(db, slot);
+      if (!sec) {
+         slot.status = kv_it_stat::iterator_erased;
+         actual_size = 0;
+         return static_cast<int32_t>(slot.status);
+      }
+      const auto* primary = db.find<kv_object>(sec->primary_id);
+      if (!primary) {
+         slot.status = kv_it_stat::iterator_erased;
+         actual_size = 0;
+         return static_cast<int32_t>(slot.status);
+      }
+      slot.current_pri_key.assign(primary->key.data(), primary->key.data() + primary->key.size());
    }
 
-   actual_size = static_cast<uint32_t>(obj->pri_key.size());
-   if (dest_size > 0 && offset < obj->pri_key.size()) {
-      auto copy_size = std::min(static_cast<size_t>(dest_size), obj->pri_key.size() - offset);
-      memcpy(dest, obj->pri_key.data() + offset, copy_size);
+   actual_size = static_cast<uint32_t>(slot.current_pri_key.size());
+   if (dest_size > 0 && offset < slot.current_pri_key.size()) {
+      auto copy_size = std::min(static_cast<size_t>(dest_size), slot.current_pri_key.size() - offset);
+      memcpy(dest, slot.current_pri_key.data() + offset, copy_size);
    }
 
    return static_cast<int32_t>(kv_it_stat::iterator_ok);

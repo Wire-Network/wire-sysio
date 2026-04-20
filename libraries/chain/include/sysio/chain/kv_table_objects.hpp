@@ -110,37 +110,34 @@ namespace sysio { namespace chain {
     * @brief Unified secondary index object. Replaces all 5 legacy secondary index types
     *        (index64, index128, index256, index_double, index_long_double).
     *
-    * Uses shared_blob for both key fields. sec_key_size and pri_key_size are
-    * billed separately at billing time on top of the fixed struct overhead.
+    * sec_key is a shared_blob; primary_id is an 8-byte reference to the kv_object
+    * this entry points to. Storing the id (instead of the full primary-key bytes)
+    * keeps secondary rows cheap regardless of primary-key length. Primary-key bytes
+    * are materialized on demand via by_id lookup when a contract calls
+    * kv_idx_primary_key.
     *
     * table_id identifies this secondary index's namespace (DJB2 hash of
     * "tablename.indexname" % 65536). Each secondary index gets its own
     * table_id, separate from the primary table's table_id.
     */
    class kv_index_object : public chainbase::object<kv_index_object_type, kv_index_object> {
-      OBJECT_CTOR(kv_index_object, (sec_key)(pri_key))
+      OBJECT_CTOR(kv_index_object, (sec_key))
 
    public:
-      id_type        id;
-      account_name   code;
-      account_name   payer;         ///< RAM payer (mirrors kv_object::payer)
-      shared_blob    sec_key;       ///< secondary key bytes
-      shared_blob    pri_key;       ///< primary key bytes
-      uint16_t       table_id = 0;  ///< secondary index namespace (DJB2 hash of "table.index" % 65536)
+      id_type             id;
+      account_name        code;
+      account_name        payer;         ///< RAM payer (mirrors kv_object::payer)
+      shared_blob         sec_key;       ///< secondary key bytes
+      kv_object::id_type  primary_id;    ///< id of the kv_object this entry indexes
+      uint16_t            table_id = 0;  ///< secondary index namespace (DJB2 hash of "table.index" % 65536)
 
       std::string_view sec_key_view() const { return {sec_key.data(), sec_key.size()}; }
-      std::string_view pri_key_view() const { return {pri_key.data(), pri_key.size()}; }
    };
 
-   /// Key extractors for kv_index_object shared_blob fields.
+   /// Key extractor for kv_index_object's shared_blob secondary key.
    struct kv_sec_key_extractor {
       using result_type = std::string_view;
       result_type operator()(const kv_index_object& o) const { return o.sec_key_view(); }
-   };
-
-   struct kv_pri_key_extractor {
-      using result_type = std::string_view;
-      result_type operator()(const kv_index_object& o) const { return o.pri_key_view(); }
    };
 
    struct by_code_table_id_seckey;
@@ -151,15 +148,20 @@ namespace sysio { namespace chain {
          ordered_unique<tag<by_id>,
             member<kv_index_object, kv_index_object::id_type, &kv_index_object::id>
          >,
+         // Composite order: (code, table_id, sec_key bytes, primary_id).
+         // primary_id serves as the deterministic tiebreaker when multiple rows
+         // share the same secondary key — replacing the previous pri_key-bytes
+         // tiebreaker. Within duplicate sec_keys the iteration order is therefore
+         // by chainbase insertion order rather than primary-key lexicographic order.
          ordered_unique<tag<by_code_table_id_seckey>,
             composite_key<kv_index_object,
                member<kv_index_object, account_name, &kv_index_object::code>,
                member<kv_index_object, uint16_t,     &kv_index_object::table_id>,
                kv_sec_key_extractor,
-               kv_pri_key_extractor
+               member<kv_index_object, kv_object::id_type, &kv_index_object::primary_id>
             >,
             composite_key_compare<std::less<account_name>, std::less<uint16_t>,
-                                  kv_key_less, kv_key_less>
+                                  kv_key_less, std::less<kv_object::id_type>>
          >
       >
    >;
@@ -180,8 +182,10 @@ namespace config {
    struct billable_size<kv_index_object> {
       static const uint64_t overhead = overhead_per_row_per_index_ram_bytes * 2;  ///< 2 indices: by_id, by_code_table_id_seckey
       // Fixed fields: 8 id + 8 code + 8 payer + 8 sec_key (offset_ptr)
-      //             + 8 pri_key (offset_ptr) + 2 table_id + 6 padding = 48
-      // sec_key.size() and pri_key.size() are added separately at billing time.
+      //             + 8 primary_id + 2 table_id + 6 padding = 48
+      // sec_key.size() is added separately at billing time. primary_id is
+      // an 8-byte reference to the kv_object; the primary-key bytes themselves
+      // are billed once against the primary row and are not duplicated here.
       static const uint64_t value = 48 + overhead;
       // protocol feature will be needed if this increases
       static_assert(sizeof(kv_index_object) == 48, "kv_index_object size changed");
@@ -191,9 +195,13 @@ namespace config {
    // ------------------------------------------------------------------
    // Snapshot DTO structs — portable serialization via FC_REFLECT.
    // These are transient (never stored in chainbase), so plain vectors
-   // are used instead of shared_blob.
+   // are used instead of shared_blob. The chainbase id is snapshotted so
+   // kv_index_object::primary_id references stay valid across save+load;
+   // the loader calls emplace_with_id to reinstate each object at its
+   // original id.
    // ------------------------------------------------------------------
    struct snapshot_kv_object {
+      uint64_t            id = 0;        ///< chainbase id preserved across snapshot save+load
       account_name        code;
       account_name        payer;
       std::vector<char>   key;
@@ -202,10 +210,11 @@ namespace config {
    };
 
    struct snapshot_kv_index_object {
+      uint64_t            id = 0;          ///< chainbase id preserved across snapshot save+load
       account_name        code;
       account_name        payer;
       std::vector<char>   sec_key;
-      std::vector<char>   pri_key;
+      uint64_t            primary_id = 0;  ///< references snapshot_kv_object::id (stable because ids are preserved)
       uint16_t            table_id = 0;
    };
 
@@ -214,5 +223,5 @@ namespace config {
 CHAINBASE_SET_INDEX_TYPE(sysio::chain::kv_object, sysio::chain::kv_index)
 CHAINBASE_SET_INDEX_TYPE(sysio::chain::kv_index_object, sysio::chain::kv_index_index)
 
-FC_REFLECT(sysio::chain::snapshot_kv_object, (code)(payer)(key)(value)(table_id))
-FC_REFLECT(sysio::chain::snapshot_kv_index_object, (code)(payer)(sec_key)(pri_key)(table_id))
+FC_REFLECT(sysio::chain::snapshot_kv_object, (id)(code)(payer)(key)(value)(table_id))
+FC_REFLECT(sysio::chain::snapshot_kv_index_object, (id)(code)(payer)(sec_key)(primary_id)(table_id))
