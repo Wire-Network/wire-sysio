@@ -175,6 +175,60 @@ BOOST_AUTO_TEST_CASE(parse_or_throw_invalid) try {
    );
 } FC_LOG_AND_RETHROW();
 
+BOOST_AUTO_TEST_CASE(parse_or_throw_out_of_range) try {
+   BOOST_CHECK_THROW(
+      parse_cron_schedule_or_throw("60 * * * *"),
+      fc::exception
+   );
+} FC_LOG_AND_RETHROW();
+
+// -----------------------------------------------------------------------
+// List / range-list / edge-case parsing
+// -----------------------------------------------------------------------
+
+BOOST_AUTO_TEST_CASE(parse_list_of_ranges) try {
+   auto sched_opt = parse_cron_schedule("1-3,5-7 * * * *");
+   BOOST_REQUIRE(sched_opt.has_value());
+   // Two range_value entries in minutes
+   BOOST_CHECK_EQUAL(sched_opt->minutes.size(), 2);
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(parse_step_without_base_rejected) try {
+   // "/5" has no base before the slash - invalid syntax
+   auto sched_opt = parse_cron_schedule("/5 * * * *");
+   BOOST_CHECK(!sched_opt.has_value());
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(parse_leading_comma_rejected) try {
+   auto sched_opt = parse_cron_schedule(",5 * * * *");
+   BOOST_CHECK(!sched_opt.has_value());
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(parse_trailing_comma_rejected) try {
+   auto sched_opt = parse_cron_schedule("5, * * * *");
+   BOOST_CHECK(!sched_opt.has_value());
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(parse_duplicate_values_deduplicated) try {
+   // std::set collapses duplicates; "5,5,5" yields a single exact_value
+   auto sched_opt = parse_cron_schedule("5,5,5 * * * *");
+   BOOST_REQUIRE(sched_opt.has_value());
+   BOOST_CHECK_EQUAL(sched_opt->minutes.size(), 1);
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(parse_dow_sunday_zero_accepted) try {
+   auto sched_opt = parse_cron_schedule("* * * * 0");
+   BOOST_REQUIRE(sched_opt.has_value());
+   BOOST_CHECK_EQUAL(sched_opt->day_of_week.size(), 1);
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(parse_dow_sunday_seven_alias) try {
+   // Documents current behavior for DOW=7 (the crontab Sunday-alias convention).
+   // If parser later adds the alias this test should change to check acceptance.
+   auto sched_opt = parse_cron_schedule("* * * * 7");
+   BOOST_CHECK(!sched_opt.has_value());
+} FC_LOG_AND_RETHROW();
+
 // -----------------------------------------------------------------------
 // Real-world examples
 // -----------------------------------------------------------------------

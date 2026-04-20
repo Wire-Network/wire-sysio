@@ -113,13 +113,14 @@ namespace {
       tcp::resolver      resolver{ioc};
       auto               dest = resolver.resolve(host, port);
       if (method == boost::beast::http::verb::get) {
-         char* escaped = curl_easy_escape(nullptr, api_key.c_str(), static_cast<int>(api_key.size()));
+         std::unique_ptr<char, decltype(&curl_free)> escaped{
+            curl_easy_escape(nullptr, api_key.c_str(), static_cast<int>(api_key.size())),
+            &curl_free};
          SYS_ASSERT(escaped != nullptr,
                   sysio::chain::plugin_config_exception,
                   "curl error occurred while performing curl_easy_escape");
          path += "?apikey=";
-         path += escaped;
-         curl_free(escaped);
+         path += escaped.get();
       }
 
       ssl_ctx.set_default_verify_paths();
@@ -157,6 +158,9 @@ namespace {
 
          beast::error_code ec;
          stream.shutdown(ec);
+         // eof/stream_truncated are benign - many servers close without a clean TLS shutdown.
+         if (ec && ec != asio::error::eof && ec != asio::ssl::error::stream_truncated)
+            dlog("TLS shutdown returned non-benign error: {}", ec.message());
 
          uint64_t sec_sleep = 0;
 
@@ -401,6 +405,10 @@ void wire_eth_maintenance_plugin::plugin_initialize(const variables_map& options
       auto queue_url = options.at(beacon_chain_queue_url).as<std::string>();
       auto apy_url = options.at(beacon_chain_apy_url).as<std::string>();
       auto api_key_val = options.at(beacon_chain_api_key).as<std::string>();
+      SYS_ASSERT(api_key_val.find_first_of("\r\n") == std::string::npos,
+                 sysio::chain::plugin_config_exception,
+                 "--beacon-chain-api-key must not contain CR/LF characters"
+                 " (value would be injected into HTTP headers).");
       auto network_val = options.at(beacon_chain_network).as<std::string>();
       auto update_interval = options.at(beacon_chain_update_interval).as<std::string>();
       auto exit_buffer_days = options.at(beacon_chain_exit_buffer_days).as<uint64_t>();
@@ -567,7 +575,7 @@ void wire_eth_maintenance_plugin::set_program_options(options_description& cli, 
        " automatically provided which will just execute immediately and then not run again.")
       (beacon_chain_finalize_epoch_interval,
        bpo::value<std::string>()->default_value(just_once_interval_name),
-       "flag to indicate to finalize the OPP epoch, using the named interval.")
+       "Name of the interval (defined via --beacon-chain-interval) on which to run OPP finalizeEpoch.")
       (beacon_chain_network,
        bpo::value<std::string>()->default_value("mainnet"),
        "The beacon chain network name passed to the queues API (e.g. mainnet, holesky).")

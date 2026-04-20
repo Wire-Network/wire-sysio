@@ -32,8 +32,8 @@ public:
 };
 
 inline const block_tag block_tag_latest(block_tag::labeled::latest);
-inline const const block_tag block_tag_pending(block_tag::labeled::pending);
-inline const const block_tag block_tag_earliest(block_tag::labeled::earliest);
+inline const block_tag block_tag_pending(block_tag::labeled::pending);
+inline const block_tag block_tag_earliest(block_tag::labeled::earliest);
 
 
 /**
@@ -458,7 +458,7 @@ public:
    template <typename C>
    std::shared_ptr<C> get_contract(const address_compat_type& address_compat,
                                    const std::vector<abi::contract>& contracts = {}) {
-      std::scoped_lock<std::mutex> lock(_contracts_map_mutex);
+      fc::lock_guard lock(_contracts_map_mutex);
       auto addr = ethereum::to_address(address_compat);
       if (!_contracts_map.contains(addr)) {
          _contracts_map[addr] = std::make_shared<C>(shared_from_this(), addr, contracts);

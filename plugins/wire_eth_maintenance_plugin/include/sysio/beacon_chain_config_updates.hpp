@@ -14,6 +14,10 @@
 
 namespace sysio {
 
+// Internal-only plain-data types: no FC_REFLECT declarations are provided because these
+// are never serialized over the network or to disk - they exist to move values between
+// the fetch/compute/transact/confirm steps within this plugin.
+
 struct queue_updates {
    std::optional<uint64_t> withdraw_delay_sec;
    std::optional<uint64_t> entry_queue_days;

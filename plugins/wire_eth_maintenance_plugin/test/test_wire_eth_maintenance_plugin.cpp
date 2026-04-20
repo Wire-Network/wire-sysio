@@ -1,5 +1,8 @@
 #include <boost/test/unit_test.hpp>
 
+#include <cmath>
+#include <limits>
+
 #include <fc/io/json.hpp>
 #include <fc/time.hpp>
 #include <sysio/chain/exceptions.hpp>
@@ -10,6 +13,9 @@ using namespace sysio::beacon_chain_detail;
 using namespace sysio;
 
 namespace {
+   // A long-horizon EPA used by tests that only need a value "far enough in the future" to
+   // produce a positive ETA. Picked for readability, not precision; test assertions must not
+   // depend on the exact magnitude. Update before 2100-01-01 (the wall-clock value).
    constexpr uint64_t far_future_epa = 4102444800ull; // 2100-01-01 00:00:00 UTC
 
    fc::variant make_queue(const char* branch_name) {
@@ -135,6 +141,38 @@ BOOST_AUTO_TEST_CASE(apy_fraction_to_bps_epsilon_robustness) {
    BOOST_CHECK_EQUAL(apy_fraction_to_bps(0.03), 300u);
 }
 
+BOOST_AUTO_TEST_CASE(apy_fraction_to_bps_negative_clamped_to_zero) {
+   BOOST_CHECK_EQUAL(apy_fraction_to_bps(-0.05), 0u);
+}
+
+BOOST_AUTO_TEST_CASE(apy_fraction_to_bps_nan_clamped_to_zero) {
+   BOOST_CHECK_EQUAL(apy_fraction_to_bps(std::nan("")), 0u);
+}
+
+BOOST_AUTO_TEST_CASE(apy_fraction_to_bps_inf_clamped_to_zero) {
+   BOOST_CHECK_EQUAL(apy_fraction_to_bps(std::numeric_limits<double>::infinity()), 0u);
+}
+
+BOOST_AUTO_TEST_CASE(apy_fraction_to_bps_extremely_large_clamped) {
+   // Wave 2 caps fraction at 100.0 (= 1,000,000 bps) before the uint64_t cast.
+   BOOST_CHECK_EQUAL(apy_fraction_to_bps(1e300), 1000000u);
+}
+
+BOOST_AUTO_TEST_CASE(get_queue_length_negative_epa_throws) {
+   // Wave 2 rejects negative int64 EPA before casting to uint64 (which would wrap huge).
+   auto queues = fc::json::from_string(R"({"exit_queue": {"estimated_processed_at": -1}})");
+   BOOST_CHECK_THROW(get_queue_length(queues, "exit_queue"), sysio::chain::plugin_config_exception);
+}
+
+BOOST_AUTO_TEST_CASE(get_queue_length_uint64_max_far_future_returns_eta) {
+   // Extremely large but still a valid uint64 - must not wrap; returns a huge ETA.
+   // Separate sanity caps in compute_queue_updates guard against pushing such a value on-chain.
+   auto queues = fc::json::from_string(R"({"exit_queue": {"estimated_processed_at": 18446744073709551614}})");
+   auto result = get_queue_length(queues, "exit_queue");
+   BOOST_REQUIRE(result.has_value());
+   BOOST_CHECK_GT(*result, uint64_t{0});
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 // ---------------------------------------------------------------------------
@@ -219,6 +257,23 @@ BOOST_AUTO_TEST_CASE(exit_queue_buffer_days_is_configurable) {
    BOOST_CHECK_EQUAL(*result.withdraw_delay_sec, 14u * seconds_per_day);
 }
 
+BOOST_AUTO_TEST_CASE(withdraw_delay_exceeding_cap_is_skipped) {
+   // Wave 2 sanity cap: 180 days. Use buffer large enough to blow past it.
+   // buffer_days=200 with past ETA -> 200-day withdraw -> exceeds 180-day cap -> skipped.
+   auto queues = make_queues_response(1, near_future_epa(3));
+   auto result = make_crank(200).compute_queue_updates(queues);
+   BOOST_CHECK(!result.withdraw_delay_sec.has_value());
+   BOOST_CHECK(result.entry_queue_days.has_value()); // unaffected
+}
+
+BOOST_AUTO_TEST_CASE(entry_queue_days_exceeding_cap_is_skipped) {
+   // deposit_eta with 400-day horizon -> entry_queue_days=400 -> exceeds 365-day cap -> skipped.
+   auto queues = make_queues_response(near_future_epa(7), near_future_epa(400));
+   auto result = make_crank().compute_queue_updates(queues);
+   BOOST_CHECK(result.withdraw_delay_sec.has_value()); // unaffected
+   BOOST_CHECK(!result.entry_queue_days.has_value());
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 // ---------------------------------------------------------------------------
@@ -245,6 +300,30 @@ BOOST_AUTO_TEST_CASE(apy_three_point_four_two_percent) {
    auto result = make_crank().compute_apy_updates(ethstore);
    BOOST_REQUIRE(result.apy_bps.has_value());
    BOOST_CHECK_EQUAL(*result.apy_bps, 342u);
+}
+
+BOOST_AUTO_TEST_CASE(apy_integer_value_is_accepted) {
+   // Wave 2 broadened acceptance from is_double() to is_numeric(); an unquoted int
+   // like `"avgapr7d": 5` (meaning 500% APR) must parse, not silently yield 0.
+   auto ethstore = fc::json::from_string(R"({"avgapr7d": 1})");
+   auto result = make_crank().compute_apy_updates(ethstore);
+   BOOST_REQUIRE(result.apy_bps.has_value());
+   // 1.0 fraction = 10000 bps = the max_apy_bps cap, so it's accepted (not skipped).
+   BOOST_CHECK_EQUAL(*result.apy_bps, 10000u);
+}
+
+BOOST_AUTO_TEST_CASE(apy_exceeds_cap_is_skipped) {
+   // 2.0 fraction -> 20000 bps -> exceeds 10000 bps cap -> skipped.
+   auto ethstore = make_ethstore_response(2.0);
+   auto result = make_crank().compute_apy_updates(ethstore);
+   BOOST_CHECK(!result.apy_bps.has_value());
+}
+
+BOOST_AUTO_TEST_CASE(apy_string_field_is_skipped) {
+   // Present-but-non-numeric field (string) must not broadcast a bogus value.
+   auto ethstore = fc::json::from_string(R"({"avgapr7d": "oops"})");
+   auto result = make_crank().compute_apy_updates(ethstore);
+   BOOST_CHECK(!result.apy_bps.has_value());
 }
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -338,6 +417,30 @@ BOOST_AUTO_TEST_CASE(fetch_throws_does_not_crash) {
       .send_set_entry_queue = [](uint64_t) { return "0xhash"; },
       .send_update_apy_bps = [](uint64_t) { return "0xhash"; },
       .confirm_txs = [](const std::vector<pending_tx>&) {}
+   }, 9);
+   BOOST_CHECK_NO_THROW(crank());
+}
+
+BOOST_AUTO_TEST_CASE(send_callback_throws_does_not_crash) {
+   beacon_chain_config_updates crank({
+      .fetch_queues = []() { return make_queues_response(near_future_epa(7), near_future_epa(3)); },
+      .fetch_apy = []() { return make_ethstore_response(0.05); },
+      .send_set_withdraw_delay = [](uint64_t) -> std::string { throw std::runtime_error("send failed"); },
+      .send_set_entry_queue = [](uint64_t) { return std::string("0xhash2"); },
+      .send_update_apy_bps = [](uint64_t) { return std::string("0xhash3"); },
+      .confirm_txs = [](const std::vector<pending_tx>&) {}
+   }, 9);
+   BOOST_CHECK_NO_THROW(crank());
+}
+
+BOOST_AUTO_TEST_CASE(confirm_txs_throws_does_not_crash) {
+   beacon_chain_config_updates crank({
+      .fetch_queues = []() { return make_queues_response(near_future_epa(7), near_future_epa(3)); },
+      .fetch_apy = []() { return make_ethstore_response(0.05); },
+      .send_set_withdraw_delay = [](uint64_t) { return std::string("0xhash1"); },
+      .send_set_entry_queue = [](uint64_t) { return std::string("0xhash2"); },
+      .send_update_apy_bps = [](uint64_t) { return std::string("0xhash3"); },
+      .confirm_txs = [](const std::vector<pending_tx>&) { throw std::runtime_error("confirm failed"); }
    }, 9);
    BOOST_CHECK_NO_THROW(crank());
 }

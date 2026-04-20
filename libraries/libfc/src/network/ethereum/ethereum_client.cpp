@@ -172,7 +172,7 @@ fc::uint256 ethereum_client::raw_get_transaction_count(const address_compat_type
 
 fc::uint256 ethereum_client::get_signer_nonce() {
    const auto count = raw_get_transaction_count(get_signer_address(), block_tag_latest);
-   std::scoped_lock<std::mutex> lock(_contracts_map_mutex);
+   fc::lock_guard lock(_contracts_map_mutex);
    if (_nonce < count) {
       _nonce = count;
    } else {
