@@ -119,6 +119,16 @@
             ]
         },
         {
+            "name": "id_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "locked_amount_t",
             "base": "",
             "fields": [
@@ -414,81 +424,57 @@
             "name": "collateral",
             "type": "collateral_entry",
             "index_type": "i64",
-            "key_names": ["scope","primary_key"],
-            "key_types": ["name","uint64"],
+            "key_names": ["id"],
+            "key_types": ["uint64"],
             "table_id": 16976,
             "secondary_indexes": [
                 {
                     "name": "byuwchain",
                     "key_type": "uint128",
-                    "table_id": 37457
+                    "table_id": 31810
                 },
                 {
                     "name": "byuw",
                     "key_type": "uint64",
-                    "table_id": 37458
+                    "table_id": 25316
                 }
             ]
-        },
-        {
-            "name": "collateral_entry",
-            "type": "collateral_entry",
-            "index_type": "i64",
-            "key_names": [],
-            "key_types": [],
-            "table_id": 37368
-        },
-        {
-            "name": "underwriting_entry",
-            "type": "underwriting_entry",
-            "index_type": "i64",
-            "key_names": [],
-            "key_types": [],
-            "table_id": 11646
-        },
-        {
-            "name": "uw_request_t",
-            "type": "uw_request_t",
-            "index_type": "i64",
-            "key_names": [],
-            "key_types": [],
-            "table_id": 32366
         },
         {
             "name": "uwconfig",
             "type": "uw_config",
             "index_type": "i64",
-            "key_names": [],
-            "key_types": [],
+            "key_names": ["name"],
+            "key_types": ["name"],
             "table_id": 7727
         },
         {
             "name": "uwledger",
             "type": "underwriting_entry",
             "index_type": "i64",
-            "key_names": ["scope","primary_key"],
-            "key_types": ["name","uint64"],
+            "key_names": ["id"],
+            "key_types": ["uint64"],
             "table_id": 53738,
             "secondary_indexes": [
                 {
                     "name": "byuw",
                     "key_type": "uint64",
-                    "table_id": 7147
+                    "table_id": 60542
                 },
                 {
                     "name": "bymessage",
                     "key_type": "uint64",
-                    "table_id": 7148
+                    "table_id": 6421
                 },
                 {
                     "name": "bystatus",
                     "key_type": "uint64",
-                    "table_id": 7149
+                    "table_id": 62060
                 },
                 {
                     "name": "byunlock",
                     "key_type": "uint64",
-                    "table_id": 7150
+                    "table_id": 7767
                 }
             ]
         },
@@ -496,19 +482,19 @@
             "name": "uwreqs",
             "type": "uw_request_t",
             "index_type": "i64",
-            "key_names": ["scope","primary_key"],
-            "key_types": ["name","uint64"],
+            "key_names": ["id"],
+            "key_types": ["uint64"],
             "table_id": 20885,
             "secondary_indexes": [
                 {
                     "name": "bystatus",
                     "key_type": "uint64",
-                    "table_id": 5782
+                    "table_id": 60695
                 },
                 {
                     "name": "byuw",
                     "key_type": "uint64",
-                    "table_id": 5783
+                    "table_id": 59177
                 }
             ]
         }

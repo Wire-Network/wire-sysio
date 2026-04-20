@@ -113,6 +113,16 @@
             ]
         },
         {
+            "name": "operator_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "processbatch",
             "base": "",
             "fields": [
@@ -337,35 +347,27 @@
             "name": "opconfig",
             "type": "op_config",
             "index_type": "i64",
-            "key_names": [],
-            "key_types": [],
+            "key_names": ["name"],
+            "key_types": ["name"],
             "table_id": 47741
-        },
-        {
-            "name": "operator_entry",
-            "type": "operator_entry",
-            "index_type": "i64",
-            "key_names": [],
-            "key_types": [],
-            "table_id": 55064
         },
         {
             "name": "operators",
             "type": "operator_entry",
             "index_type": "i64",
-            "key_names": ["scope","primary_key"],
-            "key_types": ["name","uint64"],
+            "key_names": ["account"],
+            "key_types": ["uint64"],
             "table_id": 44239,
             "secondary_indexes": [
                 {
                     "name": "bytype",
                     "key_type": "uint64",
-                    "table_id": 3024
+                    "table_id": 8691
                 },
                 {
                     "name": "bystatus",
                     "key_type": "uint64",
-                    "table_id": 3025
+                    "table_id": 57937
                 }
             ]
         }

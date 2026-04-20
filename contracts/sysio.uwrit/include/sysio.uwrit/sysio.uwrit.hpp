@@ -1,7 +1,8 @@
 #pragma once
 
 #include <sysio/sysio.hpp>
-#include <sysio/singleton.hpp>
+#include <sysio/kv_global.hpp>
+#include <sysio/kv_table.hpp>
 #include <sysio/asset.hpp>
 #include <sysio/crypto.hpp>
 #include <sysio/system.hpp>
@@ -63,8 +64,15 @@ namespace sysio {
       //  Tables
       // -----------------------------------------------------------------------
 
+      /// Auto-incrementing id-keyed primary key shared by collateral/ledger/uwreqs.
+      struct id_key {
+         uint64_t id;
+         uint64_t primary_key() const { return id; }
+         SYSLIB_SERIALIZE(id_key, (id))
+      };
+
       /// Underwriter collateral table.
-      struct [[sysio::table, sysio::contract("sysio.uwrit")]] collateral_entry {
+      struct [[sysio::table("collateral")]] collateral_entry {
          uint64_t    id;
          name        underwriter;
          fc::crypto::chain_kind_t chain_kind;
@@ -72,21 +80,25 @@ namespace sysio {
          asset       locked_amount;
          asset       available_amount; // staked - locked (precomputed)
 
-         uint64_t primary_key() const { return id; }
          uint128_t by_uw_chain() const {
             return (static_cast<uint128_t>(underwriter.value) << 64) |
                    static_cast<uint64_t>(chain_kind);
          }
          uint64_t by_underwriter() const { return underwriter.value; }
+
+         SYSLIB_SERIALIZE(collateral_entry,
+            (id)(underwriter)(chain_kind)(staked_amount)(locked_amount)(available_amount))
       };
 
-      using collateral_t = multi_index<"collateral"_n, collateral_entry,
-         indexed_by<"byuwchain"_n, const_mem_fun<collateral_entry, uint128_t, &collateral_entry::by_uw_chain>>,
-         indexed_by<"byuw"_n, const_mem_fun<collateral_entry, uint64_t, &collateral_entry::by_underwriter>>
+      using collateral_t = sysio::kv::table<"collateral"_n, id_key, collateral_entry,
+         sysio::kv::index<"byuwchain"_n,
+            sysio::const_mem_fun<collateral_entry, uint128_t, &collateral_entry::by_uw_chain>>,
+         sysio::kv::index<"byuw"_n,
+            sysio::const_mem_fun<collateral_entry, uint64_t, &collateral_entry::by_underwriter>>
       >;
 
       /// Underwriting ledger table.
-      struct [[sysio::table, sysio::contract("sysio.uwrit")]] underwriting_entry {
+      struct [[sysio::table("uwledger")]] underwriting_entry {
          uint64_t    id;
          name        underwriter;
          uint64_t    message_id;       // FK to sysio.msgch message
@@ -95,24 +107,32 @@ namespace sysio {
          asset       target_amount;
          fc::crypto::chain_kind_t source_chain;
          fc::crypto::chain_kind_t target_chain;
-         time_point  intent_time;
-         time_point  unlock_time;
+         time_point  intent_time{};
+         time_point  unlock_time{};
          asset       fee_earned;
          checksum256 source_sig;
          checksum256 target_sig;
 
-         uint64_t primary_key() const { return id; }
          uint64_t by_underwriter() const { return underwriter.value; }
          uint64_t by_message() const { return message_id; }
          uint64_t by_status() const { return static_cast<uint64_t>(status); }
          uint64_t by_unlock() const { return unlock_time.sec_since_epoch(); }
+
+         SYSLIB_SERIALIZE(underwriting_entry,
+            (id)(underwriter)(message_id)(status)(source_amount)(target_amount)
+            (source_chain)(target_chain)(intent_time)(unlock_time)(fee_earned)
+            (source_sig)(target_sig))
       };
 
-      using uwledger_t = multi_index<"uwledger"_n, underwriting_entry,
-         indexed_by<"byuw"_n, const_mem_fun<underwriting_entry, uint64_t, &underwriting_entry::by_underwriter>>,
-         indexed_by<"bymessage"_n, const_mem_fun<underwriting_entry, uint64_t, &underwriting_entry::by_message>>,
-         indexed_by<"bystatus"_n, const_mem_fun<underwriting_entry, uint64_t, &underwriting_entry::by_status>>,
-         indexed_by<"byunlock"_n, const_mem_fun<underwriting_entry, uint64_t, &underwriting_entry::by_unlock>>
+      using uwledger_t = sysio::kv::table<"uwledger"_n, id_key, underwriting_entry,
+         sysio::kv::index<"byuw"_n,
+            sysio::const_mem_fun<underwriting_entry, uint64_t, &underwriting_entry::by_underwriter>>,
+         sysio::kv::index<"bymessage"_n,
+            sysio::const_mem_fun<underwriting_entry, uint64_t, &underwriting_entry::by_message>>,
+         sysio::kv::index<"bystatus"_n,
+            sysio::const_mem_fun<underwriting_entry, uint64_t, &underwriting_entry::by_status>>,
+         sysio::kv::index<"byunlock"_n,
+            sysio::const_mem_fun<underwriting_entry, uint64_t, &underwriting_entry::by_unlock>>
       >;
 
       /// Fee configuration singleton.
@@ -128,11 +148,11 @@ namespace sysio {
             (uw_fee_share_pct)(other_uw_share_pct)(batch_op_share_pct))
       };
 
-      using uwconfig_t = sysio::singleton<"uwconfig"_n, uw_config>;
+      using uwconfig_t = sysio::kv::global<"uwconfig"_n, uw_config>;
 
       /// Underwrite request — created when an attestation requires underwriting.
       /// The attestation ID from sysio.msgch::attestations is used as primary key.
-      struct [[sysio::table, sysio::contract("sysio.uwrit")]] uw_request_t {
+      struct [[sysio::table("uwreqs")]] uw_request_t {
          uint64_t                                id;
          opp::types::AttestationType             type;
          opp::types::UnderwriteRequestStatus     status;
@@ -142,16 +162,19 @@ namespace sysio {
          uint64_t                                released_timestamp = 0;
          uint64_t                                slashed_timestamp  = 0;
 
-         uint64_t primary_key() const { return id; }
-         uint64_t by_status()   const { return static_cast<uint64_t>(status); }
-         uint64_t by_uw()       const { return uw_name.value; }
+         uint64_t by_status() const { return static_cast<uint64_t>(status); }
+         uint64_t by_uw()     const { return uw_name.value; }
+
+         SYSLIB_SERIALIZE(uw_request_t,
+            (id)(type)(status)(uw_name)(locked_amounts)
+            (unlock_timestamp)(released_timestamp)(slashed_timestamp))
       };
 
-      using uwreqs_t = multi_index<"uwreqs"_n, uw_request_t,
-         indexed_by<"bystatus"_n,
-            const_mem_fun<uw_request_t, uint64_t, &uw_request_t::by_status>>,
-         indexed_by<"byuw"_n,
-            const_mem_fun<uw_request_t, uint64_t, &uw_request_t::by_uw>>
+      using uwreqs_t = sysio::kv::table<"uwreqs"_n, id_key, uw_request_t,
+         sysio::kv::index<"bystatus"_n,
+            sysio::const_mem_fun<uw_request_t, uint64_t, &uw_request_t::by_status>>,
+         sysio::kv::index<"byuw"_n,
+            sysio::const_mem_fun<uw_request_t, uint64_t, &uw_request_t::by_uw>>
       >;
 
    private:

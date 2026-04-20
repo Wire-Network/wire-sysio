@@ -12,9 +12,16 @@ using opp::types::ChainKind;
 
 // ---------------------------------------------------------------------------
 //  Read-only mirror of sysio.authex::links table for cross-contract reads.
-//  Must match the on-chain layout exactly (same fields, types, indices).
+//  Table id and index ids are derived from the name hashes, so they match the
+//  real authex table as long as the table and index names match. Only the
+//  indices actually read here need to be mirrored.
 // ---------------------------------------------------------------------------
 namespace authex_readonly {
+
+struct links_key {
+   uint64_t key;
+   SYSLIB_SERIALIZE(links_key, (key))
+};
 
 struct links_row {
    uint64_t                 key;
@@ -22,16 +29,20 @@ struct links_row {
    fc::crypto::chain_kind_t chain_kind;
    public_key               pub_key;
 
-   uint64_t  primary_key()   const { return key; }
-   uint128_t by_namechain()  const { return to_namechain_key(username, chain_kind); }
-   uint64_t  by_name()       const { return username.value; }
-   uint64_t  by_chain()      const { return static_cast<uint64_t>(chain_kind); }
+   uint128_t by_namechain() const { return to_namechain_key(username, chain_kind); }
+   uint64_t  by_name()      const { return username.value; }
+   uint64_t  by_chain()     const { return static_cast<uint64_t>(chain_kind); }
+
+   SYSLIB_SERIALIZE(links_row, (key)(username)(chain_kind)(pub_key))
 };
 
-using links_t = multi_index<"links"_n, links_row,
-   indexed_by<"bynamechain"_n, const_mem_fun<links_row, uint128_t, &links_row::by_namechain>>,
-   indexed_by<"byname"_n,      const_mem_fun<links_row, uint64_t,  &links_row::by_name>>,
-   indexed_by<"bychain"_n,     const_mem_fun<links_row, uint64_t,  &links_row::by_chain>>
+using links_t = sysio::kv::table<"links"_n, links_key, links_row,
+   sysio::kv::index<"bynamechain"_n,
+      sysio::const_mem_fun<links_row, uint128_t, &links_row::by_namechain>>,
+   sysio::kv::index<"byname"_n,
+      sysio::const_mem_fun<links_row, uint64_t, &links_row::by_name>>,
+   sysio::kv::index<"bychain"_n,
+      sysio::const_mem_fun<links_row, uint64_t, &links_row::by_chain>>
 >;
 
 } // namespace authex_readonly
@@ -59,11 +70,8 @@ void opreg::setconfig(uint32_t max_available_producers,
    check(max_available_underwriters > 0, "max_available_underwriters must be positive");
    check(terminate_prune_delay_ms > 0, "terminate_prune_delay_ms must be positive");
 
-   opconfig_t cfg_tbl(get_self(), get_self().value);
-   op_config cfg;
-   if (cfg_tbl.exists()) {
-      cfg = cfg_tbl.get();
-   }
+   opconfig_t cfg_tbl(get_self());
+   op_config cfg = cfg_tbl.get_or_default(op_config{});
    cfg.max_available_producers = max_available_producers;
    cfg.max_available_batch_ops = max_available_batch_ops;
    cfg.max_available_underwriters = max_available_underwriters;
@@ -100,20 +108,21 @@ void opreg::regoperator(name account,
          "underwriter type cannot be bootstrapped");
 
    // Check not already registered (non-pruned)
-   operators_t ops(get_self(), get_self().value);
-   auto it = ops.find(account.value);
-   if (it != ops.end()) {
-      check(it->status == OperatorStatus::OPERATOR_STATUS_TERMINATED,
+   operators_t ops(get_self());
+   auto op_pk = operator_key{account.value};
+   if (ops.contains(op_pk)) {
+      auto existing = ops.get(op_pk);
+      check(existing.status == OperatorStatus::OPERATOR_STATUS_TERMINATED,
             "operator already registered");
       // If terminated, erase old row to allow re-registration
-      ops.erase(it);
+      ops.erase(op_pk);
    }
 
    // Verify authex links exist for all active outpost chains.
    // Skip when: bootstrapped OR privileged caller (sysio.opreg registering on behalf)
    if (!is_bootstrapped && !has_auth(get_self())) {
-      epoch::outposts_t outposts(EPOCH_ACCOUNT, EPOCH_ACCOUNT.value);
-      authex_readonly::links_t links(AUTHEX_ACCOUNT, AUTHEX_ACCOUNT.value);
+      epoch::outposts_t outposts(EPOCH_ACCOUNT);
+      authex_readonly::links_t links(AUTHEX_ACCOUNT);
       auto namechain_idx = links.get_index<"bynamechain"_n>();
 
       for (auto op_it = outposts.begin(); op_it != outposts.end(); ++op_it) {
@@ -128,17 +137,14 @@ void opreg::regoperator(name account,
    }
 
    auto now = current_time_ms();
-   ops.emplace(get_self(), [&](auto& o) {
-      o.account        = account;
-      o.type           = type;
-      o.is_bootstrapped = is_bootstrapped;
-      o.registered_at  = now;
-      if (is_bootstrapped) {
-         o.status      = OperatorStatus::OPERATOR_STATUS_ACTIVE; // AVAILABLE
-         o.available_at = now;
-      } else {
-         o.status      = OperatorStatus::OPERATOR_STATUS_UNKNOWN; // PENDING
-      }
+   ops.emplace(get_self(), op_pk, operator_entry{
+      .account         = account,
+      .type            = type,
+      .status          = is_bootstrapped ? OperatorStatus::OPERATOR_STATUS_ACTIVE    // AVAILABLE
+                                         : OperatorStatus::OPERATOR_STATUS_UNKNOWN,  // PENDING
+      .is_bootstrapped = is_bootstrapped,
+      .registered_at   = now,
+      .available_at    = is_bootstrapped ? now : 0,
    });
 }
 
@@ -148,10 +154,10 @@ void opreg::regoperator(name account,
 void opreg::stake(name account,
                   opp::types::ChainAddress chain_addr,
                   opp::types::TokenAmount amount) {
-   operators_t ops(get_self(), get_self().value);
-   auto it = ops.find(account.value);
-   check(it != ops.end(), "operator not found");
-   check(it->status != OperatorStatus::OPERATOR_STATUS_SLASHED,
+   operators_t ops(get_self());
+   auto op_pk = operator_key{account.value};
+   auto op_row = ops.get(op_pk, "operator not found");
+   check(op_row.status != OperatorStatus::OPERATOR_STATUS_SLASHED,
          "slashed operators cannot stake");
 
    bool is_deposit = static_cast<int64_t>(amount.amount) > 0;
@@ -188,7 +194,7 @@ void opreg::stake(name account,
       opp::types::WireAccount wa;
       wa.name = account.to_string();
       oa.wire_account = wa;
-      oa.type = it->type;
+      oa.type = op_row.type;
       opp::types::TokenAmount pos_amount = amount;
       pos_amount.amount = zpp::bits::vint64_t{-static_cast<int64_t>(amount.amount)};
       oa.amount = pos_amount;
@@ -197,7 +203,7 @@ void opreg::stake(name account,
       (void)out(oa);
 
       // Find outpost for this chain
-      epoch::outposts_t outposts(EPOCH_ACCOUNT, EPOCH_ACCOUNT.value);
+      epoch::outposts_t outposts(EPOCH_ACCOUNT);
       for (auto op_it = outposts.begin(); op_it != outposts.end(); ++op_it) {
          if (static_cast<int>(op_it->chain_kind) == static_cast<int>(chain_addr.kind)) {
             action(
@@ -213,22 +219,22 @@ void opreg::stake(name account,
 
    // Append stake entry
    auto now = current_time_ms();
-   ops.modify(it, same_payer, [&](auto& o) {
+   ops.modify(same_payer, op_pk, [&](auto& o) {
       o.stakes.push_back(stake_entry{chain_addr, amount, now});
    });
 
    // Re-read after modification
-   it = ops.find(account.value);
+   op_row = ops.get(op_pk);
 
    // Compute aggregate stakes and check eligibility
-   opconfig_t cfg_tbl(get_self(), get_self().value);
+   opconfig_t cfg_tbl(get_self());
    if (!cfg_tbl.exists()) return;
    auto cfg = cfg_tbl.get();
 
    // Get required stakes for this operator type
    const std::vector<stake_requirement>* reqs = nullptr;
    uint32_t max_available = 0;
-   switch (it->type) {
+   switch (op_row.type) {
       case OperatorType::OPERATOR_TYPE_PRODUCER:
          reqs = &cfg.req_prod_stakes;
          max_available = cfg.max_available_producers;
@@ -247,13 +253,13 @@ void opreg::stake(name account,
 
    // Compute aggregate per chain_kind+token_kind
    // Compare against requirements
-   bool was_eligible = (it->status == OperatorStatus::OPERATOR_STATUS_ACTIVE); // AVAILABLE
+   bool was_eligible = (op_row.status == OperatorStatus::OPERATOR_STATUS_ACTIVE); // AVAILABLE
    bool is_eligible = true;
 
    if (reqs && !reqs->empty()) {
       for (const auto& req : *reqs) {
          int64_t aggregate = 0;
-         for (const auto& s : it->stakes) {
+         for (const auto& s : op_row.stakes) {
             if (static_cast<int>(s.chain_addr.kind) == static_cast<int>(req.chain_addr.kind) &&
                 static_cast<int>(s.amount.kind) == static_cast<int>(req.min_amount.kind)) {
                aggregate += static_cast<int64_t>(s.amount.amount);
@@ -266,15 +272,15 @@ void opreg::stake(name account,
       }
    } else {
       // No requirements configured — not eligible unless bootstrapped
-      is_eligible = it->is_bootstrapped;
+      is_eligible = op_row.is_bootstrapped;
    }
 
    // Check if ALL stakes net to zero → auto-terminate
    bool all_zero = true;
-   if (!it->stakes.empty()) {
+   if (!op_row.stakes.empty()) {
       // Group by chain_kind+token_kind and sum
       std::vector<std::pair<int, int64_t>> sums; // (chain_kind*1000+token_kind, sum)
-      for (const auto& s : it->stakes) {
+      for (const auto& s : op_row.stakes) {
          int key = static_cast<int>(s.chain_addr.kind) * 1000 + static_cast<int>(s.amount.kind);
          bool found = false;
          for (auto& p : sums) {
@@ -291,8 +297,8 @@ void opreg::stake(name account,
       }
    }
 
-   if (all_zero && !it->stakes.empty()) {
-      ops.modify(it, same_payer, [&](auto& o) {
+   if (all_zero && !op_row.stakes.empty()) {
+      ops.modify(same_payer, op_pk, [&](auto& o) {
          o.status = OperatorStatus::OPERATOR_STATUS_TERMINATED;
          o.terminated_at = now;
       });
@@ -304,7 +310,7 @@ void opreg::stake(name account,
    // Dispatch type-specific processing if eligibility changed
    if (was_eligible != is_eligible) {
       name action_name;
-      switch (it->type) {
+      switch (op_row.type) {
          case OperatorType::OPERATOR_TYPE_PRODUCER:
             action_name = "processprod"_n; break;
          case OperatorType::OPERATOR_TYPE_BATCH:
@@ -331,14 +337,14 @@ void opreg::stake(name account,
 // ---------------------------------------------------------------------------
 void opreg::processprod(name account, bool was_eligible, bool is_eligible) {
    require_auth(get_self());
-   operators_t ops(get_self(), get_self().value);
-   auto it = ops.find(account.value);
-   check(it != ops.end(), "operator not found");
+   operators_t ops(get_self());
+   auto op_pk = operator_key{account.value};
+   check(ops.contains(op_pk), "operator not found");
 
    auto now = current_time_ms();
 
    if (!was_eligible && is_eligible) {
-      ops.modify(it, same_payer, [&](auto& o) {
+      ops.modify(same_payer, op_pk, [&](auto& o) {
          o.status = OperatorStatus::OPERATOR_STATUS_ACTIVE; // AVAILABLE
          o.available_at = now;
       });
@@ -346,7 +352,7 @@ void opreg::processprod(name account, bool was_eligible, bool is_eligible) {
       require_recipient(SYSTEM_ACCOUNT);
       // TODO: queue OPERATORS(AVAILABLE) to all outposts
    } else if (was_eligible && !is_eligible) {
-      ops.modify(it, same_payer, [&](auto& o) {
+      ops.modify(same_payer, op_pk, [&](auto& o) {
          o.status = OperatorStatus::OPERATOR_STATUS_UNKNOWN; // PENDING
       });
       // TODO: queue OPERATORS(PENDING) to all outposts
@@ -355,20 +361,20 @@ void opreg::processprod(name account, bool was_eligible, bool is_eligible) {
 
 void opreg::processbatch(name account, bool was_eligible, bool is_eligible) {
    require_auth(get_self());
-   operators_t ops(get_self(), get_self().value);
-   auto it = ops.find(account.value);
-   check(it != ops.end(), "operator not found");
+   operators_t ops(get_self());
+   auto op_pk = operator_key{account.value};
+   check(ops.contains(op_pk), "operator not found");
 
    auto now = current_time_ms();
 
    if (!was_eligible && is_eligible) {
-      ops.modify(it, same_payer, [&](auto& o) {
+      ops.modify(same_payer, op_pk, [&](auto& o) {
          o.status = OperatorStatus::OPERATOR_STATUS_ACTIVE; // AVAILABLE
          o.available_at = now;
       });
       // TODO: queue OPERATORS(AVAILABLE) to all outposts
    } else if (was_eligible && !is_eligible) {
-      ops.modify(it, same_payer, [&](auto& o) {
+      ops.modify(same_payer, op_pk, [&](auto& o) {
          o.status = OperatorStatus::OPERATOR_STATUS_UNKNOWN; // PENDING
       });
       // TODO: queue OPERATORS(PENDING) to all outposts
@@ -377,20 +383,20 @@ void opreg::processbatch(name account, bool was_eligible, bool is_eligible) {
 
 void opreg::processuw(name account, bool was_eligible, bool is_eligible) {
    require_auth(get_self());
-   operators_t ops(get_self(), get_self().value);
-   auto it = ops.find(account.value);
-   check(it != ops.end(), "operator not found");
+   operators_t ops(get_self());
+   auto op_pk = operator_key{account.value};
+   check(ops.contains(op_pk), "operator not found");
 
    auto now = current_time_ms();
 
    if (!was_eligible && is_eligible) {
-      ops.modify(it, same_payer, [&](auto& o) {
+      ops.modify(same_payer, op_pk, [&](auto& o) {
          o.status = OperatorStatus::OPERATOR_STATUS_ACTIVE; // AVAILABLE
          o.available_at = now;
       });
       // TODO: queue OPERATORS(AVAILABLE) to all outposts
    } else if (was_eligible && !is_eligible) {
-      ops.modify(it, same_payer, [&](auto& o) {
+      ops.modify(same_payer, op_pk, [&](auto& o) {
          o.status = OperatorStatus::OPERATOR_STATUS_UNKNOWN; // PENDING
       });
       // TODO: queue OPERATORS(PENDING) to all outposts
@@ -403,20 +409,20 @@ void opreg::processuw(name account, bool was_eligible, bool is_eligible) {
 void opreg::slash(name account, std::string reason) {
    require_auth(CHALG_ACCOUNT);
 
-   operators_t ops(get_self(), get_self().value);
-   auto it = ops.find(account.value);
-   check(it != ops.end(), "operator not found");
-   check(it->status != OperatorStatus::OPERATOR_STATUS_SLASHED,
+   operators_t ops(get_self());
+   auto op_pk = operator_key{account.value};
+   auto op_row = ops.get(op_pk, "operator not found");
+   check(op_row.status != OperatorStatus::OPERATOR_STATUS_SLASHED,
          "operator already slashed");
 
    auto now = current_time_ms();
-   ops.modify(it, same_payer, [&](auto& o) {
+   ops.modify(same_payer, op_pk, [&](auto& o) {
       o.status = OperatorStatus::OPERATOR_STATUS_SLASHED;
       o.slashed_at = now;
    });
 
    // Queue SLASH_OPERATOR to all outposts
-   epoch::outposts_t outposts(EPOCH_ACCOUNT, EPOCH_ACCOUNT.value);
+   epoch::outposts_t outposts(EPOCH_ACCOUNT);
    for (auto op_it = outposts.begin(); op_it != outposts.end(); ++op_it) {
       opp::attestations::SlashOperator so;
       opp::types::ChainAddress addr;
@@ -424,7 +430,7 @@ void opreg::slash(name account, std::string reason) {
       auto name_str = account.to_string();
       addr.address.assign(name_str.begin(), name_str.end());
       so.operator_ = addr;
-      so.type = it->type;
+      so.type = op_row.type;
       so.reason = reason;
 
       auto [encoded, out] = zpp::bits::data_out<char>();
@@ -443,12 +449,12 @@ void opreg::slash(name account, std::string reason) {
 //  prune — remove terminated operator rows past the delay
 // ---------------------------------------------------------------------------
 void opreg::prune() {
-   opconfig_t cfg_tbl(get_self(), get_self().value);
+   opconfig_t cfg_tbl(get_self());
    check(cfg_tbl.exists(), "opconfig not initialized");
    auto cfg = cfg_tbl.get();
 
    auto now = current_time_ms();
-   operators_t ops(get_self(), get_self().value);
+   operators_t ops(get_self());
    auto status_idx = ops.get_index<"bystatus"_n>();
 
    uint32_t removed = 0;
@@ -457,7 +463,7 @@ void opreg::prune() {
         it != status_idx.end() &&
         it->status == OperatorStatus::OPERATOR_STATUS_TERMINATED;) {
       if (it->terminated_at > 0 && now - it->terminated_at >= cfg.terminate_prune_delay_ms) {
-         it = status_idx.erase(it);
+         it = status_idx.erase(std::move(it));
          if (++removed >= 20) break; // Bound CPU
       } else {
          ++it;

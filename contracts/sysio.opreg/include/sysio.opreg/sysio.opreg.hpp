@@ -1,7 +1,8 @@
 #pragma once
 
 #include <sysio/sysio.hpp>
-#include <sysio/singleton.hpp>
+#include <sysio/kv_global.hpp>
+#include <sysio/kv_table.hpp>
 #include <sysio/asset.hpp>
 #include <sysio/crypto.hpp>
 #include <sysio/system.hpp>
@@ -79,8 +80,15 @@ namespace sysio {
          SYSLIB_SERIALIZE(stake_entry, (chain_addr)(amount)(timestamp_ms))
       };
 
+      /// Operators primary key: account name value.
+      struct operator_key {
+         uint64_t account;
+         uint64_t primary_key() const { return account; }
+         SYSLIB_SERIALIZE(operator_key, (account))
+      };
+
       /// Operator entry — the primary roster.
-      struct [[sysio::table, sysio::contract("sysio.opreg")]] operator_entry {
+      struct [[sysio::table("operators")]] operator_entry {
          name                          account;
          opp::types::OperatorType      type;
          opp::types::OperatorStatus    status;
@@ -91,16 +99,19 @@ namespace sysio {
          uint64_t                      slashed_at      = 0;
          uint64_t                      terminated_at   = 0;
 
-         uint64_t primary_key() const { return account.value; }
          uint64_t by_type()   const { return static_cast<uint64_t>(type); }
          uint64_t by_status() const { return static_cast<uint64_t>(status); }
+
+         SYSLIB_SERIALIZE(operator_entry,
+            (account)(type)(status)(is_bootstrapped)(stakes)
+            (registered_at)(available_at)(slashed_at)(terminated_at))
       };
 
-      using operators_t = multi_index<"operators"_n, operator_entry,
-         indexed_by<"bytype"_n,
-            const_mem_fun<operator_entry, uint64_t, &operator_entry::by_type>>,
-         indexed_by<"bystatus"_n,
-            const_mem_fun<operator_entry, uint64_t, &operator_entry::by_status>>
+      using operators_t = sysio::kv::table<"operators"_n, operator_key, operator_entry,
+         sysio::kv::index<"bytype"_n,
+            sysio::const_mem_fun<operator_entry, uint64_t, &operator_entry::by_type>>,
+         sysio::kv::index<"bystatus"_n,
+            sysio::const_mem_fun<operator_entry, uint64_t, &operator_entry::by_status>>
       >;
 
       /// Stake requirement entry for opconfig.
@@ -128,7 +139,7 @@ namespace sysio {
             (terminate_prune_delay_ms))
       };
 
-      using opconfig_t = sysio::singleton<"opconfig"_n, op_config>;
+      using opconfig_t = sysio::kv::global<"opconfig"_n, op_config>;
 
    private:
 

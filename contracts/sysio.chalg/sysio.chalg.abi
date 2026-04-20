@@ -54,6 +54,16 @@
             ]
         },
         {
+            "name": "challenge_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "enforce",
             "base": "",
             "fields": [
@@ -114,6 +124,16 @@
                 {
                     "name": "is_resolved",
                     "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "resolution_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
                 }
             ]
         },
@@ -214,47 +234,31 @@
     ],
     "tables": [
         {
-            "name": "challenge_entry",
-            "type": "challenge_entry",
-            "index_type": "i64",
-            "key_names": [],
-            "key_types": [],
-            "table_id": 63857
-        },
-        {
             "name": "challenges",
             "type": "challenge_entry",
             "index_type": "i64",
-            "key_names": ["scope","primary_key"],
-            "key_types": ["name","uint64"],
+            "key_names": ["id"],
+            "key_types": ["uint64"],
             "table_id": 633,
             "secondary_indexes": [
                 {
                     "name": "byrequest",
                     "key_type": "uint64",
-                    "table_id": 27514
+                    "table_id": 56986
                 },
                 {
                     "name": "byepoch",
                     "key_type": "uint64",
-                    "table_id": 27515
+                    "table_id": 22792
                 }
             ]
-        },
-        {
-            "name": "manual_resolution",
-            "type": "manual_resolution",
-            "index_type": "i64",
-            "key_names": [],
-            "key_types": [],
-            "table_id": 34787
         },
         {
             "name": "resolutions",
             "type": "manual_resolution",
             "index_type": "i64",
-            "key_names": ["scope","primary_key"],
-            "key_types": ["name","uint64"],
+            "key_names": ["id"],
+            "key_types": ["uint64"],
             "table_id": 62629
         }
     ],

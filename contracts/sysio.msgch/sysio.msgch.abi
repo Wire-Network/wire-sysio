@@ -146,6 +146,16 @@
             ]
         },
         {
+            "name": "id_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "message_entry",
             "base": "",
             "fields": [
@@ -252,6 +262,16 @@
             ]
         },
         {
+            "name": "outpost_consensus_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "outpost_id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "queueout",
             "base": "",
             "fields": [
@@ -309,124 +329,92 @@
     ],
     "tables": [
         {
-            "name": "attestation_entry",
-            "type": "attestation_entry",
-            "index_type": "i64",
-            "key_names": [],
-            "key_types": [],
-            "table_id": 30356
-        },
-        {
             "name": "attestations",
             "type": "attestation_entry",
             "index_type": "i64",
-            "key_names": ["scope","primary_key"],
-            "key_types": ["name","uint64"],
+            "key_names": ["id"],
+            "key_types": ["uint64"],
             "table_id": 4978,
             "secondary_indexes": [
                 {
                     "name": "bystatus",
                     "key_type": "uint64",
-                    "table_id": 25971
+                    "table_id": 15348
                 },
                 {
                     "name": "bytype",
                     "key_type": "uint64",
-                    "table_id": 25972
+                    "table_id": 31638
                 },
                 {
                     "name": "byepoch",
                     "key_type": "uint64",
-                    "table_id": 25973
+                    "table_id": 21249
                 }
             ]
-        },
-        {
-            "name": "envelope_entry",
-            "type": "envelope_entry",
-            "index_type": "i64",
-            "key_names": [],
-            "key_types": [],
-            "table_id": 1974
         },
         {
             "name": "envelopes",
             "type": "envelope_entry",
             "index_type": "i64",
-            "key_names": ["scope","primary_key"],
-            "key_types": ["name","uint64"],
+            "key_names": ["id"],
+            "key_types": ["uint64"],
             "table_id": 45555,
             "secondary_indexes": [
                 {
                     "name": "byoutepoch",
                     "key_type": "uint64",
-                    "table_id": 62708
+                    "table_id": 57096
                 },
                 {
                     "name": "bybatchop",
                     "key_type": "uint64",
-                    "table_id": 62709
+                    "table_id": 5961
                 }
             ]
-        },
-        {
-            "name": "message_entry",
-            "type": "message_entry",
-            "index_type": "i64",
-            "key_names": [],
-            "key_types": [],
-            "table_id": 52289
         },
         {
             "name": "messages",
             "type": "message_entry",
             "index_type": "i64",
-            "key_names": ["scope","primary_key"],
-            "key_types": ["name","uint64"],
+            "key_names": ["id"],
+            "key_types": ["uint64"],
             "table_id": 28724,
             "secondary_indexes": [
                 {
                     "name": "bystatus",
                     "key_type": "uint64",
-                    "table_id": 25653
+                    "table_id": 15030
                 },
                 {
                     "name": "byepoch",
                     "key_type": "uint64",
-                    "table_id": 25654
+                    "table_id": 20931
                 },
                 {
                     "name": "bymsgid",
                     "key_type": "checksum256",
-                    "table_id": 25655
+                    "table_id": 13591
                 }
             ]
-        },
-        {
-            "name": "outbound_envelope",
-            "type": "outbound_envelope",
-            "index_type": "i64",
-            "key_names": [],
-            "key_types": [],
-            "table_id": 54646
         },
         {
             "name": "outenvelopes",
             "type": "outbound_envelope",
             "index_type": "i64",
-            "key_names": ["scope","primary_key"],
-            "key_types": ["name","uint64"],
+            "key_names": ["id"],
+            "key_types": ["uint64"],
             "table_id": 18398,
             "secondary_indexes": [
                 {
                     "name": "byoutpost",
                     "key_type": "uint64",
-                    "table_id": 17887
+                    "table_id": 14600
                 },
                 {
                     "name": "byoutepoch",
                     "key_type": "uint64",
-                    "table_id": 17888
+                    "table_id": 12275
                 }
             ]
         },
@@ -434,17 +422,9 @@
             "name": "outpcons",
             "type": "outpost_consensus_entry",
             "index_type": "i64",
-            "key_names": ["scope","primary_key"],
-            "key_types": ["name","uint64"],
+            "key_names": ["outpost_id"],
+            "key_types": ["uint64"],
             "table_id": 51836
-        },
-        {
-            "name": "outpost_consensus_entry",
-            "type": "outpost_consensus_entry",
-            "index_type": "i64",
-            "key_names": [],
-            "key_types": [],
-            "table_id": 26974
         }
     ],
     "ricardian_clauses": [],
