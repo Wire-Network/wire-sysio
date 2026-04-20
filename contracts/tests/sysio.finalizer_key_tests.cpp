@@ -43,9 +43,12 @@ struct finalizer_key_tester : sysio_system_tester {
    }
 
    std::vector<finalizer_auth_info> get_last_prop_finalizers_info() {
-      auto key = sysio::chain::make_kv_scoped_key(config::system_account_name, uint64_t(0));
+      // lastpropfins is kv::global — key is [Name:8B BE] where Name = "lastpropfins"_n
+      char key_buf[sysio::chain::kv_pri_key_size];
+      sysio::chain::kv_encode_be64(key_buf, "lastpropfins"_n.to_uint64_t());
+      std::string_view key_sv(key_buf, sysio::chain::kv_pri_key_size);
       const auto& kv_idx = control->db().get_index<sysio::chain::kv_index, sysio::chain::by_code_key>();
-      auto it = kv_idx.find(boost::make_tuple(config::system_account_name, sysio::chain::compute_table_id("lastpropfins"_n.to_uint64_t()), key.to_string_view()));
+      auto it = kv_idx.find(boost::make_tuple(config::system_account_name, sysio::chain::compute_table_id("lastpropfins"_n.to_uint64_t()), key_sv));
       if (it == kv_idx.end()) {
          return {};
       }

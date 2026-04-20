@@ -14,6 +14,16 @@
             ]
         },
         {
+            "name": "acct_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "sym_code",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "close",
             "base": "",
             "fields": [
@@ -110,6 +120,16 @@
             ]
         },
         {
+            "name": "stat_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "sym_code",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "transfer",
             "base": "",
             "fields": [
@@ -166,34 +186,18 @@
     ],
     "tables": [
         {
-            "name": "account",
-            "type": "account",
-            "index_type": "i64",
-            "key_names": [],
-            "key_types": [],
-            "table_id": 15140
-        },
-        {
             "name": "accounts",
             "type": "account",
             "index_type": "i64",
-            "key_names": ["scope","primary_key"],
+            "key_names": ["scope","sym_code"],
             "key_types": ["name","uint64"],
             "table_id": 25660
-        },
-        {
-            "name": "currency_stats",
-            "type": "currency_stats",
-            "index_type": "i64",
-            "key_names": [],
-            "key_types": [],
-            "table_id": 18569
         },
         {
             "name": "stat",
             "type": "currency_stats",
             "index_type": "i64",
-            "key_names": ["scope","primary_key"],
+            "key_names": ["scope","sym_code"],
             "key_types": ["name","uint64"],
             "table_id": 4264
         }
