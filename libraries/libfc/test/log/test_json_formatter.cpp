@@ -50,7 +50,7 @@ fc::variant parse_json(const std::string& s) {
    return fc::json::from_string(s);
 }
 
-// Build a standard rotating file sink with fc::json_formatter attached.
+// Build a standard rotating file sink with fc::log::json_formatter attached.
 std::shared_ptr<spdlog::sinks::sink> make_json_rotating_sink(
    const std::string& path,
    std::size_t max_size,
@@ -58,7 +58,7 @@ std::shared_ptr<spdlog::sinks::sink> make_json_rotating_sink(
    std::map<std::string, std::string> extras = {})
 {
    auto sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(path, max_size, max_files);
-   sink->set_formatter(std::make_unique<fc::json_formatter>(std::move(extras)));
+   sink->set_formatter(std::make_unique<fc::log::json_formatter>(std::move(extras)));
    return sink;
 }
 
@@ -532,11 +532,11 @@ BOOST_AUTO_TEST_CASE(multi_thread_no_corruption) try {
    fs::remove_all(dir);
 } FC_LOG_AND_RETHROW()
 
-// Direct unit test of fc::json_formatter against a synthetic log_msg, with
+// Direct unit test of fc::log::json_formatter against a synthetic log_msg, with
 // no sink in the loop -- pinpoints formatter bugs independent of spdlog's
 // sink plumbing.
 BOOST_AUTO_TEST_CASE(formatter_direct_format) try {
-   fc::json_formatter fmt({{"env", "test"}});
+   fc::log::json_formatter fmt({{"env", "test"}});
    spdlog::details::log_msg msg{
       spdlog::source_loc{"src.cpp", 42, "my_func"},
       "direct_logger",
@@ -559,11 +559,11 @@ BOOST_AUTO_TEST_CASE(formatter_direct_format) try {
    BOOST_CHECK_EQUAL(obj["extra"].get_object()["env"].as_string(), "test");
 } FC_LOG_AND_RETHROW()
 
-// Direct unit test of fc::dmlog_formatter against a synthetic log_msg.
+// Direct unit test of fc::log::dmlog_formatter against a synthetic log_msg.
 // Exact byte sequence "DMLOG " + payload + "\n" must match what dfuse
 // postprocessing tools consume.
 BOOST_AUTO_TEST_CASE(dmlog_formatter_direct_format) try {
-   fc::dmlog_formatter fmt;
+   fc::log::dmlog_formatter fmt;
    spdlog::details::log_msg msg{
       spdlog::source_loc{"src.cpp", 1, "f"},
       "dmlogger",

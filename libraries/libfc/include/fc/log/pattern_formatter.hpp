@@ -4,7 +4,7 @@
 #include <memory>
 #include <string_view>
 
-namespace fc {
+namespace fc::log {
 
 /// Default log line pattern used when no explicit format is configured.
 /// Includes a custom %k flag rendering fc::get_thread_name().
@@ -14,7 +14,7 @@ inline constexpr std::string_view DEFAULT_LOG_PATTERN =
 /// Build a spdlog::pattern_formatter preconfigured with fc's custom %k
 /// (thread-name) flag, UTC time, and the given pattern string (defaulting
 /// to DEFAULT_LOG_PATTERN). Intended to be attached to a sink via
-/// sink->set_formatter(fc::make_pattern_formatter()).
+/// sink->set_formatter(fc::log::make_pattern_formatter()).
 std::unique_ptr<spdlog::formatter> make_pattern_formatter(std::string_view pattern = DEFAULT_LOG_PATTERN);
 
-} // namespace fc
+} // namespace fc::log

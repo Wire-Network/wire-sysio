@@ -6,12 +6,12 @@
 #include <memory>
 #include <string>
 
-namespace fc {
+namespace fc::log {
 
 /// spdlog formatter that emits one JSON object per log record, terminated
 /// by '\n'. Fields: ts (UTC microseconds), lvl, thread, logger, file, line,
 /// func, msg, (optional) extra. Usable on any sink -- attach via
-/// sink->set_formatter(std::make_unique<fc::json_formatter>(...)).
+/// sink->set_formatter(std::make_unique<fc::log::json_formatter>(...)).
 class json_formatter final : public spdlog::formatter {
 public:
    explicit json_formatter(std::map<std::string, std::string> extra_fields = {});
@@ -23,4 +23,4 @@ private:
    std::map<std::string, std::string> extra_fields_;
 };
 
-} // namespace fc
+} // namespace fc::log

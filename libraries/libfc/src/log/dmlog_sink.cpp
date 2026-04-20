@@ -12,7 +12,7 @@
 namespace fc {
 
    dmlog_sink_mt::dmlog_sink_mt(const std::string& file)
-      : spdlog::sinks::base_sink<std::mutex>(std::make_unique<dmlog_formatter>())
+      : spdlog::sinks::base_sink<std::mutex>(std::make_unique<fc::log::dmlog_formatter>())
    {
       if (file.empty() || file == "-" || file == "-stdout") {
          out = stdout;

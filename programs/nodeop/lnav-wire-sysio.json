@@ -1,7 +1,7 @@
 {
     "wire_sysio_json_log": {
         "title": "Wire Sysio JSON log",
-        "description": "JSONL format emitted by fc::json_formatter (attach to any spdlog sink via logging.json `format`: `{\"type\":\"json\"}`). Install with: lnav -i programs/nodeop/lnav-wire-sysio.json",
+        "description": "JSONL format emitted by fc::log::json_formatter (attach to any spdlog sink via logging.json `format`: `{\"type\":\"json\"}`). Install with: lnav -i programs/nodeop/lnav-wire-sysio.json",
         "url": "https://github.com/Wire-Network/wire-sysio",
         "json": true,
         "file-pattern": "\\.jsonl(\\.\\d+)?$",

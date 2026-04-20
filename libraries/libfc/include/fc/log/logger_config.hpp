@@ -14,7 +14,7 @@ namespace fc {
    class path;
 
    /// Formatter selection for a sink. Applied via sink->set_formatter() after the sink is constructed.
-   ///   type == "pattern" -> args: format::pattern_config (or empty/absent for DEFAULT_LOG_PATTERN)
+   ///   type == "pattern" -> args: format::pattern_config (or empty/absent for fc::log::DEFAULT_LOG_PATTERN)
    ///   type == "json"    -> args: format::json_config (extra_fields map, may be empty/absent)
    ///   type == "dmlog"   -> no args; dfuse deep-mind wire format, intended for dmlog_sink, not useful on other sinks
    struct format_config {
@@ -24,7 +24,7 @@ namespace fc {
 
    namespace format {
       struct pattern_config {
-         std::string pattern; // empty -> fc::DEFAULT_LOG_PATTERN
+         std::string pattern; // empty -> fc::log::DEFAULT_LOG_PATTERN
       };
       struct json_config {
          // extra_fields accepts a JSON object whose values are primitives

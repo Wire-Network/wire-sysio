@@ -5,7 +5,7 @@
 
 #include <string>
 
-namespace fc {
+namespace fc::log {
 
 namespace {
 
@@ -30,4 +30,4 @@ std::unique_ptr<spdlog::formatter> make_pattern_formatter(std::string_view patte
    return formatter;
 }
 
-} // namespace fc
+} // namespace fc::log

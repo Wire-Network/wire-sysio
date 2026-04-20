@@ -6,7 +6,7 @@
 #include <ctime>
 #include <iterator>
 
-namespace fc {
+namespace fc::log {
 
 namespace {
 
@@ -109,4 +109,4 @@ std::unique_ptr<spdlog::formatter> json_formatter::clone() const {
    return std::make_unique<json_formatter>(extra_fields_);
 }
 
-} // namespace fc
+} // namespace fc::log

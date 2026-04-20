@@ -70,8 +70,8 @@ namespace fc {
                pattern = f.args.as<format::pattern_config>().pattern;
             }
             return pattern.empty()
-               ? fc::make_pattern_formatter()
-               : fc::make_pattern_formatter(pattern);
+               ? fc::log::make_pattern_formatter()
+               : fc::log::make_pattern_formatter(pattern);
          } else if (f.type == "json") {
             std::map<std::string, std::string> extras;
             if (!f.args.is_null()) {
@@ -79,16 +79,16 @@ namespace fc {
                for (const auto& kv : jc.extra_fields)
                   extras[kv.key()] = kv.value().as_string();
             }
-            return std::make_unique<fc::json_formatter>(std::move(extras));
+            return std::make_unique<fc::log::json_formatter>(std::move(extras));
          } else if (f.type == "dmlog") {
-            return std::make_unique<fc::dmlog_formatter>();
+            return std::make_unique<fc::log::dmlog_formatter>();
          }
          // Warn-and-fallback (rather than throw) so a SIGHUP reload with a typo
          // doesn't wipe the running node's logging config.
          std::cerr << "\nWARNING: Unknown format type '" << f.type
                    << "' for sink '" << sink_name
                    << "'; falling back to default pattern" << std::endl;
-         return fc::make_pattern_formatter();
+         return fc::log::make_pattern_formatter();
       }
    } // anonymous namespace
 
@@ -176,7 +176,7 @@ namespace fc {
                if (cfg.sinks[i].format) {
                   sink_it->second->set_formatter(build_formatter(*cfg.sinks[i].format, cfg.sinks[i].name));
                } else if (cfg.sinks[i].type != "dmlog_sink") {
-                  sink_it->second->set_formatter(fc::make_pattern_formatter());
+                  sink_it->second->set_formatter(fc::log::make_pattern_formatter());
                }
             }
          }

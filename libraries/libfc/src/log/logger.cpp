@@ -20,7 +20,7 @@ namespace fc {
       sink->set_color(spdlog::level::info, sink->reset);
       sink->set_color(spdlog::level::warn, sink->yellow);
       sink->set_color(spdlog::level::err, sink->red);
-      sink->set_formatter(fc::make_pattern_formatter());
+      sink->set_formatter(fc::log::make_pattern_formatter());
       _agent_logger = std::make_unique<spdlog::logger>( "", sink );
       _agent_logger->set_level(spdlog::level::info);
    }

@@ -3,7 +3,7 @@
 
 #include <memory>
 
-namespace fc {
+namespace fc::log {
 
 /// spdlog formatter producing "DMLOG " + msg.payload + "\n", matching the
 /// deep-mind tracer wire format consumed by dfuse postprocessing tools.
@@ -16,4 +16,4 @@ public:
    std::unique_ptr<spdlog::formatter> clone() const override;
 };
 
-} // namespace fc
+} // namespace fc::log
