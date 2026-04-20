@@ -24,14 +24,20 @@ struct links_row {
    fc::crypto::chain_kind_t chain_kind;
    public_key               pub_key;
 
-   uint64_t by_name() const { return username.value; }
+   uint128_t by_namechain() const { return to_namechain_key(username, chain_kind); }
+   uint64_t  by_name()      const { return username.value; }
+   uint64_t  by_chain()     const { return static_cast<uint64_t>(chain_kind); }
 
    SYSLIB_SERIALIZE(links_row, (key)(username)(chain_kind)(pub_key))
 };
 
 using links_t = sysio::kv::table<"links"_n, links_key, links_row,
+   sysio::kv::index<"bynamechain"_n,
+      sysio::const_mem_fun<links_row, uint128_t, &links_row::by_namechain>>,
    sysio::kv::index<"byname"_n,
-      sysio::const_mem_fun<links_row, uint64_t, &links_row::by_name>>
+      sysio::const_mem_fun<links_row, uint64_t, &links_row::by_name>>,
+   sysio::kv::index<"bychain"_n,
+      sysio::const_mem_fun<links_row, uint64_t, &links_row::by_chain>>
 >;
 
 } // namespace authex_readonly
@@ -324,13 +330,13 @@ void epoch::regoutpost(opp::types::ChainKind chain_kind, uint32_t chain_id) {
 
    uint64_t next_id = outposts.available_primary_key();
 
-   outpost_info row{};
-   row.id                 = next_id;
-   row.chain_kind         = chain_kind;
-   row.chain_id           = chain_id;
-   row.last_inbound_epoch = 0;
-   row.last_outbound_epoch = 0;
-   outposts.emplace(get_self(), outpost_key{next_id}, row);
+   outposts.emplace(get_self(), outpost_key{next_id}, outpost_info{
+      .id                  = next_id,
+      .chain_kind          = chain_kind,
+      .chain_id            = chain_id,
+      .last_inbound_epoch  = 0,
+      .last_outbound_epoch = 0,
+   });
 }
 
 // ---------------------------------------------------------------------------

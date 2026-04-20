@@ -90,16 +90,16 @@ void msgch::deliver(name batch_op_name, uint64_t outpost_id, std::vector<char> d
    // Store envelope
    uint64_t env_id = envs.available_primary_key();
 
-   envelope_entry e{};
-   e.id            = env_id;
-   e.outpost_id    = outpost_id;
-   e.epoch_index   = epoch;
-   e.batch_op_name = batch_op_name;
-   e.chain_kind    = op_row.chain_kind;
-   e.checksum      = cs;
-   e.raw_data      = data;
-   e.received_at   = current_time_point();
-   envs.emplace(get_self(), id_key{env_id}, e);
+   envs.emplace(get_self(), id_key{env_id}, envelope_entry{
+      .id            = env_id,
+      .outpost_id    = outpost_id,
+      .epoch_index   = epoch,
+      .batch_op_name = batch_op_name,
+      .chain_kind    = op_row.chain_kind,
+      .checksum      = cs,
+      .raw_data      = data,
+      .received_at   = current_time_point(),
+   });
 
    // Evaluate consensus inline
    action(
@@ -190,33 +190,33 @@ void msgch::evalcons(uint64_t outpost_id, uint32_t epoch_index) {
    messages_t msgs(get_self());
    uint64_t msg_id = msgs.available_primary_key();
 
-   message_entry m{};
-   m.id           = msg_id;
-   m.outpost_id   = outpost_id;
-   m.epoch_index  = epoch;
-   m.direction    = MessageDirection::MESSAGE_DIRECTION_INBOUND;
-   m.status       = MessageStatus::MESSAGE_STATUS_PROCESSED;
-   m.raw_payload  = raw;
-   m.received_at  = now;
-   m.processed_at = now;
-   msgs.emplace(get_self(), id_key{msg_id}, m);
+   msgs.emplace(get_self(), id_key{msg_id}, message_entry{
+      .id           = msg_id,
+      .outpost_id   = outpost_id,
+      .epoch_index  = epoch,
+      .direction    = MessageDirection::MESSAGE_DIRECTION_INBOUND,
+      .status       = MessageStatus::MESSAGE_STATUS_PROCESSED,
+      .raw_payload  = raw,
+      .received_at  = now,
+      .processed_at = now,
+   });
 
    // Extract individual AttestationEntries from each Message in the Envelope
    attestations_t atts(get_self());
    for (auto& msg : envelope.messages) {
       for (auto& entry : msg.payload.attestations) {
          uint64_t att_id = atts.available_primary_key();
-         attestation_entry a{};
-         a.id                  = att_id;
-         a.outpost_id          = outpost_id;
-         a.epoch_index         = epoch;
-         a.type                = entry.type;
-         a.status              = AttestationStatus::ATTESTATION_STATUS_READY;
-         a.data                = entry.data;
-         a.pending_timestamp   = 0;
-         a.ready_timestamp     = now_sec;
-         a.processed_timestamp = 0;
-         atts.emplace(get_self(), id_key{att_id}, a);
+         atts.emplace(get_self(), id_key{att_id}, attestation_entry{
+            .id                  = att_id,
+            .outpost_id          = outpost_id,
+            .epoch_index         = epoch,
+            .type                = entry.type,
+            .status              = AttestationStatus::ATTESTATION_STATUS_READY,
+            .data                = entry.data,
+            .pending_timestamp   = 0,
+            .ready_timestamp     = now_sec,
+            .processed_timestamp = 0,
+         });
       }
    }
 
@@ -224,11 +224,11 @@ void msgch::evalcons(uint64_t outpost_id, uint32_t epoch_index) {
    outpost_consensus_t opcons(get_self());
    auto opc_pk = outpost_consensus_key{outpost_id};
    if (!opcons.contains(opc_pk)) {
-      outpost_consensus_entry r{};
-      r.outpost_id        = outpost_id;
-      r.epoch_index       = epoch_index;
-      r.consensus_reached = true;
-      opcons.emplace(get_self(), opc_pk, r);
+      opcons.emplace(get_self(), opc_pk, outpost_consensus_entry{
+         .outpost_id        = outpost_id,
+         .epoch_index       = epoch_index,
+         .consensus_reached = true,
+      });
    } else {
       opcons.modify(same_payer, opc_pk, [&](auto& r) {
          r.epoch_index       = epoch_index;
@@ -299,17 +299,17 @@ void msgch::queueout(uint64_t outpost_id,
    attestations_t atts(get_self());
    uint64_t att_id = atts.available_primary_key();
 
-   attestation_entry a{};
-   a.id                  = att_id;
-   a.outpost_id          = outpost_id;
-   a.epoch_index         = current_epoch_index();
-   a.type                = attest_type;
-   a.status              = AttestationStatus::ATTESTATION_STATUS_READY;
-   a.data                = data;
-   a.pending_timestamp   = 0;
-   a.ready_timestamp     = now_sec;
-   a.processed_timestamp = 0;
-   atts.emplace(get_self(), id_key{att_id}, a);
+   atts.emplace(get_self(), id_key{att_id}, attestation_entry{
+      .id                  = att_id,
+      .outpost_id          = outpost_id,
+      .epoch_index         = current_epoch_index(),
+      .type                = attest_type,
+      .status              = AttestationStatus::ATTESTATION_STATUS_READY,
+      .data                = data,
+      .pending_timestamp   = 0,
+      .ready_timestamp     = now_sec,
+      .processed_timestamp = 0,
+   });
 }
 
 // ---------------------------------------------------------------------------
@@ -382,14 +382,14 @@ void msgch::buildenv(uint64_t outpost_id) {
    outenvelopes_t envelopes(get_self());
    uint64_t out_id = envelopes.available_primary_key();
 
-   outbound_envelope oe{};
-   oe.id            = out_id;
-   oe.outpost_id    = outpost_id;
-   oe.epoch_index   = epoch;
-   oe.envelope_hash = sha256(packed.data(), packed.size());
-   oe.status        = EnvelopeStatus::ENVELOPE_STATUS_PENDING_DELIVERY;
-   oe.raw_envelope  = packed;
-   envelopes.emplace(get_self(), id_key{out_id}, oe);
+   envelopes.emplace(get_self(), id_key{out_id}, outbound_envelope{
+      .id            = out_id,
+      .outpost_id    = outpost_id,
+      .epoch_index   = epoch,
+      .envelope_hash = sha256(packed.data(), packed.size()),
+      .status        = EnvelopeStatus::ENVELOPE_STATUS_PENDING_DELIVERY,
+      .raw_envelope  = packed,
+   });
 }
 
 // ---------------------------------------------------------------------------

@@ -108,14 +108,14 @@ void chalg::escalate(uint64_t challenge_id) {
 
       uint64_t next_id = challenges.available_primary_key();
 
-      challenge_entry c{};
-      c.id               = next_id;
-      c.chain_request_id = ch_row.chain_request_id;
-      c.epoch_index      = ch_row.epoch_index;
-      c.round            = ch_row.round + 1;
-      c.status           = ChallengeStatus::CHALLENGE_STATUS_CHALLENGE_SENT;
-      c.challenged_at    = now;
-      challenges.emplace(get_self(), challenge_key{next_id}, c);
+      challenges.emplace(get_self(), challenge_key{next_id}, challenge_entry{
+         .id               = next_id,
+         .chain_request_id = ch_row.chain_request_id,
+         .epoch_index      = ch_row.epoch_index,
+         .round            = static_cast<uint8_t>(ch_row.round + 1),
+         .status           = ChallengeStatus::CHALLENGE_STATUS_CHALLENGE_SENT,
+         .challenged_at    = now,
+      });
 
       challenges.modify(same_payer, ch_pk, [&](auto& c) {
          c.status = ChallengeStatus::CHALLENGE_STATUS_ESCALATED;
@@ -159,15 +159,15 @@ void chalg::submitres(name submitter,
    resolutions_t resolutions(get_self());
    uint64_t next_id = resolutions.available_primary_key();
 
-   manual_resolution r{};
-   r.id                  = next_id;
-   r.challenge_id        = challenge_id;
-   r.original_chain_hash = orig_hash;
-   r.round1_chain_hash   = r1_hash;
-   r.round2_chain_hash   = r2_hash;
-   r.msig_proposal       = name(0); // TODO: link to sysio.msig proposal name
-   r.is_resolved         = false;
-   resolutions.emplace(submitter, resolution_key{next_id}, r);
+   resolutions.emplace(submitter, resolution_key{next_id}, manual_resolution{
+      .id                  = next_id,
+      .challenge_id        = challenge_id,
+      .original_chain_hash = orig_hash,
+      .round1_chain_hash   = r1_hash,
+      .round2_chain_hash   = r2_hash,
+      .msig_proposal       = name(0), // TODO: link to sysio.msig proposal name
+      .is_resolved         = false,
+   });
 
    // TODO: Create sysio.msig proposal for T1/T2/T3 vote (2/3 majority).
 }

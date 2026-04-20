@@ -30,13 +30,19 @@ struct links_row {
    public_key               pub_key;
 
    uint128_t by_namechain() const { return to_namechain_key(username, chain_kind); }
+   uint64_t  by_name()      const { return username.value; }
+   uint64_t  by_chain()     const { return static_cast<uint64_t>(chain_kind); }
 
    SYSLIB_SERIALIZE(links_row, (key)(username)(chain_kind)(pub_key))
 };
 
 using links_t = sysio::kv::table<"links"_n, links_key, links_row,
    sysio::kv::index<"bynamechain"_n,
-      sysio::const_mem_fun<links_row, uint128_t, &links_row::by_namechain>>
+      sysio::const_mem_fun<links_row, uint128_t, &links_row::by_namechain>>,
+   sysio::kv::index<"byname"_n,
+      sysio::const_mem_fun<links_row, uint64_t, &links_row::by_name>>,
+   sysio::kv::index<"bychain"_n,
+      sysio::const_mem_fun<links_row, uint64_t, &links_row::by_chain>>
 >;
 
 } // namespace authex_readonly
@@ -131,18 +137,15 @@ void opreg::regoperator(name account,
    }
 
    auto now = current_time_ms();
-   operator_entry o{};
-   o.account         = account;
-   o.type            = type;
-   o.is_bootstrapped = is_bootstrapped;
-   o.registered_at   = now;
-   if (is_bootstrapped) {
-      o.status       = OperatorStatus::OPERATOR_STATUS_ACTIVE; // AVAILABLE
-      o.available_at = now;
-   } else {
-      o.status       = OperatorStatus::OPERATOR_STATUS_UNKNOWN; // PENDING
-   }
-   ops.emplace(get_self(), op_pk, o);
+   ops.emplace(get_self(), op_pk, operator_entry{
+      .account         = account,
+      .type            = type,
+      .status          = is_bootstrapped ? OperatorStatus::OPERATOR_STATUS_ACTIVE    // AVAILABLE
+                                         : OperatorStatus::OPERATOR_STATUS_UNKNOWN,  // PENDING
+      .is_bootstrapped = is_bootstrapped,
+      .registered_at   = now,
+      .available_at    = is_bootstrapped ? now : 0,
+   });
 }
 
 // ---------------------------------------------------------------------------

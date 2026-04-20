@@ -55,16 +55,16 @@ void uwrit::submituw(name underwriter, uint64_t msg_id,
 
    uint64_t next_id = ledger.available_primary_key();
 
-   underwriting_entry e{};
-   e.id          = next_id;
-   e.underwriter = underwriter;
-   e.message_id  = msg_id;
-   e.status      = UnderwriteStatus::UNDERWRITE_STATUS_INTENT_SUBMITTED;
-   e.intent_time = now;
-   e.unlock_time = unlock;
-   e.source_sig  = source_sig;
-   e.target_sig  = target_sig;
-   ledger.emplace(underwriter, id_key{next_id}, e);
+   ledger.emplace(underwriter, id_key{next_id}, underwriting_entry{
+      .id          = next_id,
+      .underwriter = underwriter,
+      .message_id  = msg_id,
+      .status      = UnderwriteStatus::UNDERWRITE_STATUS_INTENT_SUBMITTED,
+      .intent_time = now,
+      .unlock_time = unlock,
+      .source_sig  = source_sig,
+      .target_sig  = target_sig,
+   });
 
    // TODO: Queue ATTESTATION_TYPE_UNDERWRITE_INTENT to BOTH outposts
    //       via sysio.msgch::queueout inline action.
@@ -177,14 +177,14 @@ void uwrit::updcltrl(name underwriter, fc::crypto::chain_kind_t chain_kind,
 
       uint64_t next_id = collateral.available_primary_key();
 
-      collateral_entry c{};
-      c.id               = next_id;
-      c.underwriter      = underwriter;
-      c.chain_kind       = chain_kind;
-      c.staked_amount    = amount;
-      c.locked_amount    = asset(0, amount.symbol);
-      c.available_amount = amount;
-      collateral.emplace(get_self(), id_key{next_id}, c);
+      collateral.emplace(get_self(), id_key{next_id}, collateral_entry{
+         .id               = next_id,
+         .underwriter      = underwriter,
+         .chain_kind       = chain_kind,
+         .staked_amount    = amount,
+         .locked_amount    = asset(0, amount.symbol),
+         .available_amount = amount,
+      });
    } else {
       collateral.modify(same_payer, it.key(), [&](auto& c) {
          if (is_increase) {
@@ -260,16 +260,16 @@ void uwrit::createuwreq(uint64_t attestation_id,
    check(!reqs.contains(pk),
          "underwrite request already exists for this attestation");
 
-   uw_request_t r{};
-   r.id                 = attestation_id;
-   r.type               = type;
-   r.status             = opp::types::UNDERWRITE_REQUEST_STATUS_PENDING;
-   r.uw_name            = name{};
-   r.locked_amounts     = {};
-   r.unlock_timestamp   = 0;
-   r.released_timestamp = 0;
-   r.slashed_timestamp  = 0;
-   reqs.emplace(get_self(), pk, r);
+   reqs.emplace(get_self(), pk, uw_request_t{
+      .id                 = attestation_id,
+      .type               = type,
+      .status             = opp::types::UNDERWRITE_REQUEST_STATUS_PENDING,
+      .uw_name            = name{},
+      .locked_amounts     = {},
+      .unlock_timestamp   = 0,
+      .released_timestamp = 0,
+      .slashed_timestamp  = 0,
+   });
 }
 
 } // namespace sysio
