@@ -9,7 +9,7 @@
 #include <iostream>
 
 namespace {
-   constexpr auto hex_prefix = "0x";
+   constexpr std::string_view hex_prefix = "0x";
 }
 namespace fc::network::ethereum {
 
@@ -286,7 +286,7 @@ std::string to_data_from_params(const abi::contract& contract, const data_or_par
    }
 
    if (add_prefix && !data.starts_with(hex_prefix)) {
-      data = hex_prefix + data;
+      data.insert(0, hex_prefix);
    }
    return data;
 }
@@ -446,12 +446,12 @@ fc::uint256 ethereum_client::estimate_gas(const address_compat_type& to, const a
 
    gas_config_t gc = gas_config_opt.value_or(get_gas_config());
 
-   std::string data = to_data_from_params(contract, data_or_params);;
+   std::string data;
    if (std::holds_alternative<fc::variants>(data_or_params)) {
       auto& params = std::get<fc::variants>(data_or_params);
       data = contract_encode_data(contract, params, true);
    } else {
-      data = hex_prefix + std::get<std::string>(data_or_params);
+      data.append(hex_prefix).append(std::get<std::string>(data_or_params));
    }
 
    tx("from", to_hex(get_address(), true))

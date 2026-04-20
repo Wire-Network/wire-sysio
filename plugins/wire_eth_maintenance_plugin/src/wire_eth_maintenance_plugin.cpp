@@ -1,15 +1,17 @@
-#include <curl/curl.h>
-#include <fc/io/json.hpp>
-#include <fc/log/logger.hpp>
-#include <fc/network/url.hpp>
-#include <optional>
-#include <unordered_map>
-#include <fc/network/ethereum/ethereum_abi.hpp>
-#include <fc/crypto/ethereum/ethereum_utils.hpp>
+#include <sysio/wire_eth_maintenance_plugin.hpp>
+
+#include <sysio/beacon_chain_config_updates.hpp>
+#include <sysio/beacon_chain_update_detail.hpp>
 #include <sysio/chain/exceptions.hpp>
 #include <sysio/cron_plugin.hpp>
 #include <sysio/services/cron_parser.hpp>
 #include <sysio/services/cron_service.hpp>
+
+#include <fc/crypto/ethereum/ethereum_utils.hpp>
+#include <fc/io/json.hpp>
+#include <fc/log/logger.hpp>
+#include <fc/network/ethereum/ethereum_abi.hpp>
+#include <fc/network/url.hpp>
 
 #include <boost/asio.hpp>
 #include <boost/asio/ssl.hpp>
@@ -17,18 +19,16 @@
 #include <boost/beast/http.hpp>
 #include <boost/beast/ssl.hpp>
 
+#include <curl/curl.h>
 
-#include <sysio/wire_eth_maintenance_plugin.hpp>
-#include <sysio/beacon_chain_update_detail.hpp>
-#include <sysio/beacon_chain_config_updates.hpp>
+#include <optional>
+#include <unordered_map>
 
 namespace bpo = boost::program_options;
 using namespace appbase;
 using namespace sysio;
 
 namespace sysio {
-// using namespace outpost_client::ethereum;
-
 struct OPP : fc::network::ethereum::ethereum_contract_client {
    static constexpr auto contract_name = "OPP";
 
@@ -98,7 +98,12 @@ namespace {
       using tcp       = asio::ip::tcp;
 
       fc::url url(url_str);
-      auto    host = url.host().value();
+      SYS_ASSERT(url.proto() == "https", sysio::chain::plugin_config_exception,
+                 "Only https:// URLs are supported here; got `{}` with proto=`{}`",
+                 url_str, url.proto());
+      SYS_ASSERT(url.host().has_value(), sysio::chain::plugin_config_exception,
+                 "URL `{}` has no host component", url_str);
+      auto    host = *url.host();
       auto    port = std::to_string(url.port().value_or(443));
       auto    path = url.path().value_or(std::filesystem::path("/")).string();
       ilog("host = {}, port = {}, path = {}", host, port, path);
@@ -157,7 +162,7 @@ namespace {
 
          valid = res.result() == http::status::ok;
          if (valid) {
-            ilog("res.body=\n{}", res.body());
+            dlog("res.body=\n{}", res.body());
             auto response = fc::json::from_string(res.body());
             return response["data"];
          }
@@ -250,7 +255,11 @@ namespace beacon_chain_detail {
 
 } // namespace beacon_chain_detail
 
-using namespace std;
+using std::optional;
+using std::string;
+using std::unordered_map;
+using std::vector;
+
 using addr_map_t = std::map<std::string, std::string>;
 using action = std::function<void()>;
 using interval_actions_t = vector<action>;
@@ -365,7 +374,7 @@ void wire_eth_maintenance_plugin::plugin_initialize(const variables_map& options
       auto action = [&my_ = *my, opp_contract, eth_client]() {
          ilog("finalizing OPP epoch");
          const auto bn = eth_client->get_block_number();
-         ilog("Executing beacon chain update for interval bn {}", (uint64_t)bn);
+         ilog("Executing beacon chain update for interval bn {}", static_cast<uint64_t>(bn));
          try {
             ilog("Sending finalizeEpoch transaction to OPP contract using address {}",
                  fc::to_hex(eth_client->get_address(), true));
@@ -496,8 +505,8 @@ void wire_eth_maintenance_plugin::plugin_startup() {
          .one_at_a_time = true, .tags = {"ethereum", "gas"}, .label = "beacon_chain_startup"
       });
 
-   ilog("There are {} schedule currently available.", my->schedules.size());
-   ilog("There are {} actions currently registered.", my->intervals.size());
+   ilog("There are {} schedules currently available.", my->schedules.size());
+   ilog("There are {} intervals currently registered.", my->intervals.size());
    for (const auto& [name, schedule] : my->schedules) {
       ilog("Scheduling beacon chain update for interval {}", name);
 

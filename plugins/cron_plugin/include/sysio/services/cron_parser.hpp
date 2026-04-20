@@ -15,21 +15,25 @@ namespace sysio::services {
  * 2. Extended 6-field format:       "milliseconds minute hour day-of-month month day-of-week"
  *
  * Field syntax:
- * - Wildcard:        *           (matches all values)
- * - Exact value:     5           (matches exactly 5)
- * - Range:           1-5         (matches 1,2,3,4,5)
- * - Step:            * /5        (every 5 units)  [space added to avoid comment syntax]
- * - Range with step: 10-50/5     (10,15,20,25,30,35,40,45,50)
- * - List:            1,3,5,7     (matches 1,3,5,7)
+ * @code
+ * Wildcard:        *           matches all values
+ * Exact value:     5           matches exactly 5
+ * Range:           1-5         matches 1,2,3,4,5
+ * Step:            * /5        every 5 units
+ * Range with step: 10-50/5     10,15,20,25,30,35,40,45,50
+ * List:            1,3,5,7     matches 1,3,5,7
+ * @endcode
  *
  * Examples:
- * - "* * * * *"              -> Every minute
- * - "0 * * * *"              -> Every hour at minute 0
- * - "0 9-17 * * 1-5"         -> Weekdays, 9 AM to 5 PM, on the hour
- * - "* /5 * * * *"           -> Every 5 minutes  [space added to avoid comment syntax]
- * - "0 0 1 * *"              -> First day of every month at midnight
- * - "0,15,30,45 * * * *"     -> Every 15 minutes (at 0,15,30,45)
- * - "5000 * * * * *"         -> Every minute at 5 seconds (extended format)
+ * @code
+ * "* * * * *"              every minute
+ * "0 * * * *"              every hour at minute 0
+ * "0 9-17 * * 1-5"         weekdays, 9 AM to 5 PM, on the hour
+ * "* /5 * * * *"           every 5 minutes
+ * "0 0 1 * *"              first day of every month at midnight
+ * "0,15,30,45 * * * *"     every 15 minutes (at 0,15,30,45)
+ * "5000 * * * * *"         every minute at 5 seconds (extended format)
+ * @endcode
  *
  * @param cron_expr Cron expression string
  * @return job_schedule on success, std::nullopt on parse error

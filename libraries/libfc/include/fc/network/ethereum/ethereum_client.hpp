@@ -31,9 +31,9 @@ public:
    uint64_t number;
 };
 
-const block_tag block_tag_latest(block_tag::labeled::latest);
-const block_tag block_tag_pending(block_tag::labeled::pending);
-const block_tag block_tag_earliest(block_tag::labeled::earliest);
+inline const block_tag block_tag_latest(block_tag::labeled::latest);
+inline const const block_tag block_tag_pending(block_tag::labeled::pending);
+inline const const block_tag block_tag_earliest(block_tag::labeled::earliest);
 
 
 /**

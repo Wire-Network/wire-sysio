@@ -217,6 +217,11 @@ public:
     * `fn` must return a type whose `has_value()` / `operator*` semantics
     * match std::optional or std::expected. On success the contained value is
     * returned; on retry exhaustion `opts.on_exhaustion()` supplies the error.
+    *
+    * Note on argument lifetime: each retry re-invokes `fn` with the same
+    * argument pack via `std::forward`. Callers should pass lvalues; passing
+    * an rvalue is safe only if `fn` does not move from it (since a second
+    * retry would move from a moved-from object).
     */
    template <typename Fn, typename... Args>
    auto blocking_retry(const retry_options& opts, Fn fn, Args&&... args)
@@ -230,7 +235,9 @@ public:
       std::promise<void> done_promise;
       auto done_future = done_promise.get_future();
       std::once_flag fired;
-      std::optional<fc::exception> error;
+      // Hold the catch'd exception via shared_ptr so derived-type info survives the catch frame
+      // (codebase convention — see fc::exception::dynamic_copy_exception).
+      std::shared_ptr<fc::exception> error;
 
       auto signal_done = [&]() {
          std::call_once(fired, [&]() { done_promise.set_value(); });
@@ -242,7 +249,7 @@ public:
             if (ret.has_value() || ++attempt >= opts.max_retries)
                signal_done();
          } catch (const fc::exception& e) {
-            error = e;
+            error = e.dynamic_copy_exception();
             signal_done();
          }
       };
@@ -251,7 +258,7 @@ public:
       done_future.wait();
       this->cancel(scheduled_id);
 
-      if (error.has_value())
+      if (error)
          return std::unexpected(std::move(*error));
 
       if (ret.has_value())

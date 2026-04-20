@@ -2,7 +2,6 @@
 #include <fc/exception/exception.hpp>
 #include <algorithm>
 #include <charconv>
-#include <sstream>
 #include <vector>
 
 namespace sysio::services {
@@ -39,7 +38,7 @@ std::vector<std::string_view> split(std::string_view s, char delim) {
 
 // Parse uint64_t from string_view
 std::optional<uint64_t> parse_uint(std::string_view s) {
-   uint64_t value;
+   uint64_t value {0};
    auto [ptr, ec] = std::from_chars(s.data(), s.data() + s.size(), value);
    if (ec == std::errc() && ptr == s.data() + s.size()) {
       return value;

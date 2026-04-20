@@ -515,7 +515,7 @@ fc::variant decode_dynamic_data(const abi::component_type& component, const uint
       // Advance offset to next 32-byte boundary
       size_t padded_length = ((length + 31) / 32) * 32;
       offset += padded_length;
-      return fc::variant("0x" + fc::to_hex(bytes_data));
+      return fc::variant(fc::to_hex(bytes_data, true));
    }
 
    default:
@@ -1082,6 +1082,6 @@ void fc::from_variant(const fc::variant& var, fc::network::ethereum::abi::contra
       // we expect ABI contracts that have the legacy payment ethereum interface
       const bool valid = type_str == "receive" &&
                          obj["stateMutability"].as_string() == "payable";
-      FC_ASSERT(valid, "Variant Object must have a `name` key to be deserialize ABI contract");
+      FC_ASSERT(valid, "Variant Object must have a `name` key to deserialize ABI contract");
    }
 }

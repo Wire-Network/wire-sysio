@@ -33,7 +33,7 @@ public:
          FC_ASSERT_FMT(exists(filename), "File does not exist: {}", filename.string());
          auto file_path = std::filesystem::absolute(filename);
          ilog("Loading ABI file: {}", file_path.string());
-         if (!std::ranges::none_of(_abi_files, [&](const auto& f) { return f.first == file_path; })) {
+         if (std::ranges::any_of(_abi_files, [&](const auto& f) { return f.first == file_path; })) {
             wlog("Already registered ABI file: {}", file_path.string());
             continue;
          }
