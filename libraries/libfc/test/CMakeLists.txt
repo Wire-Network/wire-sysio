@@ -26,6 +26,7 @@ add_executable( test_fc
         test_bls.cpp
         test_bitset.cpp
         test_ordered_diff.cpp
+        parallel/test_worker_task_queue.cpp
         main.cpp
         )
 target_link_libraries( test_fc fc fc-test )

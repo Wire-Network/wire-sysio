@@ -718,6 +718,42 @@ BOOST_FIXTURE_TEST_CASE( get_table_next_key_test, validating_tester ) try {
       }
    }
 
+   // (sec-10) `find` on a multi_index secondary index must return the matching
+   //          row. Regression for the bug where setting
+   //          `lower_bound == upper_bound` caused the iterator to break on
+   //          `sk >= ub_sv` before the match was emitted — passing the key via
+   //          `find` appends a null byte to the upper bound so the comparison
+   //          becomes strictly less. Exercises `batch_operator_plugin::
+   //          has_delivered_envelope`'s real-world usage.
+   {
+      chain_apis::read_only::get_table_rows_params p;
+      p.json = true;
+      p.code = "test"_n;
+      p.scope = "test";
+      p.table = "numobjs";
+      p.index_name = "bysec1";
+      p.find = R"({"bysec1": 5})";
+      auto result = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(result.rows.size(), 1u);
+      BOOST_CHECK_EQUAL(result.rows[0].get_object()["value"].get_object()["sec64"].as_uint64(), 5u);
+   }
+
+   // (sec-11) `find` miss on a multi_index secondary index must return zero
+   //          rows (not the lexicographically-next row). The null-byte append
+   //          trick only widens the upper bound to include the target — it
+   //          must not leak through to an adjacent key.
+   {
+      chain_apis::read_only::get_table_rows_params p;
+      p.json = true;
+      p.code = "test"_n;
+      p.scope = "test";
+      p.table = "numobjs";
+      p.index_name = "bysec1";
+      p.find = R"({"bysec1": 4})";
+      auto result = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(result.rows.size(), 0u);
+   }
+
 } FC_LOG_AND_RETHROW() /// get_table_next_key_test
 
 // Verify the find-on-scoped-table contract: scope is required, and when
