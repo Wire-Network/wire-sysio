@@ -258,10 +258,13 @@ int64_t apply_context::kv_erase(const char* key, uint32_t key_size) {
 The `kv_erase` intrinsic removes the primary `kv_object` row but does **not**
 clean up any associated `kv_index_object` rows. This is a data consistency bug.
 
-**The CDT-side `wire::kv::table` is expected to call `kv_idx_remove` for each
-secondary index before calling `kv_erase`.** However, a malicious contract
-could call `kv_erase` directly via the raw intrinsic without cleaning up
-secondary indices, leaving orphaned index entries that:
+**The CDT-side `wire::kv::table` is expected to call `kv_erase` first, capture
+the returned `primary_id`, and then call `kv_idx_remove` for each secondary
+index using that id.** (Secondary rows reference the primary by chainbase id,
+not by pri_key bytes, so the id must be obtained before it can be threaded
+through.) However, a malicious contract could call `kv_erase` directly via
+the raw intrinsic without cleaning up secondary indices, leaving orphaned
+index entries that:
 - Waste RAM (billed to the payer of the secondary index rows)
 - Could cause stale secondary index lookups to return primary keys that no
   longer exist

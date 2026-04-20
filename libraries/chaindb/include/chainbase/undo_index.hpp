@@ -382,9 +382,12 @@ namespace chainbase {
       // The caller is responsible for ensuring the id has not already been
       // assigned; a duplicate-id insert throws via the unique by_id index.
       // Must not be called inside an undo session — restoring a specific id
-      // would conflict with session rollback logic.
+      // would conflict with session rollback logic. Snapshot input is
+      // attestation-verified, so id range is trusted; the debug-only assert
+      // below catches developer error in tests.
       template<typename Constructor>
       const value_type& emplace_with_id( id_type id, Constructor&& c ) {
+         assert(_undo_stack.empty() && "emplace_with_id must not be called inside an undo session");
          auto p = alloc_traits::allocate(_allocator, 1);
          auto guard0 = scope_exit{[&]{ alloc_traits::deallocate(_allocator, p, 1); }};
          auto constructor = [&]( value_type& v ) {
@@ -397,7 +400,12 @@ namespace chainbase {
             BOOST_THROW_EXCEPTION( std::logic_error{ "could not insert object, most likely a duplicate id was supplied" } );
          std::get<0>(_indices).push_back(p->_item);
          on_create(p->_item);
-         if (_next_id <= id) _next_id = id_type(id._id + 1);
+         // Advance the id counter. Guard against signed overflow (UB in C++)
+         // at the saturation boundary; reaching INT64_MAX in practice would
+         // require ~585 years at 1B emplaces/sec, but the explicit check
+         // keeps the arithmetic well-defined for every compiler.
+         if (_next_id <= id && id._id < std::numeric_limits<int64_t>::max())
+            _next_id = id_type(id._id + 1);
          guard1.cancel();
          guard0.cancel();
          return p->_item;

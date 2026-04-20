@@ -150,6 +150,13 @@ BOOST_FIXTURE_TEST_CASE(idx_primary_key_read, kv_api_tester) {
    BOOST_CHECK_NO_THROW(run_action("testidxprik"_n));
 }
 
+// Direct test of raw kv_it_value on a secondary iterator handle. Pins the
+// host <-> CDT contract that kv_it_value resolves values via a sec slot's
+// cached primary_id without re-deriving the primary key.
+BOOST_FIXTURE_TEST_CASE(idx_value_on_secondary_handle, kv_api_tester) {
+   BOOST_CHECK_NO_THROW(run_action("testsecvalue"_n));
+}
+
 // ─── Edge cases ────────────────────────────────────────────────────────────
 
 BOOST_FIXTURE_TEST_CASE(cross_contract_read, kv_api_tester) {

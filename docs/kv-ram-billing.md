@@ -31,13 +31,20 @@ namespace isolation via the composite chainbase index. No `table_id_object` over
 | Object | Fixed Fields | Indices | Overhead | Billable |
 |--------|-------------|---------|----------|----------|
 | `kv_object` | 8 id + 8 code + 8 payer + 8 key (ptr) + 8 value (ptr) + 2 table_id + 6 pad = **48** | 2 | 64 | **112** + key_size + value_size |
-| `kv_index_object` | 8 id + 8 code + 8 payer + 8 sec_key (ptr) + 8 pri_key (ptr) + 2 table_id + 6 pad = **48** | 2 | 64 | **112** + sec_key_size + pri_key_size |
+| `kv_index_object` | 8 id + 8 code + 8 payer + 8 sec_key (ptr) + 8 primary_id + 2 table_id + 6 pad = **48** | 2 | 64 | **112** + sec_key_size |
+
+Secondary rows reference the primary row by its chainbase id (`primary_id`, 8
+bytes) rather than by a copy of the primary key bytes. Billing is therefore
+independent of primary-key length — a contract with a 256-byte primary key
+pays for those bytes once in the `kv_object`, not again on every
+`kv_index_object` that references it.
 
 ## KV Key Layouts
 
 - **multi_index:** Primary key `[scope:8B][pk:8B]` = 16 bytes. Secondary index
-  entries store `pri_key = [pk:8B]` and `sec_key = [scope:8B][secondary_value]`
-  so that secondary iteration is naturally scoped.
+  entries store `sec_key = [scope:8B][secondary_value]` so that secondary
+  iteration is naturally scoped; the referenced primary is looked up via
+  `primary_id` (an O(1) by_id hash hop on the host).
 
 - **kv::table:** Contract-defined key structs, BE-encoded for correct sort order.
   Key size is controlled by the contract. A uint64 primary key is just 8 bytes.
@@ -63,25 +70,29 @@ namespace isolation via the composite chainbase index. No `table_id_object` over
 
 ## Per-Row Comparisons (16-byte value, 1 uint64 secondary index)
 
+Secondary row cost is `112 + sec_key_size` — there is no `pri_key` byte term
+under the primary_id scheme.
+
 ### 1 scope per row (table\_id amortized per row)
 
 | Approach | Primary | Secondary | Total |
 |----------|---------|-----------|-------|
 | Legacy | 124 + 108 tid | 128 | **360** |
-| KV multi_index | 144 | 112+16+8=136 | **280** (-22%) |
-| KV kv::table (8B key) | 136 | 112+8+8=128 | **264** (-27%) |
+| KV multi_index | 144 | 112+16=128 | **272** (-24%) |
+| KV kv::table (8B key) | 136 | 112+8=120 | **256** (-29%) |
 
 ### Many rows per table
 
 | Approach | Primary | Secondary | Total |
 |----------|---------|-----------|-------|
 | Legacy | 124 | 128 | **252** |
-| KV multi_index | 144 | 136 | **280** (+11%) |
-| KV kv::table (8B key) | 136 | 128 | **264** (+5%) |
+| KV multi_index | 144 | 128 | **272** (+8%) |
+| KV kv::table (8B key) | 136 | 120 | **256** (+2%) |
 
 Note: `kv_index_object` has 2 chainbase indices (by_id, by_code_table_id_seckey).
-For multi_index, `sec_key = [scope:8B][secondary_value]` and `pri_key = [pk:8B]`.
-For kv::table, both `sec_key` and `pri_key` are contract-defined compact keys.
+For multi_index, `sec_key = [scope:8B][secondary_value]`. For kv::table,
+`sec_key` is a contract-defined compact key. Primary-key bytes are not
+duplicated onto secondary rows in either case.
 
 ## EOS Mainnet Estimate
 

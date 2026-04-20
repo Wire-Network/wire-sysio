@@ -308,6 +308,11 @@
             "fields": []
         },
         {
+            "name": "testsecvalue",
+            "base": "",
+            "fields": []
+        },
+        {
             "name": "testzeroval",
             "base": "",
             "fields": []
@@ -782,6 +787,11 @@
         {
             "name": "testscoped",
             "type": "testscoped",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "testsecvalue",
+            "type": "testsecvalue",
             "ricardian_contract": ""
         },
         {

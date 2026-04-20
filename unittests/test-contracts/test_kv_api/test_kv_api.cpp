@@ -595,6 +595,46 @@ public:
       kv_idx_destroy((uint32_t)h);
    }
 
+   // ─── 21b. testsecvalue: raw kv_it_value on a secondary iterator handle ───
+   // Pins the host <-> CDT contract: kv_it_value accepts secondary handles
+   // and resolves the primary row's value via the slot's cached primary_id
+   // (an O(1) by_id hop on the host).  Any regression that removes secondary
+   // support from kv_it_value, or that loses primary_id on the slot, fails
+   // this test rather than surfacing through kv_table iterator reads.
+   [[sysio::action]]
+   void testsecvalue() {
+      uint64_t self = get_self().value;
+      static constexpr uint32_t sec_tid = 113;
+
+      const char sec[] = "valkey";
+      const char pri[] = {0x1A, 0x00, 0x01};
+      const char val[] = "secvalue_payload";
+
+      // Insert primary with a known value, then a sec row pointing at it.
+      int64_t pid = kv_set(test_table_id, self, pri, sizeof(pri), val, sizeof(val));
+      check(pid >= 0, "secvalue: kv_set returned primary_id");
+      kv_idx_store(0, sec_tid, pid, sec, 6);
+
+      // Open sec iter and read VALUE (not pri_key) through kv_it_value.
+      int32_t h = kv_idx_find_secondary(self, sec_tid, sec, 6);
+      check(h >= 0, "secvalue: find should succeed");
+
+      char got[32] = {};
+      uint32_t got_sz = 0;
+      int32_t st = kv_it_value((uint32_t)h, 0, got, sizeof(got), &got_sz);
+      check(st == 0, "secvalue: kv_it_value status on sec handle");
+      check(got_sz == sizeof(val), "secvalue: actual_size matches primary value size");
+      check(memcmp(got, val, sizeof(val)) == 0, "secvalue: bytes match primary value");
+
+      // Sanity: the same call with offset past end returns 0-length correctly.
+      uint32_t tail_sz = 0;
+      st = kv_it_value((uint32_t)h, sizeof(val), got, sizeof(got), &tail_sz);
+      check(st == 0, "secvalue: status ok for offset == size");
+      check(tail_sz == sizeof(val), "secvalue: actual_size unchanged by offset");
+
+      kv_idx_destroy((uint32_t)h);
+   }
+
    // ─── 22. testcrossrd: cross-contract read ────────────────────────────────
    [[sysio::action]]
    void testcrossrd() {
