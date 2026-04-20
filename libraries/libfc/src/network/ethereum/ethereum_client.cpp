@@ -556,6 +556,7 @@ std::vector<ethereum_event_data> ethereum_client::get_events(const address_compa
    filter("toBlock", to_block_tag(to_block));
    // topics[0] is an OR-array of event signature hashes
    filter("topics", fc::variants{topic_hashes});
+   ilog("Querying events for contract {} with filter: {}", to_hex(addr, true), fc::json::to_pretty_string(filter));
 
    auto logs_result = get_logs(fc::variants{filter});
    FC_ASSERT(logs_result.is_array(), "eth_getLogs did not return an array");

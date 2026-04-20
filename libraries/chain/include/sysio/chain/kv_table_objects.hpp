@@ -47,7 +47,7 @@ namespace sysio { namespace chain {
       account_name   payer;         ///< RAM payer (default=code, privileged contracts can set to other accounts)
       shared_blob    key;           ///< primary key bytes (opaque, layout determined by CDT)
       shared_blob    value;         ///< arbitrary byte value
-      uint16_t       table_id = 0;  ///< table namespace (DJB2 hash of table name % 65536)
+      uint16_t       table_id = 0;  ///< table namespace (lower 16 bits of the DJB2 hash of table name)
 
       std::string_view key_view() const {
          return {key.data(), key.size()};
@@ -116,9 +116,9 @@ namespace sysio { namespace chain {
     * are materialized on demand via by_id lookup when a contract calls
     * kv_idx_primary_key.
     *
-    * table_id identifies this secondary index's namespace (DJB2 hash of
-    * "tablename.indexname" % 65536). Each secondary index gets its own
-    * table_id, separate from the primary table's table_id.
+    * table_id identifies this secondary index's namespace (lower 16 bits of
+    * the DJB2 hash of "tablename.indexname"). Each secondary index gets its
+    * own table_id, separate from the primary table's table_id.
     */
    class kv_index_object : public chainbase::object<kv_index_object_type, kv_index_object> {
       OBJECT_CTOR(kv_index_object, (sec_key))
@@ -129,7 +129,7 @@ namespace sysio { namespace chain {
       account_name        payer;         ///< RAM payer (mirrors kv_object::payer)
       shared_blob         sec_key;       ///< secondary key bytes
       kv_object::id_type  primary_id;    ///< id of the kv_object this entry indexes
-      uint16_t            table_id = 0;  ///< secondary index namespace (DJB2 hash of "table.index" % 65536)
+      uint16_t            table_id = 0;  ///< secondary index namespace (lower 16 bits of the DJB2 hash of "table.index")
 
       std::string_view sec_key_view() const { return {sec_key.data(), sec_key.size()}; }
    };

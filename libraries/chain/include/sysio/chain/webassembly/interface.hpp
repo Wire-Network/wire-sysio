@@ -782,7 +782,7 @@ namespace webassembly {
           * write to another contract's namespace. Keys are arbitrary byte sequences
           * (max 256 bytes), values up to 256 KiB.
           *
-          * @param table_id - table namespace identifier (DJB2 hash of table name % 65536)
+          * @param table_id - table namespace identifier (lower 16 bits of the DJB2 hash of table name)
           * @param payer - account to bill for RAM. Pass 0 to bill the executing
           *   contract. Non-zero payer is accepted but the transaction-level
           *   `unauthorized_ram_usage_increase` check requires the payer to have
@@ -801,7 +801,7 @@ namespace webassembly {
           * truncated but the full size is still returned, allowing the caller to
           * allocate and retry. Pass a zero-length buffer to probe the size.
           *
-          * @param table_id - table namespace identifier (DJB2 hash of table name % 65536)
+          * @param table_id - table namespace identifier (lower 16 bits of the DJB2 hash of table name)
           * @param code - account whose KV table to read from
           * @param key - the key bytes to look up
           * @param value - destination buffer for the value
@@ -815,7 +815,7 @@ namespace webassembly {
           * The RAM charged for the row is refunded to the original payer.
           * Throws kv_key_not_found if the key does not exist.
           *
-          * @param table_id - table namespace identifier (DJB2 hash of table name % 65536)
+          * @param table_id - table namespace identifier (lower 16 bits of the DJB2 hash of table name)
           * @param key - the key bytes to erase
           * @return chainbase id of the deleted primary row. Callers with secondary
           *   indexes should call kv_erase BEFORE kv_idx_remove so the returned id
@@ -826,7 +826,7 @@ namespace webassembly {
          /**
           * Test whether a key exists in a contract's KV table without reading the value.
           *
-          * @param table_id - table namespace identifier (DJB2 hash of table name % 65536)
+          * @param table_id - table namespace identifier (lower 16 bits of the DJB2 hash of table name)
           * @param code - account whose KV table to check
           * @param key - the key bytes to look up
           * @return 1 if the key exists, 0 otherwise
@@ -848,7 +848,7 @@ namespace webassembly {
           * The iterator is initially positioned *before* the first matching key;
           * call kv_it_next() to advance to the first result.
           *
-          * @param table_id - table namespace identifier (DJB2 hash of table name % 65536)
+          * @param table_id - table namespace identifier (lower 16 bits of the DJB2 hash of table name)
           * @param code - account whose KV table to iterate
           * @param prefix - key prefix to scope the iteration (may be empty for all keys)
           * @return iterator handle (0–15)

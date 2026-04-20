@@ -4,13 +4,21 @@
 #include <fc/reflect/variant.hpp>
 #include <fc/exception/exception.hpp>
 #include <fc/log/dmlog_sink.hpp>
+#include <fc/log/dmlog_formatter.hpp>
+#include <fc/log/json_formatter.hpp>
+#include <fc/log/pattern_formatter.hpp>
 #include <spdlog/sinks/stdout_sinks.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/sinks/daily_file_sink.h>
 #include <spdlog/sinks/rotating_file_sink.h>
 
-#include <unordered_map>
+#include <iostream>
+#include <limits>
+#include <map>
+#include <memory>
+#include <set>
 #include <string>
+#include <unordered_map>
 
 #define BOOST_DLL_USE_STD_FS
 #include <boost/dll/runtime_symbol_info.hpp>
@@ -54,6 +62,36 @@ namespace fc {
       return log_config::configure_logging( cfg );
    }
 
+   namespace {
+      std::unique_ptr<spdlog::formatter> build_formatter(const format_config& f, const std::string& sink_name) {
+         if (f.type == "pattern") {
+            std::string pattern;
+            if (!f.args.is_null()) {
+               pattern = f.args.as<format::pattern_config>().pattern;
+            }
+            return pattern.empty()
+               ? fc::log::make_pattern_formatter()
+               : fc::log::make_pattern_formatter(pattern);
+         } else if (f.type == "json") {
+            std::map<std::string, std::string> extras;
+            if (!f.args.is_null()) {
+               auto jc = f.args.as<format::json_config>();
+               for (const auto& kv : jc.extra_fields)
+                  extras[kv.key()] = kv.value().as_string();
+            }
+            return std::make_unique<fc::log::json_formatter>(std::move(extras));
+         } else if (f.type == "dmlog") {
+            return std::make_unique<fc::log::dmlog_formatter>();
+         }
+         // Warn-and-fallback (rather than throw) so a SIGHUP reload with a typo
+         // doesn't wipe the running node's logging config.
+         std::cerr << "\nWARNING: Unknown format type '" << f.type
+                   << "' for sink '" << sink_name
+                   << "'; falling back to default pattern" << std::endl;
+         return fc::log::make_pattern_formatter();
+      }
+   } // anonymous namespace
+
    bool log_config::configure_logging( const logging_config& cfg ) {
       try {
          std::lock_guard g( log_config::get().log_mutex );
@@ -63,7 +101,17 @@ namespace fc {
          logger::default_logger() = log_config::get().logger_map[DEFAULT_LOGGER];
          logger& default_logger = logger::default_logger();
 
+         // Only construct sinks that at least one logger references. Unreferenced sink definitions in the
+         // config act as a menu of available options -- no file handle is opened, no file is created --
+         // until an operator attaches them to a logger's sinks[].
+         std::set<std::string> referenced_sinks;
+         for (const auto& lcfg : cfg.loggers) {
+            for (const auto& s : lcfg.sinks)
+               referenced_sinks.insert(s);
+         }
+
          for ( size_t i = 0; i < cfg.sinks.size(); ++i ) {
+            if (!referenced_sinks.contains(cfg.sinks[i].name)) continue;
             // create sink
             auto config_colors = [](auto& sink, const std::vector<sink::level_color>& colors) {
                for (auto& it : colors) {
@@ -101,13 +149,16 @@ namespace fc {
                log_config::get().sink_map[cfg.sinks[i].name] = sink;
             } else if (cfg.sinks[i].type == "daily_file_sink") {
                auto config = cfg.sinks[i].args.as<sink::daily_file_sink_config>();
+               FC_ASSERT(config.max_files <= std::numeric_limits<uint16_t>::max(),
+                         "daily_file_sink max_files {} exceeds uint16_t max", config.max_files);
                auto sink = std::make_shared<spdlog::sinks::daily_file_sink_mt>(
-                       config.base_filename, config.rotation_hour, config.rotation_minute, config.truncate, config.max_files);
+                       config.base_filename, config.rotation_hour, config.rotation_minute,
+                       config.truncate, static_cast<uint16_t>(config.max_files));
                log_config::get().sink_map[cfg.sinks[i].name] = sink;
             } else if (cfg.sinks[i].type == "rotating_file_sink") {
                auto config = cfg.sinks[i].args.as<sink::rotating_file_sink_config>();
                auto sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(
-                       config.base_filename, config.max_size*1024*1024, config.max_files);
+                       config.base_filename, std::size_t{config.max_size}*1024*1024, config.max_files);
                log_config::get().sink_map[cfg.sinks[i].name] = sink;
             } else if (cfg.sinks[i].type == "dmlog_sink") {
                auto config = cfg.sinks[i].args.as<sink::dmlog_sink_config>();
@@ -115,6 +166,18 @@ namespace fc {
                log_config::get().sink_map[cfg.sinks[i].name] = sink;
             } else {
                std::cerr << "\nWARNING: Unknown sink type: " << cfg.sinks[i].type << std::endl;
+            }
+
+            // Attach formatter. Explicit format overrides the default; absent
+            // format means pattern (except for dmlog_sink which ships with
+            // dmlog_formatter already attached by its ctor).
+            auto sink_it = log_config::get().sink_map.find(cfg.sinks[i].name);
+            if (sink_it != log_config::get().sink_map.end()) {
+               if (cfg.sinks[i].format) {
+                  sink_it->second->set_formatter(build_formatter(*cfg.sinks[i].format, cfg.sinks[i].name));
+               } else if (cfg.sinks[i].type != "dmlog_sink") {
+                  sink_it->second->set_formatter(fc::log::make_pattern_formatter());
+               }
             }
          }
 
@@ -147,9 +210,12 @@ namespace fc {
                      lgr.add_sink(sink_it->second);
                   }
                }
-               if (cfg.loggers[i].sinks.size() > 0)
-                  lgr.update_agent_logger(
-                     std::make_unique<spdlog::logger>("", lgr.get_sinks().begin(), lgr.get_sinks().end()));
+               if (cfg.loggers[i].sinks.size() > 0) {
+                  auto agent = std::make_unique<spdlog::logger>(cfg.loggers[i].name, lgr.get_sinks().begin(), lgr.get_sinks().end());
+                  // Flush file sinks on info+ so operators see output promptly; trace/debug stay buffered for throughput.
+                  agent->flush_on(spdlog::level::info);
+                  lgr.update_agent_logger(std::move(agent));
+               }
             }
             if (!first_pass)
                break;
@@ -158,6 +224,8 @@ namespace fc {
          return true;
       } catch ( exception& e ) {
          std::cerr<<e.to_detail_string()<<"\n";
+      } catch ( std::exception& e ) {
+         std::cerr<<"Failed to configure logging: "<<e.what()<<"\n";
       }
       return false;
    }

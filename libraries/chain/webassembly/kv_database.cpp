@@ -4,8 +4,9 @@
 namespace sysio { namespace chain { namespace webassembly {
 
    static uint16_t checked_table_id(uint32_t table_id) {
-      SYS_ASSERT(table_id <= std::numeric_limits<uint16_t>::max(), kv_key_too_large,
-                 "table_id {} exceeds uint16 maximum {}", table_id, std::numeric_limits<uint16_t>::max());
+      constexpr uint32_t max_table_id = std::numeric_limits<uint16_t>::max();
+      SYS_ASSERT(table_id <= max_table_id, kv_key_too_large,
+                 "table_id {} exceeds maximum {}", table_id, max_table_id);
       return static_cast<uint16_t>(table_id);
    }
 
