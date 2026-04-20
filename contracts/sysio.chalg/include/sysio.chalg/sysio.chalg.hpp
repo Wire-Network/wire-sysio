@@ -1,7 +1,7 @@
 #pragma once
 
 #include <sysio/sysio.hpp>
-#include <sysio/singleton.hpp>
+#include <sysio/kv_table.hpp>
 #include <sysio/asset.hpp>
 #include <sysio/crypto.hpp>
 #include <sysio/system.hpp>
@@ -52,8 +52,15 @@ namespace sysio {
       //  Tables
       // -----------------------------------------------------------------------
 
+      /// Challenge primary key (auto-incrementing id).
+      struct challenge_key {
+         uint64_t id;
+         uint64_t primary_key() const { return id; }
+         SYSLIB_SERIALIZE(challenge_key, (id))
+      };
+
       /// Challenge state table.
-      struct [[sysio::table, sysio::contract("sysio.chalg")]] challenge_entry {
+      struct [[sysio::table("challenges")]] challenge_entry {
          uint64_t    id;
          uint64_t    chain_request_id;
          uint32_t    epoch_index;
@@ -63,21 +70,33 @@ namespace sysio {
          checksum256 response_hash;
          std::vector<name> correct_operators;
          std::vector<name> faulty_operators;
-         time_point  challenged_at;
-         time_point  responded_at;
+         time_point  challenged_at{};
+         time_point  responded_at{};
 
-         uint64_t primary_key() const { return id; }
          uint64_t by_request() const { return chain_request_id; }
          uint64_t by_epoch() const { return epoch_index; }
+
+         SYSLIB_SERIALIZE(challenge_entry,
+            (id)(chain_request_id)(epoch_index)(round)(status)(challenge_hash)(response_hash)
+            (correct_operators)(faulty_operators)(challenged_at)(responded_at))
       };
 
-      using challenges_t = multi_index<"challenges"_n, challenge_entry,
-         indexed_by<"byrequest"_n, const_mem_fun<challenge_entry, uint64_t, &challenge_entry::by_request>>,
-         indexed_by<"byepoch"_n, const_mem_fun<challenge_entry, uint64_t, &challenge_entry::by_epoch>>
+      using challenges_t = sysio::kv::table<"challenges"_n, challenge_key, challenge_entry,
+         sysio::kv::index<"byrequest"_n,
+            sysio::const_mem_fun<challenge_entry, uint64_t, &challenge_entry::by_request>>,
+         sysio::kv::index<"byepoch"_n,
+            sysio::const_mem_fun<challenge_entry, uint64_t, &challenge_entry::by_epoch>>
       >;
 
+      /// Manual resolution primary key (auto-incrementing id).
+      struct resolution_key {
+         uint64_t id;
+         uint64_t primary_key() const { return id; }
+         SYSLIB_SERIALIZE(resolution_key, (id))
+      };
+
       /// Manual resolution table.
-      struct [[sysio::table, sysio::contract("sysio.chalg")]] manual_resolution {
+      struct [[sysio::table("resolutions")]] manual_resolution {
          uint64_t    id;
          uint64_t    challenge_id;
          checksum256 original_chain_hash;
@@ -86,10 +105,12 @@ namespace sysio {
          name        msig_proposal;
          bool        is_resolved = false;
 
-         uint64_t primary_key() const { return id; }
+         SYSLIB_SERIALIZE(manual_resolution,
+            (id)(challenge_id)(original_chain_hash)(round1_chain_hash)
+            (round2_chain_hash)(msig_proposal)(is_resolved))
       };
 
-      using resolutions_t = multi_index<"resolutions"_n, manual_resolution>;
+      using resolutions_t = sysio::kv::table<"resolutions"_n, resolution_key, manual_resolution>;
 
    private:
       // Well-known accounts

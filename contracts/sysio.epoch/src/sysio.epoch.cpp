@@ -13,22 +13,25 @@ using opp::types::OperatorStatus;
 // Read-only mirror of sysio.authex::links table for cross-contract reads.
 namespace authex_readonly {
 
+struct links_key {
+   uint64_t key;
+   SYSLIB_SERIALIZE(links_key, (key))
+};
+
 struct links_row {
    uint64_t                 key;
    name                     username;
    fc::crypto::chain_kind_t chain_kind;
    public_key               pub_key;
 
-   uint64_t  primary_key()   const { return key; }
-   uint128_t by_namechain()  const { return to_namechain_key(username, chain_kind); }
-   uint64_t  by_name()       const { return username.value; }
-   uint64_t  by_chain()      const { return static_cast<uint64_t>(chain_kind); }
+   uint64_t by_name() const { return username.value; }
+
+   SYSLIB_SERIALIZE(links_row, (key)(username)(chain_kind)(pub_key))
 };
 
-using links_t = multi_index<"links"_n, links_row,
-   indexed_by<"bynamechain"_n, const_mem_fun<links_row, uint128_t, &links_row::by_namechain>>,
-   indexed_by<"byname"_n,      const_mem_fun<links_row, uint64_t,  &links_row::by_name>>,
-   indexed_by<"bychain"_n,     const_mem_fun<links_row, uint64_t,  &links_row::by_chain>>
+using links_t = sysio::kv::table<"links"_n, links_key, links_row,
+   sysio::kv::index<"byname"_n,
+      sysio::const_mem_fun<links_row, uint64_t, &links_row::by_name>>
 >;
 
 } // namespace authex_readonly
@@ -51,11 +54,8 @@ void epoch::setconfig(uint32_t epoch_duration_sec,
    check(attestation_retention_epoch_count > 0,
          "attestation_retention_epoch_count must be positive");
 
-   epochcfg_t cfg_tbl(get_self(), get_self().value);
-   epoch_config cfg;
-   if (cfg_tbl.exists()) {
-      cfg = cfg_tbl.get();
-   }
+   epochcfg_t cfg_tbl(get_self());
+   epoch_config cfg = cfg_tbl.get_or_default(epoch_config{});
    cfg.epoch_duration_sec = epoch_duration_sec;
    cfg.operators_per_epoch = operators_per_epoch;
    cfg.batch_operator_minimum_active = batch_operator_minimum_active;
@@ -68,15 +68,12 @@ void epoch::setconfig(uint32_t epoch_duration_sec,
 //  advance
 // ---------------------------------------------------------------------------
 void epoch::advance() {
-   epochcfg_t cfg_tbl(get_self(), get_self().value);
+   epochcfg_t cfg_tbl(get_self());
    check(cfg_tbl.exists(), "epoch config not initialized");
    auto cfg = cfg_tbl.get();
 
-   epochstate_t state_tbl(get_self(), get_self().value);
-   epoch_state state;
-   if (state_tbl.exists()) {
-      state = state_tbl.get();
-   }
+   epochstate_t state_tbl(get_self());
+   epoch_state state = state_tbl.get_or_default(epoch_state{});
 
    check(!state.is_paused, "epoch advancement is paused");
 
@@ -110,8 +107,8 @@ void epoch::advance() {
    // looks up those addresses.
    {
       opp::attestations::Operators ops_attest;
-      opreg::operators_t opreg_ops(OPREG_ACCOUNT, OPREG_ACCOUNT.value);
-      authex_readonly::links_t authex_links(AUTHEX_ACCOUNT, AUTHEX_ACCOUNT.value);
+      opreg::operators_t opreg_ops(OPREG_ACCOUNT);
+      authex_readonly::links_t authex_links(AUTHEX_ACCOUNT);
       auto links_by_name = authex_links.get_index<"byname"_n>();
 
       for (auto it = opreg_ops.begin(); it != opreg_ops.end(); ++it) {
@@ -156,7 +153,7 @@ void epoch::advance() {
       auto out = zpp::bits::out{encoded, zpp::bits::no_size{}};
       (void)out(ops_attest);
 
-      outposts_t outposts_tbl(get_self(), get_self().value);
+      outposts_t outposts_tbl(get_self());
       for (auto it = outposts_tbl.begin(); it != outposts_tbl.end(); ++it) {
          action(
             permission_level{"sysio.epoch"_n, "owner"_n},
@@ -193,7 +190,7 @@ void epoch::advance() {
       auto out = zpp::bits::out{encoded, zpp::bits::no_size{}};
       (void)out(attest);
 
-      outposts_t outposts_tbl(get_self(), get_self().value);
+      outposts_t outposts_tbl(get_self());
       for (auto it = outposts_tbl.begin(); it != outposts_tbl.end(); ++it) {
          action(
             permission_level{"sysio.epoch"_n, "owner"_n},
@@ -210,7 +207,7 @@ void epoch::advance() {
 
    // Build outbound envelopes for each outpost
    {
-      outposts_t outposts_tbl(get_self(), get_self().value);
+      outposts_t outposts_tbl(get_self());
       for (auto it = outposts_tbl.begin(); it != outposts_tbl.end(); ++it) {
          action(
             permission_level{"sysio.epoch"_n, "owner"_n},
@@ -240,12 +237,12 @@ void epoch::advance() {
 void epoch::initgroups() {
    require_auth(get_self());
 
-   epochcfg_t cfg_tbl(get_self(), get_self().value);
+   epochcfg_t cfg_tbl(get_self());
    check(cfg_tbl.exists(), "epoch config not initialized");
    auto cfg = cfg_tbl.get();
 
    // Read AVAILABLE batch operators from sysio.opreg
-   opreg::operators_t opreg_ops(OPREG_ACCOUNT, OPREG_ACCOUNT.value);
+   opreg::operators_t opreg_ops(OPREG_ACCOUNT);
    auto status_idx = opreg_ops.get_index<"bystatus"_n>();
 
    // Collect AVAILABLE batch operators, separating staked from bootstrapped
@@ -306,11 +303,8 @@ void epoch::initgroups() {
    }
 
    // Store groups in epoch state
-   epochstate_t state_tbl(get_self(), get_self().value);
-   epoch_state state;
-   if (state_tbl.exists()) {
-      state = state_tbl.get();
-   }
+   epochstate_t state_tbl(get_self());
+   epoch_state state = state_tbl.get_or_default(epoch_state{});
    state.batch_op_groups = new_groups;
    state_tbl.set(state, get_self());
 }
@@ -321,20 +315,22 @@ void epoch::initgroups() {
 void epoch::regoutpost(opp::types::ChainKind chain_kind, uint32_t chain_id) {
    require_auth(get_self());
 
-   outposts_t outposts(get_self(), get_self().value);
+   outposts_t outposts(get_self());
 
    auto chain_idx = outposts.get_index<"bychain"_n>();
    uint64_t composite = (static_cast<uint64_t>(chain_kind) << 32) | chain_id;
    auto it = chain_idx.find(composite);
    check(it == chain_idx.end(), "outpost already registered");
 
-   outposts.emplace(get_self(), [&](auto& o) {
-      o.id = outposts.available_primary_key();
-      o.chain_kind = chain_kind;
-      o.chain_id = chain_id;
-      o.last_inbound_epoch = 0;
-      o.last_outbound_epoch = 0;
-   });
+   uint64_t next_id = outposts.available_primary_key();
+
+   outpost_info row{};
+   row.id                 = next_id;
+   row.chain_kind         = chain_kind;
+   row.chain_id           = chain_id;
+   row.last_inbound_epoch = 0;
+   row.last_outbound_epoch = 0;
+   outposts.emplace(get_self(), outpost_key{next_id}, row);
 }
 
 // ---------------------------------------------------------------------------
@@ -343,11 +339,8 @@ void epoch::regoutpost(opp::types::ChainKind chain_kind, uint32_t chain_id) {
 void epoch::pause() {
    require_auth(CHALG_ACCOUNT);
 
-   epochstate_t state_tbl(get_self(), get_self().value);
-   epoch_state state;
-   if (state_tbl.exists()) {
-      state = state_tbl.get();
-   }
+   epochstate_t state_tbl(get_self());
+   epoch_state state = state_tbl.get_or_default(epoch_state{});
    state.is_paused = true;
    state_tbl.set(state, get_self());
 }
@@ -355,7 +348,7 @@ void epoch::pause() {
 void epoch::unpause() {
    require_auth(CHALG_ACCOUNT);
 
-   epochstate_t state_tbl(get_self(), get_self().value);
+   epochstate_t state_tbl(get_self());
    check(state_tbl.exists(), "epoch state not initialized");
    auto state = state_tbl.get();
    state.is_paused = false;

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <sysio/sysio.hpp>
-#include <sysio/singleton.hpp>
+#include <sysio/kv_table.hpp>
 #include <sysio/asset.hpp>
 #include <sysio/crypto.hpp>
 #include <sysio/system.hpp>
@@ -62,9 +62,16 @@ namespace sysio {
       //  Tables
       // -----------------------------------------------------------------------
 
+      /// Auto-incrementing primary key shared by id-keyed msgch tables.
+      struct id_key {
+         uint64_t id;
+         uint64_t primary_key() const { return id; }
+         SYSLIB_SERIALIZE(id_key, (id))
+      };
+
       /// Inbound envelope delivery — one row per batch-op per outpost per epoch.
       /// Consensus is evaluated by comparing checksums across operators.
-      struct [[sysio::table, sysio::contract("sysio.msgch")]] envelope_entry {
+      struct [[sysio::table("envelopes")]] envelope_entry {
          uint64_t                  id;
          uint64_t                  outpost_id;
          uint32_t                  epoch_index;
@@ -72,24 +79,27 @@ namespace sysio {
          opp::types::ChainKind     chain_kind;
          checksum256               checksum;        ///< sha256(raw_data)
          std::vector<char>         raw_data;
-         time_point                received_at;
+         time_point                received_at{};
 
-         uint64_t primary_key() const { return id; }
          uint64_t by_outpost_epoch() const {
             return (static_cast<uint64_t>(outpost_id) << 32) | epoch_index;
          }
          uint64_t by_batch_op() const { return batch_op_name.value; }
+
+         SYSLIB_SERIALIZE(envelope_entry,
+            (id)(outpost_id)(epoch_index)(batch_op_name)(chain_kind)
+            (checksum)(raw_data)(received_at))
       };
 
-      using envelopes_t = multi_index<"envelopes"_n, envelope_entry,
-         indexed_by<"byoutepoch"_n,
-            const_mem_fun<envelope_entry, uint64_t, &envelope_entry::by_outpost_epoch>>,
-         indexed_by<"bybatchop"_n,
-            const_mem_fun<envelope_entry, uint64_t, &envelope_entry::by_batch_op>>
+      using envelopes_t = sysio::kv::table<"envelopes"_n, id_key, envelope_entry,
+         sysio::kv::index<"byoutepoch"_n,
+            sysio::const_mem_fun<envelope_entry, uint64_t, &envelope_entry::by_outpost_epoch>>,
+         sysio::kv::index<"bybatchop"_n,
+            sysio::const_mem_fun<envelope_entry, uint64_t, &envelope_entry::by_batch_op>>
       >;
 
       /// Individual message extracted from a consensus-verified envelope.
-      struct [[sysio::table, sysio::contract("sysio.msgch")]] message_entry {
+      struct [[sysio::table("messages")]] message_entry {
          uint64_t                        id;
          uint64_t                        outpost_id;
          uint32_t                        epoch_index;
@@ -98,27 +108,30 @@ namespace sysio {
          opp::types::MessageDirection    direction;
          opp::types::MessageStatus       status;
          std::vector<char>               raw_payload;
-         time_point                      received_at;
-         time_point                      processed_at;
+         time_point                      received_at{};
+         time_point                      processed_at{};
 
-         uint64_t    primary_key() const { return id; }
-         uint64_t    by_status()   const { return static_cast<uint64_t>(status); }
-         uint64_t    by_epoch()    const { return epoch_index; }
-         checksum256 by_msg_id()   const { return message_id; }
+         uint64_t    by_status() const { return static_cast<uint64_t>(status); }
+         uint64_t    by_epoch()  const { return epoch_index; }
+         checksum256 by_msg_id() const { return message_id; }
+
+         SYSLIB_SERIALIZE(message_entry,
+            (id)(outpost_id)(epoch_index)(message_id)(previous_message_id)
+            (direction)(status)(raw_payload)(received_at)(processed_at))
       };
 
-      using messages_t = multi_index<"messages"_n, message_entry,
-         indexed_by<"bystatus"_n,
-            const_mem_fun<message_entry, uint64_t, &message_entry::by_status>>,
-         indexed_by<"byepoch"_n,
-            const_mem_fun<message_entry, uint64_t, &message_entry::by_epoch>>,
-         indexed_by<"bymsgid"_n,
-            const_mem_fun<message_entry, checksum256, &message_entry::by_msg_id>>
+      using messages_t = sysio::kv::table<"messages"_n, id_key, message_entry,
+         sysio::kv::index<"bystatus"_n,
+            sysio::const_mem_fun<message_entry, uint64_t, &message_entry::by_status>>,
+         sysio::kv::index<"byepoch"_n,
+            sysio::const_mem_fun<message_entry, uint64_t, &message_entry::by_epoch>>,
+         sysio::kv::index<"bymsgid"_n,
+            sysio::const_mem_fun<message_entry, checksum256, &message_entry::by_msg_id>>
       >;
 
       /// Attestation extracted from a consensus-verified message, or
       /// queued outbound attestation awaiting envelope packing.
-      struct [[sysio::table, sysio::contract("sysio.msgch")]] attestation_entry {
+      struct [[sysio::table("attestations")]] attestation_entry {
          uint64_t                        id;
          uint64_t                        outpost_id;
          uint32_t                        epoch_index;
@@ -129,23 +142,26 @@ namespace sysio {
          uint64_t                        ready_timestamp;
          uint64_t                        processed_timestamp;
 
-         uint64_t primary_key() const { return id; }
-         uint64_t by_status()   const { return static_cast<uint64_t>(status); }
-         uint64_t by_type()     const { return static_cast<uint64_t>(type); }
-         uint64_t by_epoch()    const { return epoch_index; }
+         uint64_t by_status() const { return static_cast<uint64_t>(status); }
+         uint64_t by_type()   const { return static_cast<uint64_t>(type); }
+         uint64_t by_epoch()  const { return epoch_index; }
+
+         SYSLIB_SERIALIZE(attestation_entry,
+            (id)(outpost_id)(epoch_index)(type)(status)(data)
+            (pending_timestamp)(ready_timestamp)(processed_timestamp))
       };
 
-      using attestations_t = multi_index<"attestations"_n, attestation_entry,
-         indexed_by<"bystatus"_n,
-            const_mem_fun<attestation_entry, uint64_t, &attestation_entry::by_status>>,
-         indexed_by<"bytype"_n,
-            const_mem_fun<attestation_entry, uint64_t, &attestation_entry::by_type>>,
-         indexed_by<"byepoch"_n,
-            const_mem_fun<attestation_entry, uint64_t, &attestation_entry::by_epoch>>
+      using attestations_t = sysio::kv::table<"attestations"_n, id_key, attestation_entry,
+         sysio::kv::index<"bystatus"_n,
+            sysio::const_mem_fun<attestation_entry, uint64_t, &attestation_entry::by_status>>,
+         sysio::kv::index<"bytype"_n,
+            sysio::const_mem_fun<attestation_entry, uint64_t, &attestation_entry::by_type>>,
+         sysio::kv::index<"byepoch"_n,
+            sysio::const_mem_fun<attestation_entry, uint64_t, &attestation_entry::by_epoch>>
       >;
 
       /// Outbound envelope table.
-      struct [[sysio::table, sysio::contract("sysio.msgch")]] outbound_envelope {
+      struct [[sysio::table("outenvelopes")]] outbound_envelope {
          uint64_t    id;
          uint64_t    outpost_id;
          uint32_t    epoch_index;
@@ -156,31 +172,42 @@ namespace sysio {
          opp::types::EnvelopeStatus status;
          std::vector<char> raw_envelope;
 
-         uint64_t primary_key() const { return id; }
          uint64_t by_outpost() const { return outpost_id; }
          uint64_t by_outpost_epoch() const {
             return (static_cast<uint64_t>(outpost_id) << 32) | epoch_index;
          }
+
+         SYSLIB_SERIALIZE(outbound_envelope,
+            (id)(outpost_id)(epoch_index)(envelope_hash)(merkle_root)
+            (start_message_id)(end_message_id)(status)(raw_envelope))
       };
 
-      using outenvelopes_t = multi_index<"outenvelopes"_n, outbound_envelope,
-         indexed_by<"byoutpost"_n,
-            const_mem_fun<outbound_envelope, uint64_t, &outbound_envelope::by_outpost>>,
-         indexed_by<"byoutepoch"_n,
-            const_mem_fun<outbound_envelope, uint64_t, &outbound_envelope::by_outpost_epoch>>
+      using outenvelopes_t = sysio::kv::table<"outenvelopes"_n, id_key, outbound_envelope,
+         sysio::kv::index<"byoutpost"_n,
+            sysio::const_mem_fun<outbound_envelope, uint64_t, &outbound_envelope::by_outpost>>,
+         sysio::kv::index<"byoutepoch"_n,
+            sysio::const_mem_fun<outbound_envelope, uint64_t, &outbound_envelope::by_outpost_epoch>>
       >;
+
+      /// Per-outpost consensus primary key.
+      struct outpost_consensus_key {
+         uint64_t outpost_id;
+         SYSLIB_SERIALIZE(outpost_consensus_key, (outpost_id))
+      };
 
       /// Per-outpost consensus tracking for the current epoch.
       /// One row per outpost. Rows reused (not erased) to avoid RAM churn.
-      struct [[sysio::table, sysio::contract("sysio.msgch")]] outpost_consensus_entry {
+      struct [[sysio::table("outpcons")]] outpost_consensus_entry {
          uint64_t outpost_id;
          uint32_t epoch_index;
          bool     consensus_reached;
 
-         uint64_t primary_key() const { return outpost_id; }
+         SYSLIB_SERIALIZE(outpost_consensus_entry,
+            (outpost_id)(epoch_index)(consensus_reached))
       };
 
-      using outpost_consensus_t = multi_index<"outpcons"_n, outpost_consensus_entry>;
+      using outpost_consensus_t =
+         sysio::kv::table<"outpcons"_n, outpost_consensus_key, outpost_consensus_entry>;
 
    private:
 

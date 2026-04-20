@@ -20,12 +20,12 @@ constexpr auto CHALG_ACCOUNT = "sysio.chalg"_n;
 constexpr uint32_t CLEANUP_BATCH_SIZE = 50;
 
 uint32_t current_epoch_index() {
-   epoch::epochstate_t tbl(EPOCH_ACCOUNT, EPOCH_ACCOUNT.value);
+   epoch::epochstate_t tbl(EPOCH_ACCOUNT);
    return tbl.exists() ? tbl.get().current_epoch_index : 0;
 }
 
 uint32_t epoch_operators_per_group() {
-   epoch::epochcfg_t tbl(EPOCH_ACCOUNT, EPOCH_ACCOUNT.value);
+   epoch::epochcfg_t tbl(EPOCH_ACCOUNT);
    return tbl.exists() ? tbl.get().operators_per_epoch : 7;
 }
 
@@ -54,9 +54,10 @@ void msgch::deliver(name batch_op_name, uint64_t outpost_id, std::vector<char> d
    check(!data.empty(), "delivery data cannot be empty");
 
    // Verify outpost exists
-   epoch::outposts_t outposts(EPOCH_ACCOUNT, EPOCH_ACCOUNT.value);
-   auto op_it = outposts.find(outpost_id);
-   check(op_it != outposts.end(), "outpost not found");
+   epoch::outposts_t outposts(EPOCH_ACCOUNT);
+   auto outpost_pk = epoch::outpost_key{outpost_id};
+   check(outposts.contains(outpost_pk), "outpost not found");
+   auto op_row = outposts.get(outpost_pk);
 
    // Decode envelope to validate epoch_index matches current WIRE epoch
    uint32_t epoch = current_epoch_index();
@@ -75,7 +76,7 @@ void msgch::deliver(name batch_op_name, uint64_t outpost_id, std::vector<char> d
    checksum256 cs = sha256(data.data(), data.size());
 
    // Prevent duplicate delivery from same operator for same outpost+epoch
-   envelopes_t envs(get_self(), get_self().value);
+   envelopes_t envs(get_self());
    auto oe_idx = envs.get_index<"byoutepoch"_n>();
    uint64_t composite = (static_cast<uint64_t>(outpost_id) << 32) | epoch;
    for (auto it = oe_idx.lower_bound(composite);
@@ -87,16 +88,18 @@ void msgch::deliver(name batch_op_name, uint64_t outpost_id, std::vector<char> d
    }
 
    // Store envelope
-   envs.emplace(get_self(), [&](auto& e) {
-      e.id            = envs.available_primary_key();
-      e.outpost_id    = outpost_id;
-      e.epoch_index   = epoch;
-      e.batch_op_name = batch_op_name;
-      e.chain_kind    = op_it->chain_kind;
-      e.checksum      = cs;
-      e.raw_data      = data;
-      e.received_at   = current_time_point();
-   });
+   uint64_t env_id = envs.available_primary_key();
+
+   envelope_entry e{};
+   e.id            = env_id;
+   e.outpost_id    = outpost_id;
+   e.epoch_index   = epoch;
+   e.batch_op_name = batch_op_name;
+   e.chain_kind    = op_row.chain_kind;
+   e.checksum      = cs;
+   e.raw_data      = data;
+   e.received_at   = current_time_point();
+   envs.emplace(get_self(), id_key{env_id}, e);
 
    // Evaluate consensus inline
    action(
@@ -113,7 +116,7 @@ void msgch::deliver(name batch_op_name, uint64_t outpost_id, std::vector<char> d
 void msgch::evalcons(uint64_t outpost_id, uint32_t epoch_index) {
    require_auth(get_self());
 
-   envelopes_t envs(get_self(), get_self().value);
+   envelopes_t envs(get_self());
    auto oe_idx = envs.get_index<"byoutepoch"_n>();
    uint64_t composite = (static_cast<uint64_t>(outpost_id) << 32) | epoch_index;
 
@@ -157,7 +160,7 @@ void msgch::evalcons(uint64_t outpost_id, uint32_t epoch_index) {
       }
       // Option B: Majority at epoch boundary (current time >= next_epoch_start)
       if (checksum_counts[g] > operators_per_group / 2) {
-         epoch::epochstate_t state_tbl(EPOCH_ACCOUNT, EPOCH_ACCOUNT.value);
+         epoch::epochstate_t state_tbl(EPOCH_ACCOUNT);
          if (state_tbl.exists()) {
             auto state = state_tbl.get();
             if (current_time_point() >= state.next_epoch_start) {
@@ -184,64 +187,53 @@ void msgch::evalcons(uint64_t outpost_id, uint32_t epoch_index) {
    check(decode_result == zpp::bits::errc{}, "failed to decode inbound OPP Envelope");
 
    // Store the raw envelope as an inbound message
-   messages_t msgs(get_self(), get_self().value);
-   msgs.emplace(get_self(), [&](auto& m) {
-      m.id            = msgs.available_primary_key();
-      m.outpost_id    = outpost_id;
-      m.epoch_index   = epoch;
-      m.direction     = MessageDirection::MESSAGE_DIRECTION_INBOUND;
-      m.status        = MessageStatus::MESSAGE_STATUS_PROCESSED;
-      m.raw_payload   = raw;
-      m.received_at   = now;
-      m.processed_at  = now;
-   });
+   messages_t msgs(get_self());
+   uint64_t msg_id = msgs.available_primary_key();
+
+   message_entry m{};
+   m.id           = msg_id;
+   m.outpost_id   = outpost_id;
+   m.epoch_index  = epoch;
+   m.direction    = MessageDirection::MESSAGE_DIRECTION_INBOUND;
+   m.status       = MessageStatus::MESSAGE_STATUS_PROCESSED;
+   m.raw_payload  = raw;
+   m.received_at  = now;
+   m.processed_at = now;
+   msgs.emplace(get_self(), id_key{msg_id}, m);
 
    // Extract individual AttestationEntries from each Message in the Envelope
-   attestations_t atts(get_self(), get_self().value);
+   attestations_t atts(get_self());
    for (auto& msg : envelope.messages) {
       for (auto& entry : msg.payload.attestations) {
-         atts.emplace(get_self(), [&](auto& a) {
-            a.id                  = atts.available_primary_key();
-            a.outpost_id          = outpost_id;
-            a.epoch_index         = epoch;
-            a.type                = entry.type;
-            a.status              = AttestationStatus::ATTESTATION_STATUS_READY;
-            a.data                = entry.data;
-            a.pending_timestamp   = 0;
-            a.ready_timestamp     = now_sec;
-            a.processed_timestamp = 0;
-         });
+         uint64_t att_id = atts.available_primary_key();
+         attestation_entry a{};
+         a.id                  = att_id;
+         a.outpost_id          = outpost_id;
+         a.epoch_index         = epoch;
+         a.type                = entry.type;
+         a.status              = AttestationStatus::ATTESTATION_STATUS_READY;
+         a.data                = entry.data;
+         a.pending_timestamp   = 0;
+         a.ready_timestamp     = now_sec;
+         a.processed_timestamp = 0;
+         atts.emplace(get_self(), id_key{att_id}, a);
       }
    }
 
    // === RECORD PER-OUTPOST CONSENSUS ===
-   outpost_consensus_t opcons(get_self(), get_self().value);
-   auto opc_it = opcons.find(outpost_id);
-   if (opc_it == opcons.end()) {
-      opcons.emplace(get_self(), [&](auto& r) {
-         r.outpost_id        = outpost_id;
-         r.epoch_index       = epoch_index;
-         r.consensus_reached = true;
-      });
+   outpost_consensus_t opcons(get_self());
+   auto opc_pk = outpost_consensus_key{outpost_id};
+   if (!opcons.contains(opc_pk)) {
+      outpost_consensus_entry r{};
+      r.outpost_id        = outpost_id;
+      r.epoch_index       = epoch_index;
+      r.consensus_reached = true;
+      opcons.emplace(get_self(), opc_pk, r);
    } else {
-      opcons.modify(opc_it, same_payer, [&](auto& r) {
+      opcons.modify(same_payer, opc_pk, [&](auto& r) {
          r.epoch_index       = epoch_index;
          r.consensus_reached = true;
       });
-   }
-
-   // === CHECK ALL-OUTPOST CONSENSUS ===
-   epoch::outposts_t outposts(EPOCH_ACCOUNT, EPOCH_ACCOUNT.value);
-   bool all_consensus = true;
-   uint32_t outpost_count = 0;
-
-   for (auto it = outposts.begin(); it != outposts.end(); ++it) {
-      ++outpost_count;
-      auto opc = opcons.find(it->id);
-      if (opc == opcons.end() || !opc->consensus_reached || opc->epoch_index != epoch_index) {
-         all_consensus = false;
-         break;
-      }
    }
 
    // Consensus state recorded — advance is triggered by chkcons
@@ -255,15 +247,20 @@ void msgch::chkcons() {
    uint32_t epoch = current_epoch_index();
 
    // Check all outposts have consensus for the current epoch
-   outpost_consensus_t opcons(get_self(), get_self().value);
-   epoch::outposts_t outposts(EPOCH_ACCOUNT, EPOCH_ACCOUNT.value);
+   outpost_consensus_t opcons(get_self());
+   epoch::outposts_t outposts(EPOCH_ACCOUNT);
    bool all_consensus = true;
    uint32_t outpost_count = 0;
 
    for (auto it = outposts.begin(); it != outposts.end(); ++it) {
       ++outpost_count;
-      auto opc = opcons.find(it->id);
-      if (opc == opcons.end() || !opc->consensus_reached || opc->epoch_index != epoch) {
+      auto opc_pk = outpost_consensus_key{it->id};
+      if (!opcons.contains(opc_pk)) {
+         all_consensus = false;
+         break;
+      }
+      auto opc = opcons.get(opc_pk);
+      if (!opc.consensus_reached || opc.epoch_index != epoch) {
          all_consensus = false;
          break;
       }
@@ -272,14 +269,15 @@ void msgch::chkcons() {
    if (outpost_count == 0 || !all_consensus) return;
 
    // Check wall-clock: next_epoch_start must be in the past
-   epoch::epochstate_t estate(EPOCH_ACCOUNT, EPOCH_ACCOUNT.value);
+   epoch::epochstate_t estate(EPOCH_ACCOUNT);
    if (!estate.exists()) return;
    auto state = estate.get();
    if (current_time_point() < state.next_epoch_start) return;
 
    // All conditions met — reset consensus and advance
    for (auto it = opcons.begin(); it != opcons.end(); ++it) {
-      opcons.modify(it, same_payer, [&](auto& r) { r.consensus_reached = false; });
+      auto opc_pk = outpost_consensus_key{it.key().outpost_id};
+      opcons.modify(same_payer, opc_pk, [&](auto& r) { r.consensus_reached = false; });
    }
 
    action(
@@ -298,18 +296,20 @@ void msgch::queueout(uint64_t outpost_id,
                      std::vector<char> data) {
    auto now_sec = static_cast<uint64_t>(current_time_point().sec_since_epoch());
 
-   attestations_t atts(get_self(), get_self().value);
-   atts.emplace(get_self(), [&](auto& a) {
-      a.id                  = atts.available_primary_key();
-      a.outpost_id          = outpost_id;
-      a.epoch_index         = current_epoch_index();
-      a.type                = attest_type;
-      a.status              = AttestationStatus::ATTESTATION_STATUS_READY;
-      a.data                = data;
-      a.pending_timestamp   = 0;
-      a.ready_timestamp     = now_sec;
-      a.processed_timestamp = 0;
-   });
+   attestations_t atts(get_self());
+   uint64_t att_id = atts.available_primary_key();
+
+   attestation_entry a{};
+   a.id                  = att_id;
+   a.outpost_id          = outpost_id;
+   a.epoch_index         = current_epoch_index();
+   a.type                = attest_type;
+   a.status              = AttestationStatus::ATTESTATION_STATUS_READY;
+   a.data                = data;
+   a.pending_timestamp   = 0;
+   a.ready_timestamp     = now_sec;
+   a.processed_timestamp = 0;
+   atts.emplace(get_self(), id_key{att_id}, a);
 }
 
 // ---------------------------------------------------------------------------
@@ -319,7 +319,7 @@ void msgch::buildenv(uint64_t outpost_id) {
    require_auth(EPOCH_ACCOUNT);
 
    uint32_t epoch = current_epoch_index();
-   attestations_t atts(get_self(), get_self().value);
+   attestations_t atts(get_self());
    auto now_sec = static_cast<uint64_t>(current_time_point().sec_since_epoch());
 
    // Collect READY attestations for this outpost
@@ -346,10 +346,10 @@ void msgch::buildenv(uint64_t outpost_id) {
    // Mark collected attestations as PROCESSED
    att_ids.erase(std::unique(att_ids.begin(), att_ids.end()), att_ids.end());
    for (uint64_t aid : att_ids) {
-      auto it = atts.find(aid);
-      if (it != atts.end()) {
-         atts.modify(it, same_payer, [&](auto& a) {
-            a.status = AttestationStatus::ATTESTATION_STATUS_PROCESSED;
+      auto att_pk = id_key{aid};
+      if (atts.contains(att_pk)) {
+         atts.modify(same_payer, att_pk, [&](auto& a) {
+            a.status              = AttestationStatus::ATTESTATION_STATUS_PROCESSED;
             a.processed_timestamp = now_sec;
          });
       }
@@ -379,45 +379,47 @@ void msgch::buildenv(uint64_t outpost_id) {
    (void)out(env);
 
    // Store outbound envelope
-   outenvelopes_t envelopes(get_self(), get_self().value);
-   envelopes.emplace(get_self(), [&](auto& e) {
-      e.id            = envelopes.available_primary_key();
-      e.outpost_id    = outpost_id;
-      e.epoch_index   = epoch;
-      e.envelope_hash = sha256(packed.data(), packed.size());
-      e.status        = EnvelopeStatus::ENVELOPE_STATUS_PENDING_DELIVERY;
-      e.raw_envelope  = packed;
-   });
+   outenvelopes_t envelopes(get_self());
+   uint64_t out_id = envelopes.available_primary_key();
+
+   outbound_envelope oe{};
+   oe.id            = out_id;
+   oe.outpost_id    = outpost_id;
+   oe.epoch_index   = epoch;
+   oe.envelope_hash = sha256(packed.data(), packed.size());
+   oe.status        = EnvelopeStatus::ENVELOPE_STATUS_PENDING_DELIVERY;
+   oe.raw_envelope  = packed;
+   envelopes.emplace(get_self(), id_key{out_id}, oe);
 }
 
 // ---------------------------------------------------------------------------
 //  cleanup — remove old attestations and envelopes
 // ---------------------------------------------------------------------------
 void msgch::cleanup(uint32_t before_epoch) {
-   attestations_t atts(get_self(), get_self().value);
+   attestations_t atts(get_self());
    auto epoch_idx = atts.get_index<"byepoch"_n>();
    uint32_t removed = 0;
    for (auto it = epoch_idx.begin();
         it != epoch_idx.end() && it->epoch_index < before_epoch;) {
-      it = epoch_idx.erase(it);
+      it = epoch_idx.erase(std::move(it));
       if (++removed >= CLEANUP_BATCH_SIZE) break;
    }
 
-   envelopes_t envs(get_self(), get_self().value);
+   envelopes_t envs(get_self());
    auto env_oe_idx = envs.get_index<"byoutepoch"_n>();
    removed = 0;
    for (auto it = env_oe_idx.begin();
         it != env_oe_idx.end() && it->epoch_index < before_epoch;) {
-      it = env_oe_idx.erase(it);
+      it = env_oe_idx.erase(std::move(it));
       if (++removed >= CLEANUP_BATCH_SIZE) break;
    }
 
-   outenvelopes_t outenvs(get_self(), get_self().value);
+   outenvelopes_t outenvs(get_self());
    auto out_oe_idx = outenvs.get_index<"byoutepoch"_n>();
    removed = 0;
    for (auto it = out_oe_idx.begin();
         it != out_oe_idx.end() && it->epoch_index < before_epoch;) {
-      it = out_oe_idx.erase(it);
+      it = out_oe_idx.erase(std::move(it));
       if (++removed >= CLEANUP_BATCH_SIZE) break;
    }
 }
