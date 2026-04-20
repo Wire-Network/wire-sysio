@@ -37,8 +37,8 @@
     "args": {
       "base_filename": "./logs/rotate.log",
       "max_size": 10,
-      "max_file": 10,
-      "_comment": "max_size is in MB, max_file is the max number of rotated files"
+      "max_files": 10,
+      "_comment": "max_size is in MB, max_files is the max number of rotated files"
     }
   },{
     "name" : "dmlog",
@@ -47,6 +47,43 @@
       "file": "-",
       "_comment": "file can be a filename or -, -stdout, -stderr. -stdout is same as -"
     }
+  },{
+    "name": "json_daily_file",
+    "type": "daily_file_sink",
+    "args": {
+      "base_filename": "./logs/daily.jsonl",
+      "rotation_hour": 0,
+      "rotation_minute": 0,
+      "truncate": false,
+      "max_files": 0
+    },
+    "format": {
+      "type": "json",
+      "args": { "extra_fields": {} }
+    },
+    "_comment": "JSONL output; rotates daily. Attach \"json_daily_file\" to any logger's sinks[] to enable."
+  },{
+    "name": "json_rotate_file",
+    "type": "rotating_file_sink",
+    "args": {
+      "base_filename": "./logs/rotate.jsonl",
+      "max_size": 10,
+      "max_files": 10
+    },
+    "format": {
+      "type": "json",
+      "args": { "extra_fields": {} }
+    },
+    "_comment": "JSONL output; rotates at max_size MB."
+  },{
+    "name": "json_stderr",
+    "type": "console_sink",
+    "args": { "output_type": "stderr", "color": false },
+    "format": {
+      "type": "json",
+      "args": { "extra_fields": {} }
+    },
+    "_comment": "JSONL output to stderr; formatter and sink are independently swappable."
   }
   ],
   "loggers": [{
@@ -103,7 +140,7 @@
       "level": "debug",
       "enabled": true,
       "sinks": [
-        "stderr"
+        "stderr_color"
       ]
     },{
       "name": "producer_plugin",

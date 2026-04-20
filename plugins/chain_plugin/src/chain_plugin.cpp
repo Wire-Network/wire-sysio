@@ -516,12 +516,20 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
       if (!sig_plug.has_signature_providers(std::array{crypto::chain_key_type_wire})) {
          sig_plug.register_default_signature_providers({crypto::chain_key_type_wire});
       }
-      if (!sig_plug.has_signature_providers(std::array{crypto::chain_key_type_wire_bls})) {
+      // Only auto-register BLS default for producer nodes (finalizers).
+      // Batch operator / underwriter nodes run in irreversible mode and must
+      // not have finalizer keys configured.
+      if (options.count("producer-name") &&
+          !sig_plug.has_signature_providers(std::array{crypto::chain_key_type_wire_bls})) {
          sig_plug.register_default_signature_providers({crypto::chain_key_type_wire_bls});
       }
 
       auto producer_sig_prov = sig_plug.query_providers(std::nullopt,std::nullopt,crypto::chain_key_type_wire).front();
-      auto finalizer_sig_prov = sig_plug.query_providers(std::nullopt,std::nullopt,crypto::chain_key_type_wire_bls).front();
+      fc::crypto::signature_provider_ptr finalizer_sig_prov;
+      {
+         auto bls_providers = sig_plug.query_providers(std::nullopt,std::nullopt,crypto::chain_key_type_wire_bls);
+         if (!bls_providers.empty()) finalizer_sig_prov = bls_providers.front();
+      }
 
       chain_config = controller::config();
 
@@ -769,7 +777,7 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
 
       if( options.contains( "extract-genesis-json" ) || options.at( "print-genesis-json" ).as<bool>()) {
          std::optional<genesis_state> gs;
-         
+
          gs = block_log::extract_genesis_state( blocks_dir, retained_dir );
          SYS_ASSERT( gs,
                      plugin_config_exception,
@@ -977,7 +985,14 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
                );
 
                ilog( "Starting fresh blockchain state using default genesis state." );
-               genesis.emplace(producer_sig_prov->public_key, finalizer_sig_prov->public_key);
+               if (options.count("producer-name")) {
+                  SYS_ASSERT(finalizer_sig_prov, plugin_config_exception,
+                              "Default genesis requires a BLS finalizer key but none is configured. "
+                              "Producer nodes must provide a BLS key or use --genesis-json explicitly.");
+                  genesis.emplace(producer_sig_prov->public_key, finalizer_sig_prov->public_key);
+               } else {
+                  genesis.emplace();
+               }
                chain_id = genesis->compute_chain_id();
             }
          }
@@ -1171,7 +1186,7 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
 
          irreversible_block_channel.publish( priority::low, t );
       } );
-      
+
       applied_transaction_connection = chain->applied_transaction().connect(
             [this]( std::tuple<const transaction_trace_ptr&, const packed_transaction_ptr&> t ) {
                const auto& [ trace, ptrx ] = t;
@@ -1757,9 +1772,26 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
    }
 
    // When scope is set on a primary query, prepend scope prefix to bounds.
-   if (!resolved_index_name.empty()) {
-      // Secondary index path: scope prefix is not prepended to bounds (secondary
-      // keys already contain scope internally in their encoding).
+   if (!resolved_index_name.empty() && !scope_prefix_bytes.empty()) {
+      // Secondary index keys on scoped tables (multi_index / kv_multi_index)
+      // are stored as [scope:8B BE][sec_value:N]. For json=false the caller
+      // supplies the full [scope][value] bytes via hex, but for json=true
+      // `encode_key` produced only the sec_value portion (since bound_key_names
+      // is just the index name). Prepend the scope prefix so the bound
+      // compares byte-for-byte against the stored sec_key.
+      if (p.json) {
+         auto prepend_scope_sec = [&](const std::vector<char>& bound) -> std::vector<char> {
+            std::vector<char> scoped;
+            scoped.reserve(scope_prefix_bytes.size() + bound.size());
+            scoped.insert(scoped.end(), scope_prefix_bytes.begin(), scope_prefix_bytes.end());
+            scoped.insert(scoped.end(), bound.begin(), bound.end());
+            return scoped;
+         };
+         if (!lb_bytes.empty()) lb_bytes = prepend_scope_sec(lb_bytes);
+         if (has_upper)         ub_bytes = prepend_scope_sec(ub_bytes);
+      }
+   } else if (!resolved_index_name.empty()) {
+      // Secondary index on an unscoped kv::table: nothing to prepend.
    } else if (!scope_prefix_bytes.empty()) {
       auto prepend_scope = [&](const std::vector<char>& bound) -> std::vector<char> {
          std::vector<char> scoped(scope_prefix_bytes.size() + bound.size());
@@ -3114,7 +3146,8 @@ read_only::get_account_return_t read_only::get_account( const get_account_params
          }
       }
 
-      // ROA tables use kv::table (unscoped) — key is [pk:8B BE] only
+      // ROA reslimit is a flat kv::table (no scope): reslimit_t reslimit(get_self()).
+      // KV key layout is [pk=owner:8B BE].
       auto lookup_object = [&](const name& table_name, const name& account_name) -> std::optional<vector<char>> {
          const uint16_t tid = chain::compute_table_id(table_name.to_uint64_t());
          char key_buf[chain::kv_pri_key_size];

@@ -9,7 +9,7 @@
 #include <fc/io/datastream.hpp>  // for fc::datastream
 #include <fc/io/cfile.hpp> // for fc::cfile_datastream
 #include <fc/network/message_buffer.hpp>
- 
+
 namespace fc { namespace crypto { namespace ed {
 
 // Forward declarations
@@ -48,6 +48,10 @@ struct public_key_shim {
       memcpy(result._data.data(), bytes.data(), bytes.size());
       return result;
    }
+
+   friend bool operator==(const public_key_shim& a, const public_key_shim& b) { return a._data == b._data; }
+   friend bool operator!=(const public_key_shim& a, const public_key_shim& b) { return !(a == b); }
+   friend bool operator<(const public_key_shim& a, const public_key_shim& b)  { return a._data < b._data; }
 };
 
 /**
@@ -117,7 +121,7 @@ struct private_key_shim {
 
    static private_key_shim generate();
    public_key_shim get_public_key() const;
-   
+
    signature_shim  sign_sha256(const sha256& digest) const;
 
    /**
@@ -147,6 +151,21 @@ struct private_key_shim {
       return result;
    }
 };
+
+/**
+ * Check whether the key material is all zeros (the default-constructed / uninitialized state).
+ */
+bool is_zero(const public_key_shim& pk);
+
+/**
+ * Check whether the compressed Edwards point is on the ed25519 curve.
+ *
+ * This is the same check Solana's curve25519_dalek performs for PDA validation:
+ * it decompresses the Y coordinate and tests whether x² is a quadratic residue
+ * in F_p. It is NOT the stricter "on curve AND in prime-order subgroup" check —
+ * small-order (torsion) points still count as on-curve.
+ */
+bool is_on_curve(const public_key_shim& pk);
 
 }}} // namespace fc::crypto::ed
 

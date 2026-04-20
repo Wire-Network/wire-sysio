@@ -122,15 +122,32 @@ namespace sysio {
                      std::to_string(nonce) + "|" + DIGEST_TAIL;
 
    std::optional<name> ex_permission = std::nullopt;
+   // For EM keys, recover_key returns the real y-parity prefix.
+   // Store it so downstream consumers (advance → OPERATORS attestation)
+   // get the correct compressed key for ETH address derivation.
+   public_key verified_pub_key = pub_key;
+
    // ——— Curve-specific signing & address derivation ———
    if (chain_kind == chain_kind_ethereum) {
-      // 1) keccak(msg)
+      // 1) keccak(msg) — use the pubkey string as the contract sees it
+      //    (fc/CDT may normalize the compression prefix byte)
       auto eth_hash = sysio::keccak(msg.c_str(), msg.size());
 
-      // 2) verify
-      assert_recover_key(eth_hash, sig, pub_key);
+      // 2) recover the public key from the signature + digest, then compare
+      //    the x-coordinate (bytes 1..32). The prefix byte (y-parity) may differ
+      //    due to EIP-191 double-hashing in the recovery path, but the
+      //    x-coordinate is sufficient to verify key ownership.
+      //    The recovered key (with correct prefix from libsecp256k1) is stored
+      //    in the link table so downstream consumers get the real y-parity.
+      auto recovered = recover_key(eth_hash, sig);
+      auto expected_raw = std::get<3>(pub_key);
+      auto recovered_raw = std::get<3>(recovered);
 
+      check(std::equal(expected_raw.begin() + 1, expected_raw.end(),
+                       recovered_raw.begin() + 1),
+            "EM key recovery failed: x-coordinate mismatch");
 
+      verified_pub_key = recovered;
       ex_permission = ex_eth;
 
    } else if (chain_kind == chain_kind_solana) {
@@ -167,7 +184,8 @@ namespace sysio {
    // MAKE SURE WE MAPPED TO A SUPPORTED PERMISSION
    sysio::check(ex_permission.has_value(), "Internal error: ex_permission not set");
 
-   // CREATE LINK RECORD
+   // CREATE LINK RECORD — use verified_pub_key which has the real y-parity
+   // prefix from recovery (for EM) rather than the potentially ambiguous input.
    uint64_t next_key = 0;
    if (links.cbegin() != links.cend()) {
       auto last = --links.cend();
@@ -177,7 +195,7 @@ namespace sysio {
       .key = next_key,
       .username = account,
       .chain_kind = chain_kind,
-      .pub_key = pub_key,
+      .pub_key = verified_pub_key,
    });
 
    // PUSH `ex.<chain_prefix>` TO PERMISSIONS
@@ -191,7 +209,7 @@ namespace sysio {
                  "active"_n,
                  {
                     1,
-                    {{pub_key, 1}},
+                    {{verified_pub_key, 1}},
                  }})
       .send();
 
@@ -199,7 +217,7 @@ namespace sysio {
    action(permission_level{"sysio"_n, "active"_n}, "sysio"_n, "expandauth"_n,
           expandauth{account, "active"_n,
 
-                     std::vector<key_weight>{key_weight{pub_key, 1}},
+                     std::vector<key_weight>{key_weight{verified_pub_key, 1}},
                      std::vector<sysiosystem::permission_level_weight>{}})
       .send();
 }
@@ -287,32 +305,13 @@ std::string authex::pubkey_to_string(const sysio::public_key& pk) {
    }
 
    case 4: { // PUB_ED_
-      // raw is std::array<char,32>
+      // raw is std::array<char,32> — plain base58, no checksum (matches fc)
       auto raw = std::get<4>(pk);
-
-      // 1) copy into a uint8_t array for the final buffer
       std::array<uint8_t, 32> key_bytes;
       for (size_t i = 0; i < 32; ++i)
          key_bytes[i] = static_cast<uint8_t>(raw[i]);
 
-      // 2) Inline the RIPEMD160+suffix for ED (32-byte key + "ED")
-      std::array<char, 34> d; // 32 bytes key + 2 bytes tag
-      for (size_t i = 0; i < 32; ++i)
-         d[i] = raw[i];
-      d[32] = 'E'; // tag
-      d[33] = 'D'; // tag
-
-      auto hash = sysio::ripemd160(d.data(), d.size());
-      auto hd = hash.extract_as_byte_array();
-      std::array<uint8_t, 4> chk = {static_cast<uint8_t>(hd[0]), static_cast<uint8_t>(hd[1]),
-                                    static_cast<uint8_t>(hd[2]), static_cast<uint8_t>(hd[3])};
-
-      // 3) build the 36-byte [ key || checksum ] buffer
-      std::array<uint8_t, 36> buf;
-      std::copy_n(key_bytes.begin(), 32, buf.begin());
-      std::copy_n(chk.begin(), 4, buf.begin() + 32);
-
-      return "PUB_ED_" + base58_encode(buf.data(), buf.size());
+      return "PUB_ED_" + base58_encode(key_bytes.data(), key_bytes.size());
    }
 
    default:

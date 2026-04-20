@@ -135,8 +135,11 @@ idl_type idl_type::from_variant(const fc::variant& v) {
       auto obj = v.get_object();
 
       // Check for defined type
+      // IDL v1: "defined": "TypeName" (string)
+      // IDL v2: "defined": {"name": "TypeName"} (object)
       if (obj.contains("defined")) {
-         return make_defined(obj["defined"].as_string());
+         const auto& defined_val = obj["defined"];
+         return make_defined(defined_val.is_string() ? defined_val.as_string() : defined_val["name"].as_string());
       }
       // Check for Option<T>
       if (obj.contains("option")) {
@@ -264,7 +267,7 @@ instruction_account parse_instruction_account(const fc::variant& v) {
       }
    }
    if (obj.contains("address") && !obj["address"].is_null()) {
-      acct.address = solana_public_key::from_base58(obj["address"].as_string());
+      acct.address = solana_public_key::from_base58_string(obj["address"].as_string());
    }
    if (obj.contains("pda") && !obj["pda"].is_null()) {
       auto pda = obj["pda"].get_object();
@@ -466,11 +469,15 @@ program parse_idl(const fc::variant& json) {
    program prog;
    auto obj = json.get_object();
 
-   // Parse name and version
+   // IDL v1: top-level "name"/"version". IDL v2: only "metadata.name"/"metadata.version".
    if (obj.contains("name"))
       prog.name = obj["name"].as_string();
+   else if (obj.contains("metadata") && obj["metadata"].get_object().contains("name"))
+      prog.name = obj["metadata"]["name"].as_string();
    if (obj.contains("version"))
       prog.version = obj["version"].as_string();
+   else if (obj.contains("metadata") && obj["metadata"].get_object().contains("version"))
+      prog.version = obj["metadata"]["version"].as_string();
 
    // Parse instructions
    if (obj.contains("instructions")) {

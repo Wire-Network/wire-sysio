@@ -724,7 +724,7 @@ int32_t apply_context::kv_contains(uint16_t table_id, name code, const char* key
 // --- Primary KV iterators ---
 
 uint32_t apply_context::kv_it_create(uint16_t table_id, name code, const char* prefix, uint32_t prefix_size) {
-   uint32_t handle = kv_iterators.allocate_primary(table_id, code, prefix, prefix_size);
+   const uint32_t handle = kv_iterators.allocate_primary(table_id, code, prefix, prefix_size);
    auto& slot = kv_iterators.get(handle);
 
    // Seek to first entry matching prefix
@@ -1051,7 +1051,7 @@ int32_t apply_context::kv_idx_find_secondary(name code, uint16_t table_id,
       return -1; // not found — no iterator slot allocated
    }
 
-   uint32_t handle = kv_iterators.allocate_secondary(code, table_id);
+   const uint32_t handle = kv_iterators.allocate_secondary(code, table_id);
    auto& slot = kv_iterators.get(handle);
    slot.status = kv_it_stat::iterator_ok;
    slot.current_sec_key.assign(itr->sec_key.data(), itr->sec_key.data() + itr->sec_key.size());
@@ -1069,7 +1069,7 @@ int32_t apply_context::kv_idx_lower_bound(name code, uint16_t table_id,
    if (itr == idx.end() || itr->code != code || itr->table_id != table_id) {
       auto first = idx.lower_bound(boost::make_tuple(code, table_id));
       if (first != idx.end() && first->code == code && first->table_id == table_id) {
-         uint32_t handle = kv_iterators.allocate_secondary(code, table_id);
+         const uint32_t handle = kv_iterators.allocate_secondary(code, table_id);
          auto& slot = kv_iterators.get(handle);
          slot.status = kv_it_stat::iterator_end;
          return static_cast<int32_t>(handle);
@@ -1077,7 +1077,7 @@ int32_t apply_context::kv_idx_lower_bound(name code, uint16_t table_id,
       return -1;
    }
 
-   uint32_t handle = kv_iterators.allocate_secondary(code, table_id);
+   const uint32_t handle = kv_iterators.allocate_secondary(code, table_id);
    auto& slot = kv_iterators.get(handle);
    slot.status = kv_it_stat::iterator_ok;
    slot.current_sec_key.assign(itr->sec_key.data(), itr->sec_key.data() + itr->sec_key.size());
