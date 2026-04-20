@@ -149,7 +149,7 @@ auto frequent = parse_cron_schedule("*/30000 * * * * *");
 ## Integration with Beacon Chain Update Plugin
 
 ```cpp
-void beacon_chain_update_plugin::plugin_startup() {
+void wire_eth_maintenance_plugin::plugin_startup() {
     // Parse schedule from config string
     std::string schedule_str = "0 */6 * * *"; // Every 6 hours
 
