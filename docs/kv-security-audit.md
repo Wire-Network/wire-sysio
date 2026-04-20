@@ -364,11 +364,11 @@ was once missing; our KV API prevents the bug by design.
 The `kv_erase` intrinsic removes only the `kv_object` row. Any `kv_index_object`
 rows referencing the same primary key must be removed separately via `kv_idx_remove`.
 
-**Status: Not a bug.** This is the same pattern as legacy `multi_index` where the
-CDT wrapper calls `remove_secondaries()` before `db_remove_i64`. The host provides
-primitives; the CDT library orchestrates cleanup. A contract calling raw `kv_erase`
-without `kv_idx_remove` would leave orphaned secondaries, but that is a contract
-bug, not a host bug.
+**Status: Not a bug.** The host provides primitives; the CDT library orchestrates
+cleanup by calling `kv_erase` first (to obtain `primary_id`) and then
+`kv_idx_remove` for each secondary index with that id. A contract calling raw
+`kv_erase` without following up with `kv_idx_remove` would leave orphaned
+secondaries, but that is a contract bug, not a host bug.
 
 **File:** `libraries/chain/apply_context.cpp` (kv_erase function)
 
