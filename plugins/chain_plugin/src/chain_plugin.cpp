@@ -1815,14 +1815,21 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
       // Secondary rows reference the primary row directly by chainbase id, so
       // the full primary key (including any scope prefix) is available from
       // the kv_object via a single by_id lookup.
+      // kv_idx_store guarantees every sec row references an existing primary
+      // with matching code, so a missing primary here signals a state
+      // inconsistency (bug, hostile snapshot, or chainbase invariant
+      // violation). Surface it to the RPC caller rather than silently
+      // returning an empty row.
       auto fetch_primary = [&](const chain::kv_index_object& sec_obj) -> raw_row {
-         raw_row r;
          const auto* primary = d.find<chain::kv_object>(sec_obj.primary_id);
-         if (primary) {
-            r.key.assign(primary->key.data(), primary->key.data() + primary->key.size());
-            r.value.assign(primary->value.data(), primary->value.data() + primary->value.size());
-            r.payer = primary->payer;
-         }
+         SYS_ASSERT(primary != nullptr, chain::contract_table_query_exception,
+                    "kv_index_object at sec_tid={} sec_key_size={} references primary_id={} "
+                    "that does not exist for code={}",
+                    sec_obj.table_id, sec_obj.sec_key.size(), sec_obj.primary_id._id, p.code);
+         raw_row r;
+         r.key.assign(primary->key.data(), primary->key.data() + primary->key.size());
+         r.value.assign(primary->value.data(), primary->value.data() + primary->value.size());
+         r.payer = primary->payer;
          return r;
       };
 

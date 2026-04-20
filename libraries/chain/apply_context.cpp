@@ -929,6 +929,11 @@ int32_t apply_context::kv_it_key(uint32_t handle, uint32_t offset, char* dest, u
    return static_cast<int32_t>(kv_it_stat::iterator_ok);
 }
 
+// Read the value at a primary OR secondary iterator's current position.
+// For primary iters, the value comes from the kv_object the iter is positioned
+// on. For secondary iters, the value comes from the kv_object referenced by
+// the slot's cached primary_id — a by_id lookup that avoids kv_get's
+// by_code_key walk.
 int32_t apply_context::kv_it_value(uint32_t handle, uint32_t offset, char* dest, uint32_t dest_size, uint32_t& actual_size) {
    auto& slot = kv_iterators.get(handle);
 
@@ -941,9 +946,6 @@ int32_t apply_context::kv_it_value(uint32_t handle, uint32_t offset, char* dest,
    if (slot.is_primary) {
       obj = find_current_primary(db, slot);
    } else {
-      // Secondary iterator: resolve the referenced primary kv_object via the
-      // cached primary_id (O(1) by_id lookup). This lets contracts fetch the
-      // value directly from a secondary iterator without a separate kv_get call.
       if (slot.primary_id < 0) {
          slot.status = kv_it_stat::iterator_erased;
          actual_size = 0;
@@ -1010,7 +1012,9 @@ void apply_context::kv_idx_remove(uint16_t table_id, int64_t primary_id,
    const auto& idx = db.get_index<kv_index_index, by_code_table_id_seckey>();
    auto itr = idx.find(boost::make_tuple(receiver, table_id, sv_sec, kv_object::id_type(primary_id)));
 
-   SYS_ASSERT( itr != idx.end(), kv_key_not_found, "KV secondary index entry not found for remove" );
+   SYS_ASSERT( itr != idx.end(), kv_key_not_found,
+               "KV secondary index entry not found for remove (table_id={}, primary_id={}, sec_key_size={})",
+               table_id, primary_id, sec_key_size );
 
    int64_t delta = -kv_index_object_ram(*itr);
    update_db_usage(itr->payer, delta);
@@ -1030,7 +1034,9 @@ void apply_context::kv_idx_update(uint64_t payer_val, uint16_t table_id, int64_t
    const auto& idx = db.get_index<kv_index_index, by_code_table_id_seckey>();
    auto itr = idx.find(boost::make_tuple(receiver, table_id, sv_old_sec, kv_object::id_type(primary_id)));
 
-   SYS_ASSERT( itr != idx.end(), kv_key_not_found, "KV secondary index entry not found for update" );
+   SYS_ASSERT( itr != idx.end(), kv_key_not_found,
+               "KV secondary index entry not found for update (table_id={}, primary_id={}, old_sec_key_size={})",
+               table_id, primary_id, old_sec_key_size );
 
    account_name payer = (payer_val == 0) ? receiver : account_name(payer_val);
    account_name old_payer = itr->payer;
@@ -1076,7 +1082,7 @@ int32_t apply_context::kv_idx_find_secondary(name code, uint16_t table_id,
    slot.status = kv_it_stat::iterator_ok;
    slot.current_sec_key.assign(itr->sec_key.data(), itr->sec_key.data() + itr->sec_key.size());
    slot.cached_id = itr->id._id;
-   slot.primary_id = static_cast<int64_t>(itr->primary_id._id);
+   slot.primary_id = itr->primary_id._id;
    return static_cast<int32_t>(handle);
 }
 
@@ -1111,7 +1117,7 @@ int32_t apply_context::kv_idx_lower_bound(name code, uint16_t table_id,
    slot.status = kv_it_stat::iterator_ok;
    slot.current_sec_key.assign(itr->sec_key.data(), itr->sec_key.data() + itr->sec_key.size());
    slot.cached_id = itr->id._id;
-   slot.primary_id = static_cast<int64_t>(itr->primary_id._id);
+   slot.primary_id = itr->primary_id._id;
    return static_cast<int32_t>(handle);
 }
 
@@ -1134,11 +1140,17 @@ int32_t apply_context::kv_idx_next(uint32_t handle) {
          advanced = true;
       }
    }
-   // Slow path: re-seek by (sec_key, primary_id) composite after slot cache invalidation.
+   // Slow path: re-seek by (sec_key, primary_id) composite after slot cache
+   // invalidation. A negative primary_id with status == iterator_ok is an
+   // internally-inconsistent slot — should be unreachable through the
+   // normal allocate/advance lifecycle; abort rather than synthesize a
+   // re-seek tuple from garbage.
    if (!advanced) {
+      SYS_ASSERT(slot.primary_id >= 0, kv_invalid_iterator,
+                 "kv_idx_next: slot has iterator_ok status but no primary_id");
       auto sv_sec = to_sv(slot.current_sec_key.data(), slot.current_sec_key.size());
       itr = idx.lower_bound(boost::make_tuple(slot.code, slot.table_id, sv_sec,
-                                              kv_object::id_type(slot.primary_id < 0 ? 0 : slot.primary_id)));
+                                              kv_object::id_type(slot.primary_id)));
    }
 
    if (itr != idx.end() && itr->code == slot.code && itr->table_id == slot.table_id) {
@@ -1146,7 +1158,7 @@ int32_t apply_context::kv_idx_next(uint32_t handle) {
       slot.current_sec_key.assign(itr->sec_key.data(), itr->sec_key.data() + itr->sec_key.size());
       slot.current_pri_key.clear(); // lazy cache; populated by kv_idx_primary_key on demand
       slot.cached_id = itr->id._id;
-      slot.primary_id = static_cast<int64_t>(itr->primary_id._id);
+      slot.primary_id = itr->primary_id._id;
    } else {
       slot.status = kv_it_stat::iterator_end;
       slot.current_sec_key.clear();
@@ -1177,7 +1189,7 @@ int32_t apply_context::kv_idx_prev(uint32_t handle) {
          slot.current_sec_key.assign(itr->sec_key.data(), itr->sec_key.data() + itr->sec_key.size());
          slot.current_pri_key.clear();
          slot.cached_id = itr->id._id;
-         slot.primary_id = static_cast<int64_t>(itr->primary_id._id);
+         slot.primary_id = itr->primary_id._id;
       } else {
          slot.cached_id = -1;
          slot.primary_id = -1;
@@ -1194,9 +1206,15 @@ int32_t apply_context::kv_idx_prev(uint32_t handle) {
          }
       }
       if (!found_current) {
+         // A negative primary_id with status != iterator_end is an
+         // internally-inconsistent slot — should be unreachable through
+         // the normal allocate/advance lifecycle; abort rather than
+         // synthesize a re-seek from garbage.
+         SYS_ASSERT(slot.primary_id >= 0, kv_invalid_iterator,
+                    "kv_idx_prev: slot has iterator_ok status but no primary_id");
          auto sv_sec = to_sv(slot.current_sec_key.data(), slot.current_sec_key.size());
          itr = idx.lower_bound(boost::make_tuple(slot.code, slot.table_id, sv_sec,
-                                                 kv_object::id_type(slot.primary_id < 0 ? 0 : slot.primary_id)));
+                                                 kv_object::id_type(slot.primary_id)));
       }
 
       if (itr == idx.begin()) {
@@ -1214,7 +1232,7 @@ int32_t apply_context::kv_idx_prev(uint32_t handle) {
          slot.current_sec_key.assign(itr->sec_key.data(), itr->sec_key.data() + itr->sec_key.size());
          slot.current_pri_key.clear();
          slot.cached_id = itr->id._id;
-         slot.primary_id = static_cast<int64_t>(itr->primary_id._id);
+         slot.primary_id = itr->primary_id._id;
       } else {
          slot.status = kv_it_stat::iterator_end;
          slot.current_sec_key.clear();

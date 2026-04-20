@@ -44,7 +44,7 @@ pays for those bytes once in the `kv_object`, not again on every
 - **multi_index:** Primary key `[scope:8B][pk:8B]` = 16 bytes. Secondary index
   entries store `sec_key = [scope:8B][secondary_value]` so that secondary
   iteration is naturally scoped; the referenced primary is looked up via
-  `primary_id` (an O(1) by_id hash hop on the host).
+  `primary_id` (a by_id lookup on the host).
 
 - **kv::table:** Contract-defined key structs, BE-encoded for correct sort order.
   Key size is controlled by the contract. A uint64 primary key is just 8 bytes.

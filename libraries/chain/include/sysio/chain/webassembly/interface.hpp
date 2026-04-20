@@ -913,7 +913,7 @@ namespace webassembly {
           * Read the value at the iterator's current position. Accepts both
           * primary and secondary iterator handles; for secondary iterators the
           * value is fetched from the referenced primary kv_object via its
-          * cached primary_id (O(1) by_id lookup), so contracts can read values
+          * cached primary_id (by_id lookup), so contracts can read values
           * directly from a secondary iterator without a separate kv_get call.
           *
           * @param handle - iterator handle (must be status 0)

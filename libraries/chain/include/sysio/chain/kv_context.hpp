@@ -43,6 +43,9 @@ struct kv_iterator_slot {
    // secondary row, used for pri_key/value materialization and as the
    // composite-key tiebreaker for re-seeking after invalidation.
    // -1 when not at a valid secondary position.
+   // Invariant: when status == iterator_ok, primary_id >= 0. The slow-path
+   // re-seek in kv_idx_next/kv_idx_prev asserts this to catch an
+   // internally-inconsistent slot rather than synthesize garbage.
    int64_t           primary_id = -1;
 };
 
