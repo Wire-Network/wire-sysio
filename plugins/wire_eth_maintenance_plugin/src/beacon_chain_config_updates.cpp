@@ -97,18 +97,20 @@ void beacon_chain_config_updates::operator()() const {
          }
       }
 
-      ilog("beacon_chain_config_updates: fetching APY data");
-      auto ethstore = deps_.fetch_apy();
-      ilog("ethstore: {}", fc::json::to_string(ethstore, fc::time_point::maximum()));
+      if (deps_.send_update_apy_bps) {
+         ilog("beacon_chain_config_updates: fetching APY data");
+         auto ethstore = deps_.fetch_apy();
+         ilog("ethstore: {}", fc::json::to_string(ethstore, fc::time_point::maximum()));
 
-      auto a = compute_apy_updates(ethstore);
+         auto a = compute_apy_updates(ethstore);
 
-      if (a.apy_bps && deps_.send_update_apy_bps) {
-         ilog("Sending updateApyBPS({} bps)", *a.apy_bps);
-         auto hash = deps_.send_update_apy_bps(*a.apy_bps);
-         if (!hash.empty()) {
-            ilog("updateApyBPS tx sent, hash: {}", hash);
-            pending.push_back({"updateApyBPS", std::move(hash)});
+         if (a.apy_bps) {
+            ilog("Sending updateApyBPS({} bps)", *a.apy_bps);
+            auto hash = deps_.send_update_apy_bps(*a.apy_bps);
+            if (!hash.empty()) {
+               ilog("updateApyBPS tx sent, hash: {}", hash);
+               pending.push_back({"updateApyBPS", std::move(hash)});
+            }
          }
       }
 

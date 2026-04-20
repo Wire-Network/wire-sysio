@@ -83,7 +83,7 @@ namespace {
    constexpr auto beacon_chain_exit_buffer_days         = "beacon-chain-exit-buffer-days";
 
    constexpr auto client_target_chain                   = fc::crypto::chain_kind_t::chain_kind_ethereum;
-   constexpr auto default_interval_schedule             = "0 * * * *"; // every hour at :00
+   constexpr auto default_interval_schedule             = "* */1 * * *"; // every hour
    constexpr auto default_interval_name                 = "default";
    constexpr auto just_once_interval_name               = "once";
 
@@ -119,54 +119,69 @@ namespace {
 
       ssl_ctx.set_default_verify_paths();
 
-      http::request<http::string_body> req{method, path, 11};
-      req.set(http::field::host, host);
-      req.set(http::field::content_type, "application/json");
-      if (method == boost::beast::http::verb::post)
-         req.set(http::field::authorization, "Bearer " + api_key);
-      if (!request_body.empty())
-         req.body() = request_body;
-      req.prepare_payload();
+      uint retry = 0;
+      bool valid = false;
+      while(true) {
 
-      beast::ssl_stream<beast::tcp_stream> stream(ioc, ssl_ctx);
-      stream.set_verify_mode(asio::ssl::verify_peer);
-      stream.set_verify_callback(asio::ssl::host_name_verification(host));
-      if (!SSL_set_tlsext_host_name(stream.native_handle(), host.c_str()))
-         throw beast::system_error(beast::error_code(static_cast<int>(::ERR_get_error()),
-                                                     asio::error::get_ssl_category()));
+         http::request<http::string_body> req{method, path, 11};
+         req.set(http::field::host, host);
+         req.set(http::field::content_type, "application/json");
+         if (method == boost::beast::http::verb::post)
+            req.set(http::field::authorization, "Bearer " + api_key);
+         if (!request_body.empty())
+            req.body() = request_body;
+         req.prepare_payload();
 
-      beast::get_lowest_layer(stream).expires_after(timeout);
-      beast::get_lowest_layer(stream).connect(dest);
-      stream.handshake(asio::ssl::stream_base::client);
-      http::write(stream, req);
+         beast::ssl_stream<beast::tcp_stream> stream(ioc, ssl_ctx);
+         stream.set_verify_mode(asio::ssl::verify_peer);
+         stream.set_verify_callback(asio::ssl::host_name_verification(host));
+         if (!SSL_set_tlsext_host_name(stream.native_handle(), host.c_str()))
+            throw beast::system_error(beast::error_code(static_cast<int>(::ERR_get_error()),
+                                                      asio::error::get_ssl_category()));
 
-      beast::flat_buffer                        buffer;
-      http::response_parser<http::string_body>  parser;
-      parser.body_limit(8ull * 1024 * 1024); // 8 MiB cap on response body
-      http::read(stream, buffer, parser);
-      auto& res = parser.get();
+         beast::get_lowest_layer(stream).expires_after(timeout);
+         beast::get_lowest_layer(stream).connect(dest);
+         stream.handshake(asio::ssl::stream_base::client);
+         http::write(stream, req);
 
-      beast::error_code ec;
-      stream.shutdown(ec);
+         beast::flat_buffer                        buffer;
+         http::response_parser<http::string_body>  parser;
+         parser.body_limit(8ull * 1024 * 1024); // 8 MiB cap on response body
+         http::read(stream, buffer, parser);
+         auto& res = parser.get();
 
-      if (res.result() != http::status::ok) {
-         elog("https_request HTTP error: {} {}",
-              static_cast<unsigned>(res.result()),
-              std::string(res.reason()));
-         ilog("--- Http Header ---");
-         for (auto const& field : res.base()) {
-            ilog("Name: `{}` - Value: `{}`", field.name_string(), field.value());
+         beast::error_code ec;
+         stream.shutdown(ec);
+
+         uint64_t sec_sleep = 0;
+
+         valid = res.result() == http::status::ok;
+         if (valid) {
+            ilog("res.body=\n{}", res.body());
+            auto response = fc::json::from_string(res.body());
+            return response["data"];
          }
 
-         // Body
-         ilog("--- Http Body ---");
-         ilog("{}", res.body());
-         return {};
+         // if we already did one retry, then give up
+         if (retry > 0) {
+            return {};
+         }
+
+         for (auto const& field : res.base()) {
+            if (field.name_string() == "Retry-After:") {
+               const auto sec_sleep_str = field.value();
+               auto [ptr, ec] = std::from_chars(sec_sleep_str.data(), sec_sleep_str.data() + sec_sleep_str.size(), sec_sleep);
+               if (ec == std::errc() && ptr == sec_sleep_str.data() + sec_sleep_str.size()) {
+                  // identified a valid reason to retry
+                  valid = true;
+                  std::this_thread::sleep_for(std::chrono::milliseconds(sec_sleep * 1000));
+                  break;
+               }
+            }
+         }
+         ++retry;
       }
 
-      ilog("res.body=\n{}", res.body());
-      auto response = fc::json::from_string(res.body());
-      return response["data"];
    }
 
    fc::variant get_queues_network(const std::string& queue_url, const std::string& api_key,

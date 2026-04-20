@@ -1,6 +1,6 @@
 # Cranker
 
-`cranker` is a lightweight standalone executable that periodically fetches Ethereum beacon chain state from [beaconcha.in](https://beaconcha.in) and pushes updates into on-chain smart contracts. It runs the minimum set of plugins needed for this purpose — no full Wire node is required.
+`cranker` is a standalone executable that periodically fetches Ethereum beacon chain state from [beaconcha.in](https://beaconcha.in) and pushes updates into on-chain smart contracts. It builds on the same plugin infrastructure as `nodeop` but runs only the subset of plugins needed to crank -- no producer, net, or state-history work is performed.
 
 ## What it does
 
@@ -11,7 +11,7 @@ On each scheduled interval, `cranker`:
 3. **Updates APY** — Fetches the `avgapr7d` field from the beaconcha.in ethstore API and calls `DepositManager.updateApyBPS` with the value expressed in basis points.
 4. **Finalizes epochs** — Calls `OPP.finalizeEpoch` on a separate configurable interval.
 
-Each on-chain call is submitted via the `outpost_ethereum_client_plugin` and awaits block confirmation (up to 10 minutes) before proceeding to the next step.
+Each on-chain call is submitted via the `outpost_ethereum_client_plugin` and awaits block confirmation (up to 50 minutes: 600 retries at 5-second intervals) before proceeding to the next step.
 
 ## Minimum required configuration
 
@@ -20,6 +20,18 @@ Each on-chain call is submitted via the `outpost_ethereum_client_plugin` and awa
 3. At least one **ABI file** (`--ethereum-abi-file`) containing the relevant contract definitions
 4. A **contract addresses file** (`--beacon-chain-contracts-addrs`) mapping contract names to addresses
 5. A **beacon chain API key** (`--beacon-chain-api-key`) if queue/APY updates are enabled
+
+## Security considerations
+
+The cranker is a signing daemon that holds private keys and broadcasts signed Ethereum transactions. Treat it accordingly:
+
+- **Do not pass private keys on the command line.** Inline forms like `KEY:0x<privkey>` on an interactive shell or systemd `ExecStart=` line leak the key to `/proc/<pid>/cmdline`, shell history, `ps`/`htop` output, and the systemd journal. Prefer:
+  - A **config file** (`--config-dir=/etc/cranker`) with mode `0600` and owner restricted to the cranker user, specifying `signature-provider = ...` directives.
+  - Or a **`KIOD:` backend** (`KIOD:<wallet-url>:<public-key>`), which keeps the private key in a separate key daemon (`kiod`) that the cranker talks to over a local socket.
+- **Pin the chain-id** in every `--outpost-ethereum-client` spec (the optional 4th comma-separated field). An unpinned client trusts whatever chainId the RPC returns, which is a replay-attack surface if the RPC is compromised or misconfigured.
+- **Restrict RPC egress.** The signer only needs outbound access to its pinned RPC endpoint and to `beaconcha.in`. Close everything else at the firewall.
+- **Rotate the beacon-chain API key** if the cranker host is ever suspected compromised. The key is a third-party rate-limit token for a public explorer and its blast radius is small, but it is still a secret.
+- **Logs contain operator-identifiable metadata.** Treat the cranker's stdout/journal with the same sensitivity as an ordinary signer log pipeline.
 
 ## Configuration options
 
@@ -77,7 +89,7 @@ The cron expression supports the standard 5-field format (`minute hour day-of-mo
 | `0 */6 * * *` | Every 6 hours |
 | `0 0 * * *` | Daily at midnight |
 
-If no `--beacon-chain-interval` is provided, a single default interval named `default` is created with a schedule of `* */1 * * *` (every hour).
+If no `--beacon-chain-interval` is provided, a single default interval named `default` is created with a schedule of `0 * * * *` (every hour at :00).
 
 A built-in `once` interval is always available — it runs immediately on startup and does not repeat. This is the default for both `--beacon-chain-update-interval` and `--beacon-chain-finalize-epoch-interval` if not overridden.
 
