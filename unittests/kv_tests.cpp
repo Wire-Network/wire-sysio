@@ -203,20 +203,36 @@ BOOST_AUTO_TEST_CASE(kv_index_object_crud) {
 
    auto session = db.start_undo_session(true);
 
-   // Create secondary index entries with table_id
-   const uint16_t users_idx0 = compute_table_id("users.byname");
+   const uint16_t users_tid    = compute_table_id("users");
+   const uint16_t users_idx0   = compute_table_id("users.byname");
+
+   // kv_index_object references a primary row by chainbase id, so create the
+   // primary kv_objects first and thread their ids into the secondary rows.
+   const auto& alice_row = db.create<kv_object>([&](auto& o) {
+      o.code = "test"_n;
+      o.table_id = users_tid;
+      o.key.assign("\x00\x01", 2);
+      o.value.assign("alice_val", 9);
+   });
+   const auto& bob_row = db.create<kv_object>([&](auto& o) {
+      o.code = "test"_n;
+      o.table_id = users_tid;
+      o.key.assign("\x00\x02", 2);
+      o.value.assign("bob_val", 7);
+   });
+
    db.create<kv_index_object>([&](auto& o) {
       o.code = "test"_n;
       o.table_id = users_idx0;
       o.sec_key.assign("alice", 5);
-      o.pri_key.assign("\x00\x01", 2);
+      o.primary_id = alice_row.id;
    });
 
    db.create<kv_index_object>([&](auto& o) {
       o.code = "test"_n;
       o.table_id = users_idx0;
       o.sec_key.assign("bob", 3);
-      o.pri_key.assign("\x00\x02", 2);
+      o.primary_id = bob_row.id;
    });
 
    // Find by secondary key
@@ -225,11 +241,13 @@ BOOST_AUTO_TEST_CASE(kv_index_object_crud) {
       name("test"), users_idx0, std::string_view("alice", 5)));
    BOOST_REQUIRE(itr != sec_idx.end());
    BOOST_CHECK_EQUAL(std::string_view(itr->sec_key.data(), itr->sec_key.size()), "alice");
+   BOOST_CHECK(itr->primary_id == alice_row.id);
 
    // Verify ordering: alice < bob
    ++itr;
    BOOST_REQUIRE(itr != sec_idx.end());
    BOOST_CHECK_EQUAL(std::string_view(itr->sec_key.data(), itr->sec_key.size()), "bob");
+   BOOST_CHECK(itr->primary_id == bob_row.id);
 
    session.undo();
 }

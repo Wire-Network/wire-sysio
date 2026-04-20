@@ -42,6 +42,14 @@ static int64_t kv_put(uint64_t self, const void* key, uint32_t key_size,
    return kv_set(test_table_id, self, key, key_size, value, value_size);
 }
 
+// Insert a primary row with the given key bytes at test_table_id and return
+// its chainbase id. Secondary rows created via kv_idx_store must reference an
+// existing primary row by id.
+static int64_t insert_primary(uint64_t self, const void* pri, uint32_t pri_size) {
+   const char v[] = "v";
+   return kv_set(test_table_id, self, pri, pri_size, v, sizeof(v));
+}
+
 // ── Contract ───────────────────────────────────────────────────────────────────
 
 class [[sysio::contract("test_kv_api")]] test_kv_api : public contract {
@@ -370,7 +378,8 @@ public:
 
       const char sec[] = "alice";
       const char pri[] = {0x0D, 0x00, 0x01};
-      kv_idx_store(0, test_sec_table_id, pri, 3, sec, 5);
+      int64_t pid = insert_primary(self, pri, 3);
+      kv_idx_store(0, test_sec_table_id, pid, sec, 5);
 
       int32_t handle = kv_idx_find_secondary(self, test_sec_table_id, sec, 5);
       check(handle >= 0, "idx_store: find should succeed");
@@ -391,7 +400,8 @@ public:
 
       const char sec[] = "bob";
       const char pri[] = {0x0E, 0x00, 0x01};
-      kv_idx_store(0, sec_tid, pri, 3, sec, 3);
+      int64_t pid = insert_primary(self, pri, 3);
+      kv_idx_store(0, sec_tid, pid, sec, 3);
 
       // Verify it exists
       int32_t h = kv_idx_find_secondary(self, sec_tid, sec, 3);
@@ -400,7 +410,7 @@ public:
       kv_idx_destroy((uint32_t)h);
 
       // Remove
-      kv_idx_remove(sec_tid, pri, 3, sec, 3);
+      kv_idx_remove(sec_tid, pid, sec, 3);
 
       // lower_bound should not find it: returns -1 (no entry in range)
       int32_t h2 = kv_idx_lower_bound(self, sec_tid, sec, 3);
@@ -417,8 +427,9 @@ public:
       const char new_sec[] = "david";
       const char pri[] = {0x0F, 0x00, 0x01};
 
-      kv_idx_store(0, sec_tid, pri, 3, old_sec, 7);
-      kv_idx_update(0, sec_tid, pri, 3, old_sec, 7, new_sec, 5);
+      int64_t pid = insert_primary(self, pri, 3);
+      kv_idx_store(0, sec_tid, pid, old_sec, 7);
+      kv_idx_update(0, sec_tid, pid, old_sec, 7, new_sec, 5);
 
       // Find by new key
       int32_t h = kv_idx_find_secondary(self, sec_tid, new_sec, 5);
@@ -441,7 +452,8 @@ public:
       const char secs[][8] = {"alpha", "beta", "gamma"};
       for (int i = 0; i < 3; ++i) {
          char pri[3] = {0x10, 0x00, (char)(i + 1)};
-         kv_idx_store(0, sec_tid, pri, 3, secs[i], (uint32_t)strlen(secs[i]));
+         int64_t pid = insert_primary(self, pri, 3);
+         kv_idx_store(0, sec_tid, pid, secs[i], (uint32_t)strlen(secs[i]));
       }
 
       // Find "beta"
@@ -468,7 +480,8 @@ public:
          sec[1] = '0';
          sec[2] = '\0';
          char pri[3] = {0x11, 0x00, (char)i};
-         kv_idx_store(0, sec_tid, pri, 3, sec, 2);
+         int64_t pid = insert_primary(self, pri, 3);
+         kv_idx_store(0, sec_tid, pid, sec, 2);
       }
 
       // lower_bound("15") should land on "20"
@@ -491,7 +504,8 @@ public:
       const char secs[][4] = {"aaa", "bbb", "ccc"};
       for (int i = 0; i < 3; ++i) {
          char pri[3] = {0x12, 0x00, (char)(i + 1)};
-         kv_idx_store(0, sec_tid, pri, 3, secs[i], 3);
+         int64_t pid = insert_primary(self, pri, 3);
+         kv_idx_store(0, sec_tid, pid, secs[i], 3);
       }
 
       int32_t h = kv_idx_lower_bound(self, sec_tid, "aaa", 3);
@@ -517,7 +531,8 @@ public:
       const char secs[][4] = {"xxx", "yyy", "zzz"};
       for (int i = 0; i < 3; ++i) {
          char pri[3] = {0x13, 0x00, (char)(i + 1)};
-         kv_idx_store(0, sec_tid, pri, 3, secs[i], 3);
+         int64_t pid = insert_primary(self, pri, 3);
+         kv_idx_store(0, sec_tid, pid, secs[i], 3);
       }
 
       // Find "zzz", then prev to "yyy"
@@ -542,7 +557,8 @@ public:
 
       const char sec[] = "seckey_data";
       const char pri[] = {0x14, 0x00, 0x01};
-      kv_idx_store(0, sec_tid, pri, 3, sec, 11);
+      int64_t pid = insert_primary(self, pri, 3);
+      kv_idx_store(0, sec_tid, pid, sec, 11);
 
       int32_t h = kv_idx_find_secondary(self, sec_tid, sec, 11);
       check(h >= 0, "idx_key: find should succeed");
@@ -565,7 +581,8 @@ public:
       char pri[9];
       pri[0] = 0x15;
       encode_u64(12345, pri + 1);
-      kv_idx_store(0, sec_tid, pri, 9, sec, 6);
+      int64_t pid = insert_primary(self, pri, 9);
+      kv_idx_store(0, sec_tid, pid, sec, 6);
 
       int32_t h = kv_idx_find_secondary(self, sec_tid, sec, 6);
       check(h >= 0, "idx_prikey: find should succeed");
@@ -890,14 +907,14 @@ public:
       check(memcmp(buf, val, sizeof(val)) == 0, "writeperm: data mismatch");
    }
 
-   // ─── 34. testpayer: kv_set with explicit self payer, verify delta ────────
+   // ─── 34. testpayer: kv_set with explicit self payer, verify primary_id ───
    [[sysio::action]]
    void testpayer() {
       uint64_t self = get_self().value;
-      // Payer = self via kv_put helper
+      // Payer = self via kv_put helper — kv_set now returns primary_id (>= 0).
       const char k1[] = {0x29, 0x00, 0x01};
-      int64_t d1 = kv_put(self, k1, sizeof(k1), "p1", 2);
-      check(d1 > 0, "payer: create delta should be positive");
+      int64_t id1 = kv_put(self, k1, sizeof(k1), "p1", 2);
+      check(id1 >= 0, "payer: create should return a valid primary_id");
 
       char buf[16];
       int32_t sz = kv_get(test_table_id, self, k1, sizeof(k1), buf, sizeof(buf));
@@ -905,15 +922,16 @@ public:
 
       // Payer = self via explicit kv_set
       const char k2[] = {0x29, 0x00, 0x02};
-      int64_t d2 = kv_set(test_table_id, self, k2, sizeof(k2), "p2val", 5);
-      check(d2 > 0, "payer: explicit self payer delta should be positive");
+      int64_t id2 = kv_set(test_table_id, self, k2, sizeof(k2), "p2val", 5);
+      check(id2 >= 0, "payer: explicit self payer should return primary_id");
+      check(id2 != id1, "payer: separate keys get distinct primary_ids");
 
       sz = kv_get(test_table_id, self, k2, sizeof(k2), buf, sizeof(buf));
       check(sz == 5, "payer: explicit payer read size");
 
-      // Update with smaller value — delta should be negative
-      int64_t d3 = kv_set(test_table_id, self, k2, sizeof(k2), "x", 1);
-      check(d3 < 0, "payer: shrink delta should be negative");
+      // Updating an existing row returns the SAME primary_id as the original insert.
+      int64_t id2_again = kv_set(test_table_id, self, k2, sizeof(k2), "x", 1);
+      check(id2_again == id2, "payer: update should return same primary_id");
    }
 
    // ─── 35. testmaxkey: kv_set with exactly max_kv_key_size (256 bytes) ─────
@@ -1054,10 +1072,12 @@ public:
       static constexpr uint32_t sec_tid_loc  = 202;
       const char pri[] = {0x32, 0x00, 0x01};
 
-      // Store 3 different secondary keys on 3 different table_ids
-      kv_idx_store(0, sec_tid_name, pri, 3, "name_alice", 10);
-      kv_idx_store(0, sec_tid_age,  pri, 3, "age_30", 6);
-      kv_idx_store(0, sec_tid_loc,  pri, 3, "loc_nyc", 7);
+      // Store 3 different secondary keys on 3 different table_ids, all
+      // referencing the same primary row.
+      int64_t pid = insert_primary(self, pri, 3);
+      kv_idx_store(0, sec_tid_name, pid, "name_alice", 10);
+      kv_idx_store(0, sec_tid_age,  pid, "age_30", 6);
+      kv_idx_store(0, sec_tid_loc,  pid, "loc_nyc", 7);
 
       // Find on each index independently
       int32_t h0 = kv_idx_find_secondary(self, sec_tid_name, "name_alice", 10);
@@ -1090,7 +1110,8 @@ public:
       // 3 rows with same secondary key "shared"
       for (int i = 0; i < 3; ++i) {
          char pri[3] = {0x33, 0x00, (char)(i + 1)};
-         kv_idx_store(0, sec_tid, pri, 3, "shared", 6);
+         int64_t pid = insert_primary(self, pri, 3);
+         kv_idx_store(0, sec_tid, pid, "shared", 6);
       }
 
       // lower_bound on "shared", iterate, count all
@@ -1120,7 +1141,8 @@ public:
       for (int i = 0; i < 5; ++i) {
          char sec[1] = {(char)('a' + i)};
          char pri[3] = {0x34, 0x00, (char)(i + 1)};
-         kv_idx_store(0, sec_tid, pri, 3, sec, 1);
+         int64_t pid = insert_primary(self, pri, 3);
+         kv_idx_store(0, sec_tid, pid, sec, 1);
       }
 
       // Range [b, d]: lower_bound("b"), iterate while sec_key <= "d"
@@ -1886,7 +1908,9 @@ public:
       char sec_key[257];
       memset(sec_key, 'A', sizeof(sec_key));
       char pri_key[] = {0x01};
-      kv_idx_store(0, test_sec_table_id, pri_key, sizeof(pri_key), sec_key, sizeof(sec_key));
+      uint64_t self = get_self().value;
+      int64_t pid = insert_primary(self, pri_key, sizeof(pri_key));
+      kv_idx_store(0, test_sec_table_id, pid, sec_key, sizeof(sec_key));
    }
 
    // ─── tstnotifyram: write in notification context bills receiver's RAM ─────
@@ -2015,16 +2039,15 @@ public:
    // secondary index RAM billing.
    [[sysio::action]]
    void tstidxpayer(sysio::name payer) {
-      // Primary row: 4-byte key, 10-byte value
+      // Primary row: 4-byte key, 10-byte value. Capture primary_id for the sec ref.
       char pk[] = {0x50, 0x41, 0x59, 0x01};  // "PAY\x01"
       char val[] = "idxpayerv1";
-      kv_set(test_table_id, payer.value, pk, sizeof(pk), val, sizeof(val));
+      int64_t pid = kv_set(test_table_id, payer.value, pk, sizeof(pk), val, sizeof(val));
 
-      // Secondary index: 8-byte sec key, 4-byte pri key
+      // Secondary index: 8-byte sec key; references the primary by id.
       static constexpr uint32_t sec_tid = 112;
       char sec_key[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x42};
-      kv_idx_store(payer.value, sec_tid,
-                   pk, sizeof(pk), sec_key, sizeof(sec_key));
+      kv_idx_store(payer.value, sec_tid, pid, sec_key, sizeof(sec_key));
    }
 
    // ═══════════════════════════════════════════════════════════════════════════

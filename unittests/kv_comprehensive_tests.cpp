@@ -330,15 +330,24 @@ BOOST_AUTO_TEST_CASE(kv_secondary_index_ordering) {
       return std::string(buf, 8);
    };
 
+   // Create matching primary rows so each secondary row references a real
+   // kv_object via its chainbase id.
+   const uint16_t pri_tid = compute_table_id("mytable");
    std::vector<std::pair<uint64_t, uint64_t>> entries = {{50, 1}, {10, 2}, {90, 3}, {30, 4}};
    for (auto& [sec, pri] : entries) {
       auto sk = make_sec(sec);
       auto pk = make_pri(pri);
+      const auto& primary = db.create<kv_object>([&](auto& o) {
+         o.code = "sectest"_n;
+         o.table_id = pri_tid;
+         o.key.assign(pk.data(), pk.size());
+         o.value.assign("v", 1);
+      });
       db.create<kv_index_object>([&](auto& o) {
          o.code = "sectest"_n;
          o.table_id = compute_table_id("mytable.idx0");
          o.sec_key.assign(sk.data(), sk.size());
-         o.pri_key.assign(pk.data(), pk.size());
+         o.primary_id = primary.id;
       });
    }
 
@@ -537,22 +546,29 @@ BOOST_AUTO_TEST_CASE(kv_secondary_index_lookup_by_table_id) {
    const uint16_t pri_tid = chain::compute_table_id("users"_n.to_uint64_t());
    const uint16_t sec_tid = chain::compute_sec_table_id("users"_n.to_uint64_t(), "byowner"_n.to_uint64_t());
 
-   // Insert primary rows: key=[id:8B BE], value=some data
+   // Insert primary rows and remember their chainbase ids so secondary entries
+   // can reference them via primary_id.
    auto make_pri_key = [](uint64_t id) {
       char buf[8]; chain::kv_encode_be64(buf, id); return std::string(buf, 8);
    };
 
+   std::vector<std::pair<uint64_t, kv_object::id_type>> primary_id_by_row_id;
+   auto pri_id_for = [&](uint64_t row_id) {
+      for (auto& [k, v] : primary_id_by_row_id) if (k == row_id) return v;
+      BOOST_FAIL("primary row not created"); return kv_object::id_type{};
+   };
    for (uint64_t id : {1, 2, 3}) {
       auto pk = make_pri_key(id);
-      db.create<kv_object>([&](auto& o) {
+      const auto& primary = db.create<kv_object>([&](auto& o) {
          o.code = "mycontract"_n;
          o.table_id = pri_tid;
          o.key.assign(pk.data(), pk.size());
          o.value.assign("data", 4);
       });
+      primary_id_by_row_id.emplace_back(id, primary.id);
    }
 
-   // Insert secondary index entries: sec_key=[owner:8B BE], pri_key=[id:8B BE]
+   // Insert secondary index entries: sec_key=[owner:8B BE], primary_id references the kv_object
    auto make_owner_key = [](name owner) {
       char buf[8]; chain::kv_encode_be64(buf, owner.to_uint64_t()); return std::string(buf, 8);
    };
@@ -561,12 +577,11 @@ BOOST_AUTO_TEST_CASE(kv_secondary_index_lookup_by_table_id) {
    std::vector<sec_entry> entries = {{1, "alice"_n}, {2, "bob"_n}, {3, "alice"_n}};
    for (auto& e : entries) {
       auto sk = make_owner_key(e.owner);
-      auto pk = make_pri_key(e.id);
       db.create<kv_index_object>([&](auto& o) {
          o.code = "mycontract"_n;
          o.table_id = sec_tid;
          o.sec_key.assign(sk.data(), sk.size());
-         o.pri_key.assign(pk.data(), pk.size());
+         o.primary_id = pri_id_for(e.id);
       });
    }
 
@@ -580,18 +595,128 @@ BOOST_AUTO_TEST_CASE(kv_secondary_index_lookup_by_table_id) {
    std::vector<uint64_t> found_ids;
    while (itr != sec_idx.end() && itr->code == "mycontract"_n && itr->table_id == sec_tid) {
       if (itr->sec_key_view() != alice_sv) break;
-      // Look up primary row using raw pri_key bytes
-      auto pri_sv = itr->pri_key_view();
-      const auto& pri_idx = db.get_index<kv_index, by_code_key>();
-      auto pri_itr = pri_idx.find(boost::make_tuple("mycontract"_n, pri_tid, pri_sv));
-      BOOST_REQUIRE(pri_itr != pri_idx.end());
-      found_ids.push_back(chain::kv_decode_be64(itr->pri_key.data()));
+      // Resolve the referenced primary row by id (O(1)) and decode its key.
+      const auto* primary = db.find<kv_object>(itr->primary_id);
+      BOOST_REQUIRE(primary != nullptr);
+      found_ids.push_back(chain::kv_decode_be64(primary->key.data()));
       ++itr;
    }
 
    BOOST_REQUIRE_EQUAL(found_ids.size(), 2u);
    BOOST_CHECK_EQUAL(found_ids[0], 1u);
    BOOST_CHECK_EQUAL(found_ids[1], 3u);
+
+   session.undo();
+}
+
+// Direct test of the kv_index_object composite-key tiebreaker under the
+// primary_id scheme. When two secondary rows share the same sec_key, the
+// tiebreaker is the primary row's chainbase id (insertion order), NOT the
+// primary key's lexicographic byte order. Exercises forward iteration,
+// backward iteration, find, lower_bound, and the between-duplicates
+// insertion case.
+BOOST_AUTO_TEST_CASE(kv_secondary_tiebreak_is_primary_id_insertion_order) {
+   validating_tester t( flat_set<account_name>(), nullptr, setup_policy::none );
+   auto& db = const_cast<chainbase::database&>(t.control->db());
+
+   auto session = db.start_undo_session(true);
+
+   const uint16_t pri_tid = compute_table_id("people");
+   const uint16_t sec_tid = compute_sec_table_id("people"_n.to_uint64_t(), "byname"_n.to_uint64_t());
+
+   auto make_be64 = [](uint64_t v) {
+      char buf[8]; chain::kv_encode_be64(buf, v); return std::string(buf, 8);
+   };
+
+   // Insert three primary rows with large-then-small pri_key byte values
+   // (500 > 200 > 100 in big-endian lex order). All share secondary key "bob".
+   // With a pri_key-lexicographic tiebreaker the sec-order would be
+   // [pk=100, pk=200, pk=500]. Under primary_id (insertion order) the order
+   // instead follows the sequence in which we emplace below.
+   struct entry { uint64_t pk; kv_object::id_type primary_id{}; };
+   entry e500{ 500 };
+   entry e200{ 200 };
+   entry e100{ 100 };
+
+   auto insert_primary = [&](entry& e) {
+      auto pk_bytes = make_be64(e.pk);
+      const auto& row = db.create<kv_object>([&](auto& o) {
+         o.code = "testacc"_n;
+         o.table_id = pri_tid;
+         o.key.assign(pk_bytes.data(), pk_bytes.size());
+         o.value.assign("v", 1);
+      });
+      e.primary_id = row.id;
+   };
+
+   // Order of insertion: 500, then 200, then 100. Under the new tiebreaker
+   // the sec-index iteration order inside sec_key="bob" must match THIS
+   // order, not the byte-lexicographic order of the primary keys.
+   insert_primary(e500);
+   insert_primary(e200);
+   insert_primary(e100);
+
+   auto bob_key = make_be64("bob"_n.to_uint64_t());
+   auto bob_sv = std::string_view(bob_key.data(), bob_key.size());
+
+   auto make_sec_row = [&](const entry& e) {
+      db.create<kv_index_object>([&](auto& o) {
+         o.code = "testacc"_n;
+         o.table_id = sec_tid;
+         o.sec_key.assign(bob_key.data(), bob_key.size());
+         o.primary_id = e.primary_id;
+      });
+   };
+   make_sec_row(e500);
+   make_sec_row(e200);
+   make_sec_row(e100);
+
+   const auto& sec_idx = db.get_index<kv_index_index, by_code_table_id_seckey>();
+
+   // Forward iteration: order must be primary_id-ascending (insertion order).
+   {
+      auto itr = sec_idx.lower_bound(boost::make_tuple("testacc"_n, sec_tid, bob_sv));
+      BOOST_REQUIRE(itr != sec_idx.end());
+      BOOST_CHECK(itr->primary_id == e500.primary_id);
+      ++itr;
+      BOOST_REQUIRE(itr != sec_idx.end());
+      BOOST_CHECK(itr->primary_id == e200.primary_id);
+      ++itr;
+      BOOST_REQUIRE(itr != sec_idx.end());
+      BOOST_CHECK(itr->primary_id == e100.primary_id);
+      ++itr;
+      // Next row is past bob — either end() or a different sec_key.
+      BOOST_CHECK(itr == sec_idx.end() || itr->sec_key_view() != bob_sv);
+   }
+
+   // Backward iteration yields reverse insertion order within the duplicates.
+   {
+      // Position at the last bob row, then walk backward.
+      auto itr = sec_idx.find(boost::make_tuple("testacc"_n, sec_tid, bob_sv, e100.primary_id));
+      BOOST_REQUIRE(itr != sec_idx.end());
+      BOOST_CHECK(itr->primary_id == e100.primary_id);
+      --itr;
+      BOOST_CHECK(itr->primary_id == e200.primary_id);
+      --itr;
+      BOOST_CHECK(itr->primary_id == e500.primary_id);
+   }
+
+   // Inserting a fourth bob row mid-sequence appends at the end of the
+   // duplicate group regardless of its pri_key bytes (primary_id is strictly
+   // monotonic, so the newest sec row is always last among equal sec_keys).
+   entry e300{ 300 };
+   insert_primary(e300);
+   make_sec_row(e300);
+   {
+      auto itr = sec_idx.lower_bound(boost::make_tuple("testacc"_n, sec_tid, bob_sv));
+      BOOST_REQUIRE(itr != sec_idx.end());
+      BOOST_CHECK(itr->primary_id == e500.primary_id);
+      ++itr; BOOST_CHECK(itr->primary_id == e200.primary_id);
+      ++itr; BOOST_CHECK(itr->primary_id == e100.primary_id);
+      ++itr; BOOST_CHECK(itr->primary_id == e300.primary_id); // newest, appended
+      ++itr;
+      BOOST_CHECK(itr == sec_idx.end() || itr->sec_key_view() != bob_sv);
+   }
 
    session.undo();
 }

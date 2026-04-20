@@ -643,41 +643,48 @@ BOOST_FIXTURE_TEST_CASE(billing_multiple_rows, kv_billing_tester) {
 // --------------------------------------------------------------------------
 
 BOOST_FIXTURE_TEST_CASE(billing_idx_create_row, kv_billing_tester) {
-   // testidxstore calls kv_idx_store with sec="alice" (5 bytes), pri=3 bytes.
+   // testidxstore now inserts a primary row (pri=3 bytes, val="v"=2 bytes) via
+   // insert_primary() before calling kv_idx_store, so the net delta includes
+   // BOTH the primary row bill and the secondary row bill.
+   //   primary = pri_size + val_size + KV_OBJECT_OVERHEAD = 3 + 2 + KV_OVERHEAD
+   //   sec     = sec_size + KV_INDEX_OVERHEAD            = 5 + KV_INDEX_OVERHEAD
    auto before = get_ram_usage();
    push_action(test_account, "testidxstore"_n, test_account, mutable_variant_object());
    produce_block();
    auto after = get_ram_usage();
 
-   int64_t expected = 3 + 5 + KV_INDEX_OVERHEAD;
+   int64_t expected = (3 + 2 + KV_OVERHEAD) + (5 + KV_INDEX_OVERHEAD);
    int64_t actual = after - before;
    BOOST_TEST_MESSAGE("billing_idx_create_row: expected=" << expected << " actual=" << actual);
    BOOST_REQUIRE_EQUAL(actual, expected);
 }
 
 BOOST_FIXTURE_TEST_CASE(billing_idx_create_erase_net_zero, kv_billing_tester) {
-   // testidxremov calls kv_idx_store then kv_idx_remove on the same row.
-   // If store and remove bill the same formula, the net delta is zero.
+   // testidxremov calls insert_primary (pri=3/val=2) + kv_idx_store (sec=3)
+   // then kv_idx_remove on the same row. The primary row is NOT removed by
+   // the contract, so the net delta is just the leftover primary bill.
    auto before = get_ram_usage();
    push_action(test_account, "testidxremov"_n, test_account, mutable_variant_object());
    produce_block();
    auto after = get_ram_usage();
 
-   BOOST_TEST_MESSAGE("billing_idx_create_erase_net_zero: delta=" << (after - before));
-   BOOST_REQUIRE_EQUAL(after - before, 0);
+   int64_t expected = 3 + 2 + KV_OVERHEAD; // primary row left behind
+   int64_t actual = after - before;
+   BOOST_TEST_MESSAGE("billing_idx_create_erase_net_zero: expected=" << expected << " actual=" << actual);
+   BOOST_REQUIRE_EQUAL(actual, expected);
 }
 
 BOOST_FIXTURE_TEST_CASE(billing_idx_update_shrink, kv_billing_tester) {
-   // testidxupdat: kv_idx_store(sec="charlie"/7, pri=3) then
-   //               kv_idx_update(old_sec="charlie"/7 -> new_sec="david"/5).
-   // Total bill = store + update_delta = (3 + 7 + KV_INDEX_OVERHEAD) + (5 - 7)
-   //            = 3 + 5 + KV_INDEX_OVERHEAD.
+   // testidxupdat: insert_primary (pri=3/val=2), kv_idx_store(sec="charlie"/7),
+   //               then kv_idx_update(old_sec="charlie"/7 -> new_sec="david"/5).
+   // Net: primary (3+2+KV_OVERHEAD) + sec_initial (7+KV_INDEX_OVERHEAD)
+   //      + sec_delta (5-7) = (3+2+KV_OVERHEAD) + (5 + KV_INDEX_OVERHEAD).
    auto before = get_ram_usage();
    push_action(test_account, "testidxupdat"_n, test_account, mutable_variant_object());
    produce_block();
    auto after = get_ram_usage();
 
-   int64_t expected = 3 + 5 + KV_INDEX_OVERHEAD;
+   int64_t expected = (3 + 2 + KV_OVERHEAD) + (5 + KV_INDEX_OVERHEAD);
    int64_t actual = after - before;
    BOOST_TEST_MESSAGE("billing_idx_update_shrink: expected=" << expected << " actual=" << actual);
    BOOST_REQUIRE_EQUAL(actual, expected);
