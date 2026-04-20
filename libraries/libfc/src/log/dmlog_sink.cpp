@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <signal.h>
 #include <cstdio>
+#include <print>
 
 
 namespace fc {
@@ -50,12 +51,12 @@ namespace fc {
          }
 
          if(written != remaining_size) {
-            fprintf(stderr, "DMLOG WRITE_FAILED written=%zu remaining=%zu %d %s\n", written, remaining_size, ferror(out), strerror(errno));
+            std::println(stderr, "DMLOG WRITE_FAILED written={} remaining={} {} {}", written, remaining_size, ferror(out), strerror(errno));
             clearerr(out);
          }
 
          if(is_stopped) {
-            fprintf(stderr, "DMLOG WRITE_FAILURE_TERMINATED\n");
+            std::println(stderr, "DMLOG WRITE_FAILURE_TERMINATED");
             // Depending on the error, we might have already gotten a SIGPIPE
             // An extra signal is harmless, though.  Use a process targeted
             // signal (not raise) because the SIGTERM may be blocked in this
