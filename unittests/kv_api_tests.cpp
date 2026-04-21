@@ -8,6 +8,8 @@
 #include <sysio/chain/kv_table_objects.hpp>
 #include <test_contracts.hpp>
 
+#include <limits>
+
 using namespace sysio;
 using namespace sysio::chain;
 using namespace sysio::testing;
@@ -551,6 +553,10 @@ BOOST_FIXTURE_TEST_CASE(sec_cross_scope_upper_bound, kv_api_fresh_tester) {
 static constexpr int64_t KV_OVERHEAD = config::billable_size_v<kv_object>;
 static constexpr int64_t KV_INDEX_OVERHEAD = config::billable_size_v<kv_index_object>;
 
+// Primary value size stored by the RAM-billing secondary-index actions.
+// Must match test_kv_api.cpp's ram_idx_val = "v" (1 byte payload + null).
+static constexpr uint32_t ram_idx_val_size = 2;
+
 struct kv_billing_tester : validating_tester {
    kv_billing_tester() {
       create_accounts({test_account});
@@ -560,11 +566,11 @@ struct kv_billing_tester : validating_tester {
       produce_block();
    }
 
-   int64_t get_ram_usage(name acct) {
+   int64_t get_ram_usage(name acct) const {
       return control->get_resource_limits_manager().get_account_ram_usage(acct);
    }
 
-   int64_t get_ram_usage() { return get_ram_usage(test_account); }
+   int64_t get_ram_usage() const { return get_ram_usage(test_account); }
 
    void ram_store(uint32_t key_id, uint32_t val_size) {
       push_action(test_account, "ramstore"_n, test_account,
@@ -587,9 +593,9 @@ struct kv_billing_tester : validating_tester {
 
 BOOST_FIXTURE_TEST_CASE(billing_create_row, kv_billing_tester) {
    // Creating a row should bill key_size + value_size + KV_OVERHEAD
-   auto before = get_ram_usage(test_account);
+   int64_t before = get_ram_usage(test_account);
    ram_store(1, 100); // 4-byte key, 100-byte value
-   auto after = get_ram_usage(test_account);
+   int64_t after = get_ram_usage(test_account);
 
    int64_t expected = 4 + 100 + KV_OVERHEAD; // key + value + overhead
    int64_t actual = after - before;
@@ -600,9 +606,9 @@ BOOST_FIXTURE_TEST_CASE(billing_create_row, kv_billing_tester) {
 BOOST_FIXTURE_TEST_CASE(billing_update_grow, kv_billing_tester) {
    // Growing a value should bill the delta
    ram_store(2, 50);
-   auto before = get_ram_usage(test_account);
+   int64_t before = get_ram_usage(test_account);
    ram_update(2, 200); // grow from 50 to 200
-   auto after = get_ram_usage(test_account);
+   int64_t after = get_ram_usage(test_account);
 
    int64_t expected = 200 - 50; // only value delta, key+overhead unchanged
    int64_t actual = after - before;
@@ -613,9 +619,9 @@ BOOST_FIXTURE_TEST_CASE(billing_update_grow, kv_billing_tester) {
 BOOST_FIXTURE_TEST_CASE(billing_update_shrink, kv_billing_tester) {
    // Shrinking a value should refund the delta
    ram_store(3, 200);
-   auto before = get_ram_usage(test_account);
+   int64_t before = get_ram_usage(test_account);
    ram_update(3, 50); // shrink from 200 to 50
-   auto after = get_ram_usage(test_account);
+   int64_t after = get_ram_usage(test_account);
 
    int64_t expected = 50 - 200; // negative delta = refund
    int64_t actual = after - before;
@@ -626,9 +632,9 @@ BOOST_FIXTURE_TEST_CASE(billing_update_shrink, kv_billing_tester) {
 BOOST_FIXTURE_TEST_CASE(billing_update_same_size, kv_billing_tester) {
    // Updating with same size should bill zero
    ram_store(4, 100);
-   auto before = get_ram_usage(test_account);
+   int64_t before = get_ram_usage(test_account);
    ram_update(4, 100); // same size
-   auto after = get_ram_usage(test_account);
+   int64_t after = get_ram_usage(test_account);
 
    BOOST_TEST_MESSAGE("billing_update_same_size: delta=" << (after - before));
    BOOST_REQUIRE_EQUAL(after - before, 0);
@@ -637,9 +643,9 @@ BOOST_FIXTURE_TEST_CASE(billing_update_same_size, kv_billing_tester) {
 BOOST_FIXTURE_TEST_CASE(billing_erase_refund, kv_billing_tester) {
    // Erasing should refund the full amount billed on create
    ram_store(5, 100);
-   auto before = get_ram_usage(test_account);
+   int64_t before = get_ram_usage(test_account);
    ram_erase(5);
-   auto after = get_ram_usage(test_account);
+   int64_t after = get_ram_usage(test_account);
 
    int64_t expected = -(4 + 100 + KV_OVERHEAD); // full refund
    int64_t actual = after - before;
@@ -649,10 +655,10 @@ BOOST_FIXTURE_TEST_CASE(billing_erase_refund, kv_billing_tester) {
 
 BOOST_FIXTURE_TEST_CASE(billing_create_erase_net_zero, kv_billing_tester) {
    // Create + erase should result in net zero RAM change
-   auto before = get_ram_usage(test_account);
+   int64_t before = get_ram_usage(test_account);
    ram_store(6, 500);
    ram_erase(6);
-   auto after = get_ram_usage(test_account);
+   int64_t after = get_ram_usage(test_account);
 
    BOOST_TEST_MESSAGE("billing_create_erase_net_zero: delta=" << (after - before));
    BOOST_REQUIRE_EQUAL(after - before, 0);
@@ -660,11 +666,11 @@ BOOST_FIXTURE_TEST_CASE(billing_create_erase_net_zero, kv_billing_tester) {
 
 BOOST_FIXTURE_TEST_CASE(billing_multiple_rows, kv_billing_tester) {
    // Multiple rows should each be billed independently
-   auto before = get_ram_usage(test_account);
+   int64_t before = get_ram_usage(test_account);
    ram_store(10, 100);
    ram_store(11, 200);
    ram_store(12, 300);
-   auto after = get_ram_usage(test_account);
+   int64_t after = get_ram_usage(test_account);
 
    int64_t expected = 3 * (4 + KV_OVERHEAD) + 100 + 200 + 300; // 3 rows, different values
    int64_t actual = after - before;
@@ -683,10 +689,10 @@ BOOST_FIXTURE_TEST_CASE(billing_idx_create_row, kv_billing_tester) {
    // BOTH the primary row bill and the secondary row bill.
    //   primary = pri_size + val_size + KV_OBJECT_OVERHEAD = 3 + 2 + KV_OVERHEAD
    //   sec     = sec_size + KV_INDEX_OVERHEAD            = 5 + KV_INDEX_OVERHEAD
-   auto before = get_ram_usage();
+   int64_t before = get_ram_usage();
    push_action(test_account, "testidxstore"_n, test_account, mutable_variant_object());
    produce_block();
-   auto after = get_ram_usage();
+   int64_t after = get_ram_usage();
 
    int64_t expected = (3 + 2 + KV_OVERHEAD) + (5 + KV_INDEX_OVERHEAD);
    int64_t actual = after - before;
@@ -698,10 +704,10 @@ BOOST_FIXTURE_TEST_CASE(billing_idx_create_erase_net_zero, kv_billing_tester) {
    // testidxremov calls insert_primary (pri=3/val=2) + kv_idx_store (sec=3)
    // then kv_idx_remove on the same row. The primary row is NOT removed by
    // the contract, so the net delta is just the leftover primary bill.
-   auto before = get_ram_usage();
+   int64_t before = get_ram_usage();
    push_action(test_account, "testidxremov"_n, test_account, mutable_variant_object());
    produce_block();
-   auto after = get_ram_usage();
+   int64_t after = get_ram_usage();
 
    int64_t expected = 3 + 2 + KV_OVERHEAD; // primary row left behind
    int64_t actual = after - before;
@@ -714,10 +720,10 @@ BOOST_FIXTURE_TEST_CASE(billing_idx_update_shrink, kv_billing_tester) {
    //               then kv_idx_update(old_sec="charlie"/7 -> new_sec="david"/5).
    // Net: primary (3+2+KV_OVERHEAD) + sec_initial (7+KV_INDEX_OVERHEAD)
    //      + sec_delta (5-7) = (3+2+KV_OVERHEAD) + (5 + KV_INDEX_OVERHEAD).
-   auto before = get_ram_usage();
+   int64_t before = get_ram_usage();
    push_action(test_account, "testidxupdat"_n, test_account, mutable_variant_object());
    produce_block();
-   auto after = get_ram_usage();
+   int64_t after = get_ram_usage();
 
    int64_t expected = (3 + 2 + KV_OVERHEAD) + (5 + KV_INDEX_OVERHEAD);
    int64_t actual = after - before;
@@ -738,17 +744,20 @@ struct kv_payer_billing_tester : validating_tester {
       produce_block();
    }
 
-   int64_t get_ram_usage(name acct) {
+   int64_t get_ram_usage(name acct) const {
       return control->get_resource_limits_manager().get_account_ram_usage(acct);
    }
 
    // Push rampyrset with proper sysio.payer authorization for cross-account billing.
-   // When authorize_payer=true and payer is a third party, the payer's sysio.payer
-   // permission must be first in the auth list (enforced by authorization_manager).
+   // When authorize_payer=true and payer is a real third party, the payer's
+   // sysio.payer permission must be first in the auth list (enforced by
+   // authorization_manager). payer == name{0} means "receiver pays" (matches
+   // the host kv_set(payer_val == 0) semantics); it uses test_account's active
+   // permission, not a sysio.payer grant.
    void ram_pyr_set(uint32_t key_id, uint32_t val_size, name payer,
                     bool authorize_payer = true) {
       vector<permission_level> auths;
-      if (payer != name{0} && payer != test_account && authorize_payer) {
+      if (payer != name{0} && authorize_payer) {
          auths.push_back({payer, config::sysio_payer_name});
          auths.push_back({payer, config::active_name});
       } else {
@@ -776,20 +785,20 @@ struct kv_payer_billing_tester : validating_tester {
 // Payer change, same value size — old payer fully refunded, new payer charged
 BOOST_FIXTURE_TEST_CASE(payer_change_same_size, kv_payer_billing_tester) {
    // Create row with payer=alice
-   const uint32_t VAL_SIZE = 100;
-   int64_t expected_billable = 4 + VAL_SIZE + KV_OVERHEAD;
+   const uint32_t val_size = 100;
+   int64_t expected_billable = 4 + val_size + KV_OVERHEAD;
 
-   auto alice_before = get_ram_usage("alice"_n);
-   ram_pyr_set(1, VAL_SIZE, "alice"_n);
-   auto alice_after_create = get_ram_usage("alice"_n);
+   int64_t alice_before = get_ram_usage("alice"_n);
+   ram_pyr_set(1, val_size, "alice"_n);
+   int64_t alice_after_create = get_ram_usage("alice"_n);
    BOOST_REQUIRE_EQUAL(alice_after_create - alice_before, expected_billable);
 
    // Update same key, change payer to bob, same size
-   auto bob_before = get_ram_usage("bob"_n);
+   int64_t bob_before = get_ram_usage("bob"_n);
    alice_before = get_ram_usage("alice"_n);
-   ram_pyr_set(1, VAL_SIZE, "bob"_n);
-   auto alice_after = get_ram_usage("alice"_n);
-   auto bob_after = get_ram_usage("bob"_n);
+   ram_pyr_set(1, val_size, "bob"_n);
+   int64_t alice_after = get_ram_usage("alice"_n);
+   int64_t bob_after = get_ram_usage("bob"_n);
 
    // alice fully refunded, bob charged same amount
    BOOST_REQUIRE_EQUAL(alice_after - alice_before, -expected_billable);
@@ -798,17 +807,17 @@ BOOST_FIXTURE_TEST_CASE(payer_change_same_size, kv_payer_billing_tester) {
 
 // Payer change with value growth — old payer refunded old amount, new payer charged new amount
 BOOST_FIXTURE_TEST_CASE(payer_change_with_growth, kv_payer_billing_tester) {
-   const uint32_t SMALL = 50, LARGE = 200;
-   int64_t small_billable = 4 + SMALL + KV_OVERHEAD;
-   int64_t large_billable = 4 + LARGE + KV_OVERHEAD;
+   const uint32_t small_size = 50, large_size = 200;
+   int64_t small_billable = 4 + small_size + KV_OVERHEAD;
+   int64_t large_billable = 4 + large_size + KV_OVERHEAD;
 
-   ram_pyr_set(1, SMALL, "alice"_n);
+   ram_pyr_set(1, small_size, "alice"_n);
 
-   auto alice_before = get_ram_usage("alice"_n);
-   auto bob_before = get_ram_usage("bob"_n);
-   ram_pyr_set(1, LARGE, "bob"_n);
-   auto alice_after = get_ram_usage("alice"_n);
-   auto bob_after = get_ram_usage("bob"_n);
+   int64_t alice_before = get_ram_usage("alice"_n);
+   int64_t bob_before = get_ram_usage("bob"_n);
+   ram_pyr_set(1, large_size, "bob"_n);
+   int64_t alice_after = get_ram_usage("alice"_n);
+   int64_t bob_after = get_ram_usage("bob"_n);
 
    // alice refunded full old amount, bob charged full new (larger) amount
    BOOST_REQUIRE_EQUAL(alice_after - alice_before, -small_billable);
@@ -817,17 +826,17 @@ BOOST_FIXTURE_TEST_CASE(payer_change_with_growth, kv_payer_billing_tester) {
 
 // Payer change with value shrink — old payer refunded old amount, new payer charged smaller amount
 BOOST_FIXTURE_TEST_CASE(payer_change_with_shrink, kv_payer_billing_tester) {
-   const uint32_t LARGE = 200, SMALL = 50;
-   int64_t large_billable = 4 + LARGE + KV_OVERHEAD;
-   int64_t small_billable = 4 + SMALL + KV_OVERHEAD;
+   const uint32_t large_size = 200, small_size = 50;
+   int64_t large_billable = 4 + large_size + KV_OVERHEAD;
+   int64_t small_billable = 4 + small_size + KV_OVERHEAD;
 
-   ram_pyr_set(1, LARGE, "alice"_n);
+   ram_pyr_set(1, large_size, "alice"_n);
 
-   auto alice_before = get_ram_usage("alice"_n);
-   auto bob_before = get_ram_usage("bob"_n);
-   ram_pyr_set(1, SMALL, "bob"_n);
-   auto alice_after = get_ram_usage("alice"_n);
-   auto bob_after = get_ram_usage("bob"_n);
+   int64_t alice_before = get_ram_usage("alice"_n);
+   int64_t bob_before = get_ram_usage("bob"_n);
+   ram_pyr_set(1, small_size, "bob"_n);
+   int64_t alice_after = get_ram_usage("alice"_n);
+   int64_t bob_after = get_ram_usage("bob"_n);
 
    // alice refunded full old amount, bob charged full new (smaller) amount
    BOOST_REQUIRE_EQUAL(alice_after - alice_before, -large_billable);
@@ -836,19 +845,19 @@ BOOST_FIXTURE_TEST_CASE(payer_change_with_shrink, kv_payer_billing_tester) {
 
 // Payer change back to self (payer=0 means receiver)
 BOOST_FIXTURE_TEST_CASE(payer_change_back_to_self, kv_payer_billing_tester) {
-   const uint32_t VAL_SIZE = 100;
-   int64_t expected_billable = 4 + VAL_SIZE + KV_OVERHEAD;
+   const uint32_t val_size = 100;
+   int64_t expected_billable = 4 + val_size + KV_OVERHEAD;
 
    // Create with payer=alice
-   ram_pyr_set(1, VAL_SIZE, "alice"_n);
+   ram_pyr_set(1, val_size, "alice"_n);
 
    // Change payer back to receiver (payer=0 means receiver=test_account)
    // Only test_account needs to sign since alice's delta is negative
-   auto alice_before = get_ram_usage("alice"_n);
-   auto contract_before = get_ram_usage(test_account);
-   ram_pyr_set(1, VAL_SIZE, name{0});
-   auto alice_after = get_ram_usage("alice"_n);
-   auto contract_after = get_ram_usage(test_account);
+   int64_t alice_before = get_ram_usage("alice"_n);
+   int64_t contract_before = get_ram_usage(test_account);
+   ram_pyr_set(1, val_size, name{0});
+   int64_t alice_after = get_ram_usage("alice"_n);
+   int64_t contract_after = get_ram_usage(test_account);
 
    BOOST_REQUIRE_EQUAL(alice_after - alice_before, -expected_billable);
    BOOST_REQUIRE_EQUAL(contract_after - contract_before, expected_billable);
@@ -856,27 +865,27 @@ BOOST_FIXTURE_TEST_CASE(payer_change_back_to_self, kv_payer_billing_tester) {
 
 // Erase refunds the stored payer (not the contract/receiver)
 BOOST_FIXTURE_TEST_CASE(erase_refunds_correct_payer, kv_payer_billing_tester) {
-   const uint32_t VAL_SIZE = 100;
-   int64_t expected_billable = 4 + VAL_SIZE + KV_OVERHEAD;
+   const uint32_t val_size = 100;
+   int64_t expected_billable = 4 + val_size + KV_OVERHEAD;
 
    // Create with payer=alice
-   ram_pyr_set(1, VAL_SIZE, "alice"_n);
+   ram_pyr_set(1, val_size, "alice"_n);
 
    // Erase — alice should get the refund, not the contract
-   auto alice_before = get_ram_usage("alice"_n);
-   auto contract_before = get_ram_usage(test_account);
+   int64_t alice_before = get_ram_usage("alice"_n);
+   int64_t contract_before = get_ram_usage(test_account);
    ram_erase(1);
-   auto alice_after = get_ram_usage("alice"_n);
-   auto contract_after = get_ram_usage(test_account);
+   int64_t alice_after = get_ram_usage("alice"_n);
+   int64_t contract_after = get_ram_usage(test_account);
 
    BOOST_REQUIRE_EQUAL(alice_after - alice_before, -expected_billable);
    BOOST_REQUIRE_EQUAL(contract_after - contract_before, 0);
 }
 
-// Payer change without new payer authorization — should fail.
-// Alice is not in the auth list at all, so the unprivileged has_authorization
-// check (Path 1 in validate_account_ram_deltas) fires first ->
-// unauthorized_ram_usage_increase.
+// Payer change without new payer authorization -- should fail.
+// Alice is not in the auth list at all, so validate_account_ram_deltas'
+// has_authorization check (the first guard on positive delta) fires and
+// raises unauthorized_ram_usage_increase.
 BOOST_FIXTURE_TEST_CASE(payer_change_unauth_fails, kv_payer_billing_tester) {
    // Create with self-pay
    ram_store(1, 100);
@@ -888,9 +897,10 @@ BOOST_FIXTURE_TEST_CASE(payer_change_unauth_fails, kv_payer_billing_tester) {
    );
 }
 
-// Payer signed with active but NOT sysio.payer — should fail.
-// Alice is in the auth list (passes Path 1 has_authorization), but without
-// the sysio.payer permission role Path 2 rejects -> unsatisfied_authorization.
+// Payer signed with active but NOT sysio.payer -- should fail.
+// Alice's active is in the auth list so the has_authorization check passes,
+// but the subsequent sysio.payer permission lookup doesn't find a matching
+// permission and raises unsatisfied_authorization.
 BOOST_FIXTURE_TEST_CASE(payer_change_active_only_fails, kv_payer_billing_tester) {
    ram_store(1, 100);
 
@@ -906,19 +916,19 @@ BOOST_FIXTURE_TEST_CASE(payer_change_active_only_fails, kv_payer_billing_tester)
 // Payer change — old payer not authorized, but succeeds
 // because old payer's delta is negative (refund doesn't need auth)
 BOOST_FIXTURE_TEST_CASE(payer_change_old_payer_unauth_ok, kv_payer_billing_tester) {
-   const uint32_t VAL_SIZE = 100;
-   int64_t billable = 4 + VAL_SIZE + KV_OVERHEAD;
+   const uint32_t val_size = 100;
+   int64_t billable = 4 + val_size + KV_OVERHEAD;
 
    // Create with payer=alice
-   ram_pyr_set(1, VAL_SIZE, "alice"_n);
+   ram_pyr_set(1, val_size, "alice"_n);
 
    // Change payer from alice->bob. Only bob signs.
    // alice is refunded (negative delta -> no auth needed).
-   auto alice_before = get_ram_usage("alice"_n);
-   auto bob_before = get_ram_usage("bob"_n);
-   ram_pyr_set(1, VAL_SIZE, "bob"_n);
-   auto alice_after = get_ram_usage("alice"_n);
-   auto bob_after = get_ram_usage("bob"_n);
+   int64_t alice_before = get_ram_usage("alice"_n);
+   int64_t bob_before = get_ram_usage("bob"_n);
+   ram_pyr_set(1, val_size, "bob"_n);
+   int64_t alice_after = get_ram_usage("alice"_n);
+   int64_t bob_after = get_ram_usage("bob"_n);
 
    BOOST_REQUIRE_EQUAL(alice_after - alice_before, -billable);
    BOOST_REQUIRE_EQUAL(bob_after - bob_before, billable);
@@ -926,8 +936,8 @@ BOOST_FIXTURE_TEST_CASE(payer_change_old_payer_unauth_ok, kv_payer_billing_teste
 
 // Multiple actions with different payers in one transaction — independent deltas
 BOOST_FIXTURE_TEST_CASE(mixed_payer_independent_deltas, kv_payer_billing_tester) {
-   auto alice_before = get_ram_usage("alice"_n);
-   auto bob_before = get_ram_usage("bob"_n);
+   int64_t alice_before = get_ram_usage("alice"_n);
+   int64_t bob_before = get_ram_usage("bob"_n);
 
    // Single transaction: action1 bills alice, action2 bills bob
    signed_transaction trx;
@@ -943,8 +953,8 @@ BOOST_FIXTURE_TEST_CASE(mixed_payer_independent_deltas, kv_payer_billing_tester)
    push_transaction(trx);
    produce_block();
 
-   auto alice_after = get_ram_usage("alice"_n);
-   auto bob_after = get_ram_usage("bob"_n);
+   int64_t alice_after = get_ram_usage("alice"_n);
+   int64_t bob_after = get_ram_usage("bob"_n);
 
    BOOST_REQUIRE_EQUAL(alice_after - alice_before, 4 + 100 + KV_OVERHEAD);
    BOOST_REQUIRE_EQUAL(bob_after - bob_before, 4 + 200 + KV_OVERHEAD);
@@ -952,7 +962,7 @@ BOOST_FIXTURE_TEST_CASE(mixed_payer_independent_deltas, kv_payer_billing_tester)
 
 // Create + erase across actions in one transaction — net zero for payer
 BOOST_FIXTURE_TEST_CASE(mixed_payer_create_erase_net_zero, kv_payer_billing_tester) {
-   auto alice_before = get_ram_usage("alice"_n);
+   int64_t alice_before = get_ram_usage("alice"_n);
 
    // Single transaction: action1 creates with payer=alice, action2 erases
    signed_transaction trx;
@@ -968,7 +978,7 @@ BOOST_FIXTURE_TEST_CASE(mixed_payer_create_erase_net_zero, kv_payer_billing_test
    push_transaction(trx);
    produce_block();
 
-   auto alice_after = get_ram_usage("alice"_n);
+   int64_t alice_after = get_ram_usage("alice"_n);
    BOOST_REQUIRE_EQUAL(alice_after - alice_before, 0);
 }
 
@@ -982,14 +992,13 @@ BOOST_FIXTURE_TEST_CASE(mixed_payer_create_erase_net_zero, kv_payer_billing_test
 BOOST_FIXTURE_TEST_CASE(idx_billing_store, kv_billing_tester) {
    const uint32_t sec_size = 8;
    const uint32_t pri_size = 4;
-   const uint32_t val_size = sizeof("v");  // 2 bytes (payload + null)
-   auto before = get_ram_usage(test_account);
+   int64_t before = get_ram_usage(test_account);
    push_action(test_account, "ramidxstore"_n, test_account,
       mutable_variant_object()("sec_size", sec_size)("pri_size", pri_size));
    produce_block();
-   auto after = get_ram_usage(test_account);
+   int64_t after = get_ram_usage(test_account);
 
-   int64_t expected = (pri_size + val_size + KV_OVERHEAD) + (sec_size + KV_INDEX_OVERHEAD);
+   int64_t expected = (pri_size + ram_idx_val_size + KV_OVERHEAD) + (sec_size + KV_INDEX_OVERHEAD);
    BOOST_TEST_MESSAGE("idx_billing_store: expected=" << expected << " actual=" << (after - before));
    BOOST_REQUIRE_EQUAL(after - before, expected);
 }
@@ -1003,47 +1012,47 @@ BOOST_FIXTURE_TEST_CASE(idx_billing_remove, kv_billing_tester) {
       mutable_variant_object()("sec_size", sec_size)("pri_size", pri_size));
    produce_block();
 
-   auto before = get_ram_usage(test_account);
+   int64_t before = get_ram_usage(test_account);
    push_action(test_account, "ramidxremov"_n, test_account,
       mutable_variant_object()("sec_size", sec_size)("pri_size", pri_size));
    produce_block();
-   auto after = get_ram_usage(test_account);
+   int64_t after = get_ram_usage(test_account);
 
    int64_t expected = -(sec_size + KV_INDEX_OVERHEAD);
    BOOST_TEST_MESSAGE("idx_billing_remove: expected=" << expected << " actual=" << (after - before));
    BOOST_REQUIRE_EQUAL(after - before, expected);
 }
 
-// kv_idx_update with size change — bills only the sec key delta.
+// kv_idx_update with size change -- bills only the sec key delta.
 BOOST_FIXTURE_TEST_CASE(idx_billing_update_size_change, kv_billing_tester) {
    const uint32_t pri_size = 4;
    push_action(test_account, "ramidxstore"_n, test_account,
       mutable_variant_object()("sec_size", 8)("pri_size", pri_size));
    produce_block();
 
-   auto before = get_ram_usage(test_account);
+   int64_t before = get_ram_usage(test_account);
    push_action(test_account, "ramidxupdat"_n, test_account,
       mutable_variant_object()("old_ss", 8)("new_ss", 20)("pri_size", pri_size));
    produce_block();
-   auto after = get_ram_usage(test_account);
+   int64_t after = get_ram_usage(test_account);
 
    int64_t expected = 20 - 8; // sec key delta only
    BOOST_TEST_MESSAGE("idx_billing_update_grow: expected=" << expected << " actual=" << (after - before));
    BOOST_REQUIRE_EQUAL(after - before, expected);
 }
 
-// kv_idx_update same size — zero delta.
+// kv_idx_update same size -- zero delta.
 BOOST_FIXTURE_TEST_CASE(idx_billing_update_same_size, kv_billing_tester) {
    const uint32_t pri_size = 4;
    push_action(test_account, "ramidxstore"_n, test_account,
       mutable_variant_object()("sec_size", 8)("pri_size", pri_size));
    produce_block();
 
-   auto before = get_ram_usage(test_account);
+   int64_t before = get_ram_usage(test_account);
    push_action(test_account, "ramidxupdat"_n, test_account,
       mutable_variant_object()("old_ss", 8)("new_ss", 8)("pri_size", pri_size));
    produce_block();
-   auto after = get_ram_usage(test_account);
+   int64_t after = get_ram_usage(test_account);
 
    BOOST_TEST_MESSAGE("idx_billing_update_same: delta=" << (after - before));
    BOOST_REQUIRE_EQUAL(after - before, 0);
@@ -1057,21 +1066,20 @@ BOOST_FIXTURE_TEST_CASE(idx_billing_update_same_size, kv_billing_tester) {
 BOOST_FIXTURE_TEST_CASE(idx_billing_payer_not_receiver, kv_payer_billing_tester) {
    const uint32_t sec_size = 8;
    const uint32_t pri_size = 4;
-   const uint32_t val_size = sizeof("v");  // 2
 
-   auto alice_before = get_ram_usage("alice"_n);
-   auto contract_before = get_ram_usage(test_account);
+   int64_t alice_before = get_ram_usage("alice"_n);
+   int64_t contract_before = get_ram_usage(test_account);
 
    push_action(test_account, "ramidxstpyr"_n,
       {{"alice"_n, config::sysio_payer_name}, {"alice"_n, config::active_name}},
       mutable_variant_object()("payer", "alice")("sec_size", sec_size)("pri_size", pri_size));
    produce_block();
 
-   auto alice_after = get_ram_usage("alice"_n);
-   auto contract_after = get_ram_usage(test_account);
+   int64_t alice_after = get_ram_usage("alice"_n);
+   int64_t contract_after = get_ram_usage(test_account);
 
    // Alice pays for both the primary row and the secondary row.
-   int64_t expected = (pri_size + val_size + KV_OVERHEAD) + (sec_size + KV_INDEX_OVERHEAD);
+   int64_t expected = (pri_size + ram_idx_val_size + KV_OVERHEAD) + (sec_size + KV_INDEX_OVERHEAD);
    BOOST_REQUIRE_EQUAL(alice_after - alice_before, expected);
    BOOST_REQUIRE_EQUAL(contract_after - contract_before, 0);
 }
@@ -1088,16 +1096,16 @@ BOOST_FIXTURE_TEST_CASE(idx_remove_refunds_payer, kv_payer_billing_tester) {
       mutable_variant_object()("payer", "alice")("sec_size", sec_size)("pri_size", pri_size));
    produce_block();
 
-   // Remove — alice keeps paying for primary (ramidxrmpyr passes payer=alice to
+   // Remove -- alice keeps paying for primary (ramidxrmpyr passes payer=alice to
    // kv_set, so no payer-change delta there). Secondary refund goes to alice.
-   auto alice_before = get_ram_usage("alice"_n);
-   auto contract_before = get_ram_usage(test_account);
+   int64_t alice_before = get_ram_usage("alice"_n);
+   int64_t contract_before = get_ram_usage(test_account);
    push_action(test_account, "ramidxrmpyr"_n, test_account,
       mutable_variant_object()("payer", "alice")("sec_size", sec_size)("pri_size", pri_size));
    produce_block();
 
-   auto alice_after = get_ram_usage("alice"_n);
-   auto contract_after = get_ram_usage(test_account);
+   int64_t alice_after = get_ram_usage("alice"_n);
+   int64_t contract_after = get_ram_usage(test_account);
 
    int64_t expected = -(sec_size + KV_INDEX_OVERHEAD);
    BOOST_REQUIRE_EQUAL(alice_after - alice_before, expected);
@@ -1111,7 +1119,6 @@ BOOST_FIXTURE_TEST_CASE(idx_remove_refunds_payer, kv_payer_billing_tester) {
 // secondary; bob is charged primary + new secondary.
 BOOST_FIXTURE_TEST_CASE(idx_update_payer_change, kv_payer_billing_tester) {
    const uint32_t pri_size = 4;
-   const uint32_t val_size = sizeof("v");  // 2
    const uint32_t old_ss = 8;
    const uint32_t new_ss = 12;
 
@@ -1121,18 +1128,18 @@ BOOST_FIXTURE_TEST_CASE(idx_update_payer_change, kv_payer_billing_tester) {
       mutable_variant_object()("payer", "alice")("sec_size", old_ss)("pri_size", pri_size));
    produce_block();
 
-   int64_t primary_bill = pri_size + val_size + KV_OVERHEAD;
+   int64_t primary_bill = pri_size + ram_idx_val_size + KV_OVERHEAD;
 
    // Update, change payer from alice to bob
-   auto alice_before = get_ram_usage("alice"_n);
-   auto bob_before = get_ram_usage("bob"_n);
+   int64_t alice_before = get_ram_usage("alice"_n);
+   int64_t bob_before = get_ram_usage("bob"_n);
    push_action(test_account, "ramidxuppyr"_n,
       {{"bob"_n, config::sysio_payer_name}, {"bob"_n, config::active_name}},
       mutable_variant_object()("payer", "bob")("old_ss", old_ss)("new_ss", new_ss)("pri_size", pri_size));
    produce_block();
 
-   auto alice_after = get_ram_usage("alice"_n);
-   auto bob_after = get_ram_usage("bob"_n);
+   int64_t alice_after = get_ram_usage("alice"_n);
+   int64_t bob_after = get_ram_usage("bob"_n);
 
    // Alice refunded: primary + old secondary.
    // Bob charged: primary + new secondary.
@@ -1209,22 +1216,22 @@ struct kv_notify_billing_tester : validating_tester {
       produce_block();
    }
 
-   int64_t get_ram_usage(name acct) {
+   int64_t get_ram_usage(name acct) const {
       return control->get_resource_limits_manager().get_account_ram_usage(acct);
    }
 };
 
 // Self-pay kv_set in notification context — RAM billed to notified receiver
 BOOST_FIXTURE_TEST_CASE(notify_self_pay_bills_receiver, kv_notify_billing_tester) {
-   auto notify_before = get_ram_usage(notify_account);
-   auto sender_before = get_ram_usage(test_account);
+   int64_t notify_before = get_ram_usage(notify_account);
+   int64_t sender_before = get_ram_usage(test_account);
 
    push_action(test_account, "ramnotify"_n, test_account,
       mutable_variant_object()("key_id", 1)("val_size", 100));
    produce_block();
 
-   auto notify_after = get_ram_usage(notify_account);
-   auto sender_after = get_ram_usage(test_account);
+   int64_t notify_after = get_ram_usage(notify_account);
+   int64_t sender_after = get_ram_usage(test_account);
 
    // RAM charged to notified receiver (kvnotify), not sender (kvtest)
    int64_t expected = 4 + 100 + KV_OVERHEAD;
@@ -1309,11 +1316,13 @@ BOOST_FIXTURE_TEST_CASE(idx_store_negative_primary_id_rejected, kv_api_tester) {
 }
 
 // kv_idx_store with a primary_id that does not refer to any existing row
-// must be rejected with kv_key_not_found.
+// must be rejected with kv_key_not_found. INT64_MAX is guaranteed unused by
+// chainbase allocation, so this test doesn't become a false pass if the
+// shared fixture ever grows to allocate many rows.
 BOOST_FIXTURE_TEST_CASE(idx_store_nonexistent_primary_id_rejected, kv_api_tester) {
    BOOST_CHECK_EXCEPTION(
       t.push_action(test_account, "tstidxbadpid"_n, test_account,
-         mutable_variant_object()("pid", 999999999)("sec_size", 8)),
+         mutable_variant_object()("pid", std::numeric_limits<int64_t>::max())("sec_size", 8)),
       kv_key_not_found,
       fc_exception_message_contains("non-existent primary_id"));
 }

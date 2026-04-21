@@ -18,12 +18,21 @@ static constexpr uint32_t test_sec_table_id = 100;
 // Table IDs used by RAM billing, read-only, iterator-mutation, and
 // cross-contract test actions. Keep within uint16_t range so checked_table_id
 // does not reject them.
-static constexpr uint32_t ram_idx_tbl_id  = 300;
-static constexpr uint32_t rdo_tbl_id      = 301;
-static constexpr uint32_t idx_mut_tbl_id  = 302;
-static constexpr uint32_t idx_mut2_tbl_id = 303;
-static constexpr uint32_t idx_mut3_tbl_id = 304;
-static constexpr uint32_t xc_tbl_id       = 305;
+static constexpr uint32_t ram_idx_tbl_id   = 300;
+static constexpr uint32_t rdo_tbl_id       = 301;
+static constexpr uint32_t idx_mut_tbl_id   = 302;
+static constexpr uint32_t idx_mut2_tbl_id  = 303;
+static constexpr uint32_t idx_mut3_tbl_id  = 304;
+static constexpr uint32_t xc_tbl_id        = 305;
+static constexpr uint32_t orphan_tbl_id    = 306;
+static constexpr uint32_t xc_bad_tbl_id    = 307;
+static constexpr uint32_t pid_life_tbl_id  = 308;
+
+// Payload used by the RAM-billing secondary-index actions. A single byte plus
+// the null terminator is the smallest observable primary value; the test side
+// mirrors this constant so changes to it stay in sync.
+static constexpr const char     ram_idx_val[]     = "v";
+static constexpr uint32_t       ram_idx_val_size  = sizeof(ram_idx_val);
 
 using namespace sysio;
 
@@ -2305,8 +2314,8 @@ public:
       char key[256];
       memset(key, 0xB0, 256);
       kv_set(test_table_id, 0, key, 256, "v1", 2);  // create
-      kv_set(test_table_id, 0, key, 256, "v2", 2);  // update — same key, different value
-      char buf[4];
+      kv_set(test_table_id, 0, key, 256, "v2", 2);  // update -- same key, different value
+      char buf[4] = {};
       check(kv_get(test_table_id, get_self().value, key, 256, buf, 4) == 2, "maxkeyupd: value size");
       check(memcmp(buf, "v2", 2) == 0, "maxkeyupd: value should be updated");
    }
@@ -2379,8 +2388,7 @@ public:
    void ramidxstore(uint32_t sec_size, uint32_t pri_size) {
       std::vector<char> sec_key(sec_size, 'S');
       std::vector<char> pri_key(pri_size, 'P');
-      const char val[] = "v";
-      int64_t pid = kv_set(test_table_id, 0, pri_key.data(), pri_size, val, sizeof(val));
+      int64_t pid = kv_set(test_table_id, 0, pri_key.data(), pri_size, ram_idx_val, ram_idx_val_size);
       kv_idx_store(0, ram_idx_tbl_id, pid, sec_key.data(), sec_size);
    }
 
@@ -2391,8 +2399,7 @@ public:
       std::vector<char> sec_key(sec_size, 'S');
       std::vector<char> pri_key(pri_size, 'P');
       // kv_set on an existing key returns that row's primary_id without changing bills (same value).
-      const char val[] = "v";
-      int64_t pid = kv_set(test_table_id, 0, pri_key.data(), pri_size, val, sizeof(val));
+      int64_t pid = kv_set(test_table_id, 0, pri_key.data(), pri_size, ram_idx_val, ram_idx_val_size);
       kv_idx_remove(ram_idx_tbl_id, pid, sec_key.data(), sec_size);
    }
 
@@ -2402,8 +2409,7 @@ public:
       std::vector<char> old_sec(old_ss, 'S');
       std::vector<char> new_sec(new_ss, 'T');
       std::vector<char> pri_key(pri_size, 'P');
-      const char val[] = "v";
-      int64_t pid = kv_set(test_table_id, 0, pri_key.data(), pri_size, val, sizeof(val));
+      int64_t pid = kv_set(test_table_id, 0, pri_key.data(), pri_size, ram_idx_val, ram_idx_val_size);
       kv_idx_update(0, ram_idx_tbl_id, pid,
                     old_sec.data(), old_ss, new_sec.data(), new_ss);
    }
@@ -2413,8 +2419,7 @@ public:
    void ramidxstpyr(sysio::name payer, uint32_t sec_size, uint32_t pri_size) {
       std::vector<char> sec_key(sec_size, 'S');
       std::vector<char> pri_key(pri_size, 'P');
-      const char val[] = "v";
-      int64_t pid = kv_set(test_table_id, payer.value, pri_key.data(), pri_size, val, sizeof(val));
+      int64_t pid = kv_set(test_table_id, payer.value, pri_key.data(), pri_size, ram_idx_val, ram_idx_val_size);
       kv_idx_store(payer.value, ram_idx_tbl_id, pid, sec_key.data(), sec_size);
    }
 
@@ -2424,8 +2429,7 @@ public:
    void ramidxrmpyr(sysio::name payer, uint32_t sec_size, uint32_t pri_size) {
       std::vector<char> sec_key(sec_size, 'S');
       std::vector<char> pri_key(pri_size, 'P');
-      const char val[] = "v";
-      int64_t pid = kv_set(test_table_id, payer.value, pri_key.data(), pri_size, val, sizeof(val));
+      int64_t pid = kv_set(test_table_id, payer.value, pri_key.data(), pri_size, ram_idx_val, ram_idx_val_size);
       kv_idx_remove(ram_idx_tbl_id, pid, sec_key.data(), sec_size);
    }
 
@@ -2435,10 +2439,9 @@ public:
       std::vector<char> old_sec(old_ss, 'S');
       std::vector<char> new_sec(new_ss, 'T');
       std::vector<char> pri_key(pri_size, 'P');
-      const char val[] = "v";
       // Primary was previously created by ramidxstpyr under alice; re-call kv_set
       // with same key to fetch its id without disturbing billing.
-      int64_t pid = kv_set(test_table_id, payer.value, pri_key.data(), pri_size, val, sizeof(val));
+      int64_t pid = kv_set(test_table_id, payer.value, pri_key.data(), pri_size, ram_idx_val, ram_idx_val_size);
       kv_idx_update(payer.value, ram_idx_tbl_id, pid,
                     old_sec.data(), old_ss, new_sec.data(), new_ss);
    }
@@ -2455,23 +2458,25 @@ public:
 
    [[sysio::action]]
    void tstrdoidxst() {
-      // primary_id = 0 is a placeholder — read-only transaction aborts before
-      // kv_idx_store actually dereferences it.
+      // primary_id = -1 is intentional: a negative id would also trigger the
+      // non-negative SYS_ASSERT, but the read-only check fires first. Using
+      // -1 keeps the test failing loudly if anyone reorders the SYS_ASSERTs
+      // in kv_idx_store so the negative check runs before the read-only one.
       char sec[] = "sec";
-      kv_idx_store(0, rdo_tbl_id, 0, sec, 3);
+      kv_idx_store(0, rdo_tbl_id, -1, sec, 3);
    }
 
    [[sysio::action]]
    void tstrdoidxrm() {
       char sec[] = "sec";
-      kv_idx_remove(rdo_tbl_id, 0, sec, 3);
+      kv_idx_remove(rdo_tbl_id, -1, sec, 3);
    }
 
    [[sysio::action]]
    void tstrdoidxup() {
       char os[] = "sec";
       char ns[] = "new";
-      kv_idx_update(0, rdo_tbl_id, 0, os, 3, ns, 3);
+      kv_idx_update(0, rdo_tbl_id, -1, os, 3, ns, 3);
    }
 
    // ════════════════════════════════════════════════════════════════════════════
@@ -2501,7 +2506,10 @@ public:
       require_recipient("kvnotify"_n);
    }
 
-   // Notification handler: third-party payer in notify context — should fail
+   // Notification handler: third-party payer in notify context -- should fail.
+   // Assumes the test fixture is fresh so this kv_set creates a new row (positive
+   // RAM delta). If the key already existed with a larger value the delta would
+   // be negative and the notify-context guard (delta > 0) would not fire.
    [[sysio::on_notify("*::ramnotiferr")]]
    void on_ramnotiferr(uint32_t key_id, uint32_t val_size, sysio::name payer) {
       char key[4];
@@ -2598,17 +2606,19 @@ public:
    // first inserts a primary and captures the id.
    // ════════════════════════════════════════════════════════════════════════════
 
-   // Remove secondary index entry under sec iterator — verify next() advances
+   // Remove secondary index entry under sec iterator -- verify next() advances.
+   // Each iterator-mutation action uses a private primary-key prefix so parallel
+   // runs in the shared fixture don't alias each other at test_table_id.
    [[sysio::action]]
    void tstidxerase() {
       uint64_t self = get_self().value;
       const uint32_t table = idx_mut_tbl_id;
       char sec1[] = "alpha";
       char sec2[] = "bravo";
-      char pri1[] = "pk1";
-      char pri2[] = "pk2";
-      int64_t pid1 = kv_set(test_table_id, 0, pri1, 3, "v", 2);
-      int64_t pid2 = kv_set(test_table_id, 0, pri2, 3, "v", 2);
+      char pri1[] = "ierase-pk1";
+      char pri2[] = "ierase-pk2";
+      int64_t pid1 = kv_set(test_table_id, 0, pri1, sizeof(pri1), ram_idx_val, ram_idx_val_size);
+      int64_t pid2 = kv_set(test_table_id, 0, pri2, sizeof(pri2), ram_idx_val, ram_idx_val_size);
       kv_idx_store(0, table, pid1, sec1, 5);
       kv_idx_store(0, table, pid2, sec2, 5);
 
@@ -2620,58 +2630,60 @@ public:
       kv_idx_remove(table, pid1, sec1, 5);
 
       // next() should advance to "bravo"
-      int32_t st = kv_idx_next(h);
+      int32_t st = kv_idx_next((uint32_t)h);
       check(st == 0, "idxerase: next should find bravo");
 
       char sbuf[16]; uint32_t slen = 0;
-      kv_idx_key(h, 0, sbuf, sizeof(sbuf), &slen);
+      int32_t key_st = kv_idx_key((uint32_t)h, 0, sbuf, sizeof(sbuf), &slen);
+      check(key_st == 0, "idxerase: kv_idx_key status");
       check(slen == 5, "idxerase: sec key size");
       check(memcmp(sbuf, "bravo", 5) == 0, "idxerase: should be bravo");
 
-      kv_idx_destroy(h);
+      kv_idx_destroy((uint32_t)h);
    }
 
-   // Update secondary key under sec iterator — iterator re-scans from old position
+   // Update secondary key under sec iterator -- iterator re-scans from old position
    [[sysio::action]]
    void tstidxmutupd() {
       uint64_t self = get_self().value;
       const uint32_t table = idx_mut2_tbl_id;
       char sec_old[] = "delta";
       char sec_new[] = "zebra";
-      char pri[] = "pk1";
-      int64_t pid = kv_set(test_table_id, 0, pri, 3, "v", 2);
+      char pri[] = "imut-pk1";
+      int64_t pid = kv_set(test_table_id, 0, pri, sizeof(pri), ram_idx_val, ram_idx_val_size);
       kv_idx_store(0, table, pid, sec_old, 5);
 
       // Position sec iterator on "delta"
       int32_t h = kv_idx_find_secondary(self, table, sec_old, 5);
       check(h >= 0, "idxmutupd: should find delta");
 
-      // Update "delta" -> "zebra" — removes old entry, inserts new one
+      // Update "delta" -> "zebra" -- removes old entry, inserts new one
       kv_idx_update(0, table, pid, sec_old, 5, sec_new, 5);
 
       // next() re-scans from "delta" position: "delta" gone, lower_bound lands on "zebra"
-      int32_t st = kv_idx_next(h);
+      int32_t st = kv_idx_next((uint32_t)h);
       check(st == 0, "idxmutupd: should find zebra");
 
       char sbuf[16]; uint32_t slen = 0;
-      kv_idx_key(h, 0, sbuf, sizeof(sbuf), &slen);
+      int32_t key_st = kv_idx_key((uint32_t)h, 0, sbuf, sizeof(sbuf), &slen);
+      check(key_st == 0, "idxmutupd: kv_idx_key status");
       check(slen == 5, "idxmutupd: key size");
       check(memcmp(sbuf, "zebra", 5) == 0, "idxmutupd: should be zebra");
 
-      kv_idx_destroy(h);
+      kv_idx_destroy((uint32_t)h);
    }
 
-   // Insert new secondary entry during iteration — verify visible
+   // Insert new secondary entry during iteration -- verify visible
    [[sysio::action]]
    void tstidxinsert() {
       uint64_t self = get_self().value;
       const uint32_t table = idx_mut3_tbl_id;
       char sec1[] = "aaa";
       char sec3[] = "ccc";
-      char pri1[] = "pk1";
-      char pri3[] = "pk3";
-      int64_t pid1 = kv_set(test_table_id, 0, pri1, 3, "v", 2);
-      int64_t pid3 = kv_set(test_table_id, 0, pri3, 3, "v", 2);
+      char pri1[] = "iins-pk1";
+      char pri3[] = "iins-pk3";
+      int64_t pid1 = kv_set(test_table_id, 0, pri1, sizeof(pri1), ram_idx_val, ram_idx_val_size);
+      int64_t pid3 = kv_set(test_table_id, 0, pri3, sizeof(pri3), ram_idx_val, ram_idx_val_size);
       kv_idx_store(0, table, pid1, sec1, 3);
       kv_idx_store(0, table, pid3, sec3, 3);
 
@@ -2681,20 +2693,21 @@ public:
 
       // Insert "bbb" between aaa and ccc
       char sec2[] = "bbb";
-      char pri2[] = "pk2";
-      int64_t pid2 = kv_set(test_table_id, 0, pri2, 3, "v", 2);
+      char pri2[] = "iins-pk2";
+      int64_t pid2 = kv_set(test_table_id, 0, pri2, sizeof(pri2), ram_idx_val, ram_idx_val_size);
       kv_idx_store(0, table, pid2, sec2, 3);
 
       // next() should see "bbb"
-      int32_t st = kv_idx_next(h);
+      int32_t st = kv_idx_next((uint32_t)h);
       check(st == 0, "idxinsert: next should find bbb");
 
       char sbuf[8]; uint32_t slen = 0;
-      kv_idx_key(h, 0, sbuf, sizeof(sbuf), &slen);
+      int32_t key_st = kv_idx_key((uint32_t)h, 0, sbuf, sizeof(sbuf), &slen);
+      check(key_st == 0, "idxinsert: kv_idx_key status");
       check(slen == 3, "idxinsert: key size");
       check(memcmp(sbuf, "bbb", 3) == 0, "idxinsert: should be bbb");
 
-      kv_idx_destroy(h);
+      kv_idx_destroy((uint32_t)h);
    }
 
    // ════════════════════════════════════════════════════════════════════════════
@@ -2718,12 +2731,13 @@ public:
    // ════════════════════════════════════════════════════════════════════════════
 
    // Attempt kv_idx_store with an explicit primary_id. Host-side validation
-   // rejects negative and non-existent ids with kv_key_not_found. The test
-   // driver supplies the bad id.
+   // rejects negative and non-existent ids with kv_key_not_found. Uses a
+   // dedicated table_id so a bad kv_idx_store call here never touches the
+   // table used by the cross-contract tests.
    [[sysio::action]]
    void tstidxbadpid(int64_t pid, uint32_t sec_size) {
       std::vector<char> sec(sec_size, 'S');
-      kv_idx_store(0, xc_tbl_id, pid, sec.data(), sec_size);
+      kv_idx_store(0, xc_bad_tbl_id, pid, sec.data(), sec_size);
    }
 
    // Store a primary row and save its primary_id under a well-known key so
@@ -2731,8 +2745,7 @@ public:
    [[sysio::action]]
    void tstxcprep() {
       const char pri[] = "xcbpri";
-      const char val[] = "v";
-      int64_t pid = kv_set(test_table_id, 0, pri, sizeof(pri), val, sizeof(val));
+      int64_t pid = kv_set(test_table_id, 0, pri, sizeof(pri), ram_idx_val, ram_idx_val_size);
       char pid_bytes[8];
       memcpy(pid_bytes, &pid, 8);
       // Known key for the peer to retrieve this contract's primary_id
@@ -2752,20 +2765,19 @@ public:
       int64_t other_pid;
       memcpy(&other_pid, pid_bytes, 8);
       const char sec[] = "xcbadsec";
-      kv_idx_store(0, xc_tbl_id, other_pid, sec, sizeof(sec));
+      kv_idx_store(0, xc_bad_tbl_id, other_pid, sec, sizeof(sec));
    }
 
    // Create primary + secondary, erase primary, verify kv_idx_primary_key
    // reports iterator_erased (status 2) and secondary key read still works.
    [[sysio::action]]
    void tstorphansec() {
-      static constexpr uint32_t orphan_tbl = 306;
       const char pri[] = "orphanpri";
       const char sec[] = "orphansec";
-      int64_t pid = kv_set(test_table_id, 0, pri, sizeof(pri), "v", 2);
-      kv_idx_store(0, orphan_tbl, pid, sec, sizeof(sec));
+      int64_t pid = kv_set(test_table_id, 0, pri, sizeof(pri), ram_idx_val, ram_idx_val_size);
+      kv_idx_store(0, orphan_tbl_id, pid, sec, sizeof(sec));
 
-      int32_t h = kv_idx_find_secondary(get_self().value, orphan_tbl, sec, sizeof(sec));
+      int32_t h = kv_idx_find_secondary(get_self().value, orphan_tbl_id, sec, sizeof(sec));
       check(h >= 0, "orphansec: find should succeed");
 
       // Erase the primary row
@@ -2773,7 +2785,7 @@ public:
 
       // kv_idx_primary_key on the still-live secondary iterator should now
       // report iterator_erased (the lazy primary lookup fails).
-      char pkbuf[32]; uint32_t pksz = 0;
+      char pkbuf[32] = {}; uint32_t pksz = 0;
       int32_t st = kv_idx_primary_key((uint32_t)h, 0, pkbuf, sizeof(pkbuf), &pksz);
       check(st == 2, "orphansec: kv_idx_primary_key should return iterator_erased (2)");
 
@@ -2781,12 +2793,13 @@ public:
    }
 
    // kv_set on an existing key returns the same primary_id (chainbase id
-   // is stable across updates).
+   // is stable across updates). Uses a dedicated table_id so lifecycle asserts
+   // don't share storage with the general-purpose primary table.
    [[sysio::action]]
    void tstpidstable() {
       const char key[] = "pidstable";
-      int64_t pid1 = kv_set(test_table_id, 0, key, sizeof(key), "v1", 2);
-      int64_t pid2 = kv_set(test_table_id, 0, key, sizeof(key), "v2updated", 9);
+      int64_t pid1 = kv_set(pid_life_tbl_id, 0, key, sizeof(key), "v1", 2);
+      int64_t pid2 = kv_set(pid_life_tbl_id, 0, key, sizeof(key), "v2updated", 9);
       check(pid1 == pid2, "pidstable: update must preserve primary_id");
    }
 
@@ -2795,35 +2808,38 @@ public:
    [[sysio::action]]
    void tstpidrecyc() {
       const char key[] = "pidrecyc";
-      int64_t pid1 = kv_set(test_table_id, 0, key, sizeof(key), "v1", 2);
-      kv_erase(test_table_id, key, sizeof(key));
-      int64_t pid2 = kv_set(test_table_id, 0, key, sizeof(key), "v2", 2);
+      int64_t pid1 = kv_set(pid_life_tbl_id, 0, key, sizeof(key), "v1", 2);
+      kv_erase(pid_life_tbl_id, key, sizeof(key));
+      int64_t pid2 = kv_set(pid_life_tbl_id, 0, key, sizeof(key), "v2", 2);
       check(pid1 != pid2, "pidrecyc: erase+recreate must yield a new primary_id");
    }
 
    // ════════════════════════════════════════════════════════════════════════════
-   // Cross-contract read action (existing; renamed internally from the earlier
-   // xcidxread action — kept for cross_contract_idx_read test). The action
-   // below demonstrates reading a row stored by a different contract via
-   // kv_get; the secondary index lookup is also exercised.
+   // Cross-contract read: find sec-entry on other contract, materialize the
+   // primary key via kv_idx_primary_key (exercises the lazy foreign-primary
+   // resolution path), then read the primary row value via kv_get.
    // ════════════════════════════════════════════════════════════════════════════
 
-   // Read another contract's secondary index; verify the secondary entry
-   // references a row in the other contract's primary table and read its value.
    [[sysio::action]]
    void xcidxread(sysio::name other) {
       // Find secondary index entry on other contract
       int32_t h = kv_idx_find_secondary(other.value, xc_tbl_id, "xcsec", 5);
       check(h >= 0, "xcidxread: secondary not found");
 
-      // Use the iterator directly: read primary value via kv_get on other contract.
-      // (Under the primary_id signature the secondary stores only a ref; the primary
-      // key text is still "xcpri" as stored by xcsetup.)
-      char val_buf[16];
-      int32_t val_sz = kv_get(test_table_id, other.value, "xcpri", 5, val_buf, sizeof(val_buf));
+      // Resolve primary key bytes via the sec iterator -- this triggers the
+      // host's lazy lookup of the primary row on the OTHER contract's code.
+      char pkbuf[16]; uint32_t pksz = 0;
+      int32_t pk_st = kv_idx_primary_key((uint32_t)h, 0, pkbuf, sizeof(pkbuf), &pksz);
+      check(pk_st == 0, "xcidxread: kv_idx_primary_key status");
+      check(pksz == 5, "xcidxread: primary key size");
+      check(memcmp(pkbuf, "xcpri", 5) == 0, "xcidxread: primary key data");
+
+      // Use the recovered primary key to read the value via kv_get.
+      char val_buf[16] = {};
+      int32_t val_sz = kv_get(test_table_id, other.value, pkbuf, pksz, val_buf, sizeof(val_buf));
       check(val_sz == 5, "xcidxread: value size");
       check(memcmp(val_buf, "xcval", 5) == 0, "xcidxread: value data");
 
-      kv_idx_destroy(h);
+      kv_idx_destroy((uint32_t)h);
    }
 };
