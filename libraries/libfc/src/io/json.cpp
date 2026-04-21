@@ -35,8 +35,6 @@ namespace
 
    // Max |value| decimal strings used to pick the smallest variant bucket that fits a token.
    // Signed entries use the magnitude of *_MIN (one greater than *_MAX); unsigned entries use *_MAX.
-   constexpr std::string_view int64_max_str   = "9223372036854775808";
-   constexpr std::string_view uint64_max_str  = "18446744073709551615";
    constexpr std::string_view int256_max_str =
       "57896044618658097711785492504343953926634992332820282019728792003956564819968";
    constexpr std::string_view uint256_max_str =
@@ -374,32 +372,47 @@ namespace fc
 
       // if the string is empty and we dropped zeros
       if (str.empty() && no_neg_start < start)
-        return 0;
+         return 0u;
+
       // check for s== ".", "-","-.", since "[-]0*" is checked above
       if (str == "." || str.empty()) // check the obviously wrong things we could have encountered
-        FC_THROW_EXCEPTION(parse_error_exception, "Can't parse token \"{}\" as a JSON numeric constant", str);
+         FC_THROW_EXCEPTION(parse_error_exception, "Can't parse token \"{}\" as a JSON numeric constant", str);
+
       if( dot )
-        return parser_type == json::parse_type::legacy_parser_with_string_doubles ? variant(s) : variant(to_double(s));
+         return parser_type == json::parse_type::legacy_parser_with_string_doubles ? variant(s) : variant(to_double(s));
+
       if( neg ) {
-        if( str.size() < int64_max_str.size() ||
-           (str.size() == int64_max_str.size() && str <= int64_max_str) )
-          return to_int64(s);
+         if (str.length() > int256_max_str.length() ||
+             (str.length() == int256_max_str.length() && str > int256_max_str)) {
+            FC_THROW_EXCEPTION(parse_error_exception,
+                               "Negative numeric token \"{}\" exceeds int256 range", s);
+         }
 
-        if (str.size() > int256_max_str.size() ||
-           (str.size() == int256_max_str.size() && str > int256_max_str))
-          FC_THROW_EXCEPTION(parse_error_exception,
-                             "Negative numeric token \"{}\" exceeds int256 range", s);
-        return variant(fc::int256(s));
+         // using the string with no leading 0s, to avoid the string being assumed to be in octal,
+         // since a leading 0 with only digits between 0 and 7 are assumed to be octal
+         fc::int256 val256(str);
+         val256 *= -1;
+         if( val256 >= std::numeric_limits<int64_t>::min() ) {
+            return static_cast<int64_t>(val256);
+         }
+
+         return val256;
       }
-      if( str.size() < uint64_max_str.size() ||
-         (str.size() == uint64_max_str.size() && str <= uint64_max_str) )
-        return to_uint64(s);
 
-      if (str.size() > uint256_max_str.size() ||
-         (str.size() == uint256_max_str.size() && str > uint256_max_str))
-        FC_THROW_EXCEPTION(parse_error_exception,
-                           "Numeric token \"{}\" exceeds uint256 range", s);
-      return variant(fc::uint256(s));
+      if (str.length() > uint256_max_str.length() ||
+          (str.length() == uint256_max_str.length() && str > uint256_max_str)) {
+         FC_THROW_EXCEPTION(parse_error_exception,
+                            "Numeric token \"{}\" exceeds uint256 range", s);
+      }
+
+      // using the string with no leading 0s, to avoid the string being assumed to be in octal,
+      // since a leading 0 with only digits between 0 and 7 are assumed to be octal
+      fc::uint256 val256(str);
+      if( val256 <= std::numeric_limits<uint64_t>::max() ) {
+         return static_cast<uint64_t>(val256);
+      }
+
+      return val256;
    }
 
    template<typename T>

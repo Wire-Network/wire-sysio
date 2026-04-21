@@ -234,10 +234,10 @@ BOOST_AUTO_TEST_CASE(number_from_stream_positive_uint64_max) {
 
 BOOST_AUTO_TEST_CASE(number_from_stream_positive_uint64_max_plus_one) {
    // UINT64_MAX + 1 = 18446744073709551616 (one past threshold) -> uint256
-   const auto max_plus = static_cast<uint128_t>(std::numeric_limits<uint64_t>::max()) + 1;
-   const auto str = fc::to_string(max_plus);
-   variant v = json::from_string(str);
+   fc::uint256 max_plus = fc::uint256(std::numeric_limits<uint64_t>::max()) + 1;
+   variant v = json::from_string(max_plus.str());
    BOOST_CHECK(v.is_uint256());
+   BOOST_CHECK_EQUAL(v.as_uint256(), max_plus);
 }
 
 BOOST_AUTO_TEST_CASE(number_from_stream_positive_far_past_uint64) {
@@ -299,6 +299,13 @@ BOOST_AUTO_TEST_CASE(number_from_stream_leading_zeros_fit_uint64) {
    variant v = json::from_string("0000000000000000000000042");
    BOOST_CHECK(v.is_uint64());
    BOOST_CHECK_EQUAL(v.as_uint64(), 42ull);
+}
+
+BOOST_AUTO_TEST_CASE(number_from_stream_negative_leading_zeros_fit_int64) {
+   // Leading zeros stripped before length check -> should route to uint64
+   variant v = json::from_string("-0000000000000000000000042");
+   BOOST_CHECK(v.is_int64());
+   BOOST_CHECK_EQUAL(v.as_int64(), -42ll);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
