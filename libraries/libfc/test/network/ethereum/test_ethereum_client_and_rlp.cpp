@@ -324,4 +324,69 @@ BOOST_AUTO_TEST_CASE(can_encode_tx_01) try {
    BOOST_CHECK_EQUAL(actual_unsigned_hex, test_tx_01_result);
 }
 FC_LOG_AND_RETHROW();
+
+// Signed EIP-1559 r/s must be encoded as minimal big-endian integers.
+// Strict RLP decoders (alloy-rs used by reth/anvil) reject non-minimal
+// fixed-width 32-byte string encodings of r/s with "leading zero" when the
+// most significant byte happens to be 0x00 — this occurs for ~1/256 signatures.
+BOOST_AUTO_TEST_CASE(signed_rlp_strips_leading_zeros_in_r_and_s) try {
+   auto minimal_tx = test_tx_01;
+
+   // Craft r and s whose top byte is 0x00 — the bug-triggering case.
+   bytes32 r_with_leading_zero{};
+   r_with_leading_zero[0] = 0x00;
+   for (std::size_t i = 1; i < r_with_leading_zero.size(); ++i)
+      r_with_leading_zero[i] = static_cast<std::uint8_t>(i); // 0x01..0x1f
+   bytes32 s_with_leading_zero{};
+   s_with_leading_zero[0] = 0x00;
+   for (std::size_t i = 1; i < s_with_leading_zero.size(); ++i)
+      s_with_leading_zero[i] = static_cast<std::uint8_t>(0x20 + i - 1); // 0x20..0x3e
+
+   minimal_tx.r = r_with_leading_zero;
+   minimal_tx.s = s_with_leading_zero;
+   minimal_tx.v = 1;
+
+   auto encoded = rlp::encode_eip1559_signed_typed(minimal_tx);
+   auto encoded_hex = rlp::to_hex(encoded, false);
+
+   // The tail of the encoded tx is: access-list (c0), v (01), r, s.
+   // Both r and s must be encoded as 31-byte integers (prefix 0x9f) — not
+   // 32-byte strings (prefix 0xa0 00 ...).
+   const std::string expected_tail =
+      "c001"
+      "9f" "0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f"
+      "9f" "202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e";
+   BOOST_CHECK(encoded_hex.ends_with(expected_tail));
+   // And the legacy, non-minimal forms must NOT appear anywhere.
+   BOOST_CHECK(encoded_hex.find("a0000102030405") == std::string::npos);
+   BOOST_CHECK(encoded_hex.find("a0002021222324") == std::string::npos);
+}
+FC_LOG_AND_RETHROW();
+
+// Signatures whose top byte is non-zero must still be encoded as full 32-byte
+// integers (prefix 0xa0) — the minimal encoding happens to be 32 bytes wide.
+BOOST_AUTO_TEST_CASE(signed_rlp_preserves_full_width_when_no_leading_zero) try {
+   auto tx = test_tx_01;
+   bytes32 r_full;
+   bytes32 s_full;
+   for (std::size_t i = 0; i < 32; ++i) {
+      r_full[i] = static_cast<std::uint8_t>(0x80 + i); // starts at 0x80 — no leading zero
+      s_full[i] = static_cast<std::uint8_t>(0xff - i); // starts at 0xff — no leading zero
+   }
+   tx.r = r_full;
+   tx.s = s_full;
+   tx.v = 0;
+
+   auto encoded = rlp::encode_eip1559_signed_typed(tx);
+   auto encoded_hex = rlp::to_hex(encoded, false);
+
+   // access-list c0, v=0 encoded as empty (0x80), r (a0 + 32 bytes), s (a0 + 32 bytes).
+   const std::string expected_tail =
+      "c080"
+      "a0" "808182838485868788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9f"
+      "a0" "fffefdfcfbfaf9f8f7f6f5f4f3f2f1f0efeeedecebeae9e8e7e6e5e4e3e2e1e0";
+   BOOST_CHECK(encoded_hex.ends_with(expected_tail));
+}
+FC_LOG_AND_RETHROW();
+
 BOOST_AUTO_TEST_SUITE_END()

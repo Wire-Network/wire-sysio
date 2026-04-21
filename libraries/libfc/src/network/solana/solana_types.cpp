@@ -93,11 +93,11 @@ std::vector<uint8_t> message::serialize() const {
    auto len_bytes = compact_u16::encode(static_cast<uint16_t>(account_keys.size()));
    result.insert(result.end(), len_bytes.begin(), len_bytes.end());
    for (const auto& key : account_keys) {
-      result.insert(result.end(), key.data.begin(), key.data.end());
+      result.insert(result.end(), key._data.begin(), key._data.end());
    }
 
    // Recent blockhash (32 bytes)
-   result.insert(result.end(), recent_blockhash.data.begin(), recent_blockhash.data.end());
+   result.insert(result.end(), recent_blockhash._data.begin(), recent_blockhash._data.end());
 
    // Instructions (compact-u16 length + instructions)
    len_bytes = compact_u16::encode(static_cast<uint16_t>(instructions.size()));
@@ -136,19 +136,19 @@ message message::deserialize(const uint8_t* data, size_t len) {
    auto [num_keys, key_len_bytes] = compact_u16::decode(data + offset, len - offset);
    offset += key_len_bytes;
 
-   FC_ASSERT(offset + num_keys * solana_public_key::SIZE <= len, "Message too short for account keys");
+   FC_ASSERT(offset + num_keys * solana_public_key::size <= len, "Message too short for account keys");
    msg.account_keys.reserve(num_keys);
    for (uint16_t i = 0; i < num_keys; ++i) {
       solana_public_key key;
-      std::memcpy(key.data.data(), data + offset, solana_public_key::SIZE);
+      std::memcpy(key._data.data(), data + offset, solana_public_key::size);
       msg.account_keys.push_back(key);
-      offset += solana_public_key::SIZE;
+      offset += solana_public_key::size;
    }
 
    // Recent blockhash
-   FC_ASSERT(offset + solana_public_key::SIZE <= len, "Message too short for blockhash");
-   std::memcpy(msg.recent_blockhash.data.data(), data + offset, solana_public_key::SIZE);
-   offset += solana_public_key::SIZE;
+   FC_ASSERT(offset + solana_public_key::size <= len, "Message too short for blockhash");
+   std::memcpy(msg.recent_blockhash._data.data(), data + offset, solana_public_key::size);
+   offset += solana_public_key::size;
 
    // Instructions
    auto [num_instructions, instr_len_bytes] = compact_u16::decode(data + offset, len - offset);
@@ -207,11 +207,11 @@ std::vector<uint8_t> versioned_message::serialize() const {
    auto len_bytes = compact_u16::encode(static_cast<uint16_t>(static_account_keys.size()));
    result.insert(result.end(), len_bytes.begin(), len_bytes.end());
    for (const auto& key : static_account_keys) {
-      result.insert(result.end(), key.data.begin(), key.data.end());
+      result.insert(result.end(), key._data.begin(), key._data.end());
    }
 
    // Recent blockhash (32 bytes)
-   result.insert(result.end(), recent_blockhash.data.begin(), recent_blockhash.data.end());
+   result.insert(result.end(), recent_blockhash._data.begin(), recent_blockhash._data.end());
 
    // Instructions (compact-u16 length + instructions)
    len_bytes = compact_u16::encode(static_cast<uint16_t>(instructions.size()));
@@ -238,7 +238,7 @@ std::vector<uint8_t> versioned_message::serialize() const {
 
    for (const auto& lookup : address_table_lookups) {
       // Lookup table key
-      result.insert(result.end(), lookup.key.data.begin(), lookup.key.data.end());
+      result.insert(result.end(), lookup.key._data.begin(), lookup.key._data.end());
 
       // Writable indices
       auto writable_len = compact_u16::encode(static_cast<uint16_t>(lookup.writable_indices.size()));
@@ -266,7 +266,7 @@ std::vector<uint8_t> transaction::serialize() const {
    result.insert(result.end(), len_bytes.begin(), len_bytes.end());
 
    for (const auto& sig : signatures) {
-      result.insert(result.end(), sig.data.begin(), sig.data.end());
+      result.insert(result.end(), sig.begin(), sig.end());
    }
 
    // Message
@@ -286,13 +286,13 @@ transaction transaction::deserialize(const uint8_t* data, size_t len) {
    auto [num_sigs, sig_len_bytes] = compact_u16::decode(data + offset, len - offset);
    offset += sig_len_bytes;
 
-   FC_ASSERT(offset + num_sigs * solana_signature::SIZE <= len, "Transaction too short for signatures");
+   FC_ASSERT(offset + num_sigs * std::tuple_size_v<solana_signature> <= len, "Transaction too short for signatures");
    tx.signatures.reserve(num_sigs);
    for (uint16_t i = 0; i < num_sigs; ++i) {
       solana_signature sig;
-      std::memcpy(sig.data.data(), data + offset, solana_signature::SIZE);
+      std::memcpy(sig.data(), data + offset, std::tuple_size_v<solana_signature>);
       tx.signatures.push_back(sig);
-      offset += solana_signature::SIZE;
+      offset += std::tuple_size_v<solana_signature>;
    }
 
    // Message
@@ -313,7 +313,7 @@ std::vector<uint8_t> versioned_transaction::serialize() const {
    result.insert(result.end(), len_bytes.begin(), len_bytes.end());
 
    for (const auto& sig : signatures) {
-      result.insert(result.end(), sig.data.begin(), sig.data.end());
+      result.insert(result.end(), sig.begin(), sig.end());
    }
 
    // Versioned message
@@ -331,7 +331,7 @@ solana_public_key to_pubkey(const pubkey_compat_t& pk) {
    if (std::holds_alternative<solana_public_key>(pk)) {
       return std::get<solana_public_key>(pk);
    }
-   return solana_public_key::from_base58(std::get<std::string>(pk));
+   return solana_public_key::from_base58_string(std::get<std::string>(pk));
 }
 
 }  // namespace fc::network::solana

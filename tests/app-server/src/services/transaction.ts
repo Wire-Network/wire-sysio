@@ -131,7 +131,7 @@ export async function createLinkTransaction(
     type: "EM",
     compressed: ethers.getBytes("0x" + compressedHex)
   })
-  const pubKeyString = pubKeyObj.toHexString() // "PUB_EM_..."
+  const pubKeyString = pubKeyObj.toHexString()
 
   const msg = `${pubKeyString}|${username}|${chainKind}|${nonce}|createlink auth`
 

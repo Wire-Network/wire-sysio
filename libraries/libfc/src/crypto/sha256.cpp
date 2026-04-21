@@ -28,6 +28,9 @@ namespace fc {
     std::string sha256::str() const {
        return fc::to_hex((char*)_hash, sizeof(_hash));
     }
+    std::string sha256::short_id() const {
+       return fc::to_hex(data() + 4, 8); // skip 4-byte block num prefix, 8 bytes = 16 hex chars
+    }
 
     const char* sha256::data()const { return reinterpret_cast<const char*>(&_hash[0]); }
     char*       sha256::data() { return reinterpret_cast<char*>(&_hash[0]); }

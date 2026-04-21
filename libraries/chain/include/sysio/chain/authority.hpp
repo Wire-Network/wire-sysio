@@ -94,7 +94,7 @@ struct shared_public_key {
          },
          [&](const shared_bls_public_key& spk) {
             const auto& data = r.get<fc::crypto::bls::public_key_shim>().serialize();
-            return spk.size() == data.size() && std::memcmp(spk.data(), data.data(), data.size()) == 0;
+            return spk.size() == data.size() && (data.empty() || std::memcmp(spk.data(), data.data(), data.size()) == 0);
          }
       }, l.pubkey);
    }

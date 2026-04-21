@@ -2,13 +2,67 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Code Quality Standards
+
+This is blockchain infrastructure code. **Prefer the best solution over the simplest one.** Correctness, robustness, and consensus safety always take priority over brevity or speed of implementation.
+
+- **Consensus determinism**: All code that executes on-chain must produce identical results across all nodes. No floating point, no uninitialized memory reads, no undefined behavior, no platform-dependent behavior.
+- **Thoroughness over shortcuts**: Take the time to understand the full problem. Read all relevant code before proposing changes. Do not suggest partial or "quick fix" solutions when a complete, well-designed solution is achievable.
+- **Complete test coverage**: Every change should include tests that cover normal paths, edge cases, and error conditions. Tests should verify behavior, not just that code compiles.
+- **Robustness**: Handle error conditions properly. Validate inputs at system boundaries. Prefer compile-time checks over runtime checks where possible.
+- **Clean code**: Use clear naming, consistent patterns, and appropriate abstractions. Code should be easy to audit and review.
+
+Do not optimize for token economy or response brevity at the expense of code quality. A longer, more thorough response that produces correct, well-tested code is always preferred.
+
+## Code Quality Invariants
+
+Apply these to every change in this repo. Check them before declaring a task complete — they are not optional polish.
+
+### 1. No duplicated helpers
+
+If the same helper / check / calculation appears in two translation units, extract it. Pick the home by scope:
+
+- **One plugin, internal:** anonymous namespace in the `.cpp`, or a `private`/`protected` member on the owning class.
+- **Shared across plugins:** public header under the owning plugin's `include/sysio/<plugin>/` tree, or `libraries/libfc/` when it has no plugin dependency.
+- **Common behaviour every subclass of an abstract base needs:** `protected` member (or `static` if stateless) on the base, NOT repeated in every concrete.
+
+Example: `check_deadline` used to live verbatim in both `outpost_ethereum_client.cpp` and `outpost_solana_client.cpp`. It now lives as `outpost_client::throw_if_past_deadline` and uses the client's own `to_string()` for the error label — one place to change, and the concretes get a more specific diagnostic for free.
+
+### 2. No magic literals
+
+Every string or numeric value that isn't a trivial array index / loop bound lives behind a named `constexpr`:
+
+- **File-local:** `constexpr std::string_view` / `constexpr auto` in the anonymous namespace at the top of the `.cpp`.
+- **Shared:** `inline constexpr` in a header (`constexpr` variables are implicitly inline since C++17 — being explicit never hurts).
+- **Contract-related identifiers (account names, table names, action names, secondary-index names, field keys):** group by contract in a nested `namespace`, e.g.
+  ```cpp
+  namespace msgch {
+     constexpr auto account          = "sysio.msgch";
+     constexpr auto table_envelopes  = "envelopes";
+     constexpr auto action_deliver   = "deliver";
+     constexpr auto index_byoutepoch = "byoutepoch";
+     namespace field { constexpr auto batch_op_name = "batch_op_name"; }
+  }
+  ```
+  A contract rename becomes one grep-and-change, not twenty scattered literals.
+
+### 3. Enums over raw values
+
+Any value drawn from a closed set — chain kind, envelope status, operator type, message direction — uses the enum member, never the underlying `int` or `string`.
+
+- Prefer `FC_REFLECT_ENUM`-reflected protobuf enums (`sysio::opp::types::ChainKind`, `sysio::opp::types::EnvelopeStatus`) over hand-rolled sentinels.
+- Decode variants as the enum type: `obj["status"].as<EnvelopeStatus>()`, never `static_cast<EnvelopeStatus>(obj["status"].as_uint64())`.
+- Enum-to-string: `sysio::opp::types::ChainKind_Name(kind)`. Don't hand-roll switches for human-readable names.
+
+A rename of `CHAIN_KIND_ETHEREUM` propagates through the compiler automatically when the code holds the enum. It doesn't when the code holds the bare string `"CHAIN_KIND_ETHEREUM"` or the integer `2`.
+
 ## Project Overview
 
 Wire Sysio is a C++ implementation of the AntelopeIO protocol (a fork of Spring), containing blockchain node software and supporting tools. The main executable is `nodeop` (blockchain node), with supporting tools `clio` (CLI client), `kiod` (key store daemon), and `sys-util`.
 
 ## Build Commands
 
-**Note:** The build directory varies by developer (e.g. `cmake-build-debug`, `build`, `build/debug-claude`). Examples below use `$BUILD_DIR` — substitute your actual build path.
+**Note:** The build directory MUST be located under `<wire-sysio>/build/`, examples include `<wire-sysio>/build/claude`, `<wire-sysio>/build/debug-claude`, etc). Examples below use `$BUILD_DIR` — substitute your actual build path.
 
 ### Prerequisites (one-time setup)
 ```bash
@@ -22,6 +76,14 @@ sudo apt-get install -y build-essential binutils ccache cmake curl git ninja-bui
 
 ### Configure and Build
 ```bash
+
+# Clear `linuxbrew` from PATH (if present) to avoid conflicts with system libraries and compilers.
+# This is important for consistent builds.
+export PATH=$(echo "$PATH" | tr ':' '\n' | grep -v linuxbrew | tr '\n' ':' | sed 's/:$//')
+
+# Example build directory
+export BUILD_DIR=$PWD/build/claude
+
 # Set compiler environment
 export CC=/usr/bin/clang-18
 export CXX=/usr/bin/clang++-18
@@ -62,6 +124,14 @@ ninja -C $BUILD_DIR unit_test       # Build unit tests
 cd $BUILD_DIR && ctest -j "$(nproc)" -LE _tests
 ```
 
+**Tip:** ctest runs take a long time. Always log output to a temp file so you can grep/tail without re-running:
+```bash
+cd $BUILD_DIR && ctest -j "$(nproc)" -LE "(nonparallelizable_tests|long_running_tests|wasm_spec_tests)" --output-on-failure --timeout 1000 2>&1 | tee /tmp/ctest-run.log
+# Then analyze without re-running:
+grep "Failed" /tmp/ctest-run.log
+grep "% tests passed" /tmp/ctest-run.log
+```
+
 ### Run Specific Test Suite
 ```bash
 # Run a single Boost.Test suite
@@ -76,6 +146,33 @@ cd $BUILD_DIR && ctest -j "$(nproc)" -LE _tests
 ./$BUILD_DIR/unittests/unit_test --run_test=block_tests -- --sys-vm-oc
 ```
 
+### Test Binaries
+
+Tests are split across **multiple binaries** depending on which CMake target owns the source file. `unit_test` does NOT contain everything — always check which binary owns a test before trying to run it.
+
+| Binary | Source location | Purpose |
+|--------|-----------------|---------|
+| `$BUILD_DIR/unittests/unit_test` | `unittests/*.cpp` | Core chain/library unit tests |
+| `$BUILD_DIR/tests/plugin_test` | `tests/get_table_tests.cpp`, `tests/test_*.cpp` | chain_plugin / plugin-level integration tests (e.g. `get_table_tests`, `get_kv_rows_*`, `account_query_db`, `trx_finality_status`, `trx_retry_db`) |
+| `$BUILD_DIR/contracts/tests/contracts_unit_test` | `contracts/tests/*.cpp` | System contract Boost tests (sysio.system, sysio.token, sysio.msig, sysio.roa, sysio.authex, sysio.bios) |
+| `$BUILD_DIR/libraries/libfc/test/test_fc` | `libraries/libfc/test/*.cpp` | libfc unit tests (crypto, serialization, clients) |
+
+**Boost.Test naming — common pitfall:**
+- The `--run_test=<suite>` filter uses the suite name declared by `BOOST_AUTO_TEST_SUITE(<name>)` in the source — **NOT the filename**. Example: `libraries/libfc/test/io/test_json.cpp` declares `BOOST_AUTO_TEST_SUITE(json_test_suite)`, so run it with `--run_test=json_test_suite`, not `--run_test=json_tests` or `--run_test=test_json`.
+- To find the suite name: `grep "BOOST_AUTO_TEST_SUITE(" <file.cpp>` (first match is the top-level suite). Or list everything with `./test_fc --list_content` and scan for your case name — the suite is the parent entry.
+- Suite-name != test-binary: `test_fc` is the binary that contains many suites; a single suite lives in one `.cpp` file but the filename and suite name can diverge.
+- Full path for a single case: `--run_test=<suite>/<case>` (e.g. `--run_test=json_test_suite/parse_escape_unicode_errors`).
+- Output convention: a green `*** No errors detected` line means all filtered cases passed; red `*** N failures are detected` means N failed and test-case lines above identify which.
+- If `unit_test --run_test=foo` reports `no test cases matching filter`, the test almost certainly lives in a different binary — try `plugin_test` first, then `contracts_unit_test`.
+
+**Standard pre-PR test sweep** — both `unit_test` AND `plugin_test` (and ideally `contracts_unit_test` and `test_fc`) should be built and run before creating a PR:
+```bash
+ninja -C $BUILD_DIR -j6 unit_test plugin_test contracts_unit_test test_fc
+./$BUILD_DIR/unittests/unit_test -- --sys-vm
+./$BUILD_DIR/tests/plugin_test
+./$BUILD_DIR/contracts/tests/contracts_unit_test -- --sys-vm
+./$BUILD_DIR/libraries/libfc/test/test_fc
+```
 ### Test Categories
 ```bash
 # Run from $BUILD_DIR
@@ -131,6 +228,18 @@ FC_REFLECT(my_namespace::my_type, (field1)(field2)(field3))
 FC_REFLECT_ENUM(my_namespace::my_enum, (value1)(value2)(value3))
 ```
 
+## Git Practices
+
+**NEVER use `git add -A` or `git add .`** — these will stage build artifacts, core dumps, submodules, and other untracked files. Always stage specific files by name.
+
+## Documentation Comments
+
+All generated or modified code **must** include documentation comments.
+
+- **C/C++**: Use Doxygen-style comments (`/** ... */` or `/// ...`). Place doc comments in header files when the declaration lives in a header; use implementation-file comments only for internal/static functions with no header declaration.
+- **Python**: Use docstrings (triple-quoted `"""..."""`), compatible with Sphinx or MkDocs. Not JSDoc.
+- **TypeScript/JavaScript**: Use JSDoc comments (`/** ... */`), compatible with Docusaurus.
+
 ## Code Style
 
 Uses `.clang-format` with LLVM base style and these key differences:
@@ -161,6 +270,26 @@ Three WASM execution runtimes available (x86_64 Linux):
 
 Tests run against all runtimes by default. Specify runtime with `-- --sys-vm`, `-- --sys-vm-jit`, or `-- --sys-vm-oc`.
 
+## OPP Protobufs & Libraries
+
+WIRE uses OPP to communicate between WIRE BLOCKCHAIN and EXTERNAL BLOCKCHAINS.
+
+OPP is a protocol (encoding scheme) that uses protobufs; the library is located at [libraries/opp](libraries/opp).
+The protobufs are located at [libraries/opp/proto](libraries/opp/proto).
+
+After updating the protobufs:
+- **TS/JS packages**: Run `cd wire-sysio/libraries/opp/tools && ./generate-opp-bundles.fish` to regenerate the TypeScript/Solidity/Solana model packages (`@wireio/opp-typescript-models`, etc.) consumed by `wire-e2e-tests`, `wire-ethereum`, and other JS/TS repos.
+- **C++ (host + CDT/WASM)**: Both host protobuf headers (`.pb.h` via `protoc`) and CDT contract headers (`.pb.hpp` via `protoc-gen-zpp`) are generated automatically by CMake `add_dependency` targets when the project is configured/built. No manual step required — just rebuild.
+
+### Local OPP Model Location (Optional in development environments)
+
+If you are developing on a local machine and `<wire-sysio>/../wire-opp` exists,
+then PNPM/NPM & other repos (i.e. `wire-ethereum`, `wire-e2e-tests`, etc.) will look for the OPP protobufs
+and generated types in that location.
+
+If the directory exists, when `./generate-opp-bundles.fish` is run, the generated protobuf bundles will be copied to
+`<wire-sysio>/../wire-opp/{typescript,solidity,solana}/`.
+
 ## Docker Build
 
 ```bash
@@ -180,3 +309,116 @@ The `tests/` directory contains Python integration tests using TestHarness frame
 cd $BUILD_DIR && python3 tests/<test_name>.py
 ```
 Do NOT run from the source root — that would use stale or missing binaries.
+
+## Smart Contract Compilation (System Contracts specifically)
+
+The system contracts are compiled via the `contracts_project` CMake target.
+
+> DO NOT COMPILE THE SYSTEM CONTRACTS DIRECTLY! Always use the `contracts_project` target.
+
+### CDT-Generated Artifacts
+
+> NOTE: There are `.gitignore` files specifically excluding the artifacts described below
+> but just in case, here are the details
+
+CDT generates `.actions.cpp`, `.dispatch.cpp`, and `.desc` files alongside compiled contracts. These are **not committed** — `.gitignore` files in `contracts/` and `unittests/test-contracts/` exclude them. If they appear as untracked, delete them:
+
+```bash
+find contracts/ unittests/test-contracts/ -name "*.actions.cpp" -o -name "*.dispatch.cpp" -o -name "*.desc" | xargs rm -f
+```
+
+## Copy compiled contract artifacts to source tree
+
+After building contracts, you MUST copy the compiled `.wasm` and `.abi` files from the build directory back to the source tree. This is required before generating system contract types and before testing.
+
+```bash
+for c in epoch opreg msgch uwrit chalg authex; do
+  cp "$BUILD_DIR/contracts/sysio.$c/sysio.$c.wasm" "contracts/sysio.$c/" 2>/dev/null
+  cp "$BUILD_DIR/contracts/sysio.$c/sysio.$c.abi" "contracts/sysio.$c/" 2>/dev/null
+done
+```
+
+## Generate client types for system contracts
+
+> NOTE: In a dev environment, `pnpm link` should be configured to avoid the need to publish
+> the contract types changes until fully integrated. If the host OS system username is in
+> the following list, then packages have been linked and the following does not
+> require publishing [`jglanz`]
+
+To generate the client types for the system contracts,run the following commands.
+
+`<wire-sysio>/contracts/tools/generate-system-contract-types.py -B . -O /tmp/ctt -P snake -f` then `cp
+  /tmp/ctt/typescript/SystemContractTypes.ts  <wire-libraries-ts>/packages/sdk-core/src/types/` and lastly run `cd <wire-libraries-ts> &&
+  pnpm build`
+
+This makes the types available in the SDK as:
+```ts
+import { SystemContracts } from '@wire-libraries/sdk-core';
+```
+
+
+## Regenerating Test Reference Data
+
+Some tests compare against pre-generated reference data. When contracts are recompiled (different WASM = different action merkle roots), this data must be regenerated.
+
+### Deep Mind Log
+
+The `deep_mind_tests` compare against `unittests/deep-mind/deep-mind.log`. To regenerate:
+```bash
+$BUILD_DIR/unittests/unit_test --run_test=deep_mind_tests -- --sys-vm --save-dmlog
+```
+
+### Snapshot Compatibility Data
+
+The `snapshot_part2_tests/test_compatible_versions` test uses reference blockchain and snapshot files in `unittests/snapshots/`. To regenerate:
+
+**Step 1:** Delete stale files from BOTH source and build directories. The `--save-snapshot` run replays blocks.log if it exists — if it contains WASMs with old host function signatures, replay fails with `wasm_serialization_error: wrong type for imported function`. You must delete first:
+```bash
+rm -f unittests/snapshots/blocks.* unittests/snapshots/snap_v1.*
+rm -f $BUILD_DIR/unittests/snapshots/blocks.* $BUILD_DIR/unittests/snapshots/snap_v1.*
+```
+
+**Step 2:** Regenerate. This creates a fresh blockchain, deploys the current embedded contracts, and writes new reference files:
+```bash
+$BUILD_DIR/unittests/unit_test --run_test="snapshot_part2_tests/*" -- --sys-vm --save-snapshot --generate-snapshot-log
+```
+The test writes to `$BUILD_DIR/unittests/snapshots/` (NOT the source tree, despite the flag description).
+
+**Step 3:** Copy from build dir to source tree (for git), and ensure the build dir has them for subsequent test runs:
+```bash
+cp $BUILD_DIR/unittests/snapshots/blocks.* $BUILD_DIR/unittests/snapshots/snap_v1.* unittests/snapshots/
+```
+
+**Step 4:** Re-run CMake or ninja so `configure_file` picks up the new source-tree files:
+
+```bash
+cmake --build $BUILD_DIR --target unit_test
+```
+If CMake fails because snapshot files are missing from the source tree, run step 3 first.
+
+**Common pitfall:** If you only delete source-tree files but not build-dir files, the test replays the stale build-dir blocks.log and fails. Always delete from both locations.
+
+### Consensus Blockchain Data
+
+The `savanna_misc_tests/verify_block_compatibitity` test uses `unittests/test-data/consensus_blockchain/`. To regenerate:
+```bash
+$BUILD_DIR/unittests/unit_test -t "savanna_misc_tests/verify_block_compatibitity" -- --sys-vm --save-blockchain
+```
+
+### Snapshot Info Test (`sysio_util_snapshot_info_test`)
+
+The `tests/sysio_util_snapshot_info_test.py` test compares `sys-util snapshot info` output against hardcoded expected values (chain_id, head_block_id, etc.). After regenerating snapshots, update the expected `head_block_id` in this file:
+
+```bash
+# Get new values from regenerated snapshot
+gunzip -c $BUILD_DIR/unittests/snapshots/snap_v1.bin.gz > /tmp/snap_v1.bin
+$BUILD_DIR/programs/sys-util/sys-util snapshot info /tmp/snap_v1.bin
+# Update the head_block_id in tests/sysio_util_snapshot_info_test.py
+```
+
+### When to Regenerate
+
+Regenerate all reference data whenever:
+- Any production contract is recompiled (changes action merkle roots)
+- Chain-level serialization changes (block format, snapshot format)
+- Genesis intrinsics change (different genesis state)

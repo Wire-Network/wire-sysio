@@ -57,7 +57,7 @@ namespace savanna_cluster {
    // --------------------------------------------------
    struct vote_t {
       friend std::ostream& operator<<(std::ostream& s, const vote_t& v) {
-         s << "vote_t(" << v.id.str().substr(8, 16) << ", " << (v.strong ? "strong" : "weak") << ")";
+         s << "vote_t(" << v.id.short_id() << ", " << (v.strong ? "strong" : "weak") << ")";
          return s;
       }
       bool operator==(const vote_t&) const = default;
@@ -560,8 +560,8 @@ namespace savanna_cluster {
       void print(const char* name, const signed_block_ptr& b) const {
          if (_debug_mode)
             std::cout << name << " (" << b->block_num() << ") timestamp = " << b->timestamp.slot
-                      << ", id = " << b->calculate_id().str().substr(8, 16)
-                      << ", previous = " << b->previous.str().substr(8, 16) << '\n';
+                      << ", id = " << b->calculate_id().short_id()
+                      << ", previous = " << b->previous.short_id() << '\n';
       }
 
    public:

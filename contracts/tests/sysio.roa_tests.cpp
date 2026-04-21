@@ -1,6 +1,7 @@
 #include <test_contracts.hpp>
 #include <sysio/testing/tester.hpp>
 #include <sysio/chain/abi_serializer.hpp>
+#include <sysio/chain/kv_table_objects.hpp>
 #include "sysio.system_tester.hpp"
 #include <fc/variant_object.hpp>
 #include <boost/test/unit_test.hpp>
@@ -15,6 +16,9 @@ using namespace fc;
 using namespace std;
 
 using mvo = fc::mutable_variant_object;
+
+using sysio::chain::make_kv_scoped_key;
+using sysio::chain::compute_table_id;
 
 constexpr account_name ROA = "sysio.roa"_n;
 constexpr uint64_t NETWORK_GEN = 0;
@@ -57,13 +61,13 @@ public:
    fc::variant get_nodeowner( account_name acc )
    {
       const auto& db = control->db();
-      if (const auto* table = db.find<table_id_object, by_code_scope_table>(
-             boost::make_tuple(ROA, static_cast<scope_name>(NETWORK_GEN), "nodeowners"_n))) {
-         if (auto* obj = db.find<key_value_object, by_scope_primary>(boost::make_tuple(table->id, acc.to_uint64_t()))) {
-            const vector<char> data(obj->value.data(), obj->value.data() + obj->value.size());
-            if (!data.empty()) {
-               return abi_ser.binary_to_variant( "nodeowners", data, abi_serializer::create_yield_function(abi_serializer_max_time) );
-            }
+      auto key = make_kv_scoped_key(static_cast<uint64_t>(NETWORK_GEN), acc.to_uint64_t());
+      const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
+      auto it = kv_idx.find(boost::make_tuple(ROA, compute_table_id(name("nodeowners").to_uint64_t()), key.to_string_view()));
+      if (it != kv_idx.end()) {
+         const vector<char> data(it->value.data(), it->value.data() + it->value.size());
+         if (!data.empty()) {
+            return abi_ser.binary_to_variant( "nodeowners", data, abi_serializer::create_yield_function(abi_serializer_max_time) );
          }
       }
       return fc::variant();
@@ -72,13 +76,13 @@ public:
    fc::variant get_sponsorship( account_name acc, account_name nonce)
    {
       const auto& db = control->db();
-      if (const auto* table = db.find<table_id_object, by_code_scope_table>(
-             boost::make_tuple(ROA, acc, "sponsors"_n))) {
-         if (auto* obj = db.find<key_value_object, by_scope_primary>(boost::make_tuple(table->id, nonce.to_uint64_t()))) {
-            const vector<char> data(obj->value.data(), obj->value.data() + obj->value.size());
-            if (!data.empty()) {
-               return abi_ser.binary_to_variant( "sponsor", data, abi_serializer::create_yield_function(abi_serializer_max_time) );
-            }
+      auto key = make_kv_scoped_key(acc, nonce.to_uint64_t());
+      const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
+      auto it = kv_idx.find(boost::make_tuple(ROA, compute_table_id("sponsors"_n.to_uint64_t()), key.to_string_view()));
+      if (it != kv_idx.end()) {
+         const vector<char> data(it->value.data(), it->value.data() + it->value.size());
+         if (!data.empty()) {
+            return abi_ser.binary_to_variant( "sponsor", data, abi_serializer::create_yield_function(abi_serializer_max_time) );
          }
       }
       return fc::variant();
@@ -87,14 +91,14 @@ public:
    uint64_t get_sponsor_count( account_name acc )
    {
       const auto& db = control->db();
-      if (const auto* table = db.find<table_id_object, by_code_scope_table>(
-             boost::make_tuple(ROA, static_cast<scope_name>(NETWORK_GEN), "sponsorcount"_n))) {
-         if (auto *obj = db.find<key_value_object, by_scope_primary>(boost::make_tuple(table->id, acc.to_uint64_t()))) {
-            const vector<char> data(obj->value.data(), obj->value.data() + obj->value.size());
-            if (!data.empty()) {
-               auto record = abi_ser.binary_to_variant("sponsorcount", data, abi_serializer::create_yield_function(abi_serializer_max_time));
-               return record["count"].as<uint64_t>();
-            }
+      auto key = make_kv_scoped_key(static_cast<uint64_t>(NETWORK_GEN), acc.to_uint64_t());
+      const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
+      auto it = kv_idx.find(boost::make_tuple(ROA, compute_table_id(name("sponsorcount").to_uint64_t()), key.to_string_view()));
+      if (it != kv_idx.end()) {
+         const vector<char> data(it->value.data(), it->value.data() + it->value.size());
+         if (!data.empty()) {
+            auto record = abi_ser.binary_to_variant("sponsorcount", data, abi_serializer::create_yield_function(abi_serializer_max_time));
+            return record["count"].as<uint64_t>();
          }
       }
       return 0;
@@ -102,14 +106,17 @@ public:
 
    fc::variant get_reslimit( account_name acc )
    {
+      // reslimit is kv::table (unscoped) — key is [owner:8B BE]
       const auto& db = control->db();
-      if (const auto* table = db.find<table_id_object, by_code_scope_table>(
-             boost::make_tuple(ROA, ROA, "reslimit"_n))) {
-         if (auto* obj = db.find<key_value_object, by_scope_primary>(boost::make_tuple(table->id, acc.to_uint64_t()))) {
-            const vector<char> data(obj->value.data(), obj->value.data() + obj->value.size());
-            if (!data.empty()) {
-               return abi_ser.binary_to_variant( "reslimit", data, abi_serializer::create_yield_function(abi_serializer_max_time) );
-            }
+      char key_buf[chain::kv_pri_key_size];
+      chain::kv_encode_be64(key_buf, acc.to_uint64_t());
+      std::string_view key_sv(key_buf, chain::kv_pri_key_size);
+      const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
+      auto it = kv_idx.find(boost::make_tuple(ROA, compute_table_id("reslimit"_n.to_uint64_t()), key_sv));
+      if (it != kv_idx.end()) {
+         const vector<char> data(it->value.data(), it->value.data() + it->value.size());
+         if (!data.empty()) {
+            return abi_ser.binary_to_variant( "reslimit", data, abi_serializer::create_yield_function(abi_serializer_max_time) );
          }
       }
       return fc::variant();
@@ -118,13 +125,13 @@ public:
    fc::variant get_policy( account_name acc, account_name owner )
    {
       const auto& db = control->db();
-      if (const auto* table = db.find<table_id_object, by_code_scope_table>(
-             boost::make_tuple(ROA, owner, "policies"_n))) {
-         if (auto* obj = db.find<key_value_object, by_scope_primary>(boost::make_tuple(table->id, acc.to_uint64_t()))) {
-            const vector<char> data(obj->value.data(), obj->value.data() + obj->value.size());
-            if (!data.empty()) {
-               return abi_ser.binary_to_variant( "policies", data, abi_serializer::create_yield_function(abi_serializer_max_time) );
-            }
+      auto key = make_kv_scoped_key(owner, acc.to_uint64_t());
+      const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
+      auto it = kv_idx.find(boost::make_tuple(ROA, compute_table_id("policies"_n.to_uint64_t()), key.to_string_view()));
+      if (it != kv_idx.end()) {
+         const vector<char> data(it->value.data(), it->value.data() + it->value.size());
+         if (!data.empty()) {
+            return abi_ser.binary_to_variant( "policies", data, abi_serializer::create_yield_function(abi_serializer_max_time) );
          }
       }
       return fc::variant();

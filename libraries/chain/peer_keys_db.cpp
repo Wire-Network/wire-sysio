@@ -1,5 +1,4 @@
 #include <sysio/chain/peer_keys_db.hpp>
-#include <sysio/chain/contract_table_objects.hpp>
 
 namespace sysio::chain {
 

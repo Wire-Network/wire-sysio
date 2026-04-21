@@ -376,11 +376,14 @@ class cluster_generator:
                             'max_transaction_cpu_usage': 150000 if self.args.max_transaction_cpu_usage is None else self.args.max_transaction_cpu_usage,
                             'min_transaction_cpu_usage': 100,
                             'max_transaction_lifetime': 3600,
-                            'deferred_trx_expiration_window': 600,
                             'max_transaction_delay': 3888000,
                             'max_inline_action_size': 524287,
                             'max_inline_action_depth': 10,
-                            'max_authority_depth': 10
+                            'max_authority_depth': 10,
+                            'max_action_return_value_size': 1024,
+                            'max_kv_key_size': 256,
+                            'max_kv_value_size': 262144,
+                            'max_kv_secondary_key_size': 256
                         }
                     }
         else:

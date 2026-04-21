@@ -409,6 +409,11 @@ namespace sysio::chain {
 
          bool is_known_unexpired_transaction( const transaction_id_type& id) const;
 
+         void record_transaction( const transaction_id_type& id, fc::time_point_sec expire );
+         void push_dedup_session();
+         void squash_dedup_session();
+         void undo_dedup_session();
+
          // called by host function
          int64_t set_proposed_producers( transaction_context& trx_context, vector<producer_authority> producers );
 

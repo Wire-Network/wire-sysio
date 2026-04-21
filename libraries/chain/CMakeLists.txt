@@ -63,6 +63,7 @@ set(CHAIN_WEBASSEMBLY_SOURCES
    webassembly/console.cpp
    webassembly/crypto.cpp
    webassembly/database.cpp
+   webassembly/kv_database.cpp
    webassembly/memory.cpp
    webassembly/permission.cpp
    webassembly/privileged.cpp
@@ -94,6 +95,7 @@ add_library( sysio_chain
              contract_action_match.cpp
              root_txn_identification.cpp
              transaction_context.cpp
+             transaction_dedup.cpp
              sysio_contract.cpp
              sysio_contract_abi.cpp
              sysio_contract_abi_bin.cpp

@@ -1,0 +1,6 @@
+if( BUILD_TEST_CONTRACTS )
+   add_contract( bench_kv_shim bench_kv_shim bench_kv_shim.cpp )
+else()
+   configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/bench_kv_shim.wasm ${CMAKE_CURRENT_BINARY_DIR}/bench_kv_shim.wasm COPYONLY )
+   configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/bench_kv_shim.abi  ${CMAKE_CURRENT_BINARY_DIR}/bench_kv_shim.abi  COPYONLY )
+endif()

@@ -276,8 +276,8 @@ namespace compact_u16 {
 
 // Reflection macros for serialization
 FC_REFLECT_ENUM(fc::network::solana::commitment_t, (processed)(confirmed)(finalized))
-FC_REFLECT(fc::network::solana::solana_public_key, (data))
-FC_REFLECT(fc::network::solana::solana_signature, (data))
+// solana_public_key is fc::crypto::ed::public_key_shim — raw::pack/unpack provided by elliptic_ed.hpp.
+// solana_signature is std::array<uint8_t, 64> — raw::pack/unpack provided by fc for std::array.
 FC_REFLECT(fc::network::solana::account_meta, (key)(is_signer)(is_writable))
 FC_REFLECT(fc::network::solana::instruction, (program_id)(accounts)(data))
 FC_REFLECT(fc::network::solana::compiled_instruction, (program_id_index)(account_indices)(data))

@@ -4,7 +4,7 @@
 #include <sysio/chain/authorization_manager.hpp>
 #include <sysio/chain/exceptions.hpp>
 #include <sysio/chain/resource_limits.hpp>
-#include <sysio/chain/transaction_object.hpp>
+#include <sysio/chain/controller.hpp>
 #include <sysio/chain/global_property_object.hpp>
 #include <sysio/chain/deep_mind.hpp>
 #include <sysio/chain/subjective_billing.hpp>
@@ -96,7 +96,7 @@ namespace sysio::chain {
 
    void transaction_context::initialize() {
       if (!control.skip_db_sessions() && !is_read_only()) {
-         undo_session.emplace(control.mutable_db().start_undo_session(true));
+         undo_session.emplace(control.mutable_db(), control);
       }
 
       trace->id = packed_trx.id();
@@ -450,13 +450,15 @@ namespace sysio::chain {
 
 
    void transaction_context::squash() {
-      if (undo_session) undo_session->squash();
+      if (undo_session)
+         undo_session->squash();
       control.apply_trx_block_context(trx_blk_context);
       transaction_timer.stop();
    }
 
    void transaction_context::undo() {
-      if (undo_session) undo_session->undo();
+      if (undo_session)
+         undo_session->undo();
       transaction_timer.stop();
    }
 
@@ -922,16 +924,7 @@ namespace sysio::chain {
    }
 
    void transaction_context::record_transaction( const transaction_id_type& id, fc::time_point_sec expire ) {
-      try {
-          control.mutable_db().create<transaction_object>([&](transaction_object& transaction) {
-              transaction.trx_id = id;
-              transaction.expiration = expire;
-          });
-      } catch( const boost::interprocess::bad_alloc& ) {
-         throw;
-      } catch ( ... ) {
-          SYS_ASSERT( false, tx_duplicate, "duplicate transaction {}", id );
-      }
+      control.record_transaction(id, expire);
    } /// record_transaction
 
    void transaction_context::validate_referenced_accounts( const transaction& trx, bool enforce_actor_whitelist_blacklist )const {

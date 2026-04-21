@@ -1,6 +1,6 @@
 #include <sysio/chain/deep_mind.hpp>
 #include <sysio/chain/block_state.hpp>
-#include <sysio/chain/contract_table_objects.hpp>
+#include <sysio/chain/kv_table_objects.hpp>
 #include <sysio/chain/resource_limits_private.hpp>
 #include <sysio/chain/permission_object.hpp>
 #include <sysio/chain/global_property_object.hpp>
@@ -151,62 +151,31 @@ namespace sysio::chain {
    {
       fc_dlog(_logger, "CREATION_OP CFA_INLINE {}", _action_id);
    }
-   void deep_mind_handler::on_create_table(const table_id_object& tid)
+   // KV deep_mind hooks — unified KV_OP format with table_id
+   void deep_mind_handler::on_kv_set(const kv_object& obj, bool is_new, account_name old_payer, const char* old_value, std::size_t old_value_size)
    {
-      fc_dlog(_logger, "TBL_OP INS {} {} {} {} {}",
-         _action_id,
-         tid.code,
-         tid.scope,
-         tid.table,
-         tid.payer
-      );
+      if (is_new) {
+         fc_dlog(_logger, "KV_OP INS {} {} {} {} {} {}",
+            _action_id, obj.payer, obj.code, obj.table_id,
+            fc::to_hex(obj.key.data(), obj.key.size()),
+            fc::to_hex(obj.value.data(), obj.value.size())
+         );
+      } else {
+         fc_dlog(_logger, "KV_OP UPD {} {}:{} {} {} {} {}:{}",
+            _action_id, old_payer, obj.payer, obj.code, obj.table_id,
+            fc::to_hex(obj.key.data(), obj.key.size()),
+            fc::to_hex(old_value, old_value_size),
+            fc::to_hex(obj.value.data(), obj.value.size())
+         );
+      }
    }
-   void deep_mind_handler::on_remove_table(const table_id_object& tid)
+
+   void deep_mind_handler::on_kv_erase(const kv_object& obj)
    {
-      fc_dlog(_logger, "TBL_OP REM {} {} {} {} {}",
-         _action_id,
-         tid.code,
-         tid.scope,
-         tid.table,
-         tid.payer
-      );
-   }
-   void deep_mind_handler::on_db_store_i64(const table_id_object& tid, const key_value_object& kvo)
-   {
-      fc_dlog(_logger, "DB_OP INS {} {} {} {} {} {} {}",
-         _action_id,
-         kvo.payer,
-         tid.code,
-         tid.scope,
-         tid.table,
-         name(kvo.primary_key),
-         fc::to_hex(kvo.value.data(), kvo.value.size())
-      );
-   }
-   void deep_mind_handler::on_db_update_i64(const table_id_object& tid, const key_value_object& kvo, account_name payer, const char* buffer, std::size_t buffer_size)
-   {
-      fc_dlog(_logger, "DB_OP UPD {} {}:{} {} {} {} {} {}:{}",
-         _action_id,
-         kvo.payer,
-         payer,
-         tid.code,
-         tid.scope,
-         tid.table,
-         name(kvo.primary_key),
-         fc::to_hex(kvo.value.data(),kvo.value.size()),
-         fc::to_hex(buffer, buffer_size)
-      );
-   }
-   void deep_mind_handler::on_db_remove_i64(const table_id_object& tid, const key_value_object& kvo)
-   {
-      fc_dlog(_logger, "DB_OP REM {} {} {} {} {} {} {}",
-         _action_id,
-         kvo.payer,
-         tid.code,
-         tid.scope,
-         tid.table,
-         name(kvo.primary_key),
-         fc::to_hex(kvo.value.data(), kvo.value.size())
+      fc_dlog(_logger, "KV_OP REM {} {} {} {} {} {}",
+         _action_id, obj.payer, obj.code, obj.table_id,
+         fc::to_hex(obj.key.data(), obj.key.size()),
+         fc::to_hex(obj.value.data(), obj.value.size())
       );
    }
    void deep_mind_handler::on_init_resource_limits(const resource_limits::resource_limits_config_object& config, const resource_limits::resource_limits_state_object& state)

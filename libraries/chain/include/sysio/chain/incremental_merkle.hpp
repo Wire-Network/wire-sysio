@@ -1,5 +1,6 @@
 #pragma once
 #include <sysio/chain/types.hpp>
+#include <sysio/chain/exceptions.hpp>
 #include <sysio/chain/merkle.hpp>
 #include <fc/io/raw.hpp>
 #include <bit>
@@ -45,6 +46,12 @@ public:
 
    uint64_t num_digests_appended() const {
       return mask;
+   }
+
+   void validate_snapshot() const {
+      SYS_ASSERT(trees.size() == static_cast<size_t>(std::popcount(mask)), snapshot_exception,
+                 "incremental_merkle_tree: trees.size() ({}) != popcount(mask) ({})",
+                 trees.size(), std::popcount(mask));
    }
 
 private:

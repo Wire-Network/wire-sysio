@@ -18,7 +18,7 @@ namespace fc
 {
     // forward declarations of provided functions
     template<typename T, json::parse_type parser_type> variant variant_from_stream( T& in, uint32_t max_depth );
-    template<typename T> char parse_escape( T& in );
+    template<typename T> std::string parse_escape( T& in );
     template<typename T> std::string string_from_stream( T& in );
     template<typename T> bool skip_white_space( T& in );
     template<typename T> std::string string_from_token( T& in );
@@ -45,33 +45,90 @@ namespace
 
 namespace fc
 {
-   template<typename T>
-   char parse_escape( T& in )
-   {
-      if( in.peek() == '\\' )
+   namespace {
+      void append_utf8( std::string& out, uint32_t cp )
       {
-         try {
-            in.get();
-            switch( in.peek() )
-            {
-               case 't':
-                  in.get();
-                  return '\t';
-               case 'n':
-                  in.get();
-                  return '\n';
-               case 'r':
-                  in.get();
-                  return '\r';
-               case '\\':
-                  in.get();
-                  return '\\';
-               default:
-                  return in.get();
-            }
-         } FC_RETHROW_EXCEPTIONS( info, "Stream ended with '\\'" );
+         if( cp < 0x80 ) {
+            out.push_back( static_cast<char>(cp) );
+         } else if( cp < 0x800 ) {
+            out.push_back( static_cast<char>(0xC0 | (cp >> 6)) );
+            out.push_back( static_cast<char>(0x80 | (cp & 0x3F)) );
+         } else if( cp < 0x10000 ) {
+            out.push_back( static_cast<char>(0xE0 | (cp >> 12)) );
+            out.push_back( static_cast<char>(0x80 | ((cp >> 6) & 0x3F)) );
+            out.push_back( static_cast<char>(0x80 | (cp & 0x3F)) );
+         } else {
+            out.push_back( static_cast<char>(0xF0 | (cp >> 18)) );
+            out.push_back( static_cast<char>(0x80 | ((cp >> 12) & 0x3F)) );
+            out.push_back( static_cast<char>(0x80 | ((cp >> 6) & 0x3F)) );
+            out.push_back( static_cast<char>(0x80 | (cp & 0x3F)) );
+         }
       }
-	    FC_THROW_EXCEPTION( parse_error_exception, "Expected '\\'"  );
+
+      template<typename T>
+      uint32_t read_hex4( T& in )
+      {
+         uint32_t v = 0;
+         for( int i = 0; i < 4; ++i ) {
+            char h = in.get();
+            uint32_t d;
+            if( h >= '0' && h <= '9' )      d = h - '0';
+            else if( h >= 'a' && h <= 'f' ) d = 10 + (h - 'a');
+            else if( h >= 'A' && h <= 'F' ) d = 10 + (h - 'A');
+            else FC_THROW_EXCEPTION( parse_error_exception, "Invalid hex digit in \\u escape" );
+            v = (v << 4) | d;
+         }
+         return v;
+      }
+
+      template<typename T>
+      void append_unicode_escape( std::string& out, T& in )
+      {
+         // called with 'u' still in the stream
+         in.get(); // consume 'u'
+         uint32_t cp = read_hex4( in );
+         if( cp >= 0xD800 && cp <= 0xDBFF ) {
+            // high surrogate -- must be followed by \uXXXX low surrogate
+            if( in.get() != '\\' || in.get() != 'u' )
+               FC_THROW_EXCEPTION( parse_error_exception, "Unpaired high surrogate in \\u escape" );
+            uint32_t low = read_hex4( in );
+            if( low < 0xDC00 || low > 0xDFFF )
+               FC_THROW_EXCEPTION( parse_error_exception, "Invalid low surrogate in \\u escape" );
+            cp = 0x10000 + ((cp - 0xD800) << 10) + (low - 0xDC00);
+         } else if( cp >= 0xDC00 && cp <= 0xDFFF ) {
+            FC_THROW_EXCEPTION( parse_error_exception, "Orphan low surrogate in \\u escape" );
+         }
+         append_utf8( out, cp );
+      }
+   } // anonymous namespace
+
+   template<typename T>
+   std::string parse_escape( T& in )
+   {
+      std::string result;
+      if( in.peek() != '\\' )
+         FC_THROW_EXCEPTION( parse_error_exception, "Expected '\\'" );
+      try {
+         in.get();
+         char c = in.peek();
+         switch( c )
+         {
+            case '"': case '\\': case '/':
+                      in.get(); result.push_back( c );    break;
+            case 'b': in.get(); result.push_back( '\b' ); break;
+            case 'f': in.get(); result.push_back( '\f' ); break;
+            case 'n': in.get(); result.push_back( '\n' ); break;
+            case 'r': in.get(); result.push_back( '\r' ); break;
+            case 't': in.get(); result.push_back( '\t' ); break;
+            case 'u': append_unicode_escape( result, in ); break;
+            default:
+               // Lenient: unknown escape passes through verbatim (non-strict per RFC 8259).
+               in.get();
+               result.push_back( c );
+               break;
+         }
+         return result;
+      } FC_RETHROW_EXCEPTIONS( info, "Stream ended with '\\'" );
    }
 
    template<typename T>

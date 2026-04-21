@@ -20,7 +20,7 @@ target_include_directories(
 
 # Create a custom target to update the version metadata upon every build.
 find_package(Git)
-if(EXISTS ${CMAKE_SOURCE_DIR}/.git AND ${GIT_FOUND})
+if(IS_DIRECTORY ${CMAKE_SOURCE_DIR}/.git AND ${GIT_FOUND})
    add_custom_target(
       evaluate_every_build ALL
       COMMAND ${CMAKE_COMMAND} -DGIT_EXEC=${GIT_EXECUTABLE}
@@ -31,10 +31,10 @@ if(EXISTS ${CMAKE_SOURCE_DIR}/.git AND ${GIT_FOUND})
                                -DV_MINOR=${VERSION_MINOR}
                                -DV_PATCH=${VERSION_PATCH}
                                -DV_SUFFIX=${VERSION_SUFFIX}
-                               -P ${CMAKE_SOURCE_DIR}/cmake/VersionUtils.cmake
+                               -P ${CMAKE_SOURCE_DIR}/cmake/version-tools.cmake
       BYPRODUCTS ${CMAKE_CURRENT_BINARY_DIR}/src/version_impl.cpp
       COMMENT "Updating version metadata..." VERBATIM )
-                             
+
       # Create a dependency for the given library target.
       add_dependencies(version evaluate_every_build)
 else()
