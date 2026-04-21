@@ -71,8 +71,13 @@ target_link_libraries(
 set(_required_progs fish npm pnpm node wire-protobuf-bundler protoc-gen-solidity protoc-gen-solana)
 set(_missing_progs)
 foreach(_prog ${_required_progs})
-    find_program(_found_prog ${_prog})
-    if (NOT _found_prog)
+    # Use a distinct cache variable per tool: find_program short-circuits when
+    # its output variable is already set in the cache, so reusing one variable
+    # across iterations would return the first tool's path for every subsequent
+    # lookup and silently mark all tools as "found".
+    string(MAKE_C_IDENTIFIER "${_prog}" _prog_var)
+    find_program(_found_prog_${_prog_var} ${_prog})
+    if (NOT _found_prog_${_prog_var})
         list(APPEND _missing_progs ${_prog})
     endif()
 endforeach()
