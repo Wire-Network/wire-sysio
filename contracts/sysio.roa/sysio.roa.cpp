@@ -1,5 +1,6 @@
 #include "sysio.roa.hpp"
 #include "sysio.system/native.hpp"
+#include "sysio.system/emissions.hpp"
 
 namespace sysio {
 
@@ -660,13 +661,20 @@ namespace sysio {
             .network_gen = state.network_gen,
         });
 
-        // Add user to sysio.system node_owner_dist table
-        action(
-           {get_self(), "active"_n},
-           "sysio"_n,
-           "addnodeowner"_n,
-           std::make_tuple(owner, tier)
-        ).send();
+        // Register the node owner with sysio.system emissions. Guarded on
+        // emitcfg_t::exists() so that bootstrap paths which do not deploy
+        // sysio.system (loadSystemContract=False in Cluster.py) or which run
+        // forcereg before setemitcfg continue to work -- the emissions
+        // distribution row is simply skipped in that case.
+        sysiosystem::emissions::emitcfg_t emitcfg("sysio"_n);
+        if (emitcfg.exists()) {
+            action(
+               {get_self(), "active"_n},
+               "sysio"_n,
+               "addnodeowner"_n,
+               std::make_tuple(owner, tier)
+            ).send();
+        }
 
         // TODO: Notify Council contract if needed
     };
