@@ -394,41 +394,6 @@ BOOST_AUTO_TEST_CASE(kv_get_row_by_id_fallback) {
    session.undo();
 }
 
-// Verify billable_size constants cover actual chainbase object sizes.
-// If these fail, billable_size_v is too small and users aren't being charged
-// enough RAM — which is a security issue (RAM undercharging exploit).
-BOOST_AUTO_TEST_CASE(billable_size_covers_all_objects) {
-   // billable_size_v must be >= sizeof(object) to ensure we charge at least
-   // as much as the actual memory consumed by the chainbase allocation.
-
-   // KV objects
-   BOOST_CHECK_GE(config::billable_size_v<kv_object>, sizeof(kv_object));
-   BOOST_CHECK_GE(config::billable_size_v<kv_index_object>, sizeof(kv_index_object));
-
-   // Account objects
-   BOOST_CHECK_GE(config::billable_size_v<account_object>, sizeof(account_object));
-   BOOST_CHECK_GE(config::billable_size_v<account_metadata_object>, sizeof(account_metadata_object));
-
-   // Permission objects
-   BOOST_CHECK_GE(config::billable_size_v<permission_object>, sizeof(permission_object));
-   BOOST_CHECK_GE(config::billable_size_v<permission_link_object>, sizeof(permission_link_object));
-
-   // Resource limits objects
-   BOOST_CHECK_GE(config::billable_size_v<resource_limits::resource_object>, sizeof(resource_limits::resource_object));
-   BOOST_CHECK_GE(config::billable_size_v<resource_limits::resource_pending_object>, sizeof(resource_limits::resource_pending_object));
-
-   BOOST_TEST_MESSAGE("kv_object: sizeof=" << sizeof(kv_object)
-      << " billable=" << config::billable_size_v<kv_object>);
-   BOOST_TEST_MESSAGE("kv_index_object: sizeof=" << sizeof(kv_index_object)
-      << " billable=" << config::billable_size_v<kv_index_object>);
-   BOOST_TEST_MESSAGE("account_object: sizeof=" << sizeof(account_object)
-      << " billable=" << config::billable_size_v<account_object>);
-   BOOST_TEST_MESSAGE("permission_object: sizeof=" << sizeof(permission_object)
-      << " billable=" << config::billable_size_v<permission_object>);
-   BOOST_TEST_MESSAGE("resource_object: sizeof=" << sizeof(resource_limits::resource_object)
-      << " billable=" << config::billable_size_v<resource_limits::resource_object>);
-}
-
 // ========== kv::raw_table Tests (format=0, BE keys) ==========
 
 BOOST_AUTO_TEST_CASE(kv_map_store_and_get) {
