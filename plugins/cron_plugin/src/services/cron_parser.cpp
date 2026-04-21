@@ -1,6 +1,7 @@
 #include <sysio/services/cron_parser.hpp>
 #include <fc/exception/exception.hpp>
 #include <boost/algorithm/string/classification.hpp>
+#include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/trim.hpp>
 #include <algorithm>
 #include <charconv>
@@ -21,18 +22,12 @@ std::string_view trim(std::string_view s) {
    return boost::algorithm::trim_copy_if(s, boost::algorithm::is_any_of(" \t\r\n"));
 }
 
-// Split string by delimiter
+// Split string by a single delimiter, preserving empty tokens
+// (",foo," -> ["", "foo", ""]). Tokens are views into the original
+// buffer — no allocation per token.
 std::vector<std::string_view> split(std::string_view s, char delim) {
    std::vector<std::string_view> result;
-   size_t start = 0;
-   size_t end = s.find(delim);
-
-   while (end != std::string_view::npos) {
-      result.push_back(s.substr(start, end - start));
-      start = end + 1;
-      end = s.find(delim, start);
-   }
-   result.push_back(s.substr(start));
+   boost::algorithm::split(result, s, [delim](char c) { return c == delim; });
    return result;
 }
 

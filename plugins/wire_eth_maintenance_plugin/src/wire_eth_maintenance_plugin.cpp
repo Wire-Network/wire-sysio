@@ -489,9 +489,16 @@ void wire_eth_maintenance_plugin::plugin_startup() {
    const auto eth_client = clients.front()->client;
 
    ilog("Scheduling {} to execute right after startup", just_once_interval_name);
-   job_schedule jo_schedule{.milliseconds = {job_schedule::exact_value{0}}};
+   job_schedule jo_schedule = services::parse_cron_schedule_or_throw("*/1 * * * *");
    my->just_once_jid =
       cron.add_job(jo_schedule, [my_=my,cron=&cron]() {
+         try {
+            if(!!my_->just_once_jid)
+               cron->cancel_job(*my_->just_once_jid);
+         }
+         catch (const std::exception& e) {
+            elog("Error cancelling the beacon chain update for the just once actions: {}", e.what());
+         }
          ilog("Executing beacon chain update for the processes that run `{}`", just_once_interval_name);
          for(const auto& action : my_->just_once_actions) {
             try {
@@ -500,13 +507,6 @@ void wire_eth_maintenance_plugin::plugin_startup() {
             catch (const std::exception& e) {
                elog("Error executing beacon chain update for the just once actions: {}", e.what());
             }
-         }
-         try {
-            if(!!my_->just_once_jid)
-               cron->cancel_job(*my_->just_once_jid);
-         }
-         catch (const std::exception& e) {
-            elog("Error cancelling the beacon chain update for the just once actions: {}", e.what());
          }
       },
       cron_service::job_metadata_t{
