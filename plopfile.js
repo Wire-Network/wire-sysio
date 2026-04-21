@@ -49,6 +49,7 @@ module.exports = function plopfile(plop) {
             })
 
     addGenerator("create-cxx-library")
+    addGenerator("create-cxx-plugin")
     // addGenerator("new-api-client-package")
     // addGenerator("nest-module")
     // addGenerator("service")

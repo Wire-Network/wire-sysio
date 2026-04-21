@@ -82,9 +82,9 @@ namespace detail {
 
       static snapshot_kv_object to_snapshot_row(const kv_object& obj, const chainbase::database&) {
          snapshot_kv_object row;
-         row.code       = obj.code;
-         row.payer      = obj.payer;
-         row.key_format = obj.key_format;
+         row.code     = obj.code;
+         row.payer    = obj.payer;
+         row.table_id = obj.table_id;
          SYS_ASSERT(obj.key.size() > 0, snapshot_exception, "kv_object has empty key during snapshot write");
          row.key.assign(obj.key.data(), obj.key.data() + obj.key.size());
          if (obj.value.size() > 0)
@@ -94,9 +94,13 @@ namespace detail {
 
       static void from_snapshot_row(snapshot_kv_object&& row, kv_object& obj, chainbase::database&) {
          SYS_ASSERT(!row.key.empty(), snapshot_validation_exception, "kv_object has empty key");
-         obj.code       = row.code;
-         obj.payer      = row.payer;
-         obj.key_format = row.key_format;
+         SYS_ASSERT(row.key.size() <= config::max_kv_key_size_limit, snapshot_validation_exception,
+                    "kv_object key size ({}) exceeds absolute limit ({})", row.key.size(), config::max_kv_key_size_limit);
+         SYS_ASSERT(row.value.size() <= config::max_kv_value_size_limit, snapshot_validation_exception,
+                    "kv_object value size ({}) exceeds absolute limit ({})", row.value.size(), config::max_kv_value_size_limit);
+         obj.code     = row.code;
+         obj.payer    = row.payer;
+         obj.table_id = row.table_id;
          obj.key.assign(row.key.data(), row.key.size());
          obj.value.assign(row.value.data(), row.value.size());
       }
@@ -114,8 +118,7 @@ namespace detail {
          snapshot_kv_index_object row;
          row.code     = obj.code;
          row.payer    = obj.payer;
-         row.table    = obj.table;
-         row.index_id = obj.index_id;
+         row.table_id = obj.table_id;
          SYS_ASSERT(obj.sec_key.size() > 0, snapshot_exception, "kv_index_object has empty secondary key during snapshot write");
          SYS_ASSERT(obj.pri_key.size() > 0, snapshot_exception, "kv_index_object has empty primary key during snapshot write");
          row.sec_key.assign(obj.sec_key.data(), obj.sec_key.data() + obj.sec_key.size());
@@ -126,10 +129,13 @@ namespace detail {
       static void from_snapshot_row(snapshot_kv_index_object&& row, kv_index_object& obj, chainbase::database&) {
          SYS_ASSERT(!row.sec_key.empty(), snapshot_validation_exception, "kv_index_object has empty secondary key");
          SYS_ASSERT(!row.pri_key.empty(), snapshot_validation_exception, "kv_index_object has empty primary key");
+         SYS_ASSERT(row.sec_key.size() <= config::max_kv_key_size_limit, snapshot_validation_exception,
+                    "kv_index_object secondary key size ({}) exceeds absolute limit ({})", row.sec_key.size(), config::max_kv_key_size_limit);
+         SYS_ASSERT(row.pri_key.size() <= config::max_kv_key_size_limit, snapshot_validation_exception,
+                    "kv_index_object primary key size ({}) exceeds absolute limit ({})", row.pri_key.size(), config::max_kv_key_size_limit);
          obj.code     = row.code;
          obj.payer    = row.payer;
-         obj.table    = row.table;
-         obj.index_id = row.index_id;
+         obj.table_id = row.table_id;
          obj.sec_key.assign(row.sec_key.data(), row.sec_key.size());
          obj.pri_key.assign(row.pri_key.data(), row.pri_key.size());
       }
@@ -1714,11 +1720,33 @@ struct controller_impl {
          // nothing to do
       });
 
+      // --- Snapshot state validation ---
+      // Singleton enforcement
+      SYS_ASSERT(db.get_index<global_property_multi_index>().size() == 1, snapshot_exception,
+                 "Expected exactly 1 global_property_object, found {}", db.get_index<global_property_multi_index>().size());
+      SYS_ASSERT(db.get_index<dynamic_global_property_multi_index>().size() == 1, snapshot_exception,
+                 "Expected exactly 1 dynamic_global_property_object, found {}", db.get_index<dynamic_global_property_multi_index>().size());
+      SYS_ASSERT(db.get_index<protocol_state_multi_index>().size() == 1, snapshot_exception,
+                 "Expected exactly 1 protocol_state_object, found {}", db.get_index<protocol_state_multi_index>().size());
+
+      // block_summary must be exactly 65536 rows
+      SYS_ASSERT(db.get_index<block_summary_multi_index>().size() == 0x10000, snapshot_exception,
+                 "Expected 65536 block_summary_object rows, found {}", db.get_index<block_summary_multi_index>().size());
+
       const auto& gpo = db.get<global_property_object>();
       SYS_ASSERT( gpo.chain_id == chain_id, chain_id_type_exception,
                   "chain ID in snapshot ({}) does not match the chain ID that controller was constructed with ({})",
                   gpo.chain_id, chain_id
       );
+
+      // Resource limits validation (denominators, window sizes, virtual limits)
+      resource_limits.validate_snapshot_state();
+
+      // preactivated_protocol_features should be empty in a finalized snapshot
+      const auto& pso = db.get<protocol_state_object>();
+      SYS_ASSERT(pso.preactivated_protocol_features.empty(), snapshot_exception,
+                 "Snapshot contains {} preactivated protocol features; finalized snapshots must have none",
+                 pso.preactivated_protocol_features.size());
 
       return result;
    }

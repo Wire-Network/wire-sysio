@@ -59,6 +59,8 @@ namespace sysio { namespace chain {
          }
 
          static void from_snapshot_row( snapshot_global_property_object&& row, global_property_object& value, chainbase::database& ) {
+            row.configuration.validate();
+            row.wasm_configuration.validate();
             value.configuration = row.configuration;
             value.chain_id = row.chain_id;
             value.wasm_configuration = row.wasm_configuration;

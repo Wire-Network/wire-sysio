@@ -103,55 +103,6 @@ void pack_deltas(boost::iostreams::filtering_ostreambuf& obuf, const chainbase::
       }
    };
 
-   // Like process_table but only includes rows matching a filter predicate.
-   auto process_table_filtered = [&](auto& ds, auto* name, auto& index, auto& pack_row, auto filter) {
-      auto pack_row_v0 = [&](auto& ds, bool present, auto& row) {
-         fc::raw::pack(ds, present);
-         fc::datastream<size_t> ps;
-         pack_row(ps, row);
-         fc::raw::pack(ds, fc::unsigned_int(ps.tellp()));
-         pack_row(ds, row);
-      };
-
-      if (full_snapshot) {
-         size_t count = 0;
-         for (auto& row : index.indices())
-            if (filter(row)) ++count;
-         if (count == 0) return;
-
-         fc::raw::pack(ds, fc::unsigned_int(0));
-         fc::raw::pack(ds, name);
-         fc::raw::pack(ds, fc::unsigned_int(count));
-         for (auto& row : index.indices())
-            if (filter(row)) pack_row_v0(ds, true, row);
-      } else {
-         auto undo = index.last_undo_session();
-         size_t num_entries = 0;
-         for (auto& old : undo.old_values)
-            if (filter(old) && include_delta(old, index.get(old.id))) ++num_entries;
-         for (auto& old : undo.removed_values)
-            if (filter(old)) ++num_entries;
-         for (auto& row : undo.new_values)
-            if (filter(row)) ++num_entries;
-
-         if (num_entries) {
-            fc::raw::pack(ds, fc::unsigned_int(0));
-            fc::raw::pack(ds, name);
-            fc::raw::pack(ds, fc::unsigned_int((uint32_t)num_entries));
-
-            for (auto& old : undo.old_values) {
-               auto& row = index.get(old.id);
-               if (filter(old) && include_delta(old, row))
-                  pack_row_v0(ds, true, row);
-            }
-            for (auto& old : undo.removed_values)
-               if (filter(old)) pack_row_v0(ds, false, old);
-            for (auto& row : undo.new_values)
-               if (filter(row)) pack_row_v0(ds, true, row);
-         }
-      }
-   };
-
    auto has_table = [&](auto x) -> int {
       auto& index = db.get_index<std::remove_pointer_t<decltype(x)>>();
       if (full_snapshot) {
@@ -164,35 +115,6 @@ void pack_deltas(boost::iostreams::filtering_ostreambuf& obuf, const chainbase::
       }
    };
 
-   // Count KV tables separately since kv_index may produce 2 tables
-   // (contract_row for format=1, contract_row_kv for format=0)
-   auto is_standard_kv = [](const chain::kv_object& o) { return o.key_format == 1 && o.key.size() == chain::kv_key_size; };
-   auto is_raw_kv      = [](const chain::kv_object& o) { return o.key_format != 1 || o.key.size() != chain::kv_key_size; };
-
-   auto count_kv_tables = [&]() -> int {
-      auto& index = db.get_index<chain::kv_index>();
-      if (full_snapshot) {
-         bool has_std = false, has_raw = false;
-         for (auto& row : index.indices()) {
-            if (is_standard_kv(row)) has_std = true;
-            else has_raw = true;
-            if (has_std && has_raw) break;
-         }
-         return (has_std ? 1 : 0) + (has_raw ? 1 : 0);
-      } else {
-         auto undo = index.last_undo_session();
-         bool has_std = false, has_raw = false;
-         auto check = [&](const auto& o) {
-            if (is_standard_kv(o)) has_std = true;
-            else has_raw = true;
-         };
-         for (auto& old : undo.old_values) check(old);
-         for (auto& old : undo.removed_values) check(old);
-         for (auto& row : undo.new_values) check(row);
-         return (has_std ? 1 : 0) + (has_raw ? 1 : 0);
-      }
-   };
-
    int num_tables = std::apply(
        [&has_table](auto... args) { return (has_table(args) + ... ); },
        std::tuple<chain::account_index*, chain::account_metadata_index*, chain::code_index*,
@@ -201,8 +123,7 @@ void pack_deltas(boost::iostreams::filtering_ostreambuf& obuf, const chainbase::
                   chain::resource_limits::resource_index*,
                   chain::resource_limits::resource_limits_state_index*,
                   chain::resource_limits::resource_limits_config_index*,
-                  chain::kv_index_index*>())
-       + count_kv_tables();
+                  chain::kv_index*, chain::kv_index_index*>());
 
    fc::raw::pack(ds, fc::unsigned_int(num_tables));
 
@@ -210,15 +131,9 @@ void pack_deltas(boost::iostreams::filtering_ostreambuf& obuf, const chainbase::
    process_table(ds, "account_metadata", db.get_index<chain::account_metadata_index>(), pack_row);
    process_table(ds, "code", db.get_index<chain::code_index>(), pack_row);
 
-   // KV rows with key_format=1 (standard 24-byte keys) are emitted as "contract_row"
-   // for backward compatibility with Hyperion and other SHiP clients.
-   // KV rows with key_format=0 (raw) are emitted as "contract_row_kv" — a new delta type
-   // that clients can opt into. This avoids confusing clients with zeroed-out fields.
-   {
-      auto& kv_idx = db.get_index<chain::kv_index>();
-      process_table_filtered(ds, "contract_row", kv_idx, pack_row, is_standard_kv);
-      process_table_filtered(ds, "contract_row_kv", kv_idx, pack_row, is_raw_kv);
-   }
+   // All KV rows are emitted as "contract_row_kv" with table_id.
+   // Clients resolve table_id → table name via contract ABI.
+   process_table(ds, "contract_row_kv", db.get_index<chain::kv_index>(), pack_row);
    process_table(ds, "contract_index_kv", db.get_index<chain::kv_index_index>(), pack_row);
 
    process_table(ds, "global_property", db.get_index<chain::global_property_multi_index>(), pack_row);

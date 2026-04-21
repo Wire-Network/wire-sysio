@@ -101,6 +101,9 @@ struct finality_core
 
    bool is_genesis_core() const { return refs.empty(); }
 
+   // Validate all 9 invariants. Throws snapshot_exception on violation.
+   void validate_snapshot() const;
+
    /**
     *  @pre this->links.empty() == false
     *  @post none

@@ -121,8 +121,6 @@ namespace sysio::chain::config {
   static constexpr uint32_t   max_kv_value_size_limit           = 1024*1024; ///< absolute max for value size (1 MiB)
   // Iterator limit is hardcoded (ephemeral per-transaction, bounded by CPU)
   static constexpr uint32_t   max_kv_iterators                  = 1024;
-  static constexpr uint8_t    kv_format_raw                     = 0;         ///< raw key bytes (variable-length, used by kv::raw_table)
-  static constexpr uint8_t    kv_format_standard                = 1;         ///< standard 24-byte [table:8B BE][scope:8B BE][pk:8B BE] layout
 
 #ifdef SYSIO_SYS_VM_JIT_RUNTIME_ENABLED
   static constexpr auto default_wasm_runtime = sysio::chain::wasm_interface::vm_type::sys_vm_jit;

@@ -57,7 +57,7 @@ extern "C" {
     int32_t kv_contains(uint32_t key_format, uint64_t code, const void* key, uint32_t key_size);
 
     __attribute__((sysio_wasm_import))
-    void kv_idx_store(uint64_t payer, uint64_t table, uint32_t index_id,
+    void kv_idx_store(uint64_t payer, uint32_t table_id,
                       const void* pri_key, uint32_t pri_key_size,
                       const void* sec_key, uint32_t sec_key_size);
 

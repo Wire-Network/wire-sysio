@@ -14,8 +14,11 @@ using namespace sysio::testing;
 
 static const name test_account = "kvtest"_n;
 
-struct kv_api_tester : validating_tester {
-   kv_api_tester() {
+// Shared blockchain -- initialized once, reused by all kv_api test cases.
+// Each WASM action is self-contained (creates its own keys, runs its own checks),
+// so accumulating chain state across tests is safe.
+struct kv_shared_tester : validating_tester {
+   kv_shared_tester() {
       create_accounts({test_account});
       produce_block();
       set_code(test_account, test_contracts::test_kv_api_wasm());
@@ -36,6 +39,23 @@ struct kv_api_tester : validating_tester {
       push_transaction(trx);
       produce_block();
    }
+};
+
+// Per-test fixture: thin wrapper around the shared tester.
+// Eliminates redundant blockchain boots (+ OC compilation under ASAN).
+struct kv_api_tester {
+   kv_shared_tester& t;
+   kv_api_tester() : t(shared_instance()) {}
+   void run_action(name n) { t.run_action(n); }
+   static kv_shared_tester& shared_instance() {
+      static kv_shared_tester inst;
+      return inst;
+   }
+};
+
+// Fresh per-test fixture for cross-scope tests whose actions use overlapping
+// primary keys that would collide with prior shared-tester state.
+struct kv_api_fresh_tester : kv_shared_tester {
 };
 
 BOOST_AUTO_TEST_SUITE(kv_api_tests)
@@ -323,7 +343,7 @@ BOOST_FIXTURE_TEST_CASE(sec_erase_via_iterator, kv_api_tester) {
    BOOST_CHECK_NO_THROW(run_action("tstsecerase"_n));
 }
 
-BOOST_FIXTURE_TEST_CASE(sec_iterate_order, kv_api_tester) {
+BOOST_FIXTURE_TEST_CASE(sec_iterate_order, kv_api_fresh_tester) {
    BOOST_CHECK_NO_THROW(run_action("tstseciter"_n));
 }
 
@@ -340,43 +360,15 @@ BOOST_FIXTURE_TEST_CASE(primary_rbegin_empty, kv_api_tester) {
    BOOST_CHECK_NO_THROW(run_action("tstrbempty"_n));
 }
 
-BOOST_FIXTURE_TEST_CASE(sec_rbegin_rend, kv_api_tester) {
+BOOST_FIXTURE_TEST_CASE(sec_rbegin_rend, kv_api_fresh_tester) {
    BOOST_CHECK_NO_THROW(run_action("tstsecrbegin"_n));
 }
 
-BOOST_FIXTURE_TEST_CASE(sec_erase_returns_next, kv_api_tester) {
+BOOST_FIXTURE_TEST_CASE(sec_erase_returns_next, kv_api_fresh_tester) {
    BOOST_CHECK_NO_THROW(run_action("tstsecersnxt"_n));
 }
 
-// kv::raw_table tests
-BOOST_FIXTURE_TEST_CASE(mapping_set_get, kv_api_tester) {
-   BOOST_CHECK_NO_THROW(run_action("tstmapsetget"_n));
-}
-
-BOOST_FIXTURE_TEST_CASE(mapping_contains_erase, kv_api_tester) {
-   BOOST_CHECK_NO_THROW(run_action("tstmapcont"_n));
-}
-
-BOOST_FIXTURE_TEST_CASE(mapping_update, kv_api_tester) {
-   BOOST_CHECK_NO_THROW(run_action("tstmapupdate"_n));
-}
-
-BOOST_FIXTURE_TEST_CASE(mapping_name_key, kv_api_tester) {
-   BOOST_CHECK_NO_THROW(run_action("tstmapstrkey"_n));
-}
-
-// kv::table tests
-BOOST_FIXTURE_TEST_CASE(kvtable_basic, kv_api_tester) {
-   BOOST_CHECK_NO_THROW(run_action("tstkvtbasic"_n));
-}
-
-BOOST_FIXTURE_TEST_CASE(kvtable_iterate, kv_api_tester) {
-   BOOST_CHECK_NO_THROW(run_action("tstkvtiter"_n));
-}
-
-BOOST_FIXTURE_TEST_CASE(kvtable_begin_all_scopes, kv_api_tester) {
-   BOOST_CHECK_NO_THROW(run_action("tstkvtscope"_n));
-}
+// (kv::raw_table and old kv::table tests removed -- types dropped in table_id migration)
 
 // payer validation tests
 BOOST_FIXTURE_TEST_CASE(payer_self_allowed, kv_api_tester) {
@@ -386,8 +378,8 @@ BOOST_FIXTURE_TEST_CASE(payer_self_allowed, kv_api_tester) {
 BOOST_FIXTURE_TEST_CASE(payer_other_requires_auth, kv_api_tester) {
    // Billing another account without their authorization fails at the
    // transaction level (unauthorized_ram_usage_increase), not at the KV level.
-   create_accounts({"alice"_n});
-   produce_block();
+   t.create_accounts({"alice"_n});
+   t.produce_block();
    BOOST_CHECK_THROW(run_action("tstpayeroth"_n), sysio::chain::unauthorized_ram_usage_increase);
 }
 
@@ -396,8 +388,8 @@ BOOST_FIXTURE_TEST_CASE(empty_key_rejected_kv_set, kv_api_tester) {
    BOOST_CHECK_THROW(run_action("tstemptykey"_n), fc::exception);
 }
 
-// invalid key_format rejection tests
-BOOST_FIXTURE_TEST_CASE(bad_key_format_rejected_kv_set, kv_api_tester) {
+// table_id > UINT16_MAX is rejected
+BOOST_FIXTURE_TEST_CASE(table_id_overflow_rejected, kv_api_tester) {
    BOOST_CHECK_THROW(run_action("tstbadfmt"_n), fc::exception);
 }
 
@@ -424,10 +416,10 @@ BOOST_FIXTURE_TEST_CASE(read_only_trx_rejects_write, kv_api_tester) {
       vector<permission_level>{{test_account, config::active_name}},
       test_account, "tstrdonly"_n, bytes{}
    );
-   set_transaction_headers(trx);
-   trx.sign(get_private_key(test_account, "active"), control->get_chain_id());
+   t.set_transaction_headers(trx);
+   trx.sign(t.get_private_key(test_account, "active"), t.control->get_chain_id());
    BOOST_CHECK_THROW(
-      push_transaction(trx, fc::time_point::maximum(), DEFAULT_BILLED_CPU_TIME_US, false,
+      t.push_transaction(trx, fc::time_point::maximum(), kv_shared_tester::DEFAULT_BILLED_CPU_TIME_US, false,
                        transaction_metadata::trx_type::read_only),
       fc::exception);
 }
@@ -446,27 +438,27 @@ BOOST_FIXTURE_TEST_CASE(notify_context_ram_billing, kv_api_tester) {
    // When a contract receives a notification (receiver != act.account),
    // kv_set writes to the receiver's namespace and bills receiver's RAM
    name notify_acct = "kvnotify"_n;
-   create_accounts({notify_acct});
-   produce_block();
-   set_code(notify_acct, test_contracts::test_kv_api_wasm());
-   set_abi(notify_acct, test_contracts::test_kv_api_abi().c_str());
-   produce_block();
+   t.create_accounts({notify_acct});
+   t.produce_block();
+   t.set_code(notify_acct, test_contracts::test_kv_api_wasm());
+   t.set_abi(notify_acct, test_contracts::test_kv_api_abi().c_str());
+   t.produce_block();
 
-   // Push tstsendnotif on test_account — it calls require_recipient(kvnotify)
+   // Push tstsendnotif on test_account -- it calls require_recipient(kvnotify)
    // kvnotify receives the notification and executes tstnotifyram handler (via apply)
    // Actually, require_recipient just forwards the same action, so kvnotify's
    // apply will see action=tstsendnotif. The notification will succeed and
    // any kv_set in kvnotify's on_notify will write to kvnotify's KV space.
    // For this test, we just verify the notification doesn't crash.
    BOOST_CHECK_NO_THROW(run_action("tstsendnotif"_n));
-   produce_block();
+   t.produce_block();
 
    // Verify kvnotify did NOT write to test_account's KV space
    // (notification receiver writes to its own namespace)
 }
 
 // secondary iterator clone with duplicate keys
-BOOST_FIXTURE_TEST_CASE(sec_iterator_clone_duplicate_keys, kv_api_tester) {
+BOOST_FIXTURE_TEST_CASE(sec_iterator_clone_duplicate_keys, kv_api_fresh_tester) {
    BOOST_CHECK_NO_THROW(run_action("tstsecclone"_n));
 }
 
@@ -475,12 +467,56 @@ BOOST_FIXTURE_TEST_CASE(sec_rbegin_uint128_keys, kv_api_tester) {
    BOOST_CHECK_NO_THROW(run_action("tstsecrbig"_n));
 }
 
-// ════════════════════════════════════════════════════════════════════════════
-// RAM billing tests — verify correct billing on create, update, erase
-// ════════════════════════════════════════════════════════════════════════════
+// --------------------------------------------------------------------------
+// Cross-scope secondary index isolation tests
+// Verify that kv_multi_index secondary indices are properly scoped.
+// These use kv_api_fresh_tester because they exercise multi_index with
+// overlapping primary keys across scopes.
+// --------------------------------------------------------------------------
 
-// billable_size_v<kv_object> from config — use the actual compile-time constant
+BOOST_FIXTURE_TEST_CASE(sec_cross_scope_isolation, kv_api_fresh_tester) {
+   // Two scopes with same PKs -- iteration in each scope must be isolated
+   BOOST_CHECK_NO_THROW(run_action("tstxscope"_n));
+}
+
+BOOST_FIXTURE_TEST_CASE(sec_cross_scope_find, kv_api_fresh_tester) {
+   // find(sec_val) in scope A must not return scope B's entry
+   BOOST_CHECK_NO_THROW(run_action("tstxfind"_n));
+}
+
+BOOST_FIXTURE_TEST_CASE(sec_cross_scope_erase, kv_api_fresh_tester) {
+   // Erase from scope A must not affect scope B
+   BOOST_CHECK_NO_THROW(run_action("tstxerase"_n));
+}
+
+BOOST_FIXTURE_TEST_CASE(sec_cross_scope_double, kv_api_fresh_tester) {
+   // double secondary: sort-preserving transform + scope isolation
+   BOOST_CHECK_NO_THROW(run_action("tstxdbl"_n));
+}
+
+BOOST_FIXTURE_TEST_CASE(sec_cross_scope_zero, kv_api_fresh_tester) {
+   // scope=0 is the minimum scope prefix -- verify isolation
+   BOOST_CHECK_NO_THROW(run_action("tstxzero"_n));
+}
+
+BOOST_FIXTURE_TEST_CASE(sec_cross_scope_reverse, kv_api_fresh_tester) {
+   // Reverse iteration (--end()) must not leak across scopes
+   BOOST_CHECK_NO_THROW(run_action("tstxrev"_n));
+}
+
+BOOST_FIXTURE_TEST_CASE(sec_cross_scope_upper_bound, kv_api_fresh_tester) {
+   // upper_bound in scope A stops at scope boundary
+   BOOST_CHECK_NO_THROW(run_action("tstxubound"_n));
+}
+
+// --------------------------------------------------------------------------
+// RAM billing tests -- verify correct billing on create, update, erase
+// --------------------------------------------------------------------------
+
+// billable_size_v<kv_object> / <kv_index_object> from config -- use the actual
+// compile-time constants so these tests catch any drift in the billing formula.
 static constexpr int64_t KV_OVERHEAD = config::billable_size_v<kv_object>;
+static constexpr int64_t KV_INDEX_OVERHEAD = config::billable_size_v<kv_index_object>;
 
 struct kv_billing_tester : validating_tester {
    kv_billing_tester() {
@@ -598,6 +634,52 @@ BOOST_FIXTURE_TEST_CASE(billing_multiple_rows, kv_billing_tester) {
    int64_t expected = 3 * (4 + KV_OVERHEAD) + 100 + 200 + 300; // 3 rows, different values
    int64_t actual = after - before;
    BOOST_TEST_MESSAGE("billing_multiple_rows: expected=" << expected << " actual=" << actual);
+   BOOST_REQUIRE_EQUAL(actual, expected);
+}
+
+// --------------------------------------------------------------------------
+// Secondary index (kv_index_object) billing tests -- exact-delta coverage so
+// drift in kv_index_object_ram() cannot pass silently.
+// --------------------------------------------------------------------------
+
+BOOST_FIXTURE_TEST_CASE(billing_idx_create_row, kv_billing_tester) {
+   // testidxstore calls kv_idx_store with sec="alice" (5 bytes), pri=3 bytes.
+   auto before = get_ram_usage();
+   push_action(test_account, "testidxstore"_n, test_account, mutable_variant_object());
+   produce_block();
+   auto after = get_ram_usage();
+
+   int64_t expected = 3 + 5 + KV_INDEX_OVERHEAD;
+   int64_t actual = after - before;
+   BOOST_TEST_MESSAGE("billing_idx_create_row: expected=" << expected << " actual=" << actual);
+   BOOST_REQUIRE_EQUAL(actual, expected);
+}
+
+BOOST_FIXTURE_TEST_CASE(billing_idx_create_erase_net_zero, kv_billing_tester) {
+   // testidxremov calls kv_idx_store then kv_idx_remove on the same row.
+   // If store and remove bill the same formula, the net delta is zero.
+   auto before = get_ram_usage();
+   push_action(test_account, "testidxremov"_n, test_account, mutable_variant_object());
+   produce_block();
+   auto after = get_ram_usage();
+
+   BOOST_TEST_MESSAGE("billing_idx_create_erase_net_zero: delta=" << (after - before));
+   BOOST_REQUIRE_EQUAL(after - before, 0);
+}
+
+BOOST_FIXTURE_TEST_CASE(billing_idx_update_shrink, kv_billing_tester) {
+   // testidxupdat: kv_idx_store(sec="charlie"/7, pri=3) then
+   //               kv_idx_update(old_sec="charlie"/7 -> new_sec="david"/5).
+   // Total bill = store + update_delta = (3 + 7 + KV_INDEX_OVERHEAD) + (5 - 7)
+   //            = 3 + 5 + KV_INDEX_OVERHEAD.
+   auto before = get_ram_usage();
+   push_action(test_account, "testidxupdat"_n, test_account, mutable_variant_object());
+   produce_block();
+   auto after = get_ram_usage();
+
+   int64_t expected = 3 + 5 + KV_INDEX_OVERHEAD;
+   int64_t actual = after - before;
+   BOOST_TEST_MESSAGE("billing_idx_update_shrink: expected=" << expected << " actual=" << actual);
    BOOST_REQUIRE_EQUAL(actual, expected);
 }
 

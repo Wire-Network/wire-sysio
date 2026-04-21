@@ -22,6 +22,7 @@ unittest_target(
 target_link_libraries(${CONTRACT_UNIT_TEST_EXE}
         PRIVATE
         fc-lite
+        opp
 )
 
 # add_sysio_test_executable(${CONTRACT_UNIT_TEST_EXE} ${UNIT_TESTS}) # build unit tests as one executable
