@@ -1021,7 +1021,7 @@ BOOST_AUTO_TEST_CASE( kv_roa_limit_enforcement ) { try {
    const auto& alice_account = account_name("alice");
 
    c.create_accounts( {tester1_account, alice_account}, false, true, false );
-   c.add_roa_policy(c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "0.0941 SYS", 0, 0);
+   c.add_roa_policy(c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "0.1000 SYS", 0, 0);
    // Give alice a small RAM quota — enough for small data but not large
    c.add_roa_policy(c.NODE_DADDY, alice_account, "1.0000 SYS", "1.0000 SYS", "0.0100 SYS", 0, 0);
    c.produce_block();
@@ -1080,7 +1080,7 @@ BOOST_AUTO_TEST_CASE( privileged_kv_payer_bypass ) { try {
    // Non-sysio privileged contract still requires sysio.payer auth
    const auto& priv2_account = account_name("privtest");
    c.create_accounts( {priv2_account}, false, true, false );
-   c.add_roa_policy(c.NODE_DADDY, priv2_account, "1.0000 SYS", "1.0000 SYS", "0.0941 SYS", 0, 0);
+   c.add_roa_policy(c.NODE_DADDY, priv2_account, "1.0000 SYS", "1.0000 SYS", "0.1000 SYS", 0, 0);
    c.produce_block();
    c.set_code( priv2_account, test_contracts::ram_restrictions_test_wasm() );
    c.set_abi( priv2_account, test_contracts::ram_restrictions_test_abi() );
