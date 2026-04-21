@@ -1295,6 +1295,67 @@ BOOST_FIXTURE_TEST_CASE(idx_iter_mutation_insert, kv_api_tester) {
    BOOST_CHECK_NO_THROW(run_action("tstidxinsert"_n));
 }
 
+// ════════════════════════════════════════════════════════════════════════════
+// primary_id validation & lifecycle tests
+// ════════════════════════════════════════════════════════════════════════════
+
+// kv_idx_store with a negative primary_id must be rejected by the host.
+BOOST_FIXTURE_TEST_CASE(idx_store_negative_primary_id_rejected, kv_api_tester) {
+   BOOST_CHECK_EXCEPTION(
+      t.push_action(test_account, "tstidxbadpid"_n, test_account,
+         mutable_variant_object()("pid", -1)("sec_size", 8)),
+      kv_key_not_found,
+      fc_exception_message_contains("non-negative primary_id"));
+}
+
+// kv_idx_store with a primary_id that does not refer to any existing row
+// must be rejected with kv_key_not_found.
+BOOST_FIXTURE_TEST_CASE(idx_store_nonexistent_primary_id_rejected, kv_api_tester) {
+   BOOST_CHECK_EXCEPTION(
+      t.push_action(test_account, "tstidxbadpid"_n, test_account,
+         mutable_variant_object()("pid", 999999999)("sec_size", 8)),
+      kv_key_not_found,
+      fc_exception_message_contains("non-existent primary_id"));
+}
+
+// A contract must not be able to create a secondary index entry that
+// references another contract's primary row. Fixture uses the two-contract
+// setup already available (kv_notify_billing_tester has the same WASM
+// deployed on both test_account and notify_account).
+BOOST_FIXTURE_TEST_CASE(idx_store_cross_contract_primary_rejected, kv_notify_billing_tester) {
+   // notify_account creates its own primary and stores the pid in a known key
+   push_action(notify_account, "tstxcprep"_n, notify_account, mutable_variant_object());
+   produce_block();
+
+   // test_account reads notify_account's pid and attempts kv_idx_store —
+   // host rejects because primary->code != receiver.
+   BOOST_CHECK_EXCEPTION(
+      push_action(test_account, "tstxcbadidx"_n, test_account,
+         mutable_variant_object()("other", notify_account)),
+      table_operation_not_permitted,
+      fc_exception_message_contains("references primary row owned by"));
+}
+
+// Erasing the primary row while a secondary entry still references it
+// orphans the secondary: kv_idx_primary_key on the secondary iterator
+// reports iterator_erased rather than returning stale key bytes.
+BOOST_FIXTURE_TEST_CASE(idx_orphan_after_primary_erase, kv_api_tester) {
+   BOOST_CHECK_NO_THROW(run_action("tstorphansec"_n));
+}
+
+// kv_set on an existing key returns the same primary_id — chainbase ids are
+// stable across value updates, so secondary references remain valid.
+BOOST_FIXTURE_TEST_CASE(primary_id_stable_on_update, kv_api_tester) {
+   BOOST_CHECK_NO_THROW(run_action("tstpidstable"_n));
+}
+
+// Erase + recreate with the same key yields a fresh primary_id; chainbase
+// never re-uses ids, so any stale secondary still pointing at the old id
+// will correctly read as erased.
+BOOST_FIXTURE_TEST_CASE(primary_id_differs_after_recreate, kv_api_tester) {
+   BOOST_CHECK_NO_THROW(run_action("tstpidrecyc"_n));
+}
+
 // Fork/undo coverage note:
 // All KV test fixtures use validating_tester, which replays every block on a
 // second chain and compares integrity hashes. This implicitly verifies that

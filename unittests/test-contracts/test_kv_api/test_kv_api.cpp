@@ -2711,6 +2711,103 @@ public:
       kv_idx_store(0, xc_tbl_id, pid, sec, 5);
    }
 
+   // ════════════════════════════════════════════════════════════════════════════
+   // primary_id validation & lifecycle actions (new surface on the
+   // feature/kv-secondary-primary-id branch — secondary index now stores a
+   // reference to the primary by id rather than copying the primary key bytes).
+   // ════════════════════════════════════════════════════════════════════════════
+
+   // Attempt kv_idx_store with an explicit primary_id. Host-side validation
+   // rejects negative and non-existent ids with kv_key_not_found. The test
+   // driver supplies the bad id.
+   [[sysio::action]]
+   void tstidxbadpid(int64_t pid, uint32_t sec_size) {
+      std::vector<char> sec(sec_size, 'S');
+      kv_idx_store(0, xc_tbl_id, pid, sec.data(), sec_size);
+   }
+
+   // Store a primary row and save its primary_id under a well-known key so
+   // another contract can read it back for the cross-contract test.
+   [[sysio::action]]
+   void tstxcprep() {
+      const char pri[] = "xcbpri";
+      const char val[] = "v";
+      int64_t pid = kv_set(test_table_id, 0, pri, sizeof(pri), val, sizeof(val));
+      char pid_bytes[8];
+      memcpy(pid_bytes, &pid, 8);
+      // Known key for the peer to retrieve this contract's primary_id
+      const char pid_key[] = "xcbpidref";
+      kv_set(test_table_id, 0, pid_key, sizeof(pid_key), pid_bytes, 8);
+   }
+
+   // Read the other contract's primary_id and try to create a secondary
+   // index entry that references it. Host must reject with
+   // table_operation_not_permitted because primary->code != receiver.
+   [[sysio::action]]
+   void tstxcbadidx(sysio::name other) {
+      char pid_bytes[8];
+      const char pid_key[] = "xcbpidref";
+      int32_t sz = kv_get(test_table_id, other.value, pid_key, sizeof(pid_key), pid_bytes, 8);
+      check(sz == 8, "xcbadidx: expected 8-byte pid ref from other contract");
+      int64_t other_pid;
+      memcpy(&other_pid, pid_bytes, 8);
+      const char sec[] = "xcbadsec";
+      kv_idx_store(0, xc_tbl_id, other_pid, sec, sizeof(sec));
+   }
+
+   // Create primary + secondary, erase primary, verify kv_idx_primary_key
+   // reports iterator_erased (status 2) and secondary key read still works.
+   [[sysio::action]]
+   void tstorphansec() {
+      static constexpr uint32_t orphan_tbl = 306;
+      const char pri[] = "orphanpri";
+      const char sec[] = "orphansec";
+      int64_t pid = kv_set(test_table_id, 0, pri, sizeof(pri), "v", 2);
+      kv_idx_store(0, orphan_tbl, pid, sec, sizeof(sec));
+
+      int32_t h = kv_idx_find_secondary(get_self().value, orphan_tbl, sec, sizeof(sec));
+      check(h >= 0, "orphansec: find should succeed");
+
+      // Erase the primary row
+      kv_erase(test_table_id, pri, sizeof(pri));
+
+      // kv_idx_primary_key on the still-live secondary iterator should now
+      // report iterator_erased (the lazy primary lookup fails).
+      char pkbuf[32]; uint32_t pksz = 0;
+      int32_t st = kv_idx_primary_key((uint32_t)h, 0, pkbuf, sizeof(pkbuf), &pksz);
+      check(st == 2, "orphansec: kv_idx_primary_key should return iterator_erased (2)");
+
+      kv_idx_destroy((uint32_t)h);
+   }
+
+   // kv_set on an existing key returns the same primary_id (chainbase id
+   // is stable across updates).
+   [[sysio::action]]
+   void tstpidstable() {
+      const char key[] = "pidstable";
+      int64_t pid1 = kv_set(test_table_id, 0, key, sizeof(key), "v1", 2);
+      int64_t pid2 = kv_set(test_table_id, 0, key, sizeof(key), "v2updated", 9);
+      check(pid1 == pid2, "pidstable: update must preserve primary_id");
+   }
+
+   // Erase + recreate with the same key yields a different primary_id
+   // (chainbase ids are monotonic per table and never reused).
+   [[sysio::action]]
+   void tstpidrecyc() {
+      const char key[] = "pidrecyc";
+      int64_t pid1 = kv_set(test_table_id, 0, key, sizeof(key), "v1", 2);
+      kv_erase(test_table_id, key, sizeof(key));
+      int64_t pid2 = kv_set(test_table_id, 0, key, sizeof(key), "v2", 2);
+      check(pid1 != pid2, "pidrecyc: erase+recreate must yield a new primary_id");
+   }
+
+   // ════════════════════════════════════════════════════════════════════════════
+   // Cross-contract read action (existing; renamed internally from the earlier
+   // xcidxread action — kept for cross_contract_idx_read test). The action
+   // below demonstrates reading a row stored by a different contract via
+   // kv_get; the secondary index lookup is also exercised.
+   // ════════════════════════════════════════════════════════════════════════════
+
    // Read another contract's secondary index; verify the secondary entry
    // references a row in the other contract's primary table and read its value.
    [[sysio::action]]

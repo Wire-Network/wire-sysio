@@ -537,6 +537,20 @@
             "fields": []
         },
         {
+            "name": "tstidxbadpid",
+            "base": "",
+            "fields": [
+                {
+                    "name": "pid",
+                    "type": "int64"
+                },
+                {
+                    "name": "sec_size",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
             "name": "tstidxerase",
             "base": "",
             "fields": []
@@ -622,6 +636,11 @@
             "fields": []
         },
         {
+            "name": "tstorphansec",
+            "base": "",
+            "fields": []
+        },
+        {
             "name": "tstovrkyupd",
             "base": "",
             "fields": []
@@ -648,6 +667,16 @@
         },
         {
             "name": "tstpayerself",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstpidrecyc",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstpidstable",
             "base": "",
             "fields": []
         },
@@ -758,6 +787,21 @@
         },
         {
             "name": "tstwriteperm",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstxcbadidx",
+            "base": "",
+            "fields": [
+                {
+                    "name": "other",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "tstxcprep",
             "base": "",
             "fields": []
         },
@@ -1159,6 +1203,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "tstidxbadpid",
+            "type": "tstidxbadpid",
+            "ricardian_contract": ""
+        },
+        {
             "name": "tstidxerase",
             "type": "tstidxerase",
             "ricardian_contract": ""
@@ -1239,6 +1288,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "tstorphansec",
+            "type": "tstorphansec",
+            "ricardian_contract": ""
+        },
+        {
             "name": "tstovrkyupd",
             "type": "tstovrkyupd",
             "ricardian_contract": ""
@@ -1266,6 +1320,16 @@
         {
             "name": "tstpayerself",
             "type": "tstpayerself",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstpidrecyc",
+            "type": "tstpidrecyc",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstpidstable",
+            "type": "tstpidstable",
             "ricardian_contract": ""
         },
         {
@@ -1376,6 +1440,16 @@
         {
             "name": "tstwriteperm",
             "type": "tstwriteperm",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstxcbadidx",
+            "type": "tstxcbadidx",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstxcprep",
+            "type": "tstxcprep",
             "ricardian_contract": ""
         },
         {
