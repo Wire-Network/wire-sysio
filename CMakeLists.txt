@@ -113,38 +113,6 @@ endif()
 
 message(STATUS "Using '${CORE_SYMBOL_NAME}' as CORE symbol name")
 
-if(ENABLE_TCMALLOC)
-  find_package(Gperftools REQUIRED)
-  message(STATUS "Compiling Wire with TCMalloc")
-  #if doing this by the book, simply link_libraries( ${GPERFTOOLS_TCMALLOC} ) here. That will
-  #give the performance benefits of tcmalloc but since it won't be linked last
-  #the heap profiler & checker may not be accurate. This here is rather undocumented behavior
-  #to stuff a library toward the end of the link list
-  set(CMAKE_C_STANDARD_LIBRARIES "${CMAKE_C_STANDARD_LIBRARIES} ${GPERFTOOLS_TCMALLOC}")
-  set(CMAKE_CXX_STANDARD_LIBRARIES "${CMAKE_CXX_STANDARD_LIBRARIES} ${GPERFTOOLS_TCMALLOC}")
-endif()
-
-# ASan/UBSan ship their own malloc interceptors; linking jemalloc's overrides on top produces undefined
-# behavior (double-interception, heap metadata mismatch) that makes nodeop crash on startup. The sanitizer
-# CI platforms inject -fsanitize=... via CMAKE_{C,CXX}_FLAGS (see .cicd/platforms/{asan,ubsan}.Dockerfile)
-# rather than toggling the ENABLE_*_SANITIZER options, so detect either path.
-if(ENABLE_JEMALLOC AND (ENABLE_ADDRESS_SANITIZER OR ENABLE_UNDEFINED_BEHAVIOR_SANITIZER
-                        OR "${CMAKE_C_FLAGS}${CMAKE_CXX_FLAGS}" MATCHES "-fsanitize="))
-  message(STATUS "ENABLE_JEMALLOC disabled: sanitizer detected (ENABLE_*_SANITIZER option or -fsanitize= flag)")
-  set(ENABLE_JEMALLOC OFF CACHE BOOL "" FORCE)
-endif()
-if(ENABLE_JEMALLOC)
-  if(ENABLE_TCMALLOC)
-    message(FATAL_ERROR "ENABLE_JEMALLOC and ENABLE_TCMALLOC are mutually exclusive")
-  endif()
-  # vcpkg jemalloc port only ships .a + pkg-config (no CMake config), so find by name.
-  # Only the nodeop target links jemalloc (see programs/nodeop/CMakeLists.txt);
-  # auxiliary binaries (clio/kiod/trx_generator) stay on libc malloc to avoid
-  # unexpected interactions with short-lived processes.
-  find_library(JEMALLOC_LIB_PATH NAMES jemalloc_pic jemalloc REQUIRED)
-  message(STATUS "Compiling Wire with jemalloc (nodeop-only): ${JEMALLOC_LIB_PATH}")
-endif()
-
 # sysio includes a bundled BoringSSL which conflicts with OpenSSL. Make sure any other bundled libraries (such as boost)
 # do not attempt to use an external OpenSSL in any manner
 set(CMAKE_DISABLE_FIND_PACKAGE_OpenSSL On)
