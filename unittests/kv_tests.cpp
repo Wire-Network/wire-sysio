@@ -319,4 +319,43 @@ BOOST_AUTO_TEST_CASE(kv_iterator_pool_exhaustion) {
    );
 }
 
+BOOST_AUTO_TEST_CASE(kv_handle_encoding_layout) {
+   // Pin the consensus-observable handle encoding.  Any change to this
+   // layout is a protocol change and should fail this test loudly.
+   BOOST_CHECK_EQUAL(kv_handle_slot_mask,     0x000003FFu);
+   BOOST_CHECK_EQUAL(kv_secondary_handle_tag, 0x00010000u);
+
+   // Reserved mask is every bit outside of slot+tag (within 32 bits).
+   BOOST_CHECK_EQUAL(kv_handle_reserved_mask,
+                     static_cast<uint32_t>(~(kv_handle_slot_mask | kv_secondary_handle_tag)));
+
+   // Well-formed primary handle: only slot bits may be set.
+   uint32_t primary_handle = 5u;
+   BOOST_CHECK((primary_handle & kv_handle_reserved_mask) == 0);
+   BOOST_CHECK(!kv_handle_is_secondary(primary_handle));
+   BOOST_CHECK_NO_THROW(kv_handle_check_reserved_zero(primary_handle));
+
+   // Well-formed secondary handle: slot bits + tag bit.
+   uint32_t secondary_handle = kv_make_secondary_handle(5u);
+   BOOST_CHECK_EQUAL(secondary_handle, 0x00010005u);
+   BOOST_CHECK((secondary_handle & kv_handle_reserved_mask) == 0);
+   BOOST_CHECK(kv_handle_is_secondary(secondary_handle));
+   BOOST_CHECK_EQUAL(kv_handle_slot_index(secondary_handle), 5u);
+   BOOST_CHECK_NO_THROW(kv_handle_check_reserved_zero(secondary_handle));
+
+   // Any bit inside the reserved mask must be rejected.  Walk each reserved
+   // bit individually to catch a future layout change that accidentally
+   // shrinks the reserved set.
+   for (uint32_t bit = 0; bit < 32; ++bit) {
+      uint32_t probe = 1u << bit;
+      if ((probe & kv_handle_reserved_mask) == 0) continue;
+      BOOST_CHECK_THROW(kv_handle_check_reserved_zero(probe), kv_invalid_iterator);
+   }
+
+   // Handle values in int32_t form must remain non-negative; bit 31 is
+   // reserved (and catches the "negative means not found" intrinsic
+   // contract at the encoding layer).
+   BOOST_CHECK((kv_handle_reserved_mask & 0x80000000u) != 0);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

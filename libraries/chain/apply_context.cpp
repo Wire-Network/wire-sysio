@@ -725,6 +725,14 @@ int32_t apply_context::kv_contains(uint16_t table_id, name code, const char* key
 // --- Primary KV iterators ---
 
 uint32_t apply_context::kv_it_create(uint16_t table_id, name code, const char* prefix, uint32_t prefix_size) {
+   // Cap prefix at the constexpr absolute ceiling (max_kv_key_size_limit, 1024 B).  The prefix bytes are copied into
+   // the iterator slot's std::vector<char>, so an unbounded prefix_size would let a contract allocate arbitrary
+   // host-side storage per iterator (up to max_kv_iterators slots per action).  The absolute ceiling is used
+   // instead of the dynamic max_kv_key_size because the prefix bound is about capping host-side slot memory, not
+   // matching the current on-chain stored-key limit, and the constexpr check has zero runtime cost — matching
+   // the rationale that leaves read-path query keys bounded only by WASM linear memory.
+   SYS_ASSERT( prefix_size <= config::max_kv_key_size_limit, kv_key_too_large,
+               "KV iterator prefix size {} exceeds absolute maximum {}", prefix_size, config::max_kv_key_size_limit );
    const uint32_t handle = kv_primary_iterators.allocate(table_id, code, prefix, prefix_size);
    auto& slot = kv_primary_iterators.get(handle);
 
@@ -744,12 +752,14 @@ uint32_t apply_context::kv_it_create(uint16_t table_id, name code, const char* p
 }
 
 void apply_context::kv_it_destroy(uint32_t handle) {
+   kv_handle_check_reserved_zero(handle);
    SYS_ASSERT(!kv_handle_is_secondary(handle), kv_invalid_iterator,
               "kv_it_destroy called with secondary iterator handle ({})", handle);
    kv_primary_iterators.release(handle);
 }
 
 int32_t apply_context::kv_it_status(uint32_t handle) {
+   kv_handle_check_reserved_zero(handle);
    // Accepts either handle kind; dispatch on the tag bit so generic wrappers
    // (CDT iterator destructors / status checks) keep working for both.
    if (kv_handle_is_secondary(handle)) {
@@ -759,6 +769,7 @@ int32_t apply_context::kv_it_status(uint32_t handle) {
 }
 
 int32_t apply_context::kv_it_next(uint32_t handle) {
+   kv_handle_check_reserved_zero(handle);
    SYS_ASSERT(!kv_handle_is_secondary(handle), kv_invalid_iterator,
               "kv_it_next called with secondary iterator handle ({})", handle);
    auto& slot = kv_primary_iterators.get(handle);
@@ -798,6 +809,7 @@ int32_t apply_context::kv_it_next(uint32_t handle) {
 }
 
 int32_t apply_context::kv_it_prev(uint32_t handle) {
+   kv_handle_check_reserved_zero(handle);
    SYS_ASSERT(!kv_handle_is_secondary(handle), kv_invalid_iterator,
               "kv_it_prev called with secondary iterator handle ({})", handle);
    auto& slot = kv_primary_iterators.get(handle);
@@ -867,6 +879,7 @@ int32_t apply_context::kv_it_prev(uint32_t handle) {
 }
 
 int32_t apply_context::kv_it_lower_bound(uint32_t handle, const char* key, uint32_t key_size) {
+   kv_handle_check_reserved_zero(handle);
    SYS_ASSERT(!kv_handle_is_secondary(handle), kv_invalid_iterator,
               "kv_it_lower_bound called with secondary iterator handle ({})", handle);
    auto& slot = kv_primary_iterators.get(handle);
@@ -915,6 +928,7 @@ static const kv_object* find_current_primary(const chainbase::database& db, kv_p
 }
 
 int32_t apply_context::kv_it_key(uint32_t handle, uint32_t offset, char* dest, uint32_t dest_size, uint32_t& actual_size) {
+   kv_handle_check_reserved_zero(handle);
    SYS_ASSERT(!kv_handle_is_secondary(handle), kv_invalid_iterator,
               "kv_it_key called with secondary iterator handle ({})", handle);
    auto& slot = kv_primary_iterators.get(handle);
@@ -940,8 +954,8 @@ int32_t apply_context::kv_it_key(uint32_t handle, uint32_t offset, char* dest, u
    return static_cast<int32_t>(kv_it_stat::iterator_ok);
 }
 
-// Copy bytes from `src` to `dest` honoring the intrinsic's offset+truncation
-// contract.  Shared between the primary and secondary kv_it_value paths.
+// Copy bytes from `src` to `dest` honoring the intrinsic's offset+truncation contract.  Shared between the
+// primary and secondary kv_it_value paths.
 static void copy_value_window(const char* src, size_t src_size, uint32_t offset,
                               char* dest, uint32_t dest_size, uint32_t& actual_size) {
    actual_size = static_cast<uint32_t>(src_size);
@@ -951,12 +965,11 @@ static void copy_value_window(const char* src, size_t src_size, uint32_t offset,
    }
 }
 
-// Read the value at a primary OR secondary iterator's current position.
-// For primary iters, the value comes from the kv_object the iter is positioned
-// on. For secondary iters, the value comes from the kv_object referenced by
-// the slot's cached primary_id — a by_id lookup that avoids kv_get's
-// by_code_key walk.
+// Read the value at a primary OR secondary iterator's current position.  For primary iters, the value comes
+// from the kv_object the iter is positioned on.  For secondary iters, the value comes from the kv_object
+// referenced by the slot's cached primary_id — a by_id lookup that avoids kv_get's by_code_key walk.
 int32_t apply_context::kv_it_value(uint32_t handle, uint32_t offset, char* dest, uint32_t dest_size, uint32_t& actual_size) {
+   kv_handle_check_reserved_zero(handle);
    if (kv_handle_is_secondary(handle)) {
       auto& slot = kv_secondary_iterators.get(kv_handle_slot_index(handle));
       if (slot.status != kv_it_stat::iterator_ok) {
@@ -1147,6 +1160,7 @@ int32_t apply_context::kv_idx_lower_bound(name code, uint16_t table_id,
 }
 
 int32_t apply_context::kv_idx_next(uint32_t handle) {
+   kv_handle_check_reserved_zero(handle);
    SYS_ASSERT(kv_handle_is_secondary(handle), kv_invalid_iterator,
               "kv_idx_next called with primary iterator handle ({})", handle);
    auto& slot = kv_secondary_iterators.get(kv_handle_slot_index(handle));
@@ -1197,6 +1211,7 @@ int32_t apply_context::kv_idx_next(uint32_t handle) {
 }
 
 int32_t apply_context::kv_idx_prev(uint32_t handle) {
+   kv_handle_check_reserved_zero(handle);
    SYS_ASSERT(kv_handle_is_secondary(handle), kv_invalid_iterator,
               "kv_idx_prev called with primary iterator handle ({})", handle);
    auto& slot = kv_secondary_iterators.get(kv_handle_slot_index(handle));
@@ -1298,6 +1313,7 @@ static const kv_index_object* find_current_secondary(const chainbase::database& 
 }
 
 int32_t apply_context::kv_idx_key(uint32_t handle, uint32_t offset, char* dest, uint32_t dest_size, uint32_t& actual_size) {
+   kv_handle_check_reserved_zero(handle);
    SYS_ASSERT(kv_handle_is_secondary(handle), kv_invalid_iterator,
               "kv_idx_key called with primary iterator handle ({})", handle);
    auto& slot = kv_secondary_iterators.get(kv_handle_slot_index(handle));
@@ -1324,6 +1340,7 @@ int32_t apply_context::kv_idx_key(uint32_t handle, uint32_t offset, char* dest, 
 }
 
 int32_t apply_context::kv_idx_primary_key(uint32_t handle, uint32_t offset, char* dest, uint32_t dest_size, uint32_t& actual_size) {
+   kv_handle_check_reserved_zero(handle);
    SYS_ASSERT(kv_handle_is_secondary(handle), kv_invalid_iterator,
               "kv_idx_primary_key called with primary iterator handle ({})", handle);
    auto& slot = kv_secondary_iterators.get(kv_handle_slot_index(handle));
@@ -1361,6 +1378,7 @@ int32_t apply_context::kv_idx_primary_key(uint32_t handle, uint32_t offset, char
 }
 
 void apply_context::kv_idx_destroy(uint32_t handle) {
+   kv_handle_check_reserved_zero(handle);
    SYS_ASSERT(kv_handle_is_secondary(handle), kv_invalid_iterator,
               "kv_idx_destroy called with primary iterator handle ({})", handle);
    kv_secondary_iterators.release(kv_handle_slot_index(handle));
