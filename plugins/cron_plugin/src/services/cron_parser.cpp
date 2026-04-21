@@ -1,5 +1,7 @@
 #include <sysio/services/cron_parser.hpp>
 #include <fc/exception/exception.hpp>
+#include <boost/algorithm/string/classification.hpp>
+#include <boost/algorithm/string/trim.hpp>
 #include <algorithm>
 #include <charconv>
 #include <vector>
@@ -13,12 +15,10 @@ using exact_value = cron_service::job_schedule::exact_value;
 using step_value = cron_service::job_schedule::step_value;
 using range_value = cron_service::job_schedule::range_value;
 
-// Trim whitespace from both ends
+// Trim ASCII whitespace (space/tab/CR/LF) from both ends. Returns a
+// std::string_view into the original buffer — no allocation.
 std::string_view trim(std::string_view s) {
-   auto start = s.find_first_not_of(" \t\r\n");
-   if (start == std::string_view::npos) return "";
-   auto end = s.find_last_not_of(" \t\r\n");
-   return s.substr(start, end - start + 1);
+   return boost::algorithm::trim_copy_if(s, boost::algorithm::is_any_of(" \t\r\n"));
 }
 
 // Split string by delimiter

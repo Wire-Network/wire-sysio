@@ -226,7 +226,12 @@ BOOST_AUTO_TEST_CASE(parse_dow_sunday_seven_alias) try {
    // Documents current behavior for DOW=7 (the crontab Sunday-alias convention).
    // If parser later adds the alias this test should change to check acceptance.
    auto sched_opt = parse_cron_schedule("* * * * 7");
-   BOOST_CHECK(!sched_opt.has_value());
+   BOOST_REQUIRE(sched_opt.has_value());
+   BOOST_CHECK_EQUAL(sched_opt->day_of_week.size(), 1);
+   auto exact_val = *sched_opt->day_of_week.begin();
+   BOOST_CHECK(std::holds_alternative<svc::job_schedule::exact_value>(exact_val));
+   auto exact = std::get<svc::job_schedule::exact_value>(exact_val);
+   BOOST_CHECK_EQUAL(exact.value, 7u);
 } FC_LOG_AND_RETHROW();
 
 // -----------------------------------------------------------------------
