@@ -15,3 +15,16 @@ option(DISABLE_LLVM_LINKAGE_OVERRIDE "Disable LLVM linkage override" OFF)
 
 option(ENABLE_OC "Enable sysvm-oc on supported platforms" ON)
 option(SYSIO_ENABLE_DEVELOPER_OPTIONS "enable developer options for WIRE" OFF)
+
+option(BUILD_DOXYGEN "Build doxygen documentation on every make" OFF)
+option(ENABLE_MULTIVERSION_PROTOCOL_TEST "Enable nodeop multiversion protocol test" OFF)
+option(ENABLE_COVERAGE_TESTING "Build WIRE for code coverage analysis" OFF)
+option(DISABLE_WASM_SPEC_TESTS "disable building of wasm spec unit tests" OFF)
+
+# allocators (mutually exclusive; enforced in cmake/compiler-config.cmake)
+option(ENABLE_TCMALLOC "use tcmalloc (requires gperftools)" OFF)
+option(ENABLE_JEMALLOC "link jemalloc statically into nodeop (via vcpkg)" ON)
+
+# packaging
+option(ENABLE_SYSIO_DEV_DEB "Enable building the sysio-dev .deb package" OFF)
+option(ENABLE_SPRING_DEV_DEB "Enable building the spring-dev .deb package" OFF)
