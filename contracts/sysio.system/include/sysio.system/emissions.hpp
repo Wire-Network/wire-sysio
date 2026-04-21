@@ -1,11 +1,20 @@
 #pragma once
 
-#include <cstdint>
 #include <sysio/asset.hpp>
-#include <sysio/singleton.hpp>
-#include <sysio/symbol.hpp>
-#include <sysio/multi_index.hpp>
+#include <sysio/kv_global.hpp>
+#include <sysio/kv_table.hpp>
 #include <sysio/name.hpp>
+#include <sysio/symbol.hpp>
+#include <sysio/system.hpp>
+#include <sysio/time.hpp>
+
+#include <cstdint>
+
+// Core emissions tables owned by sysio.system. This header is intentionally
+// free of OPP / protobuf dependencies so that downstream contracts (notably
+// sysio.roa) can include it to check emitcfg_t::exists() before invoking
+// addnodeowner. The opreg / epoch read-only mirrors used by processepoch
+// live in emissions.cpp (implementation detail, not public API).
 
 namespace sysiosystem::emissions {
 
@@ -14,7 +23,7 @@ namespace sysiosystem::emissions {
 // ---------------------------------------------------------------------------
 
 struct [[sysio::table("emitcfg"), sysio::contract("sysio.system")]] emission_config {
-   // Node owner allocations (WIRE subunits, 9-decimal)
+   // Node-owner allocations (WIRE subunits, 9-decimal)
    int64_t   t1_allocation;
    int64_t   t2_allocation;
    int64_t   t3_allocation;
@@ -57,10 +66,10 @@ struct [[sysio::table("emitcfg"), sysio::contract("sysio.system")]] emission_con
       (standby_end_rank))
 };
 
-typedef sysio::singleton<"emitcfg"_n, emission_config> emitcfg_t;
+using emitcfg_t = sysio::kv::global<"emitcfg"_n, emission_config>;
 
 // ---------------------------------------------------------------------------
-// Emission state (node owner distribution start time)
+// Emission state (node-owner distribution start time)
 // ---------------------------------------------------------------------------
 
 struct [[sysio::table("emissionmngr"), sysio::contract("sysio.system")]] emission_state {
@@ -69,11 +78,16 @@ struct [[sysio::table("emissionmngr"), sysio::contract("sysio.system")]] emissio
    SYSLIB_SERIALIZE(emission_state, (node_rewards_start))
 };
 
-typedef sysio::singleton<"emissionmngr"_n, emission_state> emissionstate_t;
+using emissionstate_t = sysio::kv::global<"emissionmngr"_n, emission_state>;
 
 // ---------------------------------------------------------------------------
-// Node Owner Distribution table
+// Node-owner distribution table (per-account vesting row)
 // ---------------------------------------------------------------------------
+
+struct nodedist_key {
+   uint64_t account_name;
+   SYSLIB_SERIALIZE(nodedist_key, (account_name))
+};
 
 struct [[sysio::table("nodedist"), sysio::contract("sysio.system")]] node_owner_distribution {
    sysio::name          account_name;
@@ -81,10 +95,11 @@ struct [[sysio::table("nodedist"), sysio::contract("sysio.system")]] node_owner_
    sysio::asset         claimed;
    uint32_t             total_duration;
 
-   uint64_t primary_key() const { return account_name.value; }
+   SYSLIB_SERIALIZE(node_owner_distribution,
+      (account_name)(total_allocation)(claimed)(total_duration))
 };
 
-typedef sysio::multi_index<"nodedist"_n, node_owner_distribution> nodedist_t;
+using nodedist_t = sysio::kv::table<"nodedist"_n, nodedist_key, node_owner_distribution>;
 
 struct node_claim_result {
    sysio::asset  total_allocation;
@@ -97,23 +112,36 @@ struct node_claim_result {
 };
 
 // ---------------------------------------------------------------------------
-// T5 Treasury Emissions
+// T5 treasury emissions
 // ---------------------------------------------------------------------------
 
 struct [[sysio::table("t5state"), sysio::contract("sysio.system")]] t5_state {
    sysio::time_point_sec  start_time;
-   uint64_t               epoch_count        = 0;
+   uint64_t               epoch_count         = 0;
+   // last_epoch_index tracks the most recently-distributed sysio.epoch index.
+   // Each processepoch call distributes exactly one epoch by advancing this
+   // field from N to N+1; it doubles as an idempotency guard.
+   uint32_t               last_epoch_index    = 0;
    sysio::time_point_sec  last_epoch_time;
    int64_t                last_epoch_emission = 0;
    int64_t                total_distributed   = 0;
 
-   SYSLIB_SERIALIZE(t5_state, (start_time)(epoch_count)(last_epoch_time)
-                    (last_epoch_emission)(total_distributed))
+   SYSLIB_SERIALIZE(t5_state,
+      (start_time)(epoch_count)(last_epoch_index)
+      (last_epoch_time)(last_epoch_emission)(total_distributed))
 };
 
-typedef sysio::singleton<"t5state"_n, t5_state> t5state_t;
+using t5state_t = sysio::kv::global<"t5state"_n, t5_state>;
 
+// ---------------------------------------------------------------------------
 // Per-epoch audit log (unpruned)
+// ---------------------------------------------------------------------------
+
+struct epochlog_key {
+   uint64_t epoch_num;
+   SYSLIB_SERIALIZE(epochlog_key, (epoch_num))
+};
+
 struct [[sysio::table("epochlog"), sysio::contract("sysio.system")]] epoch_log {
    uint64_t               epoch_num;
    sysio::time_point_sec  timestamp;
@@ -123,20 +151,20 @@ struct [[sysio::table("epochlog"), sysio::contract("sysio.system")]] epoch_log {
    int64_t                capex_amount      = 0;
    int64_t                governance_amount = 0;
 
-   uint64_t primary_key() const { return epoch_num; }
-
-   SYSLIB_SERIALIZE(epoch_log, (epoch_num)(timestamp)(total_emission)
-                    (compute_amount)(capital_amount)(capex_amount)(governance_amount))
+   SYSLIB_SERIALIZE(epoch_log,
+      (epoch_num)(timestamp)(total_emission)
+      (compute_amount)(capital_amount)(capex_amount)(governance_amount))
 };
 
-typedef sysio::multi_index<"epochlog"_n, epoch_log> epochlog_t;
+using epochlog_t = sysio::kv::table<"epochlog"_n, epochlog_key, epoch_log>;
 
 // ---------------------------------------------------------------------------
-// Read-only return types
+// Read-only return types (used by viewepoch / viewnodedist)
 // ---------------------------------------------------------------------------
 
 struct epoch_info_result {
-   uint64_t               epoch_count        = 0;
+   uint64_t               epoch_count         = 0;
+   uint32_t               last_epoch_index    = 0;
    sysio::time_point_sec  last_epoch_time;
    int64_t                last_epoch_emission = 0;
    int64_t                total_distributed   = 0;
@@ -144,8 +172,9 @@ struct epoch_info_result {
    int64_t                next_emission_est   = 0;
    uint32_t               seconds_until_next  = 0;
 
-   SYSLIB_SERIALIZE(epoch_info_result, (epoch_count)(last_epoch_time)(last_epoch_emission)
-                    (total_distributed)(treasury_remaining)(next_emission_est)(seconds_until_next))
+   SYSLIB_SERIALIZE(epoch_info_result,
+      (epoch_count)(last_epoch_index)(last_epoch_time)(last_epoch_emission)
+      (total_distributed)(treasury_remaining)(next_emission_est)(seconds_until_next))
 };
 
-}
+} // namespace sysiosystem::emissions
