@@ -1,8 +1,8 @@
 #include <sysio.system/sysio.system.hpp>
 #include <sysio.system/emissions.hpp>
-#include <sysio.token/sysio.token.hpp>
 
 #include <sysio/crypto.hpp>
+#include <sysio/kv_scoped_table.hpp>
 #include <sysio/opp/types/types.pb.hpp>
 #include <sysio.opp.common/opp_table_types.hpp>
 
@@ -11,6 +11,28 @@
 namespace sysiosystem {
 
 using namespace emissions;
+
+// ===========================================================================
+// Read-only mirror of sysio.token accounts table (kv::scoped_table).
+// The upstream types are private inside sysio::token; we only need read access
+// to check sysio's own WIRE balance before emitting.
+// ===========================================================================
+
+namespace token_readonly {
+
+struct acct_key {
+   uint64_t sym_code;
+   SYSLIB_SERIALIZE(acct_key, (sym_code))
+};
+
+struct account {
+   sysio::asset balance;
+   SYSLIB_SERIALIZE(account, (balance))
+};
+
+using accounts_t = sysio::kv::scoped_table<"accounts"_n, acct_key, account>;
+
+} // namespace token_readonly
 
 // ===========================================================================
 // Read-only cross-contract mirrors (implementation detail).
@@ -116,7 +138,7 @@ constexpr sysio::symbol WIRE_SYMBOL{"WIRE", 9};
 constexpr uint32_t ACTIVE_PRODUCER_COUNT  = 21;
 constexpr uint32_t STANDBY_START_RANK     = 22;
 constexpr uint32_t TOTAL_BLOCKS_PER_ROUND = ACTIVE_PRODUCER_COUNT * blocks_per_round; // 252
-constexpr uint32_t BATCH_OP_GROUP_SIZE    = 7;  // fixed: per Q3A/Q5g, slice is 1/7 always
+constexpr uint32_t BATCH_OP_GROUP_SIZE    = 7;  // fixed slice is always 1/7; slashed/absent members' share stays in treasury
 constexpr uint32_t ACTIVE_PRODUCER_WEIGHT = 15; // > any standby weight (1..cfg.standby_end_rank-21)
 
 constexpr sysio::name CAPITAL_ACCOUNT    = "sysio.cap"_n;
@@ -211,10 +233,11 @@ node_claim_result compute_node_claim(const emission_state& emission,
 // ---------------------------------------------------------------------------
 
 // Read sysio's WIRE token balance via the sysio.token kv::scoped_table.
-// Returns 0 if no balance entry exists.
+// Returns 0 if no balance entry exists. Uses a local mirror of sysio.token's
+// accounts table because the upstream types are private.
 int64_t get_wire_balance(name account) {
-   sysio::token::accounts acct_tbl(TOKEN_CONTRACT, account.value);
-   auto key = sysio::token::acct_key{WIRE_SYMBOL.code().raw()};
+   token_readonly::accounts_t acct_tbl(TOKEN_CONTRACT, account.value);
+   token_readonly::acct_key key{WIRE_SYMBOL.code().raw()};
    if (!acct_tbl.contains(key)) return 0;
    return acct_tbl.get(key).balance.amount;
 }
@@ -437,9 +460,9 @@ void system_contract::initt5(const sysio::time_point_sec& start_time) {
 // Permissionless. Distributes exactly one epoch per call: advances
 // t5state.last_epoch_index by 1. Callers catch up gaps by re-invoking.
 //
-// Failure of this action does NOT block sysio.epoch::advance -- the two are
-// decoupled (Q5d iii). Slashed/terminated recipients' shares stay in treasury
-// (Q5c iii).
+// Decoupled from sysio.epoch::advance -- an emissions failure does not block
+// protocol epoch advancement. Slashed / terminated recipients' shares stay in
+// the treasury rather than being redistributed.
 void system_contract::processepoch() {
    const auto cfg = get_emit_cfg(get_self());
 
@@ -468,7 +491,7 @@ void system_contract::processepoch() {
    }
    sysio::check(emission > 0, "treasury exhausted");
 
-   // ----- Pool balance check (Q5e) -----
+   // ----- Pool balance check: sysio must hold enough WIRE to cover the emission -----
    const int64_t balance = get_wire_balance(get_self());
    sysio::check(balance >= emission, "insufficient treasury WIRE balance");
 
@@ -484,15 +507,18 @@ void system_contract::processepoch() {
    int64_t actual_paid = 0;
 
    // =======================================================================
-   // Producer + standby pay (Q6 b: proportional to eligible_rounds; Q7: standby
-   // via existing rank weight, no eligible_rounds required; Q4/Q5c: opreg filter).
+   // Producer + standby pay. Active producers (rank 1..21) are paid in
+   // proportion to their eligible_rounds this epoch; standbys (rank 22..
+   // cfg.standby_end_rank) are paid by the existing rank-decreasing weight
+   // without an eligible_rounds requirement. Recipients are filtered by
+   // opreg status so slashed / terminated operators are skipped.
    // =======================================================================
    {
       auto prod_by_rank = _producers.get_index<"prodrank"_n>();
 
-      // expected_rounds is derived from the epoch duration, not wall clock --
-      // with Q8-ii one-epoch-per-call, wall clock may cover multiple configured
-      // epoch durations during gap catch-up.
+      // expected_rounds is derived from the configured epoch duration, not
+      // wall clock: with one-epoch-per-call gap catch-up, wall clock may span
+      // multiple configured epoch durations between calls.
       uint32_t expected_rounds = (cfg.epoch_duration_secs * 2) / TOTAL_BLOCKS_PER_ROUND;
       if (expected_rounds == 0) expected_rounds = 1;
 
@@ -580,8 +606,10 @@ void system_contract::processepoch() {
    }
 
    // =======================================================================
-   // Batch-op pay (Q3 A, Q5g: fixed 1/7 slice per member; Q4/Q5c: opreg filter;
-   // slashed members' slices stay in treasury).
+   // Batch-op pay. Divides batch_pool into a fixed 1/BATCH_OP_GROUP_SIZE slice
+   // per seat in the current rotation group. Members not registered as ACTIVE
+   // in sysio.opreg (slashed / terminated / unknown) are skipped and their
+   // slice remains in the treasury rather than being redistributed.
    // =======================================================================
    {
       const auto group         = get_current_batch_group();
@@ -613,7 +641,7 @@ void system_contract::processepoch() {
    state.last_epoch_index    = target_epoch;
    state.last_epoch_time     = now;
    state.last_epoch_emission = emission;
-   state.total_distributed  += actual_paid; // Q5c iii: only actually-paid amount
+   state.total_distributed  += actual_paid; // track only amounts actually paid; skipped recipients' shares stay in treasury
    t5s.set(state, get_self());
 
    // Audit log: records the AUTHORIZED emission + the four category amounts.
