@@ -26,9 +26,12 @@ std::string trim_public_key(const std::string& hex) {
 
    FC_ASSERT(std::ranges::contains(public_key_string_lengths, len), "Invalid public key length({}): {}", len, hex);
 
-   // If len mod 64 remainder is > 0, that means that the
-   // first two bytes denote the type and will be truncated
-   if (len % 64 > 0)
+   // For uncompressed keys (130 chars = 0x04 + 64 bytes x||y) strip the fixed
+   // 0x04 prefix — it's reapplied unconditionally below. For compressed keys
+   // (66 chars = 0x02/0x03 + 32 bytes x) the prefix encodes y-parity and MUST
+   // be preserved; stripping it forced every caller through the bare-x path
+   // which defaulted to 0x02 and silently corrupted odd-parity (0x03) keys.
+   if (len == 130)
       clean_hex = clean_hex.substr(2);
 
    return clean_hex;
@@ -87,7 +90,7 @@ fc::em::public_key to_em_public_key(const std::string& pubkey_hex) {
    if (pubkey_byte_count == 33) {
       FC_ASSERT(pubkey_bytes[0] == 0x02 || pubkey_bytes[0] == 0x03);
    }
-   switch (pubkey_bytes.size()) {
+   switch (pubkey_byte_count) {
    case 64:
       copy_to_offset = 1;
    case 65: {
@@ -98,21 +101,15 @@ fc::em::public_key to_em_public_key(const std::string& pubkey_hex) {
       }
       return fc::em::public_key(pubkey_data);
    }
-   case 32:
-      copy_to_offset = 1;
    case 33: {
       em::public_key_data pubkey_data{};
-      std::copy_n(pubkey_bytes.data(), pubkey_bytes.size(), pubkey_data.data() + copy_to_offset);
-      if (copy_to_offset) {
-         pubkey_data[0] = 0x02;
-      }
+      std::copy_n(pubkey_bytes.data(), pubkey_bytes.size(), pubkey_data.data());
       return fc::em::public_key(pubkey_data);
    }
    default:
-      FC_ASSERT(
-         false,
-         "Invalid public key size, expected 64/65 character hex string for compressed key OR 128/130 character hex string for public key")
-      ;
+      FC_ASSERT(false,
+                "Invalid EM public key byte count ({}). Expected 33 (compressed), 64 or 65 (uncompressed).",
+                pubkey_byte_count);
    }
 }
 

@@ -5,23 +5,23 @@ namespace sysio {
 
 using namespace appbase;
 
-/**
- *  This is a template plugin, intended to serve as a starting point for making new plugins
- */
+/// Template plugin — starting point for new plugins.
+/// See also: `npx plop create-cxx-plugin`
 class template_plugin : public appbase::plugin<template_plugin> {
 public:
+   APPBASE_PLUGIN_REQUIRES()
+
    template_plugin();
    virtual ~template_plugin();
- 
-   APPBASE_PLUGIN_REQUIRES()
-   virtual void set_program_options(options_description&, options_description& cfg) override;
- 
+
+   virtual void set_program_options(options_description& cli, options_description& cfg) override;
    void plugin_initialize(const variables_map& options);
    void plugin_startup();
    void plugin_shutdown();
 
 private:
-   std::unique_ptr<class template_plugin_impl> my;
+   struct impl;
+   std::unique_ptr<impl> _impl;
 };
 
-}
+} // namespace sysio

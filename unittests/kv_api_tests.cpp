@@ -14,8 +14,11 @@ using namespace sysio::testing;
 
 static const name test_account = "kvtest"_n;
 
-struct kv_api_tester : validating_tester {
-   kv_api_tester() {
+// Shared blockchain -- initialized once, reused by all kv_api test cases.
+// Each WASM action is self-contained (creates its own keys, runs its own checks),
+// so accumulating chain state across tests is safe.
+struct kv_shared_tester : validating_tester {
+   kv_shared_tester() {
       create_accounts({test_account});
       produce_block();
       set_code(test_account, test_contracts::test_kv_api_wasm());
@@ -36,6 +39,23 @@ struct kv_api_tester : validating_tester {
       push_transaction(trx);
       produce_block();
    }
+};
+
+// Per-test fixture: thin wrapper around the shared tester.
+// Eliminates redundant blockchain boots (+ OC compilation under ASAN).
+struct kv_api_tester {
+   kv_shared_tester& t;
+   kv_api_tester() : t(shared_instance()) {}
+   void run_action(name n) { t.run_action(n); }
+   static kv_shared_tester& shared_instance() {
+      static kv_shared_tester inst;
+      return inst;
+   }
+};
+
+// Fresh per-test fixture for cross-scope tests whose actions use overlapping
+// primary keys that would collide with prior shared-tester state.
+struct kv_api_fresh_tester : kv_shared_tester {
 };
 
 BOOST_AUTO_TEST_SUITE(kv_api_tests)
@@ -128,6 +148,13 @@ BOOST_FIXTURE_TEST_CASE(idx_key_read, kv_api_tester) {
 
 BOOST_FIXTURE_TEST_CASE(idx_primary_key_read, kv_api_tester) {
    BOOST_CHECK_NO_THROW(run_action("testidxprik"_n));
+}
+
+// Direct test of raw kv_it_value on a secondary iterator handle. Pins the
+// host <-> CDT contract that kv_it_value resolves values via a sec slot's
+// cached primary_id without re-deriving the primary key.
+BOOST_FIXTURE_TEST_CASE(idx_value_on_secondary_handle, kv_api_tester) {
+   BOOST_CHECK_NO_THROW(run_action("testsecvalue"_n));
 }
 
 // ─── Edge cases ────────────────────────────────────────────────────────────
@@ -349,7 +376,7 @@ BOOST_FIXTURE_TEST_CASE(sec_erase_via_iterator, kv_api_tester) {
    BOOST_CHECK_NO_THROW(run_action("tstsecerase"_n));
 }
 
-BOOST_FIXTURE_TEST_CASE(sec_iterate_order, kv_api_tester) {
+BOOST_FIXTURE_TEST_CASE(sec_iterate_order, kv_api_fresh_tester) {
    BOOST_CHECK_NO_THROW(run_action("tstseciter"_n));
 }
 
@@ -366,43 +393,15 @@ BOOST_FIXTURE_TEST_CASE(primary_rbegin_empty, kv_api_tester) {
    BOOST_CHECK_NO_THROW(run_action("tstrbempty"_n));
 }
 
-BOOST_FIXTURE_TEST_CASE(sec_rbegin_rend, kv_api_tester) {
+BOOST_FIXTURE_TEST_CASE(sec_rbegin_rend, kv_api_fresh_tester) {
    BOOST_CHECK_NO_THROW(run_action("tstsecrbegin"_n));
 }
 
-BOOST_FIXTURE_TEST_CASE(sec_erase_returns_next, kv_api_tester) {
+BOOST_FIXTURE_TEST_CASE(sec_erase_returns_next, kv_api_fresh_tester) {
    BOOST_CHECK_NO_THROW(run_action("tstsecersnxt"_n));
 }
 
-// kv::raw_table tests
-BOOST_FIXTURE_TEST_CASE(mapping_set_get, kv_api_tester) {
-   BOOST_CHECK_NO_THROW(run_action("tstmapsetget"_n));
-}
-
-BOOST_FIXTURE_TEST_CASE(mapping_contains_erase, kv_api_tester) {
-   BOOST_CHECK_NO_THROW(run_action("tstmapcont"_n));
-}
-
-BOOST_FIXTURE_TEST_CASE(mapping_update, kv_api_tester) {
-   BOOST_CHECK_NO_THROW(run_action("tstmapupdate"_n));
-}
-
-BOOST_FIXTURE_TEST_CASE(mapping_name_key, kv_api_tester) {
-   BOOST_CHECK_NO_THROW(run_action("tstmapstrkey"_n));
-}
-
-// kv::table tests
-BOOST_FIXTURE_TEST_CASE(kvtable_basic, kv_api_tester) {
-   BOOST_CHECK_NO_THROW(run_action("tstkvtbasic"_n));
-}
-
-BOOST_FIXTURE_TEST_CASE(kvtable_iterate, kv_api_tester) {
-   BOOST_CHECK_NO_THROW(run_action("tstkvtiter"_n));
-}
-
-BOOST_FIXTURE_TEST_CASE(kvtable_begin_all_scopes, kv_api_tester) {
-   BOOST_CHECK_NO_THROW(run_action("tstkvtscope"_n));
-}
+// (kv::raw_table and old kv::table tests removed -- types dropped in table_id migration)
 
 // payer validation tests
 BOOST_FIXTURE_TEST_CASE(payer_self_allowed, kv_api_tester) {
@@ -412,8 +411,8 @@ BOOST_FIXTURE_TEST_CASE(payer_self_allowed, kv_api_tester) {
 BOOST_FIXTURE_TEST_CASE(payer_other_requires_auth, kv_api_tester) {
    // Billing another account without their authorization fails at the
    // transaction level (unauthorized_ram_usage_increase), not at the KV level.
-   create_accounts({"alice"_n});
-   produce_block();
+   t.create_accounts({"alice"_n});
+   t.produce_block();
    BOOST_CHECK_THROW(run_action("tstpayeroth"_n), sysio::chain::unauthorized_ram_usage_increase);
 }
 
@@ -422,8 +421,8 @@ BOOST_FIXTURE_TEST_CASE(empty_key_rejected_kv_set, kv_api_tester) {
    BOOST_CHECK_THROW(run_action("tstemptykey"_n), fc::exception);
 }
 
-// invalid key_format rejection tests
-BOOST_FIXTURE_TEST_CASE(bad_key_format_rejected_kv_set, kv_api_tester) {
+// table_id > UINT16_MAX is rejected
+BOOST_FIXTURE_TEST_CASE(table_id_overflow_rejected, kv_api_tester) {
    BOOST_CHECK_THROW(run_action("tstbadfmt"_n), fc::exception);
 }
 
@@ -450,10 +449,10 @@ BOOST_FIXTURE_TEST_CASE(read_only_trx_rejects_write, kv_api_tester) {
       vector<permission_level>{{test_account, config::active_name}},
       test_account, "tstrdonly"_n, bytes{}
    );
-   set_transaction_headers(trx);
-   trx.sign(get_private_key(test_account, "active"), control->get_chain_id());
+   t.set_transaction_headers(trx);
+   trx.sign(t.get_private_key(test_account, "active"), t.control->get_chain_id());
    BOOST_CHECK_THROW(
-      push_transaction(trx, fc::time_point::maximum(), DEFAULT_BILLED_CPU_TIME_US, false,
+      t.push_transaction(trx, fc::time_point::maximum(), kv_shared_tester::DEFAULT_BILLED_CPU_TIME_US, false,
                        transaction_metadata::trx_type::read_only),
       fc::exception);
 }
@@ -472,27 +471,27 @@ BOOST_FIXTURE_TEST_CASE(notify_context_ram_billing, kv_api_tester) {
    // When a contract receives a notification (receiver != act.account),
    // kv_set writes to the receiver's namespace and bills receiver's RAM
    name notify_acct = "kvnotify"_n;
-   create_accounts({notify_acct});
-   produce_block();
-   set_code(notify_acct, test_contracts::test_kv_api_wasm());
-   set_abi(notify_acct, test_contracts::test_kv_api_abi().c_str());
-   produce_block();
+   t.create_accounts({notify_acct});
+   t.produce_block();
+   t.set_code(notify_acct, test_contracts::test_kv_api_wasm());
+   t.set_abi(notify_acct, test_contracts::test_kv_api_abi().c_str());
+   t.produce_block();
 
-   // Push tstsendnotif on test_account — it calls require_recipient(kvnotify)
+   // Push tstsendnotif on test_account -- it calls require_recipient(kvnotify)
    // kvnotify receives the notification and executes tstnotifyram handler (via apply)
    // Actually, require_recipient just forwards the same action, so kvnotify's
    // apply will see action=tstsendnotif. The notification will succeed and
    // any kv_set in kvnotify's on_notify will write to kvnotify's KV space.
    // For this test, we just verify the notification doesn't crash.
    BOOST_CHECK_NO_THROW(run_action("tstsendnotif"_n));
-   produce_block();
+   t.produce_block();
 
    // Verify kvnotify did NOT write to test_account's KV space
    // (notification receiver writes to its own namespace)
 }
 
 // secondary iterator clone with duplicate keys
-BOOST_FIXTURE_TEST_CASE(sec_iterator_clone_duplicate_keys, kv_api_tester) {
+BOOST_FIXTURE_TEST_CASE(sec_iterator_clone_duplicate_keys, kv_api_fresh_tester) {
    BOOST_CHECK_NO_THROW(run_action("tstsecclone"_n));
 }
 
@@ -501,12 +500,56 @@ BOOST_FIXTURE_TEST_CASE(sec_rbegin_uint128_keys, kv_api_tester) {
    BOOST_CHECK_NO_THROW(run_action("tstsecrbig"_n));
 }
 
-// ════════════════════════════════════════════════════════════════════════════
-// RAM billing tests — verify correct billing on create, update, erase
-// ════════════════════════════════════════════════════════════════════════════
+// --------------------------------------------------------------------------
+// Cross-scope secondary index isolation tests
+// Verify that kv_multi_index secondary indices are properly scoped.
+// These use kv_api_fresh_tester because they exercise multi_index with
+// overlapping primary keys across scopes.
+// --------------------------------------------------------------------------
 
-// billable_size_v<kv_object> from config — use the actual compile-time constant
+BOOST_FIXTURE_TEST_CASE(sec_cross_scope_isolation, kv_api_fresh_tester) {
+   // Two scopes with same PKs -- iteration in each scope must be isolated
+   BOOST_CHECK_NO_THROW(run_action("tstxscope"_n));
+}
+
+BOOST_FIXTURE_TEST_CASE(sec_cross_scope_find, kv_api_fresh_tester) {
+   // find(sec_val) in scope A must not return scope B's entry
+   BOOST_CHECK_NO_THROW(run_action("tstxfind"_n));
+}
+
+BOOST_FIXTURE_TEST_CASE(sec_cross_scope_erase, kv_api_fresh_tester) {
+   // Erase from scope A must not affect scope B
+   BOOST_CHECK_NO_THROW(run_action("tstxerase"_n));
+}
+
+BOOST_FIXTURE_TEST_CASE(sec_cross_scope_double, kv_api_fresh_tester) {
+   // double secondary: sort-preserving transform + scope isolation
+   BOOST_CHECK_NO_THROW(run_action("tstxdbl"_n));
+}
+
+BOOST_FIXTURE_TEST_CASE(sec_cross_scope_zero, kv_api_fresh_tester) {
+   // scope=0 is the minimum scope prefix -- verify isolation
+   BOOST_CHECK_NO_THROW(run_action("tstxzero"_n));
+}
+
+BOOST_FIXTURE_TEST_CASE(sec_cross_scope_reverse, kv_api_fresh_tester) {
+   // Reverse iteration (--end()) must not leak across scopes
+   BOOST_CHECK_NO_THROW(run_action("tstxrev"_n));
+}
+
+BOOST_FIXTURE_TEST_CASE(sec_cross_scope_upper_bound, kv_api_fresh_tester) {
+   // upper_bound in scope A stops at scope boundary
+   BOOST_CHECK_NO_THROW(run_action("tstxubound"_n));
+}
+
+// --------------------------------------------------------------------------
+// RAM billing tests -- verify correct billing on create, update, erase
+// --------------------------------------------------------------------------
+
+// billable_size_v<kv_object> / <kv_index_object> from config -- use the actual
+// compile-time constants so these tests catch any drift in the billing formula.
 static constexpr int64_t KV_OVERHEAD = config::billable_size_v<kv_object>;
+static constexpr int64_t KV_INDEX_OVERHEAD = config::billable_size_v<kv_index_object>;
 
 struct kv_billing_tester : validating_tester {
    kv_billing_tester() {
@@ -520,6 +563,8 @@ struct kv_billing_tester : validating_tester {
    int64_t get_ram_usage(name acct) {
       return control->get_resource_limits_manager().get_account_ram_usage(acct);
    }
+
+   int64_t get_ram_usage() { return get_ram_usage(test_account); }
 
    void ram_store(uint32_t key_id, uint32_t val_size) {
       push_action(test_account, "ramstore"_n, test_account,
@@ -627,11 +672,62 @@ BOOST_FIXTURE_TEST_CASE(billing_multiple_rows, kv_billing_tester) {
    BOOST_REQUIRE_EQUAL(actual, expected);
 }
 
+// --------------------------------------------------------------------------
+// Secondary index (kv_index_object) billing tests — exact-delta coverage so
+// drift in kv_index_object_ram() cannot pass silently.
+// --------------------------------------------------------------------------
+
+BOOST_FIXTURE_TEST_CASE(billing_idx_create_row, kv_billing_tester) {
+   // testidxstore now inserts a primary row (pri=3 bytes, val="v"=2 bytes) via
+   // insert_primary() before calling kv_idx_store, so the net delta includes
+   // BOTH the primary row bill and the secondary row bill.
+   //   primary = pri_size + val_size + KV_OBJECT_OVERHEAD = 3 + 2 + KV_OVERHEAD
+   //   sec     = sec_size + KV_INDEX_OVERHEAD            = 5 + KV_INDEX_OVERHEAD
+   auto before = get_ram_usage();
+   push_action(test_account, "testidxstore"_n, test_account, mutable_variant_object());
+   produce_block();
+   auto after = get_ram_usage();
+
+   int64_t expected = (3 + 2 + KV_OVERHEAD) + (5 + KV_INDEX_OVERHEAD);
+   int64_t actual = after - before;
+   BOOST_TEST_MESSAGE("billing_idx_create_row: expected=" << expected << " actual=" << actual);
+   BOOST_REQUIRE_EQUAL(actual, expected);
+}
+
+BOOST_FIXTURE_TEST_CASE(billing_idx_create_erase_net_zero, kv_billing_tester) {
+   // testidxremov calls insert_primary (pri=3/val=2) + kv_idx_store (sec=3)
+   // then kv_idx_remove on the same row. The primary row is NOT removed by
+   // the contract, so the net delta is just the leftover primary bill.
+   auto before = get_ram_usage();
+   push_action(test_account, "testidxremov"_n, test_account, mutable_variant_object());
+   produce_block();
+   auto after = get_ram_usage();
+
+   int64_t expected = 3 + 2 + KV_OVERHEAD; // primary row left behind
+   int64_t actual = after - before;
+   BOOST_TEST_MESSAGE("billing_idx_create_erase_net_zero: expected=" << expected << " actual=" << actual);
+   BOOST_REQUIRE_EQUAL(actual, expected);
+}
+
+BOOST_FIXTURE_TEST_CASE(billing_idx_update_shrink, kv_billing_tester) {
+   // testidxupdat: insert_primary (pri=3/val=2), kv_idx_store(sec="charlie"/7),
+   //               then kv_idx_update(old_sec="charlie"/7 -> new_sec="david"/5).
+   // Net: primary (3+2+KV_OVERHEAD) + sec_initial (7+KV_INDEX_OVERHEAD)
+   //      + sec_delta (5-7) = (3+2+KV_OVERHEAD) + (5 + KV_INDEX_OVERHEAD).
+   auto before = get_ram_usage();
+   push_action(test_account, "testidxupdat"_n, test_account, mutable_variant_object());
+   produce_block();
+   auto after = get_ram_usage();
+
+   int64_t expected = (3 + 2 + KV_OVERHEAD) + (5 + KV_INDEX_OVERHEAD);
+   int64_t actual = after - before;
+   BOOST_TEST_MESSAGE("billing_idx_update_shrink: expected=" << expected << " actual=" << actual);
+   BOOST_REQUIRE_EQUAL(actual, expected);
+}
+
 // ════════════════════════════════════════════════════════════════════════════
 // Payer change billing tests — verify correct billing when payer changes
 // ════════════════════════════════════════════════════════════════════════════
-
-static constexpr int64_t KV_IDX_OVERHEAD = config::billable_size_v<kv_index_object>;
 
 struct kv_payer_billing_tester : validating_tester {
    kv_payer_billing_tester() {
@@ -880,45 +976,54 @@ BOOST_FIXTURE_TEST_CASE(mixed_payer_create_erase_net_zero, kv_payer_billing_test
 // Secondary index billing tests
 // ════════════════════════════════════════════════════════════════════════════
 
-// kv_idx_store bills sec_key_size + pri_key_size + overhead
+// Under the primary_id signature, kv_idx_store bills only sec_size +
+// KV_INDEX_OVERHEAD (no pri_key bytes). The ramidxstore action also creates
+// the primary row, so the total delta is primary + secondary.
 BOOST_FIXTURE_TEST_CASE(idx_billing_store, kv_billing_tester) {
+   const uint32_t sec_size = 8;
+   const uint32_t pri_size = 4;
+   const uint32_t val_size = sizeof("v");  // 2 bytes (payload + null)
    auto before = get_ram_usage(test_account);
    push_action(test_account, "ramidxstore"_n, test_account,
-      mutable_variant_object()("sec_size", 8)("pri_size", 4));
+      mutable_variant_object()("sec_size", sec_size)("pri_size", pri_size));
    produce_block();
    auto after = get_ram_usage(test_account);
 
-   int64_t expected = 8 + 4 + KV_IDX_OVERHEAD;
+   int64_t expected = (pri_size + val_size + KV_OVERHEAD) + (sec_size + KV_INDEX_OVERHEAD);
    BOOST_TEST_MESSAGE("idx_billing_store: expected=" << expected << " actual=" << (after - before));
    BOOST_REQUIRE_EQUAL(after - before, expected);
 }
 
-// kv_idx_remove refunds the full billable amount
+// kv_idx_remove refunds the secondary row only; primary row stays in place
+// (ramidxremov does a no-op kv_set on the same primary key to re-fetch its id).
 BOOST_FIXTURE_TEST_CASE(idx_billing_remove, kv_billing_tester) {
+   const uint32_t sec_size = 8;
+   const uint32_t pri_size = 4;
    push_action(test_account, "ramidxstore"_n, test_account,
-      mutable_variant_object()("sec_size", 8)("pri_size", 4));
+      mutable_variant_object()("sec_size", sec_size)("pri_size", pri_size));
    produce_block();
 
    auto before = get_ram_usage(test_account);
    push_action(test_account, "ramidxremov"_n, test_account,
-      mutable_variant_object()("sec_size", 8)("pri_size", 4));
+      mutable_variant_object()("sec_size", sec_size)("pri_size", pri_size));
    produce_block();
    auto after = get_ram_usage(test_account);
 
-   int64_t expected = -(8 + 4 + KV_IDX_OVERHEAD);
+   int64_t expected = -(sec_size + KV_INDEX_OVERHEAD);
    BOOST_TEST_MESSAGE("idx_billing_remove: expected=" << expected << " actual=" << (after - before));
    BOOST_REQUIRE_EQUAL(after - before, expected);
 }
 
-// kv_idx_update with size change — bills only the sec key delta
+// kv_idx_update with size change — bills only the sec key delta.
 BOOST_FIXTURE_TEST_CASE(idx_billing_update_size_change, kv_billing_tester) {
+   const uint32_t pri_size = 4;
    push_action(test_account, "ramidxstore"_n, test_account,
-      mutable_variant_object()("sec_size", 8)("pri_size", 4));
+      mutable_variant_object()("sec_size", 8)("pri_size", pri_size));
    produce_block();
 
    auto before = get_ram_usage(test_account);
    push_action(test_account, "ramidxupdat"_n, test_account,
-      mutable_variant_object()("old_ss", 8)("new_ss", 20)("pri_size", 4));
+      mutable_variant_object()("old_ss", 8)("new_ss", 20)("pri_size", pri_size));
    produce_block();
    auto after = get_ram_usage(test_account);
 
@@ -927,15 +1032,16 @@ BOOST_FIXTURE_TEST_CASE(idx_billing_update_size_change, kv_billing_tester) {
    BOOST_REQUIRE_EQUAL(after - before, expected);
 }
 
-// kv_idx_update same size — zero delta
+// kv_idx_update same size — zero delta.
 BOOST_FIXTURE_TEST_CASE(idx_billing_update_same_size, kv_billing_tester) {
+   const uint32_t pri_size = 4;
    push_action(test_account, "ramidxstore"_n, test_account,
-      mutable_variant_object()("sec_size", 8)("pri_size", 4));
+      mutable_variant_object()("sec_size", 8)("pri_size", pri_size));
    produce_block();
 
    auto before = get_ram_usage(test_account);
    push_action(test_account, "ramidxupdat"_n, test_account,
-      mutable_variant_object()("old_ss", 8)("new_ss", 8)("pri_size", 4));
+      mutable_variant_object()("old_ss", 8)("new_ss", 8)("pri_size", pri_size));
    produce_block();
    auto after = get_ram_usage(test_account);
 
@@ -947,72 +1053,91 @@ BOOST_FIXTURE_TEST_CASE(idx_billing_update_same_size, kv_billing_tester) {
 // Cross-account secondary index billing — payer != receiver
 // ════════════════════════════════════════════════════════════════════════════
 
-// Secondary index store bills the specified payer, not the contract
+// Secondary index store bills the specified payer (primary row + secondary row).
 BOOST_FIXTURE_TEST_CASE(idx_billing_payer_not_receiver, kv_payer_billing_tester) {
+   const uint32_t sec_size = 8;
+   const uint32_t pri_size = 4;
+   const uint32_t val_size = sizeof("v");  // 2
+
    auto alice_before = get_ram_usage("alice"_n);
    auto contract_before = get_ram_usage(test_account);
 
    push_action(test_account, "ramidxstpyr"_n,
       {{"alice"_n, config::sysio_payer_name}, {"alice"_n, config::active_name}},
-      mutable_variant_object()("payer", "alice")("sec_size", 8)("pri_size", 4));
+      mutable_variant_object()("payer", "alice")("sec_size", sec_size)("pri_size", pri_size));
    produce_block();
 
    auto alice_after = get_ram_usage("alice"_n);
    auto contract_after = get_ram_usage(test_account);
 
-   int64_t expected = 8 + 4 + KV_IDX_OVERHEAD;
+   // Alice pays for both the primary row and the secondary row.
+   int64_t expected = (pri_size + val_size + KV_OVERHEAD) + (sec_size + KV_INDEX_OVERHEAD);
    BOOST_REQUIRE_EQUAL(alice_after - alice_before, expected);
    BOOST_REQUIRE_EQUAL(contract_after - contract_before, 0);
 }
 
-// Secondary index remove refunds the stored payer, not the contract
+// Secondary index remove refunds the stored payer (alice). ramidxrmpyr re-calls
+// kv_set with the same payer so primary billing is unchanged; only the secondary
+// row is refunded.
 BOOST_FIXTURE_TEST_CASE(idx_remove_refunds_payer, kv_payer_billing_tester) {
+   const uint32_t sec_size = 8;
+   const uint32_t pri_size = 4;
    // Store with alice as payer
    push_action(test_account, "ramidxstpyr"_n,
       {{"alice"_n, config::sysio_payer_name}, {"alice"_n, config::active_name}},
-      mutable_variant_object()("payer", "alice")("sec_size", 8)("pri_size", 4));
+      mutable_variant_object()("payer", "alice")("sec_size", sec_size)("pri_size", pri_size));
    produce_block();
 
-   // Remove — should refund alice, not the contract
+   // Remove — alice keeps paying for primary (ramidxrmpyr passes payer=alice to
+   // kv_set, so no payer-change delta there). Secondary refund goes to alice.
    auto alice_before = get_ram_usage("alice"_n);
    auto contract_before = get_ram_usage(test_account);
-   push_action(test_account, "ramidxremov"_n, test_account,
-      mutable_variant_object()("sec_size", 8)("pri_size", 4));
+   push_action(test_account, "ramidxrmpyr"_n, test_account,
+      mutable_variant_object()("payer", "alice")("sec_size", sec_size)("pri_size", pri_size));
    produce_block();
 
    auto alice_after = get_ram_usage("alice"_n);
    auto contract_after = get_ram_usage(test_account);
 
-   int64_t expected = -(8 + 4 + KV_IDX_OVERHEAD);
+   int64_t expected = -(sec_size + KV_INDEX_OVERHEAD);
    BOOST_REQUIRE_EQUAL(alice_after - alice_before, expected);
    BOOST_REQUIRE_EQUAL(contract_after - contract_before, 0);
 }
 
-// Secondary index update with payer change
+// Secondary index update with payer change from alice to bob.
+// ramidxuppyr calls kv_set with bob as payer, which changes the primary row's
+// payer from alice to bob; it then calls kv_idx_update with bob as payer so
+// the secondary row is billed to bob. Alice gets refunded for primary + old
+// secondary; bob is charged primary + new secondary.
 BOOST_FIXTURE_TEST_CASE(idx_update_payer_change, kv_payer_billing_tester) {
+   const uint32_t pri_size = 4;
+   const uint32_t val_size = sizeof("v");  // 2
+   const uint32_t old_ss = 8;
+   const uint32_t new_ss = 12;
+
    // Store with alice as payer
    push_action(test_account, "ramidxstpyr"_n,
       {{"alice"_n, config::sysio_payer_name}, {"alice"_n, config::active_name}},
-      mutable_variant_object()("payer", "alice")("sec_size", 8)("pri_size", 4));
+      mutable_variant_object()("payer", "alice")("sec_size", old_ss)("pri_size", pri_size));
    produce_block();
 
-   int64_t old_billable = 8 + 4 + KV_IDX_OVERHEAD;
-   int64_t new_billable = 12 + 4 + KV_IDX_OVERHEAD;
+   int64_t primary_bill = pri_size + val_size + KV_OVERHEAD;
 
    // Update, change payer from alice to bob
    auto alice_before = get_ram_usage("alice"_n);
    auto bob_before = get_ram_usage("bob"_n);
    push_action(test_account, "ramidxuppyr"_n,
       {{"bob"_n, config::sysio_payer_name}, {"bob"_n, config::active_name}},
-      mutable_variant_object()("payer", "bob")("old_ss", 8)("new_ss", 12)("pri_size", 4));
+      mutable_variant_object()("payer", "bob")("old_ss", old_ss)("new_ss", new_ss)("pri_size", pri_size));
    produce_block();
 
    auto alice_after = get_ram_usage("alice"_n);
    auto bob_after = get_ram_usage("bob"_n);
 
-   // alice fully refunded, bob charged new amount
-   BOOST_REQUIRE_EQUAL(alice_after - alice_before, -old_billable);
-   BOOST_REQUIRE_EQUAL(bob_after - bob_before, new_billable);
+   // Alice refunded: primary + old secondary.
+   // Bob charged: primary + new secondary.
+   BOOST_REQUIRE_EQUAL(alice_after - alice_before, -(primary_bill + (old_ss + KV_INDEX_OVERHEAD)));
+   BOOST_REQUIRE_EQUAL(bob_after - bob_before, primary_bill + (new_ss + KV_INDEX_OVERHEAD));
 }
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -1024,10 +1149,10 @@ BOOST_FIXTURE_TEST_CASE(read_only_rejects_kv_erase, kv_api_tester) {
    trx.actions.emplace_back(
       vector<permission_level>{}, test_account, "tstrdoerase"_n, bytes{}
    );
-   set_transaction_headers(trx);
+   t.set_transaction_headers(trx);
    BOOST_CHECK_THROW(
-      push_transaction(trx, fc::time_point::maximum(), DEFAULT_BILLED_CPU_TIME_US, false,
-                       transaction_metadata::trx_type::read_only),
+      t.push_transaction(trx, fc::time_point::maximum(), kv_shared_tester::DEFAULT_BILLED_CPU_TIME_US, false,
+                         transaction_metadata::trx_type::read_only),
       table_operation_not_permitted);
 }
 
@@ -1036,10 +1161,10 @@ BOOST_FIXTURE_TEST_CASE(read_only_rejects_kv_idx_store, kv_api_tester) {
    trx.actions.emplace_back(
       vector<permission_level>{}, test_account, "tstrdoidxst"_n, bytes{}
    );
-   set_transaction_headers(trx);
+   t.set_transaction_headers(trx);
    BOOST_CHECK_THROW(
-      push_transaction(trx, fc::time_point::maximum(), DEFAULT_BILLED_CPU_TIME_US, false,
-                       transaction_metadata::trx_type::read_only),
+      t.push_transaction(trx, fc::time_point::maximum(), kv_shared_tester::DEFAULT_BILLED_CPU_TIME_US, false,
+                         transaction_metadata::trx_type::read_only),
       table_operation_not_permitted);
 }
 
@@ -1048,10 +1173,10 @@ BOOST_FIXTURE_TEST_CASE(read_only_rejects_kv_idx_remove, kv_api_tester) {
    trx.actions.emplace_back(
       vector<permission_level>{}, test_account, "tstrdoidxrm"_n, bytes{}
    );
-   set_transaction_headers(trx);
+   t.set_transaction_headers(trx);
    BOOST_CHECK_THROW(
-      push_transaction(trx, fc::time_point::maximum(), DEFAULT_BILLED_CPU_TIME_US, false,
-                       transaction_metadata::trx_type::read_only),
+      t.push_transaction(trx, fc::time_point::maximum(), kv_shared_tester::DEFAULT_BILLED_CPU_TIME_US, false,
+                         transaction_metadata::trx_type::read_only),
       table_operation_not_permitted);
 }
 
@@ -1060,10 +1185,10 @@ BOOST_FIXTURE_TEST_CASE(read_only_rejects_kv_idx_update, kv_api_tester) {
    trx.actions.emplace_back(
       vector<permission_level>{}, test_account, "tstrdoidxup"_n, bytes{}
    );
-   set_transaction_headers(trx);
+   t.set_transaction_headers(trx);
    BOOST_CHECK_THROW(
-      push_transaction(trx, fc::time_point::maximum(), DEFAULT_BILLED_CPU_TIME_US, false,
-                       transaction_metadata::trx_type::read_only),
+      t.push_transaction(trx, fc::time_point::maximum(), kv_shared_tester::DEFAULT_BILLED_CPU_TIME_US, false,
+                         transaction_metadata::trx_type::read_only),
       table_operation_not_permitted);
 }
 

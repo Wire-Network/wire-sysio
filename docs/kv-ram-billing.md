@@ -4,13 +4,13 @@
 
 RAM billing ensures contracts pay for the storage they consume, preventing abuse.
 The billable size must cover at minimum the actual RAM used by chainbase objects.
-This document compares legacy (db_*_i64) and KV billing for common patterns.
+This document compares legacy EOSIO (`db_*_i64`) and Wire KV billing for common patterns.
 
 ## Constants
 
 - `overhead_per_row_per_index_ram_bytes = 32` (B-tree node overhead per index)
 
-## Legacy Objects
+## Legacy Objects (EOSIO db\_\*\_i64)
 
 | Object | Fixed Fields | Indices | Overhead | Billable |
 |--------|-------------|---------|----------|----------|
@@ -22,99 +22,124 @@ This document compares legacy (db_*_i64) and KV billing for common patterns.
 
 ## KV Objects
 
+Keys and values are stored as `shared_blob` (8-byte `offset_ptr` into chainbase
+shared memory). Key data sizes are billed separately at billing time.
+
+Each table and secondary index gets a unique `table_id` (uint16), providing
+namespace isolation via the composite chainbase index. No `table_id_object` overhead.
+
 | Object | Fixed Fields | Indices | Overhead | Billable |
 |--------|-------------|---------|----------|----------|
-| `kv_object` | 8 id + 8 code + 8 payer + 1 key_format + 2 key_size + 24 key_inline + 12 key_heap + 12 value_header + 5 padding = 80 | 2 | 64 | **144** + key_size + value_size |
-| `kv_index_object` | 8 code + 8 payer + 8 table + 16 sec_key_heap + 16 pri_key_heap + 24 sec_key_inline + 24 pri_key_inline + 2+2 key_sizes + 1 index_id + 3 padding = 112 | 3 | 96 | **208** + sec_key_size + pri_key_size |
+| `kv_object` | 8 id + 8 code + 8 payer + 8 key (ptr) + 8 value (ptr) + 2 table_id + 6 pad = **48** | 2 | 64 | **112** + key_size + value_size |
+| `kv_index_object` | 8 id + 8 code + 8 payer + 8 sec_key (ptr) + 8 primary_id + 2 table_id + 6 pad = **48** | 2 | 64 | **112** + sec_key_size |
 
-## Per-Row Comparison: sysio.token Balance (uint64_t key, 16-byte value, 1 secondary)
+Secondary rows reference the primary row by its chainbase id (`primary_id`, 8
+bytes) rather than by a copy of the primary key bytes. Billing is therefore
+independent of primary-key length — a contract with a 256-byte primary key
+pays for those bytes once in the `kv_object`, not again on every
+`kv_index_object` that references it.
 
-### Legacy
+## KV Key Layouts
 
-| Component | Bytes |
-|-----------|-------|
-| `table_id_object` (per scope, amortized) | 108 |
-| `key_value_object` (108 + 16 value) | 124 |
-| `index64_object` (secondary idx) | 128 |
-| **Total per row** | **360** |
+- **multi_index:** Primary key `[scope:8B][pk:8B]` = 16 bytes. Secondary index
+  entries store `sec_key = [scope:8B][secondary_value]` so that secondary
+  iteration is naturally scoped; the referenced primary is looked up via
+  `primary_id` (a by_id lookup on the host).
 
-### KV
+- **kv::table:** Contract-defined key structs, BE-encoded for correct sort order.
+  Key size is controlled by the contract. A uint64 primary key is just 8 bytes.
+  This is the most RAM-efficient option.
 
-| Component | Bytes |
-|-----------|-------|
-| No table_id_object needed | 0 |
-| `kv_object` (144 + 24 key + 16 value) | 184 |
-| `kv_index_object` (208 + 8 sec_key + 16 pri_key) | 232 |
-| **Total per row** | **416** |
+## Per-Row Comparisons (16-byte value, no secondary index)
 
-### Difference: +56 bytes per row (+15.6%)
+### sysio.token balance — 1 scope per holder (table\_id amortized per row)
 
-## Per-Row Comparison: Simple KV (no secondary index)
+| Approach | Component Breakdown | Total |
+|----------|-------------------|-------|
+| Legacy | kvo(108+16) + table_id(108) | **232** |
+| KV multi_index (16B key) | kv_obj(112+16+16) | **144** (-38%) |
+| KV kv::table (8B key) | kv_obj(112+8+16) | **136** (-41%) |
 
-### Legacy
+### Many rows per table (table\_id negligible)
 
-| Component | Bytes |
-|-----------|-------|
-| `table_id_object` (per scope) | 108 |
-| `key_value_object` (108 + value_size) | 108 + value_size |
-| **Total per row** | **216** + value_size |
+| Approach | Component Breakdown | Total |
+|----------|-------------------|-------|
+| Legacy | kvo(108+16) | **124** |
+| KV multi_index (16B key) | kv_obj(112+16+16) | **144** (+16%) |
+| KV kv::table (8B key) | kv_obj(112+8+16) | **136** (+10%) |
 
-### KV
+## Per-Row Comparisons (16-byte value, 1 uint64 secondary index)
 
-| Component | Bytes |
-|-----------|-------|
-| `kv_object` (144 + key_size + value_size) | 144 + key_size + value_size |
-| **Total per row** | **144** + key_size + value_size |
+Secondary row cost is `112 + sec_key_size` — there is no `pri_key` byte term
+under the primary_id scheme.
 
-### Difference: -72 bytes per row (-33%) for typical 24-byte keys
+### 1 scope per row (table\_id amortized per row)
 
-## Real-World Example: sysio.token Balance Rows
+| Approach | Primary | Secondary | Total |
+|----------|---------|-----------|-------|
+| Legacy | 124 + 108 tid | 128 | **360** |
+| KV multi_index | 144 | 112+16=128 | **272** (-24%) |
+| KV kv::table (8B key) | 136 | 112+8=120 | **256** (-29%) |
 
-sysio.token uses `sysio::kv::table` (no secondary indices). Each balance row
-stores a 24-byte key and a 16-byte value (asset).
+### Many rows per table
 
-### Per Balance Row
+| Approach | Primary | Secondary | Total |
+|----------|---------|-----------|-------|
+| Legacy | 124 | 128 | **252** |
+| KV multi_index | 144 | 128 | **272** (+8%) |
+| KV kv::table (8B key) | 136 | 120 | **256** (+2%) |
 
-| Component | Legacy | KV |
-|-----------|--------|-----|
-| `table_id_object` (1 per account scope) | 108 | 0 |
-| Row object overhead | 108 | 144 |
-| Key data | 0 (pk is 8B fixed field) | 24 |
-| Value data (asset) | 16 | 16 |
-| **Total per balance row** | **232** | **184** |
-| **Savings** | | **-21% per row** |
+Note: `kv_index_object` has 2 chainbase indices (by_id, by_code_table_id_seckey).
+For multi_index, `sec_key = [scope:8B][secondary_value]`. For kv::table,
+`sec_key` is a contract-defined compact key. Primary-key bytes are not
+duplicated onto secondary rows in either case.
 
-### At Scale (10,000 token holders)
+## EOS Mainnet Estimate
 
-| | Legacy | KV |
-|--|--------|-----|
-| Row storage (10K rows) | 10,000 x 124 = 1,240,000 | 10,000 x 184 = 1,840,000 |
-| table_id overhead (10K scopes) | 10,000 x 108 = 1,080,000 | 0 |
-| **Total** | **2,320,000 bytes (2.2 MB)** | **1,840,000 bytes (1.8 MB)** |
-| **Savings** | | **-21% total (480 KB saved)** |
+Estimated using EOS v8 snapshot (`snapshot-2026-03-10-19-eos-v8-0487758850.bin`).
+Secondary index counts: 13.3M idx64, 3.9M idx128, 355.6M idx256 (345M from xsat),
+47K idx_double, 5K idx_long_double.
 
-The savings grow with more token holders because legacy adds 108 bytes of
-`table_id_object` overhead per account scope, while KV adds zero.
+### Excluding xsat (~103M primary rows, ~28M secondary entries)
 
-### At Scale (100,000 token holders)
+| Approach | Total | vs Legacy |
+|----------|-------|-----------|
+| Legacy | 14.4 GB | baseline |
+| KV multi_index (16B key) | ~14.1 GB | **-2%** |
+| KV kv::table (~10B avg key) | ~13.6 GB | **-6%** |
 
-| | Legacy | KV |
-|--|--------|-----|
-| **Total** | **23,200,000 bytes (22.1 MB)** | **18,400,000 bytes (17.5 MB)** |
-| **Savings** | | **-21% (4.6 MB saved)** |
+### Including xsat (~262M primary rows, ~373M secondary entries)
+
+Secondary index storage alone (primary rows unchanged):
+
+| Approach | Secondary Only | vs Legacy |
+|----------|---------------|-----------|
+| Legacy | 56.3 GB | baseline |
+| KV multi_index | ~59.3 GB | **+5%** |
+| KV kv::table | ~56.3 GB | **±0%** |
+
+KV secondary index storage is larger than legacy for xsat because legacy's
+`index256_object` stores 32-byte secondary keys inline (no offset pointer
+overhead), while KV always uses `shared_blob` offset pointers. For idx64
+entries (the common case outside xsat), KV is more efficient due to fewer
+chainbase indices (2 vs 3 → 32 bytes less overhead per entry).
 
 ## Summary
 
-| Scenario | Legacy | KV | Delta |
-|----------|--------|----|-------|
-| sysio.token balance row (no secondary) | 232 | 184 | **-21%** |
-| Row + 1 secondary (uint64) | 360 | 397 | +10% |
-| Row + 1 secondary (uint128) | 368 | 397 | +8% |
-| Per-scope overhead (table_id) | 108 | 0 | **-100%** |
-| 10K token holders total | 2.2 MB | 1.8 MB | **-21%** |
-| 100K token holders total | 22.1 MB | 17.5 MB | **-21%** |
+| Scenario | Legacy | KV multi_index | KV kv::table |
+|----------|--------|----------------|--------------|
+| Token balance (1 scope/row, no idx) | 232 | 144 (**-38%**) | 136 (**-41%**) |
+| Token balance + 1 idx (1 scope/row) | 360 | 280 (**-22%**) | 264 (**-27%**) |
+| Dense table (no idx) | 124 | 144 (+16%) | 136 (+10%) |
+| Dense table + 1 idx | 252 | 280 (+11%) | 264 (+5%) |
 
-**Bottom line:** KV is cheaper for all contracts that don't use secondary indices
-(like sysio.token). For contracts with secondary indices, KV is more expensive
-per-row (+8-10%) but eliminates the per-scope `table_id_object` overhead
-entirely, making it cheaper overall for contracts with many scopes.
+**Bottom line:** KV saves 22-41% for scoped patterns like token balances,
+primarily from eliminating the `table_id_object` (108 bytes per scope).
+For dense tables with many rows and few scopes, KV adds 5-16% overhead
+from variable-length key storage. `kv::table` with compact custom keys
+consistently outperforms `multi_index` by 6-8 bytes per row.
+On the EOS mainnet (excluding xsat), KV saves 2-6% overall — an improvement
+over the previous +5% premium, achieved by reducing primary keys from 24B to
+16B and `kv_index_object` from 56B to 48B. Including xsat's 373M idx256
+secondary entries, KV secondary storage is roughly break-even with legacy
+for `kv::table` and +5% for `multi_index`.

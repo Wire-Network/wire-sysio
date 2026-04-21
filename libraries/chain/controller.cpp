@@ -12,7 +12,7 @@
 #include <sysio/chain/global_property_object.hpp>
 #include <sysio/chain/protocol_state_object.hpp>
 #include <sysio/chain/kv_table_objects.hpp>
-#include <sysio/chain/transaction_object.hpp>
+#include <sysio/chain/transaction_dedup.hpp>
 #include <sysio/chain/genesis_intrinsics.hpp>
 #include <sysio/chain/whitelisted_intrinsics.hpp>
 #include <sysio/chain/database_header_object.hpp>
@@ -59,7 +59,6 @@ using controller_index_set = index_set<
    protocol_state_multi_index,
    dynamic_global_property_multi_index,
    block_summary_multi_index,
-   transaction_multi_index,
    code_index,
    database_header_multi_index
 >;
@@ -74,7 +73,12 @@ using kv_database_index_set = index_set<
 
 namespace detail {
    // ------------------------------------------------------------------
-   // snapshot_row_traits for kv_object  (SSO key → vector<char>)
+   // snapshot_row_traits for kv_object. Preserves chainbase id so that
+   // kv_index_object::primary_id references stay valid across save+load.
+   // The loader in read_kv_rows_from_snapshot calls emplace_with_id using
+   // snapshot_kv_object::id; from_snapshot_row just populates the value
+   // fields.
+   //   (shared_blob -> vector<char>)
    // ------------------------------------------------------------------
    template<>
    struct snapshot_row_traits<kv_object> {
@@ -83,25 +87,37 @@ namespace detail {
 
       static snapshot_kv_object to_snapshot_row(const kv_object& obj, const chainbase::database&) {
          snapshot_kv_object row;
-         row.code       = obj.code;
-         row.payer      = obj.payer;
-         row.key_format = obj.key_format;
-         row.key.assign(obj.key_data(), obj.key_data() + obj.key_size);
-         row.value.assign(obj.value.data(), obj.value.data() + obj.value.size());
+         row.id       = obj.id._id;
+         row.code     = obj.code;
+         row.payer    = obj.payer;
+         row.table_id = obj.table_id;
+         SYS_ASSERT(obj.key.size() > 0, snapshot_exception, "kv_object has empty key during snapshot write");
+         row.key.assign(obj.key.data(), obj.key.data() + obj.key.size());
+         if (obj.value.size() > 0)
+            row.value.assign(obj.value.data(), obj.value.data() + obj.value.size());
          return row;
       }
 
       static void from_snapshot_row(snapshot_kv_object&& row, kv_object& obj, chainbase::database&) {
-         obj.code       = row.code;
-         obj.payer      = row.payer;
-         obj.key_format = row.key_format;
-         obj.key_assign(row.key.data(), row.key.size());
+         SYS_ASSERT(!row.key.empty(), snapshot_validation_exception, "kv_object has empty key");
+         SYS_ASSERT(row.key.size() <= config::max_kv_key_size_limit, snapshot_validation_exception,
+                    "kv_object key size ({}) exceeds absolute limit ({})", row.key.size(), config::max_kv_key_size_limit);
+         SYS_ASSERT(row.value.size() <= config::max_kv_value_size_limit, snapshot_validation_exception,
+                    "kv_object value size ({}) exceeds absolute limit ({})", row.value.size(), config::max_kv_value_size_limit);
+         obj.code     = row.code;
+         obj.payer    = row.payer;
+         obj.table_id = row.table_id;
+         obj.key.assign(row.key.data(), row.key.size());
          obj.value.assign(row.value.data(), row.value.size());
       }
    };
 
    // ------------------------------------------------------------------
-   // snapshot_row_traits for kv_index_object  (SSO keys → vector<char>)
+   // snapshot_row_traits for kv_index_object
+   //
+   // primary_id is snapshotted verbatim; chainbase ids are preserved across
+   // save+load (see emplace_with_id) so the reference remains valid without
+   // any resolution pass. This also lets the kv sections load in parallel.
    // ------------------------------------------------------------------
    template<>
    struct snapshot_row_traits<kv_index_object> {
@@ -110,22 +126,25 @@ namespace detail {
 
       static snapshot_kv_index_object to_snapshot_row(const kv_index_object& obj, const chainbase::database&) {
          snapshot_kv_index_object row;
-         row.code     = obj.code;
-         row.payer    = obj.payer;
-         row.table    = obj.table;
-         row.index_id = obj.index_id;
-         row.sec_key.assign(obj.sec_key_data(), obj.sec_key_data() + obj.sec_key_size);
-         row.pri_key.assign(obj.pri_key_data(), obj.pri_key_data() + obj.pri_key_size);
+         row.id         = obj.id._id;
+         row.code       = obj.code;
+         row.payer      = obj.payer;
+         row.table_id   = obj.table_id;
+         SYS_ASSERT(obj.sec_key.size() > 0, snapshot_exception, "kv_index_object has empty secondary key during snapshot write");
+         row.sec_key.assign(obj.sec_key.data(), obj.sec_key.data() + obj.sec_key.size());
+         row.primary_id = obj.primary_id._id;
          return row;
       }
 
       static void from_snapshot_row(snapshot_kv_index_object&& row, kv_index_object& obj, chainbase::database&) {
-         obj.code     = row.code;
-         obj.payer    = row.payer;
-         obj.table    = row.table;
-         obj.index_id = row.index_id;
-         obj.sec_key_assign(row.sec_key.data(), row.sec_key.size());
-         obj.pri_key_assign(row.pri_key.data(), row.pri_key.size());
+         SYS_ASSERT(!row.sec_key.empty(), snapshot_validation_exception, "kv_index_object has empty secondary key");
+         SYS_ASSERT(row.sec_key.size() <= config::max_kv_key_size_limit, snapshot_validation_exception,
+                    "kv_index_object secondary key size ({}) exceeds absolute limit ({})", row.sec_key.size(), config::max_kv_key_size_limit);
+         obj.code       = row.code;
+         obj.payer      = row.payer;
+         obj.table_id   = row.table_id;
+         obj.sec_key.assign(row.sec_key.data(), row.sec_key.size());
+         obj.primary_id = kv_object::id_type(row.primary_id);
       }
    };
 } // namespace detail
@@ -717,6 +736,8 @@ struct controller_impl {
    controller::config              conf;
    // persist chain_head after vote_processor shutdown, avoids concurrent access, after chain_head & conf since this uses them
    fc::scoped_exit<std::function<void()>> write_chain_head = [&]() { chain_head.write(conf.state_dir / config::chain_head_filename); };
+   transaction_dedup               trx_dedup;
+   fc::scoped_exit<std::function<void()>> write_trx_dedup = [&]() { trx_dedup.write_to_file(conf.state_dir / config::transaction_dedup_filename); };
    const chain_id_type             chain_id; // read by thread_pool threads, value will not be changed
    std::atomic<bool>               replaying = false;
    bool                            is_producer_node = false; // true if node is configured as a block producer
@@ -904,6 +925,7 @@ struct controller_impl {
    void pop_block() {
       uint32_t prev_block_num = pop_prev_block();
       db.undo();
+      trx_dedup.pop_block_revision();
       protocol_features.popped_blocks_to(prev_block_num);
    }
 
@@ -1113,6 +1135,7 @@ struct controller_impl {
             blog.append( (*bitr)->block, (*bitr)->id(), (*bitr)->block->packed_signed_block() );
 
             db.commit( (*bitr)->block_num() );
+            trx_dedup.commit_to_lib( (*bitr)->block_num() );
             root_id = (*bitr)->id();
 
             if (irreversible_mode()) {
@@ -1406,6 +1429,8 @@ struct controller_impl {
       bool valid = chain_head.read(conf.state_dir / config::chain_head_filename);
       SYS_ASSERT( valid, database_exception, "No existing chain_head.dat file");
 
+      trx_dedup.read_from_file(conf.state_dir / config::transaction_dedup_filename);
+
       SYS_ASSERT(db.revision() == chain_head.block_num(), database_exception,
                  "chain_head block num {} does not match chainbase revision {}",
                  chain_head.block_num(), db.revision());
@@ -1544,15 +1569,24 @@ struct controller_impl {
    }
 
    void read_kv_rows_from_snapshot( const snapshot_reader_ptr& snapshot, std::atomic_size_t& read_row_count, boost::asio::io_context& ctx ) {
+      // Both kv sections can load independently: primary_id references are
+      // snapshot-stable because emplace_with_id reinstates each object at its
+      // original chainbase id. Sections load in parallel via ctx worker threads.
       kv_database_index_set::walk_indices_via_post(ctx, [this, &snapshot, &read_row_count]( auto utils ) {
-         using utils_t = decltype(utils);
-         using value_t = typename decltype(utils)::index_t::value_type;
+         using index_t = typename decltype(utils)::index_t;
+         using value_t = typename index_t::value_type;
+         using snap_t  = typename detail::snapshot_row_traits<value_t>::snapshot_type;
          snapshot->read_section<value_t>([this, &read_row_count]( auto& section ) {
+            snap_t snap_row{};
             bool more = !section.empty();
             while (more) {
-               utils_t::create(db, [this, &section, &more](auto& row) {
-                  more = section.read_row(row, db);
-               });
+               more = section.read_row(snap_row);
+               db.get_mutable_index<index_t>().emplace_with_id(
+                  typename value_t::id_type(snap_row.id),
+                  [&](value_t& obj) {
+                     detail::snapshot_row_traits<value_t>::from_snapshot_row(std::move(snap_row), obj, db);
+                  });
+               snap_row = snap_t{};
                read_row_count.fetch_add(1u, std::memory_order_relaxed);
             }
          });
@@ -1579,9 +1613,6 @@ struct controller_impl {
    }
 
    void add_to_snapshot( const snapshot_writer_ptr& snapshot ) {
-      // clear in case the previous call to clear did not finish in time of deadline
-      clear_expired_input_transactions( fc::time_point::maximum() );
-
       snapshot_written_row_counter row_counter(expected_snapshot_row_count(), snapshot->name());
 
       snapshot->write_section<chain_snapshot_header>([this]( auto &section ){
@@ -1608,6 +1639,8 @@ struct controller_impl {
             });
          });
       });
+
+      trx_dedup.add_to_snapshot(snapshot);
 
       add_kv_rows_to_snapshot(snapshot, row_counter);
 
@@ -1683,6 +1716,8 @@ struct controller_impl {
 
       read_kv_rows_from_snapshot(snapshot, rows_loaded, snapshot_load_ctx);
 
+      trx_dedup.read_from_snapshot(snapshot);
+
       authorization.read_from_snapshot(snapshot, rows_loaded, snapshot_load_ctx);
       resource_limits.read_from_snapshot(snapshot, rows_loaded, snapshot_load_ctx);
 
@@ -1701,11 +1736,33 @@ struct controller_impl {
          // nothing to do
       });
 
+      // --- Snapshot state validation ---
+      // Singleton enforcement
+      SYS_ASSERT(db.get_index<global_property_multi_index>().size() == 1, snapshot_exception,
+                 "Expected exactly 1 global_property_object, found {}", db.get_index<global_property_multi_index>().size());
+      SYS_ASSERT(db.get_index<dynamic_global_property_multi_index>().size() == 1, snapshot_exception,
+                 "Expected exactly 1 dynamic_global_property_object, found {}", db.get_index<dynamic_global_property_multi_index>().size());
+      SYS_ASSERT(db.get_index<protocol_state_multi_index>().size() == 1, snapshot_exception,
+                 "Expected exactly 1 protocol_state_object, found {}", db.get_index<protocol_state_multi_index>().size());
+
+      // block_summary must be exactly 65536 rows
+      SYS_ASSERT(db.get_index<block_summary_multi_index>().size() == 0x10000, snapshot_exception,
+                 "Expected 65536 block_summary_object rows, found {}", db.get_index<block_summary_multi_index>().size());
+
       const auto& gpo = db.get<global_property_object>();
       SYS_ASSERT( gpo.chain_id == chain_id, chain_id_type_exception,
                   "chain ID in snapshot ({}) does not match the chain ID that controller was constructed with ({})",
                   gpo.chain_id, chain_id
       );
+
+      // Resource limits validation (denominators, window sizes, virtual limits)
+      resource_limits.validate_snapshot_state();
+
+      // preactivated_protocol_features should be empty in a finalized snapshot
+      const auto& pso = db.get<protocol_state_object>();
+      SYS_ASSERT(pso.preactivated_protocol_features.empty(), snapshot_exception,
+                 "Snapshot contains {} preactivated protocol features; finalized snapshots must have none",
+                 pso.preactivated_protocol_features.size());
 
       return result;
    }
@@ -2048,8 +2105,9 @@ struct controller_impl {
       }
 
       auto guard_pending = fc::make_scoped_exit([this, head_block_num=chain_head.block_num()]() {
-         protocol_features.popped_blocks_to( head_block_num );
+         trx_dedup.abort_block_revision(); // no-op if no pending revision
          pending.reset();
+         protocol_features.popped_blocks_to( head_block_num );
       });
 
       SYS_ASSERT( skip_db_sessions(s) || db.revision() == chain_head.block_num(), database_exception,
@@ -2057,6 +2115,8 @@ struct controller_impl {
                   db.revision(), chain_head.block_num(), fork_db_head().block_num() );
 
       maybe_session        session = skip_db_sessions(s) ? maybe_session() : maybe_session(db);
+      if (!skip_db_sessions(s))
+         trx_dedup.start_block_revision(chain_head.block_num() + 1);
       building_block_input bbi{chain_head.id(), chain_head.timestamp(), when, chain_head.internal()->get_producer_for_block_at(when).producer_name,
                                new_protocol_feature_activations};
       pending.emplace(std::move(session), *chain_head.internal(), bbi);
@@ -2177,7 +2237,7 @@ struct controller_impl {
             elog( "on block transaction failed due to unknown exception" );
          }
 
-         clear_expired_input_transactions(deadline);
+         clear_expired_input_transactions();
          update_producers_authority();
       }
 
@@ -2333,6 +2393,7 @@ struct controller_impl {
 
       // push the state for pending.
       pending->push();
+      trx_dedup.commit_block_revision();
    }
 
    void log_applied(controller::block_status s) const {
@@ -2347,7 +2408,7 @@ struct controller_impl {
          const auto& new_b = chain_head.block();
          ilog("Produced block {}... #{} @ {} signed by {} "
               "[trxs: {}, lib: {}, net: {}, cpu: {} us, elapsed: {} us, producing time: {} us]",
-              chain_head.id().str().substr(8, 16), new_b->block_num(), new_b->timestamp, new_b->producer,
+              chain_head.id().short_id(), new_b->block_num(), new_b->timestamp, new_b->producer,
               new_b->transactions.size(), chain_head.irreversible_blocknum(),
               br.total_net_usage, br.total_cpu_usage_us, br.total_elapsed_time, now - br.start_time);
 
@@ -2369,7 +2430,7 @@ struct controller_impl {
 
       ilog("Received block {}... #{} @ {} signed by {} " // "Received" instead of "Applied" so it matches existing log output
            "[trxs: {}, lib: {}, net: {}, cpu: {} us, elapsed: {} us, applying time: {} us, latency: {} ms]",
-           chain_head.id().str().substr(8, 16), chain_head.block_num(), chain_head.timestamp(), chain_head.producer(),
+           chain_head.id().short_id(), chain_head.block_num(), chain_head.timestamp(), chain_head.producer(),
            chain_head.block()->transactions.size(), chain_head.irreversible_blocknum(),
            br.total_net_usage, br.total_cpu_usage_us,
            br.total_elapsed_time, now - br.start_time, (now - chain_head.timestamp()).count() / 1000);
@@ -3004,6 +3065,7 @@ struct controller_impl {
 
             if (!skip_db_sessions(controller::block_status::irreversible)) {
                db.commit(bsp->block_num());
+               trx_dedup.commit_to_lib(bsp->block_num());
             }
          }
 
@@ -3173,6 +3235,7 @@ struct controller_impl {
       deque<transaction_metadata_ptr> applied_trxs;
       if( pending ) {
          applied_trxs = pending->extract_trx_metas();
+         trx_dedup.abort_block_revision();
          pending.reset();
          protocol_features.popped_blocks_to( chain_head.block_num() );
       }
@@ -3257,23 +3320,14 @@ struct controller_impl {
    }
 
 
-   void clear_expired_input_transactions(const fc::time_point& deadline) {
-      //Look for expired transactions in the deduplication list, and remove them.
-      auto& transaction_idx = db.get_mutable_index<transaction_multi_index>();
-      const auto& dedupe_index = transaction_idx.indices().get<by_expiration>();
-      auto now = is_building_block() ? pending_block_time() : chain_head.timestamp().to_time_point();
-      const auto total = dedupe_index.size();
-      uint32_t num_removed = 0;
-      while( (!dedupe_index.empty()) && ( now > dedupe_index.begin()->expiration.to_time_point() ) ) {
-         transaction_idx.remove(*dedupe_index.begin());
-         ++num_removed;
-         if( deadline <= fc::time_point::now() ) {
-            break;
-         }
-      }
+   void clear_expired_input_transactions() {
+      fc::time_point block_time = is_building_block()
+         ? pending_block_time()
+         : chain_head.timestamp().to_time_point();
+      auto [num_removed, total] = trx_dedup.clear_expired(block_time);
       if (!replaying && total > 0) {
-         dlog("removed {} expired transactions of the {} input dedup list, pending block time {}",
-              num_removed, total, now);
+         dlog("removed {} expired transactions of the {} input dedup list, block time {}",
+              num_removed, total, block_time);
       }
    }
 
@@ -4442,7 +4496,23 @@ bool controller::is_builtin_activated( builtin_protocol_feature_t f )const {
 }
 
 bool controller::is_known_unexpired_transaction( const transaction_id_type& id) const {
-   return db().find<transaction_object, by_trx_id>(id);
+   return my->trx_dedup.is_known(id);
+}
+
+void controller::record_transaction( const transaction_id_type& id, fc::time_point_sec expire ) {
+   my->trx_dedup.record(id, expire);
+}
+
+void controller::push_dedup_session() {
+   my->trx_dedup.push_session();
+}
+
+void controller::squash_dedup_session() {
+   my->trx_dedup.squash_session();
+}
+
+void controller::undo_dedup_session() {
+   my->trx_dedup.undo_session();
 }
 
 void controller::set_subjective_cpu_leeway(fc::microseconds leeway) {

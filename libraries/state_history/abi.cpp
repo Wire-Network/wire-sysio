@@ -325,6 +325,7 @@ extern const char* const state_history_plugin_abi = R"({
             "name": "contract_row_kv_v0", "fields": [
                 { "type": "name", "name": "code" },
                 { "type": "name", "name": "payer" },
+                { "type": "uint16", "name": "table_id" },
                 { "type": "bytes", "name": "key" },
                 { "type": "bytes", "name": "value" }
             ]
@@ -333,8 +334,7 @@ extern const char* const state_history_plugin_abi = R"({
             "name": "contract_index_kv_v0", "fields": [
                 { "type": "name", "name": "code" },
                 { "type": "name", "name": "payer" },
-                { "type": "name", "name": "table" },
-                { "type": "uint8", "name": "index_id" },
+                { "type": "uint16", "name": "table_id" },
                 { "type": "bytes", "name": "sec_key" },
                 { "type": "bytes", "name": "pri_key" }
             ]
@@ -685,8 +685,8 @@ extern const char* const state_history_plugin_abi = R"({
         { "name": "account_metadata", "type": "account_metadata", "key_names": ["name"] },
         { "name": "code", "type": "code", "key_names": ["vm_type", "vm_version", "code_hash"] },
         { "name": "contract_row", "type": "contract_row", "key_names": ["code", "scope", "table", "primary_key"] },
-        { "name": "contract_row_kv", "type": "contract_row_kv", "key_names": ["code"] },
-        { "name": "contract_index_kv", "type": "contract_index_kv", "key_names": ["code", "table", "index_id"] },
+        { "name": "contract_row_kv", "type": "contract_row_kv", "key_names": ["code", "table_id"] },
+        { "name": "contract_index_kv", "type": "contract_index_kv", "key_names": ["code", "table_id"] },
         { "name": "global_property", "type": "global_property", "key_names": [] },
         { "name": "generated_transaction", "type": "generated_transaction", "key_names": ["sender", "sender_id"] },
         { "name": "protocol_state", "type": "protocol_state", "key_names": [] },

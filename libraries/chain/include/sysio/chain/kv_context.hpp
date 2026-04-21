@@ -19,63 +19,71 @@ struct kv_iterator_slot {
    bool              is_primary = true;
    kv_it_stat        status = kv_it_stat::iterator_end;
    account_name      code;
-   uint8_t           key_format = 0;
+   uint16_t          table_id = 0;  ///< table namespace (primary or secondary index)
 
    // Primary iterator: prefix for bounded iteration
    std::vector<char>  prefix;
-
-   // Secondary iterator: table + index_id
-   name              table;
-   uint8_t           index_id = 0;
 
    // Current position key bytes (for re-seeking after invalidation)
    std::vector<char>  current_key;
    // For secondary iterators: current secondary key
    std::vector<char>  current_sec_key;
-   // For secondary iterators: current primary key
+   // For secondary iterators: lazy cache of primary-key bytes, populated only
+   // when kv_idx_primary_key materializes them from the referenced kv_object.
+   // Empty otherwise so iteration does not pay the by_id materialization cost.
    std::vector<char>  current_pri_key;
 
    // Cached chainbase ID for O(1) iterator_to fast path.
    // -1 means no cached ID; falls back to lower_bound re-seek.
+   //   - primary iterator: kv_object id
+   //   - secondary iterator: kv_index_object id
    int64_t           cached_id = -1;
+
+   // Secondary iterator only: id of the kv_object referenced by the current
+   // secondary row, used for pri_key/value materialization and as the
+   // composite-key tiebreaker for re-seeking after invalidation.
+   // -1 when not at a valid secondary position.
+   // Invariant: when status == iterator_ok, primary_id >= 0. The slow-path
+   // re-seek in kv_idx_next/kv_idx_prev asserts this to catch an
+   // internally-inconsistent slot rather than synthesize garbage.
+   int64_t           primary_id = -1;
 };
 
 class kv_iterator_pool {
 public:
    kv_iterator_pool() : _slots(config::max_kv_iterators) {}
 
-   uint32_t allocate_primary(uint8_t key_fmt, account_name code, const char* prefix, uint32_t prefix_size) {
+   uint32_t allocate_primary(uint16_t table_id, account_name code, const char* prefix, uint32_t prefix_size) {
       uint32_t idx = find_free();
       auto& s = _slots[idx];
       s.in_use = true;
       s.is_primary = true;
       s.status = kv_it_stat::iterator_end;
       s.code = code;
-      s.key_format = key_fmt;
+      s.table_id = table_id;
       s.prefix.assign(prefix, prefix + prefix_size);
-      s.table = name();
-      s.index_id = 0;
       s.current_key.clear();
       s.current_sec_key.clear();
       s.current_pri_key.clear();
       s.cached_id = -1;
+      s.primary_id = -1;
       return idx;
    }
 
-   uint32_t allocate_secondary(account_name code, name table, uint8_t index_id) {
+   uint32_t allocate_secondary(account_name code, uint16_t table_id) {
       uint32_t idx = find_free();
       auto& s = _slots[idx];
       s.in_use = true;
       s.is_primary = false;
       s.status = kv_it_stat::iterator_end;
       s.code = code;
+      s.table_id = table_id;
       s.prefix.clear();
-      s.table = table;
-      s.index_id = index_id;
       s.current_key.clear();
       s.current_sec_key.clear();
       s.current_pri_key.clear();
       s.cached_id = -1;
+      s.primary_id = -1;
       return idx;
    }
 
@@ -89,6 +97,7 @@ public:
       s.current_sec_key.clear();
       s.current_pri_key.clear();
       s.cached_id = -1;
+      s.primary_id = -1;
       if (handle < _next_free) _next_free = handle;
    }
 

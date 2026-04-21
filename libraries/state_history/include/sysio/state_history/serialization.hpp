@@ -153,7 +153,8 @@ void history_pack_big_bytes(datastream<ST>& ds, const sysio::chain::bytes& v) {
 template <typename ST>
 void history_pack_big_bytes(datastream<ST>& ds, const sysio::chain::shared_blob& b) {
    fc::raw::pack(ds, unsigned_int((uint32_t)b.size()));
-   ds.write(b.data(), b.size());
+   if (b.size())
+      ds.write(b.data(), b.size());
 }
 
 template <typename ST>
@@ -230,54 +231,39 @@ datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper_stat
    return ds;
 }
 
-// KV database objects — serialized in legacy contract_row format for SHiP ABI compatibility.
-// Keys encoded as [table:8B BE][scope:8B BE][pk:8B BE] are decoded back to (code, scope, table, pk).
-namespace kv_ship_detail {
-   // key_format values:
-   // 0 = raw bytes (no structure assumed)
-   // 1 = standard [table:8B BE][scope:8B BE][pk:8B BE] (kv_table / kv_multi_index)
-}
+// KV database objects — serialized as contract_row_kv with table_id.
+// Clients resolve table_id → table name via contract ABI.
 
 template <typename ST>
 datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper<sysio::chain::kv_object>& obj) {
    fc::raw::pack(ds, fc::unsigned_int(0)); // struct_version
-
-   if (obj.obj.key_format == 1 && obj.obj.key_size == sysio::chain::kv_key_size) {
-      // SHiP-compatible key: decode to legacy contract_row fields
-      uint64_t table_name  = sysio::chain::kv_decode_be64(obj.obj.key_data());
-      uint64_t scope       = sysio::chain::kv_decode_be64(obj.obj.key_data() + 8);
-      uint64_t primary_key = sysio::chain::kv_decode_be64(obj.obj.key_data() + 16);
-
-      fc::raw::pack(ds, as_type<uint64_t>(obj.obj.code.to_uint64_t())); // code
-      fc::raw::pack(ds, as_type<uint64_t>(scope));                       // scope
-      fc::raw::pack(ds, as_type<uint64_t>(table_name));                  // table
-      fc::raw::pack(ds, as_type<uint64_t>(primary_key));                 // primary_key
-      fc::raw::pack(ds, as_type<uint64_t>(obj.obj.payer.to_uint64_t())); // payer
-      history_pack_big_bytes(ds, obj.obj.value);                          // value
-   } else {
-      // Non-standard key: emit as contract_row_kv_v0 {code, payer, key, value}
-      fc::raw::pack(ds, as_type<uint64_t>(obj.obj.code.to_uint64_t()));
-      fc::raw::pack(ds, as_type<uint64_t>(obj.obj.payer.to_uint64_t()));
-      std::vector<char> key_bytes(obj.obj.key_data(), obj.obj.key_data() + obj.obj.key_size);
-      history_pack_big_bytes(ds, key_bytes);
-      history_pack_big_bytes(ds, obj.obj.value);
-   }
+   fc::raw::pack(ds, as_type<uint64_t>(obj.obj.code.to_uint64_t()));
+   fc::raw::pack(ds, as_type<uint64_t>(obj.obj.payer.to_uint64_t()));
+   fc::raw::pack(ds, as_type<uint16_t>(obj.obj.table_id));
+   sysio::chain::bytes key_bytes(obj.obj.key.data(), obj.obj.key.data() + obj.obj.key.size());
+   history_pack_big_bytes(ds, key_bytes);
+   history_pack_big_bytes(ds, obj.obj.value);
    return ds;
 }
 
 template <typename ST>
 datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper<sysio::chain::kv_index_object>& obj) {
-   fc::raw::pack(ds, fc::unsigned_int(0));
+   fc::raw::pack(ds, fc::unsigned_int(0)); // struct_version
    fc::raw::pack(ds, as_type<uint64_t>(obj.obj.code.to_uint64_t()));
    fc::raw::pack(ds, as_type<uint64_t>(obj.obj.payer.to_uint64_t()));
-   fc::raw::pack(ds, as_type<uint64_t>(obj.obj.table.to_uint64_t()));
-   fc::raw::pack(ds, as_type<uint8_t>(obj.obj.index_id));
-   history_pack_varuint64(ds, obj.obj.sec_key_size);
-   if (obj.obj.sec_key_size > 0)
-      ds.write(obj.obj.sec_key_data(), obj.obj.sec_key_size);
-   history_pack_varuint64(ds, obj.obj.pri_key_size);
-   if (obj.obj.pri_key_size > 0)
-      ds.write(obj.obj.pri_key_data(), obj.obj.pri_key_size);
+   fc::raw::pack(ds, as_type<uint16_t>(obj.obj.table_id));
+   history_pack_varuint64(ds, obj.obj.sec_key.size());
+   if (obj.obj.sec_key.size() > 0)
+      ds.write(obj.obj.sec_key.data(), obj.obj.sec_key.size());
+   // Resolve primary_id -> primary kv_object and emit its key bytes so SHiP
+   // consumers continue to see pri_key bytes in the stream. The wire format
+   // for secondary rows is unchanged (struct_version 0 still ends with
+   // a length-prefixed pri_key byte string).
+   const auto* primary = obj.db.find<sysio::chain::kv_object>(obj.obj.primary_id);
+   uint64_t pri_key_size = primary ? primary->key.size() : 0;
+   history_pack_varuint64(ds, pri_key_size);
+   if (pri_key_size > 0)
+      ds.write(primary->key.data(), pri_key_size);
    return ds;
 }
 

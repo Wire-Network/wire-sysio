@@ -4,7 +4,7 @@
     "types": [],
     "structs": [
         {
-            "name": "kvt_row",
+            "name": "dbl_row",
             "base": "",
             "fields": [
                 {
@@ -13,7 +13,7 @@
                 },
                 {
                     "name": "val",
-                    "type": "uint64"
+                    "type": "float64"
                 }
             ]
         },
@@ -45,6 +45,24 @@
             "name": "ramidxremov",
             "base": "",
             "fields": [
+                {
+                    "name": "sec_size",
+                    "type": "uint32"
+                },
+                {
+                    "name": "pri_size",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "ramidxrmpyr",
+            "base": "",
+            "fields": [
+                {
+                    "name": "payer",
+                    "type": "name"
+                },
                 {
                     "name": "sec_size",
                     "type": "uint32"
@@ -444,6 +462,11 @@
             "fields": []
         },
         {
+            "name": "testsecvalue",
+            "base": "",
+            "fields": []
+        },
+        {
             "name": "testzeroval",
             "base": "",
             "fields": []
@@ -564,42 +587,7 @@
             "fields": []
         },
         {
-            "name": "tstkvtbasic",
-            "base": "",
-            "fields": []
-        },
-        {
-            "name": "tstkvtiter",
-            "base": "",
-            "fields": []
-        },
-        {
-            "name": "tstkvtscope",
-            "base": "",
-            "fields": []
-        },
-        {
             "name": "tstlbound",
-            "base": "",
-            "fields": []
-        },
-        {
-            "name": "tstmapcont",
-            "base": "",
-            "fields": []
-        },
-        {
-            "name": "tstmapsetget",
-            "base": "",
-            "fields": []
-        },
-        {
-            "name": "tstmapstrkey",
-            "base": "",
-            "fields": []
-        },
-        {
-            "name": "tstmapupdate",
             "base": "",
             "fields": []
         },
@@ -774,6 +762,41 @@
             "fields": []
         },
         {
+            "name": "tstxdbl",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstxerase",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstxfind",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstxrev",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstxscope",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstxubound",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstxzero",
+            "base": "",
+            "fields": []
+        },
+        {
             "name": "xcidxread",
             "base": "",
             "fields": [
@@ -798,6 +821,11 @@
         {
             "name": "ramidxremov",
             "type": "ramidxremov",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "ramidxrmpyr",
+            "type": "ramidxrmpyr",
             "ricardian_contract": ""
         },
         {
@@ -1056,6 +1084,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "testsecvalue",
+            "type": "testsecvalue",
+            "ricardian_contract": ""
+        },
+        {
             "name": "testzeroval",
             "type": "testzeroval",
             "ricardian_contract": ""
@@ -1171,43 +1204,8 @@
             "ricardian_contract": ""
         },
         {
-            "name": "tstkvtbasic",
-            "type": "tstkvtbasic",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "tstkvtiter",
-            "type": "tstkvtiter",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "tstkvtscope",
-            "type": "tstkvtscope",
-            "ricardian_contract": ""
-        },
-        {
             "name": "tstlbound",
             "type": "tstlbound",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "tstmapcont",
-            "type": "tstmapcont",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "tstmapsetget",
-            "type": "tstmapsetget",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "tstmapstrkey",
-            "type": "tstmapstrkey",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "tstmapupdate",
-            "type": "tstmapupdate",
             "ricardian_contract": ""
         },
         {
@@ -1381,6 +1379,41 @@
             "ricardian_contract": ""
         },
         {
+            "name": "tstxdbl",
+            "type": "tstxdbl",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstxerase",
+            "type": "tstxerase",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstxfind",
+            "type": "tstxfind",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstxrev",
+            "type": "tstxrev",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstxscope",
+            "type": "tstxscope",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstxubound",
+            "type": "tstxubound",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstxzero",
+            "type": "tstxzero",
+            "ricardian_contract": ""
+        },
+        {
             "name": "xcidxread",
             "type": "xcidxread",
             "ricardian_contract": ""
@@ -1393,32 +1426,89 @@
     ],
     "tables": [
         {
-            "name": "kvttable",
-            "type": "kvt_row",
+            "name": "dbl_row",
+            "type": "dbl_row",
             "index_type": "i64",
-            "key_names": ["table_name","scope","primary_key"],
-            "key_types": ["name","name","uint64"]
+            "key_names": [],
+            "key_types": [],
+            "table_id": 49742
+        },
+        {
+            "name": "dbltbl",
+            "type": "dbl_row",
+            "index_type": "i64",
+            "key_names": ["scope","primary_key"],
+            "key_types": ["name","uint64"],
+            "table_id": 62600,
+            "secondary_indexes": [
+                {
+                    "name": "byval",
+                    "key_type": "float64",
+                    "table_id": 64649
+                }
+            ]
+        },
+        {
+            "name": "mi_row",
+            "type": "mi_row",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": [],
+            "table_id": 14755
         },
         {
             "name": "mitable",
             "type": "mi_row",
             "index_type": "i64",
-            "key_names": ["table_name","scope","primary_key"],
-            "key_types": ["name","name","uint64"]
+            "key_names": ["scope","primary_key"],
+            "key_types": ["name","uint64"],
+            "table_id": 28466
+        },
+        {
+            "name": "sec_big_row",
+            "type": "sec_big_row",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": [],
+            "table_id": 21480
+        },
+        {
+            "name": "sec_row",
+            "type": "sec_row",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": [],
+            "table_id": 60117
         },
         {
             "name": "secbigtbl",
             "type": "sec_big_row",
             "index_type": "i64",
-            "key_names": ["table_name","scope","primary_key"],
-            "key_types": ["name","name","uint64"]
+            "key_names": ["scope","primary_key"],
+            "key_types": ["name","uint64"],
+            "table_id": 13040,
+            "secondary_indexes": [
+                {
+                    "name": "byscore",
+                    "key_type": "uint128",
+                    "table_id": 8945
+                }
+            ]
         },
         {
             "name": "sectbl",
             "type": "sec_row",
             "index_type": "i64",
-            "key_names": ["table_name","scope","primary_key"],
-            "key_types": ["name","name","uint64"]
+            "key_names": ["scope","primary_key"],
+            "key_types": ["name","uint64"],
+            "table_id": 7439,
+            "secondary_indexes": [
+                {
+                    "name": "byage",
+                    "key_type": "uint64",
+                    "table_id": 48144
+                }
+            ]
         }
     ],
     "ricardian_clauses": [],

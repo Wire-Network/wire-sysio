@@ -168,6 +168,12 @@ namespace sysio { namespace chain {
                   _writer.write_row(detail::make_row_writer(detail::snapshot_row_traits<T>::to_snapshot_row(row, db)));
                }
 
+               /// Overload for types whose snapshot_type == value_type (no db-dependent transformation).
+               template<typename T>
+               auto add_row( const T& row ) -> std::enable_if_t<std::is_same_v<std::decay_t<T>, typename detail::snapshot_row_traits<T>::snapshot_type>> {
+                  _writer.write_row(detail::make_row_writer(row));
+               }
+
             private:
                friend class snapshot_writer;
                section_writer(snapshot_writer& writer)

@@ -1,10 +1,8 @@
 const PlopContext = require("../PlopContext")
-const assert = require("assert")
 const { rootDir } = PlopContext
-const F = require("lodash/fp")
-const { nestTargetToPath } = require("../util/plop-constants")
+const { TargetType } = require("../util/plop-constants")
 
-const { pkg } = PlopContext,
+const { rootPkg:pkg } = PlopContext,
 				{ version } = pkg
 
 
@@ -14,29 +12,31 @@ const { pkg } = PlopContext,
  */
 function generator(plop) {
 	return {
-		description: "Add a new nest module to the mono-repo",
+		description: "Add a new C++ plugin",
 		prompts: [
-			{
-				type: "list",
-				name: "target",
-				choices:
-								Object.keys(nestTargetToPath)
-				,
-				message: "target package or app"
-			},
 			{
 				type: "input",
 				name: "name",
-				message: "Module base name, do not include the part name (Module,Manager,etc)",
-				validate: (input) => /^[a-zA-Z0-9]+$/.test(input)
+				message: "C++ Plugin Name (must end with _plugin)",
+				validate: (input) => {
+					if (!input.length || !/^[a-z0-9_]+$/.test(input))
+						return "Name must be lowercase alphanumeric with underscores only"
+					if (!input.endsWith("_plugin"))
+						return "Plugin name must end with _plugin"
+					return true
+				},
 			},
 			{
-				type: "confirm",
-				name: "overwrite",
-				default: false,
-
-				message: "Should overwrite if needed"
-			}
+				type: "input",
+				name: "namespace",
+				message: "C++ Namespace",
+				validate: (input) => {
+					return input.length && /^([a-z0-9_](::)?)+$/.test(input) &&
+						!input.startsWith("::") &&
+						!input.endsWith("::")
+				},
+				default: () => "sysio"
+			},
 		],
 
 		actions: [
@@ -45,29 +45,52 @@ function generator(plop) {
 			{
 				type: "add",
 				data: {
-					name: "{{name}}"
+					name: "{{name}}",
+					namespace: "{{namespace}}"
 				},
 
-				templateFile: `${rootDir}/tools/plop/templates/nest-module/NestModule.ts.hbs`,
-				path: `${rootDir}/{{nestTargetToPath target}}/{{dashCase name}}/{{name}}Module.ts`
+				templateFile: `${rootDir}/tools/plop/templates/create-cxx-plugin/CMakeLists.txt.hbs`,
+				path: `${rootDir}/{{targetTypeToPath "plugin"}}/{{name}}/CMakeLists.txt`
 			},
 			{
 				type: "add",
 				data: {
-					name: "{{name}}"
+					name: "{{name}}",
+					namespace: "{{namespace}}"
 				},
 
-				templateFile: `${rootDir}/tools/plop/templates/nest-module/NestModuleManager.ts.hbs`,
-				path: `${rootDir}/{{nestTargetToPath target}}/{{dashCase name}}/{{name}}Manager.ts`
+				templateFile: `${rootDir}/tools/plop/templates/create-cxx-plugin/plugin-header.hpp.hbs`,
+				path: `${rootDir}/{{targetTypeToPath "plugin"}}/{{name}}/include/sysio/{{name}}/{{name}}.hpp`
 			},
 			{
 				type: "add",
 				data: {
-					name: "{{name}}"
+					name: "{{name}}",
+					namespace: "{{namespace}}"
 				},
 
-				templateFile: `${rootDir}/tools/plop/templates/nest-module/NestModuleIndex.ts.hbs`,
-				path: `${rootDir}/{{nestTargetToPath target}}/{{dashCase name}}/index.ts`
+				templateFile: `${rootDir}/tools/plop/templates/create-cxx-plugin/plugin-src.cpp.hbs`,
+				path: `${rootDir}/{{targetTypeToPath "plugin"}}/{{name}}/src/{{name}}.cpp`
+			},
+			{
+				type: "add",
+				data: {
+					name: "{{name}}",
+					namespace: "{{namespace}}"
+				},
+
+				templateFile: `${rootDir}/tools/plop/templates/create-cxx-plugin/plugin-test.cpp.hbs`,
+				path: `${rootDir}/{{targetTypeToPath "plugin"}}/{{name}}/test/main.cpp`
+			},
+			{
+				type: "add",
+				data: {
+					name: "{{name}}",
+					namespace: "{{namespace}}"
+				},
+
+				templateFile: `${rootDir}/tools/plop/templates/create-cxx-plugin/plugin-testcase.cpp.hbs`,
+				path: `${rootDir}/{{targetTypeToPath "plugin"}}/{{name}}/test/test_{{name}}.cpp`
 			},
 			// PRINT FILES
 			{
@@ -80,12 +103,6 @@ function generator(plop) {
 				type: "flush-files",
 				abortOnFail: true
 			}
-
-			// UPDATE PROJECT
-			// {
-			//   type: "update-project",
-			//   abortOnFail: true
-			// }
 		]
 	}
 }

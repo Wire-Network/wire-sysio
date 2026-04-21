@@ -24,6 +24,7 @@ namespace sysio {
          MAKE_READ_WASM_ABI(sysio_system, sysio.system, contracts)
          MAKE_READ_WASM_ABI(sysio_token,  sysio.token,  contracts)
          MAKE_READ_WASM_ABI(sysio_wrap,   sysio.wrap,   contracts)
+         MAKE_READ_WASM_ABI(sysio_authex, sysio.authex, contracts)
 
          // Contracts in `unittests/test-contracts' directory
          MAKE_READ_WASM_ABI(asserter,              asserter,              unittests/test-contracts)
@@ -55,6 +56,7 @@ namespace sysio {
          MAKE_READ_WASM_ABI(bench_kv_fast_token,   bench_kv_fast_token,   unittests/test-contracts)
          MAKE_READ_WASM_ABI(nested_container_multi_index,   nested_container_multi_index,   unittests/test-contracts)
          MAKE_READ_WASM_ABI(test_kv_map,           test_kv_map,           unittests/test-contracts)
+         MAKE_READ_WASM_ABI(test_kv_sec_query,     test_kv_sec_query,     unittests/test-contracts)
          MAKE_READ_WASM_ABI(ibc,                   ibc,                   unittests/test-contracts/savanna)
 
       };
