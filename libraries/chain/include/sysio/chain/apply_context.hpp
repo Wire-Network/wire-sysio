@@ -176,7 +176,8 @@ class apply_context {
 
    private:
 
-      kv_iterator_pool                    kv_iterators;
+      kv_primary_iterator_pool            kv_primary_iterators;
+      kv_secondary_iterator_pool          kv_secondary_iterators;
       std::optional<const account_metadata_object*> _first_receiver_metadata; ///< cached across notification dispatch
       vector< std::pair<account_name, uint32_t> > _notified; ///< keeps track of new accounts to be notifed of current message
       vector<uint32_t>                    _inline_actions; ///< action_ordinals of queued inline actions

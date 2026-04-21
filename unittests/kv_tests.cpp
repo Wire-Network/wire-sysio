@@ -253,48 +253,70 @@ BOOST_AUTO_TEST_CASE(kv_index_object_crud) {
 }
 
 BOOST_AUTO_TEST_CASE(kv_iterator_pool_basic) {
-   kv_iterator_pool pool;
+   // Primary and secondary iterators now live in independent pools.  Both pools
+   // start at slot index 0 and do not share the free-list; a handle namespace
+   // on top (see kv_make_secondary_handle) distinguishes them externally.
+   kv_primary_iterator_pool primary;
+   kv_secondary_iterator_pool secondary;
 
-   // Allocate primary
-   uint32_t h1 = pool.allocate_primary(uint16_t(0), "test"_n, "prefix", 6);
+   // Allocate primary — returns raw slot index (no tag bit).
+   uint32_t h1 = primary.allocate(uint16_t(0), "test"_n, "prefix", 6);
    BOOST_CHECK_EQUAL(h1, 0u);
-   auto& slot1 = pool.get(h1);
-   BOOST_CHECK(slot1.is_primary);
+   BOOST_CHECK(!kv_handle_is_secondary(h1));
+   auto& slot1 = primary.get(h1);
    BOOST_CHECK_EQUAL(slot1.code, "test"_n);
 
-   // Allocate secondary
-   uint32_t h2 = pool.allocate_secondary("test"_n, uint16_t(100));
-   BOOST_CHECK_EQUAL(h2, 1u);
-   auto& slot2 = pool.get(h2);
-   BOOST_CHECK(!slot2.is_primary);
+   // Allocate secondary — pool returns a raw index; apply_context tags it
+   // with the secondary handle bit before handing back to the contract.
+   uint32_t s_idx = secondary.allocate("test"_n, uint16_t(100));
+   BOOST_CHECK_EQUAL(s_idx, 0u);
+   uint32_t h2 = kv_make_secondary_handle(s_idx);
+   BOOST_CHECK(kv_handle_is_secondary(h2));
+   BOOST_CHECK_EQUAL(kv_handle_slot_index(h2), 0u);
+   auto& slot2 = secondary.get(s_idx);
+   BOOST_CHECK_EQUAL(slot2.code, "test"_n);
 
-   // Release and reuse
-   pool.release(h1);
-   uint32_t h3 = pool.allocate_primary(uint16_t(0), "other"_n, "", 0);
-   BOOST_CHECK_EQUAL(h3, 0u); // reuses slot 0
+   // Release and reuse within each pool independently.
+   primary.release(h1);
+   uint32_t h3 = primary.allocate(uint16_t(0), "other"_n, "", 0);
+   BOOST_CHECK_EQUAL(h3, 0u); // reuses slot 0 of the primary pool
 
-   pool.release(h2);
-   pool.release(h3);
+   secondary.release(s_idx);
+   primary.release(h3);
 }
 
 BOOST_AUTO_TEST_CASE(kv_iterator_pool_exhaustion) {
-   kv_iterator_pool pool;
+   kv_primary_iterator_pool primary;
+   kv_secondary_iterator_pool secondary;
 
-   // Allocate all 16 slots
+   // Fill both pools — each independently sized to max_kv_iterators.
    for (uint32_t i = 0; i < config::max_kv_iterators; ++i) {
-      pool.allocate_primary(uint16_t(0), "test"_n, "", 0);
+      primary.allocate(uint16_t(0), "test"_n, "", 0);
+      secondary.allocate("test"_n, uint16_t(100));
    }
 
-   // 17th should throw
+   // One more primary allocation throws — tests that the primary pool
+   // caps independently of the secondary pool.
    BOOST_CHECK_THROW(
-      pool.allocate_primary(uint16_t(0), "test"_n, "", 0),
+      primary.allocate(uint16_t(0), "test"_n, "", 0),
       kv_iterator_limit_exceeded
    );
 
-   // Release one and try again
-   pool.release(5);
-   uint32_t h = pool.allocate_primary(uint16_t(0), "test"_n, "", 0);
+   // Same for secondary.
+   BOOST_CHECK_THROW(
+      secondary.allocate("test"_n, uint16_t(100)),
+      kv_iterator_limit_exceeded
+   );
+
+   // Releasing a primary slot frees a primary handle only; secondary is
+   // still saturated.
+   primary.release(5);
+   uint32_t h = primary.allocate(uint16_t(0), "test"_n, "", 0);
    BOOST_CHECK_EQUAL(h, 5u);
+   BOOST_CHECK_THROW(
+      secondary.allocate("test"_n, uint16_t(100)),
+      kv_iterator_limit_exceeded
+   );
 }
 
 BOOST_AUTO_TEST_SUITE_END()
