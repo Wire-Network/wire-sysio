@@ -6,6 +6,7 @@
 #include <sysio/crypto.hpp>
 #include <sysio/fixed_bytes.hpp>
 #include <sysio/ignore.hpp>
+#include <sysio/kv_table.hpp>
 #include <sysio/print.hpp>
 #include <sysio/privileged.hpp>
 #include <sysio/producer_schedule.hpp>
@@ -93,6 +94,11 @@ namespace sysiosystem {
                                      (schedule_version)(new_producers))
    };
 
+   struct abihash_key {
+      uint64_t owner;
+      SYSLIB_SERIALIZE(abihash_key, (owner))
+   };
+
    /**
     * abi_hash is the structure underlying the abihash table and consists of:
     * - `owner`: the account owner of the contract's abi
@@ -101,10 +107,11 @@ namespace sysiosystem {
    struct [[sysio::table("abihash"), sysio::contract("sysio.system")]] abi_hash {
       name              owner;
       checksum256       hash;
-      uint64_t primary_key()const { return owner.value; }
 
       SYSLIB_SERIALIZE( abi_hash, (owner)(hash) )
    };
+
+   using abi_hash_table = sysio::kv::table< "abihash"_n, abihash_key, abi_hash >;
 
    void check_auth_change(name contract, name account, const binary_extension<name>& authorized_by);
 

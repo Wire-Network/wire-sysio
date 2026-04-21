@@ -1233,17 +1233,31 @@ namespace sysio::testing {
    vector<char> base_tester::get_row_by_id( name code, name scope, name table, uint64_t id ) const {
       vector<char> data;
       const auto& db = control->db();
+      auto table_id = compute_table_id(table.to_uint64_t());
+      const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
 
-      // KV storage: key = [scope:8B BE][pk:8B BE], table_id from table name
+      // Try scoped key first: [scope:8B BE][pk:8B BE] (kv_multi_index / scoped_table)
       {
          auto key = make_kv_scoped_key(scope, id);
-         auto table_id = compute_table_id(table.to_uint64_t());
-
-         const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
          auto kv_itr = kv_idx.find( boost::make_tuple( code, table_id, key.to_string_view() ) );
          if ( kv_itr != kv_idx.end() ) {
             data.resize( kv_itr->value.size() );
-            memcpy( data.data(), kv_itr->value.data(), data.size() );
+            if( !data.empty() )
+               memcpy( data.data(), kv_itr->value.data(), data.size() );
+            return data;
+         }
+      }
+
+      // Fall back to unscoped key: [pk:8B BE] (kv::table)
+      {
+         char key_buf[kv_pri_key_size];
+         kv_encode_be64(key_buf, id);
+         std::string_view key_sv(key_buf, kv_pri_key_size);
+         auto kv_itr = kv_idx.find( boost::make_tuple( code, table_id, key_sv ) );
+         if ( kv_itr != kv_idx.end() ) {
+            data.resize( kv_itr->value.size() );
+            if( !data.empty() )
+               memcpy( data.data(), kv_itr->value.data(), data.size() );
             return data;
          }
       }

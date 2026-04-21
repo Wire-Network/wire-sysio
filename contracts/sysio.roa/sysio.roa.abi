@@ -156,6 +156,16 @@
             ]
         },
         {
+            "name": "nodeowner_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "nodeownerreg",
             "base": "",
             "fields": [
@@ -182,6 +192,16 @@
                 {
                     "name": "block_num",
                     "type": "uint128"
+                }
+            ]
+        },
+        {
+            "name": "nodeownerreg_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "uint64"
                 }
             ]
         },
@@ -254,6 +274,16 @@
             ]
         },
         {
+            "name": "policy_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "reducepolicy",
             "base": "",
             "fields": [
@@ -301,6 +331,16 @@
                 },
                 {
                     "name": "ram_bytes",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "reslimit_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
                     "type": "uint64"
                 }
             ]
@@ -378,6 +418,16 @@
             ]
         },
         {
+            "name": "sponsor_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "nonce",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "sponsorcount",
             "base": "",
             "fields": [
@@ -387,6 +437,16 @@
                 },
                 {
                     "name": "count",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "sponsorcount_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
                     "type": "uint64"
                 }
             ]
@@ -454,23 +514,47 @@
             "name": "nodeownerreg",
             "type": "nodeownerreg",
             "index_type": "i64",
-            "key_names": ["scope","primary_key"],
+            "key_names": ["scope","owner"],
             "key_types": ["name","uint64"],
-            "table_id": 25131
+            "table_id": 25131,
+            "secondary_indexes": [
+                {
+                    "name": "bytier",
+                    "key_type": "uint64",
+                    "table_id": 9501
+                },
+                {
+                    "name": "bystatus",
+                    "key_type": "uint64",
+                    "table_id": 13229
+                },
+                {
+                    "name": "bytrxid",
+                    "key_type": "checksum256",
+                    "table_id": 31764
+                }
+            ]
         },
         {
             "name": "nodeowners",
             "type": "nodeowners",
             "index_type": "i64",
-            "key_names": ["scope","primary_key"],
+            "key_names": ["scope","owner"],
             "key_types": ["name","uint64"],
-            "table_id": 19032
+            "table_id": 19032,
+            "secondary_indexes": [
+                {
+                    "name": "bytier",
+                    "key_type": "uint64",
+                    "table_id": 59978
+                }
+            ]
         },
         {
             "name": "policies",
             "type": "policies",
             "index_type": "i64",
-            "key_names": ["scope","primary_key"],
+            "key_names": ["scope","owner"],
             "key_types": ["name","uint64"],
             "table_id": 7465
         },
@@ -478,31 +562,23 @@
             "name": "reslimit",
             "type": "reslimit",
             "index_type": "i64",
-            "key_names": ["scope","primary_key"],
-            "key_types": ["name","uint64"],
+            "key_names": ["owner"],
+            "key_types": ["uint64"],
             "table_id": 39017
         },
         {
             "name": "roastate",
             "type": "roa_state",
             "index_type": "i64",
-            "key_names": [],
-            "key_types": [],
+            "key_names": ["name"],
+            "key_types": ["name"],
             "table_id": 40960
-        },
-        {
-            "name": "sponsor",
-            "type": "sponsor",
-            "index_type": "i64",
-            "key_names": [],
-            "key_types": [],
-            "table_id": 14913
         },
         {
             "name": "sponsorcount",
             "type": "sponsorcount",
             "index_type": "i64",
-            "key_names": ["scope","primary_key"],
+            "key_names": ["scope","owner"],
             "key_types": ["name","uint64"],
             "table_id": 30086
         },
@@ -510,9 +586,16 @@
             "name": "sponsors",
             "type": "sponsor",
             "index_type": "i64",
-            "key_names": ["scope","primary_key"],
+            "key_names": ["scope","nonce"],
             "key_types": ["name","uint64"],
-            "table_id": 25433
+            "table_id": 25433,
+            "secondary_indexes": [
+                {
+                    "name": "byusername",
+                    "key_type": "uint64",
+                    "table_id": 35688
+                }
+            ]
         }
     ],
     "ricardian_clauses": [],

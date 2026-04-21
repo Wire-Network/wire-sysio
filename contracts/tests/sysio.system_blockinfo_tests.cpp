@@ -76,21 +76,20 @@ public:
 
       const auto& kv_idx = control->db().get_index<sysio::chain::kv_index, sysio::chain::by_code_key>();
 
-      // Build lower-bound key: [scope=0][start_block_height]
+      // blockinfo is kv::table (unscoped) — key is [block_height:8B BE]
       const auto blockinfo_tid = sysio::chain::compute_table_id(blockinfo_table_name.to_uint64_t());
-      auto lo_key = sysio::chain::make_kv_scoped_key(sysio::chain::name(0), static_cast<uint64_t>(start_block_height));
+      char lo_key[sysio::chain::kv_pri_key_size];
+      sysio::chain::kv_encode_be64(lo_key, static_cast<uint64_t>(start_block_height));
+      std::string_view lo_sv(lo_key, sysio::chain::kv_pri_key_size);
 
       unsigned int rows_visited = 0;
       block_info_record r;
 
-      auto itr = kv_idx.lower_bound(boost::make_tuple(config::system_account_name, blockinfo_tid, lo_key.to_string_view()));
+      auto itr = kv_idx.lower_bound(boost::make_tuple(config::system_account_name, blockinfo_tid, lo_sv));
       for (; itr != kv_idx.end() && itr->code == config::system_account_name && itr->table_id == blockinfo_tid; ++itr) {
          auto kv = itr->key_view();
-         if (kv.size() != sysio::chain::kv_scoped_key_size) break;
-         // Verify scope portion matches
-         if (kv.substr(0, sysio::chain::kv_scope_prefix_size) != lo_key.to_string_view().substr(0, sysio::chain::kv_scope_prefix_size)) break;
-         // Extract primary key (block height)
-         uint64_t pk = sysio::chain::kv_decode_be64(kv.data() + 8);
+         if (kv.size() != sysio::chain::kv_pri_key_size) break;
+         uint64_t pk = sysio::chain::kv_decode_be64(kv.data());
          if (pk > end_block_height) break;
 
          fc::datastream<const char*> ds(itr->value.data(), itr->value.size());

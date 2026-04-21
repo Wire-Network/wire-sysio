@@ -1,0 +1,103 @@
+{
+  "address": "2FcAgnSdn29VXZ3eF2jS4U4KzGaYm5M9Wha1CtArm9EU",
+  "metadata": {
+    "name": "opp_outpost",
+    "version": "0.1.0",
+    "spec": "0.1.0"
+  },
+  "instructions": [
+    {
+      "name": "initialize",
+      "discriminator": [175, 175, 109, 31, 13, 152, 155, 237],
+      "accounts": [
+        { "name": "authority", "writable": true, "signer": true },
+        { "name": "config", "writable": true, "pda": { "seeds": [{ "kind": "const", "value": [111, 117, 116, 112, 111, 115, 116, 95, 99, 111, 110, 102, 105, 103] }] } },
+        { "name": "message_buffer", "writable": true, "pda": { "seeds": [{ "kind": "const", "value": [109, 101, 115, 115, 97, 103, 101, 95, 98, 117, 102, 102, 101, 114] }] } },
+        { "name": "operator_registry", "writable": true, "pda": { "seeds": [{ "kind": "const", "value": [111, 112, 101, 114, 97, 116, 111, 114, 95, 114, 101, 103, 105, 115, 116, 114, 121] }] } },
+        { "name": "system_program" }
+      ],
+      "args": [
+        { "name": "consensus_threshold", "type": "u32" }
+      ]
+    },
+    {
+      "name": "epoch_in",
+      "discriminator": [85, 70, 55, 132, 50, 198, 135, 115],
+      "accounts": [
+        { "name": "operator", "writable": true, "signer": true },
+        { "name": "config", "writable": true, "pda": { "seeds": [{ "kind": "const", "value": [111, 117, 116, 112, 111, 115, 116, 95, 99, 111, 110, 102, 105, 103] }] } },
+        { "name": "operator_registry", "writable": true, "pda": { "seeds": [{ "kind": "const", "value": [111, 112, 101, 114, 97, 116, 111, 114, 95, 114, 101, 103, 105, 115, 116, 114, 121] }] } },
+        { "name": "epoch_deliveries", "writable": true },
+        { "name": "system_program" }
+      ],
+      "args": [
+        { "name": "envelope_data", "type": "bytes" }
+      ]
+    },
+    {
+      "name": "emit_outbound_envelope",
+      "discriminator": [142, 109, 163, 152, 3, 80, 224, 157],
+      "accounts": [
+        { "name": "caller", "signer": true },
+        { "name": "config", "writable": true, "pda": { "seeds": [{ "kind": "const", "value": [111, 117, 116, 112, 111, 115, 116, 95, 99, 111, 110, 102, 105, 103] }] } },
+        { "name": "message_buffer", "writable": true, "pda": { "seeds": [{ "kind": "const", "value": [109, 101, 115, 115, 97, 103, 101, 95, 98, 117, 102, 102, 101, 114] }] } }
+      ],
+      "args": [
+        { "name": "wire_epoch_index", "type": "u32" }
+      ]
+    },
+    {
+      "name": "add_attestation",
+      "discriminator": [206, 82, 129, 170, 54, 159, 161, 156],
+      "accounts": [
+        { "name": "authority", "signer": true },
+        { "name": "config", "pda": { "seeds": [{ "kind": "const", "value": [111, 117, 116, 112, 111, 115, 116, 95, 99, 111, 110, 102, 105, 103] }] } },
+        { "name": "message_buffer", "writable": true, "pda": { "seeds": [{ "kind": "const", "value": [109, 101, 115, 115, 97, 103, 101, 95, 98, 117, 102, 102, 101, 114] }] } }
+      ],
+      "args": [
+        { "name": "attestation_type", "type": "i32" },
+        { "name": "data", "type": "bytes" }
+      ]
+    },
+    {
+      "name": "deposit",
+      "discriminator": [242, 35, 198, 137, 82, 225, 242, 182],
+      "accounts": [
+        { "name": "depositor", "writable": true, "signer": true },
+        { "name": "config", "pda": { "seeds": [{ "kind": "const", "value": [111, 117, 116, 112, 111, 115, 116, 95, 99, 111, 110, 102, 105, 103] }] } },
+        { "name": "message_buffer", "writable": true, "pda": { "seeds": [{ "kind": "const", "value": [109, 101, 115, 115, 97, 103, 101, 95, 98, 117, 102, 102, 101, 114] }] } },
+        { "name": "vault", "writable": true, "pda": { "seeds": [{ "kind": "const", "value": [111, 117, 116, 112, 111, 115, 116, 95, 118, 97, 117, 108, 116] }] } },
+        { "name": "system_program" }
+      ],
+      "args": [
+        { "name": "operator_type", "type": "u8" },
+        { "name": "wire_account_name", "type": "string" },
+        { "name": "amount", "type": "u64" }
+      ]
+    }
+  ],
+  "accounts": [
+    { "name": "OutpostConfig", "discriminator": [211, 233, 11, 174, 26, 119, 188, 182] },
+    { "name": "MessageBuffer", "discriminator": [25, 244, 3, 5, 225, 165, 29, 250] },
+    { "name": "OperatorRegistry", "discriminator": [194, 188, 172, 240, 220, 209, 36, 100] },
+    { "name": "EpochDeliveries", "discriminator": [134, 83, 77, 28, 26, 189, 174, 190] }
+  ],
+  "types": [
+    {
+      "name": "OutpostConfig",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          { "name": "authority", "type": "pubkey" },
+          { "name": "next_epoch_index", "type": "u32" },
+          { "name": "previous_epoch_hash", "type": { "array": ["u8", 32] } },
+          { "name": "consensus_threshold", "type": "u32" },
+          { "name": "registry_initialized", "type": "bool" },
+          { "name": "last_message_id", "type": { "array": ["u8", 32] } },
+          { "name": "last_message_timestamp", "type": "u64" },
+          { "name": "bump", "type": "u8" }
+        ]
+      }
+    }
+  ]
+}

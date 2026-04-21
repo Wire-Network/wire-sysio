@@ -172,6 +172,8 @@ namespace config {
       //             + 2 table_id + 6 padding = 48
       // key.size() and value.size() are added separately at billing time.
       static const uint64_t value = 48 + overhead;
+      // protocol feature will be needed if this increases
+      static_assert(sizeof(kv_object) == 48, "kv_object size changed");
    };
 
    template<>
@@ -181,6 +183,8 @@ namespace config {
       //             + 8 pri_key (offset_ptr) + 2 table_id + 6 padding = 48
       // sec_key.size() and pri_key.size() are added separately at billing time.
       static const uint64_t value = 48 + overhead;
+      // protocol feature will be needed if this increases
+      static_assert(sizeof(kv_index_object) == 48, "kv_index_object size changed");
    };
 } // namespace config
 
