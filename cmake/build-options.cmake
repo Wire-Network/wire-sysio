@@ -24,7 +24,3 @@ option(DISABLE_WASM_SPEC_TESTS "disable building of wasm spec unit tests" OFF)
 # allocators (mutually exclusive; enforced in cmake/compiler-config.cmake)
 option(ENABLE_TCMALLOC "use tcmalloc (requires gperftools)" OFF)
 option(ENABLE_JEMALLOC "link jemalloc statically into nodeop (via vcpkg)" ON)
-
-# packaging
-option(ENABLE_SYSIO_DEV_DEB "Enable building the sysio-dev .deb package" OFF)
-option(ENABLE_SPRING_DEV_DEB "Enable building the spring-dev .deb package" OFF)
