@@ -12,6 +12,7 @@ namespace {
       static constexpr const char* _trace_trx_id_prefix = "trace_trx_id_";
       static constexpr const char* _trace_trx_id_index_prefix = "trace_trx_idx_";
       static constexpr const char* _trace_blk_idx_prefix = "trace_blk_idx_";
+      static constexpr const char* _trace_recv_bloom_prefix = "trace_recv_bloom_";
       static constexpr const char* _trace_ext = ".log";
       static constexpr const char* _compressed_trace_ext = ".clog";
       // Sized for the longest possible filename across every prefix and
@@ -23,6 +24,7 @@ namespace {
          std::char_traits<char>::length(_trace_trx_id_prefix),
          std::char_traits<char>::length(_trace_trx_id_index_prefix),
          std::char_traits<char>::length(_trace_blk_idx_prefix),
+         std::char_traits<char>::length(_trace_recv_bloom_prefix),
       });
       static constexpr size_t _max_ext_length = std::max(
          std::char_traits<char>::length(_trace_ext),
@@ -59,6 +61,22 @@ namespace sysio::trace_api {
       fc::cfile trace;
       fc::cfile index;
       const uint32_t slice_number = _slice_directory.slice_number(bt.number);
+
+      // Detect slice roll-over and flush the completed slice's bloom sidecar before we start accumulating into the
+      // new slice's builder.  A failure here is logged by the general except_handler path (finalize_and_write throws
+      // on I/O error); the sidecar is advisory so a missing one just means the query path falls back to scanning
+      // that slice.  We swallow the write error here to avoid tying slice roll-over durability to bloom durability.
+      if (_current_bloom_slice && *_current_bloom_slice != slice_number) {
+         try {
+            _current_bloom_builder.finalize_and_write(_slice_directory.bloom_slice_path(*_current_bloom_slice));
+         } catch (const std::exception& e) {
+            fc_wlog(_log, "trace_api: failed to write bloom sidecar for slice {}: {}", *_current_bloom_slice, e.what());
+         }
+         _current_bloom_builder = bloom_builder{};
+      }
+      _current_bloom_slice = slice_number;
+      _current_bloom_builder.add_block(bt);
+
       _slice_directory.find_or_create_slice_pair(slice_number, open_state::write, trace, index);
       // storing as static_variant to allow adding other data types to the trace file in the future
       const uint64_t offset = append_store(data_log_entry { bt }, trace);
@@ -91,6 +109,13 @@ namespace sysio::trace_api {
       _slice_directory.find_or_create_trx_id_slice(slice_number, open_state::write, trx_id_file);
       auto entry = metadata_log_entry { std::move(tt) };
       append_store(entry, trx_id_file);
+   }
+
+   bloom_reader store_provider::get_bloom(uint32_t slice_number) const {
+      const auto path = _slice_directory.bloom_slice_path(slice_number);
+      std::error_code ec;
+      if (!std::filesystem::exists(path, ec)) return bloom_reader{};
+      return bloom_reader{path};
    }
 
    get_block_t store_provider::get_block(uint32_t block_height, const yield_function& yield) {
@@ -296,6 +321,13 @@ namespace sysio::trace_api {
          trace_file.seek(0); // ensure we are at the start of the file
       }
       return true;
+   }
+
+   std::filesystem::path slice_directory::bloom_slice_path(uint32_t slice_number) const {
+      // Mirrors the filename convention of the other sidecars: <prefix><first>-<last><ext>.  Callers write through
+      // bloom_builder::finalize_and_write (temp + rename) and read through bloom_reader, neither of which uses
+      // fc::cfile, so no open-helper is needed here.
+      return _slice_dir / make_filename(_trace_recv_bloom_prefix, _trace_ext, slice_number, _width);
    }
 
    std::optional<compressed_file> slice_directory::find_compressed_trace_slice(uint32_t slice_number, bool open_file ) const {
@@ -764,6 +796,12 @@ namespace sysio::trace_api {
             if (std::filesystem::exists(blk_idx_path)) {
                log(std::string("Removing: ") + blk_idx_path.generic_string());
                std::filesystem::remove(blk_idx_path);
+            }
+
+            const auto bloom_path = bloom_slice_path(slice_to_clean);
+            if (std::filesystem::exists(bloom_path)) {
+               log(std::string("Removing: ") + bloom_path.generic_string());
+               std::filesystem::remove(bloom_path);
             }
 
             auto ctrace = find_compressed_trace_slice(slice_to_clean, dont_open_file);

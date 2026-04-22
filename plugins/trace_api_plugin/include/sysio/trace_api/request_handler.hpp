@@ -6,6 +6,7 @@
 #include <fc/variant.hpp>
 #include <fc/variant_object.hpp>
 #include <sysio/chain/name.hpp>
+#include <sysio/trace_api/bloom_sidecar.hpp>
 #include <sysio/trace_api/metadata_log.hpp>
 #include <sysio/trace_api/data_log.hpp>
 #include <sysio/trace_api/common.hpp>
@@ -199,8 +200,44 @@ namespace sysio::trace_api {
          // trxs with similar action counts avoid per-trx allocations.
          std::vector<const action_trace_v0*> matches;
 
+         // Per-slice bloom skip state.  When the caller supplies a receiver (or a non-include_notifications
+         // request whose receiver is auto-mirrored onto account upstream), probe the slice's receiver bloom and
+         // advance block_num past the slice on a negative probe.  The bloom is opened once per slice (lazy; only
+         // if skipping is useful for this query) and held for the life of the scan through that slice.  If the
+         // sidecar is missing or CRC-corrupt the bloom_reader is invalid and may_contain_* returns true, which
+         // preserves the existing scan behaviour.
+         const uint32_t stride = logfile_provider.slice_stride();
+         const bool skip_eligible = has_receiver || (has_account && has_action);
+         std::optional<uint32_t> current_slice;
+         bool skip_current_slice = false;
+
          const uint32_t end = query.block_num_end;
          for (uint32_t block_num = query.block_num_start; block_num <= end; ++block_num) {
+            if (skip_eligible) {
+               const uint32_t slice = logfile_provider.slice_number(block_num);
+               if (!current_slice || *current_slice != slice) {
+                  current_slice = slice;
+                  skip_current_slice = false;
+                  bloom_reader r = logfile_provider.get_bloom(slice);
+                  if (r.valid()) {
+                     if (has_receiver && !r.may_contain_receiver(receiver_v)) {
+                        skip_current_slice = true;
+                     } else if (has_receiver && has_action
+                                && !r.may_contain_recv_action(receiver_v, action_v)) {
+                        skip_current_slice = true;
+                     }
+                  }
+               }
+               if (skip_current_slice) {
+                  // Jump block_num to the last block of this slice so the for-loop's ++block_num takes us to the
+                  // first block of the next slice.  Clamp to the query's end so we don't wrap around if this is
+                  // the last slice in the range.
+                  const uint32_t slice_last = (slice + 1) * stride - 1;
+                  block_num = std::min(slice_last, end);
+                  continue;
+               }
+            }
+
             auto data = logfile_provider.get_block(block_num);
             if (!data) continue;
 

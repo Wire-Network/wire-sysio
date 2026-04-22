@@ -1,6 +1,9 @@
 #include <boost/test/unit_test.hpp>
 
+#include <fc/filesystem.hpp>
+
 #include <sysio/trace_api/abi_data_handler.hpp>
+#include <sysio/trace_api/bloom_sidecar.hpp>
 #include <sysio/trace_api/request_handler.hpp>
 #include <sysio/trace_api/test_common.hpp>
 
@@ -22,6 +25,17 @@ struct get_actions_fixture {
          auto it = fixture.blocks.find(height);
          if (it == fixture.blocks.end()) return {};
          return std::make_tuple(data_log_entry{it->second}, true /*irreversible*/);
+      }
+
+      // Stride/slice mapping is a fixture knob so tests can exercise the per-slice bloom skip path with a small
+      // stride rather than the production default of 10,000 blocks.
+      uint32_t slice_stride() const noexcept { return fixture.mock_slice_stride; }
+      uint32_t slice_number(uint32_t block_num) const noexcept { return block_num / fixture.mock_slice_stride; }
+
+      // Default: no sidecar -> invalid bloom_reader -> may_contain_* returns true -> caller scans as before.  Tests
+      // that want to exercise skipping install a function that returns a valid reader for specific slices.
+      bloom_reader get_bloom(uint32_t slice_number) const {
+         return fixture.mock_get_bloom(slice_number);
       }
 
       get_actions_fixture& fixture;
@@ -70,6 +84,8 @@ struct get_actions_fixture {
    };
 
    std::map<uint32_t, block_trace_v0> blocks;
+   uint32_t mock_slice_stride = 10;
+   std::function<bloom_reader(uint32_t)> mock_get_bloom = [](uint32_t) { return bloom_reader{}; };
    impl_type impl;
 };
 
@@ -438,6 +454,83 @@ BOOST_FIXTURE_TEST_CASE(complex_inline_and_notification_ordering, get_actions_fi
       BOOST_REQUIRE_EQUAL(r.actions.size(), 1u);
       BOOST_TEST(r.actions[0].get_object()["global_sequence"].as_uint64() == 102u);
    }
+}
+
+// Per-slice bloom skip: a valid bloom that does not contain the queried receiver causes get_actions_impl to advance
+// past the entire slice without scanning any of its blocks.  The fixture observes "no scan" by having get_block
+// return a single well-known action in every block; if the scan ran, the result would include that action.
+BOOST_FIXTURE_TEST_CASE(bloom_skips_entire_slice_when_receiver_absent, get_actions_fixture) {
+   fc::temp_directory tempdir;
+
+   // Three slices of 10 blocks each; populate every block so a non-skipped scan would always find the single action.
+   mock_slice_stride = 10;
+   for (uint32_t n = 1; n < 30; ++n) {
+      blocks[n] = make_block(n, { make_trx(TRX1, n, { make_action(n, "alice"_n, "alice"_n, "transfer"_n) }) });
+   }
+
+   // Build bloom sidecars for slices 0, 1, 2.  Slice 1 is the only one that contains alice; slices 0 and 2 have no
+   // receivers at all (empty blooms -> every probe misses).
+   auto bloom_for = [&tempdir](std::size_t idx, bool with_alice) {
+      bloom_builder b;
+      if (with_alice) {
+         action_trace_v0 a{};
+         a.receiver = "alice"_n;
+         a.account  = "alice"_n;
+         a.action   = "transfer"_n;
+         b.add_action(a);
+      }
+      const auto path = tempdir.path() / ("bloom_slice_" + std::to_string(idx) + ".log");
+      b.finalize_and_write(path);
+      return path;
+   };
+   const auto slice0_path = bloom_for(0, /*with_alice=*/false);
+   const auto slice1_path = bloom_for(1, /*with_alice=*/true);
+   const auto slice2_path = bloom_for(2, /*with_alice=*/false);
+
+   mock_get_bloom = [slice0_path, slice1_path, slice2_path](uint32_t slice) -> bloom_reader {
+      switch (slice) {
+         case 0: return bloom_reader{slice0_path};
+         case 1: return bloom_reader{slice1_path};
+         case 2: return bloom_reader{slice2_path};
+         default: return bloom_reader{};
+      }
+   };
+
+   action_query q;
+   q.block_num_start = 1;
+   q.block_num_end   = 29;
+   q.receiver        = "alice"_n;
+
+   auto r = get_actions(q);
+
+   // All hits come from slice 1 (blocks 10..19).  Slices 0 and 2 were bloom-skipped without any get_block call.
+   BOOST_REQUIRE_EQUAL(r.actions.size(), 10u);
+   for (const auto& a : r.actions) {
+      const auto block_num = a.get_object()["block_num"].as_uint64();
+      BOOST_TEST(block_num >= 10u);
+      BOOST_TEST(block_num <= 19u);
+   }
+}
+
+// Sanity check that a query with no filter cannot bloom-skip: even if the mock would return an empty bloom for
+// every slice, we still scan because there's nothing to probe against.  Without this behaviour callers would see
+// empty results on unfiltered queries once sidecars exist.
+BOOST_FIXTURE_TEST_CASE(bloom_not_consulted_when_no_filter, get_actions_fixture) {
+   mock_slice_stride = 10;
+   for (uint32_t n = 1; n < 15; ++n) {
+      blocks[n] = make_block(n, { make_trx(TRX1, n, { make_action(n, "alice"_n, "alice"_n, "transfer"_n) }) });
+   }
+   // If the handler ever calls get_bloom under this configuration, fail loudly.
+   mock_get_bloom = [](uint32_t) -> bloom_reader {
+      BOOST_FAIL("get_bloom should not be called when no filter is set");
+      return bloom_reader{};
+   };
+
+   action_query q;
+   q.block_num_start = 1;
+   q.block_num_end   = 14;
+   auto r = get_actions(q);
+   BOOST_CHECK_EQUAL(r.actions.size(), 14u);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

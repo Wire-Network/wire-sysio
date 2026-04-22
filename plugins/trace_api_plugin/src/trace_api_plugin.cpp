@@ -106,6 +106,18 @@ namespace {
          return store->has_abi_entry(account);
       }
 
+      uint32_t slice_stride() const noexcept {
+         return store->slice_stride();
+      }
+
+      uint32_t slice_number(uint32_t block_height) const noexcept {
+         return store->slice_number(block_height);
+      }
+
+      bloom_reader get_bloom(uint32_t slice_number) const {
+         return store->get_bloom(slice_number);
+      }
+
       std::shared_ptr<Store> store;
    };
 }
