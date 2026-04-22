@@ -20,6 +20,8 @@ public:
 
    virtual void plugin_shutdown();
 
+   void interrupt();
+
 private:
    std::shared_ptr<class wire_eth_maintenance_plugin_impl> my;
 };

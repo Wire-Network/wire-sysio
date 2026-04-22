@@ -598,4 +598,19 @@ void wire_eth_maintenance_plugin::plugin_shutdown() {
    curl_global_cleanup();
 }
 
+/**
+ * Thread-safety contract: invoked from the signal-catching thread via the
+ * stop_executor_cb registered in main(), concurrently with cron pool workers
+ * that are running https_request. Must only touch thread-safe state —
+ * interruption_handle takes care of that via its atomic flag and
+ * mutex-guarded io_context set.
+ */
+void wire_eth_maintenance_plugin::interrupt() {
+   ilog("interrupt");
+   if (my) {
+      my->interruption.set_shutting_down();
+      my->interruption.stop_all();
+   }
+}
+
 } // namespace sysio

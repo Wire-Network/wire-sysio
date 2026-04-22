@@ -16,6 +16,12 @@ int main(int argc, char** argv) {
    if (r != exit_code::SUCCESS)
       return r == exit_code::NODE_MANAGEMENT_SUCCESS ? exit_code::SUCCESS : r;
 
+   wire_eth_maintenance_plugin& wire_plug = app().get_plugin<wire_eth_maintenance_plugin>();
+   exe.set_stop_executor_cb([&wire_plug]() {
+      ilog("Exiting cranker");
+      wire_plug.interrupt();
+   });
+
    try {
       return exe.exec();
    } catch (const fc::exception& e) {
