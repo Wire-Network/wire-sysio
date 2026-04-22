@@ -47,6 +47,13 @@ namespace sysio {
       [[sysio::action]]
       void unpause();
 
+      /// Remove a batch-op group snapshot after sysio.system has consumed it
+      /// for emissions distribution. Only callable by sysio.system (which is
+      /// the sole consumer and knows when its last_epoch_index has caught up
+      /// past the snapshotted epoch).
+      [[sysio::action]]
+      void prunesnap(uint64_t epoch_index);
+
       // -----------------------------------------------------------------------
       //  Tables
       // -----------------------------------------------------------------------
@@ -83,6 +90,27 @@ namespace sysio {
       };
 
       using epochstate_t = sysio::kv::global<"epochstate"_n, epoch_state>;
+
+      /// Snapshot of the active batch-op group for a specific epoch, captured
+      /// at advance() time and consumed by sysio.system::processepoch so that
+      /// catch-up emissions pay the historical members, not the rotation
+      /// slot's current occupants. Pruned by sysio.system after payout.
+      struct batchsnap_key {
+         uint64_t epoch_index;
+         uint64_t primary_key() const { return epoch_index; }
+         SYSLIB_SERIALIZE(batchsnap_key, (epoch_index))
+      };
+
+      struct [[sysio::table("batchsnap")]] batch_snapshot {
+         uint64_t          epoch_index;
+         uint8_t           active_group_index = 0;
+         std::vector<name> active_members;
+
+         SYSLIB_SERIALIZE(batch_snapshot,
+            (epoch_index)(active_group_index)(active_members))
+      };
+
+      using batchsnaps_t = sysio::kv::table<"batchsnap"_n, batchsnap_key, batch_snapshot>;
 
       /// Outpost registry table primary key.
       struct outpost_key {
@@ -121,6 +149,7 @@ namespace sysio {
       static constexpr name EPOCH_ACCOUNT  = "sysio.epoch"_n;
       static constexpr name OPREG_ACCOUNT  = "sysio.opreg"_n;
       static constexpr name AUTHEX_ACCOUNT = "sysio.authex"_n;
+      static constexpr name SYSTEM_ACCOUNT = "sysio"_n;
 
    private:
 

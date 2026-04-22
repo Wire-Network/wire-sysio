@@ -182,15 +182,17 @@ bool is_op_active(name account) {
    return ops.get(key).status == OperatorStatus::OPERATOR_STATUS_ACTIVE;
 }
 
-// Returns the current epoch's active batch-op rotation group (names only).
-// Empty vector if sysio.epoch state doesn't exist or the group index is out
-// of range (both defensive -- caller treats as "no batch ops this epoch").
-std::vector<name> get_current_batch_group() {
-   sysio::epoch::readonly::epochstate_t est(epoch_refs::account);
-   if (!est.exists()) return {};
-   auto st = est.get();
-   if (st.current_batch_op_group >= st.batch_op_groups.size()) return {};
-   return st.batch_op_groups[st.current_batch_op_group];
+// Returns the batch-op rotation group that was active for the given epoch,
+// from the per-epoch snapshot written by sysio.epoch::advance(). Empty vector
+// if the snapshot is missing (caller treats as "no batch ops this epoch").
+// Reading the snapshot (vs. sysio.epoch::epochstate's current group) ensures
+// catch-up processepoch calls pay the historical members even when sysio.epoch
+// has rotated and / or re-grouped since target_epoch.
+std::vector<name> get_batch_group_for_epoch(uint32_t target_epoch) {
+   sysio::epoch::readonly::batchsnaps_t snaps(epoch_refs::account);
+   sysio::epoch::readonly::batchsnap_key key{target_epoch};
+   if (!snaps.contains(key)) return {};
+   return snaps.get(key).active_members;
 }
 
 // Returns sysio.epoch's configured operators_per_epoch (the rotation group
@@ -563,15 +565,18 @@ void system_contract::processepoch() {
    }
 
    // =======================================================================
-   // Batch-op pay. Divides batch_pool into a fixed 1/operators_per_epoch slice
-   // per seat in the current rotation group, reading operators_per_epoch from
-   // sysio.epoch::epochcfg so emissions tracks any upstream change. Members
-   // not registered as ACTIVE in sysio.opreg (slashed / terminated / unknown)
-   // are skipped and their slice remains in the treasury rather than being
-   // redistributed.
+   // Batch-op pay. Reads the snapshot written by sysio.epoch::advance() for
+   // target_epoch so catch-up runs pay the historical members of the active
+   // rotation group, not whoever occupies that slot today. Divides batch_pool
+   // into a fixed 1/operators_per_epoch slice per seat (reading
+   // operators_per_epoch from sysio.epoch::epochcfg so emissions tracks any
+   // upstream change). Members not registered as ACTIVE in sysio.opreg
+   // (slashed / terminated / unknown) are skipped and their slice remains in
+   // the treasury rather than being redistributed. After payout, the snapshot
+   // is pruned via an inline call to sysio.epoch::prunesnap.
    // =======================================================================
    {
-      const auto group         = get_current_batch_group();
+      const auto group         = get_batch_group_for_epoch(target_epoch);
       const uint32_t group_sz  = get_batch_op_group_size();
       const int64_t per_member = batch_pool / group_sz;
 
@@ -579,6 +584,18 @@ void system_contract::processepoch() {
          if (!is_op_active(m)) continue; // slashed / terminated / unknown: share stays in treasury
          send_wire_transfer(get_self(), m, per_member, memo::batch_op_reward);
          actual_paid += per_member;
+      }
+
+      // Prune the consumed snapshot. Skipped if no snapshot was written for
+      // this epoch (e.g., pre-PR chains that predate snapshot introduction).
+      sysio::epoch::readonly::batchsnaps_t snaps(epoch_refs::account);
+      if (snaps.contains(sysio::epoch::readonly::batchsnap_key{target_epoch})) {
+         sysio::action(
+            {get_self(), "active"_n},
+            epoch_refs::account,
+            "prunesnap"_n,
+            std::make_tuple(static_cast<uint64_t>(target_epoch))
+         ).send();
       }
    }
 

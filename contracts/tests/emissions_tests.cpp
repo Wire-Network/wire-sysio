@@ -521,6 +521,16 @@ public:
           abi_serializer::create_yield_function(abi_serializer_max_time));
    }
 
+   // Reads a sysio.epoch::batchsnap row for the given epoch index. Snapshots
+   // are written on sysio.epoch::advance and pruned by sysio.system::processepoch
+   // after the corresponding batch-op distribution runs.
+   fc::variant get_batch_snapshot( uint64_t epoch_index ) {
+      auto data = get_row_by_account(EPOCH, EPOCH, "batchsnap"_n, account_name(epoch_index));
+      if (data.empty()) return fc::variant();
+      return epoch_abi_ser.binary_to_variant("batch_snapshot", data,
+          abi_serializer::create_yield_function(abi_serializer_max_time));
+   }
+
    // -----------------------------
    // Producer info reader
    // -----------------------------
@@ -924,6 +934,13 @@ public:
    // calling this for a second+ advance.
    action_result advance_epoch_state(account_name signer = EPOCH) {
       return push_epoch_action(signer, "advance"_n, mvo());
+   }
+
+   // Invoke sysio.epoch::prunesnap directly from a test signer. Used in
+   // authorization-coverage tests; the production caller is sysio.system's
+   // processepoch.
+   action_result prunesnap(account_name signer, uint64_t epoch_index) {
+      return push_epoch_action(signer, "prunesnap"_n, mvo()("epoch_index", epoch_index));
    }
 
    // Convenience: set epoch config, advance genesis to index 1, ready for the
@@ -3244,6 +3261,110 @@ BOOST_FIXTURE_TEST_CASE( processepoch_gap_catchup_one_epoch_per_call, sysio_emis
    auto r = processepoch( config::system_account_name );
    BOOST_REQUIRE( r != success() );
    require_substr( r, "emissions already caught up to sysio.epoch" );
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( batch_snapshot_written_on_advance, sysio_emissions_tester ) try {
+   // sysio.epoch::advance writes a batch_snapshot row keyed by the new
+   // current_epoch_index. The fixture's bootstrap_epoch already advanced to
+   // epoch 1, so snapshot[1] should exist (with empty active_members since
+   // no initgroups has run). Each subsequent advance writes another row.
+   auto snap1 = get_batch_snapshot(1);
+   BOOST_REQUIRE( !snap1.is_null() );
+   BOOST_REQUIRE_EQUAL( snap1["epoch_index"].as<uint64_t>(), 1u );
+
+   produce_blocks(12);
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
+   produce_blocks(1);
+
+   auto snap2 = get_batch_snapshot(2);
+   BOOST_REQUIRE( !snap2.is_null() );
+   BOOST_REQUIRE_EQUAL( snap2["epoch_index"].as<uint64_t>(), 2u );
+
+   // Prior snapshot is still there; advance does not clobber.
+   auto snap1_again = get_batch_snapshot(1);
+   BOOST_REQUIRE( !snap1_again.is_null() );
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( processepoch_prunes_only_consumed_snapshot, sysio_emissions_tester ) try {
+   // After sysio.epoch advances multiple times, there is a snapshot row per
+   // advanced-to epoch. processepoch consumes exactly one epoch per call and
+   // prunes only that epoch's snapshot, leaving the rest intact for later
+   // catch-up invocations.
+   create_t5_holding_accounts();
+   const uint32_t start = head_secs() - ONE_EPOCH - 1;
+   BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
+
+   produce_blocks(12);
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
+   produce_blocks(12);
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
+
+   // Snapshots for epochs 1, 2, 3 should all exist.
+   BOOST_REQUIRE( !get_batch_snapshot(1).is_null() );
+   BOOST_REQUIRE( !get_batch_snapshot(2).is_null() );
+   BOOST_REQUIRE( !get_batch_snapshot(3).is_null() );
+
+   // First processepoch consumes epoch 1.
+   BOOST_REQUIRE_EQUAL( success(), processepoch( config::system_account_name ) );
+   BOOST_REQUIRE(  get_batch_snapshot(1).is_null() );
+   BOOST_REQUIRE( !get_batch_snapshot(2).is_null() );
+   BOOST_REQUIRE( !get_batch_snapshot(3).is_null() );
+
+   // Second consumes epoch 2.
+   BOOST_REQUIRE_EQUAL( success(), processepoch( config::system_account_name ) );
+   BOOST_REQUIRE(  get_batch_snapshot(1).is_null() );
+   BOOST_REQUIRE(  get_batch_snapshot(2).is_null() );
+   BOOST_REQUIRE( !get_batch_snapshot(3).is_null() );
+
+   // Third consumes epoch 3.
+   BOOST_REQUIRE_EQUAL( success(), processepoch( config::system_account_name ) );
+   BOOST_REQUIRE( get_batch_snapshot(1).is_null() );
+   BOOST_REQUIRE( get_batch_snapshot(2).is_null() );
+   BOOST_REQUIRE( get_batch_snapshot(3).is_null() );
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( batch_snapshot_captures_rotation_index, sysio_emissions_tester ) try {
+   // Successive advances rotate current_batch_op_group via
+   // current_epoch_index % batch_op_groups (= 3 by default). The snapshot
+   // written on each advance records THAT epoch's active_group_index, not
+   // whatever the live epoch_state rotates to afterwards.
+   produce_blocks(12);
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
+   produce_blocks(12);
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
+   produce_blocks(12);
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
+
+   // With 3 groups, rotation is 1 % 3 = 1, 2 % 3 = 2, 3 % 3 = 0, 4 % 3 = 1.
+   BOOST_REQUIRE_EQUAL( get_batch_snapshot(1)["active_group_index"].as<uint8_t>(), 1u );
+   BOOST_REQUIRE_EQUAL( get_batch_snapshot(2)["active_group_index"].as<uint8_t>(), 2u );
+   BOOST_REQUIRE_EQUAL( get_batch_snapshot(3)["active_group_index"].as<uint8_t>(), 0u );
+   BOOST_REQUIRE_EQUAL( get_batch_snapshot(4)["active_group_index"].as<uint8_t>(), 1u );
+
+   // Live state's current_batch_op_group reflects epoch 4 only (= 1).
+   BOOST_REQUIRE_EQUAL(
+      get_epoch_state_row()["current_batch_op_group"].as<uint8_t>(), 1u );
+
+   // Even though epochs 1 and 4 share rotation index 1, they are SEPARATE
+   // snapshot rows -- processepoch pays each epoch's captured members.
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( prunesnap_requires_sysio_system_auth, sysio_emissions_tester ) try {
+   // sysio.epoch::prunesnap must reject callers other than sysio (sysio.system).
+   // A batch operator who is currently in the rotation group must not be able
+   // to prune a historical snapshot out from under emissions.
+   create_user_accounts({ "alice"_n });
+   auto r = prunesnap("alice"_n, 1);
+   BOOST_REQUIRE( r != success() );
+   require_substr( r, "missing authority of sysio" );
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( prunesnap_rejects_unknown_epoch, sysio_emissions_tester ) try {
+   // prunesnap on a non-existent snapshot index must fail cleanly rather than
+   // silently no-op.
+   auto r = prunesnap(config::system_account_name, 9999);
+   BOOST_REQUIRE( r != success() );
+   require_substr( r, "batch snapshot not found for epoch" );
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( processepoch_fails_on_insufficient_treasury_balance, sysio_emissions_tester ) try {

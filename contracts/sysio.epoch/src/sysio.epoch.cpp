@@ -107,6 +107,23 @@ void epoch::advance() {
 
    state_tbl.set(state, get_self());
 
+   // Snapshot the active batch-op group for this epoch so sysio.system
+   // emissions can pay the historical roster on catch-up. The row is
+   // pruned by sysio.system::processepoch after payout.
+   {
+      std::vector<name> active_members;
+      if (state.current_batch_op_group < state.batch_op_groups.size()) {
+         active_members = state.batch_op_groups[state.current_batch_op_group];
+      }
+      batchsnaps_t snaps(get_self());
+      batchsnap_key snap_key{state.current_epoch_index};
+      snaps.emplace(get_self(), snap_key, batch_snapshot{
+         .epoch_index        = state.current_epoch_index,
+         .active_group_index = state.current_batch_op_group,
+         .active_members     = std::move(active_members),
+      });
+   }
+
    // Queue OPERATORS attestation (full roster with authex chain addresses) for each outpost.
    // IMPORTANT: Must come before BATCH_OPERATOR_GROUPS so that the ETH outpost's
    // _handleOperators populates operatorEthAddress before _handleBatchOperatorGroups
@@ -359,6 +376,18 @@ void epoch::unpause() {
    auto state = state_tbl.get();
    state.is_paused = false;
    state_tbl.set(state, get_self());
+}
+
+// ---------------------------------------------------------------------------
+//  prunesnap
+// ---------------------------------------------------------------------------
+void epoch::prunesnap(uint64_t epoch_index) {
+   require_auth(SYSTEM_ACCOUNT);
+
+   batchsnaps_t snaps(get_self());
+   batchsnap_key key{epoch_index};
+   check(snaps.contains(key), "batch snapshot not found for epoch");
+   snaps.erase(key);
 }
 
 } // namespace sysio

@@ -55,4 +55,24 @@ struct epoch_config {
 
 using epochcfg_t = sysio::kv::global<"epochcfg"_n, epoch_config>;
 
+// Mirror of sysio::epoch::batchsnap_key. Field order / types MUST track
+// the canonical definition in sysio.epoch.hpp.
+struct batchsnap_key {
+   uint64_t epoch_index;
+   SYSLIB_SERIALIZE(batchsnap_key, (epoch_index))
+};
+
+// Mirror of sysio::epoch::batch_snapshot. Field order / types MUST track
+// the canonical definition in sysio.epoch.hpp.
+struct batch_snapshot {
+   uint64_t                epoch_index        = 0;
+   uint8_t                 active_group_index = 0;
+   std::vector<sysio::name> active_members;
+
+   SYSLIB_SERIALIZE(batch_snapshot,
+      (epoch_index)(active_group_index)(active_members))
+};
+
+using batchsnaps_t = sysio::kv::table<"batchsnap"_n, batchsnap_key, batch_snapshot>;
+
 } // namespace sysio::epoch::readonly

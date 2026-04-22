@@ -14,6 +14,34 @@
             "fields": []
         },
         {
+            "name": "batch_snapshot",
+            "base": "",
+            "fields": [
+                {
+                    "name": "epoch_index",
+                    "type": "uint64"
+                },
+                {
+                    "name": "active_group_index",
+                    "type": "uint8"
+                },
+                {
+                    "name": "active_members",
+                    "type": "name[]"
+                }
+            ]
+        },
+        {
+            "name": "batchsnap_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "epoch_index",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "epoch_config",
             "base": "",
             "fields": [
@@ -128,6 +156,16 @@
             "fields": []
         },
         {
+            "name": "prunesnap",
+            "base": "",
+            "fields": [
+                {
+                    "name": "epoch_index",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "regoutpost",
             "base": "",
             "fields": [
@@ -190,6 +228,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "prunesnap",
+            "type": "prunesnap",
+            "ricardian_contract": ""
+        },
+        {
             "name": "regoutpost",
             "type": "regoutpost",
             "ricardian_contract": ""
@@ -206,6 +249,14 @@
         }
     ],
     "tables": [
+        {
+            "name": "batchsnap",
+            "type": "batch_snapshot",
+            "index_type": "i64",
+            "key_names": ["epoch_index"],
+            "key_types": ["uint64"],
+            "table_id": 36294
+        },
         {
             "name": "epochcfg",
             "type": "epoch_config",
