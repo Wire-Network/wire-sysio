@@ -523,35 +523,28 @@ namespace sysio {
         });
     };
 
-    void roa::finalizereg(const name& owner,const uint8_t& status) {
+    void roa::finalizereg(const name& owner, const uint8_t& status) {
+        require_auth(get_self());
+
+        check(status == 2 || status == 3, "Invalid status: Can only confirm (2) or reject (3)");
 
         roastate_t roastate(get_self());
         auto state = roastate.get();
         check(state.is_active, "ROA is not active yet");
 
-
         nodeownerreg_t nodereg(get_self(), state.network_gen);
         auto reg_key = nodeownerreg_key{owner.value};
 
-        check(nodereg.contains(reg_key),"No registration record found !");
+        check(nodereg.contains(reg_key), "No registration record found");
         auto existing = nodereg.get(reg_key);
 
-        check(existing.status == 1, "Registration is not in 1 ( PENDING ) state.");
+        check(existing.status == 1, "Registration is not in 1 (PENDING) state.");
 
-        check(status == 3 || status == 4, "Invalid status: Can only confirm (2) or reject (3)");
-
-        if(status == 2){
-
+        if (status == 2) {
             regnodeowner(owner, existing.tier);
-
-            nodereg.modify(get_self(), reg_key, [&](auto &row){
-                row.status = 2;
-            });
-
+            nodereg.modify(get_self(), reg_key, [&](auto &row){ row.status = 2; });
         } else {
-            nodereg.modify(get_self(), reg_key, [&](auto &row){
-                row.status = 3;
-            });
+            nodereg.modify(get_self(), reg_key, [&](auto &row){ row.status = 3; });
         }
     };
 

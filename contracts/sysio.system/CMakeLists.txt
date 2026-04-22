@@ -23,10 +23,17 @@ set(SYSIO_SYSTEM_INCLUDE_DIRS
    ${CMAKE_CURRENT_SOURCE_DIR}/../)
 
 # OPP integration dirs: emissions reads opreg/epoch state via the generated
-# protobuf types and the shared DataStream operator overloads.
+# protobuf types, the shared DataStream operator overloads, and the read-only
+# mirror headers owned by sysio.opreg and sysio.epoch.
+# (Navigation pattern matches sysio.opreg / sysio.epoch CMakeLists: the
+# contracts_project runs as a nested ExternalProject, so CMAKE_BINARY_DIR
+# there points at cmake-build-debug/contracts/, not the host build root.
+# Walk back to the host-level generated-cdt dir via CMAKE_CURRENT_BINARY_DIR.)
 set(SYSIO_SYSTEM_OPP_INCLUDE_DIRS
-   ${CMAKE_BINARY_DIR}/libraries/opp/generated-cdt
-   ${CMAKE_CURRENT_SOURCE_DIR}/../sysio.opp.common/include)
+   ${CMAKE_CURRENT_BINARY_DIR}/../../libraries/opp/generated-cdt
+   ${CMAKE_CURRENT_SOURCE_DIR}/../sysio.opp.common/include
+   ${CMAKE_CURRENT_SOURCE_DIR}/../sysio.opreg/include
+   ${CMAKE_CURRENT_SOURCE_DIR}/../sysio.epoch/include)
 
 if(BUILD_SYSTEM_CONTRACTS)
    add_contract(sysio.system sysio.system ${SYSIO_SYSTEM_SOURCES})

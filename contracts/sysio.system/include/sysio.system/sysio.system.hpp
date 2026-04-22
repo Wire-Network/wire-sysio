@@ -19,7 +19,6 @@
 #include <optional>
 #include <string>
 #include <type_traits>
-#include <unordered_set>
 
 namespace sysiosystem {
 
@@ -384,7 +383,7 @@ namespace sysiosystem {
 
          /**
           * Set the rank of an individual producer. Rank determines scheduling
-          * priority — lower rank values are scheduled first. Producers with
+          * priority -- lower rank values are scheduled first. Producers with
           * rank > 21 are considered standby.
           *
           * @param producer - registered producer account,
@@ -553,7 +552,7 @@ namespace sysiosystem {
          /**
           * Read-only: view claimable Node Owner distributions.
           */
-         [[sysio::action]]
+         [[sysio::action, sysio::read_only]]
          emissions::node_claim_result viewnodedist(const sysio::name& account_name);
 
          /**
@@ -565,7 +564,7 @@ namespace sysiosystem {
          /**
           * Process the next T5 epoch. Distributes treasury emissions
           * across categories when the epoch duration has elapsed.
-          * Permissionless — the caller cannot influence who receives
+          * Permissionless -- the caller cannot influence who receives
           * funds; recipients are determined entirely by on-chain state.
           */
          [[sysio::action]]
@@ -574,13 +573,13 @@ namespace sysiosystem {
          /**
           * Read-only: current T5 treasury emission state.
           */
-         [[sysio::action]]
+         [[sysio::action, sysio::read_only]]
          emissions::epoch_info_result viewepoch();
 
          /**
           * Read-only: all emission configuration values.
           */
-         [[sysio::action]]
+         [[sysio::action, sysio::read_only]]
          emissions::emission_config viewemitcfg();
 
          using init_action = sysio::action_wrapper<"init"_n, &system_contract::init>;

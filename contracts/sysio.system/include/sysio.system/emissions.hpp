@@ -138,12 +138,16 @@ using t5state_t = sysio::kv::global<"t5state"_n, t5_state>;
 // ---------------------------------------------------------------------------
 
 struct epochlog_key {
-   uint64_t epoch_num;
-   SYSLIB_SERIALIZE(epochlog_key, (epoch_num))
+   // Primary key mirrors sysio.epoch::current_epoch_index (same value as
+   // t5_state::last_epoch_index at write time). Aligns the audit log with
+   // sysio.epoch's own sense of "epoch N" for forensics.
+   uint64_t sysio_epoch_index;
+   SYSLIB_SERIALIZE(epochlog_key, (sysio_epoch_index))
 };
 
 struct [[sysio::table("epochlog"), sysio::contract("sysio.system")]] epoch_log {
-   uint64_t               epoch_num;
+   uint32_t               sysio_epoch_index = 0;  // mirrors t5_state.last_epoch_index / sysio.epoch::current_epoch_index
+   uint64_t               epoch_count       = 0;  // internal counter of processepoch invocations
    sysio::time_point_sec  timestamp;
    int64_t                total_emission    = 0;
    int64_t                compute_amount    = 0;
@@ -152,7 +156,7 @@ struct [[sysio::table("epochlog"), sysio::contract("sysio.system")]] epoch_log {
    int64_t                governance_amount = 0;
 
    SYSLIB_SERIALIZE(epoch_log,
-      (epoch_num)(timestamp)(total_emission)
+      (sysio_epoch_index)(epoch_count)(timestamp)(total_emission)
       (compute_amount)(capital_amount)(capex_amount)(governance_amount))
 };
 

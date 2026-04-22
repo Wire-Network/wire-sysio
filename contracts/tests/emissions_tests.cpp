@@ -508,11 +508,14 @@ public:
           abi_serializer::create_yield_function(abi_serializer_max_time));
    }
 
-   fc::variant get_epoch_log( uint64_t epoch_num ) {
+   // Reads the audit-log row keyed by sysio.epoch's current_epoch_index
+   // (t5_state::last_epoch_index at write time). Callers pass the sysio.epoch
+   // index they want to inspect.
+   fc::variant get_epoch_log( uint64_t sysio_epoch_index ) {
       auto data = get_row_by_account(config::system_account_name,
                                      config::system_account_name,
                                      "epochlog"_n,
-                                     account_name(epoch_num));
+                                     account_name(sysio_epoch_index));
       if (data.empty()) return fc::variant();
       return sysio_abi_ser.binary_to_variant("epoch_log", data,
           abi_serializer::create_yield_function(abi_serializer_max_time));
@@ -1718,6 +1721,33 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_rejects_bad_standby_rank, sysio_emissions_te
    require_substr( r, "standby_end_rank must be >= standby_start_rank" );
 } FC_LOG_AND_RETHROW()
 
+BOOST_FIXTURE_TEST_CASE( setemitcfg_rejects_standby_rank_over_cap, sysio_emissions_tester ) try {
+   // Upper cap on standby_end_rank bounds inline-action count in processepoch.
+   auto cfg = mvo()
+      ("t1_allocation", int64_t(1)) ("t2_allocation", int64_t(1)) ("t3_allocation", int64_t(1))
+      ("t1_duration", uint32_t(1))  ("t2_duration", uint32_t(1))  ("t3_duration", uint32_t(1))
+      ("min_claimable", int64_t(0))
+      ("t5_distributable", int64_t(1)) ("t5_floor", int64_t(0))
+      ("epoch_duration_secs", uint32_t(60))
+      ("decay_numerator", int64_t(9990)) ("decay_denominator", int64_t(10000))
+      ("epoch_initial_emission", int64_t(1)) ("epoch_max_emission", int64_t(1)) ("epoch_min_emission", int64_t(0))
+      ("compute_bps", uint16_t(4000)) ("capital_bps", uint16_t(3000)) ("capex_bps", uint16_t(2000)) ("governance_bps", uint16_t(1000))
+      ("producer_bps", uint16_t(7000)) ("batch_op_bps", uint16_t(3000))
+      ("standby_end_rank", uint32_t(101));
+
+   auto r = setemitcfg(config::system_account_name, cfg);
+   BOOST_REQUIRE( r != success() );
+   require_substr( r, "standby_end_rank exceeds safety cap" );
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( setinittime_rejects_epoch_zero, sysio_emissions_tester ) try {
+   // time_point_sec{} default-constructs to epoch 0; accepting it would brick
+   // claim paths permanently via compute_node_claim's start_secs > 0 guard.
+   auto r = setinittime( config::system_account_name, tpsec(0) );
+   BOOST_REQUIRE( r != success() );
+   require_substr( r, "node_rewards_start must be non-zero" );
+} FC_LOG_AND_RETHROW()
+
 BOOST_FIXTURE_TEST_CASE( setemitcfg_reconfigurable, sysio_emissions_tester ) try {
    // Change allocation mid-stream; new node owner gets new amount
    auto cfg = mvo()
@@ -1862,6 +1892,74 @@ BOOST_FIXTURE_TEST_CASE( initt5_writes_state_and_blocks_reinit, sysio_emissions_
    auto r = initt5( config::system_account_name, tpsec(start) );
    BOOST_REQUIRE( r != success() );
    require_substr( r, "t5 state already initialized" );
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( setemitcfg_post_initt5_rejects_brick_reduce, sysio_emissions_tester ) try {
+   // After t5_state exists and epochs have run, setemitcfg must reject a
+   // t5_distributable reduction that would make remaining (= distributable -
+   // floor - total_distributed) negative. Otherwise the treasury silently
+   // bricks with "treasury exhausted" on the next processepoch.
+   create_t5_holding_accounts();
+   const uint32_t start = head_secs() - ONE_EPOCH - 1;
+   BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
+   BOOST_REQUIRE_EQUAL( success(), processepoch( config::system_account_name ) );
+
+   auto cfg = mvo()
+      ("t1_allocation", T1_ALLOCATION.get_amount())
+      ("t2_allocation", T2_ALLOCATION.get_amount())
+      ("t3_allocation", T3_ALLOCATION.get_amount())
+      ("t1_duration", T1_DURATION) ("t2_duration", T2_DURATION) ("t3_duration", T3_DURATION)
+      ("min_claimable", MIN_CLAIMABLE_AMOUNT)
+      // Shrink distributable below already-distributed + floor.
+      ("t5_distributable", int64_t(1))
+      ("t5_floor", int64_t(0))
+      ("epoch_duration_secs", uint32_t(86400))
+      ("decay_numerator", DECAY_NUMERATOR) ("decay_denominator", DECAY_DENOMINATOR)
+      ("epoch_initial_emission", EPOCH_INITIAL_EMISSION)
+      ("epoch_max_emission", EPOCH_MAX_EMISSION) ("epoch_min_emission", EPOCH_MIN_EMISSION)
+      ("compute_bps", COMPUTE_BPS) ("capital_bps", CAPITAL_BPS)
+      ("capex_bps", CAPEX_BPS) ("governance_bps", uint16_t(1000))
+      ("producer_bps", PRODUCER_BPS) ("batch_op_bps", uint16_t(3000))
+      ("standby_end_rank", T_STANDBY_END_RANK);
+
+   auto r = setemitcfg(config::system_account_name, cfg);
+   BOOST_REQUIRE( r != success() );
+   require_substr( r, "t5_distributable must cover floor + already-distributed" );
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( setemitcfg_post_initt5_rejects_unreachable_min_emission, sysio_emissions_tester ) try {
+   // After t5_state exists, setemitcfg must also reject an epoch_min_emission
+   // that exceeds the remaining distributable budget -- otherwise the floor
+   // drains the treasury faster than the decay curve suggests.
+   create_t5_holding_accounts();
+   const uint32_t start = head_secs() - ONE_EPOCH - 1;
+   BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
+   BOOST_REQUIRE_EQUAL( success(), processepoch( config::system_account_name ) );
+
+   // remaining = T5_DISTRIBUTABLE - T5_FLOOR - first_epoch_distributed,
+   // which is roughly T5_DISTRIBUTABLE - T5_FLOOR. Set min/max both above
+   // that ceiling so the remaining-distributable check (not the min<=max
+   // check) is what fires.
+   auto cfg = mvo()
+      ("t1_allocation", T1_ALLOCATION.get_amount())
+      ("t2_allocation", T2_ALLOCATION.get_amount())
+      ("t3_allocation", T3_ALLOCATION.get_amount())
+      ("t1_duration", T1_DURATION) ("t2_duration", T2_DURATION) ("t3_duration", T3_DURATION)
+      ("min_claimable", MIN_CLAIMABLE_AMOUNT)
+      ("t5_distributable", T5_DISTRIBUTABLE) ("t5_floor", T5_FLOOR)
+      ("epoch_duration_secs", uint32_t(86400))
+      ("decay_numerator", DECAY_NUMERATOR) ("decay_denominator", DECAY_DENOMINATOR)
+      ("epoch_initial_emission", EPOCH_INITIAL_EMISSION)
+      ("epoch_max_emission", int64_t(999'000'000'000'000'000LL))
+      ("epoch_min_emission", int64_t(999'000'000'000'000'000LL))
+      ("compute_bps", COMPUTE_BPS) ("capital_bps", CAPITAL_BPS)
+      ("capex_bps", CAPEX_BPS) ("governance_bps", uint16_t(1000))
+      ("producer_bps", PRODUCER_BPS) ("batch_op_bps", uint16_t(3000))
+      ("standby_end_rank", T_STANDBY_END_RANK);
+
+   auto r = setemitcfg(config::system_account_name, cfg);
+   BOOST_REQUIRE( r != success() );
+   require_substr( r, "epoch_min_emission exceeds remaining distributable" );
 } FC_LOG_AND_RETHROW()
 
 // ---------------------------------------------------------------------------
@@ -2606,8 +2704,11 @@ BOOST_FIXTURE_TEST_CASE( epoch_log_records_all_fields, sysio_emissions_tester ) 
    auto log = get_epoch_log(1);
    BOOST_REQUIRE( !log.is_null() );
 
-   // epoch_num matches epoch_count
-   BOOST_REQUIRE_EQUAL( log["epoch_num"].as<uint64_t>(), 1u );
+   // sysio_epoch_index aligns with sysio.epoch's current_epoch_index at write time.
+   // epoch_count is sysio.system's internal invocation counter; after the first
+   // processepoch call both are 1.
+   BOOST_REQUIRE_EQUAL( log["sysio_epoch_index"].as<uint32_t>(), 1u );
+   BOOST_REQUIRE_EQUAL( log["epoch_count"].as<uint64_t>(), 1u );
 
    // timestamp is set (non-zero)
    BOOST_REQUIRE( log["timestamp"].as<time_point_sec>().sec_since_epoch() > 0 );
@@ -3174,20 +3275,15 @@ BOOST_FIXTURE_TEST_CASE( processepoch_fails_on_insufficient_treasury_balance, sy
    require_substr( r, "insufficient treasury WIRE balance" );
 } FC_LOG_AND_RETHROW()
 
-BOOST_FIXTURE_TEST_CASE( roa_forcereg_skips_addnodeowner_when_emitcfg_absent, sysio_emissions_tester ) try {
-   // sysio.roa::regnodeowner is guarded on sysiosystem::emissions::emitcfg_t::exists()
-   // so bootstrap flows that run forcereg before setemitcfg continue to work.
-   // Here we intentionally clear emitcfg (via direct db modify is not possible --
-   // instead, wipe the singleton by creating a fresh tester branch would be too
-   // heavy; we test the equivalent scenario by calling forcereg BEFORE setemitcfg
-   // on a fresh account, having deliberately NOT seeded emitcfg). Simpler:
-   // verify that with emitcfg PRESENT (fixture default), forcereg writes nodedist;
-   // then remove the nodedist row's precondition expectations. The complementary
-   // "emitcfg absent -> skip" path is exercised by the Python TestHarness
-   // bootstrap in Cluster.py when loadSystemContract=False.
+BOOST_FIXTURE_TEST_CASE( roa_forcereg_inlines_addnodeowner_happy_path, sysio_emissions_tester ) try {
+   // Happy path: with emitcfg present (fixture default), sysio.roa::forcereg
+   // fires an inline sysio.system::addnodeowner which writes a nodedist row.
    //
-   // This test therefore only validates the happy path: emitcfg set -> nodedist
-   // row created on sysio.system after sysio.roa::forcereg.
+   // The complementary "emitcfg absent -> skip" path is exercised by the
+   // Python TestHarness bootstrap in Cluster.py when loadSystemContract=False
+   // (not covered by this Boost suite; see sysio.roa_tests.cpp notes). The
+   // guard itself (`if (emitcfg.exists())` in sysio.roa::regnodeowner) is
+   // load-bearing for bootstrap flows without sysio.system deployed.
    create_user_accounts({ "forceregt1"_n });
 
    auto trace = forcereg_trace( ROA, "forceregt1"_n, 1 );
