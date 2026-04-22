@@ -607,10 +607,7 @@ void wire_eth_maintenance_plugin::plugin_shutdown() {
  */
 void wire_eth_maintenance_plugin::interrupt() {
    ilog("interrupt");
-   if (my) {
-      my->interruption.set_shutting_down();
-      my->interruption.stop_all();
-   }
+   app().executor().stop();
 }
 
 } // namespace sysio
