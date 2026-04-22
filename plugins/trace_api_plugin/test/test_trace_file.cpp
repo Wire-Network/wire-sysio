@@ -1255,4 +1255,218 @@ BOOST_AUTO_TEST_SUITE(slice_tests)
       BOOST_CHECK_EQUAL(*c, 1u);
    }
 
+   // Receiver bloom sidecar is built by run_maintenance_tasks at slice irreversibility, not during append.  Before
+   // LIB crosses the slice, the sidecar must be absent (queries fall back to scan); once LIB advances past the slice,
+   // a maintenance pass produces a valid sidecar whose probes hit every receiver actually present in the slice and
+   // miss for receivers that were never appended.  This exercises the full on-LIB build path including the data log
+   // stream-scan and the atomic sidecar write.
+   BOOST_FIXTURE_TEST_CASE(slice_dir_recv_bloom_build_on_lib, test_fixture)
+   {
+      fc::temp_directory tempdir;
+      const uint32_t width = 10;
+      // No compression, no deletion - keep the bloom build path focused.
+      test_store_provider sp(tempdir.path(), width);
+
+      // Build two block_trace_v0s in slice 0 (block numbers 1 and 2), each with one transaction whose actions touch
+      // a distinct, known set of receivers.
+      auto make_bt = [](uint32_t num, chain::checksum256_type id, std::vector<chain::name> receivers) {
+         block_trace_v0 bt;
+         bt.id = id;
+         bt.number = num;
+         transaction_trace_v0 trx;
+         trx.id = id;
+         trx.block_num = num;
+         uint64_t seq = uint64_t{num} * 100;
+         for (auto r : receivers) {
+            action_trace_v0 a{};
+            a.global_sequence = seq++;
+            a.receiver        = r;
+            a.account         = "sysio.token"_n;
+            a.action          = "transfer"_n;
+            trx.actions.push_back(std::move(a));
+         }
+         bt.transactions.push_back(std::move(trx));
+         return bt;
+      };
+
+      auto id1 = "b000000000000000000000000000000000000000000000000000000000000001"_h;
+      auto id2 = "b000000000000000000000000000000000000000000000000000000000000002"_h;
+      sp.append(make_bt(1, id1, { "alice"_n, "bob"_n }));
+      sp.append(make_bt(2, id2, { "charlie"_n }));
+
+      const auto bloom_path = sp._slice_directory.bloom_slice_path(0);
+
+      // Before LIB, no sidecar should exist - the append path must not have built anything on the fly.
+      BOOST_CHECK(!std::filesystem::exists(bloom_path));
+
+      // Advance LIB so slice 0 (blocks 0..9) is past LIB.  run_maintenance_tasks processes irreversible slices with
+      // min_irreversible=0, so a LIB inside slice 1 (block >= 10) makes slice 0 eligible.
+      sp._slice_directory.run_maintenance_tasks(/*lib=*/15, [](const std::string&){});
+
+      BOOST_REQUIRE(std::filesystem::exists(bloom_path));
+
+      bloom_reader r(bloom_path);
+      BOOST_REQUIRE(r.valid());
+      BOOST_CHECK(r.may_contain_receiver("alice"_n));
+      BOOST_CHECK(r.may_contain_receiver("bob"_n));
+      BOOST_CHECK(r.may_contain_receiver("charlie"_n));
+      BOOST_CHECK(r.may_contain_recv_action("alice"_n,   "transfer"_n));
+      BOOST_CHECK(r.may_contain_recv_action("charlie"_n, "transfer"_n));
+      // A receiver that was never appended should probe as absent (allowing for the 1% FPR on the small-capacity
+      // filter - try several unrelated names and tolerate at most one spurious hit).
+      std::size_t false_positives = 0;
+      for (auto n : { "never1"_n, "never2"_n, "never3"_n, "never4"_n, "never5"_n }) {
+         if (r.may_contain_receiver(n)) ++false_positives;
+      }
+      BOOST_CHECK_LE(false_positives, 1u);
+
+      // Re-running maintenance is idempotent: the bloom path still exists and the file wasn't clobbered.
+      sp._slice_directory.run_maintenance_tasks(/*lib=*/15, [](const std::string&){});
+      BOOST_REQUIRE(std::filesystem::exists(bloom_path));
+   }
+
+   // Fork behavior inside a single slice.  The extraction path re-applies forked blocks by calling append() again
+   // with a new block_trace_v0 at the same block number.  The data log ends up with BOTH the forked-out trace and
+   // the canonical trace: the blk_offset sidecar points only to the canonical offset, but the pre-fork record is
+   // still physically present in the file.  Because the bloom is built by streaming the entire data log (not by
+   // walking blk_offset), it naturally includes receivers from forked-out blocks too.  That is safe: a bloom may
+   // have false positives (a probe "hits" for a receiver that isn't in the canonical chain) but must never have
+   // false negatives (a probe "misses" for a receiver that IS in the canonical chain).  The test asserts both halves
+   // of the invariant - canonical receivers probe as present, AND a forked-out receiver also probes as present
+   // (harmless false positive), AND a never-appended receiver does not.
+   BOOST_FIXTURE_TEST_CASE(slice_dir_recv_bloom_fork_in_slice, test_fixture)
+   {
+      fc::temp_directory tempdir;
+      const uint32_t width = 10;
+      test_store_provider sp(tempdir.path(), width);
+
+      auto make_bt = [](uint32_t num, chain::checksum256_type id, chain::name receiver) {
+         block_trace_v0 bt;
+         bt.id = id;
+         bt.number = num;
+         transaction_trace_v0 trx;
+         trx.id = id;
+         trx.block_num = num;
+         action_trace_v0 a{};
+         a.global_sequence = uint64_t{num} * 100;
+         a.receiver        = receiver;
+         a.account         = "sysio.token"_n;
+         a.action          = "transfer"_n;
+         trx.actions.push_back(std::move(a));
+         bt.transactions.push_back(std::move(trx));
+         return bt;
+      };
+
+      // Initial chain: block 1 with alice, block 2 with bob.
+      sp.append(make_bt(1, "b000000000000000000000000000000000000000000000000000000000000001"_h, "alice"_n));
+      sp.append(make_bt(2, "b000000000000000000000000000000000000000000000000000000000000002"_h, "bob"_n));
+
+      // Fork: chain switches to a different branch.  Block 2 gets replayed with a different trace containing eve.
+      // Controller fires accepted_block again with the new block_trace; store_provider::append writes the new trace
+      // to the data log (appending, not overwriting in place) and updates the blk_offset sidecar to point at the new
+      // offset.  The stale "bob" record still occupies its original position in the trace file.
+      sp.append(make_bt(2, "b0000000000000000000000000000000000000000000000000000000000000b2"_h, "eve"_n));
+
+      // Advance LIB past slice 0 so maintenance builds the bloom.
+      sp._slice_directory.run_maintenance_tasks(/*lib=*/15, [](const std::string&){});
+      const auto bloom_path = sp._slice_directory.bloom_slice_path(0);
+      BOOST_REQUIRE(std::filesystem::exists(bloom_path));
+      bloom_reader r(bloom_path);
+      BOOST_REQUIRE(r.valid());
+
+      // Canonical receivers must probe as present - this is the correctness invariant.
+      BOOST_CHECK(r.may_contain_receiver("alice"_n));
+      BOOST_CHECK(r.may_contain_receiver("eve"_n));
+      // Forked-out receiver also probes as present because the stream-scan includes its stale record.  This is a
+      // benign false positive; the query scan will then visit that slice and find no canonical match for "bob".
+      BOOST_CHECK(r.may_contain_receiver("bob"_n));
+      // Sanity: a receiver that was never in any branch at any time should still miss (modulo FPR).
+      std::size_t false_positives = 0;
+      for (auto n : { "never1"_n, "never2"_n, "never3"_n, "never4"_n, "never5"_n }) {
+         if (r.may_contain_receiver(n)) ++false_positives;
+      }
+      BOOST_CHECK_LE(false_positives, 1u);
+   }
+
+   // Fork that crosses a slice boundary.  The scenario that motivated moving the bloom write to LIB (rather than
+   // doing it at slice roll-over during append): the tail of slice K is replayed after the head of slice K+1 is
+   // already in flight.  Under the earlier roll-over-based design the back-and-forth would have overwritten slice
+   // K's bloom with an incomplete one built only from the replayed blocks.  Under the LIB-based design the sidecar
+   // isn't written until the slice is fully irreversible, so forks can't reach back into an already-written sidecar.
+   BOOST_FIXTURE_TEST_CASE(slice_dir_recv_bloom_cross_slice_fork, test_fixture)
+   {
+      fc::temp_directory tempdir;
+      const uint32_t width = 10;
+      test_store_provider sp(tempdir.path(), width);
+
+      auto make_bt = [](uint32_t num, chain::checksum256_type id, chain::name receiver) {
+         block_trace_v0 bt;
+         bt.id = id;
+         bt.number = num;
+         transaction_trace_v0 trx;
+         trx.id = id;
+         trx.block_num = num;
+         action_trace_v0 a{};
+         a.global_sequence = uint64_t{num} * 100;
+         a.receiver        = receiver;
+         a.account         = "sysio.token"_n;
+         a.action          = "transfer"_n;
+         trx.actions.push_back(std::move(a));
+         bt.transactions.push_back(std::move(trx));
+         return bt;
+      };
+
+      // Normal forward progress through slice 0: blocks 1..9 each with a distinct receiver.  These will all end up
+      // in slice 0's bloom if LIB crosses cleanly.
+      for (uint32_t n = 1; n <= 9; ++n) {
+         chain::name r(0x4000'0000'0000'0000ull | n);  // synthesize distinct names
+         chain::checksum256_type id;
+         std::memcpy(id.data(), &n, sizeof(n));
+         sp.append(make_bt(n, id, r));
+      }
+      // Block 10 lands in slice 1.
+      sp.append(make_bt(10, "b00000000000000000000000000000000000000000000000000000000000000a"_h, "frank"_n));
+
+      // Simulate a fork that replays the last block of slice 0 with a different trace, then replays slice 1's first
+      // block.  This is exactly the cross-slice rollback pattern that broke the earlier design.
+      sp.append(make_bt(9,  "b0000000000000000000000000000000000000000000000000000000000000f9"_h, "grace"_n));
+      sp.append(make_bt(10, "b00000000000000000000000000000000000000000000000000000000000000b"_h, "harry"_n));
+
+      // Neither slice 0 nor slice 1 has been built yet: no LIB has crossed them.
+      BOOST_CHECK(!std::filesystem::exists(sp._slice_directory.bloom_slice_path(0)));
+      BOOST_CHECK(!std::filesystem::exists(sp._slice_directory.bloom_slice_path(1)));
+
+      // Advance LIB past slice 0 but still within slice 1.  Slice 0 should now be bloomed; slice 1 should still be
+      // absent (it's still in flight, potentially subject to further forks).
+      sp._slice_directory.run_maintenance_tasks(/*lib=*/12, [](const std::string&){});
+      BOOST_REQUIRE(std::filesystem::exists(sp._slice_directory.bloom_slice_path(0)));
+      BOOST_CHECK (!std::filesystem::exists(sp._slice_directory.bloom_slice_path(1)));
+
+      // Slice 0's bloom must contain every receiver that was ever recorded in it - canonical and forked-out alike.
+      // The key invariant: a query for "grace" (canonical tail of slice 0) MUST hit the bloom.  Under the pre-fix
+      // design this was the receiver that could get lost.
+      bloom_reader r0(sp._slice_directory.bloom_slice_path(0));
+      BOOST_REQUIRE(r0.valid());
+      for (uint32_t n = 1; n <= 8; ++n) {
+         chain::name expected(0x4000'0000'0000'0000ull | n);
+         BOOST_TEST_INFO("canonical slice-0 receiver " << expected.to_string());
+         BOOST_CHECK(r0.may_contain_receiver(expected));
+      }
+      BOOST_CHECK(r0.may_contain_receiver("grace"_n));  // canonical post-fork tail of slice 0
+      // Forked-out block 9 receiver (the 0x4000... name for n=9): also present because stream-scan includes it.
+      {
+         chain::name pre_fork_9(0x4000'0000'0000'0000ull | 9);
+         BOOST_CHECK(r0.may_contain_receiver(pre_fork_9));
+      }
+
+      // Advance LIB past slice 1 and rebuild.  Slice 1 must now be bloomed and must contain harry (canonical) - bob
+      // frank was the forked-out block 10, which the stream-scan still finds.
+      sp._slice_directory.run_maintenance_tasks(/*lib=*/25, [](const std::string&){});
+      BOOST_REQUIRE(std::filesystem::exists(sp._slice_directory.bloom_slice_path(1)));
+      bloom_reader r1(sp._slice_directory.bloom_slice_path(1));
+      BOOST_REQUIRE(r1.valid());
+      BOOST_CHECK(r1.may_contain_receiver("harry"_n));   // canonical slice-1
+      BOOST_CHECK(r1.may_contain_receiver("frank"_n));   // forked-out slice-1 (harmless false positive)
+   }
+
 BOOST_AUTO_TEST_SUITE_END()

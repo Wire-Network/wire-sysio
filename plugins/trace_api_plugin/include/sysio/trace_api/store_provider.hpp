@@ -269,6 +269,13 @@ namespace sysio::trace_api {
       void build_trx_id_index(uint32_t slice_number, const log_handler& log);
 
       /**
+       * Build the per-slice receiver bloom sidecar from the slice's trace data log.  Called on slices that are fully
+       * past LIB so the source data is final (no fork can reach back into an already-built sidecar).  No-op if the
+       * sidecar already exists or the slice has no uncompressed trace data.
+       */
+      void build_recv_bloom(uint32_t slice_number, const log_handler& log);
+
+      /**
        * Return {first, last} block numbers recorded across all index slice files, or nullopt
        * if no data exists.  Used at startup to detect gaps between existing trace data and the
        * current chain head.  Atomic in the sense that both values come from a single directory
@@ -347,6 +354,7 @@ namespace sysio::trace_api {
       const std::optional<uint32_t> _minimum_uncompressed_irreversible_history_blocks;
       std::optional<uint32_t> _last_compressed_slice;
       std::optional<uint32_t> _last_indexed_slice;
+      std::optional<uint32_t> _last_bloomed_slice;
       const size_t _compression_seek_point_stride;
 
       mutable std::mutex _maintenance_mtx;
@@ -531,16 +539,6 @@ namespace sysio::trace_api {
       // ABI sidecar: one global append-only log in the slice directory.
       // abi_log serialises its own writes and allows concurrent lookups.
       abi_log _abi_log;
-
-      // Per-slice bloom sidecar writer state.  Extraction is single-threaded (chain signal thread), so the builder
-      // and slice-number tracker are plain members - no locking needed.  The builder accumulates receivers and
-      // (receiver, action) pairs observed within the currently-open slice; append() detects a slice roll-over by
-      // comparing the incoming block's slice number against _current_bloom_slice, and on roll-over writes the
-      // completed slice's bloom to disk before resetting state for the new slice.  If the node crashes before a
-      // roll-over fires, the in-flight slice's bloom is lost; request_handler treats a missing sidecar as
-      // "scan the slice" (fail-safe), which keeps query results correct at the cost of that one slice being scanned.
-      std::optional<uint32_t> _current_bloom_slice;
-      bloom_builder           _current_bloom_builder;
    };
 
 }

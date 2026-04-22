@@ -62,21 +62,6 @@ namespace sysio::trace_api {
       fc::cfile index;
       const uint32_t slice_number = _slice_directory.slice_number(bt.number);
 
-      // Detect slice roll-over and flush the completed slice's bloom sidecar before we start accumulating into the
-      // new slice's builder.  A failure here is logged by the general except_handler path (finalize_and_write throws
-      // on I/O error); the sidecar is advisory so a missing one just means the query path falls back to scanning
-      // that slice.  We swallow the write error here to avoid tying slice roll-over durability to bloom durability.
-      if (_current_bloom_slice && *_current_bloom_slice != slice_number) {
-         try {
-            _current_bloom_builder.finalize_and_write(_slice_directory.bloom_slice_path(*_current_bloom_slice));
-         } catch (const std::exception& e) {
-            fc_wlog(_log, "trace_api: failed to write bloom sidecar for slice {}: {}", *_current_bloom_slice, e.what());
-         }
-         _current_bloom_builder = bloom_builder{};
-      }
-      _current_bloom_slice = slice_number;
-      _current_bloom_builder.add_block(bt);
-
       _slice_directory.find_or_create_slice_pair(slice_number, open_state::write, trace, index);
       // storing as static_variant to allow adding other data types to the trace file in the future
       const uint64_t offset = append_store(data_log_entry { bt }, trace);
@@ -596,6 +581,66 @@ namespace sysio::trace_api {
           " (" + std::to_string(writer.entry_count()) + " entries)");
    }
 
+   void slice_directory::build_recv_bloom(uint32_t slice_number, const log_handler& log) {
+      const auto bloom_path = bloom_slice_path(slice_number);
+      if (std::filesystem::exists(bloom_path))
+         return; // already built
+
+      // Locate the slice's trace data log (trace_<range>.log).  run_maintenance_tasks orders bloom building before
+      // compression so a freshly-irreversible slice still has its uncompressed .log.  If only a compressed .clog
+      // exists (e.g. upgrading a node that predates the bloom) or the file is missing, skip; the query path treats
+      // a missing sidecar as "scan this slice".  Don't decompress-then-scan - compressed slices are aged and rarely
+      // queried.  Look up the path without opening so we can check size before committing to an open.
+      fc::cfile trace;
+      const bool dont_open_file = false;
+      if (!find_trace_slice(slice_number, open_state::read, trace, dont_open_file)) {
+         log(std::string("trace_api: skipping receiver bloom for slice ") + std::to_string(slice_number) +
+             " (no uncompressed trace data; already compressed or never written)");
+         return;
+      }
+      // Empty trace file => no actions to bloom.  Production slices always have on-block traces so this only fires
+      // in tests that pre-create slice files; keeping it guards the maintenance path from writing a zero-entry
+      // sidecar that'd just clutter the directory.
+      const auto trace_path = trace.get_file_path();
+      std::error_code ec;
+      const uint64_t trace_size = std::filesystem::file_size(trace_path, ec);
+      if (ec || trace_size == 0) return;
+
+      log(std::string("Building receiver bloom for slice: ") + std::to_string(slice_number));
+
+      trace.open(fc::cfile::update_rw_mode);
+
+      bloom_builder builder;
+      bool processed_any_block = false;
+      try {
+         // Stream through the data log record-by-record.  Fork re-writes leave stale block_trace_v0 records in the
+         // file (the blk_offset sidecar only points to the canonical one), so the bloom will contain a superset of
+         // the canonical receivers.  That's fine: bloom allows false positives; a receiver present only in a forked-
+         // out copy just probes as present and the query scan finds no canonical match for it.
+         while (trace.tellp() < trace_size) {
+            data_log_entry entry;
+            auto ds = trace.create_datastream();
+            fc::raw::unpack(ds, entry);
+            std::visit([&builder](const auto& bt) { builder.add_block(bt); }, entry);
+            processed_any_block = true;
+         }
+      } FC_LOG_AND_DROP();
+
+      if (!processed_any_block) {
+         // No parseable records (corrupted or malformed data log).  Don't write a default-sized sidecar - let the
+         // query path fall back to scanning this slice, which is the correct behavior for unreadable input.
+         return;
+      }
+
+      try {
+         builder.finalize_and_write(bloom_path);
+      } FC_LOG_AND_DROP();
+
+      log(std::string("Built receiver bloom for slice: ") + std::to_string(slice_number) +
+          " (" + std::to_string(builder.receiver_count()) + " receivers, " +
+          std::to_string(builder.recv_action_count()) + " (receiver, action) pairs)");
+   }
+
    void slice_directory::set_lib(uint32_t lib) {
       {
          std::scoped_lock lock(_maintenance_mtx);
@@ -756,6 +801,15 @@ namespace sysio::trace_api {
       process_irreversible_slice_range(lib, 0, _last_indexed_slice, [this, &log](uint32_t slice_to_index){
          try {
             build_trx_id_index(slice_to_index, log);
+         } FC_LOG_AND_DROP();
+      });
+
+      // Build receiver bloom sidecars on the same schedule as trx_id indexes - any slice fully past LIB has its data
+      // final, so forks can't corrupt the sidecar after it's written.  Ordering before compression keeps the source
+      // .log available for the stream-scan.
+      process_irreversible_slice_range(lib, 0, _last_bloomed_slice, [this, &log](uint32_t slice_to_bloom){
+         try {
+            build_recv_bloom(slice_to_bloom, log);
          } FC_LOG_AND_DROP();
       });
 
