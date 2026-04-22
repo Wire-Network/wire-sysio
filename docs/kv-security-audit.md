@@ -241,49 +241,34 @@ and integrity-checked. The issue was that `table_id_object` rows served as
 foreign keys for `key_value_object` rows, and snapshot traversal needed to
 respect this relationship to avoid orphaned or misattributed data.
 
-**KV assessment: PARTIALLY APPLICABLE.** Our `kv_object` has no foreign key
-dependency (it's keyed by `(code, key)` directly). However, `kv_index_object`
-rows reference their parent `kv_object` via the same `(code, table, primary_key)`
-tuple. **If a `kv_object` is erased without cleaning up its `kv_index_object`
-entries, orphaned secondary index rows will remain.**
+**KV assessment: DESIGN-RESOLVED.** Our `kv_object` has no foreign key
+dependency (it's keyed by `(code, key)` directly). `kv_index_object` rows
+reference their parent `kv_object` by chainbase id (`primary_id`, an 8-byte
+`id_type`). Since `kv_erase` removes only the primary row, cleanup of
+associated secondary rows is the caller's responsibility — the CDT wrappers
+(`kv_multi_index`, `kv_table`) call `kv_erase` first to obtain `primary_id`,
+then `kv_idx_remove` for each secondary index with that id.
 
-**THIS IS A REAL ISSUE IN OUR CODE.** Looking at `kv_erase()`:
-```cpp
-int64_t apply_context::kv_erase(const char* key, uint32_t key_size) {
-   ...
-   db.remove(*itr);  // Removes kv_object only
-   return delta;      // Does NOT remove associated kv_index_object entries!
-}
-```
-The `kv_erase` intrinsic removes the primary `kv_object` row but does **not**
-clean up any associated `kv_index_object` rows. This is a data consistency bug.
+An intrinsic-level cascade was considered and rejected: the host has no
+schema knowledge of which secondary indexes a contract has defined on a
+given primary table, so it cannot enumerate the rows to remove. Instead the
+API leans on three properties to bound misuse:
 
-**The CDT-side `wire::kv::table` is expected to call `kv_erase` first, capture
-the returned `primary_id`, and then call `kv_idx_remove` for each secondary
-index using that id.** (Secondary rows reference the primary by chainbase id,
-not by pri_key bytes, so the id must be obtained before it can be threaded
-through.) However, a malicious contract could call `kv_erase` directly via
-the raw intrinsic without cleaning up secondary indices, leaving orphaned
-index entries that:
-- Waste RAM (billed to the payer of the secondary index rows)
-- Could cause stale secondary index lookups to return primary keys that no
-  longer exist
-- Could cause snapshot inconsistency if integrity checks expect referential
-  consistency
+1. **Host-side reference validation on sec-row creation.** `kv_idx_store`
+   asserts that the supplied `primary_id` exists and is owned by the
+   receiver. A contract cannot create a dangling sec row, nor can it point
+   its sec rows at another contract's primary (blocks a class of cross-
+   contract storage forgery).
+2. **Composite-key lookups on sec-row mutation.** `kv_idx_remove` and
+   `kv_idx_update` look up by the full `(code, table_id, sec_key,
+   primary_id)` tuple and assert the tuple exists. A stale or wrong
+   `primary_id` aborts the action instead of silently mutating an unrelated
+   row.
+3. **Loud failure at read time** if a contract does leak an orphan sec row
+   by skipping `kv_idx_remove`. See **ISSUE-1** for the full consequences.
 
-**Recommendation: HIGH PRIORITY.**
-1. **Option A (Enforce at intrinsic level):** Have `kv_erase` automatically
-   remove all `kv_index_object` rows matching the erased key's primary key.
-   This requires knowing the table/index structure, which the raw intrinsic
-   does not have.
-2. **Option B (Best-effort cleanup):** If `key_format == 1` (standard encoding
-   with table:scope:pk embedded), extract the table and pk from the key and
-   remove matching secondary index entries.
-3. **Option C (Document and test):** Accept that the CDT library is responsible
-   for cleanup, document this clearly, and add integrity-check logic that can
-   detect orphaned secondary index rows.
-4. **Option D (Hybrid):** Add a `kv_erase_with_indices(key, table)` intrinsic
-   that does the cleanup atomically.
+See `kv-intrinsics-reference.md` in wire-cdt for the documented call order
+that contracts using raw intrinsics must follow.
 
 ---
 
@@ -362,13 +347,51 @@ was once missing; our KV API prevents the bug by design.
 ### ISSUE-1: kv_erase Does Not Clean Up Secondary Index Entries — BY DESIGN
 
 The `kv_erase` intrinsic removes only the `kv_object` row. Any `kv_index_object`
-rows referencing the same primary key must be removed separately via `kv_idx_remove`.
+rows referencing it by `primary_id` must be removed separately via
+`kv_idx_remove`.
 
-**Status: Not a bug.** The host provides primitives; the CDT library orchestrates
-cleanup by calling `kv_erase` first (to obtain `primary_id`) and then
-`kv_idx_remove` for each secondary index with that id. A contract calling raw
-`kv_erase` without following up with `kv_idx_remove` would leave orphaned
-secondaries, but that is a contract bug, not a host bug.
+**Status: By design.** The host provides primitives; the CDT library
+(`kv_multi_index`, `kv_table`) orchestrates cleanup by calling `kv_erase`
+first to obtain `primary_id`, then `kv_idx_remove` for each secondary index
+with that id. An intrinsic-level cascade was rejected because the host has no
+schema-level knowledge of which secondary indexes a contract has defined on a
+given primary table.
+
+**Host-side guards.** The move to `primary_id`-keyed secondaries promoted
+several misuse classes from "silent orphan" to "assert-and-revert":
+
+| Misuse | Host response |
+|--------|---------------|
+| `kv_idx_store` with a `primary_id` that does not exist | Aborts (`kv_key_not_found`) |
+| `kv_idx_store` with a `primary_id` owned by another contract | Aborts (`table_operation_not_permitted`) — blocks cross-contract pointer forgery |
+| `kv_idx_remove` / `kv_idx_update` with a stale or wrong `primary_id` | Aborts (`kv_key_not_found`) — composite-key lookup misses |
+| `kv_set` / `kv_erase` / `kv_idx_*` in a read-only transaction | Aborts (`table_operation_not_permitted`) |
+
+**Residual failure mode.** A contract that calls `kv_erase` and skips the
+follow-up `kv_idx_remove` calls leaves orphan `kv_index_object` rows. The host
+does not detect this at erase time. Consequences:
+
+- **RAM billing:** orphan sec-row RAM remains charged to its payer; erase
+  does not refund it.
+- **In-contract sec-iterator reads:** `kv_it_value` and `kv_idx_primary_key`
+  on an iterator pointing at the orphan set `slot.status = iterator_erased`
+  and return that sentinel. Reads do not abort — the contract must check.
+- **RPC `get_table_rows`:** aborts on the missing primary
+  (`chain_plugin::get_table_rows` uses `db.find<kv_object>(sec->primary_id)`
+  and `SYS_ASSERT`s the reference resolves). Secondary-index queries against
+  an affected table fail loudly rather than silently skipping rows.
+- **SHiP:** materializes `pri_key` from the primary at serialize time and
+  aborts on the missing row; deltas for the affected table cannot be emitted.
+- **Snapshot save/load:** the snapshot itself stays consistent (rows reload
+  at their original ids via `emplace_with_id`), but the orphan reloads as an
+  orphan and trips the above read-side checks on first use.
+
+**Recoverability.** The orphan is recoverable in principle — `kv_idx_remove`
+accepts the `(sec_key, primary_id)` tuple and will succeed if both are
+correct. In practice, the host does not export a sec iterator's cached
+`primary_id`, so recovery requires the contract to have tracked primary_ids
+out of band, or a patched contract build that exposes the id via a custom
+read path.
 
 **File:** `libraries/chain/apply_context.cpp` (kv_erase function)
 
@@ -418,21 +441,19 @@ implicit rate limiting.
 
 ---
 
-### ISSUE-4: Billable Size Accounting for kv_erase (MEDIUM)
+### ISSUE-4: Billable Size Accounting for kv_erase — BY DESIGN (see ISSUE-1)
 
-In `kv_erase`:
-```cpp
-int64_t delta = -static_cast<int64_t>(itr->key_size + itr->value.size()
-                + config::billable_size_v<kv_object>);
-```
+`kv_erase` refunds only the primary `kv_object`'s billable size (key + value +
+row overhead). Any associated `kv_index_object` rows are independent chainbase
+objects and remain RAM-billed until explicitly removed via `kv_idx_remove`.
+This is a direct consequence of the non-cascading design documented in
+ISSUE-1, not a separate accounting bug.
 
-This credits back the primary key row's billable size. But if there were
-associated `kv_index_object` rows (secondary indices), their billable size is
-NOT credited back because `kv_erase` does not remove them (ISSUE-1). This means
-the payer of the secondary index rows continues to be billed for storage that
-is effectively orphaned.
-
-**Impact:** Economic — users pay for orphaned secondary index storage.
+**Impact:** Economic — a contract that calls `kv_erase` without following up
+with `kv_idx_remove` for each secondary index continues to be billed for the
+orphan sec rows at the sec row's original payer. The CDT wrappers enforce the
+cleanup order in practice; contracts that hand-call the raw intrinsics must
+follow the order documented in wire-cdt's `kv-intrinsics-reference.md`.
 
 **File:** Same as ISSUE-1.
 
@@ -456,8 +477,8 @@ not systematically use CVEs for their security disclosures.
 
 | Priority | Issue | Status |
 |----------|-------|--------|
-| ~~HIGH~~ | ~~ISSUE-1: Orphaned secondary indices~~ | **By design** — CDT handles cleanup |
-| ~~HIGH~~ | ~~ISSUE-5: Billable size from orphaned indices~~ | **By design** — same as above |
+| ~~HIGH~~ | ~~ISSUE-1: Orphaned secondary indices~~ | **By design** — CDT handles cleanup; raw-intrinsic contracts must follow the documented call order |
+| ~~MEDIUM~~ | ~~ISSUE-4: Billable size from orphaned indices~~ | **By design** — corollary of ISSUE-1 |
 | **DONE** | Empty key rejection | Fixed: `key_size > 0` asserted in kv_set/kv_erase |
 | **DONE** | key_format validation | Fixed: `key_format <= 1` asserted in kv_set |
 | **DONE** | Section 1.5: kv_it_lower_bound edge cases | Tests: testitlbound, tstlbound |
