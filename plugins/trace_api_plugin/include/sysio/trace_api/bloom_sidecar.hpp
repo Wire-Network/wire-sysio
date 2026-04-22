@@ -3,13 +3,13 @@
 #include <boost/bloom.hpp>
 #include <boost/crc.hpp>
 #include <boost/unordered/unordered_flat_set.hpp>
+#include <fc/io/cfile.hpp>
 #include <sysio/chain/name.hpp>
 #include <sysio/trace_api/trace.hpp>
 
 #include <cstdint>
 #include <cstring>
 #include <filesystem>
-#include <fstream>
 #include <optional>
 
 namespace sysio::trace_api {
@@ -19,7 +19,7 @@ namespace sysio::trace_api {
 ///   - receivers:    boost::bloom::filter<uint64_t, K> over action_trace_v0::receiver
 ///   - recv_action:  boost::bloom::filter<uint64_t, K> over pack_recv_action(receiver, action)
 /// A negative bloom probe is authoritative (skip the slice).  A positive probe falls through to the normal scan.
-/// Missing or corrupt sidecar => reader is invalid => caller falls back to full scan.
+/// Missing or corrupt sidecar -> reader is invalid -> caller falls back to full scan.
 namespace bloom {
 
 /// File format constants.  Stored little-endian on disk so a hex dump of the first 4 bytes reads "WIRB"; matches the
@@ -29,6 +29,10 @@ inline constexpr uint32_t file_version   = 1;
 inline constexpr uint32_t k_hashes       = 7;           ///< Fixed at compile time; reader rejects mismatched files.
 inline constexpr double   target_fpr     = 0.01;        ///< 1% false-positive rate.  Irrelevant for negatives.
 inline constexpr uint32_t min_capacity   = 32;          ///< Floor on filter sizing to avoid degenerate tiny filters.
+/// Defensive upper bound on per-filter bit count in a loaded sidecar - a corrupted or maliciously-crafted file with
+/// an absurd capacity value would otherwise trigger a huge std::vector allocation.  128 MiB per filter is ~500x the
+/// size of a realistic busy-mainnet slice bloom, so no legitimate file hits it.
+inline constexpr uint64_t max_capacity_bits = 128ull * 1024 * 1024 * 8;
 
 /// Raw on-disk header.  Body layout: recv bits (recv_capacity_bits/8 bytes) then recv_action bits, trailing uint32
 /// CRC32 over [header | body].  Fields are ordered so natural alignment produces no padding and the layout is
@@ -36,7 +40,7 @@ inline constexpr uint32_t min_capacity   = 32;          ///< Floor on filter siz
 struct header {
    uint32_t magic                     = magic_value;
    uint32_t version                   = file_version;
-   uint32_t k_hashes                  = bloom::k_hashes;  // qualified to disambiguate from the field name
+   uint32_t k_hash_count              = k_hashes;
    uint32_t n_recv                    = 0;      ///< Distinct receivers inserted (pre-rounding).
    uint32_t n_recv_action             = 0;      ///< Distinct (receiver, action) pairs inserted.
    uint32_t reserved                  = 0;
@@ -111,13 +115,14 @@ public:
 
       const auto tmp = std::filesystem::path(path).concat(".tmp");
       {
-         std::ofstream out(tmp, std::ios::binary | std::ios::trunc);
-         if (!out) throw std::runtime_error("bloom: cannot open " + tmp.string());
+         // fc::cfile throws std::ios_base::failure on open/write error; the store_provider append path swallows that
+         // (bloom is advisory) and bare file-system errors surface at the rename.  Scope the cfile so it closes (and
+         // flushes) before we rename, keeping the temp-then-rename atomicity guarantee intact.
+         fc::cfile out(tmp, fc::cfile::truncate_rw_mode);
          out.write(reinterpret_cast<const char*>(&hdr),             sizeof(hdr));
          out.write(reinterpret_cast<const char*>(recv_bits.data()), recv_bits.size());
          out.write(reinterpret_cast<const char*>(ra_bits.data()),   ra_bits.size());
          out.write(reinterpret_cast<const char*>(&crc_v),           sizeof(crc_v));
-         if (!out) throw std::runtime_error("bloom: write failed for " + tmp.string());
       }
       std::filesystem::rename(tmp, path);
    }
@@ -142,65 +147,76 @@ public:
    bool valid() const noexcept { return _valid; }
 
    /// Invariant: on invalid reader, returns true so the caller treats the slice as "may contain, scan".
-   bool may_contain_receiver(chain::name r) const {
+   bool may_contain_receiver(chain::name r) const noexcept {
       if (!_valid) return true;
       return _recv.may_contain(r.to_uint64_t());
    }
 
-   bool may_contain_recv_action(chain::name r, chain::name a) const {
+   bool may_contain_recv_action(chain::name r, chain::name a) const noexcept {
       if (!_valid) return true;
       return _recv_action.may_contain(bloom::pack_recv_action(r, a));
    }
 
 private:
    void load(const std::filesystem::path& path) {
-      std::error_code ec;
-      const auto file_size = std::filesystem::file_size(path, ec);
-      if (ec || file_size < sizeof(bloom::header) + sizeof(uint32_t)) return;
+      // Any failure here leaves _valid == false, which fails safe: the probe methods return true and the caller
+      // scans the slice.  fc::cfile throws std::ios_base::failure on open/read errors; we catch broadly to keep
+      // that guarantee without propagating to the query path.
+      try {
+         std::error_code ec;
+         const auto file_size = std::filesystem::file_size(path, ec);
+         if (ec || file_size < sizeof(bloom::header) + sizeof(uint32_t)) return;
 
-      std::ifstream in(path, std::ios::binary);
-      if (!in) return;
+         fc::cfile in(path, fc::cfile::update_rw_mode);
 
-      bloom::header hdr;
-      in.read(reinterpret_cast<char*>(&hdr), sizeof(hdr));
-      if (!in) return;
-      if (hdr.magic    != bloom::magic_value) return;
-      if (hdr.version  != bloom::file_version) return;
-      if (hdr.k_hashes != bloom::k_hashes) return;
-      if (hdr.recv_capacity_bits % CHAR_BIT != 0) return;
-      if (hdr.recv_action_capacity_bits % CHAR_BIT != 0) return;
+         bloom::header hdr;
+         in.read(reinterpret_cast<char*>(&hdr), sizeof(hdr));
+         if (hdr.magic                      != bloom::magic_value)   return;
+         if (hdr.version                    != bloom::file_version)  return;
+         if (hdr.k_hash_count               != bloom::k_hashes)      return;
+         if (hdr.recv_capacity_bits        %  CHAR_BIT != 0)         return;
+         if (hdr.recv_action_capacity_bits %  CHAR_BIT != 0)         return;
+         // Defensive cap: a corrupted or crafted header with an absurd capacity would otherwise trigger a huge
+         // allocation below.  Real bloom sizes are <1 MB even for busy-mainnet slices; 128 MB per filter is a wide
+         // safety margin.
+         if (hdr.recv_capacity_bits        > bloom::max_capacity_bits) return;
+         if (hdr.recv_action_capacity_bits > bloom::max_capacity_bits) return;
 
-      const std::size_t recv_bytes    = hdr.recv_capacity_bits / CHAR_BIT;
-      const std::size_t ra_bytes      = hdr.recv_action_capacity_bits / CHAR_BIT;
-      const std::size_t expected_size = sizeof(bloom::header) + recv_bytes + ra_bytes + sizeof(uint32_t);
-      if (file_size != expected_size) return;
+         const std::size_t recv_bytes    = hdr.recv_capacity_bits / CHAR_BIT;
+         const std::size_t ra_bytes      = hdr.recv_action_capacity_bits / CHAR_BIT;
+         const std::size_t expected_size = sizeof(bloom::header) + recv_bytes + ra_bytes + sizeof(uint32_t);
+         if (file_size != expected_size) return;
 
-      std::vector<unsigned char> recv_buf(recv_bytes);
-      std::vector<unsigned char> ra_buf(ra_bytes);
-      in.read(reinterpret_cast<char*>(recv_buf.data()), recv_bytes);
-      in.read(reinterpret_cast<char*>(ra_buf.data()),   ra_bytes);
-      uint32_t file_crc = 0;
-      in.read(reinterpret_cast<char*>(&file_crc), sizeof(file_crc));
-      if (!in) return;
+         std::vector<unsigned char> recv_buf(recv_bytes);
+         std::vector<unsigned char> ra_buf(ra_bytes);
+         in.read(reinterpret_cast<char*>(recv_buf.data()), recv_bytes);
+         in.read(reinterpret_cast<char*>(ra_buf.data()),   ra_bytes);
+         uint32_t file_crc = 0;
+         in.read(reinterpret_cast<char*>(&file_crc), sizeof(file_crc));
 
-      boost::crc_32_type crc;
-      crc.process_bytes(&hdr,             sizeof(hdr));
-      crc.process_bytes(recv_buf.data(),  recv_buf.size());
-      crc.process_bytes(ra_buf.data(),    ra_buf.size());
-      if (crc.checksum() != file_crc) return;
+         boost::crc_32_type crc;
+         crc.process_bytes(&hdr,             sizeof(hdr));
+         crc.process_bytes(recv_buf.data(),  recv_buf.size());
+         crc.process_bytes(ra_buf.data(),    ra_buf.size());
+         if (crc.checksum() != file_crc) return;
 
-      bloom::filter_t recv_f{hdr.recv_capacity_bits};
-      bloom::filter_t ra_f{hdr.recv_action_capacity_bits};
-      // filter::array() returns a boost::span over the filter's backing byte array.  capacity() already matched the
-      // header's capacity on construction, so the span sizes match our buffers and the bitwise copy is well defined.
-      if (recv_f.array().size() != recv_buf.size())  return;
-      if (ra_f.array().size()   != ra_buf.size())    return;
-      std::memcpy(recv_f.array().data(), recv_buf.data(), recv_buf.size());
-      std::memcpy(ra_f.array().data(),   ra_buf.data(),   ra_buf.size());
+         // boost::bloom guarantees filter{f.capacity()}.capacity() == f.capacity() (see boost/bloom/detail/core.hpp
+         // :480), so reconstruction with the saved capacity produces an array of the saved byte size.  The
+         // size-equality check below is a belt-and-suspenders guard against a future boost::bloom change.
+         bloom::filter_t recv_f{hdr.recv_capacity_bits};
+         bloom::filter_t ra_f{hdr.recv_action_capacity_bits};
+         if (recv_f.array().size() != recv_buf.size())  return;
+         if (ra_f.array().size()   != ra_buf.size())    return;
+         std::memcpy(recv_f.array().data(), recv_buf.data(), recv_buf.size());
+         std::memcpy(ra_f.array().data(),   ra_buf.data(),   ra_buf.size());
 
-      _recv        = std::move(recv_f);
-      _recv_action = std::move(ra_f);
-      _valid       = true;
+         _recv        = std::move(recv_f);
+         _recv_action = std::move(ra_f);
+         _valid       = true;
+      } catch (const std::exception&) {
+         // File-system or read error: leave _valid == false so may_contain_* returns true -> scan fallback.
+         _valid = false;
+      }
    }
 
    bool            _valid = false;

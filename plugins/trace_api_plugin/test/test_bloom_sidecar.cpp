@@ -222,4 +222,45 @@ BOOST_AUTO_TEST_CASE(version_mismatch_rejected) {
    BOOST_CHECK(!r.valid());
 }
 
+/// Regression pin against boost::bloom capacity round-trip.  boost::bloom's detail/core.hpp:480 documents the
+/// invariant filter{f.capacity()}.capacity() == f.capacity(), which we rely on to reconstruct the filter from the
+/// saved bit count.  If a future boost upgrade quietly breaks this, bloom_reader::load would start rejecting every
+/// sidecar on the array-size guard and every query would silently scan instead of skip.  This test freezes the
+/// invariant by inserting a known set, writing, reading back, and probing every inserted item for a hit.
+BOOST_AUTO_TEST_CASE(filter_capacity_roundtrip_invariant) {
+   fc::temp_directory tempdir;
+   const auto path = tempdir.path() / "bloom_capacity.log";
+
+   // Range of item counts spanning the min_capacity floor (32) up into busy-slice territory (1000), so a rounding
+   // regression that only shows up at certain sizes has a chance to trigger.
+   for (std::size_t n : { std::size_t{1}, std::size_t{10}, std::size_t{50}, std::size_t{500}, std::size_t{1000} }) {
+      BOOST_TEST_INFO("n=" << n);
+
+      bloom_builder b;
+      for (std::size_t i = 0; i < n; ++i) {
+         // Synthesize distinct names; name stores as uint64 so any distinct 64-bit values work.
+         chain::name receiver(0x1000'0000'0000'0000ull | static_cast<uint64_t>(i));
+         chain::name action  (0x2000'0000'0000'0000ull | static_cast<uint64_t>(i));
+         action_trace_v0 a{};
+         a.receiver = receiver;
+         a.account  = receiver;
+         a.action   = action;
+         b.add_action(a);
+      }
+      b.finalize_and_write(path);
+
+      bloom_reader r(path);
+      BOOST_REQUIRE(r.valid());
+
+      for (std::size_t i = 0; i < n; ++i) {
+         chain::name receiver(0x1000'0000'0000'0000ull | static_cast<uint64_t>(i));
+         chain::name action  (0x2000'0000'0000'0000ull | static_cast<uint64_t>(i));
+         BOOST_REQUIRE_MESSAGE(r.may_contain_receiver(receiver),
+                               "receiver " << receiver.to_string() << " should probe as present");
+         BOOST_REQUIRE_MESSAGE(r.may_contain_recv_action(receiver, action),
+                               "(receiver, action) should probe as present");
+      }
+   }
+}
+
 BOOST_AUTO_TEST_SUITE_END()

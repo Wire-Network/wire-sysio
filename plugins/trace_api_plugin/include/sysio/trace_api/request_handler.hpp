@@ -189,12 +189,12 @@ namespace sysio::trace_api {
 
          // Hoist filter state out of the hot loop: avoids re-loading the optional's discriminator and value on every
          // action comparison in the inner scan.
-         const bool        has_receiver = query.receiver.has_value();
-         const bool        has_account  = query.account.has_value();
-         const bool        has_action   = query.action.has_value();
-         const chain::name receiver_v   = has_receiver ? *query.receiver : chain::name{};
-         const chain::name account_v    = has_account  ? *query.account  : chain::name{};
-         const chain::name action_v     = has_action   ? *query.action   : chain::name{};
+         const bool        has_receiver  = query.receiver.has_value();
+         const bool        has_account   = query.account.has_value();
+         const bool        has_action    = query.action.has_value();
+         const chain::name receiver_name = has_receiver ? *query.receiver : chain::name{};
+         const chain::name account_name  = has_account  ? *query.account  : chain::name{};
+         const chain::name action_name   = has_action   ? *query.action   : chain::name{};
 
          // Reused across all transactions in all blocks: clear() keeps the vector's capacity so repeated scans of
          // trxs with similar action counts avoid per-trx allocations.
@@ -207,7 +207,10 @@ namespace sysio::trace_api {
          // sidecar is missing or CRC-corrupt the bloom_reader is invalid and may_contain_* returns true, which
          // preserves the existing scan behaviour.
          const uint32_t stride = logfile_provider.slice_stride();
-         const bool skip_eligible = has_receiver || (has_account && has_action);
+         // Both bloom probes below are gated on has_receiver (the receiver bloom is the only one we can hit with a
+         // single-filter probe, and the (receiver, action) composite still needs the receiver term).  A query with
+         // only account and/or action set can't benefit from the bloom, so don't even open the sidecar.
+         const bool skip_eligible = has_receiver;
          std::optional<uint32_t> current_slice;
          bool skip_current_slice = false;
 
@@ -220,10 +223,10 @@ namespace sysio::trace_api {
                   skip_current_slice = false;
                   bloom_reader r = logfile_provider.get_bloom(slice);
                   if (r.valid()) {
-                     if (has_receiver && !r.may_contain_receiver(receiver_v)) {
+                     if (!r.may_contain_receiver(receiver_name)) {
                         skip_current_slice = true;
-                     } else if (has_receiver && has_action
-                                && !r.may_contain_recv_action(receiver_v, action_v)) {
+                     } else if (has_action
+                                && !r.may_contain_recv_action(receiver_name, action_name)) {
                         skip_current_slice = true;
                      }
                   }
@@ -253,9 +256,9 @@ namespace sysio::trace_api {
                   // common case when scanning for a specific receiver/account/action across a wide block range.
                   matches.clear();
                   for (const auto& a : trx.actions) {
-                     if (has_receiver && a.receiver != receiver_v) continue;
-                     if (has_account  && a.account  != account_v)  continue;
-                     if (has_action   && a.action   != action_v)   continue;
+                     if (has_receiver && a.receiver != receiver_name) continue;
+                     if (has_account  && a.account  != account_name)  continue;
+                     if (has_action   && a.action   != action_name)   continue;
                      matches.push_back(&a);
                   }
                   if (matches.empty()) continue;
