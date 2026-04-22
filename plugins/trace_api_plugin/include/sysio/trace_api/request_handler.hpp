@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <limits>
 #include <optional>
 #include <fc/variant.hpp>
@@ -185,6 +186,19 @@ namespace sysio::trace_api {
       actions_result get_actions_impl(const action_query& query, variant_shape shape) {
          actions_result result;
 
+         // Hoist filter state out of the hot loop: avoids re-loading the optional's discriminator and value on every
+         // action comparison in the inner scan.
+         const bool        has_receiver = query.receiver.has_value();
+         const bool        has_account  = query.account.has_value();
+         const bool        has_action   = query.action.has_value();
+         const chain::name receiver_v   = has_receiver ? *query.receiver : chain::name{};
+         const chain::name account_v    = has_account  ? *query.account  : chain::name{};
+         const chain::name action_v     = has_action   ? *query.action   : chain::name{};
+
+         // Reused across all transactions in all blocks: clear() keeps the vector's capacity so repeated scans of
+         // trxs with similar action counts avoid per-trx allocations.
+         std::vector<const action_trace_v0*> matches;
+
          const uint32_t end = query.block_num_end;
          for (uint32_t block_num = query.block_num_start; block_num <= end; ++block_num) {
             auto data = logfile_provider.get_block(block_num);
@@ -192,39 +206,42 @@ namespace sysio::trace_api {
 
             std::visit([&](const auto& bt) {
                for (const auto& trx : bt.transactions) {
-                  // trx.actions is stored in schedule order (how the chain's apply_context
-                  // scheduled action slots), which is NOT global_sequence order when an
-                  // action queues both inline actions and require_recipient notifications:
-                  // notifications run before inlines, so the inline's global_sequence is
-                  // higher than later-scheduled notifications'.  Sort pointers by
-                  // global_sequence so clients always see execution order (matches
-                  // chain_plugin's push_transaction and the legacy get_block response).
-                  // global_sequence is unique per action (chain invariant), so sort
-                  // stability is not required.
-                  std::vector<const action_trace_v0*> sorted;
-                  sorted.reserve(trx.actions.size());
-                  for (const auto& a : trx.actions)
-                     sorted.push_back(&a);
-                  std::sort(sorted.begin(), sorted.end(), [](const auto* l, const auto* r){
-                     return l->global_sequence < r->global_sequence;
-                  });
+                  // Filter first, sort after.  trx.actions is stored in schedule order (how apply_context scheduled
+                  // action slots), which is NOT global_sequence order when a parent action queues both inline actions
+                  // and require_recipient notifications: notifications run before inlines, so the inline's
+                  // global_sequence is higher than later-scheduled notifications'.  Sort the matches by
+                  // global_sequence so clients see execution order, matching chain_plugin's push_transaction response.
+                  // global_sequence is unique per action, so sort stability is not required.  Sorting only after
+                  // filtering avoids the cost for transactions whose actions are all rejected by the filter - the
+                  // common case when scanning for a specific receiver/account/action across a wide block range.
+                  matches.clear();
+                  for (const auto& a : trx.actions) {
+                     if (has_receiver && a.receiver != receiver_v) continue;
+                     if (has_account  && a.account  != account_v)  continue;
+                     if (has_action   && a.action   != action_v)   continue;
+                     matches.push_back(&a);
+                  }
+                  if (matches.empty()) continue;
+                  std::ranges::sort(matches, {}, &action_trace_v0::global_sequence);
 
-                  for (const action_trace_v0* ap : sorted) {
+                  // Hoist per-trx variant fields so a multi-match trx doesn't repeat the checksum->hex conversion or
+                  // re-read the same block-level members for each emitted action.
+                  const std::string trx_id_str = trx.id.str();
+                  const uint32_t    trx_block  = trx.block_num;
+                  const auto&       trx_time   = trx.block_time;
+                  const auto&       trx_pbid   = trx.producer_block_id;
+
+                  for (const action_trace_v0* ap : matches) {
                      const auto& a = *ap;
-                     if (query.receiver && a.receiver != *query.receiver) continue;
-                     if (query.account  && a.account  != *query.account)  continue;
-                     if (query.action   && a.action   != *query.action)   continue;
-
-                     // Decode via the provider; build the variant via the shared
-                     // helper so get_actions / get_token_transfers / get_block all
-                     // agree on field shapes.
+                     // Decode via the provider; build the variant via the shared helper so get_actions /
+                     // get_token_transfers / get_block all agree on field shapes.
                      auto dec = data_handler_provider.decode(a);
                      decoded_action da{std::move(dec.params), std::move(dec.return_data), std::move(dec.error_message)};
                      fc::mutable_variant_object av = build_action_variant(a, da, shape);
-                     av("trx_id",            trx.id.str())
-                       ("block_num",         trx.block_num)
-                       ("block_time",        trx.block_time)
-                       ("producer_block_id", trx.producer_block_id);
+                     av("trx_id",            trx_id_str)
+                       ("block_num",         trx_block)
+                       ("block_time",        trx_time)
+                       ("producer_block_id", trx_pbid);
                      result.actions.emplace_back(std::move(av));
                   }
                }
