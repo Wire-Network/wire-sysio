@@ -1,0 +1,523 @@
+{
+    "____comment": "This file was generated with sysio-abigen. DO NOT EDIT ",
+    "version": "sysio::abi/1.2",
+    "types": [],
+    "structs": [
+        {
+            "name": "alias",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "badh",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "bigkey",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "bigpfx",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "bigsec",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "bigval",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "contcns",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "crshdst",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "crshk",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "crshlb",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "crshp",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "crshprv",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "crshs",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "crsidst",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "crsik",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "crsipk",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "crsiprv",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "csrcstp",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "csrcttk",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "danglng",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "dbldest",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "endstat",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "erasmis",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "findmis",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "idxrmmis",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "idxrmneg",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "idxupdbig",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "idxupdneg",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "idxupmis",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "inlchild",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "inlparnt",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "itinvl",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "itlimit",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "itprvbgn",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "itvalsec",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "lbempty",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "lbpast",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "maxok",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "offsa",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "payzero",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "prixtab",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "prmera",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "secilim",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "secmis",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "secneg",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tidmax",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "uaf",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "zkeyerz",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "zkeyset",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "zseckey",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "zval",
+            "base": "",
+            "fields": []
+        }
+    ],
+    "actions": [
+        {
+            "name": "alias",
+            "type": "alias",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "badh",
+            "type": "badh",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "bigkey",
+            "type": "bigkey",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "bigpfx",
+            "type": "bigpfx",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "bigsec",
+            "type": "bigsec",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "bigval",
+            "type": "bigval",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "contcns",
+            "type": "contcns",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "crshdst",
+            "type": "crshdst",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "crshk",
+            "type": "crshk",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "crshlb",
+            "type": "crshlb",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "crshp",
+            "type": "crshp",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "crshprv",
+            "type": "crshprv",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "crshs",
+            "type": "crshs",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "crsidst",
+            "type": "crsidst",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "crsik",
+            "type": "crsik",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "crsipk",
+            "type": "crsipk",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "crsiprv",
+            "type": "crsiprv",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "csrcstp",
+            "type": "csrcstp",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "csrcttk",
+            "type": "csrcttk",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "danglng",
+            "type": "danglng",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "dbldest",
+            "type": "dbldest",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "endstat",
+            "type": "endstat",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "erasmis",
+            "type": "erasmis",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "findmis",
+            "type": "findmis",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "idxrmmis",
+            "type": "idxrmmis",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "idxrmneg",
+            "type": "idxrmneg",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "idxupdbig",
+            "type": "idxupdbig",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "idxupdneg",
+            "type": "idxupdneg",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "idxupmis",
+            "type": "idxupmis",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "inlchild",
+            "type": "inlchild",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "inlparnt",
+            "type": "inlparnt",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "itinvl",
+            "type": "itinvl",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "itlimit",
+            "type": "itlimit",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "itprvbgn",
+            "type": "itprvbgn",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "itvalsec",
+            "type": "itvalsec",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "lbempty",
+            "type": "lbempty",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "lbpast",
+            "type": "lbpast",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "maxok",
+            "type": "maxok",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "offsa",
+            "type": "offsa",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "payzero",
+            "type": "payzero",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "prixtab",
+            "type": "prixtab",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "prmera",
+            "type": "prmera",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "secilim",
+            "type": "secilim",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "secmis",
+            "type": "secmis",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "secneg",
+            "type": "secneg",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tidmax",
+            "type": "tidmax",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "uaf",
+            "type": "uaf",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "zkeyerz",
+            "type": "zkeyerz",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "zkeyset",
+            "type": "zkeyset",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "zseckey",
+            "type": "zseckey",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "zval",
+            "type": "zval",
+            "ricardian_contract": ""
+        }
+    ],
+    "tables": [],
+    "ricardian_clauses": [],
+    "variants": [],
+    "action_results": []
+}
