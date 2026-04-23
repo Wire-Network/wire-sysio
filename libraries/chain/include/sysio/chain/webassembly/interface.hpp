@@ -27,7 +27,7 @@ namespace webassembly {
           * @retval -1 if the index is not valid.
           * @retval size of the cfd if the buffer is empty, otherwise return the amount of data copied onto the buffer.
          */
-         int32_t get_context_free_data(uint32_t index, legacy_span<char> buffer) const;
+         int32_t get_context_free_data(uint32_t index, span<char> buffer) const;
 
          /**
           * Check if a feature is found on the activation set.
@@ -156,7 +156,7 @@ namespace webassembly {
           * @return pre-savanna:  -1 if proposing a new producer schedule was unsuccessful, otherwise returns the version of the new proposed schedule.
           *         post-savanna: -1 if proposing a new producer schedule was unsuccessful, otherwise returns max uint32_t
          */
-         int64_t set_proposed_producers(legacy_span<const char> packed_producer_schedule);
+         int64_t set_proposed_producers(span<const char> packed_producer_schedule);
 
          /**
           * Proposes a schedule change with extended features.
@@ -173,7 +173,7 @@ namespace webassembly {
           * @return pre-savanna:  -1 if proposing a new producer schedule was unsuccessful, otherwise returns the version of the new proposed schedule.
           *         post-savanna: -1 if proposing a new producer schedule was unsuccessful, otherwise returns max uint32_t
          */
-         int64_t set_proposed_producers_ex(uint64_t packed_producer_format, legacy_span<const char> packed_producer_schedule);
+         int64_t set_proposed_producers_ex(uint64_t packed_producer_format, span<const char> packed_producer_schedule);
 
          /**
           * Submits a finalizer set change.
@@ -208,7 +208,7 @@ namespace webassembly {
           *
           * return the number of bytes copied to the buffer, or number of bytes required if the buffer is empty.
          */
-         uint32_t get_blockchain_parameters_packed(legacy_span<char> packed_blockchain_parameters) const;
+         uint32_t get_blockchain_parameters_packed(span<char> packed_blockchain_parameters) const;
 
          /**
           * Set the blockchain parameters.
@@ -217,7 +217,7 @@ namespace webassembly {
           *
           * @param packed_blockchain_parameters - a span containing the packed blockchain config parameters.
          */
-         void set_blockchain_parameters_packed(legacy_span<const char> packed_blockchain_parameters);
+         void set_blockchain_parameters_packed(span<const char> packed_blockchain_parameters);
 
          /**
           * Retrieve the blockchain config parameters.
@@ -353,7 +353,7 @@ namespace webassembly {
           * @param sig - signature.
           * @param pub - public key.
          */
-         void assert_recover_key(legacy_ptr<const fc::sha256> digest, legacy_span<const char> sig, legacy_span<const char> pub) const;
+         void assert_recover_key(legacy_ptr<const fc::sha256> digest, span<const char> sig, span<const char> pub) const;
 
          /**
           * Calculates the public key used for a given signature on a given digest.
@@ -365,7 +365,7 @@ namespace webassembly {
           *
           * @return size of data written on the buffer.
          */
-         int32_t recover_key(legacy_ptr<const fc::sha256> digest, legacy_span<const char> sig, legacy_span<char> pub) const;
+         int32_t recover_key(legacy_ptr<const fc::sha256> digest, span<const char> sig, span<char> pub) const;
 
          /**
           * Tests if the sha256 hash generated from data matches the provided digest.
@@ -374,7 +374,7 @@ namespace webassembly {
           * @param data - a span containing the data you want to hash.
           * @param hash_val - digest to compare to.
          */
-         void assert_sha256(legacy_span<const char> data, legacy_ptr<const fc::sha256> hash_val) const;
+         void assert_sha256(span<const char> data, legacy_ptr<const fc::sha256> hash_val) const;
 
          /**
           * Tests if the sha1 hash generated from data matches the provided digest.
@@ -383,7 +383,7 @@ namespace webassembly {
           * @param data - a span containing the data you want to hash.
           * @param hash_val - digest to compare to.
          */
-         void assert_sha1(legacy_span<const char> data, legacy_ptr<const fc::sha1> hash_val) const;
+         void assert_sha1(span<const char> data, legacy_ptr<const fc::sha1> hash_val) const;
 
          /**
           * Tests if the sha512 hash generated from data matches the provided digest.
@@ -392,7 +392,7 @@ namespace webassembly {
           * @param data - a span containing the data you want to hash.
           * @param hash_val - digest to compare to.
          */
-         void assert_sha512(legacy_span<const char> data, legacy_ptr<const fc::sha512> hash_val) const;
+         void assert_sha512(span<const char> data, legacy_ptr<const fc::sha512> hash_val) const;
 
          /**
           * Tests if the ripemd160 hash generated from data matches the provided digest.
@@ -401,7 +401,7 @@ namespace webassembly {
           * @param data - a span containing the data you want to hash.
           * @param hash_val - digest to compare to.
          */
-         void assert_ripemd160(legacy_span<const char> data, legacy_ptr<const fc::ripemd160> hash_val) const;
+         void assert_ripemd160(span<const char> data, legacy_ptr<const fc::ripemd160> hash_val) const;
 
          /**
           * Hashes data using SHA256.
@@ -410,7 +410,7 @@ namespace webassembly {
           * @param data - a span containing the data.
           * @param[out] hash_val - the resulting digest.
          */
-         void sha256(legacy_span<const char> data, legacy_ptr<fc::sha256> hash_val) const;
+         void sha256(span<const char> data, legacy_ptr<fc::sha256> hash_val) const;
 
          /**
           * Hashes data using SHA1.
@@ -419,7 +419,7 @@ namespace webassembly {
           * @param data - a span containing the data.
           * @param[out] hash_val - the resulting digest.
          */
-         void sha1(legacy_span<const char> data, legacy_ptr<fc::sha1> hash_val) const;
+         void sha1(span<const char> data, legacy_ptr<fc::sha1> hash_val) const;
 
          /**
           * Hashes data using SHA512.
@@ -428,7 +428,7 @@ namespace webassembly {
           * @param data - a span containing the data.
           * @param[out] hash_val - the hash
          */
-         void sha512(legacy_span<const char> data, legacy_ptr<fc::sha512> hash_val) const;
+         void sha512(span<const char> data, legacy_ptr<fc::sha512> hash_val) const;
 
          /**
           * Hashes data using RIPEMD160.
@@ -437,7 +437,7 @@ namespace webassembly {
           * @param data - a span containing the data.
           * @param[out] hash_val - computed digest.
          */
-         void ripemd160(legacy_span<const char> data, legacy_ptr<fc::ripemd160> hash_val) const;
+         void ripemd160(span<const char> data, legacy_ptr<fc::ripemd160> hash_val) const;
 
          /**
           * Checks if a transaction is authorized by a provided set of keys and permissions.
@@ -450,7 +450,7 @@ namespace webassembly {
           * @retval true if transaction is authorized.
           * @retval false otherwise.
          */
-         bool check_transaction_authorization(legacy_span<const char> trx_data, legacy_span<const char> pubkeys_data, legacy_span<const char> perms_data) const;
+         bool check_transaction_authorization(span<const char> trx_data, span<const char> pubkeys_data, span<const char> perms_data) const;
 
          /**
           * Checks if a permission is authorized by a provided delay and a provided set of keys and permissions.
@@ -465,7 +465,7 @@ namespace webassembly {
           * @retval true if permission is authorized.
           * @retval false otherwise.
          */
-         bool check_permission_authorization(account_name account, permission_name permission, legacy_span<const char> pubkeys_data, legacy_span<const char> perms_data, uint64_t delay_us) const;
+         bool check_permission_authorization(account_name account, permission_name permission, span<const char> pubkeys_data, span<const char> perms_data, uint64_t delay_us) const;
 
          /**
           * Look up the permission of an account with the smallest name >= the given permission name.
@@ -630,7 +630,7 @@ namespace webassembly {
           * @param condition - test condition.
           * @param msg - string explaining the reason for failure.
           */
-         void sysio_assert_message(bool condition, legacy_span<const char> msg) const;
+         void sysio_assert_message(bool condition, span<const char> msg) const;
 
          /**
           * Aborts processing of this action if the test condition is false.
@@ -659,7 +659,7 @@ namespace webassembly {
           *
           * @return the number of bytes copied to msg, or number of bytes that can be copied if an empty span is passed.
          */
-         int32_t read_action_data(legacy_span<char> memory) const;
+         int32_t read_action_data(span<char> memory) const;
 
          /**
           * Get the length of the current action's data field. This method is useful for dynamically sized actions.
@@ -699,7 +699,7 @@ namespace webassembly {
           * @ingroup console
           * @param str - the string to print.
           */
-         void prints_l(legacy_span<const char> str);
+         void prints_l(span<const char> str);
 
          /**
           * Prints value as a 64 bit signed integer.
@@ -771,7 +771,7 @@ namespace webassembly {
           * @ingroup console
           * @param data - Hex name to be printed.
           */
-         void printhex(legacy_span<const char> data);
+         void printhex(span<const char> data);
 
          // ---- KV Database API — Primary Operations ----
 
@@ -791,7 +791,7 @@ namespace webassembly {
           * @param value - the value bytes
           * @return RAM byte delta (positive on growth, negative on shrink, 0 on same-size update)
           */
-         int64_t  kv_set(uint32_t table_id, uint64_t payer, legacy_span<const char> key, legacy_span<const char> value);
+         int64_t  kv_set(uint32_t table_id, uint64_t payer, span<const char> key, span<const char> value);
 
          /**
           * Read a value by key from any contract's KV table.
@@ -806,7 +806,7 @@ namespace webassembly {
           * @param value - destination buffer for the value
           * @return actual value size in bytes, or -1 if the key does not exist
           */
-         int32_t  kv_get(uint32_t table_id, uint64_t code, legacy_span<const char> key, legacy_span<char> value);
+         int32_t  kv_get(uint32_t table_id, uint64_t code, span<const char> key, span<char> value);
 
          /**
           * Erase a key-value pair from the executing contract's KV table.
@@ -818,7 +818,7 @@ namespace webassembly {
           * @param key - the key bytes to erase
           * @return negative RAM byte delta (refund amount), or 0 if key not found
           */
-         int64_t  kv_erase(uint32_t table_id, legacy_span<const char> key);
+         int64_t  kv_erase(uint32_t table_id, span<const char> key);
 
          /**
           * Test whether a key exists in a contract's KV table without reading the value.
@@ -828,7 +828,7 @@ namespace webassembly {
           * @param key - the key bytes to look up
           * @return 1 if the key exists, 0 otherwise
           */
-         int32_t  kv_contains(uint32_t table_id, uint64_t code, legacy_span<const char> key);
+         int32_t  kv_contains(uint32_t table_id, uint64_t code, span<const char> key);
 
          // ---- KV Database API — Primary Iterators ----
          //
@@ -851,7 +851,7 @@ namespace webassembly {
           * @return iterator handle (0–15)
           * @throws kv_iterator_exception if the iterator pool is exhausted
           */
-         uint32_t kv_it_create(uint32_t table_id, uint64_t code, legacy_span<const char> prefix);
+         uint32_t kv_it_create(uint32_t table_id, uint64_t code, span<const char> prefix);
 
          /**
           * Release an iterator handle back to the pool.
@@ -893,7 +893,7 @@ namespace webassembly {
           * @return 0 if positioned on an exact match, 1 if positioned on a greater key
           *         or at end
           */
-         int32_t  kv_it_lower_bound(uint32_t handle, legacy_span<const char> key);
+         int32_t  kv_it_lower_bound(uint32_t handle, span<const char> key);
 
          /**
           * Read the key at the iterator's current position.
@@ -904,7 +904,7 @@ namespace webassembly {
           * @param actual_size - [out] receives the full key size
           * @return 0 on success
           */
-         int32_t  kv_it_key(uint32_t handle, uint32_t offset, legacy_span<char> dest, legacy_ptr<uint32_t> actual_size);
+         int32_t  kv_it_key(uint32_t handle, uint32_t offset, span<char> dest, legacy_ptr<uint32_t> actual_size);
 
          /**
           * Read the value at the iterator's current position.
@@ -915,7 +915,7 @@ namespace webassembly {
           * @param actual_size - [out] receives the full value size
           * @return 0 on success
           */
-         int32_t  kv_it_value(uint32_t handle, uint32_t offset, legacy_span<char> dest, legacy_ptr<uint32_t> actual_size);
+         int32_t  kv_it_value(uint32_t handle, uint32_t offset, span<char> dest, legacy_ptr<uint32_t> actual_size);
 
          // ---- KV Database API — Secondary Index Operations ----
          //
@@ -931,7 +931,7 @@ namespace webassembly {
           * @param pri_key - primary key bytes this entry points to
           * @param sec_key - secondary key bytes (order-preserving encoded)
           */
-         void     kv_idx_store(uint64_t payer, uint32_t table_id, legacy_span<const char> pri_key, legacy_span<const char> sec_key);
+         void     kv_idx_store(uint64_t payer, uint32_t table_id, span<const char> pri_key, span<const char> sec_key);
 
          /**
           * Remove a secondary index entry.
@@ -940,7 +940,7 @@ namespace webassembly {
           * @param pri_key - primary key associated with the entry
           * @param sec_key - secondary key to remove
           */
-         void     kv_idx_remove(uint32_t table_id, legacy_span<const char> pri_key, legacy_span<const char> sec_key);
+         void     kv_idx_remove(uint32_t table_id, span<const char> pri_key, span<const char> sec_key);
 
          /**
           * Update a secondary index entry's key (remove old, insert new).
@@ -951,8 +951,8 @@ namespace webassembly {
           * @param old_sec_key - current secondary key to replace
           * @param new_sec_key - new secondary key value
           */
-         void     kv_idx_update(uint64_t payer, uint32_t table_id, legacy_span<const char> pri_key,
-                                legacy_span<const char> old_sec_key, legacy_span<const char> new_sec_key);
+         void     kv_idx_update(uint64_t payer, uint32_t table_id, span<const char> pri_key,
+                                span<const char> old_sec_key, span<const char> new_sec_key);
 
          /**
           * Find an exact secondary key match and return an iterator handle.
@@ -962,7 +962,7 @@ namespace webassembly {
           * @param sec_key - secondary key to find
           * @return iterator handle (>= 0) positioned on the match, or -1 if not found
           */
-         int32_t kv_idx_find_secondary(uint64_t code, uint32_t table_id, legacy_span<const char> sec_key);
+         int32_t kv_idx_find_secondary(uint64_t code, uint32_t table_id, span<const char> sec_key);
 
          /**
           * Find the first secondary key >= the given key and return an iterator handle.
@@ -974,7 +974,7 @@ namespace webassembly {
           *   entries but table non-empty, enables kv_idx_prev). Returns -1 only when
           *   the table has no entries for this (code, table_id).
           */
-         int32_t kv_idx_lower_bound(uint64_t code, uint32_t table_id, legacy_span<const char> sec_key);
+         int32_t kv_idx_lower_bound(uint64_t code, uint32_t table_id, span<const char> sec_key);
 
          /**
           * Advance a secondary index iterator to the next entry.
@@ -1001,7 +1001,7 @@ namespace webassembly {
           * @param actual_size - [out] receives the full secondary key size
           * @return 0 on success
           */
-         int32_t  kv_idx_key(uint32_t handle, uint32_t offset, legacy_span<char> dest, legacy_ptr<uint32_t> actual_size);
+         int32_t  kv_idx_key(uint32_t handle, uint32_t offset, span<char> dest, legacy_ptr<uint32_t> actual_size);
 
          /**
           * Read the primary key associated with a secondary iterator's current entry.
@@ -1012,7 +1012,7 @@ namespace webassembly {
           * @param actual_size - [out] receives the full primary key size
           * @return 0 on success
           */
-         int32_t  kv_idx_primary_key(uint32_t handle, uint32_t offset, legacy_span<char> dest, legacy_ptr<uint32_t> actual_size);
+         int32_t  kv_idx_primary_key(uint32_t handle, uint32_t offset, span<char> dest, legacy_ptr<uint32_t> actual_size);
 
          /**
           * Release a secondary index iterator handle back to the pool.
@@ -1035,7 +1035,7 @@ namespace webassembly {
           * @ingroup transaction
           * @param data - the inline action to be sent.
          */
-         void send_inline(legacy_span<const char> data);
+         void send_inline(span<const char> data);
 
          /**
           * Send a context free inline action in the context of the parent transaction of this operation.
@@ -1043,7 +1043,7 @@ namespace webassembly {
           * @ingroup transaction
           * @param data - the packed free inline action to be sent.
          */
-         void send_context_free_inline(legacy_span<const char> data);
+         void send_context_free_inline(span<const char> data);
 
          /**
           * Access a copy of the currently executing transaction.
@@ -1054,7 +1054,7 @@ namespace webassembly {
           * @retval false if transaction was not found.
           * @retval true if transaction was canceled.
          */
-         int32_t read_transaction(legacy_span<char> data) const;
+         int32_t read_transaction(span<char> data) const;
 
          /**
           * Gets the size of the currently executing transaction.
@@ -1103,7 +1103,7 @@ namespace webassembly {
           *
           * @return the number of bytes written on the buffer or -1 if there was an error.
          */
-         int32_t get_action(uint32_t type, uint32_t index, legacy_span<char> buffer) const;
+         int32_t get_action(uint32_t type, uint32_t index, span<char> buffer) const;
 
          /**
           * Host function for addition on the elliptic curve alt_bn128

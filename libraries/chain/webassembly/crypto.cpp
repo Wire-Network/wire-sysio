@@ -33,8 +33,8 @@ namespace {
 namespace sysio::chain::webassembly {
 
    void interface::assert_recover_key( legacy_ptr<const fc::sha256> digest,
-                                       legacy_span<const char> sig,
-                                       legacy_span<const char> pub ) const {
+                                       span<const char> sig,
+                                       span<const char> pub ) const {
       fc::crypto::signature s;
       fc::crypto::public_key p;
       fc::datastream<const char*> ds( sig.data(), sig.size() );
@@ -87,8 +87,8 @@ namespace sysio::chain::webassembly {
    }
 
    int32_t interface::recover_key( legacy_ptr<const fc::sha256> digest,
-                                   legacy_span<const char> sig,
-                                   legacy_span<char> pub ) const {
+                                   span<const char> sig,
+                                   span<char> pub ) const {
       fc::crypto::signature s;
       fc::datastream<const char*> ds( sig.data(), sig.size() );
       fc::raw::unpack(ds, s);
@@ -120,39 +120,39 @@ namespace sysio::chain::webassembly {
       }
    }
 
-   void interface::assert_sha256(legacy_span<const char> data, legacy_ptr<const fc::sha256> hash_val) const {
+   void interface::assert_sha256(span<const char> data, legacy_ptr<const fc::sha256> hash_val) const {
       auto result = context.trx_context.hash_with_checktime<fc::sha256>( data.data(), data.size() );
       SYS_ASSERT( result == *hash_val, crypto_api_exception, "hash mismatch" );
    }
 
-   void interface::assert_sha1(legacy_span<const char> data, legacy_ptr<const fc::sha1> hash_val) const {
+   void interface::assert_sha1(span<const char> data, legacy_ptr<const fc::sha1> hash_val) const {
       auto result = context.trx_context.hash_with_checktime<fc::sha1>( data.data(), data.size() );
       SYS_ASSERT( result == *hash_val, crypto_api_exception, "hash mismatch" );
    }
 
-   void interface::assert_sha512(legacy_span<const char> data, legacy_ptr<const fc::sha512> hash_val) const {
+   void interface::assert_sha512(span<const char> data, legacy_ptr<const fc::sha512> hash_val) const {
       auto result = context.trx_context.hash_with_checktime<fc::sha512>( data.data(), data.size() );
       SYS_ASSERT( result == *hash_val, crypto_api_exception, "hash mismatch" );
    }
 
-   void interface::assert_ripemd160(legacy_span<const char> data, legacy_ptr<const fc::ripemd160> hash_val) const {
+   void interface::assert_ripemd160(span<const char> data, legacy_ptr<const fc::ripemd160> hash_val) const {
       auto result = context.trx_context.hash_with_checktime<fc::ripemd160>( data.data(), data.size() );
       SYS_ASSERT( result == *hash_val, crypto_api_exception, "hash mismatch" );
    }
 
-   void interface::sha1(legacy_span<const char> data, legacy_ptr<fc::sha1> hash_val) const {
+   void interface::sha1(span<const char> data, legacy_ptr<fc::sha1> hash_val) const {
       *hash_val = context.trx_context.hash_with_checktime<fc::sha1>( data.data(), data.size() );
    }
 
-   void interface::sha256(legacy_span<const char> data, legacy_ptr<fc::sha256> hash_val) const {
+   void interface::sha256(span<const char> data, legacy_ptr<fc::sha256> hash_val) const {
       *hash_val = context.trx_context.hash_with_checktime<fc::sha256>( data.data(), data.size() );
    }
 
-   void interface::sha512(legacy_span<const char> data, legacy_ptr<fc::sha512> hash_val) const {
+   void interface::sha512(span<const char> data, legacy_ptr<fc::sha512> hash_val) const {
       *hash_val = context.trx_context.hash_with_checktime<fc::sha512>( data.data(), data.size() );
    }
 
-   void interface::ripemd160(legacy_span<const char> data, legacy_ptr<fc::ripemd160> hash_val) const {
+   void interface::ripemd160(span<const char> data, legacy_ptr<fc::ripemd160> hash_val) const {
       *hash_val = context.trx_context.hash_with_checktime<fc::ripemd160>( data.data(), data.size() );
    }
 

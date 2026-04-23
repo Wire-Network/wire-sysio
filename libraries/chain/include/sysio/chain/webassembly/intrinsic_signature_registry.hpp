@@ -52,7 +52,7 @@ namespace sysio::chain::webassembly {
 // Context-free data
 // =============================================================================
 SYS_PIN_INTRINSIC( get_context_free_data,
-                   int32_t (interface::*)(uint32_t, legacy_span<char>) const );
+                   int32_t (interface::*)(uint32_t, span<char>) const );
 
 // =============================================================================
 // Privileged
@@ -75,15 +75,15 @@ SYS_PIN_INTRINSIC( get_wasm_parameters_packed,
 SYS_PIN_INTRINSIC( set_wasm_parameters_packed,
                    void (interface::*)(span<const char>) );
 SYS_PIN_INTRINSIC( set_proposed_producers,
-                   int64_t (interface::*)(legacy_span<const char>) );
+                   int64_t (interface::*)(span<const char>) );
 SYS_PIN_INTRINSIC( set_proposed_producers_ex,
-                   int64_t (interface::*)(uint64_t, legacy_span<const char>) );
+                   int64_t (interface::*)(uint64_t, span<const char>) );
 SYS_PIN_INTRINSIC( set_finalizers,
                    void (interface::*)(uint64_t, span<const char>) );
 SYS_PIN_INTRINSIC( get_blockchain_parameters_packed,
-                   uint32_t (interface::*)(legacy_span<char>) const );
+                   uint32_t (interface::*)(span<char>) const );
 SYS_PIN_INTRINSIC( set_blockchain_parameters_packed,
-                   void (interface::*)(legacy_span<const char>) );
+                   void (interface::*)(span<const char>) );
 SYS_PIN_INTRINSIC( get_parameters_packed,
                    uint32_t (interface::*)(span<const char>, span<char>) const );
 SYS_PIN_INTRINSIC( set_parameters_packed,
@@ -104,48 +104,48 @@ SYS_PIN_INTRINSIC( get_active_producers,
 // =============================================================================
 SYS_PIN_INTRINSIC( assert_recover_key,
                    void (interface::*)(legacy_ptr<const fc::sha256>,
-                                       legacy_span<const char>,
-                                       legacy_span<const char>) const );
+                                       span<const char>,
+                                       span<const char>) const );
 SYS_PIN_INTRINSIC( recover_key,
                    int32_t (interface::*)(legacy_ptr<const fc::sha256>,
-                                          legacy_span<const char>,
-                                          legacy_span<char>) const );
+                                          span<const char>,
+                                          span<char>) const );
 SYS_PIN_INTRINSIC( assert_sha256,
-                   void (interface::*)(legacy_span<const char>,
+                   void (interface::*)(span<const char>,
                                        legacy_ptr<const fc::sha256>) const );
 SYS_PIN_INTRINSIC( assert_sha1,
-                   void (interface::*)(legacy_span<const char>,
+                   void (interface::*)(span<const char>,
                                        legacy_ptr<const fc::sha1>) const );
 SYS_PIN_INTRINSIC( assert_sha512,
-                   void (interface::*)(legacy_span<const char>,
+                   void (interface::*)(span<const char>,
                                        legacy_ptr<const fc::sha512>) const );
 SYS_PIN_INTRINSIC( assert_ripemd160,
-                   void (interface::*)(legacy_span<const char>,
+                   void (interface::*)(span<const char>,
                                        legacy_ptr<const fc::ripemd160>) const );
 SYS_PIN_INTRINSIC( sha256,
-                   void (interface::*)(legacy_span<const char>,
+                   void (interface::*)(span<const char>,
                                        legacy_ptr<fc::sha256>) const );
 SYS_PIN_INTRINSIC( sha1,
-                   void (interface::*)(legacy_span<const char>,
+                   void (interface::*)(span<const char>,
                                        legacy_ptr<fc::sha1>) const );
 SYS_PIN_INTRINSIC( sha512,
-                   void (interface::*)(legacy_span<const char>,
+                   void (interface::*)(span<const char>,
                                        legacy_ptr<fc::sha512>) const );
 SYS_PIN_INTRINSIC( ripemd160,
-                   void (interface::*)(legacy_span<const char>,
+                   void (interface::*)(span<const char>,
                                        legacy_ptr<fc::ripemd160>) const );
 
 // =============================================================================
 // Permission + authorization
 // =============================================================================
 SYS_PIN_INTRINSIC( check_transaction_authorization,
-                   bool (interface::*)(legacy_span<const char>,
-                                       legacy_span<const char>,
-                                       legacy_span<const char>) const );
+                   bool (interface::*)(span<const char>,
+                                       span<const char>,
+                                       span<const char>) const );
 SYS_PIN_INTRINSIC( check_permission_authorization,
                    bool (interface::*)(account_name, permission_name,
-                                       legacy_span<const char>,
-                                       legacy_span<const char>,
+                                       span<const char>,
+                                       span<const char>,
                                        uint64_t) const );
 SYS_PIN_INTRINSIC( get_permission_lower_bound,
                    int32_t (interface::*)(account_name, permission_name, span<char>) );
@@ -178,7 +178,7 @@ SYS_PIN_INTRINSIC( abort,
 SYS_PIN_INTRINSIC( sysio_assert,
                    void (interface::*)(bool, null_terminated_ptr) const );
 SYS_PIN_INTRINSIC( sysio_assert_message,
-                   void (interface::*)(bool, legacy_span<const char>) const );
+                   void (interface::*)(bool, span<const char>) const );
 SYS_PIN_INTRINSIC( sysio_assert_code,
                    void (interface::*)(bool, uint64_t) const );
 SYS_PIN_INTRINSIC( sysio_exit,
@@ -188,7 +188,7 @@ SYS_PIN_INTRINSIC( sysio_exit,
 // Action
 // =============================================================================
 SYS_PIN_INTRINSIC( read_action_data,
-                   int32_t (interface::*)(legacy_span<char>) const );
+                   int32_t (interface::*)(span<char>) const );
 SYS_PIN_INTRINSIC( action_data_size,
                    int32_t (interface::*)() const );
 SYS_PIN_INTRINSIC( set_action_return_value,
@@ -200,7 +200,7 @@ SYS_PIN_INTRINSIC( set_action_return_value,
 SYS_PIN_INTRINSIC( prints,
                    void (interface::*)(null_terminated_ptr) );
 SYS_PIN_INTRINSIC( prints_l,
-                   void (interface::*)(legacy_span<const char>) );
+                   void (interface::*)(span<const char>) );
 SYS_PIN_INTRINSIC( printi,
                    void (interface::*)(int64_t) );
 SYS_PIN_INTRINSIC( printui,
@@ -218,27 +218,27 @@ SYS_PIN_INTRINSIC( printqf,
 SYS_PIN_INTRINSIC( printn,
                    void (interface::*)(name) );
 SYS_PIN_INTRINSIC( printhex,
-                   void (interface::*)(legacy_span<const char>) );
+                   void (interface::*)(span<const char>) );
 
 // =============================================================================
 // KV database (all 22 -- the biggest cleanup target by signature count)
 // =============================================================================
 SYS_PIN_INTRINSIC( kv_set,
                    int64_t (interface::*)(uint32_t, uint64_t,
-                                          legacy_span<const char>,
-                                          legacy_span<const char>) );
+                                          span<const char>,
+                                          span<const char>) );
 SYS_PIN_INTRINSIC( kv_get,
                    int32_t (interface::*)(uint32_t, uint64_t,
-                                          legacy_span<const char>,
-                                          legacy_span<char>) );
+                                          span<const char>,
+                                          span<char>) );
 SYS_PIN_INTRINSIC( kv_erase,
-                   int64_t (interface::*)(uint32_t, legacy_span<const char>) );
+                   int64_t (interface::*)(uint32_t, span<const char>) );
 SYS_PIN_INTRINSIC( kv_contains,
                    int32_t (interface::*)(uint32_t, uint64_t,
-                                          legacy_span<const char>) );
+                                          span<const char>) );
 SYS_PIN_INTRINSIC( kv_it_create,
                    uint32_t (interface::*)(uint32_t, uint64_t,
-                                           legacy_span<const char>) );
+                                           span<const char>) );
 SYS_PIN_INTRINSIC( kv_it_destroy,
                    void (interface::*)(uint32_t) );
 SYS_PIN_INTRINSIC( kv_it_status,
@@ -248,45 +248,45 @@ SYS_PIN_INTRINSIC( kv_it_next,
 SYS_PIN_INTRINSIC( kv_it_prev,
                    int32_t (interface::*)(uint32_t) );
 SYS_PIN_INTRINSIC( kv_it_lower_bound,
-                   int32_t (interface::*)(uint32_t, legacy_span<const char>) );
+                   int32_t (interface::*)(uint32_t, span<const char>) );
 SYS_PIN_INTRINSIC( kv_it_key,
                    int32_t (interface::*)(uint32_t, uint32_t,
-                                          legacy_span<char>,
+                                          span<char>,
                                           legacy_ptr<uint32_t>) );
 SYS_PIN_INTRINSIC( kv_it_value,
                    int32_t (interface::*)(uint32_t, uint32_t,
-                                          legacy_span<char>,
+                                          span<char>,
                                           legacy_ptr<uint32_t>) );
 SYS_PIN_INTRINSIC( kv_idx_store,
                    void (interface::*)(uint64_t, uint32_t,
-                                       legacy_span<const char>,
-                                       legacy_span<const char>) );
+                                       span<const char>,
+                                       span<const char>) );
 SYS_PIN_INTRINSIC( kv_idx_remove,
                    void (interface::*)(uint32_t,
-                                       legacy_span<const char>,
-                                       legacy_span<const char>) );
+                                       span<const char>,
+                                       span<const char>) );
 SYS_PIN_INTRINSIC( kv_idx_update,
                    void (interface::*)(uint64_t, uint32_t,
-                                       legacy_span<const char>,
-                                       legacy_span<const char>,
-                                       legacy_span<const char>) );
+                                       span<const char>,
+                                       span<const char>,
+                                       span<const char>) );
 SYS_PIN_INTRINSIC( kv_idx_find_secondary,
                    int32_t (interface::*)(uint64_t, uint32_t,
-                                          legacy_span<const char>) );
+                                          span<const char>) );
 SYS_PIN_INTRINSIC( kv_idx_lower_bound,
                    int32_t (interface::*)(uint64_t, uint32_t,
-                                          legacy_span<const char>) );
+                                          span<const char>) );
 SYS_PIN_INTRINSIC( kv_idx_next,
                    int32_t (interface::*)(uint32_t) );
 SYS_PIN_INTRINSIC( kv_idx_prev,
                    int32_t (interface::*)(uint32_t) );
 SYS_PIN_INTRINSIC( kv_idx_key,
                    int32_t (interface::*)(uint32_t, uint32_t,
-                                          legacy_span<char>,
+                                          span<char>,
                                           legacy_ptr<uint32_t>) );
 SYS_PIN_INTRINSIC( kv_idx_primary_key,
                    int32_t (interface::*)(uint32_t, uint32_t,
-                                          legacy_span<char>,
+                                          span<char>,
                                           legacy_ptr<uint32_t>) );
 SYS_PIN_INTRINSIC( kv_idx_destroy,
                    void (interface::*)(uint32_t) );
@@ -308,11 +308,11 @@ SYS_PIN_INTRINSIC( memset,
 // Transaction
 // =============================================================================
 SYS_PIN_INTRINSIC( send_inline,
-                   void (interface::*)(legacy_span<const char>) );
+                   void (interface::*)(span<const char>) );
 SYS_PIN_INTRINSIC( send_context_free_inline,
-                   void (interface::*)(legacy_span<const char>) );
+                   void (interface::*)(span<const char>) );
 SYS_PIN_INTRINSIC( read_transaction,
-                   int32_t (interface::*)(legacy_span<char>) const );
+                   int32_t (interface::*)(span<char>) const );
 SYS_PIN_INTRINSIC( transaction_size,
                    int32_t (interface::*)() const );
 SYS_PIN_INTRINSIC( expiration,
@@ -322,7 +322,7 @@ SYS_PIN_INTRINSIC( tapos_block_num,
 SYS_PIN_INTRINSIC( tapos_block_prefix,
                    int32_t (interface::*)() const );
 SYS_PIN_INTRINSIC( get_action,
-                   int32_t (interface::*)(uint32_t, uint32_t, legacy_span<char>) const );
+                   int32_t (interface::*)(uint32_t, uint32_t, span<char>) const );
 
 // =============================================================================
 // alt_bn128 / mod_exp / blake2 / sha3 / k1_recover (post-launch span API)

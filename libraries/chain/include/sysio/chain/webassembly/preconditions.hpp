@@ -38,6 +38,14 @@ namespace sysio { namespace chain { namespace webassembly {
                                        std::is_same_v<name, T> ||
                                        std::is_arithmetic_v<T>;
       };
+      // Hybrid legacy intrinsics (some args legacy_ptr / legacy_span, other args plain
+      // vm::span for byte buffers) register through REGISTER_LEGACY_*_HOST_FUNCTION.
+      // Specialize on vm::span<T> so the legacy-whitelist accepts plain byte spans using
+      // the same char-only rule as the non-legacy whitelist.
+      template <typename T>
+      struct is_whitelisted_legacy_type<vm::span<T>> {
+         static constexpr bool value = std::is_same_v<std::remove_const_t<T>, char>;
+      };
 
       template <typename T>
       struct is_whitelisted_type {

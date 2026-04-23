@@ -114,7 +114,7 @@ namespace sysio { namespace chain { namespace webassembly {
          }
       );
    }
-   int64_t interface::set_proposed_producers( legacy_span<const char> packed_producer_schedule) {
+   int64_t interface::set_proposed_producers( span<const char> packed_producer_schedule) {
       SYS_ASSERT(!context.trx_context.is_read_only(), wasm_execution_error, "set_proposed_producers not allowed in a readonly transaction");
       fc::datastream<const char*> ds( packed_producer_schedule.data(), packed_producer_schedule.size() );
       std::vector<producer_authority> producers;
@@ -131,7 +131,7 @@ namespace sysio { namespace chain { namespace webassembly {
       return set_proposed_producers_common( context, std::move(producers) );
    }
 
-   int64_t interface::set_proposed_producers_ex( uint64_t packed_producer_format, legacy_span<const char> packed_producer_schedule) {
+   int64_t interface::set_proposed_producers_ex( uint64_t packed_producer_format, span<const char> packed_producer_schedule) {
       SYS_ASSERT(!context.trx_context.is_read_only(), wasm_execution_error, "set_proposed_producers_ex not allowed in a readonly transaction");
       if (packed_producer_format == 0) {
          return set_proposed_producers(std::move(packed_producer_schedule));
@@ -203,7 +203,7 @@ namespace sysio { namespace chain { namespace webassembly {
       context.trx_context.set_proposed_finalizers( std::move(finpol) );
    }
 
-   uint32_t interface::get_blockchain_parameters_packed( legacy_span<char> packed_blockchain_parameters ) const {
+   uint32_t interface::get_blockchain_parameters_packed( span<char> packed_blockchain_parameters ) const {
       auto& gpo = context.control.get_global_properties();
 
       const chain::chain_config_v0& cfg = gpo.configuration;
@@ -218,7 +218,7 @@ namespace sysio { namespace chain { namespace webassembly {
       return 0;
    }
 
-   void interface::set_blockchain_parameters_packed( legacy_span<const char> packed_blockchain_parameters ) {
+   void interface::set_blockchain_parameters_packed( span<const char> packed_blockchain_parameters ) {
       SYS_ASSERT(!context.trx_context.is_read_only(), wasm_execution_error, "set_blockchain_parameters_packed not allowed in a readonly transaction");
       fc::datastream<const char*> ds( packed_blockchain_parameters.data(), packed_blockchain_parameters.size() );
       chain::chain_config_v0 cfg;
