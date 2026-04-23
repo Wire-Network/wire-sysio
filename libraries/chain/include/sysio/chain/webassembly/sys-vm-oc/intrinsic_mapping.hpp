@@ -251,6 +251,19 @@ inline constexpr std::size_t find_intrinsic_index(std::string_view hf) {
    return std::numeric_limits<std::size_t>::max();
 }
 
+// Compile-time guard wrapping find_intrinsic_index. Using require_intrinsic_index<find_intrinsic_index("env.foo")>
+// at a registration call site turns a missing entry in get_intrinsic_table() into a build error instead of a silent
+// SIZE_MAX that would otherwise flow through integral_constant<size_t, SIZE_MAX> as a legal constant expression and
+// produce a bogus jump-table ordinal at runtime. Ports AntelopeIO/leap#621 -- unblocked here because wire is on c++23.
+template<std::size_t Index>
+struct require_intrinsic_index {
+   static_assert(Index != std::numeric_limits<std::size_t>::max(),
+                 "OC intrinsic mapping missing -- the host function is REGISTER_*_HOST_FUNCTION'd but "
+                 "its \"env.<name>\" string is not in get_intrinsic_table() above. Add it to the table "
+                 "so sys-vm-oc can resolve the intrinsic at its fixed jump-table offset.");
+   static constexpr std::size_t value = Index;
+};
+
 inline constexpr std::size_t intrinsic_table_size() {
     return std::tuple_size<decltype(get_intrinsic_table())>::value;
 }

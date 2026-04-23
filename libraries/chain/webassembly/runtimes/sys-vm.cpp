@@ -1,5 +1,6 @@
 #include <sysio/chain/webassembly/sys-vm.hpp>
 #include <sysio/chain/webassembly/interface.hpp>
+#include <sysio/chain/webassembly/intrinsic_signature_registry.hpp>
 #include <sysio/chain/account_object.hpp>
 #include <sysio/chain/apply_context.hpp>
 #include <sysio/chain/transaction_context.hpp>
