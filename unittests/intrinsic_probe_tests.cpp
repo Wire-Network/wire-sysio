@@ -64,6 +64,7 @@ constexpr auto probe_msg_seed = "wire-intrinsic-probe-message";
 struct intrinsic_probe_shared_tester : validating_tester {
    digest_type unactivated_feature_digest;
    bytes       recover_key_payload;
+   bytes       oversized_wa_payload;
 
    intrinsic_probe_shared_tester()
       : validating_tester(flat_set<account_name>{}, nullptr,
@@ -87,6 +88,7 @@ struct intrinsic_probe_shared_tester : validating_tester {
       unactivated_feature_digest = *d;
 
       build_recover_key_payload();
+      build_oversized_wa_payload();
    }
 
    // Build (digest, sig, pub) triple from a deterministic seed so the probe
@@ -110,6 +112,37 @@ struct intrinsic_probe_shared_tester : validating_tester {
       std::memcpy(p, &sig_len, sizeof(sig_len));        p += sizeof(sig_len);
       std::memcpy(p, packed_sig.data(), sig_len);       p += sig_len;
       std::memcpy(p, packed_pub.data(), pk_len);
+   }
+
+   // Build a raw WA-variant signature blob whose auth_data + client_json variable-size components exceed the
+   // subjective 16 KiB default. The bytes do not need to be a cryptographically valid sig -- fc::raw::unpack must
+   // succeed so variable_size() is computed, after which the recover_key subjective-size guard fires before any
+   // secp256k1 math runs. Layout:
+   //   byte 0            : fc::raw variant tag = 2 (webauthn)
+   //   bytes 1-65        : r1::compact_signature (65 zero bytes)
+   //   <varint> + bytes  : auth_data  (WA_AUTH_DATA_BYTES bytes of zero)
+   //   <varint> + bytes  : client_json (WA_CLIENT_JSON_BYTES bytes of zero)
+   void build_oversized_wa_payload() {
+      constexpr size_t wa_compact_sig_bytes = 65;
+      constexpr size_t wa_variant_tag = 2;
+      // 17 KiB total -- 1 KiB over the 16 KiB default configured_subjective_signature_length_limit.
+      constexpr size_t wa_auth_data_bytes   = 8'700;
+      constexpr size_t wa_client_json_bytes = 8'700;
+
+      auto pack_varint = [](bytes& b, uint32_t v) {
+         while (v > 0x7F) { b.push_back(static_cast<char>((v & 0x7F) | 0x80)); v >>= 7; }
+         b.push_back(static_cast<char>(v));
+      };
+
+      bytes& b = oversized_wa_payload;
+      b.clear();
+      b.reserve(1 + wa_compact_sig_bytes + 5 + wa_auth_data_bytes + 5 + wa_client_json_bytes);
+      b.push_back(static_cast<char>(wa_variant_tag));
+      for (size_t i = 0; i < wa_compact_sig_bytes; ++i) b.push_back(0);
+      pack_varint(b, wa_auth_data_bytes);
+      for (size_t i = 0; i < wa_auth_data_bytes; ++i)   b.push_back(0);
+      pack_varint(b, wa_client_json_bytes);
+      for (size_t i = 0; i < wa_client_json_bytes; ++i) b.push_back(0);
    }
 
    bytes feature_digest_bytes() const {
@@ -252,37 +285,47 @@ BOOST_FIXTURE_TEST_CASE(recover_key_unaligned_digest, intrinsic_probe_fixture) {
    BOOST_CHECK_NO_THROW(t.run_with_data("recuald"_n, t.recover_key_payload));
 }
 
+// Contract-observable failure modes now return -1 rather than throwing. The in-contract probe verifies
+// `rc == -1`; the driver just asserts the host stays silent. Any host regression back to throwing surfaces
+// as BOOST_CHECK_NO_THROW failure; a regression to "silently returns positive size for bad input" surfaces
+// as a probe-side sysio_assert_message_exception.
 BOOST_FIXTURE_TEST_CASE(recover_key_bad_variant, intrinsic_probe_fixture) {
-   BOOST_CHECK_THROW(
-      t.run_with_data("recbadvar"_n, t.recover_key_payload), fc::exception);
+   BOOST_CHECK_NO_THROW(t.run_with_data("recbadvar"_n, t.recover_key_payload));
 }
 
 BOOST_FIXTURE_TEST_CASE(recover_key_bad_recovery_byte, intrinsic_probe_fixture) {
-   BOOST_CHECK_THROW(
-      t.run_with_data("recbadrec"_n, t.recover_key_payload), fc::exception);
+   BOOST_CHECK_NO_THROW(t.run_with_data("recbadrec"_n, t.recover_key_payload));
 }
 
 BOOST_FIXTURE_TEST_CASE(recover_key_corrupt_rs, intrinsic_probe_fixture) {
-   // A single-bit flip in the r component has two acceptable outcomes: the
-   // secp256k1 recovery succeeds and yields a DIFFERENT pub (probe's
-   // in-contract memcmp passes), OR the math fails (host throws
-   // fc::exception). The bad outcome the probe is protecting against is
-   // "recovery silently succeeds and returns the ORIGINAL pub", which never
-   // happens with a real bit flip -- both branches are a correct pin.
-   try {
-      t.run_with_data("recbadrs"_n, t.recover_key_payload);
-   } catch (const fc::exception&) {
-      // Math failure path -- acceptable.
-   }
+   // A single-bit flip in the r component has two acceptable outcomes: the secp256k1 recovery succeeds and yields
+   // a DIFFERENT pub (probe's in-contract memcmp passes), OR the math rejects the curve point and the probe sees
+   // rc == -1. Both branches pass the probe; the bad outcome being protected against is "recovery silently
+   // succeeds and returns the ORIGINAL pub", which is still a probe-side assert.
+   BOOST_CHECK_NO_THROW(t.run_with_data("recbadrs"_n, t.recover_key_payload));
 }
 
 BOOST_FIXTURE_TEST_CASE(recover_key_short_sig, intrinsic_probe_fixture) {
-   BOOST_CHECK_THROW(
-      t.run_with_data("recshort"_n, t.recover_key_payload), fc::exception);
+   BOOST_CHECK_NO_THROW(t.run_with_data("recshort"_n, t.recover_key_payload));
 }
 
 BOOST_FIXTURE_TEST_CASE(recover_key_empty_sig, intrinsic_probe_fixture) {
-   BOOST_CHECK_THROW(t.run("recempsig"_n), fc::exception);
+   BOOST_CHECK_NO_THROW(t.run("recempsig"_n));
+}
+
+// Pins the size-query contract: zero-size pub buffer returns the full required key size so callers can allocate
+// exactly, then re-call.
+BOOST_FIXTURE_TEST_CASE(recover_key_size_query, intrinsic_probe_fixture) {
+   BOOST_CHECK_NO_THROW(t.run_with_data("recqsize"_n, t.recover_key_payload));
+}
+
+// Pins the ONE throw recover_key still raises after the never-throw cleanup: subjective DoS guard on WebAuthn
+// variable-size (auth_data + client_json) in speculative-block mode. See the DEFERRED note in
+// libraries/chain/webassembly/crypto.cpp::recover_key for why this stays throwing rather than returning -1.
+BOOST_FIXTURE_TEST_CASE(recover_key_wa_oversized_variable_size, intrinsic_probe_fixture) {
+   BOOST_CHECK_THROW(
+      t.run_with_data("recbigwa"_n, t.oversized_wa_payload),
+      sig_variable_size_limit_exception);
 }
 
 BOOST_FIXTURE_TEST_CASE(assert_recover_key_ok, intrinsic_probe_fixture) {

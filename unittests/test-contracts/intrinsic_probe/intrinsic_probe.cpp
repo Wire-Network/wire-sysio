@@ -266,6 +266,10 @@ struct sig_hash_key_header {
 };
 constexpr uint32_t RECOVER_BUF_CAPACITY = 512;
 constexpr uint32_t MAX_RECOVERED_PUB    = 128;
+// Large buffer for the recbigwa probe -- WA sig with auth_data + client_json > 16 KiB (the subjective
+// variable-size default). Lives at file scope rather than on the wasm stack because CDT's stack is not
+// configured for >8 KiB per-frame allocations.
+constexpr uint32_t BIG_WA_BUF_CAPACITY  = 32 * 1024;
 
 // -----------------------------------------------------------------------------
 // float128 (IEEE 754 binary128) bit patterns, split into (low, high) uint64_t
@@ -310,6 +314,9 @@ constexpr uint64_t I128_ONE_HI    = 0x0000000000000000ULL;
 constexpr uint64_t U64_MAX        = 0xFFFFFFFFFFFFFFFFULL;
 
 } // namespace
+
+// File-scope static buffer for the recbigwa probe. See BIG_WA_BUF_CAPACITY comment above.
+static unsigned char big_wa_buf[BIG_WA_BUF_CAPACITY];
 
 class [[sysio::contract("intrinsic_probe")]] intrinsic_probe : public contract {
 public:
@@ -685,11 +692,10 @@ public:
              "recover_key(unaligned digest) pub mismatch -- copy-in path regression" );
    }
 
-   // Structural corruption: byte 0 of the signature is the fc::raw variant
-   // tag. Setting it to 0x7F (max single-byte unsigned_int) is guaranteed
-   // above any currently-registered signature variant index, so fc::raw's
-   // variant unpack must throw during sig decoding, before any secp256k1
-   // math runs.
+   // Structural corruption: byte 0 of the signature is the fc::raw variant tag. Setting it to 0x7F (max
+   // single-byte unsigned_int) is guaranteed above any currently-registered signature variant index, so fc::raw's
+   // variant unpack rejects during sig decoding, before any secp256k1 math runs. Post-never-throw: recover_key
+   // returns -1 on this path rather than throwing.
    [[sysio::action]]
    void recbadvar() {
       unsigned char buf[RECOVER_BUF_CAPACITY] = {};
@@ -703,16 +709,13 @@ public:
       sig_ptr[0] = static_cast<char>(0x7F);
 
       char recovered[MAX_RECOVERED_PUB] = {};
-      int32_t rc = recover_key( hdr->hash, sig_ptr, hdr->sig_len,
-                                recovered, sizeof(recovered) );
-      (void)rc;
-      check( false, "recover_key with invalid variant tag (0x7F) must throw" );
+      int32_t rc = recover_key( hdr->hash, sig_ptr, hdr->sig_len, recovered, sizeof(recovered) );
+      check( rc == -1, "recover_key with invalid variant tag (0x7F) must return -1, not throw" );
    }
 
-   // secp256k1 recovery math: byte 1 of a K1 sig is the recovery byte
-   // (canonical range [31, 35), legacy [27, 30]). Setting it outside the
-   // accepted range triggers FC_THROW_EXCEPTION in elliptic_secp256k1.cpp
-   // with message "unable to reconstruct public key from signature".
+   // secp256k1 recovery math: byte 1 of a K1 sig is the recovery byte (canonical range [31, 35), legacy [27, 30]).
+   // Setting it outside the accepted range triggers FC_THROW_EXCEPTION in elliptic_secp256k1.cpp which recover_key
+   // now catches and surfaces as rc = -1 instead of propagating.
    [[sysio::action]]
    void recbadrec() {
       unsigned char buf[RECOVER_BUF_CAPACITY] = {};
@@ -726,18 +729,18 @@ public:
       sig_ptr[1] = static_cast<char>(0x00);  // out of [27, 35)
 
       char recovered[MAX_RECOVERED_PUB] = {};
-      int32_t rc = recover_key( hdr->hash, sig_ptr, hdr->sig_len,
-                                recovered, sizeof(recovered) );
-      (void)rc;
-      check( false, "recover_key with out-of-range recovery byte must throw" );
+      int32_t rc = recover_key( hdr->hash, sig_ptr, hdr->sig_len, recovered, sizeof(recovered) );
+      check( rc == -1, "recover_key with out-of-range recovery byte must return -1" );
    }
 
-   // Valid structure, valid recovery byte, corrupted r/s. The math succeeds
-   // and produces a DIFFERENT public key than the signer originally used.
-   // Host MUST NOT throw here -- recover_key is not a verify function. This
-   // is the single most important misuse to pin: a caller that assumes
-   // recover_key verifies is broken by design; the only safe pattern is to
-   // compare the returned pub against a known-authorized pub.
+   // Valid structure, valid recovery byte, corrupted r/s. Two acceptable outcomes:
+   //   - Math succeeds and produces a DIFFERENT public key than the signer originally used (rc == pk_len, recovered
+   //     != original pub).
+   //   - Math rejects the curve point (rc == -1).
+   // Both outcomes are fine; the bad outcome the probe protects against is "math succeeds AND silently returns the
+   // ORIGINAL pub" -- that would mean recover_key is acting as a verifier and one-bit sig corruptions are getting
+   // swept under the rug, which violates the "compare-recovered-against-known-authorized" pattern that is the only
+   // safe way to use recover_key.
    [[sysio::action]]
    void recbadrs() {
       unsigned char buf[RECOVER_BUF_CAPACITY] = {};
@@ -748,28 +751,22 @@ public:
       auto* hdr = reinterpret_cast<sig_hash_key_header*>(buf);
       char* sig_ptr = reinterpret_cast<char*>(buf) + sizeof(*hdr);
       const char* pub_ptr = sig_ptr + hdr->sig_len;
-      check( hdr->sig_len >= 10,
-             "sig too short to corrupt deep r/s bytes" );
-      // Corrupt a byte well inside the r component. A small bit flip keeps
-      // (r, s) on-curve with overwhelming probability -- we want the math to
-      // succeed and return a different valid pub, not to fail validation.
+      check( hdr->sig_len >= 10, "sig too short to corrupt deep r/s bytes" );
+      // Corrupt a byte well inside the r component. A small bit flip keeps (r, s) on-curve with overwhelming
+      // probability -- we want the math to succeed and return a different valid pub.
       sig_ptr[9] = sig_ptr[9] ^ 0x01;
 
       char recovered[MAX_RECOVERED_PUB] = {};
-      int32_t rc = recover_key( hdr->hash, sig_ptr, hdr->sig_len,
-                                recovered, sizeof(recovered) );
-      // If the math fails (rare but possible with this corruption), host
-      // throws and we never reach here -- which is acceptable because the
-      // property we care about is "never silently returns original pub".
-      // The driver's BOOST_CHECK_NO_THROW will flag the corner case.
+      int32_t rc = recover_key( hdr->hash, sig_ptr, hdr->sig_len, recovered, sizeof(recovered) );
+      if ( rc == -1 ) return;  // math rejected the corrupted curve point; acceptable.
       check( rc == static_cast<int32_t>(hdr->pk_len),
-             "recover_key(corrupt r) returned unexpected size" );
+             "recover_key(corrupt r) must return -1 on math failure or full pub size on success -- got neither" );
       check( std::memcmp(recovered, pub_ptr, hdr->pk_len) != 0,
-             "recover_key on r-corrupted sig must NOT recover original pub" );
+             "recover_key on r-corrupted sig silently recovered the ORIGINAL pub -- never-verifier contract broken" );
    }
 
-   // Short sig (1 byte): valid variant tag but no shim content. fc::raw
-   // unpack of the shim bytes hits datastream end, throws.
+   // Short sig (1 byte): valid variant tag but no shim content. fc::raw unpack of the shim bytes hits datastream
+   // end; recover_key catches the unpack failure and returns -1.
    [[sysio::action]]
    void recshort() {
       unsigned char buf[RECOVER_BUF_CAPACITY] = {};
@@ -782,18 +779,57 @@ public:
 
       char recovered[MAX_RECOVERED_PUB] = {};
       int32_t rc = recover_key( hdr->hash, sig_ptr, 1, recovered, sizeof(recovered) );
-      (void)rc;
-      check( false, "recover_key with truncated sig (1 byte) must throw" );
+      check( rc == -1, "recover_key with truncated sig (1 byte) must return -1, not throw" );
    }
 
-   // Zero-length sig: datastream runs dry before the variant tag itself.
+   // Zero-length sig: datastream runs dry before the variant tag itself; recover_key returns -1.
    [[sysio::action]]
    void recempsig() {
       unsigned char dig[SHA256_SIZE] = {};
       char recovered[MAX_RECOVERED_PUB] = {};
       int32_t rc = recover_key( dig, nullptr, 0, recovered, sizeof(recovered) );
-      (void)rc;
-      check( false, "recover_key with empty signature must throw" );
+      check( rc == -1, "recover_key with empty signature must return -1, not throw" );
+   }
+
+   // Zero-size pub buffer: size-query pattern. recover_key must return the full required pub size without writing
+   // to the (zero-length) buffer, so callers can use "query with size=0, allocate exactly, call again" when they
+   // don't want CDT's 256-byte optimistic pre-allocation.
+   [[sysio::action]]
+   void recqsize() {
+      unsigned char buf[RECOVER_BUF_CAPACITY] = {};
+      uint32_t n = sysio::action_data_size();
+      check( n <= RECOVER_BUF_CAPACITY, "recqsize action data too large" );
+      sysio::read_action_data( buf, n );
+
+      const auto* hdr = reinterpret_cast<const sig_hash_key_header*>(buf);
+      const char* sig_ptr = reinterpret_cast<const char*>(buf) + sizeof(*hdr);
+
+      int32_t rc = recover_key( hdr->hash, sig_ptr, hdr->sig_len, nullptr, 0 );
+      check( rc == static_cast<int32_t>(hdr->pk_len),
+             "recover_key with zero-size pub buffer must return the full required key size" );
+   }
+
+   // WebAuthn signature whose auth_data + client_json exceeds the subjective variable-size limit (default 16 KiB
+   // from controller_config::maximum_variable_signature_length). Pins the ONE throw recover_key still raises
+   // after the never-throw-for-contract-observable-failures cleanup: the subjective per-node DoS guard against
+   // WA-sig variable-size abuse during speculative block production. See the DEFERRED note in
+   // libraries/chain/webassembly/crypto.cpp::recover_key for the full rationale and the path to removing it.
+   //
+   // Raw WA sig bytes are passed as action data with no header framing; the driver constructs a WA-variant
+   // blob large enough to trigger the cap but small enough to fit in max_transaction_net_usage.
+   [[sysio::action]]
+   void recbigwa() {
+      uint32_t n = sysio::action_data_size();
+      check( n <= BIG_WA_BUF_CAPACITY, "recbigwa action data exceeds probe static buffer" );
+      sysio::read_action_data( big_wa_buf, n );
+
+      unsigned char dig[SHA256_SIZE] = {};
+      char recovered[MAX_RECOVERED_PUB] = {};
+      int32_t rc = recover_key( dig, reinterpret_cast<const char*>(big_wa_buf), n,
+                                recovered, sizeof(recovered) );
+      (void) rc;
+      check( false, "recover_key with WA sig exceeding subjective variable-size limit must throw "
+                    "sig_variable_size_limit_exception during speculative-block production" );
    }
 
    // assert_recover_key: matching digest + sig + pub -> no throw.

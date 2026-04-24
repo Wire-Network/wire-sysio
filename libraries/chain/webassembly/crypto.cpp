@@ -89,34 +89,60 @@ namespace sysio::chain::webassembly {
    int32_t interface::recover_key( aligned_ptr<const fc::sha256> digest,
                                    span<const char> sig,
                                    span<char> pub ) const {
+      // recover_key is the rc-returning variant of signature recovery: contract-observable failure modes (bad sig
+      // structure, unactivated / unknown sig variant, secp256k1 / r1 / ed recovery math failure) surface as rc = -1
+      // so callers can accept untrusted user-submitted signatures without aborting the transaction. Contracts
+      // that want the throw-on-any-failure semantics use assert_recover_key instead.
+      //
+      // The one exception is the speculative-block variable-size subjective guard further down -- that throw
+      // stays, by design. See the DEFERRED note at the throw site for the rationale and the path to removing it.
       fc::crypto::signature s;
-      fc::datastream<const char*> ds( sig.data(), sig.size() );
-      fc::raw::unpack(ds, s);
+      try {
+         fc::datastream<const char*> ds( sig.data(), sig.size() );
+         fc::raw::unpack( ds, s );
+      } catch ( const fc::exception& ) {
+         return -1;  // empty / truncated / bad-variant-tag sig
+      }
 
       using sig_type = fc::crypto::signature::sig_type;
-      SYS_ASSERT(s.contains_type(sig_type::k1, sig_type::r1, sig_type::wa, sig_type::em, sig_type::ed), unactivated_signature_type,
-                 "Unactivated signature type used during recover_key");
+      if ( !s.contains_type(sig_type::k1, sig_type::r1, sig_type::wa, sig_type::em, sig_type::ed) )
+         return -1;  // unknown or not-yet-activated sig variant
 
-      if(context.control.is_speculative_block())
-         SYS_ASSERT(s.variable_size() <= context.control.configured_subjective_signature_length_limit(),
-                    sig_variable_size_limit_exception, "signature variable length component size greater than subjective maximum");
+      // DEFERRED -- subjective per-node DoS guard on WebAuthn variable-size fields (auth_data + client_json). Keeps
+      // throwing, NOT converted to rc = -1, because `configured_subjective_signature_length_limit` is a per-node
+      // config value (default 16384, CLI-overridable). Converting to rc = -1 would expose that subjective value
+      // to contracts: two producers with different configured limits would see different rc for the same sig, and
+      // any contract branching on rc < 0 would diverge. Throwing avoids the leak because the trx is rejected
+      // entirely before the contract observes anything. Original subjective-by-design choice documented in the
+      // webauthn-support PR (dabc79476b, May 2019); Spring still has the identical shape. To make recover_key
+      // fully non-throwing, the cap must first become consensus-uniform: either (C) hardcode 16384 as an objective
+      // limit (also removing `maximum_variable_signature_length` from controller_config and the CLI option) or
+      // (D) promote to chain_config_v0 so governance can tune via setparams. Either path also removes the
+      // trx-metadata-level `check_variable_sig_size` in favor of the new uniform mechanism. Until one lands,
+      // recover_key still throws on this specific path.
+      if ( context.control.is_speculative_block() )
+         SYS_ASSERT( s.variable_size() <= context.control.configured_subjective_signature_length_limit(),
+                     sig_variable_size_limit_exception,
+                     "signature variable length component size greater than subjective maximum" );
 
-      auto recovered = fc::crypto::public_key::recover(s, *digest);
+      fc::crypto::public_key recovered;
+      try {
+         recovered = fc::crypto::public_key::recover( s, *digest );
+      } catch ( const fc::exception& ) {
+         return -1;  // bad recovery byte / off-curve r,s / ed25519 verify failure
+      }
 
-      // Unified small-buffer contract for every signature variant: memcpy min(pub.size(), needed) of the packed key
-      // into the caller's buffer and always return the full required size. Callers can use "query with buffer=0,
-      // allocate, call again" OR the classic "pre-allocate optimistic size + shrink-or-retry on return" pattern CDT
-      // uses. Pre-normalization the k1/r1/em path FC_ASSERT'd through fc::datastream on a small buffer while the
-      // wa/ed path silently truncated via memcpy; that fixed-vs-variable asymmetry was a documented footgun and is
-      // now unified to the truncate+return-required-size contract wa/ed always shipped with. Fast path when the
-      // buffer fits (the overwhelmingly common case for CDT-generated 256-byte optimistic buffers) keeps the
-      // existing in-place datastream pack, so the heap allocation in fc::raw::pack is paid only on the adversarial
-      // under-sized-buffer path.
+      // Unified small-buffer contract for every signature variant: memcpy min(pub.size(), needed) of the packed
+      // key into the caller's buffer and always return the full required size. Callers can use "query with
+      // buffer=0, allocate, call again" OR the classic "pre-allocate optimistic size + shrink-or-retry on return"
+      // pattern CDT uses. Fast path when the buffer fits (the overwhelmingly common case for CDT-generated
+      // 256-byte optimistic buffers) keeps the in-place datastream pack, so the heap allocation in fc::raw::pack
+      // is paid only on the adversarial under-sized-buffer path.
       const auto needed = fc::raw::pack_size(recovered);
-      if (needed <= pub.size()) {
+      if ( needed <= pub.size() ) {
          fc::datastream<char*> out_ds(pub.data(), needed);
          fc::raw::pack(out_ds, recovered);
-      } else if (pub.size() > 0) {
+      } else if ( pub.size() > 0 ) {
          auto packed_pubkey = fc::raw::pack(recovered);
          std::memcpy(pub.data(), packed_pubkey.data(), pub.size());
       }
