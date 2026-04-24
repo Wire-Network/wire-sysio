@@ -22,7 +22,7 @@ namespace sysio { namespace chain { namespace webassembly {
       SYS_ASSERT( false, unsupported_feature, "Unsupported Hardfork Detected" );
    }
 
-   void interface::preactivate_feature( legacy_ptr<const digest_type> feature_digest ) {
+   void interface::preactivate_feature( aligned_ptr<const digest_type> feature_digest ) {
       SYS_ASSERT(!context.trx_context.is_read_only(), wasm_execution_error, "preactivate_feature not allowed in a readonly transaction");
       context.control.preactivate_feature( *feature_digest, context.trx_context.is_transient() );
    }
@@ -37,11 +37,11 @@ namespace sysio { namespace chain { namespace webassembly {
       }
    }
 
-   void interface::get_resource_limits( account_name account, legacy_ptr<int64_t> ram_bytes, legacy_ptr<int64_t> net_weight, legacy_ptr<int64_t> cpu_weight ) const {
+   void interface::get_resource_limits( account_name account, aligned_ptr<int64_t> ram_bytes, aligned_ptr<int64_t> net_weight, aligned_ptr<int64_t> cpu_weight ) const {
       context.control.get_resource_limits_manager().get_account_limits( account, *ram_bytes, *net_weight, *cpu_weight);
-      (void)legacy_ptr<int64_t>(std::move(ram_bytes));
-      (void)legacy_ptr<int64_t>(std::move(net_weight));
-      (void)legacy_ptr<int64_t>(std::move(cpu_weight));
+      (void)aligned_ptr<int64_t>(std::move(ram_bytes));
+      (void)aligned_ptr<int64_t>(std::move(net_weight));
+      (void)aligned_ptr<int64_t>(std::move(cpu_weight));
    }
 
    int64_t set_proposed_producers_common( apply_context& context, vector<producer_authority>&& producers ) {

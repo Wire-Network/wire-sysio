@@ -3,7 +3,7 @@
 // 22 kv_* intrinsics. This contract exercises the remaining host ABI with
 // inputs that CDT's wrappers would never emit -- zero-length spans,
 // wasm-boundary-crossing pointers, misaligned pointers for the
-// legacy_ptr<fc::sha*>-style aligned-proxy intrinsics, pointer-aliased
+// aligned_ptr<fc::sha*>-style aligned-proxy intrinsics, pointer-aliased
 // arguments, null pointer + non-zero size, and the specific edge values
 // that the 128-bit compiler_builtins and softfloat entry points are
 // expected to handle.
@@ -30,7 +30,7 @@
 // -----------------------------------------------------------------------------
 extern "C" {
 
-// --- Hash intrinsics (legacy_span<const char> data, legacy_ptr<[const] fc::sha*> hash) ---
+// --- Hash intrinsics (aligned_span<const char> data, aligned_ptr<[const] fc::sha*> hash) ---
 __attribute__((sysio_wasm_import))
 void sha256( const char* data, uint32_t length, void* hash );
 __attribute__((sysio_wasm_import))
@@ -49,7 +49,7 @@ void assert_sha512( const char* data, uint32_t length, const void* hash );
 __attribute__((sysio_wasm_import))
 void assert_ripemd160( const char* data, uint32_t length, const void* hash );
 
-// --- Signature recovery (legacy_ptr<const fc::sha256> digest, legacy_span<[const] char>) ---
+// --- Signature recovery (aligned_ptr<const fc::sha256> digest, aligned_span<[const] char>) ---
 __attribute__((sysio_wasm_import))
 int32_t recover_key( const void* digest, const char* sig, uint32_t siglen,
                      char* pub, uint32_t publen );
@@ -63,15 +63,15 @@ void    assert_recover_key( const void* digest, const char* sig, uint32_t siglen
 //     runs; the body itself may have further guards (digest validity,
 //     read-only tx, range checks on resource limits, etc.). ---
 __attribute__((sysio_wasm_import))
-void preactivate_feature( const void* feature_digest );  // legacy_ptr<const digest_type>
+void preactivate_feature( const void* feature_digest );  // aligned_ptr<const digest_type>
 
 // --- P2 -- resource/auth/producer intrinsics ---
-//  get_resource_limits: 3 x legacy_ptr<int64_t, 8> out-params
+//  get_resource_limits: 3 x aligned_ptr<int64_t, 8> out-params
 //  set_resource_limits: priv-gated, plain scalar args
-//  check_transaction_authorization: legacy_span<const char> x 3
-//  get_active_producers: legacy_span<account_name> out (uint64_t[])
-//  set_proposed_producers[_ex]: priv-gated, legacy_span<const char>
-//  get/set_blockchain_parameters_packed: legacy_span<[const] char>
+//  check_transaction_authorization: aligned_span<const char> x 3
+//  get_active_producers: aligned_span<account_name> out (uint64_t[])
+//  set_proposed_producers[_ex]: priv-gated, aligned_span<const char>
+//  get/set_blockchain_parameters_packed: aligned_span<[const] char>
 __attribute__((sysio_wasm_import))
 void get_resource_limits( uint64_t account, void* ram_bytes,
                           void* net_weight, void* cpu_weight );
@@ -100,7 +100,7 @@ void     set_blockchain_parameters_packed( const char* data, uint32_t datalen );
 __attribute__((sysio_wasm_import))
 void set_action_return_value( void* return_value, uint32_t size );
 
-// --- 128-bit integer compiler builtins (legacy_ptr<[u]int128_t> ret) ---
+// --- 128-bit integer compiler builtins (aligned_ptr<[u]int128_t> ret) ---
 // Declaring the output as void* (rather than __int128*/&) lets the unaligned
 // probes pass an intentionally misaligned address without triggering C++
 // alignment UB on the caller side; the WASM import ABI is untyped pointers
@@ -125,7 +125,7 @@ void __lshlti3( void* ret, uint64_t low, uint64_t high, uint32_t shift );
 __attribute__((sysio_wasm_import))
 void __lshrti3( void* ret, uint64_t low, uint64_t high, uint32_t shift );
 
-// --- float128 (quad) compiler builtins (legacy_ptr<float128_t> ret) ---
+// --- float128 (quad) compiler builtins (aligned_ptr<float128_t> ret) ---
 __attribute__((sysio_wasm_import))
 void __addtf3 ( void* ret, uint64_t la, uint64_t ha, uint64_t lb, uint64_t hb );
 __attribute__((sysio_wasm_import))
@@ -137,7 +137,7 @@ void __divtf3 ( void* ret, uint64_t la, uint64_t ha, uint64_t lb, uint64_t hb );
 __attribute__((sysio_wasm_import))
 void __fixtfti( void* ret, uint64_t la, uint64_t ha );
 
-// --- native float / double to int128 conversions (legacy_ptr<int128_t> ret) ---
+// --- native float / double to int128 conversions (aligned_ptr<int128_t> ret) ---
 // Paired with __fixtfti above; both exercise the same saturation boundary at
 // 2^127 but through different host entry points (to_softfloat32 / to_softfloat64
 // then ___fixsfti / ___fixdfti) and must saturate identically.
@@ -146,7 +146,7 @@ void __fixsfti( void* ret, float a );
 __attribute__((sysio_wasm_import))
 void __fixdfti( void* ret, double a );
 
-// __cmptf2 has no legacy_ptr -- uint64_t quad-pairs in, int32_t out; no
+// __cmptf2 has no aligned_ptr -- uint64_t quad-pairs in, int32_t out; no
 // alignment concerns. Used by the probes below to verify float128 results
 // without having to hand-compute the exact destination bit pattern.
 __attribute__((sysio_wasm_import))
@@ -242,7 +242,7 @@ constexpr unsigned char EMPTY_RIPE[RIPE_SIZE] = {
 // -----------------------------------------------------------------------------
 // Padding used by the unaligned-pointer probes. Size picks up +3 past any
 // plausible natural alignment so that offsetting into the buffer lands the
-// hash pointer on an address that no legacy_ptr alignment requirement will
+// hash pointer on an address that no aligned_ptr alignment requirement will
 // accept without the argument_proxy copy path engaging.
 // -----------------------------------------------------------------------------
 constexpr uint32_t UNALIGNED_OFFSET = 3;
@@ -327,7 +327,7 @@ public:
       check( std::memcmp(out, ABC_SHA256, SHA256_SIZE) == 0, "sha256('abc') mismatch" );
    }
 
-   // Zero-length input. legacy_span<const char> with size 0 must be accepted
+   // Zero-length input. aligned_span<const char> with size 0 must be accepted
    // and must produce the FIPS empty-string hash, regardless of whether data
    // is nullptr or a valid pointer.
    [[sysio::action]]
@@ -493,7 +493,7 @@ public:
    //
    // Host throws crypto_api_exception "hash mismatch" if the computed digest
    // does not equal the provided digest. Both the accepted and rejection
-   // paths exercise the legacy_ptr<const fc::sha256> copy-in path.
+   // paths exercise the aligned_ptr<const fc::sha256> copy-in path.
    // =============================================================================
 
    // Correct hash: no throw.
@@ -593,7 +593,7 @@ public:
    //   - secp256k1 recovery math failures: bad recovery byte / out-of-curve r,s.
    //   - Mathematically-valid-but-wrong sig: recovery succeeds, pub differs.
    //   - Small dest buffer: fixed-size (K1) asserts, variable-size truncates.
-   //   - argument_proxy copy-in on the legacy_ptr<const fc::sha256> digest.
+   //   - argument_proxy copy-in on the aligned_ptr<const fc::sha256> digest.
    // =============================================================================
 
    // Golden: host recovers the exact pub the driver embedded.
@@ -644,7 +644,7 @@ public:
                     "(fc::datastream fixed-size pack FC_ASSERT)" );
    }
 
-   // Unaligned digest pointer. legacy_ptr<const fc::sha256, 8> forces the
+   // Unaligned digest pointer. aligned_ptr<const fc::sha256, 8> forces the
    // argument_proxy copy-in path when the wasm pointer is not 8-aligned.
    [[sysio::action]]
    void recuald() {
@@ -881,7 +881,7 @@ public:
    // P1 -- preactivate_feature
    //
    // Registered with privileged_check in runtimes/sys-vm.cpp line 359. The
-   // priv gate fires BEFORE the legacy_ptr<const digest_type> copy-in, so the
+   // priv gate fires BEFORE the aligned_ptr<const digest_type> copy-in, so the
    // non-privileged probe never reaches the digest read. The priv body then
    // dispatches into controller::preactivate_feature which validates the
    // digest against known features.
@@ -927,8 +927,8 @@ public:
    // =============================================================================
    // P2 -- resource / auth / producer / blockchain-parameters intrinsics
    //
-   // Covers the legacy_ptr<int64_t, 8> out-param path (get_resource_limits),
-   // the legacy_span<const char> and legacy_span<account_name> producer
+   // Covers the aligned_ptr<int64_t, 8> out-param path (get_resource_limits),
+   // the aligned_span<const char> and aligned_span<account_name> producer
    // paths, and the privileged_check gating on each set_* op. Small-buffer
    // probes pin the "returns required size, does not overflow caller" contract
    // that get_blockchain_parameters_packed documents.
@@ -1232,7 +1232,7 @@ public:
    // P1 -- compiler_builtins: float128 (quad precision) ops
    //
    // Verification uses __cmptf2 / __unordtf2 (uint64_t pair args, no
-   // legacy_ptr) to compare results against pre-computed bit patterns, so
+   // aligned_ptr) to compare results against pre-computed bit patterns, so
    // the probes exercise the intrinsic under test without reintroducing a
    // second call to that same intrinsic for golden comparison.
    // =============================================================================
@@ -1386,11 +1386,11 @@ public:
    // =============================================================================
    // P3 -- console / IO / action-data intrinsics
    //
-   // Covers the remaining legacy_span / null_terminated_ptr surface. raw::prints /
+   // Covers the remaining aligned_span / null_terminated_ptr surface. raw::prints /
    // raw::sysio_assert take null_terminated_ptr (host walks memory for \0), so the
    // validator cost is per-call proportional to the string length. The *_l /
-   // *_message variants use legacy_span<const char> with explicit size and
-   // are the path the cleanup PR will keep. Remaining legacy_span<char>
+   // *_message variants use aligned_span<const char> with explicit size and
+   // are the path the cleanup PR will keep. Remaining aligned_span<char>
    // readers (read_action_data, get_context_free_data, raw::get_action,
    // raw::read_transaction) document a "size=0 returns required size" contract
    // that the small-buffer probes here pin in place.
@@ -1408,7 +1408,7 @@ public:
       raw::prints( "" );  // empty C string
    }
 
-   // raw::prints_l: legacy_span<const char>. Zero-length legal (no bytes printed).
+   // raw::prints_l: aligned_span<const char>. Zero-length legal (no bytes printed).
    // Non-null data with length 0 also legal and must behave identically.
    [[sysio::action]]
    void printlem() {
@@ -1417,7 +1417,7 @@ public:
       raw::prints_l( msg, 3 );
    }
 
-   // printhex: legacy_span<const char> of raw bytes. Zero-length legal.
+   // printhex: aligned_span<const char> of raw bytes. Zero-length legal.
    [[sysio::action]]
    void phxok() {
       const unsigned char data[] = { 0xde, 0xad, 0xbe, 0xef };
@@ -1457,7 +1457,7 @@ public:
    }
 
    // raw::sysio_assert_message with test == 0 AND empty msg span. Pins that an
-   // empty-message rejection does not crash on a zero-length legacy_span.
+   // empty-message rejection does not crash on a zero-length aligned_span.
    [[sysio::action]]
    void samngem() {
       raw::sysio_assert_message( 0, nullptr, 0 );
@@ -1525,7 +1525,7 @@ public:
    }
 
    // raw::send_inline with empty span -> host tries to unpack and fails. Pins
-   // that a zero-length legacy_span is NOT silently converted to a default
+   // that a zero-length aligned_span is NOT silently converted to a default
    // action.
    [[sysio::action]]
    void sinlem() {

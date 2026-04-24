@@ -52,14 +52,14 @@ namespace sysio { namespace chain { namespace webassembly {
       return context.kv_it_lower_bound(handle, key.data(), key.size());
    }
 
-   int32_t interface::kv_it_key(uint32_t handle, uint32_t offset, span<char> dest, legacy_ptr<uint32_t> actual_size) {
+   int32_t interface::kv_it_key(uint32_t handle, uint32_t offset, span<char> dest, aligned_ptr<uint32_t> actual_size) {
       uint32_t sz = 0;
       int32_t status = context.kv_it_key(handle, offset, dest.data(), dest.size(), sz);
       *actual_size = sz;
       return status;
    }
 
-   int32_t interface::kv_it_value(uint32_t handle, uint32_t offset, span<char> dest, legacy_ptr<uint32_t> actual_size) {
+   int32_t interface::kv_it_value(uint32_t handle, uint32_t offset, span<char> dest, aligned_ptr<uint32_t> actual_size) {
       uint32_t sz = 0;
       int32_t status = context.kv_it_value(handle, offset, dest.data(), dest.size(), sz);
       *actual_size = sz;
@@ -103,14 +103,14 @@ namespace sysio { namespace chain { namespace webassembly {
       return context.kv_idx_prev(handle);
    }
 
-   int32_t interface::kv_idx_key(uint32_t handle, uint32_t offset, span<char> dest, legacy_ptr<uint32_t> actual_size) {
+   int32_t interface::kv_idx_key(uint32_t handle, uint32_t offset, span<char> dest, aligned_ptr<uint32_t> actual_size) {
       uint32_t sz = 0;
       int32_t status = context.kv_idx_key(handle, offset, dest.data(), dest.size(), sz);
       *actual_size = sz;
       return status;
    }
 
-   int32_t interface::kv_idx_primary_key(uint32_t handle, uint32_t offset, span<char> dest, legacy_ptr<uint32_t> actual_size) {
+   int32_t interface::kv_idx_primary_key(uint32_t handle, uint32_t offset, span<char> dest, aligned_ptr<uint32_t> actual_size) {
       uint32_t sz = 0;
       int32_t status = context.kv_idx_primary_key(handle, offset, dest.data(), dest.size(), sz);
       *actual_size = sz;

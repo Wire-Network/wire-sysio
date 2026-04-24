@@ -2,11 +2,11 @@
 //
 // Consensus-critical signature registry for host intrinsics.
 //
-// Each interface method that the legacy_span/legacy_ptr -> span cleanup
+// Each interface method that the aligned_span/aligned_ptr -> span cleanup
 // will touch is pinned below via a static_assert on
 // decltype(&interface::fn). Any accidental change to a signature during
-// the cleanup -- a constness flip, a legacy_span <-> span swap, a param
-// reordering, a legacy_ptr<T, Align> alignment change -- fires a build
+// the cleanup -- a constness flip, a aligned_span <-> span swap, a param
+// reordering, a aligned_ptr<T, Align> alignment change -- fires a build
 // error here instead of silently drifting into production.
 //
 // The compiler diagnostic names the intrinsic; the next step when you see
@@ -23,8 +23,8 @@
 // This file is intentionally redundant with interface.hpp. Point of the
 // redundancy is that redundancy is exactly what catches silent drift.
 //
-// Coverage: every interface method that currently uses legacy_ptr or
-// legacy_span is pinned (the cleanup's blast radius). The span<>-using
+// Coverage: every interface method that currently uses aligned_ptr or
+// aligned_span is pinned (the cleanup's blast radius). The span<>-using
 // intrinsics that stay span<> through the cleanup are also pinned so a
 // later "normalize everything to char*+size_t" refactor is caught. The
 // softfloat _sysio_f32/f64_* arithmetic intrinsics (plain float/double
@@ -62,14 +62,14 @@ SYS_PIN_INTRINSIC( is_feature_active,
 SYS_PIN_INTRINSIC( activate_feature,
                    void (interface::*)(int64_t) const );
 SYS_PIN_INTRINSIC( preactivate_feature,
-                   void (interface::*)(legacy_ptr<const digest_type>) );
+                   void (interface::*)(aligned_ptr<const digest_type>) );
 SYS_PIN_INTRINSIC( set_resource_limits,
                    void (interface::*)(account_name, int64_t, int64_t, int64_t) );
 SYS_PIN_INTRINSIC( get_resource_limits,
                    void (interface::*)(account_name,
-                                       legacy_ptr<int64_t, 8>,
-                                       legacy_ptr<int64_t, 8>,
-                                       legacy_ptr<int64_t, 8>) const );
+                                       aligned_ptr<int64_t, 8>,
+                                       aligned_ptr<int64_t, 8>,
+                                       aligned_ptr<int64_t, 8>) const );
 SYS_PIN_INTRINSIC( get_wasm_parameters_packed,
                    uint32_t (interface::*)(span<char>, uint32_t) const );
 SYS_PIN_INTRINSIC( set_wasm_parameters_packed,
@@ -97,43 +97,43 @@ SYS_PIN_INTRINSIC( set_privileged,
 // Producers
 // =============================================================================
 SYS_PIN_INTRINSIC( get_active_producers,
-                   int32_t (interface::*)(legacy_span<account_name>) const );
+                   int32_t (interface::*)(aligned_span<account_name>) const );
 
 // =============================================================================
 // Crypto -- hashes + signature recovery
 // =============================================================================
 SYS_PIN_INTRINSIC( assert_recover_key,
-                   void (interface::*)(legacy_ptr<const fc::sha256>,
+                   void (interface::*)(aligned_ptr<const fc::sha256>,
                                        span<const char>,
                                        span<const char>) const );
 SYS_PIN_INTRINSIC( recover_key,
-                   int32_t (interface::*)(legacy_ptr<const fc::sha256>,
+                   int32_t (interface::*)(aligned_ptr<const fc::sha256>,
                                           span<const char>,
                                           span<char>) const );
 SYS_PIN_INTRINSIC( assert_sha256,
                    void (interface::*)(span<const char>,
-                                       legacy_ptr<const fc::sha256>) const );
+                                       aligned_ptr<const fc::sha256>) const );
 SYS_PIN_INTRINSIC( assert_sha1,
                    void (interface::*)(span<const char>,
-                                       legacy_ptr<const fc::sha1>) const );
+                                       aligned_ptr<const fc::sha1>) const );
 SYS_PIN_INTRINSIC( assert_sha512,
                    void (interface::*)(span<const char>,
-                                       legacy_ptr<const fc::sha512>) const );
+                                       aligned_ptr<const fc::sha512>) const );
 SYS_PIN_INTRINSIC( assert_ripemd160,
                    void (interface::*)(span<const char>,
-                                       legacy_ptr<const fc::ripemd160>) const );
+                                       aligned_ptr<const fc::ripemd160>) const );
 SYS_PIN_INTRINSIC( sha256,
                    void (interface::*)(span<const char>,
-                                       legacy_ptr<fc::sha256>) const );
+                                       aligned_ptr<fc::sha256>) const );
 SYS_PIN_INTRINSIC( sha1,
                    void (interface::*)(span<const char>,
-                                       legacy_ptr<fc::sha1>) const );
+                                       aligned_ptr<fc::sha1>) const );
 SYS_PIN_INTRINSIC( sha512,
                    void (interface::*)(span<const char>,
-                                       legacy_ptr<fc::sha512>) const );
+                                       aligned_ptr<fc::sha512>) const );
 SYS_PIN_INTRINSIC( ripemd160,
                    void (interface::*)(span<const char>,
-                                       legacy_ptr<fc::ripemd160>) const );
+                                       aligned_ptr<fc::ripemd160>) const );
 
 // =============================================================================
 // Permission + authorization
@@ -168,7 +168,7 @@ SYS_PIN_INTRINSIC( current_time,
 SYS_PIN_INTRINSIC( publication_time,
                    uint64_t (interface::*)() const );
 SYS_PIN_INTRINSIC( is_feature_activated,
-                   bool (interface::*)(legacy_ptr<const digest_type>) const );
+                   bool (interface::*)(aligned_ptr<const digest_type>) const );
 SYS_PIN_INTRINSIC( get_sender,
                    name (interface::*)() const );
 SYS_PIN_INTRINSIC( get_ram_usage,
@@ -195,7 +195,7 @@ SYS_PIN_INTRINSIC( set_action_return_value,
                    void (interface::*)(span<const char>) );
 
 // =============================================================================
-// Console (prints / printhex -- null_terminated_ptr + legacy_span readers)
+// Console (prints / printhex -- null_terminated_ptr + aligned_span readers)
 // =============================================================================
 SYS_PIN_INTRINSIC( prints,
                    void (interface::*)(null_terminated_ptr) );
@@ -206,15 +206,15 @@ SYS_PIN_INTRINSIC( printi,
 SYS_PIN_INTRINSIC( printui,
                    void (interface::*)(uint64_t) );
 SYS_PIN_INTRINSIC( printi128,
-                   void (interface::*)(legacy_ptr<const __int128>) );
+                   void (interface::*)(aligned_ptr<const __int128>) );
 SYS_PIN_INTRINSIC( printui128,
-                   void (interface::*)(legacy_ptr<const unsigned __int128>) );
+                   void (interface::*)(aligned_ptr<const unsigned __int128>) );
 SYS_PIN_INTRINSIC( printsf,
                    void (interface::*)(float32_t) );
 SYS_PIN_INTRINSIC( printdf,
                    void (interface::*)(float64_t) );
 SYS_PIN_INTRINSIC( printqf,
-                   void (interface::*)(legacy_ptr<const float128_t>) );
+                   void (interface::*)(aligned_ptr<const float128_t>) );
 SYS_PIN_INTRINSIC( printn,
                    void (interface::*)(name) );
 SYS_PIN_INTRINSIC( printhex,
@@ -252,11 +252,11 @@ SYS_PIN_INTRINSIC( kv_it_lower_bound,
 SYS_PIN_INTRINSIC( kv_it_key,
                    int32_t (interface::*)(uint32_t, uint32_t,
                                           span<char>,
-                                          legacy_ptr<uint32_t>) );
+                                          aligned_ptr<uint32_t>) );
 SYS_PIN_INTRINSIC( kv_it_value,
                    int32_t (interface::*)(uint32_t, uint32_t,
                                           span<char>,
-                                          legacy_ptr<uint32_t>) );
+                                          aligned_ptr<uint32_t>) );
 SYS_PIN_INTRINSIC( kv_idx_store,
                    void (interface::*)(uint64_t, uint32_t,
                                        span<const char>,
@@ -283,11 +283,11 @@ SYS_PIN_INTRINSIC( kv_idx_prev,
 SYS_PIN_INTRINSIC( kv_idx_key,
                    int32_t (interface::*)(uint32_t, uint32_t,
                                           span<char>,
-                                          legacy_ptr<uint32_t>) );
+                                          aligned_ptr<uint32_t>) );
 SYS_PIN_INTRINSIC( kv_idx_primary_key,
                    int32_t (interface::*)(uint32_t, uint32_t,
                                           span<char>,
-                                          legacy_ptr<uint32_t>) );
+                                          aligned_ptr<uint32_t>) );
 SYS_PIN_INTRINSIC( kv_idx_destroy,
                    void (interface::*)(uint32_t) );
 
@@ -376,54 +376,54 @@ SYS_PIN_INTRINSIC( bls_fp_exp,
                    int32_t (interface::*)(span<const char>, span<const char>, span<char>) const );
 
 // =============================================================================
-// compiler_builtins: 128-bit integer ops (all legacy_ptr<[u]int128_t, 16>)
+// compiler_builtins: 128-bit integer ops (all aligned_ptr<[u]int128_t, 16>)
 // =============================================================================
 SYS_PIN_INTRINSIC( __ashlti3,
-                   void (interface::*)(legacy_ptr<int128_t>, uint64_t, uint64_t, uint32_t) const );
+                   void (interface::*)(aligned_ptr<int128_t>, uint64_t, uint64_t, uint32_t) const );
 SYS_PIN_INTRINSIC( __ashrti3,
-                   void (interface::*)(legacy_ptr<int128_t>, uint64_t, uint64_t, uint32_t) const );
+                   void (interface::*)(aligned_ptr<int128_t>, uint64_t, uint64_t, uint32_t) const );
 SYS_PIN_INTRINSIC( __lshlti3,
-                   void (interface::*)(legacy_ptr<int128_t>, uint64_t, uint64_t, uint32_t) const );
+                   void (interface::*)(aligned_ptr<int128_t>, uint64_t, uint64_t, uint32_t) const );
 SYS_PIN_INTRINSIC( __lshrti3,
-                   void (interface::*)(legacy_ptr<int128_t>, uint64_t, uint64_t, uint32_t) const );
+                   void (interface::*)(aligned_ptr<int128_t>, uint64_t, uint64_t, uint32_t) const );
 SYS_PIN_INTRINSIC( __divti3,
-                   void (interface::*)(legacy_ptr<int128_t>, uint64_t, uint64_t,
+                   void (interface::*)(aligned_ptr<int128_t>, uint64_t, uint64_t,
                                        uint64_t, uint64_t) const );
 SYS_PIN_INTRINSIC( __udivti3,
-                   void (interface::*)(legacy_ptr<uint128_t>, uint64_t, uint64_t,
+                   void (interface::*)(aligned_ptr<uint128_t>, uint64_t, uint64_t,
                                        uint64_t, uint64_t) const );
 SYS_PIN_INTRINSIC( __multi3,
-                   void (interface::*)(legacy_ptr<uint128_t>, uint64_t, uint64_t,
+                   void (interface::*)(aligned_ptr<uint128_t>, uint64_t, uint64_t,
                                        uint64_t, uint64_t) const );
 SYS_PIN_INTRINSIC( __modti3,
-                   void (interface::*)(legacy_ptr<int128_t>, uint64_t, uint64_t,
+                   void (interface::*)(aligned_ptr<int128_t>, uint64_t, uint64_t,
                                        uint64_t, uint64_t) const );
 SYS_PIN_INTRINSIC( __umodti3,
-                   void (interface::*)(legacy_ptr<uint128_t>, uint64_t, uint64_t,
+                   void (interface::*)(aligned_ptr<uint128_t>, uint64_t, uint64_t,
                                        uint64_t, uint64_t) const );
 
 // =============================================================================
-// compiler_builtins: float128 arithmetic + conversion (legacy_ptr<float128_t, 16>
+// compiler_builtins: float128 arithmetic + conversion (aligned_ptr<float128_t, 16>
 // for output, uint64_t-pair for input)
 // =============================================================================
 SYS_PIN_INTRINSIC( __addtf3,
-                   void (interface::*)(legacy_ptr<float128_t>, uint64_t, uint64_t,
+                   void (interface::*)(aligned_ptr<float128_t>, uint64_t, uint64_t,
                                        uint64_t, uint64_t) const );
 SYS_PIN_INTRINSIC( __subtf3,
-                   void (interface::*)(legacy_ptr<float128_t>, uint64_t, uint64_t,
+                   void (interface::*)(aligned_ptr<float128_t>, uint64_t, uint64_t,
                                        uint64_t, uint64_t) const );
 SYS_PIN_INTRINSIC( __multf3,
-                   void (interface::*)(legacy_ptr<float128_t>, uint64_t, uint64_t,
+                   void (interface::*)(aligned_ptr<float128_t>, uint64_t, uint64_t,
                                        uint64_t, uint64_t) const );
 SYS_PIN_INTRINSIC( __divtf3,
-                   void (interface::*)(legacy_ptr<float128_t>, uint64_t, uint64_t,
+                   void (interface::*)(aligned_ptr<float128_t>, uint64_t, uint64_t,
                                        uint64_t, uint64_t) const );
 SYS_PIN_INTRINSIC( __negtf2,
-                   void (interface::*)(legacy_ptr<float128_t>, uint64_t, uint64_t) const );
+                   void (interface::*)(aligned_ptr<float128_t>, uint64_t, uint64_t) const );
 SYS_PIN_INTRINSIC( __extendsftf2,
-                   void (interface::*)(legacy_ptr<float128_t>, float) const );
+                   void (interface::*)(aligned_ptr<float128_t>, float) const );
 SYS_PIN_INTRINSIC( __extenddftf2,
-                   void (interface::*)(legacy_ptr<float128_t>, double) const );
+                   void (interface::*)(aligned_ptr<float128_t>, double) const );
 SYS_PIN_INTRINSIC( __trunctfdf2,
                    double (interface::*)(uint64_t, uint64_t) const );
 SYS_PIN_INTRINSIC( __trunctfsf2,
@@ -433,31 +433,31 @@ SYS_PIN_INTRINSIC( __fixtfsi,
 SYS_PIN_INTRINSIC( __fixtfdi,
                    int64_t (interface::*)(uint64_t, uint64_t) const );
 SYS_PIN_INTRINSIC( __fixtfti,
-                   void (interface::*)(legacy_ptr<int128_t>, uint64_t, uint64_t) const );
+                   void (interface::*)(aligned_ptr<int128_t>, uint64_t, uint64_t) const );
 SYS_PIN_INTRINSIC( __fixunstfsi,
                    uint32_t (interface::*)(uint64_t, uint64_t) const );
 SYS_PIN_INTRINSIC( __fixunstfdi,
                    uint64_t (interface::*)(uint64_t, uint64_t) const );
 SYS_PIN_INTRINSIC( __fixunstfti,
-                   void (interface::*)(legacy_ptr<uint128_t>, uint64_t, uint64_t) const );
+                   void (interface::*)(aligned_ptr<uint128_t>, uint64_t, uint64_t) const );
 SYS_PIN_INTRINSIC( __fixsfti,
-                   void (interface::*)(legacy_ptr<int128_t>, float) const );
+                   void (interface::*)(aligned_ptr<int128_t>, float) const );
 SYS_PIN_INTRINSIC( __fixdfti,
-                   void (interface::*)(legacy_ptr<int128_t>, double) const );
+                   void (interface::*)(aligned_ptr<int128_t>, double) const );
 SYS_PIN_INTRINSIC( __fixunssfti,
-                   void (interface::*)(legacy_ptr<uint128_t>, float) const );
+                   void (interface::*)(aligned_ptr<uint128_t>, float) const );
 SYS_PIN_INTRINSIC( __fixunsdfti,
-                   void (interface::*)(legacy_ptr<uint128_t>, double) const );
+                   void (interface::*)(aligned_ptr<uint128_t>, double) const );
 SYS_PIN_INTRINSIC( __floatsidf,
                    double (interface::*)(int32_t) const );
 SYS_PIN_INTRINSIC( __floatsitf,
-                   void (interface::*)(legacy_ptr<float128_t>, int32_t) const );
+                   void (interface::*)(aligned_ptr<float128_t>, int32_t) const );
 SYS_PIN_INTRINSIC( __floatditf,
-                   void (interface::*)(legacy_ptr<float128_t>, uint64_t) const );
+                   void (interface::*)(aligned_ptr<float128_t>, uint64_t) const );
 SYS_PIN_INTRINSIC( __floatunsitf,
-                   void (interface::*)(legacy_ptr<float128_t>, uint32_t) const );
+                   void (interface::*)(aligned_ptr<float128_t>, uint32_t) const );
 SYS_PIN_INTRINSIC( __floatunditf,
-                   void (interface::*)(legacy_ptr<float128_t>, uint64_t) const );
+                   void (interface::*)(aligned_ptr<float128_t>, uint64_t) const );
 SYS_PIN_INTRINSIC( __floattidf,
                    double (interface::*)(uint64_t, uint64_t) const );
 SYS_PIN_INTRINSIC( __floatuntidf,

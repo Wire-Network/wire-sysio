@@ -57,7 +57,7 @@ namespace webassembly {
           * @ingroup privileged
           * @param feature_digest - 256-bit digest representing the feature to pre-activate.
          */
-         void preactivate_feature(legacy_ptr<const digest_type> feature_digest);
+         void preactivate_feature(aligned_ptr<const digest_type> feature_digest);
 
          /**
           * Set the resource limits of an account.
@@ -81,7 +81,7 @@ namespace webassembly {
           * @param[out] net_weight - output to hold net weight.
           * @param[out] cpu_weight - output to hold cpu weight.
          */
-         void get_resource_limits(account_name account, legacy_ptr<int64_t, 8> ram_bytes, legacy_ptr<int64_t, 8> net_weight, legacy_ptr<int64_t, 8> cpu_weight) const;
+         void get_resource_limits(account_name account, aligned_ptr<int64_t, 8> ram_bytes, aligned_ptr<int64_t, 8> net_weight, aligned_ptr<int64_t, 8> cpu_weight) const;
 
           /**
            * Get the current wasm limits configuration.
@@ -343,7 +343,7 @@ namespace webassembly {
           *
           * @return number of bytes required (if the buffer is empty), or the number of bytes written to the buffer.
          */
-         int32_t get_active_producers(legacy_span<account_name> producers) const;
+         int32_t get_active_producers(aligned_span<account_name> producers) const;
 
          /**
           * Tests a given public key with the recovered public key from digest and signature.
@@ -353,7 +353,7 @@ namespace webassembly {
           * @param sig - signature.
           * @param pub - public key.
          */
-         void assert_recover_key(legacy_ptr<const fc::sha256> digest, span<const char> sig, span<const char> pub) const;
+         void assert_recover_key(aligned_ptr<const fc::sha256> digest, span<const char> sig, span<const char> pub) const;
 
          /**
           * Calculates the public key used for a given signature on a given digest.
@@ -365,7 +365,7 @@ namespace webassembly {
           *
           * @return size of data written on the buffer.
          */
-         int32_t recover_key(legacy_ptr<const fc::sha256> digest, span<const char> sig, span<char> pub) const;
+         int32_t recover_key(aligned_ptr<const fc::sha256> digest, span<const char> sig, span<char> pub) const;
 
          /**
           * Tests if the sha256 hash generated from data matches the provided digest.
@@ -374,7 +374,7 @@ namespace webassembly {
           * @param data - a span containing the data you want to hash.
           * @param hash_val - digest to compare to.
          */
-         void assert_sha256(span<const char> data, legacy_ptr<const fc::sha256> hash_val) const;
+         void assert_sha256(span<const char> data, aligned_ptr<const fc::sha256> hash_val) const;
 
          /**
           * Tests if the sha1 hash generated from data matches the provided digest.
@@ -383,7 +383,7 @@ namespace webassembly {
           * @param data - a span containing the data you want to hash.
           * @param hash_val - digest to compare to.
          */
-         void assert_sha1(span<const char> data, legacy_ptr<const fc::sha1> hash_val) const;
+         void assert_sha1(span<const char> data, aligned_ptr<const fc::sha1> hash_val) const;
 
          /**
           * Tests if the sha512 hash generated from data matches the provided digest.
@@ -392,7 +392,7 @@ namespace webassembly {
           * @param data - a span containing the data you want to hash.
           * @param hash_val - digest to compare to.
          */
-         void assert_sha512(span<const char> data, legacy_ptr<const fc::sha512> hash_val) const;
+         void assert_sha512(span<const char> data, aligned_ptr<const fc::sha512> hash_val) const;
 
          /**
           * Tests if the ripemd160 hash generated from data matches the provided digest.
@@ -401,7 +401,7 @@ namespace webassembly {
           * @param data - a span containing the data you want to hash.
           * @param hash_val - digest to compare to.
          */
-         void assert_ripemd160(span<const char> data, legacy_ptr<const fc::ripemd160> hash_val) const;
+         void assert_ripemd160(span<const char> data, aligned_ptr<const fc::ripemd160> hash_val) const;
 
          /**
           * Hashes data using SHA256.
@@ -410,7 +410,7 @@ namespace webassembly {
           * @param data - a span containing the data.
           * @param[out] hash_val - the resulting digest.
          */
-         void sha256(span<const char> data, legacy_ptr<fc::sha256> hash_val) const;
+         void sha256(span<const char> data, aligned_ptr<fc::sha256> hash_val) const;
 
          /**
           * Hashes data using SHA1.
@@ -419,7 +419,7 @@ namespace webassembly {
           * @param data - a span containing the data.
           * @param[out] hash_val - the resulting digest.
          */
-         void sha1(span<const char> data, legacy_ptr<fc::sha1> hash_val) const;
+         void sha1(span<const char> data, aligned_ptr<fc::sha1> hash_val) const;
 
          /**
           * Hashes data using SHA512.
@@ -428,7 +428,7 @@ namespace webassembly {
           * @param data - a span containing the data.
           * @param[out] hash_val - the hash
          */
-         void sha512(span<const char> data, legacy_ptr<fc::sha512> hash_val) const;
+         void sha512(span<const char> data, aligned_ptr<fc::sha512> hash_val) const;
 
          /**
           * Hashes data using RIPEMD160.
@@ -437,7 +437,7 @@ namespace webassembly {
           * @param data - a span containing the data.
           * @param[out] hash_val - computed digest.
          */
-         void ripemd160(span<const char> data, legacy_ptr<fc::ripemd160> hash_val) const;
+         void ripemd160(span<const char> data, aligned_ptr<fc::ripemd160> hash_val) const;
 
          /**
           * Checks if a transaction is authorized by a provided set of keys and permissions.
@@ -589,7 +589,7 @@ namespace webassembly {
           * @retval true if the specified protocol feature has been activated.
           * @retval false otherwise.
          */
-         bool is_feature_activated(legacy_ptr<const digest_type> feature_digest) const;
+         bool is_feature_activated(aligned_ptr<const digest_type> feature_digest) const;
 
          /**
           * Return the name of the account that sent the current inline action.
@@ -723,7 +723,7 @@ namespace webassembly {
           * @ingroup console
           * @param val - 128 bit signed integer to be printed.
           */
-         void printi128(legacy_ptr<const __int128> val);
+         void printi128(aligned_ptr<const __int128> val);
 
          /**
           * Prints value as a 128 bit unsigned integer.
@@ -731,7 +731,7 @@ namespace webassembly {
           * @ingroup console
           * @param val - 128 bit unsigned integer to be printed.
           */
-         void printui128(legacy_ptr<const unsigned __int128> val);
+         void printui128(aligned_ptr<const unsigned __int128> val);
 
          /**
           * Prints value as single-precision floating point number.
@@ -755,7 +755,7 @@ namespace webassembly {
           * @ingroup console
           * @param val - a pointer to the quadruple-precision floating point number to be printed
           */
-         void printqf(legacy_ptr<const float128_t> val);
+         void printqf(aligned_ptr<const float128_t> val);
 
          /**
           * Prints a 64 bit names as base32 encoded string.
@@ -904,7 +904,7 @@ namespace webassembly {
           * @param actual_size - [out] receives the full key size
           * @return 0 on success
           */
-         int32_t  kv_it_key(uint32_t handle, uint32_t offset, span<char> dest, legacy_ptr<uint32_t> actual_size);
+         int32_t  kv_it_key(uint32_t handle, uint32_t offset, span<char> dest, aligned_ptr<uint32_t> actual_size);
 
          /**
           * Read the value at the iterator's current position.
@@ -915,7 +915,7 @@ namespace webassembly {
           * @param actual_size - [out] receives the full value size
           * @return 0 on success
           */
-         int32_t  kv_it_value(uint32_t handle, uint32_t offset, span<char> dest, legacy_ptr<uint32_t> actual_size);
+         int32_t  kv_it_value(uint32_t handle, uint32_t offset, span<char> dest, aligned_ptr<uint32_t> actual_size);
 
          // ---- KV Database API — Secondary Index Operations ----
          //
@@ -1001,7 +1001,7 @@ namespace webassembly {
           * @param actual_size - [out] receives the full secondary key size
           * @return 0 on success
           */
-         int32_t  kv_idx_key(uint32_t handle, uint32_t offset, span<char> dest, legacy_ptr<uint32_t> actual_size);
+         int32_t  kv_idx_key(uint32_t handle, uint32_t offset, span<char> dest, aligned_ptr<uint32_t> actual_size);
 
          /**
           * Read the primary key associated with a secondary iterator's current entry.
@@ -1012,7 +1012,7 @@ namespace webassembly {
           * @param actual_size - [out] receives the full primary key size
           * @return 0 on success
           */
-         int32_t  kv_idx_primary_key(uint32_t handle, uint32_t offset, span<char> dest, legacy_ptr<uint32_t> actual_size);
+         int32_t  kv_idx_primary_key(uint32_t handle, uint32_t offset, span<char> dest, aligned_ptr<uint32_t> actual_size);
 
          /**
           * Release a secondary index iterator handle back to the pool.
@@ -1311,39 +1311,39 @@ namespace webassembly {
          int32_t bls_fp_exp(span<const char> base, span<const char> exp, span<char> result) const;
 
          // compiler builtins api
-         void __ashlti3(legacy_ptr<int128_t>, uint64_t, uint64_t, uint32_t) const;
-         void __ashrti3(legacy_ptr<int128_t>, uint64_t, uint64_t, uint32_t) const;
-         void __lshlti3(legacy_ptr<int128_t>, uint64_t, uint64_t, uint32_t) const;
-         void __lshrti3(legacy_ptr<int128_t>, uint64_t, uint64_t, uint32_t) const;
-         void __divti3(legacy_ptr<int128_t>, uint64_t, uint64_t, uint64_t, uint64_t) const;
-         void __udivti3(legacy_ptr<uint128_t>, uint64_t, uint64_t, uint64_t, uint64_t) const;
-         void __multi3(legacy_ptr<uint128_t>, uint64_t, uint64_t, uint64_t, uint64_t) const;
-         void __modti3(legacy_ptr<int128_t>, uint64_t, uint64_t, uint64_t, uint64_t) const;
-         void __umodti3(legacy_ptr<uint128_t>, uint64_t, uint64_t, uint64_t, uint64_t) const;
-         void __addtf3(legacy_ptr<float128_t>, uint64_t, uint64_t, uint64_t, uint64_t) const;
-         void __subtf3(legacy_ptr<float128_t>, uint64_t, uint64_t, uint64_t, uint64_t) const;
-         void __multf3(legacy_ptr<float128_t>, uint64_t, uint64_t, uint64_t, uint64_t) const;
-         void __divtf3(legacy_ptr<float128_t>, uint64_t, uint64_t, uint64_t, uint64_t) const;
-         void __negtf2(legacy_ptr<float128_t>, uint64_t, uint64_t) const;
-         void __extendsftf2(legacy_ptr<float128_t>, float) const;
-         void __extenddftf2(legacy_ptr<float128_t>, double) const;
+         void __ashlti3(aligned_ptr<int128_t>, uint64_t, uint64_t, uint32_t) const;
+         void __ashrti3(aligned_ptr<int128_t>, uint64_t, uint64_t, uint32_t) const;
+         void __lshlti3(aligned_ptr<int128_t>, uint64_t, uint64_t, uint32_t) const;
+         void __lshrti3(aligned_ptr<int128_t>, uint64_t, uint64_t, uint32_t) const;
+         void __divti3(aligned_ptr<int128_t>, uint64_t, uint64_t, uint64_t, uint64_t) const;
+         void __udivti3(aligned_ptr<uint128_t>, uint64_t, uint64_t, uint64_t, uint64_t) const;
+         void __multi3(aligned_ptr<uint128_t>, uint64_t, uint64_t, uint64_t, uint64_t) const;
+         void __modti3(aligned_ptr<int128_t>, uint64_t, uint64_t, uint64_t, uint64_t) const;
+         void __umodti3(aligned_ptr<uint128_t>, uint64_t, uint64_t, uint64_t, uint64_t) const;
+         void __addtf3(aligned_ptr<float128_t>, uint64_t, uint64_t, uint64_t, uint64_t) const;
+         void __subtf3(aligned_ptr<float128_t>, uint64_t, uint64_t, uint64_t, uint64_t) const;
+         void __multf3(aligned_ptr<float128_t>, uint64_t, uint64_t, uint64_t, uint64_t) const;
+         void __divtf3(aligned_ptr<float128_t>, uint64_t, uint64_t, uint64_t, uint64_t) const;
+         void __negtf2(aligned_ptr<float128_t>, uint64_t, uint64_t) const;
+         void __extendsftf2(aligned_ptr<float128_t>, float) const;
+         void __extenddftf2(aligned_ptr<float128_t>, double) const;
          double __trunctfdf2(uint64_t, uint64_t) const;
          float __trunctfsf2(uint64_t, uint64_t) const;
          int32_t __fixtfsi(uint64_t, uint64_t) const;
          int64_t __fixtfdi(uint64_t, uint64_t) const;
-         void __fixtfti(legacy_ptr<int128_t>, uint64_t, uint64_t) const;
+         void __fixtfti(aligned_ptr<int128_t>, uint64_t, uint64_t) const;
          uint32_t __fixunstfsi(uint64_t, uint64_t) const;
          uint64_t __fixunstfdi(uint64_t, uint64_t) const;
-         void __fixunstfti(legacy_ptr<uint128_t>, uint64_t, uint64_t) const;
-         void __fixsfti(legacy_ptr<int128_t>, float) const;
-         void __fixdfti(legacy_ptr<int128_t>, double) const;
-         void __fixunssfti(legacy_ptr<uint128_t>, float) const;
-         void __fixunsdfti(legacy_ptr<uint128_t>, double) const;
+         void __fixunstfti(aligned_ptr<uint128_t>, uint64_t, uint64_t) const;
+         void __fixsfti(aligned_ptr<int128_t>, float) const;
+         void __fixdfti(aligned_ptr<int128_t>, double) const;
+         void __fixunssfti(aligned_ptr<uint128_t>, float) const;
+         void __fixunsdfti(aligned_ptr<uint128_t>, double) const;
          double __floatsidf(int32_t) const;
-         void __floatsitf(legacy_ptr<float128_t>, int32_t) const;
-         void __floatditf(legacy_ptr<float128_t>, uint64_t) const;
-         void __floatunsitf(legacy_ptr<float128_t>, uint32_t) const;
-         void __floatunditf(legacy_ptr<float128_t>, uint64_t) const;
+         void __floatsitf(aligned_ptr<float128_t>, int32_t) const;
+         void __floatditf(aligned_ptr<float128_t>, uint64_t) const;
+         void __floatunsitf(aligned_ptr<float128_t>, uint32_t) const;
+         void __floatunditf(aligned_ptr<float128_t>, uint64_t) const;
          double __floattidf(uint64_t, uint64_t) const;
          double __floatuntidf(uint64_t, uint64_t) const;
          int32_t __cmptf2(uint64_t, uint64_t, uint64_t, uint64_t) const;

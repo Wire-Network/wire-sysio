@@ -3,14 +3,14 @@
 // the crypto, compiler_builtins, privileged, resource/auth/producer, and
 // console/IO host intrinsics with inputs CDT wrappers would never emit but a
 // malicious contract can: zero-length spans, wasm-boundary-crossing pointers,
-// unaligned legacy_ptr targets, corrupt-but-well-formed signatures, and so on.
+// unaligned aligned_ptr targets, corrupt-but-well-formed signatures, and so on.
 //
 // Shared fixture mirrors PR #308's pattern: one validating_tester constructed
 // once per process, both a non-privileged and a privileged account host the
 // same probe WASM so the driver can select which account pushes each action.
 // Privilege is required for get_resource_limits / set_resource_limits /
 // get_blockchain_parameters_packed / set_blockchain_parameters_packed /
-// preactivate_feature per their REGISTER_LEGACY_HOST_FUNCTION(_, privileged_check)
+// preactivate_feature per their REGISTER_ALIGNED_HOST_FUNCTION(_, privileged_check)
 // registration in runtimes/sys-vm.cpp.
 
 #include <boost/test/unit_test.hpp>
@@ -384,7 +384,7 @@ BOOST_FIXTURE_TEST_CASE(f32_fix_overflow,  intrinsic_probe_fixture) { BOOST_CHEC
 //
 // get_resource_limits, get_blockchain_parameters_packed, set_resource_limits,
 // set_proposed_producers[_ex], set_blockchain_parameters_packed are all
-// REGISTER_LEGACY_HOST_FUNCTION(..., privileged_check) -- their accept paths
+// REGISTER_ALIGNED_HOST_FUNCTION(..., privileged_check) -- their accept paths
 // must run from the privileged account.
 // get_active_producers and check_transaction_authorization are NOT priv-gated.
 // =============================================================================

@@ -10,13 +10,13 @@
 namespace sysio { namespace chain { namespace webassembly {
    namespace detail {
       template <typename T, std::size_t A>
-      constexpr std::integral_constant<bool, A != 0> is_legacy_ptr(legacy_ptr<T, A>);
+      constexpr std::integral_constant<bool, A != 0> is_aligned_ptr(aligned_ptr<T, A>);
       template <typename T>
-      constexpr std::false_type is_legacy_ptr(T);
+      constexpr std::false_type is_aligned_ptr(T);
       template <typename T, std::size_t A>
-      constexpr std::integral_constant<bool, A != 0> is_legacy_span(legacy_span<T, A>);
+      constexpr std::integral_constant<bool, A != 0> is_aligned_span(aligned_span<T, A>);
       template <typename T>
-      constexpr std::false_type is_legacy_span(T);
+      constexpr std::false_type is_aligned_span(T);
 
       template<typename T>
       inline constexpr bool is_softfloat_type_v =
@@ -27,23 +27,23 @@ namespace sysio { namespace chain { namespace webassembly {
          is_softfloat_type_v<T> || std::is_integral_v<T>;
 
       template <typename T>
-      struct is_whitelisted_legacy_type {
+      struct is_whitelisted_aligned_type {
          static constexpr bool value = std::is_same_v<float128_t, T> ||
                                        std::is_same_v<null_terminated_ptr, T> ||
                                        std::is_same_v<memcpy_params, T> ||
                                        std::is_same_v<memcmp_params, T> ||
                                        std::is_same_v<memset_params, T> ||
-                                       std::is_same_v<decltype(is_legacy_ptr(std::declval<T>())), std::true_type> ||
-                                       std::is_same_v<decltype(is_legacy_span(std::declval<T>())), std::true_type> ||
+                                       std::is_same_v<decltype(is_aligned_ptr(std::declval<T>())), std::true_type> ||
+                                       std::is_same_v<decltype(is_aligned_span(std::declval<T>())), std::true_type> ||
                                        std::is_same_v<name, T> ||
                                        std::is_arithmetic_v<T>;
       };
-      // Hybrid legacy intrinsics (some args legacy_ptr / legacy_span, other args plain
+      // Hybrid legacy intrinsics (some args aligned_ptr / aligned_span, other args plain
       // vm::span for byte buffers) register through REGISTER_LEGACY_*_HOST_FUNCTION.
       // Specialize on vm::span<T> so the legacy-whitelist accepts plain byte spans using
       // the same char-only rule as the non-legacy whitelist.
       template <typename T>
-      struct is_whitelisted_legacy_type<vm::span<T>> {
+      struct is_whitelisted_aligned_type<vm::span<T>> {
          static constexpr bool value = std::is_same_v<std::remove_const_t<T>, char>;
       };
 
@@ -69,10 +69,10 @@ namespace sysio { namespace chain { namespace webassembly {
    inline static constexpr bool is_whitelisted_type_v = detail::is_whitelisted_type<T>::value;
 
    template <typename T>
-   inline static constexpr bool is_whitelisted_legacy_type_v = detail::is_whitelisted_legacy_type<T>::value;
+   inline static constexpr bool is_whitelisted_aligned_type_v = detail::is_whitelisted_aligned_type<T>::value;
 
    template <typename... Ts>
-   inline static constexpr bool are_whitelisted_legacy_types_v = (... && detail::is_whitelisted_legacy_type<Ts>::value);
+   inline static constexpr bool are_whitelisted_aligned_types_v = (... && detail::is_whitelisted_aligned_type<Ts>::value);
 
    template <typename T, typename U>
    inline static bool is_aliasing(const T& s1, const U& s2) {
@@ -170,9 +170,9 @@ namespace sysio { namespace chain { namespace webassembly {
             }
          }));
 
-   SYS_VM_PRECONDITION(legacy_static_check_wl_args,
+   SYS_VM_PRECONDITION(aligned_static_check_wl_args,
          SYS_VM_INVOKE_ONCE([&](auto&&... args) {
-            static_assert( are_whitelisted_legacy_types_v<std::decay_t<decltype(args)>...>, "legacy whitelisted type violation");
+            static_assert( are_whitelisted_aligned_types_v<std::decay_t<decltype(args)>...>, "legacy whitelisted type violation");
          }));
 
 }}} // ns sysio::chain::webassembly
