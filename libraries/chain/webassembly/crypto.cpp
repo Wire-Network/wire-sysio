@@ -103,21 +103,24 @@ namespace sysio::chain::webassembly {
 
       auto recovered = fc::crypto::public_key::recover(s, *digest);
 
-      // For variable length key types use a memcpy and return length
-      if (!s.contains_type(sig_type::k1, sig_type::r1, sig_type::em)) {
-         auto packed_pubkey = fc::raw::pack(recovered);
-         auto copy_size = std::min<size_t>(pub.size(), packed_pubkey.size());
-         std::memcpy(pub.data(), packed_pubkey.data(), copy_size);
-         return packed_pubkey.size();
-      } else {
-         // For fixed size length key types avoid the copy.
-         // This will do one less copy for those keys while maintaining the rules of
-         //    [0..size) dest sizes: assert (asserts in fc::raw::pack)
-         //    [size..inf) dest sizes: return packed size (always fixed size)
-         fc::datastream<char*> out_ds( pub.data(), pub.size() );
+      // Unified small-buffer contract for every signature variant: memcpy min(pub.size(), needed) of the packed key
+      // into the caller's buffer and always return the full required size. Callers can use "query with buffer=0,
+      // allocate, call again" OR the classic "pre-allocate optimistic size + shrink-or-retry on return" pattern CDT
+      // uses. Pre-normalization the k1/r1/em path FC_ASSERT'd through fc::datastream on a small buffer while the
+      // wa/ed path silently truncated via memcpy; that fixed-vs-variable asymmetry was a documented footgun and is
+      // now unified to the truncate+return-required-size contract wa/ed always shipped with. Fast path when the
+      // buffer fits (the overwhelmingly common case for CDT-generated 256-byte optimistic buffers) keeps the
+      // existing in-place datastream pack, so the heap allocation in fc::raw::pack is paid only on the adversarial
+      // under-sized-buffer path.
+      const auto needed = fc::raw::pack_size(recovered);
+      if (needed <= pub.size()) {
+         fc::datastream<char*> out_ds(pub.data(), needed);
          fc::raw::pack(out_ds, recovered);
-         return out_ds.tellp();
+      } else if (pub.size() > 0) {
+         auto packed_pubkey = fc::raw::pack(recovered);
+         std::memcpy(pub.data(), packed_pubkey.data(), pub.size());
       }
+      return static_cast<int32_t>(needed);
    }
 
    void interface::assert_sha256(span<const char> data, aligned_ptr<const fc::sha256> hash_val) const {

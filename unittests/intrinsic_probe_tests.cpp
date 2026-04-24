@@ -242,9 +242,10 @@ BOOST_FIXTURE_TEST_CASE(recover_key_golden, intrinsic_probe_fixture) {
 }
 
 BOOST_FIXTURE_TEST_CASE(recover_key_small_pub, intrinsic_probe_fixture) {
-   // K1 fixed-size key -> fc::datastream::write FC_ASSERTs when dest < 34.
-   BOOST_CHECK_THROW(
-      t.run_with_data("recsmpub"_n, t.recover_key_payload), fc::exception);
+   // Post-normalization (crypto.cpp:recover_key): small pub buffer returns the full required key size without writing
+   // past the window or throwing. The probe's in-contract canary check verifies no buffer overrun; the driver just
+   // asserts the host stays silent.
+   BOOST_CHECK_NO_THROW(t.run_with_data("recsmpub"_n, t.recover_key_payload));
 }
 
 BOOST_FIXTURE_TEST_CASE(recover_key_unaligned_digest, intrinsic_probe_fixture) {

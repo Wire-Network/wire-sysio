@@ -620,12 +620,15 @@ public:
              "recovered public key does not match driver-supplied pub" );
    }
 
-   // Small pub buffer with a K1 signature. For fixed-size key types (k1/r1/em)
-   // the host packs through fc::datastream<char*> which FC_ASSERTs when the
-   // destination cannot hold the full serialization - so this must throw.
-   // (Variable-size keys - wa, ed - silently truncate via memcpy; that path is
-   // not reachable with the K1 sig the driver supplies and is noted in the
-   // cleanup write-up as an API inconsistency worth normalizing.)
+   // Small pub buffer. Post-normalization contract: recover_key with a pub buffer smaller than the required key size
+   // must NOT throw, must NOT write past the caller's window, and must return the full required key size so the caller
+   // can re-call with a properly-sized buffer. Applies uniformly to both fixed-size (k1/r1/em) and variable-size
+   // (wa/ed) key types; prior to the host-side normalization the k1/r1/em path FC_ASSERT'd through fc::datastream while
+   // wa/ed silently truncated.
+   //
+   // The 4-byte small_pub window is wedged inside a 32-byte canary region so that any host-side write past the window
+   // surfaces as a canary byte change. Driver verifies the in-contract checks via the probe's own check() calls -- any
+   // host misbehavior surfaces as a sysio_assert_message_exception rather than BOOST_CHECK_NO_THROW noise.
    [[sysio::action]]
    void recsmpub() {
       unsigned char buf[RECOVER_BUF_CAPACITY] = {};
@@ -636,12 +639,24 @@ public:
       const auto* hdr = reinterpret_cast<const sig_hash_key_header*>(buf);
       const char* sig_ptr = reinterpret_cast<const char*>(buf) + sizeof(*hdr);
 
-      char small_pub[4] = {};
-      int32_t rc = recover_key( hdr->hash, sig_ptr, hdr->sig_len,
-                                small_pub, sizeof(small_pub) );
-      (void)rc;
-      check( false, "recover_key with K1 sig and 4-byte pub buffer must throw "
-                    "(fc::datastream fixed-size pack FC_ASSERT)" );
+      unsigned char canary[32];
+      std::memset(canary, 0xaa, sizeof(canary));
+      char* small_pub = reinterpret_cast<char*>(canary + 8);
+      constexpr uint32_t small_pub_len = 4;
+
+      int32_t rc = recover_key( hdr->hash, sig_ptr, hdr->sig_len, small_pub, small_pub_len );
+      check( rc == static_cast<int32_t>(hdr->pk_len),
+             "recover_key with small pub buffer must return the full required key size, not throw" );
+      // Partial-write contract: host writes min(buffer_size, pub_len) bytes of the packed K1 key into the window. The
+      // K1 variant tag is index 0, so small_pub[0] must be 0 after the call -- if the byte is still the canary 0xaa
+      // the host regressed to a no-write-on-small-buffer path.
+      check( static_cast<unsigned char>(small_pub[0]) != 0xaa,
+             "recover_key did not write partial pub bytes into the small buffer "
+             "(still canary 0xaa; expected K1 variant tag or subsequent key bytes)" );
+      for ( int i = 0; i < 8; ++i )
+         check( canary[i] == 0xaa, "recover_key wrote past pub buffer start -- canary before window corrupted" );
+      for ( int i = 8 + small_pub_len; i < 32; ++i )
+         check( canary[i] == 0xaa, "recover_key wrote past pub buffer end -- canary after window corrupted" );
    }
 
    // Unaligned digest pointer. aligned_ptr<const fc::sha256, 8> forces the
