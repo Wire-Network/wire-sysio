@@ -408,7 +408,7 @@ public:
       std::optional<bool>  reverse;                   ///< iterate in reverse; pairs with `limit` to return the most recent N rows
       std::optional<bool>  show_payer;                ///< include RAM payer in each row
       std::optional<uint32_t> time_limit_ms;          ///< defaults to http-max-response-time-ms
-      std::optional<bool>  values_only;               ///< return each row as just its `value` instead of `{key, value, payer?}`.
+      std::optional<bool>  values_only;               ///< return each row as just its `value` instead of `{key, value, payer?}`. With `json=false` each row is therefore a bare hex string, not an object.
 
       // ---- C++-only fields below. Not FC_REFLECT'd, so HTTP callers cannot set them. ----
 
@@ -430,15 +430,11 @@ public:
 
    using get_table_rows_return_t = std::function<chain::t_or_exception<get_table_rows_result>()>;
 
-   /// Public table-rows query. Wraps {@link get_table_rows_page} and layers the C++-only behaviours from
-   /// `get_table_rows_params`: `all_rows` (walk the entire scan, ignoring limit/deadline), `filter` (post-fetch
-   /// predicate), and `values_only` (strip the `{key, value, payer?}` wrapper). HTTP callers that don't set any of
-   /// those land directly on the page impl and pay zero extra indirection.
+   /// Public table-rows query. Honors the per-caller scan bounds on `get_table_rows_params` (`limit`,
+   /// `time_limit_ms`, `lower/upper_bound`, `find`, `index_name`, `reverse`) plus the C++-only behaviours
+   /// `all_rows` (walk the entire scan, ignoring limit/deadline), `filter` (post-fetch predicate), and
+   /// `values_only` (strip the `{key, value, payer?}` wrapper).
    get_table_rows_return_t get_table_rows( const get_table_rows_params& params, const fc::time_point& deadline )const;
-
-   /// Single-page implementation of the table scan. Honors `limit` as the per-page row cap; does NOT walk the
-   /// whole table, filter, or strip the wrapper -- those are applied by the public {@link get_table_rows}.
-   get_table_rows_return_t get_table_rows_page( const get_table_rows_params& params, const fc::time_point& deadline )const;
 
    struct get_table_by_scope_params {
       name                 code; // mandatory

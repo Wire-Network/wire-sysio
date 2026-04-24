@@ -1677,7 +1677,7 @@ fc::variant strip_scope_fields(fc::variant&& full_key, size_t count) {
 }
 
 read_only::get_table_rows_return_t
-read_only::get_table_rows_page( const read_only::get_table_rows_params& p, const fc::time_point& deadline ) const {
+read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::time_point& deadline ) const {
    abi_def abi = sysio::chain_apis::get_abi( db, p.code );
    const auto& tbl = get_kv_table_def( abi, p.table );
 
@@ -1688,19 +1688,30 @@ read_only::get_table_rows_page( const read_only::get_table_rows_params& p, const
    // Use table_id from ABI (set by CDT's compute_table_id at compile time).
    const uint16_t table_id = tbl.table_id;
 
-   fc::time_point params_deadline = p.time_limit_ms
-      ? std::min(fc::time_point::now().safe_add(fc::milliseconds(*p.time_limit_ms)), deadline)
-      : deadline;
+   // `all_rows` is a C++-only escape hatch (not FC_REFLECT'd) that walks the entire scan in a single call,
+   // ignoring any caller-supplied `limit`, `time_limit_ms`, or `deadline`. In-tree callers that set it are driven
+   // by a tick, not an RPC deadline, and need the whole table every call. HTTP callers cannot reach this path.
+   fc::time_point params_deadline;
+   if (p.all_rows) {
+      params_deadline = fc::time_point::maximum();
+   } else if (p.time_limit_ms) {
+      params_deadline = std::min(fc::time_point::now().safe_add(fc::milliseconds(*p.time_limit_ms)), deadline);
+   } else {
+      params_deadline = deadline;
+   }
 
    // --- Validate find vs bounds ---
    SYS_ASSERT(p.find.empty() || (p.lower_bound.empty() && p.upper_bound.empty()),
               chain::contract_table_query_exception,
               "Cannot combine 'find' with 'lower_bound' or 'upper_bound'");
 
-   // Handle find: treat as exact key lookup by setting bounds to the same value
+   // Handle find: treat as exact key lookup by setting bounds to the same value.
+   // `all_rows` uncaps the per-scan limit so the single call walks every row; `find` stays limit=1 because it's an
+   // exact-match lookup.
    const string& effective_lower = p.find.empty() ? p.lower_bound : p.find;
    const string& effective_upper = p.find.empty() ? p.upper_bound : p.find;
-   uint32_t effective_limit = p.find.empty() ? p.limit : 1;
+   const uint32_t user_limit     = p.all_rows ? std::numeric_limits<uint32_t>::max() : p.limit;
+   uint32_t effective_limit      = p.find.empty() ? user_limit : 1;
 
    // --- Scope handling ---
    // If key_names[0] == "scope", this table uses scoped keys. The scope field must
@@ -2034,7 +2045,10 @@ read_only::get_table_rows_page( const read_only::get_table_rows_params& p, const
               key_names = std::move(key_names), key_types = std::move(key_types),
               scope_key_count,
               abi_serializer_max_time = abi_serializer_max_time,
-              shorten_abi_errors = shorten_abi_errors]() mutable ->
+              shorten_abi_errors = shorten_abi_errors,
+              all_rows    = p.all_rows,
+              values_only = p.values_only.value_or(false),
+              filter      = p.filter]() mutable ->
          chain::t_or_exception<read_only::get_table_rows_result> {
          get_table_rows_result result;
          result.more = p.more;
@@ -2073,6 +2087,22 @@ read_only::get_table_rows_page( const read_only::get_table_rows_params& p, const
             if (p.show_payer)
                obj["payer"] = row.payer.to_string();
             result.rows.push_back(std::move(obj));
+         }
+
+         // --- Post-pass: C++-only wrapper behaviors. Same shape as the primary-path Phase 2 below.
+         if (all_rows) { result.more = false; result.next_key.clear(); }
+         if (values_only) {
+            for (auto& row : result.rows) {
+               if (!row.is_object()) continue;
+               const auto& row_obj = row.get_object();
+               if (!row_obj.contains("value")) continue;
+               fc::variant value{row_obj["value"]};
+               row = std::move(value);
+            }
+         }
+         if (filter.has_value()) {
+            const auto& predicate = *filter;
+            std::erase_if(result.rows, [&](const fc::variant& row) { return !predicate(row); });
          }
          return result;
       };
@@ -2190,7 +2220,10 @@ read_only::get_table_rows_page( const read_only::get_table_rows_params& p, const
            key_names = std::move(key_names), key_types = std::move(key_types),
            scope_key_count,
            abi_serializer_max_time = abi_serializer_max_time,
-           shorten_abi_errors = shorten_abi_errors]() mutable
+           shorten_abi_errors = shorten_abi_errors,
+           all_rows    = p.all_rows,
+           values_only = p.values_only.value_or(false),
+           filter      = p.filter]() mutable
       -> chain::t_or_exception<read_only::get_table_rows_result> {
       read_only::get_table_rows_result result;
 
@@ -2235,54 +2268,18 @@ read_only::get_table_rows_page( const read_only::get_table_rows_params& p, const
 
       result.more = hp.more;
       result.next_key = hp.next_key;
-      return result;
-   };
-}
 
-read_only::get_table_rows_return_t
-read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::time_point& deadline ) const {
-   const bool all_rows    = p.all_rows;
-   const bool has_filter  = p.filter.has_value();
-   const bool values_only = p.values_only.value_or(false);
-
-   // Fast path: no wrapper-level behaviors. Forward to the page impl with the caller's params and deadline unchanged.
-   // HTTP callers with default params always land here.
-   if (!all_rows && !has_filter && !values_only) {
-      return get_table_rows_page(p, deadline);
-   }
-
-   return [this, p, deadline, all_rows, has_filter, values_only]()
-      -> chain::t_or_exception<get_table_rows_result> {
-      get_table_rows_params pp = p;
-      fc::time_point effective_deadline = deadline;
-
+      // --- Post-pass: C++-only wrapper behaviors ---
+      // `all_rows` walked the whole scan; a resume cursor is meaningless on the way out.
       if (all_rows) {
-         // C++-only escape hatch: walk the entire scan in a single page-impl call, ignoring any caller-supplied
-         // limit, `time_limit_ms`, or `deadline`. In-tree callers that set `all_rows` (the OPP cron plugins) are
-         // driven by a tick, not an RPC deadline, and need the whole table every call. `all_rows` is deliberately
-         // NOT FC_REFLECT'd so HTTP callers cannot trigger this path.
-         pp.limit = std::numeric_limits<uint32_t>::max();
-         pp.time_limit_ms.reset();
-         effective_deadline = fc::time_point::maximum();
+         result.more = false;
+         result.next_key.clear();
       }
 
-      auto page_fn    = get_table_rows_page(pp, effective_deadline);
-      auto page_value = page_fn();
-      if (auto* err = std::get_if<fc::exception_ptr>(&page_value)) {
-         return *err;
-      }
-      auto combined = std::get<get_table_rows_result>(std::move(page_value));
-
-      if (all_rows) {
-         // The whole scan is in `combined`; a resume cursor is meaningless.
-         combined.more = false;
-         combined.next_key.clear();
-      }
-
-      // Strip the {key, value, payer?} wrapper before filtering so the predicate sees the same shape the caller will
-      // consume.
+      // `values_only` strips the `{key, value, payer?}` wrapper before `filter` runs so the predicate sees the same
+      // shape the caller will consume.
       if (values_only) {
-         for (auto& row : combined.rows) {
+         for (auto& row : result.rows) {
             if (!row.is_object()) continue;
             const auto& row_obj = row.get_object();
             if (!row_obj.contains("value")) continue;
@@ -2293,14 +2290,14 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
          }
       }
 
-      if (has_filter) {
-         const auto& predicate = *p.filter;
-         std::erase_if(combined.rows, [&](const fc::variant& row) {
+      if (filter.has_value()) {
+         const auto& predicate = *filter;
+         std::erase_if(result.rows, [&](const fc::variant& row) {
             return !predicate(row);
          });
       }
 
-      return combined;
+      return result;
    };
 }
 
