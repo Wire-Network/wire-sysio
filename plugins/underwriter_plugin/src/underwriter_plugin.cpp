@@ -2,7 +2,9 @@
 #include <fc/crypto/sha256.hpp>
 #include <fc/variant_object.hpp>
 #include <boost/endian/conversion.hpp>
+#include <magic_enum/magic_enum.hpp>
 
+#include <sysio/chain_plugin/chain_plugin.hpp>
 #include <sysio/underwriter_plugin/underwriter_plugin.hpp>
 #include <sysio/opp/opp.hpp>
 #include <sysio/opp/types/types.pb.h>
@@ -78,39 +80,36 @@ struct underwriter_plugin::impl {
    //  Table read helper
    // -----------------------------------------------------------------------
 
-   read_only::get_table_rows_result read_table(const std::string& code,
-                                                const std::string& scope,
-                                                const std::string& table,
-                                                uint32_t limit = 100) {
-      auto ro = chain_plug->get_read_only_api(fc::microseconds(action_timeout_ms * 1000));
-      read_only::get_table_rows_params p;
-      p.json  = true;
-      p.code  = chain::name(code);
-      p.scope = scope;
-      p.table = table;
-      p.limit = limit;
-      auto deadline = fc::time_point::now() + fc::milliseconds(action_timeout_ms);
-      auto result_fn = ro.get_table_rows(p, deadline);
-      auto result = result_fn();
+   /// Thin plumbing around `chain_apis::read_only::get_table_rows`: binds
+   /// this plugin's `chain_plug` and the configured `action_timeout_ms`,
+   /// unwraps the deferred callable, and turns RPC errors into an empty
+   /// result with an error log. All query shape — pagination, filter,
+   /// unwrap, reverse, find+index — lives on `get_table_rows_params`.
+   sysio::chain_apis::read_only::get_table_rows_result
+   read_table(sysio::chain_apis::read_only::get_table_rows_params p) {
+      auto timeout  = fc::milliseconds(action_timeout_ms);
+      auto ro       = chain_plug->get_read_only_api(timeout);
+      auto deadline = fc::time_point::now() + timeout;
+      auto result   = ro.get_table_rows(p, deadline)();
       if (auto* err = std::get_if<fc::exception_ptr>(&result)) {
-         elog("underwriter: table read failed {}::{} — {}", code, table, (*err)->to_string());
+         elog("underwriter: table read failed {}::{} — {}",
+              p.code.to_string(), p.table, (*err)->to_string());
          return {};
       }
-      auto res = std::get<read_only::get_table_rows_result>(result);
+      return std::get<sysio::chain_apis::read_only::get_table_rows_result>(std::move(result));
+   }
 
-      // chain_plugin::get_table_rows wraps every row as {"key", "value", [payer]}.
-      // Callers of this helper read contract fields directly, so unwrap to value.
-      // variant::operator=(const variant&) calls clear() before reading the source,
-      // so a direct `row = row.get_object()["value"]` would destroy the source ref
-      // mid-assignment. Copy into an independent variant first, then move-assign.
-      for (auto& row : res.rows) {
-         if (!row.is_object()) continue;
-         const auto& row_obj = row.get_object();
-         if (!row_obj.contains("value")) continue;
-         fc::variant value{row_obj["value"]};
-         row = std::move(value);
-      }
-      return res;
+   /// Shortcut for the common scan shape: paginate every row from a
+   /// code/scope/table, returning unwrapped values.
+   sysio::chain_apis::read_only::get_table_rows_result
+   read_all(std::string_view code, std::string_view scope, std::string_view table) {
+      sysio::chain_apis::read_only::get_table_rows_params p;
+      p.code        = chain::name(code);
+      p.scope       = scope;
+      p.table       = table;
+      p.limit       = 0; // paginate every row
+      p.unwrap_rows = true;
+      return read_table(std::move(p));
    }
 
    // -----------------------------------------------------------------------
@@ -163,7 +162,7 @@ struct underwriter_plugin::impl {
 
    void read_outpost_registry() {
       outpost_chain_kinds.clear();
-      auto rows = read_table("sysio.epoch", "sysio.epoch", "outposts", 100);
+      auto rows = read_all("sysio.epoch", "sysio.epoch", "outposts");
       for (auto& row : rows.rows) {
          auto obj = row.get_object();
          uint64_t id = obj["id"].as_uint64();
@@ -188,7 +187,7 @@ struct underwriter_plugin::impl {
    void read_credit_lines() {
       credit_lines.clear();
 
-      auto rows = read_table("sysio.opreg", "sysio.opreg", "operators", 100);
+      auto rows = read_all("sysio.opreg", "sysio.opreg", "operators");
       for (auto& row : rows.rows) {
          auto obj = row.get_object();
          auto acct = obj["account"].as_string();
@@ -266,20 +265,24 @@ struct underwriter_plugin::impl {
    std::vector<uw_request> scan_pending_requests() {
       std::vector<uw_request> requests;
 
-      auto rows = read_table("sysio.uwrit", "sysio.uwrit", "uwreqs", 100);
+      // `uwreqs.bystatus` is a uint64 secondary index on
+      // `static_cast<uint64_t>(status)`. Scan exactly the
+      // `UNDERWRITE_REQUEST_STATUS_PENDING (0)` slice — [0, 1) — instead of
+      // paging the whole table and filtering in C++.
+      sysio::chain_apis::read_only::get_table_rows_params p;
+      p.code        = chain::name("sysio.uwrit");
+      p.scope       = "sysio.uwrit";
+      p.table       = "uwreqs";
+      p.index_name  = "bystatus";
+      constexpr auto PENDING_STATUS = magic_enum::enum_integer(
+         UnderwriteRequestStatus::UNDERWRITE_REQUEST_STATUS_PENDING);
+      p.lower_bound = std::format("{{\"bystatus\":{}}}", PENDING_STATUS);
+      p.upper_bound = std::format("{{\"bystatus\":{}}}", PENDING_STATUS + 1);
+      p.limit       = 0; // paginate all pending rows
+      p.unwrap_rows = true;
+      auto rows = read_table(std::move(p));
       for (auto& row : rows.rows) {
          auto obj = row.get_object();
-
-         // Filter: PENDING status only (UnderwriteRequestStatus = 0)
-         int status = 0;
-         if (obj["status"].is_string()) {
-            auto s = obj["status"].as_string();
-            if (s == "UNDERWRITE_REQUEST_STATUS_PENDING") status = 0;
-            else continue; // Not PENDING
-         } else {
-            status = static_cast<int>(obj["status"].as_uint64());
-            if (status != 0) continue; // UNDERWRITE_REQUEST_STATUS_PENDING = 0
-         }
 
          // Skip if already assigned to another underwriter
          auto uw_name = obj["uw_name"].as_string();
@@ -290,7 +293,9 @@ struct underwriter_plugin::impl {
 
          uw_request req;
          req.id = obj["id"].as_uint64();
-         req.status = status;
+         // Pre-filtered to PENDING by the bystatus index range above.
+         req.status = magic_enum::enum_integer(
+            UnderwriteRequestStatus::UNDERWRITE_REQUEST_STATUS_PENDING);
          req.uw_name = uw_name;
 
          // Parse attestation type
@@ -317,12 +322,17 @@ struct underwriter_plugin::impl {
    }
 
    bool parse_swap_from_attestation(uw_request& req) {
-      // Read the attestation data from sysio.msgch::attestations by ID
-      auto rows = read_table("sysio.msgch", "sysio.msgch", "attestations", 100);
+      // Primary-key exact lookup on sysio.msgch::attestations (ABI key_names
+      // = ["id"]). One row or nothing — no full-table scan.
+      sysio::chain_apis::read_only::get_table_rows_params p;
+      p.code        = chain::name("sysio.msgch");
+      p.scope       = "sysio.msgch";
+      p.table       = "attestations";
+      p.find        = std::format("{{\"id\":{}}}", req.id);
+      p.unwrap_rows = true;
+      auto rows = read_table(std::move(p));
       for (auto& row : rows.rows) {
          auto obj = row.get_object();
-         uint64_t att_id = obj["id"].as_uint64();
-         if (att_id != req.id) continue;
 
          // Found the attestation — parse the raw data as a Swap protobuf
          auto data_hex = obj["data"].as_string();

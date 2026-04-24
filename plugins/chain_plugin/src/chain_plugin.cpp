@@ -1613,7 +1613,7 @@ fc::variant strip_scope_fields(fc::variant&& full_key, size_t count) {
 }
 
 read_only::get_table_rows_return_t
-read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::time_point& deadline ) const {
+read_only::get_table_rows_page( const read_only::get_table_rows_params& p, const fc::time_point& deadline ) const {
    abi_def abi = sysio::chain_apis::get_abi( db, p.code );
    const auto& tbl = get_kv_table_def( abi, p.table );
 
@@ -2140,6 +2140,116 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
       result.more = hp.more;
       result.next_key = hp.next_key;
       return result;
+   };
+}
+
+read_only::get_table_rows_return_t
+read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::time_point& deadline ) const {
+   const bool paginate_all = (p.limit == 0);
+   const bool has_filter   = p.filter.has_value();
+   const bool do_unwrap    = p.unwrap_rows.value_or(false);
+
+   // Fast path: classic single-page semantics with a non-zero limit and no
+   // post-processing. Forward straight to the page implementation so HTTP
+   // callers pay zero extra indirection.
+   if (!paginate_all && !has_filter && !do_unwrap) {
+      return get_table_rows_page(p, deadline);
+   }
+
+   // Extended path: pagination + unwrap + filter, stitched around repeated
+   // page_impl invocations.
+   return [this, p, deadline, paginate_all, has_filter, do_unwrap]()
+      -> chain::t_or_exception<get_table_rows_result> {
+      get_table_rows_params pp = p;
+
+      // When `limit == 0` (paginate-all), the page impl needs a concrete cap.
+      // Use a page size that balances round-trips vs. RPC deadline budget.
+      constexpr uint32_t INTERNAL_PAGE_SIZE = 100;
+      if (paginate_all) {
+         pp.limit = INTERNAL_PAGE_SIZE;
+      }
+
+      // Clear extension fields from the per-page params — the page impl does
+      // not look at them, but keeping the API-level fields quiet avoids any
+      // confusion if its behavior ever grows to key off them.
+      pp.unwrap_rows.reset();
+      pp.filter.reset();
+
+      const bool reverse_scan = p.reverse.value_or(false);
+
+      get_table_rows_result combined;
+
+      while (true) {
+         auto page_fn    = get_table_rows_page(pp, deadline);
+         auto page_value = page_fn();
+         if (auto* err = std::get_if<fc::exception_ptr>(&page_value)) {
+            return *err;
+         }
+         auto page = std::get<get_table_rows_result>(std::move(page_value));
+
+         combined.rows.insert(combined.rows.end(),
+            std::make_move_iterator(page.rows.begin()),
+            std::make_move_iterator(page.rows.end()));
+         combined.more     = page.more;
+         combined.next_key = page.next_key;
+
+         if (!paginate_all) break;
+         if (!page.more || page.next_key.empty()) break;
+         if (!pp.find.empty()) break; // `find` is exact-match — no next page
+
+         // Advance the cursor for the next page.
+         //
+         // Forward: `next_key` is the first row not yet returned; setting it
+         // as `lower_bound` (inclusive) resumes at that row.
+         //
+         // Reverse: `next_key` is ALSO the first unseen row (below the last
+         // returned one), but `upper_bound` is EXCLUSIVE. Setting
+         // `upper_bound = next_key` would skip that row entirely, causing a
+         // one-row gap per page boundary. Use the last RETURNED row's key
+         // instead — `upper_bound = last_key` (exclusive) yields rows
+         // strictly below it, which is exactly what we want.
+         if (reverse_scan) {
+            if (combined.rows.empty()) break;
+            const fc::variant& last_row = combined.rows.back();
+            if (!last_row.is_object()) break;
+            const auto& last_obj = last_row.get_object();
+            if (!last_obj.contains("key")) break;
+            pp.upper_bound = fc::json::to_string(last_obj["key"], fc::time_point::maximum());
+            pp.lower_bound.clear();
+         } else {
+            pp.lower_bound = page.next_key;
+            pp.upper_bound.clear();
+         }
+      }
+
+      if (paginate_all) {
+         // We walked the scan to completion; no resume cursor is meaningful.
+         combined.more = false;
+         combined.next_key.clear();
+      }
+
+      // Unwrap before filtering so the predicate sees the same shape the
+      // caller will eventually consume.
+      if (do_unwrap) {
+         for (auto& row : combined.rows) {
+            if (!row.is_object()) continue;
+            const auto& row_obj = row.get_object();
+            if (!row_obj.contains("value")) continue;
+            // variant::operator=(const variant&) clears before reading —
+            // copy into an independent variant first, then move-assign.
+            fc::variant value{row_obj["value"]};
+            row = std::move(value);
+         }
+      }
+
+      if (has_filter) {
+         const auto& predicate = *p.filter;
+         std::erase_if(combined.rows, [&](const fc::variant& row) {
+            return !predicate(row);
+         });
+      }
+
+      return combined;
    };
 }
 

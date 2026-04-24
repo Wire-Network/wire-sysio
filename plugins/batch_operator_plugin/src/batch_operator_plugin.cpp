@@ -11,6 +11,7 @@
 #include <sysio/batch_operator_plugin/outpost_opp_job.hpp>
 #include <sysio/chain/abi_serializer.hpp>
 #include <sysio/chain/transaction.hpp>
+#include <sysio/chain_plugin/chain_plugin.hpp>
 #include <sysio/opp/opp.hpp>
 #include <sysio/opp/attestations/attestations.pb.h>
 #include <sysio/outpost_ethereum_client_plugin/outpost_ethereum_client.hpp>
@@ -33,12 +34,14 @@ namespace {
    /// that finds outposts later still responds.
    constexpr std::size_t MIN_CRON_THREADS = 5;
 
-   /// `chain_plug->get_read_only_api(...)` timeout. Covers ABI loading plus
-   /// the table scan; should not dominate the tick.
-   constexpr auto READ_ONLY_API_TIMEOUT_US = 200000;
-
    /// my_group sentinel meaning "we are not in any batch-op group".
    constexpr uint8_t GROUP_NONE = 255;
+
+   /// Rolling window size for the outbound-envelope lookup. Covers ~4 epochs
+   /// across up to 2 outposts (`DEPOT → OUTPOST` pair each epoch) plus a
+   /// slack row, so `read_pending_outbound` always sees the current epoch
+   /// without paying for a full-table scan as `outenvelopes` grows.
+   constexpr uint32_t OUTBOUND_LOOKUP_WINDOW = 8;
 
    // ── WIRE contract identifiers (actions, tables, indexes, field names) ──
    // Centralised so a contract rename/refactor shows up as one search hit,
@@ -153,7 +156,19 @@ struct batch_operator_plugin::impl {
 
       std::optional<sysio::outbound_envelope_record>
       read_pending_outbound(uint64_t outpost_id, uint32_t epoch_index) override {
-         auto rows = _impl.read_table(msgch::account, msgch::account, msgch::table_outenvelopes, 50);
+         // Reverse-iterate the latest `OUTBOUND_LOOKUP_WINDOW` rows. The primary
+         // key is auto-incrementing `id`, so reverse + small window gives the
+         // most recent epochs' envelopes without scanning the whole table (which
+         // grows unbounded until cleanup). Filtering by (outpost_id, epoch_index)
+         // after the fact is O(window), not O(rows).
+         sysio::chain_apis::read_only::get_table_rows_params p;
+         p.code        = chain::name(msgch::account);
+         p.scope       = msgch::account;
+         p.table       = msgch::table_outenvelopes;
+         p.reverse     = true;
+         p.limit       = OUTBOUND_LOOKUP_WINDOW;
+         p.unwrap_rows = true;
+         auto rows = _impl.read_table(std::move(p));
          for (auto& row : rows.rows) {
             auto     obj         = row.get_object();
             uint64_t row_outpost = obj[msgch::field::outpost_id].as_uint64();
@@ -209,84 +224,23 @@ struct batch_operator_plugin::impl {
    //  Table read helper
    // -----------------------------------------------------------------------
 
-   struct read_table_options {
-      std::optional<std::string>                              lower_bound;
-      std::optional<std::string>                              upper_bound;
-      /// Exact-match key lookup. When set, the chain plugin treats the value as
-      /// both lower and upper bound AND appends a null byte to the upper bound
-      /// so the iterator includes the target row. Use this (not `lower_bound ==
-      /// upper_bound`) for secondary-index lookups on `multi_index` tables —
-      /// those store the secondary key bytes alone and compare with `sk >=
-      /// ub_sv`, so an identical upper-bound breaks out of the loop before the
-      /// match is emitted.
-      std::optional<std::string>                              find;
-      std::optional<std::string>                              index_name;
-      std::optional<std::function<bool(const fc::variant&)>>  filter;
-      bool                                                    get_all = false;
-   };
-
-   read_only::get_table_rows_result read_table(const std::string& code,
-                                                const std::string& scope,
-                                                const std::string& table,
-                                                uint32_t limit = 100,
-                                                std::optional<read_table_options> opts = std::nullopt) {
-      auto ro = chain_plug->get_read_only_api(fc::microseconds(READ_ONLY_API_TIMEOUT_US));
-      read_only::get_table_rows_params p;
-      p.json  = true;
-      p.code  = chain::name(code);
-      p.scope = scope;
-      p.table = table;
-      p.limit = limit;
-
-      if (opts) {
-         if (opts->lower_bound)    p.lower_bound    = *opts->lower_bound;
-         if (opts->upper_bound)    p.upper_bound    = *opts->upper_bound;
-         if (opts->find)           p.find           = *opts->find;
-         if (opts->index_name)     p.index_name     = *opts->index_name;
+   /// Thin plumbing around `chain_apis::read_only::get_table_rows`: binds this
+   /// plugin's `chain_plug` and the configured `delivery_timeout_ms`,
+   /// unwraps the deferred callable, and turns RPC errors into an empty
+   /// result with an error log. All query shape — pagination, filter,
+   /// unwrap, reverse, find+index — lives on `get_table_rows_params`.
+   sysio::chain_apis::read_only::get_table_rows_result
+   read_table(sysio::chain_apis::read_only::get_table_rows_params p) {
+      auto timeout  = fc::milliseconds(delivery_timeout_ms);
+      auto ro       = chain_plug->get_read_only_api(timeout);
+      auto deadline = fc::time_point::now() + timeout;
+      auto result   = ro.get_table_rows(p, deadline)();
+      if (auto* err = std::get_if<fc::exception_ptr>(&result)) {
+         elog("batch_operator: table read failed {}::{} — {}",
+              p.code.to_string(), p.table, (*err)->to_string());
+         return {};
       }
-
-      auto deadline = fc::time_point::now() + fc::milliseconds(delivery_timeout_ms);
-
-      read_only::get_table_rows_result combined;
-      while (true) {
-         auto result_fn = ro.get_table_rows(p, deadline);
-         auto result = result_fn();
-         if (auto* err = std::get_if<fc::exception_ptr>(&result)) {
-            elog("batch_operator: table read failed {}::{} — {}", code, table, (*err)->to_string());
-            return combined;
-         }
-         auto page = std::get<read_only::get_table_rows_result>(result);
-         combined.rows.insert(combined.rows.end(),
-            std::make_move_iterator(page.rows.begin()),
-            std::make_move_iterator(page.rows.end()));
-
-         if (!opts || !opts->get_all || !page.more || page.next_key.empty()) {
-            combined.more = page.more;
-            combined.next_key = page.next_key;
-            break;
-         }
-         p.lower_bound = page.next_key;
-      }
-
-      // chain_plugin::get_table_rows wraps every row as {"key", "value", [payer]}.
-      // Callers of this helper read contract fields directly, so unwrap to value.
-      // variant::operator=(const variant&) calls clear() before reading the source,
-      // so a direct `row = row.get_object()["value"]` would destroy the source ref
-      // mid-assignment. Copy into an independent variant first, then move-assign.
-      for (auto& row : combined.rows) {
-         if (!row.is_object()) continue;
-         const auto& row_obj = row.get_object();
-         if (!row_obj.contains("value")) continue;
-         fc::variant value{row_obj["value"]};
-         row = std::move(value);
-      }
-
-      if (opts && opts->filter) {
-         std::erase_if(combined.rows, [&](const fc::variant& row) {
-            return !(*opts->filter)(row);
-         });
-      }
-      return combined;
+      return std::get<sysio::chain_apis::read_only::get_table_rows_result>(std::move(result));
    }
 
    /// Check if this operator already delivered an envelope for the
@@ -303,15 +257,17 @@ struct batch_operator_plugin::impl {
       // because chain_plugin's secondary-index iteration breaks on
       // `sk >= ub_sv` — `find` mode appends a null byte to the upper bound
       // so the secondary key compares strictly less than it.
-      std::string key_json = std::format("{{\"{}\":{}}}", msgch::index_byoutepoch, key);
-      auto rows = read_table(msgch::account, msgch::account, msgch::table_envelopes, 50,
-         read_table_options{
-            .find           = key_json,
-            .index_name     = msgch::index_byoutepoch,
-            .filter         = [op_account](const fc::variant& row) {
-               return chain::name(row[msgch::field::batch_op_name].as_string()) == op_account;
-            }
-         });
+      sysio::chain_apis::read_only::get_table_rows_params p;
+      p.code        = chain::name(msgch::account);
+      p.scope       = msgch::account;
+      p.table       = msgch::table_envelopes;
+      p.find        = std::format("{{\"{}\":{}}}", msgch::index_byoutepoch, key);
+      p.index_name  = msgch::index_byoutepoch;
+      p.unwrap_rows = true;
+      p.filter      = [op_account](const fc::variant& row) {
+         return chain::name(row[msgch::field::batch_op_name].as_string()) == op_account;
+      };
+      auto rows = read_table(std::move(p));
       return !rows.rows.empty();
    }
 
@@ -342,7 +298,13 @@ struct batch_operator_plugin::impl {
     * Returns {true, epoch_index} on success, {false, 0} if state is unavailable.
     */
    std::pair<bool, uint32_t> parse_epoch_state() {
-      auto state_rows = read_table(epoch::account, epoch::account, epoch::table_epochstate, 1);
+      sysio::chain_apis::read_only::get_table_rows_params p;
+      p.code        = chain::name(epoch::account);
+      p.scope       = epoch::account;
+      p.table       = epoch::table_epochstate;
+      p.limit       = 1;
+      p.unwrap_rows = true;
+      auto state_rows = read_table(std::move(p));
       if (state_rows.rows.empty()) return {false, 0};
 
       auto obj = state_rows.rows[0].get_object();
@@ -436,7 +398,17 @@ struct batch_operator_plugin::impl {
 
    void refresh_outposts() {
       outposts.clear();
-      auto rows = read_table(epoch::account, epoch::account, epoch::table_outposts, 50);
+      // `limit = 0` → paginate through every row. The outpost count should
+      // stay tiny (one per external chain), but don't bake in a scan cap
+      // that would stall the batch operator if governance adds more than a
+      // default single-page bound.
+      sysio::chain_apis::read_only::get_table_rows_params p;
+      p.code        = chain::name(epoch::account);
+      p.scope       = epoch::account;
+      p.table       = epoch::table_outposts;
+      p.limit       = 0;
+      p.unwrap_rows = true;
+      auto rows = read_table(std::move(p));
       for (auto& row : rows.rows) {
          auto obj = row.get_object();
          outpost_descriptor od;

@@ -401,21 +401,33 @@ public:
       string               index_name;                ///< secondary index name (e.g. "byowner") or numeric position (e.g. "2")
       string               lower_bound;               ///< inclusive lower key (JSON obj when json=true, hex when json=false)
       string               upper_bound;               ///< exclusive upper key
-      uint32_t             limit = 50;                ///< max rows to return
-      std::optional<bool>  reverse;                   ///< iterate in reverse
+      uint32_t             limit = 50;                ///< max rows to return. `0` = paginate until the scan is exhausted (aggregating all pages into a single result). A non-zero value returns at most that many rows in a single page with `more`/`next_key` set for caller-driven pagination.
+      std::optional<bool>  reverse;                   ///< iterate in reverse; pairs with `limit` to return the most recent N rows
       std::optional<bool>  show_payer;                ///< include RAM payer in each row
       std::optional<uint32_t> time_limit_ms;          ///< defaults to http-max-response-time-ms
+      std::optional<bool>  unwrap_rows;               ///< strip the `{key, value, payer?}` wrapper, returning only the `value` side of each row. C++-only (not serialized over the HTTP surface).
+      std::optional<std::function<bool(const fc::variant&)>> filter; ///< post-pagination predicate — rows returning `false` are dropped. Runs AFTER `unwrap_rows` so it sees the same shape callers do. C++-only (not serialized).
    };
 
    struct get_table_rows_result {
-      fc::variants         rows;                      ///< array of {key: {...}, value: {...}, payer?: "..."} objects
+      fc::variants         rows;                      ///< array of {key: {...}, value: {...}, payer?: "..."} objects (or bare values when `unwrap_rows` is set)
       bool                 more = false;
       string               next_key;                  ///< scope-stripped key for pagination
    };
 
    using get_table_rows_return_t = std::function<chain::t_or_exception<get_table_rows_result>()>;
 
+   /// Public table-rows query. Wraps {@link get_table_rows_page} with the
+   /// opt-in behaviors layered on `get_table_rows_params` — internal pagination
+   /// when `limit == 0`, post-fetch filter, row unwrapping. HTTP callers using
+   /// defaults (`limit=50`, no filter, no `unwrap_rows`) land on the same
+   /// single-page path as before.
    get_table_rows_return_t get_table_rows( const get_table_rows_params& params, const fc::time_point& deadline )const;
+
+   /// Single-page implementation of the table scan. Honors `limit` as the
+   /// per-page row cap; does NOT paginate, filter, or unwrap — those are
+   /// applied by the public {@link get_table_rows}.
+   get_table_rows_return_t get_table_rows_page( const get_table_rows_params& params, const fc::time_point& deadline )const;
 
    struct get_table_by_scope_params {
       name                 code; // mandatory
@@ -701,7 +713,8 @@ FC_REFLECT(sysio::chain_apis::read_only::get_block_header_result, (id)(signed_bl
 FC_REFLECT( sysio::chain_apis::read_write::push_transaction_results, (transaction_id)(processed) )
 FC_REFLECT( sysio::chain_apis::read_write::send_transaction2_params, (return_failure_trace)(retry_trx)(retry_trx_num_blocks)(transaction) )
 
-FC_REFLECT( sysio::chain_apis::read_only::get_table_rows_params, (json)(code)(table)(scope)(find)(index_name)(lower_bound)(upper_bound)(limit)(reverse)(show_payer)(time_limit_ms) )
+// `filter` deliberately excluded — `std::function` is not serialisable so it's C++-only.
+FC_REFLECT( sysio::chain_apis::read_only::get_table_rows_params, (json)(code)(table)(scope)(find)(index_name)(lower_bound)(upper_bound)(limit)(reverse)(show_payer)(time_limit_ms)(unwrap_rows) )
 FC_REFLECT( sysio::chain_apis::read_only::get_table_rows_result, (rows)(more)(next_key) );
 
 FC_REFLECT( sysio::chain_apis::read_only::get_table_by_scope_params, (code)(table)(lower_bound)(upper_bound)(limit)(reverse)(time_limit_ms) )
