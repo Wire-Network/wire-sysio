@@ -52,9 +52,40 @@ Any value drawn from a closed set — chain kind, envelope status, operator type
 
 - Prefer `FC_REFLECT_ENUM`-reflected protobuf enums (`sysio::opp::types::ChainKind`, `sysio::opp::types::EnvelopeStatus`) over hand-rolled sentinels.
 - Decode variants as the enum type: `obj["status"].as<EnvelopeStatus>()`, never `static_cast<EnvelopeStatus>(obj["status"].as_uint64())`.
-- Enum-to-string: `sysio::opp::types::ChainKind_Name(kind)`. Don't hand-roll switches for human-readable names.
+- Don't hand-roll switches for human-readable names.
 
 A rename of `CHAIN_KIND_ETHEREUM` propagates through the compiler automatically when the code holds the enum. It doesn't when the code holds the bare string `"CHAIN_KIND_ETHEREUM"` or the integer `2`.
+
+#### Enum conversions — use `magic_enum`, never `static_cast`
+
+Every enum ↔ raw value conversion goes through `magic_enum` (`#include <magic_enum/magic_enum.hpp>`). `static_cast` and hand-rolled switches survive rename refactors silently; `magic_enum` does not.
+
+| Need | Use |
+|---|---|
+| Enum → underlying integer | `magic_enum::enum_integer(v)` |
+| Enum → string name (runtime) | `magic_enum::enum_name(v)` |
+| Integer → enum (checked `std::optional<E>`) | `magic_enum::enum_cast<E>(n)` |
+| String name → enum (checked `std::optional<E>`) | `magic_enum::enum_cast<E>(name)` |
+| N-th member by declaration order | `magic_enum::enum_value<E>(i)` |
+
+Forbidden once a `magic_enum` form exists:
+
+- `static_cast<uint64_t>(SomeEnum::X)` — use `magic_enum::enum_integer(SomeEnum::X)`.
+- `static_cast<SomeEnum>(int_var)` at a trust boundary — use `magic_enum::enum_cast<SomeEnum>(int_var).value_or(SomeEnum::DEFAULT)`; static_cast past the enum's declared range is UB and it hides bad input.
+- Hand-rolled `if/switch` tables that map an enum to its spelling — use `magic_enum::enum_name`.
+
+**Sole exception — protobuf-generated enums.** `protoc` emits a `<EnumName>_Name(int value)` free function (and `<EnumName>_Parse`) for every proto enum. Use those instead of `magic_enum` for the generated types under `sysio::opp::types::` and any other `.pb.h` enums:
+
+```cpp
+// Protobuf-generated enum — prefer the generated helper.
+auto s = sysio::opp::types::ChainKind_Name(kind);        // ✓
+auto n = magic_enum::enum_name(kind);                    // ✗ works, but skip for proto enums
+
+// Non-proto enum — magic_enum.
+auto s = magic_enum::enum_name(EnvelopeStatus::PENDING); // ✓
+```
+
+Rationale: the generated `_Name` encodes the exact wire-format spelling (e.g. `"CHAIN_KIND_ETHEREUM"`), stays in lock-step with the `.proto` on every regeneration, and does not depend on the compile-time name-discovery tricks `magic_enum` uses. For every other enum in the tree, `magic_enum` is the standard.
 
 ## Project Overview
 

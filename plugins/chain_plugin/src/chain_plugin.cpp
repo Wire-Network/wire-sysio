@@ -1347,6 +1347,70 @@ chain_apis::read_only chain_plugin::get_read_only_api(const fc::microseconds& ht
    return chain_apis::read_only(chain(), my->_get_info_db, my->_account_query_db, my->_last_tracked_votes, get_abi_serializer_max_time(), http_max_response_time, my->_trx_finality_status_processing.get());
 }
 
+chain_apis::read_only::get_table_rows_result
+chain_plugin::read_table_rows(chain_apis::read_only::get_table_rows_params params,
+                              fc::microseconds timeout,
+                              std::string_view log_prefix,
+                              const std::atomic<bool>& shutdown_flag) {
+   using result_t = chain_apis::read_only::get_table_rows_result;
+   const auto deadline = fc::time_point::now() + timeout;
+
+   // Pre-capture log fields; `params` is moved into the posted lambda below, so the outer error paths cannot read
+   // from it.
+   const std::string log_code  = params.code.to_string();
+   const std::string log_table = params.table;
+
+   // shared_ptr so the posted lambda and this stack frame each own a reference; if the waiter bails (shutdown or
+   // deadline) the lambda can still safely write into the promise when the read_only queue eventually drains.
+   auto prom = std::make_shared<std::promise<result_t>>();
+   auto fut  = prom->get_future();
+
+   // Capturing `this` by raw pointer is safe: appbase drains the io_context and calls `exec.clear()` between
+   // `shutdown_plugins()` and `destroy_plugins()` (see `libraries/appbase/include/appbase/application_base.hpp`),
+   // so any lambda still queued when the plugin impl is about to be destroyed is destructed first.
+   app().executor().post(appbase::priority::medium, appbase::exec_queue::read_only,
+      [this, params = std::move(params), deadline, timeout, prom, log_prefix]() mutable {
+         try {
+            auto ro      = get_read_only_api(timeout);
+            auto variant = ro.get_table_rows(params, deadline)();
+            if (auto* err = std::get_if<fc::exception_ptr>(&variant)) {
+               elog("{}: table read failed {}::{} -- {}",
+                    log_prefix, params.code.to_string(), params.table, (*err)->to_string());
+               prom->set_value({});
+            } else {
+               prom->set_value(std::get<result_t>(std::move(variant)));
+            }
+         } catch (const fc::exception& e) {
+            elog("{}: table read threw {}::{} -- {}",
+                 log_prefix, params.code.to_string(), params.table, e.to_string());
+            prom->set_value({});
+         } catch (const std::exception& e) {
+            elog("{}: table read threw {}::{} -- {}",
+                 log_prefix, params.code.to_string(), params.table, e.what());
+            prom->set_value({});
+         } catch (...) {
+            elog("{}: table read threw unknown exception {}::{}",
+                 log_prefix, params.code.to_string(), params.table);
+            prom->set_value({});
+         }
+      });
+
+   // Poll every 200ms so we can abandon the wait if the caller is shutting down or if the deadline expires before
+   // the executor drains our lambda.
+   while (fut.wait_for(std::chrono::milliseconds(200)) == std::future_status::timeout) {
+      if (shutdown_flag.load(std::memory_order_relaxed)) {
+         wlog("{}: abandoning table read on shutdown ({}::{})", log_prefix, log_code, log_table);
+         return {};
+      }
+      if (fc::time_point::now() >= deadline) {
+         elog("{}: table read queue-wait exceeded {}ms ({}::{})",
+              log_prefix, timeout.count() / 1000, log_code, log_table);
+         return {};
+      }
+   }
+   return fut.get();
+}
+
 void chain_plugin::accept_transaction(const chain::packed_transaction_ptr& trx, next_function<chain::transaction_trace_ptr> next) {
    my->incoming_transaction_async_method(trx, false, transaction_metadata::trx_type::input, false, std::move(next));
 }
@@ -1624,19 +1688,30 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
    // Use table_id from ABI (set by CDT's compute_table_id at compile time).
    const uint16_t table_id = tbl.table_id;
 
-   fc::time_point params_deadline = p.time_limit_ms
-      ? std::min(fc::time_point::now().safe_add(fc::milliseconds(*p.time_limit_ms)), deadline)
-      : deadline;
+   // `all_rows` is a C++-only escape hatch (not FC_REFLECT'd) that walks the entire scan in a single call,
+   // ignoring any caller-supplied `limit`, `time_limit_ms`, or `deadline`. In-tree callers that set it are driven
+   // by a tick, not an RPC deadline, and need the whole table every call. HTTP callers cannot reach this path.
+   fc::time_point params_deadline;
+   if (p.all_rows) {
+      params_deadline = fc::time_point::maximum();
+   } else if (p.time_limit_ms) {
+      params_deadline = std::min(fc::time_point::now().safe_add(fc::milliseconds(*p.time_limit_ms)), deadline);
+   } else {
+      params_deadline = deadline;
+   }
 
    // --- Validate find vs bounds ---
    SYS_ASSERT(p.find.empty() || (p.lower_bound.empty() && p.upper_bound.empty()),
               chain::contract_table_query_exception,
               "Cannot combine 'find' with 'lower_bound' or 'upper_bound'");
 
-   // Handle find: treat as exact key lookup by setting bounds to the same value
+   // Handle find: treat as exact key lookup by setting bounds to the same value.
+   // `all_rows` uncaps the per-scan limit so the single call walks every row; `find` stays limit=1 because it's an
+   // exact-match lookup.
    const string& effective_lower = p.find.empty() ? p.lower_bound : p.find;
    const string& effective_upper = p.find.empty() ? p.upper_bound : p.find;
-   uint32_t effective_limit = p.find.empty() ? p.limit : 1;
+   const uint32_t user_limit     = p.all_rows ? std::numeric_limits<uint32_t>::max() : p.limit;
+   uint32_t effective_limit      = p.find.empty() ? user_limit : 1;
 
    // --- Scope handling ---
    // If key_names[0] == "scope", this table uses scoped keys. The scope field must
@@ -1869,6 +1944,29 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
          return r;
       };
 
+      // Format a secondary-index `next_key` value. When `p.json` is set, emit
+      // a JSON object matching the bound syntax (e.g. `{"byowner":"u4"}`) so
+      // `upper_bound = next_key` round-trips through the bound parser, which
+      // expects JSON when `p.json` is set. Otherwise emit hex of the raw sk
+      // bytes. Falls back to hex on any decode failure.
+      auto emit_secondary_next_key = [&](std::string_view sk) {
+         if (p.json) {
+            try {
+               std::string_view sv = sk;
+               if (!scope_prefix_bytes.empty() && sv.size() >= scope_prefix_bytes.size()) {
+                  sv.remove_prefix(scope_prefix_bytes.size());
+               }
+               auto key_var = chain::be_key_codec::decode_key(sv.data(), sv.size(),
+                                                              bound_key_names, bound_key_types);
+               hp.next_key = fc::json::to_string(key_var, fc::time_point::maximum());
+               return;
+            } catch (...) {
+               // fall through to hex
+            }
+         }
+         hp.next_key = fc::to_hex(sk.data(), sk.size());
+      };
+
       if (!reverse) {
          auto itr = sec_idx.lower_bound(boost::make_tuple(p.code, sec_tid, lb_sv));
          uint32_t count = 0;
@@ -1877,7 +1975,7 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
             if (has_upper && sk >= ub_sv) break;
             if (count >= limit) {
                hp.more = true;
-               hp.next_key = fc::to_hex(sk.data(), sk.size());
+               emit_secondary_next_key(sk);
                break;
             }
             hp.rows.push_back(fetch_primary(*itr));
@@ -1886,14 +1984,21 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
             if (fc::time_point::now() >= params_deadline) {
                if (itr != sec_idx.end() && itr->code == p.code && itr->table_id == sec_tid) {
                   hp.more = true;
-                  auto next_sk = itr->sec_key_view();
-                  hp.next_key = fc::to_hex(next_sk.data(), next_sk.size());
+                  emit_secondary_next_key(itr->sec_key_view());
                }
                break;
             }
          }
       } else {
-         // Reverse iteration
+         // Reverse iteration.
+         //
+         // Resume cursor semantics: `next_key` is the LAST RETURNED row's sk,
+         // not the first unseen row's sk. Callers resume with
+         // `upper_bound = next_key`; since `upper_bound` is exclusive and the
+         // reverse loop starts at `lower_bound(upper_bound)` then `--itr`, the
+         // next page yields the first row strictly below the last returned
+         // one -- i.e. the first unseen row. Setting `next_key` to the first
+         // unseen row's sk instead would skip that row at every page boundary.
          decltype(sec_idx.end()) itr;
          if (has_upper) {
             itr = sec_idx.lower_bound(boost::make_tuple(p.code, sec_tid, ub_sv));
@@ -1902,6 +2007,12 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
          }
          auto begin = sec_idx.lower_bound(boost::make_tuple(p.code, sec_tid, lb_sv));
          uint32_t count = 0;
+         // Remember the last-returned row's sec_key bytes so the cutoff
+         // branches below can feed them to `emit_secondary_next_key`.
+         std::vector<char> last_added_sk_bytes;
+         auto last_added_sv = [&]() {
+            return std::string_view(last_added_sk_bytes.data(), last_added_sk_bytes.size());
+         };
          if (itr != begin) {
             do {
                --itr;
@@ -1909,20 +2020,19 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
                auto sk = itr->sec_key_view();
                if (!lb_bytes.empty() && sk < lb_sv) break;
                if (count >= limit) {
-                  hp.more = true;
-                  hp.next_key = fc::to_hex(sk.data(), sk.size());
+                  if (!last_added_sk_bytes.empty()) {
+                     hp.more = true;
+                     emit_secondary_next_key(last_added_sv());
+                  }
                   break;
                }
                hp.rows.push_back(fetch_primary(*itr));
+               last_added_sk_bytes.assign(sk.data(), sk.data() + sk.size());
                ++count;
                if (fc::time_point::now() >= params_deadline) {
                   if (itr != begin) {
-                     auto prev = itr; --prev;
-                     if (prev->code == p.code && prev->table_id == sec_tid) {
-                        hp.more = true;
-                        auto prev_sk = prev->sec_key_view();
-                        hp.next_key = fc::to_hex(prev_sk.data(), prev_sk.size());
-                     }
+                     hp.more = true;
+                     emit_secondary_next_key(last_added_sv());
                   }
                   break;
                }
@@ -1935,7 +2045,10 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
               key_names = std::move(key_names), key_types = std::move(key_types),
               scope_key_count,
               abi_serializer_max_time = abi_serializer_max_time,
-              shorten_abi_errors = shorten_abi_errors]() mutable ->
+              shorten_abi_errors = shorten_abi_errors,
+              all_rows    = p.all_rows,
+              values_only = p.values_only.value_or(false),
+              filter      = p.filter]() mutable ->
          chain::t_or_exception<read_only::get_table_rows_result> {
          get_table_rows_result result;
          result.more = p.more;
@@ -1974,6 +2087,22 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
             if (p.show_payer)
                obj["payer"] = row.payer.to_string();
             result.rows.push_back(std::move(obj));
+         }
+
+         // --- Post-pass: C++-only wrapper behaviors. Same shape as the primary-path Phase 2 below.
+         if (all_rows) { result.more = false; result.next_key.clear(); }
+         if (values_only) {
+            for (auto& row : result.rows) {
+               if (!row.is_object()) continue;
+               const auto& row_obj = row.get_object();
+               if (!row_obj.contains("value")) continue;
+               fc::variant value{row_obj["value"]};
+               row = std::move(value);
+            }
+         }
+         if (filter.has_value()) {
+            const auto& predicate = *filter;
+            std::erase_if(result.rows, [&](const fc::variant& row) { return !predicate(row); });
          }
          return result;
       };
@@ -2045,6 +2174,9 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
 
       if (itr != begin) {
          uint32_t count = 0;
+         // Resume cursor is the LAST RETURNED row, not the first unseen. See
+         // the secondary-index reverse branch above for the full rationale.
+         auto last_added_itr = kv_idx.end();
          do {
             --itr;
             if (itr->code != p.code || itr->table_id != table_id)
@@ -2055,8 +2187,10 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
                break;
 
             if (count >= limit) {
-               hp.more = true;
-               collect_next_key(*itr);
+               if (last_added_itr != kv_idx.end()) {
+                  hp.more = true;
+                  collect_next_key(*last_added_itr);
+               }
                break;
             }
 
@@ -2065,6 +2199,7 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
             row.value.assign(itr->value.data(), itr->value.data() + itr->value.size());
             row.payer = itr->payer;
             hp.rows.emplace_back(std::move(row));
+            last_added_itr = itr;
 
             ++count;
             if (itr == begin) {
@@ -2073,17 +2208,8 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
             }
 
             if (fc::time_point::now() >= params_deadline) {
-               if (itr != begin) {
-                  auto prev = itr;
-                  --prev;
-                  if (prev->code == p.code && prev->table_id == table_id) {
-                     auto prev_kv = prev->key_view();
-                     if (lb_bytes.empty() || prev_kv >= lb_sv) {
-                        hp.more = true;
-                        collect_next_key(*prev);
-                     }
-                  }
-               }
+               hp.more = true;
+               collect_next_key(*last_added_itr);
                break;
             }
          } while (true);
@@ -2094,7 +2220,10 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
            key_names = std::move(key_names), key_types = std::move(key_types),
            scope_key_count,
            abi_serializer_max_time = abi_serializer_max_time,
-           shorten_abi_errors = shorten_abi_errors]() mutable
+           shorten_abi_errors = shorten_abi_errors,
+           all_rows    = p.all_rows,
+           values_only = p.values_only.value_or(false),
+           filter      = p.filter]() mutable
       -> chain::t_or_exception<read_only::get_table_rows_result> {
       read_only::get_table_rows_result result;
 
@@ -2139,6 +2268,35 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
 
       result.more = hp.more;
       result.next_key = hp.next_key;
+
+      // --- Post-pass: C++-only wrapper behaviors ---
+      // `all_rows` walked the whole scan; a resume cursor is meaningless on the way out.
+      if (all_rows) {
+         result.more = false;
+         result.next_key.clear();
+      }
+
+      // `values_only` strips the `{key, value, payer?}` wrapper before `filter` runs so the predicate sees the same
+      // shape the caller will consume.
+      if (values_only) {
+         for (auto& row : result.rows) {
+            if (!row.is_object()) continue;
+            const auto& row_obj = row.get_object();
+            if (!row_obj.contains("value")) continue;
+            // variant::operator=(const variant&) clears before reading -- copy into an independent variant first,
+            // then move-assign.
+            fc::variant value{row_obj["value"]};
+            row = std::move(value);
+         }
+      }
+
+      if (filter.has_value()) {
+         const auto& predicate = *filter;
+         std::erase_if(result.rows, [&](const fc::variant& row) {
+            return !predicate(row);
+         });
+      }
+
       return result;
    };
 }

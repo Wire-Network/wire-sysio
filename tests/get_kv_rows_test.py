@@ -191,21 +191,26 @@ try:
     # ---------------------------------------------------------------
     # Test 6: Reverse pagination
     # ---------------------------------------------------------------
+    # In reverse mode, next_key is the LAST RETURNED row's key. Callers
+    # resume with upper_bound = next_key (exclusive), which yields the
+    # first row strictly below -- i.e. the next previously unseen row.
+    # Four rows reverse with limit=2 yields two pages:
+    #   [us-west, us-east], [eu-west, ap-south].
     Print("Test 6: Reverse pagination with limit=2")
     page1 = get_table_rows({"code": "kvmap", "table": "geodata", "limit": 2, "reverse": True})
+    Print(f"  Page 1 (reverse): {[r['key']['region'] for r in page1['rows']]}, next_key={page1['next_key']}")
     assert len(page1["rows"]) == 2
     assert page1["more"] == True
-    Print(f"  Page 1 (reverse): {[r['key']['region'] for r in page1['rows']]}, next_key={page1['next_key']}")
+    assert [r["key"]["region"] for r in page1["rows"]] == ["us-west", "us-east"], \
+        f"Page 1 region mismatch: {[r['key']['region'] for r in page1['rows']]}"
 
-    # In reverse mode, next_key is the key we stopped at; use it as upper_bound for next page
     page2 = get_table_rows({"code": "kvmap", "table": "geodata", "limit": 2,
                           "reverse": True, "upper_bound": page1["next_key"]})
     Print(f"  Page 2 (reverse): {[r['key']['region'] for r in page2['rows']]}")
-    assert len(page2["rows"]) == 1, f"Page 2 expected 1 row, got {len(page2['rows'])}"
-    # us-west, us-east from page1; eu-west from page2; ap-south excluded by upper_bound
-    # Actually: reverse with upper_bound=eu-west means we iterate backward from before eu-west
-    # ap-south is the only entry < eu-west
-    assert page2["rows"][0]["key"]["region"] == "ap-south"
+    assert len(page2["rows"]) == 2, f"Page 2 expected 2 rows, got {len(page2['rows'])}"
+    assert [r["key"]["region"] for r in page2["rows"]] == ["eu-west", "ap-south"], \
+        f"Page 2 region mismatch: {[r['key']['region'] for r in page2['rows']]}"
+    assert page2["more"] == False
     Print("  PASSED")
 
     testSuccessful = True

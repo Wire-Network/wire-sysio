@@ -27,6 +27,9 @@
 
 #include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
 
+#include <atomic>
+#include <string_view>
+
 namespace fc { class variant; }
 
 namespace sysio {
@@ -401,20 +404,36 @@ public:
       string               index_name;                ///< secondary index name (e.g. "byowner") or numeric position (e.g. "2")
       string               lower_bound;               ///< inclusive lower key (JSON obj when json=true, hex when json=false)
       string               upper_bound;               ///< exclusive upper key
-      uint32_t             limit = 50;                ///< max rows to return
-      std::optional<bool>  reverse;                   ///< iterate in reverse
+      uint32_t             limit = 50;                ///< max rows to return in a single page; the caller paginates by re-issuing with `lower_bound`/`upper_bound = next_key`. Capped per page by the deadline.
+      std::optional<bool>  reverse;                   ///< iterate in reverse; pairs with `limit` to return the most recent N rows
       std::optional<bool>  show_payer;                ///< include RAM payer in each row
       std::optional<uint32_t> time_limit_ms;          ///< defaults to http-max-response-time-ms
+      std::optional<bool>  values_only;               ///< return each row as just its `value` instead of `{key, value, payer?}`. With `json=false` each row is therefore a bare hex string, not an object.
+
+      // ---- C++-only fields below. Not FC_REFLECT'd, so HTTP callers cannot set them. ----
+
+      /// Walk the entire scan in a single call, ignoring `limit`, `time_limit_ms`, and the caller's deadline.
+      /// On return, `more` is always `false` and `next_key` is empty. Only in-process callers (e.g. the OPP
+      /// cron plugins) should set this; gating it off the HTTP surface prevents unbounded server work.
+      bool                 all_rows = false;
+
+      /// Post-pagination predicate -- rows returning `false` are dropped. Runs AFTER `values_only` so it sees the
+      /// same shape the caller will consume.
+      std::optional<std::function<bool(const fc::variant&)>> filter;
    };
 
    struct get_table_rows_result {
-      fc::variants         rows;                      ///< array of {key: {...}, value: {...}, payer?: "..."} objects
+      fc::variants         rows;                      ///< array of {key: {...}, value: {...}, payer?: "..."} objects (or bare values when `values_only` is set)
       bool                 more = false;
       string               next_key;                  ///< scope-stripped key for pagination
    };
 
    using get_table_rows_return_t = std::function<chain::t_or_exception<get_table_rows_result>()>;
 
+   /// Public table-rows query. Honors the per-caller scan bounds on `get_table_rows_params` (`limit`,
+   /// `time_limit_ms`, `lower/upper_bound`, `find`, `index_name`, `reverse`) plus the C++-only behaviours
+   /// `all_rows` (walk the entire scan, ignoring limit/deadline), `filter` (post-fetch predicate), and
+   /// `values_only` (strip the `{key, value, payer?}` wrapper).
    get_table_rows_return_t get_table_rows( const get_table_rows_params& params, const fc::time_point& deadline )const;
 
    struct get_table_by_scope_params {
@@ -649,6 +668,17 @@ public:
    chain_apis::read_write get_read_write_api(const fc::microseconds& http_max_response_time);
    chain_apis::read_only get_read_only_api(const fc::microseconds& http_max_response_time) const;
 
+   /// Runs a `get_table_rows` scan on the app executor's read_only queue and blocks the caller on the result. The
+   /// scan runs during the controller's read window, avoiding races with block apply that would occur if the caller
+   /// iterated chainbase directly from its own thread. `shutdown_flag` is polled every 200ms so the caller returns
+   /// early on plugin shutdown instead of stalling up to `timeout` for the executor to drain. `log_prefix` is a
+   /// short tag (plugin name) used in error log lines.
+   chain_apis::read_only::get_table_rows_result
+   read_table_rows(chain_apis::read_only::get_table_rows_params params,
+                   fc::microseconds timeout,
+                   std::string_view log_prefix,
+                   const std::atomic<bool>& shutdown_flag);
+
    void accept_transaction(const chain::packed_transaction_ptr& trx, chain::plugin_interface::next_function<chain::transaction_trace_ptr> next);
 
    // Only call this after plugin_initialize()!
@@ -701,7 +731,9 @@ FC_REFLECT(sysio::chain_apis::read_only::get_block_header_result, (id)(signed_bl
 FC_REFLECT( sysio::chain_apis::read_write::push_transaction_results, (transaction_id)(processed) )
 FC_REFLECT( sysio::chain_apis::read_write::send_transaction2_params, (return_failure_trace)(retry_trx)(retry_trx_num_blocks)(transaction) )
 
-FC_REFLECT( sysio::chain_apis::read_only::get_table_rows_params, (json)(code)(table)(scope)(find)(index_name)(lower_bound)(upper_bound)(limit)(reverse)(show_payer)(time_limit_ms) )
+// `all_rows` and `filter` deliberately excluded -- gated to in-process callers so HTTP cannot trigger a full-table walk
+// or inject a predicate via the wire format.
+FC_REFLECT( sysio::chain_apis::read_only::get_table_rows_params, (json)(code)(table)(scope)(find)(index_name)(lower_bound)(upper_bound)(limit)(reverse)(show_payer)(time_limit_ms)(values_only) )
 FC_REFLECT( sysio::chain_apis::read_only::get_table_rows_result, (rows)(more)(next_key) );
 
 FC_REFLECT( sysio::chain_apis::read_only::get_table_by_scope_params, (code)(table)(lower_bound)(upper_bound)(limit)(reverse)(time_limit_ms) )
