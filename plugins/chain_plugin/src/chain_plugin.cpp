@@ -1347,6 +1347,70 @@ chain_apis::read_only chain_plugin::get_read_only_api(const fc::microseconds& ht
    return chain_apis::read_only(chain(), my->_get_info_db, my->_account_query_db, my->_last_tracked_votes, get_abi_serializer_max_time(), http_max_response_time, my->_trx_finality_status_processing.get());
 }
 
+chain_apis::read_only::get_table_rows_result
+chain_plugin::read_table_rows(chain_apis::read_only::get_table_rows_params params,
+                              fc::microseconds timeout,
+                              std::string_view log_prefix,
+                              const std::atomic<bool>& shutdown_flag) {
+   using result_t = chain_apis::read_only::get_table_rows_result;
+   const auto deadline = fc::time_point::now() + timeout;
+
+   // Pre-capture log fields; `params` is moved into the posted lambda below, so the outer error paths cannot read
+   // from it.
+   const std::string log_code  = params.code.to_string();
+   const std::string log_table = params.table;
+
+   // shared_ptr so the posted lambda and this stack frame each own a reference; if the waiter bails (shutdown or
+   // deadline) the lambda can still safely write into the promise when the read_only queue eventually drains.
+   auto prom = std::make_shared<std::promise<result_t>>();
+   auto fut  = prom->get_future();
+
+   // Capturing `this` by raw pointer is safe: appbase drains the io_context and calls `exec.clear()` between
+   // `shutdown_plugins()` and `destroy_plugins()` (see `libraries/appbase/include/appbase/application_base.hpp`),
+   // so any lambda still queued when the plugin impl is about to be destroyed is destructed first.
+   app().executor().post(appbase::priority::medium, appbase::exec_queue::read_only,
+      [this, params = std::move(params), deadline, timeout, prom, log_prefix]() mutable {
+         try {
+            auto ro      = get_read_only_api(timeout);
+            auto variant = ro.get_table_rows(params, deadline)();
+            if (auto* err = std::get_if<fc::exception_ptr>(&variant)) {
+               elog("{}: table read failed {}::{} -- {}",
+                    log_prefix, params.code.to_string(), params.table, (*err)->to_string());
+               prom->set_value({});
+            } else {
+               prom->set_value(std::get<result_t>(std::move(variant)));
+            }
+         } catch (const fc::exception& e) {
+            elog("{}: table read threw {}::{} -- {}",
+                 log_prefix, params.code.to_string(), params.table, e.to_string());
+            prom->set_value({});
+         } catch (const std::exception& e) {
+            elog("{}: table read threw {}::{} -- {}",
+                 log_prefix, params.code.to_string(), params.table, e.what());
+            prom->set_value({});
+         } catch (...) {
+            elog("{}: table read threw unknown exception {}::{}",
+                 log_prefix, params.code.to_string(), params.table);
+            prom->set_value({});
+         }
+      });
+
+   // Poll every 200ms so we can abandon the wait if the caller is shutting down or if the deadline expires before
+   // the executor drains our lambda.
+   while (fut.wait_for(std::chrono::milliseconds(200)) == std::future_status::timeout) {
+      if (shutdown_flag.load(std::memory_order_relaxed)) {
+         wlog("{}: abandoning table read on shutdown ({}::{})", log_prefix, log_code, log_table);
+         return {};
+      }
+      if (fc::time_point::now() >= deadline) {
+         elog("{}: table read queue-wait exceeded {}ms ({}::{})",
+              log_prefix, timeout.count() / 1000, log_code, log_table);
+         return {};
+      }
+   }
+   return fut.get();
+}
+
 void chain_plugin::accept_transaction(const chain::packed_transaction_ptr& trx, next_function<chain::transaction_trace_ptr> next) {
    my->incoming_transaction_async_method(trx, false, transaction_metadata::trx_type::input, false, std::move(next));
 }

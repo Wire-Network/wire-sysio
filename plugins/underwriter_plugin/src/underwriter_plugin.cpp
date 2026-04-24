@@ -71,7 +71,7 @@ struct underwriter_plugin::impl {
 
    // Cron job handle
    cron_service::job_id_t            scan_job_id = 0;
-   bool                              shutting_down = false;
+   std::atomic<bool>                 shutting_down{false};
 
    // Outpost chain_kind cache: outpost_id -> ChainKind
    std::map<uint64_t, ChainKind>     outpost_chain_kinds;
@@ -80,53 +80,12 @@ struct underwriter_plugin::impl {
    //  Table read helper
    // -----------------------------------------------------------------------
 
-   /// Posts a `get_table_rows` scan onto the app's read_only queue and blocks this (cron-worker) thread on the
-   /// result. Running the scan during the controller's read window is what makes the chainbase iteration safe:
-   /// the main chain thread isn't writing blocks while read-only-queue items execute. Calling
-   /// `chain_plug->get_read_only_api(...)` and iterating directly from the cron thread would race with block
-   /// apply. All query shape (`find`, `index_name`, `all_rows`, `filter`, `values_only`) lives on
-   /// `get_table_rows_params`.
+   /// Thin delegate to `chain_plugin::read_table_rows`, which posts the scan onto the app executor's read_only queue
+   /// so chainbase iteration runs during the controller's read window instead of racing with block apply.
    sysio::chain_apis::read_only::get_table_rows_result
    read_table(sysio::chain_apis::read_only::get_table_rows_params p) {
-      using result_t  = sysio::chain_apis::read_only::get_table_rows_result;
-      const auto timeout  = fc::milliseconds(action_timeout_ms);
-      const auto deadline = fc::time_point::now() + timeout;
-
-      // shared_ptr so the posted lambda and this stack frame each own a reference; if `wait_for` times out and
-      // returns, the lambda can still safely write into the promise when the read_only queue eventually drains.
-      auto prom = std::make_shared<std::promise<result_t>>();
-      auto fut  = prom->get_future();
-
-      app().executor().post(appbase::priority::medium, appbase::exec_queue::read_only,
-         [this, p = std::move(p), deadline, prom]() mutable {
-            try {
-               auto ro       = chain_plug->get_read_only_api(fc::microseconds(action_timeout_ms * 1000ll));
-               auto variant  = ro.get_table_rows(p, deadline)();
-               if (auto* err = std::get_if<fc::exception_ptr>(&variant)) {
-                  elog("underwriter: table read failed {}::{} -- {}",
-                       p.code.to_string(), p.table, (*err)->to_string());
-                  prom->set_value({});
-               } else {
-                  prom->set_value(std::get<result_t>(std::move(variant)));
-               }
-            } catch (const fc::exception& e) {
-               elog("underwriter: table read threw {}::{} -- {}", p.code.to_string(), p.table, e.to_string());
-               prom->set_value({});
-            } catch (const std::exception& e) {
-               elog("underwriter: table read threw {}::{} -- {}", p.code.to_string(), p.table, e.what());
-               prom->set_value({});
-            } catch (...) {
-               elog("underwriter: table read threw unknown exception {}::{}", p.code.to_string(), p.table);
-               prom->set_value({});
-            }
-         });
-
-      if (fut.wait_for(std::chrono::milliseconds(action_timeout_ms)) != std::future_status::ready) {
-         elog("underwriter: table read queue-wait exceeded {}ms ({}::{})",
-              action_timeout_ms, p.code.to_string(), p.table);
-         return {};
-      }
-      return fut.get();
+      return chain_plug->read_table_rows(std::move(p), fc::milliseconds(action_timeout_ms),
+                                         "underwriter", shutting_down);
    }
 
    /// Shortcut for the common scan shape: walk every row from a code/scope/table and return unwrapped values.

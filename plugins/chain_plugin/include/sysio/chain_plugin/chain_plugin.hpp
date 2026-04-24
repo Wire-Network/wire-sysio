@@ -27,6 +27,9 @@
 
 #include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
 
+#include <atomic>
+#include <string_view>
+
 namespace fc { class variant; }
 
 namespace sysio {
@@ -668,6 +671,17 @@ public:
 
    chain_apis::read_write get_read_write_api(const fc::microseconds& http_max_response_time);
    chain_apis::read_only get_read_only_api(const fc::microseconds& http_max_response_time) const;
+
+   /// Runs a `get_table_rows` scan on the app executor's read_only queue and blocks the caller on the result. The
+   /// scan runs during the controller's read window, avoiding races with block apply that would occur if the caller
+   /// iterated chainbase directly from its own thread. `shutdown_flag` is polled every 200ms so the caller returns
+   /// early on plugin shutdown instead of stalling up to `timeout` for the executor to drain. `log_prefix` is a
+   /// short tag (plugin name) used in error log lines.
+   chain_apis::read_only::get_table_rows_result
+   read_table_rows(chain_apis::read_only::get_table_rows_params params,
+                   fc::microseconds timeout,
+                   std::string_view log_prefix,
+                   const std::atomic<bool>& shutdown_flag);
 
    void accept_transaction(const chain::packed_transaction_ptr& trx, chain::plugin_interface::next_function<chain::transaction_trace_ptr> next);
 
