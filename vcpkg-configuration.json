@@ -9,8 +9,7 @@
     {
       "kind": "git",
       "repository": "https://github.com/wire-network/wire-vcpkg-registry",
-      "reference": "feature/boringssl-upstream-bump",
-      "baseline": "810862bde15169d886adc9c1e72268b54301cd94",
+      "baseline": "54d969e98171c7447dc07b57b3420df4ae246eb0",
       "packages": [
         "boost",
         "softfloat",
