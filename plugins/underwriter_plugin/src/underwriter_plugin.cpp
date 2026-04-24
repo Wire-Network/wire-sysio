@@ -99,16 +99,15 @@ struct underwriter_plugin::impl {
       return std::get<sysio::chain_apis::read_only::get_table_rows_result>(std::move(result));
    }
 
-   /// Shortcut for the common scan shape: paginate every row from a
-   /// code/scope/table, returning unwrapped values.
+   /// Shortcut for the common scan shape: walk every row from a code/scope/table and return unwrapped values.
    sysio::chain_apis::read_only::get_table_rows_result
    read_all(std::string_view code, std::string_view scope, std::string_view table) {
       sysio::chain_apis::read_only::get_table_rows_params p;
       p.code        = chain::name(code);
       p.scope       = scope;
       p.table       = table;
-      p.limit       = 0; // paginate every row
-      p.unwrap_rows = true;
+      p.all_rows    = true;
+      p.values_only = true;
       return read_table(std::move(p));
    }
 
@@ -279,7 +278,7 @@ struct underwriter_plugin::impl {
       p.lower_bound = std::format("{{\"bystatus\":{}}}", PENDING_STATUS);
       p.upper_bound = std::format("{{\"bystatus\":{}}}", PENDING_STATUS + 1);
       p.limit       = 0; // paginate all pending rows
-      p.unwrap_rows = true;
+      p.values_only = true;
       auto rows = read_table(std::move(p));
       for (auto& row : rows.rows) {
          auto obj = row.get_object();
@@ -329,7 +328,7 @@ struct underwriter_plugin::impl {
       p.scope       = "sysio.msgch";
       p.table       = "attestations";
       p.find        = std::format("{{\"id\":{}}}", req.id);
-      p.unwrap_rows = true;
+      p.values_only = true;
       auto rows = read_table(std::move(p));
       for (auto& row : rows.rows) {
          auto obj = row.get_object();

@@ -2177,87 +2177,53 @@ read_only::get_table_rows_page( const read_only::get_table_rows_params& p, const
 
 read_only::get_table_rows_return_t
 read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::time_point& deadline ) const {
-   const bool paginate_all = (p.limit == 0);
-   const bool has_filter   = p.filter.has_value();
-   const bool do_unwrap    = p.unwrap_rows.value_or(false);
+   const bool all_rows    = p.all_rows;
+   const bool has_filter  = p.filter.has_value();
+   const bool values_only = p.values_only.value_or(false);
 
-   // Fast path: classic single-page semantics with a non-zero limit and no
-   // post-processing. Forward straight to the page implementation so HTTP
-   // callers pay zero extra indirection.
-   if (!paginate_all && !has_filter && !do_unwrap) {
+   // Fast path: no wrapper-level behaviors. Forward to the page impl with the caller's params and deadline unchanged.
+   // HTTP callers with default params always land here.
+   if (!all_rows && !has_filter && !values_only) {
       return get_table_rows_page(p, deadline);
    }
 
-   // Extended path: pagination + unwrap + filter, stitched around repeated
-   // page_impl invocations.
-   return [this, p, deadline, paginate_all, has_filter, do_unwrap]()
+   return [this, p, deadline, all_rows, has_filter, values_only]()
       -> chain::t_or_exception<get_table_rows_result> {
       get_table_rows_params pp = p;
+      fc::time_point effective_deadline = deadline;
 
-      // When `limit == 0` (paginate-all), the page impl needs a concrete cap.
-      // Use a page size that balances round-trips vs. RPC deadline budget.
-      constexpr uint32_t INTERNAL_PAGE_SIZE = 100;
-      if (paginate_all) {
-         pp.limit = INTERNAL_PAGE_SIZE;
+      if (all_rows) {
+         // C++-only escape hatch: walk the entire scan in a single page-impl call, ignoring any caller-supplied
+         // limit, `time_limit_ms`, or `deadline`. In-tree callers that set `all_rows` (the OPP cron plugins) are
+         // driven by a tick, not an RPC deadline, and need the whole table every call. `all_rows` is deliberately
+         // NOT FC_REFLECT'd so HTTP callers cannot trigger this path.
+         pp.limit = std::numeric_limits<uint32_t>::max();
+         pp.time_limit_ms.reset();
+         effective_deadline = fc::time_point::maximum();
       }
 
-      // Clear extension fields from the per-page params — the page impl does
-      // not look at them, but keeping the API-level fields quiet avoids any
-      // confusion if its behavior ever grows to key off them.
-      pp.unwrap_rows.reset();
-      pp.filter.reset();
-
-      const bool reverse_scan = p.reverse.value_or(false);
-
-      get_table_rows_result combined;
-
-      while (true) {
-         auto page_fn    = get_table_rows_page(pp, deadline);
-         auto page_value = page_fn();
-         if (auto* err = std::get_if<fc::exception_ptr>(&page_value)) {
-            return *err;
-         }
-         auto page = std::get<get_table_rows_result>(std::move(page_value));
-
-         combined.rows.insert(combined.rows.end(),
-            std::make_move_iterator(page.rows.begin()),
-            std::make_move_iterator(page.rows.end()));
-         combined.more     = page.more;
-         combined.next_key = page.next_key;
-
-         if (!paginate_all) break;
-         if (!page.more || page.next_key.empty()) break;
-         if (!pp.find.empty()) break; // `find` is exact-match — no next page
-
-         // Advance the cursor. `next_key` from the page impl is the correct
-         // resume key in both directions: the first unseen row for forward
-         // (inclusive `lower_bound`), and the last returned row for reverse
-         // (exclusive `upper_bound`). Forward it to the matching bound and
-         // clear the other.
-         if (reverse_scan) {
-            pp.upper_bound = page.next_key;
-            pp.lower_bound.clear();
-         } else {
-            pp.lower_bound = page.next_key;
-            pp.upper_bound.clear();
-         }
+      auto page_fn    = get_table_rows_page(pp, effective_deadline);
+      auto page_value = page_fn();
+      if (auto* err = std::get_if<fc::exception_ptr>(&page_value)) {
+         return *err;
       }
+      auto combined = std::get<get_table_rows_result>(std::move(page_value));
 
-      if (paginate_all) {
-         // We walked the scan to completion; no resume cursor is meaningful.
+      if (all_rows) {
+         // The whole scan is in `combined`; a resume cursor is meaningless.
          combined.more = false;
          combined.next_key.clear();
       }
 
-      // Unwrap before filtering so the predicate sees the same shape the
-      // caller will eventually consume.
-      if (do_unwrap) {
+      // Strip the {key, value, payer?} wrapper before filtering so the predicate sees the same shape the caller will
+      // consume.
+      if (values_only) {
          for (auto& row : combined.rows) {
             if (!row.is_object()) continue;
             const auto& row_obj = row.get_object();
             if (!row_obj.contains("value")) continue;
-            // variant::operator=(const variant&) clears before reading —
-            // copy into an independent variant first, then move-assign.
+            // variant::operator=(const variant&) clears before reading -- copy into an independent variant first,
+            // then move-assign.
             fc::variant value{row_obj["value"]};
             row = std::move(value);
          }

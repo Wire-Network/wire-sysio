@@ -401,32 +401,40 @@ public:
       string               index_name;                ///< secondary index name (e.g. "byowner") or numeric position (e.g. "2")
       string               lower_bound;               ///< inclusive lower key (JSON obj when json=true, hex when json=false)
       string               upper_bound;               ///< exclusive upper key
-      uint32_t             limit = 50;                ///< max rows to return. `0` = paginate until the scan is exhausted (aggregating all pages into a single result). A non-zero value returns at most that many rows in a single page with `more`/`next_key` set for caller-driven pagination.
+      uint32_t             limit = 50;                ///< max rows to return in a single page; the caller paginates by re-issuing with `lower_bound`/`upper_bound = next_key`. Capped per page by the deadline.
       std::optional<bool>  reverse;                   ///< iterate in reverse; pairs with `limit` to return the most recent N rows
       std::optional<bool>  show_payer;                ///< include RAM payer in each row
       std::optional<uint32_t> time_limit_ms;          ///< defaults to http-max-response-time-ms
-      std::optional<bool>  unwrap_rows;               ///< strip the `{key, value, payer?}` wrapper, returning only the `value` side of each row. C++-only (not serialized over the HTTP surface).
-      std::optional<std::function<bool(const fc::variant&)>> filter; ///< post-pagination predicate — rows returning `false` are dropped. Runs AFTER `unwrap_rows` so it sees the same shape callers do. C++-only (not serialized).
+      std::optional<bool>  values_only;               ///< return each row as just its `value` instead of `{key, value, payer?}`.
+
+      // ---- C++-only fields below. Not FC_REFLECT'd, so HTTP callers cannot set them. ----
+
+      /// Walk the entire scan in a single call, ignoring `limit`, `time_limit_ms`, and the caller's deadline.
+      /// On return, `more` is always `false` and `next_key` is empty. Only in-process callers (e.g. the OPP
+      /// cron plugins) should set this; gating it off the HTTP surface prevents unbounded server work.
+      bool                 all_rows = false;
+
+      /// Post-pagination predicate -- rows returning `false` are dropped. Runs AFTER `values_only` so it sees the
+      /// same shape the caller will consume.
+      std::optional<std::function<bool(const fc::variant&)>> filter;
    };
 
    struct get_table_rows_result {
-      fc::variants         rows;                      ///< array of {key: {...}, value: {...}, payer?: "..."} objects (or bare values when `unwrap_rows` is set)
+      fc::variants         rows;                      ///< array of {key: {...}, value: {...}, payer?: "..."} objects (or bare values when `values_only` is set)
       bool                 more = false;
       string               next_key;                  ///< scope-stripped key for pagination
    };
 
    using get_table_rows_return_t = std::function<chain::t_or_exception<get_table_rows_result>()>;
 
-   /// Public table-rows query. Wraps {@link get_table_rows_page} with the
-   /// opt-in behaviors layered on `get_table_rows_params` — internal pagination
-   /// when `limit == 0`, post-fetch filter, row unwrapping. HTTP callers using
-   /// defaults (`limit=50`, no filter, no `unwrap_rows`) land on the same
-   /// single-page path as before.
+   /// Public table-rows query. Wraps {@link get_table_rows_page} and layers the C++-only behaviours from
+   /// `get_table_rows_params`: `all_rows` (walk the entire scan, ignoring limit/deadline), `filter` (post-fetch
+   /// predicate), and `values_only` (strip the `{key, value, payer?}` wrapper). HTTP callers that don't set any of
+   /// those land directly on the page impl and pay zero extra indirection.
    get_table_rows_return_t get_table_rows( const get_table_rows_params& params, const fc::time_point& deadline )const;
 
-   /// Single-page implementation of the table scan. Honors `limit` as the
-   /// per-page row cap; does NOT paginate, filter, or unwrap — those are
-   /// applied by the public {@link get_table_rows}.
+   /// Single-page implementation of the table scan. Honors `limit` as the per-page row cap; does NOT walk the
+   /// whole table, filter, or strip the wrapper -- those are applied by the public {@link get_table_rows}.
    get_table_rows_return_t get_table_rows_page( const get_table_rows_params& params, const fc::time_point& deadline )const;
 
    struct get_table_by_scope_params {
@@ -713,8 +721,9 @@ FC_REFLECT(sysio::chain_apis::read_only::get_block_header_result, (id)(signed_bl
 FC_REFLECT( sysio::chain_apis::read_write::push_transaction_results, (transaction_id)(processed) )
 FC_REFLECT( sysio::chain_apis::read_write::send_transaction2_params, (return_failure_trace)(retry_trx)(retry_trx_num_blocks)(transaction) )
 
-// `filter` deliberately excluded — `std::function` is not serialisable so it's C++-only.
-FC_REFLECT( sysio::chain_apis::read_only::get_table_rows_params, (json)(code)(table)(scope)(find)(index_name)(lower_bound)(upper_bound)(limit)(reverse)(show_payer)(time_limit_ms)(unwrap_rows) )
+// `all_rows` and `filter` deliberately excluded -- gated to in-process callers so HTTP cannot trigger a full-table walk
+// or inject a predicate via the wire format.
+FC_REFLECT( sysio::chain_apis::read_only::get_table_rows_params, (json)(code)(table)(scope)(find)(index_name)(lower_bound)(upper_bound)(limit)(reverse)(show_payer)(time_limit_ms)(values_only) )
 FC_REFLECT( sysio::chain_apis::read_only::get_table_rows_result, (rows)(more)(next_key) );
 
 FC_REFLECT( sysio::chain_apis::read_only::get_table_by_scope_params, (code)(table)(lower_bound)(upper_bound)(limit)(reverse)(time_limit_ms) )

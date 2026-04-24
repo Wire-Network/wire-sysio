@@ -167,7 +167,7 @@ struct batch_operator_plugin::impl {
          p.table       = msgch::table_outenvelopes;
          p.reverse     = true;
          p.limit       = OUTBOUND_LOOKUP_WINDOW;
-         p.unwrap_rows = true;
+         p.values_only = true;
          auto rows = _impl.read_table(std::move(p));
          for (auto& row : rows.rows) {
             auto     obj         = row.get_object();
@@ -263,7 +263,7 @@ struct batch_operator_plugin::impl {
       p.table       = msgch::table_envelopes;
       p.find        = std::format("{{\"{}\":{}}}", msgch::index_byoutepoch, key);
       p.index_name  = msgch::index_byoutepoch;
-      p.unwrap_rows = true;
+      p.values_only = true;
       p.filter      = [op_account](const fc::variant& row) {
          return chain::name(row[msgch::field::batch_op_name].as_string()) == op_account;
       };
@@ -303,7 +303,7 @@ struct batch_operator_plugin::impl {
       p.scope       = epoch::account;
       p.table       = epoch::table_epochstate;
       p.limit       = 1;
-      p.unwrap_rows = true;
+      p.values_only = true;
       auto state_rows = read_table(std::move(p));
       if (state_rows.rows.empty()) return {false, 0};
 
@@ -398,16 +398,14 @@ struct batch_operator_plugin::impl {
 
    void refresh_outposts() {
       outposts.clear();
-      // `limit = 0` → paginate through every row. The outpost count should
-      // stay tiny (one per external chain), but don't bake in a scan cap
-      // that would stall the batch operator if governance adds more than a
-      // default single-page bound.
+      // `all_rows` walks every row in one call. The outpost count should stay tiny (one per external chain), but
+      // don't bake in a scan cap that would stall the batch operator if governance adds more than the default bound.
       sysio::chain_apis::read_only::get_table_rows_params p;
       p.code        = chain::name(epoch::account);
       p.scope       = epoch::account;
       p.table       = epoch::table_outposts;
-      p.limit       = 0;
-      p.unwrap_rows = true;
+      p.all_rows    = true;
+      p.values_only = true;
       auto rows = read_table(std::move(p));
       for (auto& row : rows.rows) {
          auto obj = row.get_object();
