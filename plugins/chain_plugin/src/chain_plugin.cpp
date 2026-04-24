@@ -1869,6 +1869,29 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
          return r;
       };
 
+      // Format a secondary-index `next_key` value. When `p.json` is set, emit
+      // a JSON object matching the bound syntax (e.g. `{"byowner":"u4"}`) so
+      // `upper_bound = next_key` round-trips through the bound parser, which
+      // expects JSON when `p.json` is set. Otherwise emit hex of the raw sk
+      // bytes. Falls back to hex on any decode failure.
+      auto emit_secondary_next_key = [&](std::string_view sk) {
+         if (p.json) {
+            try {
+               std::string_view sv = sk;
+               if (!scope_prefix_bytes.empty() && sv.size() >= scope_prefix_bytes.size()) {
+                  sv.remove_prefix(scope_prefix_bytes.size());
+               }
+               auto key_var = chain::be_key_codec::decode_key(sv.data(), sv.size(),
+                                                              bound_key_names, bound_key_types);
+               hp.next_key = fc::json::to_string(key_var, fc::time_point::maximum());
+               return;
+            } catch (...) {
+               // fall through to hex
+            }
+         }
+         hp.next_key = fc::to_hex(sk.data(), sk.size());
+      };
+
       if (!reverse) {
          auto itr = sec_idx.lower_bound(boost::make_tuple(p.code, sec_tid, lb_sv));
          uint32_t count = 0;
@@ -1877,7 +1900,7 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
             if (has_upper && sk >= ub_sv) break;
             if (count >= limit) {
                hp.more = true;
-               hp.next_key = fc::to_hex(sk.data(), sk.size());
+               emit_secondary_next_key(sk);
                break;
             }
             hp.rows.push_back(fetch_primary(*itr));
@@ -1886,14 +1909,21 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
             if (fc::time_point::now() >= params_deadline) {
                if (itr != sec_idx.end() && itr->code == p.code && itr->table_id == sec_tid) {
                   hp.more = true;
-                  auto next_sk = itr->sec_key_view();
-                  hp.next_key = fc::to_hex(next_sk.data(), next_sk.size());
+                  emit_secondary_next_key(itr->sec_key_view());
                }
                break;
             }
          }
       } else {
-         // Reverse iteration
+         // Reverse iteration.
+         //
+         // Resume cursor semantics: `next_key` is the LAST RETURNED row's sk,
+         // not the first unseen row's sk. Callers resume with
+         // `upper_bound = next_key`; since `upper_bound` is exclusive and the
+         // reverse loop starts at `lower_bound(upper_bound)` then `--itr`, the
+         // next page yields the first row strictly below the last returned
+         // one -- i.e. the first unseen row. Setting `next_key` to the first
+         // unseen row's sk instead would skip that row at every page boundary.
          decltype(sec_idx.end()) itr;
          if (has_upper) {
             itr = sec_idx.lower_bound(boost::make_tuple(p.code, sec_tid, ub_sv));
@@ -1902,6 +1932,12 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
          }
          auto begin = sec_idx.lower_bound(boost::make_tuple(p.code, sec_tid, lb_sv));
          uint32_t count = 0;
+         // Remember the last-returned row's sec_key bytes so the cutoff
+         // branches below can feed them to `emit_secondary_next_key`.
+         std::vector<char> last_added_sk_bytes;
+         auto last_added_sv = [&]() {
+            return std::string_view(last_added_sk_bytes.data(), last_added_sk_bytes.size());
+         };
          if (itr != begin) {
             do {
                --itr;
@@ -1909,20 +1945,19 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
                auto sk = itr->sec_key_view();
                if (!lb_bytes.empty() && sk < lb_sv) break;
                if (count >= limit) {
-                  hp.more = true;
-                  hp.next_key = fc::to_hex(sk.data(), sk.size());
+                  if (!last_added_sk_bytes.empty()) {
+                     hp.more = true;
+                     emit_secondary_next_key(last_added_sv());
+                  }
                   break;
                }
                hp.rows.push_back(fetch_primary(*itr));
+               last_added_sk_bytes.assign(sk.data(), sk.data() + sk.size());
                ++count;
                if (fc::time_point::now() >= params_deadline) {
                   if (itr != begin) {
-                     auto prev = itr; --prev;
-                     if (prev->code == p.code && prev->table_id == sec_tid) {
-                        hp.more = true;
-                        auto prev_sk = prev->sec_key_view();
-                        hp.next_key = fc::to_hex(prev_sk.data(), prev_sk.size());
-                     }
+                     hp.more = true;
+                     emit_secondary_next_key(last_added_sv());
                   }
                   break;
                }
@@ -2045,6 +2080,9 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
 
       if (itr != begin) {
          uint32_t count = 0;
+         // Resume cursor is the LAST RETURNED row, not the first unseen. See
+         // the secondary-index reverse branch above for the full rationale.
+         auto last_added_itr = kv_idx.end();
          do {
             --itr;
             if (itr->code != p.code || itr->table_id != table_id)
@@ -2055,8 +2093,10 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
                break;
 
             if (count >= limit) {
-               hp.more = true;
-               collect_next_key(*itr);
+               if (last_added_itr != kv_idx.end()) {
+                  hp.more = true;
+                  collect_next_key(*last_added_itr);
+               }
                break;
             }
 
@@ -2065,6 +2105,7 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
             row.value.assign(itr->value.data(), itr->value.data() + itr->value.size());
             row.payer = itr->payer;
             hp.rows.emplace_back(std::move(row));
+            last_added_itr = itr;
 
             ++count;
             if (itr == begin) {
@@ -2073,17 +2114,8 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
             }
 
             if (fc::time_point::now() >= params_deadline) {
-               if (itr != begin) {
-                  auto prev = itr;
-                  --prev;
-                  if (prev->code == p.code && prev->table_id == table_id) {
-                     auto prev_kv = prev->key_view();
-                     if (lb_bytes.empty() || prev_kv >= lb_sv) {
-                        hp.more = true;
-                        collect_next_key(*prev);
-                     }
-                  }
-               }
+               hp.more = true;
+               collect_next_key(*last_added_itr);
                break;
             }
          } while (true);
