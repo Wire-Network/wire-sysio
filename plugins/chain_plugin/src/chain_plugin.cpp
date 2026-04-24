@@ -2229,24 +2229,13 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
          if (!page.more || page.next_key.empty()) break;
          if (!pp.find.empty()) break; // `find` is exact-match — no next page
 
-         // Advance the cursor for the next page.
-         //
-         // Forward: `next_key` is the first row not yet returned; setting it
-         // as `lower_bound` (inclusive) resumes at that row.
-         //
-         // Reverse: `next_key` is ALSO the first unseen row (below the last
-         // returned one), but `upper_bound` is EXCLUSIVE. Setting
-         // `upper_bound = next_key` would skip that row entirely, causing a
-         // one-row gap per page boundary. Use the last RETURNED row's key
-         // instead — `upper_bound = last_key` (exclusive) yields rows
-         // strictly below it, which is exactly what we want.
+         // Advance the cursor. `next_key` from the page impl is the correct
+         // resume key in both directions: the first unseen row for forward
+         // (inclusive `lower_bound`), and the last returned row for reverse
+         // (exclusive `upper_bound`). Forward it to the matching bound and
+         // clear the other.
          if (reverse_scan) {
-            if (combined.rows.empty()) break;
-            const fc::variant& last_row = combined.rows.back();
-            if (!last_row.is_object()) break;
-            const auto& last_obj = last_row.get_object();
-            if (!last_obj.contains("key")) break;
-            pp.upper_bound = fc::json::to_string(last_obj["key"], fc::time_point::maximum());
+            pp.upper_bound = page.next_key;
             pp.lower_bound.clear();
          } else {
             pp.lower_bound = page.next_key;
