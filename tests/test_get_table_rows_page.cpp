@@ -1,15 +1,16 @@
 /**
  * @file test_get_table_rows_page.cpp
- * @brief Unit tests for `chain_apis::read_only::get_table_rows` behaviours layered over `get_table_rows_page`.
+ * @brief Unit tests for `chain_apis::read_only::get_table_rows` covering the wrapper-level fields on
+ *        `get_table_rows_params` (the suite is named `table_reader_tests`).
  *
- * These cases pin down the wrapper-level fields on `get_table_rows_params`:
+ * These cases pin down:
  *
  * - `all_rows` walks the entire scan in a single call, ignoring `limit`, `time_limit_ms`, and the caller deadline.
  *   C++-only (not FC_REFLECT'd) so HTTP cannot trigger unbounded server work.
  * - `values_only` strips the `{key, value, payer?}` wrapper, returning just the value side of each row.
  * - `filter` drops rows post-`values_only`; the predicate sees the same shape the caller will consume.
- * - `reverse` + a small `limit` returns the latest N rows without skipping a row at every page boundary (the
- *   reverse-off-by-one fix in `get_table_rows_page`).
+ * - `reverse` + a small `limit` returns the latest N rows without skipping a row at every page boundary (pins the
+ *   reverse-off-by-one fix).
  *
  * Each case uses the `get_table_test` multi_index contract already wired up for `get_table_tests.cpp`.
  */
@@ -189,6 +190,35 @@ BOOST_FIXTURE_TEST_CASE(reverse_with_limit_returns_latest, validating_tester) tr
    BOOST_CHECK_EQUAL(res.rows[0].get_object()["key"].as_uint64(), 11u);
    BOOST_CHECK_EQUAL(res.rows[1].get_object()["key"].as_uint64(), 10u);
    BOOST_CHECK_EQUAL(res.rows[2].get_object()["key"].as_uint64(),  9u);
+} FC_LOG_AND_RETHROW()
+
+// `all_rows` + `values_only` + `filter` composed together. Pins the interaction: the full scan runs, each row is
+// unwrapped, and the filter sees the unwrapped shape. Independent coverage exists for each flag above, but this
+// test catches future regressions where (say) the filter runs before unwrap or limit/deadline sneak back in under
+// `all_rows`.
+BOOST_FIXTURE_TEST_CASE(all_rows_with_values_only_and_filter_composed, validating_tester) try {
+   deploy_contract(*this);
+   populate_numobjs(*this, 20); // keys/sec64 = 0..19
+
+   auto p = numobjs_params();
+   p.all_rows    = true;
+   p.values_only = true;
+   p.filter = [](const fc::variant& row) {
+      // Predicate sees the unwrapped value; expects `sec64` directly on the row (no `value` wrapper).
+      return (row.get_object()["sec64"].as_uint64() % 2) == 0;
+   };
+
+   auto ro  = make_read_only(*this);
+   auto res = run(ro, p);
+
+   BOOST_REQUIRE_EQUAL(res.rows.size(), 10u); // 0, 2, 4, ..., 18
+   for (size_t i = 0; i < res.rows.size(); ++i) {
+      // Unwrapped: no `value` key, field is directly on the row.
+      BOOST_CHECK(!res.rows[i].get_object().contains("value"));
+      BOOST_CHECK_EQUAL(res.rows[i].get_object()["sec64"].as_uint64(), i * 2);
+   }
+   BOOST_CHECK(!res.more);
+   BOOST_CHECK(res.next_key.empty());
 } FC_LOG_AND_RETHROW()
 
 // `reverse` + `all_rows` walks the table from highest to lowest key with no skips. The page-impl's reverse branch
