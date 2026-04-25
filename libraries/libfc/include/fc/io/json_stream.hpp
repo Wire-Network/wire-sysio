@@ -3,6 +3,7 @@
 #include <fc/io/json.hpp>
 
 #include <cassert>
+#include <charconv>
 #include <cstdint>
 #include <string>
 #include <string_view>
@@ -117,6 +118,24 @@ public:
       out_.append("null", 4);
    }
 
+   /// Emits a JSON string token whose content is the lowercase hex encoding of the
+   /// byte range [data, data+size).  No intermediate std::string allocation; bytes
+   /// are looped once and 2 hex chars are appended per source byte.  Equivalent
+   /// observable output to value_string(fc::to_hex(data, size)) but avoids the
+   /// per-call heap allocation in fc::to_hex.  Used by streaming JSON paths that
+   /// previously paid the to_hex allocation on every action's data / return_value.
+   void value_hex(const char* data, size_t size) {
+      value_prefix();
+      out_.push_back('"');
+      static constexpr char digits[] = "0123456789abcdef";
+      const auto* p = reinterpret_cast<const uint8_t*>(data);
+      for (size_t i = 0; i < size; ++i) {
+         out_.push_back(digits[p[i] >> 4]);
+         out_.push_back(digits[p[i] & 0x0f]);
+      }
+      out_.push_back('"');
+   }
+
    /// Append a preformatted JSON fragment at a value position.  Used to embed output
    /// from legacy fc::variant paths (eg abi_serializer::binary_to_variant + json::to_string)
    /// without an additional parse/re-emit cycle.
@@ -155,15 +174,19 @@ private:
       }
    }
 
+   // std::to_chars is non-throwing, locale-independent, and avoids the format-string
+   // parsing overhead that snprintf pays on every call.  buf is sized for the longest
+   // possible decimal of int64/uint64 (20 chars + sign + slack).  Failure case is
+   // unreachable for fixed-width integers; the unconditional out_.append handles it.
    void append_signed(int64_t n) {
       char buf[24];
-      int k = std::snprintf(buf, sizeof(buf), "%lld", static_cast<long long>(n));
-      if (k > 0) out_.append(buf, static_cast<size_t>(k));
+      auto r = std::to_chars(buf, buf + sizeof(buf), n);
+      out_.append(buf, static_cast<size_t>(r.ptr - buf));
    }
    void append_unsigned(uint64_t n) {
       char buf[24];
-      int k = std::snprintf(buf, sizeof(buf), "%llu", static_cast<unsigned long long>(n));
-      if (k > 0) out_.append(buf, static_cast<size_t>(k));
+      auto r = std::to_chars(buf, buf + sizeof(buf), n);
+      out_.append(buf, static_cast<size_t>(r.ptr - buf));
    }
 
    std::string&             out_;
