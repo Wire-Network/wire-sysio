@@ -746,10 +746,15 @@ namespace fc
    }
    // Generic boost::multiprecision to_variant/from_variant moved to fc/variant_multiprecision.hpp
 
-   fc::variant operator + ( const fc::variant& a, const fc::variant& b );
-   fc::variant operator - ( const fc::variant& a, const fc::variant& b );
-   fc::variant operator * ( const fc::variant& a, const fc::variant& b );
-   fc::variant operator / ( const fc::variant& a, const fc::variant& b );
+   // Arithmetic on variants is not supported. The previous implementations
+   // were unused dead code and `operator-` contained a never-reached loop bug.
+   // If a use case ever appears, perform the conversion explicitly
+   // (e.g. `a.as_int64() + b.as_int64()`) rather than relying on a generic
+   // multi-type operator with surprising coercion rules.
+   fc::variant operator + ( const fc::variant& a, const fc::variant& b ) = delete;
+   fc::variant operator - ( const fc::variant& a, const fc::variant& b ) = delete;
+   fc::variant operator * ( const fc::variant& a, const fc::variant& b ) = delete;
+   fc::variant operator / ( const fc::variant& a, const fc::variant& b ) = delete;
 
    bool operator == ( const fc::variant& a, const fc::variant& b );
    bool operator != ( const fc::variant& a, const fc::variant& b );
