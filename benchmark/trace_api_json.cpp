@@ -6,6 +6,7 @@
 #include <fc/crypto/hex.hpp>
 #include <fc/crypto/private_key.hpp>
 #include <fc/io/json.hpp>
+#include <fc/io/json_stream.hpp>
 #include <fc/variant.hpp>
 
 #include <random>
@@ -129,18 +130,132 @@ void trace_api_json_benchmarking() {
                                      + std::to_string(s.actions_per_trx) + " acts ("
                                      + std::to_string(s.data_bytes) + "B data)";
 
-      // Legacy path: process_block -> variant -> json::to_string.  Times the full
-      // chain the HTTP handler would execute.
-      benchmarking("variant: " + label_prefix, [&]() {
+      // Legacy total path: build variant tree + json::to_string.  Times the full
+      // chain the HTTP handler would execute (variant build on main thread, then
+      // json::to_string on HTTP thread).  Useful as a total-CPU baseline.
+      benchmarking("variant+json: " + label_prefix, [&]() {
          auto v = detail::response_formatter::process_block(entry, irreversible, noop_handler);
          std::string out = fc::json::to_string(v, fc::json::yield_function_t());
          // Defeat the optimizer.
          asm volatile("" : : "g"(out.size()) : "memory");
       });
 
-      // Streaming path: process_block_to_json writes directly into std::string.
-      benchmarking("stream:  " + label_prefix, [&]() {
+      // Variant-only: build the variant tree without serializing to JSON.  This is
+      // the actual current main-thread cost in production - json::to_string runs on
+      // an HTTP-pool thread after cb() hands the variant off.  Compare against
+      // `stream:` below to decide whether moving JSON emission onto the main thread
+      // is a net main-thread win or regression.
+      benchmarking("variant-only: " + label_prefix, [&]() {
+         auto v = detail::response_formatter::process_block(entry, irreversible, noop_handler);
+         asm volatile("" : : "g"(v.is_object()) : "memory");
+      });
+
+      // Streaming path: process_block_to_json writes JSON directly into std::string.
+      // This is the proposed new main-thread cost (no variant intermediate, no
+      // separate HTTP-thread serialization step).
+      benchmarking("stream:       " + label_prefix, [&]() {
          std::string out = detail::response_formatter::process_block_to_json(entry, irreversible, noop_handler);
+         asm volatile("" : : "g"(out.size()) : "memory");
+      });
+   }
+
+   // ---- Isolated hex-emission micro-bench ------------------------------------
+   //
+   // Probes the hex-encoding cost in isolation, the suspected dominant cause of
+   // the streaming-vs-variant-only main-thread regression on data-heavy actions.
+   // Two paths per byte size:
+   //   to_hex+value_string : fc::to_hex(...) -> std::string -> w.value_string(sv)
+   //   value_hex           : json_writer::value_hex writes hex straight into the buffer
+   //
+   // Each iteration emits a single JSON string token of N hex chars, so the delta
+   // is the per-byte hex-encoding overhead (plus one std::string alloc/dealloc on
+   // the to_hex path).  Higher N amortises the prefix/quote bookkeeping and
+   // surfaces the loop cost.
+
+   {
+      auto rng = make_rng();
+      const size_t hex_iter_bytes_total = 64 * 1024; // ~constant work per scenario
+      const size_t sizes[] = { 32, 128, 512, 2048 };
+      for (size_t bytes_per_call : sizes) {
+         auto buf = random_bytes(rng, bytes_per_call);
+         const size_t calls = std::max<size_t>(1, hex_iter_bytes_total / bytes_per_call);
+         const std::string label = std::to_string(bytes_per_call) + "B per call x " + std::to_string(calls);
+
+         benchmarking("hex variant:  " + label, [&]() {
+            std::string out;
+            fc::json_writer w(out);
+            w.begin_array();
+            for (size_t i = 0; i < calls; ++i) {
+               w.value_string(fc::to_hex(buf.data(), buf.size()));
+            }
+            w.end_array();
+            asm volatile("" : : "g"(out.size()) : "memory");
+         });
+
+         benchmarking("hex direct:   " + label, [&]() {
+            std::string out;
+            fc::json_writer w(out);
+            w.begin_array();
+            for (size_t i = 0; i < calls; ++i) {
+               w.value_hex(buf.data(), buf.size());
+            }
+            w.end_array();
+            asm volatile("" : : "g"(out.size()) : "memory");
+         });
+      }
+   }
+
+   // ---- Isolated integer-emission micro-bench --------------------------------
+   //
+   // Probes the integer-to-decimal cost in isolation, comparing snprintf (the
+   // pre-change implementation of json_writer::value_uint64) against std::to_chars
+   // (the post-change implementation).  Each iteration emits 1024 uint64 values
+   // covering a realistic mix of magnitudes: small (status / counters), medium
+   // (block numbers, cpu_usage_us), large (global_sequence on a long-running
+   // chain).  Values are pre-shuffled so branch prediction can't dominate.
+
+   {
+      auto rng = make_rng();
+      std::vector<uint64_t> mix;
+      mix.reserve(1024);
+      for (size_t i = 0; i < 1024; ++i) {
+         std::uniform_int_distribution<int> bucket{0, 2};
+         switch (bucket(rng)) {
+            case 0: mix.push_back(rng() % 256); break;          // small
+            case 1: mix.push_back(rng() % 100'000'000ull); break; // medium
+            case 2: mix.push_back(rng()); break;                // large (full uint64)
+         }
+      }
+
+      auto append_snprintf = [](std::string& out, uint64_t n) {
+         char buf[24];
+         int k = std::snprintf(buf, sizeof(buf), "%llu", static_cast<unsigned long long>(n));
+         if (k > 0) out.append(buf, static_cast<size_t>(k));
+      };
+
+      auto append_to_chars = [](std::string& out, uint64_t n) {
+         char buf[24];
+         auto r = std::to_chars(buf, buf + sizeof(buf), n);
+         out.append(buf, static_cast<size_t>(r.ptr - buf));
+      };
+
+      benchmarking("uint64 snprintf:  1024 mixed", [&]() {
+         std::string out;
+         out.reserve(16 * 1024);
+         for (uint64_t n : mix) {
+            append_snprintf(out, n);
+            out.push_back(',');
+         }
+         asm volatile("" : : "g"(out.size()) : "memory");
+      });
+
+      benchmarking("uint64 to_chars:  1024 mixed", [&]() {
+         std::string out;
+         out.reserve(16 * 1024);
+         for (uint64_t n : mix) {
+            append_to_chars(out, n);
+            out.push_back(',');
+         }
          asm volatile("" : : "g"(out.size()) : "memory");
       });
    }
