@@ -42,6 +42,9 @@ to damp out context-switch and thermal-throttle outliers.
 | copy_short_string         | Copy ctor of a short-string variant -- one heap alloc. |
 | copy_long_string          | Copy ctor of a 128-char-string variant -- big heap copy. |
 | copy_object_50key         | Copy ctor of a 50-key object variant -- shared_ptr bump. |
+| assign_long_string_to_long | `op=(const variant&)` between two heap-string variants -- watches Phase B5. |
+| assign_object_to_object   | `op=(const variant&)` between two object variants -- watches Phase B5. |
+| assign_array_to_array     | `op=(const variant&)` between two array variants -- watches Phase B5. |
 | find_hit_4key             | `variant_object::find` hit on small object. |
 | find_miss_4key            | `variant_object::find` miss on small object. |
 | find_hit_50key_first      | Hit on first key (best case for linear scan). |
@@ -95,6 +98,21 @@ Environment:
 | json_to_string_50key   |       3389.9 |     3282.3 |     4237.8 |
 | walk_50key_by_name     |        997.4 |      987.1 |     1131.7 |
 
+## Same-type op= deltas (Phase B5)
+
+Captured by stashing the variant.cpp change and rerunning:
+
+| Scenario | Pre-B5 ns | Post-B5 ns | Speedup |
+|---|---:|---:|---|
+| assign_long_string_to_long | 17.0 |  3.3 | 5.2x |
+| assign_object_to_object    | 10.3 |  2.0 | 5.1x |
+| assign_array_to_array      | 32.9 | 12.1 | 2.7x |
+
+The pre-B5 path was clear() (which delete'd the existing heap object)
+followed by a fresh `new`; B5 routes same-type assign through the
+existing heap object directly (`*existing = other_value`), saving the
+dealloc+alloc pair.
+
 ## Observations from baseline
 
 - `as_enum_string_invalid` is **~4 µs** -- the cost of `stoll` throwing
@@ -133,3 +151,4 @@ Append one row per merged commit in the follow-on series.
 | A1 lazy-allocate variant_object vector    |  13.9 |   1.4 |  55.1 |  15.0 |    -- |   5.7 | 3012.7 |  972.2 |
 | A2 add variant_object::find_or helper     |  14.7 |   1.6 |  58.0 |  15.0 |  19.9 |   4.1 | 3433.7 | 1038.3 |
 | C6 SSO for short strings (<= 14 bytes)    |   3.6 |   1.5 |  59.1 |  16.9 |  22.6 |   3.8 | 3611.1 | 1094.8 |
+| B5 same-type op= reuses heap object       |   3.6 |   1.5 |  59.1 |  16.9 |  22.6 |   3.8 | 3611.1 | 1094.8 |

@@ -242,6 +242,35 @@ int main() {
       }));
    }
 
+   // Same-type reassignment.  These rows watch Phase B item 5: when the
+   // dest already holds a heap object of the matching type, op=(const&)
+   // reuses that allocation instead of delete + new.
+   {
+      const fc::variant rhs{std::string(64, 'b')};
+      fc::variant lhs{std::string(64, 'a')};
+      print_row(run_bench("assign_long_string_to_long",  10000,  200000, 10, [&] {
+         lhs = rhs;
+         sink(lhs.get_type());
+      }));
+   }
+   {
+      const fc::variant rhs{make_50key_row()};
+      fc::variant lhs{make_50key_row()};
+      print_row(run_bench("assign_object_to_object",      10000,  100000, 10, [&] {
+         lhs = rhs;
+         sink(lhs.get_type());
+      }));
+   }
+   {
+      const fc::variant rhs{fc::variants{fc::variant(1), fc::variant(2), fc::variant(3),
+                                          fc::variant(4), fc::variant(5)}};
+      fc::variant lhs{fc::variants{fc::variant(0), fc::variant(0)}};
+      print_row(run_bench("assign_array_to_array",        20000,  200000, 10, [&] {
+         lhs = rhs;
+         sink(lhs.get_type());
+      }));
+   }
+
    // ------------------------------------------------------------------
    // Lookup on variant_object.  O(N) linear scan today; Phase B item 4
    // adds an optional hash side-table.  Both sizes captured so we can

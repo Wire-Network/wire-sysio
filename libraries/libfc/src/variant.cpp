@@ -321,8 +321,43 @@ variant& variant::operator=( const variant& v )
    if( this == &v )
       return *this;
 
+   const auto src_type = v.get_type();
+
+   // Same-type reassignment: reuse the existing heap object instead of
+   // delete-then-new.  For string/object/array/blob (and the std::string-
+   // backed multi-precision integer encodings) this skips an alloc+free
+   // pair.  Inline encodings fall through to the bytes-copy default arm.
+   if( get_type() == src_type ) {
+      switch( src_type ) {
+         case object_type:
+            **reinterpret_cast<variant_object**>(this) =
+               **reinterpret_cast<const const_variant_object_ptr*>(&v);
+            return *this;
+         case array_type:
+            **reinterpret_cast<variants**>(this) =
+               **reinterpret_cast<const const_variants_ptr*>(&v);
+            return *this;
+         case blob_type:
+            **reinterpret_cast<blob**>(this) =
+               **reinterpret_cast<const const_blob_ptr*>(&v);
+            return *this;
+         case int128_type:
+         case uint128_type:
+         case int256_type:
+         case uint256_type:
+         case string_type:
+            **reinterpret_cast<std::string**>(this) =
+               **reinterpret_cast<const const_string_ptr*>(&v);
+            return *this;
+         default:
+            // Inline (null/int/uint/double/bool/string_sso): bytes-copy.
+            _data = v._data;
+            return *this;
+      }
+   }
+
    clear();
-   switch( v.get_type() )
+   switch( src_type )
    {
       case object_type:
          *reinterpret_cast<variant_object**>(this)  =
@@ -343,7 +378,7 @@ variant& variant::operator=( const variant& v )
       default:
          _data = v._data;
    }
-   set_variant_type( this, v.get_type() );
+   set_variant_type( this, src_type );
    return *this;
 }
 
