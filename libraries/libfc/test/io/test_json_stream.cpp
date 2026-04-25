@@ -257,4 +257,66 @@ BOOST_AUTO_TEST_CASE(fc_public_key_and_signature) {
                      fc::json::to_string(v_sig, fc::json::yield_function_t()));
 }
 
+BOOST_AUTO_TEST_CASE(set_chained_object) {
+   // w.set("name", value) is sugar over w.key("name") + to_json_stream(value, w).
+   // Returns *this so call sites can chain.  The expected output is byte-identical
+   // to the equivalent key()/value_*() sequence.
+   std::string out;
+   {
+      fc::json_writer w(out);
+      w.begin_object();
+      w.set("a", 1)
+       .set("b", std::string{"two"})
+       .set("c", true)
+       .set("d", 3.5);
+      w.end_object();
+   }
+   BOOST_CHECK_EQUAL(out, R"({"a":1,"b":"two","c":true,"d":3.5})");
+}
+
+BOOST_AUTO_TEST_CASE(set_dispatches_via_to_json_stream) {
+   // Confirms set picks up to_json_stream overloads for fc leaf types and reflected
+   // structs - same dispatch rule as the free-function fc::to_json_stream.
+   const fc::sha256 h = fc::sha256::hash(std::string("hello"));
+   point_t s{42, 7, "x"};
+   std::vector<int32_t> nums{1, 2, 3};
+
+   std::string out;
+   {
+      fc::json_writer w(out);
+      w.begin_object();
+      w.set("hash",     h)        // dispatches to_json_stream(sha256, w)
+       .set("inner",    s)        // dispatches via reflector path
+       .set("nums",     nums);    // dispatches to_json_stream(vector<int>, w)
+      w.end_object();
+   }
+
+   // Cross-check against the variant + json::to_string output for the same shape.
+   fc::variant v_hash, v_inner, v_nums;
+   fc::to_variant(h, v_hash);
+   fc::to_variant(s, v_inner);
+   fc::to_variant(nums, v_nums);
+   const std::string expected =
+      std::string{"{\"hash\":"} + fc::json::to_string(v_hash,  fc::json::yield_function_t())
+      + ",\"inner\":"           + fc::json::to_string(v_inner, fc::json::yield_function_t())
+      + ",\"nums\":"            + fc::json::to_string(v_nums,  fc::json::yield_function_t())
+      + "}";
+   BOOST_CHECK_EQUAL(out, expected);
+}
+
+BOOST_AUTO_TEST_CASE(set_raw_splices_preformatted_fragment) {
+   // set_raw is "key + raw_value": for embedding a JSON fragment that was already
+   // serialized elsewhere (eg the abi_serializer + json::to_string path).
+   std::string out;
+   {
+      fc::json_writer w(out);
+      w.begin_object();
+      w.set("name",   std::string{"alice"})
+       .set_raw("payload", R"({"a":1,"b":"two"})")
+       .set("done",   true);
+      w.end_object();
+   }
+   BOOST_CHECK_EQUAL(out, R"({"name":"alice","payload":{"a":1,"b":"two"},"done":true})");
+}
+
 BOOST_AUTO_TEST_SUITE_END()

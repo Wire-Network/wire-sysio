@@ -144,6 +144,37 @@ public:
       out_.append(raw.data(), raw.size());
    }
 
+   /// Fused key + value emitter; the streaming-JSON counterpart to
+   /// fc::mutable_variant_object::set / operator().  Returns *this so call sites
+   /// chain naturally:
+   ///
+   ///   w.begin_object();
+   ///   w.set("id", id)
+   ///    .set("number", n)
+   ///    .set("producer", producer);
+   ///   w.end_object();
+   ///
+   /// Dispatches the value via to_json_stream, so any type with a
+   /// to_json_stream overload (primitives, std containers, fc leaf types,
+   /// FC_REFLECT'd structs via the reflector path) is supported.  Callers must
+   /// have <fc/reflect/json_stream.hpp> included at the call site - that header
+   /// is where the to_json_stream<T> primary template + reflector dispatch lives.
+   template<typename T>
+   json_writer& set(std::string_view name, const T& value) {
+      key(name);
+      to_json_stream(value, *this);
+      return *this;
+   }
+
+   /// Fused key + raw-value emitter.  Same chaining shape as set(), but the
+   /// value is a preformatted JSON fragment spliced verbatim (eg an
+   /// abi_serializer::binary_to_variant result that has already been json'd).
+   json_writer& set_raw(std::string_view name, std::string_view raw_json) {
+      key(name);
+      raw_value(raw_json);
+      return *this;
+   }
+
    /// True when all begin_* have been paired with end_*.  Asserted internally on destructor
    /// usage via value_prefix() is not possible, so callers can check this in tests.
    bool balanced() const { return stack_.empty(); }
