@@ -32,7 +32,9 @@ to damp out context-switch and thermal-throttle outliers.
 | ctor_null                 | `fc::variant()` default ctor + dtor. |
 | ctor_int64                | `fc::variant(int64_t)` -- inline primitive path. |
 | ctor_double               | `fc::variant(double)` -- inline primitive path. |
-| ctor_short_string         | `fc::variant("short")` -- 5 char heap string. |
+| ctor_short_string         | `fc::variant("short")` -- 5 char string (SSO inline once C6 lands). |
+| ctor_sso_boundary_14      | `fc::variant("fourteen_bytex")` -- exactly at SSO threshold. |
+| ctor_just_over_sso_15     | `fc::variant("fifteen_bytes_x")` -- one byte past, heap path. |
 | ctor_long_string          | `fc::variant("...64 chars...")` -- past any plausible SSO threshold. |
 | ctor_empty_mvo            | `fc::mutable_variant_object()` default ctor + dtor.  Phase A item 1 watch. |
 | ctor_empty_vo             | `fc::variant_object()` default ctor + dtor.  Phase A item 1 watch. |
@@ -124,9 +126,10 @@ Environment:
 
 Append one row per merged commit in the follow-on series.
 
-| Commit | ctor_empty_mvo | find_hit_50key_last | find_miss_50key | find_or_50key_hit | as_enum_string_valid | as_enum_string_invalid | walk_50key_by_name |
-|---|---:|---:|---:|---:|---:|---:|---:|
-| baseline                                  |   7.5 |  51.0 |  16.2 |    -- |  11.6 | 3976.4 |  997.4 |
-| A3 as_enum_value uses from_chars          |   7.3 |  51.1 |  16.4 |    -- |   4.6 | 2965.0 |  893.5 |
-| A1 lazy-allocate variant_object vector    |   1.4 |  55.1 |  15.0 |    -- |   5.7 | 3012.7 |  972.2 |
-| A2 add variant_object::find_or helper     |   1.6 |  58.0 |  15.0 |  19.9 |   4.1 | 3433.7 | 1038.3 |
+| Commit | ctor_short_string | ctor_empty_mvo | find_hit_50key_last | find_miss_50key | find_or_50key_hit | as_enum_string_valid | as_enum_string_invalid | walk_50key_by_name |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| baseline                                  |  14.2 |   7.5 |  51.0 |  16.2 |    -- |  11.6 | 3976.4 |  997.4 |
+| A3 as_enum_value uses from_chars          |  12.7 |   7.3 |  51.1 |  16.4 |    -- |   4.6 | 2965.0 |  893.5 |
+| A1 lazy-allocate variant_object vector    |  13.9 |   1.4 |  55.1 |  15.0 |    -- |   5.7 | 3012.7 |  972.2 |
+| A2 add variant_object::find_or helper     |  14.7 |   1.6 |  58.0 |  15.0 |  19.9 |   4.1 | 3433.7 | 1038.3 |
+| C6 SSO for short strings (<= 14 bytes)    |   3.6 |   1.5 |  59.1 |  16.9 |  22.6 |   3.8 | 3611.1 | 1094.8 |

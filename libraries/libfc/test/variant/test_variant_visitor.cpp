@@ -33,7 +33,7 @@ struct recording_visitor : public variant::visitor {
    void handle(const fc::uint256_t&) const override          { note(variant::uint256_type); }
    void handle(const double&) const override                 { note(variant::double_type); }
    void handle(const bool&) const override                   { note(variant::bool_type); }
-   void handle(const std::string&) const override            { note(variant::string_type); }
+   void handle(std::string_view) const override              { note(variant::string_type); }
    void handle(const variant_object&) const override         { note(variant::object_type); }
    void handle(const variants&) const override               { note(variant::array_type); }
    void handle(const blob&) const override                   { note(variant::blob_type); }

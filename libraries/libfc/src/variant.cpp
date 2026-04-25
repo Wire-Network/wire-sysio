@@ -23,6 +23,48 @@ void set_variant_type( variant* v, variant::type_id t)
    data[ sizeof(variant) -1 ] = t;
 }
 
+namespace {
+
+// SSO layout:
+//   bytes 0..13 : string content
+//   byte  14    : string length (0..14)
+//   byte  15    : type tag (variant::string_sso_type)
+//
+// Heap layout for the same logical string type (string_type):
+//   bytes 0..7  : std::string* (pointer to heap-allocated owning string)
+//   bytes 8..14 : unused
+//   byte  15    : type tag (variant::string_type)
+//
+// String construction picks SSO when the source size is <= sso_max_length;
+// every other code path branches on the tag to decide whether to read
+// inline bytes or dereference the heap pointer.
+
+constexpr std::size_t sso_length_byte_index = 14;
+
+inline void write_sso( variant* v, const char* src, std::size_t len ) {
+   char* data = reinterpret_cast<char*>(v);
+   if (len) std::memcpy(data, src, len);
+   data[sso_length_byte_index] = static_cast<char>(len);
+   set_variant_type(v, variant::string_sso_type);
+}
+
+inline std::string_view read_sso( const variant* v ) {
+   const char* data = reinterpret_cast<const char*>(v);
+   const auto len = static_cast<unsigned char>(data[sso_length_byte_index]);
+   return std::string_view{ data, len };
+}
+
+inline void make_string_inline_or_heap( variant* v, std::string_view src ) {
+   if (src.size() <= variant::sso_max_length) {
+      write_sso(v, src.data(), src.size());
+   } else {
+      *reinterpret_cast<std::string**>(v) = new std::string( src );
+      set_variant_type(v, variant::string_type);
+   }
+}
+
+} // anonymous namespace
+
 variant::variant()
 {
    set_variant_type( this, null_type );
@@ -124,14 +166,12 @@ variant::variant( bool val )
 
 variant::variant( char* str )
 {
-   *reinterpret_cast<std::string**>(this)  = new std::string( str );
-   set_variant_type( this, string_type );
+   make_string_inline_or_heap( this, std::string_view{ str } );
 }
 
 variant::variant( const char* str )
 {
-   *reinterpret_cast<std::string**>(this)  = new std::string( str );
-   set_variant_type( this, string_type );
+   make_string_inline_or_heap( this, std::string_view{ str } );
 }
 
 // TODO: do a proper conversion to utf8
@@ -141,8 +181,7 @@ variant::variant( wchar_t* str )
    boost::scoped_array<char> buffer(new char[len]);
    for (unsigned i = 0; i < len; ++i)
      buffer[i] = (char)str[i];
-   *reinterpret_cast<std::string**>(this)  = new std::string(buffer.get(), len);
-   set_variant_type( this, string_type );
+   make_string_inline_or_heap( this, std::string_view{ buffer.get(), len } );
 }
 
 // TODO: do a proper conversion to utf8
@@ -152,19 +191,24 @@ variant::variant( const wchar_t* str )
    boost::scoped_array<char> buffer(new char[len]);
    for (unsigned i = 0; i < len; ++i)
      buffer[i] = (char)str[i];
-   *reinterpret_cast<std::string**>(this)  = new std::string(buffer.get(), len);
-   set_variant_type( this, string_type );
+   make_string_inline_or_heap( this, std::string_view{ buffer.get(), len } );
 }
 
 variant::variant( std::string val )
 {
-   *reinterpret_cast<std::string**>(this)  = new std::string( std::move(val) );
-   set_variant_type( this, string_type );
+   // Fast path: if the source string fits inline, we never touch the heap
+   // even if the source itself happens to be heap-allocated.  The source's
+   // own destructor runs after the move, so its memory is reclaimed too.
+   if (val.size() <= sso_max_length) {
+      write_sso(this, val.data(), val.size());
+   } else {
+      *reinterpret_cast<std::string**>(this)  = new std::string( std::move(val) );
+      set_variant_type( this, string_type );
+   }
 }
 variant::variant( std::string_view val )
 {
-   *reinterpret_cast<std::string**>(this)  = new std::string( val );
-   set_variant_type( this, string_type );
+   make_string_inline_or_heap( this, val );
 }
 variant::variant( blob val )
 {
@@ -211,6 +255,9 @@ void variant::clear()
      case blob_type:
         delete *reinterpret_cast<blob**>(this);
         break;
+     case string_sso_type:
+        // Inline content; no heap allocation to free.
+        break;
      default:
         break;
    }
@@ -241,6 +288,9 @@ variant::variant( const variant& v )
              new blob(**reinterpret_cast<const const_blob_ptr*>(&v) );
           set_variant_type( this, blob_type );
           return;
+       case string_sso_type:
+          // Inline bytes copy via the byte-array assignment below; no
+          // heap allocation needed.  Falls through to the default arm.
        default:
           _data = v._data;
    }
@@ -288,6 +338,8 @@ variant& variant::operator=( const variant& v )
       case blob_type:
          *reinterpret_cast<blob**>(this)  = new blob((**reinterpret_cast<const const_blob_ptr*>(&v)) );
          break;
+      case string_sso_type:
+         // Inline bytes copy via the byte-array assignment below.
       default:
          _data = v._data;
    }
@@ -309,16 +361,16 @@ void  variant::visit( const visitor& v )const
          v.handle( *reinterpret_cast<const uint64_t*>(this) );
          return;
       case int128_type:
-         v.handle( **reinterpret_cast<const const_string_ptr*>(this) );
+         v.handle( std::string_view{ **reinterpret_cast<const const_string_ptr*>(this) } );
          return;
       case uint128_type:
-         v.handle( **reinterpret_cast<const const_string_ptr*>(this) );
+         v.handle( std::string_view{ **reinterpret_cast<const const_string_ptr*>(this) } );
          return;
       case int256_type:
-         v.handle( **reinterpret_cast<const const_string_ptr*>(this) );
+         v.handle( std::string_view{ **reinterpret_cast<const const_string_ptr*>(this) } );
          return;
       case uint256_type:
-         v.handle( **reinterpret_cast<const const_string_ptr*>(this) );
+         v.handle( std::string_view{ **reinterpret_cast<const const_string_ptr*>(this) } );
          return;
 
       case double_type:
@@ -328,7 +380,10 @@ void  variant::visit( const visitor& v )const
          v.handle( *reinterpret_cast<const bool*>(this) );
          return;
       case string_type:
-         v.handle( **reinterpret_cast<const const_string_ptr*>(this) );
+         v.handle( std::string_view{ **reinterpret_cast<const const_string_ptr*>(this) } );
+         return;
+      case string_sso_type:
+         v.handle( read_sso(this) );
          return;
       case array_type:
          v.handle( **reinterpret_cast<const const_variants_ptr*>(this) );
@@ -356,7 +411,8 @@ bool variant::is_null()const
 
 bool variant::is_string()const
 {
-   return get_type() == string_type;
+   const auto t = get_type();
+   return t == string_type || t == string_sso_type;
 }
 bool variant::is_bool()const
 {
@@ -446,6 +502,8 @@ int64_t variant::as_int64()const
    {
       case string_type:
           return to_int64(**reinterpret_cast<const const_string_ptr*>(this));
+      case string_sso_type:
+          return to_int64(read_sso(this));
       case double_type:
           return int64_t(*reinterpret_cast<const double*>(this));
       case int64_type:
@@ -467,6 +525,8 @@ uint64_t variant::as_uint64()const
    {
       case string_type:
           return to_uint64(**reinterpret_cast<const const_string_ptr*>(this));
+      case string_sso_type:
+          return to_uint64(read_sso(this));
       case double_type:
           return static_cast<uint64_t>(*reinterpret_cast<const double*>(this));
       case int64_type:
@@ -491,10 +551,9 @@ fc::int128 variant::as_int128() const
    case uint64_type:
       return static_cast<fc::int128>(*reinterpret_cast<const uint64_t*>(this));
    case int128_type:
-      return fc::int128_from_string(as_string());
    case uint128_type:
-      return fc::int128_from_string(as_string());
    case string_type:
+   case string_sso_type:
       return fc::int128_from_string(as_string());
    case bool_type:
       return static_cast<fc::int128>(*reinterpret_cast<const bool*>(this));
@@ -514,10 +573,9 @@ fc::uint128 fc::variant::as_uint128()const
    case uint64_type:
       return static_cast<fc::uint128>(*reinterpret_cast<const uint64_t*>(this));
    case int128_type:
-      return fc::uint128_from_string(as_string());
    case uint128_type:
-      return fc::uint128_from_string(as_string());
    case string_type:
+   case string_sso_type:
       return fc::uint128_from_string(as_string());
    case bool_type:
       return static_cast<fc::uint128>(*reinterpret_cast<const bool*>(this));
@@ -538,10 +596,9 @@ fc::int256 fc::variant::as_int256()const
    case uint64_type:
       return fc::int256(*reinterpret_cast<const uint64_t*>(this));
    case int256_type:
-      return fc::int256(as_string());//*reinterpret_cast<const int256*>(this);
    case uint256_type:
-      return fc::int256(as_string());
    case string_type:
+   case string_sso_type:
       return fc::int256(as_string());
    case bool_type:
       return int256(*reinterpret_cast<const bool*>(this));
@@ -561,10 +618,9 @@ fc::uint256 fc::variant::as_uint256()const
    case uint64_type:
       return fc::uint256(*reinterpret_cast<const uint64_t*>(this));
    case int256_type:
-      return fc::uint256(as_string());//*reinterpret_cast<const int256*>(this);
    case uint256_type:
-      return fc::uint256(as_string());
    case string_type:
+   case string_sso_type:
       return fc::uint256(as_string());
    case bool_type:
       return uint256(*reinterpret_cast<const bool*>(this));
@@ -582,6 +638,8 @@ double  variant::as_double()const
    {
       case string_type:
           return to_double(**reinterpret_cast<const const_string_ptr*>(this));
+      case string_sso_type:
+          return to_double(read_sso(this));
       case double_type:
           return *reinterpret_cast<const double*>(this);
       case int64_type:
@@ -599,17 +657,17 @@ double  variant::as_double()const
 
 bool  variant::as_bool()const
 {
+   auto bool_from_string_view = [](std::string_view s) -> bool {
+      if( s == "true" )  return true;
+      if( s == "false" ) return false;
+      FC_THROW_EXCEPTION( bad_cast_exception, "Cannot convert string to bool (only \"true\" or \"false\" can be converted)" );
+   };
    switch( get_type() )
    {
       case string_type:
-      {
-          const std::string& s = **reinterpret_cast<const const_string_ptr*>(this);
-          if( s == "true" )
-             return true;
-          if( s == "false" )
-             return false;
-          FC_THROW_EXCEPTION( bad_cast_exception, "Cannot convert string to bool (only \"true\" or \"false\" can be converted)" );
-      }
+          return bool_from_string_view( **reinterpret_cast<const const_string_ptr*>(this) );
+      case string_sso_type:
+          return bool_from_string_view( read_sso(this) );
       case double_type:
           return *reinterpret_cast<const double*>(this) != 0.0;
       case int64_type:
@@ -643,6 +701,8 @@ std::string variant::as_string()const
       case int256_type:
       case string_type:
           return **reinterpret_cast<const const_string_ptr*>(this);
+      case string_sso_type:
+          return std::string{ read_sso(this) };
       case double_type:
           return s_fc_to_string(*reinterpret_cast<const double*>(this));
       case int64_type:
@@ -693,6 +753,7 @@ blob variant::as_blob()const
       case null_type: return blob();
       case blob_type: return get_blob();
       case string_type:
+      case string_sso_type:
       {
          std::string_view str = get_string();
          if( str.size() == 0 ) return blob();
@@ -762,6 +823,10 @@ size_t variant::estimated_size()const
    case int256_type:
    case uint256_type:
    case string_type:
+   case string_sso_type:
+      // estimated_size is allowed to over-report; SSO content lives inside
+      // *this so the +sizeof(std::string) here is a harmless over-count and
+      // keeps the formula uniform across both string encodings.
       return as_string().length() + sizeof(std::string) + sizeof(*this);
    case array_type:
    {
@@ -784,8 +849,11 @@ size_t variant::estimated_size()const
 
 std::string_view          variant::get_string()const
 {
-  if( get_type() == string_type )
-     return **reinterpret_cast<const const_string_ptr*>(this);
+  switch( get_type() ) {
+     case string_type:     return **reinterpret_cast<const const_string_ptr*>(this);
+     case string_sso_type: return read_sso(this);
+     default: break;
+  }
   FC_THROW_EXCEPTION( bad_cast_exception, "Invalid cast from type '{}' to string", get_type() );
 }
 

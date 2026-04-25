@@ -175,20 +175,24 @@ namespace fc
       public:
         enum type_id
         {
-           null_type   = 0,
-           int64_type  = 1,
-           uint64_type = 2,
-           int128_type = 3,
-           uint128_type = 4,
-           int256_type = 5,
-           uint256_type = 6,
-           double_type = 7,
-           bool_type   = 8,
-           string_type = 9,
-           array_type  = 10,
-           object_type = 11,
-           blob_type   = 12
+           null_type       = 0,
+           int64_type      = 1,
+           uint64_type     = 2,
+           int128_type     = 3,
+           uint128_type    = 4,
+           int256_type     = 5,
+           uint256_type    = 6,
+           double_type     = 7,
+           bool_type       = 8,
+           string_type     = 9,  // heap-allocated std::string
+           array_type      = 10,
+           object_type     = 11,
+           blob_type       = 12,
+           string_sso_type = 13  // inline short string (<= 14 bytes); content in bytes 0..13, length in byte 14
         };
+        /// Maximum string length stored inline (rest of the 16-byte buffer:
+        /// 14 bytes content + 1 byte length + 1 byte type tag).
+        static constexpr std::size_t sso_max_length = 14;
 
         /// Constructs a null_type variant
         variant();
@@ -242,7 +246,7 @@ namespace fc
               virtual void handle( const fc::uint256_t& v )const      = 0;
               virtual void handle( const double& v )const        = 0;
               virtual void handle( const bool& v )const          = 0;
-              virtual void handle( const std::string& v )const   = 0;
+              virtual void handle( std::string_view v )const     = 0;
               virtual void handle( const variant_object& v)const = 0;
               virtual void handle( const variants& v)const       = 0;
               virtual void handle( const blob& v)const           = 0;
@@ -789,5 +793,5 @@ namespace fc
 
 #include <fc/reflect/reflect.hpp>
 FC_REFLECT_TYPENAME( fc::variant )
-FC_REFLECT_ENUM( fc::variant::type_id, (null_type)(int64_type)(uint64_type)(int128_type)(uint128_type)(int256_type)(uint256_type)(double_type)(bool_type)(string_type)(array_type)(object_type)(blob_type) )
+FC_REFLECT_ENUM( fc::variant::type_id, (null_type)(int64_type)(uint64_type)(int128_type)(uint128_type)(int256_type)(uint256_type)(double_type)(bool_type)(string_type)(array_type)(object_type)(blob_type)(string_sso_type) )
 FC_REFLECT( fc::blob, (data) );

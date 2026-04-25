@@ -182,9 +182,18 @@ int main() {
       fc::variant v{"short"};
       sink(v.get_type());
    }));
+   print_row(run_bench("ctor_sso_boundary_14",       50000,  500000, 10, [&] {
+      // Exactly at the SSO threshold; still inline.
+      fc::variant v{"fourteen_bytex"};
+      sink(v.get_type());
+   }));
+   print_row(run_bench("ctor_just_over_sso_15",      20000,  200000, 10, [&] {
+      // One byte past the threshold; falls back to heap.
+      fc::variant v{"fifteen_bytes_x"};
+      sink(v.get_type());
+   }));
    print_row(run_bench("ctor_long_string",          20000,  100000, 10, [&] {
-      // 64 chars -- past any reasonable SSO threshold so a heap alloc is
-      // still on the path even after Phase C.
+      // 64 chars -- well past the inline threshold; heap path.
       fc::variant v{"this is a sixty four character benchmark string ----- yyzzqqww"};
       sink(v.get_type());
    }));
