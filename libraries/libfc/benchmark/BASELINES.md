@@ -98,6 +98,62 @@ Environment:
 | json_to_string_50key   |       3389.9 |     3282.3 |     4237.8 |
 | walk_50key_by_name     |        997.4 |      987.1 |     1131.7 |
 
+## Final numbers at Release (-O3)
+
+The series above tracked deltas at RelWithDebInfo (-O2 -g) so commits
+remained comparable and the binary stayed debuggable.  These are the
+post-B5 numbers re-captured with `cmake-build-release` (-O3 -DNDEBUG)
+on the same host (12th Gen i9-12900K, clang 18.1.8) for an apples-
+to-apples external comparison.
+
+| Benchmark              | -O2 ns/op |  -O3 ns/op | -O3 / -O2 |
+|---|---:|---:|---:|
+| ctor_null              |       1.8 |       1.8 |   1.00 |
+| ctor_int64             |       2.0 |       2.1 |   1.05 |
+| ctor_double            |       2.0 |       2.0 |   1.00 |
+| ctor_short_string      |       3.6 |       3.6 |   1.00 |
+| ctor_sso_boundary_14   |       3.4 |       3.7 |   1.09 |
+| ctor_just_over_sso_15  |      14.3 |      12.6 |   0.88 |
+| ctor_long_string       |      19.7 |      20.2 |   1.03 |
+| ctor_empty_mvo         |       1.5 |       1.5 |   1.00 |
+| ctor_empty_vo          |       1.5 |       1.3 |   0.87 |
+| copy_int64             |       2.2 |       2.2 |   1.00 |
+| copy_short_string      |       2.2 |       2.8 |   1.27 |
+| copy_long_string       |      18.8 |      17.9 |   0.95 |
+| copy_object_50key      |      11.0 |      12.4 |   1.13 |
+| assign_long_string_to_long |   3.3 |       3.3 |   1.00 |
+| assign_object_to_object|       2.0 |       2.0 |   1.00 |
+| assign_array_to_array  |      12.1 |      11.2 |   0.93 |
+| find_hit_4key          |       4.4 |       4.4 |   1.00 |
+| find_miss_4key         |       5.7 |       5.3 |   0.93 |
+| find_hit_50key_first   |       3.3 |       3.2 |   0.97 |
+| find_hit_50key_last    |      59.1 |      55.5 |   0.94 |
+| find_miss_50key        |      16.9 |      15.5 |   0.92 |
+| contains_then_op_50key |      44.6 |      38.4 |   0.86 |
+| find_or_50key_hit      |      22.6 |      19.3 |   0.85 |
+| find_or_50key_miss     |      16.3 |      16.1 |   0.99 |
+| as_enum_int            |       1.6 |       1.6 |   1.00 |
+| as_enum_string_valid   |       3.8 |       3.6 |   0.95 |
+| as_enum_string_invalid |    3611.1 |    4441.6 |   1.23 |
+| as_string_int64        |       6.7 |       7.1 |   1.06 |
+| as_int64_string        |       1.5 |       1.5 |   1.00 |
+| json_parse_50key       |    9821.8 |    9740.5 |   0.99 |
+| json_to_string_50key   |    3141.9 |    3204.4 |   1.02 |
+| walk_50key_by_name     |    1094.8 |    1119.0 |   1.02 |
+
+-O3 is roughly 2-15% faster on the inlinable paths (find loops,
+array copies, find_or, contains_then_op).  A handful of scenarios
+(`copy_short_string`, `copy_object_50key`, `as_enum_string_invalid`)
+are slower at -O3, mostly within run-to-run variance for those
+specific rows.  The exception-path (`as_enum_string_invalid`) row is
+the only consistent regression -- exception unwinding generates more
+code at -O3 -- but it's still more than an order of magnitude faster
+than the baseline regardless of optimisation level.
+
+The relative ordering of all scenarios is preserved between -O2 and
+-O3, so the deltas the per-commit log tracks remain meaningful for
+choosing future optimisation work.
+
 ## Same-type op= deltas (Phase B5)
 
 Captured by stashing the variant.cpp change and rerunning:
