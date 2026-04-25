@@ -4,6 +4,30 @@
 
 namespace fc
 {
+   namespace {
+      // Shared empty entries used by every default-constructed
+      // variant_object / mutable_variant_object whose backing vector has
+      // not yet been allocated.  begin() / end() / find() / size() /
+      // operator[] route through this so they never have to branch on a
+      // null _key_value, and the singleton is never mutated -- mutating
+      // paths always allocate a fresh vector before writing.  Returned
+      // as a non-const reference so the iterator type matches both
+      // variant_object::iterator (a const_iterator) and
+      // mutable_variant_object::iterator (a non-const iterator);
+      // dereferencing an empty-range iterator is UB regardless, so the
+      // static is read-only in practice.
+      std::vector<variant_object::entry>& empty_entries() {
+         static std::vector<variant_object::entry> v;
+         return v;
+      }
+
+      // Lazy-init helper: ensures the unique_ptr is non-null before a
+      // mutating mvo operation.
+      void ensure_kv(std::unique_ptr<std::vector<variant_object::entry>>& p) {
+         if (!p) p = std::make_unique<std::vector<variant_object::entry>>();
+      }
+   }
+
    // ---------------------------------------------------------------
    // entry
 
@@ -50,13 +74,12 @@ namespace fc
 
    variant_object::iterator variant_object::begin() const
    {
-      assert( _key_value != nullptr );
-      return _key_value->begin();
+      return _key_value ? _key_value->begin() : empty_entries().begin();
    }
 
    variant_object::iterator variant_object::end() const
    {
-      return _key_value->end();
+      return _key_value ? _key_value->end() : empty_entries().end();
    }
 
    variant_object::iterator variant_object::find( const std::string& key )const
@@ -66,14 +89,16 @@ namespace fc
 
    variant_object::iterator variant_object::find( const char* key )const
    {
-      for( auto itr = begin(); itr != end(); ++itr )
+      if( !_key_value ) return empty_entries().end();
+      const auto e = _key_value->end();
+      for( auto itr = _key_value->begin(); itr != e; ++itr )
       {
          if( itr->key() == key )
          {
             return itr;
          }
       }
-      return end();
+      return e;
    }
 
    const variant& variant_object::operator[]( const std::string& key )const
@@ -90,13 +115,10 @@ namespace fc
 
    size_t variant_object::size() const
    {
-      return _key_value->size();
+      return _key_value ? _key_value->size() : 0;
    }
 
-   variant_object::variant_object()
-      :_key_value(std::make_shared<std::vector<entry>>() )
-   {
-   }
+   variant_object::variant_object() = default;
 
    variant_object::variant_object( std::string key, variant val )
       : _key_value(std::make_shared<std::vector<entry>>())
@@ -107,32 +129,29 @@ namespace fc
    variant_object::variant_object( const variant_object& obj )
    :_key_value( obj._key_value )
    {
-      assert( _key_value != nullptr );
    }
 
    variant_object::variant_object( variant_object&& obj) noexcept:
       _key_value( std::move(obj._key_value) )
    {
-      obj._key_value = std::make_shared<std::vector<entry>>();
-      assert( _key_value != nullptr );
    }
 
    variant_object::variant_object( const mutable_variant_object& obj )
-      : _key_value(std::make_shared<std::vector<entry>>(*obj._key_value))
+      : _key_value( obj._key_value
+                       ? std::make_shared<std::vector<entry>>(*obj._key_value)
+                       : nullptr )
    {
    }
 
    variant_object::variant_object( mutable_variant_object&& obj )
    : _key_value(std::move(obj._key_value))
    {
-      assert( _key_value != nullptr );
    }
 
    variant_object& variant_object::operator=( variant_object&& obj ) noexcept {
       if (this != &obj)
       {
          fc_swap(_key_value, obj._key_value );
-         assert( _key_value != nullptr );
       }
       return *this;
    }
@@ -149,13 +168,18 @@ namespace fc
    variant_object& variant_object::operator=( mutable_variant_object&& obj )
    {
       _key_value = std::move(obj._key_value);
-      obj._key_value.reset( new std::vector<entry>() );
       return *this;
    }
 
    variant_object& variant_object::operator=( const mutable_variant_object& obj )
    {
-      *_key_value = *obj._key_value;
+      // Always detach: this fixes the prior aliasing bug where writing
+      // through a shared shared_ptr could mutate a sibling variant_object
+      // that had been copy-shared from this one.  And it gives the lazy
+      // path the only allocation it needs.
+      _key_value = obj._key_value
+                     ? std::make_shared<std::vector<entry>>(*obj._key_value)
+                     : nullptr;
       return *this;
    }
 
@@ -186,22 +210,24 @@ namespace fc
 
    mutable_variant_object::iterator mutable_variant_object::begin()
    {
+      ensure_kv(_key_value);
       return _key_value->begin();
    }
 
    mutable_variant_object::iterator mutable_variant_object::end()
    {
+      ensure_kv(_key_value);
       return _key_value->end();
    }
 
    mutable_variant_object::iterator mutable_variant_object::begin() const
    {
-      return _key_value->begin();
+      return _key_value ? _key_value->begin() : empty_entries().begin();
    }
 
    mutable_variant_object::iterator mutable_variant_object::end() const
    {
-      return _key_value->end();
+      return _key_value ? _key_value->end() : empty_entries().end();
    }
 
    mutable_variant_object::iterator mutable_variant_object::find( const std::string& key )const
@@ -211,14 +237,16 @@ namespace fc
 
    mutable_variant_object::iterator mutable_variant_object::find( const char* key )const
    {
-      for( auto itr = begin(); itr != end(); ++itr )
+      if( !_key_value ) return empty_entries().end();
+      const auto e = _key_value->end();
+      for( auto itr = _key_value->begin(); itr != e; ++itr )
       {
          if( itr->key() == key )
          {
             return itr;
          }
       }
-      return end();
+      return e;
    }
 
    mutable_variant_object::iterator mutable_variant_object::find( const std::string& key )
@@ -228,14 +256,16 @@ namespace fc
 
    mutable_variant_object::iterator mutable_variant_object::find( const char* key )
    {
-      for( auto itr = begin(); itr != end(); ++itr )
+      ensure_kv(_key_value);
+      const auto e = _key_value->end();
+      for( auto itr = _key_value->begin(); itr != e; ++itr )
       {
          if( itr->key() == key )
          {
             return itr;
          }
       }
-      return end();
+      return e;
    }
 
    bool   mutable_variant_object::contains( const char* key )  { return find(key) != end(); }
@@ -263,19 +293,18 @@ namespace fc
    {
       auto itr = find( key );
       if( itr != end() ) return itr->value();
+      // find() with a non-const this already ensure_kv'd, so _key_value
+      // is guaranteed non-null here.
       _key_value->emplace_back(entry(key, variant()));
       return _key_value->back().value();
    }
 
    size_t mutable_variant_object::size() const
    {
-      return _key_value->size();
+      return _key_value ? _key_value->size() : 0;
    }
 
-   mutable_variant_object::mutable_variant_object()
-      :_key_value(new std::vector<entry>)
-   {
-   }
+   mutable_variant_object::mutable_variant_object() = default;
 
    mutable_variant_object::mutable_variant_object( std::string key, variant val )
       : _key_value(new std::vector<entry>())
@@ -284,14 +313,17 @@ namespace fc
    }
 
    mutable_variant_object::mutable_variant_object( const variant_object& obj )
-      : _key_value( new std::vector<entry>(*obj._key_value) )
+      : _key_value( obj._key_value
+                       ? new std::vector<entry>(*obj._key_value)
+                       : nullptr )
    {
    }
 
    mutable_variant_object::mutable_variant_object( variant_object&& obj )
-      : _key_value( new std::vector<entry>() )
    {
-      assert(obj._key_value.use_count() == 1); // should only be used if data not shared
+      assert(obj._key_value.use_count() <= 1); // should only be used if data not shared
+      if (!obj._key_value) return; // empty source -> stay lazy
+      _key_value = std::make_unique<std::vector<entry>>();
       if (obj._key_value.use_count() == 1)
          *_key_value = std::move(*obj._key_value);
       else
@@ -299,7 +331,9 @@ namespace fc
    }
 
    mutable_variant_object::mutable_variant_object( const mutable_variant_object& obj )
-      : _key_value( new std::vector<entry>(*obj._key_value) )
+      : _key_value( obj._key_value
+                       ? new std::vector<entry>(*obj._key_value)
+                       : nullptr )
    {
    }
 
@@ -310,13 +344,20 @@ namespace fc
 
    mutable_variant_object& mutable_variant_object::operator=( const variant_object& obj )
    {
-      *_key_value = *obj._key_value;
+      _key_value = obj._key_value
+                     ? std::make_unique<std::vector<entry>>(*obj._key_value)
+                     : nullptr;
       return *this;
    }
 
    mutable_variant_object& mutable_variant_object::operator=( variant_object&& obj )
    {
-      assert(obj._key_value.use_count() == 1); // should only be used if data not shared
+      assert(obj._key_value.use_count() <= 1); // should only be used if data not shared
+      if (!obj._key_value) {
+         _key_value.reset();
+         return *this;
+      }
+      ensure_kv(_key_value);
       if (obj._key_value.use_count() == 1)
          *_key_value = std::move(*obj._key_value);
       else
@@ -337,19 +378,23 @@ namespace fc
    {
       if (this != &obj)
       {
-         *_key_value = *obj._key_value;
+         _key_value = obj._key_value
+                        ? std::make_unique<std::vector<entry>>(*obj._key_value)
+                        : nullptr;
       }
       return *this;
    }
 
    void mutable_variant_object::reserve( size_t s )
    {
+      ensure_kv(_key_value);
       _key_value->reserve(s);
    }
 
    void  mutable_variant_object::erase( const std::string& key )
    {
-      for( auto itr = begin(); itr != end(); ++itr )
+      if (!_key_value) return;
+      for( auto itr = _key_value->begin(); itr != _key_value->end(); ++itr )
       {
          if( itr->key() == key )
          {
@@ -362,6 +407,7 @@ namespace fc
    /** replaces the value at \a key with \a var or insert's \a key if not found */
    mutable_variant_object& mutable_variant_object::set( std::string key, variant var ) &
    {
+      ensure_kv(_key_value);
       auto itr = find( key.c_str() );
       if( itr != end() )
       {
@@ -376,6 +422,7 @@ namespace fc
 
    mutable_variant_object mutable_variant_object::set( std::string key, variant var ) &&
    {
+      ensure_kv(_key_value);
       auto itr = find( key.c_str() );
       if( itr != end() )
       {
@@ -393,12 +440,14 @@ namespace fc
     */
    mutable_variant_object& mutable_variant_object::operator()( std::string key, variant var ) &
    {
+      ensure_kv(_key_value);
       _key_value->push_back( entry( std::move(key), std::move(var) ) );
       return *this;
    }
 
    mutable_variant_object mutable_variant_object::operator()( std::string key, variant var ) &&
    {
+      ensure_kv(_key_value);
       _key_value->push_back( entry( std::move(key), std::move(var) ) );
       return std::move(*this);
    }

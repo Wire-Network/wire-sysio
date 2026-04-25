@@ -126,3 +126,4 @@ Append one row per merged commit in the follow-on series.
 |---|---:|---:|---:|---:|---:|---:|
 | baseline                                  |   7.5 |  51.0 |  16.2 |  11.6 | 3976.4 |  997.4 |
 | A3 as_enum_value uses from_chars          |   7.3 |  51.1 |  16.4 |   4.6 | 2965.0 |  893.5 |
+| A1 lazy-allocate variant_object vector    |   1.4 |  55.1 |  15.0 |   5.7 | 3012.7 |  972.2 |
