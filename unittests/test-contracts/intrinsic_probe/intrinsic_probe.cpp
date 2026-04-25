@@ -136,6 +136,16 @@ __attribute__((sysio_wasm_import))
 void __divtf3 ( void* ret, uint64_t la, uint64_t ha, uint64_t lb, uint64_t hb );
 __attribute__((sysio_wasm_import))
 void __fixtfti( void* ret, uint64_t la, uint64_t ha );
+
+// --- native float / double to int128 conversions (legacy_ptr<int128_t> ret) ---
+// Paired with __fixtfti above; both exercise the same saturation boundary at
+// 2^127 but through different host entry points (to_softfloat32 / to_softfloat64
+// then ___fixsfti / ___fixdfti) and must saturate identically.
+__attribute__((sysio_wasm_import))
+void __fixsfti( void* ret, float a );
+__attribute__((sysio_wasm_import))
+void __fixdfti( void* ret, double a );
+
 // __cmptf2 has no legacy_ptr -- uint64_t quad-pairs in, int32_t out; no
 // alignment concerns. Used by the probes below to verify float128 results
 // without having to hand-compute the exact destination bit pattern.
@@ -1328,10 +1338,11 @@ public:
              "__divtf3(1.0, 0.0) must produce +Inf, not throw" );
    }
 
-   // __fixtfti: large finite float128 (2^127) truncated to int128. Host's
-   // softfloat f128_to_i128 saturates on overflow per the impl -- pin that
-   // the call returns (no throw) and produces some definite bit pattern
-   // rather than silent UB.
+   // __fixtfti: large finite float128 (+2^127) truncated to int128. The host
+   // implementation (libraries/builtins/fixtfti.c) saturates positive overflow
+   // to INT128_MAX = 0x7FFFFFFFFFFFFFFF_FFFFFFFFFFFFFFFF. Pinning the exact
+   // saturated value (not just "non-zero") guards against a regression of the
+   // signed-left-shift UB the shift-in-unsigned fix resolved.
    [[sysio::action]]
    void fixovfl() {
       alignas(16) unsigned char buf[16] = {};
@@ -1339,12 +1350,37 @@ public:
       uint64_t lo = 0, hi = 0;
       std::memcpy(&lo, buf,     8);
       std::memcpy(&hi, buf + 8, 8);
-      // Saturation ceiling for int128 is INT128_MAX = 0x7FFF_FFFF... / hi
-      // = 0x7FFFFFFFFFFFFFFF, lo = 0xFFFFFFFFFFFFFFFF. The specific value
-      // is a host-impl choice; what we pin is: the call did not silently
-      // return all zeros (which would mean the intrinsic ran uninitialized).
-      check( !(lo == 0 && hi == 0),
-             "__fixtfti(2^127) must not return 0 -- expect saturated int128" );
+      check( hi == 0x7FFFFFFFFFFFFFFFULL && lo == 0xFFFFFFFFFFFFFFFFULL,
+             "__fixtfti(+2^127) must saturate to INT128_MAX" );
+   }
+
+   // __fixdfti: native-double +2^127 truncated to int128. Host path runs
+   // to_softfloat64(a).v through ___fixdfti, which saturates the same way
+   // as the float128 path. The literal 0x1p127 is exactly representable in
+   // IEEE 754 double (sign=0, exp=1150=0x47E, frac=0).
+   [[sysio::action]]
+   void fxdfovfl() {
+      alignas(16) unsigned char buf[16] = {};
+      __fixdfti( buf, 0x1p127 );
+      uint64_t lo = 0, hi = 0;
+      std::memcpy(&lo, buf,     8);
+      std::memcpy(&hi, buf + 8, 8);
+      check( hi == 0x7FFFFFFFFFFFFFFFULL && lo == 0xFFFFFFFFFFFFFFFFULL,
+             "__fixdfti(+2^127) must saturate to INT128_MAX" );
+   }
+
+   // __fixsfti: native-float +2^127 truncated to int128. Host path runs
+   // to_softfloat32(a).v through ___fixsfti. 0x1p127f is exactly representable
+   // in IEEE 754 single precision (sign=0, exp=254=0xFE, frac=0).
+   [[sysio::action]]
+   void fxsfovfl() {
+      alignas(16) unsigned char buf[16] = {};
+      __fixsfti( buf, 0x1p127f );
+      uint64_t lo = 0, hi = 0;
+      std::memcpy(&lo, buf,     8);
+      std::memcpy(&hi, buf + 8, 8);
+      check( hi == 0x7FFFFFFFFFFFFFFFULL && lo == 0xFFFFFFFFFFFFFFFFULL,
+             "__fixsfti(+2^127) must saturate to INT128_MAX" );
    }
 
    // =============================================================================
