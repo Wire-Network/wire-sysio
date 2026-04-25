@@ -199,6 +199,16 @@
             "fields": []
         },
         {
+            "name": "fxdfovfl",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "fxsfovfl",
+            "base": "",
+            "fields": []
+        },
+        {
             "name": "gacbad",
             "base": "",
             "fields": []
@@ -688,6 +698,16 @@
         {
             "name": "fixovfl",
             "type": "fixovfl",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "fxdfovfl",
+            "type": "fxdfovfl",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "fxsfovfl",
+            "type": "fxsfovfl",
             "ricardian_contract": ""
         },
         {

@@ -375,7 +375,9 @@ BOOST_FIXTURE_TEST_CASE(f128_div_ok,        intrinsic_probe_fixture) { BOOST_CHE
 BOOST_FIXTURE_TEST_CASE(f128_div_unaligned, intrinsic_probe_fixture) { BOOST_CHECK_NO_THROW(t.run("divfua"_n));   }
 BOOST_FIXTURE_TEST_CASE(f128_div_zero,      intrinsic_probe_fixture) { BOOST_CHECK_NO_THROW(t.run("divfzero"_n)); }
 
-BOOST_FIXTURE_TEST_CASE(f128_fix_overflow, intrinsic_probe_fixture) { BOOST_CHECK_NO_THROW(t.run("fixovfl"_n)); }
+BOOST_FIXTURE_TEST_CASE(f128_fix_overflow, intrinsic_probe_fixture) { BOOST_CHECK_NO_THROW(t.run("fixovfl"_n));  }
+BOOST_FIXTURE_TEST_CASE(f64_fix_overflow,  intrinsic_probe_fixture) { BOOST_CHECK_NO_THROW(t.run("fxdfovfl"_n)); }
+BOOST_FIXTURE_TEST_CASE(f32_fix_overflow,  intrinsic_probe_fixture) { BOOST_CHECK_NO_THROW(t.run("fxsfovfl"_n)); }
 
 // =============================================================================
 // G. resource / auth / producer / blockchain-parameters (P2)
