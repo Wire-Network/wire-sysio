@@ -119,8 +119,8 @@ namespace {
       w.begin_array();
       for (const auto& a : auths) {
          w.begin_object();
-         w.key("account");    w.value_string(a.account.to_string());
-         w.key("permission"); w.value_string(a.permission.to_string());
+         w.set("account",    a.account.to_string())
+          .set("permission", a.permission.to_string());
          w.end_object();
       }
       w.end_array();
@@ -142,10 +142,10 @@ namespace {
       for (int idx : indices) {
          const auto& a = actions.at(idx);
          w.begin_object();
-         w.key("global_sequence"); w.value_uint64(a.global_sequence);
-         w.key("receiver");        w.value_string(a.receiver.to_string());
-         w.key("account");         w.value_string(a.account.to_string());
-         w.key("action");          w.value_string(a.action.to_string());
+         w.set("global_sequence", a.global_sequence)
+          .set("receiver",        a.receiver.to_string())
+          .set("account",         a.account.to_string())
+          .set("action",          a.action.to_string());
          w.key("authorization");   write_authorizations(w, a.authorization);
          w.key("data");            w.value_hex(a.data.data(), a.data.size());
          w.key("return_value");    w.value_hex(a.return_value.data(), a.return_value.size());
@@ -154,12 +154,10 @@ namespace {
          // the action body stays in the streaming pipeline.
          auto [params, return_data] = data_handler(a);
          if (!params.is_null()) {
-            w.key("params");
-            w.raw_value(fc::json::to_string(params, fc::json::yield_function_t()));
+            w.set_raw("params", fc::json::to_string(params, fc::json::yield_function_t()));
          }
          if (return_data.has_value()) {
-            w.key("return_data");
-            w.raw_value(fc::json::to_string(*return_data, fc::json::yield_function_t()));
+            w.set_raw("return_data", fc::json::to_string(*return_data, fc::json::yield_function_t()));
          }
          w.end_object();
       }
@@ -172,22 +170,19 @@ namespace {
       w.begin_array();
       for (const auto& t : transactions) {
          w.begin_object();
-         w.key("id");                fc::to_json_stream(t.id, w);
-         w.key("block_num");         w.value_uint32(t.block_num);
-         // block_timestamp_type serializes as its slot (uint32) in to_variant; preserve
-         // that shape so clients see identical output.
-         w.key("block_time");        w.value_uint32(t.block_time.slot);
-         w.key("producer_block_id"); fc::to_json_stream(t.producer_block_id, w);
-         w.key("actions");           write_actions(w, t.actions, data_handler);
+         w.set("id",                t.id)
+          .set("block_num",         t.block_num)
+          // block_timestamp_type serializes as its slot (uint32) in to_variant; preserve
+          // that shape so clients see identical output.
+          .set("block_time",        t.block_time.slot)
+          .set("producer_block_id", t.producer_block_id);
+         w.key("actions");          write_actions(w, t.actions, data_handler);
          // status is fc::enum_type<uint8_t, status_enum>; to_variant emits the numeric
          // underlying value.  Match that.
-         w.key("status");            w.value_uint64(static_cast<uint64_t>(t.status));
-         w.key("cpu_usage_us");      w.value_uint32(t.cpu_usage_us);
-         w.key("net_usage_words");   w.value_uint64(t.net_usage_words.value);
-         w.key("signatures");
-         w.begin_array();
-         for (const auto& sig : t.signatures) fc::to_json_stream(sig, w);
-         w.end_array();
+         w.set("status",          static_cast<uint64_t>(t.status))
+          .set("cpu_usage_us",    t.cpu_usage_us)
+          .set("net_usage_words", t.net_usage_words.value)
+          .set("signatures",      t.signatures);
          // transaction_header is a reflected struct composed of fc::time_point_sec,
          // uint16/uint32 and unsigned_ints.  No native to_json_stream path yet so
          // fall back via the variant bridge for just that field.
@@ -205,16 +200,16 @@ namespace sysio::trace_api::detail {
       fc::json_writer w(out);
       std::visit([&](auto&& bt) {
          w.begin_object();
-         w.key("id");                w.value_string(bt.id.str());
-         w.key("number");            w.value_uint32(bt.number);
-         w.key("previous_id");       w.value_string(bt.previous_id.str());
-         w.key("status");            w.value_string(irreversible ? "irreversible" : "pending");
-         // to_iso8601_datetime appends a 'Z' suffix that process_block also emits.
-         w.key("timestamp");         w.value_string(to_iso8601_datetime(bt.timestamp));
-         w.key("producer");          w.value_string(bt.producer.to_string());
-         w.key("transaction_mroot"); fc::to_json_stream(bt.transaction_mroot, w);
-         w.key("finality_mroot");    fc::to_json_stream(bt.finality_mroot, w);
-         w.key("transactions");      write_transactions(w, bt.transactions, data_handler);
+         w.set("id",                bt.id)
+          .set("number",            bt.number)
+          .set("previous_id",       bt.previous_id)
+          .set("status",            irreversible ? "irreversible" : "pending")
+          // to_iso8601_datetime appends a 'Z' suffix that process_block also emits.
+          .set("timestamp",         to_iso8601_datetime(bt.timestamp))
+          .set("producer",          bt.producer.to_string())
+          .set("transaction_mroot", bt.transaction_mroot)
+          .set("finality_mroot",    bt.finality_mroot);
+         w.key("transactions");     write_transactions(w, bt.transactions, data_handler);
          w.end_object();
       }, trace);
       return out;
