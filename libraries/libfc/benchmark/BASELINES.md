@@ -124,4 +124,5 @@ Append one row per merged commit in the follow-on series.
 
 | Commit | ctor_empty_mvo | find_hit_50key_last | find_miss_50key | as_enum_string_valid | as_enum_string_invalid | walk_50key_by_name |
 |---|---:|---:|---:|---:|---:|---:|
-| baseline                                  |   7.5 |  51.0 |  16.2 |  11.6 | 3976.4 | 997.4 |
+| baseline                                  |   7.5 |  51.0 |  16.2 |  11.6 | 3976.4 |  997.4 |
+| A3 as_enum_value uses from_chars          |   7.3 |  51.1 |  16.4 |   4.6 | 2965.0 |  893.5 |
