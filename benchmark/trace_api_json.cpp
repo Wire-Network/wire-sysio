@@ -157,6 +157,42 @@ void trace_api_json_benchmarking() {
          std::string out = detail::response_formatter::process_block_to_json(entry, irreversible, noop_handler);
          asm volatile("" : : "g"(out.size()) : "memory");
       });
+
+      // Struct-pass (HTTP-thread streaming pivot floor): main-thread cost when
+      // the API lambda hands the result struct (not a variant, not a string) to
+      // the HTTP thread for serialization.  API lambda captures the struct into
+      // a std::function<void(json_writer&)> closure and hands it to cb(); the
+      // HTTP thread runs the closure later (off-main, not measured here).  The
+      // capture is move-only so the per-trx vectors transfer pointers, not data.
+      // std::function does heap-allocate because the captured block_trace_v0
+      // exceeds the small-buffer optimisation threshold.
+      //
+      // Pre-builds a pool of data_log_entry copies outside the timing loop so
+      // each iter consumes a fresh one.  Setup cost is excluded from the bench
+      // (matches variant-only / stream which also start from a pre-built entry).
+      const size_t pool_size = 64; // > any reasonable --runs
+      std::vector<data_log_entry> fresh_a(pool_size, entry);
+      std::vector<data_log_entry> fresh_b(pool_size, entry);
+      size_t fresh_idx_a = 0;
+      size_t fresh_idx_b = 0;
+      benchmarking("struct-pass (fn):  " + label_prefix, [&]() {
+         data_log_entry e = std::move(fresh_a[fresh_idx_a++ % pool_size]);
+         std::function<void(fc::json_writer&)> body =
+            [e = std::move(e)](fc::json_writer& w) mutable {
+               asm volatile("" : : "g"(&e) : "memory");
+            };
+         auto holder = std::move(body); // mimic cb() posting onto the HTTP pool
+         asm volatile("" : : "g"(&holder) : "memory");
+      });
+      benchmarking("struct-pass (mof): " + label_prefix, [&]() {
+         data_log_entry e = std::move(fresh_b[fresh_idx_b++ % pool_size]);
+         std::move_only_function<void(fc::json_writer&)> body =
+            [e = std::move(e)](fc::json_writer& w) mutable {
+               asm volatile("" : : "g"(&e) : "memory");
+            };
+         auto holder = std::move(body);
+         asm volatile("" : : "g"(&holder) : "memory");
+      });
    }
 
    // ---- Isolated hex-emission micro-bench ------------------------------------
