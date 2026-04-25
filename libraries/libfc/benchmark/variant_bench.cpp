@@ -273,6 +273,14 @@ int main() {
             sink(vo["k_int_15"].as_int64());
          }
       }));
+      // The find_or replacement: single scan, no throw on miss.
+      const fc::variant default_v{int64_t{0}};
+      print_row(run_bench("find_or_50key_hit",        50000,  500000, 10, [&] {
+         sink(vo.find_or("k_int_15", default_v).as_int64());
+      }));
+      print_row(run_bench("find_or_50key_miss",       50000,  500000, 10, [&] {
+         sink(vo.find_or("not_there", default_v).as_int64());
+      }));
    }
 
    // ------------------------------------------------------------------

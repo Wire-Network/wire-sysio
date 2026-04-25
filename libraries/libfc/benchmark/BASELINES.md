@@ -46,6 +46,8 @@ to damp out context-switch and thermal-throttle outliers.
 | find_hit_50key_last       | Hit on last key (worst case for linear scan).  Phase B item 4 watch. |
 | find_miss_50key           | Full scan + miss.  Phase B item 4 watch. |
 | contains_then_op_50key    | `contains()` followed by `operator[]` on hit -- the double-scan. |
+| find_or_50key_hit         | `variant_object::find_or` on hit -- the single-scan replacement. |
+| find_or_50key_miss        | `variant_object::find_or` on miss -- no throw on miss. |
 | as_enum_int               | `as_enum_value<E>` from int variant -- numeric fast path. |
 | as_enum_string_valid      | `as_enum_value<E>` from numeric-string variant.  Phase A item 3 watch. |
 | as_enum_string_invalid    | `as_enum_value<E>` from non-numeric string -- throw path. |
@@ -122,8 +124,9 @@ Environment:
 
 Append one row per merged commit in the follow-on series.
 
-| Commit | ctor_empty_mvo | find_hit_50key_last | find_miss_50key | as_enum_string_valid | as_enum_string_invalid | walk_50key_by_name |
-|---|---:|---:|---:|---:|---:|---:|
-| baseline                                  |   7.5 |  51.0 |  16.2 |  11.6 | 3976.4 |  997.4 |
-| A3 as_enum_value uses from_chars          |   7.3 |  51.1 |  16.4 |   4.6 | 2965.0 |  893.5 |
-| A1 lazy-allocate variant_object vector    |   1.4 |  55.1 |  15.0 |   5.7 | 3012.7 |  972.2 |
+| Commit | ctor_empty_mvo | find_hit_50key_last | find_miss_50key | find_or_50key_hit | as_enum_string_valid | as_enum_string_invalid | walk_50key_by_name |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| baseline                                  |   7.5 |  51.0 |  16.2 |    -- |  11.6 | 3976.4 |  997.4 |
+| A3 as_enum_value uses from_chars          |   7.3 |  51.1 |  16.4 |    -- |   4.6 | 2965.0 |  893.5 |
+| A1 lazy-allocate variant_object vector    |   1.4 |  55.1 |  15.0 |    -- |   5.7 | 3012.7 |  972.2 |
+| A2 add variant_object::find_or helper     |   1.6 |  58.0 |  15.0 |  19.9 |   4.1 | 3433.7 | 1038.3 |

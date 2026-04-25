@@ -113,6 +113,15 @@ namespace fc
       FC_THROW_EXCEPTION( key_not_found_exception, "Key {}", key );
    }
 
+   const variant& variant_object::find_or( const char* key, const variant& default_value ) const
+   {
+      // Single scan, no contains-then-op[] double-traversal, and no
+      // throw-on-miss.  Reuses find() so the empty-singleton path in
+      // the null _key_value case is correct.
+      auto itr = find( key );
+      return itr != end() ? itr->value() : default_value;
+   }
+
    size_t variant_object::size() const
    {
       return _key_value ? _key_value->size() : 0;

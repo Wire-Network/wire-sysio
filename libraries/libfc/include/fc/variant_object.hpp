@@ -64,6 +64,19 @@ namespace fc
       iterator find( const char* key )const;
       const variant& operator[]( const std::string& key )const;
       const variant& operator[]( const char* key )const;
+      /**
+       * Non-throwing lookup: returns a reference to the value for @a key
+       * if present, otherwise to @a default_value.  Callers must keep
+       * @a default_value alive for the lifetime of the returned reference.
+       *
+       * Replaces the common `contains(k) ? obj[k] : default_v` pattern,
+       * which scans the entry list twice and throws+catches a
+       * `key_not_found_exception` on miss.
+       */
+      const variant& find_or( const char* key, const variant& default_value ) const;
+      const variant& find_or( const std::string& key, const variant& default_value ) const {
+         return find_or( key.c_str(), default_value );
+      }
       size_t size()const;
       bool   contains( const char* key ) const { return find(key) != end(); }
       bool   contains( const std::string& key ) const { return contains(key.c_str()); }

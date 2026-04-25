@@ -45,6 +45,49 @@ BOOST_AUTO_TEST_CASE(operator_brackets_throws_on_missing_key) {
    BOOST_CHECK_THROW(vo["missing"], fc::key_not_found_exception);
 }
 
+BOOST_AUTO_TEST_CASE(find_or_returns_value_on_hit) {
+   variant_object vo{mutable_variant_object("k", 7)};
+   variant default_v{int64_t{99}};
+   BOOST_CHECK_EQUAL(vo.find_or("k", default_v).as_int64(), 7);
+}
+
+BOOST_AUTO_TEST_CASE(find_or_returns_default_on_miss) {
+   variant_object vo{mutable_variant_object("k", 7)};
+   variant default_v{int64_t{99}};
+   BOOST_CHECK_EQUAL(vo.find_or("missing", default_v).as_int64(), 99);
+}
+
+BOOST_AUTO_TEST_CASE(find_or_default_on_empty_object) {
+   variant_object empty;
+   variant default_v{std::string{"fallback"}};
+   BOOST_CHECK_EQUAL(empty.find_or("anything", default_v).get_string(), "fallback");
+}
+
+BOOST_AUTO_TEST_CASE(find_or_string_key_overload) {
+   variant_object vo{mutable_variant_object("key", 42)};
+   variant default_v{int64_t{0}};
+   const std::string key = "key";
+   BOOST_CHECK_EQUAL(vo.find_or(key, default_v).as_int64(), 42);
+   const std::string missing = "missing";
+   BOOST_CHECK_EQUAL(vo.find_or(missing, default_v).as_int64(), 0);
+}
+
+BOOST_AUTO_TEST_CASE(find_or_returns_reference_to_default) {
+   variant_object empty;
+   variant default_v{int64_t{1}};
+   const variant& ref = empty.find_or("missing", default_v);
+   BOOST_CHECK_EQUAL(&ref, &default_v);
+}
+
+BOOST_AUTO_TEST_CASE(find_or_returns_reference_to_existing_entry) {
+   mutable_variant_object mvo;
+   mvo("k", int64_t{5});
+   variant_object vo{mvo};
+   variant default_v;
+   const variant& ref = vo.find_or("k", default_v);
+   BOOST_CHECK_EQUAL(&ref, &vo["k"]);
+}
+
 BOOST_AUTO_TEST_CASE(contains_and_find_consistent) {
    variant_object vo{mutable_variant_object("a", 1)("b", 2)};
    BOOST_CHECK(vo.contains("a"));
