@@ -8,17 +8,19 @@ message (and update the "latest" column below when it merges).
 ## How to run
 
 ```
-cmake -B cmake-build-release -S . -G Ninja \
-   -DCMAKE_BUILD_TYPE=Release \
-   -DCMAKE_TOOLCHAIN_FILE=$PWD/vcpkg/scripts/buildsystems/vcpkg.cmake \
-   -DCMAKE_PREFIX_PATH=/opt/prefixes/wire-001
-ninja -C cmake-build-release -j8 variant_bench
-./cmake-build-release/libraries/libfc/benchmark/variant_bench
+ninja -C cmake-build-relwithdebinfo -j8 variant_bench
+./cmake-build-relwithdebinfo/libraries/libfc/benchmark/variant_bench
 ```
 
-Release build (`-DCMAKE_BUILD_TYPE=Release`, `-O3 -DNDEBUG`) is
-required.  Debug or RelWithDebInfo numbers are not comparable and
-should not be posted.
+The series is pinned to `RelWithDebInfo` (`-O2 -g -DNDEBUG`) so that
+deltas between commits remain directly comparable AND the binary is
+debuggable when investigating a regression.  Pure Release (`-O3`)
+would shave a few percent more off the absolute numbers but would
+not change the relative ordering of the scenarios; if you want a
+final number for an external audience, re-baseline once at `-O3`
+before publishing.
+
+Debug numbers are NOT comparable and should not be posted.
 
 The harness warms up, then takes the median of 10 runs of N iterations
 to damp out context-switch and thermal-throttle outliers.
@@ -53,21 +55,73 @@ to damp out context-switch and thermal-throttle outliers.
 | json_to_string_50key      | `fc::json::to_string` of the same payload. |
 | walk_50key_by_name        | `from_variant<Row>` shape -- 30 named lookups + as_int64. |
 
-## Baseline (commit `fc::variant: add microbenchmark scaffold`)
+## Baseline
 
 Environment:
-- CPU: <fill in from /proc/cpuinfo model name>
+- CPU: 12th Gen Intel Core i9-12900K
 - OS: WSL2 Linux 6.6.87.2
-- Compiler: clang 18
-- Build type: Release (-O3 -DNDEBUG)
+- Compiler: clang 18.1.8
+- Build type: RelWithDebInfo (-O2 -g -DNDEBUG)
 
-| Benchmark | median ns/op | min ns/op | max ns/op |
+| Benchmark              | median ns/op |  min ns/op |  max ns/op |
 |---|---:|---:|---:|
-| (filled in by the baseline-capture commit)                        |           |           |           |
+| ctor_null              |          1.8 |        1.7 |        2.2 |
+| ctor_int64             |          2.0 |        1.9 |        2.0 |
+| ctor_double            |          2.0 |        2.0 |        2.1 |
+| ctor_short_string      |         14.2 |       13.0 |       15.2 |
+| ctor_long_string       |         20.5 |       18.7 |       20.9 |
+| ctor_empty_mvo         |          7.5 |        6.9 |        8.2 |
+| ctor_empty_vo          |          8.6 |        8.4 |       10.0 |
+| copy_int64             |          2.2 |        2.1 |        2.2 |
+| copy_short_string      |         11.3 |       10.8 |       12.4 |
+| copy_long_string       |         17.4 |       16.7 |       18.2 |
+| copy_object_50key      |         11.2 |       11.0 |       11.3 |
+| find_hit_4key          |          4.1 |        4.1 |        4.2 |
+| find_miss_4key         |          5.2 |        4.9 |        6.4 |
+| find_hit_50key_first   |          2.9 |        2.9 |        3.0 |
+| find_hit_50key_last    |         51.0 |       50.3 |       57.2 |
+| find_miss_50key        |         16.2 |       13.2 |       17.0 |
+| contains_then_op_50key |         36.6 |       36.0 |       41.9 |
+| as_enum_int            |          1.8 |        1.7 |        2.2 |
+| as_enum_string_valid   |         11.6 |       10.8 |       11.9 |
+| as_enum_string_invalid |       3976.4 |     3903.3 |     4517.6 |
+| as_string_int64        |          6.4 |        6.3 |        6.5 |
+| as_int64_string        |          1.4 |        1.3 |        1.6 |
+| json_parse_50key       |       9760.6 |     9613.0 |    10455.6 |
+| json_to_string_50key   |       3389.9 |     3282.3 |     4237.8 |
+| walk_50key_by_name     |        997.4 |      987.1 |     1131.7 |
+
+## Observations from baseline
+
+- `as_enum_string_invalid` is **~4 µs** -- the cost of `stoll` throwing
+  and the `catch(...)` unwinding.  Phase A item 3 (replace with
+  `from_chars`) should drop this by 1-2 orders of magnitude.
+
+- `find_hit_50key_last` is **17x** slower than `find_hit_50key_first`
+  (51 ns vs 2.9 ns).  That is the linear-scan cost on a 50-entry
+  vector.  Phase B item 4 (hash side-table at some threshold) targets
+  this directly; the small-object scenarios (`find_hit_4key` at 4 ns)
+  are the regression watch -- a hash index that hurts 4-key lookups
+  is not a win.
+
+- `contains_then_op_50key` (36.6 ns) is roughly the sum of two scans:
+  one for the `contains` check, one for the `operator[]` lookup.
+  Phase A item 2 (`find_or` non-throwing helper) collapses this back
+  to a single scan.
+
+- `ctor_empty_mvo` and `ctor_empty_vo` (7.5 / 8.6 ns) are the
+  `make_shared<vector<entry>>` allocation cost -- a default-
+  constructed `mutable_variant_object` always allocates.  Phase A
+  item 1 (lazy-allocate) targets this.
+
+- `walk_50key_by_name` (~1 µs) is the ABI-decode-shaped workload --
+  30 named lookups + as_int64.  This is the integrated regression
+  watch for the whole series.
 
 ## Log
 
 Append one row per merged commit in the follow-on series.
 
-| Commit | ctor_empty_mvo | find_hit_50key_last | find_miss_50key | as_enum_string_valid | walk_50key_by_name |
-|---|---:|---:|---:|---:|---:|
+| Commit | ctor_empty_mvo | find_hit_50key_last | find_miss_50key | as_enum_string_valid | as_enum_string_invalid | walk_50key_by_name |
+|---|---:|---:|---:|---:|---:|---:|
+| baseline                                  |   7.5 |  51.0 |  16.2 |  11.6 | 3976.4 | 997.4 |
