@@ -147,8 +147,8 @@ namespace {
          w.key("account");         w.value_string(a.account.to_string());
          w.key("action");          w.value_string(a.action.to_string());
          w.key("authorization");   write_authorizations(w, a.authorization);
-         w.key("data");            w.value_string(fc::to_hex(a.data.data(), a.data.size()));
-         w.key("return_value");    w.value_string(fc::to_hex(a.return_value.data(), a.return_value.size()));
+         w.key("data");            w.value_hex(a.data.data(), a.data.size());
+         w.key("return_value");    w.value_hex(a.return_value.data(), a.return_value.size());
          // The abi decode path still produces fc::variant (structure is ABI-dependent,
          // no streaming equivalent here).  Splice its serialized form as raw JSON so
          // the action body stays in the streaming pipeline.
