@@ -5,6 +5,7 @@
 #include <map>
 #include <memory>
 #include <set>
+#include <string_view>
 #include <system_error>
 #include <unordered_map>
 #include <unordered_set>
@@ -216,6 +217,7 @@ namespace fc
         variant( bool val );
         variant( blob val );
         variant( std::string val );
+        variant( std::string_view val );
         variant( variant_object );
         variant( mutable_variant_object );
         variant( variants );
@@ -299,7 +301,7 @@ namespace fc
               // domain we hit: leading minus accepted, leading whitespace
               // and leading '+' rejected, suffix garbage silently ignored
               // (so "1abc" still yields 1, matching the prior behaviour).
-              const std::string& s = get_string();
+              std::string_view s = get_string();
               int64_t parsed = 0;
               auto [ptr, ec] = std::from_chars(s.data(), s.data() + s.size(), parsed);
               if (ec == std::errc{}) {
@@ -322,7 +324,16 @@ namespace fc
         std::string                 as_string()const;
 
         /// @pre  get_type() == string_type
-        const std::string&          get_string()const;
+        ///
+        /// Returns a non-owning view of the variant's string bytes.
+        /// Was `const std::string&` historically; changed to
+        /// `std::string_view` so a future inline-string (SSO) encoding
+        /// can return a view of the inline bytes without materialising
+        /// a heap std::string.  Callers that need an owning copy should
+        /// use as_string() (returns std::string by value); callers that
+        /// need a null-terminated c_str must construct std::string
+        /// explicitly first.
+        std::string_view            get_string()const;
 
         /// @throw if get_type() != array_type | null_type
         variants&                   get_array();

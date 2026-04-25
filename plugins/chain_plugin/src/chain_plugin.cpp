@@ -1614,7 +1614,7 @@ uint64_t convert_to_type(const string& str, const string& desc) {
    }
 
    try {
-      return ( sysio::chain::string_to_symbol( 0, str.c_str() ) >> 8 );
+      return ( sysio::chain::string_to_symbol( 0, str ) >> 8 );
    } catch( ... ) {
       SYS_ASSERT( false, chain_type_exception, "Could not convert {} string '{}' to any of the following: "
                         "uint64_t, valid name, or valid symbol (with or without the precision)",
@@ -2618,7 +2618,7 @@ fc::variant read_only::get_currency_stats( const read_only::get_currency_stats_p
    const abi_def abi = sysio::chain_apis::get_abi( db, p.code );
    (void)get_table_type( abi, "stat" );
 
-   uint64_t scope = ( sysio::chain::string_to_symbol( 0, boost::algorithm::to_upper_copy(p.symbol).c_str() ) >> 8 );
+   uint64_t scope = ( sysio::chain::string_to_symbol( 0, boost::algorithm::to_upper_copy(p.symbol) ) >> 8 );
 
    walk_key_value_table(p.code, name(scope), "stat"_n, [&](const auto& obj){
       SYS_ASSERT( obj.value.size() >= sizeof(read_only::get_currency_stats_result), chain::asset_type_exception, "Invalid data on table");

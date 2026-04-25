@@ -161,6 +161,11 @@ variant::variant( std::string val )
    *reinterpret_cast<std::string**>(this)  = new std::string( std::move(val) );
    set_variant_type( this, string_type );
 }
+variant::variant( std::string_view val )
+{
+   *reinterpret_cast<std::string**>(this)  = new std::string( val );
+   set_variant_type( this, string_type );
+}
 variant::variant( blob val )
 {
    *reinterpret_cast<blob**>(this)  = new blob( std::move(val) );
@@ -689,13 +694,13 @@ blob variant::as_blob()const
       case blob_type: return get_blob();
       case string_type:
       {
-         const std::string& str = get_string();
+         std::string_view str = get_string();
          if( str.size() == 0 ) return blob();
          try {
             // pre-5.0 versions of variant added `=` to end of base64 encoded string in as_string() above.
             // fc version of base64_decode allows for extra `=` at the end of the string.
             // Other base64 decoders will not accept the extra `=`.
-            std::vector<char> b64 = base64_decode( str );
+            std::vector<char> b64 = base64_decode( std::string(str) );
             return { std::move(b64) };
          } catch(const std::exception&) {
             // unable to decode, return the raw chars
@@ -777,7 +782,7 @@ size_t variant::estimated_size()const
    }
 }
 
-const std::string&        variant::get_string()const
+std::string_view          variant::get_string()const
 {
   if( get_type() == string_type )
      return **reinterpret_cast<const const_string_ptr*>(this);
@@ -898,7 +903,7 @@ void to_variant( const std::vector<char>& var,  variant& vo )
 }
 void from_variant( const variant& var,  std::vector<char>& vo )
 {
-   const auto& str = var.get_string();
+   std::string_view str = var.get_string();
    FC_ASSERT( str.size() <= 2*MAX_SIZE_OF_BYTE_ARRAYS ); // Doubled because hex strings needs two characters per byte
    FC_ASSERT( str.size() % 2 == 0, "the length of hex string should be even number" );
    vo.resize( str.size() / 2 );
