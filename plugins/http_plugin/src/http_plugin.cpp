@@ -5,6 +5,7 @@
 #include <sysio/chain/exceptions.hpp>
 
 #include <fc/log/logger_config.hpp>
+#include <fc/reflect/json_stream.hpp>
 #include <fc/reflect/variant.hpp>
 #include <fc/network/listener.hpp>
 
@@ -185,6 +186,55 @@ namespace sysio {
                   conn->handle_exception();
                }
              };
+            return handler;
+         }
+
+         /**
+          * Streaming-cb counterpart of make_app_thread_url_handler.  Posts the api
+          * lambda onto the requested executor queue (read_only / read_write / etc)
+          * and forwards a streaming-cb that the api lambda invokes with a closure
+          * which the http_plugin thread pool will run later.
+          */
+         static detail::internal_url_handler_stream make_app_thread_url_handler_stream(api_entry_stream&& entry, appbase::exec_queue to_queue, int priority) {
+            detail::internal_url_handler_stream handler;
+            handler.category = entry.category;
+            auto next_ptr = std::make_shared<url_handler_stream>(std::move(entry.handler));
+            handler.fn = [priority, to_queue, next_ptr=std::move(next_ptr)]
+                       ( detail::abstract_conn_ptr conn, string&& r, string&& b, url_response_stream_callback&& then ) {
+               if (auto error_str = conn->verify_max_bytes_in_flight(b.size()); !error_str.empty()) {
+                  conn->send_busy_response(std::move(error_str));
+                  return;
+               }
+
+               app().executor().post( priority, to_queue,
+                  [next_ptr, conn=std::move(conn), r=std::move(r), b=std::move(b), then=std::move(then)]() mutable {
+                     try {
+                        if( app().is_quiting() ) return;
+                        (*next_ptr)( std::move(r), std::move(b), std::move(then) );
+                     } catch( ... ) {
+                        conn->handle_exception();
+                     }
+                  });
+            };
+            return handler;
+         }
+
+         /**
+          * Streaming-cb counterpart of make_http_thread_url_handler.  Runs the api
+          * lambda directly on the http_plugin thread (the streaming cb's emitter
+          * runs on the same pool, so the api lambda doing minimal work and
+          * immediately handing off to the cb is fine).
+          */
+         static detail::internal_url_handler_stream make_http_thread_url_handler_stream(api_entry_stream&& entry) {
+            detail::internal_url_handler_stream handler;
+            handler.category = entry.category;
+            handler.fn = [next=std::move(entry.handler)]( const detail::abstract_conn_ptr& conn, string&& r, string&& b, url_response_stream_callback&& then ) mutable {
+               try {
+                  next(std::move(r), std::move(b), std::move(then));
+               } catch( ... ) {
+                  conn->handle_exception();
+               }
+            };
             return handler;
          }
          
@@ -536,65 +586,118 @@ namespace sysio {
       SYS_ASSERT( p.second, chain::plugin_config_exception, "http url {} is not unique", path );
    }
 
+   namespace {
+      void log_add_handler_stream(http_plugin_impl* my, api_entry_stream& entry) {
+         auto addrs = my->addresses_for_category(entry.category);
+         if (addrs.size())
+            addrs = "on " + addrs;
+         else
+            addrs = "disabled for category address not configured";
+         fc_ilog(logger(), "add {} api url (stream): {} {}",
+                 from_category(entry.category), entry.path, addrs);
+      }
+   }
+
+   void http_plugin::add_handler_stream(api_entry_stream&& entry, appbase::exec_queue q, int priority) {
+      log_add_handler_stream(my.get(), entry);
+      std::string path = entry.path;
+      // The two handler maps are keyed identically; assert disjointness so a stale
+      // duplicate registration on the variant path doesn't silently shadow the
+      // streaming registration (or vice versa).
+      auto& vmap = my->plugin_state->url_handlers;
+      auto& smap = my->plugin_state->url_handlers_stream;
+      SYS_ASSERT( !vmap.contains(path), chain::plugin_config_exception,
+                  "http url {} is not unique - already registered on the variant cb path", path );
+      SYS_ASSERT( !smap.contains(path), chain::plugin_config_exception,
+                  "http url {} is not unique - already registered on the streaming cb path", path );
+      smap.emplace(path, my->make_app_thread_url_handler_stream(std::move(entry), q, priority));
+   }
+
+   void http_plugin::add_async_handler_stream(api_entry_stream&& entry) {
+      log_add_handler_stream(my.get(), entry);
+      std::string path = entry.path;
+      auto& vmap = my->plugin_state->url_handlers;
+      auto& smap = my->plugin_state->url_handlers_stream;
+      SYS_ASSERT( !vmap.contains(path), chain::plugin_config_exception,
+                  "http url {} is not unique - already registered on the variant cb path", path );
+      SYS_ASSERT( !smap.contains(path), chain::plugin_config_exception,
+                  "http url {} is not unique - already registered on the streaming cb path", path );
+      smap.emplace(path, my->make_http_thread_url_handler_stream(std::move(entry)));
+   }
+
    void http_plugin::post_http_thread_pool(std::function<void()> f) {
       if( f )
          boost::asio::post( my->plugin_state->thread_pool.get_executor(), f );
    }
 
-   void http_plugin::handle_exception( const char* api_name, const char* call_name, const string& body, const url_response_callback& cb) {
-      try {
+   namespace {
+      // Shared catch-chain for handle_exception / handle_exception_stream.  Logs the
+      // in-flight exception and invokes `emit` with (http_code, error_results); the
+      // caller decides how to deliver the result via its specific cb shape (variant
+      // path or streaming closure).
+      template<typename Emit>
+      void classify_current_exception(const char* api_name, const char* call_name,
+                                      const std::string& body, Emit&& emit) {
          try {
-            throw;
-         } catch (chain::unknown_block_exception& e) {
-            fc_dlog( logger(), "Unknown block while processing {}.{}: {}",
-                     api_name, call_name, e.to_detail_string() );
-            error_results results{400, "Unknown Block", error_results::error_info(e, verbose_http_errors)};
-            cb( 400, fc::variant( results ));
-         } catch (chain::invalid_http_request& e) {
-            fc_dlog( logger(), "Invalid http request while processing {}.{}: {}",
-                     api_name, call_name, e.to_detail_string() );
-            error_results results{400, "Invalid Request", error_results::error_info(e, verbose_http_errors)};
-            cb( 400, fc::variant( results ));
-         } catch (chain::account_query_exception& e) {
-            fc_dlog( logger(), "Account query exception while processing {}.{}: {}",
-                     api_name, call_name, e.to_detail_string() );
-            error_results results{400, "Account lookup", error_results::error_info(e, verbose_http_errors)};
-            cb( 400, fc::variant( results ));
-         } catch (chain::unsatisfied_authorization& e) {
-            fc_dlog( logger(), "Auth error while processing {}.{}: {}",
-                     api_name, call_name, e.to_detail_string() );
-            error_results results{401, "UnAuthorized", error_results::error_info(e, verbose_http_errors)};
-            cb( 401, fc::variant( results ));
-         } catch (chain::tx_duplicate& e) {
-            fc_dlog( logger(), "Duplicate trx while processing {}.{}: {}",
-                     api_name, call_name, e.to_detail_string() );
-            error_results results{409, "Conflict", error_results::error_info(e, verbose_http_errors)};
-            cb( 409, fc::variant( results ));
-         } catch (fc::eof_exception& e) {
-            fc_elog( logger(), "Unable to parse arguments to {}.{}", api_name, call_name );
-            fc_dlog( logger(), "Bad arguments: {}", body );
-            error_results results{422, "Unprocessable Entity", error_results::error_info(e, verbose_http_errors)};
-            cb( 422, fc::variant( results ));
-         } catch (fc::exception& e) {
-            fc_dlog( logger(), "Exception while processing {}.{}: {}",
-                     api_name, call_name, e.to_detail_string() );
-            error_results results{500, "Internal Service Error", error_results::error_info(e, verbose_http_errors)};
-            cb( 500, fc::variant( results ));
-         } catch (std::exception& e) {
-            fc_dlog( logger(), "STD Exception encountered while processing {}.{}: {}",
-                     api_name, call_name, e.what() );
-            error_results results{500, "Internal Service Error", error_results::error_info(fc::exception( FC_LOG_MESSAGE( error, "{}", e.what())), verbose_http_errors)};
-            cb( 500, fc::variant( results ));
+            try {
+               throw;
+            } catch (chain::unknown_block_exception& e) {
+               fc_dlog( logger(), "Unknown block while processing {}.{}: {}",
+                        api_name, call_name, e.to_detail_string() );
+               emit(400, error_results{400, "Unknown Block", error_results::error_info(e, verbose_http_errors)});
+            } catch (chain::invalid_http_request& e) {
+               fc_dlog( logger(), "Invalid http request while processing {}.{}: {}",
+                        api_name, call_name, e.to_detail_string() );
+               emit(400, error_results{400, "Invalid Request", error_results::error_info(e, verbose_http_errors)});
+            } catch (chain::account_query_exception& e) {
+               fc_dlog( logger(), "Account query exception while processing {}.{}: {}",
+                        api_name, call_name, e.to_detail_string() );
+               emit(400, error_results{400, "Account lookup", error_results::error_info(e, verbose_http_errors)});
+            } catch (chain::unsatisfied_authorization& e) {
+               fc_dlog( logger(), "Auth error while processing {}.{}: {}",
+                        api_name, call_name, e.to_detail_string() );
+               emit(401, error_results{401, "UnAuthorized", error_results::error_info(e, verbose_http_errors)});
+            } catch (chain::tx_duplicate& e) {
+               fc_dlog( logger(), "Duplicate trx while processing {}.{}: {}",
+                        api_name, call_name, e.to_detail_string() );
+               emit(409, error_results{409, "Conflict", error_results::error_info(e, verbose_http_errors)});
+            } catch (fc::eof_exception& e) {
+               fc_elog( logger(), "Unable to parse arguments to {}.{}", api_name, call_name );
+               fc_dlog( logger(), "Bad arguments: {}", body );
+               emit(422, error_results{422, "Unprocessable Entity", error_results::error_info(e, verbose_http_errors)});
+            } catch (fc::exception& e) {
+               fc_dlog( logger(), "Exception while processing {}.{}: {}",
+                        api_name, call_name, e.to_detail_string() );
+               emit(500, error_results{500, "Internal Service Error", error_results::error_info(e, verbose_http_errors)});
+            } catch (std::exception& e) {
+               fc_dlog( logger(), "STD Exception encountered while processing {}.{}: {}",
+                        api_name, call_name, e.what() );
+               emit(500, error_results{500, "Internal Service Error",
+                  error_results::error_info(fc::exception( FC_LOG_MESSAGE( error, "{}", e.what())), verbose_http_errors)});
+            } catch (...) {
+               fc_elog( logger(), "Unknown Exception encountered while processing {}.{}",
+                        api_name, call_name );
+               emit(500, error_results{500, "Internal Service Error",
+                  error_results::error_info(fc::exception( FC_LOG_MESSAGE( error, "Unknown Exception" )), verbose_http_errors)});
+            }
          } catch (...) {
-            fc_elog( logger(), "Unknown Exception encountered while processing {}.{}",
-                     api_name, call_name );
-            error_results results{500, "Internal Service Error",
-               error_results::error_info(fc::exception( FC_LOG_MESSAGE( error, "Unknown Exception" )), verbose_http_errors)};
-            cb( 500, fc::variant( results ));
+            std::cerr << "Exception attempting to handle exception for " << api_name << "." << call_name << std::endl;
          }
-      } catch (...) {
-         std::cerr << "Exception attempting to handle exception for " << api_name << "." << call_name << std::endl;
       }
+   }
+
+   void http_plugin::handle_exception( const char* api_name, const char* call_name, const string& body, const url_response_callback& cb) {
+      classify_current_exception(api_name, call_name, body, [&cb](int code, error_results r) {
+         cb(code, fc::variant(std::move(r)));
+      });
+   }
+
+   void http_plugin::handle_exception_stream( const char* api_name, const char* call_name, const string& body, url_response_stream_callback& cb) {
+      classify_current_exception(api_name, call_name, body, [&cb](int code, error_results r) {
+         cb(code, [r = std::move(r)](fc::json_writer& w) mutable {
+            fc::to_json_stream(r, w);
+         });
+      });
    }
 
    bool http_plugin::is_on_loopback(api_category category) const {

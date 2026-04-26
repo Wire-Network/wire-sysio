@@ -6,6 +6,10 @@
 #include <fc/exception/exception.hpp>
 #include <fc/reflect/reflect.hpp>
 #include <fc/io/json.hpp>
+#include <fc/io/json_stream_fwd.hpp>
+
+#include <functional>
+
 namespace sysio {
    using namespace appbase;
 
@@ -30,6 +34,29 @@ namespace sysio {
    using url_handler = std::function<void(string&&, string&&, url_response_callback&&)>;
 
    /**
+    * @brief Streaming response callback path.
+    *
+    * Parallel to url_response_callback / url_handler.  Endpoints that opt into the
+    * streaming path build no fc::variant on the response - instead they hand cb()
+    * a closure that emits the response body directly into a fc::json_writer.  The
+    * closure runs on the http_plugin thread pool, deferring the JSON emission off
+    * whatever thread the api lambda runs on (api thread, read-only pool, ...).
+    *
+    * Migration shape:
+    *   variant cb:  cb(code, fc::variant(result));
+    *   stream cb:   cb(code, [r = std::move(result)](fc::json_writer& w) mutable {
+    *                          fc::to_json_stream(r, w);
+    *                       });
+    *
+    * stream_emitter is move_only_function so the captured result struct does not
+    * have to satisfy CopyConstructible; pass the typed struct directly without
+    * round-tripping through fc::variant.
+    */
+   using stream_emitter               = std::move_only_function<void(fc::json_writer&)>;
+   using url_response_stream_callback = std::move_only_function<void(int, stream_emitter)>;
+   using url_handler_stream           = std::function<void(string&&, string&&, url_response_stream_callback&&)>;
+
+   /**
     * @brief An API, containing URLs and handlers
     *
     * An API is composed of several calls, where each call has a URL and
@@ -43,6 +70,21 @@ namespace sysio {
    };
 
    using api_description = std::vector<api_entry>;
+
+   /**
+    *  api_entry_stream is the streaming-cb counterpart of api_entry.  Same
+    *  registration shape but the handler invokes a url_response_stream_callback
+    *  rather than url_response_callback.  Endpoints register either form via
+    *  http_plugin::add_handler / add_handler_stream (or the _api batch
+    *  registration helpers).
+    */
+   struct api_entry_stream {
+      string path;
+      api_category category;
+      url_handler_stream handler;
+   };
+
+   using api_description_stream = std::vector<api_entry_stream>;
 
    enum class http_content_type {
       json = 1,
@@ -113,8 +155,38 @@ namespace sysio {
               add_async_handler(std::move(call), content_type);
         }
 
+        // ---- Streaming-cb registration --------------------------------------------------
+        // Endpoints registered via add_handler_stream / add_async_handler_stream invoke
+        // url_response_stream_callback instead of url_response_callback.  The cb's emitter
+        // closure runs on the http_plugin thread pool, so the api/main thread does no
+        // JSON serialization work; it just hands a (typically by-move) result struct off
+        // through the closure capture.
+        //
+        // content_type is implicitly application/json - the streaming path never produces
+        // anything else by design.  No json_raw distinction is needed; the json_writer
+        // output is the response body verbatim.
+        void add_handler_stream(api_entry_stream&& entry, appbase::exec_queue q, int priority = appbase::priority::medium_low);
+        void add_api_stream(api_description_stream&& api, appbase::exec_queue q, int priority = appbase::priority::medium_low) {
+           for (auto& call : api)
+              add_handler_stream(std::move(call), q, priority);
+        }
+
+        void add_async_handler_stream(api_entry_stream&& entry);
+        void add_async_api_stream(api_description_stream&& api) {
+           for (auto& call : api)
+              add_async_handler_stream(std::move(call));
+        }
+
         // standard exception handling for api handlers
         static void handle_exception( const char *api_name, const char *call_name, const string& body, const url_response_callback& cb );
+
+        /// Streaming counterpart to handle_exception: emits an error_results object as
+        /// JSON via the reflector path instead of building a fc::variant tree.  Pass cb
+        /// by mutable lvalue ref since url_response_stream_callback is move-only;
+        /// invoking it does not move from cb, so the api lambda may still call cb
+        /// elsewhere on a different code path (in practice exactly one path runs per
+        /// request).
+        static void handle_exception_stream( const char *api_name, const char *call_name, const string& body, url_response_stream_callback& cb );
 
         void post_http_thread_pool(std::function<void()> f);
 

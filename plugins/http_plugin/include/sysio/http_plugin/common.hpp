@@ -3,6 +3,7 @@
 #include <sysio/chain/thread_utils.hpp>// for thread pool
 #include <sysio/http_plugin/http_plugin.hpp>
 
+#include <fc/io/json_stream.hpp>
 #include <fc/io/raw.hpp>
 #include <fc/log/logger_config.hpp>
 #include <fc/time.hpp>
@@ -76,6 +77,19 @@ struct internal_url_handler {
    api_category category;
    http_content_type content_type = http_content_type::json;
 };
+
+/**
+* Streaming counterpart of internal_url_handler.  Endpoints registered via
+* http_plugin::add_handler_stream / add_async_handler_stream live in the parallel
+* url_handlers_stream map; the beast dispatch checks both maps and routes to whichever
+* one owns the URL.  No content_type slot - the streaming cb always emits
+* application/json directly into the response buffer.
+*/
+using internal_url_handler_stream_fn = std::function<void(abstract_conn_ptr, string&&, string&&, url_response_stream_callback&&)>;
+struct internal_url_handler_stream {
+   internal_url_handler_stream_fn fn;
+   api_category category;
+};
 /**
 * Helper method to calculate the "in flight" size of a fc::variant
 * This is an estimate based on fc::raw::pack if that process can be successfully executed
@@ -110,6 +124,10 @@ static size_t in_flight_sizeof(const std::optional<T>& o) {
 // key -> priority, url_handler
 typedef map<string, detail::internal_url_handler> url_handlers_type;
 
+// Streaming-cb counterpart of url_handlers_type.  Disjoint URL-set from the variant
+// path; an endpoint registers either form, never both.
+typedef map<string, detail::internal_url_handler_stream> url_handlers_stream_type;
+
 struct http_plugin_state {
    string access_control_allow_origin;
    string access_control_allow_headers;
@@ -129,6 +147,7 @@ struct http_plugin_state {
    string server_header;
 
    url_handlers_type url_handlers;
+   url_handlers_stream_type url_handlers_stream;
    bool keep_alive = false;
 
    uint16_t thread_pool_size = 2;
@@ -200,6 +219,51 @@ inline auto make_http_response_handler(http_plugin_state& plugin_state, detail::
                         });
    };// end lambda
 
+}
+
+/**
+* Construct a url_response_stream_callback that runs the emitter on the http_plugin
+* thread pool and sends the produced JSON as the response body.
+*
+* The api lambda is responsible for capturing whatever it wants to serialize into
+* the emitter closure (typically the typed result struct, by-move).  All JSON
+* serialization happens inside the dispatched lambda on the http thread pool, so
+* the api thread (read_only / read_write queue) never pays the per-field
+* allocation cost the variant tree built.
+*
+* Backpressure note: bytes_in_flight tracking happens after the emitter runs (we
+* don't know the body size until the buffer is full), so this path differs from
+* the variant path's pre-post estimate.  Net effect is "verify_max_bytes_in_flight
+* checks the actual produced body size before send_response," which is the same
+* end-state check the variant path performs.
+*/
+inline auto make_http_stream_response_handler(http_plugin_state& plugin_state, detail::abstract_conn_ptr session_ptr) {
+   return url_response_stream_callback{
+      [&plugin_state, session_ptr{std::move(session_ptr)}]
+      (int code, stream_emitter emitter) mutable {
+
+         boost::asio::dispatch(plugin_state.thread_pool.get_executor(),
+            [&plugin_state, session_ptr{std::move(session_ptr)}, code, emitter{std::move(emitter)}]() mutable {
+               try {
+                  std::string body;
+                  body.reserve(4096);
+                  {
+                     fc::json_writer w(body);
+                     emitter(w);
+                  }
+                  plugin_state.bytes_in_flight += body.size();
+                  auto on_exit = fc::make_scoped_exit([&, sz=body.size()]() { plugin_state.bytes_in_flight -= sz; });
+
+                  if (auto error_str = session_ptr->verify_max_bytes_in_flight(0); !error_str.empty())
+                     session_ptr->send_busy_response(std::move(error_str));
+                  else
+                     session_ptr->send_response(std::move(body), code);
+               } catch (...) {
+                  session_ptr->handle_exception();
+               }
+            });
+      }
+   };
 }
 
 inline bool host_is_valid(const http_plugin_state& plugin_state,
