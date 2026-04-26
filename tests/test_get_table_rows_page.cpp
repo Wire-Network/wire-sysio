@@ -23,6 +23,8 @@
 
 #include <test_contracts.hpp>
 
+#include <fc/io/json_stream.hpp>
+#include <fc/reflect/json_stream.hpp>
 #include <fc/variant_object.hpp>
 
 using namespace sysio;
@@ -273,6 +275,30 @@ BOOST_FIXTURE_TEST_CASE(find_with_index_returns_single_match_even_when_all_rows,
 
    BOOST_REQUIRE_EQUAL(res.rows.size(), 1u);
    BOOST_CHECK_EQUAL(res.rows[0].get_object()["sec64"].as_uint64(), 3u);
+} FC_LOG_AND_RETHROW()
+
+// Byte-identical compat between the variant-cb path (fc::variant + fc::json::to_string)
+// and the streaming-cb path (fc::to_json_stream via reflector dispatch).  The HTTP
+// /v1/chain/get_table_rows endpoint flips between these via add_api / add_api_stream;
+// any drift in the streaming path's emitted JSON would break clients that depend on
+// the exact byte sequence (eg keypair-string ordering, integer formatting).  This case
+// pins parity for a representative populated result.
+BOOST_FIXTURE_TEST_CASE(streaming_vs_variant_byte_identical, validating_tester) try {
+   deploy_contract(*this);
+   populate_numobjs(*this, 4);
+
+   auto p = numobjs_params();
+   p.all_rows  = true;
+   p.show_payer = true;
+
+   auto ro  = make_read_only(*this);
+   auto res = run(ro, p);
+
+   const std::string variant_path =
+      fc::json::to_string(fc::variant(res), fc::time_point::maximum());
+   const std::string stream_path = fc::to_json_string(res);
+
+   BOOST_CHECK_EQUAL(variant_path, stream_path);
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_SUITE_END()

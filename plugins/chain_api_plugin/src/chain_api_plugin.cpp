@@ -111,6 +111,12 @@ parse_params<chain_apis::read_only::get_transaction_id_params, http_params_types
 
 #define CHAIN_RO_CALL_WITH_400(call_name, http_response_code, params_type) CALL_WITH_400(chain, chain_ro, ro_api, chain_apis::read_only, call_name, http_response_code, params_type)
 
+// Streaming-cb counterparts.  Migration in progress; endpoints flip from the variant
+// macros above to these as their byte-identical equivalence is verified.  After the
+// last endpoint flips, the variant macros (and CALL_WITH_400 / CALL_WITH_400_POST /
+// CALL_ASYNC_WITH_400) get removed in a cleanup commit.
+#define CHAIN_RO_CALL_STREAM_POST(call_name, call_result, http_response_code, params_type) CALL_WITH_400_STREAM_POST(chain, chain_ro, ro_api, chain_apis::read_only, call_name, call_result, http_response_code, params_type)
+
 void chain_api_plugin::plugin_startup() {
    dlog( "starting chain_api_plugin" );
    my.reset(new chain_api_plugin_impl(app().get_plugin<chain_plugin>().chain()));
@@ -141,7 +147,6 @@ void chain_api_plugin::plugin_startup() {
       CHAIN_RO_CALL(get_raw_code_and_abi, 200, http_params_types::params_required),
       CHAIN_RO_CALL(get_raw_abi, 200, http_params_types::params_required),
       CHAIN_RO_CALL(get_finalizer_info, 200, http_params_types::no_params),
-      CHAIN_RO_CALL_POST(get_table_rows, chain_apis::read_only::get_table_rows_result, 200, http_params_types::params_required),
       CHAIN_RO_CALL(get_table_by_scope, 200, http_params_types::params_required),
       CHAIN_RO_CALL(get_currency_balance, 200, http_params_types::params_required),
       CHAIN_RO_CALL(get_currency_stats, 200, http_params_types::params_required),
@@ -155,6 +160,13 @@ void chain_api_plugin::plugin_startup() {
       CHAIN_RW_CALL_ASYNC(push_transactions, chain_apis::read_write::push_transactions_results, 202, http_params_types::params_required),
       CHAIN_RW_CALL_ASYNC(send_transaction, chain_apis::read_write::send_transaction_results, 202, http_params_types::params_required),
       CHAIN_RW_CALL_ASYNC(send_transaction2, chain_apis::read_write::send_transaction_results, 202, http_params_types::params_required)
+   }, appbase::exec_queue::read_only);
+
+   // Streaming-cb endpoints.  Same exec_queue and registration semantics as the
+   // variant-cb add_api block above; the difference is only how the response is
+   // delivered to the http thread pool (closure vs variant tree).
+   _http_plugin.add_api_stream({
+      CHAIN_RO_CALL_STREAM_POST(get_table_rows, chain_apis::read_only::get_table_rows_result, 200, http_params_types::params_required),
    }, appbase::exec_queue::read_only);
 
    if (chain.account_queries_enabled()) {
