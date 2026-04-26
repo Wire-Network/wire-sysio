@@ -188,7 +188,10 @@ namespace sysio {
         /// request).
         static void handle_exception_stream( const char *api_name, const char *call_name, const string& body, url_response_stream_callback& cb );
 
-        void post_http_thread_pool(std::function<void()> f);
+        // Accepts a move-only callable so streaming-cb macros can capture
+        // url_response_stream_callback (move_only_function) into the closure.
+        // std::function values implicitly convert and so are still accepted.
+        void post_http_thread_pool(std::move_only_function<void()> f);
 
         bool is_on_loopback(api_category category) const;
 

@@ -625,9 +625,9 @@ namespace sysio {
       smap.emplace(path, my->make_http_thread_url_handler_stream(std::move(entry)));
    }
 
-   void http_plugin::post_http_thread_pool(std::function<void()> f) {
+   void http_plugin::post_http_thread_pool(std::move_only_function<void()> f) {
       if( f )
-         boost::asio::post( my->plugin_state->thread_pool.get_executor(), f );
+         boost::asio::post( my->plugin_state->thread_pool.get_executor(), std::move(f) );
    }
 
    namespace {
