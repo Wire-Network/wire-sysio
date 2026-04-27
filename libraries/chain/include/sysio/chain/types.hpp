@@ -13,7 +13,6 @@
 #include <fc/io/raw.hpp>
 #include <fc/static_variant.hpp>
 #include <fc/crypto/ripemd160.hpp>
-#include <fc/fixed_string.hpp>
 #include <fc/crypto/private_key.hpp>
 
 #include <boost/version.hpp>
