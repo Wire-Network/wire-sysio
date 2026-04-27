@@ -4,6 +4,8 @@
 #include <sysio/chain/types.hpp>
 #include <sysio/chain_plugin/chain_plugin.hpp>
 #include <sysio/chain/abi_serializer.hpp>
+#include <fc/io/json_stream.hpp>
+#include <fc/reflect/json_stream.hpp>
 #include <fc/variant_object.hpp>
 #include <contracts.hpp>
 #include <test_contracts.hpp>
@@ -135,6 +137,26 @@ BOOST_FIXTURE_TEST_CASE(account_results_total_resources_test, chain_plugin_teste
     BOOST_CHECK_EQUAL(core_from_string("0.0010"), results.total_resources["cpu_weight"].as<asset>());
     BOOST_CHECK_EQUAL(results.total_resources["ram_bytes"].as_int64(), 10401144); // 100000*104+newaccount_ram(1144)
 
+} FC_LOG_AND_RETHROW() }
+
+// Byte-identical compat between the variant-cb path (fc::variant +
+// fc::json::to_string) and the streaming-cb path (fc::to_json_stream via
+// reflector dispatch + per-type overrides for chain::name / asset / symbol).
+// Pins the parity that get_account's add_api_stream registration depends on.
+BOOST_FIXTURE_TEST_CASE(get_account_streaming_vs_variant_byte_identical, chain_plugin_tester) { try {
+   produce_blocks(10);
+   setup_system_accounts();
+   produce_blocks();
+   create_account("alice1111111"_n, config::system_account_name);
+   transfer(name("sysio"), name("alice1111111"), core_from_string("650000000.0000"), name("sysio"));
+
+   read_only::get_account_results results = get_account_info(name("alice1111111"));
+
+   const std::string variant_path =
+      fc::json::to_string(fc::variant(results), fc::time_point::maximum());
+   const std::string stream_path = fc::to_json_string(results);
+
+   BOOST_CHECK_EQUAL(variant_path, stream_path);
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()
