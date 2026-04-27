@@ -13,23 +13,11 @@ namespace sysio { namespace chain { namespace webassembly {
    }
 
    void interface::__ashrti3(aligned_ptr<__int128> ret, uint64_t low, uint64_t high, uint32_t shift) const {
-      // Arithmetic right shift implemented using only well-defined unsigned operations,
-      // avoiding implementation-defined behavior of signed >> on negative values.
-      unsigned __int128 u = (static_cast<unsigned __int128>(high) << 64) | low;
-      bool negative = (high >> 63) != 0;
-
-      if (shift >= 128) {
-         *ret = negative ? static_cast<__int128>(~static_cast<unsigned __int128>(0)) : 0;
-      } else if (shift == 0) {
-         *ret = static_cast<__int128>(u);
-      } else {
-         unsigned __int128 shifted = u >> shift;
-         if (negative) {
-            unsigned __int128 mask = ~static_cast<unsigned __int128>(0) << (128 - shift);
-            shifted |= mask;
-         }
-         *ret = static_cast<__int128>(shifted);
-      }
+      // C++20 [expr.shift]/3 defines signed `>>` as arithmetic shift (sign-extending) for
+      // both non-negative and negative values; only shift counts >= the type width are UB.
+      // Saturate the out-of-range case to the sign bit: 0 for non-negative, -1 for negative.
+      __int128 i = (static_cast<__int128>(high) << 64) | low;
+      *ret = (shift >= 128) ? (i >> 127) : (i >> shift);
    }
 
    void interface::__lshlti3(aligned_ptr<__int128> ret, uint64_t low, uint64_t high, uint32_t shift) const {
