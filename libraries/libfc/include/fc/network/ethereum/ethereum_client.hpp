@@ -493,7 +493,11 @@ private:
    std::optional<fc::uint256> _chain_id;
 
    /**
-    * @brief Mutex for thread-safe access to _contracts_map
+    * @brief Mutex for thread-safe access to _contracts_map and _nonce
+    * 
+    * Note: mutex is used for both _contracts_map and _nonce because there will
+    * be little contention on this mutex between them, so there is not really a
+    * need to have _nonce's own mutex
     */
    std::mutex _contracts_map_mutex{};
 

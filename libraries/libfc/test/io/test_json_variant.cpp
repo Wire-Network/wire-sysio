@@ -308,4 +308,12 @@ BOOST_AUTO_TEST_CASE(number_from_stream_negative_leading_zeros_fit_int64) {
    BOOST_CHECK_EQUAL(v.as_int64(), -42ll);
 }
 
+BOOST_AUTO_TEST_CASE(number_from_stream_bare_minus_throws) {
+   BOOST_CHECK_THROW(json::from_string("-"), fc::parse_error_exception);
+}
+
+BOOST_AUTO_TEST_CASE(number_from_stream_bare_minus_in_array_throws) {
+   BOOST_CHECK_THROW(json::from_string("[-,1]"), fc::parse_error_exception);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
