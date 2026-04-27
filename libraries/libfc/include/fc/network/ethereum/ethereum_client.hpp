@@ -394,7 +394,7 @@ public:
     * client's own signer, use the internal cached path via create_default_tx.
     *
     * @param address The address for which to fetch the transaction count.
-    * @param block_tag Block tag at which to query.
+    * @param tag Block tag at which to query.
     * @return The transaction count (nonce).
     */
    fc::uint256 raw_get_transaction_count(const address_compat_type& address,

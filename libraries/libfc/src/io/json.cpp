@@ -405,10 +405,16 @@ namespace fc
                                "Negative numeric token \"{}\" exceeds int256 range", s);
          }
 
+         if (str == int256_max_str) {
+            const auto val = std::numeric_limits<fc::int256>::min();
+            ret = val;
+            return ret;
+         }
+
          // using the string with no leading 0s, to avoid the string being assumed to be in octal,
          // since a leading 0 with only digits between 0 and 7 are assumed to be octal
          fc::int256 val256(str);
-         val256 *= -1;
+         val256 = -val256;
          ret = std::move(val256);
          return ret;
       }

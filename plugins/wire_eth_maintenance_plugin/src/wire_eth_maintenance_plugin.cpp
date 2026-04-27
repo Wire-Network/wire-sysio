@@ -20,6 +20,7 @@
 #include <boost/beast/ssl.hpp>
 
 #include <curl/curl.h>
+#include <fc/network/curl_init.hpp>
 
 #include <optional>
 #include <unordered_map>
@@ -162,8 +163,6 @@ namespace {
          if (ec && ec != asio::error::eof && ec != asio::ssl::error::stream_truncated)
             dlog("TLS shutdown returned non-benign error: {}", ec.message());
 
-         uint64_t sec_sleep = 0;
-
          valid = res.result() == http::status::ok;
          if (valid) {
             dlog("res.body=\n{}", res.body());
@@ -245,7 +244,7 @@ namespace beacon_chain_detail {
       const auto now_sec = fc::time_point::now().sec_since_epoch();
       const auto epa = epa_var->as_uint64();
       if (epa <= now_sec) {
-         wlog("queue {} epa={} is in the past (now={}), returning nullopt", queue_branch, epa, now_sec);
+         dlog("queue {} epa={} is in the past (now={}), returning nullopt", queue_branch, epa, now_sec);
          return std::nullopt;
       }
       const auto eta = epa - now_sec;
@@ -437,10 +436,10 @@ void wire_eth_maintenance_plugin::plugin_initialize(const variables_map& options
                   .retry_schedule = job_schedule{.milliseconds = {job_schedule::step_value{5000}}},
                   .max_retries = 600,
                   .on_exhaustion = []() -> fc::exception {
-                     return fc::ethereum_abi_decode_exception(
+                     return sysio::chain::plugin_config_exception(
                         FC_LOG_MESSAGE(error, "transaction not mined within retry timeout"),
-                        fc::ethereum_abi_decode_exception_code,
-                        "ethereum_abi_decode_exception",
+                        sysio::chain::plugin_config_exception::code_value,
+                        "plugin_config_exception",
                         "transaction not mined within retry timeout");
                   }
                };
@@ -467,8 +466,7 @@ void wire_eth_maintenance_plugin::plugin_initialize(const variables_map& options
                  "Nothing is configured to run in wire_eth_maintenance_plugin");
    }
 
-   auto res = curl_global_init(CURL_GLOBAL_DEFAULT);
-   SYS_ASSERT(res == CURLE_OK, chain::http_exception, "{}", curl_easy_strerror(res));
+   fc::ensure_libcurl_initialized();
 
    ilog("initializing beacon chain plugin DONE");
 }
@@ -486,7 +484,7 @@ void wire_eth_maintenance_plugin::plugin_startup() {
    const auto eth_client = clients.front()->client;
 
    ilog("Scheduling {} to execute right after startup", just_once_interval_name);
-   job_schedule jo_schedule = services::parse_cron_schedule_or_throw("*/1 * * * *");
+   job_schedule jo_schedule = services::parse_cron_schedule_or_throw("*/1 * * * * *");
    my->just_once_jid =
       cron.add_job(jo_schedule, [my_=my,cron=&cron]() {
          try {
@@ -592,7 +590,6 @@ void wire_eth_maintenance_plugin::plugin_shutdown() {
       }
       my->just_once_jid.reset();
    }
-   curl_global_cleanup();
 }
 
 /**
