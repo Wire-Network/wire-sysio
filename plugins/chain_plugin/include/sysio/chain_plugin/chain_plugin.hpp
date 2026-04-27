@@ -668,11 +668,20 @@ public:
    chain_apis::read_write get_read_write_api(const fc::microseconds& http_max_response_time);
    chain_apis::read_only get_read_only_api(const fc::microseconds& http_max_response_time) const;
 
-   /// Runs a `get_table_rows` scan on the app executor's read_only queue and blocks the caller on the result. The
-   /// scan runs during the controller's read window, avoiding races with block apply that would occur if the caller
-   /// iterated chainbase directly from its own thread. `shutdown_flag` is polled every 200ms so the caller returns
-   /// early on plugin shutdown instead of stalling up to `timeout` for the executor to drain. `log_prefix` is a
-   /// short tag (plugin name) used in error log lines.
+   /// Runs a `get_table_rows` scan and returns its result.
+   ///
+   /// When called off the main app thread (typical case: a cron worker), the scan is posted onto the executor's
+   /// read_only queue and the calling thread blocks on the result. Running through the queue ensures chainbase
+   /// iteration happens during the controller's read window, avoiding races with block apply.
+   ///
+   /// When called from the main app thread (e.g. during `plugin_startup`), the scan runs inline. Posting + waiting
+   /// would deadlock there because the main thread is the very thread that drains the queue; running inline is safe
+   /// because the read-window discipline is already satisfied (write window: main thread is the sole chainbase
+   /// mutator; read window: main thread is one of the legitimate readers).
+   ///
+   /// `shutdown_flag` is polled every 200ms on the off-thread path so the caller returns early on plugin shutdown
+   /// instead of stalling up to `timeout` for the executor to drain. `log_prefix` is a short tag (plugin name) used
+   /// in error log lines.
    chain_apis::read_only::get_table_rows_result
    read_table_rows(chain_apis::read_only::get_table_rows_params params,
                    fc::microseconds timeout,
