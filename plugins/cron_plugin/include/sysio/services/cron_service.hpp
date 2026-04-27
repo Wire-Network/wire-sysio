@@ -232,17 +232,6 @@ public:
       if (ret.has_value())
          return std::move(*ret);
 
-      std::promise<void> done_promise;
-      auto done_future = done_promise.get_future();
-      std::once_flag fired;
-      // Hold the catch'd exception via shared_ptr so derived-type info survives the catch frame
-      // (codebase convention — see fc::exception::dynamic_copy_exception).
-      std::shared_ptr<fc::exception> error;
-
-      auto signal_done = [&]() {
-         std::call_once(fired, [&]() { done_promise.set_value(); });
-      };
-
       using ResultT = typename std::invoke_result_t<Fn, Args...>::value_type;
       std::promise<std::expected<ResultT, fc::exception>> promise;
       auto future = promise.get_future();
