@@ -77,15 +77,6 @@ namespace fc
     };
   }
 
-  void to_variant( const url& u, fc::variant& v )
-  {
-    v = std::string(u);
-  }
-  void from_variant( const fc::variant& v, url& u )
-  {
-    u  = url( v.as_string() );
-  }
-
   url::operator std::string()const
   {
       std::stringstream ss;
