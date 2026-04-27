@@ -39,13 +39,14 @@ public:
     * @brief Constructs a private key from a base64url encoded string
     * @param base64urlstr The base64url encoded string
     */
-   explicit private_key(const std::string& base64urlstr);
+   explicit private_key(std::string_view base64urlstr);
 
    private_key& operator=(const private_key& pk) = default;
    private_key& operator=(private_key&& pk) noexcept = default;
 
    private_key_secret get_secret() const { return _sk; };
    std::string to_string() const;
+   static private_key from_string(std::string_view s) { return private_key(s); }
 
    public_key get_public_key() const;
 
@@ -218,27 +219,13 @@ struct private_key_shim : crypto::shim<private_key_secret> {
 
 } // namespace fc::crypto::bls
 
-namespace fc {
-/**
- * @brief Converts a BLS private key to a variant
- * @param var The private key to convert
- * @param vo The output variant
- */
-void to_variant(const crypto::bls::private_key& var, variant& vo);
-
-/**
- * @brief Converts a variant to a BLS private key
- * @param var The variant to convert
- * @param vo The output private key
- */
-void from_variant(const variant& var, crypto::bls::private_key& vo);
-} // namespace fc
-
-
 #include <fc/reflect/reflect.hpp>
 FC_REFLECT(fc::crypto::bls::private_key, (_sk))
 
 FC_REFLECT_TYPENAME(fc::crypto::bls::public_key)
+
+#include <fc/serialize_as_string.hpp>
+FC_SERIALIZE_AS_STRING(fc::crypto::bls::private_key)
 
 FC_REFLECT(fc::crypto::bls::public_key_shim, (shim_ptr))
 FC_REFLECT(fc::crypto::bls::signature_shim, (shim_ptr))

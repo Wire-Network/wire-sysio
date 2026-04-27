@@ -42,13 +42,14 @@ namespace fc::crypto::bls {
       explicit public_key(const public_key_data& affine_non_montgomery_le);
 
       // affine non-montgomery base64url with bls_public_key_prefix
-      explicit public_key(const std::string& base64urlstr);
+      explicit public_key(std::string_view base64urlstr);
 
       bool valid()const;
       public_key_data serialize()const;
       // affine non-montgomery base64url with bls_public_key_prefix
       std::string to_string() const;
       static std::string to_string(const public_key_data& key);
+      static public_key from_string(std::string_view s) { return public_key(s); }
 
       const bls12_381::g1&    jacobian_montgomery_le() const { return _jacobian_montgomery_le; }
       const public_key_data&  affine_non_montgomery_le() const { return _affine_non_montgomery_le; }
@@ -99,7 +100,5 @@ namespace fc::crypto::bls {
 
 }  // fc::crypto::bls
 
-namespace fc {
-   void to_variant(const crypto::bls::public_key& var, variant& vo);
-   void from_variant(const variant& var, crypto::bls::public_key& vo);
-} // namespace fc
+#include <fc/serialize_as_string.hpp>
+FC_SERIALIZE_AS_STRING(fc::crypto::bls::public_key)

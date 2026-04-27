@@ -38,7 +38,7 @@ signature_shim::public_key_type signature_shim::recover(const sha256&) const {
    FC_THROW_EXCEPTION(fc::unsupported_exception, "BLS Signature Recovery is not supported");
 }
 
-static fc::sha256::uint64_array_type priv_parse_base64url(const std::string& base64urlstr) {
+static fc::sha256::uint64_array_type priv_parse_base64url(std::string_view base64urlstr) {
    auto res = std::mismatch(bls::constants::bls_private_key_prefix.begin(),
                             bls::constants::bls_private_key_prefix.end(),
                             base64urlstr.begin());
@@ -49,7 +49,7 @@ static fc::sha256::uint64_array_type priv_parse_base64url(const std::string& bas
    return fc::crypto::bls::deserialize_base64url<fc::sha256::uint64_array_type>(data_str);
 }
 
-private_key::private_key(const std::string& base64urlstr)
+private_key::private_key(std::string_view base64urlstr)
    : _sk(priv_parse_base64url(base64urlstr)) {}
 
 std::string private_key::to_string() const {
@@ -63,14 +63,3 @@ bool operator ==(const private_key& pk1, const private_key& pk2) {
 }
 
 } // fc::crypto::bls
-
-namespace fc {
-void to_variant(const crypto::bls::private_key& var, variant& vo) {
-   vo = var.to_string();
-}
-
-void from_variant(const variant& var, crypto::bls::private_key& vo) {
-   vo = crypto::bls::private_key(var.as_string());
-}
-
-} // fc
