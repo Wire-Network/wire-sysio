@@ -51,3 +51,13 @@ inline void to_json_stream(const T& v, fc::json_writer& w) {
 
 #define FC_SERIALIZE_AS_STRING(TYPE) \
    namespace fc { template<> struct serialize_as_string<TYPE> : std::true_type {}; }
+
+// Class-template variant of FC_SERIALIZE_AS_STRING.  Wrap each argument in parens
+// so internal commas (template parameter lists, template arguments) survive the
+// preprocessor's argument splitting.
+//   FC_SERIALIZE_AS_STRING_TEMPLATE((typename T, typename U), (my_type<T, U>))
+#define FC_SERIALIZE_AS_STRING_TEMPLATE(TPL_PARAMS, TYPE) \
+   namespace fc { template<FC_SERIALIZE_AS_STRING_UNPAREN_ TPL_PARAMS> \
+                  struct serialize_as_string<FC_SERIALIZE_AS_STRING_UNPAREN_ TYPE> : std::true_type {}; }
+
+#define FC_SERIALIZE_AS_STRING_UNPAREN_(...) __VA_ARGS__

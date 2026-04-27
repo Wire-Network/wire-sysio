@@ -99,11 +99,8 @@ namespace std {
 #include <fc/reflect/reflect.hpp>
 FC_REFLECT(sysio::chain::block_timestamp_type, (slot))
 
-namespace fc {
-   // Partial specialisation - FC_SERIALIZE_AS_STRING handles concrete types only.
-   template<uint16_t IntervalMs, uint64_t EpochMs>
-   struct serialize_as_string<sysio::chain::block_timestamp<IntervalMs, EpochMs>> : std::true_type {};
-}
+FC_SERIALIZE_AS_STRING_TEMPLATE((uint16_t IntervalMs, uint64_t EpochMs),
+                                (sysio::chain::block_timestamp<IntervalMs, EpochMs>))
 
 #ifdef _MSC_VER
   #pragma warning (pop)
