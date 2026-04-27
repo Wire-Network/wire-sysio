@@ -796,7 +796,7 @@ blob variant::as_blob()const
             // pre-5.0 versions of variant added `=` to end of base64 encoded string in as_string() above.
             // fc version of base64_decode allows for extra `=` at the end of the string.
             // Other base64 decoders will not accept the extra `=`.
-            std::vector<char> b64 = base64_decode( std::string(str) );
+            std::vector<char> b64 = base64_decode( str );
             return { std::move(b64) };
          } catch(const std::exception&) {
             // unable to decode, return the raw chars
