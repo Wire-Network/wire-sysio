@@ -1,16 +1,8 @@
 #pragma once
 #include <string>
+#include <fc/serialize_as_string.hpp>
 #include <fc/reflect/reflect.hpp>
 #include <iosfwd>
-
-namespace sysio::chain {
-  struct name;
-}
-namespace fc {
-  class variant;
-  void to_variant(const sysio::chain::name& c, fc::variant& v);
-  void from_variant(const fc::variant& v, sysio::chain::name& check);
-} // fc
 
 namespace sysio::chain {
    inline constexpr uint64_t char_to_symbol( char c ) {
@@ -45,7 +37,6 @@ namespace sysio::chain {
       uint64_t value = 0;
 
       friend struct fc::reflector<name>;
-      friend void fc::from_variant(const fc::variant& v, sysio::chain::name& check);
 
       void set( std::string_view str );
 
@@ -58,6 +49,7 @@ namespace sysio::chain {
       constexpr name() = default;
 
       std::string to_string()const;
+      static name from_string( std::string_view str ) { return name(str); }
       constexpr uint64_t to_uint64_t()const { return value; }
 
       friend std::ostream& operator << ( std::ostream& out, const name& n ) {
@@ -192,3 +184,4 @@ namespace std {
 };
 
 FC_REFLECT( sysio::chain::name, (value) )
+FC_SERIALIZE_AS_STRING(sysio::chain::name)

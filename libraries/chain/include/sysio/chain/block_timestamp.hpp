@@ -2,6 +2,7 @@
 #include <sysio/chain/config.hpp>
 
 #include <stdint.h>
+#include <fc/serialize_as_string.hpp>
 #include <fc/time.hpp>
 #include <fc/variant.hpp>
 #include <fc/string.hpp>
@@ -49,6 +50,12 @@ namespace sysio { namespace chain {
             return fc::time_point(fc::milliseconds(msec));
          }
 
+         std::string to_string() const { return to_time_point().to_iso_string(); }
+
+         static block_timestamp from_string(std::string_view s) {
+            return block_timestamp(fc::time_point::from_iso_string(std::string(s)));
+         }
+
          void operator = (const fc::time_point& t ) {
             set_time_point(t);
          }
@@ -76,7 +83,7 @@ namespace sysio { namespace chain {
    typedef block_timestamp<config::block_interval_ms,config::block_timestamp_epoch> block_timestamp_type;
 
    constexpr std::string format_as(const block_timestamp_type& t) {
-      return t.to_time_point().to_iso_string();
+      return t.to_string();
    }
 
 } } /// sysio::chain
@@ -93,15 +100,9 @@ namespace std {
 FC_REFLECT(sysio::chain::block_timestamp_type, (slot))
 
 namespace fc {
-  template<uint16_t IntervalMs, uint64_t EpochMs>
-  void to_variant(const sysio::chain::block_timestamp<IntervalMs,EpochMs>& t, fc::variant& v) {
-     to_variant( (fc::time_point)t, v);
-  }
-
-  template<uint16_t IntervalMs, uint64_t EpochMs>
-  void from_variant(const fc::variant& v, sysio::chain::block_timestamp<IntervalMs,EpochMs>& t) {
-     t = v.as<fc::time_point>();
-  }
+   // Partial specialisation - FC_SERIALIZE_AS_STRING handles concrete types only.
+   template<uint16_t IntervalMs, uint64_t EpochMs>
+   struct serialize_as_string<sysio::chain::block_timestamp<IntervalMs, EpochMs>> : std::true_type {};
 }
 
 #ifdef _MSC_VER
