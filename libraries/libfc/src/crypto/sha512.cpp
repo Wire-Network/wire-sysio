@@ -10,7 +10,7 @@
 namespace fc {
 
     sha512::sha512() { memset( _hash, 0, sizeof(_hash) ); }
-    sha512::sha512( const std::string& hex_str ) {
+    sha512::sha512( std::string_view hex_str ) {
       auto bytes_written = fc::from_hex( hex_str, (char*)_hash, sizeof(_hash) );
       if( bytes_written < sizeof(_hash) )
          memset( (char*)_hash + bytes_written, 0, (sizeof(_hash) - bytes_written) );
@@ -87,21 +87,6 @@ namespace fc {
     bool operator == ( const sha512& h1, const sha512& h2 ) {
       return memcmp( h1._hash, h2._hash, sizeof(h1._hash) ) == 0;
     }
-
-  void to_variant( const sha512& bi, variant& v )
-  {
-     v = std::vector<char>( (const char*)&bi, ((const char*)&bi) + sizeof(bi) );
-  }
-  void from_variant( const variant& v, sha512& bi )
-  {
-    std::vector<char> ve = v.as< std::vector<char> >();
-    if( ve.size() )
-    {
-        memcpy(bi.data(), ve.data(), fc::min<size_t>(ve.size(),sizeof(bi)) );
-    }
-    else
-        memset( bi.data(), char(0), sizeof(bi) );
-  }
 
     template<>
     unsigned int hmac<sha512>::internal_block_size() const { return 128; }

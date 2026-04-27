@@ -33,9 +33,9 @@ namespace fc {
 
     size_t from_hex(std::string_view hex_str, char* out_data, size_t out_data_len);
 
-    std::vector<uint8_t> from_hex(const std::string& hex, bool trim_prefix = true);
+    std::vector<uint8_t> from_hex(std::string_view hex, bool trim_prefix = true);
 
-    std::string trim_hex_prefix(const std::string& hex);
+    std::string_view trim_hex_prefix(std::string_view hex);
 
 
     /**

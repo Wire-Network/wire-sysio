@@ -191,7 +191,7 @@ sha3::sha3(const char *data, size_t size)
 		FC_THROW_EXCEPTION(exception, "sha3: size mismatch");
 	memcpy(_hash, data, size);
 }
-sha3::sha3(const std::string &hex_str)
+sha3::sha3(std::string_view hex_str)
 {
 	auto bytes_written = fc::from_hex(hex_str, (char *)_hash, sizeof(_hash));
 	if (bytes_written < sizeof(_hash))
@@ -281,16 +281,4 @@ bool operator==(const sha3 &h1, const sha3 &h2)
 			 h1._hash[3] == h2._hash[3];
 }
 
-void to_variant(const sha3 &bi, variant &v)
-{
-	v = std::vector<char>((const char *)&bi, ((const char *)&bi) + sizeof(bi));
-}
-void from_variant(const variant &v, sha3 &bi)
-{
-	const auto &ve = v.as<std::vector<char>>();
-	if (ve.size())
-		memcpy(bi.data(), ve.data(), fc::min<size_t>(ve.size(), sizeof(bi)));
-	else
-		memset(bi.data(), char(0), sizeof(bi));
-}
 } // namespace fc

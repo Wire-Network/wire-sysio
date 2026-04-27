@@ -4,6 +4,7 @@
 #include <fc/platform_independence.hpp>
 #include <fc/crypto/packhash.hpp>
 #include <fc/io/raw_fwd.hpp>
+#include <fc/serialize_as_string.hpp>
 #include <boost/functional/hash.hpp>
 
 namespace fc
@@ -14,10 +15,12 @@ class sha3
 public:
 	sha3();
 	~sha3(){}
-	explicit sha3(const std::string &hex_str);
+	explicit sha3(std::string_view hex_str);
 	explicit sha3(const char *data, size_t size);
 
 	std::string str() const;
+	std::string to_string() const { return str(); }
+	static sha3 from_string(std::string_view s) { return sha3(s); }
 	operator std::string() const;
 
 	const char *data() const;
@@ -100,10 +103,6 @@ public:
 	uint64_t _hash[4];
 };
 
-class variant;
-void to_variant(const sha3 &bi, variant &v);
-void from_variant(const variant &v, sha3 &bi);
-
 } // namespace fc
 
 namespace std
@@ -132,3 +131,4 @@ struct hash<fc::sha3>
 } // namespace boost
 #include <fc/reflect/reflect.hpp>
 FC_REFLECT_TYPENAME(fc::sha3)
+FC_SERIALIZE_AS_STRING(fc::sha3)

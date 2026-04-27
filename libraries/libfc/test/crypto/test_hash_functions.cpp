@@ -1,10 +1,48 @@
 #include <boost/test/unit_test.hpp>
 
 #include <fc/crypto/hex.hpp>
+#include <fc/crypto/sha1.hpp>
+#include <fc/crypto/sha224.hpp>
+#include <fc/crypto/sha256.hpp>
 #include <fc/crypto/sha3.hpp>
+#include <fc/crypto/sha512.hpp>
+#include <fc/crypto/ripemd160.hpp>
+#include <fc/crypto/keccak256.hpp>
+#include <fc/crypto/blake3.hpp>
+#include <fc/io/json.hpp>
+#include <fc/reflect/json_stream.hpp>
 #include <fc/utility.hpp>
 
 using namespace fc;
+
+namespace {
+   // Round-trip exercise for FC_SERIALIZE_AS_STRING-trait hash types.  Verifies that:
+   //   - Construction from a hex string round-trips through str() / to_string().
+   //   - The static T::from_string(string_view) factory matches construction.
+   //   - The trait-routed fc::to_variant + fc::from_variant round-trip preserves the value
+   //     and the variant's payload is the expected hex form.
+   //   - fc::to_json_string emits the hex inside JSON quotes.
+   template<typename Hash>
+   void check_hash_string_roundtrip(std::string_view hex) {
+      const Hash h{ hex };
+      BOOST_CHECK_EQUAL(h.str(),       hex);
+      BOOST_CHECK_EQUAL(h.to_string(), hex);
+
+      const Hash h2 = Hash::from_string(hex);
+      BOOST_CHECK(h == h2);
+
+      fc::variant v;
+      fc::to_variant(h, v);
+      BOOST_CHECK_EQUAL(v.as_string(), hex);
+
+      Hash h3;
+      fc::from_variant(v, h3);
+      BOOST_CHECK(h == h3);
+
+      const std::string expected_json = std::string{ "\"" } + std::string{ hex } + "\"";
+      BOOST_CHECK_EQUAL(fc::to_json_string(h), expected_json);
+   }
+}
 
 BOOST_AUTO_TEST_SUITE(hash_functions)
 BOOST_AUTO_TEST_CASE(sha3) try {
@@ -64,6 +102,53 @@ BOOST_AUTO_TEST_CASE(keccak256) try {
       BOOST_CHECK_EQUAL(fc::sha3::hash(std::get<0>(test), false).str(), std::get<1>(test));
    }
 
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(sha1_string_roundtrip) try {
+   // 20 bytes / 40 hex chars
+   check_hash_string_roundtrip<fc::sha1>("0123456789abcdef0123456789abcdef01234567");
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(sha224_string_roundtrip) try {
+   // 28 bytes / 56 hex chars
+   check_hash_string_roundtrip<fc::sha224>(
+      "0123456789abcdef0123456789abcdef0123456789abcdef01234567");
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(sha256_string_roundtrip) try {
+   // 32 bytes / 64 hex chars
+   check_hash_string_roundtrip<fc::sha256>(
+      "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef");
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(sha512_string_roundtrip) try {
+   // 64 bytes / 128 hex chars
+   check_hash_string_roundtrip<fc::sha512>(
+      "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+      "fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210");
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(sha3_string_roundtrip) try {
+   // 32 bytes / 64 hex chars
+   check_hash_string_roundtrip<fc::sha3>(
+      "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef");
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(ripemd160_string_roundtrip) try {
+   // 20 bytes / 40 hex chars
+   check_hash_string_roundtrip<fc::ripemd160>("0123456789abcdef0123456789abcdef01234567");
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(keccak256_string_roundtrip) try {
+   // 32 bytes / 64 hex chars
+   check_hash_string_roundtrip<fc::crypto::keccak256>(
+      "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef");
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(blake3_string_roundtrip) try {
+   // 32 bytes / 64 hex chars
+   check_hash_string_roundtrip<fc::crypto::blake3>(
+      "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef");
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_SUITE_END()

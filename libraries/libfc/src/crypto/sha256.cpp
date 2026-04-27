@@ -5,8 +5,6 @@
 #include <string.h>
 #include <cmath>
 #include <fc/crypto/sha256.hpp>
-#include <fc/variant.hpp>
-#include <fc/io/json_stream.hpp>
 #include <fc/exception/exception.hpp>
 #include "_digest_common.hpp"
 
@@ -18,7 +16,7 @@ namespace fc {
 	  FC_THROW_EXCEPTION( exception, "sha256: size mismatch" );
        memcpy(_hash, data, size );
     }
-    sha256::sha256( const std::string& hex_str ) {
+    sha256::sha256( std::string_view hex_str ) {
       auto bytes_written = fc::from_hex( hex_str, (char*)_hash, sizeof(_hash) );
       if( bytes_written < sizeof(_hash) )
          memset( (char*)_hash + bytes_written, 0, (sizeof(_hash) - bytes_written) );
@@ -198,28 +196,6 @@ namespace fc {
 
       return lzbits;
    }
-
-  void to_variant( const sha256& bi, variant& v )
-  {
-     v = std::vector<char>( (const char*)&bi, ((const char*)&bi) + sizeof(bi) );
-  }
-  void from_variant( const variant& v, sha256& bi )
-  {
-    std::vector<char> ve = v.as< std::vector<char> >();
-    if( ve.size() )
-    {
-        memcpy(bi.data(), ve.data(), fc::min<size_t>(ve.size(),sizeof(bi)) );
-    }
-    else
-        memset( bi.data(), char(0), sizeof(bi) );
-  }
-  void to_json_stream( const sha256& bi, json_writer& w )
-  {
-    // Emit the canonical lowercase hex form.  The existing to_variant stores raw bytes
-    // and lets fc::json::to_string base16-encode the blob at serialize time; this path
-    // shortcuts that by writing the hex string directly into the output buffer.
-    w.value_string( bi.str() );
-  }
 
   uint64_t hash64(const char* buf, size_t len)
   {

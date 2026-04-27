@@ -10,7 +10,7 @@ keccak256::keccak256() {
    memset(_hash, 0, sizeof(_hash));
 }
 
-keccak256::keccak256(const std::string& hex_str) {
+keccak256::keccak256(std::string_view hex_str) {
    auto bytes = from_hex(hex_str);
    FC_ASSERT(bytes.size() == sizeof(_hash),
              "Invalid keccak256 hex string length: {}", hex_str.size());
@@ -60,15 +60,3 @@ void keccak256::encoder::reset() {
 }
 
 } // namespace fc::crypto
-
-namespace fc {
-
-void to_variant(const crypto::keccak256& bi, variant& v) {
-   v = bi.str();
-}
-
-void from_variant(const variant& v, crypto::keccak256& bi) {
-   bi = crypto::keccak256(v.as_string());
-}
-
-} // namespace  fc

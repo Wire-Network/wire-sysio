@@ -7,7 +7,7 @@
 #include <fc/platform_independence.hpp>
 #include <fc/crypto/packhash.hpp>
 #include <fc/io/raw_fwd.hpp>
-#include <fc/io/json_stream_fwd.hpp>
+#include <fc/serialize_as_string.hpp>
 #include <boost/functional/hash.hpp>
 
 namespace fc
@@ -23,11 +23,13 @@ class sha256 : public add_packhash_to_hash<sha256>
     using byte_array_type = std::array<uint8_t, sha256::byte_size>;
 
     sha256();
-    explicit sha256( const std::string& hex_str );
+    explicit sha256( std::string_view hex_str );
     explicit sha256( const hash_array_type& hash_arr  );
     explicit sha256( const char *data, size_t size );
 
     std::string str()const;
+    std::string to_string() const { return str(); }
+    static sha256 from_string(std::string_view s) { return sha256(s); }
     std::string short_id()const;
 
     const char* data()const;
@@ -129,11 +131,6 @@ class sha256 : public add_packhash_to_hash<sha256>
     uint64_t _hash[uint64_size];
 };
 
-class variant;
-void to_variant( const sha256& bi, variant& v );
-void from_variant( const variant& v, sha256& bi );
-void to_json_stream( const sha256& bi, json_writer& w );
-
 uint64_t hash64(const char* buf, size_t len);
 
 constexpr auto format_as(const fc::sha256& h) {
@@ -180,3 +177,4 @@ namespace fc {
 
 #include <fc/reflect/reflect.hpp>
 FC_REFLECT_TYPENAME( fc::sha256 )
+FC_SERIALIZE_AS_STRING(fc::sha256)

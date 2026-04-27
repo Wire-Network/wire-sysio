@@ -2,6 +2,7 @@
 #include <fc/fwd.hpp>
 #include <fc/string.hpp>
 #include <fc/crypto/packhash.hpp>
+#include <fc/serialize_as_string.hpp>
 
 namespace fc{
 
@@ -9,9 +10,11 @@ class sha1 : public add_packhash_to_hash<sha1>
 {
   public:
     sha1();
-    explicit sha1( const std::string& hex_str );
+    explicit sha1( std::string_view hex_str );
 
     std::string str()const;
+    std::string to_string() const { return str(); }
+    static sha1 from_string(std::string_view s) { return sha1(s); }
     operator std::string()const;
 
     char*       data();
@@ -65,10 +68,6 @@ class sha1 : public add_packhash_to_hash<sha1>
     uint32_t _hash[5]; 
 };
 
-  class variant;
-  void to_variant( const sha1& bi, variant& v );
-  void from_variant( const variant& v, sha1& bi );
-
 } // namespace fc
 
 namespace std
@@ -82,3 +81,5 @@ namespace std
        }
     };
 }
+
+FC_SERIALIZE_AS_STRING(fc::sha1)
