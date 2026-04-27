@@ -261,14 +261,16 @@ void uwrit::createuwreq(uint64_t attestation_id,
          "underwrite request already exists for this attestation");
 
    reqs.emplace(get_self(), pk, uw_request_t{
-      .id                 = attestation_id,
-      .type               = type,
-      .status             = opp::types::UNDERWRITE_REQUEST_STATUS_PENDING,
-      .uw_name            = name{},
-      .locked_amounts     = {},
-      .unlock_timestamp   = 0,
-      .released_timestamp = 0,
-      .slashed_timestamp  = 0,
+      .id                        = attestation_id,
+      .type                      = type,
+      .status                    = opp::types::UNDERWRITE_REQUEST_STATUS_PENDING,
+      .uw_name                   = name{},
+      .locked_amounts            = {},
+      .unlock_timestamp          = 0,
+      .released_timestamp        = 0,
+      .slashed_timestamp         = 0,
+      .attestation_inbound_data  = std::move(data),
+      .attestation_outbound_data = {},
    });
 }
 

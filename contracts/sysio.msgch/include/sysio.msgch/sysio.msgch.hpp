@@ -53,11 +53,6 @@ namespace sysio {
       [[sysio::action]]
       void buildenv(uint64_t outpost_id);
 
-      /// Remove attestations and envelopes older than before_epoch.
-      /// Called inline from epoch::advance().
-      [[sysio::action]]
-      void cleanup(uint32_t before_epoch);
-
       // -----------------------------------------------------------------------
       //  Tables
       // -----------------------------------------------------------------------
@@ -208,6 +203,34 @@ namespace sysio {
 
       using outpost_consensus_t =
          sysio::kv::table<"outpcons"_n, outpost_consensus_key, outpost_consensus_entry>;
+
+      /// Audit-trail row for the durable envelope log. Pure metadata —
+      /// `endpoints` (start/end ChainId pair from the inbound or outbound
+      /// envelope), the `epoch_index` it corresponds to, the keccak/sha256
+      /// `checksum` of the encoded envelope bytes, and the `emitted_at`
+      /// timestamp. Raw payload is consumed inline by the consensus +
+      /// dispatch path and never stored. Off-chain audit reconstruction is
+      /// out of scope.
+      ///
+      /// Total row count is capped at
+      /// `active_outposts * 2 * epoch_retention_envelope_log_count`
+      /// (one inbound + one outbound row per active outpost per epoch).
+      /// Eviction is head-first on overflow — see
+      /// `write_envelope_log` in `src/sysio.msgch.cpp`.
+      struct [[sysio::table("envlog")]] envelope_log_entry {
+         uint64_t        id;                ///< monotonic auto-increment PK
+         opp::Endpoints  endpoints;         ///< start + end ChainId
+         uint32_t        epoch_index;
+         checksum256     checksum;          ///< sha256/keccak of envelope bytes
+         time_point      emitted_at;
+
+         uint64_t primary_key() const { return id; }
+
+         SYSLIB_SERIALIZE(envelope_log_entry,
+            (id)(endpoints)(epoch_index)(checksum)(emitted_at))
+      };
+
+      using envelope_log_t = sysio::kv::table<"envlog"_n, id_key, envelope_log_entry>;
 
    private:
 

@@ -3,9 +3,11 @@
 #include <fc/crypto/ethereum/ethereum_utils.hpp>
 #include <fc/crypto/keccak256.hpp>
 #include <fc/crypto/signer.hpp>
+#include <fc/io/json.hpp>
 #include <fc/log/logger.hpp>
 #include <fc/network/ethereum/ethereum_client.hpp>
 #include <fc/network/ethereum/ethereum_rlp_encoder.hpp>
+#include <fc/task/retry.hpp>
 #include <iostream>
 
 namespace fc::network::ethereum {
@@ -474,6 +476,66 @@ std::string ethereum_client::send_raw_transaction(const std::string& raw_tx_data
    fc::variants params{raw_tx_data};
    auto resp = execute("eth_sendRawTransaction", params);
    return resp.as_string();
+}
+
+std::string ethereum_client::wait_for_confirmation(const std::string& tx_hash,
+                                                    const ethereum_confirm_options& opts) {
+   // Phase 1: wait for the receipt to exist. A null result means the tx
+   // hasn't been included yet — retry with backoff. A `status == 0` means
+   // the EVM executed the tx and reverted — propagate as a fatal error so
+   // the caller can retry with new calldata rather than wait forever.
+   const auto receipt = fc::task::retry_until<fc::variant>(
+      "ethereum:wait_for_confirmation:receipt",
+      opts.retry,
+      [this, tx_hash]() -> std::optional<fc::variant> {
+         auto r = get_transaction_receipt(tx_hash);
+         if (r.is_null()) return std::nullopt;
+         // EVM receipt: status "0x0" = revert, "0x1" = success. Present on
+         // post-Byzantium chains only; absent on pre-Byzantium. For safety
+         // we only treat explicit "0x0" as fatal.
+         if (r.is_object() && r.get_object().contains("status")) {
+            const auto status = r.get_object()["status"].as_string();
+            if (status == "0x0" || status == "0") {
+               FC_THROW("Ethereum tx {} reverted (status=0): {}", tx_hash,
+                        fc::json::to_string(r, fc::time_point::maximum()));
+            }
+         }
+         return r;
+      });
+
+   if (opts.confirmations <= 1) {
+      // Receipt exists: tx is in the head block. That's one confirmation by
+      // definition; no further wait required.
+      return tx_hash;
+   }
+
+   // Phase 2: wait for `opts.confirmations - 1` more blocks on top of the
+   // receipt's block number. Using (confirmations - 1) because the receipt
+   // block itself counts as the first confirmation.
+   const fc::uint256 receipt_block = to_uint256(receipt.get_object()["blockNumber"]);
+   const uint32_t    extra_blocks  = opts.confirmations - 1;
+
+   // Materialise the threshold as a concrete `fc::uint256` to avoid the
+   // overloaded-operator ambiguity that arises when Boost.Multiprecision
+   // expression templates meet `fc::uint256`'s `>=` operator.
+   const fc::uint256 target_block = receipt_block + fc::uint256(extra_blocks);
+
+   fc::task::retry_until<bool>(
+      "ethereum:wait_for_confirmation:depth",
+      opts.retry,
+      [this, target_block]() -> std::optional<bool> {
+         const fc::uint256 current = get_block_number();
+         if (current >= target_block) return true;
+         return std::nullopt;
+      });
+
+   return tx_hash;
+}
+
+std::string ethereum_client::send_transaction_and_confirm(const std::string& raw_tx_data,
+                                                           const ethereum_confirm_options& opts) {
+   const auto tx_hash = send_transaction(raw_tx_data);
+   return wait_for_confirmation(tx_hash, opts);
 }
 
 /**

@@ -40,7 +40,17 @@ struct opp_solana_outpost_client : fc::network::solana::solana_program_client {
    // Pre-computed static PDAs (deterministic from program_id).
    fc::network::solana::solana_public_key config_pda;
    fc::network::solana::solana_public_key operator_registry_pda;
-   fc::network::solana::solana_public_key message_buffer_pda;
+   fc::network::solana::solana_public_key outbound_message_buffer_pda;
+   /// Singleton inbound-envelope log (WIRE → SOL records). All writes and
+   /// reads go through this one PDA; pruning is internal to the Vec so the
+   /// client never sees per-epoch accounts.
+   fc::network::solana::solana_public_key inbound_envelopes_pda;
+   /// Singleton outbound-envelope log (SOL → WIRE records). Same shape.
+   fc::network::solana::solana_public_key outbound_envelopes_pda;
+   /// Single-slot PDA holding the most recent outbound envelope's raw
+   /// bytes — overwritten on every emit. The WIRE batch operator reads
+   /// this to relay the envelope back to WIRE.
+   fc::network::solana::solana_public_key latest_outbound_envelope_pda;
 
    /// `initialize(consensus_threshold: u32) -> signature`.
    solana_program_tx_fn<std::string, uint32_t>             initialize;
@@ -66,10 +76,24 @@ struct opp_solana_outpost_client : fc::network::solana::solana_program_client {
       , operator_registry_pda(fc::network::solana::system::find_program_address(
            {std::vector<uint8_t>{'o','p','e','r','a','t','o','r','_','r','e','g','i','s','t','r','y'}},
            prog_id).first)
-      , message_buffer_pda(fc::network::solana::system::find_program_address(
-           {std::vector<uint8_t>{'m','e','s','s','a','g','e','_','b','u','f','f','e','r'}},
+      , outbound_message_buffer_pda(fc::network::solana::system::find_program_address(
+           {std::vector<uint8_t>{'o','u','t','b','o','u','n','d','_','m','e','s','s','a','g','e','_','b','u','f','f','e','r'}},
            prog_id).first)
-      , initialize(create_tx<std::string, uint32_t>(get_idl("initialize")))
+      , inbound_envelopes_pda(fc::network::solana::system::find_program_address(
+           {std::vector<uint8_t>{'i','n','b','o','u','n','d','_','e','n','v','e','l','o','p','e','s'}},
+           prog_id).first)
+      , outbound_envelopes_pda(fc::network::solana::system::find_program_address(
+           {std::vector<uint8_t>{'o','u','t','b','o','u','n','d','_','e','n','v','e','l','o','p','e','s'}},
+           prog_id).first)
+      , latest_outbound_envelope_pda(fc::network::solana::system::find_program_address(
+           {std::vector<uint8_t>{'l','a','t','e','s','t','_','o','u','t','b','o','u','n','d','_','e','n','v','e','l','o','p','e'}},
+           prog_id).first)
+      // OPP writes default to the confirmed variant — any state-changing
+      // call on this client is consensus-critical and must not silently
+      // drop (see epoch-859 stall RCA). `execute_tx_and_confirm` + default
+      // `solana_confirm_options` (commitment=processed, 15s budget) gives
+      // fast failure signal while still proving on-chain acceptance.
+      , initialize(create_tx_and_confirm<std::string, uint32_t>(get_idl("initialize")))
       // epoch_in: epoch_index selects the EpochDeliveries PDA; envelope_data is the IDL arg.
       , epoch_in([this](uint32_t epoch_index, std::vector<uint8_t> env_data) -> std::string {
            // Derive epoch_deliveries PDA: seeds = ["epoch_deliveries", epoch_index_le32]
@@ -84,25 +108,28 @@ struct opp_solana_outpost_client : fc::network::solana::solana_program_client {
                epoch_seed},
               program_id);
            account_overrides_t overrides = {
-              {"config",             config_pda},
-              {"operator_registry",  operator_registry_pda},
-              {"epoch_deliveries",   epoch_deliveries_pda}
+              {"config",              config_pda},
+              {"operator_registry",   operator_registry_pda},
+              {"epoch_deliveries",    epoch_deliveries_pda},
+              {"inbound_envelopes",   inbound_envelopes_pda},
            };
            auto& instr = get_idl("epoch_in");
            program_invoke_data_items params = {fc::variant(env_data)};
-           return execute_tx(instr, resolve_accounts(instr, params, overrides), params);
+           return execute_tx_and_confirm(instr, resolve_accounts(instr, params, overrides), params);
         })
       , emit_outbound_envelope([this](uint32_t wire_epoch_index) -> std::string {
            account_overrides_t overrides = {
-              {"config",          config_pda},
-              {"message_buffer",  message_buffer_pda}
+              {"config",                    config_pda},
+              {"outbound_message_buffer",   outbound_message_buffer_pda},
+              {"outbound_envelopes",        outbound_envelopes_pda},
+              {"latest_outbound_envelope",  latest_outbound_envelope_pda},
            };
            auto& instr = get_idl("emit_outbound_envelope");
            program_invoke_data_items params = {fc::variant(wire_epoch_index)};
-           return execute_tx(instr, resolve_accounts(instr, params, overrides), params);
+           return execute_tx_and_confirm(instr, resolve_accounts(instr, params, overrides), params);
         })
-      , add_attestation(create_tx<std::string, int32_t, std::vector<uint8_t>>(get_idl("add_attestation")))
-      , deposit(create_tx<std::string, uint8_t, std::string, uint64_t>(get_idl("deposit"))) {}
+      , add_attestation(create_tx_and_confirm<std::string, int32_t, std::vector<uint8_t>>(get_idl("add_attestation")))
+      , deposit(create_tx_and_confirm<std::string, uint8_t, std::string, uint64_t>(get_idl("deposit"))) {}
 };
 
 class outpost_solana_client_plugin : public appbase::plugin<outpost_solana_client_plugin> {

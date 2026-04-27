@@ -151,7 +151,13 @@ namespace sysio {
       using uwconfig_t = sysio::kv::global<"uwconfig"_n, uw_config>;
 
       /// Underwrite request — created when an attestation requires underwriting.
-      /// The attestation ID from sysio.msgch::attestations is used as primary key.
+      /// The attestation ID from `sysio.msgch::attestations` is used as primary
+      /// key. `sysio.msgch` no longer retains attestation rows past consumption,
+      /// so the underwriter plugin reads the attestation bytes from this row
+      /// directly. Bytes are stored as raw zpp_bits-encoded protobuf — same
+      /// shape every other proto-derived model uses on chain — so callers can
+      /// pass them straight to `OperatorAction` / `SwapRequest` decoders
+      /// without an intermediate hop.
       struct [[sysio::table("uwreqs")]] uw_request_t {
          uint64_t                                id;
          opp::types::AttestationType             type;
@@ -162,12 +168,25 @@ namespace sysio {
          uint64_t                                released_timestamp = 0;
          uint64_t                                slashed_timestamp  = 0;
 
+         /// Inbound attestation payload (zpp_bits-encoded protobuf). Set
+         /// from the `data` argument to `createuwreq`. Replaces the
+         /// previous indirection through `sysio.msgch::attestations`,
+         /// which is now transient.
+         std::vector<char>                       attestation_inbound_data;
+
+         /// Outbound attestation payload. Reserved for the underwriter
+         /// plugin's confirm/release flow (where the underwriter emits
+         /// its own attestation back into the OPP cycle). Empty until
+         /// that flow lands.
+         std::vector<char>                       attestation_outbound_data;
+
          uint64_t by_status() const { return static_cast<uint64_t>(status); }
          uint64_t by_uw()     const { return uw_name.value; }
 
          SYSLIB_SERIALIZE(uw_request_t,
             (id)(type)(status)(uw_name)(locked_amounts)
-            (unlock_timestamp)(released_timestamp)(slashed_timestamp))
+            (unlock_timestamp)(released_timestamp)(slashed_timestamp)
+            (attestation_inbound_data)(attestation_outbound_data))
       };
 
       using uwreqs_t = sysio::kv::table<"uwreqs"_n, id_key, uw_request_t,

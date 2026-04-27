@@ -1,7 +1,9 @@
 #include <sysio/batch_operator_plugin/outpost_opp_job.hpp>
 
 #include <fc/exception/exception.hpp>
+#include <fc/io/json.hpp>
 #include <fc/log/logger.hpp>
+#include <fc/network/json_rpc/json_rpc_client.hpp>
 
 namespace sysio {
 
@@ -90,9 +92,13 @@ void outpost_opp_job::run_outbound() {
       });
 
       _last_outbound_epoch = epoch;
+   } catch (const fc::network::json_rpc::json_rpc_error& e) {
+      wlog("outpost_opp_job[{}]: outbound delivery failed: code={} message='{}' data={}",
+           _client->to_string(), e.code, e.top_message(),
+           e.data.is_null() ? std::string("<none>") : fc::json::to_string(e.data, fc::json::yield_function_t{}));
    } catch (const fc::exception& e) {
       wlog("outpost_opp_job[{}]: outbound delivery failed: {}",
-           _client->to_string(), e.to_string());
+           _client->to_string(), e.to_detail_string());
    } catch (const std::exception& e) {
       wlog("outpost_opp_job[{}]: outbound delivery failed: {}",
            _client->to_string(), e.what());
