@@ -176,16 +176,13 @@ namespace {
             return {};
          }
 
-         for (auto const& field : res.base()) {
-            if (field.name_string() == "Retry-After:") {
-               const auto sec_sleep_str = field.value();
-               auto [ptr, ec] = std::from_chars(sec_sleep_str.data(), sec_sleep_str.data() + sec_sleep_str.size(), sec_sleep);
-               if (ec == std::errc() && ptr == sec_sleep_str.data() + sec_sleep_str.size()) {
-                  // identified a valid reason to retry
-                  valid = true;
-                  std::this_thread::sleep_for(std::chrono::milliseconds(sec_sleep * 1000));
-                  break;
-               }
+         const auto retry_after = res.base()[http::field::retry_after];
+         if (!retry_after.empty()) {
+            uint64_t sec_sleep = 0;
+            auto [ptr, perr] = std::from_chars(retry_after.data(),
+                                               retry_after.data() + retry_after.size(), sec_sleep);
+            if (perr == std::errc() && ptr == retry_after.data() + retry_after.size()) {
+               std::this_thread::sleep_for(std::chrono::seconds(sec_sleep));
             }
          }
          ++retry;

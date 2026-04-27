@@ -20,15 +20,14 @@ using namespace fc::crypto;
 using namespace fc::crypto::ethereum;
 using namespace fc::network::json_rpc;
 
-class block_tag {
-public:
+struct block_tag {
    enum class labeled { latest, pending, earliest, not_valid };
    explicit block_tag(labeled name);
    explicit block_tag(uint64_t bn);
    std::string to_string() const;
 
-   labeled  kind;
-   uint64_t number;
+   const labeled  kind;
+   const uint64_t number;
 };
 
 inline const block_tag block_tag_latest(block_tag::labeled::latest);

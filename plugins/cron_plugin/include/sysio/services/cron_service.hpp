@@ -243,28 +243,31 @@ public:
          std::call_once(fired, [&]() { done_promise.set_value(); });
       };
 
+      using ResultT = typename std::invoke_result_t<Fn, Args...>::value_type;
+      std::promise<std::expected<ResultT, fc::exception>> promise;
+      auto future = promise.get_future();
+      std::once_flag fired;
+
       auto retry_fn = [&, attempt = 0]() mutable {
          try {
-            ret = fn(std::forward<Args>(args)...);
-            if (ret.has_value() || ++attempt >= opts.max_retries)
-               signal_done();
+            auto r = fn(std::forward<Args>(args)...);   // local, per-invocation
+            if (r.has_value())
+               std::call_once(fired, [&]{ promise.set_value(std::move(*r)); });
+            else if (++attempt >= opts.max_retries)
+               std::call_once(fired, [&]{ promise.set_value(std::unexpected(opts.on_exhaustion())); });
          } catch (const fc::exception& e) {
-            error = e.dynamic_copy_exception();
-            signal_done();
+            auto err = e.dynamic_copy_exception();
+            std::call_once(fired, [&, err]{ promise.set_value(std::unexpected(std::move(*err))); });
          }
       };
 
-      auto scheduled_id = this->add(opts.retry_schedule, retry_fn);
-      done_future.wait();
+      auto scheduled_id = this->add(opts.retry_schedule, retry_fn,
+         job_metadata_t{
+            .one_at_a_time = true, .tags = {"ethereum", "gas"}, .label = "beacon_chain_startup"
+         });
+      const auto result = future.get();
       this->cancel(scheduled_id);
-
-      if (error)
-         return std::unexpected(std::move(*error));
-
-      if (ret.has_value())
-         return std::move(*ret);
-
-      return std::unexpected(opts.on_exhaustion());
+      return result;
    }
 
    explicit cron_service(const options& options);

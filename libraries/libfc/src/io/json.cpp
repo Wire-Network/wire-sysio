@@ -320,6 +320,7 @@ namespace fc
         s += in.get();
       }
       bool done = false;
+      variant ret;
 
       try
       {
@@ -350,7 +351,8 @@ namespace fc
                  if( isalnum( c ) )
                  {
                     s += string_from_token( in );
-                    return s;
+                    ret = std::move(s);
+                    return ret;
                  }
                 done = true;
                 break;
@@ -371,15 +373,21 @@ namespace fc
          : std::string_view{};
 
       // if the string is empty and we dropped zeros
-      if (str.empty() && no_neg_start < start)
-         return 0u;
+      if (str.empty() && no_neg_start < start) {
+         ret = 0u;
+         return ret;
+      }
 
       // check for s== ".", "-","-.", since "[-]0*" is checked above
       if (str == "." || str.empty()) // check the obviously wrong things we could have encountered
          FC_THROW_EXCEPTION(parse_error_exception, "Can't parse token \"{}\" as a JSON numeric constant", str);
 
-      if( dot )
-         return parser_type == json::parse_type::legacy_parser_with_string_doubles ? variant(s) : variant(to_double(s));
+      if( dot ) {
+         ret = parser_type == json::parse_type::legacy_parser_with_string_doubles
+               ? variant(std::move(s))
+               : variant(to_double(s));
+         return ret;
+      }
 
       if( neg ) {
          if (str.length() > int256_max_str.length() ||
@@ -393,10 +401,12 @@ namespace fc
          fc::int256 val256(str);
          val256 *= -1;
          if( val256 >= std::numeric_limits<int64_t>::min() ) {
-            return static_cast<int64_t>(val256);
+            ret = static_cast<int64_t>(val256);
+            return ret;
          }
 
-         return val256;
+         ret = std::move(val256);
+         return ret;
       }
 
       if (str.length() > uint256_max_str.length() ||
@@ -409,10 +419,12 @@ namespace fc
       // since a leading 0 with only digits between 0 and 7 are assumed to be octal
       fc::uint256 val256(str);
       if( val256 <= std::numeric_limits<uint64_t>::max() ) {
-         return static_cast<uint64_t>(val256);
+         ret = static_cast<uint64_t>(val256);
+         return ret;
       }
 
-      return val256;
+      ret = std::move(val256);
+      return ret;
    }
 
    template<typename T>
