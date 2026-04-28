@@ -150,7 +150,7 @@ void chain_api_plugin::plugin_startup() {
    // delivered to the http thread pool (closure vs variant tree).
    _http_plugin.add_api_stream({
       CHAIN_RO_CALL_STREAM(get_activated_protocol_features, chain_apis::read_only::get_activated_protocol_features_results, 200, http_params_types::possible_no_params),
-      CHAIN_RO_CALL_STREAM_POST(get_block, fc::variant, 200, http_params_types::params_required), // _POST because get_block() returns a lambda to be executed on the http thread pool
+      CHAIN_RO_CALL_STREAM_POST_DIRECT(get_block, 200, http_params_types::params_required), // _POST because get_block_stream() returns a lambda to be executed on the http thread pool
       CHAIN_RO_CALL_STREAM(get_block_info, fc::variant, 200, http_params_types::params_required),
       CHAIN_RO_CALL_STREAM(get_block_header_state, fc::variant, 200, http_params_types::params_required),
       CHAIN_RO_CALL_STREAM(get_code, chain_apis::read_only::get_code_results, 200, http_params_types::params_required),

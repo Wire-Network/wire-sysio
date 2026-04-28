@@ -1,5 +1,6 @@
 #pragma once
 #include <sysio/chain/abi_def.hpp>
+#include <sysio/chain/abi_sinks.hpp>
 #include <sysio/chain/trace.hpp>
 #include <sysio/chain/contract_types.hpp>
 #include <sysio/chain/exceptions.hpp>
@@ -113,6 +114,15 @@ struct abi_serializer {
    static void to_log_variant( const T& o, fc::variant& vo, const Resolver& resolver, const yield_function_t& yield );
    template<typename T, typename Resolver>
    static void to_log_variant( const T& o, fc::variant& vo, const Resolver& resolver, const fc::microseconds& max_action_data_serialization_time );
+
+   /// Streaming counterpart to `to_variant`: emits the same JSON shape directly into
+   /// `w` without building an intermediate `fc::variant` tree.  Reflected types route
+   /// through the same `impl::abi_to_variant` machinery, which is sink-templated -- the
+   /// only difference between this path and `to_variant` is the sink instance passed in.
+   template<typename T, typename Resolver>
+   static void to_json_stream( const T& o, fc::json_writer& w, const Resolver& resolver, const yield_function_t& yield );
+   template<typename T, typename Resolver>
+   static void to_json_stream( const T& o, fc::json_writer& w, const Resolver& resolver, const fc::microseconds& max_action_data_serialization_time );
 
    template<typename T, typename Resolver>
    static void from_variant( const fc::variant& v, T& o, const Resolver& resolver, const yield_function_t& yield );
@@ -421,161 +431,203 @@ namespace impl {
    template<typename T>
    using require_abi_t = std::enable_if_t<type_requires_abi_v<T>(), int>;
 
+   /// Sink-parameterised emitter for ABI-aware reflected types.  The same template
+   /// body drives both `abi_serializer::to_variant<T>` (variant_sink) and
+   /// `abi_serializer::to_json_stream<T>` (stream_sink) -- no logic is duplicated
+   /// across the two output paths.  Each `add` overload emits one named field at
+   /// the current sink frame; nested objects/arrays open a sub-frame.
    struct abi_to_variant {
-      /**
-       * template which overloads add for types which are not relevant to ABI information
-       * and can be degraded to the normal ::to_variant(...) processing
-       */
-      template<typename M, typename Resolver, not_require_abi_t<M> = 1>
-      static void add( mutable_variant_object &mvo, const char* name, const M& v, const Resolver&, abi_traverse_context& ctx )
+      // Non-ABI types: bottom out into the sink's generic emit (which is
+      // fc::variant(v) for variant_sink and fc::to_json_stream(v, w) for stream_sink).
+      template<typename Sink, typename M, typename Resolver, not_require_abi_t<M> = 1>
+      static void add( Sink& sink, std::string_view name, const M& v, const Resolver&, abi_traverse_context& ctx )
       {
          auto h = ctx.enter_scope();
-         mvo(name,v);
+         sink.key(name);
+         sink.template emit<M>(v);
       }
 
-      /**
-       * template which overloads add for types which contain ABI information in their trees
-       * for these types we create new ABI aware visitors
-       */
-      template<typename M, typename Resolver, require_abi_t<M> = 1>
-      static void add( mutable_variant_object &mvo, const char* name, const M& v, const Resolver& resolver, abi_traverse_context& ctx );
+      // ABI types: walk through fc::reflector via abi_to_variant_visitor.
+      template<typename Sink, typename M, typename Resolver, require_abi_t<M> = 1>
+      static void add( Sink& sink, std::string_view name, const M& v, const Resolver& resolver, abi_traverse_context& ctx );
 
-      /**
-       * template which overloads add for vectors of types which contain ABI information in their trees
-       * for these members we call ::add in order to trigger further processing
-       */
-      template<typename M, typename Resolver, require_abi_t<M> = 1>
-      static void add( mutable_variant_object &mvo, const char* name, const vector<M>& v, const Resolver& resolver, abi_traverse_context& ctx )
+      // vector<M> of ABI-bearing M.
+      template<typename Sink, typename M, typename Resolver, require_abi_t<M> = 1>
+      static void add( Sink& sink, std::string_view name, const vector<M>& v, const Resolver& resolver, abi_traverse_context& ctx )
       {
          auto h = ctx.enter_scope();
-         fc::variants array;
-         array.reserve(v.size());
-
-         for (const auto& iter: v) {
-            mutable_variant_object elem_mvo;
-            add(elem_mvo, "_", iter, resolver, ctx);
-            array.emplace_back(std::move(elem_mvo["_"]));
+         sink.key(name);
+         sink.begin_array();
+         for( const auto& iter : v ) {
+            add_value( sink, iter, resolver, ctx );
          }
-         mvo(name, std::move(array));
+         sink.end_array();
       }
 
-      /**
-      * template which overloads add for deques of types which contain ABI information in their trees
-      * for these members we call ::add in order to trigger further processing
-      */
-      template<typename M, typename Resolver, require_abi_t<M> = 1>
-      static void add( mutable_variant_object &mvo, const char* name, const deque<M>& v, const Resolver& resolver, abi_traverse_context& ctx )
+      // deque<M> of ABI-bearing M.
+      template<typename Sink, typename M, typename Resolver, require_abi_t<M> = 1>
+      static void add( Sink& sink, std::string_view name, const deque<M>& v, const Resolver& resolver, abi_traverse_context& ctx )
       {
          auto h = ctx.enter_scope();
-         deque<fc::variant> array;
-
-         for (const auto& iter: v) {
-            mutable_variant_object elem_mvo;
-            add(elem_mvo, "_", iter, resolver, ctx);
-            array.emplace_back(std::move(elem_mvo["_"]));
+         sink.key(name);
+         sink.begin_array();
+         for( const auto& iter : v ) {
+            add_value( sink, iter, resolver, ctx );
          }
-         mvo(name, std::move(array));
+         sink.end_array();
       }
-      /**
-       * template which overloads add for shared_ptr of types which contain ABI information in their trees
-       * for these members we call ::add in order to trigger further processing
-       */
-      template<typename M, typename Resolver, require_abi_t<M> = 1>
-      static void add( mutable_variant_object &mvo, const char* name, const std::shared_ptr<M>& v, const Resolver& resolver, abi_traverse_context& ctx )
+
+      // shared_ptr<M> of ABI-bearing M.  Null pointer is a no-op (matches the
+      // pre-Sink behaviour of skipping the field entirely).
+      template<typename Sink, typename M, typename Resolver, require_abi_t<M> = 1>
+      static void add( Sink& sink, std::string_view name, const std::shared_ptr<M>& v, const Resolver& resolver, abi_traverse_context& ctx )
       {
          auto h = ctx.enter_scope();
          if( !v ) return;
-         mutable_variant_object obj_mvo;
-         add(obj_mvo, "_", *v, resolver, ctx);
-         mvo(name, std::move(obj_mvo["_"]));
+         sink.key(name);
+         add_value( sink, *v, resolver, ctx );
       }
 
-      template<typename Resolver>
+      // Element-position emitter used by container helpers above and by the
+      // top-level `to_variant<T>` / `to_json_stream<T>` entry points.  Emits the
+      // value at the current (array or top-level) sink position with no leading
+      // key.  Specialised for each container shape recognised by `add` so that
+      // recursion through nested containers does not bottom-out into the
+      // reflector path with a container type as `M`.
+      template<typename Sink, typename M, typename Resolver, not_require_abi_t<M> = 1>
+      static void add_value( Sink& sink, const M& v, const Resolver&, abi_traverse_context& ctx )
+      {
+         auto h = ctx.enter_scope();
+         sink.template emit<M>(v);
+      }
+      template<typename Sink, typename M, typename Resolver, require_abi_t<M> = 1>
+      static void add_value( Sink& sink, const M& v, const Resolver& resolver, abi_traverse_context& ctx );
+
+      // Container-shape specialisations: walk through to the element add_value.
+      template<typename Sink, typename M, typename Resolver, require_abi_t<M> = 1>
+      static void add_value( Sink& sink, const vector<M>& v, const Resolver& resolver, abi_traverse_context& ctx )
+      {
+         auto h = ctx.enter_scope();
+         sink.begin_array();
+         for( const auto& iter : v ) {
+            add_value( sink, iter, resolver, ctx );
+         }
+         sink.end_array();
+      }
+      template<typename Sink, typename M, typename Resolver, require_abi_t<M> = 1>
+      static void add_value( Sink& sink, const deque<M>& v, const Resolver& resolver, abi_traverse_context& ctx )
+      {
+         auto h = ctx.enter_scope();
+         sink.begin_array();
+         for( const auto& iter : v ) {
+            add_value( sink, iter, resolver, ctx );
+         }
+         sink.end_array();
+      }
+      template<typename Sink, typename M, typename Resolver, require_abi_t<M> = 1>
+      static void add_value( Sink& sink, const std::shared_ptr<M>& v, const Resolver& resolver, abi_traverse_context& ctx )
+      {
+         auto h = ctx.enter_scope();
+         if( !v ) { sink.value_null(); return; }
+         add_value( sink, *v, resolver, ctx );
+      }
+      template<typename Sink, typename Resolver, typename... Args>
+      static void add_value( Sink& sink, const std::variant<Args...>& v, const Resolver& resolver, abi_traverse_context& ctx )
+      {
+         auto h = ctx.enter_scope();
+         add_static_variant<Sink, Resolver> adder( sink, resolver, ctx );
+         std::visit( adder, v );
+      }
+
+      // std::variant<...>: dispatch the active alternative through the visitor.
+      template<typename Sink, typename Resolver>
       struct add_static_variant
       {
-         mutable_variant_object& obj_mvo;
+         Sink& sink;
          const Resolver& resolver;
          abi_traverse_context& ctx;
-
-         add_static_variant( mutable_variant_object& o, const Resolver& r, abi_traverse_context& ctx )
-               :obj_mvo(o), resolver(r), ctx(ctx) {}
+         add_static_variant( Sink& s, const Resolver& r, abi_traverse_context& c ) : sink(s), resolver(r), ctx(c) {}
 
          typedef void result_type;
-         template<typename T> void operator()( T& v )const
+         template<typename T> void operator()( T& v ) const
          {
-            add(obj_mvo, "_", v, resolver, ctx);
+            add_value( sink, v, resolver, ctx );
          }
       };
 
-      template<typename Resolver, typename... Args>
-      static void add( mutable_variant_object &mvo, const char* name, const std::variant<Args...>& v, const Resolver& resolver, abi_traverse_context& ctx )
+      template<typename Sink, typename Resolver, typename... Args>
+      static void add( Sink& sink, std::string_view name, const std::variant<Args...>& v, const Resolver& resolver, abi_traverse_context& ctx )
       {
          auto h = ctx.enter_scope();
-         mutable_variant_object obj_mvo;
-         add_static_variant<Resolver> adder(obj_mvo, resolver, ctx);
-         std::visit(adder, v);
-         mvo(name, std::move(obj_mvo["_"]));
+         sink.key(name);
+         add_static_variant<Sink, Resolver> adder( sink, resolver, ctx );
+         std::visit( adder, v );
       }
 
-      template<typename Resolver>
-      static bool add_special_logging( mutable_variant_object& mvo, const char* name, const action& act, const Resolver& resolver, abi_traverse_context& ctx ) {
+      // Logging-mode side-effect for sysio::setcode -- inject `code_hash` next to
+      // the existing `data`/`hex_data` fields.  Returns false either way; callers
+      // still emit `data` afterwards.  No-op outside logging mode.
+      template<typename Sink, typename Resolver>
+      static bool add_special_logging( Sink& sink, const action& act, const Resolver& /*resolver*/, abi_traverse_context& ctx ) {
          if( !ctx.is_logging() ) return false;
-
          try {
-
             if( act.account == sysio::chain::config::system_account_name && act.name == "setcode"_n ) {
                auto setcode_act = act.data_as<setcode>();
                if( setcode_act.code.size() > 0 ) {
                   fc::sha256 code_hash = fc::sha256::hash(setcode_act.code.data(), (uint32_t) setcode_act.code.size());
-                  mvo("code_hash", code_hash);
+                  sink.key("code_hash");
+                  sink.template emit<fc::sha256>(code_hash);
                }
                return false; // still want the hex data included
             }
-
          } catch(...) {} // return false
-
          return false;
       }
 
-      /**
-       * overload of to_variant_object for actions
-       *
-       * This matches the FC_REFLECT for this type, but this is provided to extract the contents of act.data
-       * @tparam Resolver
-       * @param act
-       * @param resolver
-       * @return
-       */
-      template<typename Resolver>
-      static void add( mutable_variant_object &out, const char* name, const action& act, const Resolver& resolver, abi_traverse_context& ctx )
+      // Emit `bytes` either as raw hex (non-logging) or as the
+      // `{size, hex|trimmed_hex}` log shape.  Used for `data` and `hex_data`
+      // fields on `action`.
+      template<typename Sink>
+      static void emit_action_bytes_field( Sink& sink, std::string_view name, const bytes& data, abi_traverse_context& ctx )
+      {
+         sink.key(name);
+         if( !ctx.is_logging() ) {
+            sink.template emit<bytes>(data);
+            return;
+         }
+         sink.begin_object();
+         sink.key("size");
+         sink.value_uint64(data.size());
+         if( data.size() > impl::hex_log_max_size ) {
+            sink.key("trimmed_hex");
+            sink.template emit<bytes>( bytes(&data[0], &data[0] + impl::hex_log_max_size) );
+         } else {
+            sink.key("hex");
+            sink.template emit<bytes>(data);
+         }
+         sink.end_object();
+      }
+
+      /// Action: matches the FC_REFLECT shape but routes `data` through the
+      /// resolver-located ABI to decode action arguments inline.  The body lives
+      /// on `add_value` so the top-level `to_variant<action>` entry hits the
+      /// special handling rather than the reflector-based generic path.
+      template<typename Sink, typename Resolver>
+      static void add_value( Sink& sink, const action& act, const Resolver& resolver, abi_traverse_context& ctx )
       {
          static_assert(fc::reflector<action>::total_member_count == 4);
          auto h = ctx.enter_scope();
-         mutable_variant_object mvo;
-         mvo("account", act.account);
-         mvo("name", act.name);
-         mvo("authorization", act.authorization);
+         sink.begin_object();
+         add( sink, "account", act.account, resolver, ctx );
+         add( sink, "name", act.name, resolver, ctx );
+         add( sink, "authorization", act.authorization, resolver, ctx );
 
-         if( add_special_logging(mvo, name, act, resolver, ctx) ) {
-            out(name, std::move(mvo));
+         if( add_special_logging( sink, act, resolver, ctx ) ) {
+            sink.end_object();
             return;
          }
 
-         auto set_hex_data = [&](mutable_variant_object& mvo, const char* name, const bytes& data) {
-            if( !ctx.is_logging() ) {
-               mvo(name, data);
-            } else {
-               fc::mutable_variant_object sub_obj;
-               sub_obj( "size", data.size() );
-               if( data.size() > impl::hex_log_max_size ) {
-                  sub_obj( "trimmed_hex", std::vector<char>(&data[0], &data[0] + impl::hex_log_max_size) );
-               } else {
-                  sub_obj( "hex", data );
-               }
-               mvo(name, std::move(sub_obj));
-            }
-         };
-
+         bool data_emitted = false;
          try {
             auto abi_optional = resolver(act.account);
             if (abi_optional) {
@@ -583,211 +635,218 @@ namespace impl {
                auto type = abi.get_action_type(act.name);
                if (!type.empty()) {
                   try {
-                     action_data_to_variant_context _ctx(abi, ctx, type);
-                     mvo( "data", abi._binary_to_variant( type, act.data, _ctx ));
+                     sink.key("data");
+                     sink.unpack_action_data(abi, type, act.data, ctx, /*short_path*/ false);
+                     data_emitted = true;
                   } catch(...) {
-                     // any failure to serialize data, then leave as not serialized
-                     set_hex_data(mvo, "data", act.data);
+                     // serialization failure -- fall back to hex below
                   }
-               } else {
-                  set_hex_data(mvo, "data", act.data);
                }
-            } else {
-               set_hex_data(mvo, "data", act.data);
             }
-         } catch(...) {
-            set_hex_data(mvo, "data", act.data);
+         } catch(...) { /* fall back to hex below */ }
+         if( !data_emitted ) {
+            emit_action_bytes_field( sink, "data", act.data, ctx );
          }
-         set_hex_data(mvo, "hex_data", act.data);
-         out(name, std::move(mvo));
+         emit_action_bytes_field( sink, "hex_data", act.data, ctx );
+         sink.end_object();
       }
 
-      /**
-       * overload of to_variant_object for action_trace
-       *
-       * This matches the FC_REFLECT for this type, but this is provided to extract the contents of action_trace.return_value
-       * @tparam Resolver
-       * @param action_trace
-       * @param resolver
-       * @return
-       */
-      template<typename Resolver>
-      static void add( mutable_variant_object& out, const char* name, const action_trace& act_trace, const Resolver& resolver, abi_traverse_context& ctx )
+      template<typename Sink, typename Resolver>
+      static void add( Sink& sink, std::string_view name, const action& act, const Resolver& resolver, abi_traverse_context& ctx )
+      {
+         sink.key(name);
+         add_value( sink, act, resolver, ctx );
+      }
+
+      /// action_trace: matches FC_REFLECT shape; routes `return_value` through the
+      /// resolver-located ABI when an action_result type is registered.
+      template<typename Sink, typename Resolver>
+      static void add_value( Sink& sink, const action_trace& act_trace, const Resolver& resolver, abi_traverse_context& ctx )
       {
          static_assert(fc::reflector<action_trace>::total_member_count == 19);
          auto h = ctx.enter_scope();
-         mutable_variant_object mvo;
+         sink.begin_object();
+         add( sink, "action_ordinal", act_trace.action_ordinal, resolver, ctx );
+         add( sink, "creator_action_ordinal", act_trace.creator_action_ordinal, resolver, ctx );
+         add( sink, "closest_unnotified_ancestor_action_ordinal", act_trace.closest_unnotified_ancestor_action_ordinal, resolver, ctx );
+         add( sink, "receipt", act_trace.receipt, resolver, ctx );
+         add( sink, "receiver", act_trace.receiver, resolver, ctx );
+         add( sink, "act", act_trace.act, resolver, ctx );
+         add( sink, "context_free", act_trace.context_free, resolver, ctx );
+         add( sink, "elapsed", act_trace.elapsed, resolver, ctx );
+         add( sink, "cpu_usage_us", act_trace.cpu_usage_us, resolver, ctx );
+         add( sink, "net_usage", act_trace.net_usage, resolver, ctx );
+         add( sink, "console", act_trace.console, resolver, ctx );
+         add( sink, "trx_id", act_trace.trx_id, resolver, ctx );
+         add( sink, "block_num", act_trace.block_num, resolver, ctx );
+         add( sink, "block_time", act_trace.block_time, resolver, ctx );
+         add( sink, "producer_block_id", act_trace.producer_block_id, resolver, ctx );
+         add( sink, "account_ram_deltas", act_trace.account_ram_deltas, resolver, ctx );
+         add( sink, "except", act_trace.except, resolver, ctx );
+         add( sink, "error_code", act_trace.error_code, resolver, ctx );
+         add( sink, "return_value_hex_data", act_trace.return_value, resolver, ctx );
 
-         mvo("action_ordinal", act_trace.action_ordinal);
-         mvo("creator_action_ordinal", act_trace.creator_action_ordinal);
-         mvo("closest_unnotified_ancestor_action_ordinal", act_trace.closest_unnotified_ancestor_action_ordinal);
-         mvo("receipt", act_trace.receipt);
-         mvo("receiver", act_trace.receiver);
-         add(mvo, "act", act_trace.act, resolver, ctx);
-         mvo("context_free", act_trace.context_free);
-         mvo("elapsed", act_trace.elapsed);
-         mvo("cpu_usage_us", act_trace.cpu_usage_us);
-         mvo("net_usage", act_trace.net_usage);
-         mvo("console", act_trace.console);
-         mvo("trx_id", act_trace.trx_id);
-         mvo("block_num", act_trace.block_num);
-         mvo("block_time", act_trace.block_time);
-         mvo("producer_block_id", act_trace.producer_block_id);
-         mvo("account_ram_deltas", act_trace.account_ram_deltas);
-         mvo("except", act_trace.except);
-         mvo("error_code", act_trace.error_code);
-
-         mvo("return_value_hex_data", act_trace.return_value);
-         auto act = act_trace.act;
          try {
-            auto abi_optional = resolver(act.account);
+            auto abi_optional = resolver(act_trace.act.account);
             if (abi_optional) {
                const abi_serializer& abi = *abi_optional;
-               auto type = abi.get_action_result_type(act.name);
+               auto type = abi.get_action_result_type(act_trace.act.name);
                if (!type.empty()) {
-                  action_data_to_variant_context _ctx(abi, ctx, type);
-                  mvo( "return_value_data", abi._binary_to_variant( type, act_trace.return_value, _ctx ));
+                  sink.key("return_value_data");
+                  sink.unpack_action_data(abi, type, act_trace.return_value, ctx, /*short_path*/ false);
                }
             }
          } catch(...) {}
-         out(name, std::move(mvo));
+         sink.end_object();
       }
 
-      /**
-       * overload of to_variant_object for packed_transaction
-       *
-       * This matches the FC_REFLECT for this type, but this is provided to allow extracting the contents of ptrx.transaction
-       * @tparam Resolver
-       * @param act
-       * @param resolver
-       * @return
-       */
-      template<typename Resolver>
-      static void add( mutable_variant_object &out, const char* name, const packed_transaction& ptrx, const Resolver& resolver, abi_traverse_context& ctx )
+      template<typename Sink, typename Resolver>
+      static void add( Sink& sink, std::string_view name, const action_trace& act_trace, const Resolver& resolver, abi_traverse_context& ctx )
+      {
+         sink.key(name);
+         add_value( sink, act_trace, resolver, ctx );
+      }
+
+      /// packed_transaction: extract the inner transaction so consumers see action
+      /// data fully decoded rather than a packed-bytes blob.
+      template<typename Sink, typename Resolver>
+      static void add_value( Sink& sink, const packed_transaction& ptrx, const Resolver& resolver, abi_traverse_context& ctx )
       {
          static_assert(fc::reflector<packed_transaction>::total_member_count == 4);
          auto h = ctx.enter_scope();
-         mutable_variant_object mvo;
+         sink.begin_object();
          auto trx = ptrx.get_transaction();
-         mvo("id", trx.id());
-         mvo("signatures", ptrx.get_signatures());
-         mvo("compression", ptrx.get_compression());
-         mvo("packed_context_free_data", ptrx.get_packed_context_free_data());
-         mvo("context_free_data", ptrx.get_context_free_data());
+         add( sink, "id", trx.id(), resolver, ctx );
+         add( sink, "signatures", ptrx.get_signatures(), resolver, ctx );
+         add( sink, "compression", ptrx.get_compression(), resolver, ctx );
+         add( sink, "packed_context_free_data", ptrx.get_packed_context_free_data(), resolver, ctx );
+         add( sink, "context_free_data", ptrx.get_context_free_data(), resolver, ctx );
          if( !ctx.is_logging() )
-            mvo("packed_trx", ptrx.get_packed_transaction());
-         add(mvo, "transaction", trx, resolver, ctx);
-
-         out(name, std::move(mvo));
+            add( sink, "packed_trx", ptrx.get_packed_transaction(), resolver, ctx );
+         add( sink, "transaction", trx, resolver, ctx );
+         sink.end_object();
       }
 
-      /**
-       * overload of to_variant_object for transaction
-       *
-       * This matches the FC_REFLECT for this type, but this is provided to allow extracting the contents of trx.transaction_extensions
-       */
-      template<typename Resolver>
-      static void add( mutable_variant_object &out, const char* name, const transaction& trx, const Resolver& resolver, abi_traverse_context& ctx )
+      template<typename Sink, typename Resolver>
+      static void add( Sink& sink, std::string_view name, const packed_transaction& ptrx, const Resolver& resolver, abi_traverse_context& ctx )
+      {
+         sink.key(name);
+         add_value( sink, ptrx, resolver, ctx );
+      }
+
+      /// transaction: per FC_REFLECT but recurses into context_free_actions and
+      /// actions through the ABI-aware action overload above.
+      template<typename Sink, typename Resolver>
+      static void add_value( Sink& sink, const transaction& trx, const Resolver& resolver, abi_traverse_context& ctx )
       {
          static_assert(fc::reflector<transaction>::total_member_count == 9);
          auto h = ctx.enter_scope();
-         mutable_variant_object mvo;
-         mvo("expiration", trx.expiration);
-         mvo("ref_block_num", trx.ref_block_num);
-         mvo("ref_block_prefix", trx.ref_block_prefix);
-         mvo("max_net_usage_words", trx.max_net_usage_words);
-         mvo("max_cpu_usage_ms", trx.max_cpu_usage_ms);
-         mvo("delay_sec", trx.delay_sec);
-         add(mvo, "context_free_actions", trx.context_free_actions, resolver, ctx);
-         add(mvo, "actions", trx.actions, resolver, ctx);
-
+         sink.begin_object();
+         add( sink, "expiration", trx.expiration, resolver, ctx );
+         add( sink, "ref_block_num", trx.ref_block_num, resolver, ctx );
+         add( sink, "ref_block_prefix", trx.ref_block_prefix, resolver, ctx );
+         add( sink, "max_net_usage_words", trx.max_net_usage_words, resolver, ctx );
+         add( sink, "max_cpu_usage_ms", trx.max_cpu_usage_ms, resolver, ctx );
+         add( sink, "delay_sec", trx.delay_sec, resolver, ctx );
+         add( sink, "context_free_actions", trx.context_free_actions, resolver, ctx );
+         add( sink, "actions", trx.actions, resolver, ctx );
          // No transaction extensions are currently supported.
-         // When extensions are added in the future, deserialize them here.
-
-         out(name, std::move(mvo));
+         sink.end_object();
       }
 
-      /**
-       * overload of to_variant_object for signed_block
-       *
-       * This matches the FC_REFLECT for this type, but this is provided to allow extracting the contents of
-       * block.header_extensions and block.block_extensions
-       */
-      template<typename Resolver>
-      static void add( mutable_variant_object &out, const char* name, const signed_block& block, const Resolver& resolver, abi_traverse_context& ctx )
+      template<typename Sink, typename Resolver>
+      static void add( Sink& sink, std::string_view name, const transaction& trx, const Resolver& resolver, abi_traverse_context& ctx )
+      {
+         sink.key(name);
+         add_value( sink, trx, resolver, ctx );
+      }
+
+      /// Emit the inline (no begin/end_object) field set for `signed_block`.
+      /// Exposed so that callers with extra wrapper fields (eg `convert_block`'s
+      /// `id` / `block_num` / `ref_block_prefix`) can interleave them with the
+      /// reflected-block fields inside a single JSON object.
+      template<typename Sink, typename Resolver>
+      static void emit_signed_block_body( Sink& sink, const signed_block& block, const Resolver& resolver, abi_traverse_context& ctx )
       {
          static_assert(fc::reflector<signed_block>::total_member_count == 13);
-         auto h = ctx.enter_scope();
-         mutable_variant_object mvo;
-         mvo("timestamp", block.timestamp);
-         mvo("producer", block.producer);
-         mvo("previous", block.previous);
-         mvo("transaction_mroot", block.transaction_mroot);
-         mvo("finality_mroot", block.finality_mroot);
-         mvo("qc_claim", block.qc_claim);
-         mvo("new_finalizer_policy_diff", block.new_finalizer_policy_diff);
-         mvo("new_proposer_policy_diff", block.new_proposer_policy_diff);
+         add( sink, "timestamp", block.timestamp, resolver, ctx );
+         add( sink, "producer", block.producer, resolver, ctx );
+         add( sink, "previous", block.previous, resolver, ctx );
+         add( sink, "transaction_mroot", block.transaction_mroot, resolver, ctx );
+         add( sink, "finality_mroot", block.finality_mroot, resolver, ctx );
+         add( sink, "qc_claim", block.qc_claim, resolver, ctx );
+         add( sink, "new_finalizer_policy_diff", block.new_finalizer_policy_diff, resolver, ctx );
+         add( sink, "new_proposer_policy_diff", block.new_proposer_policy_diff, resolver, ctx );
 
-         // process contents of block.header_extensions
          flat_multimap<uint16_t, block_header_extension> header_exts = block.validate_and_extract_header_extensions();
          if (auto it = header_exts.find(protocol_feature_activation::extension_id()); it != header_exts.end()) {
             const auto& new_protocol_features = std::get<protocol_feature_activation>(it->second).protocol_features;
-            fc::variants pf_array;
-            pf_array.reserve(new_protocol_features.size());
+            sink.key("new_protocol_features");
+            sink.begin_array();
             for (auto feature : new_protocol_features) {
-               mutable_variant_object feature_mvo;
-               add(feature_mvo, "feature_digest", feature, resolver, ctx);
-               pf_array.push_back(std::move(feature_mvo));
+               sink.begin_object();
+               add( sink, "feature_digest", feature, resolver, ctx );
+               sink.end_object();
             }
-            mvo("new_protocol_features", pf_array);
+            sink.end_array();
          }
 
-         mvo("producer_signatures", block.producer_signatures);
-         add(mvo, "transactions", block.transactions, resolver, ctx);
+         add( sink, "producer_signatures", block.producer_signatures, resolver, ctx );
+         add( sink, "transactions", block.transactions, resolver, ctx );
 
          if (block.qc) {
-            mvo("qc", *block.qc);
+            add( sink, "qc", *block.qc, resolver, ctx );
          }
+      }
 
-         out(name, std::move(mvo));
+      template<typename Sink, typename Resolver>
+      static void add_value( Sink& sink, const signed_block& block, const Resolver& resolver, abi_traverse_context& ctx )
+      {
+         auto h = ctx.enter_scope();
+         sink.begin_object();
+         emit_signed_block_body( sink, block, resolver, ctx );
+         sink.end_object();
+      }
+
+      template<typename Sink, typename Resolver>
+      static void add( Sink& sink, std::string_view name, const signed_block& block, const Resolver& resolver, abi_traverse_context& ctx )
+      {
+         sink.key(name);
+         add_value( sink, block, resolver, ctx );
       }
    };
 
    /**
-    * Reflection visitor that uses a resolver to resolve ABIs for nested types
-    * this will degrade to the common fc::to_variant as soon as the type no longer contains
-    * ABI related info
+    * Reflection visitor that drives `abi_to_variant::add` over each member of T,
+    * resolving ABIs for nested ABI-bearing types via the supplied Resolver.  Now
+    * sink-templated so the same visitor walks reflected fields for both the
+    * variant-building and stream-emitting paths.
     *
-    * @tparam Resolver - callable with the signature (const name& code_account) -> std::optional<abi_def>
+    * @tparam Sink     - emit target (variant_sink or stream_sink)
+    * @tparam T        - the reflected type whose members are being visited
+    * @tparam Resolver - callable with signature (const name&) -> std::optional<abi_serializer>
     */
-   template<typename T, typename Resolver>
+   template<typename Sink, typename T, typename Resolver>
    class abi_to_variant_visitor
    {
       public:
-         abi_to_variant_visitor( mutable_variant_object& _mvo, const T& _val, const Resolver& _resolver, abi_traverse_context& _ctx )
-         :_vo(_mvo)
-         ,_val(_val)
-         ,_resolver(_resolver)
-         ,_ctx(_ctx)
+         abi_to_variant_visitor( Sink& s, const T& v, const Resolver& r, abi_traverse_context& c )
+         : _sink(s)
+         , _val(v)
+         , _resolver(r)
+         , _ctx(c)
          {}
 
-         /**
-          * Visit a single member and add it to the variant object
-          * @tparam Member - the member to visit
-          * @tparam Class - the class we are traversing
-          * @tparam member - pointer to the member
-          * @param name - the name of the member
-          */
-         template<typename Member, class Class, Member (Class::*member) >
+         template<typename Member, class Class, Member (Class::*member)>
          void operator()( const char* name )const
          {
-            abi_to_variant::add( _vo, name, (_val.*member), _resolver, _ctx );
+            abi_to_variant::add( _sink, name, (_val.*member), _resolver, _ctx );
          }
 
       private:
-         mutable_variant_object& _vo;
-         const T& _val;
-         const Resolver& _resolver;
+         Sink&                 _sink;
+         const T&              _val;
+         const Resolver&       _resolver;
          abi_traverse_context& _ctx;
    };
 
@@ -999,13 +1058,23 @@ namespace impl {
          abi_traverse_context& _ctx;
    };
 
-   template<typename M, typename Resolver, require_abi_t<M>>
-   void abi_to_variant::add( mutable_variant_object &mvo, const char* name, const M& v, const Resolver& resolver, abi_traverse_context& ctx )
+   template<typename Sink, typename M, typename Resolver, require_abi_t<M>>
+   void abi_to_variant::add( Sink& sink, std::string_view name, const M& v, const Resolver& resolver, abi_traverse_context& ctx )
    {
       auto h = ctx.enter_scope();
-      mutable_variant_object member_mvo;
-      fc::reflector<M>::visit( impl::abi_to_variant_visitor<M, Resolver>( member_mvo, v, resolver, ctx) );
-      mvo(name, std::move(member_mvo));
+      sink.key(name);
+      sink.begin_object();
+      fc::reflector<M>::visit( impl::abi_to_variant_visitor<Sink, M, Resolver>(sink, v, resolver, ctx) );
+      sink.end_object();
+   }
+
+   template<typename Sink, typename M, typename Resolver, require_abi_t<M>>
+   void abi_to_variant::add_value( Sink& sink, const M& v, const Resolver& resolver, abi_traverse_context& ctx )
+   {
+      auto h = ctx.enter_scope();
+      sink.begin_object();
+      fc::reflector<M>::visit( impl::abi_to_variant_visitor<Sink, M, Resolver>(sink, v, resolver, ctx) );
+      sink.end_object();
    }
 
    template<typename M, typename Resolver, require_abi_t<M>>
@@ -1019,36 +1088,50 @@ namespace impl {
 
 template<typename T, typename Resolver>
 void abi_serializer::to_variant( const T& o, fc::variant& vo, const Resolver& resolver, const yield_function_t& yield ) try {
-   mutable_variant_object mvo;
+   impl::variant_sink sink;
    impl::abi_traverse_context ctx( yield, fc::microseconds{} );
-   impl::abi_to_variant::add(mvo, "_", o, resolver, ctx);
-   vo = std::move(mvo["_"]);
+   impl::abi_to_variant::add_value(sink, o, resolver, ctx);
+   vo = std::move(sink).take_result();
 } FC_RETHROW_EXCEPTIONS(error, "Failed to serialize: {}", boost::core::demangle( typeid(o).name() ))
 
 template<typename T, typename Resolver>
 void abi_serializer::to_variant( const T& o, fc::variant& vo, const Resolver& resolver, const fc::microseconds& max_action_data_serialization_time ) try {
-   mutable_variant_object mvo;
+   impl::variant_sink sink;
    impl::abi_traverse_context ctx( create_depth_yield_function(), max_action_data_serialization_time );
-   impl::abi_to_variant::add(mvo, "_", o, resolver, ctx);
-   vo = std::move(mvo["_"]);
+   impl::abi_to_variant::add_value(sink, o, resolver, ctx);
+   vo = std::move(sink).take_result();
 } FC_RETHROW_EXCEPTIONS(error, "Failed to serialize: {}", boost::core::demangle( typeid(o).name() ))
 
 template<typename T, typename Resolver>
 void abi_serializer::to_log_variant( const T& o, fc::variant& vo, const Resolver& resolver, const yield_function_t& yield ) try {
-    mutable_variant_object mvo;
-    impl::abi_traverse_context ctx( yield, fc::microseconds{} );
-    ctx.logging();
-    impl::abi_to_variant::add(mvo, "_", o, resolver, ctx);
-    vo = std::move(mvo["_"]);
+   impl::variant_sink sink;
+   impl::abi_traverse_context ctx( yield, fc::microseconds{} );
+   ctx.logging();
+   impl::abi_to_variant::add_value(sink, o, resolver, ctx);
+   vo = std::move(sink).take_result();
 } FC_RETHROW_EXCEPTIONS(error, "Failed to serialize: {}", boost::core::demangle( typeid(o).name() ))
 
 template<typename T, typename Resolver>
 void abi_serializer::to_log_variant( const T& o, fc::variant& vo, const Resolver& resolver, const fc::microseconds& max_action_data_serialization_time ) try {
-   mutable_variant_object mvo;
+   impl::variant_sink sink;
    impl::abi_traverse_context ctx( create_depth_yield_function(), max_action_data_serialization_time );
    ctx.logging();
-   impl::abi_to_variant::add(mvo, "_", o, resolver, ctx);
-   vo = std::move(mvo["_"]);
+   impl::abi_to_variant::add_value(sink, o, resolver, ctx);
+   vo = std::move(sink).take_result();
+} FC_RETHROW_EXCEPTIONS(error, "Failed to serialize: {}", boost::core::demangle( typeid(o).name() ))
+
+template<typename T, typename Resolver>
+void abi_serializer::to_json_stream( const T& o, fc::json_writer& w, const Resolver& resolver, const yield_function_t& yield ) try {
+   impl::stream_sink sink(w);
+   impl::abi_traverse_context ctx( yield, fc::microseconds{} );
+   impl::abi_to_variant::add_value(sink, o, resolver, ctx);
+} FC_RETHROW_EXCEPTIONS(error, "Failed to serialize: {}", boost::core::demangle( typeid(o).name() ))
+
+template<typename T, typename Resolver>
+void abi_serializer::to_json_stream( const T& o, fc::json_writer& w, const Resolver& resolver, const fc::microseconds& max_action_data_serialization_time ) try {
+   impl::stream_sink sink(w);
+   impl::abi_traverse_context ctx( create_depth_yield_function(), max_action_data_serialization_time );
+   impl::abi_to_variant::add_value(sink, o, resolver, ctx);
 } FC_RETHROW_EXCEPTIONS(error, "Failed to serialize: {}", boost::core::demangle( typeid(o).name() ))
 
 template<typename T, typename Resolver>

@@ -1383,13 +1383,22 @@ void variant_sink::emit_value(fc::variant v) {
 
 void variant_sink::unpack_built_in(std::string_view ftype, fc::datastream<const char*>& stream,
                                    bool is_array, bool is_optional, abi_traverse_context& ctx) {
-   auto bv = abi_.find_built_in(ftype);
+   FC_ASSERT(abi_, "variant_sink::unpack_built_in requires the abi_serializer-bound constructor");
+   auto bv = abi_->find_built_in(ftype);
    FC_ASSERT(bv, "variant_sink::unpack_built_in: '{}' is not a built-in", std::string(ftype));
    emit_value(bv->first(stream, is_array, is_optional, ctx.get_yield_function()));
 }
 
 void variant_sink::unpack_protobuf(std::string_view ftype, fc::datastream<const char*>& stream) {
-   emit_value(abi_.pb_binary_to_variant(ftype, stream));
+   FC_ASSERT(abi_, "variant_sink::unpack_protobuf requires the abi_serializer-bound constructor");
+   emit_value(abi_->pb_binary_to_variant(ftype, stream));
+}
+
+void variant_sink::unpack_action_data(const abi_serializer& abi, std::string_view type, const bytes& data,
+                                      abi_traverse_context& ctx, bool short_path) {
+   action_data_to_variant_context inner(abi, ctx, type);
+   inner.short_path = short_path;
+   emit_value(abi._binary_to_variant(type, data, inner));
 }
 
 // -- stream_sink -------------------------------------------------------------------------
@@ -1462,7 +1471,8 @@ void stream_sink::unpack_built_in(std::string_view ftype, fc::datastream<const c
    // Variant-side may carry user overrides via add_specialized_unpack_pack that the
    // streaming dispatch does not mirror today.  Fall back to the variant unpack +
    // to_json_stream(variant, w) bridge so those overrides remain effective.
-   auto bv = abi_.find_built_in(ftype);
+   FC_ASSERT(abi_, "stream_sink::unpack_built_in requires the abi_serializer-bound constructor");
+   auto bv = abi_->find_built_in(ftype);
    FC_ASSERT(bv, "stream_sink::unpack_built_in: '{}' is not a built-in", std::string(ftype));
    auto v = bv->first(stream, is_array, is_optional, ctx.get_yield_function());
    value_variant(v);
@@ -1470,7 +1480,16 @@ void stream_sink::unpack_built_in(std::string_view ftype, fc::datastream<const c
 
 void stream_sink::unpack_protobuf(std::string_view ftype, fc::datastream<const char*>& stream) {
    // MessageToJsonString already produces JSON; splice it directly into the writer.
-   raw_value(abi_.pb_binary_to_json_string(ftype, stream));
+   FC_ASSERT(abi_, "stream_sink::unpack_protobuf requires the abi_serializer-bound constructor");
+   raw_value(abi_->pb_binary_to_json_string(ftype, stream));
+}
+
+void stream_sink::unpack_action_data(const abi_serializer& abi, std::string_view type, const bytes& data,
+                                     abi_traverse_context& ctx, bool short_path) {
+   action_data_to_variant_context inner(abi, ctx, type);
+   inner.short_path = short_path;
+   fc::datastream<const char*> ds(data.data(), data.size());
+   abi._binary_walk(type, ds, *this, inner);
 }
 
 } // namespace sysio::chain::impl

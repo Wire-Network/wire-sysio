@@ -1,8 +1,15 @@
 #pragma once
 
-#include <sysio/chain/abi_serializer.hpp>
+// Self-contained sink definitions consumed by abi_serializer's binary_walk and
+// abi_to_variant templates.  Deliberately forward-declares `abi_serializer` and
+// `abi_traverse_context` instead of including `abi_serializer.hpp`, since
+// abi_serializer.hpp includes this header before defining the templates that
+// use Sink.  Method bodies in abi_serializer.cpp see the full definitions.
+
+#include <sysio/chain/types.hpp>
 
 #include <fc/io/datastream.hpp>
+#include <fc/io/json.hpp>
 #include <fc/io/json_stream.hpp>
 #include <fc/reflect/json_stream.hpp>
 #include <fc/variant.hpp>
@@ -11,7 +18,13 @@
 #include <cstdint>
 #include <string>
 #include <string_view>
-#include <vector>
+
+namespace sysio::chain {
+   struct abi_serializer;
+   namespace impl {
+      struct abi_traverse_context;
+   }
+}
 
 namespace sysio::chain::impl {
 
@@ -37,7 +50,14 @@ namespace sysio::chain::impl {
  */
 class variant_sink {
 public:
-   explicit variant_sink(const abi_serializer& abi) noexcept : abi_(abi) {}
+   /// Construct without an abi_serializer reference -- used by `abi_to_emit<Sink>`
+   /// callers (to_variant template family) that don't need the binary unpack helpers.
+   variant_sink() noexcept = default;
+
+   /// Construct bound to an abi_serializer -- used by `_binary_walk<Sink>` callers
+   /// that need `unpack_built_in` and `unpack_protobuf` to dispatch built-in types
+   /// and protobuf decoding respectively.
+   explicit variant_sink(const abi_serializer& abi) noexcept : abi_(&abi) {}
 
    void begin_object();
    void end_object();
@@ -65,6 +85,19 @@ public:
    /// existing variant-side unpack functions produce as a single `fc::variant`.
    void value_variant(fc::variant v) { emit_value(std::move(v)); }
 
+   /// Generic field emit used by `abi_to_emit<Sink>` for non-ABI types: builds a
+   /// `fc::variant(v)` and emits it at the current value position.  Symmetric with
+   /// `stream_sink::emit<T>` which calls `fc::to_json_stream(v, w)` instead.
+   template<typename T>
+   void emit(const T& v) { emit_value(fc::variant(v)); }
+
+   /// ABI-aware action data emit: decode the binary payload to an `fc::variant`
+   /// via the per-account abi and inject it at the current value position.  This
+   /// mirrors `stream_sink::unpack_action_data` which calls `binary_to_json_stream`
+   /// directly into the writer.
+   void unpack_action_data(const abi_serializer& abi, std::string_view type, const bytes& data,
+                           abi_traverse_context& ctx, bool short_path);
+
    /// True if at least one item has been added to the current frame.  Used by the walker
    /// to enforce the legacy "Unable to unpack '...' from stream" guard on empty structs.
    bool frame_has_items() const noexcept;
@@ -78,7 +111,7 @@ public:
 private:
    void emit_value(fc::variant v);
 
-   const abi_serializer& abi_;
+   const abi_serializer* abi_ = nullptr;
 
    enum class frame_kind : uint8_t { object, array };
    struct frame {
@@ -105,7 +138,15 @@ private:
  */
 class stream_sink {
 public:
-   stream_sink(const abi_serializer& abi, fc::json_writer& w) noexcept : abi_(abi), w_(w) {}
+   /// Construct without an abi_serializer reference -- used by `abi_to_emit<Sink>`
+   /// callers (to_json_stream template family) that don't need the binary unpack
+   /// helpers.
+   explicit stream_sink(fc::json_writer& w) noexcept : w_(w) {}
+
+   /// Construct bound to an abi_serializer -- used by `_binary_walk<Sink>` callers
+   /// that need `unpack_built_in` and `unpack_protobuf` to dispatch built-in types
+   /// and protobuf decoding respectively.
+   stream_sink(const abi_serializer& abi, fc::json_writer& w) noexcept : abi_(&abi), w_(w) {}
 
    void begin_object();
    void end_object();
@@ -133,6 +174,22 @@ public:
    /// by the variant-fallback built-in path until commit 2 lands the direct unpacks.
    void value_variant(const fc::variant& v);
 
+   /// Generic field emit used by `abi_to_emit<Sink>` for non-ABI types: dispatches
+   /// straight to `fc::to_json_stream(v, w)` so reflected user structs and primitives
+   /// emit their tokens without an intermediate variant build.
+   template<typename T>
+   void emit(const T& v) {
+      fc::to_json_stream(v, w_);
+      on_value_emitted();
+   }
+
+   /// ABI-aware action data emit: decode the binary payload via
+   /// `abi.binary_to_json_stream` directly into the writer at the current value
+   /// position.  Mirrors `variant_sink::unpack_action_data` which assembles a
+   /// `fc::variant` instead.
+   void unpack_action_data(const abi_serializer& abi, std::string_view type, const bytes& data,
+                           abi_traverse_context& ctx, bool short_path);
+
    bool frame_has_items() const noexcept;
 
    void unpack_built_in(std::string_view ftype, fc::datastream<const char*>& stream,
@@ -142,7 +199,7 @@ public:
 private:
    void on_value_emitted() noexcept;
 
-   const abi_serializer& abi_;
+   const abi_serializer* abi_ = nullptr;
    fc::json_writer&      w_;
    std::vector<uint32_t> frame_items_;
 };

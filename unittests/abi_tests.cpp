@@ -53,6 +53,21 @@ static fc::time_point get_deadline() {
 
 static auto yield_fn() { return abi_serializer::create_yield_function( max_serialization_time ); }
 
+// Verify the streaming `binary_to_json_stream` path emits byte-identical JSON to
+// `to_string(binary_to_variant(...))` for the same packed bytes.  Called from the
+// round-trip helpers below so every type already exercised by abi_tests gets a
+// parity check on the streaming path for free.
+void verify_stream_matches_variant( const abi_serializer& abis, const type_name& type, const bytes& packed, const std::string& variant_json )
+{
+   std::string stream_json;
+   {
+      fc::json_writer w(stream_json);
+      abis.binary_to_json_stream(type, packed, w, yield_fn());
+      BOOST_REQUIRE( w.balanced() );
+   }
+   BOOST_TEST( stream_json == variant_json );
+}
+
 // verify that round trip conversion, via bytes, reproduces the exact same data
 fc::variant verify_byte_round_trip_conversion( const abi_serializer& abis, const type_name& type, const fc::variant& var )
 {
@@ -66,6 +81,8 @@ fc::variant verify_byte_round_trip_conversion( const abi_serializer& abis, const
    std::string r2 = fc::json::to_string(var2, get_deadline());
    std::string r3 = fc::json::to_string(var3, get_deadline());
    BOOST_TEST( r2 == r3 );
+
+   verify_stream_matches_variant( abis, type, bytes, r2 );
 
    auto bytes2 = abis.variant_to_binary(type, var2, yield_fn());
    auto bytes3 = abis.variant_to_binary(type, var3, max_serialization_time);
@@ -87,6 +104,7 @@ void verify_round_trip_conversion( const abi_serializer& abis, const type_name& 
    BOOST_REQUIRE_EQUAL(fc::json::to_string(var2, get_deadline()), expected_json);
    auto var3 = abis.binary_to_variant(type, b, max_serialization_time );
    BOOST_REQUIRE_EQUAL(fc::json::to_string(var3, get_deadline()), expected_json);
+   verify_stream_matches_variant(abis, type, bytes, expected_json);
    auto bytes2 = abis.variant_to_binary(type, var2, yield_fn());
    BOOST_REQUIRE_EQUAL(fc::to_hex(bytes2), hex);
    auto b2 = abis.variant_to_binary(type, var3, max_serialization_time);
@@ -128,6 +146,8 @@ fc::variant verify_type_round_trip_conversion( const abi_serializer& abis, const
    std::string r2 = fc::json::to_string(var2, get_deadline());
    std::string r3 = fc::json::to_string(var3, get_deadline());
    BOOST_TEST( r2 == r3 );
+
+   verify_stream_matches_variant( abis, type, bytes, r2 );
 
    auto bytes2 = abis.variant_to_binary(type, var2, yield_fn());
    auto b3 = abis.variant_to_binary(type, var3, max_serialization_time);
@@ -3397,17 +3417,19 @@ BOOST_AUTO_TEST_CASE(abi_to_variant__add_action__good_return_value)
    abi_serializer abis(abi_def(abidef), yield_fn());
 
    {
+      fc::variant trace_var;
+      abi_serializer::to_variant(at, trace_var, get_resolver(abidef), yield_fn());
       mutable_variant_object mvo;
-      sysio::chain::impl::abi_traverse_context ctx(yield_fn(), fc::microseconds{});
-      sysio::chain::impl::abi_to_variant::add(mvo, "action_traces", at, get_resolver(abidef), ctx);
+      mvo("action_traces", std::move(trace_var));
       std::string res = fc::json::to_string(mvo, get_deadline());
 
       BOOST_CHECK_EQUAL(res, expected_json);
    }
    {
+      fc::variant trace_var;
+      abi_serializer::to_variant(at, trace_var, get_resolver(abidef), max_serialization_time);
       mutable_variant_object mvo;
-      sysio::chain::impl::abi_traverse_context ctx(abi_serializer::create_depth_yield_function(), max_serialization_time);
-      sysio::chain::impl::abi_to_variant::add(mvo, "action_traces", at, get_resolver(abidef), ctx);
+      mvo("action_traces", std::move(trace_var));
       std::string res = fc::json::to_string(mvo, get_deadline());
 
       BOOST_CHECK_EQUAL(res, expected_json);
@@ -3432,17 +3454,19 @@ BOOST_AUTO_TEST_CASE(abi_to_variant__add_action__bad_return_value)
    abi_serializer abis(abi_def(abidef), yield_fn());
 
    {
+      fc::variant trace_var;
+      abi_serializer::to_variant(at, trace_var, get_resolver(abidef), yield_fn());
       mutable_variant_object mvo;
-      sysio::chain::impl::abi_traverse_context ctx(yield_fn(), fc::microseconds{});
-      sysio::chain::impl::abi_to_variant::add(mvo, "action_traces", at, get_resolver(abidef), ctx);
+      mvo("action_traces", std::move(trace_var));
       std::string res = fc::json::to_string(mvo, get_deadline());
 
       BOOST_CHECK_EQUAL(res, expected_json);
    }
    {
+      fc::variant trace_var;
+      abi_serializer::to_variant(at, trace_var, get_resolver(abidef), max_serialization_time);
       mutable_variant_object mvo;
-      sysio::chain::impl::abi_traverse_context ctx(abi_serializer::create_depth_yield_function(), max_serialization_time);
-      sysio::chain::impl::abi_to_variant::add(mvo, "action_traces", at, get_resolver(abidef), ctx);
+      mvo("action_traces", std::move(trace_var));
       std::string res = fc::json::to_string(mvo, get_deadline());
 
       BOOST_CHECK_EQUAL(res, expected_json);
@@ -3477,17 +3501,19 @@ BOOST_AUTO_TEST_CASE(abi_to_variant__add_action__no_return_value)
    abi_serializer abis(abi_def(abidef), yield_fn());
 
    {
+      fc::variant trace_var;
+      abi_serializer::to_variant(at, trace_var, get_resolver(abidef), yield_fn());
       mutable_variant_object mvo;
-      sysio::chain::impl::abi_traverse_context ctx(yield_fn(), fc::microseconds{});
-      sysio::chain::impl::abi_to_variant::add(mvo, "action_traces", at, get_resolver(abidef), ctx);
+      mvo("action_traces", std::move(trace_var));
       std::string res = fc::json::to_string(mvo, get_deadline());
 
       BOOST_CHECK_EQUAL(res, expected_json);
    }
    {
+      fc::variant trace_var;
+      abi_serializer::to_variant(at, trace_var, get_resolver(abidef), max_serialization_time);
       mutable_variant_object mvo;
-      sysio::chain::impl::abi_traverse_context ctx(abi_serializer::create_depth_yield_function(), max_serialization_time);
-      sysio::chain::impl::abi_to_variant::add(mvo, "action_traces", at, get_resolver(abidef), ctx);
+      mvo("action_traces", std::move(trace_var));
       std::string res = fc::json::to_string(mvo, get_deadline());
 
       BOOST_CHECK_EQUAL(res, expected_json);
@@ -4175,31 +4201,6 @@ BOOST_AUTO_TEST_CASE(abi_serializer_long_table_name) { try {
    BOOST_CHECK_EQUAL(abi.tables[0].name, "geolocation_records");
    BOOST_CHECK_EQUAL(abi.tables[0].table_id, 42000u);
 
-} FC_LOG_AND_RETHROW() }
-
-// Parity gate for `binary_to_json_stream`: the streaming path must produce
-// byte-identical JSON output to `fc::json::to_string(binary_to_variant(...))`.
-// Reuses `my_abi` + `my_other_json` from `general` so coverage stays in lock-step
-// with the established round-trip suite.
-BOOST_AUTO_TEST_CASE(binary_to_json_stream_parity)
-{ try {
-   auto abi = sysio_contract_abi(fc::json::from_string(my_abi).as<abi_def>());
-   abi_serializer abis(abi_def(abi), yield_fn());
-
-   auto fixture_var = fc::json::from_string(my_other_json);
-   auto packed      = abis.variant_to_binary("A", fixture_var, yield_fn());
-
-   auto via_variant         = abis.binary_to_variant("A", packed, yield_fn());
-   std::string variant_json = fc::json::to_string(via_variant, get_deadline());
-
-   std::string streamed_json;
-   {
-      fc::json_writer w(streamed_json);
-      abis.binary_to_json_stream("A", packed, w, yield_fn());
-      BOOST_CHECK( w.balanced() );
-   }
-
-   BOOST_CHECK_EQUAL( variant_json, streamed_json );
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <fc/io/json.hpp>
 #include <fc/io/json_stream.hpp>
 #include <fc/reflect/reflect.hpp>
 

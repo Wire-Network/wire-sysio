@@ -1,6 +1,7 @@
 #pragma once
 
 #include <fc/exception/exception.hpp>
+#include <fc/reflect/json_stream.hpp>
 #include <fc/variant.hpp>
 
 #include <boost/core/typeinfo.hpp>
@@ -78,6 +79,15 @@ template<typename... T> void to_variant( const std::variant<T...>& s, fc::varian
   vars[0] = s.index();
   std::visit( from_static_variant(vars[1]), s );
   v = std::move(vars);
+}
+
+/// JSON shape: 2-element array `[index, value]` matching the to_variant form.
+template<typename... T> void to_json_stream( const std::variant<T...>& s, json_writer& w )
+{
+   w.begin_array();
+   w.value_uint64(static_cast<uint64_t>(s.index()));
+   std::visit([&w](const auto& v) { fc::to_json_stream(v, w); }, s);
+   w.end_array();
 }
 
 template<typename... T> void from_variant( const fc::variant& v, std::variant<T...>& s )

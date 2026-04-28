@@ -2788,6 +2788,23 @@ std::function<chain::t_or_exception<fc::variant>()> read_only::get_block(const g
    };
 }
 
+read_only::get_block_stream_return_t
+read_only::get_block_stream(const get_block_params& params, const fc::time_point& deadline) const {
+   chain::signed_block_ptr block = get_raw_block(params, deadline);
+
+   using return_type = chain::t_or_exception<get_block_stream_emit_fn>;
+   return [this,
+           resolver = get_serializers_cache(db, block, abi_serializer_max_time),
+           block    = std::move(block)]() mutable -> return_type {
+      try {
+         return get_block_stream_emit_fn{[this, resolver = std::move(resolver), block = std::move(block)]
+                                          (fc::json_writer& w) mutable {
+            convert_block_stream(block, resolver, w);
+         }};
+      } CATCH_AND_RETURN(return_type);
+   };
+}
+
 read_only::get_block_header_result read_only::get_block_header(const read_only::get_block_header_params& params, const fc::time_point& deadline) const{
    std::optional<uint64_t> block_num;
 
@@ -2842,6 +2859,24 @@ fc::variant read_only::convert_block( const chain::signed_block_ptr& block, abi_
          ( "id", block_id )
          ( "block_num", block->block_num() )
          ( "ref_block_prefix", ref_block_prefix );
+}
+
+void read_only::convert_block_stream( const chain::signed_block_ptr& block, abi_resolver& resolver, fc::json_writer& w ) const {
+   chain::impl::stream_sink sink(w);
+   chain::impl::abi_traverse_context ctx(abi_serializer::create_depth_yield_function(), abi_serializer_max_time);
+
+   const auto block_id          = block->calculate_id();
+   const uint32_t ref_block_pfx = block_id._hash[1];
+
+   sink.begin_object();
+   chain::impl::abi_to_variant::emit_signed_block_body(sink, *block, resolver, ctx);
+   sink.key("id");
+   sink.template emit<chain::block_id_type>(block_id);
+   sink.key("block_num");
+   sink.value_uint64(block->block_num());
+   sink.key("ref_block_prefix");
+   sink.value_uint64(ref_block_pfx);
+   sink.end_object();
 }
 
 fc::variant read_only::get_block_info(const read_only::get_block_info_params& params, const fc::time_point&) const {

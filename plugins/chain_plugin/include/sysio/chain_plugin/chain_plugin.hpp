@@ -385,12 +385,30 @@ public:
    using get_block_params = get_raw_block_params;
    std::function<chain::t_or_exception<fc::variant>()> get_block(const get_block_params& params, const fc::time_point& deadline) const;
 
+   /// Direct-streaming counterpart to `get_block`.  Thread sequence:
+   ///   - Phase 1 (main app thread, read_only queue): this method's body.  `get_raw_block` is itself thread-safe;
+   ///     `get_serializers_cache` is what *requires* the main thread because it reads each referenced account's `abi`
+   ///     field out of chainbase.  Returns the outer http_fwd closure.
+   ///   - Hop 1: `CALL_WITH_400_STREAM_POST_DIRECT` posts the outer closure to the http thread pool.
+   ///   - Phase 2 (http thread pool): invokes the outer closure -- captured block + resolver snapshots, no chainbase
+   ///     access -- and produces the inner `json_writer`-emitting closure, handed to `cb`.
+   ///   - Hop 2: `make_http_stream_response_handler` re-dispatches onto the same http thread pool (inherited from the
+   ///     variant-cb `cb` shape, where Phase 2 does the row-decode work).
+   ///   - Phase 3 (http thread pool): walks the captured block via `abi_serializer::to_json_stream<signed_block>`,
+   ///     decoding each action's `data` straight into the writer with `binary_to_json_stream`.  No `fc::variant` tree
+   ///     is built per action.
+   using get_block_stream_emit_fn = std::function<void(fc::json_writer&)>;
+   using get_block_stream_return_t = std::function<chain::t_or_exception<get_block_stream_emit_fn>()>;
+   get_block_stream_return_t get_block_stream(const get_block_params& params, const fc::time_point& deadline) const;
+
    // call from app() thread
    abi_resolver get_block_serializers( const chain::signed_block_ptr& block, const fc::microseconds& max_time ) const;
 
    // call from any thread
    fc::variant convert_block( const chain::signed_block_ptr& block,
                               abi_resolver& resolver ) const;
+   void        convert_block_stream( const chain::signed_block_ptr& block,
+                                     abi_resolver& resolver, fc::json_writer& w ) const;
 
    struct get_block_header_params {
       string block_num_or_id;
