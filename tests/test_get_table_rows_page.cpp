@@ -301,4 +301,51 @@ BOOST_FIXTURE_TEST_CASE(streaming_vs_variant_byte_identical, validating_tester) 
    BOOST_CHECK_EQUAL(variant_path, stream_path);
 } FC_LOG_AND_RETHROW()
 
+namespace {
+   /// Run the new direct-streaming `get_table_rows_stream` to completion and return the
+   /// emitted JSON.  Fails the test if the RPC produced an exception_ptr.
+   std::string run_stream(read_only& ro, const read_only::get_table_rows_params& p) {
+      auto outer = ro.get_table_rows_stream(p, fc::time_point::maximum())();
+      BOOST_REQUIRE(!std::holds_alternative<fc::exception_ptr>(outer));
+      auto emit = std::get<read_only::get_table_rows_stream_emit_fn>(std::move(outer));
+      std::string out;
+      {
+         fc::json_writer w(out);
+         emit(w);
+         BOOST_REQUIRE(w.balanced());
+      }
+      return out;
+   }
+}
+
+// Byte-identical compat for the new direct-streaming path.  `get_table_rows_stream`
+// bypasses the per-row fc::variant assembly step; its emitted JSON must match
+// `fc::json::to_string(fc::variant(get_table_rows().result))` for the same params.
+// Any drift here would break HTTP clients that hit /v1/chain/get_table_rows after the
+// chain_api_plugin migration to CHAIN_RO_CALL_STREAM_POST_DIRECT.
+BOOST_FIXTURE_TEST_CASE(stream_direct_vs_variant_byte_identical, validating_tester) try {
+   deploy_contract(*this);
+   populate_numobjs(*this, 4);
+
+   auto ro = make_read_only(*this);
+
+   // Three shapes worth pinning: full wrapper + payer, all_rows escape hatch, and
+   // values_only stripped form.  Each exercises a distinct branch in the stream
+   // emit closure (wrapped object vs bare value, more/next_key suppression).
+   for (auto setup : { +[](read_only::get_table_rows_params& q) { q.all_rows = true; q.show_payer = true; },
+                       +[](read_only::get_table_rows_params& q) { q.show_payer = true; q.limit = 2; },
+                       +[](read_only::get_table_rows_params& q) { q.values_only = true; q.all_rows = true; } }) {
+      auto p = numobjs_params();
+      setup(p);
+
+      auto via_variant = run(ro, p);
+      const std::string variant_json =
+         fc::json::to_string(fc::variant(via_variant), fc::time_point::maximum());
+
+      const std::string stream_json = run_stream(ro, p);
+
+      BOOST_CHECK_EQUAL(variant_json, stream_json);
+   }
+} FC_LOG_AND_RETHROW()
+
 BOOST_AUTO_TEST_SUITE_END()

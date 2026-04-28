@@ -117,6 +117,7 @@ parse_params<chain_apis::read_only::get_transaction_id_params, http_params_types
 // CALL_ASYNC_WITH_400) get removed in a cleanup commit.
 #define CHAIN_RO_CALL_STREAM(call_name, call_result, http_response_code, params_type) CALL_WITH_400_STREAM(chain, chain_ro, ro_api, chain_apis::read_only, call_name, call_result, http_response_code, params_type)
 #define CHAIN_RO_CALL_STREAM_POST(call_name, call_result, http_response_code, params_type) CALL_WITH_400_STREAM_POST(chain, chain_ro, ro_api, chain_apis::read_only, call_name, call_result, http_response_code, params_type)
+#define CHAIN_RO_CALL_STREAM_POST_DIRECT(call_name, http_response_code, params_type) CALL_WITH_400_STREAM_POST_DIRECT(chain, chain_ro, ro_api, chain_apis::read_only, call_name, http_response_code, params_type)
 
 void chain_api_plugin::plugin_startup() {
    dlog( "starting chain_api_plugin" );
@@ -167,7 +168,7 @@ void chain_api_plugin::plugin_startup() {
       CHAIN_RO_CALL_STREAM(get_required_keys, chain_apis::read_only::get_required_keys_result, 200, http_params_types::params_required),
       CHAIN_RO_CALL_STREAM(get_transaction_id, chain_apis::read_only::get_transaction_id_result, 200, http_params_types::params_required),
       CHAIN_RO_CALL_STREAM_POST(get_account, chain_apis::read_only::get_account_results, 200, http_params_types::params_required),
-      CHAIN_RO_CALL_STREAM_POST(get_table_rows, chain_apis::read_only::get_table_rows_result, 200, http_params_types::params_required),
+      CHAIN_RO_CALL_STREAM_POST_DIRECT(get_table_rows, 200, http_params_types::params_required),
    }, appbase::exec_queue::read_only);
 
    if (chain.account_queries_enabled()) {

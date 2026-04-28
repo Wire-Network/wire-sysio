@@ -145,6 +145,28 @@ class read_only : public api_base {
    const trx_finality_status_processing* trx_finality_status_proc;
    friend class api_base;
 
+   /// Phase-1 result for `get_table_rows` / `get_table_rows_stream`: the raw KV rows
+   /// collected from chainbase plus the metadata Phase 2 needs to ABI-decode them.
+   /// Kept as a private impl detail; the public interface returns variant- or
+   /// stream-emitting closures built around this struct.
+   struct raw_table_row {
+      std::vector<char> key;
+      std::vector<char> value;
+      chain::name       payer;
+   };
+   struct table_rows_phase1 {
+      chain::abi_def              abi;
+      std::string                 tbl_name;
+      std::vector<std::string>    key_names;
+      std::vector<std::string>    key_types;
+      size_t                      scope_key_count = 0;
+      bool                        json            = true;
+      bool                        show_payer      = false;
+      bool                        more            = false;
+      std::string                 next_key;
+      std::vector<raw_table_row>  rows;
+   };
+
 public:
    static const string KEYi64;
 
@@ -436,6 +458,15 @@ public:
    /// `values_only` (strip the `{key, value, payer?}` wrapper).
    get_table_rows_return_t get_table_rows( const get_table_rows_params& params, const fc::time_point& deadline )const;
 
+   /// Streaming counterpart to `get_table_rows`.  Phase 1 (main thread) runs the same row-collection
+   /// logic; Phase 2 (http thread pool) returns a closure that emits the response JSON directly into
+   /// an `fc::json_writer` via `abi_serializer::binary_to_json_stream`, eliminating per-row variant
+   /// allocations.  `filter` is intentionally not honored on this path since it is in-tree-only and
+   /// requires a `fc::variant` to evaluate; in-tree callers continue using `get_table_rows()`.
+   using get_table_rows_stream_emit_fn = std::function<void(fc::json_writer&)>;
+   using get_table_rows_stream_return_t = std::function<chain::t_or_exception<get_table_rows_stream_emit_fn>()>;
+   get_table_rows_stream_return_t get_table_rows_stream( const get_table_rows_params& params, const fc::time_point& deadline )const;
+
    struct get_table_by_scope_params {
       name                 code; // mandatory
       name                 table; // optional, act as filter
@@ -589,6 +620,12 @@ public:
      std::optional<chain::wasm_config> wasm_config;
    };
    get_consensus_parameters_results get_consensus_parameters(const get_consensus_parameters_params&, const fc::time_point& deadline) const;
+
+private:
+   /// Phase 1 of `get_table_rows` / `get_table_rows_stream`: scans chainbase on the
+   /// main thread and returns the raw KV rows plus the ABI metadata Phase 2 needs.
+   /// Filter/post-pass options are applied by the caller's Phase 2 closure.
+   table_rows_phase1 collect_table_rows_phase1(const get_table_rows_params& params, const fc::time_point& deadline) const;
 };
 
 class read_write : public api_base {

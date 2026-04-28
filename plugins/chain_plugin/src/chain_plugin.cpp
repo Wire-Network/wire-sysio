@@ -1676,8 +1676,8 @@ fc::variant strip_scope_fields(fc::variant&& full_key, size_t count) {
    return fc::variant(std::move(stripped));
 }
 
-read_only::get_table_rows_return_t
-read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::time_point& deadline ) const {
+read_only::table_rows_phase1
+read_only::collect_table_rows_phase1( const read_only::get_table_rows_params& p, const fc::time_point& deadline ) const {
    abi_def abi = sysio::chain_apis::get_abi( db, p.code );
    const auto& tbl = get_kv_table_def( abi, p.table );
 
@@ -1749,23 +1749,15 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
       // else: scope is empty — iterate ALL scopes (no prefix filtering)
    }
 
-   // Phase 1: Collect raw rows on the main thread.
-   // Phase 2 (the returned lambda): ABI-decode on the http thread pool.
-   struct raw_row {
-      std::vector<char> key;
-      std::vector<char> value;
-      name              payer;
-   };
-   struct http_params_t {
-      bool json;
-      bool show_payer;
-      bool more;
-      std::string next_key;
-      std::vector<raw_row> rows;
-   };
+   // Phase 1: Collect raw rows on the main thread; the caller's Phase 2 closure
+   // ABI-decodes on the http thread pool.
+   using raw_row       = raw_table_row;
+   using http_params_t = table_rows_phase1;
 
    bool show_payer = p.show_payer.has_value() && *p.show_payer;
-   http_params_t hp{ p.json, show_payer, false, {}, {} };
+   http_params_t hp;
+   hp.json       = p.json;
+   hp.show_payer = show_payer;
 
    const auto& d = db.db();
    const auto& kv_idx = d.get_index<chain::kv_index, chain::by_code_key>();
@@ -2040,72 +2032,12 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
          }
       }
 
-      // Phase 2: ABI decode on http thread pool
-      return [p = std::move(hp), abi = std::move(abi), table_name = p.table,
-              key_names = std::move(key_names), key_types = std::move(key_types),
-              scope_key_count,
-              abi_serializer_max_time = abi_serializer_max_time,
-              shorten_abi_errors = shorten_abi_errors,
-              all_rows    = p.all_rows,
-              values_only = p.values_only.value_or(false),
-              filter      = p.filter]() mutable ->
-         chain::t_or_exception<read_only::get_table_rows_result> {
-         get_table_rows_result result;
-         result.more = p.more;
-         result.next_key = std::move(p.next_key);
-
-         abi_serializer abis;
-         abis.set_abi(std::move(abi), abi_serializer::create_yield_function(abi_serializer_max_time));
-         auto table_type = abis.get_table_type(table_name);
-
-         for (auto& row : p.rows) {
-            fc::mutable_variant_object obj;
-            // For secondary queries, decode the primary key as the key field
-            if (p.json) {
-               try {
-                  auto full_key = chain::be_key_codec::decode_key(
-                     row.key.data(), row.key.size(), key_names, key_types);
-                  obj["key"] = strip_scope_fields(std::move(full_key), scope_key_count);
-               } catch (...) {
-                  obj["key"] = fc::to_hex(row.key.data(), row.key.size());
-               }
-            } else {
-               obj["key"] = fc::to_hex(row.key.data(), row.key.size());
-            }
-            // Decode value
-            if (p.json && !table_type.empty() && !row.value.empty()) {
-               try {
-                  obj["value"] = abis.binary_to_variant(table_type, row.value,
-                     abi_serializer::create_yield_function(abi_serializer_max_time),
-                     shorten_abi_errors);
-               } catch (...) {
-                  obj["value"] = fc::to_hex(row.value.data(), row.value.size());
-               }
-            } else {
-               obj["value"] = fc::to_hex(row.value.data(), row.value.size());
-            }
-            if (p.show_payer)
-               obj["payer"] = row.payer.to_string();
-            result.rows.push_back(std::move(obj));
-         }
-
-         // --- Post-pass: C++-only wrapper behaviors. Same shape as the primary-path Phase 2 below.
-         if (all_rows) { result.more = false; result.next_key.clear(); }
-         if (values_only) {
-            for (auto& row : result.rows) {
-               if (!row.is_object()) continue;
-               const auto& row_obj = row.get_object();
-               if (!row_obj.contains("value")) continue;
-               fc::variant value{row_obj["value"]};
-               row = std::move(value);
-            }
-         }
-         if (filter.has_value()) {
-            const auto& predicate = *filter;
-            std::erase_if(result.rows, [&](const fc::variant& row) { return !predicate(row); });
-         }
-         return result;
-      };
+      hp.abi             = std::move(abi);
+      hp.tbl_name        = p.table;
+      hp.key_names       = std::move(key_names);
+      hp.key_types       = std::move(key_types);
+      hp.scope_key_count = scope_key_count;
+      return hp;
    }
 
    // --- Primary key query path ---
@@ -2216,20 +2148,29 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
       }
    }
 
-   return [hp = std::move(hp), abi = std::move(abi), tbl_name = p.table,
-           key_names = std::move(key_names), key_types = std::move(key_types),
-           scope_key_count,
+   hp.abi             = std::move(abi);
+   hp.tbl_name        = p.table;
+   hp.key_names       = std::move(key_names);
+   hp.key_types       = std::move(key_types);
+   hp.scope_key_count = scope_key_count;
+   return hp;
+}
+
+read_only::get_table_rows_return_t
+read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::time_point& deadline ) const {
+   auto hp = collect_table_rows_phase1(p, deadline);
+   return [hp = std::move(hp),
            abi_serializer_max_time = abi_serializer_max_time,
-           shorten_abi_errors = shorten_abi_errors,
-           all_rows    = p.all_rows,
-           values_only = p.values_only.value_or(false),
-           filter      = p.filter]() mutable
+           shorten_abi_errors      = shorten_abi_errors,
+           all_rows                = p.all_rows,
+           values_only             = p.values_only.value_or(false),
+           filter                  = p.filter]() mutable
       -> chain::t_or_exception<read_only::get_table_rows_result> {
       read_only::get_table_rows_result result;
 
       abi_serializer abis;
-      abis.set_abi(std::move(abi), abi_serializer::create_yield_function(abi_serializer_max_time));
-      auto value_type = abis.get_table_type(tbl_name);
+      abis.set_abi(std::move(hp.abi), abi_serializer::create_yield_function(abi_serializer_max_time));
+      auto value_type = abis.get_table_type(hp.tbl_name);
 
       for (auto& row : hp.rows) {
          fc::mutable_variant_object obj;
@@ -2238,8 +2179,8 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
          if (hp.json) {
             try {
                auto full_key = chain::be_key_codec::decode_key(
-                  row.key.data(), row.key.size(), key_names, key_types);
-               obj("key", strip_scope_fields(std::move(full_key), scope_key_count));
+                  row.key.data(), row.key.size(), hp.key_names, hp.key_types);
+               obj("key", strip_scope_fields(std::move(full_key), hp.scope_key_count));
             } catch (...) {
                obj("key", fc::to_hex(row.key.data(), static_cast<uint32_t>(row.key.size())));
             }
@@ -2248,7 +2189,7 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
          }
 
          // Decode value -- fall back to hex if ABI decode fails
-         if (hp.json) {
+         if (hp.json && !value_type.empty() && !row.value.empty()) {
             try {
                obj("value", abis.binary_to_variant(value_type, row.value,
                                                     abi_serializer::create_yield_function(abi_serializer_max_time),
@@ -2266,8 +2207,8 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
          result.rows.emplace_back(std::move(obj));
       }
 
-      result.more = hp.more;
-      result.next_key = hp.next_key;
+      result.more     = hp.more;
+      result.next_key = std::move(hp.next_key);
 
       // --- Post-pass: C++-only wrapper behaviors ---
       // `all_rows` walked the whole scan; a resume cursor is meaningless on the way out.
@@ -2298,6 +2239,90 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
       }
 
       return result;
+   };
+}
+
+read_only::get_table_rows_stream_return_t
+read_only::get_table_rows_stream( const read_only::get_table_rows_params& p, const fc::time_point& deadline ) const {
+   SYS_ASSERT( !p.filter.has_value(), chain::contract_table_query_exception,
+               "get_table_rows_stream does not support the 'filter' predicate; use get_table_rows() instead" );
+   auto hp = collect_table_rows_phase1(p, deadline);
+   return [hp = std::move(hp),
+           abi_serializer_max_time = abi_serializer_max_time,
+           shorten_abi_errors      = shorten_abi_errors,
+           all_rows                = p.all_rows,
+           values_only             = p.values_only.value_or(false)]() mutable
+      -> chain::t_or_exception<get_table_rows_stream_emit_fn> {
+      // Build the abi_serializer on the http thread pool so the on-wire emit
+      // closure doesn't pay the abi_def move-construction cost during emission.
+      auto abis = std::make_shared<abi_serializer>();
+      abis->set_abi(std::move(hp.abi), abi_serializer::create_yield_function(abi_serializer_max_time));
+      auto value_type = abis->get_table_type(hp.tbl_name);
+
+      const bool effective_more = !all_rows && hp.more;
+      std::string effective_next_key = all_rows ? std::string{} : std::move(hp.next_key);
+
+      return [hp                      = std::move(hp),
+              abis                    = std::move(abis),
+              value_type              = std::move(value_type),
+              abi_serializer_max_time,
+              shorten_abi_errors,
+              values_only,
+              effective_more,
+              effective_next_key      = std::move(effective_next_key)]
+             (fc::json_writer& w) mutable {
+         auto emit_value = [&](const std::vector<char>& data) {
+            if (hp.json && !value_type.empty() && !data.empty()) {
+               try {
+                  abis->binary_to_json_stream(value_type, data, w,
+                                              abi_serializer::create_yield_function(abi_serializer_max_time),
+                                              shorten_abi_errors);
+                  return;
+               } catch (...) {
+                  // fall through to hex
+               }
+            }
+            // Empty value or non-json mode: emit hex (matches the variant path's
+            // fc::variant(vector<char>) -> to_hex on emit).
+            w.value_hex(data.data(), data.size());
+         };
+
+         w.begin_object();
+         w.key("rows");
+         w.begin_array();
+         for (auto& row : hp.rows) {
+            if (values_only) {
+               emit_value(row.value);
+               continue;
+            }
+            w.begin_object();
+            w.key("key");
+            if (hp.json) {
+               try {
+                  auto full_key = chain::be_key_codec::decode_key(
+                     row.key.data(), row.key.size(), hp.key_names, hp.key_types);
+                  fc::to_json_stream(strip_scope_fields(std::move(full_key), hp.scope_key_count), w);
+               } catch (...) {
+                  w.value_hex(row.key.data(), row.key.size());
+               }
+            } else {
+               w.value_hex(row.key.data(), row.key.size());
+            }
+            w.key("value");
+            emit_value(row.value);
+            if (hp.show_payer) {
+               w.key("payer");
+               w.value_string(row.payer.to_string());
+            }
+            w.end_object();
+         }
+         w.end_array();
+         w.key("more");
+         w.value_bool(effective_more);
+         w.key("next_key");
+         w.value_string(effective_next_key);
+         w.end_object();
+      };
    };
 }
 
