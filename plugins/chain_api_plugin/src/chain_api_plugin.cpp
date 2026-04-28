@@ -90,9 +90,7 @@ parse_params<chain_apis::read_only::get_transaction_id_params, http_params_types
 }
 
 // Streaming-cb endpoint registrations.  Every chain_api_plugin endpoint is on the
-// streaming path; the variant-cb counterparts (CALL_WITH_400 / CALL_ASYNC_WITH_400 /
-// CHAIN_RO_CALL / CHAIN_RW_CALL / CHAIN_RO_CALL_ASYNC / CHAIN_RW_CALL_ASYNC /
-// CHAIN_RO_CALL_WITH_400) are no longer used from this plugin.
+// streaming path; no variant-cb wrappers remain in this plugin.
 #define CHAIN_RO_CALL_STREAM(call_name, call_result, http_response_code, params_type) CALL_WITH_400_STREAM(chain, chain_ro, ro_api, chain_apis::read_only, call_name, call_result, http_response_code, params_type)
 #define CHAIN_RO_CALL_STREAM_POST(call_name, call_result, http_response_code, params_type) CALL_WITH_400_STREAM_POST(chain, chain_ro, ro_api, chain_apis::read_only, call_name, call_result, http_response_code, params_type)
 #define CHAIN_RO_CALL_STREAM_POST_DIRECT(call_name, http_response_code, params_type) CALL_WITH_400_STREAM_POST_DIRECT(chain, chain_ro, ro_api, chain_apis::read_only, call_name, http_response_code, params_type)
