@@ -3,15 +3,10 @@
 #include <fc/io/json_stream.hpp>
 #include <fc/reflect/reflect.hpp>
 
-#include <array>
 #include <cstdint>
-#include <map>
-#include <optional>
 #include <string>
 #include <string_view>
 #include <type_traits>
-#include <unordered_map>
-#include <vector>
 
 namespace fc {
 
@@ -34,6 +29,7 @@ void to_json_stream(const T& o, json_writer& w);
 // -- Scalar overloads ---------------------------------------------------------------------
 
 inline void to_json_stream(bool b, json_writer& w)                 { w.value_bool(b); }
+inline void to_json_stream(char c, json_writer& w)                 { w.value_int8(static_cast<int8_t>(c)); }
 inline void to_json_stream(int8_t n, json_writer& w)               { w.value_int8(n); }
 inline void to_json_stream(uint8_t n, json_writer& w)              { w.value_uint8(n); }
 inline void to_json_stream(int16_t n, json_writer& w)              { w.value_int16(n); }
@@ -48,65 +44,11 @@ inline void to_json_stream(std::string_view s, json_writer& w)     { w.value_str
 inline void to_json_stream(const std::string& s, json_writer& w)   { w.value_string(s); }
 inline void to_json_stream(const char* s, json_writer& w)          { w.value_string(s ? std::string_view(s) : std::string_view()); }
 
-// -- Container overloads ------------------------------------------------------------------
-
-template<typename T, typename A>
-void to_json_stream(const std::vector<T, A>& v, json_writer& w) {
-   w.begin_array();
-   for (const auto& e : v) to_json_stream(e, w);
-   w.end_array();
-}
-
-template<typename T, std::size_t N>
-void to_json_stream(const std::array<T, N>& a, json_writer& w) {
-   w.begin_array();
-   for (const auto& e : a) to_json_stream(e, w);
-   w.end_array();
-}
-
-template<typename T>
-void to_json_stream(const std::optional<T>& o, json_writer& w) {
-   if (o) to_json_stream(*o, w);
-   else   w.value_null();
-}
-
-template<typename K, typename V, typename C, typename A>
-void to_json_stream(const std::map<K, V, C, A>& m, json_writer& w) {
-   static_assert(std::is_convertible_v<const K&, std::string_view> || std::is_integral_v<K>,
-                 "JSON object keys must be string- or integral-convertible");
-   w.begin_object();
-   for (const auto& kv : m) {
-      if constexpr (std::is_convertible_v<const K&, std::string_view>) {
-         w.key(std::string_view(kv.first));
-      } else {
-         // Integral keys are emitted as the numeric literal surrounded by quotes so the
-         // result is a valid JSON object (keys must be strings per RFC 8259).
-         char buf[24];
-         int n = std::snprintf(buf, sizeof(buf), "%lld", static_cast<long long>(kv.first));
-         w.key(std::string_view(buf, n > 0 ? static_cast<size_t>(n) : 0));
-      }
-      to_json_stream(kv.second, w);
-   }
-   w.end_object();
-}
-
-template<typename K, typename V, typename H, typename E, typename A>
-void to_json_stream(const std::unordered_map<K, V, H, E, A>& m, json_writer& w) {
-   static_assert(std::is_convertible_v<const K&, std::string_view> || std::is_integral_v<K>,
-                 "JSON object keys must be string- or integral-convertible");
-   w.begin_object();
-   for (const auto& kv : m) {
-      if constexpr (std::is_convertible_v<const K&, std::string_view>) {
-         w.key(std::string_view(kv.first));
-      } else {
-         char buf[24];
-         int n = std::snprintf(buf, sizeof(buf), "%lld", static_cast<long long>(kv.first));
-         w.key(std::string_view(buf, n > 0 ? static_cast<size_t>(n) : 0));
-      }
-      to_json_stream(kv.second, w);
-   }
-   w.end_object();
-}
+// Container overloads (std::vector, std::array, std::optional, std::map, std::set,
+// std::pair, std::deque, std::unordered_map, std::unordered_set, std::multimap) live
+// alongside their to_variant siblings in fc/variant.hpp.  flat_set / flat_multiset live
+// in fc/container/flat.hpp.  Co-locating with to_variant keeps the two paths' shape
+// and MAX_NUM_ARRAY_ELEMENTS guards in lock-step.
 
 // -- Reflector visitor --------------------------------------------------------------------
 

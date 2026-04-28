@@ -1,6 +1,6 @@
 #pragma once
 
-#include <fc/io/json.hpp>
+#include <fc/io/json_yield.hpp>
 
 #include <cassert>
 #include <charconv>
@@ -74,7 +74,7 @@ public:
       out_.push_back('"');
       // key strings must also be escaped (eg field names containing special chars are rare,
       // but correctness matters on untrusted input echoed into error messages).
-      fc::escape_string(k, out_, json::yield_function_t(), true);
+      fc::escape_string(k, out_, json_yield_function_t(), true);
       out_.push_back('"');
       out_.push_back(':');
       // A key mandates a value follows; suppress the comma from value_prefix for that value.
@@ -84,7 +84,7 @@ public:
    void value_string(std::string_view s) {
       value_prefix();
       out_.push_back('"');
-      fc::escape_string(s, out_, json::yield_function_t(), true);
+      fc::escape_string(s, out_, json_yield_function_t(), true);
       out_.push_back('"');
    }
 

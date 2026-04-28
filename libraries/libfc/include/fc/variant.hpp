@@ -20,6 +20,7 @@
 #include <fc/container/flat_fwd.hpp>
 #include <fc/int128.hpp>
 #include <fc/int256_fwd.hpp>
+#include <fc/io/json_stream.hpp>
 #include <fc/string.hpp>
 #include <fc/time.hpp>
 
@@ -454,7 +455,17 @@ namespace fc
    void from_variant( const fc::variant& var,  int32_t& vo );
    /** @ingroup Serializable */
    void from_variant( const fc::variant& var,  uint32_t& vo );
+
    /** @ingroup Serializable */
+   template<typename T>
+   void to_json_stream( const std::optional<T>& o, json_writer& w )
+   {
+      // Top-level std::optional emits null when unset; reflected struct fields use the
+      // visitor's emit() overload that omits the field instead, mirroring to_variant_visitor::add.
+      if( o ) to_json_stream( *o, w );
+      else    w.value_null();
+   }
+
    template<typename T>
    void from_variant( const variant& var,  std::optional<T>& vo )
    {
@@ -464,6 +475,15 @@ namespace fc
           vo = T();
           from_variant( var, *vo );
       }
+   }
+
+   template<typename T>
+   void to_json_stream( const std::unordered_set<T>& var, json_writer& w )
+   {
+      if( var.size() > MAX_NUM_ARRAY_ELEMENTS ) throw std::range_error( "too large" );
+      w.begin_array();
+      for( const auto& e : var ) to_json_stream( e, w );
+      w.end_array();
    }
    template<typename T>
    void to_variant( const std::unordered_set<T>& var,  fc::variant& vo )
@@ -488,6 +508,16 @@ namespace fc
 
 
    template<typename K, typename T>
+   void to_json_stream( const std::unordered_map<K, T>& var, json_writer& w )
+   {
+      // Mirrors fc::to_variant<std::unordered_map>: emits as an array of [key, value]
+      // pairs (NOT a JSON object) so non-string keys round-trip cleanly.
+      if( var.size() > MAX_NUM_ARRAY_ELEMENTS ) throw std::range_error( "too large" );
+      w.begin_array();
+      for( const auto& kv : var ) to_json_stream( kv, w );
+      w.end_array();
+   }
+   template<typename K, typename T>
    void to_variant( const std::unordered_map<K, T>& var,  fc::variant& vo )
    {
        if( var.size() > MAX_NUM_ARRAY_ELEMENTS ) throw std::range_error( "too large" );
@@ -506,6 +536,14 @@ namespace fc
       for( auto itr = vars.begin(); itr != vars.end(); ++itr )
          vo.insert( itr->as< std::pair<K,T> >() );
 
+   }
+   template<typename K, typename T>
+   void to_json_stream( const std::map<K, T>& var, json_writer& w )
+   {
+      if( var.size() > MAX_NUM_ARRAY_ELEMENTS ) throw std::range_error( "too large" );
+      w.begin_array();
+      for( const auto& kv : var ) to_json_stream( kv, w );
+      w.end_array();
    }
    template<typename K, typename T>
    void to_variant( const std::map<K, T>& var,  fc::variant& vo )
@@ -528,6 +566,14 @@ namespace fc
    }
 
    template<typename K, typename T>
+   void to_json_stream( const std::multimap<K, T>& var, json_writer& w )
+   {
+      if( var.size() > MAX_NUM_ARRAY_ELEMENTS ) throw std::range_error( "too large" );
+      w.begin_array();
+      for( const auto& kv : var ) to_json_stream( kv, w );
+      w.end_array();
+   }
+   template<typename K, typename T>
    void to_variant( const std::multimap<K, T>& var,  fc::variant& vo )
    {
        if( var.size() > MAX_NUM_ARRAY_ELEMENTS ) throw std::range_error( "too large" );
@@ -548,6 +594,14 @@ namespace fc
    }
 
 
+   template<typename T>
+   void to_json_stream( const std::set<T>& var, json_writer& w )
+   {
+      if( var.size() > MAX_NUM_ARRAY_ELEMENTS ) throw std::range_error( "too large" );
+      w.begin_array();
+      for( const auto& e : var ) to_json_stream( e, w );
+      w.end_array();
+   }
    template<typename T>
    void to_variant( const std::set<T>& var,  fc::variant& vo )
    {
@@ -571,15 +625,13 @@ namespace fc
 
    /** @ingroup Serializable */
    template<typename T>
-   void from_variant( const fc::variant& var, std::deque<T>& tmp )
+   void to_json_stream( const std::deque<T>& t, json_writer& w )
    {
-      const variants& vars = var.get_array();
-      if( vars.size() > MAX_NUM_ARRAY_ELEMENTS ) throw std::range_error( "too large" );
-      tmp.clear();
-      for( auto itr = vars.begin(); itr != vars.end(); ++itr )
-         tmp.push_back( itr->as<T>() );
+      if( t.size() > MAX_NUM_ARRAY_ELEMENTS ) throw std::range_error( "too large" );
+      w.begin_array();
+      for( const auto& e : t ) to_json_stream( e, w );
+      w.end_array();
    }
-
    /** @ingroup Serializable */
    template<typename T>
    void to_variant( const std::deque<T>& t, fc::variant& v )
@@ -590,7 +642,37 @@ namespace fc
          vars[i] = fc::variant(t[i]);
       v = std::move(vars);
    }
+   /** @ingroup Serializable */
+   template<typename T>
+   void from_variant( const fc::variant& var, std::deque<T>& tmp )
+   {
+      const variants& vars = var.get_array();
+      if( vars.size() > MAX_NUM_ARRAY_ELEMENTS ) throw std::range_error( "too large" );
+      tmp.clear();
+      for( auto itr = vars.begin(); itr != vars.end(); ++itr )
+         tmp.push_back( itr->as<T>() );
+   }
 
+   /** @ingroup Serializable */
+   template<typename T, typename... U>
+   void to_json_stream( const boost::container::deque<T, U...>& d, json_writer& w )
+   {
+      if( d.size() > MAX_NUM_ARRAY_ELEMENTS ) throw std::range_error( "too large" );
+      w.begin_array();
+      for( const auto& e : d ) to_json_stream( e, w );
+      w.end_array();
+   }
+   /** @ingroup Serializable */
+   template<typename T, typename... U>
+   void to_variant( const boost::container::deque<T, U...>& d, fc::variant& vo )
+   {
+      if( d.size() > MAX_NUM_ARRAY_ELEMENTS ) throw std::range_error( "too large" );
+      variants vars(d.size());
+      for( size_t i = 0; i < d.size(); ++i ) {
+         vars[i] = fc::variant( d[i] );
+      }
+      vo = std::move( vars );
+   }
    /** @ingroup Serializable */
    template<typename T, typename... U>
    void from_variant( const fc::variant& v, boost::container::deque<T, U...>& d )
@@ -605,17 +687,24 @@ namespace fc
    }
 
    /** @ingroup Serializable */
-   template<typename T, typename... U>
-   void to_variant( const boost::container::deque<T, U...>& d, fc::variant& vo )
+   template<typename T, typename A>
+   void to_json_stream( const std::vector<T, A>& v, json_writer& w )
    {
-      if( d.size() > MAX_NUM_ARRAY_ELEMENTS ) throw std::range_error( "too large" );
-      variants vars(d.size());
-      for( size_t i = 0; i < d.size(); ++i ) {
-         vars[i] = fc::variant( d[i] );
-      }
-      vo = std::move( vars );
+      if( v.size() > MAX_NUM_ARRAY_ELEMENTS ) throw std::range_error( "too large" );
+      w.begin_array();
+      for( const auto& e : v ) to_json_stream( e, w );
+      w.end_array();
    }
-
+   /** @ingroup Serializable */
+   template<typename T>
+   void to_variant( const std::vector<T>& t, fc::variant& v )
+   {
+      if( t.size() > MAX_NUM_ARRAY_ELEMENTS ) throw std::range_error( "too large" );
+      variants vars(t.size());
+       for( size_t i = 0; i < t.size(); ++i )
+          vars[i] = fc::variant(t[i]);
+       v = std::move(vars);
+   }
    /** @ingroup Serializable */
    template<typename T>
    void from_variant( const fc::variant& var, std::vector<T>& tmp )
@@ -629,16 +718,13 @@ namespace fc
    }
 
    /** @ingroup Serializable */
-   template<typename T>
-   void to_variant( const std::vector<T>& t, fc::variant& v )
+   template<typename T, std::size_t S>
+   void to_json_stream( const std::array<T,S>& t, json_writer& w )
    {
-      if( t.size() > MAX_NUM_ARRAY_ELEMENTS ) throw std::range_error( "too large" );
-      variants vars(t.size());
-       for( size_t i = 0; i < t.size(); ++i )
-          vars[i] = fc::variant(t[i]);
-       v = std::move(vars);
+      w.begin_array();
+      for( const auto& e : t ) to_json_stream( e, w );
+      w.end_array();
    }
-
    /** @ingroup Serializable */
    template<typename T, std::size_t S>
    void from_variant( const fc::variant& var, std::array<T,S>& tmp )
@@ -690,6 +776,16 @@ namespace fc
       v = std::move(vars);
    }
 
+   /** @ingroup Serializable */
+   template<typename A, typename B>
+   void to_json_stream( const std::pair<A,B>& t, json_writer& w )
+   {
+      // Mirrors to_variant: emits a 2-element array [first, second].
+      w.begin_array();
+      to_json_stream( t.first, w );
+      to_json_stream( t.second, w );
+      w.end_array();
+   }
    /** @ingroup Serializable */
    template<typename A, typename B>
    void to_variant( const std::pair<A,B>& t, fc::variant& v )

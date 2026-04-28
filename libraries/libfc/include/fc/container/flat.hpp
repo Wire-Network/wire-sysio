@@ -5,6 +5,7 @@
 #include <boost/container/flat_map.hpp>
 #include <boost/container/flat_set.hpp>
 #include <fc/crypto/hex.hpp>
+#include <fc/io/json_stream.hpp>
 
 namespace fc {
 
@@ -144,20 +145,32 @@ namespace fc {
    }
 
    template<typename T, typename... U>
+   void to_json_stream( const flat_set< T, U... >& s, json_writer& w ) {
+      FC_ASSERT( s.size() <= MAX_NUM_ARRAY_ELEMENTS );
+      w.begin_array();
+      for( const auto& e : s ) to_json_stream( e, w );
+      w.end_array();
+   }
+   template<typename T, typename... U>
    void to_variant( const flat_set< T, U... >& s, fc::variant& vo ) {
       detail::to_variant_from_set( s, vo );
    }
-
    template<typename T, typename... U>
    void from_variant( const fc::variant& v, flat_set< T, U... >& s ) {
       detail::from_variant_to_flat_set( v, s );
    }
 
    template<typename T, typename... U>
+   void to_json_stream( const flat_multiset< T, U... >& s, json_writer& w ) {
+      FC_ASSERT( s.size() <= MAX_NUM_ARRAY_ELEMENTS );
+      w.begin_array();
+      for( const auto& e : s ) to_json_stream( e, w );
+      w.end_array();
+   }
+   template<typename T, typename... U>
    void to_variant( const flat_multiset< T, U... >& s, fc::variant& vo ) {
       detail::to_variant_from_set( s, vo );
    }
-
    template<typename T, typename... U>
    void from_variant( const fc::variant& v, flat_multiset< T, U... >& s ) {
       detail::from_variant_to_flat_set( v, s );
