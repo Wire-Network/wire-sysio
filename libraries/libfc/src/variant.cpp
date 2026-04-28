@@ -1200,11 +1200,68 @@ std::string format_string( const std::string& frmt, const variant_object& args, 
 
 
    void to_json_stream( const variant& v, json_writer& w ) {
-      // variants hold arbitrary nested structures; emit via the existing JSON serializer
-      // and splice the result as a raw value.  No intermediate variant allocation is
-      // saved here (the variant already exists); the win is that reflected structs with
-      // a variant field participate in the streaming path instead of falling back to a
-      // full mutable_variant_object rebuild at the caller.
-      w.raw_value( fc::json::to_string( v, fc::json::yield_function_t() ) );
+      // Walk the variant tree token-by-token directly into json_writer instead of
+      // building a JSON string via fc::json::to_string and splicing it back in.  Mirrors
+      // the compact (indent=0) form of fc::json::to_string for byte-identical output.
+      switch( v.get_type() ) {
+         case variant::null_type:
+            w.value_null();
+            return;
+         case variant::int64_type: {
+            int64_t i = v.as_int64();
+            constexpr int64_t max_value(0xffffffff);
+            if( i > max_value || i < -max_value ) {
+               // Quote out-of-range integers so 64-bit JS clients don't lose precision.
+               w.value_string( v.as_string() );
+            } else {
+               w.value_int64( i );
+            }
+            return;
+         }
+         case variant::uint64_type: {
+            uint64_t i = v.as_uint64();
+            if( i > 0xffffffff ) {
+               w.value_string( v.as_string() );
+            } else {
+               w.value_uint64( i );
+            }
+            return;
+         }
+         case variant::int128_type:
+         case variant::uint128_type:
+         case variant::int256_type:
+         case variant::uint256_type:
+            // Always quoted; representation is a decimal string already.
+            w.value_string( v.as_string() );
+            return;
+         case variant::double_type:
+            // Quoted form matches fc::json::to_string's existing convention.
+            w.value_string( v.as_string() );
+            return;
+         case variant::bool_type:
+            w.value_bool( v.as_bool() );
+            return;
+         case variant::string_type:
+         case variant::string_sso_type:
+            w.value_string( v.get_string() );
+            return;
+         case variant::blob_type:
+            // as_string() returns the base64-encoded form for blobs; matches the existing
+            // fc::json::to_string blob handling.
+            w.value_string( v.as_string() );
+            return;
+         case variant::array_type: {
+            const variants& a = v.get_array();
+            w.begin_array();
+            for( const auto& e : a ) to_json_stream( e, w );
+            w.end_array();
+            return;
+         }
+         case variant::object_type:
+            to_json_stream( v.get_object(), w );
+            return;
+         default:
+            FC_THROW_EXCEPTION( fc::invalid_arg_exception, "Unsupported variant type: {}", std::to_string( v.get_type() ) );
+      }
    }
 } // namespace fc

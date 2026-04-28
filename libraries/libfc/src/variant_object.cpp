@@ -499,18 +499,27 @@ namespace fc
 
    void to_json_stream( const variant_object& vo, json_writer& w )
    {
-      // variant_object already is an fc::variant's payload; defer to fc::json::to_string
-      // and splice the serialized form.  Avoids rebuilding the object field-by-field on
-      // the stream path when the caller is handing us a prebuilt object (eg legacy code
-      // that produced a variant_object it wants to embed into a streaming response).
-      variant tmp = variant(vo);
-      w.raw_value( fc::json::to_string( tmp, fc::json::yield_function_t() ) );
+      // Walk the object's key/value pairs directly into json_writer.  Mirrors the
+      // compact (indent=0) form of fc::json::to_string for byte-identical output;
+      // values recurse into to_json_stream(variant, w) which handles nested arrays /
+      // objects without going through fc::json::to_string at any level.
+      w.begin_object();
+      for( const auto& kv : vo ) {
+         w.key( kv.key() );
+         to_json_stream( kv.value(), w );
+      }
+      w.end_object();
    }
 
    void to_json_stream( const mutable_variant_object& vo, json_writer& w )
    {
-      variant tmp = variant(vo);
-      w.raw_value( fc::json::to_string( tmp, fc::json::yield_function_t() ) );
+      // mutable_variant_object iterates the same pair shape as variant_object.
+      w.begin_object();
+      for( const auto& kv : vo ) {
+         w.key( kv.key() );
+         to_json_stream( kv.value(), w );
+      }
+      w.end_object();
    }
 
    void from_variant( const variant& var,  mutable_variant_object& vo )
