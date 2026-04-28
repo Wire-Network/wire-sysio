@@ -136,13 +136,6 @@ void chain_api_plugin::plugin_startup() {
    });
 
    _http_plugin.add_api({
-      // get_block_info / get_block_header_state / get_currency_stats return fc::variant
-      // directly.  Streaming them would just splice fc::json::to_string(v) - no real win
-      // until the streaming variant walker (rewrite of to_json_stream(variant, w)) lands,
-      // so they stay on the variant-cb path for now.
-      CHAIN_RO_CALL(get_block_info, 200, http_params_types::params_required),
-      CHAIN_RO_CALL(get_block_header_state, 200, http_params_types::params_required),
-      CHAIN_RO_CALL(get_currency_stats, 200, http_params_types::params_required),
       // transaction related APIs will be posted to read_write queue after keys are recovered, they are safe to run in parallel until they post to the read_write queue
       CHAIN_RO_CALL_ASYNC(compute_transaction, chain_apis::read_only::compute_transaction_results, 200, http_params_types::params_required),
       CHAIN_RW_CALL_ASYNC(push_transaction, chain_apis::read_write::push_transaction_results, 202, http_params_types::params_required),
@@ -157,6 +150,8 @@ void chain_api_plugin::plugin_startup() {
    _http_plugin.add_api_stream({
       CHAIN_RO_CALL_STREAM(get_activated_protocol_features, chain_apis::read_only::get_activated_protocol_features_results, 200, http_params_types::possible_no_params),
       CHAIN_RO_CALL_STREAM_POST(get_block, fc::variant, 200, http_params_types::params_required), // _POST because get_block() returns a lambda to be executed on the http thread pool
+      CHAIN_RO_CALL_STREAM(get_block_info, fc::variant, 200, http_params_types::params_required),
+      CHAIN_RO_CALL_STREAM(get_block_header_state, fc::variant, 200, http_params_types::params_required),
       CHAIN_RO_CALL_STREAM(get_code, chain_apis::read_only::get_code_results, 200, http_params_types::params_required),
       CHAIN_RO_CALL_STREAM(get_code_hash, chain_apis::read_only::get_code_hash_results, 200, http_params_types::params_required),
       CHAIN_RO_CALL_STREAM(get_consensus_parameters, chain_apis::read_only::get_consensus_parameters_results, 200, http_params_types::no_params),
@@ -166,6 +161,7 @@ void chain_api_plugin::plugin_startup() {
       CHAIN_RO_CALL_STREAM(get_finalizer_info, chain_apis::read_only::get_finalizer_info_result, 200, http_params_types::no_params),
       CHAIN_RO_CALL_STREAM(get_table_by_scope, chain_apis::read_only::get_table_by_scope_result, 200, http_params_types::params_required),
       CHAIN_RO_CALL_STREAM(get_currency_balance, std::vector<chain::asset>, 200, http_params_types::params_required),
+      CHAIN_RO_CALL_STREAM(get_currency_stats, fc::variant, 200, http_params_types::params_required),
       CHAIN_RO_CALL_STREAM(get_producers, chain_apis::read_only::get_producers_result, 200, http_params_types::params_required),
       CHAIN_RO_CALL_STREAM(get_producer_schedule, chain_apis::read_only::get_producer_schedule_result, 200, http_params_types::no_params),
       CHAIN_RO_CALL_STREAM(get_required_keys, chain_apis::read_only::get_required_keys_result, 200, http_params_types::params_required),
