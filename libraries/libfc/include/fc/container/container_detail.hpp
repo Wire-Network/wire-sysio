@@ -130,6 +130,17 @@ namespace fc {
          vo = std::move( vars );
       }
 
+      /// JSON shape mirrors to_variant_from_map: an array of [key, value] pairs.
+      template<template<typename...> class Map, typename K, typename V, typename... U >
+      void to_json_stream_from_map( const Map< K, V, U... >& m, fc::json_writer& w ) {
+         FC_ASSERT( m.size() <= MAX_NUM_ARRAY_ELEMENTS );
+         w.begin_array();
+         for( const auto& item : m ) {
+            fc::to_json_stream( item, w );
+         }
+         w.end_array();
+      }
+
       template<template<typename...> class Map, typename K, typename V, typename... U>
       void from_variant_to_map( const variant& v, Map<K, V, U...>& m ) {
          const variants& vars = v.get_array();

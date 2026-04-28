@@ -181,6 +181,11 @@ namespace fc {
       detail::to_variant_from_map( m, vo );
    }
 
+   template<typename K, typename V, typename... U >
+   void to_json_stream( const flat_map< K, V, U... >& m, fc::json_writer& w ) {
+      detail::to_json_stream_from_map( m, w );
+   }
+
    template<typename K, typename V, typename... U>
    void from_variant( const variant& v,  flat_map<K, V, U...>& m ) {
       detail::from_variant_to_flat_map( v, m );
@@ -189,6 +194,11 @@ namespace fc {
    template<typename K, typename V, typename... U >
    void to_variant( const flat_multimap< K, V, U... >& m, fc::variant& vo ) {
       detail::to_variant_from_map( m, vo );
+   }
+
+   template<typename K, typename V, typename... U >
+   void to_json_stream( const flat_multimap< K, V, U... >& m, fc::json_writer& w ) {
+      detail::to_json_stream_from_map( m, w );
    }
 
    template<typename K, typename V, typename... U>
