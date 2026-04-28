@@ -84,7 +84,7 @@ namespace {
    constexpr auto beacon_chain_exit_buffer_days         = "beacon-chain-exit-buffer-days";
 
    constexpr auto client_target_chain                   = fc::crypto::chain_kind_t::chain_kind_ethereum;
-   constexpr auto default_interval_schedule             = "* */1 * * *"; // every hour
+   constexpr auto default_interval_schedule             = "*/60 * * * *"; // every hour
    constexpr auto default_interval_name                 = "default";
    constexpr auto just_once_interval_name               = "once";
 
@@ -434,6 +434,7 @@ void wire_eth_maintenance_plugin::plugin_initialize(const variables_map& options
             auto make_retry_opts = []() -> cron_service::retry_options {
                return cron_service::retry_options{
                   .retry_schedule = job_schedule{.milliseconds = {job_schedule::step_value{5000}}},
+                  .metadata = { .one_at_a_time = true, .tags = { "ethereum", "tags" }, .label = "wire_eth_maintenance" },
                   .max_retries = 600,
                   .on_exhaustion = []() -> fc::exception {
                      return sysio::chain::plugin_config_exception(
@@ -484,7 +485,7 @@ void wire_eth_maintenance_plugin::plugin_startup() {
    const auto eth_client = clients.front()->client;
 
    ilog("Scheduling {} to execute right after startup", just_once_interval_name);
-   job_schedule jo_schedule = services::parse_cron_schedule_or_throw("*/1 * * * * *");
+   job_schedule jo_schedule = services::parse_cron_schedule_or_throw("*/60 * * * * *");
    my->just_once_jid =
       cron.add_job(jo_schedule, [my_=my,cron=&cron]() {
          try {
@@ -564,10 +565,10 @@ void wire_eth_maintenance_plugin::set_program_options(options_description& cli, 
       (beacon_chain_interval,
        boost::program_options::value<std::vector<std::string>>()->multitoken(),
        "Interval specification. Format is `<interval-name>,<cron-spec>`"
-       " where cron-spec is in standard cron format (e.g. `*/5 * * * *` for every 5 minutes)."
-       " If none are provided, a default interval with name `default` and schedule of every"
-       " 1 hour will be used (e.g. `default, * */1 * * *`). Also, a `once` interval is"
-       " automatically provided which will just execute immediately and then not run again.")
+       " where cron-spec is in standard cron format (e.g. `*/5 * * * *` for every 5 minutes). If"
+       " none are provided, a default interval with name `default` and schedule of every 1 hour"
+       " will be used (e.g. `default, */60 * * * *`). Also, a `once` interval is automatically"
+       " provided which will just executes right after starting and then is not run again.")
       (beacon_chain_finalize_epoch_interval,
        bpo::value<std::string>()->default_value(just_once_interval_name),
        "Name of the interval (defined via --beacon-chain-interval) on which to run OPP finalizeEpoch.")

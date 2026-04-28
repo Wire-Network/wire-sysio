@@ -474,6 +474,9 @@ BOOST_AUTO_TEST_SUITE(cron_service)
       svc::retry_options opts;
       opts.retry_schedule.milliseconds.insert(svc::job_schedule::step_value{25}); // every 25ms
       opts.max_retries = max_retries;
+      opts.metadata.label = "testing";
+      opts.metadata.one_at_a_time = true;
+      opts.metadata.tags = { "ethereum", "gas" };
       opts.on_exhaustion = []() -> fc::exception {
          return FC_EXCEPTION(fc::assert_exception, "blocking_retry exhausted in test");
       };

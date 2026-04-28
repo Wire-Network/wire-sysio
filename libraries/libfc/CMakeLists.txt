@@ -58,6 +58,7 @@ set(fc_sources
         src/crypto/modular_arithmetic.cpp
         src/crypto/blake2.cpp
         src/crypto/k1_recover.cpp
+        src/network/curl_init.cpp
         src/network/url.cpp
         src/network/ethereum/ethereum_abi.cpp
         src/network/ethereum/ethereum_client.cpp
@@ -121,6 +122,7 @@ target_link_libraries(
         bn256::bn256
         magic_enum::magic_enum
         fmt::fmt
+        CURL::libcurl
         ${PLATFORM_SPECIFIC_LIBS}
         ${CMAKE_DL_LIBS}
 )

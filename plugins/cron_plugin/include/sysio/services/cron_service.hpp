@@ -205,6 +205,7 @@ public:
     */
    struct retry_options {
       job_schedule retry_schedule;
+      job_metadata_t metadata;
       int max_retries{600};
       std::function<fc::exception()> on_exhaustion;
    };
@@ -250,10 +251,7 @@ public:
          }
       };
 
-      auto scheduled_id = this->add(opts.retry_schedule, retry_fn,
-         job_metadata_t{
-            .one_at_a_time = true, .tags = {"ethereum", "gas"}, .label = "beacon_chain_startup"
-         });
+      auto scheduled_id = this->add(opts.retry_schedule, retry_fn, opts.metadata);
       const auto result = future.get();
       this->cancel(scheduled_id);
       return result;

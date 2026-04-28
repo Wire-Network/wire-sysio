@@ -224,7 +224,6 @@ BOOST_AUTO_TEST_CASE(parse_dow_sunday_zero_accepted) try {
 
 BOOST_AUTO_TEST_CASE(parse_dow_sunday_seven_alias) try {
    // Documents current behavior for DOW=7 (the crontab Sunday-alias convention).
-   // If parser later adds the alias this test should change to check acceptance.
    auto sched_opt = parse_cron_schedule("* * * * 7");
    BOOST_REQUIRE(sched_opt.has_value());
    BOOST_CHECK_EQUAL(sched_opt->day_of_week.size(), 1);

@@ -20,14 +20,15 @@ using namespace fc::crypto;
 using namespace fc::crypto::ethereum;
 using namespace fc::network::json_rpc;
 
-struct block_tag {
+class block_tag {
+public:
    enum class labeled { latest, pending, earliest, not_valid };
    explicit block_tag(labeled name);
    explicit block_tag(uint64_t bn);
    std::string to_string() const;
-
-   const labeled  kind;
-   const uint64_t number;
+private:
+   labeled  kind;
+   uint64_t number;
 };
 
 inline const block_tag block_tag_latest(block_tag::labeled::latest);
@@ -499,7 +500,7 @@ private:
     * be little contention on this mutex between them, so there is not really a
     * need to have _nonce's own mutex
     */
-   std::mutex _contracts_map_mutex{};
+   fc::mutex _contracts_map_mutex{};
 
    /**
     * @brief Cached nonce for _signature_provider
