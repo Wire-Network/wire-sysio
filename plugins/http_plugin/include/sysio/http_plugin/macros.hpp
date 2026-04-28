@@ -85,6 +85,28 @@
        }}
 
 
+// Streaming-cb counterpart of CALL_WITH_400.  Sync endpoint: call runs on the
+// calling queue (typically read_only), result is captured into a json_writer-
+// emitting closure that the cb forwards to the http thread pool for emission.
+// No fc::variant tree on the response path.
+// ------------------------------------------------------------------------------------------------------
+#define CALL_WITH_400_STREAM(api_name, category, api_handle, api_namespace, call_name, call_result, http_resp_code, params_type) \
+{std::string("/v1/" #api_name "/" #call_name),                                                                  \
+      api_category::category,                                                                                   \
+      [api_handle](string&&, string&& body, url_response_stream_callback&& cb) mutable {                        \
+          auto deadline = api_handle.start();                                                                   \
+          try {                                                                                                 \
+             auto params = parse_params<api_namespace::call_name ## _params, params_type>(body);                \
+             call_result result = api_handle.call_name(std::move(params), deadline);                            \
+             cb(http_resp_code, [r = std::move(result)](fc::json_writer& w) mutable {                           \
+                fc::to_json_stream(r, w);                                                                       \
+             });                                                                                                \
+          } catch (...) {                                                                                       \
+             http_plugin::handle_exception_stream(#api_name, #call_name, body, cb);                             \
+          }                                                                                                     \
+       }}
+
+
 // Streaming-cb counterpart of CALL_WITH_400_POST.  Same Phase 1 (api thread) /
 // Phase 2 (http thread pool) split as the variant version, but Phase 2 hands
 // the typed call_result to cb as a json_writer-emitting closure - no fc::variant
