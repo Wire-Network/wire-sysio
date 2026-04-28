@@ -1005,6 +1005,12 @@ void to_variant( const std::vector<char>& var,  variant& vo )
       vo = variant(to_hex(var.data(),var.size()));
    else vo = "";
 }
+void to_json_stream( const std::vector<char>& var,  json_writer& w )
+{
+   FC_ASSERT( var.size() <= MAX_SIZE_OF_BYTE_ARRAYS );
+   // value_hex with size 0 emits `""` already; no separate empty branch needed.
+   w.value_hex(var.data(), var.size());
+}
 void from_variant( const variant& var,  std::vector<char>& vo )
 {
    std::string_view str = var.get_string();

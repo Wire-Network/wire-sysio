@@ -97,6 +97,10 @@ namespace fc
    void from_variant( const fc::variant& var,  mutable_variant_object& vo );
    void to_variant( const std::vector<char>& var,  fc::variant& vo );
    void from_variant( const fc::variant& var,  std::vector<char>& vo );
+   /// JSON shape: lowercase-hex string (matches to_variant which produces a string variant).
+   /// Concretely overrides the generic `to_json_stream(vector<T>)` template (which emits an
+   /// array of int8s).  Empty vector emits `""` to match the to_variant(empty_vec) result.
+   void to_json_stream( const std::vector<char>& var,  json_writer& w );
 
    template<typename K, typename T>
    void to_variant( const std::unordered_map<K,T>& var,  fc::variant& vo );

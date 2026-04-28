@@ -2,6 +2,7 @@
 
 #include <sysio/chain/types.hpp>
 #include <fc/io/raw.hpp>
+#include <fc/io/json_stream.hpp>
 #include <fc/crypto/base64.hpp>
 #include <softfloat/softfloat.hpp>
 
@@ -369,12 +370,22 @@ namespace fc {
 
    inline
    void to_variant( const float128_t& f, variant& v ) {
-      // Assumes platform is little endian and hex representation of 128-bit integer is in little endian order.	
+      // Assumes platform is little endian and hex representation of 128-bit integer is in little endian order.
       char as_bytes[sizeof(sysio::chain::uint128_t)];
       memcpy(as_bytes, &f, sizeof(as_bytes));
-      std::string s = "0x";	
+      std::string s = "0x";
       s.append( to_hex( as_bytes, sizeof(as_bytes) ) );
       v = s;
+   }
+
+   /// JSON shape mirrors to_variant: "0x<hex>" with little-endian bytes.
+   inline
+   void to_json_stream( const float128_t& f, json_writer& w ) {
+      char as_bytes[sizeof(sysio::chain::uint128_t)];
+      memcpy(as_bytes, &f, sizeof(as_bytes));
+      std::string s = "0x";
+      s.append( to_hex( as_bytes, sizeof(as_bytes) ) );
+      w.value_string(s);
    }
 
    inline

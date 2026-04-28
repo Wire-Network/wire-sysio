@@ -72,11 +72,17 @@ struct signed_int {
 constexpr auto format_as(const signed_int& si) { return si.value; }
 
 class variant;
+class json_writer;
 
 void to_variant( const signed_int& var,  variant& vo );
 void from_variant( const variant& var,  signed_int& vo );
 void to_variant( const unsigned_int& var,  variant& vo );
 void from_variant( const variant& var,  unsigned_int& vo );
+
+/// JSON shape: bare integer.  Matches to_json_stream(variant) for variants built
+/// from `signed_int::value` / `unsigned_int::value` (int32 / uint32 fit-range).
+void to_json_stream( const signed_int& var, json_writer& w );
+void to_json_stream( const unsigned_int& var, json_writer& w );
 
 }  // namespace fc
 

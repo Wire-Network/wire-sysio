@@ -8,6 +8,7 @@
 #include <fc/scoped_exit.hpp>
 #include <fc/time.hpp>
 #include <fc/io/json.hpp>
+#include <fc/io/json_stream_fwd.hpp>
 
 namespace google::protobuf {
    class DescriptorPool;
@@ -32,6 +33,9 @@ namespace impl {
    struct binary_to_variant_context;
    struct variant_to_binary_context;
    struct action_data_to_variant_context;
+
+   class variant_sink;
+   class stream_sink;
 }
 
 /**
@@ -80,6 +84,21 @@ struct abi_serializer {
    fc::variant binary_to_variant( const std::string_view& type, fc::datastream<const char*>& binary, const yield_function_t& yield, bool short_path = false )const;
    fc::variant binary_to_variant( const std::string_view& type, fc::datastream<const char*>& binary, const fc::microseconds& max_action_data_serialization_time, bool short_path = false )const;
 
+   /// Streaming counterpart to `binary_to_variant`.  Decodes the binary blob and
+   /// emits its JSON representation directly into `w` without constructing a
+   /// `fc::variant` tree.  The output is byte-identical to
+   /// `fc::json::to_string(binary_to_variant(...))` for all built-in types and
+   /// any reflected user struct that has a corresponding `to_json_stream` overload
+   /// (which `FC_REFLECT` provides automatically).
+   void binary_to_json_stream( const std::string_view& type, const bytes& binary, fc::json_writer& w,
+                               const yield_function_t& yield, bool short_path = false )const;
+   void binary_to_json_stream( const std::string_view& type, const bytes& binary, fc::json_writer& w,
+                               const fc::microseconds& max_action_data_serialization_time, bool short_path = false )const;
+   void binary_to_json_stream( const std::string_view& type, fc::datastream<const char*>& binary, fc::json_writer& w,
+                               const yield_function_t& yield, bool short_path = false )const;
+   void binary_to_json_stream( const std::string_view& type, fc::datastream<const char*>& binary, fc::json_writer& w,
+                               const fc::microseconds& max_action_data_serialization_time, bool short_path = false )const;
+
    bytes       variant_to_binary( const std::string_view& type, const fc::variant& var, const fc::microseconds& max_action_data_serialization_time, bool short_path = false )const;
    bytes       variant_to_binary( const std::string_view& type, const fc::variant& var, const yield_function_t& yield, bool short_path = false )const;
    void        variant_to_binary( const std::string_view& type, const fc::variant& var, fc::datastream<char*>& ds, const fc::microseconds& max_action_data_serialization_time, bool short_path = false )const;
@@ -121,6 +140,12 @@ struct abi_serializer {
    typedef std::function<void(const fc::variant&, fc::datastream<char*>&, bool, bool, const abi_serializer::yield_function_t&)>  pack_function;
 
    void add_specialized_unpack_pack( const string& name, std::pair<abi_serializer::unpack_function, abi_serializer::pack_function> unpack_pack );
+
+   /// Lookup helper used by the streaming walker sinks.  Returns a pointer to the
+   /// (unpack, pack) entry registered for `type`, or `nullptr` if it is not a
+   /// built-in.  Const view; the underlying map is shared with `binary_to_variant`
+   /// dispatch so any `add_specialized_unpack_pack` overrides are reflected.
+   const std::pair<unpack_function, pack_function>* find_built_in(std::string_view type) const noexcept;
 
    static constexpr size_t max_recursion_depth = 32; // arbitrary depth to prevent infinite recursion
 
@@ -167,12 +192,39 @@ private:
    bool is_protobuf_type(const std::string_view& type) const;
    const google::protobuf::Descriptor* get_pb_descriptor(const std::string_view& type) const;
    fc::variant pb_binary_to_variant(const std::string_view& type, fc::datastream<const char*>& stream) const;
+   /// Streaming protobuf bridge: decodes the protobuf blob and returns the JSON
+   /// string produced by `MessageToJsonString` (which `pb_binary_to_variant`
+   /// otherwise round-trips through `fc::json::from_string`).  Used by
+   /// `stream_sink::unpack_protobuf` to splice via `raw_value` without building
+   /// an intermediate variant tree.
+   std::string pb_binary_to_json_string(const std::string_view& type, fc::datastream<const char*>& stream) const;
    void pb_variant_to_binary(const std::string_view& type, const fc::variant& var, fc::datastream<char*>& ds) const;
 
    fc::variant _binary_to_variant( const std::string_view& type, const bytes& binary, impl::binary_to_variant_context& ctx )const;
    fc::variant _binary_to_variant( const std::string_view& type, fc::datastream<const char*>& binary, impl::binary_to_variant_context& ctx )const;
-   void        _binary_to_variant( const std::string_view& type, fc::datastream<const char*>& stream,
-                                   fc::mutable_variant_object& obj, impl::binary_to_variant_context& ctx )const;
+
+   /// Templated recursive walker that emits a value of `type` from `stream` into `sink`.
+   /// Mirrors the recursion shape of `_binary_to_variant`: fixed-array, built-in,
+   /// protobuf, dynamic array, optional, enum, variant, struct.  Two explicit
+   /// instantiations (variant_sink, stream_sink) live in `abi_serializer.cpp`.
+   template<typename Sink>
+   void _binary_walk( const std::string_view& type, fc::datastream<const char*>& stream,
+                      Sink& sink, impl::binary_to_variant_context& ctx )const;
+
+   /// Walk struct fields without emitting `begin_object`/`end_object`.  Recurses
+   /// into the base struct (if any) so its fields land in the same object frame
+   /// the caller already opened.
+   template<typename Sink>
+   void _binary_walk_struct_fields( const map<type_name, struct_def, std::less<>>::const_iterator& s_itr,
+                                    fc::datastream<const char*>& stream,
+                                    Sink& sink, impl::binary_to_variant_context& ctx )const;
+
+   /// Read an enum's underlying integer from `stream` and emit either the matching
+   /// member name as a string, or the raw integer for unknown values.  Templated
+   /// over sink to avoid a `fc::variant` round-trip on the streaming path.
+   template<typename Sink>
+   void _unpack_enum( const enum_def& e_def, fc::datastream<const char*>& stream,
+                      Sink& sink, impl::binary_to_variant_context& ctx )const;
 
    bytes       _variant_to_binary( const std::string_view& type, const fc::variant& var, impl::variant_to_binary_context& ctx )const;
    void        _variant_to_binary( const std::string_view& type, const fc::variant& var,
@@ -186,6 +238,8 @@ private:
    friend struct impl::abi_from_variant;
    friend struct impl::abi_to_variant;
    friend struct impl::abi_traverse_context_with_path;
+   friend class  impl::variant_sink;
+   friend class  impl::stream_sink;
 };
 
 namespace impl {

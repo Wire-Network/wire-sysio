@@ -7,6 +7,7 @@
 
 #include <fc/variant.hpp>
 #include <fc/io/json.hpp>
+#include <fc/io/json_stream.hpp>
 #include <fc/exception/exception.hpp>
 #include <fc/log/logger.hpp>
 #include <fc/time.hpp>
@@ -732,14 +733,10 @@ BOOST_AUTO_TEST_CASE(uint_types)
 } FC_LOG_AND_RETHROW() }
 
 
-BOOST_AUTO_TEST_CASE(general)
-{ try {
-
-   auto abi = sysio_contract_abi(fc::json::from_string(my_abi).as<abi_def>());
-
-   abi_serializer abis(abi_def(abi), yield_fn());
-
-   const char *my_other = R"=====(
+// Shared fixture for `general` and the streaming-parity test.  Top-level fields
+// cover every built-in plus inherited base structs, large-int quoting boundaries,
+// optional/array containers, and the ABI-described meta-types.
+static const char* my_other_json = R"=====(
     {
       "publickey"     :  "SYS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV",
       "publickey_arr" :  ["SYS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV","SYS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV","SYS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV"],
@@ -932,7 +929,14 @@ BOOST_AUTO_TEST_CASE(general)
     }
    )=====";
 
-   auto var = fc::json::from_string(my_other);
+BOOST_AUTO_TEST_CASE(general)
+{ try {
+
+   auto abi = sysio_contract_abi(fc::json::from_string(my_abi).as<abi_def>());
+
+   abi_serializer abis(abi_def(abi), yield_fn());
+
+   auto var = fc::json::from_string(my_other_json);
    verify_byte_round_trip_conversion(abi_serializer{std::move(abi), yield_fn()}, "A", var);
 
 } FC_LOG_AND_RETHROW() }
@@ -4171,6 +4175,31 @@ BOOST_AUTO_TEST_CASE(abi_serializer_long_table_name) { try {
    BOOST_CHECK_EQUAL(abi.tables[0].name, "geolocation_records");
    BOOST_CHECK_EQUAL(abi.tables[0].table_id, 42000u);
 
+} FC_LOG_AND_RETHROW() }
+
+// Parity gate for `binary_to_json_stream`: the streaming path must produce
+// byte-identical JSON output to `fc::json::to_string(binary_to_variant(...))`.
+// Reuses `my_abi` + `my_other_json` from `general` so coverage stays in lock-step
+// with the established round-trip suite.
+BOOST_AUTO_TEST_CASE(binary_to_json_stream_parity)
+{ try {
+   auto abi = sysio_contract_abi(fc::json::from_string(my_abi).as<abi_def>());
+   abi_serializer abis(abi_def(abi), yield_fn());
+
+   auto fixture_var = fc::json::from_string(my_other_json);
+   auto packed      = abis.variant_to_binary("A", fixture_var, yield_fn());
+
+   auto via_variant         = abis.binary_to_variant("A", packed, yield_fn());
+   std::string variant_json = fc::json::to_string(via_variant, get_deadline());
+
+   std::string streamed_json;
+   {
+      fc::json_writer w(streamed_json);
+      abis.binary_to_json_stream("A", packed, w, yield_fn());
+      BOOST_CHECK( w.balanced() );
+   }
+
+   BOOST_CHECK_EQUAL( variant_json, streamed_json );
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()
