@@ -89,35 +89,15 @@ parse_params<chain_apis::read_only::get_transaction_id_params, http_params_types
    } SYS_RETHROW_EXCEPTIONS(chain::invalid_http_request, "Invalid transaction");
 }
 
-#define CALL_WITH_400(api_name, category, api_handle, api_namespace, call_name, http_response_code, params_type) \
-{std::string("/v1/" #api_name "/" #call_name), \
-   api_category::category,\
-   [api_handle](string&&, string&& body, url_response_callback&& cb) mutable { \
-          auto deadline = api_handle.start(); \
-          try { \
-             auto params = parse_params<api_namespace::call_name ## _params, params_type>(body);\
-             fc::variant result( api_handle.call_name( std::move(params), deadline ) ); \
-             cb(http_response_code, std::move(result)); \
-          } catch (...) { \
-             http_plugin::handle_exception(#api_name, #call_name, body, cb); \
-          } \
-       }}
-
-#define CHAIN_RO_CALL(call_name, http_response_code, params_type) CALL_WITH_400(chain, chain_ro, ro_api, chain_apis::read_only, call_name, http_response_code, params_type)
-#define CHAIN_RW_CALL(call_name, http_response_code, params_type) CALL_WITH_400(chain, chain_rw, rw_api, chain_apis::read_write, call_name, http_response_code, params_type)
-#define CHAIN_RO_CALL_POST(call_name, call_result, http_response_code, params_type) CALL_WITH_400_POST(chain, chain_ro, ro_api, chain_apis::read_only, call_name, call_result, http_response_code, params_type)
-#define CHAIN_RO_CALL_ASYNC(call_name, call_result, http_response_code, params_type) CALL_ASYNC_WITH_400(chain, chain_ro, ro_api, chain_apis::read_only, call_name, call_result, http_response_code, params_type)
-#define CHAIN_RW_CALL_ASYNC(call_name, call_result, http_response_code, params_type) CALL_ASYNC_WITH_400(chain, chain_rw, rw_api, chain_apis::read_write, call_name, call_result, http_response_code, params_type)
-
-#define CHAIN_RO_CALL_WITH_400(call_name, http_response_code, params_type) CALL_WITH_400(chain, chain_ro, ro_api, chain_apis::read_only, call_name, http_response_code, params_type)
-
-// Streaming-cb counterparts.  Migration in progress; endpoints flip from the variant
-// macros above to these as their byte-identical equivalence is verified.  After the
-// last endpoint flips, the variant macros (and CALL_WITH_400 / CALL_WITH_400_POST /
-// CALL_ASYNC_WITH_400) get removed in a cleanup commit.
+// Streaming-cb endpoint registrations.  Every chain_api_plugin endpoint is on the
+// streaming path; the variant-cb counterparts (CALL_WITH_400 / CALL_ASYNC_WITH_400 /
+// CHAIN_RO_CALL / CHAIN_RW_CALL / CHAIN_RO_CALL_ASYNC / CHAIN_RW_CALL_ASYNC /
+// CHAIN_RO_CALL_WITH_400) are no longer used from this plugin.
 #define CHAIN_RO_CALL_STREAM(call_name, call_result, http_response_code, params_type) CALL_WITH_400_STREAM(chain, chain_ro, ro_api, chain_apis::read_only, call_name, call_result, http_response_code, params_type)
 #define CHAIN_RO_CALL_STREAM_POST(call_name, call_result, http_response_code, params_type) CALL_WITH_400_STREAM_POST(chain, chain_ro, ro_api, chain_apis::read_only, call_name, call_result, http_response_code, params_type)
 #define CHAIN_RO_CALL_STREAM_POST_DIRECT(call_name, http_response_code, params_type) CALL_WITH_400_STREAM_POST_DIRECT(chain, chain_ro, ro_api, chain_apis::read_only, call_name, http_response_code, params_type)
+#define CHAIN_RO_CALL_ASYNC_STREAM(call_name, call_result, http_response_code, params_type) CALL_ASYNC_WITH_400_STREAM(chain, chain_ro, ro_api, chain_apis::read_only, call_name, call_result, http_response_code, params_type)
+#define CHAIN_RW_CALL_ASYNC_STREAM(call_name, call_result, http_response_code, params_type) CALL_ASYNC_WITH_400_STREAM(chain, chain_rw, rw_api, chain_apis::read_write, call_name, call_result, http_response_code, params_type)
 
 void chain_api_plugin::plugin_startup() {
    dlog( "starting chain_api_plugin" );
@@ -132,22 +112,19 @@ void chain_api_plugin::plugin_startup() {
    ro_api.set_shorten_abi_errors( !http_plugin::verbose_errors() );
 
    // Run get_info on http thread only
-   _http_plugin.add_async_api({
-      CALL_WITH_400(chain, node, ro_api, chain_apis::read_only, get_info, 200, http_params_types::no_params)
+   _http_plugin.add_async_api_stream({
+      CHAIN_RO_CALL_STREAM(get_info, chain_apis::get_info_db::get_info_results, 200, http_params_types::no_params)
    });
 
-   _http_plugin.add_api({
+   _http_plugin.add_api_stream({
       // transaction related APIs will be posted to read_write queue after keys are recovered, they are safe to run in parallel until they post to the read_write queue
-      CHAIN_RO_CALL_ASYNC(compute_transaction, chain_apis::read_only::compute_transaction_results, 200, http_params_types::params_required),
-      CHAIN_RW_CALL_ASYNC(push_transaction, chain_apis::read_write::push_transaction_results, 202, http_params_types::params_required),
-      CHAIN_RW_CALL_ASYNC(push_transactions, chain_apis::read_write::push_transactions_results, 202, http_params_types::params_required),
-      CHAIN_RW_CALL_ASYNC(send_transaction, chain_apis::read_write::send_transaction_results, 202, http_params_types::params_required),
-      CHAIN_RW_CALL_ASYNC(send_transaction2, chain_apis::read_write::send_transaction_results, 202, http_params_types::params_required)
+      CHAIN_RO_CALL_ASYNC_STREAM(compute_transaction, chain_apis::read_only::compute_transaction_results, 200, http_params_types::params_required),
+      CHAIN_RW_CALL_ASYNC_STREAM(push_transaction, chain_apis::read_write::push_transaction_results, 202, http_params_types::params_required),
+      CHAIN_RW_CALL_ASYNC_STREAM(push_transactions, chain_apis::read_write::push_transactions_results, 202, http_params_types::params_required),
+      CHAIN_RW_CALL_ASYNC_STREAM(send_transaction, chain_apis::read_write::send_transaction_results, 202, http_params_types::params_required),
+      CHAIN_RW_CALL_ASYNC_STREAM(send_transaction2, chain_apis::read_write::send_transaction_results, 202, http_params_types::params_required)
    }, appbase::exec_queue::read_only);
 
-   // Streaming-cb endpoints.  Same exec_queue and registration semantics as the
-   // variant-cb add_api block above; the difference is only how the response is
-   // delivered to the http thread pool (closure vs variant tree).
    _http_plugin.add_api_stream({
       CHAIN_RO_CALL_STREAM(get_activated_protocol_features, chain_apis::read_only::get_activated_protocol_features_results, 200, http_params_types::possible_no_params),
       CHAIN_RO_CALL_STREAM_POST_DIRECT(get_block, 200, http_params_types::params_required), // _POST because get_block_stream() returns a lambda to be executed on the http thread pool
@@ -172,21 +149,21 @@ void chain_api_plugin::plugin_startup() {
    }, appbase::exec_queue::read_only);
 
    if (chain.account_queries_enabled()) {
-      _http_plugin.add_async_api({
-         CHAIN_RO_CALL_WITH_400(get_accounts_by_authorizers, 200, http_params_types::params_required),
+      _http_plugin.add_async_api_stream({
+         CHAIN_RO_CALL_STREAM(get_accounts_by_authorizers, chain_apis::read_only::get_accounts_by_authorizers_result, 200, http_params_types::params_required),
       });
    }
 
-   _http_plugin.add_async_api({
+   _http_plugin.add_async_api_stream({
       // chain_plugin send_read_only_transaction will post to read_exclusive queue
-      CHAIN_RO_CALL_ASYNC(send_read_only_transaction, chain_apis::read_only::send_read_only_transaction_results, 200, http_params_types::params_required),
-      CHAIN_RO_CALL_WITH_400(get_raw_block, 200, http_params_types::params_required),
-      CHAIN_RO_CALL_WITH_400(get_block_header, 200, http_params_types::params_required)
+      CHAIN_RO_CALL_ASYNC_STREAM(send_read_only_transaction, chain_apis::read_only::send_read_only_transaction_results, 200, http_params_types::params_required),
+      CHAIN_RO_CALL_STREAM(get_raw_block, chain::signed_block_ptr, 200, http_params_types::params_required),
+      CHAIN_RO_CALL_STREAM(get_block_header, chain_apis::read_only::get_block_header_result, 200, http_params_types::params_required)
    });
 
    if (chain.transaction_finality_status_enabled()) {
-      _http_plugin.add_api({
-         CHAIN_RO_CALL_WITH_400(get_transaction_status, 200, http_params_types::params_required),
+      _http_plugin.add_api_stream({
+         CHAIN_RO_CALL_STREAM(get_transaction_status, chain_apis::read_only::get_transaction_status_results, 200, http_params_types::params_required),
       }, appbase::exec_queue::read_only);
    }
 

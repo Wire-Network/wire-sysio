@@ -3,6 +3,7 @@
 #include <fc/io/json.hpp>
 #include <fc/io/json_stream.hpp>
 #include <fc/reflect/reflect.hpp>
+#include <fc/reflect/variant.hpp>
 
 #include <cstdint>
 #include <string>

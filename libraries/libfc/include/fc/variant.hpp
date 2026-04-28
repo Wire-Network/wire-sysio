@@ -833,6 +833,15 @@ namespace fc
       else vo = nullptr;
    }
 
+   /// JSON shape: dereference and emit the pointee, matching to_variant; null
+   /// pointers emit JSON `null`.
+   template<typename T>
+   void to_json_stream( const std::shared_ptr<T>& var, json_writer& w )
+   {
+      if( var ) to_json_stream( *var, w );
+      else     w.value_null();
+   }
+
    template<typename T>
    void from_variant( const fc::variant& var,  std::shared_ptr<T>& vo )
    {
