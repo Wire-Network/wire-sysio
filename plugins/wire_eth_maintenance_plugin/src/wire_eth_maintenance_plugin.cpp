@@ -18,9 +18,8 @@
 #include <boost/beast/core.hpp>
 #include <boost/beast/http.hpp>
 #include <boost/beast/ssl.hpp>
-
-#include <curl/curl.h>
-#include <fc/network/curl_init.hpp>
+#include <boost/url/encode.hpp>
+#include <boost/url/rfc/unreserved_chars.hpp>
 
 #include <optional>
 #include <unordered_map>
@@ -114,14 +113,8 @@ namespace {
       tcp::resolver      resolver{ioc};
       auto               dest = resolver.resolve(host, port);
       if (method == boost::beast::http::verb::get) {
-         std::unique_ptr<char, decltype(&curl_free)> escaped{
-            curl_easy_escape(nullptr, api_key.c_str(), static_cast<int>(api_key.size())),
-            &curl_free};
-         SYS_ASSERT(escaped != nullptr,
-                  sysio::chain::plugin_config_exception,
-                  "curl error occurred while performing curl_easy_escape");
          path += "?apikey=";
-         path += escaped.get();
+         path += boost::urls::encode(api_key, boost::urls::unreserved_chars);
       }
 
       ssl_ctx.set_default_verify_paths();
@@ -466,8 +459,6 @@ void wire_eth_maintenance_plugin::plugin_initialize(const variables_map& options
       SYS_ASSERT(!!opp_contract, sysio::chain::plugin_config_exception,
                  "Nothing is configured to run in wire_eth_maintenance_plugin");
    }
-
-   fc::ensure_libcurl_initialized();
 
    ilog("initializing beacon chain plugin DONE");
 }
