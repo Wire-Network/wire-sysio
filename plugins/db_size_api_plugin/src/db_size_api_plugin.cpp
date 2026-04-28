@@ -7,16 +7,16 @@ namespace sysio {
 
 using namespace sysio;
 
-#define CALL_WITH_400(api_name, api_handle, call_name, INVOKE, http_response_code) \
+#define CALL_WITH_400_STREAM(api_name, api_handle, call_name, INVOKE, http_response_code) \
 {std::string("/v1/" #api_name "/" #call_name), \
    api_category::db_size, \
-   [api_handle](string&&, string&& body, url_response_callback&& cb) mutable { \
+   [api_handle](string&&, string&& body, url_response_stream_callback&& cb) mutable { \
           try { \
              body = parse_params<std::string, http_params_types::no_params>(body); \
              INVOKE \
-             cb(http_response_code, fc::variant(result)); \
+             cb(http_response_code, [r = std::move(result)](fc::json_writer& w) mutable { fc::to_json_stream(r, w); }); \
           } catch (...) { \
-             http_plugin::handle_exception(#api_name, #call_name, body, cb); \
+             http_plugin::handle_exception_stream(#api_name, #call_name, body, cb); \
           } \
        }}
 
@@ -25,8 +25,8 @@ using namespace sysio;
 
 
 void db_size_api_plugin::plugin_startup() {
-   app().get_plugin<http_plugin>().add_api({
-       CALL_WITH_400(db_size, this, get,  INVOKE_R_V(this, get), 200),
+   app().get_plugin<http_plugin>().add_api_stream({
+       CALL_WITH_400_STREAM(db_size, this, get,  INVOKE_R_V(this, get), 200),
    }, appbase::exec_queue::read_only);
 }
 
