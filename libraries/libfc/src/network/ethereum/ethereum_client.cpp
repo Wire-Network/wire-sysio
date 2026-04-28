@@ -100,7 +100,7 @@ fc::variant ethereum_client::execute(const std::string& method, const fc::varian
  *
  * @param contract_address The address of the smart contract
  * @param abi The ABI definition of the function to call
- * @param block_tag The block at which to execute the call (e.g., "latest", "pending")
+ * @param tag The block at which to execute the call (e.g., "latest", "pending")
  * @param params The parameters to pass to the contract function
  * @return The result of the contract call as a variant
  * @throws fc::network::json_rpc::json_rpc_exception if the call fails

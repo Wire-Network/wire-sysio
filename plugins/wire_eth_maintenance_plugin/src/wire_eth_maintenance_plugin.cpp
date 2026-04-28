@@ -434,7 +434,7 @@ void wire_eth_maintenance_plugin::plugin_initialize(const variables_map& options
             auto make_retry_opts = []() -> cron_service::retry_options {
                return cron_service::retry_options{
                   .retry_schedule = job_schedule{.milliseconds = {job_schedule::step_value{5000}}},
-                  .metadata = { .one_at_a_time = true, .tags = { "ethereum", "tags" }, .label = "wire_eth_maintenance" },
+                  .metadata = { .one_at_a_time = true, .tags = { "ethereum", "gas" }, .label = "wire_eth_maintenance" },
                   .max_retries = 600,
                   .on_exhaustion = []() -> fc::exception {
                      return sysio::chain::plugin_config_exception(
