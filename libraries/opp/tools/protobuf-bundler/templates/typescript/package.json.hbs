@@ -1,0 +1,35 @@
+{
+  "name": "{{packageName}}",
+  "version": "{{version}}",
+  "description": "Auto-generated protobuf TypeScript types",
+  "types": "lib/esm/index.d.ts",
+	"main": "lib/cjs/index.js",
+	"module": "lib/esm/index.js",
+  "files": [
+    "src/**/*.ts",
+    "lib/**/*.js",
+    "lib/**/*.d.ts",
+    "lib/**/*.d.ts.map",
+    "README.md"
+  ],
+	"exports": {
+		".": {
+			"types": "./lib/esm/index.d.ts",
+			"import": "./lib/esm/index.js",
+			"require": "./lib/cjs/index.js"
+		},
+		"./*": {
+			"types": "./lib/esm/*.d.ts",
+			"import": "./lib/esm/*.js",
+			"require": "./lib/cjs/*.js"
+		}
+	},
+	"access": "public",
+  "dependencies": {
+    "@protobuf-ts/runtime": "{{protobufTsRuntimeVersion}}"
+  }{{#if additionalFields}},
+{{#each additionalFields}}
+  "{{@key}}": {{{json this}}}{{#unless @last}},{{/unless}}
+{{/each}}
+{{/if}}
+}
