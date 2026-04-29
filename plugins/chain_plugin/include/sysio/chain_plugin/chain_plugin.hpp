@@ -389,7 +389,7 @@ public:
    ///   - Phase 1 (main app thread, read_only queue): this method's body.  `get_raw_block` is itself thread-safe;
    ///     `get_serializers_cache` is what *requires* the main thread because it reads each referenced account's `abi`
    ///     field out of chainbase.  Returns the outer http_fwd closure.
-   ///   - Hop 1: `CALL_WITH_400_STREAM_POST_DIRECT` posts the outer closure to the http thread pool.
+   ///   - Hop 1: `bind_stream<&get_block_stream, dispatch::post_direct>` posts the outer closure to the http thread pool.
    ///   - Phase 2 (http thread pool): invokes the outer closure -- captured block + resolver snapshots, no chainbase
    ///     access -- and produces the inner `json_writer`-emitting closure, handed to `cb`.
    ///   - Hop 2: `make_http_stream_response_handler` re-dispatches onto the same http thread pool (inherited from the
