@@ -474,8 +474,11 @@ public:
    ///   - Phase 2 (http thread pool): invokes the outer closure, parses the captured abi bytes
    ///     into an `abi_resolver` via `build_resolver_from_captured_abis` (CPU-only, no chainbase
    ///     access), and produces the inner `json_writer`-emitting closure, handed to `cb`.
-   ///   - Hop 2: `make_http_stream_response_handler` re-dispatches onto the same http thread pool (inherited from the
-   ///     variant-cb `cb` shape, where Phase 2 does the row-decode work).
+   ///   - cb (`make_http_stream_response_handler`) calls `boost::asio::dispatch` to the same
+   ///     http thread pool.  Asio's `thread_pool::executor::do_execute` short-circuits this
+   ///     to an inline call when the calling thread is already a pool worker (which it is
+   ///     here, since we're inside the Phase 2 task posted via `post_http_thread_pool`).
+   ///     Net effect: no extra task post -- Phase 3 runs in the same task as Phase 2.
    ///   - Phase 3 (http thread pool): walks the captured block via `abi_serializer::to_json_stream<signed_block>`,
    ///     decoding each action's `data` straight into the writer with `binary_to_json_stream`.  No `fc::variant` tree
    ///     is built per action.

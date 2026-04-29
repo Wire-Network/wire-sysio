@@ -242,6 +242,16 @@ inline auto make_http_stream_response_handler(http_plugin_state& plugin_state, d
       [&plugin_state, session_ptr{std::move(session_ptr)}]
       (int code, stream_emitter emitter) mutable {
 
+         // Note on threading: boost::asio::dispatch on a thread_pool executor runs
+         // the function inline when called from a thread already inside the pool
+         // (impl/thread_pool.hpp `do_execute`: "Invoke immediately if the
+         // blocking.possibly property is enabled and we are already inside the
+         // thread pool").  So when this cb is fired from a `post_http_thread_pool`
+         // task -- e.g. the Phase 2 closure of a `dispatch::post_direct` registration
+         // -- the dispatch below is a function-call short-circuit, not a real post.
+         // For sync / sync_void / async-immediate paths (cb invoked on read-only
+         // or read-write queue), it correctly bounces JSON serialization + socket
+         // I/O onto the http thread pool.
          boost::asio::dispatch(plugin_state.thread_pool.get_executor(),
             [&plugin_state, session_ptr{std::move(session_ptr)}, code, emitter{std::move(emitter)}]() mutable {
                try {
