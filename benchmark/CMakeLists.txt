@@ -9,3 +9,11 @@ target_include_directories( benchmark PUBLIC
                             "${CMAKE_CURRENT_SOURCE_DIR}"
                             "${CMAKE_CURRENT_BINARY_DIR}/../unittests/include"
                           )
+
+# ABI fixture paths consumed by abi_serializer.cpp.  These point at the system-contract
+# sources, not the built artifacts, so the benchmark works regardless of build state.
+target_compile_definitions( benchmark
+   PRIVATE
+      TOKEN_ABI_PATH="${CMAKE_SOURCE_DIR}/contracts/sysio.token/sysio.token.abi"
+      SYSTEM_ABI_PATH="${CMAKE_SOURCE_DIR}/contracts/sysio.system/sysio.system.abi"
+)

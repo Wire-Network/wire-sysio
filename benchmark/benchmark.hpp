@@ -25,6 +25,7 @@ void blake2_benchmarking();
 void bls_benchmarking();
 void merkle_benchmarking();
 void trace_api_json_benchmarking();
+void abi_serializer_benchmarking();
 
 void benchmarking(const std::string& name, const std::function<void()>& func, std::optional<size_t> num_runs = {});
 
