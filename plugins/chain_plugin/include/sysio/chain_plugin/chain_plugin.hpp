@@ -507,7 +507,27 @@ public:
       uint32_t block_num = 0;
    };
 
-   fc::variant get_block_info(const get_block_info_params& params, const fc::time_point& deadline) const;
+   /// Typed result for `/v1/chain/get_block_info`.  Field order matches the previous mutable_variant_object
+   /// shape so the streaming JSON output is byte-identical to the prior variant path.
+   struct get_block_info_results {
+      uint32_t                                block_num            = 0;
+      uint16_t                                ref_block_num        = 0;
+      chain::block_id_type                    id;
+      chain::block_timestamp_type             timestamp;
+      chain::account_name                     producer;
+      chain::block_id_type                    previous;
+      chain::checksum256_type                 transaction_mroot;
+      chain::checksum256_type                 finality_mroot;
+      chain::qc_claim_t                       qc_claim;
+      std::vector<chain::signature_type>      producer_signatures;
+      uint32_t                                ref_block_prefix     = 0;
+   };
+
+   /// `/v1/chain/get_block_info` -- async streaming so the body runs on the http thread pool, not the read-only queue.
+   /// `fetch_block_header_by_number` is thread-safe per controller and the rest is just CPU (id calc + struct build),
+   /// so the entire body is safe off the read-only queue.
+   void get_block_info_async(get_block_info_params params,
+                              chain::next_function<get_block_info_results> next) const;
 
    struct get_block_header_state_params {
       string block_num_or_id;
@@ -859,6 +879,10 @@ FC_REFLECT(sysio::chain_apis::read_only::get_activated_protocol_features_params,
 FC_REFLECT(sysio::chain_apis::read_only::get_activated_protocol_features_results, (activated_protocol_features)(more) )
 FC_REFLECT(sysio::chain_apis::read_only::get_raw_block_params, (block_num_or_id))
 FC_REFLECT(sysio::chain_apis::read_only::get_block_info_params, (block_num))
+FC_REFLECT(sysio::chain_apis::read_only::get_block_info_results,
+           (block_num)(ref_block_num)(id)(timestamp)(producer)(previous)
+           (transaction_mroot)(finality_mroot)(qc_claim)
+           (producer_signatures)(ref_block_prefix))
 FC_REFLECT(sysio::chain_apis::read_only::get_block_header_state_params, (block_num_or_id))
 FC_REFLECT(sysio::chain_apis::read_only::get_block_header_params, (block_num_or_id)(include_extensions))
 FC_REFLECT(sysio::chain_apis::read_only::get_block_header_result, (id)(signed_block_header)(block_extensions))

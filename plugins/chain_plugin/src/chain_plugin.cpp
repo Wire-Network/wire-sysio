@@ -2892,32 +2892,38 @@ void read_only::convert_block_stream( const chain::signed_block_ptr& block, abi_
    sink.end_object();
 }
 
-fc::variant read_only::get_block_info(const read_only::get_block_info_params& params, const fc::time_point&) const {
-
-   std::optional<signed_block_header> block;
+void read_only::get_block_info_async(get_block_info_params params,
+                                      chain::next_function<get_block_info_results> next) const {
    try {
-         block = db.fetch_block_header_by_number( params.block_num );
-   } catch (...)   {
-      // assert below will handle the invalid block num
-   }
+      // Runs on the http thread pool (registered via add_async_api_stream).
+      // fetch_block_header_by_number is thread-safe per controller, so the entire
+      // body stays off the read-only queue.
+      std::optional<signed_block_header> block;
+      try {
+         block = db.fetch_block_header_by_number(params.block_num);
+      } catch (...) {
+         // assert below will handle the invalid block num
+      }
 
-   SYS_ASSERT( block, unknown_block_exception, "Could not find block: {}", params.block_num);
+      SYS_ASSERT(block, unknown_block_exception, "Could not find block: {}", params.block_num);
 
-   const auto id = block->calculate_id();
-   const uint32_t ref_block_prefix = id._hash[1];
+      const auto id = block->calculate_id();
+      const uint32_t ref_block_prefix = id._hash[1];
 
-   return fc::mutable_variant_object ()
-         ("block_num", block->block_num())
-         ("ref_block_num", static_cast<uint16_t>(block->block_num()))
-         ("id", id)
-         ("timestamp", block->timestamp)
-         ("producer", block->producer)
-         ("previous", block->previous)
-         ("transaction_mroot", block->transaction_mroot)
-         ("finality_mroot", block->finality_mroot)
-         ("qc_claim", block->qc_claim)
-         ("producer_signatures", block->producer_signatures)
-         ("ref_block_prefix", ref_block_prefix);
+      next(get_block_info_results{
+         .block_num           = block->block_num(),
+         .ref_block_num       = static_cast<uint16_t>(block->block_num()),
+         .id                  = id,
+         .timestamp           = block->timestamp,
+         .producer            = block->producer,
+         .previous            = block->previous,
+         .transaction_mroot   = block->transaction_mroot,
+         .finality_mroot      = block->finality_mroot,
+         .qc_claim            = block->qc_claim,
+         .producer_signatures = block->producer_signatures,
+         .ref_block_prefix    = ref_block_prefix,
+      });
+   } CATCH_AND_CALL(next);
 }
 
 fc::variant read_only::get_block_header_state(const get_block_header_state_params& params, const fc::time_point&) const {
@@ -3353,7 +3359,11 @@ read_only::get_account_return_t read_only::get_account( const get_account_params
    };
    http_params_t http_params;
 
-   if( abi_def abi; code_account != nullptr && abi_serializer::to_abi(code_account->abi, abi) ) {
+   // Phase 1 gate: ROA contract loaded with at least some abi bytes.  We don't parse the
+   // abi here -- to_abi (deserialize) and abi_serializer construction both move to Phase 2
+   // so the read-only queue isn't blocked on the ROA abi parse.  The content lookups below
+   // (sysio.token balance + reslimit row) only need the raw bytes plus chainbase access.
+   if (code_account != nullptr && code_account->abi.size() > 0) {
 
       const auto token_code = "sysio.token"_n;
 
@@ -3392,16 +3402,33 @@ read_only::get_account_return_t read_only::get_account( const get_account_params
          return {};
       };
 
-      http_params.total_resources          = lookup_object("reslimit"_n, params.account_name);
+      http_params.total_resources = lookup_object("reslimit"_n, params.account_name);
 
-      return [http_params = std::move(http_params), result = std::move(result), abi=std::move(abi), shorten_abi_errors=shorten_abi_errors,
-              abi_serializer_max_time=abi_serializer_max_time]() mutable ->  chain::t_or_exception<read_only::get_account_results> {
-         auto yield = [&]() { return abi_serializer::create_yield_function(abi_serializer_max_time); };
-         abi_serializer abis(std::move(abi), yield());
+      // Capture raw ABI bytes for Phase 2; both to_abi (deserialize) and abi_serializer
+      // construction will run on the http thread pool.  If parsing fails there, we skip
+      // the reslimit decode and return result with total_resources unset (preserving
+      // pre-refactor behaviour for the corrupt-abi case).
+      vector<char> abi_bytes(code_account->abi.data(),
+                             code_account->abi.data() + code_account->abi.size());
 
-         if (http_params.total_resources)
-            result.total_resources = abis.binary_to_variant("reslimit", *http_params.total_resources, yield(), shorten_abi_errors);
-         return std::move(result);
+      return [http_params = std::move(http_params), result = std::move(result),
+              abi_bytes = std::move(abi_bytes),
+              shorten_abi_errors = shorten_abi_errors,
+              abi_serializer_max_time = abi_serializer_max_time]() mutable
+                 -> chain::t_or_exception<read_only::get_account_results> {
+         try {
+            abi_def abi;
+            if (abi_serializer::to_abi(abi_bytes, abi)) {
+               auto yield = [&]() { return abi_serializer::create_yield_function(abi_serializer_max_time); };
+               abi_serializer abis(std::move(abi), yield());
+               if (http_params.total_resources) {
+                  result.total_resources = abis.binary_to_variant("reslimit",
+                                                                  *http_params.total_resources,
+                                                                  yield(), shorten_abi_errors);
+               }
+            }
+            return std::move(result);
+         } CATCH_AND_RETURN(chain::t_or_exception<read_only::get_account_results>);
       };
    }
    return [result = std::move(result)]() mutable -> chain::t_or_exception<read_only::get_account_results> {

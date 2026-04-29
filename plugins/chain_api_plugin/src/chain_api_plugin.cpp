@@ -130,8 +130,6 @@ void chain_api_plugin::plugin_startup() {
    _http_plugin.add_api_stream({
       bind_stream<&ro::get_activated_protocol_features, dispatch::sync>(
          _http_plugin, ro_api, "/v1/chain/get_activated_protocol_features", cat::chain_ro, pt::possible_no_params, 200),
-      bind_stream<&ro::get_block_info, dispatch::sync>(
-         _http_plugin, ro_api, "/v1/chain/get_block_info", cat::chain_ro, pt::params_required, 200),
       bind_stream<&ro::get_block_header_state, dispatch::sync>(
          _http_plugin, ro_api, "/v1/chain/get_block_header_state", cat::chain_ro, pt::params_required, 200),
       bind_stream<&ro::get_code, dispatch::sync>(
@@ -186,6 +184,10 @@ void chain_api_plugin::plugin_startup() {
       // queue internally for the abi capture; see read_only::get_block_stream_async.
       bind_stream<&ro::get_block_stream_async, dispatch::async>(
          _http_plugin, ro_api, "/v1/chain/get_block", cat::chain_ro, pt::params_required, 200),
+      // get_block_info is fully off the read-only queue: fetch_block_header_by_number is
+      // thread-safe and the rest is CPU; see read_only::get_block_info_async.
+      bind_stream<&ro::get_block_info_async, dispatch::async>(
+         _http_plugin, ro_api, "/v1/chain/get_block_info", cat::chain_ro, pt::params_required, 200),
       bind_stream<&ro::get_raw_block, dispatch::sync>(
          _http_plugin, ro_api, "/v1/chain/get_raw_block", cat::chain_ro, pt::params_required, 200),
       bind_stream<&ro::get_block_header, dispatch::sync>(
