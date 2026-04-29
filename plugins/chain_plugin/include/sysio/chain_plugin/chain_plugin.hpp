@@ -81,6 +81,85 @@ namespace sysio {
       return abi_resolver(abi_serializer_cache_builder(make_resolver(db, max_time, throw_on_yield::no)).add_serializers(obj).get());
    }
 
+   /// Phase-split abi capture for the streaming-cb response path.  `captured_abis`
+   /// holds the raw `abi` byte-string for every account referenced in a block /
+   /// trace, copied out of chainbase on the calling (read-only-queue) thread.
+   /// Parsing the bytes into `abi_serializer` instances is the slow part and
+   /// happens later in `build_resolver_from_captured_abis`, which can run on any
+   /// thread (typically the http thread pool) since it does not touch chainbase.
+   ///
+   /// Empty entries (`raw_abis[name] == {}`) record "we looked, no abi" so that
+   /// we don't re-walk chainbase off the read-only queue if the same account
+   /// appears multiple times.
+   struct captured_abis {
+      std::unordered_map<account_name, chain::vector<char>> raw_abis;
+   };
+
+   /// Walks the actions in `obj` (a `signed_block_ptr` or `transaction_trace_ptr`)
+   /// and copies each unique action.account's `abi` bytes out of chainbase.
+   /// Must be called on a thread with shared chainbase access (read-only queue).
+   template<class T>
+   inline captured_abis capture_abis(const controller& control, const T& obj) {
+      captured_abis cache;
+      auto add = [&](const account_name& name) {
+         if (!name.good()) return;
+         if (cache.raw_abis.find(name) != cache.raw_abis.end()) return;
+         const auto* accnt = control.find_account_metadata(name);
+         if (accnt && accnt->abi.size() > 0) {
+            cache.raw_abis.emplace(name,
+                                   chain::vector<char>{accnt->abi.data(),
+                                                       accnt->abi.data() + accnt->abi.size()});
+         } else {
+            cache.raw_abis.emplace(name, chain::vector<char>{});
+         }
+      };
+      auto visit_actions = [&](const auto& actions) {
+         for (const auto& a : actions) add(a.account);
+      };
+      if constexpr (std::is_same_v<T, chain::signed_block_ptr>) {
+         for (const auto& receipt : obj->transactions) {
+            const auto& t = receipt.trx.get_transaction();
+            visit_actions(t.actions);
+            visit_actions(t.context_free_actions);
+         }
+      } else {
+         // transaction_trace_ptr
+         for (const auto& trace : obj->action_traces) add(trace.act.account);
+      }
+      return cache;
+   }
+
+   /// Parses each captured `abi` byte-string into an `abi_serializer` and returns
+   /// the resolver.  CPU-bound; safe to run on any thread (no chainbase access).
+   /// On a per-account basis, an exception during `to_abi` / `abi_serializer` is
+   /// swallowed and the account's slot is left empty -- callers fall back to the
+   /// hex representation for actions with un-decodable ABI, matching the prior
+   /// `make_resolver(throw_on_yield::no)` behaviour.
+   inline abi_resolver build_resolver_from_captured_abis(captured_abis cache,
+                                                         const fc::microseconds& max_time) {
+      chain::abi_serializer_cache_t serializers;
+      serializers.reserve(cache.raw_abis.size());
+      for (auto& [name, raw] : cache.raw_abis) {
+         if (raw.empty()) {
+            serializers.emplace(name, std::nullopt);
+            continue;
+         }
+         try {
+            chain::abi_def abi;
+            if (chain::abi_serializer::to_abi(raw, abi)) {
+               serializers.emplace(name,
+                                   chain::abi_serializer(std::move(abi),
+                                      chain::abi_serializer::create_yield_function(max_time)));
+            } else {
+               serializers.emplace(name, std::nullopt);
+            }
+         } catch (...) {
+            serializers.emplace(name, std::nullopt);
+         }
+      }
+      return abi_resolver(std::move(serializers));
+   }
+
 namespace chain_apis {
 struct empty{};
 
@@ -386,12 +465,15 @@ public:
    std::function<chain::t_or_exception<fc::variant>()> get_block(const get_block_params& params, const fc::time_point& deadline) const;
 
    /// Direct-streaming counterpart to `get_block`.  Thread sequence:
-   ///   - Phase 1 (main app thread, read_only queue): this method's body.  `get_raw_block` is itself thread-safe;
-   ///     `get_serializers_cache` is what *requires* the main thread because it reads each referenced account's `abi`
-   ///     field out of chainbase.  Returns the outer http_fwd closure.
+   ///   - Phase 1 (main app thread, read_only queue): this method's body.  Does *only* chainbase
+   ///     reads -- `get_raw_block` (thread-safe per controller) and `capture_abis` (copies each
+   ///     referenced account's raw `abi` bytes out of chainbase).  ABI parsing is deferred so
+   ///     the read-only queue isn't blocked on per-account `abi_serializer` construction.
+   ///     Returns the outer http_fwd closure.
    ///   - Hop 1: `bind_stream<&get_block_stream, dispatch::post_direct>` posts the outer closure to the http thread pool.
-   ///   - Phase 2 (http thread pool): invokes the outer closure -- captured block + resolver snapshots, no chainbase
-   ///     access -- and produces the inner `json_writer`-emitting closure, handed to `cb`.
+   ///   - Phase 2 (http thread pool): invokes the outer closure, parses the captured abi bytes
+   ///     into an `abi_resolver` via `build_resolver_from_captured_abis` (CPU-only, no chainbase
+   ///     access), and produces the inner `json_writer`-emitting closure, handed to `cb`.
    ///   - Hop 2: `make_http_stream_response_handler` re-dispatches onto the same http thread pool (inherited from the
    ///     variant-cb `cb` shape, where Phase 2 does the row-decode work).
    ///   - Phase 3 (http thread pool): walks the captured block via `abi_serializer::to_json_stream<signed_block>`,

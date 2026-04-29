@@ -2790,17 +2790,31 @@ std::function<chain::t_or_exception<fc::variant>()> read_only::get_block(const g
 
 read_only::get_block_stream_return_t
 read_only::get_block_stream(const get_block_params& params, const fc::time_point& deadline) const {
+   // Phase 1 (read-only queue, main thread):  fetch the block and capture each
+   // referenced account's raw abi bytes out of chainbase.  Both operations require
+   // shared chainbase access; everything else (abi parsing, block walk, JSON emit)
+   // is CPU work that runs later on the http thread pool.
    chain::signed_block_ptr block = get_raw_block(params, deadline);
+   captured_abis abi_bytes = capture_abis(db, block);
 
    using return_type = chain::t_or_exception<get_block_stream_emit_fn>;
    return [this,
-           resolver = get_serializers_cache(db, block, abi_serializer_max_time),
-           block    = std::move(block)]() mutable -> return_type {
+           block      = std::move(block),
+           abi_bytes  = std::move(abi_bytes),
+           max_time   = abi_serializer_max_time]() mutable -> return_type {
       try {
-         return get_block_stream_emit_fn{[this, resolver = std::move(resolver), block = std::move(block)]
-                                          (fc::json_writer& w) mutable {
-            convert_block_stream(block, resolver, w);
-         }};
+         // Phase 2 (http thread pool):  parse the captured abi bytes into an
+         // abi_resolver.  This is the CPU-heavy step (one abi_serializer build
+         // per unique account in the block); doing it here instead of in Phase 1
+         // keeps the read-only queue free for the next request.
+         abi_resolver resolver = build_resolver_from_captured_abis(std::move(abi_bytes), max_time);
+         return get_block_stream_emit_fn{
+            [this, resolver = std::move(resolver), block = std::move(block)]
+            (fc::json_writer& w) mutable {
+               // Phase 3 (http thread pool):  walk the block, decode each action's
+               // data via the resolver, and emit the JSON response directly into w.
+               convert_block_stream(block, resolver, w);
+            }};
       } CATCH_AND_RETURN(return_type);
    };
 }
