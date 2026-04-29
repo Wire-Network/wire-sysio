@@ -67,7 +67,10 @@ bfs::path get_source_root_path() {
 
    auto current_path = get_build_root_path();
    while (current_path != current_path.root_path()) {
-      if (bfs::is_directory(current_path / ".git")) {
+      // .git is a directory in a normal clone, but a regular file (containing
+      // `gitdir: ...`) when this checkout is a git worktree -- accept either.
+      const auto git_marker = current_path / ".git";
+      if (bfs::is_directory(git_marker) || bfs::is_regular_file(git_marker)) {
          source_root_path = current_path;
          return current_path;
       }
