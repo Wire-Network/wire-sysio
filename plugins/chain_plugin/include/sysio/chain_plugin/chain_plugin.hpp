@@ -496,8 +496,8 @@ public:
    };
 
    struct get_block_header_result {
-      chain::block_id_type  id;
-      fc::variant           signed_block_header;
+      chain::block_id_type                  id;
+      chain::signed_block_header            signed_block_header;
       std::optional<chain::extensions_type> block_extensions;
    };
 
@@ -632,8 +632,8 @@ public:
    };
 
    struct get_finalizer_info_result {
-      fc::variant                            active_finalizer_policy;  // current active policy
-      fc::variant                            pending_finalizer_policy; // current pending policy. Empty if not existing
+      std::optional<chain::finalizer_policy> active_finalizer_policy;  // current active policy
+      std::optional<chain::finalizer_policy> pending_finalizer_policy; // current pending policy. Empty if not existing
 
       // Last tracked vote information for each of the finalizers in
       // active_finalizer_policy and pending_finalizer_policy.

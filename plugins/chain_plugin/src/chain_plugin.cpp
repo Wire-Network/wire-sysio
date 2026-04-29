@@ -2685,11 +2685,10 @@ read_only::get_finalizer_info_result read_only::get_finalizer_info( const read_o
    std::set<fc::crypto::bls::public_key> finalizer_keys;
 
    // Populate a particular finalizer policy
-   auto add_policy_to_result = [&](const finalizer_policy_ptr& from_policy, fc::variant& to_policy) {
+   auto add_policy_to_result = [&](const finalizer_policy_ptr& from_policy,
+                                   std::optional<chain::finalizer_policy>& to_policy) {
       if (from_policy) {
-         // Use string format of public key for easy uses
-         to_variant(*from_policy, to_policy);
-
+         to_policy = *from_policy;
          for (const auto& f: from_policy->finalizers) {
             finalizer_keys.insert(f.public_key);
          }
@@ -2841,7 +2840,7 @@ read_only::get_block_header_result read_only::get_block_header(const read_only::
          } SYS_RETHROW_EXCEPTIONS(chain::block_id_type_exception, "Invalid block ID: {}", params.block_num_or_id)
       }
       SYS_ASSERT( header, unknown_block_exception, "Could not find block header: {}", params.block_num_or_id);
-      return { header->calculate_id(), fc::variant{*header}, {}};
+      return { header->calculate_id(), std::move(*header), {}};
    } else {
       signed_block_ptr block;
       if( block_num ) {
@@ -2852,7 +2851,7 @@ read_only::get_block_header_result read_only::get_block_header(const read_only::
          } SYS_RETHROW_EXCEPTIONS(chain::block_id_type_exception, "Invalid block ID: {}", params.block_num_or_id)
       }
       SYS_ASSERT( block, unknown_block_exception, "Could not find block header: {}", params.block_num_or_id);
-      return { block->calculate_id(), fc::variant{static_cast<signed_block_header>(*block)}, block->block_extensions};
+      return { block->calculate_id(), static_cast<const signed_block_header&>(*block), block->block_extensions };
    }
 }
 
