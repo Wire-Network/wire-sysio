@@ -5,6 +5,7 @@
 #include <fc/time.hpp>
 #include <fc/filesystem.hpp>
 #include <fc/io/json.hpp>
+#include <fc/io/json_stream.hpp>
 
 namespace fc
 {
@@ -104,6 +105,18 @@ namespace fc
    void to_variant( const log_message& m, variant& v )
    {
         v = m.to_variant();
+   }
+
+   void to_json_stream( const log_message& m, json_writer& w )
+   {
+      variant v;
+      to_variant(m, v);
+      to_json_stream(v, w);
+   }
+
+   void to_json_stream( const log_context& l, json_writer& w )
+   {
+      to_json_stream(l.to_variant(), w);
    }
 
    void  to_variant( log_level e, variant& v )

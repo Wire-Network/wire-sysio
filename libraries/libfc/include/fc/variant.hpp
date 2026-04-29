@@ -61,6 +61,11 @@ namespace fc
 
    void to_variant( const blob& var,  fc::variant& vo );
    void from_variant( const fc::variant& var,  blob& vo );
+   /// JSON shape: a base64-encoded string -- matches `to_variant(blob)` (which produces a string variant).  Necessary
+   /// because `fc::blob` is FC_REFLECT'd as `(data)`, so without this explicit overload the reflector-based
+   /// `to_json_stream<T>` would emit `{"data": "<hex bytes>"}` (object form) instead.  Callers like clio's
+   /// `result["abi"].as_blob()` expect the string form.
+   void to_json_stream( const blob& var, fc::json_writer& w );
 
 
    template<typename T, typename... Args> void to_variant( const boost::multi_index_container<T,Args...>& s, fc::variant& v );

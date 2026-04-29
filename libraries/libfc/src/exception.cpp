@@ -2,6 +2,8 @@
 #include <fc/log/logger.hpp>
 #include <fc/variant_object.hpp>
 #include <fc/io/json.hpp>
+#include <fc/io/json_stream.hpp>
+#include <fc/reflect/json_stream.hpp>
 
 #include <iostream>
 #include <boost/exception/diagnostic_information.hpp>
@@ -104,6 +106,16 @@ namespace fc
                                 ( "message", e.my->_what )
                                 ( "stack", e.get_log() );
 
+   }
+
+   void to_json_stream( const exception& e, json_writer& w )
+   {
+      w.begin_object();
+      w.set( "code",    e.code() );
+      w.set( "name",    e.name() );
+      w.set( "message", e.my->_what );
+      w.set( "stack",   e.get_log() );
+      w.end_object();
    }
    void          from_variant( const variant& v, exception& ll )
    {

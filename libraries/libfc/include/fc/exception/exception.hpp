@@ -12,6 +12,7 @@
 namespace fc
 {
    namespace detail { class exception_impl; }
+   class json_writer;
 
    enum exception_code
    {
@@ -120,6 +121,7 @@ namespace fc
 
          friend void to_variant( const exception& e, variant& v );
          friend void from_variant( const variant& e, exception& ll );
+         friend void to_json_stream( const exception& e, json_writer& w );
 
          exception& operator=( const exception& copy );
          exception& operator=( exception&& copy );
@@ -129,6 +131,8 @@ namespace fc
 
    void to_variant( const exception& e, variant& v );
    void from_variant( const variant& e, exception& ll );
+   /// JSON shape mirrors `to_variant(exception)`: { code, name, message, stack: [log_messages...] }.
+   void to_json_stream( const exception& e, json_writer& w );
    typedef std::shared_ptr<exception> exception_ptr;
 
    typedef std::optional<exception> oexception;

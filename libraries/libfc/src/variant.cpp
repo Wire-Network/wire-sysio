@@ -9,6 +9,7 @@
 #include <fc/reflect/variant.hpp>
 #include <fc/io/json.hpp>
 #include <fc/io/json_stream.hpp>
+#include <fc/io/json_stream.hpp>
 #include <fc/utf8.hpp>
 #include <algorithm>
 #include <fc/int256.hpp>
@@ -1025,6 +1026,10 @@ void from_variant( const variant& var,  std::vector<char>& vo )
 
 void to_variant( const blob& b, variant& v ) {
    v = variant(base64_encode(b.data.data(), b.data.size()));
+}
+
+void to_json_stream( const blob& b, json_writer& w ) {
+   w.value_string(base64_encode(b.data.data(), b.data.size()));
 }
 
 void from_variant( const variant& v, blob& b ) {
