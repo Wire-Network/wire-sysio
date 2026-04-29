@@ -97,7 +97,8 @@ namespace sysio {
 
    /// Walks the actions in `obj` (a `signed_block_ptr` or `transaction_trace_ptr`)
    /// and copies each unique action.account's `abi` bytes out of chainbase.
-   /// Must be called on a thread with shared chainbase access (read-only queue).
+   /// Must be called from an `exec_queue::read_only` (or `read_write`) task so
+   /// that chainbase is not being mutated concurrently.
    template<class T>
    inline captured_abis capture_abis(const controller& control, const T& obj) {
       captured_abis cache;
@@ -462,29 +463,23 @@ public:
    chain::signed_block_ptr get_raw_block(const get_raw_block_params& params, const fc::time_point& deadline) const;
 
    using get_block_params = get_raw_block_params;
-   std::function<chain::t_or_exception<fc::variant>()> get_block(const get_block_params& params, const fc::time_point& deadline) const;
 
-   /// Direct-streaming counterpart to `get_block`.  Thread sequence:
-   ///   - Phase 1 (main app thread, read_only queue): this method's body.  Does *only* chainbase
-   ///     reads -- `get_raw_block` (thread-safe per controller) and `capture_abis` (copies each
-   ///     referenced account's raw `abi` bytes out of chainbase).  ABI parsing is deferred so
-   ///     the read-only queue isn't blocked on per-account `abi_serializer` construction.
-   ///     Returns the outer http_fwd closure.
-   ///   - Hop 1: `bind_stream<&get_block_stream, dispatch::post_direct>` posts the outer closure to the http thread pool.
-   ///   - Phase 2 (http thread pool): invokes the outer closure, parses the captured abi bytes
-   ///     into an `abi_resolver` via `build_resolver_from_captured_abis` (CPU-only, no chainbase
-   ///     access), and produces the inner `json_writer`-emitting closure, handed to `cb`.
-   ///   - cb (`make_http_stream_response_handler`) calls `boost::asio::dispatch` to the same
-   ///     http thread pool.  Asio's `thread_pool::executor::do_execute` short-circuits this
-   ///     to an inline call when the calling thread is already a pool worker (which it is
-   ///     here, since we're inside the Phase 2 task posted via `post_http_thread_pool`).
-   ///     Net effect: no extra task post -- Phase 3 runs in the same task as Phase 2.
-   ///   - Phase 3 (http thread pool): walks the captured block via `abi_serializer::to_json_stream<signed_block>`,
-   ///     decoding each action's `data` straight into the writer with `binary_to_json_stream`.  No `fc::variant` tree
-   ///     is built per action.
    using get_block_stream_emit_fn = std::function<void(fc::json_writer&)>;
-   using get_block_stream_return_t = std::function<chain::t_or_exception<get_block_stream_emit_fn>()>;
-   get_block_stream_return_t get_block_stream(const get_block_params& params, const fc::time_point& deadline) const;
+
+   /// Async streaming `/v1/chain/get_block` handler.  Runs `get_raw_block` on the http thread pool instead of the
+   /// read-only queue.  Threading sequence:
+   ///   - Phase 0 (http thread pool): registration uses `add_async_api_stream`, so the api method body runs on the
+   ///     http worker that handled the request.  Does only `get_raw_block`, which is thread-safe per controller.
+   ///   - Hop 1: the method posts onto `exec_queue::read_only` for the chainbase abi reads.
+   ///   - Phase 1 (read-only queue): `capture_abis(block)` copies each unique account's raw `abi` bytes, then fires
+   ///     the next callback with an http_fwd Phase-2 closure.
+   ///   - Hop 2: bind_stream::async posts the http_fwd back to the http thread pool.
+   ///   - Phase 2 (http thread pool): `build_resolver_from_captured_abis` parses the bytes (CPU-only) and constructs
+   ///     the emit_fn.
+   ///   - Phase 3 (http thread pool, asio-inlined): bind_stream wraps the emit_fn in a `to_json_stream(emit_fn, w)`
+   ///     adapter and hands it to `cb`; emit_fn walks the block + emits JSON.
+   void get_block_stream_async(get_block_params params,
+                                chain::next_function<get_block_stream_emit_fn> next) const;
 
    // call from app() thread
    abi_resolver get_block_serializers( const chain::signed_block_ptr& block, const fc::microseconds& max_time ) const;

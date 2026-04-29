@@ -5,6 +5,7 @@
 #include <cassert>
 #include <charconv>
 #include <cstdint>
+#include <functional>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -224,5 +225,15 @@ private:
    std::vector<frame>       stack_;            // small; vector is fine and avoids extra deps
    bool                     awaiting_value_ = false;
 };
+
+/// to_json_stream overload for an emit-closure: a `std::function<void(json_writer&)>`
+/// whose JSON output is whatever the closure writes when invoked.  Used by callers
+/// that want to deliver a streaming response through machinery (eg `bind_stream`'s
+/// async/typed-T paths) that wraps the payload in `to_json_stream(payload, w)` --
+/// the closure itself is the emitter, so we just invoke it.
+inline void to_json_stream(const std::function<void(json_writer&)>& fn, json_writer& w) {
+   if (fn) fn(w);
+   else    w.value_null();
+}
 
 } // namespace fc

@@ -130,9 +130,6 @@ void chain_api_plugin::plugin_startup() {
    _http_plugin.add_api_stream({
       bind_stream<&ro::get_activated_protocol_features, dispatch::sync>(
          _http_plugin, ro_api, "/v1/chain/get_activated_protocol_features", cat::chain_ro, pt::possible_no_params, 200),
-      // get_block_stream returns Phase-2 closure (function<t_or_exception<emit_fn>()>)
-      bind_stream<&ro::get_block_stream, dispatch::post_direct>(
-         _http_plugin, ro_api, "/v1/chain/get_block", cat::chain_ro, pt::params_required, 200),
       bind_stream<&ro::get_block_info, dispatch::sync>(
          _http_plugin, ro_api, "/v1/chain/get_block_info", cat::chain_ro, pt::params_required, 200),
       bind_stream<&ro::get_block_header_state, dispatch::sync>(
@@ -185,6 +182,10 @@ void chain_api_plugin::plugin_startup() {
       // chain_plugin send_read_only_transaction will post to read_exclusive queue
       bind_stream<&ro::send_read_only_transaction, dispatch::async>(
          _http_plugin, ro_api, "/v1/chain/send_read_only_transaction", cat::chain_ro, pt::params_required, 200),
+      // get_block runs Phase 0 (block fetch) on the http pool then bounces to the read-only
+      // queue internally for the abi capture; see read_only::get_block_stream_async.
+      bind_stream<&ro::get_block_stream_async, dispatch::async>(
+         _http_plugin, ro_api, "/v1/chain/get_block", cat::chain_ro, pt::params_required, 200),
       bind_stream<&ro::get_raw_block, dispatch::sync>(
          _http_plugin, ro_api, "/v1/chain/get_raw_block", cat::chain_ro, pt::params_required, 200),
       bind_stream<&ro::get_block_header, dispatch::sync>(

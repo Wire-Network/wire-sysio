@@ -2775,48 +2775,47 @@ chain::signed_block_ptr read_only::get_raw_block(const read_only::get_raw_block_
    return block;
 }
 
-std::function<chain::t_or_exception<fc::variant>()> read_only::get_block(const get_raw_block_params& params, const fc::time_point& deadline) const {
-   chain::signed_block_ptr block = get_raw_block(params, deadline);
+void read_only::get_block_stream_async(get_block_params params,
+                                        chain::next_function<get_block_stream_emit_fn> next) const {
+   try {
+      // Phase 0 (http thread pool):  block fetch.  get_raw_block is thread-safe per
+      // controller.  The deadline argument is unused by the current get_raw_block
+      // body; pass time_point::maximum so it's a no-op.
+      chain::signed_block_ptr block = get_raw_block(params, fc::time_point::maximum());
 
-   using return_type = t_or_exception<fc::variant>;
-   return [this,
-           resolver = get_serializers_cache(db, block, abi_serializer_max_time),
-           block    = std::move(block)]() mutable -> return_type {
-      try {
-         return convert_block(block, resolver);
-      } CATCH_AND_RETURN(return_type);
-   };
-}
+      // Hop 1:  post the chainbase abi capture onto the read-only queue.  Phase 2
+      // (parse + emit_fn build) returns to the http pool via the http_fwd alternative
+      // of next_function_variant.
+      app().executor().post(appbase::priority::medium_low,
+                            appbase::exec_queue::read_only,
+         [this, block = std::move(block),
+          max_time = abi_serializer_max_time,
+          next = std::move(next)]() mutable {
+            try {
+               captured_abis abi_bytes = capture_abis(db, block);
 
-read_only::get_block_stream_return_t
-read_only::get_block_stream(const get_block_params& params, const fc::time_point& deadline) const {
-   // Phase 1 (read-only queue, main thread):  fetch the block and capture each
-   // referenced account's raw abi bytes out of chainbase.  Both operations require
-   // shared chainbase access; everything else (abi parsing, block walk, JSON emit)
-   // is CPU work that runs later on the http thread pool.
-   chain::signed_block_ptr block = get_raw_block(params, deadline);
-   captured_abis abi_bytes = capture_abis(db, block);
-
-   using return_type = chain::t_or_exception<get_block_stream_emit_fn>;
-   return [this,
-           block      = std::move(block),
-           abi_bytes  = std::move(abi_bytes),
-           max_time   = abi_serializer_max_time]() mutable -> return_type {
-      try {
-         // Phase 2 (http thread pool):  parse the captured abi bytes into an
-         // abi_resolver.  This is the CPU-heavy step (one abi_serializer build
-         // per unique account in the block); doing it here instead of in Phase 1
-         // keeps the read-only queue free for the next request.
-         abi_resolver resolver = build_resolver_from_captured_abis(std::move(abi_bytes), max_time);
-         return get_block_stream_emit_fn{
-            [this, resolver = std::move(resolver), block = std::move(block)]
-            (fc::json_writer& w) mutable {
-               // Phase 3 (http thread pool):  walk the block, decode each action's
-               // data via the resolver, and emit the JSON response directly into w.
-               convert_block_stream(block, resolver, w);
-            }};
-      } CATCH_AND_RETURN(return_type);
-   };
+               // Fire next with an http_fwd that builds Phase 2 + the emit_fn on
+               // the http pool.  bind_stream::async sees the http_fwd alternative
+               // and posts it via post_http_thread_pool().
+               next(std::function<chain::t_or_exception<get_block_stream_emit_fn>()>{
+                  [this, block = std::move(block),
+                   abi_bytes = std::move(abi_bytes),
+                   max_time]() mutable
+                  -> chain::t_or_exception<get_block_stream_emit_fn> {
+                     try {
+                        auto resolver = build_resolver_from_captured_abis(std::move(abi_bytes),
+                                                                          max_time);
+                        return get_block_stream_emit_fn{
+                           [this, block = std::move(block),
+                            resolver = std::move(resolver)]
+                           (fc::json_writer& w) mutable {
+                              convert_block_stream(block, resolver, w);
+                           }};
+                     } CATCH_AND_RETURN(chain::t_or_exception<get_block_stream_emit_fn>);
+                  }});
+            } CATCH_AND_CALL(next);
+         });
+   } CATCH_AND_CALL(next);
 }
 
 read_only::get_block_header_result read_only::get_block_header(const read_only::get_block_header_params& params, const fc::time_point& deadline) const{
