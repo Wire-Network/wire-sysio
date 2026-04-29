@@ -136,11 +136,11 @@ namespace sysio {
    /// swallowed and the account's slot is left empty -- callers fall back to the
    /// hex representation for actions with un-decodable ABI, matching the prior
    /// `make_resolver(throw_on_yield::no)` behaviour.
-   inline abi_resolver build_resolver_from_captured_abis(captured_abis cache,
+   inline abi_resolver build_resolver_from_captured_abis(const captured_abis& cache,
                                                          const fc::microseconds& max_time) {
       chain::abi_serializer_cache_t serializers;
       serializers.reserve(cache.raw_abis.size());
-      for (auto& [name, raw] : cache.raw_abis) {
+      for (const auto& [name, raw] : cache.raw_abis) {
          if (raw.empty()) {
             serializers.emplace(name, std::nullopt);
             continue;
@@ -161,8 +161,35 @@ namespace sysio {
       return abi_resolver(std::move(serializers));
    }
 
+   /// Heuristic byte-size estimate for memory budgeting.  Counts the captured
+   /// raw-ABI bytes plus a small per-entry overhead -- close enough for the
+   /// trx_retry_db memory accounting without parsing each ABI eagerly.
+   inline size_t estimated_size(const captured_abis& cache) {
+      size_t total = 0;
+      for (const auto& [name, raw] : cache.raw_abis) {
+         total += sizeof(name) + raw.size();
+      }
+      return total;
+   }
+
 namespace chain_apis {
 struct empty{};
+
+/// Holds a transaction trace plus the ABI bytes captured at the moment the trace was produced.  The trace's action data
+/// is not eagerly serialized to JSON or to a variant tree -- instead, when the result is emitted, the captured ABI
+/// bytes are parsed into an `abi_serializer` resolver on the http thread pool and the trace is emitted directly via
+/// `abi_serializer::to_json_stream<transaction_trace>`.  Compared to the prior `fc::variant processed` field this:
+///   - moves the ABI parse + JSON emission off the main / chain thread;
+///   - skips the intermediate variant tree allocation per response;
+///   - preserves "ABIs at apply time, not fire time" semantics for `trx_retry_db` (the captured bytes are the
+///     apply-time snapshot).
+/// On individual actions whose contract has a corrupt ABI, the abi_serializer's streaming path falls back to hex for
+/// that action's data -- same per-action fallback used by `signed_block`.
+struct streamed_processed_trace {
+   chain::transaction_trace_ptr trace;
+   captured_abis                raw_abis;
+   fc::microseconds             max_serialization_time;
+};
 
 struct linked_action {
    name                account;
@@ -670,8 +697,8 @@ public:
    get_producer_schedule_result get_producer_schedule( const get_producer_schedule_params& params, const fc::time_point& deadline )const;
 
    struct compute_transaction_results {
-       chain::transaction_id_type  transaction_id;
-       fc::variant                 processed; // "processed" is expected JSON for trxs in clio
+       chain::transaction_id_type           transaction_id;
+       chain_apis::streamed_processed_trace processed; // "processed" is expected JSON for trxs in clio
     };
 
    struct compute_transaction_params {
@@ -681,8 +708,8 @@ public:
    void compute_transaction(compute_transaction_params params, chain::plugin_interface::next_function<compute_transaction_results> next );
 
    struct send_read_only_transaction_results {
-      chain::transaction_id_type  transaction_id;
-      fc::variant                 processed;
+      chain::transaction_id_type           transaction_id;
+      chain_apis::streamed_processed_trace processed;
    };
    struct send_read_only_transaction_params {
       fc::variant transaction;
@@ -780,7 +807,13 @@ public:
    void push_transactions(const push_transactions_params& params, chain::plugin_interface::next_function<push_transactions_results> next);
 
    using send_transaction_params = push_transaction_params;
-   using send_transaction_results = push_transaction_results;
+   /// Distinct from `push_transaction_results` -- send_transaction's `processed` is emitted via streaming directly
+   /// from the trace + captured ABIs.  push_transaction stays on `fc::variant` because it post-processes the variant
+   /// tree (inline_traces tree restructuring) before returning.
+   struct send_transaction_results {
+      chain::transaction_id_type           transaction_id;
+      chain_apis::streamed_processed_trace processed;
+   };
    void send_transaction(send_transaction_params params, chain::plugin_interface::next_function<send_transaction_results> next);
 
    struct send_transaction2_params {
@@ -888,6 +921,7 @@ FC_REFLECT(sysio::chain_apis::read_only::get_block_header_params, (block_num_or_
 FC_REFLECT(sysio::chain_apis::read_only::get_block_header_result, (id)(signed_block_header)(block_extensions))
 
 FC_REFLECT( sysio::chain_apis::read_write::push_transaction_results, (transaction_id)(processed) )
+FC_REFLECT( sysio::chain_apis::read_write::send_transaction_results, (transaction_id)(processed) )
 FC_REFLECT( sysio::chain_apis::read_write::send_transaction2_params, (return_failure_trace)(retry_trx)(retry_trx_num_blocks)(transaction) )
 
 // `all_rows` and `filter` deliberately excluded -- gated to in-process callers so HTTP cannot trigger a full-table walk
@@ -938,3 +972,10 @@ FC_REFLECT( sysio::chain_apis::read_only::compute_transaction_results, (transact
 FC_REFLECT( sysio::chain_apis::read_only::send_read_only_transaction_params, (transaction))
 FC_REFLECT( sysio::chain_apis::read_only::send_read_only_transaction_results, (transaction_id)(processed) )
 FC_REFLECT( sysio::chain_apis::read_only::get_consensus_parameters_results, (chain_config)(wasm_config))
+
+namespace fc {
+   /// JSON shape: emits the trace's reflected fields with action data decoded ABI-aware via the captured ABI bytes.
+   /// Builds a fresh `abi_resolver` from `t.raw_abis` and calls `abi_serializer::to_json_stream<transaction_trace>` --
+   /// matching the prior `abi_serializer::to_variant<transaction_trace>` output but skipping the variant tree.
+   void to_json_stream(const sysio::chain_apis::streamed_processed_trace& t, fc::json_writer& w);
+} // namespace fc

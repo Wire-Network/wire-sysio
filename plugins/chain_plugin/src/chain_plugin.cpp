@@ -3112,12 +3112,12 @@ void api_base::send_transaction_gen(API &api, send_transaction_params_t params, 
                      if( retry && api.trx_retry.has_value() && !trx_trace_ptr->except) {
                         // will be ack'ed via next later
                         api.trx_retry->track_transaction( ptrx, retry_num_blocks,
-                             [ptrx, next](const next_function_variant<std::unique_ptr<fc::variant>>& result ) {
+                             [ptrx, next](const next_function_variant<std::unique_ptr<chain_apis::streamed_processed_trace>>& result ) {
                                 if( std::holds_alternative<fc::exception_ptr>( result ) ) {
                                    next( std::get<fc::exception_ptr>( result ) );
                                 } else {
-                                   fc::variant& output = *std::get<std::unique_ptr<fc::variant>>( result );
-                                   next( Result{ptrx->id(), std::move( output )} );
+                                   auto& processed = *std::get<std::unique_ptr<chain_apis::streamed_processed_trace>>( result );
+                                   next( Result{ptrx->id(), std::move( processed )} );
                                 }
                              } );
                         retried = true;
@@ -3128,20 +3128,20 @@ void api_base::send_transaction_gen(API &api, send_transaction_params_t params, 
                      (void)retry_num_blocks; // ref variable to avoid compilation warning
                   }
                   if (!retried) {
-                     // we are still on main thread here. The lambda passed to `next()` below will be executed on the http thread pool
+                     // we are still on main thread here. The lambda passed to `next()` below will be executed on the
+                     // http thread pool.  Phase 1 (here, main thread): copy raw ABI bytes for accounts referenced
+                     // in the trace.  Phase 2 (http pool): build the streamed_processed_trace which defers ABI
+                     // parsing + JSON emission to response-emit time.
                      using return_type = t_or_exception<Result>;
                      next([&api,
                            trx_trace_ptr,
-                           resolver = get_serializers_cache(api.db, trx_trace_ptr, api.abi_serializer_max_time)]() mutable {
+                           raw_abis = sysio::capture_abis(api.db, trx_trace_ptr)]() mutable {
                         try {
-                           fc::variant output;
-                           try {
-                              abi_serializer::to_variant(*trx_trace_ptr, output, resolver, api.abi_serializer_max_time);
-                           } catch( abi_exception& ) {
-                              output = *trx_trace_ptr;
-                           }
                            const transaction_id_type& id = trx_trace_ptr->id;
-                           return return_type(Result{id, std::move( output )});
+                           return return_type(Result{id,
+                              chain_apis::streamed_processed_trace{ std::move(trx_trace_ptr),
+                                                                     std::move(raw_abis),
+                                                                     api.abi_serializer_max_time }});
                         } CATCH_AND_RETURN(return_type);
                      });
                   }
@@ -3570,5 +3570,22 @@ const controller::config& chain_plugin::chain_config() const {
    return *my->chain_config;
 }
 } // namespace sysio
+
+namespace fc {
+void to_json_stream(const sysio::chain_apis::streamed_processed_trace& t, fc::json_writer& w) {
+   if (!t.trace) {
+      w.value_null();
+      return;
+   }
+   try {
+      auto resolver = sysio::build_resolver_from_captured_abis(t.raw_abis, t.max_serialization_time);
+      sysio::chain::abi_serializer::to_json_stream(*t.trace, w, resolver, t.max_serialization_time);
+   } catch (sysio::chain::abi_exception&) {
+      // Fall back: emit via reflector with no ABI-aware action data decode.  Matches the prior variant path's
+      // `output = *trx_trace_ptr;` fallback.
+      to_json_stream(*t.trace, w);
+   }
+}
+} // namespace fc
 
 FC_REFLECT( sysio::chain_apis::detail::ram_market_exchange_state_t, (ignore1)(ignore2)(ignore3)(core_symbol)(ignore4) )

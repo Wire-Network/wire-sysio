@@ -27,12 +27,13 @@ namespace {
 constexpr uint16_t lib_totem = std::numeric_limits<uint16_t>::max();
 
 struct tracked_transaction {
-   const packed_transaction_ptr                              ptrx;
-   const uint16_t                                            num_blocks = 0; // lib is lib_totem
-   uint32_t                                                  block_num = 0;
-   fc::variant                                               trx_trace_v;
-   fc::time_point                                            last_try;
-   next_function<std::unique_ptr<fc::variant>>               next;
+   const packed_transaction_ptr                                                ptrx;
+   const uint16_t                                                              num_blocks = 0; // lib is lib_totem
+   uint32_t                                                                    block_num = 0;
+   chain::transaction_trace_ptr                                                trace_ptr;
+   sysio::captured_abis                                                        raw_abis;
+   fc::time_point                                                              last_try;
+   next_function<std::unique_ptr<sysio::chain_apis::streamed_processed_trace>> next;
 
    const transaction_id_type& id()const { return ptrx->id(); }
    fc::time_point_sec expiry()const { return ptrx->expiration(); }
@@ -52,7 +53,16 @@ struct tracked_transaction {
       return block_num != 0;
    }
 
-   size_t memory_size()const { return ptrx->get_estimated_size() + trx_trace_v.estimated_size() + sizeof(*this); }
+   /// Heuristic for the memory budget: 2x the packed-trx size accounts for the action trace bulk (each action trace
+   /// mirrors the packed action plus per-action receipt/console/etc), plus the captured raw-ABI bytes, plus the trace
+   /// struct overhead.
+   size_t memory_size()const {
+      const size_t ptrx_sz = ptrx->get_estimated_size();
+      return ptrx_sz * 2
+             + sysio::estimated_size(raw_abis)
+             + (trace_ptr ? sizeof(*trace_ptr) : 0)
+             + sizeof(*this);
+   }
 };
 
 struct by_trx_id;
@@ -105,7 +115,8 @@ struct trx_retry_db_impl {
       return _tracked_trxs.index().size();
    }
 
-   void track_transaction( packed_transaction_ptr ptrx, std::optional<uint16_t> num_blocks, next_function<std::unique_ptr<fc::variant>> next ) {
+   void track_transaction( packed_transaction_ptr ptrx, std::optional<uint16_t> num_blocks,
+                           next_function<std::unique_ptr<sysio::chain_apis::streamed_processed_trace>> next ) {
       SYS_ASSERT( _tracked_trxs.memory_size() < _max_mem_usage_size, tx_resource_exhaustion,
                   "Transaction exceeded  transaction-retry-max-storage-size-gb limit: {} bytes", _tracked_trxs.memory_size() );
       auto i = _tracked_trxs.index().get<by_trx_id>().find( ptrx->id() );
@@ -113,6 +124,7 @@ struct trx_retry_db_impl {
          _tracked_trxs.insert( {std::move(ptrx),
                                 !num_blocks.has_value() ? lib_totem : *num_blocks,
                                 0,
+                                nullptr,
                                 {},
                                 fc::time_point::now(),
                                 std::move(next)} );
@@ -133,19 +145,15 @@ struct trx_retry_db_impl {
       auto& idx = _tracked_trxs.index().get<by_trx_id>();
       auto itr = idx.find(trace->id);
       if( itr != idx.end() ) {
-         _tracked_trxs.modify( itr, [&trace, &control=_controller, &abi_max_time=_abi_serializer_max_time]( tracked_transaction& tt ) {
+         _tracked_trxs.modify( itr, [&trace, &control=_controller]( tracked_transaction& tt ) {
             tt.block_num = trace->block_num;
-            try {
-               // send_transaction trace output format.
-               // Convert to variant with abi here and now because abi could change in very next transaction.
-               // Alternatively, we could store off all the abis needed and do the conversion later, but as this is designed
-               // to run on an API node, probably the best trade off to perform the abi serialization during block processing.
-               auto resolver = get_serializers_cache(control, trace, abi_max_time);
-               tt.trx_trace_v.clear();
-               abi_serializer::to_variant(*trace, tt.trx_trace_v, resolver, abi_max_time);
-            } catch( chain::abi_exception& ) {
-               tt.trx_trace_v = *trace;
-            }
+            // Capture the trace and the raw ABI bytes for accounts referenced by it.  ABI parsing + JSON emission are
+            // deferred to response-emit time on the http thread pool (see sysio::chain_apis::streamed_processed_trace
+            // and `fc::to_json_stream(streamed_processed_trace, json_writer&)`).  Capturing the raw bytes here
+            // preserves "ABIs frozen at apply time" semantics -- subsequent on-chain ABI updates won't affect the
+            // captured copy.
+            tt.trace_ptr = trace;
+            tt.raw_abis  = sysio::capture_abis(control, trace);
          } );
       }
    }
@@ -190,7 +198,8 @@ private:
                tt.last_try += fc::seconds( 10 );
             }
             tt.block_num = 0;
-            tt.trx_trace_v.clear();
+            tt.trace_ptr.reset();
+            tt.raw_abis = {};
          } );
       }
    }
@@ -228,9 +237,11 @@ private:
       }
       // ack
       for( auto& i: to_process ) {
-         _tracked_trxs.modify( i, [&]( tracked_transaction& tt ) {
-            tt.next( std::make_unique<fc::variant>( std::move( tt.trx_trace_v ) ) );
-            tt.trx_trace_v.clear();
+         _tracked_trxs.modify( i, [this]( tracked_transaction& tt ) {
+            tt.next( std::make_unique<sysio::chain_apis::streamed_processed_trace>(
+                  sysio::chain_apis::streamed_processed_trace{ std::move(tt.trace_ptr),
+                                                                std::move(tt.raw_abis),
+                                                                _abi_serializer_max_time } ) );
          } );
          _tracked_trxs.erase( i );
       }
@@ -246,9 +257,11 @@ private:
       }
       // ack
       for( auto& i: to_process ) {
-         _tracked_trxs.modify( i, [&]( tracked_transaction& tt ) {
-            tt.next( std::make_unique<fc::variant>( std::move( tt.trx_trace_v ) ) );
-            tt.trx_trace_v.clear();
+         _tracked_trxs.modify( i, [this]( tracked_transaction& tt ) {
+            tt.next( std::make_unique<sysio::chain_apis::streamed_processed_trace>(
+                  sysio::chain_apis::streamed_processed_trace{ std::move(tt.trace_ptr),
+                                                                std::move(tt.raw_abis),
+                                                                _abi_serializer_max_time } ) );
          } );
          _tracked_trxs.erase( i );
       }
@@ -290,7 +303,8 @@ trx_retry_db::trx_retry_db( const chain::controller& controller, size_t max_mem_
 
 trx_retry_db::~trx_retry_db() = default;
 
-void trx_retry_db::track_transaction( chain::packed_transaction_ptr ptrx, std::optional<uint16_t> num_blocks, next_function<std::unique_ptr<fc::variant>> next ) {
+void trx_retry_db::track_transaction( chain::packed_transaction_ptr ptrx, std::optional<uint16_t> num_blocks,
+                                      next_function<std::unique_ptr<sysio::chain_apis::streamed_processed_trace>> next ) {
    _impl->track_transaction( std::move( ptrx ), num_blocks, next );
 }
 
