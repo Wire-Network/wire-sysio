@@ -74,6 +74,20 @@ namespace fc
    template<typename... T> void to_variant( const std::variant<T...>& s, fc::variant& v );
    template<typename... T> void from_variant( const fc::variant& v, std::variant<T...>& s );
 
+   /// Explicit bool overload so std::variant elements of type bool route here, not into the
+   /// reflected `to_variant<T>` template (which expects T to have an `FC_REFLECT`).  Without
+   /// this overload the call resolves to the template once `fc/reflect/variant.hpp` is in
+   /// scope, then fails on `fc::reflector<bool>::visit`.
+   ///
+   /// Constrained on `T == bool` exactly so implicitly-convertible-to-bool types (raw
+   /// pointers, types with `operator bool()`, etc.) do NOT silently route here -- those
+   /// fall through to the reflected path and produce a loud build error if no reflector
+   /// exists.  See `from_variant(variant&, bool&)` for the inverse (already type-safe by
+   /// virtue of taking `bool&`, which non-bools can't bind to).
+   template<typename T>
+      requires std::is_same_v<T, bool>
+   void to_variant( const T& var, fc::variant& vo ) { vo = var; }
+
    void to_variant( const uint8_t& var,  fc::variant& vo );
    void from_variant( const fc::variant& var,  uint8_t& vo );
    void to_variant( const int8_t& var,  fc::variant& vo );

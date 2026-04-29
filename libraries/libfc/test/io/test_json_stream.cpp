@@ -133,8 +133,10 @@ BOOST_AUTO_TEST_CASE(map_object_emission) {
    with_map_t m;
    m.counts["a"] = 1;
    m.counts["b"] = 2;
-   // std::map iterates in sorted order so output is deterministic.
-   BOOST_CHECK_EQUAL(fc::to_json_string(m), "{\"counts\":{\"a\":1,\"b\":2}}");
+   // std::map iterates in sorted order so output is deterministic.  Maps serialize as an
+   // array of [key, value] pairs (matching the long-standing to_variant_from_map shape),
+   // not a JSON object -- this preserves round-trip support for non-string key types.
+   BOOST_CHECK_EQUAL(fc::to_json_string(m), "{\"counts\":[[\"a\",1],[\"b\",2]]}");
 }
 
 BOOST_AUTO_TEST_CASE(raw_value_embeds_fragment) {
