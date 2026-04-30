@@ -1,5 +1,6 @@
 #include <fc/variant.hpp>
 #include <fc/variant_object.hpp>
+#include <fc/int128.hpp>
 
 #include <boost/test/unit_test.hpp>
 
@@ -115,6 +116,42 @@ BOOST_AUTO_TEST_CASE(same_type_object_reassign) {
    variant v{variant_object{mutable_variant_object("k", 1)}};
    v = variant_object{mutable_variant_object("k", 2)};
    BOOST_CHECK_EQUAL(v.get_object()["k"].as_int64(), 2);
+}
+
+// int128 / uint128 / int256 / uint256 store as new std::string(...) on the heap.
+// These cases pin the leak fix in clear() and the deep-copy fix in the copy ctor;
+// without both, ASAN reports a leak (clear()) or a use-after-free / double-free
+// (copy ctor sharing the std::string* pointer).
+BOOST_AUTO_TEST_CASE(int128_destructor_frees_heap_string) {
+   { variant v{fc::int128{42}};  } // ASAN-leak if clear() doesn't handle int128_type
+   { variant v{fc::uint128{42}}; } // same for uint128_type
+}
+
+BOOST_AUTO_TEST_CASE(int128_copy_ctor_deep_copies) {
+   {
+      variant a{fc::int128{-12345}};
+      variant b(a);                         // shallow-copy bug -> shared pointer
+      BOOST_CHECK_EQUAL(a.as_string(), b.as_string());
+      // Both destructors run at scope exit; double-free if shared pointer.
+   }
+   {
+      variant a{fc::uint128{0xABCDEF0123456789ULL}};
+      variant b(a);
+      BOOST_CHECK_EQUAL(a.as_string(), b.as_string());
+   }
+}
+
+BOOST_AUTO_TEST_CASE(int128_op_assign_aliased_subvariant) {
+   // Aliased self-assign for int128 source: lhs is object_type, rhs is int128
+   // entry inside lhs.  op=(const&) different-type path must deep-copy via
+   // copy ctor BEFORE clearing lhs (variant tmp(v); clear(); take(tmp)).
+   // If copy ctor was shallow for int128, the deep-copy step would silently
+   // share the pointer, and clear() would later free the object frame whose
+   // entry owned the heap string -- use-after-free on take.
+   variant v{variant_object{mutable_variant_object("k", fc::int128{99})}};
+   v = v.get_object()["k"];
+   BOOST_CHECK(v.get_type() == variant::int128_type);
+   BOOST_CHECK_EQUAL(v.as_string(), "99");
 }
 
 BOOST_AUTO_TEST_SUITE_END()

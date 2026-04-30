@@ -258,6 +258,11 @@ void variant::clear()
         delete *reinterpret_cast<variants**>(this);
         break;
      case string_type:
+     case int128_type:
+     case uint128_type:
+     case int256_type:
+     case uint256_type:
+        // All four use new std::string(...) storage (see ctors above).
         delete *reinterpret_cast<std::string**>(this);
         break;
      case blob_type:
@@ -274,7 +279,8 @@ void variant::clear()
 
 variant::variant( const variant& v )
 {
-   switch( v.get_type() )
+   const auto t = v.get_type();
+   switch( t )
    {
        case object_type:
           *reinterpret_cast<variant_object**>(this)  =
@@ -287,9 +293,15 @@ variant::variant( const variant& v )
           set_variant_type( this,  array_type );
           return;
        case string_type:
+       case int128_type:
+       case uint128_type:
+       case int256_type:
+       case uint256_type:
+          // All four use new std::string(...) storage (see ctors above);
+          // deep-copy so destructors don't double-free or leak.
           *reinterpret_cast<std::string**>(this)  =
              new std::string(**reinterpret_cast<const const_string_ptr*>(&v) );
-          set_variant_type( this, string_type );
+          set_variant_type( this, t );
           return;
        case blob_type:
           *reinterpret_cast<blob**>(this)  =
