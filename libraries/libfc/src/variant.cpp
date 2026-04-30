@@ -363,29 +363,12 @@ variant& variant::operator=( const variant& v )
       }
    }
 
+   // Different type: deep-copy v into a temporary before clearing this, in
+   // case v aliases storage owned by this (e.g. v = v.get_object()["k"]).
+   variant tmp(v);
    clear();
-   switch( src_type )
-   {
-      case object_type:
-         *reinterpret_cast<variant_object**>(this)  =
-            new variant_object((**reinterpret_cast<const const_variant_object_ptr*>(&v)));
-         break;
-      case array_type:
-         *reinterpret_cast<variants**>(this)  =
-            new variants((**reinterpret_cast<const const_variants_ptr*>(&v)));
-         break;
-      case string_type:
-         *reinterpret_cast<std::string**>(this)  = new std::string((**reinterpret_cast<const const_string_ptr*>(&v)) );
-         break;
-      case blob_type:
-         *reinterpret_cast<blob**>(this)  = new blob((**reinterpret_cast<const const_blob_ptr*>(&v)) );
-         break;
-      case string_sso_type:
-         // Inline bytes copy via the byte-array assignment below.
-      default:
-         _data = v._data;
-   }
-   set_variant_type( this, src_type );
+   _data = tmp._data;
+   set_variant_type( &tmp, null_type );
    return *this;
 }
 
