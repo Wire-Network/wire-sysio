@@ -256,6 +256,18 @@ namespace sysio::chain {
       built_in_types[name] = std::move( unpack_pack );
    }
 
+   void abi_serializer::add_specialized_stream_unpack( const string& /*name*/,
+                                                       stream_unpack_function /*unpack*/ ) {
+      // The streaming dispatch (get_built_in_stream_unpacks) is a static const map shared across
+      // instances.  Wiring per-instance overrides would require restructuring that into an
+      // instance-owned map plus a fallback-to-static lookup, plus a parallel change in
+      // stream_sink::unpack_built_in to consult the instance map first.  No callers need this
+      // today (add_specialized_unpack_pack itself has zero in-tree callers); intentional fail-loud
+      // until a real use case shows up.
+      FC_ASSERT(false, "abi_serializer::add_specialized_stream_unpack is not yet implemented; "
+                       "see header doc for the restructuring required");
+   }
+
    const std::pair<abi_serializer::unpack_function, abi_serializer::pack_function>*
    abi_serializer::find_built_in(std::string_view type) const noexcept {
       auto it = built_in_types.find(type);
@@ -1341,7 +1353,7 @@ void variant_sink::key(std::string_view k) {
    f.has_pending_key = true;
 }
 
-void variant_sink::value_string(std::string_view s) { emit_value(fc::variant(std::string(s))); }
+void variant_sink::value_string(std::string_view s) { emit_value(fc::variant(s)); }
 void variant_sink::value_int64(int64_t n)           { emit_value(fc::variant(n)); }
 void variant_sink::value_uint64(uint64_t n)         { emit_value(fc::variant(n)); }
 void variant_sink::value_double(double d)           { emit_value(fc::variant(d)); }
@@ -1399,6 +1411,28 @@ void variant_sink::unpack_action_data(const abi_serializer& abi, std::string_vie
    action_data_to_variant_context inner(abi, ctx, type);
    inner.short_path = short_path;
    emit_value(abi._binary_to_variant(type, data, inner));
+}
+
+bool variant_sink::unpack_action_data_field(std::string_view key_name, const abi_serializer& abi,
+                                            std::string_view type, const bytes& data,
+                                            abi_traverse_context& ctx, bool short_path) {
+   // _binary_to_variant builds the variant before we touch the sink; if it throws
+   // pending_key was set by key() but never committed by emit_value, so we just
+   // clear it and the surviving frame is left as if neither call happened.
+   try {
+      key(key_name);
+      action_data_to_variant_context inner(abi, ctx, type);
+      inner.short_path = short_path;
+      emit_value(abi._binary_to_variant(type, data, inner));
+      return true;
+   } catch(...) {
+      if (!stack_.empty()) {
+         auto& f = stack_.back();
+         f.pending_key.clear();
+         f.has_pending_key = false;
+      }
+      return false;
+   }
 }
 
 // -- stream_sink -------------------------------------------------------------------------
@@ -1492,6 +1526,33 @@ void stream_sink::unpack_action_data(const abi_serializer& abi, std::string_view
    abi._binary_walk(type, ds, *this, inner);
 }
 
+bool stream_sink::unpack_action_data_field(std::string_view key_name, const abi_serializer& abi,
+                                           std::string_view type, const bytes& data,
+                                           abi_traverse_context& ctx, bool short_path) {
+   // Snapshot writer + frame_items_ before the key emit; on throw we rewind both
+   // so the buffer / frame stack are byte-identical to the pre-call state.  The
+   // walker may have opened nested object frames before throwing, so resizing
+   // frame_items_ back to its saved depth is required to keep it in lockstep
+   // with the json_writer's internal stack.
+   const auto writer_cp = w_.checkpoint();
+   const size_t fi_save = frame_items_.size();
+   const uint32_t items_save = frame_items_.empty() ? 0 : frame_items_.back();
+   try {
+      w_.key(key_name);
+      action_data_to_variant_context inner(abi, ctx, type);
+      inner.short_path = short_path;
+      fc::datastream<const char*> ds(data.data(), data.size());
+      abi._binary_walk(type, ds, *this, inner);
+      on_value_emitted();
+      return true;
+   } catch(...) {
+      w_.rewind(writer_cp);
+      frame_items_.resize(fi_save);
+      if (!frame_items_.empty()) frame_items_.back() = items_save;
+      return false;
+   }
+}
+
 } // namespace sysio::chain::impl
 
 // -- _binary_walk<Sink> et al ------------------------------------------------------------
@@ -1515,13 +1576,9 @@ void abi_serializer::_unpack_enum( const enum_def& e_def, fc::datastream<const c
          return;
       }
    }
-   // Unknown value — emit as the underlying integer.  variant_sink reuses the just-read
-   // variant; stream_sink rebuilds it via to_json_stream(variant, w) inside value_variant.
-   if constexpr (std::is_same_v<Sink, impl::variant_sink>) {
-      sink.value_variant(std::move(int_var));
-   } else {
-      sink.value_variant(int_var);
-   }
+   // Unknown value -- emit as the underlying integer.  Both sinks take by const-ref
+   // and copy internally; the int_var temporary lives until end of expression.
+   sink.value_variant(int_var);
 }
 
 template<typename Sink>

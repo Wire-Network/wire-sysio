@@ -83,7 +83,9 @@ public:
    /// Inject an already-built `fc::variant` at the current value position.  Used by
    /// `unpack_built_in` and `unpack_protobuf` to avoid re-tokenising values that the
    /// existing variant-side unpack functions produce as a single `fc::variant`.
-   void value_variant(fc::variant v) { emit_value(std::move(v)); }
+   /// By const-ref to match `stream_sink::value_variant`; copies before emit so the
+   /// sink owns its frame entry.
+   void value_variant(const fc::variant& v) { emit_value(v); }
 
    /// Generic field emit used by `abi_to_emit<Sink>` for non-ABI types: builds a
    /// `fc::variant(v)` and emits it at the current value position.  Symmetric with
@@ -97,6 +99,14 @@ public:
    /// directly into the writer.
    void unpack_action_data(const abi_serializer& abi, std::string_view type, const bytes& data,
                            abi_traverse_context& ctx, bool short_path);
+
+   /// Atomic key + unpack_action_data.  Returns true on success.  On unpack failure,
+   /// the sink is rolled back to the state before the call -- no partial key,
+   /// no orphan inner frame -- so the caller can emit a hex fallback under the
+   /// same key without producing duplicates or malformed JSON.
+   bool unpack_action_data_field(std::string_view key_name, const abi_serializer& abi,
+                                 std::string_view type, const bytes& data,
+                                 abi_traverse_context& ctx, bool short_path);
 
    /// True if at least one item has been added to the current frame.  Used by the walker
    /// to enforce the legacy "Unable to unpack '...' from stream" guard on empty structs.
@@ -189,6 +199,14 @@ public:
    /// `fc::variant` instead.
    void unpack_action_data(const abi_serializer& abi, std::string_view type, const bytes& data,
                            abi_traverse_context& ctx, bool short_path);
+
+   /// Atomic key + unpack_action_data.  Returns true on success.  On unpack failure,
+   /// rewinds the writer (truncates the buffer + restores frame state) so the caller
+   /// can emit a hex fallback under the same key without leaving a half-written
+   /// "data":{ ... orphan or producing duplicate keys.
+   bool unpack_action_data_field(std::string_view key_name, const abi_serializer& abi,
+                                 std::string_view type, const bytes& data,
+                                 abi_traverse_context& ctx, bool short_path);
 
    bool frame_has_items() const noexcept;
 

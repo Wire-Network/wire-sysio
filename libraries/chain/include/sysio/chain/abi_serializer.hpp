@@ -151,6 +151,15 @@ struct abi_serializer {
 
    void add_specialized_unpack_pack( const string& name, std::pair<abi_serializer::unpack_function, abi_serializer::pack_function> unpack_pack );
 
+   /// Streaming-side companion to `add_specialized_unpack_pack`.  Currently asserts
+   /// not-implemented: the streaming dispatch is a static const map and registering
+   /// per-instance overrides would require restructuring it into a per-instance map.
+   /// Surfaced now so future callers see the gap at the API level rather than getting
+   /// a silent variant-fallback (slow path) for their override.
+   using stream_unpack_function = std::function<void(fc::datastream<const char*>&, bool, bool,
+                                                     const yield_function_t&, fc::json_writer&)>;
+   void add_specialized_stream_unpack( const string& name, stream_unpack_function unpack );
+
    /// Lookup helper used by the streaming walker sinks.  Returns a pointer to the
    /// (unpack, pack) entry registered for `type`, or `nullptr` if it is not a
    /// built-in.  Const view; the underlying map is shared with `binary_to_variant`
@@ -627,6 +636,9 @@ namespace impl {
             return;
          }
 
+         // unpack_action_data_field is atomic: on failure the sink is rolled back
+         // so the hex fallback emits cleanly under the same key with no duplicate
+         // and no orphan inner frame.
          bool data_emitted = false;
          try {
             auto abi_optional = resolver(act.account);
@@ -634,16 +646,10 @@ namespace impl {
                const abi_serializer& abi = *abi_optional;
                auto type = abi.get_action_type(act.name);
                if (!type.empty()) {
-                  try {
-                     sink.key("data");
-                     sink.unpack_action_data(abi, type, act.data, ctx, /*short_path*/ false);
-                     data_emitted = true;
-                  } catch(...) {
-                     // serialization failure -- fall back to hex below
-                  }
+                  data_emitted = sink.unpack_action_data_field("data", abi, type, act.data, ctx, /*short_path*/ false);
                }
             }
-         } catch(...) { /* fall back to hex below */ }
+         } catch(...) { /* resolver lookup failure -- fall back to hex below */ }
          if( !data_emitted ) {
             emit_action_bytes_field( sink, "data", act.data, ctx );
          }
@@ -686,17 +692,19 @@ namespace impl {
          add( sink, "error_code", act_trace.error_code, resolver, ctx );
          add( sink, "return_value_hex_data", act_trace.return_value, resolver, ctx );
 
+         // Atomic key + unpack: on decode failure the field is silently omitted
+         // (matches existing variant-path behavior), with no orphan frame or
+         // dangling key left in the writer.
          try {
             auto abi_optional = resolver(act_trace.act.account);
             if (abi_optional) {
                const abi_serializer& abi = *abi_optional;
                auto type = abi.get_action_result_type(act_trace.act.name);
                if (!type.empty()) {
-                  sink.key("return_value_data");
-                  sink.unpack_action_data(abi, type, act_trace.return_value, ctx, /*short_path*/ false);
+                  sink.unpack_action_data_field("return_value_data", abi, type, act_trace.return_value, ctx, /*short_path*/ false);
                }
             }
-         } catch(...) {}
+         } catch(...) { /* resolver lookup failure -- omit field */ }
          sink.end_object();
       }
 

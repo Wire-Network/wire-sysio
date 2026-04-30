@@ -3520,6 +3520,108 @@ BOOST_AUTO_TEST_CASE(abi_to_variant__add_action__no_return_value)
    }
 }
 
+// When the action_result decode fails partway, the field is silently omitted
+// from the JSON (existing variant-path behavior).  The streaming sink had a
+// bug where sink.key("return_value_data") was emitted BEFORE the inner unpack,
+// so a mid-stream throw left a dangling key + orphan frame and end_object()
+// closed the wrong scope.  Stream + variant must produce identical JSON.
+BOOST_AUTO_TEST_CASE(abi_to_variant__add_action_trace__return_value_unpack_throws_silently_omitted)
+{
+   action_trace at;
+   std::string expected_json;
+   // Set up a return_value whose declared type is "string" (length-prefix + body)
+   // but the bytes are a single 0x09 length-prefix with no body -> unpack throws
+   // partway.  generate_action_trace's parsable=false branch suppresses the
+   // return_value_data field in expected_json, which is what we want.
+   std::tie(at, expected_json) = generate_action_trace(std::optional<char>{0x09}, "09", false);
+
+   auto abi = R"({
+      "version": "sysio::abi/1.0",
+      "structs": [
+         {"name": "acttest", "base": "", "fields": [
+            {"name": "str", "type": "string"}
+         ]}
+      ],
+      "action_results": [
+         {"name": "acttest", "result_type": "string"}
+      ]
+   })";
+   auto abidef = fc::json::from_string(abi).as<abi_def>();
+
+   // Variant path: known good, builds expected_json (return_value_data omitted).
+   fc::variant variant_v;
+   abi_serializer::to_variant(at, variant_v, get_resolver(abidef), yield_fn());
+   mutable_variant_object variant_mvo;
+   variant_mvo("action_traces", std::move(variant_v));
+   const std::string variant_json = fc::json::to_string(variant_mvo, get_deadline());
+   BOOST_CHECK_EQUAL(variant_json, expected_json);
+
+   // Streaming path: must emit byte-identical JSON, with no orphan frame.
+   std::string stream_json;
+   {
+      fc::json_writer w(stream_json);
+      w.begin_object();
+      w.key("action_traces");
+      abi_serializer::to_json_stream(at, w, get_resolver(abidef), yield_fn());
+      w.end_object();
+      BOOST_REQUIRE(w.balanced());
+   }
+   BOOST_CHECK_EQUAL(stream_json, expected_json);
+   BOOST_CHECK_NO_THROW(fc::json::from_string(stream_json));
+}
+
+// When action data fails ABI decode partway through (truncated bytes, missing
+// fields, etc.), both the variant path and the streaming path must fall back
+// to the hex-only form.  The streaming sink had a bug where sink.key("data")
+// was emitted BEFORE the inner unpack, so a mid-stream throw left the writer
+// in a half-written state and the catch-side hex fallback emitted a duplicate
+// "data" key plus an orphan inner object frame, producing invalid JSON.
+BOOST_AUTO_TEST_CASE(abi_to_variant__add_action__data_unpack_throws_falls_back_to_hex)
+{
+   auto abi = R"({
+      "version": "sysio::abi/1.0",
+      "structs": [
+         {"name": "acttest", "base": "", "fields": [
+            {"name": "str", "type": "string"}
+         ]}
+      ],
+      "actions": [
+         {"name": "acttest", "type": "acttest", "ricardian_contract": ""}
+      ]
+   })";
+   auto abidef = fc::json::from_string(abi).as<abi_def>();
+
+   // String length prefix says 9 bytes but no body follows -> unpack throws partway.
+   action act(
+      std::vector<sysio::chain::permission_level>{ {account_name{"acctest"}, permission_name{"active"}} },
+      account_name{"acctest"},
+      action_name{"acttest"},
+      bytes{0x09});
+
+   const std::string expected_hex = "09";
+   const std::string expected_json =
+      "{\"account\":\"acctest\",\"name\":\"acttest\","
+      "\"authorization\":[{\"actor\":\"acctest\",\"permission\":\"active\"}],"
+      "\"data\":\"" + expected_hex + "\","
+      "\"hex_data\":\"" + expected_hex + "\"}";
+
+   {
+      fc::variant v;
+      abi_serializer::to_variant(act, v, get_resolver(abidef), yield_fn());
+      const std::string s = fc::json::to_string(v, get_deadline());
+      BOOST_CHECK_EQUAL(s, expected_json);
+   }
+   {
+      std::string s;
+      fc::json_writer w(s);
+      abi_serializer::to_json_stream(act, w, get_resolver(abidef), yield_fn());
+      BOOST_REQUIRE(w.balanced());
+      BOOST_CHECK_EQUAL(s, expected_json);
+      // Round-trip parses cleanly (catches duplicate-key / orphan-frame regressions).
+      BOOST_CHECK_NO_THROW(fc::json::from_string(s));
+   }
+}
+
 BOOST_AUTO_TEST_CASE(enum_types)
 {
    using sysio::testing::fc_exception_message_starts_with;
