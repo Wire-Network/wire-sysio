@@ -1,9 +1,14 @@
 #pragma once
 
-// Lightweight header carrying just the bits of the JSON layer that fc/io/json_stream.hpp
-// (and downstream variant.hpp / flat.hpp container streaming overloads) need to compile,
-// without dragging in fc/io/json.hpp's class json.  Pulling in class json would create
-// a cycle: variant.hpp -> json_stream.hpp -> json.hpp -> variant.hpp.
+// JSON string-escape primitives shared by both the legacy variant-tree path and
+// the streaming json_writer path.  Decoupled from class json so that
+// fc/io/json_stream.hpp (and downstream variant.hpp / flat.hpp container
+// streaming overloads) can call escape_string without pulling in class json --
+// avoiding the cycle: variant.hpp -> json_stream.hpp -> json.hpp -> variant.hpp.
+//
+// The yield-function alias is the parameter type used by escape_string;
+// class json::yield_function_t is an alias to this type so existing callers
+// continue to compile unchanged.
 
 #include <fc/utility.hpp>
 #include <string>

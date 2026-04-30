@@ -1,6 +1,6 @@
 #pragma once
 
-#include <fc/io/json_yield.hpp>
+#include <fc/io/json_escape.hpp>
 
 #include <cassert>
 #include <charconv>

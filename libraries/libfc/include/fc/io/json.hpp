@@ -3,7 +3,7 @@
 #include <fc/filesystem.hpp>
 #include <fc/time.hpp>
 #include <fc/utility.hpp>
-#include <fc/io/json_yield.hpp>
+#include <fc/io/json_escape.hpp>
 #include <fc/exception/exception.hpp>
 
 #define DEFAULT_MAX_RECURSION_DEPTH 200
