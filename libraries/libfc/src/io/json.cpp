@@ -353,7 +353,8 @@ namespace fc
                  if( isalnum( c ) )
                  {
                     s += string_from_token( in );
-                    return std::move(s);
+                    ret = std::move(s);
+                    return ret;
                  }
                 done = true;
                 break;
