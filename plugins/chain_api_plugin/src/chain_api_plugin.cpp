@@ -109,7 +109,7 @@ void chain_api_plugin::plugin_startup() {
    // Run get_info on http thread only
    _http_plugin.add_async_api_stream({
       bind_stream<&ro::get_info, dispatch::sync>(
-         _http_plugin, ro_api, "/v1/chain/get_info", cat::chain_ro, pt::no_params, 200),
+         _http_plugin, ro_api, "/v1/chain/get_info", cat::node, pt::no_params, 200),
    });
 
    _http_plugin.add_api_stream({
