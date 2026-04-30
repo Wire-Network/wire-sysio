@@ -264,8 +264,9 @@ namespace sysio::chain {
       // stream_sink::unpack_built_in to consult the instance map first.  No callers need this
       // today (add_specialized_unpack_pack itself has zero in-tree callers); intentional fail-loud
       // until a real use case shows up.
-      FC_ASSERT(false, "abi_serializer::add_specialized_stream_unpack is not yet implemented; "
-                       "see header doc for the restructuring required");
+      FC_ASSERT(false, "abi_serializer::add_specialized_stream_unpack is not yet implemented: "
+                       "the streaming dispatch is a static const map; per-instance overrides "
+                       "require restructuring it into an instance-owned map with a static fallback");
    }
 
    const std::pair<abi_serializer::unpack_function, abi_serializer::pack_function>*
