@@ -4,7 +4,6 @@
 
 #include <fc-lite/expected.hpp>
 #include <fc-lite/threadsafe_map.hpp>
-#include <fc/mutex.hpp>
 
 #include <fc/crypto/ethereum/ethereum_types.hpp>
 #include <fc/crypto/signature_provider.hpp>
@@ -13,28 +12,40 @@
 #include <fc/network/ethereum/ethereum_abi.hpp>
 #include <fc/network/json_rpc/json_rpc_client.hpp>
 
-#include <utility>
-
 namespace fc::network::ethereum {
 using namespace fc::crypto;
 using namespace fc::crypto::ethereum;
 using namespace fc::network::json_rpc;
 
-class block_tag {
-public:
-   enum class labeled { latest, pending, earliest, not_valid };
-   explicit block_tag(labeled name);
-   explicit block_tag(uint64_t bn);
-   std::string to_string() const;
-private:
-   labeled  kind;
-   uint64_t number;
-};
+/**
+ * @brief Type alias for Ethereum block tag or block number
+ *
+ * Can hold either a string (for block numbers) or string_view (for tags like "latest", "pending")
+ */
+using block_tag_t = std::variant<std::string, std::string_view>;
 
-inline const block_tag block_tag_latest(block_tag::labeled::latest);
-inline const block_tag block_tag_pending(block_tag::labeled::pending);
-inline const block_tag block_tag_earliest(block_tag::labeled::earliest);
+/**
+ * @brief Block tag constant representing pending transactions
+ */
+constexpr std::string_view block_tag_pending = "pending";
 
+/**
+ * @brief Block tag constant representing the latest block
+ */
+constexpr std::string_view block_tag_latest = "latest";
+
+/**
+ * @brief Converts a block_tag_t variant to a string
+ *
+ * @param tag Block tag variant (either string or string_view)
+ * @return String representation of the block tag
+ */
+constexpr std::string to_block_tag(block_tag_t tag) {
+   if (std::holds_alternative<std::string>(tag)) {
+      return std::get<std::string>(tag);
+   }
+   return std::string(std::get<std::string_view>(tag));
+}
 
 /**
  * @brief Type alias for contract call data - either raw hex string or structured parameters
@@ -89,7 +100,7 @@ using ethereum_client_ptr = std::shared_ptr<ethereum_client>;
  * @tparam Args Argument types for the contract function
  */
 template <typename RT, typename... Args>
-using ethereum_contract_call_fn = std::function<RT(const block_tag& tag, Args&...)>;
+using ethereum_contract_call_fn = std::function<RT(const std::string& block_tag, Args&...)>;
 
 /**
  * @brief Function type for Ethereum contract transaction functions
@@ -178,8 +189,8 @@ public:
     * @throws std::out_of_range if an event name is not found in the ABI map
     */
    std::vector<ethereum_event_data> query_events(const std::vector<std::string>& event_names,
-                                                 const block_tag& from_block,
-                                                 const block_tag& to_block = block_tag_latest);
+                                                  const block_tag_t& from_block,
+                                                  const block_tag_t& to_block = block_tag_latest);
 
 protected:
 
@@ -263,7 +274,7 @@ public:
    fc::variant execute(const std::string& method, const fc::variant& params);
 
    fc::variant execute_contract_view_fn(const address& contract_address, const abi::contract& abi,
-                                        const block_tag& tag, const contract_invoke_data_items& params);
+                                        const std::string& block_tag, const contract_invoke_data_items& params);
 
    fc::variant execute_contract_tx_fn(const eip1559_tx& tx, const abi::contract& abi,
                                       const contract_invoke_data_items& params = {}, bool sign = true);
@@ -282,7 +293,7 @@ public:
     * @param full_transaction_data Flag to determine whether to fetch full transaction data.
     * @return The block data in JSON format.
     */
-   fc::variant_object get_block_by_number(const block_tag& block_number_or_tag = block_tag_latest,
+   fc::variant_object get_block_by_number(const block_tag_t& block_number_or_tag = block_tag_latest,
                                           bool full_transaction_data = false);
 
    /**
@@ -376,8 +387,8 @@ public:
    std::vector<ethereum_event_data> get_events(const address_compat_type& contract_address,
                                                 const std::vector<std::string>& event_names,
                                                 const std::vector<abi::contract>& event_abis,
-                                                const block_tag& from_block,
-                                                const block_tag& to_block = block_tag_latest);
+                                                const block_tag_t& from_block,
+                                                const block_tag_t& to_block = block_tag_latest);
 
    /**
     * @brief Retrieves the transaction receipt by transaction hash.
@@ -389,17 +400,12 @@ public:
    // Additional Methods
 
    /**
-    * @brief Retrieves the raw transaction count (nonce) for an address via RPC.
-    *
-    * This is an uncached lookup. For obtaining the next nonce to use for this
-    * client's own signer, use the internal cached path via create_default_tx.
-    *
+    * @brief Retrieves the transaction count (nonce) for an address.
     * @param address The address for which to fetch the transaction count.
-    * @param tag Block tag at which to query.
+    * @param block_tag
     * @return The transaction count (nonce).
     */
-   fc::uint256 raw_get_transaction_count(const address_compat_type& address,
-                                         const block_tag& tag = block_tag_pending);
+   fc::uint256 get_transaction_count(const address_compat_type& address, const std::string& block_tag = "pending");
 
    /**
     * @brief Retrieves the chain ID of the connected Ethereum network.
@@ -458,7 +464,7 @@ public:
    template <typename C>
    std::shared_ptr<C> get_contract(const address_compat_type& address_compat,
                                    const std::vector<abi::contract>& contracts = {}) {
-      fc::lock_guard lock(_contracts_map_mutex);
+      std::scoped_lock<std::mutex> lock(_contracts_map_mutex);
       auto addr = ethereum::to_address(address_compat);
       if (!_contracts_map.contains(addr)) {
          _contracts_map[addr] = std::make_shared<C>(shared_from_this(), addr, contracts);
@@ -467,12 +473,6 @@ public:
    }
 
 private:
-   /**
-    * @brief Returns the next nonce to use for this client's signer,
-    * monotonically advancing past any on-chain count.
-    */
-   fc::uint256 get_signer_nonce();
-
    /**
     * @brief Signature provider for signing transactions
     */
@@ -494,23 +494,14 @@ private:
    std::optional<fc::uint256> _chain_id;
 
    /**
-    * @brief Mutex for thread-safe access to _contracts_map and _nonce
-    * 
-    * Note: mutex is used for both _contracts_map and _nonce because there will
-    * be little contention on this mutex between them, so there is not really a
-    * need to have _nonce's own mutex
+    * @brief Mutex for thread-safe access to _contracts_map
     */
-   fc::mutex _contracts_map_mutex{};
-
-   /**
-    * @brief Cached nonce for _signature_provider
-    */
-   uint256 _nonce  GUARDED_BY(_contracts_map_mutex) {0u};
+   std::mutex _contracts_map_mutex{};
 
    /**
     * @brief Cache of contract client instances by address
     */
-   std::map<address, std::shared_ptr<ethereum_contract_client>> _contracts_map  GUARDED_BY(_contracts_map_mutex) {};
+   std::map<address, std::shared_ptr<ethereum_contract_client>> _contracts_map{};
 };
 
 /**
@@ -535,9 +526,9 @@ ethereum_contract_call_fn<RT, Args...> ethereum_contract_client::create_call(con
    }
 
    abi::contract& abi = abi_map[contract.name];
-   return [this, &abi](const block_tag& tag, Args&... args) -> RT {
+   return [this, &abi](const std::string& block_tag, Args&... args) -> RT {
       contract_invoke_data_items params = {args...};
-      auto res_var = client->execute_contract_view_fn(contract_address, abi, tag, params);
+      auto res_var = client->execute_contract_view_fn(contract_address, abi, block_tag, params);
 
       if constexpr (std::is_same_v<std::decay_t<RT>, fc::variant>) {
          return res_var;

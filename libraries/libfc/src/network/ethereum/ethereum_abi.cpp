@@ -460,7 +460,7 @@ fc::variant decode_static_value(const abi::component_type& component, const uint
    case dt::address: {
       // Address is right-aligned in 32 bytes, take last 20 bytes
       std::vector<uint8_t> addr_bytes(value_data + 12, value_data + 32);
-      return fc::variant(fc::to_hex(addr_bytes, true));
+      return fc::variant("0x" + fc::to_hex(addr_bytes));
    }
 
    default:
@@ -472,7 +472,7 @@ fc::variant decode_static_value(const abi::component_type& component, const uint
       auto type_name = ethereum_abi_data_type_reflector::to_fc_string(type);
       auto sz = std::stoul(type_name.substr(5));
       std::vector<uint8_t> bytes_data(value_data, value_data + sz);
-      return fc::variant(fc::to_hex(bytes_data, true));
+      return fc::variant("0x" + fc::to_hex(bytes_data));
    }
 
    FC_THROW_EXCEPTION(fc::unsupported_exception, "Unsupported static type for ABI decoding: {}",
@@ -515,7 +515,7 @@ fc::variant decode_dynamic_data(const abi::component_type& component, const uint
       // Advance offset to next 32-byte boundary
       size_t padded_length = ((length + 31) / 32) * 32;
       offset += padded_length;
-      return fc::variant(fc::to_hex(bytes_data, true));
+      return fc::variant("0x" + fc::to_hex(bytes_data));
    }
 
    default:

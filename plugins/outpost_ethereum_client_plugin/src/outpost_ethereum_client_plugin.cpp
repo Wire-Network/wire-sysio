@@ -1,8 +1,6 @@
 #include <ranges>
 #include <regex>
-#include <fc/io/json.hpp>
 #include <fc/log/logger.hpp>
-#include <sysio/chain/exceptions.hpp>
 
 #include <sysio/outpost_ethereum_client_plugin.hpp>
 #include <sysio/outpost_ethereum_client_plugin/outpost_ethereum_client.hpp>
@@ -34,7 +32,7 @@ public:
          FC_ASSERT_FMT(exists(filename), "File does not exist: {}", filename.string());
          auto file_path = std::filesystem::absolute(filename);
          ilog("Loading ABI file: {}", file_path.string());
-         if (std::ranges::any_of(_abi_files, [&](const auto& f) { return f.first == file_path; })) {
+         if (!std::ranges::none_of(_abi_files, [&](const auto& f) { return f.first == file_path; })) {
             wlog("Already registered ABI file: {}", file_path.string());
             continue;
          }
@@ -138,6 +136,31 @@ ethereum_client_entry_ptr outpost_ethereum_client_plugin::get_client(const std::
    return my->get_client(id);
 }
 
+const std::vector<std::pair<std::filesystem::path, std::vector<fc::network::ethereum::abi::contract>>>& outpost_ethereum_client_plugin::get_abi_files() const {
+   return my->get_abi_files();
+}
+
+std::shared_ptr<outpost_client>
+outpost_ethereum_client_plugin::create_outpost_client(const std::string& eth_client_id,
+                                                    uint64_t           outpost_id,
+                                                    uint32_t           chain_id,
+                                                    const std::string& opp_addr,
+                                                    const std::string& opp_inbound_addr) {
+   auto entry = my->get_client(eth_client_id);
+   FC_ASSERT(entry, "Unknown ethereum client id: {}", eth_client_id);
+
+   std::vector<fc::network::ethereum::abi::contract> all_abis;
+   for (auto& [path, contracts] : my->get_abi_files()) {
+      all_abis.insert(all_abis.end(), contracts.begin(), contracts.end());
+   }
+   return std::make_shared<outpost_ethereum_client>(entry,
+                                                    opp_addr,
+                                                    opp_inbound_addr,
+                                                    std::move(all_abis),
+                                                    outpost_id,
+                                                    chain_id);
+}
+
 ethereum_client_ptr outpost_ethereum_client_plugin::get_client_for_chain(fc::crypto::chain_kind_t target_chain) const {
    ethereum_client_ptr result;
    for (const auto& entry : my->get_clients()) {
@@ -185,31 +208,6 @@ std::vector<fc::network::ethereum::abi::contract> outpost_ethereum_client_plugin
    }
 
    return result;
-}
-
-const std::vector<std::pair<std::filesystem::path, std::vector<fc::network::ethereum::abi::contract>>>& outpost_ethereum_client_plugin::get_abi_files() const {
-   return my->get_abi_files();
-}
-
-std::shared_ptr<outpost_client>
-outpost_ethereum_client_plugin::create_outpost_client(const std::string& eth_client_id,
-                                                    uint64_t           outpost_id,
-                                                    uint32_t           chain_id,
-                                                    const std::string& opp_addr,
-                                                    const std::string& opp_inbound_addr) {
-   auto entry = my->get_client(eth_client_id);
-   FC_ASSERT(entry, "Unknown ethereum client id: {}", eth_client_id);
-
-   std::vector<fc::network::ethereum::abi::contract> all_abis;
-   for (auto& [path, contracts] : my->get_abi_files()) {
-      all_abis.insert(all_abis.end(), contracts.begin(), contracts.end());
-   }
-   return std::make_shared<outpost_ethereum_client>(entry,
-                                                    opp_addr,
-                                                    opp_inbound_addr,
-                                                    std::move(all_abis),
-                                                    outpost_id,
-                                                    chain_id);
 }
 
 } // namespace sysio
