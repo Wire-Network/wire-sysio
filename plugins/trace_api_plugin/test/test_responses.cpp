@@ -1,5 +1,6 @@
 #include <boost/test/unit_test.hpp>
 
+#include <fc/io/json.hpp>
 #include <fc/variant_object.hpp>
 
 #include <sysio/trace_api/request_handler.hpp>
@@ -62,6 +63,10 @@ struct response_test_fixture {
 
    fc::variant get_block_trace( uint32_t block_height ) {
       return response_impl.get_block_trace( block_height );
+   }
+
+   std::string get_block_trace_json( uint32_t block_height ) {
+      return response_impl.get_block_trace_json( block_height );
    }
 
    // fixture data and methods
@@ -489,6 +494,56 @@ BOOST_AUTO_TEST_SUITE(trace_responses)
       fc::variant null_response = get_block_trace( 1 );
 
       BOOST_TEST(null_response.is_null());
+   }
+
+   // The streaming JSON response (process_block_to_json) must produce the same
+   // observable shape as the variant response (process_block) for every field.
+   // Round-trip the streaming bytes through fc::json::from_string and compare
+   // key-by-key with the variant path.  Catches silent shape regressions like
+   // status: "executed" -> 0 or block_time: {"slot":N} -> N.
+   BOOST_FIXTURE_TEST_CASE(streaming_vs_variant_block_response_parity, response_test_fixture)
+   {
+      auto block_trace = block_trace_v0 {
+         "b000000000000000000000000000000000000000000000000000000000000001"_h,
+         1,
+         "0000000000000000000000000000000000000000000000000000000000000000"_h,
+         chain::block_timestamp_type(0),
+         "bp.one"_n,
+         "0000000000000000000000000000000000000000000000000000000000000000"_h,
+         "0000000000000000000000000000000000000000000000000000000000000000"_h,
+         std::vector<transaction_trace_v0> {
+            {
+               "0000000000000000000000000000000000000000000000000000000000000001"_h,
+               std::vector<action_trace_v0> {
+                  {
+                     0,
+                     "receiver"_n, "contract"_n, "action"_n,
+                     {{ "alice"_n, "active"_n }},
+                     { 0x00, 0x01, 0x02, 0x03 },
+                     { 0x04, 0x05, 0x06, 0x07 }
+                  }
+               },
+               fc::enum_type<uint8_t, chain::transaction_receipt_header::status_enum>{chain::transaction_receipt_header::status_enum::executed},
+               10,
+               5,
+               std::vector<chain::signature_type>{ chain::signature_type() },
+               { chain::time_point_sec(), 1, 0, 100, 50, 0 },
+               1,
+               chain::block_timestamp_type(0),
+               std::optional<chain::block_id_type>{}
+            }
+         }
+      };
+
+      mock_get_block = [&block_trace]( uint32_t height ) -> get_block_t {
+         return std::make_tuple(data_log_entry(block_trace), false);
+      };
+
+      fc::variant variant_response   = get_block_trace( 1 );
+      std::string streamed_response  = get_block_trace_json( 1 );
+      fc::variant streamed_as_variant = fc::json::from_string( streamed_response );
+
+      BOOST_TEST(to_kv(variant_response) == to_kv(streamed_as_variant), boost::test_tools::per_element());
    }
 
 BOOST_AUTO_TEST_SUITE_END()

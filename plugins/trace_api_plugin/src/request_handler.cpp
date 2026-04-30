@@ -149,9 +149,11 @@ namespace {
          w.key("authorization");   write_authorizations(w, a.authorization);
          w.key("data");            w.value_hex(a.data.data(), a.data.size());
          w.key("return_value");    w.value_hex(a.return_value.data(), a.return_value.size());
-         // The abi decode path still produces fc::variant (structure is ABI-dependent,
-         // no streaming equivalent here).  Splice its serialized form as raw JSON so
-         // the action body stays in the streaming pipeline.
+         // The abi decode path still produces fc::variant (structure is ABI-dependent).
+         // TODO: route through abi_serializer::binary_to_json_stream (already in use for
+         // table rows + streamed_processed_trace) so the action body stays allocation-free
+         // end-to-end; data_handler currently builds the variant tree and we re-emit it.
+         // For now, splice its serialized form as raw JSON.
          auto [params, return_data] = data_handler(a);
          if (!params.is_null()) {
             w.set_raw("params", fc::json::to_string(params, fc::json::yield_function_t()));
@@ -172,14 +174,12 @@ namespace {
          w.begin_object();
          w.set("id",                t.id)
           .set("block_num",         t.block_num)
-          // block_timestamp_type serializes as its slot (uint32) in to_variant; preserve
-          // that shape so clients see identical output.
-          .set("block_time",        t.block_time.slot)
+          // FC_SERIALIZE_AS_STRING-reflected; emits the ISO date string.
+          .set("block_time",        t.block_time)
           .set("producer_block_id", t.producer_block_id);
          w.key("actions");          write_actions(w, t.actions, data_handler);
-         // status is fc::enum_type<uint8_t, status_enum>; to_variant emits the numeric
-         // underlying value.  Match that.
-         w.set("status",          static_cast<uint64_t>(t.status))
+         // FC_REFLECT_ENUM-reflected; emits the member-name string via to_json_stream(enum_type).
+         w.set("status",          t.status)
           .set("cpu_usage_us",    t.cpu_usage_us)
           .set("net_usage_words", t.net_usage_words.value)
           .set("signatures",      t.signatures);
