@@ -3055,22 +3055,27 @@ void read_write::push_transaction(const read_write::push_transaction_params& par
 }
 
 static void push_recurse(read_write* rw, int index, const std::shared_ptr<read_write::push_transactions_params>& params, const std::shared_ptr<read_write::push_transactions_results>& results, const next_function<read_write::push_transactions_results>& next) {
-   auto wrapped_next = [=](const next_function_variant<read_write::push_transaction_results>& result) {
+   auto wrapped_next = [=](next_function_variant<read_write::push_transaction_results>&& result) {
       if (std::holds_alternative<fc::exception_ptr>(result)) {
          const auto& e = std::get<fc::exception_ptr>(result);
          results->emplace_back( read_write::push_transaction_results{ transaction_id_type(), fc::mutable_variant_object( "error", e->to_detail_string() ) } );
       } else if (std::holds_alternative<read_write::push_transaction_results>(result)) {
-         const auto& r = std::get<read_write::push_transaction_results>(result);
-         results->emplace_back( r );
+         results->emplace_back( std::get<read_write::push_transaction_results>(std::move(result)) );
       } else {
-         assert(0);
+         // push_transaction's next_function carries an http_fwd alternative for the streaming
+         // dispatch path; push_transaction itself has not been migrated to emit one, so reaching
+         // this branch indicates a future API change that broke this assumption.  Throw rather
+         // than assert so the failure is visible in NDEBUG builds.
+         SYS_THROW(plugin_exception,
+                   "push_recurse: unsupported next_function_variant alternative (http_fwd). "
+                   "push_transaction must emit either a fc::exception_ptr or push_transaction_results.");
       }
 
       size_t next_index = index + 1;
       if (next_index < params->size()) {
          push_recurse(rw, next_index, params, results, next );
       } else {
-         next(*results);
+         next(read_write::push_transactions_results{*results});
       }
    };
 
@@ -3433,17 +3438,23 @@ read_only::get_account_return_t read_only::get_account( const get_account_params
               abi_serializer_max_time = abi_serializer_max_time]() mutable
                  -> chain::t_or_exception<read_only::get_account_results> {
          try {
-            abi_def abi;
-            if (abi_serializer::to_abi(abi_bytes, abi)) {
-               auto yield = [&]() { return abi_serializer::create_yield_function(abi_serializer_max_time); };
-               abi_serializer abis(std::move(abi), yield());
-               if (http_params.total_resources) {
-                  result.total_resources = abis.binary_to_variant("reslimit",
-                                                                  *http_params.total_resources,
-                                                                  yield(), shorten_abi_errors);
+            // Mirror the outer SYS_RETHROW_EXCEPTIONS(account_query_exception, ...) so that a throw
+            // on the http thread is reported to the client with the same exception class clients
+            // were seeing pre-refactor.  Without the inner wrap, CATCH_AND_RETURN would surface
+            // raw abi_exception / abi_serialization_deadline_exception instead.
+            try {
+               abi_def abi;
+               if (abi_serializer::to_abi(abi_bytes, abi)) {
+                  auto yield = [&]() { return abi_serializer::create_yield_function(abi_serializer_max_time); };
+                  abi_serializer abis(std::move(abi), yield());
+                  if (http_params.total_resources) {
+                     result.total_resources = abis.binary_to_variant("reslimit",
+                                                                     *http_params.total_resources,
+                                                                     yield(), shorten_abi_errors);
+                  }
                }
-            }
-            return std::move(result);
+               return std::move(result);
+            } SYS_RETHROW_EXCEPTIONS(chain::account_query_exception, "unable to retrieve account info")
          } CATCH_AND_RETURN(chain::t_or_exception<read_only::get_account_results>);
       };
    }
@@ -3594,10 +3605,16 @@ void to_json_stream(const sysio::chain_apis::streamed_processed_trace& t, fc::js
       w.value_null();
       return;
    }
+   // Checkpoint before the streaming attempt so a mid-emit throw can rewind the writer
+   // (truncate buffer + restore frame state) before the reflector-only fallback runs.
+   // Without this, the fallback would continue writing into a partially-emitted object,
+   // producing malformed JSON.
+   const auto cp = w.checkpoint();
    try {
       auto resolver = sysio::build_resolver_from_captured_abis(t.raw_abis, t.max_serialization_time);
       sysio::chain::abi_serializer::to_json_stream(*t.trace, w, resolver, t.max_serialization_time);
    } catch (sysio::chain::abi_exception&) {
+      w.rewind(cp);
       // Fall back: emit via reflector with no ABI-aware action data decode.  Matches the prior variant path's
       // `output = *trx_trace_ptr;` fallback.
       to_json_stream(*t.trace, w);

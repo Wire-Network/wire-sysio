@@ -53,14 +53,27 @@ struct tracked_transaction {
       return block_num != 0;
    }
 
-   /// Heuristic for the memory budget: 2x the packed-trx size accounts for the action trace bulk (each action trace
-   /// mirrors the packed action plus per-action receipt/console/etc), plus the captured raw-ABI bytes, plus the trace
-   /// struct overhead.
+   /// Heuristic for the memory budget.  Sums the dominant heap contributors so the
+   /// retry container's eviction loop fires when the real footprint -- not just the
+   /// packed-trx size -- exceeds the cap.  Per-action heap (console / data / return_value)
+   /// dwarfs the packed bytes for chatty contracts, so we walk the action_traces.
    size_t memory_size()const {
       const size_t ptrx_sz = ptrx->get_estimated_size();
-      return ptrx_sz * 2
+      size_t trace_sz = 0;
+      if (trace_ptr) {
+         trace_sz = sizeof(*trace_ptr);
+         for (const auto& at : trace_ptr->action_traces) {
+            trace_sz += sizeof(at)
+                      + at.console.size()
+                      + at.act.data.size()
+                      + at.return_value.size()
+                      + at.act.authorization.size() * sizeof(chain::permission_level)
+                      + at.account_ram_deltas.size() * sizeof(chain::account_delta);
+         }
+      }
+      return ptrx_sz
              + sysio::estimated_size(raw_abis)
-             + (trace_ptr ? sizeof(*trace_ptr) : 0)
+             + trace_sz
              + sizeof(*this);
    }
 };
@@ -118,7 +131,7 @@ struct trx_retry_db_impl {
    void track_transaction( packed_transaction_ptr ptrx, std::optional<uint16_t> num_blocks,
                            next_function<std::unique_ptr<sysio::chain_apis::streamed_processed_trace>> next ) {
       SYS_ASSERT( _tracked_trxs.memory_size() < _max_mem_usage_size, tx_resource_exhaustion,
-                  "Transaction exceeded  transaction-retry-max-storage-size-gb limit: {} bytes", _tracked_trxs.memory_size() );
+                  "Transaction exceeded transaction-retry-max-storage-size-gb limit: {} bytes", _tracked_trxs.memory_size() );
       auto i = _tracked_trxs.index().get<by_trx_id>().find( ptrx->id() );
       if( i == _tracked_trxs.index().end() ) {
          _tracked_trxs.insert( {std::move(ptrx),

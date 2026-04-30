@@ -8,6 +8,7 @@
 #include <fc/reflect/json_stream.hpp>
 #include <fc/time.hpp>
 
+#include <cassert>
 #include <functional>
 #include <string>
 #include <tuple>
@@ -101,12 +102,13 @@ namespace http_detail {
 
    /// Compute the per-request deadline.  Chain api handles expose `start()` which both
    /// returns the deadline and registers the in-flight call; other handles fall back to
-   /// `http_plugin::get_max_response_time()`.
+   /// `http_plugin::get_max_response_time()`.  Constraint requires `start()` return to
+   /// be convertible to fc::time_point so an unrelated `start()` does not match.
    template<typename Handle>
    inline fc::time_point compute_deadline(Handle& handle, http_plugin& http) {
-      if constexpr (requires { handle.start(); }) {
+      if constexpr (requires { { handle.start() } -> std::convertible_to<fc::time_point>; }) {
          return handle.start();
-      } else if constexpr (requires { handle->start(); }) {
+      } else if constexpr (requires { { handle->start() } -> std::convertible_to<fc::time_point>; }) {
          return handle->start();
       } else {
          const fc::microseconds m = http.get_max_response_time();
@@ -127,17 +129,20 @@ namespace http_detail {
          case http_params_types::possible_no_params:
             return parse_params<T, http_params_types::possible_no_params>(body);
       }
-      __builtin_unreachable();
+      std::unreachable();
    }
 
    /// Parse a registration path of the form "/v1/<api>/<call>" into the
-   /// (api_name, call_name) labels used by `handle_exception_stream`.
-   inline std::pair<std::string, std::string> split_path(const std::string& path) {
+   /// (api_name, call_name) labels used by `handle_exception_stream`.  Returns
+   /// owning std::string because the caller captures the labels into a long-lived
+   /// registration lambda.
+   inline std::pair<std::string, std::string> split_path(std::string_view path) {
       auto last_slash = path.find_last_of('/');
-      auto prev_slash = path.find_last_of('/', last_slash > 0 ? last_slash - 1 : 0);
-      std::string api_name  = path.substr(prev_slash + 1, last_slash - prev_slash - 1);
-      std::string call_name = path.substr(last_slash + 1);
-      return { std::move(api_name), std::move(call_name) };
+      assert(last_slash != std::string_view::npos && last_slash > 0); // expects "/api/call" shape
+      auto prev_slash = path.find_last_of('/', last_slash - 1);
+      assert(prev_slash != std::string_view::npos);
+      return { std::string(path.substr(prev_slash + 1, last_slash - prev_slash - 1)),
+               std::string(path.substr(last_slash + 1)) };
    }
 
    /// Invoke `MethodPtr` against `handle` with the right argument shape:
@@ -357,10 +362,15 @@ api_entry_stream bind_stream(http_plugin& http, Handle handle,
                using payload_t = typename is_next_fn<
                   std::remove_cvref_t<typename mf::template arg_t<mf::arity - 1>>>::payload;
                using http_fwd_t = std::function<chain::t_or_exception<payload_t>()>;
+               // The next_function operator() is rvalue-only; move out of the variant into
+               // the response closure so the heavy payload (raw ABIs, traces) is moved, not
+               // copied, before the closure runs on the http pool.
+               static_assert(std::is_move_constructible_v<payload_t>,
+                             "bind_stream::async requires the next_function payload to be move-constructible.");
 
                auto next = [&http, cb = std::move(cb), body = std::move(body),
                             api_name, call_name, resp_code]
-                  (const chain::plugin_interface::next_function_variant<payload_t>& result) mutable {
+                  (chain::plugin_interface::next_function_variant<payload_t>&& result) mutable {
                      if (std::holds_alternative<fc::exception_ptr>(result)) {
                         try { throw *std::get<fc::exception_ptr>(result); }
                         catch (...) {
@@ -369,7 +379,7 @@ api_entry_stream bind_stream(http_plugin& http, Handle handle,
                         }
                      } else if (std::holds_alternative<payload_t>(result)) {
                         cb(resp_code,
-                           [r = std::get<payload_t>(result)]
+                           [r = std::get<payload_t>(std::move(result))]
                            (fc::json_writer& w) mutable { fc::to_json_stream(r, w); });
                      } else {
                         http.post_http_thread_pool(
@@ -404,7 +414,8 @@ api_entry_stream bind_stream(http_plugin& http, Handle handle,
                if constexpr (has_params) {
                   invoke_async<MethodPtr>(handle, std::move(params), std::move(next));
                } else {
-                  invoke_async<MethodPtr>(handle, std::monostate{}, std::move(next));
+                  // Arity-1 async: no params slot, invoke the method directly.
+                  std::invoke(MethodPtr, handle, std::move(next));
                }
             }
          } catch (...) {

@@ -575,6 +575,11 @@ namespace sysio {
    void http_plugin::add_handler(api_entry&& entry, appbase::exec_queue q, int priority, http_content_type content_type) {
       log_add_handler(my.get(), entry);
       std::string path  = entry.path;
+      // Symmetric with add_handler_stream: a path registered on the streaming map
+      // would silently shadow this variant registration since lookup checks the
+      // streaming map first.
+      SYS_ASSERT( !my->plugin_state->url_handlers_stream.contains(path), chain::plugin_config_exception,
+                  "http url {} is not unique - already registered on the streaming cb path", path );
       auto p = my->plugin_state->url_handlers.emplace(path, my->make_app_thread_url_handler(std::move(entry), q, priority, content_type));
       SYS_ASSERT( p.second, chain::plugin_config_exception, "http url {} is not unique", path );
    }
@@ -582,6 +587,8 @@ namespace sysio {
    void http_plugin::add_async_handler(api_entry&& entry, http_content_type content_type) {
       log_add_handler(my.get(), entry);
       std::string path  = entry.path;
+      SYS_ASSERT( !my->plugin_state->url_handlers_stream.contains(path), chain::plugin_config_exception,
+                  "http url {} is not unique - already registered on the streaming cb path", path );
       auto p = my->plugin_state->url_handlers.emplace(path, my->make_http_thread_url_handler(std::move(entry), content_type));
       SYS_ASSERT( p.second, chain::plugin_config_exception, "http url {} is not unique", path );
    }
@@ -593,7 +600,7 @@ namespace sysio {
             addrs = "on " + addrs;
          else
             addrs = "disabled for category address not configured";
-         fc_ilog(logger(), "add {} api url (stream): {} {}",
+         fc_ilog(logger(), "add {} api url: {} {}",
                  from_category(entry.category), entry.path, addrs);
       }
    }
@@ -693,6 +700,16 @@ namespace sysio {
    }
 
    void http_plugin::handle_exception_stream( const char* api_name, const char* call_name, const string& body, url_response_stream_callback& cb) {
+      // bind_stream's outer catch can land here AFTER cb has been moved into a
+      // downstream lambda (eg if post_http_thread_pool throws after the move).
+      // Calling an empty move_only_function would throw bad_function_call on top
+      // of the original exception; classify_current_exception would log THAT one,
+      // and the client would never get a response.  Log the original exception
+      // and return so the original failure is at least visible.
+      if (!cb) {
+         classify_current_exception(api_name, call_name, body, [](int, error_results){});
+         return;
+      }
       classify_current_exception(api_name, call_name, body, [&cb](int code, error_results r) {
          cb(code, [r = std::move(r)](fc::json_writer& w) mutable {
             fc::to_json_stream(r, w);

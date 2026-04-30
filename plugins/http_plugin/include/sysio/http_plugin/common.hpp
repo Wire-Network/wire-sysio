@@ -256,7 +256,6 @@ inline auto make_http_stream_response_handler(http_plugin_state& plugin_state, d
             [&plugin_state, session_ptr{std::move(session_ptr)}, code, emitter{std::move(emitter)}]() mutable {
                try {
                   std::string body;
-                  body.reserve(4096);
                   {
                      fc::json_writer w(body);
                      emitter(w);

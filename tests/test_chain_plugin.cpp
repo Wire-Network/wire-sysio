@@ -19,7 +19,6 @@ using namespace sysio;
 using namespace sysio::chain;
 using namespace sysio::chain_apis;
 using namespace sysio::testing;
-using namespace sysio::chain_apis;
 using namespace fc;
 
 using mvo = fc::mutable_variant_object;

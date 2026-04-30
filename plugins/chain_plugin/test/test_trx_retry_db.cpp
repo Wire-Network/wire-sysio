@@ -229,14 +229,14 @@ BOOST_AUTO_TEST_CASE(trx_retry_logic) {
       auto lib = std::optional<uint16_t>{};
       auto trx_1 = make_unique_trx(chain->get_chain_id(), fc::seconds(2), 1);
       bool trx_1_expired = false;
-      trx_retry.track_transaction( trx_1, lib, [&trx_1_expired](const next_function_variant<std::unique_ptr<fc::variant>>& result){
+      trx_retry.track_transaction( trx_1, lib, [&trx_1_expired](next_function_variant<std::unique_ptr<sysio::chain_apis::streamed_processed_trace>>&& result){
          BOOST_REQUIRE( std::holds_alternative<fc::exception_ptr>(result) );
          BOOST_CHECK_EQUAL( std::get<fc::exception_ptr>(result)->code(), expired_tx_exception::code_value );
          trx_1_expired = true;
       } );
       auto trx_2 = make_unique_trx(chain->get_chain_id(), fc::seconds(4), 2);
       bool trx_2_expired = false;
-      trx_retry.track_transaction( trx_2, lib, [&trx_2_expired](const next_function_variant<std::unique_ptr<fc::variant>>& result){
+      trx_retry.track_transaction( trx_2, lib, [&trx_2_expired](next_function_variant<std::unique_ptr<sysio::chain_apis::streamed_processed_trace>>&& result){
          BOOST_REQUIRE( std::holds_alternative<fc::exception_ptr>(result) );
          BOOST_CHECK_EQUAL( std::get<fc::exception_ptr>(result)->code(), expired_tx_exception::code_value );
          trx_2_expired = true;
@@ -275,7 +275,7 @@ BOOST_AUTO_TEST_CASE(trx_retry_logic) {
       //
       auto trx_3 = make_unique_trx(chain->get_chain_id(), fc::seconds(30), 3);
       bool trx_3_expired = false;
-      trx_retry.track_transaction( trx_3, lib, [&trx_3_expired](const next_function_variant<std::unique_ptr<fc::variant>>& result){
+      trx_retry.track_transaction( trx_3, lib, [&trx_3_expired](next_function_variant<std::unique_ptr<sysio::chain_apis::streamed_processed_trace>>&& result){
          BOOST_REQUIRE( std::holds_alternative<fc::exception_ptr>(result) );
          BOOST_CHECK_EQUAL( std::get<fc::exception_ptr>(result)->code(), expired_tx_exception::code_value );
          trx_3_expired = true;
@@ -285,7 +285,7 @@ BOOST_AUTO_TEST_CASE(trx_retry_logic) {
       fc::mock_time_traits::set_now(pnow);
       auto trx_4 = make_unique_trx(chain->get_chain_id(), fc::seconds(30), 4);
       bool trx_4_expired = false;
-      trx_retry.track_transaction( trx_4, lib, [&trx_4_expired](const next_function_variant<std::unique_ptr<fc::variant>>& result){
+      trx_retry.track_transaction( trx_4, lib, [&trx_4_expired](next_function_variant<std::unique_ptr<sysio::chain_apis::streamed_processed_trace>>&& result){
          BOOST_REQUIRE( std::holds_alternative<fc::exception_ptr>(result) );
          BOOST_CHECK_EQUAL( std::get<fc::exception_ptr>(result)->code(), expired_tx_exception::code_value );
          trx_4_expired = true;
@@ -328,9 +328,9 @@ BOOST_AUTO_TEST_CASE(trx_retry_logic) {
       //
       auto trx_5 = make_unique_trx(chain->get_chain_id(), fc::seconds(30), 5);
       bool trx_5_variant = false;
-      trx_retry.track_transaction( trx_5, lib, [&trx_5_variant](const next_function_variant<std::unique_ptr<fc::variant>>& result){
-         BOOST_REQUIRE( std::holds_alternative<std::unique_ptr<fc::variant>>(result) );
-         BOOST_CHECK( !!std::get<std::unique_ptr<fc::variant>>(result) );
+      trx_retry.track_transaction( trx_5, lib, [&trx_5_variant](next_function_variant<std::unique_ptr<sysio::chain_apis::streamed_processed_trace>>&& result){
+         BOOST_REQUIRE( std::holds_alternative<std::unique_ptr<sysio::chain_apis::streamed_processed_trace>>(result) );
+         BOOST_CHECK( !!std::get<std::unique_ptr<sysio::chain_apis::streamed_processed_trace>>(result) );
          trx_5_variant = true;
       } );
       // increase time by 1 seconds, so trx_6 retry interval diff than 5
@@ -338,9 +338,9 @@ BOOST_AUTO_TEST_CASE(trx_retry_logic) {
       fc::mock_time_traits::set_now(pnow);
       auto trx_6 = make_unique_trx(chain->get_chain_id(), fc::seconds(30), 6);
       bool trx_6_variant = false;
-      trx_retry.track_transaction( trx_6, std::optional<uint32_t>(2), [&trx_6_variant](const next_function_variant<std::unique_ptr<fc::variant>>& result){
-         BOOST_REQUIRE( std::holds_alternative<std::unique_ptr<fc::variant>>(result) );
-         BOOST_CHECK( !!std::get<std::unique_ptr<fc::variant>>(result) );
+      trx_retry.track_transaction( trx_6, std::optional<uint32_t>(2), [&trx_6_variant](next_function_variant<std::unique_ptr<sysio::chain_apis::streamed_processed_trace>>&& result){
+         BOOST_REQUIRE( std::holds_alternative<std::unique_ptr<sysio::chain_apis::streamed_processed_trace>>(result) );
+         BOOST_CHECK( !!std::get<std::unique_ptr<sysio::chain_apis::streamed_processed_trace>>(result) );
          trx_6_variant = true;
       } );
       // not in block 7, so not returned to user
@@ -397,9 +397,9 @@ BOOST_AUTO_TEST_CASE(trx_retry_logic) {
       //
       auto trx_7 = make_unique_trx(chain->get_chain_id(), fc::seconds(30), 7);
       bool trx_7_variant = false;
-      trx_retry.track_transaction( trx_7, lib, [&trx_7_variant](const next_function_variant<std::unique_ptr<fc::variant>>& result){
-         BOOST_REQUIRE( std::holds_alternative<std::unique_ptr<fc::variant>>(result) );
-         BOOST_CHECK( !!std::get<std::unique_ptr<fc::variant>>(result) );
+      trx_retry.track_transaction( trx_7, lib, [&trx_7_variant](next_function_variant<std::unique_ptr<sysio::chain_apis::streamed_processed_trace>>&& result){
+         BOOST_REQUIRE( std::holds_alternative<std::unique_ptr<sysio::chain_apis::streamed_processed_trace>>(result) );
+         BOOST_CHECK( !!std::get<std::unique_ptr<sysio::chain_apis::streamed_processed_trace>>(result) );
          trx_7_variant = true;
       } );
       // increase time by 1 seconds, so trx_8 retry interval diff than 7
@@ -407,15 +407,15 @@ BOOST_AUTO_TEST_CASE(trx_retry_logic) {
       fc::mock_time_traits::set_now(pnow);
       auto trx_8 = make_unique_trx(chain->get_chain_id(), fc::seconds(30), 8);
       bool trx_8_variant = false;
-      trx_retry.track_transaction( trx_8, std::optional<uint32_t>(3), [&trx_8_variant](const next_function_variant<std::unique_ptr<fc::variant>>& result){
-         BOOST_REQUIRE( std::holds_alternative<std::unique_ptr<fc::variant>>(result) );
-         BOOST_CHECK( !!std::get<std::unique_ptr<fc::variant>>(result) );
+      trx_retry.track_transaction( trx_8, std::optional<uint32_t>(3), [&trx_8_variant](next_function_variant<std::unique_ptr<sysio::chain_apis::streamed_processed_trace>>&& result){
+         BOOST_REQUIRE( std::holds_alternative<std::unique_ptr<sysio::chain_apis::streamed_processed_trace>>(result) );
+         BOOST_CHECK( !!std::get<std::unique_ptr<sysio::chain_apis::streamed_processed_trace>>(result) );
          trx_8_variant = true;
       } );
       // one to expire, will be forked out never to return
       auto trx_9 = make_unique_trx(chain->get_chain_id(), fc::seconds(30), 9);
       bool trx_9_expired = false;
-      trx_retry.track_transaction( trx_9, lib, [&trx_9_expired](const next_function_variant<std::unique_ptr<fc::variant>>& result){
+      trx_retry.track_transaction( trx_9, lib, [&trx_9_expired](next_function_variant<std::unique_ptr<sysio::chain_apis::streamed_processed_trace>>&& result){
          BOOST_REQUIRE( std::holds_alternative<fc::exception_ptr>(result) );
          BOOST_CHECK_EQUAL( std::get<fc::exception_ptr>(result)->code(), expired_tx_exception::code_value );
          trx_9_expired = true;
@@ -556,16 +556,16 @@ BOOST_AUTO_TEST_CASE(trx_retry_logic) {
       //
       auto trx_10 = make_unique_trx(chain->get_chain_id(), fc::seconds(30), 10);
       bool trx_10_variant = false;
-      trx_retry.track_transaction( trx_10, std::optional<uint32_t>(0), [&trx_10_variant](const next_function_variant<std::unique_ptr<fc::variant>>& result){
-         BOOST_REQUIRE( std::holds_alternative<std::unique_ptr<fc::variant>>(result) );
-         BOOST_CHECK( !!std::get<std::unique_ptr<fc::variant>>(result) );
+      trx_retry.track_transaction( trx_10, std::optional<uint32_t>(0), [&trx_10_variant](next_function_variant<std::unique_ptr<sysio::chain_apis::streamed_processed_trace>>&& result){
+         BOOST_REQUIRE( std::holds_alternative<std::unique_ptr<sysio::chain_apis::streamed_processed_trace>>(result) );
+         BOOST_CHECK( !!std::get<std::unique_ptr<sysio::chain_apis::streamed_processed_trace>>(result) );
          trx_10_variant = true;
       } );
       auto trx_11 = make_unique_trx(chain->get_chain_id(), fc::seconds(30), 11);
       bool trx_11_variant = false;
-      trx_retry.track_transaction( trx_11, std::optional<uint32_t>(1), [&trx_11_variant](const next_function_variant<std::unique_ptr<fc::variant>>& result){
-         BOOST_REQUIRE( std::holds_alternative<std::unique_ptr<fc::variant>>(result) );
-         BOOST_CHECK( !!std::get<std::unique_ptr<fc::variant>>(result) );
+      trx_retry.track_transaction( trx_11, std::optional<uint32_t>(1), [&trx_11_variant](next_function_variant<std::unique_ptr<sysio::chain_apis::streamed_processed_trace>>&& result){
+         BOOST_REQUIRE( std::holds_alternative<std::unique_ptr<sysio::chain_apis::streamed_processed_trace>>(result) );
+         BOOST_CHECK( !!std::get<std::unique_ptr<sysio::chain_apis::streamed_processed_trace>>(result) );
          trx_11_variant = true;
       } );
       // seen in block immediately
