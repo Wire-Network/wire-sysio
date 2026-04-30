@@ -1,7 +1,10 @@
 #include <fc/exception/exception.hpp>
 #include <fc/bitset.hpp>
+#include <fc/utility.hpp>
 
 #include <boost/test/unit_test.hpp>
+
+#include <stdexcept>
 
 using namespace fc;
 
@@ -165,6 +168,21 @@ BOOST_AUTO_TEST_CASE(bitset_test)
    test_bitset("01110011010100101001001001100000010000110");
    test_bitset("0111001101010010111011001001001100000000000000110");
    test_bitset("01110011010100101111001101100100100111111111111111111001");
+}
+
+// to_string() drives every JSON path (FC_SERIALIZE_AS_STRING).  Cap on the
+// number of blocks must be enforced here so an oversize bitset can't allocate
+// an unbounded result string.  Threshold matches the pre-FC_SERIALIZE_AS_STRING
+// to_variant guard (num_blocks > MAX_NUM_ARRAY_ELEMENTS).
+BOOST_AUTO_TEST_CASE(bitset_to_string_caps_oversize)
+{
+   const size_t over_bits = (MAX_NUM_ARRAY_ELEMENTS + 1) * fc::bitset::bits_per_block;
+   fc::bitset bs(over_bits);
+   BOOST_CHECK_THROW(bs.to_string(), std::range_error);
+
+   // Boundary: exactly MAX_NUM_ARRAY_ELEMENTS blocks must still succeed.
+   fc::bitset bs_at_cap(MAX_NUM_ARRAY_ELEMENTS * fc::bitset::bits_per_block);
+   BOOST_CHECK_NO_THROW(bs_at_cap.to_string());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

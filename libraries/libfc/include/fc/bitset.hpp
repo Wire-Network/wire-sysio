@@ -7,6 +7,7 @@
 #include <string_view>
 #include <stdexcept>
 #include <fc/serialize_as_string.hpp>
+#include <fc/utility.hpp>
 
 namespace fc {
 
@@ -153,6 +154,11 @@ struct bitset {
    }
 
    std::string to_string() const {
+      // Guard against allocating an unbounded result string for an oversize bitset.
+      // Mirrors the pre-FC_SERIALIZE_AS_STRING to_variant cap; enforced here so it
+      // applies to every JSON path (variant, streaming, datastream).
+      if (num_blocks() > MAX_NUM_ARRAY_ELEMENTS)
+         throw std::range_error("number of blocks of bitset cannot be greater than MAX_NUM_ARRAY_ELEMENTS");
       std::string res;
       res.resize(size());
       size_t idx = 0;
