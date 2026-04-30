@@ -29,8 +29,8 @@ end
 # --- Setup & build tools ---
 pushd $tools_root
 pnpm install; or exit 1
-pnpm --filter "packages/*" dist; or exit 1
-pnpm --filter "packages/*" pnpm link --global; or exit 1
+pnpm --filter "proto*" dist; or exit 1
+cd protobuf-bundler && pnpm link --global && cd ..; or exit 1
 popd
 
 if not which wire-protobuf-bundler &> /dev/null
