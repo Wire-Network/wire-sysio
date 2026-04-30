@@ -43,6 +43,13 @@ namespace {
 
 constexpr std::size_t sso_length_byte_index = 14;
 
+// Length is stored in a single signed-char byte; round-trip through write_sso /
+// read_sso uses static_cast<char> on write and static_cast<unsigned char> on read.
+// Bumping sso_max_length above 127 would make the on-write cast set the sign bit
+// and silently corrupt the read length.
+static_assert(variant::sso_max_length < 128,
+              "SSO length byte is signed; sso_max_length must stay below 128");
+
 inline void write_sso( variant* v, const char* src, std::size_t len ) {
    char* data = reinterpret_cast<char*>(v);
    if (len) std::memcpy(data, src, len);

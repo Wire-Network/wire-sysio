@@ -198,7 +198,7 @@ namespace fc
       auto kv_size = size();
       size_t sum = sizeof(*this) + sizeof(std::vector<entry>);
       for (size_t iter = 0; iter < kv_size; ++iter) {
-         const auto& kv = _key_value->at(iter);
+         const auto& kv = (*_key_value)[iter];
          sum += kv.key().length() + sizeof(std::string);
          sum += kv.value().estimated_size();
       }
@@ -282,6 +282,14 @@ namespace fc
    bool mutable_variant_object::contains(const std::string& key) {
       return contains(key.c_str());
    };
+   bool mutable_variant_object::contains(const char* key) const {
+      // Reuse the const find() (empty-singleton path) so a missing-key probe on a
+      // default-constructed mvo doesn't allocate the entry vector.
+      return std::as_const(*this).find(key) != std::as_const(*this).end();
+   }
+   bool mutable_variant_object::contains(const std::string& key) const {
+      return contains(key.c_str());
+   }
 
    const variant& mutable_variant_object::operator[]( const std::string& key )const
    {

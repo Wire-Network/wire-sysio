@@ -90,6 +90,17 @@ BOOST_AUTO_TEST_CASE(cross_type_assign_string_to_null) {
    BOOST_CHECK(v.is_null());
 }
 
+BOOST_AUTO_TEST_CASE(self_assign_aliased_subvariant_same_type) {
+   // Self-assignment via aliased same-type sub-variant: the rhs is a reference
+   // into the lhs's heap object.  The same-type op= fast path reuses lhs's
+   // existing heap object, which means the assignment writes through the rhs's
+   // backing storage simultaneously.  Verify the content survives intact.
+   variant v{variant_object{mutable_variant_object("k", std::string{"hello"})}};
+   v = v.get_object()["k"];
+   BOOST_CHECK(v.is_string());
+   BOOST_CHECK_EQUAL(v.get_string(), "hello");
+}
+
 BOOST_AUTO_TEST_CASE(same_type_string_reassign) {
    // Documents current behaviour: same-type reassignment goes through
    // clear() (delete) + new (allocate).  Phase B item 5 may change this
