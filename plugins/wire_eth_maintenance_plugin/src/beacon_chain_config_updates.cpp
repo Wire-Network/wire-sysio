@@ -69,10 +69,18 @@ beacon_chain_config_updates::beacon_chain_config_updates(beacon_chain_config_upd
                                                          uint64_t exit_queue_buffer_days)
    : deps_(std::move(deps)), exit_queue_buffer_days_(exit_queue_buffer_days) {}
 
+void beacon_chain_config_updates::safely_confirm(std::string_view method,
+                                                 const std::string& tx_hash) const {
+   if (!deps_.confirm_tx) return;
+   try {
+      deps_.confirm_tx(method, tx_hash);
+   } catch (const std::exception& e) {
+      elog("confirm_tx for {} ({}) threw: {}", method, tx_hash, e.what());
+   }
+}
+
 void beacon_chain_config_updates::operator()() const {
    try {
-      std::vector<pending_tx> pending;
-
       ilog("beacon_chain_config_updates: fetching queue data");
       auto queues = deps_.fetch_queues();
       ilog("queues: {}", fc::json::to_string(queues, fc::time_point::maximum()));
@@ -84,7 +92,7 @@ void beacon_chain_config_updates::operator()() const {
          auto hash = deps_.send_set_withdraw_delay(*q.withdraw_delay_sec);
          if (!hash.empty()) {
             ilog("setWithdrawDelay tx sent, hash: {}", hash);
-            pending.push_back({"setWithdrawDelay", std::move(hash)});
+            safely_confirm("setWithdrawDelay", hash);
          }
       }
 
@@ -93,7 +101,7 @@ void beacon_chain_config_updates::operator()() const {
          auto hash = deps_.send_set_entry_queue(*q.entry_queue_days);
          if (!hash.empty()) {
             ilog("setEntryQueue tx sent, hash: {}", hash);
-            pending.push_back({"setEntryQueue", std::move(hash)});
+            safely_confirm("setEntryQueue", hash);
          }
       }
 
@@ -109,13 +117,10 @@ void beacon_chain_config_updates::operator()() const {
             auto hash = deps_.send_update_apy_bps(*a.apy_bps);
             if (!hash.empty()) {
                ilog("updateApyBPS tx sent, hash: {}", hash);
-               pending.push_back({"updateApyBPS", std::move(hash)});
+               safely_confirm("updateApyBPS", hash);
             }
          }
       }
-
-      if (!pending.empty() && deps_.confirm_txs)
-         deps_.confirm_txs(pending);
 
    } catch (const std::exception& e) {
       elog("beacon_chain_config_updates failed: {}", e.what());

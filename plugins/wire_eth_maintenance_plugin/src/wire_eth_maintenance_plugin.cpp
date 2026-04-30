@@ -87,6 +87,31 @@ namespace {
    constexpr auto default_interval_name                 = "default";
    constexpr auto just_once_interval_name               = "once";
 
+   // Tx-confirmation retry knobs. With a 5s schedule and 600 retries the worst-case
+   // wait per pending tx is ~50 minutes - matches the libcurl-era behavior.
+   constexpr int  tx_confirm_retry_ms          = 5000;
+   constexpr int  tx_confirm_max_retries       = 600;
+   constexpr auto tx_confirm_label             = "wire_eth_maintenance";
+   constexpr auto tx_confirm_exhaustion_msg    = "transaction not mined within retry timeout";
+
+   sysio::cron_service::retry_options make_tx_confirm_retry_opts() {
+      using job_schedule = sysio::services::cron_service::job_schedule;
+      return sysio::cron_service::retry_options{
+         .retry_schedule = job_schedule{.milliseconds = {job_schedule::step_value{tx_confirm_retry_ms}}},
+         .metadata = { .one_at_a_time = true,
+                       .tags = { "ethereum", "gas" },
+                       .label = tx_confirm_label },
+         .max_retries = tx_confirm_max_retries,
+         .on_exhaustion = []() -> fc::exception {
+            return sysio::chain::plugin_config_exception(
+               FC_LOG_MESSAGE(error, "{}", tx_confirm_exhaustion_msg),
+               sysio::chain::plugin_config_exception::code_value,
+               "plugin_config_exception",
+               tx_confirm_exhaustion_msg);
+         }
+      };
+   }
+
    fc::variant https_request(const std::string& url_str,
                              boost::beast::http::verb method,
                              const std::string& request_body,
@@ -422,35 +447,20 @@ void wire_eth_maintenance_plugin::plugin_initialize(const variables_map& options
                  return ret;
               })
             : std::function<std::string(uint64_t)>{},
-         .confirm_txs = [eth_client, &app_ref = app()](const std::vector<pending_tx>& txs) {
+         .confirm_tx = [eth_client, &app_ref = app()](std::string_view method,
+                                                      const std::string& tx_hash) {
             auto& cron_svc = app_ref.get_plugin<sysio::cron_plugin>().cron_service();
-            auto make_retry_opts = []() -> cron_service::retry_options {
-               return cron_service::retry_options{
-                  .retry_schedule = job_schedule{.milliseconds = {job_schedule::step_value{5000}}},
-                  .metadata = { .one_at_a_time = true, .tags = { "ethereum", "gas" }, .label = "wire_eth_maintenance" },
-                  .max_retries = 600,
-                  .on_exhaustion = []() -> fc::exception {
-                     return sysio::chain::plugin_config_exception(
-                        FC_LOG_MESSAGE(error, "transaction not mined within retry timeout"),
-                        sysio::chain::plugin_config_exception::code_value,
-                        "plugin_config_exception",
-                        "transaction not mined within retry timeout");
-                  }
-               };
-            };
-            for (const auto& tx : txs) {
-               auto bn = eth_client->get_block_for_transaction(tx.tx_hash);
-               if (bn) {
-                  ilog("tx for {} ({}) in block number {}", tx.method, tx.tx_hash, *bn);
-                  continue;
-               }
-               auto bn_retry = cron_svc.blocking_retry(make_retry_opts(),
-                  [&]() { return eth_client->get_block_for_transaction(tx.tx_hash); });
-               if (bn_retry.has_value())
-                  ilog("tx for {} ({}) in block number {}", tx.method, tx.tx_hash, *bn_retry);
-               else
-                  elog("failed to identify block for tx {}: {}", tx.tx_hash, bn_retry.error().what());
+            auto bn = eth_client->get_block_for_transaction(tx_hash);
+            if (bn) {
+               ilog("tx for {} ({}) in block number {}", method, tx_hash, *bn);
+               return;
             }
+            auto bn_retry = cron_svc.blocking_retry(make_tx_confirm_retry_opts(),
+               [&]() { return eth_client->get_block_for_transaction(tx_hash); });
+            if (bn_retry.has_value())
+               ilog("tx for {} ({}) in block number {}", method, tx_hash, *bn_retry);
+            else
+               elog("failed to identify block for tx {}: {}", tx_hash, bn_retry.error().what());
          }
       }, exit_buffer_days));
       ilog("There are {} actions currently registered.", actions.size());

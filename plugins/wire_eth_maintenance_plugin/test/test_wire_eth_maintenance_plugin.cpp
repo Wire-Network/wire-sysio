@@ -208,6 +208,13 @@ namespace {
    beacon_chain_config_updates make_crank(uint64_t exit_buffer_days = 9) {
       return beacon_chain_config_updates({}, exit_buffer_days);
    }
+
+   // Capture shape used by the orchestration tests to record per-tx confirm_tx invocations.
+   // Replaces the production `pending_tx` struct that was removed when batching went away.
+   struct seen_tx {
+      std::string method;
+      std::string tx_hash;
+   };
 }
 
 BOOST_AUTO_TEST_SUITE(compute_queue_updates_tests)
@@ -336,7 +343,7 @@ BOOST_AUTO_TEST_SUITE(beacon_chain_config_updates_tests)
 
 BOOST_AUTO_TEST_CASE(happy_path_all_txs_sent_and_confirmed) {
    int withdraw_called = 0, entry_called = 0, apy_called = 0;
-   std::vector<pending_tx> confirmed_txs;
+   std::vector<seen_tx> confirmed_txs;
 
    beacon_chain_config_updates crank({
       .fetch_queues = []() { return make_queues_response(near_future_epa(7), near_future_epa(3)); },
@@ -344,7 +351,9 @@ BOOST_AUTO_TEST_CASE(happy_path_all_txs_sent_and_confirmed) {
       .send_set_withdraw_delay = [&](uint64_t v) { ++withdraw_called; return "0xhash1"; },
       .send_set_entry_queue = [&](uint64_t v) { ++entry_called; return "0xhash2"; },
       .send_update_apy_bps = [&](uint64_t v) { ++apy_called; return "0xhash3"; },
-      .confirm_txs = [&](const std::vector<pending_tx>& txs) { confirmed_txs = txs; }
+      .confirm_tx = [&](std::string_view m, const std::string& h) {
+         confirmed_txs.push_back({std::string(m), h});
+      }
    }, 9);
    crank();
 
@@ -356,7 +365,7 @@ BOOST_AUTO_TEST_CASE(happy_path_all_txs_sent_and_confirmed) {
 
 BOOST_AUTO_TEST_CASE(null_withdraw_contract_skips_set_withdraw_delay) {
    int withdraw_called = 0;
-   std::vector<pending_tx> confirmed_txs;
+   std::vector<seen_tx> confirmed_txs;
 
    beacon_chain_config_updates crank({
       .fetch_queues = []() { return make_queues_response(near_future_epa(7), near_future_epa(3)); },
@@ -364,7 +373,9 @@ BOOST_AUTO_TEST_CASE(null_withdraw_contract_skips_set_withdraw_delay) {
       .send_set_withdraw_delay = {},
       .send_set_entry_queue = [](uint64_t) { return "0xhash"; },
       .send_update_apy_bps = [](uint64_t) { return "0xhash"; },
-      .confirm_txs = [&](const std::vector<pending_tx>& txs) { confirmed_txs = txs; }
+      .confirm_tx = [&](std::string_view m, const std::string& h) {
+         confirmed_txs.push_back({std::string(m), h});
+      }
    }, 9);
    crank();
 
@@ -374,7 +385,7 @@ BOOST_AUTO_TEST_CASE(null_withdraw_contract_skips_set_withdraw_delay) {
 
 BOOST_AUTO_TEST_CASE(null_deposit_manager_skips_entry_and_apy) {
    int entry_called = 0, apy_called = 0;
-   std::vector<pending_tx> confirmed_txs;
+   std::vector<seen_tx> confirmed_txs;
 
    beacon_chain_config_updates crank({
       .fetch_queues = []() { return make_queues_response(near_future_epa(7), near_future_epa(3)); },
@@ -382,7 +393,9 @@ BOOST_AUTO_TEST_CASE(null_deposit_manager_skips_entry_and_apy) {
       .send_set_withdraw_delay = [](uint64_t) { return "0xhash"; },
       .send_set_entry_queue = {},
       .send_update_apy_bps = {},
-      .confirm_txs = [&](const std::vector<pending_tx>& txs) { confirmed_txs = txs; }
+      .confirm_tx = [&](std::string_view m, const std::string& h) {
+         confirmed_txs.push_back({std::string(m), h});
+      }
    }, 9);
    crank();
 
@@ -393,7 +406,7 @@ BOOST_AUTO_TEST_CASE(null_deposit_manager_skips_entry_and_apy) {
 
 BOOST_AUTO_TEST_CASE(apy_missing_skips_update_apy_bps) {
    int apy_called = 0;
-   std::vector<pending_tx> confirmed_txs;
+   std::vector<seen_tx> confirmed_txs;
 
    beacon_chain_config_updates crank({
       .fetch_queues = []() { return make_queues_response(near_future_epa(7), near_future_epa(3)); },
@@ -401,7 +414,9 @@ BOOST_AUTO_TEST_CASE(apy_missing_skips_update_apy_bps) {
       .send_set_withdraw_delay = [](uint64_t) { return "0xhash1"; },
       .send_set_entry_queue = [](uint64_t) { return "0xhash2"; },
       .send_update_apy_bps = [&](uint64_t) { ++apy_called; return "0xhash3"; },
-      .confirm_txs = [&](const std::vector<pending_tx>& txs) { confirmed_txs = txs; }
+      .confirm_tx = [&](std::string_view m, const std::string& h) {
+         confirmed_txs.push_back({std::string(m), h});
+      }
    }, 9);
    crank();
 
@@ -416,7 +431,7 @@ BOOST_AUTO_TEST_CASE(fetch_throws_does_not_crash) {
       .send_set_withdraw_delay = [](uint64_t) { return "0xhash"; },
       .send_set_entry_queue = [](uint64_t) { return "0xhash"; },
       .send_update_apy_bps = [](uint64_t) { return "0xhash"; },
-      .confirm_txs = [](const std::vector<pending_tx>&) {}
+      .confirm_tx = [](std::string_view, const std::string&) {}
    }, 9);
    BOOST_CHECK_NO_THROW(crank());
 }
@@ -428,21 +443,28 @@ BOOST_AUTO_TEST_CASE(send_callback_throws_does_not_crash) {
       .send_set_withdraw_delay = [](uint64_t) -> std::string { throw std::runtime_error("send failed"); },
       .send_set_entry_queue = [](uint64_t) { return std::string("0xhash2"); },
       .send_update_apy_bps = [](uint64_t) { return std::string("0xhash3"); },
-      .confirm_txs = [](const std::vector<pending_tx>&) {}
+      .confirm_tx = [](std::string_view, const std::string&) {}
    }, 9);
    BOOST_CHECK_NO_THROW(crank());
 }
 
-BOOST_AUTO_TEST_CASE(confirm_txs_throws_does_not_crash) {
+BOOST_AUTO_TEST_CASE(confirm_tx_throws_does_not_crash) {
+   // A throwing confirm_tx must not propagate, and must not prevent subsequent sends:
+   // safely_confirm() in the implementation logs and continues so that confirmation
+   // failure on tx 1 still lets txs 2 and 3 be sent.
+   int withdraw_called = 0, entry_called = 0, apy_called = 0;
    beacon_chain_config_updates crank({
       .fetch_queues = []() { return make_queues_response(near_future_epa(7), near_future_epa(3)); },
       .fetch_apy = []() { return make_ethstore_response(0.05); },
-      .send_set_withdraw_delay = [](uint64_t) { return std::string("0xhash1"); },
-      .send_set_entry_queue = [](uint64_t) { return std::string("0xhash2"); },
-      .send_update_apy_bps = [](uint64_t) { return std::string("0xhash3"); },
-      .confirm_txs = [](const std::vector<pending_tx>&) { throw std::runtime_error("confirm failed"); }
+      .send_set_withdraw_delay = [&](uint64_t) { ++withdraw_called; return std::string("0xhash1"); },
+      .send_set_entry_queue   = [&](uint64_t) { ++entry_called;    return std::string("0xhash2"); },
+      .send_update_apy_bps    = [&](uint64_t) { ++apy_called;      return std::string("0xhash3"); },
+      .confirm_tx = [](std::string_view, const std::string&) { throw std::runtime_error("confirm failed"); }
    }, 9);
    BOOST_CHECK_NO_THROW(crank());
+   BOOST_CHECK_EQUAL(withdraw_called, 1);
+   BOOST_CHECK_EQUAL(entry_called, 1);
+   BOOST_CHECK_EQUAL(apy_called, 1);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

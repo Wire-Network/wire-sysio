@@ -10,7 +10,7 @@
 #include <functional>
 #include <optional>
 #include <string>
-#include <vector>
+#include <string_view>
 
 namespace sysio {
 
@@ -27,18 +27,18 @@ struct apy_updates {
    std::optional<uint64_t> apy_bps;
 };
 
-struct pending_tx {
-   std::string method;
-   std::string tx_hash;
-};
-
 struct beacon_chain_config_updates_deps {
    std::function<fc::variant()> fetch_queues;
    std::function<fc::variant()> fetch_apy;
    std::function<std::string(uint64_t)> send_set_withdraw_delay;
    std::function<std::string(uint64_t)> send_set_entry_queue;
    std::function<std::string(uint64_t)> send_update_apy_bps;
-   std::function<void(const std::vector<pending_tx>&)> confirm_txs;
+   /// Called once per successful send with the contract method name and the tx hash
+   /// returned by the corresponding `send_*` callback. The implementation is responsible
+   /// for blocking until the tx is confirmed (or determining that confirmation is
+   /// impossible) and reporting the outcome via logging - it must not throw to indicate
+   /// confirmation failure, since the surrounding orchestration treats throws as bugs.
+   std::function<void(std::string_view method, const std::string& tx_hash)> confirm_tx;
 };
 
 class beacon_chain_config_updates {
@@ -50,6 +50,10 @@ public:
    apy_updates   compute_apy_updates(const fc::variant& ethstore_response) const;
 
 private:
+   /// Invoke `deps_.confirm_tx` with the given (method, hash) pair, swallowing any exception
+   /// it raises so that one bad confirmation cannot prevent subsequent sends from running.
+   void safely_confirm(std::string_view method, const std::string& tx_hash) const;
+
    beacon_chain_config_updates_deps deps_;
    const uint64_t exit_queue_buffer_days_;
 };
