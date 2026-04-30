@@ -1061,16 +1061,17 @@ public:
 
       auto is_transient = (trx_type == transaction_metadata::trx_type::read_only || trx_type == transaction_metadata::trx_type::dry_run);
       if (!is_transient) {
-         next = [this, trx, next{std::move(next)}](const next_function_variant<transaction_trace_ptr>& response) {
-            next(response);
-
+         next = [this, trx, next{std::move(next)}](next_function_variant<transaction_trace_ptr>&& response) {
+            // Extract the ack metadata (cheap shared_ptr copies) before moving the
+            // variant into the inner next; that keeps both consumers correct under
+            // the rvalue-only contract without an extra variant copy.
             fc::exception_ptr except_ptr; // rejected
             if (std::holds_alternative<fc::exception_ptr>(response)) {
                except_ptr = std::get<fc::exception_ptr>(response);
             } else if (std::get<transaction_trace_ptr>(response)->except) {
                except_ptr = std::get<transaction_trace_ptr>(response)->except->dynamic_copy_exception();
             }
-
+            next(std::move(response));
             _transaction_ack_channel.publish(priority::low, std::pair<fc::exception_ptr, packed_transaction_ptr>(except_ptr, trx));
          };
       }
