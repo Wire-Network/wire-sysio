@@ -1,6 +1,7 @@
 #include <fc/variant.hpp>
 #include <fc/variant_object.hpp>
 #include <fc/int128.hpp>
+#include <fc/int256.hpp>
 
 #include <boost/test/unit_test.hpp>
 
@@ -123,8 +124,10 @@ BOOST_AUTO_TEST_CASE(same_type_object_reassign) {
 // without both, ASAN reports a leak (clear()) or a use-after-free / double-free
 // (copy ctor sharing the std::string* pointer).
 BOOST_AUTO_TEST_CASE(int128_destructor_frees_heap_string) {
-   { variant v{fc::int128{42}};  } // ASAN-leak if clear() doesn't handle int128_type
-   { variant v{fc::uint128{42}}; } // same for uint128_type
+   { variant v{fc::int128{42}};  }       // ASAN-leak if clear() doesn't handle int128_type
+   { variant v{fc::uint128{42}}; }       // same for uint128_type
+   { variant v{fc::int256{42}};  }       // same for int256_type
+   { variant v{fc::uint256{42}}; }       // same for uint256_type
 }
 
 BOOST_AUTO_TEST_CASE(int128_copy_ctor_deep_copies) {
@@ -139,6 +142,16 @@ BOOST_AUTO_TEST_CASE(int128_copy_ctor_deep_copies) {
       variant b(a);
       BOOST_CHECK_EQUAL(a.as_string(), b.as_string());
    }
+   {
+      variant a{fc::int256{-9999}};
+      variant b(a);
+      BOOST_CHECK_EQUAL(a.as_string(), b.as_string());
+   }
+   {
+      variant a{fc::uint256{0xDEADBEEFCAFEBABEULL}};
+      variant b(a);
+      BOOST_CHECK_EQUAL(a.as_string(), b.as_string());
+   }
 }
 
 BOOST_AUTO_TEST_CASE(int128_op_assign_aliased_subvariant) {
@@ -148,10 +161,30 @@ BOOST_AUTO_TEST_CASE(int128_op_assign_aliased_subvariant) {
    // If copy ctor was shallow for int128, the deep-copy step would silently
    // share the pointer, and clear() would later free the object frame whose
    // entry owned the heap string -- use-after-free on take.
-   variant v{variant_object{mutable_variant_object("k", fc::int128{99})}};
-   v = v.get_object()["k"];
-   BOOST_CHECK(v.get_type() == variant::int128_type);
-   BOOST_CHECK_EQUAL(v.as_string(), "99");
+   {
+      variant v{variant_object{mutable_variant_object("k", fc::int128{99})}};
+      v = v.get_object()["k"];
+      BOOST_CHECK(v.get_type() == variant::int128_type);
+      BOOST_CHECK_EQUAL(v.as_string(), "99");
+   }
+   {
+      variant v{variant_object{mutable_variant_object("k", fc::uint128{77})}};
+      v = v.get_object()["k"];
+      BOOST_CHECK(v.get_type() == variant::uint128_type);
+      BOOST_CHECK_EQUAL(v.as_string(), "77");
+   }
+   {
+      variant v{variant_object{mutable_variant_object("k", fc::int256{-55})}};
+      v = v.get_object()["k"];
+      BOOST_CHECK(v.get_type() == variant::int256_type);
+      BOOST_CHECK_EQUAL(v.as_string(), "-55");
+   }
+   {
+      variant v{variant_object{mutable_variant_object("k", fc::uint256{33})}};
+      v = v.get_object()["k"];
+      BOOST_CHECK(v.get_type() == variant::uint256_type);
+      BOOST_CHECK_EQUAL(v.as_string(), "33");
+   }
 }
 
 BOOST_AUTO_TEST_SUITE_END()
