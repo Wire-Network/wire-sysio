@@ -5,6 +5,9 @@
 #include <fc/reflect/reflect.hpp>
 #include <fc/reflect/variant.hpp>
 
+#include <cassert>
+#include <charconv>
+#include <cmath>
 #include <cstdint>
 #include <limits>
 #include <string>
@@ -67,8 +70,28 @@ inline void to_json_stream(uint64_t n, json_writer& w) {
       w.value_uint64(n);
    }
 }
-inline void to_json_stream(float f, json_writer& w)                { w.value_double(static_cast<double>(f)); }
-inline void to_json_stream(double d, json_writer& w)               { w.value_double(d); }
+// double / float emit as a JSON-quoted fixed-precision string to match fc::variant's emission shape
+// (variant.cpp s_fc_to_string + json.cpp double_type case).  Reflector-driven struct fields (e.g.
+// get_producers_result.total_producer_vote_weight) depend on this shape; emitting a bare JSON number
+// would silently break clients parsing the string form.  std::to_chars with chars_format::fixed is
+// locale-independent (unlike stringstream / snprintf, which honor LC_NUMERIC).
+inline constexpr int    double_fixed_precision = std::numeric_limits<double>::digits10 + 2;
+// Largest finite double in fixed format: max_exponent10 integer digits + '.' + precision frac + sign + NUL slack.
+inline constexpr size_t double_fixed_buf_size  = std::numeric_limits<double>::max_exponent10 + double_fixed_precision + 8;
+inline void to_json_stream(double d, json_writer& w) {
+   if (!std::isfinite(d)) {
+      // Variant emits the literal "nan" / "inf" / "-inf" string for non-finite doubles; match that shape.
+      w.value_string(std::isnan(d) ? "nan" : (d > 0 ? "inf" : "-inf"));
+      return;
+   }
+   char buf[double_fixed_buf_size];
+   auto r = std::to_chars(buf, buf + sizeof(buf), d, std::chars_format::fixed, double_fixed_precision);
+   assert(r.ec == std::errc{});
+   w.value_string(std::string_view(buf, r.ptr - buf));
+}
+inline void to_json_stream(float f, json_writer& w) {
+   to_json_stream(static_cast<double>(f), w);
+}
 inline void to_json_stream(std::string_view s, json_writer& w)     { w.value_string(s); }
 inline void to_json_stream(const std::string& s, json_writer& w)   { w.value_string(s); }
 inline void to_json_stream(const char* s, json_writer& w)          { w.value_string(s ? std::string_view(s) : std::string_view()); }

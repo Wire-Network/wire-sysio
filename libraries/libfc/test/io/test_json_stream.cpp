@@ -165,9 +165,10 @@ BOOST_AUTO_TEST_CASE(value_double_rejects_non_finite) {
       BOOST_CHECK_THROW(w.value_double(pos_inf), std::invalid_argument);
       BOOST_CHECK_THROW(w.value_double(neg_inf), std::invalid_argument);
    }
-   // Finite extremes still round-trip.
-   BOOST_CHECK_EQUAL(fc::to_json_string(0.0), "0");
-   BOOST_CHECK_EQUAL(fc::to_json_string(1.5), "1.5");
+   // Finite values: to_json_stream(double) emits the quoted fixed-precision form
+   // matching the variant path's emission shape.
+   BOOST_CHECK_EQUAL(fc::to_json_string(0.0), "\"0.00000000000000000\"");
+   BOOST_CHECK_EQUAL(fc::to_json_string(1.5), "\"1.50000000000000000\"");
 }
 
 BOOST_AUTO_TEST_CASE(string_escaping) {
@@ -374,7 +375,7 @@ BOOST_AUTO_TEST_CASE(set_chained_object) {
        .set("d", 3.5);
       w.end_object();
    }
-   BOOST_CHECK_EQUAL(out, R"({"a":1,"b":"two","c":true,"d":3.5})");
+   BOOST_CHECK_EQUAL(out, R"({"a":1,"b":"two","c":true,"d":"3.50000000000000000"})");
 }
 
 BOOST_AUTO_TEST_CASE(set_dispatches_via_to_json_stream) {
@@ -435,6 +436,18 @@ BOOST_AUTO_TEST_CASE(streaming_vs_variant_parity_libfc_leaf_types) {
    {
       check_streaming_matches_variant(fc::int128_t{-1234567890123456789LL}, "fc::int128 negative");
       check_streaming_matches_variant(fc::uint128_t{0xffffffffffffffffULL} * 2 + 1, "fc::uint128 large");
+   }
+   // double / float: variant emits a JSON-quoted fixed-precision string
+   // (digits10 + 2, std::fixed) so wire-format clients see a stable shape
+   // regardless of magnitude.  Reflector-driven struct fields (e.g.
+   // get_producers_result.total_producer_vote_weight) depend on this.
+   {
+      check_streaming_matches_variant(double{1.5},                      "double 1.5");
+      check_streaming_matches_variant(double{-2.25},                    "double -2.25");
+      check_streaming_matches_variant(double{0.1},                      "double 0.1 (round-trip)");
+      check_streaming_matches_variant(double{1e10},                     "double 1e10");
+      check_streaming_matches_variant(double{0.0},                      "double 0.0");
+      check_streaming_matches_variant(float{3.5f},                      "float 3.5");
    }
    // bls public_key + signature: derived from a deterministic seed via private_key::generate().
    // private_key itself has =delete'd to_json_stream so we don't include it here.
