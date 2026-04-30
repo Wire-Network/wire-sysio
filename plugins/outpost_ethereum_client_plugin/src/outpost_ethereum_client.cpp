@@ -82,8 +82,8 @@ std::vector<char> outpost_ethereum_client::read_inbound_envelope(
 
    const auto events = _opp_client->query_events(
       {std::string(OPP_ENVELOPE_EVENT_NAME)},
-      eth::block_tag_t{eth::block_tag_latest},
-      eth::block_tag_t{eth::block_tag_latest});
+      eth::block_tag_t{std::string(eth::block_tag_latest)},
+      eth::block_tag_t{std::string(eth::block_tag_latest)});
 
    ilog("outpost_ethereum_client[{}]: {} events fetched = {}",
         to_string(), OPP_ENVELOPE_EVENT_NAME, events.size());
