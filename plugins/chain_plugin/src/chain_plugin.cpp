@@ -1355,6 +1355,45 @@ chain_plugin::read_table_rows(chain_apis::read_only::get_table_rows_params param
    using result_t = chain_apis::read_only::get_table_rows_result;
    const auto deadline = fc::time_point::now() + timeout;
 
+   // Performs the actual chainbase scan and converts the result variant into a
+   // `get_table_rows_result`. Any exception path or embedded fc::exception_ptr is logged and
+   // collapsed to an empty result so the caller observes a single "no rows" outcome regardless
+   // of how the read failed. `log_prefix` is captured by value because this lambda is moved
+   // into the posted task below and may outlive the outer stack frame on timeout/shutdown.
+   auto run_scan = [this, log_prefix, timeout, deadline](
+      chain_apis::read_only::get_table_rows_params& p) -> result_t {
+      try {
+         auto ro      = get_read_only_api(timeout);
+         auto variant = ro.get_table_rows(p, deadline)();
+         if (auto* err = std::get_if<fc::exception_ptr>(&variant)) {
+            elog("{}: table read failed {}::{} -- {}",
+                 log_prefix, p.code.to_string(), p.table, (*err)->to_string());
+            return {};
+         }
+         return std::get<result_t>(std::move(variant));
+      } catch (const fc::exception& e) {
+         elog("{}: table read threw {}::{} -- {}",
+              log_prefix, p.code.to_string(), p.table, e.to_string());
+      } catch (const std::exception& e) {
+         elog("{}: table read threw {}::{} -- {}",
+              log_prefix, p.code.to_string(), p.table, e.what());
+      } catch (...) {
+         elog("{}: table read threw unknown exception {}::{}",
+              log_prefix, p.code.to_string(), p.table);
+      }
+      return {};
+   };
+
+   // Main-thread fast path: posting onto the executor and then blocking the main thread on the
+   // future would deadlock during `plugin_startup` (write window is the default, the read pool
+   // is not yet active, and `application::exec()` has not started its loop, so nothing drains
+   // the read_only queue while we wait). Running inline is safe because the read-window
+   // discipline is already satisfied: in the write window the main thread is the sole chainbase
+   // mutator, and in the read window the main thread is one of the legitimate readers.
+   if (std::this_thread::get_id() == app().executor().get_main_thread_id()) {
+      return run_scan(params);
+   }
+
    // Pre-capture log fields; `params` is moved into the posted lambda below, so the outer error paths cannot read
    // from it.
    const std::string log_code  = params.code.to_string();
@@ -1369,30 +1408,8 @@ chain_plugin::read_table_rows(chain_apis::read_only::get_table_rows_params param
    // `shutdown_plugins()` and `destroy_plugins()` (see `libraries/appbase/include/appbase/application_base.hpp`),
    // so any lambda still queued when the plugin impl is about to be destroyed is destructed first.
    app().executor().post(appbase::priority::medium, appbase::exec_queue::read_only,
-      [this, params = std::move(params), deadline, timeout, prom, log_prefix]() mutable {
-         try {
-            auto ro      = get_read_only_api(timeout);
-            auto variant = ro.get_table_rows(params, deadline)();
-            if (auto* err = std::get_if<fc::exception_ptr>(&variant)) {
-               elog("{}: table read failed {}::{} -- {}",
-                    log_prefix, params.code.to_string(), params.table, (*err)->to_string());
-               prom->set_value({});
-            } else {
-               prom->set_value(std::get<result_t>(std::move(variant)));
-            }
-         } catch (const fc::exception& e) {
-            elog("{}: table read threw {}::{} -- {}",
-                 log_prefix, params.code.to_string(), params.table, e.to_string());
-            prom->set_value({});
-         } catch (const std::exception& e) {
-            elog("{}: table read threw {}::{} -- {}",
-                 log_prefix, params.code.to_string(), params.table, e.what());
-            prom->set_value({});
-         } catch (...) {
-            elog("{}: table read threw unknown exception {}::{}",
-                 log_prefix, params.code.to_string(), params.table);
-            prom->set_value({});
-         }
+      [params = std::move(params), prom, run_scan = std::move(run_scan)]() mutable {
+         prom->set_value(run_scan(params));
       });
 
    // Poll every 200ms so we can abandon the wait if the caller is shutting down or if the deadline expires before
