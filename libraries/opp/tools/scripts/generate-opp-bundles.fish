@@ -30,6 +30,8 @@ end
 pushd $tools_root
 pnpm install; or exit 1
 pnpm --filter "proto*" dist; or exit 1
+cd protoc-gen-solidity && pnpm link --global && cd ..; or exit 1
+cd protoc-gen-solana && pnpm link --global && cd ..; or exit 1
 cd protobuf-bundler && pnpm link --global && cd ..; or exit 1
 popd
 
