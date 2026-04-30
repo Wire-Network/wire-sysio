@@ -329,14 +329,15 @@ namespace fc
 
         /// @pre  get_type() == string_type
         ///
-        /// Returns a non-owning view of the variant's string bytes.
-        /// Was `const std::string&` historically; changed to
-        /// `std::string_view` so a future inline-string (SSO) encoding
-        /// can return a view of the inline bytes without materialising
-        /// a heap std::string.  Callers that need an owning copy should
-        /// use as_string() (returns std::string by value); callers that
-        /// need a null-terminated c_str must construct std::string
-        /// explicitly first.
+        /// Returns a non-owning view of the variant's string bytes.  The view is
+        /// valid until the variant is destroyed, mutated (assignment, move-from,
+        /// clear), or the underlying string is modified through any other means.
+        /// Was `const std::string&` historically; changed to `std::string_view`
+        /// so a future inline-string (SSO) encoding can return a view of the
+        /// inline bytes without materialising a heap std::string.  Callers that
+        /// need an owning copy should use as_string() (returns std::string by
+        /// value); callers that need a null-terminated c_str must construct
+        /// std::string explicitly first.
         std::string_view            get_string()const;
 
         /// @throw if get_type() != array_type | null_type
