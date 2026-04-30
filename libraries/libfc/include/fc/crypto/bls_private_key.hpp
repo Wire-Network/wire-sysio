@@ -227,6 +227,15 @@ FC_REFLECT_TYPENAME(fc::crypto::bls::public_key)
 #include <fc/serialize_as_string.hpp>
 FC_SERIALIZE_AS_STRING(fc::crypto::bls::private_key)
 
+// Override the FC_SERIALIZE_AS_STRING-generated to_json_stream for bls::private_key
+// with a deleted non-template overload: streaming HTTP responses must never carry
+// private key material.  to_variant / from_variant remain intact so server-internal
+// flows (signature_provider, wallet_api_plugin) keep working.
+namespace fc {
+   class json_writer;
+   void to_json_stream(const crypto::bls::private_key& var, json_writer& w) = delete;
+}
+
 FC_REFLECT(fc::crypto::bls::public_key_shim, (shim_ptr))
 FC_REFLECT(fc::crypto::bls::signature_shim, (shim_ptr))
 
