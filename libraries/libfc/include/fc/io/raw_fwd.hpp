@@ -26,7 +26,6 @@ namespace fc {
    namespace ip { class endpoint; }
 
    namespace ecc { class public_key; class private_key; }
-   template<typename Storage> class fixed_string;
 
    namespace raw {
 

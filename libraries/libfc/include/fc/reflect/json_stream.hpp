@@ -6,6 +6,7 @@
 #include <fc/reflect/variant.hpp>
 
 #include <cstdint>
+#include <limits>
 #include <string>
 #include <string_view>
 #include <type_traits>
@@ -31,6 +32,9 @@ void to_json_stream(const T& o, json_writer& w);
 // -- Scalar overloads ---------------------------------------------------------------------
 
 inline void to_json_stream(bool b, json_writer& w)                 { w.value_bool(b); }
+// `char` emits as an int8 number (e.g. 'A' -> 65), matching the int8_t overload's shape.
+// Single-character JSON strings would surprise reflected-struct consumers; the numeric
+// form is consistent with how chars are typically read back via from_variant<char>.
 inline void to_json_stream(char c, json_writer& w)                 { w.value_int8(static_cast<int8_t>(c)); }
 inline void to_json_stream(int8_t n, json_writer& w)               { w.value_int8(n); }
 inline void to_json_stream(uint8_t n, json_writer& w)              { w.value_uint8(n); }
@@ -38,8 +42,31 @@ inline void to_json_stream(int16_t n, json_writer& w)              { w.value_int
 inline void to_json_stream(uint16_t n, json_writer& w)             { w.value_uint16(n); }
 inline void to_json_stream(int32_t n, json_writer& w)              { w.value_int32(n); }
 inline void to_json_stream(uint32_t n, json_writer& w)             { w.value_uint32(n); }
-inline void to_json_stream(int64_t n, json_writer& w)              { w.value_int64(n); }
-inline void to_json_stream(uint64_t n, json_writer& w)             { w.value_uint64(n); }
+// 64-bit integers with magnitude > 0xffffffff are emitted as JSON strings to
+// preserve precision past JS's 2^53 mantissa.  Matches fc::variant's emission
+// (libfc/src/io/json.cpp, int64_type / uint64_type cases).  Writers stay raw;
+// callers that want a literal big number use value_int64 / value_uint64 directly.
+// Buffer size: 20 digits (uint64 max) + sign + slack.
+inline constexpr size_t int64_decimal_buf_size = std::numeric_limits<int64_t>::digits10 + 3;
+
+inline void to_json_stream(int64_t n, json_writer& w) {
+   if (n > 0xffffffffLL || n < -0xffffffffLL) {
+      char buf[int64_decimal_buf_size];
+      auto r = std::to_chars(buf, buf + sizeof(buf), n);
+      w.value_string(std::string_view(buf, r.ptr - buf));
+   } else {
+      w.value_int64(n);
+   }
+}
+inline void to_json_stream(uint64_t n, json_writer& w) {
+   if (n > 0xffffffffULL) {
+      char buf[int64_decimal_buf_size];
+      auto r = std::to_chars(buf, buf + sizeof(buf), n);
+      w.value_string(std::string_view(buf, r.ptr - buf));
+   } else {
+      w.value_uint64(n);
+   }
+}
 inline void to_json_stream(float f, json_writer& w)                { w.value_double(static_cast<double>(f)); }
 inline void to_json_stream(double d, json_writer& w)               { w.value_double(d); }
 inline void to_json_stream(std::string_view s, json_writer& w)     { w.value_string(s); }
@@ -94,6 +121,8 @@ namespace detail {
    struct if_enum_json {
       template<typename T>
       static void to_json_stream(const T& v, json_writer& w) {
+         static_assert(fc::reflector<T>::is_defined::value,
+                       "fc::to_json_stream<T>: T must be FC_REFLECT'd or have a hand-written to_json_stream overload");
          w.begin_object();
          fc::reflector<T>::visit(to_json_stream_visitor<T>(w, v));
          w.end_object();

@@ -1,19 +1,35 @@
 #include <boost/test/unit_test.hpp>
 
+#include <fc/bitset.hpp>
+#include <fc/crypto/bls_public_key.hpp>
+#include <fc/crypto/bls_signature.hpp>
 #include <fc/crypto/public_key.hpp>
 #include <fc/crypto/private_key.hpp>
 #include <fc/crypto/sha256.hpp>
 #include <fc/crypto/signature.hpp>
+#include <fc/exception/exception.hpp>
+#include <fc/int128.hpp>
+#include <fc/io/enum_type.hpp>
 #include <fc/io/json.hpp>
+#include <fc/log/log_message.hpp>
+#include <fc/network/url.hpp>
 #include <fc/reflect/json_stream.hpp>
 #include <fc/reflect/variant.hpp>
+#include <fc/static_variant.hpp>
 #include <fc/time.hpp>
 #include <fc/variant.hpp>
 
+#include <fc/scoped_exit.hpp>
+
+#include <charconv>
+#include <clocale>
 #include <cstring>
+#include <limits>
 #include <map>
 #include <optional>
+#include <stdexcept>
 #include <string>
+#include <system_error>
 #include <vector>
 
 namespace {
@@ -67,6 +83,91 @@ BOOST_AUTO_TEST_CASE(primitives) {
    BOOST_CHECK_EQUAL(fc::to_json_string(int32_t{-7}),  "-7");
    BOOST_CHECK_EQUAL(fc::to_json_string(uint64_t{42}), "42");
    BOOST_CHECK_EQUAL(fc::to_json_string(std::string{"hi"}), "\"hi\"");
+}
+
+BOOST_AUTO_TEST_CASE(array_of_char_emits_hex_string) {
+   // std::array<char,N> serializes as a lowercase hex string in fc::variant
+   // (matches vector<char>); streaming must produce the same shape, not an
+   // array of byte-numbers from the generic std::array<T,S> template.
+   auto via_variant = [](const auto& v) { return fc::json::to_string(fc::variant(v), fc::json::yield_function_t()); };
+
+   std::array<char, 4> bytes{0x00, 0x01, 0x02, 0x03};
+   BOOST_CHECK_EQUAL(fc::to_json_string(bytes), "\"00010203\"");
+   BOOST_CHECK_EQUAL(fc::to_json_string(bytes), via_variant(bytes));
+
+   std::array<char, 32> wider{};
+   wider[0] = static_cast<char>(0xff); wider[31] = 0x42;
+   BOOST_CHECK_EQUAL(fc::to_json_string(wider), via_variant(wider));
+}
+
+BOOST_AUTO_TEST_CASE(large_int_quoting_matches_variant) {
+   // Variant emits 64-bit integers with |v| > 0xffffffff as quoted strings to
+   // preserve precision past JS's 2^53 limit.  Streaming must match.
+   auto via_variant = [](auto v) { return fc::json::to_string(fc::variant(v), fc::json::yield_function_t()); };
+
+   BOOST_CHECK_EQUAL(fc::to_json_string(int64_t{0xffffffff}),       via_variant(int64_t{0xffffffff}));
+   BOOST_CHECK_EQUAL(fc::to_json_string(int64_t{0x100000000}),      via_variant(int64_t{0x100000000}));
+   BOOST_CHECK_EQUAL(fc::to_json_string(int64_t{-0x100000000}),     via_variant(int64_t{-0x100000000}));
+   BOOST_CHECK_EQUAL(fc::to_json_string(uint64_t{0xffffffff}),      via_variant(uint64_t{0xffffffff}));
+   BOOST_CHECK_EQUAL(fc::to_json_string(uint64_t{0x100000000}),     via_variant(uint64_t{0x100000000}));
+   BOOST_CHECK_EQUAL(fc::to_json_string(uint64_t{0xffffffffffffffff}), via_variant(uint64_t{0xffffffffffffffff}));
+}
+
+BOOST_AUTO_TEST_CASE(value_double_locale_independent) {
+   // %g honors LC_NUMERIC: under de_DE the radix becomes ','  -> invalid JSON.
+   // value_double must use a locale-independent formatter.  scoped_exit ensures
+   // the locale is restored even if a BOOST_CHECK throws.
+   const char* saved = std::setlocale(LC_NUMERIC, nullptr);
+   const std::string saved_locale = saved ? saved : "C";
+   auto restore = fc::make_scoped_exit([&]{ std::setlocale(LC_NUMERIC, saved_locale.c_str()); });
+
+   const char* comma_locales[] = {"de_DE.UTF-8", "de_DE", "fr_FR.UTF-8", "fr_FR", "C-decimal-comma"};
+   bool found = false;
+   for (const char* loc : comma_locales) {
+      if (std::setlocale(LC_NUMERIC, loc)) { found = true; break; }
+   }
+   if (!found) {
+      BOOST_TEST_MESSAGE("no comma-radix locale available; skipping locale-independence assertion");
+      return;
+   }
+   BOOST_CHECK_EQUAL(fc::to_json_string(1.5), "1.5");
+   BOOST_CHECK_EQUAL(fc::to_json_string(-2.25), "-2.25");
+   // Round-trip: any finite double must parse back to its bit-exact value.
+   // strtod_l with the C locale avoids re-introducing the comma-radix issue.
+   auto round_trip = [](double d) {
+      const std::string s = fc::to_json_string(d);
+      double parsed = 0.0;
+      auto [_, ec] = std::from_chars(s.data(), s.data() + s.size(), parsed);
+      BOOST_REQUIRE(ec == std::errc{});
+      BOOST_CHECK_EQUAL(parsed, d);
+   };
+   round_trip(0.1);
+   round_trip(1.0 / 3.0);
+   round_trip(std::numeric_limits<double>::min());
+   round_trip(std::numeric_limits<double>::max());
+}
+
+BOOST_AUTO_TEST_CASE(value_double_rejects_non_finite) {
+   // NaN / +-inf have no JSON representation; value_double must throw rather than
+   // emit unquoted nan/inf tokens that downstream parsers reject.
+   const auto nan = std::numeric_limits<double>::quiet_NaN();
+   const auto pos_inf = std::numeric_limits<double>::infinity();
+   const auto neg_inf = -std::numeric_limits<double>::infinity();
+
+   std::string out;
+   {
+      fc::json_writer w(out);
+      BOOST_CHECK_THROW(w.value_double(nan),     std::invalid_argument);
+   }
+   BOOST_CHECK(out.empty()); // nothing written, frame state untouched
+   {
+      fc::json_writer w(out);
+      BOOST_CHECK_THROW(w.value_double(pos_inf), std::invalid_argument);
+      BOOST_CHECK_THROW(w.value_double(neg_inf), std::invalid_argument);
+   }
+   // Finite extremes still round-trip.
+   BOOST_CHECK_EQUAL(fc::to_json_string(0.0), "0");
+   BOOST_CHECK_EQUAL(fc::to_json_string(1.5), "1.5");
 }
 
 BOOST_AUTO_TEST_CASE(string_escaping) {
@@ -304,6 +405,75 @@ BOOST_AUTO_TEST_CASE(set_dispatches_via_to_json_stream) {
       + ",\"nums\":"            + fc::json::to_string(v_nums,  fc::json::yield_function_t())
       + "}";
    BOOST_CHECK_EQUAL(out, expected);
+}
+
+// Parity helper: streaming JSON for `v` must equal the variant-built JSON.
+// Catches divergence between to_json_stream(T) and to_variant(T)+json::to_string
+// for libfc leaf types whose HTTP-API consumers depend on the existing shape.
+template<typename T>
+static void check_streaming_matches_variant(const T& v, const std::string& label) {
+   const std::string streamed = fc::to_json_string(v);
+   const std::string via_var  = fc::json::to_string(fc::variant(v), fc::json::yield_function_t());
+   BOOST_CHECK_MESSAGE(streamed == via_var,
+                       label << ": streaming JSON differs from variant path\n  streaming: " << streamed
+                       << "\n  variant:   " << via_var);
+}
+
+BOOST_AUTO_TEST_CASE(streaming_vs_variant_parity_libfc_leaf_types) {
+   // exception: shape comes from FC_REFLECT(fc::exception, ...) -- stack of log_messages.
+   {
+      fc::exception e(FC_LOG_MESSAGE(error, "test exception"),
+                      fc::std_exception_code, "test_exception", "test what");
+      check_streaming_matches_variant(e, "fc::exception");
+   }
+   // log_message: timestamp + context + formatted message.
+   {
+      fc::log_message lm(FC_LOG_CONTEXT(warn), std::string("hello world"));
+      check_streaming_matches_variant(lm, "fc::log_message");
+   }
+   // 128-bit integers: emitted as decimal strings.
+   {
+      check_streaming_matches_variant(fc::int128_t{-1234567890123456789LL}, "fc::int128 negative");
+      check_streaming_matches_variant(fc::uint128_t{0xffffffffffffffffULL} * 2 + 1, "fc::uint128 large");
+   }
+   // bls public_key + signature: derived from a deterministic seed via private_key::generate().
+   // private_key itself has =delete'd to_json_stream so we don't include it here.
+   {
+      auto sk = fc::crypto::bls::private_key::generate();
+      check_streaming_matches_variant(sk.get_public_key(), "fc::crypto::bls::public_key");
+      const std::string msg = "ping";
+      auto sig = sk.sign_raw(std::span<const uint8_t>(reinterpret_cast<const uint8_t*>(msg.data()), msg.size()));
+      check_streaming_matches_variant(sig, "fc::crypto::bls::signature");
+   }
+   // url: opaque string round-trip.
+   {
+      check_streaming_matches_variant(fc::url(std::string{"https://example.com/path?q=1"}), "fc::url");
+   }
+   // bitset: '1'/'0' bit string via FC_SERIALIZE_AS_STRING.
+   {
+      check_streaming_matches_variant(fc::bitset(std::string_view{"1010110010"}), "fc::bitset");
+   }
+   // enum_type<>: reflected enum should emit the member-name string, not the underlying integer.
+   {
+      using et = fc::enum_type<uint8_t, color_t>;
+      check_streaming_matches_variant(et{color_t::green}, "fc::enum_type<color_t>");
+   }
+   // static_variant (std::variant alias): index + tagged value pair.
+   {
+      using sv_t = std::variant<int32_t, std::string>;
+      check_streaming_matches_variant(sv_t{int32_t{42}}, "static_variant alt 0");
+      check_streaming_matches_variant(sv_t{std::string{"hi"}}, "static_variant alt 1");
+   }
+   // vector<char>: lowercase hex string.
+   {
+      std::vector<char> v{0x00, 0x01, char(0xfe), char(0xff)};
+      check_streaming_matches_variant(v, "std::vector<char>");
+   }
+   // blob: base64-encoded bytes.
+   {
+      fc::blob b{{'a', 'b', 'c'}};
+      check_streaming_matches_variant(b, "fc::blob");
+   }
 }
 
 BOOST_AUTO_TEST_CASE(set_raw_splices_preformatted_fragment) {

@@ -9,7 +9,6 @@
 #include <fc/reflect/variant.hpp>
 #include <fc/io/json.hpp>
 #include <fc/io/json_stream.hpp>
-#include <fc/io/json_stream.hpp>
 #include <fc/utf8.hpp>
 #include <algorithm>
 #include <fc/int256.hpp>

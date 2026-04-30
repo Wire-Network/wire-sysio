@@ -4,8 +4,11 @@
 
 #include <cassert>
 #include <charconv>
+#include <cmath>
 #include <cstdint>
 #include <functional>
+#include <limits>
+#include <stdexcept>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -38,7 +41,10 @@ public:
    {
       // Enough room for a reasonable response without reallocation; callers that know
       // the expected size can reserve() themselves before constructing the writer.
-      out_.reserve(out_.size() + 4096);
+      // Skip if the caller already has slack so we don't risk a spec-permitted shrink.
+      if (out_.capacity() - out_.size() < 4096) {
+         out_.reserve(out_.size() + 4096);
+      }
    }
 
    void begin_object() {
@@ -49,6 +55,7 @@ public:
 
    void end_object() {
       assert(!stack_.empty() && stack_.back().ctx == context::object);
+      assert(!awaiting_value_); // key() without a value would leave a dangling colon
       out_.push_back('}');
       stack_.pop_back();
    }
@@ -67,6 +74,7 @@ public:
 
    void key(std::string_view k) {
       assert(!stack_.empty() && stack_.back().ctx == context::object);
+      assert(!awaiting_value_); // two key() calls in a row would produce "a":,"b": (invalid JSON)
       if (stack_.back().has_item) {
          out_.push_back(',');
       } else {
@@ -99,13 +107,20 @@ public:
    void value_uint8(uint8_t n)   { value_uint64(n); }
 
    void value_double(double d) {
+      // NaN / +-inf have no JSON representation: any encoder would emit non-conforming
+      // tokens that no parser will accept.  Reject before mutating the output buffer
+      // so the writer's frame state stays consistent on throw.
+      if (!std::isfinite(d)) {
+         throw std::invalid_argument("fc::json_writer::value_double: non-finite double cannot be JSON-encoded");
+      }
       value_prefix();
+      // std::to_chars is locale-independent (period radix always) and shortest-roundtrip:
+      // the parsed-back double is bit-identical to the input.  snprintf with %g would
+      // honor LC_NUMERIC and emit comma radix in non-C locales -- invalid JSON.
       char buf[32];
-      // "%.17g" preserves round-trip precision for IEEE 754 doubles.  Callers that need
-      // bit-exact formatting should emit via raw_value().
-      int n = std::snprintf(buf, sizeof(buf), "%.17g", d);
-      if (n > 0) out_.append(buf, static_cast<size_t>(n));
-      else       out_.append("null", 4); // NaN/inf are not valid JSON; emit null defensively.
+      auto r = std::to_chars(buf, buf + sizeof(buf), d);
+      assert(r.ec == std::errc{}); // unreachable: finite double + 32-byte buffer always succeeds
+      out_.append(buf, static_cast<size_t>(r.ptr - buf));
    }
 
    void value_bool(bool b) {
@@ -176,9 +191,35 @@ public:
       return *this;
    }
 
-   /// True when all begin_* have been paired with end_*.  Asserted internally on destructor
-   /// usage via value_prefix() is not possible, so callers can check this in tests.
-   bool balanced() const { return stack_.empty(); }
+   /// True when all begin_* have been paired with end_* AND no key() is awaiting
+   /// its value.  Used by tests/sinks that wrap the writer to confirm end-state
+   /// integrity after a streaming sequence completes.
+   bool balanced() const { return stack_.empty() && !awaiting_value_; }
+
+   /// Snapshot of the writer's mutable state.  Pair with rewind() to discard
+   /// any tokens emitted between the two calls.  Cheap (~3 words copied) and
+   /// non-throwing.  Used by the abi_serializer streaming path to roll back
+   /// half-written ABI fields when the inner unpack throws partway.
+   struct checkpoint_t {
+      size_t buf_size                = 0;
+      size_t stack_size              = 0;
+      bool   surviving_top_has_item  = false; // restored value of stack_[stack_size-1].has_item
+      bool   awaiting_value          = false;
+   };
+   checkpoint_t checkpoint() const noexcept {
+      return {
+         out_.size(),
+         stack_.size(),
+         stack_.empty() ? false : stack_.back().has_item,
+         awaiting_value_
+      };
+   }
+   void rewind(const checkpoint_t& cp) noexcept {
+      out_.resize(cp.buf_size);
+      stack_.resize(cp.stack_size);
+      if (!stack_.empty()) stack_.back().has_item = cp.surviving_top_has_item;
+      awaiting_value_ = cp.awaiting_value;
+   }
 
 private:
    enum class context : uint8_t { object, array };
@@ -207,16 +248,17 @@ private:
    }
 
    // std::to_chars is non-throwing, locale-independent, and avoids the format-string
-   // parsing overhead that snprintf pays on every call.  buf is sized for the longest
-   // possible decimal of int64/uint64 (20 chars + sign + slack).  Failure case is
-   // unreachable for fixed-width integers; the unconditional out_.append handles it.
+   // parsing overhead that snprintf pays on every call.  Buffer sized for the longest
+   // possible decimal of int64/uint64 (digits10+1 plus sign plus slack).
+   static constexpr size_t int64_decimal_buf = std::numeric_limits<int64_t>::digits10 + 3;
+   static_assert(int64_decimal_buf >= std::numeric_limits<uint64_t>::digits10 + 1);
    void append_signed(int64_t n) {
-      char buf[24];
+      char buf[int64_decimal_buf];
       auto r = std::to_chars(buf, buf + sizeof(buf), n);
       out_.append(buf, static_cast<size_t>(r.ptr - buf));
    }
    void append_unsigned(uint64_t n) {
-      char buf[24];
+      char buf[int64_decimal_buf];
       auto r = std::to_chars(buf, buf + sizeof(buf), n);
       out_.append(buf, static_cast<size_t>(r.ptr - buf));
    }

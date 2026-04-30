@@ -52,10 +52,19 @@ inline void to_json_stream(const T& v, fc::json_writer& w) {
 #define FC_SERIALIZE_AS_STRING(TYPE) \
    namespace fc { template<> struct serialize_as_string<TYPE> : std::true_type {}; }
 
-// Class-template variant of FC_SERIALIZE_AS_STRING.  Wrap each argument in parens
-// so internal commas (template parameter lists, template arguments) survive the
-// preprocessor's argument splitting.
-//   FC_SERIALIZE_AS_STRING_TEMPLATE((typename T, typename U), (my_type<T, U>))
+// Class-template variant of FC_SERIALIZE_AS_STRING.  BOTH arguments must be wrapped
+// in parens so internal commas (template parameter lists, template arguments) survive
+// the preprocessor's argument splitting.  No compile-time check exists for the parens
+// themselves -- without them the expansion silently goes wrong.
+//
+//   Correct:
+//     FC_SERIALIZE_AS_STRING_TEMPLATE((typename T, typename U), (my_type<T, U>))
+//
+//   Wrong (preprocessor splits on the first comma; expansion is malformed):
+//     FC_SERIALIZE_AS_STRING_TEMPLATE(typename T, typename U, my_type<T, U>)
+//
+//   Wrong (single-arg form -- no parens needed but easy to forget the wrapper):
+//     FC_SERIALIZE_AS_STRING_TEMPLATE((typename T), my_type<T>)        // missing parens on TYPE
 #define FC_SERIALIZE_AS_STRING_TEMPLATE(TPL_PARAMS, TYPE) \
    namespace fc { template<FC_SERIALIZE_AS_STRING_UNPAREN_ TPL_PARAMS> \
                   struct serialize_as_string<FC_SERIALIZE_AS_STRING_UNPAREN_ TYPE> : std::true_type {}; }

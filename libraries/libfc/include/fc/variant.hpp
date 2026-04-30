@@ -48,11 +48,10 @@ namespace fc
    template<typename T> struct safe;
 
    // Streaming JSON writer overloads for variant / variant_object; implemented in
-   // variant.cpp / variant_object.cpp.  Provides a seamless path for reflected structs
-   // that embed a fc::variant or variant_object field.  Performance is bounded by the
-   // underlying fc::json::to_string since variants can hold arbitrary shapes; callers
-   // that want the full allocation-free path should flatten variant usage out of their
-   // hot endpoints.
+   // variant.cpp / variant_object.cpp.  Walks the variant tree directly into the writer
+   // -- no intermediate fc::json::to_string string allocation.  Lets reflected structs
+   // that embed a variant or variant_object field stream through the same writer as
+   // their other members.
    void to_json_stream( const variant& v, json_writer& w );
    void to_json_stream( const variant_object& vo, json_writer& w );
    void to_json_stream( const mutable_variant_object& vo, json_writer& w );
@@ -764,6 +763,14 @@ namespace fc
    void to_variant( const std::array<char,N>& bi, variant& v )
    {
       v = std::vector<char>( static_cast<const char*>(bi.data()), static_cast<const char*>(bi.data()) + sizeof(bi) );
+   }
+
+   /// JSON shape mirrors to_variant: lowercase hex string (not the generic
+   /// std::array<T,S> template's array-of-int8 form).
+   template<size_t N>
+   void to_json_stream( const std::array<char,N>& bi, json_writer& w )
+   {
+      w.value_hex( bi.data(), N );
    }
 
    /** @ingroup Serializable */
