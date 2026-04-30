@@ -29,12 +29,21 @@ end
 # --- Setup & build tools ---
 pushd $tools_root
 pnpm install or exit 1
+pnpm --filter "packages/*" dist or exit 1
+pnpm --filter "packages/*" pnpm link --global or exit 1
 popd
 
+if not which wire-protobuf-bundler &> /dev/null
+   echo "Error: wire-protobuf-bundler is not installed or not in PATH." >&2
+   exit 1
+end
+
 # --- Build command ---
-set -l cmd pnpm exec wire-protobuf-bundler \
+set -l cmd wire-protobuf-bundler \
    --repo "file://$repo_proto_src_path" \
    --output "$repo_output_path1"
+
+
 
 # --- Run ---
 echo "Running wire-protobuf-bundler for all targets..."
