@@ -2233,13 +2233,28 @@ producer_plugin_impl::start_block_result producer_plugin_impl::start_block() {
 
       // producers need to be able to start producing on schedule, do not apply blocks as it might take a long time to apply
       // unless head not a child of pending lib, as there is no reason ever to produce on a branch that is not a child of pending lib
-      while (in_speculating_mode() || !chain.is_head_descendant_of_pending_lib()) {
+      // also apply when fork_db head is ahead of our applied head on the same chain -- producing on a stale head when the
+      // canonical chain has already moved on just orphans our blocks at the next fork switch (under Savanna fork choice
+      // by latest_qc_block_timestamp, the chain that finalized first wins regardless of who built locally)
+      auto fork_db_ahead_on_same_chain = [&]() {
+         const auto fhead = chain.fork_db_head();
+         return fhead.block_num() > head.block_num() && fhead.extends(head.id());
+      };
+      while (in_speculating_mode() || !chain.is_head_descendant_of_pending_lib() || fork_db_ahead_on_same_chain()) {
          if (is_configured_producer())
             schedule_delayed_production_loop(weak_from_this(), _pending_block_deadline); // interrupt apply_blocks at deadline
 
          auto result = apply_blocks();
-         if (result.status == controller::apply_blocks_result_t::status_t::complete && result.num_blocks_applied == 0)
+         if (result.num_blocks_applied == 0) {
+            // No progress: either nothing to apply (status complete), or apply was interrupted on a block that
+            // cannot complete within deadline (e.g., infinite trx). Exit the loop -- retrying would hit the same
+            // wall, blocking the main thread from servicing net_plugin and fork-choice updates that could deliver
+            // a better head. In producing mode, fall through to produce on the current head (a competing block at
+            // the same height, which fork choice can then prefer over the unapplyable one by timestamp).
+            if (in_speculating_mode() && result.status != controller::apply_blocks_result_t::status_t::complete)
+               return start_block_result::waiting_for_block;
             return start_block_result::succeeded;
+         }
 
          head = chain.head();
          if (head.block_num() == chain.get_pause_at_block_num())
