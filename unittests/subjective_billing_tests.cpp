@@ -368,15 +368,23 @@ BOOST_AUTO_TEST_CASE( subjective_billing_integration_test ) {
    BOOST_TEST(sub_bill.get_subjective_bill(other, b->timestamp).count() > 0);
 
    sub_bill.set_subjective_account_cpu_allowed(fc::microseconds{1000});
-   const size_t num_itrs = 1000;
+   // Push failing transactions until other's subjective bill reaches the threshold.
+   // Check at the top of each iteration so we never push when billing has already
+   // crossed the limit; doing so would throw tx_cpu_usage_exceeded instead of
+   // sysio_assert_message_exception and trip the BOOST_CHECK_THROW below.
+   // update_billed_cpu_time always contributes >= 1 us to other per transaction
+   // (delta_per_action = (remaining / num_actions) + 1, minimum = 1), so the
+   // threshold of 1000 us is reached in at most 1000 iterations; 5000 gives 5x
+   // headroom for any rounding variation across runtimes and sanitizer builds.
+   const size_t num_itrs = 5000;
    size_t i = 0;
    for (; i < num_itrs; ++i) {
-      ptrx = create_trx(0, {1,1,1,0});
-      BOOST_CHECK_THROW(push_trx( ptrx, fc::time_point::maximum(), {}, false ), sysio_assert_message_exception);
       if (sub_bill.get_subjective_bill(other, b->timestamp) >= sub_bill.get_subjective_account_cpu_allowed())
          break;
+      ptrx = create_trx(0, {1,1,1,0});
+      BOOST_CHECK_THROW(push_trx( ptrx, fc::time_point::maximum(), {}, false ), sysio_assert_message_exception);
    }
-   BOOST_REQUIRE(i < num_itrs); // failed to accumulate subjective billing
+   BOOST_REQUIRE_MESSAGE(i < num_itrs, "other's subjective billing failed to reach the threshold");
    ptrx = create_trx(0, {1,1,1,1});
    BOOST_CHECK_EXCEPTION(push_trx( ptrx, fc::time_point::maximum(), {}, false ), tx_cpu_usage_exceeded,
                          fc_exception_message_contains("Authorized account other exceeded subjective CPU limit"));
