@@ -3466,7 +3466,12 @@ struct controller_impl {
    }
 
    bool is_head_descendant_of_pending_lib() const {
-      return fork_db_.is_descendant_of_pending_savanna_lib(chain_head.id());
+      // True if pending_savanna_lib is on the chain from chain_head back to fork_db root: pending_savanna_lib is an
+      // ancestor of chain_head, or is chain_head itself. Answered from the head's finality_core, which tracks the
+      // canonical block_ref at each height across [last_final, head). No fork_db walk or mutex required.
+      const auto [pending_id, pending_timestamp] = fork_db_.pending_savanna_lib();
+      if (chain_head.id() == pending_id) return true;
+      return chain_head.extends(pending_id);
    }
 
    void set_savanna_lib(const block_id_type& id, block_timestamp_type timestamp) {

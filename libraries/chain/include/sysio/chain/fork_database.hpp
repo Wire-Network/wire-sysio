@@ -116,11 +116,6 @@ namespace sysio::chain {
       bool set_pending_savanna_lib( const block_id_type& id, block_timestamp_type timestamp );
 
       /**
-       * @return true if id is built on top of pending savanna lib or id == pending_savanna_lib
-       */
-      bool is_descendant_of_pending_savanna_lib( const block_id_type& id ) const;
-
-      /**
        * @param ancestor the id of a possible ancestor block
        * @param descendant the id of a possible descendant block
        * @return false if either ancestor or descendant not found.

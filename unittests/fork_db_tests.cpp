@@ -326,4 +326,68 @@ BOOST_AUTO_TEST_CASE(locks_out_branch_of_test) try {
 
 } FC_LOG_AND_RETHROW();
 
+// Tests for is_head_descendant_of_pending_lib, exercised via its underlying
+// helper: head.id() == pending_savanna_lib_id || head_bsp->core.extends(pending_savanna_lib_id).
+// `set_pending_savanna_lib` is monotonic in block_num, so each case uses a fresh
+// fixture whose pending_lib begins unset.
+
+namespace {
+   bool extends_or_equal(const block_state_ptr& head_bsp, const block_id_type& pending_lib_id) {
+      if (head_bsp->id() == pending_lib_id) return true;
+      return head_bsp->core.extends(pending_lib_id);
+   }
+
+   void check(fork_database_t& fork_db,
+              const block_state_ptr& pending_lib,
+              const std::vector<block_state_ptr>& heads,
+              const std::vector<block_state_ptr>& expected_true) {
+      fork_db.set_pending_savanna_lib(pending_lib->id(), pending_lib->timestamp());
+      const auto pid = pending_lib->id();
+      std::set<block_id_type> true_set;
+      for (const auto& b : expected_true) true_set.insert(b->id());
+      for (const auto& h : heads) {
+         const bool expected = true_set.count(h->id()) > 0;
+         BOOST_TEST_CONTEXT("pending_lib=#" << pending_lib->block_num() << " " << pending_lib->id().str().substr(8, 8)
+                            << ", head=#" << h->block_num() << " " << h->id().str().substr(8, 8)) {
+            BOOST_TEST(extends_or_equal(h, pid) == expected);
+         }
+      }
+   }
+} // anonymous
+
+BOOST_FIXTURE_TEST_CASE(pending_lib_eq_root, generate_fork_db_state) try {
+   // pending_lib at the genesis root -- every block is a descendant (or root itself)
+   const std::vector<block_state_ptr> heads = {root, bsp11a, bsp12a, bsp13a, bsp11b, bsp12b, bsp13b, bsp14b,
+                                                bsp11c, bsp12c, bsp13c, bsp12bb, bsp13bb, bsp13bbb};
+   check(fork_db, root, heads, heads);
+} FC_LOG_AND_RETHROW();
+
+BOOST_FIXTURE_TEST_CASE(pending_lib_at_fork_point_11a, generate_fork_db_state) try {
+   // pending_lib at bsp11a -- only branch a's blocks (and bsp11a itself) extend it
+   const std::vector<block_state_ptr> heads = {root, bsp11a, bsp12a, bsp13a, bsp11b, bsp12b, bsp13b, bsp14b,
+                                                bsp11c, bsp12c, bsp13c, bsp12bb, bsp13bb, bsp13bbb};
+   check(fork_db, bsp11a, heads, {bsp11a, bsp12a, bsp13a});
+} FC_LOG_AND_RETHROW();
+
+BOOST_FIXTURE_TEST_CASE(pending_lib_on_branch_a, generate_fork_db_state) try {
+   // pending_lib at bsp12a on branch a -- only bsp12a and bsp13a extend it
+   const std::vector<block_state_ptr> heads = {root, bsp11a, bsp12a, bsp13a, bsp11b, bsp12b, bsp13b, bsp14b,
+                                                bsp11c, bsp12c, bsp13c, bsp12bb, bsp13bb, bsp13bbb};
+   check(fork_db, bsp12a, heads, {bsp12a, bsp13a});
+} FC_LOG_AND_RETHROW();
+
+BOOST_FIXTURE_TEST_CASE(pending_lib_on_subbranch_bb, generate_fork_db_state) try {
+   // pending_lib at bsp12bb on the bb sub-branch -- only bsp12bb, bsp13bb, bsp13bbb extend it
+   const std::vector<block_state_ptr> heads = {root, bsp11a, bsp12a, bsp13a, bsp11b, bsp12b, bsp13b, bsp14b,
+                                                bsp11c, bsp12c, bsp13c, bsp12bb, bsp13bb, bsp13bbb};
+   check(fork_db, bsp12bb, heads, {bsp12bb, bsp13bb, bsp13bbb});
+} FC_LOG_AND_RETHROW();
+
+BOOST_FIXTURE_TEST_CASE(pending_lib_at_deepest_14b, generate_fork_db_state) try {
+   // pending_lib at bsp14b -- only bsp14b itself qualifies (nothing descends from it)
+   const std::vector<block_state_ptr> heads = {root, bsp11a, bsp12a, bsp13a, bsp11b, bsp12b, bsp13b, bsp14b,
+                                                bsp11c, bsp12c, bsp13c, bsp12bb, bsp13bb, bsp13bbb};
+   check(fork_db, bsp14b, heads, {bsp14b});
+} FC_LOG_AND_RETHROW();
+
 BOOST_AUTO_TEST_SUITE_END()
