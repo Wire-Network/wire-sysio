@@ -238,7 +238,11 @@ namespace sysio::chain {
             std::optional<block_handle> block;   // empty optional if block is unlinkable
          };
          // thread-safe
-         accepted_block_result accept_block( const block_id_type& id, const signed_block_ptr& b ) const;
+         // received_time, if set, is the wall-clock time the block was first received off the wire; recorded on the
+         // block_state for diagnostic logging. Default-init for callers that aren't network-receiving the block (replay,
+         // tests, locally-produced blocks).
+         accepted_block_result accept_block( const block_id_type& id, const signed_block_ptr& b,
+                                             fc::time_point received_time = fc::time_point() ) const;
 
          /// Apply any blocks that are ready from the fork_db
          struct apply_blocks_result_t {

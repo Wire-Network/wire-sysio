@@ -932,7 +932,7 @@ namespace sysio {
       void handle_message( const block_nack_request_message& msg );
       void handle_message( const sync_request_message& msg );
       void handle_message( const signed_block& msg ) = delete; // signed_block_ptr overload used instead
-      void handle_message( const block_id_type& id, signed_block_ptr ptr );
+      void handle_message( const block_id_type& id, signed_block_ptr ptr, fc::time_point received_time );
       void handle_message( const transaction_message& msg ) = delete; // handled via process_next_trx_message
       void handle_message( const packed_transaction_ptr& trx );
       void handle_message( const vote_message_ptr& msg );
@@ -3222,7 +3222,7 @@ namespace sysio {
       shared_ptr<signed_block> ptr = std::make_shared<signed_block>();
       fc::raw::unpack( ds, *ptr );
 
-      handle_message( blk_id, std::move( ptr ) );
+      handle_message( blk_id, std::move( ptr ), now );
       return true;
    }
 
@@ -4071,10 +4071,10 @@ namespace sysio {
    }
 
    // called from connection strand
-   void connection::handle_message( const block_id_type& id, signed_block_ptr ptr ) {
+   void connection::handle_message( const block_id_type& id, signed_block_ptr ptr, fc::time_point received_time ) {
       // post to dispatcher strand so that we don't have multiple threads validating the block header
       peer_dlog(p2p_blk_log, this, "posting block {} to dispatcher strand", ptr->block_num());
-      boost::asio::dispatch(my_impl->dispatcher.strand, [id, c{shared_from_this()}, ptr{std::move(ptr)}, cid=connection_id]() mutable {
+      boost::asio::dispatch(my_impl->dispatcher.strand, [id, c{shared_from_this()}, ptr{std::move(ptr)}, cid=connection_id, received_time]() mutable {
          if (app().is_quiting()) // large sync span can have many of these queued up, exit quickly
             return;
          controller& cc = my_impl->chain_plug->chain();
@@ -4090,7 +4090,7 @@ namespace sysio {
                           "received a block from the future, rejecting it: {}", id);
             }
             // this will return empty optional<block_handle> if block is not linkable
-            controller::accepted_block_result abh = cc.accept_block( id, ptr );
+            controller::accepted_block_result abh = cc.accept_block( id, ptr, received_time );
             fork_db_add_result = abh.add_result;
             obh = std::move(abh.block);
             unlinkable = fork_db_add_result == fork_db_add_t::failure;
