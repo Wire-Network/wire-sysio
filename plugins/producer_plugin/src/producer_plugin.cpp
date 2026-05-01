@@ -2873,7 +2873,17 @@ void producer_plugin_impl::schedule_delayed_production_loop(const std::weak_ptr<
       _timer.async_wait([this, cid = ++_timer_corelation_id](const boost::system::error_code& ec) {
          if (ec != boost::asio::error::operation_aborted && cid == _timer_corelation_id) {
             interrupt_transaction(controller::interrupt_t::all_trx);
-            app().executor().post(priority::high, exec_queue::read_write, [this]() {
+            // Recheck cid inside the posted lambda: between the timer callback firing and the executor
+            // running this lambda, another schedule_* call may have bumped _timer_corelation_id (e.g.
+            // schedule_maybe_produce_block taking over after process_pending_blocks bails). If we ran
+            // schedule_production_loop unconditionally here, the inner schedule_delayed_production_loop
+            // call would bump cid again and starve the just-scheduled produce_block timer. Mirrors the
+            // pattern schedule_maybe_produce_block uses.
+            app().executor().post(priority::high, exec_queue::read_write, [this, cid]() {
+               if (cid != _timer_corelation_id) {
+                  fc_dlog(_log, "Speculative/Production Change timer expired, skipping");
+                  return;
+               }
                schedule_production_loop();
             });
          }
