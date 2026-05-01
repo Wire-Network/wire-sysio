@@ -126,9 +126,13 @@ BOOST_AUTO_TEST_CASE( double_activation ) try {
 
    c.schedule_protocol_features_wo_preactivation( {*d} );
 
+   // _start_block concatenates the wo-preactivation list onto the preactivated list,
+   // producing a duplicate digest. check_protocol_features now detects the duplicate
+   // earlier (by dedup on its own activation-list scan) rather than at start_block's
+   // preactivation-map check. Both paths reject; this one is just earlier and more specific.
    BOOST_CHECK_EXCEPTION(  c.produce_block();,
-                           block_validate_exception,
-                           fc_exception_message_starts_with( "attempted duplicate activation within a single block:" )
+                           protocol_feature_exception,
+                           fc_exception_message_contains( "appears more than once in the activation list" )
    );
 
    c.protocol_features_to_be_activated_wo_preactivation.clear();
@@ -379,7 +383,7 @@ BOOST_AUTO_TEST_CASE( disallow_empty_producer_schedule_test ) { try {
    c.produce_block();
    BOOST_REQUIRE_EXCEPTION( c.set_producers_legacy( {} ),
                             wasm_execution_error,
-                            fc_exception_message_is( "Producer schedule cannot be empty" ) );
+                            fc_exception_message_contains( "producer schedule must not be empty" ) );
 
    // Setting non empty producer schedule should still be fine
    vector<name> producer_names = {"alice"_n,"bob"_n,"carol"_n};

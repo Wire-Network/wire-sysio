@@ -1,10 +1,21 @@
 #include <boost/test/unit_test.hpp>
 #include <sysio/testing/tester.hpp>
+#include <sysio/chain/snapshot_detail.hpp>
+#include <sysio/chain/block_handle.hpp>
+#include <sysio/chain/genesis_state.hpp>
 #include <test_contracts.hpp>
 
 using namespace sysio;
 using namespace testing;
 using namespace chain;
+
+// Accessor reaches into block_handle's private internal() for tests that need
+// the underlying block_state_ptr. block_handle declares friend block_handle_accessor.
+namespace sysio::chain {
+   struct block_handle_accessor {
+      static const block_state_ptr& get_bsp(const block_handle& h) { return h.internal(); }
+   };
+}
 
 BOOST_AUTO_TEST_SUITE(block_tests)
 
@@ -424,5 +435,42 @@ BOOST_FIXTURE_TEST_CASE( no_block_extensions_allowed_test, validating_tester ) {
                                      e.to_detail_string().find("No block extensions currently supported") != std::string::npos;
                            });
 }
+
+// Regression test for the snapshot hardening invariant added in block_state(snapshot).
+// For any non-genesis block_state, core.latest_qc_claim() must equal header.qc_claim
+// (finality_core::next sets latest_qc_claim from the header's claim). A snapshot with
+// the two disagreeing would break verify_basic_proper_block_invariants' assumption
+// that the core is the authoritative QC-claim reference. Snapshot loading must reject.
+BOOST_AUTO_TEST_CASE(snapshot_core_header_qc_claim_mismatch_rejected) try {
+   savanna_tester chain;
+   chain.produce_blocks(4); // past genesis
+
+   const auto& live_bsp = block_handle_accessor::get_bsp(chain.control->head());
+   BOOST_REQUIRE(!live_bsp->core.is_genesis_core());
+   BOOST_REQUIRE(live_bsp->core.latest_qc_claim() == live_bsp->header.qc_claim); // sanity
+
+   // Build a snapshot_block_state_v1 from the live one, then tamper header.qc_claim
+   // to something provably different (block_num far in the past, weak). Must NOT
+   // match core.latest_qc_claim(), which for a running chain reflects a recent block.
+   snapshot_detail::snapshot_block_state_v1 sbs{*live_bsp};
+   sbs.header.qc_claim = qc_claim_t{0, false};
+   BOOST_REQUIRE(sbs.core.latest_qc_claim() != sbs.header.qc_claim); // confirm setup
+
+   BOOST_CHECK_EXCEPTION(block_state{std::move(sbs)}, snapshot_exception,
+      fc_exception_message_contains("core.latest_qc_claim"));
+} FC_LOG_AND_RETHROW()
+
+// Genesis is intentionally exempt: core is constructed with latest_qc_claim={1,false}
+// while header.qc_claim={0,false} (see create_genesis_block). Confirm a genesis-core
+// snapshot loads cleanly despite the qc_claim disagreement.
+BOOST_AUTO_TEST_CASE(snapshot_genesis_core_header_mismatch_allowed) try {
+   genesis_state gs;
+   auto genesis_bsp = block_state::create_genesis_block(gs);
+   BOOST_REQUIRE(genesis_bsp->core.is_genesis_core());
+   BOOST_REQUIRE(genesis_bsp->core.latest_qc_claim() != genesis_bsp->header.qc_claim); // confirmed design
+
+   snapshot_detail::snapshot_block_state_v1 sbs{*genesis_bsp};
+   BOOST_CHECK_NO_THROW(block_state{std::move(sbs)});
+} FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_SUITE_END()

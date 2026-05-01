@@ -1,9 +1,11 @@
 #pragma once
 
 #include <sysio/chain/types.hpp>
+#include <sysio/chain/config.hpp>
 #include <sysio/chain/exceptions.hpp>
 #include <sysio/chain/finalizer_authority.hpp>
 #include <fc/container/ordered_diff.hpp>
+#include <boost/container/flat_set.hpp>
 
 namespace sysio::chain {
 
@@ -41,28 +43,41 @@ namespace sysio::chain {
          return result;
       }
 
-      // Validate threshold > 0 and threshold <= sum(weights). Throws snapshot_exception on violation.
-      void validate_snapshot() const {
-         SYS_ASSERT(threshold > 0, snapshot_exception,
-                    "finalizer_policy generation {}: threshold must be positive", generation);
-         SYS_ASSERT(!finalizers.empty(), snapshot_exception,
+      // Validates structural well-formedness of the policy. Single source of truth
+      // reused by the set_finalizers host function and snapshot loading; each caller
+      // wraps the thrown invalid_finalizer_policy_exception with its own context.
+      // Throws invalid_finalizer_policy_exception on violation.
+      void validate() const {
+         SYS_ASSERT(!finalizers.empty(), invalid_finalizer_policy_exception,
                     "finalizer_policy generation {}: finalizers must not be empty", generation);
+         SYS_ASSERT(finalizers.size() <= config::max_finalizers, invalid_finalizer_policy_exception,
+                    "finalizer_policy generation {}: finalizer count ({}) exceeds max ({})",
+                    generation, finalizers.size(), config::max_finalizers);
+         boost::container::flat_set<fc::crypto::bls::public_key> unique_keys;
+         unique_keys.reserve(finalizers.size());
          uint64_t sum = 0;
          for (const auto& f : finalizers) {
-            SYS_ASSERT(f.weight > 0, snapshot_exception,
+            SYS_ASSERT(f.description.size() <= config::max_finalizer_description_size, invalid_finalizer_policy_exception,
+                       "finalizer_policy generation {}: description size ({}) exceeds max ({})",
+                       generation, f.description.size(), config::max_finalizer_description_size);
+            SYS_ASSERT(f.weight > 0, invalid_finalizer_policy_exception,
                        "finalizer_policy generation {}: finalizer weight must be positive", generation);
-            SYS_ASSERT(sum <= std::numeric_limits<uint64_t>::max() - f.weight, snapshot_exception,
+            SYS_ASSERT(sum <= std::numeric_limits<uint64_t>::max() - f.weight, invalid_finalizer_policy_exception,
                        "finalizer_policy generation {}: sum of weights overflows uint64_t", generation);
             sum += f.weight;
+            SYS_ASSERT(unique_keys.insert(f.public_key).second, invalid_finalizer_policy_exception,
+                       "finalizer_policy generation {}: duplicate public_key", generation);
          }
-         SYS_ASSERT(threshold <= sum, snapshot_exception,
-                    "finalizer_policy generation {}: sum of weights ({}) didn't meet the required threshold ({})",
-                    generation, sum, threshold);
+         // BFT safety bound: threshold strictly greater than half the sum of weights.
+         // Expressed as threshold > sum/2 (rather than 2*threshold > sum) to avoid overflow.
+         SYS_ASSERT(threshold > sum / 2 && threshold <= sum, invalid_finalizer_policy_exception,
+                    "finalizer_policy generation {}: threshold ({}) must be > sum/2 ({}) and <= sum ({})",
+                    generation, threshold, sum / 2, sum);
       }
 
       // max accumulated weak weight before becoming weak_final
       uint64_t max_weak_sum_before_weak_final() const {
-         uint64_t sum = std::accumulate( finalizers.begin(), finalizers.end(), 0,
+         uint64_t sum = std::accumulate( finalizers.begin(), finalizers.end(), uint64_t{0},
             [](uint64_t acc, const finalizer_authority& f) {
                return acc + f.weight;
             }

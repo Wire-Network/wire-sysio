@@ -184,29 +184,84 @@ block_state::block_state(snapshot_detail::snapshot_block_state_v1&& sbs)
          .last_pending_finalizer_policy_digest = sbs.last_pending_finalizer_policy_digest,
          .last_pending_finalizer_policy_start_timestamp = sbs.last_pending_finalizer_policy_start_timestamp
       }
-   , strong_digest(compute_finality_digest())
-   , weak_digest(create_weak_digest(strong_digest))
-   , aggregating_qc(active_finalizer_policy,
-                    pending_finalizer_policy ? pending_finalizer_policy->second : finalizer_policy_ptr{}) // just in case we receive votes
+   // strong_digest / weak_digest / aggregating_qc are value-initialized here and
+   // assigned their real values in the body after null-guards. compute_finality_digest()
+   // and aggregating_qc_sig_t's ctor both dereference active_finalizer_policy; a
+   // tampered snapshot with null pointers would crash inside the member init list
+   // before we could SYS_ASSERT on them. Explicit {} forces value-init (matters for
+   // weak_digest_t = std::array<uint8_t,N>, whose default-init leaves bytes
+   // indeterminate).
+   , strong_digest{}
+   , weak_digest{}
+   , aggregating_qc{}
    , valid(std::move(sbs.valid))
 {
+   // fc::raw::unpack<shared_ptr<T>> permits null via a leading bool; a tampered
+   // snapshot can plant nulls in any of these slots. Null-check BEFORE any code
+   // dereferences them (compute_finality_digest / aggregating_qc construction /
+   // policy validate() calls all require non-null pointers).
+   SYS_ASSERT(active_finalizer_policy, snapshot_exception, "active_finalizer_policy must not be null");
+   SYS_ASSERT(active_proposer_policy, snapshot_exception, "active_proposer_policy must not be null");
+   if (pending_finalizer_policy) {
+      SYS_ASSERT(pending_finalizer_policy->second, snapshot_exception,
+                 "pending_finalizer_policy must not contain a null policy");
+   }
+   for (const auto& [_, pol] : proposed_finalizer_policies) {
+      SYS_ASSERT(pol, snapshot_exception, "proposed_finalizer_policies entry must not be null");
+   }
+
+   // Now safe to compute state that depends on active_finalizer_policy.
+   strong_digest  = compute_finality_digest();
+   weak_digest    = create_weak_digest(strong_digest);
+   aggregating_qc = aggregating_qc_t{
+      active_finalizer_policy,
+      pending_finalizer_policy ? pending_finalizer_policy->second : finalizer_policy_ptr{}
+   };
+
    header_exts = header.validate_and_extract_header_extensions();
 
    // Snapshot hardening: validate finality_core invariants
    core.validate_snapshot();
 
-   // Snapshot hardening: validate finalizer policies
-   SYS_ASSERT(active_finalizer_policy, snapshot_exception, "active_finalizer_policy must not be null");
-   SYS_ASSERT(active_proposer_policy, snapshot_exception, "active_proposer_policy must not be null");
-   active_finalizer_policy->validate_snapshot();
+   // core.latest_qc_claim() is the authoritative reference for downstream QC-claim checks
+   // (see verify_basic_proper_block_invariants). For every non-genesis block it equals
+   // header.qc_claim by construction (finality_core::next sets latest_qc_claim from the
+   // header's claim). Genesis intentionally differs: core is {1, false}, header is {0, false}.
+   SYS_ASSERT(core.is_genesis_core() || core.latest_qc_claim() == header.qc_claim, snapshot_exception,
+              "snapshot block_state core.latest_qc_claim {} does not match header.qc_claim {}",
+              core.latest_qc_claim(), header.qc_claim);
+
+   // Snapshot hardening: validate finalizer and proposer policies.
+   // Uses the shared validate() methods (same checks the set_finalizers /
+   // set_proposed_producers intrinsics enforce); rewraps as snapshot_exception.
+   auto validate_fin_pol = [](const finalizer_policy& p, const char* which) {
+      try { p.validate(); }
+      catch (const invalid_finalizer_policy_exception& e) {
+         SYS_THROW(snapshot_exception, "snapshot: {} finalizer policy invalid: {}", which, e.top_message());
+      }
+   };
+   auto validate_prop_pol = [](const proposer_policy& p, const char* which) {
+      try { p.validate(); }
+      catch (const producer_schedule_exception& e) {
+         SYS_THROW(snapshot_exception, "snapshot: {} proposer policy invalid: {}", which, e.top_message());
+      }
+   };
+   validate_fin_pol(*active_finalizer_policy, "active");
    if (pending_finalizer_policy) {
-      pending_finalizer_policy->second->validate_snapshot();
+      validate_fin_pol(*pending_finalizer_policy->second, "pending");
    }
    for (const auto& [_, pol] : proposed_finalizer_policies) {
-      pol->validate_snapshot();
+      validate_fin_pol(*pol, "proposed");
    }
    if (latest_qc_claim_block_active_finalizer_policy) {
-      latest_qc_claim_block_active_finalizer_policy->validate_snapshot();
+      validate_fin_pol(*latest_qc_claim_block_active_finalizer_policy, "latest_qc_claim_block_active");
+   }
+   validate_prop_pol(*active_proposer_policy, "active");
+   if (latest_proposed_proposer_policy) {
+      validate_prop_pol(*latest_proposed_proposer_policy, "latest_proposed");
+   }
+   if (latest_pending_proposer_policy) {
+      validate_prop_pol(*latest_pending_proposer_policy, "latest_pending");
    }
 
    // Snapshot hardening: validate valid_t
@@ -302,6 +357,12 @@ valid_t block_state::new_valid(const block_header_state& next_bhs, const digest_
 
 digest_type block_state::get_validation_mroot(block_num_type target_block_num) const {
    if (!valid) {
+      // The only legitimate case where a block_state has no valid structure is
+      // the Savanna genesis core (created without a finality tree). Any other
+      // null-valid is a construction or serialization bug; catching it here
+      // produces a clearer failure than the downstream finality_mroot mismatch
+      // apply_block would report.
+      assert(core.is_genesis_core());
       return digest_type{};
    }
 
