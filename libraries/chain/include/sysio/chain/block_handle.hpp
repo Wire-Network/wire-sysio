@@ -38,6 +38,12 @@ public:
    void write(const std::filesystem::path& state_file);
    bool read(const std::filesystem::path& state_file);
 
+   // Returns true if `id` is in this block's ancestry (or is this block
+   // itself within the finality_core's tracking range).
+   bool extends(const block_id_type& id) const {
+      return _bsp && _bsp->core.extends(id);
+   }
+
    // Returns true if this block carries a strong QC for a block that is not
    // in `head_handle`'s ancestry.
    //
