@@ -326,4 +326,58 @@ BOOST_AUTO_TEST_CASE(locks_out_branch_of_test) try {
 
 } FC_LOG_AND_RETHROW();
 
+// Tests that locks_out_branch_of returns false when the QC target is in head's ancestry but is older than head's
+// last_final_block_num, and therefore outside head's finality_core tracking range. Branches share an intermediate
+// ancestor (not genesis), and head's branch's lib has advanced past that ancestor via a chain of strong QCs.
+//
+// This input is not reachable from the on_incoming_block call site: fork_db_head selects the block with the newest
+// QC, so a block carrying an older QC than head's would lose fork-choice and never be passed as `this`. The test
+// pins the helper's documented contract directly so future callers passing non-best heads (debugging tools,
+// snapshot replay, etc.) are not surprised.
+BOOST_AUTO_TEST_CASE(locks_out_branch_of_lib_advanced_past_shared_ancestor) try {
+   nonce = 0;
+
+   auto make_block_with_qc = [](block_num_type block_num, const block_state_ptr& prev,
+                                const qc_claim_t& qc) {
+      auto bsp = test_block_state_accessor::make_unique_block_state(block_num, prev);
+      bsp->core = prev->core.next(prev->make_block_ref(), qc);
+      return bsp;
+   };
+
+   //                root (block 10)
+   //                  |
+   //               bsp11_shared (block 11)         <-- shared ancestor; will be qc_target
+   //               /            \
+   //           bsp12a            bsp12b  (carries strong QC for 11)
+   //             |                  |
+   //        bsp13a_shared         bsp13b  (carries strong QC for 12, lib advances to 11)
+   //        (carries strong         |
+   //         QC for 11)           bsp14b  (carries strong QC for 13, lib advances to 12)
+   //                                       <-- head; last_final is 12 > 11
+   block_state_ptr root          = test_block_state_accessor::make_genesis_block_state();
+   block_state_ptr bsp11_shared  = test_block_state_accessor::make_unique_block_state(11, root);
+
+   // Branch A: 12a, then 13a carrying a strong QC for the shared ancestor.
+   block_state_ptr bsp12a        = test_block_state_accessor::make_unique_block_state(12, bsp11_shared);
+   block_state_ptr bsp13a_shared = make_block_with_qc(13, bsp12a, {.block_num = 11, .is_strong_qc = true});
+
+   // Branch B: chain of strong QCs that advances lib past the shared ancestor.
+   block_state_ptr bsp12b = make_block_with_qc(12, bsp11_shared, {.block_num = 11, .is_strong_qc = true});
+   block_state_ptr bsp13b = make_block_with_qc(13, bsp12b,       {.block_num = 12, .is_strong_qc = true});
+   block_state_ptr bsp14b = make_block_with_qc(14, bsp13b,       {.block_num = 13, .is_strong_qc = true});
+
+   // Sanity-check the construction: head's lib is past the shared ancestor.
+   BOOST_REQUIRE_EQUAL(bsp14b->core.last_final_block_num(), 12u);
+   BOOST_REQUIRE_LT(bsp11_shared->block_num(), bsp14b->core.last_final_block_num());
+
+   // bsp14b extends bsp11_shared (B's chain is root -> bsp11_shared -> bsp12b -> bsp13b -> bsp14b),
+   // but `bsp14b->core.extends(bsp11_shared->id())` returns false because bsp11_shared is below
+   // bsp14b's tracking window. The helper must compensate so that head is correctly recognized as
+   // sharing the QC's anchor and therefore not locked out.
+   block_handle h13a_shared{bsp13a_shared};
+   block_handle h14b{bsp14b};
+   BOOST_TEST(!h13a_shared.locks_out_branch_of(h14b));
+
+} FC_LOG_AND_RETHROW();
+
 BOOST_AUTO_TEST_SUITE_END()
