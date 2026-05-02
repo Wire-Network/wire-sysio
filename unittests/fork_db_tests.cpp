@@ -393,35 +393,35 @@ namespace {
 BOOST_FIXTURE_TEST_CASE(pending_lib_eq_root, generate_fork_db_state) try {
    // pending_lib at the genesis root -- every block is a descendant (or root itself)
    const std::vector<block_state_ptr> heads = {root, bsp11a, bsp12a, bsp13a, bsp11b, bsp12b, bsp13b, bsp14b,
-                                                bsp11c, bsp12c, bsp13c, bsp12bb, bsp13bb, bsp13bbb};
+                                                bsp11c, bsp12c, bsp13c, bsp12bb, bsp13bb, bsp13bbb, bsp12bbb};
    check(fork_db, root, heads, heads);
 } FC_LOG_AND_RETHROW();
 
 BOOST_FIXTURE_TEST_CASE(pending_lib_at_fork_point_11a, generate_fork_db_state) try {
    // pending_lib at bsp11a -- only branch a's blocks (and bsp11a itself) extend it
    const std::vector<block_state_ptr> heads = {root, bsp11a, bsp12a, bsp13a, bsp11b, bsp12b, bsp13b, bsp14b,
-                                                bsp11c, bsp12c, bsp13c, bsp12bb, bsp13bb, bsp13bbb};
+                                                bsp11c, bsp12c, bsp13c, bsp12bb, bsp13bb, bsp13bbb, bsp12bbb};
    check(fork_db, bsp11a, heads, {bsp11a, bsp12a, bsp13a});
 } FC_LOG_AND_RETHROW();
 
 BOOST_FIXTURE_TEST_CASE(pending_lib_on_branch_a, generate_fork_db_state) try {
    // pending_lib at bsp12a on branch a -- only bsp12a and bsp13a extend it
    const std::vector<block_state_ptr> heads = {root, bsp11a, bsp12a, bsp13a, bsp11b, bsp12b, bsp13b, bsp14b,
-                                                bsp11c, bsp12c, bsp13c, bsp12bb, bsp13bb, bsp13bbb};
+                                                bsp11c, bsp12c, bsp13c, bsp12bb, bsp13bb, bsp13bbb, bsp12bbb};
    check(fork_db, bsp12a, heads, {bsp12a, bsp13a});
 } FC_LOG_AND_RETHROW();
 
 BOOST_FIXTURE_TEST_CASE(pending_lib_on_subbranch_bb, generate_fork_db_state) try {
    // pending_lib at bsp12bb on the bb sub-branch -- only bsp12bb, bsp13bb, bsp13bbb extend it
    const std::vector<block_state_ptr> heads = {root, bsp11a, bsp12a, bsp13a, bsp11b, bsp12b, bsp13b, bsp14b,
-                                                bsp11c, bsp12c, bsp13c, bsp12bb, bsp13bb, bsp13bbb};
+                                                bsp11c, bsp12c, bsp13c, bsp12bb, bsp13bb, bsp13bbb, bsp12bbb};
    check(fork_db, bsp12bb, heads, {bsp12bb, bsp13bb, bsp13bbb});
 } FC_LOG_AND_RETHROW();
 
 BOOST_FIXTURE_TEST_CASE(pending_lib_at_deepest_14b, generate_fork_db_state) try {
    // pending_lib at bsp14b -- only bsp14b itself qualifies (nothing descends from it)
    const std::vector<block_state_ptr> heads = {root, bsp11a, bsp12a, bsp13a, bsp11b, bsp12b, bsp13b, bsp14b,
-                                                bsp11c, bsp12c, bsp13c, bsp12bb, bsp13bb, bsp13bbb};
+                                                bsp11c, bsp12c, bsp13c, bsp12bb, bsp13bb, bsp13bbb, bsp12bbb};
    check(fork_db, bsp14b, heads, {bsp14b});
 } FC_LOG_AND_RETHROW();
 
