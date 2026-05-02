@@ -413,4 +413,35 @@ BOOST_FIXTURE_TEST_CASE(pending_lib_at_deepest_14b, generate_fork_db_state) try 
    check(fork_db, bsp14b, heads, {bsp14b});
 } FC_LOG_AND_RETHROW();
 
+// Direct controller-level test of is_head_descendant_of_pending_lib. The pending_lib_* fixture tests above verify
+// the underlying logic via a local mirror; this one exercises the actual method on a real controller to catch
+// wiring bugs (wrong destructured field, swapped comparison, wrong fork_db accessor) that the mirror cannot.
+BOOST_AUTO_TEST_CASE(controller_is_head_descendant_of_pending_lib_test) try {
+   nonce = 0;
+   // setup_policy::none keeps the test light and avoids contract setup; QCs do not form here so pending_lib does not
+   // advance on its own. We drive it manually via set_savanna_lib to exercise each branch of the controller method.
+   sysio::testing::tester c{sysio::testing::setup_policy::none};
+   c.produce_blocks(2);
+
+   auto& chain = *c.control;
+   const auto first_head = chain.head();
+
+   // Equality branch: pending_lib == head; chain_head.id() == pending_id returns true.
+   chain.set_savanna_lib(first_head.id(), first_head.timestamp());
+   BOOST_TEST(chain.is_head_descendant_of_pending_lib());
+
+   // Ancestry branch: produce more blocks so chain_head moves past the pending_lib we set; chain_head.extends
+   // (pending_id) returns true.
+   c.produce_blocks(2);
+   BOOST_REQUIRE_GT(chain.head().block_num(), first_head.block_num());
+   BOOST_TEST(chain.is_head_descendant_of_pending_lib());
+
+   // Negative case: set pending_lib to a fabricated id at block_num > head (only direction set_savanna_lib accepts;
+   // it is monotonic in block_num). chain_head can neither equal nor extend an id past itself.
+   const auto cur_head = chain.head();
+   block_id_type fake_id = make_block_id(cur_head.block_num() + 1);
+   chain.set_savanna_lib(fake_id, cur_head.timestamp());
+   BOOST_TEST(!chain.is_head_descendant_of_pending_lib());
+} FC_LOG_AND_RETHROW();
+
 BOOST_AUTO_TEST_SUITE_END()
