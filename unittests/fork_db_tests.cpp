@@ -251,6 +251,29 @@ BOOST_FIXTURE_TEST_CASE(is_child_of, generate_fork_db_state) try {
 
 } FC_LOG_AND_RETHROW();
 
+// Direct test of block_handle::extends. The helper is a thin wrapper over finality_core::extends with a null-bsp
+// guard; it is indirectly exercised by is_head_descendant_of_pending_lib but not pinned by its own test. This pins
+// the wrapper's contract so a future change (e.g., dropping the null guard) does not slip past the integration tests.
+BOOST_FIXTURE_TEST_CASE(block_handle_extends_test, generate_fork_db_state) try {
+   block_handle h_bsp13a{bsp13a};
+
+   // Self -> false. finality_core::extends requires block_num < current_block_num, so a block does not extend itself.
+   BOOST_TEST(!h_bsp13a.extends(bsp13a->id()));
+
+   // Strict ancestors on the same branch -> true.
+   BOOST_TEST(h_bsp13a.extends(bsp12a->id()));
+   BOOST_TEST(h_bsp13a.extends(bsp11a->id()));
+   BOOST_TEST(h_bsp13a.extends(root->id()));
+
+   // Sibling branches -> false (block_num is in tracking range but block_id differs).
+   BOOST_TEST(!h_bsp13a.extends(bsp11b->id()));
+   BOOST_TEST(!h_bsp13a.extends(bsp12b->id()));
+
+   // Default-constructed (null _bsp) -> false. Without the null guard this would crash.
+   BOOST_TEST(!block_handle{}.extends(root->id()));
+
+} FC_LOG_AND_RETHROW();
+
 // Tests for block_handle::locks_out_branch_of()
 // ----------------------------------------------
 // Build two branches of equal length sharing a common root, attach blocks with
