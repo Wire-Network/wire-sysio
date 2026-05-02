@@ -347,6 +347,18 @@ BOOST_AUTO_TEST_CASE(locks_out_branch_of_test) try {
    BOOST_TEST(!h13a_weak.locks_out_branch_of(h12b));
    BOOST_TEST(!h13a_weak.locks_out_branch_of(h11b));
 
+   // Head higher than `this`, on the same branch (head extends this) -> not locked out. The first extends check
+   // (_bsp->core.extends(head_id)) returns false because head_id is past this->current_block_num, but the qc_target
+   // check then catches that head extends qc_target.
+   block_state_ptr bsp14a_on_strong = test_block_state_accessor::make_unique_block_state(14, bsp13a_strong);
+   block_handle h14a_on_strong{bsp14a_on_strong};
+   BOOST_TEST(!h13a_strong.locks_out_branch_of(h14a_on_strong));
+
+   // Head higher than `this`, on a different branch -> still locked out (head doesn't extend qc_target).
+   block_state_ptr bsp14b_on_strong = test_block_state_accessor::make_unique_block_state(14, bsp13b_strong);
+   block_handle h14b_on_strong{bsp14b_on_strong};
+   BOOST_TEST(h13a_strong.locks_out_branch_of(h14b_on_strong));
+
 } FC_LOG_AND_RETHROW();
 
 // Tests for is_head_descendant_of_pending_lib, exercised via its underlying
