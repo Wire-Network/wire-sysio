@@ -44,25 +44,15 @@ public:
       return _bsp && _bsp->core.extends(id);
    }
 
-   // Returns true if this block carries a strong QC for a block that is not
-   // in `head_handle`'s ancestry.
+   // Returns true iff this block carries a strong QC whose target is not in `head_handle`'s ancestry. Under Savanna's
+   // strong-vote locking, finalizers locked on the QC target cannot later vote on any branch that does not extend it,
+   // so a head whose branch does not include the QC target can never be covered by a future QC; it is permanently
+   // locked out of fork-choice.
    //
-   // Under Savanna a strong QC for some block B implies that at least 2/3 of
-   // finalizer weight voted strong on B. The safety rule for strong votes
-   // locks those finalizers on B, so they cannot subsequently vote in a way
-   // that would let any branch not extending B form its own QC. Therefore if
-   // `head_handle` is on a branch that does not include the QC target, no
-   // block built on `head_handle` can ever be covered by a future QC, and
-   // `head_handle`'s branch cannot win fork-choice -- it is permanently
-   // locked out.
+   // Returns false when no strong QC is present, when head extends this block, or when head extends the QC target.
+   // Designed for `this == fork_db_head()` (the block with the newest QC); other callers are handled correctly too.
    //
-   // Returns false when no strong QC is present.
-   //
-   // Thread-safety: safe to call concurrently with block production / apply.
-   // `block_state_ptr` is a shared_ptr (its copy is atomic) and the
-   // `finality_core` it references is immutable after construction. The
-   // accessors used (`latest_qc_claim`, `get_block_reference`, `extends`)
-   // are const reads against that immutable state.
+   // Thread-safe: `finality_core` is immutable after block_state construction.
    bool locks_out_branch_of(const block_handle& head_handle) const {
       if (!_bsp || !head_handle._bsp)
          return false;
@@ -74,21 +64,19 @@ public:
       const auto& this_id = _bsp->id();
       const auto& head_id = head_handle._bsp->id();
 
-      // If head is on this block's branch (head is this block, or this block extends head),
-      // they share the QC's chain -- head's branch can produce blocks that include the QC
-      // target as an ancestor. Not locked out.
+      // Head is on this block's branch (head == this, or this extends head); they share the QC's chain.
       if (head_id == this_id || _bsp->core.extends(head_id))
          return false;
 
-      // If the QC target is in head's ancestry (or is head itself), head's branch already
-      // includes the block the QC was formed for. Not locked out.
+      // QC target is in head's ancestry; head's branch shares the QC's anchor. The block_num check covers qc_target
+      // older than head's last_final (outside head's tracking window): finalization past qc_target is only possible
+      // when qc_target is on head's branch.
       const auto& qc_target_id = _bsp->core.get_block_reference(qc.block_num).block_id;
-      if (head_id == qc_target_id || head_handle._bsp->core.extends(qc_target_id))
+      if (head_id == qc_target_id || head_handle._bsp->core.extends(qc_target_id) ||
+          qc.block_num < head_handle._bsp->core.last_final_block_num())
          return false;
 
-      // Otherwise head's branch and the QC target are on incompatible branches: any block
-      // built on head conflicts with the QC target, and no QC can ever be formed on head's
-      // branch. Locked out.
+      // Head's branch and the QC target are incompatible; locked out.
       return true;
    }
 };
