@@ -2889,8 +2889,8 @@ void producer_plugin_impl::schedule_delayed_production_loop(const std::weak_ptr<
          if (ec != boost::asio::error::operation_aborted && cid == _timer_corelation_id) {
             interrupt_transaction(controller::interrupt_t::all_trx);
             // Recheck cid inside the posted lambda: between the timer callback firing and the executor
-            // running this lambda, another schedule_* call may have bumped _timer_corelation_id (e.g.
-            // schedule_maybe_produce_block taking over after process_pending_blocks bails). If we ran
+            // running this lambda, another schedule_* call may have bumped _timer_corelation_id (typically
+            // the schedule_maybe_produce_block invoked after the next start_block). If we ran
             // schedule_production_loop unconditionally here, the inner schedule_delayed_production_loop
             // call would bump cid again and starve the just-scheduled produce_block timer. Mirrors the
             // pattern schedule_maybe_produce_block uses.
