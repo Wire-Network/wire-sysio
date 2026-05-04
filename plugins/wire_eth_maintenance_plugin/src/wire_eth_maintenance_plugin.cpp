@@ -386,18 +386,37 @@ void wire_eth_maintenance_plugin::plugin_initialize(const variables_map& options
    auto [ opp_contract, eth_client ] = my->get_contract<OPP>(oec_plugin);
    if( opp_contract ) {
       ilog("initializing beacon chain finalize epoch interval");
+      auto& cron_svc = app().get_plugin<sysio::cron_plugin>().cron_service();
+      auto safely_confirm = [&](const auto& method, const auto& tx_hash) {
+         auto bn = eth_client->get_block_for_transaction(tx_hash);
+         if (bn) {
+            ilog("tx for {} ({}) in block number {}", method, tx_hash, *bn);
+            return;
+         }
+         auto bn_retry = cron_svc.blocking_retry(make_tx_confirm_retry_opts(),
+            [&]() { return eth_client->get_block_for_transaction(tx_hash); });
+         if (bn_retry.has_value())
+            ilog("tx for {} ({}) in block number {}", method, tx_hash, *bn_retry);
+         else
+            elog("failed to identify block for tx {}: {}", tx_hash, bn_retry.error().what());
+      };
 
       auto& finalize_epoch_interval = options.at(beacon_chain_finalize_epoch_interval).as<std::string>();
       auto& actions = my->find_interval_actions(finalize_epoch_interval);
-      auto action = [&my_ = *my, opp_contract, eth_client]() {
+      auto action = [&my_ = *my, opp_contract, eth_client, safely_confirm=std::move(safely_confirm)]() {
          ilog("finalizing OPP epoch");
          const auto bn = eth_client->get_block_number();
          ilog("Executing beacon chain update for interval bn {}", static_cast<uint64_t>(bn));
+         const auto method ="";
          try {
-            ilog("Sending finalizeEpoch transaction to OPP contract using address {}",
-                 fc::to_hex(eth_client->get_address(), true));
+            ilog("Sending {} transaction to OPP contract using address {}",
+                 method, fc::to_hex(eth_client->get_address(), true));
             auto res = opp_contract->finalizeEpoch();
-            ilog("finalizeEpoch tx sent, hash: {}", res.as_string());
+            auto hash = res.as_string();
+            if (!hash.empty()) {
+               ilog("{} tx sent, hash: {}", method, hash);
+               safely_confirm(method, hash);
+            }
          }
          catch (const std::exception& e) {
             elog("Error executing beacon chain update for interval: {}", e.what());
@@ -476,9 +495,6 @@ void wire_eth_maintenance_plugin::plugin_initialize(const variables_map& options
 void wire_eth_maintenance_plugin::plugin_startup() {
    ilog("Starting beacon chain update plugin");
    auto& cron = app().get_plugin<sysio::cron_plugin>();
-   SYS_ASSERT(cron.cron_service().num_threads() > 1, sysio::chain::plugin_config_exception,
-              "wire_eth_maintenance_plugin uses cron_service::blocking_retry for tx confirmation;"
-              " --cron-threads must be >= 2");
    auto& oec_plugin = app().get_plugin<outpost_ethereum_client_plugin>();
    const auto clients = oec_plugin.get_clients();
    SYS_ASSERT(clients.size() > 0, sysio::chain::plugin_config_exception,

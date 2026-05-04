@@ -258,9 +258,6 @@ public:
 
    bool is_running() const;
 
-   /// Number of worker threads this service was configured with.
-   std::size_t num_threads() const { return _options.num_threads; }
-
    bool start();
 
    void stop();
