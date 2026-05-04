@@ -106,7 +106,7 @@ public:
 
    struct options {
       std::string name{"cron_service"};
-      std::size_t num_threads{2};
+      std::size_t num_threads{1};
       bool autostart{true};
    };
 
