@@ -319,6 +319,8 @@ namespace sysio::chain {
          trace->action_traces[idx].net_usage = packed_trx.get_action_billable_size(idx);
       };
 
+      trace->action_traces.reserve(trx.context_free_actions.size() + trx.actions.size());
+
       for (int oc_retry = 0; oc_retry < 2; ++oc_retry) { // interrupt_oc_exception can only happen once
          try {
             size_t idx = 0;

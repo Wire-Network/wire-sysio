@@ -35,6 +35,16 @@
             ]
         },
         {
+            "name": "links_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "key",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "links_s",
             "base": "",
             "fields": [
@@ -74,17 +84,31 @@
             "name": "links",
             "type": "links_s",
             "index_type": "i64",
-            "key_names": ["scope","primary_key"],
-            "key_types": ["name","uint64"],
-            "table_id": 27043
-        },
-        {
-            "name": "links_s",
-            "type": "links_s",
-            "index_type": "i64",
-            "key_names": [],
-            "key_types": [],
-            "table_id": 45862
+            "key_names": ["key"],
+            "key_types": ["uint64"],
+            "table_id": 27043,
+            "secondary_indexes": [
+                {
+                    "name": "bynamechain",
+                    "key_type": "uint128",
+                    "table_id": 52000
+                },
+                {
+                    "name": "byname",
+                    "key_type": "uint64",
+                    "table_id": 41817
+                },
+                {
+                    "name": "bypubkey",
+                    "key_type": "checksum256",
+                    "table_id": 14415
+                },
+                {
+                    "name": "bychain",
+                    "key_type": "uint64",
+                    "table_id": 39647
+                }
+            ]
         }
     ],
     "ricardian_clauses": [],

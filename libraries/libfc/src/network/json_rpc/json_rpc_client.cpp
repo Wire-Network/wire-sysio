@@ -242,6 +242,85 @@ variant json_rpc_client::send_json(const variant& payload, bool expect_json_body
    return j;
 }
 
+// -----------------------------------------------------------------------
+//  send_http — raw HTTP with configurable verb, path, and body.
+//  Reuses the same Boost.Beast transport as send_json but does not
+//  wrap in JSON-RPC envelope or validate JSON-RPC response structure.
+// -----------------------------------------------------------------------
+
+namespace {
+   http::verb to_beast_verb(http_verb v) {
+      switch (v) {
+         case http_verb::GET:     return http::verb::get;
+         case http_verb::PUT:     return http::verb::put;
+         case http_verb::POST:    return http::verb::post;
+         case http_verb::DELETE_: return http::verb::delete_;
+      }
+      FC_THROW("Unknown http_verb value: {}", static_cast<int>(v));
+   }
+} // anonymous namespace
+
+std::string json_rpc_client::send_http(http_verb verb, const std::string& path,
+                                       const std::string& body,
+                                       const std::string& content_type) {
+   auto& ioc = _io_ctx;
+
+   auto scheme = _url.proto();
+   auto host   = _url.host().value();
+   auto port   = std::to_string(_url.port().value_or(scheme == "https" ? 443 : 80));
+
+   asio::ssl::context ctx{asio::ssl::context::tlsv12_client};
+   tcp::resolver      resolver{_io_ctx};
+   auto               dest = resolver.resolve(host, port);
+
+   http::request<http::string_body> req{to_beast_verb(verb), path, HTTP_VERSION};
+   req.set(http::field::host, host);
+   req.set(http::field::user_agent, _user_agent);
+   if (!body.empty()) {
+      req.set(http::field::content_type, content_type);
+      req.body() = body;
+   }
+   req.prepare_payload();
+
+   beast::flat_buffer                buffer;
+   http::response<http::string_body> res;
+
+   if (scheme == "https") {
+      beast::ssl_stream<beast::tcp_stream> stream(ioc, ctx);
+      if (!SSL_set_tlsext_host_name(stream.native_handle(), host.c_str())) {
+         throw beast::system_error(
+            beast::error_code(static_cast<int>(::ERR_get_error()),
+                              asio::error::get_ssl_category()));
+      }
+      beast::get_lowest_layer(stream).connect(dest);
+      stream.handshake(asio::ssl::stream_base::client);
+      http::write(stream, req);
+      http::read(stream, buffer, res);
+      beast::error_code ec;
+      stream.shutdown(ec);
+   } else if (scheme == "http") {
+      beast::tcp_stream stream{_io_ctx};
+      auto stream_cleaner = gsl_lite::finally([&stream] { stream.close(); });
+      stream.connect(dest);
+      http::write(stream, req);
+      http::read(stream, buffer, res);
+      beast::error_code ec;
+      stream.socket().shutdown(tcp::socket::shutdown_both, ec);
+   } else {
+      throw std::runtime_error("Unsupported URL scheme: " + scheme);
+   }
+
+   if (res.result() != http::status::ok) {
+      FC_THROW("HTTP {} {} failed ({}): {}",
+               std::string(http::to_string(to_beast_verb(verb))),
+               path,
+               static_cast<unsigned>(res.result()),
+               res.reason());
+   }
+
+   return res.body();
+}
+
 void json_rpc_client::validate_basic_response(const variant& response) {
    if (!response.is_object()) {
       FC_THROW("JSON-RPC: response must be an object");

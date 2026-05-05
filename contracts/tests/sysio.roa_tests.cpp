@@ -106,10 +106,13 @@ public:
 
    fc::variant get_reslimit( account_name acc )
    {
+      // reslimit is kv::table (unscoped) — key is [owner:8B BE]
       const auto& db = control->db();
-      auto key = make_kv_scoped_key(ROA, acc.to_uint64_t());
+      char key_buf[chain::kv_pri_key_size];
+      chain::kv_encode_be64(key_buf, acc.to_uint64_t());
+      std::string_view key_sv(key_buf, chain::kv_pri_key_size);
       const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
-      auto it = kv_idx.find(boost::make_tuple(ROA, compute_table_id("reslimit"_n.to_uint64_t()), key.to_string_view()));
+      auto it = kv_idx.find(boost::make_tuple(ROA, compute_table_id("reslimit"_n.to_uint64_t()), key_sv));
       if (it != kv_idx.end()) {
          const vector<char> data(it->value.data(), it->value.data() + it->value.size());
          if (!data.empty()) {

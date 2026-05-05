@@ -1,6 +1,6 @@
 #pragma once
 #include <fc/log/logger.hpp>
-#include <spdlog/details/log_msg.h>
+#include <fc/spdlog.hpp>
 #include <spdlog/sinks/base_sink.h>
 #include <string>
 #include <mutex>

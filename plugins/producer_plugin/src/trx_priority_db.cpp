@@ -52,29 +52,25 @@ int trx_priority_db::get_trx_priority(const transaction& trx) const {
 // -----------------------------------------------------------------------------------------------------------------
 namespace {
 
-std::vector<char> get_row_by_id(const controller& control, name code, name scope, name table, uint64_t id ) {
+// Read a kv::global value — key is [Name:8B BE]
+std::vector<char> get_global_row(const controller& control, name code, name table_name) {
    const auto& db = control.db();
-
-   auto key = make_kv_scoped_key(scope, id);
-   auto key_sv = key.to_string_view();
+   auto tid = compute_table_id(table_name.to_uint64_t());
+   char key_buf[kv_pri_key_size];
+   kv_encode_be64(key_buf, table_name.to_uint64_t());
+   std::string_view key_sv(key_buf, kv_pri_key_size);
 
    const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
-   auto itr = kv_idx.find(boost::make_tuple(code, compute_table_id(table.to_uint64_t()), key_sv));
-   if (itr == kv_idx.end()) {
+   auto itr = kv_idx.find(boost::make_tuple(code, tid, key_sv));
+   if (itr == kv_idx.end())
       return {};
-   }
-
-   vector<char> data(itr->value.data(), itr->value.data() + itr->value.size());
-   return data;
-}
-
-vector<char> get_row_by_account(const controller& control, name code, name scope, name table, account_name act ) {
-   return get_row_by_id( control, code, scope, table, act.to_uint64_t() );
+   return {itr->value.data(), itr->value.data() + itr->value.size()};
 }
 
 block_timestamp_type get_last_trx_priority_update(const controller& control) {
    try {
-      vector<char> data = get_row_by_account( control, config::system_account_name, config::system_account_name, "trxpglobal"_n, "trxpglobal"_n );
+      // trxpglobal is kv::global<"trxpglobal"_n, ...>
+      auto data = get_global_row(control, config::system_account_name, "trxpglobal"_n);
       if (data.empty())
          return {};
       return fc::raw::unpack<block_timestamp_type>(data);
@@ -91,18 +87,18 @@ void trx_priority_db::load_trx_priority_map(const controller& control, trx_prior
 
       const auto& db = control.db();
 
-      // Scope-only prefix: [scope(sysio):8B BE]; table_id provides isolation
+      // trxpriority is kv::table (unscoped) — key is [priority:8B BE]
       auto trx_tid = compute_table_id("trxpriority"_n.to_uint64_t());
-      char scope_prefix[chain::kv_scope_prefix_size];
-      chain::kv_encode_be64(scope_prefix, config::system_account_name.to_uint64_t());
-      auto scope_sv = std::string_view(scope_prefix, chain::kv_scope_prefix_size);
 
       const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
-      auto itr = kv_idx.lower_bound(boost::make_tuple(config::system_account_name, trx_tid, scope_sv));
+      // Start from beginning of this table_id — all-zero is the minimum BE uint64
+      char min_key[kv_pri_key_size] = {};
+      auto itr = kv_idx.lower_bound(boost::make_tuple(config::system_account_name, trx_tid,
+                                                        std::string_view(min_key, kv_pri_key_size)));
 
       while (itr != kv_idx.end() && itr->code == config::system_account_name && itr->table_id == trx_tid) {
          auto kv = itr->key_view();
-         if (kv.size() < chain::kv_scope_prefix_size || memcmp(kv.data(), scope_prefix, chain::kv_scope_prefix_size) != 0 || kv.size() != chain::kv_scoped_key_size) break;
+         if (kv.size() != kv_pri_key_size) break;
 
          trx_prio tmp;
          datastream<const char*> ds(itr->value.data(), itr->value.size());

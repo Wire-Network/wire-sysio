@@ -23,6 +23,16 @@
             ]
         },
         {
+            "name": "abihash_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "activate",
             "base": "",
             "fields": [
@@ -571,19 +581,11 @@
     ],
     "tables": [
         {
-            "name": "abi_hash",
-            "type": "abi_hash",
-            "index_type": "i64",
-            "key_names": [],
-            "key_types": [],
-            "table_id": 10688
-        },
-        {
             "name": "abihash",
             "type": "abi_hash",
             "index_type": "i64",
-            "key_names": ["scope","primary_key"],
-            "key_types": ["name","uint64"],
+            "key_names": ["owner"],
+            "key_types": ["uint64"],
             "table_id": 49446
         }
     ],
