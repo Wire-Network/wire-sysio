@@ -47,13 +47,6 @@ namespace sysio {
       [[sysio::action]]
       void unpause();
 
-      /// Remove a batch-op group snapshot after sysio.system has consumed it
-      /// for emissions distribution. Only callable by sysio.system (which is
-      /// the sole consumer and knows when its last_epoch_index has caught up
-      /// past the snapshotted epoch).
-      [[sysio::action]]
-      void prunesnap(uint64_t epoch_index);
-
       // -----------------------------------------------------------------------
       //  Tables
       // -----------------------------------------------------------------------
@@ -91,27 +84,6 @@ namespace sysio {
 
       using epochstate_t = sysio::kv::global<"epochstate"_n, epoch_state>;
 
-      /// Snapshot of the active batch-op group for a specific epoch, captured
-      /// at advance() time and consumed by sysio.system::processepoch so that
-      /// catch-up emissions pay the historical members, not the rotation
-      /// slot's current occupants. Pruned by sysio.system after payout.
-      struct batchsnap_key {
-         uint64_t epoch_index;
-         uint64_t primary_key() const { return epoch_index; }
-         SYSLIB_SERIALIZE(batchsnap_key, (epoch_index))
-      };
-
-      struct [[sysio::table("batchsnap")]] batch_snapshot {
-         uint64_t          epoch_index;
-         uint8_t           active_group_index = 0;
-         std::vector<name> active_members;
-
-         SYSLIB_SERIALIZE(batch_snapshot,
-            (epoch_index)(active_group_index)(active_members))
-      };
-
-      using batchsnaps_t = sysio::kv::table<"batchsnap"_n, batchsnap_key, batch_snapshot>;
-
       /// Outpost registry table primary key.
       struct outpost_key {
          uint64_t id;
@@ -143,13 +115,41 @@ namespace sysio {
             sysio::const_mem_fun<outpost_info, uint64_t, &outpost_info::by_chain>>
       >;
 
+      /// Emissions readiness gate block log. One row per epoch_index that
+      /// the gate has blocked from advancing. Inserted on the first gate
+      /// failure for a given epoch; same-reason retries update last_retry_at
+      /// and retry_count without re-broadcast. Pruned when the gate
+      /// eventually passes for that epoch (advance proceeds normally).
+      struct blocklog_key {
+         uint64_t epoch_index;
+         uint64_t primary_key() const { return epoch_index; }
+         SYSLIB_SERIALIZE(blocklog_key, (epoch_index))
+      };
+
+      struct [[sysio::table("blocklog")]] blocklog_entry {
+         uint32_t                              epoch_index        = 0;
+         sysio::opp::types::EmissionsBlockReason reason           =
+            sysio::opp::types::EMISSIONS_BLOCK_REASON_UNSPECIFIED;
+         int64_t                               attempted_emission = 0;
+         int64_t                               treasury_remaining = 0;
+         int64_t                               sysio_balance      = 0;
+         uint32_t                              first_blocked_at   = 0; // unix seconds
+         uint32_t                              last_retry_at      = 0; // unix seconds
+         uint32_t                              retry_count        = 0;
+
+         SYSLIB_SERIALIZE(blocklog_entry,
+            (epoch_index)(reason)(attempted_emission)(treasury_remaining)
+            (sysio_balance)(first_blocked_at)(last_retry_at)(retry_count))
+      };
+
+      using blocklog_t = sysio::kv::table<"blocklog"_n, blocklog_key, blocklog_entry>;
+
       // Well-known accounts
       static constexpr name CHALG_ACCOUNT  = "sysio.chalg"_n;
       static constexpr name MSGCH_ACCOUNT  = "sysio.msgch"_n;
       static constexpr name EPOCH_ACCOUNT  = "sysio.epoch"_n;
       static constexpr name OPREG_ACCOUNT  = "sysio.opreg"_n;
       static constexpr name AUTHEX_ACCOUNT = "sysio.authex"_n;
-      static constexpr name SYSTEM_ACCOUNT = "sysio"_n;
 
    private:
 

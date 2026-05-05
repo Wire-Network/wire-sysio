@@ -145,6 +145,18 @@ enum AttestationType {
   ATTESTATION_TYPE_STAKING_REWARD = 60950; // 0xEE16 (stub)
   ATTESTATION_TYPE_STAKE_RESULT = 60951; // 0xEE17
   ATTESTATION_TYPE_ATTESTATION_PROCESSING_ERROR = 60952; // 0xEE18
+  ATTESTATION_TYPE_EMISSIONS_BLOCKED = 60953; // 0xEE19
+}
+
+// Reason codes for ATTESTATION_TYPE_EMISSIONS_BLOCKED. Emitted by
+// sysio.epoch::advance when its emissions readiness gate cannot pay
+// the next epoch.
+enum EmissionsBlockReason {
+  EMISSIONS_BLOCK_REASON_UNSPECIFIED          = 0;
+  EMISSIONS_BLOCK_REASON_CONFIG_MISSING       = 1; // sysio.system::setemitcfg not called
+  EMISSIONS_BLOCK_REASON_STATE_UNINITIALIZED  = 2; // sysio.system::initt5 not called
+  EMISSIONS_BLOCK_REASON_TREASURY_EXHAUSTED   = 3; // t5_distributable - t5_floor - total_distributed <= 0
+  EMISSIONS_BLOCK_REASON_BALANCE_INSUFFICIENT = 4; // sysio's WIRE balance < computed emission
 }
 
 // ---------------------------------------------------------------------------

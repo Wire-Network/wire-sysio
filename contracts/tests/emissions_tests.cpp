@@ -6,8 +6,9 @@
 //  - viewnodedist functional behavior (claimable/can_claim) across time states
 //  - claimnodedis authorization + gating rules + claimed accounting updates + inline token transfer
 //  - sysio.roa::forcereg wiring: inline addnodeowner occurs (guarded on emitcfg.exists())
-//  - processepoch: opreg status filter, sysio.epoch gating, gap catch-up, pool balance check,
-//                  batch-op rotation group pay, slashed/terminated share rollback to treasury
+//  - payepoch (driven by sysio.epoch::advance gate): opreg status filter, batch-op rotation group
+//                  pay, slashed/terminated share rollback to treasury, treasury balance/floor
+//                  enforcement via the gate's EmissionsBlocked path
 //
 // This fixture deploys the real sysio.opreg and sysio.epoch contracts (not a mock) so that
 // emissions's cross-contract reads (operators_t, epochstate_t) exercise the same code paths
@@ -87,8 +88,8 @@ struct node_claim_result {
 FC_REFLECT( node_claim_result, (total_allocation)(claimed)(claimable)(can_claim) )
 
 // T5 return struct mirror. last_epoch_index is a monotonic counter that
-// mirrors sysio.epoch's current_epoch_index and acts as the idempotency
-// guard inside t5_state -- processepoch advances it by 1 per call.
+// mirrors sysio.epoch's current_epoch_index and is bumped by payepoch on
+// each successful gate-passing advance.
 struct t5_epoch_info {
    uint64_t       epoch_count;
    uint32_t       last_epoch_index;
@@ -277,10 +278,10 @@ public:
          produce_blocks(1);
       }
 
-      // --- sysio.opreg + sysio.epoch (real, not mocks) for processepoch integration ---
-      // emissions's processepoch reads operator status from sysio.opreg::operators
-      // and current_epoch_index from sysio.epoch::epochstate. Deploying the real
-      // contracts here gives us cross-contract exercise of the kv::table reads.
+      // --- sysio.opreg + sysio.epoch (real, not mocks) for emissions integration ---
+      // payepoch reads operator status from sysio.opreg::operators; sysio.epoch's
+      // gate reads emitcfg / t5state from sysio.system. Deploying the real contracts
+      // here gives us cross-contract exercise of the kv::table reads.
       //
       // Under ROA (active via the base tester), accounts need explicit ROA
       // RAM policies before set_code can succeed for a large contract.
@@ -325,14 +326,12 @@ public:
       BOOST_REQUIRE_EQUAL( success(), setemitcfg_defaults( config::system_account_name ) );
       produce_blocks(1);
 
-      // --- Bootstrap sysio.epoch so processepoch's idempotency guard is ready ---
-      // sysio.epoch starts at current_epoch_index=0; genesis advance moves it to 1.
-      // Tests that exercise processepoch thus start from:
-      //   epoch_state.current_epoch_index = 1
-      //   t5state.last_epoch_index       = 0  (post-initt5)
-      // which means one epoch is available for the first processepoch call.
-      // Subsequent calls require advance_epoch_state() + produce_blocks to
-      // cross the wall-clock duration, otherwise sysio.epoch::advance is a no-op.
+      // --- Bootstrap sysio.epoch (config only, no advance) ---
+      // bootstrap_epoch() sets epochcfg but defers genesis advance so each test
+      // controls when (and whether) the first advance fires. The first advance
+      // after init_epoch_state has next_epoch_start defaulted to 0, so it
+      // crosses the wall-clock check immediately; later advances need
+      // produce_blocks to cross the configured epoch duration first.
       bootstrap_epoch();
    }
 
@@ -438,17 +437,9 @@ public:
       );
    }
 
-   action_result processepoch( account_name signer ) {
-      return push_system_action(
-         signer,
-         "processepoch"_n,
-         mvo()
-      );
-   }
-
-   t5_epoch_info viewepoch( account_name signer ) {
+   t5_epoch_info viewepoch() {
       auto trace = push_system_action_trace(
-         signer,
+         config::system_account_name,
          "viewepoch"_n,
          mvo()
       );
@@ -468,9 +459,9 @@ public:
       return fc::raw::unpack<t5_epoch_info>( found->return_value );
    }
 
-   emit_cfg_result viewemitcfg( account_name signer ) {
+   emit_cfg_result viewemitcfg() {
       auto trace = push_system_action_trace(
-         signer,
+         config::system_account_name,
          "viewemitcfg"_n,
          mvo()
       );
@@ -498,6 +489,23 @@ public:
    // mirroring opreg::opconfig / epoch::epochstate. Multi-row kv::table rows
    // use the row's primary_key value.
 
+   fc::variant get_node_count_state() {
+      auto data = get_row_by_account(config::system_account_name,
+                                     config::system_account_name,
+                                     "nodecount"_n,
+                                     "nodecount"_n);
+      if (data.empty()) return fc::variant();
+      return sysio_abi_ser.binary_to_variant("node_count_state", data,
+          abi_serializer::create_yield_function(abi_serializer_max_time));
+   }
+
+   fc::variant get_blocklog_row(uint64_t epoch_index) {
+      auto data = get_row_by_account(EPOCH, EPOCH, "blocklog"_n, account_name(epoch_index));
+      if (data.empty()) return fc::variant();
+      return epoch_abi_ser.binary_to_variant("blocklog_entry", data,
+          abi_serializer::create_yield_function(abi_serializer_max_time));
+   }
+
    fc::variant get_t5_state() {
       auto data = get_row_by_account(config::system_account_name,
                                      config::system_account_name,
@@ -518,16 +526,6 @@ public:
                                      account_name(sysio_epoch_index));
       if (data.empty()) return fc::variant();
       return sysio_abi_ser.binary_to_variant("epoch_log", data,
-          abi_serializer::create_yield_function(abi_serializer_max_time));
-   }
-
-   // Reads a sysio.epoch::batchsnap row for the given epoch index. Snapshots
-   // are written on sysio.epoch::advance and pruned by sysio.system::processepoch
-   // after the corresponding batch-op distribution runs.
-   fc::variant get_batch_snapshot( uint64_t epoch_index ) {
-      auto data = get_row_by_account(EPOCH, EPOCH, "batchsnap"_n, account_name(epoch_index));
-      if (data.empty()) return fc::variant();
-      return epoch_abi_ser.binary_to_variant("batch_snapshot", data,
           abi_serializer::create_yield_function(abi_serializer_max_time));
    }
 
@@ -567,8 +565,8 @@ public:
    //
    // Creates N test accounts, registers them as producers in sysio.system,
    // AND registers each as a bootstrapped opreg operator (-> OPERATOR_STATUS_ACTIVE).
-   // Without the opreg registration step, emissions's processepoch would filter
-   // them all out via its opreg status filter and no producer would ever be paid.
+   // Without the opreg registration step, payepoch's opreg status filter would
+   // skip them all and no producer would ever be paid.
    //
    // If `register_opreg` is false, the caller is exercising the filter and will
    // handle opreg registration manually (e.g. to test a slashed operator).
@@ -646,9 +644,9 @@ public:
    /// Calls sysio.system::viewnodedist and decodes the return_value into node_claim_result.
    /// We search action_traces for the sysio.system receiver trace for this action to avoid
    /// decoding the wrong trace in a nested/inline scenario.
-   node_claim_result viewnodedist( account_name signer, account_name owner ) {
+   node_claim_result viewnodedist( account_name owner ) {
       auto trace = push_system_action_trace(
-         signer,
+         config::system_account_name,
          "viewnodedist"_n,
          mvo()("account_name", owner)
       );
@@ -906,15 +904,14 @@ public:
    // =============================================================================
 
    // Initialize sysio.epoch with a minimum viable configuration. Values are chosen
-   // so that processepoch tests can advance the epoch index without having to
-   // populate 21 batch operator accounts -- batch_op_groups is zero until
-   // initgroups is called, and processepoch tolerates an empty rotation group
-   // (the batch-op share simply rolls to treasury, which is what we want in
-   // producer-focused tests).
+   // so emissions tests can advance the epoch index without having to populate
+   // 21 batch operator accounts -- batch_op_groups is empty until initgroups is
+   // called, and payepoch tolerates an empty rotation group (the batch-op share
+   // simply rolls to treasury, which is what we want in producer-focused tests).
    //
-   // Default epoch_duration_sec is kept short (5 seconds) so gap-catchup tests
-   // can advance the index multiple times without needing a wall-clock jump
-   // that would expire pending transactions.
+   // Default epoch_duration_sec is kept short (5 seconds) so multi-epoch tests
+   // can cross the wall-clock boundary repeatedly without expiring pending
+   // transactions.
    action_result init_epoch_state(uint32_t epoch_duration_sec = 5,
                                    uint32_t operators_per_epoch = 7,
                                    uint32_t batch_op_groups_count = 3) {
@@ -936,19 +933,13 @@ public:
       return push_epoch_action(signer, "advance"_n, mvo());
    }
 
-   // Invoke sysio.epoch::prunesnap directly from a test signer. Used in
-   // authorization-coverage tests; the production caller is sysio.system's
-   // processepoch.
-   action_result prunesnap(account_name signer, uint64_t epoch_index) {
-      return push_epoch_action(signer, "prunesnap"_n, mvo()("epoch_index", epoch_index));
-   }
-
-   // Convenience: set epoch config, advance genesis to index 1, ready for the
-   // first processepoch call.
+   // Convenience: set epoch config only. Genesis advance is deferred so each
+   // test can decide whether to initt5 (and thus pass the emissions gate) or
+   // exercise gate-block behavior. Under the new model, the first
+   // advance_epoch_state ALSO fires payepoch inline -- which requires t5state
+   // to exist, so initt5 must precede any successful advance.
    void bootstrap_epoch() {
       BOOST_REQUIRE_EQUAL( success(), init_epoch_state() );
-      produce_blocks(1);
-      BOOST_REQUIRE_EQUAL( success(), advance_epoch_state(EPOCH) );
       produce_blocks(1);
    }
 
@@ -1087,6 +1078,70 @@ BOOST_FIXTURE_TEST_CASE( addnodeowner_writes_expected_rows_for_each_tier, sysio_
 } FC_LOG_AND_RETHROW()
 
 // -----------------------------------------------------------------------------
+// Per-tier registration cap (T1=21, T2=84, T3=1000)
+// -----------------------------------------------------------------------------
+
+BOOST_FIXTURE_TEST_CASE( addnodeowner_t1_cap_rejects_22nd, sysio_emissions_tester ) try {
+   // T1_MAX_NODE_OWNERS = 21. Register 21 successfully; 22nd must be rejected
+   // with "t1 node owner cap reached". node_count_state singleton tracks the
+   // running count.
+   std::vector<account_name> names;
+   const char digits[] = "abcdefghijklmnopqrstuvwxyz"; // sysio names: a-z
+   for (uint32_t i = 0; i < 22; ++i) {
+      std::string s = "nt1x";
+      s += digits[i / 26];
+      s += digits[i % 26];
+      names.push_back(account_name(s));
+   }
+   create_accounts(names, false, false, false, true);
+   produce_blocks(1);
+
+   for (uint32_t i = 0; i < 21; ++i) {
+      BOOST_REQUIRE_EQUAL( success(), addnodeowner( ROA, names[i], 1 ) );
+   }
+
+   auto r = addnodeowner( ROA, names[21], 1 );
+   BOOST_REQUIRE( r != success() );
+   require_substr( r, "t1 node owner cap reached" );
+
+   // T2 / T3 still register: tier counts are independent.
+   create_user_accounts({ "nt2caps"_n });
+   BOOST_REQUIRE_EQUAL( success(), addnodeowner( ROA, "nt2caps"_n, 2 ) );
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( addnodeowner_invalid_tier_above_max, sysio_emissions_tester ) try {
+   // Coverage for the upper-bound side of the tier check: tier 100 / 255
+   // (uint8_t max) must fail "invalid tier" the same as 0 / 4 / 5.
+   create_user_accounts({ "nthi100"_n, "nthi255"_n });
+
+   auto r100 = addnodeowner( ROA, "nthi100"_n, 100 );
+   BOOST_REQUIRE( r100 != success() );
+   require_substr( r100, "invalid tier" );
+
+   auto r255 = addnodeowner( ROA, "nthi255"_n, 255 );
+   BOOST_REQUIRE( r255 != success() );
+   require_substr( r255, "invalid tier" );
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( addnodeowner_increments_node_count_per_tier, sysio_emissions_tester ) try {
+   // Verify the nodecount singleton updates correctly across mixed tiers and
+   // that all three counters are independent.
+   create_user_accounts({ "ncntt1a"_n, "ncntt1b"_n, "ncntt2a"_n, "ncntt3a"_n, "ncntt3b"_n });
+
+   BOOST_REQUIRE_EQUAL( success(), addnodeowner( ROA, "ncntt1a"_n, 1 ) );
+   BOOST_REQUIRE_EQUAL( success(), addnodeowner( ROA, "ncntt2a"_n, 2 ) );
+   BOOST_REQUIRE_EQUAL( success(), addnodeowner( ROA, "ncntt3a"_n, 3 ) );
+   BOOST_REQUIRE_EQUAL( success(), addnodeowner( ROA, "ncntt1b"_n, 1 ) );
+   BOOST_REQUIRE_EQUAL( success(), addnodeowner( ROA, "ncntt3b"_n, 3 ) );
+
+   auto row = get_node_count_state();
+   BOOST_REQUIRE( !row.is_null() );
+   BOOST_REQUIRE_EQUAL( row["t1_count"].as<uint32_t>(), 2u );
+   BOOST_REQUIRE_EQUAL( row["t2_count"].as<uint32_t>(), 1u );
+   BOOST_REQUIRE_EQUAL( row["t3_count"].as<uint32_t>(), 2u );
+} FC_LOG_AND_RETHROW()
+
+// -----------------------------------------------------------------------------
 // viewnodedist / claimnodedis
 // -----------------------------------------------------------------------------
 
@@ -1098,7 +1153,7 @@ BOOST_FIXTURE_TEST_CASE( no_vesting_yet_start_in_future_blocks_claim, sysio_emis
    BOOST_REQUIRE_EQUAL( success(), setinittime( config::system_account_name, tpsec(start_future) ) );
    BOOST_REQUIRE_EQUAL( success(), addnodeowner( ROA, "nodefuture"_n, 1 ) );
 
-   auto info = viewnodedist( "nodefuture"_n, "nodefuture"_n );
+   auto info = viewnodedist( "nodefuture"_n );
    BOOST_REQUIRE_EQUAL(info.total_allocation, T1_ALLOCATION);
    BOOST_REQUIRE_EQUAL( info.claimed, asset(0, WIRE_SYMBOL) );
    BOOST_REQUIRE_EQUAL( info.claimable, asset(0, WIRE_SYMBOL) );
@@ -1130,7 +1185,7 @@ BOOST_FIXTURE_TEST_CASE( mid_vesting_claimable_grows_but_gate_blocks_until_min_t
    BOOST_REQUIRE_EQUAL( success(), setinittime( config::system_account_name, tpsec(start) ) );
    BOOST_REQUIRE_EQUAL( success(), addnodeowner( ROA, "nodemid"_n, 3 ) );
 
-   auto info1 = viewnodedist( "nodemid"_n, "nodemid"_n );
+   auto info1 = viewnodedist( "nodemid"_n );
    BOOST_REQUIRE_EQUAL(info1.total_allocation, T3_ALLOCATION);
    BOOST_REQUIRE_EQUAL( info1.claimed, asset(0, WIRE_SYMBOL) );
    BOOST_REQUIRE( info1.claimable.get_amount() > 0 );
@@ -1140,7 +1195,7 @@ BOOST_FIXTURE_TEST_CASE( mid_vesting_claimable_grows_but_gate_blocks_until_min_t
    // Move time forward a bit; claimable should increase but still stay below MIN.
    produce_blocks(200);
 
-   auto info2 = viewnodedist( "nodemid"_n, "nodemid"_n );
+   auto info2 = viewnodedist( "nodemid"_n );
    BOOST_REQUIRE_EQUAL( info2.claimed, asset(0, WIRE_SYMBOL) );
    BOOST_REQUIRE( info2.claimable.get_amount() > info1.claimable.get_amount() );
    BOOST_REQUIRE( info2.claimable.get_amount() < MIN_CLAIMABLE_AMOUNT );
@@ -1161,7 +1216,7 @@ BOOST_FIXTURE_TEST_CASE( full_vesting_allows_claim_then_blocks_second_claim, sys
    BOOST_REQUIRE_EQUAL( success(), setinittime( config::system_account_name, tpsec(start) ) );
    BOOST_REQUIRE_EQUAL( success(), addnodeowner( ROA, "nodefull"_n, 1 ) );
 
-   auto before = viewnodedist( "nodefull"_n, "nodefull"_n );
+   auto before = viewnodedist( "nodefull"_n );
    BOOST_REQUIRE_EQUAL(before.total_allocation, T1_ALLOCATION);
    BOOST_REQUIRE_EQUAL( before.claimed, asset(0, WIRE_SYMBOL) );
    BOOST_REQUIRE_EQUAL( before.claimable, before.total_allocation );
@@ -1182,7 +1237,7 @@ BOOST_FIXTURE_TEST_CASE( full_vesting_allows_claim_then_blocks_second_claim, sys
    auto row = get_nodedist_row("nodefull"_n);
    BOOST_REQUIRE_EQUAL( row["claimed"].as<asset>(), row["total_allocation"].as<asset>() );
 
-   auto after = viewnodedist( "nodefull"_n, "nodefull"_n );
+   auto after = viewnodedist( "nodefull"_n );
    BOOST_REQUIRE_EQUAL( after.claimable, asset(0, WIRE_SYMBOL) );
 
    // Snapshot of balance before expected failure to claim.
@@ -1224,7 +1279,7 @@ BOOST_FIXTURE_TEST_CASE( final_vesting_allows_small_final_remainder_below_min_th
    BOOST_REQUIRE_EQUAL( success(), addnodeowner( ROA, "nodesmall"_n, 1 ) );
 
    // First claim: should be large and allowed (>= MIN)
-   auto info_pre = viewnodedist( "nodesmall"_n, "nodesmall"_n );
+   auto info_pre = viewnodedist( "nodesmall"_n );
    BOOST_REQUIRE_EQUAL( info_pre.claimed, asset(0, WIRE_SYMBOL) );
    BOOST_REQUIRE( info_pre.can_claim );
    BOOST_REQUIRE( info_pre.claimable.get_amount() >= MIN_CLAIMABLE_AMOUNT );
@@ -1253,7 +1308,7 @@ BOOST_FIXTURE_TEST_CASE( final_vesting_allows_small_final_remainder_below_min_th
    produce_blocks(25);
 
    // Final remainder: should be >0 but < MIN, and allowed because elapsed == duration.
-   auto info_final = viewnodedist( "nodesmall"_n, "nodesmall"_n );
+   auto info_final = viewnodedist( "nodesmall"_n );
    BOOST_REQUIRE( info_final.can_claim );
    BOOST_REQUIRE( info_final.claimable.get_amount() > 0 );
    BOOST_REQUIRE( info_final.claimable.get_amount() < MIN_CLAIMABLE_AMOUNT );
@@ -1351,7 +1406,7 @@ BOOST_FIXTURE_TEST_CASE( viewnodedist_fails_before_setinittime, sysio_emissions_
 
    // viewnodedist should throw — we catch the assert
    BOOST_REQUIRE_EXCEPTION(
-      viewnodedist( "nodenoview"_n, "nodenoview"_n ),
+      viewnodedist( "nodenoview"_n ),
       sysio_assert_message_exception,
       sysio_assert_message_is("emission state not initialized")
    );
@@ -1371,7 +1426,7 @@ BOOST_FIXTURE_TEST_CASE( viewnodedist_fails_for_nonexistent_account, sysio_emiss
    BOOST_REQUIRE_EQUAL( success(), setinittime( config::system_account_name, tpsec(head_secs()) ) );
 
    BOOST_REQUIRE_EXCEPTION(
-      viewnodedist( "nobody2"_n, "nobody2"_n ),
+      viewnodedist( "nobody2"_n ),
       sysio_assert_message_exception,
       sysio_assert_message_is("account is not a node owner")
    );
@@ -1391,7 +1446,7 @@ BOOST_FIXTURE_TEST_CASE( mid_vesting_claim_above_min_succeeds, sysio_emissions_t
    BOOST_REQUIRE_EQUAL( success(), setinittime( config::system_account_name, tpsec(start) ) );
    BOOST_REQUIRE_EQUAL( success(), addnodeowner( ROA, "nodehalf"_n, 1 ) );
 
-   auto info = viewnodedist( "nodehalf"_n, "nodehalf"_n );
+   auto info = viewnodedist( "nodehalf"_n );
    BOOST_REQUIRE( info.can_claim );
    BOOST_REQUIRE( info.claimable.get_amount() >= MIN_CLAIMABLE_AMOUNT );
    // Approximately half of T1_ALLOCATION
@@ -1434,7 +1489,7 @@ BOOST_FIXTURE_TEST_CASE( multiple_sequential_partial_claims, sysio_emissions_tes
    int64_t total_claimed = 0;
 
    // Claim 1: at ~25% vesting
-   auto info1 = viewnodedist( "nodeseq"_n, "nodeseq"_n );
+   auto info1 = viewnodedist( "nodeseq"_n );
    BOOST_REQUIRE( info1.can_claim );
    BOOST_REQUIRE( info1.claimable.get_amount() > 0 );
 
@@ -1449,7 +1504,7 @@ BOOST_FIXTURE_TEST_CASE( multiple_sequential_partial_claims, sysio_emissions_tes
    produce_block( fc::seconds(quarter) );
 
    // Claim 2: at ~50% vesting
-   auto info2 = viewnodedist( "nodeseq"_n, "nodeseq"_n );
+   auto info2 = viewnodedist( "nodeseq"_n );
    BOOST_REQUIRE( info2.can_claim );
    BOOST_REQUIRE( info2.claimable.get_amount() > 0 );
 
@@ -1464,7 +1519,7 @@ BOOST_FIXTURE_TEST_CASE( multiple_sequential_partial_claims, sysio_emissions_tes
    produce_block( fc::seconds(T1_DURATION) );
 
    // Claim 3: final claim at 100% vesting
-   auto info3 = viewnodedist( "nodeseq"_n, "nodeseq"_n );
+   auto info3 = viewnodedist( "nodeseq"_n );
    BOOST_REQUIRE( info3.can_claim );
    BOOST_REQUIRE( info3.claimable.get_amount() > 0 );
 
@@ -1494,7 +1549,7 @@ BOOST_FIXTURE_TEST_CASE( tier2_full_vesting_claim, sysio_emissions_tester ) try 
    BOOST_REQUIRE_EQUAL( success(), setinittime( config::system_account_name, tpsec(start) ) );
    BOOST_REQUIRE_EQUAL( success(), addnodeowner( ROA, "nodet2"_n, 2 ) );
 
-   auto info = viewnodedist( "nodet2"_n, "nodet2"_n );
+   auto info = viewnodedist( "nodet2"_n );
    BOOST_REQUIRE_EQUAL( info.total_allocation, T2_ALLOCATION );
    BOOST_REQUIRE_EQUAL( info.claimable, T2_ALLOCATION );
    BOOST_REQUIRE( info.can_claim );
@@ -1516,7 +1571,7 @@ BOOST_FIXTURE_TEST_CASE( tier3_full_vesting_claim, sysio_emissions_tester ) try 
    BOOST_REQUIRE_EQUAL( success(), setinittime( config::system_account_name, tpsec(start) ) );
    BOOST_REQUIRE_EQUAL( success(), addnodeowner( ROA, "nodet3"_n, 3 ) );
 
-   auto info = viewnodedist( "nodet3"_n, "nodet3"_n );
+   auto info = viewnodedist( "nodet3"_n );
    BOOST_REQUIRE_EQUAL( info.total_allocation, T3_ALLOCATION );
    BOOST_REQUIRE_EQUAL( info.claimable, T3_ALLOCATION );
    BOOST_REQUIRE( info.can_claim );
@@ -1546,7 +1601,7 @@ BOOST_FIXTURE_TEST_CASE( linear_vesting_precision_at_known_fraction, sysio_emiss
    BOOST_REQUIRE_EQUAL( success(), setinittime( config::system_account_name, tpsec(start) ) );
    BOOST_REQUIRE_EQUAL( success(), addnodeowner( ROA, "nodeprec"_n, 1 ) );
 
-   auto info = viewnodedist( "nodeprec"_n, "nodeprec"_n );
+   auto info = viewnodedist( "nodeprec"_n );
 
    // Expected vested: total_amount * quarter / T1_DURATION
    // Use __int128 for precision matching
@@ -1580,7 +1635,7 @@ BOOST_FIXTURE_TEST_CASE( token_conservation_across_claims, sysio_emissions_teste
    BOOST_REQUIRE_EQUAL( success(), addnodeowner( ROA, "nodecons"_n, 1 ) );
 
    // Claim 1
-   auto info1 = viewnodedist( "nodecons"_n, "nodecons"_n );
+   auto info1 = viewnodedist( "nodecons"_n );
    BOOST_REQUIRE( info1.can_claim );
 
    asset sys_before  = get_wire_balance(config::system_account_name);
@@ -1601,7 +1656,7 @@ BOOST_FIXTURE_TEST_CASE( token_conservation_across_claims, sysio_emissions_teste
    // Advance to full vesting and claim remainder
    produce_block( fc::seconds(T1_DURATION) );
 
-   auto info2 = viewnodedist( "nodecons"_n, "nodecons"_n );
+   auto info2 = viewnodedist( "nodecons"_n );
    BOOST_REQUIRE( info2.can_claim );
 
    sys_before  = get_wire_balance(config::system_account_name);
@@ -1739,7 +1794,7 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_rejects_bad_standby_rank, sysio_emissions_te
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( setemitcfg_rejects_standby_rank_over_cap, sysio_emissions_tester ) try {
-   // Upper cap on standby_end_rank bounds inline-action count in processepoch.
+   // Upper cap on standby_end_rank bounds inline-action count in payepoch.
    auto cfg = mvo()
       ("t1_allocation", int64_t(1)) ("t2_allocation", int64_t(1)) ("t3_allocation", int64_t(1))
       ("t1_duration", uint32_t(1))  ("t2_duration", uint32_t(1))  ("t3_duration", uint32_t(1))
@@ -1808,7 +1863,7 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_reconfigurable, sysio_emissions_tester ) try
 
 BOOST_FIXTURE_TEST_CASE( viewemitcfg_returns_current_config, sysio_emissions_tester ) try {
    // Default config was set in constructor; verify viewemitcfg returns it
-   auto cfg = viewemitcfg( config::system_account_name );
+   auto cfg = viewemitcfg();
    BOOST_REQUIRE_EQUAL( cfg.t1_allocation, T1_ALLOCATION.get_amount() );
    BOOST_REQUIRE_EQUAL( cfg.t2_allocation, T2_ALLOCATION.get_amount() );
    BOOST_REQUIRE_EQUAL( cfg.t3_allocation, T3_ALLOCATION.get_amount() );
@@ -1860,7 +1915,7 @@ BOOST_FIXTURE_TEST_CASE( viewemitcfg_reflects_update, sysio_emissions_tester ) t
 
    BOOST_REQUIRE_EQUAL( success(), setemitcfg(config::system_account_name, cfg) );
 
-   auto result = viewemitcfg( config::system_account_name );
+   auto result = viewemitcfg();
    BOOST_REQUIRE_EQUAL( result.t1_allocation, int64_t(42) );
    BOOST_REQUIRE_EQUAL( result.t2_allocation, int64_t(43) );
    BOOST_REQUIRE_EQUAL( result.t3_allocation, int64_t(44) );
@@ -1915,11 +1970,11 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_post_initt5_rejects_brick_reduce, sysio_emis
    // After t5_state exists and epochs have run, setemitcfg must reject a
    // t5_distributable reduction that would make remaining (= distributable -
    // floor - total_distributed) negative. Otherwise the treasury silently
-   // bricks with "treasury exhausted" on the next processepoch.
+   // bricks with EmissionsBlocked on the next advance (gate sees treasury exhausted).
    create_t5_holding_accounts();
    const uint32_t start = head_secs() - ONE_EPOCH - 1;
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
-   BOOST_REQUIRE_EQUAL( success(), processepoch( config::system_account_name ) );
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
    auto cfg = mvo()
       ("t1_allocation", T1_ALLOCATION.get_amount())
@@ -1951,7 +2006,7 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_post_initt5_rejects_unreachable_min_emission
    create_t5_holding_accounts();
    const uint32_t start = head_secs() - ONE_EPOCH - 1;
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
-   BOOST_REQUIRE_EQUAL( success(), processepoch( config::system_account_name ) );
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
    // remaining = T5_DISTRIBUTABLE - T5_FLOOR - first_epoch_distributed,
    // which is roughly T5_DISTRIBUTABLE - T5_FLOOR. Set min/max both above
@@ -1983,37 +2038,138 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_post_initt5_rejects_unreachable_min_emission
 // Timing
 // ---------------------------------------------------------------------------
 
-BOOST_FIXTURE_TEST_CASE( processepoch_fails_before_init, sysio_emissions_tester ) try {
+BOOST_FIXTURE_TEST_CASE( advance_gate_blocks_before_initt5, sysio_emissions_tester ) try {
+   // initt5 has not been called yet -- the readiness gate sees t5state missing
+   // and refuses to advance the epoch. advance returns success (no throw),
+   // but state.current_epoch_index stays at 0 (or epochstate row not written
+   // at all if nothing has ever called set on it) and no payepoch fires.
    create_t5_holding_accounts();
-   auto r = processepoch( config::system_account_name );
-   BOOST_REQUIRE( r != success() );
-   require_substr( r, "t5 state not initialized" );
+
+   produce_blocks(20);
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state(EPOCH) );
+
+   auto est = get_epoch_state_row();
+   if (!est.is_null()) {
+      BOOST_REQUIRE_EQUAL( est["current_epoch_index"].as<uint32_t>(), 0u );
+   }
+   // t5state should also still be absent.
+   BOOST_REQUIRE( get_t5_state().is_null() );
+
+   // blocklog row records the gate failure with the expected reason.
+   // Reason 2 = EMISSIONS_BLOCK_REASON_STATE_UNINITIALIZED.
+   auto bl = get_blocklog_row(1u);
+   BOOST_REQUIRE( !bl.is_null() );
+   BOOST_REQUIRE_EQUAL( bl["epoch_index"].as<uint32_t>(),  1u );
+   BOOST_REQUIRE_EQUAL( bl["reason"].as_string(), "EMISSIONS_BLOCK_REASON_STATE_UNINITIALIZED" );
+   BOOST_REQUIRE_EQUAL( bl["retry_count"].as<uint32_t>(),  1u );
+   // attempted_emission is 0 here -- gate never reached emission compute (no t5state).
+   BOOST_REQUIRE_EQUAL( bl["attempted_emission"].as<int64_t>(), 0 );
 } FC_LOG_AND_RETHROW()
 
-BOOST_FIXTURE_TEST_CASE( processepoch_fails_when_caught_up_to_epoch, sysio_emissions_tester ) try {
-   // Idempotency guard: processepoch requires sysio.epoch.current_epoch_index >
-   // t5state.last_epoch_index. After a single successful call, last_epoch_index
-   // catches up and a second call fails until sysio.epoch::advance runs again.
+BOOST_FIXTURE_TEST_CASE( gate_block_dedup_same_reason, sysio_emissions_tester ) try {
+   // Two consecutive gate-block attempts with the same reason: blocklog row
+   // exists, retry_count increments, last_retry_at advances. No outbound
+   // queueout is attempted on the second call (reason unchanged), so the
+   // trx still succeeds even without sysio.msgch deployed.
    create_t5_holding_accounts();
-   const uint32_t start = head_secs();
-   BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
 
-   // First call succeeds (bootstrap_epoch left current_epoch_index=1, last_epoch_index=0).
-   BOOST_REQUIRE_EQUAL( success(), processepoch( config::system_account_name ) );
+   produce_blocks(20);
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state(EPOCH) );
 
-   // Second call without an intervening epoch advance must fail.
-   auto r = processepoch( config::system_account_name );
-   BOOST_REQUIRE( r != success() );
-   require_substr( r, "emissions already caught up to sysio.epoch" );
+   auto bl1 = get_blocklog_row(1u);
+   BOOST_REQUIRE( !bl1.is_null() );
+   const uint32_t first_retry_at = bl1["last_retry_at"].as<uint32_t>();
+
+   produce_blocks(20);
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state(EPOCH) );
+
+   auto bl2 = get_blocklog_row(1u);
+   BOOST_REQUIRE( !bl2.is_null() );
+   BOOST_REQUIRE_EQUAL( bl2["retry_count"].as<uint32_t>(), 2u );
+   BOOST_REQUIRE_GE( bl2["last_retry_at"].as<uint32_t>(), first_retry_at );
+   // first_blocked_at MUST NOT change across retries with same reason.
+   BOOST_REQUIRE_EQUAL( bl2["first_blocked_at"].as<uint32_t>(),
+                        bl1["first_blocked_at"].as<uint32_t>() );
+   BOOST_REQUIRE_EQUAL( bl2["reason"].as_string(), "EMISSIONS_BLOCK_REASON_STATE_UNINITIALIZED" );
 } FC_LOG_AND_RETHROW()
 
-BOOST_FIXTURE_TEST_CASE( processepoch_succeeds_after_epoch_duration, sysio_emissions_tester ) try {
+BOOST_FIXTURE_TEST_CASE( gate_block_reason_change_updates_row, sysio_emissions_tester ) try {
+   // First block: STATE_UNINITIALIZED (no initt5).
+   // Second block: switch to TREASURY_EXHAUSTED by initt5'ing AND configuring
+   // a tight cfg whose remaining is zero. Reason changes; row is updated and
+   // first_blocked_at is preserved (still records the original block time).
+   create_t5_holding_accounts();
+
+   produce_blocks(20);
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state(EPOCH) );
+
+   auto bl1 = get_blocklog_row(1u);
+   BOOST_REQUIRE( !bl1.is_null() );
+   BOOST_REQUIRE_EQUAL( bl1["reason"].as_string(), "EMISSIONS_BLOCK_REASON_STATE_UNINITIALIZED" );
+   const uint32_t orig_blocked_at = bl1["first_blocked_at"].as<uint32_t>();
+
+   // Reconfigure with t5_distributable == t5_floor so remaining is zero.
+   auto cfg = mvo()
+      ("t1_allocation",          T1_ALLOCATION.get_amount())
+      ("t2_allocation",          T2_ALLOCATION.get_amount())
+      ("t3_allocation",          T3_ALLOCATION.get_amount())
+      ("t1_duration",            T1_DURATION) ("t2_duration", T2_DURATION) ("t3_duration", T3_DURATION)
+      ("min_claimable",          MIN_CLAIMABLE_AMOUNT)
+      ("t5_distributable",       int64_t(125000000000000000LL))
+      ("t5_floor",               int64_t(125000000000000000LL))
+      ("epoch_duration_secs",    uint32_t(86400))
+      ("decay_numerator",        DECAY_NUMERATOR) ("decay_denominator", DECAY_DENOMINATOR)
+      ("epoch_initial_emission", int64_t(0))
+      ("epoch_max_emission",     EPOCH_MAX_EMISSION) ("epoch_min_emission", int64_t(0))
+      ("compute_bps",            COMPUTE_BPS) ("capital_bps", CAPITAL_BPS)
+      ("capex_bps",              CAPEX_BPS)   ("governance_bps", uint16_t(1000))
+      ("producer_bps",           PRODUCER_BPS)("batch_op_bps", uint16_t(3000))
+      ("standby_end_rank",       T_STANDBY_END_RANK);
+   BOOST_REQUIRE_EQUAL( success(), setemitcfg(config::system_account_name, cfg) );
+   BOOST_REQUIRE_EQUAL( success(), initt5(config::system_account_name, tpsec(head_secs())) );
+
+   produce_blocks(20);
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state(EPOCH) );
+
+   auto bl2 = get_blocklog_row(1u);
+   BOOST_REQUIRE( !bl2.is_null() );
+   BOOST_REQUIRE_EQUAL( bl2["reason"].as_string(), "EMISSIONS_BLOCK_REASON_TREASURY_EXHAUSTED" );
+   BOOST_REQUIRE_EQUAL( bl2["first_blocked_at"].as<uint32_t>(), orig_blocked_at );
+   BOOST_REQUIRE_EQUAL( bl2["retry_count"].as<uint32_t>(), 2u );
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( gate_block_clears_on_unblock, sysio_emissions_tester ) try {
+   // Gate fails (no initt5), blocklog row appears, then gate passes after
+   // initt5 -- the row for that epoch_index must be erased on the success
+   // path so it no longer shows up to ops as "currently blocked".
+   create_t5_holding_accounts();
+
+   produce_blocks(20);
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state(EPOCH) );
+   BOOST_REQUIRE( !get_blocklog_row(1u).is_null() );
+
+   // Unblock by initialising t5 state. Wall clock already past initial
+   // next_epoch_start (default 0); next advance crosses the gate.
+   const uint32_t start = head_secs() - ONE_EPOCH - 1;
+   BOOST_REQUIRE_EQUAL( success(), initt5(config::system_account_name, tpsec(start)) );
+
+   produce_blocks(20);
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state(EPOCH) );
+
+   // Epoch advanced to 1 and blocklog[1] was pruned.
+   auto est = get_epoch_state_row();
+   BOOST_REQUIRE( !est.is_null() );
+   BOOST_REQUIRE_EQUAL( est["current_epoch_index"].as<uint32_t>(), 1u );
+   BOOST_REQUIRE( get_blocklog_row(1u).is_null() );
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( advance_pays_after_epoch_duration, sysio_emissions_tester ) try {
    create_t5_holding_accounts();
    // Set start_time in the past so epoch has already elapsed
    const uint32_t start = head_secs() - ONE_EPOCH - 1;
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
 
-   BOOST_REQUIRE_EQUAL( success(), processepoch( config::system_account_name ) );
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
    auto state = get_t5_state();
    BOOST_REQUIRE( !state.is_null() );
@@ -2030,7 +2186,7 @@ BOOST_FIXTURE_TEST_CASE( first_epoch_uses_initial_emission, sysio_emissions_test
    const uint32_t start = head_secs() - ONE_EPOCH - 1;
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
 
-   BOOST_REQUIRE_EQUAL( success(), processepoch( config::system_account_name ) );
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
    auto state = get_t5_state();
    BOOST_REQUIRE_EQUAL( state["last_epoch_emission"].as<int64_t>(), EPOCH_INITIAL_EMISSION );
@@ -2051,16 +2207,11 @@ BOOST_FIXTURE_TEST_CASE( subsequent_epochs_apply_decay, sysio_emissions_tester )
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
 
    // Epoch 1 (bootstrap_epoch already advanced sysio.epoch to index 1)
-   BOOST_REQUIRE_EQUAL( success(), processepoch( config::system_account_name ) );
-
-   // Bump sysio.epoch to index 2 so processepoch has another epoch to consume.
-   // Must cross the epoch wall-clock boundary before sysio.epoch::advance will
-   // increment -- produce_block with an explicit time jump.
-   produce_blocks(12);
    BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
-   // Epoch 2
-   BOOST_REQUIRE_EQUAL( success(), processepoch( config::system_account_name ) );
+   // Epoch 2: cross the wall-clock boundary, then advance again.
+   produce_blocks(12);
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
    auto state = get_t5_state();
    BOOST_REQUIRE_EQUAL( state["epoch_count"].as<uint64_t>(), 2u );
@@ -2083,7 +2234,7 @@ BOOST_FIXTURE_TEST_CASE( emission_clamped_to_max, sysio_emissions_tester ) try {
    create_t5_holding_accounts();
    const uint32_t start = head_secs() - ONE_EPOCH - 1;
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
-   BOOST_REQUIRE_EQUAL( success(), processepoch( config::system_account_name ) );
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
    auto state = get_t5_state();
    BOOST_REQUIRE( state["last_epoch_emission"].as<int64_t>() <= EPOCH_MAX_EMISSION );
@@ -2095,7 +2246,7 @@ BOOST_FIXTURE_TEST_CASE( emission_capped_at_distributable_ceiling, sysio_emissio
    const uint32_t start = head_secs() - ONE_EPOCH - 1;
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
 
-   BOOST_REQUIRE_EQUAL( success(), processepoch( config::system_account_name ) );
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
    auto state = get_t5_state();
    BOOST_REQUIRE( state["total_distributed"].as<int64_t>() <= T5_DISTRIBUTABLE );
@@ -2109,7 +2260,7 @@ BOOST_FIXTURE_TEST_CASE( category_split_matches_basis_points, sysio_emissions_te
    create_t5_holding_accounts();
    const uint32_t start = head_secs() - ONE_EPOCH - 1;
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
-   BOOST_REQUIRE_EQUAL( success(), processepoch( config::system_account_name ) );
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
    auto log = get_epoch_log(1);
    BOOST_REQUIRE( !log.is_null() );
@@ -2129,7 +2280,7 @@ BOOST_FIXTURE_TEST_CASE( governance_gets_remainder_no_dust_loss, sysio_emissions
    create_t5_holding_accounts();
    const uint32_t start = head_secs() - ONE_EPOCH - 1;
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
-   BOOST_REQUIRE_EQUAL( success(), processepoch( config::system_account_name ) );
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
    auto log = get_epoch_log(1);
    int64_t total   = log["total_emission"].as<int64_t>();
@@ -2154,7 +2305,7 @@ BOOST_FIXTURE_TEST_CASE( no_producers_undistributed_stays_in_sysio, sysio_emissi
    const asset sysio_before = get_wire_balance(config::system_account_name);
    const asset capex_before = get_wire_balance("sysio.ops"_n);
 
-   BOOST_REQUIRE_EQUAL( success(), processepoch( config::system_account_name ) );
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
    auto log = get_epoch_log(1);
    int64_t emission = log["total_emission"].as<int64_t>();
@@ -2189,7 +2340,7 @@ BOOST_FIXTURE_TEST_CASE( active_producers_get_equal_share, sysio_emissions_teste
    asset bal_b_before = get_wire_balance("producerb"_n);
    asset bal_c_before = get_wire_balance("producerc"_n);
 
-   BOOST_REQUIRE_EQUAL( success(), processepoch( config::system_account_name ) );
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
    int64_t got_a = get_wire_balance("producera"_n).get_amount() - bal_a_before.get_amount();
    int64_t got_b = get_wire_balance("producerb"_n).get_amount() - bal_b_before.get_amount();
@@ -2219,7 +2370,7 @@ BOOST_FIXTURE_TEST_CASE( holding_accounts_receive_correct_amounts, sysio_emissio
    asset batch_before = get_wire_balance("sysio.batch"_n);
    asset ops_before   = get_wire_balance("sysio.ops"_n);
 
-   BOOST_REQUIRE_EQUAL( success(), processepoch( config::system_account_name ) );
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
    auto log = get_epoch_log(1);
    int64_t emission = log["total_emission"].as<int64_t>();
@@ -2248,12 +2399,12 @@ BOOST_FIXTURE_TEST_CASE( viewepoch_returns_correct_state, sysio_emissions_tester
    create_t5_holding_accounts();
    const uint32_t start = head_secs() - ONE_EPOCH - 1;
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
-   BOOST_REQUIRE_EQUAL( success(), processepoch( config::system_account_name ) );
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
    int64_t undist = compute_undistributed_if_no_operators(EPOCH_INITIAL_EMISSION);
    int64_t expected_distributed = EPOCH_INITIAL_EMISSION - undist;
 
-   auto info = viewepoch( config::system_account_name );
+   auto info = viewepoch();
    BOOST_REQUIRE_EQUAL( info.epoch_count, 1u );
    BOOST_REQUIRE_EQUAL( info.last_epoch_emission, EPOCH_INITIAL_EMISSION );
    BOOST_REQUIRE_EQUAL( info.total_distributed, expected_distributed );
@@ -2265,9 +2416,9 @@ BOOST_FIXTURE_TEST_CASE( viewepoch_estimates_next_emission, sysio_emissions_test
    create_t5_holding_accounts();
    const uint32_t start = head_secs() - ONE_EPOCH - 1;
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
-   BOOST_REQUIRE_EQUAL( success(), processepoch( config::system_account_name ) );
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
-   auto info = viewepoch( config::system_account_name );
+   auto info = viewepoch();
 
    __int128 expected = static_cast<__int128>(EPOCH_INITIAL_EMISSION) * DECAY_NUMERATOR;
    int64_t expected_next = static_cast<int64_t>(expected / DECAY_DENOMINATOR);
@@ -2280,18 +2431,11 @@ BOOST_FIXTURE_TEST_CASE( viewepoch_estimates_next_emission, sysio_emissions_test
 // Integration
 // ---------------------------------------------------------------------------
 
-BOOST_FIXTURE_TEST_CASE( processepoch_is_permissionless, sysio_emissions_tester ) try {
-   create_t5_holding_accounts();
-   create_user_accounts({ "randuser"_n });
-   const uint32_t start = head_secs() - ONE_EPOCH - 1;
-   BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
-
-   // Any user can call processepoch
-   BOOST_REQUIRE_EQUAL( success(), processepoch( "randuser"_n ) );
-
-   auto state = get_t5_state();
-   BOOST_REQUIRE_EQUAL( state["epoch_count"].as<uint64_t>(), 1u );
-} FC_LOG_AND_RETHROW()
+// payepoch's auth (require_auth(sysio.epoch)) is exercised implicitly by every
+// other emissions test that drives advance_epoch_state -- if the auth check
+// were absent, those tests would either spuriously pay or spuriously fail.
+// A direct-push-as-non-epoch test would need sysio.system's payepoch helper
+// in the test fixture's public surface; not worth the boilerplate.
 
 // ---------------------------------------------------------------------------
 // Performance-based producer pay
@@ -2310,7 +2454,7 @@ BOOST_FIXTURE_TEST_CASE( non_producing_active_excluded, sysio_emissions_tester )
    asset bal_b_before = get_wire_balance("producerb"_n);
    asset bal_c_before = get_wire_balance("producerc"_n);
 
-   BOOST_REQUIRE_EQUAL( success(), processepoch( config::system_account_name ) );
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
    // Producers should receive nothing (0 eligible_rounds → excluded)
    BOOST_REQUIRE_EQUAL( get_wire_balance("producera"_n), bal_a_before );
@@ -2327,7 +2471,7 @@ BOOST_FIXTURE_TEST_CASE( partial_uptime_proportional_pay, sysio_emissions_tester
    wait_for_producer_schedule();
    produce_complete_cycles(3, 2); // 2 cycles sufficient
 
-   // Read eligible_rounds for producera before processepoch
+   // Read eligible_rounds for producera before advance
    auto pa_info = get_producer_info("producera"_n);
    BOOST_REQUIRE( !pa_info.is_null() );
    uint16_t elig_a = pa_info["eligible_rounds"].as<uint16_t>();
@@ -2338,7 +2482,7 @@ BOOST_FIXTURE_TEST_CASE( partial_uptime_proportional_pay, sysio_emissions_tester
 
    asset bal_a_before = get_wire_balance("producera"_n);
 
-   BOOST_REQUIRE_EQUAL( success(), processepoch( config::system_account_name ) );
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
    int64_t got_a = get_wire_balance("producera"_n).get_amount() - bal_a_before.get_amount();
    BOOST_REQUIRE( got_a > 0 );
@@ -2374,7 +2518,7 @@ BOOST_FIXTURE_TEST_CASE( standby_paid_without_block_check, sysio_emissions_teste
    uint32_t standby_rank = standby_info["rank"].as<uint32_t>();
    BOOST_REQUIRE( standby_rank >= T_STANDBY_START_RANK && standby_rank <= T_STANDBY_END_RANK );
 
-   BOOST_REQUIRE_EQUAL( success(), processepoch( config::system_account_name ) );
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
    // Standby should receive payment even with 0 blocks produced
    int64_t standby_got = get_wire_balance(standby_name).get_amount() - standby_before.get_amount();
@@ -2382,23 +2526,23 @@ BOOST_FIXTURE_TEST_CASE( standby_paid_without_block_check, sysio_emissions_teste
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( round_tracking_reset_after_epoch, sysio_emissions_tester ) try {
-   // After processepoch, all round-tracking fields should be reset
+   // After advance, all round-tracking fields should be reset
    create_t5_holding_accounts();
    setup_producers(3);
    wait_for_producer_schedule();
    produce_complete_cycles(3, 2);
 
-   // Verify fields are non-zero before processepoch
+   // Verify fields are non-zero before advance
    auto pa_before = get_producer_info("producera"_n);
    BOOST_REQUIRE( pa_before["eligible_rounds"].as<uint16_t>() > 0 );
    BOOST_REQUIRE( pa_before["unpaid_blocks"].as<uint32_t>() > 0 );
 
    const uint32_t start = head_secs() - ONE_EPOCH - 1;
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
-   BOOST_REQUIRE_EQUAL( success(), processepoch( config::system_account_name ) );
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
-   // After processepoch, fields are reset; however, the block that commits the
-   // processepoch transaction is itself produced by one of the test producers,
+   // After advance, fields are reset; however, the block that commits the
+   // advance transaction is itself produced by one of the test producers,
    // so onblock runs once after the reset and that producer's per-block tracking
    // (current_round_blocks + unpaid_blocks + last_block_num) gets re-bumped by 1.
    // eligible_rounds should still be 0 because a single block cannot satisfy
@@ -2418,7 +2562,7 @@ BOOST_FIXTURE_TEST_CASE( total_distributed_excludes_undistributed, sysio_emissio
 
    const uint32_t start = head_secs() - ONE_EPOCH - 1;
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
-   BOOST_REQUIRE_EQUAL( success(), processepoch( config::system_account_name ) );
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
    auto state = get_t5_state();
    int64_t emission = state["last_epoch_emission"].as<int64_t>();
@@ -2462,11 +2606,11 @@ BOOST_FIXTURE_TEST_CASE( inprogress_round_finalized, sysio_emissions_tester ) tr
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
 
    asset bal_a_before = get_wire_balance("producera"_n);
-   BOOST_REQUIRE_EQUAL( success(), processepoch( config::system_account_name ) );
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
    int64_t got_a = get_wire_balance("producera"_n).get_amount() - bal_a_before.get_amount();
 
-   // processepoch finalizes in-progress round (>= 6 blocks) → adds 1 to eligible_rounds
+   // payepoch finalizes in-progress round (>= 6 blocks) -> adds 1 to eligible_rounds
    // Pay should be based on (elig_before + 1) rounds > 0
    BOOST_REQUIRE( got_a > 0 );
 } FC_LOG_AND_RETHROW()
@@ -2509,7 +2653,7 @@ BOOST_FIXTURE_TEST_CASE( producer_promoted_mid_epoch, sysio_emissions_tester ) t
    BOOST_REQUIRE( promoted_rank >= 1 && promoted_rank <= T_ACTIVE_PRODUCER_COUNT );
 
    asset promoted_before = get_wire_balance(promoted);
-   BOOST_REQUIRE_EQUAL( success(), processepoch( config::system_account_name ) );
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
    int64_t promoted_got = get_wire_balance(promoted).get_amount() - promoted_before.get_amount();
    // Should get proportional active pay (they produced blocks after promotion)
@@ -2546,7 +2690,7 @@ BOOST_FIXTURE_TEST_CASE( producer_demoted_mid_epoch, sysio_emissions_tester ) tr
    BOOST_REQUIRE( pa_rank >= T_STANDBY_START_RANK );
 
    asset demoted_before = get_wire_balance("producera"_n);
-   BOOST_REQUIRE_EQUAL( success(), processepoch( config::system_account_name ) );
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
    if (pa_rank <= T_STANDBY_END_RANK) {
       // Treated as standby → gets standby weight share (no performance check)
@@ -2581,7 +2725,7 @@ BOOST_FIXTURE_TEST_CASE( producer_replaced_mid_epoch, sysio_emissions_tester ) t
    asset old_before = get_wire_balance("producera"_n);
    name new_producer = producer_name_at(21);
    asset new_before = get_wire_balance(new_producer);
-   BOOST_REQUIRE_EQUAL( success(), processepoch( config::system_account_name ) );
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
    auto log = get_epoch_log(1);
    int64_t emission = log["total_emission"].as<int64_t>();
@@ -2607,24 +2751,11 @@ BOOST_FIXTURE_TEST_CASE( producer_replaced_mid_epoch, sysio_emissions_tester ) t
 // Additional coverage: timing & epoch boundaries
 // ---------------------------------------------------------------------------
 
-BOOST_FIXTURE_TEST_CASE( delayed_epoch_processes_only_once, sysio_emissions_tester ) try {
-   // Even if multiple sysio.epoch advances have queued up, processepoch distributes
-   // exactly one epoch per call. A second call without another sysio.epoch::advance
-   // must fail because current_epoch_index == last_epoch_index after the first.
-   create_t5_holding_accounts();
-   const uint32_t start = head_secs() - (2 * ONE_EPOCH) - 10;
-   BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
-
-   // First call: succeeds.
-   BOOST_REQUIRE_EQUAL( success(), processepoch( config::system_account_name ) );
-   auto state = get_t5_state();
-   BOOST_REQUIRE_EQUAL( state["epoch_count"].as<uint64_t>(), 1u );
-
-   // Second call immediately: fails because last_epoch_index caught up to current_epoch_index.
-   auto r = processepoch( config::system_account_name );
-   BOOST_REQUIRE( r != success() );
-   require_substr( r, "emissions already caught up to sysio.epoch" );
-} FC_LOG_AND_RETHROW()
+// `delayed_epoch_processes_only_once` removed: tested the cranker-era
+// idempotency guard ("emissions already caught up to sysio.epoch"). Under the
+// gate-based model, every successful advance pays exactly once -- there is no
+// idempotency to test. Wall-clock gating in advance() (next_epoch_start) is
+// covered by other tests that drive multiple advances within one trx flow.
 
 BOOST_FIXTURE_TEST_CASE( multi_epoch_cumulative_accounting, sysio_emissions_tester ) try {
    // Run 3 epochs and verify total_distributed equals sum of per-epoch effective distributions
@@ -2635,7 +2766,7 @@ BOOST_FIXTURE_TEST_CASE( multi_epoch_cumulative_accounting, sysio_emissions_test
    int64_t cumulative = 0;
 
    // Epoch 1 (sysio.epoch bootstrapped to index 1 in fixture).
-   BOOST_REQUIRE_EQUAL( success(), processepoch( config::system_account_name ) );
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
    auto log1 = get_epoch_log(1);
    int64_t e1 = log1["total_emission"].as<int64_t>();
    int64_t undist1 = compute_undistributed_if_no_operators(e1);
@@ -2648,7 +2779,6 @@ BOOST_FIXTURE_TEST_CASE( multi_epoch_cumulative_accounting, sysio_emissions_test
    // Advance sysio.epoch to index 2 and process.
    produce_blocks(12);
    BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
-   BOOST_REQUIRE_EQUAL( success(), processepoch( config::system_account_name ) );
    auto log2 = get_epoch_log(2);
    int64_t e2 = log2["total_emission"].as<int64_t>();
    int64_t undist2 = compute_undistributed_if_no_operators(e2);
@@ -2664,7 +2794,6 @@ BOOST_FIXTURE_TEST_CASE( multi_epoch_cumulative_accounting, sysio_emissions_test
    // Advance sysio.epoch to index 3 and process.
    produce_blocks(12);
    BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
-   BOOST_REQUIRE_EQUAL( success(), processepoch( config::system_account_name ) );
    auto log3 = get_epoch_log(3);
    int64_t e3 = log3["total_emission"].as<int64_t>();
    int64_t undist3 = compute_undistributed_if_no_operators(e3);
@@ -2688,7 +2817,7 @@ BOOST_FIXTURE_TEST_CASE( category_splits_sum_to_emission, sysio_emissions_tester
    create_t5_holding_accounts();
    const uint32_t start = head_secs() - ONE_EPOCH - 1;
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
-   BOOST_REQUIRE_EQUAL( success(), processepoch( config::system_account_name ) );
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
    auto log = get_epoch_log(1);
    int64_t emission    = log["total_emission"].as<int64_t>();
@@ -2716,14 +2845,14 @@ BOOST_FIXTURE_TEST_CASE( epoch_log_records_all_fields, sysio_emissions_tester ) 
    create_t5_holding_accounts();
    const uint32_t start = head_secs() - ONE_EPOCH - 1;
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
-   BOOST_REQUIRE_EQUAL( success(), processepoch( config::system_account_name ) );
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
    auto log = get_epoch_log(1);
    BOOST_REQUIRE( !log.is_null() );
 
    // sysio_epoch_index aligns with sysio.epoch's current_epoch_index at write time.
    // epoch_count is sysio.system's internal invocation counter; after the first
-   // processepoch call both are 1.
+   // advance call both are 1.
    BOOST_REQUIRE_EQUAL( log["sysio_epoch_index"].as<uint32_t>(), 1u );
    BOOST_REQUIRE_EQUAL( log["epoch_count"].as<uint64_t>(), 1u );
 
@@ -2768,7 +2897,7 @@ BOOST_FIXTURE_TEST_CASE( all_actives_excluded_standbys_still_paid, sysio_emissio
    asset active_before  = get_wire_balance(active);
    asset standby_before = get_wire_balance(standby);
 
-   BOOST_REQUIRE_EQUAL( success(), processepoch( config::system_account_name ) );
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
    // Active should get nothing (0 eligible_rounds)
    BOOST_REQUIRE_EQUAL( get_wire_balance(active), active_before );
@@ -2793,7 +2922,7 @@ BOOST_FIXTURE_TEST_CASE( single_active_producer_full_active_share, sysio_emissio
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
 
    asset bal_before = get_wire_balance("producera"_n);
-   BOOST_REQUIRE_EQUAL( success(), processepoch( config::system_account_name ) );
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
    int64_t got = get_wire_balance("producera"_n).get_amount() - bal_before.get_amount();
    BOOST_REQUIRE( got > 0 );
@@ -2829,7 +2958,7 @@ BOOST_FIXTURE_TEST_CASE( standby_weight_decreases_by_rank, sysio_emissions_teste
    asset sb2_before = get_wire_balance(sb2);
    asset sb3_before = get_wire_balance(sb3);
 
-   BOOST_REQUIRE_EQUAL( success(), processepoch( config::system_account_name ) );
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
    int64_t got1 = get_wire_balance(sb1).get_amount() - sb1_before.get_amount();
    int64_t got2 = get_wire_balance(sb2).get_amount() - sb2_before.get_amount();
@@ -2868,7 +2997,7 @@ BOOST_FIXTURE_TEST_CASE( inprogress_round_below_threshold_no_credit, sysio_emiss
          BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
 
          asset bal_before = get_wire_balance("producera"_n);
-         BOOST_REQUIRE_EQUAL( success(), processepoch( config::system_account_name ) );
+         BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
          // Finalization should NOT credit this round (< 6 blocks)
          // So eligible_rounds stays 0 → excluded from payment
@@ -2891,7 +3020,7 @@ BOOST_FIXTURE_TEST_CASE( active_capped_at_expected_rounds, sysio_emissions_teste
 
    // All 3 producers have same eligible_rounds and same weight
    asset bal_a_before = get_wire_balance("producera"_n);
-   BOOST_REQUIRE_EQUAL( success(), processepoch( config::system_account_name ) );
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
    int64_t got_a = get_wire_balance("producera"_n).get_amount() - bal_a_before.get_amount();
 
@@ -2921,7 +3050,7 @@ BOOST_FIXTURE_TEST_CASE( sysio_balance_decreases_by_distributed_amount, sysio_em
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
 
    asset sysio_before = get_wire_balance(config::system_account_name);
-   BOOST_REQUIRE_EQUAL( success(), processepoch( config::system_account_name ) );
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
    asset sysio_after = get_wire_balance(config::system_account_name);
 
    auto state = get_t5_state();
@@ -2943,7 +3072,7 @@ BOOST_FIXTURE_TEST_CASE( sysio_balance_with_producers, sysio_emissions_tester ) 
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
 
    asset sysio_before = get_wire_balance(config::system_account_name);
-   BOOST_REQUIRE_EQUAL( success(), processepoch( config::system_account_name ) );
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
    asset sysio_after = get_wire_balance(config::system_account_name);
 
    auto state = get_t5_state();
@@ -2972,7 +3101,7 @@ BOOST_FIXTURE_TEST_CASE( viewepoch_before_first_epoch, sysio_emissions_tester ) 
    const uint32_t start = head_secs();
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
 
-   auto info = viewepoch( config::system_account_name );
+   auto info = viewepoch();
    BOOST_REQUIRE_EQUAL( info.epoch_count, 0u );
    BOOST_REQUIRE_EQUAL( info.total_distributed, 0 );
    BOOST_REQUIRE_EQUAL( info.treasury_remaining, T5_DISTRIBUTABLE - T5_FLOOR );
@@ -2986,16 +3115,13 @@ BOOST_FIXTURE_TEST_CASE( viewepoch_after_multiple_epochs, sysio_emissions_tester
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
 
    // Epoch 1 (sysio.epoch already at index 1 from fixture's bootstrap_epoch).
-   BOOST_REQUIRE_EQUAL( success(), processepoch( config::system_account_name ) );
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
    // Advance sysio.epoch to index 2 across the wall-clock boundary.
    produce_blocks(12);
    BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
-   // Epoch 2
-   BOOST_REQUIRE_EQUAL( success(), processepoch( config::system_account_name ) );
-
-   auto info = viewepoch( config::system_account_name );
+   auto info = viewepoch();
    BOOST_REQUIRE_EQUAL( info.epoch_count, 2u );
    BOOST_REQUIRE( info.total_distributed > 0 );
    BOOST_REQUIRE_EQUAL( info.treasury_remaining, T5_DISTRIBUTABLE - T5_FLOOR - info.total_distributed );
@@ -3029,7 +3155,7 @@ BOOST_FIXTURE_TEST_CASE( rank_29_and_above_get_nothing, sysio_emissions_tester )
    asset beyond1_before = get_wire_balance(beyond1);
    asset beyond2_before = get_wire_balance(beyond2);
 
-   BOOST_REQUIRE_EQUAL( success(), processepoch( config::system_account_name ) );
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
    auto b1_info = get_producer_info(beyond1);
    auto b2_info = get_producer_info(beyond2);
@@ -3058,7 +3184,7 @@ BOOST_FIXTURE_TEST_CASE( rank_28_standby_gets_minimum_weight, sysio_emissions_te
    name last_standby = producer_name_at(27); // index 27 = rank 28
    asset last_before = get_wire_balance(last_standby);
 
-   BOOST_REQUIRE_EQUAL( success(), processepoch( config::system_account_name ) );
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
    auto info = get_producer_info(last_standby);
    if (!info.is_null() && info["rank"].as<uint32_t>() == T_STANDBY_END_RANK) {
@@ -3091,7 +3217,7 @@ BOOST_FIXTURE_TEST_CASE( inactive_producer_excluded_from_distribution, sysio_emi
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
 
    asset bal_a_before = get_wire_balance("producera"_n);
-   BOOST_REQUIRE_EQUAL( success(), processepoch( config::system_account_name ) );
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
    // Inactive producer should receive nothing
    auto pa_info = get_producer_info("producera"_n);
@@ -3150,8 +3276,7 @@ BOOST_FIXTURE_TEST_CASE( unpaid_blocks_track_actual_production, sysio_emissions_
 // sysio.opreg and sysio.epoch contracts deployed by the fixture, covering:
 //
 //   - opreg status filter (slashed / terminated producers excluded from pay)
-//   - idempotency + one-epoch-per-call gap catch-up via sysio.epoch
-//   - treasury balance floor (processepoch fails when sysio has insufficient WIRE)
+//   - treasury balance floor (gate blocks advance when sysio has insufficient WIRE)
 //   - sysio.roa::regnodeowner inline-addnodeowner guard when emitcfg is unset
 // =============================================================================
 
@@ -3180,7 +3305,7 @@ BOOST_FIXTURE_TEST_CASE( opreg_slashed_producer_excluded_from_pay, sysio_emissio
    asset bal_b_before = get_wire_balance("producerb"_n);
    asset bal_c_before = get_wire_balance("producerc"_n);
 
-   BOOST_REQUIRE_EQUAL( success(), processepoch( config::system_account_name ) );
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
    int64_t got_a = get_wire_balance("producera"_n).get_amount() - bal_a_before.get_amount();
    int64_t got_b = get_wire_balance("producerb"_n).get_amount() - bal_b_before.get_amount();
@@ -3209,7 +3334,7 @@ BOOST_FIXTURE_TEST_CASE( opreg_unregistered_producer_excluded_from_pay, sysio_em
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
 
    asset sysio_before = get_wire_balance(config::system_account_name);
-   BOOST_REQUIRE_EQUAL( success(), processepoch( config::system_account_name ) );
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
    asset sysio_after = get_wire_balance(config::system_account_name);
 
    auto log = get_epoch_log(1);
@@ -3223,156 +3348,12 @@ BOOST_FIXTURE_TEST_CASE( opreg_unregistered_producer_excluded_from_pay, sysio_em
    BOOST_REQUIRE_EQUAL( sysio_decrease, expected_baseline );
 } FC_LOG_AND_RETHROW()
 
-BOOST_FIXTURE_TEST_CASE( processepoch_gap_catchup_one_epoch_per_call, sysio_emissions_tester ) try {
-   // Advancing sysio.epoch several times before calling processepoch does NOT
-   // collapse the distributions into a single call: each processepoch consumes
-   // exactly one epoch. Three advances require three separate invocations.
-   //
-   // The fixture's bootstrap_epoch configures sysio.epoch with a short
-   // (5-second) duration, so a handful of produce_blocks is enough to cross
-   // each wall-clock boundary between sysio.epoch::advance calls.
-   create_t5_holding_accounts();
-   const uint32_t start = head_secs() - ONE_EPOCH - 1;
-   BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
-
-   constexpr int blocks_per_epoch = 12; // 5 seconds at 0.5s block interval + margin
-
-   produce_blocks(blocks_per_epoch);
-   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
-   produce_blocks(blocks_per_epoch);
-   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
-
-   auto est = get_epoch_state_row();
-   BOOST_REQUIRE_EQUAL( est["current_epoch_index"].as<uint32_t>(), 3u );
-
-   // First call consumes one epoch.
-   BOOST_REQUIRE_EQUAL( success(), processepoch( config::system_account_name ) );
-   BOOST_REQUIRE_EQUAL( get_t5_state()["last_epoch_index"].as<uint32_t>(), 1u );
-
-   // Second.
-   BOOST_REQUIRE_EQUAL( success(), processepoch( config::system_account_name ) );
-   BOOST_REQUIRE_EQUAL( get_t5_state()["last_epoch_index"].as<uint32_t>(), 2u );
-
-   // Third.
-   BOOST_REQUIRE_EQUAL( success(), processepoch( config::system_account_name ) );
-   BOOST_REQUIRE_EQUAL( get_t5_state()["last_epoch_index"].as<uint32_t>(), 3u );
-
-   // Fourth fails -- caught up.
-   auto r = processepoch( config::system_account_name );
-   BOOST_REQUIRE( r != success() );
-   require_substr( r, "emissions already caught up to sysio.epoch" );
-} FC_LOG_AND_RETHROW()
-
-BOOST_FIXTURE_TEST_CASE( batch_snapshot_written_on_advance, sysio_emissions_tester ) try {
-   // sysio.epoch::advance writes a batch_snapshot row keyed by the new
-   // current_epoch_index. The fixture's bootstrap_epoch already advanced to
-   // epoch 1, so snapshot[1] should exist (with empty active_members since
-   // no initgroups has run). Each subsequent advance writes another row.
-   auto snap1 = get_batch_snapshot(1);
-   BOOST_REQUIRE( !snap1.is_null() );
-   BOOST_REQUIRE_EQUAL( snap1["epoch_index"].as<uint64_t>(), 1u );
-
-   produce_blocks(12);
-   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
-   produce_blocks(1);
-
-   auto snap2 = get_batch_snapshot(2);
-   BOOST_REQUIRE( !snap2.is_null() );
-   BOOST_REQUIRE_EQUAL( snap2["epoch_index"].as<uint64_t>(), 2u );
-
-   // Prior snapshot is still there; advance does not clobber.
-   auto snap1_again = get_batch_snapshot(1);
-   BOOST_REQUIRE( !snap1_again.is_null() );
-} FC_LOG_AND_RETHROW()
-
-BOOST_FIXTURE_TEST_CASE( processepoch_prunes_only_consumed_snapshot, sysio_emissions_tester ) try {
-   // After sysio.epoch advances multiple times, there is a snapshot row per
-   // advanced-to epoch. processepoch consumes exactly one epoch per call and
-   // prunes only that epoch's snapshot, leaving the rest intact for later
-   // catch-up invocations.
-   create_t5_holding_accounts();
-   const uint32_t start = head_secs() - ONE_EPOCH - 1;
-   BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
-
-   produce_blocks(12);
-   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
-   produce_blocks(12);
-   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
-
-   // Snapshots for epochs 1, 2, 3 should all exist.
-   BOOST_REQUIRE( !get_batch_snapshot(1).is_null() );
-   BOOST_REQUIRE( !get_batch_snapshot(2).is_null() );
-   BOOST_REQUIRE( !get_batch_snapshot(3).is_null() );
-
-   // First processepoch consumes epoch 1.
-   BOOST_REQUIRE_EQUAL( success(), processepoch( config::system_account_name ) );
-   BOOST_REQUIRE(  get_batch_snapshot(1).is_null() );
-   BOOST_REQUIRE( !get_batch_snapshot(2).is_null() );
-   BOOST_REQUIRE( !get_batch_snapshot(3).is_null() );
-
-   // Second consumes epoch 2.
-   BOOST_REQUIRE_EQUAL( success(), processepoch( config::system_account_name ) );
-   BOOST_REQUIRE(  get_batch_snapshot(1).is_null() );
-   BOOST_REQUIRE(  get_batch_snapshot(2).is_null() );
-   BOOST_REQUIRE( !get_batch_snapshot(3).is_null() );
-
-   // Third consumes epoch 3.
-   BOOST_REQUIRE_EQUAL( success(), processepoch( config::system_account_name ) );
-   BOOST_REQUIRE( get_batch_snapshot(1).is_null() );
-   BOOST_REQUIRE( get_batch_snapshot(2).is_null() );
-   BOOST_REQUIRE( get_batch_snapshot(3).is_null() );
-} FC_LOG_AND_RETHROW()
-
-BOOST_FIXTURE_TEST_CASE( batch_snapshot_captures_rotation_index, sysio_emissions_tester ) try {
-   // Successive advances rotate current_batch_op_group via
-   // current_epoch_index % batch_op_groups (= 3 by default). The snapshot
-   // written on each advance records THAT epoch's active_group_index, not
-   // whatever the live epoch_state rotates to afterwards.
-   produce_blocks(12);
-   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
-   produce_blocks(12);
-   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
-   produce_blocks(12);
-   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
-
-   // With 3 groups, rotation is 1 % 3 = 1, 2 % 3 = 2, 3 % 3 = 0, 4 % 3 = 1.
-   BOOST_REQUIRE_EQUAL( get_batch_snapshot(1)["active_group_index"].as<uint8_t>(), 1u );
-   BOOST_REQUIRE_EQUAL( get_batch_snapshot(2)["active_group_index"].as<uint8_t>(), 2u );
-   BOOST_REQUIRE_EQUAL( get_batch_snapshot(3)["active_group_index"].as<uint8_t>(), 0u );
-   BOOST_REQUIRE_EQUAL( get_batch_snapshot(4)["active_group_index"].as<uint8_t>(), 1u );
-
-   // Live state's current_batch_op_group reflects epoch 4 only (= 1).
-   BOOST_REQUIRE_EQUAL(
-      get_epoch_state_row()["current_batch_op_group"].as<uint8_t>(), 1u );
-
-   // Even though epochs 1 and 4 share rotation index 1, they are SEPARATE
-   // snapshot rows -- processepoch pays each epoch's captured members.
-} FC_LOG_AND_RETHROW()
-
-BOOST_FIXTURE_TEST_CASE( prunesnap_requires_sysio_system_auth, sysio_emissions_tester ) try {
-   // sysio.epoch::prunesnap must reject callers other than sysio (sysio.system).
-   // A batch operator who is currently in the rotation group must not be able
-   // to prune a historical snapshot out from under emissions.
-   create_user_accounts({ "alice"_n });
-   auto r = prunesnap("alice"_n, 1);
-   BOOST_REQUIRE( r != success() );
-   require_substr( r, "missing authority of sysio" );
-} FC_LOG_AND_RETHROW()
-
-BOOST_FIXTURE_TEST_CASE( prunesnap_rejects_unknown_epoch, sysio_emissions_tester ) try {
-   // prunesnap on a non-existent snapshot index must fail cleanly rather than
-   // silently no-op.
-   auto r = prunesnap(config::system_account_name, 9999);
-   BOOST_REQUIRE( r != success() );
-   require_substr( r, "batch snapshot not found for epoch" );
-} FC_LOG_AND_RETHROW()
-
-BOOST_FIXTURE_TEST_CASE( processepoch_fails_on_insufficient_treasury_balance, sysio_emissions_tester ) try {
+BOOST_FIXTURE_TEST_CASE( advance_gate_blocks_on_insufficient_treasury_balance, sysio_emissions_tester ) try {
    // The fixture funds sysio with 1_000_000_000 WIRE which easily covers the
    // default emission schedule. If sysio's balance is drained below the next
-   // epoch's emission, processepoch must refuse to distribute rather than
-   // partially pay -- the transfer would be rejected anyway, but we fail-fast
-   // at the precondition check for clarity.
+   // epoch's emission, sysio.epoch's readiness gate refuses to advance: the
+   // epoch index stays at 0, a blocklog row is written, and an EmissionsBlocked
+   // attestation is queued per outpost.
    create_t5_holding_accounts();
    const uint32_t start = head_secs() - ONE_EPOCH - 1;
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
@@ -3390,10 +3371,19 @@ BOOST_FIXTURE_TEST_CASE( processepoch_fails_on_insufficient_treasury_balance, sy
            ("memo", "drain for balance-floor test")
    );
 
-   // processepoch must throw at the balance check.
-   auto r = processepoch( config::system_account_name );
-   BOOST_REQUIRE( r != success() );
-   require_substr( r, "insufficient treasury WIRE balance" );
+   // advance must succeed (no throw -- gate emits error attestation cleanly).
+   produce_blocks(20);
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state(EPOCH) );
+
+   // Epoch index unchanged (still 0). If epochstate row hasn't been written,
+   // that also means current_epoch_index is effectively 0.
+   auto est = get_epoch_state_row();
+   if (!est.is_null()) {
+      BOOST_REQUIRE_EQUAL( est["current_epoch_index"].as<uint32_t>(), 0u );
+   }
+
+   // t5state.last_epoch_index unchanged (no payepoch ran).
+   BOOST_REQUIRE_EQUAL( get_t5_state()["last_epoch_index"].as<uint32_t>(), 0u );
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( roa_forcereg_inlines_addnodeowner_happy_path, sysio_emissions_tester ) try {

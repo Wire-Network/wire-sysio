@@ -560,6 +560,10 @@
                 {
                     "name": "ATTESTATION_TYPE_ATTESTATION_PROCESSING_ERROR",
                     "value": 60952
+                },
+                {
+                    "name": "ATTESTATION_TYPE_EMISSIONS_BLOCKED",
+                    "value": 60953
                 }
             ]
         },

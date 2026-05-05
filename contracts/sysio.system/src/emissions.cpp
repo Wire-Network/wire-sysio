@@ -1,15 +1,15 @@
 #include <sysio.system/sysio.system.hpp>
 #include <sysio.system/emissions.hpp>
 
-#include <sysio/crypto.hpp>
-#include <sysio/kv_scoped_table.hpp>
 #include <sysio/opp/types/types.pb.hpp>
 #include <sysio.opp.common/opp_table_types.hpp>
 
-// Read-only mirrors owned by the canonical contracts -- see each header's
-// invariant comment. sysio.system never writes these tables.
-#include <sysio.opreg/sysio.opreg_readonly.hpp>
-#include <sysio.epoch/sysio.epoch_readonly.hpp>
+// Canonical contract headers used for cross-contract reads. The
+// [[sysio::contract("sysio.<name>")]] attribute on each table struct pins
+// the table to its owning contract's ABI; including these from sysio.system
+// does not pollute sysio.system's ABI.
+#include <sysio.token/sysio.token.hpp>
+#include <sysio.opreg/sysio.opreg.hpp>
 
 #include <string>
 #include <string_view>
@@ -18,28 +18,6 @@
 namespace sysiosystem {
 
 using namespace emissions;
-
-// ===========================================================================
-// Read-only mirror of sysio.token accounts table (kv::scoped_table).
-// The upstream types are private inside sysio::token; we only need read access
-// to check sysio's own WIRE balance before emitting.
-// ===========================================================================
-
-namespace token_readonly {
-
-struct acct_key {
-   uint64_t sym_code;
-   SYSLIB_SERIALIZE(acct_key, (sym_code))
-};
-
-struct account {
-   sysio::asset balance;
-   SYSLIB_SERIALIZE(account, (balance))
-};
-
-using accounts_t = sysio::kv::scoped_table<"accounts"_n, acct_key, account>;
-
-} // namespace token_readonly
 
 // ---------------------------------------------------------------------------
 // Well-known OPP accounts.
@@ -63,7 +41,7 @@ constexpr sysio::symbol WIRE_SYMBOL{"WIRE", 9};
 
 constexpr uint32_t ACTIVE_PRODUCER_COUNT  = 21;
 constexpr uint32_t STANDBY_START_RANK     = 22;
-constexpr uint32_t MAX_STANDBY_END_RANK   = 100; // safety cap: bounds inline-action count in processepoch
+constexpr uint32_t MAX_STANDBY_END_RANK   = 100; // safety cap: bounds inline-action count in payepoch
 constexpr uint32_t TOTAL_BLOCKS_PER_ROUND = ACTIVE_PRODUCER_COUNT * blocks_per_round; // 252
 constexpr uint32_t ACTIVE_PRODUCER_WEIGHT = 15; // > any standby weight (1..cfg.standby_end_rank-21)
 
@@ -101,22 +79,9 @@ int64_t split_bps(int64_t total, uint16_t bps) {
    return static_cast<int64_t>(product / BPS_DENOMINATOR);
 }
 
-int64_t compute_epoch_emission(const emission_config& cfg, int64_t prev_emission, int64_t total_distributed) {
-   int64_t remaining = cfg.t5_distributable - cfg.t5_floor - total_distributed;
-   if (remaining <= 0)
-      return 0;
-
-   __int128 product = static_cast<__int128>(prev_emission) *
-                      static_cast<__int128>(cfg.decay_numerator);
-   int64_t emission = static_cast<int64_t>(product / cfg.decay_denominator);
-
-   if (emission > cfg.epoch_max_emission) emission = cfg.epoch_max_emission;
-   if (emission < cfg.epoch_min_emission) emission = cfg.epoch_min_emission;
-
-   if (emission > remaining) emission = remaining;
-
-   return emission;
-}
+// compute_epoch_emission lives in sysio.system_readonly.hpp as a template so
+// sysio.epoch's gate and this contract share one source of truth. Use the
+// qualified name at the call sites below.
 
 node_claim_result compute_node_claim(const emission_state& emission,
                                      const node_owner_distribution& row,
@@ -166,8 +131,8 @@ node_claim_result compute_node_claim(const emission_state& emission,
 // Returns 0 if no balance entry exists. Uses a local mirror of sysio.token's
 // accounts table because the upstream types are private.
 int64_t get_wire_balance(name account) {
-   token_readonly::accounts_t acct_tbl(TOKEN_CONTRACT, account.value);
-   token_readonly::acct_key key{WIRE_SYMBOL.code().raw()};
+   sysio::token::token::accounts acct_tbl(TOKEN_CONTRACT, account.value);
+   sysio::token::token::acct_key key{WIRE_SYMBOL.code().raw()};
    if (!acct_tbl.contains(key)) return 0;
    return acct_tbl.get(key).balance.amount;
 }
@@ -176,34 +141,10 @@ int64_t get_wire_balance(name account) {
 // status (OPERATOR_STATUS_ACTIVE). Slashed/terminated/unknown all return false.
 // Non-registered accounts return false.
 bool is_op_active(name account) {
-   sysio::opreg::readonly::operators_t ops(opreg_refs::account);
-   auto key = sysio::opreg::readonly::operator_key{account.value};
+   sysio::opreg::operators_t ops(opreg_refs::account);
+   auto key = sysio::opreg::operator_key{account.value};
    if (!ops.contains(key)) return false;
    return ops.get(key).status == OperatorStatus::OPERATOR_STATUS_ACTIVE;
-}
-
-// Returns the batch-op rotation group that was active for the given epoch,
-// from the per-epoch snapshot written by sysio.epoch::advance(). Empty vector
-// if the snapshot is missing (caller treats as "no batch ops this epoch").
-// Reading the snapshot (vs. sysio.epoch::epochstate's current group) ensures
-// catch-up processepoch calls pay the historical members even when sysio.epoch
-// has rotated and / or re-grouped since target_epoch.
-std::vector<name> get_batch_group_for_epoch(uint32_t target_epoch) {
-   sysio::epoch::readonly::batchsnaps_t snaps(epoch_refs::account);
-   sysio::epoch::readonly::batchsnap_key key{target_epoch};
-   if (!snaps.contains(key)) return {};
-   return snaps.get(key).active_members;
-}
-
-// Returns sysio.epoch's configured operators_per_epoch (the rotation group
-// size). The batch-op pool is divided by this value, so the upstream config
-// is the source of truth rather than a hardcoded constant here.
-uint32_t get_batch_op_group_size() {
-   sysio::epoch::readonly::epochcfg_t ecfg(epoch_refs::account);
-   sysio::check(ecfg.exists(), "sysio.epoch config not set");
-   const auto cfg = ecfg.get();
-   sysio::check(cfg.operators_per_epoch > 0, "sysio.epoch operators_per_epoch is zero");
-   return cfg.operators_per_epoch;
 }
 
 // ---------------------------------------------------------------------------
@@ -254,6 +195,11 @@ void system_contract::setemitcfg(const emissions::emission_config& cfg) {
    sysio::check(cfg.t5_floor <= cfg.t5_distributable,
                  "t5_floor must be <= t5_distributable");
    sysio::check(cfg.epoch_duration_secs > 0,     "epoch_duration_secs must be positive");
+   // Sanity ceiling: 30 days. Bounds the (cfg.epoch_duration_secs * 2) /
+   // TOTAL_BLOCKS_PER_ROUND arithmetic in payepoch's expected_rounds calc
+   // and prevents governance typo from setting a multi-year epoch.
+   sysio::check(cfg.epoch_duration_secs <= 30u * 24u * 60u * 60u,
+                 "epoch_duration_secs exceeds 30-day ceiling");
    sysio::check(cfg.decay_denominator > 0,       "decay_denominator must be positive");
    sysio::check(cfg.decay_numerator >= 0,        "decay_numerator must be non-negative");
    sysio::check(cfg.epoch_initial_emission >= 0, "epoch_initial_emission must be non-negative");
@@ -339,6 +285,29 @@ void system_contract::addnodeowner(const sysio::name& account_name, uint8_t tier
          break;
    }
 
+   // Per-tier count cap: tier sizing comes from the network's economic
+   // constants (TN_MAX_NODE_OWNERS in emissions.hpp), shared with
+   // sysio.roa::activateroa. The running count per tier is held in
+   // nodecount (created lazily here so addnodeowner has no init-order
+   // dependency on setinittime/initt5).
+   nodecountstate_t cstate(get_self());
+   auto counts = cstate.get_or_default(node_count_state{});
+   switch (tier) {
+      case 1:
+         sysio::check(counts.t1_count < emissions::T1_MAX_NODE_OWNERS, "t1 node owner cap reached");
+         ++counts.t1_count;
+         break;
+      case 2:
+         sysio::check(counts.t2_count < emissions::T2_MAX_NODE_OWNERS, "t2 node owner cap reached");
+         ++counts.t2_count;
+         break;
+      case 3:
+         sysio::check(counts.t3_count < emissions::T3_MAX_NODE_OWNERS, "t3 node owner cap reached");
+         ++counts.t3_count;
+         break;
+   }
+   cstate.set(counts, get_self());
+
    nodedist.emplace(get_self(), pk, node_owner_distribution{
       .account_name     = account_name,
       .total_allocation = asset{total_allocation_amount, WIRE_SYMBOL},
@@ -415,49 +384,42 @@ void system_contract::initt5(const sysio::time_point_sec& start_time) {
    }, get_self());
 }
 
-// Permissionless. Distributes exactly one epoch per call: advances
-// t5state.last_epoch_index by 1. Callers catch up gaps by re-invoking.
+// payepoch - pay emissions for the given sysio.epoch index. Called inline by
+// sysio.epoch::advance after its readiness gate has verified that:
+//   - emitcfg exists
+//   - t5state exists
+//   - emission_amount > 0 (treasury not at floor)
+//   - sysio's WIRE balance >= emission_amount
 //
-// Decoupled from sysio.epoch::advance -- an emissions failure does not block
-// protocol epoch advancement. Slashed / terminated recipients' shares stay in
-// the treasury rather than being redistributed.
-void system_contract::processepoch() {
+// Single-trx semantics guarantee these conditions hold through this call;
+// payepoch trusts the gate-computed emission_amount and does not recompute.
+// Strict sysio::check throws inside payepoch flag true bugs (arithmetic
+// invariants, BPS sums).
+//
+// Slashed / terminated batch-op group members are skipped via opreg filter;
+// their slice remains in the treasury.
+void system_contract::payepoch(uint32_t epoch_index,
+                               std::vector<sysio::name> active_batch_group,
+                               int64_t emission_amount) {
+   require_auth(epoch_refs::account);
+
+   // Defense in depth. Single-trx semantics make these conditions gate-guaranteed in normal operation; firing
+   // here means a bug or out-of-order call.
+   sysio::check(emission_amount > 0, "payepoch emission_amount must be positive");
+
    const auto cfg = get_emit_cfg(get_self());
 
+   // Gate guaranteed t5state exists; load directly.
    t5state_t t5s(get_self());
-   sysio::check(t5s.exists(), "t5 state not initialized");
    auto state = t5s.get();
 
-   // Read sysio.epoch state for the idempotency guard.
-   sysio::epoch::readonly::epochstate_t est(epoch_refs::account);
-   sysio::check(est.exists(), "sysio.epoch state not initialized");
-   const auto epoch_st = est.get();
-
-   sysio::check(epoch_st.current_epoch_index > state.last_epoch_index,
-                 "emissions already caught up to sysio.epoch");
-
-   const uint32_t target_epoch = state.last_epoch_index + 1;
-
-   // ----- Emission amount -----
-   int64_t emission;
-   if (state.epoch_count == 0) {
-      emission = cfg.epoch_initial_emission;
-      const int64_t remaining = cfg.t5_distributable - cfg.t5_floor - state.total_distributed;
-      if (emission > remaining) emission = remaining;
-   } else {
-      emission = compute_epoch_emission(cfg, state.last_epoch_emission, state.total_distributed);
-   }
-   sysio::check(emission > 0, "treasury exhausted");
-
-   // ----- Pool balance check: sysio must hold enough WIRE to cover the emission -----
-   const int64_t balance = get_wire_balance(get_self());
-   sysio::check(balance >= emission, "insufficient treasury WIRE balance");
+   sysio::check(epoch_index > state.last_epoch_index, "payepoch epoch already paid");
 
    // ----- Category splits -----
-   const int64_t compute_amount    = split_bps(emission, cfg.compute_bps);
-   const int64_t capital_amount    = split_bps(emission, cfg.capital_bps);
-   const int64_t capex_amount      = split_bps(emission, cfg.capex_bps);
-   const int64_t governance_amount = emission - compute_amount - capital_amount - capex_amount;
+   const int64_t compute_amount    = split_bps(emission_amount, cfg.compute_bps);
+   const int64_t capital_amount    = split_bps(emission_amount, cfg.capital_bps);
+   const int64_t capex_amount      = split_bps(emission_amount, cfg.capex_bps);
+   const int64_t governance_amount = emission_amount - compute_amount - capital_amount - capex_amount;
 
    const int64_t producer_pool = split_bps(compute_amount, cfg.producer_bps);
    const int64_t batch_pool    = compute_amount - producer_pool;
@@ -474,9 +436,7 @@ void system_contract::processepoch() {
    {
       auto prod_by_rank = _producers.get_index<"prodrank"_n>();
 
-      // expected_rounds is derived from the configured epoch duration, not
-      // wall clock: with one-epoch-per-call gap catch-up, wall clock may span
-      // multiple configured epoch durations between calls.
+      // expected_rounds is derived from the configured epoch duration.
       uint32_t expected_rounds = (cfg.epoch_duration_secs * 2) / TOTAL_BLOCKS_PER_ROUND;
       if (expected_rounds == 0) expected_rounds = 1;
 
@@ -565,37 +525,20 @@ void system_contract::processepoch() {
    }
 
    // =======================================================================
-   // Batch-op pay. Reads the snapshot written by sysio.epoch::advance() for
-   // target_epoch so catch-up runs pay the historical members of the active
-   // rotation group, not whoever occupies that slot today. Divides batch_pool
-   // into a fixed 1/operators_per_epoch slice per seat (reading
-   // operators_per_epoch from sysio.epoch::epochcfg so emissions tracks any
-   // upstream change). Members not registered as ACTIVE in sysio.opreg
-   // (slashed / terminated / unknown) are skipped and their slice remains in
-   // the treasury rather than being redistributed. After payout, the snapshot
-   // is pruned via an inline call to sysio.epoch::prunesnap.
+   // Batch-op pay. The active group is passed in by sysio.epoch::advance for
+   // this epoch. No historical reconstruction needed since emissions runs
+   // inline with advance(). Divides batch_pool into 1/group_sz slices.
+   // Members not registered as ACTIVE in sysio.opreg (slashed / terminated /
+   // unknown) are skipped and their slice remains in the treasury.
    // =======================================================================
-   {
-      const auto group         = get_batch_group_for_epoch(target_epoch);
-      const uint32_t group_sz  = get_batch_op_group_size();
+   if (!active_batch_group.empty()) {
+      const uint32_t group_sz  = static_cast<uint32_t>(active_batch_group.size());
       const int64_t per_member = batch_pool / group_sz;
 
-      for (const auto& m : group) {
-         if (!is_op_active(m)) continue; // slashed / terminated / unknown: share stays in treasury
+      for (const auto& m : active_batch_group) {
+         if (!is_op_active(m)) continue;
          send_wire_transfer(get_self(), m, per_member, memo::batch_op_reward);
          actual_paid += per_member;
-      }
-
-      // Prune the consumed snapshot. Skipped if no snapshot was written for
-      // this epoch (e.g., pre-PR chains that predate snapshot introduction).
-      sysio::epoch::readonly::batchsnaps_t snaps(epoch_refs::account);
-      if (snaps.contains(sysio::epoch::readonly::batchsnap_key{target_epoch})) {
-         sysio::action(
-            {get_self(), "active"_n},
-            epoch_refs::account,
-            "prunesnap"_n,
-            std::make_tuple(static_cast<uint64_t>(target_epoch))
-         ).send();
       }
    }
 
@@ -609,28 +552,24 @@ void system_contract::processepoch() {
    actual_paid += capital_amount + capex_amount + governance_amount;
 
    // =======================================================================
-   // State update. Order matters: last_epoch_index must be bumped so that any
-   // subsequent processepoch call (e.g. gap catch-up) sees the correct
-   // idempotency guard.
+   // State update.
    // =======================================================================
    const auto now = time_point_sec{current_time_point()};
    state.epoch_count++;
-   state.last_epoch_index    = target_epoch;
+   state.last_epoch_index    = epoch_index;
    state.last_epoch_time     = now;
-   state.last_epoch_emission = emission;
+   state.last_epoch_emission = emission_amount;
    state.total_distributed  += actual_paid; // track only amounts actually paid; skipped recipients' shares stay in treasury
    t5s.set(state, get_self());
 
    // Audit log: records the AUTHORIZED emission + the four category amounts.
    // (Producer / batch-op sub-distribution is implicit -- recipients are in traces.)
-   // Keyed by sysio.epoch::current_epoch_index so forensics speak sysio.epoch's
-   // language; the internal epoch_count is still captured in the row body.
    epochlog_t epoch_table(get_self());
-   epoch_table.emplace(get_self(), epochlog_key{state.last_epoch_index}, epoch_log{
-      .sysio_epoch_index = state.last_epoch_index,
+   epoch_table.emplace(get_self(), epochlog_key{epoch_index}, epoch_log{
+      .sysio_epoch_index = epoch_index,
       .epoch_count       = state.epoch_count,
       .timestamp         = now,
-      .total_emission    = emission,
+      .total_emission    = emission_amount,
       .compute_amount    = compute_amount,
       .capital_amount    = capital_amount,
       .capex_amount      = capex_amount,
@@ -655,7 +594,7 @@ emissions::epoch_info_result system_contract::viewepoch() {
       next_est = cfg.epoch_initial_emission;
       if (next_est > remaining) next_est = remaining;
    } else {
-      next_est = compute_epoch_emission(cfg, state.last_epoch_emission, state.total_distributed);
+      next_est = emissions::compute_epoch_emission(cfg, state.last_epoch_emission, state.total_distributed);
    }
 
    uint32_t secs_until = 0;

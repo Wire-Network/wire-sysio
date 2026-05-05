@@ -562,13 +562,20 @@ namespace sysiosystem {
          void initt5(const sysio::time_point_sec& start_time);
 
          /**
-          * Process the next T5 epoch. Distributes treasury emissions
-          * across categories when the epoch duration has elapsed.
-          * Permissionless -- the caller cannot influence who receives
-          * funds; recipients are determined entirely by on-chain state.
+          * Pay emissions for the given sysio.epoch index. Called inline by
+          * sysio.epoch::advance after its readiness gate has verified that
+          * the chain can pay this epoch. Auth: require_auth("sysio.epoch").
+          *
+          * The gate-computed emission_amount is trusted; payepoch does not
+          * recompute. Strict checks inside payepoch flag true bugs only.
+          * Runtime conditions (config missing, treasury exhausted, balance
+          * insufficient) are caught upstream by the gate, which emits an
+          * EmissionsBlocked attestation and prevents advance from proceeding.
           */
          [[sysio::action]]
-         void processepoch();
+         void payepoch(uint32_t epoch_index,
+                       std::vector<sysio::name> active_batch_group,
+                       int64_t emission_amount);
 
          /**
           * Read-only: current T5 treasury emission state.

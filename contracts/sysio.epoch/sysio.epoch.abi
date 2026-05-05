@@ -14,25 +14,45 @@
             "fields": []
         },
         {
-            "name": "batch_snapshot",
+            "name": "blocklog_entry",
             "base": "",
             "fields": [
                 {
                     "name": "epoch_index",
-                    "type": "uint64"
+                    "type": "uint32"
                 },
                 {
-                    "name": "active_group_index",
-                    "type": "uint8"
+                    "name": "reason",
+                    "type": "EmissionsBlockReason"
                 },
                 {
-                    "name": "active_members",
-                    "type": "name[]"
+                    "name": "attempted_emission",
+                    "type": "int64"
+                },
+                {
+                    "name": "treasury_remaining",
+                    "type": "int64"
+                },
+                {
+                    "name": "sysio_balance",
+                    "type": "int64"
+                },
+                {
+                    "name": "first_blocked_at",
+                    "type": "uint32"
+                },
+                {
+                    "name": "last_retry_at",
+                    "type": "uint32"
+                },
+                {
+                    "name": "retry_count",
+                    "type": "uint32"
                 }
             ]
         },
         {
-            "name": "batchsnap_key",
+            "name": "blocklog_key",
             "base": "",
             "fields": [
                 {
@@ -156,16 +176,6 @@
             "fields": []
         },
         {
-            "name": "prunesnap",
-            "base": "",
-            "fields": [
-                {
-                    "name": "epoch_index",
-                    "type": "uint64"
-                }
-            ]
-        },
-        {
             "name": "regoutpost",
             "base": "",
             "fields": [
@@ -228,11 +238,6 @@
             "ricardian_contract": ""
         },
         {
-            "name": "prunesnap",
-            "type": "prunesnap",
-            "ricardian_contract": ""
-        },
-        {
             "name": "regoutpost",
             "type": "regoutpost",
             "ricardian_contract": ""
@@ -250,12 +255,12 @@
     ],
     "tables": [
         {
-            "name": "batchsnap",
-            "type": "batch_snapshot",
+            "name": "blocklog",
+            "type": "blocklog_entry",
             "index_type": "i64",
             "key_names": ["epoch_index"],
             "key_types": ["uint64"],
-            "table_id": 36294
+            "table_id": 60163
         },
         {
             "name": "epochcfg",
@@ -315,6 +320,32 @@
                 },
                 {
                     "name": "CHAIN_KIND_SUI",
+                    "value": 4
+                }
+            ]
+        },
+        {
+            "name": "EmissionsBlockReason",
+            "type": "int32",
+            "values": [
+                {
+                    "name": "EMISSIONS_BLOCK_REASON_UNSPECIFIED",
+                    "value": 0
+                },
+                {
+                    "name": "EMISSIONS_BLOCK_REASON_CONFIG_MISSING",
+                    "value": 1
+                },
+                {
+                    "name": "EMISSIONS_BLOCK_REASON_STATE_UNINITIALIZED",
+                    "value": 2
+                },
+                {
+                    "name": "EMISSIONS_BLOCK_REASON_TREASURY_EXHAUSTED",
+                    "value": 3
+                },
+                {
+                    "name": "EMISSIONS_BLOCK_REASON_BALANCE_INSUFFICIENT",
                     "value": 4
                 }
             ]

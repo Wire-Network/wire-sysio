@@ -731,6 +731,24 @@
             ]
         },
         {
+            "name": "node_count_state",
+            "base": "",
+            "fields": [
+                {
+                    "name": "t1_count",
+                    "type": "uint32"
+                },
+                {
+                    "name": "t2_count",
+                    "type": "uint32"
+                },
+                {
+                    "name": "t3_count",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
             "name": "node_owner_distribution",
             "base": "",
             "fields": [
@@ -773,6 +791,24 @@
             ]
         },
         {
+            "name": "payepoch",
+            "base": "",
+            "fields": [
+                {
+                    "name": "epoch_index",
+                    "type": "uint32"
+                },
+                {
+                    "name": "active_batch_group",
+                    "type": "name[]"
+                },
+                {
+                    "name": "emission_amount",
+                    "type": "int64"
+                }
+            ]
+        },
+        {
             "name": "permission_level",
             "base": "",
             "fields": [
@@ -799,11 +835,6 @@
                     "type": "uint16"
                 }
             ]
-        },
-        {
-            "name": "processepoch",
-            "base": "",
-            "fields": []
         },
         {
             "name": "producer_authority",
@@ -1610,8 +1641,8 @@
             "ricardian_contract": ""
         },
         {
-            "name": "processepoch",
-            "type": "processepoch",
+            "name": "payepoch",
+            "type": "payepoch",
             "ricardian_contract": ""
         },
         {
@@ -1849,6 +1880,14 @@
             "key_names": ["name"],
             "key_types": ["name"],
             "table_id": 13870
+        },
+        {
+            "name": "nodecount",
+            "type": "node_count_state",
+            "index_type": "i64",
+            "key_names": ["name"],
+            "key_types": ["name"],
+            "table_id": 60614
         },
         {
             "name": "nodedist",

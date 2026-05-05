@@ -1,6 +1,11 @@
 #include <sysio.epoch/sysio.epoch.hpp>
 #include <sysio.opreg/sysio.opreg.hpp>
 #include <sysio.authex/sysio.authex.hpp>
+#include <sysio.token/sysio.token.hpp>
+// Canonical sysio.system emissions types + compute_epoch_emission. The
+// [[sysio::contract("sysio.system")]] attribute on emission_config / t5_state
+// pins them to sysio.system's ABI; no readonly mirror needed here.
+#include <sysio.system/emissions.hpp>
 #include <sysio/opp/attestations/attestations.pb.hpp>
 #include <zpp_bits.h>
 
@@ -9,6 +14,7 @@ namespace sysio {
 using opp::types::OperatorType;
 using opp::types::AttestationType;
 using opp::types::OperatorStatus;
+using opp::types::EmissionsBlockReason;
 
 // Read-only mirror of sysio.authex::links table for cross-contract reads.
 namespace authex_readonly {
@@ -41,6 +47,173 @@ using links_t = sysio::kv::table<"links"_n, links_key, links_row,
 >;
 
 } // namespace authex_readonly
+
+// ---------------------------------------------------------------------------
+// Emissions readiness gate. Runs in advance() before any state mutation:
+// reads sysio.system::emitcfg + t5state and sysio.token::accounts to compute
+// whether emissions can pay this epoch. If not, advance emits an
+// EmissionsBlocked attestation per outpost (deduped by the local blocklog
+// table) and returns without state change. The wall clock for the current
+// epoch effectively extends until conditions allow a successful gate pass.
+// ---------------------------------------------------------------------------
+
+namespace {
+
+constexpr name SYSTEM_ACCOUNT     = "sysio"_n;
+constexpr name TOKEN_ACCOUNT      = "sysio.token"_n;
+constexpr symbol WIRE_SYMBOL{"WIRE", 9};
+
+struct emissions_gate_result {
+   bool                  ready              = false;
+   int64_t               emission_amount    = 0;  // populated iff ready
+   int64_t               treasury_remaining = 0;  // for blocklog row
+   int64_t               sysio_balance      = 0;  // for blocklog row
+   EmissionsBlockReason  reason             = opp::types::EMISSIONS_BLOCK_REASON_UNSPECIFIED;
+};
+
+emissions_gate_result check_emissions_ready() {
+   emissions_gate_result r;
+
+   sysiosystem::emissions::emitcfg_t cfg_tbl(SYSTEM_ACCOUNT);
+   if (!cfg_tbl.exists()) {
+      r.reason = opp::types::EMISSIONS_BLOCK_REASON_CONFIG_MISSING;
+      return r;
+   }
+   const auto cfg = cfg_tbl.get();
+
+   sysiosystem::emissions::t5state_t t5s_tbl(SYSTEM_ACCOUNT);
+   if (!t5s_tbl.exists()) {
+      r.reason = opp::types::EMISSIONS_BLOCK_REASON_STATE_UNINITIALIZED;
+      return r;
+   }
+   const auto t5s = t5s_tbl.get();
+   r.treasury_remaining = cfg.t5_distributable - cfg.t5_floor - t5s.total_distributed;
+
+   // Compute would-be emission. First-epoch case: use initial; cap at remaining.
+   if (t5s.epoch_count == 0) {
+      r.emission_amount = cfg.epoch_initial_emission;
+      if (r.emission_amount > r.treasury_remaining) r.emission_amount = r.treasury_remaining;
+   } else {
+      r.emission_amount = sysiosystem::emissions::compute_epoch_emission(
+         cfg, t5s.last_epoch_emission, t5s.total_distributed);
+   }
+
+   if (r.emission_amount <= 0) {
+      r.reason = opp::types::EMISSIONS_BLOCK_REASON_TREASURY_EXHAUSTED;
+      return r;
+   }
+
+   // Read sysio's WIRE balance.
+   sysio::token::token::accounts acct_tbl(TOKEN_ACCOUNT, SYSTEM_ACCOUNT.value);
+   sysio::token::token::acct_key key{WIRE_SYMBOL.code().raw()};
+   if (acct_tbl.contains(key)) {
+      r.sysio_balance = acct_tbl.get(key).balance.amount;
+   }
+
+   // emission_amount is now retained on the BALANCE_INSUFFICIENT path so the
+   // blocklog row + cross-chain EmissionsBlocked attestation report the real
+   // shortfall (computed amount vs. available balance), not zero.
+   if (r.sysio_balance < r.emission_amount) {
+      r.reason = opp::types::EMISSIONS_BLOCK_REASON_BALANCE_INSUFFICIENT;
+      return r;
+   }
+
+   r.ready = true;
+   return r;
+}
+
+// Broadcast an EmissionsBlocked attestation to every registered outpost.
+// Called from record_gate_block on the first block for a given epoch_index
+// or when the reason changes since the previous attempt. The
+// first_blocked_at_secs argument is the original blocking time -- on a
+// reason-change rebroadcast the caller passes the existing row's
+// first_blocked_at so the timestamp tracks the original block, not "now".
+void emit_emissions_block_attestation(name self,
+                                      uint32_t epoch_index,
+                                      const emissions_gate_result& gate,
+                                      uint32_t first_blocked_at_secs) {
+   opp::attestations::EmissionsBlocked msg;
+   msg.epoch_index        = epoch_index;
+   msg.reason             = gate.reason;
+   msg.attempted_emission = gate.emission_amount;
+   msg.treasury_remaining = gate.treasury_remaining;
+   msg.sysio_balance      = gate.sysio_balance;
+   msg.first_blocked_at   = first_blocked_at_secs;
+
+   std::vector<char> encoded;
+   auto out = zpp::bits::out{encoded, zpp::bits::no_size{}};
+   (void)out(msg);
+
+   epoch::outposts_t outposts_tbl(self);
+   for (auto it = outposts_tbl.begin(); it != outposts_tbl.end(); ++it) {
+      action(
+         permission_level{self, "owner"_n},
+         epoch::MSGCH_ACCOUNT,
+         "queueout"_n,
+         std::make_tuple(
+            it->id,
+            opp::types::ATTESTATION_TYPE_EMISSIONS_BLOCKED,
+            encoded
+         )
+      ).send();
+   }
+}
+
+// Inserts or updates the local blocklog row for a gate-block on epoch_index.
+// On INSERT (first block for this epoch_index) OR when the reason has changed
+// since the previous attempt, also broadcasts an EmissionsBlocked attestation
+// per outpost. On UPDATE with same reason, only bumps last_retry_at and
+// retry_count -- no outbound emission (dedup).
+void record_gate_block(name self, uint32_t epoch_index, const emissions_gate_result& gate) {
+   epoch::blocklog_t log_tbl(self);
+   epoch::blocklog_key pk{epoch_index};
+
+   const uint32_t now_secs = static_cast<uint32_t>(current_time_point().sec_since_epoch());
+
+   if (!log_tbl.contains(pk)) {
+      log_tbl.emplace(self, pk, epoch::blocklog_entry{
+         .epoch_index        = epoch_index,
+         .reason             = gate.reason,
+         .attempted_emission = gate.emission_amount,
+         .treasury_remaining = gate.treasury_remaining,
+         .sysio_balance      = gate.sysio_balance,
+         .first_blocked_at   = now_secs,
+         .last_retry_at      = now_secs,
+         .retry_count        = 1,
+      });
+      emit_emissions_block_attestation(self, epoch_index, gate, now_secs);
+      return;
+   }
+
+   const auto existing = log_tbl.get(pk);
+   const bool reason_changed = existing.reason != gate.reason;
+
+   log_tbl.modify(self, pk, [&](auto& row) {
+      row.reason             = gate.reason;
+      row.attempted_emission = gate.emission_amount;
+      row.treasury_remaining = gate.treasury_remaining;
+      row.sysio_balance      = gate.sysio_balance;
+      row.last_retry_at      = now_secs;
+      row.retry_count       += 1;
+      // first_blocked_at intentionally unchanged: tracks the original block.
+   });
+
+   if (reason_changed) {
+      emit_emissions_block_attestation(self, epoch_index, gate, existing.first_blocked_at);
+   }
+}
+
+// Removes the blocklog row for epoch_index if present. Called on the gate
+// success path so the row reflects only currently-blocked epochs.
+void clear_gate_block(name self, uint32_t epoch_index) {
+   epoch::blocklog_t log_tbl(self);
+   epoch::blocklog_key pk{epoch_index};
+   if (log_tbl.contains(pk)) {
+      log_tbl.erase(pk);
+   }
+}
+
+} // anonymous namespace
 
 // ---------------------------------------------------------------------------
 //  setconfig
@@ -94,6 +267,21 @@ void epoch::advance() {
    auto now = current_time_point();
    if (now < state.next_epoch_start) return;
 
+   // Emissions readiness gate: epochs are never partially-advanced. If the
+   // sysio.system treasury cannot pay this epoch, record the block locally,
+   // emit an EmissionsBlocked attestation per outpost (deduped), and return
+   // without mutating state. The wall clock for the current epoch effectively
+   // extends until the gate eventually passes on a subsequent chkcons retry.
+   const uint32_t target_epoch = state.current_epoch_index + 1;
+   const auto gate = check_emissions_ready();
+   if (!gate.ready) {
+      record_gate_block(get_self(), target_epoch, gate);
+      return;
+   }
+   // Gate passed: drop any prior block_log row for this epoch (if a previous
+   // attempt blocked and we're now succeeding) and proceed.
+   clear_gate_block(get_self(), target_epoch);
+
    state.current_epoch_index++;
    state.current_batch_op_group = state.current_epoch_index % cfg.batch_op_groups;
 
@@ -106,23 +294,6 @@ void epoch::advance() {
    // No operator table writes needed — group membership is in epoch_state.batch_op_groups.
 
    state_tbl.set(state, get_self());
-
-   // Snapshot the active batch-op group for this epoch so sysio.system
-   // emissions can pay the historical roster on catch-up. The row is
-   // pruned by sysio.system::processepoch after payout.
-   {
-      std::vector<name> active_members;
-      if (state.current_batch_op_group < state.batch_op_groups.size()) {
-         active_members = state.batch_op_groups[state.current_batch_op_group];
-      }
-      batchsnaps_t snaps(get_self());
-      batchsnap_key snap_key{state.current_epoch_index};
-      snaps.emplace(get_self(), snap_key, batch_snapshot{
-         .epoch_index        = state.current_epoch_index,
-         .active_group_index = state.current_batch_op_group,
-         .active_members     = std::move(active_members),
-      });
-   }
 
    // Queue OPERATORS attestation (full roster with authex chain addresses) for each outpost.
    // IMPORTANT: Must come before BATCH_OPERATOR_GROUPS so that the ETH outpost's
@@ -179,7 +350,7 @@ void epoch::advance() {
       outposts_t outposts_tbl(get_self());
       for (auto it = outposts_tbl.begin(); it != outposts_tbl.end(); ++it) {
          action(
-            permission_level{"sysio.epoch"_n, "owner"_n},
+            permission_level{get_self(), "owner"_n},
             MSGCH_ACCOUNT,
             "queueout"_n,
             std::make_tuple(
@@ -216,7 +387,7 @@ void epoch::advance() {
       outposts_t outposts_tbl(get_self());
       for (auto it = outposts_tbl.begin(); it != outposts_tbl.end(); ++it) {
          action(
-            permission_level{"sysio.epoch"_n, "owner"_n},
+            permission_level{get_self(), "owner"_n},
             MSGCH_ACCOUNT,
             "queueout"_n,
             std::make_tuple(
@@ -233,7 +404,7 @@ void epoch::advance() {
       outposts_t outposts_tbl(get_self());
       for (auto it = outposts_tbl.begin(); it != outposts_tbl.end(); ++it) {
          action(
-            permission_level{"sysio.epoch"_n, "owner"_n},
+            permission_level{get_self(), "owner"_n},
             MSGCH_ACCOUNT,
             "buildenv"_n,
             std::make_tuple(it->id)
@@ -241,12 +412,33 @@ void epoch::advance() {
       }
    }
 
+   // Pay emissions inline. The gate already verified preconditions and
+   // computed gate.emission_amount; payepoch trusts that value (single-trx
+   // semantics make recomputation unnecessary). Pass the active batch group
+   // for this epoch directly so payepoch needs no historical reconstruction.
+   {
+      std::vector<name> active_members;
+      if (state.current_batch_op_group < state.batch_op_groups.size()) {
+         active_members = state.batch_op_groups[state.current_batch_op_group];
+      }
+      action(
+         permission_level{get_self(), "owner"_n},
+         SYSTEM_ACCOUNT,
+         "payepoch"_n,
+         std::make_tuple(
+            state.current_epoch_index,
+            std::move(active_members),
+            gate.emission_amount
+         )
+      ).send();
+   }
+
    // Cleanup old attestations/envelopes
    if (state.current_epoch_index > cfg.attestation_retention_epoch_count) {
       uint32_t before_epoch =
          state.current_epoch_index - cfg.attestation_retention_epoch_count;
       action(
-         permission_level{"sysio.epoch"_n, "owner"_n},
+         permission_level{get_self(), "owner"_n},
          MSGCH_ACCOUNT,
          "cleanup"_n,
          std::make_tuple(before_epoch)
@@ -376,18 +568,6 @@ void epoch::unpause() {
    auto state = state_tbl.get();
    state.is_paused = false;
    state_tbl.set(state, get_self());
-}
-
-// ---------------------------------------------------------------------------
-//  prunesnap
-// ---------------------------------------------------------------------------
-void epoch::prunesnap(uint64_t epoch_index) {
-   require_auth(SYSTEM_ACCOUNT);
-
-   batchsnaps_t snaps(get_self());
-   batchsnap_key key{epoch_index};
-   check(snaps.contains(key), "batch snapshot not found for epoch");
-   snaps.erase(key);
 }
 
 } // namespace sysio

@@ -238,3 +238,20 @@ message AttestationProcessingError {
   bytes                            original_data = 3;
   string                           error_message = 4;
 }
+
+// Emissions readiness gate failure (Depot → Outpost).
+// Emitted by sysio.epoch::advance when emissions cannot pay the next
+// epoch (config missing, treasury exhausted, or sysio account balance
+// insufficient). The chain remains at the prior epoch index until
+// conditions allow a successful gate pass; the wall-clock duration of
+// the current epoch extends until then. Emitted at most once per
+// (epoch_index, reason) pair: subsequent retries during the same
+// blocked epoch update sysio.system::blocklog without re-broadcasting.
+message EmissionsBlocked {
+  uint32                                epoch_index        = 1;
+  sysio.opp.types.EmissionsBlockReason  reason             = 2;
+  int64                                 attempted_emission = 3;
+  int64                                 treasury_remaining = 4;
+  int64                                 sysio_balance      = 5;
+  uint32                                first_blocked_at   = 6; // unix seconds
+}

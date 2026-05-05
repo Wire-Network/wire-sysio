@@ -19,6 +19,18 @@
 namespace sysiosystem::emissions {
 
 // ---------------------------------------------------------------------------
+// Per-tier maximum number of registered node owners. Single source of truth
+// for both sysio.roa::activateroa (which seeds tier-pool allocations) and
+// sysio.system::addnodeowner (which rejects registrations beyond the tier
+// caps). Hardcoded rather than configurable because the tier sizing is part
+// of the network's economic constants -- governance does not adjust it.
+// ---------------------------------------------------------------------------
+
+inline constexpr uint32_t T1_MAX_NODE_OWNERS = 21;
+inline constexpr uint32_t T2_MAX_NODE_OWNERS = 84;
+inline constexpr uint32_t T3_MAX_NODE_OWNERS = 1000;
+
+// ---------------------------------------------------------------------------
 // Emission configuration (set via setemitcfg action)
 // ---------------------------------------------------------------------------
 
@@ -80,6 +92,20 @@ struct [[sysio::table("emissionmngr"), sysio::contract("sysio.system")]] emissio
 
 using emissionstate_t = sysio::kv::global<"emissionmngr"_n, emission_state>;
 
+// Per-tier registration counts maintained by addnodeowner. Checked against
+// emission_config::tN_max_count before each registration. Held in its own
+// singleton (rather than emission_state) so addnodeowner does not require
+// setinittime to have run first.
+struct [[sysio::table("nodecount"), sysio::contract("sysio.system")]] node_count_state {
+   uint32_t  t1_count = 0;
+   uint32_t  t2_count = 0;
+   uint32_t  t3_count = 0;
+
+   SYSLIB_SERIALIZE(node_count_state, (t1_count)(t2_count)(t3_count))
+};
+
+using nodecountstate_t = sysio::kv::global<"nodecount"_n, node_count_state>;
+
 // ---------------------------------------------------------------------------
 // Node-owner distribution table (per-account vesting row)
 // ---------------------------------------------------------------------------
@@ -119,8 +145,8 @@ struct [[sysio::table("t5state"), sysio::contract("sysio.system")]] t5_state {
    sysio::time_point_sec  start_time;
    uint64_t               epoch_count         = 0;
    // last_epoch_index tracks the most recently-distributed sysio.epoch index.
-   // Each processepoch call distributes exactly one epoch by advancing this
-   // field from N to N+1; it doubles as an idempotency guard.
+   // Each payepoch call advances this field from N to N+1 and validates the
+   // incoming epoch_index strictly exceeds it (idempotency guard).
    uint32_t               last_epoch_index    = 0;
    sysio::time_point_sec  last_epoch_time;
    int64_t                last_epoch_emission = 0;
@@ -132,6 +158,32 @@ struct [[sysio::table("t5state"), sysio::contract("sysio.system")]] t5_state {
 };
 
 using t5state_t = sysio::kv::global<"t5state"_n, t5_state>;
+
+// ---------------------------------------------------------------------------
+// Pure emission formula. Shared between sysio.system::payepoch (success path)
+// and sysio.epoch's readiness gate (precompute path). One source of truth so
+// the gate-decided amount cannot drift from what payepoch would have computed.
+// Returns 0 when the treasury is at or below the floor (gate sees this as
+// EMISSIONS_BLOCK_REASON_TREASURY_EXHAUSTED).
+// ---------------------------------------------------------------------------
+
+inline int64_t compute_epoch_emission(const emission_config& cfg,
+                                      int64_t prev_emission,
+                                      int64_t total_distributed) {
+   const int64_t remaining = cfg.t5_distributable - cfg.t5_floor - total_distributed;
+   if (remaining <= 0) return 0;
+
+   __int128 product = static_cast<__int128>(prev_emission) *
+                      static_cast<__int128>(cfg.decay_numerator);
+   int64_t emission = static_cast<int64_t>(product / cfg.decay_denominator);
+
+   if (emission > cfg.epoch_max_emission) emission = cfg.epoch_max_emission;
+   if (emission < cfg.epoch_min_emission) emission = cfg.epoch_min_emission;
+
+   if (emission > remaining) emission = remaining;
+
+   return emission;
+}
 
 // ---------------------------------------------------------------------------
 // Per-epoch audit log (unpruned)
@@ -147,7 +199,7 @@ struct epochlog_key {
 
 struct [[sysio::table("epochlog"), sysio::contract("sysio.system")]] epoch_log {
    uint32_t               sysio_epoch_index = 0;  // mirrors t5_state.last_epoch_index / sysio.epoch::current_epoch_index
-   uint64_t               epoch_count       = 0;  // internal counter of processepoch invocations
+   uint64_t               epoch_count       = 0;  // internal counter of payepoch invocations
    sysio::time_point_sec  timestamp;
    int64_t                total_emission    = 0;
    int64_t                compute_amount    = 0;
