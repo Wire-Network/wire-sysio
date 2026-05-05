@@ -63,10 +63,6 @@ if("${CMAKE_GENERATOR}" STREQUAL "Ninja")
 endif()
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS "ON")
-set(BUILD_DOXYGEN FALSE CACHE BOOL "Build doxygen documentation on every make")
-set(ENABLE_MULTIVERSION_PROTOCOL_TEST FALSE CACHE BOOL "Enable nodeop multiversion protocol test")
-
-
 
 # WASM runtimes to enable. Each runtime in this list will have:
 #  * definition SYSIO_<RUNTIME>_RUNTIME_ENABLED defined in public libchain interface
@@ -95,8 +91,6 @@ endif()
 # uncomment this line to tell GDB about macros (slows compile times)
 # set( CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -gdwarf-2 -g3" )
 
-set(ENABLE_COVERAGE_TESTING FALSE CACHE BOOL "Build WIRE for code coverage analysis")
-
 if(ENABLE_COVERAGE_TESTING)
   set(CMAKE_C_FLAGS "--coverage ${CMAKE_C_FLAGS}")
   set(CMAKE_CXX_FLAGS "--coverage ${CMAKE_CXX_FLAGS}")
@@ -118,18 +112,6 @@ if(CORE_SYMBOL_NAME_LENGTH GREATER 7)
 endif()
 
 message(STATUS "Using '${CORE_SYMBOL_NAME}' as CORE symbol name")
-
-option(ENABLE_TCMALLOC "use tcmalloc (requires gperftools)" OFF)
-if(ENABLE_TCMALLOC)
-  find_package(Gperftools REQUIRED)
-  message(STATUS "Compiling Wire with TCMalloc")
-  #if doing this by the book, simply link_libraries( ${GPERFTOOLS_TCMALLOC} ) here. That will
-  #give the performance benefits of tcmalloc but since it won't be linked last
-  #the heap profiler & checker may not be accurate. This here is rather undocumented behavior
-  #to stuff a library toward the end of the link list
-  set(CMAKE_C_STANDARD_LIBRARIES "${CMAKE_C_STANDARD_LIBRARIES} ${GPERFTOOLS_TCMALLOC}")
-  set(CMAKE_CXX_STANDARD_LIBRARIES "${CMAKE_CXX_STANDARD_LIBRARIES} ${GPERFTOOLS_TCMALLOC}")
-endif()
 
 # sysio includes a bundled BoringSSL which conflicts with OpenSSL. Make sure any other bundled libraries (such as boost)
 # do not attempt to use an external OpenSSL in any manner
@@ -158,8 +140,6 @@ add_subdirectory(benchmark)
 
 add_subdirectory(contracts)
 add_subdirectory(contracts/tests)
-
-option(DISABLE_WASM_SPEC_TESTS "disable building of wasm spec unit tests" OFF)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/sysio.version.in ${CMAKE_CURRENT_BINARY_DIR}/sysio.version.hpp)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/sysio.version.hpp DESTINATION ${CMAKE_INSTALL_FULL_INCLUDEDIR})
@@ -248,8 +228,5 @@ endif()
 # )
 
 include(doxygen)
-
-option(ENABLE_SYSIO_DEV_DEB "Enable building the sysio-dev .deb package" OFF)
-option(ENABLE_SPRING_DEV_DEB "Enable building the spring-dev .deb package" OFF)
 
 include(cmake/package.cmake)

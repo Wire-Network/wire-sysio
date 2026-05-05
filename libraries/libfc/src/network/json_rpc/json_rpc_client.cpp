@@ -25,7 +25,7 @@ using tcp = asio::ip::tcp;
 json_rpc_error::json_rpc_error(const std::string& message) : json_rpc_error(0, message, {}) {}
 
 json_rpc_error::json_rpc_error(int code_in, const std::string& message, const variant& data_in)
-   : fc::exception(code_in, message)
+   : fc::exception(code_in, "json_rpc_error", message)
      , code(code_in)
      , data(data_in) {}
 

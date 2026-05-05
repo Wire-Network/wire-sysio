@@ -55,13 +55,13 @@ public:
 
    action_result setconfig(uint32_t duration = 360, uint32_t ops_per = 7,
                            uint32_t total = 21, uint32_t grps = 3,
-                           uint32_t retention = 1000) {
+                           uint32_t retention = 200) {
       return push_epoch_action(EPOCH_ACCOUNT, "setconfig"_n, mvo()
          ("epoch_duration_sec", duration)
          ("operators_per_epoch", ops_per)
          ("batch_operator_minimum_active", total)
          ("batch_op_groups", grps)
-         ("attestation_retention_epoch_count", retention)
+         ("epoch_retention_envelope_log_count", retention)
       );
    }
 
@@ -127,7 +127,7 @@ BOOST_FIXTURE_TEST_CASE(setconfig_basic, sysio_epoch_tester) { try {
    BOOST_REQUIRE_EQUAL(7, cfg["operators_per_epoch"].as_uint64());
    BOOST_REQUIRE_EQUAL(21, cfg["batch_operator_minimum_active"].as_uint64());
    BOOST_REQUIRE_EQUAL(3, cfg["batch_op_groups"].as_uint64());
-   BOOST_REQUIRE_EQUAL(1000, cfg["attestation_retention_epoch_count"].as_uint64());
+   BOOST_REQUIRE_EQUAL(200, cfg["epoch_retention_envelope_log_count"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(setconfig_validates_total, sysio_epoch_tester) { try {
