@@ -279,31 +279,21 @@ BOOST_AUTO_TEST_CASE( subjective_bill_account_in_both_maps_test ) {
    const auto now = time_point::now();
    const fc::time_point_sec now_sec{now};
 
-   {  // Removal via block inclusion
-      subjective_billing sub_bill;
+   subjective_billing sub_bill;
 
-      sub_bill.subjective_bill( id1, now_sec, {{a, {.cpu_usage_us = 10}}}, {{a, fc::microseconds(5)}} );
+   sub_bill.subjective_bill( id1, now_sec, {{a, {.cpu_usage_us = 10}}}, {{a, fc::microseconds(5)}} );
 
-      BOOST_CHECK_EQUAL( 10 + 5, sub_bill.get_subjective_bill(a, now).count() );
+   BOOST_CHECK_EQUAL( 10 + 5, sub_bill.get_subjective_bill(a, now).count() );
+   BOOST_CHECK_EQUAL( 1u, sub_bill.get_account_cache_size() );
 
-      // Simulate id1 landing in a block.
-      sub_bill.remove_subjective_billing( id1, 0 );
+   // Simulate id1 landing in a block.
+   sub_bill.remove_subjective_billing( id1, 0 );
 
-      // Full contribution must be cleared; with the overlap bug only 5 would be
-      // subtracted, leaving 10 stuck in the cache.
-      BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(a, now).count() );
-   }
-   {  // Same check, but with auth_cpu listed first — verify order-independence.
-      subjective_billing sub_bill;
-
-      sub_bill.subjective_bill( id1, now_sec, {{a, {.cpu_usage_us = 7}}}, {{a, fc::microseconds(3)}} );
-
-      BOOST_CHECK_EQUAL( 7 + 3, sub_bill.get_subjective_bill(a, now).count() );
-
-      sub_bill.remove_subjective_billing( id1, 0 );
-
-      BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(a, now).count() );
-   }
+   // Full contribution must be cleared; with the overlap bug only 5 would be
+   // subtracted, leaving 10 stuck in the cache.
+   BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(a, now).count() );
+   // Empty entry should also be evicted from the per-account cache.
+   BOOST_CHECK_EQUAL( 0u, sub_bill.get_account_cache_size() );
 }
 
 BOOST_AUTO_TEST_CASE( disable_payer_billing_test ) {
@@ -448,6 +438,79 @@ BOOST_AUTO_TEST_CASE( subjective_bill_duplicate_id_test ) {
    // Single removal clears it entirely.
    sub_bill.remove_subjective_billing( id1, 0 );
    BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(a, now).count() );
+   BOOST_CHECK_EQUAL( 0u, sub_bill.get_account_cache_size() );
+}
+
+BOOST_AUTO_TEST_CASE( remove_nonexistent_trx_test ) {
+   // Removing a transaction id that is not in the cache must be a silent no-op,
+   // both on an empty cache and when other unrelated entries exist. This is what
+   // makes on_block safe to invoke for blocks that may contain trxs the local node
+   // never speculatively executed.
+
+   transaction_id_type id1 = sha256::hash( "1" );
+   transaction_id_type id2 = sha256::hash( "2" );
+   account_name a = "a"_n;
+
+   const auto now = time_point::now();
+   const fc::time_point_sec now_sec{now};
+
+   subjective_billing sub_bill;
+
+   // Empty cache: no-op, no exception.
+   sub_bill.remove_subjective_billing( id1, 0 );
+   BOOST_CHECK_EQUAL( 0u, sub_bill.get_account_cache_size() );
+   BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(a, now).count() );
+
+   // Populated cache, removing a different id: existing state preserved.
+   sub_bill.subjective_bill( id1, now_sec, {{a, {.cpu_usage_us = 21}}}, {} );
+   BOOST_CHECK_EQUAL( 21, sub_bill.get_subjective_bill(a, now).count() );
+
+   sub_bill.remove_subjective_billing( id2, 0 );
+   BOOST_CHECK_EQUAL( 21, sub_bill.get_subjective_bill(a, now).count() );
+   BOOST_CHECK_EQUAL( 1u, sub_bill.get_account_cache_size() );
+}
+
+BOOST_AUTO_TEST_CASE( remove_expired_yield_exhausted_test ) {
+   // remove_expired must honor the yield predicate: when yield() returns true
+   // mid-iteration, the function returns (completed=false, num_expired=partial)
+   // and leaves the un-processed expired trxs in the cache for a follow-up call.
+
+   fc::logger log;
+   account_name a = "a"_n;
+
+   const auto now = time_point::now();
+   const fc::time_point_sec now_sec{now};
+
+   subjective_billing sub_bill;
+
+   // Bill several trxs with the same expiry so all are eligible for expiration.
+   constexpr size_t total = 5;
+   for( size_t i = 0; i < total; ++i ) {
+      transaction_id_type id = sha256::hash( std::to_string(i) );
+      sub_bill.subjective_bill( id, now_sec, {{a, {.cpu_usage_us = 10}}}, {} );
+   }
+   BOOST_CHECK_EQUAL( static_cast<int64_t>(10 * total), sub_bill.get_subjective_bill(a, now).count() );
+
+   // Yield after the second iteration. remove_expired checks yield BEFORE each
+   // entry, so we let the first 2 through then bail.
+   size_t calls = 0;
+   auto [completed, num_expired] = sub_bill.remove_expired(
+      log, now + fc::microseconds(1), now,
+      [&calls]() { return ++calls > 2; } );
+
+   BOOST_CHECK( !completed );           // exhausted, not done
+   BOOST_CHECK_EQUAL( 2u, num_expired ); // exactly two were processed
+
+   // The remaining 3 are still in the trx cache (their pending_cpu_us is intact).
+   // Total = 2 transitioned to expired_accumulator + 3 still pending = 50, all
+   // visible at `now` (decay window has not elapsed).
+   BOOST_CHECK_EQUAL( static_cast<int64_t>(10 * total), sub_bill.get_subjective_bill(a, now).count() );
+
+   // A follow-up call without yielding finishes the work.
+   auto [completed2, num_expired2] = sub_bill.remove_expired(
+      log, now + fc::microseconds(1), now, []() { return false; } );
+   BOOST_CHECK( completed2 );
+   BOOST_CHECK_EQUAL( total - 2, num_expired2 );
 }
 
 BOOST_AUTO_TEST_CASE( on_block_nullptr_test ) {
