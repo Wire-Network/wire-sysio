@@ -4,6 +4,8 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include <fc/network/json_rpc/json_rpc_client.hpp>
+
 #include <sysio/batch_operator_plugin/outpost_opp_job.hpp>
 
 #include "mocks/mock_depot_ops.hpp"
@@ -172,13 +174,74 @@ BOOST_AUTO_TEST_CASE(run_outbound_swallows_exceptions_and_does_not_mark_epoch) {
 
    outpost_opp_job job(client, depot, kDeadline);
    BOOST_CHECK_NO_THROW(job.run_outbound());
-   BOOST_CHECK(depot.emitted_events.empty()); // no signal on failure
+   // Visibility fix: emit fires BEFORE delivery, so a failed attempt still
+   // lands a debug event with the attempted bytes.
+   BOOST_CHECK_EQUAL(depot.emitted_events.size(), 1u);
 
    // The failed attempt should NOT bump _last_outbound_epoch; next tick retries.
    client->deliver_response = [](const auto&) { return std::string{"recovered"}; };
    job.run_outbound();
    BOOST_REQUIRE_EQUAL(client->outbound_calls.size(), 2u);
+   // Two emits total: one for the failed attempt, one for the recovered retry.
+   // Same epoch + same envelope ⇒ same hash, so the sink dedupes on disk.
+   BOOST_REQUIRE_EQUAL(depot.emitted_events.size(), 2u);
+}
+
+BOOST_AUTO_TEST_CASE(run_outbound_emits_event_on_failure_and_retries_next_tick) {
+   // Reproduces the dev-026 Solana groups-of-7 symptom: delivery throws a
+   // json_rpc_error with -32602/empty body, the cron tick swallows it, and
+   // the next beat retries against the same epoch+envelope. Visibility fix
+   // demands the bytes show up in the debug stream regardless of outcome.
+   auto client = make_client(CHAIN_KIND_SOLANA, 1, 0);
+   mock_depot_ops depot;
+   depot.epoch = 5;
+   outbound_envelope_record rec;
+   rec.raw_envelope = {'b', 'y', 't', 'e', 's'};
+   depot.pending_response = [rec](uint64_t, uint32_t) -> std::optional<outbound_envelope_record> {
+      return rec;
+   };
+   client->deliver_response = [](const auto&) -> std::string {
+      throw fc::network::json_rpc::json_rpc_error(-32602, "", fc::variant{});
+   };
+
+   outpost_opp_job job(client, depot, kDeadline);
+   BOOST_CHECK_NO_THROW(job.run_outbound());
+
    BOOST_REQUIRE_EQUAL(depot.emitted_events.size(), 1u);
+   const auto& ev = depot.emitted_events[0];
+   BOOST_CHECK_EQUAL(std::get<0>(ev), 5u);
+   BOOST_CHECK(std::get<1>(ev) == DEBUG_OUTPOST_ENDPOINTS_TYPE_DEPOT_OUTPOST_SOLANA);
+   BOOST_CHECK(std::get<3>(ev) == rec.raw_envelope);
+   BOOST_REQUIRE_EQUAL(client->outbound_calls.size(), 1u);
+
+   // Same epoch, success on retry — proves _last_outbound_epoch wasn't
+   // advanced by the failure.
+   client->deliver_response = [](const auto&) { return std::string{"sig"}; };
+   job.run_outbound();
+   BOOST_REQUIRE_EQUAL(client->outbound_calls.size(), 2u);
+   BOOST_REQUIRE_EQUAL(depot.emitted_events.size(), 2u);
+}
+
+BOOST_AUTO_TEST_CASE(run_outbound_emit_failure_does_not_break_delivery) {
+   // A throwing slot in the debug-envelope signal must never break the
+   // producer cluster — the emit is wrapped in FC_LOG_AND_DROP and the
+   // delivery still proceeds.
+   auto client = make_client(CHAIN_KIND_ETHEREUM, 0, 31337);
+   mock_depot_ops depot;
+   depot.epoch = 5;
+   outbound_envelope_record rec;
+   rec.raw_envelope = {'x'};
+   depot.pending_response = [rec](uint64_t, uint32_t) -> std::optional<outbound_envelope_record> {
+      return rec;
+   };
+   client->deliver_response = [](const auto&) { return std::string{"0xdeadbeef"}; };
+   depot.emit_thrower = [] { FC_THROW("debug sink down"); };
+
+   outpost_opp_job job(client, depot, kDeadline);
+   BOOST_CHECK_NO_THROW(job.run_outbound());
+
+   BOOST_REQUIRE_EQUAL(client->outbound_calls.size(), 1u);
+   BOOST_CHECK(depot.emitted_events.empty()); // throwing emit was not recorded
 }
 
 // ─── run_inbound ────────────────────────────────────────────────────────────
@@ -252,6 +315,47 @@ BOOST_AUTO_TEST_CASE(run_inbound_emits_sol_depot_signal) {
 
    BOOST_REQUIRE_EQUAL(depot.emitted_events.size(), 1u);
    BOOST_CHECK(std::get<1>(depot.emitted_events[0]) == DEBUG_OUTPOST_ENDPOINTS_TYPE_OUTPOST_SOLANA_DEPOT);
+}
+
+BOOST_AUTO_TEST_CASE(run_inbound_emits_before_deliver_to_depot) {
+   // When the WIRE-side push_action throws (transient mempool / serializer
+   // hiccup), the bytes pulled from the outpost must already be captured
+   // so the debugging trail isn't lost.
+   auto client = make_client(CHAIN_KIND_SOLANA, 1, 0);
+   mock_depot_ops depot;
+   depot.epoch = 7;
+   std::vector<char> raw{'i', 'n'};
+   client->inbound_response = [raw](const auto&) { return raw; };
+   depot.deliver_thrower = [] { FC_THROW("transient mempool"); };
+
+   outpost_opp_job job(client, depot, kDeadline);
+   BOOST_CHECK_NO_THROW(job.run_inbound());
+
+   BOOST_REQUIRE_EQUAL(depot.emitted_events.size(), 1u);
+   const auto& ev = depot.emitted_events[0];
+   BOOST_CHECK_EQUAL(std::get<0>(ev), 7u);
+   BOOST_CHECK(std::get<1>(ev) == DEBUG_OUTPOST_ENDPOINTS_TYPE_OUTPOST_SOLANA_DEPOT);
+   BOOST_CHECK(std::get<3>(ev) == raw);
+   // Throwing deliver was not recorded by the mock.
+   BOOST_CHECK(depot.deliver_calls.empty());
+}
+
+BOOST_AUTO_TEST_CASE(run_inbound_emit_failure_does_not_break_delivery) {
+   // A throwing emit in the inbound path must not prevent the WIRE-side
+   // push_action — same FC_LOG_AND_DROP guarantee as outbound.
+   auto client = make_client(CHAIN_KIND_ETHEREUM, 0, 31337);
+   mock_depot_ops depot;
+   depot.epoch = 7;
+   std::vector<char> raw{'i'};
+   client->inbound_response = [raw](const auto&) { return raw; };
+   depot.emit_thrower = [] { FC_THROW("debug sink down"); };
+
+   outpost_opp_job job(client, depot, kDeadline);
+   BOOST_CHECK_NO_THROW(job.run_inbound());
+
+   BOOST_REQUIRE_EQUAL(depot.deliver_calls.size(), 1u);
+   BOOST_CHECK(depot.deliver_calls[0].raw_messages == raw);
+   BOOST_CHECK(depot.emitted_events.empty()); // throwing emit was not recorded
 }
 
 // ─── concurrency ────────────────────────────────────────────────────────────

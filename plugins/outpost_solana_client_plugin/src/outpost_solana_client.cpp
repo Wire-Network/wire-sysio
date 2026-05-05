@@ -18,9 +18,8 @@ namespace sysio {
 namespace {
 
 // ── Op labels used for deadline-exceeded error messages ──────────────────
-constexpr std::string_view OP_EPOCH_IN               = "deliver_outbound_envelope:epoch_in";
-constexpr std::string_view OP_EMIT_OUTBOUND_ENVELOPE = "deliver_outbound_envelope:emit_outbound_envelope";
-constexpr std::string_view OP_READ_LATEST            = "read_inbound_envelope:get_account_info";
+constexpr std::string_view OP_EPOCH_IN    = "deliver_outbound_envelope:epoch_in";
+constexpr std::string_view OP_READ_LATEST = "read_inbound_envelope:get_account_info";
 
 /// 8-byte Anchor discriminator that prefixes every `#[account]`-tagged
 /// account's serialized form.
@@ -76,18 +75,50 @@ std::string outpost_solana_client::deliver_outbound_envelope(
    fc::microseconds         deadline) {
    const auto deadline_abs = fc::time_point::now() + deadline;
 
-   std::vector<uint8_t> bytes(envelope_bytes.begin(), envelope_bytes.end());
+   const size_t total = envelope_bytes.size();
+   FC_ASSERT(total > 0,
+             "outpost_solana_client: refusing to deliver an empty envelope");
+   FC_ASSERT(total <= SOLANA_MAX_ENVELOPE_BYTES,
+             "outpost_solana_client: envelope ({} bytes) exceeds Solana hard "
+             "cap of {} bytes; the program will reject it",
+             total, SOLANA_MAX_ENVELOPE_BYTES);
 
-   throw_if_past_deadline(deadline_abs, OP_EPOCH_IN);
-   auto epoch_in_sig = _program_client->epoch_in(epoch_index, bytes);
-   ilog("outpost_solana_client[{}]: epoch_in sent epoch={} bytes={} sig={}",
-        to_string(), epoch_index, bytes.size(), epoch_in_sig);
+   const uint16_t total_chunks = static_cast<uint16_t>(
+      (total + SOLANA_MAX_CHUNK_BYTES - 1) / SOLANA_MAX_CHUNK_BYTES);
 
-   throw_if_past_deadline(deadline_abs, OP_EMIT_OUTBOUND_ENVELOPE);
-   auto emit_sig = _program_client->emit_outbound_envelope(epoch_index);
-   ilog("outpost_solana_client[{}]: emit_outbound_envelope sig={}", to_string(), emit_sig);
+   // Stream the envelope into the per-(epoch, signer) chunk buffer. Each
+   // call goes through `solana_program_client::execute_tx_and_confirm`,
+   // which serialises submission + waits for `processed`-commitment
+   // confirmation before returning. Chunks are submitted sequentially —
+   // the **batch operator's only Solana-side tx is `epoch_in`**: the
+   // last-chunk call triggers the program's `finalize_envelope`, which
+   // (a) records the operator's delivery, (b) on consensus reach also
+   // fires `emit_outbound_inner` inline (drains the queued outbound
+   // attestations into a packed envelope and writes it to the
+   // `latest_outbound_envelope` PDA), and (c) self-closes this
+   // operator's chunk_buffer. No separate `emit_outbound_envelope` or
+   // `cleanup_envelope_chunks` tx is needed in the relay.
+   std::string last_sig;
+   for (uint16_t i = 0; i < total_chunks; ++i) {
+      throw_if_past_deadline(deadline_abs, OP_EPOCH_IN);
 
-   return emit_sig;
+      const size_t off = static_cast<size_t>(i) * SOLANA_MAX_CHUNK_BYTES;
+      const size_t len = std::min(SOLANA_MAX_CHUNK_BYTES, total - off);
+      std::vector<uint8_t> chunk(
+         reinterpret_cast<const uint8_t*>(envelope_bytes.data() + off),
+         reinterpret_cast<const uint8_t*>(envelope_bytes.data() + off + len));
+
+      last_sig = _program_client->epoch_in(
+         epoch_index,
+         i,
+         total_chunks,
+         static_cast<uint32_t>(total),
+         chunk);
+      ilog("outpost_solana_client[{}]: epoch_in chunk sent epoch={} chunk={}/{} bytes={} sig={}",
+           to_string(), epoch_index, i, total_chunks, len, last_sig);
+   }
+
+   return last_sig;
 }
 
 std::vector<char> outpost_solana_client::read_inbound_envelope(

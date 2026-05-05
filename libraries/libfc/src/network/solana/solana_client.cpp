@@ -576,8 +576,26 @@ std::string solana_program_client::execute_tx_and_confirm(const idl::instruction
                                                            const std::vector<account_meta>& accounts,
                                                            const program_invoke_data_items& params,
                                                            const solana_confirm_options& opts) {
-   auto instruction = build_instruction(instr, accounts, params);
-   auto tx = client->create_transaction({instruction}, client->get_pubkey());
+   // Delegate to the pre-instructions overload with an empty prefix so we
+   // have a single tx-build path; both overloads stay source-compatible
+   // for every existing caller.
+   return execute_tx_and_confirm(instr, accounts, params, {}, opts);
+}
+
+std::string solana_program_client::execute_tx_and_confirm(const idl::instruction& instr,
+                                                           const std::vector<account_meta>& accounts,
+                                                           const program_invoke_data_items& params,
+                                                           const std::vector<instruction>& pre_instructions,
+                                                           const solana_confirm_options& opts) {
+   auto idl_instruction = build_instruction(instr, accounts, params);
+
+   std::vector<instruction> all_instructions;
+   all_instructions.reserve(pre_instructions.size() + 1);
+   all_instructions.insert(all_instructions.end(),
+                           pre_instructions.begin(), pre_instructions.end());
+   all_instructions.push_back(std::move(idl_instruction));
+
+   auto tx = client->create_transaction(all_instructions, client->get_pubkey());
    client->sign_transaction(tx);
    return client->send_transaction_and_confirm(tx, opts);
 }

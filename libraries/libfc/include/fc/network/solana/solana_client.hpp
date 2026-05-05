@@ -278,6 +278,31 @@ public:
                                          solana_confirm_option_defaults);
 
    /**
+    * @brief Same as `execute_tx_and_confirm` above, but prepends the supplied
+    *        instructions to the transaction before the IDL-derived one.
+    *
+    * Used when the IDL call needs a per-tx ComputeBudget bump (heap, CU
+    * limit, priority fee) or other system-level preamble. The fee payer +
+    * signing flow are unchanged — `pre_instructions` simply land in the
+    * resulting `transaction` ahead of the IDL instruction, in the order
+    * given.
+    *
+    * @param instr           IDL instruction definition
+    * @param accounts        Account metadata for the IDL instruction
+    * @param params          Parameters for the IDL instruction (as fc::variants)
+    * @param pre_instructions Prepended instructions (e.g. ComputeBudget setters)
+    * @param opts            Commitment + retry/backoff envelope
+    * @return Confirmed transaction signature.
+    * @throws fc::timeout_exception on deadline expiry; fc::exception on tx error.
+    */
+   std::string execute_tx_and_confirm(const idl::instruction& instr,
+                                      const std::vector<account_meta>& accounts,
+                                      const program_invoke_data_items& params,
+                                      const std::vector<instruction>& pre_instructions,
+                                      const solana_confirm_options& opts =
+                                         solana_confirm_option_defaults);
+
+   /**
     * @brief Resolve accounts for an instruction based on IDL
     *
     * Resolves account pubkeys and builds account_meta list from IDL definition.
