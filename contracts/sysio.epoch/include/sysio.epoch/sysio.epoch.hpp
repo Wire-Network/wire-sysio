@@ -25,7 +25,7 @@ namespace sysio {
                      uint32_t operators_per_epoch,
                      uint32_t batch_operator_minimum_active,
                      uint32_t batch_op_groups,
-                     uint32_t attestation_retention_epoch_count);
+                     uint32_t epoch_retention_envelope_log_count);
 
       /// Advance epoch if duration elapsed (permissionless crank).
       [[sysio::action]]
@@ -57,12 +57,21 @@ namespace sysio {
          uint32_t    operators_per_epoch = 7;
          uint32_t    batch_operator_minimum_active = 21;
          uint32_t    batch_op_groups = 3;          // rotation groups (21 / 7)
-         uint32_t    attestation_retention_epoch_count = 1000;
+
+         /// Cap multiplier for the metadata-only `envelope_log` table on
+         /// `sysio.msgch`. Effective row cap is
+         /// `active_outposts * 2 * epoch_retention_envelope_log_count`
+         /// (one inbound + one outbound record per active outpost per
+         /// epoch). Default 200 — matches the SOL/ETH per-direction
+         /// metadata-log cap. Each `evalcons` consensus-reach + `buildenv`
+         /// emit reads this directly; runtime changes via `setconfig`
+         /// take effect on the next write.
+         uint32_t    epoch_retention_envelope_log_count = 200;
 
          SYSLIB_SERIALIZE(epoch_config,
             (epoch_duration_sec)(operators_per_epoch)
             (batch_operator_minimum_active)(batch_op_groups)
-            (attestation_retention_epoch_count))
+            (epoch_retention_envelope_log_count))
       };
 
       using epochcfg_t = sysio::kv::global<"epochcfg"_n, epoch_config>;

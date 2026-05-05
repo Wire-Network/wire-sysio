@@ -353,6 +353,14 @@
                 {
                     "name": "slashed_timestamp",
                     "type": "uint64"
+                },
+                {
+                    "name": "attestation_inbound_data",
+                    "type": "bytes"
+                },
+                {
+                    "name": "attestation_outbound_data",
+                    "type": "bytes"
                 }
             ]
         },

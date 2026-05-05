@@ -34,8 +34,11 @@ if(BUILD_SYSTEM_CONTRACTS)
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.system/include>
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.opreg/include>
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.authex/include>
-                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.token/include>
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.opp.common/include>
+                # sysio.token uses a flat header layout (contracts/sysio.token/sysio.token.hpp) rather than
+                # contracts/sysio.token/include/sysio.token/sysio.token.hpp, so expose contracts/ as the include
+                # root for `<sysio.token/sysio.token.hpp>` to resolve. Matches what sysio.system does.
+                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
         )
 
         target_link_libraries(${target}

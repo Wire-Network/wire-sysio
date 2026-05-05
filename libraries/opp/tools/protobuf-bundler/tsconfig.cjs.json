@@ -1,0 +1,15 @@
+{
+  "extends": "../etc/tsconfig/tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "lib/cjs",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "ignoreDeprecations": "6.0"
+  },
+  "include": ["src"],
+  "references": [
+    { "path": "../protoc-gen-solana/tsconfig.cjs.json" },
+    { "path": "../protoc-gen-solidity/tsconfig.cjs.json" }
+  ]
+}

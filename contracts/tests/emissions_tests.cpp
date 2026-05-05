@@ -920,7 +920,7 @@ public:
          ("operators_per_epoch", operators_per_epoch)
          ("batch_operator_minimum_active", operators_per_epoch * batch_op_groups_count)
          ("batch_op_groups", batch_op_groups_count)
-         ("attestation_retention_epoch_count", 1000u)
+         ("epoch_retention_envelope_log_count", 1000u)
       );
    }
 
