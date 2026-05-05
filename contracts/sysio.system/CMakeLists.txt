@@ -22,13 +22,8 @@ set(SYSIO_SYSTEM_INCLUDE_DIRS
    ${CMAKE_CURRENT_SOURCE_DIR}/include
    ${CMAKE_CURRENT_SOURCE_DIR}/../)
 
-# OPP integration dirs: emissions reads opreg/epoch state via the generated
-# protobuf types, the shared DataStream operator overloads, and the read-only
-# mirror headers owned by sysio.opreg and sysio.epoch.
-# (Navigation pattern matches sysio.opreg / sysio.epoch CMakeLists: the
-# contracts_project runs as a nested ExternalProject, so CMAKE_BINARY_DIR
-# there points at cmake-build-debug/contracts/, not the host build root.
-# Walk back to the host-level generated-cdt dir via CMAKE_CURRENT_BINARY_DIR.)
+# OPP integration: emissions reads opreg/epoch state via generated protobuf types + shared DataStream operators.
+# generated-cdt is reached via CMAKE_CURRENT_BINARY_DIR since contracts_project is a nested ExternalProject.
 set(SYSIO_SYSTEM_OPP_INCLUDE_DIRS
    ${CMAKE_CURRENT_BINARY_DIR}/../../libraries/opp/generated-cdt
    ${CMAKE_CURRENT_SOURCE_DIR}/../sysio.opp.common/include
@@ -36,11 +31,19 @@ set(SYSIO_SYSTEM_OPP_INCLUDE_DIRS
    ${CMAKE_CURRENT_SOURCE_DIR}/../sysio.epoch/include)
 
 if(BUILD_SYSTEM_CONTRACTS)
+   # emissions.cpp pulls in OPP-generated types.pb.hpp which uses magic_enum.
+   find_cdt_magic_enum()
+
    add_contract(sysio.system sysio.system ${SYSIO_SYSTEM_SOURCES})
 
    target_include_directories(sysio.system
       PUBLIC ${SYSIO_SYSTEM_INCLUDE_DIRS}
-             ${SYSIO_SYSTEM_OPP_INCLUDE_DIRS})
+             ${SYSIO_SYSTEM_OPP_INCLUDE_DIRS}
+      # cdt-cpp ignores -isystem; add vcpkg root explicitly as -I so magic_enum resolves.
+      PRIVATE ${CDT_CONTRACT_INCLUDE_PATH})
+
+   target_link_libraries(sysio.system
+      INTERFACE magic_enum::magic_enum)
 endif()
 
 # Native .so for native-module runtime debugging
@@ -55,4 +58,9 @@ if("native-module" IN_LIST SYSIO_WASM_RUNTIMES AND BUILD_SYSTEM_CONTRACTS)
       EXTRA_DISPATCH "sysiosystem::peer_keys:regpeerkey,delpeerkey,getpeerkeys"
                      "sysiosystem::trx_priority:addtrxp,deltrxp"
    )
+
+   target_link_libraries(sysio.system_native
+      INTERFACE magic_enum::magic_enum)
+
+   target_include_directories(sysio.system_native PRIVATE ${CDT_CONTRACT_INCLUDE_PATH})
 endif()
