@@ -158,19 +158,37 @@ struct opp_solana_outpost_client : fc::network::solana::solana_program_client {
               fc::variant(chunk_data),
            };
 
-           // No ComputeBudget pre-ixs on the chunked epoch_in path:
-           // they bloated each chunk tx past Solana's 1 232-byte MTU
-           // (extra ~48 B for ComputeBudget program key + 2 ix wrappers,
-           // pushing a chunk-768 tx from ~1 260 → ~1 308 B raw, encoded
-           // ~1 744 > 1 644 cap). Production 2.5 KB envelopes finalize
-           // well within the default 200 K CU / 32 K heap budgets. If
-           // 64 KB envelopes ever land live, route the FINAL chunk
-           // through a finalize-specific ix that carries the budget
-           // bumps; intermediate chunks (just buffer-append) never need
-           // them.
+           // ComputeBudget pre-ixs are injected ONLY on the final chunk —
+           // that's the chunk that triggers `finalize_envelope` +
+           // `emit_outbound_inner` on the Solana side, which compounds:
+           //   * Anchor deserialise of 9 mut accounts (~5–7 KiB heap)
+           //   * `chunk_buffer.data` manual read + envelope_data clone (~5 KiB)
+           //   * decoded Envelope proto + nested attestation Vecs (~5–10 KiB)
+           //   * inline message processing temp allocs + emit_outbound encode
+           // peak ≈ 22–30 KiB, right at the 32 KiB default BPF heap.
+           // Bounded +88 B/epoch growth in the inbound + outbound EnvelopeLog
+           // Vecs tipped the cluster over the heap ceiling at epoch 13 (OOM
+           // panic in `log_info.resize`); bumping to 256 KiB on this one tx
+           // gives the finalize path 8× margin and removes the failure mode.
+           //
+           // Non-final chunks just `chunk_buffer.data.extend_from_slice(...)`
+           // and consume <5 KiB heap — they don't need the bump, and
+           // injecting pre-ixs there bloats the chunk-write tx past the
+           // 1 232-byte MTU (the bug we hit earlier with always-on pre-ixs;
+           // the encoded tx hit 1 744 > 1 644 cap).
+           //
+           // Deliberately NOT injecting `set_compute_unit_limit` — the
+           // OOM tx consumed 116 K of 200 K CU, so CU is not the
+           // bottleneck for the production 2.5 KB envelope. Add a CU
+           // bump only when 64 KB envelopes land live.
+           std::vector<fc::network::solana::instruction> pre_ixs;
+           if (chunk_index == total_chunks - 1) {
+              pre_ixs.push_back(
+                 fc::network::solana::system::compute_budget::request_heap_frame(256'000));
+           }
            return execute_tx_and_confirm(instr,
                                          resolve_accounts(instr, params, overrides),
-                                         params);
+                                         params, pre_ixs);
         })
       , cleanup_envelope_chunks([this](uint32_t epoch_index) -> std::string {
            const std::vector<uint8_t> epoch_seed = {
