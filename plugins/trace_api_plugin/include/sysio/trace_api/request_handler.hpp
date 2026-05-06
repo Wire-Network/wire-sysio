@@ -1,12 +1,19 @@
 #pragma once
 
 #include <fc/variant.hpp>
+#include <fc/io/json_stream.hpp>
 #include <sysio/trace_api/metadata_log.hpp>
 #include <sysio/trace_api/data_log.hpp>
 #include <sysio/trace_api/common.hpp>
 
 namespace sysio::trace_api {
    using data_handler_function = std::function<std::tuple<fc::variant, std::optional<fc::variant>>( const std::variant<action_trace_v0>& action)>;
+
+   // Streaming counterpart of data_handler_function: instead of returning a variant tuple that the caller then
+   // re-serializes to JSON, the callback emits the action's "params" and (when applicable) "return_data"
+   // key/value pairs directly into the writer.  Decoded bytes flow straight from abi_serializer through
+   // binary_to_json_stream into the output buffer with no intermediate fc::variant allocation.
+   using stream_data_handler_function = std::function<void(const std::variant<action_trace_v0>& action, fc::json_writer& w)>;
 
    namespace detail {
       class response_formatter {
@@ -17,13 +24,13 @@ namespace sysio::trace_api {
          // directly into an output std::string via fc::json_writer, skipping the
          // fc::mutable_variant_object tree entirely.  Output is byte-for-byte identical
          // to fc::json::to_string(process_block(...)).
-         static std::string process_block_to_json( const data_log_entry& trace, bool irreversible, const data_handler_function& data_handler );
+         static std::string process_block_to_json( const data_log_entry& trace, bool irreversible, const stream_data_handler_function& data_handler );
 
          // Streaming counterpart for a single transaction inside a block trace.  Walks the block's transaction list and,
          // for the first entry whose id matches trxid, emits just that transaction's JSON object (no surrounding block
          // wrapper).  Returns an empty string if no transaction in the block matches.  Output for a matching trx is
          // byte-for-byte identical to fc::json::to_string(get_transaction_trace(...)).
-         static std::string process_transaction_to_json( const data_log_entry& trace, const chain::transaction_id_type& trxid, const data_handler_function& data_handler );
+         static std::string process_transaction_to_json( const data_log_entry& trace, const chain::transaction_id_type& trxid, const stream_data_handler_function& data_handler );
       };
    }
 
@@ -78,9 +85,9 @@ namespace sysio::trace_api {
             return {};
          }
 
-         auto data_handler = [this](const std::variant<action_trace_v0>& action) -> std::tuple<fc::variant, std::optional<fc::variant>> {
-            return std::visit([&](const auto& a) {
-               return data_handler_provider.serialize_to_variant(a);
+         auto data_handler = [this](const std::variant<action_trace_v0>& action, fc::json_writer& w) {
+            std::visit([&](const auto& a) {
+               data_handler_provider.serialize_to_json_stream(a, w);
             }, action);
          };
 
@@ -140,9 +147,9 @@ namespace sysio::trace_api {
             return {};
          }
 
-         auto data_handler = [this](const std::variant<action_trace_v0>& action) -> std::tuple<fc::variant, std::optional<fc::variant>> {
-            return std::visit([&](const auto& a) {
-               return data_handler_provider.serialize_to_variant(a);
+         auto data_handler = [this](const std::variant<action_trace_v0>& action, fc::json_writer& w) {
+            std::visit([&](const auto& a) {
+               data_handler_provider.serialize_to_json_stream(a, w);
             }, action);
          };
 

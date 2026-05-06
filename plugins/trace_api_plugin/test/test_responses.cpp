@@ -1,6 +1,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include <fc/io/json.hpp>
+#include <fc/io/json_stream.hpp>
 #include <fc/variant_object.hpp>
 
 #include <sysio/trace_api/request_handler.hpp>
@@ -47,6 +48,22 @@ struct response_test_fixture {
 
       std::tuple<fc::variant, std::optional<fc::variant>> serialize_to_variant(const action_trace_v0& action) {
          return fixture.mock_data_handler(action);
+      }
+
+      // Streaming peer for the mock: delegates to the same mock_data_handler that the variant path uses,
+      // then walks the resulting variant via fc::to_json_stream so the streaming output matches the
+      // variant output byte-for-byte.  Production uses abi_serializer::binary_to_json_stream end-to-end;
+      // here we don't have a real ABI, so we fake parity by re-using the variant tuple.
+      void serialize_to_json_stream(const action_trace_v0& action, fc::json_writer& w) {
+         auto [params, return_data] = fixture.mock_data_handler(action);
+         if (!params.is_null()) {
+            w.key("params");
+            fc::to_json_stream(params, w);
+         }
+         if (return_data.has_value()) {
+            w.key("return_data");
+            fc::to_json_stream(*return_data, w);
+         }
       }
 
       response_test_fixture& fixture;

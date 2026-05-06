@@ -128,7 +128,7 @@ namespace {
 
    void write_actions(fc::json_writer& w,
                       const std::vector<action_trace_v0>& actions,
-                      const data_handler_function& data_handler) {
+                      const stream_data_handler_function& data_handler) {
       // Iteration order matches process_actions: sort indices by global_sequence so
       // clients see execution order (notifications run before the inline actions that
       // queued them, so action-slot order is not global_sequence order).
@@ -149,18 +149,12 @@ namespace {
          w.key("authorization");   write_authorizations(w, a.authorization);
          w.key("data");            w.value_hex(a.data.data(), a.data.size());
          w.key("return_value");    w.value_hex(a.return_value.data(), a.return_value.size());
-         // The abi decode path still produces fc::variant (structure is ABI-dependent).
-         // TODO: route through abi_serializer::binary_to_json_stream (already in use for
-         // table rows + streamed_processed_trace) so the action body stays allocation-free
-         // end-to-end; data_handler currently builds the variant tree and we re-emit it.
-         // For now, splice its serialized form as raw JSON.
-         auto [params, return_data] = data_handler(a);
-         if (!params.is_null()) {
-            w.set_raw("params", fc::json::to_string(params, fc::json::yield_function_t()));
-         }
-         if (return_data.has_value()) {
-            w.set_raw("return_data", fc::json::to_string(*return_data, fc::json::yield_function_t()));
-         }
+         // ABI-decoded "params" / "return_data" are emitted directly into w by the streaming
+         // data_handler -- no fc::variant tree, no fc::json::to_string splice.  The handler
+         // is responsible for emitting zero, one, or both keys depending on what's available
+         // and whether the decode succeeds; on failure it rolls back via json_writer::rewind
+         // so the action object's preceding fields stay intact.
+         data_handler(a, w);
          w.end_object();
       }
       w.end_array();
@@ -168,7 +162,7 @@ namespace {
 
    void write_transaction(fc::json_writer& w,
                           const transaction_trace_v0& t,
-                          const data_handler_function& data_handler) {
+                          const stream_data_handler_function& data_handler) {
       w.begin_object();
       w.set("id",                t.id)
        .set("block_num",         t.block_num)
@@ -191,7 +185,7 @@ namespace {
 
    void write_transactions(fc::json_writer& w,
                            const std::vector<transaction_trace_v0>& transactions,
-                           const data_handler_function& data_handler) {
+                           const stream_data_handler_function& data_handler) {
       w.begin_array();
       for (const auto& t : transactions) {
          write_transaction(w, t, data_handler);
@@ -201,7 +195,7 @@ namespace {
 }
 
 namespace sysio::trace_api::detail {
-   std::string response_formatter::process_block_to_json( const data_log_entry& trace, bool irreversible, const data_handler_function& data_handler ) {
+   std::string response_formatter::process_block_to_json( const data_log_entry& trace, bool irreversible, const stream_data_handler_function& data_handler ) {
       std::string out;
       fc::json_writer w(out);
       std::visit([&](auto&& bt) {
@@ -221,7 +215,7 @@ namespace sysio::trace_api::detail {
       return out;
    }
 
-   std::string response_formatter::process_transaction_to_json( const data_log_entry& trace, const chain::transaction_id_type& trxid, const data_handler_function& data_handler ) {
+   std::string response_formatter::process_transaction_to_json( const data_log_entry& trace, const chain::transaction_id_type& trxid, const stream_data_handler_function& data_handler ) {
       std::string out;
       std::visit([&](auto&& bt) {
          for (const auto& t : bt.transactions) {
