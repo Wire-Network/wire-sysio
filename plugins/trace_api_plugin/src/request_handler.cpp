@@ -166,29 +166,35 @@ namespace {
       w.end_array();
    }
 
+   void write_transaction(fc::json_writer& w,
+                          const transaction_trace_v0& t,
+                          const data_handler_function& data_handler) {
+      w.begin_object();
+      w.set("id",                t.id)
+       .set("block_num",         t.block_num)
+       // FC_SERIALIZE_AS_STRING-reflected; emits the ISO date string.
+       .set("block_time",        t.block_time)
+       .set("producer_block_id", t.producer_block_id);
+      w.key("actions");          write_actions(w, t.actions, data_handler);
+      // FC_REFLECT_ENUM-reflected; emits the member-name string via to_json_stream(enum_type).
+      w.set("status",          t.status)
+       .set("cpu_usage_us",    t.cpu_usage_us)
+       .set("net_usage_words", t.net_usage_words.value)
+       .set("signatures",      t.signatures);
+      // transaction_header is a reflected struct composed of fc::time_point_sec,
+      // uint16/uint32 and unsigned_ints.  No native to_json_stream path yet so
+      // fall back via the variant bridge for just that field.
+      w.key("transaction_header");
+      fc::to_json_stream_via_variant(t.trx_header, w);
+      w.end_object();
+   }
+
    void write_transactions(fc::json_writer& w,
                            const std::vector<transaction_trace_v0>& transactions,
                            const data_handler_function& data_handler) {
       w.begin_array();
       for (const auto& t : transactions) {
-         w.begin_object();
-         w.set("id",                t.id)
-          .set("block_num",         t.block_num)
-          // FC_SERIALIZE_AS_STRING-reflected; emits the ISO date string.
-          .set("block_time",        t.block_time)
-          .set("producer_block_id", t.producer_block_id);
-         w.key("actions");          write_actions(w, t.actions, data_handler);
-         // FC_REFLECT_ENUM-reflected; emits the member-name string via to_json_stream(enum_type).
-         w.set("status",          t.status)
-          .set("cpu_usage_us",    t.cpu_usage_us)
-          .set("net_usage_words", t.net_usage_words.value)
-          .set("signatures",      t.signatures);
-         // transaction_header is a reflected struct composed of fc::time_point_sec,
-         // uint16/uint32 and unsigned_ints.  No native to_json_stream path yet so
-         // fall back via the variant bridge for just that field.
-         w.key("transaction_header");
-         fc::to_json_stream_via_variant(t.trx_header, w);
-         w.end_object();
+         write_transaction(w, t, data_handler);
       }
       w.end_array();
    }
@@ -211,6 +217,20 @@ namespace sysio::trace_api::detail {
           .set("finality_mroot",    bt.finality_mroot);
          w.key("transactions");     write_transactions(w, bt.transactions, data_handler);
          w.end_object();
+      }, trace);
+      return out;
+   }
+
+   std::string response_formatter::process_transaction_to_json( const data_log_entry& trace, const chain::transaction_id_type& trxid, const data_handler_function& data_handler ) {
+      std::string out;
+      std::visit([&](auto&& bt) {
+         for (const auto& t : bt.transactions) {
+            if (t.id == trxid) {
+               fc::json_writer w(out);
+               write_transaction(w, t, data_handler);
+               return;
+            }
+         }
       }, trace);
       return out;
    }

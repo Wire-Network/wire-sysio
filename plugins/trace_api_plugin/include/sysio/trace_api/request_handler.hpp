@@ -18,6 +18,12 @@ namespace sysio::trace_api {
          // fc::mutable_variant_object tree entirely.  Output is byte-for-byte identical
          // to fc::json::to_string(process_block(...)).
          static std::string process_block_to_json( const data_log_entry& trace, bool irreversible, const data_handler_function& data_handler );
+
+         // Streaming counterpart for a single transaction inside a block trace.  Walks the block's transaction list and,
+         // for the first entry whose id matches trxid, emits just that transaction's JSON object (no surrounding block
+         // wrapper).  Returns an empty string if no transaction in the block matches.  Output for a matching trx is
+         // byte-for-byte identical to fc::json::to_string(get_transaction_trace(...)).
+         static std::string process_transaction_to_json( const data_log_entry& trace, const chain::transaction_id_type& trxid, const data_handler_function& data_handler );
       };
    }
 
@@ -117,6 +123,34 @@ namespace sysio::trace_api {
             }
          }
          return result;
+      }
+
+      /**
+       * Streaming variant of get_transaction_trace: emits the matching transaction's JSON directly into a std::string
+       * via fc::json_writer instead of building the full block's fc::variant tree only to extract one transaction.
+       * Returned string is empty if the block does not exist or the trxid is not present in the block; callers should
+       * check empty() before dispatching the 200 response.  Skips the fc::variant -> fc::json::to_string copy on the
+       * response path when paired with http_content_type::json_raw.
+       */
+      std::string get_transaction_trace_json( const chain::transaction_id_type& trxid, uint32_t block_height ) {
+         _log("get_transaction_trace_json called");
+         auto data = logfile_provider.get_block(block_height);
+         if (!data) {
+            _log("No block found at block height " + std::to_string(block_height));
+            return {};
+         }
+
+         auto data_handler = [this](const std::variant<action_trace_v0>& action) -> std::tuple<fc::variant, std::optional<fc::variant>> {
+            return std::visit([&](const auto& a) {
+               return data_handler_provider.serialize_to_variant(a);
+            }, action);
+         };
+
+         auto resp = detail::response_formatter::process_transaction_to_json(std::get<0>(*data), trxid, data_handler);
+         if (resp.empty()) {
+            _log("No transaction with id " + trxid.str() + " found in block " + std::to_string(block_height));
+         }
+         return resp;
       }
 
    private:

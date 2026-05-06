@@ -69,6 +69,14 @@ struct response_test_fixture {
       return response_impl.get_block_trace_json( block_height );
    }
 
+   fc::variant get_transaction_trace( const chain::transaction_id_type& trxid, uint32_t block_height ) {
+      return response_impl.get_transaction_trace( trxid, block_height );
+   }
+
+   std::string get_transaction_trace_json( const chain::transaction_id_type& trxid, uint32_t block_height ) {
+      return response_impl.get_transaction_trace_json( trxid, block_height );
+   }
+
    // fixture data and methods
    std::function<get_block_t(uint32_t)> mock_get_block;
    std::function<std::tuple<fc::variant, std::optional<fc::variant>>(const action_trace_v0&)> mock_data_handler = default_mock_data_handler;
@@ -544,6 +552,91 @@ BOOST_AUTO_TEST_SUITE(trace_responses)
       fc::variant streamed_as_variant = fc::json::from_string( streamed_response );
 
       BOOST_TEST(to_kv(variant_response) == to_kv(streamed_as_variant), boost::test_tools::per_element());
+   }
+
+   // The streaming JSON response (process_transaction_to_json) must produce the same observable shape as the variant
+   // response (get_transaction_trace) for a matching trxid.  Round-trip the streaming bytes through fc::json::from_string
+   // and compare key-by-key with the variant path.  Catches silent shape regressions in the per-transaction emitter that
+   // the block-level parity test would not detect because they are masked by the surrounding block wrapper.
+   BOOST_FIXTURE_TEST_CASE(streaming_vs_variant_transaction_response_parity, response_test_fixture)
+   {
+      auto trx_id_a = "0000000000000000000000000000000000000000000000000000000000000001"_h;
+      auto trx_id_b = "0000000000000000000000000000000000000000000000000000000000000002"_h;
+
+      auto block_trace = block_trace_v0 {
+         "b000000000000000000000000000000000000000000000000000000000000001"_h,
+         1,
+         "0000000000000000000000000000000000000000000000000000000000000000"_h,
+         chain::block_timestamp_type(0),
+         "bp.one"_n,
+         "0000000000000000000000000000000000000000000000000000000000000000"_h,
+         "0000000000000000000000000000000000000000000000000000000000000000"_h,
+         std::vector<transaction_trace_v0> {
+            {
+               trx_id_a,
+               std::vector<action_trace_v0> {
+                  {
+                     0,
+                     "receiver"_n, "contract"_n, "action"_n,
+                     {{ "alice"_n, "active"_n }},
+                     { 0x00, 0x01, 0x02, 0x03 },
+                     { 0x04, 0x05, 0x06, 0x07 }
+                  }
+               },
+               fc::enum_type<uint8_t, chain::transaction_receipt_header::status_enum>{chain::transaction_receipt_header::status_enum::executed},
+               10,
+               5,
+               std::vector<chain::signature_type>{ chain::signature_type() },
+               { chain::time_point_sec(), 1, 0, 100, 50, 0 },
+               1,
+               chain::block_timestamp_type(0),
+               std::optional<chain::block_id_type>{}
+            },
+            {
+               trx_id_b,
+               std::vector<action_trace_v0> {
+                  {
+                     1,
+                     "receiver"_n, "contract"_n, "action"_n,
+                     {{ "bob"_n, "active"_n }},
+                     { 0x10, 0x11 },
+                     {}
+                  }
+               },
+               fc::enum_type<uint8_t, chain::transaction_receipt_header::status_enum>{chain::transaction_receipt_header::status_enum::executed},
+               20,
+               6,
+               std::vector<chain::signature_type>{ chain::signature_type() },
+               { chain::time_point_sec(), 2, 0, 200, 60, 0 },
+               1,
+               chain::block_timestamp_type(0),
+               std::optional<chain::block_id_type>{}
+            }
+         }
+      };
+
+      mock_get_block = [&block_trace]( uint32_t height ) -> get_block_t {
+         return std::make_tuple(data_log_entry(block_trace), false);
+      };
+
+      // Hit case: trxid present in the block.  Both paths must agree on every field.
+      {
+         fc::variant variant_response    = get_transaction_trace( trx_id_b, 1 );
+         std::string streamed_response   = get_transaction_trace_json( trx_id_b, 1 );
+         BOOST_TEST(!variant_response.is_null());
+         BOOST_TEST(!streamed_response.empty());
+         fc::variant streamed_as_variant = fc::json::from_string( streamed_response );
+         BOOST_TEST(to_kv(variant_response) == to_kv(streamed_as_variant), boost::test_tools::per_element());
+      }
+
+      // Miss case: trxid not in the block.  Variant path returns null variant; streaming path returns empty string.
+      {
+         auto missing_id = "00000000000000000000000000000000000000000000000000000000000000ff"_h;
+         fc::variant variant_response  = get_transaction_trace( missing_id, 1 );
+         std::string streamed_response = get_transaction_trace_json( missing_id, 1 );
+         BOOST_TEST(variant_response.is_null());
+         BOOST_TEST(streamed_response.empty());
+      }
    }
 
 BOOST_AUTO_TEST_SUITE_END()

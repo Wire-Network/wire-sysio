@@ -322,18 +322,20 @@ struct trace_api_rpc_plugin_impl : public std::enable_shared_from_this<trace_api
                error_results results{404, "Trace API: transaction id missing in the transaction id log files"};
                cb( 404, fc::variant( results ));
             } else {
-               auto resp = req_handler->get_transaction_trace(*trx_id, *blk_num);
-               if (resp.is_null()) {
+               std::string resp = req_handler->get_transaction_trace_json(*trx_id, *blk_num);
+               if (resp.empty()) {
                   error_results results{404, "Trace API: transaction trace missing"};
                   cb( 404, fc::variant( results ));
                } else {
-                  cb( 200, std::move(resp) );
+                  // Pre-serialized JSON body: wrap in a string-valued variant so the
+                  // json_raw content-type path sends it verbatim, mirroring get_block.
+                  cb( 200, fc::variant( std::move(resp) ) );
                }
             }
           } catch (...) {
              http_plugin::handle_exception("trace_api", "get_transaction", body, cb);
           }
-      }});
+      }}, http_content_type::json_raw);
    }
 
    void plugin_shutdown() {
