@@ -477,8 +477,6 @@ namespace sysio {
       alignas(hardware_destructive_interference_sz)
       compat::channels::transaction_ack::channel_type::handle  incoming_transaction_ack_subscription;
 
-      boost::asio::deadline_timer           accept_error_timer{thread_pool.get_executor()};
-
       alignas(hardware_destructive_interference_sz)
       std::atomic<fc::time_point>           head_block_time;
 
