@@ -22,14 +22,18 @@ namespace sysio {
 inline constexpr size_t SOLANA_MAX_ENVELOPE_BYTES = 65'536;
 
 /// Per-`epoch_in` chunk payload limit. Mirrors `MAX_CHUNK_BYTES` on the
-/// Solana side. Chosen to fit a single `epoch_in` chunk transaction inside
-/// Solana's 1 232-byte tx packet MTU after header/signature/account-meta
-/// overhead. Bumped down from 768 → 704 when `EpochIn` grew from 7 → 10
-/// accounts (added `outbound_message_buffer`, `outbound_envelopes`,
-/// `latest_outbound_envelope` for the inline-emit-on-finalize path); the
-/// extra 99 raw bytes of account keys + indices ate into the previous
-/// margin and pushed 768-byte chunks past MTU.
-inline constexpr size_t SOLANA_MAX_CHUNK_BYTES = 704;
+/// Solana side. Solana's tx-packet MTU is 1 232 B raw. Tx overhead at the
+/// current 12-account / 1-ix shape is ~492 B. The FINAL chunk tx also
+/// carries one ComputeBudget `request_heap_frame(256_000)` pre-ix (~40 B
+/// for the ComputeBudget program key + ix wrapper) so the consensus-reach
+/// finalize path gets a 256 KiB BPF heap budget instead of the 32 KiB
+/// default that OOM'd at epoch 13. Budget:
+///     492 (overhead) + 40 (last-chunk pre-ix) + chunk_size ≤ 1232
+///     → chunk_size ≤ 700; rounded down to 672 for a comfortable
+///     32-byte safety margin against future ABI / varint slop.
+/// Was 704 (no pre-ixs) and 768 before that (when `EpochIn` had 7
+/// accounts pre-Task 54).
+inline constexpr size_t SOLANA_MAX_CHUNK_BYTES = 672;
 
 /**
  * @brief Solana concrete `outpost_client`.
