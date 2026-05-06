@@ -22,6 +22,29 @@ constexpr auto     CHALG_ACCOUNT  = "sysio.chalg"_n;
 /// One end of every cross-chain envelope is always WIRE.
 constexpr uint32_t WIRE_CHAIN_ID  = 1;
 
+/// Hard cap on the encoded outbound envelope size, mirroring the Solana
+/// (`opp_outpost::MAX_ENVELOPE_BYTES`) and Ethereum (`OPP.MAX_ENVELOPE_BYTES`)
+/// caps. 64 KiB is the e2e-supported maximum across WIRE / Ethereum / Solana,
+/// bound by Solana's 256 KiB BPF heap divided by ~3.3× envelope-size peak heap
+/// usage during the finalising chunk's `Envelope::decode + keccak::hash + clone`.
+/// The `buildenv` packing loop uses this to decide how many READY attestations
+/// to bundle into the current epoch's envelope; any that don't fit stay in the
+/// `attestations` table with status READY for the next epoch's `buildenv` call.
+constexpr size_t   MAX_ENVELOPE_BYTES         = 65'536;
+
+/// Conservative per-attestation byte budget used by the `buildenv` packing
+/// loop: protobuf tags + length prefixes + the attestation type/data-size
+/// fields. Over-counts by a few bytes per attestation versus the actual
+/// `zpp::bits` encoded size, which keeps the loop O(N) and always errs on the
+/// side of leaving a gap. The trailing `packed.size()` check after final
+/// serialisation is the hard backstop.
+constexpr size_t   ATTESTATION_OVERHEAD_BYTES = 24;
+
+/// Conservative envelope/message header budget for the packing loop —
+/// covers the `Envelope` header fields, the wrapping `Message`, its header
+/// + payload preamble, and a safety margin for `zpp::bits` length prefixes.
+constexpr size_t   ENVELOPE_BASELINE_BYTES    = 512;
+
 uint32_t current_epoch_index() {
    epoch::epochstate_t tbl(EPOCH_ACCOUNT);
    return tbl.exists() ? tbl.get().current_epoch_index : 0;
@@ -408,6 +431,12 @@ void msgch::queueout(uint64_t outpost_id,
 
 // ---------------------------------------------------------------------------
 //  buildenv — build outbound envelope from READY attestations
+//
+//  Packs as many READY attestations as fit under MAX_ENVELOPE_BYTES into a
+//  single outbound envelope; any that don't fit stay in the table with
+//  status = READY and ride the next epoch's `buildenv` call. Mirrors the
+//  Solana (`emit_outbound_inner`) and Ethereum (`emitOutboundEnvelope`)
+//  packing-loop pattern — never drop, never refuse, always emit what fits.
 // ---------------------------------------------------------------------------
 void msgch::buildenv(uint64_t outpost_id) {
    require_auth(EPOCH_ACCOUNT);
@@ -416,9 +445,12 @@ void msgch::buildenv(uint64_t outpost_id) {
    attestations_t atts(get_self());
    auto now_sec = static_cast<uint64_t>(current_time_point().sec_since_epoch());
 
-   // Collect READY attestations for this outpost
-   std::vector<opp::AttestationEntry> entries;
-   std::vector<uint64_t> att_ids;
+   // ── Phase 1: collect candidate READY attestations for this outpost.
+   //    Order is the secondary index's natural order, which is stable across
+   //    epochs — preserves cross-epoch attestation ordering for the receiving
+   //    chain.
+   std::vector<opp::AttestationEntry> candidate_entries;
+   std::vector<uint64_t>              candidate_ids;
 
    auto status_idx = atts.get_index<"bystatus"_n>();
    for (auto it = status_idx.lower_bound(
@@ -431,15 +463,44 @@ void msgch::buildenv(uint64_t outpost_id) {
       entry.type = it->type;
       entry.data_size = zpp::bits::vuint32_t{static_cast<uint32_t>(it->data.size())};
       entry.data = it->data;
-      entries.push_back(std::move(entry));
-      att_ids.push_back(it->id);
+      candidate_entries.push_back(std::move(entry));
+      candidate_ids.push_back(it->id);
    }
 
-   if (entries.empty()) return;
+   if (candidate_entries.empty()) return;
 
-   // Mark collected attestations as PROCESSED
-   att_ids.erase(std::unique(att_ids.begin(), att_ids.end()), att_ids.end());
-   for (uint64_t aid : att_ids) {
+   // ── Phase 2: packing loop. Walk candidates in order, accumulating a
+   //    conservative byte estimate; stop once the next one would push the
+   //    envelope over MAX_ENVELOPE_BYTES. The trailing serialised-size check
+   //    is the hard backstop in case the estimator under-counts.
+   size_t included_count  = 0;
+   size_t estimated_bytes = ENVELOPE_BASELINE_BYTES;
+   for (const auto& entry : candidate_entries) {
+      const size_t entry_bytes = ATTESTATION_OVERHEAD_BYTES + entry.data.size();
+      if (estimated_bytes + entry_bytes > MAX_ENVELOPE_BYTES) {
+         break;
+      }
+      estimated_bytes += entry_bytes;
+      ++included_count;
+   }
+
+   // First-attestation-too-big guard — surface so the operator sees it
+   // instead of a silently-stuck queue. Never expected at protocol level
+   // because individual attestations are bounded well below MAX_ENVELOPE_BYTES.
+   check(included_count > 0,
+         "sysio.msgch::buildenv: a single READY attestation exceeds "
+         "MAX_ENVELOPE_BYTES — cannot pack into an envelope");
+
+   std::vector<opp::AttestationEntry> entries(
+      std::make_move_iterator(candidate_entries.begin()),
+      std::make_move_iterator(candidate_entries.begin() + included_count));
+   const std::vector<uint64_t> included_ids(
+      candidate_ids.begin(),
+      candidate_ids.begin() + included_count);
+
+   // Mark only the included attestations as PROCESSED. Remaining candidates
+   // stay READY for the next epoch's `buildenv` call.
+   for (uint64_t aid : included_ids) {
       auto att_pk = id_key{aid};
       if (atts.contains(att_pk)) {
          atts.modify(same_payer, att_pk, [&](auto& a) {
@@ -449,7 +510,7 @@ void msgch::buildenv(uint64_t outpost_id) {
       }
    }
 
-   // Build a Message containing the collected attestations
+   // Build a Message containing the included attestations.
    opp::MessagePayload payload;
    payload.version = zpp::bits::vuint32_t{1};
    payload.attestations = std::move(entries);
@@ -471,6 +532,13 @@ void msgch::buildenv(uint64_t outpost_id) {
    std::vector<char> packed;
    auto out = zpp::bits::out{packed, zpp::bits::no_size{}};
    (void)out(env);
+
+   // Hard backstop — the estimator should always over-count, but a final
+   // size check guarantees the envelope cannot exceed the cross-chain cap
+   // even if the conservative estimator drifts.
+   check(packed.size() <= MAX_ENVELOPE_BYTES,
+         "sysio.msgch::buildenv: serialised envelope exceeds MAX_ENVELOPE_BYTES "
+         "(estimator drift)");
 
    // Store outbound envelope
    outenvelopes_t envelopes(get_self());

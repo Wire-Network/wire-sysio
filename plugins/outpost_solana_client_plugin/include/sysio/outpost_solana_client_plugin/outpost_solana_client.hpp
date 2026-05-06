@@ -12,6 +12,25 @@
 
 namespace sysio {
 
+/// Hard cap on the assembled OPP envelope. Mirrors the Solana program's
+/// `MAX_ENVELOPE_BYTES` (`programs/opp-outpost/src/state/envelope_chunks.rs`).
+/// 64 KiB is the e2e-supported max across WIRE / Ethereum / Solana — the
+/// binding constraint is Solana's 256 KB BPF heap divided by the ~3.3×
+/// envelope-size peak heap usage during the finalising chunk's
+/// `Envelope::decode` + `keccak::hash` + assembled-buffer + clone. Kept in
+/// sync by hand because there's no shared C++/Rust constant header.
+inline constexpr size_t SOLANA_MAX_ENVELOPE_BYTES = 65'536;
+
+/// Per-`epoch_in` chunk payload limit. Mirrors `MAX_CHUNK_BYTES` on the
+/// Solana side. Chosen to fit a single `epoch_in` chunk transaction inside
+/// Solana's 1 232-byte tx packet MTU after header/signature/account-meta
+/// overhead. Bumped down from 768 → 704 when `EpochIn` grew from 7 → 10
+/// accounts (added `outbound_message_buffer`, `outbound_envelopes`,
+/// `latest_outbound_envelope` for the inline-emit-on-finalize path); the
+/// extra 99 raw bytes of account keys + indices ate into the previous
+/// margin and pushed 768-byte chunks past MTU.
+inline constexpr size_t SOLANA_MAX_CHUNK_BYTES = 704;
+
 /**
  * @brief Solana concrete `outpost_client`.
  *
