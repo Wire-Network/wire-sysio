@@ -191,69 +191,6 @@ public:
 
    void cancel_all();
 
-   /**
-    * Options controlling blocking_retry() behavior.
-    *
-    * retry_schedule drives how often the blocking_retry callback is re-invoked after
-    * the initial call fails. max_retries caps the total number of retry
-    * attempts (not counting the initial call). on_exhaustion produces the
-    * fc::exception surfaced when the retry budget is exhausted without a
-    * successful result.
-    */
-   struct retry_options {
-      job_schedule retry_schedule;
-      job_metadata_t metadata;
-      int max_retries{600};
-      std::function<fc::exception()> on_exhaustion;
-   };
-
-   /**
-    * Synchronously invoke `fn(args...)`, retrying on empty/unsuccessful
-    * results via a scheduled cron job until the call succeeds, the retry
-    * budget is exhausted, or `fn` throws an fc::exception.
-    *
-    * `fn` must return a type whose `has_value()` / `operator*` semantics
-    * match std::optional or std::expected. On success the contained value is
-    * returned; on retry exhaustion `opts.on_exhaustion()` supplies the error.
-    *
-    * Note on argument lifetime: each retry re-invokes `fn` with the same
-    * argument pack via `std::forward`. Callers should pass lvalues; passing
-    * an rvalue is safe only if `fn` does not move from it (since a second
-    * retry would move from a moved-from object).
-    */
-   template <typename Fn, typename... Args>
-   auto blocking_retry(const retry_options& opts, Fn fn, Args&&... args)
-      -> std::expected<typename std::invoke_result_t<Fn, Args...>::value_type, fc::exception> {
-      FC_ASSERT_FMT(_options.num_threads > 1,
-                    "cron_service::blocking_retry() logic requires configuring the cron_service with more than one thread");
-      auto ret = fn(std::forward<Args>(args)...);
-      if (ret.has_value())
-         return std::move(*ret);
-
-      using ResultT = typename std::invoke_result_t<Fn, Args...>::value_type;
-      std::promise<std::expected<ResultT, fc::exception>> promise;
-      auto future = promise.get_future();
-      std::once_flag fired;
-
-      auto retry_fn = [&, attempt = 0]() mutable {
-         try {
-            auto r = fn(std::forward<Args>(args)...);   // local, per-invocation
-            if (r.has_value())
-               std::call_once(fired, [&]{ promise.set_value(std::move(*r)); });
-            else if (++attempt >= opts.max_retries)
-               std::call_once(fired, [&]{ promise.set_value(std::unexpected(opts.on_exhaustion())); });
-         } catch (const fc::exception& e) {
-            auto err = e.dynamic_copy_exception();
-            std::call_once(fired, [&, err]{ promise.set_value(std::unexpected(std::move(*err))); });
-         }
-      };
-
-      auto scheduled_id = this->add(opts.retry_schedule, retry_fn, opts.metadata);
-      const auto result = future.get();
-      this->cancel(scheduled_id);
-      return result;
-   }
-
    explicit cron_service(const options& options);
 
    bool is_running() const;

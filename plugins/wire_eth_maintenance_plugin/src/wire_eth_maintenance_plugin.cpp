@@ -87,31 +87,6 @@ namespace {
    constexpr auto default_interval_name                 = "default";
    constexpr auto just_once_interval_name               = "once";
 
-   // Tx-confirmation retry knobs. With a 5s schedule and 600 retries the worst-case
-   // wait per pending tx is ~50 minutes - matches the libcurl-era behavior.
-   constexpr int  tx_confirm_retry_ms          = 5000;
-   constexpr int  tx_confirm_max_retries       = 600;
-   constexpr auto tx_confirm_label             = "wire_eth_maintenance";
-   constexpr auto tx_confirm_exhaustion_msg    = "transaction not mined within retry timeout";
-
-   sysio::cron_service::retry_options make_tx_confirm_retry_opts() {
-      using job_schedule = sysio::services::cron_service::job_schedule;
-      return sysio::cron_service::retry_options{
-         .retry_schedule = job_schedule{.milliseconds = {job_schedule::step_value{tx_confirm_retry_ms}}},
-         .metadata = { .one_at_a_time = true,
-                       .tags = { "ethereum", "gas" },
-                       .label = tx_confirm_label },
-         .max_retries = tx_confirm_max_retries,
-         .on_exhaustion = []() -> fc::exception {
-            return sysio::chain::plugin_config_exception(
-               FC_LOG_MESSAGE(error, "{}", tx_confirm_exhaustion_msg),
-               sysio::chain::plugin_config_exception::code_value,
-               "plugin_config_exception",
-               tx_confirm_exhaustion_msg);
-         }
-      };
-   }
-
    fc::variant https_request(const std::string& url_str,
                              boost::beast::http::verb method,
                              const std::string& request_body,
@@ -386,19 +361,14 @@ void wire_eth_maintenance_plugin::plugin_initialize(const variables_map& options
    auto [ opp_contract, eth_client ] = my->get_contract<OPP>(oec_plugin);
    if( opp_contract ) {
       ilog("initializing beacon chain finalize epoch interval");
-      auto& cron_svc = app().get_plugin<sysio::cron_plugin>().cron_service();
       auto safely_confirm = [&](const auto& method, const auto& tx_hash) {
+         eth_client->wait_for_confirmation(tx_hash);
          auto bn = eth_client->get_block_for_transaction(tx_hash);
-         if (bn) {
-            ilog("tx for {} ({}) in block number {}", method, tx_hash, *bn);
+         if (!bn) {
+            elog("failed to identify block for tx {}", tx_hash);
             return;
          }
-         auto bn_retry = cron_svc.blocking_retry(make_tx_confirm_retry_opts(),
-            [&]() { return eth_client->get_block_for_transaction(tx_hash); });
-         if (bn_retry.has_value())
-            ilog("tx for {} ({}) in block number {}", method, tx_hash, *bn_retry);
-         else
-            elog("failed to identify block for tx {}: {}", tx_hash, bn_retry.error().what());
+         ilog("tx for {} ({}) in block number {}", method, tx_hash, *bn);
       };
 
       auto& finalize_epoch_interval = options.at(beacon_chain_finalize_epoch_interval).as<std::string>();
@@ -468,18 +438,13 @@ void wire_eth_maintenance_plugin::plugin_initialize(const variables_map& options
             : std::function<std::string(uint64_t)>{},
          .confirm_tx = [eth_client, &app_ref = app()](std::string_view method,
                                                       const std::string& tx_hash) {
-            auto& cron_svc = app_ref.get_plugin<sysio::cron_plugin>().cron_service();
+            eth_client->wait_for_confirmation(tx_hash);
             auto bn = eth_client->get_block_for_transaction(tx_hash);
-            if (bn) {
-               ilog("tx for {} ({}) in block number {}", method, tx_hash, *bn);
+            if (!bn) {
+               elog("failed to identify block for tx {}", tx_hash);
                return;
             }
-            auto bn_retry = cron_svc.blocking_retry(make_tx_confirm_retry_opts(),
-               [&]() { return eth_client->get_block_for_transaction(tx_hash); });
-            if (bn_retry.has_value())
-               ilog("tx for {} ({}) in block number {}", method, tx_hash, *bn_retry);
-            else
-               elog("failed to identify block for tx {}: {}", tx_hash, bn_retry.error().what());
+            ilog("tx for {} ({}) in block number {}", method, tx_hash, *bn);
          }
       }, exit_buffer_days));
       ilog("There are {} actions currently registered.", actions.size());

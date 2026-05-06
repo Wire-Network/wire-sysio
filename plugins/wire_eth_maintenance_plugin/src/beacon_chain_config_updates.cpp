@@ -2,6 +2,24 @@
 
 #include <fc/io/json.hpp>
 #include <fc/log/logger.hpp>
+#include <fc/network/json_rpc/json_rpc_client.hpp>
+
+namespace {
+   /// TEMPORARY DIAGNOSTIC: logs send-call failures with the structured
+   /// json_rpc_error fields (code + data) intact. fc::exception::what() carries
+   /// code+message but drops the `data` field, which is where the EVM revert
+   /// reason rides on `eth_estimateGas` failures (Solidity Error(string) ABI-
+   /// encoded as a hex string). Remove this helper and its callers once the
+   /// revert root-cause is identified.
+   void log_send_failure(std::string_view method, const std::exception& e) {
+      if (auto* je = dynamic_cast<const fc::network::json_rpc::json_rpc_error*>(&e)) {
+         elog("{} failed: code={} what={} data={}", method, je->code, je->what(),
+              fc::json::to_string(je->data, fc::time_point::maximum()));
+      } else {
+         elog("{} failed: {}", method, e.what());
+      }
+   }
+}
 
 namespace sysio {
 
@@ -85,23 +103,36 @@ void beacon_chain_config_updates::operator()() const {
       auto queues = deps_.fetch_queues();
       ilog("queues: {}", fc::json::to_string(queues, fc::time_point::maximum()));
 
+      auto check_hash = [&](const auto& method, const auto& hash) {
+         if (!hash.empty()) {
+            ilog("{} tx sent, hash: {}", method, hash);
+            safely_confirm(method, hash);
+         }
+      };
+
       auto q = compute_queue_updates(queues);
 
       if (q.withdraw_delay_sec && deps_.send_set_withdraw_delay) {
-         ilog("Sending setWithdrawDelay({} sec)", *q.withdraw_delay_sec);
-         auto hash = deps_.send_set_withdraw_delay(*q.withdraw_delay_sec);
-         if (!hash.empty()) {
-            ilog("setWithdrawDelay tx sent, hash: {}", hash);
-            safely_confirm("setWithdrawDelay", hash);
+         const auto method = "setWithdrawDelay";
+         ilog("Sending {}({} sec)", method, *q.withdraw_delay_sec);
+         try {
+            auto hash = deps_.send_set_withdraw_delay(*q.withdraw_delay_sec);
+            check_hash(method, hash);
+         }
+         catch(const std::exception& e) {
+            log_send_failure(method, e);
          }
       }
 
       if (q.entry_queue_days && deps_.send_set_entry_queue) {
-         ilog("Sending setEntryQueue({} days)", *q.entry_queue_days);
-         auto hash = deps_.send_set_entry_queue(*q.entry_queue_days);
-         if (!hash.empty()) {
-            ilog("setEntryQueue tx sent, hash: {}", hash);
-            safely_confirm("setEntryQueue", hash);
+         const auto method = "setEntryQueue";
+         ilog("Sending {}({} days)", method, *q.entry_queue_days);
+         try {
+            auto hash = deps_.send_set_entry_queue(*q.entry_queue_days);
+            check_hash(method, hash);
+         }
+         catch(const std::exception& e) {
+            log_send_failure(method, e);
          }
       }
 
@@ -113,11 +144,14 @@ void beacon_chain_config_updates::operator()() const {
          auto a = compute_apy_updates(ethstore);
 
          if (a.apy_bps) {
-            ilog("Sending updateApyBPS({} bps)", *a.apy_bps);
-            auto hash = deps_.send_update_apy_bps(*a.apy_bps);
-            if (!hash.empty()) {
-               ilog("updateApyBPS tx sent, hash: {}", hash);
-               safely_confirm("updateApyBPS", hash);
+            const auto method = "updateApyBPS";
+            ilog("Sending {}({} bps)", method, *a.apy_bps);
+            try {
+               auto hash = deps_.send_update_apy_bps(*a.apy_bps);
+               check_hash(method, hash);
+            }
+            catch(const std::exception& e) {
+               log_send_failure(method, e);
             }
          }
       }
