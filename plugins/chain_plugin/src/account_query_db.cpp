@@ -60,21 +60,8 @@ namespace {
       >
    >;
 
-   /**
-    * Utility function to identify on-block action
-    * @param p
-    * @return
-    */
    bool is_onblock(const chain::transaction_trace_ptr& p) {
-      if (p->action_traces.empty())
-         return false;
-      const auto& act = p->action_traces[0].act;
-      if (act.account != sysio::chain::config::system_account_name || act.name != "onblock"_n ||
-          act.authorization.size() != 1)
-         return false;
-      const auto& auth = act.authorization[0];
-      return auth.actor == sysio::chain::config::system_account_name &&
-             auth.permission == sysio::chain::config::active_name;
+      return chain::is_onblock(*p);
    }
 
    template<typename T>
