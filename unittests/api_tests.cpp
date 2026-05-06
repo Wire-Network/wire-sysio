@@ -273,7 +273,10 @@ BOOST_FIXTURE_TEST_CASE(action_verification_tests, validating_tester) { try {
       trx.actions.push_back(act1);
       set_transaction_headers(trx);
       auto sigs = trx.sign(get_private_key("testapi"_n, "active"), control->get_chain_id());
-      BOOST_CHECK_EXCEPTION(push_transaction(trx), sysio::chain::irrelevant_auth_exception,
+      // validate_referenced_accounts enforces payer-at-position-0 earlier than
+      // authorization_manager::check_authorization, so we get transaction_exception
+      // (not irrelevant_auth_exception). This is the defense-in-depth path.
+      BOOST_CHECK_EXCEPTION(push_transaction(trx), sysio::chain::transaction_exception,
                             fc_exception_message_is("Explicit payer must be the first declared authorization"));
    }
    {
@@ -1579,7 +1582,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(permission_tests, T, validating_testers) { try {
 
       // The test contract stores its result under its own code with a fixed key.
       // Use lower_bound on the contract's code to find its first (and only) KV row.
-      auto itr = idx.lower_bound(boost::make_tuple("testapi"_n, chain::config::kv_format_raw));
+      auto itr = idx.lower_bound(boost::make_tuple("testapi"_n, uint16_t(0)));
       FC_ASSERT( itr != idx.end() && itr->code == "testapi"_n, "KV row not found for testapi");
 
       FC_ASSERT( 0 != itr->value.size(), "unexpected result size");

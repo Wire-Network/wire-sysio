@@ -30,10 +30,10 @@ namespace sysiosystem {
        * At startup the initial producer may not be one that is registered / elected
        * and therefore there may be no producer object for them.
        */
-      auto prod = _producers.find( producer.value );
-      if ( prod != _producers.end() ) {
+      auto key = producer_key_t{producer.value};
+      if ( _producers.contains(key) ) {
          _gstate.total_unpaid_blocks++;
-         _producers.modify( prod, same_payer, [&](auto& p ) {
+         _producers.modify( same_payer, key, [&](auto& p ) {
                p.unpaid_blocks++;
          });
       }

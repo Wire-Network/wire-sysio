@@ -236,7 +236,6 @@ namespace sysio::chain {
 
          uint64_t                      trx_net_limit = 0;
          bool                          net_limit_due_to_block = true;
-         uint64_t                      leeway_trx_net_limit = 0;
 
          bool                          cpu_limit_due_to_greylist = false;
          fc::microseconds              subjective_cpu_bill;
@@ -257,7 +256,7 @@ namespace sysio::chain {
             on_chain_consensus_max_transaction_cpu_usage,
             user_specified_trx_max_cpu_usage_ms,
             node_configured_max_transaction_time,
-            speculative_executed_adjusted_max_transaction_time // prev_billed_cpu_time_us > 0
+            speculative_executed_adjusted_max_transaction_time // !prev_accounts_billing.empty()
          };
          tx_cpu_usage_exceeded_reason  tx_cpu_usage_reason = tx_cpu_usage_exceeded_reason::account_cpu_limit;
    };

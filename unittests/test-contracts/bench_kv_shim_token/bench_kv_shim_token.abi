@@ -52,11 +52,20 @@
     ],
     "tables": [
         {
+            "name": "account",
+            "type": "account",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": [],
+            "table_id": 15140
+        },
+        {
             "name": "accounts",
             "type": "account",
             "index_type": "i64",
-            "key_names": ["table_name","scope","primary_key"],
-            "key_types": ["name","name","uint64"]
+            "key_names": ["scope","primary_key"],
+            "key_types": ["name","uint64"],
+            "table_id": 25660
         }
     ],
     "ricardian_clauses": [],

@@ -145,7 +145,7 @@ namespace detail {
 
 // ---------------------------------------------------------------------------
 // BE key codec -- mirrors the CDT's be_key_stream encoding in kv_raw_table.hpp.
-// Used by get_kv_rows API to decode/encode format=0 raw keys.
+// Used by get_table_rows API to decode/encode format=0 raw keys.
 // Supports: uint8, int8, uint16, int16, uint32, int32, uint64, int64,
 //           name, bool, string, float64/double.
 // ---------------------------------------------------------------------------

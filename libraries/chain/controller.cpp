@@ -82,9 +82,9 @@ namespace detail {
 
       static snapshot_kv_object to_snapshot_row(const kv_object& obj, const chainbase::database&) {
          snapshot_kv_object row;
-         row.code       = obj.code;
-         row.payer      = obj.payer;
-         row.key_format = obj.key_format;
+         row.code     = obj.code;
+         row.payer    = obj.payer;
+         row.table_id = obj.table_id;
          SYS_ASSERT(obj.key.size() > 0, snapshot_exception, "kv_object has empty key during snapshot write");
          row.key.assign(obj.key.data(), obj.key.data() + obj.key.size());
          if (obj.value.size() > 0)
@@ -93,18 +93,14 @@ namespace detail {
       }
 
       static void from_snapshot_row(snapshot_kv_object&& row, kv_object& obj, chainbase::database&) {
-         static_assert(config::KV_FORMAT_COUNT == 2,
-                       "Update kv_object snapshot key_format validation when adding new formats");
-         SYS_ASSERT(row.key_format < config::KV_FORMAT_COUNT,
-                    snapshot_validation_exception, "kv_object has invalid key_format ({})", row.key_format);
          SYS_ASSERT(!row.key.empty(), snapshot_validation_exception, "kv_object has empty key");
          SYS_ASSERT(row.key.size() <= config::max_kv_key_size_limit, snapshot_validation_exception,
                     "kv_object key size ({}) exceeds absolute limit ({})", row.key.size(), config::max_kv_key_size_limit);
          SYS_ASSERT(row.value.size() <= config::max_kv_value_size_limit, snapshot_validation_exception,
                     "kv_object value size ({}) exceeds absolute limit ({})", row.value.size(), config::max_kv_value_size_limit);
-         obj.code       = row.code;
-         obj.payer      = row.payer;
-         obj.key_format = row.key_format;
+         obj.code     = row.code;
+         obj.payer    = row.payer;
+         obj.table_id = row.table_id;
          obj.key.assign(row.key.data(), row.key.size());
          obj.value.assign(row.value.data(), row.value.size());
       }
@@ -122,8 +118,7 @@ namespace detail {
          snapshot_kv_index_object row;
          row.code     = obj.code;
          row.payer    = obj.payer;
-         row.table    = obj.table;
-         row.index_id = obj.index_id;
+         row.table_id = obj.table_id;
          SYS_ASSERT(obj.sec_key.size() > 0, snapshot_exception, "kv_index_object has empty secondary key during snapshot write");
          SYS_ASSERT(obj.pri_key.size() > 0, snapshot_exception, "kv_index_object has empty primary key during snapshot write");
          row.sec_key.assign(obj.sec_key.data(), obj.sec_key.data() + obj.sec_key.size());
@@ -140,8 +135,7 @@ namespace detail {
                     "kv_index_object primary key size ({}) exceeds absolute limit ({})", row.pri_key.size(), config::max_kv_key_size_limit);
          obj.code     = row.code;
          obj.payer    = row.payer;
-         obj.table    = row.table;
-         obj.index_id = row.index_id;
+         obj.table_id = row.table_id;
          obj.sec_key.assign(row.sec_key.data(), row.sec_key.size());
          obj.pri_key.assign(row.pri_key.data(), row.pri_key.size());
       }
@@ -1053,9 +1047,8 @@ struct controller_impl {
    }
 
    void dmlog_applied_transaction(const transaction_trace_ptr& t, const signed_transaction* trx = nullptr) {
-      // dmlog_applied_transaction is called by push_scheduled_transaction
-      // where transient transactions are not possible, and by push_transaction
-      // only when the transaction is not transient
+      // dmlog_applied_transaction is called by push_transaction only when the
+      // transaction is not transient
       if (auto dm_logger = get_deep_mind_logger(false)) {
          if (trx && is_onblock(*t))
             dm_logger->on_onblock(*trx);
@@ -1908,8 +1901,7 @@ struct controller_impl {
    /**
     *  Adds the transaction receipt to the pending block and returns it.
     */
-   template<typename T>
-   const transaction_receipt& push_receipt( const T& trx, const cpu_usage_t& cpu_usage_us ) {
+   const transaction_receipt& push_receipt( const packed_transaction& trx, const cpu_usage_t& cpu_usage_us ) {
       auto& bb = std::get<building_block>(pending->_block_stage);
       auto& receipts = bb.pending_trx_receipts();
       receipts.emplace_back( trx );
@@ -2584,7 +2576,7 @@ struct controller_impl {
             } else {
                trx_metas.reserve( b->transactions.size() );
                for( const auto& receipt : b->transactions ) {
-                  const auto& pt =receipt.trx;
+                  const auto& pt = receipt.trx;
                   transaction_metadata_ptr trx_meta_ptr = trx_lookup ? trx_lookup( pt.id() ) : transaction_metadata_ptr{};
                   if( trx_meta_ptr && *trx_meta_ptr->packed_trx() != pt ) trx_meta_ptr = nullptr;
                   if( trx_meta_ptr && ( skip_auth_checks || !trx_meta_ptr->recovered_keys().empty() ) ) {
