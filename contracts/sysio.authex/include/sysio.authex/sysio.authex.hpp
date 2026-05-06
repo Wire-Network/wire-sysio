@@ -55,7 +55,7 @@ namespace sysio {
     // ! For testing only, remove before MAINNET deployment.
     [[sysio::action]] void clearlinks();
 
-    private:
+    public:
     // ----- Tables -----
 
     struct links_key {
@@ -88,6 +88,8 @@ namespace sysio {
         kv::index<"bypubkey"_n, const_mem_fun<links_s, checksum256, &links_s::by_pub_key>>,
         kv::index<"bychain"_n, const_mem_fun<links_s, uint64_t, &links_s::by_chain>>
     >;
+
+    private:
     // ----- Helper methods -----
 
     /**
