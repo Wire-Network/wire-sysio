@@ -117,6 +117,10 @@ void test_trxs_common(std::vector<const char*>& specific_args) {
                app->find_plugin<chain_plugin>()->chain();
                app->startup();
                plugin_promise.set_value({app->find_plugin<producer_plugin>(), app->find_plugin<chain_plugin>()});
+               // The app was constructed on the outer thread; capture this thread (which
+               // runs the loop) as main_thread_id_ so producer_plugin's main-thread asserts
+               // compare against the right thread.
+               app->executor().set_main_thread_id();
                app->exec();
                return;
             } FC_LOG_AND_DROP()
