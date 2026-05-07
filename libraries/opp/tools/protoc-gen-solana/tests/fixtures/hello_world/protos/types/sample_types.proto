@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package hello.types;
+
+// Shared enum: message priority levels
+enum Priority {
+  PRIORITY_UNSPECIFIED = 0;
+  PRIORITY_LOW = 1;
+  PRIORITY_MEDIUM = 2;
+  PRIORITY_HIGH = 3;
+  PRIORITY_CRITICAL = 4;
+}
+
+// Shared enum: status codes
+enum Status {
+  STATUS_UNSPECIFIED = 0;
+  STATUS_PENDING = 1;
+  STATUS_ACTIVE = 2;
+  STATUS_COMPLETED = 3;
+  STATUS_FAILED = 4;
+}
+
+// Shared message: a tagged identifier
+message TaggedId {
+  uint64 id = 1;
+  string tag = 2;
+  Priority priority = 3;
+}
+
+// Shared message: key-value metadata pair
+message Metadata {
+  string key = 1;
+  string value = 2;
+}

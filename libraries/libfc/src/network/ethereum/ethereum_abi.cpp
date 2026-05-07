@@ -846,7 +846,8 @@ abi::contract abi::parse_contract(const fc::variant& v) {
  * @return Hex string of encoded call data (selector + encoded parameters)
  * @throws fc::exception if parameter count mismatches or encoding fails
  */
-std::string contract_encode_data(const abi::contract& contract, const std::vector<fc::variant>& params) {
+std::string contract_encode_data(const abi::contract& contract, const std::vector<fc::variant>& params,
+                                 bool add_hex_prefix) {
    const auto& inputs = contract.inputs;
    FC_ASSERT_FMT(inputs.size() == params.size(), "Parameter count mismatch (expected={}, provided={})", inputs.size(),
                  params.size());
@@ -890,7 +891,7 @@ std::string contract_encode_data(const abi::contract& contract, const std::vecto
       out.insert(out.end(), tail.begin(), tail.end());
    }
 
-   return fc::to_hex(out);
+   return fc::to_hex(out, add_hex_prefix);
 }
 
 
@@ -1058,7 +1059,12 @@ void fc::from_variant(const fc::variant& var, fc::network::ethereum::abi::contra
 
    FC_ASSERT(var.is_object(), "Variant must be an object to deserialize ABI contract");
    auto& obj = var.get_object();
-   vo.name = obj["name"].as_string();
+   const auto name_itr = obj.find("name");
+   const bool no_name = name_itr == obj.end();
+   if (!no_name) {
+      vo.name = name_itr->value().as_string();
+   }
+
    auto type_str = obj["type"].as_string();
    vo.type = fc::reflector<fc::network::ethereum::abi::invoke_target_type>::from_string(type_str.c_str());
 
@@ -1079,4 +1085,10 @@ void fc::from_variant(const fc::variant& var, fc::network::ethereum::abi::contra
 
    parse_components(vo.inputs, "inputs");
    parse_components(vo.outputs, "outputs");
+   if(no_name) {
+      // we expect ABI contracts that have the legacy payment ethereum interface
+      const bool valid = type_str == "receive" &&
+                         obj["stateMutability"].as_string() == "payable";
+      FC_ASSERT(valid, "Variant Object must have a `name` key to deserialize ABI contract");
+   }
 }

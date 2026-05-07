@@ -1,4 +1,5 @@
 #include <ranges>
+#include <regex>
 #include <fc/log/logger.hpp>
 
 #include <sysio/outpost_ethereum_client_plugin.hpp>
@@ -74,10 +75,19 @@ void outpost_ethereum_client_plugin::plugin_initialize(const variables_map& opti
       auto& id           = parts[0];
       auto& url          = parts[2];
       auto& sig_id       = parts[1];
-      fc::ostring chain_id_str = parts[3];
       std::optional<fc::uint256> chain_id;
-      if (chain_id_str.has_value())
-         chain_id = std::make_optional<fc::uint256>(fc::to_uint256(chain_id_str.value()));
+      fc::ostring chain_id_str;
+      if (parts.size() == 4) {
+         chain_id_str = parts[3];
+         if (chain_id_str.has_value())
+            chain_id = fc::to_uint256(chain_id_str.value());
+      } else {
+         wlog("ethereum client `{}` has no chain-id pinned in its spec; the client will accept"
+              " whatever chainId the RPC returns. For a signing daemon this is a replay-attack"
+              " surface if the RPC is compromised or misconfigured. Consider adding a fourth"
+              " comma-separated field to --outpost-ethereum-client to pin the expected chain-id.",
+              id);
+      }
 
       auto  sig_provider = plug_sig->get_provider(sig_id);
       my->add_client(id,
@@ -89,7 +99,7 @@ void outpost_ethereum_client_plugin::plugin_initialize(const variables_map& opti
                            chain_id)));
 
       ilog("Added ethereum client (id={},sig_id={},chainId={},url={})",
-           id,sig_id,url,chain_id_str.value_or("none"));
+           id,sig_id,chain_id_str.value_or("none"),url);
    }
 }
 
@@ -118,15 +128,15 @@ void outpost_ethereum_client_plugin::plugin_shutdown() {
    ilog("Shutdown outpost client plugin");
 }
 
-std::vector<ethereum_client_entry_ptr> outpost_ethereum_client_plugin::get_clients() {
+std::vector<ethereum_client_entry_ptr> outpost_ethereum_client_plugin::get_clients() const {
    return my->get_clients();
 }
 
-ethereum_client_entry_ptr outpost_ethereum_client_plugin::get_client(const std::string& id) {
+ethereum_client_entry_ptr outpost_ethereum_client_plugin::get_client(const std::string& id) const {
    return my->get_client(id);
 }
 
-const std::vector<std::pair<std::filesystem::path, std::vector<fc::network::ethereum::abi::contract>>>& outpost_ethereum_client_plugin::get_abi_files() {
+const std::vector<std::pair<std::filesystem::path, std::vector<fc::network::ethereum::abi::contract>>>& outpost_ethereum_client_plugin::get_abi_files() const {
    return my->get_abi_files();
 }
 
@@ -149,6 +159,55 @@ outpost_ethereum_client_plugin::create_outpost_client(const std::string& eth_cli
                                                     std::move(all_abis),
                                                     outpost_id,
                                                     chain_id);
+}
+
+ethereum_client_ptr outpost_ethereum_client_plugin::get_client_for_chain(fc::crypto::chain_kind_t target_chain) const {
+   ethereum_client_ptr result;
+   for (const auto& entry : my->get_clients()) {
+      if (target_chain == entry->signature_provider->target_chain) {
+         SYS_ASSERT(!result, sysio::chain::plugin_config_exception,
+                    "There should only be one ethereum client for chain kind {}, but there were at least 2",
+                    static_cast<int>(target_chain));
+         result = entry->client;
+      }
+   }
+   SYS_ASSERT(!!result, sysio::chain::plugin_config_exception,
+              "could not find any ethereum client for chain kind {}", static_cast<int>(target_chain));
+   return result;
+}
+
+std::vector<fc::network::ethereum::abi::contract> outpost_ethereum_client_plugin::get_abis_for_contract(const std::string& contract_name) const {
+   static const std::regex contract_regex(R"(^(.+?)(?:V\d+)?$)");
+   constexpr auto contract_name_field = "contractName";
+   std::vector<fc::network::ethereum::abi::contract> result;
+
+   for (const auto& [json_abi_file, abi_contracts] : my->get_abi_files()) {
+      auto json_var = fc::json::from_file(json_abi_file);
+      if (!json_var.is_object())
+         continue;
+
+      const auto var_obj = json_var.get_object();
+      if (!var_obj.contains(contract_name_field))
+         continue;
+
+      const auto name_var = var_obj[contract_name_field];
+      if (name_var.is_array())
+         continue;
+
+      const auto name = name_var.as<std::string>();
+
+      std::smatch matches;
+      if (!std::regex_search(name, matches, contract_regex))
+         continue;
+
+      if (matches[1].str() != contract_name)
+         continue;
+
+      result.insert(result.end(), abi_contracts.begin(), abi_contracts.end());
+      break;
+   }
+
+   return result;
 }
 
 } // namespace sysio

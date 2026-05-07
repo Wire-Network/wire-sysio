@@ -1,0 +1,55 @@
+{
+  "name": "@wireio/protoc-gen-solidity",
+  "version": "1.0.13",
+  "description": "protoc plugin generating Solidity encode/decode libraries from protobuf3 definitions",
+  "private": false,
+  "type": "commonjs",
+  "types": "lib/cjs/index.d.ts",
+  "main": "dist/bundle/protoc-gen-solidity.cjs",
+  "bin": {
+    "protoc-gen-solidity": "dist/bundle/protoc-gen-solidity.cjs"
+  },
+  "scripts": {
+    "compile": "tsc -b tsconfig.json",
+    "compile:dev": "tsc -b tsconfig.json -w",
+    "bundle": "node esbuild.config.js",
+    "bundle:dev": "node esbuild.config.js -w",
+    "build": "pnpm run compile && pnpm run bundle",
+    "build:dev": "concurrently npm:compile:dev npm:bundle:dev",
+    "dev": "pnpm run build:dev",
+    "//dist": "pnpm build && pkg -c package.json --output dist/bin/protoc-gen-solidity dist/bundle/protoc-gen-solidity.cjs",
+    "dist": "pnpm run build",
+    "format": "prettier --write \"src/**/*.{ts,tsx}\"",
+    "generate:test": "npm run dist && mkdir -p ./dist/tests/generated && npx protoc --plugin=protoc-gen-solidity=./dist/bin/protoc-gen-solidity --solidity_out=./dist/tests/generated tests/protos/*.proto",
+    "postinstall": "pnpm run dist",
+    "clean": "rm -rf lib dist",
+    "test": "jest"
+  },
+  "pkg": {
+    "assets": [
+      "sol/**/*"
+    ]
+  },
+  "files": [
+    "lib",
+    "dist/bin",
+    "dist/bundle",
+    "sol",
+    "README.md"
+  ],
+  "dependencies": {
+    "@yao-pkg/pkg": "^6.14.1",
+    "protobufjs": "^8.0.0",
+    "tracer": "^1.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.3.0",
+    "esbuild": "^0.27.3",
+    "prettier": "^3.8.1",
+    "protoc": "^29.6.0",
+    "typescript": "^6.0.2"
+  },
+  "engines": {
+    "node": ">=24"
+  }
+}

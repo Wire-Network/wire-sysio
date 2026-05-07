@@ -11,11 +11,36 @@
 #include <fc/int256.hpp>
 #include <fc/network/ethereum/ethereum_abi.hpp>
 #include <fc/network/json_rpc/json_rpc_client.hpp>
+#include <fc/task/retry.hpp>
 
 namespace fc::network::ethereum {
 using namespace fc::crypto;
 using namespace fc::crypto::ethereum;
 using namespace fc::network::json_rpc;
+
+/**
+ * Options driving `*_and_confirm` behaviour on the Ethereum client.
+ * Chain-specific knob is `confirmations`; retry/backoff delegates to the
+ * shared `fc::task::retry_options`, same as the Solana side.
+ *
+ * Callers that want different behaviour per call site construct a local
+ * `ethereum_confirm_options` with the fields they need and pass it by
+ * const-ref. The library ships `ethereum_confirm_option_defaults` for the
+ * common case.
+ */
+struct ethereum_confirm_options {
+   /// Blocks past inclusion to wait before returning success. `1` means the
+   /// tx is in the head block and we accept it; higher values trade latency
+   /// for reorg resistance. Keep at `1` for test-net / local anvil; raise
+   /// on mainnet where uncle / reorg rate is non-trivial.
+   uint32_t                  confirmations = 1;
+
+   /// Retry / backoff / deadline envelope — shared with the Solana client.
+   /// See `fc::task::retry_options` for per-field semantics.
+   fc::task::retry_options   retry         = fc::task::retry_option_defaults;
+};
+
+inline constexpr ethereum_confirm_options ethereum_confirm_option_defaults{};
 
 /**
  * @brief Type alias for Ethereum block tag or block number
@@ -223,6 +248,32 @@ protected:
    template <typename RT, typename... Args>
    ethereum_contract_tx_fn<RT, Args...> create_tx(const abi::contract& contract);
 
+   /**
+    * @brief Creates a typed contract transaction function whose returned
+    *        callable awaits on-chain inclusion + N confirmations before
+    *        returning.
+    *
+    * Same shape as `create_tx` but routes through
+    * `ethereum_client::send_transaction_and_confirm`, so each invocation
+    * polls `eth_getTransactionReceipt` and `eth_blockNumber` until the tx
+    * has settled at the requested confirmation depth or the retry
+    * envelope's deadline expires. Use this for any OPP-critical write
+    * (batch-operator delivery path) to avoid the fire-and-forget hazard
+    * that caused the epoch-859 stall on the Solana side.
+    *
+    * `opts` is captured by the emitted lambda at construction time; build
+    * a dedicated wrapper for per-invocation overrides.
+    *
+    * @tparam RT   Return type (typically fc::variant with tx hash)
+    * @tparam Args Argument types for the contract function
+    * @param contract ABI contract definition
+    * @param opts     Confirmation depth + retry envelope captured into the callable
+    */
+   template <typename RT, typename... Args>
+   ethereum_contract_tx_fn<RT, Args...> create_tx_and_confirm(
+      const abi::contract&        contract,
+      ethereum_confirm_options    opts = ethereum_confirm_option_defaults);
+
 private:
    /**
     * @brief Map of contract names to their ABI definitions
@@ -354,6 +405,57 @@ public:
     * @throws fc::network::json_rpc::json_rpc_exception if the RPC call fails or returns an error.
     */
    std::string send_raw_transaction(const std::string& raw_tx_data);
+
+   /**
+    * @brief Retrieves the transaction receipt and extracts the block number.
+    * @param tx_hash The transaction hash
+    * @return The block number if the receipt is available, or std::nullopt if not yet mined
+    */
+   std::optional<uint64_t> get_block_for_transaction(const std::string& tx_hash);
+
+   /**
+    * @brief Submit a raw transaction and await inclusion + N confirmations.
+    *
+    * Fire-and-forget `send_transaction` / `send_raw_transaction` return a
+    * tx hash without proving the tx landed. This variant:
+    *   1. Submits via the existing `send_transaction` path.
+    *   2. Polls `eth_getTransactionReceipt` until non-null. If
+    *      `receipt.status == 0` (EVM revert), throws with reason.
+    *   3. Polls `eth_blockNumber` until
+    *      `currentBlock >= receipt.blockNumber + opts.confirmations`.
+    *   4. Returns the tx hash.
+    *
+    * Shares the polling loop with the Solana client via
+    * `fc::task::retry_until`. Throws `fc::timeout_exception` on deadline
+    * expiry and `fc::exception` on EVM revert.
+    *
+    * @param raw_tx_data Raw (hex-encoded) signed transaction bytes.
+    * @param opts        Confirmation depth + retry/backoff envelope.
+    */
+   std::string send_transaction_and_confirm(const std::string& raw_tx_data,
+                                             const ethereum_confirm_options& opts =
+                                                ethereum_confirm_option_defaults);
+
+   /**
+    * @brief Wait for a previously-submitted tx hash to be included and
+    *        confirmed at `opts.confirmations` depth.
+    *
+    * Split out from `send_transaction_and_confirm` so callers that submit
+    * through a different path (e.g. `execute_contract_tx_fn` at the
+    * contract-client level) can reuse the confirmation wait without
+    * re-submitting.
+    *
+    * Same two-phase logic: poll receipt until non-null (throw on
+    * `receipt.status == 0`), then poll `eth_blockNumber` until
+    * `current >= receipt.blockNumber + opts.confirmations`.
+    *
+    * @param tx_hash Transaction hash returned by an earlier submit.
+    * @param opts    Confirmation depth + retry/backoff envelope.
+    * @return The same `tx_hash`, now confirmed.
+    */
+   std::string wait_for_confirmation(const std::string& tx_hash,
+                                      const ethereum_confirm_options& opts =
+                                         ethereum_confirm_option_defaults);
 
    /**
     * @brief Retrieves logs based on filter parameters.
@@ -544,6 +646,35 @@ ethereum_contract_tx_fn<RT, Args...> ethereum_contract_client::create_tx(const a
       contract_invoke_data_items params = {args...};
       auto tx = client->create_default_tx(contract_address, abi, params);
       auto res_var = client->execute_contract_tx_fn(tx, abi, params);
+
+      if constexpr (std::is_same_v<std::decay_t<RT>, fc::variant>) {
+         return res_var;
+      }
+
+      return res_var.as<RT>();
+   };
+}
+
+template <typename RT, typename... Args>
+ethereum_contract_tx_fn<RT, Args...> ethereum_contract_client::create_tx_and_confirm(
+   const abi::contract& contract, ethereum_confirm_options opts) {
+   auto abi_map = _abi_map.writeable();
+   if (!abi_map.contains(contract.name)) {
+      abi_map[contract.name] = contract;
+   }
+
+   abi::contract& abi = abi_map[contract.name];
+   return [this, &abi, opts](const Args&... args) -> RT {
+      contract_invoke_data_items params = {args...};
+      auto tx      = client->create_default_tx(contract_address, abi, params);
+      auto res_var = client->execute_contract_tx_fn(tx, abi, params);
+
+      // `execute_contract_tx_fn` returns the submitted tx hash. Await
+      // inclusion + confirmation depth before handing back to the caller.
+      // Throws fc::timeout_exception on deadline or fc::exception on
+      // on-chain revert.
+      const auto tx_hash = res_var.as_string();
+      client->wait_for_confirmation(tx_hash, opts);
 
       if constexpr (std::is_same_v<std::decay_t<RT>, fc::variant>) {
          return res_var;

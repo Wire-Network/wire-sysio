@@ -49,7 +49,7 @@ void epoch::setconfig(uint32_t epoch_duration_sec,
                       uint32_t operators_per_epoch,
                       uint32_t batch_operator_minimum_active,
                       uint32_t batch_op_groups,
-                      uint32_t attestation_retention_epoch_count) {
+                      uint32_t epoch_retention_envelope_log_count) {
    require_auth(get_self());
 
    check(epoch_duration_sec > 0, "epoch_duration_sec must be positive");
@@ -57,8 +57,8 @@ void epoch::setconfig(uint32_t epoch_duration_sec,
    check(batch_op_groups > 0, "batch_op_groups must be positive");
    check(batch_operator_minimum_active == operators_per_epoch * batch_op_groups,
          "batch_operator_minimum_active must equal operators_per_epoch * batch_op_groups");
-   check(attestation_retention_epoch_count > 0,
-         "attestation_retention_epoch_count must be positive");
+   check(epoch_retention_envelope_log_count > 0,
+         "epoch_retention_envelope_log_count must be positive");
 
    epochcfg_t cfg_tbl(get_self());
    epoch_config cfg = cfg_tbl.get_or_default(epoch_config{});
@@ -66,7 +66,7 @@ void epoch::setconfig(uint32_t epoch_duration_sec,
    cfg.operators_per_epoch = operators_per_epoch;
    cfg.batch_operator_minimum_active = batch_operator_minimum_active;
    cfg.batch_op_groups = batch_op_groups;
-   cfg.attestation_retention_epoch_count = attestation_retention_epoch_count;
+   cfg.epoch_retention_envelope_log_count = epoch_retention_envelope_log_count;
    cfg_tbl.set(cfg, get_self());
 }
 
@@ -224,17 +224,12 @@ void epoch::advance() {
       }
    }
 
-   // Cleanup old attestations/envelopes
-   if (state.current_epoch_index > cfg.attestation_retention_epoch_count) {
-      uint32_t before_epoch =
-         state.current_epoch_index - cfg.attestation_retention_epoch_count;
-      action(
-         permission_level{"sysio.epoch"_n, "owner"_n},
-         MSGCH_ACCOUNT,
-         "cleanup"_n,
-         std::make_tuple(before_epoch)
-      ).send();
-   }
+   // Working tables on `sysio.msgch` (`envelopes` / `messages` /
+   // `attestations` / `outenvelopes`) are now drained inline by the
+   // `evalcons` consensus-reach + `buildenv` write paths. The durable
+   // audit trail lives in the `envelope_log` table on the same contract,
+   // capped at `active_outposts * 2 * cfg.epoch_retention_envelope_log_count`
+   // and pruned head-first on overflow. No scheduled cleanup needed.
 }
 
 // ---------------------------------------------------------------------------

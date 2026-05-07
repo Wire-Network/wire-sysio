@@ -9,6 +9,7 @@
 #include <fc/network/solana/solana_idl.hpp>
 #include <fc/network/solana/solana_system_programs.hpp>
 #include <fc/network/solana/solana_types.hpp>
+#include <fc/task/retry.hpp>
 
 #include <boost/core/demangle.hpp>
 #include <map>
@@ -23,6 +24,32 @@ namespace fc::network::solana {
 
 using namespace fc::crypto;
 using namespace fc::network::json_rpc;
+
+/**
+ * Options driving `*_and_confirm` behaviour on the Solana client. The
+ * chain-specific knob is `commitment`; everything retry-related is delegated
+ * to `fc::task::retry_options` so the Solana and Ethereum clients share one
+ * backoff implementation.
+ *
+ * Callers that want different behaviour per call site construct a local
+ * `solana_confirm_options` with the fields they need and pass it by const-ref.
+ * The library ships `solana_confirm_option_defaults` for the common case.
+ */
+struct solana_confirm_options {
+   /// Commitment level a tx must reach before we consider it confirmed.
+   /// Default `processed` — fastest failure signal (~400ms), appropriate for
+   /// the OPP batch-operator flow where we re-attempt on any
+   /// mis-confirmation. Use `confirmed` when the caller needs reorg-
+   /// resistance within the same tx, `finalized` only for cross-chain
+   /// checkpoints where the wait cost is acceptable.
+   commitment_t              commitment = commitment_t::processed;
+
+   /// Retry / backoff / deadline envelope — shared with the Ethereum client.
+   /// See `fc::task::retry_options` for per-field semantics.
+   fc::task::retry_options   retry      = fc::task::retry_option_defaults;
+};
+
+inline constexpr solana_confirm_options solana_confirm_option_defaults{};
 
 class solana_client;
 using solana_client_ptr = std::shared_ptr<solana_client>;
@@ -227,6 +254,30 @@ public:
                           const program_invoke_data_items& params = {});
 
    /**
+    * @brief Execute a program transaction and await on-chain confirmation.
+    *
+    * Fire-and-forget `execute_tx` is vulnerable to dropped txs (expired
+    * blockhash, slot skip, validator hiccup, fork reorg) — the RPC returns
+    * a signature without guaranteeing the tx lands. This variant awaits
+    * `opts.commitment` with exponential backoff and throws on failure or
+    * deadline expiry. Prefer this for any state-changing call where the
+    * caller needs confirmation that Solana actually accepted the tx.
+    *
+    * @param instr   IDL instruction definition
+    * @param accounts Account metadata for the instruction
+    * @param params  Parameters for the instruction (as fc::variants)
+    * @param opts    Commitment + retry/backoff envelope. Defaults to
+    *                `commitment_t::processed` — the fastest failure signal.
+    * @return Confirmed transaction signature.
+    * @throws fc::timeout_exception on deadline expiry; fc::exception on tx error.
+    */
+   std::string execute_tx_and_confirm(const idl::instruction& instr,
+                                      const std::vector<account_meta>& accounts,
+                                      const program_invoke_data_items& params = {},
+                                      const solana_confirm_options& opts =
+                                         solana_confirm_option_defaults);
+
+   /**
     * @brief Resolve accounts for an instruction based on IDL
     *
     * Resolves account pubkeys and builds account_meta list from IDL definition.
@@ -268,6 +319,31 @@ protected:
     */
    template <typename RT, typename... Args>
    solana_program_tx_fn<RT, Args...> create_tx(const idl::instruction& instr);
+
+   /**
+    * @brief Creates a typed program transaction function whose returned
+    *        callable awaits on-chain confirmation before returning.
+    *
+    * Same shape as `create_tx` but the emitted lambda routes through
+    * `execute_tx_and_confirm`, so each invocation waits until the tx
+    * reaches `opts.commitment` or the retry envelope's deadline expires.
+    * Use this for any OPP write (batch-operator critical path) to avoid
+    * the fire-and-forget hazard that caused the epoch-859 stall.
+    *
+    * The `opts` value is captured by the lambda at construction time.
+    * Callers that need per-invocation overrides should build a dedicated
+    * `create_tx_and_confirm` wrapper or call `execute_tx_and_confirm`
+    * directly.
+    *
+    * @tparam RT Return type (typically std::string for signature)
+    * @tparam Args Argument types for the program transaction
+    * @param instr IDL instruction definition
+    * @param opts Commitment + retry envelope captured into the callable
+    */
+   template <typename RT, typename... Args>
+   solana_program_tx_fn<RT, Args...> create_tx_and_confirm(
+      const idl::instruction&  instr,
+      solana_confirm_options   opts = solana_confirm_option_defaults);
 
    /**
     * @brief Creates a typed account data getter function
@@ -766,6 +842,28 @@ public:
    std::string send_and_confirm_transaction(const transaction& tx,
                                              commitment_t commitment = commitment_t::confirmed);
 
+   /**
+    * @brief Submit a signed transaction and await confirmation with
+    *        exponential backoff + deadline.
+    *
+    * Modern cousin of `send_and_confirm_transaction`. Shares the polling
+    * loop with the Ethereum client's `send_transaction_and_confirm` via
+    * `fc::task::retry_until`, so backoff + timeout semantics are identical
+    * across chains. Throws `fc::timeout_exception` on deadline expiry and
+    * `fc::exception` with the RPC `err` payload on tx failure.
+    *
+    * Existing `send_and_confirm_transaction` stays for legacy callers — it
+    * has a fixed 1s polling cadence with a hard 60s cap.
+    *
+    * @param tx    Signed transaction.
+    * @param opts  Commitment + retry/backoff envelope. Defaults to
+    *              `commitment_t::processed` + the shared retry defaults.
+    * @return Confirmed transaction signature.
+    */
+   std::string send_transaction_and_confirm(const transaction& tx,
+                                             const solana_confirm_options& opts =
+                                                solana_confirm_option_defaults);
+
    //=========================================================================
    // Program Client Support
    //=========================================================================
@@ -862,6 +960,36 @@ solana_program_tx_fn<RT, Args...> solana_program_client::create_tx(const idl::in
          return signature;
       } else {
          // For other types, convert via variant
+         fc::variant res_var(signature);
+         return res_var.as<RT>();
+      }
+   };
+}
+
+template <typename RT, typename... Args>
+solana_program_tx_fn<RT, Args...> solana_program_client::create_tx_and_confirm(
+   const idl::instruction& instr, solana_confirm_options opts) {
+   auto idl_map = _idl_map.writeable();
+   if (!idl_map.contains(instr.name)) {
+      idl_map[instr.name] = instr;
+   }
+
+   idl::instruction& idl = idl_map[instr.name];
+   return [this, &idl, opts](Args... args) -> RT {
+      program_invoke_data_items params = {fc::variant(args)...};
+
+      // Execute + await confirmation. Throws on timeout or RPC-reported
+      // tx failure, so callers never see a "success" for a dropped tx.
+      std::string signature = execute_tx_and_confirm(
+         idl, resolve_accounts(idl, params), params, opts);
+
+      // Result coercion matches create_tx above so callers of either
+      // factory see identical return-type behaviour.
+      if constexpr (std::is_same_v<std::decay_t<RT>, fc::variant>) {
+         return fc::variant(signature);
+      } else if constexpr (std::is_same_v<std::decay_t<RT>, std::string>) {
+         return signature;
+      } else {
          fc::variant res_var(signature);
          return res_var.as<RT>();
       }
