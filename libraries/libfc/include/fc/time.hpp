@@ -74,16 +74,20 @@ namespace fc {
         /**
          * Saturating conversion to std::chrono::system_clock::time_point.
          *
-         * fc::time_point::maximum() carries microseconds(INT64_MAX); a direct construction of
-         * system_clock::time_point from that value silently overflows on platforms whose
-         * system_clock::duration is finer than microseconds (e.g. nanoseconds on libstdc++ Linux),
-         * which would yield a deadline in the past. This helper maps maximum() to
-         * system_clock::time_point::max() and otherwise performs the natural microsecond conversion.
+         * Direct construction silently overflows on platforms whose system_clock::duration is
+         * finer than microseconds (e.g. nanoseconds on libstdc++ Linux) for any value outside
+         * system_clock::time_point::{min,max}()'s representable range, wrapping into a bogus
+         * past/future deadline. Clamp the whole out-of-range region.
          */
         std::chrono::system_clock::time_point to_system_clock() const {
-           if (*this == maximum())
-              return std::chrono::system_clock::time_point::max();
-           return std::chrono::system_clock::time_point{std::chrono::microseconds{elapsed.count()}};
+           using sc_tp = std::chrono::system_clock::time_point;
+           // Largest/smallest microsecond counts that round-trip into sc_tp without overflow.
+           constexpr int64_t max_us = std::chrono::duration_cast<std::chrono::microseconds>(sc_tp::max().time_since_epoch()).count();
+           constexpr int64_t min_us = std::chrono::duration_cast<std::chrono::microseconds>(sc_tp::min().time_since_epoch()).count();
+           const int64_t us = elapsed.count();
+           if (us >= max_us) return sc_tp::max();
+           if (us <= min_us) return sc_tp::min();
+           return sc_tp{std::chrono::microseconds{us}};
         }
 
         constexpr bool   operator > ( const time_point& t )const    { return elapsed._count > t.elapsed._count; }
