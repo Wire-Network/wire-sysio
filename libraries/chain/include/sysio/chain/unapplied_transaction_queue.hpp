@@ -197,7 +197,7 @@ private:
    }
 
    static uint64_t calc_size( const transaction_metadata_ptr& trx ) {
-      return trx->get_estimated_size() + sizeof( *trx );
+      return trx->get_estimated_size();
    }
 
 };
