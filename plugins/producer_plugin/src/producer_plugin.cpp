@@ -2825,8 +2825,7 @@ void producer_plugin_impl::schedule_maybe_produce_block(bool exhausted) {
    if (!exhausted && deadline > fc::time_point::now()) {
       // ship this block off no later than its deadline
       SYS_ASSERT(chain.is_building_block(), missing_pending_block_state, "producing without pending_block_state, start_block succeeded");
-      std::chrono::time_point<std::chrono::system_clock> wake_time{std::chrono::microseconds{deadline.time_since_epoch().count()}};
-      _timer.expires_at(wake_time);
+      _timer.expires_at(deadline.to_system_clock());
       fc_dlog(_log, "Scheduling Block Production on Normal Block #{} for {}",
               chain.head().block_num() + 1, deadline);
    } else {
@@ -2861,8 +2860,7 @@ void producer_plugin_impl::schedule_delayed_production_loop(const std::weak_ptr<
                                                             std::optional<fc::time_point>              wake_up_time) {
    if (wake_up_time) {
       fc_dlog(_log, "Scheduling Speculative/Production Change at {}", *wake_up_time);
-      std::chrono::time_point<std::chrono::system_clock> wake_time{std::chrono::microseconds{wake_up_time->time_since_epoch().count()}};
-      _timer.expires_at(wake_time);
+      _timer.expires_at(wake_up_time->to_system_clock());
       _timer.async_wait([this, cid = ++_timer_corelation_id](const boost::system::error_code& ec) {
          if (ec != boost::asio::error::operation_aborted && cid == _timer_corelation_id) {
             interrupt_transaction(controller::interrupt_t::all_trx);
@@ -3121,8 +3119,7 @@ void producer_plugin_impl::switch_to_read_window() {
             // https://github.com/Wire-Network/wire-sysio/pull/202. Keep a large timeout with error
             // to provide an error if this does ever hang/timeout again.
             const fc::time_point safe_guard_deadline = _ro_window_deadline + fc::seconds(3); // give plenty of time for slow ci
-            const std::chrono::time_point<std::chrono::system_clock> deadline{
-               std::chrono::microseconds{safe_guard_deadline.time_since_epoch().count()}};
+            const auto deadline = safe_guard_deadline.to_system_clock();
             // use future to make sure all read-only tasks finished before switching to write window
             for (auto& task : _ro_exec_tasks_fut) {
                if (std::future_status::timeout != task.wait_until(deadline)) {

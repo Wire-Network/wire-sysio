@@ -248,7 +248,7 @@ public:
    };
 
    variant post_sync(const url& dest, const variant& payload, const fc::time_point& _deadline) {
-      auto deadline = deadline_type(std::chrono::microseconds(_deadline.time_since_epoch().count()));
+      auto deadline = _deadline.to_system_clock();
       FC_ASSERT(dest.host(), "No host set on URL");
 
       std::string path = dest.path() ? dest.path()->generic_string() : "/";

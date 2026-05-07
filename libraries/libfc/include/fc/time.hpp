@@ -1,4 +1,5 @@
 #pragma once
+#include <chrono>
 #include <cstdint>
 #include <ctime>
 #include <string>
@@ -69,6 +70,22 @@ namespace fc {
 
         constexpr const microseconds& time_since_epoch()const { return elapsed; }
         constexpr uint32_t            sec_since_epoch()const  { return elapsed.count() / 1000000; }
+
+        /**
+         * Saturating conversion to std::chrono::system_clock::time_point.
+         *
+         * fc::time_point::maximum() carries microseconds(INT64_MAX); a direct construction of
+         * system_clock::time_point from that value silently overflows on platforms whose
+         * system_clock::duration is finer than microseconds (e.g. nanoseconds on libstdc++ Linux),
+         * which would yield a deadline in the past. This helper maps maximum() to
+         * system_clock::time_point::max() and otherwise performs the natural microsecond conversion.
+         */
+        std::chrono::system_clock::time_point to_system_clock() const {
+           if (*this == maximum())
+              return std::chrono::system_clock::time_point::max();
+           return std::chrono::system_clock::time_point{std::chrono::microseconds{elapsed.count()}};
+        }
+
         constexpr bool   operator > ( const time_point& t )const    { return elapsed._count > t.elapsed._count; }
         constexpr bool   operator >=( const time_point& t )const    { return elapsed._count >=t.elapsed._count; }
         constexpr bool   operator < ( const time_point& t )const    { return elapsed._count < t.elapsed._count; }
