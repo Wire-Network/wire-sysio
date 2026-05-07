@@ -710,8 +710,7 @@ public:
    std::set<chain::account_name>                     _producers;
    chain::db_read_mode                               _db_read_mode = db_read_mode::HEAD;
    pending_block_mode                                _pending_block_mode = pending_block_mode::speculating;
-   block_timestamp_type                              _last_round_entry_logged{};                      // dedup the round-entry log line to once per producing round
-   // Tracks blocks signed during the current producing round so we can summarize survived-vs-orphaned at round exit.
+   // Tracks blocks signed during the current producing round so we can summarize on-head-vs-orphaned at round exit.
    struct producing_round_state {
       account_name                producer;
       block_timestamp_type        round_start;
@@ -2274,33 +2273,32 @@ producer_plugin_impl::start_block_result producer_plugin_impl::start_block() {
 
    _time_tracker.clear(); // make sure we start tracking block time after `apply_blocks()`
 
-   // Round transition diagnostics: summarize the previous round (if any) when the scheduled producer differs from the
-   // tracked producer, then log round entry. Survival check uses head.extends, valid for blocks still above LIB which
-   // is true at next-round-start; sub-second fork switches after round end could shift the count by a block or two.
-   if (_producing_round && _producing_round->producer != scheduled_producer.producer_name) {
-      // signed_blocks form one chain in the common case (no mid-round fork switch); iterate reverse and break on the
-      // first canonical id, since all earlier signed blocks are then ancestors and necessarily canonical too.
-      size_t survived = 0;
-      for (auto it = _producing_round->signed_blocks.rbegin(); it != _producing_round->signed_blocks.rend(); ++it) {
-         if (head.id() == *it || head.extends(*it)) {
-            survived = static_cast<size_t>(std::distance(it, _producing_round->signed_blocks.rend()));
-            break;
+   // Round transition diagnostics: at round-start slots, summarize the previous round (if any) and log entry for the
+   // new one. On-head check uses head.extends, valid for blocks still above LIB which is true at next-round-start;
+   // sub-second fork switches after round end could shift the count by a block or two.
+   const bool round_start_slot =
+      (block_timestamp_type(block_time).slot % chain::config::producer_repetitions) == 0;
+   if (round_start_slot) {
+      if (_producing_round) {
+         size_t on_head = 0;
+         for (const auto& id : _producing_round->signed_blocks) {
+            if (head.id() == id || head.extends(id))
+               ++on_head;
          }
+         const auto signed_count = _producing_round->signed_blocks.size();
+         ilog("Round complete for {} starting #{} at {}: signed {}, on head {}, orphaned {}",
+              _producing_round->producer, _producing_round->first_block_num, _producing_round->round_start,
+              signed_count, on_head, signed_count - on_head);
+         _producing_round.reset();
       }
-      const auto signed_count = _producing_round->signed_blocks.size();
-      ilog("Round complete for {} starting #{} at {}: signed {}, finalized {}, orphaned {}",
-           _producing_round->producer, _producing_round->first_block_num, _producing_round->round_start,
-           signed_count, survived, signed_count - survived);
-      _producing_round.reset();
-   }
-   if (in_producing_mode() && head.producer() != scheduled_producer.producer_name && _last_round_entry_logged != block_time) {
-      const auto fhead = chain.fork_db_head();
-      ilog("Entering producing round for {} at {}: head #{} {}, fhead #{} {}, {} blocks unapplied",
-           scheduled_producer.producer_name, block_time, head.block_num(), head.id().short_id(),
-           fhead.block_num(), fhead.id().short_id(), fhead.block_num() - head.block_num());
-      _last_round_entry_logged = block_time;
-      _producing_round.emplace(scheduled_producer.producer_name, block_time, head.block_num() + 1);
-      _producing_round->signed_blocks.reserve(config::producer_repetitions);
+      if (in_producing_mode()) {
+         const auto fhead = chain.fork_db_head();
+         ilog("Entering producing round for {} at {}: head #{} {}, fhead #{} {}, {} blocks unapplied",
+              scheduled_producer.producer_name, block_time, head.block_num(), head.id().short_id(),
+              fhead.block_num(), fhead.id().short_id(), fhead.block_num() - head.block_num());
+         _producing_round.emplace(scheduled_producer.producer_name, block_time, head.block_num() + 1);
+         _producing_round->signed_blocks.reserve(config::producer_repetitions);
+      }
    }
 
    const auto& preprocess_deadline = _pending_block_deadline;
