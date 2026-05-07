@@ -10,6 +10,7 @@
 // does not pollute sysio.system's ABI.
 #include <sysio.token/sysio.token.hpp>
 #include <sysio.opreg/sysio.opreg.hpp>
+#include <sysio.epoch/sysio.epoch.hpp>
 
 #include <string>
 #include <string_view>
@@ -171,6 +172,15 @@ emission_config get_emit_cfg(name self) {
    return cfgtbl.get();
 }
 
+// Canonical epoch duration lives on sysio.epoch::epochcfg. Both payepoch
+// (producer expected_rounds) and viewepoch (seconds_until_next) read it
+// here cross-contract so the value cannot drift from what advance() uses.
+uint32_t get_epoch_duration_sec() {
+   sysio::epoch::epochcfg_t cfg_tbl(epoch_refs::account);
+   sysio::check(cfg_tbl.exists(), "sysio.epoch config not initialized");
+   return cfg_tbl.get().epoch_duration_sec;
+}
+
 } // anonymous namespace
 
 // ===========================================================================
@@ -194,19 +204,13 @@ void system_contract::setemitcfg(const emissions::emission_config& cfg) {
    sysio::check(cfg.t5_floor >= 0,               "t5_floor must be non-negative");
    sysio::check(cfg.t5_floor <= cfg.t5_distributable,
                  "t5_floor must be <= t5_distributable");
-   sysio::check(cfg.epoch_duration_secs > 0,     "epoch_duration_secs must be positive");
-   // Sanity ceiling: 30 days. Bounds the (cfg.epoch_duration_secs * 2) /
-   // TOTAL_BLOCKS_PER_ROUND arithmetic in payepoch's expected_rounds calc
-   // and prevents governance typo from setting a multi-year epoch.
-   sysio::check(cfg.epoch_duration_secs <= 30u * 24u * 60u * 60u,
-                 "epoch_duration_secs exceeds 30-day ceiling");
-   sysio::check(cfg.decay_denominator > 0,       "decay_denominator must be positive");
-   sysio::check(cfg.decay_numerator >= 0,        "decay_numerator must be non-negative");
-   sysio::check(cfg.epoch_initial_emission >= 0, "epoch_initial_emission must be non-negative");
-   sysio::check(cfg.epoch_max_emission >= 0,     "epoch_max_emission must be non-negative");
-   sysio::check(cfg.epoch_min_emission >= 0,     "epoch_min_emission must be non-negative");
-   sysio::check(cfg.epoch_min_emission <= cfg.epoch_max_emission,
-                 "epoch_min_emission must be <= epoch_max_emission");
+   sysio::check(cfg.target_annual_decay_bps > 0 && cfg.target_annual_decay_bps <= 10000,
+                 "target_annual_decay_bps must be in (0, 10000]");
+   sysio::check(cfg.annual_initial_emission >= 0, "annual_initial_emission must be non-negative");
+   sysio::check(cfg.annual_max_emission >= 0,     "annual_max_emission must be non-negative");
+   sysio::check(cfg.annual_min_emission >= 0,     "annual_min_emission must be non-negative");
+   sysio::check(cfg.annual_min_emission <= cfg.annual_max_emission,
+                 "annual_min_emission must be <= annual_max_emission");
 
    // BPS splits
    sysio::check(cfg.compute_bps + cfg.capital_bps + cfg.capex_bps + cfg.governance_bps == BPS_DENOMINATOR,
@@ -220,17 +224,24 @@ void system_contract::setemitcfg(const emissions::emission_config& cfg) {
    sysio::check(cfg.standby_end_rank <= MAX_STANDBY_END_RANK,
                  "standby_end_rank exceeds safety cap");
 
+   // Audit-log retention
+   sysio::check(cfg.epoch_log_retention_count > 0,
+                 "epoch_log_retention_count must be positive");
+
    // If t5_state already exists, prevent config changes that would brick future
    // emissions. Post-init, remaining distributable must still cover what's been
-   // paid, and epoch_min_emission can't exceed what's left to distribute.
+   // paid, and the per-epoch floor (derived from annual_min_emission and the
+   // canonical epoch_duration_sec) can't exceed what's left to distribute.
    t5state_t t5s(get_self());
    if (t5s.exists()) {
       const auto state = t5s.get();
       sysio::check(cfg.t5_distributable >= cfg.t5_floor + state.total_distributed,
                     "t5_distributable must cover floor + already-distributed");
       const int64_t remaining = cfg.t5_distributable - cfg.t5_floor - state.total_distributed;
-      sysio::check(cfg.epoch_min_emission <= remaining,
-                    "epoch_min_emission exceeds remaining distributable");
+      const int64_t per_epoch_min =
+         emissions::scale_annual_to_epoch(cfg.annual_min_emission, get_epoch_duration_sec());
+      sysio::check(per_epoch_min <= remaining,
+                    "annual_min_emission per-epoch share exceeds remaining distributable");
    }
 
    emitcfg_t cfgtbl(get_self());
@@ -374,12 +385,19 @@ void system_contract::initt5(const sysio::time_point_sec& start_time) {
    t5state_t t5s(get_self());
    sysio::check(!t5s.exists(), "t5 state already initialized");
 
+   // last_epoch_emission seeds the decay chain. Stored as the per-epoch share
+   // of annual_initial_emission scaled by the canonical epoch_duration_sec on
+   // sysio.epoch, so subsequent compute_epoch_emission calls operate on a
+   // value already in per-epoch units.
+   const int64_t initial_per_epoch =
+      emissions::scale_annual_to_epoch(cfg.annual_initial_emission, get_epoch_duration_sec());
+
    t5s.set(t5_state{
       .start_time          = start_time,
       .epoch_count         = 0,
       .last_epoch_index    = 0,
       .last_epoch_time     = start_time,
-      .last_epoch_emission = cfg.epoch_initial_emission,
+      .last_epoch_emission = initial_per_epoch,
       .total_distributed   = 0,
    }, get_self());
 }
@@ -436,8 +454,10 @@ void system_contract::payepoch(uint32_t epoch_index,
    {
       auto prod_by_rank = _producers.get_index<"prodrank"_n>();
 
-      // expected_rounds is derived from the configured epoch duration.
-      uint32_t expected_rounds = (cfg.epoch_duration_secs * 2) / TOTAL_BLOCKS_PER_ROUND;
+      // expected_rounds is derived from the configured epoch duration on
+      // sysio.epoch (canonical source of truth).
+      const uint32_t epoch_duration_sec = get_epoch_duration_sec();
+      uint32_t expected_rounds = (epoch_duration_sec * 2) / TOTAL_BLOCKS_PER_ROUND;
       if (expected_rounds == 0) expected_rounds = 1;
 
       struct prod_entry {
@@ -575,6 +595,22 @@ void system_contract::payepoch(uint32_t epoch_index,
       .capex_amount      = capex_amount,
       .governance_amount = governance_amount,
    });
+
+   // Head-first prune of the audit log past its retention cap. Rows are added
+   // monotonically (one per successful payepoch) so live_count is computed in
+   // O(1) from id arithmetic. At most one row needs eviction per call since
+   // we just added one.
+   {
+      auto first_it = epoch_table.begin();
+      if (first_it != epoch_table.end()) {
+         const uint64_t oldest_index = first_it.key().sysio_epoch_index;
+         const uint64_t live_count =
+            (static_cast<uint64_t>(epoch_index) + 1) - oldest_index;
+         if (live_count > cfg.epoch_log_retention_count) {
+            epoch_table.erase(first_it);
+         }
+      }
+   }
 }
 
 emissions::epoch_info_result system_contract::viewepoch() {
@@ -589,17 +625,20 @@ emissions::epoch_info_result system_contract::viewepoch() {
    int64_t remaining = cfg.t5_distributable - cfg.t5_floor - state.total_distributed;
    if (remaining < 0) remaining = 0;
 
+   const uint32_t epoch_duration_sec = get_epoch_duration_sec();
+
    int64_t next_est;
    if (state.epoch_count == 0) {
-      next_est = cfg.epoch_initial_emission;
+      next_est = emissions::scale_annual_to_epoch(cfg.annual_initial_emission, epoch_duration_sec);
       if (next_est > remaining) next_est = remaining;
    } else {
-      next_est = emissions::compute_epoch_emission(cfg, state.last_epoch_emission, state.total_distributed);
+      next_est = emissions::compute_epoch_emission(
+         cfg, epoch_duration_sec, state.last_epoch_emission, state.total_distributed);
    }
 
    uint32_t secs_until = 0;
    const uint64_t next_epoch_time =
-      static_cast<uint64_t>(state.last_epoch_time.sec_since_epoch()) + cfg.epoch_duration_secs;
+      static_cast<uint64_t>(state.last_epoch_time.sec_since_epoch()) + epoch_duration_sec;
    if (now.sec_since_epoch() < next_epoch_time) {
       secs_until = static_cast<uint32_t>(next_epoch_time - now.sec_since_epoch());
    }

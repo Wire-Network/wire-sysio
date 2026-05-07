@@ -317,27 +317,19 @@
                     "type": "int64"
                 },
                 {
-                    "name": "epoch_duration_secs",
-                    "type": "uint32"
+                    "name": "target_annual_decay_bps",
+                    "type": "uint16"
                 },
                 {
-                    "name": "decay_numerator",
+                    "name": "annual_initial_emission",
                     "type": "int64"
                 },
                 {
-                    "name": "decay_denominator",
+                    "name": "annual_max_emission",
                     "type": "int64"
                 },
                 {
-                    "name": "epoch_initial_emission",
-                    "type": "int64"
-                },
-                {
-                    "name": "epoch_max_emission",
-                    "type": "int64"
-                },
-                {
-                    "name": "epoch_min_emission",
+                    "name": "annual_min_emission",
                     "type": "int64"
                 },
                 {
@@ -366,6 +358,10 @@
                 },
                 {
                     "name": "standby_end_rank",
+                    "type": "uint32"
+                },
+                {
+                    "name": "epoch_log_retention_count",
                     "type": "uint32"
                 }
             ]

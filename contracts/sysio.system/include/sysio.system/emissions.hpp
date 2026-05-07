@@ -1,5 +1,7 @@
 #pragma once
 
+#include <sysio.system/fp_math.hpp>
+
 #include <sysio/asset.hpp>
 #include <sysio/kv_global.hpp>
 #include <sysio/kv_table.hpp>
@@ -47,12 +49,18 @@ struct [[sysio::table("emitcfg"), sysio::contract("sysio.system")]] emission_con
    // T5 treasury
    int64_t   t5_distributable;       // total distributable amount
    int64_t   t5_floor;               // treasury floor
-   uint32_t  epoch_duration_secs;    // epoch length
-   int64_t   decay_numerator;        // decay formula numerator
-   int64_t   decay_denominator;      // decay formula denominator
-   int64_t   epoch_initial_emission; // E_0
-   int64_t   epoch_max_emission;     // ceiling
-   int64_t   epoch_min_emission;     // floor
+   // Epoch length is canonical on sysio.epoch::epochcfg::epoch_duration_sec;
+   // payepoch / viewepoch read it cross-contract. Keeping a duplicate here
+   // would let the two values drift and silently break producer-pay math.
+   //
+   // Decay and emission caps are expressed in *annual* terms; per-epoch
+   // values are derived inside compute_epoch_emission from the canonical
+   // epoch_duration_sec, so the wall-clock emission curve does not change
+   // when governance retunes the epoch frequency.
+   uint16_t  target_annual_decay_bps; // surviving fraction per year, 1..10000
+   int64_t   annual_initial_emission; // E_0 expressed per year
+   int64_t   annual_max_emission;     // per-year ceiling
+   int64_t   annual_min_emission;     // per-year floor
 
    // Category splits (basis points, must sum to 10000)
    uint16_t  compute_bps;
@@ -67,15 +75,20 @@ struct [[sysio::table("emitcfg"), sysio::contract("sysio.system")]] emission_con
    // Producer config
    uint32_t  standby_end_rank;       // last standby rank (default 28)
 
+   // Audit-log retention. Caps the unbounded `epochlog` table at this many
+   // rows; payepoch prunes head-first after each insert. One row per epoch
+   // (~64 bytes), so 8640 ~= 30 days at 6-min epoch cadence.
+   uint32_t  epoch_log_retention_count;
+
    SYSLIB_SERIALIZE(emission_config,
       (t1_allocation)(t2_allocation)(t3_allocation)
       (t1_duration)(t2_duration)(t3_duration)(min_claimable)
-      (t5_distributable)(t5_floor)(epoch_duration_secs)
-      (decay_numerator)(decay_denominator)
-      (epoch_initial_emission)(epoch_max_emission)(epoch_min_emission)
+      (t5_distributable)(t5_floor)
+      (target_annual_decay_bps)
+      (annual_initial_emission)(annual_max_emission)(annual_min_emission)
       (compute_bps)(capital_bps)(capex_bps)(governance_bps)
       (producer_bps)(batch_op_bps)
-      (standby_end_rank))
+      (standby_end_rank)(epoch_log_retention_count))
 };
 
 using emitcfg_t = sysio::kv::global<"emitcfg"_n, emission_config>;
@@ -160,25 +173,62 @@ struct [[sysio::table("t5state"), sysio::contract("sysio.system")]] t5_state {
 using t5state_t = sysio::kv::global<"t5state"_n, t5_state>;
 
 // ---------------------------------------------------------------------------
+// Per-epoch derivations from annual config + canonical epoch_duration_sec.
+// Both the gate (sysio.epoch::check_emissions_ready) and the success path
+// (sysio.system::payepoch / viewepoch) call these so derived per-epoch
+// values cannot drift between the two contracts.
+// ---------------------------------------------------------------------------
+
+inline constexpr int64_t SECONDS_PER_YEAR = 31'536'000;
+
+/// Linearly scale a per-year amount to a per-epoch amount.
+/// per_epoch = annual * epoch_secs / SECONDS_PER_YEAR.
+inline int64_t scale_annual_to_epoch(int64_t annual, uint32_t epoch_duration_sec) {
+   return static_cast<int64_t>(
+      (static_cast<__int128>(annual) * epoch_duration_sec) / SECONDS_PER_YEAR);
+}
+
+/// Per-epoch decay factor in Q32.32, derived from target annual survival
+/// ratio and epoch length: factor = (target_bps/10000)^(epoch_secs/year_secs).
+/// target_bps == 10000 (no decay) short-circuits to fp_math::ONE.
+inline fp_math::fp_t compute_per_epoch_decay_q32(uint16_t target_annual_decay_bps,
+                                                 uint32_t epoch_duration_sec) {
+   const fp_math::fp_t base =
+      (static_cast<fp_math::fp_t>(target_annual_decay_bps) << fp_math::FRAC_BITS) / 10000;
+   const fp_math::fp_t exponent = fp_math::div(
+      static_cast<fp_math::fp_t>(epoch_duration_sec) << fp_math::FRAC_BITS,
+      static_cast<fp_math::fp_t>(SECONDS_PER_YEAR) << fp_math::FRAC_BITS);
+   return fp_math::pow_frac(base, exponent);
+}
+
+// ---------------------------------------------------------------------------
 // Pure emission formula. Shared between sysio.system::payepoch (success path)
 // and sysio.epoch's readiness gate (precompute path). One source of truth so
 // the gate-decided amount cannot drift from what payepoch would have computed.
 // Returns 0 when the treasury is at or below the floor (gate sees this as
 // EMISSIONS_BLOCK_REASON_TREASURY_EXHAUSTED).
+//
+// epoch_duration_sec must be the canonical value from sysio.epoch::epochcfg.
 // ---------------------------------------------------------------------------
 
 inline int64_t compute_epoch_emission(const emission_config& cfg,
+                                      uint32_t epoch_duration_sec,
                                       int64_t prev_emission,
                                       int64_t total_distributed) {
    const int64_t remaining = cfg.t5_distributable - cfg.t5_floor - total_distributed;
    if (remaining <= 0) return 0;
 
-   __int128 product = static_cast<__int128>(prev_emission) *
-                      static_cast<__int128>(cfg.decay_numerator);
-   int64_t emission = static_cast<int64_t>(product / cfg.decay_denominator);
+   const fp_math::fp_t factor =
+      compute_per_epoch_decay_q32(cfg.target_annual_decay_bps, epoch_duration_sec);
+   __int128 product = static_cast<__int128>(prev_emission) * factor;
+   int64_t emission = static_cast<int64_t>(product / fp_math::ONE);
 
-   if (emission > cfg.epoch_max_emission) emission = cfg.epoch_max_emission;
-   if (emission < cfg.epoch_min_emission) emission = cfg.epoch_min_emission;
+   const int64_t per_epoch_max =
+      scale_annual_to_epoch(cfg.annual_max_emission, epoch_duration_sec);
+   const int64_t per_epoch_min =
+      scale_annual_to_epoch(cfg.annual_min_emission, epoch_duration_sec);
+   if (emission > per_epoch_max) emission = per_epoch_max;
+   if (emission < per_epoch_min) emission = per_epoch_min;
 
    if (emission > remaining) emission = remaining;
 

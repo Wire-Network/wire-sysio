@@ -160,6 +160,14 @@ namespace sysio {
       static constexpr name OPREG_ACCOUNT  = "sysio.opreg"_n;
       static constexpr name AUTHEX_ACCOUNT = "sysio.authex"_n;
 
+      /// Bounds on `epoch_duration_sec`. Floor is a typo-guard: well below this
+      /// value, `expected_rounds` in sysio.system::payepoch falls back to 1
+      /// for any non-trivial epoch, masking misconfig. Ceiling bounds the
+      /// `(epoch_duration_sec * 2) / TOTAL_BLOCKS_PER_ROUND` arithmetic and
+      /// prevents governance typo from setting a multi-year epoch.
+      static constexpr uint32_t MIN_EPOCH_DURATION_SEC = 60;
+      static constexpr uint32_t MAX_EPOCH_DURATION_SEC = 30u * 24u * 60u * 60u;
+
    private:
 
       // Namespace alias for OPP protobuf enum types

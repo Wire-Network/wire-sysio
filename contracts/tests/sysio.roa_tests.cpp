@@ -74,19 +74,18 @@ public:
          ("min_claimable",          int64_t(10000000000))
          ("t5_distributable",       int64_t(375000000000000000LL))
          ("t5_floor",               int64_t(125000000000000000LL))
-         ("epoch_duration_secs",    uint32_t(86400))
-         ("decay_numerator",        int64_t(9990))
-         ("decay_denominator",      int64_t(10000))
-         ("epoch_initial_emission", int64_t(563150000000000LL))
-         ("epoch_max_emission",     int64_t(3000000000000000LL))
-         ("epoch_min_emission",     int64_t(100000000000000LL))
+         ("target_annual_decay_bps", uint16_t(6940))
+         ("annual_initial_emission", int64_t(563150000000000LL * 365))
+         ("annual_max_emission",     int64_t(3000000000000000LL * 365))
+         ("annual_min_emission",     int64_t(100000000000000LL * 365))
          ("compute_bps",            uint16_t(4000))
          ("capital_bps",            uint16_t(3000))
          ("capex_bps",              uint16_t(2000))
          ("governance_bps",         uint16_t(1000))
          ("producer_bps",           uint16_t(7000))
          ("batch_op_bps",           uint16_t(3000))
-         ("standby_end_rank",       uint32_t(28));
+         ("standby_end_rank",       uint32_t(28))
+         ("epoch_log_retention_count", uint32_t(8640));
 
       auto act_type = sys_abi_ser.get_action_type("setemitcfg"_n);
       action act;

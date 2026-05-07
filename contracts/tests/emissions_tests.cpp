@@ -22,6 +22,10 @@
 
 #include "contracts.hpp"
 
+// fp_math.hpp is dependency-free __int128 fixed-point math; reused here so
+// test expectations match the contract's per-epoch derivations bit-for-bit.
+#include <sysio.system/fp_math.hpp>
+
 #include <boost/test/unit_test.hpp>
 
 #include <sysio/testing/tester.hpp>
@@ -104,7 +108,9 @@ FC_REFLECT( t5_epoch_info,
    (epoch_count)(last_epoch_index)(last_epoch_time)(last_epoch_emission)
    (total_distributed)(treasury_remaining)(next_emission_est)(seconds_until_next) )
 
-// Mirror emission_config for viewemitcfg return value
+// Mirror emission_config for viewemitcfg return value. Epoch length is
+// canonical on sysio.epoch::epochcfg::epoch_duration_sec; mirror updated
+// to drop epoch_duration_secs.
 struct emit_cfg_result {
    int64_t   t1_allocation;
    int64_t   t2_allocation;
@@ -115,12 +121,10 @@ struct emit_cfg_result {
    int64_t   min_claimable;
    int64_t   t5_distributable;
    int64_t   t5_floor;
-   uint32_t  epoch_duration_secs;
-   int64_t   decay_numerator;
-   int64_t   decay_denominator;
-   int64_t   epoch_initial_emission;
-   int64_t   epoch_max_emission;
-   int64_t   epoch_min_emission;
+   uint16_t  target_annual_decay_bps;
+   int64_t   annual_initial_emission;
+   int64_t   annual_max_emission;
+   int64_t   annual_min_emission;
    uint16_t  compute_bps;
    uint16_t  capital_bps;
    uint16_t  capex_bps;
@@ -128,16 +132,17 @@ struct emit_cfg_result {
    uint16_t  producer_bps;
    uint16_t  batch_op_bps;
    uint32_t  standby_end_rank;
+   uint32_t  epoch_log_retention_count;
 };
 FC_REFLECT( emit_cfg_result,
    (t1_allocation)(t2_allocation)(t3_allocation)
    (t1_duration)(t2_duration)(t3_duration)(min_claimable)
-   (t5_distributable)(t5_floor)(epoch_duration_secs)
-   (decay_numerator)(decay_denominator)
-   (epoch_initial_emission)(epoch_max_emission)(epoch_min_emission)
+   (t5_distributable)(t5_floor)
+   (target_annual_decay_bps)
+   (annual_initial_emission)(annual_max_emission)(annual_min_emission)
    (compute_bps)(capital_bps)(capex_bps)(governance_bps)
    (producer_bps)(batch_op_bps)
-   (standby_end_rank) )
+   (standby_end_rank)(epoch_log_retention_count) )
 
 // T5 test helper: compute expected split
 static int64_t test_split_bps(int64_t total, uint16_t bps) {
@@ -159,11 +164,46 @@ static void require_substr(const std::string& s, const std::string& needle) {
 // ---------------------------------------------------------------------------
 static constexpr int64_t T5_DISTRIBUTABLE        = 375'000'000'000'000'000LL;
 static constexpr int64_t T5_FLOOR                = 125'000'000'000'000'000LL;
-static constexpr int64_t DECAY_NUMERATOR         = 9990;
-static constexpr int64_t DECAY_DENOMINATOR       = 10000;
-static constexpr int64_t EPOCH_INITIAL_EMISSION  = 563'150'000'000'000LL;
-static constexpr int64_t EPOCH_MAX_EMISSION      = 3'000'000'000'000'000LL;
-static constexpr int64_t EPOCH_MIN_EMISSION      = 100'000'000'000'000LL;
+
+// Annual emission config (replaces former per-epoch constants).
+// 6940 bps surviving / year reproduces the old DECAY_NUMERATOR/DECAY_DENOMINATOR
+// (9990/10000) shape when scaled to 1-day epochs (0.999^365 ~= 0.694).
+// The annual_* values are the old per-(1-day) epoch values multiplied by 365.
+static constexpr uint16_t TARGET_ANNUAL_DECAY_BPS  = 6940;
+static constexpr int64_t  ANNUAL_INITIAL_EMISSION  = 563'150'000'000'000LL    * 365;
+static constexpr int64_t  ANNUAL_MAX_EMISSION      = 3'000'000'000'000'000LL  * 365;
+static constexpr int64_t  ANNUAL_MIN_EMISSION      = 100'000'000'000'000LL    * 365;
+
+static constexpr int64_t SECONDS_PER_YEAR = 31'536'000;
+
+// Mirror of the contract's scale_annual_to_epoch helper (linear scaling).
+static int64_t test_scale_annual_to_epoch(int64_t annual, uint32_t epoch_secs) {
+   return static_cast<int64_t>(
+      (static_cast<__int128>(annual) * epoch_secs) / SECONDS_PER_YEAR);
+}
+
+// Mirror of the contract's per-epoch decay computation, using the same
+// Q32.32 fp_math used on chain so test expectations are bit-exact.
+static sysiosystem::fp_math::fp_t test_per_epoch_decay_q32(
+   uint16_t target_bps, uint32_t epoch_secs)
+{
+   namespace fp = sysiosystem::fp_math;
+   const fp::fp_t base = (static_cast<fp::fp_t>(target_bps) << fp::FRAC_BITS) / 10000;
+   const fp::fp_t exponent = fp::div(
+      static_cast<fp::fp_t>(epoch_secs) << fp::FRAC_BITS,
+      static_cast<fp::fp_t>(SECONDS_PER_YEAR) << fp::FRAC_BITS);
+   return fp::pow_frac(base, exponent);
+}
+
+// Apply per-epoch decay to a previous emission (Q32.32 factor * int64_t).
+static int64_t test_apply_decay(int64_t prev_emission,
+                                uint16_t target_bps, uint32_t epoch_secs)
+{
+   namespace fp = sysiosystem::fp_math;
+   const fp::fp_t factor = test_per_epoch_decay_q32(target_bps, epoch_secs);
+   return static_cast<int64_t>(
+      (static_cast<__int128>(prev_emission) * factor) / fp::ONE);
+}
 static constexpr uint16_t COMPUTE_BPS            = 4000;
 static constexpr uint16_t CAPITAL_BPS            = 3000;
 static constexpr uint16_t CAPEX_BPS              = 2000;
@@ -384,12 +424,10 @@ public:
          ("min_claimable",          MIN_CLAIMABLE_AMOUNT)
          ("t5_distributable",       T5_DISTRIBUTABLE)
          ("t5_floor",               125'000'000'000'000'000LL)
-         ("epoch_duration_secs",    86400u)
-         ("decay_numerator",        DECAY_NUMERATOR)
-         ("decay_denominator",      DECAY_DENOMINATOR)
-         ("epoch_initial_emission", EPOCH_INITIAL_EMISSION)
-         ("epoch_max_emission",     EPOCH_MAX_EMISSION)
-         ("epoch_min_emission",     EPOCH_MIN_EMISSION)
+         ("target_annual_decay_bps", TARGET_ANNUAL_DECAY_BPS)
+         ("annual_initial_emission", ANNUAL_INITIAL_EMISSION)
+         ("annual_max_emission",     ANNUAL_MAX_EMISSION)
+         ("annual_min_emission",     ANNUAL_MIN_EMISSION)
          ("compute_bps",            COMPUTE_BPS)
          ("capital_bps",            CAPITAL_BPS)
          ("capex_bps",              CAPEX_BPS)
@@ -397,6 +435,7 @@ public:
          ("producer_bps",           PRODUCER_BPS)
          ("batch_op_bps",           uint16_t(3000))
          ("standby_end_rank",       T_STANDBY_END_RANK)
+         ("epoch_log_retention_count", uint32_t(8640))
       );
    }
 
@@ -909,10 +948,10 @@ public:
    // called, and payepoch tolerates an empty rotation group (the batch-op share
    // simply rolls to treasury, which is what we want in producer-focused tests).
    //
-   // Default epoch_duration_sec is kept short (5 seconds) so multi-epoch tests
-   // can cross the wall-clock boundary repeatedly without expiring pending
-   // transactions.
-   action_result init_epoch_state(uint32_t epoch_duration_sec = 5,
+   // Default epoch_duration_sec is the contract minimum (MIN_EPOCH_DURATION_SEC =
+   // 60s). Tests cross the wall-clock boundary by produce_blocks(120). Lower
+   // values are rejected by sysio.epoch::setconfig.
+   action_result init_epoch_state(uint32_t epoch_duration_sec = 60,
                                    uint32_t operators_per_epoch = 7,
                                    uint32_t batch_op_groups_count = 3) {
       return push_epoch_action(EPOCH, "setconfig"_n, mvo()
@@ -1690,12 +1729,12 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_requires_sysio_auth, sysio_emissions_tester 
       ("t1_duration", uint32_t(1))  ("t2_duration", uint32_t(1))  ("t3_duration", uint32_t(1))
       ("min_claimable", int64_t(0))
       ("t5_distributable", int64_t(1)) ("t5_floor", int64_t(0))
-      ("epoch_duration_secs", uint32_t(60))
-      ("decay_numerator", int64_t(9990)) ("decay_denominator", int64_t(10000))
-      ("epoch_initial_emission", int64_t(1)) ("epoch_max_emission", int64_t(1)) ("epoch_min_emission", int64_t(0))
+      ("target_annual_decay_bps", uint16_t(6940))
+      ("annual_initial_emission", int64_t(1)) ("annual_max_emission", int64_t(1)) ("annual_min_emission", int64_t(0))
       ("compute_bps", uint16_t(10000)) ("capital_bps", uint16_t(0)) ("capex_bps", uint16_t(0)) ("governance_bps", uint16_t(0))
       ("producer_bps", uint16_t(5000)) ("batch_op_bps", uint16_t(5000))
-      ("standby_end_rank", uint32_t(28));
+      ("standby_end_rank", uint32_t(28))
+      ("epoch_log_retention_count", uint32_t(8640));
 
    auto r = setemitcfg("alice"_n, cfg);
    BOOST_REQUIRE( r != success() );
@@ -1709,12 +1748,12 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_rejects_bad_category_bps, sysio_emissions_te
       ("t1_duration", uint32_t(1))  ("t2_duration", uint32_t(1))  ("t3_duration", uint32_t(1))
       ("min_claimable", int64_t(0))
       ("t5_distributable", int64_t(1)) ("t5_floor", int64_t(0))
-      ("epoch_duration_secs", uint32_t(60))
-      ("decay_numerator", int64_t(9990)) ("decay_denominator", int64_t(10000))
-      ("epoch_initial_emission", int64_t(1)) ("epoch_max_emission", int64_t(1)) ("epoch_min_emission", int64_t(0))
+      ("target_annual_decay_bps", uint16_t(6940))
+      ("annual_initial_emission", int64_t(1)) ("annual_max_emission", int64_t(1)) ("annual_min_emission", int64_t(0))
       ("compute_bps", uint16_t(5000)) ("capital_bps", uint16_t(3000)) ("capex_bps", uint16_t(2000)) ("governance_bps", uint16_t(500))
       ("producer_bps", uint16_t(5000)) ("batch_op_bps", uint16_t(5000))
-      ("standby_end_rank", uint32_t(28));
+      ("standby_end_rank", uint32_t(28))
+      ("epoch_log_retention_count", uint32_t(8640));
 
    auto r = setemitcfg(config::system_account_name, cfg);
    BOOST_REQUIRE( r != success() );
@@ -1727,12 +1766,12 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_rejects_bad_compute_subsplit, sysio_emission
       ("t1_duration", uint32_t(1))  ("t2_duration", uint32_t(1))  ("t3_duration", uint32_t(1))
       ("min_claimable", int64_t(0))
       ("t5_distributable", int64_t(1)) ("t5_floor", int64_t(0))
-      ("epoch_duration_secs", uint32_t(60))
-      ("decay_numerator", int64_t(9990)) ("decay_denominator", int64_t(10000))
-      ("epoch_initial_emission", int64_t(1)) ("epoch_max_emission", int64_t(1)) ("epoch_min_emission", int64_t(0))
+      ("target_annual_decay_bps", uint16_t(6940))
+      ("annual_initial_emission", int64_t(1)) ("annual_max_emission", int64_t(1)) ("annual_min_emission", int64_t(0))
       ("compute_bps", uint16_t(4000)) ("capital_bps", uint16_t(3000)) ("capex_bps", uint16_t(2000)) ("governance_bps", uint16_t(1000))
       ("producer_bps", uint16_t(6000)) ("batch_op_bps", uint16_t(3000))
-      ("standby_end_rank", uint32_t(28));
+      ("standby_end_rank", uint32_t(28))
+      ("epoch_log_retention_count", uint32_t(8640));
 
    auto r = setemitcfg(config::system_account_name, cfg);
    BOOST_REQUIRE( r != success() );
@@ -1745,34 +1784,41 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_rejects_zero_duration, sysio_emissions_teste
       ("t1_duration", uint32_t(0))  ("t2_duration", uint32_t(1))  ("t3_duration", uint32_t(1))
       ("min_claimable", int64_t(0))
       ("t5_distributable", int64_t(1)) ("t5_floor", int64_t(0))
-      ("epoch_duration_secs", uint32_t(60))
-      ("decay_numerator", int64_t(9990)) ("decay_denominator", int64_t(10000))
-      ("epoch_initial_emission", int64_t(1)) ("epoch_max_emission", int64_t(1)) ("epoch_min_emission", int64_t(0))
+      ("target_annual_decay_bps", uint16_t(6940))
+      ("annual_initial_emission", int64_t(1)) ("annual_max_emission", int64_t(1)) ("annual_min_emission", int64_t(0))
       ("compute_bps", uint16_t(4000)) ("capital_bps", uint16_t(3000)) ("capex_bps", uint16_t(2000)) ("governance_bps", uint16_t(1000))
       ("producer_bps", uint16_t(7000)) ("batch_op_bps", uint16_t(3000))
-      ("standby_end_rank", uint32_t(28));
+      ("standby_end_rank", uint32_t(28))
+      ("epoch_log_retention_count", uint32_t(8640));
 
    auto r = setemitcfg(config::system_account_name, cfg);
    BOOST_REQUIRE( r != success() );
    require_substr( r, "t1_duration must be positive" );
 } FC_LOG_AND_RETHROW()
 
-BOOST_FIXTURE_TEST_CASE( setemitcfg_rejects_zero_decay_denominator, sysio_emissions_tester ) try {
-   auto cfg = mvo()
-      ("t1_allocation", int64_t(1)) ("t2_allocation", int64_t(1)) ("t3_allocation", int64_t(1))
-      ("t1_duration", uint32_t(1))  ("t2_duration", uint32_t(1))  ("t3_duration", uint32_t(1))
-      ("min_claimable", int64_t(0))
-      ("t5_distributable", int64_t(1)) ("t5_floor", int64_t(0))
-      ("epoch_duration_secs", uint32_t(60))
-      ("decay_numerator", int64_t(9990)) ("decay_denominator", int64_t(0))
-      ("epoch_initial_emission", int64_t(1)) ("epoch_max_emission", int64_t(1)) ("epoch_min_emission", int64_t(0))
-      ("compute_bps", uint16_t(4000)) ("capital_bps", uint16_t(3000)) ("capex_bps", uint16_t(2000)) ("governance_bps", uint16_t(1000))
-      ("producer_bps", uint16_t(7000)) ("batch_op_bps", uint16_t(3000))
-      ("standby_end_rank", uint32_t(28));
+BOOST_FIXTURE_TEST_CASE( setemitcfg_rejects_invalid_decay_target, sysio_emissions_tester ) try {
+   // target_annual_decay_bps must be in (0, 10000]; both extremes rejected.
+   auto build_cfg = [&](uint16_t target_bps) {
+      return mvo()
+         ("t1_allocation", int64_t(1)) ("t2_allocation", int64_t(1)) ("t3_allocation", int64_t(1))
+         ("t1_duration", uint32_t(1))  ("t2_duration", uint32_t(1))  ("t3_duration", uint32_t(1))
+         ("min_claimable", int64_t(0))
+         ("t5_distributable", int64_t(1)) ("t5_floor", int64_t(0))
+         ("target_annual_decay_bps", target_bps)
+         ("annual_initial_emission", int64_t(1)) ("annual_max_emission", int64_t(1)) ("annual_min_emission", int64_t(0))
+         ("compute_bps", uint16_t(4000)) ("capital_bps", uint16_t(3000)) ("capex_bps", uint16_t(2000)) ("governance_bps", uint16_t(1000))
+         ("producer_bps", uint16_t(7000)) ("batch_op_bps", uint16_t(3000))
+         ("standby_end_rank", uint32_t(28))
+         ("epoch_log_retention_count", uint32_t(8640));
+   };
 
-   auto r = setemitcfg(config::system_account_name, cfg);
-   BOOST_REQUIRE( r != success() );
-   require_substr( r, "decay_denominator must be positive" );
+   auto r0 = setemitcfg(config::system_account_name, build_cfg(0));
+   BOOST_REQUIRE( r0 != success() );
+   require_substr( r0, "target_annual_decay_bps must be in (0, 10000]" );
+
+   auto r_high = setemitcfg(config::system_account_name, build_cfg(10001));
+   BOOST_REQUIRE( r_high != success() );
+   require_substr( r_high, "target_annual_decay_bps must be in (0, 10000]" );
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( setemitcfg_rejects_bad_standby_rank, sysio_emissions_tester ) try {
@@ -1781,12 +1827,12 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_rejects_bad_standby_rank, sysio_emissions_te
       ("t1_duration", uint32_t(1))  ("t2_duration", uint32_t(1))  ("t3_duration", uint32_t(1))
       ("min_claimable", int64_t(0))
       ("t5_distributable", int64_t(1)) ("t5_floor", int64_t(0))
-      ("epoch_duration_secs", uint32_t(60))
-      ("decay_numerator", int64_t(9990)) ("decay_denominator", int64_t(10000))
-      ("epoch_initial_emission", int64_t(1)) ("epoch_max_emission", int64_t(1)) ("epoch_min_emission", int64_t(0))
+      ("target_annual_decay_bps", uint16_t(6940))
+      ("annual_initial_emission", int64_t(1)) ("annual_max_emission", int64_t(1)) ("annual_min_emission", int64_t(0))
       ("compute_bps", uint16_t(4000)) ("capital_bps", uint16_t(3000)) ("capex_bps", uint16_t(2000)) ("governance_bps", uint16_t(1000))
       ("producer_bps", uint16_t(7000)) ("batch_op_bps", uint16_t(3000))
-      ("standby_end_rank", uint32_t(21));
+      ("standby_end_rank", uint32_t(21))
+      ("epoch_log_retention_count", uint32_t(8640));
 
    auto r = setemitcfg(config::system_account_name, cfg);
    BOOST_REQUIRE( r != success() );
@@ -1800,12 +1846,12 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_rejects_standby_rank_over_cap, sysio_emissio
       ("t1_duration", uint32_t(1))  ("t2_duration", uint32_t(1))  ("t3_duration", uint32_t(1))
       ("min_claimable", int64_t(0))
       ("t5_distributable", int64_t(1)) ("t5_floor", int64_t(0))
-      ("epoch_duration_secs", uint32_t(60))
-      ("decay_numerator", int64_t(9990)) ("decay_denominator", int64_t(10000))
-      ("epoch_initial_emission", int64_t(1)) ("epoch_max_emission", int64_t(1)) ("epoch_min_emission", int64_t(0))
+      ("target_annual_decay_bps", uint16_t(6940))
+      ("annual_initial_emission", int64_t(1)) ("annual_max_emission", int64_t(1)) ("annual_min_emission", int64_t(0))
       ("compute_bps", uint16_t(4000)) ("capital_bps", uint16_t(3000)) ("capex_bps", uint16_t(2000)) ("governance_bps", uint16_t(1000))
       ("producer_bps", uint16_t(7000)) ("batch_op_bps", uint16_t(3000))
-      ("standby_end_rank", uint32_t(101));
+      ("standby_end_rank", uint32_t(101))
+      ("epoch_log_retention_count", uint32_t(8640));
 
    auto r = setemitcfg(config::system_account_name, cfg);
    BOOST_REQUIRE( r != success() );
@@ -1832,19 +1878,18 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_reconfigurable, sysio_emissions_tester ) try
       ("min_claimable", int64_t(10000000000))
       ("t5_distributable", int64_t(375000000000000000LL))
       ("t5_floor", int64_t(125000000000000000LL))
-      ("epoch_duration_secs", uint32_t(86400))
-      ("decay_numerator", int64_t(9990))
-      ("decay_denominator", int64_t(10000))
-      ("epoch_initial_emission", int64_t(563150000000000LL))
-      ("epoch_max_emission", int64_t(3000000000000000LL))
-      ("epoch_min_emission", int64_t(100000000000000LL))
+      ("target_annual_decay_bps", uint16_t(6940))
+      ("annual_initial_emission", int64_t(563150000000000LL * 365))
+      ("annual_max_emission", int64_t(3000000000000000LL * 365))
+      ("annual_min_emission", int64_t(100000000000000LL * 365))
       ("compute_bps", uint16_t(4000))
       ("capital_bps", uint16_t(3000))
       ("capex_bps", uint16_t(2000))
       ("governance_bps", uint16_t(1000))
       ("producer_bps", uint16_t(7000))
       ("batch_op_bps", uint16_t(3000))
-      ("standby_end_rank", uint32_t(28));
+      ("standby_end_rank", uint32_t(28))
+      ("epoch_log_retention_count", uint32_t(8640));
 
    BOOST_REQUIRE_EQUAL( success(), setemitcfg(config::system_account_name, cfg) );
 
@@ -1872,12 +1917,10 @@ BOOST_FIXTURE_TEST_CASE( viewemitcfg_returns_current_config, sysio_emissions_tes
    BOOST_REQUIRE_EQUAL( cfg.t3_duration, T3_DURATION );
    BOOST_REQUIRE_EQUAL( cfg.min_claimable, MIN_CLAIMABLE_AMOUNT );
    BOOST_REQUIRE_EQUAL( cfg.t5_distributable, T5_DISTRIBUTABLE );
-   BOOST_REQUIRE_EQUAL( cfg.epoch_duration_secs, uint32_t(86400) );
-   BOOST_REQUIRE_EQUAL( cfg.decay_numerator, DECAY_NUMERATOR );
-   BOOST_REQUIRE_EQUAL( cfg.decay_denominator, DECAY_DENOMINATOR );
-   BOOST_REQUIRE_EQUAL( cfg.epoch_initial_emission, EPOCH_INITIAL_EMISSION );
-   BOOST_REQUIRE_EQUAL( cfg.epoch_max_emission, EPOCH_MAX_EMISSION );
-   BOOST_REQUIRE_EQUAL( cfg.epoch_min_emission, EPOCH_MIN_EMISSION );
+   BOOST_REQUIRE_EQUAL( cfg.target_annual_decay_bps, TARGET_ANNUAL_DECAY_BPS );
+   BOOST_REQUIRE_EQUAL( cfg.annual_initial_emission, ANNUAL_INITIAL_EMISSION );
+   BOOST_REQUIRE_EQUAL( cfg.annual_max_emission, ANNUAL_MAX_EMISSION );
+   BOOST_REQUIRE_EQUAL( cfg.annual_min_emission, ANNUAL_MIN_EMISSION );
    BOOST_REQUIRE_EQUAL( cfg.compute_bps, COMPUTE_BPS );
    BOOST_REQUIRE_EQUAL( cfg.capital_bps, CAPITAL_BPS );
    BOOST_REQUIRE_EQUAL( cfg.capex_bps, CAPEX_BPS );
@@ -1899,19 +1942,18 @@ BOOST_FIXTURE_TEST_CASE( viewemitcfg_reflects_update, sysio_emissions_tester ) t
       ("min_claimable", int64_t(5))
       ("t5_distributable", int64_t(999))
       ("t5_floor", int64_t(111))
-      ("epoch_duration_secs", uint32_t(3600))
-      ("decay_numerator", int64_t(9000))
-      ("decay_denominator", int64_t(10000))
-      ("epoch_initial_emission", int64_t(500))
-      ("epoch_max_emission", int64_t(1000))
-      ("epoch_min_emission", int64_t(10))
+      ("target_annual_decay_bps", uint16_t(5000))
+      ("annual_initial_emission", int64_t(500))
+      ("annual_max_emission", int64_t(1000))
+      ("annual_min_emission", int64_t(10))
       ("compute_bps", uint16_t(2500))
       ("capital_bps", uint16_t(2500))
       ("capex_bps", uint16_t(2500))
       ("governance_bps", uint16_t(2500))
       ("producer_bps", uint16_t(5000))
       ("batch_op_bps", uint16_t(5000))
-      ("standby_end_rank", uint32_t(30));
+      ("standby_end_rank", uint32_t(30))
+      ("epoch_log_retention_count", uint32_t(2880));
 
    BOOST_REQUIRE_EQUAL( success(), setemitcfg(config::system_account_name, cfg) );
 
@@ -1920,8 +1962,7 @@ BOOST_FIXTURE_TEST_CASE( viewemitcfg_reflects_update, sysio_emissions_tester ) t
    BOOST_REQUIRE_EQUAL( result.t2_allocation, int64_t(43) );
    BOOST_REQUIRE_EQUAL( result.t3_allocation, int64_t(44) );
    BOOST_REQUIRE_EQUAL( result.t1_duration, uint32_t(100) );
-   BOOST_REQUIRE_EQUAL( result.epoch_duration_secs, uint32_t(3600) );
-   BOOST_REQUIRE_EQUAL( result.decay_numerator, int64_t(9000) );
+   BOOST_REQUIRE_EQUAL( result.target_annual_decay_bps, uint16_t(5000) );
    BOOST_REQUIRE_EQUAL( result.compute_bps, uint16_t(2500) );
    BOOST_REQUIRE_EQUAL( result.producer_bps, uint16_t(5000) );
    BOOST_REQUIRE_EQUAL( result.standby_end_rank, uint32_t(30) );
@@ -1985,14 +2026,14 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_post_initt5_rejects_brick_reduce, sysio_emis
       // Shrink distributable below already-distributed + floor.
       ("t5_distributable", int64_t(1))
       ("t5_floor", int64_t(0))
-      ("epoch_duration_secs", uint32_t(86400))
-      ("decay_numerator", DECAY_NUMERATOR) ("decay_denominator", DECAY_DENOMINATOR)
-      ("epoch_initial_emission", EPOCH_INITIAL_EMISSION)
-      ("epoch_max_emission", EPOCH_MAX_EMISSION) ("epoch_min_emission", EPOCH_MIN_EMISSION)
+      ("target_annual_decay_bps", TARGET_ANNUAL_DECAY_BPS)
+      ("annual_initial_emission", ANNUAL_INITIAL_EMISSION)
+      ("annual_max_emission", ANNUAL_MAX_EMISSION) ("annual_min_emission", ANNUAL_MIN_EMISSION)
       ("compute_bps", COMPUTE_BPS) ("capital_bps", CAPITAL_BPS)
       ("capex_bps", CAPEX_BPS) ("governance_bps", uint16_t(1000))
       ("producer_bps", PRODUCER_BPS) ("batch_op_bps", uint16_t(3000))
-      ("standby_end_rank", T_STANDBY_END_RANK);
+      ("standby_end_rank", T_STANDBY_END_RANK)
+      ("epoch_log_retention_count", uint32_t(8640));
 
    auto r = setemitcfg(config::system_account_name, cfg);
    BOOST_REQUIRE( r != success() );
@@ -2000,38 +2041,46 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_post_initt5_rejects_brick_reduce, sysio_emis
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( setemitcfg_post_initt5_rejects_unreachable_min_emission, sysio_emissions_tester ) try {
-   // After t5_state exists, setemitcfg must also reject an epoch_min_emission
-   // that exceeds the remaining distributable budget -- otherwise the floor
-   // drains the treasury faster than the decay curve suggests.
+   // After t5_state exists, setemitcfg must also reject an annual_min_emission
+   // whose per-epoch share exceeds the remaining distributable budget -- the
+   // floor would otherwise drain the treasury faster than the decay curve
+   // suggests.
    create_t5_holding_accounts();
    const uint32_t start = head_secs() - ONE_EPOCH - 1;
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
    BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
-   // remaining = T5_DISTRIBUTABLE - T5_FLOOR - first_epoch_distributed,
-   // which is roughly T5_DISTRIBUTABLE - T5_FLOOR. Set min/max both above
-   // that ceiling so the remaining-distributable check (not the min<=max
-   // check) is what fires.
+   auto state = get_t5_state();
+   const int64_t total_distributed = state["total_distributed"].as<int64_t>();
+
+   // Make remaining_distributable a small handful of subunits, then pick an
+   // annual_min whose per-epoch share at the fixture's 60-sec epoch duration
+   // exceeds it. annual = SECONDS_PER_YEAR scales to exactly epoch_secs (=60)
+   // subunits per epoch, comfortably above small_remaining (=10).
+   const int64_t small_remaining = 10;
+   const int64_t annual_floor = SECONDS_PER_YEAR; // per-epoch at 60s = 60 subunits
+
    auto cfg = mvo()
       ("t1_allocation", T1_ALLOCATION.get_amount())
       ("t2_allocation", T2_ALLOCATION.get_amount())
       ("t3_allocation", T3_ALLOCATION.get_amount())
       ("t1_duration", T1_DURATION) ("t2_duration", T2_DURATION) ("t3_duration", T3_DURATION)
       ("min_claimable", MIN_CLAIMABLE_AMOUNT)
-      ("t5_distributable", T5_DISTRIBUTABLE) ("t5_floor", T5_FLOOR)
-      ("epoch_duration_secs", uint32_t(86400))
-      ("decay_numerator", DECAY_NUMERATOR) ("decay_denominator", DECAY_DENOMINATOR)
-      ("epoch_initial_emission", EPOCH_INITIAL_EMISSION)
-      ("epoch_max_emission", int64_t(999'000'000'000'000'000LL))
-      ("epoch_min_emission", int64_t(999'000'000'000'000'000LL))
+      ("t5_distributable", int64_t(T5_FLOOR + total_distributed + small_remaining))
+      ("t5_floor", T5_FLOOR)
+      ("target_annual_decay_bps", TARGET_ANNUAL_DECAY_BPS)
+      ("annual_initial_emission", int64_t(0))
+      ("annual_max_emission", annual_floor)
+      ("annual_min_emission", annual_floor)
       ("compute_bps", COMPUTE_BPS) ("capital_bps", CAPITAL_BPS)
       ("capex_bps", CAPEX_BPS) ("governance_bps", uint16_t(1000))
       ("producer_bps", PRODUCER_BPS) ("batch_op_bps", uint16_t(3000))
-      ("standby_end_rank", T_STANDBY_END_RANK);
+      ("standby_end_rank", T_STANDBY_END_RANK)
+      ("epoch_log_retention_count", uint32_t(8640));
 
    auto r = setemitcfg(config::system_account_name, cfg);
    BOOST_REQUIRE( r != success() );
-   require_substr( r, "epoch_min_emission exceeds remaining distributable" );
+   require_substr( r, "annual_min_emission per-epoch share exceeds remaining distributable" );
 } FC_LOG_AND_RETHROW()
 
 // ---------------------------------------------------------------------------
@@ -2045,7 +2094,7 @@ BOOST_FIXTURE_TEST_CASE( advance_gate_blocks_before_initt5, sysio_emissions_test
    // at all if nothing has ever called set on it) and no payepoch fires.
    create_t5_holding_accounts();
 
-   produce_blocks(20);
+   produce_blocks(130);
    BOOST_REQUIRE_EQUAL( success(), advance_epoch_state(EPOCH) );
 
    auto est = get_epoch_state_row();
@@ -2073,14 +2122,14 @@ BOOST_FIXTURE_TEST_CASE( gate_block_dedup_same_reason, sysio_emissions_tester ) 
    // trx still succeeds even without sysio.msgch deployed.
    create_t5_holding_accounts();
 
-   produce_blocks(20);
+   produce_blocks(130);
    BOOST_REQUIRE_EQUAL( success(), advance_epoch_state(EPOCH) );
 
    auto bl1 = get_blocklog_row(1u);
    BOOST_REQUIRE( !bl1.is_null() );
    const uint32_t first_retry_at = bl1["last_retry_at"].as<uint32_t>();
 
-   produce_blocks(20);
+   produce_blocks(130);
    BOOST_REQUIRE_EQUAL( success(), advance_epoch_state(EPOCH) );
 
    auto bl2 = get_blocklog_row(1u);
@@ -2100,7 +2149,7 @@ BOOST_FIXTURE_TEST_CASE( gate_block_reason_change_updates_row, sysio_emissions_t
    // first_blocked_at is preserved (still records the original block time).
    create_t5_holding_accounts();
 
-   produce_blocks(20);
+   produce_blocks(130);
    BOOST_REQUIRE_EQUAL( success(), advance_epoch_state(EPOCH) );
 
    auto bl1 = get_blocklog_row(1u);
@@ -2117,18 +2166,18 @@ BOOST_FIXTURE_TEST_CASE( gate_block_reason_change_updates_row, sysio_emissions_t
       ("min_claimable",          MIN_CLAIMABLE_AMOUNT)
       ("t5_distributable",       int64_t(125000000000000000LL))
       ("t5_floor",               int64_t(125000000000000000LL))
-      ("epoch_duration_secs",    uint32_t(86400))
-      ("decay_numerator",        DECAY_NUMERATOR) ("decay_denominator", DECAY_DENOMINATOR)
-      ("epoch_initial_emission", int64_t(0))
-      ("epoch_max_emission",     EPOCH_MAX_EMISSION) ("epoch_min_emission", int64_t(0))
+      ("target_annual_decay_bps", TARGET_ANNUAL_DECAY_BPS)
+      ("annual_initial_emission", int64_t(0))
+      ("annual_max_emission",     ANNUAL_MAX_EMISSION) ("annual_min_emission", int64_t(0))
       ("compute_bps",            COMPUTE_BPS) ("capital_bps", CAPITAL_BPS)
       ("capex_bps",              CAPEX_BPS)   ("governance_bps", uint16_t(1000))
       ("producer_bps",           PRODUCER_BPS)("batch_op_bps", uint16_t(3000))
-      ("standby_end_rank",       T_STANDBY_END_RANK);
+      ("standby_end_rank",       T_STANDBY_END_RANK)
+      ("epoch_log_retention_count", uint32_t(8640));
    BOOST_REQUIRE_EQUAL( success(), setemitcfg(config::system_account_name, cfg) );
    BOOST_REQUIRE_EQUAL( success(), initt5(config::system_account_name, tpsec(head_secs())) );
 
-   produce_blocks(20);
+   produce_blocks(130);
    BOOST_REQUIRE_EQUAL( success(), advance_epoch_state(EPOCH) );
 
    auto bl2 = get_blocklog_row(1u);
@@ -2144,7 +2193,7 @@ BOOST_FIXTURE_TEST_CASE( gate_block_clears_on_unblock, sysio_emissions_tester ) 
    // path so it no longer shows up to ops as "currently blocked".
    create_t5_holding_accounts();
 
-   produce_blocks(20);
+   produce_blocks(130);
    BOOST_REQUIRE_EQUAL( success(), advance_epoch_state(EPOCH) );
    BOOST_REQUIRE( !get_blocklog_row(1u).is_null() );
 
@@ -2153,7 +2202,7 @@ BOOST_FIXTURE_TEST_CASE( gate_block_clears_on_unblock, sysio_emissions_tester ) 
    const uint32_t start = head_secs() - ONE_EPOCH - 1;
    BOOST_REQUIRE_EQUAL( success(), initt5(config::system_account_name, tpsec(start)) );
 
-   produce_blocks(20);
+   produce_blocks(130);
    BOOST_REQUIRE_EQUAL( success(), advance_epoch_state(EPOCH) );
 
    // Epoch advanced to 1 and blocklog[1] was pruned.
@@ -2188,20 +2237,32 @@ BOOST_FIXTURE_TEST_CASE( first_epoch_uses_initial_emission, sysio_emissions_test
 
    BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
+   // Test fixture's epoch_duration_sec = 60. Initial per-epoch is the annual
+   // value scaled to 60 seconds.
+   const int64_t initial_per_epoch =
+      test_scale_annual_to_epoch(ANNUAL_INITIAL_EMISSION, 60);
+
    auto state = get_t5_state();
-   BOOST_REQUIRE_EQUAL( state["last_epoch_emission"].as<int64_t>(), EPOCH_INITIAL_EMISSION );
+   BOOST_REQUIRE_EQUAL( state["last_epoch_emission"].as<int64_t>(), initial_per_epoch );
 
    // With no producers registered AND no batch-op rotation group populated,
    // both the producer_pool and the batch_pool stay in the treasury.
-   int64_t undist = compute_undistributed_if_no_operators(EPOCH_INITIAL_EMISSION);
-   BOOST_REQUIRE_EQUAL( state["total_distributed"].as<int64_t>(), EPOCH_INITIAL_EMISSION - undist );
+   int64_t undist = compute_undistributed_if_no_operators(initial_per_epoch);
+   BOOST_REQUIRE_EQUAL( state["total_distributed"].as<int64_t>(), initial_per_epoch - undist );
 
    auto log = get_epoch_log(1);
    BOOST_REQUIRE( !log.is_null() );
-   BOOST_REQUIRE_EQUAL( log["total_emission"].as<int64_t>(), EPOCH_INITIAL_EMISSION );
+   BOOST_REQUIRE_EQUAL( log["total_emission"].as<int64_t>(), initial_per_epoch );
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( subsequent_epochs_apply_decay, sysio_emissions_tester ) try {
+   // Use a longer epoch so the per-epoch decay factor is large enough to
+   // observe across two epochs. At 60s epochs the factor is ~0.99999930
+   // (annual decay applied once per minute), invisible at int64 precision.
+   // 86400s (1 day) gives factor ~= 0.999, matching the legacy curve shape.
+   constexpr uint32_t EPOCH_SECS = 86400;
+   BOOST_REQUIRE_EQUAL( success(), init_epoch_state(EPOCH_SECS) );
+
    create_t5_holding_accounts();
    const uint32_t start = head_secs() - (2 * ONE_EPOCH) - 10;
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
@@ -2209,25 +2270,27 @@ BOOST_FIXTURE_TEST_CASE( subsequent_epochs_apply_decay, sysio_emissions_tester )
    // Epoch 1 (bootstrap_epoch already advanced sysio.epoch to index 1)
    BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
-   // Epoch 2: cross the wall-clock boundary, then advance again.
-   produce_blocks(12);
+   // Epoch 2: cross the wall-clock boundary (86400s = 172800 blocks at 0.5s);
+   // produce a bit more for safety margin.
+   produce_blocks(2 * EPOCH_SECS + 10);
    BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
    auto state = get_t5_state();
    BOOST_REQUIRE_EQUAL( state["epoch_count"].as<uint64_t>(), 2u );
 
-   // Expected: E_0 * DECAY_NUMERATOR / DECAY_DENOMINATOR
-   __int128 expected = static_cast<__int128>(EPOCH_INITIAL_EMISSION) * DECAY_NUMERATOR;
-   int64_t expected_e2 = static_cast<int64_t>(expected / DECAY_DENOMINATOR);
+   const int64_t initial_per_epoch =
+      test_scale_annual_to_epoch(ANNUAL_INITIAL_EMISSION, EPOCH_SECS);
+   const int64_t expected_e2 =
+      test_apply_decay(initial_per_epoch, TARGET_ANNUAL_DECAY_BPS, EPOCH_SECS);
 
    BOOST_REQUIRE_EQUAL( state["last_epoch_emission"].as<int64_t>(), expected_e2 );
 
    // Without producers OR a populated batch-op rotation group, both pools are
    // undistributed in each epoch.
-   int64_t undist1 = compute_undistributed_if_no_operators(EPOCH_INITIAL_EMISSION);
+   int64_t undist1 = compute_undistributed_if_no_operators(initial_per_epoch);
    int64_t undist2 = compute_undistributed_if_no_operators(expected_e2);
    BOOST_REQUIRE_EQUAL( state["total_distributed"].as<int64_t>(),
-      (EPOCH_INITIAL_EMISSION - undist1) + (expected_e2 - undist2) );
+      (initial_per_epoch - undist1) + (expected_e2 - undist2) );
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( emission_clamped_to_max, sysio_emissions_tester ) try {
@@ -2236,9 +2299,12 @@ BOOST_FIXTURE_TEST_CASE( emission_clamped_to_max, sysio_emissions_tester ) try {
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
    BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
+   const int64_t per_epoch_max = test_scale_annual_to_epoch(ANNUAL_MAX_EMISSION, 60);
+   const int64_t per_epoch_min = test_scale_annual_to_epoch(ANNUAL_MIN_EMISSION, 60);
+
    auto state = get_t5_state();
-   BOOST_REQUIRE( state["last_epoch_emission"].as<int64_t>() <= EPOCH_MAX_EMISSION );
-   BOOST_REQUIRE( state["last_epoch_emission"].as<int64_t>() >= EPOCH_MIN_EMISSION );
+   BOOST_REQUIRE( state["last_epoch_emission"].as<int64_t>() <= per_epoch_max );
+   BOOST_REQUIRE( state["last_epoch_emission"].as<int64_t>() >= per_epoch_min );
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( emission_capped_at_distributable_ceiling, sysio_emissions_tester ) try {
@@ -2401,18 +2467,24 @@ BOOST_FIXTURE_TEST_CASE( viewepoch_returns_correct_state, sysio_emissions_tester
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
    BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
-   int64_t undist = compute_undistributed_if_no_operators(EPOCH_INITIAL_EMISSION);
-   int64_t expected_distributed = EPOCH_INITIAL_EMISSION - undist;
+   const int64_t initial_per_epoch =
+      test_scale_annual_to_epoch(ANNUAL_INITIAL_EMISSION, 60);
+   int64_t undist = compute_undistributed_if_no_operators(initial_per_epoch);
+   int64_t expected_distributed = initial_per_epoch - undist;
 
    auto info = viewepoch();
    BOOST_REQUIRE_EQUAL( info.epoch_count, 1u );
-   BOOST_REQUIRE_EQUAL( info.last_epoch_emission, EPOCH_INITIAL_EMISSION );
+   BOOST_REQUIRE_EQUAL( info.last_epoch_emission, initial_per_epoch );
    BOOST_REQUIRE_EQUAL( info.total_distributed, expected_distributed );
    BOOST_REQUIRE( info.treasury_remaining > 0 );
    BOOST_REQUIRE_EQUAL( info.treasury_remaining, T5_DISTRIBUTABLE - T5_FLOOR - expected_distributed );
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( viewepoch_estimates_next_emission, sysio_emissions_tester ) try {
+   // Use a longer epoch so the per-epoch decay factor is visible.
+   constexpr uint32_t EPOCH_SECS = 86400;
+   BOOST_REQUIRE_EQUAL( success(), init_epoch_state(EPOCH_SECS) );
+
    create_t5_holding_accounts();
    const uint32_t start = head_secs() - ONE_EPOCH - 1;
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
@@ -2420,8 +2492,10 @@ BOOST_FIXTURE_TEST_CASE( viewepoch_estimates_next_emission, sysio_emissions_test
 
    auto info = viewepoch();
 
-   __int128 expected = static_cast<__int128>(EPOCH_INITIAL_EMISSION) * DECAY_NUMERATOR;
-   int64_t expected_next = static_cast<int64_t>(expected / DECAY_DENOMINATOR);
+   const int64_t initial_per_epoch =
+      test_scale_annual_to_epoch(ANNUAL_INITIAL_EMISSION, EPOCH_SECS);
+   const int64_t expected_next =
+      test_apply_decay(initial_per_epoch, TARGET_ANNUAL_DECAY_BPS, EPOCH_SECS);
 
    BOOST_REQUIRE_EQUAL( info.next_emission_est, expected_next );
    BOOST_REQUIRE( info.seconds_until_next > 0 );
@@ -2463,7 +2537,11 @@ BOOST_FIXTURE_TEST_CASE( non_producing_active_excluded, sysio_emissions_tester )
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( partial_uptime_proportional_pay, sysio_emissions_tester ) try {
-   // Producers with eligible_rounds < expected_rounds get proportional share
+   // Producers with eligible_rounds < expected_rounds get proportional share.
+   // Override epoch_duration_sec so expected_rounds (=epoch_secs*2/252) is
+   // well above the eligible_rounds the test produces (~2 from 2 cycles), so
+   // the proportional path is exercised rather than the elig>=expected cap.
+   BOOST_REQUIRE_EQUAL( success(), init_epoch_state(7200) );
    create_t5_holding_accounts();
    setup_producers(3);
 
@@ -2777,7 +2855,7 @@ BOOST_FIXTURE_TEST_CASE( multi_epoch_cumulative_accounting, sysio_emissions_test
    BOOST_REQUIRE_EQUAL( state1["total_distributed"].as<int64_t>(), cumulative );
 
    // Advance sysio.epoch to index 2 and process.
-   produce_blocks(12);
+   produce_blocks(130);
    BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
    auto log2 = get_epoch_log(2);
    int64_t e2 = log2["total_emission"].as<int64_t>();
@@ -2792,7 +2870,7 @@ BOOST_FIXTURE_TEST_CASE( multi_epoch_cumulative_accounting, sysio_emissions_test
    BOOST_REQUIRE( e2 < e1 );
 
    // Advance sysio.epoch to index 3 and process.
-   produce_blocks(12);
+   produce_blocks(130);
    BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
    auto log3 = get_epoch_log(3);
    int64_t e3 = log3["total_emission"].as<int64_t>();
@@ -2860,7 +2938,8 @@ BOOST_FIXTURE_TEST_CASE( epoch_log_records_all_fields, sysio_emissions_tester ) 
    BOOST_REQUIRE( log["timestamp"].as<time_point_sec>().sec_since_epoch() > 0 );
 
    // total_emission matches expected first epoch
-   BOOST_REQUIRE_EQUAL( log["total_emission"].as<int64_t>(), EPOCH_INITIAL_EMISSION );
+   BOOST_REQUIRE_EQUAL( log["total_emission"].as<int64_t>(),
+      test_scale_annual_to_epoch(ANNUAL_INITIAL_EMISSION, 60) );
 
    // All category amounts are positive
    BOOST_REQUIRE( log["compute_amount"].as<int64_t>() > 0 );
@@ -3007,9 +3086,11 @@ BOOST_FIXTURE_TEST_CASE( inprogress_round_below_threshold_no_credit, sysio_emiss
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( active_capped_at_expected_rounds, sysio_emissions_tester ) try {
-   // When eligible_rounds >= expected_rounds, payment = full_share (capped, not more)
-   // expected_rounds = (epoch_elapsed * 2) / BLOCKS_PER_ROUND
-   // With ONE_EPOCH (86400s), expected_rounds = (86400 * 2) / 252 = 685
+   // expected_rounds = (epoch_duration_sec * 2) / TOTAL_BLOCKS_PER_ROUND.
+   // Use 7200s so expected_rounds = 57, well above the elig_rounds the test
+   // produces (~2 from 2 cycles). Pay then = elig/expected * full_share which
+   // is strictly less than full_share -- exercising the proportional path.
+   BOOST_REQUIRE_EQUAL( success(), init_epoch_state(7200) );
    create_t5_holding_accounts();
    setup_producers(3);
    wait_for_producer_schedule();
@@ -3105,7 +3186,8 @@ BOOST_FIXTURE_TEST_CASE( viewepoch_before_first_epoch, sysio_emissions_tester ) 
    BOOST_REQUIRE_EQUAL( info.epoch_count, 0u );
    BOOST_REQUIRE_EQUAL( info.total_distributed, 0 );
    BOOST_REQUIRE_EQUAL( info.treasury_remaining, T5_DISTRIBUTABLE - T5_FLOOR );
-   BOOST_REQUIRE_EQUAL( info.next_emission_est, EPOCH_INITIAL_EMISSION );
+   BOOST_REQUIRE_EQUAL( info.next_emission_est,
+      test_scale_annual_to_epoch(ANNUAL_INITIAL_EMISSION, 60) );
    BOOST_REQUIRE( info.seconds_until_next > 0 );
 } FC_LOG_AND_RETHROW()
 
@@ -3118,7 +3200,7 @@ BOOST_FIXTURE_TEST_CASE( viewepoch_after_multiple_epochs, sysio_emissions_tester
    BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
    // Advance sysio.epoch to index 2 across the wall-clock boundary.
-   produce_blocks(12);
+   produce_blocks(130);
    BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
    auto info = viewepoch();
@@ -3127,8 +3209,8 @@ BOOST_FIXTURE_TEST_CASE( viewepoch_after_multiple_epochs, sysio_emissions_tester
    BOOST_REQUIRE_EQUAL( info.treasury_remaining, T5_DISTRIBUTABLE - T5_FLOOR - info.total_distributed );
 
    // next_emission_est should reflect decay from epoch 2's emission
-   __int128 expected = static_cast<__int128>(info.last_epoch_emission) * DECAY_NUMERATOR;
-   int64_t expected_next = static_cast<int64_t>(expected / DECAY_DENOMINATOR);
+   const int64_t expected_next =
+      test_apply_decay(info.last_epoch_emission, TARGET_ANNUAL_DECAY_BPS, 60);
    BOOST_REQUIRE_EQUAL( info.next_emission_est, expected_next );
 } FC_LOG_AND_RETHROW()
 
@@ -3372,7 +3454,7 @@ BOOST_FIXTURE_TEST_CASE( advance_gate_blocks_on_insufficient_treasury_balance, s
    );
 
    // advance must succeed (no throw -- gate emits error attestation cleanly).
-   produce_blocks(20);
+   produce_blocks(130);
    BOOST_REQUIRE_EQUAL( success(), advance_epoch_state(EPOCH) );
 
    // Epoch index unchanged (still 0). If epochstate row hasn't been written,
@@ -3416,6 +3498,75 @@ BOOST_FIXTURE_TEST_CASE( roa_forcereg_inlines_addnodeowner_happy_path, sysio_emi
    BOOST_REQUIRE( !row.is_null() );
    BOOST_REQUIRE_EQUAL( row["account_name"].as<name>(), "forceregt1"_n );
    BOOST_REQUIRE_EQUAL( row["total_allocation"].as<asset>(), T1_ALLOCATION );
+} FC_LOG_AND_RETHROW()
+
+// ---------------------------------------------------------------------------
+// epochlog retention
+// ---------------------------------------------------------------------------
+
+BOOST_FIXTURE_TEST_CASE( setemitcfg_rejects_zero_retention, sysio_emissions_tester ) try {
+   // epoch_log_retention_count = 0 would never prune; reject so the audit log
+   // can never grow unbounded by misconfig.
+   auto cfg = mvo()
+      ("t1_allocation", T1_ALLOCATION.get_amount())
+      ("t2_allocation", T2_ALLOCATION.get_amount())
+      ("t3_allocation", T3_ALLOCATION.get_amount())
+      ("t1_duration", T1_DURATION) ("t2_duration", T2_DURATION) ("t3_duration", T3_DURATION)
+      ("min_claimable", MIN_CLAIMABLE_AMOUNT)
+      ("t5_distributable", T5_DISTRIBUTABLE) ("t5_floor", int64_t(125000000000000000LL))
+      ("target_annual_decay_bps", TARGET_ANNUAL_DECAY_BPS)
+      ("annual_initial_emission", ANNUAL_INITIAL_EMISSION)
+      ("annual_max_emission", ANNUAL_MAX_EMISSION) ("annual_min_emission", ANNUAL_MIN_EMISSION)
+      ("compute_bps", COMPUTE_BPS) ("capital_bps", CAPITAL_BPS)
+      ("capex_bps", CAPEX_BPS) ("governance_bps", uint16_t(1000))
+      ("producer_bps", PRODUCER_BPS) ("batch_op_bps", uint16_t(3000))
+      ("standby_end_rank", T_STANDBY_END_RANK)
+      ("epoch_log_retention_count", uint32_t(0));
+
+   auto r = setemitcfg(config::system_account_name, cfg);
+   BOOST_REQUIRE( r != success() );
+   require_substr( r, "epoch_log_retention_count must be positive" );
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( epochlog_prunes_past_retention_cap, sysio_emissions_tester ) try {
+   // Set retention cap to 3, advance through 5 epochs, verify only the last
+   // 3 epoch_log rows survive.
+   create_t5_holding_accounts();
+
+   auto cfg = mvo()
+      ("t1_allocation", T1_ALLOCATION.get_amount())
+      ("t2_allocation", T2_ALLOCATION.get_amount())
+      ("t3_allocation", T3_ALLOCATION.get_amount())
+      ("t1_duration", T1_DURATION) ("t2_duration", T2_DURATION) ("t3_duration", T3_DURATION)
+      ("min_claimable", MIN_CLAIMABLE_AMOUNT)
+      ("t5_distributable", T5_DISTRIBUTABLE) ("t5_floor", int64_t(125000000000000000LL))
+      ("target_annual_decay_bps", TARGET_ANNUAL_DECAY_BPS)
+      ("annual_initial_emission", ANNUAL_INITIAL_EMISSION)
+      ("annual_max_emission", ANNUAL_MAX_EMISSION) ("annual_min_emission", ANNUAL_MIN_EMISSION)
+      ("compute_bps", COMPUTE_BPS) ("capital_bps", CAPITAL_BPS)
+      ("capex_bps", CAPEX_BPS) ("governance_bps", uint16_t(1000))
+      ("producer_bps", PRODUCER_BPS) ("batch_op_bps", uint16_t(3000))
+      ("standby_end_rank", T_STANDBY_END_RANK)
+      ("epoch_log_retention_count", uint32_t(3));
+   BOOST_REQUIRE_EQUAL( success(), setemitcfg(config::system_account_name, cfg) );
+
+   const uint32_t start = head_secs() - ONE_EPOCH - 1;
+   BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
+
+   // Epoch 1: genesis advance fires immediately (next_epoch_start = 0).
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
+   // Epochs 2-5: cross the wall-clock boundary each time.
+   for (int i = 0; i < 4; ++i) {
+      produce_blocks(130);
+      BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
+   }
+
+   // Cap is 3; only epochs 3, 4, 5 should remain. Epochs 1 and 2 are pruned.
+   BOOST_REQUIRE( get_epoch_log(1).is_null() );
+   BOOST_REQUIRE( get_epoch_log(2).is_null() );
+   BOOST_REQUIRE( !get_epoch_log(3).is_null() );
+   BOOST_REQUIRE( !get_epoch_log(4).is_null() );
+   BOOST_REQUIRE( !get_epoch_log(5).is_null() );
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_SUITE_END() // t5_emissions_tests

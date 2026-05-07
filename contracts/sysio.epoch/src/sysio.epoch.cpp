@@ -89,13 +89,21 @@ emissions_gate_result check_emissions_ready() {
    const auto t5s = t5s_tbl.get();
    r.treasury_remaining = cfg.t5_distributable - cfg.t5_floor - t5s.total_distributed;
 
+   // Read canonical epoch_duration_sec from our own epochcfg singleton --
+   // already validated at advance() entry. Pass into the shared emission
+   // formula so this contract and sysio.system see identical per-epoch
+   // values for the same inputs.
+   epoch::epochcfg_t cfg_tbl_local(epoch::EPOCH_ACCOUNT);
+   const uint32_t epoch_duration_sec = cfg_tbl_local.get().epoch_duration_sec;
+
    // Compute would-be emission. First-epoch case: use initial; cap at remaining.
    if (t5s.epoch_count == 0) {
-      r.emission_amount = cfg.epoch_initial_emission;
+      r.emission_amount = sysiosystem::emissions::scale_annual_to_epoch(
+         cfg.annual_initial_emission, epoch_duration_sec);
       if (r.emission_amount > r.treasury_remaining) r.emission_amount = r.treasury_remaining;
    } else {
       r.emission_amount = sysiosystem::emissions::compute_epoch_emission(
-         cfg, t5s.last_epoch_emission, t5s.total_distributed);
+         cfg, epoch_duration_sec, t5s.last_epoch_emission, t5s.total_distributed);
    }
 
    if (r.emission_amount <= 0) {
@@ -225,7 +233,10 @@ void epoch::setconfig(uint32_t epoch_duration_sec,
                       uint32_t epoch_retention_envelope_log_count) {
    require_auth(get_self());
 
-   check(epoch_duration_sec > 0, "epoch_duration_sec must be positive");
+   check(epoch_duration_sec >= MIN_EPOCH_DURATION_SEC,
+         "epoch_duration_sec must be >= MIN_EPOCH_DURATION_SEC");
+   check(epoch_duration_sec <= MAX_EPOCH_DURATION_SEC,
+         "epoch_duration_sec exceeds 30-day ceiling");
    check(operators_per_epoch > 0, "operators_per_epoch must be positive");
    check(batch_op_groups > 0, "batch_op_groups must be positive");
    check(batch_operator_minimum_active == operators_per_epoch * batch_op_groups,
