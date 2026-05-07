@@ -116,11 +116,12 @@ void test_trxs_common(std::vector<const char*>& specific_args) {
                app->initialize<chain_plugin, producer_plugin>(argv.size(), (char**)&argv[0]);
                app->find_plugin<chain_plugin>()->chain();
                app->startup();
-               plugin_promise.set_value({app->find_plugin<producer_plugin>(), app->find_plugin<chain_plugin>()});
-               // The app was constructed on the outer thread; capture this thread (which
-               // runs the loop) as main_thread_id_ so producer_plugin's main-thread asserts
-               // compare against the right thread.
+               // Capture this thread as main_thread_id_ before releasing the promise so
+               // any work the outer thread enqueues after plugin_fut.get() observes the
+               // correct loop thread.  scoped_app was constructed on the outer thread, so
+               // without this refresh main_thread_id_ would point there instead of here.
                app->executor().set_main_thread_id();
+               plugin_promise.set_value({app->find_plugin<producer_plugin>(), app->find_plugin<chain_plugin>()});
                app->exec();
                return;
             } FC_LOG_AND_DROP()

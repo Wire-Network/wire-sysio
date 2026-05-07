@@ -49,6 +49,8 @@ public:
    }
 
    // Called by application::exec(); refreshes main_thread_id_ to the thread driving the loop.
+   // main_thread_id_ is a plain std::thread::id (not std::atomic): only call this during setup,
+   // before any thread starts reading get_main_thread_id() concurrently with this write.
    void set_main_thread_id() {
       main_thread_id_ = std::this_thread::get_id();
    }
