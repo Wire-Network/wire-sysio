@@ -73,6 +73,11 @@ COPY <<-EOF /extras.cmake
   set(CMAKE_BUILD_TYPE "" CACHE STRING "" FORCE)
   set(CMAKE_C_FLAGS "-O3" CACHE STRING "")
   set(CMAKE_CXX_FLAGS "-O3" CACHE STRING "")
+  # Workflow's command-line -DCMAKE_BUILD_TYPE=Release wins over the FORCE above,
+  # bringing back -DNDEBUG via CMAKE_*_FLAGS_RELEASE.  Force the Release flags too
+  # so asserts stay compiled regardless of which BUILD_TYPE wins.
+  set(CMAKE_C_FLAGS_RELEASE   "-O3" CACHE STRING "" FORCE)
+  set(CMAKE_CXX_FLAGS_RELEASE "-O3" CACHE STRING "" FORCE)
   set(SYSIO_ENABLE_RELEASE_BUILD_TEST "Off" CACHE BOOL "")
 EOF
 
