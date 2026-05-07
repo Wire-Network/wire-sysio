@@ -61,12 +61,9 @@ RUN apt-get update && apt-get upgrade -y && \
 RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 100 && \
     update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 100
 
-RUN mkdir -p /opt/llvm && chmod 777 /opt/llvm
-
 ENV CC=/usr/bin/clang-18
 ENV CXX=/usr/bin/clang++-18
 ENV CMAKE_MAKE_PROGRAM=/usr/bin/ninja
-ENV CMAKE_PREFIX_PATH=/opt/llvm/llvm-11
 
 COPY <<-EOF /extras.cmake
   # reset the build type to empty to disable any cmake default flags
@@ -82,7 +79,3 @@ COPY <<-EOF /extras.cmake
 EOF
 
 ENV SYSIO_PLATFORM_HAS_EXTRAS_CMAKE=1
-
-COPY scripts /scripts
-RUN chmod +x /scripts/llvm-11/llvm-11-ubuntu-build-source.sh
-RUN BASE_DIR=/opt/llvm /scripts/llvm-11/llvm-11-ubuntu-build-source.sh
