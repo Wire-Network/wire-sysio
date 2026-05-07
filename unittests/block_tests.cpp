@@ -425,4 +425,86 @@ BOOST_FIXTURE_TEST_CASE( no_block_extensions_allowed_test, validating_tester ) {
                            });
 }
 
+BOOST_AUTO_TEST_CASE( transaction_receipt_digest_format_test )
+{
+   // Golden-value test locking in the transaction_receipt digest format:
+   //   digest = sha256( pack(cpu_usage_us) || pack(trx.digest()) )
+   // A reorder, added field, or removed field in transaction_receipt::digest() will
+   // change the hash and fail this test.
+
+   transaction_receipt r;
+   r.cpu_usage_us = { fc::unsigned_int(100), fc::unsigned_int(200) };
+
+   // Reconstruct the expected digest from first principles.
+   auto expected = [&]() {
+      digest_type::encoder enc;
+      fc::raw::pack( enc, r.cpu_usage_us );
+      fc::raw::pack( enc, r.trx.digest() );
+      return enc.result();
+   };
+
+   BOOST_CHECK_EQUAL( r.digest(), expected() );
+
+   // Stability across calls.
+   BOOST_CHECK_EQUAL( r.digest(), r.digest() );
+
+   // Changing any CPU value changes the digest.
+   auto orig = r.digest();
+   r.cpu_usage_us[0] = fc::unsigned_int(101);
+   BOOST_CHECK_NE( r.digest(), orig );
+   BOOST_CHECK_EQUAL( r.digest(), expected() );
+
+   // Appending a CPU value changes the digest.
+   auto after_mod = r.digest();
+   r.cpu_usage_us.push_back( fc::unsigned_int(50) );
+   BOOST_CHECK_NE( r.digest(), after_mod );
+   BOOST_CHECK_EQUAL( r.digest(), expected() );
+
+   // Empty cpu_usage_us is also valid and stable.
+   r.cpu_usage_us.clear();
+   BOOST_CHECK_EQUAL( r.digest(), expected() );
+}
+
+BOOST_AUTO_TEST_CASE( explicit_cpu_usage_uint32_overflow_test )
+{
+   // A malicious/buggy block with explicit per-action cpu_usage_us values whose
+   // sum exceeds uint32_t must be rejected. Without the overflow guard, the sum
+   // would silently narrow when assigned to transaction_trace::total_cpu_usage_us
+   // (fc::unsigned_int = uint32_t), potentially defeating the subsequent
+   // validate_trx_billed_cpu check and under-billing the accounts.
+
+   tester chain( setup_policy::full );
+   account_name acc = "acc"_n;
+   chain.create_accounts( {acc} );
+   chain.produce_block();
+
+   // Build a 2-action trx. nonce + nonce so that total_actions() == 2 and
+   // signatures are trivially satisfied at the system-account level.
+   signed_transaction trx;
+   trx.actions.emplace_back(
+      vector<permission_level>{{config::system_account_name, config::active_name}},
+      config::system_account_name, "nonce"_n, fc::raw::pack(std::string("a")) );
+   trx.actions.emplace_back(
+      vector<permission_level>{{config::system_account_name, config::active_name}},
+      config::system_account_name, "nonce"_n, fc::raw::pack(std::string("b")) );
+   chain.set_transaction_headers( trx, 10 );
+   trx.sign( tester::get_private_key( config::system_account_name, "active" ), chain.control->get_chain_id() );
+
+   auto ptrx = std::make_shared<packed_transaction>(trx);
+   auto fut = transaction_metadata::start_recover_keys( ptrx, chain.control->get_thread_pool(),
+                                                       chain.control->get_chain_id(), fc::microseconds::maximum(),
+                                                       transaction_metadata::trx_type::input );
+   auto mtrx = fut.get();
+
+   // Two values each just over 2^31 so their sum exceeds uint32_t max.
+   cpu_usage_t overflow_cpu{ fc::unsigned_int(0x80000000u), fc::unsigned_int(0x80000001u) };
+
+   BOOST_CHECK_EXCEPTION(
+      chain.control->test_push_transaction( mtrx, fc::time_point::maximum(),
+                                            fc::microseconds::maximum(), overflow_cpu,
+                                            true /*explicit_billed_cpu_time*/ ),
+      transaction_exception,
+      fc_exception_message_contains("overflows uint32") );
+}
+
 BOOST_AUTO_TEST_SUITE_END()

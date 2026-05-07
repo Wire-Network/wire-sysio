@@ -100,6 +100,10 @@ public:
       reset_window_size_in_num_blocks = size;
    }
 
+   // Blame every per-action first-authorizer for a failed trx — shared authorization
+   // over multi-action trxs implies shared responsibility for the failure. This is
+   // broader than the legacy single-blame model (trx-level first_authorizer only) and
+   // intentionally mirrors the per-action shared-billing design.
    void add(const action_payers_t& payers, const fc::exception& e) {
       for (const auto& p: payers) {
          auto& fa = failed_accounts[p];
@@ -110,6 +114,10 @@ public:
 
 
    // return true if exceeds max_failures_per_account and should be dropped
+   // Incrementing num_failures on a trx we're already dropping is intentional: it
+   // tracks the magnitude of abusive traffic within the reset window so that
+   // report_and_clear can log proportionally. The cap against max_failures_per_account
+   // only gates whether the trx is dropped, not whether the counter continues.
    account_name failure_limit(const action_payers_t& payers) {
       for (const auto& payer : payers) {
          auto fitr = failed_accounts.find(payer);
@@ -2533,6 +2541,14 @@ producer_plugin_impl::push_result producer_plugin_impl::push_transaction(const f
    auto start = fc::time_point::now();
    SYS_ASSERT(!trx->is_read_only(), producer_exception, "Unexpected read-only trx");
 
+   // The subjective_billing::_disabled flag is temporarily mutated below to pass
+   // per-trx context into transaction_context without changing chain APIs. This is
+   // safe only while all mutations happen on a single thread and there is no
+   // re-entrance. Read-only trx threads do NOT reach this path (they assert
+   // !is_read_only() above and take the ro path in handle_push_result with
+   // disable_subjective_enforcement set explicitly).
+   assert(app().executor().get_main_thread_id() == std::this_thread::get_id());
+
    chain::controller&         chain           = chain_plug->chain();
    chain::subjective_billing& subjective_bill = chain.get_mutable_subjective_billing();
 
@@ -2590,6 +2606,11 @@ producer_plugin_impl::push_result producer_plugin_impl::push_transaction(const f
                  chain.head().block_num() + 1, get_pending_block_producer(), prev_elapsed, block_cpu_limit, trx->id());
          return pr;
       }
+
+      // On retry, cap the allowed wall-clock time to 2x the prior run. Prevents a
+      // single slow retry from consuming most of the block budget when prev_elapsed
+      // is a reasonable proxy for the trx's real cost.
+      max_trx_time = std::min(max_trx_time, prev_elapsed * 2);
    }
 
    auto trace = chain.push_transaction(trx, block_deadline, max_trx_time);
