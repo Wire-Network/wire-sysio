@@ -2057,13 +2057,12 @@ struct controller_impl {
 
          // this code is hit if an exception was thrown, and handled by `handle_exception`
          // ------------------------------------------------------------------------------
+         // _block_report describes block contents on both producer (log_applied + produced_block_metrics) and
+         // receiver (Received log + incoming_block_metrics) paths.  A rejected trx is dropped from the block,
+         // so do not roll its net/cpu/elapsed in -- producer and receiver totals must agree.
          if (!trx->is_transient()) {
             dmlog_applied_transaction(trace);
             emit( applied_transaction, std::tie(trace, trx->packed_trx()), __FILE__, __LINE__ );
-
-            pending->_block_report.total_net_usage += trace->net_usage;
-            if( trace->receipt ) pending->_block_report.total_cpu_usage_us += trace->total_cpu_usage_us;
-            pending->_block_report.total_elapsed_time += trace->elapsed;
          }
 
          return trace;

@@ -507,4 +507,72 @@ BOOST_AUTO_TEST_CASE( explicit_cpu_usage_uint32_overflow_test )
       fc_exception_message_contains("overflows uint32") );
 }
 
+// A non-transient trx that is rejected during apply (here, by failing the auth
+// check after net_usage was already populated by init_for_input_trx) must NOT
+// contribute its net/cpu/elapsed to the producer's _block_report.  The block
+// itself contains zero such trxs; receivers replaying it see net=0, and the
+// producer's log_applied / produced_block_metrics must agree.
+BOOST_AUTO_TEST_CASE( failed_trx_excluded_from_block_report )
+{
+   // log_applied skips the metrics callback when the block timestamp is more than
+   // 5 minutes from wall-clock now (sync-mode throttle), so build a chain whose
+   // genesis is current time and the produced blocks land within the window.
+   fc::temp_directory tempdir;
+   auto def_conf = base_tester::default_config(tempdir);
+   auto genesis = def_conf.second;
+   genesis.initial_timestamp = fc::time_point::now() - fc::seconds(1);
+   savanna_tester chain( def_conf.first, genesis );
+   chain.execute_setup_policy( setup_policy::full );
+   chain.create_account( "alice"_n );
+   chain.produce_block(); // commit create_account before installing the callback
+
+   std::optional<produced_block_metrics> captured;
+   chain.control->register_update_produced_block_metrics(
+      [&]( produced_block_metrics m ) { captured = m; } );
+
+   // Baseline: produce a block with no user trxs (just onblock).
+   chain.produce_block();
+   BOOST_REQUIRE( captured );
+   const auto baseline = *captured;
+   BOOST_TEST( baseline.trxs_produced_total == 0u );
+   BOOST_TEST( baseline.net_usage_us == 0u ); // onblock is implicit; no wire bytes
+   captured.reset();
+
+   // Action authorized by alice@active, but signed with sysio's key -- the
+   // auth check throws unsatisfied_authorization AFTER init_for_input_trx
+   // has populated trace->net_usage from the action's billable size.
+   signed_transaction stx;
+   stx.actions.emplace_back(
+      vector<permission_level>{{"alice"_n, config::active_name}},
+      config::system_account_name, "nonce"_n, fc::raw::pack(std::string("x")) );
+   chain.set_transaction_headers( stx, 10 );
+   stx.sign( chain.get_private_key( config::system_account_name, "active" ),
+             chain.control->get_chain_id() );
+
+   auto trace = chain.push_transaction( stx, fc::time_point::maximum(),
+                                        base_tester::DEFAULT_BILLED_CPU_TIME_US,
+                                        true /*no_throw*/ );
+   BOOST_REQUIRE( trace->except );
+   BOOST_REQUIRE_EQUAL( trace->except->code(), unsatisfied_authorization::code_value );
+   BOOST_REQUIRE_GT( trace->net_usage, 0u ); // populated before the throw
+
+   // Failed-trx block: same shape as baseline (just onblock makes it into the block).
+   chain.produce_block();
+   BOOST_REQUIRE( captured );
+
+   // Block content matches baseline: zero user trxs.
+   BOOST_TEST( captured->trxs_produced_total == 0u );
+   // Net is the cleanest signal -- onblock contributes zero, so any non-zero
+   // net_usage_us would mean the rejected trx leaked its net into the report.
+   // Pre-fix: == trace->net_usage (>0).
+   BOOST_TEST( captured->net_usage_us == 0u );
+   // Cpu and elapsed should match the onblock-only baseline.  A large delta in
+   // total_elapsed_time_us would indicate the rejected trx's elapsed leaked too.
+   // Pre-fix: total_elapsed_time_us would be baseline + trace->elapsed.  Allow
+   // a small absolute slack (microseconds) for natural per-block variance.
+   BOOST_TEST( captured->cpu_usage_us == baseline.cpu_usage_us );
+   BOOST_TEST( std::abs( captured->total_elapsed_time_us - baseline.total_elapsed_time_us )
+               < fc::milliseconds(1).count() );
+}
+
 BOOST_AUTO_TEST_SUITE_END()
