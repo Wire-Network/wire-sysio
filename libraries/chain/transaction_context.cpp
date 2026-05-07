@@ -698,6 +698,15 @@ namespace sysio::chain {
    void transaction_context::update_billed_cpu_time( fc::time_point now ) {
       if( explicit_billed_cpu_time || is_cpu_updated ) return; // updated in init() for explicit_billed_cpu
 
+      // Read-only trxs are never billed (objective or subjective): they don't change chain state,
+      // they may legitimately have zero authorizations, and any accounts_billing accumulation here
+      // would be discarded by the read-only rollback anyway.  Implicit trxs (onblock is the only
+      // type) are objectively billed to sysio but skip the subjective path -- they're chain-generated,
+      // never appear in block->transactions (so on_block() can't clear a subjective entry), and the
+      // sysio authorizer doesn't need subjective throttling.
+      const bool bill_objectively  = !is_read_only();
+      const bool bill_subjectively = bill_objectively && !is_implicit();
+
       const int64_t cpu_sum = std::ranges::fold_left(billed_cpu_us, int64_t{0}, std::plus());
       SYS_ASSERT(cpu_sum >= 0 && cpu_sum <= std::numeric_limits<uint32_t>::max(),
                  transaction_exception,
@@ -713,41 +722,39 @@ namespace sysio::chain {
          // +1 so total is above min_transaction_cpu_usage
          int64_t delta_per_action = (( total_cpu_time_us - trace->total_cpu_usage_us ) / billed_cpu_us.size()) + 1;
          total_cpu_time_us = 0;
-         bool subjectively_bill_payer_disabled = control.get_subjective_billing().is_payer_billing_disabled();
-         auto trx_first_authorizer = packed_trx.get_transaction().first_authorizer(); // use if no authorizer
+         const bool subjectively_bill_payer_disabled = control.get_subjective_billing().is_payer_billing_disabled();
+         const auto trx_first_authorizer = packed_trx.get_transaction().first_authorizer(); // used if action has no authorizer
          for (auto&& [i, b] : std::views::enumerate(billed_cpu_us)) {
             // if exception thrown, action_traces may not be the same size as billed_cpu_us
             auto& act_trace = trace->action_traces[i];
             b.value += delta_per_action;
-            auto payer = act_trace.act.payer();
-            accounts_billing[payer].cpu_usage_us += b.value;
             total_cpu_time_us += b.value;
-            act_trace.cpu_usage_us = b.value;
-            auto first_auth = act_trace.act.first_authorizer();
-            if (first_auth.empty())
-               first_auth = trx_first_authorizer;
-            // validate_referenced_accounts rejects non-read-only trxs with zero auths
-            // (tx_no_auths), and read-only trxs skip subjective billing below, so
-            // first_auth must be populated by here.
-            assert(!first_auth.empty());
-            // When an action has an explicit sysio.payer at position 0, first_authorizer()
-            // returns the payer (same as payer()), so the guard below skips the insert.
-            // Only the payer bears the subjective cost in that case — the non-payer
-            // authorizer (e.g. {active, Y} at position 1) is intentionally NOT tracked
-            // separately, matching the objective-billing semantic where the payer absorbs
-            // the full cost.
-            if (first_auth != payer || subjectively_bill_payer_disabled) // don't subjectively bill payer twice if billing payer
-               authorizers_cpu[first_auth] += fc::microseconds{b.value};
+            act_trace.cpu_usage_us = b.value;  // trace bookkeeping for the response, regardless of billing
+            if (bill_objectively) {
+               auto payer = act_trace.act.payer();
+               accounts_billing[payer].cpu_usage_us += b.value;
+               if (bill_subjectively) {
+                  auto first_auth = act_trace.act.first_authorizer();
+                  if (first_auth.empty())
+                     first_auth = trx_first_authorizer;
+                  // validate_referenced_accounts rejects non-read-only, non-implicit trxs with zero
+                  // auths (tx_no_auths), so first_auth must be populated by here on the subjective path.
+                  assert(!first_auth.empty());
+                  // When an action has an explicit sysio.payer at position 0, first_authorizer()
+                  // returns the payer (same as payer()), so the guard below skips the insert.
+                  // Only the payer bears the subjective cost in that case -- the non-payer
+                  // authorizer (e.g. {active, Y} at position 1) is intentionally NOT tracked
+                  // separately, matching the objective-billing semantic where the payer absorbs
+                  // the full cost.
+                  if (first_auth != payer || subjectively_bill_payer_disabled) // don't subjectively bill payer twice if billing payer
+                     authorizers_cpu[first_auth] += fc::microseconds{b.value};
+               }
+            }
          }
       }
       trace->total_cpu_usage_us = total_cpu_time_us;
 
-      // update subjective billing
-      // Skip implicit trxs (onblock is the only implicit trx type): chain-generated,
-      // never appear in block->transactions (so remove_subjective_billing via on_block()
-      // would never clear them), and the sysio authorizer does not need subjective
-      // throttling.
-      if (!is_read_only() && !is_implicit()) {
+      if (bill_subjectively) {
          auto& subjective_bill = control.get_mutable_subjective_billing();
          if( trace->except ) {
             const fc::exception& e = *trace->except;
