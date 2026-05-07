@@ -58,6 +58,9 @@ BOOST_AUTO_TEST_CASE(delayed_trx) {
                "-p", "sysio", "-e", "--disable-subjective-p2p-billing=true" };
          app->initialize<chain_plugin, producer_plugin>( argv.size(), (char**) &argv[0] );
          app->startup();
+         // app was constructed on the outer thread; capture this thread as main_thread_id_
+         // before releasing the promise so producer_plugin's main-thread asserts see the loop thread.
+         app->executor().set_main_thread_id();
          plugin_promise.set_value(
             {app->find_plugin<producer_plugin>(), app->find_plugin<chain_plugin>()} );
          app->exec();
