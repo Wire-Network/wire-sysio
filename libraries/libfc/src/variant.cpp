@@ -10,6 +10,7 @@
 #include <fc/io/json.hpp>
 #include <fc/utf8.hpp>
 #include <algorithm>
+#include <cassert>
 #include <fc/int256.hpp>
 
 namespace fc
@@ -246,6 +247,31 @@ typedef const variants* const_variants_ptr;
 typedef const blob*   const_blob_ptr;
 typedef const std::string* const_string_ptr;
 
+// Direct-aliasing detector for variant::operator=(const variant&).  Aliased self-assignment (rhs refers to storage
+// owned by lhs) is undefined behaviour: operator= writes through lhs while still reading from rhs, which the write
+// would invalidate.  Returns false when rhs aliases lhs's heap object directly:
+//   v = v.get_array()[i]    (rhs is an element of lhs's vector)
+//   v = v.get_object()["k"]  (rhs is a value of one of lhs's entries)
+// Deeper nesting (rhs reachable through an inner array/object owned by lhs) remains UB but may slip past undetected.
+// Only ever called from assert(), so it (and the operator= call site) compile out under NDEBUG.
+inline bool rhs_not_aliased( const variant* lhs, const variant& v )
+{
+   const auto t = lhs->get_type();
+   if( t == variant::array_type ) {
+      const variants& dst_vec = **reinterpret_cast<const variants* const*>(lhs);
+      const variant* begin = dst_vec.data();
+      const variant* end   = begin + dst_vec.size();
+      return &v < begin || &v >= end;
+   }
+   if( t == variant::object_type ) {
+      const variant_object& dst_vo = **reinterpret_cast<const variant_object* const*>(lhs);
+      for( const auto& entry : dst_vo ) {
+         if( &entry.value() == &v ) return false;
+      }
+   }
+   return true;
+}
+
 void variant::clear()
 {
    switch( get_type() )
@@ -340,12 +366,18 @@ variant& variant::operator=( const variant& v )
    if( this == &v )
       return *this;
 
+   // Aliased self-assignment is undefined behaviour: rhs may not refer to storage owned by lhs.  Both the same-type
+   // fast path and the different-type clear()+new path read from rhs while writing through lhs, and the write
+   // invalidates rhs mid-operation.  The previous fc::variant had the same UB contract via the clear()-then-new
+   // pattern; this preserves it.  Debug builds catch the common direct-aliasing cases via the assertion below.
+   assert( rhs_not_aliased( this, v )
+           && "fc::variant operator=(const&): rhs aliases storage owned by lhs (UB)" );
+
    const auto src_type = v.get_type();
 
-   // Same-type reassignment: reuse the existing heap object instead of
-   // delete-then-new.  For string/object/array/blob (and the std::string-
-   // backed multi-precision integer encodings) this skips an alloc+free
-   // pair.  Inline encodings fall through to the bytes-copy default arm.
+   // Same-type fast path: reuse the existing heap object instead of delete-then-new.  For string/object/array/blob
+   // (and the std::string-backed multi-precision integer encodings) this skips an alloc+free pair.  Inline encodings
+   // fall through to the bytes-copy default arm.
    if( get_type() == src_type ) {
       switch( src_type ) {
          case object_type:
@@ -375,12 +407,37 @@ variant& variant::operator=( const variant& v )
       }
    }
 
-   // Different type: deep-copy v into a temporary before clearing this, in
-   // case v aliases storage owned by this (e.g. v = v.get_object()["k"]).
-   variant tmp(v);
+   // Different type: replace the heap object.  Mirrors the variant copy ctor's per-type allocation and matches the
+   // previous clear()-then-new semantics.
    clear();
-   _data = tmp._data;
-   set_variant_type( &tmp, null_type );
+   switch( src_type ) {
+      case object_type:
+         *reinterpret_cast<variant_object**>(this) =
+            new variant_object( **reinterpret_cast<const const_variant_object_ptr*>(&v) );
+         break;
+      case array_type:
+         *reinterpret_cast<variants**>(this) =
+            new variants( **reinterpret_cast<const const_variants_ptr*>(&v) );
+         break;
+      case string_type:
+      case int128_type:
+      case uint128_type:
+      case int256_type:
+      case uint256_type:
+         // All five share new std::string(...) storage (see ctors above).
+         *reinterpret_cast<std::string**>(this) =
+            new std::string( **reinterpret_cast<const const_string_ptr*>(&v) );
+         break;
+      case blob_type:
+         *reinterpret_cast<blob**>(this) =
+            new blob( **reinterpret_cast<const const_blob_ptr*>(&v) );
+         break;
+      case string_sso_type:
+      default:
+         // Inline (null/int/uint/double/bool/string_sso): bytes-copy.
+         _data = v._data;
+   }
+   set_variant_type( this, src_type );
    return *this;
 }
 
