@@ -1,6 +1,7 @@
 #pragma once
 
 #include <sysio/chain/types.hpp>
+#include <sysio/chain/exceptions.hpp>
 #include <sysio/chain/finalizer_authority.hpp>
 #include <fc/container/ordered_diff.hpp>
 
@@ -38,6 +39,25 @@ namespace sysio::chain {
          auto copy = finalizers;
          result.finalizers = finalizers_differ::apply_diff(std::move(copy), std::forward<X>(diff).finalizers_diff);
          return result;
+      }
+
+      // Validate threshold > 0 and threshold <= sum(weights). Throws snapshot_exception on violation.
+      void validate_snapshot() const {
+         SYS_ASSERT(threshold > 0, snapshot_exception,
+                    "finalizer_policy generation {}: threshold must be positive", generation);
+         SYS_ASSERT(!finalizers.empty(), snapshot_exception,
+                    "finalizer_policy generation {}: finalizers must not be empty", generation);
+         uint64_t sum = 0;
+         for (const auto& f : finalizers) {
+            SYS_ASSERT(f.weight > 0, snapshot_exception,
+                       "finalizer_policy generation {}: finalizer weight must be positive", generation);
+            SYS_ASSERT(sum <= std::numeric_limits<uint64_t>::max() - f.weight, snapshot_exception,
+                       "finalizer_policy generation {}: sum of weights overflows uint64_t", generation);
+            sum += f.weight;
+         }
+         SYS_ASSERT(threshold <= sum, snapshot_exception,
+                    "finalizer_policy generation {}: sum of weights ({}) didn't meet the required threshold ({})",
+                    generation, sum, threshold);
       }
 
       // max accumulated weak weight before becoming weak_final

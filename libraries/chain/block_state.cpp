@@ -191,6 +191,32 @@ block_state::block_state(snapshot_detail::snapshot_block_state_v1&& sbs)
    , valid(std::move(sbs.valid))
 {
    header_exts = header.validate_and_extract_header_extensions();
+
+   // Snapshot hardening: validate finality_core invariants
+   core.validate_snapshot();
+
+   // Snapshot hardening: validate finalizer policies
+   SYS_ASSERT(active_finalizer_policy, snapshot_exception, "active_finalizer_policy must not be null");
+   SYS_ASSERT(active_proposer_policy, snapshot_exception, "active_proposer_policy must not be null");
+   active_finalizer_policy->validate_snapshot();
+   if (pending_finalizer_policy) {
+      pending_finalizer_policy->second->validate_snapshot();
+   }
+   for (const auto& [_, pol] : proposed_finalizer_policies) {
+      pol->validate_snapshot();
+   }
+   if (latest_qc_claim_block_active_finalizer_policy) {
+      latest_qc_claim_block_active_finalizer_policy->validate_snapshot();
+   }
+
+   // Snapshot hardening: validate valid_t
+   if (valid) {
+      valid->validation_tree.validate_snapshot();
+      auto expected_size = core.current_block_num() - core.last_final_block_num() + 1;
+      SYS_ASSERT(valid->validation_mroots.size() == expected_size, snapshot_exception,
+                 "valid_t.validation_mroots size ({}) != expected ({})",
+                 valid->validation_mroots.size(), expected_size);
+   }
 }
 
 deque<transaction_metadata_ptr> block_state::extract_trxs_metas() {

@@ -95,6 +95,7 @@ namespace sysio { namespace chain {
       struct billable_size<permission_object> { // Also counts memory usage of the associated permission_usage_object
          static const uint64_t  overhead = 5 * overhead_per_row_per_index_ram_bytes; ///< 5 indices 2x internal ID, parent, owner, name
          static const uint64_t  value = (config::billable_size_v<shared_authority> + 64) + overhead;  ///< fixed field size + overhead
+         static_assert(sizeof(permission_object) <= value, "billable_size<permission_object> must be >= sizeof(permission_object)");
       };
    }
 } } // sysio::chain

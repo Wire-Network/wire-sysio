@@ -34,14 +34,14 @@ namespace sysiosystem {
       return get_finalizer_key_hash(fin_key_g1);
    }
 
-   // Validates finalizer and returns the iterator to finalizers table
-   finalizers_table::const_iterator system_contract::get_finalizer_itr( const name& finalizer_name ) const {
-      // Check finalizer has registered keys
-      auto finalizer_itr = _finalizers.find(finalizer_name.value);
-      check( finalizer_itr != _finalizers.end(), "finalizer " + finalizer_name.to_string() + " has not registered any finalizer keys" );
-      check( finalizer_itr->finalizer_key_count > 0, "finalizer " + finalizer_name.to_string() + "  must have at least one registered finalizer keys, has " + std::to_string(finalizer_itr->finalizer_key_count) );
+   // Validates finalizer and returns the finalizer info
+   finalizer_info system_contract::get_finalizer( const name& finalizer_name ) const {
+      auto key = finalizer_key_t{finalizer_name.value};
+      check( _finalizers.contains(key), "finalizer " + finalizer_name.to_string() + " has not registered any finalizer keys" );
+      auto fi = _finalizers.get(key);
+      check( fi.finalizer_key_count > 0, "finalizer " + finalizer_name.to_string() + "  must have at least one registered finalizer keys, has " + std::to_string(fi.finalizer_key_count) );
 
-      return finalizer_itr;
+      return fi;
    }
 
    // If finalizers have changed since last round, establishes finalizer policy
@@ -78,16 +78,10 @@ namespace sysiosystem {
       sysio::set_finalizers(std::move(fin_policy)); // call host function
 
       // Store last proposed policy in both cache and DB table
-      auto itr = _last_prop_finalizers.begin();
-      if( itr == _last_prop_finalizers.end() ) {
-         _last_prop_finalizers.emplace( get_self(), [&]( auto& f ) {
-            f.last_proposed_finalizers = proposed_finalizers;
-         });
-      } else {
-         _last_prop_finalizers.modify(itr, same_payer, [&]( auto& f ) {
-            f.last_proposed_finalizers = proposed_finalizers;
-         });
-      }
+      _last_prop_finalizers.set(
+         last_prop_finalizers_info{ .last_proposed_finalizers = proposed_finalizers },
+         same_payer
+      );
       // Ensure not invalidate anyone holding the references to the vector
       // that was returned earlier by get_last_proposed_finalizer
       if (_last_prop_finalizers_cached.has_value()) {
@@ -100,11 +94,10 @@ namespace sysiosystem {
    // Returns last proposed finalizers
    const std::vector<finalizer_auth_info>& system_contract::get_last_proposed_finalizers() {
       if( !_last_prop_finalizers_cached.has_value() ) {
-         const auto finalizers_itr = _last_prop_finalizers.begin();
-         if( finalizers_itr == _last_prop_finalizers.end() ) {
+         if( !_last_prop_finalizers.exists() ) {
             _last_prop_finalizers_cached = {};
          } else {
-            _last_prop_finalizers_cached = finalizers_itr->last_proposed_finalizers;
+            _last_prop_finalizers_cached = _last_prop_finalizers.get().last_proposed_finalizers;
          }
       }
 
@@ -115,17 +108,12 @@ namespace sysiosystem {
    // It may never be reused.
    uint64_t system_contract::get_next_finalizer_key_id() {
       uint64_t next_id = 0;
-      auto itr = _fin_key_id_generator.begin();
 
-      if( itr == _fin_key_id_generator.end() ) {
-         _fin_key_id_generator.emplace( get_self(), [&]( auto& f ) {
-            f.next_finalizer_key_id = next_id;
-         });
+      if( !_fin_key_id_generator.exists() ) {
+         _fin_key_id_generator.set( fin_key_id_generator_info{ .next_finalizer_key_id = next_id }, get_self() );
       } else {
-         next_id = itr->next_finalizer_key_id  + 1;
-         _fin_key_id_generator.modify(itr, same_payer, [&]( auto& f ) {
-            f.next_finalizer_key_id = next_id;
-         });
+         next_id = _fin_key_id_generator.get().next_finalizer_key_id + 1;
+         _fin_key_id_generator.set( fin_key_id_generator_info{ .next_finalizer_key_id = next_id }, same_payer );
       }
 
       return next_id;
@@ -142,8 +130,8 @@ namespace sysiosystem {
    void system_contract::regfinkey( const name& finalizer_name, const std::string& finalizer_key, const std::string& proof_of_possession) {
       require_auth( finalizer_name );
 
-      auto producer = _producers.find( finalizer_name.value );
-      check( producer != _producers.end(), "finalizer " + finalizer_name.to_string() + " is not a registered producer");
+      auto prod_key = producer_key_t{finalizer_name.value};
+      check( _producers.contains(prod_key), "finalizer " + finalizer_name.to_string() + " is not a registered producer");
 
       // Basic signature format check
       check(proof_of_possession.compare(0, 7, "SIG_BLS") == 0, "proof of possession signature does not start with SIG_BLS: " + proof_of_possession);
@@ -160,28 +148,30 @@ namespace sysiosystem {
       // Proof of possession check
       check(sysio::bls_pop_verify(fin_key_g1, pop_g2), "proof of possession check failed");
 
-      // Insert the finalizer key into finalyzer_keys table
-      const auto finalizer_key_itr = _finalizer_keys.emplace( finalizer_name, [&]( auto& k ) {
-         k.id                   = get_next_finalizer_key_id();
-         k.finalizer_name       = finalizer_name;
-         k.finalizer_key        = finalizer_key;
-         k.finalizer_key_binary = { fin_key_g1.begin(), fin_key_g1.end() };
+      // Insert the finalizer key into finalizer_keys table
+      auto new_key_id = get_next_finalizer_key_id();
+      std::vector<char> key_binary{ fin_key_g1.begin(), fin_key_g1.end() };
+      _finalizer_keys.emplace( finalizer_name, finkey_key_t{new_key_id}, finalizer_key_info{
+         .id                   = new_key_id,
+         .finalizer_name       = finalizer_name,
+         .finalizer_key        = finalizer_key,
+         .finalizer_key_binary = key_binary,
       });
 
       // Update finalizers table
-      auto finalizer = _finalizers.find(finalizer_name.value);
-      if( finalizer == _finalizers.end() ) {
+      auto fin_key = finalizer_key_t{finalizer_name.value};
+      if( !_finalizers.contains(fin_key) ) {
          // This is the first time the finalizer registering a finalizer key,
          // mark the key active
-         _finalizers.emplace( finalizer_name, [&]( auto& f ) {
-            f.finalizer_name       = finalizer_name;
-            f.active_key_id        = finalizer_key_itr->id;
-            f.active_key_binary    = finalizer_key_itr->finalizer_key_binary;
-            f.finalizer_key_count  = 1;
+         _finalizers.emplace( finalizer_name, fin_key, finalizer_info{
+            .finalizer_name       = finalizer_name,
+            .active_key_id        = new_key_id,
+            .active_key_binary    = key_binary,
+            .finalizer_key_count  = 1,
          });
       } else {
          // Update finalizer_key_count
-         _finalizers.modify( finalizer, same_payer, [&]( auto& f ) {
+         _finalizers.modify( same_payer, fin_key, [&]( auto& f ) {
             ++f.finalizer_key_count;
          });
       }
@@ -196,26 +186,29 @@ namespace sysiosystem {
    void system_contract::actfinkey( const name& finalizer_name, const std::string& finalizer_key ) {
       require_auth( finalizer_name );
 
-      const auto finalizer = get_finalizer_itr(finalizer_name);
+      const auto finalizer = get_finalizer(finalizer_name);
 
       // Check the key is registered
       const auto idx = _finalizer_keys.get_index<"byfinkey"_n>();
       const auto hash = get_finalizer_key_hash(finalizer_key);
-      const auto finalizer_key_itr = idx.find(hash);
-      check(finalizer_key_itr != idx.end(), "finalizer key was not registered: " + finalizer_key);
+      const auto fk_itr = idx.find(hash);
+      check(fk_itr != idx.end(), "finalizer key was not registered: " + finalizer_key);
 
       // Check the key belongs to finalizer
-      check(finalizer_key_itr->finalizer_name == name(finalizer_name), "finalizer key was not registered by the finalizer: " + finalizer_key);
+      check(fk_itr->finalizer_name == name(finalizer_name), "finalizer key was not registered by the finalizer: " + finalizer_key);
 
       // Check if the finalizer key is not already active
-      check( !finalizer_key_itr->is_active(finalizer->active_key_id), "finalizer key was already active: " + finalizer_key );
+      check( !fk_itr->is_active(finalizer.active_key_id), "finalizer key was already active: " + finalizer_key );
 
-      const auto active_key_id = finalizer->active_key_id;
+      const auto active_key_id = finalizer.active_key_id;
+      const auto new_key_id = fk_itr->id;
+      const auto new_key_binary = fk_itr->finalizer_key_binary;
 
       // Mark the finalizer key as active by updating finalizer's information in finalizers table
-      _finalizers.modify( finalizer, same_payer, [&]( auto& f ) {
-         f.active_key_id      = finalizer_key_itr->id;
-         f.active_key_binary  = finalizer_key_itr->finalizer_key_binary;
+      auto fin_key = finalizer_key_t{finalizer_name.value};
+      _finalizers.modify( same_payer, fin_key, [&]( auto& f ) {
+         f.active_key_id      = new_key_id;
+         f.active_key_binary  = new_key_binary;
       });
 
       const auto& last_proposed_finalizers = get_last_proposed_finalizers();
@@ -236,8 +229,8 @@ namespace sysiosystem {
          auto proposed_finalizers = last_proposed_finalizers;
          auto& matching_entry = proposed_finalizers[itr - last_proposed_finalizers.begin()];
 
-         matching_entry.key_id = finalizer_key_itr->id;
-         matching_entry.fin_authority.public_key = finalizer_key_itr->finalizer_key_binary;
+         matching_entry.key_id = new_key_id;
+         matching_entry.fin_authority.public_key = new_key_binary;
 
          set_proposed_finalizers(std::move(proposed_finalizers));
       }
@@ -253,7 +246,7 @@ namespace sysiosystem {
    void system_contract::delfinkey( const name& finalizer_name, const std::string& finalizer_key ) {
       require_auth( finalizer_name );
 
-      auto finalizer = get_finalizer_itr(finalizer_name);
+      auto finalizer = get_finalizer(finalizer_name);
 
       // Check the key is registered
       auto idx = _finalizer_keys.get_index<"byfinkey"_n>();
@@ -263,23 +256,24 @@ namespace sysiosystem {
 
       // Check the key belongs to the finalizer
       check(fin_key_itr->finalizer_name == name(finalizer_name), "finalizer key " + finalizer_key + " was not registered by the finalizer " + finalizer_name.to_string() );
-      
-      if( fin_key_itr->is_active(finalizer->active_key_id) ) {
-         check( finalizer->finalizer_key_count == 1, "cannot delete an active key unless it is the last registered finalizer key, has " + std::to_string(finalizer->finalizer_key_count) + " keys");
+
+      if( fin_key_itr->is_active(finalizer.active_key_id) ) {
+         check( finalizer.finalizer_key_count == 1, "cannot delete an active key unless it is the last registered finalizer key, has " + std::to_string(finalizer.finalizer_key_count) + " keys");
       }
 
       // Update finalizers table
-      if( finalizer->finalizer_key_count == 1 ) {
+      auto fin_key = finalizer_key_t{finalizer_name.value};
+      if( finalizer.finalizer_key_count == 1 ) {
          // The finalizer does not have any registered keys. Remove it from finalizers table.
-         _finalizers.erase( finalizer );
+         _finalizers.erase( fin_key );
       } else {
          // Decrement finalizer_key_count finalizers table
-         _finalizers.modify( finalizer, same_payer, [&]( auto& f ) {
+         _finalizers.modify( same_payer, fin_key, [&]( auto& f ) {
             --f.finalizer_key_count;
          });
       }
 
       // Remove the key from finalizer_keys table
-      idx.erase( fin_key_itr );
+      idx.erase( std::move(fin_key_itr) );
    }
 } /// namespace sysiosystem

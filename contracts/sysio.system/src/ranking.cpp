@@ -1,11 +1,9 @@
 #include <sysio/crypto.hpp>
 #include <sysio/datastream.hpp>
 #include <sysio/sysio.hpp>
-#include <sysio/multi_index.hpp>
 #include <sysio/permission.hpp>
 #include <sysio/privileged.hpp>
 #include <sysio/serialize.hpp>
-#include <sysio/singleton.hpp>
 
 #include <sysio.system/sysio.system.hpp>
 #include <sysio.token/sysio.token.hpp>
@@ -20,12 +18,9 @@ namespace sysiosystem {
 
    using sysio::const_mem_fun;
    using sysio::current_time_point;
-   using sysio::indexed_by;
    using sysio::microseconds;
-   using sysio::singleton;
 
    void system_contract::register_producer( const name& producer, const sysio::block_signing_authority& producer_authority, const std::string& url, uint16_t location ) {
-      auto prod = _producers.find( producer.value );
       const auto ct = current_time_point();
 
       sysio::public_key producer_key{};
@@ -40,8 +35,18 @@ namespace sysiosystem {
          }
       }, producer_authority );
 
-      if ( prod != _producers.end() ) {
-         _producers.modify( prod, get_self(), [&]( producer_info& info ){
+      auto key = producer_key_t{producer.value};
+      _producers.upsert( get_self(), key,
+         producer_info{
+            .owner              = producer,
+            .producer_key       = producer_key,
+            .is_active          = true,
+            .url                = url,
+            .last_claim_time    = ct,
+            .location           = location,
+            .producer_authority = producer_authority,
+         },
+         [&]( producer_info& info ){
             info.producer_key       = producer_key;
             info.is_active          = true;
             info.url                = url;
@@ -50,18 +55,6 @@ namespace sysiosystem {
             if ( info.last_claim_time == time_point() )
                info.last_claim_time = ct;
          });
-      } else {
-         _producers.emplace( get_self(), [&]( producer_info& info ){
-            info.owner              = producer;
-            info.producer_key       = producer_key;
-            info.is_active          = true;
-            info.url                = url;
-            info.location           = location;
-            info.last_claim_time    = ct;
-            info.producer_authority = producer_authority;
-         });
-      }
-
    }
 
    void system_contract::regproducer( const name& producer, const sysio::public_key& producer_key, const std::string& url, uint16_t location ) {
@@ -85,8 +78,9 @@ namespace sysiosystem {
    void system_contract::unregprod( const name& producer ) {
       require_auth( producer );
 
-      const auto& prod = _producers.get( producer.value, "producer not found" );
-      _producers.modify( prod, get_self(), [&]( producer_info& info ){
+      auto key = producer_key_t{producer.value};
+      _producers.get( key, "producer not found" );
+      _producers.modify( get_self(), key, [&]( producer_info& info ){
          info.deactivate();
       });
    }
@@ -107,12 +101,16 @@ namespace sysiosystem {
          if( !it->active() ) continue;
 
          // Require active finalizer key for all scheduled producers
-         auto finalizer = _finalizers.find( it->owner.value );
-         if( finalizer == _finalizers.end() || finalizer->active_key_binary.empty() ) {
+         auto fin_key = finalizer_key_t{it->owner.value};
+         if( !_finalizers.contains(fin_key) ) {
+            continue;
+         }
+         auto finalizer = _finalizers.get(fin_key);
+         if( finalizer.active_key_binary.empty() ) {
             continue;
          }
 
-         proposed_finalizers.emplace_back(*finalizer);
+         proposed_finalizers.emplace_back(finalizer);
          top_producers.emplace_back(
             sysio::producer_authority{
                .producer_name = it->owner,

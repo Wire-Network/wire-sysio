@@ -1,0 +1,6 @@
+if( BUILD_TEST_CONTRACTS )
+   add_contract( test_kv_sec_query test_kv_sec_query test_kv_sec_query.cpp )
+else()
+   configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/test_kv_sec_query.wasm ${CMAKE_CURRENT_BINARY_DIR}/test_kv_sec_query.wasm COPYONLY )
+   configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/test_kv_sec_query.abi ${CMAKE_CURRENT_BINARY_DIR}/test_kv_sec_query.abi COPYONLY )
+endif()

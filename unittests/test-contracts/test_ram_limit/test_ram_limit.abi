@@ -87,11 +87,20 @@
     ],
     "tables": [
         {
+            "name": "test",
+            "type": "test",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": [],
+            "table_id": 8080
+        },
+        {
             "name": "test.table",
             "type": "test",
             "index_type": "i64",
-            "key_names": ["table_name","scope","primary_key"],
-            "key_types": ["name","name","uint64"]
+            "key_names": ["scope","primary_key"],
+            "key_types": ["name","uint64"],
+            "table_id": 11493
         }
     ],
     "ricardian_clauses": [],

@@ -18,6 +18,16 @@ struct contracts {
    static std::vector<char>    bios_abi() { return read_abi("${CMAKE_BINARY_DIR}/contracts/sysio.bios/sysio.bios.abi"); }
    static std::vector<uint8_t> authex_wasm() { return read_wasm("${CMAKE_BINARY_DIR}/contracts/sysio.authex/sysio.authex.wasm"); }
    static std::vector<char>    authex_abi() { return read_abi("${CMAKE_BINARY_DIR}/contracts/sysio.authex/sysio.authex.abi"); }
+   static std::vector<uint8_t> epoch_wasm() { return read_wasm("${CMAKE_BINARY_DIR}/contracts/sysio.epoch/sysio.epoch.wasm"); }
+   static std::vector<char>    epoch_abi() { return read_abi("${CMAKE_BINARY_DIR}/contracts/sysio.epoch/sysio.epoch.abi"); }
+   static std::vector<uint8_t> opreg_wasm() { return read_wasm("${CMAKE_BINARY_DIR}/contracts/sysio.opreg/sysio.opreg.wasm"); }
+   static std::vector<char>    opreg_abi() { return read_abi("${CMAKE_BINARY_DIR}/contracts/sysio.opreg/sysio.opreg.abi"); }
+   static std::vector<uint8_t> msgch_wasm() { return read_wasm("${CMAKE_BINARY_DIR}/contracts/sysio.msgch/sysio.msgch.wasm"); }
+   static std::vector<char>    msgch_abi() { return read_abi("${CMAKE_BINARY_DIR}/contracts/sysio.msgch/sysio.msgch.abi"); }
+   static std::vector<uint8_t> uwrit_wasm() { return read_wasm("${CMAKE_BINARY_DIR}/contracts/sysio.uwrit/sysio.uwrit.wasm"); }
+   static std::vector<char>    uwrit_abi() { return read_abi("${CMAKE_BINARY_DIR}/contracts/sysio.uwrit/sysio.uwrit.abi"); }
+   static std::vector<uint8_t> chalg_wasm() { return read_wasm("${CMAKE_BINARY_DIR}/contracts/sysio.chalg/sysio.chalg.wasm"); }
+   static std::vector<char>    chalg_abi() { return read_abi("${CMAKE_BINARY_DIR}/contracts/sysio.chalg/sysio.chalg.abi"); }
 
    struct util {
       static std::vector<uint8_t> reject_all_wasm() { return read_wasm("${CMAKE_SOURCE_DIR}/contracts/test_contracts/reject_all.wasm"); }

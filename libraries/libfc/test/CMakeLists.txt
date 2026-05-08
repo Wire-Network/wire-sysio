@@ -9,6 +9,7 @@ add_executable( test_fc
         crypto/test_webauthn.cpp
         io/test_cfile.cpp
         io/test_json.cpp
+        log/test_json_formatter.cpp
         io/test_json_variant.cpp
         io/test_random_access_file.cpp
         io/test_raw.cpp
@@ -26,6 +27,8 @@ add_executable( test_fc
         test_bls.cpp
         test_bitset.cpp
         test_ordered_diff.cpp
+        parallel/test_worker_task_queue.cpp
+        task/test_retry.cpp
         main.cpp
         )
 target_link_libraries( test_fc fc fc-test )

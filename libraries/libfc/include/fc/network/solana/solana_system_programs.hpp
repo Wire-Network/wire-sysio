@@ -16,49 +16,49 @@ namespace fc::network::solana::system {
 namespace program_ids {
 
 // System Program - native program for account creation and SOL transfers
-inline const solana_public_key SYSTEM_PROGRAM = solana_public_key::from_base58("11111111111111111111111111111111");
+inline const solana_public_key SYSTEM_PROGRAM = solana_public_key::from_base58_string("11111111111111111111111111111111");
 
 // SPL Token Program - standard token implementation
-inline const solana_public_key TOKEN_PROGRAM = solana_public_key::from_base58("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA");
+inline const solana_public_key TOKEN_PROGRAM = solana_public_key::from_base58_string("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA");
 
 // SPL Token 2022 Program - extended token implementation
-inline const solana_public_key TOKEN_2022_PROGRAM = solana_public_key::from_base58("TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb");
+inline const solana_public_key TOKEN_2022_PROGRAM = solana_public_key::from_base58_string("TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb");
 
 // Associated Token Account Program
-inline const solana_public_key ASSOCIATED_TOKEN_PROGRAM = solana_public_key::from_base58("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL");
+inline const solana_public_key ASSOCIATED_TOKEN_PROGRAM = solana_public_key::from_base58_string("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL");
 
 // Memo Program
-inline const solana_public_key MEMO_PROGRAM = solana_public_key::from_base58("MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr");
+inline const solana_public_key MEMO_PROGRAM = solana_public_key::from_base58_string("MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr");
 
 // Memo Program (old version)
-inline const solana_public_key MEMO_PROGRAM_V1 = solana_public_key::from_base58("Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo");
+inline const solana_public_key MEMO_PROGRAM_V1 = solana_public_key::from_base58_string("Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo");
 
 // Compute Budget Program
-inline const solana_public_key COMPUTE_BUDGET_PROGRAM = solana_public_key::from_base58("ComputeBudget111111111111111111111111111111");
+inline const solana_public_key COMPUTE_BUDGET_PROGRAM = solana_public_key::from_base58_string("ComputeBudget111111111111111111111111111111");
 
 // BPF Loader
-inline const solana_public_key BPF_LOADER = solana_public_key::from_base58("BPFLoader2111111111111111111111111111111111");
+inline const solana_public_key BPF_LOADER = solana_public_key::from_base58_string("BPFLoader2111111111111111111111111111111111");
 
 // BPF Upgradeable Loader
-inline const solana_public_key BPF_UPGRADEABLE_LOADER = solana_public_key::from_base58("BPFLoaderUpgradeab1e11111111111111111111111");
+inline const solana_public_key BPF_UPGRADEABLE_LOADER = solana_public_key::from_base58_string("BPFLoaderUpgradeab1e11111111111111111111111");
 
 // Stake Program
-inline const solana_public_key STAKE_PROGRAM = solana_public_key::from_base58("Stake11111111111111111111111111111111111111");
+inline const solana_public_key STAKE_PROGRAM = solana_public_key::from_base58_string("Stake11111111111111111111111111111111111111");
 
 // Vote Program
-inline const solana_public_key VOTE_PROGRAM = solana_public_key::from_base58("Vote111111111111111111111111111111111111111");
+inline const solana_public_key VOTE_PROGRAM = solana_public_key::from_base58_string("Vote111111111111111111111111111111111111111");
 
 // Config Program
-inline const solana_public_key CONFIG_PROGRAM = solana_public_key::from_base58("Config1111111111111111111111111111111111111");
+inline const solana_public_key CONFIG_PROGRAM = solana_public_key::from_base58_string("Config1111111111111111111111111111111111111");
 
 // Address Lookup Table Program
-inline const solana_public_key ADDRESS_LOOKUP_TABLE_PROGRAM = solana_public_key::from_base58("AddressLookupTab1e1111111111111111111111111");
+inline const solana_public_key ADDRESS_LOOKUP_TABLE_PROGRAM = solana_public_key::from_base58_string("AddressLookupTab1e1111111111111111111111111");
 
 // Ed25519 Signature Verification Program
-inline const solana_public_key ED25519_PROGRAM = solana_public_key::from_base58("Ed25519SigVerify111111111111111111111111111");
+inline const solana_public_key ED25519_PROGRAM = solana_public_key::from_base58_string("Ed25519SigVerify111111111111111111111111111");
 
 // Secp256k1 Signature Recovery Program
-inline const solana_public_key SECP256K1_PROGRAM = solana_public_key::from_base58("KeccakSecp256k11111111111111111111111111111");
+inline const solana_public_key SECP256K1_PROGRAM = solana_public_key::from_base58_string("KeccakSecp256k11111111111111111111111111111");
 
 }  // namespace program_ids
 
@@ -69,34 +69,34 @@ inline const solana_public_key SECP256K1_PROGRAM = solana_public_key::from_base5
 namespace sysvars {
 
 // Clock sysvar - current slot, epoch, and unix timestamp
-inline const solana_public_key CLOCK = solana_public_key::from_base58("SysvarC1ock11111111111111111111111111111111");
+inline const solana_public_key CLOCK = solana_public_key::from_base58_string("SysvarC1ock11111111111111111111111111111111");
 
 // Rent sysvar - rent parameters
-inline const solana_public_key RENT = solana_public_key::from_base58("SysvarRent111111111111111111111111111111111");
+inline const solana_public_key RENT = solana_public_key::from_base58_string("SysvarRent111111111111111111111111111111111");
 
 // Epoch Schedule sysvar
-inline const solana_public_key EPOCH_SCHEDULE = solana_public_key::from_base58("SysvarEpochScheworker1111111111111111111111");
+inline const solana_public_key EPOCH_SCHEDULE = solana_public_key::from_base58_string("SysvarEpochScheworker1111111111111111111111");
 
 // Instructions sysvar - access to serialized instructions
-inline const solana_public_key INSTRUCTIONS = solana_public_key::from_base58("Sysvar1nstructions1111111111111111111111111");
+inline const solana_public_key INSTRUCTIONS = solana_public_key::from_base58_string("Sysvar1nstructions1111111111111111111111111");
 
 // Recent Blockhashes sysvar (deprecated)
-inline const solana_public_key RECENT_BLOCKHASHES = solana_public_key::from_base58("SysvarRecentB1ockHashes11111111111111111111");
+inline const solana_public_key RECENT_BLOCKHASHES = solana_public_key::from_base58_string("SysvarRecentB1ockHashes11111111111111111111");
 
 // Stake History sysvar
-inline const solana_public_key STAKE_HISTORY = solana_public_key::from_base58("SysvarStakeHistory1111111111111111111111111");
+inline const solana_public_key STAKE_HISTORY = solana_public_key::from_base58_string("SysvarStakeHistory1111111111111111111111111");
 
 // Slot Hashes sysvar
-inline const solana_public_key SLOT_HASHES = solana_public_key::from_base58("SysvarS1otHashes111111111111111111111111111");
+inline const solana_public_key SLOT_HASHES = solana_public_key::from_base58_string("SysvarS1otHashes111111111111111111111111111");
 
 // Slot History sysvar
-inline const solana_public_key SLOT_HISTORY = solana_public_key::from_base58("SysvarS1otHistory11111111111111111111111111");
+inline const solana_public_key SLOT_HISTORY = solana_public_key::from_base58_string("SysvarS1otHistory11111111111111111111111111");
 
 // Fees sysvar (deprecated)
-inline const solana_public_key FEES = solana_public_key::from_base58("SysvarFees111111111111111111111111111111111");
+inline const solana_public_key FEES = solana_public_key::from_base58_string("SysvarFees111111111111111111111111111111111");
 
 // Last Restart Slot sysvar
-inline const solana_public_key LAST_RESTART_SLOT = solana_public_key::from_base58("SysvarLastRestartS1ot1111111111111111111111");
+inline const solana_public_key LAST_RESTART_SLOT = solana_public_key::from_base58_string("SysvarLastRestartS1ot1111111111111111111111");
 
 }  // namespace sysvars
 

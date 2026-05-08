@@ -210,7 +210,7 @@ namespace sysio {
 
          template <typename Protocol>
          void create_listener(const std::string& address, api_category_set categories) {
-            const boost::posix_time::milliseconds accept_timeout(500);
+            const std::chrono::milliseconds accept_timeout(500);
             auto extra_listening_log_info = " for API categories: " + category_names(categories);
             using socket_type = typename Protocol::socket; 
             auto create_session = [this, categories, address](socket_type&& socket) {

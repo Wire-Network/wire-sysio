@@ -2,21 +2,46 @@
 
 #include <fc/log/logger.hpp>
 #include <fc/variant.hpp>
+#include <fc/variant_object.hpp>
 #include <filesystem>
 #include <mutex>
+#include <optional>
 #include <string>
 #include <unordered_map>
 #include <vector>
 
 namespace fc {
    class path;
+
+   /// Formatter selection for a sink. Applied via sink->set_formatter() after the sink is constructed.
+   ///   type == "pattern" -> args: format::pattern_config (or empty/absent for fc::log::DEFAULT_LOG_PATTERN)
+   ///   type == "json"    -> args: format::json_config (extra_fields map, may be empty/absent)
+   ///   type == "dmlog"   -> no args; dfuse deep-mind wire format, intended for dmlog_sink, not useful on other sinks
+   struct format_config {
+      std::string type = "pattern";
+      variant     args;
+   };
+
+   namespace format {
+      struct pattern_config {
+         std::string pattern; // empty -> fc::log::DEFAULT_LOG_PATTERN
+      };
+      struct json_config {
+         // extra_fields accepts a JSON object whose values are primitives
+         // (string/number/bool/null) coerced to string at load time. Nested
+         // objects or arrays throw fc::bad_cast_exception on configure_logging.
+         fc::variant_object extra_fields;
+      };
+   } // namespace format
+
    struct sink_config {
        explicit sink_config(const std::string& name = "", const std::string& type = "", variant args = variant())
           : name(name), type(type), args(fc::move(args)), enabled(true) {}
-       std::string name;
-       std::string type;
-       variant args;
-       bool enabled;
+       std::string                   name;
+       std::string                   type;
+       variant                       args;
+       std::optional<format_config>  format;
+       bool                          enabled;
    };
 
    namespace sink {
@@ -97,7 +122,10 @@ namespace fc {
 }
 
 #include <fc/reflect/reflect.hpp>
-FC_REFLECT( fc::sink_config, (name)(type)(args)(enabled) )
+FC_REFLECT( fc::sink_config, (name)(type)(args)(format)(enabled) )
+FC_REFLECT( fc::format_config, (type)(args) )
+FC_REFLECT( fc::format::pattern_config, (pattern) )
+FC_REFLECT( fc::format::json_config, (extra_fields) )
 FC_REFLECT( fc::sink::level_color, (level)(color) )
 FC_REFLECT_ENUM( fc::sink::output_t, (stderr)(stdout) )
 FC_REFLECT( fc::sink::console_sink_config, (color)(level_colors)(output_type) )
