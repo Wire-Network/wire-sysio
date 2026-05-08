@@ -1077,17 +1077,17 @@ public:
 
       auto is_transient = (trx_type == transaction_metadata::trx_type::read_only || trx_type == transaction_metadata::trx_type::dry_run);
       if (!is_transient) {
-         next = [this, trx, next{std::move(next)}](const next_function_variant<transaction_trace_ptr>& response) {
-            next(response);
-
+         next = [this, trx, next{std::move(next)}](next_function_variant<transaction_trace_ptr>&& response) {
+            // Publish before invoking next so the one-shot callback is the wrapper's last act; a throw from publish
+            // would otherwise re-enter next via the outer CATCH_AND_CALL after captures were already consumed.
             fc::exception_ptr except_ptr; // rejected
             if (std::holds_alternative<fc::exception_ptr>(response)) {
                except_ptr = std::get<fc::exception_ptr>(response);
             } else if (std::get<transaction_trace_ptr>(response)->except) {
                except_ptr = std::get<transaction_trace_ptr>(response)->except->dynamic_copy_exception();
             }
-
             _transaction_ack_channel.publish(priority::low, std::pair<fc::exception_ptr, packed_transaction_ptr>(except_ptr, trx));
+            next(std::move(response));
          };
       }
 
