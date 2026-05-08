@@ -83,7 +83,6 @@ namespace {
 
    chain::action_trace make_action_trace( uint64_t global_sequence, chain::action act, chain::name receiver ) {
       chain::action_trace result;
-      // don't think we need any information other than receiver and global sequence
       result.receipt.emplace(chain::action_receipt{
          receiver,
          digest_type::hash(act),
@@ -95,6 +94,11 @@ namespace {
       });
       result.receiver = receiver;
       result.act = std::move(act);
+      // chain::action_trace::cpu_usage_us / net_usage are populated for input actions;
+      // the block_extraction fixtures expect these to round-trip as fc::unsigned_int{0}
+      // on every action, so set them here rather than at every call site.
+      result.cpu_usage_us = fc::unsigned_int{0};
+      result.net_usage    = fc::unsigned_int{0};
       return result;
    }
 
