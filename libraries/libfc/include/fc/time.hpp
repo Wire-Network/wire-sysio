@@ -1,4 +1,5 @@
 #pragma once
+#include <chrono>
 #include <cstdint>
 #include <ctime>
 #include <string>
@@ -69,6 +70,26 @@ namespace fc {
 
         constexpr const microseconds& time_since_epoch()const { return elapsed; }
         constexpr uint32_t            sec_since_epoch()const  { return elapsed.count() / 1000000; }
+
+        /**
+         * Saturating conversion to std::chrono::system_clock::time_point.
+         *
+         * Direct construction silently overflows on platforms whose system_clock::duration is
+         * finer than microseconds (e.g. nanoseconds on libstdc++ Linux) for any value outside
+         * system_clock::time_point::{min,max}()'s representable range, wrapping into a bogus
+         * past/future deadline. Clamp the whole out-of-range region.
+         */
+        std::chrono::system_clock::time_point to_system_clock() const {
+           using sc_tp = std::chrono::system_clock::time_point;
+           // Largest/smallest microsecond counts that round-trip into sc_tp without overflow.
+           constexpr int64_t max_us = std::chrono::duration_cast<std::chrono::microseconds>(sc_tp::max().time_since_epoch()).count();
+           constexpr int64_t min_us = std::chrono::duration_cast<std::chrono::microseconds>(sc_tp::min().time_since_epoch()).count();
+           const int64_t us = elapsed.count();
+           if (us >= max_us) return sc_tp::max();
+           if (us <= min_us) return sc_tp::min();
+           return sc_tp{std::chrono::microseconds{us}};
+        }
+
         constexpr bool   operator > ( const time_point& t )const    { return elapsed._count > t.elapsed._count; }
         constexpr bool   operator >=( const time_point& t )const    { return elapsed._count >=t.elapsed._count; }
         constexpr bool   operator < ( const time_point& t )const    { return elapsed._count < t.elapsed._count; }

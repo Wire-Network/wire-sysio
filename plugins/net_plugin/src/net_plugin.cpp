@@ -477,8 +477,6 @@ namespace sysio {
       alignas(hardware_destructive_interference_sz)
       compat::channels::transaction_ack::channel_type::handle  incoming_transaction_ack_subscription;
 
-      boost::asio::deadline_timer           accept_error_timer{thread_pool.get_executor()};
-
       alignas(hardware_destructive_interference_sz)
       std::atomic<fc::time_point>           head_block_time;
 
@@ -4725,7 +4723,7 @@ namespace sysio {
       incoming_transaction_ack_subscription = app().get_channel<compat::channels::transaction_ack>().subscribe(
             [this](auto&& t) { transaction_ack(std::forward<decltype(t)>(t)); });
 
-      const boost::posix_time::milliseconds accept_timeout(100);
+      const std::chrono::milliseconds accept_timeout(100);
       std::string extra_listening_log_info = ", max clients is " + std::to_string(connections.get_max_client_count());
       for(auto listen_itr = listen_addresses.begin(), p2p_iter = p2p_addresses.begin();
           listen_itr != listen_addresses.end();

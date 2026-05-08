@@ -3,7 +3,7 @@
 #include <fc/log/logger.hpp>
 #include <fc/scoped_exit.hpp>
 
-#include <boost/asio/deadline_timer.hpp>
+#include <boost/asio/steady_timer.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/ip/v6_only.hpp>
 #include <boost/asio/local/stream_protocol.hpp>
@@ -74,8 +74,8 @@ requires (std::is_same_v<Protocol, boost::asio::ip::tcp> || std::is_same_v<Proto
 struct listener : listener_base<Protocol>, std::enable_shared_from_this<listener<Protocol, Executor, SocketExecutorFn, CreateSession>> {
  private:
    typename Protocol::acceptor      acceptor_;
-   boost::asio::deadline_timer      accept_error_timer_;
-   boost::posix_time::time_duration accept_timeout_;
+   boost::asio::steady_timer        accept_error_timer_;
+   std::chrono::milliseconds        accept_timeout_;
    logger&                          logger_;
    std::string                      extra_listening_log_info_;
    SocketExecutorFn                 socket_executor_fn_;
@@ -83,7 +83,7 @@ struct listener : listener_base<Protocol>, std::enable_shared_from_this<listener
 
  public:
    using endpoint_type = typename Protocol::endpoint;
-   listener(Executor& executor, logger& logger, boost::posix_time::time_duration accept_timeout,
+   listener(Executor& executor, logger& logger, std::chrono::milliseconds accept_timeout,
             const std::string& local_address, const endpoint_type& endpoint,
             const std::string& extra_listening_log_info,
             SocketExecutorFn socket_executor_fn, CreateSession create_session)
@@ -113,8 +113,8 @@ struct listener : listener_base<Protocol>, std::enable_shared_from_this<listener
       } else if (ec == boost::system::errc::too_many_files_open) {
          // retry accept() after timeout to avoid cpu loop on accept
          fc_elog(logger_, "open file limit reached: not accepting new connections for next {}ms",
-                 accept_timeout_.total_milliseconds());
-         accept_error_timer_.expires_from_now(accept_timeout_);
+                 accept_timeout_.count());
+         accept_error_timer_.expires_after(accept_timeout_);
          accept_error_timer_.async_wait([self = this->shared_from_this()](boost::system::error_code ec) {
             if (!ec)
                self->do_accept();
@@ -190,7 +190,7 @@ struct listener : listener_base<Protocol>, std::enable_shared_from_this<listener
 template <typename Protocol, typename Executor, typename SocketExecutorFn, typename CreateSession>
 requires (std::is_same_v<Protocol, boost::asio::ip::tcp> || std::is_same_v<Protocol, boost::asio::local::stream_protocol>) &&
           std::invocable<SocketExecutorFn&, typename Protocol::endpoint>
-void create_listener(Executor& executor, logger& logger, boost::posix_time::time_duration accept_timeout,
+void create_listener(Executor& executor, logger& logger, std::chrono::milliseconds accept_timeout,
                      const std::string& address, const std::string& extra_listening_log_info,
                      const SocketExecutorFn& socket_executor_fn,
                      const CreateSession& create_session) {
