@@ -301,7 +301,9 @@ for the cursor pattern.
       "trx_id": "abcd1234...",
       "block_num": 1000,
       "block_time": "2025-01-01T00:05:00.000Z",
-      "producer_block_id": "000003e8..."
+      "producer_block_id": "000003e8...",
+      "trx_cpu_usage_us": 200,
+      "trx_net_usage_words": 16
     }
   ]
 }
@@ -338,8 +340,8 @@ resume pagination from `block_num_end + 1`.
 | `data` | Raw action payload as hex. |
 | `return_value` | Raw return value as hex (empty string when none). |
 | `account_ram_deltas` | Array of `{account, delta}` objects capturing RAM allocation changes. |
-| `cpu_usage_us` | Producer-set CPU in microseconds (present only for input/top-level actions). |
-| `net_usage` | Producer-set NET usage in bytes (present only for input/top-level actions). |
+| `cpu_usage_us` | Producer-set CPU in microseconds for this action (present only for input/top-level actions). |
+| `net_usage` | Producer-set NET usage in bytes for this action (present only for input/top-level actions). |
 | `params` | ABI-decoded action payload (omitted when ABI unavailable or decode failed). |
 | `return_data` | ABI-decoded return value (omitted when ABI unavailable or no return type defined). |
 | `decode_error` | Error message; present only when ABI decoding failed and the response falls back to raw hex. |
@@ -347,6 +349,8 @@ resume pagination from `block_num_end + 1`.
 | `block_num` | Block number. |
 | `block_time` | Block timestamp (ISO-8601). |
 | `producer_block_id` | Block ID as reported by the producer (null for pending blocks). |
+| `trx_cpu_usage_us` | Parent transaction's total CPU in microseconds. |
+| `trx_net_usage_words` | Parent transaction's total NET usage in words (`ceil(net_usage / 8)`). |
 
 **Error responses:**
 
@@ -445,7 +449,8 @@ The response uses `"transfers"` as the array key instead of `"actions"`.
 `closest_unnotified_ancestor_action_ordinal`), per-receipt sequence
 numbers (`recv_sequence`, `auth_sequence`, `code_sequence`,
 `abi_sequence`), `account_ram_deltas`, and the resource usage fields
-(`cpu_usage_us`, `net_usage`). These are rarely useful for token-transfer
+(action-level `cpu_usage_us` / `net_usage` and trx-level
+`trx_cpu_usage_us` / `trx_net_usage_words`). These are rarely useful for token-transfer
 exchange/indexer workflows. If you need them, call `get_actions` with
 `receiver = account = <token_contract>, action = "transfer"` instead.
 

@@ -77,6 +77,10 @@ struct get_actions_fixture {
       return impl.get_actions(query);
    }
 
+   actions_result get_token_transfer_actions(const action_query& query) {
+      return impl.get_token_transfer_actions(query);
+   }
+
    // Default: no ABI decoding — params/return_data absent from result
    std::function<std::tuple<fc::variant, std::optional<fc::variant>>(const action_trace_v0&)>
    mock_data_handler = [](const action_trace_v0&) -> std::tuple<fc::variant, std::optional<fc::variant>> {
@@ -251,6 +255,67 @@ BOOST_FIXTURE_TEST_CASE(multi_block_scan, get_actions_fixture)
    BOOST_TEST(r.actions[0].get_object()["block_num"].as<uint32_t>() == 1u);
    BOOST_TEST(r.actions[1].get_object()["block_num"].as<uint32_t>() == 2u);
    BOOST_TEST(r.actions[2].get_object()["block_num"].as<uint32_t>() == 4u);
+}
+
+// Per-trx cpu / net totals are emitted on every action variant in the full
+// (get_actions) shape, alongside trx_id / block_num / block_time /
+// producer_block_id, so callers can attribute resource usage to the parent
+// transaction without a separate lookup.  Deliberately distinct from
+// action-level cpu_usage_us / net_usage which are per-action and in different
+// units (action net_usage is bytes; trx net_usage_words is ceil/8).
+BOOST_FIXTURE_TEST_CASE(emits_trx_resource_totals_in_full_shape, get_actions_fixture)
+{
+   transaction_trace_v0 trx = make_trx(TRX1, 1, {
+      make_action(1, "sysio.token"_n, "sysio.token"_n, "transfer"_n),
+      make_action(2, "bob"_n,         "sysio.token"_n, "transfer"_n)
+   });
+   trx.cpu_usage_us    = 1234;
+   trx.net_usage_words = fc::unsigned_int{56};
+   blocks[1] = make_block(1, { std::move(trx) });
+
+   action_query q;
+   q.block_num_start = 1;
+   q.block_num_end   = 1;
+
+   auto r = get_actions(q);
+
+   BOOST_REQUIRE_EQUAL(r.actions.size(), 2u);
+   for (const auto& a : r.actions) {
+      const auto& obj = a.get_object();
+      BOOST_TEST(obj["trx_cpu_usage_us"].as<uint32_t>()    == 1234u);
+      BOOST_TEST(obj["trx_net_usage_words"].as<uint32_t>() == 56u);
+   }
+}
+
+// Slim (get_token_transfers) omits all resource fields - both action-level
+// cpu_usage_us / net_usage and the trx-level totals.  Per-trx context
+// (trx_id, block_num, etc.) still appears so transfers can be located in the
+// chain.
+BOOST_FIXTURE_TEST_CASE(slim_shape_omits_trx_resource_totals, get_actions_fixture)
+{
+   transaction_trace_v0 trx = make_trx(TRX1, 1, {
+      make_action(1, "sysio.token"_n, "sysio.token"_n, "transfer"_n)
+   });
+   trx.cpu_usage_us    = 1234;
+   trx.net_usage_words = fc::unsigned_int{56};
+   blocks[1] = make_block(1, { std::move(trx) });
+
+   action_query q;
+   q.block_num_start = 1;
+   q.block_num_end   = 1;
+   q.receiver        = "sysio.token"_n;
+   q.account         = "sysio.token"_n;
+   q.action          = "transfer"_n;
+
+   auto r = get_token_transfer_actions(q);
+
+   BOOST_REQUIRE_EQUAL(r.actions.size(), 1u);
+   const auto& obj = r.actions[0].get_object();
+   BOOST_TEST(obj.contains("trx_id"));
+   BOOST_TEST(!obj.contains("trx_cpu_usage_us"));
+   BOOST_TEST(!obj.contains("trx_net_usage_words"));
+   BOOST_TEST(!obj.contains("cpu_usage_us"));
+   BOOST_TEST(!obj.contains("net_usage"));
 }
 
 // ABI-decoded params are included in the result when the data handler returns them
