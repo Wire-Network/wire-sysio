@@ -94,8 +94,46 @@ BOOST_AUTO_TEST_CASE(cross_type_assign_string_to_null) {
 
 // fc::variant operator=(const variant&) treats aliased rhs (rhs referring to storage owned by lhs, e.g.
 // v = v.get_array()[i] / v = v.get_object()["k"]) as undefined behaviour, matching the previous clear()-then-new
-// pattern.  Debug builds catch the common direct-aliasing cases via an assertion in variant.cpp; deeper nesting
-// remains UB.  No tests exercise aliased self-assign here -- a test cannot pin UB.
+// pattern.  Debug builds catch the common direct-aliasing cases via an assertion that calls
+// variant::_rhs_not_aliased.  The tests below exercise the detector directly -- the helper only reads pointer
+// addresses, so calling it on aliased inputs is well-defined; the UB lives in the operator= flow that follows
+// the assert when the helper is bypassed.
+
+BOOST_AUTO_TEST_CASE(rhs_not_aliased_array_element_is_aliased) {
+   variant a = variants{ variant(1), variant(2), variant(3) };
+   BOOST_CHECK( !variant::_rhs_not_aliased( &a, a.get_array()[0] ) );
+   BOOST_CHECK( !variant::_rhs_not_aliased( &a, a.get_array()[1] ) );
+   BOOST_CHECK( !variant::_rhs_not_aliased( &a, a.get_array()[2] ) );
+}
+
+BOOST_AUTO_TEST_CASE(rhs_not_aliased_object_value_is_aliased) {
+   variant a = variant_object{ mutable_variant_object("k", 42)("j", "hello") };
+   BOOST_CHECK( !variant::_rhs_not_aliased( &a, a.get_object()["k"] ) );
+   BOOST_CHECK( !variant::_rhs_not_aliased( &a, a.get_object()["j"] ) );
+}
+
+BOOST_AUTO_TEST_CASE(rhs_not_aliased_unrelated_variant) {
+   variant a = variants{ variant(1), variant(2) };
+   variant b = variants{ variant(3), variant(4) };
+   BOOST_CHECK( variant::_rhs_not_aliased( &a, b ) );
+   BOOST_CHECK( variant::_rhs_not_aliased( &a, b.get_array()[0] ) );
+}
+
+BOOST_AUTO_TEST_CASE(rhs_not_aliased_empty_array_lhs) {
+   // Empty-array lhs has no storage to alias against; any rhs is non-aliased.
+   variant a = variants{};
+   variant b{42};
+   BOOST_CHECK( variant::_rhs_not_aliased( &a, b ) );
+   BOOST_CHECK( variant::_rhs_not_aliased( &a, a ) ); // self-ref still non-aliased: a's vector is empty
+}
+
+BOOST_AUTO_TEST_CASE(rhs_not_aliased_non_array_non_object_lhs) {
+   // Non-container lhs: detector trivially returns true (no storage to alias).
+   variant a{42};
+   variant b{43};
+   BOOST_CHECK( variant::_rhs_not_aliased( &a, b ) );
+   BOOST_CHECK( variant::_rhs_not_aliased( &a, a ) );
+}
 
 BOOST_AUTO_TEST_CASE(same_type_string_reassign) {
    // Documents current behaviour: same-type reassignment goes through

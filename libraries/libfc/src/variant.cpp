@@ -11,6 +11,7 @@
 #include <fc/utf8.hpp>
 #include <algorithm>
 #include <cassert>
+#include <functional>
 #include <fc/int256.hpp>
 
 namespace fc
@@ -254,14 +255,19 @@ typedef const std::string* const_string_ptr;
 //   v = v.get_object()["k"]  (rhs is a value of one of lhs's entries)
 // Deeper nesting (rhs reachable through an inner array/object owned by lhs) remains UB but may slip past undetected.
 // Only ever called from assert(), so it (and the operator= call site) compile out under NDEBUG.
-inline bool rhs_not_aliased( const variant* lhs, const variant& v )
+//
+// Pointer comparisons via < / >= between unrelated objects are unspecified per [expr.rel]; std::less<T*> is
+// guaranteed by the standard ([comparisons]/2) to provide a strict total order across all object pointers, so
+// it is safe even when &v does not lie within dst_vec's storage.
+bool variant::_rhs_not_aliased( const variant* lhs, const variant& v )
 {
    const auto t = lhs->get_type();
    if( t == variant::array_type ) {
       const variants& dst_vec = **reinterpret_cast<const variants* const*>(lhs);
       const variant* begin = dst_vec.data();
       const variant* end   = begin + dst_vec.size();
-      return &v < begin || &v >= end;
+      std::less<const variant*> less;
+      return less(&v, begin) || !less(&v, end);
    }
    if( t == variant::object_type ) {
       const variant_object& dst_vo = **reinterpret_cast<const variant_object* const*>(lhs);
@@ -370,7 +376,7 @@ variant& variant::operator=( const variant& v )
    // fast path and the different-type clear()+new path read from rhs while writing through lhs, and the write
    // invalidates rhs mid-operation.  The previous fc::variant had the same UB contract via the clear()-then-new
    // pattern; this preserves it.  Debug builds catch the common direct-aliasing cases via the assertion below.
-   assert( rhs_not_aliased( this, v )
+   assert( _rhs_not_aliased( this, v )
            && "fc::variant operator=(const&): rhs aliases storage owned by lhs (UB)" );
 
    const auto src_type = v.get_type();

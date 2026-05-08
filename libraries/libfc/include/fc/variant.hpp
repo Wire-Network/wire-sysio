@@ -397,6 +397,9 @@ namespace fc
            return *this = variant( fc::forward<T>(v) );
         }
 
+        // Aliasing detector for operator=(const variant&); exposed for unit testing.
+        static bool _rhs_not_aliased( const variant* lhs, const variant& v );
+
         template<typename T>
         explicit variant( const std::optional<T>& v )
         {
