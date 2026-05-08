@@ -303,4 +303,57 @@ BOOST_AUTO_TEST_CASE(kv_iterator_pool_exhaustion) {
    BOOST_CHECK_EQUAL(h, 5u);
 }
 
+// kv_idx_update uses db.modify, which preserves the chainbase id but can
+// move the object's sort position. Verify that invalidate_secondary_cache
+// clears cached_id only on the matching secondary slot and only the cached_id,
+// leaving stored key bytes and status intact for the slow re-seek path.
+BOOST_AUTO_TEST_CASE(kv_iterator_pool_invalidate_secondary_cache) {
+   kv_iterator_pool pool;
+
+   uint32_t h_prim = pool.allocate_primary(config::kv_format_raw, "test"_n, "", 0);
+   uint32_t h_sec  = pool.allocate_secondary("test"_n, "users"_n, 0);
+   uint32_t h_other_table = pool.allocate_secondary("test"_n, "things"_n, 0);
+   uint32_t h_other_index = pool.allocate_secondary("test"_n, "users"_n, 1);
+   uint32_t h_other_code  = pool.allocate_secondary("alt"_n,  "users"_n, 0);
+   uint32_t h_other_id    = pool.allocate_secondary("test"_n, "users"_n, 0);
+
+   const int64_t target_id = 42;
+   const int64_t other_id  = 99;
+
+   auto seed = [](kv_iterator_slot& s, int64_t id) {
+      s.status = kv_it_stat::iterator_ok;
+      s.current_sec_key.assign({'a','l','i','c','e'});
+      s.current_pri_key.assign({'\x00','\x01'});
+      s.cached_id = id;
+   };
+
+   // Primary slot must be ignored even when its cached_id collides.
+   pool.get(h_prim).cached_id = target_id;
+   pool.get(h_prim).status = kv_it_stat::iterator_ok;
+
+   seed(pool.get(h_sec),          target_id);
+   seed(pool.get(h_other_table),  target_id);
+   seed(pool.get(h_other_index),  target_id);
+   seed(pool.get(h_other_code),   target_id);
+   seed(pool.get(h_other_id),     other_id);
+
+   pool.invalidate_secondary_cache("test"_n, "users"_n, 0, target_id);
+
+   // Matching secondary slot: cached_id cleared, key bytes and status preserved.
+   const auto& matched = pool.get(h_sec);
+   BOOST_CHECK_EQUAL(matched.cached_id, -1);
+   BOOST_CHECK(matched.status == kv_it_stat::iterator_ok);
+   BOOST_CHECK_EQUAL(matched.current_sec_key.size(), 5u);
+   BOOST_CHECK_EQUAL(matched.current_pri_key.size(), 2u);
+
+   // Primary slot untouched even though id matches.
+   BOOST_CHECK_EQUAL(pool.get(h_prim).cached_id, target_id);
+
+   // Secondary slots that differ in any of code/table/index_id/id are untouched.
+   BOOST_CHECK_EQUAL(pool.get(h_other_table).cached_id, target_id);
+   BOOST_CHECK_EQUAL(pool.get(h_other_index).cached_id, target_id);
+   BOOST_CHECK_EQUAL(pool.get(h_other_code).cached_id,  target_id);
+   BOOST_CHECK_EQUAL(pool.get(h_other_id).cached_id,    other_id);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

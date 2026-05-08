@@ -104,6 +104,20 @@ public:
       return _slots[handle];
    }
 
+   // Clears cached_id on any secondary slot referencing the given kv_index_object.
+   // Preserves stored key bytes and iterator status so the next op uses the slow
+   // re-seek path from the old position. Used before db.modify of a secondary
+   // entry, where the chainbase id survives but the object's sort position moves.
+   void invalidate_secondary_cache(account_name code, name table, uint8_t index_id, int64_t object_id) {
+      for (auto& s : _slots) {
+         if (s.in_use && !s.is_primary &&
+             s.code == code && s.table == table && s.index_id == index_id &&
+             s.cached_id == object_id) {
+            s.cached_id = -1;
+         }
+      }
+   }
+
 private:
    uint32_t find_free() {
       for (uint32_t i = _next_free; i < _slots.size(); ++i) {

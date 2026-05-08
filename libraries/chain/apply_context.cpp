@@ -1021,6 +1021,14 @@ void apply_context::kv_idx_update(uint64_t payer_val, name table, uint8_t index_
       }
    }
 
+   // db.modify preserves the kv_index_object's chainbase id but moves it to a
+   // new sort position when sec_key changes. Live secondary iterators that
+   // cached this id would otherwise advance from the post-modify position and
+   // skip entries. Invalidate the cached id on any matching slot so the next
+   // op falls back to the slow re-seek using the saved old key bytes,
+   // matching the prior remove+create observable behavior.
+   kv_iterators.invalidate_secondary_cache(receiver, table, index_id, itr->id._id);
+
    // undo_index::post_modify handles AVL tree rebalancing when composite
    // index key fields change, avoiding node dealloc/realloc overhead.
    db.modify(*itr, [&](auto& o) {
