@@ -2643,10 +2643,11 @@ producer_plugin_impl::push_result producer_plugin_impl::push_transaction(const f
          return pr;
       }
 
-      // On retry, cap the allowed wall-clock time to 2x the prior run. Prevents a
-      // single slow retry from consuming most of the block budget when prev_elapsed
-      // is a reasonable proxy for the trx's real cost.
-      max_trx_time = std::min(max_trx_time, prev_elapsed * 2);
+      // elapsed can be set on failure, but prev_succeeded indicates a real cost
+      // measurement -- only then is 2x prev_elapsed a sound cap on this retry.
+      if (trx->prev_succeeded) {
+         max_trx_time = std::min(max_trx_time, prev_elapsed * 2);
+      }
    }
 
    auto trace = chain.push_transaction(trx, block_deadline, max_trx_time);
