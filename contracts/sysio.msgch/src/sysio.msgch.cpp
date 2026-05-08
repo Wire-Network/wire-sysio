@@ -452,10 +452,9 @@ void msgch::buildenv(uint64_t outpost_id) {
 
    if (candidate_entries.empty()) return;
 
-   // ── Phase 2: packing loop. Walk candidates in order, accumulating a
-   //    conservative byte estimate; stop once the next one would push the
-   //    envelope over MAX_ENVELOPE_BYTES. The trailing serialised-size check
-   //    is the hard backstop in case the estimator under-counts.
+   // ── Phase 2: estimator-based initial pick. Walk candidates in order, accumulating a conservative byte estimate;
+   //    stop once the next one would push the envelope over MAX_ENVELOPE_BYTES. The trim loop below is the source of
+   //    truth for the size invariant; this estimator just keeps the typical case to one serialise pass.
    size_t included_count  = 0;
    size_t estimated_bytes = ENVELOPE_BASELINE_BYTES;
    for (const auto& entry : candidate_entries) {
@@ -467,9 +466,8 @@ void msgch::buildenv(uint64_t outpost_id) {
       ++included_count;
    }
 
-   // First-attestation-too-big guard — surface so the operator sees it
-   // instead of a silently-stuck queue. Never expected at protocol level
-   // because individual attestations are bounded well below MAX_ENVELOPE_BYTES.
+   // Estimator can pick zero only when the first candidate alone is too large for an envelope; the trim loop below
+   // would surface that with the same diagnostic but we abort upfront to avoid building anything in the doomed case.
    check(included_count > 0,
          "sysio.msgch::buildenv: a single READY attestation exceeds "
          "MAX_ENVELOPE_BYTES — cannot pack into an envelope");
@@ -477,11 +475,52 @@ void msgch::buildenv(uint64_t outpost_id) {
    std::vector<opp::AttestationEntry> entries(
       std::make_move_iterator(candidate_entries.begin()),
       std::make_move_iterator(candidate_entries.begin() + included_count));
-   const std::vector<uint64_t> included_ids(
+   std::vector<uint64_t> included_ids(
       candidate_ids.begin(),
       candidate_ids.begin() + included_count);
 
-   // Mark only the included attestations as PROCESSED. Remaining candidates
+   // Build + serialise the envelope from `entries`. Returned packed buffer is the wire-format protobuf with no size
+   // prefix. Pulled out as a lambda so the trim loop below can re-run it after popping an entry.
+   auto build_packed = [&](const std::vector<opp::AttestationEntry>& src) {
+      opp::MessagePayload payload;
+      payload.version = zpp::bits::vuint32_t{1};
+      payload.attestations = src;
+
+      opp::MessageHeader header;
+      header.timestamp = zpp::bits::vuint64_t{now_sec};
+
+      opp::Message msg;
+      msg.header = std::move(header);
+      msg.payload = std::move(payload);
+
+      opp::Envelope env;
+      env.epoch_index = zpp::bits::vuint32_t{epoch};
+      env.epoch_timestamp = zpp::bits::vuint64_t{now_sec};
+      env.messages.push_back(std::move(msg));
+
+      std::vector<char> out_buf;
+      auto out_stream = zpp::bits::out{out_buf, zpp::bits::no_size{}};
+      (void)out_stream(env);
+      return out_buf;
+   };
+
+   // ── Phase 3: trim loop. Serialise; if the result overshoots MAX_ENVELOPE_BYTES (estimator under-counted relative
+   //    to the actual zpp::bits encoding for this candidate set), pop the last entry and retry. The loop is the
+   //    only authority on the size invariant — replaces the previous hard-abort backstop, which left this action in
+   //    a dead-letter loop on estimator drift (PROCESSED status would roll back, the same set would re-pack the
+   //    next epoch, the same check would trip again). Popped entries stay READY and ride the next `buildenv` call.
+   //    PROCESSED marking is deferred until after the loop converges so a popped entry doesn't need a status revert.
+   std::vector<char> packed = build_packed(entries);
+   while (packed.size() > MAX_ENVELOPE_BYTES) {
+      check(entries.size() > 1,
+            "sysio.msgch::buildenv: a single READY attestation exceeds "
+            "MAX_ENVELOPE_BYTES — cannot pack into an envelope");
+      entries.pop_back();
+      included_ids.pop_back();
+      packed = build_packed(entries);
+   }
+
+   // Mark the surviving attestations as PROCESSED. Remaining candidates (popped or never picked by the estimator)
    // stay READY for the next epoch's `buildenv` call.
    for (uint64_t aid : included_ids) {
       auto att_pk = id_key{aid};
@@ -492,36 +531,6 @@ void msgch::buildenv(uint64_t outpost_id) {
          });
       }
    }
-
-   // Build a Message containing the included attestations.
-   opp::MessagePayload payload;
-   payload.version = zpp::bits::vuint32_t{1};
-   payload.attestations = std::move(entries);
-
-   opp::MessageHeader header;
-   header.timestamp = zpp::bits::vuint64_t{now_sec};
-
-   opp::Message msg;
-   msg.header = std::move(header);
-   msg.payload = std::move(payload);
-
-   // Build OPP Envelope wrapping the message
-   opp::Envelope env;
-   env.epoch_index = zpp::bits::vuint32_t{epoch};
-   env.epoch_timestamp = zpp::bits::vuint64_t{now_sec};
-   env.messages.push_back(std::move(msg));
-
-   // Serialize envelope (no size prefix — raw protobuf wire format)
-   std::vector<char> packed;
-   auto out = zpp::bits::out{packed, zpp::bits::no_size{}};
-   (void)out(env);
-
-   // Hard backstop — the estimator should always over-count, but a final
-   // size check guarantees the envelope cannot exceed the cross-chain cap
-   // even if the conservative estimator drifts.
-   check(packed.size() <= MAX_ENVELOPE_BYTES,
-         "sysio.msgch::buildenv: serialised envelope exceeds MAX_ENVELOPE_BYTES "
-         "(estimator drift)");
 
    // Store outbound envelope
    outenvelopes_t envelopes(get_self());
