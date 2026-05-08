@@ -382,6 +382,74 @@ BOOST_AUTO_TEST_CASE(test_deltas_contract) {
    BOOST_REQUIRE_GT(tester_idx_count, 0);
 }
 
+// Verify SHiP correctly emits pri_key bytes for deleted kv_index_object rows
+// when the corresponding primary kv_object was also removed in the same block.
+// The kv_index_object only stores primary_id; pri_key bytes are recovered by
+// looking up the primary in chainbase. When both primary and secondary are
+// removed in the same block, the live find() returns null and the serializer
+// must fall back to scanning the kv_index undo session's removed_values.
+BOOST_AUTO_TEST_CASE(test_deltas_contract_index_kv_secondary_delete_pri_key) {
+   table_deltas_tester chain;
+   chain.produce_block();
+
+   chain.create_account("tester"_n, config::system_account_name, false, false, false, false);
+   chain.set_code("tester"_n, test_contracts::get_table_test_wasm());
+   chain.set_abi("tester"_n, test_contracts::get_table_test_abi());
+   chain.produce_block();
+
+   // Block 1: insert a row that gets a primary kv_object plus secondary
+   // kv_index_object entries (numobjs has four secondary indices). Commit
+   // so the row is in the main table, not just the pending undo session.
+   chain.push_action("tester"_n, "addnumobj"_n, "tester"_n, mutable_variant_object()("input", 7));
+   chain.produce_block();
+
+   // Capture the primary row's id and key bytes so we can compare against
+   // the SHiP delta's recovered pri_key once it has been deleted.
+   const auto& kv_idx = chain.control->db().get_index<sysio::chain::kv_index>();
+   sysio::chain::kv_object::id_type captured_pri_id{};
+   bytes captured_pri_key;
+   {
+      bool found = false;
+      for (auto& row : kv_idx.indices()) {
+         if (row.code != "tester"_n) continue;
+         captured_pri_id = row.id;
+         captured_pri_key.assign(row.key.data(), row.key.data() + row.key.size());
+         found = true;
+         break;
+      }
+      BOOST_REQUIRE_MESSAGE(found, "expected the inserted primary row to be in chainbase");
+   }
+
+   // Block 2 (still pending): erase the row. CDT's kv_multi_index removes the
+   // primary first, then each secondary, so by the time SHiP packs deltas
+   // both kv_index and kv_index_index undo sessions hold matching removals.
+   chain.push_action("tester"_n, "erasenumobj"_n, "tester"_n, mutable_variant_object()("id", 0));
+
+   auto sec_result = chain.find_table_delta("contract_index_kv");
+   BOOST_REQUIRE(sec_result.first);
+   const variants sec_deltas =
+      chain.deserialize_data(sec_result.second, "contract_index_kv_v0", "contract_index_kv");
+   BOOST_REQUIRE_EQUAL(sec_deltas.size(), sec_result.second->rows.obj.size());
+
+   // numobjs has four secondaries; expect at least one delete delta carrying
+   // the recovered pri_key. Without the undo-session fallback the find() in
+   // serialization.hpp returns null and pri_key is emitted as empty bytes.
+   bool found_delete_with_pri_key = false;
+   for (size_t i = 0; i < sec_deltas.size(); ++i) {
+      if (sec_result.second->rows.obj[i].first) continue; // present == true → not a delete
+      const auto& v = sec_deltas[i];
+      if (v["code"].as_string() != "tester") continue;
+      const auto pri_key = v["pri_key"].as<bytes>();
+      BOOST_REQUIRE_MESSAGE(!pri_key.empty(),
+         "secondary delete delta must carry pri_key recovered from the kv_index undo session");
+      BOOST_CHECK_EQUAL_COLLECTIONS(pri_key.begin(), pri_key.end(),
+                                    captured_pri_key.begin(), captured_pri_key.end());
+      found_delete_with_pri_key = true;
+   }
+   BOOST_REQUIRE_MESSAGE(found_delete_with_pri_key,
+      "expected at least one secondary-index delete delta for the erased row");
+}
+
 // Verify all KV rows (including format=1) appear in "contract_row_kv"
 BOOST_AUTO_TEST_CASE(test_deltas_contract_row_format1_only) {
    table_deltas_tester chain;

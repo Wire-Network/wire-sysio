@@ -259,11 +259,32 @@ datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper<sysi
    // consumers continue to see pri_key bytes in the stream. The wire format
    // for secondary rows is unchanged (struct_version 0 still ends with
    // a length-prefixed pri_key byte string).
+   //
+   // For deletions both the secondary row and the primary may be removed in
+   // the same block, and pack_deltas runs after both removals have already
+   // landed in chainbase. In that case the live find() returns null, so fall
+   // back to scanning the kv_index's pending undo session for the just-removed
+   // primary. The same block-scope undo session feeds both the kv_index and
+   // kv_index_index removed_values streams, so an entry pulled from one is
+   // guaranteed to find its counterpart in the other.
    const auto* primary = obj.db.find<sysio::chain::kv_object>(obj.obj.primary_id);
-   uint64_t pri_key_size = primary ? primary->key.size() : 0;
+   const sysio::chain::shared_blob* pri_key_src = primary ? &primary->key : nullptr;
+   if (!pri_key_src) {
+      const auto& kv_idx = obj.db.get_index<sysio::chain::kv_index>();
+      if (kv_idx.has_undo_session()) {
+         auto kv_undo = kv_idx.last_undo_session();
+         for (const auto& removed : kv_undo.removed_values) {
+            if (removed.id == obj.obj.primary_id) {
+               pri_key_src = &removed.key;
+               break;
+            }
+         }
+      }
+   }
+   uint64_t pri_key_size = pri_key_src ? pri_key_src->size() : 0;
    history_pack_varuint64(ds, pri_key_size);
    if (pri_key_size > 0)
-      ds.write(primary->key.data(), pri_key_size);
+      ds.write(pri_key_src->data(), pri_key_size);
    return ds;
 }
 
