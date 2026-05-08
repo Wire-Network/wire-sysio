@@ -315,6 +315,11 @@ class PerformanceTestBasic:
         # (the parent transaction's totals); the action-level cpu_usage_us / net_usage would
         # undercount multi-action trxs and use different units (action net_usage is bytes; trx
         # net_usage_words is ceil(bytes / 8)).
+        # Block finality (irreversible/pending) comes from block_status on each action -- trace_api
+        # is the single source of truth so we never mix in a chain/get_info LIB read that could
+        # disagree with what the trace data reflects. For blocks where the action filter dropped
+        # everything (typically the leading/trailing ramp window), fall back to trace_api/get_block
+        # for that one block: empty blocks carry no harness-action trxs so the payload is small.
         actionFilter = None
         if getattr(self, 'userTrxDataDict', None):
             cfgActions = self.userTrxDataDict.get('actions') or []
@@ -322,6 +327,7 @@ class PerformanceTestBasic:
                 actionFilter = cfgActions[0].get('actionName')
         for blockNum in range(startBlockNum, endBlockNum + 1):
             blockCpuTotal, blockNetTotal, blockTransactionTotal = 0, 0, 0
+            blockStatus = None
             blockInfo = node.processUrllibRequest("chain", "get_block_info", {"block_num":blockNum}, silentErrors=False, exitOnError=True)
             actionsQuery = {"block_num_start": blockNum, "block_num_end": blockNum}
             if actionFilter:
@@ -338,6 +344,9 @@ class PerformanceTestBasic:
                     if trxId in seen:
                         continue
                     seen.add(trxId)
+                    # All actions in a block share the same block_status; capture once.
+                    if blockStatus is None:
+                        blockStatus = action.get('block_status')
                     cpu = action.get('trx_cpu_usage_us', 0) or 0
                     net = action.get('trx_net_usage_words', 0) or 0
                     trx_data = trxData(blockNum=action['block_num'], cpuUsageUs=cpu,
@@ -347,11 +356,19 @@ class PerformanceTestBasic:
                     blockCpuTotal += cpu
                     blockNetTotal += net
                     blockTransactionTotal += 1
+            if blockStatus is None:
+                # No harness-relevant action in this block. Fall back to trace_api/get_block so
+                # the row's status still comes from trace_api's data log rather than mixing in a
+                # different source. Cost is bounded -- empty/onblock-only blocks have no trx
+                # signatures to base58-encode.
+                blockResp = node.processUrllibRequest("trace_api", "get_block", {"block_num": blockNum},
+                                                     silentErrors=False, exitOnError=True)
+                blockStatus = blockResp['payload'].get('status', 'unknown')
             block_data = blockData(blockId=blockInfo["payload"]["id"],
                                    blockNum=blockInfo['payload']['block_num'],
                                    transactions=blockTransactionTotal, net=blockNetTotal, cpu=blockCpuTotal,
                                    producer=blockInfo["payload"]["producer"],
-                                   status="executed",
+                                   status=blockStatus,
                                    _timestamp=blockInfo["payload"]["timestamp"])
             self.data.blockList.append(block_data)
             self.data.blockDict[str(blockNum)] = block_data
