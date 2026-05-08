@@ -2409,12 +2409,17 @@ struct controller_impl {
          return;
       }
 
+      // wire latency is block_timestamp -> first network arrival at this node (received_time, set by net_plugin),
+      // distinct from latency which is block_timestamp -> apply complete. Their difference is the local apply-queue
+      // / in-producing-mode delay. wire latency is 0 when received_time is unset (replay, loaded from disk).
+      const auto& received_time = chain_head.internal()->received_time;
       ilog("Received block {}... #{} @ {} signed by {} " // "Received" instead of "Applied" so it matches existing log output
-           "[trxs: {}, lib: {}, net: {}, cpu: {} us, elapsed: {} us, applying time: {} us, latency: {} ms]",
+           "[trxs: {}, lib: {}, net: {}, cpu: {} us, elapsed: {} us, applying time: {} us, wire latency: {} ms, latency: {} ms]",
            chain_head.id().short_id(), chain_head.block_num(), chain_head.timestamp(), chain_head.producer(),
            chain_head.block()->transactions.size(), chain_head.irreversible_blocknum(),
-           br.total_net_usage, br.total_cpu_usage_us,
-           br.total_elapsed_time, now - br.start_time, (now - chain_head.timestamp()).count() / 1000);
+           br.total_net_usage, br.total_cpu_usage_us, br.total_elapsed_time, now - br.start_time,
+           received_time != fc::time_point() ? (received_time - chain_head.block_time()).count() / 1000 : 0,
+           (now - chain_head.timestamp()).count() / 1000);
 
       if (_update_incoming_block_metrics) {
          _update_incoming_block_metrics({.trxs_incoming_total   = chain_head.block()->transactions.size(),
@@ -2883,7 +2888,8 @@ struct controller_impl {
 
    // thread safe, expected to be called from thread other than the main thread
    // tuple<bool best_head, block_handle new_block_handle>
-   controller::accepted_block_result create_block_state_i( const block_id_type& id, const signed_block_ptr& b, const block_state& prev ) {
+   controller::accepted_block_result create_block_state_i( const block_id_type& id, const signed_block_ptr& b, const block_state& prev,
+                                                           fc::time_point received_time ) {
       std::optional<qc_t> qc = verify_basic_block_invariants(id, b, prev);
       log_and_drop_future<void> verify_qc_future;
       if (qc) {
@@ -2914,6 +2920,8 @@ struct controller_impl {
       SYS_ASSERT( id == bsp->id(), block_validate_exception,
                   "provided id {} does not match block id {}", id, bsp->id() );
 
+      bsp->received_time = received_time;
+
       assert(!!qc == verify_qc_future.valid());
       if (qc) {
          verify_qc_future.get();
@@ -2937,7 +2945,8 @@ struct controller_impl {
    }
 
    // thread safe, expected to be called from thread other than the main thread
-   controller::accepted_block_result create_block_handle( const block_id_type& id, const signed_block_ptr& b ) {
+   controller::accepted_block_result create_block_handle( const block_id_type& id, const signed_block_ptr& b,
+                                                          fc::time_point received_time ) {
       SYS_ASSERT( b, block_validate_exception, "null block" );
 
       if (auto bsp = fork_db_.get_block(id, include_root_t::yes))
@@ -2947,7 +2956,7 @@ struct controller_impl {
       if( !prev )
          return controller::accepted_block_result{.add_result = fork_db_add_t::failure, .block{}};
 
-      return create_block_state_i( id, b, *prev );
+      return create_block_state_i( id, b, *prev, received_time );
    }
 
    // thread safe, QC already verified by verify_proper_block_exts
@@ -3952,8 +3961,9 @@ boost::asio::io_context& controller::get_thread_pool() {
    return my->thread_pool.get_executor();
 }
 
-controller::accepted_block_result controller::accept_block( const block_id_type& id, const signed_block_ptr& b ) const {
-   return my->create_block_handle( id, b );
+controller::accepted_block_result controller::accept_block( const block_id_type& id, const signed_block_ptr& b,
+                                                             fc::time_point received_time ) const {
+   return my->create_block_handle( id, b, received_time );
 }
 
 transaction_trace_ptr controller::push_transaction( const transaction_metadata_ptr& trx,

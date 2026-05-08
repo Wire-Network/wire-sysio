@@ -930,7 +930,7 @@ namespace sysio {
       void handle_message( const block_nack_request_message& msg );
       void handle_message( const sync_request_message& msg );
       void handle_message( const signed_block& msg ) = delete; // signed_block_ptr overload used instead
-      void handle_message( const block_id_type& id, signed_block_ptr ptr );
+      void handle_message( const block_id_type& id, signed_block_ptr ptr, fc::time_point received_time );
       void handle_message( const transaction_message& msg ) = delete; // handled via process_next_trx_message
       void handle_message( const packed_transaction_ptr& trx );
       void handle_message( const vote_message_ptr& msg );
@@ -3220,7 +3220,7 @@ namespace sysio {
       shared_ptr<signed_block> ptr = std::make_shared<signed_block>();
       fc::raw::unpack( ds, *ptr );
 
-      handle_message( blk_id, std::move( ptr ) );
+      handle_message( blk_id, std::move( ptr ), now );
       return true;
    }
 
@@ -3793,9 +3793,18 @@ namespace sysio {
          std::chrono::nanoseconds rec{msg.rec};
          int64_t offset = (double((rec - org).count()) + double(msg_xmt.count() - msg.dst)) / 2.0;
 
+         // Outbound = our send to peer's receive (org -> rec). Inbound = peer's reply to our handle (xmt -> dst).
+         // Sign of offset shows direction; magnitude is the asymmetry. Possible causes: (a) our send queue is backed
+         // up (large outbound); (b) our connection-strand processing is behind real-time (large inbound); (c) actual
+         // clock skew between this node and the peer (NTP drift) which the offset formula assumes is symmetric and
+         // would attribute to either direction. Persistent same-sign offsets across many peers point at (a)/(b);
+         // a single peer drifting alone points at (c).
          if (std::abs(offset) > block_interval_ns) {
-            peer_wlog(p2p_msg_log, this, "Clock offset is {}us, calculation: (rec {} - org {} + xmt {} - dst {})/2",
-                      offset / 1000, rec.count(), org.count(), msg_xmt.count(), msg.dst);
+            const int64_t outbound_ms = (rec.count() - org.count()) / 1'000'000;
+            const int64_t inbound_ms  = (msg.dst - msg_xmt.count()) / 1'000'000;
+            peer_wlog(p2p_msg_log, this,
+                      "Peer message latency asymmetry or clock skew: outbound {} ms, inbound {} ms, offset {} ms",
+                      outbound_ms, inbound_ms, offset / 1'000'000);
          }
       }
       org = std::chrono::nanoseconds{0};
@@ -3889,9 +3898,18 @@ namespace sysio {
 
       if (before_lib || my_impl->dispatcher.have_block(msg.id)) {
          if (block_num - 1 == block_header::num_from_id(last_block_nack)) {
+            // log when consecutive nacks cross the threshold and bcast_block switches us to notice-only for this peer
+            if (consecutive_blocks_nacks == consecutive_block_nacks_threshold) {
+               peer_ilog(p2p_blk_log, this, "switching to block_notice mode (peer ahead of us, consecutive_nacks={})",
+                         consecutive_blocks_nacks + 1);
+            }
             ++consecutive_blocks_nacks;
             adjust_peer_score(peer_scoring::block_nack);
          } else {
+            if (consecutive_blocks_nacks > consecutive_block_nacks_threshold) {
+               peer_ilog(p2p_blk_log, this, "resuming full block broadcast (consecutive_nacks reset from {})",
+                         consecutive_blocks_nacks);
+            }
             consecutive_blocks_nacks = 0;
          }
          if (!before_lib) {
@@ -4069,10 +4087,10 @@ namespace sysio {
    }
 
    // called from connection strand
-   void connection::handle_message( const block_id_type& id, signed_block_ptr ptr ) {
+   void connection::handle_message( const block_id_type& id, signed_block_ptr ptr, fc::time_point received_time ) {
       // post to dispatcher strand so that we don't have multiple threads validating the block header
       peer_dlog(p2p_blk_log, this, "posting block {} to dispatcher strand", ptr->block_num());
-      boost::asio::dispatch(my_impl->dispatcher.strand, [id, c{shared_from_this()}, ptr{std::move(ptr)}, cid=connection_id]() mutable {
+      boost::asio::dispatch(my_impl->dispatcher.strand, [id, c{shared_from_this()}, ptr{std::move(ptr)}, cid=connection_id, received_time]() mutable {
          if (app().is_quiting()) // large sync span can have many of these queued up, exit quickly
             return;
          controller& cc = my_impl->chain_plug->chain();
@@ -4088,7 +4106,7 @@ namespace sysio {
                           "received a block from the future, rejecting it: {}", id);
             }
             // this will return empty optional<block_handle> if block is not linkable
-            controller::accepted_block_result abh = cc.accept_block( id, ptr );
+            controller::accepted_block_result abh = cc.accept_block( id, ptr, received_time );
             fork_db_add_result = abh.add_result;
             obh = std::move(abh.block);
             unlinkable = fork_db_add_result == fork_db_add_t::failure;
