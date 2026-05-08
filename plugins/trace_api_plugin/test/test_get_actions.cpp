@@ -1,5 +1,7 @@
 #include <boost/test/unit_test.hpp>
 
+#include <set>
+
 #include <fc/filesystem.hpp>
 
 #include <sysio/trace_api/abi_data_handler.hpp>
@@ -24,7 +26,10 @@ struct get_actions_fixture {
       get_block_t get_block(uint32_t height) {
          auto it = fixture.blocks.find(height);
          if (it == fixture.blocks.end()) return {};
-         return std::make_tuple(data_log_entry{it->second}, true /*irreversible*/);
+         // pending_blocks is a per-block override for tests that need to exercise
+         // the "pending" branch of block_status emission. Default is irreversible.
+         const bool irreversible = fixture.pending_blocks.find(height) == fixture.pending_blocks.end();
+         return std::make_tuple(data_log_entry{it->second}, irreversible);
       }
 
       // Stride/slice mapping is a fixture knob so tests can exercise the per-slice bloom skip path with a small
@@ -88,6 +93,7 @@ struct get_actions_fixture {
    };
 
    std::map<uint32_t, block_trace_v0> blocks;
+   std::set<uint32_t>                 pending_blocks; // blocks that should report "pending" instead of the default "irreversible"
    uint32_t mock_slice_stride = 10;
    std::function<bloom_reader(uint32_t)> mock_get_bloom = [](uint32_t) { return bloom_reader{}; };
    impl_type impl;
@@ -316,6 +322,35 @@ BOOST_FIXTURE_TEST_CASE(slim_shape_omits_trx_resource_totals, get_actions_fixtur
    BOOST_TEST(!obj.contains("trx_net_usage_words"));
    BOOST_TEST(!obj.contains("cpu_usage_us"));
    BOOST_TEST(!obj.contains("net_usage"));
+}
+
+// Every action carries a block_status mirroring get_block's "status" field, sourced from the same
+// data log tuple so trace_api remains the single source of truth for "is this action's block final."
+// Both shapes (full / slim) emit it: an exchange consuming get_token_transfers needs finality just
+// as much as a general consumer of get_actions. Operators that want only-irreversible responses can
+// run nodeop in irreversible mode -- every block returned will then carry "irreversible".
+BOOST_FIXTURE_TEST_CASE(emits_block_status_per_action, get_actions_fixture)
+{
+   blocks[1] = make_block(1, { make_trx(TRX1, 1, { make_action(1, "a"_n, "tok"_n, "transfer"_n) }) });
+   blocks[2] = make_block(2, { make_trx(TRX2, 2, { make_action(2, "a"_n, "tok"_n, "transfer"_n) }) });
+   pending_blocks.insert(2); // block 1 irreversible, block 2 still pending
+
+   action_query q;
+   q.block_num_start = 1;
+   q.block_num_end   = 2;
+
+   auto r_full = get_actions(q);
+   BOOST_REQUIRE_EQUAL(r_full.actions.size(), 2u);
+   BOOST_TEST(r_full.actions[0].get_object()["block_status"].as_string() == "irreversible");
+   BOOST_TEST(r_full.actions[1].get_object()["block_status"].as_string() == "pending");
+
+   q.receiver = "a"_n;
+   q.account  = "tok"_n;
+   q.action   = "transfer"_n;
+   auto r_slim = get_token_transfer_actions(q);
+   BOOST_REQUIRE_EQUAL(r_slim.actions.size(), 2u);
+   BOOST_TEST(r_slim.actions[0].get_object()["block_status"].as_string() == "irreversible");
+   BOOST_TEST(r_slim.actions[1].get_object()["block_status"].as_string() == "pending");
 }
 
 // ABI-decoded params are included in the result when the data handler returns them
