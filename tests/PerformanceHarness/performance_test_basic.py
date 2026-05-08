@@ -311,6 +311,10 @@ class PerformanceTestBasic:
         # block num/time, cpu/net usage, and the block header.
         # Filter by the configured action name (transfer/cpu/ram/net/newaccount/doit/...) so
         # onblock and other unrelated trxs are skipped server-side without base58 work.
+        # Per-trx cpu/net come from trx_cpu_usage_us / trx_net_usage_words on each action variant
+        # (the parent transaction's totals); the action-level cpu_usage_us / net_usage would
+        # undercount multi-action trxs and use different units (action net_usage is bytes; trx
+        # net_usage_words is ceil(bytes / 8)).
         actionFilter = None
         if getattr(self, 'userTrxDataDict', None):
             cfgActions = self.userTrxDataDict.get('actions') or []
@@ -325,7 +329,7 @@ class PerformanceTestBasic:
             actionsResp = node.processUrllibRequest("trace_api", "get_actions", actionsQuery, silentErrors=False, exitOnError=True)
             btdf_append_write = self.fileOpenMode(blockTrxDataPath)
             with open(blockTrxDataPath, btdf_append_write) as trxDataFile:
-                seen = set()  # dedup if a trx somehow has multiple matching actions
+                seen = set()  # one trxData entry per trx even if multiple actions match the filter
                 for action in actionsResp['payload']['actions']:
                     # If no action filter configured, still skip onblock explicitly.
                     if not actionFilter and action.get('account') == 'sysio' and action.get('name') == 'onblock':
@@ -334,8 +338,8 @@ class PerformanceTestBasic:
                     if trxId in seen:
                         continue
                     seen.add(trxId)
-                    cpu = action.get('cpu_usage_us', 0) or 0
-                    net = action.get('net_usage', 0) or 0
+                    cpu = action.get('trx_cpu_usage_us', 0) or 0
+                    net = action.get('trx_net_usage_words', 0) or 0
                     trx_data = trxData(blockNum=action['block_num'], cpuUsageUs=cpu,
                                        netUsageUs=net, blockTime=action['block_time'])
                     self.data.trxDict.update({trxId: trx_data})
