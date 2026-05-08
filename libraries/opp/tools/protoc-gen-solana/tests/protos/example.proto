@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+package example;
+
+// Exercises: scalars, nested messages, repeated, enums, map, oneof
+message UserProfile {
+  uint64 id = 1;
+  string name = 2;
+  string email = 3;
+  bool active = 4;
+  Role role = 5;
+  Address address = 6;
+  repeated string tags = 7;
+  map<string, string> metadata = 8;
+  bytes avatar_hash = 9;
+  int64 created_at = 10;
+  fixed64 nonce = 11;
+}
+
+enum Role {
+  ROLE_UNSPECIFIED = 0;
+  ROLE_USER = 1;
+  ROLE_ADMIN = 2;
+  ROLE_OPERATOR = 3;
+}
+
+message Address {
+  string street = 1;
+  string city = 2;
+  string state = 3;
+  string zip = 4;
+  sint32 floor = 5;
+}
+
+// Solana-specific: account metadata message
+message SolanaAccount {
+  bytes pubkey = 1;
+  uint64 lamports = 2;
+  bytes owner = 3;
+  bool executable = 4;
+  uint64 rent_epoch = 5;
+  bytes data = 6;
+}
+
+// Nested message with repeated sub-messages
+message TransactionBatch {
+  uint64 chain_id = 1;
+  repeated Transaction txns = 2;
+  fixed32 checksum = 3;
+}
+
+message Transaction {
+  bytes to = 1;
+  bytes data = 2;
+  uint64 value = 3;
+  uint64 gas_limit = 4;
+  uint64 nonce = 5;
+}

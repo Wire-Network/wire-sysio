@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package hello;
+
+import "types/sample_types.proto";
+
+// Top-level enum local to this file
+enum Greeting {
+  GREETING_UNSPECIFIED = 0;
+  GREETING_HELLO = 1;
+  GREETING_HI = 2;
+  GREETING_HEY = 3;
+}
+
+// A hello world message that references shared types
+message HelloRequest {
+  string name = 1;
+  Greeting greeting = 2;
+  hello.types.Priority priority = 3;
+  hello.types.TaggedId sender = 4;
+  repeated hello.types.Metadata metadata = 5;
+  bool urgent = 6;
+  uint64 timestamp = 7;
+}
+
+// Response referencing shared status enum
+message HelloResponse {
+  string message = 1;
+  hello.types.Status status = 2;
+  uint64 processed_at = 3;
+  hello.types.TaggedId responder = 4;
+}

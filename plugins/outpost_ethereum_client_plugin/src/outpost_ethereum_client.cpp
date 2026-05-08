@@ -2,7 +2,9 @@
 
 #include <fc/crypto/sha256.hpp>
 #include <fc/exception/exception.hpp>
+#include <fc/io/json.hpp>
 #include <fc/log/logger.hpp>
+#include <fc/network/ethereum/ethereum_abi.hpp>
 
 #include <sysio/opp/opp.hpp>
 #include <sysio/opp/opp.pb.h>
@@ -12,16 +14,6 @@ namespace sysio {
 namespace {
 
 namespace eth = fc::network::ethereum;
-
-// ── Wire-side identifiers ────────────────────────────────────────────────
-/// Event emitted by `OPP.sol` carrying a serialized `opp::Envelope` as its
-/// sole `bytes` argument. Mirrored from `wire-ethereum/contracts/OPP.sol`.
-constexpr std::string_view OPP_ENVELOPE_EVENT_NAME = "OPPEnvelope";
-
-/// Key under which the ABI decoder parks the raw envelope payload inside
-/// the decoded event variant when the event has a single named `bytes`
-/// parameter.
-constexpr std::string_view EVENT_DATA_FIELD = "data";
 
 // ── Op labels used for deadline-exceeded error messages ──────────────────
 constexpr std::string_view OP_DELIVER_OUTBOUND = "deliver_outbound_envelope";
@@ -45,9 +37,6 @@ outpost_ethereum_client::outpost_ethereum_client(
    FC_ASSERT(!_opp_addr.empty(),         "OPP address is required");
    FC_ASSERT(!_opp_inbound_addr.empty(), "OPPInbound address is required");
 
-   // Build the typed contract clients once at construction — same lazy-cached
-   // behavior the old `ensure_eth_clients` guarded, just eagerly now that this
-   // object exists.
    _opp_client         = _entry->client->get_contract<opp_contract_client>(_opp_addr, abis);
    _opp_inbound_client = _entry->client->get_contract<opp_inbound_contract_client>(_opp_inbound_addr, abis);
 }
@@ -64,8 +53,6 @@ std::string outpost_ethereum_client::deliver_outbound_envelope(
 
    throw_if_past_deadline(deadline_abs, OP_DELIVER_OUTBOUND);
 
-   // epoch_in takes its std::string argument by non-const reference, so the
-   // hex payload has to be mutable here.
    std::string envelope_hex = fc::to_hex(envelope_bytes);
    auto        result       = _opp_inbound_client->epoch_in(envelope_hex);
 
@@ -80,73 +67,111 @@ std::vector<char> outpost_ethereum_client::read_inbound_envelope(
    const auto deadline_abs = fc::time_point::now() + deadline;
    throw_if_past_deadline(deadline_abs, OP_READ_INBOUND);
 
-   const auto events = _opp_client->query_events(
-      {std::string(OPP_ENVELOPE_EVENT_NAME)},
-      eth::block_tag_t{std::string(eth::block_tag_latest)},
-      eth::block_tag_t{std::string(eth::block_tag_latest)});
+   // Single view call against the OPP contract's `latestOutboundEnvelope`
+   // storage slot, populated by `emitOutboundEnvelope`. The OPP cycle is
+   // atomic across actors so only the most-recent emitted envelope is in
+   // flight at any moment — historical reads are out of scope and live
+   // in the `OPPEnvelope` event archive for off-chain auditors.
+   // The typed view's `fc::variant` return is the raw hex `eth_call`
+   // result — `create_call<fc::variant>` does NOT auto-decode. Pull the
+   // ABI entry for this view and decode through `contract_decode_data`
+   // so we get the structured outputs `(uint32 epoch_, bytes data_)`
+   // back as a `mutable_variant_object`.
+   const auto& abi = _opp_client->get_abi("getLatestOutboundEnvelope");
+   const auto raw_hex_var = _opp_client->get_latest_outbound_envelope(
+      std::string(eth::block_tag_latest));
+   if (!raw_hex_var.is_string()) {
+      wlog("outpost_ethereum_client[{}]: getLatestOutboundEnvelope returned non-string variant",
+           to_string());
+      return {};
+   }
+   const std::string raw_hex = raw_hex_var.as_string();
+   dlog("outpost_ethereum_client[{}]: getLatestOutboundEnvelope raw_hex={}",
+        to_string(), raw_hex);
+   if (raw_hex.empty() || raw_hex == "0x") {
+      // Empty result → contract returned nothing. Either eth_call hit a
+      // non-existent slot (unexpected on a deployed contract) or the
+      // chain rolled back. Surface as a warning either way.
+      wlog("outpost_ethereum_client[{}]: getLatestOutboundEnvelope returned empty hex",
+           to_string());
+      return {};
+   }
 
-   ilog("outpost_ethereum_client[{}]: {} events fetched = {}",
-        to_string(), OPP_ENVELOPE_EVENT_NAME, events.size());
+   const auto decoded = eth::contract_decode_data(abi, raw_hex);
+   dlog("outpost_ethereum_client[{}]: getLatestOutboundEnvelope decoded={}",
+        to_string(), fc::json::to_string(decoded, fc::json::yield_function_t{}));
+   if (!decoded.is_object()) {
+      wlog("outpost_ethereum_client[{}]: decoded view result was not a variant object",
+           to_string());
+      return {};
+   }
+   const auto& obj = decoded.get_object();
+   if (!obj.contains("epoch_") || !obj.contains("data_")) {
+      wlog("outpost_ethereum_client[{}]: decoded view result missing epoch_/data_ keys",
+           to_string());
+      return {};
+   }
 
-   std::vector<char> combined;
-   uint32_t          msg_count = 0;
-
-   for (auto& evt : events) {
-      if (evt.event_name != OPP_ENVELOPE_EVENT_NAME || evt.data.empty()) continue;
-
-      // `evt.data` is raw ABI-encoded event data; decode through the ABI to
-      // extract the single `bytes` parameter that holds the raw protobuf.
-      auto decoded = evt.decode<fc::variant>();
-      if (!decoded.has_value()) {
-         elog("outpost_ethereum_client[{}]: failed to ABI-decode {} event: {}",
-              to_string(), OPP_ENVELOPE_EVENT_NAME, decoded.error().what());
-         continue;
-      }
-
-      auto&        v = decoded.value();
-      std::string  hex_data;
-      if (v.is_object() && v.get_object().contains(EVENT_DATA_FIELD.data())) {
-         hex_data = v[EVENT_DATA_FIELD.data()].as_string();
-      } else if (v.is_string()) {
-         hex_data = v.as_string();
+   // The libfc ABI decoder returns integer outputs as decimal strings
+   // (the encoder normalises every numeric type to a string). Parse
+   // accordingly; fall back to uint64 form if a future decoder change
+   // emits raw numbers.
+   uint32_t stored_epoch = 0;
+   {
+      const auto& ev = obj["epoch_"];
+      if (ev.is_string()) {
+         try { stored_epoch = static_cast<uint32_t>(std::stoul(ev.as_string())); }
+         catch (...) {
+            wlog("outpost_ethereum_client[{}]: failed to parse epoch_ string '{}'",
+                 to_string(), ev.as_string());
+            return {};
+         }
+      } else if (ev.is_uint64() || ev.is_int64()) {
+         stored_epoch = static_cast<uint32_t>(ev.as_uint64());
       } else {
-         elog("outpost_ethereum_client[{}]: unexpected ABI-decoded variant type for {}",
-              to_string(), OPP_ENVELOPE_EVENT_NAME);
-         continue;
+         wlog("outpost_ethereum_client[{}]: epoch_ has unexpected variant type",
+              to_string());
+         return {};
       }
-
-      auto proto_bytes = fc::crypto::ethereum::hex_to_bytes(hex_data);
-
-      // Validate the payload is a well-formed opp::Envelope and that its
-      // epoch_index matches. ETH retains prior-epoch emissions in its event
-      // log; a block-range query for `latest` can surface stale envelopes
-      // that would otherwise trip `sysio.msgch::deliver`'s epoch_index
-      // mismatch assertion.
-      sysio::opp::Envelope envelope;
-      if (!envelope.ParseFromArray(proto_bytes.data(),
-                                   static_cast<int>(proto_bytes.size()))) {
-         wlog("outpost_ethereum_client[{}]: skipping non-Envelope ETH event payload ({} bytes)",
-              to_string(), proto_bytes.size());
-         continue;
-      }
-
-      if (static_cast<uint32_t>(envelope.epoch_index()) != epoch_index) {
-         dlog("outpost_ethereum_client[{}]: skipping envelope for epoch {} (current {})",
-              to_string(), envelope.epoch_index(), epoch_index);
-         continue;
-      }
-
-      combined.insert(combined.end(),
-                      reinterpret_cast<const char*>(proto_bytes.data()),
-                      reinterpret_cast<const char*>(proto_bytes.data() + proto_bytes.size()));
-      ++msg_count;
+   }
+   if (stored_epoch == 0 || stored_epoch != epoch_index) {
+      // Timing-only: outpost hasn't emitted yet (epoch=0) or the WIRE
+      // batch op is querying a slightly stale tip. Both resolve on the
+      // next poll. Keep at dlog so steady-state operation isn't noisy.
+      dlog("outpost_ethereum_client[{}]: latestOutboundEnvelope epoch mismatch stored={} requested={}",
+           to_string(), stored_epoch, epoch_index);
+      return {};
    }
 
-   if (msg_count > 0) {
-      ilog("outpost_ethereum_client[{}]: concatenated {} inbound envelopes ({} bytes)",
-           to_string(), msg_count, combined.size());
+   const auto& data_var = obj["data_"];
+   if (!data_var.is_string()) {
+      wlog("outpost_ethereum_client[{}]: latestOutboundEnvelope data_ not a string",
+           to_string());
+      return {};
    }
-   return combined;
+   const std::string hex_data = data_var.as_string();
+   const auto raw = fc::crypto::ethereum::hex_to_bytes(hex_data);
+   if (raw.empty()) return {};
+
+   sysio::opp::Envelope envelope;
+   if (!envelope.ParseFromArray(raw.data(), static_cast<int>(raw.size()))) {
+      wlog("outpost_ethereum_client[{}]: latestOutboundEnvelope did not "
+           "decode as a protobuf Envelope ({} bytes)",
+           to_string(), raw.size());
+      return {};
+   }
+   if (static_cast<uint32_t>(envelope.epoch_index()) != epoch_index) {
+      wlog("outpost_ethereum_client[{}]: latestOutboundEnvelope inner "
+           "epoch={} != requested {}",
+           to_string(), envelope.epoch_index(), epoch_index);
+      return {};
+   }
+
+   std::vector<char> out(reinterpret_cast<const char*>(raw.data()),
+                         reinterpret_cast<const char*>(raw.data() + raw.size()));
+   ilog("outpost_ethereum_client[{}]: read inbound envelope epoch={} bytes={}",
+        to_string(), epoch_index, out.size());
+   return out;
 }
 
 } // namespace sysio

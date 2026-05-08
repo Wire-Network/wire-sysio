@@ -1,0 +1,103 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "declarationMap": true,
+    "lib": [
+      "DOM",
+      "DOM.Iterable",
+      "ESNext"
+    ],
+    "jsx": "react-jsx",
+    "allowJs": false,
+    "module": "ESNext",
+    "moduleDetection": "force",
+    "moduleResolution": "bundler",
+    "composite": true,
+    "incremental": true,
+    "noFallthroughCasesInSwitch": false,
+    "allowSyntheticDefaultImports": true,
+    "noImplicitAny": false,
+    "disableSizeLimit": false,
+    "preserveConstEnums": true,
+    "resolveJsonModule": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "inlineSourceMap": true,
+    "inlineSources": true,
+    "sourceMap": false,
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "strictNullChecks": false,
+    "strict": false,
+    "preserveWatchOutput": true,
+    "target": "ES2022",
+    "types": ["node", "jest"],
+    "paths": {
+      "@wireio/shared": [
+        "./packages/shared/src"
+      ],
+      "@wireio/shared/*": [
+        "./packages/shared/src/*"
+      ],
+      "@wireio/shared-web": [
+        "./packages/shared-web/src"
+      ],
+      "@wireio/shared-web/*": [
+        "./packages/shared-web/src/*"
+      ],
+      "@wireio/shared-node": [
+        "./packages/shared-node/src"
+      ],
+      "@wireio/shared-node/*": [
+        "./packages/shared-node/src/*"
+      ],
+      "@wireio/sdk-core": [
+        "./packages/sdk-core/src"
+      ],
+      "@wireio/sdk-core/*": [
+        "./packages/sdk-core/src/*"
+      ],
+      "@wireio/wallet-ext-sdk": [
+        "./packages/wallet-ext-sdk/src"
+      ],
+      "@wireio/wallet-ext-sdk/*": [
+        "./packages/wallet-ext-sdk/src/*"
+      ],
+      "@wireio/protoc-gen-solana": [
+        "./packages/protoc-gen-solana/src"
+      ],
+      "@wireio/protoc-gen-solana/*": [
+        "./packages/protoc-gen-solana/src/*"
+      ],
+      "@wireio/protoc-gen-solidity": [
+        "./packages/protoc-gen-solidity/src"
+      ],
+      "@wireio/protoc-gen-solidity/*": [
+        "./packages/protoc-gen-solidity/src/*"
+      ],
+      "@wireio/wire-protobuf-bundler": [
+        "./packages/protobuf-bundler/src"
+      ],
+      "@wireio/wire-protobuf-bundler/*": [
+        "./packages/protobuf-bundler/src/*"
+      ]
+    }
+  },
+  "include": [
+    "src",
+    "types"
+  ],
+  "exclude": [
+    "lib",
+    "dist",
+    "target",
+    "node_modules",
+    "**/*.js",
+    "**/lib/**",
+    "**/dist/**",
+    "**/target/**",
+    "**/node_modules/**"
+  ]
+}

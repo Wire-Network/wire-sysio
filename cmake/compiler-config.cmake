@@ -51,3 +51,19 @@ else()
   message(STATUS "distcc disabled (ENABLE_DISTCC=OFF).")
 endif()
 
+# Allocator overrides (applied per-target via apply_malloc_config in cmake/linker-config.cmake).
+# The two allocator backends are mutually exclusive.
+if(ENABLE_JEMALLOC AND ENABLE_TCMALLOC)
+  message(FATAL_ERROR "ENABLE_JEMALLOC and ENABLE_TCMALLOC are mutually exclusive")
+endif()
+
+# ASan/UBSan ship their own malloc interceptors; linking jemalloc's overrides on top produces undefined
+# behavior (double-interception, heap metadata mismatch) that makes nodeop crash on startup. The sanitizer
+# CI platforms inject -fsanitize=... via CMAKE_{C,CXX}_FLAGS (see .cicd/platforms/{asan,ubsan}.Dockerfile)
+# rather than toggling the ENABLE_*_SANITIZER options, so detect either path.
+if(ENABLE_JEMALLOC AND (ENABLE_ADDRESS_SANITIZER OR ENABLE_UNDEFINED_BEHAVIOR_SANITIZER
+                        OR "${CMAKE_C_FLAGS}${CMAKE_CXX_FLAGS}" MATCHES "-fsanitize="))
+  message(STATUS "ENABLE_JEMALLOC disabled: sanitizer detected (ENABLE_*_SANITIZER option or -fsanitize= flag)")
+  set(ENABLE_JEMALLOC OFF CACHE BOOL "" FORCE)
+endif()
+
