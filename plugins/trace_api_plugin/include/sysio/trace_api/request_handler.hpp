@@ -244,6 +244,13 @@ namespace sysio::trace_api {
             auto data = logfile_provider.get_block(block_num);
             if (!data) continue;
 
+            // Block-finality marker mirrors get_block's "status" field. Sourced from the same data log
+            // tuple so callers can trust trace_api as a single source of truth for "did this action's
+            // block reach finality."  Promotion (pending -> irreversible) happens out-of-band as LIB
+            // advances; consumers that gate on finality must re-poll, same as get_block today.
+            const bool        irreversible_block = std::get<1>(*data);
+            const char* const block_status_str   = irreversible_block ? "irreversible" : "pending";
+
             std::visit([&](const auto& bt) {
                for (const auto& trx : bt.transactions) {
                   // Filter first, sort after.  trx.actions is stored in schedule order (how apply_context scheduled
@@ -286,7 +293,8 @@ namespace sysio::trace_api {
                      av("trx_id",            trx_id_str)
                        ("block_num",         trx_block)
                        ("block_time",        trx_time)
-                       ("producer_block_id", trx_pbid);
+                       ("producer_block_id", trx_pbid)
+                       ("block_status",      block_status_str);
                      if (full_shape) {
                         av("trx_cpu_usage_us",    trx.cpu_usage_us)
                           ("trx_net_usage_words", trx.net_usage_words);

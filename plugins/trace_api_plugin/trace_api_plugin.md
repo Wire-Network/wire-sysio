@@ -302,6 +302,7 @@ for the cursor pattern.
       "block_num": 1000,
       "block_time": "2025-01-01T00:05:00.000Z",
       "producer_block_id": "000003e8...",
+      "block_status": "irreversible",
       "trx_cpu_usage_us": 200,
       "trx_net_usage_words": 16
     }
@@ -349,6 +350,7 @@ resume pagination from `block_num_end + 1`.
 | `block_num` | Block number. |
 | `block_time` | Block timestamp (ISO-8601). |
 | `producer_block_id` | Block ID as reported by the producer (null for pending blocks). |
+| `block_status` | Finality of this action's block: `"irreversible"` once the block is at or before LIB, `"pending"` otherwise. Mirrors the `status` field on `get_block`. A pending block can later be promoted to irreversible as LIB advances; consumers that gate on finality must re-poll. Operators that only want to serve already-final data can run nodeop with `read-mode = irreversible`, which causes every block returned by trace_api to carry `"irreversible"`. |
 | `trx_cpu_usage_us` | Parent transaction's total CPU in microseconds. |
 | `trx_net_usage_words` | Parent transaction's total NET usage in words (`ceil(net_usage / 8)`). |
 
@@ -436,7 +438,8 @@ notifications are excluded).
       "trx_id": "abcd1234...",
       "block_num": 1000,
       "block_time": "2025-01-01T00:05:00.000Z",
-      "producer_block_id": "000003e8..."
+      "producer_block_id": "000003e8...",
+      "block_status": "irreversible"
     }
   ]
 }
@@ -453,6 +456,11 @@ numbers (`recv_sequence`, `auth_sequence`, `code_sequence`,
 `trx_cpu_usage_us` / `trx_net_usage_words`). These are rarely useful for token-transfer
 exchange/indexer workflows. If you need them, call `get_actions` with
 `receiver = account = <token_contract>, action = "transfer"` instead.
+
+`block_status` IS retained -- exchanges crediting transfers need finality
+just as much as general action consumers. See the `get_actions` field
+table above for its semantics, including the irreversible-mode operator
+note.
 
 **Error responses:**
 
