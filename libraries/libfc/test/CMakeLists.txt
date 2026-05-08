@@ -27,6 +27,7 @@ add_executable( test_fc
         test_bls.cpp
         test_bitset.cpp
         test_ordered_diff.cpp
+        test_opreg_status.cpp
         parallel/test_worker_task_queue.cpp
         task/test_retry.cpp
         main.cpp

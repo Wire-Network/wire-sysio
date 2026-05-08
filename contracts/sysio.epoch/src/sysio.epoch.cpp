@@ -107,6 +107,19 @@ void epoch::advance() {
 
    state_tbl.set(state, get_self());
 
+   // Drain matured rows from `sysio.opreg::wtdwqueue`. Operators that queued
+   // a withdrawal at least WITHDRAW_WAIT_EPOCHS ago are now eligible — opreg
+   // subtracts from the balance and emits OPERATOR_ACTION(WITHDRAW_REMIT) to
+   // the matching outpost (or transfers WIRE tokens directly for WIRE-direct
+   // withdraws). Slashed-during-the-wait rows are dropped silently inside
+   // opreg's flushwtdw. See CLAUDE-WIRE-OPERATOR-COLLATERAL-IMPL-PLAN.md §3.3.
+   action(
+      permission_level{get_self(), "owner"_n},
+      OPREG_ACCOUNT,
+      "flushwtdw"_n,
+      std::make_tuple(state.current_epoch_index)
+   ).send();
+
    // Queue OPERATORS attestation (full roster with authex chain addresses) for each outpost.
    // IMPORTANT: Must come before BATCH_OPERATOR_GROUPS so that the ETH outpost's
    // _handleOperators populates operatorEthAddress before _handleBatchOperatorGroups

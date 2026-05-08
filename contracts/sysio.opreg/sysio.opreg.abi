@@ -1,38 +1,153 @@
 {
     "____comment": "This file was generated with sysio-abigen. DO NOT EDIT ",
     "version": "sysio::abi/1.2",
-    "types": [
-        {
-            "new_type_name": "vint64_t",
-            "type": "varint_int64"
-        }
-    ],
+    "types": [],
     "structs": [
         {
-            "name": "ChainAddress",
+            "name": "available",
             "base": "",
             "fields": [
                 {
-                    "name": "kind",
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "chain",
                     "type": "ChainKind"
                 },
                 {
-                    "name": "address",
-                    "type": "bytes"
+                    "name": "token_kind",
+                    "type": "TokenKind"
                 }
             ]
         },
         {
-            "name": "TokenAmount",
+            "name": "balance_entry",
             "base": "",
             "fields": [
                 {
-                    "name": "kind",
+                    "name": "chain",
+                    "type": "ChainKind"
+                },
+                {
+                    "name": "token_kind",
+                    "type": "TokenKind"
+                },
+                {
+                    "name": "balance",
+                    "type": "uint64"
+                },
+                {
+                    "name": "last_updated_ms",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "cancelwtdw",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "request_id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "chain_min_bond",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain",
+                    "type": "ChainKind"
+                },
+                {
+                    "name": "token_kind",
+                    "type": "TokenKind"
+                },
+                {
+                    "name": "min_bond",
+                    "type": "uint64"
+                },
+                {
+                    "name": "config_timestamp_ms",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "delivery_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "log_id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "delivery_log_entry",
+            "base": "",
+            "fields": [
+                {
+                    "name": "log_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "epoch",
+                    "type": "uint32"
+                },
+                {
+                    "name": "delivered",
+                    "type": "bool"
+                },
+                {
+                    "name": "ts_ms",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "deposit",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "chain",
+                    "type": "ChainKind"
+                },
+                {
+                    "name": "token_kind",
                     "type": "TokenKind"
                 },
                 {
                     "name": "amount",
-                    "type": "vint64_t"
+                    "type": "uint64"
+                },
+                {
+                    "name": "outpost_tx_hash",
+                    "type": "checksum256"
+                }
+            ]
+        },
+        {
+            "name": "flushwtdw",
+            "base": "",
+            "fields": [
+                {
+                    "name": "current_epoch",
+                    "type": "uint32"
                 }
             ]
         },
@@ -42,15 +157,15 @@
             "fields": [
                 {
                     "name": "req_prod_stakes",
-                    "type": "stake_requirement[]"
+                    "type": "chain_min_bond[]"
                 },
                 {
                     "name": "req_batchop_stakes",
-                    "type": "stake_requirement[]"
+                    "type": "chain_min_bond[]"
                 },
                 {
                     "name": "req_uw_stakes",
-                    "type": "stake_requirement[]"
+                    "type": "chain_min_bond[]"
                 },
                 {
                     "name": "max_available_producers",
@@ -66,6 +181,20 @@
                 },
                 {
                     "name": "terminate_prune_delay_ms",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "op_counters",
+            "base": "",
+            "fields": [
+                {
+                    "name": "next_withdraw_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "next_dellog_id",
                     "type": "uint64"
                 }
             ]
@@ -91,8 +220,8 @@
                     "type": "bool"
                 },
                 {
-                    "name": "stakes",
-                    "type": "stake_entry[]"
+                    "name": "balances",
+                    "type": "balance_entry[]"
                 },
                 {
                     "name": "registered_at",
@@ -109,6 +238,10 @@
                 {
                     "name": "terminated_at",
                     "type": "uint64"
+                },
+                {
+                    "name": "status_reason",
+                    "type": "string"
                 }
             ]
         },
@@ -182,6 +315,46 @@
             "fields": []
         },
         {
+            "name": "queuewtdw",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "chain",
+                    "type": "ChainKind"
+                },
+                {
+                    "name": "token_kind",
+                    "type": "TokenKind"
+                },
+                {
+                    "name": "amount",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "recorddel",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "epoch",
+                    "type": "uint32"
+                },
+                {
+                    "name": "delivered",
+                    "type": "bool"
+                }
+            ]
+        },
+        {
             "name": "regoperator",
             "base": "",
             "fields": [
@@ -196,6 +369,28 @@
                 {
                     "name": "is_bootstrapped",
                     "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "releaselock",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "chain",
+                    "type": "ChainKind"
+                },
+                {
+                    "name": "token_kind",
+                    "type": "TokenKind"
+                },
+                {
+                    "name": "amount",
+                    "type": "uint64"
                 }
             ]
         },
@@ -236,7 +431,17 @@
             ]
         },
         {
-            "name": "stake",
+            "name": "termcheck",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "terminate",
             "base": "",
             "fields": [
                 {
@@ -244,63 +449,105 @@
                     "type": "name"
                 },
                 {
-                    "name": "chain_addr",
-                    "type": "ChainAddress"
-                },
-                {
-                    "name": "amount",
-                    "type": "TokenAmount"
+                    "name": "reason",
+                    "type": "string"
                 }
             ]
         },
         {
-            "name": "stake_entry",
+            "name": "wirestake",
             "base": "",
             "fields": [
                 {
-                    "name": "chain_addr",
-                    "type": "ChainAddress"
+                    "name": "account",
+                    "type": "name"
                 },
                 {
                     "name": "amount",
-                    "type": "TokenAmount"
-                },
-                {
-                    "name": "timestamp_ms",
                     "type": "uint64"
                 }
             ]
         },
         {
-            "name": "stake_requirement",
+            "name": "wireunstake",
             "base": "",
             "fields": [
                 {
-                    "name": "chain_addr",
-                    "type": "ChainAddress"
+                    "name": "account",
+                    "type": "name"
                 },
                 {
-                    "name": "min_amount",
-                    "type": "TokenAmount"
-                },
-                {
-                    "name": "config_timestamp_ms",
+                    "name": "amount",
                     "type": "uint64"
                 }
             ]
         },
         {
-            "name": "varint_int64",
+            "name": "withdraw_key",
             "base": "",
             "fields": [
                 {
-                    "name": "value",
-                    "type": "int64"
+                    "name": "request_id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "withdraw_request",
+            "base": "",
+            "fields": [
+                {
+                    "name": "request_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "chain",
+                    "type": "ChainKind"
+                },
+                {
+                    "name": "token_kind",
+                    "type": "TokenKind"
+                },
+                {
+                    "name": "amount",
+                    "type": "uint64"
+                },
+                {
+                    "name": "eligible_at_epoch",
+                    "type": "uint32"
+                },
+                {
+                    "name": "requested_at_epoch",
+                    "type": "uint32"
                 }
             ]
         }
     ],
     "actions": [
+        {
+            "name": "available",
+            "type": "available",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "cancelwtdw",
+            "type": "cancelwtdw",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "deposit",
+            "type": "deposit",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "flushwtdw",
+            "type": "flushwtdw",
+            "ricardian_contract": ""
+        },
         {
             "name": "processbatch",
             "type": "processbatch",
@@ -322,8 +569,23 @@
             "ricardian_contract": ""
         },
         {
+            "name": "queuewtdw",
+            "type": "queuewtdw",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "recorddel",
+            "type": "recorddel",
+            "ricardian_contract": ""
+        },
+        {
             "name": "regoperator",
             "type": "regoperator",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "releaselock",
+            "type": "releaselock",
             "ricardian_contract": ""
         },
         {
@@ -337,12 +599,42 @@
             "ricardian_contract": ""
         },
         {
-            "name": "stake",
-            "type": "stake",
+            "name": "termcheck",
+            "type": "termcheck",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "terminate",
+            "type": "terminate",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "wirestake",
+            "type": "wirestake",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "wireunstake",
+            "type": "wireunstake",
             "ricardian_contract": ""
         }
     ],
     "tables": [
+        {
+            "name": "dellog",
+            "type": "delivery_log_entry",
+            "index_type": "i64",
+            "key_names": ["log_id"],
+            "key_types": ["uint64"],
+            "table_id": 14972,
+            "secondary_indexes": [
+                {
+                    "name": "byaccountts",
+                    "key_type": "uint128",
+                    "table_id": 30319
+                }
+            ]
+        },
         {
             "name": "opconfig",
             "type": "op_config",
@@ -350,6 +642,14 @@
             "key_names": ["name"],
             "key_types": ["name"],
             "table_id": 47741
+        },
+        {
+            "name": "opcounters",
+            "type": "op_counters",
+            "index_type": "i64",
+            "key_names": ["name"],
+            "key_types": ["name"],
+            "table_id": 45183
         },
         {
             "name": "operators",
@@ -370,11 +670,41 @@
                     "table_id": 57937
                 }
             ]
+        },
+        {
+            "name": "wtdwqueue",
+            "type": "withdraw_request",
+            "index_type": "i64",
+            "key_names": ["request_id"],
+            "key_types": ["uint64"],
+            "table_id": 12732,
+            "secondary_indexes": [
+                {
+                    "name": "byaccountck",
+                    "key_type": "uint128",
+                    "table_id": 37467
+                },
+                {
+                    "name": "byeligible",
+                    "key_type": "uint64",
+                    "table_id": 49033
+                },
+                {
+                    "name": "byaccount",
+                    "key_type": "uint64",
+                    "table_id": 34233
+                }
+            ]
         }
     ],
     "ricardian_clauses": [],
     "variants": [],
-    "action_results": [],
+    "action_results": [
+        {
+            "name": "available",
+            "result_type": "uint64"
+        }
+    ],
     "enums": [
         {
             "name": "ChainKind",
