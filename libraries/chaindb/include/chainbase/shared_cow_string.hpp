@@ -203,7 +203,7 @@ namespace chainbase {
       void dec_refcount(Alloc&& alloc) {
          if (_data && --_data->reference_count == 0) {
             assert(_data->size);                                    // if size == 0, _data should be nullptr
-            std::forward<Alloc>(alloc).deallocate((char*)&*_data, sizeof(impl) + _data->size + 1);
+            std::forward<Alloc>(alloc).deallocate((char*)&*_data, sizeof(impl) + _data->size);
          }
       }
       
@@ -229,12 +229,11 @@ namespace chainbase {
       void _alloc(Alloc&& alloc, const char* ptr, std::size_t size) {
          impl* new_data = nullptr;
          if (size > 0) {
-            new_data = (impl*)&*std::forward<Alloc>(alloc).allocate(sizeof(impl) + size + 1);
+            new_data = (impl*)&*std::forward<Alloc>(alloc).allocate(sizeof(impl) + size);
             new_data->reference_count = 1;
             new_data->size = size;
             if (ptr)
                std::memcpy(new_data->data, ptr, size);
-            new_data->data[size] = '\0';
          }
          dec_refcount(std::forward<Alloc>(alloc));
          _data = new_data;
