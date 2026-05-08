@@ -15,8 +15,9 @@
 // Core emissions tables owned by sysio.system. This header is intentionally
 // free of OPP / protobuf dependencies so that downstream contracts (notably
 // sysio.roa) can include it to check emitcfg_t::exists() before invoking
-// addnodeowner. The opreg / epoch read-only mirrors used by processepoch
-// live in emissions.cpp (implementation detail, not public API).
+// addnodeowner. The opreg / token / epoch cross-contract reads used by
+// payepoch and viewepoch live in emissions.cpp (implementation detail,
+// not public API).
 
 namespace sysiosystem::emissions {
 
@@ -179,7 +180,7 @@ using t5state_t = sysio::kv::global<"t5state"_n, t5_state>;
 // values cannot drift between the two contracts.
 // ---------------------------------------------------------------------------
 
-inline constexpr int64_t SECONDS_PER_YEAR = 31'536'000;
+inline constexpr int64_t SECONDS_PER_YEAR = 365LL * 24 * 60 * 60;
 
 /// Linearly scale a per-year amount to a per-epoch amount.
 /// per_epoch = annual * epoch_secs / SECONDS_PER_YEAR.
@@ -191,8 +192,8 @@ inline int64_t scale_annual_to_epoch(int64_t annual, uint32_t epoch_duration_sec
 /// Per-epoch decay factor in Q32.32, derived from target annual survival
 /// ratio and epoch length: factor = (target_bps/10000)^(epoch_secs/year_secs).
 /// target_bps == 10000 (no decay) short-circuits to fp_math::ONE.
-inline fp_math::fp_t compute_per_epoch_decay_q32(uint16_t target_annual_decay_bps,
-                                                 uint32_t epoch_duration_sec) {
+inline fp_math::fp_t compute_per_epoch_decay(uint16_t target_annual_decay_bps,
+                                              uint32_t epoch_duration_sec) {
    const fp_math::fp_t base =
       (static_cast<fp_math::fp_t>(target_annual_decay_bps) << fp_math::FRAC_BITS) / 10000;
    const fp_math::fp_t exponent = fp_math::div(
@@ -219,7 +220,7 @@ inline int64_t compute_epoch_emission(const emission_config& cfg,
    if (remaining <= 0) return 0;
 
    const fp_math::fp_t factor =
-      compute_per_epoch_decay_q32(cfg.target_annual_decay_bps, epoch_duration_sec);
+      compute_per_epoch_decay(cfg.target_annual_decay_bps, epoch_duration_sec);
    __int128 product = static_cast<__int128>(prev_emission) * factor;
    int64_t emission = static_cast<int64_t>(product / fp_math::ONE);
 

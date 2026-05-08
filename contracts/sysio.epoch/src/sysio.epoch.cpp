@@ -71,15 +71,15 @@ struct emissions_gate_result {
    EmissionsBlockReason  reason             = opp::types::EMISSIONS_BLOCK_REASON_UNSPECIFIED;
 };
 
-emissions_gate_result check_emissions_ready() {
+emissions_gate_result check_emissions_ready(uint32_t epoch_duration_sec) {
    emissions_gate_result r;
 
-   sysiosystem::emissions::emitcfg_t cfg_tbl(SYSTEM_ACCOUNT);
-   if (!cfg_tbl.exists()) {
+   sysiosystem::emissions::emitcfg_t emit_cfg_tbl(SYSTEM_ACCOUNT);
+   if (!emit_cfg_tbl.exists()) {
       r.reason = opp::types::EMISSIONS_BLOCK_REASON_CONFIG_MISSING;
       return r;
    }
-   const auto cfg = cfg_tbl.get();
+   const auto cfg = emit_cfg_tbl.get();
 
    sysiosystem::emissions::t5state_t t5s_tbl(SYSTEM_ACCOUNT);
    if (!t5s_tbl.exists()) {
@@ -89,12 +89,9 @@ emissions_gate_result check_emissions_ready() {
    const auto t5s = t5s_tbl.get();
    r.treasury_remaining = cfg.t5_distributable - cfg.t5_floor - t5s.total_distributed;
 
-   // Read canonical epoch_duration_sec from our own epochcfg singleton --
-   // already validated at advance() entry. Pass into the shared emission
-   // formula so this contract and sysio.system see identical per-epoch
-   // values for the same inputs.
-   epoch::epochcfg_t cfg_tbl_local(epoch::EPOCH_ACCOUNT);
-   const uint32_t epoch_duration_sec = cfg_tbl_local.get().epoch_duration_sec;
+   // epoch_duration_sec is the canonical value from sysio.epoch::epochcfg,
+   // passed by advance() so this gate and sysio.system see identical inputs
+   // and the gate doesn't repeat advance()'s read of the same singleton.
 
    // Compute would-be emission. First-epoch case: use initial; cap at remaining.
    if (t5s.epoch_count == 0) {
@@ -284,7 +281,7 @@ void epoch::advance() {
    // without mutating state. The wall clock for the current epoch effectively
    // extends until the gate eventually passes on a subsequent chkcons retry.
    const uint32_t target_epoch = state.current_epoch_index + 1;
-   const auto gate = check_emissions_ready();
+   const auto gate = check_emissions_ready(cfg.epoch_duration_sec);
    if (!gate.ready) {
       record_gate_block(get_self(), target_epoch, gate);
       return;

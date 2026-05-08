@@ -80,10 +80,6 @@ int64_t split_bps(int64_t total, uint16_t bps) {
    return static_cast<int64_t>(product / BPS_DENOMINATOR);
 }
 
-// compute_epoch_emission lives in sysio.system_readonly.hpp as a template so
-// sysio.epoch's gate and this contract share one source of truth. Use the
-// qualified name at the call sites below.
-
 node_claim_result compute_node_claim(const emission_state& emission,
                                      const node_owner_distribution& row,
                                      int64_t min_claimable) {
@@ -228,28 +224,31 @@ void system_contract::setemitcfg(const emissions::emission_config& cfg) {
    sysio::check(cfg.epoch_log_retention_count > 0,
                  "epoch_log_retention_count must be positive");
 
+   // Single read of sysio.epoch::epochcfg shared by the round-to-zero guards
+   // (which need epoch_secs to scale annual values) and the post-init guard
+   // (which compares per-epoch floor against remaining distributable).
+   sysio::epoch::epochcfg_t epoch_cfg_tbl(epoch_refs::account);
+   const bool epoch_configured = epoch_cfg_tbl.exists();
+   const uint32_t epoch_secs   = epoch_configured ? epoch_cfg_tbl.get().epoch_duration_sec : 0;
+
    // If sysio.epoch is configured, sanity-check that each nonzero annual
    // value scales to a non-zero per-epoch share at the canonical
    // epoch_duration_sec. Without this guard, a tiny annual value can round
    // down to 0 in scale_annual_to_epoch, the gate sees emission_amount = 0,
    // and emissions silently disable. Skipped pre-bootstrap (sysio.epoch not
    // yet configured); the same check fires on the next setemitcfg call.
-   {
-      sysio::epoch::epochcfg_t epoch_cfg_tbl(epoch_refs::account);
-      if (epoch_cfg_tbl.exists()) {
-         const uint32_t epoch_secs = epoch_cfg_tbl.get().epoch_duration_sec;
-         if (cfg.annual_initial_emission > 0) {
-            sysio::check(emissions::scale_annual_to_epoch(cfg.annual_initial_emission, epoch_secs) > 0,
-                          "annual_initial_emission per-epoch share rounds to 0 at current epoch_duration_sec");
-         }
-         if (cfg.annual_max_emission > 0) {
-            sysio::check(emissions::scale_annual_to_epoch(cfg.annual_max_emission, epoch_secs) > 0,
-                          "annual_max_emission per-epoch share rounds to 0 at current epoch_duration_sec");
-         }
-         if (cfg.annual_min_emission > 0) {
-            sysio::check(emissions::scale_annual_to_epoch(cfg.annual_min_emission, epoch_secs) > 0,
-                          "annual_min_emission per-epoch share rounds to 0 at current epoch_duration_sec");
-         }
+   if (epoch_configured) {
+      if (cfg.annual_initial_emission > 0) {
+         sysio::check(emissions::scale_annual_to_epoch(cfg.annual_initial_emission, epoch_secs) > 0,
+                       "annual_initial_emission per-epoch share rounds to 0 at current epoch_duration_sec");
+      }
+      if (cfg.annual_max_emission > 0) {
+         sysio::check(emissions::scale_annual_to_epoch(cfg.annual_max_emission, epoch_secs) > 0,
+                       "annual_max_emission per-epoch share rounds to 0 at current epoch_duration_sec");
+      }
+      if (cfg.annual_min_emission > 0) {
+         sysio::check(emissions::scale_annual_to_epoch(cfg.annual_min_emission, epoch_secs) > 0,
+                       "annual_min_emission per-epoch share rounds to 0 at current epoch_duration_sec");
       }
    }
 
@@ -257,6 +256,8 @@ void system_contract::setemitcfg(const emissions::emission_config& cfg) {
    // emissions. Post-init, remaining distributable must still cover what's been
    // paid, and the per-epoch floor (derived from annual_min_emission and the
    // canonical epoch_duration_sec) can't exceed what's left to distribute.
+   // initt5 requires sysio.epoch to be configured, so t5s.exists() implies
+   // epoch_configured -- safe to use epoch_secs directly.
    t5state_t t5s(get_self());
    if (t5s.exists()) {
       const auto state = t5s.get();
@@ -264,7 +265,7 @@ void system_contract::setemitcfg(const emissions::emission_config& cfg) {
                     "t5_distributable must cover floor + already-distributed");
       const int64_t remaining = cfg.t5_distributable - cfg.t5_floor - state.total_distributed;
       const int64_t per_epoch_min =
-         emissions::scale_annual_to_epoch(cfg.annual_min_emission, get_epoch_duration_sec());
+         emissions::scale_annual_to_epoch(cfg.annual_min_emission, epoch_secs);
       sysio::check(per_epoch_min <= remaining,
                     "annual_min_emission per-epoch share exceeds remaining distributable");
    }
@@ -483,6 +484,11 @@ void system_contract::payepoch(uint32_t epoch_index,
       // sysio.epoch (canonical source of truth).
       const uint32_t epoch_duration_sec = get_epoch_duration_sec();
       uint32_t expected_rounds = (epoch_duration_sec * 2) / TOTAL_BLOCKS_PER_ROUND;
+      // Below ~126s (one full 21-producer round at 0.5s/block), expected_rounds
+      // truncates to zero. Falling back to 1 keeps the pay formula well-defined
+      // -- producer pay collapses to "elig_rounds clamped to 1, pay = full_share"
+      // at the 60s minimum. This coarse-grained pay is the price of allowing
+      // sub-rotation epoch durations; documented at MIN_EPOCH_DURATION_SEC.
       if (expected_rounds == 0) expected_rounds = 1;
 
       struct prod_entry {

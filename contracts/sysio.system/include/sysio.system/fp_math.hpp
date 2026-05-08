@@ -24,8 +24,13 @@ using fp_t = __int128;
 inline constexpr int  FRAC_BITS = 32;
 inline constexpr fp_t ONE = static_cast<fp_t>(1) << FRAC_BITS;
 
-/// ln(2) in Q32.32. 0.6931471805599453 * 2^32 = 2977044471.55..., rounded.
+/// ln(2) in Q32.32. round(0.6931471805599453 * 2^32) = 2977044472.
 inline constexpr fp_t LN2 = 2977044472;
+
+/// Taylor-series term counts. Sized to cover Q32.32 precision over the
+/// post-range-reduction input domain: |u| <= 0.5 for ln, |y| <= 1.0 for exp.
+inline constexpr int LN_TAYLOR_TERMS  = 35;
+inline constexpr int EXP_TAYLOR_TERMS = 20;
 
 /// Multiply two Q32.32 values: (a*b) in Q32.32.
 inline constexpr fp_t mul(fp_t a, fp_t b) {
@@ -41,7 +46,7 @@ inline constexpr fp_t div(fp_t a, fp_t b) {
 /// Natural log of x for x in (0, ONE]; returns a non-positive Q32.32 value.
 /// Strategy: range-reduce by repeatedly doubling until x is in [0.5, 1.0],
 /// then evaluate the standard Taylor series ln(1-u) = -sum_{n>=1} u^n / n
-/// with |u| <= 0.5 (35 terms covers Q32.32 precision).
+/// with |u| <= 0.5 (LN_TAYLOR_TERMS covers Q32.32 precision).
 constexpr fp_t ln(fp_t x) {
    if (x >= ONE) return 0;
    int k = 0;
@@ -52,18 +57,20 @@ constexpr fp_t ln(fp_t x) {
    const fp_t u = ONE - x;
    fp_t result = 0;
    fp_t term = u;
-   for (int n = 1; n <= 35; ++n) {
-      result -= term / n;
-      if (n < 35) term = mul(term, u);
+   for (int n = 1; n <= LN_TAYLOR_TERMS; ++n) {
+      const fp_t delta = term / n;
+      if (delta == 0) break;          // remaining terms truncate to zero in Q32.32
+      result -= delta;
+      term = mul(term, u);
    }
    return result - static_cast<fp_t>(k) * LN2;
 }
 
 /// exp(y) for y in (-large, 0]; returns a positive Q32.32 value in (0, ONE].
 /// Strategy: range-reduce by halving y until |y| <= 1, evaluate Taylor
-/// (20 terms covers |y| <= 1 to Q32.32 precision), then square the result
-/// back k times to undo the halving (exp(y) = (exp(y/2^k))^(2^k)).
-constexpr fp_t exp_nonpositive(fp_t y) {
+/// (EXP_TAYLOR_TERMS covers |y| <= 1 to Q32.32 precision), then square the
+/// result back k times to undo the halving (exp(y) = (exp(y/2^k))^(2^k)).
+constexpr fp_t exp_neg(fp_t y) {
    if (y == 0) return ONE;
    int k = 0;
    while (y < -ONE) {
@@ -72,8 +79,9 @@ constexpr fp_t exp_nonpositive(fp_t y) {
    }
    fp_t result = ONE;
    fp_t term = ONE;
-   for (int n = 1; n <= 20; ++n) {
+   for (int n = 1; n <= EXP_TAYLOR_TERMS; ++n) {
       term = mul(term, y) / n;
+      if (term == 0) break;           // remaining terms truncate to zero in Q32.32
       result += term;
    }
    for (int i = 0; i < k; ++i) {
@@ -89,7 +97,7 @@ constexpr fp_t pow_frac(fp_t base, fp_t p) {
    if (base >= ONE || p == 0) return ONE;
    const fp_t ln_base = ln(base);
    const fp_t y = mul(ln_base, p);
-   return exp_nonpositive(y);
+   return exp_neg(y);
 }
 
 } // namespace sysiosystem::fp_math

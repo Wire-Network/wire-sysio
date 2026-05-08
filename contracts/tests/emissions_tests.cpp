@@ -184,7 +184,7 @@ static int64_t test_scale_annual_to_epoch(int64_t annual, uint32_t epoch_secs) {
 
 // Mirror of the contract's per-epoch decay computation, using the same
 // Q32.32 fp_math used on chain so test expectations are bit-exact.
-static sysiosystem::fp_math::fp_t test_per_epoch_decay_q32(
+static sysiosystem::fp_math::fp_t test_per_epoch_decay(
    uint16_t target_bps, uint32_t epoch_secs)
 {
    namespace fp = sysiosystem::fp_math;
@@ -200,7 +200,7 @@ static int64_t test_apply_decay(int64_t prev_emission,
                                 uint16_t target_bps, uint32_t epoch_secs)
 {
    namespace fp = sysiosystem::fp_math;
-   const fp::fp_t factor = test_per_epoch_decay_q32(target_bps, epoch_secs);
+   const fp::fp_t factor = test_per_epoch_decay(target_bps, epoch_secs);
    return static_cast<int64_t>(
       (static_cast<__int128>(prev_emission) * factor) / fp::ONE);
 }
