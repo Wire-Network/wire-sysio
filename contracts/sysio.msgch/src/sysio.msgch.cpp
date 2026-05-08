@@ -266,20 +266,11 @@ void msgch::evalcons(uint64_t outpost_id, uint32_t epoch_index) {
    auto decode_result = in(envelope);
    check(decode_result == zpp::bits::errc{}, "failed to decode inbound OPP Envelope");
 
-   // Store the raw envelope as an inbound message
-   messages_t msgs(get_self());
-   uint64_t msg_id = msgs.available_primary_key();
-
-   msgs.emplace(get_self(), id_key{msg_id}, message_entry{
-      .id           = msg_id,
-      .outpost_id   = outpost_id,
-      .epoch_index  = epoch,
-      .direction    = MessageDirection::MESSAGE_DIRECTION_INBOUND,
-      .status       = MessageStatus::MESSAGE_STATUS_PROCESSED,
-      .raw_payload  = raw,
-      .received_at  = now,
-      .processed_at = now,
-   });
+   // The `messages` row is intentionally not written here. The raw envelope bytes have already served their consensus
+   // purpose at this point: attestations are extracted below and queued via `buildenv`, and the durable trail lives in
+   // the metadata-only `envelope_log`. Emplacing a `message_entry` whose `raw_payload` mirrors `raw` (up to
+   // `MAX_ENVELOPE_BYTES`) only to drop it again at the end of this action would burn KV serialisation, undo-log
+   // entries, and a peak-RAM blip on the contract's payer for zero net storage.
 
    // Extract individual AttestationEntries from each Message in the Envelope
    attestations_t atts(get_self());
@@ -302,11 +293,10 @@ void msgch::evalcons(uint64_t outpost_id, uint32_t epoch_index) {
 
    // === AUDIT LOG + INLINE CLEANUP OF WORKING STATE ===
    //
-   // The envelope's bytes have served their purpose at this point:
-   // consensus is reached, attestations are extracted and queued for
-   // outbound delivery via `buildenv`. The durable trail is the
-   // metadata-only `envelope_log` row written below; the four working
-   // tables are drained inline so they don't grow without bound.
+   // The envelope's bytes have served their purpose at this point: consensus is reached, attestations are extracted
+   // above and queued for outbound delivery via `buildenv`. The durable trail is the metadata-only `envelope_log`
+   // row written below; the per-batch-op `envelopes` rows for this consensus event are drained inline so they do
+   // not grow without bound. PROCESSED attestation and outenvelope retention live on the `buildenv` side.
    {
       const auto& op_row = [&]() {
          epoch::outposts_t outposts(EPOCH_ACCOUNT);
@@ -327,14 +317,6 @@ void msgch::evalcons(uint64_t outpost_id, uint32_t epoch_index) {
       for (auto it = evict_idx.lower_bound(composite);
            it != evict_idx.end() && it->by_outpost_epoch() == composite; ) {
          it = evict_idx.erase(std::move(it));
-      }
-
-      // Drop the just-inserted `messages` row. Its raw_payload mirrors
-      // the envelope bytes we already discarded; downstream consumers
-      // read the audit log for trail and the attestations table for
-      // queued outbound work.
-      if (msgs.contains(id_key{msg_id})) {
-         msgs.erase(id_key{msg_id});
       }
    }
 
