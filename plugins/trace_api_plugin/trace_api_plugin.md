@@ -79,7 +79,7 @@ default).
 | Option | Default | Description |
 |--------|---------|-------------|
 | `trace-dir` | `traces` | Directory for trace files. Relative paths are resolved from the node's data directory. |
-| `trace-slice-stride` | `10000` | Number of blocks per slice file. Must be in `[1, 1000000]`. Larger values reduce file count but bloat the block-offset sidecar's per-slice pre-allocation (`stride * 8` bytes, sparse) and stress the per-slice trx_id hash index (rejected if it would need more than 2^28 buckets). |
+| `trace-slice-stride` | `10000` | Number of blocks per slice file. Must be in `[1, 1000000]`. Larger values reduce file count but bloat the block-offset sidecar's per-slice pre-allocation (`stride * 8` bytes, sparse) and stress the per-slice trx_id hash index (rejected if it would need more than 2^28 buckets). Also bounds the worst-case scan cost of `get_actions` on a positive bloom probe - smaller strides mean less work per hit-slice at the cost of more sidecar files (see [Slice stride vs. query latency](#slice-stride-vs-query-latency)). Setting takes effect on nodeop restart; existing slices retain their old naming. |
 | `trace-minimum-irreversible-history-blocks` | `-1` | Blocks past LIB to retain before old slices can be auto-deleted. `-1` disables automatic deletion (keep forever). |
 | `trace-minimum-uncompressed-irreversible-history-blocks` | `-1` | Blocks past LIB to keep uncompressed. Slices older than this threshold are transparently compressed. `-1` disables automatic compression. |
 | `trace-max-block-range` | `1000` | Maximum number of blocks scanned by a single `get_actions` or `get_token_transfers` request. Must be in `[1, 10000]`. `block_num_end` is silently clamped to `block_num_start + trace-max-block-range - 1` when a request asks for more. The response envelope always reports the actual range scanned. |
@@ -694,7 +694,7 @@ All files live inside `trace-dir`. The directory is monitored by
 #### Slice files
 
 Blocks are grouped into contiguous slices of `trace-slice-stride` blocks
-each. Each slice is represented by four files that share a common range
+each. Each slice is represented by five files that share a common range
 suffix `<start>-<end>` (zero-padded to 10 digits):
 
 | File | Description |
@@ -703,6 +703,7 @@ suffix `<start>-<end>` (zero-padded to 10 digits):
 | `trace_index_<start>-<end>.log` | Append-only metadata log of `block_entry_v0` and `lib_entry_v0` records. Source of truth; used as a fallback for `get_block` and to track LIB advancement within the slice. |
 | `trace_blk_idx_<start>-<end>.log` | Block-offset sidecar. Enables O(1) `get_block` lookups regardless of the block's position within the slice. |
 | `trace_trx_idx_<start>-<end>.log` | Transaction-id hash index. |
+| `trace_recv_bloom_<start>-<end>.log` | Per-slice bloom filter over action receivers and (receiver, action) pairs. `get_actions` consults it to skip slices that cannot contain the requested filter value. |
 
 When a slice is compressed the trace file is replaced by:
 
@@ -710,7 +711,7 @@ When a slice is compressed the trace file is replaced by:
 |------|-------------|
 | `trace_<start>-<end>.clog` | zlib-compressed trace data with embedded seek points for random access. |
 
-The index and trx_id index files are not compressed.
+The metadata, block-offset, trx-id, and receiver-bloom sidecars are not compressed - they are already compact and need random access.
 
 **Example** (10 000-block stride, blocks 0–29 999):
 
@@ -720,14 +721,17 @@ traces/
   trace_index_0000000000-0000010000.log
   trace_blk_idx_0000000000-0000010000.log
   trace_trx_idx_0000000000-0000010000.log
+  trace_recv_bloom_0000000000-0000010000.log
   trace_0000010000-0000020000.log
   trace_index_0000010000-0000020000.log
   trace_blk_idx_0000010000-0000020000.log
   trace_trx_idx_0000010000-0000020000.log
+  trace_recv_bloom_0000010000-0000020000.log
   trace_0000020000-0000030000.clog        <- compressed
   trace_index_0000020000-0000030000.log
   trace_blk_idx_0000020000-0000030000.log
   trace_trx_idx_0000020000-0000030000.log
+  trace_recv_bloom_0000020000-0000030000.log
   abi_log.log
 ```
 
@@ -763,6 +767,113 @@ the hash table). The index is built once per slice when the slice's
 last block becomes irreversible. Queries against
 `/v1/trace_api/get_transaction_trace` use this index for O(1)
 `trx_id → block_num` resolution.
+
+#### Receiver bloom sidecar
+
+`trace_recv_bloom_<start>-<end>.log` is a per-slice pair of bloom
+filters used by `/v1/trace_api/get_actions` to skip slices that cannot
+contain the requested filter value. Without it, a request for a
+rarely-active receiver across a wide block range would have to fetch
+and scan every block in every slice; with it, slices that do not
+contain the receiver are dismissed by a single O(1) probe and the
+scanner advances `block_num` to the next slice boundary.
+
+Contents:
+
+- **Receiver filter** - `boost::bloom::filter<uint64_t, 7>` over
+  `action_trace_v0::receiver` (name stored as its 64-bit value).
+- **Composite filter** - `boost::bloom::filter<uint64_t, 7>` over a
+  deterministic pack of `(receiver, action)` pairs. Probed when the
+  caller supplies both a `receiver` and an `action` filter, giving an
+  extra selectivity win for `get_token_transfers`-style lookups.
+
+Format:
+
+```
+Header (40 bytes):
+             magic         (u32) = 0x42524957 ("WIRB" on little-endian)
+             version       (u32) = 1
+             k_hashes      (u32) = 7
+             n_recv        (u32)  - distinct receivers inserted
+             n_recv_action (u32)  - distinct (receiver, action) pairs inserted
+             reserved      (u32)
+             recv_capacity_bits         (u64) - filter bit count
+             recv_action_capacity_bits  (u64)
+Body:
+             receiver bloom bits       (recv_capacity_bits / 8 bytes)
+             (receiver, action) bits   (recv_action_capacity_bits / 8 bytes)
+             crc32 (u32) over header + body
+```
+
+Filters are sized for a 1% false-positive rate with a minimum floor of
+32 items to avoid degenerate tiny bit arrays on sparse slices.  Total
+sidecar size is dominated by the number of distinct receivers seen in
+the slice (the composite filter scales with (receiver, action) pairs,
+typically 2-3x the receiver count).  A busy mainnet slice sits around
+10 KB; an empty slice produces a minimal always-miss file.
+
+Build model: the bloom is built by `slice_directory::build_recv_bloom`
+on the same schedule as the trx_id index - when the slice becomes
+fully irreversible (its last block is below LIB), the maintenance pass
+opens the slice's uncompressed data log, streams through each
+`block_trace_v0` record in order, and inserts every action's receiver
+(and `(receiver, action)` pair) into two
+`boost::unordered_flat_set<uint64_t>` accumulators.  The filters are
+then sized, populated, and written (temp + rename).  Deferring the
+write to irreversibility means forks cannot corrupt an already-written
+sidecar: a fork cannot reach back across LIB, so the slice's data log
+is final by the time the bloom is built.  Fork re-writes leave stale
+`block_trace_v0` records in the data log (the blk_offset sidecar
+points only to the canonical offset); the stream-scan visits those
+stale records too, so the bloom ends up as a superset of the canonical
+receivers.  That is safe - bloom allows false positives, and a
+forked-out receiver probing as present just means the query scan
+visits that slice and finds no canonical match.
+
+Query model: `get_actions` probes the bloom once per distinct slice in
+the queried block range.  A negative probe is authoritative and the
+entire slice is skipped with no `get_block` call.  A positive probe
+(or a missing/corrupt sidecar) falls through to the existing scan.
+Unfiltered queries (no `receiver`, no `account`, no `action`) do not
+consult the bloom.
+
+Retention: `slice_directory::run_maintenance_tasks` removes the bloom
+sidecar alongside the slice's other files when the slice ages out of
+`minimum_irreversible_history_blocks`.
+
+##### Slice stride vs. query latency
+
+The bloom is per-slice, so on a **positive** probe the scanner still
+reads every block in the slice before returning.  That cost is bounded
+by `trace-slice-stride`: larger strides mean more work per hit-slice,
+smaller strides mean finer skip granularity at the cost of more
+sidecar files.
+
+Rough per-slice scan cost on SSD with slices in the OS page cache
+(dominated by deserializing `block_trace_v0` records):
+
+| `trace-slice-stride` | Scan after bloom hit (warm) | Scan (compressed, cold) | Files per slice |
+|----------------------|-----------------------------|--------------------------|-----------------|
+| 10000 (default)      | ~50-100 ms                  | ~200-500 ms              | 5 (+ .clog)     |
+| 2500                 | ~15-25 ms                   | ~50-125 ms               | 5 (+ .clog)     |
+| 1000                 | ~5-10 ms                    | ~20-50 ms                | 5 (+ .clog)     |
+
+Smaller strides approximate a finer-grained bloom skip (bigger
+stride-shrink == more precise "miss" resolution) at the cost of
+linearly more files on disk.  At stride 1000 a year of busy-chain
+history lands around 380 000 slice files total, which modern
+filesystems handle but makes directory listings slow.
+
+Queries that cluster near head (the common case) visit only a handful
+of slices regardless of stride, so stride mostly affects deep-history
+lookups on sparse accounts.  For nodes that primarily serve recent
+queries the default is fine; nodes that expect frequent deep scans can
+benefit from dropping to 2500 or lower.
+
+`trace-slice-stride` takes effect on nodeop restart.  Existing slices
+keep their old `<first>-<last>` naming; new slices written after the
+restart use the new stride.  Nothing is migrated - query paths read
+whatever sidecars exist for the slice covering a given block.
 
 #### ABI log
 

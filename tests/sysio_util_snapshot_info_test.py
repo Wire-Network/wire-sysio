@@ -16,7 +16,7 @@ expected_results = [
         "result": {
             "version": 1,
             "chain_id": "144035215e20fd016e2b4b065349c959a1070fcbb0dc3f4784f3130685e774fc",
-            "head_block_id": "0000001d7105e950ff4a577b653dd4c75a805be942fd49f1da6f8e4642516925",
+            "head_block_id": "0000001db18b54e6237bba303af7874d75145f6e7f1d0ae8be0328bbe2283b4d",
             "head_block_num": 29,
             "head_block_time": "2025-01-01T00:00:14.000"
         }
@@ -28,7 +28,6 @@ def test_success():
         with gzip.open(test['file'], 'rb') as compressed_snap_file:
             with tempfile.NamedTemporaryFile('wb') as uncompressed_snap_file:
                 shutil.copyfileobj(compressed_snap_file, uncompressed_snap_file)
-                uncompressed_snap_file.flush()
                 assert(test['result'] == json.loads(Utils.processSysioUtilCmd(f"snapshot info {uncompressed_snap_file.name}", "do snap info", silentErrors=False, exitOnError=True)))
 
 def test_failure():

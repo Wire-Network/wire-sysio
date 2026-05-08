@@ -279,28 +279,28 @@ void printhex(const void* data, uint32_t datalen) {
 // ============================================================================
 
 INTRINSIC_EXPORT
-int64_t kv_set(uint32_t key_format, uint64_t payer, const char* key, uint32_t key_len, const char* value, uint32_t value_len) {
-   return native_context_stack::current()->kv_set(key_format, payer, legacy_span<const char>{(void*)key, key_len}, legacy_span<const char>{(void*)value, value_len});
+int64_t kv_set(uint32_t table_id, uint64_t payer, const char* key, uint32_t key_len, const char* value, uint32_t value_len) {
+   return native_context_stack::current()->kv_set(table_id, payer, legacy_span<const char>{(void*)key, key_len}, legacy_span<const char>{(void*)value, value_len});
 }
 
 INTRINSIC_EXPORT
-int32_t kv_get(uint32_t key_format, uint64_t code, const char* key, uint32_t key_len, char* value, uint32_t value_len) {
-   return native_context_stack::current()->kv_get(key_format, code, legacy_span<const char>{(void*)key, key_len}, legacy_span<char>{(void*)value, value_len});
+int32_t kv_get(uint32_t table_id, uint64_t code, const char* key, uint32_t key_len, char* value, uint32_t value_len) {
+   return native_context_stack::current()->kv_get(table_id, code, legacy_span<const char>{(void*)key, key_len}, legacy_span<char>{(void*)value, value_len});
 }
 
 INTRINSIC_EXPORT
-int64_t kv_erase(uint32_t key_format, const char* key, uint32_t key_len) {
-   return native_context_stack::current()->kv_erase(key_format, legacy_span<const char>{(void*)key, key_len});
+int64_t kv_erase(uint32_t table_id, const char* key, uint32_t key_len) {
+   return native_context_stack::current()->kv_erase(table_id, legacy_span<const char>{(void*)key, key_len});
 }
 
 INTRINSIC_EXPORT
-int32_t kv_contains(uint32_t key_format, uint64_t code, const char* key, uint32_t key_len) {
-   return native_context_stack::current()->kv_contains(key_format, code, legacy_span<const char>{(void*)key, key_len});
+int32_t kv_contains(uint32_t table_id, uint64_t code, const char* key, uint32_t key_len) {
+   return native_context_stack::current()->kv_contains(table_id, code, legacy_span<const char>{(void*)key, key_len});
 }
 
 INTRINSIC_EXPORT
-uint32_t kv_it_create(uint32_t key_format, uint64_t code, const char* prefix, uint32_t prefix_len) {
-   return native_context_stack::current()->kv_it_create(key_format, code, legacy_span<const char>{(void*)prefix, prefix_len});
+uint32_t kv_it_create(uint32_t table_id, uint64_t code, const char* prefix, uint32_t prefix_len) {
+   return native_context_stack::current()->kv_it_create(table_id, code, legacy_span<const char>{(void*)prefix, prefix_len});
 }
 
 INTRINSIC_EXPORT
@@ -339,28 +339,28 @@ int32_t kv_it_value(uint32_t handle, uint32_t offset, char* dest, uint32_t dest_
 }
 
 INTRINSIC_EXPORT
-void kv_idx_store(uint64_t payer, uint64_t table, uint32_t index_id, const char* pri_key, uint32_t pri_key_len, const char* sec_key, uint32_t sec_key_len) {
-   native_context_stack::current()->kv_idx_store(payer, table, index_id, legacy_span<const char>{(void*)pri_key, pri_key_len}, legacy_span<const char>{(void*)sec_key, sec_key_len});
+void kv_idx_store(uint64_t payer, uint32_t table_id, const char* pri_key, uint32_t pri_key_len, const char* sec_key, uint32_t sec_key_len) {
+   native_context_stack::current()->kv_idx_store(payer, table_id, legacy_span<const char>{(void*)pri_key, pri_key_len}, legacy_span<const char>{(void*)sec_key, sec_key_len});
 }
 
 INTRINSIC_EXPORT
-void kv_idx_remove(uint64_t table, uint32_t index_id, const char* pri_key, uint32_t pri_key_len, const char* sec_key, uint32_t sec_key_len) {
-   native_context_stack::current()->kv_idx_remove(table, index_id, legacy_span<const char>{(void*)pri_key, pri_key_len}, legacy_span<const char>{(void*)sec_key, sec_key_len});
+void kv_idx_remove(uint32_t table_id, const char* pri_key, uint32_t pri_key_len, const char* sec_key, uint32_t sec_key_len) {
+   native_context_stack::current()->kv_idx_remove(table_id, legacy_span<const char>{(void*)pri_key, pri_key_len}, legacy_span<const char>{(void*)sec_key, sec_key_len});
 }
 
 INTRINSIC_EXPORT
-void kv_idx_update(uint64_t payer, uint64_t table, uint32_t index_id, const char* pri_key, uint32_t pri_key_len, const char* old_sec_key, uint32_t old_sec_key_len, const char* new_sec_key, uint32_t new_sec_key_len) {
-   native_context_stack::current()->kv_idx_update(payer, table, index_id, legacy_span<const char>{(void*)pri_key, pri_key_len}, legacy_span<const char>{(void*)old_sec_key, old_sec_key_len}, legacy_span<const char>{(void*)new_sec_key, new_sec_key_len});
+void kv_idx_update(uint64_t payer, uint32_t table_id, const char* pri_key, uint32_t pri_key_len, const char* old_sec_key, uint32_t old_sec_key_len, const char* new_sec_key, uint32_t new_sec_key_len) {
+   native_context_stack::current()->kv_idx_update(payer, table_id, legacy_span<const char>{(void*)pri_key, pri_key_len}, legacy_span<const char>{(void*)old_sec_key, old_sec_key_len}, legacy_span<const char>{(void*)new_sec_key, new_sec_key_len});
 }
 
 INTRINSIC_EXPORT
-int32_t kv_idx_find_secondary(uint64_t code, uint64_t table, uint32_t index_id, const char* sec_key, uint32_t sec_key_len) {
-   return native_context_stack::current()->kv_idx_find_secondary(code, table, index_id, legacy_span<const char>{(void*)sec_key, sec_key_len});
+int32_t kv_idx_find_secondary(uint64_t code, uint32_t table_id, const char* sec_key, uint32_t sec_key_len) {
+   return native_context_stack::current()->kv_idx_find_secondary(code, table_id, legacy_span<const char>{(void*)sec_key, sec_key_len});
 }
 
 INTRINSIC_EXPORT
-int32_t kv_idx_lower_bound(uint64_t code, uint64_t table, uint32_t index_id, const char* sec_key, uint32_t sec_key_len) {
-   return native_context_stack::current()->kv_idx_lower_bound(code, table, index_id, legacy_span<const char>{(void*)sec_key, sec_key_len});
+int32_t kv_idx_lower_bound(uint64_t code, uint32_t table_id, const char* sec_key, uint32_t sec_key_len) {
+   return native_context_stack::current()->kv_idx_lower_bound(code, table_id, legacy_span<const char>{(void*)sec_key, sec_key_len});
 }
 
 INTRINSIC_EXPORT

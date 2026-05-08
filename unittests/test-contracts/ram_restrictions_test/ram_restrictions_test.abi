@@ -82,18 +82,28 @@
     ],
     "tables": [
         {
+            "name": "data",
+            "type": "data",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": [],
+            "table_id": 30912
+        },
+        {
             "name": "tablea",
             "type": "data",
             "index_type": "i64",
-            "key_names": ["table_name","scope","primary_key"],
-            "key_types": ["name","name","uint64"]
+            "key_names": ["scope","primary_key"],
+            "key_types": ["name","uint64"],
+            "table_id": 65482
         },
         {
             "name": "tableb",
             "type": "data",
             "index_type": "i64",
-            "key_names": ["table_name","scope","primary_key"],
-            "key_types": ["name","name","uint64"]
+            "key_names": ["scope","primary_key"],
+            "key_types": ["name","uint64"],
+            "table_id": 25038
         }
     ],
     "ricardian_clauses": [],

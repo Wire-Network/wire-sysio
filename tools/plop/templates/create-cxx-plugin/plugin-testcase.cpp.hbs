@@ -1,0 +1,12 @@
+#include <boost/test/unit_test.hpp>
+
+#include <sysio/{{name}}/{{name}}.hpp>
+
+BOOST_AUTO_TEST_SUITE({{name}}_tests)
+
+BOOST_AUTO_TEST_CASE(plugin_can_be_constructed) try {
+   {{namespace}}::{{name}} plugin;
+   BOOST_CHECK(true);
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_SUITE_END()

@@ -404,18 +404,36 @@
     ],
     "tables": [
         {
+            "name": "lastproof",
+            "type": "lastproof",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": [],
+            "table_id": 34563
+        },
+        {
             "name": "lastproofs",
             "type": "lastproof",
             "index_type": "i64",
-            "key_names": ["table_name","scope","primary_key"],
-            "key_types": ["name","name","uint64"]
+            "key_names": ["scope","primary_key"],
+            "key_types": ["name","uint64"],
+            "table_id": 41097
         },
         {
             "name": "policies",
             "type": "storedpolicy",
             "index_type": "i64",
-            "key_names": ["table_name","scope","primary_key"],
-            "key_types": ["name","name","uint64"]
+            "key_names": ["scope","primary_key"],
+            "key_types": ["name","uint64"],
+            "table_id": 7465
+        },
+        {
+            "name": "storedpolicy",
+            "type": "storedpolicy",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": [],
+            "table_id": 9983
         }
     ],
     "ricardian_clauses": [],

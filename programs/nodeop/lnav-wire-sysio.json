@@ -1,0 +1,85 @@
+{
+    "wire_sysio_json_log": {
+        "title": "Wire Sysio JSON log",
+        "description": "JSONL format emitted by fc::log::json_formatter (attach to any spdlog sink via logging.json `format`: `{\"type\":\"json\"}`). Install with: lnav -i programs/nodeop/lnav-wire-sysio.json",
+        "url": "https://github.com/Wire-Network/wire-sysio",
+        "json": true,
+        "file-pattern": "\\.jsonl(\\.\\d+)?$",
+        "hide-extra": false,
+        "timestamp-field": "ts",
+        "timestamp-format": [
+            "%Y-%m-%dT%H:%M:%S.%fZ"
+        ],
+        "level-field": "lvl",
+        "level": {
+            "trace":    "trace",
+            "debug":    "debug",
+            "info":     "info",
+            "warning":  "warn",
+            "error":    "error",
+            "critical": "crit"
+        },
+        "body-field": "msg",
+        "opid-field": "thread",
+        "value": {
+            "thread": {
+                "kind": "string",
+                "identifier": true,
+                "description": "Originating thread name"
+            },
+            "logger": {
+                "kind": "string",
+                "identifier": true,
+                "description": "fc logger name"
+            },
+            "file": {
+                "kind": "string",
+                "description": "Source file"
+            },
+            "line": {
+                "kind": "integer",
+                "description": "Source line number",
+                "foreign-key": false
+            },
+            "func": {
+                "kind": "string",
+                "description": "Source function"
+            },
+            "msg": {
+                "kind": "string",
+                "description": "Log message payload"
+            },
+            "extra": {
+                "kind": "json",
+                "description": "Operator-configured extra_fields object"
+            }
+        },
+        "line-format": [
+            { "field": "__timestamp__", "timestamp-format": "%H:%M:%S.%L" },
+            " ",
+            { "field": "__level__", "min-width": 8, "text-transform": "uppercase" },
+            " ",
+            { "field": "logger", "min-width": 14, "max-width": 14, "overflow": "truncate" },
+            " ",
+            { "field": "thread", "min-width": 10, "max-width": 10, "overflow": "truncate" },
+            " ",
+            { "field": "file" },
+            ":",
+            { "field": "line" },
+            " ",
+            { "field": "func" },
+            " ] ",
+            { "field": "msg" }
+        ],
+        "sample": [
+            {
+                "description": "Basic info line",
+                "line": "{\"ts\":\"2026-04-14T17:03:22.123456Z\",\"lvl\":\"info\",\"thread\":\"nodeop\",\"logger\":\"default\",\"file\":\"main.cpp\",\"line\":42,\"func\":\"main\",\"msg\":\"starting\"}"
+            },
+            {
+                "description": "Line with extra_fields",
+                "line": "{\"ts\":\"2026-04-14T17:03:22.123456Z\",\"lvl\":\"warn\",\"thread\":\"net\",\"logger\":\"net_plugin_impl\",\"file\":\"net_plugin.cpp\",\"line\":1234,\"func\":\"on_message\",\"msg\":\"peer disconnected\",\"extra\":{\"env\":\"prod\",\"region\":\"us-east-1\"}}"
+            }
+        ]
+    }
+}

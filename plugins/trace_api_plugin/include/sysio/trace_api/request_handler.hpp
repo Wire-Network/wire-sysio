@@ -1,10 +1,12 @@
 #pragma once
 
+#include <algorithm>
 #include <limits>
 #include <optional>
 #include <fc/variant.hpp>
 #include <fc/variant_object.hpp>
 #include <sysio/chain/name.hpp>
+#include <sysio/trace_api/bloom_sidecar.hpp>
 #include <sysio/trace_api/metadata_log.hpp>
 #include <sysio/trace_api/data_log.hpp>
 #include <sysio/trace_api/common.hpp>
@@ -185,46 +187,101 @@ namespace sysio::trace_api {
       actions_result get_actions_impl(const action_query& query, variant_shape shape) {
          actions_result result;
 
+         // Hoist filter state out of the hot loop: avoids re-loading the optional's discriminator and value on every
+         // action comparison in the inner scan.
+         const bool        has_receiver  = query.receiver.has_value();
+         const bool        has_account   = query.account.has_value();
+         const bool        has_action    = query.action.has_value();
+         const chain::name receiver_name = has_receiver ? *query.receiver : chain::name{};
+         const chain::name account_name  = has_account  ? *query.account  : chain::name{};
+         const chain::name action_name   = has_action   ? *query.action   : chain::name{};
+
+         // Reused across all transactions in all blocks: clear() keeps the vector's capacity so repeated scans of
+         // trxs with similar action counts avoid per-trx allocations.
+         std::vector<const action_trace_v0*> matches;
+
+         // Per-slice bloom skip state.  When the caller supplies a receiver (or a non-include_notifications
+         // request whose receiver is auto-mirrored onto account upstream), probe the slice's receiver bloom and
+         // advance block_num past the slice on a negative probe.  The bloom is opened once per slice (lazy; only
+         // if skipping is useful for this query) and held for the life of the scan through that slice.  If the
+         // sidecar is missing or CRC-corrupt the bloom_reader is invalid and may_contain_* returns true, which
+         // preserves the existing scan behaviour.
+         const uint32_t stride = logfile_provider.slice_stride();
+         // Both bloom probes below are gated on has_receiver (the receiver bloom is the only one we can hit with a
+         // single-filter probe, and the (receiver, action) composite still needs the receiver term).  A query with
+         // only account and/or action set can't benefit from the bloom, so don't even open the sidecar.
+         const bool skip_eligible = has_receiver;
+         std::optional<uint32_t> current_slice;
+         bool skip_current_slice = false;
+
          const uint32_t end = query.block_num_end;
          for (uint32_t block_num = query.block_num_start; block_num <= end; ++block_num) {
+            if (skip_eligible) {
+               const uint32_t slice = logfile_provider.slice_number(block_num);
+               if (!current_slice || *current_slice != slice) {
+                  current_slice = slice;
+                  skip_current_slice = false;
+                  bloom_reader r = logfile_provider.get_bloom(slice);
+                  if (r.valid()) {
+                     if (!r.may_contain_receiver(receiver_name)) {
+                        skip_current_slice = true;
+                     } else if (has_action
+                                && !r.may_contain_recv_action(receiver_name, action_name)) {
+                        skip_current_slice = true;
+                     }
+                  }
+               }
+               if (skip_current_slice) {
+                  // Jump block_num to the last block of this slice so the for-loop's ++block_num takes us to the
+                  // first block of the next slice.  Clamp to the query's end so we don't wrap around if this is
+                  // the last slice in the range.
+                  const uint32_t slice_last = (slice + 1) * stride - 1;
+                  block_num = std::min(slice_last, end);
+                  continue;
+               }
+            }
+
             auto data = logfile_provider.get_block(block_num);
             if (!data) continue;
 
             std::visit([&](const auto& bt) {
                for (const auto& trx : bt.transactions) {
-                  // trx.actions is stored in schedule order (how the chain's apply_context
-                  // scheduled action slots), which is NOT global_sequence order when an
-                  // action queues both inline actions and require_recipient notifications:
-                  // notifications run before inlines, so the inline's global_sequence is
-                  // higher than later-scheduled notifications'.  Sort pointers by
-                  // global_sequence so clients always see execution order (matches
-                  // chain_plugin's push_transaction and the legacy get_block response).
-                  // global_sequence is unique per action (chain invariant), so sort
-                  // stability is not required.
-                  std::vector<const action_trace_v0*> sorted;
-                  sorted.reserve(trx.actions.size());
-                  for (const auto& a : trx.actions)
-                     sorted.push_back(&a);
-                  std::sort(sorted.begin(), sorted.end(), [](const auto* l, const auto* r){
-                     return l->global_sequence < r->global_sequence;
-                  });
+                  // Filter first, sort after.  trx.actions is stored in schedule order (how apply_context scheduled
+                  // action slots), which is NOT global_sequence order when a parent action queues both inline actions
+                  // and require_recipient notifications: notifications run before inlines, so the inline's
+                  // global_sequence is higher than later-scheduled notifications'.  Sort the matches by
+                  // global_sequence so clients see execution order, matching chain_plugin's push_transaction response.
+                  // global_sequence is unique per action, so sort stability is not required.  Sorting only after
+                  // filtering avoids the cost for transactions whose actions are all rejected by the filter - the
+                  // common case when scanning for a specific receiver/account/action across a wide block range.
+                  matches.clear();
+                  for (const auto& a : trx.actions) {
+                     if (has_receiver && a.receiver != receiver_name) continue;
+                     if (has_account  && a.account  != account_name)  continue;
+                     if (has_action   && a.action   != action_name)   continue;
+                     matches.push_back(&a);
+                  }
+                  if (matches.empty()) continue;
+                  std::ranges::sort(matches, {}, &action_trace_v0::global_sequence);
 
-                  for (const action_trace_v0* ap : sorted) {
+                  // Hoist per-trx variant fields so a multi-match trx doesn't repeat the checksum->hex conversion or
+                  // re-read the same block-level members for each emitted action.
+                  const std::string trx_id_str = trx.id.str();
+                  const uint32_t    trx_block  = trx.block_num;
+                  const auto&       trx_time   = trx.block_time;
+                  const auto&       trx_pbid   = trx.producer_block_id;
+
+                  for (const action_trace_v0* ap : matches) {
                      const auto& a = *ap;
-                     if (query.receiver && a.receiver != *query.receiver) continue;
-                     if (query.account  && a.account  != *query.account)  continue;
-                     if (query.action   && a.action   != *query.action)   continue;
-
-                     // Decode via the provider; build the variant via the shared
-                     // helper so get_actions / get_token_transfers / get_block all
-                     // agree on field shapes.
+                     // Decode via the provider; build the variant via the shared helper so get_actions /
+                     // get_token_transfers / get_block all agree on field shapes.
                      auto dec = data_handler_provider.decode(a);
                      decoded_action da{std::move(dec.params), std::move(dec.return_data), std::move(dec.error_message)};
                      fc::mutable_variant_object av = build_action_variant(a, da, shape);
-                     av("trx_id",            trx.id.str())
-                       ("block_num",         trx.block_num)
-                       ("block_time",        trx.block_time)
-                       ("producer_block_id", trx.producer_block_id);
+                     av("trx_id",            trx_id_str)
+                       ("block_num",         trx_block)
+                       ("block_time",        trx_time)
+                       ("producer_block_id", trx_pbid);
                      result.actions.emplace_back(std::move(av));
                   }
                }

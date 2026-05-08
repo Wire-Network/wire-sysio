@@ -221,6 +221,10 @@ namespace sysio::chain {
 
          transaction_trace_ptr push_transaction( const transaction_metadata_ptr& trx,
                                                  fc::time_point deadline, fc::microseconds max_transaction_time );
+         // Test-only. Production callers must use push_transaction() above. Providing
+         // explicit_billed_cpu_time bypasses chain-computed CPU billing and is only valid
+         // for test harnesses and internal replay paths. Not gated by a preprocessor flag
+         // because sysio_chain is a single library shared by test and production binaries.
          transaction_trace_ptr test_push_transaction( const transaction_metadata_ptr& trx,
                                                       fc::time_point deadline, fc::microseconds max_transaction_time,
                                                       const cpu_usage_t& billed_cpu_us, bool explicit_billed_cpu_time );
