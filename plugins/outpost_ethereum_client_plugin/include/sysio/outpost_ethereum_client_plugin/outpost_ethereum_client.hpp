@@ -23,12 +23,20 @@ namespace sysio {
  */
 class outpost_ethereum_client : public outpost_client {
 public:
+   /// Construct an Ethereum outpost client.
+   ///
+   /// `inbound_read_block_tag` is the Ethereum block tag used by `read_inbound_envelope` when calling
+   /// `getLatestOutboundEnvelope`. WIRE consensus on inbound is committed forward against this read, so a tip
+   /// reorg past the chosen tag leaves WIRE state derived from external history that no longer exists. Default is
+   /// `latest`; deployments that prefer safety over latency can dial up to `safe` or `finalized` via
+   /// `--ethereum-inbound-read-block-tag`.
    outpost_ethereum_client(ethereum_client_entry_ptr                                entry,
                            std::string                                              opp_addr,
                            std::string                                              opp_inbound_addr,
                            std::vector<fc::network::ethereum::abi::contract>        abis,
                            uint64_t                                                 outpost_id,
-                           uint32_t                                                 chain_id);
+                           uint32_t                                                 chain_id,
+                           std::string                                              inbound_read_block_tag = "latest");
 
    // ── outpost_client SPI ───────────────────────────────────────────────
    sysio::opp::types::ChainKind chain_kind() const override;
@@ -44,9 +52,10 @@ public:
                                            fc::microseconds deadline) override;
 
    // Expose for inspection / tests
-   const ethereum_client_entry_ptr& entry()                const { return _entry; }
-   const std::string&               opp_address()          const { return _opp_addr; }
-   const std::string&               opp_inbound_address()  const { return _opp_inbound_addr; }
+   const ethereum_client_entry_ptr& entry()                  const { return _entry; }
+   const std::string&               opp_address()            const { return _opp_addr; }
+   const std::string&               opp_inbound_address()    const { return _opp_inbound_addr; }
+   const std::string&               inbound_read_block_tag() const { return _inbound_read_block_tag; }
 
 private:
    ethereum_client_entry_ptr                         _entry;
@@ -56,6 +65,7 @@ private:
    std::shared_ptr<opp_inbound_contract_client>      _opp_inbound_client;
    uint64_t                                          _outpost_id;
    uint32_t                                          _chain_id;
+   std::string                                       _inbound_read_block_tag;
 };
 
 using outpost_ethereum_client_ptr = std::shared_ptr<outpost_ethereum_client>;
