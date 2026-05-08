@@ -1997,6 +1997,7 @@ struct controller_impl {
 
             trx->prev_accounts_billing = trx_context.accounts_billing;
             trx->elapsed = std::max(trx->elapsed, trace->elapsed);
+            trx->prev_succeeded = true;
             if (!trx->implicit() && !trx->is_read_only()) {
                trace->receipt = push_receipt(*trx->packed_trx(), trx_context.billed_cpu_us);
                bb.pending_trx_metas().emplace_back(trx);
