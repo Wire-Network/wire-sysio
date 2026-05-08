@@ -6,6 +6,7 @@
 
 #include <sysio/chain_plugin/chain_plugin.hpp>
 #include <sysio/underwriter_plugin/underwriter_plugin.hpp>
+#include <sysio/depot/opreg_status.hpp>
 #include <sysio/opp/opp.hpp>
 #include <sysio/opp/types/types.pb.h>
 #include <sysio/opp/attestations/attestations.pb.h>
@@ -22,28 +23,41 @@ namespace eth = fc::network::ethereum;
 namespace sol = fc::network::solana;
 
 // ---------------------------------------------------------------------------
-//  Underwrite request — parsed from sysio.uwrit::uwreqs table
+//  Underwrite request — read directly from sysio.uwrit::uwreqs table.
+//
+//  Per Task 3's uwrit refactor, the row carries src/dst (chain, token_kind,
+//  amount) fields populated by createuwreq from the originating SwapRequest.
+//  No more chasing through sysio.msgch::attestations to decode the
+//  attestation payload — the data we need is right on the uwreq row.
 // ---------------------------------------------------------------------------
 struct uw_request {
    uint64_t    id;                  // attestation ID (PK of uwreqs table)
    int         attestation_type;    // AttestationType that needs underwriting (e.g., SWAP)
    int         status;              // UnderwriteRequestStatus
-   std::string uw_name;             // assigned underwriter (empty if unassigned)
-   // Decoded from the attestation data:
-   ChainKind   source_chain;
-   ChainKind   target_chain;
-   int64_t     source_amount;
-   int64_t     target_amount;
-   TokenKind   source_token;
-   TokenKind   target_token;
+   std::string uw_name;             // assigned underwriter ('' if unassigned, populated post race-resolve)
+   ChainKind   src_chain;
+   TokenKind   src_token_kind;
+   uint64_t    src_amount;
+   ChainKind   dst_chain;
+   TokenKind   dst_token_kind;
+   uint64_t    dst_amount;
 };
 
 // ---------------------------------------------------------------------------
-//  Credit line — aggregate stake per chain from sysio.opreg::operators
+//  Credit line — per-(chain_kind, token_kind) bond from sysio.opreg::operators
+//
+//  Reads the `balances` field added in opreg's Task 2 refactor (one
+//  aggregate balance per (chain, token_kind), replacing the old
+//  std::vector<stake_entry>). Note this is the RAW balance — the
+//  authoritative `available` rollup also subtracts active locks +
+//  pending withdraws via `sysio.opreg::available()`. v1 of the plugin
+//  treats raw balance as a sufficient gate; the depot's race resolver
+//  (sysio.uwrit::try_select_winner) re-validates via the rollup.
 // ---------------------------------------------------------------------------
 struct credit_line {
    int         chain_kind;
-   int64_t     total_staked;        // aggregate sum of all stake entries for this chain
+   int         token_kind;
+   uint64_t    balance;
 };
 
 // ---------------------------------------------------------------------------
@@ -62,6 +76,11 @@ struct underwriter_plugin::impl {
 
    // Credit lines (read from sysio.opreg::operators each cycle)
    std::vector<credit_line> credit_lines;
+
+   // Awareness: own status from `sysio.opreg::operators[underwriter_account]`.
+   // SLASHED / TERMINATED short-circuits the relay loop. Refreshed each cycle
+   // by `poll_own_status()` (mirror of batch_operator_plugin's awareness).
+   bool                     is_active = true;
 
    // Plugin references
    chain_plugin*                     chain_plug = nullptr;
@@ -112,6 +131,13 @@ struct underwriter_plugin::impl {
    }
 
    void do_scan_cycle() {
+      // Step 0: refresh own status. SLASHED / TERMINATED operators must NOT
+      // call commit() on outposts — the depot rejects (or simply doesn't
+      // select them as winner), but the wasted JSON-RPC tx + on-chain
+      // attestation is observable noise. Halting locally is cleaner.
+      poll_own_status();
+      if (!is_active) return;
+
       // Step 1: Read outpost registry for chain_kind mappings
       read_outpost_registry();
 
@@ -175,45 +201,80 @@ struct underwriter_plugin::impl {
    void read_credit_lines() {
       credit_lines.clear();
 
+      // Helper: protobuf enum name -> numeric int. Mirror of the inline
+      // string<->enum logic the rest of the plugin uses; centralized here
+      // so additions propagate across both ChainKind / TokenKind reads.
+      auto chain_kind_from = [](const fc::variant& v) -> int {
+         if (v.is_string()) {
+            auto s = v.as_string();
+            if (s == "CHAIN_KIND_ETHEREUM") return CHAIN_KIND_ETHEREUM;
+            if (s == "CHAIN_KIND_SOLANA")   return CHAIN_KIND_SOLANA;
+            if (s == "CHAIN_KIND_WIRE")     return CHAIN_KIND_WIRE;
+            return 0;
+         }
+         return static_cast<int>(v.as_uint64());
+      };
+      auto token_kind_from = [](const fc::variant& v) -> int {
+         if (v.is_string()) {
+            auto s = v.as_string();
+            if (s == "TOKEN_KIND_WIRE")    return 0;     // matches proto value
+            if (s == "TOKEN_KIND_ETH")     return 256;
+            if (s == "TOKEN_KIND_LIQETH")  return 496;
+            if (s == "TOKEN_KIND_SOL")     return 512;
+            if (s == "TOKEN_KIND_LIQSOL")  return 752;
+            return 0;
+         }
+         return static_cast<int>(v.as_uint64());
+      };
+
       auto rows = read_all("sysio.opreg", "sysio.opreg", "operators");
       for (auto& row : rows.rows) {
          auto obj = row.get_object();
          auto acct = obj["account"].as_string();
          if (chain::name(acct) != underwriter_account) continue;
 
-         // Found our operator entry — parse stakes to compute aggregate per chain
-         if (!obj.contains("stakes") || !obj["stakes"].is_array()) break;
+         // New schema: per-(chain, token_kind) balance rows on `balances`
+         // (replacing the old vector<stake_entry> on `stakes`). Each row
+         // is one credit line directly — no aggregation needed.
+         if (!obj.contains("balances") || !obj["balances"].is_array()) break;
 
-         std::map<int, int64_t> aggregates; // chain_kind -> aggregate amount
-         for (auto& stake_entry : obj["stakes"].get_array()) {
-            auto se = stake_entry.get_object();
-            if (!se.contains("chain_addr") || !se.contains("amount")) continue;
+         for (auto& bal_entry : obj["balances"].get_array()) {
+            auto be = bal_entry.get_object();
+            if (!be.contains("chain") || !be.contains("token_kind")
+                || !be.contains("balance")) continue;
 
-            auto chain_addr = se["chain_addr"].get_object();
-            int chain_kind = 0;
-            if (chain_addr["kind"].is_string()) {
-               auto kind_str = chain_addr["kind"].as_string();
-               if (kind_str == "CHAIN_KIND_ETHEREUM") chain_kind = CHAIN_KIND_ETHEREUM;
-               else if (kind_str == "CHAIN_KIND_SOLANA") chain_kind = CHAIN_KIND_SOLANA;
-               else if (kind_str == "CHAIN_KIND_WIRE") chain_kind = CHAIN_KIND_WIRE;
-            } else {
-               chain_kind = static_cast<int>(chain_addr["kind"].as_uint64());
-            }
-
-            auto amount_obj = se["amount"].get_object();
-            int64_t amt = 0;
-            if (amount_obj.contains("amount")) {
-               amt = amount_obj["amount"].as_int64();
-            }
-
-            aggregates[chain_kind] += amt;
+            int     chain   = chain_kind_from(be["chain"]);
+            int     token   = token_kind_from(be["token_kind"]);
+            uint64_t balance = be["balance"].as_uint64();
+            credit_lines.push_back(credit_line{chain, token, balance});
+            ilog("underwriter: credit line chain_kind={} token_kind={} balance={}",
+                 chain, token, balance);
          }
+         break;
+      }
+   }
 
-         for (auto& [ck, total] : aggregates) {
-            credit_lines.push_back(credit_line{ck, total});
-            ilog("underwriter: credit line chain_kind={} total_staked={}", ck, total);
-         }
-         break; // Found our entry, done
+   /**
+    * Refresh `is_active` from `sysio.opreg::operators[underwriter_account].status`.
+    * Mirror of the awareness poll on batch_operator_plugin — both share
+    * the `sysio::depot::opreg_status::compute_is_active` helper so the
+    * status spellings + decision table live in one place. Logs once per
+    * transition.
+    */
+   void poll_own_status() {
+      auto rows = read_all("sysio.opreg", "sysio.opreg", "operators");
+      bool was_active = is_active;
+      for (auto& row : rows.rows) {
+         auto obj = row.get_object();
+         if (chain::name(obj["account"].as_string()) != underwriter_account) continue;
+         is_active = sysio::depot::opreg_status::compute_is_active(
+            obj["status"].as_string(), was_active);
+         break;
+      }
+      if (was_active && !is_active) {
+         elog("underwriter: own status flipped to SLASHED / TERMINATED — halting relay loop");
+      } else if (!was_active && is_active) {
+         ilog("underwriter: own status flipped to ACTIVE — resuming relay loop");
       }
    }
 
@@ -223,22 +284,24 @@ struct underwriter_plugin::impl {
 
    bool is_available() {
       if (credit_lines.empty()) {
-         ilog("underwriter: not available — no stakes found in sysio.opreg");
+         ilog("underwriter: not available — no balance rows in sysio.opreg");
          return false;
       }
 
-      // Check that we have > 0 credit on every active outpost chain
+      // Check that we have > 0 balance on every active outpost chain
+      // (any token kind on that chain). Per-(chain, token) coverage is
+      // checked downstream in select_coverable for each specific request.
       for (auto& [outpost_id, chain_kind] : outpost_chain_kinds) {
          int ck = static_cast<int>(chain_kind);
          bool found = false;
          for (auto& cl : credit_lines) {
-            if (cl.chain_kind == ck && cl.total_staked > 0) {
+            if (cl.chain_kind == ck && cl.balance > 0) {
                found = true;
                break;
             }
          }
          if (!found) {
-            ilog("underwriter: not available — no stake on chain_kind={}", ck);
+            ilog("underwriter: not available — no balance on chain_kind={}", ck);
             return false;
          }
       }
@@ -296,12 +359,45 @@ struct underwriter_plugin::impl {
             if (req.attestation_type != ATTESTATION_TYPE_SWAP) continue;
          }
 
-         // The uwreq stores the encoded attestation data — we need to determine
-         // source/target chains and amounts. For now, read from locked_amounts
-         // which will be populated as intents come in. For initial request,
-         // we need the original SWAP data which is referenced by the attestation_id.
-         // The attestation_id maps back to sysio.msgch::attestations table.
-         if (!parse_swap_from_attestation(req)) continue;
+         // New schema: src/dst (chain, token_kind, amount) live directly on
+         // the uwreq row (populated by uwrit::createuwreq from the
+         // originating SwapRequest). No more parse_swap_from_attestation
+         // detour through sysio.msgch::attestations.
+         auto chain_from = [](const fc::variant& v) -> ChainKind {
+            if (v.is_string()) {
+               auto s = v.as_string();
+               if (s == "CHAIN_KIND_ETHEREUM") return CHAIN_KIND_ETHEREUM;
+               if (s == "CHAIN_KIND_SOLANA")   return CHAIN_KIND_SOLANA;
+               if (s == "CHAIN_KIND_WIRE")     return CHAIN_KIND_WIRE;
+               return CHAIN_KIND_UNKNOWN;
+            }
+            return static_cast<ChainKind>(v.as_uint64());
+         };
+         auto token_from = [](const fc::variant& v) -> TokenKind {
+            if (v.is_string()) {
+               auto s = v.as_string();
+               if (s == "TOKEN_KIND_WIRE")    return static_cast<TokenKind>(0);
+               if (s == "TOKEN_KIND_ETH")     return static_cast<TokenKind>(256);
+               if (s == "TOKEN_KIND_LIQETH")  return static_cast<TokenKind>(496);
+               if (s == "TOKEN_KIND_SOL")     return static_cast<TokenKind>(512);
+               if (s == "TOKEN_KIND_LIQSOL")  return static_cast<TokenKind>(752);
+               return static_cast<TokenKind>(0);
+            }
+            return static_cast<TokenKind>(v.as_uint64());
+         };
+
+         if (!obj.contains("src_chain") || !obj.contains("src_amount")
+             || !obj.contains("dst_chain") || !obj.contains("dst_amount")) {
+            // Row not yet populated (createuwreq writes them inline so this
+            // should be unreachable for SWAP-derived UWREQs). Skip safely.
+            continue;
+         }
+         req.src_chain      = chain_from(obj["src_chain"]);
+         req.src_token_kind = token_from(obj["src_token_kind"]);
+         req.src_amount     = obj["src_amount"].as_uint64();
+         req.dst_chain      = chain_from(obj["dst_chain"]);
+         req.dst_token_kind = token_from(obj["dst_token_kind"]);
+         req.dst_amount     = obj["dst_amount"].as_uint64();
 
          requests.push_back(std::move(req));
       }
@@ -309,109 +405,69 @@ struct underwriter_plugin::impl {
       return requests;
    }
 
-   bool parse_swap_from_attestation(uw_request& req) {
-      // Primary-key exact lookup on sysio.msgch::attestations (ABI key_names
-      // = ["id"]). One row or nothing — no full-table scan.
-      sysio::chain_apis::read_only::get_table_rows_params p;
-      p.code        = chain::name("sysio.msgch");
-      p.scope       = "sysio.msgch";
-      p.table       = "attestations";
-      p.find        = std::format("{{\"id\":{}}}", req.id);
-      p.values_only = true;
-      auto rows = read_table(std::move(p));
-      for (auto& row : rows.rows) {
-         auto obj = row.get_object();
-
-         // Found the attestation — parse the raw data as a Swap protobuf
-         auto data_hex = obj["data"].as_string();
-         auto bytes = fc::from_hex(data_hex);
-         if (bytes.empty()) return false;
-
-         opp_att::SwapRequest swap;
-         if (!swap.ParseFromString(std::string(reinterpret_cast<const char*>(bytes.data()), bytes.size()))) {
-            elog("underwriter: protobuf parse failed for attestation {}", req.id);
-            return false;
-         }
-
-         if (swap.has_source_amount()) {
-            req.source_amount = swap.source_amount().amount();
-            req.source_token = static_cast<TokenKind>(swap.source_amount().kind());
-         } else {
-            return false;
-         }
-
-         if (swap.has_target_chain()) {
-            req.target_chain = swap.target_chain().kind();
-         } else {
-            return false;
-         }
-
-         req.target_token = swap.target_token();
-
-         // Target amount defaults to source amount (1:1 for now)
-         req.target_amount = req.source_amount;
-
-         // Determine source chain from the attestation's outpost_id
-         uint64_t outpost_id = obj["outpost_id"].as_uint64();
-         auto it = outpost_chain_kinds.find(outpost_id);
-         if (it == outpost_chain_kinds.end()) return false;
-         req.source_chain = it->second;
-
-         return true;
-      }
-
-      elog("underwriter: attestation {} not found in sysio.msgch::attestations", req.id);
-      return false;
-   }
-
    // -----------------------------------------------------------------------
    //  Select requests coverable by our credit lines
-   //  Requires 100% coverage on BOTH send and receive chains
+   //  Requires 100% coverage on BOTH src and dst legs of the swap, where
+   //  each leg's required bond is per-(chain_kind, token_kind).
    // -----------------------------------------------------------------------
 
    std::vector<uw_request> select_coverable(std::vector<uw_request>& requests) {
-      // Build remaining credit per chain
-      std::map<int, int64_t> remaining;
+      // Build remaining credit per (chain_kind, token_kind). Pack the pair
+      // into a 64-bit key so std::map iteration stays cheap.
+      auto key = [](int c, int t) -> uint64_t {
+         return (static_cast<uint64_t>(c) << 32) | static_cast<uint64_t>(t);
+      };
+      std::map<uint64_t, uint64_t> remaining;
       for (auto& cl : credit_lines) {
-         remaining[cl.chain_kind] = cl.total_staked;
+         remaining[key(cl.chain_kind, cl.token_kind)] = cl.balance;
       }
 
-      // Sort by source_amount ascending (smaller swaps first — fill more requests)
+      // Sort by src_amount ascending (smaller swaps first — fill more requests).
       std::sort(requests.begin(), requests.end(),
                 [](const uw_request& a, const uw_request& b) {
-                   return a.source_amount < b.source_amount;
+                   return a.src_amount < b.src_amount;
                 });
 
       std::vector<uw_request> selected;
       for (auto& req : requests) {
-         int src_ck = static_cast<int>(req.source_chain);
-         int tgt_ck = static_cast<int>(req.target_chain);
+         uint64_t src_k = key(static_cast<int>(req.src_chain),
+                              static_cast<int>(req.src_token_kind));
+         uint64_t dst_k = key(static_cast<int>(req.dst_chain),
+                              static_cast<int>(req.dst_token_kind));
 
-         // Check source chain credit
-         auto src_it = remaining.find(src_ck);
-         if (src_it == remaining.end() || src_it->second < req.source_amount) {
-            ilog("underwriter: skip request {} — insufficient source credit (chain={}, need={}, have={})",
-                 req.id, src_ck, req.source_amount,
+         // Check source-leg credit
+         auto src_it = remaining.find(src_k);
+         if (src_it == remaining.end() || src_it->second < req.src_amount) {
+            ilog("underwriter: skip request {} — insufficient src credit (chain={} token={} need={} have={})",
+                 req.id,
+                 static_cast<int>(req.src_chain),
+                 static_cast<int>(req.src_token_kind),
+                 req.src_amount,
                  src_it != remaining.end() ? src_it->second : 0);
             continue;
          }
 
-         // Check target chain credit
-         auto tgt_it = remaining.find(tgt_ck);
-         if (tgt_it == remaining.end() || tgt_it->second < req.target_amount) {
-            ilog("underwriter: skip request {} — insufficient target credit (chain={}, need={}, have={})",
-                 req.id, tgt_ck, req.target_amount,
+         // Check destination-leg credit
+         auto tgt_it = remaining.find(dst_k);
+         if (tgt_it == remaining.end() || tgt_it->second < req.dst_amount) {
+            ilog("underwriter: skip request {} — insufficient dst credit (chain={} need={} have={})",
+                 req.id,
+                 static_cast<int>(req.dst_chain),
+                 req.dst_amount,
                  tgt_it != remaining.end() ? tgt_it->second : 0);
             continue;
          }
 
-         // Reserve credit on both chains
-         src_it->second -= req.source_amount;
-         tgt_it->second -= req.target_amount;
+         // Reserve credit on both legs (avoid double-using the same balance
+         // across multiple selected requests this cycle).
+         src_it->second -= req.src_amount;
+         tgt_it->second -= req.dst_amount;
 
          selected.push_back(req);
-         ilog("underwriter: selected request {} (source: chain={} amount={}, target: chain={} amount={})",
-              req.id, src_ck, req.source_amount, tgt_ck, req.target_amount);
+         ilog("underwriter: selected request {} — src(chain={},token={},amt={}) dst(chain={},token={},amt={})",
+              req.id,
+              static_cast<int>(req.src_chain), static_cast<int>(req.src_token_kind), req.src_amount,
+              static_cast<int>(req.dst_chain), static_cast<int>(req.dst_token_kind), req.dst_amount);
       }
 
       return selected;
@@ -422,87 +478,101 @@ struct underwriter_plugin::impl {
    //  The outpost locks capital and emits UNDERWRITE_INTENT via OPP
    // -----------------------------------------------------------------------
 
+   /**
+    * Submit a `commit` JSON-RPC call to BOTH legs of the swap (source +
+    * destination outposts). Each outpost queues an UNDERWRITE_INTENT_COMMIT
+    * attestation back to the depot; the depot's race resolver
+    * (sysio.uwrit::try_select_winner) selects the underwriter whose pair
+    * lands first AND whose available() rollup covers both legs.
+    *
+    * Per the corrected ledger model: outposts don't validate bond — they
+    * just authenticate the caller as a registered underwriter and queue the
+    * attestation. The depot does the bond check.
+    */
    void submit_intent_to_outpost(const uw_request& req) {
-      ilog("underwriter: submitting intent for request {} to source chain {}",
-           req.id, static_cast<int>(req.source_chain));
+      ilog("underwriter: submitting commit pair for uwreq {} src_chain={} dst_chain={}",
+           req.id, static_cast<int>(req.src_chain), static_cast<int>(req.dst_chain));
 
-      if (req.source_chain == CHAIN_KIND_ETHEREUM) {
-         submit_intent_eth(req);
-      } else if (req.source_chain == CHAIN_KIND_SOLANA) {
-         submit_intent_sol(req);
-      } else {
-         elog("underwriter: unsupported source chain {} for request {}",
-              static_cast<int>(req.source_chain), req.id);
-      }
+      auto submit_one = [this](ChainKind chain, uint64_t uw_request_id) {
+         if (chain == CHAIN_KIND_ETHEREUM) submit_commit_eth(uw_request_id);
+         else if (chain == CHAIN_KIND_SOLANA) submit_commit_sol(uw_request_id);
+         else elog("underwriter: unsupported chain={} for commit (uwreq {})",
+                   static_cast<int>(chain), uw_request_id);
+      };
+      submit_one(req.src_chain, req.id);
+      submit_one(req.dst_chain, req.id);
    }
 
-   void submit_intent_eth(const uw_request& req) {
+   /**
+    * Call `commit(uint64 uwRequestId, bytes signature)` on the ETH outpost's
+    * OperatorRegistry contract (introduced in wire-ethereum commit 14639ec
+    * for Task 7). The outpost queues an UNDERWRITE_INTENT_COMMIT attestation
+    * back to the depot.
+    *
+    * Signature is empty bytes for v1 — the depot's race resolver doesn't
+    * validate it yet (signature is for "defends against an outpost compromised
+    * relay forging commits in their name", a hardening phase that lands later).
+    */
+   void submit_commit_eth(uint64_t uw_request_id) {
       auto entry = eth_plug->get_client(eth_client_id);
       if (!entry || !entry->client) {
          elog("underwriter: ETH client '{}' not found", eth_client_id);
          return;
       }
-
       if (eth_opreg_addr.empty()) {
          elog("underwriter: ETH OperatorRegistry address not configured");
          return;
       }
 
-      // Find the submitUnderwriteIntent ABI from loaded ABI files
+      // Find the `commit` ABI from loaded ABI files (replaced the legacy
+      // submitUnderwriteIntent in Task 7's OperatorRegistry refactor).
       auto& abis = eth_plug->get_abi_files();
-      const eth::abi::contract* intent_abi = nullptr;
+      const eth::abi::contract* commit_abi = nullptr;
       for (auto& [path, contracts] : abis) {
          for (auto& c : contracts) {
-            if (c.name == "submitUnderwriteIntent") {
-               intent_abi = &c;
-               break;
-            }
+            if (c.name == "commit") { commit_abi = &c; break; }
          }
-         if (intent_abi) break;
+         if (commit_abi) break;
       }
-
-      if (!intent_abi) {
-         elog("underwriter: ETH submitUnderwriteIntent ABI not found in loaded ABI files");
+      if (!commit_abi) {
+         elog("underwriter: ETH commit ABI not found in loaded ABI files");
          return;
       }
 
-      // Call OperatorRegistry.submitUnderwriteIntent(requestId, amount)
-      // The outpost contract will:
-      // 1. Verify the underwriter has enough deposited collateral
-      // 2. Lock the collateral amount
-      // 3. Emit UNDERWRITE_INTENT attestation via OPP
       try {
-         auto tx = entry->client->create_default_tx(eth_opreg_addr, *intent_abi,
-            {fc::variant(req.id), fc::variant(req.source_amount)});
-         auto result = entry->client->execute_contract_tx_fn(tx, *intent_abi);
-         ilog("underwriter: ETH submitUnderwriteIntent result={}", result.as_string());
+         std::vector<uint8_t> empty_sig;
+         auto tx = entry->client->create_default_tx(eth_opreg_addr, *commit_abi,
+            {fc::variant(uw_request_id), fc::variant(empty_sig)});
+         auto result = entry->client->execute_contract_tx_fn(tx, *commit_abi);
+         ilog("underwriter: ETH commit submitted uwreq={} result={}",
+              uw_request_id, result.as_string());
       } catch (const fc::exception& e) {
-         elog("underwriter: ETH submitUnderwriteIntent failed: {}", e.to_detail_string());
+         elog("underwriter: ETH commit failed: {}", e.to_detail_string());
       }
    }
 
-   void submit_intent_sol(const uw_request& req) {
+   /**
+    * Solana-side commit submission. The matching `commit_underwrite`
+    * Anchor instruction is part of Task 8's follow-up scope (the v1
+    * Solana commit only landed schema + SLASH_OPERATOR dispatch). For now
+    * the call falls through to a log so the dual-leg flow on a SOL-touching
+    * UWREQ is observable in test clusters even though only the ETH leg
+    * actually relays. Once Task 8 follow-up adds `commit_underwrite`, the
+    * IDL lookup below activates.
+    */
+   void submit_commit_sol(uint64_t uw_request_id) {
       auto entry = sol_plug->get_client(sol_client_id);
       if (!entry || !entry->client) {
          elog("underwriter: SOL client '{}' not found", sol_client_id);
          return;
       }
-
       if (sol_program_id.empty()) {
          elog("underwriter: SOL program ID not configured");
          return;
       }
-
-      // Build and execute a Solana transaction calling the opp-outpost
-      // submit_underwrite_intent instruction. The program will:
-      // 1. Verify the underwriter has enough deposited collateral in vault PDA
-      // 2. Lock the collateral amount
-      // 3. Emit UNDERWRITE_INTENT via sol_log_data
       try {
          auto program_key = fc::crypto::solana::solana_public_key::from_base58_string(sol_program_id);
          auto& idl_files = sol_plug->get_idl_files();
-
-         // Find the opp_solana_outpost program IDL
          std::vector<sol::idl::program> program_idls;
          for (auto& [path, programs] : idl_files) {
             for (auto& p : programs) {
@@ -512,28 +582,28 @@ struct underwriter_plugin::impl {
                }
             }
          }
-
          if (program_idls.empty()) {
             elog("underwriter: opp_solana_outpost IDL not found");
             return;
          }
-
          auto program_client = std::make_shared<sol::solana_program_client>(
             entry->client, program_key, program_idls);
 
-         if (program_client->has_idl("submit_underwrite_intent")) {
-            auto& instr = program_client->get_idl("submit_underwrite_intent");
+         if (program_client->has_idl("commit_underwrite")) {
+            auto& instr = program_client->get_idl("commit_underwrite");
             auto accounts = program_client->resolve_accounts(instr);
+            std::vector<uint8_t> empty_sig;
             program_client->execute_tx(instr, accounts,
                {fc::variant(fc::mutable_variant_object()
-                  ("request_id", req.id)
-                  ("amount", req.source_amount))});
-            ilog("underwriter: SOL submit_underwrite_intent succeeded for request {}", req.id);
+                  ("uw_request_id", uw_request_id)
+                  ("signature", empty_sig))});
+            ilog("underwriter: SOL commit_underwrite submitted uwreq={}", uw_request_id);
          } else {
-            elog("underwriter: submit_underwrite_intent instruction not found in IDL");
+            wlog("underwriter: SOL commit_underwrite IDL not found — Solana leg skipped (pending Task 8 follow-up) uwreq={}",
+                 uw_request_id);
          }
       } catch (const fc::exception& e) {
-         elog("underwriter: SOL submit_underwrite_intent failed: {}", e.to_detail_string());
+         elog("underwriter: SOL commit_underwrite failed: {}", e.to_detail_string());
       }
    }
 

@@ -9,6 +9,7 @@
 #include <sysio/batch_operator_plugin/batch_operator_plugin.hpp>
 #include <sysio/batch_operator_plugin/depot_ops.hpp>
 #include <sysio/batch_operator_plugin/outpost_opp_job.hpp>
+#include <sysio/depot/opreg_status.hpp>
 #include <sysio/chain/abi_serializer.hpp>
 #include <sysio/chain/transaction.hpp>
 #include <sysio/chain_plugin/chain_plugin.hpp>
@@ -68,6 +69,19 @@ namespace {
       }
    }
 
+   namespace opreg {
+      constexpr auto account            = "sysio.opreg";
+      constexpr auto table_operators    = "operators";
+      /// Field names on `operator_entry` rows. Used by the awareness poll
+      /// that gates the relay loop on a SLASHED / TERMINATED status flip.
+      namespace field {
+         constexpr auto status = "status";
+      }
+      // `OperatorStatus` enum spellings + the `is_active` decision live
+      // in `sysio/depot/opreg_status.hpp` so underwriter_plugin can pull
+      // the same source of truth without a cross-plugin dependency.
+   }
+
    namespace epoch {
       constexpr auto account            = "sysio.epoch";
       constexpr auto table_epochstate   = "epochstate";
@@ -122,6 +136,13 @@ struct batch_operator_plugin::impl {
    fc::time_point           next_epoch_start;
    std::vector<chain::name> current_group_members;
    std::vector<outpost_descriptor> outposts;
+
+   // Operator awareness — set by `poll_own_status()` from sysio.opreg::operators.
+   // SLASHED / TERMINATED operators MUST stop relaying: continued deliveries
+   // would be wasted CPU on the WIRE chain (msgch's deliver action will reject
+   // since the operator no longer holds bond) AND a TERMINATED operator's
+   // bond is already remitted, so any continued participation is misleading.
+   bool                     is_active = true;
 
    // Plugin references
    chain_plugin*                     chain_plug = nullptr;
@@ -269,6 +290,13 @@ struct batch_operator_plugin::impl {
       try {
          do_poll_epoch_state();
       } FC_LOG_AND_DROP();
+      // Awareness: refresh own status from the depot's bond ledger. SLASHED
+      // / TERMINATED operators short-circuit the relay loop below.
+      try {
+         poll_own_status();
+      } FC_LOG_AND_DROP();
+      if (!is_active) return;
+
       // chkcons advances the epoch on consensus. Only the elected operator
       // should push it — the contract verifies authorization regardless,
       // but pushing from every batch op wastes trx slots.
@@ -279,6 +307,44 @@ struct batch_operator_plugin::impl {
          } catch (const fc::exception& e) {
             dlog("batch_operator: chkcons: {}", e.to_string());
          }
+      }
+   }
+
+   /**
+    * Refresh `is_active` from `sysio.opreg::operators[operator_account]`.
+    *
+    * Reads the row's `status` field and sets `is_active` per:
+    *   * OPERATOR_STATUS_ACTIVE      -> true  (relay loop runs normally)
+    *   * OPERATOR_STATUS_SLASHED     -> false (halt; operator forfeit bond)
+    *   * OPERATOR_STATUS_TERMINATED  -> false (halt; bond remitted, slot freed)
+    *   * other / row missing         -> retain previous value (don't toggle on
+    *                                    transient table-read failure)
+    *
+    * Logs once per status transition so cluster operators can see the flip
+    * in the batch-op log without grep'ing every poll.
+    */
+   void poll_own_status() {
+      sysio::chain_apis::read_only::get_table_rows_params p;
+      p.code        = chain::name(opreg::account);
+      p.scope       = opreg::account;
+      p.table       = opreg::table_operators;
+      p.lower_bound = operator_account.to_string();
+      p.upper_bound = operator_account.to_string();
+      p.limit       = 1;
+      p.values_only = true;
+      auto rows = read_table(std::move(p));
+      if (rows.rows.empty()) return;
+
+      auto obj    = rows.rows[0].get_object();
+      auto status = obj[opreg::field::status].as_string();
+
+      bool was_active = is_active;
+      is_active = sysio::depot::opreg_status::compute_is_active(status, was_active);
+
+      if (was_active && !is_active) {
+         elog("batch_operator: own status flipped to {} — halting relay loop", ("s", status));
+      } else if (!was_active && is_active) {
+         ilog("batch_operator: own status flipped to ACTIVE — resuming relay loop");
       }
    }
 

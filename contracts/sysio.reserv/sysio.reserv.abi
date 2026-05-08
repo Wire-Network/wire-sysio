@@ -1,0 +1,222 @@
+{
+    "____comment": "This file was generated with sysio-abigen. DO NOT EDIT ",
+    "version": "sysio::abi/1.2",
+    "types": [],
+    "structs": [
+        {
+            "name": "creditlp",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain",
+                    "type": "ChainKind"
+                },
+                {
+                    "name": "paired_token",
+                    "type": "TokenKind"
+                },
+                {
+                    "name": "paired_amount",
+                    "type": "uint64"
+                },
+                {
+                    "name": "wire_amount",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "lp_entry",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain",
+                    "type": "ChainKind"
+                },
+                {
+                    "name": "paired_token",
+                    "type": "TokenKind"
+                },
+                {
+                    "name": "reserve_paired",
+                    "type": "uint64"
+                },
+                {
+                    "name": "reserve_wire",
+                    "type": "uint64"
+                },
+                {
+                    "name": "connector_weight_bps",
+                    "type": "uint32"
+                },
+                {
+                    "name": "last_updated_ms",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "lp_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_token",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "quote",
+            "base": "",
+            "fields": [
+                {
+                    "name": "src_chain",
+                    "type": "ChainKind"
+                },
+                {
+                    "name": "src_token",
+                    "type": "TokenKind"
+                },
+                {
+                    "name": "dst_chain",
+                    "type": "ChainKind"
+                },
+                {
+                    "name": "dst_token",
+                    "type": "TokenKind"
+                },
+                {
+                    "name": "src_amount",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "setlp",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain",
+                    "type": "ChainKind"
+                },
+                {
+                    "name": "paired_token",
+                    "type": "TokenKind"
+                },
+                {
+                    "name": "reserve_paired",
+                    "type": "uint64"
+                },
+                {
+                    "name": "reserve_wire",
+                    "type": "uint64"
+                },
+                {
+                    "name": "connector_weight_bps",
+                    "type": "uint32"
+                }
+            ]
+        }
+    ],
+    "actions": [
+        {
+            "name": "creditlp",
+            "type": "creditlp",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "quote",
+            "type": "quote",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "setlp",
+            "type": "setlp",
+            "ricardian_contract": ""
+        }
+    ],
+    "tables": [
+        {
+            "name": "lps",
+            "type": "lp_entry",
+            "index_type": "i64",
+            "key_names": ["chain_token"],
+            "key_types": ["uint64"],
+            "table_id": 7778
+        }
+    ],
+    "ricardian_clauses": [],
+    "variants": [],
+    "action_results": [
+        {
+            "name": "quote",
+            "result_type": "uint64"
+        }
+    ],
+    "enums": [
+        {
+            "name": "ChainKind",
+            "type": "int32",
+            "values": [
+                {
+                    "name": "CHAIN_KIND_UNKNOWN",
+                    "value": 0
+                },
+                {
+                    "name": "CHAIN_KIND_WIRE",
+                    "value": 1
+                },
+                {
+                    "name": "CHAIN_KIND_ETHEREUM",
+                    "value": 2
+                },
+                {
+                    "name": "CHAIN_KIND_SOLANA",
+                    "value": 3
+                },
+                {
+                    "name": "CHAIN_KIND_SUI",
+                    "value": 4
+                }
+            ]
+        },
+        {
+            "name": "TokenKind",
+            "type": "int32",
+            "values": [
+                {
+                    "name": "TOKEN_KIND_WIRE",
+                    "value": 0
+                },
+                {
+                    "name": "TOKEN_KIND_ETH",
+                    "value": 256
+                },
+                {
+                    "name": "TOKEN_KIND_ERC20",
+                    "value": 257
+                },
+                {
+                    "name": "TOKEN_KIND_ERC721",
+                    "value": 258
+                },
+                {
+                    "name": "TOKEN_KIND_ERC1155",
+                    "value": 259
+                },
+                {
+                    "name": "TOKEN_KIND_LIQETH",
+                    "value": 496
+                },
+                {
+                    "name": "TOKEN_KIND_SOL",
+                    "value": 512
+                },
+                {
+                    "name": "TOKEN_KIND_LIQSOL",
+                    "value": 752
+                }
+            ]
+        }
+    ]
+}
