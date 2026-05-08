@@ -228,6 +228,31 @@ void system_contract::setemitcfg(const emissions::emission_config& cfg) {
    sysio::check(cfg.epoch_log_retention_count > 0,
                  "epoch_log_retention_count must be positive");
 
+   // If sysio.epoch is configured, sanity-check that each nonzero annual
+   // value scales to a non-zero per-epoch share at the canonical
+   // epoch_duration_sec. Without this guard, a tiny annual value can round
+   // down to 0 in scale_annual_to_epoch, the gate sees emission_amount = 0,
+   // and emissions silently disable. Skipped pre-bootstrap (sysio.epoch not
+   // yet configured); the same check fires on the next setemitcfg call.
+   {
+      sysio::epoch::epochcfg_t epoch_cfg_tbl(epoch_refs::account);
+      if (epoch_cfg_tbl.exists()) {
+         const uint32_t epoch_secs = epoch_cfg_tbl.get().epoch_duration_sec;
+         if (cfg.annual_initial_emission > 0) {
+            sysio::check(emissions::scale_annual_to_epoch(cfg.annual_initial_emission, epoch_secs) > 0,
+                          "annual_initial_emission per-epoch share rounds to 0 at current epoch_duration_sec");
+         }
+         if (cfg.annual_max_emission > 0) {
+            sysio::check(emissions::scale_annual_to_epoch(cfg.annual_max_emission, epoch_secs) > 0,
+                          "annual_max_emission per-epoch share rounds to 0 at current epoch_duration_sec");
+         }
+         if (cfg.annual_min_emission > 0) {
+            sysio::check(emissions::scale_annual_to_epoch(cfg.annual_min_emission, epoch_secs) > 0,
+                          "annual_min_emission per-epoch share rounds to 0 at current epoch_duration_sec");
+         }
+      }
+   }
+
    // If t5_state already exists, prevent config changes that would brick future
    // emissions. Post-init, remaining distributable must still cover what's been
    // paid, and the per-epoch floor (derived from annual_min_emission and the
@@ -598,18 +623,19 @@ void system_contract::payepoch(uint32_t epoch_index,
 
    // Head-first prune of the audit log past its retention cap. Rows are added
    // monotonically (one per successful payepoch) so live_count is computed in
-   // O(1) from id arithmetic. At most one row needs eviction per call since
-   // we just added one.
-   {
+   // O(1) from id arithmetic. Drop up to two oldest rows per call: only one
+   // is needed in steady state, but a recent retention-cap shrink (governance
+   // lowering epoch_log_retention_count from N to a smaller M) leaves the
+   // table over cap by N - M; pruning two per call drains it twice as fast
+   // without unbounded CPU per epoch.
+   for (int i = 0; i < 2; ++i) {
       auto first_it = epoch_table.begin();
-      if (first_it != epoch_table.end()) {
-         const uint64_t oldest_index = first_it.key().sysio_epoch_index;
-         const uint64_t live_count =
-            (static_cast<uint64_t>(epoch_index) + 1) - oldest_index;
-         if (live_count > cfg.epoch_log_retention_count) {
-            epoch_table.erase(first_it);
-         }
-      }
+      if (first_it == epoch_table.end()) break;
+      const uint64_t oldest_index = first_it.key().sysio_epoch_index;
+      const uint64_t live_count =
+         (static_cast<uint64_t>(epoch_index) + 1) - oldest_index;
+      if (live_count <= cfg.epoch_log_retention_count) break;
+      epoch_table.erase(first_it);
    }
 }
 

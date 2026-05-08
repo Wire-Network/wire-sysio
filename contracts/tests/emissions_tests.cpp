@@ -1821,6 +1821,47 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_rejects_invalid_decay_target, sysio_emission
    require_substr( r_high, "target_annual_decay_bps must be in (0, 10000]" );
 } FC_LOG_AND_RETHROW()
 
+BOOST_FIXTURE_TEST_CASE( setemitcfg_rejects_round_to_zero_per_epoch, sysio_emissions_tester ) try {
+   // Annual values that scale to 0 at the canonical epoch_duration_sec would
+   // silently disable emissions (gate sees emission_amount = 0 and blocks
+   // every advance). With the test fixture's 60-sec epoch, annual values
+   // below SECONDS_PER_YEAR/60 = 525600 round down to 0; the contract must
+   // reject such configs at setemitcfg time.
+   auto build_cfg = [&](int64_t annual_initial) {
+      return mvo()
+         ("t1_allocation", T1_ALLOCATION.get_amount())
+         ("t2_allocation", T2_ALLOCATION.get_amount())
+         ("t3_allocation", T3_ALLOCATION.get_amount())
+         ("t1_duration", T1_DURATION) ("t2_duration", T2_DURATION) ("t3_duration", T3_DURATION)
+         ("min_claimable", MIN_CLAIMABLE_AMOUNT)
+         ("t5_distributable", T5_DISTRIBUTABLE) ("t5_floor", int64_t(125000000000000000LL))
+         ("target_annual_decay_bps", TARGET_ANNUAL_DECAY_BPS)
+         ("annual_initial_emission", annual_initial)
+         ("annual_max_emission", ANNUAL_MAX_EMISSION)
+         ("annual_min_emission", int64_t(0))
+         ("compute_bps", COMPUTE_BPS) ("capital_bps", CAPITAL_BPS)
+         ("capex_bps", CAPEX_BPS) ("governance_bps", uint16_t(1000))
+         ("producer_bps", PRODUCER_BPS) ("batch_op_bps", uint16_t(3000))
+         ("standby_end_rank", T_STANDBY_END_RANK)
+         ("epoch_log_retention_count", uint32_t(8640));
+   };
+
+   // annual_initial = 1 scales to 0 at 60s -> reject.
+   auto r_tiny = setemitcfg(config::system_account_name, build_cfg(int64_t(1)));
+   BOOST_REQUIRE( r_tiny != success() );
+   require_substr( r_tiny, "annual_initial_emission per-epoch share rounds to 0" );
+
+   // annual_initial = SECONDS_PER_YEAR/60 - 1 still rounds to 0.
+   auto r_just_under = setemitcfg(config::system_account_name,
+                                   build_cfg(int64_t(SECONDS_PER_YEAR / 60 - 1)));
+   BOOST_REQUIRE( r_just_under != success() );
+   require_substr( r_just_under, "annual_initial_emission per-epoch share rounds to 0" );
+
+   // SECONDS_PER_YEAR/60 scales to exactly 1 -- accepted.
+   BOOST_REQUIRE_EQUAL( success(),
+      setemitcfg(config::system_account_name, build_cfg(int64_t(SECONDS_PER_YEAR / 60))) );
+} FC_LOG_AND_RETHROW()
+
 BOOST_FIXTURE_TEST_CASE( setemitcfg_rejects_bad_standby_rank, sysio_emissions_tester ) try {
    auto cfg = mvo()
       ("t1_allocation", int64_t(1)) ("t2_allocation", int64_t(1)) ("t3_allocation", int64_t(1))
@@ -1943,9 +1984,11 @@ BOOST_FIXTURE_TEST_CASE( viewemitcfg_reflects_update, sysio_emissions_tester ) t
       ("t5_distributable", int64_t(999))
       ("t5_floor", int64_t(111))
       ("target_annual_decay_bps", uint16_t(5000))
-      ("annual_initial_emission", int64_t(500))
-      ("annual_max_emission", int64_t(1000))
-      ("annual_min_emission", int64_t(10))
+      // Annual values must be large enough that scale_annual_to_epoch at the
+      // fixture's 60s epoch (= annual * 60 / 31'536'000) is non-zero.
+      ("annual_initial_emission", int64_t(500'000'000))
+      ("annual_max_emission", int64_t(1'000'000'000))
+      ("annual_min_emission", int64_t(10'000'000))
       ("compute_bps", uint16_t(2500))
       ("capital_bps", uint16_t(2500))
       ("capex_bps", uint16_t(2500))

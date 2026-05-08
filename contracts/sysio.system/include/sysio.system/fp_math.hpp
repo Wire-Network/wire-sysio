@@ -8,8 +8,12 @@
 /// ratio in [0.01, 1.0], exponent epoch_secs / year_secs in [~2e-6, ~0.08]).
 /// All operations are deterministic integer arithmetic on __int128.
 ///
-/// Precision: ~2.3e-10 relative. Cumulative error over a year of 6-min epochs
-/// (~88k epochs) is ~2e-5, well within treasury accounting tolerance.
+/// Precision: per-op Q32 epsilon is ~2.3e-10; pow_frac compounds across mul,
+/// ln (range reduction is exact, Taylor truncation is below epsilon for
+/// |u| <= 0.5 with 35 terms), and exp (back-squaring multiplies epsilon by
+/// the halving depth). Worst-case relative error on a single pow_frac call
+/// is ~2e-9. Cumulative error over a year of 6-min epochs (~88k epochs) is
+/// ~2e-4, well within treasury accounting tolerance.
 namespace sysiosystem::fp_math {
 
 /// Backing integer type for Q32.32 values. Real number x is stored as
