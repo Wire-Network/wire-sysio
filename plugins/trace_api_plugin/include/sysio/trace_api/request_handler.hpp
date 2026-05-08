@@ -266,16 +266,15 @@ namespace sysio::trace_api {
 
                   // Hoist per-trx variant fields so a multi-match trx doesn't repeat the checksum->hex conversion or
                   // re-read the same block-level members for each emitted action.  trx_cpu_usage_us /
-                  // trx_net_usage_words are the parent transaction's totals (action-level cpu_usage_us / net_usage
-                  // are per-action and in different units: action net_usage is bytes, trx net_usage_words is
-                  // ceil(net_usage / 8)).  Callers that need per-trx resource totals across all actions of a trx
-                  // should use these and dedup by trx_id.
-                  const std::string         trx_id_str          = trx.id.str();
-                  const uint32_t            trx_block           = trx.block_num;
-                  const auto&               trx_time            = trx.block_time;
-                  const auto&               trx_pbid            = trx.producer_block_id;
-                  const uint32_t            trx_cpu_usage_us    = trx.cpu_usage_us;
-                  const fc::unsigned_int    trx_net_usage_words = trx.net_usage_words;
+                  // trx_net_usage_words are full-shape only - they are the parent transaction's resource totals
+                  // (action-level cpu_usage_us / net_usage are per-action and in different units: action net_usage
+                  // is bytes, trx net_usage_words is ceil(net_usage / 8)).  Slim (get_token_transfers) omits all
+                  // resource fields, so we don't emit the trx-level totals there either.
+                  const std::string trx_id_str = trx.id.str();
+                  const uint32_t    trx_block  = trx.block_num;
+                  const auto&       trx_time   = trx.block_time;
+                  const auto&       trx_pbid   = trx.producer_block_id;
+                  const bool        full_shape = (shape == variant_shape::full);
 
                   for (const action_trace_v0* ap : matches) {
                      const auto& a = *ap;
@@ -284,12 +283,14 @@ namespace sysio::trace_api {
                      auto dec = data_handler_provider.decode(a);
                      decoded_action da{std::move(dec.params), std::move(dec.return_data), std::move(dec.error_message)};
                      fc::mutable_variant_object av = build_action_variant(a, da, shape);
-                     av("trx_id",              trx_id_str)
-                       ("block_num",           trx_block)
-                       ("block_time",          trx_time)
-                       ("producer_block_id",   trx_pbid)
-                       ("trx_cpu_usage_us",    trx_cpu_usage_us)
-                       ("trx_net_usage_words", trx_net_usage_words);
+                     av("trx_id",            trx_id_str)
+                       ("block_num",         trx_block)
+                       ("block_time",        trx_time)
+                       ("producer_block_id", trx_pbid);
+                     if (full_shape) {
+                        av("trx_cpu_usage_us",    trx.cpu_usage_us)
+                          ("trx_net_usage_words", trx.net_usage_words);
+                     }
                      result.actions.emplace_back(std::move(av));
                   }
                }
