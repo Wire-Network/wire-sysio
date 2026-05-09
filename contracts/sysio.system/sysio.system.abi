@@ -3,6 +3,10 @@
     "version": "sysio::abi/1.2",
     "types": [
         {
+            "new_type_name": "B_vector_name_E",
+            "type": "name[]"
+        },
+        {
             "new_type_name": "block_signing_authority",
             "type": "variant_block_signing_authority_v0"
         },
@@ -37,6 +41,24 @@
                 {
                     "name": "owner",
                     "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "accrueepoch",
+            "base": "",
+            "fields": [
+                {
+                    "name": "epoch_index",
+                    "type": "uint32"
+                },
+                {
+                    "name": "batch_group_index",
+                    "type": "uint8"
+                },
+                {
+                    "name": "per_epoch_emission",
+                    "type": "int64"
                 }
             ]
         },
@@ -363,6 +385,10 @@
                 {
                     "name": "epoch_log_retention_count",
                     "type": "uint32"
+                },
+                {
+                    "name": "pay_cadence_epochs",
+                    "type": "uint16"
                 }
             ]
         },
@@ -795,11 +821,11 @@
                     "type": "uint32"
                 },
                 {
-                    "name": "active_batch_group",
-                    "type": "name[]"
+                    "name": "batch_op_groups",
+                    "type": "B_vector_name_E[]"
                 },
                 {
-                    "name": "emission_amount",
+                    "name": "period_emission",
                     "type": "int64"
                 }
             ]
@@ -1263,6 +1289,18 @@
                 {
                     "name": "total_distributed",
                     "type": "int64"
+                },
+                {
+                    "name": "pending_emission_amount",
+                    "type": "int64"
+                },
+                {
+                    "name": "period_start_epoch",
+                    "type": "uint32"
+                },
+                {
+                    "name": "batch_group_epochs",
+                    "type": "uint32[]"
                 }
             ]
         },
@@ -1571,6 +1609,11 @@
         }
     ],
     "actions": [
+        {
+            "name": "accrueepoch",
+            "type": "accrueepoch",
+            "ricardian_contract": ""
+        },
         {
             "name": "actfinkey",
             "type": "actfinkey",

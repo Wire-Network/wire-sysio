@@ -414,6 +414,12 @@ public:
    }
 
    action_result setemitcfg_defaults( account_name signer ) {
+      return setemitcfg_with_cadence(signer, uint16_t(1));
+   }
+
+   /// Same as setemitcfg_defaults but with a configurable pay_cadence_epochs.
+   /// Tests that exercise cadence > 1 behavior call this directly.
+   action_result setemitcfg_with_cadence( account_name signer, uint16_t cadence ) {
       return setemitcfg(signer, mvo()
          ("t1_allocation",          T1_ALLOCATION.get_amount())
          ("t2_allocation",          T2_ALLOCATION.get_amount())
@@ -436,6 +442,7 @@ public:
          ("batch_op_bps",           uint16_t(3000))
          ("standby_end_rank",       T_STANDBY_END_RANK)
          ("epoch_log_retention_count", uint32_t(8640))
+         ("pay_cadence_epochs",     cadence)
       );
    }
 
@@ -1734,7 +1741,7 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_requires_sysio_auth, sysio_emissions_tester 
       ("compute_bps", uint16_t(10000)) ("capital_bps", uint16_t(0)) ("capex_bps", uint16_t(0)) ("governance_bps", uint16_t(0))
       ("producer_bps", uint16_t(5000)) ("batch_op_bps", uint16_t(5000))
       ("standby_end_rank", uint32_t(28))
-      ("epoch_log_retention_count", uint32_t(8640));
+      ("epoch_log_retention_count", uint32_t(8640))("pay_cadence_epochs", uint16_t(1));
 
    auto r = setemitcfg("alice"_n, cfg);
    BOOST_REQUIRE( r != success() );
@@ -1753,7 +1760,7 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_rejects_bad_category_bps, sysio_emissions_te
       ("compute_bps", uint16_t(5000)) ("capital_bps", uint16_t(3000)) ("capex_bps", uint16_t(2000)) ("governance_bps", uint16_t(500))
       ("producer_bps", uint16_t(5000)) ("batch_op_bps", uint16_t(5000))
       ("standby_end_rank", uint32_t(28))
-      ("epoch_log_retention_count", uint32_t(8640));
+      ("epoch_log_retention_count", uint32_t(8640))("pay_cadence_epochs", uint16_t(1));
 
    auto r = setemitcfg(config::system_account_name, cfg);
    BOOST_REQUIRE( r != success() );
@@ -1771,7 +1778,7 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_rejects_bad_compute_subsplit, sysio_emission
       ("compute_bps", uint16_t(4000)) ("capital_bps", uint16_t(3000)) ("capex_bps", uint16_t(2000)) ("governance_bps", uint16_t(1000))
       ("producer_bps", uint16_t(6000)) ("batch_op_bps", uint16_t(3000))
       ("standby_end_rank", uint32_t(28))
-      ("epoch_log_retention_count", uint32_t(8640));
+      ("epoch_log_retention_count", uint32_t(8640))("pay_cadence_epochs", uint16_t(1));
 
    auto r = setemitcfg(config::system_account_name, cfg);
    BOOST_REQUIRE( r != success() );
@@ -1789,7 +1796,7 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_rejects_zero_duration, sysio_emissions_teste
       ("compute_bps", uint16_t(4000)) ("capital_bps", uint16_t(3000)) ("capex_bps", uint16_t(2000)) ("governance_bps", uint16_t(1000))
       ("producer_bps", uint16_t(7000)) ("batch_op_bps", uint16_t(3000))
       ("standby_end_rank", uint32_t(28))
-      ("epoch_log_retention_count", uint32_t(8640));
+      ("epoch_log_retention_count", uint32_t(8640))("pay_cadence_epochs", uint16_t(1));
 
    auto r = setemitcfg(config::system_account_name, cfg);
    BOOST_REQUIRE( r != success() );
@@ -1809,7 +1816,7 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_rejects_invalid_decay_target, sysio_emission
          ("compute_bps", uint16_t(4000)) ("capital_bps", uint16_t(3000)) ("capex_bps", uint16_t(2000)) ("governance_bps", uint16_t(1000))
          ("producer_bps", uint16_t(7000)) ("batch_op_bps", uint16_t(3000))
          ("standby_end_rank", uint32_t(28))
-         ("epoch_log_retention_count", uint32_t(8640));
+         ("epoch_log_retention_count", uint32_t(8640))("pay_cadence_epochs", uint16_t(1));
    };
 
    auto r0 = setemitcfg(config::system_account_name, build_cfg(0));
@@ -1843,7 +1850,7 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_rejects_round_to_zero_per_epoch, sysio_emiss
          ("capex_bps", CAPEX_BPS) ("governance_bps", uint16_t(1000))
          ("producer_bps", PRODUCER_BPS) ("batch_op_bps", uint16_t(3000))
          ("standby_end_rank", T_STANDBY_END_RANK)
-         ("epoch_log_retention_count", uint32_t(8640));
+         ("epoch_log_retention_count", uint32_t(8640))("pay_cadence_epochs", uint16_t(1));
    };
 
    // annual_initial = 1 scales to 0 at 60s -> reject.
@@ -1873,7 +1880,7 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_rejects_bad_standby_rank, sysio_emissions_te
       ("compute_bps", uint16_t(4000)) ("capital_bps", uint16_t(3000)) ("capex_bps", uint16_t(2000)) ("governance_bps", uint16_t(1000))
       ("producer_bps", uint16_t(7000)) ("batch_op_bps", uint16_t(3000))
       ("standby_end_rank", uint32_t(21))
-      ("epoch_log_retention_count", uint32_t(8640));
+      ("epoch_log_retention_count", uint32_t(8640))("pay_cadence_epochs", uint16_t(1));
 
    auto r = setemitcfg(config::system_account_name, cfg);
    BOOST_REQUIRE( r != success() );
@@ -1892,7 +1899,7 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_rejects_standby_rank_over_cap, sysio_emissio
       ("compute_bps", uint16_t(4000)) ("capital_bps", uint16_t(3000)) ("capex_bps", uint16_t(2000)) ("governance_bps", uint16_t(1000))
       ("producer_bps", uint16_t(7000)) ("batch_op_bps", uint16_t(3000))
       ("standby_end_rank", uint32_t(101))
-      ("epoch_log_retention_count", uint32_t(8640));
+      ("epoch_log_retention_count", uint32_t(8640))("pay_cadence_epochs", uint16_t(1));
 
    auto r = setemitcfg(config::system_account_name, cfg);
    BOOST_REQUIRE( r != success() );
@@ -1930,7 +1937,7 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_reconfigurable, sysio_emissions_tester ) try
       ("producer_bps", uint16_t(7000))
       ("batch_op_bps", uint16_t(3000))
       ("standby_end_rank", uint32_t(28))
-      ("epoch_log_retention_count", uint32_t(8640));
+      ("epoch_log_retention_count", uint32_t(8640))("pay_cadence_epochs", uint16_t(1));
 
    BOOST_REQUIRE_EQUAL( success(), setemitcfg(config::system_account_name, cfg) );
 
@@ -1996,7 +2003,7 @@ BOOST_FIXTURE_TEST_CASE( viewemitcfg_reflects_update, sysio_emissions_tester ) t
       ("producer_bps", uint16_t(5000))
       ("batch_op_bps", uint16_t(5000))
       ("standby_end_rank", uint32_t(30))
-      ("epoch_log_retention_count", uint32_t(2880));
+      ("epoch_log_retention_count", uint32_t(2880))("pay_cadence_epochs", uint16_t(1));
 
    BOOST_REQUIRE_EQUAL( success(), setemitcfg(config::system_account_name, cfg) );
 
@@ -2076,7 +2083,7 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_post_initt5_rejects_brick_reduce, sysio_emis
       ("capex_bps", CAPEX_BPS) ("governance_bps", uint16_t(1000))
       ("producer_bps", PRODUCER_BPS) ("batch_op_bps", uint16_t(3000))
       ("standby_end_rank", T_STANDBY_END_RANK)
-      ("epoch_log_retention_count", uint32_t(8640));
+      ("epoch_log_retention_count", uint32_t(8640))("pay_cadence_epochs", uint16_t(1));
 
    auto r = setemitcfg(config::system_account_name, cfg);
    BOOST_REQUIRE( r != success() );
@@ -2119,7 +2126,7 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_post_initt5_rejects_unreachable_min_emission
       ("capex_bps", CAPEX_BPS) ("governance_bps", uint16_t(1000))
       ("producer_bps", PRODUCER_BPS) ("batch_op_bps", uint16_t(3000))
       ("standby_end_rank", T_STANDBY_END_RANK)
-      ("epoch_log_retention_count", uint32_t(8640));
+      ("epoch_log_retention_count", uint32_t(8640))("pay_cadence_epochs", uint16_t(1));
 
    auto r = setemitcfg(config::system_account_name, cfg);
    BOOST_REQUIRE( r != success() );
@@ -2216,7 +2223,7 @@ BOOST_FIXTURE_TEST_CASE( gate_block_reason_change_updates_row, sysio_emissions_t
       ("capex_bps",              CAPEX_BPS)   ("governance_bps", uint16_t(1000))
       ("producer_bps",           PRODUCER_BPS)("batch_op_bps", uint16_t(3000))
       ("standby_end_rank",       T_STANDBY_END_RANK)
-      ("epoch_log_retention_count", uint32_t(8640));
+      ("epoch_log_retention_count", uint32_t(8640))("pay_cadence_epochs", uint16_t(1));
    BOOST_REQUIRE_EQUAL( success(), setemitcfg(config::system_account_name, cfg) );
    BOOST_REQUIRE_EQUAL( success(), initt5(config::system_account_name, tpsec(head_secs())) );
 
@@ -3564,7 +3571,7 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_rejects_zero_retention, sysio_emissions_test
       ("capex_bps", CAPEX_BPS) ("governance_bps", uint16_t(1000))
       ("producer_bps", PRODUCER_BPS) ("batch_op_bps", uint16_t(3000))
       ("standby_end_rank", T_STANDBY_END_RANK)
-      ("epoch_log_retention_count", uint32_t(0));
+      ("epoch_log_retention_count", uint32_t(0))("pay_cadence_epochs", uint16_t(1));
 
    auto r = setemitcfg(config::system_account_name, cfg);
    BOOST_REQUIRE( r != success() );
@@ -3590,7 +3597,7 @@ BOOST_FIXTURE_TEST_CASE( epochlog_prunes_past_retention_cap, sysio_emissions_tes
       ("capex_bps", CAPEX_BPS) ("governance_bps", uint16_t(1000))
       ("producer_bps", PRODUCER_BPS) ("batch_op_bps", uint16_t(3000))
       ("standby_end_rank", T_STANDBY_END_RANK)
-      ("epoch_log_retention_count", uint32_t(3));
+      ("epoch_log_retention_count", uint32_t(3))("pay_cadence_epochs", uint16_t(1));
    BOOST_REQUIRE_EQUAL( success(), setemitcfg(config::system_account_name, cfg) );
 
    const uint32_t start = head_secs() - ONE_EPOCH - 1;
@@ -3610,6 +3617,222 @@ BOOST_FIXTURE_TEST_CASE( epochlog_prunes_past_retention_cap, sysio_emissions_tes
    BOOST_REQUIRE( !get_epoch_log(3).is_null() );
    BOOST_REQUIRE( !get_epoch_log(4).is_null() );
    BOOST_REQUIRE( !get_epoch_log(5).is_null() );
+} FC_LOG_AND_RETHROW()
+
+// ---------------------------------------------------------------------------
+// pay_cadence_epochs > 1 (period-based pay)
+// ---------------------------------------------------------------------------
+//
+// The cases below exercise the cadence-aware path: accrueepoch fires every
+// epoch, payepoch fires only on the period boundary (target_epoch >=
+// period_start_epoch + cadence - 1). Per-epoch state (last_epoch_emission,
+// last_epoch_index) is owned by accrueepoch; the period accumulator
+// (pending_emission_amount, batch_group_epochs, period_start_epoch) is
+// drained by payepoch.
+
+BOOST_FIXTURE_TEST_CASE( pay_cadence_2_pays_every_other_epoch, sysio_emissions_tester ) try {
+   create_t5_holding_accounts();
+   BOOST_REQUIRE_EQUAL( success(), setemitcfg_with_cadence( config::system_account_name, uint16_t(2) ) );
+
+   const uint32_t start = head_secs() - ONE_EPOCH - 1;
+   BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
+
+   // First advance: target_epoch=1. With period_start_epoch=0 and cadence=2
+   // the pay condition (target >= 0 + 2 - 1) is target >= 1, so this IS a
+   // pay-epoch. But pending_emission_amount starts at 0, so the period
+   // emission equals one per-epoch share -- effectively the same payout the
+   // cadence=1 case would produce on epoch 1, modulo the period_start_epoch
+   // moving to 2 instead of 2 (no difference for genesis).
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
+   {
+      auto state = get_t5_state();
+      BOOST_REQUIRE_EQUAL( state["epoch_count"].as<uint64_t>(), 1u );
+      BOOST_REQUIRE_EQUAL( state["pending_emission_amount"].as<int64_t>(), 0 );
+      BOOST_REQUIRE_EQUAL( state["period_start_epoch"].as<uint32_t>(), 2u );
+   }
+
+   // Second advance: target_epoch=2, period_start=2. Condition (target >= 2 +
+   // 2 - 1 = 3) is FALSE, so this is a NON-pay epoch. accrueepoch fires
+   // alone; epoch_count stays at 1, pending grows by one per-epoch share.
+   produce_blocks(130);
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
+   {
+      auto state = get_t5_state();
+      BOOST_REQUIRE_EQUAL( state["epoch_count"].as<uint64_t>(), 1u );  // payepoch did NOT fire
+      BOOST_REQUIRE( state["pending_emission_amount"].as<int64_t>() > 0 );  // accumulating
+      BOOST_REQUIRE_EQUAL( state["last_epoch_index"].as<uint32_t>(), 2u );  // accrueepoch advanced index
+   }
+
+   // Third advance: target_epoch=3, period_start=2. Condition (target >= 3)
+   // is TRUE; pay-epoch fires. pending drains, epoch_count==2,
+   // period_start_epoch advances to 4 for the next period.
+   produce_blocks(130);
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
+   {
+      auto state = get_t5_state();
+      BOOST_REQUIRE_EQUAL( state["epoch_count"].as<uint64_t>(), 2u );  // payepoch fired
+      BOOST_REQUIRE_EQUAL( state["pending_emission_amount"].as<int64_t>(), 0 );  // drained
+      BOOST_REQUIRE_EQUAL( state["period_start_epoch"].as<uint32_t>(), 4u );  // next period anchor
+   }
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( pay_cadence_pending_accumulates_then_drains, sysio_emissions_tester ) try {
+   // Cadence=3 under period_start_epoch=0: pay-epoch condition is target >= 2,
+   // so target=1 (genesis) is NON-pay, target=2 is pay, target=3..4 non-pay,
+   // target=5 pay, etc. (First period covers two real epochs because epoch 0
+   // is genesis -- documented quirk of the period_start_epoch=0 default.)
+   create_t5_holding_accounts();
+   BOOST_REQUIRE_EQUAL( success(), setemitcfg_with_cadence( config::system_account_name, uint16_t(3) ) );
+
+   const uint32_t start = head_secs() - ONE_EPOCH - 1;
+   BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
+
+   // First advance is target=1 -- non-pay under cadence=3. accrueepoch fires
+   // alone; pending grows from 0 by one per-epoch share.
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
+   const int64_t pending_after_genesis  = get_t5_state()["pending_emission_amount"].as<int64_t>();
+   const int64_t per_epoch_after_genesis = get_t5_state()["last_epoch_emission"].as<int64_t>();
+   BOOST_REQUIRE_EQUAL( get_t5_state()["epoch_count"].as<uint64_t>(), 0u );  // payepoch has not fired yet
+   BOOST_REQUIRE( pending_after_genesis > 0 );
+   BOOST_REQUIRE_EQUAL( pending_after_genesis, per_epoch_after_genesis );
+
+   // Second advance: target=2, pay-epoch fires. pending drains, epoch_count
+   // becomes 1, period_start_epoch advances to 3 for the next period.
+   produce_blocks(130);
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
+   {
+      auto state = get_t5_state();
+      BOOST_REQUIRE_EQUAL( state["epoch_count"].as<uint64_t>(), 1u );
+      BOOST_REQUIRE_EQUAL( state["pending_emission_amount"].as<int64_t>(), 0 );
+      BOOST_REQUIRE_EQUAL( state["period_start_epoch"].as<uint32_t>(), 3u );
+   }
+
+   // Third + fourth advances: target=3, target=4. Both non-pay (3 < 5 and
+   // 4 < 5 under the new period_start=3, cadence=3). pending grows by
+   // per-epoch share each advance.
+   produce_blocks(130);
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );  // target=3 non-pay
+   const int64_t pending_after_one = get_t5_state()["pending_emission_amount"].as<int64_t>();
+   BOOST_REQUIRE( pending_after_one > 0 );
+
+   produce_blocks(130);
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );  // target=4 non-pay
+   const int64_t pending_after_two = get_t5_state()["pending_emission_amount"].as<int64_t>();
+   BOOST_REQUIRE( pending_after_two > pending_after_one );
+
+   // Fifth advance: target=5, pay-epoch (5 >= 3 + 3 - 1 = 5). pending drains,
+   // epoch_count==2, period_start_epoch advances to 6.
+   produce_blocks(130);
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
+   {
+      auto state = get_t5_state();
+      BOOST_REQUIRE_EQUAL( state["epoch_count"].as<uint64_t>(), 2u );
+      BOOST_REQUIRE_EQUAL( state["pending_emission_amount"].as<int64_t>(), 0 );
+      BOOST_REQUIRE_EQUAL( state["period_start_epoch"].as<uint32_t>(), 6u );
+   }
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( pay_cadence_epochlog_only_on_pay_epoch, sysio_emissions_tester ) try {
+   // Audit log (`epochlog` table) gains one row per payepoch invocation; non-
+   // pay epochs add nothing. With cadence=2, advancing through epochs 1..4
+   // produces exactly two epochlog rows (epochs 1 and 3 -- the genesis pay-
+   // epoch under cadence=2 and the next period boundary).
+   create_t5_holding_accounts();
+   BOOST_REQUIRE_EQUAL( success(), setemitcfg_with_cadence( config::system_account_name, uint16_t(2) ) );
+
+   const uint32_t start = head_secs() - ONE_EPOCH - 1;
+   BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
+
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );  // target=1 pay (genesis)
+   produce_blocks(130);
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );  // target=2 non-pay
+   produce_blocks(130);
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );  // target=3 pay
+
+   BOOST_REQUIRE( !get_epoch_log(1).is_null() );  // pay-epoch -> row written
+   BOOST_REQUIRE(  get_epoch_log(2).is_null() );  // non-pay   -> no row
+   BOOST_REQUIRE( !get_epoch_log(3).is_null() );  // pay-epoch -> row written
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( pay_cadence_treasury_exhausted_gates_non_pay_epoch, sysio_emissions_tester ) try {
+   // TREASURY_EXHAUSTED gates EVERY epoch (pay or non-pay), not just pay-epochs.
+   // Otherwise the gate would silently advance non-pay epochs into a depleted
+   // treasury and only block at the period boundary. Verifies that with
+   // pay_cadence_epochs > 1 and a treasury at floor, the FIRST non-pay
+   // advance attempt blocks with TREASURY_EXHAUSTED and state does not
+   // advance.
+   create_t5_holding_accounts();
+
+   auto cfg = mvo()
+      ("t1_allocation", T1_ALLOCATION.get_amount())
+      ("t2_allocation", T2_ALLOCATION.get_amount())
+      ("t3_allocation", T3_ALLOCATION.get_amount())
+      ("t1_duration", T1_DURATION) ("t2_duration", T2_DURATION) ("t3_duration", T3_DURATION)
+      ("min_claimable", MIN_CLAIMABLE_AMOUNT)
+      ("t5_distributable", int64_t(125000000000000000LL))
+      ("t5_floor",         int64_t(125000000000000000LL))   // distributable == floor -> remaining=0
+      ("target_annual_decay_bps", TARGET_ANNUAL_DECAY_BPS)
+      ("annual_initial_emission", int64_t(0))               // forces per-epoch emission == 0
+      ("annual_max_emission", ANNUAL_MAX_EMISSION) ("annual_min_emission", int64_t(0))
+      ("compute_bps", COMPUTE_BPS) ("capital_bps", CAPITAL_BPS)
+      ("capex_bps", CAPEX_BPS) ("governance_bps", uint16_t(1000))
+      ("producer_bps", PRODUCER_BPS) ("batch_op_bps", uint16_t(3000))
+      ("standby_end_rank", T_STANDBY_END_RANK)
+      ("epoch_log_retention_count", uint32_t(8640))
+      ("pay_cadence_epochs", uint16_t(3));                  // non-pay epochs in the period
+   BOOST_REQUIRE_EQUAL( success(), setemitcfg(config::system_account_name, cfg) );
+   BOOST_REQUIRE_EQUAL( success(), initt5(config::system_account_name, tpsec(head_secs() - ONE_EPOCH - 1)) );
+
+   // Genesis advance (target=1) is a non-pay epoch under cadence=3 but the
+   // gate must still block it because per-epoch emission is zero.
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
+
+   auto bl = get_blocklog_row(1u);
+   BOOST_REQUIRE( !bl.is_null() );
+   BOOST_REQUIRE_EQUAL( bl["reason"].as_string(), "EMISSIONS_BLOCK_REASON_TREASURY_EXHAUSTED" );
+
+   // State must not have advanced: no accrueepoch fired, last_epoch_index
+   // stays at 0 (the initt5 value), pending stays at 0.
+   auto state = get_t5_state();
+   BOOST_REQUIRE_EQUAL( state["last_epoch_index"].as<uint32_t>(), 0u );
+   BOOST_REQUIRE_EQUAL( state["pending_emission_amount"].as<int64_t>(), 0 );
+   BOOST_REQUIRE_EQUAL( state["epoch_count"].as<uint64_t>(), 0u );
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( pay_cadence_change_via_setemitcfg_takes_effect, sysio_emissions_tester ) try {
+   // setemitcfg can change pay_cadence_epochs at any time; the new value
+   // takes effect on the next advance. Verifies that lowering cadence
+   // mid-period turns a previously-non-pay epoch into a pay-epoch.
+   create_t5_holding_accounts();
+   BOOST_REQUIRE_EQUAL( success(), setemitcfg_with_cadence( config::system_account_name, uint16_t(3) ) );
+
+   const uint32_t start = head_secs() - ONE_EPOCH - 1;
+   BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
+
+   // Advance 1 under cadence=3: target=1 is non-pay (1 < 0 + 3 - 1 = 2).
+   // pending grows; epoch_count stays at 0.
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
+   {
+      auto state = get_t5_state();
+      BOOST_REQUIRE_EQUAL( state["epoch_count"].as<uint64_t>(), 0u );
+      BOOST_REQUIRE( state["pending_emission_amount"].as<int64_t>() > 0 );
+   }
+
+   // Lower cadence to 1 mid-period. Next advance should pay.
+   BOOST_REQUIRE_EQUAL( success(), setemitcfg_with_cadence( config::system_account_name, uint16_t(1) ) );
+
+   // Advance 2 under cadence=1: target=2, period_start=0, condition
+   // (2 >= 0 + 1 - 1 = 0) TRUE -> pay-epoch. period_emission = pending +
+   // this-epoch's share; payepoch drains pending to 0 and advances
+   // period_start_epoch to 3.
+   produce_blocks(130);
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
+   {
+      auto state = get_t5_state();
+      BOOST_REQUIRE_EQUAL( state["epoch_count"].as<uint64_t>(), 1u );
+      BOOST_REQUIRE_EQUAL( state["pending_emission_amount"].as<int64_t>(), 0 );
+      BOOST_REQUIRE_EQUAL( state["period_start_epoch"].as<uint32_t>(), 3u );
+   }
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_SUITE_END() // t5_emissions_tests

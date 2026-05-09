@@ -563,19 +563,49 @@ namespace sysiosystem {
 
          /**
           * Pay emissions for the given sysio.epoch index. Called inline by
-          * sysio.epoch::advance after its readiness gate has verified that
-          * the chain can pay this epoch. Auth: require_auth("sysio.epoch").
+          * sysio.epoch::advance on a pay-epoch (i.e., the period boundary
+          * defined by emit_cfg.pay_cadence_epochs). Auth: require_auth(
+          * "sysio.epoch").
           *
-          * The gate-computed emission_amount is trusted; payepoch does not
-          * recompute. Strict checks inside payepoch flag true bugs only.
+          * `period_emission` is the gate-computed sum of pending accrued
+          * emissions plus this epoch's per-epoch share. payepoch trusts that
+          * value (single-trx semantics make recomputation unnecessary) and
+          * distributes it across producer / batch / capital / capex / gov
+          * pools as today, scaled to the period.
+          *
+          * `batch_op_groups` is the full state.batch_op_groups vector from
+          * sysio.epoch; payepoch reads t5state.batch_group_epochs to weight
+          * the batch pool proportionally to each group's active-epoch count
+          * over the period (groups that were active in zero epochs are
+          * skipped, which can only happen when pay_cadence_epochs <
+          * batch_op_groups.size()).
+          *
           * Runtime conditions (config missing, treasury exhausted, balance
           * insufficient) are caught upstream by the gate, which emits an
           * EmissionsBlocked attestation and prevents advance from proceeding.
           */
          [[sysio::action]]
          void payepoch(uint32_t epoch_index,
-                       std::vector<sysio::name> active_batch_group,
-                       int64_t emission_amount);
+                       std::vector<std::vector<sysio::name>> batch_op_groups,
+                       int64_t period_emission);
+
+         /**
+          * Accrue this epoch's per-epoch emission share onto t5state, without
+          * paying. Called inline by sysio.epoch::advance on every non-pay
+          * epoch (the cadence-1..cadence-2 epochs of each pay period). Auth:
+          * require_auth("sysio.epoch").
+          *
+          * Increments t5state.pending_emission_amount by `per_epoch_emission`
+          * and bumps t5state.batch_group_epochs[batch_group_index] by 1, so
+          * the next payepoch sees the period total + per-group counts.
+          *
+          * No transfers happen here. Treasury / balance gating is the
+          * gate's responsibility upstream.
+          */
+         [[sysio::action]]
+         void accrueepoch(uint32_t epoch_index,
+                          uint8_t  batch_group_index,
+                          int64_t  per_epoch_emission);
 
          /**
           * Read-only: current T5 treasury emission state.

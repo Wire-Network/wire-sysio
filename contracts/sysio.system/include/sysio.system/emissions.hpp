@@ -81,6 +81,15 @@ struct [[sysio::table("emitcfg"), sysio::contract("sysio.system")]] emission_con
    // (~64 bytes), so 8640 ~= 30 days at 6-min epoch cadence.
    uint32_t  epoch_log_retention_count;
 
+   // How many epochs accumulate before `payepoch` actually fires. 1 = pay
+   // every epoch (matches the original emissions behavior). Recommended
+   // production value: 100, which at a 6-min epoch is ~10h between pays
+   // and at a 1-min epoch is ~1h40m. Higher values reduce the per-tick
+   // inline-transfer count proportionally; the period-aggregate emission
+   // and per-recipient share-by-rounds math stay equivalent to summing
+   // the per-epoch results. Must be > 0; setemitcfg rejects zero.
+   uint16_t  pay_cadence_epochs;
+
    SYSLIB_SERIALIZE(emission_config,
       (t1_allocation)(t2_allocation)(t3_allocation)
       (t1_duration)(t2_duration)(t3_duration)(min_claimable)
@@ -89,7 +98,8 @@ struct [[sysio::table("emitcfg"), sysio::contract("sysio.system")]] emission_con
       (annual_initial_emission)(annual_max_emission)(annual_min_emission)
       (compute_bps)(capital_bps)(capex_bps)(governance_bps)
       (producer_bps)(batch_op_bps)
-      (standby_end_rank)(epoch_log_retention_count))
+      (standby_end_rank)(epoch_log_retention_count)
+      (pay_cadence_epochs))
 };
 
 using emitcfg_t = sysio::kv::global<"emitcfg"_n, emission_config>;
@@ -166,9 +176,27 @@ struct [[sysio::table("t5state"), sysio::contract("sysio.system")]] t5_state {
    int64_t                last_epoch_emission = 0;
    int64_t                total_distributed   = 0;
 
+   // Pay-cadence accumulator. Each non-pay epoch (advance() with
+   // is_pay_epoch=false) increments pending_emission_amount by that
+   // epoch's per-epoch share via accrueepoch. The pay-epoch reads
+   // pending + this-epoch's share as period_emission, distributes it,
+   // and resets pending_emission_amount to 0 / period_start_epoch to
+   // last_epoch_index+1. With pay_cadence_epochs=1 these two fields
+   // are written and immediately reset on every advance, so the
+   // legacy per-epoch behavior is unchanged.
+   int64_t                pending_emission_amount = 0;
+   uint32_t               period_start_epoch      = 0;
+   // Per-batch-op-group active-epoch counter, indexed by group number.
+   // accrueepoch increments batch_group_epochs[current_batch_op_group]
+   // each non-pay epoch; payepoch divides batch_pool proportionally
+   // and clears the vector. Sized lazily to current_batch_op_group+1
+   // on first use; pre-pay-cadence chains see length 0.
+   std::vector<uint32_t>  batch_group_epochs;
+
    SYSLIB_SERIALIZE(t5_state,
       (start_time)(epoch_count)(last_epoch_index)
-      (last_epoch_time)(last_epoch_emission)(total_distributed))
+      (last_epoch_time)(last_epoch_emission)(total_distributed)
+      (pending_emission_amount)(period_start_epoch)(batch_group_epochs))
 };
 
 using t5state_t = sysio::kv::global<"t5state"_n, t5_state>;

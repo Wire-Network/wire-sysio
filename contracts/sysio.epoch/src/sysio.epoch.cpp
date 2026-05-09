@@ -65,13 +65,15 @@ constexpr symbol WIRE_SYMBOL{"WIRE", 9};
 
 struct emissions_gate_result {
    bool                  ready              = false;
-   int64_t               emission_amount    = 0;  // populated iff ready
+   bool                  is_pay_epoch       = false; // true on the period-boundary epoch where payepoch fires
+   int64_t               emission_amount    = 0;  // per-epoch emission for THIS epoch (always populated when ready)
+   int64_t               period_emission    = 0;  // pending + emission_amount; populated only on pay-epoch
    int64_t               treasury_remaining = 0;  // for blocklog row
    int64_t               sysio_balance      = 0;  // for blocklog row
    EmissionsBlockReason  reason             = opp::types::EMISSIONS_BLOCK_REASON_UNSPECIFIED;
 };
 
-emissions_gate_result check_emissions_ready(uint32_t epoch_duration_sec) {
+emissions_gate_result check_emissions_ready(uint32_t epoch_duration_sec, uint32_t target_epoch) {
    emissions_gate_result r;
 
    sysiosystem::emissions::emitcfg_t emit_cfg_tbl(SYSTEM_ACCOUNT);
@@ -93,7 +95,7 @@ emissions_gate_result check_emissions_ready(uint32_t epoch_duration_sec) {
    // passed by advance() so this gate and sysio.system see identical inputs
    // and the gate doesn't repeat advance()'s read of the same singleton.
 
-   // Compute would-be emission. First-epoch case: use initial; cap at remaining.
+   // Compute would-be per-epoch emission. First-epoch case: use initial; cap at remaining.
    if (t5s.epoch_count == 0) {
       r.emission_amount = sysiosystem::emissions::scale_annual_to_epoch(
          cfg.annual_initial_emission, epoch_duration_sec);
@@ -103,24 +105,41 @@ emissions_gate_result check_emissions_ready(uint32_t epoch_duration_sec) {
          cfg, epoch_duration_sec, t5s.last_epoch_emission, t5s.total_distributed);
    }
 
+   // TREASURY_EXHAUSTED gates every epoch (pay or non-pay). A zero per-epoch
+   // emission means the treasury is at floor; advancing the epoch silently
+   // would let the chain roll forward into a depleted treasury.
    if (r.emission_amount <= 0) {
       r.reason = opp::types::EMISSIONS_BLOCK_REASON_TREASURY_EXHAUSTED;
       return r;
    }
 
-   // Read sysio's WIRE balance.
-   sysio::token::token::accounts acct_tbl(TOKEN_ACCOUNT, SYSTEM_ACCOUNT.value);
-   sysio::token::token::acct_key key{WIRE_SYMBOL.code().raw()};
-   if (acct_tbl.contains(key)) {
-      r.sysio_balance = acct_tbl.get(key).balance.amount;
-   }
+   // Decide whether this advance fires payepoch. Pay fires when the target
+   // epoch is `pay_cadence_epochs - 1` past `period_start_epoch`. Genesis
+   // case: t5s.period_start_epoch = 0, so the first period covers epochs
+   // 1..(pay_cadence - 1) (one short, since epoch 0 is genesis). Subsequent
+   // periods are exactly pay_cadence_epochs long.
+   r.is_pay_epoch = (target_epoch >= t5s.period_start_epoch + cfg.pay_cadence_epochs - 1);
 
-   // emission_amount is now retained on the BALANCE_INSUFFICIENT path so the
-   // blocklog row + cross-chain EmissionsBlocked attestation report the real
-   // shortfall (computed amount vs. available balance), not zero.
-   if (r.sysio_balance < r.emission_amount) {
-      r.reason = opp::types::EMISSIONS_BLOCK_REASON_BALANCE_INSUFFICIENT;
-      return r;
+   // Pay-epoch only: check the period total (pending + this epoch's share)
+   // against sysio's balance. Non-pay epochs do not transfer, so no balance
+   // check is needed; pending accumulates in t5state via accrueepoch.
+   if (r.is_pay_epoch) {
+      r.period_emission = t5s.pending_emission_amount + r.emission_amount;
+
+      sysio::token::token::accounts acct_tbl(TOKEN_ACCOUNT, SYSTEM_ACCOUNT.value);
+      sysio::token::token::acct_key key{WIRE_SYMBOL.code().raw()};
+      if (acct_tbl.contains(key)) {
+         r.sysio_balance = acct_tbl.get(key).balance.amount;
+      }
+
+      // emission_amount / period_emission is retained on the
+      // BALANCE_INSUFFICIENT path so the blocklog row + cross-chain
+      // EmissionsBlocked attestation report the real shortfall (period
+      // total vs. available balance), not zero.
+      if (r.sysio_balance < r.period_emission) {
+         r.reason = opp::types::EMISSIONS_BLOCK_REASON_BALANCE_INSUFFICIENT;
+         return r;
+      }
    }
 
    r.ready = true;
@@ -281,7 +300,7 @@ void epoch::advance() {
    // without mutating state. The wall clock for the current epoch effectively
    // extends until the gate eventually passes on a subsequent chkcons retry.
    const uint32_t target_epoch = state.current_epoch_index + 1;
-   const auto gate = check_emissions_ready(cfg.epoch_duration_sec);
+   const auto gate = check_emissions_ready(cfg.epoch_duration_sec, target_epoch);
    if (!gate.ready) {
       record_gate_block(get_self(), target_epoch, gate);
       return;
@@ -420,23 +439,35 @@ void epoch::advance() {
       }
    }
 
-   // Pay emissions inline. The gate already verified preconditions and
-   // computed gate.emission_amount; payepoch trusts that value (single-trx
-   // semantics make recomputation unnecessary). Pass the active batch group
-   // for this epoch directly so payepoch needs no historical reconstruction.
-   {
-      std::vector<name> active_members;
-      if (state.current_batch_op_group < state.batch_op_groups.size()) {
-         active_members = state.batch_op_groups[state.current_batch_op_group];
-      }
+   // Emissions side. Two inline actions queued in FIFO order:
+   //   1. accrueepoch: always queued. Records this epoch's per-epoch share
+   //      onto t5state (pending_emission_amount + batch_group_epochs[group]
+   //      + last_epoch_emission for decay continuity).
+   //   2. payepoch: queued only on pay-epochs. Reads the now-updated t5state
+   //      (which already includes this epoch's contribution from step 1),
+   //      distributes period_emission, and resets the accumulator.
+   // Both run after advance() returns; their FIFO ordering guarantees
+   // payepoch sees the post-accrue state.
+   action(
+      permission_level{get_self(), "owner"_n},
+      SYSTEM_ACCOUNT,
+      "accrueepoch"_n,
+      std::make_tuple(
+         state.current_epoch_index,
+         state.current_batch_op_group,
+         gate.emission_amount
+      )
+   ).send();
+
+   if (gate.is_pay_epoch) {
       action(
          permission_level{get_self(), "owner"_n},
          SYSTEM_ACCOUNT,
          "payepoch"_n,
          std::make_tuple(
             state.current_epoch_index,
-            std::move(active_members),
-            gate.emission_amount
+            state.batch_op_groups,
+            gate.period_emission
          )
       ).send();
    }

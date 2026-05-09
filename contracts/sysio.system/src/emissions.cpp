@@ -224,6 +224,12 @@ void system_contract::setemitcfg(const emissions::emission_config& cfg) {
    sysio::check(cfg.epoch_log_retention_count > 0,
                  "epoch_log_retention_count must be positive");
 
+   // Pay cadence (number of epochs accumulated per payepoch firing). Zero
+   // would divide-by-zero in the period share-by-rounds math; no upper
+   // bound is enforced (operator's call).
+   sysio::check(cfg.pay_cadence_epochs > 0,
+                 "pay_cadence_epochs must be positive");
+
    // Single read of sysio.epoch::epochcfg shared by the round-to-zero guards
    // (which need epoch_secs to scale annual values) and the post-init guard
    // (which compares per-epoch floor against remaining distributable).
@@ -428,42 +434,95 @@ void system_contract::initt5(const sysio::time_point_sec& start_time) {
    }, get_self());
 }
 
-// payepoch - pay emissions for the given sysio.epoch index. Called inline by
-// sysio.epoch::advance after its readiness gate has verified that:
+// accrueepoch - record this epoch's per-epoch emission share onto t5state.
+// Called inline by sysio.epoch::advance on EVERY successful epoch advance
+// (both pay and non-pay). On non-pay epochs this is the only emission-side
+// inline action; on pay-epochs accrueepoch runs first (FIFO) and payepoch
+// follows, reading the state this action just wrote.
+//
+// Updates:
+//   - pending_emission_amount += per_epoch_emission   (drained on pay-epoch)
+//   - batch_group_epochs[batch_group_index] += 1      (drained on pay-epoch)
+//   - last_epoch_emission = per_epoch_emission        (decay continuity)
+//   - last_epoch_index = epoch_index                  (replay guard)
+//   - last_epoch_time = now
+//
+// Treasury / balance gating is the gate's responsibility upstream; the
+// idempotency check (epoch_index > last_epoch_index) prevents replay.
+void system_contract::accrueepoch(uint32_t epoch_index,
+                                  uint8_t  batch_group_index,
+                                  int64_t  per_epoch_emission) {
+   require_auth(epoch_refs::account);
+
+   // Defense in depth.
+   sysio::check(per_epoch_emission > 0, "accrueepoch per_epoch_emission must be positive");
+
+   t5state_t t5s(get_self());
+   sysio::check(t5s.exists(), "t5 state not initialized");
+   auto state = t5s.get();
+
+   sysio::check(epoch_index > state.last_epoch_index, "accrueepoch epoch already accrued");
+
+   state.pending_emission_amount += per_epoch_emission;
+
+   // Lazy-grow batch_group_epochs to fit batch_group_index. Pre-pay-cadence
+   // chains see length 0 and grow on first epoch under the new schema.
+   if (batch_group_index >= state.batch_group_epochs.size()) {
+      state.batch_group_epochs.resize(batch_group_index + 1, 0);
+   }
+   state.batch_group_epochs[batch_group_index] += 1;
+
+   const auto now = time_point_sec{current_time_point()};
+   state.last_epoch_index    = epoch_index;
+   state.last_epoch_time     = now;
+   state.last_epoch_emission = per_epoch_emission;
+
+   t5s.set(state, get_self());
+}
+
+// payepoch - pay accumulated emissions for the pay period ending at
+// `epoch_index`. Called inline by sysio.epoch::advance on a pay-epoch
+// (period boundary defined by emit_cfg.pay_cadence_epochs) after its
+// readiness gate has verified that:
 //   - emitcfg exists
 //   - t5state exists
-//   - emission_amount > 0 (treasury not at floor)
-//   - sysio's WIRE balance >= emission_amount
+//   - per-epoch emission > 0 (treasury not at floor)
+//   - sysio's WIRE balance >= period_emission (pending + this epoch's share)
 //
 // Single-trx semantics guarantee these conditions hold through this call;
-// payepoch trusts the gate-computed emission_amount and does not recompute.
+// payepoch trusts the gate-computed period_emission and does not recompute.
 // Strict sysio::check throws inside payepoch flag true bugs (arithmetic
 // invariants, BPS sums).
 //
 // Slashed / terminated batch-op group members are skipped via opreg filter;
 // their slice remains in the treasury.
 void system_contract::payepoch(uint32_t epoch_index,
-                               std::vector<sysio::name> active_batch_group,
-                               int64_t emission_amount) {
+                               std::vector<std::vector<sysio::name>> batch_op_groups,
+                               int64_t period_emission) {
    require_auth(epoch_refs::account);
 
    // Defense in depth. Single-trx semantics make these conditions gate-guaranteed in normal operation; firing
    // here means a bug or out-of-order call.
-   sysio::check(emission_amount > 0, "payepoch emission_amount must be positive");
+   sysio::check(period_emission > 0, "payepoch period_emission must be positive");
 
    const auto cfg = get_emit_cfg(get_self());
 
-   // Gate guaranteed t5state exists; load directly.
+   // Gate guaranteed t5state exists; load directly. accrueepoch ran first
+   // (FIFO inline order) and already merged this epoch into pending +
+   // batch_group_epochs + last_epoch_*; trust that state.
    t5state_t t5s(get_self());
    auto state = t5s.get();
 
-   sysio::check(epoch_index > state.last_epoch_index, "payepoch epoch already paid");
+   sysio::check(epoch_index == state.last_epoch_index,
+                "payepoch must run after accrueepoch for the same epoch_index");
+   sysio::check(period_emission == state.pending_emission_amount,
+                "payepoch period_emission must equal accrued pending_emission_amount");
 
    // ----- Category splits -----
-   const int64_t compute_amount    = split_bps(emission_amount, cfg.compute_bps);
-   const int64_t capital_amount    = split_bps(emission_amount, cfg.capital_bps);
-   const int64_t capex_amount      = split_bps(emission_amount, cfg.capex_bps);
-   const int64_t governance_amount = emission_amount - compute_amount - capital_amount - capex_amount;
+   const int64_t compute_amount    = split_bps(period_emission, cfg.compute_bps);
+   const int64_t capital_amount    = split_bps(period_emission, cfg.capital_bps);
+   const int64_t capex_amount      = split_bps(period_emission, cfg.capex_bps);
+   const int64_t governance_amount = period_emission - compute_amount - capital_amount - capex_amount;
 
    const int64_t producer_pool = split_bps(compute_amount, cfg.producer_bps);
    const int64_t batch_pool    = compute_amount - producer_pool;
@@ -472,23 +531,28 @@ void system_contract::payepoch(uint32_t epoch_index,
 
    // =======================================================================
    // Producer + standby pay. Active producers (rank 1..21) are paid in
-   // proportion to their eligible_rounds this epoch; standbys (rank 22..
-   // cfg.standby_end_rank) are paid by the existing rank-decreasing weight
-   // without an eligible_rounds requirement. Recipients are filtered by
-   // opreg status so slashed / terminated operators are skipped.
+   // proportion to their eligible_rounds across the pay period; standbys
+   // (rank 22..cfg.standby_end_rank) are paid by the existing rank-
+   // decreasing weight without an eligible_rounds requirement. Producer
+   // counters accumulate across non-pay epochs (no reset by accrueepoch)
+   // and are zeroed at the end of this action. Recipients are filtered
+   // by opreg status so slashed / terminated operators are skipped.
    // =======================================================================
    {
       auto prod_by_rank = _producers.get_index<"prodrank"_n>();
 
       // expected_rounds is derived from the configured epoch duration on
-      // sysio.epoch (canonical source of truth).
+      // sysio.epoch (canonical source of truth) scaled by pay_cadence_epochs
+      // because elig_rounds accumulates across all epochs in the period.
       const uint32_t epoch_duration_sec = get_epoch_duration_sec();
-      uint32_t expected_rounds = (epoch_duration_sec * 2) / TOTAL_BLOCKS_PER_ROUND;
-      // Below ~126s (one full 21-producer round at 0.5s/block), expected_rounds
-      // truncates to zero. Falling back to 1 keeps the pay formula well-defined
-      // -- producer pay collapses to "elig_rounds clamped to 1, pay = full_share"
-      // at the 60s minimum. This coarse-grained pay is the price of allowing
-      // sub-rotation epoch durations; documented at MIN_EPOCH_DURATION_SEC.
+      uint32_t expected_rounds =
+         (epoch_duration_sec * cfg.pay_cadence_epochs * 2) / TOTAL_BLOCKS_PER_ROUND;
+      // Below ~126s of effective period duration (one full 21-producer round
+      // at 0.5s/block), expected_rounds truncates to zero. Falling back to 1
+      // keeps the pay formula well-defined -- producer pay collapses to
+      // "elig_rounds clamped to 1, pay = full_share" at the floor. This
+      // coarse-grained pay is the price of allowing sub-rotation period
+      // durations; documented at MIN_EPOCH_DURATION_SEC.
       if (expected_rounds == 0) expected_rounds = 1;
 
       struct prod_entry {
@@ -576,20 +640,33 @@ void system_contract::payepoch(uint32_t epoch_index,
    }
 
    // =======================================================================
-   // Batch-op pay. The active group is passed in by sysio.epoch::advance for
-   // this epoch. No historical reconstruction needed since emissions runs
-   // inline with advance(). Divides batch_pool into 1/group_sz slices.
+   // Batch-op pay. With pay_cadence_epochs > 1 the active group can rotate
+   // multiple times across a period, so each group's slice is weighted by
+   // its active-epoch count (state.batch_group_epochs[g]) over the period.
+   // sum(batch_group_epochs) == pay_cadence_epochs by construction. Groups
+   // that were active in zero epochs are skipped (only possible when
+   // pay_cadence < batch_op_groups.size()); their slice stays in treasury.
    // Members not registered as ACTIVE in sysio.opreg (slashed / terminated /
    // unknown) are skipped and their slice remains in the treasury.
    // =======================================================================
-   if (!active_batch_group.empty()) {
-      const uint32_t group_sz  = static_cast<uint32_t>(active_batch_group.size());
-      const int64_t per_member = batch_pool / group_sz;
+   if (cfg.pay_cadence_epochs > 0 && !batch_op_groups.empty()) {
+      for (size_t g = 0; g < batch_op_groups.size(); ++g) {
+         const auto& group = batch_op_groups[g];
+         if (group.empty()) continue;
+         const uint32_t group_epochs =
+            (g < state.batch_group_epochs.size()) ? state.batch_group_epochs[g] : 0;
+         if (group_epochs == 0) continue;
 
-      for (const auto& m : active_batch_group) {
-         if (!is_op_active(m)) continue;
-         send_wire_transfer(get_self(), m, per_member, memo::batch_op_reward);
-         actual_paid += per_member;
+         // Period-weighted slice for this group, divided evenly among members.
+         const int64_t group_pool = static_cast<int64_t>(
+            static_cast<__int128>(batch_pool) * group_epochs / cfg.pay_cadence_epochs);
+         const int64_t per_member = group_pool / static_cast<int64_t>(group.size());
+
+         for (const auto& m : group) {
+            if (!is_op_active(m)) continue;
+            send_wire_transfer(get_self(), m, per_member, memo::batch_op_reward);
+            actual_paid += per_member;
+         }
       }
    }
 
@@ -603,24 +680,30 @@ void system_contract::payepoch(uint32_t epoch_index,
    actual_paid += capital_amount + capex_amount + governance_amount;
 
    // =======================================================================
-   // State update.
+   // State update. accrueepoch already wrote last_epoch_index / last_epoch_time
+   // / last_epoch_emission (decay continuity); payepoch only updates the
+   // pay-cadence accumulator + bookkeeping for amounts actually distributed.
    // =======================================================================
-   const auto now = time_point_sec{current_time_point()};
    state.epoch_count++;
-   state.last_epoch_index    = epoch_index;
-   state.last_epoch_time     = now;
-   state.last_epoch_emission = emission_amount;
-   state.total_distributed  += actual_paid; // track only amounts actually paid; skipped recipients' shares stay in treasury
+   state.total_distributed += actual_paid; // track only amounts actually paid; skipped recipients' shares stay in treasury
+
+   // Drain accumulator + advance period boundary.
+   state.pending_emission_amount = 0;
+   std::fill(state.batch_group_epochs.begin(), state.batch_group_epochs.end(), 0);
+   state.period_start_epoch = epoch_index + 1;
+
    t5s.set(state, get_self());
 
-   // Audit log: records the AUTHORIZED emission + the four category amounts.
-   // (Producer / batch-op sub-distribution is implicit -- recipients are in traces.)
+   // Audit log: records the AUTHORIZED period emission + the four category
+   // amounts for the period that just paid. (Producer / batch-op sub-
+   // distribution is implicit -- recipients are in traces.) One row per
+   // pay-epoch; non-pay-epochs have no audit-log row.
    epochlog_t epoch_table(get_self());
    epoch_table.emplace(get_self(), epochlog_key{epoch_index}, epoch_log{
       .sysio_epoch_index = epoch_index,
       .epoch_count       = state.epoch_count,
-      .timestamp         = now,
-      .total_emission    = emission_amount,
+      .timestamp         = state.last_epoch_time,
+      .total_emission    = period_emission,
       .compute_amount    = compute_amount,
       .capital_amount    = capital_amount,
       .capex_amount      = capex_amount,
