@@ -234,6 +234,79 @@ BOOST_AUTO_TEST_CASE(kv_index_object_crud) {
    session.undo();
 }
 
+// Verify that db.modify() correctly rebalances AVL trees when a composite
+// index key field (sec_key) changes, as an alternative to remove+create.
+BOOST_AUTO_TEST_CASE(kv_index_modify_rekeys_correctly) {
+   validating_tester t( flat_set<account_name>(), nullptr, setup_policy::none );
+   auto& db = const_cast<chainbase::database&>(t.control->db());
+
+   auto session = db.start_undo_session(true);
+
+   const uint16_t users_idx = compute_table_id("users.byname");
+
+   // Create three entries: alice, bob, charlie
+   const auto& alice = db.create<kv_index_object>([&](auto& o) {
+      o.code = "test"_n;
+      o.table_id = users_idx;
+      o.sec_key.assign("alice", 5);
+      o.pri_key.assign("\x00\x01", 2);
+   });
+   db.create<kv_index_object>([&](auto& o) {
+      o.code = "test"_n;
+      o.table_id = users_idx;
+      o.sec_key.assign("bob", 3);
+      o.pri_key.assign("\x00\x02", 2);
+   });
+   db.create<kv_index_object>([&](auto& o) {
+      o.code = "test"_n;
+      o.table_id = users_idx;
+      o.sec_key.assign("charlie", 7);
+      o.pri_key.assign("\x00\x03", 2);
+   });
+
+   // Modify alice's sec_key to "zebra" -- should move to end of ordering
+   db.modify(alice, [](auto& o) {
+      o.sec_key.assign("zebra", 5);
+   });
+
+   // Verify ordering in by_code_table_id_seckey: bob < charlie < zebra
+   auto& sec_idx = db.get_index<kv_index_index, by_code_table_id_seckey>();
+   auto itr = sec_idx.lower_bound(boost::make_tuple(name("test"), users_idx));
+   BOOST_REQUIRE(itr != sec_idx.end());
+   BOOST_CHECK_EQUAL(itr->sec_key_view(), "bob");
+   ++itr;
+   BOOST_REQUIRE(itr != sec_idx.end());
+   BOOST_CHECK_EQUAL(itr->sec_key_view(), "charlie");
+   ++itr;
+   BOOST_REQUIRE(itr != sec_idx.end());
+   BOOST_CHECK_EQUAL(itr->sec_key_view(), "zebra");
+   // Verify pri_key is preserved
+   BOOST_CHECK_EQUAL(itr->pri_key_view(), std::string_view("\x00\x01", 2));
+
+   // Lookup by full composite key (sec_key + pri_key) finds the modified object.
+   auto pitr = sec_idx.find(boost::make_tuple(
+      name("test"), users_idx,
+      std::string_view("zebra", 5),
+      std::string_view("\x00\x01", 2)));
+   BOOST_REQUIRE(pitr != sec_idx.end());
+   BOOST_CHECK_EQUAL(pitr->sec_key_view(), "zebra");
+
+   // Old sec_key no longer resolves.
+   auto old_itr = sec_idx.find(boost::make_tuple(
+      name("test"), users_idx,
+      std::string_view("alice", 5),
+      std::string_view("\x00\x01", 2)));
+   BOOST_CHECK(old_itr == sec_idx.end());
+
+   // Verify undo restores original ordering
+   session.undo();
+
+   auto& sec_idx2 = db.get_index<kv_index_index, by_code_table_id_seckey>();
+   auto itr2 = sec_idx2.lower_bound(boost::make_tuple(name("test"), users_idx));
+   // After undo, all 3 entries should be gone (session created them all)
+   BOOST_CHECK(itr2 == sec_idx2.end() || itr2->code != name("test"));
+}
+
 BOOST_AUTO_TEST_CASE(kv_iterator_pool_basic) {
    kv_iterator_pool pool;
 
@@ -277,6 +350,64 @@ BOOST_AUTO_TEST_CASE(kv_iterator_pool_exhaustion) {
    pool.release(5);
    uint32_t h = pool.allocate_primary(uint16_t(0), "test"_n, "", 0);
    BOOST_CHECK_EQUAL(h, 5u);
+}
+
+// kv_idx_update uses db.modify, which preserves the chainbase id but can
+// move the object's sort position. Verify that invalidate_secondary_cache
+// clears cached_id only on the matching secondary slot and only the cached_id,
+// leaving stored key bytes and status intact for the slow re-seek path.
+BOOST_AUTO_TEST_CASE(kv_iterator_pool_invalidate_secondary_cache) {
+   kv_iterator_pool pool;
+
+   const uint16_t users_pri = compute_table_id("users");
+   const uint16_t users_idx = compute_table_id("users.byname");
+   const uint16_t users_idx_other = compute_table_id("users.byage");
+   const uint16_t things_idx = compute_table_id("things.byname");
+
+   uint32_t h_prim         = pool.allocate_primary(users_pri, "test"_n, "", 0);
+   uint32_t h_sec          = pool.allocate_secondary("test"_n, users_idx);
+   uint32_t h_other_idx_a  = pool.allocate_secondary("test"_n, things_idx);
+   uint32_t h_other_idx_b  = pool.allocate_secondary("test"_n, users_idx_other);
+   uint32_t h_other_code   = pool.allocate_secondary("alt"_n,  users_idx);
+   uint32_t h_other_id     = pool.allocate_secondary("test"_n, users_idx);
+
+   const int64_t target_id = 42;
+   const int64_t other_id  = 99;
+
+   auto seed = [](kv_iterator_slot& s, int64_t id) {
+      s.status = kv_it_stat::iterator_ok;
+      s.current_sec_key.assign({'a','l','i','c','e'});
+      s.current_pri_key.assign({'\x00','\x01'});
+      s.cached_id = id;
+   };
+
+   // Primary slot must be ignored even when its cached_id collides.
+   pool.get(h_prim).cached_id = target_id;
+   pool.get(h_prim).status = kv_it_stat::iterator_ok;
+
+   seed(pool.get(h_sec),          target_id);
+   seed(pool.get(h_other_idx_a),  target_id);
+   seed(pool.get(h_other_idx_b),  target_id);
+   seed(pool.get(h_other_code),   target_id);
+   seed(pool.get(h_other_id),     other_id);
+
+   pool.invalidate_secondary_cache("test"_n, users_idx, target_id);
+
+   // Matching secondary slot: cached_id cleared, key bytes and status preserved.
+   const auto& matched = pool.get(h_sec);
+   BOOST_CHECK_EQUAL(matched.cached_id, -1);
+   BOOST_CHECK(matched.status == kv_it_stat::iterator_ok);
+   BOOST_CHECK_EQUAL(matched.current_sec_key.size(), 5u);
+   BOOST_CHECK_EQUAL(matched.current_pri_key.size(), 2u);
+
+   // Primary slot untouched even though id matches.
+   BOOST_CHECK_EQUAL(pool.get(h_prim).cached_id, target_id);
+
+   // Secondary slots that differ in any of code/table_id/id are untouched.
+   BOOST_CHECK_EQUAL(pool.get(h_other_idx_a).cached_id, target_id);
+   BOOST_CHECK_EQUAL(pool.get(h_other_idx_b).cached_id, target_id);
+   BOOST_CHECK_EQUAL(pool.get(h_other_code).cached_id,  target_id);
+   BOOST_CHECK_EQUAL(pool.get(h_other_id).cached_id,    other_id);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
