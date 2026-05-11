@@ -641,8 +641,9 @@ int64_t apply_context::kv_set(uint16_t table_id, uint64_t payer_val, const char*
       }
 
       // Capture old value for deep_mind before modify (old_payer already captured above)
+      auto dm_logger = control.get_deep_mind_logger(trx_context.is_transient());
       std::string old_value_copy;
-      if (auto dm_logger = control.get_deep_mind_logger(trx_context.is_transient())) {
+      if (dm_logger) {
          old_value_copy.assign(itr->value.data(), itr->value.size());
       }
 
@@ -651,7 +652,7 @@ int64_t apply_context::kv_set(uint16_t table_id, uint64_t payer_val, const char*
          o.value.assign(value, value_size);
       });
 
-      if (auto dm_logger = control.get_deep_mind_logger(trx_context.is_transient())) {
+      if (dm_logger) {
          dm_logger->on_kv_set(*itr, false, old_payer, old_value_copy.data(), old_value_copy.size());
       }
 
@@ -1054,15 +1055,18 @@ void apply_context::kv_idx_update(uint64_t payer_val, uint16_t table_id, int64_t
       }
    }
 
-   // Remove old and create new (secondary_key is part of index key, can't modify in-place).
-   // primary_id is reused — both old and new sec rows point at the same kv_object.
-   db.remove(*itr);
-   db.create<kv_index_object>([&](auto& o) {
-      o.code = receiver;
+   // db.modify preserves the kv_index_object's chainbase id but moves it to a
+   // new sort position when sec_key changes. Live secondary iterators that
+   // cached this id would otherwise advance from the post-modify position and
+   // skip entries. Invalidate the cached id on any matching slot so the next
+   // op falls back to the slow re-seek using the saved old key bytes.
+   kv_iterators.invalidate_secondary_cache(receiver, table_id, itr->id._id);
+
+   // primary_id is unchanged: the find() above included it in the composite
+   // key, so the matched row's primary_id already equals the input.
+   db.modify(*itr, [&](auto& o) {
       o.payer = payer;
-      o.table_id = table_id;
       o.sec_key.assign(new_sec_key, new_sec_key_size);
-      o.primary_id = kv_object::id_type(primary_id);
    });
 }
 
