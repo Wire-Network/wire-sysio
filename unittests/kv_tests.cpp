@@ -311,15 +311,15 @@ BOOST_AUTO_TEST_CASE(kv_iterator_pool_basic) {
    kv_primary_iterator_pool prim_pool;
    kv_secondary_iterator_pool sec_pool;
 
-   // Allocate primary -- returns a raw slot index (no tag).
+   // Treat the value returned by primary allocate() as a contract-facing handle and route every access via the
+   // handle helpers so the test does not bake in the current "primary handle == slot index" detail.
    uint32_t h1 = prim_pool.allocate(uint16_t(0), "test"_n, "prefix", 6);
-   BOOST_CHECK_EQUAL(h1, 0u);
    BOOST_CHECK(!kv_handle_is_secondary(h1));
    auto& slot1 = prim_pool.get(kv_handle_slot_index(h1));
    BOOST_CHECK_EQUAL(slot1.code, "test"_n);
    BOOST_CHECK_EQUAL(slot1.prefix.size(), 6u);
 
-   // Allocate secondary -- slot index is wrapped with the tag bit.
+   // Secondary: wrap the slot index with the tag bit, then verify round-trip through the helpers.
    uint32_t s2 = sec_pool.allocate("test"_n, uint16_t(100));
    uint32_t h2 = kv_make_secondary_handle(s2);
    BOOST_CHECK(kv_handle_is_secondary(h2));
@@ -327,13 +327,41 @@ BOOST_AUTO_TEST_CASE(kv_iterator_pool_basic) {
    auto& slot2 = sec_pool.get(kv_handle_slot_index(h2));
    BOOST_CHECK_EQUAL(slot2.code, "test"_n);
 
-   // Release and reuse from each pool independently.
+   // Each pool has its own free-list. A primary release does not affect the secondary, and vice versa.
    prim_pool.release(kv_handle_slot_index(h1));
    uint32_t h3 = prim_pool.allocate(uint16_t(0), "other"_n, "", 0);
-   BOOST_CHECK_EQUAL(h3, 0u); // reuses slot 0
+   BOOST_CHECK_EQUAL(kv_handle_slot_index(h3), kv_handle_slot_index(h1)); // reuses the freed slot
 
    sec_pool.release(kv_handle_slot_index(h2));
    prim_pool.release(kv_handle_slot_index(h3));
+}
+
+BOOST_AUTO_TEST_CASE(kv_validate_handle_dispatch) {
+   // validate_primary_handle: well-formed primary returns its slot index; wrong-pool tag and reserved bits throw.
+   BOOST_CHECK_EQUAL(validate_primary_handle(0u, "op"), 0u);
+   BOOST_CHECK_EQUAL(validate_primary_handle(1023u, "op"), 1023u);
+   BOOST_CHECK_THROW(validate_primary_handle(kv_make_secondary_handle(5u), "op"), kv_invalid_iterator);
+   BOOST_CHECK_THROW(validate_primary_handle(0x00000400u, "op"), kv_invalid_iterator); // bit 10 reserved
+   BOOST_CHECK_THROW(validate_primary_handle(0x00020000u, "op"), kv_invalid_iterator); // bit 17 reserved
+   BOOST_CHECK_THROW(validate_primary_handle(0x80000000u, "op"), kv_invalid_iterator); // bit 31 reserved (sign)
+
+   // validate_secondary_handle: well-formed secondary returns its slot index; primary handles and reserved bits throw.
+   uint32_t sec_handle = kv_make_secondary_handle(5u);
+   BOOST_CHECK_EQUAL(validate_secondary_handle(sec_handle, "op"), 5u);
+   BOOST_CHECK_THROW(validate_secondary_handle(5u, "op"), kv_invalid_iterator);        // primary
+   BOOST_CHECK_THROW(validate_secondary_handle(0u, "op"), kv_invalid_iterator);        // primary, slot 0
+   BOOST_CHECK_THROW(validate_secondary_handle(sec_handle | 0x00000400u, "op"),
+                     kv_invalid_iterator); // sec + bit 10
+   BOOST_CHECK_THROW(validate_secondary_handle(sec_handle | 0x80000000u, "op"),
+                     kv_invalid_iterator); // sec + bit 31
+}
+
+BOOST_AUTO_TEST_CASE(kv_check_prefix_size_bounds) {
+   BOOST_CHECK_NO_THROW(kv_check_prefix_size(0));
+   BOOST_CHECK_NO_THROW(kv_check_prefix_size(8));
+   BOOST_CHECK_NO_THROW(kv_check_prefix_size(config::max_kv_key_size_limit));
+   BOOST_CHECK_THROW(kv_check_prefix_size(config::max_kv_key_size_limit + 1), kv_key_too_large);
+   BOOST_CHECK_THROW(kv_check_prefix_size(std::numeric_limits<uint32_t>::max()), kv_key_too_large);
 }
 
 BOOST_AUTO_TEST_CASE(kv_iterator_pool_independent_exhaustion) {

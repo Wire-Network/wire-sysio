@@ -39,27 +39,43 @@ enum class kv_it_stat : int32_t {
 
 inline constexpr uint32_t kv_secondary_handle_tag   = 0x00010000u;
 inline constexpr uint32_t kv_handle_slot_index_mask = 0x000003FFu; // bits 0..9
-inline constexpr uint32_t kv_handle_reserved_mask   =
-   ~(kv_handle_slot_index_mask | kv_secondary_handle_tag);
+inline constexpr uint32_t kv_handle_reserved_mask   = ~(kv_handle_slot_index_mask | kv_secondary_handle_tag);
 
-inline bool kv_handle_is_secondary(uint32_t handle) {
-   return (handle & kv_secondary_handle_tag) != 0;
-}
+// Compile-time invariant: slot indices must fit in the handle's slot bits. Bumping max_kv_iterators past the mask
+// width would silently truncate high-slot handles and dispatch them to the wrong slot.
+static_assert(config::max_kv_iterators <= kv_handle_slot_index_mask + 1,
+              "kv_handle_slot_index_mask too narrow for config::max_kv_iterators");
 
-inline uint32_t kv_handle_slot_index(uint32_t handle) {
-   return handle & kv_handle_slot_index_mask;
-}
+inline bool kv_handle_is_secondary(uint32_t handle) { return (handle & kv_secondary_handle_tag) != 0; }
+inline uint32_t kv_handle_slot_index(uint32_t handle) { return handle & kv_handle_slot_index_mask; }
+inline uint32_t kv_make_secondary_handle(uint32_t slot_index) { return slot_index | kv_secondary_handle_tag; }
 
-inline uint32_t kv_make_secondary_handle(uint32_t slot_index) {
-   return slot_index | kv_secondary_handle_tag;
-}
-
-// Throws kv_invalid_iterator if any reserved bit is set.  Called from every
-// host-intrinsic entry point that consumes a handle so a fabricated handle
-// aborts the action instead of silently aliasing a real slot.
+// Throws kv_invalid_iterator if any reserved bit is set. Called at every host-intrinsic entry point that consumes
+// a handle so a fabricated handle aborts the action instead of silently aliasing a real slot.
 inline void kv_handle_check_reserved_zero(uint32_t handle) {
    SYS_ASSERT((handle & kv_handle_reserved_mask) == 0, kv_invalid_iterator,
               "KV iterator handle has reserved bits set: {}", handle);
+}
+
+// Validate handle and return its slot index; throws on fabricated or wrong-pool handles.
+inline uint32_t validate_primary_handle(uint32_t handle, const char* op) {
+   kv_handle_check_reserved_zero(handle);
+   SYS_ASSERT(!kv_handle_is_secondary(handle), kv_invalid_iterator,
+              "{} called on secondary iterator handle", op);
+   return kv_handle_slot_index(handle);
+}
+inline uint32_t validate_secondary_handle(uint32_t handle, const char* op) {
+   kv_handle_check_reserved_zero(handle);
+   SYS_ASSERT(kv_handle_is_secondary(handle), kv_invalid_iterator,
+              "{} called on primary iterator handle", op);
+   return kv_handle_slot_index(handle);
+}
+
+// Bound iterator prefix size. Prefix bytes are copied into the slot's vector; without a cap a contract could allocate
+// arbitrary host-side storage per iterator. Uses the absolute key-size ceiling (not the dynamic max_kv_key_size).
+inline void kv_check_prefix_size(uint32_t prefix_size) {
+   SYS_ASSERT(prefix_size <= config::max_kv_key_size_limit, kv_key_too_large,
+              "KV iterator prefix size {} exceeds limit {}", prefix_size, config::max_kv_key_size_limit);
 }
 
 // ---------------------------------------------------------------------------
