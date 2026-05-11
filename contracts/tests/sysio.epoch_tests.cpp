@@ -144,7 +144,7 @@ BOOST_FIXTURE_TEST_CASE(regoutpost_basic, sysio_epoch_tester) { try {
    // Verify outpost row written to table (first entry, id=0)
    auto op = get_outpost(0);
    BOOST_REQUIRE(!op.is_null());
-   BOOST_REQUIRE_EQUAL("CHAIN_KIND_ETHEREUM", op["chain_kind"].as_string());
+   BOOST_REQUIRE(ChainKind::CHAIN_KIND_ETHEREUM == op["chain_kind"].as<ChainKind>());
    BOOST_REQUIRE_EQUAL(1, op["chain_id"].as_uint64());
 
    BOOST_REQUIRE_EQUAL(
@@ -159,7 +159,7 @@ BOOST_FIXTURE_TEST_CASE(regoutpost_basic, sysio_epoch_tester) { try {
    // Verify second outpost (id=1)
    auto op2 = get_outpost(1);
    BOOST_REQUIRE(!op2.is_null());
-   BOOST_REQUIRE_EQUAL("CHAIN_KIND_SOLANA", op2["chain_kind"].as_string());
+   BOOST_REQUIRE(ChainKind::CHAIN_KIND_SOLANA == op2["chain_kind"].as<ChainKind>());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(advance_before_config, sysio_epoch_tester) { try {

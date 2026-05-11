@@ -37,53 +37,6 @@ using ed_raw_key_t = std::array<uint8_t, 32>;
 }
 
 
-/**
- * Bitcoin base58 alphabet
- */
-constexpr char base58_alphabet[] = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
-
-/**
- * Encodes a given byte array into a Base58 encoded string using the Bitcoin Base58
- * alphabet ("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz").
- *
- * Base58 encoding provides a compact, human-readable textual representation of binary
- * data. It avoids visually ambiguous characters, such as '0' (zero) and 'O' (uppercase
- * o), making it suitable for use in financial identifiers, cryptocurrency addresses,
- * and similar contexts.
- *
- * @param bytes Pointer to the byte array to be encoded.
- * @param data_len Length of the byte array to be encoded.
- * @return A Base58 encoded string representation of the input byte array.
- */
-std::string base58_encode(const unsigned char* bytes, uint32_t data_len) {
-   uint32_t leading_zeros = 0;
-   while (leading_zeros < data_len && bytes[leading_zeros] == 0)
-      ++leading_zeros;
-
-   uint32_t max_len = data_len * 138 / 100 + 2;
-   std::vector<uint8_t> b58(max_len, 0);
-
-   for (uint32_t i = leading_zeros; i < data_len; ++i) {
-      uint32_t carry = bytes[i];
-      for (int32_t j = static_cast<int32_t>(max_len) - 1; j >= 0; --j) {
-         carry += 256u * b58[j];
-         b58[j] = static_cast<uint8_t>(carry % 58);
-         carry /= 58;
-      }
-   }
-
-   uint32_t start = 0;
-   while (start < max_len && b58[start] == 0)
-      ++start;
-
-   std::string result;
-   result.reserve(leading_zeros + (max_len - start));
-   result.append(leading_zeros, '1');
-   for (uint32_t i = start; i < max_len; ++i)
-      result += base58_alphabet[b58[i]];
-
-   return result;
-}
 } // anonymous namespace
 
 
@@ -295,28 +248,4 @@ std::array<uint8_t, 4> authex::digestSuffixRipemd160(const std::array<char, 33>&
    return result;
 };
 
-std::string authex::pubkey_to_string(const sysio::public_key& pk) {
-   switch (pk.index()) {
-   case fc::crypto::key_type_em: { // PUB_EM_
-
-      auto raw = std::get<3>(pk);
-
-      return "PUB_EM_" + sysio::to_hex(reinterpret_cast<const char*>(raw.data()), raw.size());
-   }
-
-   case 4: { // PUB_ED_
-      // raw is std::array<char,32> — plain base58, no checksum (matches fc)
-      auto raw = std::get<4>(pk);
-      std::array<uint8_t, 32> key_bytes;
-      for (size_t i = 0; i < 32; ++i)
-         key_bytes[i] = static_cast<uint8_t>(raw[i]);
-
-      return "PUB_ED_" + base58_encode(key_bytes.data(), key_bytes.size());
-   }
-
-   default:
-      sysio::check(false, "pubkey_to_string only supports EM (3) and ED (4)");
-      return {};
-   }
-}
 } // namespace sysio

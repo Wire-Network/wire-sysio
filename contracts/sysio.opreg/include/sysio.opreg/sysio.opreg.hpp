@@ -14,18 +14,22 @@ namespace sysio {
    /**
     * @brief sysio.opreg — operator registry on WIRE.
     *
-    * Holds the **authoritative** bond ledger for every operator type
+    * Holds the **authoritative** collateral ledger for every operator type
     * (producers, batch operators, underwriters, plus their standby tiers).
     * Per the corrected ledger model in
     * `CLAUDE-WIRE-OPERATOR-COLLATERAL-IMPL-PLAN.md`:
     *
     * - One aggregate balance per (operator, chain, token_kind) — NOT a
-    *   vector of stake entries, NOT a locked/available/amount trio.
-    * - `deposit` adds; `queue_withdraw` enqueues a 2-epoch delayed
-    *   subtraction; `slash` zeros the unlocked portion immediately and
-    *   leaves locks for `sysio.uwrit::release` to slash deferred.
+    *   vector of collateral entries, NOT a locked/available/amount trio.
+    * - `deposit` (operator-callable, WIRE-direct) and `depositinle`
+    *   (msgch-dispatched from outposts) credit the matching balance row;
+    *   `withdraw` (operator-callable, WIRE-direct) and `withdrawinle`
+    *   (msgch-dispatched from outposts) enqueue a delayed subtraction;
+    *   `slash` zeros the unlocked portion immediately and leaves locks
+    *   for `sysio.uwrit::release` to slash deferred.
     * - Underwriter locks live entirely in `sysio.uwrit::locks` — opreg
-    *   reads them via a kv::table mirror to compute `available()`.
+    *   reads them directly via the public `sysio::uwrit::locks_t` table
+    *   type to compute `available()`.
     * - Pending withdraws are also subtracted by `available()` so an
     *   operator can't double-use queued funds; `cancelwtdw` lets them
     *   walk back a queued withdraw before it executes.
@@ -61,6 +65,13 @@ namespace sysio {
       static constexpr uint32_t TERMINATE_MAX_PCT_MISSES_24H     = 5;   // percent
       static constexpr uint64_t TERMINATE_WINDOW_MS              = 24ULL * 60 * 60 * 1000;
 
+      // Per-operator audit log: ring-buffer cap (newest-in / oldest-out) and
+      // per-entry error_message length cap. Operators read recent_actions to
+      // diagnose dropped requests; the log must stay bounded so a long-lived
+      // operator's row doesn't grow unbounded.
+      static constexpr size_t   MAX_RECENT_ACTIONS       = 5;
+      static constexpr size_t   MAX_ERROR_MESSAGE_BYTES  = 2048;
+
       // -----------------------------------------------------------------------
       //  Actions
       // -----------------------------------------------------------------------
@@ -78,37 +89,56 @@ namespace sysio {
                        opp::types::OperatorType type,
                        bool is_bootstrapped);
 
-      /// Operator-callable: stake CORE_SYM tokens directly into their WIRE-side
-      /// bond. The tokens transfer in the same transaction; the corresponding
-      /// (operator, WIRE, WIRE_TOKEN) balance row is credited.
+      /// Operator-callable: lock CORE_SYM tokens directly as the operator's
+      /// WIRE-side collateral. The tokens transfer in the same transaction;
+      /// the corresponding (operator, WIRE, WIRE_TOKEN) balance row is
+      /// credited. Reverts on validation failure (no escrow exists yet —
+      /// failure surfaces in the operator's signing tx so they can retry).
       [[sysio::action]]
-      void wirestake(name account, uint64_t amount);
+      void deposit(name account, uint64_t amount);
 
-      /// Internal: credit an outpost-side bond. Called by `sysio.msgch` when
-      /// it dispatches an `OPERATOR_ACTION(DEPOSIT)` attestation that came in
-      /// from an outpost.
+      /// Internal: credit an outpost-side collateral row. Called by
+      /// `sysio.msgch` when it dispatches an `OPERATOR_ACTION(DEPOSIT_REQUEST)`
+      /// attestation that came in from an outpost.
+      ///
+      /// Validation failures (unknown account, slashed/terminated operator,
+      /// zero amount) DO NOT revert — they are recorded in the operator's
+      /// `recent_actions` log (when an entry exists) and trigger an outbound
+      /// `DEPOSIT_REVERT` attestation back to the source outpost so escrowed
+      /// funds get refunded to the depositor (minus the outpost-side gas
+      /// penalty). Reverting would abort the entire envelope's dispatch.
+      ///
+      /// `actor` is the depositor's source-chain address (refund target on
+      /// DEPOSIT_REVERT). `original_message_id` is the OPP message id of
+      /// the inbound DEPOSIT_REQUEST attestation — outposts match on it to
+      /// scope the refund to one specific in-flight deposit.
       [[sysio::action]]
-      void deposit(name account,
-                   opp::types::ChainKind chain,
-                   opp::types::TokenKind token_kind,
-                   uint64_t amount,
-                   checksum256 outpost_tx_hash);
+      void depositinle(name account,
+                       opp::types::ChainKind chain,
+                       opp::types::TokenAmount amount,
+                       opp::types::ChainAddress actor,
+                       checksum256 original_message_id);
 
-      /// Operator-callable: queue a WIRE-side withdrawal subject to the
-      /// 2-epoch wait. Equivalent to the operator calling `withdraw` JSON-RPC
-      /// on the WIRE chain. The matching tokens leave when `flushwithdraws`
-      /// drains the queue at `eligible_at_epoch`.
+      /// Operator-callable: queue a WIRE-direct collateral withdrawal subject
+      /// to the WITHDRAW_WAIT_EPOCHS wait. Outpost-held collateral is
+      /// withdrawn by calling the holding outpost's withdraw entry point —
+      /// the outpost emits an OPERATOR_ACTION(WITHDRAW_REQUEST) inbound that
+      /// reaches `withdrawinle` instead. Validation failures DO NOT revert —
+      /// they are appended to the operator's `recent_actions` ring buffer
+      /// (matching the OPP-dispatched path's failure semantics).
       [[sysio::action]]
-      void wireunstake(name account, uint64_t amount);
+      void withdraw(name account, uint64_t amount);
 
-      /// Internal: queue an outpost-side withdrawal. Called by `sysio.msgch`
-      /// when it dispatches an `OPERATOR_ACTION(WITHDRAW_REQUEST)` attestation
-      /// that came in from an outpost. Subject to the 2-epoch wait.
+      /// Internal: queue an outpost-side collateral withdrawal. Called by
+      /// `sysio.msgch` when it dispatches an `OPERATOR_ACTION(WITHDRAW_REQUEST)`
+      /// attestation that came in from an outpost. Subject to the
+      /// WITHDRAW_WAIT_EPOCHS wait. Validation failures are logged on the
+      /// operator's `recent_actions` ring buffer; the dispatch tx commits
+      /// so other attestations in the same envelope still apply.
       [[sysio::action]]
-      void queuewtdw(name account,
-                     opp::types::ChainKind chain,
-                     opp::types::TokenKind token_kind,
-                     uint64_t amount);
+      void withdrawinle(name account,
+                        opp::types::ChainKind chain,
+                        opp::types::TokenAmount amount);
 
       /// Operator-callable: cancel a previously-queued withdrawal before it
       /// flushes. The reserved amount rejoins the operator's `available()`.
@@ -143,8 +173,8 @@ namespace sysio {
 
       /// Slash an operator. Permanent. Called by `sysio.chalg`. Routes the
       /// **immediately slashable** portion (`balance - sum(active locks)`) to
-      /// the matching LP on each chain via SLASH_OPERATOR attestations. The
-      /// locked portion stays in opreg's balance and is slashed at lock-
+      /// the matching LP on each chain via OPERATOR_ACTION(SLASH) attestations.
+      /// The locked portion stays in opreg's balance and is slashed at lock-
       /// release time by `sysio.uwrit::release` (deferred-slash).
       [[sysio::action]]
       void slash(name account, std::string reason);
@@ -152,7 +182,7 @@ namespace sysio {
       /// Called by `sysio.uwrit::release` when an underwriter lock resolves.
       /// Opreg consults its own current status for the operator and routes
       /// the released amount appropriately:
-      ///   * SLASHED   — decrement balance, emit SLASH_OPERATOR (deferred-slash).
+      ///   * SLASHED   — decrement balance, emit OPERATOR_ACTION(SLASH) (deferred-slash).
       ///   * TERMINATED — decrement balance, emit WITHDRAW_REMIT (deferred-remit
       ///                  to the operator's authex destination).
       ///   * else      — no-op (balance was never decremented at lock time;
@@ -161,8 +191,7 @@ namespace sysio {
       [[sysio::action]]
       void releaselock(name account,
                        opp::types::ChainKind chain,
-                       opp::types::TokenKind token_kind,
-                       uint64_t amount);
+                       opp::types::TokenAmount amount);
 
       /// Record per-batch-op delivery hit/miss for the rolling 24h buffer.
       /// Called inline from `sysio.epoch::advance` after each delivery cycle.
@@ -214,23 +243,34 @@ namespace sysio {
 
       /// Operator entry — the primary roster.
       struct [[sysio::table("operators")]] operator_entry {
-         name                          account;
-         opp::types::OperatorType      type;
-         opp::types::OperatorStatus    status;
-         bool                          is_bootstrapped = false;
-         std::vector<balance_entry>    balances;
-         uint64_t                      registered_at   = 0;
-         uint64_t                      available_at    = 0;
-         uint64_t                      slashed_at      = 0;
-         uint64_t                      terminated_at   = 0;
-         std::string                   status_reason;
+         name                                          account;
+         opp::types::OperatorType                      type;
+         opp::types::OperatorStatus                    status;
+         bool                                          is_bootstrapped = false;
+         std::vector<balance_entry>                    balances;
+         uint64_t                                      registered_at   = 0;
+         uint64_t                                      available_at    = 0;
+         /// Generic last-mutation timestamp. Bumped any time the operator
+         /// row materially changes (status flip, balance write, slash,
+         /// termination, etc). Distinct from `terminated_at` / `available_at`,
+         /// which are moment-of-event stamps; `updated_at` is "latest touch".
+         uint64_t                                      updated_at      = 0;
+         uint64_t                                      terminated_at   = 0;
+         std::string                                   status_reason;
+         /// Newest-first ring buffer (cap = MAX_RECENT_ACTIONS) of every
+         /// OperatorAction the depot has applied or rejected for this
+         /// operator. `append_action_log` does the truncate-on-overflow.
+         /// Operators read this to diagnose dropped DEPOSIT / WITHDRAW_REQUEST
+         /// requests and to see slash entries (with reason).
+         std::vector<opp::attestations::OperatorActionLog> recent_actions;
 
          uint64_t by_type()   const { return static_cast<uint64_t>(type); }
          uint64_t by_status() const { return static_cast<uint64_t>(status); }
 
          SYSLIB_SERIALIZE(operator_entry,
             (account)(type)(status)(is_bootstrapped)(balances)
-            (registered_at)(available_at)(slashed_at)(terminated_at)(status_reason))
+            (registered_at)(available_at)(updated_at)(terminated_at)
+            (status_reason)(recent_actions))
       };
 
       using operators_t = sysio::kv::table<"operators"_n, operator_key, operator_entry,
@@ -256,16 +296,16 @@ namespace sysio {
 
       /// Operator registry configuration singleton.
       struct [[sysio::table("opconfig")]] op_config {
-         std::vector<chain_min_bond> req_prod_stakes;
-         std::vector<chain_min_bond> req_batchop_stakes;
-         std::vector<chain_min_bond> req_uw_stakes;
+         std::vector<chain_min_bond> req_prod_collat;
+         std::vector<chain_min_bond> req_batchop_collat;
+         std::vector<chain_min_bond> req_uw_collat;
          uint32_t max_available_producers    = 21;
          uint32_t max_available_batch_ops    = 63;
          uint32_t max_available_underwriters = 21;
          uint64_t terminate_prune_delay_ms   = 86400000; // 24hrs
 
          SYSLIB_SERIALIZE(op_config,
-            (req_prod_stakes)(req_batchop_stakes)(req_uw_stakes)
+            (req_prod_collat)(req_batchop_collat)(req_uw_collat)
             (max_available_producers)(max_available_batch_ops)(max_available_underwriters)
             (terminate_prune_delay_ms))
       };

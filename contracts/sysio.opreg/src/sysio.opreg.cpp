@@ -1,6 +1,7 @@
 #include <sysio.opreg/sysio.opreg.hpp>
 #include <sysio.epoch/sysio.epoch.hpp>
 #include <sysio.authex/sysio.authex.hpp>
+#include <sysio.uwrit/sysio.uwrit.hpp>
 #include <sysio/opp/attestations/attestations.pb.hpp>
 #include <zpp_bits.h>
 
@@ -12,90 +13,8 @@ using opp::types::ChainKind;
 using opp::types::TokenKind;
 using opp::types::AttestationType;
 using opp::attestations::OperatorAction;
-using opp::attestations::SlashOperator;
-using opp::attestations::ReserveTarget;
-
-// ---------------------------------------------------------------------------
-//  Read-only mirror of sysio.authex::links table for cross-contract reads.
-//  Table id and index ids are derived from the name hashes, so they match the
-//  real authex table as long as the table and index names match. Only the
-//  indices actually read here need to be mirrored.
-// ---------------------------------------------------------------------------
-namespace authex_readonly {
-
-struct links_key {
-   uint64_t key;
-   SYSLIB_SERIALIZE(links_key, (key))
-};
-
-struct links_row {
-   uint64_t                 key;
-   name                     username;
-   fc::crypto::chain_kind_t chain_kind;
-   public_key               pub_key;
-
-   uint128_t by_namechain() const { return to_namechain_key(username, chain_kind); }
-   uint64_t  by_name()      const { return username.value; }
-   uint64_t  by_chain()     const { return static_cast<uint64_t>(chain_kind); }
-
-   SYSLIB_SERIALIZE(links_row, (key)(username)(chain_kind)(pub_key))
-};
-
-using links_t = sysio::kv::table<"links"_n, links_key, links_row,
-   sysio::kv::index<"bynamechain"_n,
-      sysio::const_mem_fun<links_row, uint128_t, &links_row::by_namechain>>,
-   sysio::kv::index<"byname"_n,
-      sysio::const_mem_fun<links_row, uint64_t, &links_row::by_name>>,
-   sysio::kv::index<"bychain"_n,
-      sysio::const_mem_fun<links_row, uint64_t, &links_row::by_chain>>
->;
-
-} // namespace authex_readonly
-
-// ---------------------------------------------------------------------------
-//  Read-only mirror of sysio.uwrit::locks table for cross-contract reads.
-//
-//  Pulled in by the `available()` rollup so opreg can subtract active
-//  underwriter locks from an operator's spendable balance. The struct shape
-//  mirrors `sysio.uwrit::lock_entry` exactly (Task 3); until uwrit's locks
-//  table is populated, the kv::table iteration is empty and the rollup
-//  naturally treats locks as zero — operators have full balance available.
-// ---------------------------------------------------------------------------
-namespace uwrit_readonly {
-
-struct lock_key {
-   uint64_t lock_id;
-   SYSLIB_SERIALIZE(lock_key, (lock_id))
-};
-
-struct lock_row {
-   uint64_t       lock_id;
-   uint64_t       uwreq_id;
-   name           underwriter;
-   ChainKind      chain;
-   TokenKind      token_kind;
-   uint64_t       amount;
-   uint32_t       created_at_epoch;
-
-   uint128_t by_underwriter_ck() const {
-      return (static_cast<uint128_t>(underwriter.value) << 64)
-           | (static_cast<uint64_t>(chain) << 32)
-           | static_cast<uint64_t>(token_kind);
-   }
-   uint64_t by_uwreq() const { return uwreq_id; }
-
-   SYSLIB_SERIALIZE(lock_row,
-      (lock_id)(uwreq_id)(underwriter)(chain)(token_kind)(amount)(created_at_epoch))
-};
-
-using locks_t = sysio::kv::table<"locks"_n, lock_key, lock_row,
-   sysio::kv::index<"byuwck"_n,
-      sysio::const_mem_fun<lock_row, uint128_t, &lock_row::by_underwriter_ck>>,
-   sysio::kv::index<"byuwreq"_n,
-      sysio::const_mem_fun<lock_row, uint64_t, &lock_row::by_uwreq>>
->;
-
-} // namespace uwrit_readonly
+using opp::attestations::OperatorActionLog;
+using opp::attestations::DepositRevert;
 
 namespace {
 
@@ -104,7 +23,7 @@ uint64_t current_time_ms() {
 }
 
 /// Compute the composite key matching `withdraw_request::by_account_ck` /
-/// `uwrit_readonly::lock_row::by_underwriter_ck`. Centralized so both the
+/// `sysio::uwrit::lock_entry::by_underwriter_ck`. Centralized so both the
 /// indexer and the lookups stay in lockstep.
 uint128_t make_account_chain_token_key(name account, ChainKind chain, TokenKind token_kind) {
    return (static_cast<uint128_t>(account.value) << 64)
@@ -113,17 +32,23 @@ uint128_t make_account_chain_token_key(name account, ChainKind chain, TokenKind 
 }
 
 /// Find the outpost id registered with sysio.epoch for a given chain. Returns
-/// 0 if no matching outpost exists (the caller is responsible for handling
-/// that case — typically by skipping the queueout for chains without an
-/// outpost, e.g. WIRE-direct flows).
-uint64_t find_outpost_id_for_chain(ChainKind chain) {
+/// `std::nullopt` if no matching outpost exists (the caller is responsible
+/// for handling that case — typically by skipping the queueout for chains
+/// without an outpost, e.g. WIRE-direct flows).
+///
+/// Returning `std::optional` rather than a 0 sentinel matters: outpost
+/// ids start at 0, so a 0-as-not-found sentinel collides with the
+/// canonical Ethereum outpost id and silently drops every REMIT / SLASH
+/// queueout for that chain. The caller now uses `has_value()` to
+/// distinguish "no outpost" from "outpost #0".
+std::optional<uint64_t> find_outpost_id_for_chain(ChainKind chain) {
    sysio::epoch::outposts_t outposts(opreg::EPOCH_ACCOUNT);
    for (auto it = outposts.begin(); it != outposts.end(); ++it) {
       if (static_cast<int>(it->chain_kind) == static_cast<int>(chain)) {
          return it->id;
       }
    }
-   return 0;
+   return std::nullopt;
 }
 
 } // anonymous namespace
@@ -194,7 +119,7 @@ void opreg::regoperator(name account,
    // Skip when: bootstrapped OR privileged caller (sysio.opreg registering on behalf)
    if (!is_bootstrapped && !has_auth(get_self())) {
       epoch::outposts_t outposts(EPOCH_ACCOUNT);
-      authex_readonly::links_t links(AUTHEX_ACCOUNT);
+      authex::links_t links(AUTHEX_ACCOUNT);
       auto namechain_idx = links.get_index<"bynamechain"_n>();
 
       for (auto op_it = outposts.begin(); op_it != outposts.end(); ++op_it) {
@@ -231,7 +156,7 @@ namespace {
 /// Returns 0 if uwrit's locks table is empty (Task 3 not yet wired up) or if
 /// the operator has no locks on that chain/token.
 uint64_t sum_locks_inline(name account, ChainKind chain, TokenKind token_kind) {
-   uwrit_readonly::locks_t locks(opreg::UWRIT_ACCOUNT);
+   uwrit::locks_t locks(opreg::UWRIT_ACCOUNT);
    auto idx = locks.get_index<"byuwck"_n>();
    uint128_t composite = make_account_chain_token_key(account, chain, token_kind);
 
@@ -310,9 +235,9 @@ bool meets_role_min(const opreg::operator_entry& op,
                     const opreg::op_config& cfg) {
    const std::vector<opreg::chain_min_bond>* reqs = nullptr;
    switch (op.type) {
-      case OperatorType::OPERATOR_TYPE_PRODUCER:    reqs = &cfg.req_prod_stakes;    break;
-      case OperatorType::OPERATOR_TYPE_BATCH:       reqs = &cfg.req_batchop_stakes; break;
-      case OperatorType::OPERATOR_TYPE_UNDERWRITER: reqs = &cfg.req_uw_stakes;      break;
+      case OperatorType::OPERATOR_TYPE_PRODUCER:    reqs = &cfg.req_prod_collat;    break;
+      case OperatorType::OPERATOR_TYPE_BATCH:       reqs = &cfg.req_batchop_collat; break;
+      case OperatorType::OPERATOR_TYPE_UNDERWRITER: reqs = &cfg.req_uw_collat;      break;
       default:                                       return false;
    }
    if (!reqs || reqs->empty()) {
@@ -416,107 +341,223 @@ uint32_t get_current_epoch() {
 } // anonymous namespace
 
 // ---------------------------------------------------------------------------
-//  wirestake — operator-callable WIRE-side bond deposit
+//  Outbound attestation encoders + audit-log helpers
 // ---------------------------------------------------------------------------
-void opreg::wirestake(name account, uint64_t amount) {
-   require_auth(account);
-   check(amount > 0, "amount must be positive");
 
-   operators_t ops(get_self());
-   auto op_pk = operator_key{account.value};
-   auto op = ops.get(op_pk, "operator not found");
-   check(op.status != OperatorStatus::OPERATOR_STATUS_SLASHED &&
-         op.status != OperatorStatus::OPERATOR_STATUS_TERMINATED,
-         "operator not in a deposit-eligible state");
+namespace {
 
-   // Direct WIRE token transfer from operator -> opreg
+/// Pull the raw key bytes out of a `sysio::public_key` variant. K1 (0), R1 (1),
+/// and EM (3) share the same 33-byte compressed `ecc_public_key` layout
+/// (`std::array<char, 33>`); ED (Solana / Ed25519, index 4) is 32 bytes
+/// (`std::array<unsigned char, 32>`). Other variant arms (WebAuthn = 2,
+/// BLS = 6) are not part of the operator-collateral flow — we drop those by
+/// returning an empty vector, which then fails the `bypubkey` lookup on the
+/// depot side.
+///
+/// `std::get<ecc_public_key>` is ambiguous here (the same alias appears at
+/// indices 0, 1, and 3 in the variant), so we dispatch by index using
+/// `std::get<N>`.
+std::vector<char> pubkey_to_bytes(const sysio::public_key& pk) {
+   switch (pk.index()) {
+      case 0: {
+         const auto& arr = std::get<0>(pk);
+         return std::vector<char>(arr.begin(), arr.end());
+      }
+      case 1: {
+         const auto& arr = std::get<1>(pk);
+         return std::vector<char>(arr.begin(), arr.end());
+      }
+      case 3: {
+         const auto& arr = std::get<3>(pk);
+         return std::vector<char>(arr.begin(), arr.end());
+      }
+      case 4: {
+         const auto& arr = std::get<4>(pk);
+         return std::vector<char>(
+            reinterpret_cast<const char*>(arr.data()),
+            reinterpret_cast<const char*>(arr.data()) + arr.size());
+      }
+      default:
+         return {};
+   }
+}
+
+/// Look up `account`'s registered public key for `chain` from
+/// `sysio.authex::links` (`bynamechain` index) and pack it into a
+/// `ChainAddress`. Returns `{kind, []}` when no authex link exists — the
+/// downstream outpost / depot lookup will then fail gracefully (the depot's
+/// `dispatch_operator_action` rejects empty `op_address.address`).
+opp::types::ChainAddress operator_chain_address(name account, ChainKind chain) {
+   auto authex_chain = static_cast<fc::crypto::chain_kind_t>(chain);
+   authex::links_t links(opreg::AUTHEX_ACCOUNT);
+   auto idx = links.get_index<"bynamechain"_n>();
+   uint128_t key = to_namechain_key(account, authex_chain);
+
+   opp::types::ChainAddress addr;
+   addr.kind = chain;
+   auto it = idx.find(key);
+   if (it != idx.end()) {
+      addr.address = pubkey_to_bytes(it->pub_key);
+   }
+   return addr;
+}
+
+/// Build the `OperatorAction(action_type=SLASH)` payload for a given
+/// (account, chain, token_kind) slash. Returns the OperatorAction ready
+/// for either logging on the operator's row or queueing as an outbound
+/// OPERATOR_ACTION attestation. Pure — no side effects.
+///
+/// LP routing for the slashed funds is depot-side concern resolved via
+/// `sysio.reserve::resolve_lp` at slash-handler time; outposts on receipt
+/// only need to seize their share, so the attestation does not encode it.
+/// The `OperatorActionLog.timestamp` covers the audit trail; once an
+/// operator is slashed all subsequent OperatorActions are dropped+logged
+/// as failures, so per-action epoch is redundant on the message itself.
+OperatorAction build_slash_action(name account,
+                                  OperatorType type,
+                                  ChainKind chain,
+                                  TokenKind token_kind,
+                                  uint64_t amount,
+                                  const std::string& reason) {
+   OperatorAction oa;
+   oa.action_type = OperatorAction::ACTION_TYPE_SLASH;
+   oa.op_address  = operator_chain_address(account, chain);
+   oa.type        = type;
+   opp::types::TokenAmount ta;
+   ta.kind   = token_kind;
+   ta.amount = zpp::bits::vint64_t{static_cast<int64_t>(amount)};
+   oa.amount      = ta;
+   oa.chain       = chain;
+   oa.reason      = reason;
+   return oa;
+}
+
+/// Queue an OPERATOR_ACTION(SLASH) attestation outbound to the outpost
+/// matching `chain`. No-op if the chain is WIRE (slashed funds stay on
+/// the WIRE chain) or has no registered outpost.
+void emit_slash_attestation(name self, const OperatorAction& slash_action) {
+   if (slash_action.chain == ChainKind::CHAIN_KIND_WIRE) return;
+   auto outpost_id = find_outpost_id_for_chain(slash_action.chain);
+   if (!outpost_id) return;   // no outpost on this chain — nothing to slash through
+
+   auto [encoded, out] = zpp::bits::data_out<char>();
+   (void)out(slash_action);
+
    action(
-      permission_level{account, "active"_n},
-      TOKEN_ACCOUNT, "transfer"_n,
-      std::make_tuple(account, get_self(),
-         asset(static_cast<int64_t>(amount), CORE_SYM),
-         std::string("wirestake"))
+      permission_level{self, "active"_n},
+      opreg::MSGCH_ACCOUNT, "queueout"_n,
+      std::make_tuple(*outpost_id,
+         AttestationType::ATTESTATION_TYPE_OPERATOR_ACTION, encoded)
    ).send();
-
-   ops.modify(same_payer, op_pk, [&](auto& o) {
-      add_balance(o, ChainKind::CHAIN_KIND_WIRE, TokenKind::TOKEN_KIND_WIRE, amount);
-   });
-
-   // Re-evaluate eligibility after the deposit.
-   opconfig_t cfg_tbl(get_self());
-   if (cfg_tbl.exists()) {
-      auto cfg = cfg_tbl.get();
-      auto refreshed = ops.get(op_pk);
-      bool was_eligible = (refreshed.status == OperatorStatus::OPERATOR_STATUS_ACTIVE);
-      bool is_eligible  = meets_role_min(refreshed, cfg);
-      if (was_eligible != is_eligible) {
-         name handler;
-         switch (refreshed.type) {
-            case OperatorType::OPERATOR_TYPE_PRODUCER:    handler = "processprod"_n;  break;
-            case OperatorType::OPERATOR_TYPE_BATCH:       handler = "processbatch"_n; break;
-            case OperatorType::OPERATOR_TYPE_UNDERWRITER: handler = "processuw"_n;    break;
-            default:                                       return;
-         }
-         action(
-            permission_level{get_self(), "active"_n},
-            get_self(), handler,
-            std::make_tuple(account, was_eligible, is_eligible)
-         ).send();
-      }
-   }
 }
 
-// ---------------------------------------------------------------------------
-//  deposit — internal: outpost-driven bond credit (called by sysio.msgch)
-// ---------------------------------------------------------------------------
-void opreg::deposit(name account,
-                    opp::types::ChainKind chain,
-                    opp::types::TokenKind token_kind,
-                    uint64_t amount,
-                    checksum256 outpost_tx_hash) {
-   require_auth(get_self());
-   check(amount > 0, "amount must be positive");
-   check(chain != ChainKind::CHAIN_KIND_WIRE,
-         "WIRE-chain deposits go through wirestake (operator-authorized)");
+/// Queue a DEPOSIT_REVERT attestation outbound to the source outpost so
+/// escrowed funds get refunded to the depositor (minus the outpost-side
+/// gas penalty, computed locally on the outpost when the revert is
+/// processed). Called by `opreg::depositinle` whenever validation rejects
+/// an inbound DEPOSIT_REQUEST.
+void emit_deposit_revert(name self,
+                         ChainKind source_chain,
+                         const opp::types::ChainAddress& depositor,
+                         TokenKind token_kind,
+                         uint64_t amount,
+                         const checksum256& original_message_id,
+                         const std::string& reason) {
+   auto outpost_id = find_outpost_id_for_chain(source_chain);
+   if (!outpost_id) return;     // no outpost on this chain — nothing to refund through
 
-   operators_t ops(get_self());
-   auto op_pk = operator_key{account.value};
-   auto op = ops.get(op_pk, "operator not found");
-   check(op.status != OperatorStatus::OPERATOR_STATUS_SLASHED &&
-         op.status != OperatorStatus::OPERATOR_STATUS_TERMINATED,
-         "operator not in a deposit-eligible state");
+   opp::attestations::DepositRevert dr;
+   dr.depositor = depositor;
+   opp::types::TokenAmount ta;
+   ta.kind   = token_kind;
+   ta.amount = zpp::bits::vint64_t{static_cast<int64_t>(amount)};
+   dr.refund_amount = ta;
+   const auto& mh = original_message_id.extract_as_byte_array();
+   dr.original_deposit_message_id.assign(mh.begin(), mh.end());
+   dr.reason = reason;
+
+   auto [encoded, out] = zpp::bits::data_out<char>();
+   (void)out(dr);
+
+   action(
+      permission_level{self, "active"_n},
+      opreg::MSGCH_ACCOUNT, "queueout"_n,
+      std::make_tuple(*outpost_id,
+         AttestationType::ATTESTATION_TYPE_DEPOSIT_REVERT, encoded)
+   ).send();
+}
+
+/// Append an OperatorActionLog entry to the operator's `recent_actions`
+/// ring buffer (newest at the back). When the buffer is at MAX_RECENT_ACTIONS,
+/// drops the oldest (front) before appending. Caps `error_message` at
+/// MAX_ERROR_MESSAGE_BYTES so a noisy failure can't grow the row unbounded.
+///
+/// Caller passes the operator's primary key + the OperatorAction payload
+/// (DEPOSIT_REQUEST / WITHDRAW_REQUEST / WITHDRAW_REMIT / SLASH) plus the
+/// outcome. No-op if the operator entry doesn't exist (unknown-operator
+/// path handles its own audit via DEPOSIT_REVERT outbound).
+void append_action_log(opreg::operators_t& ops,
+                       const opreg::operator_key& op_pk,
+                       const OperatorAction& action,
+                       bool success,
+                       std::string error_message) {
+   if (!ops.contains(op_pk)) return;
+
+   if (error_message.size() > opreg::MAX_ERROR_MESSAGE_BYTES) {
+      error_message.resize(opreg::MAX_ERROR_MESSAGE_BYTES);
+   }
 
    ops.modify(same_payer, op_pk, [&](auto& o) {
-      add_balance(o, chain, token_kind, amount);
-   });
+      OperatorActionLog log_entry;
+      log_entry.action        = action;
+      log_entry.success       = success;
+      log_entry.timestamp     = current_time_point().sec_since_epoch();
+      log_entry.error_message = std::move(error_message);
 
-   // Re-evaluate eligibility after the deposit.
-   opconfig_t cfg_tbl(get_self());
-   if (cfg_tbl.exists()) {
-      auto cfg = cfg_tbl.get();
-      auto refreshed = ops.get(op_pk);
-      bool was_eligible = (refreshed.status == OperatorStatus::OPERATOR_STATUS_ACTIVE);
-      bool is_eligible  = meets_role_min(refreshed, cfg);
-      if (was_eligible != is_eligible) {
-         name handler;
-         switch (refreshed.type) {
-            case OperatorType::OPERATOR_TYPE_PRODUCER:    handler = "processprod"_n;  break;
-            case OperatorType::OPERATOR_TYPE_BATCH:       handler = "processbatch"_n; break;
-            case OperatorType::OPERATOR_TYPE_UNDERWRITER: handler = "processuw"_n;    break;
-            default:                                       return;
-         }
-         action(
-            permission_level{get_self(), "active"_n},
-            get_self(), handler,
-            std::make_tuple(account, was_eligible, is_eligible)
-         ).send();
+      if (o.recent_actions.size() >= opreg::MAX_RECENT_ACTIONS) {
+         // Drop oldest (front) before appending the newest at the back.
+         o.recent_actions.erase(o.recent_actions.begin());
       }
-   }
-   // Suppress unused-variable warning — the tx hash is for audit only and
-   // does not affect on-chain state. Kept on the action signature so the
-   // outpost can correlate the inbound attestation to a chain-specific tx.
-   (void)outpost_tx_hash;
+      o.recent_actions.push_back(std::move(log_entry));
+   });
 }
+
+/// Encode + queue an OPERATOR_ACTION(WITHDRAW_REMIT) attestation to the
+/// outpost matching `chain`. `op_address` carries the operator's authex-
+/// linked chain pubkey so the outpost can derive the destination address.
+void emit_withdraw_remit(name self,
+                         name account,
+                         OperatorType type,
+                         ChainKind chain,
+                         TokenKind token_kind,
+                         uint64_t amount,
+                         uint64_t request_id) {
+   auto outpost_id = find_outpost_id_for_chain(chain);
+   if (!outpost_id) return;
+
+   OperatorAction oa;
+   oa.action_type = OperatorAction::ACTION_TYPE_WITHDRAW_REMIT;
+   oa.op_address  = operator_chain_address(account, chain);
+   oa.type        = type;
+   opp::types::TokenAmount ta;
+   ta.kind   = token_kind;
+   ta.amount = zpp::bits::vint64_t{static_cast<int64_t>(amount)};
+   oa.amount = ta;
+   oa.request_id = request_id;
+   oa.chain      = chain;
+
+   auto [encoded, out] = zpp::bits::data_out<char>();
+   (void)out(oa);
+
+   action(
+      permission_level{self, "active"_n},
+      opreg::MSGCH_ACCOUNT, "queueout"_n,
+      std::make_tuple(*outpost_id,
+         AttestationType::ATTESTATION_TYPE_OPERATOR_ACTION, encoded)
+   ).send();
+}
+
+} // anonymous namespace
 
 // ---------------------------------------------------------------------------
 //  Withdraw queue helpers
@@ -524,22 +565,40 @@ void opreg::deposit(name account,
 
 namespace {
 
-/// Shared body for `wireunstake` (operator-authorized) and `queuewtdw`
-/// (msgch-authorized). Validates available balance, allocates a request id,
-/// inserts the row with a 2-epoch deadline.
-void enqueue_withdraw_internal(name account, ChainKind chain, TokenKind token_kind,
-                               uint64_t amount) {
-   check(amount > 0, "amount must be positive");
+/// Result of `try_enqueue_withdraw` — non-throwing variant for the
+/// msgch-dispatched `withdrawinle` path so failures get logged on the
+/// operator's row instead of reverting the inbound dispatch tx.
+struct enqueue_result {
+   bool        success;
+   uint64_t    request_id;   // valid only when success == true
+   std::string error_message;
+};
+
+/// Validate + insert a `wtdwqueue` row. Does NOT throw on validation
+/// failure — returns the diagnostic in `enqueue_result`. Used by both
+/// `withdrawinle` (msgch-dispatched, log-don't-revert) and `withdraw`
+/// (operator-callable WIRE-direct, also log-don't-revert).
+enqueue_result try_enqueue_withdraw(name account, ChainKind chain, TokenKind token_kind,
+                                    uint64_t amount) {
+   if (amount == 0) {
+      return { false, 0, "amount must be positive" };
+   }
 
    opreg::operators_t ops(name{"sysio.opreg"_n});
    auto op_pk = opreg::operator_key{account.value};
-   auto op = ops.get(op_pk, "operator not found");
-   check(op.status == OperatorStatus::OPERATOR_STATUS_ACTIVE ||
-         op.status == OperatorStatus::OPERATOR_STATUS_UNKNOWN,
-         "operator not in a withdraw-eligible state");
+   if (!ops.contains(op_pk)) {
+      return { false, 0, "operator not registered" };
+   }
+   auto op = ops.get(op_pk);
+   if (op.status != OperatorStatus::OPERATOR_STATUS_ACTIVE &&
+       op.status != OperatorStatus::OPERATOR_STATUS_UNKNOWN) {
+      return { false, 0, "operator not in a withdraw-eligible state" };
+   }
 
    uint64_t avail = available_inline(op, chain, token_kind);
-   check(avail >= amount, "insufficient available balance for withdraw");
+   if (avail < amount) {
+      return { false, 0, "insufficient available balance for withdraw" };
+   }
 
    uint32_t now_ep = get_current_epoch();
    uint64_t request_id = next_withdraw_id();
@@ -554,29 +613,122 @@ void enqueue_withdraw_internal(name account, ChainKind chain, TokenKind token_ki
       .eligible_at_epoch   = now_ep + opreg::WITHDRAW_WAIT_EPOCHS,
       .requested_at_epoch  = now_ep,
    });
+   return { true, request_id, "" };
+}
+
+/// Build an OperatorAction(WITHDRAW_REQUEST) payload for the log on a
+/// withdraw call. `request_id` is 0 if the request was rejected before
+/// allocation (the assigned id when accepted lives on the wtdwqueue row).
+OperatorAction build_withdraw_request_action(name account,
+                                             ChainKind chain,
+                                             TokenKind token_kind,
+                                             uint64_t amount,
+                                             uint64_t request_id) {
+   OperatorAction oa;
+   oa.action_type = OperatorAction::ACTION_TYPE_WITHDRAW_REQUEST;
+   oa.op_address  = operator_chain_address(account, chain);
+   oa.chain       = chain;
+   opp::types::TokenAmount ta;
+   ta.kind   = token_kind;
+   ta.amount = zpp::bits::vint64_t{static_cast<int64_t>(amount)};
+   oa.amount      = ta;
+   oa.request_id  = request_id;
+   return oa;
+}
+
+/// Build an OperatorAction(WITHDRAW_REMIT) payload for the log when
+/// `flushwtdw` matures a queue row. Mirror of build_withdraw_request_action
+/// shape, with action_type=REMIT and the request_id of the matured row.
+OperatorAction build_withdraw_remit_action(name account,
+                                           ChainKind chain,
+                                           TokenKind token_kind,
+                                           uint64_t amount,
+                                           uint64_t request_id) {
+   OperatorAction oa;
+   oa.action_type = OperatorAction::ACTION_TYPE_WITHDRAW_REMIT;
+   oa.op_address  = operator_chain_address(account, chain);
+   oa.chain       = chain;
+   opp::types::TokenAmount ta;
+   ta.kind   = token_kind;
+   ta.amount = zpp::bits::vint64_t{static_cast<int64_t>(amount)};
+   oa.amount      = ta;
+   oa.request_id  = request_id;
+   return oa;
+}
+
+/// Build an OperatorAction(DEPOSIT_REQUEST) payload for the log on a deposit
+/// call. `op_address` carries the operator's chain pubkey as encoded by the
+/// caller (outpost side has it from OPPInbound's roster cache; depot-direct
+/// WIRE deposit looks it up locally from authex::links). Pure — no side
+/// effects.
+OperatorAction build_deposit_action(const opp::types::ChainAddress& op_address,
+                                    ChainKind chain,
+                                    TokenKind token_kind,
+                                    uint64_t amount) {
+   OperatorAction oa;
+   oa.action_type = OperatorAction::ACTION_TYPE_DEPOSIT_REQUEST;
+   oa.op_address  = op_address;
+   oa.chain       = chain;
+   opp::types::TokenAmount ta;
+   ta.kind   = token_kind;
+   ta.amount = zpp::bits::vint64_t{static_cast<int64_t>(amount)};
+   oa.amount      = ta;
+   return oa;
 }
 
 } // anonymous namespace
 
 // ---------------------------------------------------------------------------
-//  wireunstake — operator-callable WIRE-side withdraw (queued, 2-epoch wait)
+//  withdraw — operator-callable WIRE-direct collateral withdraw (queued)
 // ---------------------------------------------------------------------------
-void opreg::wireunstake(name account, uint64_t amount) {
+//
+// Operator-authorized; queues a (chain=WIRE, token=WIRE) row in the
+// withdraw queue subject to WITHDRAW_WAIT_EPOCHS maturation. Validation
+// failures DO NOT revert — they append a failure entry to the operator's
+// `recent_actions` ring buffer, matching the OPP-dispatched path
+// (`withdrawinle`). The operator reads the outcome via WIRE JSON-RPC.
+// Outpost-held collateral is withdrawn by calling the holding outpost's
+// withdraw entry point — that path arrives at `withdrawinle` instead.
+void opreg::withdraw(name account, uint64_t amount) {
    require_auth(account);
-   enqueue_withdraw_internal(account, ChainKind::CHAIN_KIND_WIRE, TokenKind::TOKEN_KIND_WIRE, amount);
+
+   operators_t ops(get_self());
+   auto op_pk = operator_key{account.value};
+
+   auto result = try_enqueue_withdraw(account, ChainKind::CHAIN_KIND_WIRE,
+                                      TokenKind::TOKEN_KIND_WIRE, amount);
+   auto action = build_withdraw_request_action(account, ChainKind::CHAIN_KIND_WIRE,
+                                               TokenKind::TOKEN_KIND_WIRE, amount,
+                                               result.request_id);
+   append_action_log(ops, op_pk, action, result.success, std::move(result.error_message));
 }
 
 // ---------------------------------------------------------------------------
-//  queuewtdw — internal: outpost-driven withdraw request (called by msgch)
+//  withdrawinle — internal: outpost-driven withdraw request (msgch-inline)
 // ---------------------------------------------------------------------------
-void opreg::queuewtdw(name account,
-                      opp::types::ChainKind chain,
-                      opp::types::TokenKind token_kind,
-                      uint64_t amount) {
+//
+// Inline-dispatched from `sysio.msgch::evalcons` for inbound
+// OPERATOR_ACTION(WITHDRAW_REQUEST) attestations. Validation failures DO
+// NOT revert (revert would kill the entire envelope's dispatch); the
+// outcome is appended to the operator's `recent_actions` ring so they
+// can read why their request was dropped via WIRE JSON-RPC. Escrowed
+// funds stay in outpost custody on rejection — the operator re-issues
+// once the underlying condition resolves.
+void opreg::withdrawinle(name account,
+                         opp::types::ChainKind chain,
+                         opp::types::TokenAmount amount) {
    require_auth(get_self());
-   check(chain != ChainKind::CHAIN_KIND_WIRE,
-         "WIRE-chain withdraws go through wireunstake (operator-authorized)");
-   enqueue_withdraw_internal(account, chain, token_kind, amount);
+
+   operators_t ops(get_self());
+   auto op_pk = operator_key{account.value};
+
+   const TokenKind token_kind = amount.kind;
+   const uint64_t  raw_amount = static_cast<uint64_t>(static_cast<int64_t>(amount.amount));
+
+   auto result = try_enqueue_withdraw(account, chain, token_kind, raw_amount);
+   auto action = build_withdraw_request_action(account, chain, token_kind, raw_amount,
+                                               result.request_id);
+   append_action_log(ops, op_pk, action, result.success, std::move(result.error_message));
 }
 
 // ---------------------------------------------------------------------------
@@ -592,115 +744,142 @@ void opreg::cancelwtdw(name account, uint64_t request_id) {
 }
 
 // ---------------------------------------------------------------------------
-//  Outbound attestation encoders
+//  Eligibility re-check helper — invoked at the end of deposit/depositinle
 // ---------------------------------------------------------------------------
-
 namespace {
 
-/// Build a `ChainAddress` whose `address` bytes carry the operator's WIRE
-/// account name. Outposts use this to identify the operator via their local
-/// roster (synced from the OPERATORS attestation) and resolve the actual
-/// outpost-chain destination address themselves.
-opp::types::ChainAddress wire_account_as_chain_address(name account) {
-   opp::types::ChainAddress addr;
-   addr.kind = ChainKind::CHAIN_KIND_WIRE;
-   auto s = account.to_string();
-   addr.address.assign(s.begin(), s.end());
-   return addr;
-}
+/// After a balance change, re-evaluate whether the operator now meets the
+/// minimum-collateral threshold for their type. If the eligibility flipped
+/// vs the prior status, fan out to the per-type processor (`processprod` /
+/// `processbatch` / `processuw`) which owns the active/standby transition.
+void reevaluate_eligibility(opreg::operators_t& ops,
+                            const opreg::operator_key& op_pk,
+                            name self,
+                            name account) {
+   opreg::opconfig_t cfg_tbl(self);
+   if (!cfg_tbl.exists()) return;
+   auto cfg = cfg_tbl.get();
+   auto refreshed = ops.get(op_pk);
+   bool was_eligible = (refreshed.status == OperatorStatus::OPERATOR_STATUS_ACTIVE);
+   bool is_eligible  = meets_role_min(refreshed, cfg);
+   if (was_eligible == is_eligible) return;
 
-opp::types::WireAccount wire_account(name account) {
-   opp::types::WireAccount wa;
-   wa.name = account.to_string();
-   return wa;
-}
-
-/// Encode + queue a SLASH_OPERATOR attestation to the outpost matching the
-/// (chain, token_kind) pair. Routes the slashed amount to the matching
-/// reserve / LP. No-op (with a log line) if no outpost is registered for the
-/// chain — relevant for WIRE-side bonds where slashed funds stay on-chain.
-void emit_slash_operator(name self,
-                          name account,
-                          OperatorType type,
-                          ChainKind chain,
-                          TokenKind token_kind,
-                          uint64_t amount,
-                          const std::string& reason,
-                          uint32_t slashed_at_epoch) {
-   if (chain == ChainKind::CHAIN_KIND_WIRE) {
-      // WIRE-chain slashes don't go via OPP — funds stay on the WIRE chain.
-      // The actual movement to a WIRE-side reserve / LP is sysio.reserve's
-      // job (Task 5); for now the funds remain in the opreg account.
-      return;
+   name handler;
+   switch (refreshed.type) {
+      case OperatorType::OPERATOR_TYPE_PRODUCER:    handler = "processprod"_n;  break;
+      case OperatorType::OPERATOR_TYPE_BATCH:       handler = "processbatch"_n; break;
+      case OperatorType::OPERATOR_TYPE_UNDERWRITER: handler = "processuw"_n;    break;
+      default:                                       return;
    }
-   uint64_t outpost_id = find_outpost_id_for_chain(chain);
-   if (outpost_id == 0) return;     // chain has no registered outpost
-
-   SlashOperator so;
-   so.operator_       = wire_account_as_chain_address(account);
-   so.type            = type;
-   so.reason          = reason;
-   so.chain           = chain;
-   so.token_kind      = token_kind;
-   so.amount          = amount;
-   so.slashed_at_epoch = slashed_at_epoch;
-   // Default LP target — the matching paired-with-WIRE LP for the same token.
-   // sysio.reserve::resolve_lp will provide a more nuanced answer once Task 5
-   // lands; until then KIND_LP + paired_token == token_kind matches the
-   // post-launch design (every LP is paired with WIRE; slashed bond on an
-   // outpost credits the outpost-side LP for that token).
-   ReserveTarget rt;
-   rt.kind         = ReserveTarget::KIND_LP;
-   rt.paired_token = token_kind;
-   so.lp_target = rt;
-
-   auto [encoded, out] = zpp::bits::data_out<char>();
-   (void)out(so);
-
    action(
       permission_level{self, "active"_n},
-      opreg::MSGCH_ACCOUNT, "queueout"_n,
-      std::make_tuple(outpost_id,
-         AttestationType::ATTESTATION_TYPE_SLASH_OPERATOR, encoded)
-   ).send();
-}
-
-/// Encode + queue an OPERATOR_ACTION(WITHDRAW_REMIT) attestation to the
-/// outpost matching `chain`. Carries the operator's WIRE name so the outpost
-/// can resolve the destination address from its own roster.
-void emit_withdraw_remit(name self,
-                         name account,
-                         OperatorType type,
-                         ChainKind chain,
-                         TokenKind token_kind,
-                         uint64_t amount,
-                         uint64_t request_id) {
-   uint64_t outpost_id = find_outpost_id_for_chain(chain);
-   if (outpost_id == 0) return;
-
-   OperatorAction oa;
-   oa.action_type  = OperatorAction::ACTION_TYPE_WITHDRAW_REMIT;
-   oa.actor        = wire_account_as_chain_address(account);
-   oa.wire_account = wire_account(account);
-   oa.type         = type;
-   opp::types::TokenAmount ta;
-   ta.kind   = token_kind;
-   ta.amount = zpp::bits::vint64_t{static_cast<int64_t>(amount)};
-   oa.amount = ta;
-   oa.request_id = request_id;
-
-   auto [encoded, out] = zpp::bits::data_out<char>();
-   (void)out(oa);
-
-   action(
-      permission_level{self, "active"_n},
-      opreg::MSGCH_ACCOUNT, "queueout"_n,
-      std::make_tuple(outpost_id,
-         AttestationType::ATTESTATION_TYPE_OPERATOR_ACTION, encoded)
+      self, handler,
+      std::make_tuple(account, was_eligible, is_eligible)
    ).send();
 }
 
 } // anonymous namespace
+
+// ---------------------------------------------------------------------------
+//  deposit — operator-callable WIRE-direct collateral deposit
+// ---------------------------------------------------------------------------
+//
+// Operator-authorized; reverts on validation failure so the operator's
+// signing tx surfaces the diagnostic immediately. There's no escrow yet
+// (the operator hasn't transferred funds), so revert is the right
+// failure mode — they retry after fixing whatever was wrong (e.g.,
+// re-bootstrap their authex links). On success the matching balance row
+// is credited, the action is appended to the operator's `recent_actions`
+// ring buffer, and the eligibility transition (if any) is fanned out.
+void opreg::deposit(name account, uint64_t amount) {
+   require_auth(account);
+   check(amount > 0, "amount must be positive");
+
+   operators_t ops(get_self());
+   auto op_pk = operator_key{account.value};
+   auto op = ops.get(op_pk, "operator not found");
+   check(op.status != OperatorStatus::OPERATOR_STATUS_SLASHED &&
+         op.status != OperatorStatus::OPERATOR_STATUS_TERMINATED,
+         "operator not in a deposit-eligible state");
+
+   // Direct WIRE token transfer from operator -> opreg.
+   action(
+      permission_level{account, "active"_n},
+      TOKEN_ACCOUNT, "transfer"_n,
+      std::make_tuple(account, get_self(),
+         asset(static_cast<int64_t>(amount), CORE_SYM),
+         std::string("opreg::deposit"))
+   ).send();
+
+   ops.modify(same_payer, op_pk, [&](auto& o) {
+      add_balance(o, ChainKind::CHAIN_KIND_WIRE, TokenKind::TOKEN_KIND_WIRE, amount);
+   });
+
+   auto deposit_action = build_deposit_action(
+      operator_chain_address(account, ChainKind::CHAIN_KIND_WIRE),
+      ChainKind::CHAIN_KIND_WIRE, TokenKind::TOKEN_KIND_WIRE, amount);
+   append_action_log(ops, op_pk, deposit_action, /*success*/ true, "");
+
+   reevaluate_eligibility(ops, op_pk, get_self(), account);
+}
+
+// ---------------------------------------------------------------------------
+//  depositinle — internal: outpost-driven collateral credit (msgch-inline)
+// ---------------------------------------------------------------------------
+//
+// Inline-dispatched from `sysio.msgch::evalcons` for inbound
+// OPERATOR_ACTION(DEPOSIT_REQUEST) attestations. Validation failures DO
+// NOT revert — reverting from inside the inline dispatch would abort the
+// entire envelope. Instead, the failure is logged on the operator's
+// `recent_actions` ring (when an entry exists) and a `DEPOSIT_REVERT`
+// attestation is queued outbound to the source outpost so the escrowed
+// funds can be refunded to the depositor (minus the outpost-side gas
+// penalty, computed locally on the outpost when the revert is processed).
+void opreg::depositinle(name account,
+                        opp::types::ChainKind chain,
+                        opp::types::TokenAmount amount,
+                        opp::types::ChainAddress actor,
+                        checksum256 original_message_id) {
+   require_auth(get_self());
+
+   operators_t ops(get_self());
+   auto op_pk = operator_key{account.value};
+
+   const TokenKind token_kind = amount.kind;
+   const uint64_t  raw_amount = static_cast<uint64_t>(static_cast<int64_t>(amount.amount));
+   auto deposit_action = build_deposit_action(actor, chain, token_kind, raw_amount);
+
+   if (raw_amount == 0) {
+      const std::string err = "amount must be positive";
+      emit_deposit_revert(get_self(), chain, actor, token_kind, raw_amount,
+                          original_message_id, err);
+      append_action_log(ops, op_pk, deposit_action, false, err);
+      return;
+   }
+   if (!ops.contains(op_pk)) {
+      // No entry to log to. The DEPOSIT_REVERT IS the audit record for the
+      // outpost — outpost emits a local refund event the depositor reads.
+      emit_deposit_revert(get_self(), chain, actor, token_kind, raw_amount,
+                          original_message_id, "operator not registered");
+      return;
+   }
+   auto op = ops.get(op_pk);
+   if (op.status == OperatorStatus::OPERATOR_STATUS_SLASHED ||
+       op.status == OperatorStatus::OPERATOR_STATUS_TERMINATED) {
+      const std::string err = "operator not in a deposit-eligible state";
+      emit_deposit_revert(get_self(), chain, actor, token_kind, raw_amount,
+                          original_message_id, err);
+      append_action_log(ops, op_pk, deposit_action, false, err);
+      return;
+   }
+
+   ops.modify(same_payer, op_pk, [&](auto& o) {
+      add_balance(o, chain, token_kind, raw_amount);
+   });
+   append_action_log(ops, op_pk, deposit_action, true, "");
+
+   reevaluate_eligibility(ops, op_pk, get_self(), account);
+}
 
 // ---------------------------------------------------------------------------
 //  flushwtdw — drain matured rows from the withdraw queue
@@ -721,15 +900,24 @@ void opreg::flushwtdw(uint32_t current_epoch) {
       ++it;
 
       auto op_pk = operator_key{row.account.value};
+      // Per-row outcome lands in the operator's recent_actions log so the
+      // operator can read flush failures (slashed during wait, defensive
+      // rollup mismatches) via JSON-RPC.
+      auto remit_action = build_withdraw_remit_action(row.account, row.chain,
+                                                     row.token_kind, row.amount,
+                                                     row.request_id);
+
       if (!ops.contains(op_pk)) {
+         // Operator entry was removed between queue + flush — nowhere to log.
          queue.erase(wkey);
          continue;
       }
       auto op = ops.get(op_pk);
 
       if (op.status == OperatorStatus::OPERATOR_STATUS_SLASHED) {
-         // Slashed during the wait — drop silently; funds were already routed
-         // to the LP via the slash flow.
+         // Slashed during the wait — funds went to the LP via the slash flow.
+         append_action_log(ops, op_pk, remit_action, false,
+                           "operator slashed during withdraw-wait window");
          queue.erase(wkey);
          continue;
       }
@@ -738,8 +926,8 @@ void opreg::flushwtdw(uint32_t current_epoch) {
       // subtracts pending withdraws), but a state shift is possible.
       uint64_t avail_excluding_self = available_inline(op, row.chain, row.token_kind) + row.amount;
       if (avail_excluding_self < row.amount) {
-         // Shouldn't happen for a non-slashed op given the rollup invariants;
-         // log a debug entry and drop.
+         append_action_log(ops, op_pk, remit_action, false,
+                           "insufficient available balance at flush (rollup mismatch)");
          queue.erase(wkey);
          continue;
       }
@@ -750,45 +938,25 @@ void opreg::flushwtdw(uint32_t current_epoch) {
       });
 
       // For WIRE-direct: do the token transfer back inline. For outpost
-      // chains: queue an OPERATOR_ACTION(WITHDRAW_REMIT) to the outpost.
+      // chains: queue an OPERATOR_ACTION(WITHDRAW_REMIT) to the outpost
+      // so it can release the escrow on its end.
       if (row.chain == ChainKind::CHAIN_KIND_WIRE) {
          action(
             permission_level{get_self(), "active"_n},
             TOKEN_ACCOUNT, "transfer"_n,
             std::make_tuple(get_self(), row.account,
                asset(static_cast<int64_t>(row.amount), CORE_SYM),
-               std::string("wireunstake-flush"))
+               std::string("opreg::withdraw flush"))
          ).send();
       } else {
          emit_withdraw_remit(get_self(), row.account, op.type,
                              row.chain, row.token_kind, row.amount, row.request_id);
       }
+      append_action_log(ops, op_pk, remit_action, true, "");
 
       // Re-check eligibility — this withdraw may have dropped the operator
       // below the role minimum.
-      opconfig_t cfg_tbl(get_self());
-      if (cfg_tbl.exists()) {
-         auto cfg = cfg_tbl.get();
-         auto refreshed = ops.get(op_pk);
-         bool was_eligible = (refreshed.status == OperatorStatus::OPERATOR_STATUS_ACTIVE);
-         bool is_eligible  = meets_role_min(refreshed, cfg);
-         if (was_eligible != is_eligible) {
-            name handler;
-            switch (refreshed.type) {
-               case OperatorType::OPERATOR_TYPE_PRODUCER:    handler = "processprod"_n;  break;
-               case OperatorType::OPERATOR_TYPE_BATCH:       handler = "processbatch"_n; break;
-               case OperatorType::OPERATOR_TYPE_UNDERWRITER: handler = "processuw"_n;    break;
-               default:                                       break;
-            }
-            if (handler != name{}) {
-               action(
-                  permission_level{get_self(), "active"_n},
-                  get_self(), handler,
-                  std::make_tuple(row.account, was_eligible, is_eligible)
-               ).send();
-            }
-         }
-      }
+      reevaluate_eligibility(ops, op_pk, get_self(), row.account);
 
       queue.erase(wkey);
    }
@@ -875,18 +1043,22 @@ void opreg::slash(name account, std::string reason) {
    // will deferred-slash it as each lock resolves.
    ops.modify(same_payer, op_pk, [&](auto& o) {
       o.status        = OperatorStatus::OPERATOR_STATUS_SLASHED;
-      o.slashed_at    = now;
+      o.updated_at    = now;
       o.status_reason = reason;
       for (const auto& sp : to_slash) {
          subtract_balance(o, sp.chain, sp.token_kind, sp.amount);
       }
    });
 
-   // Emit one SLASH_OPERATOR per (chain, token_kind) with non-zero slashable.
+   // Emit one OPERATOR_ACTION(SLASH) per (chain, token_kind) with non-zero
+   // slashable, AND append each as a recent_actions log entry on the
+   // operator's row (success=true since the slash itself was applied).
    for (const auto& sp : to_slash) {
-      emit_slash_operator(get_self(), op.account, op.type,
-                          sp.chain, sp.token_kind, sp.amount,
-                          reason, now_ep);
+      auto slash_action = build_slash_action(op.account, op.type,
+                                             sp.chain, sp.token_kind, sp.amount,
+                                             reason);
+      emit_slash_attestation(get_self(), slash_action);
+      append_action_log(ops, op_pk, slash_action, /*success*/ true, "");
    }
 }
 
@@ -895,10 +1067,12 @@ void opreg::slash(name account, std::string reason) {
 // ---------------------------------------------------------------------------
 void opreg::releaselock(name account,
                         opp::types::ChainKind chain,
-                        opp::types::TokenKind token_kind,
-                        uint64_t amount) {
+                        opp::types::TokenAmount amount) {
    require_auth(UWRIT_ACCOUNT);
-   check(amount > 0, "amount must be positive");
+
+   const TokenKind token_kind = amount.kind;
+   const uint64_t  raw_amount = static_cast<uint64_t>(static_cast<int64_t>(amount.amount));
+   check(raw_amount > 0, "amount must be positive");
 
    operators_t ops(get_self());
    auto op_pk = operator_key{account.value};
@@ -915,14 +1089,15 @@ void opreg::releaselock(name account,
    // SLASHED or TERMINATED — decrement opreg balance and emit the matching
    // outbound attestation (deferred-slash to LP or deferred-remit to authex).
    ops.modify(same_payer, op_pk, [&](auto& o) {
-      subtract_balance(o, chain, token_kind, amount);
+      subtract_balance(o, chain, token_kind, raw_amount);
    });
 
    if (op.status == OperatorStatus::OPERATOR_STATUS_SLASHED) {
-      emit_slash_operator(get_self(), op.account, op.type,
-                          chain, token_kind, amount,
-                          /*reason*/ "deferred slash on lock release",
-                          /*slashed_at_epoch*/ get_current_epoch());
+      auto slash_action = build_slash_action(op.account, op.type,
+                                             chain, token_kind, raw_amount,
+                                             /*reason*/ "deferred slash on lock release");
+      emit_slash_attestation(get_self(), slash_action);
+      append_action_log(ops, op_pk, slash_action, /*success*/ true, "");
    } else {
       // TERMINATED — for WIRE-direct, transfer back to operator; otherwise
       // queue WITHDRAW_REMIT so the outpost can transfer to the authex
@@ -932,12 +1107,12 @@ void opreg::releaselock(name account,
             permission_level{get_self(), "active"_n},
             TOKEN_ACCOUNT, "transfer"_n,
             std::make_tuple(get_self(), account,
-               asset(static_cast<int64_t>(amount), CORE_SYM),
+               asset(static_cast<int64_t>(raw_amount), CORE_SYM),
                std::string("terminate-deferred-remit"))
          ).send();
       } else {
          emit_withdraw_remit(get_self(), op.account, op.type,
-                             chain, token_kind, amount, /*request_id*/ 0);
+                             chain, token_kind, raw_amount, /*request_id*/ 0);
       }
    }
 }

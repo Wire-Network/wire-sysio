@@ -142,14 +142,9 @@ namespace sysio {
       };
 
       /// Per-leg lock row. The (underwriter, chain, token_kind) composite is
-      /// the indexing key opreg's `available()` mirror uses. Rows are pushed
-      /// by `try_select_winner` and erased by `release`.
-      ///
-      /// IMPORTANT: this struct shape MUST stay in lockstep with
-      /// `uwrit_readonly::lock_row` defined in `sysio.opreg.cpp`. The kv::table
-      /// machinery serializes by member layout, so a divergence between the
-      /// writer-side (uwrit) and the mirror-reader-side (opreg) would
-      /// corrupt the rollup.
+      /// the indexing key opreg's `available()` rollup uses (cross-contract
+      /// kv::table read of `sysio::uwrit::locks_t` from `sysio.opreg`). Rows
+      /// are pushed by `try_select_winner` and erased by `release`.
       struct lock_key {
          uint64_t lock_id;
          uint64_t primary_key() const { return lock_id; }

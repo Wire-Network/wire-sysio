@@ -36,6 +36,7 @@
 using namespace sysio::testing;
 using namespace sysio;
 using namespace sysio::chain;
+using namespace sysio::opp::types;
 
 using mvo = fc::mutable_variant_object;
 
@@ -139,13 +140,13 @@ public:
       BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT,
          "regoperator"_n, mvo()
             ("account",          BATCHOP.to_string())
-            ("type",             "OPERATOR_TYPE_BATCH")
+            ("type",             OperatorType::OPERATOR_TYPE_BATCH)
             ("is_bootstrapped",  true)));
 
       BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT,
          "regoperator"_n, mvo()
             ("account",          UWRIT_OP.to_string())
-            ("type",             "OPERATOR_TYPE_UNDERWRITER")
+            ("type",             OperatorType::OPERATOR_TYPE_UNDERWRITER)
             ("is_bootstrapped",  false)));
 
       // Placeholder SOLANA outpost — soaks up id=0 so the real ETH outpost
@@ -153,11 +154,11 @@ public:
       // non-sentinel id that emit_withdraw_remit will accept.
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT,
          "regoutpost"_n, mvo()
-            ("chain_kind", "CHAIN_KIND_SOLANA")
+            ("chain_kind", ChainKind::CHAIN_KIND_SOLANA)
             ("chain_id",   1)));
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT,
          "regoutpost"_n, mvo()
-            ("chain_kind", "CHAIN_KIND_ETHEREUM")
+            ("chain_kind", ChainKind::CHAIN_KIND_ETHEREUM)
             ("chain_id",   31337)));
 
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT,
@@ -199,28 +200,36 @@ public:
       return v["current_epoch_index"].as<uint32_t>();
    }
 
-   /// Direct opreg::deposit, signed as opreg itself (require_auth(self)
-   /// passes when self signs). Bypasses the msgch dispatch path tested
-   /// separately in sysio.dispatch_tests.cpp — deposit semantics are the
-   /// same either way once the auth gate is past.
-   action_result deposit(name account, const std::string& chain,
-                         const std::string& token, uint64_t amount) {
-      return push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "deposit"_n, mvo()
-         ("account",         account.to_string())
-         ("chain",           chain)
-         ("token_kind",      token)
-         ("amount",          amount)
-         ("outpost_tx_hash", std::string(64, '0')));
+   /// Build a TokenAmount mvo from a typed (TokenKind, amount) pair. Action
+   /// signatures take the proto-struct `TokenAmount` rather than separate
+   /// kind+scalar parameters — this packs the two for the ABI serializer.
+   static fc::mutable_variant_object token_amount_mvo(TokenKind kind, uint64_t amount) {
+      return mvo()("kind", kind)("amount", amount);
    }
 
-   /// Direct opreg::queuewtdw, signed as opreg.
-   action_result queuewtdw(name account, const std::string& chain,
-                           const std::string& token, uint64_t amount) {
-      return push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "queuewtdw"_n, mvo()
-         ("account",     account.to_string())
-         ("chain",       chain)
-         ("token_kind",  token)
-         ("amount",      amount));
+   /// Direct opreg::depositinle, signed as opreg itself (require_auth(self)
+   /// passes when self signs). Bypasses the msgch dispatch path tested
+   /// separately in sysio.dispatch_tests.cpp — deposit semantics are the
+   /// same either way once the auth gate is past. `actor` defaults to a
+   /// well-formed Ethereum-shaped placeholder; tests here don't exercise
+   /// the DEPOSIT_REVERT correlation path.
+   action_result depositinle(name account, ChainKind chain, TokenKind token, uint64_t amount) {
+      return push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "depositinle"_n, mvo()
+         ("account",              account.to_string())
+         ("chain",                chain)
+         ("amount",               token_amount_mvo(token, amount))
+         ("actor",                mvo()
+            ("kind",    ChainKind::CHAIN_KIND_ETHEREUM)
+            ("address", std::vector<char>{}))
+         ("original_message_id",  std::string(64, '0')));
+   }
+
+   /// Direct opreg::withdrawinle, signed as opreg.
+   action_result withdrawinle(name account, ChainKind chain, TokenKind token, uint64_t amount) {
+      return push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "withdrawinle"_n, mvo()
+         ("account",  account.to_string())
+         ("chain",    chain)
+         ("amount",   token_amount_mvo(token, amount)));
    }
 
    /// chalg-authorized slash hook (mirrors the production chalg→opreg path
@@ -250,14 +259,16 @@ public:
    }
 
    /// Locate an operator's balance entry for a (chain, token_kind) pair.
-   uint64_t balance_of(name account, const std::string& chain,
-                       const std::string& token_kind) {
+   /// Reads each row's typed enum out of the variant via `as<EnumT>()`
+   /// (FC_REFLECT_ENUM provides the from_variant overload), so the equality
+   /// check operates on enum values, not their stringified names.
+   uint64_t balance_of(name account, ChainKind chain, TokenKind token_kind) {
       auto op = get_operator(account);
       if (op.is_null()) return 0;
       const auto& arr = op["balances"].get_array();
       for (const auto& b : arr) {
-         if (b["chain"].as_string() == chain &&
-             b["token_kind"].as_string() == token_kind) {
+         if (b["chain"].as<ChainKind>() == chain &&
+             b["token_kind"].as<TokenKind>() == token_kind) {
             return b["balance"].as_uint64();
          }
       }
@@ -268,7 +279,7 @@ public:
    /// `msgch.attestations`. The flushwtdw path never erases its emits
    /// (those are READY for the next buildenv), so a bounded scan from
    /// id=0 over the live keyspace is enough.
-   uint32_t count_attestations(const std::string& type_name,
+   uint32_t count_attestations(sysio::opp::types::AttestationType expected,
                                uint64_t scan_until = 32) {
       uint32_t n = 0;
       for (uint64_t id = 0; id < scan_until; ++id) {
@@ -277,7 +288,7 @@ public:
          if (data.empty()) continue;
          auto row = msgch_abi.binary_to_variant("attestation_entry", data,
             abi_serializer::create_yield_function(abi_serializer_max_time));
-         if (row["type"].as_string() == type_name) ++n;
+         if (row["type"].as<sysio::opp::types::AttestationType>() == expected) ++n;
       }
       return n;
    }
@@ -314,13 +325,13 @@ BOOST_FIXTURE_TEST_CASE(advance_drains_matured_eth_withdraw, sysio_epoch_flushwt
 
    constexpr uint64_t INITIAL_DEPOSIT = 5'000'000;
    constexpr uint64_t WITHDRAW_AMOUNT = 2'000'000;
-   const std::string  ETH_CHAIN  = "CHAIN_KIND_ETHEREUM";
-   const std::string  ETH_TOKEN  = "TOKEN_KIND_ETH";
+   const ChainKind   ETH_CHAIN  = ChainKind::CHAIN_KIND_ETHEREUM;
+   const TokenKind   ETH_TOKEN  = TokenKind::TOKEN_KIND_ETH;
 
    BOOST_REQUIRE_EQUAL(success(),
-      deposit(UWRIT_OP, ETH_CHAIN, ETH_TOKEN, INITIAL_DEPOSIT));
+      depositinle(UWRIT_OP, ETH_CHAIN, ETH_TOKEN, INITIAL_DEPOSIT));
    BOOST_REQUIRE_EQUAL(success(),
-      queuewtdw(UWRIT_OP, ETH_CHAIN, ETH_TOKEN, WITHDRAW_AMOUNT));
+      withdrawinle(UWRIT_OP, ETH_CHAIN, ETH_TOKEN, WITHDRAW_AMOUNT));
 
    // Sanity: row exists pre-flush, balance not yet debited.
    BOOST_REQUIRE(!get_wtdw(/*request_id=*/1).is_null());
@@ -351,13 +362,13 @@ BOOST_FIXTURE_TEST_CASE(flushwtdw_direct_emits_withdraw_remit_attestation,
 
    constexpr uint64_t INITIAL_DEPOSIT = 1'000'000;
    constexpr uint64_t WITHDRAW_AMOUNT =   400'000;
-   const std::string  ETH_CHAIN  = "CHAIN_KIND_ETHEREUM";
-   const std::string  ETH_TOKEN  = "TOKEN_KIND_ETH";
+   const ChainKind   ETH_CHAIN  = ChainKind::CHAIN_KIND_ETHEREUM;
+   const TokenKind   ETH_TOKEN  = TokenKind::TOKEN_KIND_ETH;
 
    BOOST_REQUIRE_EQUAL(success(),
-      deposit(UWRIT_OP, ETH_CHAIN, ETH_TOKEN, INITIAL_DEPOSIT));
+      depositinle(UWRIT_OP, ETH_CHAIN, ETH_TOKEN, INITIAL_DEPOSIT));
    BOOST_REQUIRE_EQUAL(success(),
-      queuewtdw(UWRIT_OP, ETH_CHAIN, ETH_TOKEN, WITHDRAW_AMOUNT));
+      withdrawinle(UWRIT_OP, ETH_CHAIN, ETH_TOKEN, WITHDRAW_AMOUNT));
 
    // Pass a `current_epoch` value comfortably past `eligible_at_epoch`
    // (which is queue-time epoch + WITHDRAW_WAIT_EPOCHS=2). Signing as
@@ -377,7 +388,8 @@ BOOST_FIXTURE_TEST_CASE(flushwtdw_direct_emits_withdraw_remit_attestation,
    // The OPERATORS / BATCH_OPERATOR_GROUPS attestations from epoch::
    // advance have NOT been queued (we never advanced post-genesis here),
    // so a single OPERATOR_ACTION row is the only thing in the table.
-   BOOST_REQUIRE_GE(count_attestations("ATTESTATION_TYPE_OPERATOR_ACTION"), 1u);
+   BOOST_REQUIRE_GE(count_attestations(
+      sysio::opp::types::AttestationType::ATTESTATION_TYPE_OPERATOR_ACTION), 1u);
 } FC_LOG_AND_RETHROW() }
 
 /// Negative path: a single advance — only one boundary crossed —
@@ -390,13 +402,13 @@ BOOST_FIXTURE_TEST_CASE(single_advance_leaves_immature_row_intact,
 
    constexpr uint64_t INITIAL_DEPOSIT = 1'000'000;
    constexpr uint64_t WITHDRAW_AMOUNT =   400'000;
-   const std::string  ETH_CHAIN  = "CHAIN_KIND_ETHEREUM";
-   const std::string  ETH_TOKEN  = "TOKEN_KIND_ETH";
+   const ChainKind   ETH_CHAIN  = ChainKind::CHAIN_KIND_ETHEREUM;
+   const TokenKind   ETH_TOKEN  = TokenKind::TOKEN_KIND_ETH;
 
    BOOST_REQUIRE_EQUAL(success(),
-      deposit(UWRIT_OP, ETH_CHAIN, ETH_TOKEN, INITIAL_DEPOSIT));
+      depositinle(UWRIT_OP, ETH_CHAIN, ETH_TOKEN, INITIAL_DEPOSIT));
    BOOST_REQUIRE_EQUAL(success(),
-      queuewtdw(UWRIT_OP, ETH_CHAIN, ETH_TOKEN, WITHDRAW_AMOUNT));
+      withdrawinle(UWRIT_OP, ETH_CHAIN, ETH_TOKEN, WITHDRAW_AMOUNT));
 
    advance_one_epoch();   // only one boundary — eligible_at_epoch is +2
 
@@ -416,13 +428,13 @@ BOOST_FIXTURE_TEST_CASE(slashed_operator_withdraw_drops_silently,
 
    constexpr uint64_t INITIAL_DEPOSIT = 1'000'000;
    constexpr uint64_t WITHDRAW_AMOUNT =   400'000;
-   const std::string  ETH_CHAIN  = "CHAIN_KIND_ETHEREUM";
-   const std::string  ETH_TOKEN  = "TOKEN_KIND_ETH";
+   const ChainKind   ETH_CHAIN  = ChainKind::CHAIN_KIND_ETHEREUM;
+   const TokenKind   ETH_TOKEN  = TokenKind::TOKEN_KIND_ETH;
 
    BOOST_REQUIRE_EQUAL(success(),
-      deposit(UWRIT_OP, ETH_CHAIN, ETH_TOKEN, INITIAL_DEPOSIT));
+      depositinle(UWRIT_OP, ETH_CHAIN, ETH_TOKEN, INITIAL_DEPOSIT));
    BOOST_REQUIRE_EQUAL(success(),
-      queuewtdw(UWRIT_OP, ETH_CHAIN, ETH_TOKEN, WITHDRAW_AMOUNT));
+      withdrawinle(UWRIT_OP, ETH_CHAIN, ETH_TOKEN, WITHDRAW_AMOUNT));
 
    // Capture the post-slash balance — the slash routes the operator's
    // entire balance to the LP, so balance_of after slash is the value

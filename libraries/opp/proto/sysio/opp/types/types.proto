@@ -128,11 +128,14 @@ enum AttestationType {
   ATTESTATION_TYPE_PRETOKEN_YIELD = 3006; // 0x0BBE
   ATTESTATION_TYPE_RESERVE_BALANCE_SHEET = 43520; // 0xAA00
   ATTESTATION_TYPE_STAKE_UPDATE = 60928; // 0xEE00
-  ATTESTATION_TYPE_NATIVE_YIELD_REWARD = 60929; // 0xEE01
+  // 60929 (0xEE01) was ATTESTATION_TYPE_NATIVE_YIELD_REWARD — removed; STAKING_REWARD
+  // is the single staker-reward feedback path. Slot left free; do not reuse.
   // DEPRECATED — pre-launch only, do not use in new code.
   ATTESTATION_TYPE_WIRE_TOKEN_PURCHASE = 60930; // 0xEE02
   ATTESTATION_TYPE_CHALLENGE_RESPONSE = 60932; // 0xEE04
-  ATTESTATION_TYPE_SLASH_OPERATOR = 60933; // 0xEE05
+  // SLASH is now an OperatorAction sub-type (action_type=ACTION_TYPE_SLASH)
+  // carried inside an OPERATOR_ACTION attestation; the standalone
+  // SLASH_OPERATOR attestation type has been removed. Slot 60933 left free.
   ATTESTATION_TYPE_SWAP = 60934; // 0xEE06
   // DEPRECATED — replaced by ATTESTATION_TYPE_UNDERWRITE_INTENT_COMMIT (60953).
   ATTESTATION_TYPE_UNDERWRITE_INTENT = 60935; // 0xEE07
@@ -166,6 +169,11 @@ enum AttestationType {
   ATTESTATION_TYPE_UNDERWRITE_INTENT_REJECT = 60954; // 0xEE1A
   // Depot -> source outpost. Variance check failed; refund the user's deposit.
   ATTESTATION_TYPE_SWAP_REVERT = 60955;              // 0xEE1B
+  // Depot -> source outpost. Identity / link-table validation failed at the
+  // opreg layer (unknown originating account, missing authex link for this
+  // chain, operator in non-deposit-eligible state). Outpost matches the
+  // referenced original_message_id and refunds the depositor.
+  ATTESTATION_TYPE_DEPOSIT_REVERT = 60956;            // 0xEE1C
 }
 
 // ---------------------------------------------------------------------------
