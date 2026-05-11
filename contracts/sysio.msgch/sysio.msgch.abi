@@ -548,20 +548,12 @@
                     "value": 60928
                 },
                 {
-                    "name": "ATTESTATION_TYPE_NATIVE_YIELD_REWARD",
-                    "value": 60929
-                },
-                {
                     "name": "ATTESTATION_TYPE_WIRE_TOKEN_PURCHASE",
                     "value": 60930
                 },
                 {
                     "name": "ATTESTATION_TYPE_CHALLENGE_RESPONSE",
                     "value": 60932
-                },
-                {
-                    "name": "ATTESTATION_TYPE_SLASH_OPERATOR",
-                    "value": 60933
                 },
                 {
                     "name": "ATTESTATION_TYPE_SWAP",
@@ -634,6 +626,10 @@
                 {
                     "name": "ATTESTATION_TYPE_SWAP_REVERT",
                     "value": 60955
+                },
+                {
+                    "name": "ATTESTATION_TYPE_DEPOSIT_REVERT",
+                    "value": 60956
                 }
             ]
         },

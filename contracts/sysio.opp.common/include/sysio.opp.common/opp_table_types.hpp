@@ -222,6 +222,354 @@ DataStream& operator>>(DataStream& ds, Envelope& t) {
 } // namespace sysio::opp
 
 // ─────────────────────────────────────────────────────────────────────────────
+//  sysio::opp::attestations — CDT DataStream operators for every attestation
+//                              message type. Required so contracts can store
+//                              these directly in `kv::table` rows or pass them
+//                              as action arguments (e.g.
+//                              `sysio.opreg::operator_entry.recent_actions`
+//                              holds `OperatorActionLog` values).
+//
+//  Generated proto fields use `zpp::bits::vuint*_t` / `vint*_t` for varints;
+//  the varint DataStream overloads above bridge them.
+// ─────────────────────────────────────────────────────────────────────────────
+namespace sysio::opp::attestations {
+
+// ChainReserveBalanceSheet
+template <typename DataStream>
+DataStream& operator<<(DataStream& ds, const ChainReserveBalanceSheet& t) {
+   return ds << t.kind << t.amounts;
+}
+template <typename DataStream>
+DataStream& operator>>(DataStream& ds, ChainReserveBalanceSheet& t) {
+   return ds >> t.kind >> t.amounts;
+}
+
+// PretokenStakeChange (deprecated; pre-launch only)
+template <typename DataStream>
+DataStream& operator<<(DataStream& ds, const PretokenStakeChange& t) {
+   return ds << t.actor << t.amount << t.index_at_mint << t.index_at_burn;
+}
+template <typename DataStream>
+DataStream& operator>>(DataStream& ds, PretokenStakeChange& t) {
+   return ds >> t.actor >> t.amount >> t.index_at_mint >> t.index_at_burn;
+}
+
+// PretokenPurchase (deprecated; pre-launch only)
+template <typename DataStream>
+DataStream& operator<<(DataStream& ds, const PretokenPurchase& t) {
+   return ds << t.actor << t.amount << t.pretoken_count << t.index_at_mint;
+}
+template <typename DataStream>
+DataStream& operator>>(DataStream& ds, PretokenPurchase& t) {
+   return ds >> t.actor >> t.amount >> t.pretoken_count >> t.index_at_mint;
+}
+
+// PretokenYield (deprecated; pre-launch only)
+template <typename DataStream>
+DataStream& operator<<(DataStream& ds, const PretokenYield& t) {
+   return ds << t.actor << t.amount << t.index_at_mint;
+}
+template <typename DataStream>
+DataStream& operator>>(DataStream& ds, PretokenYield& t) {
+   return ds >> t.actor >> t.amount >> t.index_at_mint;
+}
+
+// StakeUpdate
+template <typename DataStream>
+DataStream& operator<<(DataStream& ds, const StakeUpdate& t) {
+   return ds << t.actor << t.status << t.amount;
+}
+template <typename DataStream>
+DataStream& operator>>(DataStream& ds, StakeUpdate& t) {
+   return ds >> t.actor >> t.status >> t.amount;
+}
+
+// WireTokenPurchase
+template <typename DataStream>
+DataStream& operator<<(DataStream& ds, const WireTokenPurchase& t) {
+   return ds << t.actor << t.amounts;
+}
+template <typename DataStream>
+DataStream& operator>>(DataStream& ds, WireTokenPurchase& t) {
+   return ds >> t.actor >> t.amounts;
+}
+
+// OperatorAction — `op_address` carries the operator's authex-linked chain
+// pubkey; `action_type` discriminates DEPOSIT_REQUEST / WITHDRAW_REQUEST /
+// WITHDRAW_REMIT / SLASH per the docs in attestations.proto.
+template <typename DataStream>
+DataStream& operator<<(DataStream& ds, const OperatorAction& t) {
+   return ds << t.action_type << t.op_address << t.type << t.status
+             << t.amount << t.request_id << t.chain << t.reason;
+}
+template <typename DataStream>
+DataStream& operator>>(DataStream& ds, OperatorAction& t) {
+   return ds >> t.action_type >> t.op_address >> t.type >> t.status
+             >> t.amount >> t.request_id >> t.chain >> t.reason;
+}
+
+// OperatorActionLog — stored in sysio.opreg::operator_entry.recent_actions.
+template <typename DataStream>
+DataStream& operator<<(DataStream& ds, const OperatorActionLog& t) {
+   return ds << t.action << t.success << t.timestamp << t.error_message;
+}
+template <typename DataStream>
+DataStream& operator>>(DataStream& ds, OperatorActionLog& t) {
+   return ds >> t.action >> t.success >> t.timestamp >> t.error_message;
+}
+
+// ReserveDisbursement
+template <typename DataStream>
+DataStream& operator<<(DataStream& ds, const ReserveDisbursement& t) {
+   return ds << t.actor << t.amount << t.signature;
+}
+template <typename DataStream>
+DataStream& operator>>(DataStream& ds, ReserveDisbursement& t) {
+   return ds >> t.actor >> t.amount >> t.signature;
+}
+
+// ProtocolState
+template <typename DataStream>
+DataStream& operator<<(DataStream& ds, const ProtocolState& t) {
+   return ds << t.chain_id << t.current_message_id << t.processed_message_id
+             << t.incoming_messages << t.outgoing_messages;
+}
+template <typename DataStream>
+DataStream& operator>>(DataStream& ds, ProtocolState& t) {
+   return ds >> t.chain_id >> t.current_message_id >> t.processed_message_id
+             >> t.incoming_messages >> t.outgoing_messages;
+}
+
+// SwapRequest — variance check at the depot consults
+// `sysio.reserv::quote(...)` against `quoted_destination_amount` ±
+// `quote_tolerance_bps`.
+template <typename DataStream>
+DataStream& operator<<(DataStream& ds, const SwapRequest& t) {
+   return ds << t.actor << t.source_amount << t.target_chain << t.recipient
+             << t.target_token << t.quoted_destination_amount
+             << t.quote_tolerance_bps << t.quote_timestamp_ms;
+}
+template <typename DataStream>
+DataStream& operator>>(DataStream& ds, SwapRequest& t) {
+   return ds >> t.actor >> t.source_amount >> t.target_chain >> t.recipient
+             >> t.target_token >> t.quoted_destination_amount
+             >> t.quote_tolerance_bps >> t.quote_timestamp_ms;
+}
+
+// UnderwriteIntentCommit
+template <typename DataStream>
+DataStream& operator<<(DataStream& ds, const UnderwriteIntentCommit& t) {
+   return ds << t.uw_account << t.uw_ext_chain_addr << t.uw_request_id
+             << t.outpost_id << t.signature;
+}
+template <typename DataStream>
+DataStream& operator>>(DataStream& ds, UnderwriteIntentCommit& t) {
+   return ds >> t.uw_account >> t.uw_ext_chain_addr >> t.uw_request_id
+             >> t.outpost_id >> t.signature;
+}
+
+// UnderwriteIntentReject
+template <typename DataStream>
+DataStream& operator<<(DataStream& ds, const UnderwriteIntentReject& t) {
+   return ds << t.uw_account << t.uw_request_id << t.reason;
+}
+template <typename DataStream>
+DataStream& operator>>(DataStream& ds, UnderwriteIntentReject& t) {
+   return ds >> t.uw_account >> t.uw_request_id >> t.reason;
+}
+
+// SwapRevert
+template <typename DataStream>
+DataStream& operator<<(DataStream& ds, const SwapRevert& t) {
+   return ds << t.original_swap_message_id << t.depositor
+             << t.refund_amount << t.reason;
+}
+template <typename DataStream>
+DataStream& operator>>(DataStream& ds, SwapRevert& t) {
+   return ds >> t.original_swap_message_id >> t.depositor
+             >> t.refund_amount >> t.reason;
+}
+
+// UnderwriteIntent (legacy)
+template <typename DataStream>
+DataStream& operator<<(DataStream& ds, const UnderwriteIntent& t) {
+   return ds << t.uw_account << t.uw_ext_chain_addr << t.uw_request_id
+             << t.amount << t.chain_id;
+}
+template <typename DataStream>
+DataStream& operator>>(DataStream& ds, UnderwriteIntent& t) {
+   return ds >> t.uw_account >> t.uw_ext_chain_addr >> t.uw_request_id
+             >> t.amount >> t.chain_id;
+}
+
+// UnderwriteConfirm (legacy)
+template <typename DataStream>
+DataStream& operator<<(DataStream& ds, const UnderwriteConfirm& t) {
+   return ds << t.original_message_id << t.underwriter
+             << t.confirmed << t.error_reason;
+}
+template <typename DataStream>
+DataStream& operator>>(DataStream& ds, UnderwriteConfirm& t) {
+   return ds >> t.original_message_id >> t.underwriter
+             >> t.confirmed >> t.error_reason;
+}
+
+// Remit — destination-side payout instruction for a cross-chain swap.
+template <typename DataStream>
+DataStream& operator<<(DataStream& ds, const Remit& t) {
+   return ds << t.recipient << t.amount << t.original_message_id
+             << t.underwriter << t.unlock_timestamp;
+}
+template <typename DataStream>
+DataStream& operator>>(DataStream& ds, Remit& t) {
+   return ds >> t.recipient >> t.amount >> t.original_message_id
+             >> t.underwriter >> t.unlock_timestamp;
+}
+
+// ChallengeOperatorHash — field name `operator_` (trailing underscore) because
+// `operator` is a C++ keyword.
+template <typename DataStream>
+DataStream& operator<<(DataStream& ds, const ChallengeOperatorHash& t) {
+   return ds << t.operator_ << t.chain_hash;
+}
+template <typename DataStream>
+DataStream& operator>>(DataStream& ds, ChallengeOperatorHash& t) {
+   return ds >> t.operator_ >> t.chain_hash;
+}
+
+// ChallengeRequest
+template <typename DataStream>
+DataStream& operator<<(DataStream& ds, const ChallengeRequest& t) {
+   return ds << t.epoch_index << t.round << t.original_chain_hash
+             << t.operator_hashes;
+}
+template <typename DataStream>
+DataStream& operator>>(DataStream& ds, ChallengeRequest& t) {
+   return ds >> t.epoch_index >> t.round >> t.original_chain_hash
+             >> t.operator_hashes;
+}
+
+// EpochSync (deprecated)
+template <typename DataStream>
+DataStream& operator<<(DataStream& ds, const EpochSync& t) {
+   return ds << t.epoch_index << t.epoch_duration_sec << t.epoch_start_timestamp;
+}
+template <typename DataStream>
+DataStream& operator>>(DataStream& ds, EpochSync& t) {
+   return ds >> t.epoch_index >> t.epoch_duration_sec >> t.epoch_start_timestamp;
+}
+
+// OperatorEntry — one row of the OPERATORS attestation roster.
+template <typename DataStream>
+DataStream& operator<<(DataStream& ds, const OperatorEntry& t) {
+   return ds << t.account << t.addresses << t.type << t.status;
+}
+template <typename DataStream>
+DataStream& operator>>(DataStream& ds, OperatorEntry& t) {
+   return ds >> t.account >> t.addresses >> t.type >> t.status;
+}
+
+// Operators
+template <typename DataStream>
+DataStream& operator<<(DataStream& ds, const Operators& t) {
+   return ds << t.operators;
+}
+template <typename DataStream>
+DataStream& operator>>(DataStream& ds, Operators& t) {
+   return ds >> t.operators;
+}
+
+// BatchOperatorGroup
+template <typename DataStream>
+DataStream& operator<<(DataStream& ds, const BatchOperatorGroup& t) {
+   return ds << t.operators;
+}
+template <typename DataStream>
+DataStream& operator>>(DataStream& ds, BatchOperatorGroup& t) {
+   return ds >> t.operators;
+}
+
+// BatchOperatorGroups
+template <typename DataStream>
+DataStream& operator<<(DataStream& ds, const BatchOperatorGroups& t) {
+   return ds << t.active_group_index << t.epoch_index << t.groups;
+}
+template <typename DataStream>
+DataStream& operator>>(DataStream& ds, BatchOperatorGroups& t) {
+   return ds >> t.active_group_index >> t.epoch_index >> t.groups;
+}
+
+// ReserveTarget — `kind` discriminates LP / BURN / TREASURY routing.
+template <typename DataStream>
+DataStream& operator<<(DataStream& ds, const ReserveTarget& t) {
+   return ds << t.kind << t.paired_token;
+}
+template <typename DataStream>
+DataStream& operator>>(DataStream& ds, ReserveTarget& t) {
+   return ds >> t.kind >> t.paired_token;
+}
+
+// DepositRevert
+template <typename DataStream>
+DataStream& operator<<(DataStream& ds, const DepositRevert& t) {
+   return ds << t.original_deposit_message_id << t.depositor
+             << t.refund_amount << t.reason;
+}
+template <typename DataStream>
+DataStream& operator>>(DataStream& ds, DepositRevert& t) {
+   return ds >> t.original_deposit_message_id >> t.depositor
+             >> t.refund_amount >> t.reason;
+}
+
+// NodeOwnerReg
+template <typename DataStream>
+DataStream& operator<<(DataStream& ds, const NodeOwnerReg& t) {
+   return ds << t.owner_address << t.token_id << t.nft_address;
+}
+template <typename DataStream>
+DataStream& operator>>(DataStream& ds, NodeOwnerReg& t) {
+   return ds >> t.owner_address >> t.token_id >> t.nft_address;
+}
+
+// StakingReward — the single staker-reward feedback path. Routes to
+// `sysio.reserv::creditlp` plus per-staker WIRE payout based on
+// `share_bps`. Implementation lives in the staking work (separate engineer).
+template <typename DataStream>
+DataStream& operator<<(DataStream& ds, const StakingReward& t) {
+   return ds << t.outpost_id << t.staker_wire_account << t.share_bps
+             << t.period_start_ms << t.period_end_ms << t.reward_amount;
+}
+template <typename DataStream>
+DataStream& operator>>(DataStream& ds, StakingReward& t) {
+   return ds >> t.outpost_id >> t.staker_wire_account >> t.share_bps
+             >> t.period_start_ms >> t.period_end_ms >> t.reward_amount;
+}
+
+// StakeResult
+template <typename DataStream>
+DataStream& operator<<(DataStream& ds, const StakeResult& t) {
+   return ds << t.owner_address << t.amount << t.success << t.error_reason;
+}
+template <typename DataStream>
+DataStream& operator>>(DataStream& ds, StakeResult& t) {
+   return ds >> t.owner_address >> t.amount >> t.success >> t.error_reason;
+}
+
+// AttestationProcessingError
+template <typename DataStream>
+DataStream& operator<<(DataStream& ds, const AttestationProcessingError& t) {
+   return ds << t.attestation_id << t.original_type << t.original_data
+             << t.error_message;
+}
+template <typename DataStream>
+DataStream& operator>>(DataStream& ds, AttestationProcessingError& t) {
+   return ds >> t.attestation_id >> t.original_type >> t.original_data
+             >> t.error_message;
+}
+
+} // namespace sysio::opp::attestations
+
+// ─────────────────────────────────────────────────────────────────────────────
 //  Contract-local types with SYSLIB_SERIALIZE for multi_index table storage
 // ─────────────────────────────────────────────────────────────────────────────
 namespace sysio::opp_table {

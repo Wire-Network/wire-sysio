@@ -1,8 +1,105 @@
 {
     "____comment": "This file was generated with sysio-abigen. DO NOT EDIT ",
     "version": "sysio::abi/1.2",
-    "types": [],
+    "types": [
+        {
+            "new_type_name": "vint64_t",
+            "type": "varint_int64"
+        },
+        {
+            "new_type_name": "vuint64_t",
+            "type": "varint_uint64"
+        }
+    ],
     "structs": [
+        {
+            "name": "ChainAddress",
+            "base": "",
+            "fields": [
+                {
+                    "name": "kind",
+                    "type": "ChainKind"
+                },
+                {
+                    "name": "address",
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
+            "name": "OperatorAction",
+            "base": "",
+            "fields": [
+                {
+                    "name": "action_type",
+                    "type": "ActionType"
+                },
+                {
+                    "name": "op_address",
+                    "type": "ChainAddress"
+                },
+                {
+                    "name": "type",
+                    "type": "OperatorType"
+                },
+                {
+                    "name": "status",
+                    "type": "OperatorStatus"
+                },
+                {
+                    "name": "amount",
+                    "type": "TokenAmount"
+                },
+                {
+                    "name": "request_id",
+                    "type": "vuint64_t"
+                },
+                {
+                    "name": "chain",
+                    "type": "ChainKind"
+                },
+                {
+                    "name": "reason",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "OperatorActionLog",
+            "base": "",
+            "fields": [
+                {
+                    "name": "action",
+                    "type": "OperatorAction"
+                },
+                {
+                    "name": "success",
+                    "type": "bool"
+                },
+                {
+                    "name": "timestamp",
+                    "type": "vint64_t"
+                },
+                {
+                    "name": "error_message",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "TokenAmount",
+            "base": "",
+            "fields": [
+                {
+                    "name": "kind",
+                    "type": "TokenKind"
+                },
+                {
+                    "name": "amount",
+                    "type": "vint64_t"
+                }
+            ]
+        },
         {
             "name": "available",
             "base": "",
@@ -124,19 +221,33 @@
                     "type": "name"
                 },
                 {
+                    "name": "amount",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "depositinle",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
                     "name": "chain",
                     "type": "ChainKind"
                 },
                 {
-                    "name": "token_kind",
-                    "type": "TokenKind"
-                },
-                {
                     "name": "amount",
-                    "type": "uint64"
+                    "type": "TokenAmount"
                 },
                 {
-                    "name": "outpost_tx_hash",
+                    "name": "actor",
+                    "type": "ChainAddress"
+                },
+                {
+                    "name": "original_message_id",
                     "type": "checksum256"
                 }
             ]
@@ -156,15 +267,15 @@
             "base": "",
             "fields": [
                 {
-                    "name": "req_prod_stakes",
+                    "name": "req_prod_collat",
                     "type": "chain_min_bond[]"
                 },
                 {
-                    "name": "req_batchop_stakes",
+                    "name": "req_batchop_collat",
                     "type": "chain_min_bond[]"
                 },
                 {
-                    "name": "req_uw_stakes",
+                    "name": "req_uw_collat",
                     "type": "chain_min_bond[]"
                 },
                 {
@@ -232,7 +343,7 @@
                     "type": "uint64"
                 },
                 {
-                    "name": "slashed_at",
+                    "name": "updated_at",
                     "type": "uint64"
                 },
                 {
@@ -242,6 +353,10 @@
                 {
                     "name": "status_reason",
                     "type": "string"
+                },
+                {
+                    "name": "recent_actions",
+                    "type": "OperatorActionLog[]"
                 }
             ]
         },
@@ -315,28 +430,6 @@
             "fields": []
         },
         {
-            "name": "queuewtdw",
-            "base": "",
-            "fields": [
-                {
-                    "name": "account",
-                    "type": "name"
-                },
-                {
-                    "name": "chain",
-                    "type": "ChainKind"
-                },
-                {
-                    "name": "token_kind",
-                    "type": "TokenKind"
-                },
-                {
-                    "name": "amount",
-                    "type": "uint64"
-                }
-            ]
-        },
-        {
             "name": "recorddel",
             "base": "",
             "fields": [
@@ -385,12 +478,8 @@
                     "type": "ChainKind"
                 },
                 {
-                    "name": "token_kind",
-                    "type": "TokenKind"
-                },
-                {
                     "name": "amount",
-                    "type": "uint64"
+                    "type": "TokenAmount"
                 }
             ]
         },
@@ -455,21 +544,27 @@
             ]
         },
         {
-            "name": "wirestake",
+            "name": "varint_int64",
             "base": "",
             "fields": [
                 {
-                    "name": "account",
-                    "type": "name"
-                },
+                    "name": "value",
+                    "type": "int64"
+                }
+            ]
+        },
+        {
+            "name": "varint_uint64",
+            "base": "",
+            "fields": [
                 {
-                    "name": "amount",
+                    "name": "value",
                     "type": "uint64"
                 }
             ]
         },
         {
-            "name": "wireunstake",
+            "name": "withdraw",
             "base": "",
             "fields": [
                 {
@@ -525,6 +620,24 @@
                     "type": "uint32"
                 }
             ]
+        },
+        {
+            "name": "withdrawinle",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "chain",
+                    "type": "ChainKind"
+                },
+                {
+                    "name": "amount",
+                    "type": "TokenAmount"
+                }
+            ]
         }
     ],
     "actions": [
@@ -541,6 +654,11 @@
         {
             "name": "deposit",
             "type": "deposit",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "depositinle",
+            "type": "depositinle",
             "ricardian_contract": ""
         },
         {
@@ -566,11 +684,6 @@
         {
             "name": "prune",
             "type": "prune",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "queuewtdw",
-            "type": "queuewtdw",
             "ricardian_contract": ""
         },
         {
@@ -609,13 +722,13 @@
             "ricardian_contract": ""
         },
         {
-            "name": "wirestake",
-            "type": "wirestake",
+            "name": "withdraw",
+            "type": "withdraw",
             "ricardian_contract": ""
         },
         {
-            "name": "wireunstake",
-            "type": "wireunstake",
+            "name": "withdrawinle",
+            "type": "withdrawinle",
             "ricardian_contract": ""
         }
     ],
@@ -706,6 +819,32 @@
         }
     ],
     "enums": [
+        {
+            "name": "ActionType",
+            "type": "int32",
+            "values": [
+                {
+                    "name": "ACTION_TYPE_UNKNOWN",
+                    "value": 0
+                },
+                {
+                    "name": "ACTION_TYPE_DEPOSIT_REQUEST",
+                    "value": 1
+                },
+                {
+                    "name": "ACTION_TYPE_WITHDRAW_REQUEST",
+                    "value": 2
+                },
+                {
+                    "name": "ACTION_TYPE_WITHDRAW_REMIT",
+                    "value": 3
+                },
+                {
+                    "name": "ACTION_TYPE_SLASH",
+                    "value": 4
+                }
+            ]
+        },
         {
             "name": "ChainKind",
             "type": "int32",

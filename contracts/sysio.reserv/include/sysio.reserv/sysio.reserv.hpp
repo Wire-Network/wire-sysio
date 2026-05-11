@@ -73,8 +73,8 @@ namespace sysio {
                      opp::types::TokenKind dst_token,
                      uint64_t src_amount);
 
-      /// Credit an LP's paired-token reserve from a NATIVE_YIELD_REWARD or
-      /// STAKING_REWARD attestation. Auth=msgch. Currently unused; will be
+      /// Credit an LP's paired-token reserve from a STAKING_REWARD
+      /// attestation. Auth=msgch. Currently unused; will be
       /// invoked once Task 4's dispatch wires those types in (today they
       /// fall through to no-op — see msgch's dispatch_attestation).
       [[sysio::action]]
