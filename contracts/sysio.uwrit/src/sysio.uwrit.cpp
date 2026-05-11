@@ -1,5 +1,7 @@
 #include <sysio.uwrit/sysio.uwrit.hpp>
 #include <sysio.epoch/sysio.epoch.hpp>
+#include <sysio.opreg/sysio.opreg.hpp>
+#include <sysio.reserv/sysio.reserv.hpp>
 #include <sysio/opp/attestations/attestations.pb.hpp>
 #include <zpp_bits.h>
 
@@ -13,131 +15,6 @@ using opp::types::UnderwriteStatus;
 using opp::types::OperatorStatus;
 using opp::types::OperatorType;
 using opp::attestations::SwapRequest;
-
-// ---------------------------------------------------------------------------
-//  Read-only mirrors of sysio.opreg tables.
-//
-//  Used by `try_select_winner` to compute an underwriter's available bond on
-//  each leg without round-tripping through an action call. The struct shapes
-//  MUST stay in lockstep with the writer side in `sysio.opreg.hpp` /
-//  `sysio.opreg.cpp` — kv::table serializes by member layout, so divergence
-//  between writer and mirror corrupts the rollup.
-// ---------------------------------------------------------------------------
-namespace opreg_readonly {
-
-struct balance_entry {
-   ChainKind  chain;
-   TokenKind  token_kind;
-   uint64_t   balance;
-   uint64_t   last_updated_ms;
-
-   SYSLIB_SERIALIZE(balance_entry, (chain)(token_kind)(balance)(last_updated_ms))
-};
-
-struct operator_key {
-   uint64_t account;
-   uint64_t primary_key() const { return account; }
-   SYSLIB_SERIALIZE(operator_key, (account))
-};
-
-struct operator_entry {
-   name                       account;
-   OperatorType               type;
-   OperatorStatus             status;
-   bool                       is_bootstrapped;
-   std::vector<balance_entry> balances;
-   uint64_t                   registered_at;
-   uint64_t                   available_at;
-   uint64_t                   slashed_at;
-   uint64_t                   terminated_at;
-   std::string                status_reason;
-
-   uint64_t by_type()   const { return static_cast<uint64_t>(type); }
-   uint64_t by_status() const { return static_cast<uint64_t>(status); }
-
-   SYSLIB_SERIALIZE(operator_entry,
-      (account)(type)(status)(is_bootstrapped)(balances)
-      (registered_at)(available_at)(slashed_at)(terminated_at)(status_reason))
-};
-
-using operators_t = sysio::kv::table<"operators"_n, operator_key, operator_entry,
-   sysio::kv::index<"bytype"_n,
-      sysio::const_mem_fun<operator_entry, uint64_t, &operator_entry::by_type>>,
-   sysio::kv::index<"bystatus"_n,
-      sysio::const_mem_fun<operator_entry, uint64_t, &operator_entry::by_status>>
->;
-
-struct withdraw_key {
-   uint64_t request_id;
-   uint64_t primary_key() const { return request_id; }
-   SYSLIB_SERIALIZE(withdraw_key, (request_id))
-};
-
-struct withdraw_request {
-   uint64_t   request_id;
-   name       account;
-   ChainKind  chain;
-   TokenKind  token_kind;
-   uint64_t   amount;
-   uint32_t   eligible_at_epoch;
-   uint32_t   requested_at_epoch;
-
-   uint128_t by_account_ck() const {
-      return (static_cast<uint128_t>(account.value) << 64)
-           | (static_cast<uint64_t>(chain) << 32)
-           | static_cast<uint64_t>(token_kind);
-   }
-   uint64_t by_eligible() const { return static_cast<uint64_t>(eligible_at_epoch); }
-   uint64_t by_account()  const { return account.value; }
-
-   SYSLIB_SERIALIZE(withdraw_request,
-      (request_id)(account)(chain)(token_kind)(amount)
-      (eligible_at_epoch)(requested_at_epoch))
-};
-
-using wtdwqueue_t = sysio::kv::table<"wtdwqueue"_n, withdraw_key, withdraw_request,
-   sysio::kv::index<"byaccountck"_n,
-      sysio::const_mem_fun<withdraw_request, uint128_t, &withdraw_request::by_account_ck>>,
-   sysio::kv::index<"byeligible"_n,
-      sysio::const_mem_fun<withdraw_request, uint64_t, &withdraw_request::by_eligible>>,
-   sysio::kv::index<"byaccount"_n,
-      sysio::const_mem_fun<withdraw_request, uint64_t, &withdraw_request::by_account>>
->;
-
-} // namespace opreg_readonly
-
-// ---------------------------------------------------------------------------
-//  Read-only mirror of sysio.reserve::lps for the variance-tolerance check
-//  in createuwreq. Struct layout MUST stay in lockstep with sysio.reserve.hpp.
-// ---------------------------------------------------------------------------
-namespace reserve_readonly {
-
-struct lp_key {
-   uint64_t chain_token;
-   uint64_t primary_key() const { return chain_token; }
-   SYSLIB_SERIALIZE(lp_key, (chain_token))
-};
-
-struct lp_entry {
-   ChainKind  chain;
-   TokenKind  paired_token;
-   uint64_t   reserve_paired;
-   uint64_t   reserve_wire;
-   uint32_t   connector_weight_bps;
-   uint64_t   last_updated_ms;
-
-   uint64_t by_chain_token() const {
-      return (static_cast<uint64_t>(chain) << 32) | static_cast<uint64_t>(paired_token);
-   }
-
-   SYSLIB_SERIALIZE(lp_entry,
-      (chain)(paired_token)(reserve_paired)(reserve_wire)
-      (connector_weight_bps)(last_updated_ms))
-};
-
-using lps_t = sysio::kv::table<"lps"_n, lp_key, lp_entry>;
-
-} // namespace reserve_readonly
 
 namespace {
 
@@ -153,7 +30,7 @@ uint32_t get_current_epoch() {
 
 /// Sum the underwriter's pending withdraws on opreg for the given (chain, token).
 uint64_t opreg_pending_withdraws(name underwriter, ChainKind chain, TokenKind token_kind) {
-   opreg_readonly::wtdwqueue_t queue(uwrit::OPREG_ACCOUNT);
+   opreg::wtdwqueue_t queue(uwrit::OPREG_ACCOUNT);
    auto idx = queue.get_index<"byaccountck"_n>();
    uint128_t composite = (static_cast<uint128_t>(underwriter.value) << 64)
                        | (static_cast<uint64_t>(chain) << 32)
@@ -191,8 +68,8 @@ uint64_t sum_locks_inline(name self, name underwriter,
 /// withdraws to get the spendable amount.
 uint64_t opreg_balance(name underwriter, ChainKind chain, TokenKind token_kind,
                         OperatorStatus& out_status) {
-   opreg_readonly::operators_t ops(uwrit::OPREG_ACCOUNT);
-   opreg_readonly::operator_key op_pk{underwriter.value};
+   opreg::operators_t ops(uwrit::OPREG_ACCOUNT);
+   opreg::operator_key op_pk{underwriter.value};
    if (!ops.contains(op_pk)) {
       out_status = OperatorStatus::OPERATOR_STATUS_UNKNOWN;
       return 0;
@@ -249,26 +126,22 @@ uint64_t reserve_quote(ChainKind src_chain, TokenKind src_token,
    if (src_token == TokenKind::TOKEN_KIND_WIRE && dst_token == TokenKind::TOKEN_KIND_WIRE) {
       return src_amount;
    }
-   reserve_readonly::lps_t lps(uwrit::RESERVE_ACCOUNT);
-
-   auto pack = [](ChainKind c, TokenKind t) -> uint64_t {
-      return (static_cast<uint64_t>(c) << 32) | static_cast<uint64_t>(t);
-   };
+   reserve::lps_t lps(uwrit::RESERVE_ACCOUNT);
 
    if (src_token == TokenKind::TOKEN_KIND_WIRE) {
-      reserve_readonly::lp_key pk{pack(dst_chain, dst_token)};
+      reserve::lp_key pk{reserve::pack_chain_token(dst_chain, dst_token)};
       if (!lps.contains(pk)) return 0;
       auto lp = lps.get(pk);
       return cp_output(lp.reserve_wire, lp.reserve_paired, src_amount);
    }
    if (dst_token == TokenKind::TOKEN_KIND_WIRE) {
-      reserve_readonly::lp_key pk{pack(src_chain, src_token)};
+      reserve::lp_key pk{reserve::pack_chain_token(src_chain, src_token)};
       if (!lps.contains(pk)) return 0;
       auto lp = lps.get(pk);
       return cp_output(lp.reserve_paired, lp.reserve_wire, src_amount);
    }
-   reserve_readonly::lp_key src_pk{pack(src_chain, src_token)};
-   reserve_readonly::lp_key dst_pk{pack(dst_chain, dst_token)};
+   reserve::lp_key src_pk{reserve::pack_chain_token(src_chain, src_token)};
+   reserve::lp_key dst_pk{reserve::pack_chain_token(dst_chain, dst_token)};
    if (!lps.contains(src_pk) || !lps.contains(dst_pk)) return 0;
    auto src_lp = lps.get(src_pk);
    auto dst_lp = lps.get(dst_pk);
@@ -585,10 +458,13 @@ void uwrit::release(uint64_t uwreq_id) {
    std::vector<lock_key> to_erase;
    for (auto it = idx.lower_bound(uwreq_id);
         it != idx.end() && it->uwreq_id == uwreq_id; ++it) {
+      opp::types::TokenAmount ta;
+      ta.kind   = it->token_kind;
+      ta.amount = zpp::bits::vint64_t{static_cast<int64_t>(it->amount)};
       action(
          permission_level{get_self(), "active"_n},
          OPREG_ACCOUNT, "releaselock"_n,
-         std::make_tuple(it->underwriter, it->chain, it->token_kind, it->amount)
+         std::make_tuple(it->underwriter, it->chain, ta)
       ).send();
       to_erase.push_back(lock_key{it->lock_id});
    }

@@ -1,6 +1,7 @@
 #include <boost/test/unit_test.hpp>
 #include <sysio/testing/tester.hpp>
 #include <sysio/chain/abi_serializer.hpp>
+#include <sysio/opp/opp.hpp>
 
 #include <fc/variant_object.hpp>
 #include <fc-lite/crypto/chain_types.hpp>
@@ -10,6 +11,7 @@
 using namespace sysio::testing;
 using namespace sysio;
 using namespace sysio::chain;
+using namespace sysio::opp::types;
 using namespace fc;
 using namespace fc::crypto;
 
@@ -116,7 +118,7 @@ BOOST_FIXTURE_TEST_CASE(createuwreq_requires_msgch_auth, sysio_uwrit_tester) { t
    // call from another account (uwrit.a here) is rejected.
    BOOST_REQUIRE(push_uwrit_action("uwrit.a"_n, "createuwreq"_n, mvo()
       ("attestation_id", 1)
-      ("type", "ATTESTATION_TYPE_SWAP")
+      ("type", sysio::opp::types::AttestationType::ATTESTATION_TYPE_SWAP)
       ("outpost_id", 1)
       ("data", std::vector<char>{})
    ).find("missing authority of sysio.msgch") != std::string::npos);
@@ -150,7 +152,7 @@ BOOST_FIXTURE_TEST_CASE(rcrdcommit_requires_msgch_auth, sysio_uwrit_tester) { tr
       ("uwreq_id",   1)
       ("underwriter", "uwrit.a")
       ("outpost_id",  1)
-      ("from_chain",  "CHAIN_KIND_ETHEREUM")
+      ("from_chain",  ChainKind::CHAIN_KIND_ETHEREUM)
    ).find("missing authority of sysio.msgch") != std::string::npos);
 } FC_LOG_AND_RETHROW() }
 
@@ -162,7 +164,7 @@ BOOST_FIXTURE_TEST_CASE(rcrdcommit_rejects_unknown_uwreq, sysio_uwrit_tester) { 
          ("uwreq_id",   42)
          ("underwriter", "uwrit.a")
          ("outpost_id",  1)
-         ("from_chain",  "CHAIN_KIND_ETHEREUM")
+         ("from_chain",  ChainKind::CHAIN_KIND_ETHEREUM)
       )
    );
 } FC_LOG_AND_RETHROW() }
@@ -211,8 +213,8 @@ BOOST_FIXTURE_TEST_CASE(sumlocks_zero_for_unbonded_underwriter, sysio_uwrit_test
    BOOST_REQUIRE_EQUAL(success(),
       push_uwrit_action("uwrit.a"_n, "sumlocks"_n, mvo()
          ("underwriter", "uwrit.a")
-         ("chain",       "CHAIN_KIND_ETHEREUM")
-         ("token_kind",  "TOKEN_KIND_ETH")
+         ("chain",       ChainKind::CHAIN_KIND_ETHEREUM)
+         ("token_kind",  TokenKind::TOKEN_KIND_ETH)
       )
    );
 } FC_LOG_AND_RETHROW() }

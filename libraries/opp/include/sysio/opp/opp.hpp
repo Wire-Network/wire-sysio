@@ -14,6 +14,7 @@
 
 #include <sysio/opp/debugging/debugging.pb.h>
 #include <sysio/opp/types/types.pb.h>
+#include <sysio/opp/attestations/attestations.pb.h>
 #include <fc/reflect/reflect.hpp>
 
 // ---------------------------------------------------------------------------
@@ -81,10 +82,8 @@ FC_REFLECT_ENUM(sysio::opp::types::AttestationType,
    (ATTESTATION_TYPE_PRETOKEN_YIELD)
    (ATTESTATION_TYPE_RESERVE_BALANCE_SHEET)
    (ATTESTATION_TYPE_STAKE_UPDATE)
-   (ATTESTATION_TYPE_NATIVE_YIELD_REWARD)
    (ATTESTATION_TYPE_WIRE_TOKEN_PURCHASE)
    (ATTESTATION_TYPE_CHALLENGE_RESPONSE)
-   (ATTESTATION_TYPE_SLASH_OPERATOR)
    (ATTESTATION_TYPE_SWAP)
    (ATTESTATION_TYPE_UNDERWRITE_INTENT)
    (ATTESTATION_TYPE_UNDERWRITE_CONFIRM)
@@ -95,7 +94,39 @@ FC_REFLECT_ENUM(sysio::opp::types::AttestationType,
    (ATTESTATION_TYPE_EPOCH_SYNC)
    (ATTESTATION_TYPE_OPERATORS)
    (ATTESTATION_TYPE_REMIT_CONFIRM)
-   (ATTESTATION_TYPE_BATCH_OPERATOR_GROUPS))
+   (ATTESTATION_TYPE_BATCH_OPERATOR_GROUPS)
+   (ATTESTATION_TYPE_NODE_OWNER_REG)
+   (ATTESTATION_TYPE_STAKING_REWARD)
+   (ATTESTATION_TYPE_STAKE_RESULT)
+   (ATTESTATION_TYPE_ATTESTATION_PROCESSING_ERROR)
+   (ATTESTATION_TYPE_UNDERWRITE_INTENT_COMMIT)
+   (ATTESTATION_TYPE_UNDERWRITE_INTENT_REJECT)
+   (ATTESTATION_TYPE_SWAP_REVERT)
+   (ATTESTATION_TYPE_DEPOSIT_REVERT))
+
+// ---------------------------------------------------------------------------
+//  Nested enums on attestation messages
+//
+//  protoc-cpp prefixes nested-enum values with the enum type name (e.g.
+//  `OperatorAction_ActionType_ACTION_TYPE_UNKNOWN`), so the reflection uses
+//  the full prefixed identifier. The string form on `to_string` will carry
+//  the prefix too — JSON consumers that want the bare proto value name
+//  (e.g. "ACTION_TYPE_SLASH") should strip the `OperatorAction_ActionType_`
+//  prefix at their boundary.
+// ---------------------------------------------------------------------------
+
+FC_REFLECT_ENUM(sysio::opp::attestations::OperatorAction_ActionType,
+   (OperatorAction_ActionType_ACTION_TYPE_UNKNOWN)
+   (OperatorAction_ActionType_ACTION_TYPE_DEPOSIT_REQUEST)
+   (OperatorAction_ActionType_ACTION_TYPE_WITHDRAW_REQUEST)
+   (OperatorAction_ActionType_ACTION_TYPE_WITHDRAW_REMIT)
+   (OperatorAction_ActionType_ACTION_TYPE_SLASH))
+
+FC_REFLECT_ENUM(sysio::opp::attestations::ReserveTarget_Kind,
+   (ReserveTarget_Kind_KIND_UNKNOWN)
+   (ReserveTarget_Kind_KIND_LP)
+   (ReserveTarget_Kind_KIND_BURN)
+   (ReserveTarget_Kind_KIND_TREASURY))
 
 FC_REFLECT_ENUM(sysio::opp::types::AttestationStatus,
    (ATTESTATION_STATUS_PENDING)

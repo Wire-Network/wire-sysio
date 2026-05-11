@@ -1,6 +1,7 @@
 #include <boost/test/unit_test.hpp>
 #include <sysio/testing/tester.hpp>
 #include <sysio/chain/abi_serializer.hpp>
+#include <sysio/opp/opp.hpp>
 
 #include <fc/variant_object.hpp>
 
@@ -9,6 +10,7 @@
 using namespace sysio::testing;
 using namespace sysio;
 using namespace sysio::chain;
+using namespace sysio::opp::types;
 using namespace fc;
 
 using mvo = fc::mutable_variant_object;
@@ -58,7 +60,7 @@ public:
    }
 
    /// Helper: provision an LP via setlp.
-   action_result setlp(const std::string& chain, const std::string& token,
+   action_result setlp(ChainKind chain, TokenKind token,
                        uint64_t reserve_paired, uint64_t reserve_wire,
                        uint32_t weight = 5000) {
       return push_action(RESERVE_ACCOUNT, "setlp"_n, mvo()
@@ -69,7 +71,7 @@ public:
          ("connector_weight_bps", weight));
    }
 
-   action_result creditlp(name signer, const std::string& chain, const std::string& token,
+   action_result creditlp(name signer, ChainKind chain, TokenKind token,
                           uint64_t paired_amount, uint64_t wire_amount) {
       return push_action(signer, "creditlp"_n, mvo()
          ("chain", chain)
@@ -104,14 +106,14 @@ BOOST_AUTO_TEST_SUITE(sysio_reserve_tests)
 
 BOOST_FIXTURE_TEST_CASE(setlp_creates_lp_row, sysio_reserve_tester) { try {
    BOOST_REQUIRE_EQUAL(success(),
-      setlp("CHAIN_KIND_ETHEREUM", "TOKEN_KIND_ETH",
+      setlp(ChainKind::CHAIN_KIND_ETHEREUM, TokenKind::TOKEN_KIND_ETH,
             /*reserve_paired*/ 1'000'000, /*reserve_wire*/ 2'000'000));
 
    // ChainKind::ETHEREUM = 2; TokenKind::ETH = 256
    auto lp = get_lp(pack(2, 256));
    BOOST_REQUIRE(!lp.is_null());
-   BOOST_REQUIRE_EQUAL("CHAIN_KIND_ETHEREUM", lp["chain"].as_string());
-   BOOST_REQUIRE_EQUAL("TOKEN_KIND_ETH",      lp["paired_token"].as_string());
+   BOOST_REQUIRE(ChainKind::CHAIN_KIND_ETHEREUM == lp["chain"].as<ChainKind>());
+   BOOST_REQUIRE(TokenKind::TOKEN_KIND_ETH      == lp["paired_token"].as<TokenKind>());
    BOOST_REQUIRE_EQUAL(1'000'000, lp["reserve_paired"].as_uint64());
    BOOST_REQUIRE_EQUAL(2'000'000, lp["reserve_wire"].as_uint64());
    BOOST_REQUIRE_EQUAL(5000,      lp["connector_weight_bps"].as_uint64());
@@ -119,11 +121,11 @@ BOOST_FIXTURE_TEST_CASE(setlp_creates_lp_row, sysio_reserve_tester) { try {
 
 BOOST_FIXTURE_TEST_CASE(setlp_updates_existing_row_in_place, sysio_reserve_tester) { try {
    BOOST_REQUIRE_EQUAL(success(),
-      setlp("CHAIN_KIND_SOLANA", "TOKEN_KIND_SOL", 100, 200, 5000));
+      setlp(ChainKind::CHAIN_KIND_SOLANA, TokenKind::TOKEN_KIND_SOL, 100, 200, 5000));
 
    // Re-call updates the same row (composite key matches).
    BOOST_REQUIRE_EQUAL(success(),
-      setlp("CHAIN_KIND_SOLANA", "TOKEN_KIND_SOL", 999, 1234, 6000));
+      setlp(ChainKind::CHAIN_KIND_SOLANA, TokenKind::TOKEN_KIND_SOL, 999, 1234, 6000));
 
    // ChainKind::SOLANA = 3; TokenKind::SOL = 512
    auto lp = get_lp(pack(3, 512));
@@ -138,39 +140,39 @@ BOOST_FIXTURE_TEST_CASE(setlp_rejects_wire_paired_with_wire, sysio_reserve_teste
    // WIRE on the depot side.
    BOOST_REQUIRE_EQUAL(
       error("assertion failure with message: WIRE/WIRE LP is degenerate; nothing to provision"),
-      setlp("CHAIN_KIND_WIRE", "TOKEN_KIND_WIRE", 100, 100));
+      setlp(ChainKind::CHAIN_KIND_WIRE, TokenKind::TOKEN_KIND_WIRE, 100, 100));
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(setlp_rejects_invalid_connector_weight, sysio_reserve_tester) { try {
    // weight must be in (0, 10000].
    BOOST_REQUIRE_EQUAL(
       error("assertion failure with message: connector_weight_bps must be in (0, 10000]"),
-      setlp("CHAIN_KIND_ETHEREUM", "TOKEN_KIND_ETH", 100, 100, 0));
+      setlp(ChainKind::CHAIN_KIND_ETHEREUM, TokenKind::TOKEN_KIND_ETH, 100, 100, 0));
 
    BOOST_REQUIRE_EQUAL(
       error("assertion failure with message: connector_weight_bps must be in (0, 10000]"),
-      setlp("CHAIN_KIND_ETHEREUM", "TOKEN_KIND_ETH", 100, 100, 10001));
+      setlp(ChainKind::CHAIN_KIND_ETHEREUM, TokenKind::TOKEN_KIND_ETH, 100, 100, 10001));
 } FC_LOG_AND_RETHROW() }
 
 // ── creditlp ──
 
 BOOST_FIXTURE_TEST_CASE(creditlp_requires_msgch_auth, sysio_reserve_tester) { try {
    BOOST_REQUIRE_EQUAL(success(),
-      setlp("CHAIN_KIND_ETHEREUM", "TOKEN_KIND_ETH", 1000, 1000));
+      setlp(ChainKind::CHAIN_KIND_ETHEREUM, TokenKind::TOKEN_KIND_ETH, 1000, 1000));
 
-   // Credit-LP is auth=msgch (NATIVE_YIELD_REWARD / STAKING_REWARD dispatch).
+   // Credit-LP is auth=msgch (STAKING_REWARD dispatch).
    // A different signer should fail.
    BOOST_REQUIRE(creditlp(RESERVE_ACCOUNT,
-      "CHAIN_KIND_ETHEREUM", "TOKEN_KIND_ETH", 100, 50)
+      ChainKind::CHAIN_KIND_ETHEREUM, TokenKind::TOKEN_KIND_ETH, 100, 50)
       .find("missing authority of sysio.msgch") != std::string::npos);
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(creditlp_grows_reserves, sysio_reserve_tester) { try {
    BOOST_REQUIRE_EQUAL(success(),
-      setlp("CHAIN_KIND_ETHEREUM", "TOKEN_KIND_ETH", 1000, 1000));
+      setlp(ChainKind::CHAIN_KIND_ETHEREUM, TokenKind::TOKEN_KIND_ETH, 1000, 1000));
    BOOST_REQUIRE_EQUAL(success(),
       creditlp(MSGCH_ACCOUNT,
-               "CHAIN_KIND_ETHEREUM", "TOKEN_KIND_ETH", 100, 50));
+               ChainKind::CHAIN_KIND_ETHEREUM, TokenKind::TOKEN_KIND_ETH, 100, 50));
 
    auto lp = get_lp(pack(2, 256));
    BOOST_REQUIRE_EQUAL(1100, lp["reserve_paired"].as_uint64());
@@ -182,7 +184,7 @@ BOOST_FIXTURE_TEST_CASE(creditlp_rejects_unknown_lp, sysio_reserve_tester) { try
    BOOST_REQUIRE_EQUAL(
       error("assertion failure with message: LP not provisioned for this (chain, paired_token)"),
       creditlp(MSGCH_ACCOUNT,
-               "CHAIN_KIND_ETHEREUM", "TOKEN_KIND_ETH", 100, 50));
+               ChainKind::CHAIN_KIND_ETHEREUM, TokenKind::TOKEN_KIND_ETH, 100, 50));
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()

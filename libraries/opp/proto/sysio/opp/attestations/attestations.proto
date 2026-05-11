@@ -61,45 +61,80 @@ message WireTokenPurchase {
   repeated sysio.opp.types.TokenAmount amounts = 2;
 }
 
-// Operator-driven action across the deposit / withdraw / slash lifecycle.
+// Single envelope for every operator-affecting action across the deposit /
+// withdraw / slash lifecycle.
 //
 // Sub-types (carried in `action_type`):
-//   DEPOSIT            outpost -> depot   "operator deposited X tokens; record the bond"
-//   WITHDRAW           DEPRECATED         legacy single-step withdraw (no 2-epoch wait); replaced by
-//                                          WITHDRAW_REQUEST -> WITHDRAW_REMIT -> WITHDRAW_CONFIRMED
-//   WITHDRAW_REQUEST   outpost -> depot   "operator wants to withdraw X tokens; queue the 2-epoch wait"
-//   WITHDRAW_REMIT     depot   -> outpost "approved; transfer X tokens to the authex-resolved destination"
-//   WITHDRAW_CONFIRMED outpost -> depot   "audit confirmation that the outpost executed the remit"
+//   DEPOSIT          outpost -> depot   "operator deposited X tokens; record the bond"
+//   WITHDRAW_REQUEST outpost -> depot   "operator wants to withdraw X tokens; queue the 2-epoch wait"
+//   WITHDRAW_REMIT   depot   -> outpost "approved; transfer X tokens to the authex-resolved destination"
+//                                       success-path terminator — the depot's irreversible drain of
+//                                       `sysio.opreg::wtdwqueue` in `flushwtdw` is the authoritative
+//                                       audit trail; no roundtrip ack required.
+//   SLASH            depot   -> outpost "seize X tokens of `token_kind` from the operator's escrow on
+//                                       `chain` and route to `lp_target`". Depot-internal — emitted by
+//                                       `sysio.opreg::slash` (and uwrit deferred-slash on lock release);
+//                                       NEVER accepted inbound at the depot.
 //
 // `actor` semantics by sub-type:
-//   DEPOSIT / WITHDRAW / WITHDRAW_REQUEST / WITHDRAW_CONFIRMED — the operator's address on the source chain.
-//   WITHDRAW_REMIT                                              — the destination address resolved via
-//                                                                 sysio.authex on the depot side; may
-//                                                                 differ from the operator's canonical
-//                                                                 chain address if they registered an
-//                                                                 alternate withdrawal recipient.
+//   DEPOSIT / WITHDRAW_REQUEST — the operator's address on the source chain.
+//   WITHDRAW_REMIT             — the destination address resolved via sysio.authex on the depot side;
+//                                may differ from the operator's canonical chain address if they
+//                                registered an alternate withdrawal recipient.
+//   SLASH                      — the operator's WIRE account name encoded as bytes with kind=CHAIN_KIND_WIRE.
+//
+// SLASH-only fields (`chain` / `reason` / `lp_target` / `slashed_at_epoch`) are zero / empty for
+// every other action type and are ignored by their handlers.
 message OperatorAction {
   enum ActionType {
-    ACTION_TYPE_UNKNOWN = 0;
-    ACTION_TYPE_DEPOSIT = 1;
-    // DEPRECATED — single-step withdraw with no 2-epoch wait; replaced by the
-    // WITHDRAW_REQUEST/_REMIT/_CONFIRMED 3-stage flow. Kept on the wire so old
-    // call sites continue to encode/decode while we migrate.
-    ACTION_TYPE_WITHDRAW = 2;
-    ACTION_TYPE_WITHDRAW_REQUEST = 3;
-    ACTION_TYPE_WITHDRAW_REMIT = 4;
-    ACTION_TYPE_WITHDRAW_CONFIRMED = 5;
+    ACTION_TYPE_UNKNOWN          = 0;
+    ACTION_TYPE_DEPOSIT_REQUEST  = 1;
+    ACTION_TYPE_WITHDRAW_REQUEST = 2;
+    ACTION_TYPE_WITHDRAW_REMIT   = 3;
+    ACTION_TYPE_SLASH            = 4;
   };
-  ActionType action_type = 1;
-  sysio.opp.types.ChainAddress actor = 2;
-  sysio.opp.types.WireAccount wire_account = 3;
-  sysio.opp.types.OperatorType   type = 5;
-  sysio.opp.types.OperatorStatus status = 10;
-  sysio.opp.types.TokenAmount   amount = 20;
-  // Links a WITHDRAW_REMIT / WITHDRAW_CONFIRMED back to the originating
-  // WITHDRAW_REQUEST. Set by the depot when emitting REMIT, echoed by the
-  // outpost on CONFIRMED. Zero / unset for DEPOSIT and other sub-types.
-  uint64                        request_id = 21;
+  ActionType                       action_type = 1;
+  // Operator's outpost-chain identity, carried as the FULL chain public key
+  // (not the derived address) so the depot can resolve it through
+  // sysio.authex::links's `bypubkey` index (existing — no new index needed).
+  // For Ethereum / WIRE (secp256k1) this is the 33-byte compressed pub key;
+  // for Solana (Ed25519) it is the 32-byte pubkey, which is also the
+  // address. The depot looks up the WIRE account from the linked pubkey;
+  // outposts in turn derive the local chain address from the same pubkey.
+  sysio.opp.types.ChainAddress     op_address  = 2;
+  sysio.opp.types.OperatorType     type        = 3;
+  sysio.opp.types.OperatorStatus   status      = 4;
+  sysio.opp.types.TokenAmount      amount      = 5;
+  // Links a WITHDRAW_REMIT back to its originating WITHDRAW_REQUEST. Zero / unset
+  // for DEPOSIT_REQUEST and SLASH.
+  uint64                           request_id  = 6;
+  // Which outpost chain holds the escrow this action concerns. For DEPOSIT_REQUEST
+  // and WITHDRAW_REQUEST, identifies the holding outpost; for SLASH, identifies
+  // the outpost expected to seize its share (outposts on other chains drop the
+  // SLASH); for WITHDRAW_REMIT, identifies the outpost that must release.
+  sysio.opp.types.ChainKind        chain       = 7;
+  // Human-readable reason recorded by the depot. Populated on SLASH (slash
+  // motivation) and on log-only failure paths; empty otherwise.
+  string                           reason      = 8;
+}
+
+// Per-operator audit log entry stored in `sysio.opreg::operators[].recent_actions`.
+// Captures every OperatorAction the depot has applied (or rejected) for an
+// operator, with its outcome. The log is a 5-deep ring buffer: oldest entry
+// drops when a sixth is appended.
+message OperatorActionLog {
+  OperatorAction action        = 1;
+  // True when the action mutated state as intended; false when validation
+  // rejected it (e.g., insufficient available balance, slashed operator,
+  // unknown account). The action is still recorded so operators can see
+  // why their request was dropped.
+  bool           success       = 2;
+  // sysio.current_time_point().sec_since_epoch() at which the action was
+  // applied / rejected.
+  int64          timestamp     = 3;
+  // Reason the action failed, when `success == false`. Empty on success.
+  // Contract layer caps at 2048 bytes on append.
+  string         error_message = 4;
 }
 
 // Reserve fund disbursement.
@@ -293,8 +328,9 @@ message BatchOperatorGroup {
   repeated sysio.opp.types.ChainAddress operators = 1;
 }
 
-// Reserve-target hint for SLASH_OPERATOR — tells the outpost what to do with the
-// slashed funds. The depot resolves this via `sysio.reserve::resolve_lp(chain, token_kind, role)`.
+// Reserve-target hint carried on `OperatorAction(action_type=SLASH)` —
+// tells the outpost what to do with the slashed funds. The depot resolves
+// this via `sysio.reserve::resolve_lp(chain, token_kind, role)`.
 message ReserveTarget {
   enum Kind {
     KIND_UNKNOWN = 0;
@@ -311,31 +347,27 @@ message ReserveTarget {
   sysio.opp.types.TokenKind  paired_token = 2;
 }
 
-// Slash operator (Depot -> Outpost).
+// Deposit refund (Depot -> source Outpost).
 //
-// Emitted by `sysio.opreg::slash` for each (chain, token_kind) the operator has bond on,
-// AND by `sysio.uwrit::release` for each lock that releases while the underwriter is
-// still SLASHED (deferred-slash on lock release; see CLAUDE-WIRE-OPERATOR-COLLATERAL-IMPL-PLAN.md
-// §3.4 + §4.4).
+// Emitted by the depot's opreg layer when it can't accept an inbound DEPOSIT —
+// the originating account is unknown to opreg, the operator has no authex
+// link for the chain, etc. The outpost matches `original_deposit_message_id`
+// to the deposit it escrowed and refunds `refund_amount` to `depositor`.
 //
-// The outpost moves `amount` of `token_kind` from the operator's escrow into `lp_target`
-// (typically the matching reserve / LP on `chain`).
-message SlashOperator {
-  sysio.opp.types.ChainAddress  operator = 1;
-  sysio.opp.types.OperatorType  type = 2;
-  string                        reason = 3;
-  // Chain whose escrow holds the funds being slashed.
-  sysio.opp.types.ChainKind     chain = 4;
-  // Token kind being slashed (matches the corresponding balance_entry in opreg).
-  sysio.opp.types.TokenKind     token_kind = 5;
-  // Immediately slashable amount (the locked portion is deferred — separate
-  // SlashOperator emitted from sysio.uwrit::release per lock that resolves
-  // while the operator is SLASHED).
-  uint64                        amount = 6;
-  // Where the outpost should route the slashed funds.
-  ReserveTarget                 lp_target = 7;
-  // Epoch in which the slash decision was committed to opreg.
-  uint32                        slashed_at_epoch = 8;
+// Distinct from `SwapRevert` (which handles depot-INTERNAL swap failures like
+// overcommit or quote-variance breaches): DEPOSIT_REVERT is purely about
+// identity / link-table validation at the depot's opreg layer.
+message DepositRevert {
+  // 32-byte OPP message id of the original DEPOSIT attestation. The outpost
+  // matches on this to scope the refund to one specific in-flight deposit.
+  bytes                        original_deposit_message_id = 1;
+  // Source-chain address that paid the original deposit — the refund target.
+  sysio.opp.types.ChainAddress depositor                   = 2;
+  // Refund amount + token kind (matches the original DEPOSIT.amount).
+  sysio.opp.types.TokenAmount  refund_amount               = 3;
+  // Why the depot rejected the deposit (e.g., "operator not registered",
+  // "missing authex link for ETHEREUM").
+  string                       reason                      = 4;
 }
 
 // ---------------------------------------------------------------------------
@@ -368,24 +400,9 @@ message StakingReward {
   sysio.opp.types.TokenAmount  reward_amount = 6;
 }
 
-// Native validator-reward feedback (Outpost -> Depot).
-//
-// When a validator on an outpost (e.g. an Ethereum validator running liqEth, or a
-// Solana validator running liqsol) receives a reward, the outpost emits this so the
-// depot can credit the matching LP / reserve. Distinct from `StakingReward` (which
-// is per-staker share); this is the gross validator-level reward that feeds the LP.
-message NativeYieldReward {
-  uint64                       outpost_id = 1;
-  // Identifier for the validator on the outpost chain (e.g. validator pubkey).
-  sysio.opp.types.ChainAddress validator_id = 2;
-  // Gross reward amount + token kind.
-  sysio.opp.types.TokenAmount  reward_amount = 3;
-  // Reward period (milliseconds since epoch).
-  uint64                       reward_period_start_ms = 4;
-  uint64                       reward_period_end_ms = 5;
-  // Which LP's reserve_token_balance the depot should grow (paired with WIRE).
-  sysio.opp.types.TokenKind    lp_credit_target = 6;
-}
+// `NativeYieldReward` removed — `StakingReward` is the single staker-reward
+// feedback path. The validator-reward bulk credit lives inside the outpost's
+// reserve top-up, not in a separate attestation.
 
 // Stake result confirmation (Depot → Outpost).
 // Sent after processing a cross-chain stake attestation.

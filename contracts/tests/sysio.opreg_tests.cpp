@@ -110,29 +110,50 @@ public:
       return push_opreg_action(OPREG_ACCOUNT, "prune"_n, mvo());
    }
 
-   // ── New-action helpers (Task 2 refactor) ──
+   // ── Collateral-action helpers (msgch-dispatched paths) ──
 
-   /// Internal-only deposit dispatched from sysio.msgch (require_auth(get_self())).
-   /// Used by tests that need to seed an operator's balance without going
-   /// through the WIRE-direct wirestake (which requires sysio.token).
-   action_result deposit(name account, const std::string& chain, const std::string& token,
-                         uint64_t amount, std::string tx_hash = "") {
-      return push_opreg_action(OPREG_ACCOUNT, "deposit"_n, mvo()
-         ("account",         account)
-         ("chain",           chain)
-         ("token_kind",      token)
-         ("amount",          amount)
-         ("outpost_tx_hash", tx_hash));
+   /// Build a TokenAmount mvo from a typed (TokenKind, amount) pair. Action
+   /// signatures take `TokenAmount` (proto struct, not a separate kind+scalar
+   /// pair) — this packs the two for the ABI serializer.
+   static fc::mutable_variant_object token_amount_mvo(TokenKind kind, uint64_t amount) {
+      return mvo()("kind", kind)("amount", amount);
    }
 
-   /// Operator-driven cross-chain withdraw (msgch dispatch path).
-   action_result queuewtdw(name account, const std::string& chain, const std::string& token,
-                           uint64_t amount) {
-      return push_opreg_action(OPREG_ACCOUNT, "queuewtdw"_n, mvo()
+   /// Internal: outpost-driven deposit credit, dispatched from sysio.msgch
+   /// (require_auth(get_self()=opreg)). Used to seed an operator's outpost-
+   /// side balance without going through the WIRE-direct `deposit` action
+   /// (which requires sysio.token + operator-signed transfer).
+   ///
+   /// `actor` is the depositor's source-chain address; defaults to a
+   /// well-formed Ethereum-shaped placeholder so tests that don't care about
+   /// the revert correlation can ignore it. `original_message_id` defaults
+   /// to a zero hash for the same reason. Helpers serialize the typed enum
+   /// values via FC_REFLECT_ENUM (defined in `sysio/opp/opp.hpp`) — the ABI
+   /// serializer reads them as the corresponding enum-name strings.
+   action_result depositinle(name account, ChainKind chain, TokenKind token,
+                             uint64_t amount,
+                             ChainKind actor_kind = ChainKind::CHAIN_KIND_ETHEREUM,
+                             const std::vector<char>& actor_address = {},
+                             const std::string& original_message_id_hex = std::string(64, '0')) {
+      return push_opreg_action(OPREG_ACCOUNT, "depositinle"_n, mvo()
+         ("account",              account)
+         ("chain",                chain)
+         ("amount",               token_amount_mvo(token, amount))
+         ("actor",                mvo()
+            ("kind",    actor_kind)
+            ("address", actor_address))
+         ("original_message_id",  original_message_id_hex));
+   }
+
+   /// Internal: outpost-driven withdraw request, dispatched from sysio.msgch.
+   /// Same auth model as `depositinle` — opreg authorizes itself via the
+   /// `sysio.code` permission delegation set up at cluster bootstrap.
+   action_result withdrawinle(name account, ChainKind chain, TokenKind token,
+                              uint64_t amount) {
+      return push_opreg_action(OPREG_ACCOUNT, "withdrawinle"_n, mvo()
          ("account",     account)
          ("chain",       chain)
-         ("token_kind",  token)
-         ("amount",      amount));
+         ("amount",      token_amount_mvo(token, amount)));
    }
 
    action_result cancelwtdw(name signer, name account, uint64_t request_id) {
@@ -148,13 +169,12 @@ public:
    }
 
    action_result releaselock(name signer, name account,
-                             const std::string& chain, const std::string& token,
+                             ChainKind chain, TokenKind token,
                              uint64_t amount) {
       return push_opreg_action(signer, "releaselock"_n, mvo()
-         ("account",     account)
-         ("chain",       chain)
-         ("token_kind",  token)
-         ("amount",      amount));
+         ("account",  account)
+         ("chain",    chain)
+         ("amount",   token_amount_mvo(token, amount)));
    }
 
    /// Read a wtdwqueue row by request_id (primary key).
@@ -179,6 +199,19 @@ public:
       return data.empty() ? fc::variant() : opreg_abi_ser.binary_to_variant(
          "operator_entry", data,
          abi_serializer::create_yield_function(abi_serializer_max_time));
+   }
+
+   /// Newest entry in the operator's `recent_actions` ring buffer (back of
+   /// the vector). Returns null when the operator has no entry or no logged
+   /// actions yet. Used by tests that exercise the log-don't-revert paths
+   /// (`depositinle` / `withdrawinle` validation failures) — those paths
+   /// silently commit and append a failure entry; the assertion shape moves
+   /// from `error("...")` to "tx succeeds + log entry says it failed".
+   fc::variant latest_action_log(name account) {
+      auto op = get_operator(account);
+      if (op.is_null()) return fc::variant();
+      const auto& log = op["recent_actions"].get_array();
+      return log.empty() ? fc::variant() : log.back();
    }
 
    abi_serializer opreg_abi_ser;
@@ -220,9 +253,9 @@ BOOST_FIXTURE_TEST_CASE(regoperator_bootstrapped_batch, sysio_opreg_tester) { tr
 
    auto op = get_operator("batchop.a"_n);
    BOOST_REQUIRE_EQUAL("batchop.a", op["account"].as_string());
-   BOOST_REQUIRE_EQUAL("OPERATOR_TYPE_BATCH", op["type"].as_string());
+   BOOST_REQUIRE(OperatorType::OPERATOR_TYPE_BATCH == op["type"].as<OperatorType>());
    // Bootstrapped → immediately ACTIVE (AVAILABLE)
-   BOOST_REQUIRE_EQUAL("OPERATOR_STATUS_ACTIVE", op["status"].as_string());
+   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE == op["status"].as<OperatorStatus>());
    BOOST_REQUIRE_EQUAL(1, op["is_bootstrapped"].as_uint64());
    BOOST_REQUIRE(op["available_at"].as_uint64() > 0);
 } FC_LOG_AND_RETHROW() }
@@ -235,8 +268,8 @@ BOOST_FIXTURE_TEST_CASE(regoperator_bootstrapped_producer, sysio_opreg_tester) {
    produce_blocks();
 
    auto op = get_operator("producer.a"_n);
-   BOOST_REQUIRE_EQUAL("OPERATOR_TYPE_PRODUCER", op["type"].as_string());
-   BOOST_REQUIRE_EQUAL("OPERATOR_STATUS_ACTIVE", op["status"].as_string());
+   BOOST_REQUIRE(OperatorType::OPERATOR_TYPE_PRODUCER == op["type"].as<OperatorType>());
+   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE == op["status"].as<OperatorStatus>());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(regoperator_uw_rejects_bootstrap, sysio_opreg_tester) { try {
@@ -261,9 +294,9 @@ BOOST_FIXTURE_TEST_CASE(regoperator_non_bootstrapped_pending, sysio_opreg_tester
 
    auto op = get_operator("uwrit.a"_n);
    BOOST_REQUIRE_EQUAL("uwrit.a", op["account"].as_string());
-   BOOST_REQUIRE_EQUAL("OPERATOR_TYPE_UNDERWRITER", op["type"].as_string());
+   BOOST_REQUIRE(OperatorType::OPERATOR_TYPE_UNDERWRITER == op["type"].as<OperatorType>());
    // Non-bootstrapped without staking → PENDING (UNKNOWN)
-   BOOST_REQUIRE_EQUAL("OPERATOR_STATUS_UNKNOWN", op["status"].as_string());
+   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_UNKNOWN == op["status"].as<OperatorStatus>());
    BOOST_REQUIRE_EQUAL(0, op["is_bootstrapped"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
@@ -295,8 +328,8 @@ BOOST_FIXTURE_TEST_CASE(slash_permanent, sysio_opreg_tester) { try {
    produce_blocks();
 
    auto op = get_operator("batchop.a"_n);
-   BOOST_REQUIRE_EQUAL("OPERATOR_STATUS_SLASHED", op["status"].as_string());
-   BOOST_REQUIRE(op["slashed_at"].as_uint64() > 0);
+   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_SLASHED == op["status"].as<OperatorStatus>());
+   BOOST_REQUIRE(op["updated_at"].as_uint64() > 0);
 
    // Cannot re-register after slash
    BOOST_REQUIRE_EQUAL(
@@ -332,9 +365,9 @@ BOOST_FIXTURE_TEST_CASE(multiple_bootstrapped_batch_ops, sysio_opreg_tester) { t
    auto op_a = get_operator("batchop.a"_n);
    auto op_b = get_operator("batchop.b"_n);
    auto op_c = get_operator("batchop.c"_n);
-   BOOST_REQUIRE_EQUAL("OPERATOR_STATUS_ACTIVE", op_a["status"].as_string());
-   BOOST_REQUIRE_EQUAL("OPERATOR_STATUS_ACTIVE", op_b["status"].as_string());
-   BOOST_REQUIRE_EQUAL("OPERATOR_STATUS_ACTIVE", op_c["status"].as_string());
+   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE == op_a["status"].as<OperatorStatus>());
+   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE == op_b["status"].as<OperatorStatus>());
+   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE == op_c["status"].as<OperatorStatus>());
 
    // Now configure epoch and run initgroups which reads from opreg
    BOOST_REQUIRE_EQUAL(success(), push_epoch_action(EPOCH_ACCOUNT, "setconfig"_n, mvo()
@@ -366,13 +399,13 @@ BOOST_FIXTURE_TEST_CASE(deposit_credits_balance_row, sysio_opreg_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), regoperator("uwrit.alice"_n, OPERATOR_TYPE_UNDERWRITER, false));
 
    BOOST_REQUIRE_EQUAL(success(),
-      deposit("uwrit.alice"_n, "CHAIN_KIND_ETHEREUM", "TOKEN_KIND_ETH", 1'000'000));
+      depositinle("uwrit.alice"_n, ChainKind::CHAIN_KIND_ETHEREUM, TokenKind::TOKEN_KIND_ETH, 1'000'000));
 
    auto op = get_operator("uwrit.alice"_n);
    auto balances = op["balances"].get_array();
    BOOST_REQUIRE_EQUAL(1, balances.size());
-   BOOST_REQUIRE_EQUAL("CHAIN_KIND_ETHEREUM", balances[0]["chain"].as_string());
-   BOOST_REQUIRE_EQUAL("TOKEN_KIND_ETH",      balances[0]["token_kind"].as_string());
+   BOOST_REQUIRE(ChainKind::CHAIN_KIND_ETHEREUM == balances[0]["chain"].as<ChainKind>());
+   BOOST_REQUIRE(TokenKind::TOKEN_KIND_ETH      == balances[0]["token_kind"].as<TokenKind>());
    BOOST_REQUIRE_EQUAL(1'000'000,             balances[0]["balance"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
@@ -381,9 +414,9 @@ BOOST_FIXTURE_TEST_CASE(deposit_aggregates_into_existing_balance_row, sysio_opre
    BOOST_REQUIRE_EQUAL(success(), regoperator("uwrit.alice"_n, OPERATOR_TYPE_UNDERWRITER, false));
 
    BOOST_REQUIRE_EQUAL(success(),
-      deposit("uwrit.alice"_n, "CHAIN_KIND_ETHEREUM", "TOKEN_KIND_ETH", 100));
+      depositinle("uwrit.alice"_n, ChainKind::CHAIN_KIND_ETHEREUM, TokenKind::TOKEN_KIND_ETH, 100));
    BOOST_REQUIRE_EQUAL(success(),
-      deposit("uwrit.alice"_n, "CHAIN_KIND_ETHEREUM", "TOKEN_KIND_ETH", 50));
+      depositinle("uwrit.alice"_n, ChainKind::CHAIN_KIND_ETHEREUM, TokenKind::TOKEN_KIND_ETH, 50));
 
    auto op = get_operator("uwrit.alice"_n);
    auto balances = op["balances"].get_array();
@@ -396,34 +429,33 @@ BOOST_FIXTURE_TEST_CASE(deposit_keeps_chain_token_pairs_separate, sysio_opreg_te
    BOOST_REQUIRE_EQUAL(success(), regoperator("uwrit.alice"_n, OPERATOR_TYPE_UNDERWRITER, false));
 
    BOOST_REQUIRE_EQUAL(success(),
-      deposit("uwrit.alice"_n, "CHAIN_KIND_ETHEREUM", "TOKEN_KIND_ETH", 100));
+      depositinle("uwrit.alice"_n, ChainKind::CHAIN_KIND_ETHEREUM, TokenKind::TOKEN_KIND_ETH, 100));
    BOOST_REQUIRE_EQUAL(success(),
-      deposit("uwrit.alice"_n, "CHAIN_KIND_SOLANA",   "TOKEN_KIND_SOL", 200));
+      depositinle("uwrit.alice"_n, ChainKind::CHAIN_KIND_SOLANA,   TokenKind::TOKEN_KIND_SOL, 200));
 
    auto op = get_operator("uwrit.alice"_n);
    auto balances = op["balances"].get_array();
    BOOST_REQUIRE_EQUAL(2, balances.size());
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(deposit_rejects_wire_chain, sysio_opreg_tester) { try {
-   BOOST_REQUIRE_EQUAL(success(), setconfig());
-   BOOST_REQUIRE_EQUAL(success(), regoperator("uwrit.alice"_n, OPERATOR_TYPE_UNDERWRITER, false));
-
-   // WIRE-chain deposits MUST go through wirestake (operator-authorized
-   // direct token transfer), not via msgch dispatch.
-   BOOST_REQUIRE_EQUAL(
-      error("assertion failure with message: WIRE-chain deposits go through wirestake (operator-authorized)"),
-      deposit("uwrit.alice"_n, "CHAIN_KIND_WIRE", "TOKEN_KIND_WIRE", 100));
-} FC_LOG_AND_RETHROW() }
-
-BOOST_FIXTURE_TEST_CASE(deposit_rejects_slashed_operator, sysio_opreg_tester) { try {
+BOOST_FIXTURE_TEST_CASE(depositinle_logs_failure_when_operator_slashed, sysio_opreg_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), setconfig());
    BOOST_REQUIRE_EQUAL(success(), regoperator("uwrit.alice"_n, OPERATOR_TYPE_UNDERWRITER, false));
    BOOST_REQUIRE_EQUAL(success(), slash("uwrit.alice"_n, "test slash"));
 
-   BOOST_REQUIRE_EQUAL(
-      error("assertion failure with message: operator not in a deposit-eligible state"),
-      deposit("uwrit.alice"_n, "CHAIN_KIND_ETHEREUM", "TOKEN_KIND_ETH", 100));
+   // `depositinle` is dispatched inline from sysio.msgch — failures DO NOT
+   // revert (revert would kill the entire envelope). The action commits and
+   // appends a failure entry to `recent_actions`; the operator audits via
+   // JSON-RPC. Funds in outpost custody get refunded via the DEPOSIT_REVERT
+   // outbound queued by the same code path.
+   BOOST_REQUIRE_EQUAL(success(),
+      depositinle("uwrit.alice"_n, ChainKind::CHAIN_KIND_ETHEREUM, TokenKind::TOKEN_KIND_ETH, 100));
+
+   auto entry = latest_action_log("uwrit.alice"_n);
+   BOOST_REQUIRE(!entry.is_null());
+   BOOST_REQUIRE_EQUAL(false, entry["success"].as_bool());
+   BOOST_REQUIRE_EQUAL(std::string("operator not in a deposit-eligible state"),
+                       entry["error_message"].as_string());
 } FC_LOG_AND_RETHROW() }
 
 // ── queuewtdw + cancelwtdw (Task 2: 2-epoch withdraw queue + cancellation) ──
@@ -432,10 +464,10 @@ BOOST_FIXTURE_TEST_CASE(queuewtdw_creates_request_row, sysio_opreg_tester) { try
    BOOST_REQUIRE_EQUAL(success(), setconfig());
    BOOST_REQUIRE_EQUAL(success(), regoperator("uwrit.alice"_n, OPERATOR_TYPE_UNDERWRITER, false));
    BOOST_REQUIRE_EQUAL(success(),
-      deposit("uwrit.alice"_n, "CHAIN_KIND_ETHEREUM", "TOKEN_KIND_ETH", 1000));
+      depositinle("uwrit.alice"_n, ChainKind::CHAIN_KIND_ETHEREUM, TokenKind::TOKEN_KIND_ETH, 1000));
 
    BOOST_REQUIRE_EQUAL(success(),
-      queuewtdw("uwrit.alice"_n, "CHAIN_KIND_ETHEREUM", "TOKEN_KIND_ETH", 400));
+      withdrawinle("uwrit.alice"_n, ChainKind::CHAIN_KIND_ETHEREUM, TokenKind::TOKEN_KIND_ETH, 400));
 
    auto row = get_wtdw(1);   // monotonic id starts at 1
    BOOST_REQUIRE(!row.is_null());
@@ -443,43 +475,56 @@ BOOST_FIXTURE_TEST_CASE(queuewtdw_creates_request_row, sysio_opreg_tester) { try
    BOOST_REQUIRE_EQUAL(400,        row["amount"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(queuewtdw_rejects_insufficient_available, sysio_opreg_tester) { try {
+BOOST_FIXTURE_TEST_CASE(withdrawinle_logs_failure_on_insufficient_available, sysio_opreg_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), setconfig());
    BOOST_REQUIRE_EQUAL(success(), regoperator("uwrit.alice"_n, OPERATOR_TYPE_UNDERWRITER, false));
    BOOST_REQUIRE_EQUAL(success(),
-      deposit("uwrit.alice"_n, "CHAIN_KIND_ETHEREUM", "TOKEN_KIND_ETH", 100));
+      depositinle("uwrit.alice"_n, ChainKind::CHAIN_KIND_ETHEREUM, TokenKind::TOKEN_KIND_ETH, 100));
 
    // Asking for more than the deposited balance fails the available()
-   // sufficiency check (no locks / pending withdraws yet, so available
-   // == balance).
-   BOOST_REQUIRE_EQUAL(
-      error("assertion failure with message: insufficient available balance for withdraw"),
-      queuewtdw("uwrit.alice"_n, "CHAIN_KIND_ETHEREUM", "TOKEN_KIND_ETH", 200));
+   // sufficiency check. `withdrawinle` is the msgch-dispatched path, so it
+   // log-don't-reverts: the action commits and the failure lands in the
+   // operator's `recent_actions` ring.
+   BOOST_REQUIRE_EQUAL(success(),
+      withdrawinle("uwrit.alice"_n, ChainKind::CHAIN_KIND_ETHEREUM, TokenKind::TOKEN_KIND_ETH, 200));
+
+   auto entry = latest_action_log("uwrit.alice"_n);
+   BOOST_REQUIRE(!entry.is_null());
+   BOOST_REQUIRE_EQUAL(false, entry["success"].as_bool());
+   BOOST_REQUIRE_EQUAL(std::string("insufficient available balance for withdraw"),
+                       entry["error_message"].as_string());
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(queuewtdw_subtracts_from_available_on_subsequent_call, sysio_opreg_tester) { try {
+BOOST_FIXTURE_TEST_CASE(withdrawinle_subtracts_from_available_on_subsequent_call, sysio_opreg_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), setconfig());
    BOOST_REQUIRE_EQUAL(success(), regoperator("uwrit.alice"_n, OPERATOR_TYPE_UNDERWRITER, false));
    BOOST_REQUIRE_EQUAL(success(),
-      deposit("uwrit.alice"_n, "CHAIN_KIND_ETHEREUM", "TOKEN_KIND_ETH", 1000));
+      depositinle("uwrit.alice"_n, ChainKind::CHAIN_KIND_ETHEREUM, TokenKind::TOKEN_KIND_ETH, 1000));
 
    BOOST_REQUIRE_EQUAL(success(),
-      queuewtdw("uwrit.alice"_n, "CHAIN_KIND_ETHEREUM", "TOKEN_KIND_ETH", 700));
+      withdrawinle("uwrit.alice"_n, ChainKind::CHAIN_KIND_ETHEREUM, TokenKind::TOKEN_KIND_ETH, 700));
 
-   // After queueing 700, available() should reflect the reservation:
-   // a second queue for 400 should fail (only 300 actually available).
-   BOOST_REQUIRE_EQUAL(
-      error("assertion failure with message: insufficient available balance for withdraw"),
-      queuewtdw("uwrit.alice"_n, "CHAIN_KIND_ETHEREUM", "TOKEN_KIND_ETH", 400));
+   // After queueing 700, available() should reflect the reservation: a
+   // second queue for 400 fails (only 300 actually available). The action
+   // still commits (log-don't-revert), but the latest log entry shows the
+   // rejection.
+   BOOST_REQUIRE_EQUAL(success(),
+      withdrawinle("uwrit.alice"_n, ChainKind::CHAIN_KIND_ETHEREUM, TokenKind::TOKEN_KIND_ETH, 400));
+
+   auto entry = latest_action_log("uwrit.alice"_n);
+   BOOST_REQUIRE(!entry.is_null());
+   BOOST_REQUIRE_EQUAL(false, entry["success"].as_bool());
+   BOOST_REQUIRE_EQUAL(std::string("insufficient available balance for withdraw"),
+                       entry["error_message"].as_string());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(cancelwtdw_removes_pending_request, sysio_opreg_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), setconfig());
    BOOST_REQUIRE_EQUAL(success(), regoperator("uwrit.alice"_n, OPERATOR_TYPE_UNDERWRITER, false));
    BOOST_REQUIRE_EQUAL(success(),
-      deposit("uwrit.alice"_n, "CHAIN_KIND_ETHEREUM", "TOKEN_KIND_ETH", 1000));
+      depositinle("uwrit.alice"_n, ChainKind::CHAIN_KIND_ETHEREUM, TokenKind::TOKEN_KIND_ETH, 1000));
    BOOST_REQUIRE_EQUAL(success(),
-      queuewtdw("uwrit.alice"_n, "CHAIN_KIND_ETHEREUM", "TOKEN_KIND_ETH", 400));
+      withdrawinle("uwrit.alice"_n, ChainKind::CHAIN_KIND_ETHEREUM, TokenKind::TOKEN_KIND_ETH, 400));
 
    BOOST_REQUIRE_EQUAL(success(), cancelwtdw("uwrit.alice"_n, "uwrit.alice"_n, 1));
 
@@ -489,7 +534,7 @@ BOOST_FIXTURE_TEST_CASE(cancelwtdw_removes_pending_request, sysio_opreg_tester) 
 
    // Available should reset, so a fresh full-balance withdraw works.
    BOOST_REQUIRE_EQUAL(success(),
-      queuewtdw("uwrit.alice"_n, "CHAIN_KIND_ETHEREUM", "TOKEN_KIND_ETH", 1000));
+      withdrawinle("uwrit.alice"_n, ChainKind::CHAIN_KIND_ETHEREUM, TokenKind::TOKEN_KIND_ETH, 1000));
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(cancelwtdw_rejects_other_operators_request, sysio_opreg_tester) { try {
@@ -497,9 +542,9 @@ BOOST_FIXTURE_TEST_CASE(cancelwtdw_rejects_other_operators_request, sysio_opreg_
    BOOST_REQUIRE_EQUAL(success(), regoperator("uwrit.alice"_n, OPERATOR_TYPE_UNDERWRITER, false));
    BOOST_REQUIRE_EQUAL(success(), regoperator("uwrit.bob"_n,   OPERATOR_TYPE_UNDERWRITER, false));
    BOOST_REQUIRE_EQUAL(success(),
-      deposit("uwrit.alice"_n, "CHAIN_KIND_ETHEREUM", "TOKEN_KIND_ETH", 1000));
+      depositinle("uwrit.alice"_n, ChainKind::CHAIN_KIND_ETHEREUM, TokenKind::TOKEN_KIND_ETH, 1000));
    BOOST_REQUIRE_EQUAL(success(),
-      queuewtdw("uwrit.alice"_n, "CHAIN_KIND_ETHEREUM", "TOKEN_KIND_ETH", 400));
+      withdrawinle("uwrit.alice"_n, ChainKind::CHAIN_KIND_ETHEREUM, TokenKind::TOKEN_KIND_ETH, 400));
 
    // Bob signing tries to cancel Alice's request — must fail.
    BOOST_REQUIRE_EQUAL(
@@ -513,12 +558,12 @@ BOOST_FIXTURE_TEST_CASE(terminate_marks_status_and_zeros_unlocked_balance, sysio
    BOOST_REQUIRE_EQUAL(success(), setconfig());
    BOOST_REQUIRE_EQUAL(success(), regoperator("batchop.a"_n, OPERATOR_TYPE_BATCH, true));
    BOOST_REQUIRE_EQUAL(success(),
-      deposit("batchop.a"_n, "CHAIN_KIND_ETHEREUM", "TOKEN_KIND_ETH", 500));
+      depositinle("batchop.a"_n, ChainKind::CHAIN_KIND_ETHEREUM, TokenKind::TOKEN_KIND_ETH, 500));
 
    BOOST_REQUIRE_EQUAL(success(), terminate("batchop.a"_n, "rolling-24h: >5% miss rate"));
 
    auto op = get_operator("batchop.a"_n);
-   BOOST_REQUIRE_EQUAL("OPERATOR_STATUS_TERMINATED", op["status"].as_string());
+   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_TERMINATED == op["status"].as<OperatorStatus>());
    BOOST_REQUIRE(op["terminated_at"].as_uint64() > 0);
    // Unlocked portion (== entire balance, since no underwriter locks here)
    // got debited; balance row remains at 0.
@@ -545,7 +590,7 @@ BOOST_FIXTURE_TEST_CASE(releaselock_requires_uwrit_authority, sysio_opreg_tester
    // the deferred-slash / deferred-remit path).
    BOOST_REQUIRE(
       releaselock(OPREG_ACCOUNT, "uwrit.alice"_n,
-                  "CHAIN_KIND_ETHEREUM", "TOKEN_KIND_ETH", 100)
+                  ChainKind::CHAIN_KIND_ETHEREUM, TokenKind::TOKEN_KIND_ETH, 100)
         .find("missing authority of sysio.uwrit") != std::string::npos);
 } FC_LOG_AND_RETHROW() }
 

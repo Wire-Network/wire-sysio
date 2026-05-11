@@ -180,17 +180,10 @@ struct underwriter_plugin::impl {
       for (auto& row : rows.rows) {
          auto obj = row.get_object();
          uint64_t id = obj["id"].as_uint64();
-         // chain_kind may come as string (ABI enum) or int
-         int ck = 0;
-         if (obj["chain_kind"].is_string()) {
-            auto ck_str = obj["chain_kind"].as_string();
-            if (ck_str == "CHAIN_KIND_ETHEREUM") ck = CHAIN_KIND_ETHEREUM;
-            else if (ck_str == "CHAIN_KIND_SOLANA") ck = CHAIN_KIND_SOLANA;
-            else if (ck_str == "CHAIN_KIND_WIRE") ck = CHAIN_KIND_WIRE;
-         } else {
-            ck = static_cast<int>(obj["chain_kind"].as_uint64());
-         }
-         outpost_chain_kinds[id] = static_cast<ChainKind>(ck);
+         // FC_REFLECT_ENUM in sysio/opp/opp.hpp gives us a direct enum
+         // round-trip — the variant carries the symbolic name and `.as<T>()`
+         // recovers the typed value without a string switch.
+         outpost_chain_kinds[id] = obj["chain_kind"].as<ChainKind>();
       }
    }
 
@@ -201,32 +194,6 @@ struct underwriter_plugin::impl {
    void read_credit_lines() {
       credit_lines.clear();
 
-      // Helper: protobuf enum name -> numeric int. Mirror of the inline
-      // string<->enum logic the rest of the plugin uses; centralized here
-      // so additions propagate across both ChainKind / TokenKind reads.
-      auto chain_kind_from = [](const fc::variant& v) -> int {
-         if (v.is_string()) {
-            auto s = v.as_string();
-            if (s == "CHAIN_KIND_ETHEREUM") return CHAIN_KIND_ETHEREUM;
-            if (s == "CHAIN_KIND_SOLANA")   return CHAIN_KIND_SOLANA;
-            if (s == "CHAIN_KIND_WIRE")     return CHAIN_KIND_WIRE;
-            return 0;
-         }
-         return static_cast<int>(v.as_uint64());
-      };
-      auto token_kind_from = [](const fc::variant& v) -> int {
-         if (v.is_string()) {
-            auto s = v.as_string();
-            if (s == "TOKEN_KIND_WIRE")    return 0;     // matches proto value
-            if (s == "TOKEN_KIND_ETH")     return 256;
-            if (s == "TOKEN_KIND_LIQETH")  return 496;
-            if (s == "TOKEN_KIND_SOL")     return 512;
-            if (s == "TOKEN_KIND_LIQSOL")  return 752;
-            return 0;
-         }
-         return static_cast<int>(v.as_uint64());
-      };
-
       auto rows = read_all("sysio.opreg", "sysio.opreg", "operators");
       for (auto& row : rows.rows) {
          auto obj = row.get_object();
@@ -235,7 +202,9 @@ struct underwriter_plugin::impl {
 
          // New schema: per-(chain, token_kind) balance rows on `balances`
          // (replacing the old vector<stake_entry> on `stakes`). Each row
-         // is one credit line directly — no aggregation needed.
+         // is one credit line directly — no aggregation needed. FC_REFLECT_ENUM
+         // in sysio/opp/opp.hpp lets us round-trip the typed enums without a
+         // string-to-int switch.
          if (!obj.contains("balances") || !obj["balances"].is_array()) break;
 
          for (auto& bal_entry : obj["balances"].get_array()) {
@@ -243,8 +212,8 @@ struct underwriter_plugin::impl {
             if (!be.contains("chain") || !be.contains("token_kind")
                 || !be.contains("balance")) continue;
 
-            int     chain   = chain_kind_from(be["chain"]);
-            int     token   = token_kind_from(be["token_kind"]);
+            int     chain   = static_cast<int>(be["chain"].as<ChainKind>());
+            int     token   = static_cast<int>(be["token_kind"].as<TokenKind>());
             uint64_t balance = be["balance"].as_uint64();
             credit_lines.push_back(credit_line{chain, token, balance});
             ilog("underwriter: credit line chain_kind={} token_kind={} balance={}",
@@ -362,41 +331,19 @@ struct underwriter_plugin::impl {
          // New schema: src/dst (chain, token_kind, amount) live directly on
          // the uwreq row (populated by uwrit::createuwreq from the
          // originating SwapRequest). No more parse_swap_from_attestation
-         // detour through sysio.msgch::attestations.
-         auto chain_from = [](const fc::variant& v) -> ChainKind {
-            if (v.is_string()) {
-               auto s = v.as_string();
-               if (s == "CHAIN_KIND_ETHEREUM") return CHAIN_KIND_ETHEREUM;
-               if (s == "CHAIN_KIND_SOLANA")   return CHAIN_KIND_SOLANA;
-               if (s == "CHAIN_KIND_WIRE")     return CHAIN_KIND_WIRE;
-               return CHAIN_KIND_UNKNOWN;
-            }
-            return static_cast<ChainKind>(v.as_uint64());
-         };
-         auto token_from = [](const fc::variant& v) -> TokenKind {
-            if (v.is_string()) {
-               auto s = v.as_string();
-               if (s == "TOKEN_KIND_WIRE")    return static_cast<TokenKind>(0);
-               if (s == "TOKEN_KIND_ETH")     return static_cast<TokenKind>(256);
-               if (s == "TOKEN_KIND_LIQETH")  return static_cast<TokenKind>(496);
-               if (s == "TOKEN_KIND_SOL")     return static_cast<TokenKind>(512);
-               if (s == "TOKEN_KIND_LIQSOL")  return static_cast<TokenKind>(752);
-               return static_cast<TokenKind>(0);
-            }
-            return static_cast<TokenKind>(v.as_uint64());
-         };
-
+         // detour through sysio.msgch::attestations. FC_REFLECT_ENUM in
+         // sysio/opp/opp.hpp provides the variant ↔ typed-enum round-trip.
          if (!obj.contains("src_chain") || !obj.contains("src_amount")
              || !obj.contains("dst_chain") || !obj.contains("dst_amount")) {
             // Row not yet populated (createuwreq writes them inline so this
             // should be unreachable for SWAP-derived UWREQs). Skip safely.
             continue;
          }
-         req.src_chain      = chain_from(obj["src_chain"]);
-         req.src_token_kind = token_from(obj["src_token_kind"]);
+         req.src_chain      = obj["src_chain"].as<ChainKind>();
+         req.src_token_kind = obj["src_token_kind"].as<TokenKind>();
          req.src_amount     = obj["src_amount"].as_uint64();
-         req.dst_chain      = chain_from(obj["dst_chain"]);
-         req.dst_token_kind = token_from(obj["dst_token_kind"]);
+         req.dst_chain      = obj["dst_chain"].as<ChainKind>();
+         req.dst_token_kind = obj["dst_token_kind"].as<TokenKind>();
          req.dst_amount     = obj["dst_amount"].as_uint64();
 
          requests.push_back(std::move(req));
@@ -554,7 +501,7 @@ struct underwriter_plugin::impl {
    /**
     * Solana-side commit submission. The matching `commit_underwrite`
     * Anchor instruction is part of Task 8's follow-up scope (the v1
-    * Solana commit only landed schema + SLASH_OPERATOR dispatch). For now
+    * Solana commit only landed schema + OPERATOR_ACTION dispatch). For now
     * the call falls through to a log so the dual-leg flow on a SOL-touching
     * UWREQ is observable in test clusters even though only the ETH leg
     * actually relays. Once Task 8 follow-up adds `commit_underwrite`, the
