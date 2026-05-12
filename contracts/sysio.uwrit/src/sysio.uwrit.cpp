@@ -2,6 +2,7 @@
 #include <sysio.epoch/sysio.epoch.hpp>
 #include <sysio.opreg/sysio.opreg.hpp>
 #include <sysio.reserv/sysio.reserv.hpp>
+#include <sysio.authex/sysio.authex.hpp>
 #include <sysio/opp/attestations/attestations.pb.hpp>
 #include <zpp_bits.h>
 
@@ -195,6 +196,129 @@ void emit_swap_revert(name self, uint64_t outpost_id, uint64_t attestation_id,
    ).send();
 }
 
+/// Look up the depot's outpost id for `chain` via `sysio.epoch::outposts`.
+/// Returns `std::nullopt` when no outpost is registered for the chain
+/// (per `feedback_no_zero_sentinels` — outpost id 0 is a real id, so
+/// 0 must not double as "missing").
+std::optional<uint64_t> find_outpost_id_for_chain(ChainKind chain) {
+   sysio::epoch::outposts_t outposts(uwrit::EPOCH_ACCOUNT);
+   for (auto it = outposts.begin(); it != outposts.end(); ++it) {
+      if (it->chain_kind == chain) {
+         return it->id;
+      }
+   }
+   return std::nullopt;
+}
+
+/// Build + queue the outbound SWAP_REMIT envelope for a confirmed race.
+///
+/// Fired inline from `try_select_winner` after the depot has committed
+/// to a winning underwriter pair. Two side-effects, both must land in
+/// this transaction:
+///   1. Inline-action `sysio.reserv::debit(dst_chain, dst_amount)` —
+///      decrements `reserve_outpost_amount` so the depot's reserve
+///      view is tight against the outbound SWAP_REMIT. A failed debit
+///      (insufficient reserve) aborts the entire commit; no half-state.
+///   2. Inline-action `sysio.msgch::queueout(dst_outpost_id,
+///      ATTESTATION_TYPE_SWAP_REMIT, encoded)` — pushes the envelope
+///      for the next epoch's outbound drain. The destination outpost's
+///      Reserve.sol (ETH) / opp-outpost Reserve PDA (SOL) handles it
+///      via `_handleSwapRemit` / `handle_swap_remit`.
+void emit_swap_remit(name self,
+                      const uwrit::uw_request_t& req,
+                      name candidate) {
+   // Decode the stored SwapRequest payload so we can populate the
+   // outbound SwapRemit's `recipient` field. The depot otherwise
+   // wouldn't know which address on the destination chain the swap
+   // user wants paid (the row only stores chain/kind/amount summaries).
+   opp::attestations::SwapRequest sr;
+   {
+      auto in = zpp::bits::in{
+         std::span{req.attestation_inbound_data.data(),
+                    req.attestation_inbound_data.size()},
+         zpp::bits::no_size{}};
+      auto rc = in(sr);
+      check(rc == zpp::bits::errc{},
+            "emit_swap_remit: failed to decode stored SwapRequest");
+   }
+
+   auto dst_outpost_opt = find_outpost_id_for_chain(req.dst_chain);
+   check(dst_outpost_opt.has_value(),
+         "emit_swap_remit: no outpost registered for destination chain");
+   const uint64_t dst_outpost_id = *dst_outpost_opt;
+
+   // Reserve debit FIRST — if the reserve is insufficient the entire
+   // commit aborts and the race is unwound by the caller's surrounding
+   // transaction failing. Depot is the ground truth; no half-state.
+   action(
+      permission_level{self, "active"_n},
+      uwrit::RESERVE_ACCOUNT, "debit"_n,
+      std::make_tuple(req.dst_chain,
+                       opp::types::TokenAmount{
+                          .kind   = req.dst_token_kind,
+                          .amount = static_cast<int64_t>(req.dst_amount),
+                       })
+   ).send();
+
+   // Build the SwapRemit. `original_message_id` encodes the uwreq_id
+   // in its low 8 bytes; the destination outpost's reflected SWAP_REMIT
+   // envelope back to msgch's dispatch uses this for the release-trigger
+   // decode (see sysio.msgch.cpp's SWAP_REMIT case).
+   opp::attestations::SwapRemit remit;
+   remit.recipient        = sr.recipient;
+   remit.amount           = opp::types::TokenAmount{
+      .kind   = req.dst_token_kind,
+      .amount = static_cast<int64_t>(req.dst_amount),
+   };
+   remit.original_message_id.assign(32, 0);
+   for (size_t i = 0; i < 8; ++i) {
+      remit.original_message_id[i] =
+         static_cast<char>((req.id >> (i * 8)) & 0xff);
+   }
+   // Resolve the winning underwriter's destination-chain pubkey from
+   // `sysio.authex::links` (`bynamechain` index) so the SwapRemit
+   // carries the underwriter's auditable identity on the dst chain.
+   // The destination outpost cross-references this against the
+   // matching UNDERWRITE_INTENT_COMMIT it already saw on its leg;
+   // downstream auditors / on-chain consumers can verify the
+   // payout against the underwriter that won the race without
+   // back-tracking through the depot.
+   //
+   // An underwriter without an authex link for `dst_chain` cannot be
+   // a valid race winner (they have no on-chain identity there to
+   // commit a signature against). `try_select_winner`'s caller has
+   // already accepted their COMMIT, so this lookup should always
+   // succeed; if it doesn't, abort the commit rather than ship a
+   // SwapRemit with a blank underwriter — auditing depends on the
+   // field being populated.
+   remit.underwriter.kind = req.dst_chain;
+   {
+      sysio::authex::links_t links(uwrit::AUTHEX_ACCOUNT);
+      auto idx = links.get_index<"bynamechain"_n>();
+      const uint128_t key = sysio::to_namechain_key(candidate, req.dst_chain);
+      auto it = idx.find(key);
+      check(it != idx.end(),
+            "emit_swap_remit: winning underwriter has no authex link "
+            "for the destination chain — cannot emit a SwapRemit "
+            "with a blank underwriter address (audit requirement)");
+      remit.underwriter.address = sysio::pubkey_to_bytes(it->pub_key);
+      check(!remit.underwriter.address.empty(),
+            "emit_swap_remit: underwriter's authex pub_key variant index "
+            "unsupported (pubkey_to_bytes returned empty)");
+   }
+   remit.unlock_timestamp = 0;
+
+   auto [encoded, out] = zpp::bits::data_out<char>();
+   (void)out(remit);
+
+   action(
+      permission_level{self, "active"_n},
+      uwrit::MSGCH_ACCOUNT, "queueout"_n,
+      std::make_tuple(dst_outpost_id,
+         opp::types::AttestationType::ATTESTATION_TYPE_SWAP_REMIT, encoded)
+   ).send();
+}
+
 /// Allocate a fresh `lock_id` from the uwcounters singleton.
 uint64_t next_lock_id(name self) {
    uwrit::uwcounters_t ctr_tbl(self);
@@ -377,14 +501,23 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate) {
       }
    });
 
-   // SWAP_REMIT emit — wired up in Task 4 (sysio.msgch dispatch + msgch::queueout
-   // round-trip). The msgch dispatch handles the SWAP_REMIT lifecycle directly;
-   // there is no REMIT_CONFIRM round-trip — the depot is the ground truth and
-   // every SWAP_REMIT is depot-authorized, so success is implicit. Outpost
-   // failures emit SWAP_REJECTED back to the depot which calls
-   // sysio.reserv::onreject to re-add the unremitted amount to the outpost
-   // reserve. The uwreq sits in CONFIRMED status until the expirelock watchdog
-   // fires or msgch's dispatch routes the SWAP_REMIT.
+   // Re-read the row post-modify so emit_swap_remit sees the
+   // CONFIRMED snapshot (and gets a stable copy of the bytes /
+   // chain / amount fields).
+   auto confirmed = reqs.get(pk);
+
+   // Queue the outbound SWAP_REMIT envelope to the destination outpost
+   // + debit the depot's reserve view in the same transaction. Per
+   // protocol: the depot is the ground truth; SWAP_REMIT emission and
+   // the reserve_outpost_amount debit are atomic. The reflected
+   // SWAP_REMIT envelope from the destination outpost back to msgch
+   // triggers `uwrit::release` (the depot doesn't wait on a separate
+   // confirmation message; reflection IS the ack). Outpost-side
+   // failures emit SWAP_REJECTED back, which calls
+   // sysio.reserv::onreject to undo this debit so the depot's view
+   // reconciles with the outpost's actual (still-holding-the-token)
+   // balance.
+   emit_swap_remit(self, confirmed, candidate);
 }
 
 } // anonymous namespace

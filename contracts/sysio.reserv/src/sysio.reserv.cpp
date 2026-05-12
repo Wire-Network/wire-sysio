@@ -194,6 +194,34 @@ void reserve::onreward(opp::types::ChainKind     chain,
 }
 
 // ---------------------------------------------------------------------------
+//  debit — SWAP_REMIT emit-time debit (auth=sysio.uwrit)
+// ---------------------------------------------------------------------------
+void reserve::debit(opp::types::ChainKind     chain,
+                     opp::types::TokenAmount   outpost_amount) {
+   require_auth(UWRIT_ACCOUNT);
+   check(outpost_amount.amount > 0, "outpost_amount must be positive");
+   check(outpost_amount.kind != TokenKind::TOKEN_KIND_WIRE,
+         "debit targets the outpost-side reserve only; WIRE-side debits "
+         "are owned by the staker-payout path");
+
+   reserves_t reserves(get_self());
+   auto pk = reserve_key{pack_chain_token(chain, outpost_amount.kind)};
+   check(reserves.contains(pk),
+         "reserve not provisioned for this (chain, outpost_token); "
+         "cannot debit");
+
+   auto now = current_time_ms();
+   reserves.modify(same_payer, pk, [&](auto& r) {
+      check(r.reserve_outpost_amount.kind == outpost_amount.kind,
+            "outpost_amount.kind mismatches reserve_outpost_amount.kind");
+      check(r.reserve_outpost_amount.amount >= outpost_amount.amount,
+            "insufficient reserve_outpost_amount for SWAP_REMIT debit");
+      r.reserve_outpost_amount.amount -= outpost_amount.amount;
+      r.last_updated_ms = now;
+   });
+}
+
+// ---------------------------------------------------------------------------
 //  onreject — outpost couldn't pay SwapRemit; depot's reserve view re-adds
 //             the unremitted amount so accounting reconciles
 // ---------------------------------------------------------------------------

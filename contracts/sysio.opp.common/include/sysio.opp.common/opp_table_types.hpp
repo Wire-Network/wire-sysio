@@ -415,6 +415,8 @@ DataStream& operator>>(DataStream& ds, UnderwriteConfirm& t) {
 }
 
 // SwapRemit — destination-side payout instruction for a cross-chain swap.
+// (cdt-protoc-gen-zpp emits the same `SwapRemit` C++ struct name; this
+// DataStream pair lives in `sysio::opp::attestations` namespace.)
 // Renamed from `Remit`; the depot is the ground truth, every SwapRemit is
 // depot-authorized. On outpost-side failure, the outpost emits SwapRejected
 // and the token stays in its reserve.

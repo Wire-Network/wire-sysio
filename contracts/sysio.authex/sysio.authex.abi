@@ -14,7 +14,7 @@
             "fields": [
                 {
                     "name": "chain_kind",
-                    "type": "chain_kind_t"
+                    "type": "ChainKind"
                 },
                 {
                     "name": "account",
@@ -58,7 +58,7 @@
                 },
                 {
                     "name": "chain_kind",
-                    "type": "chain_kind_t"
+                    "type": "ChainKind"
                 },
                 {
                     "name": "pub_key",
@@ -116,27 +116,27 @@
     "action_results": [],
     "enums": [
         {
-            "name": "chain_kind_t",
-            "type": "uint8",
+            "name": "ChainKind",
+            "type": "int32",
             "values": [
                 {
-                    "name": "chain_kind_unknown",
+                    "name": "CHAIN_KIND_UNKNOWN",
                     "value": 0
                 },
                 {
-                    "name": "chain_kind_wire",
+                    "name": "CHAIN_KIND_WIRE",
                     "value": 1
                 },
                 {
-                    "name": "chain_kind_ethereum",
+                    "name": "CHAIN_KIND_ETHEREUM",
                     "value": 2
                 },
                 {
-                    "name": "chain_kind_solana",
+                    "name": "CHAIN_KIND_SOLANA",
                     "value": 3
                 },
                 {
-                    "name": "chain_kind_sui",
+                    "name": "CHAIN_KIND_SUI",
                     "value": 4
                 }
             ]
