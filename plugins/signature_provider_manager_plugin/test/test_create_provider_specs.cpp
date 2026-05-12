@@ -18,6 +18,7 @@
 
 #include <gsl-lite/gsl-lite.hpp>
 
+#include <sysio/chain/exceptions.hpp>
 #include <sysio/chain/types.hpp>
 #include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
 
@@ -337,6 +338,61 @@ BOOST_AUTO_TEST_CASE(solana_signature_provider_spec_options) {
    auto providers = mgr.query_providers(fixture1.key_name);
    BOOST_REQUIRE(!providers.empty());
    BOOST_TEST((providers[0]->key_type == chain_key_type_solana));
+}
+
+BOOST_AUTO_TEST_CASE(create_provider_ethereum_kms_spec_routes_through_parser) {
+   // End-to-end check that the plugin's spec parser routes `KMS:` through
+   // `parse_kms_spec` + `make_kms_signature_provider` and returns a provider
+   // whose sign closure is callable. The closure itself is *not* invoked
+   // here — invocation issues a real KMS::Sign request, which lives behind
+   // the env-gated live test in KMS_SIGNING_DESIGN.md §7.
+   using namespace fc::test;
+   using namespace fc::crypto;
+
+   auto clean_app = gsl_lite::finally([]() {
+      appbase::application::reset_app_singleton();
+   });
+
+   keygen_result fixture          = load_keygen_fixture("ethereum", 1);
+   const std::string kms_provider = "KMS:us-east-1:alias/wire-cranker-eth-01";
+   const auto provider_spec       = to_signature_provider_spec(
+      "kms-eth-01", chain_kind_ethereum, chain_key_type_ethereum,
+      fixture.public_key, kms_provider);
+
+   auto  tester = create_app();
+   auto& mgr    = tester->plugin();
+
+   const auto provider = mgr.create_provider(provider_spec);
+
+   BOOST_CHECK_EQUAL(provider->key_name, "kms-eth-01");
+   BOOST_TEST((provider->target_chain == chain_kind_ethereum));
+   BOOST_TEST((provider->key_type == chain_key_type_ethereum));
+   BOOST_CHECK(static_cast<bool>(provider->sign));
+   // KMS-backed providers carry no local private key.
+   BOOST_CHECK(!provider->private_key.has_value());
+}
+
+BOOST_AUTO_TEST_CASE(create_provider_kms_spec_rejects_solana) {
+   // The plugin must reject a KMS spec for a non-secp256k1 chain at parse
+   // time, not at first sign — operators should learn early that KMS
+   // can't sign Solana ed25519.
+   using namespace fc::test;
+   using namespace fc::crypto;
+
+   auto clean_app = gsl_lite::finally([]() {
+      appbase::application::reset_app_singleton();
+   });
+
+   keygen_result fixture          = load_keygen_fixture("solana", 1);
+   const std::string kms_provider = "KMS:us-east-1:alias/test";
+   const auto provider_spec       = to_signature_provider_spec(
+      "kms-sol-01", chain_kind_solana, chain_key_type_solana,
+      fixture.public_key, kms_provider);
+
+   auto  tester = create_app();
+   auto& mgr    = tester->plugin();
+
+   BOOST_CHECK_THROW(mgr.create_provider(provider_spec), sysio::chain::pending_impl_exception);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

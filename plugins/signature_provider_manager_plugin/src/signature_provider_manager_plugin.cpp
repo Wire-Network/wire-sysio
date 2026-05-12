@@ -17,6 +17,8 @@
 #include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
 #include <sysio/http_client_plugin/http_client_plugin.hpp>
 
+#include "kms_signature_provider.hpp"
+
 namespace sysio {
 namespace {
 constexpr auto option_name_kiod_timeout_us = "signature-provider-kiod-timeout-us";
@@ -108,6 +110,17 @@ public:
 
       if (spec_type_str == "KIOD") {
          return {make_kiod_signature_provider(spec_data, public_key), std::nullopt};
+      }
+
+      if (spec_type_str == "KMS") {
+         // KMS-backed signer: the secret never leaves AWS. `make_kms_signature_provider`
+         // validates the key_type / pubkey-variant pairing at construction; the
+         // closure issues KMS::Sign on each invocation, so credentials and
+         // network access are deferred to first sign rather than spec parse.
+         auto ref = sysio::sigprov::kms::parse_kms_spec(spec_data);
+         auto signer = sysio::sigprov::kms::make_kms_signature_provider(
+            ref, key_type, public_key);
+         return {std::move(signer), std::nullopt};
       }
 
       SYS_THROW(chain::plugin_config_exception, "Unsupported key provider type \"{}\"", spec_type_str);
@@ -411,9 +424,16 @@ const char* signature_provider_manager_plugin::signature_provider_help_text() co
       "   <key-type>             key format to parse\n\n"
       "   <public-key>           is a string form of a valid <key-type>\n\n"
       "   <provider-spec>        is a string in the form <provider-type>:<data>\n\n"
-      "       <provider-type>    is KEY, KIOD, or SE\n\n"
+      "       <provider-type>    is KEY, KIOD, KMS, or SE\n\n"
       "       KEY:<private-key>  is a string containing a private key of the key-type specified\n\n"
-      "       KIOD:<url>         is the URL where kiod is available and the appropriate wallet(s) are unlocked\n\n";
+      "       KIOD:<url>         is the URL where kiod is available and the appropriate wallet(s) are unlocked\n\n"
+      "       KMS:<key-ref>      <key-ref> is either a full AWS KMS ARN\n"
+      "                          (arn:aws:kms:<region>:<account>:(key|alias)/<id>) or the\n"
+      "                          shorthand <region>:<key-id-or-alias>. The KMS key must be\n"
+      "                          asymmetric ECC_SECG_P256K1 with usage SIGN_VERIFY; signing\n"
+      "                          uses ECDSA_SHA_256. Credentials come from the standard AWS\n"
+      "                          provider chain (env, shared config, IRSA, IMDS). Currently\n"
+      "                          supports chain_key_type_ethereum only.\n\n";
 }
 
 void signature_provider_manager_plugin::plugin_initialize(const variables_map& options) {
