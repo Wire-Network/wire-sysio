@@ -118,14 +118,14 @@ BOOST_FIXTURE_TEST_CASE(createuwreq_requires_msgch_auth, sysio_uwrit_tester) { t
    // call from another account (uwrit.a here) is rejected.
    BOOST_REQUIRE(push_uwrit_action("uwrit.a"_n, "createuwreq"_n, mvo()
       ("attestation_id", 1)
-      ("type", sysio::opp::types::AttestationType::ATTESTATION_TYPE_SWAP)
+      ("type", sysio::opp::types::AttestationType::ATTESTATION_TYPE_SWAP_REQUEST)
       ("outpost_id", 1)
       ("data", std::vector<char>{})
    ).find("missing authority of sysio.msgch") != std::string::npos);
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(release_requires_msgch_or_self_auth, sysio_uwrit_tester) { try {
-   // release accepts sysio.msgch (REMIT_CONFIRM dispatch path) or sysio.uwrit
+   // release accepts sysio.msgch (SWAP_REMIT dispatch path) or sysio.uwrit
    // (expirelock self-inline path) auth. Anything else is rejected.
    BOOST_REQUIRE(push_uwrit_action("uwrit.a"_n, "release"_n, mvo()
       ("uwreq_id", 1)
