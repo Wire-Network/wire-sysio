@@ -47,7 +47,7 @@
 #include <fc/crypto/private_key.hpp>
 #include <fc/crypto/public_key.hpp>
 #include <fc/crypto/signature.hpp>
-#include <fc-lite/crypto/chain_types.hpp>
+#include <magic_enum/magic_enum.hpp>
 
 #include "contracts.hpp"
 
@@ -130,11 +130,11 @@ std::string contract_em_pubkey_to_string(const fc::crypto::public_key& pk) {
 std::string build_link_message(
    const fc::crypto::public_key& pub_key,
    const std::string& account,
-   fc::crypto::chain_kind_t chain_kind,
+   sysio::opp::types::ChainKind chain_kind,
    uint64_t nonce)
 {
    auto pub_key_str = contract_em_pubkey_to_string(pub_key);
-   auto chain_kind_str = std::to_string(static_cast<uint8_t>(chain_kind));
+   auto chain_kind_str = std::to_string(magic_enum::enum_integer(chain_kind));
    return pub_key_str + "|" + account + "|" + chain_kind_str + "|" +
           std::to_string(nonce) + "|createlink auth";
 }
@@ -297,14 +297,14 @@ public:
       const uint64_t nonce = control->head().block_time().time_since_epoch().count() / 1000;
 
       auto msg = build_link_message(pub, UWRIT_OP.to_string(),
-                                    chain_kind_ethereum, nonce);
+                                    ChainKind::CHAIN_KIND_ETHEREUM, nonce);
       auto msg_hash = keccak256::hash(msg);
       auto sig = priv.sign(fc::sha256(reinterpret_cast<const char*>(msg_hash.data()),
                                       32));
 
       BOOST_REQUIRE_EQUAL(success(), push(AUTHEX_ACCOUNT, authex_abi, UWRIT_OP,
          "createlink"_n, mvo()
-            ("chain_kind", static_cast<uint8_t>(chain_kind_ethereum))
+            ("chain_kind", ChainKind::CHAIN_KIND_ETHEREUM)
             ("account",    UWRIT_OP.to_string())
             ("sig",        sig)
             ("pub_key",    pub)
