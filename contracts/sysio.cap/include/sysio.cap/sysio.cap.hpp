@@ -81,6 +81,31 @@ namespace sysio {
       [[sysio::action]]
       void flushcd(uint32_t current_epoch);
 
+      /// One row of an import batch: a pre-launch holder's WIRE credit on
+      /// `chain`. `native_address` is the raw on-chain key (20 B for ETH,
+      /// 32 B for Solana). `wire_atomic` is denominated in WIRE's 9-decimal
+      /// atomic units; the off-chain converter floors the source pretoken
+      /// value at the 1e9 boundary (sub-atomic dust dropped — total dust
+      /// pool bounded at < num_users * 1 atomic WIRE).
+      struct import_credit {
+         std::vector<char> native_address;
+         int64_t           wire_atomic = 0;
+
+         SYSLIB_SERIALIZE(import_credit, (native_address)(wire_atomic))
+      };
+
+      /// Bootstrap import: privileged, batched insert/update of
+      /// `unmapped_tokens` rows for pre-launch holders. Same `native_address`
+      /// across batches sums into the existing row. Aborts once
+      /// `cap_config::imported_complete` is true (set by `importdone`).
+      [[sysio::action]]
+      void importseed(opp::types::ChainKind chain, std::vector<import_credit> credits);
+
+      /// Finalize the bootstrap import. Flips `imported_complete` to true;
+      /// subsequent `importseed` calls revert.
+      [[sysio::action]]
+      void importdone();
+
       /// Read-only rollup of the staker's spendable (yield-earning) stake on
       /// a given chain. Returns 0 today since position-side principal is not
       /// tracked yet; once lifecycle handlers land, will return

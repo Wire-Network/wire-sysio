@@ -110,6 +110,39 @@
             ]
         },
         {
+            "name": "import_credit",
+            "base": "",
+            "fields": [
+                {
+                    "name": "native_address",
+                    "type": "bytes"
+                },
+                {
+                    "name": "wire_atomic",
+                    "type": "int64"
+                }
+            ]
+        },
+        {
+            "name": "importdone",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "importseed",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain",
+                    "type": "ChainKind"
+                },
+                {
+                    "name": "credits",
+                    "type": "import_credit[]"
+                }
+            ]
+        },
+        {
             "name": "linkswept",
             "base": "",
             "fields": [
@@ -251,6 +284,16 @@
         {
             "name": "flushcd",
             "type": "flushcd",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "importdone",
+            "type": "importdone",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "importseed",
+            "type": "importseed",
             "ricardian_contract": ""
         },
         {

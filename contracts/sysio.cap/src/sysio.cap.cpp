@@ -68,8 +68,8 @@ void cap::linkswept(name wire_account, ChainKind chain, std::vector<char> native
    auto it = idx.find(make_chain_addr_key(chain, native_pubkey));
    if (it == idx.end()) return;
 
-   const asset credit = it->balance;
-   const uint64_t row_id = it->id;
+   const asset    credit_balance = it->balance;
+   const uint64_t row_id         = it->id;
    unmapped.erase(unmapped_key{row_id});
 
    pclaims_t pclaims(get_self());
@@ -77,11 +77,11 @@ void cap::linkswept(name wire_account, ChainKind chain, std::vector<char> native
    if (pit == pclaims.end()) {
       pending_claim row;
       row.wire_account = wire_account;
-      row.balance      = credit;
+      row.balance      = credit_balance;
       pclaims.emplace(get_self(), pclaim_key{wire_account.value}, row);
    } else {
       pclaims.modify(same_payer, pclaim_key{wire_account.value}, [&](auto& row) {
-         row.balance += credit;
+         row.balance += credit_balance;
       });
    }
 }
@@ -100,6 +100,70 @@ void cap::flushcd(uint32_t current_epoch) {
       ++it;
       cdqueue.erase(cd_key{row_id});
    }
+}
+
+// ---------------------------------------------------------------------------
+//  importseed
+// ---------------------------------------------------------------------------
+void cap::importseed(ChainKind chain, std::vector<import_credit> credits) {
+   require_auth(get_self());
+
+   capcfg_t cfg(get_self());
+   const cap_config current_cfg = cfg.get_or_default(cap_config{});
+   check(!current_cfg.imported_complete, "import already finalized");
+
+   if (credits.empty()) return;
+
+   capcounters_t cnt_tbl(get_self());
+   cap_counters counters = cnt_tbl.get_or_default(cap_counters{});
+
+   unmapped_t unmapped(get_self());
+   auto idx = unmapped.template get_index<"bychainad"_n>();
+
+   for (const auto& credit : credits) {
+      check(credit.wire_atomic >= 0, "negative wire_atomic");
+      check(!credit.native_address.empty(), "empty native_address");
+      if (credit.wire_atomic == 0) continue;
+
+      const uint128_t lookup_key = make_chain_addr_key(chain, credit.native_address);
+      const asset add_balance{credit.wire_atomic, WIRE_SYM};
+
+      bool merged = false;
+      for (auto it = idx.lower_bound(lookup_key); it != idx.end(); ++it) {
+         if (it->by_chain_addr() != lookup_key) break;
+         if (it->chain_kind == chain && it->native_pubkey == credit.native_address) {
+            const uint64_t row_id = it->id;
+            unmapped.modify(same_payer, unmapped_key{row_id}, [&](auto& row) {
+               row.balance += add_balance;
+            });
+            merged = true;
+            break;
+         }
+      }
+
+      if (!merged) {
+         unmapped_token row;
+         row.id            = counters.next_unmapped_id++;
+         row.chain_kind    = chain;
+         row.native_pubkey = credit.native_address;
+         row.balance       = add_balance;
+         unmapped.emplace(get_self(), unmapped_key{row.id}, row);
+      }
+   }
+
+   cnt_tbl.set(counters, get_self());
+}
+
+// ---------------------------------------------------------------------------
+//  importdone
+// ---------------------------------------------------------------------------
+void cap::importdone() {
+   require_auth(get_self());
+   capcfg_t cfg(get_self());
+   cap_config current = cfg.get_or_default(cap_config{});
+   check(!current.imported_complete, "import already finalized");
+   current.imported_complete = true;
+   cfg.set(current, get_self());
 }
 
 // ---------------------------------------------------------------------------

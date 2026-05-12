@@ -73,4 +73,40 @@ BOOST_FIXTURE_TEST_CASE(claim_rejects_empty_ledger, sysio_cap_tester) { try {
    BOOST_REQUIRE_NE(result, success());
 } FC_LOG_AND_RETHROW() }
 
+BOOST_FIXTURE_TEST_CASE(importseed_accepts_credit_batch, sysio_cap_tester) { try {
+   std::vector<char> addr(20, char(0xAB));
+   const auto result = push_cap_action(CAP_ACCOUNT, "importseed"_n, mvo
+      ("chain", ChainKind::CHAIN_KIND_ETHEREUM)
+      ("credits", fc::variants{
+         mvo()("native_address", addr)("wire_atomic", 982953049502)
+      })
+   );
+   BOOST_REQUIRE_EQUAL(result, success());
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(importseed_rejects_negative_atomic, sysio_cap_tester) { try {
+   std::vector<char> addr(20, char(0xCD));
+   const auto result = push_cap_action(CAP_ACCOUNT, "importseed"_n, mvo
+      ("chain", ChainKind::CHAIN_KIND_ETHEREUM)
+      ("credits", fc::variants{
+         mvo()("native_address", addr)("wire_atomic", -1)
+      })
+   );
+   BOOST_REQUIRE_NE(result, success());
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(importdone_locks_subsequent_importseed, sysio_cap_tester) { try {
+   BOOST_REQUIRE_EQUAL(
+      push_cap_action(CAP_ACCOUNT, "importdone"_n, mvo{}),
+      success());
+   std::vector<char> addr(20, char(0xEF));
+   const auto result = push_cap_action(CAP_ACCOUNT, "importseed"_n, mvo
+      ("chain", ChainKind::CHAIN_KIND_ETHEREUM)
+      ("credits", fc::variants{
+         mvo()("native_address", addr)("wire_atomic", 1)
+      })
+   );
+   BOOST_REQUIRE_NE(result, success());
+} FC_LOG_AND_RETHROW() }
+
 BOOST_AUTO_TEST_SUITE_END()
