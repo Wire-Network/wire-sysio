@@ -117,43 +117,61 @@ uint64_t cp_output(uint64_t reserve_src, uint64_t reserve_dst, uint64_t src_amou
 }
 
 /// Quote `src_amount` of (src_chain, src_token) into (dst_chain, dst_token)
-/// via the WIRE-paired LPs on sysio.reserve. Returns 0 if any required LP
-/// is missing — caller treats 0 as "no quote available, skip variance check".
-uint64_t reserve_quote(ChainKind src_chain, TokenKind src_token,
-                       ChainKind dst_chain, TokenKind dst_token,
-                       uint64_t src_amount) {
+/// via the WIRE-paired reserves on sysio.reserv. Returns 0 if any required
+/// reserve is missing — caller treats 0 as "no quote available, skip
+/// variance check". Mirrors the math in `sysio.reserv::swapquote` so the
+/// variance check at SWAP_REQUEST receipt time doesn't pay for an inline
+/// action call.
+///
+/// Renamed from `reserve_quote` to `swap_quote` alongside the action-name
+/// rename of `quote` -> `swapquote` on `sysio.reserv`.
+uint64_t swap_quote(ChainKind src_chain, TokenKind src_token,
+                    ChainKind dst_chain, TokenKind dst_token,
+                    uint64_t src_amount) {
    if (src_amount == 0) return 0;
    if (src_token == TokenKind::TOKEN_KIND_WIRE && dst_token == TokenKind::TOKEN_KIND_WIRE) {
       return src_amount;
    }
-   reserve::lps_t lps(uwrit::RESERVE_ACCOUNT);
+   reserve::reserves_t reserves(uwrit::RESERVE_ACCOUNT);
+
+   auto outpost_amt = [](const reserve::reserve_entry& r) -> uint64_t {
+      return r.reserve_outpost_amount.amount < 0
+         ? uint64_t{0}
+         : static_cast<uint64_t>(r.reserve_outpost_amount.amount);
+   };
+   auto wire_amt = [](const reserve::reserve_entry& r) -> uint64_t {
+      return r.reserve_wire_amount.amount < 0
+         ? uint64_t{0}
+         : static_cast<uint64_t>(r.reserve_wire_amount.amount);
+   };
 
    if (src_token == TokenKind::TOKEN_KIND_WIRE) {
-      reserve::lp_key pk{reserve::pack_chain_token(dst_chain, dst_token)};
-      if (!lps.contains(pk)) return 0;
-      auto lp = lps.get(pk);
-      return cp_output(lp.reserve_wire, lp.reserve_paired, src_amount);
+      reserve::reserve_key pk{reserve::pack_chain_token(dst_chain, dst_token)};
+      if (!reserves.contains(pk)) return 0;
+      auto r = reserves.get(pk);
+      return cp_output(wire_amt(r), outpost_amt(r), src_amount);
    }
    if (dst_token == TokenKind::TOKEN_KIND_WIRE) {
-      reserve::lp_key pk{reserve::pack_chain_token(src_chain, src_token)};
-      if (!lps.contains(pk)) return 0;
-      auto lp = lps.get(pk);
-      return cp_output(lp.reserve_paired, lp.reserve_wire, src_amount);
+      reserve::reserve_key pk{reserve::pack_chain_token(src_chain, src_token)};
+      if (!reserves.contains(pk)) return 0;
+      auto r = reserves.get(pk);
+      return cp_output(outpost_amt(r), wire_amt(r), src_amount);
    }
-   reserve::lp_key src_pk{reserve::pack_chain_token(src_chain, src_token)};
-   reserve::lp_key dst_pk{reserve::pack_chain_token(dst_chain, dst_token)};
-   if (!lps.contains(src_pk) || !lps.contains(dst_pk)) return 0;
-   auto src_lp = lps.get(src_pk);
-   auto dst_lp = lps.get(dst_pk);
-   uint64_t intermediate = cp_output(src_lp.reserve_paired, src_lp.reserve_wire, src_amount);
+   reserve::reserve_key src_pk{reserve::pack_chain_token(src_chain, src_token)};
+   reserve::reserve_key dst_pk{reserve::pack_chain_token(dst_chain, dst_token)};
+   if (!reserves.contains(src_pk) || !reserves.contains(dst_pk)) return 0;
+   auto src_r = reserves.get(src_pk);
+   auto dst_r = reserves.get(dst_pk);
+   uint64_t intermediate = cp_output(outpost_amt(src_r), wire_amt(src_r), src_amount);
    if (intermediate == 0) return 0;
-   return cp_output(dst_lp.reserve_wire, dst_lp.reserve_paired, intermediate);
+   return cp_output(wire_amt(dst_r), outpost_amt(dst_r), intermediate);
 }
 
 /// Encode + queue a SWAP_REVERT attestation back to the source outpost when
-/// the variance check fails. The outpost matches the original SWAP via
-/// `original_swap_message_id` (low 8 bytes carry the depot's attestation_id;
-/// see msgch's REMIT_CONFIRM dispatch for the matching decode convention).
+/// the variance check fails. The outpost matches the original SWAP_REQUEST
+/// via `original_swap_message_id` (low 8 bytes carry the depot's
+/// attestation_id; see msgch's SWAP_REMIT dispatch for the matching decode
+/// convention).
 void emit_swap_revert(name self, uint64_t outpost_id, uint64_t attestation_id,
                       const opp::attestations::SwapRequest& sr,
                       const std::string& reason) {
@@ -216,10 +234,10 @@ void uwrit::createuwreq(uint64_t attestation_id,
    check(!reqs.contains(pk),
          "underwrite request already exists for this attestation");
 
-   // Only SWAP attestations create UWREQs — msgch's dispatch routes other
-   // types directly to their handlers, not through createuwreq.
-   check(type == AttestationType::ATTESTATION_TYPE_SWAP,
-         "createuwreq currently supports only SWAP attestations");
+   // Only SWAP_REQUEST attestations create UWREQs — msgch's dispatch routes
+   // other types directly to their handlers, not through createuwreq.
+   check(type == AttestationType::ATTESTATION_TYPE_SWAP_REQUEST,
+         "createuwreq currently supports only SWAP_REQUEST attestations");
 
    SwapRequest sr;
    {
@@ -240,7 +258,7 @@ void uwrit::createuwreq(uint64_t attestation_id,
    const TokenKind dst_token  = sr.target_token;
    const uint64_t  src_amount = static_cast<uint64_t>(static_cast<int64_t>(sr.source_amount.amount));
 
-   uint64_t current_quote = reserve_quote(src_chain, src_token, dst_chain, dst_token, src_amount);
+   uint64_t current_quote = swap_quote(src_chain, src_token, dst_chain, dst_token, src_amount);
    if (current_quote != 0 && sr.quoted_destination_amount != 0) {
       uint64_t quoted   = sr.quoted_destination_amount;
       uint64_t diff     = current_quote > quoted ? current_quote - quoted : quoted - current_quote;
@@ -359,11 +377,14 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate) {
       }
    });
 
-   // REMIT emit — wired up in Task 4 (sysio.msgch dispatch + msgch::queueout
-   // round-trip). The msgch dispatch routes ATTESTATION_TYPE_REMIT_CONFIRM
-   // back into uwrit::release once the destination outpost confirms; this
-   // closes the loop. For now the uwreq sits in CONFIRMED status until the
-   // expirelock watchdog fires or msgch's dispatch routes the REMIT.
+   // SWAP_REMIT emit — wired up in Task 4 (sysio.msgch dispatch + msgch::queueout
+   // round-trip). The msgch dispatch handles the SWAP_REMIT lifecycle directly;
+   // there is no REMIT_CONFIRM round-trip — the depot is the ground truth and
+   // every SWAP_REMIT is depot-authorized, so success is implicit. Outpost
+   // failures emit SWAP_REJECTED back to the depot which calls
+   // sysio.reserv::onreject to re-add the unremitted amount to the outpost
+   // reserve. The uwreq sits in CONFIRMED status until the expirelock watchdog
+   // fires or msgch's dispatch routes the SWAP_REMIT.
 }
 
 } // anonymous namespace

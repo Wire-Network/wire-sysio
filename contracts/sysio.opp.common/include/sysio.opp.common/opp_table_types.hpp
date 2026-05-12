@@ -414,16 +414,34 @@ DataStream& operator>>(DataStream& ds, UnderwriteConfirm& t) {
              >> t.confirmed >> t.error_reason;
 }
 
-// Remit — destination-side payout instruction for a cross-chain swap.
+// SwapRemit — destination-side payout instruction for a cross-chain swap.
+// Renamed from `Remit`; the depot is the ground truth, every SwapRemit is
+// depot-authorized. On outpost-side failure, the outpost emits SwapRejected
+// and the token stays in its reserve.
 template <typename DataStream>
-DataStream& operator<<(DataStream& ds, const Remit& t) {
+DataStream& operator<<(DataStream& ds, const SwapRemit& t) {
    return ds << t.recipient << t.amount << t.original_message_id
              << t.underwriter << t.unlock_timestamp;
 }
 template <typename DataStream>
-DataStream& operator>>(DataStream& ds, Remit& t) {
+DataStream& operator>>(DataStream& ds, SwapRemit& t) {
    return ds >> t.recipient >> t.amount >> t.original_message_id
              >> t.underwriter >> t.unlock_timestamp;
+}
+
+// SwapRejected — outpost cannot pay the SwapRemit; depot's
+// sysio.reserv::onreject adds `unremitted_amount.amount` back to the
+// matching `reserve_outpost_amount` so accounting reconciles with the
+// outpost's actual balance.
+template <typename DataStream>
+DataStream& operator<<(DataStream& ds, const SwapRejected& t) {
+   return ds << t.original_swap_remit_id << t.recipient
+             << t.unremitted_amount << t.reason;
+}
+template <typename DataStream>
+DataStream& operator>>(DataStream& ds, SwapRejected& t) {
+   return ds >> t.original_swap_remit_id >> t.recipient
+             >> t.unremitted_amount >> t.reason;
 }
 
 // ChallengeOperatorHash — field name `operator_` (trailing underscore) because
@@ -532,8 +550,9 @@ DataStream& operator>>(DataStream& ds, NodeOwnerReg& t) {
 }
 
 // StakingReward — the single staker-reward feedback path. Routes to
-// `sysio.reserv::creditlp` plus per-staker WIRE payout based on
-// `share_bps`. Implementation lives in the staking work (separate engineer).
+// `sysio.reserv::onreward` (credits the outpost-side reserve only). The
+// per-staker WIRE payout is a separate next-epoch action owned by the
+// staking work stream (separate engineer).
 template <typename DataStream>
 DataStream& operator<<(DataStream& ds, const StakingReward& t) {
    return ds << t.outpost_id << t.staker_wire_account << t.share_bps

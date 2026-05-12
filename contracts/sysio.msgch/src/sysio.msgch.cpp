@@ -290,7 +290,7 @@ void dispatch_attestation(name self, uint64_t attestation_id,
          dispatch_operator_action(self, data, from_chain, original_message_id);
          break;
 
-      case AttestationType::ATTESTATION_TYPE_SWAP:
+      case AttestationType::ATTESTATION_TYPE_SWAP_REQUEST:
          action(
             permission_level{self, "active"_n},
             UWRIT_ACCOUNT, "createuwreq"_n,
@@ -306,19 +306,24 @@ void dispatch_attestation(name self, uint64_t attestation_id,
          dispatch_underwrite_reject(self, data);
          break;
 
-      case AttestationType::ATTESTATION_TYPE_REMIT_CONFIRM:
-         // Decode just enough to extract the original_message_id which is
-         // the matching uwreq id (createuwreq used the originating SWAP's
-         // attestation id as the uwreq's primary key).
+      case AttestationType::ATTESTATION_TYPE_SWAP_REMIT:
+         // Inbound SWAP_REMIT — the destination outpost reflected our
+         // depot-emitted SwapRemit envelope back to us, which is the
+         // delivery acknowledgement. Use it as the release trigger.
+         //
+         // Renamed from the old REMIT_CONFIRM dispatch (which was a
+         // separate outpost-emitted confirm message — removed; the depot
+         // is the ground truth and every SwapRemit is depot-authorized,
+         // so success is implicit absent SWAP_REJECTED).
          {
-            opp::attestations::Remit remit;
+            opp::attestations::SwapRemit remit;
             auto in = zpp::bits::in{std::span{data.data(), data.size()}, zpp::bits::no_size{}};
             auto rc = in(remit);
             if (rc != zpp::bits::errc{}) break;
             // The original_message_id field encodes the uwreq's 64-bit id in
             // its low 8 bytes; treat the rest as zero-padding from the
             // depot-side encoder. Future task: a dedicated uw_request_id
-            // field on Remit would remove this dependency.
+            // field on SwapRemit would remove this dependency.
             uint64_t uwreq_id = 0;
             const auto& bytes = remit.original_message_id;
             if (bytes.size() >= 8) {
@@ -336,12 +341,52 @@ void dispatch_attestation(name self, uint64_t attestation_id,
          }
          break;
 
-      // The following are out-of-scope for Task 4: handlers land in later
-      // tasks. Falling through means the attestation row is still written
-      // to the `attestations` table for future reprocessing / debug.
-      case AttestationType::ATTESTATION_TYPE_RESERVE_BALANCE_SHEET:
+      case AttestationType::ATTESTATION_TYPE_SWAP_REJECTED:
+         // Destination outpost couldn't pay a SwapRemit; reconcile the
+         // depot's view of the reserve so it matches the outpost's
+         // (still-holding-the-amount) balance.
+         {
+            opp::attestations::SwapRejected rejected;
+            auto in = zpp::bits::in{std::span{data.data(), data.size()}, zpp::bits::no_size{}};
+            auto rc = in(rejected);
+            if (rc != zpp::bits::errc{}) break;
+            action(
+               permission_level{self, "active"_n},
+               "sysio.reserv"_n, "onreject"_n,
+               std::make_tuple(rejected)
+            ).send();
+         }
+         break;
+
       case AttestationType::ATTESTATION_TYPE_STAKING_REWARD:
-         // Routed to sysio.reserve in Task 5.
+         // Outpost-side staker reward — credit the outpost-side reserve.
+         // The matching WIRE-side payout to the staker is a separate
+         // next-epoch action owned by the staking work stream.
+         {
+            opp::attestations::StakingReward sr;
+            auto in = zpp::bits::in{std::span{data.data(), data.size()}, zpp::bits::no_size{}};
+            auto rc = in(sr);
+            if (rc != zpp::bits::errc{}) break;
+            // The reward attestation carries `reward_amount` (TokenAmount)
+            // and is routed by the originating outpost's chain. The
+            // chain comes from the inbound `from_chain` we already have
+            // in scope.
+            action(
+               permission_level{self, "active"_n},
+               "sysio.reserv"_n, "onreward"_n,
+               std::make_tuple(from_chain, sr.reward_amount)
+            ).send();
+         }
+         break;
+
+      case AttestationType::ATTESTATION_TYPE_RESERVE_BALANCE_SHEET:
+         // Per-epoch sanity check from the outpost. The depot is the
+         // ground truth; this is informational. Decode and emit a
+         // diagnostic event but do not auto-mutate the reserve — drift
+         // detection / alerting belongs to off-chain monitors that
+         // tail the chain log. Falling through silently is also
+         // acceptable today; the row is persisted in `attestations`
+         // for post-hoc inspection.
          break;
 
       case AttestationType::ATTESTATION_TYPE_CHALLENGE_REQUEST:
@@ -363,7 +408,6 @@ void dispatch_attestation(name self, uint64_t attestation_id,
       // and deprecated pre-launch types are dropped silently. SLASH was
       // formerly its own attestation type; it now rides on OPERATOR_ACTION
       // with action_type=SLASH and is gated inside `dispatch_operator_action`.
-      case AttestationType::ATTESTATION_TYPE_REMIT:
       case AttestationType::ATTESTATION_TYPE_SWAP_REVERT:
       case AttestationType::ATTESTATION_TYPE_DEPOSIT_REVERT:
       case AttestationType::ATTESTATION_TYPE_OPERATORS:

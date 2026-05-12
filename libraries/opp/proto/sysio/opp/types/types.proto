@@ -136,7 +136,10 @@ enum AttestationType {
   // SLASH is now an OperatorAction sub-type (action_type=ACTION_TYPE_SLASH)
   // carried inside an OPERATOR_ACTION attestation; the standalone
   // SLASH_OPERATOR attestation type has been removed. Slot 60933 left free.
-  ATTESTATION_TYPE_SWAP = 60934; // 0xEE06
+  // Source-outpost-emitted swap intent. Renamed from ATTESTATION_TYPE_SWAP for
+  // clarity; the lifecycle is SWAP_REQUEST -> (variance OK) -> UWREQ ->
+  // (underwriter race + REMIT/SWAP_REMIT) OR (variance bad) -> SWAP_REVERT.
+  ATTESTATION_TYPE_SWAP_REQUEST = 60934; // 0xEE06
   // DEPRECATED — replaced by ATTESTATION_TYPE_UNDERWRITE_INTENT_COMMIT (60953).
   ATTESTATION_TYPE_UNDERWRITE_INTENT = 60935; // 0xEE07
   // DEPRECATED — replaced by the depot-internal race resolver (no on-wire confirm message).
@@ -146,12 +149,21 @@ enum AttestationType {
   ATTESTATION_TYPE_UNDERWRITE_REJECT = 60937; // 0xEE09
   // DEPRECATED — replaced by REMIT / SWAP_REVERT lifecycle (no separate unlock message).
   ATTESTATION_TYPE_UNDERWRITE_UNLOCK = 60938; // 0xEE0A
-  ATTESTATION_TYPE_REMIT = 60944; // 0xEE10
+  // Depot -> destination outpost. Pay the swap recipient out of the destination
+  // outpost's reserve. Renamed from ATTESTATION_TYPE_REMIT; the depot is the
+  // ground truth — every SWAP_REMIT is depot-authorized. If the destination
+  // outpost cannot remit (insufficient reserve, recipient revert, etc.) it
+  // emits ATTESTATION_TYPE_SWAP_REJECTED back to the depot and the token stays
+  // in its reserve.
+  ATTESTATION_TYPE_SWAP_REMIT = 60944; // 0xEE10
   ATTESTATION_TYPE_CHALLENGE_REQUEST = 60945; // 0xEE11
   // DEPRECATED — replaced by `sysio.epoch::advance` internal flow (no on-wire epoch sync).
   ATTESTATION_TYPE_EPOCH_SYNC = 60946; // 0xEE12
   ATTESTATION_TYPE_OPERATORS = 60947; // 0xEE13
-  ATTESTATION_TYPE_REMIT_CONFIRM = 60948; // 0xEE14
+  // 60948 (0xEE14) was ATTESTATION_TYPE_REMIT_CONFIRM — removed; the depot is
+  // the ground truth, every SWAP_REMIT is depot-authorized so success-by-default
+  // applies. Failures are signalled by ATTESTATION_TYPE_SWAP_REJECTED. Slot
+  // left free; do not reuse.
   ATTESTATION_TYPE_BATCH_OPERATOR_GROUPS = 60943; // 0xEE0F
   ATTESTATION_TYPE_NODE_OWNER_REG = 60949; // 0xEE15
   ATTESTATION_TYPE_STAKING_REWARD = 60950; // 0xEE16
@@ -174,6 +186,12 @@ enum AttestationType {
   // chain, operator in non-deposit-eligible state). Outpost matches the
   // referenced original_message_id and refunds the depositor.
   ATTESTATION_TYPE_DEPOSIT_REVERT = 60956;            // 0xEE1C
+  // Destination outpost -> depot. The outpost could not pay the SWAP_REMIT
+  // (insufficient reserve, recipient revert, paused contract, etc.) and the
+  // token remains in its reserve. Depot calls sysio.reserv::onreject which
+  // adds `unremitted_amount.amount` back to `reserve_outpost_amount` so the
+  // depot's view of the reserve reconciles with the outpost's actual balance.
+  ATTESTATION_TYPE_SWAP_REJECTED = 60957;             // 0xEE1D
 }
 
 // ---------------------------------------------------------------------------
