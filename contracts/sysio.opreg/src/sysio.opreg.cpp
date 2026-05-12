@@ -44,7 +44,7 @@ uint128_t make_account_chain_token_key(name account, ChainKind chain, TokenKind 
 std::optional<uint64_t> find_outpost_id_for_chain(ChainKind chain) {
    sysio::epoch::outposts_t outposts(opreg::EPOCH_ACCOUNT);
    for (auto it = outposts.begin(); it != outposts.end(); ++it) {
-      if (static_cast<int>(it->chain_kind) == static_cast<int>(chain)) {
+      if (it->chain_kind == chain) {
          return it->id;
       }
    }
@@ -123,10 +123,9 @@ void opreg::regoperator(name account,
       auto namechain_idx = links.get_index<"bynamechain"_n>();
 
       for (auto op_it = outposts.begin(); op_it != outposts.end(); ++op_it) {
-         // authex uses fc::crypto::chain_kind_t which has identical numeric values
-         // to opp::types::ChainKind (ethereum=2, solana=3, sui=4)
-         auto chain = static_cast<fc::crypto::chain_kind_t>(op_it->chain_kind);
-         uint128_t composite_key = to_namechain_key(account, chain);
+         // authex now keys on `opp::types::ChainKind` directly — same
+         // type as `outpost_info.chain_kind`, no cast.
+         uint128_t composite_key = to_namechain_key(account, op_it->chain_kind);
          auto link_it = namechain_idx.find(composite_key);
          check(link_it != namechain_idx.end(),
                "missing authex link for outpost chain");
@@ -352,35 +351,6 @@ namespace {
 /// (`std::array<unsigned char, 32>`). Other variant arms (WebAuthn = 2,
 /// BLS = 6) are not part of the operator-collateral flow — we drop those by
 /// returning an empty vector, which then fails the `bypubkey` lookup on the
-/// depot side.
-///
-/// `std::get<ecc_public_key>` is ambiguous here (the same alias appears at
-/// indices 0, 1, and 3 in the variant), so we dispatch by index using
-/// `std::get<N>`.
-std::vector<char> pubkey_to_bytes(const sysio::public_key& pk) {
-   switch (pk.index()) {
-      case 0: {
-         const auto& arr = std::get<0>(pk);
-         return std::vector<char>(arr.begin(), arr.end());
-      }
-      case 1: {
-         const auto& arr = std::get<1>(pk);
-         return std::vector<char>(arr.begin(), arr.end());
-      }
-      case 3: {
-         const auto& arr = std::get<3>(pk);
-         return std::vector<char>(arr.begin(), arr.end());
-      }
-      case 4: {
-         const auto& arr = std::get<4>(pk);
-         return std::vector<char>(
-            reinterpret_cast<const char*>(arr.data()),
-            reinterpret_cast<const char*>(arr.data()) + arr.size());
-      }
-      default:
-         return {};
-   }
-}
 
 /// Look up `account`'s registered public key for `chain` from
 /// `sysio.authex::links` (`bynamechain` index) and pack it into a
@@ -388,10 +358,9 @@ std::vector<char> pubkey_to_bytes(const sysio::public_key& pk) {
 /// downstream outpost / depot lookup will then fail gracefully (the depot's
 /// `dispatch_operator_action` rejects empty `op_address.address`).
 opp::types::ChainAddress operator_chain_address(name account, ChainKind chain) {
-   auto authex_chain = static_cast<fc::crypto::chain_kind_t>(chain);
    authex::links_t links(opreg::AUTHEX_ACCOUNT);
    auto idx = links.get_index<"bynamechain"_n>();
-   uint128_t key = to_namechain_key(account, authex_chain);
+   uint128_t key = to_namechain_key(account, chain);
 
    opp::types::ChainAddress addr;
    addr.kind = chain;

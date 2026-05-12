@@ -433,7 +433,7 @@
                     "value": 60932
                 },
                 {
-                    "name": "ATTESTATION_TYPE_SWAP",
+                    "name": "ATTESTATION_TYPE_SWAP_REQUEST",
                     "value": 60934
                 },
                 {
@@ -453,7 +453,7 @@
                     "value": 60938
                 },
                 {
-                    "name": "ATTESTATION_TYPE_REMIT",
+                    "name": "ATTESTATION_TYPE_SWAP_REMIT",
                     "value": 60944
                 },
                 {
@@ -467,10 +467,6 @@
                 {
                     "name": "ATTESTATION_TYPE_OPERATORS",
                     "value": 60947
-                },
-                {
-                    "name": "ATTESTATION_TYPE_REMIT_CONFIRM",
-                    "value": 60948
                 },
                 {
                     "name": "ATTESTATION_TYPE_BATCH_OPERATOR_GROUPS",
@@ -507,6 +503,10 @@
                 {
                     "name": "ATTESTATION_TYPE_DEPOSIT_REVERT",
                     "value": 60956
+                },
+                {
+                    "name": "ATTESTATION_TYPE_SWAP_REJECTED",
+                    "value": 60957
                 }
             ]
         },

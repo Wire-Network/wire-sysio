@@ -58,6 +58,7 @@ namespace sysio {
 
       // Well-known accounts
       static constexpr name MSGCH_ACCOUNT = "sysio.msgch"_n;
+      static constexpr name UWRIT_ACCOUNT = "sysio.uwrit"_n;
 
       // Bancor connector_weight is stored in basis points (10000 = 100%).
       // Pure constant-product corresponds to weight = 5000.
@@ -126,6 +127,33 @@ namespace sysio {
       /// @param rejected   The decoded SwapRejected attestation.
       [[sysio::action]]
       void onreject(opp::attestations::SwapRejected rejected);
+
+      /// Debit the outpost-side reserve at SWAP_REMIT emit time.
+      ///
+      /// Fired inline from `sysio.uwrit::try_select_winner` when a
+      /// race winner is selected and the depot queues the outbound
+      /// SWAP_REMIT envelope. The debit lands in the same transaction
+      /// as the `msgch::queueout` so the depot's view of the reserve
+      /// is always tight — there is no race where the SWAP_REMIT is
+      /// emitted but the reserve hasn't yet been debited.
+      ///
+      /// Per the protocol: the depot's `reserves` table is the
+      /// ground truth. Balance-sheet attestations from outposts are
+      /// match-or-alert signals only; only transaction-driven
+      /// attestations (this debit on SWAP_REMIT emit, onreject on
+      /// SWAP_REJECTED inbound, onreward on STAKING_REWARD inbound)
+      /// mutate `reserve_outpost_amount`.
+      ///
+      /// @param chain            Destination chain whose reserve is being
+      ///                          debited.
+      /// @param outpost_amount   Amount + kind being remitted. Asserts
+      ///                          the kind matches the reserve's
+      ///                          `reserve_outpost_amount.kind` and
+      ///                          that there's enough balance (no
+      ///                          overdraft). Auth=sysio.uwrit.
+      [[sysio::action]]
+      void debit(opp::types::ChainKind     chain,
+                 opp::types::TokenAmount   outpost_amount);
 
       // -----------------------------------------------------------------------
       //  Tables
