@@ -51,6 +51,7 @@ add_subdirectory(sysio.msgch)
 add_subdirectory(sysio.uwrit)
 add_subdirectory(sysio.chalg)
 add_subdirectory(sysio.reserv)
+add_subdirectory(sysio.cap)
 
 add_subdirectory(sysio.token)
 add_subdirectory(sysio.wrap)
