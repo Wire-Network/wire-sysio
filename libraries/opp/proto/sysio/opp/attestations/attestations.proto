@@ -83,8 +83,12 @@ message WireTokenPurchase {
 //                                registered an alternate withdrawal recipient.
 //   SLASH                      — the operator's WIRE account name encoded as bytes with kind=CHAIN_KIND_WIRE.
 //
-// SLASH-only fields (`chain` / `reason` / `lp_target` / `slashed_at_epoch`) are zero / empty for
-// every other action type and are ignored by their handlers.
+// SLASH-only fields (`chain` / `reason`) are zero / empty for every other
+// action type and are ignored by their handlers. (`lp_target` and
+// `slashed_at_epoch` were removed in the operator-collateral refactor —
+// slash routing now derives the reserve target from the chain+token of
+// the seized amount, and the depot's `operator_entry.updated_at` carries
+// the timestamp.)
 message OperatorAction {
   enum ActionType {
     ACTION_TYPE_UNKNOWN          = 0;
@@ -266,13 +270,48 @@ message UnderwriteConfirm {
   string                        error_reason = 4;
 }
 
-// Fund remittance (Depot -> target Outpost).
-message Remit {
+// Swap-payout remittance (Depot -> destination Outpost).
+//
+// The depot is the ground truth — every SwapRemit is depot-authorized
+// (variance check passed, underwriter race resolved). The destination
+// outpost pays the recipient out of its reserve. If the transfer fails
+// (insufficient reserve, recipient revert, paused contract, etc.) the
+// outpost emits SwapRejected back to the depot and the token stays in
+// its reserve; the depot's `sysio.reserv::onreject` re-adds the
+// unremitted amount to `reserve_outpost_amount` so its view of the
+// reserve reconciles.
+//
+// Renamed from `Remit` for clarity (operator collateral has its own
+// WITHDRAW_REMIT carried as an OperatorAction.action_type — distinct
+// flow, distinct field set).
+message SwapRemit {
   sysio.opp.types.ChainAddress recipient = 1;
   sysio.opp.types.TokenAmount  amount = 2;
   bytes                        original_message_id = 3; // 32 bytes
   sysio.opp.types.ChainAddress underwriter = 4;
   uint64                       unlock_timestamp = 5;
+}
+
+// Swap-payout rejection (destination Outpost -> Depot).
+//
+// Emitted when an outpost cannot pay a SwapRemit. The token remains in
+// the outpost's reserve; the depot calls `sysio.reserv::onreject` to
+// re-add `unremitted_amount.amount` to `reserve_outpost_amount` so the
+// depot's accounting reconciles with the outpost's actual balance.
+// Outposts also push the failure onto a local ring buffer for
+// post-hoc inspection.
+message SwapRejected {
+  // 32-byte OPP message id of the SwapRemit attestation that failed.
+  bytes                        original_swap_remit_id = 1;
+  // The recipient the outpost attempted to pay (carried for diagnostic
+  // / cross-reference; depot does not branch on this).
+  sysio.opp.types.ChainAddress recipient = 2;
+  // The amount that could not be paid out and therefore remains in the
+  // outpost's reserve. `kind` matches the original SwapRemit.amount.kind.
+  sysio.opp.types.TokenAmount  unremitted_amount = 3;
+  // Human-readable failure reason — e.g.
+  // "insufficient reserve: needed 1042 SOL, had 800 SOL".
+  string                       reason = 4;
 }
 
 // ---------------------------------------------------------------------------

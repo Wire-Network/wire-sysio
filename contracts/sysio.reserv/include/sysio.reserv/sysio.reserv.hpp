@@ -6,34 +6,51 @@
 #include <sysio/asset.hpp>
 #include <sysio/system.hpp>
 #include <sysio/opp/types/types.pb.hpp>
+#include <sysio/opp/attestations/attestations.pb.hpp>
 
 namespace sysio {
 
    /**
-    * @brief sysio.reserve — per-chain LP / reserve management on WIRE.
+    * @brief sysio.reserv — per-chain reserve / quote management on WIRE.
     *
-    * Per `CLAUDE-WIRE-OPERATOR-COLLATERAL-IMPL-PLAN.md` §1 / Task 5: every
-    * cross-chain LP is paired with WIRE on the depot side. A swap from
-    * `token_a` (chain A) to `token_b` (chain B) routes as
-    * `token_a -> WIRE -> token_b`, hopping through this contract's LP table.
+    * Every cross-chain reserve is paired with WIRE on the depot side: a swap
+    * from `token_a` (chain A) to `token_b` (chain B) routes as
+    * `token_a -> WIRE -> token_b`, hopping through this contract's
+    * `reserves` table. v1 uses **constant-product** pricing (xy = k,
+    * equivalent to a Bancor reserve at `connector_weight = 0.5`). The
+    * `connector_weight_bps` field on `reserve_entry` is reserved for the
+    * asymmetric Bancor extension; today's `swapquote(...)` ignores it.
     *
-    * v1 implements **constant-product** quoting (xy = k, equivalent to a
-    * Bancor LP at `connector_weight = 0.5`). The `connector_weight` field
-    * on `lp_entry` is reserved for the asymmetric Bancor extension; today's
-    * `quote(...)` ignores it and uses pure constant-product math. Quote
-    * formulas (uint128 fixed-point, no overflow on uint64 reserves):
+    * Quote formulas (uint128 fixed-point, no overflow on uint64 amounts):
     *
     *   token -> WIRE:   dW = (rW * dT) / (rT + dT)
     *   WIRE -> token:   dT = (rT * dW) / (rW + dW)
-    *   token -> token:  dW_intermediate = quote(src_chain, src_token, WIRE, src_amount)
-    *                    dst_amount      = quote(WIRE, dst_chain, dst_token, dW_intermediate)
+    *   token -> token:  dW_intermediate = swapquote(src, WIRE, src_amount)
+    *                    dst_amount      = swapquote(WIRE, dst, dW_intermediate)
     *
-    * Read-side consumers (uwrit's variance check, off-chain quote endpoints)
-    * either call `quote(...)` directly or mirror the `lps` table and inline
-    * the math. opreg's slash flow uses the default `ReserveTarget {KIND_LP,
-    * paired_token=token_kind}` construction without consulting this contract
-    * — `resolve_lp` is reserved for the path where the canonical mapping
-    * needs to be overridden (e.g. emergency reroute).
+    * @par Action surface
+    * - `setreserve(chain, outpost_amount, wire_amount, connector_weight_bps)`
+    *   — provision or overwrite a reserve row. Auth=self.
+    * - `swapquote(from_amount, to_chain, to_token) -> TokenAmount` —
+    *   read-only swap pricing endpoint. Returns 0-amount when any required
+    *   reserve is missing; callers treat that as "no quote available; skip
+    *   variance check".
+    * - `onreward(chain, outpost_amount)` — credit the outpost-side reserve
+    *   from a STAKING_REWARD attestation. Auth=sysio.msgch. The WIRE-side
+    *   payout to the staker is a SEPARATE next-epoch action owned by the
+    *   staking work stream; this action only grows
+    *   `reserve_outpost_amount`.
+    * - `onreject(rejected)` — destination outpost could not pay a
+    *   SwapRemit and emitted SwapRejected back; re-add
+    *   `unremitted_amount.amount` to the matching
+    *   `reserve_outpost_amount` so the depot's accounting reconciles
+    *   with the outpost's actual balance. Auth=sysio.msgch.
+    *
+    * @par Schema (post operator-collateral refactor)
+    * The reserve row tracks BOTH the outpost-side and WIRE-side balances
+    * as `TokenAmount` so the kind is explicit in storage and on the wire.
+    * Renamed from the previous `lp_*` schema; the contract account name
+    * `sysio.reserv` is unchanged.
     */
    class [[sysio::contract("sysio.reserv")]] reserve : public contract {
    public:
@@ -51,49 +68,76 @@ namespace sysio {
       //  Actions
       // -----------------------------------------------------------------------
 
-      /// Provision or update an LP. The (chain, paired_token) pair is unique;
-      /// re-calling `setlp` for an existing pair updates its reserves and
-      /// connector weight in place. Reserves are denominated in the chain's
-      /// canonical units (uint64).
+      /// Provision or update a reserve. The (chain, outpost_token) pair is
+      /// unique; re-calling `setreserve` for the same pair updates its
+      /// amounts and connector weight in place.
+      ///
+      /// @param chain                  Outpost chain (ETH, SOL, etc).
+      /// @param outpost_amount         TokenAmount on the outpost side
+      ///                                (e.g. ETH or LIQETH on Ethereum).
+      ///                                `outpost_amount.kind` identifies the
+      ///                                non-WIRE side of the pair.
+      /// @param wire_amount            TokenAmount on the WIRE side. `kind`
+      ///                                must be TOKEN_KIND_WIRE — enforced
+      ///                                with `check(...)`.
+      /// @param connector_weight_bps   Bancor connector weight (5000 = 50%,
+      ///                                pure constant product). Stored but
+      ///                                unused by `swapquote` today.
       [[sysio::action]]
-      void setlp(opp::types::ChainKind chain,
-                 opp::types::TokenKind paired_token,
-                 uint64_t reserve_paired,
-                 uint64_t reserve_wire,
-                 uint32_t connector_weight_bps);
+      void setreserve(opp::types::ChainKind     chain,
+                      opp::types::TokenAmount   outpost_amount,
+                      opp::types::TokenAmount   wire_amount,
+                      uint32_t                  connector_weight_bps);
 
-      /// Read-only quote: how many destination tokens does `src_amount` of
-      /// `(src_chain, src_token)` produce on `(dst_chain, dst_token)`?
-      /// Returns 0 if any required LP is missing (caller's variance check
-      /// should treat 0 as "no LP available; skip variance check").
+      /// Read-only swap quote. Returns a `TokenAmount` carrying the
+      /// destination token kind + amount so callers don't have to track
+      /// the destination kind separately. Returns
+      /// `TokenAmount{ to_token, 0 }` when any required reserve is
+      /// missing (caller's variance check treats 0 as "no quote
+      /// available; skip variance check").
+      ///
+      /// @param from_amount   Source TokenAmount (kind + amount).
+      /// @param to_chain      Destination chain.
+      /// @param to_token      Destination TokenKind.
       [[sysio::action, sysio::read_only]]
-      uint64_t quote(opp::types::ChainKind src_chain,
-                     opp::types::TokenKind src_token,
-                     opp::types::ChainKind dst_chain,
-                     opp::types::TokenKind dst_token,
-                     uint64_t src_amount);
+      opp::types::TokenAmount swapquote(opp::types::TokenAmount   from_amount,
+                                        opp::types::ChainKind     to_chain,
+                                        opp::types::TokenKind     to_token);
 
-      /// Credit an LP's paired-token reserve from a STAKING_REWARD
-      /// attestation. Auth=msgch. Currently unused; will be
-      /// invoked once Task 4's dispatch wires those types in (today they
-      /// fall through to no-op — see msgch's dispatch_attestation).
+      /// Credit an outpost-side reserve from a STAKING_REWARD attestation.
+      /// Auth=sysio.msgch. Only `reserve_outpost_amount` grows; the
+      /// WIRE-side payout to the staker is a separate next-epoch action
+      /// owned by the staking work stream.
+      ///
+      /// @param chain            Outpost chain whose reserve received the reward.
+      /// @param outpost_amount   Amount + kind credited. `kind` must
+      ///                          match the reserve's
+      ///                          `reserve_outpost_amount.kind`.
       [[sysio::action]]
-      void creditlp(opp::types::ChainKind chain,
-                    opp::types::TokenKind paired_token,
-                    uint64_t paired_amount,
-                    uint64_t wire_amount);
+      void onreward(opp::types::ChainKind     chain,
+                    opp::types::TokenAmount   outpost_amount);
+
+      /// Reconcile a failed SwapRemit. Destination outpost could not
+      /// pay the recipient; the token stays in its reserve. Re-add the
+      /// `unremitted_amount.amount` to `reserve_outpost_amount` so the
+      /// depot's view of the reserve matches the outpost's actual
+      /// balance. Auth=sysio.msgch.
+      ///
+      /// @param rejected   The decoded SwapRejected attestation.
+      [[sysio::action]]
+      void onreject(opp::attestations::SwapRejected rejected);
 
       // -----------------------------------------------------------------------
       //  Tables
       // -----------------------------------------------------------------------
 
-      /// Composite primary key: pack chain (high 32 bits) + paired_token
-      /// (low 32 bits) into a single uint64 so the (chain, token) pair is
-      /// unique. Both enums fit comfortably in 32 bits each.
-      struct lp_key {
+      /// Composite primary key: pack chain (high 32 bits) + outpost-side
+      /// TokenKind (low 32 bits) into a single uint64 so the
+      /// (chain, outpost_token) pair is unique.
+      struct reserve_key {
          uint64_t chain_token;
          uint64_t primary_key() const { return chain_token; }
-         SYSLIB_SERIALIZE(lp_key, (chain_token))
+         SYSLIB_SERIALIZE(reserve_key, (chain_token))
       };
 
       static constexpr uint64_t pack_chain_token(opp::types::ChainKind chain,
@@ -102,32 +146,35 @@ namespace sysio {
               | static_cast<uint64_t>(token);
       }
 
-      /// One LP per (chain, paired_token). The WIRE-paired side is implicit;
-      /// every LP holds the paired token + WIRE.
-      struct [[sysio::table("lps")]] lp_entry {
-         opp::types::ChainKind  chain;
-         opp::types::TokenKind  paired_token;
-         uint64_t               reserve_paired           = 0;
-         uint64_t               reserve_wire             = 0;
-         uint32_t               connector_weight_bps     = DEFAULT_CONNECTOR_WEIGHT_BPS;
-         uint64_t               last_updated_ms          = 0;
+      /// One reserve per (chain, outpost_token). The WIRE-paired side is
+      /// implicit; every reserve holds the outpost-side token + WIRE.
+      struct [[sysio::table("reserves")]] reserve_entry {
+         opp::types::ChainKind     chain;
+         /// Outpost-side reserve. `kind` identifies the non-WIRE side
+         /// of the pair (e.g. TOKEN_KIND_ETH or TOKEN_KIND_LIQETH).
+         opp::types::TokenAmount   reserve_outpost_amount;
+         /// WIRE-side reserve. `kind` is always TOKEN_KIND_WIRE.
+         opp::types::TokenAmount   reserve_wire_amount;
+         uint32_t                  connector_weight_bps  = DEFAULT_CONNECTOR_WEIGHT_BPS;
+         uint64_t                  last_updated_ms       = 0;
 
-         /// Composite key matching `lp_key::chain_token` (kept here too so
+         /// Composite key matching `reserve_key::chain_token` (kept here too so
          /// secondary-index lookups by the same key work uniformly).
          uint64_t by_chain_token() const {
-            return pack_chain_token(chain, paired_token);
+            return pack_chain_token(chain, reserve_outpost_amount.kind);
          }
 
-         SYSLIB_SERIALIZE(lp_entry,
-            (chain)(paired_token)(reserve_paired)(reserve_wire)
+         SYSLIB_SERIALIZE(reserve_entry,
+            (chain)(reserve_outpost_amount)(reserve_wire_amount)
             (connector_weight_bps)(last_updated_ms))
       };
 
-      using lps_t = sysio::kv::table<"lps"_n, lp_key, lp_entry>;
+      using reserves_t = sysio::kv::table<"reserves"_n, reserve_key, reserve_entry>;
 
    private:
-      using ChainKind = opp::types::ChainKind;
-      using TokenKind = opp::types::TokenKind;
+      using ChainKind   = opp::types::ChainKind;
+      using TokenKind   = opp::types::TokenKind;
+      using TokenAmount = opp::types::TokenAmount;
    };
 
 } // namespace sysio
