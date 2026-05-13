@@ -50,6 +50,7 @@ namespace sysio {
          MAKE_READ_WASM_ABI(get_block_num_test,    get_block_num_test,    unittests/test-contracts)
          MAKE_READ_WASM_ABI(bench_kv_db,           bench_kv_db,           unittests/test-contracts)
          MAKE_READ_WASM_ABI(test_kv_api,           test_kv_api,           unittests/test-contracts)
+         MAKE_READ_WASM_ABI(kv_intrinsic_probe,    kv_intrinsic_probe,    unittests/test-contracts)
          MAKE_READ_WASM_ABI(bench_kv_shim,         bench_kv_shim,         unittests/test-contracts)
          MAKE_READ_WASM_ABI(bench_kv_shim_token,   bench_kv_shim_token,   unittests/test-contracts)
          MAKE_READ_WASM_ABI(bench_kv_token,        bench_kv_token,        unittests/test-contracts)
