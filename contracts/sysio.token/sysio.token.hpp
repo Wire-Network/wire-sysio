@@ -122,20 +122,28 @@ namespace sysio {
          using transfer_action = sysio::action_wrapper<"transfer"_n, &token::transfer>;
          using open_action = sysio::action_wrapper<"open"_n, &token::open>;
          using close_action = sysio::action_wrapper<"close"_n, &token::close>;
-      private:
+
+         // Account row + key types are public so foreign contracts can read
+         // balances directly via `accounts(token_contract, owner.value)`
+         // without having to mirror the schema. The [[sysio::contract("sysio.token")]]
+         // class attribute pins the table to sysio.token's ABI; it does not
+         // pollute the importer's ABI even when this header is included.
          struct acct_key {
             uint64_t sym_code;
             SYSLIB_SERIALIZE(acct_key, (sym_code))
          };
 
-         struct stat_key {
-            uint64_t sym_code;
-            SYSLIB_SERIALIZE(stat_key, (sym_code))
-         };
-
          struct [[sysio::table("accounts")]] account {
             asset    balance;
             SYSLIB_SERIALIZE(account, (balance))
+         };
+
+         using accounts = kv::scoped_table<"accounts"_n, acct_key, account>;
+
+      private:
+         struct stat_key {
+            uint64_t sym_code;
+            SYSLIB_SERIALIZE(stat_key, (sym_code))
          };
 
          struct [[sysio::table("stat")]] currency_stats {
@@ -145,7 +153,6 @@ namespace sysio {
             SYSLIB_SERIALIZE(currency_stats, (supply)(max_supply)(issuer))
          };
 
-         using accounts = kv::scoped_table<"accounts"_n, acct_key, account>;
          using stats    = kv::scoped_table<"stat"_n, stat_key, currency_stats>;
 
          void sub_balance( const name& owner, const asset& value );

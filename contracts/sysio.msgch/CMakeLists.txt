@@ -35,6 +35,9 @@ if(BUILD_SYSTEM_CONTRACTS)
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.epoch/include>
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.authex/include>
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.system/include>
+                # cdt-cpp ignores -isystem; add vcpkg root explicitly as -I so magic_enum resolves.
+                PRIVATE
+                ${CDT_CONTRACT_INCLUDE_PATH}
         )
 
         target_link_libraries(${target}

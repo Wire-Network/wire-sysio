@@ -14,6 +14,54 @@
             "fields": []
         },
         {
+            "name": "blocklog_entry",
+            "base": "",
+            "fields": [
+                {
+                    "name": "epoch_index",
+                    "type": "uint32"
+                },
+                {
+                    "name": "reason",
+                    "type": "EmissionsBlockReason"
+                },
+                {
+                    "name": "attempted_emission",
+                    "type": "int64"
+                },
+                {
+                    "name": "treasury_remaining",
+                    "type": "int64"
+                },
+                {
+                    "name": "sysio_balance",
+                    "type": "int64"
+                },
+                {
+                    "name": "first_blocked_at",
+                    "type": "uint32"
+                },
+                {
+                    "name": "last_retry_at",
+                    "type": "uint32"
+                },
+                {
+                    "name": "retry_count",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "blocklog_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "epoch_index",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "epoch_config",
             "base": "",
             "fields": [
@@ -207,6 +255,14 @@
     ],
     "tables": [
         {
+            "name": "blocklog",
+            "type": "blocklog_entry",
+            "index_type": "i64",
+            "key_names": ["epoch_index"],
+            "key_types": ["uint64"],
+            "table_id": 60163
+        },
+        {
             "name": "epochcfg",
             "type": "epoch_config",
             "index_type": "i64",
@@ -264,6 +320,32 @@
                 },
                 {
                     "name": "CHAIN_KIND_SUI",
+                    "value": 4
+                }
+            ]
+        },
+        {
+            "name": "EmissionsBlockReason",
+            "type": "int32",
+            "values": [
+                {
+                    "name": "EMISSIONS_BLOCK_REASON_UNSPECIFIED",
+                    "value": 0
+                },
+                {
+                    "name": "EMISSIONS_BLOCK_REASON_CONFIG_MISSING",
+                    "value": 1
+                },
+                {
+                    "name": "EMISSIONS_BLOCK_REASON_STATE_UNINITIALIZED",
+                    "value": 2
+                },
+                {
+                    "name": "EMISSIONS_BLOCK_REASON_TREASURY_EXHAUSTED",
+                    "value": 3
+                },
+                {
+                    "name": "EMISSIONS_BLOCK_REASON_BALANCE_INSUFFICIENT",
                     "value": 4
                 }
             ]

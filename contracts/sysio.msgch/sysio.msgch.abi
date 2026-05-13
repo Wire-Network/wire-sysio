@@ -630,6 +630,10 @@
                 {
                     "name": "ATTESTATION_TYPE_DEPOSIT_REVERT",
                     "value": 60956
+                },
+                {
+                    "name": "ATTESTATION_TYPE_EMISSIONS_BLOCKED",
+                    "value": 60957
                 }
             ]
         },

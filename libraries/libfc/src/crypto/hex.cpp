@@ -25,8 +25,8 @@ std::string to_hex(const char* d, uint32_t s, bool add_prefix) {
    return r;
 }
 
-size_t from_hex(const std::string& hex_str, char* out_data, size_t out_data_len) {
-   std::string::const_iterator i       = hex_str.begin();
+size_t from_hex(std::string_view hex_str, char* out_data, size_t out_data_len) {
+   auto                        i       = hex_str.begin();
    uint8_t*                    out_pos = (uint8_t*)out_data;
    uint8_t*                    out_end = out_pos + out_data_len;
    while (i != hex_str.end() && out_end != out_pos) {

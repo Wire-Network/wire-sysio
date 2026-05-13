@@ -641,8 +641,9 @@ int64_t apply_context::kv_set(uint16_t table_id, uint64_t payer_val, const char*
       }
 
       // Capture old value for deep_mind before modify (old_payer already captured above)
+      auto dm_logger = control.get_deep_mind_logger(trx_context.is_transient());
       std::string old_value_copy;
-      if (auto dm_logger = control.get_deep_mind_logger(trx_context.is_transient())) {
+      if (dm_logger) {
          old_value_copy.assign(itr->value.data(), itr->value.size());
       }
 
@@ -651,7 +652,7 @@ int64_t apply_context::kv_set(uint16_t table_id, uint64_t payer_val, const char*
          o.value.assign(value, value_size);
       });
 
-      if (auto dm_logger = control.get_deep_mind_logger(trx_context.is_transient())) {
+      if (dm_logger) {
          dm_logger->on_kv_set(*itr, false, old_payer, old_value_copy.data(), old_value_copy.size());
       }
 
@@ -724,8 +725,9 @@ int32_t apply_context::kv_contains(uint16_t table_id, name code, const char* key
 // --- Primary KV iterators ---
 
 uint32_t apply_context::kv_it_create(uint16_t table_id, name code, const char* prefix, uint32_t prefix_size) {
-   const uint32_t handle = kv_iterators.allocate_primary(table_id, code, prefix, prefix_size);
-   auto& slot = kv_iterators.get(handle);
+   kv_check_prefix_size(prefix_size);
+   const uint32_t handle = kv_primary_iterators.allocate(table_id, code, prefix, prefix_size);
+   auto& slot = kv_primary_iterators.get(handle);
 
    // Seek to first entry matching prefix
    const auto& idx = db.get_index<kv_index, by_code_key>();
@@ -743,16 +745,16 @@ uint32_t apply_context::kv_it_create(uint16_t table_id, name code, const char* p
 }
 
 void apply_context::kv_it_destroy(uint32_t handle) {
-   kv_iterators.release(handle);
+   kv_primary_iterators.release(validate_primary_handle(handle, "kv_it_destroy"));
 }
 
 int32_t apply_context::kv_it_status(uint32_t handle) {
-   return static_cast<int32_t>(kv_iterators.get(handle).status);
+   auto& slot = kv_primary_iterators.get(validate_primary_handle(handle, "kv_it_status"));
+   return static_cast<int32_t>(slot.status);
 }
 
 int32_t apply_context::kv_it_next(uint32_t handle) {
-   auto& slot = kv_iterators.get(handle);
-   SYS_ASSERT(slot.is_primary, kv_invalid_iterator, "kv_it_next called on secondary iterator");
+   auto& slot = kv_primary_iterators.get(validate_primary_handle(handle, "kv_it_next"));
 
    if (slot.status == kv_it_stat::iterator_end) return static_cast<int32_t>(kv_it_stat::iterator_end);
 
@@ -789,8 +791,7 @@ int32_t apply_context::kv_it_next(uint32_t handle) {
 }
 
 int32_t apply_context::kv_it_prev(uint32_t handle) {
-   auto& slot = kv_iterators.get(handle);
-   SYS_ASSERT(slot.is_primary, kv_invalid_iterator, "kv_it_prev called on secondary iterator");
+   auto& slot = kv_primary_iterators.get(validate_primary_handle(handle, "kv_it_prev"));
 
    const auto& idx = db.get_index<kv_index, by_code_key>();
 
@@ -857,8 +858,7 @@ int32_t apply_context::kv_it_prev(uint32_t handle) {
 }
 
 int32_t apply_context::kv_it_lower_bound(uint32_t handle, const char* key, uint32_t key_size) {
-   auto& slot = kv_iterators.get(handle);
-   SYS_ASSERT(slot.is_primary, kv_invalid_iterator, "kv_it_lower_bound called on secondary iterator");
+   auto& slot = kv_primary_iterators.get(validate_primary_handle(handle, "kv_it_lower_bound"));
 
    const auto& idx = db.get_index<kv_index, by_code_key>();
 
@@ -884,7 +884,7 @@ int32_t apply_context::kv_it_lower_bound(uint32_t handle, const char* key, uint3
 
 // Helper: find the current primary row by cached ID (fast) or key bytes (slow).
 // Updates cached_id on success. Returns nullptr if the row was erased.
-static const kv_object* find_current_primary(const chainbase::database& db, kv_iterator_slot& slot) {
+static const kv_object* find_current_primary(const chainbase::database& db, kv_primary_slot& slot) {
    // Fast path: by cached chainbase ID
    if (slot.cached_id >= 0) {
       const auto* obj = db.find<kv_object>(kv_object::id_type(slot.cached_id));
@@ -904,8 +904,7 @@ static const kv_object* find_current_primary(const chainbase::database& db, kv_i
 }
 
 int32_t apply_context::kv_it_key(uint32_t handle, uint32_t offset, char* dest, uint32_t dest_size, uint32_t& actual_size) {
-   auto& slot = kv_iterators.get(handle);
-   SYS_ASSERT(slot.is_primary, kv_invalid_iterator, "kv_it_key called on secondary iterator");
+   auto& slot = kv_primary_iterators.get(validate_primary_handle(handle, "kv_it_key"));
 
    if (slot.status != kv_it_stat::iterator_ok) {
       actual_size = 0;
@@ -929,8 +928,7 @@ int32_t apply_context::kv_it_key(uint32_t handle, uint32_t offset, char* dest, u
 }
 
 int32_t apply_context::kv_it_value(uint32_t handle, uint32_t offset, char* dest, uint32_t dest_size, uint32_t& actual_size) {
-   auto& slot = kv_iterators.get(handle);
-   SYS_ASSERT(slot.is_primary, kv_invalid_iterator, "kv_it_value called on secondary iterator");
+   auto& slot = kv_primary_iterators.get(validate_primary_handle(handle, "kv_it_value"));
 
    if (slot.status != kv_it_stat::iterator_ok) {
       actual_size = 0;
@@ -1029,14 +1027,19 @@ void apply_context::kv_idx_update(uint64_t payer_val, uint16_t table_id,
       }
    }
 
-   // Remove old and create new (secondary_key is part of index key, can't modify in-place)
-   db.remove(*itr);
-   db.create<kv_index_object>([&](auto& o) {
-      o.code = receiver;
+   // db.modify preserves the kv_index_object's chainbase id but moves it to a
+   // new sort position when sec_key changes. Live secondary iterators that
+   // cached this id would otherwise advance from the post-modify position and
+   // skip entries. Invalidate the cached id on any matching slot so the next
+   // op falls back to the slow re-seek using the saved old key bytes,
+   // matching the prior remove+create observable behavior.
+   kv_secondary_iterators.invalidate_cache(receiver, table_id, itr->id._id);
+
+   // undo_index::post_modify handles AVL tree rebalancing when composite
+   // index key fields change, avoiding node dealloc/realloc overhead.
+   db.modify(*itr, [&](auto& o) {
       o.payer = payer;
-      o.table_id = table_id;
       o.sec_key.assign(new_sec_key, new_sec_key_size);
-      o.pri_key.assign(pri_key, pri_key_size);
    });
 }
 
@@ -1051,13 +1054,13 @@ int32_t apply_context::kv_idx_find_secondary(name code, uint16_t table_id,
       return -1; // not found — no iterator slot allocated
    }
 
-   const uint32_t handle = kv_iterators.allocate_secondary(code, table_id);
-   auto& slot = kv_iterators.get(handle);
+   const uint32_t slot_index = kv_secondary_iterators.allocate(code, table_id);
+   auto& slot = kv_secondary_iterators.get(slot_index);
    slot.status = kv_it_stat::iterator_ok;
    slot.current_sec_key.assign(itr->sec_key.data(), itr->sec_key.data() + itr->sec_key.size());
    slot.current_pri_key.assign(itr->pri_key.data(), itr->pri_key.data() + itr->pri_key.size());
    slot.cached_id = itr->id._id;
-   return static_cast<int32_t>(handle);
+   return static_cast<int32_t>(kv_make_secondary_handle(slot_index));
 }
 
 int32_t apply_context::kv_idx_lower_bound(name code, uint16_t table_id,
@@ -1069,26 +1072,25 @@ int32_t apply_context::kv_idx_lower_bound(name code, uint16_t table_id,
    if (itr == idx.end() || itr->code != code || itr->table_id != table_id) {
       auto first = idx.lower_bound(boost::make_tuple(code, table_id));
       if (first != idx.end() && first->code == code && first->table_id == table_id) {
-         const uint32_t handle = kv_iterators.allocate_secondary(code, table_id);
-         auto& slot = kv_iterators.get(handle);
+         const uint32_t slot_index = kv_secondary_iterators.allocate(code, table_id);
+         auto& slot = kv_secondary_iterators.get(slot_index);
          slot.status = kv_it_stat::iterator_end;
-         return static_cast<int32_t>(handle);
+         return static_cast<int32_t>(kv_make_secondary_handle(slot_index));
       }
       return -1;
    }
 
-   const uint32_t handle = kv_iterators.allocate_secondary(code, table_id);
-   auto& slot = kv_iterators.get(handle);
+   const uint32_t slot_index = kv_secondary_iterators.allocate(code, table_id);
+   auto& slot = kv_secondary_iterators.get(slot_index);
    slot.status = kv_it_stat::iterator_ok;
    slot.current_sec_key.assign(itr->sec_key.data(), itr->sec_key.data() + itr->sec_key.size());
    slot.current_pri_key.assign(itr->pri_key.data(), itr->pri_key.data() + itr->pri_key.size());
    slot.cached_id = itr->id._id;
-   return static_cast<int32_t>(handle);
+   return static_cast<int32_t>(kv_make_secondary_handle(slot_index));
 }
 
 int32_t apply_context::kv_idx_next(uint32_t handle) {
-   auto& slot = kv_iterators.get(handle);
-   SYS_ASSERT(!slot.is_primary, kv_invalid_iterator, "kv_idx_next called on primary iterator");
+   auto& slot = kv_secondary_iterators.get(validate_secondary_handle(handle, "kv_idx_next"));
 
    if (slot.status == kv_it_stat::iterator_end) return static_cast<int32_t>(kv_it_stat::iterator_end);
 
@@ -1128,8 +1130,7 @@ int32_t apply_context::kv_idx_next(uint32_t handle) {
 }
 
 int32_t apply_context::kv_idx_prev(uint32_t handle) {
-   auto& slot = kv_iterators.get(handle);
-   SYS_ASSERT(!slot.is_primary, kv_invalid_iterator, "kv_idx_prev called on primary iterator");
+   auto& slot = kv_secondary_iterators.get(validate_secondary_handle(handle, "kv_idx_prev"));
 
    const auto& idx = db.get_index<kv_index_index, by_code_table_id_seckey>();
 
@@ -1192,7 +1193,7 @@ int32_t apply_context::kv_idx_prev(uint32_t handle) {
 }
 
 // Helper: find the current secondary entry by cached ID (fast) or key bytes (slow).
-static const kv_index_object* find_current_secondary(const chainbase::database& db, kv_iterator_slot& slot) {
+static const kv_index_object* find_current_secondary(const chainbase::database& db, kv_secondary_slot& slot) {
    if (slot.cached_id >= 0) {
       const auto* obj = db.find<kv_index_object>(kv_index_object::id_type(slot.cached_id));
       if (obj && obj->code == slot.code && obj->table_id == slot.table_id)
@@ -1211,8 +1212,7 @@ static const kv_index_object* find_current_secondary(const chainbase::database& 
 }
 
 int32_t apply_context::kv_idx_key(uint32_t handle, uint32_t offset, char* dest, uint32_t dest_size, uint32_t& actual_size) {
-   auto& slot = kv_iterators.get(handle);
-   SYS_ASSERT(!slot.is_primary, kv_invalid_iterator, "kv_idx_key called on primary iterator");
+   auto& slot = kv_secondary_iterators.get(validate_secondary_handle(handle, "kv_idx_key"));
 
    if (slot.status != kv_it_stat::iterator_ok) {
       actual_size = 0;
@@ -1236,8 +1236,7 @@ int32_t apply_context::kv_idx_key(uint32_t handle, uint32_t offset, char* dest, 
 }
 
 int32_t apply_context::kv_idx_primary_key(uint32_t handle, uint32_t offset, char* dest, uint32_t dest_size, uint32_t& actual_size) {
-   auto& slot = kv_iterators.get(handle);
-   SYS_ASSERT(!slot.is_primary, kv_invalid_iterator, "kv_idx_primary_key called on primary iterator");
+   auto& slot = kv_secondary_iterators.get(validate_secondary_handle(handle, "kv_idx_primary_key"));
 
    if (slot.status != kv_it_stat::iterator_ok) {
       actual_size = 0;
@@ -1261,7 +1260,7 @@ int32_t apply_context::kv_idx_primary_key(uint32_t handle, uint32_t offset, char
 }
 
 void apply_context::kv_idx_destroy(uint32_t handle) {
-   kv_iterators.release(handle);
+   kv_secondary_iterators.release(validate_secondary_handle(handle, "kv_idx_destroy"));
 }
 
 } /// sysio::chain
