@@ -61,9 +61,13 @@ namespace sysio {
       // Rolling delivery-buffer thresholds for batch-op termination. Per the
       // plan §1: missing a delivery is NOT a slash; consistent missing IS
       // grounds for administrative termination.
-      static constexpr uint32_t TERMINATE_MAX_CONSECUTIVE_MISSES = 3;
-      static constexpr uint32_t TERMINATE_MAX_PCT_MISSES_24H     = 5;   // percent
-      static constexpr uint64_t TERMINATE_WINDOW_MS              = 24ULL * 60 * 60 * 1000;
+      //
+      // All three thresholds live in `op_config` so tests can override them
+      // without recompiling. These `DEFAULT_*` constants are the values
+      // production bootstrap should install.
+      static constexpr uint32_t DEFAULT_TERMINATE_MAX_CONSECUTIVE_MISSES = 5;
+      static constexpr uint32_t DEFAULT_TERMINATE_MAX_PCT_MISSES_24H     = 5;   // percent
+      static constexpr uint64_t DEFAULT_TERMINATE_WINDOW_MS              = 24ULL * 60 * 60 * 1000;
 
       // Per-operator audit log: ring-buffer cap (newest-in / oldest-out) and
       // per-entry error_message length cap. Operators read recent_actions to
@@ -76,12 +80,19 @@ namespace sysio {
       //  Actions
       // -----------------------------------------------------------------------
 
-      /// Set operator registry configuration.
+      /// Set operator registry configuration. The three `terminate_*`
+      /// thresholds drive `termcheck`'s rolling-buffer evaluation; tests
+      /// can dial them down (e.g. `terminate_max_consecutive_misses=2`,
+      /// `terminate_window_ms=60_000`) to make the miss → terminate path
+      /// observable inside a flow-test's timeout budget.
       [[sysio::action]]
       void setconfig(uint32_t max_available_producers,
                      uint32_t max_available_batch_ops,
                      uint32_t max_available_underwriters,
-                     uint64_t terminate_prune_delay_ms);
+                     uint64_t terminate_prune_delay_ms,
+                     uint32_t terminate_max_consecutive_misses,
+                     uint32_t terminate_max_pct_misses_24h,
+                     uint64_t terminate_window_ms);
 
       /// Register a new operator.
       [[sysio::action]]
@@ -108,15 +119,20 @@ namespace sysio {
       /// funds get refunded to the depositor (minus the outpost-side gas
       /// penalty). Reverting would abort the entire envelope's dispatch.
       ///
-      /// `actor` is the depositor's source-chain address (refund target on
-      /// DEPOSIT_REVERT). `original_message_id` is the OPP message id of
-      /// the inbound DEPOSIT_REQUEST attestation — outposts match on it to
-      /// scope the refund to one specific in-flight deposit.
+      /// `actor_chain` + `actor_address` form the depositor's source-chain
+      /// `ChainAddress` (refund target on DEPOSIT_REVERT). They're split
+      /// here per the no-proto-messages-in-actions rule —
+      /// `opp::types::ChainAddress` would leak `bytes` typedefs into the
+      /// ABI. `original_message_id` is the OPP message id of the inbound
+      /// DEPOSIT_REQUEST attestation — outposts match on it to scope the
+      /// refund to one specific in-flight deposit.
       [[sysio::action]]
       void depositinle(name account,
                        opp::types::ChainKind chain,
-                       opp::types::TokenAmount amount,
-                       opp::types::ChainAddress actor,
+                       opp::types::TokenKind token_kind,
+                       uint64_t amount,
+                       opp::types::ChainKind actor_chain,
+                       std::vector<char> actor_address,
                        checksum256 original_message_id);
 
       /// Operator-callable: queue a WIRE-direct collateral withdrawal subject
@@ -138,7 +154,8 @@ namespace sysio {
       [[sysio::action]]
       void withdrawinle(name account,
                         opp::types::ChainKind chain,
-                        opp::types::TokenAmount amount);
+                        opp::types::TokenKind token_kind,
+                        uint64_t amount);
 
       /// Operator-callable: cancel a previously-queued withdrawal before it
       /// flushes. The reserved amount rejoins the operator's `available()`.
@@ -191,7 +208,8 @@ namespace sysio {
       [[sysio::action]]
       void releaselock(name account,
                        opp::types::ChainKind chain,
-                       opp::types::TokenAmount amount);
+                       opp::types::TokenKind token_kind,
+                       uint64_t amount);
 
       /// Record per-batch-op delivery hit/miss for the rolling 24h buffer.
       /// Called inline from `sysio.epoch::advance` after each delivery cycle.
@@ -299,15 +317,19 @@ namespace sysio {
          std::vector<chain_min_bond> req_prod_collat;
          std::vector<chain_min_bond> req_batchop_collat;
          std::vector<chain_min_bond> req_uw_collat;
-         uint32_t max_available_producers    = 21;
-         uint32_t max_available_batch_ops    = 63;
-         uint32_t max_available_underwriters = 21;
-         uint64_t terminate_prune_delay_ms   = 86400000; // 24hrs
+         uint32_t max_available_producers          = 21;
+         uint32_t max_available_batch_ops          = 63;
+         uint32_t max_available_underwriters       = 21;
+         uint64_t terminate_prune_delay_ms         = 86400000; // 24hrs
+         uint32_t terminate_max_consecutive_misses = DEFAULT_TERMINATE_MAX_CONSECUTIVE_MISSES;
+         uint32_t terminate_max_pct_misses_24h     = DEFAULT_TERMINATE_MAX_PCT_MISSES_24H;
+         uint64_t terminate_window_ms              = DEFAULT_TERMINATE_WINDOW_MS;
 
          SYSLIB_SERIALIZE(op_config,
             (req_prod_collat)(req_batchop_collat)(req_uw_collat)
             (max_available_producers)(max_available_batch_ops)(max_available_underwriters)
-            (terminate_prune_delay_ms))
+            (terminate_prune_delay_ms)
+            (terminate_max_consecutive_misses)(terminate_max_pct_misses_24h)(terminate_window_ms))
       };
 
       using opconfig_t = sysio::kv::global<"opconfig"_n, op_config>;

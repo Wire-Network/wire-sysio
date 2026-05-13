@@ -59,20 +59,31 @@ std::optional<uint64_t> find_outpost_id_for_chain(ChainKind chain) {
 void opreg::setconfig(uint32_t max_available_producers,
                       uint32_t max_available_batch_ops,
                       uint32_t max_available_underwriters,
-                      uint64_t terminate_prune_delay_ms) {
+                      uint64_t terminate_prune_delay_ms,
+                      uint32_t terminate_max_consecutive_misses,
+                      uint32_t terminate_max_pct_misses_24h,
+                      uint64_t terminate_window_ms) {
    require_auth(get_self());
 
    check(max_available_producers > 0, "max_available_producers must be positive");
    check(max_available_batch_ops > 0, "max_available_batch_ops must be positive");
    check(max_available_underwriters > 0, "max_available_underwriters must be positive");
    check(terminate_prune_delay_ms > 0, "terminate_prune_delay_ms must be positive");
+   check(terminate_max_consecutive_misses > 0,
+         "terminate_max_consecutive_misses must be positive");
+   check(terminate_max_pct_misses_24h > 0 && terminate_max_pct_misses_24h <= 100,
+         "terminate_max_pct_misses_24h must be in (0, 100]");
+   check(terminate_window_ms > 0, "terminate_window_ms must be positive");
 
    opconfig_t cfg_tbl(get_self());
    op_config cfg = cfg_tbl.get_or_default(op_config{});
-   cfg.max_available_producers = max_available_producers;
-   cfg.max_available_batch_ops = max_available_batch_ops;
-   cfg.max_available_underwriters = max_available_underwriters;
-   cfg.terminate_prune_delay_ms = terminate_prune_delay_ms;
+   cfg.max_available_producers          = max_available_producers;
+   cfg.max_available_batch_ops          = max_available_batch_ops;
+   cfg.max_available_underwriters       = max_available_underwriters;
+   cfg.terminate_prune_delay_ms         = terminate_prune_delay_ms;
+   cfg.terminate_max_consecutive_misses = terminate_max_consecutive_misses;
+   cfg.terminate_max_pct_misses_24h     = terminate_max_pct_misses_24h;
+   cfg.terminate_window_ms              = terminate_window_ms;
    cfg_tbl.set(cfg, get_self());
 }
 
@@ -685,17 +696,15 @@ void opreg::withdraw(name account, uint64_t amount) {
 // once the underlying condition resolves.
 void opreg::withdrawinle(name account,
                          opp::types::ChainKind chain,
-                         opp::types::TokenAmount amount) {
+                         opp::types::TokenKind token_kind,
+                         uint64_t amount) {
    require_auth(get_self());
 
    operators_t ops(get_self());
    auto op_pk = operator_key{account.value};
 
-   const TokenKind token_kind = amount.kind;
-   const uint64_t  raw_amount = static_cast<uint64_t>(static_cast<int64_t>(amount.amount));
-
-   auto result = try_enqueue_withdraw(account, chain, token_kind, raw_amount);
-   auto action = build_withdraw_request_action(account, chain, token_kind, raw_amount,
+   auto result = try_enqueue_withdraw(account, chain, token_kind, amount);
+   auto action = build_withdraw_request_action(account, chain, token_kind, amount,
                                                result.request_id);
    append_action_log(ops, op_pk, action, result.success, std::move(result.error_message));
 }
@@ -806,21 +815,28 @@ void opreg::deposit(name account, uint64_t amount) {
 // penalty, computed locally on the outpost when the revert is processed).
 void opreg::depositinle(name account,
                         opp::types::ChainKind chain,
-                        opp::types::TokenAmount amount,
-                        opp::types::ChainAddress actor,
+                        opp::types::TokenKind token_kind,
+                        uint64_t amount,
+                        opp::types::ChainKind actor_chain,
+                        std::vector<char> actor_address,
                         checksum256 original_message_id) {
    require_auth(get_self());
 
    operators_t ops(get_self());
    auto op_pk = operator_key{account.value};
 
-   const TokenKind token_kind = amount.kind;
-   const uint64_t  raw_amount = static_cast<uint64_t>(static_cast<int64_t>(amount.amount));
-   auto deposit_action = build_deposit_action(actor, chain, token_kind, raw_amount);
+   // Reconstruct the depositor's ChainAddress locally — the proto message
+   // type stays out of the ABI but is fine to use inside the contract for
+   // building OPERATOR_ACTION logs and DEPOSIT_REVERT correlation.
+   opp::types::ChainAddress actor;
+   actor.kind    = actor_chain;
+   actor.address = std::move(actor_address);
 
-   if (raw_amount == 0) {
+   auto deposit_action = build_deposit_action(actor, chain, token_kind, amount);
+
+   if (amount == 0) {
       const std::string err = "amount must be positive";
-      emit_deposit_revert(get_self(), chain, actor, token_kind, raw_amount,
+      emit_deposit_revert(get_self(), chain, actor, token_kind, amount,
                           original_message_id, err);
       append_action_log(ops, op_pk, deposit_action, false, err);
       return;
@@ -828,7 +844,7 @@ void opreg::depositinle(name account,
    if (!ops.contains(op_pk)) {
       // No entry to log to. The DEPOSIT_REVERT IS the audit record for the
       // outpost — outpost emits a local refund event the depositor reads.
-      emit_deposit_revert(get_self(), chain, actor, token_kind, raw_amount,
+      emit_deposit_revert(get_self(), chain, actor, token_kind, amount,
                           original_message_id, "operator not registered");
       return;
    }
@@ -836,14 +852,26 @@ void opreg::depositinle(name account,
    if (op.status == OperatorStatus::OPERATOR_STATUS_SLASHED ||
        op.status == OperatorStatus::OPERATOR_STATUS_TERMINATED) {
       const std::string err = "operator not in a deposit-eligible state";
-      emit_deposit_revert(get_self(), chain, actor, token_kind, raw_amount,
+      emit_deposit_revert(get_self(), chain, actor, token_kind, amount,
+                          original_message_id, err);
+      append_action_log(ops, op_pk, deposit_action, false, err);
+      return;
+   }
+   // Bootstrapped operators are bonded by fiat — no deposit is ever
+   // permitted for them. Reject via DEPOSIT_REVERT (NOT a throw, per
+   // the no-throws-in-OPP-handlers rule — a throw here would halt the
+   // entire envelope's evalcons → chain stalls). The outpost refunds
+   // the depositor when it processes the revert.
+   if (op.is_bootstrapped) {
+      const std::string err = "bootstrapped operator cannot accept deposits";
+      emit_deposit_revert(get_self(), chain, actor, token_kind, amount,
                           original_message_id, err);
       append_action_log(ops, op_pk, deposit_action, false, err);
       return;
    }
 
    ops.modify(same_payer, op_pk, [&](auto& o) {
-      add_balance(o, chain, token_kind, raw_amount);
+      add_balance(o, chain, token_kind, amount);
    });
    append_action_log(ops, op_pk, deposit_action, true, "");
 
@@ -1036,12 +1064,10 @@ void opreg::slash(name account, std::string reason) {
 // ---------------------------------------------------------------------------
 void opreg::releaselock(name account,
                         opp::types::ChainKind chain,
-                        opp::types::TokenAmount amount) {
+                        opp::types::TokenKind token_kind,
+                        uint64_t amount) {
    require_auth(UWRIT_ACCOUNT);
-
-   const TokenKind token_kind = amount.kind;
-   const uint64_t  raw_amount = static_cast<uint64_t>(static_cast<int64_t>(amount.amount));
-   check(raw_amount > 0, "amount must be positive");
+   check(amount > 0, "amount must be positive");
 
    operators_t ops(get_self());
    auto op_pk = operator_key{account.value};
@@ -1058,12 +1084,12 @@ void opreg::releaselock(name account,
    // SLASHED or TERMINATED — decrement opreg balance and emit the matching
    // outbound attestation (deferred-slash to LP or deferred-remit to authex).
    ops.modify(same_payer, op_pk, [&](auto& o) {
-      subtract_balance(o, chain, token_kind, raw_amount);
+      subtract_balance(o, chain, token_kind, amount);
    });
 
    if (op.status == OperatorStatus::OPERATOR_STATUS_SLASHED) {
       auto slash_action = build_slash_action(op.account, op.type,
-                                             chain, token_kind, raw_amount,
+                                             chain, token_kind, amount,
                                              /*reason*/ "deferred slash on lock release");
       emit_slash_attestation(get_self(), slash_action);
       append_action_log(ops, op_pk, slash_action, /*success*/ true, "");
@@ -1076,12 +1102,12 @@ void opreg::releaselock(name account,
             permission_level{get_self(), "active"_n},
             TOKEN_ACCOUNT, "transfer"_n,
             std::make_tuple(get_self(), account,
-               asset(static_cast<int64_t>(raw_amount), CORE_SYM),
+               asset(static_cast<int64_t>(amount), CORE_SYM),
                std::string("terminate-deferred-remit"))
          ).send();
       } else {
          emit_withdraw_remit(get_self(), op.account, op.type,
-                             chain, token_kind, raw_amount, /*request_id*/ 0);
+                             chain, token_kind, amount, /*request_id*/ 0);
       }
    }
 }
@@ -1180,8 +1206,13 @@ void opreg::termcheck(name account) {
    // are open questions per the plan §1; revisit when those decisions land.
    if (op.type != OperatorType::OPERATOR_TYPE_BATCH) return;
 
+   // Thresholds come from opconfig — tests can dial them down so the
+   // miss-window evaluation fits the test timeout budget.
+   opconfig_t cfg_tbl(get_self());
+   const auto cfg = cfg_tbl.get_or_default(op_config{});
+
    uint64_t now_ms      = current_time_ms();
-   uint64_t window_open = now_ms > TERMINATE_WINDOW_MS ? now_ms - TERMINATE_WINDOW_MS : 0;
+   uint64_t window_open = now_ms > cfg.terminate_window_ms ? now_ms - cfg.terminate_window_ms : 0;
 
    dellog_t log(get_self());
    auto idx = log.get_index<"byaccountts"_n>();
@@ -1204,13 +1235,18 @@ void opreg::termcheck(name account) {
       }
    }
 
-   bool exceeds_consecutive = worst_consecutive > TERMINATE_MAX_CONSECUTIVE_MISSES;
+   bool exceeds_consecutive = worst_consecutive > cfg.terminate_max_consecutive_misses;
    bool exceeds_percent     = total_in_window > 0 &&
-                              (total_misses * 100u / total_in_window) > TERMINATE_MAX_PCT_MISSES_24H;
+                              (total_misses * 100u / total_in_window) > cfg.terminate_max_pct_misses_24h;
    if (exceeds_consecutive || exceeds_percent) {
       terminate_inline(get_self(), account,
-         exceeds_consecutive ? std::string{"rolling-24h: >3 consecutive misses"}
-                             : std::string{"rolling-24h: >5% miss rate"});
+         exceeds_consecutive
+            ? std::string{"rolling-window: >"}
+                 + std::to_string(cfg.terminate_max_consecutive_misses)
+                 + " consecutive misses"
+            : std::string{"rolling-window: >"}
+                 + std::to_string(cfg.terminate_max_pct_misses_24h)
+                 + "% miss rate");
    }
 }
 

@@ -73,60 +73,100 @@ namespace sysio {
       /// unique; re-calling `setreserve` for the same pair updates its
       /// amounts and connector weight in place.
       ///
+      /// Per protocol: protobuf-generated MESSAGE types never appear in
+      /// action signatures (they'd leak `vint*_t` typedefs into the ABI and
+      /// silently mis-align host/contract serialization). `TokenAmount` is
+      /// split into `(TokenKind, uint64_t)` here; the WIRE-side `kind` is
+      /// implicit (always TOKEN_KIND_WIRE).
+      ///
       /// @param chain                  Outpost chain (ETH, SOL, etc).
-      /// @param outpost_amount         TokenAmount on the outpost side
-      ///                                (e.g. ETH or LIQETH on Ethereum).
-      ///                                `outpost_amount.kind` identifies the
-      ///                                non-WIRE side of the pair.
-      /// @param wire_amount            TokenAmount on the WIRE side. `kind`
-      ///                                must be TOKEN_KIND_WIRE — enforced
-      ///                                with `check(...)`.
+      /// @param outpost_kind           TokenKind on the outpost side
+      ///                                (e.g. TOKEN_KIND_ETH or
+      ///                                TOKEN_KIND_LIQETH on Ethereum).
+      ///                                Must not be TOKEN_KIND_WIRE — that
+      ///                                would describe a pointless WIRE/WIRE
+      ///                                reserve.
+      /// @param outpost_amount         Outpost-side balance to seed.
+      /// @param wire_amount            WIRE-side balance to seed. The kind
+      ///                                is implicit (TOKEN_KIND_WIRE).
       /// @param connector_weight_bps   Bancor connector weight (5000 = 50%,
       ///                                pure constant product). Stored but
       ///                                unused by `swapquote` today.
       [[sysio::action]]
       void setreserve(opp::types::ChainKind     chain,
-                      opp::types::TokenAmount   outpost_amount,
-                      opp::types::TokenAmount   wire_amount,
+                      opp::types::TokenKind     outpost_kind,
+                      uint64_t                  outpost_amount,
+                      uint64_t                  wire_amount,
                       uint32_t                  connector_weight_bps);
 
-      /// Read-only swap quote. Returns a `TokenAmount` carrying the
-      /// destination token kind + amount so callers don't have to track
-      /// the destination kind separately. Returns
-      /// `TokenAmount{ to_token, 0 }` when any required reserve is
-      /// missing (caller's variance check treats 0 as "no quote
-      /// available; skip variance check").
+      /// Read-only swap quote. Returns the destination amount as a plain
+      /// `uint64_t` — the caller passes `to_token` so they already know the
+      /// kind; returning a struct would re-leak proto-message-via-ABI
+      /// pitfalls. Returns 0 when any required reserve is missing (caller's
+      /// variance check treats 0 as "no quote available; skip variance
+      /// check").
       ///
-      /// @param from_amount   Source TokenAmount (kind + amount).
+      /// @param from_kind     Source TokenKind.
+      /// @param from_amount   Source amount.
       /// @param to_chain      Destination chain.
       /// @param to_token      Destination TokenKind.
+      /// @return              Destination amount priced against the matching
+      ///                       reserve(s), or 0 if no quote is available.
       [[sysio::action, sysio::read_only]]
-      opp::types::TokenAmount swapquote(opp::types::TokenAmount   from_amount,
-                                        opp::types::ChainKind     to_chain,
-                                        opp::types::TokenKind     to_token);
+      uint64_t swapquote(opp::types::TokenKind     from_kind,
+                         uint64_t                  from_amount,
+                         opp::types::ChainKind     to_chain,
+                         opp::types::TokenKind     to_token);
 
       /// Credit an outpost-side reserve from a STAKING_REWARD attestation.
       /// Auth=sysio.msgch. Only `reserve_outpost_amount` grows; the
       /// WIRE-side payout to the staker is a separate next-epoch action
-      /// owned by the staking work stream.
+      /// owned by the staking work stream. TokenAmount split into
+      /// `(TokenKind, uint64_t)` per the no-proto-messages-in-actions rule.
       ///
       /// @param chain            Outpost chain whose reserve received the reward.
-      /// @param outpost_amount   Amount + kind credited. `kind` must
-      ///                          match the reserve's
-      ///                          `reserve_outpost_amount.kind`.
+      /// @param outpost_kind     TokenKind credited. Must match the
+      ///                          reserve's `reserve_outpost_amount.kind`.
+      /// @param outpost_amount   Amount credited.
       [[sysio::action]]
       void onreward(opp::types::ChainKind     chain,
-                    opp::types::TokenAmount   outpost_amount);
+                    opp::types::TokenKind     outpost_kind,
+                    uint64_t                  outpost_amount);
 
       /// Reconcile a failed SwapRemit. Destination outpost could not
       /// pay the recipient; the token stays in its reserve. Re-add the
-      /// `unremitted_amount.amount` to `reserve_outpost_amount` so the
-      /// depot's view of the reserve matches the outpost's actual
-      /// balance. Auth=sysio.msgch.
+      /// unremitted amount to `reserve_outpost_amount` so the depot's
+      /// view of the reserve matches the outpost's actual balance.
+      /// Auth=sysio.msgch.
       ///
-      /// @param rejected   The decoded SwapRejected attestation.
+      /// The `SwapRejected` proto message is flattened into its primitive
+      /// fields here so no proto-message type appears in the action
+      /// signature (would leak varint typedefs into the ABI).
+      ///
+      /// @param original_swap_remit_id   32-byte OPP message id of the
+      ///                                   SwapRemit that failed (carried
+      ///                                   for cross-reference / audit).
+      /// @param recipient_kind           ChainKind portion of the failed
+      ///                                   SwapRemit's recipient
+      ///                                   (identifies the holding outpost
+      ///                                   whose reserve to credit back).
+      /// @param recipient_address        Raw recipient bytes (carried for
+      ///                                   audit; depot does not branch on
+      ///                                   this).
+      /// @param unremitted_kind          TokenKind of the unremitted amount;
+      ///                                   must match the reserve's
+      ///                                   `reserve_outpost_amount.kind`.
+      /// @param unremitted_amount        Amount that stayed in the outpost's
+      ///                                   reserve and needs to be re-added
+      ///                                   to the depot's view.
+      /// @param reason                   Human-readable failure reason.
       [[sysio::action]]
-      void onreject(opp::attestations::SwapRejected rejected);
+      void onreject(checksum256              original_swap_remit_id,
+                    opp::types::ChainKind    recipient_kind,
+                    std::vector<char>        recipient_address,
+                    opp::types::TokenKind    unremitted_kind,
+                    uint64_t                 unremitted_amount,
+                    std::string              reason);
 
       /// Debit the outpost-side reserve at SWAP_REMIT emit time.
       ///
@@ -144,16 +184,21 @@ namespace sysio {
       /// SWAP_REJECTED inbound, onreward on STAKING_REWARD inbound)
       /// mutate `reserve_outpost_amount`.
       ///
+      /// TokenAmount split into `(TokenKind, uint64_t)` per the
+      /// no-proto-messages-in-actions rule.
+      ///
       /// @param chain            Destination chain whose reserve is being
       ///                          debited.
-      /// @param outpost_amount   Amount + kind being remitted. Asserts
-      ///                          the kind matches the reserve's
-      ///                          `reserve_outpost_amount.kind` and
-      ///                          that there's enough balance (no
-      ///                          overdraft). Auth=sysio.uwrit.
+      /// @param outpost_kind     TokenKind being remitted. Must match
+      ///                          the reserve's
+      ///                          `reserve_outpost_amount.kind`.
+      /// @param outpost_amount   Amount being remitted. Asserts there's
+      ///                          enough balance (no overdraft).
+      ///                          Auth=sysio.uwrit.
       [[sysio::action]]
       void debit(opp::types::ChainKind     chain,
-                 opp::types::TokenAmount   outpost_amount);
+                 opp::types::TokenKind     outpost_kind,
+                 uint64_t                  outpost_amount);
 
       // -----------------------------------------------------------------------
       //  Tables

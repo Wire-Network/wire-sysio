@@ -54,36 +54,33 @@ uint64_t to_unsigned(int64_t amount) {
 //  setreserve
 // ---------------------------------------------------------------------------
 void reserve::setreserve(opp::types::ChainKind     chain,
-                          opp::types::TokenAmount   outpost_amount,
-                          opp::types::TokenAmount   wire_amount,
+                          opp::types::TokenKind     outpost_kind,
+                          uint64_t                  outpost_amount,
+                          uint64_t                  wire_amount,
                           uint32_t                  connector_weight_bps) {
    require_auth(get_self());
    check(connector_weight_bps > 0 && connector_weight_bps <= MAX_CONNECTOR_WEIGHT_BPS,
          "connector_weight_bps must be in (0, 10000]");
-   check(wire_amount.kind == TokenKind::TOKEN_KIND_WIRE,
-         "wire_amount.kind must be TOKEN_KIND_WIRE");
-   check(outpost_amount.kind != TokenKind::TOKEN_KIND_WIRE,
-         "outpost_amount.kind must not be TOKEN_KIND_WIRE (the WIRE side is implicit)");
-   // The pure WIRE/WIRE LP is not a thing — the previous check already
-   // forbids that, but keep an explicit guard for the chain-side too.
+   check(outpost_kind != TokenKind::TOKEN_KIND_WIRE,
+         "outpost_kind must not be TOKEN_KIND_WIRE (the WIRE side is implicit)");
    check(!(chain == ChainKind::CHAIN_KIND_WIRE),
          "WIRE chain has no outpost reserve; reserves are per-outpost only");
 
    reserves_t reserves(get_self());
-   auto pk  = reserve_key{pack_chain_token(chain, outpost_amount.kind)};
+   auto pk  = reserve_key{pack_chain_token(chain, outpost_kind)};
    auto now = current_time_ms();
    if (reserves.contains(pk)) {
       reserves.modify(same_payer, pk, [&](auto& r) {
-         r.reserve_outpost_amount = outpost_amount;
-         r.reserve_wire_amount    = wire_amount;
+         r.reserve_outpost_amount = make_token_amount(outpost_kind, outpost_amount);
+         r.reserve_wire_amount    = make_token_amount(TokenKind::TOKEN_KIND_WIRE, wire_amount);
          r.connector_weight_bps   = connector_weight_bps;
          r.last_updated_ms        = now;
       });
    } else {
       reserves.emplace(get_self(), pk, reserve_entry{
          .chain                  = chain,
-         .reserve_outpost_amount = outpost_amount,
-         .reserve_wire_amount    = wire_amount,
+         .reserve_outpost_amount = make_token_amount(outpost_kind, outpost_amount),
+         .reserve_wire_amount    = make_token_amount(TokenKind::TOKEN_KIND_WIRE, wire_amount),
          .connector_weight_bps   = connector_weight_bps,
          .last_updated_ms        = now,
       });
@@ -93,102 +90,78 @@ void reserve::setreserve(opp::types::ChainKind     chain,
 // ---------------------------------------------------------------------------
 //  swapquote — read-only constant-product quote
 // ---------------------------------------------------------------------------
-opp::types::TokenAmount reserve::swapquote(opp::types::TokenAmount   from_amount,
-                                            opp::types::ChainKind     to_chain,
-                                            opp::types::TokenKind     to_token) {
-   if (from_amount.amount <= 0) {
-      return make_token_amount(to_token, 0);
-   }
-   const uint64_t  src_amount = to_unsigned(from_amount.amount);
-   const TokenKind src_token  = from_amount.kind;
-   // src chain isn't on the input — the (chain, kind) packed key uses the
-   // outpost-side TokenKind only; the chain comes from `to_chain` for the
-   // dst hop and is implicit on the src hop because every cross-chain
-   // src token is uniquely owned by exactly one outpost reserve.
-   //
-   // For the src hop we look the reserve up by walking the table. To
-   // avoid a scan, callers that know the src chain can use the
-   // `swapquote_explicit` overload (not implemented yet); for the
-   // common case of contract callers (uwrit's variance check) the
-   // src chain is known and is passed as the `from_amount`'s chain
-   // through a new field. v1: assume the caller passes a chain hint
-   // by using the same chain on both sides when src and dst differ
-   // — we relax this when the actual variance flow lands.
-   //
-   // To stay backward-compatible with uwrit's variance check while the
-   // signature is in flux, treat `to_chain` as the hint for both the
-   // src and dst lookups when src_token != WIRE && dst_token != WIRE.
-   // For half-hops (one side is WIRE), only one reserve is consulted
-   // and the chain is unambiguous.
+uint64_t reserve::swapquote(opp::types::TokenKind     from_kind,
+                             uint64_t                  from_amount,
+                             opp::types::ChainKind     to_chain,
+                             opp::types::TokenKind     to_token) {
+   if (from_amount == 0) return 0;
 
    reserves_t reserves(get_self());
 
    // Trivial case: src token already IS WIRE, dst token also WIRE.
-   if (src_token == TokenKind::TOKEN_KIND_WIRE &&
+   if (from_kind == TokenKind::TOKEN_KIND_WIRE &&
        to_token == TokenKind::TOKEN_KIND_WIRE) {
-      return make_token_amount(to_token, src_amount);
+      return from_amount;
    }
 
    // Half-hop: src is WIRE — quote WIRE -> outpost token on dst chain.
-   if (src_token == TokenKind::TOKEN_KIND_WIRE) {
+   if (from_kind == TokenKind::TOKEN_KIND_WIRE) {
       auto pk = reserve_key{pack_chain_token(to_chain, to_token)};
-      if (!reserves.contains(pk)) return make_token_amount(to_token, 0);
+      if (!reserves.contains(pk)) return 0;
       auto r = reserves.get(pk);
-      uint64_t out = cp_output(to_unsigned(r.reserve_wire_amount.amount),
-                               to_unsigned(r.reserve_outpost_amount.amount),
-                               src_amount);
-      return make_token_amount(to_token, out);
+      return cp_output(to_unsigned(r.reserve_wire_amount.amount),
+                       to_unsigned(r.reserve_outpost_amount.amount),
+                       from_amount);
    }
 
    // Half-hop: dst is WIRE — quote outpost token on src chain -> WIRE.
    if (to_token == TokenKind::TOKEN_KIND_WIRE) {
-      auto pk = reserve_key{pack_chain_token(to_chain, src_token)};
-      if (!reserves.contains(pk)) return make_token_amount(to_token, 0);
+      auto pk = reserve_key{pack_chain_token(to_chain, from_kind)};
+      if (!reserves.contains(pk)) return 0;
       auto r = reserves.get(pk);
-      uint64_t out = cp_output(to_unsigned(r.reserve_outpost_amount.amount),
-                               to_unsigned(r.reserve_wire_amount.amount),
-                               src_amount);
-      return make_token_amount(to_token, out);
+      return cp_output(to_unsigned(r.reserve_outpost_amount.amount),
+                       to_unsigned(r.reserve_wire_amount.amount),
+                       from_amount);
    }
 
    // Full hop: src token -> WIRE -> dst token. Two reserves consulted.
-   auto src_pk = reserve_key{pack_chain_token(to_chain, src_token)};
+   // `to_chain` doubles as the hint for the src reserve lookup since every
+   // outpost-token uniquely lives on exactly one outpost.
+   auto src_pk = reserve_key{pack_chain_token(to_chain, from_kind)};
    auto dst_pk = reserve_key{pack_chain_token(to_chain, to_token)};
-   if (!reserves.contains(src_pk) || !reserves.contains(dst_pk)) {
-      return make_token_amount(to_token, 0);
-   }
+   if (!reserves.contains(src_pk) || !reserves.contains(dst_pk)) return 0;
    auto src_r = reserves.get(src_pk);
    auto dst_r = reserves.get(dst_pk);
    uint64_t wire_intermediate = cp_output(to_unsigned(src_r.reserve_outpost_amount.amount),
                                           to_unsigned(src_r.reserve_wire_amount.amount),
-                                          src_amount);
-   if (wire_intermediate == 0) return make_token_amount(to_token, 0);
-   uint64_t out = cp_output(to_unsigned(dst_r.reserve_wire_amount.amount),
-                            to_unsigned(dst_r.reserve_outpost_amount.amount),
-                            wire_intermediate);
-   return make_token_amount(to_token, out);
+                                          from_amount);
+   if (wire_intermediate == 0) return 0;
+   return cp_output(to_unsigned(dst_r.reserve_wire_amount.amount),
+                    to_unsigned(dst_r.reserve_outpost_amount.amount),
+                    wire_intermediate);
 }
 
 // ---------------------------------------------------------------------------
 //  onreward — STAKING_REWARD attestation credits the outpost-side reserve
 // ---------------------------------------------------------------------------
 void reserve::onreward(opp::types::ChainKind     chain,
-                        opp::types::TokenAmount   outpost_amount) {
+                        opp::types::TokenKind     outpost_kind,
+                        uint64_t                  outpost_amount) {
    require_auth(MSGCH_ACCOUNT);
-   check(outpost_amount.amount > 0, "outpost_amount must be positive");
-   check(outpost_amount.kind != TokenKind::TOKEN_KIND_WIRE,
+   check(outpost_amount > 0, "outpost_amount must be positive");
+   check(outpost_kind != TokenKind::TOKEN_KIND_WIRE,
          "STAKING_REWARD credits the outpost-side reserve only; WIRE-side payout is a separate action");
 
    reserves_t reserves(get_self());
-   auto pk = reserve_key{pack_chain_token(chain, outpost_amount.kind)};
+   auto pk = reserve_key{pack_chain_token(chain, outpost_kind)};
    check(reserves.contains(pk),
          "reserve not provisioned for this (chain, outpost_token); call setreserve first");
 
    auto now = current_time_ms();
    reserves.modify(same_payer, pk, [&](auto& r) {
-      check(r.reserve_outpost_amount.kind == outpost_amount.kind,
-            "outpost_amount.kind mismatches reserve_outpost_amount.kind");
-      r.reserve_outpost_amount.amount += outpost_amount.amount;
+      check(r.reserve_outpost_amount.kind == outpost_kind,
+            "outpost_kind mismatches reserve_outpost_amount.kind");
+      r.reserve_outpost_amount.amount += static_cast<int64_t>(outpost_amount);
       r.last_updated_ms = now;
    });
 }
@@ -197,26 +170,27 @@ void reserve::onreward(opp::types::ChainKind     chain,
 //  debit — SWAP_REMIT emit-time debit (auth=sysio.uwrit)
 // ---------------------------------------------------------------------------
 void reserve::debit(opp::types::ChainKind     chain,
-                     opp::types::TokenAmount   outpost_amount) {
+                     opp::types::TokenKind     outpost_kind,
+                     uint64_t                  outpost_amount) {
    require_auth(UWRIT_ACCOUNT);
-   check(outpost_amount.amount > 0, "outpost_amount must be positive");
-   check(outpost_amount.kind != TokenKind::TOKEN_KIND_WIRE,
+   check(outpost_amount > 0, "outpost_amount must be positive");
+   check(outpost_kind != TokenKind::TOKEN_KIND_WIRE,
          "debit targets the outpost-side reserve only; WIRE-side debits "
          "are owned by the staker-payout path");
 
    reserves_t reserves(get_self());
-   auto pk = reserve_key{pack_chain_token(chain, outpost_amount.kind)};
+   auto pk = reserve_key{pack_chain_token(chain, outpost_kind)};
    check(reserves.contains(pk),
          "reserve not provisioned for this (chain, outpost_token); "
          "cannot debit");
 
    auto now = current_time_ms();
    reserves.modify(same_payer, pk, [&](auto& r) {
-      check(r.reserve_outpost_amount.kind == outpost_amount.kind,
-            "outpost_amount.kind mismatches reserve_outpost_amount.kind");
-      check(r.reserve_outpost_amount.amount >= outpost_amount.amount,
+      check(r.reserve_outpost_amount.kind == outpost_kind,
+            "outpost_kind mismatches reserve_outpost_amount.kind");
+      check(to_unsigned(r.reserve_outpost_amount.amount) >= outpost_amount,
             "insufficient reserve_outpost_amount for SWAP_REMIT debit");
-      r.reserve_outpost_amount.amount -= outpost_amount.amount;
+      r.reserve_outpost_amount.amount -= static_cast<int64_t>(outpost_amount);
       r.last_updated_ms = now;
    });
 }
@@ -225,27 +199,29 @@ void reserve::debit(opp::types::ChainKind     chain,
 //  onreject — outpost couldn't pay SwapRemit; depot's reserve view re-adds
 //             the unremitted amount so accounting reconciles
 // ---------------------------------------------------------------------------
-void reserve::onreject(opp::attestations::SwapRejected rejected) {
+void reserve::onreject(checksum256              /*original_swap_remit_id*/,
+                        opp::types::ChainKind    recipient_kind,
+                        std::vector<char>        /*recipient_address*/,
+                        opp::types::TokenKind    unremitted_kind,
+                        uint64_t                 unremitted_amount,
+                        std::string              /*reason*/) {
    require_auth(MSGCH_ACCOUNT);
-   const auto& unremitted = rejected.unremitted_amount;
-   check(unremitted.amount > 0, "unremitted_amount must be positive");
-   check(unremitted.kind != TokenKind::TOKEN_KIND_WIRE,
+   check(unremitted_amount > 0, "unremitted_amount must be positive");
+   check(unremitted_kind != TokenKind::TOKEN_KIND_WIRE,
          "SwapRejected reconciles the outpost-side reserve; WIRE-side has no outpost balance");
 
    // The recipient's chain identifies which outpost reserve the failed
    // SwapRemit was drawn from.
-   const ChainKind chain = rejected.recipient.kind;
-
    reserves_t reserves(get_self());
-   auto pk = reserve_key{pack_chain_token(chain, unremitted.kind)};
+   auto pk = reserve_key{pack_chain_token(recipient_kind, unremitted_kind)};
    check(reserves.contains(pk),
          "reserve not provisioned for this (chain, outpost_token); cannot reconcile SwapRejected");
 
    auto now = current_time_ms();
    reserves.modify(same_payer, pk, [&](auto& r) {
-      check(r.reserve_outpost_amount.kind == unremitted.kind,
-            "unremitted_amount.kind mismatches reserve_outpost_amount.kind");
-      r.reserve_outpost_amount.amount += unremitted.amount;
+      check(r.reserve_outpost_amount.kind == unremitted_kind,
+            "unremitted_kind mismatches reserve_outpost_amount.kind");
+      r.reserve_outpost_amount.amount += static_cast<int64_t>(unremitted_amount);
       r.last_updated_ms = now;
    });
 }
