@@ -24,14 +24,13 @@ class sysio_cap_tester : public tester {
 public:
    static constexpr auto CAP_ACCOUNT    = "sysio.cap"_n;
    static constexpr auto AUTHEX_ACCOUNT = "sysio.authex"_n;
-   static constexpr auto EPOCH_ACCOUNT  = "sysio.epoch"_n;
    static constexpr auto TOKEN_ACCOUNT  = "sysio.token"_n;
 
    sysio_cap_tester() {
       produce_blocks(2);
 
       create_accounts({
-         CAP_ACCOUNT, EPOCH_ACCOUNT, TOKEN_ACCOUNT,
+         CAP_ACCOUNT, TOKEN_ACCOUNT,
          "alice"_n, "bob"_n,
       });
       produce_blocks(2);

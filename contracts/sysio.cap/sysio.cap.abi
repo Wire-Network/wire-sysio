@@ -4,20 +4,6 @@
     "types": [],
     "structs": [
         {
-            "name": "availstake",
-            "base": "",
-            "fields": [
-                {
-                    "name": "wire_account",
-                    "type": "name"
-                },
-                {
-                    "name": "chain",
-                    "type": "ChainKind"
-                }
-            ]
-        },
-        {
             "name": "cap_config",
             "base": "",
             "fields": [
@@ -38,20 +24,6 @@
                 {
                     "name": "next_unmapped_id",
                     "type": "uint64"
-                },
-                {
-                    "name": "next_cd_id",
-                    "type": "uint64"
-                }
-            ]
-        },
-        {
-            "name": "cd_key",
-            "base": "",
-            "fields": [
-                {
-                    "name": "request_id",
-                    "type": "uint64"
                 }
             ]
         },
@@ -62,50 +34,6 @@
                 {
                     "name": "wire_account",
                     "type": "name"
-                }
-            ]
-        },
-        {
-            "name": "cooldown_entry",
-            "base": "",
-            "fields": [
-                {
-                    "name": "request_id",
-                    "type": "uint64"
-                },
-                {
-                    "name": "position_id",
-                    "type": "uint64"
-                },
-                {
-                    "name": "wire_account",
-                    "type": "name"
-                },
-                {
-                    "name": "chain_kind",
-                    "type": "ChainKind"
-                },
-                {
-                    "name": "amount",
-                    "type": "asset"
-                },
-                {
-                    "name": "eligible_at_epoch",
-                    "type": "uint32"
-                },
-                {
-                    "name": "requested_at_epoch",
-                    "type": "uint32"
-                }
-            ]
-        },
-        {
-            "name": "flushcd",
-            "base": "",
-            "fields": [
-                {
-                    "name": "current_epoch",
-                    "type": "uint32"
                 }
             ]
         },
@@ -272,18 +200,8 @@
     ],
     "actions": [
         {
-            "name": "availstake",
-            "type": "availstake",
-            "ricardian_contract": ""
-        },
-        {
             "name": "claim",
             "type": "claim",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "flushcd",
-            "type": "flushcd",
             "ricardian_contract": ""
         },
         {
@@ -323,31 +241,6 @@
             "key_names": ["name"],
             "key_types": ["name"],
             "table_id": 40418
-        },
-        {
-            "name": "cdqueue",
-            "type": "cooldown_entry",
-            "index_type": "i64",
-            "key_names": ["request_id"],
-            "key_types": ["uint64"],
-            "table_id": 24354,
-            "secondary_indexes": [
-                {
-                    "name": "bywirechn",
-                    "key_type": "uint128",
-                    "table_id": 36786
-                },
-                {
-                    "name": "byeligible",
-                    "key_type": "uint64",
-                    "table_id": 62191
-                },
-                {
-                    "name": "byposition",
-                    "key_type": "uint64",
-                    "table_id": 6853
-                }
-            ]
         },
         {
             "name": "pclaims",
@@ -400,12 +293,7 @@
     ],
     "ricardian_clauses": [],
     "variants": [],
-    "action_results": [
-        {
-            "name": "availstake",
-            "result_type": "uint64"
-        }
-    ],
+    "action_results": [],
     "enums": [
         {
             "name": "ChainKind",

@@ -29,12 +29,11 @@ namespace sysio {
     *   `pending_claims`.
     * - `positions` carries lifecycle metadata only — status, owner mapping,
     *   timestamps. Shares and principal live at the outpost.
-    * - `cooldown_queue` mirrors opreg's `withdraw_queue`. Eligibility-cursor
-    *   driven; drained by `flushcd` on each `sysio.epoch::advance` tick.
-    *   Cooldown begins when the staking-withdrawal envelope reaches this
-    *   contract.
-    * - `available_stake` is the read-only rollup analogous to opreg's
-    *   `available()`.
+    *
+    * No cooldown/withdrawal machinery for v1 (Jack 2026-05-13: outpost has
+    * no cooldown scenarios in this wave). When withdrawals come online
+    * post-launch, the cooldown-queue + maturation-flush pattern can be
+    * added back — see opreg's `withdraw_queue` for reference.
     */
    class [[sysio::contract("sysio.cap")]] cap : public contract {
    public:
@@ -43,14 +42,10 @@ namespace sysio {
       // Well-known accounts.
       static constexpr name AUTHEX_ACCOUNT = "sysio.authex"_n;
       static constexpr name MSGCH_ACCOUNT  = "sysio.msgch"_n;
-      static constexpr name EPOCH_ACCOUNT  = "sysio.epoch"_n;
       static constexpr name TOKEN_ACCOUNT  = "sysio.token"_n;
 
       // WIRE token symbol. 9 decimals system-wide.
       static constexpr symbol WIRE_SYM = symbol("WIRE", 9);
-
-      // Cooldown wait epochs. Mirrors opreg::WITHDRAW_WAIT_EPOCHS.
-      static constexpr uint32_t COOLDOWN_WAIT_EPOCHS = 2;
 
       // -----------------------------------------------------------------------
       //  Actions
@@ -76,11 +71,6 @@ namespace sysio {
                      opp::types::ChainKind chain,
                      std::vector<char> native_pubkey);
 
-      /// Internal: drain matured rows from `cooldown_queue`. Called inline
-      /// from `sysio.epoch::advance` each tick.
-      [[sysio::action]]
-      void flushcd(uint32_t current_epoch);
-
       /// One row of an import batch: a pre-launch holder's WIRE credit on
       /// `chain`. `native_address` is the raw on-chain key (20 B for ETH,
       /// 32 B for Solana). `wire_atomic` is denominated in WIRE's 9-decimal
@@ -105,13 +95,6 @@ namespace sysio {
       /// subsequent `importseed` calls revert.
       [[sysio::action]]
       void importdone();
-
-      /// Read-only rollup of the staker's spendable (yield-earning) stake on
-      /// a given chain. Returns 0 today since position-side principal is not
-      /// tracked yet; once lifecycle handlers land, will return
-      /// `sum(open_principal) - sum(active_cooldown_amount)`.
-      [[sysio::action, sysio::read_only]]
-      uint64_t availstake(name wire_account, opp::types::ChainKind chain);
 
       // -----------------------------------------------------------------------
       //  Tables
@@ -217,46 +200,6 @@ namespace sysio {
             sysio::const_mem_fun<unmapped_token, uint128_t, &unmapped_token::by_chain_addr>>
       >;
 
-      /// Cooldown queue. Mirrors opreg::withdraw_request layout.
-      struct cd_key {
-         uint64_t request_id;
-         uint64_t primary_key() const { return request_id; }
-         SYSLIB_SERIALIZE(cd_key, (request_id))
-      };
-
-      struct [[sysio::table("cdqueue")]] cooldown_entry {
-         uint64_t                  request_id          = 0;
-         uint64_t                  position_id         = 0;
-         name                      wire_account;
-         opp::types::ChainKind     chain_kind          = opp::types::ChainKind::CHAIN_KIND_UNKNOWN;
-         asset                     amount              = asset{0, WIRE_SYM};
-         uint32_t                  eligible_at_epoch   = 0;
-         uint32_t                  requested_at_epoch  = 0;
-
-         uint64_t primary_key() const { return request_id; }
-
-         /// (wire_account, chain_kind) composite for `available_stake` scans.
-         uint128_t by_wire_chain() const {
-            return (static_cast<uint128_t>(wire_account.value) << 64)
-                 | static_cast<uint64_t>(chain_kind);
-         }
-         uint64_t by_eligible() const { return static_cast<uint64_t>(eligible_at_epoch); }
-         uint64_t by_position() const { return position_id; }
-
-         SYSLIB_SERIALIZE(cooldown_entry,
-            (request_id)(position_id)(wire_account)(chain_kind)(amount)
-            (eligible_at_epoch)(requested_at_epoch))
-      };
-
-      using cdqueue_t = sysio::kv::table<"cdqueue"_n, cd_key, cooldown_entry,
-         sysio::kv::index<"bywirechn"_n,
-            sysio::const_mem_fun<cooldown_entry, uint128_t, &cooldown_entry::by_wire_chain>>,
-         sysio::kv::index<"byeligible"_n,
-            sysio::const_mem_fun<cooldown_entry, uint64_t, &cooldown_entry::by_eligible>>,
-         sysio::kv::index<"byposition"_n,
-            sysio::const_mem_fun<cooldown_entry, uint64_t, &cooldown_entry::by_position>>
-      >;
-
       /// Cap-staking config singleton. `imported_complete` is the one-way flag
       /// protecting the bootstrap `importseed` action (added in a follow-up).
       struct [[sysio::table("capcfg")]] cap_config {
@@ -267,13 +210,12 @@ namespace sysio {
 
       using capcfg_t = sysio::kv::global<"capcfg"_n, cap_config>;
 
-      /// Monotonic id counters for position / unmapped / cooldown rows.
+      /// Monotonic id counters for position / unmapped rows.
       struct [[sysio::table("capcounters")]] cap_counters {
          uint64_t next_position_id  = 1;
          uint64_t next_unmapped_id  = 1;
-         uint64_t next_cd_id        = 1;
 
-         SYSLIB_SERIALIZE(cap_counters, (next_position_id)(next_unmapped_id)(next_cd_id))
+         SYSLIB_SERIALIZE(cap_counters, (next_position_id)(next_unmapped_id))
       };
 
       using capcounters_t = sysio::kv::global<"capcounters"_n, cap_counters>;
