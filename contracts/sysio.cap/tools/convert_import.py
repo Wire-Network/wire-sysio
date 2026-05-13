@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
 """Convert the indexer JSON dump into sysio.cap::importseed action batches.
 
-Schema (current snapshot, may evolve as the indexer stabilizes):
-  metadata     bookkeeping; not consumed by the contract
+Live source (Ethereum balances):
+  curl -H 'x-api-key: <key>' https://index.wire.foundation/opp/balances
+
+Schema (verified against the /opp/balances endpoint as of 2026-05-13):
+  metadata     bookkeeping; not consumed by the contract. Notable fields:
+               generatedAt, totalMessages, yieldDust (indexer-side dust ledger)
   purchasers[] {address, totalPretokens, yieldClaimed, ...}
                owed = totalPretokens  (already net of yieldClaimed)
   stakers[]    {address, pretokenYield, yieldClaimed, ...}
@@ -17,8 +21,8 @@ Rows with wire_atomic == 0 are filtered. Output is a JSON array of importseed
 action arg objects, each batched up to --batch-size credits per call.
 
 Usage:
-  ./convert_import.py response_1778592566067.json > batches.json
-  ./convert_import.py response_*.json --batch-size 100 --chain CHAIN_KIND_ETHEREUM
+  ./convert_import.py balances.json > batches.json
+  ./convert_import.py balances.json --batch-size 100 --chain CHAIN_KIND_ETHEREUM
 """
 
 import argparse
@@ -93,8 +97,13 @@ def main() -> int:
    sys.stdout.write("\n")
 
    total_atomic = sum(c["wire_atomic"] for c in credits)
-   print(
+   meta = data.get("metadata") or {}
+   lines = [
       f"input:            {args.input}",
+      f"generatedAt:      {meta.get('generatedAt', '<missing>')}",
+      f"totalMessages:    {meta.get('totalMessages', '<missing>')}",
+      f"indexer yieldDust: {meta.get('yieldDust', '<missing>')}"
+      " (indexer-side ledger; informational)",
       f"unique addresses: {len(accumulator)}",
       f"non-zero credits: {len(credits)}",
       f"batches:          {len(batches)} (size {args.batch_size})",
@@ -102,9 +111,8 @@ def main() -> int:
       f" ({total_atomic / DUST_BASE:.6f} WIRE)",
       f"dropped dust:     {dropped_dust} sub-atomic units"
       f" ({dropped_dust / 10**18:.2e} WIRE)",
-      sep="\n",
-      file=sys.stderr,
-   )
+   ]
+   print(*lines, sep="\n", file=sys.stderr)
    return 0
 
 
