@@ -102,7 +102,8 @@ FC_REFLECT_ENUM(sysio::opp::types::AttestationType,
    (ATTESTATION_TYPE_UNDERWRITE_INTENT_COMMIT)
    (ATTESTATION_TYPE_UNDERWRITE_INTENT_REJECT)
    (ATTESTATION_TYPE_SWAP_REVERT)
-   (ATTESTATION_TYPE_DEPOSIT_REVERT))
+   (ATTESTATION_TYPE_DEPOSIT_REVERT)
+   (ATTESTATION_TYPE_EMISSIONS_BLOCKED))
 
 // ---------------------------------------------------------------------------
 //  Nested enums on attestation messages
