@@ -259,7 +259,8 @@ public:
          if (row["outpost_id"].as_uint64() != outpost_id) continue;
          // status == READY (matches AttestationStatus::ATTESTATION_STATUS_READY,
          // the value the contract emits for queued-but-not-yet-bundled rows).
-         if (row["status"].as_string() == "ATTESTATION_STATUS_READY") ++n;
+         if (row["status"].as<sysio::opp::types::AttestationStatus>() ==
+             sysio::opp::types::AttestationStatus::ATTESTATION_STATUS_READY) ++n;
       }
       return n;
    }
@@ -306,11 +307,11 @@ BOOST_FIXTURE_TEST_CASE(buildenv_writes_envlog_row, sysio_msgch_envlog_tester) {
    // start = WIRE/1, end = ETH/31337. ABI serializer reflects the
    // ChainKind enum back as its symbolic name; the `chain_id` field is a
    // `vuint32_t` and surfaces as `{"value": N}`.
-   BOOST_REQUIRE_EQUAL(std::string("CHAIN_KIND_WIRE"),
-                       row["endpoints"]["start"]["kind"].as_string());
+   BOOST_REQUIRE(opp::types::CHAIN_KIND_WIRE ==
+                 row["endpoints"]["start"]["kind"].as<opp::types::ChainKind>());
    BOOST_REQUIRE_EQUAL(1u, row["endpoints"]["start"]["id"]["value"].as_uint64());
-   BOOST_REQUIRE_EQUAL(std::string("CHAIN_KIND_ETHEREUM"),
-                       row["endpoints"]["end"]["kind"].as_string());
+   BOOST_REQUIRE(opp::types::CHAIN_KIND_ETHEREUM ==
+                 row["endpoints"]["end"]["kind"].as<opp::types::ChainKind>());
    BOOST_REQUIRE_EQUAL(31337u, row["endpoints"]["end"]["id"]["value"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 

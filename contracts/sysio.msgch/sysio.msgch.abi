@@ -548,20 +548,12 @@
                     "value": 60928
                 },
                 {
-                    "name": "ATTESTATION_TYPE_NATIVE_YIELD_REWARD",
-                    "value": 60929
-                },
-                {
                     "name": "ATTESTATION_TYPE_WIRE_TOKEN_PURCHASE",
                     "value": 60930
                 },
                 {
                     "name": "ATTESTATION_TYPE_CHALLENGE_RESPONSE",
                     "value": 60932
-                },
-                {
-                    "name": "ATTESTATION_TYPE_SLASH_OPERATOR",
-                    "value": 60933
                 },
                 {
                     "name": "ATTESTATION_TYPE_SWAP",
@@ -624,8 +616,20 @@
                     "value": 60952
                 },
                 {
-                    "name": "ATTESTATION_TYPE_EMISSIONS_BLOCKED",
+                    "name": "ATTESTATION_TYPE_UNDERWRITE_INTENT_COMMIT",
                     "value": 60953
+                },
+                {
+                    "name": "ATTESTATION_TYPE_UNDERWRITE_INTENT_REJECT",
+                    "value": 60954
+                },
+                {
+                    "name": "ATTESTATION_TYPE_SWAP_REVERT",
+                    "value": 60955
+                },
+                {
+                    "name": "ATTESTATION_TYPE_DEPOSIT_REVERT",
+                    "value": 60956
                 }
             ]
         },

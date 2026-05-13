@@ -16,38 +16,6 @@ using opp::types::AttestationType;
 using opp::types::OperatorStatus;
 using opp::types::EmissionsBlockReason;
 
-// Read-only mirror of sysio.authex::links table for cross-contract reads.
-namespace authex_readonly {
-
-struct links_key {
-   uint64_t key;
-   SYSLIB_SERIALIZE(links_key, (key))
-};
-
-struct links_row {
-   uint64_t                 key;
-   name                     username;
-   fc::crypto::chain_kind_t chain_kind;
-   public_key               pub_key;
-
-   uint128_t by_namechain() const { return to_namechain_key(username, chain_kind); }
-   uint64_t  by_name()      const { return username.value; }
-   uint64_t  by_chain()     const { return static_cast<uint64_t>(chain_kind); }
-
-   SYSLIB_SERIALIZE(links_row, (key)(username)(chain_kind)(pub_key))
-};
-
-using links_t = sysio::kv::table<"links"_n, links_key, links_row,
-   sysio::kv::index<"bynamechain"_n,
-      sysio::const_mem_fun<links_row, uint128_t, &links_row::by_namechain>>,
-   sysio::kv::index<"byname"_n,
-      sysio::const_mem_fun<links_row, uint64_t, &links_row::by_name>>,
-   sysio::kv::index<"bychain"_n,
-      sysio::const_mem_fun<links_row, uint64_t, &links_row::by_chain>>
->;
-
-} // namespace authex_readonly
-
 // ---------------------------------------------------------------------------
 // Emissions readiness gate. Runs in advance() before any state mutation:
 // reads sysio.system::emitcfg + t5state and sysio.token::accounts to compute
@@ -322,6 +290,19 @@ void epoch::advance() {
 
    state_tbl.set(state, get_self());
 
+   // Drain matured rows from `sysio.opreg::wtdwqueue`. Operators that queued
+   // a withdrawal at least WITHDRAW_WAIT_EPOCHS ago are now eligible — opreg
+   // subtracts from the balance and emits OPERATOR_ACTION(WITHDRAW_REMIT) to
+   // the matching outpost (or transfers WIRE tokens directly for WIRE-direct
+   // withdraws). Slashed-during-the-wait rows are dropped silently inside
+   // opreg's flushwtdw. See CLAUDE-WIRE-OPERATOR-COLLATERAL-IMPL-PLAN.md §3.3.
+   action(
+      permission_level{get_self(), "owner"_n},
+      OPREG_ACCOUNT,
+      "flushwtdw"_n,
+      std::make_tuple(state.current_epoch_index)
+   ).send();
+
    // Queue OPERATORS attestation (full roster with authex chain addresses) for each outpost.
    // IMPORTANT: Must come before BATCH_OPERATOR_GROUPS so that the ETH outpost's
    // _handleOperators populates operatorEthAddress before _handleBatchOperatorGroups
@@ -329,7 +310,7 @@ void epoch::advance() {
    {
       opp::attestations::Operators ops_attest;
       opreg::operators_t opreg_ops(OPREG_ACCOUNT);
-      authex_readonly::links_t authex_links(AUTHEX_ACCOUNT);
+      authex::links_t authex_links(AUTHEX_ACCOUNT);
       auto links_by_name = authex_links.get_index<"byname"_n>();
 
       for (auto it = opreg_ops.begin(); it != opreg_ops.end(); ++it) {

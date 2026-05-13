@@ -1,257 +1,213 @@
 #include <sysio.uwrit/sysio.uwrit.hpp>
+#include <sysio.epoch/sysio.epoch.hpp>
+#include <sysio.opreg/sysio.opreg.hpp>
+#include <sysio.reserv/sysio.reserv.hpp>
+#include <sysio/opp/attestations/attestations.pb.hpp>
+#include <zpp_bits.h>
 
 namespace sysio {
 
+using opp::types::ChainKind;
+using opp::types::TokenKind;
+using opp::types::AttestationType;
+using opp::types::UnderwriteRequestStatus;
 using opp::types::UnderwriteStatus;
+using opp::types::OperatorStatus;
+using opp::types::OperatorType;
+using opp::attestations::SwapRequest;
+
+namespace {
+
+uint64_t current_time_ms() {
+   return static_cast<uint64_t>(current_time_point().sec_since_epoch()) * 1000;
+}
+
+uint32_t get_current_epoch() {
+   sysio::epoch::epochstate_t es(uwrit::EPOCH_ACCOUNT);
+   if (!es.exists()) return 0;
+   return es.get().current_epoch_index;
+}
+
+/// Sum the underwriter's pending withdraws on opreg for the given (chain, token).
+uint64_t opreg_pending_withdraws(name underwriter, ChainKind chain, TokenKind token_kind) {
+   opreg::wtdwqueue_t queue(uwrit::OPREG_ACCOUNT);
+   auto idx = queue.get_index<"byaccountck"_n>();
+   uint128_t composite = (static_cast<uint128_t>(underwriter.value) << 64)
+                       | (static_cast<uint64_t>(chain) << 32)
+                       | static_cast<uint64_t>(token_kind);
+
+   uint64_t total = 0;
+   auto it  = idx.lower_bound(composite);
+   auto end = idx.upper_bound(composite);
+   for (; it != end; ++it) {
+      total += it->amount;
+   }
+   return total;
+}
+
+/// Sum this contract's active locks for the given (underwriter, chain, token).
+uint64_t sum_locks_inline(name self, name underwriter,
+                          ChainKind chain, TokenKind token_kind) {
+   uwrit::locks_t locks(self);
+   auto idx = locks.get_index<"byuwck"_n>();
+   uint128_t composite = (static_cast<uint128_t>(underwriter.value) << 64)
+                       | (static_cast<uint64_t>(chain) << 32)
+                       | static_cast<uint64_t>(token_kind);
+
+   uint64_t total = 0;
+   auto it  = idx.lower_bound(composite);
+   auto end = idx.upper_bound(composite);
+   for (; it != end; ++it) {
+      total += it->amount;
+   }
+   return total;
+}
+
+/// Look up an underwriter's balance on opreg for the given (chain, token).
+/// Returns the raw stored balance — caller subtracts active locks + pending
+/// withdraws to get the spendable amount.
+uint64_t opreg_balance(name underwriter, ChainKind chain, TokenKind token_kind,
+                        OperatorStatus& out_status) {
+   opreg::operators_t ops(uwrit::OPREG_ACCOUNT);
+   opreg::operator_key op_pk{underwriter.value};
+   if (!ops.contains(op_pk)) {
+      out_status = OperatorStatus::OPERATOR_STATUS_UNKNOWN;
+      return 0;
+   }
+   auto op = ops.get(op_pk);
+   out_status = op.status;
+   for (const auto& b : op.balances) {
+      if (b.chain == chain && b.token_kind == token_kind) {
+         return b.balance;
+      }
+   }
+   return 0;
+}
+
+/// Compute the underwriter's spendable balance on (chain, token_kind).
+/// Mirrors the sysio.opreg::available() formula:
+///   balance - sum(active locks here in uwrit) - sum(pending withdraws on opreg)
+/// gated by status (SLASHED / TERMINATED -> 0).
+uint64_t available_via_mirrors(name self, name underwriter,
+                                ChainKind chain, TokenKind token_kind) {
+   OperatorStatus status;
+   uint64_t balance = opreg_balance(underwriter, chain, token_kind, status);
+   if (status == OperatorStatus::OPERATOR_STATUS_SLASHED ||
+       status == OperatorStatus::OPERATOR_STATUS_TERMINATED) {
+      return 0;
+   }
+   uint64_t locked  = sum_locks_inline(self, underwriter, chain, token_kind);
+   uint64_t pending = opreg_pending_withdraws(underwriter, chain, token_kind);
+   uint64_t reserved = locked + pending;
+   return balance > reserved ? balance - reserved : 0;
+}
+
+/// Constant-product output computed locally — mirrors sysio.reserve::cp_output
+/// (the uwrit mirror reads the same `lps` rows; the math is replicated here so
+/// uwrit doesn't need to action-call into reserve from inside createuwreq).
+uint64_t cp_output(uint64_t reserve_src, uint64_t reserve_dst, uint64_t src_amount) {
+   if (reserve_src == 0 || reserve_dst == 0 || src_amount == 0) return 0;
+   uint128_t numerator   = static_cast<uint128_t>(reserve_dst) * src_amount;
+   uint128_t denominator = static_cast<uint128_t>(reserve_src) + src_amount;
+   uint128_t result      = numerator / denominator;
+   if (result > static_cast<uint128_t>(std::numeric_limits<uint64_t>::max())) {
+      return std::numeric_limits<uint64_t>::max();
+   }
+   return static_cast<uint64_t>(result);
+}
+
+/// Quote `src_amount` of (src_chain, src_token) into (dst_chain, dst_token)
+/// via the WIRE-paired LPs on sysio.reserve. Returns 0 if any required LP
+/// is missing — caller treats 0 as "no quote available, skip variance check".
+uint64_t reserve_quote(ChainKind src_chain, TokenKind src_token,
+                       ChainKind dst_chain, TokenKind dst_token,
+                       uint64_t src_amount) {
+   if (src_amount == 0) return 0;
+   if (src_token == TokenKind::TOKEN_KIND_WIRE && dst_token == TokenKind::TOKEN_KIND_WIRE) {
+      return src_amount;
+   }
+   reserve::lps_t lps(uwrit::RESERVE_ACCOUNT);
+
+   if (src_token == TokenKind::TOKEN_KIND_WIRE) {
+      reserve::lp_key pk{reserve::pack_chain_token(dst_chain, dst_token)};
+      if (!lps.contains(pk)) return 0;
+      auto lp = lps.get(pk);
+      return cp_output(lp.reserve_wire, lp.reserve_paired, src_amount);
+   }
+   if (dst_token == TokenKind::TOKEN_KIND_WIRE) {
+      reserve::lp_key pk{reserve::pack_chain_token(src_chain, src_token)};
+      if (!lps.contains(pk)) return 0;
+      auto lp = lps.get(pk);
+      return cp_output(lp.reserve_paired, lp.reserve_wire, src_amount);
+   }
+   reserve::lp_key src_pk{reserve::pack_chain_token(src_chain, src_token)};
+   reserve::lp_key dst_pk{reserve::pack_chain_token(dst_chain, dst_token)};
+   if (!lps.contains(src_pk) || !lps.contains(dst_pk)) return 0;
+   auto src_lp = lps.get(src_pk);
+   auto dst_lp = lps.get(dst_pk);
+   uint64_t intermediate = cp_output(src_lp.reserve_paired, src_lp.reserve_wire, src_amount);
+   if (intermediate == 0) return 0;
+   return cp_output(dst_lp.reserve_wire, dst_lp.reserve_paired, intermediate);
+}
+
+/// Encode + queue a SWAP_REVERT attestation back to the source outpost when
+/// the variance check fails. The outpost matches the original SWAP via
+/// `original_swap_message_id` (low 8 bytes carry the depot's attestation_id;
+/// see msgch's REMIT_CONFIRM dispatch for the matching decode convention).
+void emit_swap_revert(name self, uint64_t outpost_id, uint64_t attestation_id,
+                      const opp::attestations::SwapRequest& sr,
+                      const std::string& reason) {
+   opp::attestations::SwapRevert rev;
+   rev.original_swap_message_id.assign(32, 0);
+   for (size_t i = 0; i < 8; ++i) {
+      rev.original_swap_message_id[i] = static_cast<char>((attestation_id >> (i * 8)) & 0xff);
+   }
+   rev.depositor     = sr.actor;
+   rev.refund_amount = sr.source_amount;
+   rev.reason        = reason;
+
+   auto [encoded, out] = zpp::bits::data_out<char>();
+   (void)out(rev);
+
+   action(
+      permission_level{self, "active"_n},
+      uwrit::MSGCH_ACCOUNT, "queueout"_n,
+      std::make_tuple(outpost_id,
+         opp::types::AttestationType::ATTESTATION_TYPE_SWAP_REVERT, encoded)
+   ).send();
+}
+
+/// Allocate a fresh `lock_id` from the uwcounters singleton.
+uint64_t next_lock_id(name self) {
+   uwrit::uwcounters_t ctr_tbl(self);
+   auto ctr = ctr_tbl.get_or_default(uwrit::uw_counters{});
+   uint64_t id = ctr.next_lock_id;
+   ctr.next_lock_id = id + 1;
+   ctr_tbl.set(ctr, self);
+   return id;
+}
+
+} // anonymous namespace
 
 // ---------------------------------------------------------------------------
 //  setconfig
 // ---------------------------------------------------------------------------
-void uwrit::setconfig(uint32_t fee_bps,
-                      uint32_t confirm_lock_sec,
-                      uint32_t uw_fee_share_pct,
-                      uint32_t other_uw_share_pct,
-                      uint32_t batch_op_share_pct) {
+void uwrit::setconfig(uint32_t fee_bps) {
    require_auth(get_self());
-
-   check(uw_fee_share_pct + other_uw_share_pct + batch_op_share_pct == 100,
-         "fee share percentages must sum to 100");
    check(fee_bps <= 10000, "fee_bps cannot exceed 10000 (100%)");
-   check(confirm_lock_sec > 0, "confirm_lock_sec must be positive");
 
    uwconfig_t cfg_tbl(get_self());
    uw_config cfg = cfg_tbl.get_or_default(uw_config{});
    cfg.fee_bps = fee_bps;
-   cfg.confirm_lock_sec = confirm_lock_sec;
-   cfg.uw_fee_share_pct = uw_fee_share_pct;
-   cfg.other_uw_share_pct = other_uw_share_pct;
-   cfg.batch_op_share_pct = batch_op_share_pct;
    cfg_tbl.set(cfg, get_self());
 }
 
 // ---------------------------------------------------------------------------
-//  submituw
-// ---------------------------------------------------------------------------
-void uwrit::submituw(name underwriter, uint64_t msg_id,
-                     checksum256 source_sig, checksum256 target_sig) {
-   require_auth(underwriter);
-
-   uwconfig_t cfg_tbl(get_self());
-   check(cfg_tbl.exists(), "underwriting config not initialized");
-   auto cfg = cfg_tbl.get();
-
-   // Check no existing underwriting for this message
-   uwledger_t ledger(get_self());
-   auto msg_idx = ledger.get_index<"bymessage"_n>();
-   auto existing = msg_idx.find(msg_id);
-   check(existing == msg_idx.end(), "message already has underwriting entry");
-
-   // TODO: Verify underwriter has sufficient uncommitted collateral on BOTH
-   //       source and target chains by reading collateral table.
-   //       For now, create the ledger entry.
-
-   auto now = current_time_point();
-   auto unlock = now + microseconds(static_cast<int64_t>(cfg.confirm_lock_sec) * 1'000'000);
-
-   uint64_t next_id = ledger.available_primary_key();
-
-   ledger.emplace(underwriter, id_key{next_id}, underwriting_entry{
-      .id          = next_id,
-      .underwriter = underwriter,
-      .message_id  = msg_id,
-      .status      = UnderwriteStatus::UNDERWRITE_STATUS_INTENT_SUBMITTED,
-      .intent_time = now,
-      .unlock_time = unlock,
-      .source_sig  = source_sig,
-      .target_sig  = target_sig,
-   });
-
-   // TODO: Queue ATTESTATION_TYPE_UNDERWRITE_INTENT to BOTH outposts
-   //       via sysio.msgch::queueout inline action.
-}
-
-// ---------------------------------------------------------------------------
-//  confirmuw
-// ---------------------------------------------------------------------------
-void uwrit::confirmuw(uint64_t uw_entry_id) {
-   require_auth(get_self());
-
-   uwledger_t ledger(get_self());
-   auto pk = id_key{uw_entry_id};
-   auto row = ledger.get(pk, "underwriting entry not found");
-   check(row.status == UnderwriteStatus::UNDERWRITE_STATUS_INTENT_SUBMITTED,
-         "entry not in INTENT_SUBMITTED state");
-
-   // TODO: Verify BOTH outpost confirmations have been received.
-   //       Calculate exchange rate via reserve balances, verify threshold.
-
-   ledger.modify(same_payer, pk, [&](auto& e) {
-      e.status = UnderwriteStatus::UNDERWRITE_STATUS_INTENT_CONFIRMED;
-   });
-
-   // TODO: Queue ATTESTATION_TYPE_REMIT to target outpost via sysio.msgch::queueout.
-}
-
-// ---------------------------------------------------------------------------
-//  expirelock
-// ---------------------------------------------------------------------------
-void uwrit::expirelock(uint64_t uw_entry_id) {
-   // Permissionless — anyone can call to expire stale locks.
-   uwledger_t ledger(get_self());
-   auto pk = id_key{uw_entry_id};
-   auto row = ledger.get(pk, "underwriting entry not found");
-   check(row.status != UnderwriteStatus::UNDERWRITE_STATUS_RELEASED &&
-         row.status != UnderwriteStatus::UNDERWRITE_STATUS_SLASHED,
-         "entry already finalized");
-
-   auto now = current_time_point();
-   check(now >= row.unlock_time, "lock has not expired yet");
-
-   ledger.modify(same_payer, pk, [&](auto& e) {
-      e.status = UnderwriteStatus::UNDERWRITE_STATUS_RELEASED;
-   });
-
-   // Release committed collateral
-   collateral_t collateral(get_self());
-   auto uw_idx = collateral.get_index<"byuw"_n>();
-   for (auto c_it = uw_idx.lower_bound(row.underwriter.value);
-        c_it != uw_idx.end() && c_it->underwriter == row.underwriter; ++c_it) {
-      auto col_pk = c_it.key();
-      if (c_it->chain_kind == row.source_chain) {
-         collateral.modify(same_payer, col_pk, [&](auto& c) {
-            c.locked_amount    -= row.source_amount;
-            c.available_amount += row.source_amount;
-         });
-      }
-      if (c_it->chain_kind == row.target_chain) {
-         collateral.modify(same_payer, col_pk, [&](auto& c) {
-            c.locked_amount    -= row.target_amount;
-            c.available_amount += row.target_amount;
-         });
-      }
-   }
-}
-
-// ---------------------------------------------------------------------------
-//  distfee
-// ---------------------------------------------------------------------------
-void uwrit::distfee(uint64_t uw_entry_id) {
-   require_auth(get_self());
-
-   uwledger_t ledger(get_self());
-   auto pk = id_key{uw_entry_id};
-   auto row = ledger.get(pk, "underwriting entry not found");
-   check(row.status == UnderwriteStatus::UNDERWRITE_STATUS_INTENT_CONFIRMED,
-         "entry not confirmed");
-
-   uwconfig_t cfg_tbl(get_self());
-   auto cfg = cfg_tbl.get();
-
-   // TODO: Calculate fee based on fee_bps applied to both source and target amounts.
-   //       Split according to uw_fee_share_pct / other_uw_share_pct / batch_op_share_pct.
-   //       Transfer fee shares to respective accounts.
-   //       For now, mark as completed.
-
-   ledger.modify(same_payer, pk, [&](auto& e) {
-      e.status = UnderwriteStatus::UNDERWRITE_STATUS_RELEASED;
-   });
-}
-
-// ---------------------------------------------------------------------------
-//  updcltrl
-// ---------------------------------------------------------------------------
-void uwrit::updcltrl(name underwriter, fc::crypto::chain_kind_t chain_kind,
-                     asset amount, bool is_increase) {
-   require_auth(get_self());
-
-   collateral_t collateral(get_self());
-
-   // Find existing entry for this underwriter + chain_kind
-   auto uw_idx = collateral.get_index<"byuwchain"_n>();
-   uint128_t composite = (static_cast<uint128_t>(underwriter.value) << 64) |
-                          static_cast<uint64_t>(chain_kind);
-   auto it = uw_idx.find(composite);
-
-   if (it == uw_idx.end()) {
-      check(is_increase, "cannot decrease non-existent collateral");
-
-      uint64_t next_id = collateral.available_primary_key();
-
-      collateral.emplace(get_self(), id_key{next_id}, collateral_entry{
-         .id               = next_id,
-         .underwriter      = underwriter,
-         .chain_kind       = chain_kind,
-         .staked_amount    = amount,
-         .locked_amount    = asset(0, amount.symbol),
-         .available_amount = amount,
-      });
-   } else {
-      collateral.modify(same_payer, it.key(), [&](auto& c) {
-         if (is_increase) {
-            c.staked_amount    += amount;
-            c.available_amount += amount;
-         } else {
-            check(c.available_amount >= amount, "insufficient available collateral");
-            c.staked_amount    -= amount;
-            c.available_amount -= amount;
-         }
-      });
-   }
-}
-
-// ---------------------------------------------------------------------------
-//  slash
-// ---------------------------------------------------------------------------
-void uwrit::slash(name underwriter, std::string reason) {
-   require_auth(CHALG_ACCOUNT);
-
-   // Seize ALL collateral from slashed underwriter
-   collateral_t collateral(get_self());
-   {
-      auto uw_idx = collateral.get_index<"byuw"_n>();
-      std::vector<id_key> to_zero;
-      for (auto it = uw_idx.lower_bound(underwriter.value);
-           it != uw_idx.end() && it->underwriter == underwriter; ++it) {
-         to_zero.push_back(it.key());
-      }
-      for (const auto& pk : to_zero) {
-         collateral.modify(same_payer, pk, [&](auto& c) {
-            c.staked_amount    = asset(0, c.staked_amount.symbol);
-            c.locked_amount    = asset(0, c.locked_amount.symbol);
-            c.available_amount = asset(0, c.available_amount.symbol);
-         });
-      }
-   }
-
-   // Mark all active underwriting entries as slashed
-   uwledger_t ledger(get_self());
-   {
-      auto uw_ledger_idx = ledger.get_index<"byuw"_n>();
-      std::vector<id_key> to_slash;
-      for (auto it = uw_ledger_idx.lower_bound(underwriter.value);
-           it != uw_ledger_idx.end() && it->underwriter == underwriter; ++it) {
-         if (it->status == UnderwriteStatus::UNDERWRITE_STATUS_INTENT_SUBMITTED ||
-             it->status == UnderwriteStatus::UNDERWRITE_STATUS_INTENT_CONFIRMED) {
-            to_slash.push_back(it.key());
-         }
-      }
-      for (const auto& pk : to_slash) {
-         ledger.modify(same_payer, pk, [&](auto& e) {
-            e.status = UnderwriteStatus::UNDERWRITE_STATUS_SLASHED;
-         });
-      }
-   }
-
-   // TODO: Distribute seized collateral per slash distribution rules:
-   //       50% to challenger, 25% to other underwriters, 25% to batch operators.
-   //       Queue ATTESTATION_TYPE_SLASH_OPERATOR to all outposts.
-}
-
-// ---------------------------------------------------------------------------
-//  createuwreq — create underwrite request (called inline from sysio.msgch)
+//  createuwreq — called inline from sysio.msgch when SWAP arrives
 // ---------------------------------------------------------------------------
 void uwrit::createuwreq(uint64_t attestation_id,
                          opp::types::AttestationType type,
+                         uint64_t outpost_id,
                          std::vector<char> data) {
    require_auth(MSGCH_ACCOUNT);
 
@@ -260,18 +216,308 @@ void uwrit::createuwreq(uint64_t attestation_id,
    check(!reqs.contains(pk),
          "underwrite request already exists for this attestation");
 
+   // Only SWAP attestations create UWREQs — msgch's dispatch routes other
+   // types directly to their handlers, not through createuwreq.
+   check(type == AttestationType::ATTESTATION_TYPE_SWAP,
+         "createuwreq currently supports only SWAP attestations");
+
+   SwapRequest sr;
+   {
+      auto in = zpp::bits::in{std::span{data.data(), data.size()}, zpp::bits::no_size{}};
+      auto rc = in(sr);
+      check(rc == zpp::bits::errc{}, "failed to decode SwapRequest");
+   }
+
+   // Variance-tolerance check via sysio.reserve mirror. If no LP is
+   // provisioned for the (chain, token) pair on either side the quote
+   // returns 0 and the variance check is implicitly skipped — the swap
+   // proceeds to the underwriter race. This lets dev / smoke clusters
+   // without provisioned LPs continue to operate while still applying the
+   // check the moment LPs are present.
+   const TokenKind src_token  = sr.source_amount.kind;
+   const ChainKind src_chain  = sr.actor.kind;
+   const ChainKind dst_chain  = sr.target_chain.kind;
+   const TokenKind dst_token  = sr.target_token;
+   const uint64_t  src_amount = static_cast<uint64_t>(static_cast<int64_t>(sr.source_amount.amount));
+
+   uint64_t current_quote = reserve_quote(src_chain, src_token, dst_chain, dst_token, src_amount);
+   if (current_quote != 0 && sr.quoted_destination_amount != 0) {
+      uint64_t quoted   = sr.quoted_destination_amount;
+      uint64_t diff     = current_quote > quoted ? current_quote - quoted : quoted - current_quote;
+      // tolerance_bps / 10000 of quoted; computed in uint128 to avoid overflow.
+      uint128_t allowed = (static_cast<uint128_t>(quoted) * sr.quote_tolerance_bps) / 10000u;
+      if (static_cast<uint128_t>(diff) > allowed) {
+         emit_swap_revert(get_self(), outpost_id, attestation_id, sr,
+                          "variance exceeded tolerance: quoted=" + std::to_string(quoted)
+                          + " current=" + std::to_string(current_quote)
+                          + " tolerance_bps=" + std::to_string(sr.quote_tolerance_bps));
+         return;   // no UWREQ created
+      }
+   }
+
    reqs.emplace(get_self(), pk, uw_request_t{
       .id                        = attestation_id,
       .type                      = type,
-      .status                    = opp::types::UNDERWRITE_REQUEST_STATUS_PENDING,
-      .uw_name                   = name{},
-      .locked_amounts            = {},
-      .unlock_timestamp          = 0,
-      .released_timestamp        = 0,
-      .slashed_timestamp         = 0,
+      .status                    = UnderwriteRequestStatus::UNDERWRITE_REQUEST_STATUS_PENDING,
+      .src_chain                 = sr.actor.kind,
+      .src_token_kind            = sr.source_amount.kind,
+      .src_amount                = static_cast<uint64_t>(static_cast<int64_t>(sr.source_amount.amount)),
+      .dst_chain                 = sr.target_chain.kind,
+      .dst_token_kind            = sr.target_token,
+      .dst_amount                = sr.quoted_destination_amount,
+      .commits_by                = {},
+      .winner                    = name{},
+      .committed_at_ms           = 0,
+      .settled_at_ms             = 0,
+      .expires_at_epoch          = 0,
       .attestation_inbound_data  = std::move(data),
       .attestation_outbound_data = {},
    });
+}
+
+// ---------------------------------------------------------------------------
+//  Internal: try_select_winner — race resolver
+// ---------------------------------------------------------------------------
+
+namespace {
+
+/// Helper: find or create the commit_entry for `underwriter` inside an
+/// uw_request_t. Returns iterator-like reference into the in-place vector.
+uwrit::commit_entry* find_or_create_commit(uwrit::uw_request_t& req, name underwriter) {
+   for (auto& c : req.commits_by) {
+      if (c.underwriter == underwriter) return &c;
+   }
+   req.commits_by.push_back(uwrit::commit_entry{
+      .underwriter = underwriter,
+   });
+   return &req.commits_by.back();
+}
+
+/// Resolve the race once both legs of a (uwreq, underwriter) pair have
+/// arrived. If the underwriter has sufficient bond on each chain, push two
+/// lock rows + mark them winner + emit REMIT to the destination outpost.
+/// Otherwise mark their commit_entry as INSUFFICIENT_BOND (status=SLASHED in
+/// the proto enum, used here as a sentinel for "race-disqualified").
+void try_select_winner(name self, uint64_t uwreq_id, name candidate) {
+   uwrit::uwreqs_t reqs(self);
+   auto pk = uwrit::id_key{uwreq_id};
+   if (!reqs.contains(pk)) return;
+   auto req = reqs.get(pk);
+   if (req.status != UnderwriteRequestStatus::UNDERWRITE_REQUEST_STATUS_PENDING) return;
+
+   uint64_t src_avail = available_via_mirrors(self, candidate, req.src_chain, req.src_token_kind);
+   uint64_t dst_avail = available_via_mirrors(self, candidate, req.dst_chain, req.dst_token_kind);
+   if (src_avail < req.src_amount || dst_avail < req.dst_amount) {
+      // Insufficient bond — mark the commit_entry but don't promote.
+      reqs.modify(same_payer, pk, [&](auto& r) {
+         auto* c = find_or_create_commit(r, candidate);
+         c->status = UnderwriteStatus::UNDERWRITE_STATUS_SLASHED;
+         c->reason = "insufficient bond on one or both legs";
+      });
+      return;
+   }
+
+   // Winner — push two locks (one per leg) + mark uwreq CONFIRMED.
+   uint32_t now_ep = get_current_epoch();
+   uwrit::locks_t locks(self);
+
+   uint64_t src_lock_id = next_lock_id(self);
+   locks.emplace(self, uwrit::lock_key{src_lock_id}, uwrit::lock_entry{
+      .lock_id          = src_lock_id,
+      .uwreq_id         = uwreq_id,
+      .underwriter      = candidate,
+      .chain            = req.src_chain,
+      .token_kind       = req.src_token_kind,
+      .amount           = req.src_amount,
+      .created_at_epoch = now_ep,
+   });
+
+   uint64_t dst_lock_id = next_lock_id(self);
+   locks.emplace(self, uwrit::lock_key{dst_lock_id}, uwrit::lock_entry{
+      .lock_id          = dst_lock_id,
+      .uwreq_id         = uwreq_id,
+      .underwriter      = candidate,
+      .chain            = req.dst_chain,
+      .token_kind       = req.dst_token_kind,
+      .amount           = req.dst_amount,
+      .created_at_epoch = now_ep,
+   });
+
+   reqs.modify(same_payer, pk, [&](auto& r) {
+      r.status          = UnderwriteRequestStatus::UNDERWRITE_REQUEST_STATUS_CONFIRMED;
+      r.winner          = candidate;
+      r.committed_at_ms = current_time_ms();
+      // Mark the winner's commit_entry CONFIRMED, others RELEASED (loser).
+      for (auto& c : r.commits_by) {
+         if (c.underwriter == candidate) {
+            c.status = UnderwriteStatus::UNDERWRITE_STATUS_INTENT_CONFIRMED;
+         } else if (c.status == UnderwriteStatus::UNDERWRITE_STATUS_INTENT_SUBMITTED) {
+            // Eligible loser — promote to RELEASED for retention/debugging.
+            c.status = UnderwriteStatus::UNDERWRITE_STATUS_RELEASED;
+            c.reason = "lost the COMMIT race";
+         }
+      }
+   });
+
+   // REMIT emit — wired up in Task 4 (sysio.msgch dispatch + msgch::queueout
+   // round-trip). The msgch dispatch routes ATTESTATION_TYPE_REMIT_CONFIRM
+   // back into uwrit::release once the destination outpost confirms; this
+   // closes the loop. For now the uwreq sits in CONFIRMED status until the
+   // expirelock watchdog fires or msgch's dispatch routes the REMIT.
+}
+
+} // anonymous namespace
+
+// ---------------------------------------------------------------------------
+//  rcrdcommit — record a per-leg COMMIT arrival
+// ---------------------------------------------------------------------------
+void uwrit::rcrdcommit(uint64_t uwreq_id,
+                       name underwriter,
+                       uint64_t outpost_id,
+                       opp::types::ChainKind from_chain) {
+   require_auth(MSGCH_ACCOUNT);
+   (void)outpost_id;   // outpost_id is informational; race math uses from_chain
+
+   uwreqs_t reqs(get_self());
+   auto pk = id_key{uwreq_id};
+   check(reqs.contains(pk), "uwreq not found");
+   auto req = reqs.get(pk);
+   check(req.status == UnderwriteRequestStatus::UNDERWRITE_REQUEST_STATUS_PENDING,
+         "uwreq not open for commits");
+
+   reqs.modify(same_payer, pk, [&](auto& r) {
+      auto* c = find_or_create_commit(r, underwriter);
+      uint64_t now_ms = current_time_ms();
+      if (from_chain == r.src_chain) {
+         c->source_received_at_ms = now_ms;
+      } else if (from_chain == r.dst_chain) {
+         c->dest_received_at_ms = now_ms;
+      }
+      // Re-set status to INTENT_SUBMITTED if the underwriter is re-arming
+      // a previously-disqualified entry (e.g. they topped up bond and want
+      // back in the race). The next try_select_winner call re-evaluates.
+      if (c->status == UnderwriteStatus::UNDERWRITE_STATUS_SLASHED) {
+         c->status = UnderwriteStatus::UNDERWRITE_STATUS_INTENT_SUBMITTED;
+         c->reason.clear();
+      }
+   });
+
+   // Re-read after modify — try_select_winner needs the latest commit_entry.
+   auto refreshed = reqs.get(pk);
+   for (const auto& c : refreshed.commits_by) {
+      if (c.underwriter == underwriter &&
+          c.source_received_at_ms != 0 && c.dest_received_at_ms != 0) {
+         try_select_winner(get_self(), uwreq_id, underwriter);
+         break;
+      }
+   }
+}
+
+// ---------------------------------------------------------------------------
+//  rcrdreject — underwriter (or outpost) rejects an intent
+// ---------------------------------------------------------------------------
+void uwrit::rcrdreject(uint64_t uwreq_id, name underwriter, std::string reason) {
+   require_auth(MSGCH_ACCOUNT);
+
+   uwreqs_t reqs(get_self());
+   auto pk = id_key{uwreq_id};
+   check(reqs.contains(pk), "uwreq not found");
+   auto req = reqs.get(pk);
+   check(req.status == UnderwriteRequestStatus::UNDERWRITE_REQUEST_STATUS_PENDING,
+         "uwreq not open for rejects");
+
+   reqs.modify(same_payer, pk, [&](auto& r) {
+      auto* c = find_or_create_commit(r, underwriter);
+      c->status = UnderwriteStatus::UNDERWRITE_STATUS_RELEASED;
+      c->reason = std::move(reason);
+   });
+}
+
+// ---------------------------------------------------------------------------
+//  release — settle an UWREQ; deferred-slash / deferred-remit each lock
+// ---------------------------------------------------------------------------
+void uwrit::release(uint64_t uwreq_id) {
+   // Two callers expected:
+   //   * sysio.msgch::dispatch on REMIT_CONFIRM inbound (msgch auth).
+   //   * uwrit::expirelock self-inline when a lock has aged past its deadline
+   //     (uwrit's own auth, sent from the expirelock action body).
+   check(has_auth(MSGCH_ACCOUNT) || has_auth(get_self()),
+         "release requires sysio.msgch or sysio.uwrit authority");
+
+   uwreqs_t reqs(get_self());
+   auto pk = id_key{uwreq_id};
+   check(reqs.contains(pk), "uwreq not found");
+   auto req = reqs.get(pk);
+   check(req.status == UnderwriteRequestStatus::UNDERWRITE_REQUEST_STATUS_CONFIRMED,
+         "uwreq not in CONFIRMED state");
+
+   // Iterate locks for this uwreq via secondary index, copy out keys (we'll
+   // erase as we go), then for each: call opreg::releaselock + erase.
+   locks_t locks(get_self());
+   auto idx = locks.get_index<"byuwreq"_n>();
+   std::vector<lock_key> to_erase;
+   for (auto it = idx.lower_bound(uwreq_id);
+        it != idx.end() && it->uwreq_id == uwreq_id; ++it) {
+      opp::types::TokenAmount ta;
+      ta.kind   = it->token_kind;
+      ta.amount = zpp::bits::vint64_t{static_cast<int64_t>(it->amount)};
+      action(
+         permission_level{get_self(), "active"_n},
+         OPREG_ACCOUNT, "releaselock"_n,
+         std::make_tuple(it->underwriter, it->chain, ta)
+      ).send();
+      to_erase.push_back(lock_key{it->lock_id});
+   }
+   for (const auto& k : to_erase) {
+      locks.erase(k);
+   }
+
+   uint32_t now_ep = get_current_epoch();
+   reqs.modify(same_payer, pk, [&](auto& r) {
+      r.status           = UnderwriteRequestStatus::UNDERWRITE_REQUEST_STATUS_COMPLETED;
+      r.settled_at_ms    = current_time_ms();
+      r.expires_at_epoch = now_ep + UWREQ_RETENTION_EPOCHS;
+   });
+}
+
+// ---------------------------------------------------------------------------
+//  expirelock — permissionless watchdog for stale locks
+// ---------------------------------------------------------------------------
+void uwrit::expirelock(uint64_t uwreq_id) {
+   uwreqs_t reqs(get_self());
+   auto pk = id_key{uwreq_id};
+   check(reqs.contains(pk), "uwreq not found");
+   auto req = reqs.get(pk);
+   check(req.status == UnderwriteRequestStatus::UNDERWRITE_REQUEST_STATUS_CONFIRMED,
+         "uwreq not in CONFIRMED state");
+
+   // Check the oldest lock for this uwreq has aged past the unlock deadline.
+   // The deadline is the 10-epoch UWREQ retention window — generous enough
+   // that the destination outpost has had ample time to confirm REMIT.
+   locks_t locks(get_self());
+   auto idx = locks.get_index<"byuwreq"_n>();
+   auto it = idx.lower_bound(uwreq_id);
+   check(it != idx.end() && it->uwreq_id == uwreq_id, "no locks for uwreq");
+
+   uint32_t now_ep = get_current_epoch();
+   check(now_ep >= it->created_at_epoch + UWREQ_RETENTION_EPOCHS,
+         "uwreq lock has not yet aged past the unlock deadline");
+
+   // Self-call release inline.
+   action(
+      permission_level{get_self(), "active"_n},
+      get_self(), "release"_n,
+      std::make_tuple(uwreq_id)
+   ).send();
+}
+
+// ---------------------------------------------------------------------------
+//  sumlocks — read-only helper
+// ---------------------------------------------------------------------------
+uint64_t uwrit::sumlocks(name underwriter,
+                         opp::types::ChainKind chain,
+                         opp::types::TokenKind token_kind) {
+   return sum_locks_inline(get_self(), underwriter, chain, token_kind);
 }
 
 } // namespace sysio

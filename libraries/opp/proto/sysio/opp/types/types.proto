@@ -122,30 +122,59 @@ enum AttestationType {
   ATTESTATION_TYPE_OPERATOR_ACTION = 2001; // 0x0BB9
   ATTESTATION_TYPE_STAKE = 3001; // 0x0BB9
   ATTESTATION_TYPE_UNSTAKE = 3002; // 0x0BBA
+  // DEPRECATED — pre-launch only, do not use in new code.
   ATTESTATION_TYPE_PRETOKEN_PURCHASE = 3004; // 0x0BBB
+  // DEPRECATED — pre-launch only, do not use in new code.
   ATTESTATION_TYPE_PRETOKEN_YIELD = 3006; // 0x0BBE
   ATTESTATION_TYPE_RESERVE_BALANCE_SHEET = 43520; // 0xAA00
   ATTESTATION_TYPE_STAKE_UPDATE = 60928; // 0xEE00
-  ATTESTATION_TYPE_NATIVE_YIELD_REWARD = 60929; // 0xEE01
+  // 60929 (0xEE01) was ATTESTATION_TYPE_NATIVE_YIELD_REWARD — removed; STAKING_REWARD
+  // is the single staker-reward feedback path. Slot left free; do not reuse.
+  // DEPRECATED — pre-launch only, do not use in new code.
   ATTESTATION_TYPE_WIRE_TOKEN_PURCHASE = 60930; // 0xEE02
   ATTESTATION_TYPE_CHALLENGE_RESPONSE = 60932; // 0xEE04
-  ATTESTATION_TYPE_SLASH_OPERATOR = 60933; // 0xEE05
+  // SLASH is now an OperatorAction sub-type (action_type=ACTION_TYPE_SLASH)
+  // carried inside an OPERATOR_ACTION attestation; the standalone
+  // SLASH_OPERATOR attestation type has been removed. Slot 60933 left free.
   ATTESTATION_TYPE_SWAP = 60934; // 0xEE06
+  // DEPRECATED — replaced by ATTESTATION_TYPE_UNDERWRITE_INTENT_COMMIT (60953).
   ATTESTATION_TYPE_UNDERWRITE_INTENT = 60935; // 0xEE07
+  // DEPRECATED — replaced by the depot-internal race resolver (no on-wire confirm message).
   ATTESTATION_TYPE_UNDERWRITE_CONFIRM = 60936; // 0xEE08
+  // DEPRECATED — replaced by ATTESTATION_TYPE_UNDERWRITE_INTENT_REJECT (60954). Different semantics —
+  // the new value is "an underwriter rejecting their own intent"; the legacy was "depot rejecting".
   ATTESTATION_TYPE_UNDERWRITE_REJECT = 60937; // 0xEE09
+  // DEPRECATED — replaced by REMIT / SWAP_REVERT lifecycle (no separate unlock message).
   ATTESTATION_TYPE_UNDERWRITE_UNLOCK = 60938; // 0xEE0A
   ATTESTATION_TYPE_REMIT = 60944; // 0xEE10
   ATTESTATION_TYPE_CHALLENGE_REQUEST = 60945; // 0xEE11
+  // DEPRECATED — replaced by `sysio.epoch::advance` internal flow (no on-wire epoch sync).
   ATTESTATION_TYPE_EPOCH_SYNC = 60946; // 0xEE12
   ATTESTATION_TYPE_OPERATORS = 60947; // 0xEE13
   ATTESTATION_TYPE_REMIT_CONFIRM = 60948; // 0xEE14
   ATTESTATION_TYPE_BATCH_OPERATOR_GROUPS = 60943; // 0xEE0F
   ATTESTATION_TYPE_NODE_OWNER_REG = 60949; // 0xEE15
-  ATTESTATION_TYPE_STAKING_REWARD = 60950; // 0xEE16 (stub)
+  ATTESTATION_TYPE_STAKING_REWARD = 60950; // 0xEE16
   ATTESTATION_TYPE_STAKE_RESULT = 60951; // 0xEE17
   ATTESTATION_TYPE_ATTESTATION_PROCESSING_ERROR = 60952; // 0xEE18
-  ATTESTATION_TYPE_EMISSIONS_BLOCKED = 60953; // 0xEE19
+
+  // ---------------------------------------------------------------------------
+  //  New collateral / underwriter / variance-revert lifecycle (post-rebase).
+  //  See CLAUDE-WIRE-OPERATOR-COLLATERAL-IMPL-PLAN.md §6 for the full contracts.
+  // ---------------------------------------------------------------------------
+  // Underwriter -> outpost (JSON-RPC) -> depot. Single attestation per (underwriter, outpost) leg;
+  // the depot resolves the race when both legs land for the same underwriter.
+  ATTESTATION_TYPE_UNDERWRITE_INTENT_COMMIT = 60953; // 0xEE19
+  // Underwriter explicitly steps back from a race they entered (or the outpost rejects malformed input).
+  ATTESTATION_TYPE_UNDERWRITE_INTENT_REJECT = 60954; // 0xEE1A
+  // Depot -> source outpost. Variance check failed; refund the user's deposit.
+  ATTESTATION_TYPE_SWAP_REVERT = 60955;              // 0xEE1B
+  // Depot -> source outpost. Identity / link-table validation failed at the
+  // opreg layer (unknown originating account, missing authex link for this
+  // chain, operator in non-deposit-eligible state). Outpost matches the
+  // referenced original_message_id and refunds the depositor.
+  ATTESTATION_TYPE_DEPOSIT_REVERT = 60956;            // 0xEE1C
+  ATTESTATION_TYPE_EMISSIONS_BLOCKED = 60957;         // 0xEE1D
 }
 
 // Reason codes for ATTESTATION_TYPE_EMISSIONS_BLOCKED. Emitted by

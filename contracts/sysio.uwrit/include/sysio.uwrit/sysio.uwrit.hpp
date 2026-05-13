@@ -12,198 +12,270 @@
 
 namespace sysio {
 
+   /**
+    * @brief sysio.uwrit — underwriter race resolver + flat lock vector.
+    *
+    * Per the corrected ledger model in
+    * `CLAUDE-WIRE-OPERATOR-COLLATERAL-IMPL-PLAN.md`:
+    *
+    * - opreg owns the bond ledger (per-(operator, chain, token_kind) aggregate
+    *   balance). uwrit owns the **lock vector** — one row per leg of every
+    *   in-flight UWREQ. opreg's `available()` rollup reads this table via a
+    *   mirror to subtract active locks from the operator's spendable balance.
+    *
+    * - On `UNDERWRITE_INTENT_COMMIT` arrival (one per outpost; underwriters
+    *   call `commit(...)` JSON-RPC on each side), `record_commit` registers
+    *   the per-leg arrival in `uwreqs.commits_by`. When BOTH legs land for
+    *   the same underwriter, `try_select_winner` checks the underwriter's
+    *   `sysio.opreg::available(...)` for each chain; if both legs are
+    *   covered, the underwriter wins, two rows are pushed onto `locks`, and
+    *   a `REMIT` is queued to the destination outpost.
+    *
+    * - opreg.balance is **not** mutated when a lock is added — the lock
+    *   simply reduces what `available()` rolls up. When a lock releases:
+    *     * SLASHED underwriter   — opreg::releaselock decrements balance
+    *                               and emits SLASH_OPERATOR (deferred-slash).
+    *     * TERMINATED underwriter — opreg::releaselock decrements balance
+    *                               and emits WITHDRAW_REMIT to authex
+    *                               destination (deferred-remit).
+    *     * Healthy underwriter   — no opreg call; freed amount naturally
+    *                               reappears in `available()` once the lock
+    *                               row is erased.
+    */
    class [[sysio::contract("sysio.uwrit")]] uwrit : public contract {
    public:
       using contract::contract;
+
+      // Well-known accounts
+      static constexpr name EPOCH_ACCOUNT = "sysio.epoch"_n;
+      static constexpr name MSGCH_ACCOUNT = "sysio.msgch"_n;
+      static constexpr name OPREG_ACCOUNT = "sysio.opreg"_n;
+      static constexpr name CHALG_ACCOUNT = "sysio.chalg"_n;
+      static constexpr name RESERVE_ACCOUNT = "sysio.reserv"_n;
+
+      // Number of epochs an UWREQ row lives after settlement / abort. 10 epochs
+      // matches the bootstrap doc's "losers retained 10 epochs for debugging"
+      // requirement; covers SETTLED, REVERTED, EXPIRED uwreqs alike.
+      static constexpr uint32_t UWREQ_RETENTION_EPOCHS = 10;
 
       // -----------------------------------------------------------------------
       //  Actions
       // -----------------------------------------------------------------------
 
-      /// Set underwriting configuration.
+      /// Set underwriting fee config. Simplified vs the legacy 4-step model —
+      /// fee distribution is deferred to a later task; for now this just
+      /// holds the per-spoke fee_bps that the depot applies.
       [[sysio::action]]
-      void setconfig(uint32_t fee_bps,
-                     uint32_t confirm_lock_sec,
-                     uint32_t uw_fee_share_pct,
-                     uint32_t other_uw_share_pct,
-                     uint32_t batch_op_share_pct);
+      void setconfig(uint32_t fee_bps);
 
-      /// Underwriter submits intent to underwrite a message.
-      [[sysio::action]]
-      void submituw(name underwriter, uint64_t msg_id,
-                    checksum256 source_sig, checksum256 target_sig);
-
-      /// Called when outpost confirms underwriting commitment.
-      [[sysio::action]]
-      void confirmuw(uint64_t uw_entry_id);
-
-      /// Expire locks past unlock_time (permissionless).
-      [[sysio::action]]
-      void expirelock(uint64_t uw_entry_id);
-
-      /// Distribute fees after completion.
-      [[sysio::action]]
-      void distfee(uint64_t uw_entry_id);
-
-      /// Update collateral from outpost attestations.
-      [[sysio::action]]
-      void updcltrl(name underwriter, fc::crypto::chain_kind_t chain_kind,
-                    asset amount, bool is_increase);
-
-      /// Slash underwriter (called by sysio.chalg).
-      [[sysio::action]]
-      void slash(name underwriter, std::string reason);
-
-      /// Create underwrite request (called inline from sysio.msgch).
+      /// Called inline from `sysio.msgch::dispatch` when a SWAP attestation
+      /// arrives. Decodes the SwapRequest, runs the variance-tolerance check
+      /// against `sysio.reserve::quote` (skipped when no LP is provisioned
+      /// for the (chain, token) pair), and either:
+      ///   * creates an OPEN UWREQ with src/dst populated from the swap, or
+      ///   * emits a SWAP_REVERT back to `outpost_id` and skips UWREQ creation
+      ///     when the gap between quoted_destination_amount and the depot's
+      ///     current quote exceeds `quote_tolerance_bps`.
+      ///
+      /// `outpost_id` is the source outpost the SWAP came from — needed so
+      /// the SWAP_REVERT routes back to the user's depositing outpost on
+      /// variance failure.
       [[sysio::action]]
       void createuwreq(uint64_t attestation_id,
                        opp::types::AttestationType type,
+                       uint64_t outpost_id,
                        std::vector<char> data);
+
+      /// Called inline from `sysio.msgch::dispatch` when an
+      /// UNDERWRITE_INTENT_COMMIT attestation arrives. Records the per-leg
+      /// arrival in `uwreqs.commits_by`. When both legs land for the same
+      /// underwriter, runs `try_select_winner` to resolve the race.
+      [[sysio::action]]
+      void rcrdcommit(uint64_t uwreq_id,
+                      name underwriter,
+                      uint64_t outpost_id,
+                      opp::types::ChainKind from_chain);
+
+      /// Called inline from `sysio.msgch::dispatch` when an
+      /// UNDERWRITE_INTENT_REJECT attestation arrives. Marks the
+      /// underwriter's race entry as REJECTED.
+      [[sysio::action]]
+      void rcrdreject(uint64_t uwreq_id, name underwriter, std::string reason);
+
+      /// Settle an UWREQ. For each lock entry: erase the row and call
+      /// opreg::releaselock so opreg can deferred-slash / deferred-remit /
+      /// no-op based on the underwriter's current status. The UWREQ row
+      /// itself transitions to SETTLED with `expires_at_epoch = now + 10`
+      /// for off-chain debug retention.
+      ///
+      /// auth=self: invoked inline from msgch dispatch on REMIT_CONFIRM /
+      /// SWAP_REVERT, or from `expirelock` when a lock has aged past
+      /// the unlock deadline.
+      [[sysio::action]]
+      void release(uint64_t uwreq_id);
+
+      /// Permissionless: trigger `release(uwreq_id)` if the UWREQ has been
+      /// COMMITTED for longer than its unlock deadline without settlement.
+      /// Used by watchdog scripts / cron to clear stale locks; the deadline
+      /// is intentionally generous to give the destination outpost time to
+      /// confirm REMIT.
+      [[sysio::action]]
+      void expirelock(uint64_t uwreq_id);
+
+      /// Read-only rollup of an underwriter's active lock total on a given
+      /// (chain, token_kind). Used by off-chain consumers + (eventually)
+      /// other contracts that don't rely on opreg's mirror.
+      [[sysio::action, sysio::read_only]]
+      uint64_t sumlocks(name underwriter,
+                        opp::types::ChainKind chain,
+                        opp::types::TokenKind token_kind);
 
       // -----------------------------------------------------------------------
       //  Tables
       // -----------------------------------------------------------------------
 
-      /// Auto-incrementing id-keyed primary key shared by collateral/ledger/uwreqs.
+      /// Auto-incrementing id-keyed primary key used by `uwreqs`.
       struct id_key {
          uint64_t id;
          uint64_t primary_key() const { return id; }
          SYSLIB_SERIALIZE(id_key, (id))
       };
 
-      /// Underwriter collateral table.
-      struct [[sysio::table("collateral")]] collateral_entry {
-         uint64_t    id;
-         name        underwriter;
-         fc::crypto::chain_kind_t chain_kind;
-         asset       staked_amount;
-         asset       locked_amount;
-         asset       available_amount; // staked - locked (precomputed)
+      /// Per-leg lock row. The (underwriter, chain, token_kind) composite is
+      /// the indexing key opreg's `available()` rollup uses (cross-contract
+      /// kv::table read of `sysio::uwrit::locks_t` from `sysio.opreg`). Rows
+      /// are pushed by `try_select_winner` and erased by `release`.
+      struct lock_key {
+         uint64_t lock_id;
+         uint64_t primary_key() const { return lock_id; }
+         SYSLIB_SERIALIZE(lock_key, (lock_id))
+      };
 
-         uint128_t by_uw_chain() const {
-            return (static_cast<uint128_t>(underwriter.value) << 64) |
-                   static_cast<uint64_t>(chain_kind);
+      struct [[sysio::table("locks")]] lock_entry {
+         uint64_t                lock_id          = 0;
+         uint64_t                uwreq_id         = 0;
+         name                    underwriter;
+         opp::types::ChainKind   chain;
+         opp::types::TokenKind   token_kind;
+         uint64_t                amount           = 0;
+         uint32_t                created_at_epoch = 0;
+
+         /// Composite index for opreg's `available()` rollup: 64 bits
+         /// underwriter + 32 chain + 32 token_kind.
+         uint128_t by_underwriter_ck() const {
+            return (static_cast<uint128_t>(underwriter.value) << 64)
+                 | (static_cast<uint64_t>(chain) << 32)
+                 | static_cast<uint64_t>(token_kind);
          }
-         uint64_t by_underwriter() const { return underwriter.value; }
+         uint64_t by_uwreq() const { return uwreq_id; }
 
-         SYSLIB_SERIALIZE(collateral_entry,
-            (id)(underwriter)(chain_kind)(staked_amount)(locked_amount)(available_amount))
+         SYSLIB_SERIALIZE(lock_entry,
+            (lock_id)(uwreq_id)(underwriter)(chain)(token_kind)
+            (amount)(created_at_epoch))
       };
 
-      using collateral_t = sysio::kv::table<"collateral"_n, id_key, collateral_entry,
-         sysio::kv::index<"byuwchain"_n,
-            sysio::const_mem_fun<collateral_entry, uint128_t, &collateral_entry::by_uw_chain>>,
-         sysio::kv::index<"byuw"_n,
-            sysio::const_mem_fun<collateral_entry, uint64_t, &collateral_entry::by_underwriter>>
+      using locks_t = sysio::kv::table<"locks"_n, lock_key, lock_entry,
+         sysio::kv::index<"byuwck"_n,
+            sysio::const_mem_fun<lock_entry, uint128_t, &lock_entry::by_underwriter_ck>>,
+         sysio::kv::index<"byuwreq"_n,
+            sysio::const_mem_fun<lock_entry, uint64_t, &lock_entry::by_uwreq>>
       >;
 
-      /// Underwriting ledger table.
-      struct [[sysio::table("uwledger")]] underwriting_entry {
-         uint64_t    id;
-         name        underwriter;
-         uint64_t    message_id;       // FK to sysio.msgch message
-         opp::types::UnderwriteStatus status;
-         asset       source_amount;
-         asset       target_amount;
-         fc::crypto::chain_kind_t source_chain;
-         fc::crypto::chain_kind_t target_chain;
-         time_point  intent_time{};
-         time_point  unlock_time{};
-         asset       fee_earned;
-         checksum256 source_sig;
-         checksum256 target_sig;
+      /// Per-underwriter race entry inside an UWREQ row. Tracks when each
+      /// leg of a dual-COMMIT pair arrived so `try_select_winner` can
+      /// resolve the race deterministically.
+      struct commit_entry {
+         name      underwriter;
+         uint64_t  source_received_at_ms = 0;
+         uint64_t  dest_received_at_ms   = 0;
+         /// Race outcome — INTENT_SUBMITTED (initial), INTENT_CONFIRMED
+         /// (winner), SLASHED (rejected for insufficient bond), or RELEASED
+         /// (loser, kept for debugging). Reuses the existing protobuf
+         /// UnderwriteStatus enum.
+         opp::types::UnderwriteStatus status = opp::types::UNDERWRITE_STATUS_INTENT_SUBMITTED;
+         std::string reason;
 
-         uint64_t by_underwriter() const { return underwriter.value; }
-         uint64_t by_message() const { return message_id; }
-         uint64_t by_status() const { return static_cast<uint64_t>(status); }
-         uint64_t by_unlock() const { return unlock_time.sec_since_epoch(); }
-
-         SYSLIB_SERIALIZE(underwriting_entry,
-            (id)(underwriter)(message_id)(status)(source_amount)(target_amount)
-            (source_chain)(target_chain)(intent_time)(unlock_time)(fee_earned)
-            (source_sig)(target_sig))
+         SYSLIB_SERIALIZE(commit_entry,
+            (underwriter)(source_received_at_ms)(dest_received_at_ms)(status)(reason))
       };
 
-      using uwledger_t = sysio::kv::table<"uwledger"_n, id_key, underwriting_entry,
-         sysio::kv::index<"byuw"_n,
-            sysio::const_mem_fun<underwriting_entry, uint64_t, &underwriting_entry::by_underwriter>>,
-         sysio::kv::index<"bymessage"_n,
-            sysio::const_mem_fun<underwriting_entry, uint64_t, &underwriting_entry::by_message>>,
-         sysio::kv::index<"bystatus"_n,
-            sysio::const_mem_fun<underwriting_entry, uint64_t, &underwriting_entry::by_status>>,
-         sysio::kv::index<"byunlock"_n,
-            sysio::const_mem_fun<underwriting_entry, uint64_t, &underwriting_entry::by_unlock>>
-      >;
-
-      /// Fee configuration singleton.
-      struct [[sysio::table("uwconfig")]] uw_config {
-         uint32_t fee_bps = 10;              // 0.1% = 10 basis points per spoke
-         uint32_t confirm_lock_sec = 86400;  // 24 hours challenge window
-         uint32_t uw_fee_share_pct = 50;     // 50% to underwriter
-         uint32_t other_uw_share_pct = 25;   // 25% to other underwriters
-         uint32_t batch_op_share_pct = 25;   // 25% to batch operators
-
-         SYSLIB_SERIALIZE(uw_config,
-            (fee_bps)(confirm_lock_sec)
-            (uw_fee_share_pct)(other_uw_share_pct)(batch_op_share_pct))
-      };
-
-      using uwconfig_t = sysio::kv::global<"uwconfig"_n, uw_config>;
-
-      /// Underwrite request — created when an attestation requires underwriting.
-      /// The attestation ID from `sysio.msgch::attestations` is used as primary
-      /// key. `sysio.msgch` no longer retains attestation rows past consumption,
-      /// so the underwriter plugin reads the attestation bytes from this row
-      /// directly. Bytes are stored as raw zpp_bits-encoded protobuf — same
-      /// shape every other proto-derived model uses on chain — so callers can
-      /// pass them straight to `OperatorAction` / `SwapRequest` decoders
-      /// without an intermediate hop.
+      /// UWREQ row — one per inbound SWAP attestation. Tracks the swap's
+      /// src/dst pairs, the underwriter race, and the eventual settlement.
       struct [[sysio::table("uwreqs")]] uw_request_t {
          uint64_t                                id;
          opp::types::AttestationType             type;
          opp::types::UnderwriteRequestStatus     status;
-         name                                    uw_name;
-         std::vector<opp_table::locked_amount_t> locked_amounts;
-         uint64_t                                unlock_timestamp   = 0;
-         uint64_t                                released_timestamp = 0;
-         uint64_t                                slashed_timestamp  = 0;
 
-         /// Inbound attestation payload (zpp_bits-encoded protobuf). Set
-         /// from the `data` argument to `createuwreq`. Replaces the
-         /// previous indirection through `sysio.msgch::attestations`,
-         /// which is now transient.
+         /// Src / dst of the cross-chain swap. Populated by `createuwreq`
+         /// from the decoded SwapRequest. Used by `try_select_winner` to
+         /// validate per-leg bond coverage.
+         opp::types::ChainKind                   src_chain;
+         opp::types::TokenKind                   src_token_kind;
+         uint64_t                                src_amount        = 0;
+         opp::types::ChainKind                   dst_chain;
+         opp::types::TokenKind                   dst_token_kind;
+         uint64_t                                dst_amount        = 0;
+
+         /// Race state.
+         std::vector<commit_entry>               commits_by;
+         name                                    winner;
+         uint64_t                                committed_at_ms   = 0;
+         uint64_t                                settled_at_ms     = 0;
+         /// Epoch after which this row is eligible for prune (kept for
+         /// debugging; see `UWREQ_RETENTION_EPOCHS`).
+         uint32_t                                expires_at_epoch  = 0;
+
+         /// Inbound attestation payload (zpp_bits-encoded protobuf).
          std::vector<char>                       attestation_inbound_data;
 
-         /// Outbound attestation payload. Reserved for the underwriter
-         /// plugin's confirm/release flow (where the underwriter emits
-         /// its own attestation back into the OPP cycle). Empty until
-         /// that flow lands.
+         /// Outbound attestation payload reserved for future flows where
+         /// uwrit emits its own response (e.g. underwriter intent acks).
+         /// Empty until that flow lands.
          std::vector<char>                       attestation_outbound_data;
 
          uint64_t by_status() const { return static_cast<uint64_t>(status); }
-         uint64_t by_uw()     const { return uw_name.value; }
+         uint64_t by_winner() const { return winner.value; }
 
          SYSLIB_SERIALIZE(uw_request_t,
-            (id)(type)(status)(uw_name)(locked_amounts)
-            (unlock_timestamp)(released_timestamp)(slashed_timestamp)
+            (id)(type)(status)
+            (src_chain)(src_token_kind)(src_amount)
+            (dst_chain)(dst_token_kind)(dst_amount)
+            (commits_by)(winner)(committed_at_ms)(settled_at_ms)(expires_at_epoch)
             (attestation_inbound_data)(attestation_outbound_data))
       };
 
       using uwreqs_t = sysio::kv::table<"uwreqs"_n, id_key, uw_request_t,
          sysio::kv::index<"bystatus"_n,
             sysio::const_mem_fun<uw_request_t, uint64_t, &uw_request_t::by_status>>,
-         sysio::kv::index<"byuw"_n,
-            sysio::const_mem_fun<uw_request_t, uint64_t, &uw_request_t::by_uw>>
+         sysio::kv::index<"bywinner"_n,
+            sysio::const_mem_fun<uw_request_t, uint64_t, &uw_request_t::by_winner>>
       >;
 
-   private:
-      // Well-known accounts
-      static constexpr name EPOCH_ACCOUNT = "sysio.epoch"_n;
-      static constexpr name MSGCH_ACCOUNT = "sysio.msgch"_n;
-      static constexpr name CHALG_ACCOUNT = "sysio.chalg"_n;
+      /// Singleton holding the next-issued `lock_id`. Keeps the auto-
+      /// increment monotonic across action calls.
+      struct [[sysio::table("uwcounters")]] uw_counters {
+         uint64_t next_lock_id = 1;
+         SYSLIB_SERIALIZE(uw_counters, (next_lock_id))
+      };
 
-      // UnderwriteStatus constants (match protobuf values)
-      using UnderwriteStatus = opp::types::UnderwriteStatus;
+      using uwcounters_t = sysio::kv::global<"uwcounters"_n, uw_counters>;
+
+      /// Fee configuration singleton. Held over from the legacy contract;
+      /// fee distribution itself is deferred to a follow-up task.
+      struct [[sysio::table("uwconfig")]] uw_config {
+         uint32_t fee_bps = 10;   // 0.1% per spoke
+         SYSLIB_SERIALIZE(uw_config, (fee_bps))
+      };
+
+      using uwconfig_t = sysio::kv::global<"uwconfig"_n, uw_config>;
+
+   private:
+
+      using UnderwriteRequestStatus = opp::types::UnderwriteRequestStatus;
+      using UnderwriteStatus        = opp::types::UnderwriteStatus;
+      using ChainKind               = opp::types::ChainKind;
+      using TokenKind               = opp::types::TokenKind;
+      using AttestationType         = opp::types::AttestationType;
    };
 
 } // namespace sysio

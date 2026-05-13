@@ -1,11 +1,14 @@
 #include <sysio.msgch/sysio.msgch.hpp>
 #include <sysio.epoch/sysio.epoch.hpp>
+#include <sysio.authex/sysio.authex.hpp>
 #include <sysio/opp/opp.pb.hpp>
+#include <sysio/opp/attestations/attestations.pb.hpp>
 #include <zpp_bits.h>
 
 namespace sysio {
 
 using opp::types::ChainKind;
+using opp::types::TokenKind;
 using opp::types::MessageDirection;
 using opp::types::MessageStatus;
 using opp::types::EnvelopeStatus;
@@ -15,8 +18,10 @@ using opp::types::AttestationStatus;
 namespace {
 
 constexpr auto     EPOCH_ACCOUNT  = "sysio.epoch"_n;
+constexpr auto     OPREG_ACCOUNT  = "sysio.opreg"_n;
 constexpr auto     UWRIT_ACCOUNT  = "sysio.uwrit"_n;
 constexpr auto     CHALG_ACCOUNT  = "sysio.chalg"_n;
+constexpr auto     AUTHEX_ACCOUNT = "sysio.authex"_n;
 
 /// WIRE chain numeric id used in `opp::Endpoints` rows on the audit log.
 /// One end of every cross-chain envelope is always WIRE.
@@ -105,6 +110,277 @@ void write_envelope_log(name self,
         it != tbl.end() && dropped < per_epoch; ) {
       it = tbl.erase(std::move(it));
       ++dropped;
+   }
+}
+
+/// Build a `sysio::public_key` variant from the raw bytes carried in
+/// `op_address.address` plus the originating chain. Inverse of
+/// opreg.cpp's `pubkey_to_bytes`. Returns an empty (default-constructed
+/// K1) variant for malformed input or unsupported chain kinds — the
+/// downstream `bypubkey` lookup then misses and the dispatch drops.
+sysio::public_key public_key_from_op_address(ChainKind chain,
+                                             const std::vector<char>& bytes) {
+   sysio::public_key pk;
+   switch (chain) {
+      case ChainKind::CHAIN_KIND_WIRE: {       // K1 — variant index 0
+         if (bytes.size() != 33) return pk;
+         sysio::ecc_public_key arr;
+         std::copy(bytes.begin(), bytes.end(), arr.begin());
+         pk.emplace<0>(arr);
+         return pk;
+      }
+      case ChainKind::CHAIN_KIND_ETHEREUM: {   // EM — variant index 3
+         if (bytes.size() != 33) return pk;
+         sysio::ecc_public_key arr;
+         std::copy(bytes.begin(), bytes.end(), arr.begin());
+         pk.emplace<3>(arr);
+         return pk;
+      }
+      case ChainKind::CHAIN_KIND_SOLANA: {     // ED — variant index 4
+         if (bytes.size() != 32) return pk;
+         sysio::ed_public_key arr;
+         std::copy(bytes.begin(), bytes.end(),
+                   reinterpret_cast<char*>(arr.data()));
+         pk.emplace<4>(arr);
+         return pk;
+      }
+      default:
+         return pk;
+   }
+}
+
+/// Resolve `op_address` (chain-kind + raw pubkey bytes) to the operator's
+/// WIRE account name via `sysio.authex::links`'s `bypubkey` index. Returns
+/// `name{}` (zero) on miss — caller treats that as "operator not linked,
+/// drop the attestation".
+name resolve_account_from_op_address(const opp::types::ChainAddress& op_address) {
+   sysio::public_key pk = public_key_from_op_address(op_address.kind,
+                                                     op_address.address);
+   auto digest = sysio::pubkey_to_checksum256(pk);
+   sysio::authex::links_t links(AUTHEX_ACCOUNT);
+   auto by_pubkey = links.get_index<"bypubkey"_n>();
+   auto it = by_pubkey.find(digest);
+   if (it == by_pubkey.end()) return name{};
+   return it->username;
+}
+
+/// Decode an OperatorAction sub-message and dispatch to the appropriate
+/// sysio.opreg action. Called from the inbound dispatch loop in `evalcons`.
+///
+/// Sub-type routing:
+///   * DEPOSIT_REQUEST     → opreg::depositinle(account, chain, amount, actor, msg_id)
+///   * WITHDRAW_REQUEST    → opreg::withdrawinle(account, chain, amount)
+///   * WITHDRAW_REMIT      → outbound-only (depot → outpost); silently dropped if seen inbound
+///   * SLASH               → depot-internal; rejected if seen inbound. Slash decisions
+///                            originate from sysio.chalg → opreg::slash and never re-enter
+///                            the depot via OPP. A slash arriving inbound here is either an
+///                            outpost replaying its own outbound (no-op), or a malformed
+///                            attestation from a misbehaving operator (drop).
+///   * UNKNOWN             → no-op
+///
+/// `original_message_id` is the OPP message id of the attestation's parent
+/// Message — opreg::depositinle uses it to populate DEPOSIT_REVERT correlation
+/// when refunding an unaccepted deposit.
+void dispatch_operator_action(name self, const std::vector<char>& data,
+                              ChainKind from_chain,
+                              const checksum256& original_message_id) {
+   opp::attestations::OperatorAction oa;
+   {
+      auto in = zpp::bits::in{std::span{data.data(), data.size()}, zpp::bits::no_size{}};
+      auto rc = in(oa);
+      if (rc != zpp::bits::errc{}) return;   // malformed; skip silently
+   }
+
+   // Resolve the operator's WIRE account from `op_address` via authex's
+   // bypubkey index. Outposts emit the full chain pubkey (33 bytes for
+   // secp256k1, 32 for Ed25519); the depot's authex link table is the
+   // single source of truth that maps it back to a WIRE name. On miss
+   // (no authex link, malformed bytes, unsupported chain kind), drop —
+   // the OperatorRegistry that originated this deposit will see no
+   // corresponding state update on the depot side and can re-emit after
+   // the operator completes their authex registration.
+   name account = resolve_account_from_op_address(oa.op_address);
+   if (account == name{}) return;
+
+   using AT = opp::attestations::OperatorAction;
+   switch (oa.action_type) {
+      case AT::ACTION_TYPE_DEPOSIT_REQUEST: {
+         // opreg::depositinle checks require_auth(get_self()=opreg). msgch
+         // must therefore declare opreg's own permission on the inline action.
+         // For the chain's inline-send auth check to accept this declaration,
+         // opreg.active must trust msgch@sysio.code — wired at cluster
+         // bootstrap via `updateauth` (see wire-tools-ts ClusterManager
+         // alongside the analogous sysio↔authex grant). The test fixture
+         // sets up the same delegation in `sysio.dispatch_tests.cpp`.
+         action(
+            permission_level{OPREG_ACCOUNT, "active"_n},
+            OPREG_ACCOUNT, "depositinle"_n,
+            std::make_tuple(account, from_chain, oa.amount,
+                            oa.op_address, original_message_id)
+         ).send();
+         break;
+      }
+      case AT::ACTION_TYPE_WITHDRAW_REQUEST: {
+         // Same delegation requirement as DEPOSIT_REQUEST — opreg.active must
+         // trust msgch@sysio.code at the cluster level.
+         action(
+            permission_level{OPREG_ACCOUNT, "active"_n},
+            OPREG_ACCOUNT, "withdrawinle"_n,
+            std::make_tuple(account, from_chain, oa.amount)
+         ).send();
+         break;
+      }
+      case AT::ACTION_TYPE_WITHDRAW_REMIT:  // outbound-only — never expected inbound
+      case AT::ACTION_TYPE_SLASH:           // depot-internal; never accepted inbound
+      case AT::ACTION_TYPE_UNKNOWN:
+      default:
+         break;
+   }
+}
+
+/// Dispatch an UNDERWRITE_INTENT_COMMIT to sysio.uwrit::rcrdcommit.
+void dispatch_underwrite_commit(name self, const std::vector<char>& data,
+                                ChainKind from_chain, uint64_t outpost_id) {
+   opp::attestations::UnderwriteIntentCommit uic;
+   {
+      auto in = zpp::bits::in{std::span{data.data(), data.size()}, zpp::bits::no_size{}};
+      auto rc = in(uic);
+      if (rc != zpp::bits::errc{}) return;
+   }
+   if (uic.uw_account.name.empty()) return;
+
+   action(
+      permission_level{self, "active"_n},
+      UWRIT_ACCOUNT, "rcrdcommit"_n,
+      std::make_tuple(uic.uw_request_id, name{uic.uw_account.name},
+                      outpost_id, from_chain)
+   ).send();
+}
+
+/// Dispatch an UNDERWRITE_INTENT_REJECT to sysio.uwrit::rcrdreject.
+void dispatch_underwrite_reject(name self, const std::vector<char>& data) {
+   opp::attestations::UnderwriteIntentReject uir;
+   {
+      auto in = zpp::bits::in{std::span{data.data(), data.size()}, zpp::bits::no_size{}};
+      auto rc = in(uir);
+      if (rc != zpp::bits::errc{}) return;
+   }
+   if (uir.uw_account.name.empty()) return;
+
+   action(
+      permission_level{self, "active"_n},
+      UWRIT_ACCOUNT, "rcrdreject"_n,
+      std::make_tuple(uir.uw_request_id, name{uir.uw_account.name}, uir.reason)
+   ).send();
+}
+
+/// Per-attestation dispatch entry. Called from the inbound extraction loop
+/// in `evalcons` after a consensus envelope has been unpacked. Dispatch is
+/// best-effort — silently no-ops on unknown / out-of-scope types so the
+/// inbound stream can keep flowing even when the depot hasn't yet wired up
+/// every handler (e.g. RESERVE_BALANCE_SHEET / STAKING_REWARD route to
+/// sysio.reserve, which lands in Task 5).
+void dispatch_attestation(name self, uint64_t attestation_id,
+                          AttestationType type,
+                          const std::vector<char>& data,
+                          ChainKind from_chain, uint64_t outpost_id,
+                          const checksum256& original_message_id) {
+   switch (type) {
+      case AttestationType::ATTESTATION_TYPE_OPERATOR_ACTION:
+         dispatch_operator_action(self, data, from_chain, original_message_id);
+         break;
+
+      case AttestationType::ATTESTATION_TYPE_SWAP:
+         action(
+            permission_level{self, "active"_n},
+            UWRIT_ACCOUNT, "createuwreq"_n,
+            std::make_tuple(attestation_id, type, outpost_id, data)
+         ).send();
+         break;
+
+      case AttestationType::ATTESTATION_TYPE_UNDERWRITE_INTENT_COMMIT:
+         dispatch_underwrite_commit(self, data, from_chain, outpost_id);
+         break;
+
+      case AttestationType::ATTESTATION_TYPE_UNDERWRITE_INTENT_REJECT:
+         dispatch_underwrite_reject(self, data);
+         break;
+
+      case AttestationType::ATTESTATION_TYPE_REMIT_CONFIRM:
+         // Decode just enough to extract the original_message_id which is
+         // the matching uwreq id (createuwreq used the originating SWAP's
+         // attestation id as the uwreq's primary key).
+         {
+            opp::attestations::Remit remit;
+            auto in = zpp::bits::in{std::span{data.data(), data.size()}, zpp::bits::no_size{}};
+            auto rc = in(remit);
+            if (rc != zpp::bits::errc{}) break;
+            // The original_message_id field encodes the uwreq's 64-bit id in
+            // its low 8 bytes; treat the rest as zero-padding from the
+            // depot-side encoder. Future task: a dedicated uw_request_id
+            // field on Remit would remove this dependency.
+            uint64_t uwreq_id = 0;
+            const auto& bytes = remit.original_message_id;
+            if (bytes.size() >= 8) {
+               for (size_t i = 0; i < 8; ++i) {
+                  uwreq_id |= static_cast<uint64_t>(static_cast<uint8_t>(bytes[i])) << (i * 8);
+               }
+            }
+            if (uwreq_id != 0) {
+               action(
+                  permission_level{self, "active"_n},
+                  UWRIT_ACCOUNT, "release"_n,
+                  std::make_tuple(uwreq_id)
+               ).send();
+            }
+         }
+         break;
+
+      // The following are out-of-scope for Task 4: handlers land in later
+      // tasks. Falling through means the attestation row is still written
+      // to the `attestations` table for future reprocessing / debug.
+      case AttestationType::ATTESTATION_TYPE_RESERVE_BALANCE_SHEET:
+      case AttestationType::ATTESTATION_TYPE_STAKING_REWARD:
+         // Routed to sysio.reserve in Task 5.
+         break;
+
+      case AttestationType::ATTESTATION_TYPE_CHALLENGE_REQUEST:
+      case AttestationType::ATTESTATION_TYPE_CHALLENGE_RESPONSE:
+         // Routed to sysio.chalg in Task 6 (the manual-msig flow has a
+         // different entry point — `initchal` / `submitres` — than the
+         // dispatch shape here).
+         break;
+
+      case AttestationType::ATTESTATION_TYPE_STAKE:
+      case AttestationType::ATTESTATION_TYPE_UNSTAKE:
+      case AttestationType::ATTESTATION_TYPE_STAKE_UPDATE:
+      case AttestationType::ATTESTATION_TYPE_STAKE_RESULT:
+         // Validator-staking lifecycle; depot-side handlers land in a later
+         // task alongside liqEth / liqsol-token wiring.
+         break;
+
+      // Outbound-only types (depot emits these, never receives them inbound)
+      // and deprecated pre-launch types are dropped silently. SLASH was
+      // formerly its own attestation type; it now rides on OPERATOR_ACTION
+      // with action_type=SLASH and is gated inside `dispatch_operator_action`.
+      case AttestationType::ATTESTATION_TYPE_REMIT:
+      case AttestationType::ATTESTATION_TYPE_SWAP_REVERT:
+      case AttestationType::ATTESTATION_TYPE_DEPOSIT_REVERT:
+      case AttestationType::ATTESTATION_TYPE_OPERATORS:
+      case AttestationType::ATTESTATION_TYPE_BATCH_OPERATOR_GROUPS:
+      case AttestationType::ATTESTATION_TYPE_PRETOKEN_PURCHASE:
+      case AttestationType::ATTESTATION_TYPE_PRETOKEN_YIELD:
+      case AttestationType::ATTESTATION_TYPE_WIRE_TOKEN_PURCHASE:
+      case AttestationType::ATTESTATION_TYPE_EPOCH_SYNC:
+      case AttestationType::ATTESTATION_TYPE_UNDERWRITE_INTENT:
+      case AttestationType::ATTESTATION_TYPE_UNDERWRITE_CONFIRM:
+      case AttestationType::ATTESTATION_TYPE_UNDERWRITE_REJECT:
+      case AttestationType::ATTESTATION_TYPE_UNDERWRITE_UNLOCK:
+      case AttestationType::ATTESTATION_TYPE_NODE_OWNER_REG:
+      case AttestationType::ATTESTATION_TYPE_ATTESTATION_PROCESSING_ERROR:
+      case AttestationType::ATTESTATION_TYPE_UNSPECIFIED:
+      default:
+         break;
    }
 }
 
@@ -280,8 +556,19 @@ void msgch::evalcons(uint64_t outpost_id, uint32_t epoch_index) {
       .processed_at = now,
    });
 
-   // Extract individual AttestationEntries from each Message in the Envelope
+   // Extract individual AttestationEntries from each Message in the Envelope.
+   // Each attestation is BOTH (a) recorded in the `attestations` table for
+   // audit / re-dispatch / outbound packing AND (b) inline-dispatched to the
+   // matching depot-side handler contract. Dispatch is best-effort — unknown
+   // / out-of-scope types fall through silently so the inbound stream keeps
+   // flowing while later tasks land their handlers.
    attestations_t atts(get_self());
+   ChainKind from_chain = ChainKind::CHAIN_KIND_UNKNOWN;
+   {
+      epoch::outposts_t outposts(EPOCH_ACCOUNT);
+      auto opost = outposts.get(epoch::outpost_key{outpost_id});
+      from_chain = opost.chain_kind;
+   }
    for (auto& msg : envelope.messages) {
       for (auto& entry : msg.payload.attestations) {
          uint64_t att_id = atts.available_primary_key();
@@ -296,6 +583,19 @@ void msgch::evalcons(uint64_t outpost_id, uint32_t epoch_index) {
             .ready_timestamp     = now_sec,
             .processed_timestamp = 0,
          });
+         // Reconstruct the OPP message_id as a checksum256 so downstream
+         // handlers (DEPOSIT_REVERT correlation, future audit trails) can
+         // pin per-attestation outcomes back to the originating message.
+         checksum256 msg_id;
+         {
+            auto& mid = msg.header.message_id;
+            std::array<uint8_t, 32> raw{};
+            const size_t n = std::min<size_t>(mid.size(), 32);
+            for (size_t i = 0; i < n; ++i) raw[i] = static_cast<uint8_t>(mid[i]);
+            msg_id = checksum256{raw};
+         }
+         dispatch_attestation(get_self(), att_id, entry.type, entry.data,
+                              from_chain, outpost_id, msg_id);
       }
    }
 
