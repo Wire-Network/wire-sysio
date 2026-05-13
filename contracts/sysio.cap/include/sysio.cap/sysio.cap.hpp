@@ -17,9 +17,10 @@ namespace sysio {
     * @brief sysio.cap — depot-side WIRE distribution and claim ledger.
     *
     * Holds the pending-WIRE balances owed to LIQ-token stakers and pre-launch
-    * pretoken purchasers. The outpost owns share computation (per-staker
-    * `share_bps` arrives pre-computed in `StakingReward`); wire-sysio just
-    * credits, holds, and pays out.
+    * pretoken purchasers. The depot owns proportional distribution of bulk
+    * WIRE allocations (per Jack 2026-05-13: outpost only records events, the
+    * depot splits proportionally using pretoken amounts + pretoken yield as
+    * the weight; no time-weighting, snapshot-based at allocation time).
     *
     * - `pending_claims` is the per-Wire-account ledger of WIRE owed.
     *   Users call `claim` to drain via inline transfer.
@@ -27,13 +28,15 @@ namespace sysio {
     *   stakers / purchasers who don't have a Wire account yet. Completing
     *   AuthX linking inline-calls `linkswept` which moves the credit into
     *   `pending_claims`.
-    * - `positions` carries lifecycle metadata only — status, owner mapping,
-    *   timestamps. Shares and principal live at the outpost.
     *
     * No cooldown/withdrawal machinery for v1 (Jack 2026-05-13: outpost has
     * no cooldown scenarios in this wave). When withdrawals come online
     * post-launch, the cooldown-queue + maturation-flush pattern can be
     * added back — see opreg's `withdraw_queue` for reference.
+    *
+    * Per-user pretoken-balance state needed for ongoing `StakingReward`
+    * proration is deferred -- add when the StakingReward handler lands and
+    * we know exactly which attestation(s) maintain the balances.
     */
    class [[sysio::contract("sysio.cap")]] cap : public contract {
    public:
@@ -100,55 +103,6 @@ namespace sysio {
       //  Tables
       // -----------------------------------------------------------------------
 
-      /// Position lifecycle metadata. Outpost owns shares and principal;
-      /// wire-sysio stores only what it uniquely tracks.
-      struct position_key {
-         uint64_t id;
-         uint64_t primary_key() const { return id; }
-         SYSLIB_SERIALIZE(position_key, (id))
-      };
-
-      struct [[sysio::table("positions")]] position {
-         uint64_t                       id                  = 0;
-         opp::types::ChainKind          chain_kind          = opp::types::ChainKind::CHAIN_KIND_UNKNOWN;
-         std::vector<char>              native_address;
-         uint64_t                       outpost_position_id = 0;
-         opp::types::StakeStatus        status              = opp::types::StakeStatus::STAKE_STATUS_UNKNOWN;
-         name                           wire_account;
-         uint64_t                       opened_at_ms        = 0;
-         uint64_t                       last_status_ms      = 0;
-
-         uint64_t  primary_key()     const { return id; }
-         uint64_t  by_wire_account() const { return wire_account.value; }
-         uint64_t  by_status()       const { return static_cast<uint64_t>(status); }
-
-         /// Composite: (chain << 64 | first 8 bytes of native_address).
-         /// 8-byte prefix gives a 2^64 namespace per chain — collisions on
-         /// 20-byte ETH addresses or 32-byte SOL pubkeys are negligible at
-         /// expected user counts.
-         uint128_t by_chain_addr() const {
-            if (native_address.empty()) return 0;
-            uint64_t prefix = 0;
-            const size_t n = native_address.size() < sizeof(uint64_t)
-                           ? native_address.size() : sizeof(uint64_t);
-            std::memcpy(&prefix, native_address.data(), n);
-            return (static_cast<uint128_t>(chain_kind) << 64) | prefix;
-         }
-
-         SYSLIB_SERIALIZE(position,
-            (id)(chain_kind)(native_address)(outpost_position_id)
-            (status)(wire_account)(opened_at_ms)(last_status_ms))
-      };
-
-      using positions_t = sysio::kv::table<"positions"_n, position_key, position,
-         sysio::kv::index<"bywire"_n,
-            sysio::const_mem_fun<position, uint64_t, &position::by_wire_account>>,
-         sysio::kv::index<"bystatus"_n,
-            sysio::const_mem_fun<position, uint64_t, &position::by_status>>,
-         sysio::kv::index<"bychainad"_n,
-            sysio::const_mem_fun<position, uint128_t, &position::by_chain_addr>>
-      >;
-
       /// Pending-claims: per-Wire-account WIRE owed.
       struct pclaim_key {
          uint64_t wire_account;
@@ -210,19 +164,17 @@ namespace sysio {
 
       using capcfg_t = sysio::kv::global<"capcfg"_n, cap_config>;
 
-      /// Monotonic id counters for position / unmapped rows.
+      /// Monotonic id counter for unmapped rows.
       struct [[sysio::table("capcounters")]] cap_counters {
-         uint64_t next_position_id  = 1;
          uint64_t next_unmapped_id  = 1;
 
-         SYSLIB_SERIALIZE(cap_counters, (next_position_id)(next_unmapped_id))
+         SYSLIB_SERIALIZE(cap_counters, (next_unmapped_id))
       };
 
       using capcounters_t = sysio::kv::global<"capcounters"_n, cap_counters>;
 
    private:
       using ChainKind   = opp::types::ChainKind;
-      using StakeStatus = opp::types::StakeStatus;
       using TokenKind   = opp::types::TokenKind;
    };
 

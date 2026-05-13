@@ -18,10 +18,6 @@
             "base": "",
             "fields": [
                 {
-                    "name": "next_position_id",
-                    "type": "uint64"
-                },
-                {
                     "name": "next_unmapped_id",
                     "type": "uint64"
                 }
@@ -109,54 +105,6 @@
                 {
                     "name": "balance",
                     "type": "asset"
-                }
-            ]
-        },
-        {
-            "name": "position",
-            "base": "",
-            "fields": [
-                {
-                    "name": "id",
-                    "type": "uint64"
-                },
-                {
-                    "name": "chain_kind",
-                    "type": "ChainKind"
-                },
-                {
-                    "name": "native_address",
-                    "type": "bytes"
-                },
-                {
-                    "name": "outpost_position_id",
-                    "type": "uint64"
-                },
-                {
-                    "name": "status",
-                    "type": "StakeStatus"
-                },
-                {
-                    "name": "wire_account",
-                    "type": "name"
-                },
-                {
-                    "name": "opened_at_ms",
-                    "type": "uint64"
-                },
-                {
-                    "name": "last_status_ms",
-                    "type": "uint64"
-                }
-            ]
-        },
-        {
-            "name": "position_key",
-            "base": "",
-            "fields": [
-                {
-                    "name": "id",
-                    "type": "uint64"
                 }
             ]
         },
@@ -251,31 +199,6 @@
             "table_id": 16291
         },
         {
-            "name": "positions",
-            "type": "position",
-            "index_type": "i64",
-            "key_names": ["id"],
-            "key_types": ["uint64"],
-            "table_id": 39131,
-            "secondary_indexes": [
-                {
-                    "name": "bywire",
-                    "key_type": "uint64",
-                    "table_id": 45669
-                },
-                {
-                    "name": "bystatus",
-                    "key_type": "uint64",
-                    "table_id": 6749
-                },
-                {
-                    "name": "bychainad",
-                    "key_type": "uint128",
-                    "table_id": 65189
-                }
-            ]
-        },
-        {
             "name": "unmapped",
             "type": "unmapped_token",
             "index_type": "i64",
@@ -318,36 +241,6 @@
                 {
                     "name": "CHAIN_KIND_SUI",
                     "value": 4
-                }
-            ]
-        },
-        {
-            "name": "StakeStatus",
-            "type": "int32",
-            "values": [
-                {
-                    "name": "STAKE_STATUS_UNKNOWN",
-                    "value": 0
-                },
-                {
-                    "name": "STAKE_STATUS_WARMUP",
-                    "value": 1
-                },
-                {
-                    "name": "STAKE_STATUS_COOLDOWN",
-                    "value": 2
-                },
-                {
-                    "name": "STAKE_STATUS_ACTIVE",
-                    "value": 3
-                },
-                {
-                    "name": "STAKE_STATUS_TERMINATED",
-                    "value": 240
-                },
-                {
-                    "name": "STAKE_STATUS_SLASHED",
-                    "value": 241
                 }
             ]
         }
