@@ -62,7 +62,8 @@ message Message {
 //  Epoch envelope
 // ---------------------------------------------------------------------------
 
-// Envelope that spans a range of messages within an epoch.
+// Envelope for an epoch. `messages` are carried inline and are consensus-covered
+// by the accepted serialized envelope digest.
 message Envelope {
    bytes          envelope_hash          = 1; // 32 bytes
    Endpoints      endpoints              = 2;
