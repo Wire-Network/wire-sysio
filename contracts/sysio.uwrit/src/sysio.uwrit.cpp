@@ -250,14 +250,12 @@ void emit_swap_remit(name self,
    // Reserve debit FIRST — if the reserve is insufficient the entire
    // commit aborts and the race is unwound by the caller's surrounding
    // transaction failing. Depot is the ground truth; no half-state.
+   // TokenAmount is split into (kind, amount) on the inline action per
+   // the no-proto-messages-in-actions rule.
    action(
       permission_level{self, "active"_n},
       uwrit::RESERVE_ACCOUNT, "debit"_n,
-      std::make_tuple(req.dst_chain,
-                       opp::types::TokenAmount{
-                          .kind   = req.dst_token_kind,
-                          .amount = static_cast<int64_t>(req.dst_amount),
-                       })
+      std::make_tuple(req.dst_chain, req.dst_token_kind, req.dst_amount)
    ).send();
 
    // Build the SwapRemit. `original_message_id` encodes the uwreq_id
@@ -612,13 +610,12 @@ void uwrit::release(uint64_t uwreq_id) {
    std::vector<lock_key> to_erase;
    for (auto it = idx.lower_bound(uwreq_id);
         it != idx.end() && it->uwreq_id == uwreq_id; ++it) {
-      opp::types::TokenAmount ta;
-      ta.kind   = it->token_kind;
-      ta.amount = zpp::bits::vint64_t{static_cast<int64_t>(it->amount)};
+      // TokenAmount is split into (kind, amount) on the inline action per
+      // the no-proto-messages-in-actions rule.
       action(
          permission_level{get_self(), "active"_n},
          OPREG_ACCOUNT, "releaselock"_n,
-         std::make_tuple(it->underwriter, it->chain, ta)
+         std::make_tuple(it->underwriter, it->chain, it->token_kind, it->amount)
       ).send();
       to_erase.push_back(lock_key{it->lock_id});
    }

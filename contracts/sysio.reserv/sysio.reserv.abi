@@ -9,42 +9,6 @@
     ],
     "structs": [
         {
-            "name": "ChainAddress",
-            "base": "",
-            "fields": [
-                {
-                    "name": "kind",
-                    "type": "ChainKind"
-                },
-                {
-                    "name": "address",
-                    "type": "bytes"
-                }
-            ]
-        },
-        {
-            "name": "SwapRejected",
-            "base": "",
-            "fields": [
-                {
-                    "name": "original_swap_remit_id",
-                    "type": "bytes"
-                },
-                {
-                    "name": "recipient",
-                    "type": "ChainAddress"
-                },
-                {
-                    "name": "unremitted_amount",
-                    "type": "TokenAmount"
-                },
-                {
-                    "name": "reason",
-                    "type": "string"
-                }
-            ]
-        },
-        {
             "name": "TokenAmount",
             "base": "",
             "fields": [
@@ -67,8 +31,12 @@
                     "type": "ChainKind"
                 },
                 {
+                    "name": "outpost_kind",
+                    "type": "TokenKind"
+                },
+                {
                     "name": "outpost_amount",
-                    "type": "TokenAmount"
+                    "type": "uint64"
                 }
             ]
         },
@@ -77,8 +45,28 @@
             "base": "",
             "fields": [
                 {
-                    "name": "rejected",
-                    "type": "SwapRejected"
+                    "name": "original_swap_remit_id",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "recipient_kind",
+                    "type": "ChainKind"
+                },
+                {
+                    "name": "recipient_address",
+                    "type": "bytes"
+                },
+                {
+                    "name": "unremitted_kind",
+                    "type": "TokenKind"
+                },
+                {
+                    "name": "unremitted_amount",
+                    "type": "uint64"
+                },
+                {
+                    "name": "reason",
+                    "type": "string"
                 }
             ]
         },
@@ -91,8 +79,12 @@
                     "type": "ChainKind"
                 },
                 {
+                    "name": "outpost_kind",
+                    "type": "TokenKind"
+                },
+                {
                     "name": "outpost_amount",
-                    "type": "TokenAmount"
+                    "type": "uint64"
                 }
             ]
         },
@@ -141,12 +133,16 @@
                     "type": "ChainKind"
                 },
                 {
+                    "name": "outpost_kind",
+                    "type": "TokenKind"
+                },
+                {
                     "name": "outpost_amount",
-                    "type": "TokenAmount"
+                    "type": "uint64"
                 },
                 {
                     "name": "wire_amount",
-                    "type": "TokenAmount"
+                    "type": "uint64"
                 },
                 {
                     "name": "connector_weight_bps",
@@ -159,8 +155,12 @@
             "base": "",
             "fields": [
                 {
+                    "name": "from_kind",
+                    "type": "TokenKind"
+                },
+                {
                     "name": "from_amount",
-                    "type": "TokenAmount"
+                    "type": "uint64"
                 },
                 {
                     "name": "to_chain",
@@ -225,7 +225,7 @@
     "action_results": [
         {
             "name": "swapquote",
-            "result_type": "TokenAmount"
+            "result_type": "uint64"
         }
     ],
     "enums": [

@@ -203,6 +203,10 @@ void dispatch_operator_action(name self, const std::vector<char>& data,
    if (account == name{}) return;
 
    using AT = opp::attestations::OperatorAction;
+   // TokenAmount + ChainAddress get split into (kind, amount) / (kind, address)
+   // on the inline-action tuples per the no-proto-messages-in-actions rule.
+   const uint64_t raw_amount =
+      static_cast<uint64_t>(static_cast<int64_t>(oa.amount.amount));
    switch (oa.action_type) {
       case AT::ACTION_TYPE_DEPOSIT_REQUEST: {
          // opreg::depositinle checks require_auth(get_self()=opreg). msgch
@@ -215,8 +219,10 @@ void dispatch_operator_action(name self, const std::vector<char>& data,
          action(
             permission_level{OPREG_ACCOUNT, "active"_n},
             OPREG_ACCOUNT, "depositinle"_n,
-            std::make_tuple(account, from_chain, oa.amount,
-                            oa.op_address, original_message_id)
+            std::make_tuple(account, from_chain,
+                            oa.amount.kind, raw_amount,
+                            oa.op_address.kind, oa.op_address.address,
+                            original_message_id)
          ).send();
          break;
       }
@@ -226,7 +232,8 @@ void dispatch_operator_action(name self, const std::vector<char>& data,
          action(
             permission_level{OPREG_ACCOUNT, "active"_n},
             OPREG_ACCOUNT, "withdrawinle"_n,
-            std::make_tuple(account, from_chain, oa.amount)
+            std::make_tuple(account, from_chain,
+                            oa.amount.kind, raw_amount)
          ).send();
          break;
       }
@@ -344,16 +351,40 @@ void dispatch_attestation(name self, uint64_t attestation_id,
       case AttestationType::ATTESTATION_TYPE_SWAP_REJECTED:
          // Destination outpost couldn't pay a SwapRemit; reconcile the
          // depot's view of the reserve so it matches the outpost's
-         // (still-holding-the-amount) balance.
+         // (still-holding-the-amount) balance. Flatten the SwapRejected
+         // proto message into primitive params on the inline action — the
+         // ABI never sees a proto-message-typed parameter per the
+         // no-proto-messages-in-actions rule.
          {
             opp::attestations::SwapRejected rejected;
             auto in = zpp::bits::in{std::span{data.data(), data.size()}, zpp::bits::no_size{}};
             auto rc = in(rejected);
             if (rc != zpp::bits::errc{}) break;
+            checksum256 original_id;
+            // SwapRejected.original_swap_remit_id is a proto `bytes` field —
+            // OPP message ids are always 32 bytes (keccak/sha digests per the
+            // platform spec). Anything shorter implies a malformed
+            // attestation; drop it rather than silently truncate.
+            const auto& id_bytes = rejected.original_swap_remit_id;
+            if (id_bytes.size() == 32) {
+               std::array<uint8_t, 32> arr{};
+               std::copy(id_bytes.begin(), id_bytes.end(),
+                         reinterpret_cast<char*>(arr.data()));
+               original_id = checksum256(arr);
+            } else {
+               break;   // malformed; drop
+            }
+            const uint64_t unremitted_raw =
+               static_cast<uint64_t>(static_cast<int64_t>(rejected.unremitted_amount.amount));
             action(
                permission_level{self, "active"_n},
                "sysio.reserv"_n, "onreject"_n,
-               std::make_tuple(rejected)
+               std::make_tuple(original_id,
+                                rejected.recipient.kind,
+                                rejected.recipient.address,
+                                rejected.unremitted_amount.kind,
+                                unremitted_raw,
+                                rejected.reason)
             ).send();
          }
          break;
@@ -367,14 +398,14 @@ void dispatch_attestation(name self, uint64_t attestation_id,
             auto in = zpp::bits::in{std::span{data.data(), data.size()}, zpp::bits::no_size{}};
             auto rc = in(sr);
             if (rc != zpp::bits::errc{}) break;
-            // The reward attestation carries `reward_amount` (TokenAmount)
-            // and is routed by the originating outpost's chain. The
-            // chain comes from the inbound `from_chain` we already have
-            // in scope.
+            // Split reward_amount (TokenAmount) into (kind, amount) on the
+            // inline action per the no-proto-messages-in-actions rule.
+            const uint64_t reward_raw =
+               static_cast<uint64_t>(static_cast<int64_t>(sr.reward_amount.amount));
             action(
                permission_level{self, "active"_n},
                "sysio.reserv"_n, "onreward"_n,
-               std::make_tuple(from_chain, sr.reward_amount)
+               std::make_tuple(from_chain, sr.reward_amount.kind, reward_raw)
             ).send();
          }
          break;

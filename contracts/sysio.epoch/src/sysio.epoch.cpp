@@ -1,5 +1,6 @@
 #include <sysio.epoch/sysio.epoch.hpp>
 #include <sysio.opreg/sysio.opreg.hpp>
+#include <sysio.msgch/sysio.msgch.hpp>
 #include <sysio.authex/sysio.authex.hpp>
 #include <sysio/opp/attestations/attestations.pb.hpp>
 #include <zpp_bits.h>
@@ -61,6 +62,68 @@ void epoch::advance() {
    // Wall-clock minimum: don't advance before next_epoch_start
    auto now = current_time_point();
    if (now < state.next_epoch_start) return;
+
+   // Before incrementing: evaluate per-op delivery state for the EXPIRING
+   // epoch. The active group of the expiring epoch (`current_batch_op_group`
+   // BEFORE the increment) is the set of ops responsible for delivering
+   // every registered outpost's inbound envelope for `current_epoch_index`.
+   //
+   // For each (outpost × member of the expiring group):
+   //   - scan `msgch::envelopes` (`byoutepoch` index) for any row matching
+   //     (outpost_id, current_epoch_index, batch_op_name == member)
+   //   - inline `opreg::recorddel(member, current_epoch_index, did_deliver)`
+   //   - inline `opreg::termcheck(member)` — the threshold + window come
+   //     from `op_config`, so tests dial the thresholds via setconfig
+   //
+   // Skipped on the genesis epoch (`current_epoch_index == 0`) — no group
+   // existed yet, and the membership vector is empty.
+   if (state.current_epoch_index > 0 &&
+       !state.batch_op_groups.empty() &&
+       state.current_batch_op_group < state.batch_op_groups.size()) {
+      const auto& expiring_group =
+         state.batch_op_groups[state.current_batch_op_group];
+
+      msgch::envelopes_t envs(MSGCH_ACCOUNT);
+      auto oe_idx = envs.get_index<"byoutepoch"_n>();
+
+      outposts_t outposts_tbl(get_self());
+      for (auto op_it = outposts_tbl.begin(); op_it != outposts_tbl.end(); ++op_it) {
+         const uint64_t composite =
+            (op_it->id << 32) | state.current_epoch_index;
+
+         // Walk the (outpost, epoch) bucket and collect distinct delivering
+         // batch ops. Vector linear-scan is fine — group size is small
+         // (single-digit ops/group in every practical config).
+         std::vector<name> delivered;
+         for (auto e = oe_idx.lower_bound(composite);
+              e != oe_idx.end() && e->by_outpost_epoch() == composite; ++e) {
+            bool already = false;
+            for (const auto& d : delivered) {
+               if (d == e->batch_op_name) { already = true; break; }
+            }
+            if (!already) delivered.push_back(e->batch_op_name);
+         }
+
+         for (const auto& member : expiring_group) {
+            bool did_deliver = false;
+            for (const auto& d : delivered) {
+               if (d == member) { did_deliver = true; break; }
+            }
+            action(
+               permission_level{get_self(), "owner"_n},
+               OPREG_ACCOUNT,
+               "recorddel"_n,
+               std::make_tuple(member, state.current_epoch_index, did_deliver)
+            ).send();
+            action(
+               permission_level{get_self(), "owner"_n},
+               OPREG_ACCOUNT,
+               "termcheck"_n,
+               std::make_tuple(member)
+            ).send();
+         }
+      }
+   }
 
    state.current_epoch_index++;
    state.current_batch_op_group = state.current_epoch_index % cfg.batch_op_groups;
