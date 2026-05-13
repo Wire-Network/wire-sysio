@@ -2,7 +2,7 @@
 // Uses only extern "C" decls to bypass CDT's kv_multi_index / kv::table
 // wrappers, so we can pass inputs CDT would never emit: zero sizes,
 // oversize spans, stale/forged iterator handles, cross-pool handles,
-// negative primary_ids, table_ids above the uint16 namespace, etc.
+// table_ids above the uint16 namespace, etc.
 //
 // Each action is self-contained and uses a distinct table_id so shared-state
 // accumulation across actions is safe under a shared tester.
@@ -46,13 +46,16 @@ int32_t  kv_it_value(uint32_t handle, uint32_t offset, void* dest, uint32_t dest
                      uint32_t* actual_size);
 
 __attribute__((sysio_wasm_import))
-void     kv_idx_store(uint64_t payer, uint32_t table_id, int64_t primary_id,
+void     kv_idx_store(uint64_t payer, uint32_t table_id,
+                      const void* pri_key, uint32_t pri_key_size,
                       const void* sec_key, uint32_t sec_key_size);
 __attribute__((sysio_wasm_import))
-void     kv_idx_remove(uint32_t table_id, int64_t primary_id,
+void     kv_idx_remove(uint32_t table_id,
+                       const void* pri_key, uint32_t pri_key_size,
                        const void* sec_key, uint32_t sec_key_size);
 __attribute__((sysio_wasm_import))
-void     kv_idx_update(uint64_t payer, uint32_t table_id, int64_t primary_id,
+void     kv_idx_update(uint64_t payer, uint32_t table_id,
+                       const void* pri_key, uint32_t pri_key_size,
                        const void* old_sec_key, uint32_t old_sec_key_size,
                        const void* new_sec_key, uint32_t new_sec_key_size);
 __attribute__((sysio_wasm_import))
@@ -92,8 +95,7 @@ static constexpr uint32_t tid_bigsec_sec = 512;
 static constexpr uint32_t tid_tidmax     = 513;
 static constexpr uint32_t tid_crossh_pri = 514;
 static constexpr uint32_t tid_crossh_sec = 515;
-static constexpr uint32_t tid_secneg     = 516;
-static constexpr uint32_t tid_secmis     = 517;
+static constexpr uint32_t tid_bigpri     = 516;
 static constexpr uint32_t tid_uaf        = 518;
 static constexpr uint32_t tid_dbldest    = 519;
 static constexpr uint32_t tid_alias      = 520;
@@ -103,26 +105,24 @@ static constexpr uint32_t tid_idxrm_pri  = 523;
 static constexpr uint32_t tid_idxrm_sec  = 524;
 static constexpr uint32_t tid_idxup_pri  = 525;
 static constexpr uint32_t tid_idxup_sec  = 526;
-static constexpr uint32_t tid_findmis    = 527;
-static constexpr uint32_t tid_lbpast_pri = 528;
-static constexpr uint32_t tid_lbpast_sec = 529;
-static constexpr uint32_t tid_lbempty    = 530;
-static constexpr uint32_t tid_prmera_pri = 531;
-static constexpr uint32_t tid_prmera_sec = 532;
-static constexpr uint32_t tid_itprvbg    = 533;
-static constexpr uint32_t tid_cpool      = 534;
-static constexpr uint32_t tid_cpool_sec  = 535;
-static constexpr uint32_t tid_cross_pri  = 536;
-static constexpr uint32_t tid_cross_sec  = 537;
-static constexpr uint32_t tid_secilim_p  = 538;
-static constexpr uint32_t tid_secilim_s  = 539;
-static constexpr uint32_t tid_maxok      = 540;
-static constexpr uint32_t tid_dangl_pri  = 541;
-static constexpr uint32_t tid_dangl_sec  = 542;
-static constexpr uint32_t tid_prixtab_a  = 543;
-static constexpr uint32_t tid_prixtab_b  = 544;
-static constexpr uint32_t tid_prixtab_s  = 545;
-static constexpr uint32_t tid_inliso     = 546;
+static constexpr uint32_t tid_idxupbig   = 527;
+static constexpr uint32_t tid_findmis    = 528;
+static constexpr uint32_t tid_lbpast_pri = 529;
+static constexpr uint32_t tid_lbpast_sec = 530;
+static constexpr uint32_t tid_lbempty    = 531;
+static constexpr uint32_t tid_prmera_pri = 532;
+static constexpr uint32_t tid_prmera_sec = 533;
+static constexpr uint32_t tid_itprvbg    = 534;
+static constexpr uint32_t tid_cpool      = 535;
+static constexpr uint32_t tid_cpool_sec  = 536;
+static constexpr uint32_t tid_secilim_p  = 537;
+static constexpr uint32_t tid_secilim_s  = 538;
+static constexpr uint32_t tid_maxok      = 539;
+static constexpr uint32_t tid_dangl_pri  = 540;
+static constexpr uint32_t tid_dangl_sec  = 541;
+static constexpr uint32_t tid_prixtab_a  = 542;
+static constexpr uint32_t tid_prixtab_s  = 543;
+static constexpr uint32_t tid_inliso     = 544;
 
 // kv_it_stat values (from chain/kv_context.hpp).
 static constexpr int32_t IT_OK     = 0;
@@ -151,8 +151,8 @@ public:
       char       marker   = 0;
       char       buf[16]  = {};
 
-      int64_t id_a = kv_set(tid_zval, self, key_a, sizeof(key_a), &marker, 0);
-      check(id_a >= 0, "kv_set(value_size=0) must return a valid id");
+      int64_t billed = kv_set(tid_zval, self, key_a, sizeof(key_a), &marker, 0);
+      check(billed >= 0, "kv_set(value_size=0) must succeed (returns RAM billable)");
 
       int32_t sz = kv_get(tid_zval, self, key_a, sizeof(key_a), buf, sizeof(buf));
       check(sz == 0, "kv_get on empty-value row must return 0 (found, empty)");
@@ -172,8 +172,7 @@ public:
 
       // Grow then shrink back to 0.
       const char val[] = "XYZ";
-      int64_t id2 = kv_set(tid_zval, self, key_a, sizeof(key_a), val, sizeof(val));
-      check(id2 == id_a, "kv_set update must preserve primary id");
+      kv_set(tid_zval, self, key_a, sizeof(key_a), val, sizeof(val));
       kv_set(tid_zval, self, key_a, sizeof(key_a), &marker, 0);
       sz = kv_get(tid_zval, self, key_a, sizeof(key_a), buf, sizeof(buf));
       check(sz == 0, "shrink back to empty failed");
@@ -189,12 +188,12 @@ public:
       // Primary anchors.
       const char pkey_p[] = {'P'};
       const char pkey_q[] = {'Q'};
-      int64_t pid_p = kv_set(tid_zseck_pri, self, pkey_p, sizeof(pkey_p), "p", 1);
-      int64_t pid_q = kv_set(tid_zseck_pri, self, pkey_q, sizeof(pkey_q), "q", 1);
+      kv_set(tid_zseck_pri, self, pkey_p, sizeof(pkey_p), "p", 1);
+      kv_set(tid_zseck_pri, self, pkey_q, sizeof(pkey_q), "q", 1);
 
-      // Two secondary entries with empty sec_key pointing at different primaries.
-      kv_idx_store(self, tid_zseck_sec, pid_p, &marker, 0);
-      kv_idx_store(self, tid_zseck_sec, pid_q, &marker, 0);
+      // Two secondary entries with empty sec_key, different pri_key bytes.
+      kv_idx_store(self, tid_zseck_sec, pkey_p, sizeof(pkey_p), &marker, 0);
+      kv_idx_store(self, tid_zseck_sec, pkey_q, sizeof(pkey_q), &marker, 0);
 
       int32_t h = kv_idx_find_secondary(self, tid_zseck_sec, &marker, 0);
       check(h >= 0, "kv_idx_find_secondary(empty) must return a valid handle");
@@ -206,7 +205,7 @@ public:
       actual = 99;
       check(kv_idx_primary_key(h, 0, buf, sizeof(buf), &actual) == IT_OK &&
             actual == sizeof(pkey_p),
-            "kv_idx_primary_key must resolve to a primary key byte");
+            "kv_idx_primary_key must return stored pri_key bytes");
       check(buf[0] == 'P' || buf[0] == 'Q', "primary_key must be one of the anchors");
       char first = buf[0];
 
@@ -220,15 +219,15 @@ public:
 
       // Update empty -> non-empty and back.
       const char nonempty[] = {0x10, 0x20};
-      kv_idx_update(self, tid_zseck_sec, pid_p, &marker, 0, nonempty, sizeof(nonempty));
+      kv_idx_update(self, tid_zseck_sec, pkey_p, sizeof(pkey_p), &marker, 0, nonempty, sizeof(nonempty));
       h = kv_idx_find_secondary(self, tid_zseck_sec, nonempty, sizeof(nonempty));
       check(h >= 0, "post-update find_secondary(nonempty) must succeed");
       kv_idx_destroy(h);
-      kv_idx_update(self, tid_zseck_sec, pid_p, nonempty, sizeof(nonempty), &marker, 0);
+      kv_idx_update(self, tid_zseck_sec, pkey_p, sizeof(pkey_p), nonempty, sizeof(nonempty), &marker, 0);
 
       // Cleanup.
-      kv_idx_remove(tid_zseck_sec, pid_p, &marker, 0);
-      kv_idx_remove(tid_zseck_sec, pid_q, &marker, 0);
+      kv_idx_remove(tid_zseck_sec, pkey_p, sizeof(pkey_p), &marker, 0);
+      kv_idx_remove(tid_zseck_sec, pkey_q, sizeof(pkey_q), &marker, 0);
       kv_erase(tid_zseck_pri, pkey_p, sizeof(pkey_p));
       kv_erase(tid_zseck_pri, pkey_q, sizeof(pkey_q));
    }
@@ -387,9 +386,18 @@ public:
    void bigsec() {
       const uint64_t self = get_self().value;
       const char pk[] = {'P'};
-      int64_t pid = kv_set(tid_bigsec_pri, self, pk, sizeof(pk), "v", 1);
+      kv_set(tid_bigsec_pri, self, pk, sizeof(pk), "v", 1);
       static char huge[MAX_SEC_KEY_SIZE + 1] = {}; // 257 bytes
-      kv_idx_store(self, tid_bigsec_sec, pid, huge, sizeof(huge));
+      kv_idx_store(self, tid_bigsec_sec, pk, sizeof(pk), huge, sizeof(huge));
+   }
+
+   // kv_idx_store with oversize pri_key -> kv_key_too_large.
+   // Distinct SYS_ASSERT site from bigsec (pri_key check vs sec_key check).
+   [[sysio::action]]
+   void bigpri() {
+      const uint64_t self = get_self().value;
+      static char huge[MAX_KEY_SIZE + 1] = {}; // 257 bytes
+      kv_idx_store(self, tid_bigpri, huge, sizeof(huge), "s", 1);
    }
 
    // kv_it_create with prefix over the absolute 1024 B limit -> kv_key_too_large
@@ -415,13 +423,13 @@ public:
       kv_it_status(0xDEADBEEFu); // bits outside slot-mask|tag-bit are set
    }
 
-   // Primary kv_it_* called on a secondary handle -> kv_invalid_iterator
+   // Primary kv_it_next called on a secondary handle -> kv_invalid_iterator
    [[sysio::action]]
    void crshp() {
       const uint64_t self = get_self().value;
       const char pk[] = {'P'};
-      int64_t pid = kv_set(tid_crossh_pri, self, pk, sizeof(pk), "v", 1);
-      kv_idx_store(self, tid_crossh_sec, pid, "s", 1);
+      kv_set(tid_crossh_pri, self, pk, sizeof(pk), "v", 1);
+      kv_idx_store(self, tid_crossh_sec, pk, sizeof(pk), "s", 1);
 
       int32_t sh = kv_idx_find_secondary(self, tid_crossh_sec, "s", 1);
       check(sh >= 0, "secondary handle required to probe cross-pool rejection");
@@ -429,7 +437,7 @@ public:
       kv_it_next(static_cast<uint32_t>(sh));
    }
 
-   // Secondary kv_idx_* called on a primary handle -> kv_invalid_iterator
+   // Secondary kv_idx_next called on a primary handle -> kv_invalid_iterator
    [[sysio::action]]
    void crshs() {
       const uint64_t self = get_self().value;
@@ -441,47 +449,17 @@ public:
       kv_idx_next(ph);
    }
 
-   // kv_idx_store with primary_id = -1 -> kv_key_not_found
-   [[sysio::action]]
-   void secneg() {
-      const uint64_t self = get_self().value;
-      kv_idx_store(self, tid_secneg, -1, "s", 1);
-   }
-
-   // kv_idx_store with a primary_id that does not correspond to any kv_object
-   //   -> kv_key_not_found "references non-existent primary_id"
-   [[sysio::action]]
-   void secmis() {
-      const uint64_t self = get_self().value;
-      // 0x0FFFFFFFFFFFFFFF is positive but astronomically unlikely to collide.
-      int64_t huge_id = static_cast<int64_t>(0x0FFFFFFFFFFFFFFFLL);
-      kv_idx_store(self, tid_secmis, huge_id, "s", 1);
-   }
-
-   // kv_idx_remove with primary_id = -1 -> kv_key_not_found.
-   // Independent SYS_ASSERT from the one tested by secneg; refactor-proofing.
-   [[sysio::action]]
-   void idxrmneg() {
-      kv_idx_remove(tid_secneg, -1, "s", 1);
-   }
-
-   // kv_idx_update with primary_id = -1 -> kv_key_not_found.
-   // Independent SYS_ASSERT from secneg/idxrmneg.
-   [[sysio::action]]
-   void idxupdneg() {
-      const uint64_t self = get_self().value;
-      kv_idx_update(self, tid_secneg, -1, "a", 1, "b", 1);
-   }
-
    // kv_idx_update with oversize new_sec_key -> kv_secondary_key_too_large.
-   // Independent SYS_ASSERT from the one bigsec triggers on kv_idx_store.
-   // Size check runs before the primary_id and entry-exists checks, so no
-   // setup is needed.
+   // The size check runs before the entry-exists lookup, so the call site can
+   // use any pri_key bytes and a never-stored old_sec_key and still trip the
+   // independent SYS_ASSERT.
    [[sysio::action]]
    void idxupdbig() {
       const uint64_t self = get_self().value;
+      const char dummy_pri[] = {'x'};
       static char huge[MAX_SEC_KEY_SIZE + 1] = {}; // 257 bytes
-      kv_idx_update(self, tid_secneg, /*primary_id=*/0, "a", 1, huge, sizeof(huge));
+      kv_idx_update(self, tid_idxupbig, dummy_pri, sizeof(dummy_pri),
+                    "a", 1, huge, sizeof(huge));
    }
 
    // kv_it_status on a handle whose slot was released -> kv_invalid_iterator.
@@ -565,14 +543,14 @@ public:
    }
 
    // kv_idx_remove of a non-existent entry -> kv_key_not_found
-   // (kv_idx_remove's itr-not-end guard). (sec_key, primary_id) pair never stored.
+   // (kv_idx_remove's itr-not-end guard). (sec_key, pri_key) pair never stored.
    [[sysio::action]]
    void idxrmmis() {
       const uint64_t self = get_self().value;
       const char pk[] = {'P'};
-      int64_t pid = kv_set(tid_idxrm_pri, self, pk, sizeof(pk), "v", 1);
+      kv_set(tid_idxrm_pri, self, pk, sizeof(pk), "v", 1);
       // Remove an entry that was never stored.
-      kv_idx_remove(tid_idxrm_sec, pid, "s", 1);
+      kv_idx_remove(tid_idxrm_sec, pk, sizeof(pk), "s", 1);
    }
 
    // kv_idx_update of a non-existent entry -> kv_key_not_found
@@ -581,8 +559,8 @@ public:
    void idxupmis() {
       const uint64_t self = get_self().value;
       const char pk[] = {'P'};
-      int64_t pid = kv_set(tid_idxup_pri, self, pk, sizeof(pk), "v", 1);
-      kv_idx_update(self, tid_idxup_sec, pid, "old", 3, "new", 3);
+      kv_set(tid_idxup_pri, self, pk, sizeof(pk), "v", 1);
+      kv_idx_update(self, tid_idxup_sec, pk, sizeof(pk), "old", 3, "new", 3);
    }
 
    // ==========================================================================
@@ -607,16 +585,18 @@ public:
    void lbpast() {
       const uint64_t self = get_self().value;
       const char pk[] = {'P'};
-      int64_t pid = kv_set(tid_lbpast_pri, self, pk, sizeof(pk), "v", 1);
-      kv_idx_store(self, tid_lbpast_sec, pid, "m", 1);
+      kv_set(tid_lbpast_pri, self, pk, sizeof(pk), "v", 1);
+      kv_idx_store(self, tid_lbpast_sec, pk, sizeof(pk), "m", 1);
 
       // Seek past the only entry.
       int32_t h = kv_idx_lower_bound(self, tid_lbpast_sec, "z", 1);
       check(h >= 0, "lower_bound past-end in non-empty table must return a valid handle");
-      check(kv_it_status(static_cast<uint32_t>(h)) == IT_END,
-            "handle must be in end state");
+      // kv_it_status rejects secondary handles; use kv_idx_next to observe end
+      // state (next from end stays at end).
+      check(kv_idx_next(static_cast<uint32_t>(h)) == IT_END,
+            "handle must be in end state (next from end must stay end)");
 
-      // prev into the last entry.
+      // prev from end into the last entry.
       check(kv_idx_prev(static_cast<uint32_t>(h)) == IT_OK,
             "prev from end must land on last entry");
       char     buf[4] = {};
@@ -627,7 +607,7 @@ public:
       kv_idx_destroy(static_cast<uint32_t>(h));
 
       // Cleanup.
-      kv_idx_remove(tid_lbpast_sec, pid, "m", 1);
+      kv_idx_remove(tid_lbpast_sec, pk, sizeof(pk), "m", 1);
       kv_erase(tid_lbpast_pri, pk, sizeof(pk));
    }
 
@@ -642,33 +622,35 @@ public:
       }
    }
 
-   // kv_idx_primary_key on a secondary iterator whose referenced primary row
-   // was erased mid-txn: status transitions to iterator_erased; no throw.
-   // Exercises kv_idx_primary_key's lazy-cache branch where the db.find<kv_object>
-   // lookup on the cached primary_id returns null.
+   // kv_idx_primary_key on a secondary iterator after the referenced primary
+   // row is erased mid-txn: master stores pri_key bytes inline on the secondary
+   // entry, so the lookup returns IT_OK with the original pri_key bytes -- the
+   // host does NOT auto-invalidate dangling references. Auto-cascade would be a
+   // protocol change. Pinning the no-cascade behavior so a future refactor
+   // that swaps inline pri_key bytes for a chainbase-id lookup would fail here.
    [[sysio::action]]
    void prmera() {
       const uint64_t self = get_self().value;
       const char pk[] = {'P'};
-      int64_t pid = kv_set(tid_prmera_pri, self, pk, sizeof(pk), "v", 1);
-      kv_idx_store(self, tid_prmera_sec, pid, "s", 1);
+      kv_set(tid_prmera_pri, self, pk, sizeof(pk), "v", 1);
+      kv_idx_store(self, tid_prmera_sec, pk, sizeof(pk), "s", 1);
 
       int32_t h = kv_idx_find_secondary(self, tid_prmera_sec, "s", 1);
       check(h >= 0, "find_secondary must return a valid handle");
 
-      // Erase primary, leaving the secondary entry dangling briefly.
+      // Erase primary, leaving the secondary entry's pri_key bytes intact.
       kv_erase(tid_prmera_pri, pk, sizeof(pk));
 
-      // primary_key lookup: lazy cache is empty, find<kv_object>(id) returns null,
-      // status becomes iterator_erased (2).
       char     buf[4] = {};
       uint32_t actual = 99;
       int32_t  st     = kv_idx_primary_key(static_cast<uint32_t>(h), 0, buf, sizeof(buf), &actual);
-      check(st == IT_ERASED, "primary_key after primary erase must report iterator_erased");
-      check(actual == 0, "primary_key must not report bytes after primary erase");
+      check(st == IT_OK,
+            "primary_key after primary erase returns IT_OK (pri_key bytes are stored inline)");
+      check(actual == sizeof(pk) && buf[0] == 'P',
+            "primary_key returns the original stored pri_key bytes");
 
       kv_idx_destroy(static_cast<uint32_t>(h));
-      kv_idx_remove(tid_prmera_sec, pid, "s", 1);
+      kv_idx_remove(tid_prmera_sec, pk, sizeof(pk), "s", 1);
    }
 
    // kv_it_prev called when iterator is positioned at begin transitions to
@@ -700,8 +682,8 @@ public:
    uint32_t make_sec_handle_() {
       const uint64_t self = get_self().value;
       const char pk[] = {'X'};
-      int64_t pid = kv_set(tid_cpool, self, pk, sizeof(pk), "v", 1);
-      kv_idx_store(self, tid_cpool_sec, pid, "s", 1);
+      kv_set(tid_cpool, self, pk, sizeof(pk), "v", 1);
+      kv_idx_store(self, tid_cpool_sec, pk, sizeof(pk), "s", 1);
       int32_t h = kv_idx_find_secondary(self, tid_cpool_sec, "s", 1);
       check(h >= 0, "precondition: secondary handle must allocate");
       return static_cast<uint32_t>(h);
@@ -723,36 +705,15 @@ public:
       char b[4]; uint32_t a = 0;
       kv_it_key(make_sec_handle_(), 0, b, sizeof(b), &a);
    }
-   // kv_it_value AND kv_it_status accept both handle kinds by design: their
-   // implementations dispatch on the secondary-tag bit rather than asserting
-   // on it. kv_it_value on a secondary handle reads the value of the primary
-   // row referenced by the secondary entry's cached primary_id. Pin the dual-
-   // dispatch so a future refactor that inadvertently locks either intrinsic
-   // to primary-only would fail here rather than silently change the ABI.
-   [[sysio::action]]
-   void itvalsec() {
-      const uint64_t self = get_self().value;
-      const char pk[] = {'V'};
-      int64_t pid = kv_set(tid_cpool, self, pk, sizeof(pk), "hello", 6);
-      kv_idx_store(self, tid_cpool_sec, pid, "sv", 2);
-      int32_t sh = kv_idx_find_secondary(self, tid_cpool_sec, "sv", 2);
-      check(sh >= 0, "precondition: secondary handle");
-
-      char     buf[8] = {};
-      uint32_t actual = 99;
-      int32_t  st     = kv_it_value(static_cast<uint32_t>(sh), 0, buf, sizeof(buf), &actual);
-      check(st == IT_OK, "kv_it_value(sec_handle) must report ok");
-      check(actual == 6, "kv_it_value(sec_handle) must report primary value size");
-      check(memcmp(buf, "hello", 6) == 0, "kv_it_value(sec_handle) must deliver primary bytes");
-
-      // kv_it_status similarly accepts both kinds.
-      check(kv_it_status(static_cast<uint32_t>(sh)) == IT_OK,
-            "kv_it_status accepts secondary handles and reflects their status");
-
-      kv_idx_destroy(static_cast<uint32_t>(sh));
-      kv_idx_remove(tid_cpool_sec, pid, "sv", 2);
-      kv_erase(tid_cpool, pk, sizeof(pk));
+   // kv_it_value on a secondary handle: master rejects via validate_primary_handle.
+   // Distinct SYS_ASSERT from kv_it_next/key/prev/destroy/lower_bound which all
+   // route through the same primary-handle check; this one and crshst pin the
+   // remaining two sites.
+   [[sysio::action]] void crshv()    {
+      char b[4]; uint32_t a = 0;
+      kv_it_value(make_sec_handle_(), 0, b, sizeof(b), &a);
    }
+   [[sysio::action]] void crshst()   { kv_it_status(make_sec_handle_()); }
 
    [[sysio::action]] void crsiprv()  { kv_idx_prev(make_pri_handle_()); }
    [[sysio::action]] void crsik()    {
@@ -766,41 +727,6 @@ public:
    [[sysio::action]] void crsidst()  { kv_idx_destroy(make_pri_handle_()); }
 
    // ==========================================================================
-   // G. Cross-contract primary_id rejection.
-   //    kv_idx_store validates primary->code == receiver: a contract cannot
-   //    create a secondary entry referencing another account's primary row.
-   //    Violation throws table_operation_not_permitted.
-   //    Run csrcstp on kvprobe to stake a primary and cache its id in a known
-   //    row, then run csrcttk on kvprobe2 to attempt the attack.
-   // ==========================================================================
-
-   [[sysio::action]]
-   void csrcstp() {
-      const uint64_t self = get_self().value;
-      const char anchor_k[] = "ANCHOR";
-      int64_t pid = kv_set(tid_cross_pri, self, anchor_k, 6, "v", 1);
-      char buf[8];
-      memcpy(buf, &pid, 8);
-      const char pid_k[] = "PID";
-      kv_set(tid_cross_pri, self, pid_k, 3, buf, 8);
-   }
-
-   [[sysio::action]]
-   void csrcttk() {
-      const uint64_t self   = get_self().value;
-      const uint64_t victim = name{"kvprobe"_n}.value; // setup runs on kvprobe
-      char buf[8] = {};
-      const char pid_k[] = "PID";
-      int32_t sz = kv_get(tid_cross_pri, victim, pid_k, 3, buf, 8);
-      check(sz == 8, "attack precondition: victim's staked primary_id must be readable");
-      int64_t pid = 0;
-      memcpy(&pid, buf, 8);
-      // Attempt to create a secondary entry on kvprobe2 that references
-      // kvprobe's primary row. Must throw table_operation_not_permitted.
-      kv_idx_store(self, tid_cross_sec, pid, "sec", 3);
-   }
-
-   // ==========================================================================
    // H. Resource and invariant probes a malicious contract could abuse.
    // ==========================================================================
 
@@ -811,8 +737,8 @@ public:
    void secilim() {
       const uint64_t self = get_self().value;
       const char pk[] = {'P'};
-      int64_t pid = kv_set(tid_secilim_p, self, pk, sizeof(pk), "v", 1);
-      kv_idx_store(self, tid_secilim_s, pid, "s", 1);
+      kv_set(tid_secilim_p, self, pk, sizeof(pk), "v", 1);
+      kv_idx_store(self, tid_secilim_s, pk, sizeof(pk), "s", 1);
       // 1024 slots. Never destroying so the pool fills up.
       for (uint32_t i = 0; i < 1024; ++i) {
          int32_t h = kv_idx_find_secondary(self, tid_secilim_s, "s", 1);
@@ -847,69 +773,78 @@ public:
    // Dangling-secondary invariant: the host does NOT auto-remove secondary
    // entries when the referenced primary row is erased. A contract that erases
    // a primary without first removing its secondaries leaves state that can
-   // still be found, updated, and observed as iterator_erased. Pinning this
-   // behavior because "auto-cascade" would be a protocol change. A malicious
-   // contract can't crash the chain with it, but can bloat its own RAM bill
-   // with orphan secondaries indefinitely -- worth documenting.
+   // still be found, updated, and read. Master stores pri_key bytes inline on
+   // the secondary entry; kv_idx_primary_key returns those bytes even after
+   // the primary is gone. Pinning this behavior because "auto-cascade" would
+   // be a protocol change. A malicious contract can't crash the chain with it
+   // but can bloat its own RAM bill with orphan secondaries indefinitely --
+   // worth documenting.
    [[sysio::action]]
    void danglng() {
       const uint64_t self = get_self().value;
       const char pk[] = {'P'};
-      int64_t pid = kv_set(tid_dangl_pri, self, pk, sizeof(pk), "v", 1);
-      kv_idx_store(self, tid_dangl_sec, pid, "s", 1);
+      kv_set(tid_dangl_pri, self, pk, sizeof(pk), "v", 1);
+      kv_idx_store(self, tid_dangl_sec, pk, sizeof(pk), "s", 1);
       kv_erase(tid_dangl_pri, pk, sizeof(pk));
 
       // Dangling secondary still findable.
       int32_t h = kv_idx_find_secondary(self, tid_dangl_sec, "s", 1);
       check(h >= 0, "dangling secondary entry must still be findable");
 
-      // primary_key reports the dangling state.
+      // primary_key returns the stored pri_key bytes; host does not check
+      // whether the referenced primary row still exists.
       char     buf[4] = {};
       uint32_t actual = 99;
-      check(kv_idx_primary_key(static_cast<uint32_t>(h), 0, buf, sizeof(buf), &actual) == IT_ERASED,
-            "primary_key on dangling secondary must report iterator_erased");
+      int32_t  st     = kv_idx_primary_key(static_cast<uint32_t>(h), 0, buf, sizeof(buf), &actual);
+      check(st == IT_OK,
+            "primary_key on dangling secondary returns IT_OK (no auto-invalidation)");
+      check(actual == sizeof(pk) && buf[0] == 'P',
+            "primary_key returns the originally stored pri_key bytes");
       kv_idx_destroy(static_cast<uint32_t>(h));
 
-      // Mutation still succeeds: the (receiver, tid, old_sec, pid) composite
+      // Mutation still succeeds: the (receiver, tid, old_sec, pri_key) composite
       // still resolves to a live kv_index_object even though the referenced
       // primary is gone.
-      kv_idx_update(self, tid_dangl_sec, pid, "s", 1, "s2", 2);
+      kv_idx_update(self, tid_dangl_sec, pk, sizeof(pk), "s", 1, "s2", 2);
       h = kv_idx_find_secondary(self, tid_dangl_sec, "s2", 2);
       check(h >= 0, "post-update dangling entry must still be findable at new sec_key");
       kv_idx_destroy(static_cast<uint32_t>(h));
 
       // Cleanup (required, else RAM leaks).
-      kv_idx_remove(tid_dangl_sec, pid, "s2", 2);
+      kv_idx_remove(tid_dangl_sec, pk, sizeof(pk), "s2", 2);
    }
 
    // Primary/secondary table_id coupling is CONVENTIONAL, not enforced.
-   // kv_idx_store only checks primary->code == receiver; it does NOT require
-   // the primary's table_id to bear any relationship to the secondary table_id.
-   // A contract can attach a secondary entry at table B to a primary row that
-   // lives in table A (same receiver). Pinning this behavior: if a future
-   // hardening adds a table-coupling check, this test updates along with it.
+   // kv_idx_store takes pri_key bytes as-is and stores them inline on the
+   // secondary entry; no validation that the bytes correspond to any primary
+   // row in any specific table. A contract can attach a secondary entry at
+   // table S referencing pri_key bytes that happen to match a primary in
+   // table A (same receiver), or that match no primary at all. Pinning this
+   // behavior: if a future hardening cross-checks the pri_key against a
+   // specific primary table, this test updates along with it.
    [[sysio::action]]
    void prixtab() {
       const uint64_t self = get_self().value;
       const char pk_a[] = {'A'};
-      int64_t pid_a = kv_set(tid_prixtab_a, self, pk_a, sizeof(pk_a), "va", 2);
+      kv_set(tid_prixtab_a, self, pk_a, sizeof(pk_a), "va", 2);
 
-      // Secondary entry in tid_prixtab_s referencing primary from tid_prixtab_a.
-      kv_idx_store(self, tid_prixtab_s, pid_a, "s", 1);
+      // Secondary entry in tid_prixtab_s referencing pri_key bytes that live
+      // in tid_prixtab_a.
+      kv_idx_store(self, tid_prixtab_s, pk_a, sizeof(pk_a), "s", 1);
 
       int32_t h = kv_idx_find_secondary(self, tid_prixtab_s, "s", 1);
-      check(h >= 0, "cross-table primary_id reference must succeed");
+      check(h >= 0, "cross-table pri_key reference must succeed");
 
-      // primary_key reads the primary's key bytes from table_a.
+      // primary_key returns the stored pri_key bytes verbatim.
       char     buf[4] = {};
       uint32_t actual = 99;
       int32_t  st     = kv_idx_primary_key(static_cast<uint32_t>(h), 0, buf, sizeof(buf), &actual);
       check(st == IT_OK && actual == sizeof(pk_a) && buf[0] == 'A',
-            "cross-table primary_key must deliver the primary's actual bytes");
+            "cross-table primary_key must return the stored pri_key bytes");
       kv_idx_destroy(static_cast<uint32_t>(h));
 
       // Cleanup.
-      kv_idx_remove(tid_prixtab_s, pid_a, "s", 1);
+      kv_idx_remove(tid_prixtab_s, pk_a, sizeof(pk_a), "s", 1);
       kv_erase(tid_prixtab_a, pk_a, sizeof(pk_a));
    }
 

@@ -24,6 +24,11 @@
             "fields": []
         },
         {
+            "name": "bigpri",
+            "base": "",
+            "fields": []
+        },
+        {
             "name": "bigsec",
             "base": "",
             "fields": []
@@ -69,6 +74,16 @@
             "fields": []
         },
         {
+            "name": "crshst",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "crshv",
+            "base": "",
+            "fields": []
+        },
+        {
             "name": "crsidst",
             "base": "",
             "fields": []
@@ -85,16 +100,6 @@
         },
         {
             "name": "crsiprv",
-            "base": "",
-            "fields": []
-        },
-        {
-            "name": "csrcstp",
-            "base": "",
-            "fields": []
-        },
-        {
-            "name": "csrcttk",
             "base": "",
             "fields": []
         },
@@ -129,17 +134,7 @@
             "fields": []
         },
         {
-            "name": "idxrmneg",
-            "base": "",
-            "fields": []
-        },
-        {
             "name": "idxupdbig",
-            "base": "",
-            "fields": []
-        },
-        {
-            "name": "idxupdneg",
             "base": "",
             "fields": []
         },
@@ -170,11 +165,6 @@
         },
         {
             "name": "itprvbgn",
-            "base": "",
-            "fields": []
-        },
-        {
-            "name": "itvalsec",
             "base": "",
             "fields": []
         },
@@ -215,16 +205,6 @@
         },
         {
             "name": "secilim",
-            "base": "",
-            "fields": []
-        },
-        {
-            "name": "secmis",
-            "base": "",
-            "fields": []
-        },
-        {
-            "name": "secneg",
             "base": "",
             "fields": []
         },
@@ -281,6 +261,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "bigpri",
+            "type": "bigpri",
+            "ricardian_contract": ""
+        },
+        {
             "name": "bigsec",
             "type": "bigsec",
             "ricardian_contract": ""
@@ -326,6 +311,16 @@
             "ricardian_contract": ""
         },
         {
+            "name": "crshst",
+            "type": "crshst",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "crshv",
+            "type": "crshv",
+            "ricardian_contract": ""
+        },
+        {
             "name": "crsidst",
             "type": "crsidst",
             "ricardian_contract": ""
@@ -343,16 +338,6 @@
         {
             "name": "crsiprv",
             "type": "crsiprv",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "csrcstp",
-            "type": "csrcstp",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "csrcttk",
-            "type": "csrcttk",
             "ricardian_contract": ""
         },
         {
@@ -386,18 +371,8 @@
             "ricardian_contract": ""
         },
         {
-            "name": "idxrmneg",
-            "type": "idxrmneg",
-            "ricardian_contract": ""
-        },
-        {
             "name": "idxupdbig",
             "type": "idxupdbig",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "idxupdneg",
-            "type": "idxupdneg",
             "ricardian_contract": ""
         },
         {
@@ -428,11 +403,6 @@
         {
             "name": "itprvbgn",
             "type": "itprvbgn",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "itvalsec",
-            "type": "itvalsec",
             "ricardian_contract": ""
         },
         {
@@ -473,16 +443,6 @@
         {
             "name": "secilim",
             "type": "secilim",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "secmis",
-            "type": "secmis",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "secneg",
-            "type": "secneg",
             "ricardian_contract": ""
         },
         {

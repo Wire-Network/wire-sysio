@@ -11,35 +11,29 @@ using namespace sysio;
 using namespace sysio::chain;
 using namespace sysio::testing;
 
-static const name probe_account  = "kvprobe"_n;
-static const name probe_account2 = "kvprobe2"_n;
+static const name probe_account = "kvprobe"_n;
 
 // Shared tester: deploy kv_intrinsic_probe once, reuse across cases.
 // Each action uses distinct table_ids/keys so shared state is safe.
-// Second account (kvprobe2) hosts the same contract for cross-contract probes.
 struct kv_probe_shared_tester : validating_tester {
    kv_probe_shared_tester() {
-      create_accounts({probe_account, probe_account2});
+      create_accounts({probe_account});
       produce_block();
       set_code(probe_account, test_contracts::kv_intrinsic_probe_wasm());
       set_abi(probe_account, test_contracts::kv_intrinsic_probe_abi().c_str());
-      set_code(probe_account2, test_contracts::kv_intrinsic_probe_wasm());
-      set_abi(probe_account2, test_contracts::kv_intrinsic_probe_abi().c_str());
       produce_block();
    }
 
-   void run_action(name action_name) { run_action_on(probe_account, action_name); }
-
-   void run_action_on(name acct, name action_name) {
+   void run_action(name action_name) {
       signed_transaction trx;
       trx.actions.emplace_back(
-         vector<permission_level>{{acct, config::active_name}},
-         acct,
+         vector<permission_level>{{probe_account, config::active_name}},
+         probe_account,
          action_name,
          bytes{}
       );
       set_transaction_headers(trx);
-      trx.sign(get_private_key(acct, "active"), control->get_chain_id());
+      trx.sign(get_private_key(probe_account, "active"), control->get_chain_id());
       push_transaction(trx);
       produce_block();
    }
@@ -49,7 +43,6 @@ struct kv_probe_tester {
    kv_probe_shared_tester& t;
    kv_probe_tester() : t(shared_instance()) {}
    void run_action(name n) { t.run_action(n); }
-   void run_action_on(name acct, name n) { t.run_action_on(acct, n); }
    static kv_probe_shared_tester& shared_instance() {
       static kv_probe_shared_tester inst;
       return inst;
@@ -110,6 +103,10 @@ BOOST_FIXTURE_TEST_CASE(kv_idx_store_oversize_sec_rejected, kv_probe_tester) {
    BOOST_CHECK_THROW(run_action("bigsec"_n), kv_secondary_key_too_large);
 }
 
+BOOST_FIXTURE_TEST_CASE(kv_idx_store_oversize_pri_rejected, kv_probe_tester) {
+   BOOST_CHECK_THROW(run_action("bigpri"_n), kv_key_too_large);
+}
+
 BOOST_FIXTURE_TEST_CASE(kv_it_create_oversize_prefix_rejected, kv_probe_tester) {
    BOOST_CHECK_THROW(run_action("bigpfx"_n), kv_key_too_large);
 }
@@ -128,22 +125,6 @@ BOOST_FIXTURE_TEST_CASE(primary_intrinsic_on_secondary_handle_rejected, kv_probe
 
 BOOST_FIXTURE_TEST_CASE(secondary_intrinsic_on_primary_handle_rejected, kv_probe_tester) {
    BOOST_CHECK_THROW(run_action("crshs"_n), kv_invalid_iterator);
-}
-
-BOOST_FIXTURE_TEST_CASE(kv_idx_store_negative_primary_id_rejected, kv_probe_tester) {
-   BOOST_CHECK_THROW(run_action("secneg"_n), kv_key_not_found);
-}
-
-BOOST_FIXTURE_TEST_CASE(kv_idx_store_missing_primary_id_rejected, kv_probe_tester) {
-   BOOST_CHECK_THROW(run_action("secmis"_n), kv_key_not_found);
-}
-
-BOOST_FIXTURE_TEST_CASE(kv_idx_remove_negative_primary_id_rejected, kv_probe_tester) {
-   BOOST_CHECK_THROW(run_action("idxrmneg"_n), kv_key_not_found);
-}
-
-BOOST_FIXTURE_TEST_CASE(kv_idx_update_negative_primary_id_rejected, kv_probe_tester) {
-   BOOST_CHECK_THROW(run_action("idxupdneg"_n), kv_key_not_found);
 }
 
 BOOST_FIXTURE_TEST_CASE(kv_idx_update_oversize_new_sec_key_rejected, kv_probe_tester) {
@@ -237,10 +218,12 @@ BOOST_FIXTURE_TEST_CASE(kv_it_key_on_secondary_handle_rejected, kv_probe_tester)
    BOOST_CHECK_THROW(run_action("crshk"_n), kv_invalid_iterator);
 }
 
-// kv_it_value and kv_it_status accept both handle kinds by design; kv_it_value
-// on a secondary handle reads through the cached primary_id.
-BOOST_FIXTURE_TEST_CASE(kv_it_value_via_secondary_handle, kv_probe_tester) {
-   BOOST_CHECK_NO_THROW(run_action("itvalsec"_n));
+BOOST_FIXTURE_TEST_CASE(kv_it_value_on_secondary_handle_rejected, kv_probe_tester) {
+   BOOST_CHECK_THROW(run_action("crshv"_n), kv_invalid_iterator);
+}
+
+BOOST_FIXTURE_TEST_CASE(kv_it_status_on_secondary_handle_rejected, kv_probe_tester) {
+   BOOST_CHECK_THROW(run_action("crshst"_n), kv_invalid_iterator);
 }
 
 BOOST_FIXTURE_TEST_CASE(kv_idx_prev_on_primary_handle_rejected, kv_probe_tester) {
@@ -260,20 +243,6 @@ BOOST_FIXTURE_TEST_CASE(kv_idx_destroy_on_primary_handle_rejected, kv_probe_test
 }
 
 // =============================================================================
-// G. Cross-contract primary_id rejection. Two-account setup: kvprobe stakes a
-//    primary and caches its id in a kv row; kvprobe2 reads the id and attempts
-//    kv_idx_store against it (its receiver is kvprobe2 but primary->code is
-//    kvprobe -> table_operation_not_permitted via kv_idx_store's
-//    primary->code == receiver guard).
-// =============================================================================
-
-BOOST_FIXTURE_TEST_CASE(cross_contract_primary_id_rejected, kv_probe_tester) {
-   BOOST_CHECK_NO_THROW(run_action("csrcstp"_n));
-   BOOST_CHECK_THROW(run_action_on(probe_account2, "csrcttk"_n),
-                     table_operation_not_permitted);
-}
-
-// =============================================================================
 // H. Resource and invariant probes.
 // =============================================================================
 
@@ -289,7 +258,7 @@ BOOST_FIXTURE_TEST_CASE(dangling_secondary_after_primary_erase, kv_probe_tester)
    BOOST_CHECK_NO_THROW(run_action("danglng"_n));
 }
 
-BOOST_FIXTURE_TEST_CASE(cross_table_primary_id_permitted, kv_probe_tester) {
+BOOST_FIXTURE_TEST_CASE(cross_table_pri_key_permitted, kv_probe_tester) {
    BOOST_CHECK_NO_THROW(run_action("prixtab"_n));
 }
 
