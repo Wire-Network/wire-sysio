@@ -62,7 +62,8 @@ message Message {
 //  Epoch envelope
 // ---------------------------------------------------------------------------
 
-// Envelope that spans a range of messages within an epoch.
+// Envelope for an epoch. `messages` are carried inline and are consensus-covered
+// by the accepted serialized envelope digest.
 message Envelope {
    bytes          envelope_hash          = 1; // 32 bytes
    Endpoints      endpoints              = 2;
@@ -70,10 +71,14 @@ message Envelope {
    uint32         epoch_index            = 6;
    uint32         epoch_envelope_index   = 7;
 
+   // Deprecated legacy paged-delivery metadata. Inline envelope receivers must
+   // ignore this for consensus acceptance.
    bytes          merkle                 = 15; // 32 bytes
 
    bytes          previous_envelope_hash = 20; // 32 bytes
 
+   // Deprecated legacy range metadata. Receivers can inspect `messages`
+   // directly and must not require these fields for acceptance.
    bytes          start_message_id       = 30; // 32 bytes
    bytes          end_message_id         = 31; // 32 bytes
 

@@ -203,20 +203,19 @@ DataStream& operator>>(DataStream& ds, Message& t) {
    return ds >> t.header >> t.payload;
 }
 
-// Envelope: all fields (signatures field removed per protocol spec)
+// Envelope: current inline-consensus fields. Legacy merkle/range metadata is
+// decode-compatible at the protobuf layer but ignored by CDT table storage.
 template <typename DataStream>
 DataStream& operator<<(DataStream& ds, const Envelope& t) {
    return ds << t.envelope_hash << t.endpoints << t.epoch_timestamp
-             << t.epoch_index << t.epoch_envelope_index << t.merkle
-             << t.previous_envelope_hash << t.start_message_id
-             << t.end_message_id;
+             << t.epoch_index << t.epoch_envelope_index
+             << t.previous_envelope_hash << t.messages;
 }
 template <typename DataStream>
 DataStream& operator>>(DataStream& ds, Envelope& t) {
    return ds >> t.envelope_hash >> t.endpoints >> t.epoch_timestamp
-             >> t.epoch_index >> t.epoch_envelope_index >> t.merkle
-             >> t.previous_envelope_hash >> t.start_message_id
-             >> t.end_message_id;
+             >> t.epoch_index >> t.epoch_envelope_index
+             >> t.previous_envelope_hash >> t.messages;
 }
 
 } // namespace sysio::opp
