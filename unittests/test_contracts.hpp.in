@@ -42,6 +42,7 @@ namespace sysio {
          MAKE_READ_WASM_ABI(snapshot_test,         snapshot_test,         unittests/test-contracts)
          MAKE_READ_WASM_ABI(test_api,              test_api,              unittests/test-contracts)
          MAKE_READ_WASM_ABI(test_ram_limit,        test_ram_limit,        unittests/test-contracts)
+         MAKE_READ_WASM_ABI(action_order_test,     action_order_test,     unittests/test-contracts)
          MAKE_READ_WASM_ABI(action_results,        action_results,        unittests/test-contracts)
          MAKE_READ_WASM_ABI(wasm_config_bios,      wasm_config_bios,      unittests/test-contracts)
          MAKE_READ_WASM_ABI(params_test,           params_test,           unittests/test-contracts)
