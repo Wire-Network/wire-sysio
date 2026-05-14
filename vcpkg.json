@@ -61,7 +61,7 @@
     {
       "name": "aws-sdk-cpp",
       "default-features": false,
-      "version>=": "1.11.591",
+      "version>=": "1.11.665",
       "features": [
         "kms"
       ]
@@ -148,7 +148,7 @@
     },
     {
       "name": "aws-sdk-cpp",
-      "version": "1.11.591"
+      "version": "1.11.665"
     }
   ]
 }
