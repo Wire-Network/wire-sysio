@@ -61,7 +61,12 @@ constexpr int8_t b58_reverse[256] = {
 /// The division is implemented in-place on a working buffer that holds
 /// the partial quotient in base58. Leading zero bytes in the input are
 /// preserved as leading '1' characters in the output.
-std::string encode_base58(const unsigned char* pbegin, const unsigned char* pend) {
+///
+/// `yield` is invoked periodically so a deadline-bound caller
+/// (abi_serializer with a deadline yield) can interrupt the O(n*m)
+/// loop before it finishes on attacker-controlled large inputs.
+std::string encode_base58(const unsigned char* pbegin, const unsigned char* pend,
+                          const fc::yield_function_t& yield) {
    size_t zeroes = 0;
    while (pbegin != pend && *pbegin == 0) {
       ++pbegin;
@@ -71,7 +76,10 @@ std::string encode_base58(const unsigned char* pbegin, const unsigned char* pend
    const size_t size = static_cast<size_t>(pend - pbegin) * 138 / 100 + 1;
    boost::container::small_vector<unsigned char, b58_inline_capacity> b58(size);
    size_t length = 0;
+   size_t outer = 0;
    while (pbegin != pend) {
+      if ((++outer & 0x3F) == 0) // every 64 input bytes
+         yield();
       int carry = *pbegin;
       size_t i = 0;
       // b58 = b58 * 256 + carry, walking from least to most significant digit.
@@ -148,11 +156,8 @@ bool decode_base58(const char* psz, std::vector<unsigned char>& vch) {
 namespace fc {
 
 std::string to_base58(const char* d, size_t s, const fc::yield_function_t& yield) {
-   yield();
-   auto str = encode_base58(reinterpret_cast<const unsigned char*>(d),
-                            reinterpret_cast<const unsigned char*>(d) + s);
-   yield();
-   return str;
+   const auto* p = reinterpret_cast<const unsigned char*>(d);
+   return encode_base58(p, p + s, yield);
 }
 
 std::string to_base58(const std::vector<char>& d, const fc::yield_function_t& yield) {
