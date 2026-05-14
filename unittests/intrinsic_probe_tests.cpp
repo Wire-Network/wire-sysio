@@ -262,16 +262,25 @@ BOOST_FIXTURE_TEST_CASE(recover_key_bad_recovery_byte, intrinsic_probe_fixture) 
 }
 
 BOOST_FIXTURE_TEST_CASE(recover_key_corrupt_rs, intrinsic_probe_fixture) {
-   // A single-bit flip in the r component has two acceptable outcomes: the
-   // secp256k1 recovery succeeds and yields a DIFFERENT pub (probe's
-   // in-contract memcmp passes), OR the math fails (host throws
-   // fc::exception). The bad outcome the probe is protecting against is
-   // "recovery silently succeeds and returns the ORIGINAL pub", which never
-   // happens with a real bit flip -- both branches are a correct pin.
+   // A single-bit flip in the r component has two acceptable outcomes:
+   //   A. secp256k1 recovery succeeds and yields a DIFFERENT pub. The contract
+   //      verifies pub != original via check() and returns normally.
+   //   B. The math fails. libfc's elliptic_secp256k1.cpp throws plain
+   //      fc::exception ("unable to reconstruct public key from signature").
+   // The bad outcome we are pinning AGAINST is "recovery silently returns the
+   // ORIGINAL pub": that fires the contract's `check(memcmp != 0)` which
+   // throws sysio_assert_message_exception. Since that type derives from
+   // fc::exception, a broad catch would swallow exactly the regression we
+   // want to detect -- so filter it out explicitly first.
    try {
       t.run_with_data("recbadrs"_n, t.recover_key_payload);
+   } catch (const sysio_assert_message_exception& e) {
+      BOOST_FAIL("recbadrs surfaced a contract assertion (recover_key may have "
+                 "silently returned the original pub on a corrupted signature): "
+                 << e.to_detail_string());
    } catch (const fc::exception&) {
-      // Math failure path -- acceptable.
+      // Path B: host math failure -- acceptable; the contract's bad-outcome
+      // check was never reached.
    }
 }
 
