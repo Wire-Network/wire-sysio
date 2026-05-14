@@ -23,19 +23,19 @@
 namespace {
 
 /// Alphabet used for base58 encoding (no 0OIl to avoid visually similar glyphs).
-constexpr const char* k_b58_alphabet =
+constexpr const char* b58_alphabet =
    "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
 /// Inline capacity for the working buffer used inside encode/decode.
 /// Covers any input up to ~92 bytes without touching the heap; signatures
 /// are 65 bytes, public keys 33, private keys 32, so all production callers
 /// stay on the stack. Larger inputs fall back to a heap allocation.
-constexpr size_t k_b58_inline_capacity = 128;
+constexpr size_t b58_inline_capacity = 128;
 
 /// Reverse lookup table: maps an ASCII byte to its base58 digit value, or -1
 /// if the byte is not a valid base58 character. Sized at 256 so any unsigned
 /// byte indexes safely.
-constexpr int8_t k_b58_reverse[256] = {
+constexpr int8_t b58_reverse[256] = {
    -1,-1,-1,-1,-1,-1,-1,-1, -1,-1,-1,-1,-1,-1,-1,-1,
    -1,-1,-1,-1,-1,-1,-1,-1, -1,-1,-1,-1,-1,-1,-1,-1,
    -1,-1,-1,-1,-1,-1,-1,-1, -1,-1,-1,-1,-1,-1,-1,-1,
@@ -62,18 +62,18 @@ constexpr int8_t k_b58_reverse[256] = {
 /// the partial quotient in base58. Leading zero bytes in the input are
 /// preserved as leading '1' characters in the output.
 std::string encode_base58(const unsigned char* pbegin, const unsigned char* pend) {
-   int zeroes = 0;
+   size_t zeroes = 0;
    while (pbegin != pend && *pbegin == 0) {
       ++pbegin;
       ++zeroes;
    }
    // log(256) / log(58) ~= 1.366, round up via *138/100 + 1.
-   const int size = static_cast<int>((pend - pbegin) * 138 / 100 + 1);
-   boost::container::small_vector<unsigned char, k_b58_inline_capacity> b58(size);
-   int length = 0;
+   const size_t size = static_cast<size_t>(pend - pbegin) * 138 / 100 + 1;
+   boost::container::small_vector<unsigned char, b58_inline_capacity> b58(size);
+   size_t length = 0;
    while (pbegin != pend) {
       int carry = *pbegin;
-      int i = 0;
+      size_t i = 0;
       // b58 = b58 * 256 + carry, walking from least to most significant digit.
       for (auto it = b58.rbegin(); (carry != 0 || i < length) && it != b58.rend(); ++it, ++i) {
          carry += 256 * (*it);
@@ -88,10 +88,10 @@ std::string encode_base58(const unsigned char* pbegin, const unsigned char* pend
    while (it != b58.end() && *it == 0)
       ++it;
    std::string str;
-   str.reserve(static_cast<size_t>(zeroes) + static_cast<size_t>(b58.end() - it));
+   str.reserve(zeroes + static_cast<size_t>(b58.end() - it));
    str.assign(zeroes, '1');
    while (it != b58.end())
-      str += k_b58_alphabet[*(it++)];
+      str += b58_alphabet[*(it++)];
    return str;
 }
 
@@ -105,22 +105,22 @@ bool decode_base58(const char* psz, std::vector<unsigned char>& vch) {
    vch.clear();
    while (*psz && std::isspace(static_cast<unsigned char>(*psz)))
       ++psz;
-   int zeroes = 0;
+   size_t zeroes = 0;
    while (*psz == '1') {
       ++zeroes;
       ++psz;
    }
    const size_t psz_len = std::strlen(psz);
    // log(58) / log(256) ~= 0.733, round up via *733/1000 + 1.
-   const int size = static_cast<int>(psz_len * 733 / 1000 + 1);
-   boost::container::small_vector<unsigned char, k_b58_inline_capacity> b256(size);
-   int length = 0;
+   const size_t size = psz_len * 733 / 1000 + 1;
+   boost::container::small_vector<unsigned char, b58_inline_capacity> b256(size);
+   size_t length = 0;
    while (*psz && !std::isspace(static_cast<unsigned char>(*psz))) {
-      const int digit = k_b58_reverse[static_cast<unsigned char>(*psz)];
+      const int digit = b58_reverse[static_cast<unsigned char>(*psz)];
       if (digit < 0)
          return false;
       int carry = digit;
-      int i = 0;
+      size_t i = 0;
       // b256 = b256 * 58 + carry.
       for (auto it = b256.rbegin(); (carry != 0 || i < length) && it != b256.rend(); ++it, ++i) {
          carry += 58 * (*it);
@@ -136,7 +136,7 @@ bool decode_base58(const char* psz, std::vector<unsigned char>& vch) {
    if (*psz != 0)
       return false;
    auto it = b256.begin() + (size - length);
-   vch.reserve(static_cast<size_t>(zeroes) + static_cast<size_t>(b256.end() - it));
+   vch.reserve(zeroes + static_cast<size_t>(b256.end() - it));
    vch.assign(zeroes, 0x00);
    while (it != b256.end())
       vch.push_back(*(it++));
