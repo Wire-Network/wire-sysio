@@ -1,0 +1,6 @@
+if( BUILD_TEST_CONTRACTS )
+   add_contract( action_order_test action_order_test action_order_test.cpp )
+else()
+   configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/action_order_test.wasm ${CMAKE_CURRENT_BINARY_DIR}/action_order_test.wasm COPYONLY )
+   configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/action_order_test.abi  ${CMAKE_CURRENT_BINARY_DIR}/action_order_test.abi  COPYONLY )
+endif()
