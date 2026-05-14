@@ -38,6 +38,14 @@ importseed action arg objects, each batched up to --batch-size credits
 per call. `native_address` is emitted as the hex spelling of the raw
 bytes (no 0x prefix), which the sysio.cap ABI consumes as `bytes`.
 
+Batching: default is 10,000 credits per trx, which fits well inside
+the 150ms execution / 500KB transaction-size envelope. At launch
+scale (under ~50K users per chain) this typically produces a single
+batch; importseed accrues into `unmapped_tokens` with zero inline
+transfers, so the only cost driver is the per-row table write.
+Operators only need to lower --batch-size if a trx hits the size or
+execution limit at very high user counts.
+
 Usage:
   ./convert_import.py eth_balances.json --chain CHAIN_KIND_ETHEREUM > eth.json
   ./convert_import.py sol_balances.json --chain CHAIN_KIND_SOLANA   > sol.json
@@ -101,8 +109,10 @@ def parse_args() -> argparse.Namespace:
    )
    ap.add_argument("input", type=Path,
                    help="Indexer JSON file (ETH or SOL /opp/[solana/]balances shape)")
-   ap.add_argument("--batch-size", type=int, default=50,
-                   help="Credits per importseed call (default: 50)")
+   ap.add_argument("--batch-size", type=int, default=10_000,
+                   help="Credits per importseed call (default: 10000; "
+                        "fits the 150ms/500KB trx envelope with headroom). "
+                        "Lower this only if you hit a trx size or execution limit.")
    ap.add_argument("--chain", default="CHAIN_KIND_ETHEREUM",
                    choices=sorted(CHAIN_CONFIG.keys()),
                    help="ChainKind enum name (default: CHAIN_KIND_ETHEREUM)")
