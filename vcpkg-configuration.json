@@ -11,7 +11,6 @@
       "repository": "https://github.com/wire-network/wire-vcpkg-registry",
       "baseline": "23aa4018992d85602a4b5c30104a623e708b4b3e",
       "packages": [
-        "boost",
         "softfloat",
         "libsodium",
         "ethash",
