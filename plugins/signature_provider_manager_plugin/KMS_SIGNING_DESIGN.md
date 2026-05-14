@@ -302,13 +302,13 @@ KMS:<key-ref>     <key-ref> is either an ARN
    aws-sdk-cpp itself ─────────────────► (declares openssl)
    ```
 
-   **Resolution (landed):** overlay ports in `wire-network/wire-vcpkg-registry` on branch `feature/aws-sdk-cpp-boringssl` (commits `641bb7f`, `d1e4cc9`, `088646f`):
+   **Resolution (landed):** overlay ports in `wire-network/wire-vcpkg-registry` on branch `feature/aws-sdk-cpp-boringssl` (commits `641bb7f`, `d1e4cc9`, `088646f`, `c739f08`):
 
    - `ports/aws-sdk-cpp/` — manifest only; drops the `openssl` dep (the SDK's per-OS `OpenSSLImpl` was removed before 1.11.591, crypto delegates to `aws-crt-cpp`).
    - `ports/aws-c-cal/` — drops the `openssl` dep, replaces it with `boringssl-custom`; patches `CMakeLists.txt` and the installed `aws-c-cal-config.cmake` to use `boringssl::crypto`.
    - `ports/s2n/` — drops the `openssl` dep, replaces it with `boringssl-custom`; patches `CMakeLists.txt` and the installed `s2n-config.cmake` to use `boringssl::crypto`; relaxes `-Werror` on the build (upstream tracks bleeding-edge compilers).
 
-   `vcpkg-configuration.json` claims all three port names in the wire registry's `packages` array and pins `baseline: 088646fd...`. End-to-end verified against a `file:///home/swamp/dev/wire-vcpkg-registry` URL: all 50 ports install cleanly, `libaws-cpp-sdk-kms.a` + `libs2n.a` + `libbscrypto.a` materialise in `vcpkg_installed/x64-linux/lib/`, no port-install collision, `cmake -B build -S .` exits 0 in 105.9 s.
+   `vcpkg-configuration.json` claims all three port names in the wire registry's `packages` array and pins `baseline: c739f089...` (`aws-sdk-cpp 1.11.665`, `aws-c-cal 0.9.3`, `s2n 1.5.27`). End-to-end verified against a `file:///home/swamp/dev/wire-vcpkg-registry` URL: all 50 ports install cleanly, `libaws-cpp-sdk-kms.a` + `libs2n.a` + `libbscrypto.a` materialise in `vcpkg_installed/x64-linux/lib/`, no port-install collision, `cmake -B build -S .` exits 0 in 105.9 s.
 
    **Pending durability step:** `feature/aws-sdk-cpp-boringssl` must merge to `master` in the registry. vcpkg's git-registry uses the registry's HEAD branch for port discovery (independent of the configured baseline SHA), so consumers fetching from `https://github.com/wire-network/wire-vcpkg-registry` will get `error: aws-sdk-cpp does not exist` until the branch lands on master. PR or fast-forward push to master closes this.
 2. **Determinism.** secp256k1 ECDSA in KMS is **not** RFC-6979 deterministic. Each call returns a fresh `(r, s)`. Fine for transactions (nonce + chainId pin replay), but a hard "no" for any signing path that consensus assumes is deterministic across nodes. Documented in §8.
