@@ -4,7 +4,12 @@
 #include <sysio.reserv/sysio.reserv.hpp>
 #include <sysio.authex/sysio.authex.hpp>
 #include <sysio/opp/attestations/attestations.pb.hpp>
+#include <sysio/permission.hpp>
+#include <sysio/crypto.hpp>
 #include <zpp_bits.h>
+
+#include <cstring>
+#include <limits>
 
 namespace sysio {
 
@@ -323,6 +328,93 @@ void emit_swap_remit(name self,
    ).send();
 }
 
+/// Verify the embedded signature in `uic_bytes` was produced by one of the
+/// `underwriter` account's permissions over the digest
+/// `sha256(serialize(uic_with_signature_blanked))`. Returns true on first
+/// matching key. Returns false (never throws) when the bytes are empty,
+/// the proto fails to decode, the embedded signature is missing, or no key
+/// across the underwriter's permissions recovers to the signature.
+///
+/// **Per `feedback_opp_handlers_never_throw.md` — this MUST stay
+/// non-throwing.** It's called from `try_select_winner`, which runs inside
+/// the evalcons inline-action chain; a `check()` failure here halts
+/// consensus. Today we defensively bound the signature length and variant
+/// tag before invoking the chain crypto intrinsic, but malformed
+/// attacker-controlled bytes that pass the bounds checks could still trip
+/// `recover_key` itself. See the TODO at the call site in
+/// `try_select_winner` for the launch-time hardening decision.
+bool verify_uic_signature(name underwriter,
+                           const std::vector<char>& uic_bytes) {
+   if (uic_bytes.empty()) return false;
+
+   // Decode the UIC payload.
+   opp::attestations::UnderwriteIntentCommit uic;
+   {
+      auto in = zpp::bits::in{
+         std::span{uic_bytes.data(), uic_bytes.size()},
+         zpp::bits::no_size{}};
+      if (in(uic) != zpp::bits::errc{}) return false;
+   }
+
+   // Save the signature, blank it, recompute the digest.
+   std::vector<char> sig_bytes_view{uic.signature.begin(), uic.signature.end()};
+   if (sig_bytes_view.empty()) return false;
+   uic.signature.clear();
+
+   std::vector<char> blanked;
+   auto out = zpp::bits::out{blanked, zpp::bits::no_size{}};
+   if (out(uic) != zpp::bits::errc{}) return false;
+
+   sysio::checksum256 digest =
+      sysio::sha256(blanked.data(), blanked.size());
+
+   // Defensive bounds before invoking the chain signature intrinsic. The
+   // first byte of a packed `sysio::signature` is the variant tag
+   // (0=K1, 1=R1, 2=WebAuthN, 3=EM, 4=ED25519, 5=BLS). Anything outside
+   // that range or sized outside the smallest/largest legal variant is
+   // tossed before the intrinsic gets a chance to assert.
+   if (sig_bytes_view.size() < 2 || sig_bytes_view.size() > 1024) return false;
+   const uint8_t tag = static_cast<uint8_t>(sig_bytes_view[0]);
+   if (tag > 5) return false;
+
+   // Unpack the underwriter's signature variant from the embedded bytes.
+   sysio::signature parsed_sig;
+   {
+      sysio::datastream<const char*> ds{sig_bytes_view.data(),
+                                          sig_bytes_view.size()};
+      ds >> parsed_sig;
+   }
+
+   // Recover the public key the signature was produced with.
+   sysio::public_key recovered = sysio::recover_key(digest, parsed_sig);
+
+   // Iterate every permission on `underwriter` and look for a match. The
+   // typical underwriter has only `owner` + `active` so the loop is small.
+   sysio::name cursor{};
+   while (true) {
+      char name_buf[8];
+      int32_t sz = sysio::internal_use_do_not_use::get_permission_lower_bound(
+         underwriter.value, cursor.value, name_buf, sizeof(name_buf));
+      if (sz <= 0) break;
+
+      sysio::name perm_name;
+      std::memcpy(&perm_name, name_buf, sizeof(perm_name));
+
+      std::vector<char> buf(static_cast<size_t>(sz));
+      sysio::internal_use_do_not_use::get_permission_lower_bound(
+         underwriter.value, cursor.value, buf.data(), buf.size());
+      auto rec = sysio::unpack<sysio::permission_record>(buf);
+
+      for (const auto& kw : rec.auth.keys) {
+         if (kw.key == recovered) return true;
+      }
+
+      if (perm_name.value == std::numeric_limits<uint64_t>::max()) break;
+      cursor = sysio::name{perm_name.value + 1};
+   }
+   return false;
+}
+
 /// Allocate a fresh `lock_id` from the uwcounters singleton.
 uint64_t next_lock_id(name self) {
    uwrit::uwcounters_t ctr_tbl(self);
@@ -338,13 +430,28 @@ uint64_t next_lock_id(name self) {
 // ---------------------------------------------------------------------------
 //  setconfig
 // ---------------------------------------------------------------------------
-void uwrit::setconfig(uint32_t fee_bps) {
+void uwrit::setconfig(uint32_t fee_bps,
+                      uint32_t collateral_lock_duration_epoch_count,
+                      uint8_t  fee_split_winner_pct,
+                      uint8_t  fee_split_other_uw_pct,
+                      uint8_t  fee_split_batch_op_pct) {
    require_auth(get_self());
    check(fee_bps <= 10000, "fee_bps cannot exceed 10000 (100%)");
+   check(collateral_lock_duration_epoch_count > 0,
+         "collateral_lock_duration_epoch_count must be positive");
+   const uint32_t split_total = static_cast<uint32_t>(fee_split_winner_pct)
+                              + static_cast<uint32_t>(fee_split_other_uw_pct)
+                              + static_cast<uint32_t>(fee_split_batch_op_pct);
+   check(split_total == 100,
+         "fee_split_*_pct must sum to 100");
 
    uwconfig_t cfg_tbl(get_self());
    uw_config cfg = cfg_tbl.get_or_default(uw_config{});
-   cfg.fee_bps = fee_bps;
+   cfg.fee_bps                              = fee_bps;
+   cfg.collateral_lock_duration_epoch_count = collateral_lock_duration_epoch_count;
+   cfg.fee_split_winner_pct                 = fee_split_winner_pct;
+   cfg.fee_split_other_uw_pct               = fee_split_other_uw_pct;
+   cfg.fee_split_batch_op_pct               = fee_split_batch_op_pct;
    cfg_tbl.set(cfg, get_self());
 }
 
@@ -411,6 +518,7 @@ void uwrit::createuwreq(uint64_t attestation_id,
       .dst_chain                 = sr.target_chain.kind,
       .dst_token_kind            = sr.target_token,
       .dst_amount                = sr.quoted_destination_amount,
+      .variance_tolerance_bps    = sr.quote_tolerance_bps,
       .commits_by                = {},
       .winner                    = name{},
       .committed_at_ms           = 0,
@@ -451,6 +559,24 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate) {
    auto req = reqs.get(pk);
    if (req.status != UnderwriteRequestStatus::UNDERWRITE_REQUEST_STATUS_PENDING) return;
 
+   // ── T7: signature verification on both legs ──────────────────────────
+   // Look up the candidate's commit_entry to get the per-leg UIC bytes.
+   const uwrit::commit_entry* ce_ptr = nullptr;
+   for (const auto& c : req.commits_by) {
+      if (c.underwriter == candidate) { ce_ptr = &c; break; }
+   }
+   if (!ce_ptr) return;
+   if (!verify_uic_signature(candidate, ce_ptr->source_uic_bytes) ||
+       !verify_uic_signature(candidate, ce_ptr->dest_uic_bytes)) {
+      // Per `feedback_opp_handlers_never_throw.md`: dispatch handlers
+      // must NOT throw — a check() halts evalcons and stalls consensus.
+      // Log + skip instead. The race resolves with the remaining valid
+      // commit if any.
+      // TODO: decide how to handle invalid sigs before launch @jglanz
+      sysio::print("invalid sig for uwreq ", uwreq_id, " from ", candidate, "\n");
+      return;
+   }
+
    uint64_t src_avail = available_via_mirrors(self, candidate, req.src_chain, req.src_token_kind);
    uint64_t dst_avail = available_via_mirrors(self, candidate, req.dst_chain, req.dst_token_kind);
    if (src_avail < req.src_amount || dst_avail < req.dst_amount) {
@@ -463,8 +589,68 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate) {
       return;
    }
 
+   // ── T6: race-time variance recheck ────────────────────────────────────
+   // The createuwreq path validated the LP quote at ingestion. Between
+   // then and now the LP may have drifted; if the drift now exceeds the
+   // user's tolerance, emit SWAP_REVERT instead of locking. Skipped when
+   // the local mirror returns 0 (no LP provisioned) — same convention as
+   // createuwreq.
+   {
+      const uint64_t current_quote = swap_quote(
+         req.src_chain, req.src_token_kind,
+         req.dst_chain, req.dst_token_kind,
+         req.src_amount);
+      const uint64_t quoted = req.dst_amount;
+      if (current_quote != 0 && quoted != 0) {
+         const uint64_t diff = current_quote > quoted
+                                  ? current_quote - quoted
+                                  : quoted - current_quote;
+         const uint128_t allowed = (static_cast<uint128_t>(quoted)
+                                       * req.variance_tolerance_bps) / 10000u;
+         if (static_cast<uint128_t>(diff) > allowed) {
+            // Recover originating outpost from the swap-request payload
+            // so the SWAP_REVERT routes back correctly.
+            opp::attestations::SwapRequest sr;
+            {
+               auto in = zpp::bits::in{
+                  std::span{req.attestation_inbound_data.data(),
+                              req.attestation_inbound_data.size()},
+                  zpp::bits::no_size{}};
+               if (in(sr) == zpp::bits::errc{}) {
+                  auto src_outpost_opt = find_outpost_id_for_chain(req.src_chain);
+                  if (src_outpost_opt) {
+                     emit_swap_revert(self, *src_outpost_opt, req.id, sr,
+                        "variance exceeded tolerance at race resolution: "
+                        "quoted=" + std::to_string(quoted)
+                        + " current=" + std::to_string(current_quote)
+                        + " tolerance_bps=" + std::to_string(req.variance_tolerance_bps));
+                  }
+               }
+            }
+            reqs.modify(same_payer, pk, [&](auto& r) {
+               r.status           = UnderwriteRequestStatus::UNDERWRITE_REQUEST_STATUS_REJECTED;
+               r.settled_at_ms    = current_time_ms();
+               r.expires_at_epoch = get_current_epoch() + uwrit::UWREQ_RETENTION_EPOCHS;
+               for (auto& c : r.commits_by) {
+                  if (c.status == UnderwriteStatus::UNDERWRITE_STATUS_INTENT_SUBMITTED) {
+                     c.status = UnderwriteStatus::UNDERWRITE_STATUS_RELEASED;
+                     c.reason = "uwreq reverted at race resolution (variance drift)";
+                  }
+               }
+            });
+            return;
+         }
+      }
+   }
+
    // Winner — push two locks (one per leg) + mark uwreq CONFIRMED.
    uint32_t now_ep = get_current_epoch();
+   // Lock duration comes from uwconfig; default (10 epochs) used when no
+   // setconfig has been issued yet.
+   uwrit::uwconfig_t uwcfg_tbl(self);
+   auto uwcfg = uwcfg_tbl.get_or_default(uwrit::uw_config{});
+   uint32_t expires_ep = now_ep + uwcfg.collateral_lock_duration_epoch_count;
+
    uwrit::locks_t locks(self);
 
    uint64_t src_lock_id = next_lock_id(self);
@@ -476,6 +662,7 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate) {
       .token_kind       = req.src_token_kind,
       .amount           = req.src_amount,
       .created_at_epoch = now_ep,
+      .expires_at_epoch = expires_ep,
    });
 
    uint64_t dst_lock_id = next_lock_id(self);
@@ -487,6 +674,7 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate) {
       .token_kind       = req.dst_token_kind,
       .amount           = req.dst_amount,
       .created_at_epoch = now_ep,
+      .expires_at_epoch = expires_ep,
    });
 
    reqs.modify(same_payer, pk, [&](auto& r) {
@@ -532,9 +720,9 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate) {
 void uwrit::rcrdcommit(uint64_t uwreq_id,
                        name underwriter,
                        uint64_t outpost_id,
-                       opp::types::ChainKind from_chain) {
+                       opp::types::ChainKind from_chain,
+                       std::vector<char> uic_bytes) {
    require_auth(MSGCH_ACCOUNT);
-   (void)outpost_id;   // outpost_id is informational; race math uses from_chain
 
    uwreqs_t reqs(get_self());
    auto pk = id_key{uwreq_id};
@@ -548,8 +736,12 @@ void uwrit::rcrdcommit(uint64_t uwreq_id,
       uint64_t now_ms = current_time_ms();
       if (from_chain == r.src_chain) {
          c->source_received_at_ms = now_ms;
+         c->source_outpost_id     = outpost_id;
+         c->source_uic_bytes      = uic_bytes;
       } else if (from_chain == r.dst_chain) {
          c->dest_received_at_ms = now_ms;
+         c->dest_outpost_id     = outpost_id;
+         c->dest_uic_bytes      = uic_bytes;
       }
       // Re-set status to INTENT_SUBMITTED if the underwriter is re-arming
       // a previously-disqualified entry (e.g. they topped up bond and want
@@ -569,26 +761,6 @@ void uwrit::rcrdcommit(uint64_t uwreq_id,
          break;
       }
    }
-}
-
-// ---------------------------------------------------------------------------
-//  rcrdreject — underwriter (or outpost) rejects an intent
-// ---------------------------------------------------------------------------
-void uwrit::rcrdreject(uint64_t uwreq_id, name underwriter, std::string reason) {
-   require_auth(MSGCH_ACCOUNT);
-
-   uwreqs_t reqs(get_self());
-   auto pk = id_key{uwreq_id};
-   check(reqs.contains(pk), "uwreq not found");
-   auto req = reqs.get(pk);
-   check(req.status == UnderwriteRequestStatus::UNDERWRITE_REQUEST_STATUS_PENDING,
-         "uwreq not open for rejects");
-
-   reqs.modify(same_payer, pk, [&](auto& r) {
-      auto* c = find_or_create_commit(r, underwriter);
-      c->status = UnderwriteStatus::UNDERWRITE_STATUS_RELEASED;
-      c->reason = std::move(reason);
-   });
 }
 
 // ---------------------------------------------------------------------------
@@ -675,6 +847,33 @@ uint64_t uwrit::sumlocks(name underwriter,
                          opp::types::ChainKind chain,
                          opp::types::TokenKind token_kind) {
    return sum_locks_inline(get_self(), underwriter, chain, token_kind);
+}
+
+// ---------------------------------------------------------------------------
+//  chklocks — epoch-boundary sweep of expired locks
+// ---------------------------------------------------------------------------
+void uwrit::chklocks(uint32_t up_to_epoch) {
+   // Two valid callers:
+   //   * sysio.epoch::advance — inlined at every epoch boundary so an
+   //     epoch advance naturally evicts whatever just aged out.
+   //   * sysio.uwrit — manual cleanup invocation, e.g. from a migration.
+   check(has_auth(EPOCH_ACCOUNT) || has_auth(get_self()),
+         "chklocks requires sysio.epoch or sysio.uwrit authority");
+
+   locks_t locks(get_self());
+   auto idx = locks.get_index<"byexpire"_n>();
+
+   // Walk in ascending `expires_at_epoch` and erase while expired. We can't
+   // hold an iterator across `locks.erase(*it)` (it invalidates the index
+   // cursor), so collect keys first and erase in a second pass.
+   std::vector<lock_key> doomed;
+   for (auto it = idx.begin();
+        it != idx.end() && it->expires_at_epoch <= up_to_epoch; ++it) {
+      doomed.push_back(lock_key{it->lock_id});
+   }
+   for (const auto& k : doomed) {
+      locks.erase(k);
+   }
 }
 
 } // namespace sysio

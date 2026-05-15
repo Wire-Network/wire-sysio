@@ -70,9 +70,17 @@ public:
       }
    }
 
-   action_result setconfig(uint32_t fee_bps = 10) {
+   action_result setconfig(uint32_t fee_bps                              = 10,
+                           uint32_t collateral_lock_duration_epoch_count = 10,
+                           uint8_t  fee_split_winner_pct                 = 50,
+                           uint8_t  fee_split_other_uw_pct               = 25,
+                           uint8_t  fee_split_batch_op_pct               = 25) {
       return push_uwrit_action(UWRIT_ACCOUNT, "setconfig"_n, mvo()
-         ("fee_bps", fee_bps)
+         ("fee_bps",                              fee_bps)
+         ("collateral_lock_duration_epoch_count", collateral_lock_duration_epoch_count)
+         ("fee_split_winner_pct",                 fee_split_winner_pct)
+         ("fee_split_other_uw_pct",               fee_split_other_uw_pct)
+         ("fee_split_batch_op_pct",               fee_split_batch_op_pct)
       );
    }
 
@@ -104,12 +112,38 @@ BOOST_FIXTURE_TEST_CASE(setconfig_basic, sysio_uwrit_tester) { try {
 
    auto cfg = get_uwconfig();
    BOOST_REQUIRE_EQUAL(25, cfg["fee_bps"].as_uint64());
+   BOOST_REQUIRE_EQUAL(10, cfg["collateral_lock_duration_epoch_count"].as_uint64());
+   BOOST_REQUIRE_EQUAL(50, cfg["fee_split_winner_pct"].as_uint64());
+   BOOST_REQUIRE_EQUAL(25, cfg["fee_split_other_uw_pct"].as_uint64());
+   BOOST_REQUIRE_EQUAL(25, cfg["fee_split_batch_op_pct"].as_uint64());
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(setconfig_writes_custom_lock_duration, sysio_uwrit_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(),
+      setconfig(/*fee_bps*/10, /*lock*/7, /*winner*/60, /*other_uw*/20, /*batchop*/20));
+   auto cfg = get_uwconfig();
+   BOOST_REQUIRE_EQUAL(7,  cfg["collateral_lock_duration_epoch_count"].as_uint64());
+   BOOST_REQUIRE_EQUAL(60, cfg["fee_split_winner_pct"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(setconfig_rejects_excessive_fee, sysio_uwrit_tester) { try {
    BOOST_REQUIRE_EQUAL(
       error("assertion failure with message: fee_bps cannot exceed 10000 (100%)"),
       setconfig(10001)
+   );
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(setconfig_rejects_zero_lock_duration, sysio_uwrit_tester) { try {
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: collateral_lock_duration_epoch_count must be positive"),
+      setconfig(/*fee_bps*/10, /*lock*/0, /*winner*/50, /*other_uw*/25, /*batchop*/25)
+   );
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(setconfig_rejects_split_not_summing_to_100, sysio_uwrit_tester) { try {
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: fee_split_*_pct must sum to 100"),
+      setconfig(/*fee_bps*/10, /*lock*/10, /*winner*/50, /*other_uw*/30, /*batchop*/25)
    );
 } FC_LOG_AND_RETHROW() }
 
@@ -153,6 +187,7 @@ BOOST_FIXTURE_TEST_CASE(rcrdcommit_requires_msgch_auth, sysio_uwrit_tester) { tr
       ("underwriter", "uwrit.a")
       ("outpost_id",  1)
       ("from_chain",  ChainKind::CHAIN_KIND_ETHEREUM)
+      ("uic_bytes",   std::vector<char>{})
    ).find("missing authority of sysio.msgch") != std::string::npos);
 } FC_LOG_AND_RETHROW() }
 
@@ -165,28 +200,7 @@ BOOST_FIXTURE_TEST_CASE(rcrdcommit_rejects_unknown_uwreq, sysio_uwrit_tester) { 
          ("underwriter", "uwrit.a")
          ("outpost_id",  1)
          ("from_chain",  ChainKind::CHAIN_KIND_ETHEREUM)
-      )
-   );
-} FC_LOG_AND_RETHROW() }
-
-// ── rcrdreject (Task 3: explicit underwriter intent rejection) ──
-
-BOOST_FIXTURE_TEST_CASE(rcrdreject_requires_msgch_auth, sysio_uwrit_tester) { try {
-   // Like rcrdcommit, rcrdreject is dispatched inline from sysio.msgch only.
-   BOOST_REQUIRE(push_uwrit_action("uwrit.a"_n, "rcrdreject"_n, mvo()
-      ("uwreq_id",    1)
-      ("underwriter", "uwrit.a")
-      ("reason",      "rejected by underwriter")
-   ).find("missing authority of sysio.msgch") != std::string::npos);
-} FC_LOG_AND_RETHROW() }
-
-BOOST_FIXTURE_TEST_CASE(rcrdreject_rejects_unknown_uwreq, sysio_uwrit_tester) { try {
-   BOOST_REQUIRE_EQUAL(
-      error("assertion failure with message: uwreq not found"),
-      push_uwrit_action(MSGCH_ACCOUNT, "rcrdreject"_n, mvo()
-         ("uwreq_id",    77)
-         ("underwriter", "uwrit.a")
-         ("reason",      "n/a")
+         ("uic_bytes",   std::vector<char>{})
       )
    );
 } FC_LOG_AND_RETHROW() }

@@ -63,11 +63,21 @@ namespace sysio {
       //  Actions
       // -----------------------------------------------------------------------
 
-      /// Set underwriting fee config. Simplified vs the legacy 4-step model —
-      /// fee distribution is deferred to a later task; for now this just
-      /// holds the per-spoke fee_bps that the depot applies.
+      /// Set underwriting fee + lock config. Fields:
+      ///   * `fee_bps` — per-spoke fee charged by the depot.
+      ///   * `collateral_lock_duration_epoch_count` — number of epochs after
+      ///     `lock_entry.created_at_epoch` that the lock auto-expires (swept
+      ///     by `sysio.epoch::advance -> chklocks`).
+      ///   * `fee_split_winner_pct` / `fee_split_other_uw_pct` /
+      ///     `fee_split_batch_op_pct` — distribution shares (sum to 100).
+      ///     Distribution logic itself is deferred to a follow-up; today
+      ///     these fields are persisted but not read by any code path.
       [[sysio::action]]
-      void setconfig(uint32_t fee_bps);
+      void setconfig(uint32_t fee_bps,
+                     uint32_t collateral_lock_duration_epoch_count,
+                     uint8_t  fee_split_winner_pct,
+                     uint8_t  fee_split_other_uw_pct,
+                     uint8_t  fee_split_batch_op_pct);
 
       /// Called inline from `sysio.msgch::dispatch` when a SWAP attestation
       /// arrives. Decodes the SwapRequest, runs the variance-tolerance check
@@ -89,19 +99,20 @@ namespace sysio {
 
       /// Called inline from `sysio.msgch::dispatch` when an
       /// UNDERWRITE_INTENT_COMMIT attestation arrives. Records the per-leg
-      /// arrival in `uwreqs.commits_by`. When both legs land for the same
-      /// underwriter, runs `try_select_winner` to resolve the race.
+      /// arrival in `uwreqs.commits_by` and stores the verbatim UIC bytes
+      /// so `try_select_winner` can reconstruct + verify the digest. When
+      /// both legs land for the same underwriter, runs `try_select_winner`
+      /// to resolve the race.
+      ///
+      /// `uic_bytes` is the raw zpp_bits-encoded `UnderwriteIntentCommit`
+      /// payload — the action signature carries bytes, not the proto
+      /// message itself, per `feedback_no_proto_messages_in_actions.md`.
       [[sysio::action]]
       void rcrdcommit(uint64_t uwreq_id,
                       name underwriter,
                       uint64_t outpost_id,
-                      opp::types::ChainKind from_chain);
-
-      /// Called inline from `sysio.msgch::dispatch` when an
-      /// UNDERWRITE_INTENT_REJECT attestation arrives. Marks the
-      /// underwriter's race entry as REJECTED.
-      [[sysio::action]]
-      void rcrdreject(uint64_t uwreq_id, name underwriter, std::string reason);
+                      opp::types::ChainKind from_chain,
+                      std::vector<char> uic_bytes);
 
       /// Settle an UWREQ. For each lock entry: erase the row and call
       /// opreg::releaselock so opreg can deferred-slash / deferred-remit /
@@ -122,6 +133,16 @@ namespace sysio {
       /// confirm REMIT.
       [[sysio::action]]
       void expirelock(uint64_t uwreq_id);
+
+      /// Sweep all `locks` rows whose `expires_at_epoch <= up_to_epoch`. Inlined
+      /// from `sysio.epoch::advance` at every epoch boundary; can also be
+      /// invoked by `sysio.uwrit` itself for manual cleanup. The
+      /// `byexpire` secondary index walks rows in ascending expiry, so the
+      /// loop stops at the first row that hasn't expired yet — the steady-
+      /// state cost is O(n) in the number of locks expiring this epoch, not
+      /// table size.
+      [[sysio::action]]
+      void chklocks(uint32_t up_to_epoch);
 
       /// Read-only rollup of an underwriter's active lock total on a given
       /// (chain, token_kind). Used by off-chain consumers + (eventually)
@@ -160,6 +181,10 @@ namespace sysio {
          opp::types::TokenKind   token_kind;
          uint64_t                amount           = 0;
          uint32_t                created_at_epoch = 0;
+         /// `created_at_epoch + uwconfig.collateral_lock_duration_epoch_count`,
+         /// computed at insert time in `try_select_winner`. Indexed via
+         /// `byexpire` so `chklocks` can sweep expired locks in ascending order.
+         uint32_t                expires_at_epoch = 0;
 
          /// Composite index for opreg's `available()` rollup: 64 bits
          /// underwriter + 32 chain + 32 token_kind.
@@ -168,27 +193,46 @@ namespace sysio {
                  | (static_cast<uint64_t>(chain) << 32)
                  | static_cast<uint64_t>(token_kind);
          }
-         uint64_t by_uwreq() const { return uwreq_id; }
+         uint64_t by_uwreq()            const { return uwreq_id; }
+         uint64_t by_expires_at_epoch() const { return expires_at_epoch; }
 
          SYSLIB_SERIALIZE(lock_entry,
             (lock_id)(uwreq_id)(underwriter)(chain)(token_kind)
-            (amount)(created_at_epoch))
+            (amount)(created_at_epoch)(expires_at_epoch))
       };
 
       using locks_t = sysio::kv::table<"locks"_n, lock_key, lock_entry,
          sysio::kv::index<"byuwck"_n,
             sysio::const_mem_fun<lock_entry, uint128_t, &lock_entry::by_underwriter_ck>>,
          sysio::kv::index<"byuwreq"_n,
-            sysio::const_mem_fun<lock_entry, uint64_t, &lock_entry::by_uwreq>>
+            sysio::const_mem_fun<lock_entry, uint64_t, &lock_entry::by_uwreq>>,
+         sysio::kv::index<"byexpire"_n,
+            sysio::const_mem_fun<lock_entry, uint64_t, &lock_entry::by_expires_at_epoch>>
       >;
 
       /// Per-underwriter race entry inside an UWREQ row. Tracks when each
       /// leg of a dual-COMMIT pair arrived so `try_select_winner` can
-      /// resolve the race deterministically.
+      /// resolve the race deterministically. Each leg's COMMIT is an
+      /// independent attestation with its own outpost_id + uw_ext_chain_addr
+      /// (the underwriter's chain identity on that leg's outpost) + signature
+      /// over the whole UIC. The depot stores the full UIC bytes per leg so
+      /// `try_select_winner` can reconstruct the signed digest verbatim and
+      /// verify against any of the underwriter's WIRE account permissions.
       struct commit_entry {
          name      underwriter;
-         uint64_t  source_received_at_ms = 0;
-         uint64_t  dest_received_at_ms   = 0;
+         /// Source-leg COMMIT. `source_uic_bytes` is the verbatim zpp_bits
+         /// serialization of the `UnderwriteIntentCommit` proto received from
+         /// the source-side outpost; the bytes include the underwriter's
+         /// signature in the `signature` field. Empty until the source-leg
+         /// arrives.
+         uint64_t          source_received_at_ms = 0;
+         uint64_t          source_outpost_id     = 0;
+         std::vector<char> source_uic_bytes;
+         /// Destination-leg COMMIT. Same shape, populated when the dest-side
+         /// outpost's relay arrives.
+         uint64_t          dest_received_at_ms   = 0;
+         uint64_t          dest_outpost_id       = 0;
+         std::vector<char> dest_uic_bytes;
          /// Race outcome — INTENT_SUBMITTED (initial), INTENT_CONFIRMED
          /// (winner), SLASHED (rejected for insufficient bond), or RELEASED
          /// (loser, kept for debugging). Reuses the existing protobuf
@@ -197,7 +241,10 @@ namespace sysio {
          std::string reason;
 
          SYSLIB_SERIALIZE(commit_entry,
-            (underwriter)(source_received_at_ms)(dest_received_at_ms)(status)(reason))
+            (underwriter)
+            (source_received_at_ms)(source_outpost_id)(source_uic_bytes)
+            (dest_received_at_ms)(dest_outpost_id)(dest_uic_bytes)
+            (status)(reason))
       };
 
       /// UWREQ row — one per inbound SWAP attestation. Tracks the swap's
@@ -209,13 +256,20 @@ namespace sysio {
 
          /// Src / dst of the cross-chain swap. Populated by `createuwreq`
          /// from the decoded SwapRequest. Used by `try_select_winner` to
-         /// validate per-leg bond coverage.
+         /// validate per-leg bond coverage. `dst_amount` IS the quoted
+         /// destination amount the underwriter must deliver.
          opp::types::ChainKind                   src_chain;
          opp::types::TokenKind                   src_token_kind;
          uint64_t                                src_amount        = 0;
          opp::types::ChainKind                   dst_chain;
          opp::types::TokenKind                   dst_token_kind;
          uint64_t                                dst_amount        = 0;
+         /// Variance tolerance the user accepted at SWAP_REQUEST time, in
+         /// basis points (50 = 0.5%). The depot's createuwreq path validates
+         /// the LP quote against this at ingestion; `try_select_winner`
+         /// re-validates against the live quote at race-resolution time so
+         /// drift between ingestion and race doesn't burn the underwriter.
+         uint32_t                                variance_tolerance_bps = 0;
 
          /// Race state.
          std::vector<commit_entry>               commits_by;
@@ -241,6 +295,7 @@ namespace sysio {
             (id)(type)(status)
             (src_chain)(src_token_kind)(src_amount)
             (dst_chain)(dst_token_kind)(dst_amount)
+            (variance_tolerance_bps)
             (commits_by)(winner)(committed_at_ms)(settled_at_ms)(expires_at_epoch)
             (attestation_inbound_data)(attestation_outbound_data))
       };
@@ -261,11 +316,19 @@ namespace sysio {
 
       using uwcounters_t = sysio::kv::global<"uwcounters"_n, uw_counters>;
 
-      /// Fee configuration singleton. Held over from the legacy contract;
-      /// fee distribution itself is deferred to a follow-up task.
+      /// Fee + lock-duration + fee-split configuration singleton. Distribution
+      /// logic for the fee-split fields lands in a follow-up task; today they
+      /// are persisted only.
       struct [[sysio::table("uwconfig")]] uw_config {
-         uint32_t fee_bps = 10;   // 0.1% per spoke
-         SYSLIB_SERIALIZE(uw_config, (fee_bps))
+         uint32_t fee_bps                              = 10;   // 0.1% per spoke
+         uint32_t collateral_lock_duration_epoch_count = 10;   // epochs from create to auto-expire
+         uint8_t  fee_split_winner_pct                 = 50;
+         uint8_t  fee_split_other_uw_pct               = 25;
+         uint8_t  fee_split_batch_op_pct               = 25;
+         SYSLIB_SERIALIZE(uw_config,
+            (fee_bps)
+            (collateral_lock_duration_epoch_count)
+            (fee_split_winner_pct)(fee_split_other_uw_pct)(fee_split_batch_op_pct))
       };
 
       using uwconfig_t = sysio::kv::global<"uwconfig"_n, uw_config>;
