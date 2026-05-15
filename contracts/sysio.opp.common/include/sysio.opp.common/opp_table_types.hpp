@@ -368,16 +368,6 @@ DataStream& operator>>(DataStream& ds, UnderwriteIntentCommit& t) {
              >> t.outpost_id >> t.signature;
 }
 
-// UnderwriteIntentReject
-template <typename DataStream>
-DataStream& operator<<(DataStream& ds, const UnderwriteIntentReject& t) {
-   return ds << t.uw_account << t.uw_request_id << t.reason;
-}
-template <typename DataStream>
-DataStream& operator>>(DataStream& ds, UnderwriteIntentReject& t) {
-   return ds >> t.uw_account >> t.uw_request_id >> t.reason;
-}
-
 // SwapRevert
 template <typename DataStream>
 DataStream& operator<<(DataStream& ds, const SwapRevert& t) {
@@ -388,30 +378,6 @@ template <typename DataStream>
 DataStream& operator>>(DataStream& ds, SwapRevert& t) {
    return ds >> t.original_swap_message_id >> t.depositor
              >> t.refund_amount >> t.reason;
-}
-
-// UnderwriteIntent (legacy)
-template <typename DataStream>
-DataStream& operator<<(DataStream& ds, const UnderwriteIntent& t) {
-   return ds << t.uw_account << t.uw_ext_chain_addr << t.uw_request_id
-             << t.amount << t.chain_id;
-}
-template <typename DataStream>
-DataStream& operator>>(DataStream& ds, UnderwriteIntent& t) {
-   return ds >> t.uw_account >> t.uw_ext_chain_addr >> t.uw_request_id
-             >> t.amount >> t.chain_id;
-}
-
-// UnderwriteConfirm (legacy)
-template <typename DataStream>
-DataStream& operator<<(DataStream& ds, const UnderwriteConfirm& t) {
-   return ds << t.original_message_id << t.underwriter
-             << t.confirmed << t.error_reason;
-}
-template <typename DataStream>
-DataStream& operator>>(DataStream& ds, UnderwriteConfirm& t) {
-   return ds >> t.original_message_id >> t.underwriter
-             >> t.confirmed >> t.error_reason;
 }
 
 // SwapRemit — destination-side payout instruction for a cross-chain swap.
