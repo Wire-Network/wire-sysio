@@ -1915,10 +1915,10 @@ int main( int argc, char** argv ) {
          return;
       }
 
-      // --r1/--em/--sol select a curve and are mutually exclusive (enforced by CLI11
-      // ->excludes() below, so a bad combination is a non-zero parse error). --k1 is
-      // not a curve switch: it selects the prefixed PVT_K1_/PUB_K1_ form of the
-      // default K1 key instead of the legacy unprefixed form.
+      // --k1/--r1/--em/--sol are mutually exclusive (enforced by CLI11 ->excludes()
+      // below, so any combination is a non-zero parse error). No flag => the default
+      // K1 key in its legacy unprefixed form; --k1 => the same K1 key in the prefixed
+      // PVT_K1_/PUB_K1_ form; --r1/--em/--sol => that curve (always prefixed).
       auto kt = crypto::private_key::key_type::k1;
       if      (sol) kt = crypto::private_key::key_type::ed;   // Solana ed25519
       else if (em)  kt = crypto::private_key::key_type::em;   // Ethereum-style secp256k1 (MetaMask personal_sign)
@@ -1941,11 +1941,12 @@ int main( int argc, char** argv ) {
          out << localized("Public key: ${key}", ("key", pubs ) ) << std::endl;
       }
    });
-   create_key_cmd->add_flag( "--k1", k1, "Generate a key using the K1 curve (Bitcoin) with PUB_K1_ & PVT_K1_ prefix instead of legacy"  );
+   auto k1_flag  = create_key_cmd->add_flag( "--k1", k1, "Generate a key using the K1 curve (Bitcoin) with PUB_K1_ & PVT_K1_ prefix instead of legacy"  );
    auto r1_flag  = create_key_cmd->add_flag( "--r1", r1, "Generate a key using the R1 curve (iPhone), instead of the K1 curve (Bitcoin)"  );
    auto em_flag  = create_key_cmd->add_flag( "--em", em, "Generate an EM key (Ethereum-style secp256k1, PUB_EM_/PVT_EM_) for MetaMask/external personal_sign"  );
    auto sol_flag = create_key_cmd->add_flag( "--sol", sol, "Generate a Solana key (ed25519, PUB_ED_/PVT_ED_) for external Solana signers"  );
-   // --r1/--em/--sol pick different curves; selecting more than one is a usage error.
+   // --k1/--r1/--em/--sol are mutually exclusive; selecting more than one is a usage error.
+   k1_flag->excludes(r1_flag)->excludes(em_flag)->excludes(sol_flag);
    r1_flag->excludes(em_flag)->excludes(sol_flag);
    em_flag->excludes(sol_flag);
    create_key_cmd->add_option("-f,--file", key_file, localized("Name of file to write private/public key output to. (Must be set, unless \"--to-console\" is passed"));
@@ -2131,7 +2132,8 @@ int main( int argc, char** argv ) {
 
    string em_private_key;
    auto em_private_key_cmd = convert_cmd->add_subcommand("em_private_key", localized("Convert a raw Ethereum secret (or PVT_EM_) to Wire PVT_EM_/PUB_EM_ key forms"));
-   em_private_key_cmd->add_option("--private-key", em_private_key, localized("PVT_EM_... or a raw 0x Ethereum hex secret; prompts if not provided"))->expected(0, 1);
+   em_private_key_cmd->add_option("--private-key", em_private_key, localized("PVT_EM_... or a raw 0x Ethereum hex secret. Omit to enter it at the prompt; "
+                                                "passing it here exposes the secret in ps/shell history"))->expected(0, 1);
    em_private_key_cmd->add_option("-f,--file", key_file, localized("Name of file to write private/public key output to. (Must be set, unless \"--to-console\" is passed"));
    em_private_key_cmd->add_flag("--to-console", print_console, localized("Print private/public keys to console."));
    em_private_key_cmd->callback([&] {
@@ -2163,7 +2165,8 @@ int main( int argc, char** argv ) {
    string em_sign_priv;
    auto em_sign_cmd = convert_cmd->add_subcommand("em_sign", localized("Sign a 32-byte sha256 digest with an EM key (EIP-191 personal_sign), printing SIG_EM_"));
    em_sign_cmd->add_option("digest", em_sign_digest, localized("32-byte sha256 digest, 64 hex chars (0x optional)"))->required();
-   em_sign_cmd->add_option("--private-key", em_sign_priv, localized("PVT_EM_... or a raw 0x Ethereum hex secret; prompts if not provided"))->expected(0, 1);
+   em_sign_cmd->add_option("--private-key", em_sign_priv, localized("PVT_EM_... or a raw 0x Ethereum hex secret. Omit to enter it at the prompt; "
+                                                "passing it here exposes the secret in ps/shell history"))->expected(0, 1);
    em_sign_cmd->callback([&] {
       if (em_sign_priv.empty()) {
          std::cout << localized("private key: ");

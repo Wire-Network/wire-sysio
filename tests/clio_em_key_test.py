@@ -47,6 +47,11 @@ KAT_PUB_EM     = ("PUB_EM_044bc2a31265153f07e70e0bab08724e6b85e217f8cd628ceb6297
                   "47bb493382ce28cab79ad7119ee1ad3ebcdb98a16805211530ecc6cfefa1b88e6dff99232a")
 KAT_SIG_EM     = ("SIG_EM_0xea0847dc6f2c9a189b85f01e9a1d51931ac92ee381b67641384b523"
                   "14a803fd5064a69f67b5967f2cac3fa3b9cf3f4f0be9f08e282e0e71ed0ce13d202a892b71b")
+# KAT_DIGEST with the last hex nibble flipped: a valid but different 32-byte
+# digest. Recovering KAT_SIG_EM against this must yield a *different* key --
+# proving recovery is digest-bound (the property the stale-signature pre-flight
+# in the metamask harness relies on).
+KAT_WRONG_DIGEST = KAT_DIGEST[:-1] + ("5" if KAT_DIGEST[-1] != "5" else "6")
 
 testSuccessful = False
 
@@ -134,6 +139,20 @@ def test_known_answer_vector():
     assert clio("convert", "em_recover", KAT_SIG_EM, KAT_DIGEST)["Public key"] == KAT_PUB_EM
 
 
+def test_recover_is_digest_bound():
+    """Recovery is bound to the exact digest signed.
+
+    Recovering the reference signature against a *different* (but well-formed)
+    digest still succeeds -- ECDSA recovery yields some point for almost any
+    digest -- but must yield a DIFFERENT public key, never the reference one.
+    This is precisely what lets the metamask harness reject a stale or
+    wrong-digest paste offline instead of as an opaque unsatisfied_authorization.
+    """
+    recovered = clio("convert", "em_recover", KAT_SIG_EM, KAT_WRONG_DIGEST)["Public key"]
+    assert recovered.startswith("PUB_EM_"), recovered
+    assert recovered != KAT_PUB_EM, "recovery is not digest-bound: wrong digest recovered the reference key"
+
+
 def test_error_handling():
     """Mutually exclusive curve flags and malformed crypto inputs are hard errors.
 
@@ -142,9 +161,12 @@ def test_error_handling():
     ``ERROR:`` and emit no key, exit 0. Assert that contract rather than an exit
     code so this test does not silently encode a behavior change to it.
     """
-    # mutually exclusive curve flags -> CLI11 parse error (non-zero)
+    # mutually exclusive curve flags -> CLI11 parse error (non-zero); all of
+    # --k1/--r1/--em/--sol exclude each other
     clio("create", "key", "--em", "--sol", "--to-console", expect_fail=True)
     clio("create", "key", "--em", "--r1", "--to-console", expect_fail=True)
+    clio("create", "key", "--k1", "--em", "--to-console", expect_fail=True)
+    clio("create", "key", "--k1", "--r1", "--to-console", expect_fail=True)
 
     # neither --file nor --to-console: soft validation -> ERROR, no key, exit 0
     res = clio("create", "key", "--em", raw=True)
@@ -153,6 +175,7 @@ def test_error_handling():
 
     # malformed crypto inputs throw in libfc -> non-zero
     clio("convert", "em_sign", "deadbeef", "--private-key", KAT_PVT_EM, expect_fail=True)  # 8 hex != 64
+    clio("convert", "em_sign", "z" * 64, "--private-key", KAT_PVT_EM, expect_fail=True)    # 64 chars, not hex
     clio("convert", "em_recover", "SIG_EM_0xdeadbeef", KAT_DIGEST, expect_fail=True)       # malformed sig
 
 
@@ -161,6 +184,7 @@ try:
     test_create_key_sol()
     test_create_key_to_file()
     test_known_answer_vector()
+    test_recover_is_digest_bound()
     test_error_handling()
     testSuccessful = True
 except Exception as e:
