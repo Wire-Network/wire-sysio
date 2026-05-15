@@ -17,7 +17,6 @@
         "ethash",
         "catch2",
         "cli11",
-        "curl",
         "boringssl-custom",
         "secp256k1-internal",
         "bn256",

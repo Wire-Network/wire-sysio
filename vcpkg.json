@@ -24,12 +24,6 @@
     "protobuf",
     "jemalloc",
     {
-      "name": "curl",
-      "features": [
-        "boringssl-custom"
-      ]
-    },
-    {
       "name": "catch2",
       "features": [
         "no-posix-signals"

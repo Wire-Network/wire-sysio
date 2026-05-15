@@ -12,13 +12,12 @@ target_link_libraries( ${CLI_CLIENT_EXECUTABLE_NAME}
                        PRIVATE appbase version CLI11::CLI11 chain_api_plugin producer_plugin chain_plugin http_plugin sysio_chain fc ${CMAKE_DL_LIBS} ${PLATFORM_SPECIFIC_LIBS} Boost::process Boost::dll
 )
 
-target_sources(${CLI_CLIENT_EXECUTABLE_NAME} PRIVATE do_http_post_libcurl.cpp)
+target_sources(${CLI_CLIENT_EXECUTABLE_NAME} PRIVATE do_http_post_beast.cpp)
 target_link_libraries( ${CLI_CLIENT_EXECUTABLE_NAME}
         PRIVATE
         boringssl::ssl
         boringssl::crypto
-        boringssl::decrepit
-        CURL::libcurl)
+        boringssl::decrepit)
 
 copy_bin( ${CLI_CLIENT_EXECUTABLE_NAME} )
 install( TARGETS
