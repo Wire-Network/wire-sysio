@@ -1,5 +1,7 @@
 #include <fc/log/logger.hpp>
 #include <fc/crypto/sha256.hpp>
+#include <fc/crypto/signature.hpp>
+#include <fc/io/raw.hpp>
 #include <fc/variant_object.hpp>
 #include <boost/endian/conversion.hpp>
 #include <magic_enum/magic_enum.hpp>
@@ -120,6 +122,118 @@ struct underwriter_plugin::impl {
    }
 
    // -----------------------------------------------------------------------
+   //  Pre-flight checks — unconditional, no dev escape hatch
+   //
+   //  Verifies that the configured `underwriter_account` is set up to
+   //  participate in the race BEFORE any cron job is scheduled. Failure
+   //  prevents the scan loop from starting; the cluster bootstrap is
+   //  responsible for establishing whatever state is missing.
+   //
+   //  Checks (all required):
+   //    1. Operator exists in `sysio.opreg::operators` and status == ACTIVE.
+   //    2. `sysio.authex::links` covers every chain in the
+   //       `sysio.epoch::outposts` registered set — without an authex link
+   //       for a chain the underwriter cannot sign a commit on that chain.
+   //    3. Non-zero balance on at least one TokenKind for every registered
+   //       outpost chain.
+   //
+   //  Returns true on success. On any failure logs a structured `elog`
+   //  naming the specific missing item, and returns false. The caller
+   //  (plugin_startup) treats false as "do not schedule the cron".
+   //
+   //  Per `feedback_no_dev_escape_hatches.md`: NO `--strict=false` option,
+   //  no dev fallback. Dev clusters that fail preflight are bootstrap bugs
+   //  to fix in `wire-tools-ts/packages/test-cluster-tool`, not workarounds
+   //  to ship in the plugin.
+   // -----------------------------------------------------------------------
+   bool run_preflight() {
+      // ── Check 1: operator status ─────────────────────────────────────
+      bool found_op = false;
+      bool active   = false;
+      {
+         auto rows = read_all("sysio.opreg", "sysio.opreg", "operators");
+         for (auto& row : rows.rows) {
+            auto obj = row.get_object();
+            if (chain::name(obj["account"].as_string()) != underwriter_account) continue;
+            found_op = true;
+            auto status = obj["status"].as<OperatorStatus>();
+            active = (status == OperatorStatus::OPERATOR_STATUS_ACTIVE);
+            break;
+         }
+      }
+      if (!found_op) {
+         elog("underwriter preflight: account {} not registered in sysio.opreg::operators",
+              underwriter_account.to_string());
+         return false;
+      }
+      if (!active) {
+         elog("underwriter preflight: account {} not in OPERATOR_STATUS_ACTIVE — "
+              "fix the depot-side opreg state before starting the plugin",
+              underwriter_account.to_string());
+         return false;
+      }
+
+      // Populate the outpost-chain cache (also used by the scan loop) so
+      // the link + balance coverage checks know what to look for.
+      read_outpost_registry();
+
+      if (outpost_chain_kinds.empty()) {
+         elog("underwriter preflight: no outposts registered in sysio.epoch::outposts — "
+              "nothing to commit against");
+         return false;
+      }
+
+      // ── Check 2: authex link coverage per outpost chain ──────────────
+      std::set<ChainKind> linked_chains;
+      {
+         auto rows = read_all("sysio.authex", "sysio.authex", "links");
+         for (auto& row : rows.rows) {
+            auto obj = row.get_object();
+            if (chain::name(obj["username"].as_string()) != underwriter_account) continue;
+            linked_chains.insert(obj["chain_kind"].as<ChainKind>());
+         }
+      }
+      for (auto& [outpost_id, chain_kind] : outpost_chain_kinds) {
+         if (!linked_chains.count(chain_kind)) {
+            elog("underwriter preflight: missing sysio.authex link for outpost {} "
+                 "(chain_kind={}) — bootstrap must call sysio.authex::createlink for "
+                 "this account on every outpost chain",
+                 outpost_id,
+                 std::string{sysio::opp::types::ChainKind_Name(chain_kind)});
+            return false;
+         }
+      }
+
+      // ── Check 3: non-zero balance per outpost chain ──────────────────
+      // Reuses read_credit_lines() (refreshed every cycle anyway) for
+      // consistency with the live scan path.
+      read_credit_lines();
+      for (auto& [outpost_id, chain_kind] : outpost_chain_kinds) {
+         const auto ck_int = magic_enum::enum_integer(chain_kind);
+         bool has_balance = false;
+         for (auto& cl : credit_lines) {
+            if (cl.chain_kind == static_cast<int>(ck_int) && cl.balance > 0) {
+               has_balance = true;
+               break;
+            }
+         }
+         if (!has_balance) {
+            elog("underwriter preflight: zero balance on outpost {} "
+                 "(chain_kind={}) — bootstrap must deposit collateral for "
+                 "this account on every outpost chain",
+                 outpost_id,
+                 std::string{sysio::opp::types::ChainKind_Name(chain_kind)});
+            return false;
+         }
+      }
+
+      ilog("underwriter preflight: all checks passed (account={} outposts={})",
+           underwriter_account.to_string(),
+           outpost_chain_kinds.size());
+      return true;
+   }
+
+   // -----------------------------------------------------------------------
    //  Main scan cycle
    // -----------------------------------------------------------------------
 
@@ -194,33 +308,80 @@ struct underwriter_plugin::impl {
    void read_credit_lines() {
       credit_lines.clear();
 
-      auto rows = read_all("sysio.opreg", "sysio.opreg", "operators");
-      for (auto& row : rows.rows) {
+      // ── Step 1: raw balances from sysio.opreg::operators[underwriter] ──
+      // Per-(chain, token_kind) row on `balances` (one balance, not a
+      // stake-vector). Mirrors what `sysio.opreg::available()` reads as
+      // its starting point.
+      auto ops_rows = read_all("sysio.opreg", "sysio.opreg", "operators");
+      for (auto& row : ops_rows.rows) {
          auto obj = row.get_object();
-         auto acct = obj["account"].as_string();
-         if (chain::name(acct) != underwriter_account) continue;
-
-         // New schema: per-(chain, token_kind) balance rows on `balances`
-         // (replacing the old vector<stake_entry> on `stakes`). Each row
-         // is one credit line directly — no aggregation needed. FC_REFLECT_ENUM
-         // in sysio/opp/opp.hpp lets us round-trip the typed enums without a
-         // string-to-int switch.
+         if (chain::name(obj["account"].as_string()) != underwriter_account) continue;
          if (!obj.contains("balances") || !obj["balances"].is_array()) break;
-
          for (auto& bal_entry : obj["balances"].get_array()) {
             auto be = bal_entry.get_object();
-            if (!be.contains("chain") || !be.contains("token_kind")
-                || !be.contains("balance")) continue;
-
-            int     chain   = static_cast<int>(be["chain"].as<ChainKind>());
-            int     token   = static_cast<int>(be["token_kind"].as<TokenKind>());
-            uint64_t balance = be["balance"].as_uint64();
+            if (!be.contains("chain") || !be.contains("token_kind") ||
+                !be.contains("balance")) continue;
+            const int      chain   = magic_enum::enum_integer(be["chain"].as<ChainKind>());
+            const int      token   = magic_enum::enum_integer(be["token_kind"].as<TokenKind>());
+            const uint64_t balance = be["balance"].as_uint64();
             credit_lines.push_back(credit_line{chain, token, balance});
-            ilog("underwriter: credit line chain_kind={} token_kind={} balance={}",
-                 chain, token, balance);
          }
          break;
       }
+
+      // ── Step 2: subtract active locks (sysio.uwrit::locks) ─────────────
+      // Mirror of sysio.uwrit's local `sum_locks_inline` helper. Sum amounts
+      // by (chain, token_kind) for any row whose underwriter matches us;
+      // subtract from the matching credit_line. Locks that exceed the raw
+      // balance clamp to 0 — same convention as the depot's available().
+      auto lock_rows = read_all("sysio.uwrit", "sysio.uwrit", "locks");
+      for (auto& row : lock_rows.rows) {
+         auto obj = row.get_object();
+         if (chain::name(obj["underwriter"].as_string()) != underwriter_account) continue;
+         const int      chain  = magic_enum::enum_integer(obj["chain"].as<ChainKind>());
+         const int      token  = magic_enum::enum_integer(obj["token_kind"].as<TokenKind>());
+         const uint64_t amount = obj["amount"].as_uint64();
+         for (auto& cl : credit_lines) {
+            if (cl.chain_kind == chain && cl.token_kind == token) {
+               cl.balance = (cl.balance > amount) ? (cl.balance - amount) : 0;
+               break;
+            }
+         }
+      }
+
+      // ── Step 3: subtract pending withdraws (sysio.opreg::wtdwqueue) ────
+      // Mirror of sysio.opreg::available()'s pending_withdraws subtract.
+      auto wq_rows = read_all("sysio.opreg", "sysio.opreg", "wtdwqueue");
+      for (auto& row : wq_rows.rows) {
+         auto obj = row.get_object();
+         if (chain::name(obj["account"].as_string()) != underwriter_account) continue;
+         const int      chain  = magic_enum::enum_integer(obj["chain"].as<ChainKind>());
+         const int      token  = magic_enum::enum_integer(obj["token_kind"].as<TokenKind>());
+         const uint64_t amount = obj["amount"].as_uint64();
+         for (auto& cl : credit_lines) {
+            if (cl.chain_kind == chain && cl.token_kind == token) {
+               cl.balance = (cl.balance > amount) ? (cl.balance - amount) : 0;
+               break;
+            }
+         }
+      }
+
+      for (auto& cl : credit_lines) {
+         ilog("underwriter: credit line chain_kind={} token_kind={} available={}",
+              cl.chain_kind, cl.token_kind, cl.balance);
+      }
+   }
+
+   /// Per-(chain, token_kind) availability predicate — replaces the
+   /// per-chain `is_available()` so `select_coverable` and any future
+   /// per-token gate can use the same lookup.
+   bool has_credit(ChainKind chain, TokenKind token_kind) const {
+      const int ck = magic_enum::enum_integer(chain);
+      const int tk = magic_enum::enum_integer(token_kind);
+      for (auto& cl : credit_lines) {
+         if (cl.chain_kind == ck && cl.token_kind == tk && cl.balance > 0) return true;
+      }
+      return false;
    }
 
    /**
@@ -425,24 +586,98 @@ struct underwriter_plugin::impl {
    //  The outpost locks capital and emits UNDERWRITE_INTENT via OPP
    // -----------------------------------------------------------------------
 
+   /// Look up the depot's outpost id for the given chain via the
+   /// `outpost_chain_kinds` cache (populated by `read_outpost_registry`).
+   /// Returns `std::nullopt` if no outpost is registered for the chain
+   /// (per `feedback_no_zero_sentinels.md` — outpost id 0 is a real id).
+   std::optional<uint64_t> find_outpost_id(ChainKind chain) const {
+      for (auto& [id, ck] : outpost_chain_kinds) {
+         if (ck == chain) return id;
+      }
+      return std::nullopt;
+   }
+
+   /// Build a verbatim, signed `UnderwriteIntentCommit` payload for the
+   /// given (uwreq_id, outpost_id) leg. Returns an empty vector on any
+   /// failure (no signature provider, serialize failure, etc.).
+   ///
+   /// Digest semantics: the underwriter signs `sha256(serialize(uic with
+   /// signature blanked))`. The depot's `try_select_winner` rebuilds the
+   /// same digest from the bytes it received and verifies the embedded
+   /// signature against the underwriter's WIRE account permissions via
+   /// `get_permission_lower_bound` — see `sysio.uwrit::verify_uic_signature`.
+   std::vector<char> build_signed_uic_bytes(uint64_t uwreq_id, uint64_t outpost_id) {
+      opp_att::UnderwriteIntentCommit uic;
+      uic.mutable_uw_account()->set_name(underwriter_account.to_string());
+      uic.set_uw_request_id(uwreq_id);
+      uic.set_outpost_id(outpost_id);
+      // uw_ext_chain_addr left default-constructed (empty kind/address) for
+      // v1 — the per-leg outpost_id is the binding the depot's verify path
+      // needs, and the signature ties the whole UIC together regardless.
+      uic.clear_signature();
+
+      std::string blanked;
+      if (!uic.SerializeToString(&blanked)) {
+         elog("underwriter: UIC serialize failed (blank phase) for uwreq {}", uwreq_id);
+         return {};
+      }
+
+      auto digest = fc::sha256::hash(blanked.data(), blanked.size());
+
+      auto& sig_plug = app().get_plugin<signature_provider_manager_plugin>();
+      auto wire_providers = sig_plug.query_providers(
+         std::nullopt, fc::crypto::chain_kind_wire, fc::crypto::chain_key_type_wire);
+      if (wire_providers.empty()) {
+         elog("underwriter: no WIRE K1 signature provider available for uwreq {}",
+              uwreq_id);
+         return {};
+      }
+      auto fc_sig = wire_providers.front()->sign(digest);
+
+      // Pack the fc::crypto::signature via fc::raw — the byte format matches
+      // what the depot-side `datastream >> sysio::signature` expects (variant
+      // tag + variant payload, both `fc` and `sysio` share the wire layout).
+      std::vector<char> sig_bytes = fc::raw::pack(fc_sig);
+      uic.set_signature(std::string(sig_bytes.begin(), sig_bytes.end()));
+
+      std::string final_bytes;
+      if (!uic.SerializeToString(&final_bytes)) {
+         elog("underwriter: UIC serialize failed (final phase) for uwreq {}", uwreq_id);
+         return {};
+      }
+      return std::vector<char>(final_bytes.begin(), final_bytes.end());
+   }
+
    /**
     * Submit a `commit` JSON-RPC call to BOTH legs of the swap (source +
     * destination outposts). Each outpost queues an UNDERWRITE_INTENT_COMMIT
     * attestation back to the depot; the depot's race resolver
-    * (sysio.uwrit::try_select_winner) selects the underwriter whose pair
-    * lands first AND whose available() rollup covers both legs.
+    * (sysio.uwrit::try_select_winner) reconstructs the digest, verifies
+    * the signature against the underwriter's account permissions, and
+    * promotes the underwriter to winner iff both legs' signatures verify
+    * AND both legs' bond covers (via `available()` rollup).
     *
-    * Per the corrected ledger model: outposts don't validate bond — they
-    * just authenticate the caller as a registered underwriter and queue the
-    * attestation. The depot does the bond check.
+    * Per the corrected ledger model: outposts don't validate the signature
+    * or the bond — they just authenticate the caller as a registered
+    * active underwriter and relay the UIC bytes verbatim. The depot does
+    * the real authorization.
     */
    void submit_intent_to_outpost(const uw_request& req) {
       ilog("underwriter: submitting commit pair for uwreq {} src_chain={} dst_chain={}",
            req.id, static_cast<int>(req.src_chain), static_cast<int>(req.dst_chain));
 
       auto submit_one = [this](ChainKind chain, uint64_t uw_request_id) {
-         if (chain == CHAIN_KIND_ETHEREUM) submit_commit_eth(uw_request_id);
-         else if (chain == CHAIN_KIND_SOLANA) submit_commit_sol(uw_request_id);
+         auto outpost_id_opt = find_outpost_id(chain);
+         if (!outpost_id_opt) {
+            elog("underwriter: no outpost registered for chain_kind={} (uwreq {})",
+                 static_cast<int>(chain), uw_request_id);
+            return;
+         }
+         auto uic_bytes = build_signed_uic_bytes(uw_request_id, *outpost_id_opt);
+         if (uic_bytes.empty()) return;   // already logged
+
+         if (chain == CHAIN_KIND_ETHEREUM)      submit_commit_eth(uw_request_id, uic_bytes);
+         else if (chain == CHAIN_KIND_SOLANA)   submit_commit_sol(uw_request_id, uic_bytes);
          else elog("underwriter: unsupported chain={} for commit (uwreq {})",
                    static_cast<int>(chain), uw_request_id);
       };
@@ -451,16 +686,12 @@ struct underwriter_plugin::impl {
    }
 
    /**
-    * Call `commit(uint64 uwRequestId, bytes signature)` on the ETH outpost's
-    * OperatorRegistry contract (introduced in wire-ethereum commit 14639ec
-    * for Task 7). The outpost queues an UNDERWRITE_INTENT_COMMIT attestation
-    * back to the depot.
-    *
-    * Signature is empty bytes for v1 — the depot's race resolver doesn't
-    * validate it yet (signature is for "defends against an outpost compromised
-    * relay forging commits in their name", a hardening phase that lands later).
+    * Call `commit(bytes uicBytes)` on the ETH outpost's OperatorRegistry —
+    * an opaque relay of the underwriter's signed UnderwriteIntentCommit.
+    * The contract auth-checks msg.sender (active underwriter) and emits
+    * the bytes verbatim onto the OPP outbound queue back to the depot.
     */
-   void submit_commit_eth(uint64_t uw_request_id) {
+   void submit_commit_eth(uint64_t uw_request_id, const std::vector<char>& uic_bytes) {
       auto entry = eth_plug->get_client(eth_client_id);
       if (!entry || !entry->client) {
          elog("underwriter: ETH client '{}' not found", eth_client_id);
@@ -471,8 +702,6 @@ struct underwriter_plugin::impl {
          return;
       }
 
-      // Find the `commit` ABI from loaded ABI files (replaced the legacy
-      // submitUnderwriteIntent in Task 7's OperatorRegistry refactor).
       auto& abis = eth_plug->get_abi_files();
       const eth::abi::contract* commit_abi = nullptr;
       for (auto& [path, contracts] : abis) {
@@ -487,27 +716,24 @@ struct underwriter_plugin::impl {
       }
 
       try {
-         std::vector<uint8_t> empty_sig;
+         std::vector<uint8_t> uic_bytes_u8(uic_bytes.begin(), uic_bytes.end());
          auto tx = entry->client->create_default_tx(eth_opreg_addr, *commit_abi,
-            {fc::variant(uw_request_id), fc::variant(empty_sig)});
+            {fc::variant(uic_bytes_u8)});
          auto result = entry->client->execute_contract_tx_fn(tx, *commit_abi);
-         ilog("underwriter: ETH commit submitted uwreq={} result={}",
-              uw_request_id, result.as_string());
+         ilog("underwriter: ETH commit submitted uwreq={} bytes={} result={}",
+              uw_request_id, uic_bytes.size(), result.as_string());
       } catch (const fc::exception& e) {
          elog("underwriter: ETH commit failed: {}", e.to_detail_string());
       }
    }
 
    /**
-    * Solana-side commit submission. The matching `commit_underwrite`
-    * Anchor instruction is part of Task 8's follow-up scope (the v1
-    * Solana commit only landed schema + OPERATOR_ACTION dispatch). For now
-    * the call falls through to a log so the dual-leg flow on a SOL-touching
-    * UWREQ is observable in test clusters even though only the ETH leg
-    * actually relays. Once Task 8 follow-up adds `commit_underwrite`, the
-    * IDL lookup below activates.
+    * Call `commit_underwrite(bytes uic_bytes)` on the SOL outpost's
+    * opp-outpost program — an opaque relay of the underwriter's signed
+    * UnderwriteIntentCommit. The program auth-checks the Signer (active
+    * underwriter) and pushes the bytes verbatim onto the outbound buffer.
     */
-   void submit_commit_sol(uint64_t uw_request_id) {
+   void submit_commit_sol(uint64_t uw_request_id, const std::vector<char>& uic_bytes) {
       auto entry = sol_plug->get_client(sol_client_id);
       if (!entry || !entry->client) {
          elog("underwriter: SOL client '{}' not found", sol_client_id);
@@ -536,84 +762,31 @@ struct underwriter_plugin::impl {
          auto program_client = std::make_shared<sol::solana_program_client>(
             entry->client, program_key, program_idls);
 
-         if (program_client->has_idl("commit_underwrite")) {
-            auto& instr = program_client->get_idl("commit_underwrite");
-            auto accounts = program_client->resolve_accounts(instr);
-            std::vector<uint8_t> empty_sig;
-            program_client->execute_tx(instr, accounts,
-               {fc::variant(fc::mutable_variant_object()
-                  ("uw_request_id", uw_request_id)
-                  ("signature", empty_sig))});
-            ilog("underwriter: SOL commit_underwrite submitted uwreq={}", uw_request_id);
-         } else {
-            wlog("underwriter: SOL commit_underwrite IDL not found — Solana leg skipped (pending Task 8 follow-up) uwreq={}",
-                 uw_request_id);
+         if (!program_client->has_idl("commit_underwrite")) {
+            elog("underwriter: SOL commit_underwrite IDL missing — deploy bug "
+                 "(opp-outpost program does not expose commit_underwrite). "
+                 "Skipping SOL leg for uwreq {}", uw_request_id);
+            return;
          }
+         auto& instr = program_client->get_idl("commit_underwrite");
+         auto accounts = program_client->resolve_accounts(instr);
+         std::vector<uint8_t> uic_bytes_u8(uic_bytes.begin(), uic_bytes.end());
+         program_client->execute_tx(instr, accounts,
+            {fc::variant(fc::mutable_variant_object()("uic_bytes", uic_bytes_u8))});
+         ilog("underwriter: SOL commit_underwrite submitted uwreq={} bytes={}",
+              uw_request_id, uic_bytes.size());
       } catch (const fc::exception& e) {
          elog("underwriter: SOL commit_underwrite failed: {}", e.to_detail_string());
       }
    }
 
-   // -----------------------------------------------------------------------
-   //  Action push helper (for WIRE chain actions)
-   // -----------------------------------------------------------------------
-
-   void push_action(const std::string& contract,
-                    const std::string& action_name,
-                    chain::name auth_account,
-                    const fc::variant_object& data) {
-      auto& chain = chain_plug->chain();
-      auto abi_max_time = fc::microseconds(action_timeout_ms * 1000);
-
-      auto resolver = make_resolver(chain, abi_max_time, throw_on_yield::no);
-      auto abis_opt = resolver(chain::name(contract));
-      auto action_type = abis_opt->get_action_type(chain::name(action_name));
-      auto action_data = abis_opt->variant_to_binary(
-         action_type, fc::variant(data),
-         chain::abi_serializer::create_yield_function(abi_max_time));
-
-      chain::signed_transaction trx;
-      trx.actions.emplace_back(
-         std::vector<chain::permission_level>{{auth_account, chain::config::active_name}},
-         chain::name(contract), chain::name(action_name), std::move(action_data));
-      trx.set_reference_block(chain.head().id());
-      trx.expiration = fc::time_point_sec(chain.head().block_time() + fc::seconds(30));
-
-      // Sign with WIRE K1 key
-      auto& sig_plug = app().get_plugin<signature_provider_manager_plugin>();
-      auto wire_providers = sig_plug.query_providers(
-         std::nullopt, fc::crypto::chain_kind_wire, fc::crypto::chain_key_type_wire);
-      if (wire_providers.empty()) {
-         elog("underwriter: no WIRE K1 signature provider available");
-         return;
-      }
-      auto chain_id = chain.get_chain_id();
-      auto digest = trx.sig_digest(chain_id, trx.context_free_data);
-      trx.signatures.push_back(wire_providers.front()->sign(digest));
-
-      auto packed = chain::packed_transaction(std::move(trx), chain::packed_transaction::compression_type::none);
-      auto rw = chain_plug->get_read_write_api(abi_max_time);
-      fc::variant packed_var;
-      chain::to_variant(packed, packed_var);
-
-      std::promise<void> done;
-      auto future = done.get_future();
-
-      rw.push_transaction(
-         packed_var.get_object(),
-         [&done, &contract, &action_name](const auto& result) {
-            if (auto* err = std::get_if<fc::exception_ptr>(&result)) {
-               elog("underwriter: push {}::{} failed — {}", contract, action_name, (*err)->to_string());
-            } else {
-               ilog("underwriter: pushed {}::{} ok", contract, action_name);
-            }
-            done.set_value();
-         });
-
-      if (future.wait_for(std::chrono::milliseconds(action_timeout_ms)) == std::future_status::timeout) {
-         elog("underwriter: push {}::{} timed out", contract, action_name);
-      }
-   }
+   // The plugin previously carried a `push_action()` helper for signing
+   // and pushing WIRE-chain actions; after the commit refactor (T9 + T14)
+   // the underwriter does not push any WIRE-chain actions on its own —
+   // commits go via the outpost RPC clients in `submit_commit_eth` /
+   // `submit_commit_sol`. The signature_provider_manager_plugin dependency
+   // is still required because `build_signed_uic_bytes` uses it to sign
+   // the UIC digest with the underwriter's WIRE K1 key.
 };
 
 // ---------------------------------------------------------------------------
@@ -671,6 +844,14 @@ void underwriter_plugin::plugin_startup() {
    }
 
    ilog("underwriter_plugin: starting for account {}", _impl->underwriter_account.to_string());
+
+   // Unconditional pre-flight: bail (no cron job) if the depot-side state
+   // for this underwriter is incomplete. Cluster bootstrap is responsible
+   // for establishing the missing state — there is no dev escape hatch.
+   if (!_impl->run_preflight()) {
+      elog("underwriter_plugin: pre-flight failed — cron job NOT registered");
+      return;
+   }
 
    auto& cron = app().get_plugin<cron_plugin>();
    cron_service::job_schedule sched;
