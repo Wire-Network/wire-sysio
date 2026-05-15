@@ -1904,18 +1904,33 @@ int main( int argc, char** argv ) {
 
    bool r1 = false;
    bool k1 = false;
+   bool em = false;
+   bool sol = false;
    string key_file;
    bool print_console = false;
    // create key
-   auto create_key_cmd = create_cmd->add_subcommand("key", localized("Create a new keypair and print the public and private keys"))->callback( [&r1, &k1, &key_file, &print_console](){
+   auto create_key_cmd = create_cmd->add_subcommand("key", localized("Create a new keypair and print the public and private keys"))->callback( [&r1, &k1, &em, &sol, &key_file, &print_console](){
       if (key_file.empty() && !print_console) {
          std::cerr << "ERROR: Either indicate a file using \"--file\" or pass \"--to-console\"" << std::endl;
          return;
       }
 
-      auto pk    = r1 ? private_key_type::generate(crypto::private_key::key_type::r1) : private_key_type::generate();
-      auto privs = pk.to_string({}, k1);
-      auto pubs  = pk.get_public_key().to_string({}, k1);
+      // --r1/--em/--sol select a curve and are mutually exclusive (enforced by CLI11
+      // ->excludes() below, so a bad combination is a non-zero parse error). --k1 is
+      // not a curve switch: it selects the prefixed PVT_K1_/PUB_K1_ form of the
+      // default K1 key instead of the legacy unprefixed form.
+      auto kt = crypto::private_key::key_type::k1;
+      if      (sol) kt = crypto::private_key::key_type::ed;   // Solana ed25519
+      else if (em)  kt = crypto::private_key::key_type::em;   // Ethereum-style secp256k1 (MetaMask personal_sign)
+      else if (r1)  kt = crypto::private_key::key_type::r1;
+
+      // K1 has a legacy unprefixed form; --k1 requests the prefixed PVT_K1_/PUB_K1_
+      // form. r1/em/ed are only ever emitted in their prefixed (PVT_*_/PUB_*_) form.
+      const bool include_prefix = (kt != crypto::private_key::key_type::k1) || k1;
+
+      auto pk    = private_key_type::generate(kt);
+      auto privs = pk.to_string({}, include_prefix);
+      auto pubs  = pk.get_public_key().to_string({}, include_prefix);
       if (print_console) {
          std::cout << localized("Private key: ${key}", ("key",  privs) ) << std::endl;
          std::cout << localized("Public key: ${key}", ("key", pubs ) ) << std::endl;
@@ -1927,7 +1942,12 @@ int main( int argc, char** argv ) {
       }
    });
    create_key_cmd->add_flag( "--k1", k1, "Generate a key using the K1 curve (Bitcoin) with PUB_K1_ & PVT_K1_ prefix instead of legacy"  );
-   create_key_cmd->add_flag( "--r1", r1, "Generate a key using the R1 curve (iPhone), instead of the K1 curve (Bitcoin)"  );
+   auto r1_flag  = create_key_cmd->add_flag( "--r1", r1, "Generate a key using the R1 curve (iPhone), instead of the K1 curve (Bitcoin)"  );
+   auto em_flag  = create_key_cmd->add_flag( "--em", em, "Generate an EM key (Ethereum-style secp256k1, PUB_EM_/PVT_EM_) for MetaMask/external personal_sign"  );
+   auto sol_flag = create_key_cmd->add_flag( "--sol", sol, "Generate a Solana key (ed25519, PUB_ED_/PVT_ED_) for external Solana signers"  );
+   // --r1/--em/--sol pick different curves; selecting more than one is a usage error.
+   r1_flag->excludes(em_flag)->excludes(sol_flag);
+   em_flag->excludes(sol_flag);
    create_key_cmd->add_option("-f,--file", key_file, localized("Name of file to write private/public key output to. (Must be set, unless \"--to-console\" is passed"));
    create_key_cmd->add_flag( "--to-console", print_console, localized("Print private/public keys to console."));
 
@@ -2085,6 +2105,93 @@ int main( int argc, char** argv ) {
       auto pubk = fc::crypto::public_key::from_string(k1_public_key, fc::crypto::public_key::key_type::k1);
       std::cout << localized("Public key: ${key}", ("key", pubk.to_string({}) ) ) << std::endl;
       std::cout << localized("Public key: ${key}", ("key", pubk.to_string({}, true) ) ) << std::endl;
+   });
+
+   // EM (Ethereum-style secp256k1) key utilities. These let an external Ethereum signer (MetaMask personal_sign)
+   // interoperate with Wire offline: import a raw Ethereum secret as a Wire PVT_EM_ key, and sign/recover a Wire
+   // transaction sig_digest exactly as nodeop validates it, using libfc's own em path (the same code the chain runs).
+
+   /// Parse a Wire PVT_EM_ string or a raw 0x-prefixed Ethereum hex secret into a unified em private key.
+   /// One helper, used by every em_* subcommand below.
+   auto parse_em_private_key = [](const std::string& s) -> fc::crypto::private_key {
+      if (s.rfind("PVT_EM_", 0) == 0)
+         return fc::crypto::private_key::from_string(s, fc::crypto::private_key::key_type::em);
+      // Raw Ethereum form (what MetaMask / eth tooling exports): 0x<64hex> or 64hex.
+      auto em_priv = fc::em::private_key::from_native_string(s);
+      return fc::crypto::private_key::regenerate<fc::em::private_key_shim>(em_priv.get_secret());
+   };
+
+   /// Parse a 32-byte sha256 digest given as 64 hex chars (optional 0x prefix).
+   auto parse_sha256_hex = [](std::string s) -> fc::sha256 {
+      if (s.rfind("0x", 0) == 0 || s.rfind("0X", 0) == 0)
+         s = s.substr(2);
+      SYSC_ASSERT(s.size() == 64, "ERROR: digest must be a 32-byte sha256 (64 hex chars, 0x optional)");
+      return fc::sha256(s);
+   };
+
+   string em_private_key;
+   auto em_private_key_cmd = convert_cmd->add_subcommand("em_private_key", localized("Convert a raw Ethereum secret (or PVT_EM_) to Wire PVT_EM_/PUB_EM_ key forms"));
+   em_private_key_cmd->add_option("--private-key", em_private_key, localized("PVT_EM_... or a raw 0x Ethereum hex secret; prompts if not provided"))->expected(0, 1);
+   em_private_key_cmd->add_option("-f,--file", key_file, localized("Name of file to write private/public key output to. (Must be set, unless \"--to-console\" is passed"));
+   em_private_key_cmd->add_flag("--to-console", print_console, localized("Print private/public keys to console."));
+   em_private_key_cmd->callback([&] {
+      if (key_file.empty() && !print_console) {
+         std::cerr << "ERROR: Either indicate a file using \"--file\" or pass \"--to-console\"" << std::endl;
+         return;
+      }
+      if (em_private_key.empty()) {
+         std::cout << localized("private key: ");
+         fc::set_console_echo(false);
+         std::getline(std::cin, em_private_key, '\n');
+         fc::set_console_echo(true);
+         std::cout << std::endl;
+      }
+      auto privk = parse_em_private_key(em_private_key);
+      auto pubk  = privk.get_public_key();
+      if (print_console) {
+         std::cout << localized("Private key: ${key}", ("key", privk.to_string({}, true)) ) << std::endl;
+         std::cout << localized("Public key: ${key}",  ("key", pubk.to_string({}, true))  ) << std::endl;
+      } else {
+         std::cerr << localized("saving keys to ${filename}", ("filename", key_file)) << std::endl;
+         std::ofstream out( key_file.c_str() );
+         out << localized("Private key: ${key}", ("key", privk.to_string({}, true)) ) << std::endl;
+         out << localized("Public key: ${key}",  ("key", pubk.to_string({}, true))  ) << std::endl;
+      }
+   });
+
+   string em_sign_digest;
+   string em_sign_priv;
+   auto em_sign_cmd = convert_cmd->add_subcommand("em_sign", localized("Sign a 32-byte sha256 digest with an EM key (EIP-191 personal_sign), printing SIG_EM_"));
+   em_sign_cmd->add_option("digest", em_sign_digest, localized("32-byte sha256 digest, 64 hex chars (0x optional)"))->required();
+   em_sign_cmd->add_option("--private-key", em_sign_priv, localized("PVT_EM_... or a raw 0x Ethereum hex secret; prompts if not provided"))->expected(0, 1);
+   em_sign_cmd->callback([&] {
+      if (em_sign_priv.empty()) {
+         std::cout << localized("private key: ");
+         fc::set_console_echo(false);
+         std::getline(std::cin, em_sign_priv, '\n');
+         fc::set_console_echo(true);
+         std::cout << std::endl;
+      }
+      auto privk  = parse_em_private_key(em_sign_priv);
+      auto digest = parse_sha256_hex(em_sign_digest);
+      // private_key::sign dispatches to em::sign_sha256, which wraps the digest in the EIP-191 personal_sign
+      // envelope before secp256k1 -- identical to what MetaMask produces and to what nodeop recovers. Emit the
+      // prefixed SIG_EM_ form, which is what `clio push transaction --signature` and send_transaction2 expect.
+      std::cout << localized("Signature: ${sig}", ("sig", privk.sign(digest).to_string({}, true)) ) << std::endl;
+   });
+
+   string em_recover_sig;
+   string em_recover_digest;
+   auto em_recover_cmd = convert_cmd->add_subcommand("em_recover", localized("Recover the PUB_EM_ from a SIG_EM_ over a 32-byte sha256 digest (EIP-191)"));
+   em_recover_cmd->add_option("signature", em_recover_sig, localized("SIG_EM_... signature to recover from"))->required();
+   em_recover_cmd->add_option("digest", em_recover_digest, localized("32-byte sha256 digest, 64 hex chars (0x optional)"))->required();
+   em_recover_cmd->callback([&] {
+      auto sig    = fc::crypto::signature::from_string(em_recover_sig, fc::crypto::signature::sig_type::em);
+      auto digest = parse_sha256_hex(em_recover_digest);
+      // public_key::recover dispatches to em::recover, which applies the same EIP-191 envelope before recovery.
+      // Emit the prefixed PUB_EM_ form so it compares directly against an expandauth-registered key.
+      auto pubk = fc::crypto::public_key::recover(sig, digest);
+      std::cout << localized("Public key: ${key}", ("key", pubk.to_string({}, true)) ) << std::endl;
    });
 
    string name_input;
