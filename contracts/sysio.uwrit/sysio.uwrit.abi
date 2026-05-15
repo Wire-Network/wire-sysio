@@ -461,10 +461,6 @@
                     "value": 60945
                 },
                 {
-                    "name": "ATTESTATION_TYPE_EPOCH_SYNC",
-                    "value": 60946
-                },
-                {
                     "name": "ATTESTATION_TYPE_OPERATORS",
                     "value": 60947
                 },

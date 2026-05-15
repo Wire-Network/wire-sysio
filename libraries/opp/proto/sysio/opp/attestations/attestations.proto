@@ -336,12 +336,11 @@ message ChallengeOperatorHash {
 //  Epoch & roster management attestations
 // ---------------------------------------------------------------------------
 
-// Epoch sync notification (Depot -> Outpost).
-message EpochSync {
-  uint32 epoch_index = 1;
-  uint32 epoch_duration_sec = 2;
-  uint64 epoch_start_timestamp = 3;
-}
+// `EpochSync` was removed — the depot's `sysio.epoch::advance` flow is now the
+// sole driver of epoch progression, and `epoch_duration_sec` rides every
+// `BatchOperatorGroups` attestation. No on-wire epoch-sync message exists. The
+// `ATTESTATION_TYPE_EPOCH_SYNC = 60946` slot in `types.proto` is reserved; do
+// not reuse it.
 
 // Operator roster (Depot -> Outpost, every epoch).
 message Operators {
@@ -357,10 +356,16 @@ message OperatorEntry {
 
 // Batch operator group assignments (Depot -> Outpost, every epoch).
 // Contains all groups and the index of the active group for the current epoch.
+// `epoch_duration_sec` mirrors the depot's
+// `sysio.epoch::epochcfg::epoch_duration_sec` so the outpost can evaluate
+// the fallback (path-2) majority consensus only after that many seconds
+// have elapsed since the current epoch started — see
+// .claude/rules/opp-consensus.md.
 message BatchOperatorGroups {
   uint32 active_group_index = 1;
   uint32 epoch_index = 2;
   repeated BatchOperatorGroup groups = 3;
+  uint32 epoch_duration_sec = 4;
 }
 
 message BatchOperatorGroup {

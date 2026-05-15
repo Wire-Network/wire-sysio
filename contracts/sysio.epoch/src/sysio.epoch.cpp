@@ -123,15 +123,85 @@ void epoch::advance() {
             ).send();
          }
       }
+
+      // NOTE: we intentionally do NOT erase the per-batch-op envelope
+      // metadata rows here. `evalcons` already cleared their heavy
+      // `raw_data` (1-2 KB → 0 bytes) at consensus reach, so the residual
+      // weight is just the tuple `(id, outpost_id, epoch_index,
+      // batch_op_name, checksum, ...)` — small and bounded by group
+      // membership × outposts × retained-epochs. A dedicated bounded-
+      // retention sweep belongs in a separate periodic ix; trying to
+      // erase here races with the permissionless `chkcons` →
+      // inline-`advance` pattern that fires from every batchop every
+      // cron tick and trips kv-index-remove on already-evicted buckets.
    }
 
-   state.current_epoch_index++;
-   state.current_batch_op_group = state.current_epoch_index % cfg.batch_op_groups;
+   const bool had_expiring_group = state.current_epoch_index > 0;
 
+   state.current_epoch_index++;
    state.current_epoch_start =
       (state.next_epoch_start.sec_since_epoch() == 0) ? now : state.next_epoch_start;
    state.next_epoch_start = state.current_epoch_start +
       microseconds(static_cast<int64_t>(cfg.epoch_duration_sec) * 1'000'000);
+
+   // ── Slide the schedule window ───────────────────────────────────────────
+   // Skip on the genesis advance (0 → 1): schbatchgps just placed
+   // [G1, G2, G3] for epochs 1, 2, 3 and G1 is now the current (front)
+   // group — popping here would lose it. From the SECOND advance onward
+   // (1 → 2, 2 → 3, ...), the front group has just expired so we pop
+   // it and compute a new tail.
+   //
+   // Eligibility for the new tail: ACTIVE batch ops, sorted non-bootstrapped
+   // first (preference rule), MINUS anyone already resident in the N-1
+   // surviving groups. The window itself encodes "scheduled in the last
+   // N-1 epochs" — no separate history table.
+   //
+   // After: window = [current, current+1, ..., current+N-1], front is
+   // always the active group → current_batch_op_group stays at 0.
+   if (had_expiring_group && !state.batch_op_groups.empty()) {
+      state.batch_op_groups.erase(state.batch_op_groups.begin());
+
+      // Collect already-resident accounts so the new tail excludes them.
+      std::vector<name> resident;
+      resident.reserve(cfg.batch_op_groups * cfg.operators_per_epoch);
+      for (const auto& g : state.batch_op_groups) {
+         for (const auto& a : g) resident.push_back(a);
+      }
+      auto is_resident = [&](name a) {
+         for (const auto& r : resident) if (r == a) return true;
+         return false;
+      };
+
+      // Pull ACTIVE batch ops, non-bootstrapped first, exclude resident.
+      opreg::operators_t opreg_ops(OPREG_ACCOUNT);
+      auto status_idx = opreg_ops.get_index<"bystatus"_n>();
+      std::vector<std::pair<name, bool>> pool;
+      for (auto it = status_idx.lower_bound(
+              static_cast<uint64_t>(OperatorStatus::OPERATOR_STATUS_ACTIVE));
+           it != status_idx.end() &&
+           it->status == OperatorStatus::OPERATOR_STATUS_ACTIVE; ++it) {
+         if (it->type == OperatorType::OPERATOR_TYPE_BATCH && !is_resident(it->account)) {
+            pool.push_back({it->account, it->is_bootstrapped});
+         }
+      }
+      std::sort(pool.begin(), pool.end(),
+         [](const auto& a, const auto& b) {
+            if (a.second != b.second) return !a.second; // non-bootstrapped first
+            return a.first < b.first;
+         });
+
+      std::vector<name> new_tail;
+      new_tail.reserve(cfg.operators_per_epoch);
+      for (size_t i = 0; i < pool.size() && new_tail.size() < cfg.operators_per_epoch; ++i) {
+         new_tail.push_back(pool[i].first);
+      }
+      check(!new_tail.empty(),
+            "no eligible batch operators for the new tail group");
+
+      state.batch_op_groups.push_back(std::move(new_tail));
+   }
+
+   state.current_batch_op_group = 0;
 
    // Note: last_elected_epoch tracking is epoch-internal state.
    // No operator table writes needed — group membership is in epoch_state.batch_op_groups.
@@ -224,6 +294,11 @@ void epoch::advance() {
       opp::attestations::BatchOperatorGroups attest;
       attest.active_group_index = zpp::bits::vuint32_t{state.current_batch_op_group};
       attest.epoch_index = zpp::bits::vuint32_t{state.current_epoch_index};
+      // Propagate the depot's minimum epoch duration so the outpost can
+      // evaluate the fallback (path-2) majority consensus after this many
+      // seconds since the current epoch started — see
+      // .claude/rules/opp-consensus.md.
+      attest.epoch_duration_sec = zpp::bits::vuint32_t{cfg.epoch_duration_sec};
       for (auto& group : state.batch_op_groups) {
          opp::attestations::BatchOperatorGroup grp;
          for (auto& op_name : group) {
@@ -277,80 +352,74 @@ void epoch::advance() {
 }
 
 // ---------------------------------------------------------------------------
-//  initgroups — reads AVAILABLE batch ops from sysio.opreg
+//  schbatchgps — initial fill of the N-group sliding window
+//
+//  Called ONCE at bootstrap. Reads ACTIVE batch operators from sysio.opreg,
+//  sorts non-bootstrapped first (progressive-takeover preference per
+//  .claude/rules/batch-operator-schedule-preference.md), and partitions
+//  them into N groups (`cfg.batch_op_groups`). The resulting window is
+//  [epoch_1_group, epoch_2_group, ..., epoch_N_group].
+//
+//  After this, every per-epoch `advance` pops the front group and pushes
+//  a new tail group, where the tail's members are drawn from the ACTIVE
+//  pool MINUS anyone still resident in the N-1 surviving groups. The
+//  window itself encodes "scheduled in the last N-1 epochs"; no separate
+//  history table is needed.
 // ---------------------------------------------------------------------------
-void epoch::initgroups() {
+void epoch::schbatchgps() {
    require_auth(get_self());
 
    epochcfg_t cfg_tbl(get_self());
    check(cfg_tbl.exists(), "epoch config not initialized");
    auto cfg = cfg_tbl.get();
 
-   // Read AVAILABLE batch operators from sysio.opreg
+   // Collect ACTIVE batch operators (non-bootstrapped first, then bootstrapped).
    opreg::operators_t opreg_ops(OPREG_ACCOUNT);
    auto status_idx = opreg_ops.get_index<"bystatus"_n>();
-
-   // Collect AVAILABLE batch operators, separating staked from bootstrapped
    std::vector<std::pair<name, bool>> available_batch; // (account, is_bootstrapped)
    for (auto it = status_idx.lower_bound(
-           static_cast<uint64_t>(OperatorStatus::OPERATOR_STATUS_ACTIVE)); // AVAILABLE = ACTIVE(3)
+           static_cast<uint64_t>(OperatorStatus::OPERATOR_STATUS_ACTIVE));
         it != status_idx.end() &&
         it->status == OperatorStatus::OPERATOR_STATUS_ACTIVE; ++it) {
       if (it->type == OperatorType::OPERATOR_TYPE_BATCH) {
          available_batch.push_back({it->account, it->is_bootstrapped});
       }
    }
-
    check(available_batch.size() >= cfg.batch_operator_minimum_active,
          "not enough available batch operators for group assignment");
-
-   // Sort: staked operators first (is_bootstrapped=false), then bootstrapped.
-   // Within each group, sort by account name for determinism.
    std::sort(available_batch.begin(), available_batch.end(),
       [](const auto& a, const auto& b) {
-         if (a.second != b.second) return !a.second; // staked (false) before bootstrapped (true)
-         return a.first < b.first; // deterministic by name within each category
+         if (a.second != b.second) return !a.second; // non-bootstrapped first
+         return a.first < b.first;
       });
-
-   // Trim to exactly batch_operator_minimum_active
    available_batch.resize(cfg.batch_operator_minimum_active);
 
-   // Extract just names
-   std::vector<name> batch_names;
-   batch_names.reserve(available_batch.size());
-   for (const auto& p : available_batch) {
-      batch_names.push_back(p.first);
-   }
-
-   // Even/odd interleave shuffle
-   std::vector<name> even_list, odd_list;
-   for (size_t i = 0; i < batch_names.size(); ++i) {
-      if (i % 2 == 0) {
-         even_list.push_back(batch_names[i]);
-      } else {
-         odd_list.push_back(batch_names[i]);
-      }
-   }
+   // Even/odd interleave to spread non-bootstrapped + bootstrapped across groups.
    std::vector<name> shuffled;
-   shuffled.insert(shuffled.end(), even_list.begin(), even_list.end());
-   shuffled.insert(shuffled.end(), odd_list.begin(), odd_list.end());
+   shuffled.reserve(available_batch.size());
+   for (size_t i = 0; i < available_batch.size(); i += 2)
+      shuffled.push_back(available_batch[i].first);
+   for (size_t i = 1; i < available_batch.size(); i += 2)
+      shuffled.push_back(available_batch[i].first);
 
-   // Divide into groups
+   // Partition into N groups of `operators_per_epoch` members.
    std::vector<std::vector<name>> new_groups;
+   new_groups.reserve(cfg.batch_op_groups);
    for (uint32_t g = 0; g < cfg.batch_op_groups; ++g) {
       std::vector<name> group;
+      group.reserve(cfg.operators_per_epoch);
       uint32_t start = g * cfg.operators_per_epoch;
-      uint32_t end_idx = start + cfg.operators_per_epoch;
-      for (uint32_t i = start; i < end_idx && i < shuffled.size(); ++i) {
-         group.push_back(shuffled[i]);
+      for (uint32_t i = 0; i < cfg.operators_per_epoch && (start + i) < shuffled.size(); ++i) {
+         group.push_back(shuffled[start + i]);
       }
-      new_groups.push_back(group);
+      new_groups.push_back(std::move(group));
    }
 
-   // Store groups in epoch state
+   // Store the window; advance picks up from here.
    epochstate_t state_tbl(get_self());
    epoch_state state = state_tbl.get_or_default(epoch_state{});
    state.batch_op_groups = new_groups;
+   state.current_batch_op_group = 0; // front-of-window is always current
    state_tbl.set(state, get_self());
 }
 

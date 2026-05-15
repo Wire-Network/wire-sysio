@@ -9,6 +9,10 @@
 #include <sysio/outpost_solana_client_plugin.hpp>
 #include <sysio/outpost_solana_client_plugin/outpost_solana_client.hpp>
 
+#include <sysio/opp/opp.pb.h>
+#include <sysio/opp/attestations/attestations.pb.h>
+#include <sysio/opp/types/types.pb.h>
+
 using namespace std::literals;
 using namespace fc::network::solana;
 
@@ -170,6 +174,206 @@ BOOST_AUTO_TEST_CASE(borsh_encode_bytes_roundtrip) try {
    borsh::decoder dec(enc.data());
    auto decoded = dec.read_bytes();
    BOOST_CHECK(decoded == test_data);
+} FC_LOG_AND_RETHROW();
+
+// ── extract_inbound_recipient_pubkeys: envelope-decode + remit/revert
+//    pubkey extraction. Verifies the cranker enhancement that walks an
+//    inbound envelope's attestations and surfaces the operator /
+//    depositor SOL pubkeys that `epoch_in` must declare in its
+//    `remaining_accounts` so the on-chain WITHDRAW_REMIT /
+//    DEPOSIT_REVERT handlers can do their CPI transfers immediately.
+
+namespace {
+
+/// Build a 32-byte SOLANA `ChainAddress` carrying `pk_bytes` verbatim.
+sysio::opp::types::ChainAddress make_sol_addr(const std::array<uint8_t, 32>& pk_bytes) {
+   sysio::opp::types::ChainAddress addr;
+   addr.set_kind(sysio::opp::types::CHAIN_KIND_SOLANA);
+   addr.set_address(pk_bytes.data(), pk_bytes.size());
+   return addr;
+}
+
+/// Build a 32-byte ETHEREUM `ChainAddress` (32-byte length is a SOL
+/// pubkey, but the kind flag is ETH — the helper must reject this
+/// shape rather than misinterpret it).
+sysio::opp::types::ChainAddress make_eth_addr_32(const std::array<uint8_t, 32>& bytes) {
+   sysio::opp::types::ChainAddress addr;
+   addr.set_kind(sysio::opp::types::CHAIN_KIND_ETHEREUM);
+   addr.set_address(bytes.data(), bytes.size());
+   return addr;
+}
+
+/// Pack a single `AttestationEntry` (type + data) into a freshly-built
+/// `Envelope` and return its serialized bytes.
+std::vector<char> envelope_with_entries(
+   const std::vector<sysio::opp::AttestationEntry>& entries) {
+   sysio::opp::Envelope env;
+   auto*                msg = env.add_messages();
+   for (const auto& e : entries) {
+      auto* out = msg->mutable_payload()->add_attestations();
+      *out      = e;
+   }
+   std::string buf;
+   env.SerializeToString(&buf);
+   return std::vector<char>(buf.begin(), buf.end());
+}
+
+/// Build an `OPERATOR_ACTION(WITHDRAW_REMIT)` entry pointing at
+/// `op_addr`. Other proto fields are populated with neutral defaults —
+/// the decoder only reads `op_address` + `action_type`.
+sysio::opp::AttestationEntry remit_entry(const sysio::opp::types::ChainAddress& op_addr) {
+   sysio::opp::attestations::OperatorAction oa;
+   oa.set_action_type(sysio::opp::attestations::OperatorAction_ActionType_ACTION_TYPE_WITHDRAW_REMIT);
+   *oa.mutable_op_address() = op_addr;
+   std::string body;
+   oa.SerializeToString(&body);
+
+   sysio::opp::AttestationEntry entry;
+   entry.set_type(sysio::opp::types::ATTESTATION_TYPE_OPERATOR_ACTION);
+   entry.set_data(std::move(body));
+   return entry;
+}
+
+/// Same as `remit_entry` but for SLASH (which should NOT be returned —
+/// SLASH routes to the Reserve PDA which is in the static account list).
+sysio::opp::AttestationEntry slash_entry(const sysio::opp::types::ChainAddress& op_addr) {
+   sysio::opp::attestations::OperatorAction oa;
+   oa.set_action_type(sysio::opp::attestations::OperatorAction_ActionType_ACTION_TYPE_SLASH);
+   *oa.mutable_op_address() = op_addr;
+   std::string body;
+   oa.SerializeToString(&body);
+
+   sysio::opp::AttestationEntry entry;
+   entry.set_type(sysio::opp::types::ATTESTATION_TYPE_OPERATOR_ACTION);
+   entry.set_data(std::move(body));
+   return entry;
+}
+
+/// Build a `DEPOSIT_REVERT` entry pointing at `depositor_addr`.
+sysio::opp::AttestationEntry revert_entry(const sysio::opp::types::ChainAddress& depositor_addr) {
+   sysio::opp::attestations::DepositRevert dr;
+   *dr.mutable_depositor() = depositor_addr;
+   std::string body;
+   dr.SerializeToString(&body);
+
+   sysio::opp::AttestationEntry entry;
+   entry.set_type(sysio::opp::types::ATTESTATION_TYPE_DEPOSIT_REVERT);
+   entry.set_data(std::move(body));
+   return entry;
+}
+
+std::array<uint8_t, 32> filled_pubkey(uint8_t byte) {
+   std::array<uint8_t, 32> arr{};
+   arr.fill(byte);
+   return arr;
+}
+
+} // anonymous namespace
+
+BOOST_AUTO_TEST_CASE(extract_pubkeys_empty_envelope_returns_empty) try {
+   std::vector<char> envelope = envelope_with_entries({});
+   auto pks = sysio::outpost_solana_client_detail::extract_inbound_recipient_pubkeys(envelope);
+   BOOST_CHECK(pks.empty());
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(extract_pubkeys_single_withdraw_remit) try {
+   auto op_pk = filled_pubkey(0xAA);
+   auto envelope = envelope_with_entries({remit_entry(make_sol_addr(op_pk))});
+
+   auto pks = sysio::outpost_solana_client_detail::extract_inbound_recipient_pubkeys(envelope);
+   BOOST_REQUIRE_EQUAL(pks.size(), 1u);
+   BOOST_CHECK(pks[0].serialize() == op_pk);
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(extract_pubkeys_deposit_revert) try {
+   auto depositor_pk = filled_pubkey(0xBB);
+   auto envelope = envelope_with_entries({revert_entry(make_sol_addr(depositor_pk))});
+
+   auto pks = sysio::outpost_solana_client_detail::extract_inbound_recipient_pubkeys(envelope);
+   BOOST_REQUIRE_EQUAL(pks.size(), 1u);
+   BOOST_CHECK(pks[0].serialize() == depositor_pk);
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(extract_pubkeys_dedupes_repeated_recipient) try {
+   auto op_pk = filled_pubkey(0xCC);
+   // Two WITHDRAW_REMITs to the same operator (e.g. ETH bond + SOL bond
+   // both being returned in one envelope referencing the operator's SOL
+   // wallet twice) — only one account slot is needed in the tx.
+   auto envelope = envelope_with_entries({
+      remit_entry(make_sol_addr(op_pk)),
+      remit_entry(make_sol_addr(op_pk)),
+   });
+
+   auto pks = sysio::outpost_solana_client_detail::extract_inbound_recipient_pubkeys(envelope);
+   BOOST_REQUIRE_EQUAL(pks.size(), 1u);
+   BOOST_CHECK(pks[0].serialize() == op_pk);
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(extract_pubkeys_skips_slash) try {
+   // SLASH attestations target the Reserve PDA, which is already a
+   // declared account on `epoch_in`. They MUST NOT bloat the
+   // remaining_accounts list — every entry costs ~33 bytes against the
+   // 1 232-byte tx MTU.
+   auto slash_op = filled_pubkey(0xDD);
+   auto remit_op = filled_pubkey(0xEE);
+   auto envelope = envelope_with_entries({
+      slash_entry(make_sol_addr(slash_op)),
+      remit_entry(make_sol_addr(remit_op)),
+   });
+
+   auto pks = sysio::outpost_solana_client_detail::extract_inbound_recipient_pubkeys(envelope);
+   BOOST_REQUIRE_EQUAL(pks.size(), 1u);
+   BOOST_CHECK(pks[0].serialize() == remit_op);
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(extract_pubkeys_skips_non_solana_chain) try {
+   // A WITHDRAW_REMIT whose `op_address` carries kind=ETHEREUM is not
+   // for this outpost and must not contribute a SOL account.
+   auto eth_bytes = filled_pubkey(0x01);
+   auto envelope  = envelope_with_entries({
+      remit_entry(make_eth_addr_32(eth_bytes)),
+   });
+
+   auto pks = sysio::outpost_solana_client_detail::extract_inbound_recipient_pubkeys(envelope);
+   BOOST_CHECK(pks.empty());
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(extract_pubkeys_skips_malformed_address_length) try {
+   // 20-byte address with kind=SOLANA — the bytes pass the chain check
+   // but fail the length check; the decoder must drop the entry rather
+   // than truncate or zero-extend.
+   sysio::opp::types::ChainAddress malformed;
+   malformed.set_kind(sysio::opp::types::CHAIN_KIND_SOLANA);
+   std::vector<uint8_t> short_addr(20, 0xAB);
+   malformed.set_address(short_addr.data(), short_addr.size());
+
+   auto envelope = envelope_with_entries({remit_entry(malformed)});
+
+   auto pks = sysio::outpost_solana_client_detail::extract_inbound_recipient_pubkeys(envelope);
+   BOOST_CHECK(pks.empty());
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(extract_pubkeys_returns_empty_on_garbage_envelope) try {
+   std::vector<char> garbage = {char(0xFF), char(0xFF), char(0xFF), char(0xFF)};
+   auto pks = sysio::outpost_solana_client_detail::extract_inbound_recipient_pubkeys(garbage);
+   BOOST_CHECK(pks.empty());
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(extract_pubkeys_mixed_remit_and_revert_preserved_order) try {
+   auto op_a       = filled_pubkey(0x10);
+   auto depositor  = filled_pubkey(0x20);
+   auto op_b       = filled_pubkey(0x30);
+   auto envelope   = envelope_with_entries({
+      remit_entry(make_sol_addr(op_a)),
+      revert_entry(make_sol_addr(depositor)),
+      remit_entry(make_sol_addr(op_b)),
+   });
+
+   auto pks = sysio::outpost_solana_client_detail::extract_inbound_recipient_pubkeys(envelope);
+   BOOST_REQUIRE_EQUAL(pks.size(), 3u);
+   BOOST_CHECK(pks[0].serialize() == op_a);
+   BOOST_CHECK(pks[1].serialize() == depositor);
+   BOOST_CHECK(pks[2].serialize() == op_b);
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_SUITE_END()

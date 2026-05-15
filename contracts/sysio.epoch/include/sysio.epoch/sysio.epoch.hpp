@@ -33,7 +33,7 @@ namespace sysio {
 
       /// Group assignment — reads AVAILABLE batch ops from sysio.opreg.
       [[sysio::action]]
-      void initgroups();
+      void schbatchgps();
 
       /// Register an outpost chain.
       [[sysio::action]]

@@ -60,11 +60,17 @@ public:
    bool     within_epoch_window() const override { return window_open; }
    bool     is_elected()         const override { return elected; }
    uint32_t current_epoch()      const override { return epoch; }
+   bool     is_epoch_boundary_past() const override { return epoch_boundary_past; }
 
    // Knobs callers can set before driving the job under test.
    bool     window_open = true;
    bool     elected     = true;
    uint32_t epoch       = 1;
+   /// Drives the consensus-retry gate in `outpost_opp_job::run_outbound`.
+   /// Default `false` keeps the existing tests' "no retry" expectation
+   /// intact; tests targeting the retry path flip this to `true` to
+   /// simulate wall-clock past `next_epoch_start`.
+   bool     epoch_boundary_past = false;
 
    std::function<std::optional<sysio::outbound_envelope_record>(uint64_t, uint32_t)> pending_response;
    std::function<bool(uint64_t, uint32_t)>                                           has_delivered_response;

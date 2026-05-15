@@ -69,8 +69,8 @@ public:
       return push_epoch_action(EPOCH_ACCOUNT, "advance"_n, mvo());
    }
 
-   action_result initgroups() {
-      return push_epoch_action(EPOCH_ACCOUNT, "initgroups"_n, mvo());
+   action_result schbatchgps() {
+      return push_epoch_action(EPOCH_ACCOUNT, "schbatchgps"_n, mvo());
    }
 
    action_result regoutpost(ChainKind chain_kind, uint32_t chain_id) {
@@ -184,11 +184,11 @@ BOOST_FIXTURE_TEST_CASE(pause_unpause, sysio_epoch_tester) { try {
 BOOST_FIXTURE_TEST_CASE(initgroups_no_opreg, sysio_epoch_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), setconfig());
 
-   // initgroups reads from sysio.opreg — which is not deployed in this fixture.
+   // schbatchgps reads from sysio.opreg — which is not deployed in this fixture.
    // Should fail because there are no AVAILABLE batch operators.
    BOOST_REQUIRE_EQUAL(
       error("assertion failure with message: not enough available batch operators for group assignment"),
-      initgroups()
+      schbatchgps()
    );
 } FC_LOG_AND_RETHROW() }
 

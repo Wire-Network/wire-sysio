@@ -65,8 +65,30 @@ void outpost_opp_job::run_outbound() {
       // Genesis epoch is handled by the depot's bootstrap path, not here.
       return;
    }
-   if (epoch == _last_outbound_epoch) {
-      // Already attempted this epoch; avoid re-delivering on every cron tick.
+   // Path-2 fallback consensus retry. When the initial delivery happened
+   // but consensus didn't tip (only majority delivered, e.g. freshop is
+   // in the current group with no cranker), the outpost waits for the
+   // boundary to elapse before path-2 can fire. The contract's check
+   // only re-runs when a tx hits it, so the cranker must re-deliver
+   // post-boundary. Both ETH `OPPInbound::epochIn` and SOL
+   // `opp_outpost::epoch_in` are idempotent on same-hash re-deliveries
+   // from the same operator — they re-run the consensus tip without
+   // re-recording. See .claude/rules/opp-consensus.md.
+   //
+   // Gating:
+   //   - Only one retry per epoch (`_last_consensus_retry_epoch`)
+   //   - Only after WIRE depot's boundary has elapsed
+   //     (`_depot.is_epoch_boundary_past()` — proxies the outpost-side
+   //      boundary check since both sides share `epoch_duration_sec`)
+   //
+   // Without the boundary gate, the cranker would re-deliver every tick
+   // and burn gas on no-op consensus checks before path-2 is eligible.
+   const bool retry_pending = epoch == _last_outbound_epoch
+                            && epoch != _last_consensus_retry_epoch
+                            && _depot.is_epoch_boundary_past();
+   if (epoch == _last_outbound_epoch && !retry_pending) {
+      // Already attempted this epoch and either the boundary hasn't
+      // elapsed yet or a retry already fired for it.
       return;
    }
 
@@ -96,10 +118,18 @@ void outpost_opp_job::run_outbound() {
 
    try {
       auto tx_id = _client->deliver_outbound_envelope(epoch, pending->raw_envelope, _outpost_deadline);
-      ilog("outpost_opp_job[{}]: delivered outbound envelope ({} bytes) tx={}",
-           _client->to_string(), pending->raw_envelope.size(), tx_id);
+      ilog("outpost_opp_job[{}]: {} outbound envelope ({} bytes) tx={}",
+           _client->to_string(),
+           retry_pending ? "consensus-retry"
+                         : "delivered",
+           pending->raw_envelope.size(),
+           tx_id);
 
-      _last_outbound_epoch = epoch;
+      if (retry_pending) {
+         _last_consensus_retry_epoch = epoch;
+      } else {
+         _last_outbound_epoch = epoch;
+      }
    } catch (const fc::network::json_rpc::json_rpc_error& e) {
       wlog("outpost_opp_job[{}]: outbound delivery failed: code={} message='{}' data={} detail='{}'",
            _client->to_string(), e.code, e.top_message(),
