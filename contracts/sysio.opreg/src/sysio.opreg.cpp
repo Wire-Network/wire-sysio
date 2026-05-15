@@ -51,6 +51,22 @@ std::optional<uint64_t> find_outpost_id_for_chain(ChainKind chain) {
    return std::nullopt;
 }
 
+/// Enforce uniqueness of `(chain, token_kind)` within a collateral-
+/// requirements vector. Duplicates would cause the same (chain, token)
+/// pair to be checked twice during eligibility evaluation — harmless
+/// behaviorally but a clear configuration error worth surfacing at the
+/// boundary rather than silently absorbing.
+void require_no_duplicate_chain_token(const std::vector<opreg::chain_min_bond>& v,
+                                      const char* role_label) {
+   for (auto outer = v.begin(); outer != v.end(); ++outer) {
+      for (auto inner = std::next(outer); inner != v.end(); ++inner) {
+         check(!(outer->chain == inner->chain && outer->token_kind == inner->token_kind),
+               std::string(role_label) +
+                  ": duplicate (chain, token_kind) in collateral requirements");
+      }
+   }
+}
+
 } // anonymous namespace
 
 // ---------------------------------------------------------------------------
@@ -62,7 +78,10 @@ void opreg::setconfig(uint32_t max_available_producers,
                       uint64_t terminate_prune_delay_ms,
                       uint32_t terminate_max_consecutive_misses,
                       uint32_t terminate_max_pct_misses_24h,
-                      uint64_t terminate_window_ms) {
+                      uint64_t terminate_window_ms,
+                      std::vector<chain_min_bond> req_prod_collat,
+                      std::vector<chain_min_bond> req_batchop_collat,
+                      std::vector<chain_min_bond> req_uw_collat) {
    require_auth(get_self());
 
    check(max_available_producers > 0, "max_available_producers must be positive");
@@ -75,6 +94,23 @@ void opreg::setconfig(uint32_t max_available_producers,
          "terminate_max_pct_misses_24h must be in (0, 100]");
    check(terminate_window_ms > 0, "terminate_window_ms must be positive");
 
+   require_no_duplicate_chain_token(req_prod_collat,    "req_prod_collat");
+   require_no_duplicate_chain_token(req_batchop_collat, "req_batchop_collat");
+   require_no_duplicate_chain_token(req_uw_collat,      "req_uw_collat");
+
+   // Stamp every entry's `config_timestamp_ms` with the on-chain time
+   // so consumers can detect stale configuration without trusting the
+   // caller's clock — the action's value for that field is ignored.
+   const auto now = current_time_ms();
+   const auto stamp = [now](std::vector<chain_min_bond>& v) {
+      for (auto& entry : v) {
+         entry.config_timestamp_ms = now;
+      }
+   };
+   stamp(req_prod_collat);
+   stamp(req_batchop_collat);
+   stamp(req_uw_collat);
+
    opconfig_t cfg_tbl(get_self());
    op_config cfg = cfg_tbl.get_or_default(op_config{});
    cfg.max_available_producers          = max_available_producers;
@@ -84,6 +120,9 @@ void opreg::setconfig(uint32_t max_available_producers,
    cfg.terminate_max_consecutive_misses = terminate_max_consecutive_misses;
    cfg.terminate_max_pct_misses_24h     = terminate_max_pct_misses_24h;
    cfg.terminate_window_ms              = terminate_window_ms;
+   cfg.req_prod_collat                  = std::move(req_prod_collat);
+   cfg.req_batchop_collat               = std::move(req_batchop_collat);
+   cfg.req_uw_collat                    = std::move(req_uw_collat);
    cfg_tbl.set(cfg, get_self());
 }
 
@@ -241,8 +280,19 @@ uint64_t slashable_now(const opreg::operator_entry& op,
 
 /// Check whether the operator's available balance on (chain, token_kind)
 /// covers the role's minimum bond on that pair.
+///
+/// Bootstrapped operators are ACTIVE-by-fiat and bypass the per-outpost
+/// bond check regardless of how `req_*_collat` is configured — they
+/// represent system-installed operators that the depot trusts without
+/// requiring collateral. Non-bootstrapped operators must satisfy every
+/// `(chain, token_kind)` entry in the matching `req_*_collat` vector;
+/// an empty/unset vector means "no operator of this role can become
+/// ACTIVE until configuration lands."
 bool meets_role_min(const opreg::operator_entry& op,
                     const opreg::op_config& cfg) {
+   if (op.is_bootstrapped) {
+      return true;
+   }
    const std::vector<opreg::chain_min_bond>* reqs = nullptr;
    switch (op.type) {
       case OperatorType::OPERATOR_TYPE_PRODUCER:    reqs = &cfg.req_prod_collat;    break;
@@ -251,9 +301,7 @@ bool meets_role_min(const opreg::operator_entry& op,
       default:                                       return false;
    }
    if (!reqs || reqs->empty()) {
-      // No requirements configured — bootstrapped operators are eligible by fiat,
-      // others stay PENDING until config is set.
-      return op.is_bootstrapped;
+      return false;
    }
    for (const auto& req : *reqs) {
       uint64_t avail = available_inline(op, req.chain, req.token_kind);
@@ -420,7 +468,11 @@ void emit_slash_attestation(name self, const OperatorAction& slash_action) {
    auto outpost_id = find_outpost_id_for_chain(slash_action.chain);
    if (!outpost_id) return;   // no outpost on this chain — nothing to slash through
 
-   auto [encoded, out] = zpp::bits::data_out<char>();
+   // `no_size{}` — raw protobuf bytes, no 4-byte zpp length prefix. The
+   // outpost decodes the attestation `data` field as a pure protobuf
+   // message; a size prefix would corrupt the first field tag.
+   std::vector<char> encoded;
+   auto out = zpp::bits::out{encoded, zpp::bits::no_size{}};
    (void)out(slash_action);
 
    action(
@@ -456,7 +508,9 @@ void emit_deposit_revert(name self,
    dr.original_deposit_message_id.assign(mh.begin(), mh.end());
    dr.reason = reason;
 
-   auto [encoded, out] = zpp::bits::data_out<char>();
+   // `no_size{}` — see emit_slash_attestation for the rationale.
+   std::vector<char> encoded;
+   auto out = zpp::bits::out{encoded, zpp::bits::no_size{}};
    (void)out(dr);
 
    action(
@@ -526,7 +580,9 @@ void emit_withdraw_remit(name self,
    oa.request_id = request_id;
    oa.chain      = chain;
 
-   auto [encoded, out] = zpp::bits::data_out<char>();
+   // `no_size{}` — see emit_slash_attestation for the rationale.
+   std::vector<char> encoded;
+   auto out = zpp::bits::out{encoded, zpp::bits::no_size{}};
    (void)out(oa);
 
    action(
@@ -1156,6 +1212,16 @@ void terminate_inline(name self, name account, const std::string& reason) {
 
    // Remit each (chain, token_kind). For WIRE-chain: direct token transfer
    // back to the operator. For outpost chains: queue WITHDRAW_REMIT.
+   //
+   // After each remit, append a WITHDRAW_REMIT entry to the operator's
+   // `recent_actions` ring buffer so the audit trail mirrors the
+   // operator-initiated withdraw flow (`flushwtdw` does the same at line
+   // ~1008). Without this entry, downstream consumers polling
+   // `operators[op].recent_actions` for proof of remit emission see only
+   // the prior DEPOSIT_REQUESTs and miss the termination payout — same
+   // semantic gap on TERMINATED ops as on a normal queued withdraw, only
+   // resolvable by querying msgch internals (which are transient — the
+   // rows drain on the next `buildenv`).
    for (const auto& rp : to_remit) {
       if (rp.chain == ChainKind::CHAIN_KIND_WIRE) {
          action(
@@ -1169,6 +1235,10 @@ void terminate_inline(name self, name account, const std::string& reason) {
          emit_withdraw_remit(self, account, op.type,
                              rp.chain, rp.token_kind, rp.amount, /*request_id*/ 0);
       }
+      OperatorAction remit_action = build_withdraw_remit_action(
+         account, rp.chain, rp.token_kind, rp.amount, /*request_id*/ 0);
+      append_action_log(ops, op_pk, remit_action, /*success*/ true,
+                        std::string("terminate-remit"));
    }
 }
 
@@ -1201,6 +1271,15 @@ void opreg::termcheck(name account) {
    if (!ops.contains(op_pk)) return;
    auto op = ops.get(op_pk);
    if (op.status != OperatorStatus::OPERATOR_STATUS_ACTIVE) return;
+   // Bootstrapped operators are the genesis / chain-of-trust seed set and
+   // are NEVER subject to rolling-window termination — see
+   // .claude/rules/bootstrapped-operator-invariants.md at the wire root. A
+   // transient bug in the deliver / consensus / advance pipeline (or a
+   // benign operator-side outage) must not be able to tear the
+   // bootstrapped seed set down, because doing so drops the chain below
+   // `batch_operator_minimum_active` with no remaining ACTIVE operators
+   // to advance consensus and no recovery path.
+   if (op.is_bootstrapped) return;
    // Termination on rolling-buffer underperformance is, for now, scoped to
    // batch operators. Producer schedule misses + underwriter offline-too-long
    // are open questions per the plan §1; revisit when those decisions land.

@@ -235,6 +235,14 @@ struct batch_operator_plugin::impl {
       bool     within_epoch_window() const override { return _impl.within_epoch_window(); }
       bool     is_elected()         const override { return _impl.is_elected; }
       uint32_t current_epoch()      const override { return _impl.current_epoch; }
+      bool     is_epoch_boundary_past() const override {
+         // `next_epoch_start` is cached on `_impl` from
+         // `sysio.epoch::epochstate`. Empty time_point = no cache yet
+         // (pre-bootstrap) → conservative `false`. Otherwise compare
+         // against wall clock.
+         if (_impl.next_epoch_start == fc::time_point()) return false;
+         return fc::time_point::now() >= _impl.next_epoch_start;
+      }
    };
 
    std::unique_ptr<depot_ops_impl_t>                              depot_ops_backing{

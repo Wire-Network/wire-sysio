@@ -86,4 +86,35 @@ private:
 
 using outpost_solana_client_ptr = std::shared_ptr<outpost_solana_client>;
 
+namespace outpost_solana_client_detail {
+
+/// Decode an inbound envelope and return the deduplicated set of
+/// 32-byte Solana pubkeys that the on-chain `epoch_in` handler will
+/// need to address in its CPI lamport transfers:
+///
+///   * `OPERATOR_ACTION(WITHDRAW_REMIT)` → operator's SOL wallet
+///     (`op_address.address`) for the vault → operator transfer.
+///   * `DEPOSIT_REVERT`                   → depositor's SOL wallet
+///     (`depositor.address`)              for the vault → depositor refund.
+///
+/// `OPERATOR_ACTION(SLASH)` routes vault → Reserve PDA, which is
+/// already a declared account on the `epoch_in` IDL, so SLASH targets
+/// are NOT in the returned vector.
+///
+/// Malformed attestations (wrong chain kind, wrong address length,
+/// proto decode failure) are skipped silently — the on-chain handler
+/// log+skips them the same way per `feedback_opp_handlers_never_throw.md`.
+/// A whole-envelope decode failure returns an empty vector + a warning
+/// log; the on-chain handlers will then log+skip every remit/revert in
+/// the envelope, the depot retains the authoritative state, and the
+/// next envelope can re-attempt.
+///
+/// Exposed in this header (rather than the .cpp's anonymous namespace)
+/// so the plugin's unit tests can exercise the decoder against a
+/// synthesised Envelope without spinning up a full Solana client.
+std::vector<fc::network::solana::solana_public_key>
+extract_inbound_recipient_pubkeys(const std::vector<char>& envelope_bytes);
+
+} // namespace outpost_solana_client_detail
+
 } // namespace sysio

@@ -81,13 +81,44 @@ public:
       }
    }
 
+   /// Build a single `chain_min_bond` entry as an fc::variant suitable for
+   /// `setconfig`'s `req_*_collat` vector arguments. `config_timestamp_ms`
+   /// is overwritten by the action to the on-chain time, so it's pinned
+   /// to 0 here for deterministic input.
+   static fc::variant make_chain_min_bond(ChainKind chain, TokenKind kind, uint64_t min_bond) {
+      return fc::variant(mvo()
+         ("chain",                chain)
+         ("token_kind",           kind)
+         ("min_bond",             min_bond)
+         ("config_timestamp_ms",  uint64_t{0}));
+   }
+
+   /// Push `sysio.opreg::setconfig` with sane defaults. The `max_consec_misses`
+   /// / `max_pct_misses_24h` / `terminate_window_ms` defaults mirror the
+   /// contract's `DEFAULT_TERMINATE_*` constants. The three trailing
+   /// `req_*_collat` vectors default empty — meaning every operator role
+   /// has a (trivially satisfied) zero-requirements eligibility check.
+   /// Tests that need to exercise the per-outpost bond requirement pass
+   /// in vectors built via `make_chain_min_bond(...)`.
    action_result setconfig(uint32_t max_prod = 21, uint32_t max_batch = 63,
-                           uint32_t max_uw = 21, uint64_t prune_delay = 600000) {
+                           uint32_t max_uw = 21, uint64_t prune_delay = 600000,
+                           uint32_t max_consec_misses = 5,
+                           uint32_t max_pct_misses_24h = 5,
+                           uint64_t terminate_window_ms = 24ULL * 60 * 60 * 1000,
+                           std::vector<fc::variant> req_prod_collat    = {},
+                           std::vector<fc::variant> req_batchop_collat = {},
+                           std::vector<fc::variant> req_uw_collat      = {}) {
       return push_opreg_action(OPREG_ACCOUNT, "setconfig"_n, mvo()
-         ("max_available_producers", max_prod)
-         ("max_available_batch_ops", max_batch)
-         ("max_available_underwriters", max_uw)
-         ("terminate_prune_delay_ms", prune_delay)
+         ("max_available_producers",          max_prod)
+         ("max_available_batch_ops",          max_batch)
+         ("max_available_underwriters",       max_uw)
+         ("terminate_prune_delay_ms",         prune_delay)
+         ("terminate_max_consecutive_misses", max_consec_misses)
+         ("terminate_max_pct_misses_24h",     max_pct_misses_24h)
+         ("terminate_window_ms",              terminate_window_ms)
+         ("req_prod_collat",                  req_prod_collat)
+         ("req_batchop_collat",               req_batchop_collat)
+         ("req_uw_collat",                    req_uw_collat)
       );
    }
 
@@ -111,37 +142,35 @@ public:
    }
 
    // ── Collateral-action helpers (msgch-dispatched paths) ──
-
-   /// Build a TokenAmount mvo from a typed (TokenKind, amount) pair. Action
-   /// signatures take `TokenAmount` (proto struct, not a separate kind+scalar
-   /// pair) — this packs the two for the ABI serializer.
-   static fc::mutable_variant_object token_amount_mvo(TokenKind kind, uint64_t amount) {
-      return mvo()("kind", kind)("amount", amount);
-   }
+   //
+   // All collateral-action signatures take flat primitives — no proto
+   // messages, per `feedback_no_proto_messages_in_actions.md` (proto
+   // varint typedefs leak into the ABI when used in action signatures).
+   // `TokenAmount` is split into `(token_kind, amount)`; `ChainAddress`
+   // is split into `(actor_chain, actor_address)`.
 
    /// Internal: outpost-driven deposit credit, dispatched from sysio.msgch
    /// (require_auth(get_self()=opreg)). Used to seed an operator's outpost-
    /// side balance without going through the WIRE-direct `deposit` action
    /// (which requires sysio.token + operator-signed transfer).
    ///
-   /// `actor` is the depositor's source-chain address; defaults to a
-   /// well-formed Ethereum-shaped placeholder so tests that don't care about
-   /// the revert correlation can ignore it. `original_message_id` defaults
-   /// to a zero hash for the same reason. Helpers serialize the typed enum
-   /// values via FC_REFLECT_ENUM (defined in `sysio/opp/opp.hpp`) — the ABI
-   /// serializer reads them as the corresponding enum-name strings.
+   /// `actor_chain` + `actor_address` form the depositor's source-chain
+   /// `ChainAddress` (refund target on DEPOSIT_REVERT). `actor_chain`
+   /// defaults to Ethereum and `actor_address` is empty for tests that
+   /// don't care about the revert correlation. `original_message_id`
+   /// defaults to a zero hash for the same reason.
    action_result depositinle(name account, ChainKind chain, TokenKind token,
                              uint64_t amount,
-                             ChainKind actor_kind = ChainKind::CHAIN_KIND_ETHEREUM,
+                             ChainKind actor_chain = ChainKind::CHAIN_KIND_ETHEREUM,
                              const std::vector<char>& actor_address = {},
                              const std::string& original_message_id_hex = std::string(64, '0')) {
       return push_opreg_action(OPREG_ACCOUNT, "depositinle"_n, mvo()
          ("account",              account)
          ("chain",                chain)
-         ("amount",               token_amount_mvo(token, amount))
-         ("actor",                mvo()
-            ("kind",    actor_kind)
-            ("address", actor_address))
+         ("token_kind",           token)
+         ("amount",               amount)
+         ("actor_chain",          actor_chain)
+         ("actor_address",        actor_address)
          ("original_message_id",  original_message_id_hex));
    }
 
@@ -153,7 +182,8 @@ public:
       return push_opreg_action(OPREG_ACCOUNT, "withdrawinle"_n, mvo()
          ("account",     account)
          ("chain",       chain)
-         ("amount",      token_amount_mvo(token, amount)));
+         ("token_kind",  token)
+         ("amount",      amount));
    }
 
    action_result cancelwtdw(name signer, name account, uint64_t request_id) {
@@ -172,9 +202,10 @@ public:
                              ChainKind chain, TokenKind token,
                              uint64_t amount) {
       return push_opreg_action(signer, "releaselock"_n, mvo()
-         ("account",  account)
-         ("chain",    chain)
-         ("amount",   token_amount_mvo(token, amount)));
+         ("account",     account)
+         ("chain",       chain)
+         ("token_kind",  token)
+         ("amount",      amount));
    }
 
    /// Read a wtdwqueue row by request_id (primary key).
@@ -348,7 +379,7 @@ BOOST_FIXTURE_TEST_CASE(prune_requires_config, sysio_opreg_tester) { try {
    );
 } FC_LOG_AND_RETHROW() }
 
-// ── Multiple bootstrapped operators for initgroups ──
+// ── Multiple bootstrapped operators for schbatchgps ──
 
 BOOST_FIXTURE_TEST_CASE(multiple_bootstrapped_batch_ops, sysio_opreg_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), setconfig());
@@ -369,7 +400,7 @@ BOOST_FIXTURE_TEST_CASE(multiple_bootstrapped_batch_ops, sysio_opreg_tester) { t
    BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE == op_b["status"].as<OperatorStatus>());
    BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE == op_c["status"].as<OperatorStatus>());
 
-   // Now configure epoch and run initgroups which reads from opreg
+   // Now configure epoch and run schbatchgps which reads from opreg
    BOOST_REQUIRE_EQUAL(success(), push_epoch_action(EPOCH_ACCOUNT, "setconfig"_n, mvo()
       ("epoch_duration_sec", 90)
       ("operators_per_epoch", 1)
@@ -379,7 +410,7 @@ BOOST_FIXTURE_TEST_CASE(multiple_bootstrapped_batch_ops, sysio_opreg_tester) { t
    ));
    produce_blocks();
 
-   BOOST_REQUIRE_EQUAL(success(), push_epoch_action(EPOCH_ACCOUNT, "initgroups"_n, mvo()));
+   BOOST_REQUIRE_EQUAL(success(), push_epoch_action(EPOCH_ACCOUNT, "schbatchgps"_n, mvo()));
    produce_blocks();
 
    // Verify epoch state has groups populated
@@ -556,7 +587,13 @@ BOOST_FIXTURE_TEST_CASE(cancelwtdw_rejects_other_operators_request, sysio_opreg_
 
 BOOST_FIXTURE_TEST_CASE(terminate_marks_status_and_zeros_unlocked_balance, sysio_opreg_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), setconfig());
-   BOOST_REQUIRE_EQUAL(success(), regoperator("batchop.a"_n, OPERATOR_TYPE_BATCH, true));
+   // Non-bootstrapped op: bootstrapped operators are ACTIVE-by-fiat and
+   // `depositinle` rejects their inbound deposits via DEPOSIT_REVERT, so no
+   // balance row would be created. A non-bootstrapped op accepts the deposit
+   // and stays UNKNOWN (no req_batchop_collat configured), which `terminate`
+   // accepts as a terminable state alongside ACTIVE.
+   BOOST_REQUIRE_EQUAL(success(),
+      regoperator("batchop.a"_n, OPERATOR_TYPE_BATCH, /*is_bootstrapped=*/false));
    BOOST_REQUIRE_EQUAL(success(),
       depositinle("batchop.a"_n, ChainKind::CHAIN_KIND_ETHEREUM, TokenKind::TOKEN_KIND_ETH, 500));
 
@@ -592,6 +629,93 @@ BOOST_FIXTURE_TEST_CASE(releaselock_requires_uwrit_authority, sysio_opreg_tester
       releaselock(OPREG_ACCOUNT, "uwrit.alice"_n,
                   ChainKind::CHAIN_KIND_ETHEREUM, TokenKind::TOKEN_KIND_ETH, 100)
         .find("missing authority of sysio.uwrit") != std::string::npos);
+} FC_LOG_AND_RETHROW() }
+
+// ── setconfig: per-outpost collateral requirements ──
+
+// `setconfig` with `req_batchop_collat=[(ETH,ETH,X),(SOL,SOL,X)]` enforces
+// that a non-bootstrapped batch operator must bond on BOTH chains before
+// flipping ACTIVE. A deposit on one chain alone leaves the operator in
+// UNKNOWN — the eligibility predicate (`meets_role_min`) iterates the
+// requirement vector and `available()` returns 0 for the missing chain.
+// This is the only mechanism enforcing the protocol's "ACTIVE requires
+// deposit on every active outpost" promise; without it the second
+// deposit is implicit and the test would silently green on incomplete
+// configuration (see `feedback_full_protocol_requirements.md`).
+BOOST_FIXTURE_TEST_CASE(setconfig_two_chain_bond_activation, sysio_opreg_tester) { try {
+   constexpr uint64_t MIN_BOND = 1'000'000;
+
+   BOOST_REQUIRE_EQUAL(success(), setconfig(
+      /*max_prod=*/21, /*max_batch=*/63, /*max_uw=*/21, /*prune_delay=*/600000,
+      /*max_consec_misses=*/5, /*max_pct_misses_24h=*/5,
+      /*terminate_window_ms=*/24ULL * 60 * 60 * 1000,
+      /*req_prod_collat=*/{},
+      /*req_batchop_collat=*/{
+         make_chain_min_bond(ChainKind::CHAIN_KIND_ETHEREUM, TokenKind::TOKEN_KIND_ETH, MIN_BOND),
+         make_chain_min_bond(ChainKind::CHAIN_KIND_SOLANA,   TokenKind::TOKEN_KIND_SOL, MIN_BOND),
+      },
+      /*req_uw_collat=*/{}));
+
+   BOOST_REQUIRE_EQUAL(success(),
+      regoperator("batchop.a"_n, OPERATOR_TYPE_BATCH, /*is_bootstrapped=*/false));
+
+   // Pre-deposit: a non-bootstrapped operator with no balances cannot yet
+   // satisfy any (chain, token_kind) requirement — status stays UNKNOWN.
+   auto op = get_operator("batchop.a"_n);
+   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_UNKNOWN == op["status"].as<OperatorStatus>());
+
+   // After ETH bond: ETH requirement met, SOL still missing → still UNKNOWN.
+   BOOST_REQUIRE_EQUAL(success(),
+      depositinle("batchop.a"_n, ChainKind::CHAIN_KIND_ETHEREUM,
+                  TokenKind::TOKEN_KIND_ETH, MIN_BOND));
+   op = get_operator("batchop.a"_n);
+   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_UNKNOWN == op["status"].as<OperatorStatus>());
+
+   // After SOL bond: every requirement met → status flips to ACTIVE via the
+   // inline `processbatch` hook fired from `reevaluate_eligibility`.
+   BOOST_REQUIRE_EQUAL(success(),
+      depositinle("batchop.a"_n, ChainKind::CHAIN_KIND_SOLANA,
+                  TokenKind::TOKEN_KIND_SOL, MIN_BOND));
+   op = get_operator("batchop.a"_n);
+   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE == op["status"].as<OperatorStatus>());
+   BOOST_REQUIRE(op["available_at"].as_uint64() > 0);
+} FC_LOG_AND_RETHROW() }
+
+// `setconfig` rejects vectors containing two entries with the same
+// `(chain, token_kind)` pair — a clear configuration error worth
+// surfacing at the system boundary rather than silently absorbed by the
+// eligibility-evaluation loop (which would check the same row twice).
+BOOST_FIXTURE_TEST_CASE(setconfig_rejects_duplicate_chain_token_in_collat, sysio_opreg_tester) { try {
+   const auto duplicate_vec = std::vector<fc::variant>{
+      make_chain_min_bond(ChainKind::CHAIN_KIND_ETHEREUM, TokenKind::TOKEN_KIND_ETH, 100),
+      make_chain_min_bond(ChainKind::CHAIN_KIND_ETHEREUM, TokenKind::TOKEN_KIND_ETH, 200),
+   };
+
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: req_batchop_collat: "
+            "duplicate (chain, token_kind) in collateral requirements"),
+      setconfig(21, 63, 21, 600000, 5, 5, 24ULL * 60 * 60 * 1000,
+                /*req_prod_collat=*/{},
+                /*req_batchop_collat=*/duplicate_vec,
+                /*req_uw_collat=*/{}));
+} FC_LOG_AND_RETHROW() }
+
+// `setconfig` stamps `config_timestamp_ms` on every entry with the
+// on-chain time, ignoring whatever value the caller passed. Test pins
+// the input to 0 and asserts the stored value is non-zero.
+BOOST_FIXTURE_TEST_CASE(setconfig_stamps_collat_config_timestamp, sysio_opreg_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), setconfig(
+      21, 63, 21, 600000, 5, 5, 24ULL * 60 * 60 * 1000,
+      /*req_prod_collat=*/{},
+      /*req_batchop_collat=*/{
+         make_chain_min_bond(ChainKind::CHAIN_KIND_ETHEREUM, TokenKind::TOKEN_KIND_ETH, 1000),
+      },
+      /*req_uw_collat=*/{}));
+
+   auto cfg = get_opconfig();
+   auto bops = cfg["req_batchop_collat"].get_array();
+   BOOST_REQUIRE_EQUAL(1u, bops.size());
+   BOOST_REQUIRE(bops[0]["config_timestamp_ms"].as_uint64() > 0);
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()

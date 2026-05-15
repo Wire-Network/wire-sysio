@@ -6,7 +6,7 @@ Epoch lifecycle and batch operator scheduling contract for the OPP (Outpost Prot
 
 - Manages the synthetic epoch clock (default: 6-minute epochs)
 - Maintains the batch operator roster (registration, warmup, cooldown, blacklist)
-- Assigns operators into 3 rotation groups of 7 via `initgroups`
+- Assigns operators into 3 rotation groups of 7 via `schbatchgps`
 - Advances epochs with deterministic group rotation (`epoch_index % 3`)
 - Supports in-place operator replacement when an operator is slashed or deregistered
 - Registers external chain outposts (ETH, SOL, etc.)
@@ -29,7 +29,7 @@ Epoch lifecycle and batch operator scheduling contract for the OPP (Outpost Prot
 | `regoperator` | `sysio.epoch` | Register an operator |
 | `unregoper` | operator | Begin deregistration (cooldown) |
 | `advance` | permissionless | Advance epoch if duration elapsed |
-| `initgroups` | `sysio.epoch` | One-time group assignment (21 operators) |
+| `schbatchgps` | `sysio.epoch` | One-time group assignment (21 operators) |
 | `replaceop` | `sysio.epoch` | Replace operator in-place within group |
 | `regoutpost` | `sysio.epoch` | Register an outpost chain |
 | `pause` | `sysio.chalg` | Set global pause |

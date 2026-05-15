@@ -28,6 +28,7 @@
 #include <sysio/testing/tester.hpp>
 #include <sysio/chain/abi_serializer.hpp>
 #include <sysio/opp/opp.hpp>
+#include <sysio/opp/attestations/attestations.pb.h>
 
 #include <fc/variant_object.hpp>
 
@@ -111,7 +112,7 @@ public:
    }
 
    /// One-shot bootstrap: epoch config + opreg config + a bootstrapped
-   /// batch op + a pending underwriter + an Ethereum outpost + initgroups
+   /// batch op + a pending underwriter + an Ethereum outpost + schbatchgps
    /// + the genesis advance.
    ///
    /// Note: `find_outpost_id_for_chain` in opreg returns 0 as the "no
@@ -132,10 +133,16 @@ public:
 
       BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT,
          "setconfig"_n, mvo()
-            ("max_available_producers",   21)
-            ("max_available_batch_ops",   63)
-            ("max_available_underwriters",21)
-            ("terminate_prune_delay_ms",  600000)));
+            ("max_available_producers",          21)
+            ("max_available_batch_ops",          63)
+            ("max_available_underwriters",       21)
+            ("terminate_prune_delay_ms",         600000)
+            ("terminate_max_consecutive_misses", 5)
+            ("terminate_max_pct_misses_24h",     5)
+            ("terminate_window_ms",              uint64_t{24ULL * 60 * 60 * 1000})
+            ("req_prod_collat",                  fc::variants{})
+            ("req_batchop_collat",               fc::variants{})
+            ("req_uw_collat",                    fc::variants{})));
 
       BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT,
          "regoperator"_n, mvo()
@@ -162,7 +169,7 @@ public:
             ("chain_id",   31337)));
 
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT,
-         "initgroups"_n, mvo()));
+         "schbatchgps"_n, mvo()));
 
       // Genesis advance — permissionless until current_epoch_index moves
       // off zero. Sets up the next_epoch_start wall-clock so subsequent
@@ -200,36 +207,34 @@ public:
       return v["current_epoch_index"].as<uint32_t>();
    }
 
-   /// Build a TokenAmount mvo from a typed (TokenKind, amount) pair. Action
-   /// signatures take the proto-struct `TokenAmount` rather than separate
-   /// kind+scalar parameters — this packs the two for the ABI serializer.
-   static fc::mutable_variant_object token_amount_mvo(TokenKind kind, uint64_t amount) {
-      return mvo()("kind", kind)("amount", amount);
-   }
-
    /// Direct opreg::depositinle, signed as opreg itself (require_auth(self)
    /// passes when self signs). Bypasses the msgch dispatch path tested
    /// separately in sysio.dispatch_tests.cpp — deposit semantics are the
-   /// same either way once the auth gate is past. `actor` defaults to a
-   /// well-formed Ethereum-shaped placeholder; tests here don't exercise
-   /// the DEPOSIT_REVERT correlation path.
+   /// same either way once the auth gate is past.
+   ///
+   /// Signature is flat per `feedback_no_proto_messages_in_actions.md`:
+   /// `TokenAmount` is split into `(token_kind, amount)`; `ChainAddress`
+   /// into `(actor_chain, actor_address)`. Tests here don't exercise the
+   /// DEPOSIT_REVERT correlation path, so `actor_chain` defaults to a
+   /// well-formed Ethereum-shaped placeholder with an empty address.
    action_result depositinle(name account, ChainKind chain, TokenKind token, uint64_t amount) {
       return push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "depositinle"_n, mvo()
          ("account",              account.to_string())
          ("chain",                chain)
-         ("amount",               token_amount_mvo(token, amount))
-         ("actor",                mvo()
-            ("kind",    ChainKind::CHAIN_KIND_ETHEREUM)
-            ("address", std::vector<char>{}))
+         ("token_kind",           token)
+         ("amount",               amount)
+         ("actor_chain",          ChainKind::CHAIN_KIND_ETHEREUM)
+         ("actor_address",        std::vector<char>{})
          ("original_message_id",  std::string(64, '0')));
    }
 
    /// Direct opreg::withdrawinle, signed as opreg.
    action_result withdrawinle(name account, ChainKind chain, TokenKind token, uint64_t amount) {
       return push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "withdrawinle"_n, mvo()
-         ("account",  account.to_string())
-         ("chain",    chain)
-         ("amount",   token_amount_mvo(token, amount)));
+         ("account",     account.to_string())
+         ("chain",       chain)
+         ("token_kind",  token)
+         ("amount",      amount));
    }
 
    /// chalg-authorized slash hook (mirrors the production chalg→opreg path
@@ -291,6 +296,30 @@ public:
          if (row["type"].as<sysio::opp::types::AttestationType>() == expected) ++n;
       }
       return n;
+   }
+
+   /// Collect the raw `data` bytes of every `msgch.attestations` row whose
+   /// `type` matches `expected`. Returned in primary-key order, which is
+   /// the order in which they were emitted (sysio.opreg's `emit_*` helpers
+   /// each call `msgch::queueout` once, and queueout uses
+   /// `attestations.available_primary_key()`).
+   ///
+   /// Used by the `data_out`-vs-`no_size` regression tests below to
+   /// inspect the exact bytes that would land in an outbound envelope.
+   std::vector<std::vector<char>>
+   collect_attestation_data(sysio::opp::types::AttestationType expected,
+                            uint64_t scan_until = 32) {
+      std::vector<std::vector<char>> out;
+      for (uint64_t id = 0; id < scan_until; ++id) {
+         auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT,
+                                   "attestations"_n, id);
+         if (data.empty()) continue;
+         auto row = msgch_abi.binary_to_variant("attestation_entry", data,
+            abi_serializer::create_yield_function(abi_serializer_max_time));
+         if (row["type"].as<sysio::opp::types::AttestationType>() != expected) continue;
+         out.push_back(row["data"].as<std::vector<char>>());
+      }
+      return out;
    }
 
    abi_serializer epoch_abi, opreg_abi, msgch_abi;
@@ -451,6 +480,121 @@ BOOST_FIXTURE_TEST_CASE(slashed_operator_withdraw_drops_silently,
    // anything back, did NOT double-debit, did NOT emit a WITHDRAW_REMIT.
    BOOST_REQUIRE_EQUAL(balance_after_slash,
                        balance_of(UWRIT_OP, ETH_CHAIN, ETH_TOKEN));
+} FC_LOG_AND_RETHROW() }
+
+/// Regression — encoding form for `msgch::queueout` payloads.
+///
+/// Background: `sysio.opreg::emit_*` (plus the equivalent `sysio.uwrit::
+/// emit_*`) used to serialize their `OperatorAction` / `DepositRevert`
+/// / `SwapRemit` payload via `zpp::bits::data_out<char>()`, which
+/// prepends a 4-byte little-endian length prefix before the protobuf
+/// bytes. The depot stores `data` verbatim in `msgch.attestations` and
+/// the outpost decodes the same bytes as a standard protobuf message —
+/// the size prefix becomes the first "tag" the outpost sees and corrupts
+/// the parse (SOL: `AnchorError::AttestationDecodeFailed`; ETH-side
+/// Solidity codecs silently zero-init the fields). The fix is to use
+/// `zpp::bits::out{vec, zpp::bits::no_size{}}` so the depot-emitted
+/// bytes are pure protobuf wire format.
+///
+/// This test pins the post-fix invariant: the queued OPERATOR_ACTION's
+/// `data` must parse as a protobuf `OperatorAction` whose action_type
+/// is the WITHDRAW_REMIT we just flushed.
+BOOST_FIXTURE_TEST_CASE(flushwtdw_attestation_data_is_clean_protobuf,
+                        sysio_epoch_flushwtdw_tester) { try {
+   bootstrap_for_flushwtdw();
+
+   constexpr uint64_t INITIAL_DEPOSIT = 1'000'000;
+   constexpr uint64_t WITHDRAW_AMOUNT =   400'000;
+   const ChainKind   ETH_CHAIN  = ChainKind::CHAIN_KIND_ETHEREUM;
+   const TokenKind   ETH_TOKEN  = TokenKind::TOKEN_KIND_ETH;
+
+   BOOST_REQUIRE_EQUAL(success(),
+      depositinle(UWRIT_OP, ETH_CHAIN, ETH_TOKEN, INITIAL_DEPOSIT));
+   BOOST_REQUIRE_EQUAL(success(),
+      withdrawinle(UWRIT_OP, ETH_CHAIN, ETH_TOKEN, WITHDRAW_AMOUNT));
+
+   constexpr uint32_t FUTURE_EPOCH = 100;
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, EPOCH_ACCOUNT,
+      "flushwtdw"_n, mvo()("current_epoch", FUTURE_EPOCH)));
+
+   auto rows = collect_attestation_data(
+      sysio::opp::types::AttestationType::ATTESTATION_TYPE_OPERATOR_ACTION);
+   BOOST_REQUIRE_EQUAL(rows.size(), 1u);
+   const auto& bytes = rows.front();
+   BOOST_REQUIRE(!bytes.empty());
+
+   // First byte MUST be a valid protobuf field-1-varint tag (0x08 =
+   // OperatorAction.action_type). The pre-fix `data_out<char>()` form
+   // would have left an LE u32 size prefix here (e.g. `0x39 0x00 0x00
+   // 0x00 ...`), and 0x39 is field 7 wire-type 1 — a parse-poisoning tag.
+   BOOST_REQUIRE_EQUAL(static_cast<uint8_t>(bytes.front()), 0x08u);
+
+   // Full parse — must succeed and recover the WITHDRAW_REMIT action_type.
+   sysio::opp::attestations::OperatorAction oa;
+   BOOST_REQUIRE(oa.ParseFromArray(bytes.data(),
+                                   static_cast<int>(bytes.size())));
+   BOOST_REQUIRE_EQUAL(
+      static_cast<int>(oa.action_type()),
+      static_cast<int>(sysio::opp::attestations::
+                         OperatorAction_ActionType_ACTION_TYPE_WITHDRAW_REMIT));
+   BOOST_REQUIRE_EQUAL(
+      static_cast<int>(oa.chain()),
+      static_cast<int>(sysio::opp::types::ChainKind::CHAIN_KIND_ETHEREUM));
+   BOOST_REQUIRE_EQUAL(static_cast<uint64_t>(oa.amount().amount()),
+                       WITHDRAW_AMOUNT);
+} FC_LOG_AND_RETHROW() }
+
+/// Regression — multiple queued attestations from a single flush all
+/// carry clean protobuf bytes. `msgch::buildenv`'s packing loop concats
+/// per-attestation payloads into the envelope; if any one is corrupt the
+/// outpost rejects the whole envelope. Walks the N=3 scenario:
+/// deposit → 3 staggered withdraws on the same chain → single flush
+/// drains all three → 3 OPERATOR_ACTION rows queued. Every row's `data`
+/// must independently parse as a clean OperatorAction whose amount
+/// matches the corresponding queued withdraw.
+BOOST_FIXTURE_TEST_CASE(flushwtdw_multiple_attestations_all_clean_protobuf,
+                        sysio_epoch_flushwtdw_tester) { try {
+   bootstrap_for_flushwtdw();
+
+   constexpr uint64_t INITIAL_DEPOSIT  = 1'000'000;
+   const ChainKind   ETH_CHAIN  = ChainKind::CHAIN_KIND_ETHEREUM;
+   const TokenKind   ETH_TOKEN  = TokenKind::TOKEN_KIND_ETH;
+
+   const std::array<uint64_t, 3> withdraws{ 100'000, 200'000, 300'000 };
+
+   BOOST_REQUIRE_EQUAL(success(),
+      depositinle(UWRIT_OP, ETH_CHAIN, ETH_TOKEN, INITIAL_DEPOSIT));
+   for (auto amount : withdraws) {
+      BOOST_REQUIRE_EQUAL(success(),
+         withdrawinle(UWRIT_OP, ETH_CHAIN, ETH_TOKEN, amount));
+   }
+
+   constexpr uint32_t FUTURE_EPOCH = 100;
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, EPOCH_ACCOUNT,
+      "flushwtdw"_n, mvo()("current_epoch", FUTURE_EPOCH)));
+
+   auto rows = collect_attestation_data(
+      sysio::opp::types::AttestationType::ATTESTATION_TYPE_OPERATOR_ACTION);
+   BOOST_REQUIRE_EQUAL(rows.size(), withdraws.size());
+
+   // Each row is independently a clean protobuf OperatorAction.
+   // Iteration order matches queueout order (= flush order = the order
+   // we enqueued the withdraws above), so amounts line up positionally.
+   for (size_t i = 0; i < rows.size(); ++i) {
+      const auto& bytes = rows[i];
+      BOOST_REQUIRE(!bytes.empty());
+      BOOST_REQUIRE_EQUAL(static_cast<uint8_t>(bytes.front()), 0x08u);
+
+      sysio::opp::attestations::OperatorAction oa;
+      BOOST_REQUIRE(oa.ParseFromArray(bytes.data(),
+                                      static_cast<int>(bytes.size())));
+      BOOST_REQUIRE_EQUAL(
+         static_cast<int>(oa.action_type()),
+         static_cast<int>(sysio::opp::attestations::
+                            OperatorAction_ActionType_ACTION_TYPE_WITHDRAW_REMIT));
+      BOOST_REQUIRE_EQUAL(static_cast<uint64_t>(oa.amount().amount()),
+                          withdraws[i]);
+   }
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -86,6 +86,24 @@ struct depot_ops {
     * Cached by the depot implementation; refreshed on the `epoch_tick` job.
     */
    virtual uint32_t current_epoch() const = 0;
+
+   /**
+    * True when wall-clock has advanced past the depot's `next_epoch_start` for
+    * the currently-cached epoch. Used by the outpost cranker to decide when
+    * a consensus-retry re-delivery is warranted on a stuck path-2 fallback
+    * case: once the WIRE depot's boundary has elapsed, the outpost-side
+    * boundary (same `epoch_duration_sec`) is also definitively past, so a
+    * re-delivery from an already-delivered operator can re-trigger the
+    * outpost's consensus evaluation and tip path-2 fallback. Without this
+    * gate the cranker would have to either re-deliver every tick (gas
+    * waste) or never re-deliver (chain stalls when initial deliveries fall
+    * short of unanimous). Mirrors the WIRE-side `sysio.msgch::chkcons`
+    * "time gate passed" check.
+    *
+    * Returns false when the cache is empty (pre-bootstrap) or when the
+    * boundary has not yet elapsed for the current epoch.
+    */
+   virtual bool is_epoch_boundary_past() const = 0;
 };
 
 } // namespace sysio

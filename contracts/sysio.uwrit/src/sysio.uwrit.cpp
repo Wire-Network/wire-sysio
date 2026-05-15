@@ -185,7 +185,11 @@ void emit_swap_revert(name self, uint64_t outpost_id, uint64_t attestation_id,
    rev.refund_amount = sr.source_amount;
    rev.reason        = reason;
 
-   auto [encoded, out] = zpp::bits::data_out<char>();
+   // `no_size{}` — raw protobuf bytes for the outpost decoder; the default
+   // `zpp::bits::data_out` form prepends a 4-byte LE length prefix that
+   // corrupts the first field tag on the receiving side.
+   std::vector<char> encoded;
+   auto out = zpp::bits::out{encoded, zpp::bits::no_size{}};
    (void)out(rev);
 
    action(
@@ -306,7 +310,9 @@ void emit_swap_remit(name self,
    }
    remit.unlock_timestamp = 0;
 
-   auto [encoded, out] = zpp::bits::data_out<char>();
+   // `no_size{}` — see emit_swap_revert for the rationale.
+   std::vector<char> encoded;
+   auto out = zpp::bits::out{encoded, zpp::bits::no_size{}};
    (void)out(remit);
 
    action(

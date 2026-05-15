@@ -446,7 +446,6 @@ void dispatch_attestation(name self, uint64_t attestation_id,
       case AttestationType::ATTESTATION_TYPE_PRETOKEN_PURCHASE:
       case AttestationType::ATTESTATION_TYPE_PRETOKEN_YIELD:
       case AttestationType::ATTESTATION_TYPE_WIRE_TOKEN_PURCHASE:
-      case AttestationType::ATTESTATION_TYPE_EPOCH_SYNC:
       case AttestationType::ATTESTATION_TYPE_UNDERWRITE_INTENT:
       case AttestationType::ATTESTATION_TYPE_UNDERWRITE_CONFIRM:
       case AttestationType::ATTESTATION_TYPE_UNDERWRITE_REJECT:
@@ -695,12 +694,25 @@ void msgch::evalcons(uint64_t outpost_id, uint32_t epoch_index) {
 
       write_envelope_log(get_self(), endpoints, epoch, seen_checksums[consensus_group]);
 
-      // Drop the per-batch-op `envelopes` rows for this consensus event —
-      // raw_data is dead weight once consensus is reached.
-      auto evict_idx = envs.get_index<"byoutepoch"_n>();
-      for (auto it = evict_idx.lower_bound(composite);
-           it != evict_idx.end() && it->by_outpost_epoch() == composite; ) {
-         it = evict_idx.erase(std::move(it));
+      // Drop the HEAVY `raw_data` from each per-batch-op `envelopes` row,
+      // but KEEP the metadata tuple `(outpost_id, epoch_index, batch_op_name)`
+      // intact. `epoch::advance` reads this metadata via the `byoutepoch`
+      // index to compute `did_deliver` per group member — erasing the rows
+      // here destroys that signal and miscredits every batchop as
+      // `delivered=false`, cascading bootstrapped operators into termination
+      // within a few rotations. The metadata rows are evicted by
+      // `epoch::advance` after `recorddel` has read them.
+      std::vector<uint64_t> ids_to_clear;
+      auto modify_idx = envs.get_index<"byoutepoch"_n>();
+      for (auto it = modify_idx.lower_bound(composite);
+           it != modify_idx.end() && it->by_outpost_epoch() == composite; ++it) {
+         ids_to_clear.push_back(it->id);
+      }
+      for (auto id : ids_to_clear) {
+         envs.modify(same_payer, id_key{id}, [](auto& r) {
+            r.raw_data.clear();
+            r.raw_data.shrink_to_fit();
+         });
       }
 
       // Drop the just-inserted `messages` row. Its raw_payload mirrors
