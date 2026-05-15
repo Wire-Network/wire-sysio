@@ -219,6 +219,11 @@
             "fields": []
         },
         {
+            "name": "gcfdcf",
+            "base": "",
+            "fields": []
+        },
+        {
             "name": "muledge",
             "base": "",
             "fields": []
@@ -718,6 +723,11 @@
         {
             "name": "gacok",
             "type": "gacok",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "gcfdcf",
+            "type": "gcfdcf",
             "ricardian_contract": ""
         },
         {

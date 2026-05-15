@@ -106,6 +106,19 @@ void set_action_return_value( void* return_value, uint32_t size );
 // alignment UB on the caller side; the WASM import ABI is untyped pointers
 // and the host's argument_proxy<__int128_t*, 16> handles alignment via
 // memcpy on entry / exit.
+//
+// Coverage boundary: this suite probes the adversarially-distinct
+// representatives of the int128 / float128 host surface -- multiply, signed
+// and unsigned divide, arithmetic-left-shift, float128 add / multiply /
+// divide, and the float->int128 saturating conversions -- across the golden,
+// unaligned-copy-out, and edge-value paths the pointer->span cleanup reworks.
+// __modti3, __umodti3, __ashrti3, __lshlti3, __lshrti3 and __subtf3 are
+// declared here for ABI completeness but intentionally NOT separately probed:
+// the stacked host-compiler-builtin removal supersedes this entire section --
+// it deletes these host implementations and relocates equivalent coverage,
+// including the INT128_MIN/-1 wrap and shift-count >= 128 saturation edges,
+// into the contract-side librt test suite. Host-ABI probes for those entry
+// points would pin behavior that change deletes.
 __attribute__((sysio_wasm_import))
 void __multi3 ( void* ret, uint64_t la, uint64_t ha, uint64_t lb, uint64_t hb );
 __attribute__((sysio_wasm_import))
@@ -1522,6 +1535,22 @@ public:
    void rtxsm() {
       size_t rc = raw::read_transaction( nullptr, 0 );
       check( rc > 0, "raw::read_transaction(nullptr, 0) should return required size" );
+   }
+
+   // raw::get_context_free_data is registered context-free-only
+   // (REGISTER_LEGACY_CF_ONLY_HOST_FUNCTION). Its context_free_check
+   // precondition fires BEFORE the host body and SYS_ASSERTs unaccessible_api
+   // ("this API may only be called from context_free apply") whenever the
+   // calling apply context is not context free. This probe drives it from a
+   // regular action, so the gate must throw before the legacy_span<char>
+   // buffer is ever adapted -- the arguments are deliberately bogus (null
+   // data, zero length) to prove the rejection is unconditional on the span.
+   // Mirrors the privileged_check rejection probes (preactnp / setresnp).
+   [[sysio::action]]
+   void gcfdcf() {
+      raw::get_context_free_data( 0, nullptr, 0 );
+      check( false, "raw::get_context_free_data from non-context-free apply "
+                    "must throw unaccessible_api" );
    }
 
    // raw::send_inline with empty span -> host tries to unpack and fails. Pins
