@@ -51,18 +51,39 @@ struct opp_solana_outpost_client : fc::network::solana::solana_program_client {
    /// bytes — overwritten on every emit. The WIRE batch operator reads
    /// this to relay the envelope back to WIRE.
    fc::network::solana::solana_public_key latest_outbound_envelope_pda;
+   /// Outpost lamport vault. Holds escrowed collateral deposited via
+   /// `deposit`; drained on inbound WITHDRAW_REMIT / SLASH /
+   /// DEPOSIT_REVERT by the program's signed system_program::transfer
+   /// CPI. Pre-derived from seed `outpost_vault`.
+   fc::network::solana::solana_public_key vault_pda;
+   /// Outpost Reserve PDA — receives slashed-collateral routing and
+   /// DEPOSIT_REVERT penalties. Pre-derived from seed `outpost_reserve`.
+   fc::network::solana::solana_public_key reserve_pda;
 
    /// `initialize(consensus_threshold: u32) -> signature`.
    solana_program_tx_fn<std::string, uint32_t>             initialize;
-   /// `epoch_in(epoch_index, chunk_index, total_chunks, total_bytes, chunk_data) -> signature`.
+   /// `epoch_in(epoch_index, chunk_index, total_chunks, total_bytes, chunk_data,
+   ///           extra_remaining_accounts) -> signature`.
+   ///
    /// Inbound delivery is chunked: Solana's 1 232-byte tx MTU can't carry
    /// a full OPP envelope at production roster sizes, so the caller streams
    /// the envelope into a per-(epoch, signer) staging PDA and the program
    /// auto-finalizes on the last chunk. epoch_index selects both the
    /// per-epoch EpochDeliveries PDA and the per-(epoch, signer) chunk-buffer
    /// PDA.
+   ///
+   /// `extra_remaining_accounts` is appended past the IDL's account list
+   /// as Anchor `remaining_accounts`. The on-chain WITHDRAW_REMIT and
+   /// DEPOSIT_REVERT handlers need to CPI-transfer to operator /
+   /// depositor wallets, which Solana requires be declared on the tx;
+   /// the cranker (`outpost_solana_client::deliver_outbound_envelope`)
+   /// decodes the envelope, extracts `op_address.address` pubkeys from
+   /// inbound WITHDRAW_REMIT / DEPOSIT_REVERT attestations, and passes
+   /// them here. Non-final chunks ignore the slice — only the
+   /// finalize-triggering chunk's account list matters for dispatch.
    solana_program_tx_fn<std::string, uint32_t, uint16_t, uint16_t, uint32_t,
-                         std::vector<uint8_t>> epoch_in;
+                         std::vector<uint8_t>,
+                         std::vector<fc::network::solana::solana_public_key>> epoch_in;
    /// `cleanup_envelope_chunks(epoch_index) -> signature`.
    /// Permissionless reaper for chunk buffers an operator started but
    /// never finished. Callable once the chain has advanced past
@@ -98,6 +119,12 @@ struct opp_solana_outpost_client : fc::network::solana::solana_program_client {
       , latest_outbound_envelope_pda(fc::network::solana::system::find_program_address(
            {std::vector<uint8_t>{'l','a','t','e','s','t','_','o','u','t','b','o','u','n','d','_','e','n','v','e','l','o','p','e'}},
            prog_id).first)
+      , vault_pda(fc::network::solana::system::find_program_address(
+           {std::vector<uint8_t>{'o','u','t','p','o','s','t','_','v','a','u','l','t'}},
+           prog_id).first)
+      , reserve_pda(fc::network::solana::system::find_program_address(
+           {std::vector<uint8_t>{'o','u','t','p','o','s','t','_','r','e','s','e','r','v','e'}},
+           prog_id).first)
       // OPP writes default to the confirmed variant — any state-changing
       // call on this client is consensus-critical and must not silently
       // drop (see epoch-859 stall RCA). `execute_tx_and_confirm` + default
@@ -111,7 +138,8 @@ struct opp_solana_outpost_client : fc::network::solana::solana_program_client {
                         uint16_t chunk_index,
                         uint16_t total_chunks,
                         uint32_t total_bytes,
-                        std::vector<uint8_t> chunk_data) -> std::string {
+                        std::vector<uint8_t> chunk_data,
+                        std::vector<fc::network::solana::solana_public_key> extra_remaining_accounts) -> std::string {
            const std::vector<uint8_t> epoch_seed = {
               static_cast<uint8_t>(epoch_index & 0xFF),
               static_cast<uint8_t>((epoch_index >>  8) & 0xFF),
@@ -148,6 +176,8 @@ struct opp_solana_outpost_client : fc::network::solana::solana_program_client {
               {"outbound_message_buffer",   outbound_message_buffer_pda},
               {"outbound_envelopes",        outbound_envelopes_pda},
               {"latest_outbound_envelope",  latest_outbound_envelope_pda},
+              {"vault",                     vault_pda},
+              {"reserve",                   reserve_pda},
            };
            auto& instr = get_idl("epoch_in");
            program_invoke_data_items params = {
@@ -186,9 +216,22 @@ struct opp_solana_outpost_client : fc::network::solana::solana_program_client {
               pre_ixs.push_back(
                  fc::network::solana::system::compute_budget::request_heap_frame(256'000));
            }
-           return execute_tx_and_confirm(instr,
-                                         resolve_accounts(instr, params, overrides),
-                                         params, pre_ixs);
+           // Resolve the IDL's declared accounts first, then append any
+           // extra `remaining_accounts` the cranker decoded from the
+           // inbound envelope (operator / depositor wallets that
+           // WITHDRAW_REMIT / DEPOSIT_REVERT handlers need to address).
+           // Anchor's runtime exposes everything past the IDL's
+           // declared accounts as `ctx.remaining_accounts`; the
+           // operator pubkeys land there in order. They're marked
+           // writable (the CPI transfer adds lamports) and non-signer
+           // (the operator isn't signing this tx).
+           auto accounts = resolve_accounts(instr, params, overrides);
+           accounts.reserve(accounts.size() + extra_remaining_accounts.size());
+           for (const auto& extra_pk : extra_remaining_accounts) {
+              accounts.push_back(
+                 fc::network::solana::account_meta::writable(extra_pk, /*is_signer=*/false));
+           }
+           return execute_tx_and_confirm(instr, accounts, params, pre_ixs);
         })
       , cleanup_envelope_chunks([this](uint32_t epoch_index) -> std::string {
            const std::vector<uint8_t> epoch_seed = {

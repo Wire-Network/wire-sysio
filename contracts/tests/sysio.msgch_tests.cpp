@@ -140,8 +140,10 @@ BOOST_FIXTURE_TEST_CASE(deliver_invalid_request, sysio_msgch_tester) { try {
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(queueout_basic, sysio_msgch_tester) { try {
-   // AttestationType: EPOCH_SYNC = 60940
-   BOOST_REQUIRE_EQUAL(success(), queueout(0, 60940));
+   // AttestationType: OPERATORS = 60947 — any in-range, non-removed enum value
+   // suffices here; the test only verifies the queueout/table mechanics, not
+   // any per-type dispatch logic.
+   BOOST_REQUIRE_EQUAL(success(), queueout(0, 60947));
 
    // Verify attestation written to table (first entry, id=0)
    auto attest = get_attestation(0);

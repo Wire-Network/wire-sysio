@@ -77,6 +77,27 @@ namespace sysio {
       static constexpr size_t   MAX_ERROR_MESSAGE_BYTES  = 2048;
 
       // -----------------------------------------------------------------------
+      //  Forward types
+      // -----------------------------------------------------------------------
+
+      /// Per-(chain, token_kind) minimum-bond row stored in `opconfig`'s
+      /// per-role requirement vectors and accepted as `setconfig` input.
+      /// Declared above the action surface so action signatures can take
+      /// `std::vector<chain_min_bond>` parameters by complete type. The
+      /// schema requires one entry per supported chain (WIRE / ETHEREUM /
+      /// SOLANA) when the role actually needs bond there; `min_bond` may
+      /// be 0 to keep the row's shape uniform across roles even when a
+      /// particular chain doesn't gate that role.
+      struct chain_min_bond {
+         opp::types::ChainKind  chain;
+         opp::types::TokenKind  token_kind;
+         uint64_t               min_bond            = 0;
+         uint64_t               config_timestamp_ms = 0;
+
+         SYSLIB_SERIALIZE(chain_min_bond, (chain)(token_kind)(min_bond)(config_timestamp_ms))
+      };
+
+      // -----------------------------------------------------------------------
       //  Actions
       // -----------------------------------------------------------------------
 
@@ -85,6 +106,22 @@ namespace sysio {
       /// can dial them down (e.g. `terminate_max_consecutive_misses=2`,
       /// `terminate_window_ms=60_000`) to make the miss → terminate path
       /// observable inside a flow-test's timeout budget.
+      ///
+      /// The three `req_*_collat` vectors are the per-role eligibility
+      /// requirements: each entry is a `(chain, token_kind, min_bond)`
+      /// triple the operator's `available(account, chain, token_kind)`
+      /// must meet or exceed for that role. The chain set is closed
+      /// implicitly — an operator that isn't bonded on an entry's chain
+      /// has `available(...) == 0` and fails the predicate. This is the
+      /// only mechanism that enforces "ACTIVE requires deposit on every
+      /// active outpost"; `meets_role_min` (in this contract) iterates
+      /// the matching vector for each eligibility evaluation.
+      ///
+      /// `config_timestamp_ms` on each entry is overwritten by
+      /// `setconfig` with the on-chain `current_time_ms()`, so the
+      /// caller's clock isn't trusted for staleness comparisons. Within
+      /// each vector, every `(chain, token_kind)` pair must be unique;
+      /// duplicates fail the action.
       [[sysio::action]]
       void setconfig(uint32_t max_available_producers,
                      uint32_t max_available_batch_ops,
@@ -92,7 +129,10 @@ namespace sysio {
                      uint64_t terminate_prune_delay_ms,
                      uint32_t terminate_max_consecutive_misses,
                      uint32_t terminate_max_pct_misses_24h,
-                     uint64_t terminate_window_ms);
+                     uint64_t terminate_window_ms,
+                     std::vector<chain_min_bond> req_prod_collat,
+                     std::vector<chain_min_bond> req_batchop_collat,
+                     std::vector<chain_min_bond> req_uw_collat);
 
       /// Register a new operator.
       [[sysio::action]]
@@ -297,20 +337,6 @@ namespace sysio {
          sysio::kv::index<"bystatus"_n,
             sysio::const_mem_fun<operator_entry, uint64_t, &operator_entry::by_status>>
       >;
-
-      /// Per-(chain, token_kind) minimum-bond row in opconfig. The schema
-      /// requires one entry per supported chain (WIRE / ETHEREUM / SOLANA);
-      /// `min_bond` may be 0 when a particular role doesn't actually need
-      /// bond on a chain, but the row must still appear so the structure is
-      /// uniform across roles.
-      struct chain_min_bond {
-         opp::types::ChainKind  chain;
-         opp::types::TokenKind  token_kind;
-         uint64_t               min_bond            = 0;
-         uint64_t               config_timestamp_ms = 0;
-
-         SYSLIB_SERIALIZE(chain_min_bond, (chain)(token_kind)(min_bond)(config_timestamp_ms))
-      };
 
       /// Operator registry configuration singleton.
       struct [[sysio::table("opconfig")]] op_config {

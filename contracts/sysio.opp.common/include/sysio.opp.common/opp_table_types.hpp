@@ -469,16 +469,6 @@ DataStream& operator>>(DataStream& ds, ChallengeRequest& t) {
              >> t.operator_hashes;
 }
 
-// EpochSync (deprecated)
-template <typename DataStream>
-DataStream& operator<<(DataStream& ds, const EpochSync& t) {
-   return ds << t.epoch_index << t.epoch_duration_sec << t.epoch_start_timestamp;
-}
-template <typename DataStream>
-DataStream& operator>>(DataStream& ds, EpochSync& t) {
-   return ds >> t.epoch_index >> t.epoch_duration_sec >> t.epoch_start_timestamp;
-}
-
 // OperatorEntry — one row of the OPERATORS attestation roster.
 template <typename DataStream>
 DataStream& operator<<(DataStream& ds, const OperatorEntry& t) {
