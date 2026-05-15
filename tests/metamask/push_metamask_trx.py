@@ -16,31 +16,40 @@ What this exercises:
          Round 2 - clio convert unpack_transaction | clio push transaction
                     --signature SIG_EM_... -s.
     6. Signing has two modes:
-         --simulate : metamask_sim.py drives the signing automatically. This is
-                      what the `metamask_trx_signing_test` ctest runs, so CI
-                      needs no browser.
+         --simulate : clio's own EM tooling drives the signing automatically
+                      (`clio create key --em` for the identity,
+                      `clio convert em_sign` for the signature). This is what
+                      the `metamask_trx_signing_test` ctest runs, so CI needs
+                      no browser and no Python eth stack -- the only dependency
+                      is the clio binary the build already produces.
          (default)  : print the digest and wait for the user to paste the
-                      SIG_EM_... value from metamask-sign.html. The pasted
-                      identity and every signature are verified offline before
-                      anything reaches the chain, so a stale or wrong paste is
-                      rejected locally with a clear message instead of as an
-                      opaque unsatisfied_authorization.
+                      SIG_EM_... value from metamask-sign.html (real MetaMask).
+                      Every pasted signature is recovered offline via
+                      `clio convert em_recover` and checked against the EM key
+                      registered on the account before anything reaches the
+                      chain, so a stale or wrong paste is rejected locally with
+                      a clear message instead of as an opaque
+                      unsatisfied_authorization.
+
+clio's EM path is libfc's own crypto -- the exact code nodeop runs to validate
+these signatures -- and is pinned byte-for-byte against the Ethereum-ecosystem
+reference (eth_account / MetaMask personal_sign) by the separate, hermetic
+`clio_em_key_test` ctest. This harness exercises the full chain round-trip.
 
 Run from your build directory (so $BUILD_DIR/programs/clio resolves):
 
     cd $BUILD_DIR
-    .venv/bin/python tests/metamask/push_metamask_trx.py --simulate
-    .venv/bin/python tests/metamask/push_metamask_trx.py            # manual
+    python3 tests/metamask/push_metamask_trx.py --simulate
+    python3 tests/metamask/push_metamask_trx.py            # manual (real MetaMask)
 
 Use `--leave-running` to leave the cluster up after the test.
 """
 
 from __future__ import annotations
 
-import functools
 import hashlib
 import json
-import os
+import re
 import subprocess
 import sys
 import urllib.error
@@ -48,14 +57,7 @@ import urllib.request
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-sys.path.insert(0, str(HERE))
-sys.path.insert(0, str(HERE.parent))
-
-from em_sig_to_wire import (  # noqa: E402
-    eth_address_from_pub,
-    metamask_pub_to_wire,
-    wire_pub_to_metamask,
-)
+sys.path.insert(0, str(HERE.parent))  # tests/ -- so `import TestHarness` resolves
 
 # TestHarness shaping
 from TestHarness import (  # noqa: E402
@@ -76,65 +78,6 @@ errorExit = Utils.errorExit
 # this, so an out-of-range --trx-expiration is rejected up front with a clear
 # message rather than failing opaquely inside clio.
 MAX_TRX_EXPIRATION_SECONDS = 3600
-
-# metamask_sim.py (simulate) and verify_em_sig.py (manual pre-flight) run as
-# subprocesses and import these. Probed once at startup against a chosen
-# interpreter so a deps-less launcher fails fast with guidance instead of
-# rejecting every signature deep in the manual flow.
-_REQUIRED_DEPS = ("eth_account", "eth_keys", "eth_utils")
-
-
-@functools.lru_cache(maxsize=1)
-def _dep_python() -> str:
-    """Return a Python interpreter that can import the eth_account stack.
-
-    Relying on sys.executable breaks when the harness is launched with a bare
-    `python3` that lacks the deps: the pre-flight subprocess then fails with an
-    opaque "No module named 'eth_account'" and the manual loop rejects every
-    paste forever. Prefer the launching interpreter if it already has the deps;
-    otherwise fall back to $VIRTUAL_ENV or the first `.venv` found walking up
-    from this script (works whether run from the source tree or the build-dir
-    copy). errorExit with actionable guidance if nothing qualifies.
-    """
-    probe = "import " + ", ".join(_REQUIRED_DEPS)
-
-    def has_deps(py: str) -> bool:
-        try:
-            return subprocess.run([py, "-c", probe],
-                                  capture_output=True, text=True).returncode == 0
-        except OSError:
-            return False
-
-    if has_deps(sys.executable):
-        return sys.executable
-
-    candidates: list[str] = []
-    venv_env = os.environ.get("VIRTUAL_ENV")
-    if venv_env:
-        candidates.append(str(Path(venv_env) / "bin" / "python"))
-    for parent in [HERE, *HERE.parents]:
-        cand = parent / ".venv" / "bin" / "python"
-        if cand.is_file():
-            candidates.append(str(cand))
-
-    tried: list[str] = []
-    for cand in candidates:
-        if cand in tried:
-            continue
-        tried.append(cand)
-        if has_deps(cand):
-            return cand
-
-    errorExit(
-        "no Python with the eth_account stack "
-        f"({', '.join(_REQUIRED_DEPS)}) could be found.\n"
-        f"  launched with : {sys.executable}\n"
-        f"  also tried    : {tried or '(none)'}\n"
-        "  fix: run the harness with the repo virtualenv, e.g.\n"
-        "       <wire-sysio>/.venv/bin/python tests/metamask/push_metamask_trx.py ...\n"
-        "  or:  <that venv>/bin/python -m pip install "
-        "eth-account eth-keys eth-utils pycryptodome")
-
 
 def _prompt(label: str) -> str:
     """input() that turns EOF / Ctrl-C into a clean TestHarness exit.
@@ -165,6 +108,25 @@ def _run_clio(node, *args, capture_json=True):
     if not capture_json:
         return out
     return json.loads(out) if out else {}
+
+
+def _clio_offline(*args, expect_fail=False) -> dict[str, str] | None:
+    """Run clio for an offline subcommand (create key / convert em_*); no node.
+
+    These subcommands print `Label: value` lines and never touch a wallet or
+    nodeop, so they take no node args. Returns the parsed lines as a dict, or
+    None when `expect_fail` and clio exited non-zero (a malformed signature in
+    the manual pre-flight, recovered locally rather than at the chain).
+    """
+    cmd = [Utils.SysClientPath, *args]
+    if Utils.Debug:
+        Print(f"cmd: {' '.join(cmd)}")
+    res = subprocess.run(cmd, capture_output=True, text=True)
+    if res.returncode != 0:
+        if expect_fail:
+            return None
+        errorExit(f"clio failed: {' '.join(cmd)}\nstderr: {res.stderr}\nstdout: {res.stdout}")
+    return {k: v for k, v in re.findall(r'(\w[^:\n]*): ([^\n]+)', res.stdout)}
 
 
 def _parse_asset(asset: str) -> tuple[int, int, str]:
@@ -201,121 +163,73 @@ def _assert_balance_decreased(label: str, before: str, after: str, expected_delt
     Print(f"{label}: balance {before} -> {after} (-{expected_delta}) OK")
 
 
-def _validate_pasted_identity(em_info: dict[str, str]):
-    """Offline check of the three values pasted from metamask-sign.html.
-
-    The signature gets a recovery pre-flight; the identity it must recover to
-    deserves the same treatment. Confirm the pasted uncompressed pubkey, the
-    pasted Ethereum address, and the pasted PUB_EM_ are mutually consistent so
-    a typo fails here with a clear message instead of opaquely at expandauth.
-    """
-    eth_address = em_info["eth_address"]
-    pub_hex = em_info["uncompressed_pub_hex"]
-    wire_pub_em = em_info["wire_pub_em"]
-    if not wire_pub_em.startswith("PUB_EM_"):
-        errorExit(f"pasted Wire pubkey is not a PUB_EM_ value: {wire_pub_em!r}")
-    try:
-        # wire_pub_to_metamask validates the PUB_EM_ framing/length/0x04 prefix.
-        wire_pub_to_metamask(wire_pub_em)
-        derived_wire = metamask_pub_to_wire(pub_hex)
-        derived_addr = eth_address_from_pub(pub_hex)
-    except Exception as exc:  # noqa: BLE001
-        errorExit(f"pasted identity is malformed: {exc}")
-    if derived_wire.lower() != wire_pub_em.lower():
-        errorExit("pasted uncompressed pubkey does not match the pasted PUB_EM_:\n"
-                  f"  from pubkey : {derived_wire}\n"
-                  f"  pasted PUB  : {wire_pub_em}")
-    if derived_addr.lower() != eth_address.lower():
-        errorExit("pasted ETH address does not match the pasted pubkey:\n"
-                  f"  from pubkey : {derived_addr}\n"
-                  f"  pasted addr : {eth_address}")
-
-
 def _create_em_key(simulate: bool,
-                    private_key_hex: str | None) -> tuple[dict[str, str], str | None]:
-    """Obtain the EM identity, either from metamask_sim keygen or by paste.
+                    sim_priv_arg: str | None) -> tuple[dict[str, str], str | None]:
+    """Obtain the EM identity via clio (simulate) or by paste (manual).
 
-    Returns (em_info, sim_private_key). `em_info` always has exactly
-    {eth_address, uncompressed_pub_hex, wire_pub_em}; `sim_private_key` is the
-    simulator's hex private key in --simulate mode (used to sign later) and
-    None in manual mode. Keeping the shape identical across both modes avoids
-    the previous branch-dependent KeyError footgun.
+    Returns (em_info, sim_priv_em). `em_info` always has exactly {wire_pub_em}.
+    `sim_priv_em` is the PVT_EM_ to sign with in --simulate mode and None in
+    manual mode (the private key never leaves the browser there). Keeping the
+    shape identical across both modes avoids a branch-dependent KeyError.
     """
     if simulate:
-        cmd = [_dep_python(), str(HERE / "metamask_sim.py"), "keygen"]
-        if private_key_hex:
-            cmd += ["--private-key", private_key_hex]
-        res = subprocess.run(cmd, capture_output=True, text=True, check=True)
-        raw = json.loads(res.stdout)
-        em_info = {
-            "eth_address": raw["eth_address"],
-            "uncompressed_pub_hex": raw["uncompressed_pub_hex"],
-            "wire_pub_em": raw["wire_pub_em"],
-        }
-        return em_info, raw["private_key"]
+        if sim_priv_arg:
+            # Reproducible: a fixed PVT_EM_ or raw 0x Ethereum hex secret.
+            r = _clio_offline("convert", "em_private_key",
+                              "--private-key", sim_priv_arg, "--to-console")
+        else:
+            r = _clio_offline("create", "key", "--em", "--to-console")
+        return {"wire_pub_em": r["Public key"]}, r["Private key"]
 
     Print("\nOpen tests/metamask/metamask-sign.html in a browser with Metamask")
     Print("installed. Click 'Connect Metamask' and then sign any test message so")
-    Print("the page can ecRecover and surface your uncompressed pubkey.")
-    Print("Paste the values shown on the page below:\n")
-    em_info = {
-        "eth_address": _prompt("ETH address (0x...): "),
-        "uncompressed_pub_hex": _prompt("uncompressed pubkey (0x04...): "),
-        "wire_pub_em": _prompt("Wire PUB_EM_ pubkey: "),
-    }
-    _validate_pasted_identity(em_info)
-    Print("pasted identity is self-consistent (pubkey <-> address <-> PUB_EM_)")
-    return em_info, None
+    Print("the page can ecRecover and surface your Wire PUB_EM_ pubkey.")
+    Print("Paste it below (the per-signature pre-flight checks every signature")
+    Print("recovers to THIS key before anything reaches the chain):\n")
+    wire_pub_em = _prompt("Wire PUB_EM_ pubkey: ")
+    if not wire_pub_em.startswith("PUB_EM_"):
+        errorExit(f"pasted Wire pubkey is not a PUB_EM_ value: {wire_pub_em!r}")
+    return {"wire_pub_em": wire_pub_em}, None
 
 
 def _verify_sig_locally(digest_hex: str, sig_em: str,
                         expected_wire_pub: str) -> tuple[int, str]:
     """Offline pre-flight before pushing: recover the signer pubkey from
-    (digest, sig) using the SAME EIP-191 envelope nodeop applies, and confirm it
-    matches the EM key registered on the account.
+    (digest, sig) via `clio convert em_recover` -- the SAME libfc EIP-191 path
+    nodeop applies -- and confirm it matches the EM key registered on the
+    account.
 
-    Delegates to verify_em_sig.py (its documented CLI) rather than reaching into
-    its internals, and mirrors how metamask_sim.py is driven elsewhere here.
-
-    Returns (returncode, detail) where returncode follows verify_em_sig.py's
-    contract: 0 ok, 1 recovery failed (the pasted text is not a recoverable
-    signature), 2 recovered-key mismatch (wrong/stale digest signed), 3 CLI
-    error. `detail` carries its recovered-vs-expected output so a bad paste is
-    diagnosable HERE instead of as an opaque unsatisfied_authorization.
+    Returns (status, detail): 0 ok; 1 not a recoverable signature (clio could
+    not recover, e.g. malformed paste); 2 recovered-key mismatch (wrong/stale
+    digest signed). `detail` carries the recovered-vs-expected text so a bad
+    paste is diagnosable HERE instead of as an opaque unsatisfied_authorization.
     """
-    cmd = [
-        _dep_python(), str(HERE / "verify_em_sig.py"),
-        "--digest", digest_hex,
-        "--signature", sig_em,
-        "--expect-pub", expected_wire_pub,
-    ]
-    res = subprocess.run(cmd, capture_output=True, text=True)
-    parts = [res.stdout.strip(), res.stderr.strip()]
-    detail = "\n".join(p for p in parts if p)
-    return res.returncode, detail
+    r = _clio_offline("convert", "em_recover", sig_em, digest_hex, expect_fail=True)
+    if r is None or "Public key" not in r:
+        return 1, "clio could not recover a public key from the pasted signature"
+    recovered = r["Public key"]
+    if recovered == expected_wire_pub:
+        return 0, recovered
+    return 2, (f"  recovered : {recovered}\n"
+               f"  expected  : {expected_wire_pub}")
 
 
-def _sign_with_metamask(simulate: bool, private_key_hex: str | None,
+def _sign_with_metamask(simulate: bool, sim_priv_em: str | None,
                         digest_hex: str, expected_wire_pub: str) -> str:
-    """Get a SIG_EM_... signature for `digest_hex` either from sim or from human paste.
+    """Get a SIG_EM_... signature for `digest_hex` from clio (sim) or human paste.
 
     Manual mode runs an offline recovery pre-flight on the pasted signature before
     returning it: anything that does not recover to the account's registered EM
     key is rejected locally with a clear diagnostic and the user is re-prompted,
     rather than letting nodeop reject it later with an opaque
-    unsatisfied_authorization. (The simulate path is unchanged.)
+    unsatisfied_authorization.
     """
     if simulate:
-        assert private_key_hex, "simulator mode requires the simulator's private key"
-        cmd = [
-            _dep_python(), str(HERE / "metamask_sim.py"),
-            "sign",
-            "--private-key", private_key_hex,
-            "--digest", digest_hex,
-            "--raw",
-        ]
-        res = subprocess.run(cmd, capture_output=True, text=True, check=True)
-        return res.stdout.strip()
+        assert sim_priv_em, "simulator mode requires the simulator's PVT_EM_ key"
+        # clio convert em_sign applies the same EIP-191 envelope nodeop recovers
+        # with; pinned byte-for-byte to MetaMask by the clio_em_key_test ctest.
+        return _clio_offline("convert", "em_sign", digest_hex,
+                             "--private-key", sim_priv_em)["Signature"]
 
     Print("\n" + "=" * 72)
     Print("Paste THIS EXACT digest into the HTML page's 'Digest to sign' field:")
@@ -331,19 +245,15 @@ def _sign_with_metamask(simulate: bool, private_key_hex: str | None,
         if rc == 0:
             Print("pre-flight OK: signature recovers to the registered EM key; pushing")
             return sig
-        # A missing dependency / CLI failure is not something re-pasting can fix;
-        # fail loudly rather than spinning the prompt forever. (_dep_python makes
-        # the missing-module case unreachable, but guard it regardless.)
-        if "No module named" in detail or rc not in (1, 2):
-            errorExit(f"pre-flight could not run (verify_em_sig exit {rc}); "
-                      f"this is an environment problem, not a bad signature:\n{detail}")
         Print(f"\n*** REJECTED locally (NOT sent to chain):\n{detail}\n")
         if rc == 2:
             Print("The signature recovers to a DIFFERENT key than the one registered.")
             Print("Almost always a stale signature from an earlier run, or the")
             Print("pubkey-reveal signature instead of this transaction's digest.")
             Print(f"The digest to sign is still: {digest_hex}")
-            Print("Re-sign THAT exact digest in the browser and paste again.\n")
+            Print("Re-sign THAT exact digest in the browser and paste again.")
+            Print("If this persists across a fresh re-sign, the PUB_EM_ you")
+            Print("pasted earlier may not be this wallet's key.\n")
         else:  # rc == 1
             Print("That is not a recoverable signature. Paste the full")
             Print("SIG_EM_0x... value exactly as the page's 'Wire SIG_EM_' box")
@@ -390,7 +300,7 @@ def _build_unsigned_transfer(node, sender: str, recipient: str, quantity: str,
 
 
 def _sign_unsigned_packed(packed, chain_id_hex: str, simulate: bool,
-                          sim_private_key: str | None,
+                          sim_priv_em: str | None,
                           expected_wire_pub: str) -> tuple[str, str]:
     """Compute sig_digest and obtain a SIG_EM_... over it. Returns (sig_em, digest_hex).
 
@@ -398,7 +308,7 @@ def _sign_unsigned_packed(packed, chain_id_hex: str, simulate: bool,
     pre-flights the pasted signature against it before returning.
     """
     sig_digest = _compute_sig_digest(chain_id_hex, packed["packed_trx"])
-    sig_em = _sign_with_metamask(simulate, sim_private_key, sig_digest, expected_wire_pub)
+    sig_em = _sign_with_metamask(simulate, sim_priv_em, sig_digest, expected_wire_pub)
     return sig_em, sig_digest
 
 
@@ -498,9 +408,10 @@ def _assert_executed(label: str, result: dict):
 def main() -> int:
     app_args = AppArgs()
     app_args.add_bool("--simulate",
-                      help="Drive metamask_sim.py to sign instead of asking the user to paste")
+                      help="Sign automatically via clio's EM tooling instead of asking the user to paste")
     app_args.add("--sim-private-key", type=str, default=None,
-                 help="If --simulate, use this hex private key instead of a fresh one")
+                 help="If --simulate, sign with this fixed key (PVT_EM_... or a raw 0x "
+                      "Ethereum hex secret) instead of a freshly generated one")
     app_args.add("--transfer-amount", type=str, default="1.0000 SYS",
                  help="Asset string to transfer (default: '1.0000 SYS')")
     app_args.add("--trx-expiration", type=int, default=600,
@@ -515,14 +426,6 @@ def main() -> int:
     if not 0 < args.trx_expiration <= MAX_TRX_EXPIRATION_SECONDS:
         errorExit(f"--trx-expiration must be in (0, {MAX_TRX_EXPIRATION_SECONDS}] "
                   f"seconds, got {args.trx_expiration}")
-
-    # Resolve the eth_account interpreter up front: a deps-less launcher errors
-    # here in ~1s with guidance, instead of after a multi-minute cluster launch
-    # and (manual mode) a paste that the pre-flight could never accept.
-    dep_py = _dep_python()
-    if dep_py != sys.executable:
-        Print(f"note: {sys.executable} lacks the eth_account stack; "
-              f"using {dep_py} for sim / pre-flight subprocesses")
 
     Utils.Debug = args.v
     cluster = Cluster(
@@ -568,7 +471,7 @@ def main() -> int:
             errorExit("createAccountAndVerify failed")
 
         Print("setting up Metamask-style EM key on the test account")
-        em_info, sim_private_key = _create_em_key(args.simulate, args.sim_private_key)
+        em_info, sim_priv_em = _create_em_key(args.simulate, args.sim_private_key)
         Print(json.dumps(em_info, indent=2))
 
         Print("calling sysio::expandauth to add the EM key to active permission")
@@ -611,7 +514,7 @@ def main() -> int:
                                                "metamask http transfer",
                                                args.trx_expiration)
         sig_em_http, digest_http = _sign_unsigned_packed(
-            packed_http, chain_id_hex, args.simulate, sim_private_key,
+            packed_http, chain_id_hex, args.simulate, sim_priv_em,
             em_info["wire_pub_em"])
         Print(f"sig_digest: {digest_http}")
         Print(f"signature : {sig_em_http}")
@@ -628,7 +531,7 @@ def main() -> int:
                                                "metamask clio transfer",
                                                args.trx_expiration)
         sig_em_clio, digest_clio = _sign_unsigned_packed(
-            packed_clio, chain_id_hex, args.simulate, sim_private_key,
+            packed_clio, chain_id_hex, args.simulate, sim_priv_em,
             em_info["wire_pub_em"])
         Print(f"sig_digest: {digest_clio}")
         Print(f"signature : {sig_em_clio}")
