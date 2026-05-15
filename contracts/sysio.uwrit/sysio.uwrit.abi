@@ -433,7 +433,7 @@
                     "value": 60932
                 },
                 {
-                    "name": "ATTESTATION_TYPE_SWAP",
+                    "name": "ATTESTATION_TYPE_SWAP_REQUEST",
                     "value": 60934
                 },
                 {
@@ -453,7 +453,7 @@
                     "value": 60938
                 },
                 {
-                    "name": "ATTESTATION_TYPE_REMIT",
+                    "name": "ATTESTATION_TYPE_SWAP_REMIT",
                     "value": 60944
                 },
                 {
@@ -461,16 +461,8 @@
                     "value": 60945
                 },
                 {
-                    "name": "ATTESTATION_TYPE_EPOCH_SYNC",
-                    "value": 60946
-                },
-                {
                     "name": "ATTESTATION_TYPE_OPERATORS",
                     "value": 60947
-                },
-                {
-                    "name": "ATTESTATION_TYPE_REMIT_CONFIRM",
-                    "value": 60948
                 },
                 {
                     "name": "ATTESTATION_TYPE_BATCH_OPERATOR_GROUPS",
@@ -509,8 +501,12 @@
                     "value": 60956
                 },
                 {
-                    "name": "ATTESTATION_TYPE_EMISSIONS_BLOCKED",
+                    "name": "ATTESTATION_TYPE_SWAP_REJECTED",
                     "value": 60957
+                },
+                {
+                    "name": "ATTESTATION_TYPE_EMISSIONS_BLOCKED",
+                    "value": 60958
                 }
             ]
         },

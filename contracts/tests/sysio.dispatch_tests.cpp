@@ -47,7 +47,7 @@
 #include <fc/crypto/private_key.hpp>
 #include <fc/crypto/public_key.hpp>
 #include <fc/crypto/signature.hpp>
-#include <fc-lite/crypto/chain_types.hpp>
+#include <magic_enum/magic_enum.hpp>
 
 #include "contracts.hpp"
 
@@ -130,11 +130,11 @@ std::string contract_em_pubkey_to_string(const fc::crypto::public_key& pk) {
 std::string build_link_message(
    const fc::crypto::public_key& pub_key,
    const std::string& account,
-   fc::crypto::chain_kind_t chain_kind,
+   sysio::opp::types::ChainKind chain_kind,
    uint64_t nonce)
 {
    auto pub_key_str = contract_em_pubkey_to_string(pub_key);
-   auto chain_kind_str = std::to_string(static_cast<uint8_t>(chain_kind));
+   auto chain_kind_str = std::to_string(magic_enum::enum_integer(chain_kind));
    return pub_key_str + "|" + account + "|" + chain_kind_str + "|" +
           std::to_string(nonce) + "|createlink auth";
 }
@@ -297,14 +297,14 @@ public:
       const uint64_t nonce = control->head().block_time().time_since_epoch().count() / 1000;
 
       auto msg = build_link_message(pub, UWRIT_OP.to_string(),
-                                    chain_kind_ethereum, nonce);
+                                    ChainKind::CHAIN_KIND_ETHEREUM, nonce);
       auto msg_hash = keccak256::hash(msg);
       auto sig = priv.sign(fc::sha256(reinterpret_cast<const char*>(msg_hash.data()),
                                       32));
 
       BOOST_REQUIRE_EQUAL(success(), push(AUTHEX_ACCOUNT, authex_abi, UWRIT_OP,
          "createlink"_n, mvo()
-            ("chain_kind", static_cast<uint8_t>(chain_kind_ethereum))
+            ("chain_kind", ChainKind::CHAIN_KIND_ETHEREUM)
             ("account",    UWRIT_OP.to_string())
             ("sig",        sig)
             ("pub_key",    pub)
@@ -316,7 +316,7 @@ public:
    /// Bootstrap epoch + opreg with the minimum config that pins
    /// operators_per_group=1 (so a single deliver = consensus). Then register
    /// `BATCHOP` as a bootstrapped batch operator (so it lands in the active
-   /// group via initgroups), `UWRIT_OP` as an underwriter (PENDING — its
+   /// group via schbatchgps), `UWRIT_OP` as an underwriter (PENDING — its
    /// status is irrelevant for dispatch tests, only its existence matters
    /// for opreg::depositinle's `operator not found` check), bootstrap the
    /// UWRIT_OP↔Ethereum authex link (so msgch's `op_address` → WIRE-name
@@ -333,10 +333,16 @@ public:
 
       BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT,
          "setconfig"_n, mvo()
-            ("max_available_producers",   21)
-            ("max_available_batch_ops",   63)
-            ("max_available_underwriters",21)
-            ("terminate_prune_delay_ms",  600000)));
+            ("max_available_producers",          21)
+            ("max_available_batch_ops",          63)
+            ("max_available_underwriters",       21)
+            ("terminate_prune_delay_ms",         600000)
+            ("terminate_max_consecutive_misses", 5)
+            ("terminate_max_pct_misses_24h",     5)
+            ("terminate_window_ms",              uint64_t{24ULL * 60 * 60 * 1000})
+            ("req_prod_collat",                  fc::variants{})
+            ("req_batchop_collat",               fc::variants{})
+            ("req_uw_collat",                    fc::variants{})));
 
       BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT,
          "regoperator"_n, mvo()
@@ -363,7 +369,7 @@ public:
             ("chain_id",   31337)));
 
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT,
-         "initgroups"_n, mvo()));
+         "schbatchgps"_n, mvo()));
 
       // Genesis advance — permissionless so anyone can sign; epoch just
       // needs the call to set current_epoch_index to 1.

@@ -239,12 +239,20 @@
                     "type": "ChainKind"
                 },
                 {
-                    "name": "amount",
-                    "type": "TokenAmount"
+                    "name": "token_kind",
+                    "type": "TokenKind"
                 },
                 {
-                    "name": "actor",
-                    "type": "ChainAddress"
+                    "name": "amount",
+                    "type": "uint64"
+                },
+                {
+                    "name": "actor_chain",
+                    "type": "ChainKind"
+                },
+                {
+                    "name": "actor_address",
+                    "type": "bytes"
                 },
                 {
                     "name": "original_message_id",
@@ -292,6 +300,18 @@
                 },
                 {
                     "name": "terminate_prune_delay_ms",
+                    "type": "uint64"
+                },
+                {
+                    "name": "terminate_max_consecutive_misses",
+                    "type": "uint32"
+                },
+                {
+                    "name": "terminate_max_pct_misses_24h",
+                    "type": "uint32"
+                },
+                {
+                    "name": "terminate_window_ms",
                     "type": "uint64"
                 }
             ]
@@ -478,8 +498,12 @@
                     "type": "ChainKind"
                 },
                 {
+                    "name": "token_kind",
+                    "type": "TokenKind"
+                },
+                {
                     "name": "amount",
-                    "type": "TokenAmount"
+                    "type": "uint64"
                 }
             ]
         },
@@ -502,6 +526,30 @@
                 {
                     "name": "terminate_prune_delay_ms",
                     "type": "uint64"
+                },
+                {
+                    "name": "terminate_max_consecutive_misses",
+                    "type": "uint32"
+                },
+                {
+                    "name": "terminate_max_pct_misses_24h",
+                    "type": "uint32"
+                },
+                {
+                    "name": "terminate_window_ms",
+                    "type": "uint64"
+                },
+                {
+                    "name": "req_prod_collat",
+                    "type": "chain_min_bond[]"
+                },
+                {
+                    "name": "req_batchop_collat",
+                    "type": "chain_min_bond[]"
+                },
+                {
+                    "name": "req_uw_collat",
+                    "type": "chain_min_bond[]"
                 }
             ]
         },
@@ -634,8 +682,12 @@
                     "type": "ChainKind"
                 },
                 {
+                    "name": "token_kind",
+                    "type": "TokenKind"
+                },
+                {
                     "name": "amount",
-                    "type": "TokenAmount"
+                    "type": "uint64"
                 }
             ]
         }

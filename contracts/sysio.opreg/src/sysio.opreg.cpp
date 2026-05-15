@@ -44,11 +44,27 @@ uint128_t make_account_chain_token_key(name account, ChainKind chain, TokenKind 
 std::optional<uint64_t> find_outpost_id_for_chain(ChainKind chain) {
    sysio::epoch::outposts_t outposts(opreg::EPOCH_ACCOUNT);
    for (auto it = outposts.begin(); it != outposts.end(); ++it) {
-      if (static_cast<int>(it->chain_kind) == static_cast<int>(chain)) {
+      if (it->chain_kind == chain) {
          return it->id;
       }
    }
    return std::nullopt;
+}
+
+/// Enforce uniqueness of `(chain, token_kind)` within a collateral-
+/// requirements vector. Duplicates would cause the same (chain, token)
+/// pair to be checked twice during eligibility evaluation — harmless
+/// behaviorally but a clear configuration error worth surfacing at the
+/// boundary rather than silently absorbing.
+void require_no_duplicate_chain_token(const std::vector<opreg::chain_min_bond>& v,
+                                      const char* role_label) {
+   for (auto outer = v.begin(); outer != v.end(); ++outer) {
+      for (auto inner = std::next(outer); inner != v.end(); ++inner) {
+         check(!(outer->chain == inner->chain && outer->token_kind == inner->token_kind),
+               std::string(role_label) +
+                  ": duplicate (chain, token_kind) in collateral requirements");
+      }
+   }
 }
 
 } // anonymous namespace
@@ -59,20 +75,54 @@ std::optional<uint64_t> find_outpost_id_for_chain(ChainKind chain) {
 void opreg::setconfig(uint32_t max_available_producers,
                       uint32_t max_available_batch_ops,
                       uint32_t max_available_underwriters,
-                      uint64_t terminate_prune_delay_ms) {
+                      uint64_t terminate_prune_delay_ms,
+                      uint32_t terminate_max_consecutive_misses,
+                      uint32_t terminate_max_pct_misses_24h,
+                      uint64_t terminate_window_ms,
+                      std::vector<chain_min_bond> req_prod_collat,
+                      std::vector<chain_min_bond> req_batchop_collat,
+                      std::vector<chain_min_bond> req_uw_collat) {
    require_auth(get_self());
 
    check(max_available_producers > 0, "max_available_producers must be positive");
    check(max_available_batch_ops > 0, "max_available_batch_ops must be positive");
    check(max_available_underwriters > 0, "max_available_underwriters must be positive");
    check(terminate_prune_delay_ms > 0, "terminate_prune_delay_ms must be positive");
+   check(terminate_max_consecutive_misses > 0,
+         "terminate_max_consecutive_misses must be positive");
+   check(terminate_max_pct_misses_24h > 0 && terminate_max_pct_misses_24h <= 100,
+         "terminate_max_pct_misses_24h must be in (0, 100]");
+   check(terminate_window_ms > 0, "terminate_window_ms must be positive");
+
+   require_no_duplicate_chain_token(req_prod_collat,    "req_prod_collat");
+   require_no_duplicate_chain_token(req_batchop_collat, "req_batchop_collat");
+   require_no_duplicate_chain_token(req_uw_collat,      "req_uw_collat");
+
+   // Stamp every entry's `config_timestamp_ms` with the on-chain time
+   // so consumers can detect stale configuration without trusting the
+   // caller's clock — the action's value for that field is ignored.
+   const auto now = current_time_ms();
+   const auto stamp = [now](std::vector<chain_min_bond>& v) {
+      for (auto& entry : v) {
+         entry.config_timestamp_ms = now;
+      }
+   };
+   stamp(req_prod_collat);
+   stamp(req_batchop_collat);
+   stamp(req_uw_collat);
 
    opconfig_t cfg_tbl(get_self());
    op_config cfg = cfg_tbl.get_or_default(op_config{});
-   cfg.max_available_producers = max_available_producers;
-   cfg.max_available_batch_ops = max_available_batch_ops;
-   cfg.max_available_underwriters = max_available_underwriters;
-   cfg.terminate_prune_delay_ms = terminate_prune_delay_ms;
+   cfg.max_available_producers          = max_available_producers;
+   cfg.max_available_batch_ops          = max_available_batch_ops;
+   cfg.max_available_underwriters       = max_available_underwriters;
+   cfg.terminate_prune_delay_ms         = terminate_prune_delay_ms;
+   cfg.terminate_max_consecutive_misses = terminate_max_consecutive_misses;
+   cfg.terminate_max_pct_misses_24h     = terminate_max_pct_misses_24h;
+   cfg.terminate_window_ms              = terminate_window_ms;
+   cfg.req_prod_collat                  = std::move(req_prod_collat);
+   cfg.req_batchop_collat               = std::move(req_batchop_collat);
+   cfg.req_uw_collat                    = std::move(req_uw_collat);
    cfg_tbl.set(cfg, get_self());
 }
 
@@ -123,10 +173,9 @@ void opreg::regoperator(name account,
       auto namechain_idx = links.get_index<"bynamechain"_n>();
 
       for (auto op_it = outposts.begin(); op_it != outposts.end(); ++op_it) {
-         // authex uses fc::crypto::chain_kind_t which has identical numeric values
-         // to opp::types::ChainKind (ethereum=2, solana=3, sui=4)
-         auto chain = static_cast<fc::crypto::chain_kind_t>(op_it->chain_kind);
-         uint128_t composite_key = to_namechain_key(account, chain);
+         // authex now keys on `opp::types::ChainKind` directly — same
+         // type as `outpost_info.chain_kind`, no cast.
+         uint128_t composite_key = to_namechain_key(account, op_it->chain_kind);
          auto link_it = namechain_idx.find(composite_key);
          check(link_it != namechain_idx.end(),
                "missing authex link for outpost chain");
@@ -231,8 +280,19 @@ uint64_t slashable_now(const opreg::operator_entry& op,
 
 /// Check whether the operator's available balance on (chain, token_kind)
 /// covers the role's minimum bond on that pair.
+///
+/// Bootstrapped operators are ACTIVE-by-fiat and bypass the per-outpost
+/// bond check regardless of how `req_*_collat` is configured — they
+/// represent system-installed operators that the depot trusts without
+/// requiring collateral. Non-bootstrapped operators must satisfy every
+/// `(chain, token_kind)` entry in the matching `req_*_collat` vector;
+/// an empty/unset vector means "no operator of this role can become
+/// ACTIVE until configuration lands."
 bool meets_role_min(const opreg::operator_entry& op,
                     const opreg::op_config& cfg) {
+   if (op.is_bootstrapped) {
+      return true;
+   }
    const std::vector<opreg::chain_min_bond>* reqs = nullptr;
    switch (op.type) {
       case OperatorType::OPERATOR_TYPE_PRODUCER:    reqs = &cfg.req_prod_collat;    break;
@@ -241,9 +301,7 @@ bool meets_role_min(const opreg::operator_entry& op,
       default:                                       return false;
    }
    if (!reqs || reqs->empty()) {
-      // No requirements configured — bootstrapped operators are eligible by fiat,
-      // others stay PENDING until config is set.
-      return op.is_bootstrapped;
+      return false;
    }
    for (const auto& req : *reqs) {
       uint64_t avail = available_inline(op, req.chain, req.token_kind);
@@ -352,35 +410,6 @@ namespace {
 /// (`std::array<unsigned char, 32>`). Other variant arms (WebAuthn = 2,
 /// BLS = 6) are not part of the operator-collateral flow — we drop those by
 /// returning an empty vector, which then fails the `bypubkey` lookup on the
-/// depot side.
-///
-/// `std::get<ecc_public_key>` is ambiguous here (the same alias appears at
-/// indices 0, 1, and 3 in the variant), so we dispatch by index using
-/// `std::get<N>`.
-std::vector<char> pubkey_to_bytes(const sysio::public_key& pk) {
-   switch (pk.index()) {
-      case 0: {
-         const auto& arr = std::get<0>(pk);
-         return std::vector<char>(arr.begin(), arr.end());
-      }
-      case 1: {
-         const auto& arr = std::get<1>(pk);
-         return std::vector<char>(arr.begin(), arr.end());
-      }
-      case 3: {
-         const auto& arr = std::get<3>(pk);
-         return std::vector<char>(arr.begin(), arr.end());
-      }
-      case 4: {
-         const auto& arr = std::get<4>(pk);
-         return std::vector<char>(
-            reinterpret_cast<const char*>(arr.data()),
-            reinterpret_cast<const char*>(arr.data()) + arr.size());
-      }
-      default:
-         return {};
-   }
-}
 
 /// Look up `account`'s registered public key for `chain` from
 /// `sysio.authex::links` (`bynamechain` index) and pack it into a
@@ -388,10 +417,9 @@ std::vector<char> pubkey_to_bytes(const sysio::public_key& pk) {
 /// downstream outpost / depot lookup will then fail gracefully (the depot's
 /// `dispatch_operator_action` rejects empty `op_address.address`).
 opp::types::ChainAddress operator_chain_address(name account, ChainKind chain) {
-   auto authex_chain = static_cast<fc::crypto::chain_kind_t>(chain);
    authex::links_t links(opreg::AUTHEX_ACCOUNT);
    auto idx = links.get_index<"bynamechain"_n>();
-   uint128_t key = to_namechain_key(account, authex_chain);
+   uint128_t key = to_namechain_key(account, chain);
 
    opp::types::ChainAddress addr;
    addr.kind = chain;
@@ -440,7 +468,11 @@ void emit_slash_attestation(name self, const OperatorAction& slash_action) {
    auto outpost_id = find_outpost_id_for_chain(slash_action.chain);
    if (!outpost_id) return;   // no outpost on this chain — nothing to slash through
 
-   auto [encoded, out] = zpp::bits::data_out<char>();
+   // `no_size{}` — raw protobuf bytes, no 4-byte zpp length prefix. The
+   // outpost decodes the attestation `data` field as a pure protobuf
+   // message; a size prefix would corrupt the first field tag.
+   std::vector<char> encoded;
+   auto out = zpp::bits::out{encoded, zpp::bits::no_size{}};
    (void)out(slash_action);
 
    action(
@@ -476,7 +508,9 @@ void emit_deposit_revert(name self,
    dr.original_deposit_message_id.assign(mh.begin(), mh.end());
    dr.reason = reason;
 
-   auto [encoded, out] = zpp::bits::data_out<char>();
+   // `no_size{}` — see emit_slash_attestation for the rationale.
+   std::vector<char> encoded;
+   auto out = zpp::bits::out{encoded, zpp::bits::no_size{}};
    (void)out(dr);
 
    action(
@@ -546,7 +580,9 @@ void emit_withdraw_remit(name self,
    oa.request_id = request_id;
    oa.chain      = chain;
 
-   auto [encoded, out] = zpp::bits::data_out<char>();
+   // `no_size{}` — see emit_slash_attestation for the rationale.
+   std::vector<char> encoded;
+   auto out = zpp::bits::out{encoded, zpp::bits::no_size{}};
    (void)out(oa);
 
    action(
@@ -716,17 +752,15 @@ void opreg::withdraw(name account, uint64_t amount) {
 // once the underlying condition resolves.
 void opreg::withdrawinle(name account,
                          opp::types::ChainKind chain,
-                         opp::types::TokenAmount amount) {
+                         opp::types::TokenKind token_kind,
+                         uint64_t amount) {
    require_auth(get_self());
 
    operators_t ops(get_self());
    auto op_pk = operator_key{account.value};
 
-   const TokenKind token_kind = amount.kind;
-   const uint64_t  raw_amount = static_cast<uint64_t>(static_cast<int64_t>(amount.amount));
-
-   auto result = try_enqueue_withdraw(account, chain, token_kind, raw_amount);
-   auto action = build_withdraw_request_action(account, chain, token_kind, raw_amount,
+   auto result = try_enqueue_withdraw(account, chain, token_kind, amount);
+   auto action = build_withdraw_request_action(account, chain, token_kind, amount,
                                                result.request_id);
    append_action_log(ops, op_pk, action, result.success, std::move(result.error_message));
 }
@@ -837,21 +871,28 @@ void opreg::deposit(name account, uint64_t amount) {
 // penalty, computed locally on the outpost when the revert is processed).
 void opreg::depositinle(name account,
                         opp::types::ChainKind chain,
-                        opp::types::TokenAmount amount,
-                        opp::types::ChainAddress actor,
+                        opp::types::TokenKind token_kind,
+                        uint64_t amount,
+                        opp::types::ChainKind actor_chain,
+                        std::vector<char> actor_address,
                         checksum256 original_message_id) {
    require_auth(get_self());
 
    operators_t ops(get_self());
    auto op_pk = operator_key{account.value};
 
-   const TokenKind token_kind = amount.kind;
-   const uint64_t  raw_amount = static_cast<uint64_t>(static_cast<int64_t>(amount.amount));
-   auto deposit_action = build_deposit_action(actor, chain, token_kind, raw_amount);
+   // Reconstruct the depositor's ChainAddress locally — the proto message
+   // type stays out of the ABI but is fine to use inside the contract for
+   // building OPERATOR_ACTION logs and DEPOSIT_REVERT correlation.
+   opp::types::ChainAddress actor;
+   actor.kind    = actor_chain;
+   actor.address = std::move(actor_address);
 
-   if (raw_amount == 0) {
+   auto deposit_action = build_deposit_action(actor, chain, token_kind, amount);
+
+   if (amount == 0) {
       const std::string err = "amount must be positive";
-      emit_deposit_revert(get_self(), chain, actor, token_kind, raw_amount,
+      emit_deposit_revert(get_self(), chain, actor, token_kind, amount,
                           original_message_id, err);
       append_action_log(ops, op_pk, deposit_action, false, err);
       return;
@@ -859,7 +900,7 @@ void opreg::depositinle(name account,
    if (!ops.contains(op_pk)) {
       // No entry to log to. The DEPOSIT_REVERT IS the audit record for the
       // outpost — outpost emits a local refund event the depositor reads.
-      emit_deposit_revert(get_self(), chain, actor, token_kind, raw_amount,
+      emit_deposit_revert(get_self(), chain, actor, token_kind, amount,
                           original_message_id, "operator not registered");
       return;
    }
@@ -867,14 +908,26 @@ void opreg::depositinle(name account,
    if (op.status == OperatorStatus::OPERATOR_STATUS_SLASHED ||
        op.status == OperatorStatus::OPERATOR_STATUS_TERMINATED) {
       const std::string err = "operator not in a deposit-eligible state";
-      emit_deposit_revert(get_self(), chain, actor, token_kind, raw_amount,
+      emit_deposit_revert(get_self(), chain, actor, token_kind, amount,
+                          original_message_id, err);
+      append_action_log(ops, op_pk, deposit_action, false, err);
+      return;
+   }
+   // Bootstrapped operators are bonded by fiat — no deposit is ever
+   // permitted for them. Reject via DEPOSIT_REVERT (NOT a throw, per
+   // the no-throws-in-OPP-handlers rule — a throw here would halt the
+   // entire envelope's evalcons → chain stalls). The outpost refunds
+   // the depositor when it processes the revert.
+   if (op.is_bootstrapped) {
+      const std::string err = "bootstrapped operator cannot accept deposits";
+      emit_deposit_revert(get_self(), chain, actor, token_kind, amount,
                           original_message_id, err);
       append_action_log(ops, op_pk, deposit_action, false, err);
       return;
    }
 
    ops.modify(same_payer, op_pk, [&](auto& o) {
-      add_balance(o, chain, token_kind, raw_amount);
+      add_balance(o, chain, token_kind, amount);
    });
    append_action_log(ops, op_pk, deposit_action, true, "");
 
@@ -1067,12 +1120,10 @@ void opreg::slash(name account, std::string reason) {
 // ---------------------------------------------------------------------------
 void opreg::releaselock(name account,
                         opp::types::ChainKind chain,
-                        opp::types::TokenAmount amount) {
+                        opp::types::TokenKind token_kind,
+                        uint64_t amount) {
    require_auth(UWRIT_ACCOUNT);
-
-   const TokenKind token_kind = amount.kind;
-   const uint64_t  raw_amount = static_cast<uint64_t>(static_cast<int64_t>(amount.amount));
-   check(raw_amount > 0, "amount must be positive");
+   check(amount > 0, "amount must be positive");
 
    operators_t ops(get_self());
    auto op_pk = operator_key{account.value};
@@ -1089,12 +1140,12 @@ void opreg::releaselock(name account,
    // SLASHED or TERMINATED — decrement opreg balance and emit the matching
    // outbound attestation (deferred-slash to LP or deferred-remit to authex).
    ops.modify(same_payer, op_pk, [&](auto& o) {
-      subtract_balance(o, chain, token_kind, raw_amount);
+      subtract_balance(o, chain, token_kind, amount);
    });
 
    if (op.status == OperatorStatus::OPERATOR_STATUS_SLASHED) {
       auto slash_action = build_slash_action(op.account, op.type,
-                                             chain, token_kind, raw_amount,
+                                             chain, token_kind, amount,
                                              /*reason*/ "deferred slash on lock release");
       emit_slash_attestation(get_self(), slash_action);
       append_action_log(ops, op_pk, slash_action, /*success*/ true, "");
@@ -1107,12 +1158,12 @@ void opreg::releaselock(name account,
             permission_level{get_self(), "active"_n},
             TOKEN_ACCOUNT, "transfer"_n,
             std::make_tuple(get_self(), account,
-               asset(static_cast<int64_t>(raw_amount), CORE_SYM),
+               asset(static_cast<int64_t>(amount), CORE_SYM),
                std::string("terminate-deferred-remit"))
          ).send();
       } else {
          emit_withdraw_remit(get_self(), op.account, op.type,
-                             chain, token_kind, raw_amount, /*request_id*/ 0);
+                             chain, token_kind, amount, /*request_id*/ 0);
       }
    }
 }
@@ -1161,6 +1212,16 @@ void terminate_inline(name self, name account, const std::string& reason) {
 
    // Remit each (chain, token_kind). For WIRE-chain: direct token transfer
    // back to the operator. For outpost chains: queue WITHDRAW_REMIT.
+   //
+   // After each remit, append a WITHDRAW_REMIT entry to the operator's
+   // `recent_actions` ring buffer so the audit trail mirrors the
+   // operator-initiated withdraw flow (`flushwtdw` does the same at line
+   // ~1008). Without this entry, downstream consumers polling
+   // `operators[op].recent_actions` for proof of remit emission see only
+   // the prior DEPOSIT_REQUESTs and miss the termination payout — same
+   // semantic gap on TERMINATED ops as on a normal queued withdraw, only
+   // resolvable by querying msgch internals (which are transient — the
+   // rows drain on the next `buildenv`).
    for (const auto& rp : to_remit) {
       if (rp.chain == ChainKind::CHAIN_KIND_WIRE) {
          action(
@@ -1174,6 +1235,10 @@ void terminate_inline(name self, name account, const std::string& reason) {
          emit_withdraw_remit(self, account, op.type,
                              rp.chain, rp.token_kind, rp.amount, /*request_id*/ 0);
       }
+      OperatorAction remit_action = build_withdraw_remit_action(
+         account, rp.chain, rp.token_kind, rp.amount, /*request_id*/ 0);
+      append_action_log(ops, op_pk, remit_action, /*success*/ true,
+                        std::string("terminate-remit"));
    }
 }
 
@@ -1206,13 +1271,27 @@ void opreg::termcheck(name account) {
    if (!ops.contains(op_pk)) return;
    auto op = ops.get(op_pk);
    if (op.status != OperatorStatus::OPERATOR_STATUS_ACTIVE) return;
+   // Bootstrapped operators are the genesis / chain-of-trust seed set and
+   // are NEVER subject to rolling-window termination — see
+   // .claude/rules/bootstrapped-operator-invariants.md at the wire root. A
+   // transient bug in the deliver / consensus / advance pipeline (or a
+   // benign operator-side outage) must not be able to tear the
+   // bootstrapped seed set down, because doing so drops the chain below
+   // `batch_operator_minimum_active` with no remaining ACTIVE operators
+   // to advance consensus and no recovery path.
+   if (op.is_bootstrapped) return;
    // Termination on rolling-buffer underperformance is, for now, scoped to
    // batch operators. Producer schedule misses + underwriter offline-too-long
    // are open questions per the plan §1; revisit when those decisions land.
    if (op.type != OperatorType::OPERATOR_TYPE_BATCH) return;
 
+   // Thresholds come from opconfig — tests can dial them down so the
+   // miss-window evaluation fits the test timeout budget.
+   opconfig_t cfg_tbl(get_self());
+   const auto cfg = cfg_tbl.get_or_default(op_config{});
+
    uint64_t now_ms      = current_time_ms();
-   uint64_t window_open = now_ms > TERMINATE_WINDOW_MS ? now_ms - TERMINATE_WINDOW_MS : 0;
+   uint64_t window_open = now_ms > cfg.terminate_window_ms ? now_ms - cfg.terminate_window_ms : 0;
 
    dellog_t log(get_self());
    auto idx = log.get_index<"byaccountts"_n>();
@@ -1235,13 +1314,18 @@ void opreg::termcheck(name account) {
       }
    }
 
-   bool exceeds_consecutive = worst_consecutive > TERMINATE_MAX_CONSECUTIVE_MISSES;
+   bool exceeds_consecutive = worst_consecutive > cfg.terminate_max_consecutive_misses;
    bool exceeds_percent     = total_in_window > 0 &&
-                              (total_misses * 100u / total_in_window) > TERMINATE_MAX_PCT_MISSES_24H;
+                              (total_misses * 100u / total_in_window) > cfg.terminate_max_pct_misses_24h;
    if (exceeds_consecutive || exceeds_percent) {
       terminate_inline(get_self(), account,
-         exceeds_consecutive ? std::string{"rolling-24h: >3 consecutive misses"}
-                             : std::string{"rolling-24h: >5% miss rate"});
+         exceeds_consecutive
+            ? std::string{"rolling-window: >"}
+                 + std::to_string(cfg.terminate_max_consecutive_misses)
+                 + " consecutive misses"
+            : std::string{"rolling-window: >"}
+                 + std::to_string(cfg.terminate_max_pct_misses_24h)
+                 + "% miss rate");
    }
 }
 

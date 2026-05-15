@@ -122,11 +122,6 @@
             ]
         },
         {
-            "name": "initgroups",
-            "base": "",
-            "fields": []
-        },
-        {
             "name": "outpost_info",
             "base": "",
             "fields": [
@@ -190,6 +185,11 @@
             ]
         },
         {
+            "name": "schbatchgps",
+            "base": "",
+            "fields": []
+        },
+        {
             "name": "setconfig",
             "base": "",
             "fields": [
@@ -228,11 +228,6 @@
             "ricardian_contract": ""
         },
         {
-            "name": "initgroups",
-            "type": "initgroups",
-            "ricardian_contract": ""
-        },
-        {
             "name": "pause",
             "type": "pause",
             "ricardian_contract": ""
@@ -240,6 +235,11 @@
         {
             "name": "regoutpost",
             "type": "regoutpost",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "schbatchgps",
+            "type": "schbatchgps",
             "ricardian_contract": ""
         },
         {

@@ -1,10 +1,29 @@
 {
     "____comment": "This file was generated with sysio-abigen. DO NOT EDIT ",
     "version": "sysio::abi/1.2",
-    "types": [],
+    "types": [
+        {
+            "new_type_name": "vint64_t",
+            "type": "varint_int64"
+        }
+    ],
     "structs": [
         {
-            "name": "creditlp",
+            "name": "TokenAmount",
+            "base": "",
+            "fields": [
+                {
+                    "name": "kind",
+                    "type": "TokenKind"
+                },
+                {
+                    "name": "amount",
+                    "type": "vint64_t"
+                }
+            ]
+        },
+        {
+            "name": "debit",
             "base": "",
             "fields": [
                 {
@@ -12,21 +31,47 @@
                     "type": "ChainKind"
                 },
                 {
-                    "name": "paired_token",
+                    "name": "outpost_kind",
                     "type": "TokenKind"
                 },
                 {
-                    "name": "paired_amount",
-                    "type": "uint64"
-                },
-                {
-                    "name": "wire_amount",
+                    "name": "outpost_amount",
                     "type": "uint64"
                 }
             ]
         },
         {
-            "name": "lp_entry",
+            "name": "onreject",
+            "base": "",
+            "fields": [
+                {
+                    "name": "original_swap_remit_id",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "recipient_kind",
+                    "type": "ChainKind"
+                },
+                {
+                    "name": "recipient_address",
+                    "type": "bytes"
+                },
+                {
+                    "name": "unremitted_kind",
+                    "type": "TokenKind"
+                },
+                {
+                    "name": "unremitted_amount",
+                    "type": "uint64"
+                },
+                {
+                    "name": "reason",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "onreward",
             "base": "",
             "fields": [
                 {
@@ -34,16 +79,30 @@
                     "type": "ChainKind"
                 },
                 {
-                    "name": "paired_token",
+                    "name": "outpost_kind",
                     "type": "TokenKind"
                 },
                 {
-                    "name": "reserve_paired",
+                    "name": "outpost_amount",
                     "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "reserve_entry",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain",
+                    "type": "ChainKind"
                 },
                 {
-                    "name": "reserve_wire",
-                    "type": "uint64"
+                    "name": "reserve_outpost_amount",
+                    "type": "TokenAmount"
+                },
+                {
+                    "name": "reserve_wire_amount",
+                    "type": "TokenAmount"
                 },
                 {
                     "name": "connector_weight_bps",
@@ -56,7 +115,7 @@
             ]
         },
         {
-            "name": "lp_key",
+            "name": "reserve_key",
             "base": "",
             "fields": [
                 {
@@ -66,33 +125,7 @@
             ]
         },
         {
-            "name": "quote",
-            "base": "",
-            "fields": [
-                {
-                    "name": "src_chain",
-                    "type": "ChainKind"
-                },
-                {
-                    "name": "src_token",
-                    "type": "TokenKind"
-                },
-                {
-                    "name": "dst_chain",
-                    "type": "ChainKind"
-                },
-                {
-                    "name": "dst_token",
-                    "type": "TokenKind"
-                },
-                {
-                    "name": "src_amount",
-                    "type": "uint64"
-                }
-            ]
-        },
-        {
-            "name": "setlp",
+            "name": "setreserve",
             "base": "",
             "fields": [
                 {
@@ -100,15 +133,15 @@
                     "type": "ChainKind"
                 },
                 {
-                    "name": "paired_token",
+                    "name": "outpost_kind",
                     "type": "TokenKind"
                 },
                 {
-                    "name": "reserve_paired",
+                    "name": "outpost_amount",
                     "type": "uint64"
                 },
                 {
-                    "name": "reserve_wire",
+                    "name": "wire_amount",
                     "type": "uint64"
                 },
                 {
@@ -116,40 +149,82 @@
                     "type": "uint32"
                 }
             ]
+        },
+        {
+            "name": "swapquote",
+            "base": "",
+            "fields": [
+                {
+                    "name": "from_kind",
+                    "type": "TokenKind"
+                },
+                {
+                    "name": "from_amount",
+                    "type": "uint64"
+                },
+                {
+                    "name": "to_chain",
+                    "type": "ChainKind"
+                },
+                {
+                    "name": "to_token",
+                    "type": "TokenKind"
+                }
+            ]
+        },
+        {
+            "name": "varint_int64",
+            "base": "",
+            "fields": [
+                {
+                    "name": "value",
+                    "type": "int64"
+                }
+            ]
         }
     ],
     "actions": [
         {
-            "name": "creditlp",
-            "type": "creditlp",
+            "name": "debit",
+            "type": "debit",
             "ricardian_contract": ""
         },
         {
-            "name": "quote",
-            "type": "quote",
+            "name": "onreject",
+            "type": "onreject",
             "ricardian_contract": ""
         },
         {
-            "name": "setlp",
-            "type": "setlp",
+            "name": "onreward",
+            "type": "onreward",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "setreserve",
+            "type": "setreserve",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "swapquote",
+            "type": "swapquote",
             "ricardian_contract": ""
         }
     ],
     "tables": [
         {
-            "name": "lps",
-            "type": "lp_entry",
+            "name": "reserves",
+            "type": "reserve_entry",
             "index_type": "i64",
             "key_names": ["chain_token"],
             "key_types": ["uint64"],
-            "table_id": 7778
+            "table_id": 52863
         }
     ],
     "ricardian_clauses": [],
     "variants": [],
     "action_results": [
         {
-            "name": "quote",
+            "name": "swapquote",
             "result_type": "uint64"
         }
     ],

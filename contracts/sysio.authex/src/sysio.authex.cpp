@@ -43,20 +43,23 @@ using ed_raw_key_t = std::array<uint8_t, 32>;
 namespace sysio {
 
 // ----- PUBLIC ACTIONS -----
-[[sysio::action]] void authex::createlink(const fc::crypto::chain_kind_t chain_kind, const name& account,
+[[sysio::action]] void authex::createlink(const opp::types::ChainKind chain_kind, const name& account,
                                           const signature& sig, const public_key& pub_key, const uint64_t nonce) {
-   using namespace fc::crypto;
+   using ChainKind = opp::types::ChainKind;
+
    // Require caller authorization
    require_auth(account);
 
    // ——— Chain kind validation ———
-   check(chain_kind == chain_kind_ethereum || chain_kind == chain_kind_solana || chain_kind == chain_kind_sui,
-         "Invalid chain_kind. Supported: chain_kind_ethereum(2), chain_kind_solana(3), chain_kind_sui(4).");
+   check(chain_kind == ChainKind::CHAIN_KIND_ETHEREUM
+         || chain_kind == ChainKind::CHAIN_KIND_SOLANA
+         || chain_kind == ChainKind::CHAIN_KIND_SUI,
+         "Invalid chain_kind. Supported: CHAIN_KIND_ETHEREUM(2), CHAIN_KIND_SOLANA(3), CHAIN_KIND_SUI(4).");
 
    // ——— Table & indices ———
    links_t links(get_self());
    auto by_namechain = links.get_index<"bynamechain"_n>();
-   uint128_t name_chain = (static_cast<uint128_t>(account.value) << 64) | static_cast<uint64_t>(chain_kind);
+   uint128_t name_chain = to_namechain_key(account, chain_kind);
    check(by_namechain.find(name_chain) == by_namechain.end(), "Account already has a link for this chain.");
 
    auto by_pubkey = links.get_index<"bypubkey"_n>();
@@ -69,8 +72,14 @@ namespace sysio {
    check(nonce <= now_ms && now_ms - nonce <= TEN_MIN_MS, "Invalid nonce: must be within the last 10 minutes");
 
    // ——— Build the message string ———
+   //
+   // Wire format: the chain identifier is serialised as the decimal of
+   // its proto numeric value (ETH=2, SOL=3, SUI=4). `magic_enum::
+   // enum_integer` extracts the underlying value type-safely; off-chain
+   // signers reconstruct the same string from their generated
+   // `ChainKind` enum's numeric value.
    static constexpr const char* DIGEST_TAIL = "createlink auth";
-   std::string chain_kind_str = std::to_string(static_cast<uint8_t>(chain_kind));
+   std::string chain_kind_str = std::to_string(magic_enum::enum_integer(chain_kind));
    std::string msg = pubkey_to_string(pub_key) + "|" + account.to_string() + "|" + chain_kind_str + "|" +
                      std::to_string(nonce) + "|" + DIGEST_TAIL;
 
@@ -81,7 +90,7 @@ namespace sysio {
    public_key verified_pub_key = pub_key;
 
    // ——— Curve-specific signing & address derivation ———
-   if (chain_kind == chain_kind_ethereum) {
+   if (chain_kind == ChainKind::CHAIN_KIND_ETHEREUM) {
       // 1) keccak(msg) — use the pubkey string as the contract sees it
       //    (fc/CDT may normalize the compression prefix byte)
       auto eth_hash = sysio::keccak(msg.c_str(), msg.size());
@@ -103,7 +112,7 @@ namespace sysio {
       verified_pub_key = recovered;
       ex_permission = ex_eth;
 
-   } else if (chain_kind == chain_kind_solana) {
+   } else if (chain_kind == ChainKind::CHAIN_KIND_SOLANA) {
       checksum256 hash256;
       // 1) sha256(msg) → returns a checksum256
       checksum256 raw_digest = sysio::sha256(msg.c_str(), msg.size());
@@ -120,7 +129,7 @@ namespace sysio {
       assert_recover_key(hash256, sig, pub_key);
 
       ex_permission = ex_sol;
-   } else if (chain_kind == chain_kind_sui) { // sui
+   } else if (chain_kind == ChainKind::CHAIN_KIND_SUI) { // sui
       std::vector<uint8_t> bcs;
       bcs.reserve(4 + msg.size());
       bcs.insert(bcs.end(), {3, 0, 0, static_cast<uint8_t>(msg.size())});
@@ -192,18 +201,18 @@ namespace sysio {
 
 // TODO: Adjust this logic need to handle removal of ex.eth or ex.sol respectively.
 void authex::onmanualrmv(const name& account, const name& permission) {
-   using namespace fc::crypto;
+   using ChainKind = opp::types::ChainKind;
 
-   chain_kind_t kind;
+   ChainKind kind;
    switch (permission.value) {
    case ex_sol.value:
-      kind = chain_kind_solana;
+      kind = ChainKind::CHAIN_KIND_SOLANA;
       break;
    case ex_eth.value:
-      kind = chain_kind_ethereum;
+      kind = ChainKind::CHAIN_KIND_ETHEREUM;
       break;
    case ex_sui.value:
-      kind = chain_kind_sui;
+      kind = ChainKind::CHAIN_KIND_SUI;
       break;
    default:
       sysio::check(false, "Invalid permission for removal.");

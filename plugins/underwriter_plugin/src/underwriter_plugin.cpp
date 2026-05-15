@@ -321,11 +321,11 @@ struct underwriter_plugin::impl {
          // Parse attestation type
          if (obj["type"].is_string()) {
             auto t = obj["type"].as_string();
-            if (t == "ATTESTATION_TYPE_SWAP") req.attestation_type = ATTESTATION_TYPE_SWAP;
-            else continue; // Only handle SWAP requests
+            if (t == "ATTESTATION_TYPE_SWAP_REQUEST") req.attestation_type = ATTESTATION_TYPE_SWAP_REQUEST;
+            else continue; // Only handle SWAP_REQUEST attestations
          } else {
             req.attestation_type = static_cast<int>(obj["type"].as_uint64());
-            if (req.attestation_type != ATTESTATION_TYPE_SWAP) continue;
+            if (req.attestation_type != ATTESTATION_TYPE_SWAP_REQUEST) continue;
          }
 
          // New schema: src/dst (chain, token_kind, amount) live directly on
