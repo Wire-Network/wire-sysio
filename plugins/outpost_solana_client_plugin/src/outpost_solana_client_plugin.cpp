@@ -1,4 +1,7 @@
 #include <ranges>
+
+#include <magic_enum/magic_enum.hpp>
+
 #include <fc/log/logger.hpp>
 
 #include <sysio/outpost_solana_client_plugin.hpp>
@@ -7,8 +10,11 @@
 namespace sysio {
 
 namespace {
-constexpr auto option_name_client = "outpost-solana-client";
-constexpr auto option_idl_file    = "solana-idl-file";
+constexpr auto option_name_client         = "outpost-solana-client";
+constexpr auto option_idl_file            = "solana-idl-file";
+constexpr auto option_inbound_commitment  = "solana-inbound-read-commitment";
+
+constexpr auto default_inbound_commitment = "confirmed";
 
 [[maybe_unused]] inline fc::logger& logger() {
    static fc::logger log{"outpost_solana_client_plugin"};
@@ -20,8 +26,12 @@ class outpost_solana_client_plugin_impl {
    std::map<std::string, solana_client_entry_ptr> _clients{};
    using file_idl_programs_t = std::pair<std::filesystem::path, std::vector<fc::network::solana::idl::program>>;
    std::vector<file_idl_programs_t> _idl_files{};
+   fc::network::solana::commitment_t _inbound_read_commitment = fc::network::solana::commitment_t::confirmed;
 
 public:
+   void set_inbound_read_commitment(fc::network::solana::commitment_t c) { _inbound_read_commitment = c; }
+   fc::network::solana::commitment_t inbound_read_commitment() const { return _inbound_read_commitment; }
+
    std::vector<file_idl_programs_t> load_idl_files(const std::vector<std::filesystem::path>& file_names) {
       static std::mutex mutex;
       std::scoped_lock lock(mutex);
@@ -72,6 +82,15 @@ void outpost_solana_client_plugin::plugin_initialize(const variables_map& option
              "At least one solana client argument is required {}",
              option_name_client);
 
+   {
+      const auto& s = options.at(option_inbound_commitment).as<std::string>();
+      auto parsed = magic_enum::enum_cast<fc::network::solana::commitment_t>(s);
+      FC_ASSERT(parsed.has_value(), "Invalid {} value '{}' (expected one of: processed, confirmed, finalized)",
+                option_inbound_commitment, s);
+      my->set_inbound_read_commitment(*parsed);
+      ilog("Solana inbound read commitment: {}", s);
+   }
+
    auto plug_sig      = app().find_plugin<signature_provider_manager_plugin>();
    auto client_specs  = options.at(option_name_client).as<std::vector<std::string>>();
 
@@ -109,7 +128,13 @@ void outpost_solana_client_plugin::set_program_options(options_description& cli,
       "Format: `<sol-client-id>,<sig-provider-id>,<rpc-url>`")(
       option_idl_file,
       boost::program_options::value<std::vector<std::filesystem::path>>()->multitoken(),
-      "Solana program IDL file(s). Expects each file to be a JSON IDL (Anchor format) program definition.");
+      "Solana program IDL file(s). Expects each file to be a JSON IDL (Anchor format) program definition.")(
+      option_inbound_commitment,
+      boost::program_options::value<std::string>()->default_value(default_inbound_commitment),
+      "Solana commitment level used by `read_inbound_envelope` when fetching the `latest_outbound_envelope` PDA. "
+      "WIRE consensus on inbound is committed forward against this read; a slot reorg below the chosen commitment "
+      "leaves WIRE state derived from external history that no longer exists. "
+      "One of: processed, confirmed, finalized.");
 }
 
 void outpost_solana_client_plugin::plugin_shutdown() {
@@ -155,7 +180,7 @@ outpost_solana_client_plugin::create_outpost_client(const std::string& sol_clien
              OPP_SOLANA_OUTPOST_PROGRAM_NAME);
 
    return std::make_shared<outpost_solana_client>(
-      entry, program_key, std::move(program_idls), outpost_id, chain_id);
+      entry, program_key, std::move(program_idls), outpost_id, chain_id, my->inbound_read_commitment());
 }
 
 } // namespace sysio

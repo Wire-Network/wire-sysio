@@ -27,15 +27,18 @@ outpost_ethereum_client::outpost_ethereum_client(
    std::string                                       opp_inbound_addr,
    std::vector<fc::network::ethereum::abi::contract> abis,
    uint64_t                                          outpost_id,
-   uint32_t                                          chain_id)
+   uint32_t                                          chain_id,
+   std::string                                       inbound_read_block_tag)
    : _entry(std::move(entry))
    , _opp_addr(std::move(opp_addr))
    , _opp_inbound_addr(std::move(opp_inbound_addr))
    , _outpost_id(outpost_id)
-   , _chain_id(chain_id) {
+   , _chain_id(chain_id)
+   , _inbound_read_block_tag(std::move(inbound_read_block_tag)) {
    FC_ASSERT(_entry && _entry->client, "ethereum_client_entry must carry a client");
-   FC_ASSERT(!_opp_addr.empty(),         "OPP address is required");
-   FC_ASSERT(!_opp_inbound_addr.empty(), "OPPInbound address is required");
+   FC_ASSERT(!_opp_addr.empty(),              "OPP address is required");
+   FC_ASSERT(!_opp_inbound_addr.empty(),      "OPPInbound address is required");
+   FC_ASSERT(!_inbound_read_block_tag.empty(), "inbound_read_block_tag is required");
 
    _opp_client         = _entry->client->get_contract<opp_contract_client>(_opp_addr, abis);
    _opp_inbound_client = _entry->client->get_contract<opp_inbound_contract_client>(_opp_inbound_addr, abis);
@@ -78,8 +81,7 @@ std::vector<char> outpost_ethereum_client::read_inbound_envelope(
    // so we get the structured outputs `(uint32 epoch_, bytes data_)`
    // back as a `mutable_variant_object`.
    const auto& abi = _opp_client->get_abi("getLatestOutboundEnvelope");
-   const auto raw_hex_var = _opp_client->get_latest_outbound_envelope(
-      std::string(eth::block_tag_latest));
+   const auto raw_hex_var = _opp_client->get_latest_outbound_envelope(_inbound_read_block_tag);
    if (!raw_hex_var.is_string()) {
       wlog("outpost_ethereum_client[{}]: getLatestOutboundEnvelope returned non-string variant",
            to_string());

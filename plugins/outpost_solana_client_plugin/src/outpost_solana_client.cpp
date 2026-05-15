@@ -1,5 +1,6 @@
 #include <sysio/outpost_solana_client_plugin/outpost_solana_client.hpp>
 
+#include <bit>
 #include <cstring>
 #include <optional>
 #include <string>
@@ -35,8 +36,11 @@ constexpr size_t LATEST_VEC_LEN_OFF = LATEST_HEADER_LEN;
 constexpr size_t LATEST_DATA_OFF    = LATEST_HEADER_LEN + 4;
 constexpr size_t LATEST_EPOCH_OFF   = ANCHOR_DISCRIMINATOR_LEN;
 
-/// Read a little-endian u32 from `buf` at `off`.
+/// Read a little-endian u32 from `buf` at `off`. Borsh is little-endian on the wire; the native-endian `memcpy` below
+/// is correct only on a little-endian host. Wire is x86_64-only today; the static_assert documents that dependency and
+/// fails to compile if a future port to a big-endian host removes the implicit guarantee.
 uint32_t read_u32_le(const std::vector<uint8_t>& buf, size_t off) {
+   static_assert(std::endian::native == std::endian::little, "read_u32_le assumes a little-endian host");
    if (off + 4 > buf.size()) FC_THROW("LatestOutboundEnvelope: truncated u32 at {}", off);
    uint32_t v;
    std::memcpy(&v, buf.data() + off, 4);
@@ -50,11 +54,13 @@ outpost_solana_client::outpost_solana_client(
    fc::network::solana::solana_public_key         program_id,
    std::vector<fc::network::solana::idl::program> program_idls,
    uint64_t                                       outpost_id,
-   uint32_t                                       chain_id)
+   uint32_t                                       chain_id,
+   fc::network::solana::commitment_t              inbound_read_commitment)
    : _entry(std::move(entry))
    , _program_id(program_id)
    , _outpost_id(outpost_id)
-   , _chain_id(chain_id) {
+   , _chain_id(chain_id)
+   , _inbound_read_commitment(inbound_read_commitment) {
    FC_ASSERT(_entry && _entry->client,
              "solana_client_entry must carry a client");
    FC_ASSERT(!program_idls.empty(),
@@ -127,15 +133,14 @@ std::vector<char> outpost_solana_client::read_inbound_envelope(
    const auto deadline_abs = fc::time_point::now() + deadline;
    throw_if_past_deadline(deadline_abs, OP_READ_LATEST);
 
-   // Single RPC: fetch the `latest_outbound_envelope` PDA. The Solana
-   // program overwrites this account with the most recent emitted
-   // envelope's bytes. The OPP cycle is atomic across actors — at any
-   // time only the most-recent emitted envelope is in flight — so a
-   // single-slot PDA is sufficient and historical reads are out of
-   // scope (off-chain audit tooling owns them).
+   // Single RPC: fetch the `latest_outbound_envelope` PDA. The Solana program overwrites this account with the most
+   // recent emitted envelope's bytes. The OPP cycle is atomic across actors — at any time only the most-recent emitted
+   // envelope is in flight — so a single-slot PDA is sufficient and historical reads are out of scope (off-chain audit
+   // tooling owns them). Commitment level is operator-configurable via `--solana-inbound-read-commitment`; the default
+   // is `confirmed`.
    auto info = _entry->client->get_account_info(
       _program_client->latest_outbound_envelope_pda,
-      fc::network::solana::commitment_t::confirmed);
+      _inbound_read_commitment);
    if (!info.has_value()) {
       // PDA was init'd at outpost initialize — absence here means the
       // RPC is out of sync or the program redeployed mid-run. Surface.

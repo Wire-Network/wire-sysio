@@ -8,8 +8,15 @@ namespace sysio {
 // using namespace outpost_client::ethereum;
 
 namespace {
-constexpr auto option_name_client     = "outpost-ethereum-client";
-constexpr auto option_abi_file     = "ethereum-abi-file";
+constexpr auto option_name_client        = "outpost-ethereum-client";
+constexpr auto option_abi_file           = "ethereum-abi-file";
+constexpr auto option_inbound_block_tag  = "ethereum-inbound-read-block-tag";
+
+constexpr auto default_inbound_block_tag = "latest";
+
+/// Block tags accepted by the modern (post-merge) Ethereum JSON-RPC. `latest` and `pending` are pre-merge; `safe`
+/// (~6 min) and `finalized` (~12.8 min) are beacon-chain-finality-aware. `earliest` is included for completeness.
+constexpr std::string_view valid_block_tags[] = {"latest", "earliest", "pending", "safe", "finalized"};
 
 [[maybe_unused]] inline fc::logger& logger() {
    static fc::logger log{"outpost_ethereum_client_plugin"};
@@ -21,8 +28,12 @@ class outpost_ethereum_client_plugin_impl {
    std::map<std::string, ethereum_client_entry_ptr> _clients{};
    using file_abi_contracts_t = std::pair<std::filesystem::path, std::vector<fc::network::ethereum::abi::contract>>;
    std::vector<file_abi_contracts_t> _abi_files{};
+   std::string _inbound_read_block_tag{default_inbound_block_tag};
 
 public:
+   void set_inbound_read_block_tag(std::string tag) { _inbound_read_block_tag = std::move(tag); }
+   const std::string& inbound_read_block_tag() const { return _inbound_read_block_tag; }
+
    std::vector<file_abi_contracts_t> load_abi_files(const std::vector<std::filesystem::path>& file_names) {
       static std::mutex mutex;
       std::scoped_lock lock(mutex);
@@ -65,6 +76,16 @@ void outpost_ethereum_client_plugin::plugin_initialize(const variables_map& opti
       my->load_abi_files(abi_files);
    }
    FC_ASSERT(options.count(option_name_client), "At least one ethereum client argument is required {}", option_name_client);
+
+   {
+      const auto& tag = options.at(option_inbound_block_tag).as<std::string>();
+      const bool ok = std::ranges::any_of(valid_block_tags, [&](std::string_view v) { return v == tag; });
+      FC_ASSERT(ok, "Invalid {} value '{}' (expected one of: latest, earliest, pending, safe, finalized)",
+                option_inbound_block_tag, tag);
+      my->set_inbound_read_block_tag(tag);
+      ilog("Ethereum inbound read block tag: {}", tag);
+   }
+
    auto plug_sig = app().find_plugin<signature_provider_manager_plugin>();
    auto client_specs    = options.at(option_name_client).as<std::vector<std::string>>();
    for (auto& client_spec : client_specs) {
@@ -109,8 +130,12 @@ void outpost_ethereum_client_plugin::set_program_options(options_description& cl
       "`<eth-client-id>,<sig-provider-id>,<eth-node-url>[,<eth-chain-id>]`")(
       option_abi_file,
       boost::program_options::value<std::vector<std::filesystem::path>>()->multitoken(),
-      "Ethereum contract ABI file(s).  Expects the file to have a JSON array of ABI complient contract definitions."
-      );
+      "Ethereum contract ABI file(s).  Expects the file to have a JSON array of ABI complient contract definitions.")(
+      option_inbound_block_tag,
+      boost::program_options::value<std::string>()->default_value(default_inbound_block_tag),
+      "Ethereum block tag used by `read_inbound_envelope` when calling `getLatestOutboundEnvelope`. WIRE consensus "
+      "on inbound is committed forward against this read; a tip reorg past the chosen tag leaves WIRE state derived "
+      "from external history that no longer exists. One of: latest, earliest, pending, safe, finalized.");
 }
 
 
@@ -148,7 +173,8 @@ outpost_ethereum_client_plugin::create_outpost_client(const std::string& eth_cli
                                                     opp_inbound_addr,
                                                     std::move(all_abis),
                                                     outpost_id,
-                                                    chain_id);
+                                                    chain_id,
+                                                    my->inbound_read_block_tag());
 }
 
 } // namespace sysio

@@ -53,11 +53,20 @@ inline constexpr size_t SOLANA_MAX_CHUNK_BYTES = 672;
  */
 class outpost_solana_client : public outpost_client {
 public:
+   /// Construct a Solana outpost client.
+   ///
+   /// `inbound_read_commitment` is the Solana commitment level used by `read_inbound_envelope` when fetching the
+   /// `latest_outbound_envelope` PDA. WIRE consensus on inbound is committed forward against this read, so a slot that
+   /// reorgs after being read at a pre-finalized commitment leaves WIRE state derived from external history that no
+   /// longer exists. Default is `confirmed` (current behavior); deployments that prefer safety over latency can dial up
+   /// to `finalized` via `--solana-inbound-read-commitment`.
    outpost_solana_client(solana_client_entry_ptr                             entry,
                          fc::network::solana::solana_public_key              program_id,
                          std::vector<fc::network::solana::idl::program>      program_idls,
                          uint64_t                                            outpost_id,
-                         uint32_t                                            chain_id);
+                         uint32_t                                            chain_id,
+                         fc::network::solana::commitment_t                   inbound_read_commitment
+                            = fc::network::solana::commitment_t::confirmed);
 
    // ── outpost_client SPI ───────────────────────────────────────────────
    sysio::opp::types::ChainKind chain_kind() const override;
@@ -73,8 +82,9 @@ public:
                                            fc::microseconds deadline) override;
 
    // Expose for inspection / tests
-   const solana_client_entry_ptr&                entry()                 const { return _entry; }
-   const fc::network::solana::solana_public_key& program_id()            const { return _program_id; }
+   const solana_client_entry_ptr&                entry()                   const { return _entry; }
+   const fc::network::solana::solana_public_key& program_id()              const { return _program_id; }
+   fc::network::solana::commitment_t             inbound_read_commitment() const { return _inbound_read_commitment; }
 
 private:
    solana_client_entry_ptr                       _entry;
@@ -82,6 +92,7 @@ private:
    std::shared_ptr<opp_solana_outpost_client>    _program_client;
    uint64_t                                      _outpost_id;
    uint32_t                                      _chain_id;
+   fc::network::solana::commitment_t             _inbound_read_commitment;
 };
 
 using outpost_solana_client_ptr = std::shared_ptr<outpost_solana_client>;
