@@ -342,11 +342,11 @@ void emit_swap_remit(name self,
 /// **Per `feedback_opp_handlers_never_throw.md` — this MUST stay
 /// non-throwing.** It's called from `try_select_winner`, which runs inside
 /// the evalcons inline-action chain; a `check()` failure here halts
-/// consensus. Today we defensively bound the signature length and variant
-/// tag before invoking the chain crypto intrinsic, but malformed
-/// attacker-controlled bytes that pass the bounds checks could still trip
-/// `recover_key` itself. The launch-time fix is a `recover_key_nothrow`
-/// host intrinsic (tracked in the underwriter-gap summary).
+/// consensus. The defensive size+tag bounds catch the obvious cases; the
+/// `sysio::recover_key_nothrow` intrinsic catches everything else the
+/// host crypto path can raise (malformed bytes, unactivated signature
+/// type, recovery math failure, subjective-size limit) and returns
+/// `std::nullopt` instead.
 bool verify_uic_signature(name underwriter,
                            const std::vector<char>& uic_bytes) {
    if (uic_bytes.empty()) return false;
@@ -376,7 +376,7 @@ bool verify_uic_signature(name underwriter,
    // first byte of a packed `sysio::signature` is the variant tag
    // (0=K1, 1=R1, 2=WebAuthN, 3=EM, 4=ED25519, 5=BLS). Anything outside
    // that range or sized outside the smallest/largest legal variant is
-   // tossed before the intrinsic gets a chance to assert.
+   // tossed before the intrinsic gets a chance to attempt recovery.
    if (sig_bytes_view.size() < 2 || sig_bytes_view.size() > 1024) return false;
    const uint8_t tag = static_cast<uint8_t>(sig_bytes_view[0]);
    if (tag > 5) return false;
@@ -389,8 +389,16 @@ bool verify_uic_signature(name underwriter,
       ds >> parsed_sig;
    }
 
-   // Recover the public key the signature was produced with.
-   sysio::public_key recovered = sysio::recover_key(digest, parsed_sig);
+   // Recover the public key — non-throwing variant. The host wraps the
+   // throwing recovery path in try/catch and returns `std::nullopt` on
+   // any failure (malformed bytes, unactivated sig type, recovery math
+   // failure, subjective-size limit). Required because CDT compiles
+   // with `-fno-exceptions` and `try_select_winner` cannot halt the
+   // dispatch on attacker-controlled bytes (per
+   // `feedback_opp_handlers_never_throw.md`).
+   auto recovered_opt = sysio::recover_key_nothrow(digest, parsed_sig);
+   if (!recovered_opt) return false;
+   const sysio::public_key& recovered = *recovered_opt;
 
    // Only `owner` and `active` permissions are considered. The
    // underwriter_plugin's signature_provider_manager_plugin config is
@@ -475,6 +483,23 @@ void uwrit::createuwreq(uint64_t attestation_id,
       check(rc == zpp::bits::errc{}, "failed to decode SwapRequest");
    }
 
+   // Hard-fail any SwapRequest without a populated `source_tx_id`. The
+   // off-chain underwriter verify path uses this id to confirm a real
+   // on-chain deposit backs the swap before committing collateral; a
+   // SwapRequest without it can't be verified, and an outpost is
+   // required to populate the field at swap-emit time. Per
+   // `feedback_opp_handlers_never_throw.md` we cannot `check()`/throw
+   // here (we're inside the evalcons dispatch chain — a throw stalls
+   // consensus); instead emit a SwapRevert back to the source outpost so
+   // the user's deposit is refunded and the run continues.
+   if (sr.source_tx_id.empty()) {
+      emit_swap_revert(get_self(), outpost_id, attestation_id, sr,
+                       "SwapRequest rejected: source_tx_id is required "
+                       "(no SwapRequest may be emitted without a "
+                       "populated source-chain transaction id)");
+      return;
+   }
+
    // Variance-tolerance check via sysio.reserve mirror. If no LP is
    // provisioned for the (chain, token) pair on either side the quote
    // returns 0 and the variance check is implicitly skipped — the swap
@@ -514,6 +539,7 @@ void uwrit::createuwreq(uint64_t attestation_id,
       .dst_amount                = sr.quoted_destination_amount,
       .variance_tolerance_bps    = sr.quote_tolerance_bps,
       .source_tx_id              = sr.source_tx_id,
+      .depositor                 = sr.actor.address,
       .commits_by                = {},
       .winner                    = name{},
       .committed_at_ms           = 0,

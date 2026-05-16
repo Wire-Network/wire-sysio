@@ -277,13 +277,23 @@ namespace sysio {
          /// drift between ingestion and race doesn't burn the underwriter.
          uint32_t                                variance_tolerance_bps = 0;
 
-         /// Source-chain derived id for the deposit that funded this swap
-         /// (see SwapRequest.source_tx_id proto comment for the derivation
-         /// recipe). Used off-chain by the underwriter plugin's
-         /// verify_source_deposit step to confirm a real on-chain deposit
-         /// backs the swap before committing collateral. Empty until the
-         /// swap-emit site lands on the outposts.
+         /// Source-chain id of the deposit transaction that funded this
+         /// swap (ETH: 32-byte tx hash; SOL: 64-byte signature). Used by
+         /// the off-chain underwriter plugin's `verify_source_deposit`
+         /// step to confirm a real on-chain deposit backs the swap
+         /// before committing collateral. `createuwreq` rejects any
+         /// SwapRequest with an empty `source_tx_id` (emits SwapRevert
+         /// for refund) — every outpost must populate this field at
+         /// swap-emit time.
          std::vector<char>                       source_tx_id;
+
+         /// Depositor's address on the source chain (decoded from
+         /// `SwapRequest.actor.address`). ETH = 20 bytes (left-padded in
+         /// 32-byte ABI slots when matched); SOL = 32-byte Ed25519
+         /// pubkey. The underwriter plugin matches this against the
+         /// `tx.from` (ETH) / fee-payer (SOL) of the source-deposit tx
+         /// during verification.
+         std::vector<char>                       depositor;
 
          /// Race state.
          std::vector<commit_entry>               commits_by;
@@ -309,7 +319,7 @@ namespace sysio {
             (id)(type)(status)
             (src_chain)(src_token_kind)(src_amount)
             (dst_chain)(dst_token_kind)(dst_amount)
-            (variance_tolerance_bps)(source_tx_id)
+            (variance_tolerance_bps)(source_tx_id)(depositor)
             (commits_by)(winner)(committed_at_ms)(settled_at_ms)(expires_at_epoch)
             (attestation_inbound_data)(attestation_outbound_data))
       };
