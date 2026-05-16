@@ -1575,6 +1575,22 @@ public:
       check( rc > 0, "raw::read_transaction(nullptr, 0) should return required size" );
    }
 
+   // raw::get_context_free_data is registered context-free-only
+   // (REGISTER_ALIGNED_CF_ONLY_HOST_FUNCTION). Its context_free_check
+   // precondition fires BEFORE the host body and SYS_ASSERTs unaccessible_api
+   // ("this API may only be called from context_free apply") whenever the
+   // calling apply context is not context free. This probe drives it from a
+   // regular action, so the gate must throw before the aligned_span<char>
+   // buffer is ever adapted -- the arguments are deliberately bogus (null
+   // data, zero length) to prove the rejection is unconditional on the span.
+   // Mirrors the privileged_check rejection probes (preactnp / setresnp).
+   [[sysio::action]]
+   void gcfdcf() {
+      raw::get_context_free_data( 0, nullptr, 0 );
+      check( false, "raw::get_context_free_data from non-context-free apply "
+                    "must throw unaccessible_api" );
+   }
+
    // raw::send_inline with empty span -> host tries to unpack and fails. Pins
    // that a zero-length aligned_span is NOT silently converted to a default
    // action.

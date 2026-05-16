@@ -505,6 +505,17 @@ BOOST_FIXTURE_TEST_CASE(get_action_bad, intrinsic_probe_fixture) {
 BOOST_FIXTURE_TEST_CASE(read_transaction_ok,   intrinsic_probe_fixture) { BOOST_CHECK_NO_THROW(t.run("rtxok"_n)); }
 BOOST_FIXTURE_TEST_CASE(read_transaction_zero, intrinsic_probe_fixture) { BOOST_CHECK_NO_THROW(t.run("rtxsm"_n)); }
 
+// get_context_free_data is registered context-free-only
+// (REGISTER_ALIGNED_CF_ONLY_HOST_FUNCTION). Driven from a regular action its
+// context_free_check precondition fires before the body and throws
+// unaccessible_api, exactly like the privileged_check rejection probes. Pins
+// that the CF-only gate -- which wraps the same aligned_span<char> adaptation
+// the pointer->span cleanup reworks -- rejects the call before touching the
+// span.
+BOOST_FIXTURE_TEST_CASE(get_context_free_data_non_cf, intrinsic_probe_fixture) {
+   BOOST_CHECK_THROW(t.run("gcfdcf"_n), unaccessible_api);
+}
+
 BOOST_FIXTURE_TEST_CASE(send_inline_empty, intrinsic_probe_fixture) {
    BOOST_CHECK_THROW(t.run("sinlem"_n), fc::exception);
 }

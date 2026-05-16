@@ -2,14 +2,15 @@
 #include <cstdint>
 #include <limits>
 #include <string>
+#include <string_view>
 #include <vector>
 #include <fc/int256.hpp>
 
 namespace fc
 {
-  std::int64_t  to_int64( const std::string& );
-  std::uint64_t to_uint64( const std::string& );
-  double   to_double( const std::string& );
+  std::int64_t  to_int64( std::string_view );
+  std::uint64_t to_uint64( std::string_view );
+  double   to_double( std::string_view );
 
   class variant_object;
   std::string format_string( const std::string&, const variant_object&, bool minimize = false );
