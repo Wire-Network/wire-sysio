@@ -2,6 +2,7 @@
 
 #include <sysio/chain_plugin/chain_plugin.hpp>
 #include <sysio/cron_plugin.hpp>
+#include <sysio/http_plugin/http_plugin.hpp>
 #include <sysio/outpost_ethereum_client_plugin.hpp>
 #include <sysio/outpost_solana_client_plugin.hpp>
 #include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
@@ -31,6 +32,7 @@ namespace sysio {
       APPBASE_PLUGIN_REQUIRES(
          (chain_plugin)
          (cron_plugin)
+         (http_plugin)
          (outpost_ethereum_client_plugin)
          (outpost_solana_client_plugin)
          (signature_provider_manager_plugin)
