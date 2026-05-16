@@ -55,15 +55,20 @@ aws kms create-alias \
 ### 2. IAM permission
 
 The principal whose credentials the test runs under needs `kms:Sign` on the
-key. (The plugin does not call `kms:GetPublicKey` — the expected pubkey is
-supplied by the caller, not fetched from KMS.) Minimum inline policy:
+key. `kms:GetPublicKey` is also granted so the same principal can extract
+the matching pubkey hex (Prereq #4) without juggling a second role; the
+plugin itself does not call `GetPublicKey` (the expected pubkey is supplied
+by the caller). Minimum inline policy:
 
 ```json
 {
    "Version": "2012-10-17",
    "Statement": [{
       "Effect": "Allow",
-      "Action": "kms:Sign",
+      "Action": [
+         "kms:Sign",
+         "kms:GetPublicKey"
+      ],
       "Resource": "arn:aws:kms:us-east-1:<account-id>:key/<KeyId>"
    }]
 }
