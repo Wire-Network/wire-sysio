@@ -23,6 +23,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cluster_launcher.py ${CMAKE_CURRENT_B
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/distributed-transactions-test.py ${CMAKE_CURRENT_BINARY_DIR}/distributed-transactions-test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/sysio_util_bls_test.py ${CMAKE_CURRENT_BINARY_DIR}/sysio_util_bls_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/sysio_util_snapshot_info_test.py ${CMAKE_CURRENT_BINARY_DIR}/sysio_util_snapshot_info_test.py COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/clio_em_key_test.py ${CMAKE_CURRENT_BINARY_DIR}/clio_em_key_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/sample-cluster-map.json ${CMAKE_CURRENT_BINARY_DIR}/sample-cluster-map.json COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/restart-scenarios-test.py ${CMAKE_CURRENT_BINARY_DIR}/restart-scenarios-test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/terminate-scenarios-test.py ${CMAKE_CURRENT_BINARY_DIR}/terminate-scenarios-test.py COPYONLY)
@@ -252,6 +253,7 @@ add_np_test(NAME lib_advance_test COMMAND tests/lib_advance_test.py -v ${UNSHARE
 add_np_test(NAME producer_rank_test COMMAND tests/producer_rank_test.py -v ${UNSHARE})
 
 add_p_test(NAME sysio_util_bls_test COMMAND tests/sysio_util_bls_test.py)
+add_p_test(NAME clio_em_key_test COMMAND tests/clio_em_key_test.py)
 add_p_test(NAME sysio_util_snapshot_info_test COMMAND tests/sysio_util_snapshot_info_test.py)
 
 add_np_test(NAME http_plugin_test COMMAND tests/http_plugin_test.py ${UNSHARE} TIMEOUT 200)
