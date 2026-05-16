@@ -20,6 +20,13 @@ add_executable( test_fc
         scoped_exit/test_scoped_exit.cpp
         static_variant/test_static_variant.cpp
         variant/test_variant.cpp
+        variant/test_variant_as.cpp
+        variant/test_variant_assign.cpp
+        variant/test_variant_ctor.cpp
+        variant/test_variant_enum.cpp
+        variant/test_variant_object_misc.cpp
+        variant/test_variant_operators.cpp
+        variant/test_variant_visitor.cpp
         variant_estimated_size/test_variant_estimated_size.cpp
         test_base64.cpp
         test_traits.cpp
