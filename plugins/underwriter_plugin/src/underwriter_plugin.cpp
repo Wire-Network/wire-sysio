@@ -1,14 +1,20 @@
 #include <fc/log/logger.hpp>
+#include <fc/crypto/base58.hpp>
 #include <fc/crypto/sha256.hpp>
 #include <fc/crypto/signature.hpp>
 #include <fc/io/raw.hpp>
 #include <fc/variant_object.hpp>
+#include <boost/algorithm/string/predicate.hpp>
 #include <boost/endian/conversion.hpp>
 #include <magic_enum/magic_enum.hpp>
 
 #include <sysio/chain_plugin/chain_plugin.hpp>
+#include <sysio/chain/authorization_manager.hpp>
+#include <sysio/chain/controller.hpp>
 #include <sysio/http_plugin/http_plugin.hpp>
+#include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
 #include <sysio/underwriter_plugin/underwriter_plugin.hpp>
+#include <sysio/underwriter_plugin/source_deposit_constants.hpp>
 #include <sysio/depot/opreg_status.hpp>
 #include <sysio/opp/opp.hpp>
 #include <sysio/opp/types/types.pb.h>
@@ -49,11 +55,19 @@ struct uw_request {
    ChainKind               dst_chain;
    TokenKind               dst_token_kind;
    uint64_t                dst_amount;
-   /// Source-chain derived id for the deposit (see SwapRequest.source_tx_id
-   /// proto comment). Empty until the swap-emit site lands on the outposts;
-   /// verify_source_deposit treats empty as "verification not yet active"
-   /// and logs a warning rather than skipping the commit.
+   /// Source-chain id of the deposit transaction. ETH = 32-byte tx hash;
+   /// SOL = 64-byte signature. Populated by `createuwreq` from
+   /// `SwapRequest.source_tx_id`. The depot rejects SwapRequests with an
+   /// empty `source_tx_id` (emits SwapRevert), so by the time a uwreq
+   /// reaches the plugin's scan this MUST be non-empty.
    std::vector<char>       source_tx_id;
+
+   /// Depositor's address on the source chain (decoded from
+   /// `SwapRequest.actor.address`). The plugin's verify_source_deposit
+   /// step cross-references the source-chain tx's `from` field (ETH) or
+   /// fee-payer (SOL) against this to confirm the recorded depositor
+   /// actually authorized the deposit.
+   std::vector<char>       depositor;
 };
 
 // ---------------------------------------------------------------------------
@@ -86,7 +100,9 @@ struct underwriter_plugin::impl {
    std::string  sol_client_id;
    std::string  eth_opreg_addr;             // OperatorRegistry contract address on ETH
    std::string  sol_program_id;             // opp-outpost program ID on SOL
-   std::string  eth_source_contract_addr;   // contract emitting SwapRequested (T13 verify_source_deposit)
+   std::string  eth_source_contract_addr;        // contract emitting SwapRequested (T13 verify_source_deposit)
+   std::vector<uint8_t> eth_source_deposit_selector; // 4-byte function selector for the swap-deposit call on `eth_source_contract_addr`
+   std::vector<uint8_t> sol_source_deposit_discriminator; // 8-byte anchor discriminator for the swap-deposit instruction on `sol_program_id`
 
    // ── Diagnostic counters surfaced via the `/v1/underwriter/*` HTTP API
    //   (and the future `clio opp uw stats` wrapper).
@@ -289,6 +305,95 @@ struct underwriter_plugin::impl {
                  std::string{sysio::opp::types::ChainKind_Name(chain_kind)});
             return false;
          }
+      }
+
+      // ── Check 4: required CLI options ────────────────────────────────
+      //
+      // The verify_source_deposit path requires the source contract /
+      // program address + function selector / instruction discriminator
+      // for every supported chain. Missing them disables verification
+      // (and the depot's createuwreq rejects any SwapRequest without a
+      // populated source_tx_id), so we refuse to start instead.
+      if (eth_source_contract_addr.empty()) {
+         elog("underwriter preflight: --underwriter-eth-source-contract-addr is required");
+         return false;
+      }
+      if (eth_source_deposit_selector.size() != 4) {
+         elog("underwriter preflight: --underwriter-eth-source-deposit-selector is required "
+              "(4-byte hex)");
+         return false;
+      }
+      if (sol_program_id.empty()) {
+         elog("underwriter preflight: --underwriter-sol-program-id is required");
+         return false;
+      }
+      if (sol_source_deposit_discriminator.size() != 8) {
+         elog("underwriter preflight: --underwriter-sol-source-deposit-discriminator is required "
+              "(8-byte hex)");
+         return false;
+      }
+
+      // ── Check 5: WIRE K1 signature provider — exactly one ────────────
+      //
+      // The plugin signs UIC digests with the underwriter's WIRE K1 key
+      // before relaying to the outposts. We require exactly one matching
+      // provider so we never pick arbitrarily among multiple — if the
+      // operator has configured several K1 providers (e.g. one for the
+      // batch operator + one for the underwriter on the same node), they
+      // must scope to distinct WIRE chains/key-types or this check fires.
+      auto& sig_plug = app().get_plugin<signature_provider_manager_plugin>();
+      auto wire_providers = sig_plug.query_providers(
+         std::nullopt, fc::crypto::chain_kind_wire, fc::crypto::chain_key_type_wire);
+      if (wire_providers.size() != 1) {
+         elog("underwriter preflight: expected exactly 1 WIRE K1 signature provider, "
+              "got {} — configure exactly one --signature-provider entry whose chain=wire "
+              "and key-type=wire", wire_providers.size());
+         return false;
+      }
+
+      // ── Check 6: signature self-test ─────────────────────────────────
+      //
+      // Sign a fixed test digest with the configured provider, recover
+      // the pubkey, and confirm it is on the underwriter account's
+      // `owner` or `active` permission. Catches "wrong key configured"
+      // at startup instead of after a live uwreq is silently rejected
+      // by the depot's verify_uic_signature.
+      try {
+         const fc::sha256 self_test_digest = fc::sha256::hash(std::string{
+            "wire.underwriter_plugin.signature_self_test.v1"});
+         const fc::crypto::signature sig = wire_providers.front()->sign(self_test_digest);
+         const fc::crypto::public_key recovered =
+            fc::crypto::public_key::recover(sig, self_test_digest);
+
+         // Look up the underwriter account's `owner` + `active` keys via
+         // the controller's authorization manager (read window is open
+         // during plugin_startup; this is a const accessor on the
+         // immutable state of the account).
+         auto& ctrl = chain_plug->chain();
+         const auto& am = ctrl.get_authorization_manager();
+         auto matches_perm = [&](chain::name perm_name) {
+            try {
+               const auto& p = am.get_permission({underwriter_account, perm_name});
+               for (const auto& kw : p.auth.keys) {
+                  if (kw.key.to_public_key() == recovered) return true;
+               }
+            } catch (...) {
+               // Permission doesn't exist; treat as no-match.
+            }
+            return false;
+         };
+         if (!matches_perm(chain::config::owner_name) &&
+             !matches_perm(chain::config::active_name)) {
+            elog("underwriter preflight: signature self-test failed — the configured "
+                 "WIRE K1 signature provider's recovered pubkey ({}) is not present on "
+                 "the underwriter account's `owner` or `active` permission. The depot "
+                 "will reject every commit signed by this provider.",
+                 recovered.to_string(fc::yield_function_t{}));
+            return false;
+         }
+      } catch (const fc::exception& e) {
+         elog("underwriter preflight: signature self-test threw: {}", e.to_detail_string());
+         return false;
       }
 
       ilog("underwriter preflight: all checks passed (account={} outposts={})",
@@ -615,15 +720,19 @@ struct underwriter_plugin::impl {
          req.dst_chain      = obj["dst_chain"].as<ChainKind>();
          req.dst_token_kind = obj["dst_token_kind"].as<TokenKind>();
          req.dst_amount     = obj["dst_amount"].as_uint64();
-         if (obj.contains("source_tx_id")) {
-            auto s = obj["source_tx_id"].as_string();
-            // The ABI surfaces `bytes` as a hex string. Decode if non-empty;
-            // leave empty for backward-compat with older rows.
-            if (!s.empty()) {
-               req.source_tx_id.resize(s.size() / 2);
-               fc::from_hex(s, req.source_tx_id.data(), req.source_tx_id.size());
-            }
-         }
+         // The ABI surfaces `bytes` as a hex string. Decode both
+         // source_tx_id and depositor — the depot rejects any SwapRequest
+         // with empty source_tx_id at createuwreq (emits SwapRevert), so
+         // every uwreq the plugin sees should carry both fields.
+         auto decode_hex_field = [&](const char* key, std::vector<char>& out) {
+            if (!obj.contains(key)) return;
+            auto s = obj[key].as_string();
+            if (s.empty()) return;
+            out.resize(s.size() / 2);
+            fc::from_hex(s, out.data(), out.size());
+         };
+         decode_hex_field("source_tx_id", req.source_tx_id);
+         decode_hex_field("depositor",    req.depositor);
 
          requests.push_back(std::move(req));
       }
@@ -878,12 +987,19 @@ struct underwriter_plugin::impl {
 
       auto digest = fc::sha256::hash(blanked.data(), blanked.size());
 
+      // Preflight validates that exactly one WIRE K1 provider is
+      // configured AND that its recovered pubkey is on the underwriter
+      // account's owner/active permission. The cron job won't start if
+      // either check fails, so by the time we reach here the assumption
+      // is safe — but cheap to assert again in case the provider set
+      // mutates (it shouldn't; appbase plugins don't re-init on the fly).
       auto& sig_plug = app().get_plugin<signature_provider_manager_plugin>();
       auto wire_providers = sig_plug.query_providers(
          std::nullopt, fc::crypto::chain_kind_wire, fc::crypto::chain_key_type_wire);
-      if (wire_providers.empty()) {
-         elog("underwriter: no WIRE K1 signature provider available for uwreq {}",
-              uwreq_id);
+      if (wire_providers.size() != 1) {
+         elog("underwriter: expected exactly 1 WIRE K1 signature provider, got {} — "
+              "preflight should have caught this. Aborting commit for uwreq {}.",
+              wire_providers.size(), uwreq_id);
          return {};
       }
       auto fc_sig = wire_providers.front()->sign(digest);
@@ -902,26 +1018,34 @@ struct underwriter_plugin::impl {
       return std::vector<char>(final_bytes.begin(), final_bytes.end());
    }
 
-   /// Per `claude-underwriter-gap-plan.md` §6.5: before committing
-   /// collateral, the underwriter independently verifies the source-chain
-   /// deposit that funded this swap. The SWAP_REQUEST attestation carries
-   /// a derived `source_tx_id` (see `attestations.proto`) — a
-   /// keccak256/sha256 of `(uw_request_id, depositor, block_number/slot,
-   /// nonce)` computed by the source outpost. The plugin queries the
-   /// source chain for the matching `SwapRequested(bytes32 indexed
-   /// source_tx_id, depositor, token_kind, amount)` event and confirms
-   /// the args match the uwreq row.
+   /// Before committing collateral, independently verify the source-chain
+   /// deposit that funded this swap. `req.source_tx_id` is the chain-native
+   /// transaction id captured at swap-emit time (ETH: 32-byte tx hash;
+   /// SOL: 64-byte signature). The verify path fetches that tx, confirms
+   /// it succeeded against the configured source contract / program, and
+   /// cross-references every argument we can decode against the uwreq:
    ///
-   /// Until the swap-emit site lands on the outposts the field is empty.
-   /// We log and return true in that case so the existing flow keeps
-   /// working — when the emit site lands and populates the field on every
-   /// SWAP_REQUEST, this gate flips to enforcing automatically.
+   ///   * `depositor`   — `tx.from` (ETH) / fee-payer (SOL) must match `req.depositor`.
+   ///   * source contract — `tx.to` (ETH) / program-id (SOL) must match the configured address.
+   ///   * function selector / instruction discriminator — must match the configured value.
+   ///   * receipt status (ETH) / meta.err (SOL) — must indicate success.
+   ///   * inclusion depth — ETH requires `ETH_MIN_CONFIRMATIONS` past the receipt's block.
+   ///                       SOL fetches at commitment `SOL_COMMITMENT`.
+   ///
+   /// Hard-fail on empty `source_tx_id` — the depot's `createuwreq` rejects
+   /// SwapRequests without one (emits SwapRevert), so by the time a uwreq
+   /// reaches the plugin every row MUST carry one. A `req.source_tx_id`
+   /// empty here means either the depot's reject regressed OR the plugin
+   /// read a row pre-validation; either way the safe move is to refuse to
+   /// commit until the data is whole.
    bool verify_source_deposit(const uw_request& req) {
       if (req.source_tx_id.empty()) {
-         wlog("underwriter: source_tx_id empty for uwreq {} — staged rollout, "
-              "swap-emit-site not yet populating the field; verification skipped",
-              req.id);
-         return true;
+         elog("underwriter: REFUSING to commit uwreq {} — source_tx_id empty. "
+              "Every SwapRequest is required to carry a populated source_tx_id; "
+              "the depot's createuwreq must have regressed.", req.id);
+         std::lock_guard lk{stats_mutex};
+         source_deposit_mismatch_count++;
+         return false;
       }
       switch (req.src_chain) {
          case ChainKind::CHAIN_KIND_ETHEREUM:
@@ -935,24 +1059,21 @@ struct underwriter_plugin::impl {
       }
    }
 
-   /// ETH-side source-deposit verification. Issues `eth_getLogs` for the
-   /// `SwapRequested(bytes32 indexed source_tx_id, address depositor,
-   /// uint32 token_kind, uint256 amount)` event on the source outpost
-   /// contract, filtered by the derived id from `req.source_tx_id`. Then
-   /// decodes the event's non-indexed args and compares them to the
-   /// uwreq row. Logs + increments `source_deposit_mismatch` on any
-   /// arg mismatch.
+   /// ETH-side source-deposit verification. `req.source_tx_id` is the
+   /// raw 32-byte tx hash captured at swap-emit time. The verify path:
    ///
-   /// Returns true when the event exists AND every arg matches. Returns
-   /// false when no event is found or any arg differs — the caller skips
-   /// the commit in either case.
+   ///   1. `eth_getTransactionByHash(source_tx_id)` — tx must exist.
+   ///   2. `tx.to` must equal `--underwriter-eth-source-contract-addr` (case-insensitive).
+   ///   3. `tx.from` must equal `req.depositor` (case-insensitive 20-byte ETH address).
+   ///   4. `tx.input[0..4]` must equal `--underwriter-eth-source-deposit-selector` (the
+   ///      4-byte function selector for the swap-deposit call).
+   ///   5. `eth_getTransactionReceipt(source_tx_id)` must report status != "0x0".
+   ///   6. `eth_blockNumber() - receipt.blockNumber >= ETH_MIN_CONFIRMATIONS` so we don't
+   ///      accept a tx in a chain tip that may still reorg.
    ///
-   /// Configuration: `--underwriter-eth-source-contract-addr` names the
-   /// contract that emits the SwapRequested event. If the option is
-   /// unset, verification cannot run and the function returns false
-   /// (skip-with-elog). Once the emit site lands on `OutpostManager.sol`
-   /// (or wherever the swap-deposit flow ends up), set this to that
-   /// contract's address in the operator's config.
+   /// Every required option (contract address, selector) is checked in
+   /// preflight; if any is unset the plugin refuses to start. Returns
+   /// true only when all six checks pass.
    bool verify_source_deposit_eth(const uw_request& req) {
       auto entry = eth_plug->get_client(eth_client_id);
       if (!entry || !entry->client) {
@@ -960,100 +1081,304 @@ struct underwriter_plugin::impl {
               "(uwreq {})", eth_client_id, req.id);
          return false;
       }
-      if (eth_source_contract_addr.empty()) {
-         elog("underwriter: --underwriter-eth-source-contract-addr not configured; "
-              "cannot verify source deposit for uwreq {}", req.id);
-         return false;
-      }
-
-      // Build the get_logs filter: address + [event_topic, source_tx_id].
-      // The event topic hash (keccak256 of the event signature) is
-      // computed from the SwapRequested entry in the source contract's
-      // loaded ABI. Each ABI entry is one `abi::contract` with `type ==
-      // event` for events; `abi::to_event_topic` returns its keccak256.
-      auto& abis = eth_plug->get_abi_files();
-      std::optional<fc::crypto::keccak256> swap_requested_topic;
-      for (auto& [path, contracts] : abis) {
-         for (auto& c : contracts) {
-            if (c.type == eth::abi::invoke_target_type::event
-                && c.name == "SwapRequested") {
-               swap_requested_topic = eth::abi::to_event_topic(c);
-               break;
-            }
-         }
-         if (swap_requested_topic) break;
-      }
-      if (!swap_requested_topic) {
-         elog("underwriter: SwapRequested event ABI not loaded; cannot verify "
-              "source deposit for uwreq {}", req.id);
-         return false;
-      }
-
-      std::string source_tx_id_hex = "0x" +
-         fc::to_hex(req.source_tx_id.data(), req.source_tx_id.size());
-      std::string topic0_hex = "0x" + std::string{swap_requested_topic->str()};
-
-      fc::mutable_variant_object filter;
-      filter("address",    eth_source_contract_addr);
-      filter("topics",     std::vector<fc::variant>{
-                              fc::variant(topic0_hex),
-                              fc::variant(source_tx_id_hex),
-                          });
-      filter("fromBlock",  "earliest");
-      filter("toBlock",    "latest");
-
-      fc::variant logs;
-      try {
-         logs = entry->client->get_logs(fc::variant(filter));
-      } catch (const fc::exception& e) {
-         elog("underwriter: eth_getLogs failed for uwreq {} source-deposit verify: {}",
-              req.id, e.to_detail_string());
-         return false;
-      }
-
-      if (!logs.is_array() || logs.get_array().empty()) {
-         elog("underwriter: source-deposit verify failed for uwreq {} — no "
-              "SwapRequested(source_tx_id={}) event found on {}",
-              req.id, source_tx_id_hex, eth_source_contract_addr);
-         {
-            std::lock_guard lk{stats_mutex};
-            source_deposit_mismatch_count++;
-         }
-         return false;
-      }
-
-      // Decoding the SwapRequested event's non-indexed args (depositor,
-      // token_kind, amount) and matching them against `req` requires the
-      // ABI decoder for that event. The ABI lookup above gives us the
-      // event definition; libfc's `eth::abi::decode_event` consumes it.
-      // For v1 we accept the existence of the event as sufficient — the
-      // strict arg match lands when the emit site is finalized and we can
-      // pin the encoding without guessing.
-      // TODO @jglanz: full arg-match against (req.src_token_kind, req.src_amount)
-      //   once the SwapRequested event ABI is final.
-      ilog("underwriter: source-deposit verify (existence-check phase) "
-           "passed for uwreq {} source_tx_id={}", req.id, source_tx_id_hex);
-      return true;
-   }
-
-   /// SOL-side source-deposit verification — same shape as the ETH path
-   /// but via `get_signatures_for_address` on the source program +
-   /// transaction-log decoding. Deferred until the SOL swap-emit site
-   /// lands; today returns false (skip) when source_tx_id is non-empty
-   /// and src_chain == SOLANA. The empty-source_tx_id branch (staged
-   /// rollout) is handled in `verify_source_deposit` above.
-   bool verify_source_deposit_sol(const uw_request& req) {
-      elog("underwriter: SOL source-deposit verify not yet implemented "
-           "(deferred until SOL swap-emit-site lands; uwreq {})", req.id);
-      // TODO @jglanz: implement via sol_client->get_signatures_for_address
-      // filtered by the SOL outpost program id, then per-sig
-      // sol_client->get_transaction and decode the program log emitted at
-      // swap-deposit time.
-      {
+      auto bump_mismatch = [&]() {
          std::lock_guard lk{stats_mutex};
          source_deposit_mismatch_count++;
+      };
+
+      const std::string tx_hash_hex = "0x" +
+         fc::to_hex(req.source_tx_id.data(), req.source_tx_id.size());
+
+      try {
+         auto tx = entry->client->get_transaction_by_hash(tx_hash_hex);
+         if (tx.is_null()) {
+            elog("underwriter: source-deposit verify failed for uwreq {} — "
+                 "eth_getTransactionByHash({}) returned null",
+                 req.id, tx_hash_hex);
+            bump_mismatch();
+            return false;
+         }
+         const auto tx_obj = tx.get_object();
+
+         // (2) tx.to == configured source contract.
+         std::string to_addr;
+         if (tx_obj.contains("to") && tx_obj["to"].is_string()) {
+            to_addr = tx_obj["to"].as_string();
+         }
+         if (!boost::iequals(to_addr, eth_source_contract_addr)) {
+            elog("underwriter: source-deposit verify failed for uwreq {} — "
+                 "tx.to={} != configured {}", req.id, to_addr,
+                 eth_source_contract_addr);
+            bump_mismatch();
+            return false;
+         }
+
+         // (3) tx.from == req.depositor. The depot stores the 20-byte
+         //     ETH address verbatim in `depositor`; the RPC returns the
+         //     same address as a "0x"-prefixed lower-case hex string.
+         std::string from_addr;
+         if (tx_obj.contains("from") && tx_obj["from"].is_string()) {
+            from_addr = tx_obj["from"].as_string();
+         }
+         const std::string req_depositor = "0x" +
+            fc::to_hex(req.depositor.data(), req.depositor.size());
+         if (!boost::iequals(from_addr, req_depositor)) {
+            elog("underwriter: source-deposit verify failed for uwreq {} — "
+                 "tx.from={} != req.depositor={}", req.id, from_addr,
+                 req_depositor);
+            bump_mismatch();
+            return false;
+         }
+
+         // (4) Function selector match. tx.input is "0x"-prefixed hex.
+         std::string input_hex;
+         if (tx_obj.contains("input") && tx_obj["input"].is_string()) {
+            input_hex = tx_obj["input"].as_string();
+         }
+         // Strip "0x" prefix; selector is the first 4 bytes (8 hex chars).
+         std::string_view input_no_prefix = input_hex;
+         if (input_no_prefix.size() >= 2 && input_no_prefix[0] == '0' &&
+             (input_no_prefix[1] == 'x' || input_no_prefix[1] == 'X')) {
+            input_no_prefix.remove_prefix(2);
+         }
+         if (input_no_prefix.size() < 8) {
+            elog("underwriter: source-deposit verify failed for uwreq {} — "
+                 "tx.input too short ({} hex chars) to contain a 4-byte selector",
+                 req.id, input_no_prefix.size());
+            bump_mismatch();
+            return false;
+         }
+         std::vector<uint8_t> got_selector(4);
+         for (size_t i = 0; i < 4; ++i) {
+            got_selector[i] = static_cast<uint8_t>(std::stoul(
+               std::string{input_no_prefix.substr(i * 2, 2)}, nullptr, 16));
+         }
+         if (got_selector != eth_source_deposit_selector) {
+            const std::string got_hex   = fc::to_hex(reinterpret_cast<const char*>(got_selector.data()), got_selector.size());
+            const std::string want_hex  = fc::to_hex(reinterpret_cast<const char*>(eth_source_deposit_selector.data()),
+                                                      eth_source_deposit_selector.size());
+            elog("underwriter: source-deposit verify failed for uwreq {} — "
+                 "tx.input[0..4]={} != configured selector={}",
+                 req.id, got_hex, want_hex);
+            bump_mismatch();
+            return false;
+         }
+
+         // (5) Receipt must exist + status not == "0x0".
+         auto receipt = entry->client->get_transaction_receipt(tx_hash_hex);
+         if (receipt.is_null()) {
+            elog("underwriter: source-deposit verify deferred for uwreq {} — "
+                 "no receipt for tx {} (not yet mined). Skip + retry next cycle.",
+                 req.id, tx_hash_hex);
+            // Not a mismatch — the tx exists but isn't yet receipt-ready.
+            return false;
+         }
+         const auto rcpt_obj = receipt.get_object();
+         if (rcpt_obj.contains("status")
+             && rcpt_obj["status"].as_string() == "0x0") {
+            elog("underwriter: source-deposit verify failed for uwreq {} — "
+                 "tx {} reverted on-chain", req.id, tx_hash_hex);
+            bump_mismatch();
+            return false;
+         }
+
+         // (6) Confirmation depth. Reorgs of `ETH_MIN_CONFIRMATIONS`
+         //     blocks are not statistically meaningful on a healthy
+         //     PoS ETH chain; this guards against a tx being mined into
+         //     a block that's later orphaned.
+         if (!rcpt_obj.contains("blockNumber")
+             || !rcpt_obj["blockNumber"].is_string()) {
+            elog("underwriter: source-deposit verify deferred for uwreq {} — "
+                 "receipt missing blockNumber for tx {}", req.id, tx_hash_hex);
+            return false;
+         }
+         const uint64_t rcpt_blk = std::stoull(
+            rcpt_obj["blockNumber"].as_string().substr(2), nullptr, 16);
+         const uint64_t head_blk =
+            entry->client->get_block_number().convert_to<uint64_t>();
+         if (head_blk < rcpt_blk
+             || (head_blk - rcpt_blk) < underwriter::ETH_MIN_CONFIRMATIONS) {
+            elog("underwriter: source-deposit verify deferred for uwreq {} — "
+                 "insufficient confirmations: head={} receipt={} need={}",
+                 req.id, head_blk, rcpt_blk,
+                 underwriter::ETH_MIN_CONFIRMATIONS);
+            return false;
+         }
+
+         ilog("underwriter: source-deposit verify passed for uwreq {} "
+              "(tx {} → {} from {}; selector ok; depth={})",
+              req.id, tx_hash_hex, to_addr, from_addr, head_blk - rcpt_blk);
+         return true;
+      } catch (const fc::exception& e) {
+         elog("underwriter: source-deposit verify failed for uwreq {} — "
+              "RPC error: {}", req.id, e.to_detail_string());
+         bump_mismatch();
+         return false;
       }
-      return false;
+   }
+
+   /// SOL-side source-deposit verification. `req.source_tx_id` is the
+   /// raw 64-byte Solana transaction signature captured at swap-emit
+   /// time. The verify path:
+   ///
+   ///   1. `getTransaction(base58(source_tx_id), commitment=SOL_COMMITMENT)` — tx must exist.
+   ///   2. `tx.meta.err` must be null.
+   ///   3. `sol_program_id` must appear in `tx.transaction.message.accountKeys`.
+   ///   4. The deposit instruction (the instruction targeting our program) must:
+   ///      a. start with the configured 8-byte anchor discriminator
+   ///         (`--underwriter-sol-source-deposit-discriminator`), and
+   ///      b. carry the depositor pubkey as the first signer in `accountKeys` matching `req.depositor`.
+   ///
+   /// Returns true only when all checks pass.
+   bool verify_source_deposit_sol(const uw_request& req) {
+      auto entry = sol_plug->get_client(sol_client_id);
+      if (!entry || !entry->client) {
+         elog("underwriter: SOL client '{}' not found for source-deposit verify "
+              "(uwreq {})", sol_client_id, req.id);
+         return false;
+      }
+      auto bump_mismatch = [&]() {
+         std::lock_guard lk{stats_mutex};
+         source_deposit_mismatch_count++;
+      };
+
+      // Solana signatures are 64 bytes encoded as base58 strings on the
+      // wire. The batch operator stored the raw 64 bytes in source_tx_id.
+      const std::string sig_b58 = fc::to_base58(
+         req.source_tx_id.data(), req.source_tx_id.size(),
+         fc::yield_function_t{});
+
+      try {
+         auto tx = entry->client->get_transaction(sig_b58,
+            underwriter::SOL_COMMITMENT);
+         if (tx.is_null()) {
+            elog("underwriter: source-deposit verify failed for uwreq {} — "
+                 "getTransaction({}) returned null", req.id, sig_b58);
+            bump_mismatch();
+            return false;
+         }
+         const auto tx_obj = tx.get_object();
+         // (2) tx.meta.err must be null for success.
+         if (tx_obj.contains("meta") && tx_obj["meta"].is_object()) {
+            const auto meta = tx_obj["meta"].get_object();
+            if (meta.contains("err") && !meta["err"].is_null()) {
+               elog("underwriter: source-deposit verify failed for uwreq {} — "
+                    "tx {} failed on-chain (meta.err={})", req.id, sig_b58,
+                    meta["err"].as_string());
+               bump_mismatch();
+               return false;
+            }
+         }
+
+         // (3) sol_program_id must appear in accountKeys. We also record
+         //     its index because Solana instructions reference accounts
+         //     by index into this array.
+         std::vector<std::string> account_keys;
+         std::optional<size_t> program_idx;
+         if (tx_obj.contains("transaction") && tx_obj["transaction"].is_object()) {
+            const auto inner = tx_obj["transaction"].get_object();
+            if (inner.contains("message") && inner["message"].is_object()) {
+               const auto msg = inner["message"].get_object();
+               if (msg.contains("accountKeys") && msg["accountKeys"].is_array()) {
+                  size_t i = 0;
+                  for (const auto& k : msg["accountKeys"].get_array()) {
+                     if (k.is_string()) {
+                        account_keys.push_back(k.as_string());
+                        if (account_keys.back() == sol_program_id) {
+                           program_idx = i;
+                        }
+                     }
+                     ++i;
+                  }
+                  if (!program_idx) {
+                     elog("underwriter: source-deposit verify failed for uwreq {} — "
+                          "tx {} does not reference SOL outpost program {}",
+                          req.id, sig_b58, sol_program_id);
+                     bump_mismatch();
+                     return false;
+                  }
+                  // (4b) Depositor must equal accountKeys[0] (Solana fee
+                  //      payer / first signer). `req.depositor` is the
+                  //      raw 32-byte Ed25519 pubkey; base58-encode it
+                  //      to compare against the RPC's string form.
+                  if (account_keys.empty()) {
+                     elog("underwriter: source-deposit verify failed for uwreq {} — "
+                          "tx {} has empty accountKeys", req.id, sig_b58);
+                     bump_mismatch();
+                     return false;
+                  }
+                  const std::string depositor_b58 = fc::to_base58(
+                     req.depositor.data(), req.depositor.size(),
+                     fc::yield_function_t{});
+                  if (account_keys.front() != depositor_b58) {
+                     elog("underwriter: source-deposit verify failed for uwreq {} — "
+                          "fee-payer={} != req.depositor={}",
+                          req.id, account_keys.front(), depositor_b58);
+                     bump_mismatch();
+                     return false;
+                  }
+               }
+               // (4a) Discriminator match on the instruction targeting our
+               //      program. The RPC's `message.instructions[].programIdIndex`
+               //      points into accountKeys; we want the instruction whose
+               //      programIdIndex == our resolved index.
+               if (msg.contains("instructions") && msg["instructions"].is_array()) {
+                  bool disc_seen = false;
+                  for (const auto& ix : msg["instructions"].get_array()) {
+                     if (!ix.is_object()) continue;
+                     const auto ix_obj = ix.get_object();
+                     if (!ix_obj.contains("programIdIndex")) continue;
+                     if (ix_obj["programIdIndex"].as_uint64() != *program_idx) continue;
+
+                     // `data` is base58-encoded in the JSON-RPC response
+                     // (default encoding). Decode + compare the leading 8
+                     // bytes to the configured discriminator.
+                     std::string data_b58;
+                     if (ix_obj.contains("data") && ix_obj["data"].is_string()) {
+                        data_b58 = ix_obj["data"].as_string();
+                     }
+                     if (data_b58.empty()) continue;
+                     std::vector<char> decoded;
+                     try {
+                        // fc::from_base58 returns vector<char>
+                        decoded = fc::from_base58(data_b58);
+                     } catch (...) {
+                        continue;
+                     }
+                     if (decoded.size() < 8) continue;
+                     if (std::equal(
+                            sol_source_deposit_discriminator.begin(),
+                            sol_source_deposit_discriminator.end(),
+                            reinterpret_cast<const uint8_t*>(decoded.data()))) {
+                        disc_seen = true;
+                        break;
+                     }
+                  }
+                  if (!disc_seen) {
+                     const std::string want = fc::to_hex(
+                        reinterpret_cast<const char*>(sol_source_deposit_discriminator.data()),
+                        sol_source_deposit_discriminator.size());
+                     elog("underwriter: source-deposit verify failed for uwreq {} — "
+                          "no instruction targeting program {} carries the "
+                          "configured discriminator {}",
+                          req.id, sol_program_id, want);
+                     bump_mismatch();
+                     return false;
+                  }
+               }
+            }
+         }
+
+         ilog("underwriter: source-deposit verify passed for uwreq {} "
+              "(SOL tx {} touches program {}; discriminator + depositor ok)",
+              req.id, sig_b58, sol_program_id);
+         return true;
+      } catch (const fc::exception& e) {
+         elog("underwriter: source-deposit verify failed for uwreq {} — "
+              "RPC error: {}", req.id, e.to_detail_string());
+         bump_mismatch();
+         return false;
+      }
    }
 
    /**
@@ -1371,9 +1696,16 @@ void underwriter_plugin::set_program_options(options_description& cli,
    opts("underwriter-sol-program-id", bpo::value<std::string>(),
         "OPP outpost program ID on Solana (base58)");
    opts("underwriter-eth-source-contract-addr", bpo::value<std::string>(),
-        "Ethereum contract address that emits the `SwapRequested` event used "
-        "for source-deposit verification (T13). Unset disables verification "
-        "with a structured elog at scan time.");
+        "Ethereum contract address that handles swap deposits — the verify_source_deposit "
+        "path requires `tx.to` to equal this. Required.");
+   opts("underwriter-eth-source-deposit-selector", bpo::value<std::string>(),
+        "4-byte function selector (hex; with or without 0x prefix) for the swap-deposit "
+        "call on `underwriter-eth-source-contract-addr`. The verify path requires "
+        "`tx.input[0..4]` to equal this. Required.");
+   opts("underwriter-sol-source-deposit-discriminator", bpo::value<std::string>(),
+        "8-byte anchor discriminator (hex; with or without 0x prefix) for the swap-deposit "
+        "instruction on `underwriter-sol-program-id`. The verify path requires the "
+        "instruction's data field to start with this. Required.");
 }
 
 void underwriter_plugin::plugin_initialize(const variables_map& options) {
@@ -1391,6 +1723,29 @@ void underwriter_plugin::plugin_initialize(const variables_map& options) {
    if (options.count("underwriter-eth-source-contract-addr"))
       _impl->eth_source_contract_addr =
          options["underwriter-eth-source-contract-addr"].as<std::string>();
+   auto hex_option_to_bytes = [&](const char* opt_name, size_t expected_len) {
+      std::vector<uint8_t> out;
+      if (!options.count(opt_name)) return out;
+      auto s = options[opt_name].as<std::string>();
+      // Strip optional 0x prefix
+      if (s.size() >= 2 && s[0] == '0' && (s[1] == 'x' || s[1] == 'X')) {
+         s.erase(0, 2);
+      }
+      if (s.size() != expected_len * 2) {
+         elog("underwriter: --{} must be exactly {} bytes (got {} hex chars)",
+              opt_name, expected_len, s.size());
+         return std::vector<uint8_t>{};
+      }
+      out.resize(expected_len);
+      for (size_t i = 0; i < expected_len; ++i) {
+         out[i] = static_cast<uint8_t>(std::stoul(s.substr(i * 2, 2), nullptr, 16));
+      }
+      return out;
+   };
+   _impl->eth_source_deposit_selector =
+      hex_option_to_bytes("underwriter-eth-source-deposit-selector", 4);
+   _impl->sol_source_deposit_discriminator =
+      hex_option_to_bytes("underwriter-sol-source-deposit-discriminator", 8);
 
    _impl->chain_plug = &app().get_plugin<chain_plugin>();
    _impl->cron_plug  = &app().get_plugin<cron_plugin>();

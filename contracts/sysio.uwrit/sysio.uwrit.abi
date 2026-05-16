@@ -314,6 +314,10 @@
                     "type": "bytes"
                 },
                 {
+                    "name": "depositor",
+                    "type": "bytes"
+                },
+                {
                     "name": "commits_by",
                     "type": "commit_entry[]"
                 },

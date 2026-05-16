@@ -191,17 +191,13 @@ message SwapRequest {
   // Quote timestamp (milliseconds since epoch) — informational; the depot's
   // variance check uses the LP price at consensus time, not at quote time.
   uint64                       quote_timestamp_ms = 8;
-  // Source-chain derived id for the deposit that funded this swap. Contracts
-  // cannot read their own tx hash, so the source outpost computes
-  // `keccak256(uw_request_id, msg.sender, block.number, nonce)` (ETH) or
-  // `sha256(uw_request_id, depositor, slot, nonce)` (SOL) at swap-emit time
-  // and surfaces the digest both here and in an indexed event
-  // (`SwapRequested(bytes32 indexed source_tx_id, depositor, token_kind, amount)`).
-  // The off-chain underwriter plugin reads this id and queries the matching
-  // event on the source chain to confirm a real deposit backs the swap
-  // before committing collateral. Empty until the swap-emit site lands on
-  // an outpost — the plugin treats empty as "verification not yet active"
-  // and logs a warning rather than skipping the commit.
+  // Source-chain transaction id of the deposit that funded this swap.
+  // ETH: 32-byte tx hash. SOL: 64-byte signature. Captured by the source
+  // outpost at swap-emit time and surfaced here verbatim — the depot's
+  // `sysio.uwrit::createuwreq` REJECTS any SwapRequest with an empty
+  // `source_tx_id` (emits SwapRevert), and the underwriter plugin's
+  // `verify_source_deposit` cross-references this tx against the depot's
+  // recorded `depositor` + amount + token before committing collateral.
   bytes                        source_tx_id = 9;
 }
 
