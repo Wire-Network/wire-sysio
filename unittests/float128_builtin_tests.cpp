@@ -108,31 +108,31 @@ struct builtin_harness {
 
    f128 addtf3(f128 a, f128 b) {
       float128_t r;
-      iface.__addtf3(legacy_ptr<float128_t>(static_cast<void*>(&r)), a.lo, a.hi, b.lo, b.hi);
+      iface.__addtf3(aligned_ptr<float128_t>(static_cast<void*>(&r)), a.lo, a.hi, b.lo, b.hi);
       return {r.v[0], r.v[1]};
    }
 
    f128 subtf3(f128 a, f128 b) {
       float128_t r;
-      iface.__subtf3(legacy_ptr<float128_t>(static_cast<void*>(&r)), a.lo, a.hi, b.lo, b.hi);
+      iface.__subtf3(aligned_ptr<float128_t>(static_cast<void*>(&r)), a.lo, a.hi, b.lo, b.hi);
       return {r.v[0], r.v[1]};
    }
 
    f128 multf3(f128 a, f128 b) {
       float128_t r;
-      iface.__multf3(legacy_ptr<float128_t>(static_cast<void*>(&r)), a.lo, a.hi, b.lo, b.hi);
+      iface.__multf3(aligned_ptr<float128_t>(static_cast<void*>(&r)), a.lo, a.hi, b.lo, b.hi);
       return {r.v[0], r.v[1]};
    }
 
    f128 divtf3(f128 a, f128 b) {
       float128_t r;
-      iface.__divtf3(legacy_ptr<float128_t>(static_cast<void*>(&r)), a.lo, a.hi, b.lo, b.hi);
+      iface.__divtf3(aligned_ptr<float128_t>(static_cast<void*>(&r)), a.lo, a.hi, b.lo, b.hi);
       return {r.v[0], r.v[1]};
    }
 
    f128 negtf2(f128 a) {
       float128_t r;
-      iface.__negtf2(legacy_ptr<float128_t>(static_cast<void*>(&r)), a.lo, a.hi);
+      iface.__negtf2(aligned_ptr<float128_t>(static_cast<void*>(&r)), a.lo, a.hi);
       return {r.v[0], r.v[1]};
    }
 
@@ -140,13 +140,13 @@ struct builtin_harness {
 
    f128 extendsftf2(float f) {
       float128_t r;
-      iface.__extendsftf2(legacy_ptr<float128_t>(static_cast<void*>(&r)), f);
+      iface.__extendsftf2(aligned_ptr<float128_t>(static_cast<void*>(&r)), f);
       return {r.v[0], r.v[1]};
    }
 
    f128 extenddftf2(double d) {
       float128_t r;
-      iface.__extenddftf2(legacy_ptr<float128_t>(static_cast<void*>(&r)), d);
+      iface.__extenddftf2(aligned_ptr<float128_t>(static_cast<void*>(&r)), d);
       return {r.v[0], r.v[1]};
    }
 
@@ -162,13 +162,13 @@ struct builtin_harness {
 
    __int128 fixtfti(f128 a) {
       __int128 r = 0;
-      iface.__fixtfti(legacy_ptr<__int128>(static_cast<void*>(&r)), a.lo, a.hi);
+      iface.__fixtfti(aligned_ptr<__int128>(static_cast<void*>(&r)), a.lo, a.hi);
       return r;
    }
 
    unsigned __int128 fixunstfti(f128 a) {
       unsigned __int128 r = 0;
-      iface.__fixunstfti(legacy_ptr<unsigned __int128>(static_cast<void*>(&r)), a.lo, a.hi);
+      iface.__fixunstfti(aligned_ptr<unsigned __int128>(static_cast<void*>(&r)), a.lo, a.hi);
       return r;
    }
 
@@ -176,25 +176,25 @@ struct builtin_harness {
 
    __int128 fixsfti(float a) {
       __int128 r = 0;
-      iface.__fixsfti(legacy_ptr<__int128>(static_cast<void*>(&r)), a);
+      iface.__fixsfti(aligned_ptr<__int128>(static_cast<void*>(&r)), a);
       return r;
    }
 
    __int128 fixdfti(double a) {
       __int128 r = 0;
-      iface.__fixdfti(legacy_ptr<__int128>(static_cast<void*>(&r)), a);
+      iface.__fixdfti(aligned_ptr<__int128>(static_cast<void*>(&r)), a);
       return r;
    }
 
    unsigned __int128 fixunssfti(float a) {
       unsigned __int128 r = 0;
-      iface.__fixunssfti(legacy_ptr<unsigned __int128>(static_cast<void*>(&r)), a);
+      iface.__fixunssfti(aligned_ptr<unsigned __int128>(static_cast<void*>(&r)), a);
       return r;
    }
 
    unsigned __int128 fixunsdfti(double a) {
       unsigned __int128 r = 0;
-      iface.__fixunsdfti(legacy_ptr<unsigned __int128>(static_cast<void*>(&r)), a);
+      iface.__fixunsdfti(aligned_ptr<unsigned __int128>(static_cast<void*>(&r)), a);
       return r;
    }
 
@@ -204,25 +204,25 @@ struct builtin_harness {
 
    f128 floatsitf(int32_t i) {
       float128_t r;
-      iface.__floatsitf(legacy_ptr<float128_t>(static_cast<void*>(&r)), i);
+      iface.__floatsitf(aligned_ptr<float128_t>(static_cast<void*>(&r)), i);
       return {r.v[0], r.v[1]};
    }
 
    f128 floatditf(uint64_t a) {
       float128_t r;
-      iface.__floatditf(legacy_ptr<float128_t>(static_cast<void*>(&r)), a);
+      iface.__floatditf(aligned_ptr<float128_t>(static_cast<void*>(&r)), a);
       return {r.v[0], r.v[1]};
    }
 
    f128 floatunsitf(uint32_t i) {
       float128_t r;
-      iface.__floatunsitf(legacy_ptr<float128_t>(static_cast<void*>(&r)), i);
+      iface.__floatunsitf(aligned_ptr<float128_t>(static_cast<void*>(&r)), i);
       return {r.v[0], r.v[1]};
    }
 
    f128 floatunditf(uint64_t a) {
       float128_t r;
-      iface.__floatunditf(legacy_ptr<float128_t>(static_cast<void*>(&r)), a);
+      iface.__floatunditf(aligned_ptr<float128_t>(static_cast<void*>(&r)), a);
       return {r.v[0], r.v[1]};
    }
 

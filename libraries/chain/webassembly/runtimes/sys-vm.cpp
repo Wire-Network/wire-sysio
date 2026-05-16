@@ -1,5 +1,6 @@
 #include <sysio/chain/webassembly/sys-vm.hpp>
 #include <sysio/chain/webassembly/interface.hpp>
+#include <sysio/chain/webassembly/intrinsic_signature_registry.hpp>
 #include <sysio/chain/account_object.hpp>
 #include <sysio/chain/apply_context.hpp>
 #include <sysio/chain/transaction_context.hpp>
@@ -329,44 +330,44 @@ struct host_function_registrator {
    }                                                                                                                   \
    inline static auto NAME##_registrator = NAME##_registrator_impl();
 
-#define REGISTER_LEGACY_HOST_FUNCTION(NAME, ...)                                                                       \
-   static host_function_registrator<&interface::NAME, legacy_static_check_wl_args, context_aware_check, ##__VA_ARGS__> \
+#define REGISTER_ALIGNED_HOST_FUNCTION(NAME, ...)                                                                       \
+   static host_function_registrator<&interface::NAME, aligned_static_check_wl_args, context_aware_check, ##__VA_ARGS__> \
        NAME##_registrator_impl() {                                                                                     \
       return {BOOST_HANA_STRING("env"), BOOST_HANA_STRING(#NAME)};                                                     \
    }                                                                                                                   \
    inline static auto NAME##_registrator = NAME##_registrator_impl();
 
-#define REGISTER_LEGACY_CF_HOST_FUNCTION(NAME, ...)                                                                    \
-   static host_function_registrator<&interface::NAME, legacy_static_check_wl_args, ##__VA_ARGS__>                      \
+#define REGISTER_ALIGNED_CF_HOST_FUNCTION(NAME, ...)                                                                    \
+   static host_function_registrator<&interface::NAME, aligned_static_check_wl_args, ##__VA_ARGS__>                      \
        NAME##_registrator_impl() {                                                                                     \
       return {BOOST_HANA_STRING("env"), BOOST_HANA_STRING(#NAME)};                                                     \
    }                                                                                                                   \
    inline static auto NAME##_registrator = NAME##_registrator_impl();
 
-#define REGISTER_LEGACY_CF_ONLY_HOST_FUNCTION(NAME, ...)                                                               \
-   static host_function_registrator<&interface::NAME, legacy_static_check_wl_args, context_free_check, ##__VA_ARGS__>  \
+#define REGISTER_ALIGNED_CF_ONLY_HOST_FUNCTION(NAME, ...)                                                               \
+   static host_function_registrator<&interface::NAME, aligned_static_check_wl_args, context_free_check, ##__VA_ARGS__>  \
        NAME##_registrator_impl() {                                                                                     \
       return {BOOST_HANA_STRING("env"), BOOST_HANA_STRING(#NAME)};                                                     \
    }                                                                                                                   \
    inline static auto NAME##_registrator = NAME##_registrator_impl();
 
 // context free api
-REGISTER_LEGACY_CF_ONLY_HOST_FUNCTION(get_context_free_data)
+REGISTER_ALIGNED_CF_ONLY_HOST_FUNCTION(get_context_free_data)
 
 // privileged api
 REGISTER_HOST_FUNCTION(is_feature_active, privileged_check);
 REGISTER_HOST_FUNCTION(activate_feature, privileged_check);
-REGISTER_LEGACY_HOST_FUNCTION(preactivate_feature, privileged_check);
+REGISTER_ALIGNED_HOST_FUNCTION(preactivate_feature, privileged_check);
 REGISTER_HOST_FUNCTION(set_resource_limits, privileged_check);
-REGISTER_LEGACY_HOST_FUNCTION(get_resource_limits, privileged_check);
+REGISTER_ALIGNED_HOST_FUNCTION(get_resource_limits, privileged_check);
 REGISTER_HOST_FUNCTION(get_parameters_packed, privileged_check);
 REGISTER_HOST_FUNCTION(set_parameters_packed, privileged_check);
 REGISTER_HOST_FUNCTION(get_wasm_parameters_packed, privileged_check);
 REGISTER_HOST_FUNCTION(set_wasm_parameters_packed, privileged_check);
-REGISTER_LEGACY_HOST_FUNCTION(set_proposed_producers, privileged_check);
-REGISTER_LEGACY_HOST_FUNCTION(set_proposed_producers_ex, privileged_check);
-REGISTER_LEGACY_HOST_FUNCTION(get_blockchain_parameters_packed, privileged_check);
-REGISTER_LEGACY_HOST_FUNCTION(set_blockchain_parameters_packed, privileged_check);
+REGISTER_ALIGNED_HOST_FUNCTION(set_proposed_producers, privileged_check);
+REGISTER_ALIGNED_HOST_FUNCTION(set_proposed_producers_ex, privileged_check);
+REGISTER_ALIGNED_HOST_FUNCTION(get_blockchain_parameters_packed, privileged_check);
+REGISTER_ALIGNED_HOST_FUNCTION(set_blockchain_parameters_packed, privileged_check);
 REGISTER_HOST_FUNCTION(is_privileged, privileged_check);
 REGISTER_HOST_FUNCTION(set_privileged, privileged_check);
 REGISTER_HOST_FUNCTION(set_finalizers, privileged_check);
@@ -432,23 +433,23 @@ REGISTER_INJECTED_HOST_FUNCTION(_sysio_ui32_to_f64);
 REGISTER_INJECTED_HOST_FUNCTION(_sysio_ui64_to_f64);
 
 // producer api
-REGISTER_LEGACY_HOST_FUNCTION(get_active_producers);
+REGISTER_ALIGNED_HOST_FUNCTION(get_active_producers);
 
 // crypto api
-REGISTER_LEGACY_CF_HOST_FUNCTION(assert_recover_key);
-REGISTER_LEGACY_CF_HOST_FUNCTION(recover_key);
-REGISTER_LEGACY_CF_HOST_FUNCTION(assert_sha256);
-REGISTER_LEGACY_CF_HOST_FUNCTION(assert_sha1);
-REGISTER_LEGACY_CF_HOST_FUNCTION(assert_sha512);
-REGISTER_LEGACY_CF_HOST_FUNCTION(assert_ripemd160);
-REGISTER_LEGACY_CF_HOST_FUNCTION(sha256);
-REGISTER_LEGACY_CF_HOST_FUNCTION(sha1);
-REGISTER_LEGACY_CF_HOST_FUNCTION(sha512);
-REGISTER_LEGACY_CF_HOST_FUNCTION(ripemd160);
+REGISTER_ALIGNED_CF_HOST_FUNCTION(assert_recover_key);
+REGISTER_ALIGNED_CF_HOST_FUNCTION(recover_key);
+REGISTER_ALIGNED_CF_HOST_FUNCTION(assert_sha256);
+REGISTER_ALIGNED_CF_HOST_FUNCTION(assert_sha1);
+REGISTER_ALIGNED_CF_HOST_FUNCTION(assert_sha512);
+REGISTER_ALIGNED_CF_HOST_FUNCTION(assert_ripemd160);
+REGISTER_ALIGNED_CF_HOST_FUNCTION(sha256);
+REGISTER_ALIGNED_CF_HOST_FUNCTION(sha1);
+REGISTER_ALIGNED_CF_HOST_FUNCTION(sha512);
+REGISTER_ALIGNED_CF_HOST_FUNCTION(ripemd160);
 
 // permission api
-REGISTER_LEGACY_HOST_FUNCTION(check_transaction_authorization);
-REGISTER_LEGACY_HOST_FUNCTION(check_permission_authorization);
+REGISTER_ALIGNED_HOST_FUNCTION(check_transaction_authorization);
+REGISTER_ALIGNED_HOST_FUNCTION(check_permission_authorization);
 REGISTER_HOST_FUNCTION(get_permission_lower_bound);
 
 // authorization api
@@ -462,112 +463,112 @@ REGISTER_HOST_FUNCTION(get_code_hash);
 // system api
 REGISTER_HOST_FUNCTION(current_time);
 REGISTER_HOST_FUNCTION(publication_time);
-REGISTER_LEGACY_HOST_FUNCTION(is_feature_activated);
+REGISTER_ALIGNED_HOST_FUNCTION(is_feature_activated);
 REGISTER_HOST_FUNCTION(get_sender);
 REGISTER_HOST_FUNCTION(get_ram_usage);
 
 // context-free system api
 REGISTER_CF_HOST_FUNCTION(abort)
-REGISTER_LEGACY_CF_HOST_FUNCTION(sysio_assert)
-REGISTER_LEGACY_CF_HOST_FUNCTION(sysio_assert_message)
+REGISTER_ALIGNED_CF_HOST_FUNCTION(sysio_assert)
+REGISTER_ALIGNED_CF_HOST_FUNCTION(sysio_assert_message)
 REGISTER_CF_HOST_FUNCTION(sysio_assert_code)
 REGISTER_CF_HOST_FUNCTION(sysio_exit)
 
 // action api
-REGISTER_LEGACY_CF_HOST_FUNCTION(read_action_data);
+REGISTER_ALIGNED_CF_HOST_FUNCTION(read_action_data);
 REGISTER_CF_HOST_FUNCTION(action_data_size);
 REGISTER_CF_HOST_FUNCTION(current_receiver);
 REGISTER_HOST_FUNCTION(set_action_return_value);
 
 // console api
-REGISTER_LEGACY_CF_HOST_FUNCTION(prints);
-REGISTER_LEGACY_CF_HOST_FUNCTION(prints_l);
+REGISTER_ALIGNED_CF_HOST_FUNCTION(prints);
+REGISTER_ALIGNED_CF_HOST_FUNCTION(prints_l);
 REGISTER_CF_HOST_FUNCTION(printi);
 REGISTER_CF_HOST_FUNCTION(printui);
-REGISTER_LEGACY_CF_HOST_FUNCTION(printi128);
-REGISTER_LEGACY_CF_HOST_FUNCTION(printui128);
+REGISTER_ALIGNED_CF_HOST_FUNCTION(printi128);
+REGISTER_ALIGNED_CF_HOST_FUNCTION(printui128);
 REGISTER_CF_HOST_FUNCTION(printsf);
 REGISTER_CF_HOST_FUNCTION(printdf);
-REGISTER_LEGACY_CF_HOST_FUNCTION(printqf);
+REGISTER_ALIGNED_CF_HOST_FUNCTION(printqf);
 REGISTER_CF_HOST_FUNCTION(printn);
-REGISTER_LEGACY_CF_HOST_FUNCTION(printhex);
+REGISTER_ALIGNED_CF_HOST_FUNCTION(printhex);
 
 // kv database api
-REGISTER_LEGACY_HOST_FUNCTION(kv_set);
-REGISTER_LEGACY_HOST_FUNCTION(kv_get);
-REGISTER_LEGACY_HOST_FUNCTION(kv_erase);
-REGISTER_LEGACY_HOST_FUNCTION(kv_contains);
-REGISTER_LEGACY_HOST_FUNCTION(kv_it_create);
+REGISTER_ALIGNED_HOST_FUNCTION(kv_set);
+REGISTER_ALIGNED_HOST_FUNCTION(kv_get);
+REGISTER_ALIGNED_HOST_FUNCTION(kv_erase);
+REGISTER_ALIGNED_HOST_FUNCTION(kv_contains);
+REGISTER_ALIGNED_HOST_FUNCTION(kv_it_create);
 REGISTER_HOST_FUNCTION(kv_it_destroy);
 REGISTER_HOST_FUNCTION(kv_it_status);
 REGISTER_HOST_FUNCTION(kv_it_next);
 REGISTER_HOST_FUNCTION(kv_it_prev);
-REGISTER_LEGACY_HOST_FUNCTION(kv_it_lower_bound);
-REGISTER_LEGACY_HOST_FUNCTION(kv_it_key);
-REGISTER_LEGACY_HOST_FUNCTION(kv_it_value);
-REGISTER_LEGACY_HOST_FUNCTION(kv_idx_store);
-REGISTER_LEGACY_HOST_FUNCTION(kv_idx_remove);
-REGISTER_LEGACY_HOST_FUNCTION(kv_idx_update);
-REGISTER_LEGACY_HOST_FUNCTION(kv_idx_find_secondary);
-REGISTER_LEGACY_HOST_FUNCTION(kv_idx_lower_bound);
+REGISTER_ALIGNED_HOST_FUNCTION(kv_it_lower_bound);
+REGISTER_ALIGNED_HOST_FUNCTION(kv_it_key);
+REGISTER_ALIGNED_HOST_FUNCTION(kv_it_value);
+REGISTER_ALIGNED_HOST_FUNCTION(kv_idx_store);
+REGISTER_ALIGNED_HOST_FUNCTION(kv_idx_remove);
+REGISTER_ALIGNED_HOST_FUNCTION(kv_idx_update);
+REGISTER_ALIGNED_HOST_FUNCTION(kv_idx_find_secondary);
+REGISTER_ALIGNED_HOST_FUNCTION(kv_idx_lower_bound);
 REGISTER_HOST_FUNCTION(kv_idx_next);
 REGISTER_HOST_FUNCTION(kv_idx_prev);
-REGISTER_LEGACY_HOST_FUNCTION(kv_idx_key);
-REGISTER_LEGACY_HOST_FUNCTION(kv_idx_primary_key);
+REGISTER_ALIGNED_HOST_FUNCTION(kv_idx_key);
+REGISTER_ALIGNED_HOST_FUNCTION(kv_idx_primary_key);
 REGISTER_HOST_FUNCTION(kv_idx_destroy);
 
 // memory api
-REGISTER_LEGACY_CF_HOST_FUNCTION(memcpy);
-REGISTER_LEGACY_CF_HOST_FUNCTION(memmove);
-REGISTER_LEGACY_CF_HOST_FUNCTION(memcmp);
-REGISTER_LEGACY_CF_HOST_FUNCTION(memset);
+REGISTER_ALIGNED_CF_HOST_FUNCTION(memcpy);
+REGISTER_ALIGNED_CF_HOST_FUNCTION(memmove);
+REGISTER_ALIGNED_CF_HOST_FUNCTION(memcmp);
+REGISTER_ALIGNED_CF_HOST_FUNCTION(memset);
 
 // transaction api
-REGISTER_LEGACY_HOST_FUNCTION(send_inline);
-REGISTER_LEGACY_HOST_FUNCTION(send_context_free_inline);
+REGISTER_ALIGNED_HOST_FUNCTION(send_inline);
+REGISTER_ALIGNED_HOST_FUNCTION(send_context_free_inline);
 
 // context-free transaction api
-REGISTER_LEGACY_CF_HOST_FUNCTION(read_transaction);
+REGISTER_ALIGNED_CF_HOST_FUNCTION(read_transaction);
 REGISTER_CF_HOST_FUNCTION(transaction_size);
 REGISTER_CF_HOST_FUNCTION(expiration);
 REGISTER_CF_HOST_FUNCTION(tapos_block_num);
 REGISTER_CF_HOST_FUNCTION(tapos_block_prefix);
-REGISTER_LEGACY_CF_HOST_FUNCTION(get_action);
+REGISTER_ALIGNED_CF_HOST_FUNCTION(get_action);
 
 // compiler builtins api
-REGISTER_LEGACY_CF_HOST_FUNCTION(__ashlti3);
-REGISTER_LEGACY_CF_HOST_FUNCTION(__ashrti3);
-REGISTER_LEGACY_CF_HOST_FUNCTION(__lshlti3);
-REGISTER_LEGACY_CF_HOST_FUNCTION(__lshrti3);
-REGISTER_LEGACY_CF_HOST_FUNCTION(__divti3);
-REGISTER_LEGACY_CF_HOST_FUNCTION(__udivti3);
-REGISTER_LEGACY_CF_HOST_FUNCTION(__multi3);
-REGISTER_LEGACY_CF_HOST_FUNCTION(__modti3);
-REGISTER_LEGACY_CF_HOST_FUNCTION(__umodti3);
-REGISTER_LEGACY_CF_HOST_FUNCTION(__addtf3);
-REGISTER_LEGACY_CF_HOST_FUNCTION(__subtf3);
-REGISTER_LEGACY_CF_HOST_FUNCTION(__multf3);
-REGISTER_LEGACY_CF_HOST_FUNCTION(__divtf3);
-REGISTER_LEGACY_CF_HOST_FUNCTION(__negtf2);
-REGISTER_LEGACY_CF_HOST_FUNCTION(__extendsftf2);
-REGISTER_LEGACY_CF_HOST_FUNCTION(__extenddftf2);
+REGISTER_ALIGNED_CF_HOST_FUNCTION(__ashlti3);
+REGISTER_ALIGNED_CF_HOST_FUNCTION(__ashrti3);
+REGISTER_ALIGNED_CF_HOST_FUNCTION(__lshlti3);
+REGISTER_ALIGNED_CF_HOST_FUNCTION(__lshrti3);
+REGISTER_ALIGNED_CF_HOST_FUNCTION(__divti3);
+REGISTER_ALIGNED_CF_HOST_FUNCTION(__udivti3);
+REGISTER_ALIGNED_CF_HOST_FUNCTION(__multi3);
+REGISTER_ALIGNED_CF_HOST_FUNCTION(__modti3);
+REGISTER_ALIGNED_CF_HOST_FUNCTION(__umodti3);
+REGISTER_ALIGNED_CF_HOST_FUNCTION(__addtf3);
+REGISTER_ALIGNED_CF_HOST_FUNCTION(__subtf3);
+REGISTER_ALIGNED_CF_HOST_FUNCTION(__multf3);
+REGISTER_ALIGNED_CF_HOST_FUNCTION(__divtf3);
+REGISTER_ALIGNED_CF_HOST_FUNCTION(__negtf2);
+REGISTER_ALIGNED_CF_HOST_FUNCTION(__extendsftf2);
+REGISTER_ALIGNED_CF_HOST_FUNCTION(__extenddftf2);
 REGISTER_CF_HOST_FUNCTION(__trunctfdf2);
 REGISTER_CF_HOST_FUNCTION(__trunctfsf2);
 REGISTER_CF_HOST_FUNCTION(__fixtfsi);
 REGISTER_CF_HOST_FUNCTION(__fixtfdi);
-REGISTER_LEGACY_CF_HOST_FUNCTION(__fixtfti);
+REGISTER_ALIGNED_CF_HOST_FUNCTION(__fixtfti);
 REGISTER_CF_HOST_FUNCTION(__fixunstfsi);
 REGISTER_CF_HOST_FUNCTION(__fixunstfdi);
-REGISTER_LEGACY_CF_HOST_FUNCTION(__fixunstfti);
-REGISTER_LEGACY_CF_HOST_FUNCTION(__fixsfti);
-REGISTER_LEGACY_CF_HOST_FUNCTION(__fixdfti);
-REGISTER_LEGACY_CF_HOST_FUNCTION(__fixunssfti);
-REGISTER_LEGACY_CF_HOST_FUNCTION(__fixunsdfti);
+REGISTER_ALIGNED_CF_HOST_FUNCTION(__fixunstfti);
+REGISTER_ALIGNED_CF_HOST_FUNCTION(__fixsfti);
+REGISTER_ALIGNED_CF_HOST_FUNCTION(__fixdfti);
+REGISTER_ALIGNED_CF_HOST_FUNCTION(__fixunssfti);
+REGISTER_ALIGNED_CF_HOST_FUNCTION(__fixunsdfti);
 REGISTER_CF_HOST_FUNCTION(__floatsidf);
-REGISTER_LEGACY_CF_HOST_FUNCTION(__floatsitf);
-REGISTER_LEGACY_CF_HOST_FUNCTION(__floatditf);
-REGISTER_LEGACY_CF_HOST_FUNCTION(__floatunsitf);
-REGISTER_LEGACY_CF_HOST_FUNCTION(__floatunditf);
+REGISTER_ALIGNED_CF_HOST_FUNCTION(__floatsitf);
+REGISTER_ALIGNED_CF_HOST_FUNCTION(__floatditf);
+REGISTER_ALIGNED_CF_HOST_FUNCTION(__floatunsitf);
+REGISTER_ALIGNED_CF_HOST_FUNCTION(__floatunditf);
 REGISTER_CF_HOST_FUNCTION(__floattidf);
 REGISTER_CF_HOST_FUNCTION(__floatuntidf);
 REGISTER_CF_HOST_FUNCTION(__cmptf2);

@@ -32,47 +32,47 @@ namespace {
 
       __int128 ashrti3(uint64_t low, uint64_t high, uint32_t shift) {
          __int128 result{};
-         iface.__ashrti3(legacy_ptr<__int128>(static_cast<void*>(&result)), low, high, shift);
+         iface.__ashrti3(aligned_ptr<__int128>(static_cast<void*>(&result)), low, high, shift);
          return result;
       }
       __int128 ashlti3(uint64_t low, uint64_t high, uint32_t shift) {
          __int128 result{};
-         iface.__ashlti3(legacy_ptr<__int128>(static_cast<void*>(&result)), low, high, shift);
+         iface.__ashlti3(aligned_ptr<__int128>(static_cast<void*>(&result)), low, high, shift);
          return result;
       }
       __int128 lshlti3(uint64_t low, uint64_t high, uint32_t shift) {
          __int128 result{};
-         iface.__lshlti3(legacy_ptr<__int128>(static_cast<void*>(&result)), low, high, shift);
+         iface.__lshlti3(aligned_ptr<__int128>(static_cast<void*>(&result)), low, high, shift);
          return result;
       }
       __int128 lshrti3(uint64_t low, uint64_t high, uint32_t shift) {
          __int128 result{};
-         iface.__lshrti3(legacy_ptr<__int128>(static_cast<void*>(&result)), low, high, shift);
+         iface.__lshrti3(aligned_ptr<__int128>(static_cast<void*>(&result)), low, high, shift);
          return result;
       }
       __int128 divti3(uint64_t la, uint64_t ha, uint64_t lb, uint64_t hb) {
          __int128 result{};
-         iface.__divti3(legacy_ptr<__int128>(static_cast<void*>(&result)), la, ha, lb, hb);
+         iface.__divti3(aligned_ptr<__int128>(static_cast<void*>(&result)), la, ha, lb, hb);
          return result;
       }
       unsigned __int128 udivti3(uint64_t la, uint64_t ha, uint64_t lb, uint64_t hb) {
          unsigned __int128 result{};
-         iface.__udivti3(legacy_ptr<unsigned __int128>(static_cast<void*>(&result)), la, ha, lb, hb);
+         iface.__udivti3(aligned_ptr<unsigned __int128>(static_cast<void*>(&result)), la, ha, lb, hb);
          return result;
       }
       unsigned __int128 multi3(uint64_t la, uint64_t ha, uint64_t lb, uint64_t hb) {
          unsigned __int128 result{};
-         iface.__multi3(legacy_ptr<unsigned __int128>(static_cast<void*>(&result)), la, ha, lb, hb);
+         iface.__multi3(aligned_ptr<unsigned __int128>(static_cast<void*>(&result)), la, ha, lb, hb);
          return result;
       }
       __int128 modti3(uint64_t la, uint64_t ha, uint64_t lb, uint64_t hb) {
          __int128 result{};
-         iface.__modti3(legacy_ptr<__int128>(static_cast<void*>(&result)), la, ha, lb, hb);
+         iface.__modti3(aligned_ptr<__int128>(static_cast<void*>(&result)), la, ha, lb, hb);
          return result;
       }
       unsigned __int128 umodti3(uint64_t la, uint64_t ha, uint64_t lb, uint64_t hb) {
          unsigned __int128 result{};
-         iface.__umodti3(legacy_ptr<unsigned __int128>(static_cast<void*>(&result)), la, ha, lb, hb);
+         iface.__umodti3(aligned_ptr<unsigned __int128>(static_cast<void*>(&result)), la, ha, lb, hb);
          return result;
       }
 

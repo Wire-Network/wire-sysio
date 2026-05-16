@@ -7,42 +7,30 @@
 
 namespace sysio { namespace chain { namespace webassembly {
 
-   void interface::__ashlti3(legacy_ptr<__int128> ret, uint64_t low, uint64_t high, uint32_t shift) const {
+   void interface::__ashlti3(aligned_ptr<__int128> ret, uint64_t low, uint64_t high, uint32_t shift) const {
       fc::uint128 i = fc::to_uint128(high, low);
       *ret = (shift >= 128) ? 0 : (unsigned __int128)(i << shift);
    }
 
-   void interface::__ashrti3(legacy_ptr<__int128> ret, uint64_t low, uint64_t high, uint32_t shift) const {
-      // Arithmetic right shift implemented using only well-defined unsigned operations,
-      // avoiding implementation-defined behavior of signed >> on negative values.
-      unsigned __int128 u = (static_cast<unsigned __int128>(high) << 64) | low;
-      bool negative = (high >> 63) != 0;
-
-      if (shift >= 128) {
-         *ret = negative ? static_cast<__int128>(~static_cast<unsigned __int128>(0)) : 0;
-      } else if (shift == 0) {
-         *ret = static_cast<__int128>(u);
-      } else {
-         unsigned __int128 shifted = u >> shift;
-         if (negative) {
-            unsigned __int128 mask = ~static_cast<unsigned __int128>(0) << (128 - shift);
-            shifted |= mask;
-         }
-         *ret = static_cast<__int128>(shifted);
-      }
+   void interface::__ashrti3(aligned_ptr<__int128> ret, uint64_t low, uint64_t high, uint32_t shift) const {
+      // C++20 [expr.shift]/3 defines signed `>>` as arithmetic shift (sign-extending) for
+      // both non-negative and negative values; only shift counts >= the type width are UB.
+      // Saturate the out-of-range case to the sign bit: 0 for non-negative, -1 for negative.
+      __int128 i = (static_cast<__int128>(high) << 64) | low;
+      *ret = (shift >= 128) ? (i >> 127) : (i >> shift);
    }
 
-   void interface::__lshlti3(legacy_ptr<__int128> ret, uint64_t low, uint64_t high, uint32_t shift) const {
+   void interface::__lshlti3(aligned_ptr<__int128> ret, uint64_t low, uint64_t high, uint32_t shift) const {
       fc::uint128 i = fc::to_uint128(high, low);
       *ret = (shift >= 128) ? 0 : (unsigned __int128)(i << shift);
    }
 
-   void interface::__lshrti3(legacy_ptr<__int128> ret, uint64_t low, uint64_t high, uint32_t shift) const {
+   void interface::__lshrti3(aligned_ptr<__int128> ret, uint64_t low, uint64_t high, uint32_t shift) const {
       fc::uint128 i = fc::to_uint128(high, low);
       *ret = (shift >= 128) ? 0 : (unsigned __int128)(i >> shift);
    }
 
-   void interface::__divti3(legacy_ptr<__int128> ret, uint64_t la, uint64_t ha, uint64_t lb, uint64_t hb) const {
+   void interface::__divti3(aligned_ptr<__int128> ret, uint64_t la, uint64_t ha, uint64_t lb, uint64_t hb) const {
       __int128 lhs = ha;
       __int128 rhs = hb;
 
@@ -65,7 +53,7 @@ namespace sysio { namespace chain { namespace webassembly {
       *ret = lhs;
    }
 
-   void interface::__udivti3(legacy_ptr<unsigned __int128> ret, uint64_t la, uint64_t ha, uint64_t lb, uint64_t hb) const {
+   void interface::__udivti3(aligned_ptr<unsigned __int128> ret, uint64_t la, uint64_t ha, uint64_t lb, uint64_t hb) const {
       unsigned __int128 lhs = ha;
       unsigned __int128 rhs = hb;
 
@@ -81,7 +69,7 @@ namespace sysio { namespace chain { namespace webassembly {
       *ret = lhs;
    }
 
-   void interface::__multi3(legacy_ptr<uint128_t> ret, uint64_t la, uint64_t ha, uint64_t lb, uint64_t hb) const {
+   void interface::__multi3(aligned_ptr<uint128_t> ret, uint64_t la, uint64_t ha, uint64_t lb, uint64_t hb) const {
       uint128_t lhs = ha;
       uint128_t rhs = hb;
 
@@ -95,7 +83,7 @@ namespace sysio { namespace chain { namespace webassembly {
       *ret = lhs;
    }
 
-   void interface::__modti3(legacy_ptr<__int128> ret, uint64_t la, uint64_t ha, uint64_t lb, uint64_t hb) const {
+   void interface::__modti3(aligned_ptr<__int128> ret, uint64_t la, uint64_t ha, uint64_t lb, uint64_t hb) const {
       __int128 lhs = ha;
       __int128 rhs = hb;
 
@@ -117,7 +105,7 @@ namespace sysio { namespace chain { namespace webassembly {
       *ret = lhs;
    }
 
-   void interface::__umodti3(legacy_ptr<unsigned __int128> ret, uint64_t la, uint64_t ha, uint64_t lb, uint64_t hb) const {
+   void interface::__umodti3(aligned_ptr<unsigned __int128> ret, uint64_t la, uint64_t ha, uint64_t lb, uint64_t hb) const {
       unsigned __int128 lhs = ha;
       unsigned __int128 rhs = hb;
 
@@ -134,35 +122,35 @@ namespace sysio { namespace chain { namespace webassembly {
    }
 
    // arithmetic long double
-   void interface::__addtf3( legacy_ptr<float128_t> ret, uint64_t la, uint64_t ha, uint64_t lb, uint64_t hb ) const {
+   void interface::__addtf3( aligned_ptr<float128_t> ret, uint64_t la, uint64_t ha, uint64_t lb, uint64_t hb ) const {
       float128_t a = {{ la, ha }};
       float128_t b = {{ lb, hb }};
       *ret = f128_add( a, b );
    }
-   void interface::__subtf3( legacy_ptr<float128_t> ret, uint64_t la, uint64_t ha, uint64_t lb, uint64_t hb ) const {
+   void interface::__subtf3( aligned_ptr<float128_t> ret, uint64_t la, uint64_t ha, uint64_t lb, uint64_t hb ) const {
       float128_t a = {{ la, ha }};
       float128_t b = {{ lb, hb }};
       *ret = f128_sub( a, b );
    }
-   void interface::__multf3( legacy_ptr<float128_t> ret, uint64_t la, uint64_t ha, uint64_t lb, uint64_t hb ) const {
+   void interface::__multf3( aligned_ptr<float128_t> ret, uint64_t la, uint64_t ha, uint64_t lb, uint64_t hb ) const {
       float128_t a = {{ la, ha }};
       float128_t b = {{ lb, hb }};
       *ret = f128_mul( a, b );
    }
-   void interface::__divtf3( legacy_ptr<float128_t> ret, uint64_t la, uint64_t ha, uint64_t lb, uint64_t hb ) const {
+   void interface::__divtf3( aligned_ptr<float128_t> ret, uint64_t la, uint64_t ha, uint64_t lb, uint64_t hb ) const {
       float128_t a = {{ la, ha }};
       float128_t b = {{ lb, hb }};
       *ret = f128_div( a, b );
    }
-   void interface::__negtf2( legacy_ptr<float128_t> ret, uint64_t la, uint64_t ha ) const {
+   void interface::__negtf2( aligned_ptr<float128_t> ret, uint64_t la, uint64_t ha ) const {
       *ret = {{ la, (ha ^ (uint64_t)1 << 63) }};
    }
 
    // conversion long double
-   void interface::__extendsftf2( legacy_ptr<float128_t> ret, float f ) const {
+   void interface::__extendsftf2( aligned_ptr<float128_t> ret, float f ) const {
       *ret = f32_to_f128( to_softfloat32(f) );
    }
-   void interface::__extenddftf2( legacy_ptr<float128_t> ret, double d ) const {
+   void interface::__extenddftf2( aligned_ptr<float128_t> ret, double d ) const {
       *ret = f64_to_f128( to_softfloat64(d) );
    }
    double interface::__trunctfdf2( uint64_t l, uint64_t h ) const {
@@ -181,7 +169,7 @@ namespace sysio { namespace chain { namespace webassembly {
       float128_t f = {{ l, h }};
       return f128_to_i64( f, 0, false );
    }
-   void interface::__fixtfti( legacy_ptr<__int128> ret, uint64_t l, uint64_t h ) const {
+   void interface::__fixtfti( aligned_ptr<__int128> ret, uint64_t l, uint64_t h ) const {
       float128_t f = {{ l, h }};
       *ret = ___fixtfti( f );
    }
@@ -193,35 +181,35 @@ namespace sysio { namespace chain { namespace webassembly {
       float128_t f = {{ l, h }};
       return f128_to_ui64( f, 0, false );
    }
-   void interface::__fixunstfti( legacy_ptr<unsigned __int128> ret, uint64_t l, uint64_t h ) const {
+   void interface::__fixunstfti( aligned_ptr<unsigned __int128> ret, uint64_t l, uint64_t h ) const {
       float128_t f = {{ l, h }};
       *ret = ___fixunstfti( f );
    }
-   void interface::__fixsfti( legacy_ptr<__int128> ret, float a ) const {
+   void interface::__fixsfti( aligned_ptr<__int128> ret, float a ) const {
       *ret = ___fixsfti( to_softfloat32(a).v );
    }
-   void interface::__fixdfti( legacy_ptr<__int128> ret, double a ) const {
+   void interface::__fixdfti( aligned_ptr<__int128> ret, double a ) const {
       *ret = ___fixdfti( to_softfloat64(a).v );
    }
-   void interface::__fixunssfti( legacy_ptr<unsigned __int128> ret, float a ) const {
+   void interface::__fixunssfti( aligned_ptr<unsigned __int128> ret, float a ) const {
       *ret = ___fixunssfti( to_softfloat32(a).v );
    }
-   void interface::__fixunsdfti( legacy_ptr<unsigned __int128> ret, double a ) const {
+   void interface::__fixunsdfti( aligned_ptr<unsigned __int128> ret, double a ) const {
       *ret = ___fixunsdfti( to_softfloat64(a).v );
    }
    double interface::__floatsidf( int32_t i ) const {
       return from_softfloat64(i32_to_f64(i));
    }
-   void interface::__floatsitf( legacy_ptr<float128_t> ret, int32_t i ) const {
+   void interface::__floatsitf( aligned_ptr<float128_t> ret, int32_t i ) const {
       *ret = i32_to_f128(i);
    }
-   void interface::__floatditf( legacy_ptr<float128_t> ret, uint64_t a ) const {
+   void interface::__floatditf( aligned_ptr<float128_t> ret, uint64_t a ) const {
       *ret = i64_to_f128( a );
    }
-   void interface::__floatunsitf( legacy_ptr<float128_t> ret, uint32_t i ) const {
+   void interface::__floatunsitf( aligned_ptr<float128_t> ret, uint32_t i ) const {
       *ret = ui32_to_f128(i);
    }
-   void interface::__floatunditf( legacy_ptr<float128_t> ret, uint64_t a ) const {
+   void interface::__floatunditf( aligned_ptr<float128_t> ret, uint64_t a ) const {
       *ret = ui64_to_f128( a );
    }
    double interface::__floattidf( uint64_t l, uint64_t h ) const {

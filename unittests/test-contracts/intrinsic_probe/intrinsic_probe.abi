@@ -314,12 +314,22 @@
             "fields": []
         },
         {
+            "name": "recbigwa",
+            "base": "",
+            "fields": []
+        },
+        {
             "name": "recempsig",
             "base": "",
             "fields": []
         },
         {
             "name": "recok",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "recqsize",
             "base": "",
             "fields": []
         },
@@ -821,6 +831,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "recbigwa",
+            "type": "recbigwa",
+            "ricardian_contract": ""
+        },
+        {
             "name": "recempsig",
             "type": "recempsig",
             "ricardian_contract": ""
@@ -828,6 +843,11 @@
         {
             "name": "recok",
             "type": "recok",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "recqsize",
+            "type": "recqsize",
             "ricardian_contract": ""
         },
         {
