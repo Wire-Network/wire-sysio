@@ -166,6 +166,10 @@
                     "type": "ChainKind"
                 },
                 {
+                    "name": "from_token_kind",
+                    "type": "TokenKind"
+                },
+                {
                     "name": "uic_bytes",
                     "type": "bytes"
                 }
@@ -304,6 +308,10 @@
                 {
                     "name": "variance_tolerance_bps",
                     "type": "uint32"
+                },
+                {
+                    "name": "source_tx_id",
+                    "type": "bytes"
                 },
                 {
                     "name": "commits_by",

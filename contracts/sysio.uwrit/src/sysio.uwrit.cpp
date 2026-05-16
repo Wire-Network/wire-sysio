@@ -328,12 +328,16 @@ void emit_swap_remit(name self,
    ).send();
 }
 
-/// Verify the embedded signature in `uic_bytes` was produced by one of the
-/// `underwriter` account's permissions over the digest
-/// `sha256(serialize(uic_with_signature_blanked))`. Returns true on first
-/// matching key. Returns false (never throws) when the bytes are empty,
-/// the proto fails to decode, the embedded signature is missing, or no key
-/// across the underwriter's permissions recovers to the signature.
+/// Verify the embedded signature in `uic_bytes` was produced by a key on
+/// EITHER the `underwriter` account's `active` OR `owner` permission, over
+/// the digest `sha256(serialize(uic_with_signature_blanked))`. Returns
+/// true on first matching key. Returns false (never throws) when the bytes
+/// are empty, the proto fails to decode, the embedded signature is missing,
+/// or no `active`/`owner` key recovers to the signature. Other permissions
+/// (custom permission names) are intentionally NOT checked: the
+/// underwriter_plugin's signature_provider_manager_plugin config is pinned
+/// to one of `active`/`owner`, so accepting a custom permission would let
+/// an attacker bypass the configuration constraint.
 ///
 /// **Per `feedback_opp_handlers_never_throw.md` — this MUST stay
 /// non-throwing.** It's called from `try_select_winner`, which runs inside
@@ -341,8 +345,8 @@ void emit_swap_remit(name self,
 /// consensus. Today we defensively bound the signature length and variant
 /// tag before invoking the chain crypto intrinsic, but malformed
 /// attacker-controlled bytes that pass the bounds checks could still trip
-/// `recover_key` itself. See the TODO at the call site in
-/// `try_select_winner` for the launch-time hardening decision.
+/// `recover_key` itself. The launch-time fix is a `recover_key_nothrow`
+/// host intrinsic (tracked in the underwriter-gap summary).
 bool verify_uic_signature(name underwriter,
                            const std::vector<char>& uic_bytes) {
    if (uic_bytes.empty()) return false;
@@ -388,29 +392,19 @@ bool verify_uic_signature(name underwriter,
    // Recover the public key the signature was produced with.
    sysio::public_key recovered = sysio::recover_key(digest, parsed_sig);
 
-   // Iterate every permission on `underwriter` and look for a match. The
-   // typical underwriter has only `owner` + `active` so the loop is small.
-   sysio::name cursor{};
-   while (true) {
-      char name_buf[8];
-      int32_t sz = sysio::internal_use_do_not_use::get_permission_lower_bound(
-         underwriter.value, cursor.value, name_buf, sizeof(name_buf));
-      if (sz <= 0) break;
-
-      sysio::name perm_name;
-      std::memcpy(&perm_name, name_buf, sizeof(perm_name));
-
-      std::vector<char> buf(static_cast<size_t>(sz));
-      sysio::internal_use_do_not_use::get_permission_lower_bound(
-         underwriter.value, cursor.value, buf.data(), buf.size());
-      auto rec = sysio::unpack<sysio::permission_record>(buf);
-
-      for (const auto& kw : rec.auth.keys) {
+   // Only `owner` and `active` permissions are considered. The
+   // underwriter_plugin's signature_provider_manager_plugin config is
+   // pinned to one of those two (see plugin docs); accepting a custom
+   // permission would open a separate authorization surface that nothing
+   // else on the platform validates.
+   constexpr sysio::name OWNER_PERM  = "owner"_n;
+   constexpr sysio::name ACTIVE_PERM = "active"_n;
+   for (auto perm : { ACTIVE_PERM, OWNER_PERM }) {
+      auto rec_opt = sysio::get_permission(underwriter, perm);
+      if (!rec_opt) continue;
+      for (const auto& kw : rec_opt->auth.keys) {
          if (kw.key == recovered) return true;
       }
-
-      if (perm_name.value == std::numeric_limits<uint64_t>::max()) break;
-      cursor = sysio::name{perm_name.value + 1};
    }
    return false;
 }
@@ -519,6 +513,7 @@ void uwrit::createuwreq(uint64_t attestation_id,
       .dst_token_kind            = sr.target_token,
       .dst_amount                = sr.quoted_destination_amount,
       .variance_tolerance_bps    = sr.quote_tolerance_bps,
+      .source_tx_id              = sr.source_tx_id,
       .commits_by                = {},
       .winner                    = name{},
       .committed_at_ms           = 0,
@@ -721,6 +716,7 @@ void uwrit::rcrdcommit(uint64_t uwreq_id,
                        name underwriter,
                        uint64_t outpost_id,
                        opp::types::ChainKind from_chain,
+                       opp::types::TokenKind from_token_kind,
                        std::vector<char> uic_bytes) {
    require_auth(MSGCH_ACCOUNT);
 
@@ -734,11 +730,18 @@ void uwrit::rcrdcommit(uint64_t uwreq_id,
    reqs.modify(same_payer, pk, [&](auto& r) {
       auto* c = find_or_create_commit(r, underwriter);
       uint64_t now_ms = current_time_ms();
-      if (from_chain == r.src_chain) {
+      // Route by the `(from_chain, from_token_kind)` pair so same-chain
+      // swaps (e.g. ERC20 → ETH-native on one outpost) land in the
+      // correct per-leg slot.
+      const bool is_source = (from_chain == r.src_chain
+                              && from_token_kind == r.src_token_kind);
+      const bool is_dest   = (from_chain == r.dst_chain
+                              && from_token_kind == r.dst_token_kind);
+      if (is_source) {
          c->source_received_at_ms = now_ms;
          c->source_outpost_id     = outpost_id;
          c->source_uic_bytes      = uic_bytes;
-      } else if (from_chain == r.dst_chain) {
+      } else if (is_dest) {
          c->dest_received_at_ms = now_ms;
          c->dest_outpost_id     = outpost_id;
          c->dest_uic_bytes      = uic_bytes;

@@ -191,6 +191,18 @@ message SwapRequest {
   // Quote timestamp (milliseconds since epoch) — informational; the depot's
   // variance check uses the LP price at consensus time, not at quote time.
   uint64                       quote_timestamp_ms = 8;
+  // Source-chain derived id for the deposit that funded this swap. Contracts
+  // cannot read their own tx hash, so the source outpost computes
+  // `keccak256(uw_request_id, msg.sender, block.number, nonce)` (ETH) or
+  // `sha256(uw_request_id, depositor, slot, nonce)` (SOL) at swap-emit time
+  // and surfaces the digest both here and in an indexed event
+  // (`SwapRequested(bytes32 indexed source_tx_id, depositor, token_kind, amount)`).
+  // The off-chain underwriter plugin reads this id and queries the matching
+  // event on the source chain to confirm a real deposit backs the swap
+  // before committing collateral. Empty until the swap-emit site lands on
+  // an outpost — the plugin treats empty as "verification not yet active"
+  // and logs a warning rather than skipping the commit.
+  bytes                        source_tx_id = 9;
 }
 
 // Underwriter intent commit (Outposts -> Depot, one per outpost).
@@ -224,6 +236,15 @@ message UnderwriteIntentCommit {
   // commit to every other field in this message; an outpost forging a commit
   // in another underwriter's name cannot produce a verifying signature.
   bytes                           signature = 5;
+  // TokenKind this COMMIT covers. Together with the outpost's chain (carried
+  // by msgch::dispatch_underwrite_commit as `from_chain`), the pair
+  // `(from_chain, token_kind)` disambiguates same-chain swaps where
+  // both legs originate on the same outpost but cover different TokenKinds
+  // (e.g. ERC20→ETH-native, USDC→USDT). The depot's `rcrdcommit` routes
+  // the UIC into the source-leg slot when
+  // `(from_chain, token_kind) == (uwreq.src_chain, uwreq.src_token_kind)`
+  // and the dest-leg slot when it matches `(uwreq.dst_chain, uwreq.dst_token_kind)`.
+  sysio.opp.types.TokenKind       token_kind = 6;
 }
 
 // Cross-chain swap revert (Depot -> source Outpost).

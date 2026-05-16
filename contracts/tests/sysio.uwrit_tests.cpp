@@ -183,11 +183,12 @@ BOOST_FIXTURE_TEST_CASE(rcrdcommit_requires_msgch_auth, sysio_uwrit_tester) { tr
    // rcrdcommit is invoked inline from sysio.msgch on UNDERWRITE_INTENT_COMMIT
    // dispatch. A direct call from another account is rejected.
    BOOST_REQUIRE(push_uwrit_action("uwrit.a"_n, "rcrdcommit"_n, mvo()
-      ("uwreq_id",   1)
-      ("underwriter", "uwrit.a")
-      ("outpost_id",  1)
-      ("from_chain",  ChainKind::CHAIN_KIND_ETHEREUM)
-      ("uic_bytes",   std::vector<char>{})
+      ("uwreq_id",        1)
+      ("underwriter",     "uwrit.a")
+      ("outpost_id",      1)
+      ("from_chain",      ChainKind::CHAIN_KIND_ETHEREUM)
+      ("from_token_kind", TokenKind::TOKEN_KIND_ETH)
+      ("uic_bytes",       std::vector<char>{})
    ).find("missing authority of sysio.msgch") != std::string::npos);
 } FC_LOG_AND_RETHROW() }
 
@@ -196,11 +197,12 @@ BOOST_FIXTURE_TEST_CASE(rcrdcommit_rejects_unknown_uwreq, sysio_uwrit_tester) { 
    BOOST_REQUIRE_EQUAL(
       error("assertion failure with message: uwreq not found"),
       push_uwrit_action(MSGCH_ACCOUNT, "rcrdcommit"_n, mvo()
-         ("uwreq_id",   42)
-         ("underwriter", "uwrit.a")
-         ("outpost_id",  1)
-         ("from_chain",  ChainKind::CHAIN_KIND_ETHEREUM)
-         ("uic_bytes",   std::vector<char>{})
+         ("uwreq_id",        42)
+         ("underwriter",     "uwrit.a")
+         ("outpost_id",      1)
+         ("from_chain",      ChainKind::CHAIN_KIND_ETHEREUM)
+         ("from_token_kind", TokenKind::TOKEN_KIND_ETH)
+         ("uic_bytes",       std::vector<char>{})
       )
    );
 } FC_LOG_AND_RETHROW() }
