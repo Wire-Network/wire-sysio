@@ -249,9 +249,10 @@ void dispatch_operator_action(name self, const std::vector<char>& data,
 ///
 /// The full UIC bytes are forwarded verbatim so the depot can reconstruct
 /// the digest and verify the underwriter's signature at race resolution
-/// time. We decode here only enough to route (uwreq id + uw_account); the
-/// authoritative copy for verification is the bytes themselves, stored on
-/// `commit_entry.{source,dest}_uic_bytes`.
+/// time. We decode here to extract the routing scalars (uwreq id,
+/// uw_account, token_kind — the latter discriminates same-chain
+/// swap legs); the authoritative copy for verification is the bytes
+/// themselves, stored on `commit_entry.{source,dest}_uic_bytes`.
 void dispatch_underwrite_commit(name self, const std::vector<char>& data,
                                 ChainKind from_chain, uint64_t outpost_id) {
    opp::attestations::UnderwriteIntentCommit uic;
@@ -266,7 +267,7 @@ void dispatch_underwrite_commit(name self, const std::vector<char>& data,
       permission_level{self, "active"_n},
       UWRIT_ACCOUNT, "rcrdcommit"_n,
       std::make_tuple(uic.uw_request_id, name{uic.uw_account.name},
-                      outpost_id, from_chain, data)
+                      outpost_id, from_chain, uic.token_kind, data)
    ).send();
 }
 

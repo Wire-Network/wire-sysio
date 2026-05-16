@@ -104,6 +104,11 @@ namespace sysio {
       /// both legs land for the same underwriter, runs `try_select_winner`
       /// to resolve the race.
       ///
+      /// `(from_chain, from_token_kind)` together identify which leg of
+      /// the swap this UIC covers — same-chain swaps (e.g. ERC20→ETH on
+      /// a single outpost) require both to disambiguate the source and
+      /// destination legs.
+      ///
       /// `uic_bytes` is the raw zpp_bits-encoded `UnderwriteIntentCommit`
       /// payload — the action signature carries bytes, not the proto
       /// message itself, per `feedback_no_proto_messages_in_actions.md`.
@@ -112,6 +117,7 @@ namespace sysio {
                       name underwriter,
                       uint64_t outpost_id,
                       opp::types::ChainKind from_chain,
+                      opp::types::TokenKind from_token_kind,
                       std::vector<char> uic_bytes);
 
       /// Settle an UWREQ. For each lock entry: erase the row and call
@@ -271,6 +277,14 @@ namespace sysio {
          /// drift between ingestion and race doesn't burn the underwriter.
          uint32_t                                variance_tolerance_bps = 0;
 
+         /// Source-chain derived id for the deposit that funded this swap
+         /// (see SwapRequest.source_tx_id proto comment for the derivation
+         /// recipe). Used off-chain by the underwriter plugin's
+         /// verify_source_deposit step to confirm a real on-chain deposit
+         /// backs the swap before committing collateral. Empty until the
+         /// swap-emit site lands on the outposts.
+         std::vector<char>                       source_tx_id;
+
          /// Race state.
          std::vector<commit_entry>               commits_by;
          name                                    winner;
@@ -295,7 +309,7 @@ namespace sysio {
             (id)(type)(status)
             (src_chain)(src_token_kind)(src_amount)
             (dst_chain)(dst_token_kind)(dst_amount)
-            (variance_tolerance_bps)
+            (variance_tolerance_bps)(source_tx_id)
             (commits_by)(winner)(committed_at_ms)(settled_at_ms)(expires_at_epoch)
             (attestation_inbound_data)(attestation_outbound_data))
       };
