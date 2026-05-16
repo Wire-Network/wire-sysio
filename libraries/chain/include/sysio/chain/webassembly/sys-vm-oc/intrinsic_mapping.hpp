@@ -81,6 +81,7 @@ inline constexpr auto get_intrinsic_table() {
       "env.get_active_producers",
       "env.assert_recover_key",
       "env.recover_key",
+      "env.recover_key_nothrow",
       "env.assert_sha256",
       "env.assert_sha1",
       "env.assert_sha512",

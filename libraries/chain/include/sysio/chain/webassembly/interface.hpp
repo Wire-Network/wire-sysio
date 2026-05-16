@@ -368,6 +368,28 @@ namespace webassembly {
          int32_t recover_key(legacy_ptr<const fc::sha256> digest, legacy_span<const char> sig, legacy_span<char> pub) const;
 
          /**
+          * Non-throwing variant of recover_key. Catches every host-side
+          * exception (`fc::raw::unpack` malformed-bytes failure,
+          * `SYS_ASSERT` on unactivated signature type, recovery math
+          * failure, subjective-size limit) and returns -1 instead. On
+          * success returns the same byte count as `recover_key`.
+          *
+          * Required by CDT-side callers in inbound-attestation dispatch
+          * paths (e.g. `sysio.uwrit::verify_uic_signature`) that must NOT
+          * halt on attacker-controlled signature bytes — CDT compiles
+          * with `-fno-exceptions`, so a throwing intrinsic cannot be
+          * wrapped contract-side.
+          *
+          * @ingroup crypto
+          * @param digest - digest of the message that was signed.
+          * @param sig - signature bytes.
+          * @param[out] pub - output buffer for the recovered public key.
+          *
+          * @return bytes written to `pub` on success; -1 on failure.
+          */
+         int32_t recover_key_nothrow(legacy_ptr<const fc::sha256> digest, legacy_span<const char> sig, legacy_span<char> pub) const;
+
+         /**
           * Tests if the sha256 hash generated from data matches the provided digest.
           *
           * @ingroup crypto
