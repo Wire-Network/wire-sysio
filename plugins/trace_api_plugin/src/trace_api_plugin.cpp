@@ -1,8 +1,9 @@
 #include <sysio/trace_api/trace_api_plugin.hpp>
 
 #include <sysio/trace_api/abi_data_handler.hpp>
-#include <sysio/trace_api/request_handler.hpp>
 #include <sysio/trace_api/chain_extraction.hpp>
+#include <sysio/trace_api/logging.hpp>
+#include <sysio/trace_api/request_handler.hpp>
 #include <sysio/trace_api/store_provider.hpp>
 
 #include <sysio/trace_api/configuration_utils.hpp>
@@ -13,12 +14,10 @@
 
 using namespace sysio::trace_api;
 using namespace sysio::trace_api::configuration_utils;
+using namespace sysio::chain::literals;
 using boost::signals2::scoped_connection;
 
 namespace {
-
-   const std::string logger_name("trace_api");
-   fc::logger _log;
 
    std::string to_detail_string(const std::exception_ptr& e) {
       try {
@@ -91,6 +90,34 @@ namespace {
          store->append_trx_ids(std::move(tt));
       }
 
+      std::optional<std::pair<uint32_t,uint32_t>> first_and_last_recorded_blocks() const {
+         return store->first_and_last_recorded_blocks();
+      }
+
+      void append_abi(chain::name account, uint64_t global_seq, std::vector<char> abi_bytes) {
+         store->append_abi(account, global_seq, std::move(abi_bytes));
+      }
+
+      std::optional<abi_log::lookup_result> lookup_abi(chain::name account, uint64_t global_seq) const {
+         return store->lookup_abi(account, global_seq);
+      }
+
+      bool has_abi_entry(chain::name account) const {
+         return store->has_abi_entry(account);
+      }
+
+      uint32_t slice_stride() const noexcept {
+         return store->slice_stride();
+      }
+
+      uint32_t slice_number(uint32_t block_height) const noexcept {
+         return store->slice_number(block_height);
+      }
+
+      bloom_reader get_bloom(uint32_t slice_number) const {
+         return store->get_bloom(slice_number);
+      }
+
       std::shared_ptr<Store> store;
    };
 }
@@ -106,13 +133,20 @@ struct trace_api_common_impl {
       cfg_options("trace-dir", bpo::value<std::filesystem::path>()->default_value("traces"),
                   "the location of the trace directory (absolute path or relative to application data dir)");
       cfg_options("trace-slice-stride", bpo::value<uint32_t>()->default_value(10'000),
-                  "the number of blocks each \"slice\" of trace data will contain on the filesystem");
+                  "Number of blocks each \"slice\" of trace data will contain on the filesystem.\n"
+                  "Must be in the range [1, 1000000].  Larger values reduce file count but bloat the\n"
+                  "block-offset sidecar pre-allocation and stress the per-slice trx_id hash index.");
       cfg_options("trace-minimum-irreversible-history-blocks", boost::program_options::value<int32_t>()->default_value(-1),
                   "Number of blocks to ensure are kept past LIB for retrieval before \"slice\" files can be automatically removed.\n"
                   "A value of -1 indicates that automatic removal of \"slice\" files will be turned off.");
       cfg_options("trace-minimum-uncompressed-irreversible-history-blocks", boost::program_options::value<int32_t>()->default_value(-1),
                   "Number of blocks to ensure are uncompressed past LIB. Compressed \"slice\" files are still accessible but may carry a performance loss on retrieval\n"
                   "A value of -1 indicates that automatic compression of \"slice\" files will be turned off.");
+      cfg_options("trace-max-block-range", bpo::value<uint32_t>()->default_value(1000),
+                  "Maximum number of blocks scanned by a single get_actions or get_token_transfers request.\n"
+                  "Must be in [1, 10000]. block_num_end is silently clamped to block_num_start + this - 1.\n"
+                  "Clients paginate by advancing block_num_start by this amount each call. The response\n"
+                  "envelope reports the actual range scanned.");
    }
 
    void plugin_initialize(const appbase::variables_map& options) {
@@ -125,6 +159,8 @@ struct trace_api_common_impl {
         resmon_plugin->monitor_directory(trace_dir);
 
       slice_stride = options.at("trace-slice-stride").as<uint32_t>();
+      SYS_ASSERT(slice_stride >= 1 && slice_stride <= 1'000'000, chain::plugin_config_exception,
+                 "\"trace-slice-stride\" must be in [1, 1000000]; got {}", slice_stride);
 
       const int32_t blocks = options.at("trace-minimum-irreversible-history-blocks").as<int32_t>();
       SYS_ASSERT(blocks >= -1, chain::plugin_config_exception,
@@ -140,6 +176,11 @@ struct trace_api_common_impl {
       if (uncompressed_blocks > manual_slice_file_value) {
          minimum_uncompressed_irreversible_history_blocks = uncompressed_blocks;
       }
+
+      const uint32_t block_range = options.at("trace-max-block-range").as<uint32_t>();
+      SYS_ASSERT(block_range >= 1 && block_range <= 10'000, chain::plugin_config_exception,
+                 "\"trace-max-block-range\" must be in [1, 10000]; got {}", block_range);
+      max_block_range = block_range;
 
       store = std::make_shared<store_provider>(
          trace_dir,
@@ -170,6 +211,7 @@ struct trace_api_common_impl {
    static constexpr int32_t manual_slice_file_value = -1;
    static constexpr uint32_t compression_seek_point_stride = 6 * 1024 * 1024; // 6 MiB strides for clog seek points
 
+   uint32_t max_block_range = 100;
    std::shared_ptr<store_provider> store;
 };
 
@@ -181,51 +223,24 @@ struct trace_api_rpc_plugin_impl : public std::enable_shared_from_this<trace_api
    explicit trace_api_rpc_plugin_impl( const std::shared_ptr<trace_api_common_impl>& common )
    :common(common) {}
 
-   static void set_program_options(appbase::options_description& cli, appbase::options_description& cfg) {
-      auto cfg_options = cfg.add_options();
-      cfg_options("trace-rpc-abi", bpo::value<vector<string>>()->composing(),
-                  "ABIs used when decoding trace RPC responses.\n"
-                  "There must be at least one ABI specified OR the flag trace-no-abis must be used.\n"
-                  "ABIs are specified as \"Key=Value\" pairs in the form <account-name>=<abi-def>\n"
-                  "Where <abi-def> can be:\n"
-                  "   an absolute path to a file containing a valid JSON-encoded ABI\n"
-                  "   a relative path from `data-dir` to a file containing a valid JSON-encoded ABI\n"
-                  );
-      cfg_options("trace-no-abis",
-            "Use to indicate that the RPC responses will not use ABIs.\n"
-            "Failure to specify this option when there are no trace-rpc-abi configuations will result in an Error.\n"
-            "This option is mutually exclusive with trace-rpc-api"
-      );
-   }
-
-   void plugin_initialize(const appbase::variables_map& options) {
-      ilog("initializing trace api rpc plugin");
-      std::shared_ptr<abi_data_handler> data_handler = std::make_shared<abi_data_handler>([](const exception_with_context& e){
-         log_exception(e, fc::log_level::debug);
-         if (std::get<0>(e)) { // rethrow so caller is notified of error
-            std::rethrow_exception(std::get<0>(e));
-         }
-      });
-
-      if( options.count("trace-rpc-abi") ) {
-         SYS_ASSERT(options.count("trace-no-abis") == 0, chain::plugin_config_exception,
-                    "Trace API is configured with ABIs however trace-no-abis is set");
-         const std::vector<std::string> key_value_pairs = options["trace-rpc-abi"].as<std::vector<std::string>>();
-         for (const auto& entry : key_value_pairs) {
-            try {
-               auto kv = parse_kv_pairs(entry);
-               auto account = chain::name(kv.first);
-               auto abi = abi_def_from_file(kv.second, app().data_dir());
-               data_handler->add_abi(account, std::move(abi));
-            } catch (...) {
-               elog("Malformed trace-rpc-abi provider: \"{}\"", entry);
-               throw;
+   void plugin_initialize(const appbase::variables_map&) {
+      fc_ilog(_log, "trace_api: initializing trace api rpc plugin");
+      max_block_range = common->max_block_range;
+      auto store = common->store;
+      auto data_handler = std::make_shared<abi_data_handler>(
+         [](const exception_with_context& e) {
+            // Log at debug and fall back to raw hex -- do not rethrow, since
+            // ABI capture is automatic and decoding failures should be soft.
+            log_exception(e, fc::log_level::debug);
+         },
+         [store](chain::name account, uint64_t global_seq) -> std::optional<abi_data_handler::lookup_entry> {
+            std::optional<abi_data_handler::lookup_entry> out;
+            if (auto r = store->lookup_abi(account, global_seq)) {
+               out.emplace(abi_data_handler::lookup_entry{r->effective_global_seq, std::move(r->abi_bytes)});
             }
+            return out;
          }
-      } else {
-         SYS_ASSERT(options.count("trace-no-abis") != 0, chain::plugin_config_exception,
-                    "Trace API is not configured with ABIs and trace-no-abis is not set");
-      }
+      );
 
       req_handler = std::make_shared<request_handler_t>(
          shared_store_provider<store_provider>(common->store),
@@ -326,12 +341,132 @@ struct trace_api_rpc_plugin_impl : public std::enable_shared_from_this<trace_api
              http_plugin::handle_exception("trace_api", "get_transaction", body, cb);
           }
       }});
+
+      http.add_async_handler({"/v1/trace_api/get_actions",
+            api_category::trace_api,
+            [this](std::string, std::string body, url_response_callback cb)
+      {
+         action_query query;
+         bool include_notifications = false;
+         if (!body.empty()) {
+            try {
+               auto input = fc::json::from_string(body);
+               const auto& obj = input.get_object();
+               if (obj.contains("receiver"))
+                  query.receiver = chain::name(obj["receiver"].as_string());
+               if (obj.contains("account"))
+                  query.account = chain::name(obj["account"].as_string());
+               if (obj.contains("action"))
+                  query.action = chain::name(obj["action"].as_string());
+               if (obj.contains("block_num_start"))
+                  query.block_num_start = obj["block_num_start"].as<uint32_t>();
+               if (obj.contains("block_num_end"))
+                  query.block_num_end = obj["block_num_end"].as<uint32_t>();
+               if (obj.contains("include_notifications"))
+                  include_notifications = obj["include_notifications"].as_bool();
+            } catch (...) {
+               error_results results{400, "Bad request body"};
+               cb( 400, fc::variant( results ));
+               return;
+            }
+         }
+
+         // Default = canonical actions only (receiver == account).  When the caller
+         // specifies exactly one of receiver/account and does not opt in to
+         // notifications, mirror the specified value onto the missing one.
+         if (!include_notifications) {
+            if (query.account && !query.receiver)
+               query.receiver = query.account;
+            else if (query.receiver && !query.account)
+               query.account = query.receiver;
+         }
+
+         if (query.block_num_start > query.block_num_end) {
+            error_results results{400, "block_num_start must be <= block_num_end"};
+            cb( 400, fc::variant( results ));
+            return;
+         }
+
+         clamp_block_end(query);
+
+         try {
+            auto result = req_handler->get_actions(query);
+            cb( 200, fc::mutable_variant_object()
+                        ("block_num_start", query.block_num_start)
+                        ("block_num_end",   query.block_num_end)
+                        ("actions",         result.actions) );
+         } catch (...) {
+            http_plugin::handle_exception("trace_api", "get_actions", body, cb);
+         }
+      }});
+
+      http.add_async_handler({"/v1/trace_api/get_token_transfers",
+            api_category::trace_api,
+            [this](std::string, std::string body, url_response_callback cb)
+      {
+         // Convenience wrapper: receiver==account==token_contract, action="transfer"
+         // gives exactly one result per transfer (inline notifications excluded).
+         static constexpr chain::name default_token_contract = "sysio.token"_n;
+         static constexpr chain::name transfer_action_name   = "transfer"_n;
+         action_query query;
+         query.action   = transfer_action_name;
+         query.receiver = default_token_contract;
+         query.account  = default_token_contract;
+
+         if (!body.empty()) {
+            try {
+               auto input = fc::json::from_string(body);
+               const auto& obj = input.get_object();
+               if (obj.contains("token_contract")) {
+                  chain::name tc = chain::name(obj["token_contract"].as_string());
+                  query.receiver = tc;
+                  query.account  = tc;
+               }
+               if (obj.contains("block_num_start"))
+                  query.block_num_start = obj["block_num_start"].as<uint32_t>();
+               if (obj.contains("block_num_end"))
+                  query.block_num_end = obj["block_num_end"].as<uint32_t>();
+            } catch (...) {
+               error_results results{400, "Bad request body"};
+               cb( 400, fc::variant( results ));
+               return;
+            }
+         }
+
+         if (query.block_num_start > query.block_num_end) {
+            error_results results{400, "block_num_start must be <= block_num_end"};
+            cb( 400, fc::variant( results ));
+            return;
+         }
+
+         clamp_block_end(query);
+
+         try {
+            auto result = req_handler->get_token_transfer_actions(query);
+            cb( 200, fc::mutable_variant_object()
+                        ("block_num_start", query.block_num_start)
+                        ("block_num_end",   query.block_num_end)
+                        ("transfers",       result.actions) );
+         } catch (...) {
+            http_plugin::handle_exception("trace_api", "get_token_transfers", body, cb);
+         }
+      }});
    }
 
    void plugin_shutdown() {
    }
 
+   // Silently clamp block_num_end so the scan spans at most max_block_range blocks.
+   // No 400 returned -- wide-range requests are a normal pagination pattern.
+   // The response envelope reports the actual range so clients can detect the clamp.
+   void clamp_block_end(action_query& query) const {
+      const uint64_t max_end = uint64_t{query.block_num_start} + max_block_range - 1;
+      if (max_end < query.block_num_end)
+         query.block_num_end = static_cast<uint32_t>(max_end);
+   }
+
    std::shared_ptr<trace_api_common_impl> common;
+   uint32_t max_block_range = 100;
 
    using request_handler_t = request_handler<shared_store_provider<store_provider>, abi_data_handler::shared_provider>;
    std::shared_ptr<request_handler_t> req_handler;
@@ -342,15 +477,35 @@ struct trace_api_plugin_impl {
    :common(common) {}
 
    void plugin_initialize(const appbase::variables_map& options) {
-      ilog("initializing trace api plugin");
+      fc_ilog(_log, "trace_api: initializing trace api plugin");
       auto log_exceptions_and_shutdown = [](const exception_with_context& e) {
          log_exception(e, fc::log_level::error);
          app().quit();
          throw yield_exception("shutting down");
       };
-      extraction = std::make_shared<chain_extraction_t>(shared_store_provider<store_provider>(common->store), log_exceptions_and_shutdown);
-
       auto& chain = app().find_plugin<chain_plugin>()->chain();
+
+      // Lazy ABI fetcher: called from applied_transaction (chain write thread) on first
+      // encounter of each account. Captures current ABI from the chain DB at that point.
+      chain_extraction_t::abi_fetcher_t abi_fetcher = [&chain](chain::name account)
+            -> std::optional<std::vector<char>> {
+         std::optional<std::vector<char>> result;
+         try {
+            const auto* meta = chain.find_account_metadata(account);
+            if (meta && meta->abi.size() > 0)
+               result.emplace(meta->abi.data(), meta->abi.data() + meta->abi.size());
+         } catch (const std::exception& e) {
+            fc_dlog(_log, "trace_api: lazy ABI fetch for {} failed: {}", account, e.what());
+         } catch (...) {
+            fc_dlog(_log, "trace_api: lazy ABI fetch for {} failed: unknown", account);
+         }
+         return result;
+      };
+
+      extraction = std::make_shared<chain_extraction_t>(
+         shared_store_provider<store_provider>(common->store),
+         log_exceptions_and_shutdown,
+         std::move(abi_fetcher));
 
       applied_transaction_connection.emplace(
          chain.applied_transaction().connect([this](std::tuple<const chain::transaction_trace_ptr&, const chain::packed_transaction_ptr&> t) {
@@ -409,7 +564,6 @@ trace_api_plugin::~trace_api_plugin() = default;
 
 void trace_api_plugin::set_program_options(appbase::options_description& cli, appbase::options_description& cfg) {
    trace_api_common_impl::set_program_options(cli, cfg);
-   trace_api_rpc_plugin_impl::set_program_options(cli, cfg);
 }
 
 void trace_api_plugin::plugin_initialize(const appbase::variables_map& options) {
@@ -446,7 +600,6 @@ trace_api_rpc_plugin::~trace_api_rpc_plugin() = default;
 
 void trace_api_rpc_plugin::set_program_options(appbase::options_description& cli, appbase::options_description& cfg) {
    trace_api_common_impl::set_program_options(cli, cfg);
-   trace_api_rpc_plugin_impl::set_program_options(cli, cfg);
 }
 
 void trace_api_rpc_plugin::plugin_initialize(const appbase::variables_map& options) {

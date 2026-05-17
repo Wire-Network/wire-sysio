@@ -12,34 +12,39 @@ using open_state = slice_directory::open_state;
 namespace {
    struct test_fixture {
 
-      std::vector<action_trace_v0> actions = {
+      std::vector<action_trace_v0> actions {
          {
-            1,
-            "receiver"_n, "contract"_n, "action"_n,
-            {{ "alice"_n, "active"_n }},
-            { 0x01, 0x01, 0x01, 0x01 },
-            { 0x05, 0x05, 0x05, 0x05 }
+            .global_sequence = 1,
+            .receiver        = "receiver"_n,
+            .account         = "contract"_n,
+            .action          = "action"_n,
+            .authorization   = {{ "alice"_n, "active"_n }},
+            .data            = { 0x01, 0x01, 0x01, 0x01 },
+            .return_value    = { 0x05, 0x05, 0x05, 0x05 }
          },
          {
-            0,
-            "receiver"_n, "contract"_n, "action"_n,
-            {{ "alice"_n, "active"_n }},
-            { 0x00, 0x00, 0x00, 0x00 },
-            { 0x04, 0x04, 0x04, 0x04}
+            .global_sequence = 0,
+            .receiver        = "receiver"_n,
+            .account         = "contract"_n,
+            .action          = "action"_n,
+            .authorization   = {{ "alice"_n, "active"_n }},
+            .data            = { 0x00, 0x00, 0x00, 0x00 },
+            .return_value    = { 0x04, 0x04, 0x04, 0x04 }
          },
          {
-            2,
-            "receiver"_n, "contract"_n, "action"_n,
-            {{ "alice"_n, "active"_n }},
-            { 0x02, 0x02, 0x02, 0x02 },
-            { 0x06, 0x06, 0x06, 0x06 }
+            .global_sequence = 2,
+            .receiver        = "receiver"_n,
+            .account         = "contract"_n,
+            .action          = "action"_n,
+            .authorization   = {{ "alice"_n, "active"_n }},
+            .data            = { 0x02, 0x02, 0x02, 0x02 },
+            .return_value    = { 0x06, 0x06, 0x06, 0x06 }
          }
       };
 
       transaction_trace_v0 transaction_trace {
          "0000000000000000000000000000000000000000000000000000000000000001"_h,
          actions,
-         fc::enum_type<uint8_t, chain::transaction_receipt_header::status_enum>{chain::transaction_receipt_header::status_enum::executed},
          10,
          5,
          { chain::signature_type() },
@@ -73,44 +78,46 @@ namespace {
       };
 
       const block_trace_v0 bt1 {
-         "0000000000000000000000000000000000000000000000000000000000000001"_h,
-         1,
-         "0000000000000000000000000000000000000000000000000000000000000003"_h,
-         chain::block_timestamp_type(1),
-         "bp.one"_n,
-         "0000000000000000000000000000000000000000000000000000000000000000"_h,
-         "0000000000000000000000000000000000000000000000000000000000000000"_h,
-         {
-            {
-               "0000000000000000000000000000000000000000000000000000000000000001"_h,
-               {
+         .id                = "0000000000000000000000000000000000000000000000000000000000000001"_h,
+         .number            = 1,
+         .previous_id       = "0000000000000000000000000000000000000000000000000000000000000003"_h,
+         .timestamp         = chain::block_timestamp_type(1),
+         .producer          = "bp.one"_n,
+         .transaction_mroot = "0000000000000000000000000000000000000000000000000000000000000000"_h,
+         .finality_mroot    = "0000000000000000000000000000000000000000000000000000000000000000"_h,
+         .transactions = {
+            transaction_trace_v0 {
+               .id              = "0000000000000000000000000000000000000000000000000000000000000001"_h,
+               .actions = {
                   {
-                     0,
-                     "sysio.token"_n, "sysio.token"_n, "transfer"_n,
-                     {{ "alice"_n, "active"_n }},
-                     make_transfer_data( "alice"_n, "bob"_n, "0.0001 SYS"_t, "Memo!" ),
-                     {}
+                     .global_sequence = 0,
+                     .receiver        = "sysio.token"_n,
+                     .account         = "sysio.token"_n,
+                     .action          = "transfer"_n,
+                     .authorization   = {{ "alice"_n, "active"_n }},
+                     .data            = make_transfer_data( "alice"_n, "bob"_n, "0.0001 SYS"_t, "Memo!" )
                   },
                   {
-                     1,
-                     "alice"_n, "sysio.token"_n, "transfer"_n,
-                     {{ "alice"_n, "active"_n }},
-                     make_transfer_data( "alice"_n, "bob"_n, "0.0001 SYS"_t, "Memo!" ),
-                     {}
+                     .global_sequence = 1,
+                     .receiver        = "alice"_n,
+                     .account         = "sysio.token"_n,
+                     .action          = "transfer"_n,
+                     .authorization   = {{ "alice"_n, "active"_n }},
+                     .data            = make_transfer_data( "alice"_n, "bob"_n, "0.0001 SYS"_t, "Memo!" )
                   },
                   {
-                     2,
-                     "bob"_n, "sysio.token"_n, "transfer"_n,
-                     {{ "alice"_n, "active"_n }},
-                     make_transfer_data( "alice"_n, "bob"_n, "0.0001 SYS"_t, "Memo!" ),
-                     {}
+                     .global_sequence = 2,
+                     .receiver        = "bob"_n,
+                     .account         = "sysio.token"_n,
+                     .action          = "transfer"_n,
+                     .authorization   = {{ "alice"_n, "active"_n }},
+                     .data            = make_transfer_data( "alice"_n, "bob"_n, "0.0001 SYS"_t, "Memo!" )
                   }
                },
-               fc::enum_type<uint8_t, chain::transaction_receipt_header::status_enum>{chain::transaction_receipt_header::status_enum::executed},
-               10,
-               5,
-               std::vector<chain::signature_type>{chain::signature_type()},
-               chain::transaction_header{chain::time_point_sec(), 1, 0, 100, 50, 0}
+               .cpu_usage_us    = 10,
+               .net_usage_words = 5,
+               .signatures      = {chain::signature_type()},
+               .trx_header      = chain::transaction_header{chain::time_point_sec(), 1, 0, 100, 50, 0}
             }
          }
       };
@@ -127,7 +134,6 @@ namespace {
             {
                "f000000000000000000000000000000000000000000000000000000000000004"_h,
                {},
-               fc::enum_type<uint8_t, chain::transaction_receipt_header::status_enum>{chain::transaction_receipt_header::status_enum::executed},
                10,
                5,
                std::vector<chain::signature_type>{chain::signature_type()},
@@ -162,6 +168,7 @@ namespace {
       }
       using store_provider::scan_metadata_log_from;
       using store_provider::read_data_log;
+      using store_provider::_slice_directory;
    };
 
    class vslice_datastream;
@@ -830,46 +837,66 @@ BOOST_AUTO_TEST_SUITE(slice_tests)
       sp.append(block_trace1);
       sp.append_lib(1);
       sp.append(block_trace2);
-      int count = 0;
-      get_block_t block1 = sp.get_block(1, [&count]() {
-         if (++count >= 3) {
-            throw yield_exception("");
-         }
-      });
+
+      // get_block uses the trace_blk_idx_<range>.log sidecar for O(1) lookup and does
+      // not iterate, so the yield callback is not invoked on the fast path.
+      get_block_t block1 = sp.get_block(1, [](){ BOOST_FAIL("yield must not be called on sidecar fast path"); });
       BOOST_REQUIRE(block1);
       BOOST_REQUIRE(std::get<1>(*block1));
       const auto block1_bt = std::get<0>(*block1);
       BOOST_REQUIRE_EQUAL(std::get<block_trace_v0>(block1_bt), block_trace1);
 
-      count = 0;
-      get_block_t block2 = sp.get_block(5, [&count]() {
-         if (++count >= 4) {
-            throw yield_exception("");
-         }
-      });
+      get_block_t block2 = sp.get_block(5, [](){ BOOST_FAIL("yield must not be called on sidecar fast path"); });
       BOOST_REQUIRE(block2);
       BOOST_REQUIRE(!std::get<1>(*block2));
       const auto block2_bt = std::get<0>(*block2);
       BOOST_REQUIRE_EQUAL(std::get<block_trace_v0>(block2_bt), block_trace2);
 
-      count = 0;
-      try {
-         sp.get_block(5,[&count]() {
-            if (++count >= 3) {
-               throw yield_exception("");
-            }
-         });
-         BOOST_FAIL("Should not have completed scan");
-      } catch (const yield_exception& ex) {
-      }
+      // Missing block: sidecar slot is empty, we fall back to scanning the metadata log.
+      get_block_t block_missing = sp.get_block(2);
+      BOOST_REQUIRE(!block_missing);
+   }
 
-      count = 0;
-      block2 = sp.get_block(2,[&count]() {
-         if (++count >= 4) {
-            throw yield_exception("");
-         }
-      });
-      BOOST_REQUIRE(!block2);
+   // Sidecar must be removed when its slice is cleaned up.
+   BOOST_FIXTURE_TEST_CASE(test_blk_offset_sidecar_cleanup, test_fixture)
+   {
+      fc::temp_directory tempdir;
+      const uint32_t width = 100;
+      slice_directory sd(tempdir.path(), width, /*min_irr=*/0u, std::optional<uint32_t>(), 0);
+
+      // Create sidecar + matching trace/index for slice 0 so cleanup has something to do.
+      sd.write_block_offset(1, 0);
+      fc::cfile f;
+      sd.find_or_create_trace_slice(0, open_state::read, f);
+      sd.find_or_create_index_slice(0, open_state::read, f);
+
+      const auto sidecar = tempdir.path() / "trace_blk_idx_0000000000-0000000100.log";
+      BOOST_REQUIRE(std::filesystem::exists(sidecar));
+
+      // Advance LIB several slices past 0 so slice 0 is rotated out.
+      sd.run_maintenance_tasks(width * 5, [](auto&&){});
+
+      BOOST_REQUIRE(!std::filesystem::exists(sidecar));
+   }
+
+   // Fork re-writes the block to a new offset.  The sidecar slot must be overwritten so
+   // get_block returns the latest (fork-resolved) copy, matching the scan-based "last wins".
+   BOOST_FIXTURE_TEST_CASE(test_blk_offset_fork_rewrite, test_fixture)
+   {
+      fc::temp_directory tempdir;
+      store_provider sp(tempdir.path(), 100, std::optional<uint32_t>(), std::optional<uint32_t>(), 0);
+
+      // Different block bodies but same block number.  Simulates a fork re-applying block 1.
+      block_trace_v0 forked = block_trace1;
+      forked.producer = "bp.two"_n;
+
+      sp.append(block_trace1);
+      sp.append(forked);
+
+      auto result = sp.get_block(1);
+      BOOST_REQUIRE(result);
+      const auto bt = std::get<block_trace_v0>(std::get<0>(*result));
+      BOOST_REQUIRE_EQUAL(bt, forked);
    }
 
 // Verify basics of get_trx_block_number()
@@ -883,7 +910,6 @@ BOOST_AUTO_TEST_SUITE(slice_tests)
       transaction_trace_v0 trx_trace1 {
          trx_id1,
          actions,
-         fc::enum_type<uint8_t, chain::transaction_receipt_header::status_enum>{chain::transaction_receipt_header::status_enum::executed},
          10,
          5,
          { chain::signature_type() },
@@ -893,7 +919,6 @@ BOOST_AUTO_TEST_SUITE(slice_tests)
       transaction_trace_v0 trx_trace2 {
          trx_id2,
          actions,
-         fc::enum_type<uint8_t, chain::transaction_receipt_header::status_enum>{chain::transaction_receipt_header::status_enum::executed},
          10,
          5,
          { chain::signature_type() },
@@ -996,7 +1021,6 @@ BOOST_AUTO_TEST_SUITE(slice_tests)
       transaction_trace_v0 trx_trace1 {
          target_trx_id,
          actions,
-         fc::enum_type<uint8_t, chain::transaction_receipt_header::status_enum>{chain::transaction_receipt_header::status_enum::executed},
          10,
          5,
          { chain::signature_type() },
@@ -1006,7 +1030,6 @@ BOOST_AUTO_TEST_SUITE(slice_tests)
       transaction_trace_v0 trx_trace2 {
          "0000000000000000000000000000000000000000000000000000000000000002"_h,
          actions,
-         fc::enum_type<uint8_t, chain::transaction_receipt_header::status_enum>{chain::transaction_receipt_header::status_enum::executed},
          10,
          5,
          { chain::signature_type() },
@@ -1124,8 +1147,6 @@ BOOST_AUTO_TEST_SUITE(slice_tests)
       transaction_trace_v0 trx_trace1 {
          target_trx_id,
          actions,
-         fc::enum_type<uint8_t, chain::transaction_receipt_header::status_enum>{
-            chain::transaction_receipt_header::status_enum::executed},
          10,
          5,
          {chain::signature_type()},
@@ -1176,6 +1197,276 @@ BOOST_AUTO_TEST_SUITE(slice_tests)
       block_num = sp.get_trx_block_number(target_trx_id, {});
       BOOST_REQUIRE(block_num);
       BOOST_REQUIRE_EQUAL(*block_num, trx_block_num); // target trx is in final block
+   }
+
+   // build_trx_id_index must apply the same fork-resolution logic as the linear
+   // scan in get_trx_block_number: when the trx_id log holds multiple
+   // block_trxs_entry records for the same block_num (one per accepted block at
+   // that height, including forked-out ones), only the LAST entry per block_num
+   // reflects the canonical post-fork state.  Trxs that appeared in an earlier
+   // entry for that block_num but not the last one were forked out and must NOT
+   // appear in the index.  Trxs that moved to a different block in the canonical
+   // fork must resolve to the new block_num.
+   BOOST_FIXTURE_TEST_CASE(test_build_trx_id_index_dedups_forked_trxs, test_fixture)
+   {
+      // Distinct first-8-byte prefixes so each trx maps to a unique bucket
+      // (the writer's prefix64 = first 8 bytes of the trx_id).
+      const chain::transaction_id_type trx_a =
+         "a1a2a3a4a5a6a7a8000000000000000000000000000000000000000000000001"_h;
+      const chain::transaction_id_type trx_b =
+         "b1b2b3b4b5b6b7b8000000000000000000000000000000000000000000000002"_h;
+      const chain::transaction_id_type trx_c =
+         "c1c2c3c4c5c6c7c8000000000000000000000000000000000000000000000003"_h;
+
+      fc::temp_directory tempdir;
+      const uint32_t width = 100;
+      test_store_provider sp(tempdir.path(), width);
+
+      // First accepted block at height 1: contains trx_a + trx_b.
+      sp.append_trx_ids(block_trxs_entry{ .ids = {trx_a, trx_b}, .block_num = 1 });
+      // Block 1 forks out and is replaced by a different block at height 1:
+      // canonical block 1 contains only trx_c (trx_a moved, trx_b removed).
+      sp.append_trx_ids(block_trxs_entry{ .ids = {trx_c},        .block_num = 1 });
+      // trx_a re-appears at block 2 in the canonical chain.
+      sp.append_trx_ids(block_trxs_entry{ .ids = {trx_a},        .block_num = 2 });
+
+      // Build the index for slice 0 directly (bypass the maintenance thread).
+      sp._slice_directory.build_trx_id_index(0, [](const std::string&){});
+
+      // Open the resulting on-disk index and verify lookups.
+      auto reader = sp._slice_directory.find_trx_id_index_slice(0);
+      BOOST_REQUIRE(reader.has_value());
+      BOOST_REQUIRE(reader->valid());
+
+      // trx_a moved to block 2 in the canonical chain -> lookup returns 2,
+      // NOT 1 (the forked-out occurrence).
+      auto a = reader->lookup(trx_a);
+      BOOST_REQUIRE(a.has_value());
+      BOOST_CHECK_EQUAL(*a, 2u);
+
+      // trx_b was removed entirely (only present in the forked-out block 1).
+      // Its bucket must be empty.
+      auto b = reader->lookup(trx_b);
+      BOOST_CHECK(!b.has_value());
+
+      // trx_c is in canonical block 1.
+      auto c = reader->lookup(trx_c);
+      BOOST_REQUIRE(c.has_value());
+      BOOST_CHECK_EQUAL(*c, 1u);
+   }
+
+   // Receiver bloom sidecar is built by run_maintenance_tasks at slice irreversibility, not during append.  Before
+   // LIB crosses the slice, the sidecar must be absent (queries fall back to scan); once LIB advances past the slice,
+   // a maintenance pass produces a valid sidecar whose probes hit every receiver actually present in the slice and
+   // miss for receivers that were never appended.  This exercises the full on-LIB build path including the data log
+   // stream-scan and the atomic sidecar write.
+   BOOST_FIXTURE_TEST_CASE(slice_dir_recv_bloom_build_on_lib, test_fixture)
+   {
+      fc::temp_directory tempdir;
+      const uint32_t width = 10;
+      // No compression, no deletion - keep the bloom build path focused.
+      test_store_provider sp(tempdir.path(), width);
+
+      // Build two block_trace_v0s in slice 0 (block numbers 1 and 2), each with one transaction whose actions touch
+      // a distinct, known set of receivers.
+      auto make_bt = [](uint32_t num, chain::checksum256_type id, std::vector<chain::name> receivers) {
+         block_trace_v0 bt;
+         bt.id = id;
+         bt.number = num;
+         transaction_trace_v0 trx;
+         trx.id = id;
+         trx.block_num = num;
+         uint64_t seq = uint64_t{num} * 100;
+         for (auto r : receivers) {
+            action_trace_v0 a{};
+            a.global_sequence = seq++;
+            a.receiver        = r;
+            a.account         = "sysio.token"_n;
+            a.action          = "transfer"_n;
+            trx.actions.push_back(std::move(a));
+         }
+         bt.transactions.push_back(std::move(trx));
+         return bt;
+      };
+
+      auto id1 = "b000000000000000000000000000000000000000000000000000000000000001"_h;
+      auto id2 = "b000000000000000000000000000000000000000000000000000000000000002"_h;
+      sp.append(make_bt(1, id1, { "alice"_n, "bob"_n }));
+      sp.append(make_bt(2, id2, { "charlie"_n }));
+
+      const auto bloom_path = sp._slice_directory.bloom_slice_path(0);
+
+      // Before LIB, no sidecar should exist - the append path must not have built anything on the fly.
+      BOOST_CHECK(!std::filesystem::exists(bloom_path));
+
+      // Advance LIB so slice 0 (blocks 0..9) is past LIB.  run_maintenance_tasks processes irreversible slices with
+      // min_irreversible=0, so a LIB inside slice 1 (block >= 10) makes slice 0 eligible.
+      sp._slice_directory.run_maintenance_tasks(/*lib=*/15, [](const std::string&){});
+
+      BOOST_REQUIRE(std::filesystem::exists(bloom_path));
+
+      bloom_reader r(bloom_path);
+      BOOST_REQUIRE(r.valid());
+      BOOST_CHECK(r.may_contain_receiver("alice"_n));
+      BOOST_CHECK(r.may_contain_receiver("bob"_n));
+      BOOST_CHECK(r.may_contain_receiver("charlie"_n));
+      BOOST_CHECK(r.may_contain_recv_action("alice"_n,   "transfer"_n));
+      BOOST_CHECK(r.may_contain_recv_action("charlie"_n, "transfer"_n));
+      // A receiver that was never appended should probe as absent (allowing for the 1% FPR on the small-capacity
+      // filter - try several unrelated names and tolerate at most one spurious hit).
+      std::size_t false_positives = 0;
+      for (auto n : { "never1"_n, "never2"_n, "never3"_n, "never4"_n, "never5"_n }) {
+         if (r.may_contain_receiver(n)) ++false_positives;
+      }
+      BOOST_CHECK_LE(false_positives, 1u);
+
+      // Re-running maintenance is idempotent: the bloom path still exists and the file wasn't clobbered.
+      sp._slice_directory.run_maintenance_tasks(/*lib=*/15, [](const std::string&){});
+      BOOST_REQUIRE(std::filesystem::exists(bloom_path));
+   }
+
+   // Fork behavior inside a single slice.  The extraction path re-applies forked blocks by calling append() again
+   // with a new block_trace_v0 at the same block number.  The data log ends up with BOTH the forked-out trace and
+   // the canonical trace: the blk_offset sidecar points only to the canonical offset, but the pre-fork record is
+   // still physically present in the file.  Because the bloom is built by streaming the entire data log (not by
+   // walking blk_offset), it naturally includes receivers from forked-out blocks too.  That is safe: a bloom may
+   // have false positives (a probe "hits" for a receiver that isn't in the canonical chain) but must never have
+   // false negatives (a probe "misses" for a receiver that IS in the canonical chain).  The test asserts both halves
+   // of the invariant - canonical receivers probe as present, AND a forked-out receiver also probes as present
+   // (harmless false positive), AND a never-appended receiver does not.
+   BOOST_FIXTURE_TEST_CASE(slice_dir_recv_bloom_fork_in_slice, test_fixture)
+   {
+      fc::temp_directory tempdir;
+      const uint32_t width = 10;
+      test_store_provider sp(tempdir.path(), width);
+
+      auto make_bt = [](uint32_t num, chain::checksum256_type id, chain::name receiver) {
+         block_trace_v0 bt;
+         bt.id = id;
+         bt.number = num;
+         transaction_trace_v0 trx;
+         trx.id = id;
+         trx.block_num = num;
+         action_trace_v0 a{};
+         a.global_sequence = uint64_t{num} * 100;
+         a.receiver        = receiver;
+         a.account         = "sysio.token"_n;
+         a.action          = "transfer"_n;
+         trx.actions.push_back(std::move(a));
+         bt.transactions.push_back(std::move(trx));
+         return bt;
+      };
+
+      // Initial chain: block 1 with alice, block 2 with bob.
+      sp.append(make_bt(1, "b000000000000000000000000000000000000000000000000000000000000001"_h, "alice"_n));
+      sp.append(make_bt(2, "b000000000000000000000000000000000000000000000000000000000000002"_h, "bob"_n));
+
+      // Fork: chain switches to a different branch.  Block 2 gets replayed with a different trace containing eve.
+      // Controller fires accepted_block again with the new block_trace; store_provider::append writes the new trace
+      // to the data log (appending, not overwriting in place) and updates the blk_offset sidecar to point at the new
+      // offset.  The stale "bob" record still occupies its original position in the trace file.
+      sp.append(make_bt(2, "b0000000000000000000000000000000000000000000000000000000000000b2"_h, "eve"_n));
+
+      // Advance LIB past slice 0 so maintenance builds the bloom.
+      sp._slice_directory.run_maintenance_tasks(/*lib=*/15, [](const std::string&){});
+      const auto bloom_path = sp._slice_directory.bloom_slice_path(0);
+      BOOST_REQUIRE(std::filesystem::exists(bloom_path));
+      bloom_reader r(bloom_path);
+      BOOST_REQUIRE(r.valid());
+
+      // Canonical receivers must probe as present - this is the correctness invariant.
+      BOOST_CHECK(r.may_contain_receiver("alice"_n));
+      BOOST_CHECK(r.may_contain_receiver("eve"_n));
+      // Forked-out receiver also probes as present because the stream-scan includes its stale record.  This is a
+      // benign false positive; the query scan will then visit that slice and find no canonical match for "bob".
+      BOOST_CHECK(r.may_contain_receiver("bob"_n));
+      // Sanity: a receiver that was never in any branch at any time should still miss (modulo FPR).
+      std::size_t false_positives = 0;
+      for (auto n : { "never1"_n, "never2"_n, "never3"_n, "never4"_n, "never5"_n }) {
+         if (r.may_contain_receiver(n)) ++false_positives;
+      }
+      BOOST_CHECK_LE(false_positives, 1u);
+   }
+
+   // Fork that crosses a slice boundary.  The scenario that motivated moving the bloom write to LIB (rather than
+   // doing it at slice roll-over during append): the tail of slice K is replayed after the head of slice K+1 is
+   // already in flight.  Under the earlier roll-over-based design the back-and-forth would have overwritten slice
+   // K's bloom with an incomplete one built only from the replayed blocks.  Under the LIB-based design the sidecar
+   // isn't written until the slice is fully irreversible, so forks can't reach back into an already-written sidecar.
+   BOOST_FIXTURE_TEST_CASE(slice_dir_recv_bloom_cross_slice_fork, test_fixture)
+   {
+      fc::temp_directory tempdir;
+      const uint32_t width = 10;
+      test_store_provider sp(tempdir.path(), width);
+
+      auto make_bt = [](uint32_t num, chain::checksum256_type id, chain::name receiver) {
+         block_trace_v0 bt;
+         bt.id = id;
+         bt.number = num;
+         transaction_trace_v0 trx;
+         trx.id = id;
+         trx.block_num = num;
+         action_trace_v0 a{};
+         a.global_sequence = uint64_t{num} * 100;
+         a.receiver        = receiver;
+         a.account         = "sysio.token"_n;
+         a.action          = "transfer"_n;
+         trx.actions.push_back(std::move(a));
+         bt.transactions.push_back(std::move(trx));
+         return bt;
+      };
+
+      // Normal forward progress through slice 0: blocks 1..9 each with a distinct receiver.  These will all end up
+      // in slice 0's bloom if LIB crosses cleanly.
+      for (uint32_t n = 1; n <= 9; ++n) {
+         chain::name r(0x4000'0000'0000'0000ull | n);  // synthesize distinct names
+         chain::checksum256_type id;
+         std::memcpy(id.data(), &n, sizeof(n));
+         sp.append(make_bt(n, id, r));
+      }
+      // Block 10 lands in slice 1.
+      sp.append(make_bt(10, "b00000000000000000000000000000000000000000000000000000000000000a"_h, "frank"_n));
+
+      // Simulate a fork that replays the last block of slice 0 with a different trace, then replays slice 1's first
+      // block.  This is exactly the cross-slice rollback pattern that broke the earlier design.
+      sp.append(make_bt(9,  "b0000000000000000000000000000000000000000000000000000000000000f9"_h, "grace"_n));
+      sp.append(make_bt(10, "b00000000000000000000000000000000000000000000000000000000000000b"_h, "harry"_n));
+
+      // Neither slice 0 nor slice 1 has been built yet: no LIB has crossed them.
+      BOOST_CHECK(!std::filesystem::exists(sp._slice_directory.bloom_slice_path(0)));
+      BOOST_CHECK(!std::filesystem::exists(sp._slice_directory.bloom_slice_path(1)));
+
+      // Advance LIB past slice 0 but still within slice 1.  Slice 0 should now be bloomed; slice 1 should still be
+      // absent (it's still in flight, potentially subject to further forks).
+      sp._slice_directory.run_maintenance_tasks(/*lib=*/12, [](const std::string&){});
+      BOOST_REQUIRE(std::filesystem::exists(sp._slice_directory.bloom_slice_path(0)));
+      BOOST_CHECK (!std::filesystem::exists(sp._slice_directory.bloom_slice_path(1)));
+
+      // Slice 0's bloom must contain every receiver that was ever recorded in it - canonical and forked-out alike.
+      // The key invariant: a query for "grace" (canonical tail of slice 0) MUST hit the bloom.  Under the pre-fix
+      // design this was the receiver that could get lost.
+      bloom_reader r0(sp._slice_directory.bloom_slice_path(0));
+      BOOST_REQUIRE(r0.valid());
+      for (uint32_t n = 1; n <= 8; ++n) {
+         chain::name expected(0x4000'0000'0000'0000ull | n);
+         BOOST_TEST_INFO("canonical slice-0 receiver " << expected.to_string());
+         BOOST_CHECK(r0.may_contain_receiver(expected));
+      }
+      BOOST_CHECK(r0.may_contain_receiver("grace"_n));  // canonical post-fork tail of slice 0
+      // Forked-out block 9 receiver (the 0x4000... name for n=9): also present because stream-scan includes it.
+      {
+         chain::name pre_fork_9(0x4000'0000'0000'0000ull | 9);
+         BOOST_CHECK(r0.may_contain_receiver(pre_fork_9));
+      }
+
+      // Advance LIB past slice 1 and rebuild.  Slice 1 must now be bloomed and must contain harry (canonical) - bob
+      // frank was the forked-out block 10, which the stream-scan still finds.
+      sp._slice_directory.run_maintenance_tasks(/*lib=*/25, [](const std::string&){});
+      BOOST_REQUIRE(std::filesystem::exists(sp._slice_directory.bloom_slice_path(1)));
+      bloom_reader r1(sp._slice_directory.bloom_slice_path(1));
+      BOOST_REQUIRE(r1.valid());
+      BOOST_CHECK(r1.may_contain_receiver("harry"_n));   // canonical slice-1
+      BOOST_CHECK(r1.may_contain_receiver("frank"_n));   // forked-out slice-1 (harmless false positive)
    }
 
 BOOST_AUTO_TEST_SUITE_END()

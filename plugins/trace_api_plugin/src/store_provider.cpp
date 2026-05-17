@@ -1,5 +1,7 @@
 #include <sysio/trace_api/store_provider.hpp>
+#include <sysio/trace_api/logging.hpp>
 
+#include <fc/io/raw.hpp>
 #include <fc/variant_object.hpp>
 #include <fc/log/logger_config.hpp>
 
@@ -8,9 +10,28 @@ namespace {
       static constexpr const char* _trace_prefix = "trace_";
       static constexpr const char* _trace_index_prefix = "trace_index_";
       static constexpr const char* _trace_trx_id_prefix = "trace_trx_id_";
+      static constexpr const char* _trace_trx_id_index_prefix = "trace_trx_idx_";
+      static constexpr const char* _trace_blk_idx_prefix = "trace_blk_idx_";
+      static constexpr const char* _trace_recv_bloom_prefix = "trace_recv_bloom_";
       static constexpr const char* _trace_ext = ".log";
       static constexpr const char* _compressed_trace_ext = ".clog";
-      static constexpr int _max_filename_size = std::char_traits<char>::length(_trace_index_prefix) + 10 + 1 + 10 + std::char_traits<char>::length(_compressed_trace_ext) + 1; // "trace_index_" + 10-digits + '-' + 10-digits + ".clog" + null-char
+      // Sized for the longest possible filename across every prefix and
+      // extension known to this file.  Adding a longer prefix above
+      // automatically grows the buffer; no manual recount needed.
+      static constexpr size_t _max_prefix_length = std::max({
+         std::char_traits<char>::length(_trace_prefix),
+         std::char_traits<char>::length(_trace_index_prefix),
+         std::char_traits<char>::length(_trace_trx_id_prefix),
+         std::char_traits<char>::length(_trace_trx_id_index_prefix),
+         std::char_traits<char>::length(_trace_blk_idx_prefix),
+         std::char_traits<char>::length(_trace_recv_bloom_prefix),
+      });
+      static constexpr size_t _max_ext_length = std::max(
+         std::char_traits<char>::length(_trace_ext),
+         std::char_traits<char>::length(_compressed_trace_ext)
+      );
+      // prefix + 10-digit start + '-' + 10-digit end + ext + '\0'
+      static constexpr int _max_filename_size = _max_prefix_length + 10 + 1 + 10 + _max_ext_length + 1;
 
       std::string make_filename(const char* slice_prefix, const char* slice_ext, uint32_t slice_number, uint32_t slice_width) {
          char filename[_max_filename_size] = {};
@@ -32,20 +53,26 @@ namespace {
 namespace sysio::trace_api {
       store_provider::store_provider(const std::filesystem::path& slice_dir, uint32_t stride_width, std::optional<uint32_t> minimum_irreversible_history_blocks,
                                   std::optional<uint32_t> minimum_uncompressed_irreversible_history_blocks, size_t compression_seek_point_stride)
-   : _slice_directory(slice_dir, stride_width, minimum_irreversible_history_blocks, minimum_uncompressed_irreversible_history_blocks, compression_seek_point_stride) {
-   }
+   : _slice_directory(slice_dir, stride_width, minimum_irreversible_history_blocks, minimum_uncompressed_irreversible_history_blocks, compression_seek_point_stride)
+   , _abi_log(slice_dir / "abi_log.log") {}
 
    template<typename BlockTrace>
    void store_provider::append(const BlockTrace& bt) {
       fc::cfile trace;
       fc::cfile index;
       const uint32_t slice_number = _slice_directory.slice_number(bt.number);
+
       _slice_directory.find_or_create_slice_pair(slice_number, open_state::write, trace, index);
       // storing as static_variant to allow adding other data types to the trace file in the future
       const uint64_t offset = append_store(data_log_entry { bt }, trace);
 
       auto be = metadata_log_entry { block_entry_v0 { .id = bt.id, .number = bt.number, .offset = offset }};
       append_store(be, index);
+
+      // Record in the block-offset sidecar for O(1) get_block lookups.  Fork re-writes
+      // overwrite the slot; if this step throws the metadata log remains the source of
+      // truth and get_block falls back to the linear scan.
+      _slice_directory.write_block_offset(bt.number, offset);
    }
 
    template void store_provider::append<block_trace_v0>(const block_trace_v0& bt);
@@ -69,27 +96,38 @@ namespace sysio::trace_api {
       append_store(entry, trx_id_file);
    }
 
+   bloom_reader store_provider::get_bloom(uint32_t slice_number) const {
+      const auto path = _slice_directory.bloom_slice_path(slice_number);
+      std::error_code ec;
+      if (!std::filesystem::exists(path, ec)) return bloom_reader{};
+      return bloom_reader{path};
+   }
+
    get_block_t store_provider::get_block(uint32_t block_height, const yield_function& yield) {
-      std::optional<uint64_t> trace_offset;
-      bool irreversible = false;
-      scan_metadata_log_from(block_height, 0, [&block_height, &trace_offset, &irreversible](const metadata_log_entry& e) -> bool {
-         if (std::holds_alternative<block_entry_v0>(e)) {
-            const auto& block = std::get<block_entry_v0>(e);
-            if (block.number == block_height) {
-               trace_offset = block.offset;
+      // Fast path: O(1) random-access lookup of the trace offset via the block-offset sidecar.
+      std::optional<uint64_t> trace_offset = _slice_directory.lookup_block_offset(block_height);
+
+      if (!trace_offset) {
+         // Fallback: scan the metadata log.  Covers slices without a sidecar (e.g. corruption,
+         // missing sidecar file) or the rare case where a block exists in the metadata log but
+         // the sidecar write was interrupted.
+         scan_metadata_log_from(block_height, 0, [&block_height, &trace_offset](const metadata_log_entry& e) -> bool {
+            if (std::holds_alternative<block_entry_v0>(e)) {
+               const auto& block = std::get<block_entry_v0>(e);
+               if (block.number == block_height) {
+                  trace_offset = block.offset;
+               }
             }
-         } else if (std::holds_alternative<lib_entry_v0>(e)) {
-            auto lib = std::get<lib_entry_v0>(e).lib;
-            if (lib >= block_height) {
-               irreversible = true;
-               return false;
-            }
-         }
-         return true;
-      }, yield);
+            return true;
+         }, yield);
+      }
+
       if (!trace_offset) {
          return get_block_t{};
       }
+
+      const bool irreversible = block_height <= _slice_directory.best_known_lib();
+
       std::optional<data_log_entry> entry = read_data_log(block_height, *trace_offset);
       if (!entry) {
          return get_block_t{};
@@ -98,11 +136,63 @@ namespace sysio::trace_api {
    }
 
    get_block_n store_provider::get_trx_block_number(const chain::transaction_id_type& trx_id, const yield_function& yield) {
-      // traversing from last stride to first
-      // if we find a trx it is either LIB or it is the latest fork, either way we are done
+      // Fast path: probe the per-slice hash index for each slice newest-to-oldest.
+      // The index covers only irreversible slices; reversible blocks fall through to
+      // the linear scan below.
       std::set<uint32_t> trx_block_nums;
 
       _slice_directory.for_each_trx_id_slice([&](fc::cfile& trx_id_file) -> bool {
+         yield();
+
+         // Derive the slice number from the file path and try the index first.
+         // If the filename can't be parsed (slice_number_from_path returns nullopt),
+         // fall through to the linear scan below.
+         const std::optional<uint32_t> slice_number =
+            _slice_directory.slice_number_from_path(trx_id_file.get_file_path());
+         if (slice_number) {
+            if (auto reader = _slice_directory.find_trx_id_index_slice(*slice_number)) {
+               if (auto block_num = reader->lookup(trx_id)) {
+                  // Confirm the hit by scanning the candidate block's
+                  // block_trxs_entry for a full trx_id match.  A naked 64-bit
+                  // prefix collision (extremely rare with natural sha256 ids,
+                  // but findable in ~2^32 GPU work adversarially) would otherwise
+                  // return the wrong block_num and the downstream get_block
+                  // scan would 404 the real trx.  On confirm failure, reset the
+                  // file to offset 0 and fall through to the linear scan below.
+                  bool confirmed = false;
+                  {
+                     metadata_log_entry entry;
+                     auto ds = trx_id_file.create_datastream();
+                     const uint64_t end = file_size(trx_id_file.get_file_path());
+                     while (trx_id_file.tellp() < end) {
+                        yield();
+                        fc::raw::unpack(ds, entry);
+                        if (!std::holds_alternative<block_trxs_entry>(entry)) continue;
+                        const auto& te = std::get<block_trxs_entry>(entry);
+                        if (te.block_num != *block_num) continue;
+                        for (const auto& id : te.ids) {
+                           if (id == trx_id) { confirmed = true; break; }
+                        }
+                        if (confirmed) break;
+                     }
+                  }
+                  if (confirmed) {
+                     trx_block_nums.insert(*block_num);
+                     return false; // found in an irreversible slice; stop
+                  }
+                  // Prefix collision: reset the file so the linear scan starts
+                  // from offset 0 -- the target trx may still be in a DIFFERENT
+                  // block whose trxs entry we passed over during confirmation.
+                  trx_id_file.seek(0);
+                  // fall through to linear scan
+               } else {
+                  return true; // not in this indexed slice; continue to next
+               }
+            }
+         }
+
+         // No index for this slice (reversible window or index not yet built):
+         // fall back to linear scan.
          metadata_log_entry entry;
          auto ds = trx_id_file.create_datastream();
          const uint64_t end = file_size(trx_id_file.get_file_path());
@@ -129,7 +219,7 @@ namespace sysio::trace_api {
                   return false; // *(--trx_block_nums.end()) is the block with highest block number which is final
                }
             } else {
-               FC_ASSERT( false, "unpacked data should be a block_trxs_entry or a lib_entry_v0" );;
+               FC_ASSERT( false, "unpacked data should be a block_trxs_entry or a lib_entry_v0" );
             }
             offset = trx_id_file.tellp();
          }
@@ -218,6 +308,13 @@ namespace sysio::trace_api {
       return true;
    }
 
+   std::filesystem::path slice_directory::bloom_slice_path(uint32_t slice_number) const {
+      // Mirrors the filename convention of the other sidecars: <prefix><first>-<last><ext>.  Callers write through
+      // bloom_builder::finalize_and_write (temp + rename) and read through bloom_reader, neither of which uses
+      // fc::cfile, so no open-helper is needed here.
+      return _slice_dir / make_filename(_trace_recv_bloom_prefix, _trace_ext, slice_number, _width);
+   }
+
    std::optional<compressed_file> slice_directory::find_compressed_trace_slice(uint32_t slice_number, bool open_file ) const {
       auto filename = make_filename(_trace_prefix, _compressed_trace_ext, slice_number, _width);
       const auto slice_path = _slice_dir / filename;
@@ -259,7 +356,7 @@ namespace sysio::trace_api {
       if (trace_found != index_found) {
          const std::string trace_status = trace_found ? "existing" : "new";
          const std::string index_status = index_found ? "existing" : "new";
-         elog("Trace file is {}, but it's metadata file is {}. This means the files are not consistent.", trace_status, index_status);
+         fc_elog(_log, "Trace file is {}, but it's metadata file is {}. This means the files are not consistent.", trace_status, index_status);
       }
    }
 
@@ -312,12 +409,334 @@ namespace sysio::trace_api {
       }
    }
 
+   namespace {
+      // Collect and sort all trace_index_*.log paths; ascending=true gives lowest slice first.
+      std::vector<std::filesystem::path> collect_index_paths(const std::filesystem::path& slice_dir, bool ascending) {
+         namespace fs = std::filesystem;
+         std::vector<fs::path> paths;
+         for (const auto& entry : fs::directory_iterator(slice_dir)) {
+            if (!entry.is_regular_file()) continue;
+            const auto name = entry.path().filename().string();
+            if (name.rfind(_trace_index_prefix, 0) == 0 && entry.path().extension() == _trace_ext)
+               paths.push_back(entry.path());
+         }
+         if (ascending) {
+            std::sort(paths.begin(), paths.end());
+         } else {
+            std::sort(paths.begin(), paths.end(), std::greater<>());
+         }
+         return paths;
+      }
+
+      // Scan a single index slice file and return the min and max block numbers found.
+      std::optional<std::pair<uint32_t,uint32_t>> scan_index_slice(const std::filesystem::path& path, uint32_t current_version) {
+         try {
+            fc::cfile index;
+            index.set_file_path(path);
+            index.open("rb");
+            index.seek(0);
+            const auto header = extract_store<slice_directory::index_header>(index);
+            if (header.version != current_version)
+               return std::nullopt;
+            const uint64_t end = file_size(path);
+            std::optional<uint32_t> lo, hi;
+            while (index.tellp() < end) {
+               const auto e = extract_store<metadata_log_entry>(index);
+               if (std::holds_alternative<block_entry_v0>(e)) {
+                  const auto num = std::get<block_entry_v0>(e).number;
+                  if (!lo || num < *lo) lo = num;
+                  if (!hi || num > *hi) hi = num;
+               }
+            }
+            if (lo && hi)
+               return std::make_pair(*lo, *hi);
+         } catch (...) {
+            // malformed or partially written slice
+            fc_wlog(_log, "trace_api: cannot scan index slice '{}'", path.string());
+         }
+         return std::nullopt;
+      }
+   } // anonymous namespace
+
+   std::optional<std::pair<uint32_t,uint32_t>> slice_directory::first_and_last_recorded_blocks() const {
+      // Named local with the exact return type so the compiler can NRVO it directly
+      // into the caller's slot.  Single directory scan: collect ascending paths,
+      // walk from both ends.  Returning both bounds from one call guarantees callers
+      // see a consistent view -- either both values are present or neither is.
+      std::optional<std::pair<uint32_t,uint32_t>> result;
+
+      const auto paths = collect_index_paths(_slice_dir, /*ascending=*/true);
+      std::optional<uint32_t> first_block;
+      for (const auto& path : paths) {
+         if (const auto r = scan_index_slice(path, _current_version)) {
+            first_block = r->first;
+            break;
+         }
+      }
+      if (!first_block)
+         return result;
+
+      // first_block was found, so at least one slice has block entries; the reverse
+      // pass is guaranteed to find at least one (worst case, the same slice).
+      uint32_t last_block = *first_block;
+      for (auto it = paths.rbegin(); it != paths.rend(); ++it) {
+         if (const auto r = scan_index_slice(*it, _current_version)) {
+            last_block = r->second;
+            break;
+         }
+      }
+
+      result.emplace(*first_block, last_block);
+      return result;
+   }
+
+   std::optional<std::pair<uint32_t,uint32_t>> store_provider::first_and_last_recorded_blocks() const {
+      return _slice_directory.first_and_last_recorded_blocks();
+   }
+
+   void store_provider::append_abi(chain::name account, uint64_t global_seq, std::vector<char> abi_bytes) {
+      _abi_log.append(account, global_seq, std::move(abi_bytes));
+   }
+
+   std::optional<abi_log::lookup_result> store_provider::lookup_abi(chain::name account, uint64_t global_seq) const {
+      return _abi_log.lookup(account, global_seq);
+   }
+
+   bool store_provider::has_abi_entry(chain::name account) const {
+      return _abi_log.has_entry(account);
+   }
+
+   std::optional<uint32_t> slice_directory::slice_number_from_path(const std::filesystem::path& trx_id_path) const {
+      // Filename format: trace_trx_id_XXXXXXXXXX-YYYYYYYYYY.log
+      // Parse the start block number (XXXXXXXXXX) and divide by _width.
+      // Named local matching the return type so the compiler can NRVO the
+      // optional directly into the caller's slot.
+      const auto name = trx_id_path.filename().string();
+      const auto prefix_len = std::char_traits<char>::length(_trace_trx_id_prefix);
+      std::optional<uint32_t> result;
+      try {
+         const uint32_t start_block = static_cast<uint32_t>(std::stoul(name.substr(prefix_len, 10)));
+         result = start_block / _width;
+      } catch (...) {
+         fc_wlog(_log, "trace_api: cannot parse slice start-block from filename '{}'", name);
+      }
+      return result;
+   }
+
+   std::optional<trx_id_index_reader> slice_directory::find_trx_id_index_slice(uint32_t slice_number) const {
+      auto filename = make_filename(_trace_trx_id_index_prefix, _trace_ext, slice_number, _width);
+      const auto path = _slice_dir / filename;
+      if (!std::filesystem::exists(path))
+         return std::nullopt;
+      trx_id_index_reader reader(path);
+      if (!reader.valid())
+         return std::nullopt;
+      return reader;
+   }
+
+   void slice_directory::build_trx_id_index(uint32_t slice_number, const log_handler& log) {
+      auto idx_filename = make_filename(_trace_trx_id_index_prefix, _trace_ext, slice_number, _width);
+      const auto idx_path = _slice_dir / idx_filename;
+      if (std::filesystem::exists(idx_path))
+         return; // already built
+
+      fc::cfile trx_id_file;
+      if (!find_trx_id_slice(slice_number, open_state::read, trx_id_file))
+         return; // no source data
+
+      log(std::string("Building trx_id index for slice: ") + std::to_string(slice_number));
+
+      // Dedup pass: the trx_id log can hold MULTIPLE block_trxs_entry records
+      // with the same block_num when the chain forks at that height (each
+      // accepted block, including forked-out ones, writes one entry).  The
+      // last entry for each block_num reflects the canonical post-fork-
+      // resolution state, matching the semantics of the linear-scan path in
+      // get_trx_block_number which uses trx_block_nums.erase to drop forked-
+      // out entries.  Build a canonical map first, then feed it to the
+      // writer (which itself does last-write-wins per prefix).
+      std::map<uint32_t /*block_num*/, std::vector<chain::transaction_id_type>> canonical;
+      const uint64_t end = file_size(trx_id_file.get_file_path());
+      while (trx_id_file.tellp() < end) {
+         metadata_log_entry entry;
+         auto ds = trx_id_file.create_datastream();
+         fc::raw::unpack(ds, entry);
+         if (std::holds_alternative<block_trxs_entry>(entry)) {
+            const auto& te = std::get<block_trxs_entry>(entry);
+            canonical[te.block_num] = te.ids; // last entry per block_num wins
+         }
+      }
+
+      trx_id_index_writer writer;
+      for (const auto& [block_num, ids] : canonical) {
+         for (const auto& id : ids)
+            writer.add(id, block_num);
+      }
+
+      // Write to a temp path and atomically rename so concurrent readers never
+      // see a partially written index file.
+      const auto tmp_path = idx_path.parent_path() / (idx_path.filename().string() + ".tmp");
+      writer.write(tmp_path);
+      std::filesystem::rename(tmp_path, idx_path);
+      log(std::string("Built trx_id index for slice: ") + std::to_string(slice_number) +
+          " (" + std::to_string(writer.entry_count()) + " entries)");
+   }
+
+   void slice_directory::build_recv_bloom(uint32_t slice_number, const log_handler& log) {
+      const auto bloom_path = bloom_slice_path(slice_number);
+      if (std::filesystem::exists(bloom_path))
+         return; // already built
+
+      // Locate the slice's trace data log (trace_<range>.log).  run_maintenance_tasks orders bloom building before
+      // compression so a freshly-irreversible slice still has its uncompressed .log.  If only a compressed .clog
+      // exists (e.g. upgrading a node that predates the bloom) or the file is missing, skip; the query path treats
+      // a missing sidecar as "scan this slice".  Don't decompress-then-scan - compressed slices are aged and rarely
+      // queried.  Look up the path without opening so we can check size before committing to an open.
+      fc::cfile trace;
+      const bool dont_open_file = false;
+      if (!find_trace_slice(slice_number, open_state::read, trace, dont_open_file)) {
+         log(std::string("trace_api: skipping receiver bloom for slice ") + std::to_string(slice_number) +
+             " (no uncompressed trace data; already compressed or never written)");
+         return;
+      }
+      // Empty trace file => no actions to bloom.  Production slices always have on-block traces so this only fires
+      // in tests that pre-create slice files; keeping it guards the maintenance path from writing a zero-entry
+      // sidecar that'd just clutter the directory.
+      const auto trace_path = trace.get_file_path();
+      std::error_code ec;
+      const uint64_t trace_size = std::filesystem::file_size(trace_path, ec);
+      if (ec || trace_size == 0) return;
+
+      log(std::string("Building receiver bloom for slice: ") + std::to_string(slice_number));
+
+      trace.open(fc::cfile::update_rw_mode);
+
+      bloom_builder builder;
+      bool processed_any_block = false;
+      try {
+         // Stream through the data log record-by-record.  Fork re-writes leave stale block_trace_v0 records in the
+         // file (the blk_offset sidecar only points to the canonical one), so the bloom will contain a superset of
+         // the canonical receivers.  That's fine: bloom allows false positives; a receiver present only in a forked-
+         // out copy just probes as present and the query scan finds no canonical match for it.
+         while (trace.tellp() < trace_size) {
+            data_log_entry entry;
+            auto ds = trace.create_datastream();
+            fc::raw::unpack(ds, entry);
+            std::visit([&builder](const auto& bt) { builder.add_block(bt); }, entry);
+            processed_any_block = true;
+         }
+      } FC_LOG_AND_DROP();
+
+      if (!processed_any_block) {
+         // No parseable records (corrupted or malformed data log).  Don't write a default-sized sidecar - let the
+         // query path fall back to scanning this slice, which is the correct behavior for unreadable input.
+         return;
+      }
+
+      try {
+         builder.finalize_and_write(bloom_path);
+      } FC_LOG_AND_DROP();
+
+      log(std::string("Built receiver bloom for slice: ") + std::to_string(slice_number) +
+          " (" + std::to_string(builder.receiver_count()) + " receivers, " +
+          std::to_string(builder.recv_action_count()) + " (receiver, action) pairs)");
+   }
+
    void slice_directory::set_lib(uint32_t lib) {
       {
          std::scoped_lock lock(_maintenance_mtx);
          _best_known_lib = lib;
       }
       _maintenance_condition.notify_one();
+   }
+
+   uint32_t slice_directory::best_known_lib() const {
+      std::scoped_lock lock(_maintenance_mtx);
+      return _best_known_lib;
+   }
+
+   bool slice_directory::open_or_create_blk_offset_slice(uint32_t slice_number, fc::cfile& blk_idx) const {
+      const bool found = find_slice(_trace_blk_idx_prefix, slice_number, blk_idx, /*open_file=*/false);
+      if (found) {
+         // Existing file: open for random-access read/write ("rb+").
+         blk_idx.open(fc::cfile::update_rw_mode);
+         blk_offset_index_header header{};
+         try {
+            blk_idx.seek(0);
+            blk_idx.read(reinterpret_cast<char*>(&header), sizeof(header));
+         } catch (...) {
+            blk_idx.close();
+            return false;
+         }
+         if (header.magic != blk_offset_index_header::magic_value ||
+             header.version != blk_offset_index_header::current_version ||
+             header.width != _width) {
+            blk_idx.close();
+            return false;
+         }
+         return true;
+      }
+
+      // New file: create with truncate+read/write ("wb+") so subsequent seek()+write()
+      // behave as random-access (append mode "ab+" would ignore the seek on writes).
+      blk_idx.open(fc::cfile::truncate_rw_mode);
+      blk_offset_index_header header{};
+      header.width = _width;
+      blk_idx.seek(0);
+      blk_idx.write(reinterpret_cast<const char*>(&header), sizeof(header));
+      // Pre-allocate by writing the final byte.  Linux fills the gap sparsely.
+      const uint64_t final_byte = sizeof(blk_offset_index_header) + uint64_t{_width} * sizeof(uint64_t) - 1;
+      const char zero = 0;
+      blk_idx.seek(final_byte);
+      blk_idx.write(&zero, 1);
+      blk_idx.flush();
+      return true;
+   }
+
+   void slice_directory::write_block_offset(uint32_t block_height, uint64_t trace_offset) const {
+      const uint32_t slice_number = this->slice_number(block_height);
+      fc::cfile blk_idx;
+      if (!open_or_create_blk_offset_slice(slice_number, blk_idx)) {
+         // Existing sidecar is unusable (wrong magic/version/width).  Remove and recreate;
+         // readers fall back to the metadata-log scan in the meantime.
+         std::filesystem::remove(blk_idx.get_file_path());
+         if (!open_or_create_blk_offset_slice(slice_number, blk_idx)) {
+            return;
+         }
+      }
+      const uint32_t slot = block_height % _width;
+      const uint64_t slot_pos = sizeof(blk_offset_index_header) + uint64_t{slot} * sizeof(uint64_t);
+      const uint64_t encoded = trace_offset + 1; // 0 reserved as "empty"
+      blk_idx.seek(slot_pos);
+      blk_idx.write(reinterpret_cast<const char*>(&encoded), sizeof(encoded));
+      blk_idx.flush();
+   }
+
+   std::optional<uint64_t> slice_directory::lookup_block_offset(uint32_t block_height) const {
+      const uint32_t slice_number = this->slice_number(block_height);
+      fc::cfile blk_idx;
+      const bool found = find_slice(_trace_blk_idx_prefix, slice_number, blk_idx, /*open_file=*/false);
+      if (!found) return std::nullopt;
+
+      try {
+         blk_idx.open(fc::cfile::update_rw_mode);
+         blk_offset_index_header header{};
+         blk_idx.seek(0);
+         blk_idx.read(reinterpret_cast<char*>(&header), sizeof(header));
+         if (header.magic != blk_offset_index_header::magic_value ||
+             header.version != blk_offset_index_header::current_version ||
+             header.width != _width) {
+            return std::nullopt;
+         }
+         const uint32_t slot = block_height % _width;
+         const uint64_t slot_pos = sizeof(blk_offset_index_header) + uint64_t{slot} * sizeof(uint64_t);
+         uint64_t encoded = 0;
+         blk_idx.seek(slot_pos);
+         blk_idx.read(reinterpret_cast<char*>(&encoded), sizeof(encoded));
+         if (encoded == 0) return std::nullopt;
+         return encoded - 1;
+      } catch (...) {
+         return std::nullopt;
+      }
    }
 
    void slice_directory::start_maintenance_thread(log_handler log) {
@@ -377,6 +796,23 @@ namespace sysio::trace_api {
    }
 
    void slice_directory::run_maintenance_tasks(uint32_t lib, const log_handler& log) {
+      // Build trx_id indexes for all newly irreversible slices (min_irreversible=0:
+      // index as soon as a slice's block range is fully below LIB).
+      process_irreversible_slice_range(lib, 0, _last_indexed_slice, [this, &log](uint32_t slice_to_index){
+         try {
+            build_trx_id_index(slice_to_index, log);
+         } FC_LOG_AND_DROP();
+      });
+
+      // Build receiver bloom sidecars on the same schedule as trx_id indexes - any slice fully past LIB has its data
+      // final, so forks can't corrupt the sidecar after it's written.  Ordering before compression keeps the source
+      // .log available for the stream-scan.
+      process_irreversible_slice_range(lib, 0, _last_bloomed_slice, [this, &log](uint32_t slice_to_bloom){
+         try {
+            build_recv_bloom(slice_to_bloom, log);
+         } FC_LOG_AND_DROP();
+      });
+
       if (_minimum_irreversible_history_blocks) {
          process_irreversible_slice_range(lib, *_minimum_irreversible_history_blocks, _last_cleaned_up_slice, [this, &log](uint32_t slice_to_clean){
             fc::cfile trace;
@@ -401,6 +837,25 @@ namespace sysio::trace_api {
             if (trx_id_found) {
                log(std::string("Removing: ") + trx_id.get_file_path().generic_string());
                std::filesystem::remove(trx_id.get_file_path());
+            }
+            auto idx_filename = make_filename(_trace_trx_id_index_prefix, _trace_ext, slice_to_clean, _width);
+            const auto idx_path = _slice_dir / idx_filename;
+            if (std::filesystem::exists(idx_path)) {
+               log(std::string("Removing: ") + idx_path.generic_string());
+               std::filesystem::remove(idx_path);
+            }
+
+            auto blk_idx_filename = make_filename(_trace_blk_idx_prefix, _trace_ext, slice_to_clean, _width);
+            const auto blk_idx_path = _slice_dir / blk_idx_filename;
+            if (std::filesystem::exists(blk_idx_path)) {
+               log(std::string("Removing: ") + blk_idx_path.generic_string());
+               std::filesystem::remove(blk_idx_path);
+            }
+
+            const auto bloom_path = bloom_slice_path(slice_to_clean);
+            if (std::filesystem::exists(bloom_path)) {
+               log(std::string("Removing: ") + bloom_path.generic_string());
+               std::filesystem::remove(bloom_path);
             }
 
             auto ctrace = find_compressed_trace_slice(slice_to_clean, dont_open_file);

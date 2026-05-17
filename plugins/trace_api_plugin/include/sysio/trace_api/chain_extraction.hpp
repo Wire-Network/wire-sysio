@@ -1,28 +1,49 @@
 #pragma once
 
 #include <sysio/trace_api/common.hpp>
-#include <sysio/trace_api/trace.hpp>
 #include <sysio/trace_api/extract_util.hpp>
+#include <sysio/trace_api/logging.hpp>
+#include <sysio/trace_api/trace.hpp>
+#include <sysio/chain/config.hpp>
+#include <sysio/chain/name.hpp>
+#include <fc/io/raw.hpp>
+#include <fmt/format.h>
 #include <exception>
 #include <functional>
 #include <map>
+#include <unordered_set>
 
-namespace sysio { namespace trace_api {
+namespace sysio::trace_api {
 
 using chain::transaction_id_type;
 using chain::packed_transaction;
+using namespace sysio::chain::literals;
+
+// Compile-time constants for setabi detection: built from constexpr _n
+// literals so we don't pay a chain::name construction cost on every action.
+inline constexpr chain::name setabi_action_name = "setabi"_n;
 
 template <typename StoreProvider>
 class chain_extraction_impl_type {
 public:
    /**
-    * Chain Extractor for capturing transaction traces, action traces, and block info.
-    * @param store provider of append & append_lib
-    * @param except_handler called on exceptions, logging if any is left to the user
+    * Called to fetch the current ABI bytes for an account (lazy init on first encounter).
+    * Returns nullopt if the account has no ABI.
     */
-   chain_extraction_impl_type( StoreProvider store, exception_handler except_handler )
+   using abi_fetcher_t = std::function<std::optional<std::vector<char>>(chain::name)>;
+
+   /**
+    * Chain Extractor for capturing transaction traces, action traces, and block info.
+    * @param store provider of append, append_lib, and append_abi
+    * @param except_handler called on exceptions, logging if any is left to the user
+    * @param abi_fetcher optional callback to lazily fetch the current ABI for an account;
+    *                    called on first encounter of each account; receives global_seq 0
+    */
+   chain_extraction_impl_type( StoreProvider store, exception_handler except_handler,
+                                abi_fetcher_t abi_fetcher = {} )
    : store(std::move(store))
    , except_handler(std::move(except_handler))
+   , abi_fetcher(std::move(abi_fetcher))
    {}
 
    /// connect to chain controller applied_transaction signal
@@ -54,6 +75,80 @@ private:
       } else {
          cached_traces[trace->id] = {trace, t};
       }
+
+      // ABI capture: scan all action traces (including inlines) in this transaction.
+      //
+      // First pass: collect setabi targets in this trx so the second pass can
+      // skip the lazy fetch for any account whose ABI is being replaced here.
+      // on_applied_transaction runs AFTER all actions in the trx have applied,
+      // so the chain DB already reflects the new ABI; doing a lazy fetch and
+      // recording it as target@0 would poison lookups for actions on target
+      // that executed earlier in this same trx (they need the OLD ABI, which
+      // is no longer reachable from post-apply state).
+      std::unordered_set<chain::name> setabi_targets_this_trx;
+      for (const auto& at : trace->action_traces) {
+         if (!at.receipt) continue;
+         if (at.act.account == chain::config::system_account_name &&
+             at.act.name    == setabi_action_name) {
+            try {
+               chain::name target;
+               chain::bytes abi_bytes;
+               auto ds = fc::datastream<const char*>(at.act.data.data(), at.act.data.size());
+               fc::raw::unpack(ds, target);
+               fc::raw::unpack(ds, abi_bytes);
+               setabi_targets_this_trx.insert(target);
+            } catch (const std::exception& e) {
+               fc_wlog(_log, "trace_api: failed to unpack setabi data (collecting targets) at global_seq {}: {}",
+                       at.receipt->global_sequence, e.what());
+            }
+         }
+      }
+
+      // Second pass: lazy fetch + setabi record, skipping lazy fetch for any
+      // account whose ABI is being replaced in this trx.
+      for (const auto& at : trace->action_traces) {
+         if (!at.receipt) continue; // skip context-free or failed actions
+
+         const chain::name account = at.act.account;
+
+         // Lazy ABI fetch: on first encounter of an account (that isn't having
+         // its ABI replaced in this same trx), record its current ABI at
+         // global_seq 0 so pre-plugin-start actions still decode.  "First
+         // encounter" is decided by the abi_log itself: if it has no record
+         // for this account, we trigger the fetch.  Once any record exists
+         // (lazy or setabi), we never re-fetch.  Using the log as
+         // source-of-truth avoids holding a per-node-lifetime set of all
+         // accounts ever observed.
+         if (abi_fetcher
+             && setabi_targets_this_trx.count(account) == 0
+             && !store.has_abi_entry(account))
+         {
+            try {
+               if (auto abi = abi_fetcher(account))
+                  store.append_abi(account, 0, std::move(*abi));
+            } catch (const std::exception& e) {
+               fc_dlog(_log, "trace_api: lazy ABI fetch for {} failed: {}", account, e.what());
+            }
+         }
+
+         // setabi: record the new ABI with its exact global_sequence.
+         if (at.act.account == chain::config::system_account_name &&
+             at.act.name    == setabi_action_name) {
+            try {
+               chain::name target_account;
+               chain::bytes abi_bytes;
+               auto ds = fc::datastream<const char*>(at.act.data.data(), at.act.data.size());
+               fc::raw::unpack(ds, target_account);
+               fc::raw::unpack(ds, abi_bytes);
+               store.append_abi(target_account,
+                                at.receipt->global_sequence,
+                                std::vector<char>(abi_bytes.begin(), abi_bytes.end()));
+            } catch (const std::exception& e) {
+               fc_wlog(_log, "trace_api: failed to record setabi at global_seq {}: {}",
+                       at.receipt->global_sequence, e.what());
+            }
+         }
+      }
    }
 
    void on_accepted_block(const chain::signed_block_ptr& block, const chain::block_id_type& id ) {
@@ -65,7 +160,51 @@ private:
    }
 
    void on_block_start( uint32_t block_num ) {
+      if (!startup_checked) {
+         startup_checked = true;
+         check_continuity(block_num);
+      }
       clear_caches();
+   }
+
+   void check_continuity(uint32_t block_num) {
+      try {
+         const auto recorded = store.first_and_last_recorded_blocks();
+         if (!recorded) {
+            fc_ilog(_log, "trace_api: no prior trace data found, starting fresh at block {}", block_num);
+            return;
+         }
+         const uint32_t first = recorded->first;
+         const uint32_t last  = recorded->second;
+         // Overlap or exact continuation: chain head is within or just past existing data.
+         // Re-applied blocks will overwrite existing slice entries as they are re-recorded.
+         if (block_num >= first && block_num <= last + 1)
+            return;
+
+         if (block_num < first) {
+            throw std::runtime_error(fmt::format(
+               "trace_api: chain head ({}) is before the first recorded trace block ({}). "
+               "To recover: load a snapshot whose chain head is within [{}, {}], "
+               "or copy the trace files covering blocks {}..{} from another node, "
+               "or delete the trace directory to start fresh (loses historical traces).",
+               block_num, first, first, last + 1, block_num, first - 1));
+         }
+         // block_num > last + 1: forward gap
+         throw std::runtime_error(fmt::format(
+            "trace_api: gap detected in trace data. Last recorded block: {}, current block: {}. "
+            "To recover: load a snapshot covering block {} (or earlier within the recorded range), "
+            "or copy the trace files covering blocks {}..{} from another node, "
+            "or delete the trace directory to start fresh (loses historical traces).",
+            last, block_num, last + 1, last + 1, block_num - 1));
+      } catch (const yield_exception&) {
+         // Order matters: yield_exception propagates (it's the signal that the
+         // plugin's own except_handler uses to unwind the controller), while
+         // other exceptions from store.* calls or the throws above go through
+         // except_handler so the operator sees a properly formatted message.
+         throw;
+      } catch (...) {
+         except_handler(MAKE_EXCEPTION_WITH_CONTEXT(std::current_exception()));
+      }
    }
 
    void clear_caches() {
@@ -116,9 +255,11 @@ private:
 private:
    StoreProvider                                                store;
    exception_handler                                            except_handler;
+   abi_fetcher_t                                                abi_fetcher;
    std::map<transaction_id_type, cache_trace>                   cached_traces;
    std::optional<cache_trace>                                   onblock_trace;
+   bool                                                         startup_checked{false};
 
 };
 
-}}
+} // namespace sysio::trace_api
