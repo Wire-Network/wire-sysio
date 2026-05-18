@@ -38,6 +38,12 @@ public:
    void write(const std::filesystem::path& state_file);
    bool read(const std::filesystem::path& state_file);
 
+   // Returns true if `id` is in this block's ancestry (or is this block
+   // itself within the finality_core's tracking range).
+   bool extends(const block_id_type& id) const {
+      return _bsp && _bsp->core.extends(id);
+   }
+
    // Returns true iff this block carries a strong QC whose target is not in `head_handle`'s ancestry. Under Savanna's
    // strong-vote locking, finalizers locked on the QC target cannot later vote on any branch that does not extend it,
    // so a head whose branch does not include the QC target can never be covered by a future QC; it is permanently
