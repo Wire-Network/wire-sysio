@@ -14,16 +14,6 @@
             "fields": []
         },
         {
-            "name": "addfok",
-            "base": "",
-            "fields": []
-        },
-        {
-            "name": "addfua",
-            "base": "",
-            "fields": []
-        },
-        {
             "name": "arecbadrec",
             "base": "",
             "fields": []
@@ -129,21 +119,6 @@
             "fields": []
         },
         {
-            "name": "ashlok",
-            "base": "",
-            "fields": []
-        },
-        {
-            "name": "ashlover",
-            "base": "",
-            "fields": []
-        },
-        {
-            "name": "ashlua",
-            "base": "",
-            "fields": []
-        },
-        {
             "name": "bcpgetok",
             "base": "",
             "fields": []
@@ -164,51 +139,6 @@
             "fields": []
         },
         {
-            "name": "divfok",
-            "base": "",
-            "fields": []
-        },
-        {
-            "name": "divfua",
-            "base": "",
-            "fields": []
-        },
-        {
-            "name": "divfzero",
-            "base": "",
-            "fields": []
-        },
-        {
-            "name": "divok",
-            "base": "",
-            "fields": []
-        },
-        {
-            "name": "divua",
-            "base": "",
-            "fields": []
-        },
-        {
-            "name": "divzero",
-            "base": "",
-            "fields": []
-        },
-        {
-            "name": "fixovfl",
-            "base": "",
-            "fields": []
-        },
-        {
-            "name": "fxdfovfl",
-            "base": "",
-            "fields": []
-        },
-        {
-            "name": "fxsfovfl",
-            "base": "",
-            "fields": []
-        },
-        {
             "name": "gacbad",
             "base": "",
             "fields": []
@@ -220,36 +150,6 @@
         },
         {
             "name": "gcfdcf",
-            "base": "",
-            "fields": []
-        },
-        {
-            "name": "muledge",
-            "base": "",
-            "fields": []
-        },
-        {
-            "name": "mulfnan",
-            "base": "",
-            "fields": []
-        },
-        {
-            "name": "mulfok",
-            "base": "",
-            "fields": []
-        },
-        {
-            "name": "mulfua",
-            "base": "",
-            "fields": []
-        },
-        {
-            "name": "mulok",
-            "base": "",
-            "fields": []
-        },
-        {
-            "name": "mulua",
             "base": "",
             "fields": []
         },
@@ -502,21 +402,6 @@
             "name": "sprodnp",
             "base": "",
             "fields": []
-        },
-        {
-            "name": "udivok",
-            "base": "",
-            "fields": []
-        },
-        {
-            "name": "udivua",
-            "base": "",
-            "fields": []
-        },
-        {
-            "name": "udivzero",
-            "base": "",
-            "fields": []
         }
     ],
     "actions": [
@@ -528,16 +413,6 @@
         {
             "name": "actprdsm",
             "type": "actprdsm",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "addfok",
-            "type": "addfok",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "addfua",
-            "type": "addfua",
             "ricardian_contract": ""
         },
         {
@@ -646,21 +521,6 @@
             "ricardian_contract": ""
         },
         {
-            "name": "ashlok",
-            "type": "ashlok",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "ashlover",
-            "type": "ashlover",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "ashlua",
-            "type": "ashlua",
-            "ricardian_contract": ""
-        },
-        {
             "name": "bcpgetok",
             "type": "bcpgetok",
             "ricardian_contract": ""
@@ -681,51 +541,6 @@
             "ricardian_contract": ""
         },
         {
-            "name": "divfok",
-            "type": "divfok",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "divfua",
-            "type": "divfua",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "divfzero",
-            "type": "divfzero",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "divok",
-            "type": "divok",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "divua",
-            "type": "divua",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "divzero",
-            "type": "divzero",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "fixovfl",
-            "type": "fixovfl",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "fxdfovfl",
-            "type": "fxdfovfl",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "fxsfovfl",
-            "type": "fxsfovfl",
-            "ricardian_contract": ""
-        },
-        {
             "name": "gacbad",
             "type": "gacbad",
             "ricardian_contract": ""
@@ -738,36 +553,6 @@
         {
             "name": "gcfdcf",
             "type": "gcfdcf",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "muledge",
-            "type": "muledge",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "mulfnan",
-            "type": "mulfnan",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "mulfok",
-            "type": "mulfok",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "mulfua",
-            "type": "mulfua",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "mulok",
-            "type": "mulok",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "mulua",
-            "type": "mulua",
             "ricardian_contract": ""
         },
         {
@@ -1018,21 +803,6 @@
         {
             "name": "sprodnp",
             "type": "sprodnp",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "udivok",
-            "type": "udivok",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "udivua",
-            "type": "udivua",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "udivzero",
-            "type": "udivzero",
             "ricardian_contract": ""
         }
     ],

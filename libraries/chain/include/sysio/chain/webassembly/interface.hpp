@@ -1310,51 +1310,6 @@ namespace webassembly {
          */
          int32_t bls_fp_exp(span<const char> base, span<const char> exp, span<char> result) const;
 
-         // compiler builtins api
-         void __ashlti3(aligned_ptr<int128_t>, uint64_t, uint64_t, uint32_t) const;
-         void __ashrti3(aligned_ptr<int128_t>, uint64_t, uint64_t, uint32_t) const;
-         void __lshlti3(aligned_ptr<int128_t>, uint64_t, uint64_t, uint32_t) const;
-         void __lshrti3(aligned_ptr<int128_t>, uint64_t, uint64_t, uint32_t) const;
-         void __divti3(aligned_ptr<int128_t>, uint64_t, uint64_t, uint64_t, uint64_t) const;
-         void __udivti3(aligned_ptr<uint128_t>, uint64_t, uint64_t, uint64_t, uint64_t) const;
-         void __multi3(aligned_ptr<uint128_t>, uint64_t, uint64_t, uint64_t, uint64_t) const;
-         void __modti3(aligned_ptr<int128_t>, uint64_t, uint64_t, uint64_t, uint64_t) const;
-         void __umodti3(aligned_ptr<uint128_t>, uint64_t, uint64_t, uint64_t, uint64_t) const;
-         void __addtf3(aligned_ptr<float128_t>, uint64_t, uint64_t, uint64_t, uint64_t) const;
-         void __subtf3(aligned_ptr<float128_t>, uint64_t, uint64_t, uint64_t, uint64_t) const;
-         void __multf3(aligned_ptr<float128_t>, uint64_t, uint64_t, uint64_t, uint64_t) const;
-         void __divtf3(aligned_ptr<float128_t>, uint64_t, uint64_t, uint64_t, uint64_t) const;
-         void __negtf2(aligned_ptr<float128_t>, uint64_t, uint64_t) const;
-         void __extendsftf2(aligned_ptr<float128_t>, float) const;
-         void __extenddftf2(aligned_ptr<float128_t>, double) const;
-         double __trunctfdf2(uint64_t, uint64_t) const;
-         float __trunctfsf2(uint64_t, uint64_t) const;
-         int32_t __fixtfsi(uint64_t, uint64_t) const;
-         int64_t __fixtfdi(uint64_t, uint64_t) const;
-         void __fixtfti(aligned_ptr<int128_t>, uint64_t, uint64_t) const;
-         uint32_t __fixunstfsi(uint64_t, uint64_t) const;
-         uint64_t __fixunstfdi(uint64_t, uint64_t) const;
-         void __fixunstfti(aligned_ptr<uint128_t>, uint64_t, uint64_t) const;
-         void __fixsfti(aligned_ptr<int128_t>, float) const;
-         void __fixdfti(aligned_ptr<int128_t>, double) const;
-         void __fixunssfti(aligned_ptr<uint128_t>, float) const;
-         void __fixunsdfti(aligned_ptr<uint128_t>, double) const;
-         double __floatsidf(int32_t) const;
-         void __floatsitf(aligned_ptr<float128_t>, int32_t) const;
-         void __floatditf(aligned_ptr<float128_t>, uint64_t) const;
-         void __floatunsitf(aligned_ptr<float128_t>, uint32_t) const;
-         void __floatunditf(aligned_ptr<float128_t>, uint64_t) const;
-         double __floattidf(uint64_t, uint64_t) const;
-         double __floatuntidf(uint64_t, uint64_t) const;
-         int32_t __cmptf2(uint64_t, uint64_t, uint64_t, uint64_t) const;
-         int32_t __eqtf2(uint64_t, uint64_t, uint64_t, uint64_t) const;
-         int32_t __netf2(uint64_t, uint64_t, uint64_t, uint64_t) const;
-         int32_t __getf2(uint64_t, uint64_t, uint64_t, uint64_t) const;
-         int32_t __gttf2(uint64_t, uint64_t, uint64_t, uint64_t) const;
-         int32_t __letf2(uint64_t, uint64_t, uint64_t, uint64_t) const;
-         int32_t __lttf2(uint64_t, uint64_t, uint64_t, uint64_t) const;
-         int32_t __unordtf2(uint64_t, uint64_t, uint64_t, uint64_t) const;
-
       private:
          apply_context& context;
    };

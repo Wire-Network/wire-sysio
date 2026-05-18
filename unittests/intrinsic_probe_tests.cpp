@@ -376,52 +376,10 @@ BOOST_FIXTURE_TEST_CASE(preactivate_bogus_digest, intrinsic_probe_fixture) {
    BOOST_CHECK_THROW(t.run_priv("preactbog"_n), fc::exception);
 }
 
-// =============================================================================
-// E. compiler_builtins: 128-bit integer ops
-//
-// Each intrinsic is covered by (golden, unaligned out-ptr, edge value) where
-// relevant. Division-by-zero throws arithmetic_exception per the host's
-// SYS_ASSERT in compiler_builtins.cpp::__divti3 / __udivti3.
-// =============================================================================
-
-BOOST_FIXTURE_TEST_CASE(int128_mul_ok,        intrinsic_probe_fixture) { BOOST_CHECK_NO_THROW(t.run("mulok"_n));   }
-BOOST_FIXTURE_TEST_CASE(int128_mul_unaligned, intrinsic_probe_fixture) { BOOST_CHECK_NO_THROW(t.run("mulua"_n));   }
-BOOST_FIXTURE_TEST_CASE(int128_mul_carry,     intrinsic_probe_fixture) { BOOST_CHECK_NO_THROW(t.run("muledge"_n)); }
-
-BOOST_FIXTURE_TEST_CASE(int128_div_ok,        intrinsic_probe_fixture) { BOOST_CHECK_NO_THROW(t.run("divok"_n)); }
-BOOST_FIXTURE_TEST_CASE(int128_div_unaligned, intrinsic_probe_fixture) { BOOST_CHECK_NO_THROW(t.run("divua"_n)); }
-BOOST_FIXTURE_TEST_CASE(int128_div_zero,      intrinsic_probe_fixture) {
-   BOOST_CHECK_THROW(t.run("divzero"_n), arithmetic_exception);
-}
-
-BOOST_FIXTURE_TEST_CASE(int128_udiv_ok,        intrinsic_probe_fixture) { BOOST_CHECK_NO_THROW(t.run("udivok"_n)); }
-BOOST_FIXTURE_TEST_CASE(int128_udiv_unaligned, intrinsic_probe_fixture) { BOOST_CHECK_NO_THROW(t.run("udivua"_n)); }
-BOOST_FIXTURE_TEST_CASE(int128_udiv_zero,      intrinsic_probe_fixture) {
-   BOOST_CHECK_THROW(t.run("udivzero"_n), arithmetic_exception);
-}
-
-BOOST_FIXTURE_TEST_CASE(int128_ashl_ok,             intrinsic_probe_fixture) { BOOST_CHECK_NO_THROW(t.run("ashlok"_n));   }
-BOOST_FIXTURE_TEST_CASE(int128_ashl_unaligned,      intrinsic_probe_fixture) { BOOST_CHECK_NO_THROW(t.run("ashlua"_n));   }
-BOOST_FIXTURE_TEST_CASE(int128_ashl_shift_overflow, intrinsic_probe_fixture) { BOOST_CHECK_NO_THROW(t.run("ashlover"_n)); }
-
-// =============================================================================
-// F. compiler_builtins: float128 (quad precision) ops
-// =============================================================================
-
-BOOST_FIXTURE_TEST_CASE(f128_add_ok,        intrinsic_probe_fixture) { BOOST_CHECK_NO_THROW(t.run("addfok"_n)); }
-BOOST_FIXTURE_TEST_CASE(f128_add_unaligned, intrinsic_probe_fixture) { BOOST_CHECK_NO_THROW(t.run("addfua"_n)); }
-
-BOOST_FIXTURE_TEST_CASE(f128_mul_ok,        intrinsic_probe_fixture) { BOOST_CHECK_NO_THROW(t.run("mulfok"_n));  }
-BOOST_FIXTURE_TEST_CASE(f128_mul_unaligned, intrinsic_probe_fixture) { BOOST_CHECK_NO_THROW(t.run("mulfua"_n));  }
-BOOST_FIXTURE_TEST_CASE(f128_mul_nan,       intrinsic_probe_fixture) { BOOST_CHECK_NO_THROW(t.run("mulfnan"_n)); }
-
-BOOST_FIXTURE_TEST_CASE(f128_div_ok,        intrinsic_probe_fixture) { BOOST_CHECK_NO_THROW(t.run("divfok"_n));   }
-BOOST_FIXTURE_TEST_CASE(f128_div_unaligned, intrinsic_probe_fixture) { BOOST_CHECK_NO_THROW(t.run("divfua"_n));   }
-BOOST_FIXTURE_TEST_CASE(f128_div_zero,      intrinsic_probe_fixture) { BOOST_CHECK_NO_THROW(t.run("divfzero"_n)); }
-
-BOOST_FIXTURE_TEST_CASE(f128_fix_overflow, intrinsic_probe_fixture) { BOOST_CHECK_NO_THROW(t.run("fixovfl"_n));  }
-BOOST_FIXTURE_TEST_CASE(f64_fix_overflow,  intrinsic_probe_fixture) { BOOST_CHECK_NO_THROW(t.run("fxdfovfl"_n)); }
-BOOST_FIXTURE_TEST_CASE(f32_fix_overflow,  intrinsic_probe_fixture) { BOOST_CHECK_NO_THROW(t.run("fxsfovfl"_n)); }
+// E + F (compiler_builtins int128 + float128 host probes) removed: those host
+// intrinsics were dropped, so probing the host ABI for them no longer applies.
+// Contract-side librt coverage lives in api_tests.cpp::compiler_builtins_tests
+// (drives test_compiler_builtins.cpp without sysio_wasm_import attributes).
 
 // =============================================================================
 // G. resource / auth / producer / blockchain-parameters (P2)

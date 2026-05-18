@@ -5,8 +5,9 @@
 #include <string_view>
 
 namespace sysio { namespace chain { namespace sysvmoc {
-//NEVER reorder or remove indexes; the PIC uses the indexes in this table as an offset in to a jump
-// table. Adding on the bottom is fine and requires no other updates elsewhere
+//Post-launch the PIC uses the indexes in this table as an offset into a jump table, so
+//indexes must NOT be reordered or removed once a network is live (cached compiled modules
+//embed the offsets). Pre-launch they may be renumbered freely.
 namespace detail {
    template <typename... Args>
    inline constexpr auto generate_table( Args&&... args ) {
@@ -24,49 +25,6 @@ inline constexpr auto get_intrinsic_table() {
       "sysvmoc_internal.depth_assert",
       "sysio_injection.call_depth_assert",  //now unused; left for purposes of not upsetting existing code mappings
       "sysio_injection.checktime",          //now unused; left for purposes of not upsetting existing code mappings
-      "env.__ashlti3",
-      "env.__ashrti3",
-      "env.__lshlti3",
-      "env.__lshrti3",
-      "env.__divti3",
-      "env.__udivti3",
-      "env.__modti3",
-      "env.__umodti3",
-      "env.__multi3",
-      "env.__addtf3",
-      "env.__subtf3",
-      "env.__multf3",
-      "env.__divtf3",
-      "env.__eqtf2",
-      "env.__netf2",
-      "env.__getf2",
-      "env.__gttf2",
-      "env.__lttf2",
-      "env.__letf2",
-      "env.__cmptf2",
-      "env.__unordtf2",
-      "env.__negtf2",
-      "env.__floatsitf",
-      "env.__floatunsitf",
-      "env.__floatditf",
-      "env.__floatunditf",
-      "env.__floattidf",
-      "env.__floatuntidf",
-      "env.__floatsidf",
-      "env.__extendsftf2",
-      "env.__extenddftf2",
-      "env.__fixtfti",
-      "env.__fixtfdi",
-      "env.__fixtfsi",
-      "env.__fixunstfti",
-      "env.__fixunstfdi",
-      "env.__fixunstfsi",
-      "env.__fixsfti",
-      "env.__fixdfti",
-      "env.__fixunssfti",
-      "env.__fixunsdfti",
-      "env.__trunctfdf2",
-      "env.__trunctfsf2",
       "env.is_feature_active",
       "env.activate_feature",
       "env.get_resource_limits",

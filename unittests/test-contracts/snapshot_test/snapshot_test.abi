@@ -137,7 +137,34 @@
             "index_type": "i64",
             "key_names": ["scope","primary_key"],
             "key_types": ["name","uint64"],
-            "table_id": 30912
+            "table_id": 30912,
+            "secondary_indexes": [
+                {
+                    "name": "byf",
+                    "key_type": "float64",
+                    "table_id": 14529
+                },
+                {
+                    "name": "byff",
+                    "key_type": "float128",
+                    "table_id": 14530
+                },
+                {
+                    "name": "byi",
+                    "key_type": "uint64",
+                    "table_id": 14531
+                },
+                {
+                    "name": "byii",
+                    "key_type": "uint128",
+                    "table_id": 14532
+                },
+                {
+                    "name": "byiiii",
+                    "key_type": "fixed_bytes<32>",
+                    "table_id": 14533
+                }
+            ]
         },
         {
             "name": "test",
