@@ -96,7 +96,7 @@
     },
     {
       "name": "boringssl-custom",
-      "version": "1.0.2"
+      "version": "1.0.3"
     },
     {
       "name": "catch2",

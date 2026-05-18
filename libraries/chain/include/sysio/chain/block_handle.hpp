@@ -73,6 +73,11 @@ public:
       // Head's branch and the QC target are incompatible; locked out.
       return true;
    }
+  
+   // Returns true if `id` is in this block's ancestry (or is this block itself within the finality_core's tracking range).
+   bool extends(const block_id_type& id) const {
+      return _bsp && _bsp->core.extends(id);
+   }
 };
 
 } // namespace sysio::chain

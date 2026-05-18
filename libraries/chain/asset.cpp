@@ -33,42 +33,42 @@ string asset::to_string()const {
    return sign + result + " " + symbol_name();
 }
 
-asset asset::from_string(const string& from)
+asset asset::from_string(std::string_view from)
 {
    try {
-      string s = boost::algorithm::trim_copy(from);
+      std::string_view s = boost::algorithm::trim_copy(from);
 
       // Find space in order to split amount and symbol
       auto space_pos = s.find(' ');
-      SYS_ASSERT((space_pos != string::npos), asset_type_exception, "Asset's amount and symbol should be separated with space");
-      auto symbol_str = boost::algorithm::trim_copy(s.substr(space_pos + 1));
-      auto amount_str = s.substr(0, space_pos);
+      SYS_ASSERT((space_pos != std::string_view::npos), asset_type_exception, "Asset's amount and symbol should be separated with space");
+      std::string_view symbol_str = boost::algorithm::trim_copy(s.substr(space_pos + 1));
+      std::string_view amount_str = s.substr(0, space_pos);
 
       // Ensure that if decimal point is used (.), decimal fraction is specified
       auto dot_pos = amount_str.find('.');
-      if (dot_pos != string::npos) {
+      if (dot_pos != std::string_view::npos) {
          SYS_ASSERT((dot_pos != amount_str.size() - 1), asset_type_exception, "Missing decimal fraction after decimal point");
       }
 
       // Parse symbol
       string precision_digit_str;
-      if (dot_pos != string::npos) {
+      if (dot_pos != std::string_view::npos) {
          precision_digit_str = sysio::chain::to_string(amount_str.size() - dot_pos - 1);
       } else {
          precision_digit_str = "0";
       }
 
-      string symbol_part = precision_digit_str + ',' + symbol_str;
+      string symbol_part = precision_digit_str + ',' + std::string{symbol_str};
       symbol sym = symbol::from_string(symbol_part);
 
       // Parse amount
       safe<int64_t> int_part, fract_part;
-      if (dot_pos != string::npos) {
-         int_part = fc::to_int64(amount_str.substr(0, dot_pos));
-         fract_part = fc::to_int64(amount_str.substr(dot_pos + 1));
+      if (dot_pos != std::string_view::npos) {
+         int_part = fc::to_int64(std::string{amount_str.substr(0, dot_pos)});
+         fract_part = fc::to_int64(std::string{amount_str.substr(dot_pos + 1)});
          if (amount_str[0] == '-') fract_part *= -1;
       } else {
-         int_part = fc::to_int64(amount_str);
+         int_part = fc::to_int64(std::string{amount_str});
       }
 
       safe<int64_t> amount = int_part;

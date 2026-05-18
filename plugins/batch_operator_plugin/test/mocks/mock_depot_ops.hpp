@@ -40,11 +40,19 @@ public:
 
    void deliver_to_depot(uint64_t                 outpost_id,
                          const std::vector<char>& raw_messages) override {
+      // `deliver_thrower` runs before recording so a test can simulate the
+      // WIRE-side push_action failing without losing the call evidence —
+      // any throw from the hook propagates to the caller, which is what
+      // the production failure path looks like.
+      if (deliver_thrower) deliver_thrower();
       std::lock_guard<std::mutex> lock(_mx);
       deliver_calls.push_back({outpost_id, raw_messages});
    }
 
    void emit_debug_envelope(sysio::opp::debugging::DebugEnvelopeEvent event) override {
+      // `emit_thrower` simulates a misbehaving signal slot. Ordered before
+      // the recording step so a thrown event isn't logged as emitted.
+      if (emit_thrower) emit_thrower();
       std::lock_guard<std::mutex> lock(_mx);
       emitted_events.push_back(std::move(event));
    }
@@ -60,6 +68,17 @@ public:
 
    std::function<std::optional<sysio::outbound_envelope_record>(uint64_t, uint32_t)> pending_response;
    std::function<bool(uint64_t, uint32_t)>                                           has_delivered_response;
+
+   /// Test-only seam: invoked at the top of `emit_debug_envelope` before
+   /// any recording. If it throws, simulates a misbehaving signal slot —
+   /// production code wraps the emit in FC_LOG_AND_DROP, so this lets us
+   /// prove that a slot throw never breaks the surrounding work.
+   std::function<void()> emit_thrower;
+
+   /// Test-only seam: invoked at the top of `deliver_to_depot`. If it
+   /// throws, simulates a transient WIRE-side push_action failure — used
+   /// to drive the inbound run-through without recording the failed call.
+   std::function<void()> deliver_thrower;
 
    // Call recorders
    struct key { uint64_t outpost_id; uint32_t epoch_index; };

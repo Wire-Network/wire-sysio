@@ -75,6 +75,8 @@ struct block_state : public block_header_state {     // block_header_state provi
    weak_digest_t              weak_digest;           // finalizer_digest (weak, cached so we can quickly validate votes)
    aggregating_qc_t           aggregating_qc;        // where we accumulate votes we receive
    std::optional<valid_t>     valid;
+   fc::time_point             received_time;         // wall-clock time the block was first received off the wire by net_plugin;
+                                                     // default-initialized for blocks that were produced locally or loaded from disk
 
    // ------ updated for votes, used for fork_db ordering ------------------------------
 private:

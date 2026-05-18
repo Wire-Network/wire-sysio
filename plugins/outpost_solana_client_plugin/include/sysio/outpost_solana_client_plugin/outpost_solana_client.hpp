@@ -12,6 +12,29 @@
 
 namespace sysio {
 
+/// Hard cap on the assembled OPP envelope. Mirrors the Solana program's
+/// `MAX_ENVELOPE_BYTES` (`programs/opp-outpost/src/state/envelope_chunks.rs`).
+/// 64 KiB is the e2e-supported max across WIRE / Ethereum / Solana — the
+/// binding constraint is Solana's 256 KB BPF heap divided by the ~3.3×
+/// envelope-size peak heap usage during the finalising chunk's
+/// `Envelope::decode` + `keccak::hash` + assembled-buffer + clone. Kept in
+/// sync by hand because there's no shared C++/Rust constant header.
+inline constexpr size_t SOLANA_MAX_ENVELOPE_BYTES = 65'536;
+
+/// Per-`epoch_in` chunk payload limit. Mirrors `MAX_CHUNK_BYTES` on the
+/// Solana side. Solana's tx-packet MTU is 1 232 B raw. Tx overhead at the
+/// current 12-account / 1-ix shape is ~492 B. The FINAL chunk tx also
+/// carries one ComputeBudget `request_heap_frame(256_000)` pre-ix (~40 B
+/// for the ComputeBudget program key + ix wrapper) so the consensus-reach
+/// finalize path gets a 256 KiB BPF heap budget instead of the 32 KiB
+/// default that OOM'd at epoch 13. Budget:
+///     492 (overhead) + 40 (last-chunk pre-ix) + chunk_size ≤ 1232
+///     → chunk_size ≤ 700; rounded down to 672 for a comfortable
+///     32-byte safety margin against future ABI / varint slop.
+/// Was 704 (no pre-ixs) and 768 before that (when `EpochIn` had 7
+/// accounts pre-Task 54).
+inline constexpr size_t SOLANA_MAX_CHUNK_BYTES = 672;
+
 /**
  * @brief Solana concrete `outpost_client`.
  *

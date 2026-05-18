@@ -34,7 +34,7 @@ struct asset : fc::reflect_init
    const symbol& get_symbol() const { return sym; }
    share_type get_amount()const { return amount; }
 
-   static asset from_string(const string& from);
+   static asset from_string(std::string_view from);
    string       to_string()const;
 
    asset& operator += (const asset& o)
