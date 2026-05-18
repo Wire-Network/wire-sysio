@@ -140,15 +140,19 @@ enum AttestationType {
   // clarity; the lifecycle is SWAP_REQUEST -> (variance OK) -> UWREQ ->
   // (underwriter race + REMIT/SWAP_REMIT) OR (variance bad) -> SWAP_REVERT.
   ATTESTATION_TYPE_SWAP_REQUEST = 60934; // 0xEE06
-  // DEPRECATED — replaced by ATTESTATION_TYPE_UNDERWRITE_INTENT_COMMIT (60953).
-  ATTESTATION_TYPE_UNDERWRITE_INTENT = 60935; // 0xEE07
-  // DEPRECATED — replaced by the depot-internal race resolver (no on-wire confirm message).
-  ATTESTATION_TYPE_UNDERWRITE_CONFIRM = 60936; // 0xEE08
-  // DEPRECATED — replaced by ATTESTATION_TYPE_UNDERWRITE_INTENT_REJECT (60954). Different semantics —
-  // the new value is "an underwriter rejecting their own intent"; the legacy was "depot rejecting".
-  ATTESTATION_TYPE_UNDERWRITE_REJECT = 60937; // 0xEE09
-  // DEPRECATED — replaced by REMIT / SWAP_REVERT lifecycle (no separate unlock message).
-  ATTESTATION_TYPE_UNDERWRITE_UNLOCK = 60938; // 0xEE0A
+  // 60935 (0xEE07) was ATTESTATION_TYPE_UNDERWRITE_INTENT — removed; the race
+  // resolver uses ATTESTATION_TYPE_UNDERWRITE_INTENT_COMMIT (60953) only.
+  // Slot left free; do not reuse.
+  // 60936 (0xEE08) was ATTESTATION_TYPE_UNDERWRITE_CONFIRM — removed; the
+  // depot resolves the race internally with no on-wire confirm. Slot left
+  // free; do not reuse.
+  // 60937 (0xEE09) was ATTESTATION_TYPE_UNDERWRITE_REJECT — removed; depot
+  // rejection of bad commits is handled internally (log + skip on signature
+  // verification failure; pre-launch slashing decision pending). Slot left
+  // free; do not reuse.
+  // 60938 (0xEE0A) was ATTESTATION_TYPE_UNDERWRITE_UNLOCK — removed; the
+  // release lifecycle is fully covered by SWAP_REMIT / SWAP_REVERT. Slot
+  // left free; do not reuse.
   // Depot -> destination outpost. Pay the swap recipient out of the destination
   // outpost's reserve. Renamed from ATTESTATION_TYPE_REMIT; the depot is the
   // ground truth — every SWAP_REMIT is depot-authorized. If the destination
@@ -178,9 +182,17 @@ enum AttestationType {
   // ---------------------------------------------------------------------------
   // Underwriter -> outpost (JSON-RPC) -> depot. Single attestation per (underwriter, outpost) leg;
   // the depot resolves the race when both legs land for the same underwriter.
+  // The underwriter constructs the UnderwriteIntentCommit off-chain, signs the
+  // digest of its serialized-with-empty-signature form, places the signature
+  // back into the same struct, re-serializes, and submits those bytes to each
+  // outpost's commit endpoint. Outposts auth-check the caller as a registered
+  // active underwriter and relay the bytes verbatim; the depot verifies the
+  // signature against the underwriter's account permissions.
   ATTESTATION_TYPE_UNDERWRITE_INTENT_COMMIT = 60953; // 0xEE19
-  // Underwriter explicitly steps back from a race they entered (or the outpost rejects malformed input).
-  ATTESTATION_TYPE_UNDERWRITE_INTENT_REJECT = 60954; // 0xEE1A
+  // 60954 (0xEE1A) was ATTESTATION_TYPE_UNDERWRITE_INTENT_REJECT — removed;
+  // there is no underwriter "voluntary decline" path, and depot-side rejection
+  // of bad commits is handled internally (log + skip; pre-launch slashing
+  // decision pending). Slot left free; do not reuse.
   // Depot -> source outpost. Variance check failed; refund the user's deposit.
   ATTESTATION_TYPE_SWAP_REVERT = 60955;              // 0xEE1B
   // Depot -> source outpost. Identity / link-table validation failed at the
@@ -273,7 +285,7 @@ enum EnvelopeStatus {
 }
 
 enum AttestationStatus {
-  ATTESTATION_STATUS_PENDING   = 0; // Requires UnderwriteIntent before processing
+  ATTESTATION_STATUS_PENDING   = 0; // Requires further processing before being applied
   ATTESTATION_STATUS_READY     = 1; // Ready to process or send outbound
   ATTESTATION_STATUS_PROCESSED = 2; // Fully processed
 }

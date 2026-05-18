@@ -342,40 +342,35 @@ DataStream& operator>>(DataStream& ds, ProtocolState& t) {
 
 // SwapRequest — variance check at the depot consults
 // `sysio.reserv::quote(...)` against `quoted_destination_amount` ±
-// `quote_tolerance_bps`.
+// `quote_tolerance_bps`. `source_tx_id` is the contract-derived id the
+// off-chain underwriter plugin uses to query the matching SwapRequested
+// event on the source chain for deposit verification (see proto comment).
 template <typename DataStream>
 DataStream& operator<<(DataStream& ds, const SwapRequest& t) {
    return ds << t.actor << t.source_amount << t.target_chain << t.recipient
              << t.target_token << t.quoted_destination_amount
-             << t.quote_tolerance_bps << t.quote_timestamp_ms;
+             << t.quote_tolerance_bps << t.quote_timestamp_ms
+             << t.source_tx_id;
 }
 template <typename DataStream>
 DataStream& operator>>(DataStream& ds, SwapRequest& t) {
    return ds >> t.actor >> t.source_amount >> t.target_chain >> t.recipient
              >> t.target_token >> t.quoted_destination_amount
-             >> t.quote_tolerance_bps >> t.quote_timestamp_ms;
+             >> t.quote_tolerance_bps >> t.quote_timestamp_ms
+             >> t.source_tx_id;
 }
 
-// UnderwriteIntentCommit
+// UnderwriteIntentCommit — `token_kind` disambiguates same-chain
+// swap legs (e.g. ERC20→ETH-native on a single outpost).
 template <typename DataStream>
 DataStream& operator<<(DataStream& ds, const UnderwriteIntentCommit& t) {
    return ds << t.uw_account << t.uw_ext_chain_addr << t.uw_request_id
-             << t.outpost_id << t.signature;
+             << t.outpost_id << t.signature << t.token_kind;
 }
 template <typename DataStream>
 DataStream& operator>>(DataStream& ds, UnderwriteIntentCommit& t) {
    return ds >> t.uw_account >> t.uw_ext_chain_addr >> t.uw_request_id
-             >> t.outpost_id >> t.signature;
-}
-
-// UnderwriteIntentReject
-template <typename DataStream>
-DataStream& operator<<(DataStream& ds, const UnderwriteIntentReject& t) {
-   return ds << t.uw_account << t.uw_request_id << t.reason;
-}
-template <typename DataStream>
-DataStream& operator>>(DataStream& ds, UnderwriteIntentReject& t) {
-   return ds >> t.uw_account >> t.uw_request_id >> t.reason;
+             >> t.outpost_id >> t.signature >> t.token_kind;
 }
 
 // SwapRevert
@@ -388,30 +383,6 @@ template <typename DataStream>
 DataStream& operator>>(DataStream& ds, SwapRevert& t) {
    return ds >> t.original_swap_message_id >> t.depositor
              >> t.refund_amount >> t.reason;
-}
-
-// UnderwriteIntent (legacy)
-template <typename DataStream>
-DataStream& operator<<(DataStream& ds, const UnderwriteIntent& t) {
-   return ds << t.uw_account << t.uw_ext_chain_addr << t.uw_request_id
-             << t.amount << t.chain_id;
-}
-template <typename DataStream>
-DataStream& operator>>(DataStream& ds, UnderwriteIntent& t) {
-   return ds >> t.uw_account >> t.uw_ext_chain_addr >> t.uw_request_id
-             >> t.amount >> t.chain_id;
-}
-
-// UnderwriteConfirm (legacy)
-template <typename DataStream>
-DataStream& operator<<(DataStream& ds, const UnderwriteConfirm& t) {
-   return ds << t.original_message_id << t.underwriter
-             << t.confirmed << t.error_reason;
-}
-template <typename DataStream>
-DataStream& operator>>(DataStream& ds, UnderwriteConfirm& t) {
-   return ds >> t.original_message_id >> t.underwriter
-             >> t.confirmed >> t.error_reason;
 }
 
 // SwapRemit — destination-side payout instruction for a cross-chain swap.

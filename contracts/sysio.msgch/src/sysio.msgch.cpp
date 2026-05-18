@@ -246,6 +246,13 @@ void dispatch_operator_action(name self, const std::vector<char>& data,
 }
 
 /// Dispatch an UNDERWRITE_INTENT_COMMIT to sysio.uwrit::rcrdcommit.
+///
+/// The full UIC bytes are forwarded verbatim so the depot can reconstruct
+/// the digest and verify the underwriter's signature at race resolution
+/// time. We decode here to extract the routing scalars (uwreq id,
+/// uw_account, token_kind — the latter discriminates same-chain
+/// swap legs); the authoritative copy for verification is the bytes
+/// themselves, stored on `commit_entry.{source,dest}_uic_bytes`.
 void dispatch_underwrite_commit(name self, const std::vector<char>& data,
                                 ChainKind from_chain, uint64_t outpost_id) {
    opp::attestations::UnderwriteIntentCommit uic;
@@ -260,24 +267,7 @@ void dispatch_underwrite_commit(name self, const std::vector<char>& data,
       permission_level{self, "active"_n},
       UWRIT_ACCOUNT, "rcrdcommit"_n,
       std::make_tuple(uic.uw_request_id, name{uic.uw_account.name},
-                      outpost_id, from_chain)
-   ).send();
-}
-
-/// Dispatch an UNDERWRITE_INTENT_REJECT to sysio.uwrit::rcrdreject.
-void dispatch_underwrite_reject(name self, const std::vector<char>& data) {
-   opp::attestations::UnderwriteIntentReject uir;
-   {
-      auto in = zpp::bits::in{std::span{data.data(), data.size()}, zpp::bits::no_size{}};
-      auto rc = in(uir);
-      if (rc != zpp::bits::errc{}) return;
-   }
-   if (uir.uw_account.name.empty()) return;
-
-   action(
-      permission_level{self, "active"_n},
-      UWRIT_ACCOUNT, "rcrdreject"_n,
-      std::make_tuple(uir.uw_request_id, name{uir.uw_account.name}, uir.reason)
+                      outpost_id, from_chain, uic.token_kind, data)
    ).send();
 }
 
@@ -307,10 +297,6 @@ void dispatch_attestation(name self, uint64_t attestation_id,
 
       case AttestationType::ATTESTATION_TYPE_UNDERWRITE_INTENT_COMMIT:
          dispatch_underwrite_commit(self, data, from_chain, outpost_id);
-         break;
-
-      case AttestationType::ATTESTATION_TYPE_UNDERWRITE_INTENT_REJECT:
-         dispatch_underwrite_reject(self, data);
          break;
 
       case AttestationType::ATTESTATION_TYPE_SWAP_REMIT:
@@ -469,10 +455,6 @@ void dispatch_attestation(name self, uint64_t attestation_id,
       case AttestationType::ATTESTATION_TYPE_PRETOKEN_PURCHASE:
       case AttestationType::ATTESTATION_TYPE_PRETOKEN_YIELD:
       case AttestationType::ATTESTATION_TYPE_WIRE_TOKEN_PURCHASE:
-      case AttestationType::ATTESTATION_TYPE_UNDERWRITE_INTENT:
-      case AttestationType::ATTESTATION_TYPE_UNDERWRITE_CONFIRM:
-      case AttestationType::ATTESTATION_TYPE_UNDERWRITE_REJECT:
-      case AttestationType::ATTESTATION_TYPE_UNDERWRITE_UNLOCK:
       case AttestationType::ATTESTATION_TYPE_NODE_OWNER_REG:
       case AttestationType::ATTESTATION_TYPE_ATTESTATION_PROCESSING_ERROR:
       case AttestationType::ATTESTATION_TYPE_UNSPECIFIED:

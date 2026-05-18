@@ -10,7 +10,7 @@
 ///
 ///   * `OPERATOR_ACTION (DEPOSIT_REQUEST)`  → opreg::depositinle  → balance row
 ///   * `OPERATOR_ACTION (WITHDRAW_REQUEST)` → opreg::withdrawinle → wtdwqueue row
-///   * `UNDERWRITE_INTENT_REJECT`      → uwrit::rcrdreject    → commit_entry RELEASED
+///   * `UNDERWRITE_INTENT_COMMIT`     → uwrit::rcrdcommit    → commit_entry SUBMITTED
 ///   * `REMIT_CONFIRM`                 → uwrit::release       → uwreq COMPLETED
 ///
 /// The path under test is:

@@ -594,6 +594,17 @@ void epoch::advance() {
       ).send();
    }
 
+   // Sweep underwriter locks whose `expires_at_epoch` is now in the past.
+   // The sweep walks `byexpire` ascending and stops at the first row that
+   // hasn't aged out yet, so the per-advance cost is O(expiring locks),
+   // not table size. An empty result is the steady-state case.
+   action(
+      permission_level{"sysio.epoch"_n, "owner"_n},
+      "sysio.uwrit"_n,
+      "chklocks"_n,
+      std::make_tuple(state.current_epoch_index)
+   ).send();
+
    // Working tables on `sysio.msgch` (`envelopes` / `messages` /
    // `attestations` / `outenvelopes`) are now drained inline by the
    // `evalcons` consensus-reach + `buildenv` write paths. The durable

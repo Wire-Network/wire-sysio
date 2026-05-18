@@ -191,19 +191,34 @@ message SwapRequest {
   // Quote timestamp (milliseconds since epoch) — informational; the depot's
   // variance check uses the LP price at consensus time, not at quote time.
   uint64                       quote_timestamp_ms = 8;
+  // Source-chain transaction id of the deposit that funded this swap.
+  // ETH: 32-byte tx hash. SOL: 64-byte signature. Captured by the source
+  // outpost at swap-emit time and surfaced here verbatim — the depot's
+  // `sysio.uwrit::createuwreq` REJECTS any SwapRequest with an empty
+  // `source_tx_id` (emits SwapRevert), and the underwriter plugin's
+  // `verify_source_deposit` cross-references this tx against the depot's
+  // recorded `depositor` + amount + token before committing collateral.
+  bytes                        source_tx_id = 9;
 }
 
 // Underwriter intent commit (Outposts -> Depot, one per outpost).
 //
-// Underwriters never speak OPP directly — they invoke a `commit(uw_request_id, signature)`
-// JSON-RPC entry on each outpost (source + destination), and each outpost queues this
-// attestation back to the depot. The depot's race resolver in `sysio.uwrit::record_commit`
-// picks the first underwriter whose pair (one COMMIT per outpost) both land at the depot
-// AND whose WIRE-tracked per-chain bond covers the leg amount.
+// Underwriters never speak OPP directly — they construct this message off-chain,
+// sign the digest of its own serialized-with-empty-`signature` form with their
+// WIRE-account-permission private key, place the signature back into the
+// `signature` field, re-serialize, and invoke `commit(bytes uic)` JSON-RPC on
+// each outpost (source + destination). Each outpost auth-checks the caller as a
+// registered active underwriter and relays the bytes verbatim to the depot. The
+// depot's race resolver in `sysio.uwrit::rcrdcommit` records the per-leg arrival;
+// when both legs land for the same underwriter, `try_select_winner` rebuilds
+// the digest (serialize with `signature` blanked, sha256) and verifies it
+// against the public keys on every permission of `uw_account` via
+// `get_permission_lower_bound`. Any match accepts the commit.
 //
 // The COMMIT carries no chain-side lock fields — the lock is recorded entirely on the
 // depot in `sysio.uwrit::locks` when the race resolves. Outposts are JSON-RPC relays
-// that authenticate the caller as a registered underwriter; they do not validate bond.
+// that authenticate the caller as a registered underwriter; they do not validate the
+// signature or the bond.
 message UnderwriteIntentCommit {
   sysio.opp.types.WireAccount     uw_account = 1;
   // Underwriter's address on the outpost emitting this COMMIT.
@@ -212,22 +227,20 @@ message UnderwriteIntentCommit {
   uint64                          uw_request_id = 3;
   // Which outpost this COMMIT came from (so the depot can match the dual-COMMIT pair).
   uint64                          outpost_id = 4;
-  // Underwriter's signature over (uw_request_id || outpost_id) — proves the underwriter
-  // actually authorized this COMMIT (defends against an outpost compromised relay forging
-  // commits in their name).
+  // Underwriter's signature over `sha256(serialize(self_with_signature_blanked))`
+  // using a key that belongs to one of `uw_account`'s permissions. Binds the
+  // commit to every other field in this message; an outpost forging a commit
+  // in another underwriter's name cannot produce a verifying signature.
   bytes                           signature = 5;
-}
-
-// Underwriter intent reject (Outpost -> Depot).
-//
-// An underwriter explicitly steps back from a race they entered, OR an outpost rejects
-// a malformed `commit` JSON-RPC. Different semantics from the legacy UNDERWRITE_REJECT
-// (which was depot-initiated, not underwriter-initiated).
-message UnderwriteIntentReject {
-  sysio.opp.types.WireAccount  uw_account = 1;
-  uint64                       uw_request_id = 2;
-  // Optional reason — primarily for debugging; the depot does not branch on this string.
-  string                       reason = 3;
+  // TokenKind this COMMIT covers. Together with the outpost's chain (carried
+  // by msgch::dispatch_underwrite_commit as `from_chain`), the pair
+  // `(from_chain, token_kind)` disambiguates same-chain swaps where
+  // both legs originate on the same outpost but cover different TokenKinds
+  // (e.g. ERC20→ETH-native, USDC→USDT). The depot's `rcrdcommit` routes
+  // the UIC into the source-leg slot when
+  // `(from_chain, token_kind) == (uwreq.src_chain, uwreq.src_token_kind)`
+  // and the dest-leg slot when it matches `(uwreq.dst_chain, uwreq.dst_token_kind)`.
+  sysio.opp.types.TokenKind       token_kind = 6;
 }
 
 // Cross-chain swap revert (Depot -> source Outpost).
@@ -247,28 +260,12 @@ message SwapRevert {
   string                       reason = 4;
 }
 
-// Underwriting intent submission (Outposts -> Depot).
-message UnderwriteIntent {
-  sysio.opp.types.WireAccount     uw_account = 1;
-  sysio.opp.types.ChainAddress    uw_ext_chain_addr = 10;
-
-  // ID of the attestion this intent is meant to underwrite,
-  // Attestation IDs are generated by the depot (`msgch`) when
-  // Envelopes are processed and messages are ingested.
-  uint64                          uw_request_id = 3;
-
-  sysio.opp.types.TokenAmount     amount = 4;
-  sysio.opp.types.ChainId         chain_id = 5;
-}
-
-
-// Underwriting confirmation (Outpost -> Depot).
-message UnderwriteConfirm {
-  bytes                         original_message_id = 1; // 32 bytes
-  sysio.opp.types.ChainAddress  underwriter = 2;
-  bool                          confirmed = 3;
-  string                        error_reason = 4;
-}
+// `UnderwriteIntent` and `UnderwriteConfirm` (legacy pre-launch messages) were
+// removed alongside their `ATTESTATION_TYPE_UNDERWRITE_INTENT` /
+// `ATTESTATION_TYPE_UNDERWRITE_CONFIRM` discriminants — the race is now
+// resolved with the single `UnderwriteIntentCommit` message above plus the
+// depot-internal `try_select_winner`. Slots in the AttestationType enum are
+// left free; do not reuse.
 
 // Swap-payout remittance (Depot -> destination Outpost).
 //

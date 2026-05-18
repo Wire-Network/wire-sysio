@@ -560,22 +560,6 @@
                     "value": 60934
                 },
                 {
-                    "name": "ATTESTATION_TYPE_UNDERWRITE_INTENT",
-                    "value": 60935
-                },
-                {
-                    "name": "ATTESTATION_TYPE_UNDERWRITE_CONFIRM",
-                    "value": 60936
-                },
-                {
-                    "name": "ATTESTATION_TYPE_UNDERWRITE_REJECT",
-                    "value": 60937
-                },
-                {
-                    "name": "ATTESTATION_TYPE_UNDERWRITE_UNLOCK",
-                    "value": 60938
-                },
-                {
                     "name": "ATTESTATION_TYPE_SWAP_REMIT",
                     "value": 60944
                 },
@@ -610,10 +594,6 @@
                 {
                     "name": "ATTESTATION_TYPE_UNDERWRITE_INTENT_COMMIT",
                     "value": 60953
-                },
-                {
-                    "name": "ATTESTATION_TYPE_UNDERWRITE_INTENT_REJECT",
-                    "value": 60954
                 },
                 {
                     "name": "ATTESTATION_TYPE_SWAP_REVERT",

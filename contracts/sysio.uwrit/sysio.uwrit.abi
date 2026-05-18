@@ -4,6 +4,16 @@
     "types": [],
     "structs": [
         {
+            "name": "chklocks",
+            "base": "",
+            "fields": [
+                {
+                    "name": "up_to_epoch",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
             "name": "commit_entry",
             "base": "",
             "fields": [
@@ -16,8 +26,24 @@
                     "type": "uint64"
                 },
                 {
+                    "name": "source_outpost_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "source_uic_bytes",
+                    "type": "bytes"
+                },
+                {
                     "name": "dest_received_at_ms",
                     "type": "uint64"
+                },
+                {
+                    "name": "dest_outpost_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "dest_uic_bytes",
+                    "type": "bytes"
                 },
                 {
                     "name": "status",
@@ -102,6 +128,10 @@
                 {
                     "name": "created_at_epoch",
                     "type": "uint32"
+                },
+                {
+                    "name": "expires_at_epoch",
+                    "type": "uint32"
                 }
             ]
         },
@@ -134,24 +164,14 @@
                 {
                     "name": "from_chain",
                     "type": "ChainKind"
-                }
-            ]
-        },
-        {
-            "name": "rcrdreject",
-            "base": "",
-            "fields": [
-                {
-                    "name": "uwreq_id",
-                    "type": "uint64"
                 },
                 {
-                    "name": "underwriter",
-                    "type": "name"
+                    "name": "from_token_kind",
+                    "type": "TokenKind"
                 },
                 {
-                    "name": "reason",
-                    "type": "string"
+                    "name": "uic_bytes",
+                    "type": "bytes"
                 }
             ]
         },
@@ -172,6 +192,22 @@
                 {
                     "name": "fee_bps",
                     "type": "uint32"
+                },
+                {
+                    "name": "collateral_lock_duration_epoch_count",
+                    "type": "uint32"
+                },
+                {
+                    "name": "fee_split_winner_pct",
+                    "type": "uint8"
+                },
+                {
+                    "name": "fee_split_other_uw_pct",
+                    "type": "uint8"
+                },
+                {
+                    "name": "fee_split_batch_op_pct",
+                    "type": "uint8"
                 }
             ]
         },
@@ -200,6 +236,22 @@
                 {
                     "name": "fee_bps",
                     "type": "uint32"
+                },
+                {
+                    "name": "collateral_lock_duration_epoch_count",
+                    "type": "uint32"
+                },
+                {
+                    "name": "fee_split_winner_pct",
+                    "type": "uint8"
+                },
+                {
+                    "name": "fee_split_other_uw_pct",
+                    "type": "uint8"
+                },
+                {
+                    "name": "fee_split_batch_op_pct",
+                    "type": "uint8"
                 }
             ]
         },
@@ -254,6 +306,18 @@
                     "type": "uint64"
                 },
                 {
+                    "name": "variance_tolerance_bps",
+                    "type": "uint32"
+                },
+                {
+                    "name": "source_tx_id",
+                    "type": "bytes"
+                },
+                {
+                    "name": "depositor",
+                    "type": "bytes"
+                },
+                {
                     "name": "commits_by",
                     "type": "commit_entry[]"
                 },
@@ -286,6 +350,11 @@
     ],
     "actions": [
         {
+            "name": "chklocks",
+            "type": "chklocks",
+            "ricardian_contract": ""
+        },
+        {
             "name": "createuwreq",
             "type": "createuwreq",
             "ricardian_contract": ""
@@ -298,11 +367,6 @@
         {
             "name": "rcrdcommit",
             "type": "rcrdcommit",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "rcrdreject",
-            "type": "rcrdreject",
             "ricardian_contract": ""
         },
         {
@@ -339,6 +403,11 @@
                     "name": "byuwreq",
                     "key_type": "uint64",
                     "table_id": 30520
+                },
+                {
+                    "name": "byexpire",
+                    "key_type": "uint64",
+                    "table_id": 53377
                 }
             ]
         },
@@ -437,22 +506,6 @@
                     "value": 60934
                 },
                 {
-                    "name": "ATTESTATION_TYPE_UNDERWRITE_INTENT",
-                    "value": 60935
-                },
-                {
-                    "name": "ATTESTATION_TYPE_UNDERWRITE_CONFIRM",
-                    "value": 60936
-                },
-                {
-                    "name": "ATTESTATION_TYPE_UNDERWRITE_REJECT",
-                    "value": 60937
-                },
-                {
-                    "name": "ATTESTATION_TYPE_UNDERWRITE_UNLOCK",
-                    "value": 60938
-                },
-                {
                     "name": "ATTESTATION_TYPE_SWAP_REMIT",
                     "value": 60944
                 },
@@ -487,10 +540,6 @@
                 {
                     "name": "ATTESTATION_TYPE_UNDERWRITE_INTENT_COMMIT",
                     "value": 60953
-                },
-                {
-                    "name": "ATTESTATION_TYPE_UNDERWRITE_INTENT_REJECT",
-                    "value": 60954
                 },
                 {
                     "name": "ATTESTATION_TYPE_SWAP_REVERT",
