@@ -81,6 +81,18 @@ message TokenAmount {
   int64     amount = 2;
 }
 
+// Pair of (chain, token-amount). Used by config surfaces that need to
+// describe per-(chain, token) values — for example the test-cluster-tool's
+// underwriter collateral config (`--underwriter-collateral-json-file`):
+// the file root is either `[ChainTokenAmount, ...]` (uniform across every
+// underwriter) or `[[ChainTokenAmount, ...], ...]` (one inner array per
+// underwriter, varied). Parsed off-chain via `@protobuf-ts/runtime` JSON
+// serdes against the generated `ChainTokenAmount` model.
+message ChainTokenAmount {
+  ChainId     chain  = 1;
+  TokenAmount amount = 2;
+}
+
 // ---------------------------------------------------------------------------
 //  Encoding flags  (originally a single uint8 bitfield)
 //
