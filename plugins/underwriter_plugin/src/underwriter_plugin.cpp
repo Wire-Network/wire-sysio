@@ -3,6 +3,7 @@
 #include <fc/crypto/sha256.hpp>
 #include <fc/crypto/signature.hpp>
 #include <fc/io/raw.hpp>
+#include <fc/network/ethereum/ethereum_abi.hpp>
 #include <fc/variant_object.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/endian/conversion.hpp>
@@ -99,10 +100,27 @@ struct underwriter_plugin::impl {
    std::string  eth_client_id;
    std::string  sol_client_id;
    std::string  eth_opreg_addr;             // OperatorRegistry contract address on ETH
-   std::string  sol_program_id;             // opp-outpost program ID on SOL
-   std::string  eth_source_contract_addr;        // contract emitting SwapRequested (T13 verify_source_deposit)
-   std::vector<uint8_t> eth_source_deposit_selector; // 4-byte function selector for the swap-deposit call on `eth_source_contract_addr`
-   std::vector<uint8_t> sol_source_deposit_discriminator; // 8-byte anchor discriminator for the swap-deposit instruction on `sol_program_id`
+   /// opp-outpost program ID on SOL. Not a CLI option — resolved at
+   /// preflight from the loaded IDL's top-level `address` field (or
+   /// `metadata.address` on older IDLs).
+   std::string  sol_program_id;
+   /// Configured names of the swap-deposit function (ETH) / instruction
+   /// (SOL). The contract address + function selector / instruction
+   /// discriminator are resolved at preflight time from the ABI / IDL
+   /// files registered with the outpost client plugins
+   /// (`outpost_ethereum_client_plugin::get_abi_files()` /
+   /// `outpost_solana_client_plugin::get_idl_files()`) so we don't
+   /// duplicate that configuration here. Both are required at preflight.
+   std::string  eth_source_deposit_function_name;
+   std::string  sol_source_deposit_instruction_name;
+
+   /// Resolved-at-preflight verify-path state derived from the above
+   /// + the outpost client plugins' ABI / IDL surfaces. Used directly by
+   /// `verify_source_deposit_{eth,sol}` — these are populated only after
+   /// `run_preflight()` has succeeded.
+   std::string  resolved_eth_source_contract_addr;
+   std::vector<uint8_t> resolved_eth_source_deposit_selector;
+   std::vector<uint8_t> resolved_sol_source_deposit_discriminator;
 
    // ── Diagnostic counters surfaced via the `/v1/underwriter/*` HTTP API
    //   (and the future `clio opp uw stats` wrapper).
@@ -307,40 +325,109 @@ struct underwriter_plugin::impl {
          }
       }
 
-      // ── Check 4: required CLI options ────────────────────────────────
+      // ── Check 4: required CLI options + ABI/IDL resolution ───────────
       //
-      // The verify_source_deposit path requires the source contract /
-      // program address + function selector / instruction discriminator
-      // for every supported chain. Missing them disables verification
-      // (and the depot's createuwreq rejects any SwapRequest without a
-      // populated source_tx_id), so we refuse to start instead.
-      if (eth_source_contract_addr.empty()) {
-         elog("underwriter preflight: --underwriter-eth-source-contract-addr is required");
+      // The verify_source_deposit path identifies the swap-deposit
+      // function (ETH) / instruction (SOL) by NAME. The contract
+      // address + function selector + instruction discriminator are
+      // resolved from the ABI / IDL files registered with the outpost
+      // client plugins (avoiding duplicate plugin options that would
+      // need to be kept in sync with `--ethereum-abi-file` /
+      // `--solana-idl-file`).
+      if (eth_source_deposit_function_name.empty()) {
+         elog("underwriter preflight: --underwriter-eth-source-deposit-function is required");
          return false;
       }
-      if (eth_source_deposit_selector.size() != 4) {
-         elog("underwriter preflight: --underwriter-eth-source-deposit-selector is required "
-              "(4-byte hex)");
-         return false;
-      }
-      if (sol_program_id.empty()) {
-         elog("underwriter preflight: --underwriter-sol-program-id is required");
-         return false;
-      }
-      if (sol_source_deposit_discriminator.size() != 8) {
-         elog("underwriter preflight: --underwriter-sol-source-deposit-discriminator is required "
-              "(8-byte hex)");
+      if (sol_source_deposit_instruction_name.empty()) {
+         elog("underwriter preflight: --underwriter-sol-source-deposit-instruction is required");
          return false;
       }
 
-      // ── Check 5: WIRE K1 signature provider — exactly one ────────────
+      // ETH: walk every loaded ABI for a `function` contract whose name
+      // matches. The match yields the deployed `contract_address` and
+      // the keccak256(signature) from which we derive the 4-byte
+      // selector. Both are cached on the plugin for the verify path.
+      {
+         resolved_eth_source_contract_addr.clear();
+         resolved_eth_source_deposit_selector.clear();
+         bool found = false;
+         for (const auto& [path, contracts] : eth_plug->get_abi_files()) {
+            for (const auto& c : contracts) {
+               if (c.type != fc::network::ethereum::abi::invoke_target_type::function) continue;
+               if (c.name != eth_source_deposit_function_name) continue;
+               if (c.contract_address.empty()) {
+                  elog("underwriter preflight: ABI '{}' has function '{}' but no "
+                       "`contract_address` metadata — populate the address in the "
+                       "ABI file so the verify path knows the deployed contract",
+                       path.string(), eth_source_deposit_function_name);
+                  return false;
+               }
+               resolved_eth_source_contract_addr = c.contract_address;
+               const auto sel_hash = fc::network::ethereum::abi::to_contract_function_selector(c);
+               const uint8_t* sp = sel_hash.data();
+               resolved_eth_source_deposit_selector.assign(sp, sp + 4);
+               found = true;
+               break;
+            }
+            if (found) break;
+         }
+         if (!found) {
+            elog("underwriter preflight: no ETH ABI entry found for function '{}'; "
+                 "pass --ethereum-abi-file pointing at the ABI that declares it",
+                 eth_source_deposit_function_name);
+            return false;
+         }
+      }
+
+      // SOL: walk every loaded IDL for the named instruction. The IDL
+      // parser populates each instruction's 8-byte anchor discriminator
+      // (`sha256("global:<instruction_name>")[0..8]`) AND the program's
+      // deployed address (`metadata.address` / top-level `address`),
+      // so we don't duplicate the program ID in a separate CLI option —
+      // both come from the IDL JSON.
+      {
+         resolved_sol_source_deposit_discriminator.clear();
+         sol_program_id.clear();
+         bool found = false;
+         for (const auto& [path, programs] : sol_plug->get_idl_files()) {
+            for (const auto& p : programs) {
+               if (const auto* ix = p.find_instruction(sol_source_deposit_instruction_name); ix) {
+                  resolved_sol_source_deposit_discriminator.assign(
+                     ix->discriminator.begin(), ix->discriminator.end());
+                  if (p.address.empty()) {
+                     elog("underwriter preflight: SOL IDL '{}' carries instruction '{}' but "
+                          "no `address` / `metadata.address` field — the program ID must be "
+                          "present in the IDL JSON for the verify path to identify it on-chain",
+                          path.string(), sol_source_deposit_instruction_name);
+                     return false;
+                  }
+                  sol_program_id = p.address;
+                  found = true;
+                  break;
+               }
+            }
+            if (found) break;
+         }
+         if (!found) {
+            elog("underwriter preflight: no SOL IDL instruction found named '{}'; "
+                 "pass --solana-idl-file pointing at the IDL that declares it",
+                 sol_source_deposit_instruction_name);
+            return false;
+         }
+      }
+
+      // ── Check 5: signature providers — 3-provider minimum ────────────
       //
-      // The plugin signs UIC digests with the underwriter's WIRE K1 key
-      // before relaying to the outposts. We require exactly one matching
-      // provider so we never pick arbitrarily among multiple — if the
-      // operator has configured several K1 providers (e.g. one for the
-      // batch operator + one for the underwriter on the same node), they
-      // must scope to distinct WIRE chains/key-types or this check fires.
+      // The underwriter signs UIC digests on WIRE (K1), and submits
+      // commit transactions on each active outpost (ETH + SOL) — so
+      // three sig-provider entries are required at startup:
+      //   • exactly one (chain=wire, key-type=wire) — for UIC signing.
+      //     more than one would silently arbitrate at `.front()`; we
+      //     refuse the ambiguity.
+      //   • at least one (chain=ethereum, key-type=ethereum) — for
+      //     paying gas on ETH outpost commits.
+      //   • at least one (chain=solana, key-type=solana) — for SOL
+      //     outpost commits.
       auto& sig_plug = app().get_plugin<signature_provider_manager_plugin>();
       auto wire_providers = sig_plug.query_providers(
          std::nullopt, fc::crypto::chain_kind_wire, fc::crypto::chain_key_type_wire);
@@ -348,6 +435,20 @@ struct underwriter_plugin::impl {
          elog("underwriter preflight: expected exactly 1 WIRE K1 signature provider, "
               "got {} — configure exactly one --signature-provider entry whose chain=wire "
               "and key-type=wire", wire_providers.size());
+         return false;
+      }
+      auto eth_providers = sig_plug.query_providers(
+         std::nullopt, fc::crypto::chain_kind_ethereum, fc::crypto::chain_key_type_ethereum);
+      if (eth_providers.empty()) {
+         elog("underwriter preflight: at least 1 Ethereum signature provider is required "
+              "(chain=ethereum, key-type=ethereum) for paying gas on ETH outpost commits");
+         return false;
+      }
+      auto sol_providers = sig_plug.query_providers(
+         std::nullopt, fc::crypto::chain_kind_solana, fc::crypto::chain_key_type_solana);
+      if (sol_providers.empty()) {
+         elog("underwriter preflight: at least 1 Solana signature provider is required "
+              "(chain=solana, key-type=solana) for SOL outpost commits");
          return false;
       }
 
@@ -1100,15 +1201,16 @@ struct underwriter_plugin::impl {
          }
          const auto tx_obj = tx.get_object();
 
-         // (2) tx.to == configured source contract.
+         // (2) tx.to == source contract address (resolved at preflight
+         //     from the matching ABI entry's `contract_address`).
          std::string to_addr;
          if (tx_obj.contains("to") && tx_obj["to"].is_string()) {
             to_addr = tx_obj["to"].as_string();
          }
-         if (!boost::iequals(to_addr, eth_source_contract_addr)) {
+         if (!boost::iequals(to_addr, resolved_eth_source_contract_addr)) {
             elog("underwriter: source-deposit verify failed for uwreq {} — "
-                 "tx.to={} != configured {}", req.id, to_addr,
-                 eth_source_contract_addr);
+                 "tx.to={} != resolved source contract {}",
+                 req.id, to_addr, resolved_eth_source_contract_addr);
             bump_mismatch();
             return false;
          }
@@ -1153,13 +1255,15 @@ struct underwriter_plugin::impl {
             got_selector[i] = static_cast<uint8_t>(std::stoul(
                std::string{input_no_prefix.substr(i * 2, 2)}, nullptr, 16));
          }
-         if (got_selector != eth_source_deposit_selector) {
-            const std::string got_hex   = fc::to_hex(reinterpret_cast<const char*>(got_selector.data()), got_selector.size());
-            const std::string want_hex  = fc::to_hex(reinterpret_cast<const char*>(eth_source_deposit_selector.data()),
-                                                      eth_source_deposit_selector.size());
+         if (got_selector != resolved_eth_source_deposit_selector) {
+            const std::string got_hex  = fc::to_hex(reinterpret_cast<const char*>(got_selector.data()),
+                                                     got_selector.size());
+            const std::string want_hex = fc::to_hex(
+               reinterpret_cast<const char*>(resolved_eth_source_deposit_selector.data()),
+               resolved_eth_source_deposit_selector.size());
             elog("underwriter: source-deposit verify failed for uwreq {} — "
-                 "tx.input[0..4]={} != configured selector={}",
-                 req.id, got_hex, want_hex);
+                 "tx.input[0..4]={} != resolved selector={} for function '{}'",
+                 req.id, got_hex, want_hex, eth_source_deposit_function_name);
             bump_mismatch();
             return false;
          }
@@ -1347,8 +1451,8 @@ struct underwriter_plugin::impl {
                      }
                      if (decoded.size() < 8) continue;
                      if (std::equal(
-                            sol_source_deposit_discriminator.begin(),
-                            sol_source_deposit_discriminator.end(),
+                            resolved_sol_source_deposit_discriminator.begin(),
+                            resolved_sol_source_deposit_discriminator.end(),
                             reinterpret_cast<const uint8_t*>(decoded.data()))) {
                         disc_seen = true;
                         break;
@@ -1356,12 +1460,13 @@ struct underwriter_plugin::impl {
                   }
                   if (!disc_seen) {
                      const std::string want = fc::to_hex(
-                        reinterpret_cast<const char*>(sol_source_deposit_discriminator.data()),
-                        sol_source_deposit_discriminator.size());
+                        reinterpret_cast<const char*>(resolved_sol_source_deposit_discriminator.data()),
+                        resolved_sol_source_deposit_discriminator.size());
                      elog("underwriter: source-deposit verify failed for uwreq {} — "
                           "no instruction targeting program {} carries the "
-                          "configured discriminator {}",
-                          req.id, sol_program_id, want);
+                          "resolved discriminator {} for instruction '{}'",
+                          req.id, sol_program_id, want,
+                          sol_source_deposit_instruction_name);
                      bump_mismatch();
                      return false;
                   }
@@ -1611,7 +1716,9 @@ struct underwriter_plugin::impl {
          ("sol_client_id",                  sol_client_id)
          ("eth_opreg_addr",                 eth_opreg_addr)
          ("sol_program_id",                 sol_program_id)
-         ("eth_source_contract_addr",       eth_source_contract_addr)
+         ("eth_source_deposit_function",    eth_source_deposit_function_name)
+         ("eth_source_contract_addr",       resolved_eth_source_contract_addr)
+         ("sol_source_deposit_instruction", sol_source_deposit_instruction_name)
          ("uwreqs_seen_pending",            uwreqs_seen_pending_count)
          ("commits_confirmed",              commits_confirmed_count)
          ("commits_failed",                 commits_failed_count)
@@ -1693,19 +1800,16 @@ void underwriter_plugin::set_program_options(options_description& cli,
         "Solana outpost client ID");
    opts("underwriter-eth-opreg-addr", bpo::value<std::string>(),
         "OperatorRegistry contract address on Ethereum (hex)");
-   opts("underwriter-sol-program-id", bpo::value<std::string>(),
-        "OPP outpost program ID on Solana (base58)");
-   opts("underwriter-eth-source-contract-addr", bpo::value<std::string>(),
-        "Ethereum contract address that handles swap deposits — the verify_source_deposit "
-        "path requires `tx.to` to equal this. Required.");
-   opts("underwriter-eth-source-deposit-selector", bpo::value<std::string>(),
-        "4-byte function selector (hex; with or without 0x prefix) for the swap-deposit "
-        "call on `underwriter-eth-source-contract-addr`. The verify path requires "
-        "`tx.input[0..4]` to equal this. Required.");
-   opts("underwriter-sol-source-deposit-discriminator", bpo::value<std::string>(),
-        "8-byte anchor discriminator (hex; with or without 0x prefix) for the swap-deposit "
-        "instruction on `underwriter-sol-program-id`. The verify path requires the "
-        "instruction's data field to start with this. Required.");
+   opts("underwriter-eth-source-deposit-function", bpo::value<std::string>(),
+        "Name of the ETH swap-deposit function. Resolved at preflight against the ABI "
+        "files registered with --ethereum-abi-file; the matching `function` entry's "
+        "`contract_address` becomes the source contract address, and its keccak256 "
+        "signature yields the 4-byte selector. Required.");
+   opts("underwriter-sol-source-deposit-instruction", bpo::value<std::string>(),
+        "Name of the SOL swap-deposit instruction. Resolved at preflight against the IDL "
+        "files registered with --solana-idl-file; the matching instruction's anchor "
+        "discriminator (8 bytes) is used to identify the deposit instruction in source "
+        "txs. Required.");
 }
 
 void underwriter_plugin::plugin_initialize(const variables_map& options) {
@@ -1718,34 +1822,12 @@ void underwriter_plugin::plugin_initialize(const variables_map& options) {
    _impl->sol_client_id     = options["underwriter-sol-client-id"].as<std::string>();
    if (options.count("underwriter-eth-opreg-addr"))
       _impl->eth_opreg_addr = options["underwriter-eth-opreg-addr"].as<std::string>();
-   if (options.count("underwriter-sol-program-id"))
-      _impl->sol_program_id = options["underwriter-sol-program-id"].as<std::string>();
-   if (options.count("underwriter-eth-source-contract-addr"))
-      _impl->eth_source_contract_addr =
-         options["underwriter-eth-source-contract-addr"].as<std::string>();
-   auto hex_option_to_bytes = [&](const char* opt_name, size_t expected_len) {
-      std::vector<uint8_t> out;
-      if (!options.count(opt_name)) return out;
-      auto s = options[opt_name].as<std::string>();
-      // Strip optional 0x prefix
-      if (s.size() >= 2 && s[0] == '0' && (s[1] == 'x' || s[1] == 'X')) {
-         s.erase(0, 2);
-      }
-      if (s.size() != expected_len * 2) {
-         elog("underwriter: --{} must be exactly {} bytes (got {} hex chars)",
-              opt_name, expected_len, s.size());
-         return std::vector<uint8_t>{};
-      }
-      out.resize(expected_len);
-      for (size_t i = 0; i < expected_len; ++i) {
-         out[i] = static_cast<uint8_t>(std::stoul(s.substr(i * 2, 2), nullptr, 16));
-      }
-      return out;
-   };
-   _impl->eth_source_deposit_selector =
-      hex_option_to_bytes("underwriter-eth-source-deposit-selector", 4);
-   _impl->sol_source_deposit_discriminator =
-      hex_option_to_bytes("underwriter-sol-source-deposit-discriminator", 8);
+   if (options.count("underwriter-eth-source-deposit-function"))
+      _impl->eth_source_deposit_function_name =
+         options["underwriter-eth-source-deposit-function"].as<std::string>();
+   if (options.count("underwriter-sol-source-deposit-instruction"))
+      _impl->sol_source_deposit_instruction_name =
+         options["underwriter-sol-source-deposit-instruction"].as<std::string>();
 
    _impl->chain_plug = &app().get_plugin<chain_plugin>();
    _impl->cron_plug  = &app().get_plugin<cron_plugin>();
