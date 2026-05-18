@@ -67,10 +67,8 @@ BOOST_AUTO_TEST_CASE(preflight_required_options_are_registered) try {
       option_names.insert(opt->long_name());
    }
    BOOST_CHECK(option_names.count("underwriter-account") > 0);
-   BOOST_CHECK(option_names.count("underwriter-eth-source-contract-addr") > 0);
-   BOOST_CHECK(option_names.count("underwriter-eth-source-deposit-selector") > 0);
-   BOOST_CHECK(option_names.count("underwriter-sol-program-id") > 0);
-   BOOST_CHECK(option_names.count("underwriter-sol-source-deposit-discriminator") > 0);
+   BOOST_CHECK(option_names.count("underwriter-eth-source-deposit-function") > 0);
+   BOOST_CHECK(option_names.count("underwriter-sol-source-deposit-instruction") > 0);
 } FC_LOG_AND_RETHROW();
 
 // The preflight cases below are placeholders: exercising the live
