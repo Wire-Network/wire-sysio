@@ -8,6 +8,9 @@
 #include <sysio/opp/types/types.pb.hpp>
 #include <sysio/opp/attestations/attestations.pb.hpp>
 
+#include <cstdint>
+#include <limits>
+
 namespace sysio {
 
    /**
@@ -243,6 +246,103 @@ namespace sysio {
       };
 
       using reserves_t = sysio::kv::table<"reserves"_n, reserve_key, reserve_entry>;
+
+      // -----------------------------------------------------------------------
+      //  Shared pricing math
+      //
+      //  `swapquote` (the read-only action) and cross-contract callers that
+      //  cannot use it (sysio/sysio has no synchronous inter-contract call
+      //  with a return value) both go through `quote()` so the constant-product
+      //  pricing has exactly one implementation. `sysio.cap` reads this
+      //  contract's published `reserves` table and calls `quote()` to price a
+      //  native staking reward into WIRE.
+      // -----------------------------------------------------------------------
+
+      /// Constant-product single-hop output:
+      ///   dst = (reserve_dst * src_amount) / (reserve_src + src_amount)
+      /// Computed in uint128 (max product 2^128, exactly representable).
+      /// Returns 0 if any input is 0; saturates at uint64 max for absurd
+      /// inputs (practically unreachable for sane reserves).
+      static uint64_t cp_output(uint64_t reserve_src, uint64_t reserve_dst, uint64_t src_amount) {
+         if (reserve_src == 0 || reserve_dst == 0 || src_amount == 0) return 0;
+         uint128_t numerator   = static_cast<uint128_t>(reserve_dst) * src_amount;
+         uint128_t denominator = static_cast<uint128_t>(reserve_src) + src_amount;
+         uint128_t result      = numerator / denominator;
+         if (result > static_cast<uint128_t>(std::numeric_limits<uint64_t>::max())) {
+            return std::numeric_limits<uint64_t>::max();
+         }
+         return static_cast<uint64_t>(result);
+      }
+
+      /// Unsigned magnitude of an on-wire `TokenAmount.amount`. Negative
+      /// values (invalid in reserve accounting) saturate at 0.
+      static uint64_t to_unsigned(int64_t amount) {
+         return amount < 0 ? 0 : static_cast<uint64_t>(amount);
+      }
+
+      /// Constant-product swap quote against `reserves`. Identical pricing to
+      /// the `swapquote` action but callable in-process by cross-contract
+      /// readers. `reserves` is caller-supplied so the table owner is explicit
+      /// (this contract passes its own handle; `sysio.cap` passes one scoped
+      /// to `sysio.reserv`). Returns 0 when any required reserve is missing —
+      /// callers treat 0 as "no quote available".
+      ///
+      /// @param reserves    Reserve table handle (rows owned by sysio.reserv).
+      /// @param from_kind   Source TokenKind.
+      /// @param from_amount Source amount.
+      /// @param to_chain    Destination chain (also the src-reserve hint on a
+      ///                     full token -> WIRE -> token hop).
+      /// @param to_token    Destination TokenKind.
+      /// @return            Destination amount, or 0 if no quote is available.
+      static uint64_t quote(reserves_t&               reserves,
+                            opp::types::TokenKind     from_kind,
+                            uint64_t                  from_amount,
+                            opp::types::ChainKind     to_chain,
+                            opp::types::TokenKind     to_token) {
+         using TK = opp::types::TokenKind;
+         if (from_amount == 0) return 0;
+
+         // Trivial: WIRE -> WIRE.
+         if (from_kind == TK::TOKEN_KIND_WIRE && to_token == TK::TOKEN_KIND_WIRE) {
+            return from_amount;
+         }
+
+         // Half-hop: WIRE -> outpost token on the destination chain.
+         if (from_kind == TK::TOKEN_KIND_WIRE) {
+            auto pk = reserve_key{pack_chain_token(to_chain, to_token)};
+            if (!reserves.contains(pk)) return 0;
+            auto r = reserves.get(pk);
+            return cp_output(to_unsigned(r.reserve_wire_amount.amount),
+                             to_unsigned(r.reserve_outpost_amount.amount),
+                             from_amount);
+         }
+
+         // Half-hop: outpost token on the source chain -> WIRE.
+         if (to_token == TK::TOKEN_KIND_WIRE) {
+            auto pk = reserve_key{pack_chain_token(to_chain, from_kind)};
+            if (!reserves.contains(pk)) return 0;
+            auto r = reserves.get(pk);
+            return cp_output(to_unsigned(r.reserve_outpost_amount.amount),
+                             to_unsigned(r.reserve_wire_amount.amount),
+                             from_amount);
+         }
+
+         // Full hop: src token -> WIRE -> dst token. `to_chain` doubles as the
+         // src-reserve hint since every outpost token lives on exactly one
+         // outpost.
+         auto src_pk = reserve_key{pack_chain_token(to_chain, from_kind)};
+         auto dst_pk = reserve_key{pack_chain_token(to_chain, to_token)};
+         if (!reserves.contains(src_pk) || !reserves.contains(dst_pk)) return 0;
+         auto src_r = reserves.get(src_pk);
+         auto dst_r = reserves.get(dst_pk);
+         uint64_t wire_intermediate = cp_output(to_unsigned(src_r.reserve_outpost_amount.amount),
+                                                to_unsigned(src_r.reserve_wire_amount.amount),
+                                                from_amount);
+         if (wire_intermediate == 0) return 0;
+         return cp_output(to_unsigned(dst_r.reserve_wire_amount.amount),
+                          to_unsigned(dst_r.reserve_outpost_amount.amount),
+                          wire_intermediate);
+      }
 
    private:
       using ChainKind   = opp::types::ChainKind;

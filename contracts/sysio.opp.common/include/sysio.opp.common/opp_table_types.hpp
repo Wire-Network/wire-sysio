@@ -541,19 +541,21 @@ DataStream& operator>>(DataStream& ds, NodeOwnerReg& t) {
    return ds >> t.owner_address >> t.token_id >> t.nft_address;
 }
 
-// StakingReward — the single staker-reward feedback path. Routes to
-// `sysio.reserv::onreward` (credits the outpost-side reserve only). The
-// per-staker WIRE payout is a separate next-epoch action owned by the
-// staking work stream (separate engineer).
+// StakingReward — the single staker-reward feedback path. `sysio.msgch`
+// routes it twice: the aggregate native amount to `sysio.reserv::onreward`
+// (outpost-side reserve), and the per-staker body to `sysio.cap::onreward`
+// (WIRE-side claim ledger). Field order mirrors the proto (1..7).
 template <typename DataStream>
 DataStream& operator<<(DataStream& ds, const StakingReward& t) {
    return ds << t.outpost_id << t.staker_wire_account << t.share_bps
-             << t.period_start_ms << t.period_end_ms << t.reward_amount;
+             << t.reward_epoch_index << t.external_epoch_ref
+             << t.reward_amount << t.staker_native_address;
 }
 template <typename DataStream>
 DataStream& operator>>(DataStream& ds, StakingReward& t) {
    return ds >> t.outpost_id >> t.staker_wire_account >> t.share_bps
-             >> t.period_start_ms >> t.period_end_ms >> t.reward_amount;
+             >> t.reward_epoch_index >> t.external_epoch_ref
+             >> t.reward_amount >> t.staker_native_address;
 }
 
 // StakeResult

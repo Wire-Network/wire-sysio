@@ -13,25 +13,6 @@ uint64_t current_time_ms() {
    return static_cast<uint64_t>(current_time_point().sec_since_epoch()) * 1000;
 }
 
-/// Constant-product output from a single hop:
-///   dst_amount = (reserve_dst * src_amount) / (reserve_src + src_amount)
-///
-/// Computed in uint128 to avoid overflow on uint64 reserves * uint64 amounts
-/// (max product is 2^128, exactly representable). Returns 0 if either reserve
-/// is empty or src_amount is zero.
-uint64_t cp_output(uint64_t reserve_src, uint64_t reserve_dst, uint64_t src_amount) {
-   if (reserve_src == 0 || reserve_dst == 0 || src_amount == 0) return 0;
-   uint128_t numerator   = static_cast<uint128_t>(reserve_dst) * src_amount;
-   uint128_t denominator = static_cast<uint128_t>(reserve_src) + src_amount;
-   uint128_t result      = numerator / denominator;
-   // Saturate at uint64 max — practically unreachable for sane reserves but
-   // protects against absurd inputs.
-   if (result > static_cast<uint128_t>(std::numeric_limits<uint64_t>::max())) {
-      return std::numeric_limits<uint64_t>::max();
-   }
-   return static_cast<uint64_t>(result);
-}
-
 /// Build a TokenAmount with `kind` and `amount`. amount is int64 on the
 /// wire; the upstream callers carry uint64 quantities so the cast is
 /// explicit.
@@ -40,12 +21,6 @@ TokenAmount make_token_amount(TokenKind kind, uint64_t amount) {
    ta.kind   = kind;
    ta.amount = static_cast<int64_t>(amount);
    return ta;
-}
-
-/// Pull the unsigned magnitude out of a TokenAmount. Negative on-wire
-/// amounts (which are not valid in reserve accounting) saturate at 0.
-uint64_t to_unsigned(int64_t amount) {
-   return amount < 0 ? 0 : static_cast<uint64_t>(amount);
 }
 
 } // anonymous namespace
@@ -94,51 +69,12 @@ uint64_t reserve::swapquote(opp::types::TokenKind     from_kind,
                              uint64_t                  from_amount,
                              opp::types::ChainKind     to_chain,
                              opp::types::TokenKind     to_token) {
-   if (from_amount == 0) return 0;
-
+   // Pricing lives in the shared header helper so `sysio.cap` (which cannot
+   // call this read-only action — sysio/sysio has no synchronous
+   // inter-contract call) prices native staking rewards with the exact same
+   // math against this contract's published `reserves` table.
    reserves_t reserves(get_self());
-
-   // Trivial case: src token already IS WIRE, dst token also WIRE.
-   if (from_kind == TokenKind::TOKEN_KIND_WIRE &&
-       to_token == TokenKind::TOKEN_KIND_WIRE) {
-      return from_amount;
-   }
-
-   // Half-hop: src is WIRE — quote WIRE -> outpost token on dst chain.
-   if (from_kind == TokenKind::TOKEN_KIND_WIRE) {
-      auto pk = reserve_key{pack_chain_token(to_chain, to_token)};
-      if (!reserves.contains(pk)) return 0;
-      auto r = reserves.get(pk);
-      return cp_output(to_unsigned(r.reserve_wire_amount.amount),
-                       to_unsigned(r.reserve_outpost_amount.amount),
-                       from_amount);
-   }
-
-   // Half-hop: dst is WIRE — quote outpost token on src chain -> WIRE.
-   if (to_token == TokenKind::TOKEN_KIND_WIRE) {
-      auto pk = reserve_key{pack_chain_token(to_chain, from_kind)};
-      if (!reserves.contains(pk)) return 0;
-      auto r = reserves.get(pk);
-      return cp_output(to_unsigned(r.reserve_outpost_amount.amount),
-                       to_unsigned(r.reserve_wire_amount.amount),
-                       from_amount);
-   }
-
-   // Full hop: src token -> WIRE -> dst token. Two reserves consulted.
-   // `to_chain` doubles as the hint for the src reserve lookup since every
-   // outpost-token uniquely lives on exactly one outpost.
-   auto src_pk = reserve_key{pack_chain_token(to_chain, from_kind)};
-   auto dst_pk = reserve_key{pack_chain_token(to_chain, to_token)};
-   if (!reserves.contains(src_pk) || !reserves.contains(dst_pk)) return 0;
-   auto src_r = reserves.get(src_pk);
-   auto dst_r = reserves.get(dst_pk);
-   uint64_t wire_intermediate = cp_output(to_unsigned(src_r.reserve_outpost_amount.amount),
-                                          to_unsigned(src_r.reserve_wire_amount.amount),
-                                          from_amount);
-   if (wire_intermediate == 0) return 0;
-   return cp_output(to_unsigned(dst_r.reserve_wire_amount.amount),
-                    to_unsigned(dst_r.reserve_outpost_amount.amount),
-                    wire_intermediate);
+   return quote(reserves, from_kind, from_amount, to_chain, to_token);
 }
 
 // ---------------------------------------------------------------------------

@@ -390,22 +390,45 @@ void dispatch_attestation(name self, uint64_t attestation_id,
          break;
 
       case AttestationType::ATTESTATION_TYPE_STAKING_REWARD:
-         // Outpost-side staker reward — credit the outpost-side reserve.
-         // The matching WIRE-side payout to the staker is a separate
-         // next-epoch action owned by the staking work stream.
+         // STAKING_REWARD routes two ways:
+         //   1. the aggregate native amount credits the outpost-side reserve
+         //      (sysio.reserv::onreward) so swapquote stays solvent;
+         //   2. the per-staker body is dispatched to sysio.cap::onreward,
+         //      which prices native -> WIRE off that reserve and credits the
+         //      staker's claim ledger (pending_claims if AuthX-linked, else
+         //      parked in unmapped_tokens by native address until they link).
+         // Both proto messages are flattened into primitive params per the
+         // no-proto-messages-in-actions rule.
          {
             opp::attestations::StakingReward sr;
             auto in = zpp::bits::in{std::span{data.data(), data.size()}, zpp::bits::no_size{}};
             auto rc = in(sr);
             if (rc != zpp::bits::errc{}) break;
-            // Split reward_amount (TokenAmount) into (kind, amount) on the
-            // inline action per the no-proto-messages-in-actions rule.
             const uint64_t reward_raw =
                static_cast<uint64_t>(static_cast<int64_t>(sr.reward_amount.amount));
+            // 1. Outpost-side reserve credit (aggregate, native-denominated).
             action(
                permission_level{self, "active"_n},
                "sysio.reserv"_n, "onreward"_n,
                std::make_tuple(from_chain, sr.reward_amount.kind, reward_raw)
+            ).send();
+            // 2. Per-staker WIRE-side claim-ledger credit. staker_wire_account
+            //    is passed as the raw string (empty => not yet AuthX-linked,
+            //    so sysio.cap parks by native address); staker_native_address
+            //    .address is a proto `bytes` field, directly compatible with
+            //    the action's std::vector<char> parameter.
+            action(
+               permission_level{self, "active"_n},
+               "sysio.cap"_n, "onreward"_n,
+               std::make_tuple(sr.outpost_id,
+                                sr.staker_wire_account.name,
+                                from_chain,
+                                sr.staker_native_address.address,
+                                sr.reward_amount.kind,
+                                reward_raw,
+                                sr.reward_epoch_index,
+                                sr.external_epoch_ref,
+                                sr.share_bps)
             ).send();
          }
          break;

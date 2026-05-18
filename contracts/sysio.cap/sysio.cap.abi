@@ -10,6 +10,10 @@
                 {
                     "name": "imported_complete",
                     "type": "bool"
+                },
+                {
+                    "name": "claim_window_sec",
+                    "type": "uint32"
                 }
             ]
         },
@@ -19,6 +23,14 @@
             "fields": [
                 {
                     "name": "next_unmapped_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "next_stage_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "next_cursor_id",
                     "type": "uint64"
                 }
             ]
@@ -30,6 +42,16 @@
                 {
                     "name": "wire_account",
                     "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "flushexpired",
+            "base": "",
+            "fields": [
+                {
+                    "name": "max_rows",
+                    "type": "uint32"
                 }
             ]
         },
@@ -85,6 +107,94 @@
             ]
         },
         {
+            "name": "native_stage",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "outpost_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "chain",
+                    "type": "ChainKind"
+                },
+                {
+                    "name": "native_pubkey",
+                    "type": "bytes"
+                },
+                {
+                    "name": "wire_account",
+                    "type": "name"
+                },
+                {
+                    "name": "native_kind",
+                    "type": "TokenKind"
+                },
+                {
+                    "name": "native_amount",
+                    "type": "uint64"
+                },
+                {
+                    "name": "reward_epoch_index",
+                    "type": "uint32"
+                },
+                {
+                    "name": "external_epoch_ref",
+                    "type": "uint64"
+                },
+                {
+                    "name": "expires_at_sec",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "onreward",
+            "base": "",
+            "fields": [
+                {
+                    "name": "outpost_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "staker_wire_account",
+                    "type": "string"
+                },
+                {
+                    "name": "reward_chain",
+                    "type": "ChainKind"
+                },
+                {
+                    "name": "staker_native_addr",
+                    "type": "bytes"
+                },
+                {
+                    "name": "reward_kind",
+                    "type": "TokenKind"
+                },
+                {
+                    "name": "reward_amount",
+                    "type": "uint64"
+                },
+                {
+                    "name": "reward_epoch_index",
+                    "type": "uint32"
+                },
+                {
+                    "name": "external_epoch_ref",
+                    "type": "uint64"
+                },
+                {
+                    "name": "share_bps",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
             "name": "pclaim_key",
             "base": "",
             "fields": [
@@ -105,6 +215,56 @@
                 {
                     "name": "balance",
                     "type": "asset"
+                },
+                {
+                    "name": "expires_at_sec",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "retryconvert",
+            "base": "",
+            "fields": [
+                {
+                    "name": "max_rows",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "reward_cursor",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "outpost_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "chain",
+                    "type": "ChainKind"
+                },
+                {
+                    "name": "native_pubkey",
+                    "type": "bytes"
+                },
+                {
+                    "name": "last_external_epoch_ref",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "rwdcur_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
                 }
             ]
         },
@@ -112,6 +272,26 @@
             "name": "setconfig",
             "base": "",
             "fields": []
+        },
+        {
+            "name": "setwindow",
+            "base": "",
+            "fields": [
+                {
+                    "name": "window_sec",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "stage_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                }
+            ]
         },
         {
             "name": "unmapped_key",
@@ -142,6 +322,10 @@
                 {
                     "name": "balance",
                     "type": "asset"
+                },
+                {
+                    "name": "expires_at_sec",
+                    "type": "uint32"
                 }
             ]
         }
@@ -150,6 +334,11 @@
         {
             "name": "claim",
             "type": "claim",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "flushexpired",
+            "type": "flushexpired",
             "ricardian_contract": ""
         },
         {
@@ -168,8 +357,23 @@
             "ricardian_contract": ""
         },
         {
+            "name": "onreward",
+            "type": "onreward",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "retryconvert",
+            "type": "retryconvert",
+            "ricardian_contract": ""
+        },
+        {
             "name": "setconfig",
             "type": "setconfig",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "setwindow",
+            "type": "setwindow",
             "ricardian_contract": ""
         }
     ],
@@ -191,12 +395,42 @@
             "table_id": 40418
         },
         {
+            "name": "nativestage",
+            "type": "native_stage",
+            "index_type": "i64",
+            "key_names": ["id"],
+            "key_types": ["uint64"],
+            "table_id": 20200,
+            "secondary_indexes": [
+                {
+                    "name": "bychainad",
+                    "key_type": "uint128",
+                    "table_id": 29106
+                }
+            ]
+        },
+        {
             "name": "pclaims",
             "type": "pending_claim",
             "index_type": "i64",
             "key_names": ["wire_account"],
             "key_types": ["uint64"],
             "table_id": 16291
+        },
+        {
+            "name": "rwdcursors",
+            "type": "reward_cursor",
+            "index_type": "i64",
+            "key_names": ["id"],
+            "key_types": ["uint64"],
+            "table_id": 64468,
+            "secondary_indexes": [
+                {
+                    "name": "byoutaddr",
+                    "key_type": "uint128",
+                    "table_id": 35362
+                }
+            ]
         },
         {
             "name": "unmapped",
@@ -241,6 +475,44 @@
                 {
                     "name": "CHAIN_KIND_SUI",
                     "value": 4
+                }
+            ]
+        },
+        {
+            "name": "TokenKind",
+            "type": "int32",
+            "values": [
+                {
+                    "name": "TOKEN_KIND_WIRE",
+                    "value": 0
+                },
+                {
+                    "name": "TOKEN_KIND_ETH",
+                    "value": 256
+                },
+                {
+                    "name": "TOKEN_KIND_ERC20",
+                    "value": 257
+                },
+                {
+                    "name": "TOKEN_KIND_ERC721",
+                    "value": 258
+                },
+                {
+                    "name": "TOKEN_KIND_ERC1155",
+                    "value": 259
+                },
+                {
+                    "name": "TOKEN_KIND_LIQETH",
+                    "value": 496
+                },
+                {
+                    "name": "TOKEN_KIND_SOL",
+                    "value": 512
+                },
+                {
+                    "name": "TOKEN_KIND_LIQSOL",
+                    "value": 752
                 }
             ]
         }
