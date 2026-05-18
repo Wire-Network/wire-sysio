@@ -9,4 +9,5 @@ plugin_target(
 
         signature_provider_manager_plugin
         sysio_chain
+        opp
         )

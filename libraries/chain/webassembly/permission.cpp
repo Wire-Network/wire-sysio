@@ -20,9 +20,9 @@ namespace sysio { namespace chain { namespace webassembly {
       permissions = fc::raw::unpack<flat_set<permission_level>>( perms_data, perms_size );
    }
 
-   bool interface::check_transaction_authorization( legacy_span<const char> trx_data,
-                                                    legacy_span<const char> pubkeys_data,
-                                                    legacy_span<const char> perms_data ) const {
+   bool interface::check_transaction_authorization( span<const char> trx_data,
+                                                    span<const char> pubkeys_data,
+                                                    span<const char> perms_data ) const {
       transaction trx = fc::raw::unpack<transaction>( trx_data.data(), trx_data.size() );
 
       flat_set<public_key_type> provided_keys;
@@ -47,8 +47,8 @@ namespace sysio { namespace chain { namespace webassembly {
    }
 
    bool interface::check_permission_authorization( account_name account, permission_name permission,
-                                                   legacy_span<const char> pubkeys_data,
-                                                   legacy_span<const char> perms_data,
+                                                   span<const char> pubkeys_data,
+                                                   span<const char> perms_data,
                                                    uint64_t delay_us ) const {
       SYS_ASSERT( delay_us == 0, action_validate_exception, "delayed transactions not supported" );
 

@@ -201,9 +201,12 @@ void snapshot_scheduler::create_snapshot(next_function<snapshot_information> nex
    if(existing != pending_by_id.end()) {
       // if a snapshot at this block is already pending, attach this requests handler to it
       pending_by_id.modify(existing, [&next](auto& entry) {
-         entry.next = [prev = entry.next, next](const next_function_variant<snapshot_information>& res) {
-            prev(res);
-            next(res);
+         entry.next = [prev = entry.next, next](next_function_variant<snapshot_information>&& res) {
+            // Fan-out to two next_functions: each must receive its own variant copy
+            // so neither sees a moved-from value.  next_function::operator() is
+            // rvalue-only, so the copy is required and visible.
+            prev(next_function_variant<snapshot_information>{res});
+            next(std::move(res));
          };
       });
    } else {

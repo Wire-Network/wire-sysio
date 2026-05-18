@@ -47,7 +47,7 @@ namespace sysio { namespace chain {
       account_name   payer;         ///< RAM payer (default=code, privileged contracts can set to other accounts)
       shared_blob    key;           ///< primary key bytes (opaque, layout determined by CDT)
       shared_blob    value;         ///< arbitrary byte value
-      uint16_t       table_id = 0;  ///< table namespace (DJB2 hash of table name % 65536)
+      uint16_t       table_id = 0;  ///< table namespace (lower 16 bits of the DJB2 hash of table name)
 
       std::string_view key_view() const {
          return {key.data(), key.size()};
@@ -113,9 +113,9 @@ namespace sysio { namespace chain {
     * Uses shared_blob for both key fields. sec_key_size and pri_key_size are
     * billed separately at billing time on top of the fixed struct overhead.
     *
-    * table_id identifies this secondary index's namespace (DJB2 hash of
-    * "tablename.indexname" % 65536). Each secondary index gets its own
-    * table_id, separate from the primary table's table_id.
+    * table_id identifies this secondary index's namespace (lower 16 bits of
+    * the DJB2 hash of "tablename.indexname"). Each secondary index gets its
+    * own table_id, separate from the primary table's table_id.
     */
    class kv_index_object : public chainbase::object<kv_index_object_type, kv_index_object> {
       OBJECT_CTOR(kv_index_object, (sec_key)(pri_key))
@@ -126,7 +126,7 @@ namespace sysio { namespace chain {
       account_name   payer;         ///< RAM payer (mirrors kv_object::payer)
       shared_blob    sec_key;       ///< secondary key bytes
       shared_blob    pri_key;       ///< primary key bytes
-      uint16_t       table_id = 0;  ///< secondary index namespace (DJB2 hash of "table.index" % 65536)
+      uint16_t       table_id = 0;  ///< secondary index namespace (lower 16 bits of the DJB2 hash of "table.index")
 
       std::string_view sec_key_view() const { return {sec_key.data(), sec_key.size()}; }
       std::string_view pri_key_view() const { return {pri_key.data(), pri_key.size()}; }
@@ -172,6 +172,8 @@ namespace config {
       //             + 2 table_id + 6 padding = 48
       // key.size() and value.size() are added separately at billing time.
       static const uint64_t value = 48 + overhead;
+      // protocol feature will be needed if this increases
+      static_assert(sizeof(kv_object) == 48, "kv_object size changed");
    };
 
    template<>
@@ -181,6 +183,8 @@ namespace config {
       //             + 8 pri_key (offset_ptr) + 2 table_id + 6 padding = 48
       // sec_key.size() and pri_key.size() are added separately at billing time.
       static const uint64_t value = 48 + overhead;
+      // protocol feature will be needed if this increases
+      static_assert(sizeof(kv_index_object) == 48, "kv_index_object size changed");
    };
 } // namespace config
 

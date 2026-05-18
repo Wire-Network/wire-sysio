@@ -87,7 +87,7 @@ namespace fc
        static inline void from_variant( const fc::variant& v, T& o ) 
        { 
            if( v.is_string() )
-              o = fc::reflector<T>::from_string( v.get_string().c_str() );
+              o = fc::reflector<T>::from_string( v.get_string() );
            else
               o = fc::reflector<T>::from_int( v.as_int64() );
        }

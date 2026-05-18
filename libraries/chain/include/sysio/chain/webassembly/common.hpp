@@ -26,10 +26,10 @@ namespace sysio { namespace chain {
    using span = sysio::vm::span<T, Extent>;
 
    template <typename T, std::size_t Align = alignof(T)>
-   using legacy_ptr = sysio::vm::argument_proxy<T*, Align>;
+   using aligned_ptr = sysio::vm::argument_proxy<T*, Align>;
 
    template <typename T, std::size_t Align = alignof(T)>
-   using legacy_span = sysio::vm::argument_proxy<sysio::vm::span<T>, Align>;
+   using aligned_span = sysio::vm::argument_proxy<sysio::vm::span<T>, Align>;
 
    struct null_terminated_ptr {
       null_terminated_ptr(const char* ptr) : ptr(ptr) {}

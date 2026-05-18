@@ -340,7 +340,7 @@ auto fn(A... a) {
    try {
       if constexpr(!is_injected) {
          constexpr int cb_current_call_depth_remaining_segment_offset = OFFSET_OF_CONTROL_BLOCK_MEMBER(current_call_depth_remaining);
-         constexpr int depth_assertion_intrinsic_offset = OFFSET_OF_FIRST_INTRINSIC - (int) find_intrinsic_index("sysvmoc_internal.depth_assert") * 8;
+         constexpr int depth_assertion_intrinsic_offset = OFFSET_OF_FIRST_INTRINSIC - (int) require_intrinsic_index<find_intrinsic_index("sysvmoc_internal.depth_assert")>::value * 8;
 
          asm volatile("cmpl   $1,%%gs:%c[callDepthRemainOffset]\n"
                       "jne    1f\n"
@@ -393,7 +393,7 @@ void register_sysvm_oc(Name n) {
    // Has special handling
    if(n == BOOST_HANA_STRING("env.sysio_exit")) return;
    constexpr auto fn = create_function<F, Preconditions, injected>();
-   constexpr auto index = find_intrinsic_index(n.c_str());
+   constexpr auto index = require_intrinsic_index<find_intrinsic_index(n.c_str())>::value;
    [[maybe_unused]] intrinsic the_intrinsic(
       n.c_str(),
       wasm_function_type_provider<std::remove_pointer_t<decltype(fn)>>::type(),

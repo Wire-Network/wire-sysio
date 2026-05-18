@@ -1,3 +1,6 @@
+core
+.claude/
+.remember
 *.tsbuildinfo
 .env
 .local*/
@@ -43,6 +46,7 @@ libraries/types/type_generator
 libraries/types/types_test
 libraries/fc/test/crypto/test_cypher_suites
 libraries/testing/chain_tester
+
 
 libraries/wallet/Doxyfile
 libraries/wallet/api_documentation.cpp
@@ -106,7 +110,8 @@ CMakeLists.txt.user
 node_modules
 package-lock.json
 
-/snapshots
+/snapshot*
+/test
 
 cliff.toml
 !cmake/build-options.cmake

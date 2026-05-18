@@ -304,6 +304,7 @@ vector<chain::permission_level> get_account_permissions(const vector<string>& pe
    vector<chain::permission_level> accountPermissions;
    boost::range::copy(fixedPermissions, back_inserter(accountPermissions));
    if (!tx_payer.empty()) {
+      // sysio.payer must be the first authorization; action::payer() only inspects position 0.
       accountPermissions.insert(accountPermissions.begin(), chain::permission_level{ .actor = name(tx_payer), .permission = name("sysio.payer") });
    }
    return accountPermissions;
@@ -313,6 +314,7 @@ vector<chain::permission_level> get_account_permissions(const vector<string>& pe
    if (permissions.empty()) {
       vector<chain::permission_level> accountPermissions{default_permission};
       if (!tx_payer.empty()) {
+         // sysio.payer must be the first authorization; action::payer() only inspects position 0.
          accountPermissions.insert(accountPermissions.begin(), chain::permission_level{ .actor = name(tx_payer), .permission = name("sysio.payer") });
       }
       return accountPermissions;
@@ -2083,6 +2085,34 @@ int main( int argc, char** argv ) {
       auto pubk = fc::crypto::public_key::from_string(k1_public_key, fc::crypto::public_key::key_type::k1);
       std::cout << localized("Public key: ${key}", ("key", pubk.to_string({}) ) ) << std::endl;
       std::cout << localized("Public key: ${key}", ("key", pubk.to_string({}, true) ) ) << std::endl;
+   });
+
+   string name_input;
+   auto name_cmd = convert_cmd->add_subcommand("name", localized("Convert between sysio::name and uint64_t, printing both interpretations"));
+   name_cmd->add_option("input", name_input, localized("A sysio name or uint64_t value (decimal, or 0x-prefixed hex)"))->required();
+   name_cmd->callback([&name_input] {
+      bool any_success = false;
+      try {
+         name n{name_input};
+         std::cout << localized("As sysio::name : \"${name}\" -> uint64_t: ${value}",
+                                ("name", n.to_string())("value", n.to_uint64_t())) << std::endl;
+         any_success = true;
+      } catch (const fc::exception&) {}
+      try {
+         size_t pos = 0;
+         uint64_t v = std::stoull(name_input, &pos, 0);
+         if (pos != name_input.size())
+            throw std::invalid_argument("trailing characters after number");
+         name n{v};
+         std::cout << localized("As uint64_t    : ${value} -> sysio::name: \"${name}\"",
+                                ("value", v)("name", n.to_string())) << std::endl;
+         any_success = true;
+      } catch (const std::invalid_argument&) {
+      } catch (const std::out_of_range&) {}
+      if (!any_success) {
+         std::cerr << localized("ERROR: Input is neither a valid sysio::name nor a uint64_t") << std::endl;
+         FC_THROW_EXCEPTION(explained_exception, "invalid name input");
+      }
    });
 
    // pack hex
