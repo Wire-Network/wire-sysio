@@ -139,6 +139,8 @@ info "Bootstrapping vcpkg"
 export VCPKG_DISABLE_METRICS="${VCPKG_DISABLE_METRICS:-1}"
 
 if [[ "$BUILD_MODE" == "forked-pr-ci" ]]; then
+  # Fork PRs cannot use package credentials, so they intentionally fall back to
+  # vcpkg's ephemeral runner-local binary cache and may rebuild dependencies.
   export VCPKG_BINARY_SOURCES="clear;default,readwrite"
 else
   if [[ "$BUILD_MODE" == "trusted-ci" ]]; then

@@ -155,6 +155,7 @@ scripts/build-with-github-vcpkg-cache.sh
 
 The script bootstraps vcpkg, configures the GitHub Packages NuGet binary cache,
 runs CMake with the repository vcpkg toolchain, and builds the project.
+It does not run tests unless `--run-tests` is passed.
 
 When `ccache` is installed, the CMake build uses it through `ENABLE_CCACHE=ON`
 and stores cache files in `.ccache` by default.
