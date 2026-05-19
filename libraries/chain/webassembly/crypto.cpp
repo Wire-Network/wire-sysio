@@ -32,9 +32,9 @@ namespace {
 
 namespace sysio::chain::webassembly {
 
-   void interface::assert_recover_key( legacy_ptr<const fc::sha256> digest,
-                                       legacy_span<const char> sig,
-                                       legacy_span<const char> pub ) const {
+   void interface::assert_recover_key( aligned_ptr<const fc::sha256> digest,
+                                       span<const char> sig,
+                                       span<const char> pub ) const {
       fc::crypto::signature s;
       fc::crypto::public_key p;
       fc::datastream<const char*> ds( sig.data(), sig.size() );
@@ -86,92 +86,102 @@ namespace sysio::chain::webassembly {
                   "Error expected key different than recovered key" );
    }
 
-   int32_t interface::recover_key_nothrow( legacy_ptr<const fc::sha256> digest,
-                                            legacy_span<const char> sig,
-                                            legacy_span<char> pub ) const {
-      // Host-side wraps the throwing `recover_key` in try/catch — the
-      // host runtime supports exceptions, the WASM contract caller does
-      // not. Catch absolutely everything (the throwing path can raise
-      // `fc::exception`, `std::exception`, or SYS_ASSERT-style
-      // chain_exceptions) and translate to a -1 sentinel so the
-      // contract sees a non-throwing return.
-      try {
-         // argument_proxy (both ptr and span specializations) is
-         // non-copyable but movable; forward by move into the existing
-         // recover_key body.
-         return recover_key(std::move(digest), std::move(sig), std::move(pub));
-      } catch (...) {
-         return -1;
-      }
-   }
-
-   int32_t interface::recover_key( legacy_ptr<const fc::sha256> digest,
-                                   legacy_span<const char> sig,
-                                   legacy_span<char> pub ) const {
+   int32_t interface::recover_key( aligned_ptr<const fc::sha256> digest,
+                                   span<const char> sig,
+                                   span<char> pub ) const {
+      // recover_key is the rc-returning variant of signature recovery: contract-observable failure modes (bad sig
+      // structure, unactivated / unknown sig variant, secp256k1 / r1 / ed recovery math failure) surface as rc = -1
+      // so callers can accept untrusted user-submitted signatures without aborting the transaction. Contracts
+      // that want the throw-on-any-failure semantics use assert_recover_key instead.
+      //
+      // The one exception is the speculative-block variable-size subjective guard further down -- that throw
+      // stays, by design. See the DEFERRED note at the throw site for the rationale and the path to removing it.
       fc::crypto::signature s;
-      fc::datastream<const char*> ds( sig.data(), sig.size() );
-      fc::raw::unpack(ds, s);
+      try {
+         fc::datastream<const char*> ds( sig.data(), sig.size() );
+         fc::raw::unpack( ds, s );
+      } catch ( const fc::exception& ) {
+         return -1;  // empty / truncated / bad-variant-tag sig
+      }
 
       using sig_type = fc::crypto::signature::sig_type;
-      SYS_ASSERT(s.contains_type(sig_type::k1, sig_type::r1, sig_type::wa, sig_type::em, sig_type::ed), unactivated_signature_type,
-                 "Unactivated signature type used during recover_key");
+      if ( !s.contains_type(sig_type::k1, sig_type::r1, sig_type::wa, sig_type::em, sig_type::ed) )
+         return -1;  // unknown or not-yet-activated sig variant
 
-      if(context.control.is_speculative_block())
-         SYS_ASSERT(s.variable_size() <= context.control.configured_subjective_signature_length_limit(),
-                    sig_variable_size_limit_exception, "signature variable length component size greater than subjective maximum");
+      // DEFERRED -- subjective per-node DoS guard on WebAuthn variable-size fields (auth_data + client_json). Keeps
+      // throwing, NOT converted to rc = -1, because `configured_subjective_signature_length_limit` is a per-node
+      // config value (default 16384, CLI-overridable). Converting to rc = -1 would expose that subjective value
+      // to contracts: two producers with different configured limits would see different rc for the same sig, and
+      // any contract branching on rc < 0 would diverge. Throwing avoids the leak because the trx is rejected
+      // entirely before the contract observes anything. Original subjective-by-design choice documented in the
+      // webauthn-support PR (dabc79476b, May 2019); Spring still has the identical shape. To make recover_key
+      // fully non-throwing, the cap must first become consensus-uniform: either (C) hardcode 16384 as an objective
+      // limit (also removing `maximum_variable_signature_length` from controller_config and the CLI option) or
+      // (D) promote to chain_config_v0 so governance can tune via setparams. Either path also removes the
+      // trx-metadata-level `check_variable_sig_size` in favor of the new uniform mechanism. Until one lands,
+      // recover_key still throws on this specific path.
+      if ( context.control.is_speculative_block() )
+         SYS_ASSERT( s.variable_size() <= context.control.configured_subjective_signature_length_limit(),
+                     sig_variable_size_limit_exception,
+                     "signature variable length component size greater than subjective maximum" );
 
-      auto recovered = fc::crypto::public_key::recover(s, *digest);
-
-      // For variable length key types use a memcpy and return length
-      if (!s.contains_type(sig_type::k1, sig_type::r1, sig_type::em)) {
-         auto packed_pubkey = fc::raw::pack(recovered);
-         auto copy_size = std::min<size_t>(pub.size(), packed_pubkey.size());
-         std::memcpy(pub.data(), packed_pubkey.data(), copy_size);
-         return packed_pubkey.size();
-      } else {
-         // For fixed size length key types avoid the copy.
-         // This will do one less copy for those keys while maintaining the rules of
-         //    [0..size) dest sizes: assert (asserts in fc::raw::pack)
-         //    [size..inf) dest sizes: return packed size (always fixed size)
-         fc::datastream<char*> out_ds( pub.data(), pub.size() );
-         fc::raw::pack(out_ds, recovered);
-         return out_ds.tellp();
+      fc::crypto::public_key recovered;
+      try {
+         recovered = fc::crypto::public_key::recover( s, *digest );
+      } catch ( const fc::exception& ) {
+         return -1;  // bad recovery byte / off-curve r,s / ed25519 verify failure
       }
+
+      // Unified small-buffer contract for every signature variant: memcpy min(pub.size(), needed) of the packed
+      // key into the caller's buffer and always return the full required size. Callers can use "query with
+      // buffer=0, allocate, call again" OR the classic "pre-allocate optimistic size + shrink-or-retry on return"
+      // pattern CDT uses. Fast path when the buffer fits (the overwhelmingly common case for CDT-generated
+      // 256-byte optimistic buffers) keeps the in-place datastream pack, so the heap allocation in fc::raw::pack
+      // is paid only on the adversarial under-sized-buffer path.
+      const auto needed = fc::raw::pack_size(recovered);
+      if ( needed <= pub.size() ) {
+         fc::datastream<char*> out_ds(pub.data(), needed);
+         fc::raw::pack(out_ds, recovered);
+      } else if ( pub.size() > 0 ) {
+         auto packed_pubkey = fc::raw::pack(recovered);
+         std::memcpy(pub.data(), packed_pubkey.data(), pub.size());
+      }
+      return static_cast<int32_t>(needed);
    }
 
-   void interface::assert_sha256(legacy_span<const char> data, legacy_ptr<const fc::sha256> hash_val) const {
+   void interface::assert_sha256(span<const char> data, aligned_ptr<const fc::sha256> hash_val) const {
       auto result = context.trx_context.hash_with_checktime<fc::sha256>( data.data(), data.size() );
       SYS_ASSERT( result == *hash_val, crypto_api_exception, "hash mismatch" );
    }
 
-   void interface::assert_sha1(legacy_span<const char> data, legacy_ptr<const fc::sha1> hash_val) const {
+   void interface::assert_sha1(span<const char> data, aligned_ptr<const fc::sha1> hash_val) const {
       auto result = context.trx_context.hash_with_checktime<fc::sha1>( data.data(), data.size() );
       SYS_ASSERT( result == *hash_val, crypto_api_exception, "hash mismatch" );
    }
 
-   void interface::assert_sha512(legacy_span<const char> data, legacy_ptr<const fc::sha512> hash_val) const {
+   void interface::assert_sha512(span<const char> data, aligned_ptr<const fc::sha512> hash_val) const {
       auto result = context.trx_context.hash_with_checktime<fc::sha512>( data.data(), data.size() );
       SYS_ASSERT( result == *hash_val, crypto_api_exception, "hash mismatch" );
    }
 
-   void interface::assert_ripemd160(legacy_span<const char> data, legacy_ptr<const fc::ripemd160> hash_val) const {
+   void interface::assert_ripemd160(span<const char> data, aligned_ptr<const fc::ripemd160> hash_val) const {
       auto result = context.trx_context.hash_with_checktime<fc::ripemd160>( data.data(), data.size() );
       SYS_ASSERT( result == *hash_val, crypto_api_exception, "hash mismatch" );
    }
 
-   void interface::sha1(legacy_span<const char> data, legacy_ptr<fc::sha1> hash_val) const {
+   void interface::sha1(span<const char> data, aligned_ptr<fc::sha1> hash_val) const {
       *hash_val = context.trx_context.hash_with_checktime<fc::sha1>( data.data(), data.size() );
    }
 
-   void interface::sha256(legacy_span<const char> data, legacy_ptr<fc::sha256> hash_val) const {
+   void interface::sha256(span<const char> data, aligned_ptr<fc::sha256> hash_val) const {
       *hash_val = context.trx_context.hash_with_checktime<fc::sha256>( data.data(), data.size() );
    }
 
-   void interface::sha512(legacy_span<const char> data, legacy_ptr<fc::sha512> hash_val) const {
+   void interface::sha512(span<const char> data, aligned_ptr<fc::sha512> hash_val) const {
       *hash_val = context.trx_context.hash_with_checktime<fc::sha512>( data.data(), data.size() );
    }
 
-   void interface::ripemd160(legacy_span<const char> data, legacy_ptr<fc::ripemd160> hash_val) const {
+   void interface::ripemd160(span<const char> data, aligned_ptr<fc::ripemd160> hash_val) const {
       *hash_val = context.trx_context.hash_with_checktime<fc::ripemd160>( data.data(), data.size() );
    }
 
@@ -276,7 +286,7 @@ namespace sysio::chain::webassembly {
       // sanity‐check sizes
       if( result.size() != BLAKE2B256_DIGEST_LENGTH )
          return return_code::failure;
-
+  
       // BLAKE2B256 takes uint8_t*, so cast away const‐char
       auto in_bytes = reinterpret_cast<const uint8_t*>(data.data());
       auto out_bytes = reinterpret_cast<uint8_t*>(result.data());
@@ -464,7 +474,7 @@ namespace sysio::chain::webassembly {
    int32_t interface::bls_fp_mod(span<const char> s, span<char> result) const {
       // s is scalar.
       if(s.size() != 64 ||  result.size() != 48)
-         return return_code::failure;
+         return return_code::failure;  
       std::array<uint64_t, 8> k = bls12_381::scalar::fromBytesLE<8>(std::span<const uint8_t, 64>((const uint8_t*)s.data(), 64));
       bls12_381::fp e = bls12_381::fp::modPrime<8>(k);
       e.toBytesLE(std::span<uint8_t, 48>((uint8_t*)result.data(), 48), from_mont::yes);

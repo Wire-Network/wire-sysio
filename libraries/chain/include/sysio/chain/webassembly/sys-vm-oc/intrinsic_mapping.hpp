@@ -5,8 +5,9 @@
 #include <string_view>
 
 namespace sysio { namespace chain { namespace sysvmoc {
-//NEVER reorder or remove indexes; the PIC uses the indexes in this table as an offset in to a jump
-// table. Adding on the bottom is fine and requires no other updates elsewhere
+//Post-launch the PIC uses the indexes in this table as an offset into a jump table, so
+//indexes must NOT be reordered or removed once a network is live (cached compiled modules
+//embed the offsets). Pre-launch they may be renumbered freely.
 namespace detail {
    template <typename... Args>
    inline constexpr auto generate_table( Args&&... args ) {
@@ -24,49 +25,6 @@ inline constexpr auto get_intrinsic_table() {
       "sysvmoc_internal.depth_assert",
       "sysio_injection.call_depth_assert",  //now unused; left for purposes of not upsetting existing code mappings
       "sysio_injection.checktime",          //now unused; left for purposes of not upsetting existing code mappings
-      "env.__ashlti3",
-      "env.__ashrti3",
-      "env.__lshlti3",
-      "env.__lshrti3",
-      "env.__divti3",
-      "env.__udivti3",
-      "env.__modti3",
-      "env.__umodti3",
-      "env.__multi3",
-      "env.__addtf3",
-      "env.__subtf3",
-      "env.__multf3",
-      "env.__divtf3",
-      "env.__eqtf2",
-      "env.__netf2",
-      "env.__getf2",
-      "env.__gttf2",
-      "env.__lttf2",
-      "env.__letf2",
-      "env.__cmptf2",
-      "env.__unordtf2",
-      "env.__negtf2",
-      "env.__floatsitf",
-      "env.__floatunsitf",
-      "env.__floatditf",
-      "env.__floatunditf",
-      "env.__floattidf",
-      "env.__floatuntidf",
-      "env.__floatsidf",
-      "env.__extendsftf2",
-      "env.__extenddftf2",
-      "env.__fixtfti",
-      "env.__fixtfdi",
-      "env.__fixtfsi",
-      "env.__fixunstfti",
-      "env.__fixunstfdi",
-      "env.__fixunstfsi",
-      "env.__fixsfti",
-      "env.__fixdfti",
-      "env.__fixunssfti",
-      "env.__fixunsdfti",
-      "env.__trunctfdf2",
-      "env.__trunctfsf2",
       "env.is_feature_active",
       "env.activate_feature",
       "env.get_resource_limits",
@@ -81,7 +39,6 @@ inline constexpr auto get_intrinsic_table() {
       "env.get_active_producers",
       "env.assert_recover_key",
       "env.recover_key",
-      "env.recover_key_nothrow",
       "env.assert_sha256",
       "env.assert_sha1",
       "env.assert_sha512",
@@ -251,6 +208,19 @@ inline constexpr std::size_t find_intrinsic_index(std::string_view hf) {
          return i;
    return std::numeric_limits<std::size_t>::max();
 }
+
+// Compile-time guard wrapping find_intrinsic_index. Using require_intrinsic_index<find_intrinsic_index("env.foo")>
+// at a registration call site turns a missing entry in get_intrinsic_table() into a build error instead of a silent
+// SIZE_MAX that would otherwise flow through integral_constant<size_t, SIZE_MAX> as a legal constant expression and
+// produce a bogus jump-table ordinal at runtime. Ports AntelopeIO/leap#621 -- unblocked here because wire is on c++23.
+template<std::size_t Index>
+struct require_intrinsic_index {
+   static_assert(Index != std::numeric_limits<std::size_t>::max(),
+                 "OC intrinsic mapping missing -- the host function is REGISTER_*_HOST_FUNCTION'd but "
+                 "its \"env.<name>\" string is not in get_intrinsic_table() above. Add it to the table "
+                 "so sys-vm-oc can resolve the intrinsic at its fixed jump-table offset.");
+   static constexpr std::size_t value = Index;
+};
 
 inline constexpr std::size_t intrinsic_table_size() {
     return std::tuple_size<decltype(get_intrinsic_table())>::value;

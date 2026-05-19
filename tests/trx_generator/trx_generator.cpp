@@ -135,7 +135,7 @@ namespace sysio::testing {
 
    void locate_key_words_in_action_mvo(std::vector<std::string>& acct_gen_fields_out, const fc::mutable_variant_object& action_mvo, const std::string& key_word) {
       for (const fc::mutable_variant_object::entry& e: action_mvo) {
-         if (e.value().get_type() == fc::variant::string_type && e.value() == key_word) {
+         if (e.value().is_string() && e.value() == key_word) {
             acct_gen_fields_out.push_back(e.key());
          } else if (e.value().get_type() == fc::variant::object_type) {
             auto inner_mvo = fc::mutable_variant_object(e.value());

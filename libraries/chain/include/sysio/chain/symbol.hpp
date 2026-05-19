@@ -17,13 +17,10 @@ namespace sysio::chain {
          where the integer represents number of decimals. Number of decimals must be larger than zero.
        */
 
-      static constexpr uint64_t string_to_symbol_c(uint8_t precision, const char* str) {
-         uint32_t len = 0;
-         while (str[len]) ++len;
-
+      static constexpr uint64_t string_to_symbol_c(uint8_t precision, std::string_view str) {
          uint64_t result = 0;
          // No validation is done at compile time
-         for (uint32_t i = 0; i < len; ++i) {
+         for (size_t i = 0; i < str.size(); ++i) {
             result |= (uint64_t(str[i]) << (8*(1+i)));
          }
 
@@ -33,12 +30,10 @@ namespace sysio::chain {
 
 #define SY(P,X) ::sysio::chain::string_to_symbol_c(P,#X)
 
-      static uint64_t string_to_symbol(uint8_t precision, const char* str) {
+      static uint64_t string_to_symbol(uint8_t precision, std::string_view str) {
          try {
-            uint32_t len = 0;
-            while(str[len]) ++len;
             uint64_t result = 0;
-            for (uint32_t i = 0; i < len; ++i) {
+            for (size_t i = 0; i < str.size(); ++i) {
                // All characters must be upper case alphabets
                SYS_ASSERT (str[i] >= 'A' && str[i] <= 'Z', symbol_type_exception, "invalid character in symbol name");
                result |= (uint64_t(str[i]) << (8*(i+1)));
@@ -59,13 +54,13 @@ namespace sysio::chain {
 
             static constexpr uint8_t max_precision = 18;
 
-            explicit symbol(uint8_t p, const char* s): m_value(string_to_symbol(p, s)) {
+            explicit symbol(uint8_t p, std::string_view s): m_value(string_to_symbol(p, s)) {
                SYS_ASSERT(valid(), symbol_type_exception, "invalid symbol: {}", s);
             }
             explicit symbol(uint64_t v = CORE_SYMBOL): m_value(v) {
                SYS_ASSERT(valid(), symbol_type_exception, "invalid symbol: {}", name());
             }
-            static symbol from_string(const string& from);
+            static symbol from_string(std::string_view from);
             uint64_t value() const { return m_value; }
             bool valid() const
             {
@@ -185,7 +180,7 @@ namespace fc {
       vo = sysio::chain::symbol(var.value << 8).name();
    }
    inline void from_variant(const fc::variant& var, sysio::chain::symbol_code& vo) {
-      vo = sysio::chain::symbol(0, var.get_string().c_str()).to_symbol_code();
+      vo = sysio::chain::symbol(0, var.get_string()).to_symbol_code();
    }
 }
 

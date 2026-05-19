@@ -341,12 +341,14 @@ void emit_swap_remit(name self,
 ///
 /// **Per `feedback_opp_handlers_never_throw.md` — this MUST stay
 /// non-throwing.** It's called from `try_select_winner`, which runs inside
-/// the evalcons inline-action chain; a `check()` failure here halts
-/// consensus. The defensive size+tag bounds catch the obvious cases; the
-/// `sysio::recover_key_nothrow` intrinsic catches everything else the
-/// host crypto path can raise (malformed bytes, unactivated signature
-/// type, recovery math failure, subjective-size limit) and returns
-/// `std::nullopt` instead.
+/// the evalcons inline-action chain; a `check()`/throw here halts
+/// consensus. The defensive size+tag bounds reject structurally invalid
+/// signatures, and `sysio::try_recover_key` surfaces the host's
+/// contract-observable failures (malformed bytes, unactivated / unknown
+/// variant, recovery-math failure) as `std::nullopt` instead of aborting.
+/// The host's subjective WebAuthn size guard is speculative-block-gated
+/// and, in any case, unreachable here: the size bound rejects anything
+/// over 1024 bytes, well below the 16 KiB guard.
 bool verify_uic_signature(name underwriter,
                            const std::vector<char>& uic_bytes) {
    if (uic_bytes.empty()) return false;
@@ -389,14 +391,13 @@ bool verify_uic_signature(name underwriter,
       ds >> parsed_sig;
    }
 
-   // Recover the public key — non-throwing variant. The host wraps the
-   // throwing recovery path in try/catch and returns `std::nullopt` on
-   // any failure (malformed bytes, unactivated sig type, recovery math
-   // failure, subjective-size limit). Required because CDT compiles
-   // with `-fno-exceptions` and `try_select_winner` cannot halt the
-   // dispatch on attacker-controlled bytes (per
-   // `feedback_opp_handlers_never_throw.md`).
-   auto recovered_opt = sysio::recover_key_nothrow(digest, parsed_sig);
+   // Recover the public key with the non-throwing CDT wrapper: master's
+   // host recover_key returns rc < 0 for contract-observable failures and
+   // try_recover_key surfaces that as std::nullopt rather than aborting.
+   // Required because CDT compiles with `-fno-exceptions` and
+   // try_select_winner cannot halt the dispatch on attacker-controlled
+   // bytes (per `feedback_opp_handlers_never_throw.md`).
+   auto recovered_opt = sysio::try_recover_key(digest, parsed_sig);
    if (!recovered_opt) return false;
    const sysio::public_key& recovered = *recovered_opt;
 

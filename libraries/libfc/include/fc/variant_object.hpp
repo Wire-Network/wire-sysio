@@ -64,6 +64,23 @@ namespace fc
       iterator find( const char* key )const;
       const variant& operator[]( const std::string& key )const;
       const variant& operator[]( const char* key )const;
+      /**
+       * Non-throwing lookup: returns a reference to the value for @a key
+       * if present, otherwise to @a default_value.  Callers must keep
+       * @a default_value alive for the lifetime of the returned reference.
+       *
+       * On-hit lifetime: the returned reference is invalidated by any
+       * subsequent insert / erase / assignment on this variant_object;
+       * callers must not hold it across mutations.
+       *
+       * Replaces the common `contains(k) ? obj[k] : default_v` pattern,
+       * which scans the entry list twice and throws+catches a
+       * `key_not_found_exception` on miss.
+       */
+      const variant& find_or( const char* key, const variant& default_value ) const;
+      const variant& find_or( const std::string& key, const variant& default_value ) const {
+         return find_or( key.c_str(), default_value );
+      }
       size_t size()const;
       bool   contains( const char* key ) const { return find(key) != end(); }
       bool   contains( const std::string& key ) const { return contains(key.c_str()); }
@@ -159,6 +176,11 @@ namespace fc
       iterator             find( const char* key );
       bool                 contains( const char* key );
       bool                 contains( const std::string& key );
+      // Const overloads route through the const find() path which handles the
+      // empty (no-allocation) state, so `contains()` on a default-constructed
+      // mvo doesn't trigger the lazy entry-vector allocation.
+      bool                 contains( const char* key ) const;
+      bool                 contains( const std::string& key ) const;
 
       /** replaces the value at \a key with \a var or inserts \a key if not found */
       mutable_variant_object& set( std::string key, variant var ) &;
@@ -213,8 +235,9 @@ namespace fc
 
 
       explicit mutable_variant_object( variant v )
-            :_key_value( new std::vector<entry>() )
       {
+         // operator=(const variant_object&) replaces _key_value, so any
+         // initializer here would just be overwritten -- skip the alloc.
          *this = v.get_object();
       }
 
@@ -223,7 +246,6 @@ namespace fc
                                            !std::is_base_of<variant, std::decay_t<T>>::value &&
                                            !std::is_base_of<variant_object, std::decay_t<T>>::value>>
       explicit mutable_variant_object( T&& v )
-      :_key_value( new std::vector<entry>() )
       {
           *this = std::move(variant(fc::forward<T>(v)).get_object());
       }

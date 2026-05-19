@@ -260,13 +260,13 @@ BOOST_FIXTURE_TEST_CASE(rcrdcommit_same_chain_swap_auth, sysio_uwrit_tester) { t
    ).find("missing authority of sysio.msgch") != std::string::npos);
 } FC_LOG_AND_RETHROW() }
 
-// ── B4: recover_key_nothrow no-throw guarantee ─────────────────────────
+// ── B4: malformed-UIC no-halt guarantee ────────────────────────────────
 //
 // verify_uic_signature must never halt the dispatch chain on malformed
 // signature bytes (per feedback_opp_handlers_never_throw.md — a
-// `check()` here stalls consensus). It calls `recover_key_nothrow` which
-// returns `std::nullopt` on any failure; the helper turns that into a
-// `return false` and logs.
+// `check()` here stalls consensus). It calls `sysio::try_recover_key`,
+// which returns `std::nullopt` for the host's contract-observable
+// failures; the helper turns that into a `return false`.
 //
 // This case sends rcrdcommit with msgch auth and a uic_bytes blob whose
 // (decoded) signature would normally cause `recover_key` to throw. The

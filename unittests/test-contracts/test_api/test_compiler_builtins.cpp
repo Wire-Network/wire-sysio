@@ -7,34 +7,21 @@
 
 #include "test_api.hpp"
 
-//these are no longer exposed in cdt
+// Plain extern "C" declarations (no sysio_wasm_import attribute) so calls
+// resolve to the librt copy linked into the contract WASM via --use-rt, not
+// to env imports. Host registrations for these have been dropped; the tests
+// below verify librt's behavior under WASM execution across sys-vm,
+// sys-vm-jit, and sys-vm-oc -- the consensus surface that matters now.
 extern "C" {
-__attribute__((sysio_wasm_import))
-void __multi3(__int128& ret, uint64_t la, uint64_t ha, uint64_t lb, uint64_t hb);
-
-__attribute__((sysio_wasm_import))
-void __divti3(__int128& ret, uint64_t la, uint64_t ha, uint64_t lb, uint64_t hb);
-
-__attribute__((sysio_wasm_import))
-void __udivti3(unsigned __int128& ret, uint64_t la, uint64_t ha, uint64_t lb, uint64_t hb);
-
-__attribute__((sysio_wasm_import))
-void __lshlti3(__int128& ret, uint64_t low, uint64_t high, uint32_t shift);
-
-__attribute__((sysio_wasm_import))
-void __ashlti3(__int128& ret, uint64_t low, uint64_t high, uint32_t shift);
-
-__attribute__((sysio_wasm_import))
-void __lshrti3(__int128& ret, uint64_t low, uint64_t high, uint32_t shift);
-
-__attribute__((sysio_wasm_import))
-void __ashrti3(__int128& ret, uint64_t low, uint64_t high, uint32_t shift);
-
-__attribute__((sysio_wasm_import))
-void __modti3(__int128& ret, uint64_t la, uint64_t ha, uint64_t lb, uint64_t hb);
-
-__attribute__((sysio_wasm_import))
-void __umodti3(unsigned __int128& ret, uint64_t la, uint64_t ha, uint64_t lb, uint64_t hb);
+   void __multi3 (__int128&, uint64_t, uint64_t, uint64_t, uint64_t);
+   void __divti3 (__int128&, uint64_t, uint64_t, uint64_t, uint64_t);
+   void __udivti3(unsigned __int128&, uint64_t, uint64_t, uint64_t, uint64_t);
+   void __lshlti3(__int128&, uint64_t, uint64_t, uint32_t);
+   void __ashlti3(__int128&, uint64_t, uint64_t, uint32_t);
+   void __lshrti3(__int128&, uint64_t, uint64_t, uint32_t);
+   void __ashrti3(__int128&, uint64_t, uint64_t, uint32_t);
+   void __modti3 (__int128&, uint64_t, uint64_t, uint64_t, uint64_t);
+   void __umodti3(unsigned __int128&, uint64_t, uint64_t, uint64_t, uint64_t);
 }
 
 unsigned __int128 operator "" _ULLL( const char* lit ) {
@@ -386,33 +373,45 @@ void test_compiler_builtins::test_modti3_by_0() {
    sysio_assert( false, "should have thrown an error" );
 }
 
+// Note: this test originally inherited expected values from the signed
+// test_modti3 (lhs % rhs == lhs when |lhs| < |rhs|). For the unsigned domain
+// those expectations are wrong: (u128)-30 is 2^128 - 30 (huge), not -30.
+// Correct math is asserted below.
 void test_compiler_builtins::test_umodti3() {
    unsigned __int128 res    = 0;
-   unsigned __int128 lhs_a  = (unsigned __int128)-30;
+   unsigned __int128 lhs_a  = (unsigned __int128)-30;            // 2^128 - 30
    unsigned __int128 rhs_a  = 100;
    unsigned __int128 lhs_b  = 30;
-   unsigned __int128 rhs_b  = (unsigned __int128)-100;
-   
+   unsigned __int128 rhs_b  = (unsigned __int128)-100;            // 2^128 - 100
+
+   // (2^128 - 30) % 100 == 26
    __umodti3( res, uint64_t(lhs_a), uint64_t(lhs_a >> 64), uint64_t(rhs_a), uint64_t(rhs_a >> 64) );
-   sysio_assert( res ==  (unsigned __int128)-30, "__modti3 result should be -30" );
+   sysio_assert( res == 26, "__umodti3 (2^128-30)%100 should be 26" );
 
+   // 30 % (2^128 - 100) == 30 (dividend smaller than divisor)
    __umodti3( res, uint64_t(lhs_b), uint64_t(lhs_b >> 64), uint64_t(rhs_b), uint64_t(rhs_b >> 64) );
-   sysio_assert( res ==  30, "__modti3 result should be 30" );
-   
+   sysio_assert( res == 30, "__umodti3 30%(2^128-100) should be 30" );
+
+   // (2^128 - 30) % (2^128 - 100) == 70
+   //   2^128 - 30 = 1 * (2^128 - 100) + 70
    __umodti3( res, uint64_t(lhs_a), uint64_t(lhs_a >> 64), uint64_t(rhs_b), uint64_t(rhs_b >> 64) );
-   sysio_assert( res ==  (unsigned __int128)-30, "__modti3 result should be -30" );
+   sysio_assert( res == 70, "__umodti3 (2^128-30)%(2^128-100) should be 70" );
 
+   // 100 % 30 == 10
    __umodti3( res, uint64_t(rhs_a), uint64_t(rhs_a >> 64), uint64_t(lhs_b), uint64_t(lhs_b >> 64) );
-   sysio_assert( res ==  10, "__modti3 result should be 10" );
+   sysio_assert( res == 10, "__umodti3 100%30 should be 10" );
 
+   // 100 % (2^128 - 100) == 100 (dividend smaller than divisor)
    __umodti3( res, uint64_t(rhs_a), uint64_t(rhs_a >> 64), uint64_t(rhs_b), uint64_t(rhs_b >> 64) );
-   sysio_assert( res ==  0, "__modti3 result should be 0" );
+   sysio_assert( res == 100, "__umodti3 100%(2^128-100) should be 100" );
 
+   // 100 % 100 == 0
    __umodti3( res, uint64_t(rhs_a), uint64_t(rhs_a >> 64), uint64_t(rhs_a), uint64_t(rhs_a >> 64) );
-   sysio_assert( res ==  0, "__modti3 result should be 0" );
+   sysio_assert( res == 0, "__umodti3 100%100 should be 0" );
 
+   // 0 % 100 == 0
    __umodti3( res, 0, 0, uint64_t(rhs_a), uint64_t(rhs_a >> 64) );
-   sysio_assert( res ==  0, "__modti3 result should be 0" );
+   sysio_assert( res == 0, "__umodti3 0%100 should be 0" );
 }
 
 void test_compiler_builtins::test_umodti3_by_0() {
@@ -421,4 +420,66 @@ void test_compiler_builtins::test_umodti3_by_0() {
 
    __umodti3( res, uint64_t(lhs), uint64_t(lhs >> 64), 0, 0 );
    sysio_assert( false, "should have thrown an error" );
+}
+
+// INT128_MIN / -1 is signed-overflow UB in plain C; librt force-handles it
+// to wrap to INT128_MIN (matching the host behavior we removed). Replaces
+// the divmod_host_function_overflow_wast that previously imported env.__divti3.
+void test_compiler_builtins::test_divti3_overflow() {
+   __int128 res = 0;
+   // INT128_MIN: lo=0, hi=0x8000000000000000
+   __divti3( res, 0, 0x8000000000000000ULL,
+                  0xffffffffffffffffULL, 0xffffffffffffffffULL ); // -1
+
+   __int128 expected = (__int128)1 << 127; // bit pattern of INT128_MIN
+   sysio_assert( res == expected, "__divti3 INT128_MIN/-1 should wrap to INT128_MIN" );
+}
+
+// INT128_MIN % -1 is signed-overflow UB; mathematical result is 0.
+// librt force-handles it.
+void test_compiler_builtins::test_modti3_overflow() {
+   __int128 res = 1; // poison (any nonzero)
+   __modti3( res, 0, 0x8000000000000000ULL,
+                  0xffffffffffffffffULL, 0xffffffffffffffffULL ); // -1
+
+   sysio_assert( res == 0, "__modti3 INT128_MIN%-1 should be 0" );
+}
+
+// shift count >= 128 is UB on builtin __int128; librt clamps to a well-defined
+// saturation result: 0 for left/logical-right shifts, sign-extension for
+// arithmetic right (__ashrti3).
+void test_compiler_builtins::test_shift_overflow() {
+   __int128 res = 0xDEADBEEFCAFEBABE; // poison
+
+   // __lshlti3: any shift >= 128 returns 0 regardless of input
+   __lshlti3( res, 1, 0, 128 );
+   sysio_assert( res == 0, "__lshlti3 shift=128 must return 0" );
+   res = 0xDEADBEEFCAFEBABE;
+   __lshlti3( res, 0xffffffffffffffffULL, 0xffffffffffffffffULL, 200 );
+   sysio_assert( res == 0, "__lshlti3 shift=200 must return 0" );
+
+   // __ashlti3: same saturation as logical
+   res = 0xDEADBEEFCAFEBABE;
+   __ashlti3( res, 1, 0, 128 );
+   sysio_assert( res == 0, "__ashlti3 shift=128 must return 0" );
+
+   // __lshrti3: shift >= 128 returns 0 regardless of input
+   res = 0xDEADBEEFCAFEBABE;
+   __lshrti3( res, 0xffffffffffffffffULL, 0xffffffffffffffffULL, 128 );
+   sysio_assert( res == 0, "__lshrti3 shift=128 must return 0" );
+
+   // __ashrti3: shift >= 128 saturates to sign bit (0 for non-negative,
+   // -1 for negative). The "negative" case is the meaningful one because it
+   // distinguishes arithmetic from logical right shift.
+   res = 0xDEADBEEFCAFEBABE;
+   __ashrti3( res, 100, 0, 128 ); // positive 100 high=0
+   sysio_assert( res == 0, "__ashrti3 shift=128 on positive must return 0" );
+
+   res = 0xDEADBEEFCAFEBABE;
+   __ashrti3( res, 0, 0x8000000000000000ULL, 128 ); // INT128_MIN (negative)
+   sysio_assert( res == -1, "__ashrti3 shift=128 on INT128_MIN must return -1" );
+
+   res = 0xDEADBEEFCAFEBABE;
+   __ashrti3( res, 0xffffffffffffffffULL, 0xffffffffffffffffULL, 200 ); // -1
+   sysio_assert( res == -1, "__ashrti3 shift=200 on -1 must return -1" );
 }

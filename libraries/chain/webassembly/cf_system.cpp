@@ -15,7 +15,7 @@ namespace sysio { namespace chain { namespace webassembly {
       }
    }
 
-   void interface::sysio_assert_message( bool condition, legacy_span<const char> msg ) const {
+   void interface::sysio_assert_message( bool condition, span<const char> msg ) const {
       if( BOOST_UNLIKELY( !condition ) ) {
          const size_t sz = msg.size() > max_assert_message ? max_assert_message : msg.size();
          std::string message( msg.data(), sz );
