@@ -107,6 +107,11 @@ You can invoke them by running `ctest` from a terminal in your build directory a
 ctest -L "nonparallelizable_tests"
 ```
 
+On Linux hosts that support user and network namespaces, CMake automatically
+adds `--unshared` to tests that support it. This allows many tests that reuse
+the same localhost ports to run concurrently in isolated network namespaces.
+Control this with `-DSYSIO_UNSHARED_TESTS=AUTO|ON|OFF` at configure time.
+
 #### Long-Running Tests
 
 The long-running tests are [medium-to-large](https://testing.googleblog.com/2010/12/test-sizes.html) integration tests

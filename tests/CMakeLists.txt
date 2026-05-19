@@ -114,9 +114,48 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/producer_rank_test.py ${CMAKE_CURRENT
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/split_blocklog_replay_test.py ${CMAKE_CURRENT_BINARY_DIR}/split_blocklog_replay_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/PerformanceHarnessScenarioRunner.py ${CMAKE_CURRENT_BINARY_DIR}/PerformanceHarnessScenarioRunner.py COPYONLY)
 
-if(DEFINED ENV{GITHUB_ACTIONS})
+set(SYSIO_UNSHARED_TESTS "AUTO" CACHE STRING "Use Linux network namespaces for tests that support --unshared. Values: AUTO, ON, OFF")
+set_property(CACHE SYSIO_UNSHARED_TESTS PROPERTY STRINGS AUTO ON OFF)
+string(TOUPPER "${SYSIO_UNSHARED_TESTS}" SYSIO_UNSHARED_TESTS)
+if(NOT SYSIO_UNSHARED_TESTS MATCHES "^(AUTO|ON|OFF)$")
+  message(FATAL_ERROR "SYSIO_UNSHARED_TESTS must be AUTO, ON, or OFF")
+endif()
+
+set(SYSIO_CAN_UNSHARE_TESTS FALSE)
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND NOT SYSIO_UNSHARED_TESTS STREQUAL "OFF")
+  set(SYSIO_UNSHARE_PROBE "${CMAKE_CURRENT_BINARY_DIR}/probe_unshared_tests.py")
+  file(WRITE "${SYSIO_UNSHARE_PROBE}" "
+import pathlib
+import sys
+import importlib.util
+
+libc_path = pathlib.Path(r'${CMAKE_CURRENT_SOURCE_DIR}') / 'TestHarness' / 'libc.py'
+spec = importlib.util.spec_from_file_location('sysio_test_libc', libc_path)
+libc = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(libc)
+
+libc.unshare(libc.CLONE_NEWNET)
+")
+  execute_process(
+    COMMAND python3 "${SYSIO_UNSHARE_PROBE}"
+    RESULT_VARIABLE SYSIO_UNSHARE_RESULT
+    OUTPUT_QUIET
+    ERROR_VARIABLE SYSIO_UNSHARE_ERROR
+  )
+  if(SYSIO_UNSHARE_RESULT EQUAL 0)
+    set(SYSIO_CAN_UNSHARE_TESTS TRUE)
+  endif()
+endif()
+
+if(SYSIO_UNSHARED_TESTS STREQUAL "ON" AND NOT SYSIO_CAN_UNSHARE_TESTS)
+  message(FATAL_ERROR "SYSIO_UNSHARED_TESTS=ON, but this host cannot create a user/network namespace: ${SYSIO_UNSHARE_ERROR}")
+endif()
+
+if(SYSIO_CAN_UNSHARE_TESTS)
+  message(STATUS "Using --unshared for tests that support network namespace isolation")
   set(UNSHARE "--unshared")
 else()
+  message(STATUS "Not using --unshared for tests; set SYSIO_UNSHARED_TESTS=ON to require it")
   set(UNSHARE "")
 endif()
 
