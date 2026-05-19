@@ -1,5 +1,4 @@
 #include <boost/test/unit_test.hpp>
-#include <sysio/chain/contract_table_objects.hpp>
 #include <sysio/chain/global_property_object.hpp>
 #include <sysio/chain/resource_limits.hpp>
 #include <sysio/chain/wast_to_wasm.hpp>

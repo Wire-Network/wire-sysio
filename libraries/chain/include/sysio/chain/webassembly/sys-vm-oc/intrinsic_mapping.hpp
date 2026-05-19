@@ -5,8 +5,9 @@
 #include <string_view>
 
 namespace sysio { namespace chain { namespace sysvmoc {
-//NEVER reorder or remove indexes; the PIC uses the indexes in this table as an offset in to a jump
-// table. Adding on the bottom is fine and requires no other updates elsewhere
+//Post-launch the PIC uses the indexes in this table as an offset into a jump table, so
+//indexes must NOT be reordered or removed once a network is live (cached compiled modules
+//embed the offsets). Pre-launch they may be renumbered freely.
 namespace detail {
    template <typename... Args>
    inline constexpr auto generate_table( Args&&... args ) {
@@ -24,49 +25,6 @@ inline constexpr auto get_intrinsic_table() {
       "sysvmoc_internal.depth_assert",
       "sysio_injection.call_depth_assert",  //now unused; left for purposes of not upsetting existing code mappings
       "sysio_injection.checktime",          //now unused; left for purposes of not upsetting existing code mappings
-      "env.__ashlti3",
-      "env.__ashrti3",
-      "env.__lshlti3",
-      "env.__lshrti3",
-      "env.__divti3",
-      "env.__udivti3",
-      "env.__modti3",
-      "env.__umodti3",
-      "env.__multi3",
-      "env.__addtf3",
-      "env.__subtf3",
-      "env.__multf3",
-      "env.__divtf3",
-      "env.__eqtf2",
-      "env.__netf2",
-      "env.__getf2",
-      "env.__gttf2",
-      "env.__lttf2",
-      "env.__letf2",
-      "env.__cmptf2",
-      "env.__unordtf2",
-      "env.__negtf2",
-      "env.__floatsitf",
-      "env.__floatunsitf",
-      "env.__floatditf",
-      "env.__floatunditf",
-      "env.__floattidf",
-      "env.__floatuntidf",
-      "env.__floatsidf",
-      "env.__extendsftf2",
-      "env.__extenddftf2",
-      "env.__fixtfti",
-      "env.__fixtfdi",
-      "env.__fixtfsi",
-      "env.__fixunstfti",
-      "env.__fixunstfdi",
-      "env.__fixunstfsi",
-      "env.__fixsfti",
-      "env.__fixdfti",
-      "env.__fixunssfti",
-      "env.__fixunsdfti",
-      "env.__trunctfdf2",
-      "env.__trunctfsf2",
       "env.is_feature_active",
       "env.activate_feature",
       "env.get_resource_limits",
@@ -79,66 +37,6 @@ inline constexpr auto get_intrinsic_table() {
       "env.set_privileged",
       "env.preactivate_feature",
       "env.get_active_producers",
-      "env.db_store_i64",
-      "env.db_update_i64",
-      "env.db_remove_i64",
-      "env.db_get_i64",
-      "env.db_next_i64",
-      "env.db_previous_i64",
-      "env.db_find_i64",
-      "env.db_lowerbound_i64",
-      "env.db_upperbound_i64",
-      "env.db_end_i64",
-      "env.db_idx64_store",
-      "env.db_idx64_remove",
-      "env.db_idx64_update",
-      "env.db_idx64_find_primary",
-      "env.db_idx64_find_secondary",
-      "env.db_idx64_lowerbound",
-      "env.db_idx64_upperbound",
-      "env.db_idx64_end",
-      "env.db_idx64_next",
-      "env.db_idx64_previous",
-      "env.db_idx128_store",
-      "env.db_idx128_remove",
-      "env.db_idx128_update",
-      "env.db_idx128_find_primary",
-      "env.db_idx128_find_secondary",
-      "env.db_idx128_lowerbound",
-      "env.db_idx128_upperbound",
-      "env.db_idx128_end",
-      "env.db_idx128_next",
-      "env.db_idx128_previous",
-      "env.db_idx_double_store",
-      "env.db_idx_double_remove",
-      "env.db_idx_double_update",
-      "env.db_idx_double_find_primary",
-      "env.db_idx_double_find_secondary",
-      "env.db_idx_double_lowerbound",
-      "env.db_idx_double_upperbound",
-      "env.db_idx_double_end",
-      "env.db_idx_double_next",
-      "env.db_idx_double_previous",
-      "env.db_idx_long_double_store",
-      "env.db_idx_long_double_remove",
-      "env.db_idx_long_double_update",
-      "env.db_idx_long_double_find_primary",
-      "env.db_idx_long_double_find_secondary",
-      "env.db_idx_long_double_lowerbound",
-      "env.db_idx_long_double_upperbound",
-      "env.db_idx_long_double_end",
-      "env.db_idx_long_double_next",
-      "env.db_idx_long_double_previous",
-      "env.db_idx256_store",
-      "env.db_idx256_remove",
-      "env.db_idx256_update",
-      "env.db_idx256_find_primary",
-      "env.db_idx256_find_secondary",
-      "env.db_idx256_lowerbound",
-      "env.db_idx256_upperbound",
-      "env.db_idx256_end",
-      "env.db_idx256_next",
-      "env.db_idx256_previous",
       "env.assert_recover_key",
       "env.recover_key",
       "env.assert_sha256",
@@ -278,7 +176,29 @@ inline constexpr auto get_intrinsic_table() {
       "env.get_ram_usage",
       "env.set_finalizers",
       "sysvmoc_internal.check_memcpy_params",
-      "env.get_permission_lower_bound"
+      "env.get_permission_lower_bound",
+      "env.kv_set",
+      "env.kv_get",
+      "env.kv_erase",
+      "env.kv_contains",
+      "env.kv_it_create",
+      "env.kv_it_destroy",
+      "env.kv_it_status",
+      "env.kv_it_next",
+      "env.kv_it_prev",
+      "env.kv_it_lower_bound",
+      "env.kv_it_key",
+      "env.kv_it_value",
+      "env.kv_idx_store",
+      "env.kv_idx_remove",
+      "env.kv_idx_update",
+      "env.kv_idx_find_secondary",
+      "env.kv_idx_lower_bound",
+      "env.kv_idx_next",
+      "env.kv_idx_prev",
+      "env.kv_idx_key",
+      "env.kv_idx_primary_key",
+      "env.kv_idx_destroy"
    );
 }
 inline constexpr std::size_t find_intrinsic_index(std::string_view hf) {
@@ -288,6 +208,19 @@ inline constexpr std::size_t find_intrinsic_index(std::string_view hf) {
          return i;
    return std::numeric_limits<std::size_t>::max();
 }
+
+// Compile-time guard wrapping find_intrinsic_index. Using require_intrinsic_index<find_intrinsic_index("env.foo")>
+// at a registration call site turns a missing entry in get_intrinsic_table() into a build error instead of a silent
+// SIZE_MAX that would otherwise flow through integral_constant<size_t, SIZE_MAX> as a legal constant expression and
+// produce a bogus jump-table ordinal at runtime. Ports AntelopeIO/leap#621 -- unblocked here because wire is on c++23.
+template<std::size_t Index>
+struct require_intrinsic_index {
+   static_assert(Index != std::numeric_limits<std::size_t>::max(),
+                 "OC intrinsic mapping missing -- the host function is REGISTER_*_HOST_FUNCTION'd but "
+                 "its \"env.<name>\" string is not in get_intrinsic_table() above. Add it to the table "
+                 "so sys-vm-oc can resolve the intrinsic at its fixed jump-table offset.");
+   static constexpr std::size_t value = Index;
+};
 
 inline constexpr std::size_t intrinsic_table_size() {
     return std::tuple_size<decltype(get_intrinsic_table())>::value;

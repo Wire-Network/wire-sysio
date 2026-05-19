@@ -119,20 +119,15 @@ public:
       BOOST_REQUIRE_EQUAL("", result);
    }
 
-   // Read a snaprecord from the chain database for a given block_num.
+   // Read a snaprecord from the given chain for a given block_num.
    // Uses ABI-based deserialization to avoid hard-coded byte offsets.
    // Returns true if found, and fills in on_chain_hash.
-   bool read_snap_record(const chainbase::database& db, uint32_t block_num, fc::sha256& on_chain_hash) {
-      const auto* t_id = db.find<table_id_object, by_code_scope_table>(
-         boost::make_tuple(config::system_account_name, config::system_account_name, "snaprecords"_n));
-      if (!t_id) return false;
-
-      const auto& kv_index = db.get_index<key_value_index, by_scope_primary>();
-      auto it = kv_index.find(boost::make_tuple(t_id->id, static_cast<uint64_t>(block_num)));
-      if (it == kv_index.end()) return false;
+   bool read_snap_record(const base_tester& t, uint32_t block_num, fc::sha256& on_chain_hash) {
+      vector<char> data = t.get_row_by_id(config::system_account_name, config::system_account_name,
+                                          "snaprecords"_n, static_cast<uint64_t>(block_num));
+      if (data.empty()) return false;
 
       // Deserialize via ABI to extract snapshot_hash field by name
-      vector<char> data(it->value.begin(), it->value.end());
       auto row_var = sys_abi_ser.binary_to_variant("snap_record", data,
                                                     abi_serializer::create_yield_function(abi_serializer_max_time));
       auto hash_bytes = row_var["snapshot_hash"].as<bytes>();
@@ -200,7 +195,7 @@ BOOST_FIXTURE_TEST_CASE(snapshot_hash_matches_attestation, snapshot_attest_fixtu
 
    // Read the attested record from chain state
    fc::sha256 on_chain_hash;
-   bool found = read_snap_record(control->db(), block_num, on_chain_hash);
+   bool found = read_snap_record(*this, block_num, on_chain_hash);
 
    BOOST_REQUIRE(found);
    BOOST_REQUIRE_EQUAL(hash_as_sha256.str(), on_chain_hash.str());
@@ -266,7 +261,7 @@ BOOST_FIXTURE_TEST_CASE(snapshot_hash_mismatch_detected, snapshot_attest_fixture
 
    // Read on-chain record
    fc::sha256 on_chain_hash;
-   bool found = read_snap_record(control->db(), block_num, on_chain_hash);
+   bool found = read_snap_record(*this, block_num, on_chain_hash);
    BOOST_REQUIRE(found);
 
    // Verify the on-chain hash does NOT match the real snapshot hash
@@ -297,7 +292,7 @@ BOOST_FIXTURE_TEST_CASE(snapshot_no_attestation_detected, snapshot_attest_fixtur
 
    // Try to read — should not find any record
    fc::sha256 on_chain_hash;
-   bool found = read_snap_record(control->db(), block_num, on_chain_hash);
+   bool found = read_snap_record(*this, block_num, on_chain_hash);
    BOOST_REQUIRE(!found);
 
 } FC_LOG_AND_RETHROW() }
@@ -332,7 +327,7 @@ BOOST_FIXTURE_TEST_CASE(attestation_survives_snapshot_load, snapshot_attest_fixt
 
    // Verify attestation exists
    fc::sha256 on_chain_hash;
-   BOOST_REQUIRE(read_snap_record(control->db(), pre_snap_block_num, on_chain_hash));
+   BOOST_REQUIRE(read_snap_record(*this, pre_snap_block_num, on_chain_hash));
    BOOST_REQUIRE_EQUAL(hash_as_sha256.str(), on_chain_hash.str());
 
    // Now take a NEW snapshot (which includes the attestation table data)
@@ -348,7 +343,7 @@ BOOST_FIXTURE_TEST_CASE(attestation_survives_snapshot_load, snapshot_attest_fixt
 
    // The attestation record should survive the snapshot round-trip
    fc::sha256 loaded_on_chain_hash;
-   bool found = read_snap_record(snap_chain.control->db(), pre_snap_block_num, loaded_on_chain_hash);
+   bool found = read_snap_record(snap_chain, pre_snap_block_num, loaded_on_chain_hash);
 
    BOOST_REQUIRE(found);
    BOOST_REQUIRE_EQUAL(hash_as_sha256.str(), loaded_on_chain_hash.str());

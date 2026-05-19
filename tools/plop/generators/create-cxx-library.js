@@ -37,7 +37,7 @@ function generator(plop) {
 						!input.startsWith("::") &&
 						!input.endsWith("::")
 				},
-				value: (answers) => answers.name
+				default: (answers) => `sysio::${answers.name}`
 
 			},
 			// {

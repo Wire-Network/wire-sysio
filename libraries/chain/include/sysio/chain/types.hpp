@@ -23,6 +23,7 @@
 #include <vector>
 #include <deque>
 #include <cstdint>
+#include <functional>
 
 #define OBJECT_CTOR1(NAME) \
     public: \
@@ -79,6 +80,158 @@ namespace sysio::chain {
    template<typename T>
    using deque = boost::container::deque< T, void, block_1024_option_t >;
 
+   // ── KV table_id computation ─────────────────────────────────────────────────
+   // DJB2 hash truncated to uint16_t. Must match CDT's compute_table_id
+   // in sysiolib/contracts/sysio/kv_constants.hpp.
+
+   /// DJB2 initial hash seed (canonical value from Daniel J. Bernstein's hash function).
+   inline constexpr uint64_t djbh_seed = 5381;
+
+   /// DJB2-hash a string.
+   inline constexpr uint64_t kv_djbh_hash(std::string_view s) {
+      uint64_t hash = djbh_seed;
+      for (char c : s)
+         // hash * 33 (2^5 + 1), then add byte
+         hash = ((hash << 5) + hash) + static_cast<uint8_t>(c);
+      return hash;
+   }
+
+   /// DJB2-hash the 8 big-endian bytes of a uint64_t, optionally continuing from an existing hash.
+   /// Gives good distribution regardless of input bit patterns (unlike raw % 65536
+   /// which maps most name::raw values to 0 due to MSB-packed encoding).
+   inline constexpr uint64_t kv_djbh_hash_raw(uint64_t raw, uint64_t hash = djbh_seed) {
+      for (int i = 0; i < 8; ++i)
+         // hash * 33 (2^5 + 1), then add byte
+         hash = ((hash << 5) + hash) + static_cast<uint8_t>(raw >> (56 - i * 8));
+      return hash;
+   }
+
+   /// Compute table_id from a string name (for test/tooling convenience).
+   /// Narrowing cast to uint16_t truncates to the low 16 bits (well-defined for unsigned).
+   inline constexpr uint16_t compute_table_id(std::string_view table_name) {
+      return static_cast<uint16_t>(kv_djbh_hash(table_name));
+   }
+
+   /// Compute table_id from a raw uint64_t template parameter (name::raw or hash_id::raw).
+   /// This is the canonical form used by CDT — matches CDT's compute_table_id(uint64_t).
+   inline constexpr uint16_t compute_table_id(uint64_t raw) {
+      return static_cast<uint16_t>(kv_djbh_hash_raw(raw));
+   }
+
+   /// Compute secondary index table_id from table + index raw uint64_t values.
+   /// Chains two 8-byte DJB2 passes: first the table bytes, then the index bytes.
+   inline constexpr uint16_t compute_sec_table_id(uint64_t table_raw, uint64_t index_raw) {
+      return static_cast<uint16_t>(kv_djbh_hash_raw(index_raw, kv_djbh_hash_raw(table_raw)));
+   }
+
+   /// Compute secondary index table_id for multi_index (positional indices).
+   inline constexpr uint16_t compute_mi_sec_table_id(uint64_t table_raw, uint8_t index_pos) {
+      return compute_sec_table_id(table_raw, static_cast<uint64_t>(index_pos) + 1);
+   }
+
+   // ── KV key encoding utilities ──────────────────────────────────────────────
+   // Used throughout chain, plugins, and tests for constructing KV keys.
+   // Legacy 24-byte layout: [table:8B BE][scope:8B BE][pk:8B BE]
+   // New layout (after CDT table_id update): [scope:8B BE][pk:8B BE] = 16B
+
+   /// Encode a uint64_t as 8 bytes big-endian into buf.
+   inline void kv_encode_be64(char* buf, uint64_t v) {
+      for (int i = 7; i >= 0; --i) { buf[i] = static_cast<char>(v & 0xFF); v >>= 8; }
+   }
+
+   /// Decode 8 bytes big-endian from buf into a uint64_t.
+   inline uint64_t kv_decode_be64(const char* buf) {
+      uint64_t v = 0;
+      for (int i = 0; i < 8; ++i) v = (v << 8) | static_cast<uint8_t>(buf[i]);
+      return v;
+   }
+
+   /// KV key component sizes (bytes) — parts first, then derived
+   inline constexpr size_t kv_pri_key_size       = sizeof(uint64_t); ///< [pk:8B]
+   inline constexpr size_t kv_scope_prefix_size  = sizeof(uint64_t); ///< [scope:8B BE]
+   inline constexpr size_t kv_scoped_key_size    = kv_scope_prefix_size + kv_pri_key_size; ///< [scope:8B][pk:8B] = 16B
+
+   // Legacy 24-byte key constants — used by chain_plugin until step 5 migration
+   inline constexpr size_t kv_table_prefix_size = sizeof(uint64_t); ///< legacy [table:8B]
+   inline constexpr size_t kv_prefix_size       = kv_table_prefix_size + kv_scope_prefix_size; ///< legacy [table:8B][scope:8B] = 16B
+   inline constexpr size_t kv_key_size          = kv_table_prefix_size + kv_scope_prefix_size + kv_pri_key_size; ///< legacy 24B
+
+   /// Build a 16-byte scoped KV key: [scope:8B BE][pk:8B BE]
+   struct kv_scoped_key_t {
+      static constexpr size_t size = kv_scoped_key_size;
+      char data[size];
+      std::string_view to_string_view() const { return {data, size}; }
+   };
+
+   inline kv_scoped_key_t make_kv_scoped_key(uint64_t scope, uint64_t pk) {
+      kv_scoped_key_t key;
+      kv_encode_be64(key.data,                         scope);
+      kv_encode_be64(key.data + kv_scope_prefix_size,  pk);
+      return key;
+   }
+
+   inline kv_scoped_key_t make_kv_scoped_key(name scope, uint64_t pk) {
+      return make_kv_scoped_key(scope.to_uint64_t(), pk);
+   }
+
+   /// Build a legacy 24-byte KV key: [table:8B BE][scope:8B BE][pk:8B BE]
+   struct kv_key_t {
+      static constexpr size_t size = kv_key_size;
+      char data[size];
+      std::string_view to_string_view() const { return {data, size}; }
+   };
+
+   inline kv_key_t make_kv_key(uint64_t table, uint64_t scope, uint64_t pk) {
+      kv_key_t key;
+      kv_encode_be64(key.data,                                               table);
+      kv_encode_be64(key.data + kv_table_prefix_size,                        scope);
+      kv_encode_be64(key.data + kv_table_prefix_size + kv_scope_prefix_size, pk);
+      return key;
+   }
+
+   inline kv_key_t make_kv_key(name table, name scope, uint64_t pk) {
+      return make_kv_key(table.to_uint64_t(), scope.to_uint64_t(), pk);
+   }
+
+   /// Build a 16-byte KV prefix: [table:8B BE][scope:8B BE]
+   struct kv_prefix_t {
+      static constexpr size_t size = kv_prefix_size;
+      char data[size];
+      std::string_view to_string_view() const { return {data, size}; }
+      /// True if kv starts with this prefix
+      bool matches(std::string_view kv) const { return kv.size() >= size && memcmp(kv.data(), data, size) == 0; }
+   };
+
+   inline kv_prefix_t make_kv_prefix(uint64_t table, uint64_t scope) {
+      kv_prefix_t prefix;
+      kv_encode_be64(prefix.data,     table);
+      kv_encode_be64(prefix.data + 8, scope);
+      return prefix;
+   }
+
+   inline kv_prefix_t make_kv_prefix(name table, name scope) {
+      return make_kv_prefix(table.to_uint64_t(), scope.to_uint64_t());
+   }
+
+   /// Build an 8-byte KV table prefix: [table:8B BE]
+   struct kv_table_prefix_t {
+      static constexpr size_t size = kv_table_prefix_size;
+      char data[size];
+      std::string_view to_string_view() const { return {data, size}; }
+      /// True if kv starts with this prefix
+      bool matches(std::string_view kv) const { return kv.size() >= size && memcmp(kv.data(), data, size) == 0; }
+   };
+
+   inline kv_table_prefix_t make_kv_table_prefix(uint64_t table) {
+      kv_table_prefix_t prefix;
+      kv_encode_be64(prefix.data, table);
+      return prefix;
+   }
+
+   inline kv_table_prefix_t make_kv_table_prefix(name table) {
+      return make_kv_table_prefix(table.to_uint64_t());
+   }
+
    struct void_t{};
 
    using chainbase::allocator;
@@ -129,8 +282,10 @@ namespace sysio::chain {
     * packed_object::type field from enum_type to uint16 to avoid
     * warnings when converting packed_objects to/from json.
     *
-    * UNUSED_ enums can be taken for new purposes but otherwise the offsets
-    * in this enumeration are potentially shared_memory breaking
+    * After launch, removing or reordering entries is a shared-memory
+    * breaking change. Add new types before OBJECT_TYPE_COUNT. To retire
+    * a type, rename it UNUSED_<name> and leave it in place as a
+    * placeholder so subsequent ordinals remain stable.
     */
    enum object_type
    {
@@ -138,45 +293,20 @@ namespace sysio::chain {
       account_object_type,
       account_metadata_object_type,
       permission_object_type,
-      permission_usage_object_type,
       permission_link_object_type,
-      UNUSED_action_code_object_type,
-      key_value_object_type,
-      index64_object_type,
-      index128_object_type,
-      index256_object_type,
-      index_double_object_type,
-      index_long_double_object_type,
       global_property_object_type,
       dynamic_global_property_object_type,
       block_summary_object_type,
-      transaction_object_type,
-      generated_transaction_object_type,
-      UNUSED_producer_object_type,
-      UNUSED_chain_property_object_type,
-      account_control_history_object_type,     ///< Defined by history_plugin
-      UNUSED_account_transaction_history_object_type,
-      UNUSED_transaction_history_object_type,
-      public_key_history_object_type,          ///< Defined by history_plugin
-      UNUSED_balance_object_type,
-      UNUSED_staked_balance_object_type,
-      UNUSED_producer_votes_object_type,
-      UNUSED_producer_schedule_object_type,
-      UNUSED_proxy_vote_object_type,
-      UNUSED_scope_sequence_object_type,
-      table_id_object_type,
       resource_object_type,
       resource_pending_object_type,
       resource_limits_state_object_type,
       resource_limits_config_object_type,
-      account_history_object_type,              ///< Defined by history_plugin
-      action_history_object_type,               ///< Defined by history_plugin
-      reversible_block_object_type,
       protocol_state_object_type,
-      UNUSED_account_ram_correction_object_type,
       code_object_type,
       database_header_object_type,
       contract_root_object_type,
+      kv_object_type,
+      kv_index_object_type,
       OBJECT_TYPE_COUNT ///< Sentry value which contains the number of different object types
    };
 
@@ -378,13 +508,30 @@ namespace sysio::chain {
    template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
    template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
 
-   // next_function is a function passed to an API (like send_transaction) and which is called at the end of
-   // the API processing on the main thread. The type T is a description of the API result that can be
+   // next_function is a function passed to an API (like send_transaction) and which is called at the end
+   // of the API processing on the main thread. The type T is a description of the API result that can be
    // serialized as output.
    // The function accepts a variant which can contain an exception_ptr (if an exception occured while
    // processing the API) or the result T.
    // The third option is a function which can be executed in a multithreaded context (likely on the
    // http_plugin thread pool) and which completes the API processing and returns the result T.
+   //
+   // The user-provided callable is held inside a std::move_only_function so consume-on-call captures
+   // (e.g. [cb = std::move(cb)] mutable {...}) work correctly. The outer wrapper is copyable via a
+   // shared_ptr indirection - required because the callback travels through paths that copy
+   // (boost::signals2 slot dispatch, boost::multi_index value storage, lambdas captured by [=],
+   // CATCH_AND_CALL fallbacks held alongside an async capture in the same scope). All copies share
+   // the same underlying callable; if the underlying lambda consumes its captures, calling through
+   // any copy after the first invocation reaches an exhausted state.
+   //
+   // Invocation contract (load-bearing):
+   //   * Exactly one invocation across the lifetime of all copies. Calling more than once -- whether
+   //     through one copy or across copies -- is undefined: the underlying move_only_function may
+   //     have already moved out its captures.
+   //   * Single-threaded invocation. operator() is declared const but mutates the shared
+   //     move_only_function; concurrent invocation across copies on different threads is a data race.
+   //     The bind_stream / chain_plugin response paths hand the callback off to one thread (typically
+   //     the http pool) where the single invocation runs; the producing thread must not also invoke.
    // -------------------------------------------------------------------------------------------------------
    template<typename T>
    using t_or_exception = std::variant<T, fc::exception_ptr>;
@@ -393,7 +540,34 @@ namespace sysio::chain {
    using next_function_variant = std::variant<fc::exception_ptr, T, std::function<t_or_exception<T>()>>;
 
    template<typename T>
-   using next_function = std::function<void(const next_function_variant<T>&)>;
+   class next_function {
+   public:
+      // Rvalue-ref signature lets the consuming closure move the payload out of the variant
+      // (`std::get<T>(std::move(v))`) instead of copying.  Lvalue callers must explicitly
+      // std::move; this is a deliberate compile-time forcing function rather than a silent
+      // copy at the by-value parameter boundary.
+      using element_type = std::move_only_function<void(next_function_variant<T>&&)>;
+
+      next_function() = default;
+      next_function(std::nullptr_t) noexcept {}
+
+      template<typename F>
+         requires (!std::is_same_v<std::decay_t<F>, next_function>)
+      next_function(F&& f)
+         : _f(std::make_shared<element_type>(std::forward<F>(f))) {}
+
+      void operator()(next_function_variant<T>&& v) const {
+         if (!_f || !*_f) [[unlikely]] {
+            throw std::bad_function_call();
+         }
+         (*_f)(std::move(v));
+      }
+
+      explicit operator bool() const noexcept { return _f && static_cast<bool>(*_f); }
+
+   private:
+      std::shared_ptr<element_type> _f;
+   };
 
    // to configure whether a process should be done asynchronously or not
    enum class async_t { no, yes };

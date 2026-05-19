@@ -4,6 +4,7 @@
 #include <sysio/chain/block_log.hpp>
 #include <sysio/chain/wast_to_wasm.hpp>
 #include <sysio/chain/sysio_contract.hpp>
+#include <sysio/chain/kv_table_objects.hpp>
 #include <sysio/testing/bls_utils.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/copy.hpp>
@@ -133,11 +134,6 @@ namespace sysio::testing {
          res( it->key(), it->value() );
       }
       return res;
-   }
-
-   void copy_row(const chain::key_value_object& obj, vector<char>& data) {
-      data.resize( obj.value.size() );
-      memcpy( data.data(), obj.value.data(), obj.value.size() );
    }
 
    protocol_feature_set make_protocol_feature_set(const subjective_restriction_map& custom_subjective_restrictions) {
@@ -1214,18 +1210,19 @@ namespace sysio::testing {
                                        const symbol&       asset_symbol,
                                        const account_name& account ) const {
       const auto& db  = control->db();
-      const auto* tbl = db.template find<table_id_object, by_code_scope_table>(boost::make_tuple(code, account, "accounts"_n));
       share_type result = 0;
 
-      // the balance is implied to be 0 if either the table or row does not exist
-      if (tbl) {
-         const auto *obj = db.template find<key_value_object, by_scope_primary>(boost::make_tuple(tbl->id, asset_symbol.to_symbol_code().value));
-         if (obj) {
-            //balance is the first field in the serialization
-            fc::datastream<const char *> ds(obj->value.data(), obj->value.size());
-            fc::raw::unpack(ds, result);
-         }
+      // KV storage: key = [scope(account):8B BE][pk(sym_code):8B BE], table_id from "accounts"
+      auto key = make_kv_scoped_key(account, asset_symbol.to_symbol_code().value);
+      auto table_id = compute_table_id("accounts"_n.to_uint64_t());
+
+      const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
+      auto kv_itr = kv_idx.find( boost::make_tuple( code, table_id, key.to_string_view() ) );
+      if ( kv_itr != kv_idx.end() ) {
+         fc::datastream<const char *> ds(kv_itr->value.data(), kv_itr->value.size());
+         fc::raw::unpack(ds, result);
       }
+
       return asset(result, asset_symbol);
    }
 
@@ -1236,21 +1233,35 @@ namespace sysio::testing {
    vector<char> base_tester::get_row_by_id( name code, name scope, name table, uint64_t id ) const {
       vector<char> data;
       const auto& db = control->db();
-      const auto* t_id = db.find<chain::table_id_object, chain::by_code_scope_table>( boost::make_tuple( code, scope, table ) );
-      if ( !t_id ) {
-         return data;
+      auto table_id = compute_table_id(table.to_uint64_t());
+      const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
+
+      // Try scoped key first: [scope:8B BE][pk:8B BE] (kv_multi_index / scoped_table)
+      {
+         auto key = make_kv_scoped_key(scope, id);
+         auto kv_itr = kv_idx.find( boost::make_tuple( code, table_id, key.to_string_view() ) );
+         if ( kv_itr != kv_idx.end() ) {
+            data.resize( kv_itr->value.size() );
+            if( !data.empty() )
+               memcpy( data.data(), kv_itr->value.data(), data.size() );
+            return data;
+         }
       }
-      //FC_ASSERT( t_id != 0, "object not found" );
 
-      const auto& idx = db.get_index<chain::key_value_index, chain::by_scope_primary>();
-
-      auto itr = idx.lower_bound( boost::make_tuple( t_id->id, id ) );
-      if ( itr == idx.end() || itr->t_id != t_id->id || id != itr->primary_key ) {
-         return data;
+      // Fall back to unscoped key: [pk:8B BE] (kv::table)
+      {
+         char key_buf[kv_pri_key_size];
+         kv_encode_be64(key_buf, id);
+         std::string_view key_sv(key_buf, kv_pri_key_size);
+         auto kv_itr = kv_idx.find( boost::make_tuple( code, table_id, key_sv ) );
+         if ( kv_itr != kv_idx.end() ) {
+            data.resize( kv_itr->value.size() );
+            if( !data.empty() )
+               memcpy( data.data(), kv_itr->value.data(), data.size() );
+            return data;
+         }
       }
 
-      data.resize( itr->value.size() );
-      memcpy( data.data(), itr->value.data(), data.size() );
       return data;
    }
 
@@ -1457,11 +1468,6 @@ namespace sysio::testing {
       // same as contracts/sysio.system/src/finalizer_key.cpp
       input.threshold = (names.size() * 2) / 3 + 1;
       return set_finalizers(input);
-   }
-
-   const table_id_object* base_tester::find_table( name code, name scope, name table ) {
-      auto tid = control->db().find<table_id_object, by_code_scope_table>(boost::make_tuple(code, scope, table));
-      return tid;
    }
 
    void base_tester::schedule_protocol_features_wo_preactivation(const vector<digest_type>& feature_digests) {

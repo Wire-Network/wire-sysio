@@ -126,9 +126,12 @@ struct random_access_file_context {
          do {
             if(offs == append_t) {
 #ifdef __linux__
-               wrote = pwritev2(fd, iov, i, 0, RWF_APPEND);   //linux *not* opened with O_APPEND, appending requires special flag
-               if(wrote == -1 && errno == EOPNOTSUPP)         //fallback for kernels before 4.16
-                  wrote = pwritev(fd, iov, i, size());
+               // linux is *not* opened with O_APPEND (O_APPEND breaks pwrite/pwritev on linux,
+               // see pwrite(2) BUGS). pwritev2 RWF_APPEND is unreliable on some container
+               // filesystems (e.g. overlayfs) where the flag is silently ignored and the write
+               // goes to offset 0 instead of EOF. Use pwritev at current file size which is
+               // safe for the documented single-threaded append usage.
+               wrote = pwritev(fd, iov, i, size());
 #else
                wrote = writev(fd, iov, i);                    //opened with O_APPEND, just write
 #endif

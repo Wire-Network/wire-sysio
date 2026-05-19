@@ -1,5 +1,6 @@
 #include "sysio.system_tester.hpp"
 
+#include <sysio/chain/kv_table_objects.hpp>
 #include <boost/test/unit_test.hpp>
 
 using namespace sysio_system;
@@ -42,24 +43,17 @@ struct finalizer_key_tester : sysio_system_tester {
    }
 
    std::vector<finalizer_auth_info> get_last_prop_finalizers_info() {
-      const auto* table_id_itr = control->db().find<sysio::chain::table_id_object, sysio::chain::by_code_scope_table>(
-         boost::make_tuple(config::system_account_name, config::system_account_name, "lastpropfins"_n));
-
-      if (!table_id_itr) {
+      // lastpropfins is kv::global — key is [Name:8B BE] where Name = "lastpropfins"_n
+      char key_buf[sysio::chain::kv_pri_key_size];
+      sysio::chain::kv_encode_be64(key_buf, "lastpropfins"_n.to_uint64_t());
+      std::string_view key_sv(key_buf, sysio::chain::kv_pri_key_size);
+      const auto& kv_idx = control->db().get_index<sysio::chain::kv_index, sysio::chain::by_code_key>();
+      auto it = kv_idx.find(boost::make_tuple(config::system_account_name, sysio::chain::compute_table_id("lastpropfins"_n.to_uint64_t()), key_sv));
+      if (it == kv_idx.end()) {
          return {};
       }
 
-      auto t_id = table_id_itr->id;
-      const auto& idx = control->db().get_index<sysio::chain::key_value_index, sysio::chain::by_scope_primary>();
-
-      if( idx.begin() == idx.end() ) {
-         return {};
-      }
-
-      vector<char> data;
-      auto itr = idx.lower_bound( boost::make_tuple( t_id, 0 ) );
-      data.resize( itr->value.size() );
-      memcpy( data.data(), itr->value.data(), data.size() );
+      vector<char> data(it->value.data(), it->value.data() + it->value.size());
       fc::variant fins_info = data.empty() ? fc::variant() : abi_ser.binary_to_variant( "last_prop_finalizers_info", data, abi_serializer::create_yield_function(abi_serializer_max_time) );
       std::vector<finalizer_auth_info> finalizers = fins_info["last_proposed_finalizers"].as<std::vector<finalizer_auth_info>>();
 

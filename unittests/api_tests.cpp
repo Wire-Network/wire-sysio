@@ -9,7 +9,7 @@
 #include <sysio/testing/tester.hpp>
 #include <sysio/chain/exceptions.hpp>
 #include <sysio/chain/account_object.hpp>
-#include <sysio/chain/contract_table_objects.hpp>
+#include <sysio/chain/kv_table_objects.hpp>
 #include <sysio/chain/block_summary_object.hpp>
 #include <sysio/chain/global_property_object.hpp>
 #include <sysio/chain/wasm_interface.hpp>
@@ -273,7 +273,10 @@ BOOST_FIXTURE_TEST_CASE(action_verification_tests, validating_tester) { try {
       trx.actions.push_back(act1);
       set_transaction_headers(trx);
       auto sigs = trx.sign(get_private_key("testapi"_n, "active"), control->get_chain_id());
-      BOOST_CHECK_EXCEPTION(push_transaction(trx), sysio::chain::irrelevant_auth_exception,
+      // validate_referenced_accounts enforces payer-at-position-0 earlier than
+      // authorization_manager::check_authorization, so we get transaction_exception
+      // (not irrelevant_auth_exception). This is the defense-in-depth path.
+      BOOST_CHECK_EXCEPTION(push_transaction(trx), sysio::chain::transaction_exception,
                             fc_exception_message_is("Explicit payer must be the first declared authorization"));
    }
    {
@@ -469,34 +472,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(require_notice_tests, T, validating_testers) { try
 
    } FC_LOG_AND_RETHROW() }
 
-BOOST_AUTO_TEST_CASE(ram_billing_in_notify_tests) { try {
-   fc::temp_directory tempdir;
-   validating_tester chain( tempdir, true );
-   chain.execute_setup_policy( setup_policy::preactivate_feature_and_new_bios );
-
-   chain.produce_block();
-   chain.create_account( "testapi"_n );
-   chain.create_account( "testapi2"_n );
-   chain.produce_block();
-   chain.set_code( "testapi"_n, test_contracts::test_api_wasm() );
-   chain.produce_block();
-   chain.set_code( "testapi2"_n, test_contracts::test_api_wasm() );
-   chain.produce_block();
-
-   // wire-sysio does not have protocol feature ram_restrictions, ram restrictions are enforced from genesis
-   BOOST_CHECK_EXCEPTION( CALL_TEST_FUNCTION( chain, "test_action", "test_ram_billing_in_notify",
-                                              fc::raw::pack( ((unsigned __int128)"testapi2"_n.to_uint64_t() << 64) | "testapi"_n.to_uint64_t() ) ),
-                          unauthorized_ram_usage_increase,
-                          fc_exception_message_is("unprivileged contract cannot increase RAM usage of another account within a notify context: testapi")
-   );
-
-
-   CALL_TEST_FUNCTION( chain, "test_action", "test_ram_billing_in_notify", fc::raw::pack( ((unsigned __int128)"testapi2"_n.to_uint64_t() << 64) | 0 ) );
-
-   CALL_TEST_FUNCTION( chain, "test_action", "test_ram_billing_in_notify", fc::raw::pack( ((unsigned __int128)"testapi2"_n.to_uint64_t() << 64) | "testapi2"_n.to_uint64_t() ) );
-
-   BOOST_REQUIRE_EQUAL( chain.validate(), true );
-} FC_LOG_AND_RETHROW() }
+// ram_billing_in_notify_tests removed: KV always bills RAM to the contract (receiver) account,
+// so the legacy payer-based RAM billing restrictions in notify contexts no longer apply.
+// The test_ram_billing_in_notify action uses legacy db_store_i64 which no longer exists.
 
 /*************************************************************************************
  * context free action tests
@@ -812,6 +790,21 @@ BOOST_AUTO_TEST_CASE(light_validation_skip_cfa) try {
 
 /*************************************************************************************
  * compiler_builtins_tests test case
+ *
+ * Exercises CDT librt's int128 compiler builtins through WASM execution. The
+ * test_api contract is built with --use-rt; test_compiler_builtins.cpp declares
+ * each intrinsic as plain extern "C" (no sysio_wasm_import) so calls resolve to
+ * the librt copy linked into the contract module. The host-side registrations
+ * for these intrinsics have been dropped -- the consensus surface is now
+ * "does the WASM containing librt execute identically across sys-vm,
+ * sys-vm-jit, and sys-vm-oc?", which this test exercises via the validating
+ * tester (each sub-test runs through every enabled runtime).
+ *
+ * Coverage replaces the deleted unittests/float128_builtin_tests.cpp (host
+ * direct-call tests) and the divmod_host_function_overflow_wast that used to
+ * import env.__divti3. New cases (test_divti3_overflow / test_modti3_overflow /
+ * test_shift_overflow) cover librt's UB guards: INT128_MIN/-1 wrap-around for
+ * div/mod, and shift-count >= 128 saturation for the shift builtins.
  *************************************************************************************/
 BOOST_AUTO_TEST_CASE(compiler_builtins_tests) try {
    validating_tester chain;
@@ -822,55 +815,114 @@ BOOST_AUTO_TEST_CASE(compiler_builtins_tests) try {
    chain.set_code( "testapi"_n, test_contracts::test_api_wasm() );
    chain.produce_blocks(1);
 
-   // test test_multi3
+   // Basic correctness across runtimes
    CALL_TEST_FUNCTION( chain, "test_compiler_builtins", "test_multi3", {});
-
-   // test test_divti3
    CALL_TEST_FUNCTION( chain, "test_compiler_builtins", "test_divti3", {});
-
-   // test test_divti3_by_0
-   BOOST_CHECK_EXCEPTION(CALL_TEST_FUNCTION( chain, "test_compiler_builtins", "test_divti3_by_0", {}), arithmetic_exception,
-         [](const fc::exception& e) {
-            return expect_assert_message(e, "divide by zero");
-         }
-      );
-
-   // test test_udivti3
    CALL_TEST_FUNCTION( chain, "test_compiler_builtins", "test_udivti3", {});
-
-   // test test_udivti3_by_0
-   BOOST_CHECK_EXCEPTION(CALL_TEST_FUNCTION( chain, "test_compiler_builtins", "test_udivti3_by_0", {}), arithmetic_exception,
-         [](const fc::exception& e) {
-            return expect_assert_message(e, "divide by zero");
-         }
-      );
-
-   // test test_modti3
    CALL_TEST_FUNCTION( chain, "test_compiler_builtins", "test_modti3", {});
-
-   // test test_modti3_by_0
-   BOOST_CHECK_EXCEPTION(CALL_TEST_FUNCTION( chain, "test_compiler_builtins", "test_modti3_by_0", {}), arithmetic_exception,
-         [](const fc::exception& e) {
-            return expect_assert_message(e, "divide by zero");
-         }
-      );
-
-   // test test_lshlti3
+   CALL_TEST_FUNCTION( chain, "test_compiler_builtins", "test_umodti3", {});
    CALL_TEST_FUNCTION( chain, "test_compiler_builtins", "test_lshlti3", {});
-
-   // test test_lshrti3
    CALL_TEST_FUNCTION( chain, "test_compiler_builtins", "test_lshrti3", {});
-
-   // test test_ashlti3
    CALL_TEST_FUNCTION( chain, "test_compiler_builtins", "test_ashlti3", {});
-
-   // test test_ashrti3
    CALL_TEST_FUNCTION( chain, "test_compiler_builtins", "test_ashrti3", {});
 
-   chain.produce_block();
-   chain.set_code( "testapi"_n, divmod_host_function_overflow_wast );
-   chain.produce_block();
-   CALL_TEST_FUNCTION( chain, "test_compiler_builtins", "", {}); //divmod_host_function_overflow_wast ignores action name
+   // Divide-by-zero: librt fires sysio_assert("divide by zero"), which surfaces
+   // as sysio_assert_message_exception (was arithmetic_exception with the host).
+   // CALL_TEST_FUNCTION is macro-based, so action names must be compile-time
+   // string literals -- inline each BOOST_CHECK_EXCEPTION rather than loop.
+   auto is_divzero_assert = [](const fc::exception& e) {
+      return expect_assert_message(e, "divide by zero");
+   };
+   BOOST_CHECK_EXCEPTION(
+      CALL_TEST_FUNCTION(chain, "test_compiler_builtins", "test_divti3_by_0", {}),
+      sysio_assert_message_exception, is_divzero_assert);
+   BOOST_CHECK_EXCEPTION(
+      CALL_TEST_FUNCTION(chain, "test_compiler_builtins", "test_udivti3_by_0", {}),
+      sysio_assert_message_exception, is_divzero_assert);
+   BOOST_CHECK_EXCEPTION(
+      CALL_TEST_FUNCTION(chain, "test_compiler_builtins", "test_modti3_by_0", {}),
+      sysio_assert_message_exception, is_divzero_assert);
+   BOOST_CHECK_EXCEPTION(
+      CALL_TEST_FUNCTION(chain, "test_compiler_builtins", "test_umodti3_by_0", {}),
+      sysio_assert_message_exception, is_divzero_assert);
+
+   // INT128_MIN/-1 wrap and shift-count >= 128 saturation -- the deterministic
+   // edges that librt's UB guards pin down. Each contract action self-asserts
+   // the expected result; failure surfaces as sysio_assert_message_exception.
+   CALL_TEST_FUNCTION( chain, "test_compiler_builtins", "test_divti3_overflow", {});
+   CALL_TEST_FUNCTION( chain, "test_compiler_builtins", "test_modti3_overflow", {});
+   CALL_TEST_FUNCTION( chain, "test_compiler_builtins", "test_shift_overflow", {});
+
+   BOOST_REQUIRE_EQUAL( chain.validate(), true );
+} FC_LOG_AND_RETHROW()
+
+
+/*************************************************************************************
+ * f128_builtins_tests test case
+ *
+ * Exercises CDT libsf (softfloat) ops through WASM execution. test_api is built
+ * with --use-rt; test_f128_builtins.cpp declares each entry point as plain
+ * extern "C" so calls resolve to the libsf copy linked into the contract module.
+ * Replaces the deleted unittests/float128_builtin_tests.cpp host-direct-call
+ * golden-value suite -- same operations, same golden bit patterns, exercised
+ * through the WASM runtimes that matter for consensus.
+ *************************************************************************************/
+BOOST_AUTO_TEST_CASE(f128_builtins_tests) try {
+   validating_tester chain;
+
+   chain.produce_blocks(2);
+   chain.create_account( "testapi"_n );
+   chain.produce_blocks(10);
+   chain.set_code( "testapi"_n, test_contracts::test_api_wasm() );
+   chain.produce_blocks(1);
+
+   // Arithmetic
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_addtf3", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_subtf3", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_multf3", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_divtf3", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_negtf2", {});
+
+   // Conversions: extend / truncate
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_extendsftf2", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_extenddftf2", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_trunctfdf2", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_trunctfsf2", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_float_f128_roundtrip", {});
+
+   // f128 -> int
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_fixtfsi", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_fixtfdi", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_fixtfti", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_fixunstfsi", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_fixunstfdi", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_fixunstfti", {});
+
+   // f32/f64 -> int128
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_fixsfti", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_fixdfti", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_fixunssfti", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_fixunsdfti", {});
+
+   // int -> f64 / f128
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_floatsidf", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_floatsitf", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_floatditf", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_floatunsitf", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_floatunditf", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_floattidf", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_floatuntidf", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_int_f128_roundtrip", {});
+
+   // Comparisons
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_eqtf2", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_netf2", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_getf2", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_gttf2", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_letf2", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_lttf2", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_cmptf2", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_unordtf2", {});
 
    BOOST_REQUIRE_EQUAL( chain.validate(), true );
 } FC_LOG_AND_RETHROW()
@@ -1149,255 +1201,16 @@ BOOST_FIXTURE_TEST_CASE(test_get_ram_usage, validating_tester) { try {
    BOOST_REQUIRE_EQUAL( validate(), true );
 } FC_LOG_AND_RETHROW() }
 
-/*************************************************************************************
- * db_tests test case
- *************************************************************************************/
-BOOST_AUTO_TEST_CASE_TEMPLATE(db_tests, T, validating_testers) { try {
-   T chain;
+// db_tests removed: legacy db_*_i64 intrinsics no longer exist.
+// KV database coverage is provided by kv_api_tests.
 
-   chain.produce_block();
-   chain.create_account( "testapi"_n );
-   chain.create_account( "testapi2"_n );
-   chain.produce_block();
-   chain.set_code( "testapi"_n, test_contracts::test_api_db_wasm() );
-   chain.set_abi(  "testapi"_n, test_contracts::test_api_db_abi() );
-   chain.set_code( "testapi2"_n, test_contracts::test_api_db_wasm() );
-   chain.set_abi(  "testapi2"_n, test_contracts::test_api_db_abi() );
-   chain.produce_block();
+// db_notify_tests removed: legacy db_*_i64 intrinsics no longer exist.
+// KV notification semantics are tested elsewhere.
 
-   chain.push_action( "testapi"_n, "pg"_n,  "testapi"_n, mutable_variant_object() ); // primary_i64_general
-   chain.push_action( "testapi"_n, "pl"_n,  "testapi"_n, mutable_variant_object() ); // primary_i64_lowerbound
-   chain.push_action( "testapi"_n, "pu"_n,  "testapi"_n, mutable_variant_object() ); // primary_i64_upperbound
-   chain.push_action( "testapi"_n, "s1g"_n, "testapi"_n, mutable_variant_object() ); // idx64_general
-   chain.push_action( "testapi"_n, "s1l"_n, "testapi"_n, mutable_variant_object() ); // idx64_lowerbound
-   chain.push_action( "testapi"_n, "s1u"_n, "testapi"_n, mutable_variant_object() ); // idx64_upperbound
+// Legacy db_tests, multi_index_tests, find_secondary_key, test_invalid_access removed.
+// KV equivalents provided by kv_api_tests (77 test cases covering all 24 KV intrinsics,
+// multi_index API, secondary indices, kv::raw_table, kv::table, and begin_all_scopes).
 
-   chain.push_action( "testapi"_n, "s2g"_n, "testapi"_n, mutable_variant_object() ); // idx128_general
-   chain.push_action( "testapi"_n, "s2l"_n, "testapi"_n, mutable_variant_object() ); // idx128_lowerbound
-   chain.push_action( "testapi"_n, "s2u"_n, "testapi"_n, mutable_variant_object() ); // idx128_upperbound
-
-   chain.push_action( "testapi"_n, "s3g"_n, "testapi"_n, mutable_variant_object() ); // idx256_general
-   chain.push_action( "testapi"_n, "s3l"_n, "testapi"_n, mutable_variant_object() ); // idx256_lowerbound
-   chain.push_action( "testapi"_n, "s3u"_n, "testapi"_n, mutable_variant_object() ); // idx256_upperbound
-
-   chain.push_action( "testapi"_n, "s4g"_n, "testapi"_n, mutable_variant_object() ); // idx_double_general
-   chain.push_action( "testapi"_n, "s4l"_n, "testapi"_n, mutable_variant_object() ); // idx_double_lowerbound
-   chain.push_action( "testapi"_n, "s4u"_n, "testapi"_n, mutable_variant_object() ); // idx_double_upperbound
-
-   chain.push_action( "testapi"_n, "s5g"_n, "testapi"_n, mutable_variant_object() ); // idx_long_double_general
-   chain.push_action( "testapi"_n, "s5l"_n, "testapi"_n, mutable_variant_object() ); // idx_long_double_lowerbound
-   chain.push_action( "testapi"_n, "s5u"_n, "testapi"_n, mutable_variant_object() ); // idx_long_double_upperbound
-
-   // Action I/O: verify action_data_size, read_action_data, current_receiver
-   chain.push_action( "testapi"_n, "actsize"_n, "testapi"_n, mutable_variant_object()("val", 42) );
-   chain.push_action( "testapi"_n, "actread"_n, "testapi"_n, mutable_variant_object()("val", 0xDEADBEEFCAFEBABEULL) );
-   chain.push_action( "testapi"_n, "actrecv"_n, "testapi"_n, mutable_variant_object() );
-
-   // Transaction metadata: verify transaction_size, expiration, tapos, read_transaction
-   chain.push_action( "testapi"_n, "trxsize"_n, "testapi"_n, mutable_variant_object() );
-   chain.push_action( "testapi"_n, "trxexp"_n,  "testapi"_n, mutable_variant_object() );
-   chain.push_action( "testapi"_n, "trxtapos"_n,"testapi"_n, mutable_variant_object() );
-   chain.push_action( "testapi"_n, "trxread"_n, "testapi"_n, mutable_variant_object() );
-
-   // Store value in primary table
-   chain.push_action( "testapi"_n, "tia"_n, "testapi"_n, mutable_variant_object() // test_invalid_access
-      ("code", "testapi")
-      ("val", 10)
-      ("index", 0)
-      ("store", true)
-   );
-
-   // Attempt to change the value stored in the primary table under the code of "testapi"_n
-   BOOST_CHECK_EXCEPTION( chain.push_action( "testapi2"_n, "tia"_n, "testapi2"_n, mutable_variant_object()
-                              ("code", "testapi")
-                              ("val", "20")
-                              ("index", 0)
-                              ("store", true)
-                           ), table_access_violation,
-                           fc_exception_message_is("db access violation")
-   );
-
-   // Verify that the value has not changed.
-   chain.push_action( "testapi"_n, "tia"_n, "testapi"_n, mutable_variant_object()
-      ("code", "testapi")
-      ("val", 10)
-      ("index", 0)
-      ("store", false)
-   );
-
-   // Store value in secondary table
-   chain.push_action( "testapi"_n, "tia"_n, "testapi"_n, mutable_variant_object() // test_invalid_access
-      ("code", "testapi")
-      ("val", 10)
-      ("index", 1)
-      ("store", true)
-   );
-
-   // Attempt to change the value stored in the secondary table under the code of "testapi"_n
-   BOOST_CHECK_EXCEPTION( chain.push_action( "testapi2"_n, "tia"_n, "testapi2"_n, mutable_variant_object()
-                              ("code", "testapi")
-                              ("val", "20")
-                              ("index", 1)
-                              ("store", true)
-                           ), table_access_violation,
-                           fc_exception_message_is("db access violation")
-   );
-
-   // Verify that the value has not changed.
-   chain.push_action( "testapi"_n, "tia"_n, "testapi"_n, mutable_variant_object()
-      ("code", "testapi")
-      ("val", 10)
-      ("index", 1)
-      ("store", false)
-   );
-
-   // idx_double_nan_create_fail
-   BOOST_CHECK_EXCEPTION(  chain.push_action( "testapi"_n, "sdnancreate"_n, "testapi"_n, mutable_variant_object() ),
-                           transaction_exception,
-                           fc_exception_message_is("NaN is not an allowed value for a secondary key")
-   );
-
-   // idx_double_nan_modify_fail
-   BOOST_CHECK_EXCEPTION(  chain.push_action( "testapi"_n, "sdnanmodify"_n, "testapi"_n, mutable_variant_object() ),
-                           transaction_exception,
-                           fc_exception_message_is("NaN is not an allowed value for a secondary key")
-   );
-
-   // idx_double_nan_lookup_fail
-   BOOST_CHECK_EXCEPTION(  chain.push_action( "testapi"_n, "sdnanlookup"_n, "testapi"_n, mutable_variant_object()
-                              ("lookup_type", 0) // 0 for find
-                           ), transaction_exception,
-                           fc_exception_message_is("NaN is not an allowed value for a secondary key")
-   );
-
-   BOOST_CHECK_EXCEPTION(  chain.push_action( "testapi"_n, "sdnanlookup"_n, "testapi"_n, mutable_variant_object()
-                              ("lookup_type", 1) // 1 for lower bound
-                           ), transaction_exception,
-                           fc_exception_message_is("NaN is not an allowed value for a secondary key")
-   );
-
-   BOOST_CHECK_EXCEPTION(  chain.push_action( "testapi"_n, "sdnanlookup"_n, "testapi"_n, mutable_variant_object()
-                              ("lookup_type", 2) // 2 for upper bound
-                           ), transaction_exception,
-                           fc_exception_message_is("NaN is not an allowed value for a secondary key")
-   );
-
-   chain.push_action( "testapi"_n, "sk32align"_n, "testapi"_n, mutable_variant_object() ); // misaligned_secondary_key256_tests
-
-   BOOST_REQUIRE_EQUAL( chain.validate(), true );
-} FC_LOG_AND_RETHROW() }
-
-// The multi_index iterator cache is preserved across notifications for the same action.
-BOOST_AUTO_TEST_CASE_TEMPLATE(db_notify_tests, T, validating_testers) {
-   T chain;
-
-   chain.create_accounts( {"notifier"_n,"notified"_n } );
-   const char notifier[] = R"=====(
-(module
- (func $db_store_i64 (import "env" "db_store_i64") (param i64 i64 i64 i64 i32 i32) (result i32))
- (func $db_find_i64 (import "env" "db_find_i64") (param i64 i64 i64 i64) (result i32))
- (func $db_idx64_store (import "env" "db_idx64_store") (param i64 i64 i64 i64 i32) (result i32))
- (func $db_idx64_find_primary (import "env" "db_idx64_find_primary") (param i64 i64 i64 i32 i64) (result i32))
- (func $db_idx128_store (import "env" "db_idx128_store") (param i64 i64 i64 i64 i32) (result i32))
- (func $db_idx128_find_primary (import "env" "db_idx128_find_primary") (param i64 i64 i64 i32 i64) (result i32))
- (func $db_idx256_store (import "env" "db_idx256_store") (param i64 i64 i64 i64 i32 i32) (result i32))
- (func $db_idx256_find_primary (import "env" "db_idx256_find_primary") (param i64 i64 i64 i32 i32 i64) (result i32))
- (func $db_idx_double_store (import "env" "db_idx_double_store") (param i64 i64 i64 i64 i32) (result i32))
- (func $db_idx_double_find_primary (import "env" "db_idx_double_find_primary") (param i64 i64 i64 i32 i64) (result i32))
- (func $db_idx_long_double_store (import "env" "db_idx_long_double_store") (param i64 i64 i64 i64 i32) (result i32))
- (func $db_idx_long_double_find_primary (import "env" "db_idx_long_double_find_primary") (param i64 i64 i64 i32 i64) (result i32))
- (func $sysio_assert (import "env" "sysio_assert") (param i32 i32))
- (func $require_recipient (import "env" "require_recipient") (param i64))
- (memory 1)
- (func (export "apply") (param i64 i64 i64)
-  (local i32)
-  (set_local 3 (i64.ne (get_local 0) (get_local 1)))
-  (if (get_local 3) (then (i32.store8 (i32.const 7) (i32.const 100))))
-  (drop (call $db_store_i64 (i64.const 0) (i64.const 0) (get_local 0) (i64.const 0) (i32.const 0) (i32.const 0)))
-  (drop (call $db_idx64_store (i64.const 0) (i64.const 0) (get_local 0) (i64.const 0) (i32.const 256)))
-  (drop (call $db_idx128_store (i64.const 0) (i64.const 0) (get_local 0) (i64.const 0) (i32.const 256)))
-  (drop (call $db_idx256_store (i64.const 0) (i64.const 0) (get_local 0) (i64.const 0) (i32.const 256) (i32.const 2)))
-  (drop (call $db_idx_double_store (i64.const 0) (i64.const 0) (get_local 0) (i64.const 0) (i32.const 256)))
-  (drop (call $db_idx_long_double_store (i64.const 0) (i64.const 0) (get_local 0) (i64.const 0) (i32.const 256)))
-  (call $sysio_assert (i32.eq (call $db_find_i64 (get_local 0) (i64.const 0) (i64.const 0) (i64.const 0) ) (get_local 3)) (i32.const 0))
-  (call $sysio_assert (i32.eq (call $db_idx64_find_primary (get_local 0) (i64.const 0) (i64.const 0) (i32.const 256) (i64.const 0)) (get_local 3)) (i32.const 32))
-  (call $sysio_assert (i32.eq (call $db_idx128_find_primary (get_local 0) (i64.const 0) (i64.const 0) (i32.const 256) (i64.const 0)) (get_local 3)) (i32.const 64))
-  (call $sysio_assert (i32.eq (call $db_idx256_find_primary (get_local 0) (i64.const 0) (i64.const 0) (i32.const 256) (i32.const 2) (i64.const 0)) (get_local 3)) (i32.const 96))
-  (call $sysio_assert (i32.eq (call $db_idx_double_find_primary (get_local 0) (i64.const 0) (i64.const 0) (i32.const 256) (i64.const 0)) (get_local 3)) (i32.const 128))
-  (call $sysio_assert (i32.eq (call $db_idx_long_double_find_primary (get_local 0) (i64.const 0) (i64.const 0) (i32.const 256) (i64.const 0)) (get_local 3)) (i32.const 160))
-  (call $require_recipient (i64.const 11327368596746665984))
- )
- (data (i32.const 0) "notifier: primary")
- (data (i32.const 32) "notifier: idx64")
- (data (i32.const 64) "notifier: idx128")
- (data (i32.const 96) "notifier: idx256")
- (data (i32.const 128) "notifier: idx_double")
- (data (i32.const 160) "notifier: idx_long_double")
-)
-)=====";
-   chain.set_code("notifier"_n, notifier );
-   chain.set_code("notified"_n, notifier );
-
-   BOOST_TEST_REQUIRE(chain.push_action( action({},"notifier"_n, name(), {}),"notifier"_n.to_uint64_t() ) == "");
-}
-
-/*************************************************************************************
- * multi_index_tests test case
- *************************************************************************************/
-BOOST_AUTO_TEST_CASE_TEMPLATE(multi_index_tests, T, validating_testers) { try {
-   T chain;
-
-   chain.produce_block();
-   chain.create_account( "testapi"_n );
-   chain.produce_block();
-   chain.set_code( "testapi"_n, test_contracts::test_api_multi_index_wasm() );
-   chain.set_abi( "testapi"_n, test_contracts::test_api_multi_index_abi() );
-   chain.produce_block();
-
-   auto check_failure = [&chain]( action_name a, const char* expected_error_msg ) {
-      BOOST_CHECK_EXCEPTION(  chain.push_action( "testapi"_n, a, "testapi"_n, {} ),
-                              sysio_assert_message_exception,
-                              sysio_assert_message_is( expected_error_msg )
-      );
-   };
-
-   chain.push_action( "testapi"_n, "s1g"_n,  "testapi"_n, {} );        // idx64_general
-   chain.push_action( "testapi"_n, "s1store"_n,  "testapi"_n, {} );    // idx64_store_only
-   chain.push_action( "testapi"_n, "s1check"_n,  "testapi"_n, {} );    // idx64_check_without_storing
-   chain.push_action( "testapi"_n, "s2g"_n,  "testapi"_n, {} );        // idx128_general
-   chain.push_action( "testapi"_n, "s2store"_n,  "testapi"_n, {} );    // idx128_store_only
-   chain.push_action( "testapi"_n, "s2check"_n,  "testapi"_n, {} );    // idx128_check_without_storing
-   chain.push_action( "testapi"_n, "s2autoinc"_n,  "testapi"_n, {} );  // idx128_autoincrement_test
-   chain.push_action( "testapi"_n, "s2autoinc1"_n,  "testapi"_n, {} ); // idx128_autoincrement_test_part1
-   chain.push_action( "testapi"_n, "s2autoinc2"_n,  "testapi"_n, {} ); // idx128_autoincrement_test_part2
-   chain.push_action( "testapi"_n, "s3g"_n,  "testapi"_n, {} );        // idx256_general
-   chain.push_action( "testapi"_n, "sdg"_n,  "testapi"_n, {} );        // idx_double_general
-   chain.push_action( "testapi"_n, "sldg"_n,  "testapi"_n, {} );       // idx_long_double_general
-
-   check_failure( "s1pkend"_n, "cannot increment end iterator" ); // idx64_pk_iterator_exceed_end
-   check_failure( "s1skend"_n, "cannot increment end iterator" ); // idx64_sk_iterator_exceed_end
-   check_failure( "s1pkbegin"_n, "cannot decrement iterator at beginning of table" ); // idx64_pk_iterator_exceed_begin
-   check_failure( "s1skbegin"_n, "cannot decrement iterator at beginning of index" ); // idx64_sk_iterator_exceed_begin
-   check_failure( "s1pkref"_n, "object passed to iterator_to is not in multi_index" ); // idx64_pass_pk_ref_to_other_table
-   check_failure( "s1skref"_n, "object passed to iterator_to is not in multi_index" ); // idx64_pass_sk_ref_to_other_table
-   check_failure( "s1pkitrto"_n, "object passed to iterator_to is not in multi_index" ); // idx64_pass_pk_end_itr_to_iterator_to
-   check_failure( "s1pkmodify"_n, "cannot pass end iterator to modify" ); // idx64_pass_pk_end_itr_to_modify
-   check_failure( "s1pkerase"_n, "cannot pass end iterator to erase" ); // idx64_pass_pk_end_itr_to_erase
-   check_failure( "s1skitrto"_n, "object passed to iterator_to is not in multi_index" ); // idx64_pass_sk_end_itr_to_iterator_to
-   check_failure( "s1skmodify"_n, "cannot pass end iterator to modify" ); // idx64_pass_sk_end_itr_to_modify
-   check_failure( "s1skerase"_n, "cannot pass end iterator to erase" ); // idx64_pass_sk_end_itr_to_erase
-   check_failure( "s1modpk"_n, "updater cannot change primary key when modifying an object" ); // idx64_modify_primary_key
-   check_failure( "s1exhaustpk"_n, "next primary key in table is at autoincrement limit" ); // idx64_run_out_of_avl_pk
-   check_failure( "s1findfail1"_n, "unable to find key" ); // idx64_require_find_fail
-   check_failure( "s1findfail2"_n, "unable to find primary key in require_find" );// idx64_require_find_fail_with_msg
-   check_failure( "s1findfail3"_n, "unable to find secondary key" ); // idx64_require_find_sk_fail
-   check_failure( "s1findfail4"_n, "unable to find sec key" ); // idx64_require_find_sk_fail_with_msg
-
-   chain.push_action( "testapi"_n, "s1skcache"_n,  "testapi"_n, {} ); // idx64_sk_cache_pk_lookup
-   chain.push_action( "testapi"_n, "s1pkcache"_n,  "testapi"_n, {} ); // idx64_pk_cache_sk_lookup
-
-   BOOST_REQUIRE_EQUAL( chain.validate(), true );
-} FC_LOG_AND_RETHROW() }
 
 /*************************************************************************************
  * crypto_tests test cases
@@ -1839,14 +1652,12 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(permission_tests, T, validating_testers) { try {
 
    auto get_result_int64 = [&]() -> int64_t {
       const auto& db = chain.control->db();
-      const auto* t_id = db.template find<table_id_object, by_code_scope_table>(boost::make_tuple("testapi"_n, "testapi"_n, "testapi"_n));
+      const auto& idx = db.template get_index<kv_index, by_code_key>();
 
-      FC_ASSERT(t_id != 0, "Table id not found");
-
-      const auto& idx = db.template get_index<key_value_index, by_scope_primary>();
-
-      auto itr = idx.lower_bound(boost::make_tuple(t_id->id));
-      FC_ASSERT( itr != idx.end() && itr->t_id == t_id->id, "lower_bound failed");
+      // The test contract stores its result under its own code with a fixed key.
+      // Use lower_bound on the contract's code to find its first (and only) KV row.
+      auto itr = idx.lower_bound(boost::make_tuple("testapi"_n, uint16_t(0)));
+      FC_ASSERT( itr != idx.end() && itr->code == "testapi"_n, "KV row not found for testapi");
 
       FC_ASSERT( 0 != itr->value.size(), "unexpected result size");
       return *reinterpret_cast<const int64_t *>(itr->value.data());
@@ -2755,8 +2566,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( action_results_tests, T, validating_testers ) { t
 
       auto &atrace = res->action_traces;
       BOOST_REQUIRE_EQUAL( atrace[0].receipt.has_value(), true );
-      BOOST_REQUIRE_EQUAL( atrace[0].return_value.size(), 256 );
-      vector<char> expected_vec(256 - 2, '0');//2 bytes for size of type unsigned_int
+      BOOST_REQUIRE_EQUAL( atrace[0].return_value.size(), 1024 );
+      vector<char> expected_vec(1024 - 2, '0');//2 bytes for size of type unsigned_int
       vector<char> ret_vec = fc::raw::unpack<vector<char>>(atrace[0].return_value);
 
       BOOST_REQUIRE_EQUAL_COLLECTIONS( ret_vec.begin(),
@@ -2949,15 +2760,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( small_const_memcpy_oob_tests, T, validating_teste
 
 } FC_LOG_AND_RETHROW() }
 
-//test that find_secondary_key behaves like lowerbound
-BOOST_AUTO_TEST_CASE_TEMPLATE( find_seconary_key, T, validating_testers ) {
-   try {
-      T t;
-      t.create_account("secfind"_n);
-      t.set_code("secfind"_n, sysio::testing::test_contracts::db_find_secondary_test_wasm());
-      t.set_abi("secfind"_n, sysio::testing::test_contracts::db_find_secondary_test_abi());
-      t.push_action("secfind"_n, "doit"_n, "secfind"_n, variant_object());
-   } FC_LOG_AND_RETHROW()
-}
+// find_seconary_key removed: db_find_secondary_test contract used legacy db_*_i64 intrinsics.
 
 BOOST_AUTO_TEST_SUITE_END()

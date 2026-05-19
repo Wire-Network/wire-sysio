@@ -192,6 +192,52 @@ BOOST_AUTO_TEST_CASE(test_em_alt) try {
    BOOST_CHECK_EQUAL(key.to_string({}, true), test_private_key2.to_string({}, true));
 } FC_LOG_AND_RETHROW();
 
+BOOST_AUTO_TEST_CASE(test_em_compressed_prefix_roundtrip) try {
+   // Parsing a compressed (33-byte) secp256k1 public key from hex must preserve
+   // the SEC1 prefix byte (0x02 = even y, 0x03 = odd y). Normalizing 0x03 to
+   // 0x02 silently flips to the wrong curve point and breaks Ethereum address
+   // derivation / signature verification for roughly half of all keys.
+   bool saw_02 = false;
+   bool saw_03 = false;
+   for (int i = 0; i < 80 && (!saw_02 || !saw_03); ++i) {
+      auto priv = private_key::generate(private_key::key_type::em);
+      auto pub  = priv.get_public_key();
+      const auto& compressed = pub.get<em::public_key_shim>()._data;
+      const uint8_t prefix = static_cast<uint8_t>(compressed[0]);
+      BOOST_TEST((prefix == 0x02 || prefix == 0x03));
+
+      const std::string compressed_hex = fc::to_hex(compressed, true); // "0x" + 66 hex chars
+      BOOST_CHECK_EQUAL(compressed_hex.size(), 68u);
+
+      auto parsed = public_key::from_string(compressed_hex, public_key::key_type::em);
+      const auto& parsed_bytes = parsed.get<em::public_key_shim>()._data;
+
+      BOOST_CHECK_EQUAL(static_cast<unsigned>(static_cast<uint8_t>(parsed_bytes[0])),
+                        static_cast<unsigned>(prefix));
+      BOOST_CHECK(std::equal(compressed.begin(), compressed.end(), parsed_bytes.begin()));
+
+      if (prefix == 0x02) saw_02 = true;
+      if (prefix == 0x03) saw_03 = true;
+   }
+   BOOST_CHECK_MESSAGE(saw_02, "did not sample any 0x02-prefix EM key in 80 iterations");
+   BOOST_CHECK_MESSAGE(saw_03, "did not sample any 0x03-prefix EM key in 80 iterations");
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(test_em_rejects_bare_x_hex) try {
+   // Bare 32-byte x-coordinate (64 hex chars) does not carry y-parity and
+   // cannot identify a unique curve point, so it must be rejected rather
+   // than silently defaulted to even y.
+   auto priv = private_key::generate(private_key::key_type::em);
+   auto pub  = priv.get_public_key();
+   const auto& compressed = pub.get<em::public_key_shim>()._data;
+   const std::string bare_x_hex =
+      std::string("0x") + fc::to_hex(compressed.data() + 1, compressed.size() - 1);
+   BOOST_CHECK_EQUAL(bare_x_hex.size(), 66u); // "0x" + 64 hex chars
+
+   BOOST_CHECK_THROW(public_key::from_string(bare_x_hex, public_key::key_type::em),
+                     fc::exception);
+} FC_LOG_AND_RETHROW();
+
 BOOST_AUTO_TEST_CASE(test_em_recovery_of_trx) try {
    auto        payload    = "Test Cases";
    auto        digest_raw = fc::sha256::hash(payload); // pretend payload is a transaction

@@ -1,6 +1,6 @@
 #include <sysio/producer_plugin/trx_priority_db.hpp>
 #include <sysio/chain/abi_serializer.hpp>
-#include <sysio/chain/contract_table_objects.hpp>
+#include <sysio/chain/kv_table_objects.hpp>
 #include <sysio/chain/wasm_interface_private.hpp>
 #include <sysio/chain/account_object.hpp>
 
@@ -52,32 +52,25 @@ int trx_priority_db::get_trx_priority(const transaction& trx) const {
 // -----------------------------------------------------------------------------------------------------------------
 namespace {
 
-std::vector<char> get_row_by_id(const controller& control, name code, name scope, name table, uint64_t id ) {
+// Read a kv::global value — key is [Name:8B BE]
+std::vector<char> get_global_row(const controller& control, name code, name table_name) {
    const auto& db = control.db();
-   const auto* t_id = db.find<chain::table_id_object, chain::by_code_scope_table>( boost::make_tuple( code, scope, table ) );
-   if ( !t_id ) {
+   auto tid = compute_table_id(table_name.to_uint64_t());
+   char key_buf[kv_pri_key_size];
+   kv_encode_be64(key_buf, table_name.to_uint64_t());
+   std::string_view key_sv(key_buf, kv_pri_key_size);
+
+   const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
+   auto itr = kv_idx.find(boost::make_tuple(code, tid, key_sv));
+   if (itr == kv_idx.end())
       return {};
-   }
-
-   const auto& idx = db.get_index<chain::key_value_index, chain::by_scope_primary>();
-
-   auto itr = idx.lower_bound( boost::make_tuple( t_id->id, id ) );
-   if ( itr == idx.end() || itr->t_id != t_id->id || id != itr->primary_key ) {
-      return {};
-   }
-
-   vector<char> data( itr->value.size() );
-   memcpy( data.data(), itr->value.data(), data.size() );
-   return data;
-}
-
-vector<char> get_row_by_account(const controller& control, name code, name scope, name table, account_name act ) {
-   return get_row_by_id( control, code, scope, table, act.to_uint64_t() );
+   return {itr->value.data(), itr->value.data() + itr->value.size()};
 }
 
 block_timestamp_type get_last_trx_priority_update(const controller& control) {
    try {
-      vector<char> data = get_row_by_account( control, config::system_account_name, config::system_account_name, "trxpglobal"_n, "trxpglobal"_n );
+      // trxpglobal is kv::global<"trxpglobal"_n, ...>
+      auto data = get_global_row(control, config::system_account_name, "trxpglobal"_n);
       if (data.empty())
          return {};
       return fc::raw::unpack<block_timestamp_type>(data);
@@ -93,38 +86,32 @@ void trx_priority_db::load_trx_priority_map(const controller& control, trx_prior
       const fc::time_point deadline = fc::time_point::now() + serializer_max_time;
 
       const auto& db = control.db();
-      const auto table_lookup_tuple = boost::make_tuple( config::system_account_name, config::system_account_name, "trxpriority"_n );
-      const auto* t_id = db.find<chain::table_id_object, chain::by_code_scope_table>( table_lookup_tuple );
-      if ( !t_id ) {
-         return;
-      }
 
-      const auto lower_bound_lookup_tuple = std::make_tuple( t_id->id, std::numeric_limits<uint64_t>::lowest() );
-      const auto upper_bound_lookup_tuple = std::make_tuple( t_id->id, std::numeric_limits<uint64_t>::max() );
+      // trxpriority is kv::table (unscoped) — key is [priority:8B BE]
+      auto trx_tid = compute_table_id("trxpriority"_n.to_uint64_t());
 
-      auto unpack_trx_prio = [&](const chain::key_value_object& obj) {
+      const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
+      // Start from beginning of this table_id — all-zero is the minimum BE uint64
+      char min_key[kv_pri_key_size] = {};
+      auto itr = kv_idx.lower_bound(boost::make_tuple(config::system_account_name, trx_tid,
+                                                        std::string_view(min_key, kv_pri_key_size)));
+
+      while (itr != kv_idx.end() && itr->code == config::system_account_name && itr->table_id == trx_tid) {
+         auto kv = itr->key_view();
+         if (kv.size() != kv_pri_key_size) break;
+
          trx_prio tmp;
-         datastream<const char*>  ds( obj.value.data(), obj.value.size() );
+         datastream<const char*> ds(itr->value.data(), itr->value.size());
          fc::raw::unpack(ds, tmp);
-         return tmp;
-      };
+         m.insert({tmp.receiver, tmp});
 
-      auto walk_table_row_range = [&]( auto itr, auto end_itr ) {
-         for( ; itr != end_itr; ++itr ) {
-            trx_prio p = unpack_trx_prio( *itr );
-            m.insert({p.receiver, p});
-            if (fc::time_point::now() > deadline) {
-               dlog("Unable to deserialize trx priority table before deadline");
-               _last_trx_priority_update = block_timestamp_type{}; // try again on next interval
-               break;
-            }
+         if (fc::time_point::now() > deadline) {
+            dlog("Unable to deserialize trx priority table before deadline");
+            _last_trx_priority_update = block_timestamp_type{}; // try again on next interval
+            break;
          }
-      };
-
-      const auto& idx = db.get_index<chain::key_value_index, chain::by_scope_primary>();
-      auto lower = idx.lower_bound( lower_bound_lookup_tuple );
-      auto upper = idx.upper_bound( upper_bound_lookup_tuple );
-      walk_table_row_range( lower, upper );
+         ++itr;
+      }
 
    } FC_LOG_AND_DROP()
 }

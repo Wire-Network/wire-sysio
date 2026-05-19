@@ -405,6 +405,9 @@ void istream_json_snapshot_reader::set_section( const string& section_name ) {
 
    impl->sec_name = section_name;
    impl->num_rows = impl->doc[section_name.c_str()]["num_rows"].GetInt();
+   SYS_ASSERT( static_cast<uint64_t>(impl->doc[section_name.c_str()]["rows"].GetArray().Size()) >= impl->num_rows,
+               snapshot_exception, "JSON snapshot {} num_rows ({}) exceeds actual rows array size ({})",
+               section_name, impl->num_rows, impl->doc[section_name.c_str()]["rows"].GetArray().Size() );
    ilog( "reading {}, num_rows: {}", section_name, impl->num_rows );
 }
 
@@ -498,6 +501,10 @@ void threaded_snapshot_reader::load_index() {
       // Parse section index at index_offset
       fc::datastream<const char*> ids(mapped_snap_addr + index_offset, file_size - footer_size - index_offset);
 
+      static constexpr uint32_t max_num_sections = 256;
+      SYS_ASSERT(num_sections <= max_num_sections, snapshot_exception,
+                 "Snapshot claims {} sections, maximum is {}", num_sections, max_num_sections);
+
       section_index_.clear();
       section_index_.reserve(num_sections);
 
@@ -519,10 +526,35 @@ void threaded_snapshot_reader::load_index() {
          ids.read(reinterpret_cast<char*>(&entry.row_count), sizeof(entry.row_count));
          ids.read(entry.hash.char_data(), entry.hash.data_size());
 
-         SYS_ASSERT(entry.data_offset + entry.data_size <= index_offset, snapshot_exception,
+         SYS_ASSERT(entry.data_size <= index_offset && entry.data_offset <= index_offset - entry.data_size,
+                    snapshot_exception,
                     "Section '{}' data extends beyond section index", entry.name);
 
          section_index_.push_back(std::move(entry));
+      }
+
+      // Validate no duplicate section names
+      for (size_t i = 0; i < section_index_.size(); ++i) {
+         for (size_t j = i + 1; j < section_index_.size(); ++j) {
+            SYS_ASSERT(section_index_[i].name != section_index_[j].name, snapshot_exception,
+                       "Duplicate snapshot section name '{}'", section_index_[i].name);
+         }
+      }
+
+      // Validate no overlapping section data ranges
+      for (size_t i = 0; i < section_index_.size(); ++i) {
+         if (section_index_[i].data_size == 0)
+            continue;
+         for (size_t j = i + 1; j < section_index_.size(); ++j) {
+            if (section_index_[j].data_size == 0)
+               continue;
+            auto i_end = section_index_[i].data_offset + section_index_[i].data_size;
+            auto j_end = section_index_[j].data_offset + section_index_[j].data_size;
+            bool overlaps = section_index_[i].data_offset < j_end && section_index_[j].data_offset < i_end;
+            SYS_ASSERT(!overlaps, snapshot_exception,
+                       "Snapshot sections '{}' and '{}' have overlapping data ranges",
+                       section_index_[i].name, section_index_[j].name);
+         }
       }
 
       index_loaded_ = true;

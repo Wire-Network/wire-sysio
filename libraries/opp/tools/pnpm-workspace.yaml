@@ -1,0 +1,8 @@
+packages:
+  - "protobuf-bundler"
+  - "protoc-gen-solana"
+  - "protoc-gen-solidity"
+allowBuilds:
+  esbuild: true
+  protobufjs: true
+  unrs-resolver: true

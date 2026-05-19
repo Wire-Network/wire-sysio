@@ -12,9 +12,8 @@ void snapshot_attest::regsnapprov(name producer, name snap_account) {
    require_auth(producer);
 
    // Validate producer is registered and rank <= max_snap_provider_rank
-   producers_table producers(get_self(), get_self().value);
-   auto prod_itr = producers.find(producer.value);
-   check(prod_itr != producers.end(), "producer is not registered");
+   producers_table producers(get_self());
+   auto prod_itr = producers.require_find(producer_key_t{producer.value}, "producer is not registered");
    check(prod_itr->rank <= max_snap_provider_rank,
          "producer rank exceeds maximum for snapshot providers");
 

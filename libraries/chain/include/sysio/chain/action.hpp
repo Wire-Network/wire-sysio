@@ -105,7 +105,7 @@ namespace sysio { namespace chain {
 
    private:
       friend struct packed_transaction;
-      uint32_t get_billable_size()const { return fc::raw::pack_size(static_cast<const action_base&>(*this)) + data.size(); }
+      uint32_t get_billable_size()const { return fc::raw::pack_size(*this); }
    };
 
    inline digest_type generate_action_digest(const action& act, const vector<char>& action_output) {

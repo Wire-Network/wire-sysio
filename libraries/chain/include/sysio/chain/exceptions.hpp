@@ -531,14 +531,11 @@ namespace sysio { namespace chain {
 
    FC_DECLARE_DERIVED_EXCEPTION( contract_exception,           chain_exception,
                                  3160000, "Contract exception" )
-      FC_DECLARE_DERIVED_EXCEPTION( invalid_table_payer,             contract_exception,
-                                    3160001, "The payer of the table data is invalid" )
+      // invalid_table_payer       3160001  (removed: legacy db_* only)
       FC_DECLARE_DERIVED_EXCEPTION( table_access_violation,          contract_exception,
                                     3160002, "Table access violation" )
-      FC_DECLARE_DERIVED_EXCEPTION( invalid_table_iterator,          contract_exception,
-                                    3160003, "Invalid table iterator" )
-      FC_DECLARE_DERIVED_EXCEPTION( table_not_in_cache,          contract_exception,
-                                    3160004, "Table can not be found inside the cache" )
+      // invalid_table_iterator    3160003  (removed: legacy db_* only)
+      // table_not_in_cache        3160004  (removed: legacy db_* only)
       FC_DECLARE_DERIVED_EXCEPTION( table_operation_not_permitted,          contract_exception,
                                     3160005, "The table operation is not allowed" )
       FC_DECLARE_DERIVED_EXCEPTION( invalid_contract_vm_type,          contract_exception,
@@ -555,6 +552,20 @@ namespace sysio { namespace chain {
                                     3160015, "Unknown wasm_config version" )
       FC_DECLARE_DERIVED_EXCEPTION( config_parse_error,                   contract_exception,
                                     3160016, "Parsing config error" )
+      FC_DECLARE_DERIVED_EXCEPTION( kv_key_too_large,                    contract_exception,
+                                    3160017, "KV key exceeds maximum allowed size" )
+      FC_DECLARE_DERIVED_EXCEPTION( kv_value_too_large,                  contract_exception,
+                                    3160018, "KV value exceeds maximum allowed size" )
+      FC_DECLARE_DERIVED_EXCEPTION( kv_iterator_limit_exceeded,          contract_exception,
+                                    3160019, "Exceeded maximum number of KV iterators" )
+      FC_DECLARE_DERIVED_EXCEPTION( kv_invalid_iterator,                 contract_exception,
+                                    3160020, "Invalid KV iterator handle" )
+      FC_DECLARE_DERIVED_EXCEPTION( kv_write_denied,                     contract_exception,
+                                    3160021, "KV write operation denied" )
+      FC_DECLARE_DERIVED_EXCEPTION( kv_key_not_found,                    contract_exception,
+                                    3160022, "KV key not found" )
+      FC_DECLARE_DERIVED_EXCEPTION( kv_secondary_key_too_large,          contract_exception,
+                                    3160023, "KV secondary key exceeds maximum allowed size" )
 
    FC_DECLARE_DERIVED_EXCEPTION( producer_exception,           chain_exception,
                                  3170000, "Producer exception" )
