@@ -53,6 +53,7 @@ static constexpr account_name OPREG = "sysio.opreg"_n;
 static constexpr account_name EPOCH = "sysio.epoch"_n;
 static constexpr account_name CHALG = "sysio.chalg"_n;
 static constexpr account_name MSGCH = "sysio.msgch"_n;
+static constexpr account_name UWRIT = "sysio.uwrit"_n;
 
 // Keep these in sync with contracts/sysio.system/src/emissions.cpp
 static constexpr uint32_t SECONDS_PER_MONTH = 30u * 24u * 60u * 60u;
@@ -325,7 +326,14 @@ public:
       //
       // Under ROA (active via the base tester), accounts need explicit ROA
       // RAM policies before set_code can succeed for a large contract.
-      create_accounts({ OPREG, EPOCH, CHALG, MSGCH });
+      //
+      // UWRIT is created bare (no ROA policy, no code) on purpose: epoch
+      // advance fires an unconditional inline sysio.uwrit::chklocks
+      // (underwriter lock-expiry sweep). The chain only requires the target
+      // account to exist; with no code the inline call is a harmless no-op,
+      // and no underwriter locks are staged in these tests. Giving it a
+      // 500 SYS policy like the others would overrun nodedaddy's ROA pool.
+      create_accounts({ OPREG, EPOCH, CHALG, MSGCH, UWRIT });
       produce_blocks(1);
 
       for (auto acct : { OPREG, EPOCH, CHALG, MSGCH }) {
