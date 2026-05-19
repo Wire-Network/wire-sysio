@@ -396,7 +396,7 @@ bool verify_uic_signature(name underwriter,
    // with `-fno-exceptions` and `try_select_winner` cannot halt the
    // dispatch on attacker-controlled bytes (per
    // `feedback_opp_handlers_never_throw.md`).
-   auto recovered_opt = sysio::recover_key_nothrow(digest, parsed_sig);
+   auto recovered_opt = sysio::try_recover_key(digest, parsed_sig);
    if (!recovered_opt) return false;
    const sysio::public_key& recovered = *recovered_opt;
 

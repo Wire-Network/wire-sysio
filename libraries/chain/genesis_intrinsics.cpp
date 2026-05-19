@@ -58,7 +58,6 @@ const std::vector<const char*> genesis_intrinsics = {
    "get_active_producers",
    "assert_recover_key",
    "recover_key",
-   "recover_key_nothrow",
    "assert_sha256",
    "assert_sha1",
    "assert_sha512",

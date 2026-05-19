@@ -86,25 +86,6 @@ namespace sysio::chain::webassembly {
                   "Error expected key different than recovered key" );
    }
 
-   int32_t interface::recover_key_nothrow( legacy_ptr<const fc::sha256> digest,
-                                            legacy_span<const char> sig,
-                                            legacy_span<char> pub ) const {
-      // Host-side wraps the throwing `recover_key` in try/catch — the
-      // host runtime supports exceptions, the WASM contract caller does
-      // not. Catch absolutely everything (the throwing path can raise
-      // `fc::exception`, `std::exception`, or SYS_ASSERT-style
-      // chain_exceptions) and translate to a -1 sentinel so the
-      // contract sees a non-throwing return.
-      try {
-         // argument_proxy (both ptr and span specializations) is
-         // non-copyable but movable; forward by move into the existing
-         // recover_key body.
-         return recover_key(std::move(digest), std::move(sig), std::move(pub));
-      } catch (...) {
-         return -1;
-      }
-   }
-
    int32_t interface::recover_key( legacy_ptr<const fc::sha256> digest,
                                    legacy_span<const char> sig,
                                    legacy_span<char> pub ) const {
