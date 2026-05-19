@@ -16,7 +16,7 @@ on:
         required: true
 
 permissions:
-  packages: read
+  packages: write
   contents: read
 
 defaults:
@@ -41,6 +41,7 @@ jobs:
       CCACHE_MAXSIZE: "10G"
       CCACHE_COMPRESS: "true"
       CCACHE_COMPRESSLEVEL: "6"
+      VCPKG_NUGET_FEED_URL: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
     steps:
         - name: Allow safe directories
           run: git config --global --add safe.directory '*'
@@ -48,14 +49,6 @@ jobs:
         - uses: actions/checkout@v5
           with:
             submodules: recursive
-
-        - name: Restore vcpkg binary cache
-          uses: actions/cache@v5
-          with:
-            path: ${{ github.workspace }}/vcpkg-binary-cache
-            key: vcpkg-binaries-${{ matrix.platform }}-${{ hashFiles('vcpkg.json') }}
-            restore-keys: |
-              vcpkg-binaries-${{ matrix.platform }}-
 
         - name: Restore ccache
           uses: actions/cache@v5
@@ -71,18 +64,28 @@ jobs:
             echo "Building for ${{ matrix.platform }}"
 
             # Use $GITHUB_WORKSPACE (container path /__w/...) not ${{ github.workspace }}
-            # (host path /home/runner/work/...) so ccache/vcpkg write to the mounted
-            # volume and persist for actions/cache to save.
+            # (host path /home/runner/work/...) so ccache writes to the mounted
+            # volume and persists for actions/cache to save.
             export CCACHE_DIR="$GITHUB_WORKSPACE/.ccache"
-            export VCPKG_BINARY_SOURCES="clear;files,$GITHUB_WORKSPACE/vcpkg-binary-cache,readwrite"
+            export VCPKG_EXE="$GITHUB_WORKSPACE/vcpkg/vcpkg"
+            export VCPKG_BINARY_SOURCES="clear;nuget,$VCPKG_NUGET_FEED_URL,readwrite"
 
-            # Clean intermediate vcpkg artifacts but preserve binary cache and downloads
+            # Clean intermediate vcpkg artifacts but preserve downloads
             rm -rf vcpkg/buildtrees vcpkg/packages vcpkg/vcpkg_installed \
                     build/vcpkg_installed ~/.cache/vcpkg ~/.vcpkg
 
-            mkdir -p "$GITHUB_WORKSPACE/vcpkg-binary-cache"
-
             ./vcpkg/bootstrap-vcpkg.sh
+
+            NUGET_EXE="$($VCPKG_EXE fetch nuget | tail -n 1)"
+            mono "$NUGET_EXE" sources remove -Name GitHubPackages || true
+            mono "$NUGET_EXE" sources add \
+              -Source "$VCPKG_NUGET_FEED_URL" \
+              -StorePasswordInClearText \
+              -Name GitHubPackages \
+              -UserName "${{ github.repository_owner }}" \
+              -Password "${{ secrets.GH_TOKEN_DEV }}"
+            mono "$NUGET_EXE" setapikey "${{ secrets.GH_TOKEN_DEV }}" \
+              -Source "$VCPKG_NUGET_FEED_URL"
 
             chown -R $(id -u):$(id -g) $PWD
 

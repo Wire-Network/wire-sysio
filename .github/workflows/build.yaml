@@ -52,6 +52,9 @@ jobs:
     name: Run Build Workflow
     uses: ./.github/workflows/build_base.yaml
     needs: [platform-cache]
+    permissions:
+      packages: write
+      contents: read
     secrets:
       GH_TOKEN_DEV: ${{ secrets.GH_TOKEN_DEV }}
     with:
