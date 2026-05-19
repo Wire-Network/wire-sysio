@@ -941,6 +941,16 @@
             ]
         },
         {
+            "name": "snap_provider_key_t",
+            "base": "",
+            "fields": [
+                {
+                    "name": "snap_account",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "snap_record",
             "base": "",
             "fields": [
@@ -959,6 +969,16 @@
                 {
                     "name": "attested_at_block",
                     "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "snap_record_key_t",
+            "base": "",
+            "fields": [
+                {
+                    "name": "block_num",
+                    "type": "uint64"
                 }
             ]
         },
@@ -985,6 +1005,16 @@
                 {
                     "name": "voters",
                     "type": "name[]"
+                }
+            ]
+        },
+        {
+            "name": "snap_vote_key_t",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
                 }
             ]
         },
@@ -1602,22 +1632,22 @@
             "name": "snapconfig",
             "type": "snap_config",
             "index_type": "i64",
-            "key_names": [],
-            "key_types": [],
+            "key_names": ["name"],
+            "key_types": ["name"],
             "table_id": 45242
         },
         {
             "name": "snapprovs",
             "type": "snap_provider",
             "index_type": "i64",
-            "key_names": ["scope","primary_key"],
-            "key_types": ["name","uint64"],
+            "key_names": ["snap_account"],
+            "key_types": ["uint64"],
             "table_id": 42185,
             "secondary_indexes": [
                 {
                     "name": "byproducer",
                     "key_type": "uint64",
-                    "table_id": 24010
+                    "table_id": 27665
                 }
             ]
         },
@@ -1625,22 +1655,22 @@
             "name": "snaprecords",
             "type": "snap_record",
             "index_type": "i64",
-            "key_names": ["scope","primary_key"],
-            "key_types": ["name","uint64"],
+            "key_names": ["block_num"],
+            "key_types": ["uint64"],
             "table_id": 43128
         },
         {
             "name": "snapvotes",
             "type": "snap_vote",
             "index_type": "i64",
-            "key_names": ["scope","primary_key"],
-            "key_types": ["name","uint64"],
+            "key_names": ["id"],
+            "key_types": ["uint64"],
             "table_id": 6736,
             "secondary_indexes": [
                 {
                     "name": "byblocknum",
                     "key_type": "uint64",
-                    "table_id": 27217
+                    "table_id": 8321
                 }
             ]
         },
