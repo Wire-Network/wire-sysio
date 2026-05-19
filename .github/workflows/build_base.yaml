@@ -43,6 +43,7 @@ jobs:
       CCACHE_COMPRESSLEVEL: "6"
       VCPKG_DISABLE_METRICS: "1"
       VCPKG_NUGET_FEED_URL: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
+      VCPKG_NUGET_USER: ${{ github.repository_owner }}
     steps:
         - name: Allow safe directories
           run: git config --global --add safe.directory '*'
@@ -61,6 +62,9 @@ jobs:
 
         - name: Build
           id: build
+          env:
+            GITHUB_TOKEN: ${{ secrets.GH_TOKEN_DEV }}
+            GITHUB_USER: ${{ github.repository_owner }}
           run: |
             echo "Building for ${{ matrix.platform }}"
 
@@ -68,47 +72,24 @@ jobs:
             # (host path /home/runner/work/...) so ccache writes to the mounted
             # volume and persists for actions/cache to save.
             export CCACHE_DIR="$GITHUB_WORKSPACE/.ccache"
-            export VCPKG_EXE="$GITHUB_WORKSPACE/vcpkg/vcpkg"
-            export VCPKG_BINARY_SOURCES="clear;nuget,$VCPKG_NUGET_FEED_URL,readwrite"
-
-            # Clean intermediate vcpkg artifacts but preserve downloads
-            rm -rf vcpkg/buildtrees vcpkg/packages vcpkg/vcpkg_installed \
-                    build/vcpkg_installed ~/.cache/vcpkg ~/.vcpkg
-
-            ./vcpkg/bootstrap-vcpkg.sh
-
-            NUGET_EXE="$($VCPKG_EXE fetch nuget | tail -n 1)"
-            mono "$NUGET_EXE" sources remove -Name GitHubPackages || true
-            mono "$NUGET_EXE" sources add \
-              -Source "$VCPKG_NUGET_FEED_URL" \
-              -StorePasswordInClearText \
-              -Name GitHubPackages \
-              -UserName "${{ github.repository_owner }}" \
-              -Password "${{ secrets.GH_TOKEN_DEV }}"
-            mono "$NUGET_EXE" setapikey "${{ secrets.GH_TOKEN_DEV }}" \
-              -Source "$VCPKG_NUGET_FEED_URL"
 
             chown -R $(id -u):$(id -g) $PWD
 
             # Reset ccache stats for this build
             ccache -z || true
 
-            cmake -B build -S . -G Ninja ${SYSIO_PLATFORM_HAS_EXTRAS_CMAKE:+-C /extras.cmake} \
-            -DCMAKE_C_COMPILER=$CC \
-            -DCMAKE_CXX_COMPILER=$CXX \
-            -DCMAKE_MAKE_PROGRAM=$CMAKE_MAKE_PROGRAM \
-            -DCMAKE_TOOLCHAIN_FILE=$PWD/vcpkg/scripts/buildsystems/vcpkg.cmake \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DENABLE_CCACHE=ON \
-            -DENABLE_TESTS=ON \
-            ${CMAKE_PREFIX_PATH:+-DCMAKE_PREFIX_PATH=$CMAKE_PREFIX_PATH}
-
             if [[ "${{ matrix.platform }}" == "gcc" ]]; then
               echo "Using reduced parallelism for gcc platform"
-              cmake --build build -- -j 8
+              BUILD_JOBS=8
             else
-              cmake --build build -- -j 11
+              BUILD_JOBS=11
             fi
+
+            scripts/build-with-github-vcpkg-cache.sh \
+              --mode trusted-ci \
+              --build-dir build \
+              --jobs "$BUILD_JOBS" \
+              --skip-tests
 
             echo "=== ccache statistics ==="
             ccache -s || true

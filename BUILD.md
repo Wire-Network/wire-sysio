@@ -135,57 +135,151 @@ This will build the vcpkg executable and set up the local vcpkg infrastructure. 
 
 You are now ready to build Wire Sysio.
 
-## Step 2 - Build
+## Recommended: Build with the GitHub Packages vcpkg Cache
 
-Make sure you are in the root of the `wire-sysio` repo, then perform the build with CMake and your chosen compiler.
+Make sure you are in the root of the `wire-sysio` repo, then perform the build with the shared script used by CI and local developer builds.
 
 > ⚠️ **Memory/Parallelism Warning** ⚠️  
 > Building Wire Sysio from source can be resource-intensive. Some source files require **up to 4 GB of RAM** each to compile. If you use all CPU cores for parallel compilation (e.g. `make -j$(nproc)` or Ninja default parallelism), you may exhaust memory and encounter compiler crashes. Consider using a lower parallel job count (`-j`) if you run into memory issues or if you need to use your machine for other tasks during the build.
 
-### Build Instructions
-
-First, ensure the environment is set to use **Clang 18** as the compiler:
+The simplest way to build with the same vcpkg NuGet binary cache used by CI is
+to run:
 
 ```bash
-# Example: set CC and CXX to Clang 18 compilers (adjust path if installed elsewhere)
 export CC=/opt/clang/clang-18/bin/clang
 export CXX=/opt/clang/clang-18/bin/clang++
+export CMAKE_PREFIX_PATH="/opt/clang/clang-18"
+
+scripts/build-with-github-vcpkg-cache.sh
 ```
 
-Now run CMake to configure the build and generate build files. We recommend using **Ninja** as the build generator for faster builds (we installed `ninja-build` earlier):
+The script bootstraps vcpkg, configures the GitHub Packages NuGet binary cache,
+runs CMake with the repository vcpkg toolchain, builds the project, and runs
+tests.
+
+When `ccache` is installed, the CMake build uses it through `ENABLE_CCACHE=ON`
+and stores cache files in `.ccache` by default.
+
+Useful options:
 
 ```bash
+scripts/build-with-github-vcpkg-cache.sh --build-dir build/release
+scripts/build-with-github-vcpkg-cache.sh --jobs 8
+scripts/build-with-github-vcpkg-cache.sh --skip-tests
+```
+
+The script has three build modes:
+
+- `developer`: local developer builds; reads packages from the GitHub Packages
+  NuGet cache and never publishes packages
+- `trusted-ci`: trusted GitHub Actions runs; reads and writes the GitHub
+  Packages NuGet cache
+- `forked-pr-ci`: fork pull-request runs; uses vcpkg's default local cache so
+  the workflow does not need package credentials
+
+The default mode is `developer`. The GitHub Actions workflow uses the same
+script with `--mode trusted-ci --skip-tests`, because CI runs tests in separate
+jobs after archiving the build directory.
+
+## Optional: Use the GitHub Packages vcpkg Binary Cache Manually
+
+The project can restore vcpkg-built dependencies from the same NuGet-backed
+binary cache used by CI. This is optional, but it avoids rebuilding large vcpkg
+dependencies locally.
+
+To use the cache, you need:
+
+- a GitHub token that can read Wire-Network GitHub Packages
+- `read:packages` scope on that token
+- Mono, because vcpkg runs `nuget.exe` on Linux
+
+Install Mono:
+
+```bash
+sudo apt-get install -y mono-complete
+```
+
+If you use the GitHub CLI, refresh the local token with package-read scope:
+
+```bash
+gh auth refresh -h github.com -s read:packages
+gh auth status
+```
+
+`gh auth status` should list `read:packages` in the token scopes.
+
+Configure the NuGet source:
+
+```bash
+export GITHUB_TOKEN="$(gh auth token)"
+export GITHUB_USER="$(gh api user --jq .login)"
+export VCPKG_NUGET_FEED="https://nuget.pkg.github.com/Wire-Network/index.json"
+
+NUGET_EXE="$(./vcpkg/vcpkg fetch nuget | tail -n 1)"
+
+mono "$NUGET_EXE" sources remove -Name "github" >/dev/null 2>&1 || true
+mono "$NUGET_EXE" sources add \
+  -Name "github" \
+  -Source "$VCPKG_NUGET_FEED" \
+  -UserName "$GITHUB_USER" \
+  -Password "$GITHUB_TOKEN" \
+  -StorePasswordInClearText
+
+mono "$NUGET_EXE" setapikey "$GITHUB_TOKEN" -Source "$VCPKG_NUGET_FEED"
+```
+
+Enable read-only binary cache restores for the current shell:
+
+```bash
+export VCPKG_FEATURE_FLAGS="manifests,binarycaching"
+export VCPKG_BINARY_SOURCES="clear;nuget,$VCPKG_NUGET_FEED,read"
+```
+
+A successful restore looks like:
+
+```text
+Restored 9 package(s) from NuGet
+```
+
+If vcpkg prints `Restored 0 package(s) from NuGet`, check:
+
+- `gh auth status` includes `read:packages`
+- the compiler and platform match the CI platform image
+- the vcpkg manifest, registry configuration, and dependency features match CI
+
+## Configure
+
+From the repository root:
+
+```bash
+export CC=/opt/clang/clang-18/bin/clang
+export CXX=/opt/clang/clang-18/bin/clang++
+export CMAKE_MAKE_PROGRAM=/usr/bin/ninja
+export CMAKE_PREFIX_PATH="/opt/clang/clang-18"
+
 cmake -B build -S . -G Ninja \
   -DCMAKE_C_COMPILER="$CC" \
   -DCMAKE_CXX_COMPILER="$CXX" \
+  -DCMAKE_MAKE_PROGRAM="$CMAKE_MAKE_PROGRAM" \
   -DCMAKE_TOOLCHAIN_FILE="$PWD/vcpkg/scripts/buildsystems/vcpkg.cmake" \
   -DCMAKE_BUILD_TYPE=Release \
-  -DCMAKE_PREFIX_PATH="/opt/clang/clang-18" \
-  -DENABLE_CCACHE=ON
+  -DCMAKE_PREFIX_PATH="$CMAKE_PREFIX_PATH" \
+  -DENABLE_CCACHE=ON \
+  -DENABLE_TESTS=ON
 ```
 
-In the above command:
-- `-B build -S .` tells CMake to create (or use) the directory `build/` for the build files.
-- `-G Ninja` chooses the Ninja generator. If you prefer Makefiles, you can omit this (default is Unix Makefiles), but ensure you adjust build commands accordingly.
-- `CMAKE_C_COMPILER` and `CMAKE_CXX_COMPILER` are pointed to Clang 18 (from Step 1b).
-- `CMAKE_TOOLCHAIN_FILE` points to the vcpkg toolchain file, so CMake will integrate vcpkg dependencies automatically.
-- `CMAKE_BUILD_TYPE=Release` produces an optimized build. (You can use `Debug` for development, etc.)
-- `CMAKE_PREFIX_PATH` is set to install location where you plan to install the CDT tooling (if not the system prefix `/usr`).
-- `ENABLE_CCACHE=ON` will use **ccache** to cache compilation results (if `ccache` is installed). This can significantly speed up rebuilds. You can omit this or set `OFF` if you do not have ccache or do not want to use it.
-
-If CMake configuration is successful, it will generate the build files in the `build/` directory. Now proceed to compile:
+## Build
 
 ```bash
-cmake --build build -- -j$(nproc)
+cmake --build build -- -j "$(nproc)"
 ```
 
-This will start the build process (using all available CPU cores by default). If you find your system running low on memory or becoming unresponsive, cancel the build (`Ctrl+C`) and re-run with a lower parallel job count, for example: 
+If you find your system running low on memory or becoming unresponsive, cancel
+the build (`Ctrl+C`) and re-run with a lower parallel job count, for example:
 
 ```bash
-cmake --build build -- -j4
-``` 
-
-(to limit to 4 threads). Ninja will respect the `-j` flag similarly, or you can set the environment variable `CMAKE_BUILD_PARALLEL_LEVEL` before running the `cmake --build` command.
+cmake --build build -- -j 4
+```
 
 Once the build completes successfully, the Wire Sysio binaries and libraries will be available in `build/bin/` (and other subdirectories under `build/`). 
 
@@ -225,7 +319,7 @@ Choose **either** method A or B according to your preference. Method A (deb pack
 
 Wire Sysio also provides a Docker-based build environment for convenience. This is the easiest way to build and run Wire Sysio without manually installing all dependencies, as the Dockerfile encapsulates all requirements (including Clang 18, etc.) and build steps.
 
-The provided Docker setup supports building on any modern 64-bit Linux or Apple Silicon (arm64) host that can run Docker (x86_64, arm64/aarch64). The container will produce Wire Sysio binaries for the same architecture as the host.
+The provided Docker setup is intended for x86_64 hosts that can run Docker. The Dockerfile configures vcpkg with the `x64-linux` triplet.
 
 To build Wire Sysio using Docker:
 
@@ -234,24 +328,33 @@ To build Wire Sysio using Docker:
 ./scripts/docker-build.sh
 ```
 
-This script will build the Docker image (using the `./etc/docker/Dockerfile`) and compile Wire Sysio inside it. The final Wire Sysio build artifacts will be available within the Docker image (and can be copied out or used via Docker container).
+This script will build the Docker image using `etc/docker/Dockerfile` and compile Wire Sysio inside it. The final Wire Sysio build artifacts are available inside the image under `/wire/wire-sysio/build/Release`.
 
-By default, it builds the `app-build-repo` target (fetching the source from the repository). You can also build from your local source or choose other stages:
+By default, it builds the `app-build-local` target using your current checkout as the source context. You can also choose other stages:
 
-- To build using **local source context** (your cloned repository code), use the `app-build-local` target:
+- To build using **local source context** explicitly, use the `app-build-local` target:
   ```bash
   ./scripts/docker-build.sh --target=app-build-local
   ```
-- To specify a different Git branch or repository for the source, set the `SYSIO_BRANCH` or `REPO` build args via the script (see script help for usage).
+- To build from the remote repository source, use the `app-build-repo` target:
+  ```bash
+  ./scripts/docker-build.sh --target=app-build-repo --sysio-branch=master
+  ```
+- To build the repository source with Wire CDT as well, use the `cdt-build-repo` target:
+  ```bash
+  ./scripts/docker-build.sh --target=cdt-build-repo --sysio-branch=master --cdt-branch=master
+  ```
 
-- To tag the resulting Docker image with a specific name (default tag is `wire/sysio:latest`), use the `--tag` option:
+- To tag the resulting Docker image with a specific name (default tag is `wire/sysio`), use the `--tag` option:
   ```bash
   ./scripts/docker-build.sh --target=app-build-local --tag=wire/sysio:mybuild
   ```
-- There is an additional flag that can be used to specify which Ubuntu version your image builds on (defaults Ubuntu 24.04)
+- To specify which Ubuntu base image tag to build on, use `--ubuntu-tag` (defaults to `24.04`):
   ```bash
   ./scripts/docker-build.sh --ubuntu-tag=24.04
   ```
+
+The script requires at least 32 GiB of available memory and passes `--memory 32G` to `docker build`.
   
 After the script finishes, you will have a Docker image with Wire Sysio built inside. You can run this image or extract the built binaries. (Refer to the Dockerfile targets and the script for details on where the binaries reside in each stage.)
 
