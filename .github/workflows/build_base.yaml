@@ -96,8 +96,7 @@ jobs:
             scripts/build-with-github-vcpkg-cache.sh \
               --mode "$BUILD_MODE" \
               --build-dir build \
-              --jobs "$BUILD_JOBS" \
-              --skip-tests
+              --jobs "$BUILD_JOBS"
 
             echo "=== ccache statistics ==="
             ccache -s || true
