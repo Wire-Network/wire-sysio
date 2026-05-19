@@ -6,6 +6,7 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BUILD_DIR="${BUILD_DIR:-$ROOT_DIR/build}"
 JOBS="${JOBS:-$(nproc)}"
 RUN_TESTS=1
+CLEAN="${WIRE_SYSIO_CLEAN_BUILD:-}"
 NEEDS_CI_OWNERSHIP_FIX=0
 BUILD_MODE="${WIRE_SYSIO_BUILD_MODE:-developer}"
 VCPKG_NUGET_FEED="${VCPKG_NUGET_FEED:-${VCPKG_NUGET_FEED_URL:-https://nuget.pkg.github.com/Wire-Network/index.json}}"
@@ -19,6 +20,8 @@ Build Wire Sysio with the GitHub Packages vcpkg NuGet binary cache.
 Options:
   --build-dir DIR       CMake build directory. Default: $BUILD_DIR
   --jobs N             Parallel build jobs. Default: $JOBS
+  --clean              Remove vcpkg build artifacts before configuring.
+                       Default: enabled in CI modes, disabled in developer mode.
   --skip-tests         Configure and build only.
   --mode MODE          Build mode: developer, trusted-ci, or forked-pr-ci.
                        Default: $BUILD_MODE
@@ -66,6 +69,10 @@ while [[ $# -gt 0 ]]; do
       JOBS="$2"
       shift 2
       ;;
+    --clean)
+      CLEAN=1
+      shift
+      ;;
     --skip-tests)
       RUN_TESTS=0
       shift
@@ -87,6 +94,14 @@ done
 
 if [[ "$BUILD_MODE" != "developer" && "$BUILD_MODE" != "trusted-ci" && "$BUILD_MODE" != "forked-pr-ci" ]]; then
   fail "Unsupported build mode '$BUILD_MODE'." "Use '--mode developer' for local builds, '--mode trusted-ci' for trusted GitHub Actions runs, or '--mode forked-pr-ci' for fork pull requests."
+fi
+
+if [[ -z "$CLEAN" ]]; then
+  if [[ "$BUILD_MODE" == "developer" ]]; then
+    CLEAN=0
+  else
+    CLEAN=1
+  fi
 fi
 
 if [[ "$BUILD_MODE" == "trusted-ci" || "$BUILD_MODE" == "forked-pr-ci" ]]; then
@@ -113,15 +128,13 @@ if [[ "$NEEDS_CI_OWNERSHIP_FIX" -eq 1 ]]; then
   chown -R "$(id -u):$(id -g)" "$ROOT_DIR"
 fi
 
-rm -rf "$ROOT_DIR/vcpkg/buildtrees" "$ROOT_DIR/vcpkg/packages" "$ROOT_DIR/vcpkg/vcpkg_installed" \
-       "$BUILD_DIR/vcpkg_installed" ~/.cache/vcpkg ~/.vcpkg
-
-if [[ ! -x "$ROOT_DIR/vcpkg/vcpkg" ]]; then
-  info "Bootstrapping vcpkg"
-  "$ROOT_DIR/vcpkg/bootstrap-vcpkg.sh"
-else
-  "$ROOT_DIR/vcpkg/bootstrap-vcpkg.sh"
+if [[ "$CLEAN" == "1" ]]; then
+  rm -rf "$ROOT_DIR/vcpkg/buildtrees" "$ROOT_DIR/vcpkg/packages" "$ROOT_DIR/vcpkg/vcpkg_installed" \
+         "$BUILD_DIR/vcpkg_installed" ~/.cache/vcpkg ~/.vcpkg
 fi
+
+info "Bootstrapping vcpkg"
+"$ROOT_DIR/vcpkg/bootstrap-vcpkg.sh"
 
 export VCPKG_DISABLE_METRICS="${VCPKG_DISABLE_METRICS:-1}"
 
@@ -160,6 +173,7 @@ else
 
   info "Configuring GitHub Packages NuGet source"
   mono "$NUGET_EXE" sources remove -Name "github" >/dev/null 2>&1 || true
+  # NuGet on Linux under Mono needs this flag to persist the feed credential.
   mono "$NUGET_EXE" sources add \
     -Name "github" \
     -Source "$VCPKG_NUGET_FEED" \
@@ -205,7 +219,7 @@ if [[ -n "${CMAKE_PREFIX_PATH:-}" ]]; then
   CMAKE_ARGS+=(-DCMAKE_PREFIX_PATH="$CMAKE_PREFIX_PATH")
 fi
 
-CONFIGURE_LOG="$BUILD_DIR/vcpkg-nuget-configure.log"
+CONFIGURE_LOG="$BUILD_DIR/cmake-configure.log"
 mkdir -p "$BUILD_DIR"
 
 info "Build directory: $BUILD_DIR"
@@ -225,9 +239,7 @@ fi
 
 if grep -q "Restored 0 package(s) from NuGet" "$CONFIGURE_LOG"; then
   info "Warning: vcpkg reported zero NuGet restores. This can mean the ABI does not match CI, or that the packages were already installed in '$BUILD_DIR'."
-fi
-
-if grep -q "Restored [1-9][0-9]* package(s) from NuGet" "$CONFIGURE_LOG"; then
+elif grep -q "Restored [1-9][0-9]* package(s) from NuGet" "$CONFIGURE_LOG"; then
   info "Confirmed vcpkg restored packages from the GitHub NuGet cache"
 else
   info "No NuGet restore line was printed. This usually means vcpkg packages were already installed in '$BUILD_DIR'."
@@ -238,7 +250,8 @@ cmake --build "$BUILD_DIR" -- -j "$JOBS"
 
 if [[ "$RUN_TESTS" -eq 1 ]]; then
   info "Running tests"
-  ctest --test-dir "$BUILD_DIR" -j "$JOBS" --output-on-failure
+  ctest --test-dir "$BUILD_DIR" -j "$JOBS" --output-on-failure \
+    -LE "(nonparallelizable_tests|long_running_tests|wasm_spec_tests)"
 fi
 
 info "Done"

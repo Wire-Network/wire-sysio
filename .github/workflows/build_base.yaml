@@ -65,6 +65,7 @@ jobs:
           env:
             GITHUB_TOKEN: ${{ secrets.GH_TOKEN_DEV }}
             GITHUB_USER: ${{ github.repository_owner }}
+            IS_FORK_PR: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository }}
           run: |
             echo "Building for ${{ matrix.platform }}"
 
@@ -85,8 +86,15 @@ jobs:
               BUILD_JOBS=11
             fi
 
+            BUILD_MODE=trusted-ci
+            if [[ "$IS_FORK_PR" == "true" ]]; then
+              echo "Using local vcpkg binary cache for fork pull request"
+              BUILD_MODE=forked-pr-ci
+              unset GITHUB_TOKEN GITHUB_USER
+            fi
+
             scripts/build-with-github-vcpkg-cache.sh \
-              --mode trusted-ci \
+              --mode "$BUILD_MODE" \
               --build-dir build \
               --jobs "$BUILD_JOBS" \
               --skip-tests

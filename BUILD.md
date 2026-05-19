@@ -165,6 +165,7 @@ Useful options:
 ```bash
 scripts/build-with-github-vcpkg-cache.sh --build-dir build/release
 scripts/build-with-github-vcpkg-cache.sh --jobs 8
+scripts/build-with-github-vcpkg-cache.sh --clean
 scripts/build-with-github-vcpkg-cache.sh --skip-tests
 ```
 
@@ -177,9 +178,11 @@ The script has three build modes:
 - `forked-pr-ci`: fork pull-request runs; uses vcpkg's default local cache so
   the workflow does not need package credentials
 
-The default mode is `developer`. The GitHub Actions workflow uses the same
-script with `--mode trusted-ci --skip-tests`, because CI runs tests in separate
-jobs after archiving the build directory.
+The default mode is `developer`. Developer mode keeps the local vcpkg caches
+between runs unless `--clean` is passed. GitHub Actions uses the same script
+with `--skip-tests`; trusted pull requests run in `trusted-ci` mode, while fork
+pull requests run in `forked-pr-ci` mode. CI runs tests in separate jobs after
+archiving the build directory.
 
 ## Optional: Use the GitHub Packages vcpkg Binary Cache Manually
 
