@@ -5,7 +5,7 @@ set -Eeuo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BUILD_DIR="${BUILD_DIR:-$ROOT_DIR/build}"
 JOBS="${JOBS:-$(nproc)}"
-RUN_TESTS=1
+RUN_TESTS=0
 CLEAN="${WIRE_SYSIO_CLEAN_BUILD:-}"
 NEEDS_CI_OWNERSHIP_FIX=0
 BUILD_MODE="${WIRE_SYSIO_BUILD_MODE:-developer}"
@@ -22,7 +22,8 @@ Options:
   --jobs N             Parallel build jobs. Default: $JOBS
   --clean              Remove vcpkg build artifacts before configuring.
                        Default: enabled in CI modes, disabled in developer mode.
-  --skip-tests         Configure and build only.
+  --run-tests          Run the parallel-safe test subset after building.
+  --skip-tests         Configure and build only. This is the default.
   --mode MODE          Build mode: developer, trusted-ci, or forked-pr-ci.
                        Default: $BUILD_MODE
   -h, --help           Show this help.
@@ -71,6 +72,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --clean)
       CLEAN=1
+      shift
+      ;;
+    --run-tests)
+      RUN_TESTS=1
       shift
       ;;
     --skip-tests)

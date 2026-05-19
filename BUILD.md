@@ -154,8 +154,7 @@ scripts/build-with-github-vcpkg-cache.sh
 ```
 
 The script bootstraps vcpkg, configures the GitHub Packages NuGet binary cache,
-runs CMake with the repository vcpkg toolchain, builds the project, and runs
-tests.
+runs CMake with the repository vcpkg toolchain, and builds the project.
 
 When `ccache` is installed, the CMake build uses it through `ENABLE_CCACHE=ON`
 and stores cache files in `.ccache` by default.
@@ -166,7 +165,7 @@ Useful options:
 scripts/build-with-github-vcpkg-cache.sh --build-dir build/release
 scripts/build-with-github-vcpkg-cache.sh --jobs 8
 scripts/build-with-github-vcpkg-cache.sh --clean
-scripts/build-with-github-vcpkg-cache.sh --skip-tests
+scripts/build-with-github-vcpkg-cache.sh --run-tests
 ```
 
 The script has three build modes:
@@ -180,9 +179,9 @@ The script has three build modes:
 
 The default mode is `developer`. Developer mode keeps the local vcpkg caches
 between runs unless `--clean` is passed. GitHub Actions uses the same script
-with `--skip-tests`; trusted pull requests run in `trusted-ci` mode, while fork
-pull requests run in `forked-pr-ci` mode. CI runs tests in separate jobs after
-archiving the build directory.
+with trusted pull requests running in `trusted-ci` mode and fork pull requests
+running in `forked-pr-ci` mode. CI runs tests in separate jobs after archiving
+the build directory.
 
 ## Optional: Use the GitHub Packages vcpkg Binary Cache Manually
 
