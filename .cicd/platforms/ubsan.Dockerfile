@@ -32,6 +32,7 @@ RUN apt-get update && apt-get upgrade -y && \
                        zip                  \
                        unzip                \
                        tar                  \
+                       mono-complete        \
                        vim                  \
                        sudo                 \
                        doxygen              \

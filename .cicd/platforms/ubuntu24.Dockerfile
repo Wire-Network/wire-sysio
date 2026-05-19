@@ -27,6 +27,7 @@ RUN apt-get update && apt-get upgrade -y && \
     zip                  \
     unzip                \
     tar                  \
+    mono-complete        \
     sudo                 \
     golang               \
     python3-dev          \
