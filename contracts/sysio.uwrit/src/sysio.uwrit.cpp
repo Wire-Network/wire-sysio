@@ -391,12 +391,16 @@ bool verify_uic_signature(name underwriter,
       ds >> parsed_sig;
    }
 
-   // Recover the public key. The size/tag bounds above pre-filter the
-   // structurally invalid signatures; converting recover_key's remaining
-   // contract-observable throws to an rc = -1 sentinel (so this stays
-   // non-throwing on every input) is tracked as separate host+CDT work —
-   // see the function-level note above.
-   const sysio::public_key recovered = sysio::recover_key(digest, parsed_sig);
+   // Recover the public key — non-throwing variant. The host wraps the
+   // throwing recovery path in try/catch and returns `std::nullopt` on
+   // any failure (malformed bytes, unactivated sig type, recovery math
+   // failure, subjective-size limit). Required because CDT compiles
+   // with `-fno-exceptions` and `try_select_winner` cannot halt the
+   // dispatch on attacker-controlled bytes (per
+   // `feedback_opp_handlers_never_throw.md`).
+   auto recovered_opt = sysio::try_recover_key(digest, parsed_sig);
+   if (!recovered_opt) return false;
+   const sysio::public_key& recovered = *recovered_opt;
 
    // Only `owner` and `active` permissions are considered. The
    // underwriter_plugin's signature_provider_manager_plugin config is
