@@ -198,8 +198,10 @@ namespace sysio {
      * @brief Using the signature and provided parameters, this action will create a link between the WIRE account name and the external chain address. Pub keys / Addresses are 1:1 mapped.
      *
      * @param chain_kind The chain identifier from `opp::types::ChainKind`
-     *                   (CHAIN_KIND_ETHEREUM / CHAIN_KIND_SOLANA / CHAIN_KIND_SUI).
+     *                   (CHAIN_KIND_EVM / CHAIN_KIND_SVM).
      *                   Wire-side legacy `fc::crypto::chain_kind_t` is host-only.
+     *                   TODO @jglanz: SUI variant removed in v6; revisit when
+     *                   SUI outpost is added.
      * @param account   The WIRE account name of the user which the address is being linked to.
      * @param sig        A valid signature for the target chain converted to Wire's standard.
      * @param pub_key     The external chain's public key in Wire format.

@@ -42,7 +42,7 @@ outpost_ethereum_client::outpost_ethereum_client(
 }
 
 sysio::opp::types::ChainKind outpost_ethereum_client::chain_kind() const {
-   return sysio::opp::types::CHAIN_KIND_ETHEREUM;
+   return sysio::opp::types::CHAIN_KIND_EVM;
 }
 
 std::string outpost_ethereum_client::deliver_outbound_envelope(

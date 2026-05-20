@@ -58,7 +58,7 @@ namespace {
 /// will log+skip them too, so no fatal failure).
 std::optional<fc::network::solana::solana_public_key> sol_pubkey_from_chain_address(
    const sysio::opp::types::ChainAddress& addr) {
-   if (addr.kind() != sysio::opp::types::CHAIN_KIND_SOLANA) return std::nullopt;
+   if (addr.kind() != sysio::opp::types::CHAIN_KIND_SVM) return std::nullopt;
    if (addr.address().size() != 32)                         return std::nullopt;
    std::array<uint8_t, 32> bytes{};
    std::memcpy(bytes.data(), addr.address().data(), 32);
@@ -142,7 +142,7 @@ outpost_solana_client::outpost_solana_client(
 }
 
 sysio::opp::types::ChainKind outpost_solana_client::chain_kind() const {
-   return sysio::opp::types::CHAIN_KIND_SOLANA;
+   return sysio::opp::types::CHAIN_KIND_SVM;
 }
 
 std::string outpost_solana_client::deliver_outbound_envelope(
