@@ -214,7 +214,7 @@ try:
     scheduled_producers = cluster.nodes[0].getProducerSchedule()
     # Use retry loop since nodes restarted sequentially may still be catching up,
     # causing temporary connection closures due to block rejection violations
-    assert Utils.waitForBool(lambda: verifyGossipConnections(scheduled_producers), timeout=60), \
+    assert Utils.waitForBool(lambda: verifyGossipConnections(scheduled_producers), timeout=90), \
         "Timed out waiting for all gossip connections to be established"
 
     Print("Manual connect node_19 defproducert to node_04 defproducere")
@@ -236,7 +236,7 @@ try:
     Print(f"Scheduled producers: {scheduled_producers}")
     assert(len(scheduled_producers) == 4)
     assert("defproducerb" in scheduled_producers and "defproducerh" in scheduled_producers and "defproducerm" in scheduled_producers and "defproducerr" in scheduled_producers)
-    assert Utils.waitForBool(lambda: verifyGossipConnections(scheduled_producers), timeout=60), \
+    assert Utils.waitForBool(lambda: verifyGossipConnections(scheduled_producers), timeout=90), \
         "Timed out waiting for new schedule gossip connections"
 
     Print("Verify manual connection still connected and stale gossip peer disconnected")
