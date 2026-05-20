@@ -4,6 +4,7 @@
     {
       "name": "vcpkg-base",
       "hidden": true,
+      "generator": "Ninja",
       "cacheVariables": {
         "CMAKE_C_COMPILER": "clang-18",
         "CMAKE_CXX_COMPILER": "clang++-18",
@@ -15,7 +16,6 @@
         "ENABLE_TESTS": "ON"
       },
       "environment": {
-        "CMAKE_GENERATOR": "Ninja",
         "VCPKG_DISABLE_METRICS": "1"
       }
     },

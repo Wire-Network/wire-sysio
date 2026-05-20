@@ -159,11 +159,11 @@ The default presets use release-only vcpkg dependencies through the
 for x86_64 Linux hosts; other architectures need a matching vcpkg triplet and
 local preset override.
 
-The presets set `CMAKE_GENERATOR=Ninja` and select `clang-18` and `clang++-18`
-by executable name, without hard-coding absolute paths. For a script run, set
-`CC`, `CXX`, or `CMAKE_GENERATOR` when you need a specific toolchain. For
-IDE-specific paths, create a local `CMakeUserPresets.json`. The script does not
-run tests unless `--run-tests` is passed.
+The presets use the `Ninja` generator and select `clang-18` and `clang++-18` by
+executable name, without hard-coding absolute paths. For a script run, set
+`CC` or `CXX` when you need a specific compiler. For IDE-specific paths or a
+different generator, create a local `CMakeUserPresets.json`. The script does
+not run tests unless `--run-tests` is passed.
 
 When `ccache` is installed, the CMake build uses it through `ENABLE_CCACHE=ON`
 and stores cache files in `.ccache` by default.
