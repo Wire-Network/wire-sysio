@@ -7,6 +7,7 @@ BUILD_DIR="${BUILD_DIR:-$ROOT_DIR/build}"
 EFFECTIVE_BUILD_DIR=""
 JOBS="${JOBS:-$(nproc)}"
 RUN_TESTS=0
+CONFIGURE_ONLY="${WIRE_SYSIO_CONFIGURE_ONLY:-0}"
 CLEAN="${WIRE_SYSIO_CLEAN_BUILD:-}"
 NEEDS_CI_OWNERSHIP_FIX=0
 BUILD_MODE="${WIRE_SYSIO_BUILD_MODE:-developer}"
@@ -43,6 +44,8 @@ Options:
   --clean              Remove vcpkg build artifacts before configuring.
                        Default: enabled in CI modes, disabled in developer mode.
   --run-tests          Run the parallel-safe test subset after building.
+  --configure-only     Stop after CMake configure. This completes the vcpkg
+                       manifest install but skips the project build and tests.
   --mode MODE          Build mode: developer, trusted-ci, or forked-pr-ci.
                        Default: inferred from known --preset values, otherwise
                        $BUILD_MODE.
@@ -299,6 +302,10 @@ while [[ $# -gt 0 ]]; do
       RUN_TESTS=1
       shift
       ;;
+    --configure-only)
+      CONFIGURE_ONLY=1
+      shift
+      ;;
     --mode)
       [[ $# -ge 2 ]] || fail "--mode requires a value." "Use '--mode developer', '--mode trusted-ci', or '--mode forked-pr-ci'."
       BUILD_MODE="$2"
@@ -499,6 +506,10 @@ if [[ -n "${CMAKE_PREFIX_PATH:-}" ]]; then
   CMAKE_CONFIGURE_ARGS+=(-DCMAKE_PREFIX_PATH="$CMAKE_PREFIX_PATH")
 fi
 
+if [[ -n "${VCPKG_INSTALL_OPTIONS:-}" ]]; then
+  CMAKE_CONFIGURE_ARGS+=(-DVCPKG_INSTALL_OPTIONS="$VCPKG_INSTALL_OPTIONS")
+fi
+
 CONFIGURE_LOG="$EFFECTIVE_BUILD_DIR/cmake-configure.log"
 mkdir -p "$EFFECTIVE_BUILD_DIR"
 
@@ -509,6 +520,9 @@ info "Build directory: $EFFECTIVE_BUILD_DIR"
 info "CMake preset: $CMAKE_PRESET"
 info "Build mode: $BUILD_MODE"
 info "vcpkg binary sources: $VCPKG_BINARY_SOURCES"
+if [[ -n "${VCPKG_INSTALL_OPTIONS:-}" ]]; then
+  info "vcpkg install options: $VCPKG_INSTALL_OPTIONS"
+fi
 
 info "Configuring CMake"
 set +e
@@ -526,6 +540,11 @@ elif grep -Eiq "Restored[[:space:]]+[1-9][0-9]*([^0-9]|$).*package(s|\\(s\\))?.*
   info "Confirmed vcpkg restored packages from the GitHub NuGet cache"
 else
   info "No NuGet restore line was printed. This usually means vcpkg packages were already installed in '$BUILD_DIR'."
+fi
+
+if [[ "$CONFIGURE_ONLY" == "1" ]]; then
+  info "Configure-only mode requested; stopping before project build"
+  exit 0
 fi
 
 info "Building"
