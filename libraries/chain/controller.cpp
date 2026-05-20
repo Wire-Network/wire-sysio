@@ -2239,9 +2239,21 @@ struct controller_impl {
          auto block_num = chain_head.block_num() + 1;
          if (peer_keys_db.should_update(block_num)) { // update once/minute
             // update peer public keys from chainbase db using a readonly trx
-            peer_keys_db.update_peer_keys(block_num, get_top_producer_keys());
+            // TEMP DIAG: time get_top_producer_keys to confirm/refute 20ms-deadline hypothesis on slow CI
+            auto t0 = fc::time_point::now();
+            auto res = get_top_producer_keys();
+            auto elapsed_us = (fc::time_point::now() - t0).count();
+            wlog("DIAG update_peer_keys: block {} getpeerkeys returned {} entries in {}us",
+                 block_num, res.size(), elapsed_us);
+            peer_keys_db.update_peer_keys(block_num, std::move(res));
          }
-      } FC_LOG_AND_DROP()
+      } catch (const fc::exception& e) {
+         wlog("DIAG update_peer_keys: getpeerkeys threw: {}", e.to_detail_string());
+      } catch (const std::exception& e) {
+         wlog("DIAG update_peer_keys: getpeerkeys threw std::exception: {}", e.what());
+      } catch (...) {
+         wlog("DIAG update_peer_keys: getpeerkeys threw unknown exception");
+      }
    }
 
    void assemble_block(bool validating, const qc_data_t& validating_qc_data, const block_state_ptr& validating_bsp)
