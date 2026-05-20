@@ -25,6 +25,7 @@ tmp
 \.#*
 CMakeCache.txt
 CMakeFiles
+CMakeUserPresets.json
 cmake-build-*/
 Makefile
 compile_commands.json

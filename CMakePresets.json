@@ -1,0 +1,75 @@
+{
+  "version": 6,
+  "configurePresets": [
+    {
+      "name": "vcpkg-base",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "clang-18",
+        "CMAKE_CXX_COMPILER": "clang++-18",
+        "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/vcpkg/scripts/buildsystems/vcpkg.cmake",
+        "VCPKG_OVERLAY_TRIPLETS": "${sourceDir}/.github/vcpkg-triplets",
+        "VCPKG_TARGET_TRIPLET": "x64-linux-release",
+        "VCPKG_HOST_TRIPLET": "x64-linux-release",
+        "ENABLE_CCACHE": "ON",
+        "ENABLE_TESTS": "ON"
+      },
+      "environment": {
+        "CMAKE_GENERATOR": "Ninja",
+        "VCPKG_DISABLE_METRICS": "1"
+      }
+    },
+    {
+      "name": "vcpkg-github-release",
+      "displayName": "Release with GitHub vcpkg cache",
+      "description": "x86_64 Linux release build using release-only vcpkg dependencies; GitHub package cache is configured by the script or environment.",
+      "inherits": "vcpkg-base",
+      "binaryDir": "${sourceDir}/build/release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "vcpkg-github-debug-release-deps",
+      "displayName": "Debug with GitHub vcpkg cache release deps",
+      "description": "Debug build of Wire Sysio while keeping vcpkg dependencies release-only.",
+      "inherits": "vcpkg-github-release",
+      "binaryDir": "${sourceDir}/build/debug-release-deps",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "vcpkg-github-release-ci",
+      "displayName": "CI release with GitHub vcpkg cache",
+      "inherits": "vcpkg-github-release"
+    },
+    {
+      "name": "vcpkg-local-release-fork",
+      "displayName": "Fork PR release with local vcpkg cache",
+      "inherits": "vcpkg-base",
+      "binaryDir": "${sourceDir}/build/fork-release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "vcpkg-github-release",
+      "configurePreset": "vcpkg-github-release"
+    },
+    {
+      "name": "vcpkg-github-debug-release-deps",
+      "configurePreset": "vcpkg-github-debug-release-deps"
+    },
+    {
+      "name": "vcpkg-github-release-ci",
+      "configurePreset": "vcpkg-github-release-ci"
+    },
+    {
+      "name": "vcpkg-local-release-fork",
+      "configurePreset": "vcpkg-local-release-fork"
+    }
+  ]
+}

@@ -15,6 +15,10 @@ on:
       GH_TOKEN_DEV:
         required: true
 
+# Trusted CI publishes vcpkg binary cache packages to GitHub Packages. Fork pull
+# requests run with GitHub's reduced token permissions and the build script
+# switches them to forked-pr-ci mode, which uses a local vcpkg cache and unsets
+# package credentials before configuring.
 permissions:
   packages: write
   contents: read
@@ -42,8 +46,7 @@ jobs:
       CCACHE_COMPRESS: "true"
       CCACHE_COMPRESSLEVEL: "6"
       VCPKG_DISABLE_METRICS: "1"
-      VCPKG_NUGET_FEED_URL: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
-      VCPKG_NUGET_USER: ${{ github.repository_owner }}
+      VCPKG_NUGET_FEED: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
     steps:
         - name: Allow safe directories
           run: git config --global --add safe.directory '*'

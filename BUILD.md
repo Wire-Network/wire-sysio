@@ -146,16 +146,24 @@ The simplest way to build with the same vcpkg NuGet binary cache used by CI is
 to run:
 
 ```bash
-export CC=/opt/clang/clang-18/bin/clang
-export CXX=/opt/clang/clang-18/bin/clang++
-export CMAKE_PREFIX_PATH="/opt/clang/clang-18"
-
 scripts/build-with-github-vcpkg-cache.sh
 ```
 
 The script bootstraps vcpkg, configures the GitHub Packages NuGet binary cache,
-runs CMake with the repository vcpkg toolchain, and builds the project.
-It does not run tests unless `--run-tests` is passed.
+runs CMake with a generated `dev-release` user preset, and
+builds the project. The generated `CMakeUserPresets.json` captures the local
+vcpkg binary cache environment for IDEs without storing package credentials.
+The default presets use release-only vcpkg dependencies through the
+`x64-linux-release` triplet, even for the
+`dev-debug` preset. These presets are intended
+for x86_64 Linux hosts; other architectures need a matching vcpkg triplet and
+local preset override.
+
+The presets set `CMAKE_GENERATOR=Ninja` and select `clang-18` and `clang++-18`
+by executable name, without hard-coding absolute paths. For a script run, set
+`CC`, `CXX`, or `CMAKE_GENERATOR` when you need a specific toolchain. For
+IDE-specific paths, create a local `CMakeUserPresets.json`. The script does not
+run tests unless `--run-tests` is passed.
 
 When `ccache` is installed, the CMake build uses it through `ENABLE_CCACHE=ON`
 and stores cache files in `.ccache` by default.
@@ -164,10 +172,16 @@ Useful options:
 
 ```bash
 scripts/build-with-github-vcpkg-cache.sh --build-dir build/release
+scripts/build-with-github-vcpkg-cache.sh --preset dev-debug
 scripts/build-with-github-vcpkg-cache.sh --jobs 8
 scripts/build-with-github-vcpkg-cache.sh --clean
 scripts/build-with-github-vcpkg-cache.sh --run-tests
 ```
+
+In developer mode, `--build-dir` is a build directory prefix: `dev-release`
+uses `<dir>/release`, and `dev-debug` uses `<dir>/debug-release-deps`. In CI
+modes, `--build-dir` is the exact CMake build directory so the workflow can
+archive a stable `build` artifact.
 
 The script has three build modes:
 
@@ -322,7 +336,9 @@ Choose **either** method A or B according to your preference. Method A (deb pack
 
 Wire Sysio also provides a Docker-based build environment for convenience. This is the easiest way to build and run Wire Sysio without manually installing all dependencies, as the Dockerfile encapsulates all requirements (including Clang 18, etc.) and build steps.
 
-The provided Docker setup is intended for x86_64 hosts that can run Docker. The Dockerfile configures vcpkg with the `x64-linux` triplet.
+The provided Docker setup is intended for x86_64 hosts that can run Docker. The
+Dockerfile configures vcpkg with the `x64-linux` triplet, so arm64 hosts are not
+supported by this Docker path unless they run the image under amd64 emulation.
 
 To build Wire Sysio using Docker:
 
