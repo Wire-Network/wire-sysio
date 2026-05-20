@@ -23,6 +23,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cctype>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -38,13 +39,21 @@ namespace {
 /// other than `aws` becomes a deployment target).
 constexpr std::string_view kms_arn_prefix = "arn:aws:kms:";
 
+/// Case-insensitive lead-in shared by every ARN. A spec that begins with this
+/// but does not match `kms_arn_prefix` is a malformed or out-of-scope ARN —
+/// never the shorthand `<region>:<key-id>` form — and must fail loudly rather
+/// than fall through to the shorthand parser. See `parse_kms_spec`.
+constexpr std::string_view arn_lead_in = "arn:";
+
 /// Number of colon-separated segments in a well-formed KMS ARN:
 /// `arn`, `aws`, `kms`, `<region>`, `<account>`, `(key|alias)/<id>`.
 constexpr std::size_t kms_arn_segment_count = 6;
 
 /// Indices into the split ARN.
-constexpr std::size_t arn_idx_region = 3;
-constexpr std::size_t arn_idx_tail   = 5;
+constexpr std::size_t arn_idx_partition = 1;
+constexpr std::size_t arn_idx_service   = 2;
+constexpr std::size_t arn_idx_region    = 3;
+constexpr std::size_t arn_idx_tail      = 5;
 
 /// Tail prefixes the KMS API accepts for the `KeyId` field.
 constexpr std::string_view tail_prefix_key   = "key/";
@@ -123,6 +132,20 @@ kms_client_cache& kms_clients() {
    return c;
 }
 
+/// Case-insensitive ASCII prefix test. ARN partitions and services are
+/// lowercase by convention, but an operator may paste a mis-cased
+/// `ARN:AWS:KMS:...`; we still want to recognise it as an ARN so it fails
+/// loudly in `parse_kms_spec` rather than being mistaken for the shorthand
+/// `<region>:<key-id>` form.
+bool starts_with_ci(std::string_view s, std::string_view prefix) {
+   if (s.size() < prefix.size())
+      return false;
+   return std::equal(prefix.begin(), prefix.end(), s.begin(),
+                     [](unsigned char a, unsigned char b) {
+                        return std::tolower(a) == std::tolower(b);
+                     });
+}
+
 } // namespace
 
 kms_key_ref parse_kms_spec(std::string_view spec_data) {
@@ -155,6 +178,31 @@ kms_key_ref parse_kms_spec(std::string_view spec_data) {
                  "KMS ARN tail \"{}\" has empty key/alias name", tail);
 
       return kms_key_ref{region, tail};
+   }
+
+   // A spec that begins with `arn:` (any casing) but did not match the
+   // supported `arn:aws:kms:` form above is a malformed or out-of-scope ARN,
+   // never shorthand. Falling through to the `<region>:<key-id>` parser below
+   // would split on the first colon and silently yield region="arn"; AWS then
+   // rejects that only at first sign — with an opaque `InvalidRegion`/endpoint
+   // error, after a billable attempt. Fail loudly here instead, naming the
+   // offending partition and service. Non-`aws` partitions (`aws-cn`,
+   // `aws-us-gov`) are deliberately out of scope; this is the boundary that
+   // enforces it. A mis-cased `ARN:AWS:KMS:...` and a typo'd service
+   // (`arn:aws:ksm:...`) land here too — the message points at the canonical
+   // form in every case.
+   if (starts_with_ci(spec_data, arn_lead_in)) {
+      const auto parts = fc::split(std::string{spec_data}, ':', kms_arn_segment_count);
+      std::string partition, service;
+      if (parts.size() > arn_idx_partition)
+         partition = parts[arn_idx_partition];
+      if (parts.size() > arn_idx_service)
+         service = parts[arn_idx_service];
+      FC_THROW_EXCEPTION(chain::plugin_config_exception,
+                         "Unsupported KMS ARN \"{}\": only the 'arn:aws:kms:' partition/service "
+                         "is supported (got partition \"{}\", service \"{}\"). Non-'aws' "
+                         "partitions such as 'aws-cn' and 'aws-us-gov' are out of scope.",
+                         spec_data, partition, service);
    }
 
    // Shorthand `<region>:<key-id-or-alias>`. We only split on the first colon

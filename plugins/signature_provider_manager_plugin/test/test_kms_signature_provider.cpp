@@ -177,6 +177,38 @@ BOOST_AUTO_TEST_CASE(parse_kms_spec_rejects_arn_too_few_segments) {
                      sysio::chain::plugin_config_exception);
 }
 
+BOOST_AUTO_TEST_CASE(parse_kms_spec_rejects_china_partition) {
+   // `aws-cn` partition is out of scope. Must fail loudly at parse time
+   // rather than mis-parsing region as "arn" and failing later at first sign.
+   BOOST_CHECK_THROW(parse_kms_spec("arn:aws-cn:kms:cn-north-1:111122223333:key/abc"),
+                     sysio::chain::plugin_config_exception);
+}
+
+BOOST_AUTO_TEST_CASE(parse_kms_spec_rejects_govcloud_partition) {
+   // `aws-us-gov` partition is likewise out of scope.
+   BOOST_CHECK_THROW(parse_kms_spec("arn:aws-us-gov:kms:us-gov-west-1:111122223333:key/abc"),
+                     sysio::chain::plugin_config_exception);
+}
+
+BOOST_AUTO_TEST_CASE(parse_kms_spec_rejects_uppercase_arn) {
+   // A mis-cased ARN is not the supported lowercase `arn:aws:kms:` form;
+   // recognised case-insensitively as an ARN so it fails loudly here.
+   BOOST_CHECK_THROW(parse_kms_spec("ARN:AWS:KMS:us-east-1:111122223333:key/abc"),
+                     sysio::chain::plugin_config_exception);
+}
+
+BOOST_AUTO_TEST_CASE(parse_kms_spec_rejects_typoed_service) {
+   // `ksm` instead of `kms` — would otherwise mis-parse region as "arn".
+   BOOST_CHECK_THROW(parse_kms_spec("arn:aws:ksm:us-east-1:111122223333:key/abc"),
+                     sysio::chain::plugin_config_exception);
+}
+
+BOOST_AUTO_TEST_CASE(parse_kms_spec_rejects_bare_arn_prefix) {
+   // Just `arn:` with nothing after it is still an ARN-shaped spec, not
+   // shorthand with a region literally named "arn".
+   BOOST_CHECK_THROW(parse_kms_spec("arn:"), sysio::chain::plugin_config_exception);
+}
+
 BOOST_AUTO_TEST_CASE(parse_kms_spec_rejects_shorthand_empty_region) {
    // Leading colon means no region.
    BOOST_CHECK_THROW(parse_kms_spec(":alias/wire-cranker-eth-01"),
