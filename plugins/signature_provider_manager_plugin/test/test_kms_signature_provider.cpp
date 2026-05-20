@@ -80,6 +80,33 @@ std::vector<unsigned char> compact_to_der(const std::array<unsigned char, 64>& c
    return der;
 }
 
+/**
+ * Test helper: wrap a 65-byte uncompressed secp256k1 EC point (0x04 || X || Y)
+ * in a DER X.509 SubjectPublicKeyInfo, byte-for-byte identical to what AWS KMS
+ * `GetPublicKey` returns for an `ECC_SECG_P256K1` signing key. Lets us exercise
+ * the production `spki_der_to_public_key` decoder without calling AWS.
+ *
+ * The 23-byte prefix is fixed because every field length is small enough for
+ * single-byte DER length encoding and the algorithm identifiers are constant:
+ *
+ *   SEQUENCE (0x56) {
+ *      SEQUENCE (0x10) { OID id-ecPublicKey, OID secp256k1 }
+ *      BIT STRING (0x42) { 00 <65-byte point> }
+ *   }
+ */
+std::vector<unsigned char> point_to_spki_der(
+   const fc::em::public_key_data_uncompressed& point) {
+   static constexpr std::array<unsigned char, 23> spki_prefix = {
+      0x30, 0x56, 0x30, 0x10, 0x06, 0x07, 0x2A, 0x86,
+      0x48, 0xCE, 0x3D, 0x02, 0x01, 0x06, 0x05, 0x2B,
+      0x81, 0x04, 0x00, 0x0A, 0x03, 0x42, 0x00};
+   std::vector<unsigned char> der(spki_prefix.begin(), spki_prefix.end());
+   for (const char c : point) {
+      der.push_back(static_cast<unsigned char>(c));
+   }
+   return der;
+}
+
 /// Curve order N for secp256k1 (big-endian). Used to construct deliberately
 /// high-S signatures from a known low-S form by computing s' = N - s.
 constexpr std::array<unsigned char, 32> secp256k1_curve_order = {
@@ -341,6 +368,69 @@ BOOST_AUTO_TEST_CASE(der_to_eth_signature_normalises_high_s_input) {
 
    // Output must be canonical (low-S) and match the locally signed form.
    BOOST_CHECK(out == local);
+}
+
+// ---------------------------------------------------------------------------
+// spki_der_to_public_key — design §5.7 public-key pinning decoder
+//
+// These tests synthesise the X.509 SubjectPublicKeyInfo that AWS KMS
+// `GetPublicKey` returns by wrapping a locally generated EC point with
+// `point_to_spki_der` above. No AWS credentials, no network.
+// ---------------------------------------------------------------------------
+
+BOOST_AUTO_TEST_CASE(spki_der_to_public_key_round_trips) {
+   // A well-formed secp256k1 SPKI must decode back to the exact key it wraps.
+   for (int i = 0; i < 4; ++i) {
+      const auto priv = fc::em::private_key::generate();
+      const auto pub  = priv.get_public_key();
+
+      const auto der     = point_to_spki_der(pub.serialize_uncompressed());
+      const auto decoded = sysio::sigprov::kms::spki_der_to_public_key(
+         std::span<const unsigned char>(der));
+      BOOST_CHECK(decoded == pub);
+   }
+}
+
+BOOST_AUTO_TEST_CASE(spki_der_to_public_key_rejects_garbage) {
+   // Non-DER bytes must fail the structural walk, not be silently accepted.
+   const std::array<unsigned char, 4> garbage{0xde, 0xad, 0xbe, 0xef};
+   BOOST_CHECK_THROW(
+      sysio::sigprov::kms::spki_der_to_public_key(std::span<const unsigned char>(garbage)),
+      sysio::chain::plugin_config_exception);
+}
+
+BOOST_AUTO_TEST_CASE(spki_der_to_public_key_rejects_wrong_curve) {
+   // Flip the final byte of the curve OID (0x0A -> 0x07): the structure stays
+   // valid DER but the named curve is no longer secp256k1. An operator who
+   // pointed the spec at a non-secp256k1 EC key must get a loud parse error.
+   const auto priv = fc::em::private_key::generate();
+   auto der = point_to_spki_der(priv.get_public_key().serialize_uncompressed());
+   der[19] = 0x07; // index 19 = last octet of the secp256k1 curve OID body
+   BOOST_CHECK_THROW(
+      sysio::sigprov::kms::spki_der_to_public_key(std::span<const unsigned char>(der)),
+      sysio::chain::plugin_config_exception);
+}
+
+BOOST_AUTO_TEST_CASE(spki_der_to_public_key_rejects_truncated) {
+   // A buffer shorter than its declared DER lengths must fail, not over-read.
+   const auto priv = fc::em::private_key::generate();
+   auto der = point_to_spki_der(priv.get_public_key().serialize_uncompressed());
+   der.resize(der.size() - 10); // chop the tail of the EC point
+   BOOST_CHECK_THROW(
+      sysio::sigprov::kms::spki_der_to_public_key(std::span<const unsigned char>(der)),
+      sysio::chain::plugin_config_exception);
+}
+
+BOOST_AUTO_TEST_CASE(spki_der_to_public_key_rejects_off_curve_point) {
+   // Structurally valid SPKI whose 65-byte point (0x04 followed by all zeros)
+   // is not on the secp256k1 curve. libsecp256k1 rejects it; the helper must
+   // surface that as the module's standard plugin_config_exception.
+   fc::em::public_key_data_uncompressed off_curve{};
+   off_curve[0] = 0x04;
+   const auto der = point_to_spki_der(off_curve);
+   BOOST_CHECK_THROW(
+      sysio::sigprov::kms::spki_der_to_public_key(std::span<const unsigned char>(der)),
+      sysio::chain::plugin_config_exception);
 }
 
 // ---------------------------------------------------------------------------

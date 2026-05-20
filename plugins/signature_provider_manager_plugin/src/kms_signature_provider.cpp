@@ -11,6 +11,7 @@
 #include <aws/core/utils/Array.h>
 #include <aws/kms/KMSClient.h>
 #include <aws/kms/KMSErrors.h>
+#include <aws/kms/model/GetPublicKeyRequest.h>
 #include <aws/kms/model/SignRequest.h>
 #include <aws/kms/model/MessageType.h>
 #include <aws/kms/model/SigningAlgorithmSpec.h>
@@ -96,12 +97,28 @@ private:
 /// Per-closure state for a KMS-backed signer. Captured by `std::shared_ptr`
 /// so that `std::function` copies remain cheap and the same `KMSClient` /
 /// expected pubkey are shared across copies of the closure.
+///
+/// A user-provided constructor is required because `std::once_flag` is neither
+/// copyable nor movable, which rules out the aggregate / designated-initializer
+/// construction the struct would otherwise allow.
 struct kms_signer_state {
+   kms_signer_state(std::shared_ptr<Aws::KMS::KMSClient> client_,
+                    std::string                         key_id_,
+                    fc::em::public_key                  expected_em_pubkey_)
+      : client(std::move(client_))
+      , key_id(std::move(key_id_))
+      , expected_em_pubkey(std::move(expected_em_pubkey_)) {}
+
    std::shared_ptr<Aws::KMS::KMSClient> client;
    std::string                          key_id;
-   /// secp256k1 uncompressed public key the spec pinned. Used by
+   /// secp256k1 uncompressed public key the spec pinned. Verified once against
+   /// the live KMS key by `verify_kms_pubkey` (design §5.7), then used by
    /// `recover_v` to discriminate between recovery_id 0 and 1.
    fc::em::public_key                   expected_em_pubkey;
+   /// One-shot guard for the GetPublicKey pinning check. The check runs on the
+   /// first `Sign`; `std::call_once` re-runs it only if it threw — e.g. a
+   /// transient GetPublicKey API error — and never again once it has passed.
+   std::once_flag                       pin_once;
 };
 
 /// Translate an AWS KMS error outcome into a fc::exception with a stable
@@ -144,6 +161,175 @@ bool starts_with_ci(std::string_view s, std::string_view prefix) {
                      [](unsigned char a, unsigned char b) {
                         return std::tolower(a) == std::tolower(b);
                      });
+}
+
+// ---------------------------------------------------------------------------
+// X.509 SubjectPublicKeyInfo (DER) decoding — design §5.7 public-key pinning.
+//
+// AWS KMS `GetPublicKey` returns the key as a DER-encoded SubjectPublicKeyInfo
+// (RFC 5280 §4.1). We walk just enough of that structure to verify the key is
+// secp256k1 and to lift out the raw EC point.
+// ---------------------------------------------------------------------------
+
+/// ASN.1 DER universal tags that appear inside an EC SubjectPublicKeyInfo.
+constexpr unsigned char der_tag_sequence   = 0x30;
+constexpr unsigned char der_tag_oid        = 0x06;
+constexpr unsigned char der_tag_bit_string = 0x03;
+
+/// DER length encoding: when the high bit of the leading length octet is set,
+/// the low 7 bits give the number of subsequent big-endian length octets.
+constexpr unsigned char der_length_long_form_bit = 0x80;
+constexpr unsigned char der_length_value_mask    = 0x7F;
+
+/// DER OBJECT IDENTIFIER bodies (the content of the OID TLV — tag and length
+/// stripped) for the two OIDs that a secp256k1 SPKI must carry:
+/// `1.2.840.10045.2.1` id-ecPublicKey and `1.3.132.0.10` secp256k1.
+constexpr std::array<unsigned char, 7> oid_ec_public_key = {
+   0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x02, 0x01};
+constexpr std::array<unsigned char, 5> oid_secp256k1 = {
+   0x2B, 0x81, 0x04, 0x00, 0x0A};
+
+/// An uncompressed secp256k1 EC point is `0x04 || X[32] || Y[32]`.
+constexpr unsigned char ec_point_uncompressed_prefix = 0x04;
+constexpr std::size_t   ec_point_uncompressed_len    = 65;
+
+/// Minimal ASN.1 DER reader over a byte span. DER is a canonical, unambiguous
+/// encoding, so a structural tag-length-value walk is a genuine parse — not a
+/// heuristic. Every malformed input raises `plugin_config_exception`.
+struct der_reader {
+   std::span<const unsigned char> buf;
+   std::size_t                    pos = 0;
+
+   /// True once every byte of `buf` has been consumed.
+   bool at_end() const { return pos >= buf.size(); }
+
+   /// One decoded tag-length-value triple. `content` views into the reader's
+   /// underlying buffer (no copy is made).
+   struct element {
+      unsigned char                  tag;
+      std::span<const unsigned char> content;
+   };
+
+   /// Read the next TLV element and advance past it.
+   element next() {
+      SYS_ASSERT(pos + 2 <= buf.size(), chain::plugin_config_exception,
+                 "Malformed KMS public-key DER: truncated tag/length header");
+      const unsigned char tag = buf[pos++];
+
+      std::size_t len = buf[pos++];
+      if ((len & der_length_long_form_bit) != 0) {
+         const std::size_t len_octets = len & der_length_value_mask;
+         SYS_ASSERT(len_octets >= 1 && len_octets <= sizeof(std::size_t),
+                    chain::plugin_config_exception,
+                    "Malformed KMS public-key DER: unsupported {}-octet length field",
+                    len_octets);
+         SYS_ASSERT(pos + len_octets <= buf.size(), chain::plugin_config_exception,
+                    "Malformed KMS public-key DER: truncated long-form length");
+         len = 0;
+         for (std::size_t i = 0; i < len_octets; ++i) {
+            len = (len << 8) | buf[pos++];
+         }
+      }
+      // `buf.size() - pos` cannot underflow: `pos <= buf.size()` is an
+      // invariant here, and the subtraction form avoids `pos + len` wrapping
+      // on a maliciously large long-form length.
+      SYS_ASSERT(len <= buf.size() - pos, chain::plugin_config_exception,
+                 "Malformed KMS public-key DER: element body of {} bytes overruns buffer",
+                 len);
+
+      const auto content = buf.subspan(pos, len);
+      pos += len;
+      return {tag, content};
+   }
+};
+
+/// Walk a DER X.509 SubjectPublicKeyInfo and return its raw uncompressed
+/// secp256k1 EC point (`0x04 || X || Y`). Verifies the algorithm is
+/// `id-ecPublicKey` over the `secp256k1` named curve, so an operator who
+/// pointed the spec at an RSA key, a P-256 key, etc. gets a precise error
+/// instead of a downstream surprise.
+std::array<unsigned char, ec_point_uncompressed_len>
+parse_spki_ec_point(std::span<const unsigned char> spki_der) {
+   der_reader top{spki_der};
+   const auto spki = top.next();
+   SYS_ASSERT(spki.tag == der_tag_sequence, chain::plugin_config_exception,
+              "KMS public-key DER: expected outer SEQUENCE, got tag {:#x}",
+              static_cast<unsigned>(spki.tag));
+   SYS_ASSERT(top.at_end(), chain::plugin_config_exception,
+              "KMS public-key DER: unexpected trailing bytes after SubjectPublicKeyInfo");
+
+   // SubjectPublicKeyInfo ::= SEQUENCE { algorithm AlgorithmIdentifier,
+   //                                     subjectPublicKey BIT STRING }
+   der_reader body{spki.content};
+   const auto algorithm  = body.next();
+   const auto subject_pk = body.next();
+   SYS_ASSERT(algorithm.tag == der_tag_sequence, chain::plugin_config_exception,
+              "KMS public-key DER: expected AlgorithmIdentifier SEQUENCE, got tag {:#x}",
+              static_cast<unsigned>(algorithm.tag));
+   SYS_ASSERT(subject_pk.tag == der_tag_bit_string, chain::plugin_config_exception,
+              "KMS public-key DER: expected subjectPublicKey BIT STRING, got tag {:#x}",
+              static_cast<unsigned>(subject_pk.tag));
+   SYS_ASSERT(body.at_end(), chain::plugin_config_exception,
+              "KMS public-key DER: unexpected trailing bytes inside SubjectPublicKeyInfo");
+
+   // AlgorithmIdentifier ::= SEQUENCE { algorithm OID, parameters (curve OID) }
+   der_reader alg{algorithm.content};
+   const auto algo_oid  = alg.next();
+   const auto curve_oid = alg.next();
+   SYS_ASSERT(algo_oid.tag == der_tag_oid && curve_oid.tag == der_tag_oid,
+              chain::plugin_config_exception,
+              "KMS public-key DER: AlgorithmIdentifier is not a pair of OBJECT IDENTIFIERs");
+   SYS_ASSERT(std::ranges::equal(algo_oid.content, oid_ec_public_key),
+              chain::plugin_config_exception,
+              "KMS public-key DER: algorithm is not id-ecPublicKey — the KMS key is not an "
+              "elliptic-curve key");
+   SYS_ASSERT(std::ranges::equal(curve_oid.content, oid_secp256k1),
+              chain::plugin_config_exception,
+              "KMS public-key DER: EC curve is not secp256k1 — the KMS key must be created "
+              "with key spec ECC_SECG_P256K1");
+
+   // subjectPublicKey BIT STRING: a leading "unused bits" octet (0 for a
+   // byte-aligned key) followed by the EC point itself.
+   SYS_ASSERT(!subject_pk.content.empty() && subject_pk.content.front() == 0x00,
+              chain::plugin_config_exception,
+              "KMS public-key DER: subjectPublicKey BIT STRING has a non-zero unused-bit count");
+   const auto point = subject_pk.content.subspan(1);
+   SYS_ASSERT(point.size() == ec_point_uncompressed_len, chain::plugin_config_exception,
+              "KMS public-key DER: EC point is {} bytes, expected {} (uncompressed 0x04 form)",
+              point.size(), ec_point_uncompressed_len);
+   SYS_ASSERT(point.front() == ec_point_uncompressed_prefix, chain::plugin_config_exception,
+              "KMS public-key DER: EC point is not in uncompressed (0x04) form");
+
+   std::array<unsigned char, ec_point_uncompressed_len> out{};
+   std::ranges::copy(point, out.begin());
+   return out;
+}
+
+/// Design §5.7 public-key pinning. Fetch the KMS key's public key with the
+/// free, non-billable `GetPublicKey` API, decode its SubjectPublicKeyInfo, and
+/// assert it matches the key the operator pinned in the spec. On mismatch this
+/// throws `plugin_config_exception` early — before any billable `Sign` — with a
+/// message that names the misconfiguration directly. Invoked exactly once per
+/// closure through `kms_signer_state::pin_once`.
+void verify_kms_pubkey(kms_signer_state& state) {
+   Aws::KMS::Model::GetPublicKeyRequest req;
+   req.SetKeyId(Aws::String{state.key_id.c_str()});
+
+   auto outcome = state.client->GetPublicKey(req);
+   if (!outcome.IsSuccess()) {
+      throw_kms_error("GetPublicKey", state.key_id, outcome.GetError());
+   }
+
+   const auto& spki_buf = outcome.GetResult().GetPublicKey();
+   const std::span<const unsigned char> spki_der{
+      spki_buf.GetUnderlyingData(), spki_buf.GetLength()};
+
+   const auto kms_pubkey = spki_der_to_public_key(spki_der);
+   SYS_ASSERT(kms_pubkey == state.expected_em_pubkey, chain::plugin_config_exception,
+              "AWS KMS key \"{}\" holds a public key that does not match the public key "
+              "pinned in the signature-provider spec. Correct the spec's <public-key> to the "
+              "key this KMS key actually holds, or point the spec at the intended KMS key.",
+              state.key_id);
 }
 
 } // namespace
@@ -293,6 +479,27 @@ fc::em::compact_signature der_to_eth_signature(
    return out;
 }
 
+fc::em::public_key spki_der_to_public_key(std::span<const unsigned char> spki_der) {
+   const auto point = parse_spki_ec_point(spki_der);
+
+   // `public_key_data_uncompressed` is std::array<char, 65>; the EC point is
+   // std::array<unsigned char, 65>. The element-wise copy is a value-preserving
+   // unsigned-char -> char conversion (bit pattern unchanged).
+   fc::em::public_key_data_uncompressed uncompressed{};
+   std::ranges::copy(point, uncompressed.begin());
+
+   // The fc::em::public_key constructor re-validates the point on the curve via
+   // libsecp256k1 and raises an fc assertion on a bad point. Translate that to
+   // the module's standard exception type so every failure here is uniform.
+   try {
+      return fc::em::public_key{uncompressed};
+   } catch (const fc::exception& e) {
+      FC_THROW_EXCEPTION(chain::plugin_config_exception,
+                         "KMS public-key DER carries an EC point that is not a valid "
+                         "secp256k1 public key: {}", e.to_detail_string());
+   }
+}
+
 fc::crypto::sign_fn make_kms_signature_provider(const kms_key_ref&             ref,
                                                 fc::crypto::chain_key_type_t   key_type,
                                                 const fc::crypto::public_key&  expected_pubkey) {
@@ -314,13 +521,20 @@ fc::crypto::sign_fn make_kms_signature_provider(const kms_key_ref&             r
 
    const auto& shim = expected_pubkey.get<fc::em::public_key_shim>();
 
-   auto state = std::make_shared<kms_signer_state>(kms_signer_state{
-      .client             = get_kms_client(ref.region),
-      .key_id             = ref.key_id,
-      .expected_em_pubkey = shim.unwrapped(),
-   });
+   auto state = std::make_shared<kms_signer_state>(
+      get_kms_client(ref.region), ref.key_id, shim.unwrapped());
 
    return [state](const chain::digest_type& digest) -> chain::signature_type {
+      // Public-key pinning (design §5.7). Before the first — and only the
+      // first — billable Sign, fetch the KMS key's own public key with the
+      // free GetPublicKey API and assert it matches the key pinned in the
+      // spec. This turns the common "wrong <public-key> in the spec" mistake
+      // into a fast, direct error instead of an opaque recovery failure that
+      // would otherwise surface only after a paid Sign. `std::call_once` runs
+      // the check exactly once on success; if it throws (e.g. a transient
+      // GetPublicKey API error) the next Sign retries it.
+      std::call_once(state->pin_once, [&] { verify_kms_pubkey(*state); });
+
       // Build a Sign request. MessageType=DIGEST tells KMS the 32 bytes are
       // already a hash; otherwise it would re-hash with SHA-256 and break
       // any chain that hashes with anything other than SHA-256.

@@ -128,6 +128,28 @@ fc::em::compact_signature der_to_eth_signature(
    const fc::em::public_key&           expected_pubkey);
 
 /**
+ * @brief Decode an X.509 SubjectPublicKeyInfo (DER) into a secp256k1 public key.
+ *
+ * AWS KMS `GetPublicKey` returns the public key as a DER-encoded
+ * SubjectPublicKeyInfo (RFC 5280 §4.1): an outer `SEQUENCE` wrapping an
+ * `AlgorithmIdentifier` and a `BIT STRING`. This helper walks that structure,
+ * verifies the algorithm is `id-ecPublicKey` over the `secp256k1` named curve,
+ * and lifts the trailing uncompressed `0x04 || X || Y` point into an
+ * `fc::em::public_key`. It backs the design §5.7 public-key pinning check.
+ *
+ * Because DER is a canonical encoding, the walk is an exact parse rather than a
+ * heuristic: anything that is not a well-formed secp256k1 SPKI is rejected.
+ *
+ * @param spki_der DER bytes of the SubjectPublicKeyInfo (88 bytes for a
+ *        well-formed uncompressed secp256k1 key)
+ * @throws sysio::chain::plugin_config_exception if the DER is malformed, the
+ *         algorithm or curve is not secp256k1, or the EC point is not a valid
+ *         uncompressed secp256k1 public key
+ * @return the decoded public key
+ */
+fc::em::public_key spki_der_to_public_key(std::span<const unsigned char> spki_der);
+
+/**
  * @brief Get (or lazily create) a process-wide `KMSClient` for `region`.
  *
  * The first call from the process triggers `Aws::InitAPI`; the SDK is shut
@@ -156,16 +178,23 @@ std::shared_ptr<Aws::KMS::KMSClient> get_kms_client(const std::string& region);
  * happens here; the first KMS request occurs only when the closure is
  * invoked.
  *
+ * On its first invocation the closure performs design §5.7 public-key
+ * pinning: it calls `KMSClient::GetPublicKey` exactly once, decodes the
+ * returned X.509 SubjectPublicKeyInfo via `spki_der_to_public_key`, and
+ * asserts the KMS key's public key matches `expected_pubkey`. A mismatch
+ * throws `chain::plugin_config_exception` immediately — before any billable
+ * `Sign` — so a spec that pins the wrong `<public-key>` fails fast with a
+ * direct error. The pinning check runs once on success; a transient
+ * `GetPublicKey` failure is retried on the next `Sign`.
+ *
  * Each invocation sends an `ECDSA_SHA_256` `Sign` request with
  * `MessageType=DIGEST` (so KMS treats the 32-byte input as already hashed
  * rather than re-hashing with SHA-256), decodes KMS's DER signature,
  * normalises it to low-S, recovers the Ethereum `v` byte by trying both
  * parities and matching against `expected_pubkey`, and returns a 65-byte
  * compact signature. If neither parity recovers to the expected key the call
- * throws `chain::plugin_config_exception` — effectively the per-sign
- * integrity check that the KMS key still matches the public key pinned in
- * the spec. There is no `KMSClient::GetPublicKey` call; the pubkey match is
- * proven implicitly by successful ECDSA recovery.
+ * throws `chain::plugin_config_exception`; once pinning has passed this is a
+ * defence-in-depth check that should never fire.
  *
  * v1 only supports secp256k1 keys held as Ethereum public keys
  * (`chain_key_type_ethereum` + `fc::em::public_key_shim`). Other key types
