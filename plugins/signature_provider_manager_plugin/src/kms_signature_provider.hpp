@@ -10,9 +10,6 @@
  * its tests; it is intentionally not installed under `include/`.
  */
 
-#include <aws/kms/KMSClient.h>
-#include <aws/kms/KMSErrors.h>
-
 #include <fc/crypto/chain_types_reflect.hpp>
 #include <fc/crypto/elliptic_em.hpp>
 #include <fc/crypto/keccak256.hpp>
@@ -25,6 +22,31 @@
 #include <span>
 #include <string>
 #include <string_view>
+
+/**
+ * Forward declarations for the AWS SDK types named in this header's function
+ * signatures. The full `<aws/kms/...>` headers pull in a large dependency
+ * tree; declaring these types opaquely keeps that tree out of every
+ * translation unit that includes this header only for `parse_kms_spec` /
+ * `make_kms_signature_provider` — notably `signature_provider_manager_plugin.cpp`,
+ * which uses no AWS type at all. The full AWS headers are included only where
+ * the complete types are actually needed: `kms_signature_provider.cpp` and the
+ * plugin's test translation unit.
+ *
+ * `KMSClient` is named only as `std::shared_ptr<KMSClient>` and `AWSError`
+ * only behind a reference, so an incomplete type suffices for the declarations
+ * below. This couples the header to the AWS SDK's (very stable) declaration of
+ * these names; the SDK ships no forward-declaration header of its own.
+ */
+namespace Aws {
+namespace KMS {
+   class KMSClient;
+   enum class KMSErrors;
+} // namespace KMS
+namespace Client {
+   template<typename ERROR_TYPE> class AWSError;
+} // namespace Client
+} // namespace Aws
 
 namespace sysio::sigprov::kms {
 
