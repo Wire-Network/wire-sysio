@@ -14,9 +14,9 @@ namespace {
 sysio::opp::debugging::DebugOutpostEndpointsType
 depot_outpost_direction_for(sysio::opp::types::ChainKind kind) {
    switch (kind) {
-      case sysio::opp::types::CHAIN_KIND_ETHEREUM:
+      case sysio::opp::types::CHAIN_KIND_EVM:
          return sysio::opp::debugging::DEBUG_OUTPOST_ENDPOINTS_TYPE_DEPOT_OUTPOST_ETHEREUM;
-      case sysio::opp::types::CHAIN_KIND_SOLANA:
+      case sysio::opp::types::CHAIN_KIND_SVM:
          return sysio::opp::debugging::DEBUG_OUTPOST_ENDPOINTS_TYPE_DEPOT_OUTPOST_SOLANA;
       default:
          return sysio::opp::debugging::DEBUG_OUTPOST_ENDPOINTS_TYPE_UNKNOWN;
@@ -28,9 +28,9 @@ depot_outpost_direction_for(sysio::opp::types::ChainKind kind) {
 sysio::opp::debugging::DebugOutpostEndpointsType
 outpost_depot_direction_for(sysio::opp::types::ChainKind kind) {
    switch (kind) {
-      case sysio::opp::types::CHAIN_KIND_ETHEREUM:
+      case sysio::opp::types::CHAIN_KIND_EVM:
          return sysio::opp::debugging::DEBUG_OUTPOST_ENDPOINTS_TYPE_OUTPOST_ETHEREUM_DEPOT;
-      case sysio::opp::types::CHAIN_KIND_SOLANA:
+      case sysio::opp::types::CHAIN_KIND_SVM:
          return sysio::opp::debugging::DEBUG_OUTPOST_ENDPOINTS_TYPE_OUTPOST_SOLANA_DEPOT;
       default:
          return sysio::opp::debugging::DEBUG_OUTPOST_ENDPOINTS_TYPE_UNKNOWN;

@@ -1,6 +1,8 @@
 #include <sysio.msgch/sysio.msgch.hpp>
 #include <sysio.epoch/sysio.epoch.hpp>
 #include <sysio.authex/sysio.authex.hpp>
+#include <sysio.chains/sysio.chains.hpp>
+#include <sysio.opp.common/slug_name.hpp>
 #include <sysio/opp/opp.pb.hpp>
 #include <sysio/opp/attestations/attestations.pb.hpp>
 #include <zpp_bits.h>
@@ -8,7 +10,6 @@
 namespace sysio {
 
 using opp::types::ChainKind;
-using opp::types::TokenKind;
 using opp::types::MessageDirection;
 using opp::types::MessageStatus;
 using opp::types::EnvelopeStatus;
@@ -17,11 +18,13 @@ using opp::types::AttestationStatus;
 
 namespace {
 
-constexpr auto     EPOCH_ACCOUNT  = "sysio.epoch"_n;
-constexpr auto     OPREG_ACCOUNT  = "sysio.opreg"_n;
-constexpr auto     UWRIT_ACCOUNT  = "sysio.uwrit"_n;
-constexpr auto     CHALG_ACCOUNT  = "sysio.chalg"_n;
-constexpr auto     AUTHEX_ACCOUNT = "sysio.authex"_n;
+constexpr auto     EPOCH_ACCOUNT   = "sysio.epoch"_n;
+constexpr auto     OPREG_ACCOUNT   = "sysio.opreg"_n;
+constexpr auto     UWRIT_ACCOUNT   = "sysio.uwrit"_n;
+constexpr auto     CHALG_ACCOUNT   = "sysio.chalg"_n;
+constexpr auto     AUTHEX_ACCOUNT  = "sysio.authex"_n;
+constexpr auto     CHAINS_ACCOUNT  = "sysio.chains"_n;
+constexpr auto     RESERV_ACCOUNT  = "sysio.reserv"_n;
 
 /// WIRE chain numeric id used in `opp::Endpoints` rows on the audit log.
 /// One end of every cross-chain envelope is always WIRE.
@@ -87,9 +90,15 @@ void write_envelope_log(name self,
       .emitted_at  = current_time_point(),
    });
 
-   epoch::outposts_t outposts(EPOCH_ACCOUNT);
+   // Active-outpost count is sourced from sysio.chains::chains, filtering
+   // out the depot self-row. Mirrors the predicate used by sysio.epoch's
+   // `is_active_outpost`: a chain row is an active outpost iff
+   // `row.active == true && row.is_depot == false`.
+   sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
    uint32_t active_outposts = 0;
-   for (auto it = outposts.begin(); it != outposts.end(); ++it) ++active_outposts;
+   for (auto it = chains_tbl.begin(); it != chains_tbl.end(); ++it) {
+      if (it->active && !it->is_depot) ++active_outposts;
+   }
    if (active_outposts == 0) return;                  // nothing to bound against
 
    epoch::epochcfg_t cfg_tbl(EPOCH_ACCOUNT);
@@ -129,14 +138,14 @@ sysio::public_key public_key_from_op_address(ChainKind chain,
          pk.emplace<0>(arr);
          return pk;
       }
-      case ChainKind::CHAIN_KIND_ETHEREUM: {   // EM — variant index 3
+      case ChainKind::CHAIN_KIND_EVM: {        // EM — variant index 3
          if (bytes.size() != 33) return pk;
          sysio::ecc_public_key arr;
          std::copy(bytes.begin(), bytes.end(), arr.begin());
          pk.emplace<3>(arr);
          return pk;
       }
-      case ChainKind::CHAIN_KIND_SOLANA: {     // ED — variant index 4
+      case ChainKind::CHAIN_KIND_SVM: {        // ED — variant index 4
          if (bytes.size() != 32) return pk;
          sysio::ed_public_key arr;
          std::copy(bytes.begin(), bytes.end(),
@@ -167,9 +176,12 @@ name resolve_account_from_op_address(const opp::types::ChainAddress& op_address)
 /// Decode an OperatorAction sub-message and dispatch to the appropriate
 /// sysio.opreg action. Called from the inbound dispatch loop in `evalcons`.
 ///
-/// Sub-type routing:
-///   * DEPOSIT_REQUEST     → opreg::depositinle(account, chain, amount, actor, msg_id)
-///   * WITHDRAW_REQUEST    → opreg::withdrawinle(account, chain, amount)
+/// Sub-type routing (post v6 data-model refactor — codenames everywhere):
+///   * DEPOSIT_REQUEST     → opreg::depositinle(account, chain_code, token_code,
+///                                              amount, actor_chain, actor_addr,
+///                                              msg_id)
+///   * WITHDRAW_REQUEST    → opreg::withdrawinle(account, chain_code, token_code,
+///                                                amount)
 ///   * WITHDRAW_REMIT      → outbound-only (depot → outpost); silently dropped if seen inbound
 ///   * SLASH               → depot-internal; rejected if seen inbound. Slash decisions
 ///                            originate from sysio.chalg → opreg::slash and never re-enter
@@ -177,6 +189,14 @@ name resolve_account_from_op_address(const opp::types::ChainAddress& op_address)
 ///                            outpost replaying its own outbound (no-op), or a malformed
 ///                            attestation from a misbehaving operator (drop).
 ///   * UNKNOWN             → no-op
+///
+/// `chain_code` is sourced from `OperatorAction.chain_code` (uint64 slug_name
+/// on the wire). The `from_chain` ChainKind argument is retained only as a
+/// trust-boundary check — the attestation was received from the outpost
+/// representing that VM family, so a mismatched payload `chain_code` (one
+/// whose owning chain row in `sysio.chains` has a different `kind`) is a
+/// red flag. Per `feedback_opp_handlers_never_throw`, we silently drop on
+/// mismatch rather than aborting the envelope.
 ///
 /// `original_message_id` is the OPP message id of the attestation's parent
 /// Message — opreg::depositinle uses it to populate DEPOSIT_REVERT correlation
@@ -202,9 +222,18 @@ void dispatch_operator_action(name self, const std::vector<char>& data,
    name account = resolve_account_from_op_address(oa.op_address);
    if (account == name{}) return;
 
+   // (void)from_chain — retained on the signature for future cross-checks
+   // against the chain row resolved from `oa.chain_code`. No-op for now
+   // because dispatch must never throw; if the cross-check were to fail
+   // we'd silently drop rather than abort the envelope.
+   (void)from_chain;
+
    using AT = opp::attestations::OperatorAction;
-   // TokenAmount + ChainAddress get split into (kind, amount) / (kind, address)
-   // on the inline-action tuples per the no-proto-messages-in-actions rule.
+   // TokenAmount + ChainAddress get split into (chain_code, token_code,
+   // amount) / (kind, address) on the inline-action tuples per the
+   // no-proto-messages-in-actions rule.
+   const sysio::slug_name chain_code{oa.chain_code};
+   const sysio::slug_name token_code{oa.amount.token_code};
    const uint64_t raw_amount =
       static_cast<uint64_t>(static_cast<int64_t>(oa.amount.amount));
    switch (oa.action_type) {
@@ -219,8 +248,7 @@ void dispatch_operator_action(name self, const std::vector<char>& data,
          action(
             permission_level{OPREG_ACCOUNT, "active"_n},
             OPREG_ACCOUNT, "depositinle"_n,
-            std::make_tuple(account, from_chain,
-                            oa.amount.kind, raw_amount,
+            std::make_tuple(account, chain_code, token_code, raw_amount,
                             oa.op_address.kind, oa.op_address.address,
                             original_message_id)
          ).send();
@@ -232,8 +260,7 @@ void dispatch_operator_action(name self, const std::vector<char>& data,
          action(
             permission_level{OPREG_ACCOUNT, "active"_n},
             OPREG_ACCOUNT, "withdrawinle"_n,
-            std::make_tuple(account, from_chain,
-                            oa.amount.kind, raw_amount)
+            std::make_tuple(account, chain_code, token_code, raw_amount)
          ).send();
          break;
       }
@@ -250,9 +277,15 @@ void dispatch_operator_action(name self, const std::vector<char>& data,
 /// The full UIC bytes are forwarded verbatim so the depot can reconstruct
 /// the digest and verify the underwriter's signature at race resolution
 /// time. We decode here to extract the routing scalars (uwreq id,
-/// uw_account, token_kind — the latter discriminates same-chain
-/// swap legs); the authoritative copy for verification is the bytes
-/// themselves, stored on `commit_entry.{source,dest}_uic_bytes`.
+/// uw_account, chain_code, token_code, reserve_code — the latter triple
+/// disambiguates same-chain swap legs and points at the precise reserve
+/// covering this leg); the authoritative copy for verification is the
+/// bytes themselves, stored on `commit_entry.{source,dest}_uic_bytes`.
+///
+/// Post v6: identity scalars on UIC are codenames (uint64) — `from_chain`
+/// (ChainKind, retained for receipt-trust checks) is no longer the routing
+/// key. (void)-cast for now; future trust-boundary checks may cross-
+/// reference `uic.chain_code`'s owning chain row against `from_chain`.
 void dispatch_underwrite_commit(name self, const std::vector<char>& data,
                                 ChainKind from_chain, uint64_t outpost_id) {
    opp::attestations::UnderwriteIntentCommit uic;
@@ -263,11 +296,69 @@ void dispatch_underwrite_commit(name self, const std::vector<char>& data,
    }
    if (uic.uw_account.name.empty()) return;
 
+   (void)from_chain;   // routing now keyed on uic.chain_code (slug_name)
+
    action(
       permission_level{self, "active"_n},
       UWRIT_ACCOUNT, "rcrdcommit"_n,
-      std::make_tuple(uic.uw_request_id, name{uic.uw_account.name},
-                      outpost_id, from_chain, uic.token_kind, data)
+      std::make_tuple(uic.uw_request_id, name{uic.uw_account.name}, outpost_id,
+                      sysio::slug_name{uic.chain_code},
+                      sysio::slug_name{uic.token_code},
+                      sysio::slug_name{uic.reserve_code},
+                      data)
+   ).send();
+}
+
+/// Dispatch a RESERVE_CREATE attestation to sysio.reserv::oncrtreserve.
+/// Inserts a PENDING reserve row on the depot. Per
+/// `feedback_opp_handlers_never_throw`, decode failures silently no-op.
+/// The downstream `oncrtreserve` is itself a never-throw handler — duplicate
+/// reserves are logged + dropped on the depot side.
+void dispatch_reserve_create(name self, const std::vector<char>& data) {
+   opp::attestations::ReserveCreate rc;
+   {
+      auto in = zpp::bits::in{std::span{data.data(), data.size()}, zpp::bits::no_size{}};
+      auto err = in(rc);
+      if (err != zpp::bits::errc{}) return;
+   }
+
+   action(
+      permission_level{self, "active"_n},
+      RESERV_ACCOUNT, "oncrtreserve"_n,
+      std::make_tuple(sysio::slug_name{rc.chain_code},
+                      sysio::slug_name{rc.token_code},
+                      sysio::slug_name{rc.reserve_code},
+                      rc.name,
+                      rc.description,
+                      rc.external_token_amount,
+                      rc.requested_wire_amount,
+                      rc.connector_weight_bps,
+                      rc.creator_addr.kind,
+                      rc.creator_addr.address)
+   ).send();
+}
+
+/// Dispatch a RESERVE_CREATE_CANCEL attestation to sysio.reserv::oncnclrsv.
+/// The depot decides whether the creator won or lost the race against any
+/// `matchreserve` call — see `oncnclrsv`. Per
+/// `feedback_opp_handlers_never_throw`, decode failures silently no-op
+/// and downstream race-loss is also a silent no-op on the reserv side.
+void dispatch_reserve_create_cancel(name self, const std::vector<char>& data) {
+   opp::attestations::ReserveCreateCancel cancel;
+   {
+      auto in = zpp::bits::in{std::span{data.data(), data.size()}, zpp::bits::no_size{}};
+      auto err = in(cancel);
+      if (err != zpp::bits::errc{}) return;
+   }
+
+   action(
+      permission_level{self, "active"_n},
+      RESERV_ACCOUNT, "oncnclrsv"_n,
+      std::make_tuple(sysio::slug_name{cancel.chain_code},
+                      sysio::slug_name{cancel.token_code},
+                      sysio::slug_name{cancel.reserve_code},
+                      cancel.creator_addr.kind,
+                      cancel.creator_addr.address)
    ).send();
 }
 
@@ -341,6 +432,12 @@ void dispatch_attestation(name self, uint64_t attestation_id,
          // proto message into primitive params on the inline action — the
          // ABI never sees a proto-message-typed parameter per the
          // no-proto-messages-in-actions rule.
+         //
+         // Post v6: `chain_code` and `reserve_code` come from the
+         // attestation payload (the destination reserve that failed to
+         // pay); `token_code` comes from the unremitted TokenAmount.
+         // The triple (chain_code, token_code, reserve_code) is the
+         // reserve PK on `sysio.reserv::reserves`.
          {
             opp::attestations::SwapRejected rejected;
             auto in = zpp::bits::in{std::span{data.data(), data.size()}, zpp::bits::no_size{}};
@@ -364,13 +461,14 @@ void dispatch_attestation(name self, uint64_t attestation_id,
                static_cast<uint64_t>(static_cast<int64_t>(rejected.unremitted_amount.amount));
             action(
                permission_level{self, "active"_n},
-               "sysio.reserv"_n, "onreject"_n,
+               RESERV_ACCOUNT, "onreject"_n,
                std::make_tuple(original_id,
-                                rejected.recipient.kind,
-                                rejected.recipient.address,
-                                rejected.unremitted_amount.kind,
-                                unremitted_raw,
-                                rejected.reason)
+                               sysio::slug_name{rejected.chain_code},
+                               sysio::slug_name{rejected.unremitted_amount.token_code},
+                               sysio::slug_name{rejected.reserve_code},
+                               unremitted_raw,
+                               rejected.recipient.address,
+                               rejected.reason)
             ).send();
          }
          break;
@@ -379,21 +477,53 @@ void dispatch_attestation(name self, uint64_t attestation_id,
          // Outpost-side staker reward — credit the outpost-side reserve.
          // The matching WIRE-side payout to the staker is a separate
          // next-epoch action owned by the staking work stream.
+         //
+         // Post v6: chain + reserve + token identity are all carried on
+         // the attestation as codenames; `from_chain` (VM family) is no
+         // longer the routing key.
          {
             opp::attestations::StakingReward sr;
             auto in = zpp::bits::in{std::span{data.data(), data.size()}, zpp::bits::no_size{}};
             auto rc = in(sr);
             if (rc != zpp::bits::errc{}) break;
-            // Split reward_amount (TokenAmount) into (kind, amount) on the
-            // inline action per the no-proto-messages-in-actions rule.
+            // Split reward_amount (TokenAmount) into (chain_code, token_code,
+            // reserve_code, amount) on the inline action per the
+            // no-proto-messages-in-actions rule.
             const uint64_t reward_raw =
                static_cast<uint64_t>(static_cast<int64_t>(sr.reward_amount.amount));
             action(
                permission_level{self, "active"_n},
-               "sysio.reserv"_n, "onreward"_n,
-               std::make_tuple(from_chain, sr.reward_amount.kind, reward_raw)
+               RESERV_ACCOUNT, "onreward"_n,
+               std::make_tuple(sysio::slug_name{sr.chain_code},
+                               sysio::slug_name{sr.reward_amount.token_code},
+                               sysio::slug_name{sr.reserve_code},
+                               reward_raw)
             ).send();
          }
+         break;
+
+      case AttestationType::ATTESTATION_TYPE_RESERVE_CREATE:
+         // Outpost-initiated reserve creation. Insert a PENDING row on
+         // `sysio.reserv` awaiting a depot-side `matchreserve` call. The
+         // creator's outpost-side custody is locked on the originating
+         // outpost; refund (on RESERVE_CREATE_CANCELLED) targets
+         // `creator_addr`.
+         dispatch_reserve_create(self, data);
+         break;
+
+      case AttestationType::ATTESTATION_TYPE_RESERVE_CREATE_CANCEL:
+         // Creator cancellation of a still-PENDING reserve. If the race
+         // against `matchreserve` is lost the reserv contract no-ops; if
+         // won it flips status to CANCELLED + queues a RESERVE_CREATE_CANCELLED
+         // back to the originating outpost so the local custody is released.
+         dispatch_reserve_create_cancel(self, data);
+         break;
+
+      case AttestationType::ATTESTATION_TYPE_RESERVE_CREATE_CANCELLED:
+      case AttestationType::ATTESTATION_TYPE_RESERVE_READY:
+         // Depot → outpost outbound-only. Should never appear inbound at
+         // the depot; if a misbehaving outpost relays one back it is a
+         // benign no-op. Silently drop per `feedback_opp_handlers_never_throw`.
          break;
 
       case AttestationType::ATTESTATION_TYPE_RESERVE_BALANCE_SHEET:
@@ -464,11 +594,17 @@ void msgch::deliver(name batch_op_name, uint64_t outpost_id, std::vector<char> d
    is_batch_operator_active(batch_op_name);
    check(!data.empty(), "delivery data cannot be empty");
 
-   // Verify outpost exists
-   epoch::outposts_t outposts(EPOCH_ACCOUNT);
-   auto outpost_pk = epoch::outpost_key{outpost_id};
-   check(outposts.contains(outpost_pk), "outpost not found");
-   auto op_row = outposts.get(outpost_pk);
+   // Verify outpost exists on the new `sysio.chains::chains` table.
+   // `outpost_id` is the originating chain's slug_name value (uint64) per
+   // the v6 data-model refactor — the chain row's PK is `code.value`.
+   // Reject deliveries from the depot self-row (`is_depot==true`) and
+   // from inactive chains; both are protocol invariants.
+   sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
+   auto chain_pk = sysio::chains::chain_key{sysio::slug_name{outpost_id}};
+   check(chains_tbl.contains(chain_pk), "outpost not found in sysio.chains");
+   auto op_row = chains_tbl.get(chain_pk);
+   check(!op_row.is_depot, "deliver: outpost_id refers to the depot self-row");
+   check(op_row.active, "deliver: outpost is not active");
 
    // Decode envelope to validate epoch_index matches current WIRE epoch
    uint32_t epoch = current_epoch_index();
@@ -506,7 +642,12 @@ void msgch::deliver(name batch_op_name, uint64_t outpost_id, std::vector<char> d
       .outpost_id    = outpost_id,
       .epoch_index   = epoch,
       .batch_op_name = batch_op_name,
-      .chain_kind    = op_row.chain_kind,
+      // `chain_kind` is the VM family (ChainKind enum) of the originating
+      // chain — preserved on the row so per-batch-op audit consumers don't
+      // need a follow-up cross-contract read of `sysio.chains` to know
+      // whether this was an EVM/SVM/WIRE delivery. The chain row's `kind`
+      // is authoritative; this is just the cached projection.
+      .chain_kind    = op_row.kind,
       .checksum      = cs,
       .raw_data      = data,
       .received_at   = current_time_point(),
@@ -621,9 +762,16 @@ void msgch::evalcons(uint64_t outpost_id, uint32_t epoch_index) {
    attestations_t atts(get_self());
    ChainKind from_chain = ChainKind::CHAIN_KIND_UNKNOWN;
    {
-      epoch::outposts_t outposts(EPOCH_ACCOUNT);
-      auto opost = outposts.get(epoch::outpost_key{outpost_id});
-      from_chain = opost.chain_kind;
+      // Look up the originating chain row on `sysio.chains` (PK =
+      // slug_name value). `from_chain` is the VM-family receipt-trust
+      // signal passed to per-attestation dispatchers; the slug_name
+      // routing is sourced from each attestation's own `chain_code`
+      // field per the v6 data-model refactor.
+      sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
+      auto chain_pk = sysio::chains::chain_key{sysio::slug_name{outpost_id}};
+      if (chains_tbl.contains(chain_pk)) {
+         from_chain = chains_tbl.get(chain_pk).kind;
+      }
    }
    for (auto& msg : envelope.messages) {
       for (auto& entry : msg.payload.attestations) {
@@ -663,14 +811,17 @@ void msgch::evalcons(uint64_t outpost_id, uint32_t epoch_index) {
    // metadata-only `envelope_log` row written below; the four working
    // tables are drained inline so they don't grow without bound.
    {
-      const auto& op_row = [&]() {
-         epoch::outposts_t outposts(EPOCH_ACCOUNT);
-         return outposts.get(epoch::outpost_key{outpost_id});
+      // Resolve the originating chain row on `sysio.chains` (PK = slug_name
+      // value). `external_chain_id` projects to the `ChainId.id` field on
+      // the audit-log endpoint pair; `kind` projects to `ChainId.kind`.
+      const auto op_row = [&]() {
+         sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
+         return chains_tbl.get(sysio::chains::chain_key{sysio::slug_name{outpost_id}});
       }();
 
       sysio::opp::Endpoints endpoints;
-      endpoints.start.kind = op_row.chain_kind;
-      endpoints.start.id   = op_row.chain_id;
+      endpoints.start.kind = op_row.kind;
+      endpoints.start.id   = op_row.external_chain_id;
       endpoints.end.kind   = ChainKind::CHAIN_KIND_WIRE;
       endpoints.end.id     = WIRE_CHAIN_ID;
 
@@ -732,15 +883,19 @@ void msgch::evalcons(uint64_t outpost_id, uint32_t epoch_index) {
 void msgch::chkcons() {
    uint32_t epoch = current_epoch_index();
 
-   // Check all outposts have consensus for the current epoch
+   // Check all active outposts have consensus for the current epoch.
+   // Outpost set is sourced from `sysio.chains::chains` filtered to
+   // active && !is_depot per the v6 data-model refactor; outpost ids
+   // in `outpcons` are slug_name values (chain_row::code.value).
    outpost_consensus_t opcons(get_self());
-   epoch::outposts_t outposts(EPOCH_ACCOUNT);
+   sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
    bool all_consensus = true;
    uint32_t outpost_count = 0;
 
-   for (auto it = outposts.begin(); it != outposts.end(); ++it) {
+   for (auto it = chains_tbl.begin(); it != chains_tbl.end(); ++it) {
+      if (!it->active || it->is_depot) continue;
       ++outpost_count;
-      auto opc_pk = outpost_consensus_key{it->id};
+      auto opc_pk = outpost_consensus_key{it->code.value};
       if (!opcons.contains(opc_pk)) {
          all_consensus = false;
          break;
@@ -930,16 +1085,19 @@ void msgch::buildenv(uint64_t outpost_id) {
    // the just-PROCESSED attestations for this outpost (their bytes are
    // now baked into `packed` above).
    {
-      const auto& op_row = [&]() {
-         epoch::outposts_t outposts(EPOCH_ACCOUNT);
-         return outposts.get(epoch::outpost_key{outpost_id});
+      // Resolve the destination chain row on `sysio.chains` (PK = slug_name
+      // value). Symmetric with the evalcons inbound endpoints projection
+      // — `kind` → `ChainId.kind`, `external_chain_id` → `ChainId.id`.
+      const auto op_row = [&]() {
+         sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
+         return chains_tbl.get(sysio::chains::chain_key{sysio::slug_name{outpost_id}});
       }();
 
       sysio::opp::Endpoints endpoints;
       endpoints.start.kind = ChainKind::CHAIN_KIND_WIRE;
       endpoints.start.id   = WIRE_CHAIN_ID;
-      endpoints.end.kind   = op_row.chain_kind;
-      endpoints.end.id     = op_row.chain_id;
+      endpoints.end.kind   = op_row.kind;
+      endpoints.end.id     = op_row.external_chain_id;
 
       write_envelope_log(get_self(), endpoints, epoch,
                          sha256(packed.data(), packed.size()));

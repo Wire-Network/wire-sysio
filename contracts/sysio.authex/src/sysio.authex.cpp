@@ -8,7 +8,8 @@ using namespace sysio;
 
 constexpr name ex_eth = "ex.eth"_n;
 constexpr name ex_sol = "ex.sol"_n;
-constexpr name ex_sui = "ex.sui"_n;
+// TODO @jglanz: SUI removed in v6; restore when SUI outpost is added.
+[[maybe_unused]] constexpr name ex_sui = "ex.sui"_n;
 
 /**
  * Duplicated struct representing ABI of the `updateauth` action.
@@ -51,10 +52,10 @@ namespace sysio {
    require_auth(account);
 
    // ——— Chain kind validation ———
-   check(chain_kind == ChainKind::CHAIN_KIND_ETHEREUM
-         || chain_kind == ChainKind::CHAIN_KIND_SOLANA
-         || chain_kind == ChainKind::CHAIN_KIND_SUI,
-         "Invalid chain_kind. Supported: CHAIN_KIND_ETHEREUM(2), CHAIN_KIND_SOLANA(3), CHAIN_KIND_SUI(4).");
+   // TODO @jglanz: SUI removed in v6; restore when SUI outpost is added.
+   check(chain_kind == ChainKind::CHAIN_KIND_EVM
+         || chain_kind == ChainKind::CHAIN_KIND_SVM,
+         "Invalid chain_kind. Supported: CHAIN_KIND_EVM(2), CHAIN_KIND_SVM(3).");
 
    // ——— Table & indices ———
    links_t links(get_self());
@@ -74,10 +75,10 @@ namespace sysio {
    // ——— Build the message string ———
    //
    // Wire format: the chain identifier is serialised as the decimal of
-   // its proto numeric value (ETH=2, SOL=3, SUI=4). `magic_enum::
-   // enum_integer` extracts the underlying value type-safely; off-chain
-   // signers reconstruct the same string from their generated
-   // `ChainKind` enum's numeric value.
+   // its proto numeric value (EVM=2, SVM=3). `magic_enum::enum_integer`
+   // extracts the underlying value type-safely; off-chain signers
+   // reconstruct the same string from their generated `ChainKind` enum's
+   // numeric value.
    static constexpr const char* DIGEST_TAIL = "createlink auth";
    std::string chain_kind_str = std::to_string(magic_enum::enum_integer(chain_kind));
    std::string msg = pubkey_to_string(pub_key) + "|" + account.to_string() + "|" + chain_kind_str + "|" +
@@ -90,7 +91,7 @@ namespace sysio {
    public_key verified_pub_key = pub_key;
 
    // ——— Curve-specific signing & address derivation ———
-   if (chain_kind == ChainKind::CHAIN_KIND_ETHEREUM) {
+   if (chain_kind == ChainKind::CHAIN_KIND_EVM) {
       // 1) keccak(msg) — use the pubkey string as the contract sees it
       //    (fc/CDT may normalize the compression prefix byte)
       auto eth_hash = sysio::keccak(msg.c_str(), msg.size());
@@ -112,7 +113,7 @@ namespace sysio {
       verified_pub_key = recovered;
       ex_permission = ex_eth;
 
-   } else if (chain_kind == ChainKind::CHAIN_KIND_SOLANA) {
+   } else if (chain_kind == ChainKind::CHAIN_KIND_SVM) {
       checksum256 hash256;
       // 1) sha256(msg) → returns a checksum256
       checksum256 raw_digest = sysio::sha256(msg.c_str(), msg.size());
@@ -129,7 +130,10 @@ namespace sysio {
       assert_recover_key(hash256, sig, pub_key);
 
       ex_permission = ex_sol;
-   } else if (chain_kind == ChainKind::CHAIN_KIND_SUI) { // sui
+   }
+#if 0
+   // TODO @jglanz: SUI removed in v6; restore when SUI outpost is added.
+   else if (chain_kind == ChainKind::CHAIN_KIND_SUI) { // sui
       std::vector<uint8_t> bcs;
       bcs.reserve(4 + msg.size());
       bcs.insert(bcs.end(), {3, 0, 0, static_cast<uint8_t>(msg.size())});
@@ -142,6 +146,7 @@ namespace sysio {
 
       ex_permission = ex_sui;
    }
+#endif
 
    // MAKE SURE WE MAPPED TO A SUPPORTED PERMISSION
    sysio::check(ex_permission.has_value(), "Internal error: ex_permission not set");
@@ -206,14 +211,17 @@ void authex::onmanualrmv(const name& account, const name& permission) {
    ChainKind kind;
    switch (permission.value) {
    case ex_sol.value:
-      kind = ChainKind::CHAIN_KIND_SOLANA;
+      kind = ChainKind::CHAIN_KIND_SVM;
       break;
    case ex_eth.value:
-      kind = ChainKind::CHAIN_KIND_ETHEREUM;
+      kind = ChainKind::CHAIN_KIND_EVM;
       break;
+#if 0
+   // TODO @jglanz: SUI removed in v6; restore when SUI outpost is added.
    case ex_sui.value:
       kind = ChainKind::CHAIN_KIND_SUI;
       break;
+#endif
    default:
       sysio::check(false, "Invalid permission for removal.");
       return; // unreachable, silences uninitialized warning

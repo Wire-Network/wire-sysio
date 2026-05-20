@@ -7,7 +7,9 @@
 #include <sysio/crypto.hpp>
 #include <sysio/system.hpp>
 #include <sysio/opp/types/types.pb.hpp>
+#include <sysio.opp.common/slug_name.hpp>
 #include <sysio.opp.common/opp_table_types.hpp>
+#include <magic_enum/magic_enum.hpp>
 
 namespace sysio {
 
@@ -80,21 +82,17 @@ namespace sysio {
       //  Forward types
       // -----------------------------------------------------------------------
 
-      /// Per-(chain, token_kind) minimum-bond row stored in `opconfig`'s
+      /// Per-(chain, token) minimum-bond row stored in `opconfig`'s
       /// per-role requirement vectors and accepted as `setconfig` input.
-      /// Declared above the action surface so action signatures can take
-      /// `std::vector<chain_min_bond>` parameters by complete type. The
-      /// schema requires one entry per supported chain (WIRE / ETHEREUM /
-      /// SOLANA) when the role actually needs bond there; `min_bond` may
-      /// be 0 to keep the row's shape uniform across roles even when a
-      /// particular chain doesn't gate that role.
+      /// Per the v6 data-model refactor: `chain` / `token` identifiers are
+      /// `sysio::slug_name` (uint64-packed) instead of the old enums.
       struct chain_min_bond {
-         opp::types::ChainKind  chain;
-         opp::types::TokenKind  token_kind;
-         uint64_t               min_bond            = 0;
-         uint64_t               config_timestamp_ms = 0;
+         sysio::slug_name  chain_code;
+         sysio::slug_name  token_code;
+         uint64_t         min_bond            = 0;
+         uint64_t         config_timestamp_ms = 0;
 
-         SYSLIB_SERIALIZE(chain_min_bond, (chain)(token_kind)(min_bond)(config_timestamp_ms))
+         SYSLIB_SERIALIZE(chain_min_bond, (chain_code)(token_code)(min_bond)(config_timestamp_ms))
       };
 
       // -----------------------------------------------------------------------
@@ -167,13 +165,13 @@ namespace sysio {
       /// DEPOSIT_REQUEST attestation — outposts match on it to scope the
       /// refund to one specific in-flight deposit.
       [[sysio::action]]
-      void depositinle(name account,
-                       opp::types::ChainKind chain,
-                       opp::types::TokenKind token_kind,
-                       uint64_t amount,
+      void depositinle(name                  account,
+                       sysio::slug_name       chain_code,
+                       sysio::slug_name       token_code,
+                       uint64_t              amount,
                        opp::types::ChainKind actor_chain,
-                       std::vector<char> actor_address,
-                       checksum256 original_message_id);
+                       std::vector<char>     actor_address,
+                       checksum256           original_message_id);
 
       /// Operator-callable: queue a WIRE-direct collateral withdrawal subject
       /// to the WITHDRAW_WAIT_EPOCHS wait. Outpost-held collateral is
@@ -192,10 +190,7 @@ namespace sysio {
       /// operator's `recent_actions` ring buffer; the dispatch tx commits
       /// so other attestations in the same envelope still apply.
       [[sysio::action]]
-      void withdrawinle(name account,
-                        opp::types::ChainKind chain,
-                        opp::types::TokenKind token_kind,
-                        uint64_t amount);
+      void withdrawinle(name account, sysio::slug_name chain_code, sysio::slug_name token_code, uint64_t amount);
 
       /// Operator-callable: cancel a previously-queued withdrawal before it
       /// flushes. The reserved amount rejoins the operator's `available()`.
@@ -212,9 +207,7 @@ namespace sysio {
       /// TERMINATED, or if no balance row exists. Otherwise returns
       /// `balance - sum(active locks on uwrit) - sum(pending withdraws)`.
       [[sysio::action, sysio::read_only]]
-      uint64_t available(name account,
-                         opp::types::ChainKind chain,
-                         opp::types::TokenKind token_kind);
+      uint64_t available(name account, sysio::slug_name chain_code, sysio::slug_name token_code);
 
       /// Type-specific eligibility transitions. Called inline from the
       /// deposit / withdraw / slash / terminate paths when an operator's
@@ -246,10 +239,7 @@ namespace sysio {
       ///                  the freed amount naturally reappears in `available()`
       ///                  the moment uwrit erases the lock row).
       [[sysio::action]]
-      void releaselock(name account,
-                       opp::types::ChainKind chain,
-                       opp::types::TokenKind token_kind,
-                       uint64_t amount);
+      void releaselock(name account, sysio::slug_name chain_code, sysio::slug_name token_code, uint64_t amount);
 
       /// Record per-batch-op delivery hit/miss for the rolling 24h buffer.
       /// Called inline from `sysio.epoch::advance` after each delivery cycle.
@@ -279,17 +269,17 @@ namespace sysio {
       //  Tables
       // -----------------------------------------------------------------------
 
-      /// Per-(chain, token_kind) aggregate balance row. The locked portion
+      /// Per-(chain_code, token_code) aggregate balance row. The locked portion
       /// is implied by `sysio.uwrit::locks` (consulted by `available()`); the
       /// pending-withdraw portion is implied by this contract's
       /// `withdraw_queue` (also consulted by `available()`).
       struct balance_entry {
-         opp::types::ChainKind  chain;
-         opp::types::TokenKind  token_kind;
-         uint64_t               balance         = 0;
-         uint64_t               last_updated_ms = 0;
+         sysio::slug_name  chain_code;
+         sysio::slug_name  token_code;
+         uint64_t         balance         = 0;
+         uint64_t         last_updated_ms = 0;
 
-         SYSLIB_SERIALIZE(balance_entry, (chain)(token_kind)(balance)(last_updated_ms))
+         SYSLIB_SERIALIZE(balance_entry, (chain_code)(token_code)(balance)(last_updated_ms))
       };
 
       /// Operators primary key: account name value.
@@ -322,8 +312,8 @@ namespace sysio {
          /// requests and to see slash entries (with reason).
          std::vector<opp::attestations::OperatorActionLog> recent_actions;
 
-         uint64_t by_type()   const { return static_cast<uint64_t>(type); }
-         uint64_t by_status() const { return static_cast<uint64_t>(status); }
+         uint64_t by_type()   const { return magic_enum::enum_integer(type); }
+         uint64_t by_status() const { return magic_enum::enum_integer(status); }
 
          SYSLIB_SERIALIZE(operator_entry,
             (account)(type)(status)(is_bootstrapped)(balances)
@@ -370,19 +360,23 @@ namespace sysio {
       };
 
       struct [[sysio::table("wtdwqueue")]] withdraw_request {
-         uint64_t                request_id          = 0;
-         name                    account;
-         opp::types::ChainKind   chain;
-         opp::types::TokenKind   token_kind;
-         uint64_t                amount              = 0;
-         uint32_t                eligible_at_epoch   = 0;
-         uint32_t                requested_at_epoch  = 0;
+         uint64_t          request_id          = 0;
+         name              account;
+         sysio::slug_name   chain_code;
+         sysio::slug_name   token_code;
+         uint64_t          amount              = 0;
+         uint32_t          eligible_at_epoch   = 0;
+         uint32_t          requested_at_epoch  = 0;
 
-         /// Composite (account, chain, token_kind) for available() rollup.
-         uint128_t by_account_ck() const {
-            return (static_cast<uint128_t>(account.value) << 64)
-                 | (static_cast<uint64_t>(chain) << 32)
-                 | static_cast<uint64_t>(token_kind);
+         /// Composite (account, chain_code, token_code) for available() rollup.
+         /// 3 × uint64 = 192 bits → checksum256.
+         checksum256 by_account_ck() const {
+            std::array<uint8_t, 24> buf{};
+            uint64_t acc_v = account.value;
+            std::memcpy(buf.data() +  0, &acc_v,            8);
+            std::memcpy(buf.data() +  8, &chain_code.value, 8);
+            std::memcpy(buf.data() + 16, &token_code.value, 8);
+            return sysio::sha256(reinterpret_cast<const char*>(buf.data()), buf.size());
          }
          /// Eligibility cursor for flushwtdw.
          uint64_t  by_eligible() const { return static_cast<uint64_t>(eligible_at_epoch); }
@@ -390,13 +384,18 @@ namespace sysio {
          uint64_t  by_account()  const { return account.value; }
 
          SYSLIB_SERIALIZE(withdraw_request,
-            (request_id)(account)(chain)(token_kind)(amount)
+            (request_id)(account)(chain_code)(token_code)(amount)
             (eligible_at_epoch)(requested_at_epoch))
       };
 
+      // Per plan §B.2 (mirrors sysio.uwrit::locks): split-index approach.
+      // Antelope KV secondary indexes use fixed-width integer keys; the
+      // 3-uint64 (account, chain_code, token_code) composite is computed on
+      // the row as `by_account_ck()` for cross-contract comparisons but is
+      // NOT a table-managed secondary index. Callers scan `byaccount`
+      // (uint64) and filter (chain_code, token_code) in memory — cheap
+      // because pending-withdraw counts per account are O(1)-ish.
       using wtdwqueue_t = sysio::kv::table<"wtdwqueue"_n, withdraw_key, withdraw_request,
-         sysio::kv::index<"byaccountck"_n,
-            sysio::const_mem_fun<withdraw_request, uint128_t, &withdraw_request::by_account_ck>>,
          sysio::kv::index<"byeligible"_n,
             sysio::const_mem_fun<withdraw_request, uint64_t, &withdraw_request::by_eligible>>,
          sysio::kv::index<"byaccount"_n,

@@ -122,8 +122,13 @@ struct opp_solana_outpost_client : fc::network::solana::solana_program_client {
       , vault_pda(fc::network::solana::system::find_program_address(
            {std::vector<uint8_t>{'o','u','t','p','o','s','t','_','v','a','u','l','t'}},
            prog_id).first)
+      // v6: SOL outpost reserve aggregate is seeded with b"reserve_aggregate"
+      // (see `RESERVE_AGGREGATE_SEED` in programs/opp-outpost/src/state/reserve.rs).
+      // Previously this used b"outpost_reserve" which derived to a non-existent
+      // PDA → epoch_in's `reserve_aggregate` account validation failed with
+      // fc::assert_exception 10.
       , reserve_pda(fc::network::solana::system::find_program_address(
-           {std::vector<uint8_t>{'o','u','t','p','o','s','t','_','r','e','s','e','r','v','e'}},
+           {std::vector<uint8_t>{'r','e','s','e','r','v','e','_','a','g','g','r','e','g','a','t','e'}},
            prog_id).first)
       // OPP writes default to the confirmed variant — any state-changing
       // call on this client is consensus-critical and must not silently
@@ -177,7 +182,9 @@ struct opp_solana_outpost_client : fc::network::solana::solana_program_client {
               {"outbound_envelopes",        outbound_envelopes_pda},
               {"latest_outbound_envelope",  latest_outbound_envelope_pda},
               {"vault",                     vault_pda},
-              {"reserve",                   reserve_pda},
+              // v6 IDL field is `reserve_aggregate` (matches the Anchor
+              // `#[derive(Accounts)]` field name in epoch_in.rs / Initialize).
+              {"reserve_aggregate",         reserve_pda},
            };
            auto& instr = get_idl("epoch_in");
            program_invoke_data_items params = {

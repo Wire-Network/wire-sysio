@@ -8,6 +8,7 @@
 #include <sysio/system.hpp>
 #include <fc-lite/crypto/chain_types.hpp>
 #include <sysio/opp/types/types.pb.hpp>
+#include <sysio.opp.common/slug_name.hpp>
 #include <sysio.opp.common/opp_table_types.hpp>
 
 namespace sysio {
@@ -15,13 +16,30 @@ namespace sysio {
    /**
     * @brief sysio.uwrit — underwriter race resolver + flat lock vector.
     *
-    * Per the corrected ledger model in
-    * `CLAUDE-WIRE-OPERATOR-COLLATERAL-IMPL-PLAN.md`:
+    * Per the v6 data-model refactor (`load-context-and-follow-smooth-flame.md`
+    * §3.13, §4.5, §4.6):
     *
-    * - opreg owns the bond ledger (per-(operator, chain, token_kind) aggregate
+    * - opreg owns the bond ledger (per-(operator, chain_code, token_code) aggregate
     *   balance). uwrit owns the **lock vector** — one row per leg of every
     *   in-flight UWREQ. opreg's `available()` rollup reads this table via a
     *   mirror to subtract active locks from the operator's spendable balance.
+    *
+    * - Identity has been rekeyed onto `sysio::slug_name` (uint64). Each
+    *   `lock_entry` carries `(chain_code, token_code, reserve_code)`; the
+    *   `reserve_code` records which specific reserve this leg is bound to
+    *   so a slash-to-reserve hop on a same-(chain, token) pair with
+    *   multiple reserves can route unambiguously. `uw_request_t` carries
+    *   `src_*` and `dst_*` slug_name triples for the same reason.
+    *
+    * - The per-underwriter composite lock index can no longer fit in a
+    *   `uint128_t` (3 × uint64 = 192 bits). It is split into two secondary
+    *   indexes per the plan's B.2 design:
+    *     * `byuwck`         — `checksum256(account || chain_code || token_code)`
+    *                          for the per-(chain, token) rollup that opreg's
+    *                          `available()` reads.
+    *     * `byunderwriter` — uint64 split-index keyed on `underwriter.value`
+    *                          for cheap per-operator scans (in-memory filter
+    *                          on chain_code / token_code / reserve_code).
     *
     * - On `UNDERWRITE_INTENT_COMMIT` arrival (one per outpost; underwriters
     *   call `commit(...)` JSON-RPC on each side), `record_commit` registers
@@ -51,6 +69,7 @@ namespace sysio {
       static constexpr name MSGCH_ACCOUNT  = "sysio.msgch"_n;
       static constexpr name AUTHEX_ACCOUNT = "sysio.authex"_n;
       static constexpr name OPREG_ACCOUNT = "sysio.opreg"_n;
+      static constexpr name CHAINS_ACCOUNT = "sysio.chains"_n;
       static constexpr name CHALG_ACCOUNT = "sysio.chalg"_n;
       static constexpr name RESERVE_ACCOUNT = "sysio.reserv"_n;
 
@@ -81,8 +100,8 @@ namespace sysio {
 
       /// Called inline from `sysio.msgch::dispatch` when a SWAP attestation
       /// arrives. Decodes the SwapRequest, runs the variance-tolerance check
-      /// against `sysio.reserve::quote` (skipped when no LP is provisioned
-      /// for the (chain, token) pair), and either:
+      /// against `sysio.reserve::swapquote` (skipped when no LP is provisioned
+      /// for the relevant reserves), and either:
       ///   * creates an OPEN UWREQ with src/dst populated from the swap, or
       ///   * emits a SWAP_REVERT back to `outpost_id` and skips UWREQ creation
       ///     when the gap between quoted_destination_amount and the depot's
@@ -104,10 +123,10 @@ namespace sysio {
       /// both legs land for the same underwriter, runs `try_select_winner`
       /// to resolve the race.
       ///
-      /// `(from_chain, from_token_kind)` together identify which leg of
-      /// the swap this UIC covers — same-chain swaps (e.g. ERC20→ETH on
-      /// a single outpost) require both to disambiguate the source and
-      /// destination legs.
+      /// `(from_chain_code, from_token_code, reserve_code)` together identify
+      /// which leg of the swap this UIC covers. Same-chain swaps with
+      /// multiple reserves of the same `(chain, token)` need all three
+      /// codes to disambiguate src vs dst.
       ///
       /// `uic_bytes` is the raw zpp_bits-encoded `UnderwriteIntentCommit`
       /// payload — the action signature carries bytes, not the proto
@@ -116,8 +135,9 @@ namespace sysio {
       void rcrdcommit(uint64_t uwreq_id,
                       name underwriter,
                       uint64_t outpost_id,
-                      opp::types::ChainKind from_chain,
-                      opp::types::TokenKind from_token_kind,
+                      sysio::slug_name from_chain_code,
+                      sysio::slug_name from_token_code,
+                      sysio::slug_name reserve_code,
                       std::vector<char> uic_bytes);
 
       /// Settle an UWREQ. For each lock entry: erase the row and call
@@ -151,12 +171,12 @@ namespace sysio {
       void chklocks(uint32_t up_to_epoch);
 
       /// Read-only rollup of an underwriter's active lock total on a given
-      /// (chain, token_kind). Used by off-chain consumers + (eventually)
+      /// `(chain_code, token_code)`. Used by off-chain consumers + (eventually)
       /// other contracts that don't rely on opreg's mirror.
       [[sysio::action, sysio::read_only]]
       uint64_t sumlocks(name underwriter,
-                        opp::types::ChainKind chain,
-                        opp::types::TokenKind token_kind);
+                        sysio::slug_name chain_code,
+                        sysio::slug_name token_code);
 
       // -----------------------------------------------------------------------
       //  Tables
@@ -169,10 +189,22 @@ namespace sysio {
          SYSLIB_SERIALIZE(id_key, (id))
       };
 
-      /// Per-leg lock row. The (underwriter, chain, token_kind) composite is
-      /// the indexing key opreg's `available()` rollup uses (cross-contract
-      /// kv::table read of `sysio::uwrit::locks_t` from `sysio.opreg`). Rows
-      /// are pushed by `try_select_winner` and erased by `release`.
+      /// Per-leg lock row. Rows are pushed by `try_select_winner` and erased
+      /// by `release`.
+      ///
+      /// The `(underwriter, chain_code, token_code)` triple is the indexing
+      /// surface opreg's `available()` rollup uses (cross-contract read of
+      /// `sysio::uwrit::locks_t` from `sysio.opreg`). 3 × uint64 = 192 bits
+      /// exceeds `uint128_t`, so the composite is hashed into a `checksum256`
+      /// via `by_underwriter_ck`. A separate `by_underwriter` split-index
+      /// (uint64 keyed on `underwriter.value`) provides the cheap
+      /// per-operator scan path for consumers that filter on chain / token
+      /// / reserve in-memory (per plan §B.2).
+      ///
+      /// `reserve_code` records which specific reserve this leg covers; on
+      /// a slash, the outpost routes seized collateral to that reserve via
+      /// `ReserveTarget`, even when multiple reserves exist for the same
+      /// `(chain_code, token_code)` pair.
       struct lock_key {
          uint64_t lock_id;
          uint64_t primary_key() const { return lock_id; }
@@ -183,8 +215,9 @@ namespace sysio {
          uint64_t                lock_id          = 0;
          uint64_t                uwreq_id         = 0;
          name                    underwriter;
-         opp::types::ChainKind   chain;
-         opp::types::TokenKind   token_kind;
+         sysio::slug_name         chain_code;
+         sysio::slug_name         token_code;
+         sysio::slug_name         reserve_code;
          uint64_t                amount           = 0;
          uint32_t                created_at_epoch = 0;
          /// `created_at_epoch + uwconfig.collateral_lock_duration_epoch_count`,
@@ -192,24 +225,41 @@ namespace sysio {
          /// `byexpire` so `chklocks` can sweep expired locks in ascending order.
          uint32_t                expires_at_epoch = 0;
 
-         /// Composite index for opreg's `available()` rollup: 64 bits
-         /// underwriter + 32 chain + 32 token_kind.
-         uint128_t by_underwriter_ck() const {
-            return (static_cast<uint128_t>(underwriter.value) << 64)
-                 | (static_cast<uint64_t>(chain) << 32)
-                 | static_cast<uint64_t>(token_kind);
+         /// Composite checksum index for opreg's `available()` rollup:
+         /// `sha256(underwriter.value || chain_code.value || token_code.value)`
+         /// packed as 24 little-endian bytes. 3 × uint64 = 192 bits doesn't
+         /// fit `uint128_t`, so we hash the triple to land in `checksum256`.
+         checksum256 by_underwriter_ck() const {
+            std::array<uint8_t, 24> buf{};
+            uint64_t uw_v = underwriter.value;
+            std::memcpy(buf.data() +  0, &uw_v,             8);
+            std::memcpy(buf.data() +  8, &chain_code.value, 8);
+            std::memcpy(buf.data() + 16, &token_code.value, 8);
+            return sysio::sha256(reinterpret_cast<const char*>(buf.data()), buf.size());
          }
+         /// Split-index for cheap per-operator scans (plan §B.2). Callers
+         /// pull all rows for a given underwriter and filter on
+         /// chain_code / token_code / reserve_code in memory.
+         uint64_t by_underwriter()      const { return underwriter.value; }
          uint64_t by_uwreq()            const { return uwreq_id; }
          uint64_t by_expires_at_epoch() const { return expires_at_epoch; }
 
          SYSLIB_SERIALIZE(lock_entry,
-            (lock_id)(uwreq_id)(underwriter)(chain)(token_kind)
+            (lock_id)(uwreq_id)(underwriter)(chain_code)(token_code)(reserve_code)
             (amount)(created_at_epoch)(expires_at_epoch))
       };
 
+      // Per plan §B.2: split-index approach — keep only uint64 secondary
+      // indexes. `by_underwriter_ck` (checksum256) is computed on the row
+      // when needed for cross-contract composite comparisons, but is NOT a
+      // table-managed secondary index (Antelope KV's secondary-index
+      // templates expect fixed-width integer keys). opreg's `available()`
+      // rollup scans `byunderwriter` (uint64) and filters (chain_code,
+      // token_code) in memory — cheap because underwriters hold O(1)
+      // concurrent locks.
       using locks_t = sysio::kv::table<"locks"_n, lock_key, lock_entry,
-         sysio::kv::index<"byuwck"_n,
-            sysio::const_mem_fun<lock_entry, uint128_t, &lock_entry::by_underwriter_ck>>,
+         sysio::kv::index<"byuw"_n,
+            sysio::const_mem_fun<lock_entry, uint64_t, &lock_entry::by_underwriter>>,
          sysio::kv::index<"byuwreq"_n,
             sysio::const_mem_fun<lock_entry, uint64_t, &lock_entry::by_uwreq>>,
          sysio::kv::index<"byexpire"_n,
@@ -224,6 +274,11 @@ namespace sysio {
       /// over the whole UIC. The depot stores the full UIC bytes per leg so
       /// `try_select_winner` can reconstruct the signed digest verbatim and
       /// verify against any of the underwriter's WIRE account permissions.
+      ///
+      /// `commit_entry` does NOT carry codenames — the per-leg
+      /// `(chain_code, token_code, reserve_code)` identity is on the
+      /// surrounding `uw_request_t::src_*` / `dst_*` fields; the
+      /// commit_entry slot is solely a race-tracker.
       struct commit_entry {
          name      underwriter;
          /// Source-leg COMMIT. `source_uic_bytes` is the verbatim zpp_bits
@@ -255,6 +310,12 @@ namespace sysio {
 
       /// UWREQ row — one per inbound SWAP attestation. Tracks the swap's
       /// src/dst pairs, the underwriter race, and the eventual settlement.
+      ///
+      /// Each side of the swap carries a full `(chain_code, token_code,
+      /// reserve_code)` triple per the v6 data-model refactor: identity
+      /// is slug_name-keyed throughout, and `reserve_code` lets a same-
+      /// `(chain, token)` swap target a specific reserve when multiple
+      /// reserves exist for that pair.
       struct [[sysio::table("uwreqs")]] uw_request_t {
          uint64_t                                id;
          opp::types::AttestationType             type;
@@ -264,11 +325,13 @@ namespace sysio {
          /// from the decoded SwapRequest. Used by `try_select_winner` to
          /// validate per-leg bond coverage. `dst_amount` IS the quoted
          /// destination amount the underwriter must deliver.
-         opp::types::ChainKind                   src_chain;
-         opp::types::TokenKind                   src_token_kind;
+         sysio::slug_name                         src_chain_code;
+         sysio::slug_name                         src_token_code;
+         sysio::slug_name                         src_reserve_code;
          uint64_t                                src_amount        = 0;
-         opp::types::ChainKind                   dst_chain;
-         opp::types::TokenKind                   dst_token_kind;
+         sysio::slug_name                         dst_chain_code;
+         sysio::slug_name                         dst_token_code;
+         sysio::slug_name                         dst_reserve_code;
          uint64_t                                dst_amount        = 0;
          /// Variance tolerance the user accepted at SWAP_REQUEST time, in
          /// basis points (50 = 0.5%). The depot's createuwreq path validates
@@ -312,13 +375,13 @@ namespace sysio {
          /// Empty until that flow lands.
          std::vector<char>                       attestation_outbound_data;
 
-         uint64_t by_status() const { return static_cast<uint64_t>(status); }
+         uint64_t by_status() const { return magic_enum::enum_integer(status); }
          uint64_t by_winner() const { return winner.value; }
 
          SYSLIB_SERIALIZE(uw_request_t,
             (id)(type)(status)
-            (src_chain)(src_token_kind)(src_amount)
-            (dst_chain)(dst_token_kind)(dst_amount)
+            (src_chain_code)(src_token_code)(src_reserve_code)(src_amount)
+            (dst_chain_code)(dst_token_code)(dst_reserve_code)(dst_amount)
             (variance_tolerance_bps)(source_tx_id)(depositor)
             (commits_by)(winner)(committed_at_ms)(settled_at_ms)(expires_at_epoch)
             (attestation_inbound_data)(attestation_outbound_data))
@@ -362,7 +425,6 @@ namespace sysio {
       using UnderwriteRequestStatus = opp::types::UnderwriteRequestStatus;
       using UnderwriteStatus        = opp::types::UnderwriteStatus;
       using ChainKind               = opp::types::ChainKind;
-      using TokenKind               = opp::types::TokenKind;
       using AttestationType         = opp::types::AttestationType;
    };
 

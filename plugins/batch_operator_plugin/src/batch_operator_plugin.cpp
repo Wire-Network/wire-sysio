@@ -85,7 +85,6 @@ namespace {
    namespace epoch {
       constexpr auto account            = "sysio.epoch";
       constexpr auto table_epochstate   = "epochstate";
-      constexpr auto table_outposts     = "outposts";
       /// Field names on `epoch_state` singleton.
       namespace field {
          constexpr auto current_epoch_index    = "current_epoch_index";
@@ -95,11 +94,21 @@ namespace {
          constexpr auto current_epoch_start    = "current_epoch_start";
          constexpr auto next_epoch_start       = "next_epoch_start";
       }
-      /// Field names on `outpost_info` rows.
-      namespace outpost_field {
-         constexpr auto id         = "id";
-         constexpr auto chain_kind = "chain_kind";
-         constexpr auto chain_id   = "chain_id";
+   }
+
+   /// v6: chain registry was split out of `sysio.epoch` onto its own
+   /// `sysio.chains` contract. The `outposts` table was replaced by the
+   /// `chains` KV table, keyed by slug_name (uint64 packed).
+   namespace chains {
+      constexpr auto account       = "sysio.chains";
+      constexpr auto table_chains  = "chains";
+      /// Field names on `Chain` row (proto-mirror schema).
+      namespace field {
+         constexpr auto code              = "code";              // {value: uint64} slug_name
+         constexpr auto kind              = "kind";              // ChainKind enum (string spelling)
+         constexpr auto external_chain_id = "external_chain_id"; // uint32
+         constexpr auto is_depot          = "is_depot";          // bool — the single WIRE-self row
+         constexpr auto active            = "active";            // bool
       }
    }
 }
@@ -332,18 +341,36 @@ struct batch_operator_plugin::impl {
     * in the batch-op log without grep'ing every poll.
     */
    void poll_own_status() {
+      // v6: `sysio.opreg::operators` is a KV table whose PK is a struct
+      // `{account: name}`; the chain_plugin's `lower_bound` / `upper_bound`
+      // expects JSON-shaped key bounds for KV tables, not the bare name
+      // string the v5 multi_index path accepted. Easiest robust fix: scan
+      // all rows and filter in-plugin — the operator count stays bounded
+      // by `op_config.max_available_*` (capped at ~100 for the lifetime
+      // of this plugin), so a linear scan once per `poll_own_status`
+      // period is cheap.
       sysio::chain_apis::read_only::get_table_rows_params p;
       p.code        = chain::name(opreg::account);
       p.scope       = opreg::account;
       p.table       = opreg::table_operators;
-      p.lower_bound = operator_account.to_string();
-      p.upper_bound = operator_account.to_string();
-      p.limit       = 1;
+      p.all_rows    = true;
       p.values_only = true;
       auto rows = read_table(std::move(p));
       if (rows.rows.empty()) return;
 
-      auto obj    = rows.rows[0].get_object();
+      auto self = operator_account.to_string();
+      fc::variant_object obj;
+      bool found = false;
+      for (auto& r : rows.rows) {
+         auto row_obj = r.get_object();
+         auto acct_it = row_obj.find("account");
+         if (acct_it != row_obj.end() && acct_it->value().as_string() == self) {
+            obj = row_obj;
+            found = true;
+            break;
+         }
+      }
+      if (!found) return;
       auto status = obj[opreg::field::status].as_string();
 
       bool was_active = is_active;
@@ -460,25 +487,66 @@ struct batch_operator_plugin::impl {
    // -----------------------------------------------------------------------
 
    void refresh_outposts() {
-      outposts.clear();
-      // `all_rows` walks every row in one call. The outpost count should stay tiny (one per external chain), but
-      // don't bake in a scan cap that would stall the batch operator if governance adds more than the default bound.
+      // v6: chain registry lives on `sysio.chains::chains` (replaces the
+      // removed `sysio.epoch::outposts` table). Each row carries the
+      // chain's slug_name + kind + external_chain_id + is_depot + active.
+      // Outposts are the non-depot, active rows; the single is_depot=true
+      // row is the WIRE chain itself and is skipped.
+      //
+      // Startup race: in a multi-node cluster the batch-op node replays
+      // blocks from the producer asynchronously. There's a brief window
+      // where `sysio.chains` exists on the producer but the local node
+      // hasn't replayed far enough to see it — `read_table` throws
+      // `Account Query Exception (3060002)` / `Contract Table Query
+      // Exception (3060003)` during that window. Catch + return; the
+      // outer cron tick re-enters every poll interval and self-heals.
       sysio::chain_apis::read_only::get_table_rows_params p;
-      p.code        = chain::name(epoch::account);
-      p.scope       = epoch::account;
-      p.table       = epoch::table_outposts;
+      p.code        = chain::name(chains::account);
+      p.scope       = chains::account;
+      p.table       = chains::table_chains;
       p.all_rows    = true;
       p.values_only = true;
-      auto rows = read_table(std::move(p));
+      sysio::chain_apis::read_only::get_table_rows_result rows;
+      try {
+         rows = read_table(std::move(p));
+      } catch (const fc::exception& e) {
+         // Transient (cold-start replay, account not yet visible).
+         // Don't clear `outposts` — keep the last-known set so jobs
+         // built from earlier reads continue to work; the next tick
+         // will refresh once the table is reachable.
+         static fc::time_point last_warn;
+         auto now = fc::time_point::now();
+         if (now > last_warn + fc::seconds(30)) {
+            wlog("batch_operator: refresh_outposts deferred — sysio.chains read failed: {}",
+                 ("e", e.top_message()));
+            last_warn = now;
+         }
+         return;
+      }
+      outposts.clear();
       for (auto& row : rows.rows) {
          auto obj = row.get_object();
+         // The `code` field on the Chain proto is a `slug_name` struct
+         // wrapping a uint64 (see slug_name.hpp). The JSON view exposes
+         // it as `{value: <uint64>}`. Unpack defensively.
+         uint64_t code_val = 0;
+         if (auto code_obj = obj.find(chains::field::code); code_obj != obj.end()) {
+            if (code_obj->value().is_object()) {
+               code_val = code_obj->value().get_object()["value"].as_uint64();
+            } else {
+               code_val = code_obj->value().as_uint64();
+            }
+         }
+         bool is_depot = obj[chains::field::is_depot].as_bool();
+         bool active   = obj[chains::field::active].as_bool();
+         if (is_depot || !active) continue;
          outpost_descriptor od;
-         od.id         = obj[epoch::outpost_field::id].as_uint64();
-         od.chain_kind = obj[epoch::outpost_field::chain_kind].as<ChainKind>();
-         od.chain_id   = static_cast<uint32_t>(obj[epoch::outpost_field::chain_id].as_uint64());
+         od.id         = code_val;  // slug_name uint64 doubles as outpost id
+         od.chain_kind = obj[chains::field::kind].as<ChainKind>();
+         od.chain_id   = static_cast<uint32_t>(obj[chains::field::external_chain_id].as_uint64());
          outposts.push_back(std::move(od));
       }
-      ilog("batch_operator: loaded {} outposts", outposts.size());
+      ilog("batch_operator: loaded {} outposts (v6 sysio.chains)", outposts.size());
       build_opp_jobs();
    }
 
@@ -493,10 +561,10 @@ struct batch_operator_plugin::impl {
 
          std::shared_ptr<sysio::outpost_client> client;
          try {
-            if (op.chain_kind == CHAIN_KIND_ETHEREUM) {
+            if (op.chain_kind == CHAIN_KIND_EVM) {
                client = eth_plug->create_outpost_client(eth_client_id, op.id, op.chain_id,
                                                      eth_opp_addr, eth_opp_inbound_addr);
-            } else if (op.chain_kind == CHAIN_KIND_SOLANA) {
+            } else if (op.chain_kind == CHAIN_KIND_SVM) {
                client = sol_plug->create_outpost_client(sol_client_id, op.id, op.chain_id,
                                                      sol_program_id);
             } else {
