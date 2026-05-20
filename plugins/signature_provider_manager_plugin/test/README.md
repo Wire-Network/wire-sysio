@@ -157,6 +157,4 @@ test needs.
 | `AccessDeniedException: not authorized to perform: kms:Sign` | IAM policy missing — see Prereq #2                |
 | `NotFoundException: Invalid keyId`                 | Wrong region in `KMS_LIVE_SPEC`, or alias not created    |
 | `BOOST_CHECK(recovered == em_expected) failed`     | `KMS_LIVE_PUBKEY` does not match the key KMS holds       |
-| `parse_kms_spec` exception at startup              | Spec body malformed — see `KMS_SIGNING_DESIGN.md` §3     |
-
-See `../KMS_SIGNING_DESIGN.md` for the full design context.
+| `parse_kms_spec` exception at startup              | Spec body malformed — check the `KMS:` spec format       |

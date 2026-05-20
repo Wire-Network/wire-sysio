@@ -3,9 +3,10 @@
  *
  * These cases cover only the offline parse path — `parse_kms_spec` does no
  * network I/O and constructs no `KMSClient`, so the suite runs without AWS
- * credentials and without an internet connection. End-to-end signing tests
- * live in a separate suite (gated behind `KMS_LIVE_TEST`, see
- * `KMS_SIGNING_DESIGN.md` §7).
+ * credentials and without an internet connection. The one end-to-end signing
+ * test in this file (`kms_live_sign_round_trip`) is gated on the
+ * `KMS_LIVE_SPEC` / `KMS_LIVE_PUBKEY` environment variables and is skipped
+ * unless both are set.
  */
 
 #include <boost/test/unit_test.hpp>
@@ -488,8 +489,8 @@ BOOST_AUTO_TEST_CASE(make_kms_signature_provider_returns_callable_for_ethereum) 
 
 BOOST_AUTO_TEST_CASE(make_kms_signature_provider_rejects_wire_k1) {
    // Wire K1 (`chain_key_type_wire`) is also secp256k1, but its public-key
-   // and signature shapes differ from Ethereum's. Goal #2 of the design note
-   // tracks adding it; until then, fail loud.
+   // and signature shapes differ from Ethereum's, so it is not yet supported
+   // — fail loud rather than sign with the wrong format.
    const auto chain_pub =
       fc::crypto::private_key::generate(fc::crypto::private_key::key_type::k1).get_public_key();
 

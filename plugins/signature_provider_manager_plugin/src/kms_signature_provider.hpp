@@ -4,8 +4,7 @@
  * AWS KMS-backed signature provider — plugin-private header.
  *
  * The KMS provider extends the existing `KEY:` / `KIOD:` spec grammar with a
- * third form, `KMS:<key-ref>`, where the signing key never leaves AWS. See
- * `KMS_SIGNING_DESIGN.md` (this directory) for the full design.
+ * third form, `KMS:<key-ref>`, where the signing key never leaves AWS.
  *
  * This header is consumed only by the plugin's own translation units and by
  * its tests; it is intentionally not installed under `include/`.
@@ -226,8 +225,7 @@ struct kms_signer {
  * (`chain_key_type_ethereum` + `fc::em::public_key_shim`). Other key types
  * raise `chain::pending_impl_exception` at construction; a `public_key`
  * variant that does not hold the Ethereum shim raises
- * `chain::plugin_config_exception`. See KMS_SIGNING_DESIGN.md §2 for the
- * non-goal curves.
+ * `chain::plugin_config_exception`.
  *
  * @param ref parsed `(region, key_id)` pair
  * @param key_type chain key type; must be `chain_key_type_ethereum`

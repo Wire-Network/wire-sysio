@@ -344,8 +344,8 @@ BOOST_AUTO_TEST_CASE(create_provider_ethereum_kms_spec_routes_through_parser) {
    // End-to-end check that the plugin's spec parser routes `KMS:` through
    // `parse_kms_spec` + `make_kms_signature_provider` and returns a provider
    // whose sign closure is callable. The closure itself is *not* invoked
-   // here — invocation issues a real KMS::Sign request, which lives behind
-   // the env-gated live test in KMS_SIGNING_DESIGN.md §7.
+   // here — invocation issues a real KMS::Sign request, which is covered
+   // only by the env-gated live test.
    using namespace fc::test;
    using namespace fc::crypto;
 

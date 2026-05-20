@@ -514,8 +514,8 @@ kms_signer make_kms_signature_provider(const kms_key_ref&             ref,
    // v1 only supports secp256k1 keys held as Ethereum-flavoured public keys
    // (ECC_SECG_P256K1 in KMS, signed with ECDSA_SHA_256). Wire K1 (sysio's
    // own secp256k1 path), R1, BLS, Ed25519, and webauthn use different key
-   // shapes or curves and need separate plumbing — see KMS_SIGNING_DESIGN.md
-   // §2 non-goals for the contract.
+   // shapes or curves and need separate plumbing, so they are out of scope
+   // for v1.
    SYS_ASSERT(key_type == fc::crypto::chain_key_type_ethereum,
               chain::pending_impl_exception,
               "KMS signing currently supports only chain_key_type_ethereum, got {}",
