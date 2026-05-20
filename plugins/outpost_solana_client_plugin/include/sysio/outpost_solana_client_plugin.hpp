@@ -40,14 +40,34 @@ struct opp_solana_outpost_client : fc::network::solana::solana_program_client {
    // Pre-computed static PDAs (deterministic from program_id).
    fc::network::solana::solana_public_key config_pda;
    fc::network::solana::solana_public_key operator_registry_pda;
-   fc::network::solana::solana_public_key message_buffer_pda;
+   fc::network::solana::solana_public_key outbound_message_buffer_pda;
+   /// Singleton inbound-envelope log (WIRE → SOL records). All writes and
+   /// reads go through this one PDA; pruning is internal to the Vec so the
+   /// client never sees per-epoch accounts.
+   fc::network::solana::solana_public_key inbound_envelopes_pda;
+   /// Singleton outbound-envelope log (SOL → WIRE records). Same shape.
+   fc::network::solana::solana_public_key outbound_envelopes_pda;
+   /// Single-slot PDA holding the most recent outbound envelope's raw
+   /// bytes — overwritten on every emit. The WIRE batch operator reads
+   /// this to relay the envelope back to WIRE.
+   fc::network::solana::solana_public_key latest_outbound_envelope_pda;
 
    /// `initialize(consensus_threshold: u32) -> signature`.
    solana_program_tx_fn<std::string, uint32_t>             initialize;
-   /// `epoch_in(epoch_index, envelope_data) -> signature`.
-   /// epoch_index is used only to derive the per-epoch EpochDeliveries PDA;
-   /// the IDL instruction arg is envelope_data only.
-   solana_program_tx_fn<std::string, uint32_t, std::vector<uint8_t>> epoch_in;
+   /// `epoch_in(epoch_index, chunk_index, total_chunks, total_bytes, chunk_data) -> signature`.
+   /// Inbound delivery is chunked: Solana's 1 232-byte tx MTU can't carry
+   /// a full OPP envelope at production roster sizes, so the caller streams
+   /// the envelope into a per-(epoch, signer) staging PDA and the program
+   /// auto-finalizes on the last chunk. epoch_index selects both the
+   /// per-epoch EpochDeliveries PDA and the per-(epoch, signer) chunk-buffer
+   /// PDA.
+   solana_program_tx_fn<std::string, uint32_t, uint16_t, uint16_t, uint32_t,
+                         std::vector<uint8_t>> epoch_in;
+   /// `cleanup_envelope_chunks(epoch_index) -> signature`.
+   /// Permissionless reaper for chunk buffers an operator started but
+   /// never finished. Callable once the chain has advanced past
+   /// `epoch_index`. Rent returns to the original uploader.
+   solana_program_tx_fn<std::string, uint32_t>             cleanup_envelope_chunks;
    /// `emit_outbound_envelope(wire_epoch_index: u32) -> signature`.
    solana_program_tx_fn<std::string, uint32_t>             emit_outbound_envelope;
    /// `add_attestation(attestation_type: i32, data: bytes) -> signature`.
@@ -66,43 +86,152 @@ struct opp_solana_outpost_client : fc::network::solana::solana_program_client {
       , operator_registry_pda(fc::network::solana::system::find_program_address(
            {std::vector<uint8_t>{'o','p','e','r','a','t','o','r','_','r','e','g','i','s','t','r','y'}},
            prog_id).first)
-      , message_buffer_pda(fc::network::solana::system::find_program_address(
-           {std::vector<uint8_t>{'m','e','s','s','a','g','e','_','b','u','f','f','e','r'}},
+      , outbound_message_buffer_pda(fc::network::solana::system::find_program_address(
+           {std::vector<uint8_t>{'o','u','t','b','o','u','n','d','_','m','e','s','s','a','g','e','_','b','u','f','f','e','r'}},
            prog_id).first)
-      , initialize(create_tx<std::string, uint32_t>(get_idl("initialize")))
-      // epoch_in: epoch_index selects the EpochDeliveries PDA; envelope_data is the IDL arg.
-      , epoch_in([this](uint32_t epoch_index, std::vector<uint8_t> env_data) -> std::string {
-           // Derive epoch_deliveries PDA: seeds = ["epoch_deliveries", epoch_index_le32]
-           std::vector<uint8_t> epoch_seed = {
+      , inbound_envelopes_pda(fc::network::solana::system::find_program_address(
+           {std::vector<uint8_t>{'i','n','b','o','u','n','d','_','e','n','v','e','l','o','p','e','s'}},
+           prog_id).first)
+      , outbound_envelopes_pda(fc::network::solana::system::find_program_address(
+           {std::vector<uint8_t>{'o','u','t','b','o','u','n','d','_','e','n','v','e','l','o','p','e','s'}},
+           prog_id).first)
+      , latest_outbound_envelope_pda(fc::network::solana::system::find_program_address(
+           {std::vector<uint8_t>{'l','a','t','e','s','t','_','o','u','t','b','o','u','n','d','_','e','n','v','e','l','o','p','e'}},
+           prog_id).first)
+      // OPP writes default to the confirmed variant — any state-changing
+      // call on this client is consensus-critical and must not silently
+      // drop (see epoch-859 stall RCA). `execute_tx_and_confirm` + default
+      // `solana_confirm_options` (commitment=processed, 15s budget) gives
+      // fast failure signal while still proving on-chain acceptance.
+      , initialize(create_tx_and_confirm<std::string, uint32_t>(get_idl("initialize")))
+      // epoch_in: chunked. epoch_index drives both the EpochDeliveries PDA
+      // and the per-(epoch, signer) chunk-buffer PDA; the chunked args are
+      // forwarded as the IDL params.
+      , epoch_in([this](uint32_t epoch_index,
+                        uint16_t chunk_index,
+                        uint16_t total_chunks,
+                        uint32_t total_bytes,
+                        std::vector<uint8_t> chunk_data) -> std::string {
+           const std::vector<uint8_t> epoch_seed = {
               static_cast<uint8_t>(epoch_index & 0xFF),
               static_cast<uint8_t>((epoch_index >>  8) & 0xFF),
               static_cast<uint8_t>((epoch_index >> 16) & 0xFF),
               static_cast<uint8_t>((epoch_index >> 24) & 0xFF)
            };
-           auto [epoch_deliveries_pda, _b] = fc::network::solana::system::find_program_address(
-              {std::vector<uint8_t>{'e','p','o','c','h','_','d','e','l','i','v','e','r','i','e','s'},
-               epoch_seed},
-              program_id);
+           auto [epoch_deliveries_pda, _epoch_bump] =
+              fc::network::solana::system::find_program_address(
+                 {std::vector<uint8_t>{'e','p','o','c','h','_','d','e','l','i','v','e','r','i','e','s'},
+                  epoch_seed},
+                 program_id);
+           // Per-(epoch, signer) chunk buffer. The signer's pubkey IS the
+           // third seed — multiple operators in the same group write to
+           // their own buffers without contention.
+           const auto signer_pk = this->client->get_pubkey().serialize();
+           auto [chunk_buffer_pda, _chunk_bump] =
+              fc::network::solana::system::find_program_address(
+                 {std::vector<uint8_t>{'e','n','v','e','l','o','p','e','_','c','h','u','n','k','s'},
+                  epoch_seed,
+                  std::vector<uint8_t>(signer_pk.begin(), signer_pk.end())},
+                 program_id);
+           // The Solana program's `epoch_in` finalize path now fires the
+           // outbound emit inline at consensus reach (see
+           // `epoch_in.rs::finalize_envelope`), so the IDL's account list
+           // grew to carry the outbound-emit accounts. The relay injects
+           // pre-derived PDAs for all of them; the operator never sends a
+           // separate `emit_outbound_envelope` tx.
            account_overrides_t overrides = {
-              {"config",             config_pda},
-              {"operator_registry",  operator_registry_pda},
-              {"epoch_deliveries",   epoch_deliveries_pda}
+              {"config",                    config_pda},
+              {"operator_registry",         operator_registry_pda},
+              {"epoch_deliveries",          epoch_deliveries_pda},
+              {"chunk_buffer",              chunk_buffer_pda},
+              {"inbound_envelopes",         inbound_envelopes_pda},
+              {"outbound_message_buffer",   outbound_message_buffer_pda},
+              {"outbound_envelopes",        outbound_envelopes_pda},
+              {"latest_outbound_envelope",  latest_outbound_envelope_pda},
            };
            auto& instr = get_idl("epoch_in");
-           program_invoke_data_items params = {fc::variant(env_data)};
-           return execute_tx(instr, resolve_accounts(instr, params, overrides), params);
+           program_invoke_data_items params = {
+              fc::variant(epoch_index),
+              fc::variant(chunk_index),
+              fc::variant(total_chunks),
+              fc::variant(total_bytes),
+              fc::variant(chunk_data),
+           };
+
+           // ComputeBudget pre-ixs are injected ONLY on the final chunk —
+           // that's the chunk that triggers `finalize_envelope` +
+           // `emit_outbound_inner` on the Solana side, which compounds:
+           //   * Anchor deserialise of 9 mut accounts (~5–7 KiB heap)
+           //   * `chunk_buffer.data` manual read + envelope_data clone (~5 KiB)
+           //   * decoded Envelope proto + nested attestation Vecs (~5–10 KiB)
+           //   * inline message processing temp allocs + emit_outbound encode
+           // peak ≈ 22–30 KiB, right at the 32 KiB default BPF heap.
+           // Bounded +88 B/epoch growth in the inbound + outbound EnvelopeLog
+           // Vecs tipped the cluster over the heap ceiling at epoch 13 (OOM
+           // panic in `log_info.resize`); bumping to 256 KiB on this one tx
+           // gives the finalize path 8× margin and removes the failure mode.
+           //
+           // Non-final chunks just `chunk_buffer.data.extend_from_slice(...)`
+           // and consume <5 KiB heap — they don't need the bump, and
+           // injecting pre-ixs there bloats the chunk-write tx past the
+           // 1 232-byte MTU (the bug we hit earlier with always-on pre-ixs;
+           // the encoded tx hit 1 744 > 1 644 cap).
+           //
+           // Deliberately NOT injecting `set_compute_unit_limit` — the
+           // OOM tx consumed 116 K of 200 K CU, so CU is not the
+           // bottleneck for the production 2.5 KB envelope. Add a CU
+           // bump only when 64 KB envelopes land live.
+           std::vector<fc::network::solana::instruction> pre_ixs;
+           if (chunk_index == total_chunks - 1) {
+              pre_ixs.push_back(
+                 fc::network::solana::system::compute_budget::request_heap_frame(256'000));
+           }
+           return execute_tx_and_confirm(instr,
+                                         resolve_accounts(instr, params, overrides),
+                                         params, pre_ixs);
+        })
+      , cleanup_envelope_chunks([this](uint32_t epoch_index) -> std::string {
+           const std::vector<uint8_t> epoch_seed = {
+              static_cast<uint8_t>(epoch_index & 0xFF),
+              static_cast<uint8_t>((epoch_index >>  8) & 0xFF),
+              static_cast<uint8_t>((epoch_index >> 16) & 0xFF),
+              static_cast<uint8_t>((epoch_index >> 24) & 0xFF)
+           };
+           // The reaper closes ITS OWN buffer (caller's pubkey is the
+           // third seed). For closing someone else's stale buffer, rebuild
+           // a sibling lambda that takes an explicit uploader pubkey.
+           const auto signer_pk = this->client->get_pubkey().serialize();
+           auto [chunk_buffer_pda, _bump] =
+              fc::network::solana::system::find_program_address(
+                 {std::vector<uint8_t>{'e','n','v','e','l','o','p','e','_','c','h','u','n','k','s'},
+                  epoch_seed,
+                  std::vector<uint8_t>(signer_pk.begin(), signer_pk.end())},
+                 program_id);
+           account_overrides_t overrides = {
+              {"config",                    config_pda},
+              {"latest_outbound_envelope",  latest_outbound_envelope_pda},
+              {"chunk_buffer",              chunk_buffer_pda},
+              // `uploader` resolves to the signer (caller closes their own
+              // buffer); the IDL marks it `mut` and Anchor's seeds-derived
+              // close target accepts any pubkey that matches the seeds.
+           };
+           auto& instr = get_idl("cleanup_envelope_chunks");
+           program_invoke_data_items params = {fc::variant(epoch_index)};
+           return execute_tx_and_confirm(instr, resolve_accounts(instr, params, overrides), params);
         })
       , emit_outbound_envelope([this](uint32_t wire_epoch_index) -> std::string {
            account_overrides_t overrides = {
-              {"config",          config_pda},
-              {"message_buffer",  message_buffer_pda}
+              {"config",                    config_pda},
+              {"outbound_message_buffer",   outbound_message_buffer_pda},
+              {"outbound_envelopes",        outbound_envelopes_pda},
+              {"latest_outbound_envelope",  latest_outbound_envelope_pda},
            };
            auto& instr = get_idl("emit_outbound_envelope");
            program_invoke_data_items params = {fc::variant(wire_epoch_index)};
-           return execute_tx(instr, resolve_accounts(instr, params, overrides), params);
+           return execute_tx_and_confirm(instr, resolve_accounts(instr, params, overrides), params);
         })
-      , add_attestation(create_tx<std::string, int32_t, std::vector<uint8_t>>(get_idl("add_attestation")))
-      , deposit(create_tx<std::string, uint8_t, std::string, uint64_t>(get_idl("deposit"))) {}
+      , add_attestation(create_tx_and_confirm<std::string, int32_t, std::vector<uint8_t>>(get_idl("add_attestation")))
+      , deposit(create_tx_and_confirm<std::string, uint8_t, std::string, uint64_t>(get_idl("deposit"))) {}
 };
 
 class outpost_solana_client_plugin : public appbase::plugin<outpost_solana_client_plugin> {

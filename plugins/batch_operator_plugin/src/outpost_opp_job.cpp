@@ -1,7 +1,9 @@
 #include <sysio/batch_operator_plugin/outpost_opp_job.hpp>
 
 #include <fc/exception/exception.hpp>
+#include <fc/io/json.hpp>
 #include <fc/log/logger.hpp>
+#include <fc/network/json_rpc/json_rpc_client.hpp>
 
 namespace sysio {
 
@@ -77,22 +79,35 @@ void outpost_opp_job::run_outbound() {
       return;
    }
 
+   // Emit the debug event BEFORE delivery so failed attempts are still
+   // captured by the external_debugging sink. The captured `.data` file is
+   // the only path to root-causing a Solana RPC reject when the validator's
+   // error body is opaque (e.g., -32602 with empty message). Wrapped in its
+   // own try/log-and-drop so a misbehaving signal slot can never break the
+   // producer cluster.
    try {
-      auto tx_id = _client->deliver_outbound_envelope(epoch, pending->raw_envelope, _outpost_deadline);
-      ilog("outpost_opp_job[{}]: delivered outbound envelope ({} bytes) tx={}",
-           _client->to_string(), pending->raw_envelope.size(), tx_id);
-
       _depot.emit_debug_envelope(sysio::opp::debugging::DebugEnvelopeEvent{
          epoch,
          depot_outpost_direction_for(_client->chain_kind()),
          ::sysio::chain::name{}, // batch_op_name filled in by the depot
          pending->raw_envelope
       });
+   } FC_LOG_AND_DROP("outpost_opp_job[{}]: emit_debug_envelope threw", _client->to_string());
+
+   try {
+      auto tx_id = _client->deliver_outbound_envelope(epoch, pending->raw_envelope, _outpost_deadline);
+      ilog("outpost_opp_job[{}]: delivered outbound envelope ({} bytes) tx={}",
+           _client->to_string(), pending->raw_envelope.size(), tx_id);
 
       _last_outbound_epoch = epoch;
+   } catch (const fc::network::json_rpc::json_rpc_error& e) {
+      wlog("outpost_opp_job[{}]: outbound delivery failed: code={} message='{}' data={} detail='{}'",
+           _client->to_string(), e.code, e.top_message(),
+           e.data.is_null() ? std::string("<none>") : fc::json::to_string(e.data, fc::json::yield_function_t{}),
+           e.to_detail_string());
    } catch (const fc::exception& e) {
       wlog("outpost_opp_job[{}]: outbound delivery failed: {}",
-           _client->to_string(), e.to_string());
+           _client->to_string(), e.to_detail_string());
    } catch (const std::exception& e) {
       wlog("outpost_opp_job[{}]: outbound delivery failed: {}",
            _client->to_string(), e.what());
@@ -130,16 +145,23 @@ void outpost_opp_job::run_inbound() {
          return;
       }
 
+      // Emit BEFORE deliver_to_depot for the same reason as run_outbound:
+      // a transient WIRE-side push_action failure (e.g., mempool full,
+      // ABI-serializer hiccup) must not eat the bytes we just pulled off
+      // the outpost — those bytes are the diagnostic record. Wrapped so a
+      // throwing slot can't break the inbound path.
+      try {
+         _depot.emit_debug_envelope(sysio::opp::debugging::DebugEnvelopeEvent{
+            epoch,
+            outpost_depot_direction_for(_client->chain_kind()),
+            ::sysio::chain::name{}, // batch_op_name filled in by the depot
+            raw
+         });
+      } FC_LOG_AND_DROP("outpost_opp_job[{}]: emit_debug_envelope threw", _client->to_string());
+
       _depot.deliver_to_depot(_client->outpost_id(), raw);
       ilog("outpost_opp_job[{}]: delivered {} inbound bytes to depot for epoch {}",
            _client->to_string(), raw.size(), epoch);
-
-      _depot.emit_debug_envelope(sysio::opp::debugging::DebugEnvelopeEvent{
-         epoch,
-         outpost_depot_direction_for(_client->chain_kind()),
-         ::sysio::chain::name{}, // batch_op_name filled in by the depot
-         raw
-      });
    } catch (const fc::exception& e) {
       wlog("outpost_opp_job[{}]: inbound cycle failed: {}",
            _client->to_string(), e.to_string());

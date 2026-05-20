@@ -34,7 +34,7 @@
                     "type": "uint32"
                 },
                 {
-                    "name": "attestation_retention_epoch_count",
+                    "name": "epoch_retention_envelope_log_count",
                     "type": "uint32"
                 }
             ]
@@ -162,7 +162,7 @@
                     "type": "uint32"
                 },
                 {
-                    "name": "attestation_retention_epoch_count",
+                    "name": "epoch_retention_envelope_log_count",
                     "type": "uint32"
                 }
             ]

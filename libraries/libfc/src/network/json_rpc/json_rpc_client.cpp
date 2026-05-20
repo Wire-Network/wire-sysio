@@ -25,9 +25,18 @@ using tcp = asio::ip::tcp;
 json_rpc_error::json_rpc_error(const std::string& message) : json_rpc_error(0, message, {}) {}
 
 json_rpc_error::json_rpc_error(int code_in, const std::string& message, const variant& data_in)
-   : fc::exception(code_in, message)
+   : fc::exception(code_in, "json_rpc_error", message)
      , code(code_in)
-     , data(data_in) {}
+     , data(data_in) {
+   // Push the server-supplied message into the fc::exception log_messages
+   // collection so `top_message()` and the FC_LOG_AND_RETHROW family see
+   // the actual reason rather than an empty string. fc::exception stores
+   // the constructor `message` as the *description*, but `top_message()`
+   // reads from `log_messages` — without this append, downstream callers
+   // that diagnose JSON-RPC failures get `code=… message=''` and lose the
+   // server's diagnostic text.
+   append_log( FC_LOG_MESSAGE( error, "{}", message ) );
+}
 
 json_rpc_client json_rpc_client::create(const std::variant<std::string, fc::url>& source) {
    fc::url url;

@@ -6,6 +6,8 @@
 #include <fc/log/logger.hpp>
 #include <fc/network/solana/solana_borsh.hpp>
 #include <fc/network/solana/solana_client.hpp>
+#include <fc/task/retry.hpp>
+#include <magic_enum/magic_enum.hpp>
 #include <thread>
 
 namespace fc::network::solana {
@@ -568,6 +570,34 @@ std::string solana_program_client::execute_tx(const idl::instruction& instr, con
    auto tx = client->create_transaction({instruction}, client->get_pubkey());
    client->sign_transaction(tx);
    return client->send_transaction(tx);
+}
+
+std::string solana_program_client::execute_tx_and_confirm(const idl::instruction& instr,
+                                                           const std::vector<account_meta>& accounts,
+                                                           const program_invoke_data_items& params,
+                                                           const solana_confirm_options& opts) {
+   // Delegate to the pre-instructions overload with an empty prefix so we
+   // have a single tx-build path; both overloads stay source-compatible
+   // for every existing caller.
+   return execute_tx_and_confirm(instr, accounts, params, {}, opts);
+}
+
+std::string solana_program_client::execute_tx_and_confirm(const idl::instruction& instr,
+                                                           const std::vector<account_meta>& accounts,
+                                                           const program_invoke_data_items& params,
+                                                           const std::vector<instruction>& pre_instructions,
+                                                           const solana_confirm_options& opts) {
+   auto idl_instruction = build_instruction(instr, accounts, params);
+
+   std::vector<instruction> all_instructions;
+   all_instructions.reserve(pre_instructions.size() + 1);
+   all_instructions.insert(all_instructions.end(),
+                           pre_instructions.begin(), pre_instructions.end());
+   all_instructions.push_back(std::move(idl_instruction));
+
+   auto tx = client->create_transaction(all_instructions, client->get_pubkey());
+   client->sign_transaction(tx);
+   return client->send_transaction_and_confirm(tx, opts);
 }
 
 std::pair<solana_public_key, uint8_t> solana_program_client::derive_pda(const std::vector<idl::pda_seed>& pda_seeds,
@@ -1469,6 +1499,55 @@ std::string solana_client::send_and_confirm_transaction(const transaction& tx, c
    }
 
    FC_THROW("Transaction confirmation timeout");
+}
+
+namespace {
+   /// True when `confirmation_status` string from `getSignatureStatuses` is
+   /// at least as advanced as the requested `target`. Commitment ordering is
+   /// `processed < confirmed < finalized`; an RPC reporting "finalized"
+   /// satisfies every lesser target. Empty status string means the cluster
+   /// has not observed the tx yet — never sufficient.
+   bool has_reached_commitment(const std::string& confirmation_status, commitment_t target) {
+      if (confirmation_status.empty()) return false;
+
+      // Map the RPC's string back to the enum. Unknown strings are treated
+      // as "not yet confirmed" — safer than guessing.
+      auto observed = magic_enum::enum_cast<commitment_t>(confirmation_status);
+      if (!observed.has_value()) return false;
+
+      // Enum declaration order (processed=0, confirmed=1, finalized=2) encodes
+      // the monotonic commitment strength we compare against.
+      return magic_enum::enum_integer(*observed) >= magic_enum::enum_integer(target);
+   }
+} // namespace
+
+std::string solana_client::send_transaction_and_confirm(const transaction& tx,
+                                                         const solana_confirm_options& opts) {
+   // Submit once — send_transaction is fire-and-forget by design. We wrap
+   // the poll-until-confirmed step in `fc::task::retry_until` so backoff +
+   // deadline semantics are shared with the Ethereum client.
+   const std::string sig = send_transaction(tx, /*skip_preflight=*/false, opts.commitment);
+
+   return fc::task::retry_until<std::string>(
+      "solana:send_transaction_and_confirm",
+      opts.retry,
+      [this, sig, target = opts.commitment]() -> std::optional<std::string> {
+         auto statuses = get_signature_statuses({sig}, false);
+         if (statuses.value.empty() || !statuses.value[0].has_value()) {
+            return std::nullopt; // cluster hasn't observed the tx yet — retry
+         }
+         const auto& s = *statuses.value[0];
+         if (s.err.has_value()) {
+            // Fatal: the tx ran and failed. No amount of waiting fixes that;
+            // propagate so the caller's retry logic (at the batch-op layer)
+            // can re-submit with a fresh blockhash / nonce.
+            FC_THROW("Transaction failed: {}", *s.err);
+         }
+         if (has_reached_commitment(s.confirmation_status, target)) {
+            return sig; // done — reached the requested commitment level
+         }
+         return std::nullopt; // seen, not yet at target commitment — retry
+      });
 }
 
 } // namespace fc::network::solana

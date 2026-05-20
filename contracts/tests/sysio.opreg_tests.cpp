@@ -286,7 +286,7 @@ BOOST_FIXTURE_TEST_CASE(multiple_bootstrapped_batch_ops, sysio_opreg_tester) { t
       ("operators_per_epoch", 1)
       ("batch_operator_minimum_active", 3)
       ("batch_op_groups", 3)
-      ("attestation_retention_epoch_count", 1000)
+      ("epoch_retention_envelope_log_count", 200)
    ));
    produce_blocks();
 

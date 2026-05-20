@@ -78,6 +78,9 @@ BOOST_AUTO_TEST_CASE(snapshot_scheduler_test) {
 
                producer_plugin* prod_plug = app->find_plugin<producer_plugin>();
                chain_plugin* chain_plug = app->find_plugin<chain_plugin>();
+               // app was constructed on the outer thread; capture this thread as main_thread_id_
+               // before releasing the promise so producer_plugin's main-thread asserts see the loop thread.
+               app->executor().set_main_thread_id();
                plugin_promise.set_value({prod_plug, chain_plug});
 
                auto bs = chain_plug->chain().block_start().connect([&prod_plug, &at_block_20_promise](uint32_t bn) {
@@ -221,6 +224,9 @@ BOOST_AUTO_TEST_CASE(snapshot_scheduler_old_json) {
                at_block_16.set_value();
          });
 
+         // app was constructed on the outer thread; capture this thread as main_thread_id_
+         // so producer_plugin's main-thread asserts see the loop thread.
+         app->executor().set_main_thread_id();
          app->exec();
          return;
       } FC_LOG_AND_DROP()

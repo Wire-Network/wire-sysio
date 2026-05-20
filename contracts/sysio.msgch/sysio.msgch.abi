@@ -1,8 +1,41 @@
 {
     "____comment": "This file was generated with sysio-abigen. DO NOT EDIT ",
     "version": "sysio::abi/1.2",
-    "types": [],
+    "types": [
+        {
+            "new_type_name": "vuint32_t",
+            "type": "varint_uint32"
+        }
+    ],
     "structs": [
+        {
+            "name": "ChainId",
+            "base": "",
+            "fields": [
+                {
+                    "name": "kind",
+                    "type": "ChainKind"
+                },
+                {
+                    "name": "id",
+                    "type": "vuint32_t"
+                }
+            ]
+        },
+        {
+            "name": "Endpoints",
+            "base": "",
+            "fields": [
+                {
+                    "name": "start",
+                    "type": "ChainId"
+                },
+                {
+                    "name": "end",
+                    "type": "ChainId"
+                }
+            ]
+        },
         {
             "name": "attestation_entry",
             "base": "",
@@ -66,16 +99,6 @@
             "fields": []
         },
         {
-            "name": "cleanup",
-            "base": "",
-            "fields": [
-                {
-                    "name": "before_epoch",
-                    "type": "uint32"
-                }
-            ]
-        },
-        {
             "name": "deliver",
             "base": "",
             "fields": [
@@ -127,6 +150,32 @@
                 },
                 {
                     "name": "received_at",
+                    "type": "time_point"
+                }
+            ]
+        },
+        {
+            "name": "envelope_log_entry",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "endpoints",
+                    "type": "Endpoints"
+                },
+                {
+                    "name": "epoch_index",
+                    "type": "uint32"
+                },
+                {
+                    "name": "checksum",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "emitted_at",
                     "type": "time_point"
                 }
             ]
@@ -288,6 +337,16 @@
                     "type": "bytes"
                 }
             ]
+        },
+        {
+            "name": "varint_uint32",
+            "base": "",
+            "fields": [
+                {
+                    "name": "value",
+                    "type": "uint32"
+                }
+            ]
         }
     ],
     "actions": [
@@ -304,11 +363,6 @@
         {
             "name": "chkcons",
             "type": "chkcons",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "cleanup",
-            "type": "cleanup",
             "ricardian_contract": ""
         },
         {
@@ -372,6 +426,14 @@
                     "table_id": 5961
                 }
             ]
+        },
+        {
+            "name": "envlog",
+            "type": "envelope_log_entry",
+            "index_type": "i64",
+            "key_names": ["id"],
+            "key_types": ["uint64"],
+            "table_id": 31386
         },
         {
             "name": "messages",

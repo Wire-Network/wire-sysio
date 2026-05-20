@@ -86,7 +86,7 @@ struct reflector{
 };
 
 void throw_bad_enum_cast( int64_t i, const char* e );
-void throw_bad_enum_cast( const char* k, const char* e );
+void throw_bad_enum_cast( std::string_view k, const char* e );
 
 template<typename C>
 struct has_reflector_init {
@@ -191,7 +191,7 @@ static inline void visit( Visitor&& v ) { \
    case enum_type::elem: return std::string(BOOST_PP_STRINGIZE(elem));
 
 #define FC_REFLECT_ENUM_FROM_STRING( r, enum_type, elem ) \
-  if( strcmp( s, BOOST_PP_STRINGIZE(elem)  ) == 0 || strcmp( s, BOOST_PP_STRINGIZE(enum_type) "_" BOOST_PP_STRINGIZE(elem)  ) == 0 ) return enum_type::elem;
+  if( s == BOOST_PP_STRINGIZE(elem)  || s == BOOST_PP_STRINGIZE(enum_type) "_" BOOST_PP_STRINGIZE(elem)  ) return enum_type::elem;
 
 #define FC_REFLECT_ENUM_FROM_STRING_CASE( r, enum_type, elem ) \
    case enum_type::elem:
@@ -232,21 +232,18 @@ template<> struct reflector<ENUM> { \
       } \
       return e;\
     } \
-    static ENUM from_string( const char* s ) { \
+    static ENUM from_string( std::string_view s ) { \
         BOOST_PP_SEQ_FOR_EACH( FC_REFLECT_ENUM_FROM_STRING, ENUM, FIELDS ) \
         int64_t i = 0; \
         try \
         { \
-           i = boost::lexical_cast<int64_t>(s); \
+           i = boost::lexical_cast<int64_t>(s.data(), s.size()); \
         } \
         catch( const boost::bad_lexical_cast& e ) \
         { \
            fc::throw_bad_enum_cast( s, BOOST_PP_STRINGIZE(ENUM) ); \
         } \
         return from_int(i); \
-    } \
-    static ENUM from_string( const std::string& str ) { \
-        return from_string(str.c_str()); \
     } \
     template< typename Visitor > \
     static void visit( Visitor& v ) \
@@ -276,19 +273,18 @@ template<> struct get_typename<ENUM>  { static const char* name()  { return BOOS
 
 #define FC_REFLECT_ENUM_FROM_STRING_WITH_STRIP( r, enum_type, elem ) \
    { \
-      if( strcmp( s, BOOST_PP_STRINGIZE(elem)  ) == 0 ) return enum_type::elem; \
-      std::string str(s); \
+      constexpr std::string_view _fc_elem_sv{BOOST_PP_STRINGIZE(elem)}; \
+      if( s == _fc_elem_sv ) return enum_type::elem; \
       if (strip_base_enum) { \
          std::string b(BOOST_PP_STRINGIZE(enum_type)); \
          if (b.ends_with("_t")) b = b.substr(0, b.length() - 2); \
          b += "_"; \
          auto last_split_pos = b.find_last_of("::"); \
-         if (last_split_pos != b.npos) {\
-            b = b.substr(last_split_pos + 1); \
+         if (last_split_pos != b.npos) b = b.substr(last_split_pos + 1); \
+         if (_fc_elem_sv.starts_with(b) && s == _fc_elem_sv.substr(b.size())) { \
+            return enum_type::elem; \
          } \
-         if (!str.starts_with(b)) str = b + str; \
       } \
-      if (str == BOOST_PP_STRINGIZE(elem)) return enum_type::elem; \
    }
 
 #define FC_REFLECT_ENUM_WITH_STRIP( ENUM, FIELDS, STRIP_BASE_ENUM_DEFAULT ) \
@@ -327,21 +323,18 @@ template<> struct reflector<ENUM> { \
       } \
       return e;\
     } \
-    static ENUM from_string( const char* s, bool strip_base_enum = STRIP_BASE_ENUM_DEFAULT) { \
+    static ENUM from_string( std::string_view s, bool strip_base_enum = STRIP_BASE_ENUM_DEFAULT) { \
         BOOST_PP_SEQ_FOR_EACH( FC_REFLECT_ENUM_FROM_STRING_WITH_STRIP, ENUM, FIELDS ) \
         int64_t i = 0; \
         try \
         { \
-           i = boost::lexical_cast<int64_t>(s); \
+           i = boost::lexical_cast<int64_t>(s.data(), s.size()); \
         } \
         catch( const boost::bad_lexical_cast& e ) \
         { \
            fc::throw_bad_enum_cast( s, BOOST_PP_STRINGIZE(ENUM) ); \
         } \
         return from_int(i); \
-    } \
-    static ENUM from_string( const std::string& str, bool strip_base_enum = STRIP_BASE_ENUM_DEFAULT ) { \
-        return from_string(str.c_str(), strip_base_enum); \
     } \
     template< typename Visitor > \
     static void visit( Visitor& v ) \

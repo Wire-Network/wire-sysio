@@ -369,6 +369,10 @@ BOOST_AUTO_TEST_CASE(locks_out_branch_of_test) try {
    block_handle h14b_on_strong{bsp14b_on_strong};
    BOOST_TEST(h13a_strong.locks_out_branch_of(h14b_on_strong));
 
+   // `this` is the genesis block: create_core_for_genesis_block yields latest_qc_claim().is_strong_qc == false,
+   // so the strong-QC early return fires and no head is ever reported as locked out.
+   BOOST_TEST(!h_root.locks_out_branch_of(h12b));
+
 } FC_LOG_AND_RETHROW();
 
 // Tests for is_head_descendant_of_pending_lib, exercised via its underlying
@@ -562,6 +566,15 @@ BOOST_AUTO_TEST_CASE(locks_out_branch_of_lib_advanced_past_shared_ancestor) try 
    block_handle h13a_shared{bsp13a_shared};
    block_handle h14b{bsp14b};
    BOOST_TEST(!h13a_shared.locks_out_branch_of(h14b));
+
+   // Boundary: qc.block_num exactly equals head's last_final_block_num. bsp13b's lib is the shared ancestor
+   // (block 11) itself, and bsp13a_shared carries a strong QC for that same block 11. The strict
+   // `qc.block_num < head.last_final` guard does NOT fire here (11 < 11 is false); the not-locked-out result
+   // must instead come from head.extends(qc_target) -- per Savanna safety, the block at head's last_final
+   // height is head's own final block, so head's core reference at 11 equals the shared qc_target.
+   block_handle h13b{bsp13b};
+   BOOST_REQUIRE_EQUAL(bsp13b->core.last_final_block_num(), 11u);
+   BOOST_TEST(!h13a_shared.locks_out_branch_of(h13b));
 
 } FC_LOG_AND_RETHROW();
 

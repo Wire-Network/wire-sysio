@@ -144,6 +144,20 @@
             ]
         },
         {
+            "name": "get_proposal",
+            "base": "",
+            "fields": [
+                {
+                    "name": "proposer",
+                    "type": "name"
+                },
+                {
+                    "name": "proposal_name",
+                    "type": "name"
+                }
+            ]
+        },
+        {
             "name": "inval_key",
             "base": "",
             "fields": [
@@ -220,6 +234,38 @@
             ]
         },
         {
+            "name": "propchunk",
+            "base": "",
+            "fields": [
+                {
+                    "name": "proposal_name",
+                    "type": "name"
+                },
+                {
+                    "name": "chunk_index",
+                    "type": "uint32"
+                },
+                {
+                    "name": "data",
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
+            "name": "propchunk_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "proposal_name",
+                    "type": "uint64"
+                },
+                {
+                    "name": "chunk_index",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
             "name": "proposal",
             "base": "",
             "fields": [
@@ -234,6 +280,18 @@
                 {
                     "name": "earliest_exec_time",
                     "type": "time_point?$"
+                },
+                {
+                    "name": "chunk_count",
+                    "type": "uint32$"
+                },
+                {
+                    "name": "total_size",
+                    "type": "uint32$"
+                },
+                {
+                    "name": "trx_hash",
+                    "type": "checksum256$"
                 }
             ]
         },
@@ -353,6 +411,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "getproposal",
+            "type": "get_proposal",
+            "ricardian_contract": ""
+        },
+        {
             "name": "invalidate",
             "type": "invalidate",
             "ricardian_contract": ""
@@ -394,6 +457,14 @@
             "table_id": 5047
         },
         {
+            "name": "propchunks",
+            "type": "propchunk",
+            "index_type": "i64",
+            "key_names": ["scope","proposal_name","chunk_index"],
+            "key_types": ["name","uint64","uint32"],
+            "table_id": 51135
+        },
+        {
             "name": "proposal",
             "type": "proposal",
             "index_type": "i64",
@@ -404,5 +475,10 @@
     ],
     "ricardian_clauses": [],
     "variants": [],
-    "action_results": []
+    "action_results": [
+        {
+            "name": "getproposal",
+            "result_type": "proposal"
+        }
+    ]
 }
