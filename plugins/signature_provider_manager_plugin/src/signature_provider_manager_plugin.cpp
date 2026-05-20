@@ -405,11 +405,15 @@ public:
     *
     * For every KMS-backed signing key registered before startup, issue a
     * single `GetPublicKey` call. That resolves AWS credentials, warms the
-    * client, and verifies the KMS key matches the pinned public key. Any
-    * misconfiguration — missing credentials, bad region, absent IAM grant,
-    * unreachable IMDS, or a mismatched public key — throws
-    * `chain::plugin_config_exception` here, aborting startup loudly instead of
-    * failing on the first production sign.
+    * client, and verifies the KMS key matches the pinned public key.
+    *
+    * A permanent misconfiguration — missing credentials, bad region, absent
+    * IAM grant, or a mismatched public key — throws
+    * `chain::plugin_config_exception`, which propagates out of
+    * `plugin_startup()` and aborts startup loudly instead of failing on the
+    * first production sign. A transient error (throttle, timeout, KMSInternal)
+    * is logged and skipped — it is not a misconfiguration, so the lazy
+    * first-sign check is left to retry it rather than killing node startup.
     *
     * A no-op unless `_kms_startup_check` is set, and a no-op when no KMS-backed
     * keys are registered.
@@ -431,10 +435,29 @@ public:
       }
 
       ilog("Verifying AWS KMS credentials for {} signing key(s) at startup", probes.size());
+      std::size_t deferred = 0;
       for (auto& probe : probes) {
-         probe(); // throws chain::plugin_config_exception on any misconfiguration
+         try {
+            probe();
+         } catch (const chain::signing_transient_exception& e) {
+            // A transient KMS error (throttle, timeout, KMSInternal) at startup
+            // is not a misconfiguration — don't abort the node over it. Log it
+            // and continue; the lazy first-sign check re-runs the same probe.
+            ++deferred;
+            wlog("AWS KMS startup credential check: transient error for one "
+                 "key, deferring its check to the first sign: {}",
+                 e.to_detail_string());
+         }
+         // A permanent misconfiguration throws chain::plugin_config_exception,
+         // which propagates out of plugin_startup() and aborts startup loudly.
       }
-      ilog("AWS KMS startup credential check passed");
+      if (deferred == 0) {
+         ilog("AWS KMS startup credential check passed");
+      } else {
+         ilog("AWS KMS startup credential check passed; {} key(s) hit a "
+              "transient error and will be re-checked on the first sign",
+              deferred);
+      }
    }
 
 private:

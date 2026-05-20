@@ -19,6 +19,8 @@
 #include <fc/log/logger.hpp>
 #include <magic_enum/magic_enum.hpp>
 
+#include <fmt/format.h>
+
 #include <secp256k1.h>
 #include <secp256k1_recovery.h>
 
@@ -120,21 +122,6 @@ struct kms_signer_state {
    /// transient GetPublicKey API error — and never again once it has passed.
    std::once_flag                       pin_once;
 };
-
-/// Translate an AWS KMS error outcome into a fc::exception with a stable
-/// shape. The error-type enum name is the most actionable signal (e.g.
-/// `AccessDenied`, `KeyUnavailable`, `Throttling`); the message and HTTP
-/// status round out the diagnostic.
-[[noreturn]] void throw_kms_error(std::string_view op, std::string_view key_id,
-                                  const Aws::Client::AWSError<Aws::KMS::KMSErrors>& err) {
-   FC_THROW_EXCEPTION(chain::plugin_config_exception,
-                      "AWS KMS {} for key \"{}\" failed: {} (status {}, {}): {}",
-                      op, key_id,
-                      magic_enum::enum_name(err.GetErrorType()),
-                      static_cast<int>(err.GetResponseCode()),
-                      std::string{err.GetExceptionName().c_str()},
-                      std::string{err.GetMessage().c_str()});
-}
 
 /// Per-region cache of KMS clients. Lock once on lookup; the SDK's HTTP
 /// pool inside the client is itself thread-safe, so multiple sign closures
@@ -341,6 +328,33 @@ void ensure_kms_pubkey_pinned(kms_signer_state& state) {
 }
 
 } // namespace
+
+[[noreturn]] void throw_kms_error(std::string_view op, std::string_view key_id,
+                                  const Aws::Client::AWSError<Aws::KMS::KMSErrors>& err) {
+   // The AWS SDK tags every deserialised error with a retryability class when
+   // it parses the response. Transient classes (throttling, KMSInternal,
+   // dependency / network timeouts, service-unavailable) report ShouldRetry();
+   // permanent ones (access denied, key not found, disabled key, invalid
+   // state, bad parameters) do not. Map that split onto two exception types so
+   // a caller can retry the transient class with backoff and treat the rest as
+   // a fatal misconfiguration. The SDK's own classification is authoritative —
+   // it is what the SDK's retry strategy uses — so there is no hand-maintained
+   // table of error codes here to drift out of date.
+   const bool transient = err.ShouldRetry();
+   const auto message = fmt::format(
+      "AWS KMS {} for key \"{}\" failed: {} (status {}, {}) [{}]: {}",
+      op, key_id,
+      magic_enum::enum_name(err.GetErrorType()),
+      static_cast<int>(err.GetResponseCode()),
+      std::string{err.GetExceptionName().c_str()},
+      transient ? "transient, retryable" : "permanent",
+      std::string{err.GetMessage().c_str()});
+
+   if (transient) {
+      FC_THROW_EXCEPTION(chain::signing_transient_exception, "{}", message);
+   }
+   FC_THROW_EXCEPTION(chain::plugin_config_exception, "{}", message);
+}
 
 kms_key_ref parse_kms_spec(std::string_view spec_data) {
    SYS_ASSERT(!spec_data.empty(), chain::plugin_config_exception,

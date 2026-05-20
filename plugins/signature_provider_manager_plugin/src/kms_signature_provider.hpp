@@ -11,6 +11,7 @@
  */
 
 #include <aws/kms/KMSClient.h>
+#include <aws/kms/KMSErrors.h>
 
 #include <fc/crypto/chain_types_reflect.hpp>
 #include <fc/crypto/elliptic_em.hpp>
@@ -170,6 +171,33 @@ fc::em::public_key spki_der_to_public_key(std::span<const unsigned char> spki_de
 std::shared_ptr<Aws::KMS::KMSClient> get_kms_client(const std::string& region);
 
 /**
+ * @brief Translate a failed AWS KMS API outcome into an fc exception, split by
+ *        whether the failure is transient.
+ *
+ * The AWS SDK classifies every deserialised error as retryable or not — the
+ * same classification its own retry strategy uses. `throw_kms_error` maps that
+ * split onto two distinct exception types so a caller can react correctly:
+ *
+ *   - Transient (throttling, `KMSInternal`, dependency / network timeouts,
+ *     service-unavailable) -> `sysio::chain::signing_transient_exception`. The
+ *     operation may be retried with backoff; the credentials and key are fine.
+ *   - Permanent (access denied, key not found, disabled key, invalid state,
+ *     bad parameters) -> `sysio::chain::plugin_config_exception`. Retrying will
+ *     not help — the operator must fix credentials, IAM, region, or the spec.
+ *
+ * The two types are siblings, not parent and child, so a handler that catches
+ * only `plugin_config_exception` will not silently swallow a retryable error.
+ *
+ * @param op short label for the failed operation (e.g. "Sign", "GetPublicKey")
+ * @param key_id the KMS key id / alias / ARN tail the call targeted
+ * @param err the failed outcome's AWS error
+ * @throws sysio::chain::signing_transient_exception if `err` is retryable
+ * @throws sysio::chain::plugin_config_exception otherwise
+ */
+[[noreturn]] void throw_kms_error(std::string_view op, std::string_view key_id,
+                                  const Aws::Client::AWSError<Aws::KMS::KMSErrors>& err);
+
+/**
  * @brief A KMS-backed signer: the signing closure plus its one-shot startup
  *        probe.
  *
@@ -181,7 +209,10 @@ std::shared_ptr<Aws::KMS::KMSClient> get_kms_client(const std::string& region);
 struct kms_signer {
    /// Signing closure, usable wherever `fc::crypto::sign_fn` is expected. Each
    /// call issues one `KMS::Sign`; the first call also runs the public-key
-   /// pinning check, unless `warm_up` has already run it.
+   /// pinning check, unless `warm_up` has already run it. A transient KMS
+   /// failure throws `sysio::chain::signing_transient_exception` (safe to retry
+   /// with backoff); a permanent one throws
+   /// `sysio::chain::plugin_config_exception` (fatal — fix the configuration).
    fc::crypto::sign_fn sign;
 
    /// Eagerly run the startup probe: a single `KMS::GetPublicKey`
@@ -189,8 +220,11 @@ struct kms_signer {
    /// key matches the pinned public key — without signing. Optional; if never
    /// called, the same check happens lazily on the first `sign`. Idempotent —
    /// it shares the closure's one-shot guard, so calling it never makes the
-   /// check run twice. Throws `sysio::chain::plugin_config_exception` on a
-   /// missing credential, bad region, absent IAM grant, or mismatched key.
+   /// check run twice. A permanent misconfiguration (missing credential, bad
+   /// region, absent IAM grant, mismatched key) throws
+   /// `sysio::chain::plugin_config_exception`; a transient failure (throttle,
+   /// timeout, `KMSInternal`) throws `sysio::chain::signing_transient_exception`
+   /// and the check is left to run again on the first `sign`.
    std::function<void()> warm_up;
 };
 
@@ -220,6 +254,11 @@ struct kms_signer {
  * compact signature. If neither parity recovers to the expected key the call
  * throws `chain::plugin_config_exception`; once pinning has passed this is a
  * defence-in-depth check that should never fire.
+ *
+ * A failed `Sign` or `GetPublicKey` call is classified by retryability: a
+ * transient failure (throttle, `KMSInternal`, timeout) throws
+ * `chain::signing_transient_exception` and may be retried with backoff; a
+ * permanent one throws `chain::plugin_config_exception`. See `throw_kms_error`.
  *
  * v1 only supports secp256k1 keys held as Ethereum public keys
  * (`chain_key_type_ethereum` + `fc::em::public_key_shim`). Other key types

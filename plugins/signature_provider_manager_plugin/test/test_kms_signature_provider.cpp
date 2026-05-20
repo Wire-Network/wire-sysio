@@ -30,6 +30,8 @@
 #include <string_view>
 #include <vector>
 
+#include <aws/kms/KMSErrors.h>
+
 #include "../src/kms_signature_provider.hpp"
 
 using sysio::sigprov::kms::kms_key_ref;
@@ -586,6 +588,51 @@ BOOST_AUTO_TEST_CASE(make_kms_signature_provider_rejects_pubkey_variant_mismatch
          fc::crypto::chain_key_type_ethereum,
          wire_pub),
       sysio::chain::plugin_config_exception);
+}
+
+// ---------------------------------------------------------------------------
+// throw_kms_error — transient vs permanent classification
+//
+// `throw_kms_error` maps an AWS error onto two exception types using the SDK's
+// own retryability classification. Constructing an `AWSError` is offline — it
+// is a plain value type, so these tests need no SDK init and no network.
+// ---------------------------------------------------------------------------
+
+BOOST_AUTO_TEST_CASE(throw_kms_error_maps_retryable_to_transient) {
+   // A throttling error is retryable — the caller should back off and retry.
+   const Aws::Client::AWSError<Aws::KMS::KMSErrors> err(
+      Aws::KMS::KMSErrors::THROTTLING, "ThrottlingException", "Rate exceeded",
+      /* isRetryable */ true);
+   BOOST_CHECK_THROW(sysio::sigprov::kms::throw_kms_error("Sign", "alias/x", err),
+                     sysio::chain::signing_transient_exception);
+}
+
+BOOST_AUTO_TEST_CASE(throw_kms_error_maps_non_retryable_to_config) {
+   // Access-denied is permanent — retrying will not help, the IAM grant is
+   // missing. It must surface as a config exception, not a transient one.
+   const Aws::Client::AWSError<Aws::KMS::KMSErrors> err(
+      Aws::KMS::KMSErrors::ACCESS_DENIED, "AccessDeniedException",
+      "not authorized to perform kms:Sign", /* isRetryable */ false);
+   BOOST_CHECK_THROW(sysio::sigprov::kms::throw_kms_error("Sign", "alias/x", err),
+                     sysio::chain::plugin_config_exception);
+}
+
+BOOST_AUTO_TEST_CASE(throw_kms_error_transient_is_not_a_config_exception) {
+   // The transient and permanent classes must be siblings, not parent/child,
+   // so a handler that catches only `plugin_config_exception` cannot silently
+   // swallow a retryable error and defeat the caller's retry/backoff logic.
+   const Aws::Client::AWSError<Aws::KMS::KMSErrors> err(
+      Aws::KMS::KMSErrors::K_M_S_INTERNAL, "KMSInternalException",
+      "internal service error", /* isRetryable */ true);
+   bool caught_transient = false;
+   try {
+      sysio::sigprov::kms::throw_kms_error("GetPublicKey", "alias/x", err);
+   } catch (const sysio::chain::plugin_config_exception&) {
+      BOOST_FAIL("transient KMS error was caught as plugin_config_exception");
+   } catch (const sysio::chain::signing_transient_exception&) {
+      caught_transient = true;
+   }
+   BOOST_CHECK(caught_transient);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
