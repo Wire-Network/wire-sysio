@@ -371,7 +371,7 @@ BOOST_AUTO_TEST_CASE(der_to_eth_signature_normalises_high_s_input) {
 }
 
 // ---------------------------------------------------------------------------
-// spki_der_to_public_key — design §5.7 public-key pinning decoder
+// spki_der_to_public_key — KMS public-key pinning decoder
 //
 // These tests synthesise the X.509 SubjectPublicKeyInfo that AWS KMS
 // `GetPublicKey` returns by wrapping a locally generated EC point with
@@ -475,13 +475,15 @@ BOOST_AUTO_TEST_CASE(make_kms_signature_provider_returns_callable_for_ethereum) 
    const auto chain_pub =
       fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em).get_public_key();
 
-   const auto sign = sysio::sigprov::kms::make_kms_signature_provider(
+   const auto kms = sysio::sigprov::kms::make_kms_signature_provider(
       kms_key_ref{"us-east-1", "alias/wire-cranker-eth-01"},
       fc::crypto::chain_key_type_ethereum,
       chain_pub);
 
-   // Closure must be set; we deliberately do not invoke it (would hit live KMS).
-   BOOST_CHECK(static_cast<bool>(sign));
+   // Both the signing closure and the startup probe must be set; we deliberately
+   // invoke neither here (either would hit live KMS).
+   BOOST_CHECK(static_cast<bool>(kms.sign));
+   BOOST_CHECK(static_cast<bool>(kms.warm_up));
 }
 
 BOOST_AUTO_TEST_CASE(make_kms_signature_provider_rejects_wire_k1) {
@@ -544,9 +546,14 @@ BOOST_AUTO_TEST_CASE(kms_live_sign_round_trip) {
       fc::crypto::from_native_string_to_public_key<fc::crypto::chain_key_type_ethereum>(pub_hex);
    const auto em_expected = chain_pub.get<fc::em::public_key_shim>().unwrapped();
 
-   const auto ref  = sysio::sigprov::kms::parse_kms_spec(spec_env);
-   const auto sign = sysio::sigprov::kms::make_kms_signature_provider(
+   const auto ref = sysio::sigprov::kms::parse_kms_spec(spec_env);
+   const auto kms = sysio::sigprov::kms::make_kms_signature_provider(
       ref, fc::crypto::chain_key_type_ethereum, chain_pub);
+
+   // Exercise the startup probe: a GetPublicKey call plus the public-key pin,
+   // with no signing. It must pass before we attempt a (billable) Sign — and a
+   // passing probe pre-pins the closure.
+   BOOST_CHECK_NO_THROW(kms.warm_up());
 
    // Deterministic digest so the test is replayable and the AWS account audit
    // log entries are recognisable across runs.
@@ -558,7 +565,7 @@ BOOST_AUTO_TEST_CASE(kms_live_sign_round_trip) {
    sysio::chain::digest_type chain_digest;
    std::memcpy(chain_digest.data(), keccak.data(), 32);
 
-   const auto sig = sign(chain_digest);
+   const auto sig = kms.sign(chain_digest);
 
    const auto& em_sig    = sig.get<fc::em::signature_shim>();
    const auto  recovered = em_sig.recover_eth(keccak).unwrapped();

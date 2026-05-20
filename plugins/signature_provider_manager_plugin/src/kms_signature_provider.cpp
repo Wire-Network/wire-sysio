@@ -112,8 +112,8 @@ struct kms_signer_state {
    std::shared_ptr<Aws::KMS::KMSClient> client;
    std::string                          key_id;
    /// secp256k1 uncompressed public key the spec pinned. Verified once against
-   /// the live KMS key by `verify_kms_pubkey` (design §5.7), then used by
-   /// `recover_v` to discriminate between recovery_id 0 and 1.
+   /// the live KMS key by `verify_kms_pubkey`, then used by `recover_v` to
+   /// discriminate between recovery_id 0 and 1.
    fc::em::public_key                   expected_em_pubkey;
    /// One-shot guard for the GetPublicKey pinning check. The check runs on the
    /// first `Sign`; `std::call_once` re-runs it only if it threw — e.g. a
@@ -164,7 +164,7 @@ bool starts_with_ci(std::string_view s, std::string_view prefix) {
 }
 
 // ---------------------------------------------------------------------------
-// X.509 SubjectPublicKeyInfo (DER) decoding — design §5.7 public-key pinning.
+// X.509 SubjectPublicKeyInfo (DER) decoding for KMS public-key pinning.
 //
 // AWS KMS `GetPublicKey` returns the key as a DER-encoded SubjectPublicKeyInfo
 // (RFC 5280 §4.1). We walk just enough of that structure to verify the key is
@@ -305,10 +305,10 @@ parse_spki_ec_point(std::span<const unsigned char> spki_der) {
    return out;
 }
 
-/// Design §5.7 public-key pinning. Fetch the KMS key's public key with the
-/// free, non-billable `GetPublicKey` API, decode its SubjectPublicKeyInfo, and
-/// assert it matches the key the operator pinned in the spec. On mismatch this
-/// throws `plugin_config_exception` early — before any billable `Sign` — with a
+/// Public-key pinning check. Fetch the KMS key's public key with the free,
+/// non-billable `GetPublicKey` API, decode its SubjectPublicKeyInfo, and assert
+/// it matches the key the operator pinned in the spec. On mismatch this throws
+/// `plugin_config_exception` early — before any billable `Sign` — with a
 /// message that names the misconfiguration directly. Invoked exactly once per
 /// closure through `kms_signer_state::pin_once`.
 void verify_kms_pubkey(kms_signer_state& state) {
@@ -330,6 +330,14 @@ void verify_kms_pubkey(kms_signer_state& state) {
               "pinned in the signature-provider spec. Correct the spec's <public-key> to the "
               "key this KMS key actually holds, or point the spec at the intended KMS key.",
               state.key_id);
+}
+
+/// Run the public-key pinning check exactly once for `state`. Both the first
+/// `Sign` and the opt-in startup probe funnel through here, so `std::call_once`
+/// guarantees a single GetPublicKey round-trip — and retries it only if it
+/// threw (e.g. a transient GetPublicKey API error).
+void ensure_kms_pubkey_pinned(kms_signer_state& state) {
+   std::call_once(state.pin_once, [&] { verify_kms_pubkey(state); });
 }
 
 } // namespace
@@ -500,9 +508,9 @@ fc::em::public_key spki_der_to_public_key(std::span<const unsigned char> spki_de
    }
 }
 
-fc::crypto::sign_fn make_kms_signature_provider(const kms_key_ref&             ref,
-                                                fc::crypto::chain_key_type_t   key_type,
-                                                const fc::crypto::public_key&  expected_pubkey) {
+kms_signer make_kms_signature_provider(const kms_key_ref&             ref,
+                                       fc::crypto::chain_key_type_t   key_type,
+                                       const fc::crypto::public_key&  expected_pubkey) {
    // v1 only supports secp256k1 keys held as Ethereum-flavoured public keys
    // (ECC_SECG_P256K1 in KMS, signed with ECDSA_SHA_256). Wire K1 (sysio's
    // own secp256k1 path), R1, BLS, Ed25519, and webauthn use different key
@@ -524,16 +532,16 @@ fc::crypto::sign_fn make_kms_signature_provider(const kms_key_ref&             r
    auto state = std::make_shared<kms_signer_state>(
       get_kms_client(ref.region), ref.key_id, shim.unwrapped());
 
-   return [state](const chain::digest_type& digest) -> chain::signature_type {
-      // Public-key pinning (design §5.7). Before the first — and only the
-      // first — billable Sign, fetch the KMS key's own public key with the
-      // free GetPublicKey API and assert it matches the key pinned in the
-      // spec. This turns the common "wrong <public-key> in the spec" mistake
-      // into a fast, direct error instead of an opaque recovery failure that
-      // would otherwise surface only after a paid Sign. `std::call_once` runs
-      // the check exactly once on success; if it throws (e.g. a transient
-      // GetPublicKey API error) the next Sign retries it.
-      std::call_once(state->pin_once, [&] { verify_kms_pubkey(*state); });
+   fc::crypto::sign_fn sign = [state](const chain::digest_type& digest) -> chain::signature_type {
+      // Public-key pinning. Before the first — and only the first — billable
+      // Sign, fetch the KMS key's own public key with the free GetPublicKey
+      // API and assert it matches the key pinned in the spec. This turns the
+      // common "wrong <public-key> in the spec" mistake into a fast, direct
+      // error instead of an opaque recovery failure that would otherwise
+      // surface only after a paid Sign. If the opt-in startup probe already
+      // ran the check, this is a no-op — both paths share `state->pin_once`
+      // through `ensure_kms_pubkey_pinned`.
+      ensure_kms_pubkey_pinned(*state);
 
       // Build a Sign request. MessageType=DIGEST tells KMS the 32 bytes are
       // already a hash; otherwise it would re-hash with SHA-256 and break
@@ -561,6 +569,16 @@ fc::crypto::sign_fn make_kms_signature_provider(const kms_key_ref&             r
       return fc::crypto::signature(
          fc::crypto::signature::storage_type{fc::em::signature_shim{compact}});
    };
+
+   // Startup probe: runs the same one-shot pinning check as the first Sign,
+   // but issues only the free GetPublicKey — no billable Sign. An opt-in
+   // plugin_startup() calls this so a missing credential, bad region, absent
+   // IAM grant, or wrong pinned key fails loudly at boot instead of deep in
+   // production. It shares `state` (hence `pin_once`) with `sign`, so enabling
+   // the probe never doubles the check.
+   std::function<void()> warm_up = [state] { ensure_kms_pubkey_pinned(*state); };
+
+   return kms_signer{.sign = std::move(sign), .warm_up = std::move(warm_up)};
 }
 
 std::shared_ptr<Aws::KMS::KMSClient> get_kms_client(const std::string& region) {

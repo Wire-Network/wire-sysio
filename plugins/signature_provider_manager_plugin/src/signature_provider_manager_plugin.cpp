@@ -21,7 +21,14 @@
 
 namespace sysio {
 namespace {
-constexpr auto option_name_kiod_timeout_us = "signature-provider-kiod-timeout-us";
+constexpr auto option_name_kiod_timeout = "signature-provider-kiod-timeout";
+
+/// Opt-in flag: when true, plugin_startup() probes every KMS-backed signing key
+/// with a GetPublicKey call so a credential / region / IAM misconfiguration
+/// fails loudly at boot rather than on the first production sign. Default
+/// false, so nodes with no KMS keys and offline test environments are
+/// unaffected.
+constexpr auto option_name_kms_startup_check = "signature-provider-kms-startup-check";
 
 std::filesystem::path default_signature_provider_spec_file() {
    return app().config_dir() / "default_signature_providers.json";
@@ -36,6 +43,12 @@ public:
     * `kiod` request timeout
     */
    fc::microseconds _kiod_provider_timeout_us;
+
+   /**
+    * When true, `plugin_startup()` runs the opt-in AWS KMS startup credential
+    * check. Set from `option_name_kms_startup_check` in `plugin_initialize`.
+    */
+   bool _kms_startup_check{false};
 
    fc::crypto::sign_fn make_key_signature_provider(const chain::private_key_type& key) const {
       return [key](const chain::digest_type& digest) { return key.sign(digest); };
@@ -118,9 +131,17 @@ public:
          // closure issues KMS::Sign on each invocation, so credentials and
          // network access are deferred to first sign rather than spec parse.
          auto ref = sysio::sigprov::kms::parse_kms_spec(spec_data);
-         auto signer = sysio::sigprov::kms::make_kms_signature_provider(
-            ref, key_type, public_key);
-         return {std::move(signer), std::nullopt};
+         auto kms = sysio::sigprov::kms::make_kms_signature_provider(ref, key_type, public_key);
+
+         // Retain the startup probe so plugin_startup() can — when the opt-in
+         // KMS startup check is enabled — fail fast on a missing credential,
+         // bad region, absent IAM grant, or wrong pinned key, instead of
+         // discovering it deep into production on the first sign.
+         {
+            std::scoped_lock lock(_signing_providers_mutex);
+            _kms_startup_probes.push_back(std::move(kms.warm_up));
+         }
+         return {std::move(kms.sign), std::nullopt};
       }
 
       SYS_THROW(chain::plugin_config_exception, "Unsupported key provider type \"{}\"", spec_type_str);
@@ -379,6 +400,43 @@ public:
       return set_provider(provider);
    }
 
+   /**
+    * Run the opt-in AWS KMS startup credential check.
+    *
+    * For every KMS-backed signing key registered before startup, issue a
+    * single `GetPublicKey` call. That resolves AWS credentials, warms the
+    * client, and verifies the KMS key matches the pinned public key. Any
+    * misconfiguration — missing credentials, bad region, absent IAM grant,
+    * unreachable IMDS, or a mismatched public key — throws
+    * `chain::plugin_config_exception` here, aborting startup loudly instead of
+    * failing on the first production sign.
+    *
+    * A no-op unless `_kms_startup_check` is set, and a no-op when no KMS-backed
+    * keys are registered.
+    */
+   void run_kms_startup_check() {
+      if (!_kms_startup_check) {
+         return;
+      }
+
+      // Copy the probe list so the network-bound GetPublicKey calls run
+      // without holding the providers mutex.
+      std::vector<std::function<void()>> probes;
+      {
+         std::scoped_lock lock(_signing_providers_mutex);
+         probes = _kms_startup_probes;
+      }
+      if (probes.empty()) {
+         return;
+      }
+
+      ilog("Verifying AWS KMS credentials for {} signing key(s) at startup", probes.size());
+      for (auto& probe : probes) {
+         probe(); // throws chain::plugin_config_exception on any misconfiguration
+      }
+      ilog("AWS KMS startup credential check passed");
+   }
+
 private:
    std::atomic_uint32_t _anon_key_counter{0};
 
@@ -398,6 +456,13 @@ private:
     */
    std::map<std::string, fc::crypto::signature_provider_ptr> _signing_providers_by_name{};
    std::map<chain::public_key_type, fc::crypto::signature_provider_ptr> _signing_providers_by_pubkey{};
+
+   /**
+    * One-shot startup probes, one per KMS-backed signing key, collected as
+    * providers are created. Run by `run_kms_startup_check()` when
+    * `_kms_startup_check` is enabled. Guarded by `_signing_providers_mutex`.
+    */
+   std::vector<std::function<void()>> _kms_startup_probes{};
 };
 
 signature_provider_manager_plugin::signature_provider_manager_plugin()
@@ -407,12 +472,20 @@ signature_provider_manager_plugin::~signature_provider_manager_plugin() {}
 
 void signature_provider_manager_plugin::set_program_options(options_description&, options_description& cfg) {
    cfg.add_options()(
-      "signature-provider-kiod-timeout", boost::program_options::value<int32_t>()->default_value(5),
+      option_name_kiod_timeout, boost::program_options::value<int32_t>()->default_value(5),
       "Limits the maximum time (in milliseconds) that is allowed for sending requests to a kiod provider for signing");
    cfg.add_options()(
       "signature-provider", boost::program_options::value<std::vector<std::string>>()->multitoken(),
       "Signature provider spec formatted as (check docs for details): "
       "`<name>,<chain-kind>,<key-type>,<public-key>,<private-key-provider-spec>`");;
+   cfg.add_options()(
+      option_name_kms_startup_check,
+      boost::program_options::value<bool>()->default_value(false),
+      "When true, the signature provider plugin issues an AWS KMS GetPublicKey "
+      "call at startup for every KMS-backed (`KMS:` spec) signing key, failing "
+      "fast if credentials, region, IAM permissions, or the pinned public key "
+      "are misconfigured. Off by default, so nodes without KMS keys and offline "
+      "test environments are unaffected.");
 }
 
 const char* signature_provider_manager_plugin::signature_provider_help_text() const {
@@ -437,8 +510,11 @@ const char* signature_provider_manager_plugin::signature_provider_help_text() co
 }
 
 void signature_provider_manager_plugin::plugin_initialize(const variables_map& options) {
-   if (options.contains(option_name_kiod_timeout_us))
-      my->_kiod_provider_timeout_us = fc::milliseconds(options.at(option_name_kiod_timeout_us).as<int32_t>());
+   if (options.contains(option_name_kiod_timeout))
+      my->_kiod_provider_timeout_us = fc::milliseconds(options.at(option_name_kiod_timeout).as<int32_t>());
+
+   if (options.contains(option_name_kms_startup_check))
+      my->_kms_startup_check = options.at(option_name_kms_startup_check).as<bool>();
 
    if (options.contains(option_name_provider)) {
       auto specs = options.at(option_name_provider).as<std::vector<std::string>>();
@@ -449,6 +525,13 @@ void signature_provider_manager_plugin::plugin_initialize(const variables_map& o
               provider->key_name, provider->public_key.to_string({}));
       }
    }
+}
+
+void signature_provider_manager_plugin::plugin_startup() {
+   // Opt-in AWS KMS credential probe. A no-op unless
+   // `signature-provider-kms-startup-check` is enabled; when enabled, any KMS
+   // misconfiguration throws here and aborts startup loudly.
+   my->run_kms_startup_check();
 }
 
 fc::crypto::signature_provider_ptr signature_provider_manager_plugin::create_provider(const std::string& spec) {

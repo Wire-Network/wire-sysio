@@ -20,6 +20,7 @@
 #include <fc/crypto/signature_provider.hpp>
 
 #include <array>
+#include <functional>
 #include <memory>
 #include <span>
 #include <string>
@@ -135,7 +136,7 @@ fc::em::compact_signature der_to_eth_signature(
  * `AlgorithmIdentifier` and a `BIT STRING`. This helper walks that structure,
  * verifies the algorithm is `id-ecPublicKey` over the `secp256k1` named curve,
  * and lifts the trailing uncompressed `0x04 || X || Y` point into an
- * `fc::em::public_key`. It backs the design §5.7 public-key pinning check.
+ * `fc::em::public_key`. It backs the KMS public-key pinning check.
  *
  * Because DER is a canonical encoding, the walk is an exact parse rather than a
  * heuristic: anything that is not a well-formed secp256k1 SPKI is rejected.
@@ -170,18 +171,43 @@ fc::em::public_key spki_der_to_public_key(std::span<const unsigned char> spki_de
 std::shared_ptr<Aws::KMS::KMSClient> get_kms_client(const std::string& region);
 
 /**
- * @brief Build a `sign_fn` closure that signs digests with AWS KMS.
+ * @brief A KMS-backed signer: the signing closure plus its one-shot startup
+ *        probe.
+ *
+ * `make_kms_signature_provider` returns this pair so a caller can choose to
+ * validate the KMS key eagerly at startup instead of lazily on the first sign.
+ * Both members share the same underlying state, so the public-key pinning
+ * check runs at most once regardless of which one triggers it.
+ */
+struct kms_signer {
+   /// Signing closure, usable wherever `fc::crypto::sign_fn` is expected. Each
+   /// call issues one `KMS::Sign`; the first call also runs the public-key
+   /// pinning check, unless `warm_up` has already run it.
+   fc::crypto::sign_fn sign;
+
+   /// Eagerly run the startup probe: a single `KMS::GetPublicKey`
+   /// that resolves AWS credentials, warms the client, and verifies the KMS
+   /// key matches the pinned public key — without signing. Optional; if never
+   /// called, the same check happens lazily on the first `sign`. Idempotent —
+   /// it shares the closure's one-shot guard, so calling it never makes the
+   /// check run twice. Throws `sysio::chain::plugin_config_exception` on a
+   /// missing credential, bad region, absent IAM grant, or mismatched key.
+   std::function<void()> warm_up;
+};
+
+/**
+ * @brief Build a KMS-backed signer (closure + startup probe) for a key.
  *
  * Validates `key_type` and the public-key variant, resolves the shared
  * `KMSClient` for `ref.region` via `get_kms_client`, and captures the client,
  * key id, and expected public key into the returned closure. No network I/O
- * happens here; the first KMS request occurs only when the closure is
- * invoked.
+ * happens here; the first KMS request occurs only when the closure — or the
+ * returned `warm_up` probe — is invoked.
  *
- * On its first invocation the closure performs design §5.7 public-key
- * pinning: it calls `KMSClient::GetPublicKey` exactly once, decodes the
- * returned X.509 SubjectPublicKeyInfo via `spki_der_to_public_key`, and
- * asserts the KMS key's public key matches `expected_pubkey`. A mismatch
+ * On its first invocation the closure performs public-key pinning: it calls
+ * `KMSClient::GetPublicKey` exactly once, decodes the returned X.509
+ * SubjectPublicKeyInfo via `spki_der_to_public_key`, and asserts the KMS
+ * key's public key matches `expected_pubkey`. A mismatch
  * throws `chain::plugin_config_exception` immediately — before any billable
  * `Sign` — so a spec that pins the wrong `<public-key>` fails fast with a
  * direct error. The pinning check runs once on success; a transient
@@ -208,9 +234,9 @@ std::shared_ptr<Aws::KMS::KMSClient> get_kms_client(const std::string& region);
  * @param expected_pubkey public key the operator pinned in the spec; used at
  *        each sign call to recover the `v` byte and to assert that the
  *        signature KMS produced matches that key
- * @return a `sign_fn` matching `fc::crypto::sign_fn`'s signature
+ * @return a `kms_signer` bundling the signing closure and the startup probe
  */
-fc::crypto::sign_fn make_kms_signature_provider(
+kms_signer make_kms_signature_provider(
    const kms_key_ref&            ref,
    fc::crypto::chain_key_type_t  key_type,
    const fc::crypto::public_key& expected_pubkey);

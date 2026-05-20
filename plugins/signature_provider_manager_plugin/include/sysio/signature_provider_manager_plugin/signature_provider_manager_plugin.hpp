@@ -38,7 +38,18 @@ public:
                                     boost::program_options::options_description& cfg) override;
 
    void plugin_initialize(const variables_map& options);
-   void plugin_startup() {}
+
+   /**
+    * Plugin startup hook.
+    *
+    * Runs the opt-in AWS KMS startup credential check: when
+    * `signature-provider-kms-startup-check` is enabled, every KMS-backed
+    * signing key is probed with a `GetPublicKey` call so a credential, region,
+    * IAM, or pinned-key misconfiguration aborts startup loudly instead of
+    * failing on the first production sign. A no-op when the check is disabled
+    * or no KMS keys are configured.
+    */
+   void plugin_startup();
    void plugin_shutdown() {}
 
    const char* signature_provider_help_text() const;
