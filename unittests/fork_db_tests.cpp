@@ -269,6 +269,16 @@ BOOST_FIXTURE_TEST_CASE(block_handle_extends_test, generate_fork_db_state) try {
    BOOST_TEST(!h_bsp13a.extends(bsp11b->id()));
    BOOST_TEST(!h_bsp13a.extends(bsp12b->id()));
 
+   // block_num below the tracking range (< last_final_block_num) -> false. Catches a regression where extends
+   // widens its lower bound: a synthetic id at block_num 9 sits below root's 10 and must never be accepted.
+   BOOST_TEST(!h_bsp13a.extends(make_block_id(9)));
+
+   // block_num at or above current_block_num on a sibling -> false. Catches a regression where extends widens
+   // its upper bound: bsp13b is at block 13 (== current_block_num of bsp13a) and bsp14b is at block 14 (>),
+   // both on branch b; neither must be reported as extended.
+   BOOST_TEST(!h_bsp13a.extends(bsp13b->id()));
+   BOOST_TEST(!h_bsp13a.extends(bsp14b->id()));
+
    // Default-constructed (null _bsp) -> false. Without the null guard this would crash.
    BOOST_TEST(!block_handle{}.extends(root->id()));
 
@@ -426,33 +436,78 @@ BOOST_FIXTURE_TEST_CASE(pending_lib_at_deepest_14b, generate_fork_db_state) try 
 } FC_LOG_AND_RETHROW();
 
 // Direct controller-level test of is_head_descendant_of_pending_lib. The pending_lib_* fixture tests above verify
-// the underlying logic via a local mirror; this one exercises the actual method on a real controller to catch
-// wiring bugs (wrong destructured field, swapped comparison, wrong fork_db accessor) that the mirror cannot.
+// the underlying logic via a local mirror across many (head, pending_lib) combinations on a synthetic fork_db;
+// this one drives a real controller through repeated produce_blocks + set_savanna_lib steps to exercise each
+// branch of the controller method and catch wiring bugs (wrong destructured field, swapped comparison, wrong
+// fork_db accessor). set_savanna_lib is monotonic in block_num, so pending_lib only advances forward across
+// stages; head is advanced via produce_blocks between stages to expose new (head, pending_lib) pairs.
 BOOST_AUTO_TEST_CASE(controller_is_head_descendant_of_pending_lib_test) try {
    nonce = 0;
-   // setup_policy::none keeps the test light and avoids contract setup; QCs do not form here so pending_lib does not
-   // advance on its own. We drive it manually via set_savanna_lib to exercise each branch of the controller method.
+   // setup_policy::none keeps the test light and avoids contract setup; QCs do not form here so pending_lib does
+   // not advance on its own.
    sysio::testing::tester c{sysio::testing::setup_policy::none};
-   c.produce_blocks(2);
+   c.produce_blocks(5);
 
    auto& chain = *c.control;
-   const auto first_head = chain.head();
+   auto id_at = [&](uint32_t bn) {
+      auto id = chain.chain_block_id_for_num(bn);
+      BOOST_REQUIRE(id.has_value());
+      return *id;
+   };
+   auto ts_at = [&](uint32_t bn) {
+      auto sb = chain.fetch_block_by_number(bn);
+      BOOST_REQUIRE(sb);
+      return sb->timestamp;
+   };
 
-   // Equality branch: pending_lib == head; chain_head.id() == pending_id returns true.
-   chain.set_savanna_lib(first_head.id(), first_head.timestamp());
+   // Stage 1 -- ancestor branch, distant: pending_lib at an early block (block 2), head several blocks ahead.
+   const uint32_t early_bn = 2;
+   chain.set_savanna_lib(id_at(early_bn), ts_at(early_bn));
+   BOOST_REQUIRE_GT(chain.head().block_num(), early_bn);
    BOOST_TEST(chain.is_head_descendant_of_pending_lib());
 
-   // Ancestry branch: produce more blocks so chain_head moves past the pending_lib we set; chain_head.extends
-   // (pending_id) returns true.
+   // Stage 2 -- ancestor branch, closer: advance head, then set pending_lib to a more recent ancestor.
    c.produce_blocks(2);
-   BOOST_REQUIRE_GT(chain.head().block_num(), first_head.block_num());
+   const uint32_t closer_bn = 4;
+   chain.set_savanna_lib(id_at(closer_bn), ts_at(closer_bn));
    BOOST_TEST(chain.is_head_descendant_of_pending_lib());
 
-   // Negative case: set pending_lib to a fabricated id at block_num > head (only direction set_savanna_lib accepts;
-   // it is monotonic in block_num). chain_head can neither equal nor extend an id past itself.
-   const auto cur_head = chain.head();
-   block_id_type fake_id = make_block_id(cur_head.block_num() + 1);
-   chain.set_savanna_lib(fake_id, cur_head.timestamp());
+   // Stage 3 -- equality branch: pending_lib set to current head; chain_head.id() == pending_id short-circuit.
+   const auto h_eq = chain.head();
+   chain.set_savanna_lib(h_eq.id(), h_eq.timestamp());
+   BOOST_TEST(chain.is_head_descendant_of_pending_lib());
+
+   // Stage 4 -- ancestor branch, after head advances past the equality-pinned pending_lib. pending_lib stays where
+   // it was (no further set_savanna_lib call); head's finality_core must still recognize the now-older lib.
+   c.produce_blocks(3);
+   BOOST_REQUIRE_GT(chain.head().block_num(), h_eq.block_num());
+   BOOST_TEST(chain.is_head_descendant_of_pending_lib());
+
+   // Stage 5 -- ancestor branch, immediate parent: pending_lib at head - 1.
+   const uint32_t parent_bn = chain.head().block_num() - 1;
+   chain.set_savanna_lib(id_at(parent_bn), ts_at(parent_bn));
+   BOOST_TEST(chain.is_head_descendant_of_pending_lib());
+
+   // Stage 6 -- equality branch at the latest head.
+   const auto h_eq2 = chain.head();
+   chain.set_savanna_lib(h_eq2.id(), h_eq2.timestamp());
+   BOOST_TEST(chain.is_head_descendant_of_pending_lib());
+
+   // Stage 7 -- negative branch, pending_lib past head: fabricated id at head.block_num()+1. set_savanna_lib only
+   // accepts forward movement, but does not require new_lib <= head.block_num. head can neither equal nor extend
+   // an id whose block_num is at or past head's current_block_num.
+   const auto h_neg = chain.head();
+   const block_id_type fake_above = make_block_id(h_neg.block_num() + 1);
+   chain.set_savanna_lib(fake_above, h_neg.timestamp());
+   BOOST_TEST(!chain.is_head_descendant_of_pending_lib());
+
+   // Stage 8 -- negative branch, pending_lib at a block_num head has now caught up to but with a synthetic id that
+   // does not match the real block at that height. extends() finds a ref at fake_above's block_num but the ids
+   // differ, so the answer is still false. Distinct from stage 7 in that head's tracking range now covers the
+   // pending_lib's block_num; this pins the "different id at same height" branch of finality_core::extends.
+   c.produce_blocks(5);
+   const uint32_t fake_bn = block_header::num_from_id(fake_above);
+   BOOST_REQUIRE_GT(chain.head().block_num(), fake_bn);
    BOOST_TEST(!chain.is_head_descendant_of_pending_lib());
 } FC_LOG_AND_RETHROW();
 
