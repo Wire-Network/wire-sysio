@@ -2238,8 +2238,7 @@ producer_plugin_impl::start_block_result producer_plugin_impl::start_block() {
       // canonical chain has already moved on just orphans our blocks at the next fork switch (under Savanna fork choice
       // by latest_qc_block_timestamp, the chain that finalized first wins regardless of who built locally)
       auto fork_db_ahead_on_same_chain = [&]() {
-         const auto fhead = chain.fork_db_head();
-         return fhead.block_num() > head.block_num() && fhead.extends(head.id());
+         return chain.fork_db_head().extends(head.id());
       };
       while (in_speculating_mode() || !chain.is_head_descendant_of_pending_lib() || fork_db_ahead_on_same_chain()) {
          if (is_configured_producer())
