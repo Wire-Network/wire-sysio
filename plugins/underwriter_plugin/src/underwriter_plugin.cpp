@@ -1,4 +1,5 @@
 #include <fc/log/logger.hpp>
+#include <fc/slug_name.hpp>
 #include <fc/crypto/base58.hpp>
 #include <fc/crypto/sha256.hpp>
 #include <fc/crypto/signature.hpp>
@@ -56,6 +57,19 @@ struct uw_request {
    ChainKind               dst_chain;
    TokenKind               dst_token_kind;
    uint64_t                dst_amount;
+   /// Per-leg slug_name triples (v6 data-model). These are the authoritative
+   /// identifiers for the depot's `rcrdcommit` routing and the
+   /// `UnderwriteIntentCommit` (`chain_code` / `token_code` / `reserve_code`)
+   /// payload populated in `build_signed_uic_bytes`. The `ChainKind` /
+   /// `TokenKind` siblings above are retained only for credit-line bucketing
+   /// against `sysio.opreg::operators.balances`, which still surfaces those
+   /// enums for now.
+   fc::slug_name            src_chain_code{};
+   fc::slug_name            src_token_code{};
+   fc::slug_name            src_reserve_code{};
+   fc::slug_name            dst_chain_code{};
+   fc::slug_name            dst_token_code{};
+   fc::slug_name            dst_reserve_code{};
    /// Source-chain id of the deposit transaction. ETH = 32-byte tx hash;
    /// SOL = 64-byte signature. Populated by `createuwreq` from
    /// `SwapRequest.source_tx_id`. The depot rejects SwapRequests with an
@@ -804,23 +818,38 @@ struct underwriter_plugin::impl {
             req.attestation_type = *at;
          }
 
-         // New schema: src/dst (chain, token_kind, amount) live directly on
-         // the uwreq row (populated by uwrit::createuwreq from the
-         // originating SwapRequest). No more parse_swap_from_attestation
-         // detour through sysio.msgch::attestations. FC_REFLECT_ENUM in
-         // sysio/opp/opp.hpp provides the variant ↔ typed-enum round-trip.
-         if (!obj.contains("src_chain") || !obj.contains("src_amount")
-             || !obj.contains("dst_chain") || !obj.contains("dst_amount")) {
+         // v6 data-model schema: src/dst identity lives on the uwreq row as
+         // `(chain_code, token_code, reserve_code)` slug_name triples plus a
+         // `*_amount`. Populated by `sysio.uwrit::createuwreq` from the
+         // originating SwapRequest. The ABI surfaces slug_name as
+         // `{value: uint64}`; we lift the inner uint64 directly into
+         // `fc::slug_name` to mirror the host-side packing.
+         if (!obj.contains("src_chain_code") || !obj.contains("src_amount")
+             || !obj.contains("dst_chain_code") || !obj.contains("dst_amount")) {
             // Row not yet populated (createuwreq writes them inline so this
             // should be unreachable for SWAP-derived UWREQs). Skip safely.
             continue;
          }
-         req.src_chain      = obj["src_chain"].as<ChainKind>();
-         req.src_token_kind = obj["src_token_kind"].as<TokenKind>();
-         req.src_amount     = obj["src_amount"].as_uint64();
-         req.dst_chain      = obj["dst_chain"].as<ChainKind>();
-         req.dst_token_kind = obj["dst_token_kind"].as<TokenKind>();
-         req.dst_amount     = obj["dst_amount"].as_uint64();
+         auto read_codename = [&](const char* key) -> fc::slug_name {
+            return fc::slug_name{obj[key]["value"].as_uint64()};
+         };
+         req.src_chain_code   = read_codename("src_chain_code");
+         req.src_token_code   = read_codename("src_token_code");
+         req.src_reserve_code = read_codename("src_reserve_code");
+         req.src_amount       = obj["src_amount"].as_uint64();
+         req.dst_chain_code   = read_codename("dst_chain_code");
+         req.dst_token_code   = read_codename("dst_token_code");
+         req.dst_reserve_code = read_codename("dst_reserve_code");
+         req.dst_amount       = obj["dst_amount"].as_uint64();
+         // ChainKind / TokenKind siblings retained for the credit-line
+         // bucketing path (sysio.opreg::operators.balances still surfaces
+         // them as enums; cross-walk to codenames is a follow-up). Defaulted
+         // to UNKNOWN so the selector treats this row as uncoverable until
+         // that path is migrated to codenames.
+         req.src_chain      = ChainKind::CHAIN_KIND_UNKNOWN;
+         req.src_token_kind = TokenKind::TOKEN_KIND_UNKNOWN;
+         req.dst_chain      = ChainKind::CHAIN_KIND_UNKNOWN;
+         req.dst_token_kind = TokenKind::TOKEN_KIND_UNKNOWN;
          // The ABI surfaces `bytes` as a hex string. Decode both
          // source_tx_id and depositor — the depot rejects any SwapRequest
          // with empty source_tx_id at createuwreq (emits SwapRevert), so
@@ -1053,31 +1082,45 @@ struct underwriter_plugin::impl {
    }
 
    /// Build a verbatim, signed `UnderwriteIntentCommit` payload for the
-   /// given `(uwreq_id, outpost_id, token_kind)` leg. Returns an empty
-   /// vector on any failure (no signature provider, serialize failure, etc.).
+   /// given leg's `(uwreq_id, outpost_id, chain_code, token_code,
+   /// reserve_code)`. Returns an empty vector on any failure (no signature
+   /// provider, serialize failure, etc.).
    ///
-   /// `token_kind` discriminates which leg of the uwreq this UIC covers —
-   /// for same-chain swaps (e.g. ERC20→ETH-native on one outpost) both
-   /// legs share `outpost_id` but differ on `token_kind`. The depot's
-   /// `rcrdcommit` routes the UIC into the source-leg or dest-leg slot
-   /// based on the `(from_chain, token_kind)` pair.
+   /// The slug_name triple `(chain_code, token_code, reserve_code)` is the
+   /// v6 routing scalar set the depot's `rcrdcommit` uses to disambiguate
+   /// src vs dst legs — same-chain swaps with multiple reserves on a single
+   /// `(chain, token)` pair are still resolvable because `reserve_code`
+   /// breaks the tie. `outpost_id` carries the chain identity at the OPP
+   /// envelope level (the originating-outpost field on the inbound
+   /// envelope); `chain_code` is the same chain as a slug_name and is what
+   /// the depot indexes against `sysio.uwrit::uw_request_t.*_chain_code`.
    ///
    /// Digest semantics: the underwriter signs `sha256(serialize(uic with
    /// signature blanked))`. The depot's `try_select_winner` rebuilds the
    /// same digest from the bytes it received and verifies the embedded
    /// signature against the underwriter's WIRE account permissions
    /// (`owner` / `active` only) — see `sysio.uwrit::verify_uic_signature`.
-   std::vector<char> build_signed_uic_bytes(uint64_t uwreq_id,
-                                              uint64_t outpost_id,
-                                              TokenKind token_kind) {
+   std::vector<char> build_signed_uic_bytes(uint64_t        uwreq_id,
+                                            uint64_t        outpost_id,
+                                            fc::slug_name    chain_code,
+                                            fc::slug_name    token_code,
+                                            fc::slug_name    reserve_code) {
       opp_att::UnderwriteIntentCommit uic;
       uic.mutable_uw_account()->set_name(underwriter_account.to_string());
       uic.set_uw_request_id(uwreq_id);
       uic.set_outpost_id(outpost_id);
-      uic.set_token_kind(token_kind);
+      // v6 data-model: leg identity is the slug_name triple. The wire format
+      // for each field is the packed uint64 slug_name value (alphabet
+      // `[A-Z0-9_]+`, ≤8 chars). The depot decodes these back to
+      // `sysio::slug_name` via `sysio::slug_name{uic.chain_code}` etc. in
+      // `sysio.msgch::dispatch_underwrite_commit`.
+      uic.set_chain_code(chain_code.value);
+      uic.set_token_code(token_code.value);
+      uic.set_reserve_code(reserve_code.value);
       // uw_ext_chain_addr left default-constructed (empty kind/address) for
-      // v1 — the (outpost_id, token_kind) pair is the binding the depot's
-      // routing path needs, and the signature ties the whole UIC together.
+      // v1 — the slug_name triple + outpost_id pair is the binding the
+      // depot's routing path needs, and the signature ties the whole UIC
+      // together.
       uic.clear_signature();
 
       std::string blanked;
@@ -1149,9 +1192,9 @@ struct underwriter_plugin::impl {
          return false;
       }
       switch (req.src_chain) {
-         case ChainKind::CHAIN_KIND_ETHEREUM:
+         case ChainKind::CHAIN_KIND_EVM:
             return verify_source_deposit_eth(req);
-         case ChainKind::CHAIN_KIND_SOLANA:
+         case ChainKind::CHAIN_KIND_SVM:
             return verify_source_deposit_sol(req);
          default:
             elog("underwriter: cannot verify source deposit for chain={} (uwreq {})",
@@ -1511,16 +1554,21 @@ struct underwriter_plugin::impl {
       }
 
       ilog("underwriter: submitting commit pair for uwreq {} "
-           "src=({},{}) dst=({},{})",
+           "src=({},{},{}) dst=({},{},{})",
            req.id,
-           ChainKind_Name(req.src_chain), TokenKind_Name(req.src_token_kind),
-           ChainKind_Name(req.dst_chain), TokenKind_Name(req.dst_token_kind));
+           req.src_chain_code.to_string(),
+           req.src_token_code.to_string(),
+           req.src_reserve_code.to_string(),
+           req.dst_chain_code.to_string(),
+           req.dst_token_code.to_string(),
+           req.dst_reserve_code.to_string());
 
-      // Per-leg dispatch keyed on `(chain, token_kind)`. Same-chain swaps
-      // (e.g. ERC20 → ETH-native on one outpost) share `chain` between the
-      // two legs but differ on `token_kind`; the UIC payload carries the
-      // `token_kind` so the depot's `rcrdcommit` can route to the correct
-      // source/dest slot on `commit_entry`.
+      // Per-leg dispatch keyed on the v6 slug_name triple
+      // `(chain_code, token_code, reserve_code)`. Same-chain swaps (e.g.
+      // ERC20 → native on one outpost) share `chain_code` between the two
+      // legs but differ on `token_code`/`reserve_code`; the UIC payload
+      // carries the full triple so the depot's `rcrdcommit` can route to
+      // the correct source/dest slot on `commit_entry`.
       //
       // Confirmation discipline: we skip any leg whose
       // `(uwreq_id, chain, token_kind)` triple is already in
@@ -1528,12 +1576,18 @@ struct underwriter_plugin::impl {
       // After a successful confirm we record the triple so the next scan
       // doesn't resubmit. Per project rules: confirm BEFORE recording so
       // a partial-landing in the map cannot happen without OPP breakage.
-      auto submit_one = [this](ChainKind chain, TokenKind token_kind,
-                                uint64_t uw_request_id) {
+      auto submit_one = [this](ChainKind    chain,
+                               TokenKind    token_kind,
+                               fc::slug_name chain_code,
+                               fc::slug_name token_code,
+                               fc::slug_name reserve_code,
+                               uint64_t     uw_request_id) {
          const commit_key key{uw_request_id, chain, token_kind};
          if (confirmed_commits.contains(key)) {
             ilog("underwriter: skip already-confirmed commit uwreq={} chain={} token={}",
-                 uw_request_id, ChainKind_Name(chain), TokenKind_Name(token_kind));
+                 uw_request_id,
+                 chain_code.to_string(),
+                 token_code.to_string());
             return;
          }
 
@@ -1544,14 +1598,14 @@ struct underwriter_plugin::impl {
             return;
          }
          auto uic_bytes = build_signed_uic_bytes(
-            uw_request_id, *outpost_id_opt, token_kind);
+            uw_request_id, *outpost_id_opt, chain_code, token_code, reserve_code);
          if (uic_bytes.empty()) return;   // already logged
 
          bool confirmed = false;
          switch (chain) {
-            case ChainKind::CHAIN_KIND_ETHEREUM:
+            case ChainKind::CHAIN_KIND_EVM:
                confirmed = submit_commit_eth(uw_request_id, uic_bytes); break;
-            case ChainKind::CHAIN_KIND_SOLANA:
+            case ChainKind::CHAIN_KIND_SVM:
                confirmed = submit_commit_sol(uw_request_id, uic_bytes); break;
             default:
                elog("underwriter: unsupported chain={} for commit (uwreq {})",
@@ -1566,8 +1620,12 @@ struct underwriter_plugin::impl {
             commits_failed_count++;
          }
       };
-      submit_one(req.src_chain, req.src_token_kind, req.id);
-      submit_one(req.dst_chain, req.dst_token_kind, req.id);
+      submit_one(req.src_chain, req.src_token_kind,
+                 req.src_chain_code, req.src_token_code, req.src_reserve_code,
+                 req.id);
+      submit_one(req.dst_chain, req.dst_token_kind,
+                 req.dst_chain_code, req.dst_token_code, req.dst_reserve_code,
+                 req.id);
    }
 
    /**

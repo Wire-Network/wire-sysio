@@ -2,6 +2,7 @@
 #include <sysio.opreg/sysio.opreg.hpp>
 #include <sysio.msgch/sysio.msgch.hpp>
 #include <sysio.authex/sysio.authex.hpp>
+#include <sysio.chains/sysio.chains.hpp>
 #include <sysio/opp/attestations/attestations.pb.hpp>
 #include <zpp_bits.h>
 
@@ -10,6 +11,17 @@ namespace sysio {
 using opp::types::OperatorType;
 using opp::types::AttestationType;
 using opp::types::OperatorStatus;
+
+namespace {
+
+/// True when a chains row represents an active outpost (i.e. not the depot
+/// self-row and is active). Pulled out so every fanout loop in `advance`
+/// uses the identical predicate.
+inline bool is_active_outpost(const sysio::chains::chain_row& row) {
+   return row.active && !row.is_depot;
+}
+
+} // namespace
 
 // ---------------------------------------------------------------------------
 //  setconfig
@@ -66,14 +78,20 @@ void epoch::advance() {
    // Before incrementing: evaluate per-op delivery state for the EXPIRING
    // epoch. The active group of the expiring epoch (`current_batch_op_group`
    // BEFORE the increment) is the set of ops responsible for delivering
-   // every registered outpost's inbound envelope for `current_epoch_index`.
+   // every active outpost's inbound envelope for `current_epoch_index`.
    //
    // For each (outpost × member of the expiring group):
    //   - scan `msgch::envelopes` (`byoutepoch` index) for any row matching
-   //     (outpost_id, current_epoch_index, batch_op_name == member)
+   //     (chain_code, current_epoch_index, batch_op_name == member)
    //   - inline `opreg::recorddel(member, current_epoch_index, did_deliver)`
    //   - inline `opreg::termcheck(member)` — the threshold + window come
    //     from `op_config`, so tests dial the thresholds via setconfig
+   //
+   // The outpost set is sourced via a cross-contract read of
+   // `sysio.chains::chains` (no local mirror) filtered to
+   // `active==true && !is_depot`. Each surviving row's `code` is the
+   // outpost's chain code; its underlying `uint64` value is what
+   // `sysio.msgch::envelopes.outpost_id` carries on the wire.
    //
    // Skipped on the genesis epoch (`current_epoch_index == 0`) — no group
    // existed yet, and the membership vector is empty.
@@ -86,10 +104,13 @@ void epoch::advance() {
       msgch::envelopes_t envs(MSGCH_ACCOUNT);
       auto oe_idx = envs.get_index<"byoutepoch"_n>();
 
-      outposts_t outposts_tbl(get_self());
-      for (auto op_it = outposts_tbl.begin(); op_it != outposts_tbl.end(); ++op_it) {
+      sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
+      for (auto op_it = chains_tbl.begin(); op_it != chains_tbl.end(); ++op_it) {
+         if (!is_active_outpost(*op_it)) continue;
+
+         const uint64_t chain_code = op_it->code.value;
          const uint64_t composite =
-            (op_it->id << 32) | state.current_epoch_index;
+            (chain_code << 32) | state.current_epoch_index;
 
          // Walk the (outpost, epoch) bucket and collect distinct delivering
          // batch ops. Vector linear-scan is fine — group size is small
@@ -273,14 +294,15 @@ void epoch::advance() {
       auto out = zpp::bits::out{encoded, zpp::bits::no_size{}};
       (void)out(ops_attest);
 
-      outposts_t outposts_tbl(get_self());
-      for (auto it = outposts_tbl.begin(); it != outposts_tbl.end(); ++it) {
+      sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
+      for (auto it = chains_tbl.begin(); it != chains_tbl.end(); ++it) {
+         if (!is_active_outpost(*it)) continue;
          action(
             permission_level{"sysio.epoch"_n, "owner"_n},
             MSGCH_ACCOUNT,
             "queueout"_n,
             std::make_tuple(
-               it->id,
+               it->code.value,
                opp::types::ATTESTATION_TYPE_OPERATORS,
                encoded
             )
@@ -315,14 +337,15 @@ void epoch::advance() {
       auto out = zpp::bits::out{encoded, zpp::bits::no_size{}};
       (void)out(attest);
 
-      outposts_t outposts_tbl(get_self());
-      for (auto it = outposts_tbl.begin(); it != outposts_tbl.end(); ++it) {
+      sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
+      for (auto it = chains_tbl.begin(); it != chains_tbl.end(); ++it) {
+         if (!is_active_outpost(*it)) continue;
          action(
             permission_level{"sysio.epoch"_n, "owner"_n},
             MSGCH_ACCOUNT,
             "queueout"_n,
             std::make_tuple(
-               it->id,
+               it->code.value,
                opp::types::ATTESTATION_TYPE_BATCH_OPERATOR_GROUPS,
                encoded
             )
@@ -332,13 +355,14 @@ void epoch::advance() {
 
    // Build outbound envelopes for each outpost
    {
-      outposts_t outposts_tbl(get_self());
-      for (auto it = outposts_tbl.begin(); it != outposts_tbl.end(); ++it) {
+      sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
+      for (auto it = chains_tbl.begin(); it != chains_tbl.end(); ++it) {
+         if (!is_active_outpost(*it)) continue;
          action(
             permission_level{"sysio.epoch"_n, "owner"_n},
             MSGCH_ACCOUNT,
             "buildenv"_n,
-            std::make_tuple(it->id)
+            std::make_tuple(it->code.value)
          ).send();
       }
    }
@@ -432,30 +456,6 @@ void epoch::schbatchgps() {
    state.batch_op_groups = new_groups;
    state.current_batch_op_group = 0; // front-of-window is always current
    state_tbl.set(state, get_self());
-}
-
-// ---------------------------------------------------------------------------
-//  regoutpost
-// ---------------------------------------------------------------------------
-void epoch::regoutpost(opp::types::ChainKind chain_kind, uint32_t chain_id) {
-   require_auth(get_self());
-
-   outposts_t outposts(get_self());
-
-   auto chain_idx = outposts.get_index<"bychain"_n>();
-   uint64_t composite = (static_cast<uint64_t>(chain_kind) << 32) | chain_id;
-   auto it = chain_idx.find(composite);
-   check(it == chain_idx.end(), "outpost already registered");
-
-   uint64_t next_id = outposts.available_primary_key();
-
-   outposts.emplace(get_self(), outpost_key{next_id}, outpost_info{
-      .id                  = next_id,
-      .chain_kind          = chain_kind,
-      .chain_id            = chain_id,
-      .last_inbound_epoch  = 0,
-      .last_outbound_epoch = 0,
-   });
 }
 
 // ---------------------------------------------------------------------------

@@ -45,7 +45,7 @@ public:
 
    /// Human-readable identifier safe to embed in log lines and metrics.
    /// Canonical format: `{outpost_id}:{ChainKind_Name}:{chain_id}`
-   /// e.g. `"0:CHAIN_KIND_ETHEREUM:31337"` or `"1:CHAIN_KIND_SOLANA:0"`.
+   /// e.g. `"0:CHAIN_KIND_EVM:31337"` or `"1:CHAIN_KIND_SVM:0"`.
    ///
    /// The default implementation derives the string from the other three
    /// getters — concretes only override when they want a chain-specific

@@ -4,6 +4,7 @@
 #include <sysio/opp/opp.hpp>
 
 #include <fc/variant_object.hpp>
+#include <fc/slug_name.hpp>
 #include <fc-lite/crypto/chain_types.hpp>
 
 #include "contracts.hpp"
@@ -16,6 +17,15 @@ using namespace fc;
 using namespace fc::crypto;
 
 using mvo = fc::mutable_variant_object;
+
+namespace {
+
+/// SlugName mvo helper for v6 action arguments.
+inline fc::mutable_variant_object codename_mvo(std::string_view s) {
+   return mvo()("value", fc::slug_name{s}.value);
+}
+
+} // anonymous namespace
 
 class sysio_uwrit_tester : public tester {
 public:
@@ -181,28 +191,33 @@ BOOST_FIXTURE_TEST_CASE(expirelock_missing_uwreq, sysio_uwrit_tester) { try {
 
 BOOST_FIXTURE_TEST_CASE(rcrdcommit_requires_msgch_auth, sysio_uwrit_tester) { try {
    // rcrdcommit is invoked inline from sysio.msgch on UNDERWRITE_INTENT_COMMIT
-   // dispatch. A direct call from another account is rejected.
+   // dispatch. v6 signature carries (from_chain_code, from_token_code,
+   // reserve_code) slug_name triples in place of the old enum pair.
    BOOST_REQUIRE(push_uwrit_action("uwrit.a"_n, "rcrdcommit"_n, mvo()
-      ("uwreq_id",        1)
-      ("underwriter",     "uwrit.a")
-      ("outpost_id",      1)
-      ("from_chain",      ChainKind::CHAIN_KIND_ETHEREUM)
-      ("from_token_kind", TokenKind::TOKEN_KIND_ETH)
-      ("uic_bytes",       std::vector<char>{})
+      ("uwreq_id",         1)
+      ("underwriter",      "uwrit.a")
+      ("outpost_id",       1)
+      ("from_chain_code",  codename_mvo("ETH"))
+      ("from_token_code",  codename_mvo("ETH"))
+      ("reserve_code",     codename_mvo("PRIMARY"))
+      ("uic_bytes",        std::vector<char>{})
    ).find("missing authority of sysio.msgch") != std::string::npos);
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(rcrdcommit_rejects_unknown_uwreq, sysio_uwrit_tester) { try {
-   // msgch-signed but the uwreq doesn't exist — should report not-found.
-   BOOST_REQUIRE_EQUAL(
-      error("assertion failure with message: uwreq not found"),
+   // v6: OPP handlers MUST NEVER throw (feedback_opp_handlers_never_throw.md
+   // — a `check()` in dispatch halts consensus). The previous error-based
+   // assertion is gone; the action logs + skips on unknown uwreq and
+   // returns success. The test now pins THAT invariant.
+   BOOST_REQUIRE_EQUAL(success(),
       push_uwrit_action(MSGCH_ACCOUNT, "rcrdcommit"_n, mvo()
-         ("uwreq_id",        42)
-         ("underwriter",     "uwrit.a")
-         ("outpost_id",      1)
-         ("from_chain",      ChainKind::CHAIN_KIND_ETHEREUM)
-         ("from_token_kind", TokenKind::TOKEN_KIND_ETH)
-         ("uic_bytes",       std::vector<char>{})
+         ("uwreq_id",         42)
+         ("underwriter",      "uwrit.a")
+         ("outpost_id",       1)
+         ("from_chain_code",  codename_mvo("ETH"))
+         ("from_token_code",  codename_mvo("ETH"))
+         ("reserve_code",     codename_mvo("PRIMARY"))
+         ("uic_bytes",        std::vector<char>{})
       )
    );
 } FC_LOG_AND_RETHROW() }
@@ -223,14 +238,12 @@ BOOST_FIXTURE_TEST_CASE(release_rejects_unknown_uwreq, sysio_uwrit_tester) { try
 // ── sumlocks (Task 3: read-only per-(underwriter, chain, token) lock total) ──
 
 BOOST_FIXTURE_TEST_CASE(sumlocks_zero_for_unbonded_underwriter, sysio_uwrit_tester) { try {
-   // Read-only action with no preconditions: an underwriter that has never
-   // entered a race holds zero locks on every (chain, token_kind). The action
-   // returns 0; with no exception the call is considered successful.
+   // v6 sumlocks signature: slug_name pair (chain_code, token_code).
    BOOST_REQUIRE_EQUAL(success(),
       push_uwrit_action("uwrit.a"_n, "sumlocks"_n, mvo()
          ("underwriter", "uwrit.a")
-         ("chain",       ChainKind::CHAIN_KIND_ETHEREUM)
-         ("token_kind",  TokenKind::TOKEN_KIND_ETH)
+         ("chain_code",  codename_mvo("ETH"))
+         ("token_code",  codename_mvo("ETH"))
       )
    );
 } FC_LOG_AND_RETHROW() }
@@ -246,17 +259,15 @@ BOOST_FIXTURE_TEST_CASE(sumlocks_zero_for_unbonded_underwriter, sysio_uwrit_test
 // legs to the source slot. This case verifies the dispatch still
 // auth-checks correctly when the two chains coincide.
 BOOST_FIXTURE_TEST_CASE(rcrdcommit_same_chain_swap_auth, sysio_uwrit_tester) { try {
-   // Same shape as `rcrdcommit_requires_msgch_auth` but with src==dst chain
-   // — verifies the auth-check fires identically (not bypassed for the
-   // same-chain case). The actual same-chain routing logic is exercised
-   // via the integration flow tests; this guards the auth surface.
+   // v6: slug_name triple disambiguates same-chain swap legs.
    BOOST_REQUIRE(push_uwrit_action("uwrit.a"_n, "rcrdcommit"_n, mvo()
-      ("uwreq_id",        7)
-      ("underwriter",     "uwrit.a")
-      ("outpost_id",      1)
-      ("from_chain",      ChainKind::CHAIN_KIND_ETHEREUM)  // src == dst
-      ("from_token_kind", TokenKind::TOKEN_KIND_ERC20)     // distinguishes legs
-      ("uic_bytes",       std::vector<char>{})
+      ("uwreq_id",         7)
+      ("underwriter",      "uwrit.a")
+      ("outpost_id",       1)
+      ("from_chain_code",  codename_mvo("ETH"))      // src == dst chain
+      ("from_token_code",  codename_mvo("USDC"))     // distinguishes legs
+      ("reserve_code",     codename_mvo("PRIMARY"))
+      ("uic_bytes",        std::vector<char>{})
    ).find("missing authority of sysio.msgch") != std::string::npos);
 } FC_LOG_AND_RETHROW() }
 
@@ -283,18 +294,18 @@ BOOST_FIXTURE_TEST_CASE(rcrdcommit_malformed_uic_does_not_halt, sysio_uwrit_test
    bad_uic_bytes[0] = '\xFF';  // variant tag well outside legal range
 
    auto r = push_uwrit_action(MSGCH_ACCOUNT, "rcrdcommit"_n, mvo()
-      ("uwreq_id",        9001)
-      ("underwriter",     "uwrit.a")
-      ("outpost_id",      1)
-      ("from_chain",      ChainKind::CHAIN_KIND_ETHEREUM)
-      ("from_token_kind", TokenKind::TOKEN_KIND_ETH)
-      ("uic_bytes",       bad_uic_bytes)
+      ("uwreq_id",         9001)
+      ("underwriter",      "uwrit.a")
+      ("outpost_id",       1)
+      ("from_chain_code",  codename_mvo("ETH"))
+      ("from_token_code",  codename_mvo("ETH"))
+      ("reserve_code",     codename_mvo("PRIMARY"))
+      ("uic_bytes",        bad_uic_bytes)
    );
-   // No uwreq with id 9001 exists, so we expect "uwreq not found", NOT a
-   // crypto-related throw / halt from recover_key. The point is the
-   // failure mode is benign + recoverable (an error string), not a
-   // consensus-halting throw.
-   BOOST_REQUIRE_EQUAL(error("assertion failure with message: uwreq not found"), r);
+   // v6: rcrdcommit logs + skips rather than throwing — neither the
+   // unknown-uwreq path nor the malformed-uic path may halt the
+   // consensus pipeline. The invariant: the action does NOT throw.
+   BOOST_REQUIRE_EQUAL(success(), r);
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -3,9 +3,12 @@
 #include <sysio.opreg/sysio.opreg.hpp>
 #include <sysio.reserv/sysio.reserv.hpp>
 #include <sysio.authex/sysio.authex.hpp>
+#include <sysio.chains/sysio.chains.hpp>
+#include <sysio.opp.common/slug_name.hpp>
 #include <sysio/opp/attestations/attestations.pb.hpp>
 #include <sysio/permission.hpp>
 #include <sysio/crypto.hpp>
+#include <magic_enum/magic_enum.hpp>
 #include <zpp_bits.h>
 
 #include <cstring>
@@ -13,13 +16,13 @@
 
 namespace sysio {
 
-using opp::types::ChainKind;
-using opp::types::TokenKind;
 using opp::types::AttestationType;
 using opp::types::UnderwriteRequestStatus;
 using opp::types::UnderwriteStatus;
 using opp::types::OperatorStatus;
 using opp::types::OperatorType;
+using opp::types::ReserveStatus;
+using opp::types::ChainKind;
 using opp::attestations::SwapRequest;
 
 namespace {
@@ -34,45 +37,74 @@ uint32_t get_current_epoch() {
    return es.get().current_epoch_index;
 }
 
-/// Sum the underwriter's pending withdraws on opreg for the given (chain, token).
-uint64_t opreg_pending_withdraws(name underwriter, ChainKind chain, TokenKind token_kind) {
+/// Compose the `sha256(account || chain_code || token_code)` composite key.
+/// Post v6 split-index design (§B.2): the rollup helpers (`opreg_pending_withdraws`,
+/// `sum_locks_inline`) now scan the per-uint64 secondary indexes (`byaccount`,
+/// `byuw`) and filter `(chain_code, token_code)` in memory instead of indexing
+/// by a 24-byte composite. This helper is kept only for any caller that still
+/// needs to derive the same key for cross-contract diagnostic comparison.
+checksum256 compose_account_chain_token_ck(name account,
+                                            sysio::slug_name chain_code,
+                                            sysio::slug_name token_code) {
+   std::array<uint8_t, 24> buf{};
+   uint64_t acc_v = account.value;
+   std::memcpy(buf.data() +  0, &acc_v,             8);
+   std::memcpy(buf.data() +  8, &chain_code.value,  8);
+   std::memcpy(buf.data() + 16, &token_code.value,  8);
+   return sysio::sha256(reinterpret_cast<const char*>(buf.data()), buf.size());
+}
+
+/// Sum the underwriter's pending withdraws on opreg for the given
+/// `(chain_code, token_code)`. Per v6 plan §B.2 (split-index design):
+/// `opreg::wtdwqueue_t` exposes only uint64 secondary indexes. The `byaccount`
+/// index keys on `account.value`; rows are filtered on `(chain_code,
+/// token_code)` in memory. Per-account pending-withdraw counts are O(1)-ish
+/// so the scan is cheap.
+uint64_t opreg_pending_withdraws(name underwriter,
+                                  sysio::slug_name chain_code,
+                                  sysio::slug_name token_code) {
    opreg::wtdwqueue_t queue(uwrit::OPREG_ACCOUNT);
-   auto idx = queue.get_index<"byaccountck"_n>();
-   uint128_t composite = (static_cast<uint128_t>(underwriter.value) << 64)
-                       | (static_cast<uint64_t>(chain) << 32)
-                       | static_cast<uint64_t>(token_kind);
+   auto idx = queue.template get_index<"byaccount"_n>();
 
    uint64_t total = 0;
-   auto it  = idx.lower_bound(composite);
-   auto end = idx.upper_bound(composite);
+   auto it  = idx.lower_bound(underwriter.value);
+   auto end = idx.upper_bound(underwriter.value);
    for (; it != end; ++it) {
+      if (it->chain_code != chain_code || it->token_code != token_code) continue;
       total += it->amount;
    }
    return total;
 }
 
-/// Sum this contract's active locks for the given (underwriter, chain, token).
-uint64_t sum_locks_inline(name self, name underwriter,
-                          ChainKind chain, TokenKind token_kind) {
+/// Sum this contract's active locks for the given
+/// `(underwriter, chain_code, token_code)`. Per v6 plan §B.2 (split-index
+/// design): `uwrit::locks_t` exposes only uint64 secondary indexes. The `byuw`
+/// index keys on `underwriter.value`; rows are filtered on `(chain_code,
+/// token_code)` in memory. Per-underwriter lock counts are O(1)-ish so the
+/// scan is cheap.
+uint64_t sum_locks_inline(name self,
+                           name underwriter,
+                           sysio::slug_name chain_code,
+                           sysio::slug_name token_code) {
    uwrit::locks_t locks(self);
-   auto idx = locks.get_index<"byuwck"_n>();
-   uint128_t composite = (static_cast<uint128_t>(underwriter.value) << 64)
-                       | (static_cast<uint64_t>(chain) << 32)
-                       | static_cast<uint64_t>(token_kind);
+   auto idx = locks.template get_index<"byuw"_n>();
 
    uint64_t total = 0;
-   auto it  = idx.lower_bound(composite);
-   auto end = idx.upper_bound(composite);
+   auto it  = idx.lower_bound(underwriter.value);
+   auto end = idx.upper_bound(underwriter.value);
    for (; it != end; ++it) {
+      if (it->chain_code != chain_code || it->token_code != token_code) continue;
       total += it->amount;
    }
    return total;
 }
 
-/// Look up an underwriter's balance on opreg for the given (chain, token).
-/// Returns the raw stored balance — caller subtracts active locks + pending
-/// withdraws to get the spendable amount.
-uint64_t opreg_balance(name underwriter, ChainKind chain, TokenKind token_kind,
+/// Look up an underwriter's balance on opreg for the given
+/// `(chain_code, token_code)`. Returns the raw stored balance — caller
+/// subtracts active locks + pending withdraws to get the spendable amount.
+uint64_t opreg_balance(name underwriter,
+                        sysio::slug_name chain_code,
+                        sysio::slug_name token_code,
                         OperatorStatus& out_status) {
    opreg::operators_t ops(uwrit::OPREG_ACCOUNT);
    opreg::operator_key op_pk{underwriter.value};
@@ -83,34 +115,37 @@ uint64_t opreg_balance(name underwriter, ChainKind chain, TokenKind token_kind,
    auto op = ops.get(op_pk);
    out_status = op.status;
    for (const auto& b : op.balances) {
-      if (b.chain == chain && b.token_kind == token_kind) {
+      if (b.chain_code == chain_code && b.token_code == token_code) {
          return b.balance;
       }
    }
    return 0;
 }
 
-/// Compute the underwriter's spendable balance on (chain, token_kind).
-/// Mirrors the sysio.opreg::available() formula:
+/// Compute the underwriter's spendable balance on
+/// `(chain_code, token_code)`. Mirrors the sysio.opreg::available() formula:
 ///   balance - sum(active locks here in uwrit) - sum(pending withdraws on opreg)
 /// gated by status (SLASHED / TERMINATED -> 0).
-uint64_t available_via_mirrors(name self, name underwriter,
-                                ChainKind chain, TokenKind token_kind) {
+uint64_t available_via_mirrors(name self,
+                                name underwriter,
+                                sysio::slug_name chain_code,
+                                sysio::slug_name token_code) {
    OperatorStatus status;
-   uint64_t balance = opreg_balance(underwriter, chain, token_kind, status);
+   uint64_t balance = opreg_balance(underwriter, chain_code, token_code, status);
    if (status == OperatorStatus::OPERATOR_STATUS_SLASHED ||
        status == OperatorStatus::OPERATOR_STATUS_TERMINATED) {
       return 0;
    }
-   uint64_t locked  = sum_locks_inline(self, underwriter, chain, token_kind);
-   uint64_t pending = opreg_pending_withdraws(underwriter, chain, token_kind);
+   uint64_t locked  = sum_locks_inline(self, underwriter, chain_code, token_code);
+   uint64_t pending = opreg_pending_withdraws(underwriter, chain_code, token_code);
    uint64_t reserved = locked + pending;
    return balance > reserved ? balance - reserved : 0;
 }
 
-/// Constant-product output computed locally — mirrors sysio.reserve::cp_output
-/// (the uwrit mirror reads the same `lps` rows; the math is replicated here so
-/// uwrit doesn't need to action-call into reserve from inside createuwreq).
+/// Constant-product output computed locally — mirrors sysio.reserv::swapquote
+/// (the uwrit mirror reads the same `reserves` rows; the math is replicated
+/// here so uwrit doesn't need to action-call into reserv from inside
+/// createuwreq).
 uint64_t cp_output(uint64_t reserve_src, uint64_t reserve_dst, uint64_t src_amount) {
    if (reserve_src == 0 || reserve_dst == 0 || src_amount == 0) return 0;
    uint128_t numerator   = static_cast<uint128_t>(reserve_dst) * src_amount;
@@ -122,55 +157,74 @@ uint64_t cp_output(uint64_t reserve_src, uint64_t reserve_dst, uint64_t src_amou
    return static_cast<uint64_t>(result);
 }
 
-/// Quote `src_amount` of (src_chain, src_token) into (dst_chain, dst_token)
-/// via the WIRE-paired reserves on sysio.reserv. Returns 0 if any required
-/// reserve is missing — caller treats 0 as "no quote available, skip
-/// variance check". Mirrors the math in `sysio.reserv::swapquote` so the
-/// variance check at SWAP_REQUEST receipt time doesn't pay for an inline
-/// action call.
+/// Find a reserve by its triple key, returning the row pointer-equivalent
+/// optional. Mirrors sysio.reserv's primary-key access. Returns
+/// `std::nullopt` when no such reserve exists (the variance check then
+/// treats the quote as 0 — implicit skip).
+std::optional<reserve::reserve_row> find_reserve(sysio::slug_name chain_code,
+                                                  sysio::slug_name token_code,
+                                                  sysio::slug_name reserve_code) {
+   reserve::reserves_t reserves(uwrit::RESERVE_ACCOUNT);
+   reserve::reserve_key pk{chain_code, token_code, reserve_code};
+   if (!reserves.contains(pk)) return std::nullopt;
+   return reserves.get(pk);
+}
+
+/// Quote `src_amount` of (src_chain, src_token, src_reserve) into
+/// (dst_chain, dst_token, dst_reserve) via the WIRE-paired reserves on
+/// sysio.reserv. Returns 0 if any required reserve is missing or not
+/// ACTIVE — caller treats 0 as "no quote available, skip variance check".
+/// Mirrors the math in `sysio.reserv::swapquote` so the variance check at
+/// SWAP_REQUEST receipt time doesn't pay for an inline action call.
 ///
-/// Renamed from `reserve_quote` to `swap_quote` alongside the action-name
-/// rename of `quote` -> `swapquote` on `sysio.reserv`.
-uint64_t swap_quote(ChainKind src_chain, TokenKind src_token,
-                    ChainKind dst_chain, TokenKind dst_token,
+/// WIRE-to-WIRE round-trip (paying out WIRE on both sides) is a no-op
+/// transfer of `src_amount`. Otherwise the path is:
+///   * (outpost-side X) -> WIRE via the X reserve
+///   * WIRE -> (outpost-side Y) via the Y reserve
+/// with cp_output running on the side that carries the non-WIRE token.
+uint64_t swap_quote(sysio::slug_name src_chain_code,
+                    sysio::slug_name src_token_code,
+                    sysio::slug_name src_reserve_code,
+                    sysio::slug_name dst_chain_code,
+                    sysio::slug_name dst_token_code,
+                    sysio::slug_name dst_reserve_code,
                     uint64_t src_amount) {
+   using sysio::slug_name_literals::operator""_s;
+   static constexpr sysio::slug_name WIRE_TOKEN = "WIRE"_s;
+
    if (src_amount == 0) return 0;
-   if (src_token == TokenKind::TOKEN_KIND_WIRE && dst_token == TokenKind::TOKEN_KIND_WIRE) {
+   if (src_token_code == WIRE_TOKEN && dst_token_code == WIRE_TOKEN) {
       return src_amount;
    }
-   reserve::reserves_t reserves(uwrit::RESERVE_ACCOUNT);
 
-   auto outpost_amt = [](const reserve::reserve_entry& r) -> uint64_t {
-      return r.reserve_outpost_amount.amount < 0
-         ? uint64_t{0}
-         : static_cast<uint64_t>(r.reserve_outpost_amount.amount);
-   };
-   auto wire_amt = [](const reserve::reserve_entry& r) -> uint64_t {
-      return r.reserve_wire_amount.amount < 0
-         ? uint64_t{0}
-         : static_cast<uint64_t>(r.reserve_wire_amount.amount);
+   auto active_or_null = [](std::optional<reserve::reserve_row>&& r)
+                            -> std::optional<reserve::reserve_row> {
+      if (!r) return std::nullopt;
+      if (r->status != ReserveStatus::RESERVE_STATUS_ACTIVE) return std::nullopt;
+      return r;
    };
 
-   if (src_token == TokenKind::TOKEN_KIND_WIRE) {
-      reserve::reserve_key pk{reserve::pack_chain_token(dst_chain, dst_token)};
-      if (!reserves.contains(pk)) return 0;
-      auto r = reserves.get(pk);
-      return cp_output(wire_amt(r), outpost_amt(r), src_amount);
+   if (src_token_code == WIRE_TOKEN) {
+      auto r = active_or_null(find_reserve(dst_chain_code, dst_token_code, dst_reserve_code));
+      if (!r) return 0;
+      return cp_output(r->reserve_wire_amount, r->reserve_chain_amount, src_amount);
    }
-   if (dst_token == TokenKind::TOKEN_KIND_WIRE) {
-      reserve::reserve_key pk{reserve::pack_chain_token(src_chain, src_token)};
-      if (!reserves.contains(pk)) return 0;
-      auto r = reserves.get(pk);
-      return cp_output(outpost_amt(r), wire_amt(r), src_amount);
+   if (dst_token_code == WIRE_TOKEN) {
+      auto r = active_or_null(find_reserve(src_chain_code, src_token_code, src_reserve_code));
+      if (!r) return 0;
+      return cp_output(r->reserve_chain_amount, r->reserve_wire_amount, src_amount);
    }
-   reserve::reserve_key src_pk{reserve::pack_chain_token(src_chain, src_token)};
-   reserve::reserve_key dst_pk{reserve::pack_chain_token(dst_chain, dst_token)};
-   if (!reserves.contains(src_pk) || !reserves.contains(dst_pk)) return 0;
-   auto src_r = reserves.get(src_pk);
-   auto dst_r = reserves.get(dst_pk);
-   uint64_t intermediate = cp_output(outpost_amt(src_r), wire_amt(src_r), src_amount);
+
+   auto src_r = active_or_null(find_reserve(src_chain_code, src_token_code, src_reserve_code));
+   auto dst_r = active_or_null(find_reserve(dst_chain_code, dst_token_code, dst_reserve_code));
+   if (!src_r || !dst_r) return 0;
+   uint64_t intermediate = cp_output(src_r->reserve_chain_amount,
+                                      src_r->reserve_wire_amount,
+                                      src_amount);
    if (intermediate == 0) return 0;
-   return cp_output(wire_amt(dst_r), outpost_amt(dst_r), intermediate);
+   return cp_output(dst_r->reserve_wire_amount,
+                     dst_r->reserve_chain_amount,
+                     intermediate);
 }
 
 /// Encode + queue a SWAP_REVERT attestation back to the source outpost when
@@ -178,17 +232,26 @@ uint64_t swap_quote(ChainKind src_chain, TokenKind src_token,
 /// via `original_swap_message_id` (low 8 bytes carry the depot's
 /// attestation_id; see msgch's SWAP_REMIT dispatch for the matching decode
 /// convention).
-void emit_swap_revert(name self, uint64_t outpost_id, uint64_t attestation_id,
+///
+/// The slug_name pair `(source_chain_code, source_reserve_code)` is included
+/// so the outpost can locate the matching local reserve when refunding.
+void emit_swap_revert(name self,
+                      uint64_t outpost_id,
+                      uint64_t attestation_id,
                       const opp::attestations::SwapRequest& sr,
+                      sysio::slug_name source_chain_code,
+                      sysio::slug_name source_reserve_code,
                       const std::string& reason) {
    opp::attestations::SwapRevert rev;
    rev.original_swap_message_id.assign(32, 0);
    for (size_t i = 0; i < 8; ++i) {
       rev.original_swap_message_id[i] = static_cast<char>((attestation_id >> (i * 8)) & 0xff);
    }
-   rev.depositor     = sr.actor;
-   rev.refund_amount = sr.source_amount;
-   rev.reason        = reason;
+   rev.depositor           = sr.actor;
+   rev.refund_amount       = sr.source_amount;
+   rev.reason              = reason;
+   rev.source_chain_code   = source_chain_code.value;
+   rev.source_reserve_code = source_reserve_code.value;
 
    // `no_size{}` — raw protobuf bytes for the outpost decoder; the default
    // `zpp::bits::data_out` form prepends a 4-byte LE length prefix that
@@ -205,18 +268,34 @@ void emit_swap_revert(name self, uint64_t outpost_id, uint64_t attestation_id,
    ).send();
 }
 
-/// Look up the depot's outpost id for `chain` via `sysio.epoch::outposts`.
-/// Returns `std::nullopt` when no outpost is registered for the chain
-/// (per `feedback_no_zero_sentinels` — outpost id 0 is a real id, so
-/// 0 must not double as "missing").
-std::optional<uint64_t> find_outpost_id_for_chain(ChainKind chain) {
-   sysio::epoch::outposts_t outposts(uwrit::EPOCH_ACCOUNT);
-   for (auto it = outposts.begin(); it != outposts.end(); ++it) {
-      if (it->chain_kind == chain) {
-         return it->id;
-      }
-   }
-   return std::nullopt;
+/// Resolve a `sysio::slug_name` chain identifier to its `ChainKind` by
+/// reading the `sysio.chains::chains` registry row. Returns `std::nullopt`
+/// when no chain row exists for the code — callers treat that as "no
+/// outpost for this chain, skip the queueout".
+std::optional<ChainKind> chain_kind_for_code(sysio::slug_name chain_code) {
+   sysio::chains::chains_t tbl(uwrit::CHAINS_ACCOUNT);
+   sysio::chains::chain_key pk{chain_code};
+   if (!tbl.contains(pk)) return std::nullopt;
+   return tbl.get(pk).kind;
+}
+
+/// Look up the depot's outpost id for `chain_code` via the chains registry.
+/// Returns `std::nullopt` when no chain row is registered (per
+/// `feedback_no_zero_sentinels` — outpost id 0 is a real id, so 0 must not
+/// double as "missing").
+///
+/// Post v6 cross-contract realignment: chain rows live in
+/// `sysio.chains::chains` keyed by `code` (slug_name); the legacy
+/// `sysio.epoch::outposts` table is gone. The "outpost id" returned here is
+/// the chain's `code.value` (uint64). The depot-self row is filtered out so
+/// WIRE-direct flows skip queueouts cleanly.
+std::optional<uint64_t> find_outpost_id_for_chain(sysio::slug_name chain_code) {
+   sysio::chains::chains_t chains_tbl(uwrit::CHAINS_ACCOUNT);
+   sysio::chains::chain_key pk{chain_code};
+   if (!chains_tbl.contains(pk)) return std::nullopt;
+   const auto row = chains_tbl.get(pk);
+   if (row.is_depot) return std::nullopt;   // WIRE-direct flows don't queueout
+   return chain_code.value;
 }
 
 /// Build + queue the outbound SWAP_REMIT envelope for a confirmed race.
@@ -224,10 +303,12 @@ std::optional<uint64_t> find_outpost_id_for_chain(ChainKind chain) {
 /// Fired inline from `try_select_winner` after the depot has committed
 /// to a winning underwriter pair. Two side-effects, both must land in
 /// this transaction:
-///   1. Inline-action `sysio.reserv::debit(dst_chain, dst_amount)` —
-///      decrements `reserve_outpost_amount` so the depot's reserve
-///      view is tight against the outbound SWAP_REMIT. A failed debit
-///      (insufficient reserve) aborts the entire commit; no half-state.
+///   1. Inline-action `sysio.reserv::debit(dst_chain_code, dst_token_code,
+///      dst_reserve_code, dst_amount)` — decrements the destination
+///      reserve's outpost-side balance so the depot's reserve view is
+///      tight against the outbound SWAP_REMIT. A failed debit
+///      (insufficient reserve / not ACTIVE) aborts the entire commit;
+///      no half-state.
 ///   2. Inline-action `sysio.msgch::queueout(dst_outpost_id,
 ///      ATTESTATION_TYPE_SWAP_REMIT, encoded)` — pushes the envelope
 ///      for the next epoch's outbound drain. The destination outpost's
@@ -251,20 +332,24 @@ void emit_swap_remit(name self,
             "emit_swap_remit: failed to decode stored SwapRequest");
    }
 
-   auto dst_outpost_opt = find_outpost_id_for_chain(req.dst_chain);
+   auto dst_outpost_opt = find_outpost_id_for_chain(req.dst_chain_code);
    check(dst_outpost_opt.has_value(),
          "emit_swap_remit: no outpost registered for destination chain");
    const uint64_t dst_outpost_id = *dst_outpost_opt;
 
-   // Reserve debit FIRST — if the reserve is insufficient the entire
-   // commit aborts and the race is unwound by the caller's surrounding
-   // transaction failing. Depot is the ground truth; no half-state.
-   // TokenAmount is split into (kind, amount) on the inline action per
-   // the no-proto-messages-in-actions rule.
+   // Reserve debit FIRST — if the reserve is insufficient or not ACTIVE
+   // the entire commit aborts and the race is unwound by the caller's
+   // surrounding transaction failing. Depot is the ground truth; no
+   // half-state. The slug_name triple identifies a specific reserve on
+   // (chain_code, token_code), critical when multiple reserves exist for
+   // the same (chain, token) pair.
    action(
       permission_level{self, "active"_n},
       uwrit::RESERVE_ACCOUNT, "debit"_n,
-      std::make_tuple(req.dst_chain, req.dst_token_kind, req.dst_amount)
+      std::make_tuple(req.dst_chain_code,
+                       req.dst_token_code,
+                       req.dst_reserve_code,
+                       req.dst_amount)
    ).send();
 
    // Build the SwapRemit. `original_message_id` encodes the uwreq_id
@@ -274,14 +359,17 @@ void emit_swap_remit(name self,
    opp::attestations::SwapRemit remit;
    remit.recipient        = sr.recipient;
    remit.amount           = opp::types::TokenAmount{
-      .kind   = req.dst_token_kind,
-      .amount = static_cast<int64_t>(req.dst_amount),
+      .token_code = req.dst_token_code.value,
+      .amount     = static_cast<int64_t>(req.dst_amount),
    };
    remit.original_message_id.assign(32, 0);
    for (size_t i = 0; i < 8; ++i) {
       remit.original_message_id[i] =
          static_cast<char>((req.id >> (i * 8)) & 0xff);
    }
+   remit.chain_code   = req.dst_chain_code.value;
+   remit.reserve_code = req.dst_reserve_code.value;
+
    // Resolve the winning underwriter's destination-chain pubkey from
    // `sysio.authex::links` (`bynamechain` index) so the SwapRemit
    // carries the underwriter's auditable identity on the dst chain.
@@ -291,18 +379,27 @@ void emit_swap_remit(name self,
    // payout against the underwriter that won the race without
    // back-tracking through the depot.
    //
-   // An underwriter without an authex link for `dst_chain` cannot be
-   // a valid race winner (they have no on-chain identity there to
+   // An underwriter without an authex link for the dst chain cannot
+   // be a valid race winner (they have no on-chain identity there to
    // commit a signature against). `try_select_winner`'s caller has
    // already accepted their COMMIT, so this lookup should always
    // succeed; if it doesn't, abort the commit rather than ship a
    // SwapRemit with a blank underwriter — auditing depends on the
    // field being populated.
-   remit.underwriter.kind = req.dst_chain;
+   //
+   // The authex links table is still keyed by `(account, ChainKind)`
+   // because that table hasn't been migrated to codenames in this
+   // refactor wave; resolve via `chain_kind_for_code` first.
    {
+      auto dst_kind_opt = chain_kind_for_code(req.dst_chain_code);
+      check(dst_kind_opt.has_value(),
+            "emit_swap_remit: destination chain_code not registered in sysio.chains");
+      const ChainKind dst_kind = *dst_kind_opt;
+
+      remit.underwriter.kind = dst_kind;
       sysio::authex::links_t links(uwrit::AUTHEX_ACCOUNT);
       auto idx = links.get_index<"bynamechain"_n>();
-      const uint128_t key = sysio::to_namechain_key(candidate, req.dst_chain);
+      const uint128_t key = sysio::to_namechain_key(candidate, dst_kind);
       auto it = idx.find(key);
       check(it != idx.end(),
             "emit_swap_remit: winning underwriter has no authex link "
@@ -483,6 +580,19 @@ void uwrit::createuwreq(uint64_t attestation_id,
       check(rc == zpp::bits::errc{}, "failed to decode SwapRequest");
    }
 
+   // Pull the slug_name triples + amounts out of the decoded SwapRequest.
+   // The source token's code lives on the TokenAmount; the source chain
+   // and source reserve are top-level fields. Destination has all three
+   // top-level.
+   const sysio::slug_name src_chain_code{sr.source_chain_code};
+   const sysio::slug_name src_token_code{sr.source_amount.token_code};
+   const sysio::slug_name src_reserve_code{sr.source_reserve_code};
+   const sysio::slug_name dst_chain_code{sr.target_chain_code};
+   const sysio::slug_name dst_token_code{sr.target_token_code};
+   const sysio::slug_name dst_reserve_code{sr.target_reserve_code};
+   const uint64_t        src_amount =
+      static_cast<uint64_t>(static_cast<int64_t>(sr.source_amount.amount));
+
    // Hard-fail any SwapRequest without a populated `source_tx_id`. The
    // off-chain underwriter verify path uses this id to confirm a real
    // on-chain deposit backs the swap before committing collateral; a
@@ -494,25 +604,22 @@ void uwrit::createuwreq(uint64_t attestation_id,
    // the user's deposit is refunded and the run continues.
    if (sr.source_tx_id.empty()) {
       emit_swap_revert(get_self(), outpost_id, attestation_id, sr,
+                       src_chain_code, src_reserve_code,
                        "SwapRequest rejected: source_tx_id is required "
                        "(no SwapRequest may be emitted without a "
                        "populated source-chain transaction id)");
       return;
    }
 
-   // Variance-tolerance check via sysio.reserve mirror. If no LP is
-   // provisioned for the (chain, token) pair on either side the quote
-   // returns 0 and the variance check is implicitly skipped — the swap
-   // proceeds to the underwriter race. This lets dev / smoke clusters
-   // without provisioned LPs continue to operate while still applying the
-   // check the moment LPs are present.
-   const TokenKind src_token  = sr.source_amount.kind;
-   const ChainKind src_chain  = sr.actor.kind;
-   const ChainKind dst_chain  = sr.target_chain.kind;
-   const TokenKind dst_token  = sr.target_token;
-   const uint64_t  src_amount = static_cast<uint64_t>(static_cast<int64_t>(sr.source_amount.amount));
-
-   uint64_t current_quote = swap_quote(src_chain, src_token, dst_chain, dst_token, src_amount);
+   // Variance-tolerance check via sysio.reserv mirror. If no matching
+   // ACTIVE reserve exists for either leg the quote returns 0 and the
+   // variance check is implicitly skipped — the swap proceeds to the
+   // underwriter race. This lets dev / smoke clusters without provisioned
+   // LPs continue to operate while still applying the check the moment
+   // matching reserves are present.
+   const uint64_t current_quote = swap_quote(src_chain_code, src_token_code, src_reserve_code,
+                                              dst_chain_code, dst_token_code, dst_reserve_code,
+                                              src_amount);
    if (current_quote != 0 && sr.quoted_destination_amount != 0) {
       uint64_t quoted   = sr.quoted_destination_amount;
       uint64_t diff     = current_quote > quoted ? current_quote - quoted : quoted - current_quote;
@@ -520,6 +627,7 @@ void uwrit::createuwreq(uint64_t attestation_id,
       uint128_t allowed = (static_cast<uint128_t>(quoted) * sr.quote_tolerance_bps) / 10000u;
       if (static_cast<uint128_t>(diff) > allowed) {
          emit_swap_revert(get_self(), outpost_id, attestation_id, sr,
+                          src_chain_code, src_reserve_code,
                           "variance exceeded tolerance: quoted=" + std::to_string(quoted)
                           + " current=" + std::to_string(current_quote)
                           + " tolerance_bps=" + std::to_string(sr.quote_tolerance_bps));
@@ -531,11 +639,13 @@ void uwrit::createuwreq(uint64_t attestation_id,
       .id                        = attestation_id,
       .type                      = type,
       .status                    = UnderwriteRequestStatus::UNDERWRITE_REQUEST_STATUS_PENDING,
-      .src_chain                 = sr.actor.kind,
-      .src_token_kind            = sr.source_amount.kind,
-      .src_amount                = static_cast<uint64_t>(static_cast<int64_t>(sr.source_amount.amount)),
-      .dst_chain                 = sr.target_chain.kind,
-      .dst_token_kind            = sr.target_token,
+      .src_chain_code            = src_chain_code,
+      .src_token_code            = src_token_code,
+      .src_reserve_code          = src_reserve_code,
+      .src_amount                = src_amount,
+      .dst_chain_code            = dst_chain_code,
+      .dst_token_code            = dst_token_code,
+      .dst_reserve_code          = dst_reserve_code,
       .dst_amount                = sr.quoted_destination_amount,
       .variance_tolerance_bps    = sr.quote_tolerance_bps,
       .source_tx_id              = sr.source_tx_id,
@@ -598,8 +708,8 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate) {
       return;
    }
 
-   uint64_t src_avail = available_via_mirrors(self, candidate, req.src_chain, req.src_token_kind);
-   uint64_t dst_avail = available_via_mirrors(self, candidate, req.dst_chain, req.dst_token_kind);
+   uint64_t src_avail = available_via_mirrors(self, candidate, req.src_chain_code, req.src_token_code);
+   uint64_t dst_avail = available_via_mirrors(self, candidate, req.dst_chain_code, req.dst_token_code);
    if (src_avail < req.src_amount || dst_avail < req.dst_amount) {
       // Insufficient bond — mark the commit_entry but don't promote.
       reqs.modify(same_payer, pk, [&](auto& r) {
@@ -618,8 +728,8 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate) {
    // createuwreq.
    {
       const uint64_t current_quote = swap_quote(
-         req.src_chain, req.src_token_kind,
-         req.dst_chain, req.dst_token_kind,
+         req.src_chain_code, req.src_token_code, req.src_reserve_code,
+         req.dst_chain_code, req.dst_token_code, req.dst_reserve_code,
          req.src_amount);
       const uint64_t quoted = req.dst_amount;
       if (current_quote != 0 && quoted != 0) {
@@ -638,9 +748,10 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate) {
                               req.attestation_inbound_data.size()},
                   zpp::bits::no_size{}};
                if (in(sr) == zpp::bits::errc{}) {
-                  auto src_outpost_opt = find_outpost_id_for_chain(req.src_chain);
+                  auto src_outpost_opt = find_outpost_id_for_chain(req.src_chain_code);
                   if (src_outpost_opt) {
                      emit_swap_revert(self, *src_outpost_opt, req.id, sr,
+                        req.src_chain_code, req.src_reserve_code,
                         "variance exceeded tolerance at race resolution: "
                         "quoted=" + std::to_string(quoted)
                         + " current=" + std::to_string(current_quote)
@@ -665,6 +776,9 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate) {
    }
 
    // Winner — push two locks (one per leg) + mark uwreq CONFIRMED.
+   // Each lock_entry carries the matching leg's full slug_name triple
+   // (`chain_code, token_code, reserve_code`) so a future slash routes
+   // unambiguously back to the originating reserve.
    uint32_t now_ep = get_current_epoch();
    // Lock duration comes from uwconfig; default (10 epochs) used when no
    // setconfig has been issued yet.
@@ -679,8 +793,9 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate) {
       .lock_id          = src_lock_id,
       .uwreq_id         = uwreq_id,
       .underwriter      = candidate,
-      .chain            = req.src_chain,
-      .token_kind       = req.src_token_kind,
+      .chain_code       = req.src_chain_code,
+      .token_code       = req.src_token_code,
+      .reserve_code     = req.src_reserve_code,
       .amount           = req.src_amount,
       .created_at_epoch = now_ep,
       .expires_at_epoch = expires_ep,
@@ -691,8 +806,9 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate) {
       .lock_id          = dst_lock_id,
       .uwreq_id         = uwreq_id,
       .underwriter      = candidate,
-      .chain            = req.dst_chain,
-      .token_kind       = req.dst_token_kind,
+      .chain_code       = req.dst_chain_code,
+      .token_code       = req.dst_token_code,
+      .reserve_code     = req.dst_reserve_code,
       .amount           = req.dst_amount,
       .created_at_epoch = now_ep,
       .expires_at_epoch = expires_ep,
@@ -722,7 +838,7 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate) {
    // Queue the outbound SWAP_REMIT envelope to the destination outpost
    // + debit the depot's reserve view in the same transaction. Per
    // protocol: the depot is the ground truth; SWAP_REMIT emission and
-   // the reserve_outpost_amount debit are atomic. The reflected
+   // the reserve's outpost-side debit are atomic. The reflected
    // SWAP_REMIT envelope from the destination outpost back to msgch
    // triggers `uwrit::release` (the depot doesn't wait on a separate
    // confirmation message; reflection IS the ack). Outpost-side
@@ -738,31 +854,50 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate) {
 // ---------------------------------------------------------------------------
 //  rcrdcommit — record a per-leg COMMIT arrival
 // ---------------------------------------------------------------------------
+//
+// The leg-classification logic now uses the slug_name triple
+// `(from_chain_code, from_token_code, reserve_code)` to disambiguate src
+// vs dst. The triple is required because two reserves of the same token
+// can coexist on the same chain — same-(chain, token) swaps fall back to
+// reserve_code as the tiebreaker.
 void uwrit::rcrdcommit(uint64_t uwreq_id,
                        name underwriter,
                        uint64_t outpost_id,
-                       opp::types::ChainKind from_chain,
-                       opp::types::TokenKind from_token_kind,
+                       sysio::slug_name from_chain_code,
+                       sysio::slug_name from_token_code,
+                       sysio::slug_name reserve_code,
                        std::vector<char> uic_bytes) {
    require_auth(MSGCH_ACCOUNT);
 
    uwreqs_t reqs(get_self());
    auto pk = id_key{uwreq_id};
-   check(reqs.contains(pk), "uwreq not found");
-   auto req = reqs.get(pk);
-   check(req.status == UnderwriteRequestStatus::UNDERWRITE_REQUEST_STATUS_PENDING,
-         "uwreq not open for commits");
+   // Dispatched-from-msgch handlers MUST NOT throw — a check() halts
+   // evalcons (`feedback_opp_handlers_never_throw.md`). Silently no-op
+   // on unknown uwreq_id or wrong status.
+   if (!reqs.contains(pk)) {
+      sysio::print("rcrdcommit: unknown uwreq ", uwreq_id, ", skipping\n");
+      return;
+   }
+   auto req_snapshot = reqs.get(pk);
+   if (req_snapshot.status != UnderwriteRequestStatus::UNDERWRITE_REQUEST_STATUS_PENDING) {
+      sysio::print("rcrdcommit: uwreq ", uwreq_id,
+                   " not in PENDING (status=",
+                   magic_enum::enum_integer(req_snapshot.status), "), skipping\n");
+      return;
+   }
 
    reqs.modify(same_payer, pk, [&](auto& r) {
       auto* c = find_or_create_commit(r, underwriter);
       uint64_t now_ms = current_time_ms();
-      // Route by the `(from_chain, from_token_kind)` pair so same-chain
-      // swaps (e.g. ERC20 → ETH-native on one outpost) land in the
-      // correct per-leg slot.
-      const bool is_source = (from_chain == r.src_chain
-                              && from_token_kind == r.src_token_kind);
-      const bool is_dest   = (from_chain == r.dst_chain
-                              && from_token_kind == r.dst_token_kind);
+      // Route by the full `(chain_code, token_code, reserve_code)` triple
+      // so same-chain swaps with multiple reserves on the same (chain,
+      // token) pair land in the correct per-leg slot.
+      const bool is_source = (from_chain_code  == r.src_chain_code
+                              && from_token_code == r.src_token_code
+                              && reserve_code    == r.src_reserve_code);
+      const bool is_dest   = (from_chain_code  == r.dst_chain_code
+                              && from_token_code == r.dst_token_code
+                              && reserve_code    == r.dst_reserve_code);
       if (is_source) {
          c->source_received_at_ms = now_ms;
          c->source_outpost_id     = outpost_id;
@@ -812,17 +947,16 @@ void uwrit::release(uint64_t uwreq_id) {
 
    // Iterate locks for this uwreq via secondary index, copy out keys (we'll
    // erase as we go), then for each: call opreg::releaselock + erase.
+   // releaselock takes (account, chain_code, token_code, amount).
    locks_t locks(get_self());
    auto idx = locks.get_index<"byuwreq"_n>();
    std::vector<lock_key> to_erase;
    for (auto it = idx.lower_bound(uwreq_id);
         it != idx.end() && it->uwreq_id == uwreq_id; ++it) {
-      // TokenAmount is split into (kind, amount) on the inline action per
-      // the no-proto-messages-in-actions rule.
       action(
          permission_level{get_self(), "active"_n},
          OPREG_ACCOUNT, "releaselock"_n,
-         std::make_tuple(it->underwriter, it->chain, it->token_kind, it->amount)
+         std::make_tuple(it->underwriter, it->chain_code, it->token_code, it->amount)
       ).send();
       to_erase.push_back(lock_key{it->lock_id});
    }
@@ -873,9 +1007,9 @@ void uwrit::expirelock(uint64_t uwreq_id) {
 //  sumlocks — read-only helper
 // ---------------------------------------------------------------------------
 uint64_t uwrit::sumlocks(name underwriter,
-                         opp::types::ChainKind chain,
-                         opp::types::TokenKind token_kind) {
-   return sum_locks_inline(get_self(), underwriter, chain, token_kind);
+                         sysio::slug_name chain_code,
+                         sysio::slug_name token_code) {
+   return sum_locks_inline(get_self(), underwriter, chain_code, token_code);
 }
 
 // ---------------------------------------------------------------------------

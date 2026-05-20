@@ -606,6 +606,22 @@
                 {
                     "name": "ATTESTATION_TYPE_SWAP_REJECTED",
                     "value": 60957
+                },
+                {
+                    "name": "ATTESTATION_TYPE_RESERVE_CREATE",
+                    "value": 60958
+                },
+                {
+                    "name": "ATTESTATION_TYPE_RESERVE_CREATE_CANCEL",
+                    "value": 60959
+                },
+                {
+                    "name": "ATTESTATION_TYPE_RESERVE_CREATE_CANCELLED",
+                    "value": 60960
+                },
+                {
+                    "name": "ATTESTATION_TYPE_RESERVE_READY",
+                    "value": 60961
                 }
             ]
         },
@@ -622,16 +638,12 @@
                     "value": 1
                 },
                 {
-                    "name": "CHAIN_KIND_ETHEREUM",
+                    "name": "CHAIN_KIND_EVM",
                     "value": 2
                 },
                 {
-                    "name": "CHAIN_KIND_SOLANA",
+                    "name": "CHAIN_KIND_SVM",
                     "value": 3
-                },
-                {
-                    "name": "CHAIN_KIND_SUI",
-                    "value": 4
                 }
             ]
         },

@@ -1,9 +1,11 @@
 #include <boost/test/unit_test.hpp>
 #include <sysio/testing/tester.hpp>
 #include <sysio/chain/abi_serializer.hpp>
+#include <sysio/chain/kv_table_objects.hpp>
 #include <sysio/opp/opp.hpp>
 
 #include <fc/variant_object.hpp>
+#include <fc/slug_name.hpp>
 
 #include "contracts.hpp"
 
@@ -15,6 +17,11 @@ using namespace fc;
 
 using mvo = fc::mutable_variant_object;
 
+/// v6 data-model: reserves are keyed by the triple `(chain_code, token_code,
+/// reserve_code)` (each a `sysio::slug_name` packed uint64). The legacy
+/// `setreserve` action is gone; `regreserve` is the bootstrap-window
+/// equivalent (it works only while `current_epoch_index == 0`, which is the
+/// state immediately after deploying the contract in these tests).
 class sysio_reserve_tester : public tester {
 public:
    static constexpr auto RESERVE_ACCOUNT = "sysio.reserv"_n;
@@ -59,62 +66,100 @@ public:
       }
    }
 
-   /// Build a TokenAmount mvo for action arg construction.
-   static mvo token_amount(TokenKind kind, int64_t amount) {
-      return mvo()("kind", kind)("amount", amount);
+   // ── SlugName helpers (v6) ──
+
+   static fc::slug_name cn(std::string_view s) { return fc::slug_name{s}; }
+   static fc::mutable_variant_object codename_mvo(std::string_view s) {
+      return mvo()("value", fc::slug_name{s}.value);
    }
 
-   /// Helper: provision a reserve via setreserve.
-   action_result setreserve(ChainKind chain,
-                             TokenKind outpost_kind, int64_t outpost_amount,
-                             int64_t wire_amount,
-                             uint32_t weight = 5000) {
-      return push_action(RESERVE_ACCOUNT, "setreserve"_n, mvo()
-         ("chain", chain)
-         ("outpost_amount", token_amount(outpost_kind, outpost_amount))
-         ("wire_amount",    token_amount(TokenKind::TOKEN_KIND_WIRE, wire_amount))
-         ("connector_weight_bps", weight));
+   /// `regreserve` is the v6 bootstrap-window action for inserting a reserve
+   /// row with `status=ACTIVE`. Triple-slug_name PK is
+   /// `(chain_code, token_code, reserve_code)`.
+   action_result regreserve(std::string_view chain_code,
+                            std::string_view token_code,
+                            std::string_view reserve_code,
+                            uint64_t initial_chain_amount,
+                            uint64_t initial_wire_amount,
+                            uint32_t weight = 5000,
+                            const std::string& name_str = "test reserve",
+                            const std::string& description = "") {
+      return push_action(RESERVE_ACCOUNT, "regreserve"_n, mvo()
+         ("chain_code",            codename_mvo(chain_code))
+         ("token_code",            codename_mvo(token_code))
+         ("reserve_code",          codename_mvo(reserve_code))
+         ("name",                  name_str)
+         ("description",           description)
+         ("initial_chain_amount",  initial_chain_amount)
+         ("initial_wire_amount",   initial_wire_amount)
+         ("connector_weight_bps",  weight));
    }
 
-   action_result onreward(name signer, ChainKind chain,
-                           TokenKind outpost_kind, int64_t outpost_amount) {
+   /// `onreward` v6 signature: `(chain_code, token_code, reserve_code,
+   /// outpost_amount)`.
+   action_result onreward(name signer,
+                          std::string_view chain_code,
+                          std::string_view token_code,
+                          std::string_view reserve_code,
+                          uint64_t outpost_amount) {
       return push_action(signer, "onreward"_n, mvo()
-         ("chain", chain)
-         ("outpost_amount", token_amount(outpost_kind, outpost_amount)));
+         ("chain_code",     codename_mvo(chain_code))
+         ("token_code",     codename_mvo(token_code))
+         ("reserve_code",   codename_mvo(reserve_code))
+         ("outpost_amount", outpost_amount));
    }
 
-   /// Build a SwapRejected mvo for onreject. The recipient.kind identifies
-   /// which outpost reserve the failed SwapRemit was drawn from.
-   action_result onreject(name signer, ChainKind recipient_chain,
-                           TokenKind outpost_kind, int64_t unremitted_amount) {
-      mvo recipient = mvo()
-         ("kind",    recipient_chain)
-         ("address", std::vector<char>{})
-         ("encoding", mvo()("byte_order", 0)("hash_algo", 0)("encoding", 0));
+   /// `onreject` v6 signature.
+   action_result onreject(name signer,
+                          std::string_view chain_code,
+                          std::string_view token_code,
+                          std::string_view reserve_code,
+                          uint64_t unremitted_amount) {
       return push_action(signer, "onreject"_n, mvo()
-         ("rejected", mvo()
-            ("original_swap_remit_id", std::vector<char>(32, 0))
-            ("recipient", recipient)
-            ("unremitted_amount", token_amount(outpost_kind, unremitted_amount))
-            ("reason", "test rejection")));
+         ("original_swap_remit_id", std::string(64, '0'))
+         ("chain_code",             codename_mvo(chain_code))
+         ("token_code",             codename_mvo(token_code))
+         ("reserve_code",           codename_mvo(reserve_code))
+         ("unremitted_amount",      unremitted_amount)
+         ("recipient_address",      std::vector<char>{})
+         ("reason",                 "test rejection"));
    }
 
-   /// Pack the (chain_kind, outpost_token) composite that
-   /// `reserve_key.chain_token` stores. Mirrors
-   /// `sysio::reserve::pack_chain_token` so the row lookup uses the same
-   /// key the contract emplaced under.
-   ///   - ChainKind::ETHEREUM = 2  -> high 32 bits
-   ///   - ChainKind::SOLANA   = 3
-   ///   - TokenKind::ETH      = 256 -> low 32 bits
-   static uint64_t pack(uint32_t chain_kind, uint32_t token_kind) {
-      return (static_cast<uint64_t>(chain_kind) << 32) | static_cast<uint64_t>(token_kind);
-   }
+   /// Walk every row in `sysio.reserv::reserves` (KV-keyed by checksum256)
+   /// via the DB index and return the row whose slug_name triple matches.
+   /// `get_row_by_id` only supports uint64 keys; this scan is the test-side
+   /// workaround.
+   fc::variant find_reserve(std::string_view chain_code,
+                            std::string_view token_code,
+                            std::string_view reserve_code) {
+      const auto target_chain   = cn(chain_code).value;
+      const auto target_token   = cn(token_code).value;
+      const auto target_reserve = cn(reserve_code).value;
 
-   fc::variant get_reserve(uint64_t chain_token_key) {
-      auto data = get_row_by_id(RESERVE_ACCOUNT, RESERVE_ACCOUNT, "reserves"_n, chain_token_key);
-      return data.empty() ? fc::variant() : abi_ser.binary_to_variant(
-         "reserve_entry", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+      const auto& db = control->db();
+      const auto table_id = chain::compute_table_id("reserves"_n.to_uint64_t());
+      const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
+      auto itr = kv_idx.lower_bound(boost::make_tuple(RESERVE_ACCOUNT, table_id, std::string_view{}));
+      for (; itr != kv_idx.end()
+             && itr->code == RESERVE_ACCOUNT
+             && itr->table_id == table_id; ++itr) {
+         std::vector<char> raw(itr->value.size());
+         if (!raw.empty())
+            std::memcpy(raw.data(), itr->value.data(), raw.size());
+         try {
+            auto row = abi_ser.binary_to_variant(
+               "reserve_row", raw,
+               abi_serializer::create_yield_function(abi_serializer_max_time));
+            if (row["chain_code"]["value"].as_uint64()   == target_chain &&
+                row["token_code"]["value"].as_uint64()   == target_token &&
+                row["reserve_code"]["value"].as_uint64() == target_reserve) {
+               return row;
+            }
+         } catch (...) {
+            // skip rows that don't decode
+         }
+      }
+      return fc::variant();
    }
 
    abi_serializer abi_ser;
@@ -122,145 +167,100 @@ public:
 
 BOOST_AUTO_TEST_SUITE(sysio_reserve_tests)
 
-// ── setreserve ──
+// ── regreserve (v6 bootstrap-window action) ──
 
-BOOST_FIXTURE_TEST_CASE(setreserve_creates_reserve_row, sysio_reserve_tester) { try {
+BOOST_FIXTURE_TEST_CASE(regreserve_creates_reserve_row, sysio_reserve_tester) { try {
    BOOST_REQUIRE_EQUAL(success(),
-      setreserve(ChainKind::CHAIN_KIND_ETHEREUM, TokenKind::TOKEN_KIND_ETH,
-                 /*outpost_amount*/ 1'000'000, /*wire_amount*/ 2'000'000));
+      regreserve("ETH", "ETH", "PRIMARY",
+                 /*chain_amount*/ 1'000'000, /*wire_amount*/ 2'000'000));
 
-   // ChainKind::ETHEREUM = 2; TokenKind::ETH = 256
-   auto r = get_reserve(pack(2, 256));
+   auto r = find_reserve("ETH", "ETH", "PRIMARY");
    BOOST_REQUIRE(!r.is_null());
-   BOOST_REQUIRE(ChainKind::CHAIN_KIND_ETHEREUM == r["chain"].as<ChainKind>());
-   BOOST_REQUIRE(TokenKind::TOKEN_KIND_ETH      == r["reserve_outpost_amount"]["kind"].as<TokenKind>());
-   BOOST_REQUIRE_EQUAL(1'000'000, r["reserve_outpost_amount"]["amount"].as_int64());
-   BOOST_REQUIRE(TokenKind::TOKEN_KIND_WIRE     == r["reserve_wire_amount"]["kind"].as<TokenKind>());
-   BOOST_REQUIRE_EQUAL(2'000'000, r["reserve_wire_amount"]["amount"].as_int64());
+   BOOST_REQUIRE_EQUAL(1'000'000, r["reserve_chain_amount"].as_uint64());
+   BOOST_REQUIRE_EQUAL(2'000'000, r["reserve_wire_amount"].as_uint64());
    BOOST_REQUIRE_EQUAL(5000,      r["connector_weight_bps"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(setreserve_updates_existing_row_in_place, sysio_reserve_tester) { try {
+BOOST_FIXTURE_TEST_CASE(regreserve_rejects_duplicate, sysio_reserve_tester) { try {
    BOOST_REQUIRE_EQUAL(success(),
-      setreserve(ChainKind::CHAIN_KIND_SOLANA, TokenKind::TOKEN_KIND_SOL, 100, 200, 5000));
+      regreserve("SOL", "SOL", "PRIMARY", 100, 200, 5000));
 
-   // Re-call updates the same row (composite key matches).
-   BOOST_REQUIRE_EQUAL(success(),
-      setreserve(ChainKind::CHAIN_KIND_SOLANA, TokenKind::TOKEN_KIND_SOL, 999, 1234, 6000));
-
-   // ChainKind::SOLANA = 3; TokenKind::SOL = 512
-   auto r = get_reserve(pack(3, 512));
-   BOOST_REQUIRE(!r.is_null());
-   BOOST_REQUIRE_EQUAL(999,  r["reserve_outpost_amount"]["amount"].as_int64());
-   BOOST_REQUIRE_EQUAL(1234, r["reserve_wire_amount"]["amount"].as_int64());
-   BOOST_REQUIRE_EQUAL(6000, r["connector_weight_bps"].as_uint64());
-} FC_LOG_AND_RETHROW() }
-
-BOOST_FIXTURE_TEST_CASE(setreserve_rejects_wire_outpost_kind, sysio_reserve_tester) { try {
-   // outpost_amount.kind must NOT be TOKEN_KIND_WIRE — the WIRE side is
-   // implicit and lives on `reserve_wire_amount`.
+   // Re-call with the same triple must reject (regreserve only inserts).
    BOOST_REQUIRE(
-      setreserve(ChainKind::CHAIN_KIND_ETHEREUM, TokenKind::TOKEN_KIND_WIRE, 100, 100)
-         .find("outpost_amount.kind must not be TOKEN_KIND_WIRE") != std::string::npos);
+      regreserve("SOL", "SOL", "PRIMARY", 999, 1234, 6000).find("already") != std::string::npos);
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(setreserve_rejects_wire_chain, sysio_reserve_tester) { try {
-   // The depot's WIRE chain has no outpost reserve.
+BOOST_FIXTURE_TEST_CASE(regreserve_rejects_invalid_connector_weight, sysio_reserve_tester) { try {
    BOOST_REQUIRE(
-      setreserve(ChainKind::CHAIN_KIND_WIRE, TokenKind::TOKEN_KIND_ETH, 100, 100)
-         .find("WIRE chain has no outpost reserve") != std::string::npos);
-} FC_LOG_AND_RETHROW() }
+      regreserve("ETH", "ETH", "PRIMARY", 100, 100, 0)
+         .find("connector_weight_bps") != std::string::npos);
 
-BOOST_FIXTURE_TEST_CASE(setreserve_rejects_invalid_connector_weight, sysio_reserve_tester) { try {
-   // weight must be in (0, 10000].
-   BOOST_REQUIRE_EQUAL(
-      error("assertion failure with message: connector_weight_bps must be in (0, 10000]"),
-      setreserve(ChainKind::CHAIN_KIND_ETHEREUM, TokenKind::TOKEN_KIND_ETH, 100, 100, 0));
-
-   BOOST_REQUIRE_EQUAL(
-      error("assertion failure with message: connector_weight_bps must be in (0, 10000]"),
-      setreserve(ChainKind::CHAIN_KIND_ETHEREUM, TokenKind::TOKEN_KIND_ETH, 100, 100, 10001));
+   BOOST_REQUIRE(
+      regreserve("ETH", "ETH", "PRIMARY2", 100, 100, 10001)
+         .find("connector_weight_bps") != std::string::npos);
 } FC_LOG_AND_RETHROW() }
 
 // ── onreward ──
 
 BOOST_FIXTURE_TEST_CASE(onreward_requires_msgch_auth, sysio_reserve_tester) { try {
    BOOST_REQUIRE_EQUAL(success(),
-      setreserve(ChainKind::CHAIN_KIND_ETHEREUM, TokenKind::TOKEN_KIND_ETH, 1000, 1000));
+      regreserve("ETH", "ETH", "PRIMARY", 1000, 1000));
 
-   // onreward is auth=msgch (STAKING_REWARD dispatch).
-   BOOST_REQUIRE(onreward(RESERVE_ACCOUNT,
-      ChainKind::CHAIN_KIND_ETHEREUM, TokenKind::TOKEN_KIND_ETH, 100)
+   BOOST_REQUIRE(onreward(RESERVE_ACCOUNT, "ETH", "ETH", "PRIMARY", 100)
       .find("missing authority of sysio.msgch") != std::string::npos);
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(onreward_grows_outpost_reserve_only, sysio_reserve_tester) { try {
    BOOST_REQUIRE_EQUAL(success(),
-      setreserve(ChainKind::CHAIN_KIND_ETHEREUM, TokenKind::TOKEN_KIND_ETH, 1000, 1000));
+      regreserve("ETH", "ETH", "PRIMARY", 1000, 1000));
    BOOST_REQUIRE_EQUAL(success(),
-      onreward(MSGCH_ACCOUNT,
-               ChainKind::CHAIN_KIND_ETHEREUM, TokenKind::TOKEN_KIND_ETH, 100));
+      onreward(MSGCH_ACCOUNT, "ETH", "ETH", "PRIMARY", 100));
 
-   auto r = get_reserve(pack(2, 256));
-   // Only the outpost-side grew; the WIRE side is untouched (the staker's
-   // WIRE payout is a separate next-epoch action owned by the staking
-   // work stream).
-   BOOST_REQUIRE_EQUAL(1100, r["reserve_outpost_amount"]["amount"].as_int64());
-   BOOST_REQUIRE_EQUAL(1000, r["reserve_wire_amount"]["amount"].as_int64());
+   auto r = find_reserve("ETH", "ETH", "PRIMARY");
+   BOOST_REQUIRE(!r.is_null());
+   BOOST_REQUIRE_EQUAL(1100, r["reserve_chain_amount"].as_uint64());
+   BOOST_REQUIRE_EQUAL(1000, r["reserve_wire_amount"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(onreward_rejects_wire_kind, sysio_reserve_tester) { try {
+BOOST_FIXTURE_TEST_CASE(onreward_silently_skips_unknown_reserve, sysio_reserve_tester) { try {
+   // v6: onreward is dispatched from msgch; per
+   // feedback_opp_handlers_never_throw.md it MUST NOT throw. An unknown
+   // reserve simply logs + skips and the action returns success.
    BOOST_REQUIRE_EQUAL(success(),
-      setreserve(ChainKind::CHAIN_KIND_ETHEREUM, TokenKind::TOKEN_KIND_ETH, 1000, 1000));
+      onreward(MSGCH_ACCOUNT, "ETH", "ETH", "MISSING", 100));
 
-   BOOST_REQUIRE(onreward(MSGCH_ACCOUNT,
-      ChainKind::CHAIN_KIND_ETHEREUM, TokenKind::TOKEN_KIND_WIRE, 100)
-      .find("STAKING_REWARD credits the outpost-side reserve only") != std::string::npos);
-} FC_LOG_AND_RETHROW() }
-
-BOOST_FIXTURE_TEST_CASE(onreward_rejects_unknown_reserve, sysio_reserve_tester) { try {
-   // No setreserve first — onreward should reject because no row exists.
-   BOOST_REQUIRE(onreward(MSGCH_ACCOUNT,
-      ChainKind::CHAIN_KIND_ETHEREUM, TokenKind::TOKEN_KIND_ETH, 100)
-      .find("reserve not provisioned for this (chain, outpost_token)") != std::string::npos);
+   auto r = find_reserve("ETH", "ETH", "MISSING");
+   BOOST_REQUIRE(r.is_null());
 } FC_LOG_AND_RETHROW() }
 
 // ── onreject ──
 
 BOOST_FIXTURE_TEST_CASE(onreject_requires_msgch_auth, sysio_reserve_tester) { try {
    BOOST_REQUIRE_EQUAL(success(),
-      setreserve(ChainKind::CHAIN_KIND_ETHEREUM, TokenKind::TOKEN_KIND_ETH, 1000, 1000));
+      regreserve("ETH", "ETH", "PRIMARY", 1000, 1000));
 
-   BOOST_REQUIRE(onreject(RESERVE_ACCOUNT,
-      ChainKind::CHAIN_KIND_ETHEREUM, TokenKind::TOKEN_KIND_ETH, 50)
+   BOOST_REQUIRE(onreject(RESERVE_ACCOUNT, "ETH", "ETH", "PRIMARY", 50)
       .find("missing authority of sysio.msgch") != std::string::npos);
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(onreject_re_adds_unremitted_amount, sysio_reserve_tester) { try {
    BOOST_REQUIRE_EQUAL(success(),
-      setreserve(ChainKind::CHAIN_KIND_ETHEREUM, TokenKind::TOKEN_KIND_ETH, 1000, 1000));
+      regreserve("ETH", "ETH", "PRIMARY", 1000, 1000));
 
-   // Outpost couldn't pay 50 ETH; depot reconciles by adding 50 back to
-   // reserve_outpost_amount so its view matches the outpost's actual
-   // (still-holding-the-50) balance.
    BOOST_REQUIRE_EQUAL(success(),
-      onreject(MSGCH_ACCOUNT,
-               ChainKind::CHAIN_KIND_ETHEREUM, TokenKind::TOKEN_KIND_ETH, 50));
+      onreject(MSGCH_ACCOUNT, "ETH", "ETH", "PRIMARY", 50));
 
-   auto r = get_reserve(pack(2, 256));
-   BOOST_REQUIRE_EQUAL(1050, r["reserve_outpost_amount"]["amount"].as_int64());
-   BOOST_REQUIRE_EQUAL(1000, r["reserve_wire_amount"]["amount"].as_int64());
+   auto r = find_reserve("ETH", "ETH", "PRIMARY");
+   BOOST_REQUIRE(!r.is_null());
+   BOOST_REQUIRE_EQUAL(1050, r["reserve_chain_amount"].as_uint64());
+   BOOST_REQUIRE_EQUAL(1000, r["reserve_wire_amount"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
 // ── swapquote ──
 
 BOOST_FIXTURE_TEST_CASE(swapquote_returns_zero_when_reserve_missing, sysio_reserve_tester) { try {
-   // No setreserve — quote should return TokenAmount{ to_token, 0 }.
-   // (read-only action; we exercise the RPC path indirectly by invoking
-   // the action and inspecting the trace's return value, but for
-   // simplicity we cover the "missing reserve" path by asserting the
-   // setreserve absence does not produce a row to read.)
-   auto r = get_reserve(pack(2, 256));
+   // No regreserve — the row simply doesn't exist.
+   auto r = find_reserve("ETH", "ETH", "PRIMARY");
    BOOST_REQUIRE(r.is_null());
 } FC_LOG_AND_RETHROW() }
 

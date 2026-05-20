@@ -6,6 +6,7 @@
 #include <sysio/crypto.hpp>
 #include <sysio/system.hpp>
 #include <sysio/opp/types/types.pb.hpp>
+#include <sysio.opp.common/slug_name.hpp>
 #include <sysio.opp.common/opp_table_types.hpp>
 
 namespace sysio {
@@ -26,12 +27,21 @@ namespace sysio {
       /// Batch operator delivers inbound OPP data for a specific outpost.
       /// Computes sha256 checksum trustlessly, stores in envelopes table,
       /// then calls evalcons inline to check consensus.
+      ///
+      /// `outpost_id` is the originating chain's slug_name value (the underlying
+      /// `uint64` of `sysio::slug_name`). The depot looks the row up directly
+      /// on `sysio.chains::chains` keyed by `code.value == outpost_id`; the
+      /// numeric value IS the slug_name, and `sysio.epoch::advance` uses the
+      /// same convention when fanning out `queueout` / `buildenv` per outpost.
       [[sysio::action]]
       void deliver(name batch_op_name, uint64_t outpost_id, std::vector<char> data);
 
       /// Evaluate consensus on inbound envelopes for an outpost+epoch.
       /// Called inline from deliver. On consensus: unpacks envelope,
       /// stores messages + attestations, records per-outpost consensus.
+      ///
+      /// `outpost_id` is the originating chain's slug_name value
+      /// (see `deliver` for the convention).
       [[sysio::action]]
       void evalcons(uint64_t outpost_id, uint32_t epoch_index);
 
@@ -43,6 +53,24 @@ namespace sysio {
 
       /// Queue an outbound attestation for an outpost.
       /// Writes to the attestations table with status READY.
+      ///
+      /// `outpost_id` is the destination outpost's chain slug_name value
+      /// (uint64). Called by sibling system contracts that need to send
+      /// targeted depot → outpost envelopes:
+      ///   * `sysio.epoch::advance` — `OPERATORS`, `BATCH_OPERATOR_GROUPS`
+      ///     fanout to every active outpost.
+      ///   * `sysio.reserv::matchreserve` — `RESERVE_READY` to the
+      ///     reserve's owning outpost (chain_code).
+      ///   * `sysio.reserv::oncnclrsv` — `RESERVE_CREATE_CANCELLED` to
+      ///     the reserve's owning outpost on race-win cancel.
+      ///   * `sysio.opreg::*` — `OPERATOR_ACTION` family (WITHDRAW_REMIT,
+      ///     SLASH) — once the v6 reserve-flow lands the same pattern
+      ///     reaches every depot-authorised outbound.
+      ///
+      /// No `require_auth` here — the calling contract's own auth signs
+      /// the inline action and the table is logically "append-only" from
+      /// the caller's perspective; abuse mitigation lives at the calling
+      /// contracts' privileged-action gates.
       [[sysio::action]]
       void queueout(uint64_t outpost_id,
                     opp::types::AttestationType attest_type,
