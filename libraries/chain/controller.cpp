@@ -980,6 +980,17 @@ struct controller_impl {
                // in some tests, the system contract is not set and the return value is empty.
                fc::datastream<const char*> ds(retval.data(), retval.size());
                fc::raw::unpack(ds, res);
+            } else {
+               // Action executed but returned no value: deployed system contract on `sysio`
+               // does not handle getpeerkeys (or its dispatcher doesn't propagate the return).
+               // BP peer-key gossip cannot bootstrap without this; warn once so the cause is
+               // visible (this path is otherwise silent and update_peer_keys() will keep retrying).
+               static std::atomic<bool> warned{false};
+               if (!warned.exchange(true)) {
+                  wlog("getpeerkeys inline read-only action returned empty payload. "
+                       "Deployed system contract on `sysio` may be missing the getpeerkeys handler "
+                       "or its return value. BP peer-key updates and BP-gossip peering will not function.");
+               }
             }
          }
 
@@ -2239,21 +2250,9 @@ struct controller_impl {
          auto block_num = chain_head.block_num() + 1;
          if (peer_keys_db.should_update(block_num)) { // update once/minute
             // update peer public keys from chainbase db using a readonly trx
-            // TEMP DIAG: time get_top_producer_keys to confirm/refute 20ms-deadline hypothesis on slow CI
-            auto t0 = fc::time_point::now();
-            auto res = get_top_producer_keys();
-            auto elapsed_us = (fc::time_point::now() - t0).count();
-            wlog("DIAG update_peer_keys: block {} getpeerkeys returned {} entries in {}us",
-                 block_num, res.size(), elapsed_us);
-            peer_keys_db.update_peer_keys(block_num, std::move(res));
+            peer_keys_db.update_peer_keys(block_num, get_top_producer_keys());
          }
-      } catch (const fc::exception& e) {
-         wlog("DIAG update_peer_keys: getpeerkeys threw: {}", e.to_detail_string());
-      } catch (const std::exception& e) {
-         wlog("DIAG update_peer_keys: getpeerkeys threw std::exception: {}", e.what());
-      } catch (...) {
-         wlog("DIAG update_peer_keys: getpeerkeys threw unknown exception");
-      }
+      } FC_LOG_AND_DROP()
    }
 
    void assemble_block(bool validating, const qc_data_t& validating_qc_data, const block_state_ptr& validating_bsp)
