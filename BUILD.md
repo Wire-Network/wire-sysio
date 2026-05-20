@@ -155,7 +155,7 @@ builds the project. The generated `CMakeUserPresets.json` captures the local
 vcpkg binary cache environment for IDEs without storing package credentials.
 The default presets use release-only vcpkg dependencies through the
 `x64-linux-release` triplet, even for the
-`dev-debug` preset. These presets are intended
+`dev-debug`, `dev-asan`, and `dev-ubsan` presets. These presets are intended
 for x86_64 Linux hosts; other architectures need a matching vcpkg triplet and
 local preset override.
 
@@ -165,6 +165,9 @@ executable name, without hard-coding absolute paths. For a script run, set
 different generator, create a local `CMakeUserPresets.json`. The script does
 not run tests unless `--run-tests` is passed.
 
+Developer user presets also export `CC` and `CXX` so vcpkg's compiler ABI
+detection matches the script and CI when an IDE invokes CMake directly.
+
 When `ccache` is installed, the CMake build uses it through `ENABLE_CCACHE=ON`
 and stores cache files in `.ccache` by default.
 
@@ -173,15 +176,19 @@ Useful options:
 ```bash
 scripts/build-with-github-vcpkg-cache.sh --build-dir build/release
 scripts/build-with-github-vcpkg-cache.sh --preset dev-debug
+scripts/build-with-github-vcpkg-cache.sh --preset dev-asan
+scripts/build-with-github-vcpkg-cache.sh --preset dev-ubsan
 scripts/build-with-github-vcpkg-cache.sh --jobs 8
 scripts/build-with-github-vcpkg-cache.sh --clean
 scripts/build-with-github-vcpkg-cache.sh --run-tests
 ```
 
 In developer mode, `--build-dir` is a build directory prefix: `dev-release`
-uses `<dir>/release`, and `dev-debug` uses `<dir>/debug-release-deps`. In CI
-modes, `--build-dir` is the exact CMake build directory so the workflow can
-archive a stable `build` artifact.
+uses `<dir>/release`, `dev-debug` uses `<dir>/debug-release-deps`, `dev-asan`
+uses `<dir>/asan`, and `dev-ubsan` uses `<dir>/ubsan`. The sanitizer presets
+instrument Wire Sysio itself while reusing release-built vcpkg packages from
+the GitHub NuGet cache. In CI modes, `--build-dir` is the exact CMake build
+directory so the workflow can archive a stable `build` artifact.
 
 The script has three build modes:
 
