@@ -70,10 +70,9 @@ constexpr unsigned char eth_v_offset = 27;
 /// destroyed at static destruction (after the client cache, since the cache
 /// is touched by `get_kms_client` *after* this lifecycle, making it the
 /// younger Meyers singleton; younger statics are destroyed first). The
-/// remaining ordering risk — a `signature_provider_t` outliving the plugin
-/// while still holding a `KMSClient` shared_ptr — is handled at the plugin
-/// layer by clearing providers in `plugin_shutdown` (KMS_SIGNING_DESIGN.md
-/// §9 risk #6).
+/// safe because the application object owns the plugin and is destroyed
+/// before atexit static teardown; do not hand a KMS-backed `sign_fn` to an
+/// owner that outlives the application.
 struct aws_sdk_lifecycle {
    static aws_sdk_lifecycle& instance() {
       static aws_sdk_lifecycle s;

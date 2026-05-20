@@ -150,14 +150,35 @@ std::shared_ptr<Aws::KMS::KMSClient> get_kms_client(const std::string& region);
 /**
  * @brief Build a `sign_fn` closure that signs digests with AWS KMS.
  *
- * Stub in this revision: throws `chain::pending_impl_exception` on first
- * invocation. Implementation lands in step 6 of `KMS_SIGNING_DESIGN.md` §10
- * (DER → raw, low-S normalisation, v-recovery, and `KMSClient` lifecycle).
+ * Validates `key_type` and the public-key variant, resolves the shared
+ * `KMSClient` for `ref.region` via `get_kms_client`, and captures the client,
+ * key id, and expected public key into the returned closure. No network I/O
+ * happens here; the first KMS request occurs only when the closure is
+ * invoked.
  *
- * @param ref the parsed `(region, key_id)` pair
- * @param key_type chain key type (must be ethereum / wire k1 — secp256k1)
- * @param expected_pubkey public key the operator placed in the spec; the
- *        provider validates it against `KMSClient::GetPublicKey` on first sign
+ * Each invocation sends an `ECDSA_SHA_256` `Sign` request with
+ * `MessageType=DIGEST` (so KMS treats the 32-byte input as already hashed
+ * rather than re-hashing with SHA-256), decodes KMS's DER signature,
+ * normalises it to low-S, recovers the Ethereum `v` byte by trying both
+ * parities and matching against `expected_pubkey`, and returns a 65-byte
+ * compact signature. If neither parity recovers to the expected key the call
+ * throws `chain::plugin_config_exception` — effectively the per-sign
+ * integrity check that the KMS key still matches the public key pinned in
+ * the spec. There is no `KMSClient::GetPublicKey` call; the pubkey match is
+ * proven implicitly by successful ECDSA recovery.
+ *
+ * v1 only supports secp256k1 keys held as Ethereum public keys
+ * (`chain_key_type_ethereum` + `fc::em::public_key_shim`). Other key types
+ * raise `chain::pending_impl_exception` at construction; a `public_key`
+ * variant that does not hold the Ethereum shim raises
+ * `chain::plugin_config_exception`. See KMS_SIGNING_DESIGN.md §2 for the
+ * non-goal curves.
+ *
+ * @param ref parsed `(region, key_id)` pair
+ * @param key_type chain key type; must be `chain_key_type_ethereum`
+ * @param expected_pubkey public key the operator pinned in the spec; used at
+ *        each sign call to recover the `v` byte and to assert that the
+ *        signature KMS produced matches that key
  * @return a `sign_fn` matching `fc::crypto::sign_fn`'s signature
  */
 fc::crypto::sign_fn make_kms_signature_provider(
