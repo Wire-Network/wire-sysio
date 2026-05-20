@@ -2854,7 +2854,13 @@ void producer_plugin_impl::schedule_production_loop() {
       _timer.async_wait([this, cid = ++_timer_corelation_id](const boost::system::error_code& ec) {
          if (ec != boost::asio::error::operation_aborted && cid == _timer_corelation_id) {
             interrupt_transaction(controller::interrupt_t::all_trx);
-            app().executor().post(priority::high, exec_queue::read_write, [this]() {
+            // Recheck cid in the posted lambda: another schedule_* call may have bumped _timer_corelation_id between the
+            // timer firing and the post running. Same pattern as schedule_maybe_produce_block / schedule_delayed_production_loop.
+            app().executor().post(priority::high, exec_queue::read_write, [this, cid]() {
+               if (cid != _timer_corelation_id) {
+                  fc_dlog(_log, "Failed-start retry timer expired, skipping");
+                  return;
+               }
                schedule_production_loop();
             });
          }
