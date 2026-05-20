@@ -38,8 +38,8 @@ public:
    void write(const std::filesystem::path& state_file);
    bool read(const std::filesystem::path& state_file);
 
-   // Returns true if `id` is in this block's ancestry (or is this block
-   // itself within the finality_core's tracking range).
+   // Returns true if `id` is a strict ancestor of this block within the finality_core's tracking range
+   // (block_num in [last_final_block_num, current_block_num)). A block does not extend itself.
    bool extends(const block_id_type& id) const {
       return _bsp && _bsp->core.extends(id);
    }
