@@ -645,4 +645,105 @@ BOOST_AUTO_TEST_CASE(test_signer_rejects_wrong_key_type) try {
    BOOST_CHECK_THROW(eth_client_signer{provider}, fc::exception);
 } FC_LOG_AND_RETHROW();
 
+// ===========================================================================
+// Remote-signer support — eth_client_signer / wire_eth_signer driving a
+// signature_provider_t that has no local private key (e.g. an AWS KMS key),
+// where the `sign` closure is the signer.
+// ===========================================================================
+
+BOOST_AUTO_TEST_CASE(test_eth_client_signer_signs_via_closure_without_private_key) try {
+   // A provider with no local private key — its `sign` closure does the
+   // signing, mirroring an AWS KMS-backed provider.
+   auto key    = private_key::generate(private_key::key_type::em);
+   auto pub    = key.get_public_key();
+   auto em_key = key.get<em::private_key_shim>();
+
+   auto payload = ethereum::to_uint8_span("eth transaction bytes");
+   auto kc      = keccak256::hash(payload);
+
+   signature_provider_t remote;
+   remote.key_type   = chain_key_type_ethereum;
+   remote.public_key = pub;
+   // remote.private_key intentionally left empty.
+   remote.sign = [em_key, kc](const sha256&) {
+      // A KMS-style raw signer: a recoverable signature over the 32-byte
+      // digest it is handed (here the known keccak digest of `payload`).
+      return signature(signature::storage_type(em_key.sign_keccak256(kc)));
+   };
+   BOOST_REQUIRE(!remote.private_key.has_value());
+
+   eth_client_signer s(remote);
+   auto sig       = s.sign(payload);
+   auto recovered = s.recover(sig, payload);
+   BOOST_CHECK_EQUAL(recovered.to_string({}), pub.to_string({}));
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(test_eth_client_signer_closure_matches_local_key) try {
+   // The remote-signer path must produce the identical signature the local-key
+   // path produces — libsecp256k1 ECDSA is RFC-6979 deterministic.
+   auto key    = private_key::generate(private_key::key_type::em);
+   auto em_key = key.get<em::private_key_shim>();
+
+   auto payload = ethereum::to_uint8_span("eth transaction bytes");
+   auto kc      = keccak256::hash(payload);
+
+   auto local = make_provider(key, chain_key_type_ethereum); // has private_key
+
+   signature_provider_t remote;
+   remote.key_type   = chain_key_type_ethereum;
+   remote.public_key = key.get_public_key();
+   remote.sign = [em_key, kc](const sha256&) {
+      return signature(signature::storage_type(em_key.sign_keccak256(kc)));
+   };
+
+   auto local_sig  = eth_client_signer(local).sign(payload);
+   auto remote_sig = eth_client_signer(remote).sign(payload);
+   BOOST_CHECK_EQUAL(local_sig.to_string({}), remote_sig.to_string({}));
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(test_eth_client_signer_rejects_remote_signature_for_wrong_key) try {
+   // A remote signer whose closure signs with a different key than the provider
+   // advertises must be rejected by the self-verifying recover check, rather
+   // than emitting a transaction with an invalid signature.
+   auto key_a = private_key::generate(private_key::key_type::em);
+   auto key_b = private_key::generate(private_key::key_type::em);
+   auto em_b  = key_b.get<em::private_key_shim>();
+
+   auto payload = ethereum::to_uint8_span("eth transaction bytes");
+   auto kc      = keccak256::hash(payload);
+
+   signature_provider_t bad;
+   bad.key_type   = chain_key_type_ethereum;
+   bad.public_key = key_a.get_public_key();   // provider advertises key A
+   bad.sign = [em_b, kc](const sha256&) {     // but the closure signs with key B
+      return signature(signature::storage_type(em_b.sign_keccak256(kc)));
+   };
+
+   eth_client_signer s(bad);
+   BOOST_CHECK_THROW(s.sign(payload), fc::exception);
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(test_wire_eth_signer_signs_via_closure_without_private_key) try {
+   // wire_eth_signer shares the same remote-signer path; its EIP-191 framing is
+   // applied in `prepare`, so the closure still just raw-signs the digest.
+   auto key    = private_key::generate(private_key::key_type::em);
+   auto pub    = key.get_public_key();
+   auto em_key = key.get<em::private_key_shim>();
+
+   auto digest   = sha256::hash("wire transaction digest");
+   auto prepared = ethereum::hash_user_message(digest.to_uint8_span());
+
+   signature_provider_t remote;
+   remote.key_type   = chain_key_type_ethereum;
+   remote.public_key = pub;
+   remote.sign = [em_key, prepared](const sha256&) {
+      return signature(signature::storage_type(em_key.sign_keccak256(prepared)));
+   };
+
+   wire_eth_signer s(remote);
+   auto sig       = s.sign(digest);
+   auto recovered = s.recover(sig, digest);
+   BOOST_CHECK_EQUAL(recovered.to_string({}), pub.to_string({}));
+} FC_LOG_AND_RETHROW();
+
 BOOST_AUTO_TEST_SUITE_END()
