@@ -10,8 +10,8 @@
         "CMAKE_CXX_COMPILER": "clang++-18",
         "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/vcpkg/scripts/buildsystems/vcpkg.cmake",
         "VCPKG_OVERLAY_TRIPLETS": "${sourceDir}/.github/vcpkg-triplets",
-        "VCPKG_TARGET_TRIPLET": "x64-linux-release",
-        "VCPKG_HOST_TRIPLET": "x64-linux-release",
+        "VCPKG_TARGET_TRIPLET": "x64-linux-sysio-release",
+        "VCPKG_HOST_TRIPLET": "x64-linux-sysio-release",
         "ENABLE_CCACHE": "ON",
         "ENABLE_TESTS": "ON"
       },

@@ -154,7 +154,7 @@ runs CMake with a generated `dev-release` user preset, and
 builds the project. The generated `CMakeUserPresets.json` captures the local
 vcpkg binary cache environment for IDEs without storing package credentials.
 The default presets use release-only vcpkg dependencies through the
-`x64-linux-release` triplet, even for the
+`x64-linux-sysio-release` triplet, even for the
 `dev-debug`, `dev-asan`, and `dev-ubsan` presets. These presets are intended
 for x86_64 Linux hosts; other architectures need a matching vcpkg triplet and
 local preset override.
