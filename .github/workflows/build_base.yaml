@@ -111,6 +111,93 @@ jobs:
 
             tar -pcz --exclude "*.o" build > build.tar.gz
 
+        - name: Delete sysio triplet vcpkg NuGet packages
+          if: always()
+          env:
+            GITHUB_TOKEN: ${{ github.token }}
+            OWNER: ${{ github.repository_owner }}
+          run: |
+            set -euo pipefail
+
+            python3 - <<'PY'
+            import json
+            import os
+            import sys
+            import time
+            import urllib.error
+            import urllib.parse
+            import urllib.request
+
+            owner = os.environ["OWNER"]
+            token = os.environ["GITHUB_TOKEN"]
+            suffix = "_x64-linux-sysio-release"
+            base = "https://api.github.com"
+            headers = {
+                "Accept": "application/vnd.github+json",
+                "Authorization": f"Bearer {token}",
+                "X-GitHub-Api-Version": "2022-11-28",
+                "User-Agent": "wire-sysio-vcpkg-cache-cleanup",
+            }
+
+            def request(method, path):
+                req = urllib.request.Request(f"{base}{path}", headers=headers, method=method)
+                try:
+                    with urllib.request.urlopen(req) as response:
+                        body = response.read().decode("utf-8")
+                        return response.status, json.loads(body) if body else None
+                except urllib.error.HTTPError as exc:
+                    body = exc.read().decode("utf-8", errors="replace")
+                    if exc.code in (404, 409):
+                        return exc.code, None
+                    print(f"{method} {path} failed with HTTP {exc.code}: {body}", file=sys.stderr)
+                    raise
+
+            status, packages = request(
+                "GET",
+                f"/users/{urllib.parse.quote(owner)}/packages?package_type=nuget&per_page=100",
+            )
+            if status != 200 or not packages:
+                print("No packages visible for cleanup")
+                sys.exit(0)
+
+            targets = [package["name"] for package in packages if package["name"].endswith(suffix)]
+            if not targets:
+                print(f"No NuGet packages ending with {suffix} found")
+                sys.exit(0)
+
+            print("Deleting package versions for:")
+            for target in targets:
+                print(f"  {target}")
+
+            for package_name in targets:
+                page = 1
+                while True:
+                    encoded = urllib.parse.quote(package_name, safe="")
+                    status, versions = request(
+                        "GET",
+                        f"/users/{urllib.parse.quote(owner)}/packages/nuget/{encoded}/versions?per_page=100&page={page}",
+                    )
+                    if status == 404 or not versions:
+                        break
+
+                    for version in versions:
+                        version_id = version["id"]
+                        version_name = version.get("name", version_id)
+                        delete_status, _ = request(
+                            "DELETE",
+                            f"/users/{urllib.parse.quote(owner)}/packages/nuget/{encoded}/versions/{version_id}",
+                        )
+                        if delete_status == 204:
+                            print(f"Deleted {package_name} {version_name}")
+                        elif delete_status == 404:
+                            print(f"Already deleted {package_name} {version_name}")
+                        time.sleep(0.1)
+
+                    page += 1
+
+            print("Cleanup complete")
+            PY
+
         - name: Show vcpkg logs if failure
           if: failure()
           run: |
