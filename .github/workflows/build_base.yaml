@@ -152,11 +152,19 @@ jobs:
                     print(f"{method} {path} failed with HTTP {exc.code}: {body}", file=sys.stderr)
                     raise
 
-            status, packages = request(
-                "GET",
-                f"/users/{urllib.parse.quote(owner)}/packages?package_type=nuget&per_page=100",
-            )
-            if status != 200 or not packages:
+            packages = []
+            page = 1
+            while True:
+                status, page_packages = request(
+                    "GET",
+                    f"/users/{urllib.parse.quote(owner)}/packages?package_type=nuget&per_page=100&page={page}",
+                )
+                if status == 404 or not page_packages:
+                    break
+                packages.extend(page_packages)
+                page += 1
+
+            if not packages:
                 print("No packages visible for cleanup")
                 sys.exit(0)
 
