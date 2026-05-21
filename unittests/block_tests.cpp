@@ -625,4 +625,39 @@ BOOST_AUTO_TEST_CASE(snapshot_genesis_core_header_mismatch_allowed) try {
    BOOST_CHECK_NO_THROW(block_state{std::move(sbs)});
 } FC_LOG_AND_RETHROW()
 
+// A tampered snapshot can carry a null activated_protocol_features. The snapshot
+// block_state ctor reaches it transitively via compute_finality_digest -> compute_base_digest,
+// which asserts then dereferences the pointer. The ctor must reject with snapshot_exception
+// before the digest path runs.
+BOOST_AUTO_TEST_CASE(snapshot_null_activated_protocol_features_rejected) try {
+   savanna_tester chain;
+   chain.produce_blocks(4);
+
+   const auto head_handle = chain.control->head();
+   const auto& live_bsp = block_handle_accessor::get_bsp(head_handle);
+
+   snapshot_detail::snapshot_block_state_v1 sbs{*live_bsp};
+   sbs.activated_protocol_features.reset(); // null out before construction
+
+   BOOST_CHECK_EXCEPTION(block_state{std::move(sbs)}, snapshot_exception,
+      fc_exception_message_contains("activated_protocol_features"));
+} FC_LOG_AND_RETHROW()
+
+// A tampered snapshot can carry an empty / malformed finality_core. Without validating
+// the core first, compute_finality_digest's call to core.latest_qc_claim() would assert
+// on the empty links vector. The ctor must reject with snapshot_exception instead.
+BOOST_AUTO_TEST_CASE(snapshot_empty_core_rejected) try {
+   savanna_tester chain;
+   chain.produce_blocks(4);
+
+   const auto head_handle = chain.control->head();
+   const auto& live_bsp = block_handle_accessor::get_bsp(head_handle);
+
+   snapshot_detail::snapshot_block_state_v1 sbs{*live_bsp};
+   sbs.core = finality_core{}; // default-initialized: links and refs both empty
+
+   BOOST_CHECK_EXCEPTION(block_state{std::move(sbs)}, snapshot_exception,
+      fc_exception_message_contains("links must not be empty"));
+} FC_LOG_AND_RETHROW()
+
 BOOST_AUTO_TEST_SUITE_END()

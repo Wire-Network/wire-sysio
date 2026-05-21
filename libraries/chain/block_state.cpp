@@ -199,7 +199,9 @@ block_state::block_state(snapshot_detail::snapshot_block_state_v1&& sbs)
    // fc::raw::unpack<shared_ptr<T>> permits null via a leading bool; a tampered
    // snapshot can plant nulls in any of these slots. Null-check BEFORE any code
    // dereferences them (compute_finality_digest / aggregating_qc construction /
-   // policy validate() calls all require non-null pointers).
+   // policy validate() calls all require non-null pointers). activated_protocol_features
+   // is reached through compute_base_digest() from compute_finality_digest() below.
+   SYS_ASSERT(activated_protocol_features, snapshot_exception, "activated_protocol_features must not be null");
    SYS_ASSERT(active_finalizer_policy, snapshot_exception, "active_finalizer_policy must not be null");
    SYS_ASSERT(active_proposer_policy, snapshot_exception, "active_proposer_policy must not be null");
    if (pending_finalizer_policy) {
@@ -210,7 +212,13 @@ block_state::block_state(snapshot_detail::snapshot_block_state_v1&& sbs)
       SYS_ASSERT(pol, snapshot_exception, "proposed_finalizer_policies entry must not be null");
    }
 
-   // Now safe to compute state that depends on active_finalizer_policy.
+   // Snapshot hardening: validate finality_core invariants BEFORE computing digests.
+   // compute_finality_digest() calls core.latest_qc_claim() (asserts !links.empty()) and
+   // core.get_block_reference() (asserts bounds on refs); an empty or malformed core
+   // would assert/segfault inside the digest path before we could throw snapshot_exception.
+   core.validate_snapshot();
+
+   // Now safe to compute state that depends on active_finalizer_policy / activated_protocol_features / core.
    strong_digest  = compute_finality_digest();
    weak_digest    = create_weak_digest(strong_digest);
    aggregating_qc = aggregating_qc_t{
@@ -219,9 +227,6 @@ block_state::block_state(snapshot_detail::snapshot_block_state_v1&& sbs)
    };
 
    header_exts = header.validate_and_extract_header_extensions();
-
-   // Snapshot hardening: validate finality_core invariants
-   core.validate_snapshot();
 
    // core.latest_qc_claim() is the authoritative reference for downstream QC-claim checks
    // (see verify_basic_proper_block_invariants). For every non-genesis block it equals
