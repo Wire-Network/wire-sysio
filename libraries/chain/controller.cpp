@@ -1047,9 +1047,8 @@ struct controller_impl {
    }
 
    void dmlog_applied_transaction(const transaction_trace_ptr& t, const signed_transaction* trx = nullptr) {
-      // dmlog_applied_transaction is called by push_scheduled_transaction
-      // where transient transactions are not possible, and by push_transaction
-      // only when the transaction is not transient
+      // dmlog_applied_transaction is called by push_transaction only when the
+      // transaction is not transient
       if (auto dm_logger = get_deep_mind_logger(false)) {
          if (trx && is_onblock(*t))
             dm_logger->on_onblock(*trx);
@@ -1902,8 +1901,7 @@ struct controller_impl {
    /**
     *  Adds the transaction receipt to the pending block and returns it.
     */
-   template<typename T>
-   const transaction_receipt& push_receipt( const T& trx, const cpu_usage_t& cpu_usage_us ) {
+   const transaction_receipt& push_receipt( const packed_transaction& trx, const cpu_usage_t& cpu_usage_us ) {
       auto& bb = std::get<building_block>(pending->_block_stage);
       auto& receipts = bb.pending_trx_receipts();
       receipts.emplace_back( trx );
@@ -1999,6 +1997,7 @@ struct controller_impl {
 
             trx->prev_accounts_billing = trx_context.accounts_billing;
             trx->elapsed = std::max(trx->elapsed, trace->elapsed);
+            trx->prev_succeeded = true;
             if (!trx->implicit() && !trx->is_read_only()) {
                trace->receipt = push_receipt(*trx->packed_trx(), trx_context.billed_cpu_us);
                bb.pending_trx_metas().emplace_back(trx);
@@ -2059,13 +2058,12 @@ struct controller_impl {
 
          // this code is hit if an exception was thrown, and handled by `handle_exception`
          // ------------------------------------------------------------------------------
+         // _block_report describes block contents on both producer (log_applied + produced_block_metrics) and
+         // receiver (Received log + incoming_block_metrics) paths.  A rejected trx is dropped from the block,
+         // so do not roll its net/cpu/elapsed in -- producer and receiver totals must agree.
          if (!trx->is_transient()) {
             dmlog_applied_transaction(trace);
             emit( applied_transaction, std::tie(trace, trx->packed_trx()), __FILE__, __LINE__ );
-
-            pending->_block_report.total_net_usage += trace->net_usage;
-            if( trace->receipt ) pending->_block_report.total_cpu_usage_us += trace->total_cpu_usage_us;
-            pending->_block_report.total_elapsed_time += trace->elapsed;
          }
 
          return trace;
@@ -2412,12 +2410,17 @@ struct controller_impl {
          return;
       }
 
+      // wire latency is block_timestamp -> first network arrival at this node (received_time, set by net_plugin),
+      // distinct from latency which is block_timestamp -> apply complete. Their difference is the local apply-queue
+      // / in-producing-mode delay. wire latency is 0 when received_time is unset (replay, loaded from disk).
+      const auto& received_time = chain_head.internal()->received_time;
       ilog("Received block {}... #{} @ {} signed by {} " // "Received" instead of "Applied" so it matches existing log output
-           "[trxs: {}, lib: {}, net: {}, cpu: {} us, elapsed: {} us, applying time: {} us, latency: {} ms]",
+           "[trxs: {}, lib: {}, net: {}, cpu: {} us, elapsed: {} us, applying time: {} us, wire latency: {} ms, latency: {} ms]",
            chain_head.id().short_id(), chain_head.block_num(), chain_head.timestamp(), chain_head.producer(),
            chain_head.block()->transactions.size(), chain_head.irreversible_blocknum(),
-           br.total_net_usage, br.total_cpu_usage_us,
-           br.total_elapsed_time, now - br.start_time, (now - chain_head.timestamp()).count() / 1000);
+           br.total_net_usage, br.total_cpu_usage_us, br.total_elapsed_time, now - br.start_time,
+           received_time != fc::time_point() ? (received_time - chain_head.block_time()).count() / 1000 : 0,
+           (now - chain_head.timestamp()).count() / 1000);
 
       if (_update_incoming_block_metrics) {
          _update_incoming_block_metrics({.trxs_incoming_total   = chain_head.block()->transactions.size(),
@@ -2578,7 +2581,7 @@ struct controller_impl {
             } else {
                trx_metas.reserve( b->transactions.size() );
                for( const auto& receipt : b->transactions ) {
-                  const auto& pt =receipt.trx;
+                  const auto& pt = receipt.trx;
                   transaction_metadata_ptr trx_meta_ptr = trx_lookup ? trx_lookup( pt.id() ) : transaction_metadata_ptr{};
                   if( trx_meta_ptr && *trx_meta_ptr->packed_trx() != pt ) trx_meta_ptr = nullptr;
                   if( trx_meta_ptr && ( skip_auth_checks || !trx_meta_ptr->recovered_keys().empty() ) ) {
@@ -2886,7 +2889,8 @@ struct controller_impl {
 
    // thread safe, expected to be called from thread other than the main thread
    // tuple<bool best_head, block_handle new_block_handle>
-   controller::accepted_block_result create_block_state_i( const block_id_type& id, const signed_block_ptr& b, const block_state& prev ) {
+   controller::accepted_block_result create_block_state_i( const block_id_type& id, const signed_block_ptr& b, const block_state& prev,
+                                                           fc::time_point received_time ) {
       std::optional<qc_t> qc = verify_basic_block_invariants(id, b, prev);
       log_and_drop_future<void> verify_qc_future;
       if (qc) {
@@ -2917,6 +2921,8 @@ struct controller_impl {
       SYS_ASSERT( id == bsp->id(), block_validate_exception,
                   "provided id {} does not match block id {}", id, bsp->id() );
 
+      bsp->received_time = received_time;
+
       assert(!!qc == verify_qc_future.valid());
       if (qc) {
          verify_qc_future.get();
@@ -2940,7 +2946,8 @@ struct controller_impl {
    }
 
    // thread safe, expected to be called from thread other than the main thread
-   controller::accepted_block_result create_block_handle( const block_id_type& id, const signed_block_ptr& b ) {
+   controller::accepted_block_result create_block_handle( const block_id_type& id, const signed_block_ptr& b,
+                                                          fc::time_point received_time ) {
       SYS_ASSERT( b, block_validate_exception, "null block" );
 
       if (auto bsp = fork_db_.get_block(id, include_root_t::yes))
@@ -2950,7 +2957,7 @@ struct controller_impl {
       if( !prev )
          return controller::accepted_block_result{.add_result = fork_db_add_t::failure, .block{}};
 
-      return create_block_state_i( id, b, *prev );
+      return create_block_state_i( id, b, *prev, received_time );
    }
 
    // thread safe, QC already verified by verify_proper_block_exts
@@ -3955,8 +3962,9 @@ boost::asio::io_context& controller::get_thread_pool() {
    return my->thread_pool.get_executor();
 }
 
-controller::accepted_block_result controller::accept_block( const block_id_type& id, const signed_block_ptr& b ) const {
-   return my->create_block_handle( id, b );
+controller::accepted_block_result controller::accept_block( const block_id_type& id, const signed_block_ptr& b,
+                                                             fc::time_point received_time ) const {
+   return my->create_block_handle( id, b, received_time );
 }
 
 transaction_trace_ptr controller::push_transaction( const transaction_metadata_ptr& trx,

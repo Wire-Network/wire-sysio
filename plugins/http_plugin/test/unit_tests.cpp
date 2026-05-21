@@ -269,6 +269,9 @@ struct http_plugin_test_fixture {
          app_thread = std::thread([&]() {
             try {
                app->startup();
+               // app was constructed on the outer thread; capture this thread as main_thread_id_
+               // so producer_plugin's main-thread asserts see the loop thread.
+               app->executor().set_main_thread_id();
                app->exec();
             } catch (...) {
                plugin = nullptr;

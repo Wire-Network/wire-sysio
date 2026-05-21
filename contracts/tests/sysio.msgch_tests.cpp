@@ -232,6 +232,38 @@ public:
       );
    }
 
+   /// Variable-payload `queueout` for envelope-cap tests. Pattern matches
+   /// the production attestation flow but lets the test author dial in the
+   /// exact per-attestation size needed to drive the packing loop across
+   /// the `MAX_ENVELOPE_BYTES` boundary.
+   action_result queueout_with_data(uint64_t outpost_id,
+                                    uint32_t attest_type,
+                                    std::vector<char> data) {
+      return push_action(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "queueout"_n, mvo()
+         ("outpost_id",   outpost_id)
+         ("attest_type",  attest_type)
+         ("data",         std::move(data))
+      );
+   }
+
+   /// Count READY-status attestations for `outpost_id` by probing the
+   /// table by-id. Avoids needing an ABI binding for the secondary index.
+   uint32_t count_ready_attestations(uint64_t outpost_id, uint64_t scan_until) {
+      uint32_t n = 0;
+      for (uint64_t id = 0; id < scan_until; ++id) {
+         auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "attestations"_n, id);
+         if (data.empty()) continue;
+         auto row = msgch_abi.binary_to_variant(
+            "attestation_entry", data,
+            abi_serializer::create_yield_function(abi_serializer_max_time));
+         if (row["outpost_id"].as_uint64() != outpost_id) continue;
+         // status == READY (matches AttestationStatus::ATTESTATION_STATUS_READY,
+         // the value the contract emits for queued-but-not-yet-bundled rows).
+         if (row["status"].as_string() == "ATTESTATION_STATUS_READY") ++n;
+      }
+      return n;
+   }
+
    action_result buildenv(uint64_t outpost_id) {
       return push_action(MSGCH_ACCOUNT, EPOCH_ACCOUNT, "buildenv"_n, mvo()
          ("outpost_id", outpost_id)
@@ -411,6 +443,103 @@ BOOST_FIXTURE_TEST_CASE(buildenv_drops_processed_attestations, sysio_msgch_envlo
       }
    }
    BOOST_REQUIRE(found);
+} FC_LOG_AND_RETHROW() }
+
+/// Packing-loop coverage for `MAX_ENVELOPE_BYTES = 65 536`. Queue 12
+/// attestations of 8 KiB each (cumulative ≈ 96 KiB, ~50 % over the cap),
+/// call `buildenv`, and assert:
+///   * the emitted `outenvelopes` row is ≤ 65 536 bytes (cross-chain cap),
+///   * a non-trivial subset of READY attestations remained queued for the
+///     next epoch (the un-included tail),
+///   * a second `buildenv` drains the remainder under the same cap.
+/// This is the §6c boundary test that turns "analytical max" into
+/// "demonstrated max" on the WIRE side.
+BOOST_FIXTURE_TEST_CASE(buildenv_packs_until_cap_then_leaves_remainder,
+                        sysio_msgch_envlog_tester) { try {
+   bootstrap_epoch_config(/*retention=*/200);
+   register_outpost(opp::types::CHAIN_KIND_ETHEREUM, 31337);
+   produce_blocks();
+
+   // 8 KiB of payload per attestation. With ENVELOPE_BASELINE_BYTES = 512
+   // and ATTESTATION_OVERHEAD_BYTES = 24 in the contract's estimator,
+   // each entry costs 24 + 8192 = 8216 bytes; (65 536 − 512) / 8216 ≈ 7.9
+   // → 7 entries fit, 5 stay queued. Exact fit count depends on the
+   // estimator's conservative margin; the assertions below check the
+   // invariants ("≤ cap", "some remainder", "drains on next emit") rather
+   // than a hardcoded fit count, keeping the test robust to small
+   // estimator tweaks.
+   constexpr size_t  PER_ATTEST_BYTES   = 8 * 1024;
+   constexpr uint32_t TOTAL_ATTESTATIONS = 12;
+   constexpr size_t  MAX_ENV_BYTES      = 65'536;
+
+   // Vary one byte per attestation so each tx has a distinct payload —
+   // identical transactions in the same block collapse to a single
+   // dedup'd tx, which would silently halve our queue depth.
+   for (uint32_t i = 0; i < TOTAL_ATTESTATIONS; ++i) {
+      std::vector<char> payload(PER_ATTEST_BYTES, 0x42);
+      payload[0] = static_cast<char>(i);
+      BOOST_REQUIRE_EQUAL(success(),
+         queueout_with_data(/*outpost_id=*/0, /*type=*/60940, payload));
+   }
+   produce_blocks();
+
+   // First emit: packs as many as fit, drops the rest in queue.
+   BOOST_REQUIRE_EQUAL(success(), buildenv(/*outpost_id=*/0));
+   produce_blocks();
+
+   // The most recent emit lives at one of the early ids; the one-deep
+   // retention sweep means at most one row exists per outpost. Find it.
+   fc::variant emitted_row;
+   uint64_t    emitted_id = std::numeric_limits<uint64_t>::max();
+   for (uint64_t id = 0; id < 16; ++id) {
+      auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "outenvelopes"_n, id);
+      if (data.empty()) continue;
+      emitted_row = msgch_abi.binary_to_variant(
+         "outbound_envelope", data,
+         abi_serializer::create_yield_function(abi_serializer_max_time));
+      emitted_id = id;
+      break;
+   }
+   BOOST_REQUIRE(!emitted_row.is_null());
+
+   // ── Invariant 1: emitted envelope is at or under the cross-chain cap.
+   const auto& raw = emitted_row["raw_envelope"].as<std::vector<char>>();
+   BOOST_TEST_MESSAGE("emit#1 envelope size = " << raw.size() << " bytes");
+   BOOST_REQUIRE_LE(raw.size(), MAX_ENV_BYTES);
+
+   // ── Invariant 2: NOT every attestation made it into this envelope —
+   //    the packing loop genuinely dropped some onto the next epoch.
+   //    `count_ready_attestations` counts un-emitted (still READY) rows.
+   uint32_t still_ready = count_ready_attestations(/*outpost_id=*/0,
+                                                   /*scan_until=*/TOTAL_ATTESTATIONS + 4);
+   BOOST_TEST_MESSAGE("emit#1 leftover READY = " << still_ready);
+   BOOST_REQUIRE_GT(still_ready, 0u);
+   BOOST_REQUIRE_LT(still_ready, TOTAL_ATTESTATIONS);
+
+   // ── Invariant 3: a follow-up emit drains the remainder under the same
+   //    cap. After this emit, no READY attestations should remain queued.
+   BOOST_REQUIRE_EQUAL(success(), buildenv(/*outpost_id=*/0));
+   produce_blocks();
+
+   // Find the new emitted row (one-deep retention dropped the prior one).
+   fc::variant emitted_row_2;
+   for (uint64_t id = 0; id < 16; ++id) {
+      if (id == emitted_id) continue;        // prior row was evicted
+      auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "outenvelopes"_n, id);
+      if (data.empty()) continue;
+      emitted_row_2 = msgch_abi.binary_to_variant(
+         "outbound_envelope", data,
+         abi_serializer::create_yield_function(abi_serializer_max_time));
+      break;
+   }
+   BOOST_REQUIRE(!emitted_row_2.is_null());
+   const auto& raw2 = emitted_row_2["raw_envelope"].as<std::vector<char>>();
+   BOOST_TEST_MESSAGE("emit#2 envelope size = " << raw2.size() << " bytes");
+   BOOST_REQUIRE_LE(raw2.size(), MAX_ENV_BYTES);
+
+   uint32_t still_ready_after_emit2 =
+      count_ready_attestations(/*outpost_id=*/0, /*scan_until=*/TOTAL_ATTESTATIONS + 4);
+   BOOST_REQUIRE_EQUAL(still_ready_after_emit2, 0u);
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()

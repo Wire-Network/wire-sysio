@@ -273,7 +273,10 @@ BOOST_FIXTURE_TEST_CASE(action_verification_tests, validating_tester) { try {
       trx.actions.push_back(act1);
       set_transaction_headers(trx);
       auto sigs = trx.sign(get_private_key("testapi"_n, "active"), control->get_chain_id());
-      BOOST_CHECK_EXCEPTION(push_transaction(trx), sysio::chain::irrelevant_auth_exception,
+      // validate_referenced_accounts enforces payer-at-position-0 earlier than
+      // authorization_manager::check_authorization, so we get transaction_exception
+      // (not irrelevant_auth_exception). This is the defense-in-depth path.
+      BOOST_CHECK_EXCEPTION(push_transaction(trx), sysio::chain::transaction_exception,
                             fc_exception_message_is("Explicit payer must be the first declared authorization"));
    }
    {
@@ -787,6 +790,21 @@ BOOST_AUTO_TEST_CASE(light_validation_skip_cfa) try {
 
 /*************************************************************************************
  * compiler_builtins_tests test case
+ *
+ * Exercises CDT librt's int128 compiler builtins through WASM execution. The
+ * test_api contract is built with --use-rt; test_compiler_builtins.cpp declares
+ * each intrinsic as plain extern "C" (no sysio_wasm_import) so calls resolve to
+ * the librt copy linked into the contract module. The host-side registrations
+ * for these intrinsics have been dropped -- the consensus surface is now
+ * "does the WASM containing librt execute identically across sys-vm,
+ * sys-vm-jit, and sys-vm-oc?", which this test exercises via the validating
+ * tester (each sub-test runs through every enabled runtime).
+ *
+ * Coverage replaces the deleted unittests/float128_builtin_tests.cpp (host
+ * direct-call tests) and the divmod_host_function_overflow_wast that used to
+ * import env.__divti3. New cases (test_divti3_overflow / test_modti3_overflow /
+ * test_shift_overflow) cover librt's UB guards: INT128_MIN/-1 wrap-around for
+ * div/mod, and shift-count >= 128 saturation for the shift builtins.
  *************************************************************************************/
 BOOST_AUTO_TEST_CASE(compiler_builtins_tests) try {
    validating_tester chain;
@@ -797,55 +815,114 @@ BOOST_AUTO_TEST_CASE(compiler_builtins_tests) try {
    chain.set_code( "testapi"_n, test_contracts::test_api_wasm() );
    chain.produce_blocks(1);
 
-   // test test_multi3
+   // Basic correctness across runtimes
    CALL_TEST_FUNCTION( chain, "test_compiler_builtins", "test_multi3", {});
-
-   // test test_divti3
    CALL_TEST_FUNCTION( chain, "test_compiler_builtins", "test_divti3", {});
-
-   // test test_divti3_by_0
-   BOOST_CHECK_EXCEPTION(CALL_TEST_FUNCTION( chain, "test_compiler_builtins", "test_divti3_by_0", {}), arithmetic_exception,
-         [](const fc::exception& e) {
-            return expect_assert_message(e, "divide by zero");
-         }
-      );
-
-   // test test_udivti3
    CALL_TEST_FUNCTION( chain, "test_compiler_builtins", "test_udivti3", {});
-
-   // test test_udivti3_by_0
-   BOOST_CHECK_EXCEPTION(CALL_TEST_FUNCTION( chain, "test_compiler_builtins", "test_udivti3_by_0", {}), arithmetic_exception,
-         [](const fc::exception& e) {
-            return expect_assert_message(e, "divide by zero");
-         }
-      );
-
-   // test test_modti3
    CALL_TEST_FUNCTION( chain, "test_compiler_builtins", "test_modti3", {});
-
-   // test test_modti3_by_0
-   BOOST_CHECK_EXCEPTION(CALL_TEST_FUNCTION( chain, "test_compiler_builtins", "test_modti3_by_0", {}), arithmetic_exception,
-         [](const fc::exception& e) {
-            return expect_assert_message(e, "divide by zero");
-         }
-      );
-
-   // test test_lshlti3
+   CALL_TEST_FUNCTION( chain, "test_compiler_builtins", "test_umodti3", {});
    CALL_TEST_FUNCTION( chain, "test_compiler_builtins", "test_lshlti3", {});
-
-   // test test_lshrti3
    CALL_TEST_FUNCTION( chain, "test_compiler_builtins", "test_lshrti3", {});
-
-   // test test_ashlti3
    CALL_TEST_FUNCTION( chain, "test_compiler_builtins", "test_ashlti3", {});
-
-   // test test_ashrti3
    CALL_TEST_FUNCTION( chain, "test_compiler_builtins", "test_ashrti3", {});
 
-   chain.produce_block();
-   chain.set_code( "testapi"_n, divmod_host_function_overflow_wast );
-   chain.produce_block();
-   CALL_TEST_FUNCTION( chain, "test_compiler_builtins", "", {}); //divmod_host_function_overflow_wast ignores action name
+   // Divide-by-zero: librt fires sysio_assert("divide by zero"), which surfaces
+   // as sysio_assert_message_exception (was arithmetic_exception with the host).
+   // CALL_TEST_FUNCTION is macro-based, so action names must be compile-time
+   // string literals -- inline each BOOST_CHECK_EXCEPTION rather than loop.
+   auto is_divzero_assert = [](const fc::exception& e) {
+      return expect_assert_message(e, "divide by zero");
+   };
+   BOOST_CHECK_EXCEPTION(
+      CALL_TEST_FUNCTION(chain, "test_compiler_builtins", "test_divti3_by_0", {}),
+      sysio_assert_message_exception, is_divzero_assert);
+   BOOST_CHECK_EXCEPTION(
+      CALL_TEST_FUNCTION(chain, "test_compiler_builtins", "test_udivti3_by_0", {}),
+      sysio_assert_message_exception, is_divzero_assert);
+   BOOST_CHECK_EXCEPTION(
+      CALL_TEST_FUNCTION(chain, "test_compiler_builtins", "test_modti3_by_0", {}),
+      sysio_assert_message_exception, is_divzero_assert);
+   BOOST_CHECK_EXCEPTION(
+      CALL_TEST_FUNCTION(chain, "test_compiler_builtins", "test_umodti3_by_0", {}),
+      sysio_assert_message_exception, is_divzero_assert);
+
+   // INT128_MIN/-1 wrap and shift-count >= 128 saturation -- the deterministic
+   // edges that librt's UB guards pin down. Each contract action self-asserts
+   // the expected result; failure surfaces as sysio_assert_message_exception.
+   CALL_TEST_FUNCTION( chain, "test_compiler_builtins", "test_divti3_overflow", {});
+   CALL_TEST_FUNCTION( chain, "test_compiler_builtins", "test_modti3_overflow", {});
+   CALL_TEST_FUNCTION( chain, "test_compiler_builtins", "test_shift_overflow", {});
+
+   BOOST_REQUIRE_EQUAL( chain.validate(), true );
+} FC_LOG_AND_RETHROW()
+
+
+/*************************************************************************************
+ * f128_builtins_tests test case
+ *
+ * Exercises CDT libsf (softfloat) ops through WASM execution. test_api is built
+ * with --use-rt; test_f128_builtins.cpp declares each entry point as plain
+ * extern "C" so calls resolve to the libsf copy linked into the contract module.
+ * Replaces the deleted unittests/float128_builtin_tests.cpp host-direct-call
+ * golden-value suite -- same operations, same golden bit patterns, exercised
+ * through the WASM runtimes that matter for consensus.
+ *************************************************************************************/
+BOOST_AUTO_TEST_CASE(f128_builtins_tests) try {
+   validating_tester chain;
+
+   chain.produce_blocks(2);
+   chain.create_account( "testapi"_n );
+   chain.produce_blocks(10);
+   chain.set_code( "testapi"_n, test_contracts::test_api_wasm() );
+   chain.produce_blocks(1);
+
+   // Arithmetic
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_addtf3", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_subtf3", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_multf3", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_divtf3", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_negtf2", {});
+
+   // Conversions: extend / truncate
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_extendsftf2", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_extenddftf2", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_trunctfdf2", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_trunctfsf2", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_float_f128_roundtrip", {});
+
+   // f128 -> int
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_fixtfsi", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_fixtfdi", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_fixtfti", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_fixunstfsi", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_fixunstfdi", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_fixunstfti", {});
+
+   // f32/f64 -> int128
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_fixsfti", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_fixdfti", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_fixunssfti", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_fixunsdfti", {});
+
+   // int -> f64 / f128
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_floatsidf", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_floatsitf", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_floatditf", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_floatunsitf", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_floatunditf", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_floattidf", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_floatuntidf", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_int_f128_roundtrip", {});
+
+   // Comparisons
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_eqtf2", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_netf2", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_getf2", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_gttf2", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_letf2", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_lttf2", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_cmptf2", {});
+   CALL_TEST_FUNCTION( chain, "test_f128_builtins", "test_unordtf2", {});
 
    BOOST_REQUIRE_EQUAL( chain.validate(), true );
 } FC_LOG_AND_RETHROW()
