@@ -5,7 +5,7 @@
 #include <sysio/chain/trace.hpp>
 #include <sysio/chain/snapshot.hpp>
 #include <sysio/chain/block_timestamp.hpp>
-#include <sysio/chain/transaction_context.hpp>
+#include <sysio/chain/transaction_metadata.hpp>
 #include <chainbase/chainbase.hpp>
 #include <set>
 

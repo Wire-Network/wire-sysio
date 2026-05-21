@@ -1,0 +1,26 @@
+[package]
+name = "{{packageName}}"
+version = "{{version}}"
+edition = "2021"
+description = "Auto-generated protobuf types for {{packageName}}"
+{{#if license}}
+license = "{{license}}"
+{{/if}}
+{{#if repository}}
+repository = "{{repository}}"
+{{/if}}
+{{#if authors}}
+authors = [{{#each authors}}"{{this}}"{{#unless @last}}, {{/unless}}{{/each}}]
+{{/if}}
+
+[features]
+default = []
+borsh = ["dep:borsh"]
+idl-build = ["dep:anchor-lang", "anchor-lang/idl-build"]
+
+[dependencies]
+borsh = { version = "0.10", optional = true }
+anchor-lang = { version = "0.31", optional = true }
+{{#each dependencies}}
+{{@key}} = "{{this}}"
+{{/each}}

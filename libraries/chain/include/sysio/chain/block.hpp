@@ -20,6 +20,11 @@ namespace sysio { namespace chain {
       explicit transaction_receipt( const packed_transaction& ptrx ):trx(ptrx){}
       packed_transaction trx;
 
+      // Receipt digest format: pack(cpu_usage_us: vec<varuint32>) + pack(trx.digest())
+      // cpu_usage_us is the per-input-action billed CPU vector, in action order.
+      // Differs from upstream EOSIO which packed status, cpu_usage_us (uint32), and
+      // net_usage_words ahead of the trx digest. Wire removed status and net_usage_words
+      // (deferred trxs are not supported) and changed cpu_usage_us to a per-action vector.
       digest_type digest()const {
          digest_type::encoder enc;
          fc::raw::pack( enc, cpu_usage_us );

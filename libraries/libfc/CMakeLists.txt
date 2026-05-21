@@ -19,6 +19,9 @@ set(fc_sources
         src/log/log_message.cpp
         src/log/logger.cpp
         src/log/dmlog_sink.cpp
+        src/log/dmlog_formatter.cpp
+        src/log/json_formatter.cpp
+        src/log/pattern_formatter.cpp
         src/log/logger_config.cpp
         src/crypto/_digest_common.cpp
         src/crypto/aes.cpp
@@ -127,6 +130,8 @@ target_compile_definitions(fc PUBLIC -DFC_AVAILABLE=1)
 if (ENABLE_TESTS)
     add_subdirectory(test)
 endif ()
+
+add_subdirectory(benchmark)
 
 install(
         TARGETS fc

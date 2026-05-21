@@ -58,7 +58,6 @@ set(CHAIN_WEBASSEMBLY_SOURCES
    webassembly/authorization.cpp
    webassembly/cf_system.cpp
    webassembly/cf_transaction.cpp
-   webassembly/compiler_builtins.cpp
    webassembly/context_free.cpp
    webassembly/console.cpp
    webassembly/crypto.cpp
@@ -153,7 +152,6 @@ target_link_libraries(
   WAST
   WASM
   softfloat::softfloat
-  builtins
   ${CHAIN_SYSVM_LIBRARIES}
   ${CHAIN_NATIVE_MODULE_LIBRARIES}
   ${LLVM_LIBS}

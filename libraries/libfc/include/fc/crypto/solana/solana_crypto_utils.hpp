@@ -1,102 +1,51 @@
 #pragma once
 
+#include <fc/crypto/elliptic_ed.hpp>
 #include <fc/crypto/public_key.hpp>
+#include <array>
+#include <cstdint>
 #include <string>
-#include <vector>
-
-// Forward declarations in the case of circular dependencies
-namespace fc::ed {
-class public_key;
-class private_key;
-} // namespace fc::ed
 
 /**
- * Utilities for interacting with ethereum keys
+ * Solana-flavored aliases and helpers over fc::crypto::ed.
+ *
+ * A Solana "pubkey" is just a 32-byte ed25519 public key — structurally identical
+ * to fc::crypto::ed::public_key_shim. A Solana-wire "signature" is the raw 64-byte
+ * ed25519 signature without fc's self-contained 96-byte (pubkey+sig) envelope.
+ *
+ * Domain-general properties of ed25519 keys (on-curve / zero checks) live in
+ * fc::crypto::ed and are reachable here via ADL.
  */
 namespace fc::crypto::solana {
 
-// Forward declarations
-struct solana_public_key;
-struct solana_signature;
+/**
+ * Solana pubkey — reuses the ed25519 shim directly (32 bytes).
+ * Named `solana_public_key` (rather than bare `public_key`) to avoid
+ * clashing with `fc::crypto::public_key` in files that do
+ * `using namespace fc::crypto;`.
+ */
+using solana_public_key = fc::crypto::ed::public_key_shim;
+
+/** Solana wire-format signature (64 bytes, no embedded pubkey). */
+using solana_signature = std::array<uint8_t, 64>;
+
+// NOTE: Base58 encode/decode for `solana_public_key` uses the shim's own methods:
+//   `pk.to_string(fc::yield_function_t{})` and `solana_public_key::from_base58_string(s)`.
+// No Solana-specific wrappers are provided for pubkeys to avoid duplicating that API.
+
+/** Base58 encode a Solana wire-format signature. */
+std::string to_base58(const solana_signature& sig);
+
+/** Decode a Solana wire-format signature from base58. Throws on wrong length. */
+solana_signature signature_from_base58(const std::string& str);
+
+/** Convert the ED variant of fc::crypto::public_key into a Solana pubkey. */
+solana_public_key from_fc_public_key(const fc::crypto::public_key& pk);
 
 /**
- * @brief 32-byte Solana public key (base58 encoded in Solana)
+ * Strip the 32-byte embedded pubkey prefix from fc's ed signature_shim to
+ * obtain the 64-byte Solana wire-format signature.
  */
-struct solana_public_key {
-   static constexpr size_t SIZE = 32;
-   std::array<uint8_t, SIZE> data{};
+solana_signature from_ed_signature(const fc::crypto::ed::signature_shim& sig);
 
-   solana_public_key() = default;
-   explicit solana_public_key(const std::array<uint8_t, SIZE>& d)
-      : data(d) {}
-   explicit solana_public_key(const uint8_t* d) { std::copy_n(d, SIZE, data.begin()); }
-
-   /**
-    * @brief Convert public key to base58 string
-    */
-   std::string to_base58() const;
-
-   /**
-    * @brief Create public key from base58 string
-    */
-   static solana_public_key from_base58(const std::string& str);
-
-   /**
-    * @brief Create public key from fc::crypto::public_key (ED25519)
-    */
-   static solana_public_key from_public_key(const fc::crypto::public_key& pk);
-
-   /**
-    * @brief Create public key from ED25519 public key shim
-    */
-   static solana_public_key from_ed_public_key(const fc::crypto::ed::public_key_shim& pk);
-
-   /**
-    * @brief Check if the public key is all zeros (default/uninitialized)
-    */
-   bool is_zero() const;
-
-   bool operator==(const solana_public_key& other) const { return data == other.data; }
-   bool operator!=(const solana_public_key& other) const { return data != other.data; }
-   bool operator<(const solana_public_key& other) const { return data < other.data; }
-};
-
-/**
- * @brief 64-byte Solana signature
- */
-struct solana_signature {
-   static constexpr size_t SIZE = 64;
-   std::array<uint8_t, SIZE> data{};
-
-   solana_signature() = default;
-   explicit solana_signature(const std::array<uint8_t, SIZE>& d)
-      : data(d) {}
-   explicit solana_signature(const uint8_t* d) { std::copy_n(d, SIZE, data.begin()); }
-
-   /**
-    * @brief Convert signature to base58 string
-    */
-   std::string to_base58() const;
-
-   /**
-    * @brief Create signature from base58 string
-    */
-   static solana_signature from_base58(const std::string& str);
-
-   /**
-    * @brief Create signature from ED25519 signature shim
-    */
-   static solana_signature from_ed_signature(const fc::crypto::ed::signature_shim& sig);
-
-   bool operator==(const solana_signature& other) const { return data == other.data; }
-   bool operator!=(const solana_signature& other) const { return data != other.data; }
-};
-
-/**
- * @brief Check if an address is on the ed25519 curve
- *
- * @param address The address to check
- * @return True if the address is on the curve, false otherwise
- */
-bool is_on_curve(const solana_public_key& address);
 } // namespace fc::crypto::solana

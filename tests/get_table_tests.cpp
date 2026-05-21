@@ -643,18 +643,12 @@ BOOST_FIXTURE_TEST_CASE( get_table_next_key_test, validating_tester ) try {
       BOOST_CHECK_EQUAL(page1.rows[0].get_object()["value"].get_object()["sec64"].as_uint64(), 2u);
       BOOST_CHECK_EQUAL(page1.rows[1].get_object()["value"].get_object()["sec64"].as_uint64(), 5u);
 
-      // next_key for secondary queries is the secondary key bytes (hex). Use
-      // it as lower_bound on a json=false call so the bytes are interpreted
-      // directly without re-encoding.
-      chain_apis::read_only::get_table_rows_params p2;
-      p2.json = false;
-      p2.code = "test"_n;
-      p2.scope = "test";
-      p2.table = "numobjs";
-      p2.index_name = "bysec1";
-      p2.lower_bound = page1.next_key;
-      p2.limit = 50;
-      auto page2 = get_table_rows_full(plugin, p2, fc::time_point::maximum());
+      // With `p.json = true`, `next_key` for secondary queries is a JSON
+      // object matching the bound syntax. Feed it back directly as
+      // `lower_bound` on another json=true call for seamless pagination.
+      p.lower_bound = page1.next_key;
+      p.limit       = 50;
+      auto page2 = get_table_rows_full(plugin, p, fc::time_point::maximum());
       BOOST_REQUIRE_EQUAL(page2.rows.size(), 1u);
       BOOST_REQUIRE_EQUAL(page2.more, false);
    }
@@ -718,6 +712,42 @@ BOOST_FIXTURE_TEST_CASE( get_table_next_key_test, validating_tester ) try {
       }
    }
 
+   // (sec-10) `find` on a multi_index secondary index must return the matching
+   //          row. Regression for the bug where setting
+   //          `lower_bound == upper_bound` caused the iterator to break on
+   //          `sk >= ub_sv` before the match was emitted — passing the key via
+   //          `find` appends a null byte to the upper bound so the comparison
+   //          becomes strictly less. Exercises `batch_operator_plugin::
+   //          has_delivered_envelope`'s real-world usage.
+   {
+      chain_apis::read_only::get_table_rows_params p;
+      p.json = true;
+      p.code = "test"_n;
+      p.scope = "test";
+      p.table = "numobjs";
+      p.index_name = "bysec1";
+      p.find = R"({"bysec1": 5})";
+      auto result = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(result.rows.size(), 1u);
+      BOOST_CHECK_EQUAL(result.rows[0].get_object()["value"].get_object()["sec64"].as_uint64(), 5u);
+   }
+
+   // (sec-11) `find` miss on a multi_index secondary index must return zero
+   //          rows (not the lexicographically-next row). The null-byte append
+   //          trick only widens the upper bound to include the target — it
+   //          must not leak through to an adjacent key.
+   {
+      chain_apis::read_only::get_table_rows_params p;
+      p.json = true;
+      p.code = "test"_n;
+      p.scope = "test";
+      p.table = "numobjs";
+      p.index_name = "bysec1";
+      p.find = R"({"bysec1": 4})";
+      auto result = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(result.rows.size(), 0u);
+   }
+
 } FC_LOG_AND_RETHROW() /// get_table_next_key_test
 
 // Verify the find-on-scoped-table contract: scope is required, and when
@@ -754,7 +784,7 @@ BOOST_FIXTURE_TEST_CASE( get_table_find_scoped_test, validating_tester ) try {
       p.json = true;
       p.code = "sysio.token"_n;
       p.table = "accounts";
-      p.find = R"({"sym_code": )" + std::to_string(sys_code) + "}";
+      p.find = R"({"sym_code":)" + std::to_string(sys_code) + "}";
       // p.scope intentionally left empty
       BOOST_CHECK_EXCEPTION(
          get_table_rows_full(plugin, p, fc::time_point::maximum()),
@@ -772,7 +802,7 @@ BOOST_FIXTURE_TEST_CASE( get_table_find_scoped_test, validating_tester ) try {
       p.code = "sysio.token"_n;
       p.table = "accounts";
       p.scope = "inita";
-      p.find = R"({"sym_code": )" + std::to_string(sys_code) + "}";
+      p.find = R"({"sym_code":)" + std::to_string(sys_code) + "}";
       auto result = get_table_rows_full(plugin, p, fc::time_point::maximum());
       BOOST_REQUIRE_EQUAL(result.rows.size(), 1u);
       BOOST_REQUIRE_EQUAL(result.more, false);
@@ -787,7 +817,7 @@ BOOST_FIXTURE_TEST_CASE( get_table_find_scoped_test, validating_tester ) try {
       p.code = "sysio.token"_n;
       p.table = "accounts";
       p.scope = "inita";
-      p.find = R"({"sym_code": 99999})";
+      p.find = R"({"sym_code":99999})";
       auto result = get_table_rows_full(plugin, p, fc::time_point::maximum());
       BOOST_REQUIRE_EQUAL(result.rows.size(), 0u);
       BOOST_REQUIRE_EQUAL(result.more, false);
@@ -1058,50 +1088,241 @@ BOOST_FIXTURE_TEST_CASE( get_kv_rows_basic_test, validating_tester ) try {
 
 } FC_LOG_AND_RETHROW()
 
+// Shared setup for the two primary-index reverse-pagination tests below.
+// `test_kv_sec_query` primary is a single-field uint64 `id`. Seeds ids 1..5.
+static void setup_kvrev_primary(validating_tester& t, account_name acct) {
+   t.produce_block();
+   t.create_accounts({acct});
+   t.produce_block();
+   t.set_code(acct, test_contracts::test_kv_sec_query_wasm());
+   t.set_abi(acct,  test_contracts::test_kv_sec_query_abi());
+   t.produce_block();
+   for (uint64_t id = 1; id <= 5; ++id) {
+      t.push_action(acct, "adduser"_n, acct,
+                    mutable_variant_object()("id", id)
+                                            ("owner", std::string("u") + std::to_string(id))
+                                            ("balance", id * 100));
+   }
+   t.produce_block();
+}
+
+// Reverse pagination over a primary key with `json=true`. Pins the
+// reverse-pagination resume contract: `upper_bound = prev.next_key` must
+// walk every row exactly once with no boundary drop. `next_key` in json
+// mode is a JSON object matching the bound syntax.
+//
+// Five rows with primary ids 1..5. With limit=2 reverse, a correct scan
+// returns three pages: [5,4], [3,2], [1].
 BOOST_FIXTURE_TEST_CASE( get_kv_rows_reverse_pagination_test, validating_tester ) try {
-   produce_block();
-   create_accounts({"kvrev"_n});
-   produce_block();
-
-   set_code("kvrev"_n, test_contracts::test_kv_map_wasm());
-   set_abi("kvrev"_n, test_contracts::test_kv_map_abi());
-   produce_block();
-
-   kv_put(*this, "kvrev"_n, "a", 1, "val1", 10);
-   kv_put(*this, "kvrev"_n, "b", 1, "val2", 20);
-   kv_put(*this, "kvrev"_n, "c", 1, "val3", 30);
-   kv_put(*this, "kvrev"_n, "d", 1, "val4", 40);
-   kv_put(*this, "kvrev"_n, "e", 1, "val5", 50);
-   produce_block();
+   setup_kvrev_primary(*this, "kvrev"_n);
 
    std::optional<sysio::chain_apis::tracked_votes> _tracked_votes;
    chain_apis::read_only plugin(*(this->control), {}, {}, _tracked_votes,
                                 fc::microseconds::maximum(), fc::microseconds::maximum(), {});
 
-   // Reverse pagination with limit=2
    chain_apis::read_only::get_table_rows_params p;
-   p.json = true;
-   p.code = "kvrev"_n;
-   p.table = "geodata";
-   p.limit = 2;
+   p.json    = true;
+   p.code    = "kvrev"_n;
+   p.table   = "users";
+   p.limit   = 2;
    p.reverse = true;
 
-   // Page 1 (reverse): e/1, d/1
+   auto id_of = [](const fc::variant& row) {
+      return row.get_object()["key"].get_object()["id"].as_uint64();
+   };
+
+   // Page 1: id=5, id=4. next_key = JSON form of id=4 (last returned).
    auto page1 = get_table_rows_kv(plugin, p, fc::time_point::maximum());
    BOOST_REQUIRE_EQUAL(2u, page1.rows.size());
    BOOST_REQUIRE_EQUAL(true, page1.more);
-   BOOST_REQUIRE(!page1.next_key.empty());
-   BOOST_REQUIRE_EQUAL("e", page1.rows[0]["key"].get_object()["region"].as_string());
-   BOOST_REQUIRE_EQUAL("d", page1.rows[1]["key"].get_object()["region"].as_string());
+   BOOST_CHECK_EQUAL(5u, id_of(page1.rows[0]));
+   BOOST_CHECK_EQUAL(4u, id_of(page1.rows[1]));
+   BOOST_CHECK_EQUAL(R"({"id":4})", page1.next_key);
 
-   // Page 2 (reverse): use next_key as upper_bound
-   // next_key from page1 points to "c" (exclusive), so page2 gets b, a
+   // Page 2: id=3, id=2. `upper_bound = {"id":4}` must NOT drop id=3.
    p.upper_bound = page1.next_key;
    auto page2 = get_table_rows_kv(plugin, p, fc::time_point::maximum());
    BOOST_REQUIRE_EQUAL(2u, page2.rows.size());
-   BOOST_REQUIRE_EQUAL(false, page2.more); // only b, a remain
-   BOOST_REQUIRE_EQUAL("b", page2.rows[0]["key"].get_object()["region"].as_string());
-   BOOST_REQUIRE_EQUAL("a", page2.rows[1]["key"].get_object()["region"].as_string());
+   BOOST_REQUIRE_EQUAL(true, page2.more);
+   BOOST_CHECK_EQUAL(3u, id_of(page2.rows[0]));
+   BOOST_CHECK_EQUAL(2u, id_of(page2.rows[1]));
+   BOOST_CHECK_EQUAL(R"({"id":2})", page2.next_key);
+
+   // Page 3: id=1. Scan exhausted.
+   p.upper_bound = page2.next_key;
+   auto page3 = get_table_rows_kv(plugin, p, fc::time_point::maximum());
+   BOOST_REQUIRE_EQUAL(1u, page3.rows.size());
+   BOOST_REQUIRE_EQUAL(false, page3.more);
+   BOOST_REQUIRE(page3.next_key.empty());
+   BOOST_CHECK_EQUAL(1u, id_of(page3.rows[0]));
+
+} FC_LOG_AND_RETHROW()
+
+// Same contract and data as the json=true test above, but `json=false`
+// end-to-end. Pins the hex `next_key` path.
+BOOST_FIXTURE_TEST_CASE( get_kv_rows_reverse_pagination_hex_test, validating_tester ) try {
+   setup_kvrev_primary(*this, "kvrevh"_n);
+
+   auto be8_hex = [](uint64_t v) {
+      char buf[8];
+      chain::kv_encode_be64(buf, v);
+      return fc::to_hex(buf, 8);
+   };
+
+   std::optional<sysio::chain_apis::tracked_votes> _tracked_votes;
+   chain_apis::read_only plugin(*(this->control), {}, {}, _tracked_votes,
+                                fc::microseconds::maximum(), fc::microseconds::maximum(), {});
+
+   chain_apis::read_only::get_table_rows_params p;
+   p.json    = false;
+   p.code    = "kvrevh"_n;
+   p.table   = "users";
+   p.limit   = 2;
+   p.reverse = true;
+
+   // Page 1: id=5, id=4. next_key = hex(be64(4)).
+   auto page1 = get_table_rows_kv(plugin, p, fc::time_point::maximum());
+   BOOST_REQUIRE_EQUAL(2u, page1.rows.size());
+   BOOST_REQUIRE_EQUAL(true, page1.more);
+   BOOST_CHECK_EQUAL(be8_hex(5), page1.rows[0].get_object()["key"].as_string());
+   BOOST_CHECK_EQUAL(be8_hex(4), page1.rows[1].get_object()["key"].as_string());
+   BOOST_CHECK_EQUAL(be8_hex(4), page1.next_key);
+
+   // Page 2: id=3, id=2. next_key = hex(be64(2)).
+   p.upper_bound = page1.next_key;
+   auto page2 = get_table_rows_kv(plugin, p, fc::time_point::maximum());
+   BOOST_REQUIRE_EQUAL(2u, page2.rows.size());
+   BOOST_REQUIRE_EQUAL(true, page2.more);
+   BOOST_CHECK_EQUAL(be8_hex(3), page2.rows[0].get_object()["key"].as_string());
+   BOOST_CHECK_EQUAL(be8_hex(2), page2.rows[1].get_object()["key"].as_string());
+   BOOST_CHECK_EQUAL(be8_hex(2), page2.next_key);
+
+   // Page 3: id=1. Scan exhausted.
+   p.upper_bound = page2.next_key;
+   auto page3 = get_table_rows_kv(plugin, p, fc::time_point::maximum());
+   BOOST_REQUIRE_EQUAL(1u, page3.rows.size());
+   BOOST_REQUIRE_EQUAL(false, page3.more);
+   BOOST_REQUIRE(page3.next_key.empty());
+   BOOST_CHECK_EQUAL(be8_hex(1), page3.rows[0].get_object()["key"].as_string());
+
+} FC_LOG_AND_RETHROW()
+
+// Shared setup for the two secondary-index reverse-pagination tests below.
+// test_kv_sec_query has a single-field uint64 primary (`id`) and a `byowner`
+// name secondary. Five users u1-u5 with id=1..5 sort in byowner ascending as
+// u1, u2, u3, u4, u5; reverse walks them u5, u4, u3, u2, u1.
+static void setup_secrev(validating_tester& t, account_name acct) {
+   t.produce_block();
+   t.create_accounts({acct});
+   t.produce_block();
+   t.set_code(acct, test_contracts::test_kv_sec_query_wasm());
+   t.set_abi(acct,  test_contracts::test_kv_sec_query_abi());
+   t.produce_block();
+   for (uint64_t id = 1; id <= 5; ++id) {
+      t.push_action(acct, "adduser"_n, acct,
+                    mutable_variant_object()("id", id)
+                                            ("owner", std::string("u") + std::to_string(id))
+                                            ("balance", id * 100));
+   }
+   t.produce_block();
+}
+
+// Reverse pagination over a secondary index with `json=true`. Exercises the
+// secondary-index reverse branch AND the JSON next_key path: `upper_bound =
+// prev.next_key` must round-trip through the bound parser (which expects
+// JSON when `p.json` is set), and must not drop a row at each page boundary.
+BOOST_FIXTURE_TEST_CASE( get_kv_rows_reverse_pagination_secondary_test, validating_tester ) try {
+   setup_secrev(*this, "secrev"_n);
+
+   std::optional<sysio::chain_apis::tracked_votes> _tracked_votes;
+   chain_apis::read_only plugin(*(this->control), {}, {}, _tracked_votes,
+                                fc::microseconds::maximum(), fc::microseconds::maximum(), {});
+
+   chain_apis::read_only::get_table_rows_params p;
+   p.json       = true;
+   p.code       = "secrev"_n;
+   p.table      = "users";
+   p.index_name = "byowner";
+   p.limit      = 2;
+   p.reverse    = true;
+
+   auto owner_of = [](const fc::variant& row) {
+      return row.get_object()["value"].get_object()["owner"].as_string();
+   };
+
+   // Page 1: rows for u5, u4. next_key = JSON form of the byowner key for u4.
+   auto page1 = get_table_rows_kv(plugin, p, fc::time_point::maximum());
+   BOOST_REQUIRE_EQUAL(2u, page1.rows.size());
+   BOOST_REQUIRE_EQUAL(true, page1.more);
+   BOOST_CHECK_EQUAL("u5", owner_of(page1.rows[0]));
+   BOOST_CHECK_EQUAL("u4", owner_of(page1.rows[1]));
+   BOOST_CHECK_EQUAL(R"({"byowner":"u4"})", page1.next_key);
+
+   // Page 2: u3, u2. `upper_bound = {"byowner":"u4"}` must NOT drop u3.
+   p.upper_bound = page1.next_key;
+   auto page2 = get_table_rows_kv(plugin, p, fc::time_point::maximum());
+   BOOST_REQUIRE_EQUAL(2u, page2.rows.size());
+   BOOST_REQUIRE_EQUAL(true, page2.more);
+   BOOST_CHECK_EQUAL("u3", owner_of(page2.rows[0]));
+   BOOST_CHECK_EQUAL("u2", owner_of(page2.rows[1]));
+   BOOST_CHECK_EQUAL(R"({"byowner":"u2"})", page2.next_key);
+
+   // Page 3: u1. Scan exhausted.
+   p.upper_bound = page2.next_key;
+   auto page3 = get_table_rows_kv(plugin, p, fc::time_point::maximum());
+   BOOST_REQUIRE_EQUAL(1u, page3.rows.size());
+   BOOST_REQUIRE_EQUAL(false, page3.more);
+   BOOST_REQUIRE(page3.next_key.empty());
+   BOOST_CHECK_EQUAL("u1", owner_of(page3.rows[0]));
+} FC_LOG_AND_RETHROW()
+
+// Same as above but with `json=false` end-to-end. Pins the hex next_key
+// path for secondary-index reverse pagination.
+BOOST_FIXTURE_TEST_CASE( get_kv_rows_reverse_pagination_secondary_hex_test, validating_tester ) try {
+   setup_secrev(*this, "secrevh"_n);
+
+   auto be8_hex = [](uint64_t v) {
+      char buf[8];
+      chain::kv_encode_be64(buf, v);
+      return fc::to_hex(buf, 8);
+   };
+   auto owner_sk_hex = [&](const char* owner) {
+      return be8_hex(chain::name(owner).to_uint64_t());
+   };
+
+   std::optional<sysio::chain_apis::tracked_votes> _tracked_votes;
+   chain_apis::read_only plugin(*(this->control), {}, {}, _tracked_votes,
+                                fc::microseconds::maximum(), fc::microseconds::maximum(), {});
+
+   chain_apis::read_only::get_table_rows_params p;
+   p.json       = false;
+   p.code       = "secrevh"_n;
+   p.table      = "users";
+   p.index_name = "byowner";
+   p.limit      = 2;
+   p.reverse    = true;
+
+   auto page1 = get_table_rows_kv(plugin, p, fc::time_point::maximum());
+   BOOST_REQUIRE_EQUAL(2u, page1.rows.size());
+   BOOST_REQUIRE_EQUAL(true, page1.more);
+   BOOST_CHECK_EQUAL(be8_hex(5),            page1.rows[0].get_object()["key"].as_string());
+   BOOST_CHECK_EQUAL(be8_hex(4),            page1.rows[1].get_object()["key"].as_string());
+   BOOST_CHECK_EQUAL(owner_sk_hex("u4"),    page1.next_key);
+
+   p.upper_bound = page1.next_key;
+   auto page2 = get_table_rows_kv(plugin, p, fc::time_point::maximum());
+   BOOST_REQUIRE_EQUAL(2u, page2.rows.size());
+   BOOST_REQUIRE_EQUAL(true, page2.more);
+   BOOST_CHECK_EQUAL(be8_hex(3),            page2.rows[0].get_object()["key"].as_string());
+   BOOST_CHECK_EQUAL(be8_hex(2),            page2.rows[1].get_object()["key"].as_string());
+   BOOST_CHECK_EQUAL(owner_sk_hex("u2"),    page2.next_key);
+
+   p.upper_bound = page2.next_key;
+   auto page3 = get_table_rows_kv(plugin, p, fc::time_point::maximum());
+   BOOST_REQUIRE_EQUAL(1u, page3.rows.size());
+   BOOST_REQUIRE_EQUAL(false, page3.more);
+   BOOST_REQUIRE(page3.next_key.empty());
+   BOOST_CHECK_EQUAL(be8_hex(1),            page3.rows[0].get_object()["key"].as_string());
 
 } FC_LOG_AND_RETHROW()
 
@@ -1337,7 +1558,7 @@ BOOST_FIXTURE_TEST_CASE( get_table_find_test, validating_tester ) try {
       p.code = "sysio.token"_n;
       p.table = "accounts";
       p.scope = "inita";
-      p.find = R"({"sym_code": 9999999})";
+      p.find = R"({"sym_code":9999999})";
       auto result = get_table_rows_full(plugin, p, fc::time_point::maximum());
       BOOST_REQUIRE_EQUAL(0u, result.rows.size());
    }
@@ -1349,8 +1570,8 @@ BOOST_FIXTURE_TEST_CASE( get_table_find_test, validating_tester ) try {
       p.code = "sysio.token"_n;
       p.table = "accounts";
       p.scope = "inita";
-      p.find = R"({"sym_code": 1397703940})";
-      p.lower_bound = R"({"sym_code": 0})";
+      p.find = R"({"sym_code":1397703940})";
+      p.lower_bound = R"({"sym_code":0})";
       BOOST_CHECK_THROW(
          get_table_rows_full(plugin, p, fc::time_point::maximum()),
          chain::contract_table_query_exception
@@ -1397,8 +1618,8 @@ BOOST_FIXTURE_TEST_CASE( get_table_scoped_bounds_test, validating_tester ) try {
       p.code = "sysio.token"_n;
       p.table = "accounts";
       p.scope = "inita";
-      p.lower_bound = R"({"sym_code": )" + std::to_string(bbb_code) + "}";
-      p.upper_bound = R"({"sym_code": )" + std::to_string(ccc_code + 1) + "}";
+      p.lower_bound = R"({"sym_code":)" + std::to_string(bbb_code) + "}";
+      p.upper_bound = R"({"sym_code":)" + std::to_string(ccc_code + 1) + "}";
       auto result = get_table_rows_full(plugin, p, fc::time_point::maximum());
       BOOST_REQUIRE_EQUAL(2u, result.rows.size());
       BOOST_REQUIRE_EQUAL("100.0000 BBB", result.rows[0]["value"]["balance"].as_string());
@@ -1412,8 +1633,8 @@ BOOST_FIXTURE_TEST_CASE( get_table_scoped_bounds_test, validating_tester ) try {
       p.code = "sysio.token"_n;
       p.table = "accounts";
       p.scope = "inita";
-      p.lower_bound = R"({"sym_code": )" + std::to_string(bbb_code) + "}";
-      p.upper_bound = R"({"sym_code": )" + std::to_string(ccc_code + 1) + "}";
+      p.lower_bound = R"({"sym_code":)" + std::to_string(bbb_code) + "}";
+      p.upper_bound = R"({"sym_code":)" + std::to_string(ccc_code + 1) + "}";
       p.reverse = true;
       auto result = get_table_rows_full(plugin, p, fc::time_point::maximum());
       BOOST_REQUIRE_EQUAL(2u, result.rows.size());
@@ -1428,8 +1649,8 @@ BOOST_FIXTURE_TEST_CASE( get_table_scoped_bounds_test, validating_tester ) try {
       p.code = "sysio.token"_n;
       p.table = "accounts";
       p.scope = "inita";
-      p.lower_bound = R"({"sym_code": )" + std::to_string(aaa_code) + "}";
-      p.upper_bound = R"({"sym_code": )" + std::to_string(sys_code + 1) + "}";
+      p.lower_bound = R"({"sym_code":)" + std::to_string(aaa_code) + "}";
+      p.upper_bound = R"({"sym_code":)" + std::to_string(sys_code + 1) + "}";
       p.limit = 2;
       auto result = get_table_rows_full(plugin, p, fc::time_point::maximum());
       BOOST_REQUIRE_EQUAL(2u, result.rows.size());
@@ -1453,7 +1674,7 @@ BOOST_FIXTURE_TEST_CASE( get_table_scoped_bounds_test, validating_tester ) try {
       p.code = "sysio.token"_n;
       p.table = "accounts";
       p.scope = "inita";
-      p.upper_bound = R"({"sym_code": )" + std::to_string(bbb_code + 1) + "}";
+      p.upper_bound = R"({"sym_code":)" + std::to_string(bbb_code + 1) + "}";
       auto result = get_table_rows_full(plugin, p, fc::time_point::maximum());
       BOOST_REQUIRE_EQUAL(2u, result.rows.size());
       BOOST_REQUIRE_EQUAL("100.0000 AAA", result.rows[0]["value"]["balance"].as_string());
@@ -1467,7 +1688,7 @@ BOOST_FIXTURE_TEST_CASE( get_table_scoped_bounds_test, validating_tester ) try {
       p.code = "sysio.token"_n;
       p.table = "accounts";
       p.scope = "inita";
-      p.lower_bound = R"({"sym_code": )" + std::to_string(ccc_code) + "}";
+      p.lower_bound = R"({"sym_code":)" + std::to_string(ccc_code) + "}";
       auto result = get_table_rows_full(plugin, p, fc::time_point::maximum());
       BOOST_REQUIRE_EQUAL(2u, result.rows.size());
       BOOST_REQUIRE_EQUAL("100.0000 CCC", result.rows[0]["value"]["balance"].as_string());

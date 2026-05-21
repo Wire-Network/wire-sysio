@@ -1,0 +1,6 @@
+if( BUILD_TEST_CONTRACTS )
+   add_contract( intrinsic_probe intrinsic_probe intrinsic_probe.cpp )
+else()
+   configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/intrinsic_probe.wasm ${CMAKE_CURRENT_BINARY_DIR}/intrinsic_probe.wasm COPYONLY )
+   configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/intrinsic_probe.abi  ${CMAKE_CURRENT_BINARY_DIR}/intrinsic_probe.abi  COPYONLY )
+endif()

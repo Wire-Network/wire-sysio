@@ -2039,7 +2039,7 @@ BOOST_AUTO_TEST_CASE( more_billed_cpu_test ) try {
    trace = push_trx( ptrx, fc::time_point::maximum(), {}, false ); // non-explicit billing
    BOOST_TEST_MESSAGE(fc::json::to_pretty_string(trace));
    BOOST_TEST(trace->elapsed.count() > 1);
-   BOOST_TEST(trace->net_usage == 340u);
+   BOOST_TEST(trace->net_usage == 343u);
    BOOST_TEST_REQUIRE(trace->action_traces.size() == 3u);
    wdump((trace->action_traces.at(0).elapsed));
    wdump((trace->action_traces.at(1).elapsed));
@@ -2054,9 +2054,9 @@ BOOST_AUTO_TEST_CASE( more_billed_cpu_test ) try {
    BOOST_TEST_REQUIRE(!!trace->action_traces.at(1).cpu_usage_us);
    BOOST_TEST_REQUIRE(!!trace->action_traces.at(2).cpu_usage_us);
    BOOST_TEST(trace->net_usage == std::ranges::fold_left(trace->action_traces, 0ul, [](uint64_t v, const action_trace& t) { return v + *t.net_usage; }));
-   BOOST_TEST(*trace->action_traces.at(0).net_usage == 108u);
-   BOOST_TEST(*trace->action_traces.at(1).net_usage == 108u);
-   BOOST_TEST(*trace->action_traces.at(2).net_usage == 124u); // has two auths
+   BOOST_TEST(*trace->action_traces.at(0).net_usage == 109u);
+   BOOST_TEST(*trace->action_traces.at(1).net_usage == 109u);
+   BOOST_TEST(*trace->action_traces.at(2).net_usage == 125u); // has two auths
    BOOST_TEST(trace->total_cpu_usage_us.value == std::ranges::fold_left(trace->action_traces, 0ul, [](uint64_t v, const action_trace& t) { return v + *t.cpu_usage_us; }));
    BOOST_TEST(trace->total_cpu_usage_us.value >= 100u);
    BOOST_TEST(*trace->action_traces.at(0).cpu_usage_us > 1u); // min billed trx time is 100
@@ -2090,7 +2090,7 @@ BOOST_AUTO_TEST_CASE( more_billed_cpu_test ) try {
    trace = push_trx( ptrx, fc::time_point::maximum(), cpu_usage, true );
    BOOST_TEST_MESSAGE(fc::json::to_pretty_string(trace));
    BOOST_TEST(trace->elapsed.count() > 1);
-   BOOST_TEST(trace->net_usage == 340u);
+   BOOST_TEST(trace->net_usage == 343u);
    BOOST_TEST_REQUIRE(trace->action_traces.size() == 3u);
    BOOST_TEST(trace->action_traces.at(0).elapsed.count() > 0);
    BOOST_TEST(trace->action_traces.at(1).elapsed.count() > 0);
@@ -2102,9 +2102,9 @@ BOOST_AUTO_TEST_CASE( more_billed_cpu_test ) try {
    BOOST_TEST_REQUIRE(!!trace->action_traces.at(1).cpu_usage_us);
    BOOST_TEST_REQUIRE(!!trace->action_traces.at(2).cpu_usage_us);
    BOOST_TEST(trace->net_usage == std::ranges::fold_left(trace->action_traces, 0ul, [](uint64_t v, const action_trace& t) { return v + *t.net_usage; }));
-   BOOST_TEST(*trace->action_traces.at(0).net_usage == 108u);
-   BOOST_TEST(*trace->action_traces.at(1).net_usage == 108u);
-   BOOST_TEST(*trace->action_traces.at(2).net_usage == 124u); // has two auths
+   BOOST_TEST(*trace->action_traces.at(0).net_usage == 109u);
+   BOOST_TEST(*trace->action_traces.at(1).net_usage == 109u);
+   BOOST_TEST(*trace->action_traces.at(2).net_usage == 125u); // has two auths
    BOOST_TEST(trace->total_cpu_usage_us.value == total_cpu);
    BOOST_TEST(*trace->action_traces.at(0).cpu_usage_us == cpu_usage[0]);
    BOOST_TEST(*trace->action_traces.at(1).cpu_usage_us == cpu_usage[1]);

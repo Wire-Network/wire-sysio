@@ -23,19 +23,19 @@ protected:
    virtual std::string do_grouping() const { return "\03"; }
 };
 
-int64_t to_int64(const std::string& i) {
+int64_t to_int64(std::string_view i) {
    try {
-      return boost::lexical_cast<int64_t>(i.c_str(), i.size());
+      return boost::lexical_cast<int64_t>(i.data(), i.size());
    } catch (const boost::bad_lexical_cast& e) {
       FC_THROW_EXCEPTION(parse_error_exception, "Couldn't parse int64_t");
    }
    FC_RETHROW_EXCEPTIONS(warn, "{} => int64_t", i)
 }
 
-uint64_t to_uint64(const std::string& i) {
+uint64_t to_uint64(std::string_view i) {
    try {
       try {
-         return boost::lexical_cast<uint64_t>(i.c_str(), i.size());
+         return boost::lexical_cast<uint64_t>(i.data(), i.size());
       } catch (const boost::bad_lexical_cast& e) {
          FC_THROW_EXCEPTION(parse_error_exception, "Couldn't parse uint64_t");
       }
@@ -44,9 +44,9 @@ uint64_t to_uint64(const std::string& i) {
    FC_CAPTURE_AND_RETHROW("{}", i)
 }
 
-double to_double(const std::string& i) {
+double to_double(std::string_view i) {
    try {
-      return boost::lexical_cast<double>(i.c_str(), i.size());
+      return boost::lexical_cast<double>(i.data(), i.size());
    } catch (const boost::bad_lexical_cast& e) {
       FC_THROW_EXCEPTION(parse_error_exception, "Couldn't parse double");
    }

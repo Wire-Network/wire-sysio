@@ -7,7 +7,7 @@
 static constexpr uint32_t bench_table_id = 42;
 
 // Hand-written KV intrinsic declarations matching host interface.hpp signatures.
-// legacy_span<T> maps to (ptr, size) pair in WASM ABI.
+// aligned_span<T> maps to (ptr, size) pair in WASM ABI.
 extern "C" {
    __attribute__((sysio_wasm_import))
    int64_t kv_set(uint32_t key_format, uint64_t payer, const void* key, uint32_t key_size, const void* value, uint32_t value_size);
@@ -92,8 +92,8 @@ public:
 
    [[sysio::action]]
    void iterall() {
-      uint64_t code = get_self().value;
-      uint32_t handle = kv_it_create(bench_table_id, code, nullptr, 0);
+      const uint64_t code = get_self().value;
+      const uint32_t handle = kv_it_create(bench_table_id, code, nullptr, 0);
 
       uint32_t count = 0;
       int32_t status = kv_it_next(handle);

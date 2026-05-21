@@ -436,6 +436,153 @@ BOOST_FIXTURE_TEST_CASE( no_block_extensions_allowed_test, validating_tester ) {
                            });
 }
 
+BOOST_AUTO_TEST_CASE( transaction_receipt_digest_format_test )
+{
+   // Golden-value test locking in the transaction_receipt digest format:
+   //   digest = sha256( pack(cpu_usage_us) || pack(trx.digest()) )
+   // A reorder, added field, or removed field in transaction_receipt::digest() will
+   // change the hash and fail this test.
+
+   transaction_receipt r;
+   r.cpu_usage_us = { fc::unsigned_int(100), fc::unsigned_int(200) };
+
+   // Reconstruct the expected digest from first principles.
+   auto expected = [&]() {
+      digest_type::encoder enc;
+      fc::raw::pack( enc, r.cpu_usage_us );
+      fc::raw::pack( enc, r.trx.digest() );
+      return enc.result();
+   };
+
+   BOOST_CHECK_EQUAL( r.digest(), expected() );
+
+   // Stability across calls.
+   BOOST_CHECK_EQUAL( r.digest(), r.digest() );
+
+   // Changing any CPU value changes the digest.
+   auto orig = r.digest();
+   r.cpu_usage_us[0] = fc::unsigned_int(101);
+   BOOST_CHECK_NE( r.digest(), orig );
+   BOOST_CHECK_EQUAL( r.digest(), expected() );
+
+   // Appending a CPU value changes the digest.
+   auto after_mod = r.digest();
+   r.cpu_usage_us.push_back( fc::unsigned_int(50) );
+   BOOST_CHECK_NE( r.digest(), after_mod );
+   BOOST_CHECK_EQUAL( r.digest(), expected() );
+
+   // Empty cpu_usage_us is also valid and stable.
+   r.cpu_usage_us.clear();
+   BOOST_CHECK_EQUAL( r.digest(), expected() );
+}
+
+BOOST_AUTO_TEST_CASE( explicit_cpu_usage_uint32_overflow_test )
+{
+   // A malicious/buggy block with explicit per-action cpu_usage_us values whose
+   // sum exceeds uint32_t must be rejected. Without the overflow guard, the sum
+   // would silently narrow when assigned to transaction_trace::total_cpu_usage_us
+   // (fc::unsigned_int = uint32_t), potentially defeating the subsequent
+   // validate_trx_billed_cpu check and under-billing the accounts.
+
+   tester chain( setup_policy::full );
+   account_name acc = "acc"_n;
+   chain.create_accounts( {acc} );
+   chain.produce_block();
+
+   // Build a 2-action trx. nonce + nonce so that total_actions() == 2 and
+   // signatures are trivially satisfied at the system-account level.
+   signed_transaction trx;
+   trx.actions.emplace_back(
+      vector<permission_level>{{config::system_account_name, config::active_name}},
+      config::system_account_name, "nonce"_n, fc::raw::pack(std::string("a")) );
+   trx.actions.emplace_back(
+      vector<permission_level>{{config::system_account_name, config::active_name}},
+      config::system_account_name, "nonce"_n, fc::raw::pack(std::string("b")) );
+   chain.set_transaction_headers( trx, 10 );
+   trx.sign( tester::get_private_key( config::system_account_name, "active" ), chain.control->get_chain_id() );
+
+   auto ptrx = std::make_shared<packed_transaction>(trx);
+   auto fut = transaction_metadata::start_recover_keys( ptrx, chain.control->get_thread_pool(),
+                                                       chain.control->get_chain_id(), fc::microseconds::maximum(),
+                                                       transaction_metadata::trx_type::input );
+   auto mtrx = fut.get();
+
+   // Two values each just over 2^31 so their sum exceeds uint32_t max.
+   cpu_usage_t overflow_cpu{ fc::unsigned_int(0x80000000u), fc::unsigned_int(0x80000001u) };
+
+   BOOST_CHECK_EXCEPTION(
+      chain.control->test_push_transaction( mtrx, fc::time_point::maximum(),
+                                            fc::microseconds::maximum(), overflow_cpu,
+                                            true /*explicit_billed_cpu_time*/ ),
+      transaction_exception,
+      fc_exception_message_contains("overflows uint32") );
+}
+
+// A non-transient trx that is rejected during apply (here, by failing the auth
+// check after net_usage was already populated by init_for_input_trx) must NOT
+// contribute its net/cpu/elapsed to the producer's _block_report.  The block
+// itself contains zero such trxs; receivers replaying it see net=0, and the
+// producer's log_applied / produced_block_metrics must agree.
+BOOST_AUTO_TEST_CASE( failed_trx_excluded_from_block_report )
+{
+   // log_applied skips the metrics callback when the block timestamp is more than
+   // 5 minutes from wall-clock now (sync-mode throttle), so build a chain whose
+   // genesis is current time and the produced blocks land within the window.
+   fc::temp_directory tempdir;
+   auto def_conf = base_tester::default_config(tempdir);
+   auto genesis = def_conf.second;
+   genesis.initial_timestamp = fc::time_point::now() - fc::seconds(1);
+   savanna_tester chain( def_conf.first, genesis );
+   chain.execute_setup_policy( setup_policy::full );
+   chain.create_account( "alice"_n );
+   chain.produce_block(); // commit create_account before installing the callback
+
+   std::optional<produced_block_metrics> captured;
+   chain.control->register_update_produced_block_metrics(
+      [&]( produced_block_metrics m ) { captured = m; } );
+
+   // Baseline: produce a block with no user trxs (just onblock).
+   chain.produce_block();
+   BOOST_REQUIRE( captured );
+   const auto baseline = *captured;
+   BOOST_TEST( baseline.trxs_produced_total == 0u );
+   BOOST_TEST( baseline.net_usage_us == 0u ); // onblock is implicit; no wire bytes
+   captured.reset();
+
+   // Action authorized by alice@active, but signed with sysio's key -- the
+   // auth check throws unsatisfied_authorization AFTER init_for_input_trx
+   // has populated trace->net_usage from the action's billable size.
+   signed_transaction stx;
+   stx.actions.emplace_back(
+      vector<permission_level>{{"alice"_n, config::active_name}},
+      config::system_account_name, "nonce"_n, fc::raw::pack(std::string("x")) );
+   chain.set_transaction_headers( stx, 10 );
+   stx.sign( chain.get_private_key( config::system_account_name, "active" ),
+             chain.control->get_chain_id() );
+
+   auto trace = chain.push_transaction( stx, fc::time_point::maximum(),
+                                        base_tester::DEFAULT_BILLED_CPU_TIME_US,
+                                        true /*no_throw*/ );
+   BOOST_REQUIRE( trace->except );
+   BOOST_REQUIRE_EQUAL( trace->except->code(), unsatisfied_authorization::code_value );
+   BOOST_REQUIRE_GT( trace->net_usage, 0u ); // populated before the throw
+
+   // Failed-trx block: same shape as baseline (just onblock makes it into the block).
+   chain.produce_block();
+   BOOST_REQUIRE( captured );
+
+   // Block content matches baseline: zero user trxs.
+   BOOST_TEST( captured->trxs_produced_total == 0u );
+   // Net is the cleanest signal. onblock contributes zero, so any non-zero net_usage_us would mean the rejected
+   // trx leaked its net into the report. Pre-fix: == trace->net_usage (>0).
+   BOOST_TEST( captured->net_usage_us == 0u );
+   // Cpu must match the onblock-only baseline. Pre-fix it would be baseline + trace->total_cpu_usage_us.
+   // net/cpu/elapsed all aggregate at the same controller site under one condition, so they leak together or
+   // not at all. net + cpu are sufficient signal. A wall-clock assertion on total_elapsed_time_us would only
+   // add CI jitter noise without strengthening the test.
+   BOOST_TEST( captured->cpu_usage_us == baseline.cpu_usage_us );
+}
+
 // Regression test for the snapshot hardening invariant added in block_state(snapshot).
 // For any non-genesis block_state, core.latest_qc_claim() must equal header.qc_claim
 // (finality_core::next sets latest_qc_claim from the header's claim). A snapshot with

@@ -19,9 +19,15 @@ namespace fc::em {
 namespace fc::crypto::ethereum {
 
 /**
- * Public key lengths
+ * Accepted hex-string lengths for an EM public key. Bare 32-byte x-only (64
+ * hex chars) is intentionally excluded: y-parity cannot be recovered from x
+ * alone, so the parser has no way to select the correct curve point and
+ * previously defaulted to even y — silently producing the wrong key whenever
+ * the caller's real key had odd parity. Callers should supply 66-char
+ * compressed (0x02/0x03 + x), 128-char uncompressed (x||y), or 130-char
+ * uncompressed with 0x04 prefix.
  */
-constexpr std::array public_key_string_lengths = {64,66,128,130};
+constexpr std::array public_key_string_lengths = {66,128,130};
 
 /**
  * Standard Ethereum message prefix used for signing according to EIP-155
