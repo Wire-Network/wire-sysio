@@ -592,7 +592,12 @@ BOOST_AUTO_TEST_CASE(snapshot_core_header_qc_claim_mismatch_rejected) try {
    savanna_tester chain;
    chain.produce_blocks(4); // past genesis
 
-   const auto& live_bsp = block_handle_accessor::get_bsp(chain.control->head());
+   // controller::head() returns block_handle by value; bind to a named local so its
+   // embedded shared_ptr outlives live_bsp (a reference into it). Without this the
+   // temporary dies at the end of the full-expression and the get_bsp() reference
+   // dangles; clang and the sanitizer builds reuse the stack and read garbage.
+   const auto head_handle = chain.control->head();
+   const auto& live_bsp = block_handle_accessor::get_bsp(head_handle);
    BOOST_REQUIRE(!live_bsp->core.is_genesis_core());
    BOOST_REQUIRE(live_bsp->core.latest_qc_claim() == live_bsp->header.qc_claim); // sanity
 
