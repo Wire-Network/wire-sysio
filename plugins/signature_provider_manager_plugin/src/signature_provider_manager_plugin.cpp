@@ -133,8 +133,8 @@ public:
          auto ref = sysio::sigprov::kms::parse_kms_spec(spec_data);
          auto kms = sysio::sigprov::kms::make_kms_signature_provider(ref, key_type, public_key);
 
-         // Retain the startup probe so plugin_startup() can — when the opt-in
-         // KMS startup check is enabled — fail fast on a missing credential,
+         // Retain the startup probe so plugin_startup() can -- when the opt-in
+         // KMS startup check is enabled -- fail fast on a missing credential,
          // bad region, absent IAM grant, or wrong pinned key, instead of
          // discovering it deep into production on the first sign.
          {
@@ -407,30 +407,34 @@ public:
     * single `GetPublicKey` call. That resolves AWS credentials, warms the
     * client, and verifies the KMS key matches the pinned public key.
     *
-    * A permanent misconfiguration — missing credentials, bad region, absent
-    * IAM grant, or a mismatched public key — throws
+    * A permanent misconfiguration -- missing credentials, bad region, absent
+    * IAM grant, or a mismatched public key -- throws
     * `chain::plugin_config_exception`, which propagates out of
     * `plugin_startup()` and aborts startup loudly instead of failing on the
     * first production sign. A transient error (throttle, timeout, KMSInternal)
-    * is logged and skipped — it is not a misconfiguration, so the lazy
+    * is logged and skipped -- it is not a misconfiguration, so the lazy
     * first-sign check is left to retry it rather than killing node startup.
     *
     * A no-op unless `_kms_startup_check` is set, and a no-op when no KMS-backed
     * keys are registered.
+    *
+    * The probe list is one-shot: this drains it (whether or not the check is
+    * enabled) so it never lingers as a misleading registry of signers. A KMS
+    * key registered after `plugin_startup()` -- e.g. via a future runtime spec
+    * reload -- is not retroactively probed; its pinning check still runs lazily
+    * on the first sign through the closure's shared one-shot guard.
     */
    void run_kms_startup_check() {
-      if (!_kms_startup_check) {
-         return;
-      }
-
-      // Copy the probe list so the network-bound GetPublicKey calls run
-      // without holding the providers mutex.
+      // Drain the probe list under the lock. Moving it out both hands the
+      // network-bound GetPublicKey calls a private copy to run without holding
+      // the providers mutex, and empties the member so the one-shot nature of
+      // the startup check is structural rather than just documented.
       std::vector<std::function<void()>> probes;
       {
          std::scoped_lock lock(_signing_providers_mutex);
-         probes = _kms_startup_probes;
+         probes = std::exchange(_kms_startup_probes, {});
       }
-      if (probes.empty()) {
+      if (!_kms_startup_check || probes.empty()) {
          return;
       }
 
@@ -441,7 +445,7 @@ public:
             probe();
          } catch (const chain::signing_transient_exception& e) {
             // A transient KMS error (throttle, timeout, KMSInternal) at startup
-            // is not a misconfiguration — don't abort the node over it. Log it
+            // is not a misconfiguration -- don't abort the node over it. Log it
             // and continue; the lazy first-sign check re-runs the same probe.
             ++deferred;
             wlog("AWS KMS startup credential check: transient error for one "
@@ -504,11 +508,10 @@ void signature_provider_manager_plugin::set_program_options(options_description&
    cfg.add_options()(
       option_name_kms_startup_check,
       boost::program_options::value<bool>()->default_value(false),
-      "When true, the signature provider plugin issues an AWS KMS GetPublicKey "
-      "call at startup for every KMS-backed (`KMS:` spec) signing key, failing "
-      "fast if credentials, region, IAM permissions, or the pinned public key "
-      "are misconfigured. Off by default, so nodes without KMS keys and offline "
-      "test environments are unaffected.");
+      "Probe every `KMS:` signing key with a GetPublicKey call at startup; "
+      "fail fast if credentials, region, IAM, or the pinned public key are "
+      "wrong. Off by default; has no effect when no KMS-backed keys are "
+      "configured.");
 }
 
 const char* signature_provider_manager_plugin::signature_provider_help_text() const {
@@ -520,7 +523,7 @@ const char* signature_provider_manager_plugin::signature_provider_help_text() co
       "   <key-type>             key format to parse\n\n"
       "   <public-key>           is a string form of a valid <key-type>\n\n"
       "   <provider-spec>        is a string in the form <provider-type>:<data>\n\n"
-      "       <provider-type>    is KEY, KIOD, KMS, or SE\n\n"
+      "       <provider-type>    is KEY, KIOD, or KMS\n\n"
       "       KEY:<private-key>  is a string containing a private key of the key-type specified\n\n"
       "       KIOD:<url>         is the URL where kiod is available and the appropriate wallet(s) are unlocked\n\n"
       "       KMS:<key-ref>      <key-ref> is either a full AWS KMS ARN\n"

@@ -54,11 +54,14 @@ aws kms create-alias \
 
 ### 2. IAM permission
 
-The principal whose credentials the test runs under needs `kms:Sign` on the
-key. `kms:GetPublicKey` is also granted so the same principal can extract
-the matching pubkey hex (Prereq #4) without juggling a second role; the
-plugin itself does not call `GetPublicKey` (the expected pubkey is supplied
-by the caller). Minimum inline policy:
+The principal whose credentials the test runs under needs both `kms:Sign`
+and `kms:GetPublicKey` on the key. `kms:GetPublicKey` is required at runtime,
+not just for setup: on the first sign of each key — and again from the
+optional startup probe — the plugin calls `GetPublicKey` exactly once to pin
+the operator-supplied public key against the one KMS actually holds. Without
+that grant the lazy pin and the startup probe both fail with
+`AccessDeniedException` on first use. The same call is also how you extract
+the matching pubkey hex for the spec (Prereq #4). Minimum inline policy:
 
 ```json
 {

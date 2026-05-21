@@ -344,7 +344,7 @@ BOOST_AUTO_TEST_CASE(create_provider_ethereum_kms_spec_routes_through_parser) {
    // End-to-end check that the plugin's spec parser routes `KMS:` through
    // `parse_kms_spec` + `make_kms_signature_provider` and returns a provider
    // whose sign closure is callable. The closure itself is *not* invoked
-   // here — invocation issues a real KMS::Sign request, which is covered
+   // here -- invocation issues a real KMS::Sign request, which is covered
    // only by the env-gated live test.
    using namespace fc::test;
    using namespace fc::crypto;
@@ -374,7 +374,7 @@ BOOST_AUTO_TEST_CASE(create_provider_ethereum_kms_spec_routes_through_parser) {
 
 BOOST_AUTO_TEST_CASE(create_provider_kms_spec_rejects_solana) {
    // The plugin must reject a KMS spec for a non-secp256k1 chain at parse
-   // time, not at first sign — operators should learn early that KMS
+   // time, not at first sign -- operators should learn early that KMS
    // can't sign Solana ed25519.
    using namespace fc::test;
    using namespace fc::crypto;

@@ -87,7 +87,7 @@ Elected via Appointed Proof of Stake (APoS). They validate transactions and prod
 - Building and submitting outbound envelopes to external chains
 - Responding to challenges if disputed
 
-Signing keys for outbound submissions can be held locally (`KEY:`), in a `kiod` daemon (`KIOD:`), or in AWS KMS (`KMS:` — secp256k1 asymmetric keys). See `plugins/signature_provider_manager_plugin/KMS_SIGNING_DESIGN.md` for the KMS spec format and operational notes.
+Signing keys for outbound submissions can be held locally (`KEY:`), in a `kiod` daemon (`KIOD:`), or in AWS KMS (`KMS:` — secp256k1 asymmetric keys). See `plugins/signature_provider_manager_plugin/test/README.md` for KMS key setup, IAM requirements, the `KMS:` spec format, and operational notes.
 
 ### Underwriters
 Independent operators running the `underwriter_plugin`. They provide collateral-backed liquidity for cross-chain swaps:

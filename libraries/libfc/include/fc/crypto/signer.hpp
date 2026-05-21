@@ -7,15 +7,17 @@
 #include <fc/crypto/keccak256.hpp>
 #include <fc/crypto/sha256.hpp>
 
+#include <magic_enum/magic_enum.hpp>
+
 #include <span>
 
 namespace fc::crypto {
 
 // ===========================================================================
-// signer_traits — compile-time signing dispatch per (TargetChain, KeyType)
+// signer_traits -- compile-time signing dispatch per (TargetChain, KeyType)
 // ===========================================================================
 
-/// Primary template — must be specialized for each valid (TargetChain, KeyType) pair
+/// Primary template -- must be specialized for each valid (TargetChain, KeyType) pair
 template<chain_kind_t TargetChain, chain_key_type_t KeyType>
 struct signer_traits;
 
@@ -25,20 +27,20 @@ namespace detail {
 /// supporting both `signature_provider_t` shapes:
 ///
 ///  - A provider with a local `em` private key signs in-process.
-///  - A provider with no local key — a remote signer such as AWS KMS — has no
+///  - A provider with no local key -- a remote signer such as AWS KMS -- has no
 ///    key to sign with directly, so the digest is handed to its `sign` closure.
 ///    `sign` is typed on `fc::sha256`, but the closure treats that argument as
 ///    an opaque 32-byte digest, so the keccak digest is carried across
 ///    byte-for-byte and raw-signed.
 ///
-/// Digest preparation (plain keccak vs. EIP-191 framing) is the caller's job —
-/// it has already happened in `signer_traits::prepare` — so the remote signer
+/// Digest preparation (plain keccak vs. EIP-191 framing) is the caller's job --
+/// it has already happened in `signer_traits::prepare` -- so the remote signer
 /// must raw-sign the digest as given. The remote path self-verifies this:
 /// it recovers the public key from the returned signature and asserts it
 /// matches the provider's key. A remote signer that applied its own message
 /// framing instead of raw-signing, or that signed with the wrong key, recovers
-/// to a different key and is rejected here — before an invalid transaction can
-/// be emitted — rather than yielding a silently bad signature.
+/// to a different key and is rejected here -- before an invalid transaction can
+/// be emitted -- rather than yielding a silently bad signature.
 inline signature em_sign_keccak(const signature_provider_t& p, const keccak256& digest) {
    if (p.private_key) {
       FC_ASSERT(p.private_key->contains<em::private_key_shim>(),
@@ -62,14 +64,14 @@ inline signature em_sign_keccak(const signature_provider_t& p, const keccak256& 
       sig.get<em::signature_shim>().recover_eth(digest)));
    FC_ASSERT(recovered == p.public_key,
              "remote signer produced a signature that does not recover to the "
-             "provider's public key — the signer's key or digest framing is wrong");
+             "provider's public key -- the signer's key or digest framing is wrong");
    return sig;
 }
 
 } // namespace detail
 
 // ---------------------------------------------------------------------------
-// (ethereum, ethereum) — ETH client transaction signing
+// (ethereum, ethereum) -- ETH client transaction signing
 // Signs: keccak256(raw_bytes) via EM (secp256k1)
 // ---------------------------------------------------------------------------
 template<>
@@ -95,7 +97,7 @@ struct signer_traits<chain_kind_ethereum, chain_key_type_ethereum> {
 };
 
 // ---------------------------------------------------------------------------
-// (wire, ethereum) — Wire transactions signed via MetaMask / personal_sign
+// (wire, ethereum) -- Wire transactions signed via MetaMask / personal_sign
 // Signs: keccak256(EIP-191 prefix + sha256_raw) via EM (secp256k1)
 // ---------------------------------------------------------------------------
 template<>
@@ -121,7 +123,7 @@ struct signer_traits<chain_kind_wire, chain_key_type_ethereum> {
 };
 
 // ---------------------------------------------------------------------------
-// (solana, solana) — Solana client transaction signing
+// (solana, solana) -- Solana client transaction signing
 // Signs: raw_bytes via ED25519
 // ---------------------------------------------------------------------------
 template<>
@@ -151,7 +153,7 @@ struct signer_traits<chain_kind_solana, chain_key_type_solana> {
 };
 
 // ===========================================================================
-// signer<TargetChain, KeyType> — typed cross-chain signing wrapper
+// signer<TargetChain, KeyType> -- typed cross-chain signing wrapper
 // ===========================================================================
 
 template<chain_kind_t TargetChain, chain_key_type_t KeyType>
@@ -163,7 +165,7 @@ struct signer {
    explicit signer(const signature_provider_t& p) : provider(p) {
       FC_ASSERT(p.key_type == KeyType,
          "signer: provider key_type mismatch (expected {}, got {})",
-         static_cast<int>(KeyType), static_cast<int>(p.key_type));
+         magic_enum::enum_name(KeyType), magic_enum::enum_name(p.key_type));
    }
 
    signature sign(typename traits::input_type data) const {
@@ -189,10 +191,29 @@ struct signer {
 };
 
 // ===========================================================================
-// wire_signer — key-type agnostic Wire transaction signing
+// wire_signer -- key-type agnostic Wire transaction signing
 // Passes through to provider.sign(sha256); handles K1/EM/ED polymorphically
 // ===========================================================================
 
+/**
+ * @brief Key-type-agnostic Wire transaction signer.
+ *
+ * Hands the 32-byte digest straight to `provider.sign(...)`, which dispatches
+ * polymorphically over K1 / EM / ED keys inside the provider's closure.
+ *
+ * Unlike `signer<>` (and its `wire_eth_signer` alias), `wire_signer` has no
+ * `prepare()` hook: it raw-signs exactly the 32 bytes it is given and applies
+ * no EIP-191 framing. For an Ethereum key that framing
+ * (`ethereum::hash_user_message`) lives in
+ * `signer_traits<chain_kind_wire, chain_key_type_ethereum>::prepare`, not in
+ * the signature provider -- a `KEY:` provider's `em::private_key_shim` and a
+ * `KMS:` provider alike raw-sign the digest as handed in. Consequently
+ * `wire_signer` and `wire_eth_signer` are NOT interchangeable even for an
+ * identical provider: swapping one for the other changes which bytes are
+ * signed. Use `wire_eth_signer` when the Wire transaction must carry a
+ * MetaMask-compatible `personal_sign` signature; use `wire_signer` only when
+ * the caller has already produced the exact digest to be signed.
+ */
 struct wire_signer {
    const signature_provider_t& provider;
 

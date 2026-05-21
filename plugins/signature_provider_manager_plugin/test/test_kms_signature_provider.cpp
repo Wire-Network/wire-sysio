@@ -1,7 +1,7 @@
 /**
  * Unit tests for the AWS KMS signature provider parser.
  *
- * These cases cover only the offline parse path — `parse_kms_spec` does no
+ * These cases cover only the offline parse path -- `parse_kms_spec` does no
  * network I/O and constructs no `KMSClient`, so the suite runs without AWS
  * credentials and without an internet connection. The one end-to-end signing
  * test in this file (`kms_live_sign_round_trip`) is gated on the
@@ -177,7 +177,7 @@ BOOST_AUTO_TEST_CASE(parse_kms_spec_rejects_empty) {
 }
 
 BOOST_AUTO_TEST_CASE(parse_kms_spec_rejects_no_region_no_arn) {
-   // Bare key id — ambiguous about which region the key lives in. Must throw.
+   // Bare key id -- ambiguous about which region the key lives in. Must throw.
    BOOST_CHECK_THROW(parse_kms_spec("1234abcd-12ab-34cd-56ef-1234567890ab"),
                      sysio::chain::plugin_config_exception);
 }
@@ -188,8 +188,22 @@ BOOST_AUTO_TEST_CASE(parse_kms_spec_rejects_arn_missing_tail) {
                      sysio::chain::plugin_config_exception);
 }
 
+BOOST_AUTO_TEST_CASE(parse_kms_spec_rejects_arn_empty_account) {
+   // A stray colon collapsed the account-id segment to empty. The six segment
+   // count still holds, so this is caught by the explicit account check, not
+   // the segment-count assertion.
+   BOOST_CHECK_THROW(parse_kms_spec("arn:aws:kms:us-east-1::key/abc"),
+                     sysio::chain::plugin_config_exception);
+}
+
+BOOST_AUTO_TEST_CASE(parse_kms_spec_rejects_arn_empty_region) {
+   // Likewise for an empty region segment.
+   BOOST_CHECK_THROW(parse_kms_spec("arn:aws:kms::111122223333:key/abc"),
+                     sysio::chain::plugin_config_exception);
+}
+
 BOOST_AUTO_TEST_CASE(parse_kms_spec_rejects_arn_bad_tail_prefix) {
-   // ARN tail that doesn't start with `key/` or `alias/` — KMS rejects this
+   // ARN tail that doesn't start with `key/` or `alias/` -- KMS rejects this
    // server-side, but we can fail loud at parse time.
    BOOST_CHECK_THROW(parse_kms_spec("arn:aws:kms:us-east-1:111122223333:foo/bar"),
                      sysio::chain::plugin_config_exception);
@@ -228,7 +242,7 @@ BOOST_AUTO_TEST_CASE(parse_kms_spec_rejects_uppercase_arn) {
 }
 
 BOOST_AUTO_TEST_CASE(parse_kms_spec_rejects_typoed_service) {
-   // `ksm` instead of `kms` — would otherwise mis-parse region as "arn".
+   // `ksm` instead of `kms` -- would otherwise mis-parse region as "arn".
    BOOST_CHECK_THROW(parse_kms_spec("arn:aws:ksm:us-east-1:111122223333:key/abc"),
                      sysio::chain::plugin_config_exception);
 }
@@ -252,7 +266,7 @@ BOOST_AUTO_TEST_CASE(parse_kms_spec_rejects_shorthand_empty_key_id) {
 }
 
 // ---------------------------------------------------------------------------
-// DER → raw + low-S + v-recovery helpers
+// DER -> raw + low-S + v-recovery helpers
 //
 // These tests synthesise the inputs that AWS KMS would normally produce by
 // signing locally with `fc::em::private_key::sign_compact` and re-encoding
@@ -374,7 +388,7 @@ BOOST_AUTO_TEST_CASE(der_to_eth_signature_normalises_high_s_input) {
 }
 
 // ---------------------------------------------------------------------------
-// spki_der_to_public_key — KMS public-key pinning decoder
+// spki_der_to_public_key -- KMS public-key pinning decoder
 //
 // These tests synthesise the X.509 SubjectPublicKeyInfo that AWS KMS
 // `GetPublicKey` returns by wrapping a locally generated EC point with
@@ -492,7 +506,7 @@ BOOST_AUTO_TEST_CASE(make_kms_signature_provider_returns_callable_for_ethereum) 
 BOOST_AUTO_TEST_CASE(make_kms_signature_provider_rejects_wire_k1) {
    // Wire K1 (`chain_key_type_wire`) is also secp256k1, but its public-key
    // and signature shapes differ from Ethereum's, so it is not yet supported
-   // — fail loud rather than sign with the wrong format.
+   // -- fail loud rather than sign with the wrong format.
    const auto chain_pub =
       fc::crypto::private_key::generate(fc::crypto::private_key::key_type::k1).get_public_key();
 
@@ -505,7 +519,7 @@ BOOST_AUTO_TEST_CASE(make_kms_signature_provider_rejects_wire_k1) {
 }
 
 BOOST_AUTO_TEST_CASE(make_kms_signature_provider_rejects_solana) {
-   // Solana keys are Ed25519 — KMS does not support that signing algorithm.
+   // Solana keys are Ed25519 -- KMS does not support that signing algorithm.
    const auto chain_pub =
       fc::crypto::private_key::generate(fc::crypto::private_key::key_type::ed).get_public_key();
 
@@ -518,7 +532,7 @@ BOOST_AUTO_TEST_CASE(make_kms_signature_provider_rejects_solana) {
 }
 
 // ---------------------------------------------------------------------------
-// Live KMS round-trip — env-gated, skipped in default CI.
+// Live KMS round-trip -- env-gated, skipped in default CI.
 //
 // Set both env vars to exercise this case against a real AWS KMS key:
 //   KMS_LIVE_SPEC    body of a `KMS:` spec, e.g. `us-east-1:alias/wire-ci-test`
@@ -540,7 +554,7 @@ BOOST_AUTO_TEST_CASE(kms_live_sign_round_trip) {
    const auto* spec_env = std::getenv("KMS_LIVE_SPEC");
    const auto* pub_env  = std::getenv("KMS_LIVE_PUBKEY");
    if (!spec_env || !pub_env || *spec_env == '\0' || *pub_env == '\0') {
-      BOOST_TEST_MESSAGE("KMS_LIVE_SPEC / KMS_LIVE_PUBKEY not set — skipping live KMS test");
+      BOOST_TEST_MESSAGE("KMS_LIVE_SPEC / KMS_LIVE_PUBKEY not set -- skipping live KMS test");
       return;
    }
 
@@ -554,7 +568,7 @@ BOOST_AUTO_TEST_CASE(kms_live_sign_round_trip) {
       ref, fc::crypto::chain_key_type_ethereum, chain_pub);
 
    // Exercise the startup probe: a GetPublicKey call plus the public-key pin,
-   // with no signing. It must pass before we attempt a (billable) Sign — and a
+   // with no signing. It must pass before we attempt a (billable) Sign -- and a
    // passing probe pre-pins the closure.
    BOOST_CHECK_NO_THROW(kms.warm_up());
 
@@ -562,7 +576,7 @@ BOOST_AUTO_TEST_CASE(kms_live_sign_round_trip) {
    // log entries are recognisable across runs.
    const auto keccak = fc::crypto::keccak256::hash(std::string{"wire-sysio kms live test 2026"});
 
-   // chain::digest_type is fc::sha256 — a 32-byte holder. We copy the
+   // chain::digest_type is fc::sha256 -- a 32-byte holder. We copy the
    // keccak256 bytes verbatim because KMS treats the message as opaque
    // when MessageType=DIGEST.
    sysio::chain::digest_type chain_digest;
@@ -591,15 +605,15 @@ BOOST_AUTO_TEST_CASE(make_kms_signature_provider_rejects_pubkey_variant_mismatch
 }
 
 // ---------------------------------------------------------------------------
-// throw_kms_error — transient vs permanent classification
+// throw_kms_error -- transient vs permanent classification
 //
 // `throw_kms_error` maps an AWS error onto two exception types using the SDK's
-// own retryability classification. Constructing an `AWSError` is offline — it
+// own retryability classification. Constructing an `AWSError` is offline -- it
 // is a plain value type, so these tests need no SDK init and no network.
 // ---------------------------------------------------------------------------
 
 BOOST_AUTO_TEST_CASE(throw_kms_error_maps_retryable_to_transient) {
-   // A throttling error is retryable — the caller should back off and retry.
+   // A throttling error is retryable -- the caller should back off and retry.
    const Aws::Client::AWSError<Aws::KMS::KMSErrors> err(
       Aws::KMS::KMSErrors::THROTTLING, "ThrottlingException", "Rate exceeded",
       /* isRetryable */ true);
@@ -608,7 +622,7 @@ BOOST_AUTO_TEST_CASE(throw_kms_error_maps_retryable_to_transient) {
 }
 
 BOOST_AUTO_TEST_CASE(throw_kms_error_maps_non_retryable_to_config) {
-   // Access-denied is permanent — retrying will not help, the IAM grant is
+   // Access-denied is permanent -- retrying will not help, the IAM grant is
    // missing. It must surface as a config exception, not a transient one.
    const Aws::Client::AWSError<Aws::KMS::KMSErrors> err(
       Aws::KMS::KMSErrors::ACCESS_DENIED, "AccessDeniedException",
@@ -633,6 +647,29 @@ BOOST_AUTO_TEST_CASE(throw_kms_error_transient_is_not_a_config_exception) {
       caught_transient = true;
    }
    BOOST_CHECK(caught_transient);
+}
+
+BOOST_AUTO_TEST_CASE(throw_kms_error_message_carries_enum_name) {
+   // Regression guard for the magic_enum range. KMS service-specific error
+   // codes (Aws::KMS::KMSErrors) begin at 129; magic_enum's default ceiling is
+   // 128, so without MAGIC_ENUM_RANGE_MAX raised the enum-name field of the
+   // diagnostic is blank for every KMS-specific error. DISABLED has value 141,
+   // squarely in the formerly-dead range.
+   const Aws::Client::AWSError<Aws::KMS::KMSErrors> err(
+      Aws::KMS::KMSErrors::DISABLED, "DisabledException", "Key is disabled",
+      /* isRetryable */ false);
+   try {
+      sysio::sigprov::kms::throw_kms_error("Sign", "alias/x", err);
+      BOOST_FAIL("throw_kms_error did not throw");
+   } catch (const fc::exception& e) {
+      // "DISABLED" is the magic_enum::enum_name spelling. The wire name
+      // ("DisabledException") and the human message ("Key is disabled") use
+      // mixed / lower case, so the all-caps form appears only if enum_name
+      // resolved -- asserting on it specifically pins the range fix.
+      const auto detail = e.to_detail_string();
+      BOOST_CHECK_MESSAGE(detail.find("DISABLED") != std::string::npos,
+                          "KMS diagnostic is missing the KMSErrors enum name: " << detail);
+   }
 }
 
 BOOST_AUTO_TEST_SUITE_END()

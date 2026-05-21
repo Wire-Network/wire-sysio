@@ -1,7 +1,7 @@
 #pragma once
 
 /**
- * AWS KMS-backed signature provider — plugin-private header.
+ * AWS KMS-backed signature provider -- plugin-private header.
  *
  * The KMS provider extends the existing `KEY:` / `KIOD:` spec grammar with a
  * third form, `KMS:<key-ref>`, where the signing key never leaves AWS.
@@ -28,7 +28,7 @@
  * signatures. The full `<aws/kms/...>` headers pull in a large dependency
  * tree; declaring these types opaquely keeps that tree out of every
  * translation unit that includes this header only for `parse_kms_spec` /
- * `make_kms_signature_provider` — notably `signature_provider_manager_plugin.cpp`,
+ * `make_kms_signature_provider` -- notably `signature_provider_manager_plugin.cpp`,
  * which uses no AWS type at all. The full AWS headers are included only where
  * the complete types are actually needed: `kms_signature_provider.cpp` and the
  * plugin's test translation unit.
@@ -53,7 +53,7 @@ namespace sysio::sigprov::kms {
 /**
  * @brief Parsed KMS key reference.
  *
- * `key_id` is whatever follows the resolved region — either the bare key id /
+ * `key_id` is whatever follows the resolved region -- either the bare key id /
  * alias as the operator typed it (`<region>:<key-id-or-alias>` form), or the
  * `key/<uuid>` / `alias/<name>` tail of an ARN. AWS KMS accepts both shapes
  * in the `KeyId` field of `Sign` / `GetPublicKey`, so we hand it through
@@ -111,7 +111,7 @@ std::array<unsigned char, 64> der_to_compact(std::span<const unsigned char> der)
 bool normalise_low_s(std::array<unsigned char, 64>& compact);
 
 /**
- * @brief Find the `recovery_id ∈ {0, 1}` that recovers `expected` from `compact`.
+ * @brief Find the `recovery_id in {0, 1}` that recovers `expected` from `compact`.
  *
  * KMS does not return a recovery byte. We derive it locally by trying both
  * parities, recovering the candidate public key, and comparing to the pubkey
@@ -127,14 +127,14 @@ bool normalise_low_s(std::array<unsigned char, 64>& compact);
  * @param digest the 32-byte digest the signature was produced over
  * @param expected the public key the signer is supposed to control
  * @throws sysio::chain::plugin_config_exception if neither parity recovers `expected`
- * @return `recovery_id` ∈ {0, 1} (Ethereum's `v` byte is `27 + recovery_id`)
+ * @return `recovery_id` in {0, 1} (Ethereum's `v` byte is `27 + recovery_id`)
  */
 unsigned char recover_v(const std::array<unsigned char, 64>& compact,
                         std::span<const std::uint8_t, 32>    digest,
                         const fc::em::public_key&            expected);
 
 /**
- * @brief End-to-end: DER → low-S compact + recovered v → 65-byte Ethereum sig.
+ * @brief End-to-end: DER -> low-S compact + recovered v -> 65-byte Ethereum sig.
  *
  * Wraps `der_to_compact` + `normalise_low_s` + `recover_v` and packs the
  * result as `[ r | s | (27 + recovery_id) ]`, the format consumed by
@@ -154,7 +154,7 @@ fc::em::compact_signature der_to_eth_signature(
  * @brief Decode an X.509 SubjectPublicKeyInfo (DER) into a secp256k1 public key.
  *
  * AWS KMS `GetPublicKey` returns the public key as a DER-encoded
- * SubjectPublicKeyInfo (RFC 5280 §4.1): an outer `SEQUENCE` wrapping an
+ * SubjectPublicKeyInfo (RFC 5280 section 4.1): an outer `SEQUENCE` wrapping an
  * `AlgorithmIdentifier` and a `BIT STRING`. This helper walks that structure,
  * verifies the algorithm is `id-ecPublicKey` over the `secp256k1` named curve,
  * and lifts the trailing uncompressed `0x04 || X || Y` point into an
@@ -196,7 +196,7 @@ std::shared_ptr<Aws::KMS::KMSClient> get_kms_client(const std::string& region);
  * @brief Translate a failed AWS KMS API outcome into an fc exception, split by
  *        whether the failure is transient.
  *
- * The AWS SDK classifies every deserialised error as retryable or not — the
+ * The AWS SDK classifies every deserialised error as retryable or not -- the
  * same classification its own retry strategy uses. `throw_kms_error` maps that
  * split onto two distinct exception types so a caller can react correctly:
  *
@@ -205,7 +205,7 @@ std::shared_ptr<Aws::KMS::KMSClient> get_kms_client(const std::string& region);
  *     operation may be retried with backoff; the credentials and key are fine.
  *   - Permanent (access denied, key not found, disabled key, invalid state,
  *     bad parameters) -> `sysio::chain::plugin_config_exception`. Retrying will
- *     not help — the operator must fix credentials, IAM, region, or the spec.
+ *     not help -- the operator must fix credentials, IAM, region, or the spec.
  *
  * The two types are siblings, not parent and child, so a handler that catches
  * only `plugin_config_exception` will not silently swallow a retryable error.
@@ -234,13 +234,13 @@ struct kms_signer {
    /// pinning check, unless `warm_up` has already run it. A transient KMS
    /// failure throws `sysio::chain::signing_transient_exception` (safe to retry
    /// with backoff); a permanent one throws
-   /// `sysio::chain::plugin_config_exception` (fatal — fix the configuration).
+   /// `sysio::chain::plugin_config_exception` (fatal -- fix the configuration).
    fc::crypto::sign_fn sign;
 
    /// Eagerly run the startup probe: a single `KMS::GetPublicKey`
    /// that resolves AWS credentials, warms the client, and verifies the KMS
-   /// key matches the pinned public key — without signing. Optional; if never
-   /// called, the same check happens lazily on the first `sign`. Idempotent —
+   /// key matches the pinned public key -- without signing. Optional; if never
+   /// called, the same check happens lazily on the first `sign`. Idempotent --
    /// it shares the closure's one-shot guard, so calling it never makes the
    /// check run twice. A permanent misconfiguration (missing credential, bad
    /// region, absent IAM grant, mismatched key) throws
@@ -256,15 +256,15 @@ struct kms_signer {
  * Validates `key_type` and the public-key variant, resolves the shared
  * `KMSClient` for `ref.region` via `get_kms_client`, and captures the client,
  * key id, and expected public key into the returned closure. No network I/O
- * happens here; the first KMS request occurs only when the closure — or the
- * returned `warm_up` probe — is invoked.
+ * happens here; the first KMS request occurs only when the closure -- or the
+ * returned `warm_up` probe -- is invoked.
  *
  * On its first invocation the closure performs public-key pinning: it calls
  * `KMSClient::GetPublicKey` exactly once, decodes the returned X.509
  * SubjectPublicKeyInfo via `spki_der_to_public_key`, and asserts the KMS
  * key's public key matches `expected_pubkey`. A mismatch
- * throws `chain::plugin_config_exception` immediately — before any billable
- * `Sign` — so a spec that pins the wrong `<public-key>` fails fast with a
+ * throws `chain::plugin_config_exception` immediately -- before any billable
+ * `Sign` -- so a spec that pins the wrong `<public-key>` fails fast with a
  * direct error. The pinning check runs once on success; a transient
  * `GetPublicKey` failure is retried on the next `Sign`.
  *

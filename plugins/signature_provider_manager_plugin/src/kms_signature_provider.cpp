@@ -1,3 +1,16 @@
+// magic_enum resolves an enum value to its name only when the value falls
+// inside [MAGIC_ENUM_RANGE_MIN, MAGIC_ENUM_RANGE_MAX] (default -128..128).
+// AWS KMS's service-specific error codes (Aws::KMS::KMSErrors) begin at
+// Aws::Client::CoreErrors::SERVICE_EXTENSION_START_RANGE + 1 = 129 and run up
+// to 176, so under the default ceiling magic_enum::enum_name() would return ""
+// for every KMS-specific error in throw_kms_error() -- precisely the transient
+// vs. permanent triage cases that matter most. Raise the ceiling to 256 (well
+// above the highest KMS error value, 176). This must be defined before
+// <magic_enum/magic_enum.hpp> is first included anywhere in this translation
+// unit -- including transitively through the headers below -- so it sits ahead
+// of every #include.
+#define MAGIC_ENUM_RANGE_MAX 256
+
 #include "kms_signature_provider.hpp"
 
 #include <sysio/chain/exceptions.hpp>
@@ -37,14 +50,14 @@ namespace sysio::sigprov::kms {
 namespace {
 
 /// Anchor for ARN detection. ARNs always start with `arn:aws:kms:` (no
-/// regional suffix on the partition for kms — `arn:aws-cn:kms:` and
+/// regional suffix on the partition for kms -- `arn:aws-cn:kms:` and
 /// `arn:aws-us-gov:kms:` are not currently in scope; revisit if a partition
 /// other than `aws` becomes a deployment target).
 constexpr std::string_view kms_arn_prefix = "arn:aws:kms:";
 
 /// Case-insensitive lead-in shared by every ARN. A spec that begins with this
-/// but does not match `kms_arn_prefix` is a malformed or out-of-scope ARN —
-/// never the shorthand `<region>:<key-id>` form — and must fail loudly rather
+/// but does not match `kms_arn_prefix` is a malformed or out-of-scope ARN --
+/// never the shorthand `<region>:<key-id>` form -- and must fail loudly rather
 /// than fall through to the shorthand parser. See `parse_kms_spec`.
 constexpr std::string_view arn_lead_in = "arn:";
 
@@ -56,6 +69,7 @@ constexpr std::size_t kms_arn_segment_count = 6;
 constexpr std::size_t arn_idx_partition = 1;
 constexpr std::size_t arn_idx_service   = 2;
 constexpr std::size_t arn_idx_region    = 3;
+constexpr std::size_t arn_idx_account   = 4;
 constexpr std::size_t arn_idx_tail      = 5;
 
 /// Tail prefixes the KMS API accepts for the `KeyId` field.
@@ -66,7 +80,10 @@ constexpr std::string_view tail_prefix_alias = "alias/";
 /// lazily on first use; libsecp256k1 contexts are thread-safe for the
 /// signing-verification operations we use here. Lives separate from libfc's
 /// internal context (`fc::em::detail::_get_context`) because that one is
-/// not exposed across translation units.
+/// not exposed across translation units. It is created with
+/// `SECP256K1_CONTEXT_NONE` -- no precomputation tables -- so this second
+/// long-lived context costs only a few hundred bytes, not the few hundred KiB
+/// a precomputed context would.
 const secp256k1_context* kms_secp_ctx() {
    static secp256k1_context* ctx = secp256k1_context_create(SECP256K1_CONTEXT_NONE);
    return ctx;
@@ -81,18 +98,36 @@ constexpr unsigned char eth_v_offset = 27;
 /// Process-wide AWS SDK lifecycle. Constructed lazily on first KMS access,
 /// destroyed at static destruction (after the client cache, since the cache
 /// is touched by `get_kms_client` *after* this lifecycle, making it the
-/// younger Meyers singleton; younger statics are destroyed first). The
-/// safe because the application object owns the plugin and is destroyed
-/// before atexit static teardown; do not hand a KMS-backed `sign_fn` to an
-/// owner that outlives the application.
+/// younger Meyers singleton; younger statics are destroyed first). Holding a
+/// `KMSClient` shared_ptr inside a long-lived `sign_fn` closure is safe
+/// because the application object owns the plugin and is destroyed before
+/// atexit static teardown; do not hand a KMS-backed `sign_fn` to an owner
+/// that outlives the application.
 struct aws_sdk_lifecycle {
    static aws_sdk_lifecycle& instance() {
       static aws_sdk_lifecycle s;
       return s;
    }
+
+   // This is a Meyers singleton: there is exactly one lifecycle per process.
+   // Deleting copy / move makes that intent explicit and stops a stray
+   // `aws_sdk_lifecycle copy = ...` from compiling and running a second
+   // InitAPI / ShutdownAPI pair.
+   aws_sdk_lifecycle(const aws_sdk_lifecycle&)            = delete;
+   aws_sdk_lifecycle(aws_sdk_lifecycle&&)                 = delete;
+   aws_sdk_lifecycle& operator=(const aws_sdk_lifecycle&) = delete;
+   aws_sdk_lifecycle& operator=(aws_sdk_lifecycle&&)      = delete;
+
 private:
    aws_sdk_lifecycle()  { Aws::InitAPI(_options); }
    ~aws_sdk_lifecycle() { Aws::ShutdownAPI(_options); }
+
+   // TODO: the default-constructed SDKOptions leaves the AWS SDK's internal
+   // logger disabled. To diagnose an AWS-side retry storm or credential-chain
+   // failure from the node's own logs -- without restarting the node under the
+   // AWS_LOG_LEVEL environment variable -- install an
+   // Aws::Utils::Logging::LogSystemInterface here that forwards to fc::log
+   // before the Aws::InitAPI call above.
    Aws::SDKOptions _options{};
 };
 
@@ -118,8 +153,8 @@ struct kms_signer_state {
    /// discriminate between recovery_id 0 and 1.
    fc::em::public_key                   expected_em_pubkey;
    /// One-shot guard for the GetPublicKey pinning check. The check runs on the
-   /// first `Sign`; `std::call_once` re-runs it only if it threw — e.g. a
-   /// transient GetPublicKey API error — and never again once it has passed.
+   /// first `Sign`; `std::call_once` re-runs it only if it threw -- e.g. a
+   /// transient GetPublicKey API error -- and never again once it has passed.
    std::once_flag                       pin_once;
 };
 
@@ -154,7 +189,7 @@ bool starts_with_ci(std::string_view s, std::string_view prefix) {
 // X.509 SubjectPublicKeyInfo (DER) decoding for KMS public-key pinning.
 //
 // AWS KMS `GetPublicKey` returns the key as a DER-encoded SubjectPublicKeyInfo
-// (RFC 5280 §4.1). We walk just enough of that structure to verify the key is
+// (RFC 5280 section 4.1). We walk just enough of that structure to verify the key is
 // secp256k1 and to lift out the raw EC point.
 // ---------------------------------------------------------------------------
 
@@ -168,7 +203,7 @@ constexpr unsigned char der_tag_bit_string = 0x03;
 constexpr unsigned char der_length_long_form_bit = 0x80;
 constexpr unsigned char der_length_value_mask    = 0x7F;
 
-/// DER OBJECT IDENTIFIER bodies (the content of the OID TLV — tag and length
+/// DER OBJECT IDENTIFIER bodies (the content of the OID TLV -- tag and length
 /// stripped) for the two OIDs that a secp256k1 SPKI must carry:
 /// `1.2.840.10045.2.1` id-ecPublicKey and `1.3.132.0.10` secp256k1.
 constexpr std::array<unsigned char, 7> oid_ec_public_key = {
@@ -181,7 +216,7 @@ constexpr unsigned char ec_point_uncompressed_prefix = 0x04;
 constexpr std::size_t   ec_point_uncompressed_len    = 65;
 
 /// Minimal ASN.1 DER reader over a byte span. DER is a canonical, unambiguous
-/// encoding, so a structural tag-length-value walk is a genuine parse — not a
+/// encoding, so a structural tag-length-value walk is a genuine parse -- not a
 /// heuristic. Every malformed input raises `plugin_config_exception`.
 struct der_reader {
    std::span<const unsigned char> buf;
@@ -198,7 +233,7 @@ struct der_reader {
    };
 
    /// Read the next TLV element and advance past it.
-   element next() {
+   [[nodiscard]] element next() {
       SYS_ASSERT(pos + 2 <= buf.size(), chain::plugin_config_exception,
                  "Malformed KMS public-key DER: truncated tag/length header");
       const unsigned char tag = buf[pos++];
@@ -268,11 +303,11 @@ parse_spki_ec_point(std::span<const unsigned char> spki_der) {
               "KMS public-key DER: AlgorithmIdentifier is not a pair of OBJECT IDENTIFIERs");
    SYS_ASSERT(std::ranges::equal(algo_oid.content, oid_ec_public_key),
               chain::plugin_config_exception,
-              "KMS public-key DER: algorithm is not id-ecPublicKey — the KMS key is not an "
+              "KMS public-key DER: algorithm is not id-ecPublicKey -- the KMS key is not an "
               "elliptic-curve key");
    SYS_ASSERT(std::ranges::equal(curve_oid.content, oid_secp256k1),
               chain::plugin_config_exception,
-              "KMS public-key DER: EC curve is not secp256k1 — the KMS key must be created "
+              "KMS public-key DER: EC curve is not secp256k1 -- the KMS key must be created "
               "with key spec ECC_SECG_P256K1");
 
    // subjectPublicKey BIT STRING: a leading "unused bits" octet (0 for a
@@ -295,12 +330,12 @@ parse_spki_ec_point(std::span<const unsigned char> spki_der) {
 /// Public-key pinning check. Fetch the KMS key's public key with the free,
 /// non-billable `GetPublicKey` API, decode its SubjectPublicKeyInfo, and assert
 /// it matches the key the operator pinned in the spec. On mismatch this throws
-/// `plugin_config_exception` early — before any billable `Sign` — with a
+/// `plugin_config_exception` early -- before any billable `Sign` -- with a
 /// message that names the misconfiguration directly. Invoked exactly once per
 /// closure through `kms_signer_state::pin_once`.
 void verify_kms_pubkey(kms_signer_state& state) {
    Aws::KMS::Model::GetPublicKeyRequest req;
-   req.SetKeyId(Aws::String{state.key_id.c_str()});
+   req.SetKeyId(Aws::String{state.key_id});
 
    auto outcome = state.client->GetPublicKey(req);
    if (!outcome.IsSuccess()) {
@@ -321,7 +356,7 @@ void verify_kms_pubkey(kms_signer_state& state) {
 
 /// Run the public-key pinning check exactly once for `state`. Both the first
 /// `Sign` and the opt-in startup probe funnel through here, so `std::call_once`
-/// guarantees a single GetPublicKey round-trip — and retries it only if it
+/// guarantees a single GetPublicKey round-trip -- and retries it only if it
 /// threw (e.g. a transient GetPublicKey API error).
 void ensure_kms_pubkey_pinned(kms_signer_state& state) {
    std::call_once(state.pin_once, [&] { verify_kms_pubkey(state); });
@@ -337,18 +372,18 @@ void ensure_kms_pubkey_pinned(kms_signer_state& state) {
    // permanent ones (access denied, key not found, disabled key, invalid
    // state, bad parameters) do not. Map that split onto two exception types so
    // a caller can retry the transient class with backoff and treat the rest as
-   // a fatal misconfiguration. The SDK's own classification is authoritative —
-   // it is what the SDK's retry strategy uses — so there is no hand-maintained
+   // a fatal misconfiguration. The SDK's own classification is authoritative --
+   // it is what the SDK's retry strategy uses -- so there is no hand-maintained
    // table of error codes here to drift out of date.
    const bool transient = err.ShouldRetry();
    const auto message = fmt::format(
       "AWS KMS {} for key \"{}\" failed: {} (status {}, {}) [{}]: {}",
       op, key_id,
       magic_enum::enum_name(err.GetErrorType()),
-      static_cast<int>(err.GetResponseCode()),
-      std::string{err.GetExceptionName().c_str()},
+      magic_enum::enum_integer(err.GetResponseCode()),
+      err.GetExceptionName(),
       transient ? "transient, retryable" : "permanent",
-      std::string{err.GetMessage().c_str()});
+      err.GetMessage());
 
    if (transient) {
       FC_THROW_EXCEPTION(chain::signing_transient_exception, "{}", message);
@@ -365,24 +400,36 @@ kms_key_ref parse_kms_spec(std::string_view spec_data) {
       // stray colons inside the trailing `key/<id>` segment stay glued to it
       // (KMS key ids are uuids, no colons today, but aliases are operator-
       // chosen and we should not silently truncate).
-      auto parts = fc::split(std::string{spec_data}, ':', kms_arn_segment_count);
+      auto parts = fc::split(spec_data, ':', kms_arn_segment_count);
       SYS_ASSERT(parts.size() == kms_arn_segment_count, chain::plugin_config_exception,
                  "Malformed KMS ARN \"{}\": expected {} colon-separated segments, got {}",
                  spec_data, kms_arn_segment_count, parts.size());
 
-      const auto& region = parts[arn_idx_region];
-      const auto& tail   = parts[arn_idx_tail];
+      const auto& region  = parts[arn_idx_region];
+      const auto& account = parts[arn_idx_account];
+      const auto& tail    = parts[arn_idx_tail];
 
+      // `arn`, `aws`, and `kms` are guaranteed non-empty and correct by the
+      // `kms_arn_prefix` match above. The region, account, and tail segments
+      // are operator-supplied; an empty one means a stray colon collapsed two
+      // segments (e.g. `arn:aws:kms:us-east-1::key/x`) and the `key_id` we
+      // would hand KMS is wrong. Reject that here with a precise message
+      // rather than after a billable Sign against a bad endpoint.
       SYS_ASSERT(!region.empty(), chain::plugin_config_exception,
                  "KMS ARN \"{}\" has empty region segment", spec_data);
+      SYS_ASSERT(!account.empty(), chain::plugin_config_exception,
+                 "KMS ARN \"{}\" has empty account-id segment", spec_data);
       SYS_ASSERT(tail.starts_with(tail_prefix_key) || tail.starts_with(tail_prefix_alias),
                  chain::plugin_config_exception,
                  "KMS ARN tail must start with 'key/' or 'alias/', got \"{}\" in \"{}\"",
                  tail, spec_data);
-      // Reject bare prefixes: `key/` or `alias/` with nothing after them.
-      SYS_ASSERT(tail.size() > tail_prefix_key.size() &&
-                 (!tail.starts_with(tail_prefix_alias) || tail.size() > tail_prefix_alias.size()),
-                 chain::plugin_config_exception,
+      // Reject bare prefixes: `key/` or `alias/` with nothing after them. The
+      // assertion above guarantees `tail` starts with exactly one of the two,
+      // so the prefix actually present determines how much to strip.
+      const auto name = tail.starts_with(tail_prefix_key)
+                           ? tail.substr(tail_prefix_key.size())
+                           : tail.substr(tail_prefix_alias.size());
+      SYS_ASSERT(!name.empty(), chain::plugin_config_exception,
                  "KMS ARN tail \"{}\" has empty key/alias name", tail);
 
       return kms_key_ref{region, tail};
@@ -392,15 +439,15 @@ kms_key_ref parse_kms_spec(std::string_view spec_data) {
    // supported `arn:aws:kms:` form above is a malformed or out-of-scope ARN,
    // never shorthand. Falling through to the `<region>:<key-id>` parser below
    // would split on the first colon and silently yield region="arn"; AWS then
-   // rejects that only at first sign — with an opaque `InvalidRegion`/endpoint
+   // rejects that only at first sign -- with an opaque `InvalidRegion`/endpoint
    // error, after a billable attempt. Fail loudly here instead, naming the
    // offending partition and service. Non-`aws` partitions (`aws-cn`,
    // `aws-us-gov`) are deliberately out of scope; this is the boundary that
    // enforces it. A mis-cased `ARN:AWS:KMS:...` and a typo'd service
-   // (`arn:aws:ksm:...`) land here too — the message points at the canonical
+   // (`arn:aws:ksm:...`) land here too -- the message points at the canonical
    // form in every case.
    if (starts_with_ci(spec_data, arn_lead_in)) {
-      const auto parts = fc::split(std::string{spec_data}, ':', kms_arn_segment_count);
+      const auto parts = fc::split(spec_data, ':', kms_arn_segment_count);
       std::string partition, service;
       if (parts.size() > arn_idx_partition)
          partition = parts[arn_idx_partition];
@@ -468,6 +515,13 @@ bool normalise_low_s(std::array<unsigned char, 64>& compact) {
 unsigned char recover_v(const std::array<unsigned char, 64>& compact,
                         std::span<const std::uint8_t, 32>    digest,
                         const fc::em::public_key&            expected) {
+   // ECDSA recovery ids span {0, 1, 2, 3}. Ids 2 and 3 only arise when the
+   // signature's `r` had to be reduced modulo the curve order `n` because the
+   // ephemeral point's x-coordinate exceeded `n` -- a ~2^-128 event that no
+   // compliant ECDSA implementation, AWS KMS included, ever emits. The
+   // recoverable set is therefore exactly {0, 1}. Do not widen this bound
+   // speculatively: a genuine id of 2/3 would mean KMS returned a
+   // non-canonical signature, which is a defect to surface, not to absorb.
    for (unsigned char rec_id = 0; rec_id < 2; ++rec_id) {
       fc::em::compact_signature trial{};
       std::ranges::copy(compact, trial.begin());
@@ -547,13 +601,13 @@ kms_signer make_kms_signature_provider(const kms_key_ref&             ref,
       get_kms_client(ref.region), ref.key_id, shim.unwrapped());
 
    fc::crypto::sign_fn sign = [state](const chain::digest_type& digest) -> chain::signature_type {
-      // Public-key pinning. Before the first — and only the first — billable
+      // Public-key pinning. Before the first -- and only the first -- billable
       // Sign, fetch the KMS key's own public key with the free GetPublicKey
       // API and assert it matches the key pinned in the spec. This turns the
       // common "wrong <public-key> in the spec" mistake into a fast, direct
       // error instead of an opaque recovery failure that would otherwise
       // surface only after a paid Sign. If the opt-in startup probe already
-      // ran the check, this is a no-op — both paths share `state->pin_once`
+      // ran the check, this is a no-op -- both paths share `state->pin_once`
       // through `ensure_kms_pubkey_pinned`.
       ensure_kms_pubkey_pinned(*state);
 
@@ -561,7 +615,7 @@ kms_signer make_kms_signature_provider(const kms_key_ref&             ref,
       // already a hash; otherwise it would re-hash with SHA-256 and break
       // any chain that hashes with anything other than SHA-256.
       Aws::KMS::Model::SignRequest req;
-      req.SetKeyId(Aws::String{state->key_id.c_str()});
+      req.SetKeyId(Aws::String{state->key_id});
       req.SetMessage(Aws::Utils::ByteBuffer{
          digest.to_uint8_span().data(),
          digest.to_uint8_span().size()});
@@ -585,7 +639,7 @@ kms_signer make_kms_signature_provider(const kms_key_ref&             ref,
    };
 
    // Startup probe: runs the same one-shot pinning check as the first Sign,
-   // but issues only the free GetPublicKey — no billable Sign. An opt-in
+   // but issues only the free GetPublicKey -- no billable Sign. An opt-in
    // plugin_startup() calls this so a missing credential, bad region, absent
    // IAM grant, or wrong pinned key fails loudly at boot instead of deep in
    // production. It shares `state` (hence `pin_once`) with `sign`, so enabling
@@ -611,7 +665,7 @@ std::shared_ptr<Aws::KMS::KMSClient> get_kms_client(const std::string& region) {
    auto& slot = c.by_region[region];
    if (!slot) {
       Aws::Client::ClientConfiguration cfg;
-      cfg.region = Aws::String{region.c_str()};
+      cfg.region = Aws::String{region};
       slot = std::make_shared<Aws::KMS::KMSClient>(cfg);
    }
    return slot;
