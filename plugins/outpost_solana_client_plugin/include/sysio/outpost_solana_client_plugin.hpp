@@ -16,6 +16,26 @@ using namespace fc::network::solana;
 /// both speak a single constant when locating the program's IDL entry.
 inline constexpr const char* OPP_SOLANA_OUTPOST_PROGRAM_NAME = "opp_outpost";
 
+/// Interval between successive `getSignaturesForAddress` + log-scan attempts
+/// inside the underwriter daemon's `verify_source_deposit_sol`. Kept long
+/// enough to keep the RPC load production-acceptable — a tighter interval is
+/// reserved for tighter-budget flows (e.g. tx-confirmation polling at the
+/// `processed` commitment level, ~400ms).
+///
+/// Shared with the underwriter plugin so the production-tuning lever lives
+/// in one place per chain client.
+inline constexpr auto SOL_SWAP_DEPOSIT_POLL_INTERVAL = fc::seconds(15);
+
+/// Total wall-clock budget for `verify_source_deposit_sol` to find the
+/// `SwapDeposit` marker log line emitted by `opp-outpost::request_swap`.
+/// On expiry the verifier returns `false` and the underwriter's outer poll
+/// loop reattempts on its next tick. 120s comfortably covers:
+///   - the slot it took for `request_swap` to land + finalize, AND
+///   - the RPC `getSignaturesForAddress` window (default ~1000 sigs back),
+///   - across an `solana-test-validator` cluster (no ledger pruning within
+///     this horizon) and a production RPC (≥ 2 epochs of tx history).
+inline constexpr auto SOL_SWAP_DEPOSIT_TOTAL_TIMEOUT = fc::seconds(120);
+
 struct solana_client_entry_t {
    std::string                        id;
    std::string                        url;
@@ -95,6 +115,12 @@ struct opp_solana_outpost_client : fc::network::solana::solana_program_client {
    solana_program_tx_fn<std::string, int32_t, std::vector<uint8_t>> add_attestation;
    /// `deposit(operator_type: u8, wire_account_name: string, amount: u64) -> signature`.
    solana_program_tx_fn<std::string, uint8_t, std::string, uint64_t> deposit;
+   /// `commit_underwrite(uic_bytes: bytes) -> signature`.
+   /// Relays an underwriter's signed `UnderwriteIntentCommit` to the
+   /// outpost as opaque bytes. The on-chain handler stores the bytes
+   /// for the next outbound envelope so the batch operator can relay
+   /// the COMMIT back to the depot; no other state changes.
+   solana_program_tx_fn<std::string, std::vector<uint8_t>> commit_underwrite;
 
    opp_solana_outpost_client(const solana_client_ptr& client,
                              const fc::network::solana::solana_public_key& prog_id,
@@ -281,7 +307,22 @@ struct opp_solana_outpost_client : fc::network::solana::solana_program_client {
            return execute_tx_and_confirm(instr, resolve_accounts(instr, params, overrides), params);
         })
       , add_attestation(create_tx_and_confirm<std::string, int32_t, std::vector<uint8_t>>(get_idl("add_attestation")))
-      , deposit(create_tx_and_confirm<std::string, uint8_t, std::string, uint64_t>(get_idl("deposit"))) {}
+      , deposit(create_tx_and_confirm<std::string, uint8_t, std::string, uint64_t>(get_idl("deposit")))
+      // commit_underwrite is `(uic_bytes: bytes) -> signature`. The IDL declares
+      // three accounts — `underwriter` (signer, default-resolved from the
+      // client), `operator_registry` (PDA), and `outbound_message_buffer`
+      // (PDA). IDL v2 (Anchor 0.31+) does not embed PDA seeds, so the typed
+      // wrapper must inject the pre-derived PDAs as overrides — same pattern
+      // as `epoch_in` / `emit_outbound_envelope` above.
+      , commit_underwrite([this](std::vector<uint8_t> uic_bytes) -> std::string {
+           account_overrides_t overrides = {
+              {"operator_registry",        operator_registry_pda},
+              {"outbound_message_buffer",  outbound_message_buffer_pda},
+           };
+           auto& instr = get_idl("commit_underwrite");
+           program_invoke_data_items params = {fc::variant(uic_bytes)};
+           return execute_tx_and_confirm(instr, resolve_accounts(instr, params, overrides), params);
+        }) {}
 };
 
 class outpost_solana_client_plugin : public appbase::plugin<outpost_solana_client_plugin> {
@@ -310,13 +351,13 @@ public:
     * and constructs an `outpost_solana_client` bound to the given program id.
     *
     * @param sol_client_id  Id passed to `--outpost-solana-client`.
-    * @param outpost_id     Outpost id from `sysio.epoch::outposts`.
+    * @param chain_code     Outpost id from `sysio.epoch::outposts`.
     * @param chain_id       Numeric chain id from the outpost row (Solana = 0).
     * @param program_id     Base58 address of the deployed OPP outpost program.
     * @throws fc::exception if the client id is unknown or no matching IDL is loaded.
     */
    std::shared_ptr<outpost_client> create_outpost_client(const std::string& sol_client_id,
-                                                       uint64_t           outpost_id,
+                                                       uint64_t           chain_code,
                                                        uint32_t           chain_id,
                                                        const std::string& program_id);
 

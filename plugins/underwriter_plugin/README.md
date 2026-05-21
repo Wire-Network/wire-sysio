@@ -33,7 +33,7 @@ Every `--underwriter-scan-interval-ms` (default 5 s):
 
 1. `poll_own_status()` — short-circuit if the underwriter's status has
    flipped to `SLASHED` / `TERMINATED`.
-2. `read_outpost_registry()` — refresh the `(outpost_id → chain_kind)`
+2. `read_outpost_registry()` — refresh the `(chain_code → chain_kind)`
    cache from `sysio.epoch::outposts`.
 3. `read_credit_lines()` — compute available bond per
    `(chain, token_kind)` by mirroring the depot's `sysio.opreg::available()`
@@ -58,7 +58,7 @@ Every `--underwriter-scan-interval-ms` (default 5 s):
 For each leg of every selected uwreq:
 
 1. Construct a proto `UnderwriteIntentCommit` with `uw_account`,
-   `uw_request_id`, `outpost_id`, and a blank `signature`.
+   `uw_request_id`, `chain_code`, and a blank `signature`.
 2. Serialize the proto, compute `sha256(blanked_bytes)` — the digest.
 3. Sign the digest via `signature_provider_manager_plugin::query_providers`
    (WIRE chain kind + K1 key type). The fc::crypto::signature is packed

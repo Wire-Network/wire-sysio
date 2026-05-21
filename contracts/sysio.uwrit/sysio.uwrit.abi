@@ -68,7 +68,7 @@
                     "type": "AttestationType"
                 },
                 {
-                    "name": "outpost_id",
+                    "name": "chain_code",
                     "type": "uint64"
                 },
                 {
@@ -162,7 +162,7 @@
                     "type": "name"
                 },
                 {
-                    "name": "outpost_id",
+                    "name": "chain_code",
                     "type": "uint64"
                 },
                 {

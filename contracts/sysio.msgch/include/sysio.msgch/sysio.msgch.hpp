@@ -28,22 +28,22 @@ namespace sysio {
       /// Computes sha256 checksum trustlessly, stores in envelopes table,
       /// then calls evalcons inline to check consensus.
       ///
-      /// `outpost_id` is the originating chain's slug_name value (the underlying
+      /// `chain_code` is the originating chain's slug_name value (the underlying
       /// `uint64` of `sysio::slug_name`). The depot looks the row up directly
-      /// on `sysio.chains::chains` keyed by `code.value == outpost_id`; the
+      /// on `sysio.chains::chains` keyed by `code.value == chain_code`; the
       /// numeric value IS the slug_name, and `sysio.epoch::advance` uses the
       /// same convention when fanning out `queueout` / `buildenv` per outpost.
       [[sysio::action]]
-      void deliver(name batch_op_name, uint64_t outpost_id, std::vector<char> data);
+      void deliver(name batch_op_name, uint64_t chain_code, std::vector<char> data);
 
       /// Evaluate consensus on inbound envelopes for an outpost+epoch.
       /// Called inline from deliver. On consensus: unpacks envelope,
       /// stores messages + attestations, records per-outpost consensus.
       ///
-      /// `outpost_id` is the originating chain's slug_name value
+      /// `chain_code` is the originating chain's slug_name value
       /// (see `deliver` for the convention).
       [[sysio::action]]
-      void evalcons(uint64_t outpost_id, uint32_t epoch_index);
+      void evalcons(uint64_t chain_code, uint32_t epoch_index);
 
       /// Check if all-outpost consensus is reached AND next_epoch_start
       /// has passed. If yes, reset consensus and call advance.
@@ -54,7 +54,7 @@ namespace sysio {
       /// Queue an outbound attestation for an outpost.
       /// Writes to the attestations table with status READY.
       ///
-      /// `outpost_id` is the destination outpost's chain slug_name value
+      /// `chain_code` is the destination outpost's chain slug_name value
       /// (uint64). Called by sibling system contracts that need to send
       /// targeted depot → outpost envelopes:
       ///   * `sysio.epoch::advance` — `OPERATORS`, `BATCH_OPERATOR_GROUPS`
@@ -72,14 +72,14 @@ namespace sysio {
       /// the caller's perspective; abuse mitigation lives at the calling
       /// contracts' privileged-action gates.
       [[sysio::action]]
-      void queueout(uint64_t outpost_id,
+      void queueout(uint64_t chain_code,
                     opp::types::AttestationType attest_type,
                     std::vector<char> data);
 
       /// Build outbound envelope from READY attestations for an outpost.
       /// Collects attestations, packs into OPP Envelope, stores in outenvelopes.
       [[sysio::action]]
-      void buildenv(uint64_t outpost_id);
+      void buildenv(uint64_t chain_code);
 
       // -----------------------------------------------------------------------
       //  Tables
@@ -96,7 +96,7 @@ namespace sysio {
       /// Consensus is evaluated by comparing checksums across operators.
       struct [[sysio::table("envelopes")]] envelope_entry {
          uint64_t                  id;
-         uint64_t                  outpost_id;
+         uint64_t                  chain_code;
          uint32_t                  epoch_index;
          name                      batch_op_name;
          opp::types::ChainKind     chain_kind;
@@ -105,12 +105,12 @@ namespace sysio {
          time_point                received_at{};
 
          uint64_t by_outpost_epoch() const {
-            return (static_cast<uint64_t>(outpost_id) << 32) | epoch_index;
+            return (static_cast<uint64_t>(chain_code) << 32) | epoch_index;
          }
          uint64_t by_batch_op() const { return batch_op_name.value; }
 
          SYSLIB_SERIALIZE(envelope_entry,
-            (id)(outpost_id)(epoch_index)(batch_op_name)(chain_kind)
+            (id)(chain_code)(epoch_index)(batch_op_name)(chain_kind)
             (checksum)(raw_data)(received_at))
       };
 
@@ -124,7 +124,7 @@ namespace sysio {
       /// Individual message extracted from a consensus-verified envelope.
       struct [[sysio::table("messages")]] message_entry {
          uint64_t                        id;
-         uint64_t                        outpost_id;
+         uint64_t                        chain_code;
          uint32_t                        epoch_index;
          checksum256                     message_id;
          checksum256                     previous_message_id;
@@ -139,7 +139,7 @@ namespace sysio {
          checksum256 by_msg_id() const { return message_id; }
 
          SYSLIB_SERIALIZE(message_entry,
-            (id)(outpost_id)(epoch_index)(message_id)(previous_message_id)
+            (id)(chain_code)(epoch_index)(message_id)(previous_message_id)
             (direction)(status)(raw_payload)(received_at)(processed_at))
       };
 
@@ -156,7 +156,7 @@ namespace sysio {
       /// queued outbound attestation awaiting envelope packing.
       struct [[sysio::table("attestations")]] attestation_entry {
          uint64_t                        id;
-         uint64_t                        outpost_id;
+         uint64_t                        chain_code;
          uint32_t                        epoch_index;
          opp::types::AttestationType     type;
          opp::types::AttestationStatus   status;
@@ -170,7 +170,7 @@ namespace sysio {
          uint64_t by_epoch()  const { return epoch_index; }
 
          SYSLIB_SERIALIZE(attestation_entry,
-            (id)(outpost_id)(epoch_index)(type)(status)(data)
+            (id)(chain_code)(epoch_index)(type)(status)(data)
             (pending_timestamp)(ready_timestamp)(processed_timestamp))
       };
 
@@ -186,7 +186,7 @@ namespace sysio {
       /// Outbound envelope table.
       struct [[sysio::table("outenvelopes")]] outbound_envelope {
          uint64_t    id;
-         uint64_t    outpost_id;
+         uint64_t    chain_code;
          uint32_t    epoch_index;
          checksum256 envelope_hash;
          checksum256 merkle_root;
@@ -195,13 +195,13 @@ namespace sysio {
          opp::types::EnvelopeStatus status;
          std::vector<char> raw_envelope;
 
-         uint64_t by_outpost() const { return outpost_id; }
+         uint64_t by_outpost() const { return chain_code; }
          uint64_t by_outpost_epoch() const {
-            return (static_cast<uint64_t>(outpost_id) << 32) | epoch_index;
+            return (static_cast<uint64_t>(chain_code) << 32) | epoch_index;
          }
 
          SYSLIB_SERIALIZE(outbound_envelope,
-            (id)(outpost_id)(epoch_index)(envelope_hash)(merkle_root)
+            (id)(chain_code)(epoch_index)(envelope_hash)(merkle_root)
             (start_message_id)(end_message_id)(status)(raw_envelope))
       };
 
@@ -214,23 +214,55 @@ namespace sysio {
 
       /// Per-outpost consensus primary key.
       struct outpost_consensus_key {
-         uint64_t outpost_id;
-         SYSLIB_SERIALIZE(outpost_consensus_key, (outpost_id))
+         uint64_t chain_code;
+         SYSLIB_SERIALIZE(outpost_consensus_key, (chain_code))
       };
 
       /// Per-outpost consensus tracking for the current epoch.
       /// One row per outpost. Rows reused (not erased) to avoid RAM churn.
       struct [[sysio::table("outpcons")]] outpost_consensus_entry {
-         uint64_t outpost_id;
+         uint64_t chain_code;
          uint32_t epoch_index;
          bool     consensus_reached;
 
          SYSLIB_SERIALIZE(outpost_consensus_entry,
-            (outpost_id)(epoch_index)(consensus_reached))
+            (chain_code)(epoch_index)(consensus_reached))
       };
 
       using outpost_consensus_t =
          sysio::kv::table<"outpcons"_n, outpost_consensus_key, outpost_consensus_entry>;
+
+      /// Singleton holding the monotonic next-attestation-id counter.
+      ///
+      /// Why a singleton instead of `atts.available_primary_key()`: the
+      /// `buildenv` outbound-bundle cleanup at the bottom of this file
+      /// erases the just-bundled `ATTESTATION_STATUS_PROCESSED` rows for
+      /// the destination `chain_code`. Inbound `deliver()`-inserted rows
+      /// also carry `status = PROCESSED` (they go straight to dispatch),
+      /// so the cleanup drains both. Once the atts table is empty,
+      /// `available_primary_key()` resets to 0, our `std::max(1, ...)`
+      /// floor bumps it to 1 — and the next inbound `SwapRequest` gets
+      /// the SAME attestation_id as a prior phase. The downstream
+      /// `sysio.uwrit::createuwreq` idempotency guard
+      /// (`reqs.contains(pk)`) then short-circuits the second phase,
+      /// silently dropping the new swap.
+      ///
+      /// `att_seq` is a one-row table holding `next` — the next id to
+      /// mint. `mint_att_id()` reads + bumps it atomically. Cleanup
+      /// passes through.
+      struct att_seq_key {
+         uint64_t id;
+         SYSLIB_SERIALIZE(att_seq_key, (id))
+      };
+
+      struct [[sysio::table("attseq")]] att_seq_entry {
+         uint64_t id;     // always 0 (singleton row)
+         uint64_t next;   // next attestation_id to mint
+
+         SYSLIB_SERIALIZE(att_seq_entry, (id)(next))
+      };
+
+      using att_seq_t = sysio::kv::table<"attseq"_n, att_seq_key, att_seq_entry>;
 
       /// Audit-trail row for the durable envelope log. Pure metadata —
       /// `endpoints` (start/end ChainId pair from the inbound or outbound

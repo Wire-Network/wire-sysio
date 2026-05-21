@@ -77,7 +77,6 @@ void tokens::activtoken(sysio::slug_name code) {
 void tokens::regctok(sysio::slug_name   chain_code,
                       sysio::slug_name   token_code,
                       std::vector<char> contract_addr,
-                      uint32_t          precision_override,
                       bool              is_native) {
    require_priv_caller();
 
@@ -104,7 +103,6 @@ void tokens::regctok(sysio::slug_name   chain_code,
       .chain_code         = chain_code,
       .token_code         = token_code,
       .contract_addr      = std::move(contract_addr),
-      .precision_override = precision_override,
       .is_native          = is_native,
       .active             = bootstrap,
       .registered_at_ms   = now,

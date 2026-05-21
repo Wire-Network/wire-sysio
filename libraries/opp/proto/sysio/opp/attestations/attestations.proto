@@ -149,12 +149,17 @@ message SwapRequest {
   uint64                       target_token_code  = 6;
   uint64                       target_reserve_code = 7;
   sysio.opp.types.ChainAddress recipient    = 8;
-  // Quoted destination amount at deposit time, in destination-chain token units.
-  uint64                       quoted_destination_amount = 9;
-  // Variance tolerance in basis points.
-  uint32                       quote_tolerance_bps       = 10;
-  // Quote timestamp.
-  uint64                       quote_timestamp_ms        = 11;
+  // Target destination amount at deposit time, in destination-chain token units.
+  // The user expresses the minimum they accept; the depot's variance check
+  // compares the live `swapquote` output against this and rejects if drift
+  // exceeds `target_tolerance_bps`. The user need not have fetched a quote
+  // before submitting — they may be arbitraging, guessing, or simply naming
+  // a preferred minimum.
+  uint64                       target_amount             = 9;
+  // Variance tolerance in basis points (e.g. 50 = 0.5%).
+  uint32                       target_tolerance_bps      = 10;
+  // Timestamp the user set their target at — informational only.
+  uint64                       target_timestamp_ms       = 11;
   // Source-chain transaction id of the funding deposit.
   bytes                        source_tx_id              = 12;
 }

@@ -163,7 +163,7 @@ BOOST_FIXTURE_TEST_CASE(createuwreq_requires_msgch_auth, sysio_uwrit_tester) { t
    BOOST_REQUIRE(push_uwrit_action("uwrit.a"_n, "createuwreq"_n, mvo()
       ("attestation_id", 1)
       ("type", sysio::opp::types::AttestationType::ATTESTATION_TYPE_SWAP_REQUEST)
-      ("outpost_id", 1)
+      ("chain_code", 1)
       ("data", std::vector<char>{})
    ).find("missing authority of sysio.msgch") != std::string::npos);
 } FC_LOG_AND_RETHROW() }
@@ -196,7 +196,7 @@ BOOST_FIXTURE_TEST_CASE(rcrdcommit_requires_msgch_auth, sysio_uwrit_tester) { tr
    BOOST_REQUIRE(push_uwrit_action("uwrit.a"_n, "rcrdcommit"_n, mvo()
       ("uwreq_id",         1)
       ("underwriter",      "uwrit.a")
-      ("outpost_id",       1)
+      ("chain_code",       1)
       ("from_chain_code",  codename_mvo("ETH"))
       ("from_token_code",  codename_mvo("ETH"))
       ("reserve_code",     codename_mvo("PRIMARY"))
@@ -213,7 +213,7 @@ BOOST_FIXTURE_TEST_CASE(rcrdcommit_rejects_unknown_uwreq, sysio_uwrit_tester) { 
       push_uwrit_action(MSGCH_ACCOUNT, "rcrdcommit"_n, mvo()
          ("uwreq_id",         42)
          ("underwriter",      "uwrit.a")
-         ("outpost_id",       1)
+         ("chain_code",       1)
          ("from_chain_code",  codename_mvo("ETH"))
          ("from_token_code",  codename_mvo("ETH"))
          ("reserve_code",     codename_mvo("PRIMARY"))
@@ -263,7 +263,7 @@ BOOST_FIXTURE_TEST_CASE(rcrdcommit_same_chain_swap_auth, sysio_uwrit_tester) { t
    BOOST_REQUIRE(push_uwrit_action("uwrit.a"_n, "rcrdcommit"_n, mvo()
       ("uwreq_id",         7)
       ("underwriter",      "uwrit.a")
-      ("outpost_id",       1)
+      ("chain_code",       1)
       ("from_chain_code",  codename_mvo("ETH"))      // src == dst chain
       ("from_token_code",  codename_mvo("USDC"))     // distinguishes legs
       ("reserve_code",     codename_mvo("PRIMARY"))
@@ -296,7 +296,7 @@ BOOST_FIXTURE_TEST_CASE(rcrdcommit_malformed_uic_does_not_halt, sysio_uwrit_test
    auto r = push_uwrit_action(MSGCH_ACCOUNT, "rcrdcommit"_n, mvo()
       ("uwreq_id",         9001)
       ("underwriter",      "uwrit.a")
-      ("outpost_id",       1)
+      ("chain_code",       1)
       ("from_chain_code",  codename_mvo("ETH"))
       ("from_token_code",  codename_mvo("ETH"))
       ("reserve_code",     codename_mvo("PRIMARY"))

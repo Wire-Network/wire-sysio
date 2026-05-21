@@ -92,7 +92,7 @@ void outpost_opp_job::run_outbound() {
       return;
    }
 
-   auto pending = _depot.read_pending_outbound(_client->outpost_id(), epoch);
+   auto pending = _depot.read_pending_outbound(_client->chain_code(), epoch);
    if (!pending) {
       dlog("outpost_opp_job[{}]: no pending outbound for epoch {}",
            _client->to_string(), epoch);
@@ -162,7 +162,7 @@ void outpost_opp_job::run_inbound() {
    if (epoch == 0) return;
 
    try {
-      if (_depot.has_delivered_envelope(_client->outpost_id(), epoch)) {
+      if (_depot.has_delivered_envelope(_client->chain_code(), epoch)) {
          dlog("outpost_opp_job[{}]: already delivered for epoch {}",
               _client->to_string(), epoch);
          return;
@@ -189,7 +189,7 @@ void outpost_opp_job::run_inbound() {
          });
       } FC_LOG_AND_DROP("outpost_opp_job[{}]: emit_debug_envelope threw", _client->to_string());
 
-      _depot.deliver_to_depot(_client->outpost_id(), raw);
+      _depot.deliver_to_depot(_client->chain_code(), raw);
       ilog("outpost_opp_job[{}]: delivered {} inbound bytes to depot for epoch {}",
            _client->to_string(), raw.size(), epoch);
    } catch (const fc::exception& e) {
