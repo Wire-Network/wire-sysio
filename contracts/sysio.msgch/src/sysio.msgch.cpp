@@ -6,6 +6,7 @@
 #include <sysio/opp/opp.pb.hpp>
 #include <sysio/opp/attestations/attestations.pb.hpp>
 #include <zpp_bits.h>
+#include <algorithm>
 
 namespace sysio {
 
@@ -58,6 +59,32 @@ uint32_t current_epoch_index() {
    return tbl.exists() ? tbl.get().current_epoch_index : 0;
 }
 
+/// Mint the next attestation id from the `attseq` singleton.
+///
+/// Replaces a `std::max<uint64_t>(1, atts.available_primary_key())` call
+/// at every `attestations_t` insertion site. The `attseq` singleton survives the
+/// `buildenv` cleanup of `ATTESTATION_STATUS_PROCESSED` rows, so the
+/// monotonic counter keeps advancing across phases even when the atts
+/// table is drained. Without this, Phase N+1's inbound `SwapRequest`
+/// inherits Phase 1's attestation_id and collides with the existing UWREQ
+/// row in `sysio.uwrit` — `createuwreq`'s idempotency guard then
+/// silently drops the new swap.
+///
+/// First call materialises the row at `next = 2` and returns `1`.
+/// Subsequent calls return the current `next` and post-increment.
+uint64_t mint_att_id(name self) {
+   msgch::att_seq_t seq(self);
+   msgch::att_seq_key pk{0};
+   if (!seq.contains(pk)) {
+      seq.emplace(self, pk, msgch::att_seq_entry{ .id = 0, .next = 2 });
+      return 1;
+   }
+   auto row = seq.get(pk);
+   uint64_t out = row.next;
+   seq.modify(same_payer, pk, [&](auto& r) { r.next = out + 1; });
+   return out;
+}
+
 uint32_t epoch_operators_per_group() {
    epoch::epochcfg_t tbl(EPOCH_ACCOUNT);
    return tbl.exists() ? tbl.get().operators_per_epoch : 7;
@@ -81,7 +108,7 @@ void write_envelope_log(name self,
                         uint32_t                     epoch_index,
                         const checksum256&           checksum) {
    sysio::msgch::envelope_log_t tbl(self);
-   const uint64_t new_id = tbl.available_primary_key();
+   const uint64_t new_id = std::max<uint64_t>(1, tbl.available_primary_key());
    tbl.emplace(self, sysio::msgch::id_key{new_id}, sysio::msgch::envelope_log_entry{
       .id          = new_id,
       .endpoints   = endpoints,
@@ -287,7 +314,7 @@ void dispatch_operator_action(name self, const std::vector<char>& data,
 /// key. (void)-cast for now; future trust-boundary checks may cross-
 /// reference `uic.chain_code`'s owning chain row against `from_chain`.
 void dispatch_underwrite_commit(name self, const std::vector<char>& data,
-                                ChainKind from_chain, uint64_t outpost_id) {
+                                ChainKind from_chain, uint64_t chain_code) {
    opp::attestations::UnderwriteIntentCommit uic;
    {
       auto in = zpp::bits::in{std::span{data.data(), data.size()}, zpp::bits::no_size{}};
@@ -301,7 +328,7 @@ void dispatch_underwrite_commit(name self, const std::vector<char>& data,
    action(
       permission_level{self, "active"_n},
       UWRIT_ACCOUNT, "rcrdcommit"_n,
-      std::make_tuple(uic.uw_request_id, name{uic.uw_account.name}, outpost_id,
+      std::make_tuple(uic.uw_request_id, name{uic.uw_account.name}, chain_code,
                       sysio::slug_name{uic.chain_code},
                       sysio::slug_name{uic.token_code},
                       sysio::slug_name{uic.reserve_code},
@@ -371,7 +398,7 @@ void dispatch_reserve_create_cancel(name self, const std::vector<char>& data) {
 void dispatch_attestation(name self, uint64_t attestation_id,
                           AttestationType type,
                           const std::vector<char>& data,
-                          ChainKind from_chain, uint64_t outpost_id,
+                          ChainKind from_chain, uint64_t chain_code,
                           const checksum256& original_message_id) {
    switch (type) {
       case AttestationType::ATTESTATION_TYPE_OPERATOR_ACTION:
@@ -382,12 +409,12 @@ void dispatch_attestation(name self, uint64_t attestation_id,
          action(
             permission_level{self, "active"_n},
             UWRIT_ACCOUNT, "createuwreq"_n,
-            std::make_tuple(attestation_id, type, outpost_id, data)
+            std::make_tuple(attestation_id, type, chain_code, data)
          ).send();
          break;
 
       case AttestationType::ATTESTATION_TYPE_UNDERWRITE_INTENT_COMMIT:
-         dispatch_underwrite_commit(self, data, from_chain, outpost_id);
+         dispatch_underwrite_commit(self, data, from_chain, chain_code);
          break;
 
       case AttestationType::ATTESTATION_TYPE_SWAP_REMIT:
@@ -590,20 +617,20 @@ void msgch::bootstrap() {
 // ---------------------------------------------------------------------------
 //  deliver — batch operator delivers inbound OPP data for a specific outpost
 // ---------------------------------------------------------------------------
-void msgch::deliver(name batch_op_name, uint64_t outpost_id, std::vector<char> data) {
+void msgch::deliver(name batch_op_name, uint64_t chain_code, std::vector<char> data) {
    is_batch_operator_active(batch_op_name);
    check(!data.empty(), "delivery data cannot be empty");
 
    // Verify outpost exists on the new `sysio.chains::chains` table.
-   // `outpost_id` is the originating chain's slug_name value (uint64) per
+   // `chain_code` is the originating chain's slug_name value (uint64) per
    // the v6 data-model refactor — the chain row's PK is `code.value`.
    // Reject deliveries from the depot self-row (`is_depot==true`) and
    // from inactive chains; both are protocol invariants.
    sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
-   auto chain_pk = sysio::chains::chain_key{sysio::slug_name{outpost_id}};
+   auto chain_pk = sysio::chains::chain_key{sysio::slug_name{chain_code}};
    check(chains_tbl.contains(chain_pk), "outpost not found in sysio.chains");
    auto op_row = chains_tbl.get(chain_pk);
-   check(!op_row.is_depot, "deliver: outpost_id refers to the depot self-row");
+   check(!op_row.is_depot, "deliver: chain_code refers to the depot self-row");
    check(op_row.active, "deliver: outpost is not active");
 
    // Decode envelope to validate epoch_index matches current WIRE epoch
@@ -625,7 +652,7 @@ void msgch::deliver(name batch_op_name, uint64_t outpost_id, std::vector<char> d
    // Prevent duplicate delivery from same operator for same outpost+epoch
    envelopes_t envs(get_self());
    auto oe_idx = envs.get_index<"byoutepoch"_n>();
-   uint64_t composite = (static_cast<uint64_t>(outpost_id) << 32) | epoch;
+   uint64_t composite = (static_cast<uint64_t>(chain_code) << 32) | epoch;
    for (auto it = oe_idx.lower_bound(composite);
         it != oe_idx.end() && it->by_outpost_epoch() == composite; ++it) {
       if (it->batch_op_name == batch_op_name) {
@@ -635,11 +662,11 @@ void msgch::deliver(name batch_op_name, uint64_t outpost_id, std::vector<char> d
    }
 
    // Store envelope
-   uint64_t env_id = envs.available_primary_key();
+   uint64_t env_id = std::max<uint64_t>(1, envs.available_primary_key());
 
    envs.emplace(get_self(), id_key{env_id}, envelope_entry{
       .id            = env_id,
-      .outpost_id    = outpost_id,
+      .chain_code    = chain_code,
       .epoch_index   = epoch,
       .batch_op_name = batch_op_name,
       // `chain_kind` is the VM family (ChainKind enum) of the originating
@@ -658,19 +685,19 @@ void msgch::deliver(name batch_op_name, uint64_t outpost_id, std::vector<char> d
       permission_level{get_self(), "active"_n},
       get_self(),
       "evalcons"_n,
-      std::make_tuple(outpost_id, epoch)
+      std::make_tuple(chain_code, epoch)
    ).send();
 }
 
 // ---------------------------------------------------------------------------
 //  evalcons — evaluate consensus on inbound envelopes for outpost+epoch
 // ---------------------------------------------------------------------------
-void msgch::evalcons(uint64_t outpost_id, uint32_t epoch_index) {
+void msgch::evalcons(uint64_t chain_code, uint32_t epoch_index) {
    require_auth(get_self());
 
    envelopes_t envs(get_self());
    auto oe_idx = envs.get_index<"byoutepoch"_n>();
-   uint64_t composite = (static_cast<uint64_t>(outpost_id) << 32) | epoch_index;
+   uint64_t composite = (static_cast<uint64_t>(chain_code) << 32) | epoch_index;
 
    // Group envelopes by checksum (CDT-compatible parallel vectors)
    std::vector<checksum256>       seen_checksums;
@@ -727,6 +754,36 @@ void msgch::evalcons(uint64_t outpost_id, uint32_t epoch_index) {
    if (!consensus_reached) return;
 
    // === CONSENSUS REACHED ===
+   //
+   // Idempotency guard: `evalcons` is re-fired by every `deliver` call. If a
+   // post-quorum batch op delivers (3rd-of-3 after a 2-of-3 reach), we hit
+   // this branch a second time and would otherwise re-store the envelope's
+   // messages + re-dispatch every attestation under fresh `att_id`s. That
+   // re-dispatch turns every late delivery into a duplicate `createuwreq`
+   // (etc.), surfacing as `assertion failure with message: ... already
+   // exists` even though the late delivery itself is a benign no-op per
+   // `opp-consensus.md`. Skip the dispatch block when an INBOUND message
+   // for this (chain_code, epoch) is already on file.
+   {
+      messages_t msgs(get_self());
+      auto ep_idx = msgs.get_index<"byepoch"_n>();
+      bool already_dispatched = false;
+      for (auto it = ep_idx.lower_bound(epoch_index);
+           it != ep_idx.end() && it->by_epoch() == epoch_index; ++it) {
+         if (it->chain_code == chain_code
+             && it->direction == MessageDirection::MESSAGE_DIRECTION_INBOUND) {
+            already_dispatched = true;
+            break;
+         }
+      }
+      if (already_dispatched) {
+         sysio::print_f("evalcons: chain_code=%llu epoch=%u already dispatched, "
+                        "treating post-quorum delivery as benign no-op\n",
+                        static_cast<unsigned long long>(chain_code), epoch_index);
+         return;
+      }
+   }
+
    auto& raw    = checksum_data[consensus_group];
    auto  now    = current_time_point();
    auto  now_sec = static_cast<uint64_t>(now.sec_since_epoch());
@@ -740,11 +797,11 @@ void msgch::evalcons(uint64_t outpost_id, uint32_t epoch_index) {
 
    // Store the raw envelope as an inbound message
    messages_t msgs(get_self());
-   uint64_t msg_id = msgs.available_primary_key();
+   uint64_t msg_id = std::max<uint64_t>(1, msgs.available_primary_key());
 
    msgs.emplace(get_self(), id_key{msg_id}, message_entry{
       .id           = msg_id,
-      .outpost_id   = outpost_id,
+      .chain_code   = chain_code,
       .epoch_index  = epoch,
       .direction    = MessageDirection::MESSAGE_DIRECTION_INBOUND,
       .status       = MessageStatus::MESSAGE_STATUS_PROCESSED,
@@ -768,24 +825,33 @@ void msgch::evalcons(uint64_t outpost_id, uint32_t epoch_index) {
       // routing is sourced from each attestation's own `chain_code`
       // field per the v6 data-model refactor.
       sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
-      auto chain_pk = sysio::chains::chain_key{sysio::slug_name{outpost_id}};
+      auto chain_pk = sysio::chains::chain_key{sysio::slug_name{chain_code}};
       if (chains_tbl.contains(chain_pk)) {
          from_chain = chains_tbl.get(chain_pk).kind;
       }
    }
    for (auto& msg : envelope.messages) {
       for (auto& entry : msg.payload.attestations) {
-         uint64_t att_id = atts.available_primary_key();
+         uint64_t att_id = mint_att_id(get_self());
+         // Inbound attestations land in the same `atts` table as
+         // outbound (queued by `queueout`) — but they must NEVER feed
+         // back into `buildenv` for the source outpost (the outpost
+         // doesn't have handlers for its own emitted types, e.g. ETH
+         // outpost reverts `OPP_UnhandledAttestationType(SwapRequest)`
+         // when an inbound SwapRequest gets echoed back). Store them
+         // with `status = PROCESSED` directly so the secondary index
+         // `bystatus` query in `buildenv` skips them — the dispatch
+         // call below is the row's full lifecycle on the depot.
          atts.emplace(get_self(), id_key{att_id}, attestation_entry{
             .id                  = att_id,
-            .outpost_id          = outpost_id,
+            .chain_code          = chain_code,
             .epoch_index         = epoch,
             .type                = entry.type,
-            .status              = AttestationStatus::ATTESTATION_STATUS_READY,
+            .status              = AttestationStatus::ATTESTATION_STATUS_PROCESSED,
             .data                = entry.data,
             .pending_timestamp   = 0,
             .ready_timestamp     = now_sec,
-            .processed_timestamp = 0,
+            .processed_timestamp = now_sec,
          });
          // Reconstruct the OPP message_id as a checksum256 so downstream
          // handlers (DEPOSIT_REVERT correlation, future audit trails) can
@@ -799,7 +865,7 @@ void msgch::evalcons(uint64_t outpost_id, uint32_t epoch_index) {
             msg_id = checksum256{raw};
          }
          dispatch_attestation(get_self(), att_id, entry.type, entry.data,
-                              from_chain, outpost_id, msg_id);
+                              from_chain, chain_code, msg_id);
       }
    }
 
@@ -816,7 +882,7 @@ void msgch::evalcons(uint64_t outpost_id, uint32_t epoch_index) {
       // the audit-log endpoint pair; `kind` projects to `ChainId.kind`.
       const auto op_row = [&]() {
          sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
-         return chains_tbl.get(sysio::chains::chain_key{sysio::slug_name{outpost_id}});
+         return chains_tbl.get(sysio::chains::chain_key{sysio::slug_name{chain_code}});
       }();
 
       sysio::opp::Endpoints endpoints;
@@ -828,7 +894,7 @@ void msgch::evalcons(uint64_t outpost_id, uint32_t epoch_index) {
       write_envelope_log(get_self(), endpoints, epoch, seen_checksums[consensus_group]);
 
       // Drop the HEAVY `raw_data` from each per-batch-op `envelopes` row,
-      // but KEEP the metadata tuple `(outpost_id, epoch_index, batch_op_name)`
+      // but KEEP the metadata tuple `(chain_code, epoch_index, batch_op_name)`
       // intact. `epoch::advance` reads this metadata via the `byoutepoch`
       // index to compute `did_deliver` per group member — erasing the rows
       // here destroys that signal and miscredits every batchop as
@@ -859,10 +925,10 @@ void msgch::evalcons(uint64_t outpost_id, uint32_t epoch_index) {
 
    // === RECORD PER-OUTPOST CONSENSUS ===
    outpost_consensus_t opcons(get_self());
-   auto opc_pk = outpost_consensus_key{outpost_id};
+   auto opc_pk = outpost_consensus_key{chain_code};
    if (!opcons.contains(opc_pk)) {
       opcons.emplace(get_self(), opc_pk, outpost_consensus_entry{
-         .outpost_id        = outpost_id,
+         .chain_code        = chain_code,
          .epoch_index       = epoch_index,
          .consensus_reached = true,
       });
@@ -917,7 +983,7 @@ void msgch::chkcons() {
 
    // All conditions met — reset consensus and advance
    for (auto it = opcons.begin(); it != opcons.end(); ++it) {
-      auto opc_pk = outpost_consensus_key{it.key().outpost_id};
+      auto opc_pk = outpost_consensus_key{it.key().chain_code};
       opcons.modify(same_payer, opc_pk, [&](auto& r) { r.consensus_reached = false; });
    }
 
@@ -932,17 +998,17 @@ void msgch::chkcons() {
 // ---------------------------------------------------------------------------
 //  queueout — queue outbound attestation for an outpost
 // ---------------------------------------------------------------------------
-void msgch::queueout(uint64_t outpost_id,
+void msgch::queueout(uint64_t chain_code,
                      opp::types::AttestationType attest_type,
                      std::vector<char> data) {
    auto now_sec = static_cast<uint64_t>(current_time_point().sec_since_epoch());
 
    attestations_t atts(get_self());
-   uint64_t att_id = atts.available_primary_key();
+   uint64_t att_id = mint_att_id(get_self());
 
    atts.emplace(get_self(), id_key{att_id}, attestation_entry{
       .id                  = att_id,
-      .outpost_id          = outpost_id,
+      .chain_code          = chain_code,
       .epoch_index         = current_epoch_index(),
       .type                = attest_type,
       .status              = AttestationStatus::ATTESTATION_STATUS_READY,
@@ -962,7 +1028,7 @@ void msgch::queueout(uint64_t outpost_id,
 //  Solana (`emit_outbound_inner`) and Ethereum (`emitOutboundEnvelope`)
 //  packing-loop pattern — never drop, never refuse, always emit what fits.
 // ---------------------------------------------------------------------------
-void msgch::buildenv(uint64_t outpost_id) {
+void msgch::buildenv(uint64_t chain_code) {
    require_auth(EPOCH_ACCOUNT);
 
    uint32_t epoch = current_epoch_index();
@@ -981,7 +1047,7 @@ void msgch::buildenv(uint64_t outpost_id) {
            static_cast<uint64_t>(AttestationStatus::ATTESTATION_STATUS_READY));
         it != status_idx.end() &&
         it->status == AttestationStatus::ATTESTATION_STATUS_READY; ++it) {
-      if (it->outpost_id != outpost_id) continue;
+      if (it->chain_code != chain_code) continue;
 
       opp::AttestationEntry entry;
       entry.type = it->type;
@@ -1066,11 +1132,11 @@ void msgch::buildenv(uint64_t outpost_id) {
 
    // Store outbound envelope
    outenvelopes_t envelopes(get_self());
-   uint64_t out_id = envelopes.available_primary_key();
+   uint64_t out_id = std::max<uint64_t>(1, envelopes.available_primary_key());
 
    envelopes.emplace(get_self(), id_key{out_id}, outbound_envelope{
       .id            = out_id,
-      .outpost_id    = outpost_id,
+      .chain_code    = chain_code,
       .epoch_index   = epoch,
       .envelope_hash = sha256(packed.data(), packed.size()),
       .status        = EnvelopeStatus::ENVELOPE_STATUS_PENDING_DELIVERY,
@@ -1090,7 +1156,7 @@ void msgch::buildenv(uint64_t outpost_id) {
       // — `kind` → `ChainId.kind`, `external_chain_id` → `ChainId.id`.
       const auto op_row = [&]() {
          sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
-         return chains_tbl.get(sysio::chains::chain_key{sysio::slug_name{outpost_id}});
+         return chains_tbl.get(sysio::chains::chain_key{sysio::slug_name{chain_code}});
       }();
 
       sysio::opp::Endpoints endpoints;
@@ -1104,8 +1170,8 @@ void msgch::buildenv(uint64_t outpost_id) {
 
       // Drop previous outpost emits — keep only the row we just inserted.
       auto by_outpost = envelopes.get_index<"byoutpost"_n>();
-      for (auto it = by_outpost.lower_bound(outpost_id);
-           it != by_outpost.end() && it->outpost_id == outpost_id; ) {
+      for (auto it = by_outpost.lower_bound(chain_code);
+           it != by_outpost.end() && it->chain_code == chain_code; ) {
          if (it->id == out_id) { ++it; continue; }
          it = by_outpost.erase(std::move(it));
       }
@@ -1118,7 +1184,7 @@ void msgch::buildenv(uint64_t outpost_id) {
                         static_cast<uint64_t>(AttestationStatus::ATTESTATION_STATUS_PROCESSED));
            it != processed_idx.end() &&
            it->status == AttestationStatus::ATTESTATION_STATUS_PROCESSED; ) {
-         if (it->outpost_id != outpost_id) { ++it; continue; }
+         if (it->chain_code != chain_code) { ++it; continue; }
          it = processed_idx.erase(std::move(it));
       }
    }

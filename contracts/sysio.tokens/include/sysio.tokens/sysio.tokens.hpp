@@ -64,7 +64,6 @@ namespace sysio {
       void regctok(sysio::slug_name   chain_code,
                    sysio::slug_name   token_code,
                    std::vector<char> contract_addr,
-                   uint32_t          precision_override,
                    bool              is_native);
 
       [[sysio::action]]
@@ -121,7 +120,6 @@ namespace sysio {
          sysio::slug_name   chain_code;
          sysio::slug_name   token_code;
          std::vector<char> contract_addr;
-         uint32_t          precision_override = 0;
          bool              is_native          = false;
          bool              active             = false;
          uint64_t          registered_at_ms   = 0;
@@ -132,7 +130,7 @@ namespace sysio {
          uint64_t by_active()     const { return active ? 1 : 0; }
 
          SYSLIB_SERIALIZE(chain_token_row,
-            (chain_code)(token_code)(contract_addr)(precision_override)
+            (chain_code)(token_code)(contract_addr)
             (is_native)(active)(registered_at_ms)(activated_at_ms))
       };
 

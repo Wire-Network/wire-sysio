@@ -329,10 +329,10 @@ public:
       produce_blocks();
    }
 
-   action_result deliver(uint64_t outpost_id, const std::vector<char>& data) {
+   action_result deliver(uint64_t chain_code, const std::vector<char>& data) {
       return push(MSGCH_ACCOUNT, msgch_abi, BATCHOP, "deliver"_n, mvo()
          ("batch_op_name", BATCHOP.to_string())
-         ("outpost_id",    outpost_id)
+         ("chain_code",    chain_code)
          ("data",          data));
    }
 
@@ -405,7 +405,7 @@ BOOST_FIXTURE_TEST_CASE(dispatch_routes_deposit_to_opreg, sysio_dispatch_tester)
       sysio::opp::types::ATTESTATION_TYPE_OPERATOR_ACTION,
       operator_payload);
 
-   BOOST_REQUIRE_EQUAL(success(), deliver(/*outpost_id=*/eth_code, envelope));
+   BOOST_REQUIRE_EQUAL(success(), deliver(/*chain_code=*/eth_code, envelope));
 
    auto op = get_operator(UWRIT_OP);
    BOOST_REQUIRE(!op.is_null());
@@ -422,7 +422,7 @@ BOOST_FIXTURE_TEST_CASE(dispatch_routes_withdraw_request_to_opreg, sysio_dispatc
    constexpr int64_t WITHDRAW_AMOUNT = 2'000'000;
    const auto eth_code = fc::slug_name{"ETH"}.value;
 
-   // The depot dedups per-(batch_op, outpost_id, epoch) — a second `deliver`
+   // The depot dedups per-(batch_op, chain_code, epoch) — a second `deliver`
    // from the same batch op in the same epoch is silently dropped. To exercise
    // both dispatch branches in one test, both attestations ride a single
    // envelope.
@@ -440,7 +440,7 @@ BOOST_FIXTURE_TEST_CASE(dispatch_routes_withdraw_request_to_opreg, sysio_dispatc
       eth_code, eth_code,
       WITHDRAW_AMOUNT);
 
-   BOOST_REQUIRE_EQUAL(success(), deliver(/*outpost_id=*/eth_code,
+   BOOST_REQUIRE_EQUAL(success(), deliver(/*chain_code=*/eth_code,
       encode_envelope_with_attestations(current_epoch(),
          sysio::opp::types::ATTESTATION_TYPE_OPERATOR_ACTION,
          {deposit_payload, wtdw_payload})));
@@ -463,7 +463,7 @@ BOOST_FIXTURE_TEST_CASE(dispatch_silently_drops_out_of_scope_types, sysio_dispat
       sysio::opp::types::ATTESTATION_TYPE_STAKE,
       std::string{});
 
-   BOOST_REQUIRE_EQUAL(success(), deliver(/*outpost_id=*/eth_code, envelope));
+   BOOST_REQUIRE_EQUAL(success(), deliver(/*chain_code=*/eth_code, envelope));
 
    auto op = get_operator(UWRIT_OP);
    BOOST_REQUIRE(!op.is_null());

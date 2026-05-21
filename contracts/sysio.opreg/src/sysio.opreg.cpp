@@ -519,8 +519,8 @@ OperatorAction build_slash_action(name account,
 void emit_slash_attestation(name self, const OperatorAction& slash_action) {
    const sysio::slug_name chain_code{slash_action.chain_code};
    if (chain_code == kWireChainCode) return;
-   auto outpost_id = find_outpost_id_for_chain(chain_code);
-   if (!outpost_id) return;   // no outpost on this chain — nothing to slash through
+   auto resolved = find_outpost_id_for_chain(chain_code);
+   if (!resolved) return;   // no outpost on this chain — nothing to slash through
 
    // `no_size{}` — raw protobuf bytes, no 4-byte zpp length prefix. The
    // outpost decodes the attestation `data` field as a pure protobuf
@@ -532,7 +532,7 @@ void emit_slash_attestation(name self, const OperatorAction& slash_action) {
    action(
       permission_level{self, "active"_n},
       opreg::MSGCH_ACCOUNT, "queueout"_n,
-      std::make_tuple(*outpost_id,
+      std::make_tuple(*resolved,
          AttestationType::ATTESTATION_TYPE_OPERATOR_ACTION, encoded)
    ).send();
 }
@@ -549,8 +549,8 @@ void emit_deposit_revert(name self,
                          uint64_t amount,
                          const checksum256& original_message_id,
                          const std::string& reason) {
-   auto outpost_id = find_outpost_id_for_chain(source_chain_code);
-   if (!outpost_id) return;     // no outpost on this chain — nothing to refund through
+   auto chain_code = find_outpost_id_for_chain(source_chain_code);
+   if (!chain_code) return;     // no outpost on this chain — nothing to refund through
 
    opp::attestations::DepositRevert dr;
    dr.depositor = depositor;
@@ -571,7 +571,7 @@ void emit_deposit_revert(name self,
    action(
       permission_level{self, "active"_n},
       opreg::MSGCH_ACCOUNT, "queueout"_n,
-      std::make_tuple(*outpost_id,
+      std::make_tuple(*chain_code,
          AttestationType::ATTESTATION_TYPE_DEPOSIT_REVERT, encoded)
    ).send();
 }
@@ -621,8 +621,8 @@ void emit_withdraw_remit(name self,
                          sysio::slug_name token_code,
                          uint64_t amount,
                          uint64_t request_id) {
-   auto outpost_id = find_outpost_id_for_chain(chain_code);
-   if (!outpost_id) return;
+   auto resolved = find_outpost_id_for_chain(chain_code);
+   if (!resolved) return;
 
    OperatorAction oa;
    oa.action_type = OperatorAction::ACTION_TYPE_WITHDRAW_REMIT;
@@ -643,7 +643,7 @@ void emit_withdraw_remit(name self,
    action(
       permission_level{self, "active"_n},
       opreg::MSGCH_ACCOUNT, "queueout"_n,
-      std::make_tuple(*outpost_id,
+      std::make_tuple(*resolved,
          AttestationType::ATTESTATION_TYPE_OPERATOR_ACTION, encoded)
    ).send();
 }

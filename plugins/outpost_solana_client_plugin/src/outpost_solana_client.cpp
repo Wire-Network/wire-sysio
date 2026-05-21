@@ -22,6 +22,7 @@ namespace {
 // ── Op labels used for deadline-exceeded error messages ──────────────────
 constexpr std::string_view OP_EPOCH_IN    = "deliver_outbound_envelope:epoch_in";
 constexpr std::string_view OP_READ_LATEST = "read_inbound_envelope:get_account_info";
+constexpr std::string_view OP_UW_COMMIT   = "uw_commit:commit_underwrite";
 
 /// 8-byte Anchor discriminator that prefixes every `#[account]`-tagged
 /// account's serialized form.
@@ -110,6 +111,14 @@ extract_inbound_recipient_pubkeys(const std::vector<char>& envelope_bytes) {
                }
                break;
             }
+            case sysio::opp::types::ATTESTATION_TYPE_SWAP_REMIT: {
+               sysio::opp::attestations::SwapRemit sr;
+               if (!sr.ParseFromString(entry.data())) continue;
+               if (auto pk = sol_pubkey_from_chain_address(sr.recipient())) {
+                  record_unique(*pk);
+               }
+               break;
+            }
             default:
                break;
          }
@@ -119,17 +128,52 @@ extract_inbound_recipient_pubkeys(const std::vector<char>& envelope_bytes) {
    return recipients;
 }
 
+std::vector<reserve_pda_seeds>
+extract_inbound_swap_remit_reserve_seeds(const std::vector<char>& envelope_bytes) {
+   std::vector<reserve_pda_seeds> seeds;
+
+   sysio::opp::Envelope env;
+   if (!env.ParseFromArray(envelope_bytes.data(),
+                           static_cast<int>(envelope_bytes.size()))) {
+      wlog("outpost_solana_client: envelope decode for swap-remit reserve "
+           "seeds extraction failed; submitting epoch_in with no Reserve "
+           "PDAs (SWAP_REMIT lamport transfers will log-and-skip on-chain "
+           "if any are present)");
+      return seeds;
+   }
+
+   auto record_unique = [&seeds](uint64_t token_code, uint64_t reserve_code) {
+      auto matches = [&](const reserve_pda_seeds& s) {
+         return s.token_code == token_code && s.reserve_code == reserve_code;
+      };
+      if (std::find_if(seeds.begin(), seeds.end(), matches) == seeds.end()) {
+         seeds.push_back(reserve_pda_seeds{token_code, reserve_code});
+      }
+   };
+
+   for (const auto& message : env.messages()) {
+      for (const auto& entry : message.payload().attestations()) {
+         if (entry.type() != sysio::opp::types::ATTESTATION_TYPE_SWAP_REMIT) continue;
+         sysio::opp::attestations::SwapRemit sr;
+         if (!sr.ParseFromString(entry.data())) continue;
+         record_unique(sr.amount().token_code(), sr.reserve_code());
+      }
+   }
+
+   return seeds;
+}
+
 } // namespace
 
 outpost_solana_client::outpost_solana_client(
    solana_client_entry_ptr                        entry,
    fc::network::solana::solana_public_key         program_id,
    std::vector<fc::network::solana::idl::program> program_idls,
-   uint64_t                                       outpost_id,
+   uint64_t                                       chain_code,
    uint32_t                                       chain_id)
    : _entry(std::move(entry))
    , _program_id(program_id)
-   , _outpost_id(outpost_id)
+   , _outpost_id(chain_code)
    , _chain_id(chain_id) {
    FC_ASSERT(_entry && _entry->client,
              "solana_client_entry must carry a client");
@@ -170,11 +214,36 @@ std::string outpost_solana_client::deliver_outbound_envelope(
    // CPI transfers fire. Non-final chunks don't process attestations
    // so they don't need the extras and skipping them keeps each
    // chunk-write tx as small as possible (closer to the 1 232-byte MTU).
-   const auto recipient_pubkeys =
+   auto recipient_pubkeys =
       outpost_solana_client_detail::extract_inbound_recipient_pubkeys(envelope_bytes);
+
+   // SWAP_REMIT: the on-chain `handle_swap_remit` needs the per-(token,
+   // reserve) Reserve PDA in `remaining_accounts` to drain lamports out
+   // to the recipient. Derive the PDA seeds from each inbound SWAP_REMIT
+   // attestation and append the resolved PDA past the user's recipient
+   // pubkey. The deduped recipient list above already includes the
+   // SWAP_REMIT recipient (handled by the same extractor switch).
+   const auto reserve_seeds =
+      outpost_solana_client_detail::extract_inbound_swap_remit_reserve_seeds(envelope_bytes);
+   for (const auto& seeds : reserve_seeds) {
+      std::vector<uint8_t> seed1 = {'r','e','s','e','r','v','e'};
+      std::vector<uint8_t> seed2(8);
+      std::vector<uint8_t> seed3(8);
+      for (size_t i = 0; i < 8; ++i) {
+         seed2[i] = static_cast<uint8_t>((seeds.token_code   >> (i * 8)) & 0xff);
+         seed3[i] = static_cast<uint8_t>((seeds.reserve_code >> (i * 8)) & 0xff);
+      }
+      auto pda = fc::network::solana::system::find_program_address(
+         {seed1, seed2, seed3}, _program_id).first;
+      if (std::find(recipient_pubkeys.begin(), recipient_pubkeys.end(), pda)
+          == recipient_pubkeys.end()) {
+         recipient_pubkeys.push_back(pda);
+      }
+   }
+
    if (!recipient_pubkeys.empty()) {
       ilog("outpost_solana_client[{}]: epoch={} found {} inbound REMIT/REVERT "
-           "recipient(s) — passing as remaining_accounts on final chunk",
+           "recipient(s)/reserve(s) — passing as remaining_accounts on final chunk",
            to_string(), epoch_index, recipient_pubkeys.size());
    }
 
@@ -304,6 +373,23 @@ std::vector<char> outpost_solana_client::read_inbound_envelope(
    ilog("outpost_solana_client[{}]: read inbound envelope for epoch {} ({} bytes)",
         to_string(), epoch_index, envelope_bytes.size());
    return envelope_bytes;
+}
+
+std::string outpost_solana_client::uw_commit(
+   uint64_t                 uw_request_id,
+   const std::vector<char>& uic_bytes,
+   fc::microseconds         deadline) {
+   const auto deadline_abs = fc::time_point::now() + deadline;
+   throw_if_past_deadline(deadline_abs, OP_UW_COMMIT);
+
+   // `commit_underwrite(uic_bytes: bytes)` — opaque relay. The typed
+   // wrapper carries the IDL-default account list (config + outbound
+   // message buffer); the underwriter doesn't supply overrides.
+   std::vector<uint8_t> uic_bytes_u8(uic_bytes.begin(), uic_bytes.end());
+   auto signature = _program_client->commit_underwrite(std::move(uic_bytes_u8));
+   ilog("outpost_solana_client[{}]: uw_commit confirmed uwreq={} sig={} bytes={}",
+        to_string(), uw_request_id, signature, uic_bytes.size());
+   return signature;
 }
 
 } // namespace sysio

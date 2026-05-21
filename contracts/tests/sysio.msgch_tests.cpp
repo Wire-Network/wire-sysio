@@ -69,11 +69,11 @@ public:
       return success();
    }
 
-   action_result deliver(name op, uint64_t outpost_id,
+   action_result deliver(name op, uint64_t chain_code,
                          std::vector<char> data = {}) {
       return push_msgch_action(op, "deliver"_n, mvo()
          ("batch_op_name", op)
-         ("outpost_id", outpost_id)
+         ("chain_code", chain_code)
          ("data", data)
       );
    }
@@ -84,19 +84,19 @@ public:
       );
    }
 
-   action_result queueout(uint64_t outpost_id, uint16_t attest_type, std::vector<char> data = {}) {
+   action_result queueout(uint64_t chain_code, uint16_t attest_type, std::vector<char> data = {}) {
       return push_msgch_action(MSGCH_ACCOUNT, "queueout"_n, mvo()
-         ("outpost_id", outpost_id)
+         ("chain_code", chain_code)
          ("attest_type", attest_type)
          ("data", data)
       );
    }
 
-   action_result buildenv(uint64_t outpost_id) {
+   action_result buildenv(uint64_t chain_code) {
       return push_msgch_action(MSGCH_ACCOUNT, "buildenv"_n, {{
          EPOCH_ACCOUNT, config::active_name
       }}, mvo()
-         ("outpost_id", outpost_id)
+         ("chain_code", chain_code)
       );
    }
 
@@ -156,27 +156,27 @@ BOOST_FIXTURE_TEST_CASE(deliver_invalid_request, sysio_msgch_tester) { try {
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(queueout_basic, sysio_msgch_tester) { try {
-   // v6: outpost_id is the chain's slug_name value. `queueout` doesn't itself
+   // v6: chain_code is the chain's slug_name value. `queueout` doesn't itself
    // look up the chain, so storing under an arbitrary slug_name works; the
    // chain check happens at `buildenv` time. AttestationType: OPERATORS =
    // 60947 — any in-range, non-removed enum value suffices here; the test
    // only verifies the queueout/table mechanics.
-   const uint64_t outpost_id = fc::slug_name{"ETH"}.value;
-   BOOST_REQUIRE_EQUAL(success(), queueout(outpost_id, 60947));
+   const uint64_t chain_code = fc::slug_name{"ETH"}.value;
+   BOOST_REQUIRE_EQUAL(success(), queueout(chain_code, 60947));
 
    auto attest = get_attestation(0);
    BOOST_REQUIRE(!attest.is_null());
-   BOOST_REQUIRE_EQUAL(outpost_id, attest["outpost_id"].as_uint64());
+   BOOST_REQUIRE_EQUAL(chain_code, attest["chain_code"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(buildenv_basic, sysio_msgch_tester) { try {
    // v6 buildenv looks up the chain row in sysio.chains before doing any
    // packing work; without a registered chain it would fail with "key not
    // found". The empty-queue early-return happens before that lookup, so
-   // an unregistered outpost_id still returns success when there are no
+   // an unregistered chain_code still returns success when there are no
    // candidate attestations. This test pins THAT invariant.
-   const uint64_t outpost_id = fc::slug_name{"ETH"}.value;
-   BOOST_REQUIRE_EQUAL(success(), buildenv(outpost_id));
+   const uint64_t chain_code = fc::slug_name{"ETH"}.value;
+   BOOST_REQUIRE_EQUAL(success(), buildenv(chain_code));
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -264,9 +264,9 @@ public:
          ));
    }
 
-   action_result queueout(uint64_t outpost_id, uint32_t attest_type) {
+   action_result queueout(uint64_t chain_code, uint32_t attest_type) {
       return push_action(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "queueout"_n, mvo()
-         ("outpost_id",   outpost_id)
+         ("chain_code",   chain_code)
          ("attest_type",  attest_type)
          ("data",         std::vector<char>{0x01, 0x02, 0x03})
       );
@@ -276,19 +276,19 @@ public:
    /// the production attestation flow but lets the test author dial in the
    /// exact per-attestation size needed to drive the packing loop across
    /// the `MAX_ENVELOPE_BYTES` boundary.
-   action_result queueout_with_data(uint64_t outpost_id,
+   action_result queueout_with_data(uint64_t chain_code,
                                     uint32_t attest_type,
                                     std::vector<char> data) {
       return push_action(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "queueout"_n, mvo()
-         ("outpost_id",   outpost_id)
+         ("chain_code",   chain_code)
          ("attest_type",  attest_type)
          ("data",         std::move(data))
       );
    }
 
-   /// Count READY-status attestations for `outpost_id` by probing the
+   /// Count READY-status attestations for `chain_code` by probing the
    /// table by-id. Avoids needing an ABI binding for the secondary index.
-   uint32_t count_ready_attestations(uint64_t outpost_id, uint64_t scan_until) {
+   uint32_t count_ready_attestations(uint64_t chain_code, uint64_t scan_until) {
       uint32_t n = 0;
       for (uint64_t id = 0; id < scan_until; ++id) {
          auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "attestations"_n, id);
@@ -296,7 +296,7 @@ public:
          auto row = msgch_abi.binary_to_variant(
             "attestation_entry", data,
             abi_serializer::create_yield_function(abi_serializer_max_time));
-         if (row["outpost_id"].as_uint64() != outpost_id) continue;
+         if (row["chain_code"].as_uint64() != chain_code) continue;
          // status == READY (matches AttestationStatus::ATTESTATION_STATUS_READY,
          // the value the contract emits for queued-but-not-yet-bundled rows).
          if (row["status"].as<sysio::opp::types::AttestationStatus>() ==
@@ -305,9 +305,9 @@ public:
       return n;
    }
 
-   action_result buildenv(uint64_t outpost_id) {
+   action_result buildenv(uint64_t chain_code) {
       return push_action(MSGCH_ACCOUNT, EPOCH_ACCOUNT, "buildenv"_n, mvo()
-         ("outpost_id", outpost_id)
+         ("chain_code", chain_code)
       );
    }
 
@@ -328,7 +328,7 @@ BOOST_AUTO_TEST_SUITE(sysio_msgch_envlog_tests)
 
 namespace {
 
-/// In v6, `outpost_id` is the chain's slug_name value (uint64). All envlog
+/// In v6, `chain_code` is the chain's slug_name value (uint64). All envlog
 /// tests register one EVM-class chain via `register_outpost(...)` which uses
 /// the spelling `"ETH"`. ETH_OUTPOST_ID is the slug_name's packed value.
 constexpr uint64_t ETH_OUTPOST_ID = fc::slug_name_literals::operator""_s("ETH", 3).value;
@@ -344,8 +344,8 @@ BOOST_FIXTURE_TEST_CASE(buildenv_writes_envlog_row, sysio_msgch_envlog_tester) {
    register_outpost(opp::types::CHAIN_KIND_EVM, 31337);
    produce_blocks();
 
-   BOOST_REQUIRE_EQUAL(success(), queueout(/*outpost_id=*/ETH_OUTPOST_ID, /*type=*/60940));
-   BOOST_REQUIRE_EQUAL(success(), buildenv(/*outpost_id=*/ETH_OUTPOST_ID));
+   BOOST_REQUIRE_EQUAL(success(), queueout(/*chain_code=*/ETH_OUTPOST_ID, /*type=*/60940));
+   BOOST_REQUIRE_EQUAL(success(), buildenv(/*chain_code=*/ETH_OUTPOST_ID));
    produce_blocks();
 
    auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "envlog"_n, 0);
@@ -530,12 +530,12 @@ BOOST_FIXTURE_TEST_CASE(buildenv_packs_until_cap_then_leaves_remainder,
       std::vector<char> payload(PER_ATTEST_BYTES, 0x42);
       payload[0] = static_cast<char>(i);
       BOOST_REQUIRE_EQUAL(success(),
-         queueout_with_data(/*outpost_id=*/ETH_OUTPOST_ID, /*type=*/60940, payload));
+         queueout_with_data(/*chain_code=*/ETH_OUTPOST_ID, /*type=*/60940, payload));
    }
    produce_blocks();
 
    // First emit: packs as many as fit, drops the rest in queue.
-   BOOST_REQUIRE_EQUAL(success(), buildenv(/*outpost_id=*/ETH_OUTPOST_ID));
+   BOOST_REQUIRE_EQUAL(success(), buildenv(/*chain_code=*/ETH_OUTPOST_ID));
    produce_blocks();
 
    // The most recent emit lives at one of the early ids; the one-deep
@@ -561,7 +561,7 @@ BOOST_FIXTURE_TEST_CASE(buildenv_packs_until_cap_then_leaves_remainder,
    // ── Invariant 2: NOT every attestation made it into this envelope —
    //    the packing loop genuinely dropped some onto the next epoch.
    //    `count_ready_attestations` counts un-emitted (still READY) rows.
-   uint32_t still_ready = count_ready_attestations(/*outpost_id=*/ETH_OUTPOST_ID,
+   uint32_t still_ready = count_ready_attestations(/*chain_code=*/ETH_OUTPOST_ID,
                                                    /*scan_until=*/TOTAL_ATTESTATIONS + 4);
    BOOST_TEST_MESSAGE("emit#1 leftover READY = " << still_ready);
    BOOST_REQUIRE_GT(still_ready, 0u);
@@ -569,7 +569,7 @@ BOOST_FIXTURE_TEST_CASE(buildenv_packs_until_cap_then_leaves_remainder,
 
    // ── Invariant 3: a follow-up emit drains the remainder under the same
    //    cap. After this emit, no READY attestations should remain queued.
-   BOOST_REQUIRE_EQUAL(success(), buildenv(/*outpost_id=*/ETH_OUTPOST_ID));
+   BOOST_REQUIRE_EQUAL(success(), buildenv(/*chain_code=*/ETH_OUTPOST_ID));
    produce_blocks();
 
    // Find the new emitted row (one-deep retention dropped the prior one).
@@ -589,7 +589,7 @@ BOOST_FIXTURE_TEST_CASE(buildenv_packs_until_cap_then_leaves_remainder,
    BOOST_REQUIRE_LE(raw2.size(), MAX_ENV_BYTES);
 
    uint32_t still_ready_after_emit2 =
-      count_ready_attestations(/*outpost_id=*/ETH_OUTPOST_ID, /*scan_until=*/TOTAL_ATTESTATIONS + 4);
+      count_ready_attestations(/*chain_code=*/ETH_OUTPOST_ID, /*scan_until=*/TOTAL_ATTESTATIONS + 4);
    BOOST_REQUIRE_EQUAL(still_ready_after_emit2, 0u);
 } FC_LOG_AND_RETHROW() }
 

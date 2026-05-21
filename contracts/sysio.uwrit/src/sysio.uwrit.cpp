@@ -236,7 +236,7 @@ uint64_t swap_quote(sysio::slug_name src_chain_code,
 /// The slug_name pair `(source_chain_code, source_reserve_code)` is included
 /// so the outpost can locate the matching local reserve when refunding.
 void emit_swap_revert(name self,
-                      uint64_t outpost_id,
+                      uint64_t chain_code,
                       uint64_t attestation_id,
                       const opp::attestations::SwapRequest& sr,
                       sysio::slug_name source_chain_code,
@@ -263,7 +263,7 @@ void emit_swap_revert(name self,
    action(
       permission_level{self, "active"_n},
       uwrit::MSGCH_ACCOUNT, "queueout"_n,
-      std::make_tuple(outpost_id,
+      std::make_tuple(chain_code,
          opp::types::AttestationType::ATTESTATION_TYPE_SWAP_REVERT, encoded)
    ).send();
 }
@@ -358,6 +358,23 @@ void emit_swap_remit(name self,
    // decode (see sysio.msgch.cpp's SWAP_REMIT case).
    opp::attestations::SwapRemit remit;
    remit.recipient        = sr.recipient;
+   // FORCE recipient.kind to the destination chain's actual ChainKind.
+   // The ETH outpost's `requestSwap` deliberately ships SwapRequest with
+   // `recipient.kind = CHAIN_KIND_UNKNOWN` ("depot routes by chain_code,
+   // outposts decode by their own chain kind") — but the SOL outpost's
+   // off-chain cranker (`extract_inbound_recipient_pubkeys`) filters on
+   // `kind == CHAIN_KIND_SVM` to decide whether to forward the recipient
+   // pubkey as a `remaining_accounts` extra. UNKNOWN → dropped → on-chain
+   // `handle_swap_remit` rejects "recipient not in remaining_accounts".
+   // The depot resolves the dst chain's kind below from `sysio.chains`,
+   // so overwrite here so the off-chain cranker sees a coherent kind.
+   // Per the project rule against 0-as-sentinel for closed-set enums.
+   {
+      auto dst_kind_for_recipient = chain_kind_for_code(req.dst_chain_code);
+      check(dst_kind_for_recipient.has_value(),
+            "emit_swap_remit: cannot resolve dst chain kind for recipient");
+      remit.recipient.kind = *dst_kind_for_recipient;
+   }
    remit.amount           = opp::types::TokenAmount{
       .token_code = req.dst_token_code.value,
       .amount     = static_cast<int64_t>(req.dst_amount),
@@ -559,14 +576,24 @@ void uwrit::setconfig(uint32_t fee_bps,
 // ---------------------------------------------------------------------------
 void uwrit::createuwreq(uint64_t attestation_id,
                          opp::types::AttestationType type,
-                         uint64_t outpost_id,
+                         uint64_t chain_code,
                          std::vector<char> data) {
    require_auth(MSGCH_ACCOUNT);
 
    uwreqs_t reqs(get_self());
    auto pk = id_key{attestation_id};
-   check(!reqs.contains(pk),
-         "underwrite request already exists for this attestation");
+   // Duplicate-delivery is the protocol's normal idempotency case — every
+   // batch op re-relays the same envelope on each cron tick until the
+   // depot advances the epoch, so the second, third, ... batch op's
+   // `deliver → evalcons → dispatch → createuwreq` call lands on a row
+   // that's already present. Per `feedback_opp_handlers_never_throw.md`
+   // a `check()` here halts `evalcons` and stalls consensus across the
+   // chain. Silently no-op the duplicate and let the relay continue.
+   if (reqs.contains(pk)) {
+      sysio::print("createuwreq: uwreq ", attestation_id,
+                   " already exists, skipping idempotent re-delivery\n");
+      return;
+   }
 
    // Only SWAP_REQUEST attestations create UWREQs — msgch's dispatch routes
    // other types directly to their handlers, not through createuwreq.
@@ -603,7 +630,7 @@ void uwrit::createuwreq(uint64_t attestation_id,
    // consensus); instead emit a SwapRevert back to the source outpost so
    // the user's deposit is refunded and the run continues.
    if (sr.source_tx_id.empty()) {
-      emit_swap_revert(get_self(), outpost_id, attestation_id, sr,
+      emit_swap_revert(get_self(), chain_code, attestation_id, sr,
                        src_chain_code, src_reserve_code,
                        "SwapRequest rejected: source_tx_id is required "
                        "(no SwapRequest may be emitted without a "
@@ -620,17 +647,17 @@ void uwrit::createuwreq(uint64_t attestation_id,
    const uint64_t current_quote = swap_quote(src_chain_code, src_token_code, src_reserve_code,
                                               dst_chain_code, dst_token_code, dst_reserve_code,
                                               src_amount);
-   if (current_quote != 0 && sr.quoted_destination_amount != 0) {
-      uint64_t quoted   = sr.quoted_destination_amount;
-      uint64_t diff     = current_quote > quoted ? current_quote - quoted : quoted - current_quote;
-      // tolerance_bps / 10000 of quoted; computed in uint128 to avoid overflow.
-      uint128_t allowed = (static_cast<uint128_t>(quoted) * sr.quote_tolerance_bps) / 10000u;
+   if (current_quote != 0 && sr.target_amount != 0) {
+      uint64_t target   = sr.target_amount;
+      uint64_t diff     = current_quote > target ? current_quote - target : target - current_quote;
+      // tolerance_bps / 10000 of target; computed in uint128 to avoid overflow.
+      uint128_t allowed = (static_cast<uint128_t>(target) * sr.target_tolerance_bps) / 10000u;
       if (static_cast<uint128_t>(diff) > allowed) {
-         emit_swap_revert(get_self(), outpost_id, attestation_id, sr,
+         emit_swap_revert(get_self(), chain_code, attestation_id, sr,
                           src_chain_code, src_reserve_code,
-                          "variance exceeded tolerance: quoted=" + std::to_string(quoted)
+                          "variance exceeded tolerance: target=" + std::to_string(target)
                           + " current=" + std::to_string(current_quote)
-                          + " tolerance_bps=" + std::to_string(sr.quote_tolerance_bps));
+                          + " tolerance_bps=" + std::to_string(sr.target_tolerance_bps));
          return;   // no UWREQ created
       }
    }
@@ -646,8 +673,8 @@ void uwrit::createuwreq(uint64_t attestation_id,
       .dst_chain_code            = dst_chain_code,
       .dst_token_code            = dst_token_code,
       .dst_reserve_code          = dst_reserve_code,
-      .dst_amount                = sr.quoted_destination_amount,
-      .variance_tolerance_bps    = sr.quote_tolerance_bps,
+      .dst_amount                = sr.target_amount,
+      .variance_tolerance_bps    = sr.target_tolerance_bps,
       .source_tx_id              = sr.source_tx_id,
       .depositor                 = sr.actor.address,
       .commits_by                = {},
@@ -862,7 +889,7 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate) {
 // reserve_code as the tiebreaker.
 void uwrit::rcrdcommit(uint64_t uwreq_id,
                        name underwriter,
-                       uint64_t outpost_id,
+                       uint64_t chain_code,
                        sysio::slug_name from_chain_code,
                        sysio::slug_name from_token_code,
                        sysio::slug_name reserve_code,
@@ -900,11 +927,11 @@ void uwrit::rcrdcommit(uint64_t uwreq_id,
                               && reserve_code    == r.dst_reserve_code);
       if (is_source) {
          c->source_received_at_ms = now_ms;
-         c->source_outpost_id     = outpost_id;
+         c->source_outpost_id     = chain_code;
          c->source_uic_bytes      = uic_bytes;
       } else if (is_dest) {
          c->dest_received_at_ms = now_ms;
-         c->dest_outpost_id     = outpost_id;
+         c->dest_outpost_id     = chain_code;
          c->dest_uic_bytes      = uic_bytes;
       }
       // Re-set status to INTENT_SUBMITTED if the underwriter is re-arming

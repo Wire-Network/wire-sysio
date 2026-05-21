@@ -15,30 +15,30 @@ namespace sysio::test {
 class mock_depot_ops : public sysio::depot_ops {
 public:
    struct deliver_call {
-      uint64_t          outpost_id = 0;
+      uint64_t          chain_code = 0;
       std::vector<char> raw_messages;
    };
 
    std::optional<sysio::outbound_envelope_record>
-   read_pending_outbound(uint64_t outpost_id, uint32_t epoch_index) override {
+   read_pending_outbound(uint64_t chain_code, uint32_t epoch_index) override {
       std::lock_guard<std::mutex> lock(_mx);
-      read_pending_calls.push_back({outpost_id, epoch_index});
+      read_pending_calls.push_back({chain_code, epoch_index});
       if (pending_response) {
-         return pending_response(outpost_id, epoch_index);
+         return pending_response(chain_code, epoch_index);
       }
       return std::nullopt;
    }
 
-   bool has_delivered_envelope(uint64_t outpost_id, uint32_t epoch_index) override {
+   bool has_delivered_envelope(uint64_t chain_code, uint32_t epoch_index) override {
       std::lock_guard<std::mutex> lock(_mx);
-      has_delivered_calls.push_back({outpost_id, epoch_index});
+      has_delivered_calls.push_back({chain_code, epoch_index});
       if (has_delivered_response) {
-         return has_delivered_response(outpost_id, epoch_index);
+         return has_delivered_response(chain_code, epoch_index);
       }
       return false;
    }
 
-   void deliver_to_depot(uint64_t                 outpost_id,
+   void deliver_to_depot(uint64_t                 chain_code,
                          const std::vector<char>& raw_messages) override {
       // `deliver_thrower` runs before recording so a test can simulate the
       // WIRE-side push_action failing without losing the call evidence —
@@ -46,7 +46,7 @@ public:
       // the production failure path looks like.
       if (deliver_thrower) deliver_thrower();
       std::lock_guard<std::mutex> lock(_mx);
-      deliver_calls.push_back({outpost_id, raw_messages});
+      deliver_calls.push_back({chain_code, raw_messages});
    }
 
    void emit_debug_envelope(sysio::opp::debugging::DebugEnvelopeEvent event) override {
@@ -87,7 +87,7 @@ public:
    std::function<void()> deliver_thrower;
 
    // Call recorders
-   struct key { uint64_t outpost_id; uint32_t epoch_index; };
+   struct key { uint64_t chain_code; uint32_t epoch_index; };
    std::vector<key>          read_pending_calls;
    std::vector<key>          has_delivered_calls;
    std::vector<deliver_call> deliver_calls;

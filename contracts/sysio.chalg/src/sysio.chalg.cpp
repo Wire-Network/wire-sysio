@@ -1,5 +1,7 @@
 #include <sysio.chalg/sysio.chalg.hpp>
 
+#include <algorithm>
+
 namespace sysio {
 
 using opp::types::ChallengeStatus;
@@ -20,7 +22,7 @@ void chalg::initchal(uint64_t chain_req_id) {
 
    auto now = current_time_point();
 
-   uint64_t next_id = challenges.available_primary_key();
+   uint64_t next_id = std::max<uint64_t>(1, challenges.available_primary_key());
 
    challenge_entry c{};
    c.id               = next_id;
@@ -110,7 +112,7 @@ void chalg::escalate(uint64_t challenge_id) {
       // Escalate to next automatic round
       auto now = current_time_point();
 
-      uint64_t next_id = challenges.available_primary_key();
+      uint64_t next_id = std::max<uint64_t>(1, challenges.available_primary_key());
 
       challenges.emplace(get_self(), challenge_key{next_id}, challenge_entry{
          .id               = next_id,
@@ -161,7 +163,7 @@ void chalg::submitres(name submitter,
          "only escalated challenges accept manual resolution");
 
    resolutions_t resolutions(get_self());
-   uint64_t next_id = resolutions.available_primary_key();
+   uint64_t next_id = std::max<uint64_t>(1, resolutions.available_primary_key());
 
    resolutions.emplace(submitter, resolution_key{next_id}, manual_resolution{
       .id                  = next_id,
