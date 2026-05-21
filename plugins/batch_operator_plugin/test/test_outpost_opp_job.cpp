@@ -95,7 +95,7 @@ BOOST_AUTO_TEST_CASE(run_outbound_delivers_and_emits_eth_depot_direction) {
    depot.epoch = 5;
 
    outbound_envelope_record rec;
-   rec.outpost_id   = 0;
+   rec.chain_code   = 0;
    rec.epoch_index  = 5;
    rec.raw_envelope = {'e', 'n', 'v'};
    depot.pending_response = [rec](uint64_t, uint32_t) -> std::optional<outbound_envelope_record> {
@@ -294,7 +294,7 @@ BOOST_AUTO_TEST_CASE(run_inbound_delivers_to_depot_and_emits_eth_depot_signal) {
    job.run_inbound();
 
    BOOST_REQUIRE_EQUAL(depot.deliver_calls.size(), 1u);
-   BOOST_CHECK_EQUAL(depot.deliver_calls[0].outpost_id, 0u);
+   BOOST_CHECK_EQUAL(depot.deliver_calls[0].chain_code, 0u);
    BOOST_CHECK(depot.deliver_calls[0].raw_messages == raw);
 
    BOOST_REQUIRE_EQUAL(depot.emitted_events.size(), 1u);

@@ -170,12 +170,12 @@ DataStream& operator>>(DataStream& ds, Token& t) {
 
 template <typename DataStream>
 DataStream& operator<<(DataStream& ds, const ChainToken& t) {
-   return ds << t.chain_code << t.token_code << t.contract_addr << t.precision_override
+   return ds << t.chain_code << t.token_code << t.contract_addr
              << t.is_native << t.active << t.registered_at_ms << t.activated_at_ms;
 }
 template <typename DataStream>
 DataStream& operator>>(DataStream& ds, ChainToken& t) {
-   return ds >> t.chain_code >> t.token_code >> t.contract_addr >> t.precision_override
+   return ds >> t.chain_code >> t.token_code >> t.contract_addr
              >> t.is_native >> t.active >> t.registered_at_ms >> t.activated_at_ms;
 }
 
@@ -405,8 +405,8 @@ DataStream& operator<<(DataStream& ds, const SwapRequest& t) {
    return ds << t.actor << t.source_amount
              << t.source_chain_code << t.source_reserve_code
              << t.target_chain_code << t.target_token_code << t.target_reserve_code
-             << t.recipient << t.quoted_destination_amount
-             << t.quote_tolerance_bps << t.quote_timestamp_ms
+             << t.recipient << t.target_amount
+             << t.target_tolerance_bps << t.target_timestamp_ms
              << t.source_tx_id;
 }
 template <typename DataStream>
@@ -414,8 +414,8 @@ DataStream& operator>>(DataStream& ds, SwapRequest& t) {
    return ds >> t.actor >> t.source_amount
              >> t.source_chain_code >> t.source_reserve_code
              >> t.target_chain_code >> t.target_token_code >> t.target_reserve_code
-             >> t.recipient >> t.quoted_destination_amount
-             >> t.quote_tolerance_bps >> t.quote_timestamp_ms
+             >> t.recipient >> t.target_amount
+             >> t.target_tolerance_bps >> t.target_timestamp_ms
              >> t.source_tx_id;
 }
 
@@ -424,13 +424,13 @@ DataStream& operator>>(DataStream& ds, SwapRequest& t) {
 template <typename DataStream>
 DataStream& operator<<(DataStream& ds, const UnderwriteIntentCommit& t) {
    return ds << t.uw_account << t.uw_ext_chain_addr << t.uw_request_id
-             << t.outpost_id << t.signature
+             << t.chain_code << t.signature
              << t.token_code << t.chain_code << t.reserve_code;
 }
 template <typename DataStream>
 DataStream& operator>>(DataStream& ds, UnderwriteIntentCommit& t) {
    return ds >> t.uw_account >> t.uw_ext_chain_addr >> t.uw_request_id
-             >> t.outpost_id >> t.signature
+             >> t.chain_code >> t.signature
              >> t.token_code >> t.chain_code >> t.reserve_code;
 }
 
@@ -568,13 +568,13 @@ DataStream& operator>>(DataStream& ds, NodeOwnerReg& t) {
 // StakingReward — v6: adds chain_code + reserve_code.
 template <typename DataStream>
 DataStream& operator<<(DataStream& ds, const StakingReward& t) {
-   return ds << t.outpost_id << t.staker_wire_account << t.share_bps
+   return ds << t.chain_code << t.staker_wire_account << t.share_bps
              << t.period_start_ms << t.period_end_ms << t.reward_amount
              << t.chain_code << t.reserve_code;
 }
 template <typename DataStream>
 DataStream& operator>>(DataStream& ds, StakingReward& t) {
-   return ds >> t.outpost_id >> t.staker_wire_account >> t.share_bps
+   return ds >> t.chain_code >> t.staker_wire_account >> t.share_bps
              >> t.period_start_ms >> t.period_end_ms >> t.reward_amount
              >> t.chain_code >> t.reserve_code;
 }

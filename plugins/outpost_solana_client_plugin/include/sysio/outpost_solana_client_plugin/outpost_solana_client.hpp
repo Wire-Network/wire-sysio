@@ -56,14 +56,14 @@ public:
    outpost_solana_client(solana_client_entry_ptr                             entry,
                          fc::network::solana::solana_public_key              program_id,
                          std::vector<fc::network::solana::idl::program>      program_idls,
-                         uint64_t                                            outpost_id,
+                         uint64_t                                            chain_code,
                          uint32_t                                            chain_id);
 
    // ── outpost_client SPI ───────────────────────────────────────────────
    sysio::opp::types::ChainKind chain_kind() const override;
-   uint64_t                     outpost_id() const override { return _outpost_id; }
+   uint64_t                     chain_code() const override { return _outpost_id; }
    uint32_t                     chain_id()   const override { return _chain_id; }
-   // to_string() inherits the base-class default: "{outpost_id}:{ChainKind}:{chain_id}".
+   // to_string() inherits the base-class default: "{chain_code}:{ChainKind}:{chain_id}".
 
    std::string deliver_outbound_envelope(uint32_t                 epoch_index,
                                          const std::vector<char>& envelope_bytes,
@@ -71,6 +71,10 @@ public:
 
    std::vector<char> read_inbound_envelope(uint32_t         epoch_index,
                                            fc::microseconds deadline) override;
+
+   std::string uw_commit(uint64_t                 uw_request_id,
+                         const std::vector<char>& uic_bytes,
+                         fc::microseconds         deadline) override;
 
    // Expose for inspection / tests
    const solana_client_entry_ptr&                entry()                 const { return _entry; }
@@ -114,6 +118,28 @@ namespace outpost_solana_client_detail {
 /// synthesised Envelope without spinning up a full Solana client.
 std::vector<fc::network::solana::solana_public_key>
 extract_inbound_recipient_pubkeys(const std::vector<char>& envelope_bytes);
+
+/// `(token_code, reserve_code)` pair for a Reserve PDA derivation. Used
+/// by the SWAP_REMIT remaining-accounts path: the cranker walks inbound
+/// SWAP_REMIT attestations, collects every (token_code, reserve_code)
+/// pair, and the caller derives + appends the corresponding Reserve
+/// PDA(s) past the IDL's declared accounts on the final-chunk
+/// `epoch_in` submission. Without this the on-chain `handle_swap_remit`
+/// can't `find_remaining_account` the Reserve PDA and queues
+/// SWAP_REJECTED instead of paying the recipient.
+struct reserve_pda_seeds {
+   uint64_t token_code;
+   uint64_t reserve_code;
+};
+
+/// Walk every `SWAP_REMIT` attestation in `envelope_bytes` and collect
+/// the (token_code, reserve_code) pair for each. Caller derives the
+/// Reserve PDA via Anchor's `find_program_address` with the
+/// `[RESERVE_SEED, &token_code.to_le_bytes(), &reserve_code.to_le_bytes()]`
+/// seed list against the program id. Per-envelope deduplication is the
+/// caller's responsibility.
+std::vector<reserve_pda_seeds>
+extract_inbound_swap_remit_reserve_seeds(const std::vector<char>& envelope_bytes);
 
 } // namespace outpost_solana_client_detail
 

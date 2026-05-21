@@ -91,7 +91,7 @@ void epoch::advance() {
    // `sysio.chains::chains` (no local mirror) filtered to
    // `active==true && !is_depot`. Each surviving row's `code` is the
    // outpost's chain code; its underlying `uint64` value is what
-   // `sysio.msgch::envelopes.outpost_id` carries on the wire.
+   // `sysio.msgch::envelopes.chain_code` carries on the wire.
    //
    // Skipped on the genesis epoch (`current_epoch_index == 0`) — no group
    // existed yet, and the membership vector is empty.
@@ -148,7 +148,7 @@ void epoch::advance() {
       // NOTE: we intentionally do NOT erase the per-batch-op envelope
       // metadata rows here. `evalcons` already cleared their heavy
       // `raw_data` (1-2 KB → 0 bytes) at consensus reach, so the residual
-      // weight is just the tuple `(id, outpost_id, epoch_index,
+      // weight is just the tuple `(id, chain_code, epoch_index,
       // batch_op_name, checksum, ...)` — small and bounded by group
       // membership × outposts × retained-epochs. A dedicated bounded-
       // retention sweep belongs in a separate periodic ix; trying to

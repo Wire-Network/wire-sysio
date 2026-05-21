@@ -59,7 +59,7 @@ namespace {
       constexpr auto action_bootstrap    = "bootstrap";
       /// Field names on `envelope_entry` / `outbound_envelope` rows.
       namespace field {
-         constexpr auto outpost_id     = "outpost_id";
+         constexpr auto chain_code     = "chain_code";
          constexpr auto epoch_index    = "epoch_index";
          constexpr auto status         = "status";
          constexpr auto raw_envelope   = "raw_envelope";
@@ -185,11 +185,11 @@ struct batch_operator_plugin::impl {
       explicit depot_ops_impl_t(impl& i) : _impl(i) {}
 
       std::optional<sysio::outbound_envelope_record>
-      read_pending_outbound(uint64_t outpost_id, uint32_t epoch_index) override {
+      read_pending_outbound(uint64_t chain_code, uint32_t epoch_index) override {
          // Reverse-iterate the latest `OUTBOUND_LOOKUP_WINDOW` rows. The primary
          // key is auto-incrementing `id`, so reverse + small window gives the
          // most recent epochs' envelopes without scanning the whole table (which
-         // grows unbounded until cleanup). Filtering by (outpost_id, epoch_index)
+         // grows unbounded until cleanup). Filtering by (chain_code, epoch_index)
          // after the fact is O(window), not O(rows).
          sysio::chain_apis::read_only::get_table_rows_params p;
          p.code        = chain::name(msgch::account);
@@ -201,14 +201,14 @@ struct batch_operator_plugin::impl {
          auto rows = _impl.read_table(std::move(p));
          for (auto& row : rows.rows) {
             auto     obj         = row.get_object();
-            uint64_t row_outpost = obj[msgch::field::outpost_id].as_uint64();
+            uint64_t row_outpost = obj[msgch::field::chain_code].as_uint64();
             auto     row_epoch   = static_cast<uint32_t>(obj[msgch::field::epoch_index].as_uint64());
             auto     status      = obj[msgch::field::status].as<EnvelopeStatus>();
-            if (row_outpost != outpost_id || row_epoch != epoch_index
+            if (row_outpost != chain_code || row_epoch != epoch_index
                 || status != ENVELOPE_STATUS_PENDING_DELIVERY) continue;
 
             sysio::outbound_envelope_record rec;
-            rec.outpost_id        = row_outpost;
+            rec.chain_code        = row_outpost;
             rec.epoch_index       = row_epoch;
             rec.envelope_hash_hex = obj[msgch::field::envelope_hash].as_string();
             auto raw_bytes        = fc::from_hex(obj[msgch::field::raw_envelope].as_string());
@@ -218,17 +218,17 @@ struct batch_operator_plugin::impl {
          return std::nullopt;
       }
 
-      bool has_delivered_envelope(uint64_t outpost_id, uint32_t epoch_index) override {
-         return _impl.has_delivered_envelope(outpost_id, epoch_index);
+      bool has_delivered_envelope(uint64_t chain_code, uint32_t epoch_index) override {
+         return _impl.has_delivered_envelope(chain_code, epoch_index);
       }
 
-      void deliver_to_depot(uint64_t outpost_id,
+      void deliver_to_depot(uint64_t chain_code,
                             const std::vector<char>& raw_messages) override {
          _impl.push_action(
             msgch::account, msgch::action_deliver, _impl.operator_account,
             fc::mutable_variant_object()
                (msgch::field::batch_op_name, _impl.operator_account.to_string())
-               (msgch::field::outpost_id,    outpost_id)
+               (msgch::field::chain_code,    chain_code)
                (msgch::field::data,          raw_messages));
       }
 
@@ -273,8 +273,8 @@ struct batch_operator_plugin::impl {
    /// Check if this operator already delivered an envelope for the
    /// given outpost + epoch by querying msgch::envelopes via the
    /// byoutepoch secondary index.
-   bool has_delivered_envelope(uint64_t outpost_id, uint32_t epoch_index) {
-      uint64_t key = (static_cast<uint64_t>(outpost_id) << 32) | epoch_index;
+   bool has_delivered_envelope(uint64_t chain_code, uint32_t epoch_index) {
+      uint64_t key = (static_cast<uint64_t>(chain_code) << 32) | epoch_index;
       auto op_account = operator_account;
       // chain_plugin::get_table_rows forwards secondary-index bounds through
       // be_key_codec::encode_key, which unconditionally calls get_object() on
@@ -786,13 +786,13 @@ void batch_operator_plugin::plugin_startup() {
    // Per-outpost outbound + inbound. Each pair targets the same
    // outpost_opp_job instance; the job's internal mutex serializes them
    // when they run on different worker threads concurrently.
-   for (auto& [outpost_id, job] : _impl->opp_jobs) {
+   for (auto& [chain_code, job] : _impl->opp_jobs) {
       const auto identifier = job->client().to_string();
       {
          sysio::services::cron_service::job_schedule sched;
          sched.milliseconds = {sysio::services::cron_service::job_schedule::step_value{poll_ms}};
          sysio::services::cron_service::job_metadata_t meta;
-         meta.label         = std::format("outpost_opp_outbound_{}", outpost_id);
+         meta.label         = std::format("outpost_opp_outbound_{}", chain_code);
          meta.one_at_a_time = true;
          auto id = _impl->cron_svc->add(sched,
                                         [job_wp = std::weak_ptr(job)]() {
@@ -807,7 +807,7 @@ void batch_operator_plugin::plugin_startup() {
          sysio::services::cron_service::job_schedule sched;
          sched.milliseconds = {sysio::services::cron_service::job_schedule::step_value{poll_ms}};
          sysio::services::cron_service::job_metadata_t meta;
-         meta.label         = std::format("outpost_opp_inbound_{}", outpost_id);
+         meta.label         = std::format("outpost_opp_inbound_{}", chain_code);
          meta.one_at_a_time = true;
          auto id = _impl->cron_svc->add(sched,
                                         [job_wp = std::weak_ptr(job)]() {

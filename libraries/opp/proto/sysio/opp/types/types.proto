@@ -152,7 +152,10 @@ message ChainToken {
   uint64 chain_code            = 1;
   uint64 token_code            = 2;
   bytes  contract_addr         = 3;   // chain-specific encoding; empty for native
-  uint32 precision_override    = 4;   // 0 means "use Token.precision"
+  // (field 4 retired — `precision_override` was removed; precision conversion
+  //  is purely an outpost-internal concern, not depot-tracked state.)
+  reserved 4;
+  reserved "precision_override";
   bool   is_native             = 5;   // exactly one per Chain
   bool   active                = 6;
   uint64 registered_at_ms      = 7;

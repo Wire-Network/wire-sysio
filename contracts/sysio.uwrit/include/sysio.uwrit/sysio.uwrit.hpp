@@ -103,17 +103,17 @@ namespace sysio {
       /// against `sysio.reserve::swapquote` (skipped when no LP is provisioned
       /// for the relevant reserves), and either:
       ///   * creates an OPEN UWREQ with src/dst populated from the swap, or
-      ///   * emits a SWAP_REVERT back to `outpost_id` and skips UWREQ creation
-      ///     when the gap between quoted_destination_amount and the depot's
-      ///     current quote exceeds `quote_tolerance_bps`.
+      ///   * emits a SWAP_REVERT back to `chain_code` and skips UWREQ creation
+      ///     when the gap between target_amount and the depot's
+      ///     current quote exceeds `target_tolerance_bps`.
       ///
-      /// `outpost_id` is the source outpost the SWAP came from — needed so
+      /// `chain_code` is the source outpost the SWAP came from — needed so
       /// the SWAP_REVERT routes back to the user's depositing outpost on
       /// variance failure.
       [[sysio::action]]
       void createuwreq(uint64_t attestation_id,
                        opp::types::AttestationType type,
-                       uint64_t outpost_id,
+                       uint64_t chain_code,
                        std::vector<char> data);
 
       /// Called inline from `sysio.msgch::dispatch` when an
@@ -134,7 +134,7 @@ namespace sysio {
       [[sysio::action]]
       void rcrdcommit(uint64_t uwreq_id,
                       name underwriter,
-                      uint64_t outpost_id,
+                      uint64_t chain_code,
                       sysio::slug_name from_chain_code,
                       sysio::slug_name from_token_code,
                       sysio::slug_name reserve_code,
@@ -269,7 +269,7 @@ namespace sysio {
       /// Per-underwriter race entry inside an UWREQ row. Tracks when each
       /// leg of a dual-COMMIT pair arrived so `try_select_winner` can
       /// resolve the race deterministically. Each leg's COMMIT is an
-      /// independent attestation with its own outpost_id + uw_ext_chain_addr
+      /// independent attestation with its own chain_code + uw_ext_chain_addr
       /// (the underwriter's chain identity on that leg's outpost) + signature
       /// over the whole UIC. The depot stores the full UIC bytes per leg so
       /// `try_select_winner` can reconstruct the signed digest verbatim and

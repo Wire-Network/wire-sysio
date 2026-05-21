@@ -55,7 +55,7 @@ reserve::reserve_key make_key(sysio::slug_name chain_code,
 ///   * `zpp::bits::no_size{}` — raw protobuf bytes for the outpost decoder
 ///     (the default `zpp::bits::data_out` form prepends a 4-byte LE length
 ///     prefix that corrupts the first field tag on the receiving side).
-///   * The destination `outpost_id` is the reserve's `chain_code.value`
+///   * The destination `chain_code` is the reserve's `chain_code.value`
 ///     itself (per the v6 convention recorded in `sysio.msgch.hpp`:
 ///     "the outpost id IS the chain's slug_name value").
 template <typename ProtoMessage>
@@ -193,7 +193,7 @@ void reserve::matchreserve(sysio::slug_name chain_code,
 
    // Reserve is now ACTIVE on the depot. Notify the owning outpost so its
    // local reserve record can flip to ACTIVE and become usable for swap
-   // routing. The destination `outpost_id` is the reserve's `chain_code`
+   // routing. The destination `chain_code` is the reserve's `chain_code`
    // (per the v6 `sysio.msgch::queueout` convention — the outpost id is
    // the chain slug_name's packed uint64 value).
    opp::attestations::ReserveReady ready;
@@ -240,7 +240,7 @@ void reserve::oncnclrsv(sysio::slug_name       chain_code,
 
    // Race won — depot accepted the cancel before any matchreserve. Notify
    // the outpost so it refunds the creator's `external_token_amount`. The
-   // destination `outpost_id` is the reserve's owning `chain_code`. Per
+   // destination `chain_code` is the reserve's owning `chain_code`. Per
    // `feedback_opp_handlers_never_throw.md` this handler still cannot
    // throw; we only reach the queueout after all soft-validation checks
    // above have silently returned, so the action is safe to send here.
