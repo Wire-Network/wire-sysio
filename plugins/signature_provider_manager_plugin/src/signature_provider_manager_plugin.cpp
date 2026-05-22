@@ -76,7 +76,25 @@ public:
       };
    }
 
-   std::pair<fc::crypto::sign_fn, std::optional<fc::crypto::private_key>> create_provider_from_spec(
+   /**
+    * Result of building a signing provider from a `<private-key-provider-spec>`:
+    * the signing closure, the local private key (only for `KEY:` specs), and --
+    * for `KMS:` specs only -- the one-shot startup probe.
+    *
+    * `kms_warm_up` is handed back rather than registered inline so the caller
+    * can defer appending it to `_kms_startup_probes` until the provider has
+    * been successfully inserted. A provider rejected by `set_provider()` (a
+    * duplicate key_name or public_key) must not leave an orphan probe behind:
+    * `plugin_startup()` would otherwise probe -- or fail node startup on -- a
+    * KMS key whose provider was never registered.
+    */
+   struct provider_spec_result {
+      fc::crypto::sign_fn                    signer;
+      std::optional<fc::crypto::private_key> private_key;
+      std::function<void()>                  kms_warm_up;  ///< empty for non-KMS specs
+   };
+
+   provider_spec_result create_provider_from_spec(
       fc::crypto::chain_key_type_t key_type,
       const fc::crypto::public_key& public_key,
       const std::string& spec) {
@@ -118,11 +136,11 @@ public:
 
          FC_ASSERT(public_key == privkey.get_public_key(), "Private key does not match given public key for {}",
                    fc::json::to_log_string(public_key));
-         return {make_key_signature_provider(privkey), privkey};
+         return {.signer = make_key_signature_provider(privkey), .private_key = privkey};
       }
 
       if (spec_type_str == "KIOD") {
-         return {make_kiod_signature_provider(spec_data, public_key), std::nullopt};
+         return {.signer = make_kiod_signature_provider(spec_data, public_key)};
       }
 
       if (spec_type_str == "KMS") {
@@ -133,15 +151,14 @@ public:
          auto ref = sysio::sigprov::kms::parse_kms_spec(spec_data);
          auto kms = sysio::sigprov::kms::make_kms_signature_provider(ref, key_type, public_key);
 
-         // Retain the startup probe so plugin_startup() can -- when the opt-in
-         // KMS startup check is enabled -- fail fast on a missing credential,
-         // bad region, absent IAM grant, or wrong pinned key, instead of
-         // discovering it deep into production on the first sign.
-         {
-            std::scoped_lock lock(_signing_providers_mutex);
-            _kms_startup_probes.push_back(std::move(kms.warm_up));
-         }
-         return {std::move(kms.sign), std::nullopt};
+         // Hand the startup probe back to the caller rather than registering it
+         // here. It is appended to `_kms_startup_probes` only once the provider
+         // is successfully inserted, so a provider rejected as a duplicate
+         // leaves no probe for plugin_startup() to run. The probe lets
+         // plugin_startup() -- when the opt-in KMS startup check is enabled --
+         // fail fast on a missing credential, bad region, absent IAM grant, or
+         // wrong pinned key instead of discovering it on the first sign.
+         return {.signer = std::move(kms.sign), .kms_warm_up = std::move(kms.warm_up)};
       }
 
       SYS_THROW(chain::plugin_config_exception, "Unsupported key provider type \"{}\"", spec_type_str);
@@ -392,12 +409,24 @@ public:
       }
       }
 
-      auto [signer, privkey] = create_provider_from_spec(key_type, pubkey, private_key_provider_spec);
+      auto [signer, privkey, kms_warm_up] =
+         create_provider_from_spec(key_type, pubkey, private_key_provider_spec);
       auto provider = std::make_shared<signature_provider_t>(
          signature_provider_t{target_chain, key_type, key_name, pubkey, privkey, signer}
          );
 
-      return set_provider(provider);
+      // Register first. set_provider() throws plugin_config_exception on a
+      // duplicate key_name / public_key; reaching the statement after it means
+      // the provider is in the maps. Only then is the KMS startup probe (if
+      // any) retained -- a rejected provider leaves nothing behind for
+      // plugin_startup() to probe.
+      set_provider(provider);
+
+      if (kms_warm_up) {
+         std::scoped_lock lock(_signing_providers_mutex);
+         _kms_startup_probes.push_back(std::move(kms_warm_up));
+      }
+      return provider;
    }
 
    /**
