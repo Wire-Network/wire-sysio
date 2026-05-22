@@ -9,7 +9,6 @@
 #include <sysio.system/emissions.hpp>
 #include <sysio.chains/sysio.chains.hpp>
 #include <sysio/opp/attestations/attestations.pb.hpp>
-#include <zpp_bits.h>
 
 namespace sysio {
 
@@ -428,8 +427,20 @@ void epoch::advance() {
       for (size_t i = 0; i < pool.size() && new_tail.size() < cfg.operators_per_epoch; ++i) {
          new_tail.push_back(pool[i].first);
       }
-      check(!new_tail.empty(),
-            "no eligible batch operators for the new tail group");
+      // An empty or short new tail is a degraded but non-fatal state: batch
+      // operators were terminated faster than replacements could activate.
+      // Aborting advance() here would halt OPP epoch advancement chain-wide,
+      // leaving manual operator-roster repair as the only recovery -- so the
+      // window keeps its N groups (this one possibly empty) and the shortfall
+      // is reported instead. The empty group is also visible cross-chain in
+      // the BatchOperatorGroups attestation built below.
+      if (new_tail.empty()) {
+         sysio::print("sysio.epoch::advance: no eligible batch operators for "
+                      "the new tail group at epoch ",
+                      state.current_epoch_index + cfg.batch_op_groups - 1,
+                      "; pushing an empty group -- operator roster needs "
+                      "attention\n");
+      }
 
       state.batch_op_groups.push_back(std::move(new_tail));
    }
