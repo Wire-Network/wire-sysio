@@ -14,9 +14,9 @@ namespace {
 sysio::opp::debugging::DebugOutpostEndpointsType
 depot_outpost_direction_for(sysio::opp::types::ChainKind kind) {
    switch (kind) {
-      case sysio::opp::types::CHAIN_KIND_ETHEREUM:
+      case sysio::opp::types::CHAIN_KIND_EVM:
          return sysio::opp::debugging::DEBUG_OUTPOST_ENDPOINTS_TYPE_DEPOT_OUTPOST_ETHEREUM;
-      case sysio::opp::types::CHAIN_KIND_SOLANA:
+      case sysio::opp::types::CHAIN_KIND_SVM:
          return sysio::opp::debugging::DEBUG_OUTPOST_ENDPOINTS_TYPE_DEPOT_OUTPOST_SOLANA;
       default:
          return sysio::opp::debugging::DEBUG_OUTPOST_ENDPOINTS_TYPE_UNKNOWN;
@@ -28,9 +28,9 @@ depot_outpost_direction_for(sysio::opp::types::ChainKind kind) {
 sysio::opp::debugging::DebugOutpostEndpointsType
 outpost_depot_direction_for(sysio::opp::types::ChainKind kind) {
    switch (kind) {
-      case sysio::opp::types::CHAIN_KIND_ETHEREUM:
+      case sysio::opp::types::CHAIN_KIND_EVM:
          return sysio::opp::debugging::DEBUG_OUTPOST_ENDPOINTS_TYPE_OUTPOST_ETHEREUM_DEPOT;
-      case sysio::opp::types::CHAIN_KIND_SOLANA:
+      case sysio::opp::types::CHAIN_KIND_SVM:
          return sysio::opp::debugging::DEBUG_OUTPOST_ENDPOINTS_TYPE_OUTPOST_SOLANA_DEPOT;
       default:
          return sysio::opp::debugging::DEBUG_OUTPOST_ENDPOINTS_TYPE_UNKNOWN;
@@ -92,7 +92,7 @@ void outpost_opp_job::run_outbound() {
       return;
    }
 
-   auto pending = _depot.read_pending_outbound(_client->outpost_id(), epoch);
+   auto pending = _depot.read_pending_outbound(_client->chain_code(), epoch);
    if (!pending) {
       dlog("outpost_opp_job[{}]: no pending outbound for epoch {}",
            _client->to_string(), epoch);
@@ -162,7 +162,7 @@ void outpost_opp_job::run_inbound() {
    if (epoch == 0) return;
 
    try {
-      if (_depot.has_delivered_envelope(_client->outpost_id(), epoch)) {
+      if (_depot.has_delivered_envelope(_client->chain_code(), epoch)) {
          dlog("outpost_opp_job[{}]: already delivered for epoch {}",
               _client->to_string(), epoch);
          return;
@@ -189,7 +189,7 @@ void outpost_opp_job::run_inbound() {
          });
       } FC_LOG_AND_DROP("outpost_opp_job[{}]: emit_debug_envelope threw", _client->to_string());
 
-      _depot.deliver_to_depot(_client->outpost_id(), raw);
+      _depot.deliver_to_depot(_client->chain_code(), raw);
       ilog("outpost_opp_job[{}]: delivered {} inbound bytes to depot for epoch {}",
            _client->to_string(), raw.size(), epoch);
    } catch (const fc::exception& e) {

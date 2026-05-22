@@ -55,12 +55,16 @@
                     "type": "vuint64_t"
                 },
                 {
-                    "name": "chain",
-                    "type": "ChainKind"
+                    "name": "chain_code",
+                    "type": "vuint64_t"
                 },
                 {
                     "name": "reason",
                     "type": "string"
+                },
+                {
+                    "name": "reserve_code",
+                    "type": "vuint64_t"
                 }
             ]
         },
@@ -91,8 +95,8 @@
             "base": "",
             "fields": [
                 {
-                    "name": "kind",
-                    "type": "TokenKind"
+                    "name": "token_code",
+                    "type": "vuint64_t"
                 },
                 {
                     "name": "amount",
@@ -109,12 +113,12 @@
                     "type": "name"
                 },
                 {
-                    "name": "chain",
-                    "type": "ChainKind"
+                    "name": "chain_code",
+                    "type": "slug_name"
                 },
                 {
-                    "name": "token_kind",
-                    "type": "TokenKind"
+                    "name": "token_code",
+                    "type": "slug_name"
                 }
             ]
         },
@@ -123,12 +127,12 @@
             "base": "",
             "fields": [
                 {
-                    "name": "chain",
-                    "type": "ChainKind"
+                    "name": "chain_code",
+                    "type": "slug_name"
                 },
                 {
-                    "name": "token_kind",
-                    "type": "TokenKind"
+                    "name": "token_code",
+                    "type": "slug_name"
                 },
                 {
                     "name": "balance",
@@ -159,12 +163,12 @@
             "base": "",
             "fields": [
                 {
-                    "name": "chain",
-                    "type": "ChainKind"
+                    "name": "chain_code",
+                    "type": "slug_name"
                 },
                 {
-                    "name": "token_kind",
-                    "type": "TokenKind"
+                    "name": "token_code",
+                    "type": "slug_name"
                 },
                 {
                     "name": "min_bond",
@@ -235,12 +239,12 @@
                     "type": "name"
                 },
                 {
-                    "name": "chain",
-                    "type": "ChainKind"
+                    "name": "chain_code",
+                    "type": "slug_name"
                 },
                 {
-                    "name": "token_kind",
-                    "type": "TokenKind"
+                    "name": "token_code",
+                    "type": "slug_name"
                 },
                 {
                     "name": "amount",
@@ -494,12 +498,12 @@
                     "type": "name"
                 },
                 {
-                    "name": "chain",
-                    "type": "ChainKind"
+                    "name": "chain_code",
+                    "type": "slug_name"
                 },
                 {
-                    "name": "token_kind",
-                    "type": "TokenKind"
+                    "name": "token_code",
+                    "type": "slug_name"
                 },
                 {
                     "name": "amount",
@@ -564,6 +568,16 @@
                 {
                     "name": "reason",
                     "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "slug_name",
+            "base": "",
+            "fields": [
+                {
+                    "name": "value",
+                    "type": "uint64"
                 }
             ]
         },
@@ -648,12 +662,12 @@
                     "type": "name"
                 },
                 {
-                    "name": "chain",
-                    "type": "ChainKind"
+                    "name": "chain_code",
+                    "type": "slug_name"
                 },
                 {
-                    "name": "token_kind",
-                    "type": "TokenKind"
+                    "name": "token_code",
+                    "type": "slug_name"
                 },
                 {
                     "name": "amount",
@@ -678,12 +692,12 @@
                     "type": "name"
                 },
                 {
-                    "name": "chain",
-                    "type": "ChainKind"
+                    "name": "chain_code",
+                    "type": "slug_name"
                 },
                 {
-                    "name": "token_kind",
-                    "type": "TokenKind"
+                    "name": "token_code",
+                    "type": "slug_name"
                 },
                 {
                     "name": "amount",
@@ -845,11 +859,6 @@
             "table_id": 12732,
             "secondary_indexes": [
                 {
-                    "name": "byaccountck",
-                    "key_type": "uint128",
-                    "table_id": 37467
-                },
-                {
                     "name": "byeligible",
                     "key_type": "uint64",
                     "table_id": 49033
@@ -910,16 +919,12 @@
                     "value": 1
                 },
                 {
-                    "name": "CHAIN_KIND_ETHEREUM",
+                    "name": "CHAIN_KIND_EVM",
                     "value": 2
                 },
                 {
-                    "name": "CHAIN_KIND_SOLANA",
+                    "name": "CHAIN_KIND_SVM",
                     "value": 3
-                },
-                {
-                    "name": "CHAIN_KIND_SUI",
-                    "value": 4
                 }
             ]
         },
@@ -976,44 +981,6 @@
                 {
                     "name": "OPERATOR_TYPE_CHALLENGER",
                     "value": 4
-                }
-            ]
-        },
-        {
-            "name": "TokenKind",
-            "type": "int32",
-            "values": [
-                {
-                    "name": "TOKEN_KIND_WIRE",
-                    "value": 0
-                },
-                {
-                    "name": "TOKEN_KIND_ETH",
-                    "value": 256
-                },
-                {
-                    "name": "TOKEN_KIND_ERC20",
-                    "value": 257
-                },
-                {
-                    "name": "TOKEN_KIND_ERC721",
-                    "value": 258
-                },
-                {
-                    "name": "TOKEN_KIND_ERC1155",
-                    "value": 259
-                },
-                {
-                    "name": "TOKEN_KIND_LIQETH",
-                    "value": 496
-                },
-                {
-                    "name": "TOKEN_KIND_SOL",
-                    "value": 512
-                },
-                {
-                    "name": "TOKEN_KIND_LIQSOL",
-                    "value": 752
                 }
             ]
         }

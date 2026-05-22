@@ -37,6 +37,30 @@
             ]
         },
         {
+            "name": "att_seq_entry",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "next",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "att_seq_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "attestation_entry",
             "base": "",
             "fields": [
@@ -45,7 +69,7 @@
                     "type": "uint64"
                 },
                 {
-                    "name": "outpost_id",
+                    "name": "chain_code",
                     "type": "uint64"
                 },
                 {
@@ -88,7 +112,7 @@
             "base": "",
             "fields": [
                 {
-                    "name": "outpost_id",
+                    "name": "chain_code",
                     "type": "uint64"
                 }
             ]
@@ -107,7 +131,7 @@
                     "type": "name"
                 },
                 {
-                    "name": "outpost_id",
+                    "name": "chain_code",
                     "type": "uint64"
                 },
                 {
@@ -125,7 +149,7 @@
                     "type": "uint64"
                 },
                 {
-                    "name": "outpost_id",
+                    "name": "chain_code",
                     "type": "uint64"
                 },
                 {
@@ -185,7 +209,7 @@
             "base": "",
             "fields": [
                 {
-                    "name": "outpost_id",
+                    "name": "chain_code",
                     "type": "uint64"
                 },
                 {
@@ -213,7 +237,7 @@
                     "type": "uint64"
                 },
                 {
-                    "name": "outpost_id",
+                    "name": "chain_code",
                     "type": "uint64"
                 },
                 {
@@ -259,7 +283,7 @@
                     "type": "uint64"
                 },
                 {
-                    "name": "outpost_id",
+                    "name": "chain_code",
                     "type": "uint64"
                 },
                 {
@@ -297,7 +321,7 @@
             "base": "",
             "fields": [
                 {
-                    "name": "outpost_id",
+                    "name": "chain_code",
                     "type": "uint64"
                 },
                 {
@@ -315,7 +339,7 @@
             "base": "",
             "fields": [
                 {
-                    "name": "outpost_id",
+                    "name": "chain_code",
                     "type": "uint64"
                 }
             ]
@@ -325,7 +349,7 @@
             "base": "",
             "fields": [
                 {
-                    "name": "outpost_id",
+                    "name": "chain_code",
                     "type": "uint64"
                 },
                 {
@@ -408,6 +432,14 @@
             ]
         },
         {
+            "name": "attseq",
+            "type": "att_seq_entry",
+            "index_type": "i64",
+            "key_names": ["id"],
+            "key_types": ["uint64"],
+            "table_id": 1067
+        },
+        {
             "name": "envelopes",
             "type": "envelope_entry",
             "index_type": "i64",
@@ -484,7 +516,7 @@
             "name": "outpcons",
             "type": "outpost_consensus_entry",
             "index_type": "i64",
-            "key_names": ["outpost_id"],
+            "key_names": ["chain_code"],
             "key_types": ["uint64"],
             "table_id": 51836
         }
@@ -608,8 +640,24 @@
                     "value": 60957
                 },
                 {
-                    "name": "ATTESTATION_TYPE_EMISSIONS_BLOCKED",
+                    "name": "ATTESTATION_TYPE_RESERVE_CREATE",
                     "value": 60958
+                },
+                {
+                    "name": "ATTESTATION_TYPE_RESERVE_CREATE_CANCEL",
+                    "value": 60959
+                },
+                {
+                    "name": "ATTESTATION_TYPE_RESERVE_CREATE_CANCELLED",
+                    "value": 60960
+                },
+                {
+                    "name": "ATTESTATION_TYPE_RESERVE_READY",
+                    "value": 60961
+                },
+                {
+                    "name": "ATTESTATION_TYPE_EMISSIONS_BLOCKED",
+                    "value": 60962
                 }
             ]
         },
@@ -626,16 +674,12 @@
                     "value": 1
                 },
                 {
-                    "name": "CHAIN_KIND_ETHEREUM",
+                    "name": "CHAIN_KIND_EVM",
                     "value": 2
                 },
                 {
-                    "name": "CHAIN_KIND_SOLANA",
+                    "name": "CHAIN_KIND_SVM",
                     "value": 3
-                },
-                {
-                    "name": "CHAIN_KIND_SUI",
-                    "value": 4
                 }
             ]
         },

@@ -17,7 +17,7 @@ namespace sysio {
  * concrete `outpost_client::deliver_outbound_envelope`.
  */
 struct outbound_envelope_record {
-   uint64_t          outpost_id        = 0;
+   uint64_t          chain_code        = 0;
    uint32_t          epoch_index       = 0;
    std::string       envelope_hash_hex;
    std::vector<char> raw_envelope;
@@ -43,21 +43,21 @@ struct depot_ops {
     * holds no matching row (no outbound traffic this cycle).
     */
    virtual std::optional<outbound_envelope_record>
-   read_pending_outbound(uint64_t outpost_id, uint32_t epoch_index) = 0;
+   read_pending_outbound(uint64_t chain_code, uint32_t epoch_index) = 0;
 
    /**
     * Ask `sysio.msgch::envelopes` whether we already pushed a
     * `sysio.msgch::deliver` for this outpost in this epoch. Used to guard the
     * inbound path so a retrying cron job does not double-deliver.
     */
-   virtual bool has_delivered_envelope(uint64_t outpost_id, uint32_t epoch_index) = 0;
+   virtual bool has_delivered_envelope(uint64_t chain_code, uint32_t epoch_index) = 0;
 
    /**
     * Push `sysio.msgch::deliver` with the concatenated inbound envelope bytes.
     * Synchronous — blocks on the action's future until the configured
     * delivery timeout elapses.
     */
-   virtual void deliver_to_depot(uint64_t                 outpost_id,
+   virtual void deliver_to_depot(uint64_t                 chain_code,
                                  const std::vector<char>& raw_messages) = 0;
 
    /**

@@ -24,9 +24,8 @@
 FC_REFLECT_ENUM(sysio::opp::types::ChainKind,
    (CHAIN_KIND_UNKNOWN)
    (CHAIN_KIND_WIRE)
-   (CHAIN_KIND_ETHEREUM)
-   (CHAIN_KIND_SOLANA)
-   (CHAIN_KIND_SUI))
+   (CHAIN_KIND_EVM)
+   (CHAIN_KIND_SVM))
 
 FC_REFLECT_ENUM(sysio::opp::types::ChainKeyType,
    (CHAIN_KEY_TYPE_UNKNOWN)
@@ -60,14 +59,21 @@ FC_REFLECT_ENUM(sysio::opp::types::OperatorStatus,
 // ---------------------------------------------------------------------------
 
 FC_REFLECT_ENUM(sysio::opp::types::TokenKind,
-   (TOKEN_KIND_WIRE)
-   (TOKEN_KIND_ETH)
+   (TOKEN_KIND_UNKNOWN)
+   (TOKEN_KIND_NATIVE)
    (TOKEN_KIND_ERC20)
    (TOKEN_KIND_ERC721)
    (TOKEN_KIND_ERC1155)
-   (TOKEN_KIND_LIQETH)
-   (TOKEN_KIND_SOL)
-   (TOKEN_KIND_LIQSOL))
+   (TOKEN_KIND_SPL)
+   (TOKEN_KIND_SPL_NFT)
+   (TOKEN_KIND_LIQ))
+
+// v6 — Reserve lifecycle
+FC_REFLECT_ENUM(sysio::opp::types::ReserveStatus,
+   (RESERVE_STATUS_UNKNOWN)
+   (RESERVE_STATUS_PENDING)
+   (RESERVE_STATUS_ACTIVE)
+   (RESERVE_STATUS_CANCELLED))
 
 // ---------------------------------------------------------------------------
 //  Attestation enums
@@ -96,7 +102,12 @@ FC_REFLECT_ENUM(sysio::opp::types::AttestationType,
    (ATTESTATION_TYPE_UNDERWRITE_INTENT_COMMIT)
    (ATTESTATION_TYPE_SWAP_REVERT)
    (ATTESTATION_TYPE_DEPOSIT_REVERT)
-   (ATTESTATION_TYPE_SWAP_REJECTED))
+   (ATTESTATION_TYPE_SWAP_REJECTED)
+   (ATTESTATION_TYPE_RESERVE_CREATE)
+   (ATTESTATION_TYPE_RESERVE_CREATE_CANCEL)
+   (ATTESTATION_TYPE_RESERVE_CREATE_CANCELLED)
+   (ATTESTATION_TYPE_RESERVE_READY)
+   (ATTESTATION_TYPE_EMISSIONS_BLOCKED))
 
 // ---------------------------------------------------------------------------
 //  Nested enums on attestation messages
@@ -116,11 +127,7 @@ FC_REFLECT_ENUM(sysio::opp::attestations::OperatorAction_ActionType,
    (OperatorAction_ActionType_ACTION_TYPE_WITHDRAW_REMIT)
    (OperatorAction_ActionType_ACTION_TYPE_SLASH))
 
-FC_REFLECT_ENUM(sysio::opp::attestations::ReserveTarget_Kind,
-   (ReserveTarget_Kind_KIND_UNKNOWN)
-   (ReserveTarget_Kind_KIND_LP)
-   (ReserveTarget_Kind_KIND_BURN)
-   (ReserveTarget_Kind_KIND_TREASURY))
+// ReserveTarget_Kind removed in v6 — ReserveTarget is now (chain_code, reserve_code, TokenAmount).
 
 FC_REFLECT_ENUM(sysio::opp::types::AttestationStatus,
    (ATTESTATION_STATUS_PENDING)

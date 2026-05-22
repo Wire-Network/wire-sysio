@@ -1,9 +1,12 @@
 #include <fc/log/logger.hpp>
+#include <fc/slug_name.hpp>
 #include <fc/crypto/base58.hpp>
+#include <fc/crypto/keccak256.hpp>
 #include <fc/crypto/sha256.hpp>
 #include <fc/crypto/signature.hpp>
 #include <fc/io/raw.hpp>
 #include <fc/network/ethereum/ethereum_abi.hpp>
+#include <fc/task/retry.hpp>
 #include <fc/variant_object.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/endian/conversion.hpp>
@@ -34,8 +37,6 @@ namespace sysio {
 using namespace chain_apis;
 using namespace sysio::opp::types;
 namespace opp_att = sysio::opp::attestations;
-namespace eth = fc::network::ethereum;
-namespace sol = fc::network::solana;
 
 // ---------------------------------------------------------------------------
 //  Underwrite request — read directly from sysio.uwrit::uwreqs table.
@@ -56,11 +57,29 @@ struct uw_request {
    ChainKind               dst_chain;
    TokenKind               dst_token_kind;
    uint64_t                dst_amount;
-   /// Source-chain id of the deposit transaction. ETH = 32-byte tx hash;
-   /// SOL = 64-byte signature. Populated by `createuwreq` from
-   /// `SwapRequest.source_tx_id`. The depot rejects SwapRequests with an
-   /// empty `source_tx_id` (emits SwapRevert), so by the time a uwreq
-   /// reaches the plugin's scan this MUST be non-empty.
+   /// Per-leg slug_name triples (v6 data-model). These are the authoritative
+   /// identifiers for the depot's `rcrdcommit` routing and the
+   /// `UnderwriteIntentCommit` (`chain_code` / `token_code` / `reserve_code`)
+   /// payload populated in `build_signed_uic_bytes`. The `ChainKind` /
+   /// `TokenKind` siblings above are retained only for credit-line bucketing
+   /// against `sysio.opreg::operators.balances`, which still surfaces those
+   /// enums for now.
+   fc::slug_name            src_chain_code{};
+   fc::slug_name            src_token_code{};
+   fc::slug_name            src_reserve_code{};
+   fc::slug_name            dst_chain_code{};
+   fc::slug_name            dst_token_code{};
+   fc::slug_name            dst_reserve_code{};
+   /// Variance tolerance the user attached to the original SwapRequest
+   /// (as basis points). Verified in the source-deposit hash binding
+   /// so the underwriter cannot collude with a stale on-chain
+   /// `SwapDeposit` whose terms differ from the depot's UWREQ.
+   uint32_t                 variance_tolerance_bps{};
+   /// Source-chain identifier. ETH = 8-byte big-endian `SwapDeposit.id`
+   /// (the outpost-local monotonic counter); SOL = 64-byte signature.
+   /// Populated by `createuwreq` from `SwapRequest.source_tx_id`. The
+   /// underwriter's source-deposit verifier interprets the bytes
+   /// per-chain.
    std::vector<char>       source_tx_id;
 
    /// Depositor's address on the source chain (decoded from
@@ -100,6 +119,12 @@ struct underwriter_plugin::impl {
    std::string  eth_client_id;
    std::string  sol_client_id;
    std::string  eth_opreg_addr;             // OperatorRegistry contract address on ETH
+   /// Minimum ETH block confirmations required before a SwapDeposit
+   /// log is accepted as source-deposit-verified. Default mirrors
+   /// `underwriter::ETH_MIN_CONFIRMATIONS` (12, mainnet-safe). The
+   /// test cluster overrides via `--underwriter-eth-min-confirmations 1`.
+   uint64_t     eth_min_confirmations =
+      sysio::underwriter::ETH_MIN_CONFIRMATIONS;
    /// opp-outpost program ID on SOL. Not a CLI option — resolved at
    /// preflight from the loaded IDL's top-level `address` field (or
    /// `metadata.address` on older IDLs).
@@ -159,8 +184,23 @@ struct underwriter_plugin::impl {
    cron_service::job_id_t            scan_job_id = 0;
    std::atomic<bool>                 shutting_down{false};
 
-   // Outpost chain_kind cache: outpost_id -> ChainKind
+   // Outpost chain_kind cache: chain_code -> ChainKind
    std::map<uint64_t, ChainKind>     outpost_chain_kinds;
+
+   /// SPI handles to the configured outposts, keyed by `ChainKind`. Built
+   /// once at `plugin_startup` (after preflight) via the
+   /// `outpost_{ethereum,solana}_client_plugin::create_outpost_client`
+   /// factories. The relay loop selects by chain_kind and calls
+   /// `outpost->uw_commit(...)` — every chain-specific concern (ABI /
+   /// IDL discovery, address encoding, on-chain confirmation) lives in
+   /// the concrete. Per `outpost-client-spi.md`.
+   std::map<ChainKind, sysio::outpost_client_ptr> outpost_by_chain;
+   /// v6 cross-walk: token slug_name → TokenKind enum. Refreshed each
+   /// scan cycle by `read_credit_lines` (which reads `sysio.tokens::tokens`
+   /// for the lookup); used by `scan_pending_requests` to translate the
+   /// uwreq row's `src/dst_token_code` slug into the `TokenKind` the
+   /// `select_coverable` bucket lookup needs.
+   std::map<uint64_t, TokenKind>     token_kind_by_code;
 
    // ── Outstanding commit tracking (one entry per CONFIRMED leg) ───────
    // Per `feedback`: an underwriter that confirmed a commit tx for a leg
@@ -247,10 +287,16 @@ struct underwriter_plugin::impl {
          return false;
       }
       if (!active) {
-         elog("underwriter preflight: account {} not in OPERATOR_STATUS_ACTIVE — "
-              "fix the depot-side opreg state before starting the plugin",
+         // Non-fatal: depot's collateral-deposit + meets_role_min activation
+         // can land AFTER the underwriter node is up (cluster bootstrap
+         // orders it that way — Phase 11d deposits collateral on the
+         // already-running underwriter node to flip uwrit.a → ACTIVE).
+         // The scan loop's `poll_own_status()` re-checks every cycle and
+         // skips work until ACTIVE, so we just log and let the cron job
+         // pick up the activation transition.
+         ilog("underwriter preflight: account {} not yet OPERATOR_STATUS_ACTIVE — "
+              "scan loop will start polling and wait for activation",
               underwriter_account.to_string());
-         return false;
       }
 
       // Populate the outpost-chain cache (also used by the scan loop) so
@@ -258,7 +304,7 @@ struct underwriter_plugin::impl {
       read_outpost_registry();
 
       if (outpost_chain_kinds.empty()) {
-         elog("underwriter preflight: no outposts registered in sysio.epoch::outposts — "
+         elog("underwriter preflight: no outposts registered in sysio.chains::chains — "
               "nothing to commit against");
          return false;
       }
@@ -273,12 +319,12 @@ struct underwriter_plugin::impl {
             linked_chains.insert(obj["chain_kind"].as<ChainKind>());
          }
       }
-      for (auto& [outpost_id, chain_kind] : outpost_chain_kinds) {
+      for (auto& [chain_code, chain_kind] : outpost_chain_kinds) {
          if (!linked_chains.count(chain_kind)) {
             elog("underwriter preflight: missing sysio.authex link for outpost {} "
                  "(chain_kind={}) — bootstrap must call sysio.authex::createlink for "
                  "this account on every outpost chain",
-                 outpost_id,
+                 chain_code,
                  std::string{sysio::opp::types::ChainKind_Name(chain_kind)});
             return false;
          }
@@ -310,18 +356,22 @@ struct underwriter_plugin::impl {
             break;
          }
       }
-      for (auto& [outpost_id, chain_kind] : outpost_chain_kinds) {
+      for (auto& [chain_code, chain_kind] : outpost_chain_kinds) {
          const int ck = magic_enum::enum_integer(chain_kind);
          auto it = raw_balance_by_chain.find(ck);
          if (it == raw_balance_by_chain.end() || it->second == 0) {
-            elog("underwriter preflight: zero raw balance on outpost {} "
-                 "(chain_kind={}) — bootstrap must deposit collateral for "
-                 "this account on every outpost chain (locks are NOT "
-                 "deducted here; a fully-locked underwriter still passes "
-                 "this check)",
-                 outpost_id,
+            // Non-fatal: collateral may be deposited AFTER plugin startup
+            // (cluster bootstrap orders it that way — Phase 11d deposits
+            // on the already-running underwriter node to flip uwrit.a →
+            // ACTIVE). The scan loop's `is_available()` re-checks every
+            // cycle and skips work until the operator has positive
+            // balance on every active chain; the plugin then naturally
+            // joins the underwriter race once activation lands.
+            ilog("underwriter preflight: zero raw balance on outpost {} "
+                 "(chain_kind={}) — scan loop will poll for collateral "
+                 "deposit and begin committing once available",
+                 chain_code,
                  std::string{sysio::opp::types::ChainKind_Name(chain_kind)});
-            return false;
          }
       }
 
@@ -590,14 +640,25 @@ struct underwriter_plugin::impl {
 
    void read_outpost_registry() {
       outpost_chain_kinds.clear();
-      auto rows = read_all("sysio.epoch", "sysio.epoch", "outposts");
+      // v6 refactor: chain rows moved from `sysio.epoch::outposts` to
+      // `sysio.chains::chains`. Each row is a `Chain` with fields:
+      //   `code`       — slug_name (the universal chain identifier; the
+      //                  v5 `outpost_id` was just this slug's uint64).
+      //   `kind`       — ChainKind enum.
+      //   `is_depot`   — true for the WIRE depot's own row; we filter
+      //                  it out since underwriters don't commit to the
+      //                  depot itself.
+      auto rows = read_all("sysio.chains", "sysio.chains", "chains");
       for (auto& row : rows.rows) {
          auto obj = row.get_object();
-         uint64_t id = obj["id"].as_uint64();
+         if (obj.contains("is_depot") && obj["is_depot"].as_bool()) continue;
+         // `code` is a `slug_name` — serialised as `{"value": <uint64>}`.
+         const auto& code_obj = obj["code"].get_object();
+         uint64_t chain_code = code_obj["value"].as_uint64();
          // FC_REFLECT_ENUM in sysio/opp/opp.hpp gives us a direct enum
          // round-trip — the variant carries the symbolic name and `.as<T>()`
          // recovers the typed value without a string switch.
-         outpost_chain_kinds[id] = obj["chain_kind"].as<ChainKind>();
+         outpost_chain_kinds[chain_code] = obj["kind"].as<ChainKind>();
       }
    }
 
@@ -608,10 +669,51 @@ struct underwriter_plugin::impl {
    void read_credit_lines() {
       credit_lines.clear();
 
+      // v6 schema: balance / lock / withdraw rows carry `chain_code`
+      // and `token_code` slug_names (serialised as `{"value": <u64>}`)
+      // — not the v5 `chain` (ChainKind enum) / `token_kind` (TokenKind
+      // enum). Translation:
+      //   chain_code → ChainKind  via `outpost_chain_kinds` map
+      //                            (populated by `read_outpost_registry`).
+      //   token_code → TokenKind  via `sysio.tokens::tokens.kind`
+      //                            (lazy-loaded into `token_kind_by_code`).
+      // Reads happen in this order so the registry caches are warm when
+      // the balance loop runs.
+
+      // Refresh token-code → TokenKind cache once per scan (tokens
+      // table is small — 5 rows in the test cluster). Stored as a
+      // member so `scan_pending_requests` can reuse the same map when
+      // translating uwreq slug codes to TokenKind for bucket matching.
+      token_kind_by_code.clear();
+      {
+         auto tk_rows = read_all("sysio.tokens", "sysio.tokens", "tokens");
+         for (auto& row : tk_rows.rows) {
+            auto obj  = row.get_object();
+            uint64_t code = obj["code"].get_object()["value"].as_uint64();
+            token_kind_by_code[code] = obj["kind"].as<TokenKind>();
+         }
+      }
+
+      // Local helper: read `chain_code`/`token_code` slug_name fields
+      // (v6 shape `{"value": <u64>}`) and project to (ChainKind,
+      // TokenKind). Returns nullopt when the chain/token isn't in the
+      // outpost registry / tokens table — the row gets skipped.
+      auto read_slug_pair = [&](const fc::variant_object& obj)
+         -> std::optional<std::pair<ChainKind, TokenKind>> {
+         if (!obj.contains("chain_code") || !obj.contains("token_code")) {
+            return std::nullopt;
+         }
+         uint64_t chain_code = obj["chain_code"].get_object()["value"].as_uint64();
+         uint64_t token_code = obj["token_code"].get_object()["value"].as_uint64();
+         auto cki = outpost_chain_kinds.find(chain_code);
+         auto tki = token_kind_by_code.find(token_code);
+         if (cki == outpost_chain_kinds.end() || tki == token_kind_by_code.end()) {
+            return std::nullopt;
+         }
+         return std::make_pair(cki->second, tki->second);
+      };
+
       // ── Step 1: raw balances from sysio.opreg::operators[underwriter] ──
-      // Per-(chain, token_kind) row on `balances` (one balance, not a
-      // stake-vector). Mirrors what `sysio.opreg::available()` reads as
-      // its starting point.
       auto ops_rows = read_all("sysio.opreg", "sysio.opreg", "operators");
       for (auto& row : ops_rows.rows) {
          auto obj = row.get_object();
@@ -619,11 +721,11 @@ struct underwriter_plugin::impl {
          if (!obj.contains("balances") || !obj["balances"].is_array()) break;
          for (auto& bal_entry : obj["balances"].get_array()) {
             auto be = bal_entry.get_object();
-            if (!be.contains("chain") || !be.contains("token_kind") ||
-                !be.contains("balance")) continue;
+            auto kinds = read_slug_pair(be);
+            if (!kinds) continue;
             credit_lines.push_back(credit_line{
-               .chain_kind = be["chain"].as<ChainKind>(),
-               .token_kind = be["token_kind"].as<TokenKind>(),
+               .chain_kind = kinds->first,
+               .token_kind = kinds->second,
                .balance    = be["balance"].as_uint64(),
             });
          }
@@ -631,19 +733,17 @@ struct underwriter_plugin::impl {
       }
 
       // ── Step 2: subtract active locks (sysio.uwrit::locks) ─────────────
-      // Mirror of sysio.uwrit's local `sum_locks_inline` helper. Sum amounts
-      // by (chain, token_kind) for any row whose underwriter matches us;
-      // subtract from the matching credit_line. Locks that exceed the raw
-      // balance clamp to 0 — same convention as the depot's available().
+      // Locks that exceed the raw balance clamp to 0 — same convention as
+      // the depot's `available()`.
       auto lock_rows = read_all("sysio.uwrit", "sysio.uwrit", "locks");
       for (auto& row : lock_rows.rows) {
          auto obj = row.get_object();
          if (chain::name(obj["underwriter"].as_string()) != underwriter_account) continue;
-         const ChainKind chain  = obj["chain"].as<ChainKind>();
-         const TokenKind token  = obj["token_kind"].as<TokenKind>();
-         const uint64_t  amount = obj["amount"].as_uint64();
+         auto kinds = read_slug_pair(obj);
+         if (!kinds) continue;
+         const uint64_t amount = obj["amount"].as_uint64();
          for (auto& cl : credit_lines) {
-            if (cl.chain_kind == chain && cl.token_kind == token) {
+            if (cl.chain_kind == kinds->first && cl.token_kind == kinds->second) {
                cl.balance = (cl.balance > amount) ? (cl.balance - amount) : 0;
                break;
             }
@@ -651,16 +751,15 @@ struct underwriter_plugin::impl {
       }
 
       // ── Step 3: subtract pending withdraws (sysio.opreg::wtdwqueue) ────
-      // Mirror of sysio.opreg::available()'s pending_withdraws subtract.
       auto wq_rows = read_all("sysio.opreg", "sysio.opreg", "wtdwqueue");
       for (auto& row : wq_rows.rows) {
          auto obj = row.get_object();
          if (chain::name(obj["account"].as_string()) != underwriter_account) continue;
-         const ChainKind chain  = obj["chain"].as<ChainKind>();
-         const TokenKind token  = obj["token_kind"].as<TokenKind>();
-         const uint64_t  amount = obj["amount"].as_uint64();
+         auto kinds = read_slug_pair(obj);
+         if (!kinds) continue;
+         const uint64_t amount = obj["amount"].as_uint64();
          for (auto& cl : credit_lines) {
-            if (cl.chain_kind == chain && cl.token_kind == token) {
+            if (cl.chain_kind == kinds->first && cl.token_kind == kinds->second) {
                cl.balance = (cl.balance > amount) ? (cl.balance - amount) : 0;
                break;
             }
@@ -722,7 +821,7 @@ struct underwriter_plugin::impl {
       // Check that we have > 0 balance on every active outpost chain
       // (any token kind on that chain). Per-(chain, token) coverage is
       // checked downstream in select_coverable for each specific request.
-      for (auto& [outpost_id, chain_kind] : outpost_chain_kinds) {
+      for (auto& [chain_code, chain_kind] : outpost_chain_kinds) {
          bool found = false;
          for (auto& cl : credit_lines) {
             if (cl.chain_kind == chain_kind && cl.balance > 0) {
@@ -747,27 +846,33 @@ struct underwriter_plugin::impl {
    std::vector<uw_request> scan_pending_requests() {
       std::vector<uw_request> requests;
 
-      // `uwreqs.bystatus` is a uint64 secondary index on
-      // `static_cast<uint64_t>(status)`. Scan exactly the
-      // `UNDERWRITE_REQUEST_STATUS_PENDING (0)` slice — [0, 1) — instead of
-      // paging the whole table and filtering in C++.
-      sysio::chain_apis::read_only::get_table_rows_params p;
-      p.code        = chain::name("sysio.uwrit");
-      p.scope       = "sysio.uwrit";
-      p.table       = "uwreqs";
-      p.index_name  = "bystatus";
-      constexpr auto PENDING_STATUS = magic_enum::enum_integer(
-         UnderwriteRequestStatus::UNDERWRITE_REQUEST_STATUS_PENDING);
-      p.lower_bound = std::format("{{\"bystatus\":{}}}", PENDING_STATUS);
-      p.upper_bound = std::format("{{\"bystatus\":{}}}", PENDING_STATUS + 1);
-      p.limit       = 0; // paginate all pending rows
-      p.values_only = true;
-      auto rows = read_table(std::move(p));
+      // v6: `sysio.uwrit::uwreqs` is now a KV table. The legacy
+      // multi_index-style `{"bystatus": <n>}` lower_bound format
+      // doesn't traverse the KV secondary index — it returns 0 rows.
+      // Until a v6 KV-index query path lands here, scan by primary
+      // key and filter PENDING in C++. uwreqs is small (one row per
+      // in-flight swap; race-resolved rows transition to other
+      // statuses within an epoch), so this is cheap.
+      auto rows = read_all("sysio.uwrit", "sysio.uwrit", "uwreqs");
+      const auto pending_name = std::string{
+         "UNDERWRITE_REQUEST_STATUS_PENDING"};
       for (auto& row : rows.rows) {
          auto obj = row.get_object();
 
+         // Filter to PENDING only. The status field surfaces as the
+         // wire-format spelling string under the v6 ABI.
+         if (!obj.contains("status")) continue;
+         if (obj["status"].is_string()) {
+            if (obj["status"].as_string() != pending_name) continue;
+         } else {
+            if (obj["status"].as_uint64() !=
+                magic_enum::enum_integer(
+                  UnderwriteRequestStatus::UNDERWRITE_REQUEST_STATUS_PENDING))
+               continue;
+         }
+
          // Skip if already assigned to another underwriter
-         auto uw_name = obj["uw_name"].as_string();
+         auto uw_name = obj.contains("uw_name") ? obj["uw_name"].as_string() : std::string{};
          if (!uw_name.empty() && chain::name(uw_name) != underwriter_account &&
              chain::name(uw_name) != chain::name()) {
             continue;
@@ -804,23 +909,55 @@ struct underwriter_plugin::impl {
             req.attestation_type = *at;
          }
 
-         // New schema: src/dst (chain, token_kind, amount) live directly on
-         // the uwreq row (populated by uwrit::createuwreq from the
-         // originating SwapRequest). No more parse_swap_from_attestation
-         // detour through sysio.msgch::attestations. FC_REFLECT_ENUM in
-         // sysio/opp/opp.hpp provides the variant ↔ typed-enum round-trip.
-         if (!obj.contains("src_chain") || !obj.contains("src_amount")
-             || !obj.contains("dst_chain") || !obj.contains("dst_amount")) {
+         // v6 data-model schema: src/dst identity lives on the uwreq row as
+         // `(chain_code, token_code, reserve_code)` slug_name triples plus a
+         // `*_amount`. Populated by `sysio.uwrit::createuwreq` from the
+         // originating SwapRequest. The ABI surfaces slug_name as
+         // `{value: uint64}`; we lift the inner uint64 directly into
+         // `fc::slug_name` to mirror the host-side packing.
+         if (!obj.contains("src_chain_code") || !obj.contains("src_amount")
+             || !obj.contains("dst_chain_code") || !obj.contains("dst_amount")) {
             // Row not yet populated (createuwreq writes them inline so this
             // should be unreachable for SWAP-derived UWREQs). Skip safely.
             continue;
          }
-         req.src_chain      = obj["src_chain"].as<ChainKind>();
-         req.src_token_kind = obj["src_token_kind"].as<TokenKind>();
-         req.src_amount     = obj["src_amount"].as_uint64();
-         req.dst_chain      = obj["dst_chain"].as<ChainKind>();
-         req.dst_token_kind = obj["dst_token_kind"].as<TokenKind>();
-         req.dst_amount     = obj["dst_amount"].as_uint64();
+         auto read_codename = [&](const char* key) -> fc::slug_name {
+            return fc::slug_name{obj[key]["value"].as_uint64()};
+         };
+         req.src_chain_code   = read_codename("src_chain_code");
+         req.src_token_code   = read_codename("src_token_code");
+         req.src_reserve_code = read_codename("src_reserve_code");
+         req.src_amount       = obj["src_amount"].as_uint64();
+         req.dst_chain_code   = read_codename("dst_chain_code");
+         req.dst_token_code   = read_codename("dst_token_code");
+         req.dst_reserve_code = read_codename("dst_reserve_code");
+         req.dst_amount       = obj["dst_amount"].as_uint64();
+         req.variance_tolerance_bps = obj.contains("variance_tolerance_bps")
+            ? static_cast<uint32_t>(obj["variance_tolerance_bps"].as_uint64())
+            : 0u;
+         // Cross-walk the slug_name codes to ChainKind/TokenKind enums
+         // for the `select_coverable` bucket-matching path (which keys
+         // on the enums). Maps populated by the upstream
+         // `read_outpost_registry` (`sysio.chains::chains` → ChainKind)
+         // and `read_credit_lines` (`sysio.tokens::tokens` → TokenKind)
+         // calls in `do_scan_cycle`. Any uncovered slug — e.g. the
+         // depot's WIRE chain (filtered out of outpost_chain_kinds via
+         // is_depot) — falls through as UNKNOWN; `select_coverable`
+         // then treats the request as out of scope and skips it.
+         auto resolve_chain_kind = [&](fc::slug_name code) -> ChainKind {
+            auto it = outpost_chain_kinds.find(code.value);
+            return it != outpost_chain_kinds.end()
+                   ? it->second : ChainKind::CHAIN_KIND_UNKNOWN;
+         };
+         auto resolve_token_kind = [&](fc::slug_name code) -> TokenKind {
+            auto it = token_kind_by_code.find(code.value);
+            return it != token_kind_by_code.end()
+                   ? it->second : TokenKind::TOKEN_KIND_UNKNOWN;
+         };
+         req.src_chain      = resolve_chain_kind(req.src_chain_code);
+         req.src_token_kind = resolve_token_kind(req.src_token_code);
+         req.dst_chain      = resolve_chain_kind(req.dst_chain_code);
+         req.dst_token_kind = resolve_token_kind(req.dst_token_code);
          // The ABI surfaces `bytes` as a hex string. Decode both
          // source_tx_id and depositor — the depot rejects any SwapRequest
          // with empty source_tx_id at createuwreq (emits SwapRevert), so
@@ -1053,31 +1190,60 @@ struct underwriter_plugin::impl {
    }
 
    /// Build a verbatim, signed `UnderwriteIntentCommit` payload for the
-   /// given `(uwreq_id, outpost_id, token_kind)` leg. Returns an empty
-   /// vector on any failure (no signature provider, serialize failure, etc.).
+   /// given leg's `(uwreq_id, chain_code, chain_code, token_code,
+   /// reserve_code)`. Returns an empty vector on any failure (no signature
+   /// provider, serialize failure, etc.).
    ///
-   /// `token_kind` discriminates which leg of the uwreq this UIC covers —
-   /// for same-chain swaps (e.g. ERC20→ETH-native on one outpost) both
-   /// legs share `outpost_id` but differ on `token_kind`. The depot's
-   /// `rcrdcommit` routes the UIC into the source-leg or dest-leg slot
-   /// based on the `(from_chain, token_kind)` pair.
+   /// The slug_name triple `(chain_code, token_code, reserve_code)` is the
+   /// v6 routing scalar set the depot's `rcrdcommit` uses to disambiguate
+   /// src vs dst legs — same-chain swaps with multiple reserves on a single
+   /// `(chain, token)` pair are still resolvable because `reserve_code`
+   /// breaks the tie. `chain_code` carries the chain identity at the OPP
+   /// envelope level (the originating-outpost field on the inbound
+   /// envelope); `chain_code` is the same chain as a slug_name and is what
+   /// the depot indexes against `sysio.uwrit::uw_request_t.*_chain_code`.
    ///
    /// Digest semantics: the underwriter signs `sha256(serialize(uic with
    /// signature blanked))`. The depot's `try_select_winner` rebuilds the
    /// same digest from the bytes it received and verifies the embedded
    /// signature against the underwriter's WIRE account permissions
    /// (`owner` / `active` only) — see `sysio.uwrit::verify_uic_signature`.
-   std::vector<char> build_signed_uic_bytes(uint64_t uwreq_id,
-                                              uint64_t outpost_id,
-                                              TokenKind token_kind) {
+   std::vector<char> build_signed_uic_bytes(uint64_t        uwreq_id,
+                                            uint64_t        outpost_chain_code,
+                                            ChainKind       leg_chain_kind,
+                                            fc::slug_name    chain_code,
+                                            fc::slug_name    token_code,
+                                            fc::slug_name    reserve_code) {
       opp_att::UnderwriteIntentCommit uic;
       uic.mutable_uw_account()->set_name(underwriter_account.to_string());
       uic.set_uw_request_id(uwreq_id);
-      uic.set_outpost_id(outpost_id);
-      uic.set_token_kind(token_kind);
-      // uw_ext_chain_addr left default-constructed (empty kind/address) for
-      // v1 — the (outpost_id, token_kind) pair is the binding the depot's
-      // routing path needs, and the signature ties the whole UIC together.
+      uic.set_outpost_id(outpost_chain_code);
+      // v6 data-model: leg identity is the slug_name triple. The wire format
+      // for each field is the packed uint64 slug_name value (alphabet
+      // `[A-Z0-9_]+`, ≤8 chars). The depot decodes these back to
+      // `sysio::slug_name` via `sysio::slug_name{uic.chain_code}` etc. in
+      // `sysio.msgch::dispatch_underwrite_commit`.
+      uic.set_chain_code(chain_code.value);
+      uic.set_token_code(token_code.value);
+      uic.set_reserve_code(reserve_code.value);
+      // FORCE serialization of `uw_ext_chain_addr` AND its inner `kind`
+      // enum to a non-zero value. Background: proto3 C++ omits unset
+      // message fields and zero-valued enums from `SerializeToString`,
+      // but the depot's CDT decoder uses `zpp::bits::pb_members<N>`
+      // which ALWAYS emits every declared member (and every enum) on
+      // re-encode. If host omits field 2, or sets it to a default-
+      // constructed ChainAddress with `kind=CHAIN_KIND_UNSPECIFIED=0`,
+      // then the depot's verify-side
+      // decode → blank-signature → re-encode round-trip produces extra
+      // bytes for field 2 and/or its nested `kind` enum, the digests
+      // diverge, and `verify_uic_signature` fails.
+      //
+      // Setting `kind` to the leg's actual ChainKind makes both encoders
+      // emit the same bytes. The `address` bytes vector stays empty —
+      // empty containers are skipped by BOTH encoders, so that's safe.
+      // See `wire-sysio/.claude/rules/zpp-bits-is-cdt-only.md` for the
+      // full encoder-divergence rationale.
+      uic.mutable_uw_ext_chain_addr()->set_kind(leg_chain_kind);
       uic.clear_signature();
 
       std::string blanked;
@@ -1149,9 +1315,9 @@ struct underwriter_plugin::impl {
          return false;
       }
       switch (req.src_chain) {
-         case ChainKind::CHAIN_KIND_ETHEREUM:
+         case ChainKind::CHAIN_KIND_EVM:
             return verify_source_deposit_eth(req);
-         case ChainKind::CHAIN_KIND_SOLANA:
+         case ChainKind::CHAIN_KIND_SVM:
             return verify_source_deposit_sol(req);
          default:
             elog("underwriter: cannot verify source deposit for chain={} (uwreq {})",
@@ -1160,21 +1326,37 @@ struct underwriter_plugin::impl {
       }
    }
 
-   /// ETH-side source-deposit verification. `req.source_tx_id` is the
-   /// raw 32-byte tx hash captured at swap-emit time. The verify path:
+   /// ETH-side source-deposit verification, event-scan flavour.
    ///
-   ///   1. `eth_getTransactionByHash(source_tx_id)` — tx must exist.
-   ///   2. `tx.to` must equal `--underwriter-eth-source-contract-addr` (case-insensitive).
-   ///   3. `tx.from` must equal `req.depositor` (case-insensitive 20-byte ETH address).
-   ///   4. `tx.input[0..4]` must equal `--underwriter-eth-source-deposit-selector` (the
-   ///      4-byte function selector for the swap-deposit call).
-   ///   5. `eth_getTransactionReceipt(source_tx_id)` must report status != "0x0".
-   ///   6. `eth_blockNumber() - receipt.blockNumber >= ETH_MIN_CONFIRMATIONS` so we don't
-   ///      accept a tx in a chain tip that may still reorg.
+   /// `req.source_tx_id` is an 8-byte big-endian uint64 — the outpost-
+   /// local monotonic counter value written into the SwapRequest
+   /// envelope by `ReserveManager.requestSwap`. The corresponding
+   /// `SwapDeposit(uint64 indexed id, bytes32 hash)` event is emitted
+   /// in the same tx. Verification:
    ///
-   /// Every required option (contract address, selector) is checked in
-   /// preflight; if any is unset the plugin refuses to start. Returns
-   /// true only when all six checks pass.
+   ///   1. Parse `source_tx_id` → `id` (uint64). Reject empty / wrong-size.
+   ///   2. `eth_getLogs` filtered by:
+   ///        - address = resolved ReserveManager contract address
+   ///        - topic[0] = keccak256("SwapDeposit(uint64,bytes32)")
+   ///        - topic[1] = abi-encoded `id` (32-byte BE-padded uint64)
+   ///      Must return exactly one matching log.
+   ///   3. Decode the log's `data` field as the emitted hash bytes.
+   ///   4. Recompute the same hash from UWREQ fields:
+   ///        keccak256(packed
+   ///          depositor[20]
+   ///          src_amount [u64 BE]   src_token_code [u64 BE]   src_reserve_code [u64 BE]
+   ///          dst_chain_code [u64 BE]   dst_token_code [u64 BE]   dst_reserve_code [u64 BE]
+   ///          dst_amount [u64 BE]
+   ///          variance_tolerance_bps [u32 BE])
+   ///      The depot's UWREQ row carries every input; matches must be
+   ///      bit-exact against the contract-emitted `hash`.
+   ///   5. Pull the matching log's `transactionHash`. Receipt must exist,
+   ///      status != "0x0", and confirmations >= ETH_MIN_CONFIRMATIONS.
+   ///
+   /// A non-matching hash is a hard mismatch — the depositor's swap
+   /// params disagree with what's recorded on the source chain. A
+   /// missing log / receipt without mismatched fields is a deferred
+   /// retry (returns false but no mismatch counter bump).
    bool verify_source_deposit_eth(const uw_request& req) {
       auto entry = eth_plug->get_client(eth_client_id);
       if (!entry || !entry->client) {
@@ -1187,112 +1369,164 @@ struct underwriter_plugin::impl {
          source_deposit_mismatch_count++;
       };
 
-      const std::string tx_hash_hex = "0x" +
-         fc::to_hex(req.source_tx_id.data(), req.source_tx_id.size());
+      // (1) Decode source_tx_id as an 8-byte big-endian uint64 id.
+      if (req.source_tx_id.size() != 8) {
+         elog("underwriter: source-deposit verify failed for uwreq {} — "
+              "source_tx_id has wrong size ({} bytes; expected 8 for ETH "
+              "monotonic id)", req.id, req.source_tx_id.size());
+         bump_mismatch();
+         return false;
+      }
+      uint64_t deposit_id = 0;
+      for (size_t i = 0; i < 8; ++i) {
+         deposit_id = (deposit_id << 8) |
+                      static_cast<uint8_t>(req.source_tx_id[i]);
+      }
+
+      // (2) eth_getLogs filter for SwapDeposit(uint64 indexed id, bytes32 hash).
+      // The event topic[0] is keccak256 of the canonical signature.
+      static const std::string SWAP_DEPOSIT_TOPIC =
+         "0x" + fc::to_hex(reinterpret_cast<const char*>(
+            fc::crypto::keccak256::hash(std::string{
+               "SwapDeposit(uint64,bytes32)"}).data()), 32);
+      // Indexed uint64 → left-pad to 32 bytes (Solidity uses 0-padded
+      // big-endian; topics are always 32 bytes).
+      std::string id_topic = "0x";
+      id_topic.reserve(66);
+      id_topic.append(48, '0');           // 24 leading zero bytes = 48 hex chars
+      for (int shift = 56; shift >= 0; shift -= 8) {
+         uint8_t b = static_cast<uint8_t>((deposit_id >> shift) & 0xff);
+         char buf[3]; std::snprintf(buf, sizeof buf, "%02x", b);
+         id_topic.append(buf, 2);
+      }
 
       try {
-         auto tx = entry->client->get_transaction_by_hash(tx_hash_hex);
-         if (tx.is_null()) {
-            elog("underwriter: source-deposit verify failed for uwreq {} — "
-                 "eth_getTransactionByHash({}) returned null",
-                 req.id, tx_hash_hex);
-            bump_mismatch();
+         fc::mutable_variant_object filter;
+         filter("address",   resolved_eth_source_contract_addr);
+         filter("fromBlock", std::string{"earliest"});
+         filter("toBlock",   std::string{"latest"});
+         filter("topics", fc::variants{
+            fc::variant{SWAP_DEPOSIT_TOPIC},
+            fc::variant{id_topic},
+         });
+         // eth_getLogs takes its filter as the first element of the JSON-RPC
+         // `params` array — wrap the filter object in a one-element array.
+         auto logs_var = entry->client->get_logs(
+            fc::variant{fc::variants{fc::variant{filter}}});
+         if (!logs_var.is_array() || logs_var.size() == 0) {
+            ilog("underwriter: source-deposit verify deferred for uwreq {} — "
+                 "no SwapDeposit log yet (id={}, contract={})",
+                 req.id, deposit_id, resolved_eth_source_contract_addr);
             return false;
          }
-         const auto tx_obj = tx.get_object();
+         // Should be exactly one match — id is unique per outpost. Use
+         // the first; warn (don't fail) on duplicates so we surface a
+         // bug without halting the underwriter.
+         if (logs_var.size() > 1) {
+            wlog("underwriter: source-deposit verify uwreq {} — got {} "
+                 "SwapDeposit logs for id={}; using the first",
+                 req.id, logs_var.size(), deposit_id);
+         }
+         const auto& log = logs_var.get_array().at(0).get_object();
 
-         // (2) tx.to == source contract address (resolved at preflight
-         //     from the matching ABI entry's `contract_address`).
-         std::string to_addr;
-         if (tx_obj.contains("to") && tx_obj["to"].is_string()) {
-            to_addr = tx_obj["to"].as_string();
+         // (3) Decode log.data = abi.encodePacked(bytes32 hash) = 32 bytes.
+         std::string data_hex;
+         if (log.contains("data") && log["data"].is_string()) {
+            data_hex = log["data"].as_string();
          }
-         if (!boost::iequals(to_addr, resolved_eth_source_contract_addr)) {
+         std::string_view data_view = data_hex;
+         if (data_view.size() >= 2 && data_view[0] == '0' &&
+             (data_view[1] == 'x' || data_view[1] == 'X')) {
+            data_view.remove_prefix(2);
+         }
+         if (data_view.size() != 64) {
             elog("underwriter: source-deposit verify failed for uwreq {} — "
-                 "tx.to={} != resolved source contract {}",
-                 req.id, to_addr, resolved_eth_source_contract_addr);
+                 "SwapDeposit log.data has wrong size ({} hex chars; "
+                 "expected 64 for bytes32)", req.id, data_view.size());
             bump_mismatch();
             return false;
+         }
+         std::array<uint8_t, 32> on_chain_hash{};
+         for (size_t i = 0; i < 32; ++i) {
+            on_chain_hash[i] = static_cast<uint8_t>(std::stoul(
+               std::string{data_view.substr(i * 2, 2)}, nullptr, 16));
          }
 
-         // (3) tx.from == req.depositor. The depot stores the 20-byte
-         //     ETH address verbatim in `depositor`; the RPC returns the
-         //     same address as a "0x"-prefixed lower-case hex string.
-         std::string from_addr;
-         if (tx_obj.contains("from") && tx_obj["from"].is_string()) {
-            from_addr = tx_obj["from"].as_string();
-         }
-         const std::string req_depositor = "0x" +
-            fc::to_hex(req.depositor.data(), req.depositor.size());
-         if (!boost::iequals(from_addr, req_depositor)) {
+         // (4) Recompute the hash from the UWREQ row's flat fields.
+         //     Layout MUST match ReserveManager.requestSwap's
+         //     abi.encodePacked(...) call exactly.
+         std::vector<uint8_t> packed;
+         packed.reserve(20 + 8 * 7 + 4);
+         packed.insert(packed.end(),
+                       req.depositor.begin(), req.depositor.end());
+         auto append_u64_be = [&](uint64_t v) {
+            for (int shift = 56; shift >= 0; shift -= 8) {
+               packed.push_back(static_cast<uint8_t>((v >> shift) & 0xff));
+            }
+         };
+         auto append_u32_be = [&](uint32_t v) {
+            for (int shift = 24; shift >= 0; shift -= 8) {
+               packed.push_back(static_cast<uint8_t>((v >> shift) & 0xff));
+            }
+         };
+         append_u64_be(req.src_amount);
+         append_u64_be(req.src_token_code.value);
+         append_u64_be(req.src_reserve_code.value);
+         append_u64_be(req.dst_chain_code.value);
+         append_u64_be(req.dst_token_code.value);
+         append_u64_be(req.dst_reserve_code.value);
+         append_u64_be(req.dst_amount);
+         append_u32_be(req.variance_tolerance_bps);
+         if (packed.size() != 20 + 8 * 7 + 4) {
             elog("underwriter: source-deposit verify failed for uwreq {} — "
-                 "tx.from={} != req.depositor={}", req.id, from_addr,
-                 req_depositor);
+                 "packed buffer size {} != expected {}",
+                 req.id, packed.size(), 20 + 8 * 7 + 4);
             bump_mismatch();
             return false;
          }
-
-         // (4) Function selector match. tx.input is "0x"-prefixed hex.
-         std::string input_hex;
-         if (tx_obj.contains("input") && tx_obj["input"].is_string()) {
-            input_hex = tx_obj["input"].as_string();
-         }
-         // Strip "0x" prefix; selector is the first 4 bytes (8 hex chars).
-         std::string_view input_no_prefix = input_hex;
-         if (input_no_prefix.size() >= 2 && input_no_prefix[0] == '0' &&
-             (input_no_prefix[1] == 'x' || input_no_prefix[1] == 'X')) {
-            input_no_prefix.remove_prefix(2);
-         }
-         if (input_no_prefix.size() < 8) {
-            elog("underwriter: source-deposit verify failed for uwreq {} — "
-                 "tx.input too short ({} hex chars) to contain a 4-byte selector",
-                 req.id, input_no_prefix.size());
-            bump_mismatch();
-            return false;
-         }
-         std::vector<uint8_t> got_selector(4);
-         for (size_t i = 0; i < 4; ++i) {
-            got_selector[i] = static_cast<uint8_t>(std::stoul(
-               std::string{input_no_prefix.substr(i * 2, 2)}, nullptr, 16));
-         }
-         if (got_selector != resolved_eth_source_deposit_selector) {
-            const std::string got_hex  = fc::to_hex(reinterpret_cast<const char*>(got_selector.data()),
-                                                     got_selector.size());
+         auto recomputed = fc::crypto::keccak256::hash(
+            std::span<const uint8_t>{packed.data(), packed.size()});
+         if (std::memcmp(recomputed.data(), on_chain_hash.data(), 32) != 0) {
+            const std::string got_hex = fc::to_hex(
+               reinterpret_cast<const char*>(on_chain_hash.data()), 32);
             const std::string want_hex = fc::to_hex(
-               reinterpret_cast<const char*>(resolved_eth_source_deposit_selector.data()),
-               resolved_eth_source_deposit_selector.size());
+               reinterpret_cast<const char*>(recomputed.data()), 32);
             elog("underwriter: source-deposit verify failed for uwreq {} — "
-                 "tx.input[0..4]={} != resolved selector={} for function '{}'",
-                 req.id, got_hex, want_hex, eth_source_deposit_function_name);
+                 "SwapDeposit hash mismatch (id={}): on-chain={} recomputed={}",
+                 req.id, deposit_id, got_hex, want_hex);
             bump_mismatch();
             return false;
          }
 
-         // (5) Receipt must exist + status not == "0x0".
+         // (5) Receipt + confirmation depth on the matching tx.
+         std::string tx_hash_hex;
+         if (log.contains("transactionHash") &&
+             log["transactionHash"].is_string()) {
+            tx_hash_hex = log["transactionHash"].as_string();
+         }
+         if (tx_hash_hex.empty()) {
+            elog("underwriter: source-deposit verify failed for uwreq {} — "
+                 "SwapDeposit log missing transactionHash", req.id);
+            bump_mismatch();
+            return false;
+         }
          auto receipt = entry->client->get_transaction_receipt(tx_hash_hex);
          if (receipt.is_null()) {
-            elog("underwriter: source-deposit verify deferred for uwreq {} — "
-                 "no receipt for tx {} (not yet mined). Skip + retry next cycle.",
-                 req.id, tx_hash_hex);
-            // Not a mismatch — the tx exists but isn't yet receipt-ready.
+            ilog("underwriter: source-deposit verify deferred for uwreq {} — "
+                 "no receipt yet for matching tx {}", req.id, tx_hash_hex);
             return false;
          }
          const auto rcpt_obj = receipt.get_object();
-         if (rcpt_obj.contains("status")
-             && rcpt_obj["status"].as_string() == "0x0") {
+         if (rcpt_obj.contains("status") &&
+             rcpt_obj["status"].as_string() == "0x0") {
             elog("underwriter: source-deposit verify failed for uwreq {} — "
-                 "tx {} reverted on-chain", req.id, tx_hash_hex);
+                 "matching tx {} reverted on-chain", req.id, tx_hash_hex);
             bump_mismatch();
             return false;
          }
-
-         // (6) Confirmation depth. Reorgs of `ETH_MIN_CONFIRMATIONS`
-         //     blocks are not statistically meaningful on a healthy
-         //     PoS ETH chain; this guards against a tx being mined into
-         //     a block that's later orphaned.
-         if (!rcpt_obj.contains("blockNumber")
-             || !rcpt_obj["blockNumber"].is_string()) {
-            elog("underwriter: source-deposit verify deferred for uwreq {} — "
+         if (!rcpt_obj.contains("blockNumber") ||
+             !rcpt_obj["blockNumber"].is_string()) {
+            ilog("underwriter: source-deposit verify deferred for uwreq {} — "
                  "receipt missing blockNumber for tx {}", req.id, tx_hash_hex);
             return false;
          }
@@ -1300,18 +1534,18 @@ struct underwriter_plugin::impl {
             rcpt_obj["blockNumber"].as_string().substr(2), nullptr, 16);
          const uint64_t head_blk =
             entry->client->get_block_number().convert_to<uint64_t>();
-         if (head_blk < rcpt_blk
-             || (head_blk - rcpt_blk) < underwriter::ETH_MIN_CONFIRMATIONS) {
-            elog("underwriter: source-deposit verify deferred for uwreq {} — "
+         if (head_blk < rcpt_blk ||
+             (head_blk - rcpt_blk) < eth_min_confirmations) {
+            ilog("underwriter: source-deposit verify deferred for uwreq {} — "
                  "insufficient confirmations: head={} receipt={} need={}",
                  req.id, head_blk, rcpt_blk,
-                 underwriter::ETH_MIN_CONFIRMATIONS);
+                 eth_min_confirmations);
             return false;
          }
 
          ilog("underwriter: source-deposit verify passed for uwreq {} "
-              "(tx {} → {} from {}; selector ok; depth={})",
-              req.id, tx_hash_hex, to_addr, from_addr, head_blk - rcpt_blk);
+              "(SwapDeposit id={} tx={} depth={})",
+              req.id, deposit_id, tx_hash_hex, head_blk - rcpt_blk);
          return true;
       } catch (const fc::exception& e) {
          elog("underwriter: source-deposit verify failed for uwreq {} — "
@@ -1321,19 +1555,40 @@ struct underwriter_plugin::impl {
       }
    }
 
-   /// SOL-side source-deposit verification. `req.source_tx_id` is the
-   /// raw 64-byte Solana transaction signature captured at swap-emit
-   /// time. The verify path:
+   /// SOL-side source-deposit verification. Mirrors
+   /// `verify_source_deposit_eth` step-for-step:
    ///
-   ///   1. `getTransaction(base58(source_tx_id), commitment=SOL_COMMITMENT)` — tx must exist.
-   ///   2. `tx.meta.err` must be null.
-   ///   3. `sol_program_id` must appear in `tx.transaction.message.accountKeys`.
-   ///   4. The deposit instruction (the instruction targeting our program) must:
-   ///      a. start with the configured 8-byte anchor discriminator
-   ///         (`--underwriter-sol-source-deposit-discriminator`), and
-   ///      b. carry the depositor pubkey as the first signer in `accountKeys` matching `req.depositor`.
+   ///   1. `req.source_tx_id` is an 8-byte big-endian monotonic
+   ///      `deposit_id` (minted by `opp-outpost::request_swap`,
+   ///      `OutboundMessageBuffer.next_swap_id`). Wrong-size →
+   ///      hard mismatch.
+   ///   2. `fc::task::retry_until` with
+   ///      `SOL_SWAP_DEPOSIT_POLL_INTERVAL` (15s) /
+   ///      `SOL_SWAP_DEPOSIT_TOTAL_TIMEOUT` (120s, both in
+   ///      `outpost_solana_client_plugin.hpp`) drives the scan loop:
+   ///        a. `getSignaturesForAddress(sol_program_id,
+   ///           limit=SOL_SCAN_LIMIT)` — enumerate recent program
+   ///           sigs.
+   ///        b. For each sig, `getTransaction(sig)`; inspect
+   ///           `meta.err` (skip failed tx) and
+   ///           `meta.logMessages[]` for the canonical marker:
+   ///           `Program log: opp_outpost: SwapDeposit id=<id> hash=<64hex>`.
+   ///   3. On match, parse the 32-byte on-chain hash from the log.
+   ///   4. Recompute the same hash from the UWREQ row's flat fields
+   ///      (depositor[32] + 7×u64 BE + u32 BE = 92 packed bytes).
+   ///      Bit-exact mismatch → hard mismatch counter.
+   ///   5. Confirmation gate: matching tx's `meta.confirmationStatus`
+   ///      (when present on the per-sig listing from step 2a) must
+   ///      be `"finalized"` — same severity as ETH's `head -
+   ///      receipt.blockNumber >= eth_min_confirmations` gate. Tx
+   ///      not yet finalized → deferred retry (no mismatch bump).
    ///
-   /// Returns true only when all checks pass.
+   /// `false` returns:
+   ///   - hard mismatch (counter bumped) on bad size, hash divergence,
+   ///     or tx-level execution error;
+   ///   - deferred retry (no counter bump) on `retry_until` deadline
+   ///     reached without a matching log — the outer poll loop
+   ///     reattempts on its next tick.
    bool verify_source_deposit_sol(const uw_request& req) {
       auto entry = sol_plug->get_client(sol_client_id);
       if (!entry || !entry->client) {
@@ -1346,138 +1601,245 @@ struct underwriter_plugin::impl {
          source_deposit_mismatch_count++;
       };
 
-      // Solana signatures are 64 bytes encoded as base58 strings on the
-      // wire. The batch operator stored the raw 64 bytes in source_tx_id.
-      const std::string sig_b58 = fc::to_base58(
-         req.source_tx_id.data(), req.source_tx_id.size(),
-         fc::yield_function_t{});
+      // ── (1) source_tx_id → 8-byte big-endian deposit_id ────────────────
+      if (req.source_tx_id.size() != 8) {
+         elog("underwriter: source-deposit verify failed for uwreq {} — "
+              "source_tx_id has wrong size ({} bytes; expected 8 for SOL "
+              "monotonic deposit_id mirroring the ETH wire shape)",
+              req.id, req.source_tx_id.size());
+         bump_mismatch();
+         return false;
+      }
+      uint64_t deposit_id = 0;
+      for (size_t i = 0; i < 8; ++i) {
+         deposit_id = (deposit_id << 8) |
+                      static_cast<uint8_t>(req.source_tx_id[i]);
+      }
+
+      // ── (4) Recompute the expected correlation hash from UWREQ fields ──
+      // Layout MUST stay synchronized with the producer side
+      // (`opp-outpost/src/instructions/request_swap.rs::correlation_hash`).
+      // 32 + 7×8 + 4 = 92 bytes total.
+      std::vector<uint8_t> packed;
+      packed.reserve(32 + 7 * 8 + 4);
+      if (req.depositor.size() != 32) {
+         elog("underwriter: source-deposit verify failed for uwreq {} — "
+              "depositor has wrong size ({} bytes; expected 32 for SVM "
+              "Ed25519 pubkey)", req.id, req.depositor.size());
+         bump_mismatch();
+         return false;
+      }
+      packed.insert(packed.end(), req.depositor.begin(), req.depositor.end());
+      auto append_u64_be = [&](uint64_t v) {
+         for (int shift = 56; shift >= 0; shift -= 8) {
+            packed.push_back(static_cast<uint8_t>((v >> shift) & 0xff));
+         }
+      };
+      auto append_u32_be = [&](uint32_t v) {
+         for (int shift = 24; shift >= 0; shift -= 8) {
+            packed.push_back(static_cast<uint8_t>((v >> shift) & 0xff));
+         }
+      };
+      append_u64_be(req.src_amount);
+      append_u64_be(req.src_token_code.value);
+      append_u64_be(req.src_reserve_code.value);
+      append_u64_be(req.dst_chain_code.value);
+      append_u64_be(req.dst_token_code.value);
+      append_u64_be(req.dst_reserve_code.value);
+      append_u64_be(req.dst_amount);
+      append_u32_be(req.variance_tolerance_bps);
+      if (packed.size() != 32 + 7 * 8 + 4) {
+         elog("underwriter: source-deposit verify failed for uwreq {} — "
+              "packed buffer size {} != expected {}",
+              req.id, packed.size(), 32 + 7 * 8 + 4);
+         bump_mismatch();
+         return false;
+      }
+      const auto recomputed_hash = fc::crypto::keccak256::hash(
+         std::span<const uint8_t>{packed.data(), packed.size()});
+
+      // Canonical marker the producer emits on `request_swap`. The
+      // Solana JSON-RPC `meta.logMessages[]` array contains each
+      // `msg!` line verbatim, prefixed with `"Program log: "`.
+      const std::string marker_prefix =
+         "Program log: opp_outpost: SwapDeposit id=" +
+         std::to_string(deposit_id) + " hash=";
+
+      // ── (2) + (3) retry-loop until matched or budget expires ───────────
+      // `bool hard_mismatch` distinguishes "found and known-bad" (hash
+      // divergence / tx error) from "not yet found" (deferred). The
+      // retry-callback returns:
+      //   - Some(true)               → success, exit retry_until
+      //   - Some(false) hard_mismatch → fail-fast, exit retry_until
+      //   - None                     → deferred, sleep + retry
+      // Outer `try { retry_until } catch (timeout_exception)` maps the
+      // deadline-without-match case to deferred-no-mismatch-bump,
+      // matching the ETH verify's semantics.
+      constexpr size_t SOL_SCAN_LIMIT = 50;   // per-iteration sig batch
+      bool        hard_mismatch_seen = false;
+      std::string matched_sig;
 
       try {
-         auto tx = entry->client->get_transaction(sig_b58,
-            underwriter::SOL_COMMITMENT);
-         if (tx.is_null()) {
-            elog("underwriter: source-deposit verify failed for uwreq {} — "
-                 "getTransaction({}) returned null", req.id, sig_b58);
-            bump_mismatch();
+         fc::task::retry_options opts;
+         opts.initial_backoff = SOL_SWAP_DEPOSIT_POLL_INTERVAL;
+         opts.max_backoff     = SOL_SWAP_DEPOSIT_POLL_INTERVAL;
+         opts.total_timeout   = SOL_SWAP_DEPOSIT_TOTAL_TIMEOUT;
+         opts.growth_factor   = 1.0;   // fixed-interval cadence
+
+         std::function<std::optional<bool>()> attempt =
+         [&]() -> std::optional<bool> {
+            std::vector<fc::variant> sigs;
+            try {
+               sigs = entry->client->get_signatures_for_address(
+                  sol_program_id, std::nullopt, std::nullopt, SOL_SCAN_LIMIT);
+            } catch (const fc::exception& e) {
+               ilog("underwriter: source-deposit verify deferred for uwreq {} — "
+                    "getSignaturesForAddress({}) RPC error: {}",
+                    req.id, sol_program_id, e.to_detail_string());
+               return std::nullopt;
+            }
+
+            for (const auto& sig_var : sigs) {
+               if (!sig_var.is_object()) continue;
+               const auto sig_obj = sig_var.get_object();
+               if (!sig_obj.contains("signature") ||
+                   !sig_obj["signature"].is_string()) continue;
+               const std::string sig_b58 = sig_obj["signature"].as_string();
+
+               // Skip failed txs at the listing level — sigs with an `err`
+               // field carry execution failures and can't have emitted our
+               // marker line successfully.
+               if (sig_obj.contains("err") && !sig_obj["err"].is_null()) {
+                  continue;
+               }
+
+               fc::variant tx;
+               try {
+                  tx = entry->client->get_transaction(
+                     sig_b58, underwriter::SOL_COMMITMENT);
+               } catch (const fc::exception& e) {
+                  // Transient — move on; the next iteration may succeed.
+                  continue;
+               }
+               if (tx.is_null() || !tx.is_object()) continue;
+               const auto tx_obj = tx.get_object();
+               if (!tx_obj.contains("meta") || !tx_obj["meta"].is_object()) {
+                  continue;
+               }
+               const auto meta_obj = tx_obj["meta"].get_object();
+               // Skip failed txs again at the tx level for completeness.
+               if (meta_obj.contains("err") && !meta_obj["err"].is_null()) {
+                  continue;
+               }
+               if (!meta_obj.contains("logMessages") ||
+                   !meta_obj["logMessages"].is_array()) {
+                  continue;
+               }
+               for (const auto& line_var : meta_obj["logMessages"].get_array()) {
+                  if (!line_var.is_string()) continue;
+                  const std::string line = line_var.as_string();
+                  if (!boost::algorithm::starts_with(line, marker_prefix)) {
+                     continue;
+                  }
+                  // Parse the 64-char lowercase hex hash that follows
+                  // `marker_prefix`. Format MUST match the producer's
+                  // `format!("{:02x}", b)` per-byte spelling.
+                  const auto hash_hex = std::string_view{line}
+                                          .substr(marker_prefix.size());
+                  if (hash_hex.size() != 64) {
+                     elog("underwriter: source-deposit verify failed for "
+                          "uwreq {} — marker found in tx {} but hash field "
+                          "has wrong size ({} chars; expected 64)",
+                          req.id, sig_b58, hash_hex.size());
+                     hard_mismatch_seen = true;
+                     bump_mismatch();
+                     return std::optional<bool>(false);
+                  }
+                  std::array<uint8_t, 32> on_chain_hash{};
+                  bool parse_ok = true;
+                  for (size_t i = 0; i < 32 && parse_ok; ++i) {
+                     try {
+                        on_chain_hash[i] = static_cast<uint8_t>(std::stoul(
+                           std::string{hash_hex.substr(i * 2, 2)},
+                           nullptr, 16));
+                     } catch (...) {
+                        parse_ok = false;
+                     }
+                  }
+                  if (!parse_ok) {
+                     elog("underwriter: source-deposit verify failed for "
+                          "uwreq {} — marker found in tx {} but hash field "
+                          "is not lowercase hex: {}",
+                          req.id, sig_b58, std::string(hash_hex));
+                     hard_mismatch_seen = true;
+                     bump_mismatch();
+                     return std::optional<bool>(false);
+                  }
+                  if (std::memcmp(recomputed_hash.data(),
+                                   on_chain_hash.data(), 32) != 0) {
+                     const std::string got_hex(hash_hex);
+                     const std::string want_hex = fc::to_hex(
+                        reinterpret_cast<const char*>(recomputed_hash.data()),
+                        32);
+                     elog("underwriter: source-deposit verify failed for "
+                          "uwreq {} — SwapDeposit hash mismatch "
+                          "(deposit_id={} tx={}): on-chain={} recomputed={}",
+                          req.id, deposit_id, sig_b58, got_hex, want_hex);
+                     hard_mismatch_seen = true;
+                     bump_mismatch();
+                     return std::optional<bool>(false);
+                  }
+
+                  // ── (5) Confirmation gate — must be finalized ──────────
+                  std::string conf_status;
+                  if (sig_obj.contains("confirmationStatus") &&
+                      sig_obj["confirmationStatus"].is_string()) {
+                     conf_status = sig_obj["confirmationStatus"].as_string();
+                  }
+                  if (conf_status != "finalized") {
+                     ilog("underwriter: source-deposit verify deferred for "
+                          "uwreq {} — matching tx {} not yet finalized "
+                          "(confirmationStatus={})",
+                          req.id, sig_b58, conf_status);
+                     return std::nullopt;
+                  }
+
+                  matched_sig = sig_b58;
+                  return std::optional<bool>(true);
+               }
+            }
+            return std::nullopt;   // not found this iteration; sleep + retry
+         };
+
+         const bool ok = fc::task::retry_until<bool>(
+            "underwriter:verify_source_deposit_sol", opts, attempt);
+         if (ok) {
+            ilog("underwriter: source-deposit verify passed for uwreq {} "
+                 "(deposit_id={} tx={} program={})",
+                 req.id, deposit_id, matched_sig, sol_program_id);
+            return true;
+         }
+         // retry_until returned `false` → hard mismatch already counted +
+         // logged inside the callback. Propagate the failure unchanged.
+         return false;
+      } catch (const fc::timeout_exception&) {
+         // Deadline reached without finding a matching log. Treat as a
+         // deferred retry by the outer underwriter loop — DO NOT bump
+         // the mismatch counter, matching the ETH verify's semantics
+         // for "log not yet present."
+         if (hard_mismatch_seen) {
+            // Defensive: shouldn't get here since hard mismatch returns
+            // Some(false) above, but if it ever does, keep counting.
             return false;
          }
-         const auto tx_obj = tx.get_object();
-         // (2) tx.meta.err must be null for success.
-         if (tx_obj.contains("meta") && tx_obj["meta"].is_object()) {
-            const auto meta = tx_obj["meta"].get_object();
-            if (meta.contains("err") && !meta["err"].is_null()) {
-               elog("underwriter: source-deposit verify failed for uwreq {} — "
-                    "tx {} failed on-chain (meta.err={})", req.id, sig_b58,
-                    meta["err"].as_string());
-               bump_mismatch();
-               return false;
-            }
-         }
-
-         // (3) sol_program_id must appear in accountKeys. We also record
-         //     its index because Solana instructions reference accounts
-         //     by index into this array.
-         std::vector<std::string> account_keys;
-         std::optional<size_t> program_idx;
-         if (tx_obj.contains("transaction") && tx_obj["transaction"].is_object()) {
-            const auto inner = tx_obj["transaction"].get_object();
-            if (inner.contains("message") && inner["message"].is_object()) {
-               const auto msg = inner["message"].get_object();
-               if (msg.contains("accountKeys") && msg["accountKeys"].is_array()) {
-                  size_t i = 0;
-                  for (const auto& k : msg["accountKeys"].get_array()) {
-                     if (k.is_string()) {
-                        account_keys.push_back(k.as_string());
-                        if (account_keys.back() == sol_program_id) {
-                           program_idx = i;
-                        }
-                     }
-                     ++i;
-                  }
-                  if (!program_idx) {
-                     elog("underwriter: source-deposit verify failed for uwreq {} — "
-                          "tx {} does not reference SOL outpost program {}",
-                          req.id, sig_b58, sol_program_id);
-                     bump_mismatch();
-                     return false;
-                  }
-                  // (4b) Depositor must equal accountKeys[0] (Solana fee
-                  //      payer / first signer). `req.depositor` is the
-                  //      raw 32-byte Ed25519 pubkey; base58-encode it
-                  //      to compare against the RPC's string form.
-                  if (account_keys.empty()) {
-                     elog("underwriter: source-deposit verify failed for uwreq {} — "
-                          "tx {} has empty accountKeys", req.id, sig_b58);
-                     bump_mismatch();
-                     return false;
-                  }
-                  const std::string depositor_b58 = fc::to_base58(
-                     req.depositor.data(), req.depositor.size(),
-                     fc::yield_function_t{});
-                  if (account_keys.front() != depositor_b58) {
-                     elog("underwriter: source-deposit verify failed for uwreq {} — "
-                          "fee-payer={} != req.depositor={}",
-                          req.id, account_keys.front(), depositor_b58);
-                     bump_mismatch();
-                     return false;
-                  }
-               }
-               // (4a) Discriminator match on the instruction targeting our
-               //      program. The RPC's `message.instructions[].programIdIndex`
-               //      points into accountKeys; we want the instruction whose
-               //      programIdIndex == our resolved index.
-               if (msg.contains("instructions") && msg["instructions"].is_array()) {
-                  bool disc_seen = false;
-                  for (const auto& ix : msg["instructions"].get_array()) {
-                     if (!ix.is_object()) continue;
-                     const auto ix_obj = ix.get_object();
-                     if (!ix_obj.contains("programIdIndex")) continue;
-                     if (ix_obj["programIdIndex"].as_uint64() != *program_idx) continue;
-
-                     // `data` is base58-encoded in the JSON-RPC response
-                     // (default encoding). Decode + compare the leading 8
-                     // bytes to the configured discriminator.
-                     std::string data_b58;
-                     if (ix_obj.contains("data") && ix_obj["data"].is_string()) {
-                        data_b58 = ix_obj["data"].as_string();
-                     }
-                     if (data_b58.empty()) continue;
-                     std::vector<char> decoded;
-                     try {
-                        // fc::from_base58 returns vector<char>
-                        decoded = fc::from_base58(data_b58);
-                     } catch (...) {
-                        continue;
-                     }
-                     if (decoded.size() < 8) continue;
-                     if (std::equal(
-                            resolved_sol_source_deposit_discriminator.begin(),
-                            resolved_sol_source_deposit_discriminator.end(),
-                            reinterpret_cast<const uint8_t*>(decoded.data()))) {
-                        disc_seen = true;
-                        break;
-                     }
-                  }
-                  if (!disc_seen) {
-                     const std::string want = fc::to_hex(
-                        reinterpret_cast<const char*>(resolved_sol_source_deposit_discriminator.data()),
-                        resolved_sol_source_deposit_discriminator.size());
-                     elog("underwriter: source-deposit verify failed for uwreq {} — "
-                          "no instruction targeting program {} carries the "
-                          "resolved discriminator {} for instruction '{}'",
-                          req.id, sol_program_id, want,
-                          sol_source_deposit_instruction_name);
-                     bump_mismatch();
-                     return false;
-                  }
-               }
-            }
-         }
-
-         ilog("underwriter: source-deposit verify passed for uwreq {} "
-              "(SOL tx {} touches program {}; discriminator + depositor ok)",
-              req.id, sig_b58, sol_program_id);
-         return true;
+         ilog("underwriter: source-deposit verify deferred for uwreq {} — "
+              "no SwapDeposit log line for deposit_id={} after {}s "
+              "(program={}, scan-interval={}s, will retry on next outer tick)",
+              req.id, deposit_id,
+              SOL_SWAP_DEPOSIT_TOTAL_TIMEOUT.count() / 1'000'000,
+              sol_program_id,
+              SOL_SWAP_DEPOSIT_POLL_INTERVAL.count() / 1'000'000);
+         return false;
       } catch (const fc::exception& e) {
          elog("underwriter: source-deposit verify failed for uwreq {} — "
               "RPC error: {}", req.id, e.to_detail_string());
@@ -1511,16 +1873,21 @@ struct underwriter_plugin::impl {
       }
 
       ilog("underwriter: submitting commit pair for uwreq {} "
-           "src=({},{}) dst=({},{})",
+           "src=({},{},{}) dst=({},{},{})",
            req.id,
-           ChainKind_Name(req.src_chain), TokenKind_Name(req.src_token_kind),
-           ChainKind_Name(req.dst_chain), TokenKind_Name(req.dst_token_kind));
+           req.src_chain_code.to_string(),
+           req.src_token_code.to_string(),
+           req.src_reserve_code.to_string(),
+           req.dst_chain_code.to_string(),
+           req.dst_token_code.to_string(),
+           req.dst_reserve_code.to_string());
 
-      // Per-leg dispatch keyed on `(chain, token_kind)`. Same-chain swaps
-      // (e.g. ERC20 → ETH-native on one outpost) share `chain` between the
-      // two legs but differ on `token_kind`; the UIC payload carries the
-      // `token_kind` so the depot's `rcrdcommit` can route to the correct
-      // source/dest slot on `commit_entry`.
+      // Per-leg dispatch keyed on the v6 slug_name triple
+      // `(chain_code, token_code, reserve_code)`. Same-chain swaps (e.g.
+      // ERC20 → native on one outpost) share `chain_code` between the two
+      // legs but differ on `token_code`/`reserve_code`; the UIC payload
+      // carries the full triple so the depot's `rcrdcommit` can route to
+      // the correct source/dest slot on `commit_entry`.
       //
       // Confirmation discipline: we skip any leg whose
       // `(uwreq_id, chain, token_kind)` triple is already in
@@ -1528,12 +1895,18 @@ struct underwriter_plugin::impl {
       // After a successful confirm we record the triple so the next scan
       // doesn't resubmit. Per project rules: confirm BEFORE recording so
       // a partial-landing in the map cannot happen without OPP breakage.
-      auto submit_one = [this](ChainKind chain, TokenKind token_kind,
-                                uint64_t uw_request_id) {
+      auto submit_one = [this](ChainKind    chain,
+                               TokenKind    token_kind,
+                               fc::slug_name chain_code,
+                               fc::slug_name token_code,
+                               fc::slug_name reserve_code,
+                               uint64_t     uw_request_id) {
          const commit_key key{uw_request_id, chain, token_kind};
          if (confirmed_commits.contains(key)) {
             ilog("underwriter: skip already-confirmed commit uwreq={} chain={} token={}",
-                 uw_request_id, ChainKind_Name(chain), TokenKind_Name(token_kind));
+                 uw_request_id,
+                 chain_code.to_string(),
+                 token_code.to_string());
             return;
          }
 
@@ -1544,19 +1917,33 @@ struct underwriter_plugin::impl {
             return;
          }
          auto uic_bytes = build_signed_uic_bytes(
-            uw_request_id, *outpost_id_opt, token_kind);
+            uw_request_id, *outpost_id_opt, chain, chain_code, token_code, reserve_code);
          if (uic_bytes.empty()) return;   // already logged
 
+         // Chain-agnostic SPI call. The `outpost_by_chain` map carries one
+         // `outpost_client` per supported chain kind, built at startup via
+         // the outpost-plugin factories. Each concrete owns its own ABI /
+         // IDL discovery, address encoding, and on-chain confirmation
+         // discipline — this loop just relays opaque UIC bytes through the
+         // virtual. Per `outpost-client-spi.md`.
+         auto it = outpost_by_chain.find(chain);
+         if (it == outpost_by_chain.end()) {
+            elog("underwriter: no outpost_client wired for chain={} (uwreq {})",
+                 ChainKind_Name(chain), uw_request_id);
+            std::lock_guard lk{stats_mutex};
+            commits_failed_count++;
+            return;
+         }
          bool confirmed = false;
-         switch (chain) {
-            case ChainKind::CHAIN_KIND_ETHEREUM:
-               confirmed = submit_commit_eth(uw_request_id, uic_bytes); break;
-            case ChainKind::CHAIN_KIND_SOLANA:
-               confirmed = submit_commit_sol(uw_request_id, uic_bytes); break;
-            default:
-               elog("underwriter: unsupported chain={} for commit (uwreq {})",
-                    ChainKind_Name(chain), uw_request_id);
-               return;
+         try {
+            auto tx_or_sig = it->second->uw_commit(
+               uw_request_id, uic_bytes, fc::milliseconds(action_timeout_ms));
+            ilog("underwriter: commit landed on {} uwreq={} tx_or_sig={}",
+                 it->second->to_string(), uw_request_id, tx_or_sig);
+            confirmed = true;
+         } catch (const fc::exception& e) {
+            elog("underwriter: commit failed on {} for uwreq={}: {}",
+                 it->second->to_string(), uw_request_id, e.to_detail_string());
          }
          std::lock_guard lk{stats_mutex};
          if (confirmed) {
@@ -1566,131 +1953,28 @@ struct underwriter_plugin::impl {
             commits_failed_count++;
          }
       };
-      submit_one(req.src_chain, req.src_token_kind, req.id);
-      submit_one(req.dst_chain, req.dst_token_kind, req.id);
+      submit_one(req.src_chain, req.src_token_kind,
+                 req.src_chain_code, req.src_token_code, req.src_reserve_code,
+                 req.id);
+      submit_one(req.dst_chain, req.dst_token_kind,
+                 req.dst_chain_code, req.dst_token_code, req.dst_reserve_code,
+                 req.id);
    }
 
-   /**
-    * Call `commit(bytes uicBytes)` on the ETH outpost's OperatorRegistry —
-    * an opaque relay of the underwriter's signed UnderwriteIntentCommit.
-    * Submits, then waits for on-chain inclusion via the libfc client's
-    * `wait_for_confirmation`. Returns true iff the tx confirmed; the caller
-    * uses that to decide whether to record the leg in `confirmed_commits`.
-    */
-   bool submit_commit_eth(uint64_t uw_request_id, const std::vector<char>& uic_bytes) {
-      auto entry = eth_plug->get_client(eth_client_id);
-      if (!entry || !entry->client) {
-         elog("underwriter: ETH client '{}' not found", eth_client_id);
-         return false;
-      }
-      if (eth_opreg_addr.empty()) {
-         elog("underwriter: ETH OperatorRegistry address not configured");
-         return false;
-      }
-
-      auto& abis = eth_plug->get_abi_files();
-      const eth::abi::contract* commit_abi = nullptr;
-      for (auto& [path, contracts] : abis) {
-         for (auto& c : contracts) {
-            if (c.name == "commit") { commit_abi = &c; break; }
-         }
-         if (commit_abi) break;
-      }
-      if (!commit_abi) {
-         elog("underwriter: ETH commit ABI not found in loaded ABI files");
-         return false;
-      }
-
-      try {
-         std::vector<uint8_t> uic_bytes_u8(uic_bytes.begin(), uic_bytes.end());
-         auto tx = entry->client->create_default_tx(eth_opreg_addr, *commit_abi,
-            {fc::variant(uic_bytes_u8)});
-         auto result   = entry->client->execute_contract_tx_fn(tx, *commit_abi);
-         auto tx_hash  = result.as_string();
-         // Wait for on-chain inclusion; throws on revert / timeout. Per
-         // the user's directive: confirming inclusion BEFORE recording the
-         // commit means partial-landing in the local map cannot happen
-         // without an OPP-level breakage.
-         entry->client->wait_for_confirmation(tx_hash);
-         ilog("underwriter: ETH commit confirmed uwreq={} tx_hash={} bytes={}",
-              uw_request_id, tx_hash, uic_bytes.size());
-         return true;
-      } catch (const fc::exception& e) {
-         elog("underwriter: ETH commit failed for uwreq={}: {}",
-              uw_request_id, e.to_detail_string());
-         return false;
-      }
-   }
-
-   /**
-    * Call `commit_underwrite(bytes uic_bytes)` on the SOL outpost's
-    * opp-outpost program — an opaque relay of the underwriter's signed
-    * UnderwriteIntentCommit. Uses `execute_tx_and_confirm` (libfc helper)
-    * so the call returns only after the tx is included + confirmed.
-    * Returns true iff the tx confirmed; the caller decides whether to
-    * record the leg in `confirmed_commits`.
-    */
-   bool submit_commit_sol(uint64_t uw_request_id, const std::vector<char>& uic_bytes) {
-      auto entry = sol_plug->get_client(sol_client_id);
-      if (!entry || !entry->client) {
-         elog("underwriter: SOL client '{}' not found", sol_client_id);
-         return false;
-      }
-      if (sol_program_id.empty()) {
-         elog("underwriter: SOL program ID not configured");
-         return false;
-      }
-      try {
-         auto program_key = fc::crypto::solana::solana_public_key::from_base58_string(sol_program_id);
-         auto& idl_files = sol_plug->get_idl_files();
-         std::vector<sol::idl::program> program_idls;
-         for (auto& [path, programs] : idl_files) {
-            for (auto& p : programs) {
-               if (p.name == "opp_solana_outpost") {
-                  program_idls.push_back(p);
-                  break;
-               }
-            }
-         }
-         if (program_idls.empty()) {
-            elog("underwriter: opp_solana_outpost IDL not found");
-            return false;
-         }
-         auto program_client = std::make_shared<sol::solana_program_client>(
-            entry->client, program_key, program_idls);
-
-         if (!program_client->has_idl("commit_underwrite")) {
-            elog("underwriter: SOL commit_underwrite IDL missing — deploy bug "
-                 "(opp-outpost program does not expose commit_underwrite). "
-                 "Skipping SOL leg for uwreq {}", uw_request_id);
-            return false;
-         }
-         auto& instr = program_client->get_idl("commit_underwrite");
-         auto accounts = program_client->resolve_accounts(instr);
-         std::vector<uint8_t> uic_bytes_u8(uic_bytes.begin(), uic_bytes.end());
-         // execute_tx_and_confirm: submits then awaits inclusion; throws
-         // on timeout / failure. Same confirm-before-record discipline as
-         // the ETH path above.
-         auto signature = program_client->execute_tx_and_confirm(
-            instr, accounts,
-            {fc::variant(fc::mutable_variant_object()("uic_bytes", uic_bytes_u8))});
-         ilog("underwriter: SOL commit_underwrite confirmed uwreq={} signature={} bytes={}",
-              uw_request_id, signature, uic_bytes.size());
-         return true;
-      } catch (const fc::exception& e) {
-         elog("underwriter: SOL commit_underwrite failed for uwreq={}: {}",
-              uw_request_id, e.to_detail_string());
-         return false;
-      }
-   }
+   // Outpost commit submission is delegated entirely to the `outpost_client`
+   // SPI — see `outpost_by_chain` above and `submit_intent_to_outpost` for
+   // the dispatch. Chain-specific ABI / IDL discovery, address encoding,
+   // and on-chain confirmation live inside
+   // `outpost_ethereum_client::uw_commit` and
+   // `outpost_solana_client::uw_commit`. Per `outpost-client-spi.md`.
 
    // The plugin previously carried a `push_action()` helper for signing
    // and pushing WIRE-chain actions; after the commit refactor (T9 + T14)
    // the underwriter does not push any WIRE-chain actions on its own —
-   // commits go via the outpost RPC clients in `submit_commit_eth` /
-   // `submit_commit_sol`. The signature_provider_manager_plugin dependency
-   // is still required because `build_signed_uic_bytes` uses it to sign
-   // the UIC digest with the underwriter's WIRE K1 key.
+   // commits go via the outpost_client SPI. The
+   // signature_provider_manager_plugin dependency is still required
+   // because `build_signed_uic_bytes` uses it to sign the UIC digest
+   // with the underwriter's WIRE K1 key.
 
    // ── HTTP API: /v1/underwriter/* ─────────────────────────────────────
    // Read-only diagnostic surface for the operator. Wraps internal state
@@ -1810,6 +2094,14 @@ void underwriter_plugin::set_program_options(options_description& cli,
         "files registered with --solana-idl-file; the matching instruction's anchor "
         "discriminator (8 bytes) is used to identify the deposit instruction in source "
         "txs. Required.");
+   opts("underwriter-eth-min-confirmations",
+        bpo::value<uint64_t>()->default_value(
+           sysio::underwriter::ETH_MIN_CONFIRMATIONS),
+        "Minimum ETH block confirmations the underwriter requires before a "
+        "SwapDeposit log is accepted as source-deposit-verified. Default 12 "
+        "(mainnet-safe). Lower (e.g. 1) on the local anvil test cluster where "
+        "blocks only mine on user txs and waiting for 12 confirmations would "
+        "stall the underwriter race.");
 }
 
 void underwriter_plugin::plugin_initialize(const variables_map& options) {
@@ -1828,6 +2120,8 @@ void underwriter_plugin::plugin_initialize(const variables_map& options) {
    if (options.count("underwriter-sol-source-deposit-instruction"))
       _impl->sol_source_deposit_instruction_name =
          options["underwriter-sol-source-deposit-instruction"].as<std::string>();
+   _impl->eth_min_confirmations =
+      options["underwriter-eth-min-confirmations"].as<uint64_t>();
 
    _impl->chain_plug = &app().get_plugin<chain_plugin>();
    _impl->cron_plug  = &app().get_plugin<cron_plugin>();
@@ -1848,6 +2142,53 @@ void underwriter_plugin::plugin_startup() {
    // for establishing the missing state — there is no dev escape hatch.
    if (!_impl->run_preflight()) {
       elog("underwriter_plugin: pre-flight failed — cron job NOT registered");
+      return;
+   }
+
+   // Materialize the outpost_client SPI handles. The underwriter never
+   // sees raw `ethereum_client` / `solana_client` instances after this
+   // point — every outpost-side action goes through the SPI virtuals.
+   // Per `outpost-client-spi.md`:
+   //   * ETH outpost is constructed with only the OperatorRegistry
+   //     address — the underwriter does not consume / emit OPP
+   //     envelopes itself, so OPP / OPPInbound addresses are left empty
+   //     and `deliver_outbound_envelope` / `read_inbound_envelope` would
+   //     assert if called (they're not, on this code path).
+   //   * SOL outpost is constructed with the program id resolved at
+   //     preflight from the IDL's `address` field; the typed program
+   //     wrapper exposes `commit_underwrite` directly.
+   try {
+      if (!_impl->eth_client_id.empty() && !_impl->eth_opreg_addr.empty()) {
+         _impl->outpost_by_chain[ChainKind::CHAIN_KIND_EVM] =
+            _impl->eth_plug->create_outpost_client(_impl->eth_client_id,
+                                                   /*chain_code=*/0,
+                                                   /*chain_id=*/0,
+                                                   /*opp_addr=*/"",
+                                                   /*opp_inbound_addr=*/"",
+                                                   _impl->eth_opreg_addr);
+         ilog("underwriter_plugin: wired ETH outpost_client (opreg={})",
+              _impl->eth_opreg_addr);
+      } else {
+         wlog("underwriter_plugin: ETH outpost_client NOT wired "
+              "(eth_client_id='{}', eth_opreg_addr='{}')",
+              _impl->eth_client_id, _impl->eth_opreg_addr);
+      }
+      if (!_impl->sol_client_id.empty() && !_impl->sol_program_id.empty()) {
+         _impl->outpost_by_chain[ChainKind::CHAIN_KIND_SVM] =
+            _impl->sol_plug->create_outpost_client(_impl->sol_client_id,
+                                                   /*chain_code=*/0,
+                                                   /*chain_id=*/0,
+                                                   _impl->sol_program_id);
+         ilog("underwriter_plugin: wired SOL outpost_client (program={})",
+              _impl->sol_program_id);
+      } else {
+         wlog("underwriter_plugin: SOL outpost_client NOT wired "
+              "(sol_client_id='{}', sol_program_id='{}')",
+              _impl->sol_client_id, _impl->sol_program_id);
+      }
+   } catch (const fc::exception& e) {
+      elog("underwriter_plugin: failed to build outpost_client(s): {}",
+           e.to_detail_string());
       return;
    }
 

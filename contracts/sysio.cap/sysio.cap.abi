@@ -26,10 +26,6 @@
                     "type": "uint64"
                 },
                 {
-                    "name": "next_stage_id",
-                    "type": "uint64"
-                },
-                {
                     "name": "next_cursor_id",
                     "type": "uint64"
                 }
@@ -107,52 +103,6 @@
             ]
         },
         {
-            "name": "native_stage",
-            "base": "",
-            "fields": [
-                {
-                    "name": "id",
-                    "type": "uint64"
-                },
-                {
-                    "name": "outpost_id",
-                    "type": "uint64"
-                },
-                {
-                    "name": "chain",
-                    "type": "ChainKind"
-                },
-                {
-                    "name": "native_pubkey",
-                    "type": "bytes"
-                },
-                {
-                    "name": "wire_account",
-                    "type": "name"
-                },
-                {
-                    "name": "native_kind",
-                    "type": "TokenKind"
-                },
-                {
-                    "name": "native_amount",
-                    "type": "uint64"
-                },
-                {
-                    "name": "reward_epoch_index",
-                    "type": "uint32"
-                },
-                {
-                    "name": "external_epoch_ref",
-                    "type": "uint64"
-                },
-                {
-                    "name": "expires_at_sec",
-                    "type": "uint32"
-                }
-            ]
-        },
-        {
             "name": "onreward",
             "base": "",
             "fields": [
@@ -171,10 +121,6 @@
                 {
                     "name": "staker_native_addr",
                     "type": "bytes"
-                },
-                {
-                    "name": "reward_kind",
-                    "type": "TokenKind"
                 },
                 {
                     "name": "reward_amount",
@@ -218,16 +164,6 @@
                 },
                 {
                     "name": "expires_at_sec",
-                    "type": "uint32"
-                }
-            ]
-        },
-        {
-            "name": "retryconvert",
-            "base": "",
-            "fields": [
-                {
-                    "name": "max_rows",
                     "type": "uint32"
                 }
             ]
@@ -280,16 +216,6 @@
                 {
                     "name": "window_sec",
                     "type": "uint32"
-                }
-            ]
-        },
-        {
-            "name": "stage_key",
-            "base": "",
-            "fields": [
-                {
-                    "name": "id",
-                    "type": "uint64"
                 }
             ]
         },
@@ -362,11 +288,6 @@
             "ricardian_contract": ""
         },
         {
-            "name": "retryconvert",
-            "type": "retryconvert",
-            "ricardian_contract": ""
-        },
-        {
             "name": "setconfig",
             "type": "setconfig",
             "ricardian_contract": ""
@@ -393,21 +314,6 @@
             "key_names": ["name"],
             "key_types": ["name"],
             "table_id": 40418
-        },
-        {
-            "name": "nativestage",
-            "type": "native_stage",
-            "index_type": "i64",
-            "key_names": ["id"],
-            "key_types": ["uint64"],
-            "table_id": 20200,
-            "secondary_indexes": [
-                {
-                    "name": "bychainad",
-                    "key_type": "uint128",
-                    "table_id": 29106
-                }
-            ]
         },
         {
             "name": "pclaims",
@@ -465,54 +371,12 @@
                     "value": 1
                 },
                 {
-                    "name": "CHAIN_KIND_ETHEREUM",
+                    "name": "CHAIN_KIND_EVM",
                     "value": 2
                 },
                 {
-                    "name": "CHAIN_KIND_SOLANA",
+                    "name": "CHAIN_KIND_SVM",
                     "value": 3
-                },
-                {
-                    "name": "CHAIN_KIND_SUI",
-                    "value": 4
-                }
-            ]
-        },
-        {
-            "name": "TokenKind",
-            "type": "int32",
-            "values": [
-                {
-                    "name": "TOKEN_KIND_WIRE",
-                    "value": 0
-                },
-                {
-                    "name": "TOKEN_KIND_ETH",
-                    "value": 256
-                },
-                {
-                    "name": "TOKEN_KIND_ERC20",
-                    "value": 257
-                },
-                {
-                    "name": "TOKEN_KIND_ERC721",
-                    "value": 258
-                },
-                {
-                    "name": "TOKEN_KIND_ERC1155",
-                    "value": 259
-                },
-                {
-                    "name": "TOKEN_KIND_LIQETH",
-                    "value": 496
-                },
-                {
-                    "name": "TOKEN_KIND_SOL",
-                    "value": 512
-                },
-                {
-                    "name": "TOKEN_KIND_LIQSOL",
-                    "value": 752
                 }
             ]
         }

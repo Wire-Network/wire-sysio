@@ -1,11 +1,14 @@
 #include <sysio.reserv/sysio.reserv.hpp>
+#include <sysio.epoch/sysio.epoch.hpp>
+#include <sysio.msgch/sysio.msgch.hpp>
 #include <sysio.opp.common/opp_table_types.hpp>
 
-namespace sysio {
+#include <zpp_bits.h>
 
-using opp::types::ChainKind;
-using opp::types::TokenKind;
-using opp::types::TokenAmount;
+#include <cstring>
+#include <limits>
+
+namespace sysio {
 
 namespace {
 
@@ -13,152 +16,335 @@ uint64_t current_time_ms() {
    return static_cast<uint64_t>(current_time_point().sec_since_epoch()) * 1000;
 }
 
-/// Build a TokenAmount with `kind` and `amount`. amount is int64 on the
-/// wire; the upstream callers carry uint64 quantities so the cast is
-/// explicit.
-TokenAmount make_token_amount(TokenKind kind, uint64_t amount) {
-   TokenAmount ta;
-   ta.kind   = kind;
-   ta.amount = static_cast<int64_t>(amount);
-   return ta;
+uint32_t get_current_epoch_index() {
+   sysio::epoch::epochstate_t es(reserve::EPOCH_ACCOUNT);
+   if (!es.exists()) return 0;
+   return es.get().current_epoch_index;
 }
 
-} // anonymous namespace
+bool is_bootstrap_window() {
+   return get_current_epoch_index() == 0;
+}
 
-// ---------------------------------------------------------------------------
-//  setreserve
-// ---------------------------------------------------------------------------
-void reserve::setreserve(opp::types::ChainKind     chain,
-                          opp::types::TokenKind     outpost_kind,
-                          uint64_t                  outpost_amount,
-                          uint64_t                  wire_amount,
-                          uint32_t                  connector_weight_bps) {
-   require_auth(get_self());
-   check(connector_weight_bps > 0 && connector_weight_bps <= MAX_CONNECTOR_WEIGHT_BPS,
-         "connector_weight_bps must be in (0, 10000]");
-   check(outpost_kind != TokenKind::TOKEN_KIND_WIRE,
-         "outpost_kind must not be TOKEN_KIND_WIRE (the WIRE side is implicit)");
-   check(!(chain == ChainKind::CHAIN_KIND_WIRE),
-         "WIRE chain has no outpost reserve; reserves are per-outpost only");
+void require_priv_caller() {
+   require_auth(current_receiver());
+   sysio::check(sysio::is_privileged(current_receiver()),
+                "sysio.reserv: privileged account required");
+}
 
-   reserves_t reserves(get_self());
-   auto pk  = reserve_key{pack_chain_token(chain, outpost_kind)};
-   auto now = current_time_ms();
-   if (reserves.contains(pk)) {
-      reserves.modify(same_payer, pk, [&](auto& r) {
-         r.reserve_outpost_amount = make_token_amount(outpost_kind, outpost_amount);
-         r.reserve_wire_amount    = make_token_amount(TokenKind::TOKEN_KIND_WIRE, wire_amount);
-         r.connector_weight_bps   = connector_weight_bps;
-         r.last_updated_ms        = now;
-      });
-   } else {
-      reserves.emplace(get_self(), pk, reserve_entry{
-         .chain                  = chain,
-         .reserve_outpost_amount = make_token_amount(outpost_kind, outpost_amount),
-         .reserve_wire_amount    = make_token_amount(TokenKind::TOKEN_KIND_WIRE, wire_amount),
-         .connector_weight_bps   = connector_weight_bps,
-         .last_updated_ms        = now,
-      });
+uint64_t cp_output(uint64_t reserve_src, uint64_t reserve_dst, uint64_t src_amount) {
+   if (reserve_src == 0 || reserve_dst == 0 || src_amount == 0) return 0;
+   uint128_t numerator   = static_cast<uint128_t>(reserve_dst) * src_amount;
+   uint128_t denominator = static_cast<uint128_t>(reserve_src) + src_amount;
+   uint128_t result      = numerator / denominator;
+   if (result > static_cast<uint128_t>(std::numeric_limits<uint64_t>::max())) {
+      return std::numeric_limits<uint64_t>::max();
    }
+   return static_cast<uint64_t>(result);
 }
 
-// ---------------------------------------------------------------------------
-//  swapquote — read-only constant-product quote
-// ---------------------------------------------------------------------------
-uint64_t reserve::swapquote(opp::types::TokenKind     from_kind,
-                             uint64_t                  from_amount,
-                             opp::types::ChainKind     to_chain,
-                             opp::types::TokenKind     to_token) {
-   // Pricing lives in the shared header helper so `sysio.cap` (which cannot
-   // call this read-only action — sysio/sysio has no synchronous
-   // inter-contract call) prices native staking rewards with the exact same
-   // math against this contract's published `reserves` table.
-   reserves_t reserves(get_self());
-   return quote(reserves, from_kind, from_amount, to_chain, to_token);
+reserve::reserve_key make_key(sysio::slug_name chain_code,
+                              sysio::slug_name token_code,
+                              sysio::slug_name reserve_code) {
+   return reserve::reserve_key{chain_code, token_code, reserve_code};
 }
 
-// ---------------------------------------------------------------------------
-//  onreward — STAKING_REWARD attestation credits the outpost-side reserve
-// ---------------------------------------------------------------------------
-void reserve::onreward(opp::types::ChainKind     chain,
-                        opp::types::TokenKind     outpost_kind,
-                        uint64_t                  outpost_amount) {
-   require_auth(MSGCH_ACCOUNT);
-   check(outpost_amount > 0, "outpost_amount must be positive");
-   check(outpost_kind != TokenKind::TOKEN_KIND_WIRE,
-         "STAKING_REWARD credits the outpost-side reserve only; WIRE-side payout is a separate action");
+/// Encode + queue a depot→outpost attestation back to the reserve's owning
+/// chain. Mirrors `sysio.uwrit::emit_swap_remit` / `emit_swap_revert`:
+///
+///   * `zpp::bits::no_size{}` — raw protobuf bytes for the outpost decoder
+///     (the default `zpp::bits::data_out` form prepends a 4-byte LE length
+///     prefix that corrupts the first field tag on the receiving side).
+///   * The destination `chain_code` is the reserve's `chain_code.value`
+///     itself (per the v6 convention recorded in `sysio.msgch.hpp`:
+///     "the outpost id IS the chain's slug_name value").
+template <typename ProtoMessage>
+void queue_attestation_out(name self,
+                           sysio::slug_name owning_chain,
+                           opp::types::AttestationType attest_type,
+                           const ProtoMessage& message) {
+   std::vector<char> encoded;
+   auto out = zpp::bits::out{encoded, zpp::bits::no_size{}};
+   (void)out(message);
 
-   reserves_t reserves(get_self());
-   auto pk = reserve_key{pack_chain_token(chain, outpost_kind)};
-   check(reserves.contains(pk),
-         "reserve not provisioned for this (chain, outpost_token); call setreserve first");
+   action(
+      permission_level{self, "active"_n},
+      reserve::MSGCH_ACCOUNT, "queueout"_n,
+      std::make_tuple(owning_chain.value, attest_type, encoded)
+   ).send();
+}
 
-   auto now = current_time_ms();
-   reserves.modify(same_payer, pk, [&](auto& r) {
-      check(r.reserve_outpost_amount.kind == outpost_kind,
-            "outpost_kind mismatches reserve_outpost_amount.kind");
-      r.reserve_outpost_amount.amount += static_cast<int64_t>(outpost_amount);
-      r.last_updated_ms = now;
+} // namespace
+
+void reserve::regreserve(sysio::slug_name chain_code,
+                          sysio::slug_name token_code,
+                          sysio::slug_name reserve_code,
+                          std::string     name,
+                          std::string     description,
+                          uint64_t        initial_chain_amount,
+                          uint64_t        initial_wire_amount,
+                          uint32_t        connector_weight_bps) {
+   require_priv_caller();
+   sysio::check(is_bootstrap_window(),
+                "regreserve is bootstrap-window only; post-bootstrap reserves go through create_reserve");
+   sysio::check(connector_weight_bps > 0 && connector_weight_bps <= MAX_CONNECTOR_WEIGHT_BPS,
+                "connector_weight_bps must be in (0, 10000]");
+   sysio::check(initial_chain_amount > 0 && initial_wire_amount > 0,
+                "bootstrap reserve must seed both chain_amount and wire_amount > 0");
+
+   reserves_t tbl(get_self());
+   auto pk = make_key(chain_code, token_code, reserve_code);
+   sysio::check(tbl.find(pk) == tbl.end(), "reserve already registered");
+
+   const auto now = current_time_ms();
+   tbl.emplace(get_self(), pk, reserve_row{
+      .chain_code             = chain_code,
+      .token_code             = token_code,
+      .reserve_code           = reserve_code,
+      .name                   = std::move(name),
+      .description            = std::move(description),
+      .status                 = opp::types::RESERVE_STATUS_ACTIVE,
+      .reserve_chain_amount   = initial_chain_amount,
+      .reserve_wire_amount    = initial_wire_amount,
+      .connector_weight_bps   = connector_weight_bps,
+      .creator_addr           = {},
+      .requested_wire_amount  = initial_wire_amount,
+      .external_token_amount  = initial_chain_amount,
+      .registered_at_ms       = now,
+      .activated_at_ms        = now,
+      .cancelled_at_ms        = 0,
    });
 }
 
-// ---------------------------------------------------------------------------
-//  debit — SWAP_REMIT emit-time debit (auth=sysio.uwrit)
-// ---------------------------------------------------------------------------
-void reserve::debit(opp::types::ChainKind     chain,
-                     opp::types::TokenKind     outpost_kind,
-                     uint64_t                  outpost_amount) {
+void reserve::oncrtreserve(sysio::slug_name       chain_code,
+                            sysio::slug_name       token_code,
+                            sysio::slug_name       reserve_code,
+                            std::string           name,
+                            std::string           description,
+                            uint64_t              external_token_amount,
+                            uint64_t              requested_wire_amount,
+                            uint32_t              connector_weight_bps,
+                            opp::types::ChainKind creator_chain_kind,
+                            std::vector<char>     creator_chain_addr) {
+   require_auth(MSGCH_ACCOUNT);
+
+   // Soft-validate; silent skip per feedback_opp_handlers_never_throw.
+   if (connector_weight_bps == 0 || connector_weight_bps > MAX_CONNECTOR_WEIGHT_BPS) {
+      sysio::print("oncrtreserve: bad connector_weight_bps; skipping\n");
+      return;
+   }
+   if (external_token_amount == 0 || requested_wire_amount == 0) {
+      sysio::print("oncrtreserve: zero deposit / requested amount; skipping\n");
+      return;
+   }
+
+   reserves_t tbl(get_self());
+   auto pk = make_key(chain_code, token_code, reserve_code);
+   if (tbl.find(pk) != tbl.end()) {
+      sysio::print("oncrtreserve: reserve already exists; skipping\n");
+      return;
+   }
+
+   opp::types::ChainAddress creator;
+   creator.kind    = creator_chain_kind;
+   creator.address = std::move(creator_chain_addr);
+
+   const auto now = current_time_ms();
+   tbl.emplace(get_self(), pk, reserve_row{
+      .chain_code             = chain_code,
+      .token_code             = token_code,
+      .reserve_code           = reserve_code,
+      .name                   = std::move(name),
+      .description            = std::move(description),
+      .status                 = opp::types::RESERVE_STATUS_PENDING,
+      .reserve_chain_amount   = external_token_amount,
+      .reserve_wire_amount    = 0,
+      .connector_weight_bps   = connector_weight_bps,
+      .creator_addr           = std::move(creator),
+      .requested_wire_amount  = requested_wire_amount,
+      .external_token_amount  = external_token_amount,
+      .registered_at_ms       = now,
+      .activated_at_ms        = 0,
+      .cancelled_at_ms        = 0,
+   });
+}
+
+void reserve::matchreserve(sysio::slug_name chain_code,
+                            sysio::slug_name token_code,
+                            sysio::slug_name reserve_code,
+                            name            matcher,
+                            uint64_t        wire_amount) {
+   require_auth(matcher);
+
+   reserves_t tbl(get_self());
+   auto pk = make_key(chain_code, token_code, reserve_code);
+   auto it = tbl.find(pk);
+   sysio::check(it != tbl.end(), "matchreserve: reserve not found");
+   sysio::check(it->status == opp::types::RESERVE_STATUS_PENDING,
+                "matchreserve: reserve is not PENDING");
+   sysio::check(wire_amount == it->requested_wire_amount,
+                "matchreserve: wire_amount must equal requested_wire_amount exactly");
+
+   tbl.modify(get_self(), pk, [&](auto& row) {
+      row.status              = opp::types::RESERVE_STATUS_ACTIVE;
+      row.reserve_wire_amount = wire_amount;
+      row.activated_at_ms     = current_time_ms();
+   });
+
+   // Reserve is now ACTIVE on the depot. Notify the owning outpost so its
+   // local reserve record can flip to ACTIVE and become usable for swap
+   // routing. The destination `chain_code` is the reserve's `chain_code`
+   // (per the v6 `sysio.msgch::queueout` convention — the outpost id is
+   // the chain slug_name's packed uint64 value).
+   opp::attestations::ReserveReady ready;
+   ready.chain_code   = chain_code.value;
+   ready.token_code   = token_code.value;
+   ready.reserve_code = reserve_code.value;
+   queue_attestation_out(get_self(), chain_code,
+                         opp::types::AttestationType::ATTESTATION_TYPE_RESERVE_READY,
+                         ready);
+}
+
+void reserve::oncnclrsv(sysio::slug_name       chain_code,
+                         sysio::slug_name       token_code,
+                         sysio::slug_name       reserve_code,
+                         opp::types::ChainKind creator_chain_kind,
+                         std::vector<char>     creator_chain_addr) {
+   require_auth(MSGCH_ACCOUNT);
+
+   reserves_t tbl(get_self());
+   auto pk = make_key(chain_code, token_code, reserve_code);
+   auto it = tbl.find(pk);
+   if (it == tbl.end()) {
+      sysio::print("oncnclrsv: reserve not found; silently skipping\n");
+      return;
+   }
+
+   if (it->status != opp::types::RESERVE_STATUS_PENDING) {
+      sysio::print("oncnclrsv: status != PENDING; race lost, silent no-op\n");
+      return;
+   }
+
+   const bool addr_matches =
+      it->creator_addr.kind    == creator_chain_kind &&
+      it->creator_addr.address == creator_chain_addr;
+   if (!addr_matches) {
+      sysio::print("oncnclrsv: creator_addr mismatch; silently skipping\n");
+      return;
+   }
+
+   tbl.modify(get_self(), pk, [&](auto& row) {
+      row.status          = opp::types::RESERVE_STATUS_CANCELLED;
+      row.cancelled_at_ms = current_time_ms();
+   });
+
+   // Race won — depot accepted the cancel before any matchreserve. Notify
+   // the outpost so it refunds the creator's `external_token_amount`. The
+   // destination `chain_code` is the reserve's owning `chain_code`. Per
+   // `feedback_opp_handlers_never_throw.md` this handler still cannot
+   // throw; we only reach the queueout after all soft-validation checks
+   // above have silently returned, so the action is safe to send here.
+   opp::attestations::ReserveCreateCancelled cancelled;
+   cancelled.chain_code   = chain_code.value;
+   cancelled.token_code   = token_code.value;
+   cancelled.reserve_code = reserve_code.value;
+   queue_attestation_out(get_self(), chain_code,
+                         opp::types::AttestationType::ATTESTATION_TYPE_RESERVE_CREATE_CANCELLED,
+                         cancelled);
+}
+
+uint64_t reserve::swapquote(sysio::slug_name from_chain_code,
+                             sysio::slug_name from_token_code,
+                             sysio::slug_name from_reserve_code,
+                             uint64_t        from_amount,
+                             sysio::slug_name to_chain_code,
+                             sysio::slug_name to_token_code,
+                             sysio::slug_name to_reserve_code) {
+   if (from_amount == 0) return 0;
+
+   reserves_t tbl(get_self());
+   auto src_pk = make_key(from_chain_code, from_token_code, from_reserve_code);
+   auto dst_pk = make_key(to_chain_code,   to_token_code,   to_reserve_code);
+   auto src_it = tbl.find(src_pk);
+   auto dst_it = tbl.find(dst_pk);
+   if (src_it == tbl.end() || dst_it == tbl.end()) return 0;
+   if (src_it->status != opp::types::RESERVE_STATUS_ACTIVE) return 0;
+   if (dst_it->status != opp::types::RESERVE_STATUS_ACTIVE) return 0;
+
+   uint64_t wire_intermediate = cp_output(src_it->reserve_chain_amount,
+                                          src_it->reserve_wire_amount,
+                                          from_amount);
+   if (wire_intermediate == 0) return 0;
+   return cp_output(dst_it->reserve_wire_amount, dst_it->reserve_chain_amount, wire_intermediate);
+}
+
+void reserve::debit(sysio::slug_name chain_code,
+                     sysio::slug_name token_code,
+                     sysio::slug_name reserve_code,
+                     uint64_t        amount) {
    require_auth(UWRIT_ACCOUNT);
-   check(outpost_amount > 0, "outpost_amount must be positive");
-   check(outpost_kind != TokenKind::TOKEN_KIND_WIRE,
-         "debit targets the outpost-side reserve only; WIRE-side debits "
-         "are owned by the staker-payout path");
+   sysio::check(amount > 0, "amount must be positive");
 
-   reserves_t reserves(get_self());
-   auto pk = reserve_key{pack_chain_token(chain, outpost_kind)};
-   check(reserves.contains(pk),
-         "reserve not provisioned for this (chain, outpost_token); "
-         "cannot debit");
+   reserves_t tbl(get_self());
+   auto pk = make_key(chain_code, token_code, reserve_code);
+   auto it = tbl.find(pk);
+   sysio::check(it != tbl.end(), "debit: reserve not found");
+   sysio::check(it->status == opp::types::RESERVE_STATUS_ACTIVE,
+                "debit: reserve not ACTIVE");
+   sysio::check(it->reserve_chain_amount >= amount,
+                "insufficient reserve_chain_amount for SWAP_REMIT debit");
 
-   auto now = current_time_ms();
-   reserves.modify(same_payer, pk, [&](auto& r) {
-      check(r.reserve_outpost_amount.kind == outpost_kind,
-            "outpost_kind mismatches reserve_outpost_amount.kind");
-      check(to_unsigned(r.reserve_outpost_amount.amount) >= outpost_amount,
-            "insufficient reserve_outpost_amount for SWAP_REMIT debit");
-      r.reserve_outpost_amount.amount -= static_cast<int64_t>(outpost_amount);
-      r.last_updated_ms = now;
+   tbl.modify(get_self(), pk, [&](auto& row) {
+      row.reserve_chain_amount -= amount;
    });
 }
 
-// ---------------------------------------------------------------------------
-//  onreject — outpost couldn't pay SwapRemit; depot's reserve view re-adds
-//             the unremitted amount so accounting reconciles
-// ---------------------------------------------------------------------------
-void reserve::onreject(checksum256              /*original_swap_remit_id*/,
-                        opp::types::ChainKind    recipient_kind,
-                        std::vector<char>        /*recipient_address*/,
-                        opp::types::TokenKind    unremitted_kind,
-                        uint64_t                 unremitted_amount,
-                        std::string              /*reason*/) {
+void reserve::onreject(checksum256       /*original_swap_remit_id*/,
+                        sysio::slug_name   chain_code,
+                        sysio::slug_name   token_code,
+                        sysio::slug_name   reserve_code,
+                        uint64_t          unremitted_amount,
+                        std::vector<char> /*recipient_address*/,
+                        std::string       /*reason*/) {
    require_auth(MSGCH_ACCOUNT);
-   check(unremitted_amount > 0, "unremitted_amount must be positive");
-   check(unremitted_kind != TokenKind::TOKEN_KIND_WIRE,
-         "SwapRejected reconciles the outpost-side reserve; WIRE-side has no outpost balance");
+   if (unremitted_amount == 0) return;
 
-   // The recipient's chain identifies which outpost reserve the failed
-   // SwapRemit was drawn from.
-   reserves_t reserves(get_self());
-   auto pk = reserve_key{pack_chain_token(recipient_kind, unremitted_kind)};
-   check(reserves.contains(pk),
-         "reserve not provisioned for this (chain, outpost_token); cannot reconcile SwapRejected");
+   reserves_t tbl(get_self());
+   auto pk = make_key(chain_code, token_code, reserve_code);
+   auto it = tbl.find(pk);
+   if (it == tbl.end()) {
+      sysio::print("onreject: reserve not found; silently skipping\n");
+      return;
+   }
+   if (it->status != opp::types::RESERVE_STATUS_ACTIVE) {
+      sysio::print("onreject: reserve not ACTIVE; silently skipping\n");
+      return;
+   }
+   tbl.modify(get_self(), pk, [&](auto& row) {
+      row.reserve_chain_amount += unremitted_amount;
+   });
+}
 
-   auto now = current_time_ms();
-   reserves.modify(same_payer, pk, [&](auto& r) {
-      check(r.reserve_outpost_amount.kind == unremitted_kind,
-            "unremitted_kind mismatches reserve_outpost_amount.kind");
-      r.reserve_outpost_amount.amount += static_cast<int64_t>(unremitted_amount);
-      r.last_updated_ms = now;
+void reserve::onreward(sysio::slug_name chain_code,
+                        sysio::slug_name token_code,
+                        sysio::slug_name reserve_code,
+                        uint64_t        outpost_amount) {
+   require_auth(MSGCH_ACCOUNT);
+   if (outpost_amount == 0) return;
+
+   reserves_t tbl(get_self());
+   auto pk = make_key(chain_code, token_code, reserve_code);
+   auto it = tbl.find(pk);
+   if (it == tbl.end()) {
+      sysio::print("onreward: reserve not found; silently skipping\n");
+      return;
+   }
+   if (it->status != opp::types::RESERVE_STATUS_ACTIVE) {
+      sysio::print("onreward: reserve not ACTIVE; silently skipping\n");
+      return;
+   }
+   tbl.modify(get_self(), pk, [&](auto& row) {
+      row.reserve_chain_amount += outpost_amount;
    });
 }
 

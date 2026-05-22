@@ -8,7 +8,6 @@
 #include <sysio/system.hpp>
 #include <sysio/opp/types/types.pb.hpp>
 #include <sysio.opp.common/opp_table_types.hpp>
-#include <sysio.reserv/sysio.reserv.hpp>   // reserve::reserves_t + shared quote()
 
 #include <cstring>
 #include <cstdint>
@@ -25,12 +24,10 @@ namespace sysio {
     * `STAKING_REWARD` flow.
     *
     * Inbound `STAKING_REWARD` attestations route through `sysio.msgch`, which
-    * credits the outpost-side reserve (`sysio.reserv::onreward`) and dispatches
-    * the per-staker body here via `onreward`. `onreward` prices the native
-    * reward into WIRE off `sysio.reserv`'s published `reserves` table (there is
-    * no synchronous inter-contract call, so the read-only `swapquote` action is
-    * not usable on-chain — the shared `reserve::quote` helper is used instead),
-    * then credits the staker's claim ledger.
+    * dispatches the per-staker body here via `onreward`. The reward arrives
+    * already WIRE-denominated — native -> WIRE conversion and source-chain
+    * precision scaling happen outpost-side — so `onreward` simply credits the
+    * staker's claim ledger.
     *
     * Ledgers:
     * - `pending_claims` — per-Wire-account WIRE owed. `claim` drains a row via
@@ -38,10 +35,6 @@ namespace sysio {
     * - `unmapped_tokens` — per-(chain, native_pubkey) WIRE owed for stakers /
     *   purchasers without a Wire account yet. Completing AuthX linking
     *   inline-calls `linkswept`, which moves the credit into `pending_claims`.
-    * - `native_stage` — rewards received while `sysio.reserv` had no quote
-    *   (reserve not yet provisioned). Held in native units; `retryconvert`
-    *   re-prices and promotes them once a quote is available. Nothing is
-    *   dropped.
     * - `reward_cursors` — per-(outpost_id, chain, native_pubkey) high-water
     *   mark of the last processed source-chain epoch reference. Replays /
     *   duplicates (`external_epoch_ref <= last`) are rejected at ingest, so no
@@ -96,11 +89,9 @@ namespace sysio {
       void claim(name wire_account);
 
       /// Internal: sweep an `unmapped_tokens` entry into `pending_claims` when
-      /// the staker / purchaser completes AuthX linking, and stamp the now
-      /// known Wire account onto any `native_stage` rows still awaiting a
-      /// quote (so `retryconvert` routes them to `pending_claims`). Called
-      /// inline by `sysio.authex` after a successful link. No-op if nothing
-      /// matches. Auth=sysio.authex.
+      /// the staker / purchaser completes AuthX linking. Called inline by
+      /// `sysio.authex` after a successful link. No-op if nothing matches.
+      /// Auth=sysio.authex.
       [[sysio::action]]
       void linkswept(name wire_account,
                      opp::types::ChainKind chain,
@@ -108,21 +99,21 @@ namespace sysio {
 
       /// Per-staker WIRE-side credit of a `STAKING_REWARD`. Dispatched inline
       /// by `sysio.msgch` (the proto body flattened to primitives). Dedupes
-      /// on the source-chain epoch reference, prices native -> WIRE off
-      /// `sysio.reserv`'s reserve, and credits `pending_claims` (if linked)
-      /// or `unmapped_tokens` (if not). If no quote is available the reward
-      /// is staged in native units for `retryconvert`. Auth=sysio.msgch.
+      /// on the source-chain epoch reference and credits `pending_claims` (if
+      /// linked) or `unmapped_tokens` (if not). The reward arrives already
+      /// WIRE-denominated; native -> WIRE conversion is outpost-side.
+      /// Auth=sysio.msgch.
       ///
       /// @param outpost_id          Emitting outpost (dedupe scope).
       /// @param staker_wire_account Staker's Wire account name, or "" when not
       ///                            yet AuthX-linked (then parked by native
       ///                            address until the link sweep).
-      /// @param reward_chain        Source chain (reserve pricing + parking).
+      /// @param reward_chain        Source chain (parking + dedupe key).
       /// @param staker_native_addr  Staker's raw native address (dedupe +
       ///                            parking key; always populated).
-      /// @param reward_kind         Native TokenKind of the reward.
-      /// @param reward_amount       Absolute native reward amount (already the
-      ///                            staker's prorated portion).
+      /// @param reward_amount       Absolute WIRE reward amount in atomic
+      ///                            units (already the staker's prorated
+      ///                            portion).
       /// @param reward_epoch_index  WIRE epoch index (informational / audit).
       /// @param external_epoch_ref  Source-chain epoch reference; monotonic
       ///                            per (outpost, staker) — dedupe key.
@@ -132,23 +123,15 @@ namespace sysio {
                     std::string           staker_wire_account,
                     opp::types::ChainKind reward_chain,
                     std::vector<char>     staker_native_addr,
-                    opp::types::TokenKind reward_kind,
                     uint64_t              reward_amount,
                     uint32_t              reward_epoch_index,
                     uint64_t              external_epoch_ref,
                     uint32_t              share_bps);
 
-      /// Permissionless crank: re-price up to `max_rows` `native_stage` rows
-      /// against the now-available reserve and promote successful ones into
-      /// the claim ledger. Rows that still have no quote are left for a later
-      /// call. Bounded so a single transaction can't be starved.
-      [[sysio::action]]
-      void retryconvert(uint32_t max_rows);
-
       /// Permissionless crank: prune up to `max_rows` expired ledger rows
-      /// (`pending_claims`, `unmapped_tokens`, `native_stage`). Erasing a
-      /// credited row leaves its WIRE in the `sysio.cap` balance — it reverts
-      /// into the staking capital fund for redistribution. Bounded.
+      /// (`pending_claims`, `unmapped_tokens`). Erasing a credited row leaves
+      /// its WIRE in the `sysio.cap` balance — it reverts into the staking
+      /// capital fund for redistribution. Bounded.
       [[sysio::action]]
       void flushexpired(uint32_t max_rows);
 
@@ -231,49 +214,6 @@ namespace sysio {
             sysio::const_mem_fun<unmapped_token, uint128_t, &unmapped_token::by_chain_addr>>
       >;
 
-      /// Native-staged rewards awaiting a reserve quote. Held in native units;
-      /// `retryconvert` re-prices and promotes them.
-      struct stage_key {
-         uint64_t id;
-         uint64_t primary_key() const { return id; }
-         SYSLIB_SERIALIZE(stage_key, (id))
-      };
-
-      struct [[sysio::table("nativestage")]] native_stage {
-         uint64_t                  id                 = 0;
-         uint64_t                  outpost_id         = 0;
-         opp::types::ChainKind     chain              = opp::types::ChainKind::CHAIN_KIND_UNKNOWN;
-         std::vector<char>         native_pubkey;
-         /// Resolved Wire account, or default-constructed (value 0) if the
-         /// staker was not yet AuthX-linked when staged. `linkswept` stamps
-         /// this once the staker links so `retryconvert` routes to
-         /// `pending_claims`.
-         name                      wire_account;
-         // Always set explicitly when a row is created; the zero value
-         // (TOKEN_KIND_WIRE) is just the default-construction placeholder.
-         opp::types::TokenKind     native_kind        = opp::types::TokenKind::TOKEN_KIND_WIRE;
-         uint64_t                  native_amount      = 0;
-         uint32_t                  reward_epoch_index = 0;
-         uint64_t                  external_epoch_ref = 0;
-         uint32_t                  expires_at_sec     = 0;
-
-         uint64_t primary_key() const { return id; }
-
-         uint128_t by_chain_addr() const {
-            return chain_addr_key(chain, native_pubkey);
-         }
-
-         SYSLIB_SERIALIZE(native_stage,
-            (id)(outpost_id)(chain)(native_pubkey)(wire_account)
-            (native_kind)(native_amount)(reward_epoch_index)
-            (external_epoch_ref)(expires_at_sec))
-      };
-
-      using nativestage_t = sysio::kv::table<"nativestage"_n, stage_key, native_stage,
-         sysio::kv::index<"bychainad"_n,
-            sysio::const_mem_fun<native_stage, uint128_t, &native_stage::by_chain_addr>>
-      >;
-
       /// Per-(outpost_id, chain, native_pubkey) dedupe cursor: the highest
       /// source-chain epoch reference processed. Anything `<=` is a replay.
       struct rwdcur_key {
@@ -319,10 +259,9 @@ namespace sysio {
       /// Monotonic id counters.
       struct [[sysio::table("capcounters")]] cap_counters {
          uint64_t next_unmapped_id = 1;
-         uint64_t next_stage_id    = 1;
          uint64_t next_cursor_id   = 1;
 
-         SYSLIB_SERIALIZE(cap_counters, (next_unmapped_id)(next_stage_id)(next_cursor_id))
+         SYSLIB_SERIALIZE(cap_counters, (next_unmapped_id)(next_cursor_id))
       };
 
       using capcounters_t = sysio::kv::global<"capcounters"_n, cap_counters>;

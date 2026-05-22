@@ -9,7 +9,6 @@ namespace sysio {
 namespace {
 
 using opp::types::ChainKind;
-using opp::types::TokenKind;
 
 /// Deterministic wall-clock seconds (block time). Used for the claimable
 /// window; epoch indices carried on the attestation are for audit only.
@@ -185,15 +184,14 @@ void cap::claim(name wire_account) {
 }
 
 // ---------------------------------------------------------------------------
-//  linkswept — AuthX link completed: sweep unmapped -> pending, and stamp the
-//  now-known Wire account onto any still-staged native rewards.
+//  linkswept — AuthX link completed: sweep unmapped -> pending.
 // ---------------------------------------------------------------------------
 void cap::linkswept(name wire_account, ChainKind chain, std::vector<char> native_pubkey) {
    require_auth(AUTHEX_ACCOUNT);
 
    const uint32_t window = config_window(get_self());
 
-   // 1. Sweep an unmapped balance into the staker's pending_claims row.
+   // Sweep an unmapped balance into the staker's pending_claims row.
    unmapped_t unmapped(get_self());
    auto uidx = unmapped.template get_index<"bychainad"_n>();
    auto uit = scan_find(uidx, chain_addr_key(chain, native_pubkey),
@@ -208,26 +206,6 @@ void cap::linkswept(name wire_account, ChainKind chain, std::vector<char> native
       // wire_account is set -> routed to pending_claims, expiry refreshed.
       credit_wire(get_self(), wire_account, chain, native_pubkey, bal, window);
    }
-
-   // 2. Stamp the Wire account onto every still-unconverted native_stage row
-   //    for this (chain, address) so a later retryconvert routes the proceeds
-   //    to pending_claims instead of re-parking them as unmapped.
-   nativestage_t stg(get_self());
-   auto sidx = stg.template get_index<"bychainad"_n>();
-   const uint128_t skey = chain_addr_key(chain, native_pubkey);
-   for (auto it = sidx.lower_bound(skey);
-        it != sidx.end() && it->by_chain_addr() == skey; ) {
-      const bool hit = it->chain == chain
-                    && it->native_pubkey == native_pubkey
-                    && it->wire_account.value == 0;
-      const uint64_t rid = it->id;
-      ++it;   // advance before the modify
-      if (hit) {
-         stg.modify(same_payer, stage_key{rid}, [&](auto& r) {
-            r.wire_account = wire_account;
-         });
-      }
-   }
 }
 
 // ---------------------------------------------------------------------------
@@ -237,7 +215,6 @@ void cap::onreward(uint64_t              outpost_id,
                    std::string           staker_wire_account,
                    opp::types::ChainKind reward_chain,
                    std::vector<char>     staker_native_addr,
-                   opp::types::TokenKind reward_kind,
                    uint64_t              reward_amount,
                    uint32_t              reward_epoch_index,
                    uint64_t              external_epoch_ref,
@@ -249,8 +226,7 @@ void cap::onreward(uint64_t              outpost_id,
    // must not break the message chain on a malformed row).
    if (reward_amount == 0 || staker_native_addr.empty()) return;
 
-   // Dedupe at ingest so replays are rejected even while a prior reward for
-   // this staker is still staged awaiting a quote.
+   // Dedupe at ingest so a replay / out-of-order duplicate is rejected.
    if (!cursor_admit(get_self(), outpost_id, reward_chain,
                      staker_native_addr, external_epoch_ref)) {
       return;
@@ -261,64 +237,12 @@ void cap::onreward(uint64_t              outpost_id,
       wacct = name(staker_wire_account);
    }
 
-   const uint32_t window = config_window(get_self());
-
-   // Price native -> WIRE off sysio.reserv's published reserve. No sync
-   // inter-contract call exists, so the read-only swapquote action is not
-   // usable here; the shared reserve::quote helper runs the identical math.
-   reserve::reserves_t reserves(RESERV_ACCOUNT);
-   const uint64_t wire_raw = reserve::quote(reserves, reward_kind, reward_amount,
-                                            reward_chain,
-                                            opp::types::TokenKind::TOKEN_KIND_WIRE);
-
-   if (wire_raw == 0) {
-      // No quote yet — stage in native units; retryconvert promotes it once
-      // the reserve is provisioned. Nothing is dropped.
-      uint64_t sid = next_id(get_self(), [](cap_counters& c) -> uint64_t& {
-         return c.next_stage_id;
-      });
-      nativestage_t stg(get_self());
-      stg.emplace(get_self(), stage_key{sid},
-         native_stage{ .id                 = sid,
-                       .outpost_id         = outpost_id,
-                       .chain              = reward_chain,
-                       .native_pubkey      = staker_native_addr,
-                       .wire_account       = wacct,
-                       .native_kind        = reward_kind,
-                       .native_amount      = reward_amount,
-                       .reward_epoch_index = reward_epoch_index,
-                       .external_epoch_ref = external_epoch_ref,
-                       .expires_at_sec     = now_sec() + window });
-      return;
-   }
-
+   // reward_amount arrives already WIRE-denominated -- native -> WIRE
+   // conversion and source-chain precision scaling are outpost-side -- so the
+   // claim ledger is credited directly.
    credit_wire(get_self(), wacct, reward_chain, staker_native_addr,
-               asset{ static_cast<int64_t>(wire_raw), WIRE_SYM }, window);
-}
-
-// ---------------------------------------------------------------------------
-//  retryconvert — re-price staged native rewards now that a quote may exist
-// ---------------------------------------------------------------------------
-void cap::retryconvert(uint32_t max_rows) {
-   nativestage_t stg(get_self());
-   reserve::reserves_t reserves(RESERV_ACCOUNT);
-   const uint32_t window = config_window(get_self());
-
-   uint32_t processed = 0;
-   for (auto it = stg.begin(); it != stg.end() && processed < max_rows; ) {
-      const native_stage row = *it;   // copy out before any erase
-      ++it;                            // advance before erase
-      ++processed;
-
-      const uint64_t wire_raw = reserve::quote(reserves, row.native_kind,
-                                               row.native_amount, row.chain,
-                                               opp::types::TokenKind::TOKEN_KIND_WIRE);
-      if (wire_raw == 0) continue;     // still no quote; leave for a later call
-
-      credit_wire(get_self(), row.wire_account, row.chain, row.native_pubkey,
-                  asset{ static_cast<int64_t>(wire_raw), WIRE_SYM }, window);
-      stg.erase(stage_key{row.id});
-   }
+               asset{ static_cast<int64_t>(reward_amount), WIRE_SYM },
+               config_window(get_self()));
 }
 
 // ---------------------------------------------------------------------------
@@ -345,16 +269,6 @@ void cap::flushexpired(uint32_t max_rows) {
       ++it;
       if (row.expires_at_sec != 0 && cutoff >= row.expires_at_sec) {
          unmapped.erase(unmapped_key{row.id});
-         --budget;
-      }
-   }
-
-   nativestage_t stg(get_self());
-   for (auto it = stg.begin(); it != stg.end() && budget > 0; ) {
-      const native_stage row = *it;
-      ++it;
-      if (row.expires_at_sec != 0 && cutoff >= row.expires_at_sec) {
-         stg.erase(stage_key{row.id});
          --budget;
       }
    }

@@ -82,14 +82,14 @@ DataStream& operator>>(DataStream& ds, ChainId& t) {
    return ds >> t.kind >> t.id;
 }
 
-// TokenAmount: { TokenKind kind; vint64_t amount; }
+// TokenAmount: { uint64 token_code; vint64_t amount; }  (v6 — codename-keyed)
 template <typename DataStream>
 DataStream& operator<<(DataStream& ds, const TokenAmount& t) {
-   return ds << t.kind << t.amount;
+   return ds << t.token_code << t.amount;
 }
 template <typename DataStream>
 DataStream& operator>>(DataStream& ds, TokenAmount& t) {
-   return ds >> t.kind >> t.amount;
+   return ds >> t.token_code >> t.amount;
 }
 
 // ChainAddress: { ChainKind kind; vector<char> address; }
@@ -140,6 +140,69 @@ DataStream& operator<<(DataStream& ds, const EncodingFlags& t) {
 template <typename DataStream>
 DataStream& operator>>(DataStream& ds, EncodingFlags& t) {
    return ds >> t.endianness >> t.hash_algorithm >> t.length_encoding;
+}
+
+// ---------------------------------------------------------------------------
+//  v6 registry-entity messages (Chain / Token / ChainToken / Reserve / ReserveTarget)
+// ---------------------------------------------------------------------------
+
+template <typename DataStream>
+DataStream& operator<<(DataStream& ds, const Chain& t) {
+   return ds << t.kind << t.code << t.external_chain_id << t.name << t.description
+             << t.is_depot << t.active << t.registered_at_ms << t.activated_at_ms;
+}
+template <typename DataStream>
+DataStream& operator>>(DataStream& ds, Chain& t) {
+   return ds >> t.kind >> t.code >> t.external_chain_id >> t.name >> t.description
+             >> t.is_depot >> t.active >> t.registered_at_ms >> t.activated_at_ms;
+}
+
+template <typename DataStream>
+DataStream& operator<<(DataStream& ds, const Token& t) {
+   return ds << t.kind << t.code << t.symbol_name << t.description << t.precision
+             << t.address << t.active << t.registered_at_ms << t.activated_at_ms;
+}
+template <typename DataStream>
+DataStream& operator>>(DataStream& ds, Token& t) {
+   return ds >> t.kind >> t.code >> t.symbol_name >> t.description >> t.precision
+             >> t.address >> t.active >> t.registered_at_ms >> t.activated_at_ms;
+}
+
+template <typename DataStream>
+DataStream& operator<<(DataStream& ds, const ChainToken& t) {
+   return ds << t.chain_code << t.token_code << t.contract_addr
+             << t.is_native << t.active << t.registered_at_ms << t.activated_at_ms;
+}
+template <typename DataStream>
+DataStream& operator>>(DataStream& ds, ChainToken& t) {
+   return ds >> t.chain_code >> t.token_code >> t.contract_addr
+             >> t.is_native >> t.active >> t.registered_at_ms >> t.activated_at_ms;
+}
+
+template <typename DataStream>
+DataStream& operator<<(DataStream& ds, const Reserve& t) {
+   return ds << t.chain_code << t.token_code << t.code << t.name << t.description
+             << t.status << t.reserve_chain_amount << t.reserve_wire_amount
+             << t.connector_weight_bps << t.creator_addr
+             << t.requested_wire_amount << t.external_token_amount
+             << t.registered_at_ms << t.activated_at_ms << t.cancelled_at_ms;
+}
+template <typename DataStream>
+DataStream& operator>>(DataStream& ds, Reserve& t) {
+   return ds >> t.chain_code >> t.token_code >> t.code >> t.name >> t.description
+             >> t.status >> t.reserve_chain_amount >> t.reserve_wire_amount
+             >> t.connector_weight_bps >> t.creator_addr
+             >> t.requested_wire_amount >> t.external_token_amount
+             >> t.registered_at_ms >> t.activated_at_ms >> t.cancelled_at_ms;
+}
+
+template <typename DataStream>
+DataStream& operator<<(DataStream& ds, const ReserveTarget& t) {
+   return ds << t.chain_code << t.reserve_code << t.amount;
+}
+template <typename DataStream>
+DataStream& operator>>(DataStream& ds, ReserveTarget& t) {
+   return ds >> t.chain_code >> t.reserve_code >> t.amount;
 }
 
 } // namespace sysio::opp::types
@@ -203,20 +266,18 @@ DataStream& operator>>(DataStream& ds, Message& t) {
    return ds >> t.header >> t.payload;
 }
 
-// Envelope: all fields (signatures field removed per protocol spec)
+// Envelope: trimmed v6 — merkle/start_message_id/end_message_id removed
 template <typename DataStream>
 DataStream& operator<<(DataStream& ds, const Envelope& t) {
    return ds << t.envelope_hash << t.endpoints << t.epoch_timestamp
-             << t.epoch_index << t.epoch_envelope_index << t.merkle
-             << t.previous_envelope_hash << t.start_message_id
-             << t.end_message_id;
+             << t.epoch_index << t.epoch_envelope_index
+             << t.previous_envelope_hash;
 }
 template <typename DataStream>
 DataStream& operator>>(DataStream& ds, Envelope& t) {
    return ds >> t.envelope_hash >> t.endpoints >> t.epoch_timestamp
-             >> t.epoch_index >> t.epoch_envelope_index >> t.merkle
-             >> t.previous_envelope_hash >> t.start_message_id
-             >> t.end_message_id;
+             >> t.epoch_index >> t.epoch_envelope_index
+             >> t.previous_envelope_hash;
 }
 
 } // namespace sysio::opp
@@ -234,14 +295,14 @@ DataStream& operator>>(DataStream& ds, Envelope& t) {
 // ─────────────────────────────────────────────────────────────────────────────
 namespace sysio::opp::attestations {
 
-// ChainReserveBalanceSheet
+// ReserveBalanceSheet (v6, renamed from ChainReserveBalanceSheet)
 template <typename DataStream>
-DataStream& operator<<(DataStream& ds, const ChainReserveBalanceSheet& t) {
-   return ds << t.kind << t.amounts;
+DataStream& operator<<(DataStream& ds, const ReserveBalanceSheet& t) {
+   return ds << t.chain_code << t.amounts << t.reserve_codes;
 }
 template <typename DataStream>
-DataStream& operator>>(DataStream& ds, ChainReserveBalanceSheet& t) {
-   return ds >> t.kind >> t.amounts;
+DataStream& operator>>(DataStream& ds, ReserveBalanceSheet& t) {
+   return ds >> t.chain_code >> t.amounts >> t.reserve_codes;
 }
 
 // PretokenStakeChange (deprecated; pre-launch only)
@@ -294,18 +355,16 @@ DataStream& operator>>(DataStream& ds, WireTokenPurchase& t) {
    return ds >> t.actor >> t.amounts;
 }
 
-// OperatorAction — `op_address` carries the operator's authex-linked chain
-// pubkey; `action_type` discriminates DEPOSIT_REQUEST / WITHDRAW_REQUEST /
-// WITHDRAW_REMIT / SLASH per the docs in attestations.proto.
+// OperatorAction — v6: chain_code (codename uint64), and SLASH carries reserve_code.
 template <typename DataStream>
 DataStream& operator<<(DataStream& ds, const OperatorAction& t) {
    return ds << t.action_type << t.op_address << t.type << t.status
-             << t.amount << t.request_id << t.chain << t.reason;
+             << t.amount << t.request_id << t.chain_code << t.reason << t.reserve_code;
 }
 template <typename DataStream>
 DataStream& operator>>(DataStream& ds, OperatorAction& t) {
    return ds >> t.action_type >> t.op_address >> t.type >> t.status
-             >> t.amount >> t.request_id >> t.chain >> t.reason;
+             >> t.amount >> t.request_id >> t.chain_code >> t.reason >> t.reserve_code;
 }
 
 // OperatorActionLog — stored in sysio.opreg::operator_entry.recent_actions.
@@ -328,93 +387,93 @@ DataStream& operator>>(DataStream& ds, ReserveDisbursement& t) {
    return ds >> t.actor >> t.amount >> t.signature;
 }
 
-// ProtocolState
+// ProtocolState — v6: chain_code (codename uint64) replaces ChainId chain_id.
 template <typename DataStream>
 DataStream& operator<<(DataStream& ds, const ProtocolState& t) {
-   return ds << t.chain_id << t.current_message_id << t.processed_message_id
+   return ds << t.chain_code << t.current_message_id << t.processed_message_id
              << t.incoming_messages << t.outgoing_messages;
 }
 template <typename DataStream>
 DataStream& operator>>(DataStream& ds, ProtocolState& t) {
-   return ds >> t.chain_id >> t.current_message_id >> t.processed_message_id
+   return ds >> t.chain_code >> t.current_message_id >> t.processed_message_id
              >> t.incoming_messages >> t.outgoing_messages;
 }
 
-// SwapRequest — variance check at the depot consults
-// `sysio.reserv::quote(...)` against `quoted_destination_amount` ±
-// `quote_tolerance_bps`. `source_tx_id` is the contract-derived id the
-// off-chain underwriter plugin uses to query the matching SwapRequested
-// event on the source chain for deposit verification (see proto comment).
+// SwapRequest — v6: full codename triples for source + target.
 template <typename DataStream>
 DataStream& operator<<(DataStream& ds, const SwapRequest& t) {
-   return ds << t.actor << t.source_amount << t.target_chain << t.recipient
-             << t.target_token << t.quoted_destination_amount
-             << t.quote_tolerance_bps << t.quote_timestamp_ms
+   return ds << t.actor << t.source_amount
+             << t.source_chain_code << t.source_reserve_code
+             << t.target_chain_code << t.target_token_code << t.target_reserve_code
+             << t.recipient << t.target_amount
+             << t.target_tolerance_bps << t.target_timestamp_ms
              << t.source_tx_id;
 }
 template <typename DataStream>
 DataStream& operator>>(DataStream& ds, SwapRequest& t) {
-   return ds >> t.actor >> t.source_amount >> t.target_chain >> t.recipient
-             >> t.target_token >> t.quoted_destination_amount
-             >> t.quote_tolerance_bps >> t.quote_timestamp_ms
+   return ds >> t.actor >> t.source_amount
+             >> t.source_chain_code >> t.source_reserve_code
+             >> t.target_chain_code >> t.target_token_code >> t.target_reserve_code
+             >> t.recipient >> t.target_amount
+             >> t.target_tolerance_bps >> t.target_timestamp_ms
              >> t.source_tx_id;
 }
 
-// UnderwriteIntentCommit — `token_kind` disambiguates same-chain
-// swap legs (e.g. ERC20→ETH-native on a single outpost).
+// UnderwriteIntentCommit — v6: (token_code, chain_code, reserve_code) triple
+// disambiguates same-chain swap legs.
 template <typename DataStream>
 DataStream& operator<<(DataStream& ds, const UnderwriteIntentCommit& t) {
    return ds << t.uw_account << t.uw_ext_chain_addr << t.uw_request_id
-             << t.outpost_id << t.signature << t.token_kind;
+             << t.chain_code << t.signature
+             << t.token_code << t.chain_code << t.reserve_code;
 }
 template <typename DataStream>
 DataStream& operator>>(DataStream& ds, UnderwriteIntentCommit& t) {
    return ds >> t.uw_account >> t.uw_ext_chain_addr >> t.uw_request_id
-             >> t.outpost_id >> t.signature >> t.token_kind;
+             >> t.chain_code >> t.signature
+             >> t.token_code >> t.chain_code >> t.reserve_code;
 }
 
-// SwapRevert
+// SwapRevert — v6 adds source_chain_code + source_reserve_code.
 template <typename DataStream>
 DataStream& operator<<(DataStream& ds, const SwapRevert& t) {
    return ds << t.original_swap_message_id << t.depositor
-             << t.refund_amount << t.reason;
+             << t.refund_amount << t.reason
+             << t.source_chain_code << t.source_reserve_code;
 }
 template <typename DataStream>
 DataStream& operator>>(DataStream& ds, SwapRevert& t) {
    return ds >> t.original_swap_message_id >> t.depositor
-             >> t.refund_amount >> t.reason;
+             >> t.refund_amount >> t.reason
+             >> t.source_chain_code >> t.source_reserve_code;
 }
 
-// SwapRemit — destination-side payout instruction for a cross-chain swap.
-// (cdt-protoc-gen-zpp emits the same `SwapRemit` C++ struct name; this
-// DataStream pair lives in `sysio::opp::attestations` namespace.)
-// Renamed from `Remit`; the depot is the ground truth, every SwapRemit is
-// depot-authorized. On outpost-side failure, the outpost emits SwapRejected
-// and the token stays in its reserve.
+// SwapRemit — v6: adds chain_code + reserve_code (destination identity).
 template <typename DataStream>
 DataStream& operator<<(DataStream& ds, const SwapRemit& t) {
    return ds << t.recipient << t.amount << t.original_message_id
-             << t.underwriter << t.unlock_timestamp;
+             << t.underwriter << t.unlock_timestamp
+             << t.chain_code << t.reserve_code;
 }
 template <typename DataStream>
 DataStream& operator>>(DataStream& ds, SwapRemit& t) {
    return ds >> t.recipient >> t.amount >> t.original_message_id
-             >> t.underwriter >> t.unlock_timestamp;
+             >> t.underwriter >> t.unlock_timestamp
+             >> t.chain_code >> t.reserve_code;
 }
 
-// SwapRejected — outpost cannot pay the SwapRemit; depot's
-// sysio.reserv::onreject adds `unremitted_amount.amount` back to the
-// matching `reserve_outpost_amount` so accounting reconciles with the
-// outpost's actual balance.
+// SwapRejected — v6: adds chain_code + reserve_code.
 template <typename DataStream>
 DataStream& operator<<(DataStream& ds, const SwapRejected& t) {
    return ds << t.original_swap_remit_id << t.recipient
-             << t.unremitted_amount << t.reason;
+             << t.unremitted_amount << t.reason
+             << t.chain_code << t.reserve_code;
 }
 template <typename DataStream>
 DataStream& operator>>(DataStream& ds, SwapRejected& t) {
    return ds >> t.original_swap_remit_id >> t.recipient
-             >> t.unremitted_amount >> t.reason;
+             >> t.unremitted_amount >> t.reason
+             >> t.chain_code >> t.reserve_code;
 }
 
 // ChallengeOperatorHash — field name `operator_` (trailing underscore) because
@@ -480,26 +539,20 @@ DataStream& operator>>(DataStream& ds, BatchOperatorGroups& t) {
    return ds >> t.active_group_index >> t.epoch_index >> t.groups;
 }
 
-// ReserveTarget — `kind` discriminates LP / BURN / TREASURY routing.
-template <typename DataStream>
-DataStream& operator<<(DataStream& ds, const ReserveTarget& t) {
-   return ds << t.kind << t.paired_token;
-}
-template <typename DataStream>
-DataStream& operator>>(DataStream& ds, ReserveTarget& t) {
-   return ds >> t.kind >> t.paired_token;
-}
+// ReserveTarget — v6: (chain_code, reserve_code, TokenAmount).
+// (NOTE: ReserveTarget lives in `sysio::opp::types` per v6 types.proto;
+//  the DataStream overloads below in the types namespace.)
 
-// DepositRevert
+// DepositRevert — v6: adds chain_code.
 template <typename DataStream>
 DataStream& operator<<(DataStream& ds, const DepositRevert& t) {
    return ds << t.original_deposit_message_id << t.depositor
-             << t.refund_amount << t.reason;
+             << t.refund_amount << t.reason << t.chain_code;
 }
 template <typename DataStream>
 DataStream& operator>>(DataStream& ds, DepositRevert& t) {
    return ds >> t.original_deposit_message_id >> t.depositor
-             >> t.refund_amount >> t.reason;
+             >> t.refund_amount >> t.reason >> t.chain_code;
 }
 
 // NodeOwnerReg
@@ -527,6 +580,52 @@ DataStream& operator>>(DataStream& ds, StakingReward& t) {
    return ds >> t.outpost_id >> t.staker_wire_account >> t.share_bps
              >> t.reward_epoch_index >> t.external_epoch_ref
              >> t.reward_amount >> t.staker_native_address;
+}
+
+// ---------------------------------------------------------------------------
+//  v6 reserve-flow attestations
+// ---------------------------------------------------------------------------
+
+template <typename DataStream>
+DataStream& operator<<(DataStream& ds, const ReserveCreate& t) {
+   return ds << t.chain_code << t.token_code << t.reserve_code
+             << t.name << t.description
+             << t.external_token_amount << t.requested_wire_amount
+             << t.connector_weight_bps << t.creator_addr;
+}
+template <typename DataStream>
+DataStream& operator>>(DataStream& ds, ReserveCreate& t) {
+   return ds >> t.chain_code >> t.token_code >> t.reserve_code
+             >> t.name >> t.description
+             >> t.external_token_amount >> t.requested_wire_amount
+             >> t.connector_weight_bps >> t.creator_addr;
+}
+
+template <typename DataStream>
+DataStream& operator<<(DataStream& ds, const ReserveCreateCancel& t) {
+   return ds << t.chain_code << t.token_code << t.reserve_code << t.creator_addr;
+}
+template <typename DataStream>
+DataStream& operator>>(DataStream& ds, ReserveCreateCancel& t) {
+   return ds >> t.chain_code >> t.token_code >> t.reserve_code >> t.creator_addr;
+}
+
+template <typename DataStream>
+DataStream& operator<<(DataStream& ds, const ReserveCreateCancelled& t) {
+   return ds << t.chain_code << t.token_code << t.reserve_code;
+}
+template <typename DataStream>
+DataStream& operator>>(DataStream& ds, ReserveCreateCancelled& t) {
+   return ds >> t.chain_code >> t.token_code >> t.reserve_code;
+}
+
+template <typename DataStream>
+DataStream& operator<<(DataStream& ds, const ReserveReady& t) {
+   return ds << t.chain_code << t.token_code << t.reserve_code;
+}
+template <typename DataStream>
+DataStream& operator>>(DataStream& ds, ReserveReady& t) {
+   return ds >> t.chain_code >> t.token_code >> t.reserve_code;
 }
 
 // StakeResult

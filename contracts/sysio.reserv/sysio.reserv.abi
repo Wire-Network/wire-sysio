@@ -1,24 +1,19 @@
 {
     "____comment": "This file was generated with sysio-abigen. DO NOT EDIT ",
     "version": "sysio::abi/1.2",
-    "types": [
-        {
-            "new_type_name": "vint64_t",
-            "type": "varint_int64"
-        }
-    ],
+    "types": [],
     "structs": [
         {
-            "name": "TokenAmount",
+            "name": "ChainAddress",
             "base": "",
             "fields": [
                 {
                     "name": "kind",
-                    "type": "TokenKind"
+                    "type": "ChainKind"
                 },
                 {
-                    "name": "amount",
-                    "type": "vint64_t"
+                    "name": "address",
+                    "type": "bytes"
                 }
             ]
         },
@@ -27,16 +22,118 @@
             "base": "",
             "fields": [
                 {
-                    "name": "chain",
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "reserve_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "amount",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "matchreserve",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "reserve_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "matcher",
+                    "type": "name"
+                },
+                {
+                    "name": "wire_amount",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "oncnclrsv",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "reserve_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "creator_chain_kind",
                     "type": "ChainKind"
                 },
                 {
-                    "name": "outpost_kind",
-                    "type": "TokenKind"
+                    "name": "creator_chain_addr",
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
+            "name": "oncrtreserve",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
                 },
                 {
-                    "name": "outpost_amount",
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "reserve_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "name",
+                    "type": "string"
+                },
+                {
+                    "name": "description",
+                    "type": "string"
+                },
+                {
+                    "name": "external_token_amount",
                     "type": "uint64"
+                },
+                {
+                    "name": "requested_wire_amount",
+                    "type": "uint64"
+                },
+                {
+                    "name": "connector_weight_bps",
+                    "type": "uint32"
+                },
+                {
+                    "name": "creator_chain_kind",
+                    "type": "ChainKind"
+                },
+                {
+                    "name": "creator_chain_addr",
+                    "type": "bytes"
                 }
             ]
         },
@@ -49,20 +146,24 @@
                     "type": "checksum256"
                 },
                 {
-                    "name": "recipient_kind",
-                    "type": "ChainKind"
+                    "name": "chain_code",
+                    "type": "slug_name"
                 },
                 {
-                    "name": "recipient_address",
-                    "type": "bytes"
+                    "name": "token_code",
+                    "type": "slug_name"
                 },
                 {
-                    "name": "unremitted_kind",
-                    "type": "TokenKind"
+                    "name": "reserve_code",
+                    "type": "slug_name"
                 },
                 {
                     "name": "unremitted_amount",
                     "type": "uint64"
+                },
+                {
+                    "name": "recipient_address",
+                    "type": "bytes"
                 },
                 {
                     "name": "reason",
@@ -75,12 +176,16 @@
             "base": "",
             "fields": [
                 {
-                    "name": "chain",
-                    "type": "ChainKind"
+                    "name": "chain_code",
+                    "type": "slug_name"
                 },
                 {
-                    "name": "outpost_kind",
-                    "type": "TokenKind"
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "reserve_code",
+                    "type": "slug_name"
                 },
                 {
                     "name": "outpost_amount",
@@ -89,28 +194,40 @@
             ]
         },
         {
-            "name": "reserve_entry",
+            "name": "regreserve",
             "base": "",
             "fields": [
                 {
-                    "name": "chain",
-                    "type": "ChainKind"
+                    "name": "chain_code",
+                    "type": "slug_name"
                 },
                 {
-                    "name": "reserve_outpost_amount",
-                    "type": "TokenAmount"
+                    "name": "token_code",
+                    "type": "slug_name"
                 },
                 {
-                    "name": "reserve_wire_amount",
-                    "type": "TokenAmount"
+                    "name": "reserve_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "name",
+                    "type": "string"
+                },
+                {
+                    "name": "description",
+                    "type": "string"
+                },
+                {
+                    "name": "initial_chain_amount",
+                    "type": "uint64"
+                },
+                {
+                    "name": "initial_wire_amount",
+                    "type": "uint64"
                 },
                 {
                     "name": "connector_weight_bps",
                     "type": "uint32"
-                },
-                {
-                    "name": "last_updated_ms",
-                    "type": "uint64"
                 }
             ]
         },
@@ -119,34 +236,92 @@
             "base": "",
             "fields": [
                 {
-                    "name": "chain_token",
-                    "type": "uint64"
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "reserve_code",
+                    "type": "slug_name"
                 }
             ]
         },
         {
-            "name": "setreserve",
+            "name": "reserve_row",
             "base": "",
             "fields": [
                 {
-                    "name": "chain",
-                    "type": "ChainKind"
+                    "name": "chain_code",
+                    "type": "slug_name"
                 },
                 {
-                    "name": "outpost_kind",
-                    "type": "TokenKind"
+                    "name": "token_code",
+                    "type": "slug_name"
                 },
                 {
-                    "name": "outpost_amount",
+                    "name": "reserve_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "name",
+                    "type": "string"
+                },
+                {
+                    "name": "description",
+                    "type": "string"
+                },
+                {
+                    "name": "status",
+                    "type": "ReserveStatus"
+                },
+                {
+                    "name": "reserve_chain_amount",
                     "type": "uint64"
                 },
                 {
-                    "name": "wire_amount",
+                    "name": "reserve_wire_amount",
                     "type": "uint64"
                 },
                 {
                     "name": "connector_weight_bps",
                     "type": "uint32"
+                },
+                {
+                    "name": "creator_addr",
+                    "type": "ChainAddress"
+                },
+                {
+                    "name": "requested_wire_amount",
+                    "type": "uint64"
+                },
+                {
+                    "name": "external_token_amount",
+                    "type": "uint64"
+                },
+                {
+                    "name": "registered_at_ms",
+                    "type": "uint64"
+                },
+                {
+                    "name": "activated_at_ms",
+                    "type": "uint64"
+                },
+                {
+                    "name": "cancelled_at_ms",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "slug_name",
+            "base": "",
+            "fields": [
+                {
+                    "name": "value",
+                    "type": "uint64"
                 }
             ]
         },
@@ -155,30 +330,32 @@
             "base": "",
             "fields": [
                 {
-                    "name": "from_kind",
-                    "type": "TokenKind"
+                    "name": "from_chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "from_token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "from_reserve_code",
+                    "type": "slug_name"
                 },
                 {
                     "name": "from_amount",
                     "type": "uint64"
                 },
                 {
-                    "name": "to_chain",
-                    "type": "ChainKind"
+                    "name": "to_chain_code",
+                    "type": "slug_name"
                 },
                 {
-                    "name": "to_token",
-                    "type": "TokenKind"
-                }
-            ]
-        },
-        {
-            "name": "varint_int64",
-            "base": "",
-            "fields": [
+                    "name": "to_token_code",
+                    "type": "slug_name"
+                },
                 {
-                    "name": "value",
-                    "type": "int64"
+                    "name": "to_reserve_code",
+                    "type": "slug_name"
                 }
             ]
         }
@@ -187,6 +364,21 @@
         {
             "name": "debit",
             "type": "debit",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "matchreserve",
+            "type": "matchreserve",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "oncnclrsv",
+            "type": "oncnclrsv",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "oncrtreserve",
+            "type": "oncrtreserve",
             "ricardian_contract": ""
         },
         {
@@ -200,8 +392,8 @@
             "ricardian_contract": ""
         },
         {
-            "name": "setreserve",
-            "type": "setreserve",
+            "name": "regreserve",
+            "type": "regreserve",
             "ricardian_contract": ""
         },
         {
@@ -213,11 +405,23 @@
     "tables": [
         {
             "name": "reserves",
-            "type": "reserve_entry",
+            "type": "reserve_row",
             "index_type": "i64",
-            "key_names": ["chain_token"],
-            "key_types": ["uint64"],
-            "table_id": 52863
+            "key_names": ["chain_code","token_code","reserve_code"],
+            "key_types": ["slug_name","slug_name","slug_name"],
+            "table_id": 52863,
+            "secondary_indexes": [
+                {
+                    "name": "bychaintok",
+                    "key_type": "uint128",
+                    "table_id": 35544
+                },
+                {
+                    "name": "bystatus",
+                    "key_type": "uint64",
+                    "table_id": 46081
+                }
+            ]
         }
     ],
     "ricardian_clauses": [],
@@ -242,54 +446,34 @@
                     "value": 1
                 },
                 {
-                    "name": "CHAIN_KIND_ETHEREUM",
+                    "name": "CHAIN_KIND_EVM",
                     "value": 2
                 },
                 {
-                    "name": "CHAIN_KIND_SOLANA",
+                    "name": "CHAIN_KIND_SVM",
                     "value": 3
-                },
-                {
-                    "name": "CHAIN_KIND_SUI",
-                    "value": 4
                 }
             ]
         },
         {
-            "name": "TokenKind",
+            "name": "ReserveStatus",
             "type": "int32",
             "values": [
                 {
-                    "name": "TOKEN_KIND_WIRE",
+                    "name": "RESERVE_STATUS_UNKNOWN",
                     "value": 0
                 },
                 {
-                    "name": "TOKEN_KIND_ETH",
-                    "value": 256
+                    "name": "RESERVE_STATUS_PENDING",
+                    "value": 1
                 },
                 {
-                    "name": "TOKEN_KIND_ERC20",
-                    "value": 257
+                    "name": "RESERVE_STATUS_ACTIVE",
+                    "value": 2
                 },
                 {
-                    "name": "TOKEN_KIND_ERC721",
-                    "value": 258
-                },
-                {
-                    "name": "TOKEN_KIND_ERC1155",
-                    "value": 259
-                },
-                {
-                    "name": "TOKEN_KIND_LIQETH",
-                    "value": 496
-                },
-                {
-                    "name": "TOKEN_KIND_SOL",
-                    "value": 512
-                },
-                {
-                    "name": "TOKEN_KIND_LIQSOL",
-                    "value": 752
+                    "name": "RESERVE_STATUS_CANCELLED",
+                    "value": 3
                 }
             ]
         }

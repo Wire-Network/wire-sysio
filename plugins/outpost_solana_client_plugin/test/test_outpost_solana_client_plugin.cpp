@@ -188,7 +188,7 @@ namespace {
 /// Build a 32-byte SOLANA `ChainAddress` carrying `pk_bytes` verbatim.
 sysio::opp::types::ChainAddress make_sol_addr(const std::array<uint8_t, 32>& pk_bytes) {
    sysio::opp::types::ChainAddress addr;
-   addr.set_kind(sysio::opp::types::CHAIN_KIND_SOLANA);
+   addr.set_kind(sysio::opp::types::CHAIN_KIND_SVM);
    addr.set_address(pk_bytes.data(), pk_bytes.size());
    return addr;
 }
@@ -198,7 +198,7 @@ sysio::opp::types::ChainAddress make_sol_addr(const std::array<uint8_t, 32>& pk_
 /// shape rather than misinterpret it).
 sysio::opp::types::ChainAddress make_eth_addr_32(const std::array<uint8_t, 32>& bytes) {
    sysio::opp::types::ChainAddress addr;
-   addr.set_kind(sysio::opp::types::CHAIN_KIND_ETHEREUM);
+   addr.set_kind(sysio::opp::types::CHAIN_KIND_EVM);
    addr.set_address(bytes.data(), bytes.size());
    return addr;
 }
@@ -343,7 +343,7 @@ BOOST_AUTO_TEST_CASE(extract_pubkeys_skips_malformed_address_length) try {
    // but fail the length check; the decoder must drop the entry rather
    // than truncate or zero-extend.
    sysio::opp::types::ChainAddress malformed;
-   malformed.set_kind(sysio::opp::types::CHAIN_KIND_SOLANA);
+   malformed.set_kind(sysio::opp::types::CHAIN_KIND_SVM);
    std::vector<uint8_t> short_addr(20, 0xAB);
    malformed.set_address(short_addr.data(), short_addr.size());
 

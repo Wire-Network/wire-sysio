@@ -68,7 +68,7 @@
                     "type": "AttestationType"
                 },
                 {
-                    "name": "outpost_id",
+                    "name": "chain_code",
                     "type": "uint64"
                 },
                 {
@@ -114,12 +114,16 @@
                     "type": "name"
                 },
                 {
-                    "name": "chain",
-                    "type": "ChainKind"
+                    "name": "chain_code",
+                    "type": "slug_name"
                 },
                 {
-                    "name": "token_kind",
-                    "type": "TokenKind"
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "reserve_code",
+                    "type": "slug_name"
                 },
                 {
                     "name": "amount",
@@ -158,16 +162,20 @@
                     "type": "name"
                 },
                 {
-                    "name": "outpost_id",
+                    "name": "chain_code",
                     "type": "uint64"
                 },
                 {
-                    "name": "from_chain",
-                    "type": "ChainKind"
+                    "name": "from_chain_code",
+                    "type": "slug_name"
                 },
                 {
-                    "name": "from_token_kind",
-                    "type": "TokenKind"
+                    "name": "from_token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "reserve_code",
+                    "type": "slug_name"
                 },
                 {
                     "name": "uic_bytes",
@@ -212,6 +220,16 @@
             ]
         },
         {
+            "name": "slug_name",
+            "base": "",
+            "fields": [
+                {
+                    "name": "value",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "sumlocks",
             "base": "",
             "fields": [
@@ -220,12 +238,12 @@
                     "type": "name"
                 },
                 {
-                    "name": "chain",
-                    "type": "ChainKind"
+                    "name": "chain_code",
+                    "type": "slug_name"
                 },
                 {
-                    "name": "token_kind",
-                    "type": "TokenKind"
+                    "name": "token_code",
+                    "type": "slug_name"
                 }
             ]
         },
@@ -282,24 +300,32 @@
                     "type": "UnderwriteRequestStatus"
                 },
                 {
-                    "name": "src_chain",
-                    "type": "ChainKind"
+                    "name": "src_chain_code",
+                    "type": "slug_name"
                 },
                 {
-                    "name": "src_token_kind",
-                    "type": "TokenKind"
+                    "name": "src_token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "src_reserve_code",
+                    "type": "slug_name"
                 },
                 {
                     "name": "src_amount",
                     "type": "uint64"
                 },
                 {
-                    "name": "dst_chain",
-                    "type": "ChainKind"
+                    "name": "dst_chain_code",
+                    "type": "slug_name"
                 },
                 {
-                    "name": "dst_token_kind",
-                    "type": "TokenKind"
+                    "name": "dst_token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "dst_reserve_code",
+                    "type": "slug_name"
                 },
                 {
                     "name": "dst_amount",
@@ -395,9 +421,9 @@
             "table_id": 31311,
             "secondary_indexes": [
                 {
-                    "name": "byuwck",
-                    "key_type": "uint128",
-                    "table_id": 60583
+                    "name": "byuw",
+                    "key_type": "uint64",
+                    "table_id": 10723
                 },
                 {
                     "name": "byuwreq",
@@ -554,72 +580,24 @@
                     "value": 60957
                 },
                 {
-                    "name": "ATTESTATION_TYPE_EMISSIONS_BLOCKED",
+                    "name": "ATTESTATION_TYPE_RESERVE_CREATE",
                     "value": 60958
-                }
-            ]
-        },
-        {
-            "name": "ChainKind",
-            "type": "int32",
-            "values": [
-                {
-                    "name": "CHAIN_KIND_UNKNOWN",
-                    "value": 0
                 },
                 {
-                    "name": "CHAIN_KIND_WIRE",
-                    "value": 1
+                    "name": "ATTESTATION_TYPE_RESERVE_CREATE_CANCEL",
+                    "value": 60959
                 },
                 {
-                    "name": "CHAIN_KIND_ETHEREUM",
-                    "value": 2
+                    "name": "ATTESTATION_TYPE_RESERVE_CREATE_CANCELLED",
+                    "value": 60960
                 },
                 {
-                    "name": "CHAIN_KIND_SOLANA",
-                    "value": 3
+                    "name": "ATTESTATION_TYPE_RESERVE_READY",
+                    "value": 60961
                 },
                 {
-                    "name": "CHAIN_KIND_SUI",
-                    "value": 4
-                }
-            ]
-        },
-        {
-            "name": "TokenKind",
-            "type": "int32",
-            "values": [
-                {
-                    "name": "TOKEN_KIND_WIRE",
-                    "value": 0
-                },
-                {
-                    "name": "TOKEN_KIND_ETH",
-                    "value": 256
-                },
-                {
-                    "name": "TOKEN_KIND_ERC20",
-                    "value": 257
-                },
-                {
-                    "name": "TOKEN_KIND_ERC721",
-                    "value": 258
-                },
-                {
-                    "name": "TOKEN_KIND_ERC1155",
-                    "value": 259
-                },
-                {
-                    "name": "TOKEN_KIND_LIQETH",
-                    "value": 496
-                },
-                {
-                    "name": "TOKEN_KIND_SOL",
-                    "value": 512
-                },
-                {
-                    "name": "TOKEN_KIND_LIQSOL",
-                    "value": 752
+                    "name": "ATTESTATION_TYPE_EMISSIONS_BLOCKED",
+                    "value": 60962
                 }
             ]
         },

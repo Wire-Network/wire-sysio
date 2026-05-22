@@ -326,19 +326,18 @@ public:
       //
       // Under ROA (active via the base tester), accounts need explicit ROA
       // RAM policies before set_code can succeed for a large contract.
-      //
-      // UWRIT is created bare (no ROA policy, no code) on purpose: epoch
-      // advance fires an unconditional inline sysio.uwrit::chklocks
-      // (underwriter lock-expiry sweep). The chain only requires the target
-      // account to exist; with no code the inline call is a harmless no-op,
-      // and no underwriter locks are staged in these tests. Giving it a
-      // 500 SYS policy like the others would overrun nodedaddy's ROA pool.
       create_accounts({ OPREG, EPOCH, CHALG, MSGCH, UWRIT });
       produce_blocks(1);
 
-      for (auto acct : { OPREG, EPOCH, CHALG, MSGCH }) {
+      // OPREG, EPOCH and UWRIT have real contract code set below and need the
+      // full RAM policy; CHALG and MSGCH are inline-target placeholders with
+      // no code deployed. Sizing the placeholders down keeps the sixth
+      // allocation within nodedaddy's tier-1 SYS pool.
+      for (auto acct : { OPREG, EPOCH, CHALG, MSGCH, UWRIT }) {
          if (get_roa_policy(acct, "nodedaddy"_n).is_null()) {
-            auto tr = addpolicy_ram_only("nodedaddy"_n, acct, asset::from_string("500.0000 SYS"));
+            const bool has_code = acct == OPREG || acct == EPOCH || acct == UWRIT;
+            auto tr = addpolicy_ram_only("nodedaddy"_n, acct,
+               asset::from_string(has_code ? "500.0000 SYS" : "100.0000 SYS"));
             BOOST_REQUIRE( tr );
             BOOST_REQUIRE( !tr->except );
          }
@@ -352,6 +351,12 @@ public:
       set_code( EPOCH, contracts::epoch_wasm() );
       set_abi ( EPOCH, contracts::epoch_abi().data() );
       set_privileged( EPOCH );
+
+      // sysio.epoch::advance unconditionally inlines sysio.uwrit::chklocks,
+      // so uwrit must be deployed for advance_epoch_state() to succeed.
+      set_code( UWRIT, contracts::uwrit_wasm() );
+      set_abi ( UWRIT, contracts::uwrit_abi().data() );
+      set_privileged( UWRIT );
 
       produce_blocks(1);
 

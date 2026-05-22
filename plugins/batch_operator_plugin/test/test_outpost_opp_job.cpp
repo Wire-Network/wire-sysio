@@ -16,8 +16,8 @@ using sysio::opp::debugging::DEBUG_OUTPOST_ENDPOINTS_TYPE_DEPOT_OUTPOST_ETHEREUM
 using sysio::opp::debugging::DEBUG_OUTPOST_ENDPOINTS_TYPE_DEPOT_OUTPOST_SOLANA;
 using sysio::opp::debugging::DEBUG_OUTPOST_ENDPOINTS_TYPE_OUTPOST_ETHEREUM_DEPOT;
 using sysio::opp::debugging::DEBUG_OUTPOST_ENDPOINTS_TYPE_OUTPOST_SOLANA_DEPOT;
-using sysio::opp::types::CHAIN_KIND_ETHEREUM;
-using sysio::opp::types::CHAIN_KIND_SOLANA;
+using sysio::opp::types::CHAIN_KIND_EVM;
+using sysio::opp::types::CHAIN_KIND_SVM;
 using sysio::outbound_envelope_record;
 using sysio::outpost_opp_job;
 using sysio::test::mock_depot_ops;
@@ -38,7 +38,7 @@ BOOST_AUTO_TEST_SUITE(outpost_opp_job_tests)
 // ─── run_outbound ───────────────────────────────────────────────────────────
 
 BOOST_AUTO_TEST_CASE(run_outbound_skips_when_epoch_window_closed) {
-   auto client = make_client(CHAIN_KIND_ETHEREUM, 0, 31337);
+   auto client = make_client(CHAIN_KIND_EVM, 0, 31337);
    mock_depot_ops depot;
    depot.window_open = false;
 
@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE(run_outbound_skips_when_epoch_window_closed) {
 }
 
 BOOST_AUTO_TEST_CASE(run_outbound_skips_when_not_elected) {
-   auto client = make_client(CHAIN_KIND_ETHEREUM, 0, 31337);
+   auto client = make_client(CHAIN_KIND_EVM, 0, 31337);
    mock_depot_ops depot;
    depot.elected = false;
 
@@ -64,7 +64,7 @@ BOOST_AUTO_TEST_CASE(run_outbound_skips_when_not_elected) {
 }
 
 BOOST_AUTO_TEST_CASE(run_inbound_skips_when_not_elected) {
-   auto client = make_client(CHAIN_KIND_SOLANA, 1, 0);
+   auto client = make_client(CHAIN_KIND_SVM, 1, 0);
    mock_depot_ops depot;
    depot.elected = false;
 
@@ -77,7 +77,7 @@ BOOST_AUTO_TEST_CASE(run_inbound_skips_when_not_elected) {
 }
 
 BOOST_AUTO_TEST_CASE(run_outbound_noop_when_no_pending_envelope) {
-   auto client = make_client(CHAIN_KIND_ETHEREUM, 0, 31337);
+   auto client = make_client(CHAIN_KIND_EVM, 0, 31337);
    mock_depot_ops depot;
    // depot.pending_response returns nullopt by default.
 
@@ -90,12 +90,12 @@ BOOST_AUTO_TEST_CASE(run_outbound_noop_when_no_pending_envelope) {
 }
 
 BOOST_AUTO_TEST_CASE(run_outbound_delivers_and_emits_eth_depot_direction) {
-   auto client = make_client(CHAIN_KIND_ETHEREUM, 0, 31337);
+   auto client = make_client(CHAIN_KIND_EVM, 0, 31337);
    mock_depot_ops depot;
    depot.epoch = 5;
 
    outbound_envelope_record rec;
-   rec.outpost_id   = 0;
+   rec.chain_code   = 0;
    rec.epoch_index  = 5;
    rec.raw_envelope = {'e', 'n', 'v'};
    depot.pending_response = [rec](uint64_t, uint32_t) -> std::optional<outbound_envelope_record> {
@@ -118,7 +118,7 @@ BOOST_AUTO_TEST_CASE(run_outbound_delivers_and_emits_eth_depot_direction) {
 }
 
 BOOST_AUTO_TEST_CASE(run_outbound_emits_sol_depot_direction) {
-   auto client = make_client(CHAIN_KIND_SOLANA, 1, 0);
+   auto client = make_client(CHAIN_KIND_SVM, 1, 0);
    mock_depot_ops depot;
    depot.epoch = 5;
 
@@ -136,7 +136,7 @@ BOOST_AUTO_TEST_CASE(run_outbound_emits_sol_depot_direction) {
 }
 
 BOOST_AUTO_TEST_CASE(run_outbound_only_delivers_once_per_epoch) {
-   auto client = make_client(CHAIN_KIND_ETHEREUM, 0, 31337);
+   auto client = make_client(CHAIN_KIND_EVM, 0, 31337);
    mock_depot_ops depot;
    depot.epoch = 5;
 
@@ -160,7 +160,7 @@ BOOST_AUTO_TEST_CASE(run_outbound_only_delivers_once_per_epoch) {
 }
 
 BOOST_AUTO_TEST_CASE(run_outbound_swallows_exceptions_and_does_not_mark_epoch) {
-   auto client = make_client(CHAIN_KIND_ETHEREUM, 0, 31337);
+   auto client = make_client(CHAIN_KIND_EVM, 0, 31337);
    mock_depot_ops depot;
    depot.epoch = 5;
    outbound_envelope_record rec;
@@ -192,7 +192,7 @@ BOOST_AUTO_TEST_CASE(run_outbound_emits_event_on_failure_and_retries_next_tick) 
    // json_rpc_error with -32602/empty body, the cron tick swallows it, and
    // the next beat retries against the same epoch+envelope. Visibility fix
    // demands the bytes show up in the debug stream regardless of outcome.
-   auto client = make_client(CHAIN_KIND_SOLANA, 1, 0);
+   auto client = make_client(CHAIN_KIND_SVM, 1, 0);
    mock_depot_ops depot;
    depot.epoch = 5;
    outbound_envelope_record rec;
@@ -226,7 +226,7 @@ BOOST_AUTO_TEST_CASE(run_outbound_emit_failure_does_not_break_delivery) {
    // A throwing slot in the debug-envelope signal must never break the
    // producer cluster — the emit is wrapped in FC_LOG_AND_DROP and the
    // delivery still proceeds.
-   auto client = make_client(CHAIN_KIND_ETHEREUM, 0, 31337);
+   auto client = make_client(CHAIN_KIND_EVM, 0, 31337);
    mock_depot_ops depot;
    depot.epoch = 5;
    outbound_envelope_record rec;
@@ -247,7 +247,7 @@ BOOST_AUTO_TEST_CASE(run_outbound_emit_failure_does_not_break_delivery) {
 // ─── run_inbound ────────────────────────────────────────────────────────────
 
 BOOST_AUTO_TEST_CASE(run_inbound_skips_when_epoch_window_closed) {
-   auto client = make_client(CHAIN_KIND_ETHEREUM, 0, 31337);
+   auto client = make_client(CHAIN_KIND_EVM, 0, 31337);
    mock_depot_ops depot;
    depot.window_open = false;
 
@@ -259,7 +259,7 @@ BOOST_AUTO_TEST_CASE(run_inbound_skips_when_epoch_window_closed) {
 }
 
 BOOST_AUTO_TEST_CASE(run_inbound_skips_when_already_delivered) {
-   auto client = make_client(CHAIN_KIND_ETHEREUM, 0, 31337);
+   auto client = make_client(CHAIN_KIND_EVM, 0, 31337);
    mock_depot_ops depot;
    depot.has_delivered_response = [](uint64_t, uint32_t) { return true; };
 
@@ -272,7 +272,7 @@ BOOST_AUTO_TEST_CASE(run_inbound_skips_when_already_delivered) {
 }
 
 BOOST_AUTO_TEST_CASE(run_inbound_noop_when_remote_has_nothing) {
-   auto client = make_client(CHAIN_KIND_ETHEREUM, 0, 31337);
+   auto client = make_client(CHAIN_KIND_EVM, 0, 31337);
    mock_depot_ops depot;
 
    outpost_opp_job job(client, depot, kDeadline);
@@ -284,7 +284,7 @@ BOOST_AUTO_TEST_CASE(run_inbound_noop_when_remote_has_nothing) {
 }
 
 BOOST_AUTO_TEST_CASE(run_inbound_delivers_to_depot_and_emits_eth_depot_signal) {
-   auto client = make_client(CHAIN_KIND_ETHEREUM, 0, 31337);
+   auto client = make_client(CHAIN_KIND_EVM, 0, 31337);
    mock_depot_ops depot;
    depot.epoch = 7;
    std::vector<char> raw{'i', 'n', 'b'};
@@ -294,7 +294,7 @@ BOOST_AUTO_TEST_CASE(run_inbound_delivers_to_depot_and_emits_eth_depot_signal) {
    job.run_inbound();
 
    BOOST_REQUIRE_EQUAL(depot.deliver_calls.size(), 1u);
-   BOOST_CHECK_EQUAL(depot.deliver_calls[0].outpost_id, 0u);
+   BOOST_CHECK_EQUAL(depot.deliver_calls[0].chain_code, 0u);
    BOOST_CHECK(depot.deliver_calls[0].raw_messages == raw);
 
    BOOST_REQUIRE_EQUAL(depot.emitted_events.size(), 1u);
@@ -305,7 +305,7 @@ BOOST_AUTO_TEST_CASE(run_inbound_delivers_to_depot_and_emits_eth_depot_signal) {
 }
 
 BOOST_AUTO_TEST_CASE(run_inbound_emits_sol_depot_signal) {
-   auto client = make_client(CHAIN_KIND_SOLANA, 1, 0);
+   auto client = make_client(CHAIN_KIND_SVM, 1, 0);
    mock_depot_ops depot;
    std::vector<char> raw{'s'};
    client->inbound_response = [raw](const auto&) { return raw; };
@@ -321,7 +321,7 @@ BOOST_AUTO_TEST_CASE(run_inbound_emits_before_deliver_to_depot) {
    // When the WIRE-side push_action throws (transient mempool / serializer
    // hiccup), the bytes pulled from the outpost must already be captured
    // so the debugging trail isn't lost.
-   auto client = make_client(CHAIN_KIND_SOLANA, 1, 0);
+   auto client = make_client(CHAIN_KIND_SVM, 1, 0);
    mock_depot_ops depot;
    depot.epoch = 7;
    std::vector<char> raw{'i', 'n'};
@@ -343,7 +343,7 @@ BOOST_AUTO_TEST_CASE(run_inbound_emits_before_deliver_to_depot) {
 BOOST_AUTO_TEST_CASE(run_inbound_emit_failure_does_not_break_delivery) {
    // A throwing emit in the inbound path must not prevent the WIRE-side
    // push_action — same FC_LOG_AND_DROP guarantee as outbound.
-   auto client = make_client(CHAIN_KIND_ETHEREUM, 0, 31337);
+   auto client = make_client(CHAIN_KIND_EVM, 0, 31337);
    mock_depot_ops depot;
    depot.epoch = 7;
    std::vector<char> raw{'i'};
@@ -361,7 +361,7 @@ BOOST_AUTO_TEST_CASE(run_inbound_emit_failure_does_not_break_delivery) {
 // ─── concurrency ────────────────────────────────────────────────────────────
 
 BOOST_AUTO_TEST_CASE(run_outbound_and_run_inbound_serialize_on_state_mx) {
-   auto client = make_client(CHAIN_KIND_ETHEREUM, 0, 31337);
+   auto client = make_client(CHAIN_KIND_EVM, 0, 31337);
    mock_depot_ops depot;
 
    outbound_envelope_record rec;

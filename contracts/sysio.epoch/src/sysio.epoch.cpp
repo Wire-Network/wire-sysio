@@ -7,6 +7,7 @@
 // [[sysio::contract("sysio.system")]] attribute on emission_config / t5_state
 // pins them to sysio.system's ABI; no readonly mirror needed here.
 #include <sysio.system/emissions.hpp>
+#include <sysio.chains/sysio.chains.hpp>
 #include <sysio/opp/attestations/attestations.pb.hpp>
 #include <zpp_bits.h>
 
@@ -31,6 +32,13 @@ namespace {
 constexpr name SYSTEM_ACCOUNT     = "sysio"_n;
 constexpr name TOKEN_ACCOUNT      = "sysio.token"_n;
 constexpr symbol WIRE_SYMBOL{"WIRE", 9};
+
+/// True when a chains row represents an active outpost (i.e. not the depot
+/// self-row and is active). Pulled out so every fanout loop in `advance`
+/// uses the identical predicate.
+inline bool is_active_outpost(const sysio::chains::chain_row& row) {
+   return row.active && !row.is_depot;
+}
 
 struct emissions_gate_result {
    bool                  ready              = false;
@@ -115,7 +123,7 @@ emissions_gate_result check_emissions_ready(uint32_t epoch_duration_sec, uint32_
    return r;
 }
 
-// Broadcast an EmissionsBlocked attestation to every registered outpost.
+// Broadcast an EmissionsBlocked attestation to every active outpost.
 // Called from record_gate_block on the first block for a given epoch_index
 // or when the reason changes since the previous attempt. The
 // first_blocked_at_secs argument is the original blocking time -- on a
@@ -137,14 +145,15 @@ void emit_emissions_block_attestation(name self,
    auto out = zpp::bits::out{encoded, zpp::bits::no_size{}};
    (void)out(msg);
 
-   epoch::outposts_t outposts_tbl(self);
-   for (auto it = outposts_tbl.begin(); it != outposts_tbl.end(); ++it) {
+   sysio::chains::chains_t chains_tbl(epoch::CHAINS_ACCOUNT);
+   for (auto it = chains_tbl.begin(); it != chains_tbl.end(); ++it) {
+      if (!is_active_outpost(*it)) continue;
       action(
          permission_level{self, "owner"_n},
          epoch::MSGCH_ACCOUNT,
          "queueout"_n,
          std::make_tuple(
-            it->id,
+            it->code.value,
             opp::types::ATTESTATION_TYPE_EMISSIONS_BLOCKED,
             encoded
          )
@@ -268,9 +277,6 @@ void epoch::advance() {
    // emit an EmissionsBlocked attestation per outpost (deduped), and return
    // without mutating state. The wall clock for the current epoch effectively
    // extends until the gate eventually passes on a subsequent chkcons retry.
-   // Runs before the delivery-eval / termination-check below so a blocked
-   // epoch defers the whole transition (delivery state is recorded only when
-   // the epoch actually rolls over).
    const uint32_t target_epoch = state.current_epoch_index + 1;
    const auto gate = check_emissions_ready(cfg.epoch_duration_sec, target_epoch);
    if (!gate.ready) {
@@ -284,14 +290,20 @@ void epoch::advance() {
    // Before incrementing: evaluate per-op delivery state for the EXPIRING
    // epoch. The active group of the expiring epoch (`current_batch_op_group`
    // BEFORE the increment) is the set of ops responsible for delivering
-   // every registered outpost's inbound envelope for `current_epoch_index`.
+   // every active outpost's inbound envelope for `current_epoch_index`.
    //
    // For each (outpost × member of the expiring group):
    //   - scan `msgch::envelopes` (`byoutepoch` index) for any row matching
-   //     (outpost_id, current_epoch_index, batch_op_name == member)
+   //     (chain_code, current_epoch_index, batch_op_name == member)
    //   - inline `opreg::recorddel(member, current_epoch_index, did_deliver)`
    //   - inline `opreg::termcheck(member)` — the threshold + window come
    //     from `op_config`, so tests dial the thresholds via setconfig
+   //
+   // The outpost set is sourced via a cross-contract read of
+   // `sysio.chains::chains` (no local mirror) filtered to
+   // `active==true && !is_depot`. Each surviving row's `code` is the
+   // outpost's chain code; its underlying `uint64` value is what
+   // `sysio.msgch::envelopes.chain_code` carries on the wire.
    //
    // Skipped on the genesis epoch (`current_epoch_index == 0`) — no group
    // existed yet, and the membership vector is empty.
@@ -304,10 +316,13 @@ void epoch::advance() {
       msgch::envelopes_t envs(MSGCH_ACCOUNT);
       auto oe_idx = envs.get_index<"byoutepoch"_n>();
 
-      outposts_t outposts_tbl(get_self());
-      for (auto op_it = outposts_tbl.begin(); op_it != outposts_tbl.end(); ++op_it) {
+      sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
+      for (auto op_it = chains_tbl.begin(); op_it != chains_tbl.end(); ++op_it) {
+         if (!is_active_outpost(*op_it)) continue;
+
+         const uint64_t chain_code = op_it->code.value;
          const uint64_t composite =
-            (op_it->id << 32) | state.current_epoch_index;
+            (chain_code << 32) | state.current_epoch_index;
 
          // Walk the (outpost, epoch) bucket and collect distinct delivering
          // batch ops. Vector linear-scan is fine — group size is small
@@ -345,7 +360,7 @@ void epoch::advance() {
       // NOTE: we intentionally do NOT erase the per-batch-op envelope
       // metadata rows here. `evalcons` already cleared their heavy
       // `raw_data` (1-2 KB → 0 bytes) at consensus reach, so the residual
-      // weight is just the tuple `(id, outpost_id, epoch_index,
+      // weight is just the tuple `(id, chain_code, epoch_index,
       // batch_op_name, checksum, ...)` — small and bounded by group
       // membership × outposts × retained-epochs. A dedicated bounded-
       // retention sweep belongs in a separate periodic ix; trying to
@@ -491,14 +506,15 @@ void epoch::advance() {
       auto out = zpp::bits::out{encoded, zpp::bits::no_size{}};
       (void)out(ops_attest);
 
-      outposts_t outposts_tbl(get_self());
-      for (auto it = outposts_tbl.begin(); it != outposts_tbl.end(); ++it) {
+      sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
+      for (auto it = chains_tbl.begin(); it != chains_tbl.end(); ++it) {
+         if (!is_active_outpost(*it)) continue;
          action(
             permission_level{get_self(), "owner"_n},
             MSGCH_ACCOUNT,
             "queueout"_n,
             std::make_tuple(
-               it->id,
+               it->code.value,
                opp::types::ATTESTATION_TYPE_OPERATORS,
                encoded
             )
@@ -533,14 +549,15 @@ void epoch::advance() {
       auto out = zpp::bits::out{encoded, zpp::bits::no_size{}};
       (void)out(attest);
 
-      outposts_t outposts_tbl(get_self());
-      for (auto it = outposts_tbl.begin(); it != outposts_tbl.end(); ++it) {
+      sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
+      for (auto it = chains_tbl.begin(); it != chains_tbl.end(); ++it) {
+         if (!is_active_outpost(*it)) continue;
          action(
             permission_level{get_self(), "owner"_n},
             MSGCH_ACCOUNT,
             "queueout"_n,
             std::make_tuple(
-               it->id,
+               it->code.value,
                opp::types::ATTESTATION_TYPE_BATCH_OPERATOR_GROUPS,
                encoded
             )
@@ -550,16 +567,28 @@ void epoch::advance() {
 
    // Build outbound envelopes for each outpost
    {
-      outposts_t outposts_tbl(get_self());
-      for (auto it = outposts_tbl.begin(); it != outposts_tbl.end(); ++it) {
+      sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
+      for (auto it = chains_tbl.begin(); it != chains_tbl.end(); ++it) {
+         if (!is_active_outpost(*it)) continue;
          action(
             permission_level{get_self(), "owner"_n},
             MSGCH_ACCOUNT,
             "buildenv"_n,
-            std::make_tuple(it->id)
+            std::make_tuple(it->code.value)
          ).send();
       }
    }
+
+   // Sweep underwriter locks whose `expires_at_epoch` is now in the past.
+   // The sweep walks `byexpire` ascending and stops at the first row that
+   // hasn't aged out yet, so the per-advance cost is O(expiring locks),
+   // not table size. An empty result is the steady-state case.
+   action(
+      permission_level{"sysio.epoch"_n, "owner"_n},
+      "sysio.uwrit"_n,
+      "chklocks"_n,
+      std::make_tuple(state.current_epoch_index)
+   ).send();
 
    // Emissions side. Two inline actions queued in FIFO order:
    //   1. accrueepoch: always queued. Records this epoch's per-epoch share
@@ -593,17 +622,6 @@ void epoch::advance() {
          )
       ).send();
    }
-
-   // Sweep underwriter locks whose `expires_at_epoch` is now in the past.
-   // The sweep walks `byexpire` ascending and stops at the first row that
-   // hasn't aged out yet, so the per-advance cost is O(expiring locks),
-   // not table size. An empty result is the steady-state case.
-   action(
-      permission_level{"sysio.epoch"_n, "owner"_n},
-      "sysio.uwrit"_n,
-      "chklocks"_n,
-      std::make_tuple(state.current_epoch_index)
-   ).send();
 
    // Working tables on `sysio.msgch` (`envelopes` / `messages` /
    // `attestations` / `outenvelopes`) are now drained inline by the
@@ -683,30 +701,6 @@ void epoch::schbatchgps() {
    state.batch_op_groups = new_groups;
    state.current_batch_op_group = 0; // front-of-window is always current
    state_tbl.set(state, get_self());
-}
-
-// ---------------------------------------------------------------------------
-//  regoutpost
-// ---------------------------------------------------------------------------
-void epoch::regoutpost(opp::types::ChainKind chain_kind, uint32_t chain_id) {
-   require_auth(get_self());
-
-   outposts_t outposts(get_self());
-
-   auto chain_idx = outposts.get_index<"bychain"_n>();
-   uint64_t composite = (static_cast<uint64_t>(chain_kind) << 32) | chain_id;
-   auto it = chain_idx.find(composite);
-   check(it == chain_idx.end(), "outpost already registered");
-
-   uint64_t next_id = outposts.available_primary_key();
-
-   outposts.emplace(get_self(), outpost_key{next_id}, outpost_info{
-      .id                  = next_id,
-      .chain_kind          = chain_kind,
-      .chain_id            = chain_id,
-      .last_inbound_epoch  = 0,
-      .last_outbound_epoch = 0,
-   });
 }
 
 // ---------------------------------------------------------------------------
