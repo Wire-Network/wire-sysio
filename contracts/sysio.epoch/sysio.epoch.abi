@@ -122,72 +122,14 @@
             ]
         },
         {
-            "name": "initgroups",
-            "base": "",
-            "fields": []
-        },
-        {
-            "name": "outpost_info",
-            "base": "",
-            "fields": [
-                {
-                    "name": "id",
-                    "type": "uint64"
-                },
-                {
-                    "name": "chain_kind",
-                    "type": "ChainKind"
-                },
-                {
-                    "name": "chain_id",
-                    "type": "uint32"
-                },
-                {
-                    "name": "last_inbound_msg_id",
-                    "type": "checksum256"
-                },
-                {
-                    "name": "last_outbound_msg_id",
-                    "type": "checksum256"
-                },
-                {
-                    "name": "last_inbound_epoch",
-                    "type": "uint32"
-                },
-                {
-                    "name": "last_outbound_epoch",
-                    "type": "uint32"
-                }
-            ]
-        },
-        {
-            "name": "outpost_key",
-            "base": "",
-            "fields": [
-                {
-                    "name": "id",
-                    "type": "uint64"
-                }
-            ]
-        },
-        {
             "name": "pause",
             "base": "",
             "fields": []
         },
         {
-            "name": "regoutpost",
+            "name": "schbatchgps",
             "base": "",
-            "fields": [
-                {
-                    "name": "chain_kind",
-                    "type": "ChainKind"
-                },
-                {
-                    "name": "chain_id",
-                    "type": "uint32"
-                }
-            ]
+            "fields": []
         },
         {
             "name": "setconfig",
@@ -228,18 +170,13 @@
             "ricardian_contract": ""
         },
         {
-            "name": "initgroups",
-            "type": "initgroups",
-            "ricardian_contract": ""
-        },
-        {
             "name": "pause",
             "type": "pause",
             "ricardian_contract": ""
         },
         {
-            "name": "regoutpost",
-            "type": "regoutpost",
+            "name": "schbatchgps",
+            "type": "schbatchgps",
             "ricardian_contract": ""
         },
         {
@@ -277,53 +214,12 @@
             "key_names": ["name"],
             "key_types": ["name"],
             "table_id": 59387
-        },
-        {
-            "name": "outposts",
-            "type": "outpost_info",
-            "index_type": "i64",
-            "key_names": ["id"],
-            "key_types": ["uint64"],
-            "table_id": 18067,
-            "secondary_indexes": [
-                {
-                    "name": "bychain",
-                    "key_type": "uint64",
-                    "table_id": 26575
-                }
-            ]
         }
     ],
     "ricardian_clauses": [],
     "variants": [],
     "action_results": [],
     "enums": [
-        {
-            "name": "ChainKind",
-            "type": "int32",
-            "values": [
-                {
-                    "name": "CHAIN_KIND_UNKNOWN",
-                    "value": 0
-                },
-                {
-                    "name": "CHAIN_KIND_WIRE",
-                    "value": 1
-                },
-                {
-                    "name": "CHAIN_KIND_ETHEREUM",
-                    "value": 2
-                },
-                {
-                    "name": "CHAIN_KIND_SOLANA",
-                    "value": 3
-                },
-                {
-                    "name": "CHAIN_KIND_SUI",
-                    "value": 4
-                }
-            ]
-        },
         {
             "name": "EmissionsBlockReason",
             "type": "int32",

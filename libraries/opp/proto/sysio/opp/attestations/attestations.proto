@@ -8,39 +8,46 @@ import "sysio/opp/opp.proto";
 option cc_enable_arenas = true;
 
 // ---------------------------------------------------------------------------
-//  Common (Pre & Post Launch) Attestations
+//  Reserve balance snapshot (Outpost -> Depot)
+//
+//  Reports the on-chain reserve balances the outpost is custodying. Depot
+//  uses this as a match-or-alert signal against `sysio.reserv::reserves`.
+//  Renamed from `ChainReserveBalanceSheet` for the chain-centric framing.
 // ---------------------------------------------------------------------------
 
-// Reserve balance snapshot for a given chain.
-message ChainReserveBalanceSheet {
-  sysio.opp.types.ChainKind               kind = 1;
-  repeated sysio.opp.types.TokenAmount amounts = 2;
+message ReserveBalanceSheet {
+  // Chain identifier (codename) on which these reserves live.
+  uint64 chain_code = 1;
+  // One TokenAmount per reserve being reported. The matching reserve_code
+  // for each entry is at the same index in `reserve_codes` — this lets the
+  // depot disambiguate when a single (chain, token) pair has multiple
+  // reserves.
+  repeated sysio.opp.types.TokenAmount amounts        = 2;
+  repeated uint64                      reserve_codes  = 3;
 }
 
 // ---------------------------------------------------------------------------
-//  Pre-launch specific attestations
+//  Pre-launch specific attestations (DEPRECATED — kept for proto compatibility
+//  during the deprecation pass)
 // ---------------------------------------------------------------------------
 
-// Pre-token stake attestation.
 message PretokenStakeChange {
-  sysio.opp.types.ChainAddress actor = 1;
-  sysio.opp.types.TokenAmount amount = 2;
-  int64                index_at_mint = 10; // -1 == unstake action
-  int64                index_at_burn = 11; // -1 == stake action
+  sysio.opp.types.ChainAddress actor          = 1;
+  sysio.opp.types.TokenAmount  amount         = 2;
+  int64                        index_at_mint  = 10;
+  int64                        index_at_burn  = 11;
 }
 
-// Pre-token purchase attestation.
 message PretokenPurchase {
-  sysio.opp.types.ChainAddress actor = 1;
-  sysio.opp.types.TokenAmount  amount = 2;
+  sysio.opp.types.ChainAddress actor          = 1;
+  sysio.opp.types.TokenAmount  amount         = 2;
   int64                        pretoken_count = 3;
-  int64                        index_at_mint = 10;
+  int64                        index_at_mint  = 10;
 }
 
-// Pre-token yield distribution.
 message PretokenYield {
-  sysio.opp.types.ChainAddress actor = 1;
-  sysio.opp.types.TokenAmount  amount = 2;
+  sysio.opp.types.ChainAddress actor         = 1;
+  sysio.opp.types.TokenAmount  amount        = 2;
   int64                        index_at_mint = 3;
 }
 
@@ -48,43 +55,25 @@ message PretokenYield {
 //  Post-launch attestations
 // ---------------------------------------------------------------------------
 
-// Stake status update.
 message StakeUpdate {
-  sysio.opp.types.ChainAddress actor = 1;
+  sysio.opp.types.ChainAddress actor  = 1;
   sysio.opp.types.StakeStatus  status = 2;
   sysio.opp.types.TokenAmount  amount = 3;
 }
 
-// Wire token purchase.
 message WireTokenPurchase {
-  sysio.opp.types.ChainAddress actor = 1;
+  sysio.opp.types.ChainAddress         actor   = 1;
   repeated sysio.opp.types.TokenAmount amounts = 2;
 }
 
-// Single envelope for every operator-affecting action across the deposit /
-// withdraw / slash lifecycle.
+// ---------------------------------------------------------------------------
+//  Operator action — DEPOSIT_REQUEST / WITHDRAW_REQUEST / WITHDRAW_REMIT / SLASH
 //
-// Sub-types (carried in `action_type`):
-//   DEPOSIT          outpost -> depot   "operator deposited X tokens; record the bond"
-//   WITHDRAW_REQUEST outpost -> depot   "operator wants to withdraw X tokens; queue the 2-epoch wait"
-//   WITHDRAW_REMIT   depot   -> outpost "approved; transfer X tokens to the authex-resolved destination"
-//                                       success-path terminator — the depot's irreversible drain of
-//                                       `sysio.opreg::wtdwqueue` in `flushwtdw` is the authoritative
-//                                       audit trail; no roundtrip ack required.
-//   SLASH            depot   -> outpost "seize X tokens of `token_kind` from the operator's escrow on
-//                                       `chain` and route to `lp_target`". Depot-internal — emitted by
-//                                       `sysio.opreg::slash` (and uwrit deferred-slash on lock release);
-//                                       NEVER accepted inbound at the depot.
-//
-// `actor` semantics by sub-type:
-//   DEPOSIT / WITHDRAW_REQUEST — the operator's address on the source chain.
-//   WITHDRAW_REMIT             — the destination address resolved via sysio.authex on the depot side;
-//                                may differ from the operator's canonical chain address if they
-//                                registered an alternate withdrawal recipient.
-//   SLASH                      — the operator's WIRE account name encoded as bytes with kind=CHAIN_KIND_WIRE.
-//
-// SLASH-only fields (`chain` / `reason` / `lp_target` / `slashed_at_epoch`) are zero / empty for
-// every other action type and are ignored by their handlers.
+//  Identity carriers updated for the data-model refactor:
+//    * `chain_code` (codename / uint64)  — was `ChainKind chain`.
+//    * `amount.token_code` (codename)    — was `amount.kind` (TokenKind enum).
+// ---------------------------------------------------------------------------
+
 message OperatorAction {
   enum ActionType {
     ACTION_TYPE_UNKNOWN          = 0;
@@ -94,333 +83,286 @@ message OperatorAction {
     ACTION_TYPE_SLASH            = 4;
   };
   ActionType                       action_type = 1;
-  // Operator's outpost-chain identity, carried as the FULL chain public key
-  // (not the derived address) so the depot can resolve it through
-  // sysio.authex::links's `bypubkey` index (existing — no new index needed).
-  // For Ethereum / WIRE (secp256k1) this is the 33-byte compressed pub key;
-  // for Solana (Ed25519) it is the 32-byte pubkey, which is also the
-  // address. The depot looks up the WIRE account from the linked pubkey;
-  // outposts in turn derive the local chain address from the same pubkey.
+  // Operator's outpost-chain identity (full chain public key).
   sysio.opp.types.ChainAddress     op_address  = 2;
   sysio.opp.types.OperatorType     type        = 3;
   sysio.opp.types.OperatorStatus   status      = 4;
   sysio.opp.types.TokenAmount      amount      = 5;
-  // Links a WITHDRAW_REMIT back to its originating WITHDRAW_REQUEST. Zero / unset
-  // for DEPOSIT_REQUEST and SLASH.
+  // Links a WITHDRAW_REMIT back to its originating WITHDRAW_REQUEST.
   uint64                           request_id  = 6;
-  // Which outpost chain holds the escrow this action concerns. For DEPOSIT_REQUEST
-  // and WITHDRAW_REQUEST, identifies the holding outpost; for SLASH, identifies
-  // the outpost expected to seize its share (outposts on other chains drop the
-  // SLASH); for WITHDRAW_REMIT, identifies the outpost that must release.
-  sysio.opp.types.ChainKind        chain       = 7;
-  // Human-readable reason recorded by the depot. Populated on SLASH (slash
-  // motivation) and on log-only failure paths; empty otherwise.
+  // Chain identifier (codename) of the outpost holding the escrow. For
+  // DEPOSIT_REQUEST / WITHDRAW_REQUEST identifies the holding outpost; for
+  // SLASH identifies the outpost expected to seize its share; for
+  // WITHDRAW_REMIT identifies the outpost that must release.
+  uint64                           chain_code  = 7;
+  // Human-readable reason recorded by the depot. Populated on SLASH and
+  // on log-only failure paths; empty otherwise.
   string                           reason      = 8;
+  // SLASH-only — identifies WHICH reserve on (chain, token) receives the
+  // seized funds. The outpost routes via `ReserveTarget`. Empty (0) for
+  // non-SLASH action types.
+  uint64                           reserve_code = 9;
 }
 
 // Per-operator audit log entry stored in `sysio.opreg::operators[].recent_actions`.
-// Captures every OperatorAction the depot has applied (or rejected) for an
-// operator, with its outcome. The log is a 5-deep ring buffer: oldest entry
-// drops when a sixth is appended.
 message OperatorActionLog {
   OperatorAction action        = 1;
-  // True when the action mutated state as intended; false when validation
-  // rejected it (e.g., insufficient available balance, slashed operator,
-  // unknown account). The action is still recorded so operators can see
-  // why their request was dropped.
   bool           success       = 2;
-  // sysio.current_time_point().sec_since_epoch() at which the action was
-  // applied / rejected.
   int64          timestamp     = 3;
-  // Reason the action failed, when `success == false`. Empty on success.
-  // Contract layer caps at 2048 bytes on append.
   string         error_message = 4;
 }
 
-// Reserve fund disbursement.
 message ReserveDisbursement {
-  sysio.opp.types.ChainAddress actor = 1;
-  sysio.opp.types.TokenAmount  amount = 2;
-
-  repeated sysio.opp.types.ChainSignature signature = 3;
+  sysio.opp.types.ChainAddress             actor     = 1;
+  sysio.opp.types.TokenAmount              amount    = 2;
+  repeated sysio.opp.types.ChainSignature  signature = 3;
 }
 
 // ---------------------------------------------------------------------------
 //  Protocol state tracking
 // ---------------------------------------------------------------------------
 
-
-// Protocol state tracking for a message chain on a given chain.
 message ProtocolState {
-  sysio.opp.types.ChainId       chain_id = 1;
-  bytes                         current_message_id = 2; // 32 bytes
-  bytes                         processed_message_id = 3; // 32 bytes
-  repeated sysio.opp.Message   incoming_messages = 10;
-  repeated sysio.opp.Message    outgoing_messages = 11;
+  // Chain identifier (codename).
+  uint64                        chain_code           = 1;
+  bytes                         current_message_id   = 2;
+  bytes                         processed_message_id = 3;
+  repeated sysio.opp.Message    incoming_messages    = 10;
+  repeated sysio.opp.Message    outgoing_messages    = 11;
 }
 
 // ---------------------------------------------------------------------------
-//  Cross-chain swap & underwriting attestations
+//  Cross-chain swap + underwriting attestations
 // ---------------------------------------------------------------------------
 
 // Cross-chain swap request (source Outpost -> Depot).
 //
-// The deposit IS the swap request — the user calls `swap(...)` on the source
-// outpost, depositing source_amount, and the outpost immediately queues this
-// attestation to the depot. `quoted_destination_amount` + `quote_tolerance_bps`
-// + `quote_timestamp_ms` capture the LP price quote at deposit time so the
-// depot can perform a variance-tolerance check (against `sysio.reserve::quote`
-// at consensus time) before opening the underwriter race. If the gap exceeds
-// tolerance, the depot emits a `SwapRevert` back to the source outpost and the
-// user's deposit is refunded.
+// Carries explicit src + dst chain/token/reserve codes. The depot's
+// underwriter race uses all three codes per leg to disambiguate same-chain
+// swaps (multiple reserves of the same token on the same chain).
 message SwapRequest {
-  sysio.opp.types.ChainAddress actor = 1;
+  sysio.opp.types.ChainAddress actor        = 1;
   sysio.opp.types.TokenAmount  source_amount = 2;
-  sysio.opp.types.ChainId      target_chain = 3;
-  sysio.opp.types.ChainAddress recipient = 4;
-  sysio.opp.types.TokenKind    target_token = 5;
-  // Quoted destination amount at deposit time, in destination-chain token units.
-  uint64                       quoted_destination_amount = 6;
-  // Variance tolerance in basis points (50 = 0.5%). The depot rejects with
-  // SwapRevert if |current_price - quote_price| / quote_price > tolerance_bps/10000.
-  uint32                       quote_tolerance_bps = 7;
-  // Quote timestamp (milliseconds since epoch) — informational; the depot's
-  // variance check uses the LP price at consensus time, not at quote time.
-  uint64                       quote_timestamp_ms = 8;
+  uint64                       source_chain_code  = 3;
+  uint64                       source_reserve_code = 4;
+  uint64                       target_chain_code  = 5;
+  uint64                       target_token_code  = 6;
+  uint64                       target_reserve_code = 7;
+  sysio.opp.types.ChainAddress recipient    = 8;
+  // Target destination amount at deposit time, in destination-chain token units.
+  // The user expresses the minimum they accept; the depot's variance check
+  // compares the live `swapquote` output against this and rejects if drift
+  // exceeds `target_tolerance_bps`. The user need not have fetched a quote
+  // before submitting — they may be arbitraging, guessing, or simply naming
+  // a preferred minimum.
+  uint64                       target_amount             = 9;
+  // Variance tolerance in basis points (e.g. 50 = 0.5%).
+  uint32                       target_tolerance_bps      = 10;
+  // Timestamp the user set their target at — informational only.
+  uint64                       target_timestamp_ms       = 11;
+  // Source-chain transaction id of the funding deposit.
+  bytes                        source_tx_id              = 12;
 }
 
-// Underwriter intent commit (Outposts -> Depot, one per outpost).
+// Underwriter intent commit (Outposts -> Depot, one per outpost / leg).
 //
-// Underwriters never speak OPP directly — they invoke a `commit(uw_request_id, signature)`
-// JSON-RPC entry on each outpost (source + destination), and each outpost queues this
-// attestation back to the depot. The depot's race resolver in `sysio.uwrit::record_commit`
-// picks the first underwriter whose pair (one COMMIT per outpost) both land at the depot
-// AND whose WIRE-tracked per-chain bond covers the leg amount.
-//
-// The COMMIT carries no chain-side lock fields — the lock is recorded entirely on the
-// depot in `sysio.uwrit::locks` when the race resolves. Outposts are JSON-RPC relays
-// that authenticate the caller as a registered underwriter; they do not validate bond.
+// Identity carriers updated:
+//   * `token_code` (codename)  — was `token_kind` (TokenKind enum).
+//   * `chain_code` (codename)  — identifies the outpost this commit is from.
+//   * `reserve_code` (codename) — disambiguates which reserve on that
+//                                  (chain, token) pair this leg covers.
 message UnderwriteIntentCommit {
-  sysio.opp.types.WireAccount     uw_account = 1;
-  // Underwriter's address on the outpost emitting this COMMIT.
+  sysio.opp.types.WireAccount     uw_account        = 1;
   sysio.opp.types.ChainAddress    uw_ext_chain_addr = 2;
-  // Depot's UWREQ id (the outpost reads this from the SWAP -> UWREQ ack).
-  uint64                          uw_request_id = 3;
-  // Which outpost this COMMIT came from (so the depot can match the dual-COMMIT pair).
-  uint64                          outpost_id = 4;
-  // Underwriter's signature over (uw_request_id || outpost_id) — proves the underwriter
-  // actually authorized this COMMIT (defends against an outpost compromised relay forging
-  // commits in their name).
-  bytes                           signature = 5;
-}
-
-// Underwriter intent reject (Outpost -> Depot).
-//
-// An underwriter explicitly steps back from a race they entered, OR an outpost rejects
-// a malformed `commit` JSON-RPC. Different semantics from the legacy UNDERWRITE_REJECT
-// (which was depot-initiated, not underwriter-initiated).
-message UnderwriteIntentReject {
-  sysio.opp.types.WireAccount  uw_account = 1;
-  uint64                       uw_request_id = 2;
-  // Optional reason — primarily for debugging; the depot does not branch on this string.
-  string                       reason = 3;
+  uint64                          uw_request_id     = 3;
+  uint64                          outpost_id        = 4;
+  bytes                           signature         = 5;
+  uint64                          token_code        = 6;
+  uint64                          chain_code        = 7;
+  uint64                          reserve_code      = 8;
 }
 
 // Cross-chain swap revert (Depot -> source Outpost).
 //
-// Emitted when the variance-tolerance check on a SwapRequest fails: the LP price has
-// drifted past the user's tolerance between quote time and consensus time. The source
-// outpost matches by `original_swap_message_id` and refunds `refund_amount` (which
-// equals the original `source_amount`) to the depositor.
+// Emitted when the variance-tolerance check on a SwapRequest fails.
 message SwapRevert {
-  // 32-byte OPP message id of the original SwapRequest attestation.
   bytes                        original_swap_message_id = 1;
-  // The depositor address on the source chain — recipient of the refund.
-  sysio.opp.types.ChainAddress depositor = 2;
-  // Refund amount + token kind (matches the original SwapRequest.source_amount).
-  sysio.opp.types.TokenAmount  refund_amount = 3;
-  // Human-readable reason — e.g., "variance 12.4% > tolerance 0.5% (quote=1042 SOL, current=913 SOL)".
-  string                       reason = 4;
+  sysio.opp.types.ChainAddress depositor                = 2;
+  sysio.opp.types.TokenAmount  refund_amount            = 3;
+  string                       reason                   = 4;
+  uint64                       source_chain_code        = 5;
+  uint64                       source_reserve_code      = 6;
 }
 
-// Underwriting intent submission (Outposts -> Depot).
-message UnderwriteIntent {
-  sysio.opp.types.WireAccount     uw_account = 1;
-  sysio.opp.types.ChainAddress    uw_ext_chain_addr = 10;
-
-  // ID of the attestion this intent is meant to underwrite,
-  // Attestation IDs are generated by the depot (`msgch`) when
-  // Envelopes are processed and messages are ingested.
-  uint64                          uw_request_id = 3;
-
-  sysio.opp.types.TokenAmount     amount = 4;
-  sysio.opp.types.ChainId         chain_id = 5;
+// Swap-payout remittance (Depot -> destination Outpost).
+message SwapRemit {
+  sysio.opp.types.ChainAddress recipient            = 1;
+  sysio.opp.types.TokenAmount  amount               = 2;
+  bytes                        original_message_id  = 3;
+  sysio.opp.types.ChainAddress underwriter          = 4;
+  uint64                       unlock_timestamp     = 5;
+  // Destination chain + reserve identity (codenames).
+  uint64                       chain_code           = 6;
+  uint64                       reserve_code         = 7;
 }
 
-
-// Underwriting confirmation (Outpost -> Depot).
-message UnderwriteConfirm {
-  bytes                         original_message_id = 1; // 32 bytes
-  sysio.opp.types.ChainAddress  underwriter = 2;
-  bool                          confirmed = 3;
-  string                        error_reason = 4;
-}
-
-// Fund remittance (Depot -> target Outpost).
-message Remit {
-  sysio.opp.types.ChainAddress recipient = 1;
-  sysio.opp.types.TokenAmount  amount = 2;
-  bytes                        original_message_id = 3; // 32 bytes
-  sysio.opp.types.ChainAddress underwriter = 4;
-  uint64                       unlock_timestamp = 5;
+// Swap-payout rejection (destination Outpost -> Depot).
+message SwapRejected {
+  bytes                        original_swap_remit_id = 1;
+  sysio.opp.types.ChainAddress recipient              = 2;
+  sysio.opp.types.TokenAmount  unremitted_amount      = 3;
+  string                       reason                 = 4;
+  uint64                       chain_code             = 5;
+  uint64                       reserve_code           = 6;
 }
 
 // ---------------------------------------------------------------------------
 //  Challenge attestations
 // ---------------------------------------------------------------------------
 
-// Challenge request (Depot -> source Outpost).
 message ChallengeRequest {
-  uint32                            epoch_index = 1;
-  uint32                            round = 2;
-  bytes                             original_chain_hash = 3; // 32 bytes
-  repeated ChallengeOperatorHash    operator_hashes = 4;
+  uint32                            epoch_index         = 1;
+  uint32                            round               = 2;
+  bytes                             original_chain_hash = 3;
+  repeated ChallengeOperatorHash    operator_hashes     = 4;
 }
 
-// Per-operator hash submitted during a challenged epoch.
 message ChallengeOperatorHash {
-  sysio.opp.types.ChainAddress operator = 1;
-  bytes                        chain_hash = 2; // 32 bytes
+  sysio.opp.types.ChainAddress operator   = 1;
+  bytes                        chain_hash = 2;
 }
 
 // ---------------------------------------------------------------------------
 //  Epoch & roster management attestations
 // ---------------------------------------------------------------------------
 
-// Epoch sync notification (Depot -> Outpost).
-message EpochSync {
-  uint32 epoch_index = 1;
-  uint32 epoch_duration_sec = 2;
-  uint64 epoch_start_timestamp = 3;
-}
-
-// Operator roster (Depot -> Outpost, every epoch).
 message Operators {
   repeated OperatorEntry operators = 1;
 }
 
 message OperatorEntry {
-  sysio.opp.types.WireAccount    account = 1;
+  sysio.opp.types.WireAccount           account   = 1;
   repeated sysio.opp.types.ChainAddress addresses = 2;
-  sysio.opp.types.OperatorType   type = 3;
-  sysio.opp.types.OperatorStatus status = 4;
+  sysio.opp.types.OperatorType          type      = 3;
+  sysio.opp.types.OperatorStatus        status    = 4;
 }
 
-// Batch operator group assignments (Depot -> Outpost, every epoch).
-// Contains all groups and the index of the active group for the current epoch.
 message BatchOperatorGroups {
-  uint32 active_group_index = 1;
-  uint32 epoch_index = 2;
-  repeated BatchOperatorGroup groups = 3;
+  uint32                       active_group_index = 1;
+  uint32                       epoch_index        = 2;
+  repeated BatchOperatorGroup  groups             = 3;
+  uint32                       epoch_duration_sec = 4;
 }
 
 message BatchOperatorGroup {
   repeated sysio.opp.types.ChainAddress operators = 1;
 }
 
-// Reserve-target hint carried on `OperatorAction(action_type=SLASH)` —
-// tells the outpost what to do with the slashed funds. The depot resolves
-// this via `sysio.reserve::resolve_lp(chain, token_kind, role)`.
-message ReserveTarget {
-  enum Kind {
-    KIND_UNKNOWN = 0;
-    // Route to the matching paired-with-WIRE LP on the source chain. `paired_token`
-    // identifies which LP gets credited.
-    KIND_LP = 1;
-    // Route to a burn / unrecoverable pool. `paired_token` unused.
-    KIND_BURN = 2;
-    // Route to a treasury account. `paired_token` unused.
-    KIND_TREASURY = 3;
-  }
-  Kind                       kind = 1;
-  // For KIND_LP, the token side of the WIRE-paired LP that receives the slashed funds.
-  sysio.opp.types.TokenKind  paired_token = 2;
-}
-
 // Deposit refund (Depot -> source Outpost).
-//
-// Emitted by the depot's opreg layer when it can't accept an inbound DEPOSIT —
-// the originating account is unknown to opreg, the operator has no authex
-// link for the chain, etc. The outpost matches `original_deposit_message_id`
-// to the deposit it escrowed and refunds `refund_amount` to `depositor`.
-//
-// Distinct from `SwapRevert` (which handles depot-INTERNAL swap failures like
-// overcommit or quote-variance breaches): DEPOSIT_REVERT is purely about
-// identity / link-table validation at the depot's opreg layer.
 message DepositRevert {
-  // 32-byte OPP message id of the original DEPOSIT attestation. The outpost
-  // matches on this to scope the refund to one specific in-flight deposit.
   bytes                        original_deposit_message_id = 1;
-  // Source-chain address that paid the original deposit — the refund target.
   sysio.opp.types.ChainAddress depositor                   = 2;
-  // Refund amount + token kind (matches the original DEPOSIT.amount).
   sysio.opp.types.TokenAmount  refund_amount               = 3;
-  // Why the depot rejected the deposit (e.g., "operator not registered",
-  // "missing authex link for ETHEREUM").
   string                       reason                      = 4;
+  uint64                       chain_code                  = 5;
 }
 
 // ---------------------------------------------------------------------------
 //  Operator Registry attestations
 // ---------------------------------------------------------------------------
 
-// NFT → WIRE token conversion (ETH BAR.sol → Depot).
 message NodeOwnerReg {
   sysio.opp.types.ChainAddress owner_address = 1;
-  bytes                        token_id = 2;
-  sysio.opp.types.ChainAddress nft_address = 3;
+  bytes                        token_id      = 2;
+  sysio.opp.types.ChainAddress nft_address   = 3;
 }
 
 // Staking reward distribution (Outpost -> Depot).
-//
-// Emitted by an outpost when a staker's slice of a validator-reward distribution
-// has been computed. The depot routes this to `sysio.reserve::credit_lp` (or a
-// per-staker share contract) so the staker's WIRE-side accounting is updated.
 message StakingReward {
-  // Outpost id emitting the reward — identifies the (chain, validator) context.
-  uint64                       outpost_id = 1;
-  // The staker's WIRE account.
+  uint64                       outpost_id          = 1;
   sysio.opp.types.WireAccount  staker_wire_account = 2;
-  // The staker's share of the reward in basis points (10000 = 100%).
-  uint32                       share_bps = 3;
-  // Reward period (milliseconds since epoch).
-  uint64                       period_start_ms = 4;
-  uint64                       period_end_ms = 5;
-  // Absolute reward amount + token kind being credited.
-  sysio.opp.types.TokenAmount  reward_amount = 6;
+  uint32                       share_bps           = 3;
+  uint64                       period_start_ms     = 4;
+  uint64                       period_end_ms       = 5;
+  sysio.opp.types.TokenAmount  reward_amount       = 6;
+  uint64                       chain_code          = 7;
+  uint64                       reserve_code        = 8;
 }
 
-// `NativeYieldReward` removed — `StakingReward` is the single staker-reward
-// feedback path. The validator-reward bulk credit lives inside the outpost's
-// reserve top-up, not in a separate attestation.
-
-// Stake result confirmation (Depot → Outpost).
-// Sent after processing a cross-chain stake attestation.
 message StakeResult {
   sysio.opp.types.ChainAddress owner_address = 1;
-  sysio.opp.types.TokenAmount  amount = 2;
-  bool                         success = 3;
-  string                       error_reason = 4;
+  sysio.opp.types.TokenAmount  amount        = 2;
+  bool                         success       = 3;
+  string                       error_reason  = 4;
 }
 
-// Attestation processing error (Depot → Outpost).
-// Sent when an inbound attestation fails processing.
-// Prevents breaking the OPP message chain.
 message AttestationProcessingError {
   uint64                           attestation_id = 1;
-  sysio.opp.types.AttestationType  original_type = 2;
-  bytes                            original_data = 3;
-  string                           error_message = 4;
+  sysio.opp.types.AttestationType  original_type  = 2;
+  bytes                            original_data  = 3;
+  string                           error_message  = 4;
+}
+
+// ---------------------------------------------------------------------------
+//  Reserve creation flow (v6 — outpost-initiated, depot-matched)
+//
+//  Lifecycle:
+//    1. User calls outpost `create_reserve(...)`. Outpost takes external_token_amount
+//       custody, inserts a local PENDING reserve record, queues RESERVE_CREATE.
+//    2. Depot receives RESERVE_CREATE → `sysio.reserv::oncrtreserve(...)` inserts
+//       a row with status=PENDING (creator_addr remembered for cancel refund).
+//    3. Any WIRE account calls `sysio.reserv::matchreserve(...)` putting up
+//       requested_wire_amount WIRE → status flips to ACTIVE → RESERVE_READY queued.
+//    4. Outpost dispatches RESERVE_READY → marks local reserve ACTIVE; reserve
+//       is now usable for swap routing.
+//
+//  Cancel path (anywhere before match wins):
+//    a. Creator calls outpost `cancel_create_reserve(...)`. Outpost queues
+//       RESERVE_CREATE_CANCEL. DOES NOT mutate local state.
+//    b. Depot receives RESERVE_CREATE_CANCEL:
+//          - If status == PENDING: set to CANCELLED, queue RESERVE_CREATE_CANCELLED.
+//          - Else (race lost to match): silent no-op per
+//            feedback_opp_handlers_never_throw.md — no attestation emitted.
+//    c. Outpost dispatches RESERVE_CREATE_CANCELLED → refunds the original
+//       external_token_amount to creator_addr; marks local reserve CANCELLED.
+// ---------------------------------------------------------------------------
+
+// Outpost -> Depot. Open a new PENDING reserve.
+message ReserveCreate {
+  uint64                       chain_code             = 1;   // the outpost's own chain
+  uint64                       token_code             = 2;
+  uint64                       reserve_code           = 3;
+  string                       name                   = 4;
+  string                       description            = 5;
+  uint64                       external_token_amount  = 6;
+  uint64                       requested_wire_amount  = 7;
+  uint32                       connector_weight_bps   = 8;
+  sysio.opp.types.ChainAddress creator_addr           = 9;   // refund target on cancel
+}
+
+// Outpost -> Depot. Creator cancels their PENDING reserve.
+message ReserveCreateCancel {
+  uint64                       chain_code   = 1;
+  uint64                       token_code   = 2;
+  uint64                       reserve_code = 3;
+  // Proof-of-creator: must match the depot row's creator_addr.
+  sysio.opp.types.ChainAddress creator_addr = 4;
+}
+
+// Depot -> Outpost. Cancel was accepted while status was still PENDING.
+// Outpost refunds the external_token_amount to its local reserve's `creator`.
+message ReserveCreateCancelled {
+  uint64 chain_code   = 1;
+  uint64 token_code   = 2;
+  uint64 reserve_code = 3;
+}
+
+// Depot -> Outpost. Matcher put up requested_wire_amount WIRE; reserve ACTIVE.
+// Outpost marks its local reserve record ACTIVE — usable for swap routing.
+message ReserveReady {
+  uint64 chain_code   = 1;
+  uint64 token_code   = 2;
+  uint64 reserve_code = 3;
 }
 
 // Emissions readiness gate failure (Depot → Outpost).

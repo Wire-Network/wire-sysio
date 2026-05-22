@@ -53,6 +53,7 @@ static constexpr account_name OPREG = "sysio.opreg"_n;
 static constexpr account_name EPOCH = "sysio.epoch"_n;
 static constexpr account_name CHALG = "sysio.chalg"_n;
 static constexpr account_name MSGCH = "sysio.msgch"_n;
+static constexpr account_name UWRIT = "sysio.uwrit"_n;
 
 // Keep these in sync with contracts/sysio.system/src/emissions.cpp
 static constexpr uint32_t SECONDS_PER_MONTH = 30u * 24u * 60u * 60u;
@@ -325,12 +326,18 @@ public:
       //
       // Under ROA (active via the base tester), accounts need explicit ROA
       // RAM policies before set_code can succeed for a large contract.
-      create_accounts({ OPREG, EPOCH, CHALG, MSGCH });
+      create_accounts({ OPREG, EPOCH, CHALG, MSGCH, UWRIT });
       produce_blocks(1);
 
-      for (auto acct : { OPREG, EPOCH, CHALG, MSGCH }) {
+      // OPREG, EPOCH and UWRIT have real contract code set below and need the
+      // full RAM policy; CHALG and MSGCH are inline-target placeholders with
+      // no code deployed. Sizing the placeholders down keeps the sixth
+      // allocation within nodedaddy's tier-1 SYS pool.
+      for (auto acct : { OPREG, EPOCH, CHALG, MSGCH, UWRIT }) {
          if (get_roa_policy(acct, "nodedaddy"_n).is_null()) {
-            auto tr = addpolicy_ram_only("nodedaddy"_n, acct, asset::from_string("500.0000 SYS"));
+            const bool has_code = acct == OPREG || acct == EPOCH || acct == UWRIT;
+            auto tr = addpolicy_ram_only("nodedaddy"_n, acct,
+               asset::from_string(has_code ? "500.0000 SYS" : "100.0000 SYS"));
             BOOST_REQUIRE( tr );
             BOOST_REQUIRE( !tr->except );
          }
@@ -344,6 +351,12 @@ public:
       set_code( EPOCH, contracts::epoch_wasm() );
       set_abi ( EPOCH, contracts::epoch_abi().data() );
       set_privileged( EPOCH );
+
+      // sysio.epoch::advance unconditionally inlines sysio.uwrit::chklocks,
+      // so uwrit must be deployed for advance_epoch_state() to succeed.
+      set_code( UWRIT, contracts::uwrit_wasm() );
+      set_abi ( UWRIT, contracts::uwrit_abi().data() );
+      set_privileged( UWRIT );
 
       produce_blocks(1);
 

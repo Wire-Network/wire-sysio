@@ -4,36 +4,45 @@
 #include <sysio/kv_global.hpp>
 #include <sysio/kv_table.hpp>
 #include <sysio/asset.hpp>
+#include <sysio/crypto.hpp>
 #include <sysio/system.hpp>
+#include <sysio/privileged.hpp>
 #include <sysio/opp/types/types.pb.hpp>
+#include <sysio/opp/attestations/attestations.pb.hpp>
+#include <sysio.opp.common/slug_name.hpp>
+#include <sysio.opp.common/opp_table_types.hpp>
+
+#include <limits>
 
 namespace sysio {
 
    /**
-    * @brief sysio.reserve — per-chain LP / reserve management on WIRE.
+    * @brief sysio.reserv — reserve registry with create→match→ready handshake.
     *
-    * Per `CLAUDE-WIRE-OPERATOR-COLLATERAL-IMPL-PLAN.md` §1 / Task 5: every
-    * cross-chain LP is paired with WIRE on the depot side. A swap from
-    * `token_a` (chain A) to `token_b` (chain B) routes as
-    * `token_a -> WIRE -> token_b`, hopping through this contract's LP table.
+    * Per the v6 data-model refactor:
     *
-    * v1 implements **constant-product** quoting (xy = k, equivalent to a
-    * Bancor LP at `connector_weight = 0.5`). The `connector_weight` field
-    * on `lp_entry` is reserved for the asymmetric Bancor extension; today's
-    * `quote(...)` ignores it and uses pure constant-product math. Quote
-    * formulas (uint128 fixed-point, no overflow on uint64 reserves):
+    * - Reserve primary key is the triple `(chain_code, token_code, code)`
+    *   (all codenames). Composite stored as `checksum256(chain || token || code)`.
     *
-    *   token -> WIRE:   dW = (rW * dT) / (rT + dT)
-    *   WIRE -> token:   dT = (rT * dW) / (rW + dW)
-    *   token -> token:  dW_intermediate = quote(src_chain, src_token, WIRE, src_amount)
-    *                    dst_amount      = quote(WIRE, dst_chain, dst_token, dW_intermediate)
+    * - `ReserveStatus` proto enum (`PENDING` / `ACTIVE` / `CANCELLED`) replaces
+    *   the prior `active: bool`.
     *
-    * Read-side consumers (uwrit's variance check, off-chain quote endpoints)
-    * either call `quote(...)` directly or mirror the `lps` table and inline
-    * the math. opreg's slash flow uses the default `ReserveTarget {KIND_LP,
-    * paired_token=token_kind}` construction without consulting this contract
-    * — `resolve_lp` is reserved for the path where the canonical mapping
-    * needs to be overridden (e.g. emergency reroute).
+    * - **Bootstrap path** (`current_epoch_index == 0`): `regreserve(...)` is
+    *   priv-gated and inserts a row with `status=ACTIVE` inline. No `matchreserve`
+    *   needed.
+    *
+    * - **Post-bootstrap path**: users call `create_reserve(...)` on outposts; the
+    *   outpost queues a `RESERVE_CREATE` attestation; sysio.msgch dispatches
+    *   `oncrtreserve(...)` which inserts a row with `status=PENDING`. Any WIRE
+    *   account then calls `matchreserve(...)` putting up `requested_wire_amount`
+    *   WIRE — `sysio.reserv` takes custody, status flips to `ACTIVE`, and a
+    *   `RESERVE_READY` is queued back to the outpost.
+    *
+    * - **Cancel path**: creator calls `cancel_create_reserve(...)` on the outpost.
+    *   `RESERVE_CREATE_CANCEL` flows; sysio.msgch dispatches `oncnclrsv(...)`. If
+    *   `status == PENDING`, set `CANCELLED` + queue `RESERVE_CREATE_CANCELLED`.
+    *   Else silent no-op (race lost — match landed first;
+    *   feedback_opp_handlers_never_throw applies).
     */
    class [[sysio::contract("sysio.reserv")]] reserve : public contract {
    public:
@@ -41,93 +50,163 @@ namespace sysio {
 
       // Well-known accounts
       static constexpr name MSGCH_ACCOUNT = "sysio.msgch"_n;
+      static constexpr name UWRIT_ACCOUNT = "sysio.uwrit"_n;
+      static constexpr name TOKEN_ACCOUNT = "sysio.token"_n;
+      static constexpr name EPOCH_ACCOUNT = "sysio.epoch"_n;
 
       // Bancor connector_weight is stored in basis points (10000 = 100%).
       // Pure constant-product corresponds to weight = 5000.
-      static constexpr uint32_t MAX_CONNECTOR_WEIGHT_BPS = 10000;
+      static constexpr uint32_t MAX_CONNECTOR_WEIGHT_BPS     = 10000;
       static constexpr uint32_t DEFAULT_CONNECTOR_WEIGHT_BPS = 5000;
 
       // -----------------------------------------------------------------------
       //  Actions
       // -----------------------------------------------------------------------
 
-      /// Provision or update an LP. The (chain, paired_token) pair is unique;
-      /// re-calling `setlp` for an existing pair updates its reserves and
-      /// connector weight in place. Reserves are denominated in the chain's
-      /// canonical units (uint64).
+      /// Bootstrap-window only. Insert a reserve row directly with
+      /// `status=ACTIVE`. Priv-gated; rejects when `current_epoch_index > 0`.
       [[sysio::action]]
-      void setlp(opp::types::ChainKind chain,
-                 opp::types::TokenKind paired_token,
-                 uint64_t reserve_paired,
-                 uint64_t reserve_wire,
-                 uint32_t connector_weight_bps);
+      void regreserve(sysio::slug_name chain_code,
+                      sysio::slug_name token_code,
+                      sysio::slug_name reserve_code,
+                      std::string     name,
+                      std::string     description,
+                      uint64_t        initial_chain_amount,
+                      uint64_t        initial_wire_amount,
+                      uint32_t        connector_weight_bps);
 
-      /// Read-only quote: how many destination tokens does `src_amount` of
-      /// `(src_chain, src_token)` produce on `(dst_chain, dst_token)`?
-      /// Returns 0 if any required LP is missing (caller's variance check
-      /// should treat 0 as "no LP available; skip variance check").
+      /// Dispatched by sysio.msgch when a RESERVE_CREATE attestation arrives.
+      /// Inserts a row with `status=PENDING`. **NEVER throws** —
+      /// per feedback_opp_handlers_never_throw: duplicate / malformed records
+      /// are silently logged + skipped.
+      [[sysio::action]]
+      void oncrtreserve(sysio::slug_name       chain_code,
+                        sysio::slug_name       token_code,
+                        sysio::slug_name       reserve_code,
+                        std::string           name,
+                        std::string           description,
+                        uint64_t              external_token_amount,
+                        uint64_t              requested_wire_amount,
+                        uint32_t              connector_weight_bps,
+                        opp::types::ChainKind creator_chain_kind,
+                        std::vector<char>     creator_chain_addr);
+
+      /// Permissionless (auth = matcher). Takes WIRE custody of
+      /// `wire_amount` (must exactly equal `reserve.requested_wire_amount`),
+      /// flips status to ACTIVE, queues RESERVE_READY outbound.
+      [[sysio::action]]
+      void matchreserve(sysio::slug_name chain_code,
+                        sysio::slug_name token_code,
+                        sysio::slug_name reserve_code,
+                        name            matcher,
+                        uint64_t        wire_amount);
+
+      /// Dispatched by sysio.msgch when a RESERVE_CREATE_CANCEL attestation
+      /// arrives. If `status==PENDING`, flip to CANCELLED + queue
+      /// RESERVE_CREATE_CANCELLED. Else: silent no-op (match won the race).
+      /// **NEVER throws.**
+      [[sysio::action]]
+      void oncnclrsv(sysio::slug_name       chain_code,
+                     sysio::slug_name       token_code,
+                     sysio::slug_name       reserve_code,
+                     opp::types::ChainKind creator_chain_kind,
+                     std::vector<char>     creator_chain_addr);
+
+      /// Read-only quote across two reserves (src and dst). Requires both
+      /// reserves ACTIVE with the same connector model. Returns 0 when any
+      /// required reserve is missing or inactive.
       [[sysio::action, sysio::read_only]]
-      uint64_t quote(opp::types::ChainKind src_chain,
-                     opp::types::TokenKind src_token,
-                     opp::types::ChainKind dst_chain,
-                     opp::types::TokenKind dst_token,
-                     uint64_t src_amount);
+      uint64_t swapquote(sysio::slug_name from_chain_code,
+                         sysio::slug_name from_token_code,
+                         sysio::slug_name from_reserve_code,
+                         uint64_t        from_amount,
+                         sysio::slug_name to_chain_code,
+                         sysio::slug_name to_token_code,
+                         sysio::slug_name to_reserve_code);
 
-      /// Credit an LP's paired-token reserve from a STAKING_REWARD
-      /// attestation. Auth=msgch. Currently unused; will be
-      /// invoked once Task 4's dispatch wires those types in (today they
-      /// fall through to no-op — see msgch's dispatch_attestation).
+      /// Auth=sysio.uwrit. Inline-debit at SWAP_REMIT emit time. Asserts the
+      /// reserve is ACTIVE and balance is sufficient.
       [[sysio::action]]
-      void creditlp(opp::types::ChainKind chain,
-                    opp::types::TokenKind paired_token,
-                    uint64_t paired_amount,
-                    uint64_t wire_amount);
+      void debit(sysio::slug_name chain_code,
+                 sysio::slug_name token_code,
+                 sysio::slug_name reserve_code,
+                 uint64_t        amount);
+
+      /// Auth=sysio.msgch. Reconcile a failed SwapRemit: re-add unremitted
+      /// amount to the matching reserve's outpost-side balance.
+      [[sysio::action]]
+      void onreject(checksum256       original_swap_remit_id,
+                    sysio::slug_name   chain_code,
+                    sysio::slug_name   token_code,
+                    sysio::slug_name   reserve_code,
+                    uint64_t          unremitted_amount,
+                    std::vector<char> recipient_address,
+                    std::string       reason);
+
+      /// Auth=sysio.msgch. Credit STAKING_REWARD into the matching reserve.
+      [[sysio::action]]
+      void onreward(sysio::slug_name chain_code,
+                    sysio::slug_name token_code,
+                    sysio::slug_name reserve_code,
+                    uint64_t        outpost_amount);
 
       // -----------------------------------------------------------------------
       //  Tables
       // -----------------------------------------------------------------------
 
-      /// Composite primary key: pack chain (high 32 bits) + paired_token
-      /// (low 32 bits) into a single uint64 so the (chain, token) pair is
-      /// unique. Both enums fit comfortably in 32 bits each.
-      struct lp_key {
-         uint64_t chain_token;
-         uint64_t primary_key() const { return chain_token; }
-         SYSLIB_SERIALIZE(lp_key, (chain_token))
-      };
-
-      static constexpr uint64_t pack_chain_token(opp::types::ChainKind chain,
-                                                  opp::types::TokenKind token) {
-         return (static_cast<uint64_t>(chain) << 32)
-              | static_cast<uint64_t>(token);
-      }
-
-      /// One LP per (chain, paired_token). The WIRE-paired side is implicit;
-      /// every LP holds the paired token + WIRE.
-      struct [[sysio::table("lps")]] lp_entry {
-         opp::types::ChainKind  chain;
-         opp::types::TokenKind  paired_token;
-         uint64_t               reserve_paired           = 0;
-         uint64_t               reserve_wire             = 0;
-         uint32_t               connector_weight_bps     = DEFAULT_CONNECTOR_WEIGHT_BPS;
-         uint64_t               last_updated_ms          = 0;
-
-         /// Composite key matching `lp_key::chain_token` (kept here too so
-         /// secondary-index lookups by the same key work uniformly).
-         uint64_t by_chain_token() const {
-            return pack_chain_token(chain, paired_token);
+      /// Triple-slug_name primary key. Composite encoded as
+      /// `checksum256(chain_code || token_code || reserve_code)`.
+      struct reserve_key {
+         sysio::slug_name chain_code;
+         sysio::slug_name token_code;
+         sysio::slug_name reserve_code;
+         checksum256 primary_key() const {
+            std::array<uint8_t, 24> buf{};
+            std::memcpy(buf.data() +  0, &chain_code.value,   8);
+            std::memcpy(buf.data() +  8, &token_code.value,   8);
+            std::memcpy(buf.data() + 16, &reserve_code.value, 8);
+            return sysio::sha256(reinterpret_cast<const char*>(buf.data()), buf.size());
          }
-
-         SYSLIB_SERIALIZE(lp_entry,
-            (chain)(paired_token)(reserve_paired)(reserve_wire)
-            (connector_weight_bps)(last_updated_ms))
+         SYSLIB_SERIALIZE(reserve_key, (chain_code)(token_code)(reserve_code))
       };
 
-      using lps_t = sysio::kv::table<"lps"_n, lp_key, lp_entry>;
+      struct [[sysio::table("reserves")]] reserve_row {
+         sysio::slug_name             chain_code;
+         sysio::slug_name             token_code;
+         sysio::slug_name             reserve_code;
+         std::string                 name;
+         std::string                 description;
+         opp::types::ReserveStatus   status                 = opp::types::RESERVE_STATUS_UNKNOWN;
+         uint64_t                    reserve_chain_amount   = 0;
+         uint64_t                    reserve_wire_amount    = 0;
+         uint32_t                    connector_weight_bps   = DEFAULT_CONNECTOR_WEIGHT_BPS;
+         opp::types::ChainAddress    creator_addr;
+         uint64_t                    requested_wire_amount  = 0;
+         uint64_t                    external_token_amount  = 0;
+         uint64_t                    registered_at_ms       = 0;
+         uint64_t                    activated_at_ms        = 0;
+         uint64_t                    cancelled_at_ms        = 0;
+
+         uint128_t by_chain_token() const {
+            return (static_cast<uint128_t>(chain_code.value) << 64) | token_code.value;
+         }
+         uint64_t by_status() const { return magic_enum::enum_integer(status); }
+
+         SYSLIB_SERIALIZE(reserve_row,
+            (chain_code)(token_code)(reserve_code)(name)(description)
+            (status)(reserve_chain_amount)(reserve_wire_amount)(connector_weight_bps)
+            (creator_addr)(requested_wire_amount)(external_token_amount)
+            (registered_at_ms)(activated_at_ms)(cancelled_at_ms))
+      };
+
+      using reserves_t = sysio::kv::table<"reserves"_n, reserve_key, reserve_row,
+         sysio::kv::index<"bychaintok"_n, sysio::const_mem_fun<reserve_row, uint128_t, &reserve_row::by_chain_token>>,
+         sysio::kv::index<"bystatus"_n,   sysio::const_mem_fun<reserve_row, uint64_t,  &reserve_row::by_status>>
+      >;
 
    private:
-      using ChainKind = opp::types::ChainKind;
-      using TokenKind = opp::types::TokenKind;
+      using ReserveStatus = opp::types::ReserveStatus;
+      using ChainKind     = opp::types::ChainKind;
    };
 
 } // namespace sysio

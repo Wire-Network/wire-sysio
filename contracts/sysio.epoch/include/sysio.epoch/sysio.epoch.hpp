@@ -33,11 +33,7 @@ namespace sysio {
 
       /// Group assignment — reads AVAILABLE batch ops from sysio.opreg.
       [[sysio::action]]
-      void initgroups();
-
-      /// Register an outpost chain.
-      [[sysio::action]]
-      void regoutpost(opp::types::ChainKind chain_kind, uint32_t chain_id);
+      void schbatchgps();
 
       /// Set global pause (only callable by sysio.chalg).
       [[sysio::action]]
@@ -93,37 +89,6 @@ namespace sysio {
 
       using epochstate_t = sysio::kv::global<"epochstate"_n, epoch_state>;
 
-      /// Outpost registry table primary key.
-      struct outpost_key {
-         uint64_t id;
-         uint64_t primary_key() const { return id; }
-         SYSLIB_SERIALIZE(outpost_key, (id))
-      };
-
-      /// Outpost registry table.
-      struct [[sysio::table("outposts")]] outpost_info {
-         uint64_t    id;
-         sysio::opp::types::ChainKind chain_kind;
-         uint32_t    chain_id;
-         checksum256 last_inbound_msg_id;
-         checksum256 last_outbound_msg_id;
-         uint32_t    last_inbound_epoch = 0;
-         uint32_t    last_outbound_epoch = 0;
-
-         uint64_t by_chain() const {
-            return (static_cast<uint64_t>(chain_kind) << 32) | chain_id;
-         }
-
-         SYSLIB_SERIALIZE(outpost_info,
-            (id)(chain_kind)(chain_id)(last_inbound_msg_id)(last_outbound_msg_id)
-            (last_inbound_epoch)(last_outbound_epoch))
-      };
-
-      using outposts_t = sysio::kv::table<"outposts"_n, outpost_key, outpost_info,
-         sysio::kv::index<"bychain"_n,
-            sysio::const_mem_fun<outpost_info, uint64_t, &outpost_info::by_chain>>
-      >;
-
       /// Emissions readiness gate block log. One row per epoch_index that
       /// the gate has blocked from advancing. Inserted on the first gate
       /// failure for a given epoch; same-reason retries update last_retry_at
@@ -159,6 +124,7 @@ namespace sysio {
       static constexpr name EPOCH_ACCOUNT  = "sysio.epoch"_n;
       static constexpr name OPREG_ACCOUNT  = "sysio.opreg"_n;
       static constexpr name AUTHEX_ACCOUNT = "sysio.authex"_n;
+      static constexpr name CHAINS_ACCOUNT = "sysio.chains"_n;
 
       /// Bounds on `epoch_duration_sec`. Floor is a typo-guard: well below this
       /// value, `expected_rounds` in sysio.system::payepoch falls back to 1

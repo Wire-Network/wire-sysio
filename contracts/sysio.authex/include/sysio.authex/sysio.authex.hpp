@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include <fc-lite/crypto/chain_types.hpp>
+#include <fc-lite/crypto/chain_types.hpp>   // fc::crypto::key_type_em used by pubkey_to_string below
 #include <sysio/name.hpp>
 #include <sysio/kv_table.hpp>
 #include <sysio/sysio.hpp>
@@ -16,10 +16,21 @@
 #include <sysio/datastream.hpp>
 #include <sysio/serialize.hpp>
 
+#include <magic_enum/magic_enum.hpp>
+#include <sysio/opp/types/types.pb.hpp>
+
 namespace sysio {
 
-  constexpr uint128_t to_namechain_key(const name& name, const fc::crypto::chain_kind_t kind) {
-    return (static_cast<uint128_t>(name.value) << 64) | static_cast<uint64_t>(kind);
+  /// Pack `(account, chain)` into the uint128 key used by the
+  /// `links.bynamechain` secondary index. The chain identifier is
+  /// the proto-canonical `opp::types::ChainKind` (legacy host-side
+  /// `fc::crypto::chain_kind_t` carries identical numeric values and
+  /// is intentionally NOT used here — contract code stays on the
+  /// proto-canonical type).
+  constexpr uint128_t to_namechain_key(const name& name,
+                                        const opp::types::ChainKind kind) {
+    return (static_cast<uint128_t>(name.value) << 64)
+         | static_cast<uint64_t>(magic_enum::enum_integer(kind));
   }
 
   /**
@@ -133,6 +144,51 @@ namespace sysio {
      return sha256(pk_str.c_str(), pk_str.size());
   }
 
+  /**
+   * @brief Extract the raw key bytes from a `sysio::public_key` variant.
+   *
+   * Mirrors what every consumer of the authex `bynamechain` / `bypubkey`
+   * lookup wants to do post-`it->pub_key` — pull the chain-side address
+   * bytes out of the variant so it can be packed into an
+   * `opp::types::ChainAddress.address` field.
+   *
+   * `std::get<ecc_public_key>` is ambiguous (the same alias appears at
+   * indices 0, 1, and 3 of the variant), so the dispatch goes by index.
+   * Index layout:
+   *   0 — K1 (secp256k1 compressed, 33 bytes)
+   *   1 — R1 (NIST P-256 compressed, 33 bytes)
+   *   3 — EM (Ethereum / Ethereum-style secp256k1 compressed, 33 bytes)
+   *   4 — ED (Ed25519, 32 bytes; raw `std::array<uint8_t,32>`)
+   *
+   * @param pk The public_key variant.
+   * @return  The key bytes as a `std::vector<char>` (33 for ECC, 32 for
+   *          Ed25519). Empty vector on an unsupported variant index.
+   */
+  inline std::vector<char> pubkey_to_bytes(const sysio::public_key& pk) {
+     switch (pk.index()) {
+        case 0: {
+           const auto& arr = std::get<0>(pk);
+           return std::vector<char>(arr.begin(), arr.end());
+        }
+        case 1: {
+           const auto& arr = std::get<1>(pk);
+           return std::vector<char>(arr.begin(), arr.end());
+        }
+        case 3: {
+           const auto& arr = std::get<3>(pk);
+           return std::vector<char>(arr.begin(), arr.end());
+        }
+        case 4: {
+           const auto& arr = std::get<4>(pk);
+           return std::vector<char>(
+              reinterpret_cast<const char*>(arr.data()),
+              reinterpret_cast<const char*>(arr.data()) + arr.size());
+        }
+        default:
+           return {};
+     }
+  }
+
   class [[sysio::contract("sysio.authex")]] authex : public contract {
     public:
     using contract::contract;
@@ -141,7 +197,11 @@ namespace sysio {
     /**
      * @brief Using the signature and provided parameters, this action will create a link between the WIRE account name and the external chain address. Pub keys / Addresses are 1:1 mapped.
      *
-     * @param chain_kind The chain identifier from fc::crypto::chain_kind_t (e.g. chain_kind_ethereum, chain_kind_solana, chain_kind_sui).
+     * @param chain_kind The chain identifier from `opp::types::ChainKind`
+     *                   (CHAIN_KIND_EVM / CHAIN_KIND_SVM).
+     *                   Wire-side legacy `fc::crypto::chain_kind_t` is host-only.
+     *                   TODO @jglanz: SUI variant removed in v6; revisit when
+     *                   SUI outpost is added.
      * @param account   The WIRE account name of the user which the address is being linked to.
      * @param sig        A valid signature for the target chain converted to Wire's standard.
      * @param pub_key     The external chain's public key in Wire format.
@@ -149,7 +209,7 @@ namespace sysio {
      * @return [[sysio::action]] void
      */
     [[sysio::action]] void createlink(
-        const fc::crypto::chain_kind_t chain_kind,
+        const opp::types::ChainKind chain_kind,
         const sysio::name &account,
         const sysio::signature &sig,
         const sysio::public_key &pub_key,
@@ -179,16 +239,18 @@ namespace sysio {
      */
     struct [[sysio::table("links")]] links_s {
       uint64_t key;
-      name username;                       // Wire account name of the user
-      fc::crypto::chain_kind_t chain_kind; // The external chain identifier
-      public_key pub_key;                  // External chain's Public key in PUB_XX_ format.
+      name username;                          // Wire account name of the user
+      opp::types::ChainKind chain_kind;       // The external chain identifier (proto-canonical)
+      public_key pub_key;                     // External chain's Public key in PUB_XX_ format.
 
       uint128_t by_namechain() const { return to_namechain_key(username, chain_kind); }
       uint64_t by_name() const { return username.value; }
       checksum256 by_pub_key() const {
         return pubkey_to_checksum256(pub_key);
       }
-      uint64_t by_chain() const { return static_cast<uint64_t>(chain_kind); }
+      uint64_t by_chain() const {
+        return static_cast<uint64_t>(magic_enum::enum_integer(chain_kind));
+      }
 
       SYSLIB_SERIALIZE(links_s, (key)(username)(chain_kind)(pub_key))
     };
