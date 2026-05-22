@@ -509,7 +509,7 @@ signature_provider_t make_provider(const private_key& key, chain_key_type_t key_
    p.key_type    = key_type;
    p.public_key  = key.get_public_key();
    p.private_key = key;
-   p.sign        = [key](const sha256& d) { return key.sign(d); };
+   p.sign        = [key](hash256 d) { return key.sign(as_sha256(d)); };
    return p;
 }
 
@@ -665,9 +665,12 @@ BOOST_AUTO_TEST_CASE(test_eth_client_signer_signs_via_closure_without_private_ke
    remote.key_type   = chain_key_type_ethereum;
    remote.public_key = pub;
    // remote.private_key intentionally left empty.
-   remote.sign = [em_key, kc](const sha256&) {
+   remote.sign = [em_key, kc](hash256 digest) {
       // A KMS-style raw signer: a recoverable signature over the 32-byte
-      // digest it is handed (here the known keccak digest of `payload`).
+      // digest it is handed. The eth signing path now delivers a keccak256-
+      // tagged hash256 -- verify the typed argument arrives correctly.
+      BOOST_REQUIRE(std::holds_alternative<keccak256>(digest));
+      BOOST_CHECK(std::get<keccak256>(digest) == kc);
       return signature(signature::storage_type(em_key.sign_keccak256(kc)));
    };
    BOOST_REQUIRE(!remote.private_key.has_value());
@@ -692,7 +695,7 @@ BOOST_AUTO_TEST_CASE(test_eth_client_signer_closure_matches_local_key) try {
    signature_provider_t remote;
    remote.key_type   = chain_key_type_ethereum;
    remote.public_key = key.get_public_key();
-   remote.sign = [em_key, kc](const sha256&) {
+   remote.sign = [em_key, kc](hash256) {
       return signature(signature::storage_type(em_key.sign_keccak256(kc)));
    };
 
@@ -715,7 +718,7 @@ BOOST_AUTO_TEST_CASE(test_eth_client_signer_rejects_remote_signature_for_wrong_k
    signature_provider_t bad;
    bad.key_type   = chain_key_type_ethereum;
    bad.public_key = key_a.get_public_key();   // provider advertises key A
-   bad.sign = [em_b, kc](const sha256&) {     // but the closure signs with key B
+   bad.sign = [em_b, kc](hash256) {           // but the closure signs with key B
       return signature(signature::storage_type(em_b.sign_keccak256(kc)));
    };
 
@@ -736,7 +739,7 @@ BOOST_AUTO_TEST_CASE(test_wire_eth_signer_signs_via_closure_without_private_key)
    signature_provider_t remote;
    remote.key_type   = chain_key_type_ethereum;
    remote.public_key = pub;
-   remote.sign = [em_key, prepared](const sha256&) {
+   remote.sign = [em_key, prepared](hash256) {
       return signature(signature::storage_type(em_key.sign_keccak256(prepared)));
    };
 
