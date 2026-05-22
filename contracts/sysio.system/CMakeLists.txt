@@ -20,7 +20,7 @@ set(SYSIO_SYSTEM_HEADERS
 
 set(SYSIO_SYSTEM_INCLUDE_DIRS
    ${CMAKE_CURRENT_SOURCE_DIR}/include
-   ${CMAKE_CURRENT_SOURCE_DIR}/../)
+   ${CMAKE_CURRENT_SOURCE_DIR}/../sysio.token/include)
 
 # OPP integration: emissions reads opreg/epoch state via generated protobuf types + shared DataStream operators.
 # generated-cdt is reached via CMAKE_CURRENT_BINARY_DIR since contracts_project is a nested ExternalProject.
@@ -38,9 +38,7 @@ if(BUILD_SYSTEM_CONTRACTS)
 
    target_include_directories(sysio.system
       PUBLIC ${SYSIO_SYSTEM_INCLUDE_DIRS}
-             ${SYSIO_SYSTEM_OPP_INCLUDE_DIRS}
-      # cdt-cpp ignores -isystem; add vcpkg root explicitly as -I so magic_enum resolves.
-      PRIVATE ${CDT_CONTRACT_INCLUDE_PATH})
+             ${SYSIO_SYSTEM_OPP_INCLUDE_DIRS})
 
    target_link_libraries(sysio.system
       INTERFACE magic_enum::magic_enum)
@@ -61,6 +59,4 @@ if("native-module" IN_LIST SYSIO_WASM_RUNTIMES AND BUILD_SYSTEM_CONTRACTS)
 
    target_link_libraries(sysio.system_native
       INTERFACE magic_enum::magic_enum)
-
-   target_include_directories(sysio.system_native PRIVATE ${CDT_CONTRACT_INCLUDE_PATH})
 endif()

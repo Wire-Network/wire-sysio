@@ -37,11 +37,7 @@ if(BUILD_SYSTEM_CONTRACTS)
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.authex/include>
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.chains/include>
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.opp.common/include>
-                # sysio.token has a flat header layout; expose contracts/ so <sysio.token/sysio.token.hpp> resolves.
-                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
-                # cdt-cpp ignores -isystem; add vcpkg root explicitly as -I so magic_enum resolves.
-                PRIVATE
-                ${CDT_CONTRACT_INCLUDE_PATH}
+                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.token/include>
         )
 
         target_link_libraries(${target}
