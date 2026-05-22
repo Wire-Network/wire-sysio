@@ -146,7 +146,7 @@ BOOST_FIXTURE_TEST_CASE(linkauth_test, read_only_trx_tester) { try {
    produce_blocks( 1 );
 
    name account = "alice"_n;
-   name code = "sysio_token"_n;
+   name code = "sysio.token"_n;
    name type = "transfer"_n;
    name requirement = "first"_n;
    action act = {
@@ -161,7 +161,7 @@ BOOST_FIXTURE_TEST_CASE(unlinkauth_test, read_only_trx_tester) { try {
    produce_blocks( 1 );
 
    name account = "alice"_n;
-   name code = "sysio_token"_n;
+   name code = "sysio.token"_n;
    name type = "transfer"_n;
    action act = {
       vector<permission_level>{{config::system_account_name,config::active_name}},

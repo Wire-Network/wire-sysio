@@ -125,25 +125,20 @@ BOOST_AUTO_TEST_CASE(accepts_full_alphabet) {
 }
 
 // ---------------------------------------------------------------------------
-//  Slot-to-char round-trip for every valid slot
+//  Alphabet
 // ---------------------------------------------------------------------------
 
-BOOST_AUTO_TEST_CASE(every_valid_slot_roundtrips) {
-   for (uint64_t slot = 1; slot <= 37; ++slot) {
-      const char c = slug_name::slot_to_char(slot);
-      BOOST_CHECK_NE(c, '\0');
-      const uint64_t back = slug_name::char_to_slot(c);
-      BOOST_CHECK_EQUAL(back, slot);
+BOOST_AUTO_TEST_CASE(every_alphabet_char_roundtrips) {
+   // every non-pad symbol of the alphabet round-trips as a single-char slug
+   const std::string_view alphabet = fc::slug_name_traits::alphabet;
+   for (std::size_t s = 1; s < alphabet.size(); ++s) {
+      const std::string one(1, alphabet[s]);
+      BOOST_CHECK_EQUAL(slug_name{one}.to_string(), one);
    }
 }
 
-BOOST_AUTO_TEST_CASE(slot_zero_is_terminator) {
-   BOOST_CHECK_EQUAL(slug_name::slot_to_char(0), '\0');
-}
-
-BOOST_AUTO_TEST_CASE(out_of_range_slot_returns_null) {
-   BOOST_CHECK_EQUAL(slug_name::slot_to_char(38), '\0');
-   BOOST_CHECK_EQUAL(slug_name::slot_to_char(63), '\0');
+BOOST_AUTO_TEST_CASE(symbol_zero_is_the_nul_pad) {
+   BOOST_CHECK_EQUAL(fc::slug_name_traits::alphabet[0], '\0');
 }
 
 // ---------------------------------------------------------------------------
@@ -164,15 +159,6 @@ BOOST_AUTO_TEST_CASE(fc_serialization_size_is_8_bytes) {
    // The wire format is a single uint64 (no varint tagging from FC_REFLECT
    // for a POD struct with one fixed-width field).
    BOOST_CHECK_EQUAL(packed.size(), 8u);
-}
-
-// ---------------------------------------------------------------------------
-//  String conversion operator
-// ---------------------------------------------------------------------------
-
-BOOST_AUTO_TEST_CASE(implicit_string_conversion) {
-   const std::string s = std::string{slug_name{"PRIMARY"}};
-   BOOST_CHECK_EQUAL(s, "PRIMARY");
 }
 
 BOOST_AUTO_TEST_SUITE_END()

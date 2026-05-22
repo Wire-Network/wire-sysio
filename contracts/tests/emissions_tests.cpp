@@ -1196,9 +1196,9 @@ BOOST_FIXTURE_TEST_CASE( addnodeowner_t1_cap_rejects_22nd, sysio_emissions_teste
 BOOST_FIXTURE_TEST_CASE( addnodeowner_invalid_tier_above_max, sysio_emissions_tester ) try {
    // Coverage for the upper-bound side of the tier check: tier 100 / 255
    // (uint8_t max) must fail "invalid tier" the same as 0 / 4 / 5.
-   create_user_accounts({ "nthi100"_n, "nthi255"_n });
+   create_user_accounts({ "nthione"_n, "nthi255"_n });
 
-   auto r100 = addnodeowner( ROA, "nthi100"_n, 100 );
+   auto r100 = addnodeowner( ROA, "nthione"_n, 100 );
    BOOST_REQUIRE( r100 != success() );
    require_substr( r100, "invalid tier" );
 
