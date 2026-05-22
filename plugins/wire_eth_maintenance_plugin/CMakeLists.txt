@@ -1,0 +1,9 @@
+set(TARGET_LIB_NAME wire_eth_maintenance_plugin)
+
+plugin_target(
+        ${TARGET_LIB_NAME}
+        LIBRARIES
+        outpost_ethereum_client_plugin
+        cron_plugin
+        Boost::url
+)

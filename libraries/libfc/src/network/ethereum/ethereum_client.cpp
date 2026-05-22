@@ -86,7 +86,7 @@ fc::variant ethereum_client::execute(const std::string& method, const fc::varian
 fc::variant ethereum_client::execute_contract_view_fn(const address& contract_address, const abi::contract& abi,
                                                       const std::string& block_tag,
                                                       const contract_invoke_data_items& params) {
-   auto abi_call_encoded = contract_encode_data(abi, params);
+   auto abi_call_encoded = contract_encode_data(abi, params, true);
    auto to_data_mvo = fc::mutable_variant_object("to", to_hex(contract_address, true))("data", abi_call_encoded);
    fc::variants rpc_params = {to_data_mvo, fc::variant(block_tag)};
    return execute("eth_call", rpc_params);
@@ -120,7 +120,7 @@ fc::variant ethereum_client::execute_contract_tx_fn(const eip1559_tx& source_tx,
       tx_encoded = rlp::encode_eip1559_signed_typed(tx);
    }
 
-   return send_raw_transaction(to_hex(tx_encoded));
+   return send_raw_transaction(to_hex(tx_encoded, true));
 }
 
 
@@ -476,6 +476,16 @@ std::string ethereum_client::send_raw_transaction(const std::string& raw_tx_data
    fc::variants params{raw_tx_data};
    auto resp = execute("eth_sendRawTransaction", params);
    return resp.as_string();
+}
+
+std::optional<uint64_t> ethereum_client::get_block_for_transaction(const std::string& tx_hash) {
+   auto receipt = get_transaction_receipt(tx_hash);
+   if (receipt.is_null())
+      return std::nullopt;
+   const auto& obj = receipt.get_object();
+   if (!obj.contains("blockNumber") || obj["blockNumber"].is_null())
+      return std::nullopt;
+   return static_cast<uint64_t>(to_uint256(obj["blockNumber"]));
 }
 
 std::string ethereum_client::wait_for_confirmation(const std::string& tx_hash,

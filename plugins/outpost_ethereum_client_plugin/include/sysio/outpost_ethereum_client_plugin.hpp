@@ -68,9 +68,11 @@ public:
 
    virtual void plugin_shutdown();
 
-   std::vector<ethereum_client_entry_ptr> get_clients();
-   ethereum_client_entry_ptr get_client(const std::string& id);
-   const std::vector<std::pair<std::filesystem::path, std::vector<fc::network::ethereum::abi::contract>>>& get_abi_files();
+   std::vector<ethereum_client_entry_ptr> get_clients() const;
+   ethereum_client_entry_ptr get_client(const std::string& id) const;
+   const std::vector<std::pair<std::filesystem::path, std::vector<fc::network::ethereum::abi::contract>>>& get_abi_files() const;
+   ethereum_client_ptr get_client_for_chain(fc::crypto::chain_kind_t target_chain) const;
+   std::vector<fc::network::ethereum::abi::contract> get_abis_for_contract(const std::string& contract_name) const;
 
    /**
     * @brief Build an `outpost_client` concrete for an ETH outpost.

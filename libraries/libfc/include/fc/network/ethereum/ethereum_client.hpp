@@ -407,6 +407,13 @@ public:
    std::string send_raw_transaction(const std::string& raw_tx_data);
 
    /**
+    * @brief Retrieves the transaction receipt and extracts the block number.
+    * @param tx_hash The transaction hash
+    * @return The block number if the receipt is available, or std::nullopt if not yet mined
+    */
+   std::optional<uint64_t> get_block_for_transaction(const std::string& tx_hash);
+
+   /**
     * @brief Submit a raw transaction and await inclusion + N confirmations.
     *
     * Fire-and-forget `send_transaction` / `send_raw_transaction` return a

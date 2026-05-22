@@ -36,6 +36,7 @@ set(BOOST_COMPONENTS
         system
         thread
         unit_test_framework
+        url
 )
 foreach (COMPONENT ${BOOST_COMPONENTS})
     find_package(boost_${COMPONENT} ${BOOST_VERSION} EXACT CONFIG REQUIRED)

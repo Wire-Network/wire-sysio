@@ -77,7 +77,8 @@ void log_non_default_options(const std::vector<bpo::basic_option<char>>& options
    for (const auto& op : options) {
       bool mask = false;
       if (op.string_key == "peer-private-key"s
-          || op.string_key == "p2p-auto-bp-peer"s) {
+          || op.string_key == "p2p-auto-bp-peer"s
+          || op.string_key == "beacon-chain-api-key"s) {
          mask = true;
           }
       std::string v;
