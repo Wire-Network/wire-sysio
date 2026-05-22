@@ -396,10 +396,12 @@ kms_key_ref parse_kms_spec(std::string_view spec_data) {
               "KMS spec body is empty; expected an ARN or '<region>:<key-id-or-alias>'");
 
    if (spec_data.starts_with(kms_arn_prefix)) {
-      // Full ARN form. Capture exactly `kms_arn_segment_count` parts so any
-      // stray colons inside the trailing `key/<id>` segment stay glued to it
-      // (KMS key ids are uuids, no colons today, but aliases are operator-
-      // chosen and we should not silently truncate).
+      // Full ARN form. Split into exactly `kms_arn_segment_count` parts so any
+      // stray colons inside the trailing `key/<id>` / `alias/<name>` segment
+      // stay glued to it (KMS key ids are uuids with no colons today, but
+      // aliases are operator-chosen and must not be silently truncated). The
+      // split is only for *validation* below -- the value handed to KMS is the
+      // unmodified ARN.
       auto parts = fc::split(spec_data, ':', kms_arn_segment_count);
       SYS_ASSERT(parts.size() == kms_arn_segment_count, chain::plugin_config_exception,
                  "Malformed KMS ARN \"{}\": expected {} colon-separated segments, got {}",
@@ -412,9 +414,9 @@ kms_key_ref parse_kms_spec(std::string_view spec_data) {
       // `arn`, `aws`, and `kms` are guaranteed non-empty and correct by the
       // `kms_arn_prefix` match above. The region, account, and tail segments
       // are operator-supplied; an empty one means a stray colon collapsed two
-      // segments (e.g. `arn:aws:kms:us-east-1::key/x`) and the `key_id` we
-      // would hand KMS is wrong. Reject that here with a precise message
-      // rather than after a billable Sign against a bad endpoint.
+      // segments (e.g. `arn:aws:kms:us-east-1::key/x`), producing a malformed
+      // ARN. Reject that here with a precise message rather than after a
+      // billable Sign against a bad endpoint.
       SYS_ASSERT(!region.empty(), chain::plugin_config_exception,
                  "KMS ARN \"{}\" has empty region segment", spec_data);
       SYS_ASSERT(!account.empty(), chain::plugin_config_exception,
@@ -432,7 +434,15 @@ kms_key_ref parse_kms_spec(std::string_view spec_data) {
       SYS_ASSERT(!name.empty(), chain::plugin_config_exception,
                  "KMS ARN tail \"{}\" has empty key/alias name", tail);
 
-      return kms_key_ref{region, tail};
+      // Hand KMS the full ARN, not the `key/<id>` / `alias/<name>` tail. AWS
+      // KMS accepts a bare key id, a key ARN, an alias name, or an alias ARN
+      // as `KeyId` -- but NOT the bare `key/<uuid>` tail. Passing the whole
+      // ARN both keeps key ARNs valid and preserves the account id: an alias
+      // ARN stripped to `alias/<name>` would resolve against the *caller's*
+      // account and could silently bind a same-named alias for a different
+      // key. `region` is still taken from the ARN to build the regional
+      // client; it matches the region embedded in the ARN we pass through.
+      return kms_key_ref{region, std::string{spec_data}};
    }
 
    // A spec that begins with `arn:` (any casing) but did not match the

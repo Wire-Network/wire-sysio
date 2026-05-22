@@ -149,15 +149,24 @@ std::array<unsigned char, 64> drop_v(const fc::em::compact_signature& sig) {
 BOOST_AUTO_TEST_SUITE(kms_signature_provider_tests)
 
 BOOST_AUTO_TEST_CASE(parse_kms_spec_arn_key) {
-   const auto ref = parse_kms_spec("arn:aws:kms:us-east-1:111122223333:key/1234abcd-12ab-34cd-56ef-1234567890ab");
+   // A key ARN must round-trip into `key_id` whole. AWS KMS accepts a key ARN
+   // as `KeyId` but rejects the bare `key/<uuid>` tail, and keeping the full
+   // ARN preserves the account id.
+   constexpr auto arn =
+      "arn:aws:kms:us-east-1:111122223333:key/1234abcd-12ab-34cd-56ef-1234567890ab";
+   const auto ref = parse_kms_spec(arn);
    BOOST_CHECK_EQUAL(ref.region, "us-east-1");
-   BOOST_CHECK_EQUAL(ref.key_id, "key/1234abcd-12ab-34cd-56ef-1234567890ab");
+   BOOST_CHECK_EQUAL(ref.key_id, arn);
 }
 
 BOOST_AUTO_TEST_CASE(parse_kms_spec_arn_alias) {
-   const auto ref = parse_kms_spec("arn:aws:kms:eu-west-2:111122223333:alias/wire-cranker-eth-01");
+   // An alias ARN must likewise round-trip whole: stripping it to the bare
+   // `alias/<name>` would drop the account id and could resolve a same-named
+   // alias in the caller's own account.
+   constexpr auto arn = "arn:aws:kms:eu-west-2:111122223333:alias/wire-cranker-eth-01";
+   const auto ref = parse_kms_spec(arn);
    BOOST_CHECK_EQUAL(ref.region, "eu-west-2");
-   BOOST_CHECK_EQUAL(ref.key_id, "alias/wire-cranker-eth-01");
+   BOOST_CHECK_EQUAL(ref.key_id, arn);
 }
 
 BOOST_AUTO_TEST_CASE(parse_kms_spec_shorthand_uuid) {

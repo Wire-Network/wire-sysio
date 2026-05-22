@@ -53,11 +53,19 @@ namespace sysio::sigprov::kms {
 /**
  * @brief Parsed KMS key reference.
  *
- * `key_id` is whatever follows the resolved region -- either the bare key id /
- * alias as the operator typed it (`<region>:<key-id-or-alias>` form), or the
- * `key/<uuid>` / `alias/<name>` tail of an ARN. AWS KMS accepts both shapes
- * in the `KeyId` field of `Sign` / `GetPublicKey`, so we hand it through
- * verbatim and let the SDK validate it.
+ * `region` selects the regional `KMSClient`. `key_id` is handed verbatim to
+ * the `KeyId` field of KMS `Sign` / `GetPublicKey`.
+ *
+ * AWS KMS accepts four `KeyId` forms -- a bare key id, a key ARN, an alias
+ * name (`alias/<name>`), or an alias ARN -- but NOT the bare `key/<uuid>`
+ * tail of an ARN. Accordingly:
+ *   - For an ARN spec, `key_id` is the full ARN, unmodified. Keeping the ARN
+ *     intact preserves the account id; stripping an alias ARN down to the
+ *     bare `alias/<name>` would resolve the alias in the *caller's* account
+ *     and could silently bind a same-named alias for a different key.
+ *   - For the shorthand `<region>:<key-id-or-alias>` spec, `key_id` is the
+ *     bare key id or `alias/<name>` the operator supplied; that form
+ *     deliberately resolves within the caller's own account.
  */
 struct kms_key_ref {
    std::string region;
@@ -69,8 +77,8 @@ struct kms_key_ref {
  *
  * Accepted forms:
  *   - Full ARN: `arn:aws:kms:<region>:<account>:(key|alias)/<id>`
- *     Region is taken from the ARN's region segment; `key_id` is the trailing
- *     `key/<id>` or `alias/<name>` portion.
+ *     Region is taken from the ARN's region segment; `key_id` is the full ARN
+ *     itself, passed to KMS verbatim so the account id is preserved.
  *   - Shorthand: `<region>:<key-id-or-alias>`
  *     Region is the leading token; everything after the first `:` is `key_id`.
  *
