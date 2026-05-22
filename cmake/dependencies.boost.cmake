@@ -5,7 +5,6 @@ set(CMAKE_FIND_PACKAGE_PREFER_CONFIG ON)
 set(Boost_USE_STATIC_LIBS ON)
 set(BOOST_COMPONENTS
         accumulators
-        algorithm
         asio
         assign
         atomic
@@ -23,7 +22,6 @@ set(BOOST_COMPONENTS
         headers
         interprocess
         iostreams
-        lexical_cast
         lockfree
         multi_index
         multiprecision
