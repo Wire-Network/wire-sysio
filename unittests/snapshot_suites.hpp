@@ -55,73 +55,70 @@ struct variant_snapshot_suite {
    }
 };
 
-struct buffered_snapshot_suite {
-   using writer_t = ostream_snapshot_writer;
-   using reader_t = istream_snapshot_reader;
-   using write_storage_t = std::ostringstream;
-   using snapshot_t = std::string;
-   using read_storage_t = std::istringstream;
+struct threaded_snapshot_suite {
+   using writer_t = threaded_snapshot_writer;
+   using reader_t = threaded_snapshot_reader;
+
+   // externally opaque type that refers to a snapshot: filename on disk
+   using snapshot_t = std::filesystem::path;
 
    struct writer : public writer_t {
-      writer( const std::shared_ptr<write_storage_t>& storage )
-      :writer_t(*storage)
-      ,storage(storage)
-      {
-
-      }
-
-      std::shared_ptr<write_storage_t> storage;
-   };
-
-   struct reader : public reader_t {
-      explicit reader(const std::shared_ptr<read_storage_t>& storage)
-      :reader_t(*storage)
-      ,storage(storage)
+      writer(const std::filesystem::path& path)
+      : writer_t(path)
+      , path(path)
       {}
 
-      std::shared_ptr<read_storage_t> storage;
+      std::filesystem::path path;
    };
 
-
    static auto get_writer() {
-      return std::make_shared<writer>(std::make_shared<write_storage_t>());
+      const std::filesystem::path new_snap_path = threaded_snapshot_tempdir.path() / (std::to_string(next_tempfile++) + ".bin");
+      return std::make_shared<writer>(new_snap_path);
    }
 
    static auto finalize(const std::shared_ptr<writer>& w) {
       w->finalize();
-      return w->storage->str();
+      return w->path;
    }
 
-   static auto get_reader( const snapshot_t& buffer) {
-      return std::make_shared<reader>(std::make_shared<read_storage_t>(buffer));
+   static auto get_reader(const snapshot_t& filename) {
+      return std::make_shared<threaded_snapshot_reader>(filename);
    }
 
    static snapshot_t load_from_file(const std::string& filename) {
       snapshot_input_file<snapshot::binary> file(filename);
-      return file.read_as_string();
+      const std::filesystem::path new_snap_path = threaded_snapshot_tempdir.path() / (std::to_string(next_tempfile++) + ".bin");
+      const std::string decompressed_snap = file.read_as_string();
+
+      namespace bio = boost::iostreams;
+      bio::copy(bio::array_source(decompressed_snap.data(), decompressed_snap.size()), bio::file_sink(new_snap_path));
+
+      return new_snap_path;
    }
 
    static void write_to_file( const std::string& basename, const snapshot_t& snapshot ) {
+      // Read the raw .bin file and write it gzip-compressed to the standard snapshots directory
+      std::ifstream in(snapshot, std::ios::binary);
+      std::string contents((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
       snapshot_output_file<snapshot::binary> file(basename);
-      file.write<snapshot_t>(snapshot);
+      file.write(contents);
    }
-};
 
+   inline static fc::temp_directory threaded_snapshot_tempdir;
+   inline static unsigned           next_tempfile;
+};
 
 struct json_snapshot_suite {
    using writer_t = ostream_json_snapshot_writer;
    using reader_t = istream_json_snapshot_reader;
    using write_storage_t = std::ostringstream;
    using snapshot_t = std::string;
-   using read_storage_t = std::istringstream;
 
    struct writer : public writer_t {
       writer( const std::shared_ptr<write_storage_t>& storage )
       :writer_t(*storage)
       ,storage(storage)
-      {
-
-      }
+      {}
 
       std::shared_ptr<write_storage_t> storage;
    };
@@ -140,7 +137,6 @@ struct json_snapshot_suite {
          remove(json_snapshot_suite::temp_file().c_str());
       }
    };
-
 
    static auto get_writer() {
       return std::make_shared<writer>(std::make_shared<write_storage_t>());
@@ -170,58 +166,4 @@ struct json_snapshot_suite {
    }
 };
 
-struct threaded_snapshot_suite {
-   using writer_t = ostream_snapshot_writer;
-   using reader_t = threaded_snapshot_reader;
-
-   //externally opaque type that refers to a snapshot. For this suite: filename on disk. This means snapshot must
-   // reside on disk and not in memory like other snapshot_suites
-   using snapshot_t = std::filesystem::path;
-
-   using write_storage_t = std::ofstream;
-
-   struct writer : public writer_t {
-      writer( const std::shared_ptr<write_storage_t>& storage ) : writer_t(*storage), storage(storage) {}
-
-      std::shared_ptr<write_storage_t> storage;
-      std::filesystem::path            path;
-   };
-
-   static auto get_writer() {
-      const std::filesystem::path new_snap_path = threaded_snapshot_tempdir.path() / (std::to_string(next_tempfile++) + ".bin");
-
-      std::shared_ptr<writer> new_writer = std::make_shared<writer>(std::make_shared<write_storage_t>(new_snap_path, std::ios::binary));
-      new_writer->path = new_snap_path;
-      return new_writer;
-   }
-
-   static auto finalize(const std::shared_ptr<writer>& w) {
-      w->finalize();
-      w->storage->flush();
-      return w->path;
-   }
-
-   static auto get_reader(const snapshot_t& filename) {
-      return std::make_shared<threaded_snapshot_reader>(filename);
-   }
-
-   static snapshot_t load_from_file(const std::string& filename) {
-      snapshot_input_file<snapshot::binary> file(filename);
-      const std::filesystem::path new_snap_path = threaded_snapshot_tempdir.path() / (std::to_string(next_tempfile++) + ".bin");
-      const std::string decompressed_snap = file.read_as_string();
-
-      namespace bio = boost::iostreams;
-      bio::copy(bio::array_source(decompressed_snap.data(), decompressed_snap.size()), bio::file_sink(new_snap_path));
-
-      return new_snap_path;
-   }
-
-   static void write_to_file( const std::string& basename, const snapshot_t& snapshot ) {
-      FC_ASSERT(false, "unimplemented");
-   }
-
-   inline static fc::temp_directory threaded_snapshot_tempdir;
-   inline static unsigned           next_tempfile;
-};
-
-using snapshot_suites = boost::mpl::list<variant_snapshot_suite, buffered_snapshot_suite, json_snapshot_suite, threaded_snapshot_suite>;
+using snapshot_suites = boost::mpl::list<variant_snapshot_suite, threaded_snapshot_suite, json_snapshot_suite>;

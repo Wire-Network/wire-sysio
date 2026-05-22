@@ -1,4 +1,5 @@
 #include <savanna_cluster.hpp>
+#include <snapshot_suites.hpp>
 #include <test-data.hpp>
 
 #include <fc/io/fstream.hpp> // for read_file_contents
@@ -593,7 +594,7 @@ BOOST_FIXTURE_TEST_CASE(validate_qc_requiring_finalizer_policies, savanna_cluste
 static void save_blockchain_data(const std::filesystem::path& ref_blockchain_path,
                                  const std::filesystem::path& blocks_path,
                                  const block_id_type&         id,
-                                 const std::string&           snapshot) {
+                                 const std::filesystem::path& snapshot) {
    auto source_log_file   = blocks_path / "blocks.log";
    auto source_index_file = blocks_path / "blocks.index";
 
@@ -613,12 +614,8 @@ static void save_blockchain_data(const std::filesystem::path& ref_blockchain_pat
    ref_id_file.write(id.data(), id.data_size());
    ref_id_file.close();
 
-   // save reference snapshot
-   fc::cfile snapshot_file;
-   snapshot_file.set_file_path(ref_snapshot_file_name);
-   snapshot_file.open("w");
-   snapshot_file.write(snapshot.data(), snapshot.size());
-   snapshot_file.close();
+   // save reference snapshot (copy the v2 binary file)
+   std::filesystem::copy_file(snapshot, ref_snapshot_file_name, std::filesystem::copy_options::overwrite_existing);
 }
 
 static block_id_type read_reference_id(const std::filesystem::path& ref_blockchain_path) {
@@ -629,12 +626,8 @@ static block_id_type read_reference_id(const std::filesystem::path& ref_blockcha
    return block_id_type(content.data(), content.size());
 }
 
-static std::string read_reference_snapshot(const std::filesystem::path& ref_blockchain_path) {
-   auto ref_snapshot_file_path = ref_blockchain_path / "snapshot";
-   std::string content;
-   fc::read_file_contents(ref_snapshot_file_path, content);
-
-   return content;
+static std::filesystem::path read_reference_snapshot(const std::filesystem::path& ref_blockchain_path) {
+   return ref_blockchain_path / "snapshot";
 }
 
 // need to pass in temp_dir. otherwise it will be destroyed after replay_reference_blockchain returns
@@ -677,7 +670,7 @@ static void sync_replayed_blockchain(const std::filesystem::path& ref_blockchain
    std::filesystem::remove_all(sync_chain.get_config().blocks_dir);
 
    // restart from reference snapshot
-   sync_chain.open(buffered_snapshot_suite::get_reader(read_reference_snapshot(ref_blockchain_path)));
+   sync_chain.open(threaded_snapshot_suite::get_reader(read_reference_snapshot(ref_blockchain_path)));
 
    // sync with the replayed blockchain
    while( sync_chain.fork_db_head().block_num() < replay_chain->fork_db_head().block_num() ) {

@@ -10,6 +10,8 @@
 #include <fc/io/json.hpp>
 #include <fc/utf8.hpp>
 #include <algorithm>
+#include <cassert>
+#include <functional>
 #include <fc/int256.hpp>
 
 namespace fc
@@ -22,6 +24,55 @@ void set_variant_type( variant* v, variant::type_id t)
    char* data = reinterpret_cast<char*>(v);
    data[ sizeof(variant) -1 ] = t;
 }
+
+namespace {
+
+// SSO layout:
+//   bytes 0..13 : string content
+//   byte  14    : string length (0..14)
+//   byte  15    : type tag (variant::string_sso_type)
+//
+// Heap layout for the same logical string type (string_type):
+//   bytes 0..7  : std::string* (pointer to heap-allocated owning string)
+//   bytes 8..14 : unused
+//   byte  15    : type tag (variant::string_type)
+//
+// String construction picks SSO when the source size is <= sso_max_length;
+// every other code path branches on the tag to decide whether to read
+// inline bytes or dereference the heap pointer.
+
+constexpr std::size_t sso_length_byte_index = 14;
+
+// Length is stored in a single signed-char byte; round-trip through write_sso /
+// read_sso uses static_cast<char> on write and static_cast<unsigned char> on read.
+// Bumping sso_max_length above 127 would make the on-write cast set the sign bit
+// and silently corrupt the read length.
+static_assert(variant::sso_max_length < 128,
+              "SSO length byte is signed; sso_max_length must stay below 128");
+
+inline void write_sso( variant* v, const char* src, std::size_t len ) {
+   char* data = reinterpret_cast<char*>(v);
+   if (len) std::memcpy(data, src, len);
+   data[sso_length_byte_index] = static_cast<char>(len);
+   set_variant_type(v, variant::string_sso_type);
+}
+
+inline std::string_view read_sso( const variant* v ) {
+   const char* data = reinterpret_cast<const char*>(v);
+   const auto len = static_cast<unsigned char>(data[sso_length_byte_index]);
+   return std::string_view{ data, len };
+}
+
+inline void make_string_inline_or_heap( variant* v, std::string_view src ) {
+   if (src.size() <= variant::sso_max_length) {
+      write_sso(v, src.data(), src.size());
+   } else {
+      *reinterpret_cast<std::string**>(v) = new std::string( src );
+      set_variant_type(v, variant::string_type);
+   }
+}
+
+} // anonymous namespace
 
 variant::variant()
 {
@@ -124,14 +175,12 @@ variant::variant( bool val )
 
 variant::variant( char* str )
 {
-   *reinterpret_cast<std::string**>(this)  = new std::string( str );
-   set_variant_type( this, string_type );
+   make_string_inline_or_heap( this, std::string_view{ str } );
 }
 
 variant::variant( const char* str )
 {
-   *reinterpret_cast<std::string**>(this)  = new std::string( str );
-   set_variant_type( this, string_type );
+   make_string_inline_or_heap( this, std::string_view{ str } );
 }
 
 // TODO: do a proper conversion to utf8
@@ -141,8 +190,7 @@ variant::variant( wchar_t* str )
    boost::scoped_array<char> buffer(new char[len]);
    for (unsigned i = 0; i < len; ++i)
      buffer[i] = (char)str[i];
-   *reinterpret_cast<std::string**>(this)  = new std::string(buffer.get(), len);
-   set_variant_type( this, string_type );
+   make_string_inline_or_heap( this, std::string_view{ buffer.get(), len } );
 }
 
 // TODO: do a proper conversion to utf8
@@ -152,14 +200,24 @@ variant::variant( const wchar_t* str )
    boost::scoped_array<char> buffer(new char[len]);
    for (unsigned i = 0; i < len; ++i)
      buffer[i] = (char)str[i];
-   *reinterpret_cast<std::string**>(this)  = new std::string(buffer.get(), len);
-   set_variant_type( this, string_type );
+   make_string_inline_or_heap( this, std::string_view{ buffer.get(), len } );
 }
 
 variant::variant( std::string val )
 {
-   *reinterpret_cast<std::string**>(this)  = new std::string( std::move(val) );
-   set_variant_type( this, string_type );
+   // Fast path: if the source string fits inline, we never touch the heap
+   // even if the source itself happens to be heap-allocated.  The source's
+   // own destructor runs after the move, so its memory is reclaimed too.
+   if (val.size() <= sso_max_length) {
+      write_sso(this, val.data(), val.size());
+   } else {
+      *reinterpret_cast<std::string**>(this)  = new std::string( std::move(val) );
+      set_variant_type( this, string_type );
+   }
+}
+variant::variant( std::string_view val )
+{
+   make_string_inline_or_heap( this, val );
 }
 variant::variant( blob val )
 {
@@ -190,6 +248,36 @@ typedef const variants* const_variants_ptr;
 typedef const blob*   const_blob_ptr;
 typedef const std::string* const_string_ptr;
 
+// Direct-aliasing detector for variant::operator=(const variant&).  Aliased self-assignment (rhs refers to storage
+// owned by lhs) is undefined behaviour: operator= writes through lhs while still reading from rhs, which the write
+// would invalidate.  Returns false when rhs aliases lhs's heap object directly:
+//   v = v.get_array()[i]    (rhs is an element of lhs's vector)
+//   v = v.get_object()["k"]  (rhs is a value of one of lhs's entries)
+// Deeper nesting (rhs reachable through an inner array/object owned by lhs) remains UB but may slip past undetected.
+// Only ever called from assert(), so it (and the operator= call site) compile out under NDEBUG.
+//
+// Pointer comparisons via < / >= between unrelated objects are unspecified per [expr.rel]; std::less<T*> is
+// guaranteed by the standard ([comparisons]/2) to provide a strict total order across all object pointers, so
+// it is safe even when &v does not lie within dst_vec's storage.
+bool variant::_rhs_not_aliased( const variant* lhs, const variant& v )
+{
+   const auto t = lhs->get_type();
+   if( t == variant::array_type ) {
+      const variants& dst_vec = **reinterpret_cast<const variants* const*>(lhs);
+      const variant* begin = dst_vec.data();
+      const variant* end   = begin + dst_vec.size();
+      std::less<const variant*> less;
+      return less(&v, begin) || !less(&v, end);
+   }
+   if( t == variant::object_type ) {
+      const variant_object& dst_vo = **reinterpret_cast<const variant_object* const*>(lhs);
+      for( const auto& entry : dst_vo ) {
+         if( &entry.value() == &v ) return false;
+      }
+   }
+   return true;
+}
+
 void variant::clear()
 {
    switch( get_type() )
@@ -201,10 +289,18 @@ void variant::clear()
         delete *reinterpret_cast<variants**>(this);
         break;
      case string_type:
+     case int128_type:
+     case uint128_type:
+     case int256_type:
+     case uint256_type:
+        // All four use new std::string(...) storage (see ctors above).
         delete *reinterpret_cast<std::string**>(this);
         break;
      case blob_type:
         delete *reinterpret_cast<blob**>(this);
+        break;
+     case string_sso_type:
+        // Inline content; no heap allocation to free.
         break;
      default:
         break;
@@ -214,7 +310,8 @@ void variant::clear()
 
 variant::variant( const variant& v )
 {
-   switch( v.get_type() )
+   const auto t = v.get_type();
+   switch( t )
    {
        case object_type:
           *reinterpret_cast<variant_object**>(this)  =
@@ -227,15 +324,24 @@ variant::variant( const variant& v )
           set_variant_type( this,  array_type );
           return;
        case string_type:
+       case int128_type:
+       case uint128_type:
+       case int256_type:
+       case uint256_type:
+          // All four use new std::string(...) storage (see ctors above);
+          // deep-copy so destructors don't double-free or leak.
           *reinterpret_cast<std::string**>(this)  =
              new std::string(**reinterpret_cast<const const_string_ptr*>(&v) );
-          set_variant_type( this, string_type );
+          set_variant_type( this, t );
           return;
        case blob_type:
           *reinterpret_cast<blob**>(this)  =
              new blob(**reinterpret_cast<const const_blob_ptr*>(&v) );
           set_variant_type( this, blob_type );
           return;
+       case string_sso_type:
+          // Inline bytes copy via the byte-array assignment below; no
+          // heap allocation needed.  Falls through to the default arm.
        default:
           _data = v._data;
    }
@@ -266,27 +372,78 @@ variant& variant::operator=( const variant& v )
    if( this == &v )
       return *this;
 
+   // Aliased self-assignment is undefined behaviour: rhs may not refer to storage owned by lhs.  Both the same-type
+   // fast path and the different-type clear()+new path read from rhs while writing through lhs, and the write
+   // invalidates rhs mid-operation.  The previous fc::variant had the same UB contract via the clear()-then-new
+   // pattern; this preserves it.  Debug builds catch the common direct-aliasing cases via the assertion below.
+   assert( _rhs_not_aliased( this, v )
+           && "fc::variant operator=(const&): rhs aliases storage owned by lhs (UB)" );
+
+   const auto src_type = v.get_type();
+
+   // Same-type fast path: reuse the existing heap object instead of delete-then-new.  For string/object/array/blob
+   // (and the std::string-backed multi-precision integer encodings) this skips an alloc+free pair.  Inline encodings
+   // fall through to the bytes-copy default arm.
+   if( get_type() == src_type ) {
+      switch( src_type ) {
+         case object_type:
+            **reinterpret_cast<variant_object**>(this) =
+               **reinterpret_cast<const const_variant_object_ptr*>(&v);
+            return *this;
+         case array_type:
+            **reinterpret_cast<variants**>(this) =
+               **reinterpret_cast<const const_variants_ptr*>(&v);
+            return *this;
+         case blob_type:
+            **reinterpret_cast<blob**>(this) =
+               **reinterpret_cast<const const_blob_ptr*>(&v);
+            return *this;
+         case int128_type:
+         case uint128_type:
+         case int256_type:
+         case uint256_type:
+         case string_type:
+            **reinterpret_cast<std::string**>(this) =
+               **reinterpret_cast<const const_string_ptr*>(&v);
+            return *this;
+         default:
+            // Inline (null/int/uint/double/bool/string_sso): bytes-copy.
+            _data = v._data;
+            return *this;
+      }
+   }
+
+   // Different type: replace the heap object.  Mirrors the variant copy ctor's per-type allocation and matches the
+   // previous clear()-then-new semantics.
    clear();
-   switch( v.get_type() )
-   {
+   switch( src_type ) {
       case object_type:
-         *reinterpret_cast<variant_object**>(this)  =
-            new variant_object((**reinterpret_cast<const const_variant_object_ptr*>(&v)));
+         *reinterpret_cast<variant_object**>(this) =
+            new variant_object( **reinterpret_cast<const const_variant_object_ptr*>(&v) );
          break;
       case array_type:
-         *reinterpret_cast<variants**>(this)  =
-            new variants((**reinterpret_cast<const const_variants_ptr*>(&v)));
+         *reinterpret_cast<variants**>(this) =
+            new variants( **reinterpret_cast<const const_variants_ptr*>(&v) );
          break;
       case string_type:
-         *reinterpret_cast<std::string**>(this)  = new std::string((**reinterpret_cast<const const_string_ptr*>(&v)) );
+      case int128_type:
+      case uint128_type:
+      case int256_type:
+      case uint256_type:
+         // All five share new std::string(...) storage (see ctors above).
+         *reinterpret_cast<std::string**>(this) =
+            new std::string( **reinterpret_cast<const const_string_ptr*>(&v) );
          break;
       case blob_type:
-         *reinterpret_cast<blob**>(this)  = new blob((**reinterpret_cast<const const_blob_ptr*>(&v)) );
+         *reinterpret_cast<blob**>(this) =
+            new blob( **reinterpret_cast<const const_blob_ptr*>(&v) );
          break;
+      case string_sso_type:
       default:
+         // Inline (null/int/uint/double/bool/string_sso): bytes-copy.
          _data = v._data;
    }
-   set_variant_type( this, v.get_type() );
+   set_variant_type( this, src_type );
    return *this;
 }
 
@@ -304,16 +461,16 @@ void  variant::visit( const visitor& v )const
          v.handle( *reinterpret_cast<const uint64_t*>(this) );
          return;
       case int128_type:
-         v.handle( **reinterpret_cast<const const_string_ptr*>(this) );
+         v.handle( std::string_view{ **reinterpret_cast<const const_string_ptr*>(this) } );
          return;
       case uint128_type:
-         v.handle( **reinterpret_cast<const const_string_ptr*>(this) );
+         v.handle( std::string_view{ **reinterpret_cast<const const_string_ptr*>(this) } );
          return;
       case int256_type:
-         v.handle( **reinterpret_cast<const const_string_ptr*>(this) );
+         v.handle( std::string_view{ **reinterpret_cast<const const_string_ptr*>(this) } );
          return;
       case uint256_type:
-         v.handle( **reinterpret_cast<const const_string_ptr*>(this) );
+         v.handle( std::string_view{ **reinterpret_cast<const const_string_ptr*>(this) } );
          return;
 
       case double_type:
@@ -323,7 +480,10 @@ void  variant::visit( const visitor& v )const
          v.handle( *reinterpret_cast<const bool*>(this) );
          return;
       case string_type:
-         v.handle( **reinterpret_cast<const const_string_ptr*>(this) );
+         v.handle( std::string_view{ **reinterpret_cast<const const_string_ptr*>(this) } );
+         return;
+      case string_sso_type:
+         v.handle( read_sso(this) );
          return;
       case array_type:
          v.handle( **reinterpret_cast<const const_variants_ptr*>(this) );
@@ -351,7 +511,8 @@ bool variant::is_null()const
 
 bool variant::is_string()const
 {
-   return get_type() == string_type;
+   const auto t = get_type();
+   return t == string_type || t == string_sso_type;
 }
 bool variant::is_bool()const
 {
@@ -441,6 +602,8 @@ int64_t variant::as_int64()const
    {
       case string_type:
           return to_int64(**reinterpret_cast<const const_string_ptr*>(this));
+      case string_sso_type:
+          return to_int64(read_sso(this));
       case double_type:
           return int64_t(*reinterpret_cast<const double*>(this));
       case int64_type:
@@ -462,6 +625,8 @@ uint64_t variant::as_uint64()const
    {
       case string_type:
           return to_uint64(**reinterpret_cast<const const_string_ptr*>(this));
+      case string_sso_type:
+          return to_uint64(read_sso(this));
       case double_type:
           return static_cast<uint64_t>(*reinterpret_cast<const double*>(this));
       case int64_type:
@@ -486,10 +651,9 @@ fc::int128 variant::as_int128() const
    case uint64_type:
       return static_cast<fc::int128>(*reinterpret_cast<const uint64_t*>(this));
    case int128_type:
-      return fc::int128_from_string(as_string());
    case uint128_type:
-      return fc::int128_from_string(as_string());
    case string_type:
+   case string_sso_type:
       return fc::int128_from_string(as_string());
    case bool_type:
       return static_cast<fc::int128>(*reinterpret_cast<const bool*>(this));
@@ -509,10 +673,9 @@ fc::uint128 fc::variant::as_uint128()const
    case uint64_type:
       return static_cast<fc::uint128>(*reinterpret_cast<const uint64_t*>(this));
    case int128_type:
-      return fc::uint128_from_string(as_string());
    case uint128_type:
-      return fc::uint128_from_string(as_string());
    case string_type:
+   case string_sso_type:
       return fc::uint128_from_string(as_string());
    case bool_type:
       return static_cast<fc::uint128>(*reinterpret_cast<const bool*>(this));
@@ -533,10 +696,9 @@ fc::int256 fc::variant::as_int256()const
    case uint64_type:
       return fc::int256(*reinterpret_cast<const uint64_t*>(this));
    case int256_type:
-      return fc::int256(as_string());//*reinterpret_cast<const int256*>(this);
    case uint256_type:
-      return fc::int256(as_string());
    case string_type:
+   case string_sso_type:
       return fc::int256(as_string());
    case bool_type:
       return int256(*reinterpret_cast<const bool*>(this));
@@ -556,10 +718,9 @@ fc::uint256 fc::variant::as_uint256()const
    case uint64_type:
       return fc::uint256(*reinterpret_cast<const uint64_t*>(this));
    case int256_type:
-      return fc::uint256(as_string());//*reinterpret_cast<const int256*>(this);
    case uint256_type:
-      return fc::uint256(as_string());
    case string_type:
+   case string_sso_type:
       return fc::uint256(as_string());
    case bool_type:
       return uint256(*reinterpret_cast<const bool*>(this));
@@ -577,6 +738,8 @@ double  variant::as_double()const
    {
       case string_type:
           return to_double(**reinterpret_cast<const const_string_ptr*>(this));
+      case string_sso_type:
+          return to_double(read_sso(this));
       case double_type:
           return *reinterpret_cast<const double*>(this);
       case int64_type:
@@ -594,17 +757,17 @@ double  variant::as_double()const
 
 bool  variant::as_bool()const
 {
+   auto bool_from_string_view = [](std::string_view s) -> bool {
+      if( s == "true" )  return true;
+      if( s == "false" ) return false;
+      FC_THROW_EXCEPTION( bad_cast_exception, "Cannot convert string to bool (only \"true\" or \"false\" can be converted)" );
+   };
    switch( get_type() )
    {
       case string_type:
-      {
-          const std::string& s = **reinterpret_cast<const const_string_ptr*>(this);
-          if( s == "true" )
-             return true;
-          if( s == "false" )
-             return false;
-          FC_THROW_EXCEPTION( bad_cast_exception, "Cannot convert string to bool (only \"true\" or \"false\" can be converted)" );
-      }
+          return bool_from_string_view( **reinterpret_cast<const const_string_ptr*>(this) );
+      case string_sso_type:
+          return bool_from_string_view( read_sso(this) );
       case double_type:
           return *reinterpret_cast<const double*>(this) != 0.0;
       case int64_type:
@@ -638,6 +801,8 @@ std::string variant::as_string()const
       case int256_type:
       case string_type:
           return **reinterpret_cast<const const_string_ptr*>(this);
+      case string_sso_type:
+          return std::string{ read_sso(this) };
       case double_type:
           return s_fc_to_string(*reinterpret_cast<const double*>(this));
       case int64_type:
@@ -688,8 +853,9 @@ blob variant::as_blob()const
       case null_type: return blob();
       case blob_type: return get_blob();
       case string_type:
+      case string_sso_type:
       {
-         const std::string& str = get_string();
+         std::string_view str = get_string();
          if( str.size() == 0 ) return blob();
          try {
             // pre-5.0 versions of variant added `=` to end of base64 encoded string in as_string() above.
@@ -757,6 +923,10 @@ size_t variant::estimated_size()const
    case int256_type:
    case uint256_type:
    case string_type:
+   case string_sso_type:
+      // estimated_size is allowed to over-report; SSO content lives inside
+      // *this so the +sizeof(std::string) here is a harmless over-count and
+      // keeps the formula uniform across both string encodings.
       return as_string().length() + sizeof(std::string) + sizeof(*this);
    case array_type:
    {
@@ -777,10 +947,13 @@ size_t variant::estimated_size()const
    }
 }
 
-const std::string&        variant::get_string()const
+std::string_view          variant::get_string()const
 {
-  if( get_type() == string_type )
-     return **reinterpret_cast<const const_string_ptr*>(this);
+  switch( get_type() ) {
+     case string_type:     return **reinterpret_cast<const const_string_ptr*>(this);
+     case string_sso_type: return read_sso(this);
+     default: break;
+  }
   FC_THROW_EXCEPTION( bad_cast_exception, "Invalid cast from type '{}' to string", get_type() );
 }
 
@@ -898,7 +1071,7 @@ void to_variant( const std::vector<char>& var,  variant& vo )
 }
 void from_variant( const variant& var,  std::vector<char>& vo )
 {
-   const auto& str = var.get_string();
+   std::string_view str = var.get_string();
    FC_ASSERT( str.size() <= 2*MAX_SIZE_OF_BYTE_ARRAYS ); // Doubled because hex strings needs two characters per byte
    FC_ASSERT( str.size() % 2 == 0, "the length of hex string should be even number" );
    vo.resize( str.size() / 2 );
@@ -1090,107 +1263,4 @@ std::string format_string( const std::string& frmt, const variant_object& args, 
    }
 
 
-   variant operator + ( const variant& a, const variant& b )
-   {
-      if( a.is_array()  && b.is_array() )
-      {
-         const variants& aa = a.get_array();
-         const variants& ba = b.get_array();
-         variants result;
-         result.reserve( std::max(aa.size(),ba.size()) );
-         auto num = std::max(aa.size(),ba.size());
-         for( unsigned i = 0; i < num; ++i )
-         {
-            if( aa.size() > i && ba.size() > i )
-               result[i]  = aa[i] + ba[i];
-            else if( aa.size() > i )
-               result[i]  = aa[i];
-            else
-               result[i]  = ba[i];
-         }
-         return result;
-      }
-      if( a.is_string()  || b.is_string() ) return a.as_string() + b.as_string();
-      if( a.is_double()  || b.is_double() ) return a.as_double() + b.as_double();
-      if( a.is_int64()   || b.is_int64() )  return a.as_int64() + b.as_int64();
-      if( a.is_uint64()  || b.is_uint64() ) return a.as_uint64() + b.as_uint64();
-      FC_ASSERT( false, "invalid operation {} + {}", fc::json::to_log_string(a), fc::json::to_log_string(b) );
-   }
-
-   variant operator - ( const variant& a, const variant& b )
-   {
-      if( a.is_array()  && b.is_array() )
-      {
-         const variants& aa = a.get_array();
-         const variants& ba = b.get_array();
-         variants result;
-         result.reserve( std::max(aa.size(),ba.size()) );
-         auto num = std::max(aa.size(),ba.size());
-         for( unsigned i = 0; i < num; --i )
-         {
-            if( aa.size() > i && ba.size() > i )
-               result[i]  = aa[i] - ba[i];
-            else if( aa.size() > i )
-               result[i]  = aa[i];
-            else
-               result[i]  = ba[i];
-         }
-         return result;
-      }
-      if( a.is_string()  || b.is_string() ) return a.as_string() - b.as_string();
-      if( a.is_double()  || b.is_double() ) return a.as_double() - b.as_double();
-      if( a.is_int64()   || b.is_int64() )  return a.as_int64() - b.as_int64();
-      if( a.is_uint64()  || b.is_uint64() ) return a.as_uint64() - b.as_uint64();
-      FC_ASSERT( false, "invalid operation {} + {}", fc::json::to_log_string(a), fc::json::to_log_string(b) );
-   }
-   variant operator * ( const variant& a, const variant& b )
-   {
-      if( a.is_double()  || b.is_double() ) return a.as_double() * b.as_double();
-      if( a.is_int64()   || b.is_int64() )  return a.as_int64() * b.as_int64();
-      if( a.is_uint64()  || b.is_uint64() ) return a.as_uint64() * b.as_uint64();
-      if( a.is_array()  && b.is_array() )
-      {
-         const variants& aa = a.get_array();
-         const variants& ba = b.get_array();
-         variants result;
-         result.reserve( std::max(aa.size(),ba.size()) );
-         auto num = std::max(aa.size(),ba.size());
-         for( unsigned i = 0; i < num; ++i )
-         {
-            if( aa.size() > i && ba.size() > i )
-               result[i]  = aa[i] * ba[i];
-            else if( aa.size() > i )
-               result[i]  = aa[i];
-            else
-               result[i]  = ba[i];
-         }
-         return result;
-      }
-      FC_ASSERT( false, "invalid operation {} * {}", fc::json::to_log_string(a), fc::json::to_log_string(b) );
-   }
-   variant operator / ( const variant& a, const variant& b )
-   {
-      if( a.is_double()  || b.is_double() ) return a.as_double() / b.as_double();
-      if( a.is_int64()   || b.is_int64() )  return a.as_int64() / b.as_int64();
-      if( a.is_uint64()  || b.is_uint64() ) return a.as_uint64() / b.as_uint64();
-      if( a.is_array()  && b.is_array() )
-      {
-         const variants& aa = a.get_array();
-         const variants& ba = b.get_array();
-         variants result;
-         result.reserve( std::max(aa.size(),ba.size()) );
-         auto num = std::max(aa.size(),ba.size());
-         for( unsigned i = 0; i < num; ++i )
-         {
-            if( aa.size() > i && ba.size() > i )
-               result[i]  = aa[i] / ba[i];
-            else if( aa.size() > i )
-               result[i]  = aa[i];
-            else
-               result[i]  = ba[i];
-         }
-         return result;
-      }
-      FC_ASSERT( false, "invalid operation {} / {}", fc::json::to_log_string(a), fc::json::to_log_string(b) );
-   }
 } // namespace fc

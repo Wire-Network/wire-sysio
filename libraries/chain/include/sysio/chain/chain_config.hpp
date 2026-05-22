@@ -29,11 +29,14 @@ struct chain_config_v0 {
       max_transaction_cpu_usage_id,
       min_transaction_cpu_usage_id,
       max_transaction_lifetime_id,
-      deferred_trx_expiration_window_id,
       max_transaction_delay_id,
       max_inline_action_size_id,
       max_inline_action_depth_id,
       max_authority_depth_id,
+      max_action_return_value_size_id,
+      max_kv_key_size_id,
+      max_kv_value_size_id,
+      max_kv_secondary_key_size_id,
       PARAMS_COUNT
    };
 
@@ -51,11 +54,15 @@ struct chain_config_v0 {
    uint32_t   min_transaction_cpu_usage;           ///< the minimum billable cpu usage (in microseconds) that the chain requires
 
    uint32_t   max_transaction_lifetime;            ///< the maximum number of seconds that an input transaction's expiration can be ahead of the time of the block in which it is first included
-   uint32_t   deferred_trx_expiration_window;      ///< the number of seconds after the time a deferred transaction can first execute until it expires
    uint32_t   max_transaction_delay;               ///< the maximum number of seconds that can be imposed as a delay requirement by authorization checks
    uint32_t   max_inline_action_size;              ///< maximum allowed size (in bytes) of an inline action
    uint16_t   max_inline_action_depth;             ///< recursion depth limit on sending inline actions
    uint16_t   max_authority_depth;                 ///< recursion depth limit for checking if an authority is satisfied
+
+   uint32_t   max_action_return_value_size = config::default_max_action_return_value_size; ///< size limit for action return value
+   uint32_t   max_kv_key_size             = config::default_max_kv_key_size;               ///< maximum KV primary key size in bytes
+   uint32_t   max_kv_value_size           = config::default_max_kv_value_size;             ///< maximum KV value size in bytes
+   uint32_t   max_kv_secondary_key_size   = config::default_max_kv_secondary_key_size;     ///< maximum KV secondary key size in bytes
 
    void validate()const;
 
@@ -79,13 +86,16 @@ struct chain_config_v0 {
                            lhs.max_block_cpu_usage,
                            lhs.target_block_cpu_usage_pct,
                            lhs.max_transaction_cpu_usage,
-                           lhs.max_transaction_cpu_usage,
+                           lhs.min_transaction_cpu_usage,
                            lhs.max_transaction_lifetime,
-                           lhs.deferred_trx_expiration_window,
                            lhs.max_transaction_delay,
                            lhs.max_inline_action_size,
                            lhs.max_inline_action_depth,
-                           lhs.max_authority_depth
+                           lhs.max_authority_depth,
+                           lhs.max_action_return_value_size,
+                           lhs.max_kv_key_size,
+                           lhs.max_kv_value_size,
+                           lhs.max_kv_secondary_key_size
                         )
                ==
                std::tie(   rhs.max_block_net_usage,
@@ -98,13 +108,16 @@ struct chain_config_v0 {
                            rhs.max_block_cpu_usage,
                            rhs.target_block_cpu_usage_pct,
                            rhs.max_transaction_cpu_usage,
-                           rhs.max_transaction_cpu_usage,
+                           rhs.min_transaction_cpu_usage,
                            rhs.max_transaction_lifetime,
-                           rhs.deferred_trx_expiration_window,
                            rhs.max_transaction_delay,
                            rhs.max_inline_action_size,
                            rhs.max_inline_action_depth,
-                           rhs.max_authority_depth
+                           rhs.max_authority_depth,
+                           rhs.max_action_return_value_size,
+                           rhs.max_kv_key_size,
+                           rhs.max_kv_value_size,
+                           rhs.max_kv_secondary_key_size
                         );
    };
 
@@ -126,61 +139,14 @@ protected:
                      << "Min Transaction CPU Usage: " << min_transaction_cpu_usage << ", "
 
                      << "Max Transaction Lifetime: " << max_transaction_lifetime << ", "
-                     << "Deferred Transaction Expiration Window: " << deferred_trx_expiration_window << ", "
                      << "Max Transaction Delay: " << max_transaction_delay << ", "
                      << "Max Inline Action Size: " << max_inline_action_size << ", "
                      << "Max Inline Action Depth: " << max_inline_action_depth << ", "
-                     << "Max Authority Depth: " << max_authority_depth;
-   }
-};
-
-/**
- * @brief v1 Producer-voted blockchain configuration parameters
- *
- * If Adding new parameters create chain_config_v[n] class instead of adding
- * new parameters to v1 or v0. This is needed for snapshots backward compatibility
- */
-struct chain_config_v1 : chain_config_v0 {
-   using Base = chain_config_v0;
-
-   uint32_t   max_action_return_value_size = config::default_max_action_return_value_size;               ///< size limit for action return value
-   
-   //order must match parameters as ids are used in serialization
-   enum {
-     max_action_return_value_size_id = Base::PARAMS_COUNT,
-     PARAMS_COUNT
-   };
-
-   inline const Base& base() const {
-      return static_cast<const Base&>(*this);
-   }
-
-   void validate() const;
-
-   template<typename Stream>
-   friend Stream& operator << ( Stream& out, const chain_config_v1& c ) {
-      return c.log(out) << "\n";
-   }
-
-   friend inline bool operator == ( const chain_config_v1& lhs, const chain_config_v1& rhs ) {
-      //add v1 parameters comarison here
-      return std::tie(lhs.max_action_return_value_size) == std::tie(rhs.max_action_return_value_size) 
-          && lhs.base() == rhs.base();
-   }
-
-   friend inline bool operator != ( const chain_config_v1& lhs, const chain_config_v1& rhs ) {
-      return !(lhs == rhs);
-   }
-
-   inline chain_config_v1& operator= (const Base& b) {
-      Base::operator= (b);
-      return *this;
-   }
-
-protected:
-   template<typename Stream>
-   Stream& log(Stream& out) const{
-      return base().log(out) << ", Max Action Return Value Size: " << max_action_return_value_size;
+                     << "Max Authority Depth: " << max_authority_depth << ", "
+                     << "Max Action Return Value Size: " << max_action_return_value_size << ", "
+                     << "Max KV Key Size: " << max_kv_key_size << ", "
+                     << "Max KV Value Size: " << max_kv_value_size << ", "
+                     << "Max KV Secondary Key Size: " << max_kv_secondary_key_size;
    }
 };
 
@@ -192,8 +158,9 @@ struct config_entry_validator{
    bool operator()(uint32_t id) const;
 };
 
-//after adding 1st value to chain_config_v1 change this using to point to v1
-using chain_config = chain_config_v1;
+// Single-version chain config. When adding new parameters in the future,
+// create chain_config_v1 and update the using alias.
+using chain_config = chain_config_v0;
 using config_range = data_range<chain_config, config_entry_validator>;
 
 } } // namespace sysio::chain
@@ -206,13 +173,11 @@ FC_REFLECT(sysio::chain::chain_config_v0,
            (max_block_cpu_usage)(target_block_cpu_usage_pct)
            (max_transaction_cpu_usage)(min_transaction_cpu_usage)
 
-           (max_transaction_lifetime)(deferred_trx_expiration_window)(max_transaction_delay)
+           (max_transaction_lifetime)(max_transaction_delay)
            (max_inline_action_size)(max_inline_action_depth)(max_authority_depth)
 
-)
-
-FC_REFLECT_DERIVED(sysio::chain::chain_config_v1, (sysio::chain::chain_config_v0), 
            (max_action_return_value_size)
+           (max_kv_key_size)(max_kv_value_size)(max_kv_secondary_key_size)
 )
 
 namespace fc {
@@ -269,9 +234,6 @@ inline DataStream &operator<<(DataStream &s, const sysio::chain::data_entry<sysi
       case chain_config_v0::max_transaction_lifetime_id:
       fc::raw::pack(s, entry.config.max_transaction_lifetime);
       break;
-      case chain_config_v0::deferred_trx_expiration_window_id:
-      fc::raw::pack(s, entry.config.deferred_trx_expiration_window);
-      break;
       case chain_config_v0::max_transaction_delay_id:
       fc::raw::pack(s, entry.config.max_transaction_delay);
       break;
@@ -284,41 +246,21 @@ inline DataStream &operator<<(DataStream &s, const sysio::chain::data_entry<sysi
       case chain_config_v0::max_authority_depth_id:
       fc::raw::pack(s, entry.config.max_authority_depth);
       break;
+      case chain_config_v0::max_action_return_value_size_id:
+      fc::raw::pack(s, entry.config.max_action_return_value_size);
+      break;
+      case chain_config_v0::max_kv_key_size_id:
+      fc::raw::pack(s, entry.config.max_kv_key_size);
+      break;
+      case chain_config_v0::max_kv_value_size_id:
+      fc::raw::pack(s, entry.config.max_kv_value_size);
+      break;
+      case chain_config_v0::max_kv_secondary_key_size_id:
+      fc::raw::pack(s, entry.config.max_kv_secondary_key_size);
+      break;
       default:
       FC_THROW_EXCEPTION(config_parse_error, "DataStream& operator<<: no such id: {}", entry.id);
    }
-   return s;
-}
-
-/**
- * @brief This is for packing data_entry<chain_config_v1, ...> 
- * that is used as part of packing data_range<chain_config_v1, ...>
- * @param s datastream
- * @param entry contains config reference and particular id
- * @throws unsupported_feature if protocol feature for particular id is not activated
- */
-template <typename DataStream>
-inline DataStream &operator<<(DataStream &s, const sysio::chain::data_entry<sysio::chain::chain_config_v1, sysio::chain::config_entry_validator> &entry){
-   using namespace sysio::chain;
-
-   //initial requirements were to skip packing field if it is not activated.
-   //this approach allows to spam this function with big buffer so changing this behavior
-   //moreover:
-   //The contract has no way to know that the value was skipped and is likely to behave incorrectly.
-   //When the protocol feature is not activated, the old version of nodeop that doesn't know about 
-   //the entry MUST behave the same as the new version of nodeop that does.
-   //Skipping known but unactivated entries violates this.
-   SYS_ASSERT(entry.is_allowed(), unsupported_feature, "config id {} is no allowed", entry.id);
-   
-   switch (entry.id){
-      case chain_config_v1::max_action_return_value_size_id:
-      fc::raw::pack(s, entry.config.max_action_return_value_size);
-      break;
-      default:
-      data_entry<chain_config_v0, config_entry_validator> base_entry(entry);
-      fc::raw::pack(s, base_entry);
-   }
-
    return s;
 }
 
@@ -372,9 +314,6 @@ inline DataStream &operator>>(DataStream &s, sysio::chain::data_entry<sysio::cha
       case chain_config_v0::max_transaction_lifetime_id:
       fc::raw::unpack(s, entry.config.max_transaction_lifetime);
       break;
-      case chain_config_v0::deferred_trx_expiration_window_id:
-      fc::raw::unpack(s, entry.config.deferred_trx_expiration_window);
-      break;
       case chain_config_v0::max_transaction_delay_id:
       fc::raw::unpack(s, entry.config.max_transaction_delay);
       break;
@@ -387,33 +326,20 @@ inline DataStream &operator>>(DataStream &s, sysio::chain::data_entry<sysio::cha
       case chain_config_v0::max_authority_depth_id:
       fc::raw::unpack(s, entry.config.max_authority_depth);
       break;
-      default:
-      FC_THROW_EXCEPTION(sysio::chain::config_parse_error, "DataStream& operator<<: no such id: {}", entry.id);
-   }
-   
-   return s;
-}
-
-/**
- * @brief This is for unpacking data_entry<chain_config_v1, ...> 
- * that is used as part of unpacking data_range<chain_config_v1, ...>
- * @param s datastream
- * @param entry contains config reference and particular id
- * @throws unsupported_feature if protocol feature for particular id is not activated
- */
-template <typename DataStream>
-inline DataStream &operator>>(DataStream &s, sysio::chain::data_entry<sysio::chain::chain_config_v1, sysio::chain::config_entry_validator> &entry){
-   using namespace sysio::chain;
-
-   SYS_ASSERT(entry.is_allowed(), unsupported_feature, "config id {} is no allowed", entry.id);
-
-   switch (entry.id){
-      case chain_config_v1::max_action_return_value_size_id:
+      case chain_config_v0::max_action_return_value_size_id:
       fc::raw::unpack(s, entry.config.max_action_return_value_size);
       break;
+      case chain_config_v0::max_kv_key_size_id:
+      fc::raw::unpack(s, entry.config.max_kv_key_size);
+      break;
+      case chain_config_v0::max_kv_value_size_id:
+      fc::raw::unpack(s, entry.config.max_kv_value_size);
+      break;
+      case chain_config_v0::max_kv_secondary_key_size_id:
+      fc::raw::unpack(s, entry.config.max_kv_secondary_key_size);
+      break;
       default:
-      sysio::chain::data_entry<chain_config_v0, config_entry_validator> base_entry(entry);
-      fc::raw::unpack(s, base_entry);
+      FC_THROW_EXCEPTION(sysio::chain::config_parse_error, "DataStream& operator<<: no such id: {}", entry.id);
    }
 
    return s;

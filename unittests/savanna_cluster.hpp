@@ -57,7 +57,7 @@ namespace savanna_cluster {
    // --------------------------------------------------
    struct vote_t {
       friend std::ostream& operator<<(std::ostream& s, const vote_t& v) {
-         s << "vote_t(" << v.id.str().substr(8, 16) << ", " << (v.strong ? "strong" : "weak") << ")";
+         s << "vote_t(" << v.id.short_id() << ", " << (v.strong ? "strong" : "weak") << ")";
          return s;
       }
       bool operator==(const vote_t&) const = default;
@@ -250,17 +250,17 @@ namespace savanna_cluster {
          return control->is_block_missing_finalizer_votes(head());
       }
 
-      std::string snapshot() const {
+      std::filesystem::path snapshot() const {
          dlog("node {} - taking snapshot", _node_idx);
-         auto writer = buffered_snapshot_suite::get_writer();
+         auto writer = threaded_snapshot_suite::get_writer();
          control->abort_block();
          control->write_snapshot(writer);
-         return buffered_snapshot_suite::finalize(writer);
+         return threaded_snapshot_suite::finalize(writer);
       }
 
-      void open_from_snapshot(const std::string& snapshot) {
+      void open_from_snapshot(const std::filesystem::path& snapshot) {
          dlog("node {} - restoring from snapshot", _node_idx);
-         open(buffered_snapshot_suite::get_reader(snapshot));
+         open(threaded_snapshot_suite::get_reader(snapshot));
       }
 
       std::vector<uint8_t> save_fsi() const {
@@ -560,8 +560,8 @@ namespace savanna_cluster {
       void print(const char* name, const signed_block_ptr& b) const {
          if (_debug_mode)
             std::cout << name << " (" << b->block_num() << ") timestamp = " << b->timestamp.slot
-                      << ", id = " << b->calculate_id().str().substr(8, 16)
-                      << ", previous = " << b->previous.str().substr(8, 16) << '\n';
+                      << ", id = " << b->calculate_id().short_id()
+                      << ", previous = " << b->previous.short_id() << '\n';
       }
 
    public:

@@ -37,8 +37,8 @@ public:
    };
 
    struct integrity_hash_information {
-      chain::block_id_type head_block_id;
-      chain::digest_type   integrity_hash;
+      chain::block_id_type  head_block_id;
+      fc::crypto::blake3    integrity_hash;
    };
 
    struct scheduled_protocol_feature_activations {

@@ -309,7 +309,7 @@ int main(int argc, char* argv[]) {
       auto& client = client_entry->client;
 
       ilog("Connected to Solana RPC: {}", client_entry->url);
-      ilog("Signer public key: {}", client->get_pubkey().to_base58());
+      ilog("Signer public key: {}", client->get_pubkey().to_string(fc::yield_function_t{}));
 
       // Query basic chain information
       auto slot = client->get_slot();
@@ -337,13 +337,13 @@ int main(int argc, char* argv[]) {
       }
 
       // Test the raw counter program (non-Anchor)
-      const solana_public_key counter_program_id = solana_public_key::from_base58("Cdea2BCiWYBPTQJQq2oWjn5vCkfgENSHNG4GVnWqSvyw");
+      const solana_public_key counter_program_id = solana_public_key::from_base58_string("Cdea2BCiWYBPTQJQq2oWjn5vCkfgENSHNG4GVnWqSvyw");
       ilog("");
       ilog("=== Testing Raw Counter Program ===");
-      ilog("Program ID: {}", counter_program_id.to_base58());
+      ilog("Program ID: {}", counter_program_id.to_string(fc::yield_function_t{}));
 
       auto raw_counter = client->get_data_program<solana_program_test_counter_data_client>(counter_program_id);
-      ilog("Counter PDA: {}", raw_counter->counter_pda.to_base58());
+      ilog("Counter PDA: {}", raw_counter->counter_pda.to_string(fc::yield_function_t{}));
 
       uint64_t current_value = raw_counter->get_counter_value();
       ilog("Current counter value: {}", current_value);
@@ -361,14 +361,14 @@ int main(int argc, char* argv[]) {
       }
 
       // Test the Anchor counter program
-      const solana_public_key anchor_counter_program_id = solana_public_key::from_base58("8qR5fPrG9YWSWc68NLArP8m4JhM4e1T3aJ4waV9RKYQb");
+      const solana_public_key anchor_counter_program_id = solana_public_key::from_base58_string("8qR5fPrG9YWSWc68NLArP8m4JhM4e1T3aJ4waV9RKYQb");
       ilog("");
       ilog("=== Testing Anchor Counter Program ===");
-      ilog("Program ID: {}", anchor_counter_program_id.to_base58());
+      ilog("Program ID: {}", anchor_counter_program_id.to_string(fc::yield_function_t{}));
 
       auto anchor_counter = client->get_program<solana_program_test_counter_anchor_client>(
          anchor_counter_program_id, all_idls);
-      ilog("Counter PDA: {}", anchor_counter->counter_pda.to_base58());
+      ilog("Counter PDA: {}", anchor_counter->counter_pda.to_string(fc::yield_function_t{}));
 
       // Check if initialized
       bool is_init = anchor_counter->is_initialized();
@@ -399,11 +399,11 @@ int main(int argc, char* argv[]) {
       // Test the typed Anchor counter client (strongly-typed account data)
       ilog("");
       ilog("=== Testing Anchor Counter Program (Typed Client) ===");
-      ilog("Program ID: {}", anchor_counter_program_id.to_base58());
+      ilog("Program ID: {}", anchor_counter_program_id.to_string(fc::yield_function_t{}));
 
       auto typed_counter = client->get_program<solana_program_test_counter_anchor_typed_client>(
          anchor_counter_program_id, all_idls);
-      ilog("Counter PDA: {}", typed_counter->counter_pda.to_base58());
+      ilog("Counter PDA: {}", typed_counter->counter_pda.to_string(fc::yield_function_t{}));
 
       bool typed_is_init = typed_counter->is_initialized();
       ilog("Counter initialized: {}", typed_is_init ? "yes" : "no");

@@ -289,7 +289,7 @@ namespace sysio { namespace chain {
       }
 
       void run(const unsigned num_threads) {
-         run(num_threads, std::chrono::years::max(), [](){});
+         run(num_threads, std::chrono::hours(24 * 365), [](){});
       }
 
       /// ping will be called every ping_interval while waiting for all work to complete. This time isn't precise, but

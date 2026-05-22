@@ -104,6 +104,14 @@ namespace sysio::chain {
       built_in_types.emplace("varint32",                  pack_unpack<fc::signed_int>());
       built_in_types.emplace("varuint32",                 pack_unpack<fc::unsigned_int>());
 
+      // CDT typedefs `vint64_t` / `vuint64_t` (zpp::bits varint wrappers) to abi
+      // names `varint_int64` / `varint_uint64`. The CDT DataStream operators in
+      // contracts/sysio.opp.common/include/sysio.opp.common/opp_table_types.hpp
+      // serialize them as plain int64/uint64 — the wire format matches the bare
+      // integer type, so the abi-side decode is identical.
+      built_in_types.emplace("varint_int64",              pack_unpack<int64_t>());
+      built_in_types.emplace("varint_uint64",             pack_unpack<uint64_t>());
+
       // TODO: Add proper support for floating point types. For now this is good enough.
       built_in_types.emplace("float32",                   pack_unpack<float>());
       built_in_types.emplace("float64",                   pack_unpack<double>());
@@ -600,20 +608,19 @@ namespace sysio::chain {
          } SYS_RETHROW_EXCEPTIONS( unpack_exception, "Unable to unpack presence flag of optional '{}'", ctx.get_path_string() )
          return flag ? _binary_to_variant(ftype, stream, ctx) : fc::variant();
       } else if( auto e_itr = enums.find(rtype); e_itr != enums.end() ) {
-         // Enum type: read as underlying integer type, then convert to member name string if possible
+         // Enum type: read as underlying integer, return member name string.
+         // Falls back to integer for values not in the enum definition.
          auto btype = built_in_types.find(e_itr->second.type);
          SYS_ASSERT( btype != built_in_types.end(), invalid_type_inside_abi,
                      "Enum '{}' has unknown underlying type '{}'", impl::limit_size(rtype), impl::limit_size(e_itr->second.type) );
-         auto int_variant = btype->second.first(stream, false, false, ctx.get_yield_function());
-         auto int_val = int_variant.as_int64();
-         // Look up the enum member name for this value
+         auto int_var = btype->second.first(stream, false, false, ctx.get_yield_function());
+         auto int_val = int_var.as_int64();
          for( const auto& ev : e_itr->second.values ) {
             if( ev.value == int_val ) {
                return fc::variant(ev.name);
             }
          }
-         // No matching member name, return as integer
-         return int_variant;
+         return int_var; // Unknown value — return as integer
       } else {
          auto v_itr = variants.find(rtype);
          if( v_itr != variants.end() ) {
@@ -713,7 +720,9 @@ namespace sysio::chain {
             _variant_to_binary(fundamental_type(rtype), var, ds, ctx);
          }
       } else if( auto e_itr = enums.find(rtype); e_itr != enums.end() ) {
-         // Enum type: accept string member name or integer value
+         // Enum type: accept string member name or integer value.
+         // For string matching, tries exact match first, then prefix-stripped match
+         // (e.g., "ethereum" matches "chain_kind_ethereum" by stripping the "chain_kind_" prefix).
          auto btype = built_in_types.find(e_itr->second.type);
          SYS_ASSERT( btype != built_in_types.end(), invalid_type_inside_abi,
                      "Enum '{}' has unknown underlying type '{}'", ctx.maybe_shorten(rtype), ctx.maybe_shorten(e_itr->second.type) );
@@ -721,11 +730,25 @@ namespace sysio::chain {
          if( var.is_string() ) {
             auto name_str = var.get_string();
             bool found = false;
+            // Pass 1: exact match
             for( const auto& ev : e_itr->second.values ) {
                if( ev.name == name_str ) {
                   val_to_pack = fc::variant(ev.value);
                   found = true;
                   break;
+               }
+            }
+            // Pass 2: prefix-stripped match — enum members often have a common prefix
+            // derived from the type name (e.g., "chain_kind_" for type "chain_kind_t").
+            // Try matching "name_str" as a suffix of each member name after a '_' separator.
+            if( !found ) {
+               for( const auto& ev : e_itr->second.values ) {
+                  auto pos = ev.name.rfind('_');
+                  if( pos != std::string::npos && ev.name.substr(pos + 1) == name_str ) {
+                     val_to_pack = fc::variant(ev.value);
+                     found = true;
+                     break;
+                  }
                }
             }
             SYS_ASSERT( found, pack_exception,
@@ -853,8 +876,8 @@ namespace sysio::chain {
       if( itr != actions.end() ) return itr->second;
       return type_name();
    }
-   type_name abi_serializer::get_table_type(name action)const {
-      auto itr = tables.find(action);
+   type_name abi_serializer::get_table_type(const string_view& table)const {
+      auto itr = tables.find(table);
       if( itr != tables.end() ) return itr->second;
       return type_name();
    }

@@ -1,5 +1,4 @@
 #include <sysio/chain/sysio_contract.hpp>
-#include <sysio/chain/contract_table_objects.hpp>
 
 #include <sysio/chain/controller.hpp>
 #include <sysio/chain/transaction_context.hpp>
@@ -87,7 +86,6 @@ void apply_sysio_newaccount(apply_context& context) {
       int ram_delta = 0;
       db.create<account_object>([&](auto& a) {
          a.name = create.name;
-         a.creation_date = context.control.pending_block_time();
       });
       ram_delta += config::billable_size_v<account_object>;
 

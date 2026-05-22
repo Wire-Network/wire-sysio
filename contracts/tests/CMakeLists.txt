@@ -6,6 +6,7 @@
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/contracts.hpp.in ${CMAKE_CURRENT_BINARY_DIR}/contracts.hpp)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
+include_directories(${CMAKE_SOURCE_DIR}/contracts/sysio.system/include)
 # UNIT TESTING ###
 include(CTest) # eliminates DartConfiguration.tcl errors at test runtime
 enable_testing()
@@ -22,6 +23,7 @@ unittest_target(
 target_link_libraries(${CONTRACT_UNIT_TEST_EXE}
         PRIVATE
         fc-lite
+        opp
 )
 
 # add_sysio_test_executable(${CONTRACT_UNIT_TEST_EXE} ${UNIT_TESTS}) # build unit tests as one executable

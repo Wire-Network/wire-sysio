@@ -27,6 +27,7 @@ class sha256 : public add_packhash_to_hash<sha256>
     explicit sha256( const char *data, size_t size );
 
     std::string str()const;
+    std::string short_id()const;
 
     const char* data()const;
     char*       data();

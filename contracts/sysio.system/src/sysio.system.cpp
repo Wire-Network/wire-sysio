@@ -11,12 +11,12 @@ namespace sysiosystem {
 
    system_contract::system_contract( name s, name code, datastream<const char*> ds )
    :native(s,code,ds),
-    _producers(get_self(), get_self().value),
-    _finalizer_keys(get_self(), get_self().value),
-    _finalizers(get_self(), get_self().value),
-    _last_prop_finalizers(get_self(), get_self().value),
-    _fin_key_id_generator(get_self(), get_self().value),
-    _global(get_self(), get_self().value)
+    _producers(get_self()),
+    _finalizer_keys(get_self()),
+    _finalizers(get_self()),
+    _last_prop_finalizers(get_self()),
+    _fin_key_id_generator(get_self()),
+    _global(get_self())
    {
       _gstate  = _global.exists() ? _global.get() : get_default_parameters();
    }
@@ -52,12 +52,12 @@ namespace sysiosystem {
 #ifndef SYSTEM_BLOCKCHAIN_PARAMETERS
       set_blockchain_parameters( params );
 #else
-      constexpr size_t param_count = 18;
+      constexpr size_t param_count = 20;
       // an upper bound on the serialized size
       char buf[1 + sizeof(params) + param_count];
       datastream<char*> stream(buf, sizeof(buf));
 
-      stream << uint8_t(17);
+      stream << uint8_t(param_count);
       stream << uint8_t(0) << params.max_block_net_usage
              << uint8_t(1) << params.target_block_net_usage_pct
              << uint8_t(2) << params.max_transaction_net_usage
@@ -72,16 +72,15 @@ namespace sysiosystem {
              << uint8_t(10) << params.min_transaction_cpu_usage
 
              << uint8_t(11) << params.max_transaction_lifetime
-             << uint8_t(12) << params.deferred_trx_expiration_window
-             << uint8_t(13) << params.max_transaction_delay
-             << uint8_t(14) << params.max_inline_action_size
-             << uint8_t(15) << params.max_inline_action_depth
-             << uint8_t(16) << params.max_authority_depth;
-      if(params.max_action_return_value_size)
-      {
-         stream << uint8_t(17) << params.max_action_return_value_size.value();
-         ++buf[0];
-      }
+             << uint8_t(12) << params.max_transaction_delay
+             << uint8_t(13) << params.max_inline_action_size
+             << uint8_t(14) << params.max_inline_action_depth
+             << uint8_t(15) << params.max_authority_depth
+
+             << uint8_t(16) << params.max_action_return_value_size
+             << uint8_t(17) << params.max_kv_key_size
+             << uint8_t(18) << params.max_kv_value_size
+             << uint8_t(19) << params.max_kv_secondary_key_size;
 
       set_parameters_packed(buf, stream.tellp());
 #endif
@@ -188,18 +187,18 @@ namespace sysiosystem {
       uint32_t rank = 0;
       for( const auto& prod_name : producers ) {
          ++rank;
-         auto i = _producers.find(prod_name.value);
-         if( i != _producers.end() ) {
-            _producers.modify(i, same_payer, [&](auto& p) {
+         auto key = producer_key_t{prod_name.value};
+         if( _producers.contains(key) ) {
+            _producers.modify(same_payer, key, [&](auto& p) {
                p.rank = rank;
             });
          }
          rm_sched_prods.erase(prod_name);
       }
       for( const auto& prod : rm_sched_prods ) {
-         auto i = _producers.find(prod.value);
-         if( i != _producers.end() ) {
-            _producers.modify(i, same_payer, [&](auto& p) {
+         auto key = producer_key_t{prod.value};
+         if( _producers.contains(key) ) {
+            _producers.modify(same_payer, key, [&](auto& p) {
                p.rank = p.rank + max_producers;
             });
          }
@@ -208,10 +207,10 @@ namespace sysiosystem {
 
    void system_contract::setrank( const name& producer, uint32_t rank ) {
       require_auth( get_self() );
-      auto prod = _producers.find( producer.value );
-      check( prod != _producers.end(), "producer not found" );
+      auto key = producer_key_t{producer.value};
+      check( _producers.contains(key), "producer not found" );
       check( rank > 0, "rank must be positive" );
-      _producers.modify( prod, same_payer, [&](auto& p) {
+      _producers.modify( same_payer, key, [&](auto& p) {
          p.rank = rank;
       });
    }
@@ -263,9 +262,9 @@ namespace sysiosystem {
 
    void system_contract::rmvproducer( const name& producer ) {
       require_auth( get_self() );
-      auto prod = _producers.find( producer.value );
-      check( prod != _producers.end(), "producer not found" );
-      _producers.modify( prod, same_payer, [&](auto& p) {
+      auto key = producer_key_t{producer.value};
+      check( _producers.contains(key), "producer not found" );
+      _producers.modify( same_payer, key, [&](auto& p) {
             p.deactivate();
          });
    }
@@ -299,18 +298,11 @@ namespace sysiosystem {
 
    void native::setabi( const name& acnt, const std::vector<char>& abi,
                         const binary_extension<std::string>& memo ) {
-      sysio::multi_index< "abihash"_n, abi_hash >  table(get_self(), get_self().value);
-      auto itr = table.find( acnt.value );
-      if( itr == table.end() ) {
-         table.emplace( acnt, [&]( auto& row ) {
-            row.owner = acnt;
-            row.hash = sysio::sha256(const_cast<char*>(abi.data()), abi.size());
-         });
-      } else {
-         table.modify( itr, same_payer, [&]( auto& row ) {
-            row.hash = sysio::sha256(const_cast<char*>(abi.data()), abi.size());
-         });
-      }
+      abi_hash_table table(get_self());
+      auto new_hash = sysio::sha256(const_cast<char*>(abi.data()), abi.size());
+      table.upsert( acnt, abihash_key{acnt.value},
+         abi_hash{acnt, new_hash},
+         [&]( auto& row ) { row.hash = new_hash; } );
    }
 
    void system_contract::init( unsigned_int version, const symbol& core ) {

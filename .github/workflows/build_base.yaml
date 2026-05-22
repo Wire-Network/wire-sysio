@@ -30,18 +30,14 @@ jobs:
       fail-fast: false
       matrix:
         platform: ${{fromJSON(inputs.platform-list)}}
-    runs-on: ["self-hosted", "enf-x86-beefy"]
+    runs-on:
+      group: core-repo-group
     container:
       image: ${{ fromJSON(inputs.platforms)[matrix.platform].image }}
       credentials:
         username: dev-wire
         password: ${{ secrets.GH_TOKEN_DEV }}
     env:
-      # vcpkg binary caching: store pre-built packages in a local directory,
-      # persisted across runs via actions/cache. The old x-gha backend was
-      # removed from vcpkg; this 'files' backend is the supported replacement.
-      VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/vcpkg-binary-cache,readwrite"
-      CCACHE_DIR: ${{ github.workspace }}/.ccache
       CCACHE_MAXSIZE: "10G"
       CCACHE_COMPRESS: "true"
       CCACHE_COMPRESSLEVEL: "6"
@@ -49,12 +45,12 @@ jobs:
         - name: Allow safe directories
           run: git config --global --add safe.directory '*'
 
-        - uses: actions/checkout@v4
+        - uses: actions/checkout@v5
           with:
             submodules: recursive
 
         - name: Restore vcpkg binary cache
-          uses: actions/cache@v4
+          uses: actions/cache@v5
           with:
             path: ${{ github.workspace }}/vcpkg-binary-cache
             key: vcpkg-binaries-${{ matrix.platform }}-${{ hashFiles('vcpkg.json') }}
@@ -62,7 +58,7 @@ jobs:
               vcpkg-binaries-${{ matrix.platform }}-
 
         - name: Restore ccache
-          uses: actions/cache@v4
+          uses: actions/cache@v5
           with:
             path: ${{ github.workspace }}/.ccache
             key: ccache-${{ matrix.platform }}-${{ github.sha }}
@@ -74,11 +70,17 @@ jobs:
           run: |
             echo "Building for ${{ matrix.platform }}"
 
+            # Use $GITHUB_WORKSPACE (container path /__w/...) not ${{ github.workspace }}
+            # (host path /home/runner/work/...) so ccache/vcpkg write to the mounted
+            # volume and persist for actions/cache to save.
+            export CCACHE_DIR="$GITHUB_WORKSPACE/.ccache"
+            export VCPKG_BINARY_SOURCES="clear;files,$GITHUB_WORKSPACE/vcpkg-binary-cache,readwrite"
+
             # Clean intermediate vcpkg artifacts but preserve binary cache and downloads
             rm -rf vcpkg/buildtrees vcpkg/packages vcpkg/vcpkg_installed \
                     build/vcpkg_installed ~/.cache/vcpkg ~/.vcpkg
 
-            mkdir -p "${{ github.workspace }}/vcpkg-binary-cache"
+            mkdir -p "$GITHUB_WORKSPACE/vcpkg-binary-cache"
 
             ./vcpkg/bootstrap-vcpkg.sh
 
@@ -128,7 +130,7 @@ jobs:
 #            sudo apt install -y nodejs
 
         - name: Upload builddir
-          uses: actions/upload-artifact@v4
+          uses: actions/upload-artifact@v6
           with:
             name: ${{matrix.platform}}-build
             path: build.tar.gz

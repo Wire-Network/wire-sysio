@@ -79,6 +79,7 @@ RetString base64_encode(const unsigned char* s, size_t len, bool url = false);
 
 std::string base64_encode(char const* s, unsigned int len);
 std::vector<char> base64_decode( const std::string& s);
+std::vector<char> base64_decode( std::string_view s);
 std::string base64url_encode(const char* s, size_t len);
 std::string base64url_encode(const std::string& s);
 std::vector<char> base64url_decode(const std::string& s);
@@ -262,11 +263,13 @@ inline RetString decode(const String& encoded_string, bool remove_linebreaks, bo
       return RetString{};
 
    if (remove_linebreaks) {
-      String copy{encoded_string};
+      // Always copy into a std::string here regardless of String, since string_view
+      // has no erase().  Recurse on std::string so the rest of the body stays the same.
+      std::string copy{encoded_string};
 
       copy.erase(std::remove(copy.begin(), copy.end(), '\n'), copy.end());
 
-      return base64_decode<RetString, String>(copy, false, url);
+      return base64_decode<RetString, std::string>(copy, false, url);
    }
 
    size_t length_of_string = encoded_string.size();
@@ -356,6 +359,10 @@ inline std::string base64_encode(char const* s, unsigned int len) {
 
 inline std::vector<char> base64_decode( const std::string& s) {
    return detail::decode<std::vector<char>, std::string>(s, false, false);
+}
+
+inline std::vector<char> base64_decode( std::string_view s) {
+   return detail::decode<std::vector<char>, std::string_view>(s, false, false);
 }
 
 inline std::string base64url_encode(const char* s, size_t len) {

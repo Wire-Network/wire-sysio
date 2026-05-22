@@ -206,12 +206,13 @@ namespace sysio { namespace chain { namespace webassembly {
    uint32_t interface::get_blockchain_parameters_packed( legacy_span<char> packed_blockchain_parameters ) const {
       auto& gpo = context.control.get_global_properties();
 
-      auto s = fc::raw::pack_size( gpo.configuration.v0() );
+      const chain::chain_config_v0& cfg = gpo.configuration;
+      auto s = fc::raw::pack_size( cfg );
       if( packed_blockchain_parameters.size() == 0 ) return s;
 
       if ( s <= packed_blockchain_parameters.size() ) {
          fc::datastream<char*> ds( packed_blockchain_parameters.data(), s );
-         fc::raw::pack(ds, gpo.configuration.v0());
+         fc::raw::pack(ds, cfg);
          return s;
       }
       return 0;

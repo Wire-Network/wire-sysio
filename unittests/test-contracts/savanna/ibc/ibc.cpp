@@ -9,7 +9,7 @@ void ibc::_maybe_set_finalizer_policy(const finalizer_policy_input& policy, cons
         //if a previous policy was in force, it is now superseded by the newer one for any future proof verification
         if (itr!=_policies_table.rend()){
             auto fwd_itr = itr.base();
-            fwd_itr--;
+            --fwd_itr;
             _policies_table.modify( fwd_itr, same_payer, [&]( auto& sfp ) {
                 sfp.last_block_num = from_block_num;
            });
@@ -36,7 +36,7 @@ void ibc::_maybe_add_proven_root(const uint32_t block_num, const checksum256& fi
     auto merkle_index = _proofs_table.get_index<"merkleroot"_n>();
     auto last_itr = _proofs_table.rbegin();
 
-    //if first proven root or newer than the last proven root, we store it 
+    //if first proven root or newer than the last proven root, we store it
     if (last_itr == _proofs_table.rend() || last_itr->block_num<(uint64_t)block_num){
         auto itr = merkle_index.find(finality_mroot);
         if (itr == merkle_index.end()){
@@ -113,7 +113,7 @@ void ibc::_check_finality_proof(const finality_proof& finality_proof, const bloc
 
     //check if the target proof of inclusion correctly resolves to the root of the finality proof
     _check_target_block_proof_of_inclusion(target_block_proof_of_inclusion, finality_proof.qc_block.finality_mroot);
-    
+
     //if the finality_mroot we just proven is more recent than the last root we have stored, store it
     uint64_t offset = target_block_proof_of_inclusion.final_block_index - target_block_proof_of_inclusion.target_block_index;
 
@@ -154,7 +154,7 @@ ACTION ibc::setfpolicy(const finalizer_policy_input& policy, const uint32_t from
     //clean up if necessary
     _maybe_remove_from_cache<policies_table>();
     _maybe_remove_from_cache<proofs_table>();
-    
+
 }
 
 ACTION ibc::checkproof(const proof& proof){

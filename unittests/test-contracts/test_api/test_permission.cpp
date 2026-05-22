@@ -31,29 +31,8 @@ void test_permission::check_authorization( uint64_t receiver, uint64_t code, uin
                                                      microseconds{ 0 }
                                                    );
 
-   auto itr = db_lowerbound_i64( self, self, self, 1 );
-   if(itr == -1) {
-      db_store_i64( self, self, self, 1, &res64, sizeof(int64_t) );
-   } else {
-      db_update_i64( itr, self, &res64, sizeof(int64_t) );
-   }
-}
-
-struct test_permission_last_used_msg {
-   sysio::name account;
-   sysio::name permission;
-   int64_t     last_used_time;
-
-   SYSLIB_SERIALIZE( test_permission_last_used_msg, (account)(permission)(last_used_time) )
-};
-
-void test_permission::test_account_creation_time( uint64_t /* receiver */, uint64_t code, uint64_t action ) {
-   (void)code;
-   (void)action;
-   using namespace sysio;
-
-   auto params = unpack_action_data<test_permission_last_used_msg>();
-
-   time_point msec{ microseconds{params.last_used_time}};
-   sysio_assert( sysio::get_account_creation_time(params.account) == msec, "unexpected account creation time" );
+   char key[24];
+   make_kv_key(self, self, 1, key);
+   // kv_set does upsert — stores if new, updates if exists
+   kv_set( 0, self, key, 24, &res64, sizeof(int64_t) );
 }

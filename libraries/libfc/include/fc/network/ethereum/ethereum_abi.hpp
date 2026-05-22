@@ -17,7 +17,16 @@
 namespace fc::network::ethereum {
 
 namespace abi {
-enum class invoke_target_type { function, constructor, event, error };
+/// Top-level entry kinds emitted by the Solidity compiler in a contract
+/// JSON ABI. `function` / `constructor` / `event` / `error` are the
+/// standard four; `receive` and `fallback` are the two payable
+/// catch-all handlers Solidity emits without a `name` field (they're
+/// the contract's auto-routed ETH receivers). The parser used to skip
+/// these for lack of a name — now they're first-class members so the
+/// outpost_ethereum_client can introspect contracts that accept native
+/// ETH via `receive()` (ReserveManager, etc.) without
+/// `key_not_found_exception` blowing up plugin init.
+enum class invoke_target_type { function, constructor, event, error, receive, fallback };
 
 enum class data_type : int64_t {
    boolean,
@@ -171,6 +180,8 @@ struct contract {
    abi::invoke_target_type type;
    std::vector<component_type> inputs;
    std::vector<component_type> outputs;
+   /** Deployed contract address (hex string, optional — populated from ABI file metadata). */
+   std::string contract_address;
 };
 
 std::string to_contract_component_signature(const component_type& component);
@@ -295,7 +306,7 @@ struct get_typename<fc::network::ethereum::abi::data_type> {
 };
 }; // namespace fc
 
-FC_REFLECT_ENUM(fc::network::ethereum::abi::invoke_target_type, (function)(constructor)(event)(error));
+FC_REFLECT_ENUM(fc::network::ethereum::abi::invoke_target_type, (function)(constructor)(event)(error)(receive)(fallback));
 
 FC_REFLECT(fc::network::ethereum::abi::component_type::list_config_type, (is_list)(size));
 FC_REFLECT(fc::network::ethereum::abi::component_type, (name)(type)(list_config)(components)(internal_type));

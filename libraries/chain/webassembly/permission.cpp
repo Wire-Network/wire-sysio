@@ -74,13 +74,6 @@ namespace sysio { namespace chain { namespace webassembly {
       return false;
    }
 
-   int64_t interface::get_account_creation_time( account_name account ) const {
-      const auto* acct = context.db.find<account_object, by_name>(account);
-      SYS_ASSERT( acct != nullptr, action_validate_exception,
-                  "account '{}' does not exist", account );
-      return time_point(acct->creation_date).time_since_epoch().count();
-   }
-
    int32_t interface::get_permission_lower_bound( account_name account, permission_name permission, span<char> buffer ) {
       const auto& idx = context.db.get_index<permission_index>().indices().get<by_owner>();
       auto itr = idx.lower_bound( boost::make_tuple( account, permission ) );

@@ -1,22 +1,24 @@
 #pragma once
 
 #include <sysio/asset.hpp>
+#include <sysio/sysio.hpp>
+#include <sysio/kv_table.hpp>
+#include <sysio/kv_global.hpp>
 #include <sysio/binary_extension.hpp>
 #include <sysio/crypto.hpp>
 #include <sysio/privileged.hpp>
 #include <sysio/producer_schedule.hpp>
-#include <sysio/singleton.hpp>
 #include <sysio/system.hpp>
 #include <sysio/time.hpp>
 #include <sysio/instant_finality.hpp>
 
+#include <sysio.system/emissions.hpp>
 #include <sysio.system/native.hpp>
 
 #include <limits>
 #include <optional>
 #include <string>
 #include <type_traits>
-#include <unordered_set>
 
 namespace sysiosystem {
 
@@ -26,9 +28,8 @@ namespace sysiosystem {
    using sysio::check;
    using sysio::const_mem_fun;
    using sysio::datastream;
-   using sysio::indexed_by;
    using sysio::name;
-   using sysio::same_payer;
+   using sysio::kv::same_payer;
    using sysio::symbol;
    using sysio::symbol_code;
    using sysio::time_point;
@@ -63,18 +64,13 @@ namespace sysiosystem {
    static constexpr int64_t  useconds_per_day      = int64_t(seconds_per_day) * 1000'000ll;
    static constexpr int64_t  useconds_per_hour     = int64_t(seconds_per_hour) * 1000'000ll;
    static constexpr uint32_t blocks_per_day        = 2 * seconds_per_day; // half seconds per day
+   static constexpr uint32_t blocks_per_round      = 12; // sysio::chain::config::producer_repetitions
+   static constexpr uint32_t min_blocks_per_round_for_pay = 6;
+   static constexpr uint32_t no_prev_block        = std::numeric_limits<uint32_t>::max(); // sentinel: no previous block
 
-#ifdef SYSTEM_BLOCKCHAIN_PARAMETERS
-   struct blockchain_parameters_v1 : sysio::blockchain_parameters
-   {
-      sysio::binary_extension<uint32_t> max_action_return_value_size;
-      SYSLIB_SERIALIZE_DERIVED( blockchain_parameters_v1, sysio::blockchain_parameters,
-                                (max_action_return_value_size) )
-   };
-   using blockchain_parameters_t = blockchain_parameters_v1;
-#else
+   // All fields (including max_action_return_value_size, KV limits) are now
+   // in the base sysio::blockchain_parameters struct.
    using blockchain_parameters_t = sysio::blockchain_parameters;
-#endif
 
    // Defines new global state parameters.
    struct [[sysio::table("global"), sysio::contract("sysio.system")]] sysio_global_state : sysio::blockchain_parameters {
@@ -100,8 +96,13 @@ namespace sysiosystem {
       return sysio::block_signing_authority_v0{ .threshold = 1, .keys = {{producer_key, 1}} };
    }
 
+   struct producer_key_t {
+      uint64_t owner;
+      SYSLIB_SERIALIZE(producer_key_t, (owner))
+   };
+
    // Defines `producer_info` structure to be stored in `producer_info` table, added after version 1.0
-   struct [[sysio::table, sysio::contract("sysio.system")]] producer_info {
+   struct [[sysio::table("producers"), sysio::contract("sysio.system")]] producer_info {
       name                                                     owner;
       sysio::public_key                                        producer_key; /// a packed public key object
       uint32_t                                                 rank = std::numeric_limits<uint32_t>::max();
@@ -111,8 +112,10 @@ namespace sysiosystem {
       time_point                                               last_claim_time;
       uint16_t                                                 location = 0;
       sysio::block_signing_authority                           producer_authority; // added in version 1.9.0
+      uint32_t                                                 last_block_num = no_prev_block;
+      uint16_t                                                 current_round_blocks = 0;   // blocks in current (in-progress) round
+      uint32_t                                                 eligible_rounds      = 0;   // rounds meeting >= min_blocks threshold (per epoch)
 
-      uint64_t primary_key()const { return owner.value;                             }
       uint64_t by_rank()const     { return rank; }
       bool     active()const      { return is_active;                               }
       void     deactivate()       { producer_key = public_key(); producer_authority = sysio::block_signing_authority{}; is_active = false; }
@@ -121,12 +124,18 @@ namespace sysiosystem {
          return producer_authority;
       }
 
-      SYSLIB_SERIALIZE( producer_info, (owner)(producer_key)(rank)(is_active)(url)(unpaid_blocks)(last_claim_time)(location)(producer_authority) )
+      SYSLIB_SERIALIZE( producer_info, (owner)(producer_key)(rank)(is_active)(url)(unpaid_blocks)(last_claim_time)(location)(producer_authority)
+                         (last_block_num)(current_round_blocks)(eligible_rounds) )
    };
 
-   typedef sysio::multi_index< "producers"_n, producer_info,
-                               indexed_by<"prodrank"_n, const_mem_fun<producer_info, uint64_t, &producer_info::by_rank>>
-                             > producers_table;
+   using producers_table = sysio::kv::table< "producers"_n, producer_key_t, producer_info,
+                              sysio::kv::index<"prodrank"_n, const_mem_fun<producer_info, uint64_t, &producer_info::by_rank>>
+                           >;
+
+   struct finkey_key_t {
+      uint64_t id;
+      SYSLIB_SERIALIZE(finkey_key_t, (id))
+   };
 
    // finalizer_key_info stores information about a finalizer key.
    struct [[sysio::table("finkeys"), sysio::contract("sysio.system")]] finalizer_key_info {
@@ -135,22 +144,25 @@ namespace sysiosystem {
       std::string       finalizer_key;        // finalizer key in base64url format
       std::vector<char> finalizer_key_binary; // finalizer key in binary format in Affine little endian non-montgomery g1
 
-      uint64_t    primary_key() const { return id; }
       uint64_t    by_fin_name() const { return finalizer_name.value; }
       // Use binary format to hash. It is more robust and less likely to change
       // than the base64url text encoding of it.
-      // There is no need to store the hash key to avoid re-computation,
-      // which only happens if the table row is modified. There won't be any
-      // modification of the table rows of; it may only be removed.
       checksum256 by_fin_key()  const { return sysio::sha256(finalizer_key_binary.data(), finalizer_key_binary.size()); }
 
       bool is_active(uint64_t finalizer_active_key_id) const { return id == finalizer_active_key_id ; }
+
+      SYSLIB_SERIALIZE( finalizer_key_info, (id)(finalizer_name)(finalizer_key)(finalizer_key_binary) )
    };
-   typedef sysio::multi_index<
-      "finkeys"_n, finalizer_key_info,
-      indexed_by<"byfinname"_n, const_mem_fun<finalizer_key_info, uint64_t, &finalizer_key_info::by_fin_name>>,
-      indexed_by<"byfinkey"_n, const_mem_fun<finalizer_key_info, checksum256, &finalizer_key_info::by_fin_key>>
-   > finalizer_keys_table;
+   using finalizer_keys_table = sysio::kv::table<
+      "finkeys"_n, finkey_key_t, finalizer_key_info,
+      sysio::kv::index<"byfinname"_n, const_mem_fun<finalizer_key_info, uint64_t, &finalizer_key_info::by_fin_name>>,
+      sysio::kv::index<"byfinkey"_n, const_mem_fun<finalizer_key_info, checksum256, &finalizer_key_info::by_fin_key>>
+   >;
+
+   struct finalizer_key_t {
+      uint64_t finalizer_name;
+      SYSLIB_SERIALIZE(finalizer_key_t, (finalizer_name))
+   };
 
    // finalizer_info stores information about a finalizer.
    struct [[sysio::table("finalizers"), sysio::contract("sysio.system")]] finalizer_info {
@@ -159,9 +171,9 @@ namespace sysiosystem {
       std::vector<char> active_key_binary;        // finalizer's active finalizer key's binary format in Affine little endian non-montgomery g1
       uint32_t          finalizer_key_count = 0;  // number of finalizer keys registered by this finalizer
 
-      uint64_t primary_key() const { return finalizer_name.value; }
+      SYSLIB_SERIALIZE( finalizer_info, (finalizer_name)(active_key_id)(active_key_binary)(finalizer_key_count) )
    };
-   typedef sysio::multi_index< "finalizers"_n, finalizer_info > finalizers_table;
+   using finalizers_table = sysio::kv::table< "finalizers"_n, finalizer_key_t, finalizer_info >;
 
    // finalizer_auth_info stores a finalizer's key id and its finalizer authority
    struct finalizer_auth_info {
@@ -182,31 +194,25 @@ namespace sysiosystem {
    };
 
    // A single entry storing information about last proposed finalizers.
-   // Should avoid  using the global singleton pattern as it unnecessarily
-   // serializes data at construction/desstruction of system_contract,
-   // even if the data is not used.
    struct [[sysio::table("lastpropfins"), sysio::contract("sysio.system")]] last_prop_finalizers_info {
       std::vector<finalizer_auth_info> last_proposed_finalizers; // sorted by ascending finalizer key id
-
-      uint64_t primary_key()const { return 0; }
 
       SYSLIB_SERIALIZE( last_prop_finalizers_info, (last_proposed_finalizers) )
    };
 
-   typedef sysio::multi_index< "lastpropfins"_n, last_prop_finalizers_info >  last_prop_fins_table;
+   using last_prop_fins_global = sysio::kv::global< "lastpropfins"_n, last_prop_finalizers_info >;
 
    // A single entry storing next available finalizer key_id to make sure
    // key_id in finalizers_table will never be reused.
    struct [[sysio::table("finkeyidgen"), sysio::contract("sysio.system")]] fin_key_id_generator_info {
       uint64_t next_finalizer_key_id = 0;
-      uint64_t primary_key()const { return 0; }
 
       SYSLIB_SERIALIZE( fin_key_id_generator_info, (next_finalizer_key_id) )
    };
 
-   typedef sysio::multi_index< "finkeyidgen"_n, fin_key_id_generator_info >  fin_key_id_gen_table;
+   using fin_key_id_gen_global = sysio::kv::global< "finkeyidgen"_n, fin_key_id_generator_info >;
 
-   typedef sysio::singleton< "global"_n, sysio_global_state >   global_state_singleton;
+   using global_state_singleton = sysio::kv::global< "global"_n, sysio_global_state >;
 
    /**
     * The `sysio.system` smart contract is provided by `Wire.Network` as a sample system contract, and it defines the
@@ -225,9 +231,9 @@ namespace sysiosystem {
          producers_table          _producers;
          finalizer_keys_table     _finalizer_keys;
          finalizers_table         _finalizers;
-         last_prop_fins_table     _last_prop_finalizers;
+         last_prop_fins_global    _last_prop_finalizers;
          std::optional<std::vector<finalizer_auth_info>> _last_prop_finalizers_cached;
-         fin_key_id_gen_table     _fin_key_id_generator;
+         fin_key_id_gen_global    _fin_key_id_generator;
          global_state_singleton   _global;
          sysio_global_state       _gstate;
 
@@ -377,7 +383,7 @@ namespace sysiosystem {
 
          /**
           * Set the rank of an individual producer. Rank determines scheduling
-          * priority — lower rank values are scheduled first. Producers with
+          * priority -- lower rank values are scheduled first. Producers with
           * rank > 21 are considered standby.
           *
           * @param producer - registered producer account,
@@ -516,6 +522,103 @@ namespace sysiosystem {
          [[sysio::on_notify("auth.msg::onlinkauth")]]
          void onlinkauth(const name &user, const name &permission, const sysio::public_key &pub_key);
 
+         // ---- Emissions actions (defined in emissions.cpp) ----
+
+         /**
+          * Set or update emission configuration parameters.
+          * Must be called before any other emissions actions.
+          */
+         [[sysio::action]]
+         void setemitcfg(const emissions::emission_config& cfg);
+
+         /**
+          * Sets the starting time for Node Owner distributions.
+          */
+         [[sysio::action]]
+         void setinittime(const sysio::time_point_sec& no_reward_init_time);
+
+         /**
+          * Called inline by sysio.roa when a Node Owner is registered.
+          */
+         [[sysio::action]]
+         void addnodeowner(const sysio::name& account_name, uint8_t tier);
+
+         /**
+          * Claim vested Node Owner distribution.
+          */
+         [[sysio::action]]
+         void claimnodedis(const sysio::name& account_name);
+
+         /**
+          * Read-only: view claimable Node Owner distributions.
+          */
+         [[sysio::action, sysio::read_only]]
+         emissions::node_claim_result viewnodedist(const sysio::name& account_name);
+
+         /**
+          * Initialize the T5 treasury emissions system.
+          */
+         [[sysio::action]]
+         void initt5(const sysio::time_point_sec& start_time);
+
+         /**
+          * Pay emissions for the given sysio.epoch index. Called inline by
+          * sysio.epoch::advance on a pay-epoch (i.e., the period boundary
+          * defined by emit_cfg.pay_cadence_epochs). Auth: require_auth(
+          * "sysio.epoch").
+          *
+          * `period_emission` is the gate-computed sum of pending accrued
+          * emissions plus this epoch's per-epoch share. payepoch trusts that
+          * value (single-trx semantics make recomputation unnecessary) and
+          * distributes it across producer / batch / capital / capex / gov
+          * pools as today, scaled to the period.
+          *
+          * `batch_op_groups` is the full state.batch_op_groups vector from
+          * sysio.epoch; payepoch reads t5state.batch_group_epochs to weight
+          * the batch pool proportionally to each group's active-epoch count
+          * over the period (groups that were active in zero epochs are
+          * skipped, which can only happen when pay_cadence_epochs <
+          * batch_op_groups.size()).
+          *
+          * Runtime conditions (config missing, treasury exhausted, balance
+          * insufficient) are caught upstream by the gate, which emits an
+          * EmissionsBlocked attestation and prevents advance from proceeding.
+          */
+         [[sysio::action]]
+         void payepoch(uint32_t epoch_index,
+                       std::vector<std::vector<sysio::name>> batch_op_groups,
+                       int64_t period_emission);
+
+         /**
+          * Accrue this epoch's per-epoch emission share onto t5state, without
+          * paying. Called inline by sysio.epoch::advance on every non-pay
+          * epoch (the cadence-1..cadence-2 epochs of each pay period). Auth:
+          * require_auth("sysio.epoch").
+          *
+          * Increments t5state.pending_emission_amount by `per_epoch_emission`
+          * and bumps t5state.batch_group_epochs[batch_group_index] by 1, so
+          * the next payepoch sees the period total + per-group counts.
+          *
+          * No transfers happen here. Treasury / balance gating is the
+          * gate's responsibility upstream.
+          */
+         [[sysio::action]]
+         void accrueepoch(uint32_t epoch_index,
+                          uint8_t  batch_group_index,
+                          int64_t  per_epoch_emission);
+
+         /**
+          * Read-only: current T5 treasury emission state.
+          */
+         [[sysio::action, sysio::read_only]]
+         emissions::epoch_info_result viewepoch();
+
+         /**
+          * Read-only: all emission configuration values.
+          */
+         [[sysio::action, sysio::read_only]]
+         emissions::emission_config viewemitcfg();
+
          using init_action = sysio::action_wrapper<"init"_n, &system_contract::init>;
          using setacctram_action = sysio::action_wrapper<"setacctram"_n, &system_contract::setacctram>;
          using setacctnet_action = sysio::action_wrapper<"setacctnet"_n, &system_contract::setacctnet>;
@@ -552,7 +655,7 @@ namespace sysiosystem {
          void set_proposed_finalizers( std::vector<finalizer_auth_info> finalizers );
          const std::vector<finalizer_auth_info>& get_last_proposed_finalizers();
          uint64_t get_next_finalizer_key_id();
-         finalizers_table::const_iterator get_finalizer_itr( const name& finalizer_name ) const;
+         finalizer_info get_finalizer( const name& finalizer_name ) const;
    };
 
 }

@@ -221,6 +221,10 @@ namespace sysio::chain {
 
          transaction_trace_ptr push_transaction( const transaction_metadata_ptr& trx,
                                                  fc::time_point deadline, fc::microseconds max_transaction_time );
+         // Test-only. Production callers must use push_transaction() above. Providing
+         // explicit_billed_cpu_time bypasses chain-computed CPU billing and is only valid
+         // for test harnesses and internal replay paths. Not gated by a preprocessor flag
+         // because sysio_chain is a single library shared by test and production binaries.
          transaction_trace_ptr test_push_transaction( const transaction_metadata_ptr& trx,
                                                       fc::time_point deadline, fc::microseconds max_transaction_time,
                                                       const cpu_usage_t& billed_cpu_us, bool explicit_billed_cpu_time );
@@ -238,7 +242,11 @@ namespace sysio::chain {
             std::optional<block_handle> block;   // empty optional if block is unlinkable
          };
          // thread-safe
-         accepted_block_result accept_block( const block_id_type& id, const signed_block_ptr& b ) const;
+         // received_time, if set, is the wall-clock time the block was first received off the wire; recorded on the
+         // block_state for diagnostic logging. Default-init for callers that aren't network-receiving the block (replay,
+         // tests, locally-produced blocks).
+         accepted_block_result accept_block( const block_id_type& id, const signed_block_ptr& b,
+                                             fc::time_point received_time = fc::time_point() ) const;
 
          /// Apply any blocks that are ready from the fork_db
          struct apply_blocks_result_t {
@@ -373,7 +381,7 @@ namespace sysio::chain {
          // thread-safe
          digest_type get_strong_digest_by_id( const block_id_type& id ) const; // used in unittests
 
-         fc::sha256 calculate_integrity_hash();
+         fc::crypto::blake3 calculate_integrity_hash();
          void write_snapshot( const snapshot_writer_ptr& snapshot );
          // thread-safe
          bool is_writing_snapshot()const;
@@ -408,6 +416,11 @@ namespace sysio::chain {
          bool is_builtin_activated( builtin_protocol_feature_t f )const;
 
          bool is_known_unexpired_transaction( const transaction_id_type& id) const;
+
+         void record_transaction( const transaction_id_type& id, fc::time_point_sec expire );
+         void push_dedup_session();
+         void squash_dedup_session();
+         void undo_dedup_session();
 
          // called by host function
          int64_t set_proposed_producers( transaction_context& trx_context, vector<producer_authority> producers );

@@ -32,11 +32,15 @@ struct genesis_state {
       .min_transaction_cpu_usage            = config::default_min_transaction_cpu_usage,
 
       .max_transaction_lifetime             = config::default_max_trx_lifetime,
-      .deferred_trx_expiration_window       = config::default_deferred_trx_expiration_window,
       .max_transaction_delay                = config::default_max_trx_delay,
       .max_inline_action_size               = config::default_max_inline_action_size,
       .max_inline_action_depth              = config::default_max_inline_action_depth,
       .max_authority_depth                  = config::default_max_auth_depth,
+
+      .max_action_return_value_size         = config::default_max_action_return_value_size, ///< size limit for action return value
+      .max_kv_key_size                      = config::default_max_kv_key_size,               ///< maximum KV primary key size in bytes
+      .max_kv_value_size                    = config::default_max_kv_value_size,             ///< maximum KV value size in bytes
+      .max_kv_secondary_key_size            = config::default_max_kv_secondary_key_size     ///< maximum KV secondary key size in bytes
    };
 
    static constexpr wasm_config default_initial_wasm_configuration {

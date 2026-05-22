@@ -14,7 +14,6 @@ namespace sysio { namespace chain {
 
       id_type              id;
       account_name         name; //< name should not be changed within a chainbase modifier lambda
-      block_timestamp_type creation_date;
       uint64_t             recv_sequence = 0;
       uint64_t             auth_sequence = 0;
    };
@@ -91,9 +90,9 @@ namespace sysio { namespace chain {
       template<>
       struct billable_size<account_object> {
          // protocol feature will be needed if this increases
-         static_assert(sizeof(account_object) == 40, "account_object size changed");
+         static_assert(sizeof(account_object) == 32, "account_object size changed");
          static constexpr uint64_t overhead = overhead_per_row_per_index_ram_bytes * 2; ///< 2x indices id, name
-         static constexpr uint64_t value = 40 + overhead; ///< fixed field + overhead
+         static constexpr uint64_t value = 32 + overhead; ///< fixed field + overhead
       };
    }
 
@@ -102,6 +101,6 @@ namespace sysio { namespace chain {
 CHAINBASE_SET_INDEX_TYPE(sysio::chain::account_object, sysio::chain::account_index)
 CHAINBASE_SET_INDEX_TYPE(sysio::chain::account_metadata_object, sysio::chain::account_metadata_index)
 
-FC_REFLECT(sysio::chain::account_object, (name)(creation_date)(recv_sequence)(auth_sequence))
+FC_REFLECT(sysio::chain::account_object, (name)(recv_sequence)(auth_sequence))
 FC_REFLECT(sysio::chain::account_metadata_object, (name)(code_sequence)(abi_sequence)
                                                   (code_hash)(abi)(last_code_update)(flags)(vm_type)(vm_version))

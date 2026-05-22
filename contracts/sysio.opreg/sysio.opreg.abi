@@ -1,0 +1,988 @@
+{
+    "____comment": "This file was generated with sysio-abigen. DO NOT EDIT ",
+    "version": "sysio::abi/1.2",
+    "types": [
+        {
+            "new_type_name": "vint64_t",
+            "type": "varint_int64"
+        },
+        {
+            "new_type_name": "vuint64_t",
+            "type": "varint_uint64"
+        }
+    ],
+    "structs": [
+        {
+            "name": "ChainAddress",
+            "base": "",
+            "fields": [
+                {
+                    "name": "kind",
+                    "type": "ChainKind"
+                },
+                {
+                    "name": "address",
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
+            "name": "OperatorAction",
+            "base": "",
+            "fields": [
+                {
+                    "name": "action_type",
+                    "type": "ActionType"
+                },
+                {
+                    "name": "op_address",
+                    "type": "ChainAddress"
+                },
+                {
+                    "name": "type",
+                    "type": "OperatorType"
+                },
+                {
+                    "name": "status",
+                    "type": "OperatorStatus"
+                },
+                {
+                    "name": "amount",
+                    "type": "TokenAmount"
+                },
+                {
+                    "name": "request_id",
+                    "type": "vuint64_t"
+                },
+                {
+                    "name": "chain_code",
+                    "type": "vuint64_t"
+                },
+                {
+                    "name": "reason",
+                    "type": "string"
+                },
+                {
+                    "name": "reserve_code",
+                    "type": "vuint64_t"
+                }
+            ]
+        },
+        {
+            "name": "OperatorActionLog",
+            "base": "",
+            "fields": [
+                {
+                    "name": "action",
+                    "type": "OperatorAction"
+                },
+                {
+                    "name": "success",
+                    "type": "bool"
+                },
+                {
+                    "name": "timestamp",
+                    "type": "vint64_t"
+                },
+                {
+                    "name": "error_message",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "TokenAmount",
+            "base": "",
+            "fields": [
+                {
+                    "name": "token_code",
+                    "type": "vuint64_t"
+                },
+                {
+                    "name": "amount",
+                    "type": "vint64_t"
+                }
+            ]
+        },
+        {
+            "name": "available",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                }
+            ]
+        },
+        {
+            "name": "balance_entry",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "balance",
+                    "type": "uint64"
+                },
+                {
+                    "name": "last_updated_ms",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "cancelwtdw",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "request_id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "chain_min_bond",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "min_bond",
+                    "type": "uint64"
+                },
+                {
+                    "name": "config_timestamp_ms",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "delivery_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "log_id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "delivery_log_entry",
+            "base": "",
+            "fields": [
+                {
+                    "name": "log_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "epoch",
+                    "type": "uint32"
+                },
+                {
+                    "name": "delivered",
+                    "type": "bool"
+                },
+                {
+                    "name": "ts_ms",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "deposit",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "amount",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "depositinle",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "amount",
+                    "type": "uint64"
+                },
+                {
+                    "name": "actor_chain",
+                    "type": "ChainKind"
+                },
+                {
+                    "name": "actor_address",
+                    "type": "bytes"
+                },
+                {
+                    "name": "original_message_id",
+                    "type": "checksum256"
+                }
+            ]
+        },
+        {
+            "name": "flushwtdw",
+            "base": "",
+            "fields": [
+                {
+                    "name": "current_epoch",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "op_config",
+            "base": "",
+            "fields": [
+                {
+                    "name": "req_prod_collat",
+                    "type": "chain_min_bond[]"
+                },
+                {
+                    "name": "req_batchop_collat",
+                    "type": "chain_min_bond[]"
+                },
+                {
+                    "name": "req_uw_collat",
+                    "type": "chain_min_bond[]"
+                },
+                {
+                    "name": "max_available_producers",
+                    "type": "uint32"
+                },
+                {
+                    "name": "max_available_batch_ops",
+                    "type": "uint32"
+                },
+                {
+                    "name": "max_available_underwriters",
+                    "type": "uint32"
+                },
+                {
+                    "name": "terminate_prune_delay_ms",
+                    "type": "uint64"
+                },
+                {
+                    "name": "terminate_max_consecutive_misses",
+                    "type": "uint32"
+                },
+                {
+                    "name": "terminate_max_pct_misses_24h",
+                    "type": "uint32"
+                },
+                {
+                    "name": "terminate_window_ms",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "op_counters",
+            "base": "",
+            "fields": [
+                {
+                    "name": "next_withdraw_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "next_dellog_id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "operator_entry",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "type",
+                    "type": "OperatorType"
+                },
+                {
+                    "name": "status",
+                    "type": "OperatorStatus"
+                },
+                {
+                    "name": "is_bootstrapped",
+                    "type": "bool"
+                },
+                {
+                    "name": "balances",
+                    "type": "balance_entry[]"
+                },
+                {
+                    "name": "registered_at",
+                    "type": "uint64"
+                },
+                {
+                    "name": "available_at",
+                    "type": "uint64"
+                },
+                {
+                    "name": "updated_at",
+                    "type": "uint64"
+                },
+                {
+                    "name": "terminated_at",
+                    "type": "uint64"
+                },
+                {
+                    "name": "status_reason",
+                    "type": "string"
+                },
+                {
+                    "name": "recent_actions",
+                    "type": "OperatorActionLog[]"
+                }
+            ]
+        },
+        {
+            "name": "operator_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "processbatch",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "was_eligible",
+                    "type": "bool"
+                },
+                {
+                    "name": "is_eligible",
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "processprod",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "was_eligible",
+                    "type": "bool"
+                },
+                {
+                    "name": "is_eligible",
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "processuw",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "was_eligible",
+                    "type": "bool"
+                },
+                {
+                    "name": "is_eligible",
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "prune",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "recorddel",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "epoch",
+                    "type": "uint32"
+                },
+                {
+                    "name": "delivered",
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "regoperator",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "type",
+                    "type": "OperatorType"
+                },
+                {
+                    "name": "is_bootstrapped",
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "releaselock",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "amount",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "setconfig",
+            "base": "",
+            "fields": [
+                {
+                    "name": "max_available_producers",
+                    "type": "uint32"
+                },
+                {
+                    "name": "max_available_batch_ops",
+                    "type": "uint32"
+                },
+                {
+                    "name": "max_available_underwriters",
+                    "type": "uint32"
+                },
+                {
+                    "name": "terminate_prune_delay_ms",
+                    "type": "uint64"
+                },
+                {
+                    "name": "terminate_max_consecutive_misses",
+                    "type": "uint32"
+                },
+                {
+                    "name": "terminate_max_pct_misses_24h",
+                    "type": "uint32"
+                },
+                {
+                    "name": "terminate_window_ms",
+                    "type": "uint64"
+                },
+                {
+                    "name": "req_prod_collat",
+                    "type": "chain_min_bond[]"
+                },
+                {
+                    "name": "req_batchop_collat",
+                    "type": "chain_min_bond[]"
+                },
+                {
+                    "name": "req_uw_collat",
+                    "type": "chain_min_bond[]"
+                }
+            ]
+        },
+        {
+            "name": "slash",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "reason",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "slug_name",
+            "base": "",
+            "fields": [
+                {
+                    "name": "value",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "termcheck",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "terminate",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "reason",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "varint_int64",
+            "base": "",
+            "fields": [
+                {
+                    "name": "value",
+                    "type": "int64"
+                }
+            ]
+        },
+        {
+            "name": "varint_uint64",
+            "base": "",
+            "fields": [
+                {
+                    "name": "value",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "withdraw",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "amount",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "withdraw_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "request_id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "withdraw_request",
+            "base": "",
+            "fields": [
+                {
+                    "name": "request_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "amount",
+                    "type": "uint64"
+                },
+                {
+                    "name": "eligible_at_epoch",
+                    "type": "uint32"
+                },
+                {
+                    "name": "requested_at_epoch",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "withdrawinle",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "amount",
+                    "type": "uint64"
+                }
+            ]
+        }
+    ],
+    "actions": [
+        {
+            "name": "available",
+            "type": "available",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "cancelwtdw",
+            "type": "cancelwtdw",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "deposit",
+            "type": "deposit",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "depositinle",
+            "type": "depositinle",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "flushwtdw",
+            "type": "flushwtdw",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "processbatch",
+            "type": "processbatch",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "processprod",
+            "type": "processprod",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "processuw",
+            "type": "processuw",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "prune",
+            "type": "prune",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "recorddel",
+            "type": "recorddel",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "regoperator",
+            "type": "regoperator",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "releaselock",
+            "type": "releaselock",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "setconfig",
+            "type": "setconfig",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "slash",
+            "type": "slash",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "termcheck",
+            "type": "termcheck",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "terminate",
+            "type": "terminate",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "withdraw",
+            "type": "withdraw",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "withdrawinle",
+            "type": "withdrawinle",
+            "ricardian_contract": ""
+        }
+    ],
+    "tables": [
+        {
+            "name": "dellog",
+            "type": "delivery_log_entry",
+            "index_type": "i64",
+            "key_names": ["log_id"],
+            "key_types": ["uint64"],
+            "table_id": 14972,
+            "secondary_indexes": [
+                {
+                    "name": "byaccountts",
+                    "key_type": "uint128",
+                    "table_id": 30319
+                }
+            ]
+        },
+        {
+            "name": "opconfig",
+            "type": "op_config",
+            "index_type": "i64",
+            "key_names": ["name"],
+            "key_types": ["name"],
+            "table_id": 47741
+        },
+        {
+            "name": "opcounters",
+            "type": "op_counters",
+            "index_type": "i64",
+            "key_names": ["name"],
+            "key_types": ["name"],
+            "table_id": 45183
+        },
+        {
+            "name": "operators",
+            "type": "operator_entry",
+            "index_type": "i64",
+            "key_names": ["account"],
+            "key_types": ["uint64"],
+            "table_id": 44239,
+            "secondary_indexes": [
+                {
+                    "name": "bytype",
+                    "key_type": "uint64",
+                    "table_id": 8691
+                },
+                {
+                    "name": "bystatus",
+                    "key_type": "uint64",
+                    "table_id": 57937
+                }
+            ]
+        },
+        {
+            "name": "wtdwqueue",
+            "type": "withdraw_request",
+            "index_type": "i64",
+            "key_names": ["request_id"],
+            "key_types": ["uint64"],
+            "table_id": 12732,
+            "secondary_indexes": [
+                {
+                    "name": "byeligible",
+                    "key_type": "uint64",
+                    "table_id": 49033
+                },
+                {
+                    "name": "byaccount",
+                    "key_type": "uint64",
+                    "table_id": 34233
+                }
+            ]
+        }
+    ],
+    "ricardian_clauses": [],
+    "variants": [],
+    "action_results": [
+        {
+            "name": "available",
+            "result_type": "uint64"
+        }
+    ],
+    "enums": [
+        {
+            "name": "ActionType",
+            "type": "int32",
+            "values": [
+                {
+                    "name": "ACTION_TYPE_UNKNOWN",
+                    "value": 0
+                },
+                {
+                    "name": "ACTION_TYPE_DEPOSIT_REQUEST",
+                    "value": 1
+                },
+                {
+                    "name": "ACTION_TYPE_WITHDRAW_REQUEST",
+                    "value": 2
+                },
+                {
+                    "name": "ACTION_TYPE_WITHDRAW_REMIT",
+                    "value": 3
+                },
+                {
+                    "name": "ACTION_TYPE_SLASH",
+                    "value": 4
+                }
+            ]
+        },
+        {
+            "name": "ChainKind",
+            "type": "int32",
+            "values": [
+                {
+                    "name": "CHAIN_KIND_UNKNOWN",
+                    "value": 0
+                },
+                {
+                    "name": "CHAIN_KIND_WIRE",
+                    "value": 1
+                },
+                {
+                    "name": "CHAIN_KIND_EVM",
+                    "value": 2
+                },
+                {
+                    "name": "CHAIN_KIND_SVM",
+                    "value": 3
+                }
+            ]
+        },
+        {
+            "name": "OperatorStatus",
+            "type": "int32",
+            "values": [
+                {
+                    "name": "OPERATOR_STATUS_UNKNOWN",
+                    "value": 0
+                },
+                {
+                    "name": "OPERATOR_STATUS_WARMUP",
+                    "value": 1
+                },
+                {
+                    "name": "OPERATOR_STATUS_COOLDOWN",
+                    "value": 2
+                },
+                {
+                    "name": "OPERATOR_STATUS_ACTIVE",
+                    "value": 3
+                },
+                {
+                    "name": "OPERATOR_STATUS_TERMINATED",
+                    "value": 240
+                },
+                {
+                    "name": "OPERATOR_STATUS_SLASHED",
+                    "value": 241
+                }
+            ]
+        },
+        {
+            "name": "OperatorType",
+            "type": "int32",
+            "values": [
+                {
+                    "name": "OPERATOR_TYPE_UNKNOWN",
+                    "value": 0
+                },
+                {
+                    "name": "OPERATOR_TYPE_PRODUCER",
+                    "value": 1
+                },
+                {
+                    "name": "OPERATOR_TYPE_BATCH",
+                    "value": 2
+                },
+                {
+                    "name": "OPERATOR_TYPE_UNDERWRITER",
+                    "value": 3
+                },
+                {
+                    "name": "OPERATOR_TYPE_CHALLENGER",
+                    "value": 4
+                }
+            ]
+        }
+    ]
+}

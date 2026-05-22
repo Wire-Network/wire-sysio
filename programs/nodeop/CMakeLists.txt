@@ -3,6 +3,8 @@ configure_file(config.hpp.in config.hpp ESCAPE_QUOTES)
 
 chain_target(${NODE_EXECUTABLE_NAME} SOURCE_FILES main.cpp)
 
+apply_malloc_config(${NODE_EXECUTABLE_NAME})
+
 macro(sysio_additional_plugin)
     set(ADDITIONAL_PLUGINS_TARGET "${ADDITIONAL_PLUGINS_TARGET};${ARGN}" PARENT_SCOPE)
 endmacro()

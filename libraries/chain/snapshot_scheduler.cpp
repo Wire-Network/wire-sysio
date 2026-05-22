@@ -170,12 +170,9 @@ void snapshot_scheduler::create_snapshot(next_function<snapshot_information> nex
    auto write_snapshot = [&](const fs::path& p) -> void {
       if(predicate) predicate();
       fs::create_directory(p.parent_path());
-      auto snap_out = std::ofstream(p.generic_string(), (std::ios::out | std::ios::binary));
-      auto writer = std::make_shared<ostream_snapshot_writer>(snap_out);
+      auto writer = std::make_shared<threaded_snapshot_writer>(p);
       chain.write_snapshot(writer);
       writer->finalize();
-      snap_out.flush();
-      snap_out.close();
    };
 
    // If in irreversible mode, create snapshot and return path to snapshot immediately.
@@ -204,9 +201,12 @@ void snapshot_scheduler::create_snapshot(next_function<snapshot_information> nex
    if(existing != pending_by_id.end()) {
       // if a snapshot at this block is already pending, attach this requests handler to it
       pending_by_id.modify(existing, [&next](auto& entry) {
-         entry.next = [prev = entry.next, next](const next_function_variant<snapshot_information>& res) {
-            prev(res);
-            next(res);
+         entry.next = [prev = entry.next, next](next_function_variant<snapshot_information>&& res) {
+            // Fan-out to two next_functions: each must receive its own variant copy
+            // so neither sees a moved-from value.  next_function::operator() is
+            // rvalue-only, so the copy is required and visible.
+            prev(next_function_variant<snapshot_information>{res});
+            next(std::move(res));
          };
       });
    } else {
