@@ -24,6 +24,10 @@ namespace sysio::chain {
       static constexpr int              max_len  = 13;
       static constexpr std::string_view alphabet = ".12345abcdefghijklmnopqrstuvwxyz";
 
+      // Symbol 0 ('.') is an ordinary interior character, not a terminator:
+      // to_string() keeps interior dots and only trims trailing padding.
+      static constexpr bool             zero_terminates = false;
+
       // Declared here, defined in name.cpp — keeps <sysio/chain/exceptions.hpp>
       // and the SYS_ASSERT machinery out of this very widely-included header.
       [[noreturn]] static void throw_invalid( std::string_view in, const char* why );

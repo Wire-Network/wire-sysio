@@ -40,6 +40,11 @@ struct slug_name_traits {
    static constexpr std::string_view alphabet{ alphabet_storage,
                                                sizeof(alphabet_storage) - 1 };
 
+   // A symbol-0 ('\0') slot terminates the string — to_string() stops there, so
+   // a raw value with an interior zero decodes identically to the contract-side
+   // sysio::slug_name, which also stops at the first zero.
+   static constexpr bool zero_terminates = true;
+
    [[noreturn]] static void throw_invalid( std::string_view in, const char* why ) {
       FC_ASSERT( false, "invalid slug_name '{}': {}", std::string(in), why );
       __builtin_unreachable();

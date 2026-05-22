@@ -8,14 +8,11 @@
  * symbol first, so that integer ordering matches string ordering. They differ
  * only in alphabet and length, which Traits supplies.
  *
- * A Traits type must provide:
- *   static constexpr int              max_len;   // number of symbols
- *   static constexpr std::string_view alphabet;  // alphabet[s] is symbol s's
- *                                                // character; alphabet[0] is the
- *                                                // pad symbol. char -> symbol is
- *                                                // derived (any char not in the
- *                                                // alphabet maps to symbol 0).
- *   [[noreturn]] static void throw_invalid(std::string_view in, const char* why);
+ * Traits is the policy that specialises the template; it must satisfy the
+ * basic_name_traits concept (declared below). alphabet[0] is the pad symbol and
+ * any character outside the alphabet maps to symbol 0. zero_terminates selects
+ * how to_string() treats a symbol-0 slot — a hard terminator (slug_name) or an
+ * ordinary interior character (name's '.').
  *
  * The symbol width is derived — the minimal bits to index the alphabet,
  * ceil(log2(alphabet.size())). Symbols are packed most-significant-first; when
@@ -32,6 +29,7 @@
 #include <fc/reflect/reflect.hpp>
 
 #include <compare>
+#include <concepts>
 #include <cstddef>
 #include <cstdint>
 #include <iosfwd>
@@ -40,7 +38,21 @@
 
 namespace fc {
 
+/// Compile-time contract for a basic_name Traits policy: an alphabet and a
+/// length, a zero_terminates flag steering to_string(), and an invalid-input
+/// hook. Enforced in place of a prose list of trait requirements.
 template <typename Traits>
+concept basic_name_traits =
+   requires( std::string_view in, const char* why ) {
+      { Traits::max_len }                -> std::convertible_to<int>;
+      { Traits::alphabet }               -> std::convertible_to<std::string_view>;
+      { Traits::zero_terminates }        -> std::convertible_to<bool>;
+      { Traits::throw_invalid(in, why) } -> std::same_as<void>;
+   }
+   && Traits::max_len > 0
+   && std::string_view{ Traits::alphabet }.size() > 0;
+
+template <basic_name_traits Traits>
 struct basic_name {
    uint64_t value = 0;
 
@@ -83,12 +95,18 @@ struct basic_name {
       std::string s;
       for (int i = 0; i < Traits::max_len; ++i) {
          const uint64_t sym = (value >> shift(i)) & width_mask(i);
+         // A zero-terminated alphabet (slug_name) ends at the first symbol-0
+         // slot; for name, symbol 0 ('.') is an ordinary interior character.
+         if (Traits::zero_terminates && sym == 0)
+            break;
          s.push_back(char_of(sym));
       }
-      // trailing symbol-0 slots are padding, not content
-      const char pad = char_of(0);
-      while (!s.empty() && s.back() == pad)
-         s.pop_back();
+      if (!Traits::zero_terminates) {
+         // trailing symbol-0 slots are padding, not content
+         const char pad = char_of(0);
+         while (!s.empty() && s.back() == pad)
+            s.pop_back();
+      }
       return s;
    }
 
