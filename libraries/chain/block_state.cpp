@@ -269,14 +269,17 @@ block_state::block_state(snapshot_detail::snapshot_block_state_v1&& sbs)
       validate_prop_pol(*latest_pending_proposer_policy, "latest_pending");
    }
 
-   // Snapshot hardening: validate valid_t
-   if (valid) {
-      valid->validation_tree.validate_snapshot();
-      auto expected_size = core.current_block_num() - core.last_final_block_num() + 1;
-      SYS_ASSERT(valid->validation_mroots.size() == expected_size, snapshot_exception,
-                 "valid_t.validation_mroots size ({}) != expected ({})",
-                 valid->validation_mroots.size(), expected_size);
-   }
+   // Snapshot hardening: validate valid_t. A snapshot is never taken at genesis, so
+   // every snapshot block_state must carry a valid_t (finality-tree) structure. A null
+   // valid is a tampered or truncated snapshot; without this check get_validation_mroot()
+   // would later return an empty digest (after a debug-only assert) and the corruption
+   // would surface only indirectly as a finality_mroot mismatch in apply_block.
+   SYS_ASSERT(valid, snapshot_exception, "snapshot block_state must have a valid_t finality structure");
+   valid->validation_tree.validate_snapshot();
+   auto expected_size = core.current_block_num() - core.last_final_block_num() + 1;
+   SYS_ASSERT(valid->validation_mroots.size() == expected_size, snapshot_exception,
+              "valid_t.validation_mroots size ({}) != expected ({})",
+              valid->validation_mroots.size(), expected_size);
 }
 
 deque<transaction_metadata_ptr> block_state::extract_trxs_metas() {

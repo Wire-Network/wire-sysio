@@ -660,4 +660,25 @@ BOOST_AUTO_TEST_CASE(snapshot_empty_core_rejected) try {
       fc_exception_message_contains("links must not be empty"));
 } FC_LOG_AND_RETHROW()
 
+// A snapshot is never taken at genesis, so every snapshot block_state must carry a
+// valid_t (finality-tree) structure. A tampered snapshot that nulls it out must be
+// rejected at construction: get_validation_mroot() would otherwise return an empty
+// digest (after a debug-only assert) and the corruption would surface only later as
+// a finality_mroot mismatch in apply_block.
+BOOST_AUTO_TEST_CASE(snapshot_null_valid_rejected) try {
+   savanna_tester chain;
+   chain.produce_blocks(4);
+
+   const auto head_handle = chain.control->head();
+   const auto& live_bsp = block_handle_accessor::get_bsp(head_handle);
+   BOOST_REQUIRE(!live_bsp->core.is_genesis_core());
+
+   snapshot_detail::snapshot_block_state_v1 sbs{*live_bsp};
+   BOOST_REQUIRE(sbs.valid); // a validated head block carries a valid_t structure
+   sbs.valid.reset();        // tamper: null it out before construction
+
+   BOOST_CHECK_EXCEPTION(block_state{std::move(sbs)}, snapshot_exception,
+      fc_exception_message_contains("valid_t finality structure"));
+} FC_LOG_AND_RETHROW()
+
 BOOST_AUTO_TEST_SUITE_END()
