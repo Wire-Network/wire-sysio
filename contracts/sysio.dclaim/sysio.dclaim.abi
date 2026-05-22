@@ -205,12 +205,7 @@
             ]
         },
         {
-            "name": "setconfig",
-            "base": "",
-            "fields": []
-        },
-        {
-            "name": "setwindow",
+            "name": "setclmwindow",
             "base": "",
             "fields": [
                 {
@@ -218,6 +213,11 @@
                     "type": "uint32"
                 }
             ]
+        },
+        {
+            "name": "setconfig",
+            "base": "",
+            "fields": []
         },
         {
             "name": "unmapped_key",
@@ -288,13 +288,13 @@
             "ricardian_contract": ""
         },
         {
-            "name": "setconfig",
-            "type": "setconfig",
+            "name": "setclmwindow",
+            "type": "setclmwindow",
             "ricardian_contract": ""
         },
         {
-            "name": "setwindow",
-            "type": "setwindow",
+            "name": "setconfig",
+            "type": "setconfig",
             "ricardian_contract": ""
         }
     ],

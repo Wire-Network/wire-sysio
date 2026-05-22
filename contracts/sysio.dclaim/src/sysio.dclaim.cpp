@@ -1,4 +1,4 @@
-#include <sysio.cap/sysio.cap.hpp>
+#include <sysio.dclaim/sysio.dclaim.hpp>
 
 #include <cstdint>
 #include <string>
@@ -33,16 +33,16 @@ auto scan_find(Index& idx, uint128_t key, KeyFn key_of, MatchFn matches) {
 
 /// Current claimable-reward window (seconds) from config, default if unset.
 uint32_t config_window(name self) {
-   cap::capcfg_t cfg(self);
-   return cfg.get_or_default(cap::cap_config{}).claim_window_sec;
+   dclaim::capcfg_t cfg(self);
+   return cfg.get_or_default(dclaim::cap_config{}).claim_window_sec;
 }
 
 /// Allocate the next id from one of the monotonic counters. `pick` returns a
 /// reference to the field to bump.
 template<class Pick>
 uint64_t next_id(name self, Pick pick) {
-   cap::capcounters_t cnt(self);
-   cap::cap_counters c = cnt.get_or_default(cap::cap_counters{});
+   dclaim::capcounters_t cnt(self);
+   dclaim::cap_counters c = cnt.get_or_default(dclaim::cap_counters{});
    uint64_t& field = pick(c);
    uint64_t id = field++;
    cnt.set(c, self);
@@ -59,15 +59,15 @@ void credit_wire(name self, name wacct, ChainKind chain,
    const uint32_t exp = now_sec() + window;
 
    if (wacct.value != 0) {
-      cap::pclaims_t pclaims(self);
-      auto it = pclaims.find(cap::pclaim_key{wacct.value});
+      dclaim::pclaims_t pclaims(self);
+      auto it = pclaims.find(dclaim::pclaim_key{wacct.value});
       if (it == pclaims.end()) {
-         pclaims.emplace(self, cap::pclaim_key{wacct.value},
-            cap::pending_claim{ .wire_account = wacct,
+         pclaims.emplace(self, dclaim::pclaim_key{wacct.value},
+            dclaim::pending_claim{ .wire_account = wacct,
                                 .balance      = amt,
                                 .expires_at_sec = exp });
       } else {
-         pclaims.modify(same_payer, cap::pclaim_key{wacct.value}, [&](auto& r) {
+         pclaims.modify(same_payer, dclaim::pclaim_key{wacct.value}, [&](auto& r) {
             r.balance        += amt;
             r.expires_at_sec  = exp;
          });
@@ -75,26 +75,26 @@ void credit_wire(name self, name wacct, ChainKind chain,
       return;
    }
 
-   cap::unmapped_t unmapped(self);
+   dclaim::unmapped_t unmapped(self);
    auto idx = unmapped.template get_index<"bychainad"_n>();
-   auto it = scan_find(idx, cap::chain_addr_key(chain, addr),
+   auto it = scan_find(idx, dclaim::chain_addr_key(chain, addr),
                        [](const auto& r) { return r.by_chain_addr(); },
                        [&](const auto& r) {
                           return r.chain_kind == chain && r.native_pubkey == addr;
                        });
    if (it == idx.end()) {
-      uint64_t id = next_id(self, [](cap::cap_counters& c) -> uint64_t& {
+      uint64_t id = next_id(self, [](dclaim::cap_counters& c) -> uint64_t& {
          return c.next_unmapped_id;
       });
-      unmapped.emplace(self, cap::unmapped_key{id},
-         cap::unmapped_token{ .id             = id,
+      unmapped.emplace(self, dclaim::unmapped_key{id},
+         dclaim::unmapped_token{ .id             = id,
                               .chain_kind     = chain,
                               .native_pubkey  = addr,
                               .balance        = amt,
                               .expires_at_sec = exp });
    } else {
       uint64_t rid = it->id;
-      unmapped.modify(same_payer, cap::unmapped_key{rid}, [&](auto& r) {
+      unmapped.modify(same_payer, dclaim::unmapped_key{rid}, [&](auto& r) {
          r.balance        += amt;
          r.expires_at_sec  = exp;
       });
@@ -108,9 +108,9 @@ void credit_wire(name self, name wacct, ChainKind chain,
 /// still staged awaiting a quote.
 bool cursor_admit(name self, uint64_t outpost_id, ChainKind chain,
                   const std::vector<char>& addr, uint64_t ext_ref) {
-   cap::rwdcursors_t cur(self);
+   dclaim::rwdcursors_t cur(self);
    auto idx = cur.template get_index<"byoutaddr"_n>();
-   auto it = scan_find(idx, cap::outpost_addr_key(outpost_id, chain, addr),
+   auto it = scan_find(idx, dclaim::outpost_addr_key(outpost_id, chain, addr),
                        [](const auto& r) { return r.by_outpost_addr(); },
                        [&](const auto& r) {
                           return r.outpost_id == outpost_id
@@ -118,11 +118,11 @@ bool cursor_admit(name self, uint64_t outpost_id, ChainKind chain,
                               && r.native_pubkey == addr;
                        });
    if (it == idx.end()) {
-      uint64_t id = next_id(self, [](cap::cap_counters& c) -> uint64_t& {
+      uint64_t id = next_id(self, [](dclaim::cap_counters& c) -> uint64_t& {
          return c.next_cursor_id;
       });
-      cur.emplace(self, cap::rwdcur_key{id},
-         cap::reward_cursor{ .id         = id,
+      cur.emplace(self, dclaim::rwdcur_key{id},
+         dclaim::reward_cursor{ .id         = id,
                              .outpost_id = outpost_id,
                              .chain      = chain,
                              .native_pubkey = addr,
@@ -131,7 +131,7 @@ bool cursor_admit(name self, uint64_t outpost_id, ChainKind chain,
    }
    if (ext_ref <= it->last_external_epoch_ref) return false;
    uint64_t rid = it->id;
-   cur.modify(same_payer, cap::rwdcur_key{rid}, [&](auto& r) {
+   cur.modify(same_payer, dclaim::rwdcur_key{rid}, [&](auto& r) {
       r.last_external_epoch_ref = ext_ref;
    });
    return true;
@@ -142,7 +142,7 @@ bool cursor_admit(name self, uint64_t outpost_id, ChainKind chain,
 // ---------------------------------------------------------------------------
 //  setconfig
 // ---------------------------------------------------------------------------
-void cap::setconfig() {
+void dclaim::setconfig() {
    require_auth(get_self());
    capcfg_t cfg(get_self());
    if (!cfg.exists()) {
@@ -151,9 +151,9 @@ void cap::setconfig() {
 }
 
 // ---------------------------------------------------------------------------
-//  setwindow
+//  setclmwindow
 // ---------------------------------------------------------------------------
-void cap::setwindow(uint32_t window_sec) {
+void dclaim::setclmwindow(uint32_t window_sec) {
    require_auth(get_self());
    check(window_sec > 0, "window_sec must be positive");
    capcfg_t cfg(get_self());
@@ -165,7 +165,7 @@ void cap::setwindow(uint32_t window_sec) {
 // ---------------------------------------------------------------------------
 //  claim
 // ---------------------------------------------------------------------------
-void cap::claim(name wire_account) {
+void dclaim::claim(name wire_account) {
    require_auth(wire_account);
 
    pclaims_t pclaims(get_self());
@@ -179,14 +179,14 @@ void cap::claim(name wire_account) {
       permission_level{ get_self(), "active"_n },
       TOKEN_ACCOUNT,
       "transfer"_n,
-      std::make_tuple(get_self(), wire_account, payout, std::string("sysio.cap claim"))
+      std::make_tuple(get_self(), wire_account, payout, std::string("sysio.dclaim claim"))
    ).send();
 }
 
 // ---------------------------------------------------------------------------
 //  linkswept — AuthX link completed: sweep unmapped -> pending.
 // ---------------------------------------------------------------------------
-void cap::linkswept(name wire_account, ChainKind chain, std::vector<char> native_pubkey) {
+void dclaim::linkswept(name wire_account, ChainKind chain, std::vector<char> native_pubkey) {
    require_auth(AUTHEX_ACCOUNT);
 
    const uint32_t window = config_window(get_self());
@@ -211,7 +211,7 @@ void cap::linkswept(name wire_account, ChainKind chain, std::vector<char> native
 // ---------------------------------------------------------------------------
 //  onreward — per-staker WIRE-side credit of a STAKING_REWARD
 // ---------------------------------------------------------------------------
-void cap::onreward(uint64_t              outpost_id,
+void dclaim::onreward(uint64_t              outpost_id,
                    std::string           staker_wire_account,
                    opp::types::ChainKind reward_chain,
                    std::vector<char>     staker_native_addr,
@@ -222,7 +222,7 @@ void cap::onreward(uint64_t              outpost_id,
    require_auth(MSGCH_ACCOUNT);
 
    // Tolerate degenerate input rather than aborting the inbound OPP envelope
-   // (the verifier role lives upstream in msgch::evalcons; cap trusts but
+   // (the verifier role lives upstream in msgch::evalcons; dclaim trusts but
    // must not break the message chain on a malformed row).
    if (reward_amount == 0 || staker_native_addr.empty()) return;
 
@@ -247,9 +247,9 @@ void cap::onreward(uint64_t              outpost_id,
 
 // ---------------------------------------------------------------------------
 //  flushexpired — prune expired rows; credited WIRE reverts to the capital
-//  fund (it simply stays in the sysio.cap balance once the row is erased).
+//  fund (it simply stays in the sysio.dclaim balance once the row is erased).
 // ---------------------------------------------------------------------------
-void cap::flushexpired(uint32_t max_rows) {
+void dclaim::flushexpired(uint32_t max_rows) {
    const uint32_t cutoff = now_sec();
    uint32_t budget = max_rows;
 
@@ -277,7 +277,7 @@ void cap::flushexpired(uint32_t max_rows) {
 // ---------------------------------------------------------------------------
 //  importseed — bootstrap pre-launch holders into unmapped_tokens
 // ---------------------------------------------------------------------------
-void cap::importseed(ChainKind chain, std::vector<import_credit> credits) {
+void dclaim::importseed(ChainKind chain, std::vector<import_credit> credits) {
    require_auth(get_self());
 
    capcfg_t cfg(get_self());
@@ -304,7 +304,7 @@ void cap::importseed(ChainKind chain, std::vector<import_credit> credits) {
 // ---------------------------------------------------------------------------
 //  importdone
 // ---------------------------------------------------------------------------
-void cap::importdone() {
+void dclaim::importdone() {
    require_auth(get_self());
    capcfg_t cfg(get_self());
    cap_config current = cfg.get_or_default(cap_config{});

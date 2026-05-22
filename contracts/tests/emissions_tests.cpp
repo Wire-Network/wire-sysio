@@ -408,7 +408,7 @@ public:
    // -----------------------------
    void create_t5_holding_accounts() {
       vector<account_name> accts = {
-         "sysio.cap"_n, "sysio.gov"_n, "sysio.batch"_n, "sysio.ops"_n
+         "sysio.dclaim"_n, "sysio.gov"_n, "sysio.batch"_n, "sysio.ops"_n
       };
       for (auto a : accts) {
          if (!control->db().find<account_object, by_name>(a)) {
@@ -2486,7 +2486,7 @@ BOOST_FIXTURE_TEST_CASE( active_producers_get_equal_share, sysio_emissions_teste
 // ---------------------------------------------------------------------------
 
 BOOST_FIXTURE_TEST_CASE( holding_accounts_receive_correct_amounts, sysio_emissions_tester ) try {
-   // Category bucket recipients are fixed accounts (sysio.cap / sysio.gov / sysio.ops).
+   // Category bucket recipients are fixed accounts (sysio.dclaim / sysio.gov / sysio.ops).
    // The batch-op share is NOT sent to a holding account -- it is split across the
    // members of the current sysio.epoch batch_op_groups rotation slot. When no
    // operators are registered, the entire batch_pool stays in the treasury.
@@ -2494,7 +2494,7 @@ BOOST_FIXTURE_TEST_CASE( holding_accounts_receive_correct_amounts, sysio_emissio
    const uint32_t start = head_secs() - ONE_EPOCH - 1;
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
 
-   asset cap_before   = get_wire_balance("sysio.cap"_n);
+   asset dclaim_before   = get_wire_balance("sysio.dclaim"_n);
    asset gov_before   = get_wire_balance("sysio.gov"_n);
    asset batch_before = get_wire_balance("sysio.batch"_n);
    asset ops_before   = get_wire_balance("sysio.ops"_n);
@@ -2507,12 +2507,12 @@ BOOST_FIXTURE_TEST_CASE( holding_accounts_receive_correct_amounts, sysio_emissio
    int64_t gov      = log["governance_amount"].as<int64_t>();
    int64_t capex_base = test_split_bps(emission, CAPEX_BPS);
 
-   int64_t cap_received   = get_wire_balance("sysio.cap"_n).get_amount()   - cap_before.get_amount();
+   int64_t dclaim_received   = get_wire_balance("sysio.dclaim"_n).get_amount()   - dclaim_before.get_amount();
    int64_t gov_received   = get_wire_balance("sysio.gov"_n).get_amount()   - gov_before.get_amount();
    int64_t batch_received = get_wire_balance("sysio.batch"_n).get_amount() - batch_before.get_amount();
    int64_t ops_received   = get_wire_balance("sysio.ops"_n).get_amount()   - ops_before.get_amount();
 
-   BOOST_REQUIRE_EQUAL( cap_received, capital );
+   BOOST_REQUIRE_EQUAL( dclaim_received, capital );
    BOOST_REQUIRE_EQUAL( gov_received, gov );
    // sysio.batch is not an emissions recipient anymore -- batch pay goes to the
    // current rotation group, not a holding account.

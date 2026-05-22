@@ -501,7 +501,7 @@ void dispatch_attestation(name self, uint64_t attestation_id,
          break;
 
       case AttestationType::ATTESTATION_TYPE_STAKING_REWARD:
-         // Per-staker staking reward -> sysio.cap claim ledger. The v6
+         // Per-staker staking reward -> sysio.dclaim claim ledger. The v6
          // staking-reward path does not deposit back to a reserve (the
          // external-pool credit and native -> WIRE conversion are
          // outpost-side), so the pre-v6 reserv::onreward leg is dropped and
@@ -514,12 +514,12 @@ void dispatch_attestation(name self, uint64_t attestation_id,
             const uint64_t reward_raw =
                static_cast<uint64_t>(static_cast<int64_t>(sr.reward_amount.amount));
             // staker_wire_account.name is the raw account string (empty =>
-            // staker not yet AuthX-linked, so sysio.cap parks by native
+            // staker not yet AuthX-linked, so sysio.dclaim parks by native
             // address). staker_native_address carries the chain (kind) and
             // the raw address bytes.
             action(
                permission_level{self, "active"_n},
-               "sysio.cap"_n, "onreward"_n,
+               "sysio.dclaim"_n, "onreward"_n,
                std::make_tuple(sr.outpost_id,
                                sr.staker_wire_account.name,
                                sr.staker_native_address.kind,

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Convert the indexer JSON dump into sysio.cap::importseed action batches.
+"""Convert the indexer JSON dump into sysio.dclaim::importseed action batches.
 
 Live sources:
   ETH: curl -H 'x-api-key: <key>' https://index.wire.foundation/opp/balances
@@ -36,7 +36,7 @@ Per-address conversion:
 Rows with wire_atomic == 0 are filtered. Output is a JSON array of
 importseed action arg objects, each batched up to --batch-size credits
 per call. `native_address` is emitted as the hex spelling of the raw
-bytes (no 0x prefix), which the sysio.cap ABI consumes as `bytes`.
+bytes (no 0x prefix), which the sysio.dclaim ABI consumes as `bytes`.
 
 Batching: default is 10,000 credits per trx, which fits well inside
 the 150ms execution / 500KB transaction-size envelope. At launch
@@ -103,7 +103,7 @@ CHAIN_CONFIG = {
 # ---------------------------------------------------------------------------
 def parse_args() -> argparse.Namespace:
    ap = argparse.ArgumentParser(
-      description="Emit sysio.cap::importseed batches from the indexer JSON.",
+      description="Emit sysio.dclaim::importseed batches from the indexer JSON.",
       formatter_class=argparse.RawDescriptionHelpFormatter,
       epilog=__doc__,
    )

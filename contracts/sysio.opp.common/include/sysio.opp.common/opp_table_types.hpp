@@ -567,7 +567,7 @@ DataStream& operator>>(DataStream& ds, NodeOwnerReg& t) {
 
 // StakingReward — the single staker-reward feedback path. `sysio.msgch`
 // routes it twice: the aggregate native amount to `sysio.reserv::onreward`
-// (outpost-side reserve), and the per-staker body to `sysio.cap::onreward`
+// (outpost-side reserve), and the per-staker body to `sysio.dclaim::onreward`
 // (WIRE-side claim ledger). Field order mirrors the proto (1..7).
 template <typename DataStream>
 DataStream& operator<<(DataStream& ds, const StakingReward& t) {

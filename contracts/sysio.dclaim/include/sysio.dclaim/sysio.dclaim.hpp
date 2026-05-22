@@ -17,7 +17,7 @@
 namespace sysio {
 
    /**
-    * @brief sysio.cap — depot-side WIRE distribution and claim ledger.
+    * @brief sysio.dclaim — depot-side WIRE distribution and claim ledger.
     *
     * Holds the pending-WIRE balances owed to LIQ-token stakers and pre-launch
     * pretoken purchasers, and the per-staker WIRE-side leg of the
@@ -42,16 +42,16 @@ namespace sysio {
     *
     * Claimable lifespan: every credited / staged balance carries an
     * `expires_at_sec`. `flushexpired` prunes anything past it; the WIRE stays
-    * in the `sysio.cap` account balance — i.e. it reverts into the staking
+    * in the `sysio.dclaim` account balance — i.e. it reverts into the staking
     * capital fund for redistribution. The window is configurable
-    * (`setwindow`), defaulting to 180 days.
+    * (`setclmwindow`), defaulting to 180 days.
     *
     * No cooldown/withdrawal machinery for v1 (no withdrawal flow in this
     * wave). When withdrawals come online post-launch, the cooldown-queue +
     * maturation-flush pattern can be added back — see opreg's
     * `withdraw_queue` for reference.
     */
-   class [[sysio::contract("sysio.cap")]] cap : public contract {
+   class [[sysio::contract("sysio.dclaim")]] dclaim : public contract {
    public:
       using contract::contract;
 
@@ -65,7 +65,7 @@ namespace sysio {
       static constexpr symbol WIRE_SYM = symbol("WIRE", 9);
 
       // Default claimable-reward lifespan: 180 days, in seconds. Configurable
-      // per deployment via `setwindow`.
+      // per deployment via `setclmwindow`.
       static constexpr uint32_t DEFAULT_CLAIM_WINDOW_SEC = 180u * 24u * 60u * 60u;
 
       // -----------------------------------------------------------------------
@@ -80,10 +80,10 @@ namespace sysio {
       /// Set the claimable-reward window (seconds). Unclaimed balances older
       /// than this revert to the capital fund on `flushexpired`. Auth=self.
       [[sysio::action]]
-      void setwindow(uint32_t window_sec);
+      void setclmwindow(uint32_t window_sec);
 
       /// User-callable: drain the caller's `pending_claims` row via an inline
-      /// transfer of WIRE from `sysio.cap` to `wire_account`. Erases the row.
+      /// transfer of WIRE from `sysio.dclaim` to `wire_account`. Erases the row.
       /// Reverts if no row exists or the balance is zero.
       [[sysio::action]]
       void claim(name wire_account);
@@ -130,7 +130,7 @@ namespace sysio {
 
       /// Permissionless crank: prune up to `max_rows` expired ledger rows
       /// (`pending_claims`, `unmapped_tokens`). Erasing a credited row leaves
-      /// its WIRE in the `sysio.cap` balance — it reverts into the staking
+      /// its WIRE in the `sysio.dclaim` balance — it reverts into the staking
       /// capital fund for redistribution. Bounded.
       [[sysio::action]]
       void flushexpired(uint32_t max_rows);

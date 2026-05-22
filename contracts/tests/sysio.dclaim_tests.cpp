@@ -15,33 +15,33 @@ using namespace sysio::opp::types;
 
 using mvo = fc::mutable_variant_object;
 
-/// Test fixture for sysio.cap. Deploys sysio.cap and creates sysio.msgch /
+/// Test fixture for sysio.dclaim. Deploys sysio.dclaim and creates sysio.msgch /
 /// sysio.authex as the authorized inbound callers. The v6 staking-reward path
 /// credits a WIRE-denominated amount directly (native -> WIRE conversion is
 /// outpost-side), so no sysio.reserv deployment is needed.
-class sysio_cap_tester : public tester {
+class sysio_dclaim_tester : public tester {
 public:
-   static constexpr auto CAP_ACCOUNT    = "sysio.cap"_n;
+   static constexpr auto DCLAIM_ACCOUNT    = "sysio.dclaim"_n;
    static constexpr auto MSGCH_ACCOUNT  = "sysio.msgch"_n;
    static constexpr auto AUTHEX_ACCOUNT = "sysio.authex"_n;
    static constexpr auto TOKEN_ACCOUNT  = "sysio.token"_n;
 
-   sysio_cap_tester() {
+   sysio_dclaim_tester() {
       produce_blocks(2);
       // sysio.authex is created by the tester bootstrap (account-linking
       // system account); it is signed for directly to drive linkswept, never
       // re-created here.
       create_accounts({
-         CAP_ACCOUNT, MSGCH_ACCOUNT, TOKEN_ACCOUNT, "alice"_n, "bob"_n,
+         DCLAIM_ACCOUNT, MSGCH_ACCOUNT, TOKEN_ACCOUNT, "alice"_n, "bob"_n,
       });
       produce_blocks(2);
 
-      set_code(CAP_ACCOUNT, contracts::cap_wasm());
-      set_abi(CAP_ACCOUNT, contracts::cap_abi().data());
-      set_privileged(CAP_ACCOUNT);
+      set_code(DCLAIM_ACCOUNT, contracts::dclaim_wasm());
+      set_abi(DCLAIM_ACCOUNT, contracts::dclaim_abi().data());
+      set_privileged(DCLAIM_ACCOUNT);
       produce_blocks();
 
-      cap_abi_ser.set_abi(load_abi(CAP_ACCOUNT),
+      dclaim_abi_ser.set_abi(load_abi(DCLAIM_ACCOUNT),
                           abi_serializer::create_yield_function(abi_serializer_max_time));
    }
 
@@ -80,18 +80,18 @@ public:
       }
    }
 
-   action_result push_cap(name signer, name action_name, const variant_object& data) {
-      return push(CAP_ACCOUNT, cap_abi_ser, signer, action_name, data);
+   action_result push_dclaim(name signer, name action_name, const variant_object& data) {
+      return push(DCLAIM_ACCOUNT, dclaim_abi_ser, signer, action_name, data);
    }
 
-   /// Dispatch a STAKING_REWARD per-staker body to cap::onreward. `amount` is
+   /// Dispatch a STAKING_REWARD per-staker body to dclaim::onreward. `amount` is
    /// the WIRE-denominated reward (native -> WIRE conversion is outpost-side).
    action_result onreward(name signer, uint64_t outpost_id,
                           const std::string& wire_account, ChainKind chain,
                           const std::vector<char>& native_addr,
                           uint64_t amount, uint32_t epoch_index,
                           uint64_t external_epoch_ref, uint32_t share_bps = 10000) {
-      return push_cap(signer, "onreward"_n, mvo()
+      return push_dclaim(signer, "onreward"_n, mvo()
          ("outpost_id", outpost_id)
          ("staker_wire_account", wire_account)
          ("reward_chain", chain)
@@ -103,9 +103,9 @@ public:
    }
 
    fc::variant get_kv(name table, const char* type, uint64_t id) {
-      auto data = get_row_by_id(CAP_ACCOUNT, CAP_ACCOUNT, table, id);
+      auto data = get_row_by_id(DCLAIM_ACCOUNT, DCLAIM_ACCOUNT, table, id);
       return data.empty() ? fc::variant()
-         : cap_abi_ser.binary_to_variant(
+         : dclaim_abi_ser.binary_to_variant(
               type, data, abi_serializer::create_yield_function(abi_serializer_max_time));
    }
    fc::variant pending_of(name acct)  { return get_kv("pclaims"_n,     "pending_claim", acct.to_uint64_t()); }
@@ -114,23 +114,23 @@ public:
 
    std::vector<char> addr20{std::vector<char>(20, char(0xA1))};
 
-   abi_serializer cap_abi_ser;
+   abi_serializer dclaim_abi_ser;
 };
 
-BOOST_AUTO_TEST_SUITE(sysio_cap_tests)
+BOOST_AUTO_TEST_SUITE(sysio_dclaim_tests)
 
 // -- config / import surface --
 
-BOOST_FIXTURE_TEST_CASE(setconfig_initializes_singleton, sysio_cap_tester) { try {
-   BOOST_REQUIRE_EQUAL(push_cap(CAP_ACCOUNT, "setconfig"_n, mvo{}), success());
+BOOST_FIXTURE_TEST_CASE(setconfig_initializes_singleton, sysio_dclaim_tester) { try {
+   BOOST_REQUIRE_EQUAL(push_dclaim(DCLAIM_ACCOUNT, "setconfig"_n, mvo{}), success());
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(claim_rejects_empty_ledger, sysio_cap_tester) { try {
-   BOOST_REQUIRE_NE(push_cap("alice"_n, "claim"_n, mvo()("wire_account", "alice")), success());
+BOOST_FIXTURE_TEST_CASE(claim_rejects_empty_ledger, sysio_dclaim_tester) { try {
+   BOOST_REQUIRE_NE(push_dclaim("alice"_n, "claim"_n, mvo()("wire_account", "alice")), success());
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(importseed_accepts_credit_batch, sysio_cap_tester) { try {
-   BOOST_REQUIRE_EQUAL(push_cap(CAP_ACCOUNT, "importseed"_n, mvo
+BOOST_FIXTURE_TEST_CASE(importseed_accepts_credit_batch, sysio_dclaim_tester) { try {
+   BOOST_REQUIRE_EQUAL(push_dclaim(DCLAIM_ACCOUNT, "importseed"_n, mvo
       ("chain", ChainKind::CHAIN_KIND_EVM)
       ("credits", fc::variants{ mvo()("native_address", addr20)("wire_atomic", 982953049502) })),
       success());
@@ -140,41 +140,41 @@ BOOST_FIXTURE_TEST_CASE(importseed_accepts_credit_batch, sysio_cap_tester) { try
    BOOST_REQUIRE_EQUAL(u["balance"].as_string().substr(0, 3), std::string("982"));
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(importseed_rejects_negative_atomic, sysio_cap_tester) { try {
-   BOOST_REQUIRE_NE(push_cap(CAP_ACCOUNT, "importseed"_n, mvo
+BOOST_FIXTURE_TEST_CASE(importseed_rejects_negative_atomic, sysio_dclaim_tester) { try {
+   BOOST_REQUIRE_NE(push_dclaim(DCLAIM_ACCOUNT, "importseed"_n, mvo
       ("chain", ChainKind::CHAIN_KIND_EVM)
       ("credits", fc::variants{ mvo()("native_address", addr20)("wire_atomic", -1) })),
       success());
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(importdone_locks_subsequent_importseed, sysio_cap_tester) { try {
-   BOOST_REQUIRE_EQUAL(push_cap(CAP_ACCOUNT, "importdone"_n, mvo{}), success());
-   BOOST_REQUIRE_NE(push_cap(CAP_ACCOUNT, "importseed"_n, mvo
+BOOST_FIXTURE_TEST_CASE(importdone_locks_subsequent_importseed, sysio_dclaim_tester) { try {
+   BOOST_REQUIRE_EQUAL(push_dclaim(DCLAIM_ACCOUNT, "importdone"_n, mvo{}), success());
+   BOOST_REQUIRE_NE(push_dclaim(DCLAIM_ACCOUNT, "importseed"_n, mvo
       ("chain", ChainKind::CHAIN_KIND_EVM)
       ("credits", fc::variants{ mvo()("native_address", addr20)("wire_atomic", 1) })),
       success());
 } FC_LOG_AND_RETHROW() }
 
-// -- setwindow --
+// -- setclmwindow --
 
-BOOST_FIXTURE_TEST_CASE(setwindow_rejects_zero, sysio_cap_tester) { try {
-   BOOST_REQUIRE_NE(push_cap(CAP_ACCOUNT, "setwindow"_n, mvo()("window_sec", 0)), success());
-   BOOST_REQUIRE_EQUAL(push_cap(CAP_ACCOUNT, "setwindow"_n, mvo()("window_sec", 3600)), success());
+BOOST_FIXTURE_TEST_CASE(setclmwindow_rejects_zero, sysio_dclaim_tester) { try {
+   BOOST_REQUIRE_NE(push_dclaim(DCLAIM_ACCOUNT, "setclmwindow"_n, mvo()("window_sec", 0)), success());
+   BOOST_REQUIRE_EQUAL(push_dclaim(DCLAIM_ACCOUNT, "setclmwindow"_n, mvo()("window_sec", 3600)), success());
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(setwindow_requires_self_auth, sysio_cap_tester) { try {
-   BOOST_REQUIRE_NE(push_cap("alice"_n, "setwindow"_n, mvo()("window_sec", 3600)), success());
+BOOST_FIXTURE_TEST_CASE(setclmwindow_requires_self_auth, sysio_dclaim_tester) { try {
+   BOOST_REQUIRE_NE(push_dclaim("alice"_n, "setclmwindow"_n, mvo()("window_sec", 3600)), success());
 } FC_LOG_AND_RETHROW() }
 
 // -- onreward auth + routing --
 
-BOOST_FIXTURE_TEST_CASE(onreward_requires_msgch_auth, sysio_cap_tester) { try {
+BOOST_FIXTURE_TEST_CASE(onreward_requires_msgch_auth, sysio_dclaim_tester) { try {
    BOOST_REQUIRE_NE(
       onreward("alice"_n, 1, "alice", ChainKind::CHAIN_KIND_EVM, addr20, 1000, 7, 100),
       success());
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(onreward_linked_credits_pending_claims, sysio_cap_tester) { try {
+BOOST_FIXTURE_TEST_CASE(onreward_linked_credits_pending_claims, sysio_dclaim_tester) { try {
    BOOST_REQUIRE_EQUAL(
       onreward(MSGCH_ACCOUNT, 1, "alice", ChainKind::CHAIN_KIND_EVM, addr20, 1000, 7, 100),
       success());
@@ -184,7 +184,7 @@ BOOST_FIXTURE_TEST_CASE(onreward_linked_credits_pending_claims, sysio_cap_tester
    BOOST_REQUIRE_EQUAL(p["balance"].as<asset>().get_amount(), 1000);
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(onreward_unlinked_parks_unmapped_then_linkswept, sysio_cap_tester) { try {
+BOOST_FIXTURE_TEST_CASE(onreward_unlinked_parks_unmapped_then_linkswept, sysio_dclaim_tester) { try {
    // Empty wire account -> parked in unmapped by native address.
    BOOST_REQUIRE_EQUAL(
       onreward(MSGCH_ACCOUNT, 1, "", ChainKind::CHAIN_KIND_EVM, addr20, 5000, 7, 100),
@@ -196,7 +196,7 @@ BOOST_FIXTURE_TEST_CASE(onreward_unlinked_parks_unmapped_then_linkswept, sysio_c
 
    // AuthX link sweeps it into pending_claims for bob.
    BOOST_REQUIRE_EQUAL(
-      push_cap(AUTHEX_ACCOUNT, "linkswept"_n, mvo()
+      push_dclaim(AUTHEX_ACCOUNT, "linkswept"_n, mvo()
          ("wire_account", "bob")
          ("chain", ChainKind::CHAIN_KIND_EVM)
          ("native_pubkey", addr20)),
@@ -207,7 +207,7 @@ BOOST_FIXTURE_TEST_CASE(onreward_unlinked_parks_unmapped_then_linkswept, sysio_c
 
 // -- dedupe cursor --
 
-BOOST_FIXTURE_TEST_CASE(onreward_dedupes_stale_external_ref, sysio_cap_tester) { try {
+BOOST_FIXTURE_TEST_CASE(onreward_dedupes_stale_external_ref, sysio_dclaim_tester) { try {
    BOOST_REQUIRE_EQUAL(
       onreward(MSGCH_ACCOUNT, 1, "alice", ChainKind::CHAIN_KIND_EVM, addr20, 1000, 7, 100),
       success());
@@ -228,8 +228,8 @@ BOOST_FIXTURE_TEST_CASE(onreward_dedupes_stale_external_ref, sysio_cap_tester) {
 
 // -- claimable window expiry / reversion --
 
-BOOST_FIXTURE_TEST_CASE(flushexpired_reverts_expired_pending, sysio_cap_tester) { try {
-   BOOST_REQUIRE_EQUAL(push_cap(CAP_ACCOUNT, "setwindow"_n, mvo()("window_sec", 1)), success());
+BOOST_FIXTURE_TEST_CASE(flushexpired_reverts_expired_pending, sysio_dclaim_tester) { try {
+   BOOST_REQUIRE_EQUAL(push_dclaim(DCLAIM_ACCOUNT, "setclmwindow"_n, mvo()("window_sec", 1)), success());
    BOOST_REQUIRE_EQUAL(
       onreward(MSGCH_ACCOUNT, 1, "alice", ChainKind::CHAIN_KIND_EVM, addr20, 1000, 7, 100),
       success());
@@ -239,7 +239,7 @@ BOOST_FIXTURE_TEST_CASE(flushexpired_reverts_expired_pending, sysio_cap_tester) 
    produce_blocks(10);
    produce_block(fc::seconds(5));
 
-   BOOST_REQUIRE_EQUAL(push_cap("alice"_n, "flushexpired"_n, mvo()("max_rows", 50)), success());
+   BOOST_REQUIRE_EQUAL(push_dclaim("alice"_n, "flushexpired"_n, mvo()("max_rows", 50)), success());
    BOOST_REQUIRE(pending_of("alice"_n).is_null());   // reverted to capital fund
 } FC_LOG_AND_RETHROW() }
 

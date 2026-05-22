@@ -1,4 +1,4 @@
-set(contract_name sysio.cap)
+set(contract_name sysio.dclaim)
 bootstrap_contract(${contract_name})
 
 if(BUILD_SYSTEM_CONTRACTS)
@@ -14,7 +14,7 @@ if(BUILD_SYSTEM_CONTRACTS)
                 TARGET ${contract_name}_native
                 SOURCES ${SOURCES}
                 INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include
-                CONTRACT_CLASS "sysio::cap"
+                CONTRACT_CLASS "sysio::dclaim"
                 HEADERS ${HEADERS}
                 ABI_FILE ${CMAKE_BINARY_DIR}/contracts/${contract_name}/${contract_name}.abi
         )
@@ -36,9 +36,6 @@ if(BUILD_SYSTEM_CONTRACTS)
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.reserv/include>
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.opp.common/include>
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.system/include>
-                # cdt-cpp ignores -isystem; add vcpkg root explicitly as -I so magic_enum resolves.
-                PRIVATE
-                ${CDT_CONTRACT_INCLUDE_PATH}
         )
 
         target_link_libraries(${target}
