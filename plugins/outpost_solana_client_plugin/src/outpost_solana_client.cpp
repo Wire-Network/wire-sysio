@@ -128,6 +128,38 @@ extract_inbound_recipient_pubkeys(const std::vector<char>& envelope_bytes) {
    return recipients;
 }
 
+std::vector<swap_remit_spl_target>
+extract_inbound_swap_remit_spl_targets(const std::vector<char>& envelope_bytes) {
+   std::vector<swap_remit_spl_target> targets;
+
+   sysio::opp::Envelope env;
+   if (!env.ParseFromArray(envelope_bytes.data(),
+                           static_cast<int>(envelope_bytes.size()))) {
+      wlog("outpost_solana_client: envelope decode for SPL swap-remit "
+           "target extraction failed; submitting epoch_in with no SPL "
+           "extras (any SPL SwapRemit attestations present will reject "
+           "with `recipient ATA not in remaining_accounts`)");
+      return targets;
+   }
+
+   for (const auto& message : env.messages()) {
+      for (const auto& entry : message.payload().attestations()) {
+         if (entry.type() != sysio::opp::types::ATTESTATION_TYPE_SWAP_REMIT) continue;
+         sysio::opp::attestations::SwapRemit sr;
+         if (!sr.ParseFromString(entry.data())) continue;
+         auto recipient = sol_pubkey_from_chain_address(sr.recipient());
+         if (!recipient) continue;  // not an SVM recipient
+         targets.push_back(swap_remit_spl_target{
+            sr.amount().token_code(),
+            sr.reserve_code(),
+            *recipient
+         });
+      }
+   }
+
+   return targets;
+}
+
 std::vector<reserve_pda_seeds>
 extract_inbound_swap_remit_reserve_seeds(const std::vector<char>& envelope_bytes) {
    std::vector<reserve_pda_seeds> seeds;
@@ -189,6 +221,66 @@ sysio::opp::types::ChainKind outpost_solana_client::chain_kind() const {
    return sysio::opp::types::CHAIN_KIND_SVM;
 }
 
+std::optional<fc::network::solana::solana_public_key>
+outpost_solana_client::spl_mint_for_token_code(uint64_t token_code) {
+   std::lock_guard<std::mutex> guard(_token_address_mutex);
+
+   if (_token_address_cache_loaded) {
+      auto it = _mint_by_token_code.find(token_code);
+      if (it != _mint_by_token_code.end()) return it->second;
+      // Not seen at load time; record a negative entry to avoid
+      // re-querying. set_token_address(...) calls at runtime would
+      // require a relay restart (matches the on-chain
+      // `token_addresses_by_code` cap — they're set once at bootstrap).
+      _mint_by_token_code.emplace(token_code, std::nullopt);
+      return std::nullopt;
+   }
+
+   // First miss: fetch + parse OutpostConfig.token_addresses_by_code.
+   // Uses the program_client's IDL-driven decoder so a future struct
+   // change picks up via wire-solana's regenerated IDL without C++
+   // edits.
+   try {
+      auto cfg = _program_client->get_account_data<fc::variant>(
+         "OutpostConfig", _program_client->config_pda);
+      const auto& cfg_obj = cfg.get_object();
+      if (cfg_obj.contains("token_addresses_by_code")) {
+         const auto& entries = cfg_obj["token_addresses_by_code"].get_array();
+         for (const auto& entry_v : entries) {
+            const auto& entry = entry_v.get_object();
+            if (!entry.contains("token_code") || !entry.contains("mint")) continue;
+            uint64_t tc = entry["token_code"].as_uint64();
+            const std::string mint_b58 = entry["mint"].as_string();
+            // All-zeroes base58 ("11111111111111111111111111111111") is
+            // the native marker — store as nullopt so the relay skips
+            // SPL account derivation for native-token SwapRemits.
+            constexpr std::string_view NATIVE_MARKER_B58 =
+               "11111111111111111111111111111111";
+            if (mint_b58 == NATIVE_MARKER_B58) {
+               _mint_by_token_code.emplace(tc, std::nullopt);
+            } else {
+               _mint_by_token_code.emplace(
+                  tc,
+                  fc::network::solana::solana_public_key::from_base58_string(mint_b58)
+               );
+            }
+         }
+      }
+      _token_address_cache_loaded = true;
+      ilog("outpost_solana_client[{}]: token_address cache loaded with {} entries from OutpostConfig",
+           to_string(), _mint_by_token_code.size());
+   } catch (const std::exception& e) {
+      wlog("outpost_solana_client[{}]: token_address cache load failed: {} "
+           "— SPL SwapRemits will fail until cache loads on next attempt",
+           to_string(), e.what());
+      return std::nullopt;
+   }
+
+   auto it = _mint_by_token_code.find(token_code);
+   if (it != _mint_by_token_code.end()) return it->second;
+   return std::nullopt;
+}
+
 std::string outpost_solana_client::deliver_outbound_envelope(
    uint32_t                 epoch_index,
    const std::vector<char>& envelope_bytes,
@@ -241,10 +333,72 @@ std::string outpost_solana_client::deliver_outbound_envelope(
       }
    }
 
+   // SWAP_REMIT with non-native dst: the on-chain `handle_swap_remit_spl`
+   // additionally needs `[reserve_vault PDA, recipient ATA, SPL mint,
+   // spl_token_program]` in remaining_accounts so the signed
+   // `token::transfer` CPI can resolve all referenced AccountInfos. The
+   // mint comes from `OutpostConfig.token_addresses_by_code` (cached on
+   // first miss); the recipient ATA is the deterministic
+   // `get_associated_token_address(recipient, mint)`; the reserve_vault
+   // PDA mirrors the Reserve PDA seed shape with `reserve_vault` prefix.
+   //
+   // Native-SOL dst attestations naturally skip this block because the
+   // mint lookup returns nullopt (native marker), and the on-chain
+   // native branch doesn't reference any of these accounts so absence
+   // doesn't matter.
+   const auto spl_targets =
+      outpost_solana_client_detail::extract_inbound_swap_remit_spl_targets(envelope_bytes);
+   size_t spl_accounts_added = 0;
+   const auto& token_program_id =
+      fc::network::solana::system::program_ids::TOKEN_PROGRAM;
+   const auto& associated_token_program_id =
+      fc::network::solana::system::program_ids::ASSOCIATED_TOKEN_PROGRAM;
+   for (const auto& target : spl_targets) {
+      auto mint_opt = spl_mint_for_token_code(target.token_code);
+      if (!mint_opt) continue;  // native or unknown token_code
+
+      // reserve_vault PDA (separate seed prefix from Reserve PDA).
+      std::vector<uint8_t> vault_seed1 = {'r','e','s','e','r','v','e','_','v','a','u','l','t'};
+      std::vector<uint8_t> vault_seed2(8);
+      std::vector<uint8_t> vault_seed3(8);
+      for (size_t i = 0; i < 8; ++i) {
+         vault_seed2[i] = static_cast<uint8_t>((target.token_code   >> (i * 8)) & 0xff);
+         vault_seed3[i] = static_cast<uint8_t>((target.reserve_code >> (i * 8)) & 0xff);
+      }
+      auto vault_pda = fc::network::solana::system::find_program_address(
+         {vault_seed1, vault_seed2, vault_seed3}, _program_id).first;
+
+      // recipient ATA = find_program_address(
+      //   [recipient, TOKEN_PROGRAM, mint],
+      //   ASSOCIATED_TOKEN_PROGRAM).
+      // Same seed shape as `Pubkey::find_program_address` on the Rust
+      // side via `spl_associated_token_account::get_associated_token_address`.
+      const auto recipient_arr      = target.recipient.serialize();
+      const auto token_program_arr  = token_program_id.serialize();
+      const auto mint_arr           = mint_opt->serialize();
+      std::vector<uint8_t> recipient_bytes(recipient_arr.begin(), recipient_arr.end());
+      std::vector<uint8_t> token_program_bytes(token_program_arr.begin(), token_program_arr.end());
+      std::vector<uint8_t> mint_bytes(mint_arr.begin(), mint_arr.end());
+      auto recipient_ata = fc::network::solana::system::find_program_address(
+         {recipient_bytes, token_program_bytes, mint_bytes},
+         associated_token_program_id).first;
+
+      // Dedup-append each pubkey. The on-chain handler uses
+      // `find_remaining_account(remaining_accounts, &pubkey)` which is
+      // order-independent, so any append position works.
+      for (const auto& pk : {vault_pda, recipient_ata, *mint_opt, token_program_id}) {
+         if (std::find(recipient_pubkeys.begin(), recipient_pubkeys.end(), pk)
+             == recipient_pubkeys.end()) {
+            recipient_pubkeys.push_back(pk);
+            ++spl_accounts_added;
+         }
+      }
+   }
+
    if (!recipient_pubkeys.empty()) {
       ilog("outpost_solana_client[{}]: epoch={} found {} inbound REMIT/REVERT "
-           "recipient(s)/reserve(s) — passing as remaining_accounts on final chunk",
-           to_string(), epoch_index, recipient_pubkeys.size());
+           "recipient(s)/reserve(s) ({} SPL extras) — passing as remaining_accounts on final chunk",
+           to_string(), epoch_index, recipient_pubkeys.size(), spl_accounts_added);
    }
 
    // Stream the envelope into the per-(epoch, signer) chunk buffer. Each
