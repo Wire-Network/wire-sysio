@@ -86,13 +86,13 @@ public:
 
    /// Dispatch a STAKING_REWARD per-staker body to dclaim::onreward. `amount` is
    /// the WIRE-denominated reward (native -> WIRE conversion is outpost-side).
-   action_result onreward(name signer, uint64_t outpost_id,
+   action_result onreward(name signer, uint64_t chain_code,
                           const std::string& wire_account, ChainKind chain,
                           const std::vector<char>& native_addr,
                           uint64_t amount, uint32_t epoch_index,
                           uint64_t external_epoch_ref, uint32_t share_bps = 10000) {
       return push_dclaim(signer, "onreward"_n, mvo()
-         ("outpost_id", outpost_id)
+         ("chain_code", chain_code)
          ("staker_wire_account", wire_account)
          ("reward_chain", chain)
          ("staker_native_addr", native_addr)

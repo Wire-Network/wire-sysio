@@ -520,7 +520,7 @@ void dispatch_attestation(name self, uint64_t attestation_id,
             action(
                permission_level{self, "active"_n},
                "sysio.dclaim"_n, "onreward"_n,
-               std::make_tuple(sr.outpost_id,
+               std::make_tuple(sr.chain_code,
                                sr.staker_wire_account.name,
                                sr.staker_native_address.kind,
                                sr.staker_native_address.address,

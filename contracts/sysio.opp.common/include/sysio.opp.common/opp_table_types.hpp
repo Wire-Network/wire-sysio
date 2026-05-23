@@ -571,13 +571,13 @@ DataStream& operator>>(DataStream& ds, NodeOwnerReg& t) {
 // (WIRE-side claim ledger). Field order mirrors the proto (1..7).
 template <typename DataStream>
 DataStream& operator<<(DataStream& ds, const StakingReward& t) {
-   return ds << t.outpost_id << t.staker_wire_account << t.share_bps
+   return ds << t.chain_code << t.staker_wire_account << t.share_bps
              << t.reward_epoch_index << t.external_epoch_ref
              << t.reward_amount << t.staker_native_address;
 }
 template <typename DataStream>
 DataStream& operator>>(DataStream& ds, StakingReward& t) {
-   return ds >> t.outpost_id >> t.staker_wire_account >> t.share_bps
+   return ds >> t.chain_code >> t.staker_wire_account >> t.share_bps
              >> t.reward_epoch_index >> t.external_epoch_ref
              >> t.reward_amount >> t.staker_native_address;
 }

@@ -107,7 +107,7 @@
             "base": "",
             "fields": [
                 {
-                    "name": "outpost_id",
+                    "name": "chain_code",
                     "type": "uint64"
                 },
                 {
@@ -177,7 +177,7 @@
                     "type": "uint64"
                 },
                 {
-                    "name": "outpost_id",
+                    "name": "chain_code",
                     "type": "uint64"
                 },
                 {
@@ -332,9 +332,9 @@
             "table_id": 64468,
             "secondary_indexes": [
                 {
-                    "name": "byoutaddr",
+                    "name": "bychaincode",
                     "key_type": "uint128",
-                    "table_id": 35362
+                    "table_id": 60686
                 }
             ]
         },

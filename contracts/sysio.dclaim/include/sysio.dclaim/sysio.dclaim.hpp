@@ -35,7 +35,7 @@ namespace sysio {
     * - `unmapped_tokens` — per-(chain, native_pubkey) WIRE owed for stakers /
     *   purchasers without a Wire account yet. Completing AuthX linking
     *   inline-calls `linkswept`, which moves the credit into `pending_claims`.
-    * - `reward_cursors` — per-(outpost_id, chain, native_pubkey) high-water
+    * - `reward_cursors` — per-(chain_code, chain, native_pubkey) high-water
     *   mark of the last processed source-chain epoch reference. Replays /
     *   duplicates (`external_epoch_ref <= last`) are rejected at ingest, so no
     *   per-reward history is retained (roll-up + data-leak safe).
@@ -104,7 +104,7 @@ namespace sysio {
       /// WIRE-denominated; native -> WIRE conversion is outpost-side.
       /// Auth=sysio.msgch.
       ///
-      /// @param outpost_id          Emitting outpost (dedupe scope).
+      /// @param chain_code          Emitting outpost's chain code (dedupe scope).
       /// @param staker_wire_account Staker's Wire account name, or "" when not
       ///                            yet AuthX-linked (then parked by native
       ///                            address until the link sweep).
@@ -116,10 +116,10 @@ namespace sysio {
       ///                            portion).
       /// @param reward_epoch_index  WIRE epoch index (informational / audit).
       /// @param external_epoch_ref  Source-chain epoch reference; monotonic
-      ///                            per (outpost, staker) — dedupe key.
+      ///                            per (chain, staker) — dedupe key.
       /// @param share_bps           Staker share in bps (informational only).
       [[sysio::action]]
-      void onreward(uint64_t              outpost_id,
+      void onreward(uint64_t              chain_code,
                     std::string           staker_wire_account,
                     opp::types::ChainKind reward_chain,
                     std::vector<char>     staker_native_addr,
@@ -214,7 +214,7 @@ namespace sysio {
             sysio::const_mem_fun<unmapped_token, uint128_t, &unmapped_token::by_chain_addr>>
       >;
 
-      /// Per-(outpost_id, chain, native_pubkey) dedupe cursor: the highest
+      /// Per-(chain_code, chain, native_pubkey) dedupe cursor: the highest
       /// source-chain epoch reference processed. Anything `<=` is a replay.
       struct rwdcur_key {
          uint64_t id;
@@ -224,24 +224,24 @@ namespace sysio {
 
       struct [[sysio::table("rwdcursors")]] reward_cursor {
          uint64_t                  id                      = 0;
-         uint64_t                  outpost_id              = 0;
+         uint64_t                  chain_code              = 0;
          opp::types::ChainKind     chain                   = opp::types::ChainKind::CHAIN_KIND_UNKNOWN;
          std::vector<char>         native_pubkey;
          uint64_t                  last_external_epoch_ref = 0;
 
          uint64_t primary_key() const { return id; }
 
-         uint128_t by_outpost_addr() const {
-            return outpost_addr_key(outpost_id, chain, native_pubkey);
+         uint128_t by_chaincode_addr() const {
+            return chaincode_addr_key(chain_code, chain, native_pubkey);
          }
 
          SYSLIB_SERIALIZE(reward_cursor,
-            (id)(outpost_id)(chain)(native_pubkey)(last_external_epoch_ref))
+            (id)(chain_code)(chain)(native_pubkey)(last_external_epoch_ref))
       };
 
       using rwdcursors_t = sysio::kv::table<"rwdcursors"_n, rwdcur_key, reward_cursor,
-         sysio::kv::index<"byoutaddr"_n,
-            sysio::const_mem_fun<reward_cursor, uint128_t, &reward_cursor::by_outpost_addr>>
+         sysio::kv::index<"bychaincode"_n,
+            sysio::const_mem_fun<reward_cursor, uint128_t, &reward_cursor::by_chaincode_addr>>
       >;
 
       /// Cap-staking config singleton.
@@ -286,17 +286,17 @@ namespace sysio {
          return (static_cast<uint128_t>(chain) << 64) | prefix;
       }
 
-      /// (outpost_id, chain, native address) -> uint128 narrowing key. High 64
-      /// bits = outpost_id; low 64 = chain (high 32) xored with the first 4
+      /// (chain_code, chain, native address) -> uint128 narrowing key. High 64
+      /// bits = chain_code; low 64 = chain (high 32) xored with the first 4
       /// address bytes.
-      static uint128_t outpost_addr_key(uint64_t outpost_id,
-                                        opp::types::ChainKind chain,
-                                        const std::vector<char>& addr) {
+      static uint128_t chaincode_addr_key(uint64_t chain_code,
+                                          opp::types::ChainKind chain,
+                                          const std::vector<char>& addr) {
          uint32_t prefix = 0;
          const size_t n = addr.size() < sizeof(uint32_t) ? addr.size() : sizeof(uint32_t);
          if (n > 0) std::memcpy(&prefix, addr.data(), n);
          uint64_t lo = (static_cast<uint64_t>(chain) << 32) ^ static_cast<uint64_t>(prefix);
-         return (static_cast<uint128_t>(outpost_id) << 64) | lo;
+         return (static_cast<uint128_t>(chain_code) << 64) | lo;
       }
 
    private:
