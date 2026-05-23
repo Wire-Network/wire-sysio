@@ -208,9 +208,17 @@ void system_contract::setemitcfg(const emissions::emission_config& cfg) {
    sysio::check(cfg.annual_min_emission <= cfg.annual_max_emission,
                  "annual_min_emission must be <= annual_max_emission");
 
-   // BPS splits
-   sysio::check(cfg.compute_bps + cfg.capital_bps + cfg.capex_bps + cfg.governance_bps == BPS_DENOMINATOR,
-                 "category BPS must sum to 10000");
+   // BPS splits. compute + capex + governance bound what payepoch transfers
+   // each period; the remainder (10000 - that sum) is the implicit capital
+   // reserve, drained lazily by sysio.dclaim::onreward via fundclaim. Sum
+   // exactly 10000 means no implicit reserve (capital draws come out of
+   // future periods' headroom). Sum > 10000 would over-commit period_emission.
+   const uint32_t paid_at_payepoch_bps =
+      static_cast<uint32_t>(cfg.compute_bps)
+      + static_cast<uint32_t>(cfg.capex_bps)
+      + static_cast<uint32_t>(cfg.governance_bps);
+   sysio::check(paid_at_payepoch_bps <= BPS_DENOMINATOR,
+                 "compute + capex + governance BPS must be <= 10000");
    sysio::check(cfg.producer_bps + cfg.batch_op_bps == BPS_DENOMINATOR,
                  "compute sub-split BPS must sum to 10000");
 
@@ -480,16 +488,22 @@ void system_contract::accrueepoch(uint32_t epoch_index,
    t5s.set(state, get_self());
 }
 
-// payepoch - pay accumulated emissions for the pay period ending at
-// `epoch_index`. Called inline by sysio.epoch::advance on a pay-epoch
-// (period boundary defined by emit_cfg.pay_cadence_epochs) after its
-// readiness gate has verified that:
+// payepoch - pay the compute, capex, and governance shares of accumulated
+// emissions for the pay period ending at `epoch_index`. Called inline by
+// sysio.epoch::advance on a pay-epoch (period boundary defined by
+// emit_cfg.pay_cadence_epochs) after its readiness gate has verified that:
 //   - emitcfg exists
 //   - t5state exists
 //   - per-epoch emission > 0 (treasury not at floor)
 //   - sysio's WIRE balance >= period_emission (pending + this epoch's share)
 //
-// Single-trx semantics guarantee these conditions hold through this call;
+// Capital is NOT paid here. The implicit capital reserve
+// (period_emission - compute - capex - governance) stays in sysio's balance
+// and is drained lazily by fundclaim as sysio.dclaim::onreward fires, so
+// dclaim has funds the moment a claim is credited rather than at the next
+// pay-epoch.
+//
+// Single-trx semantics guarantee gate conditions hold through this call;
 // payepoch trusts the gate-computed period_emission and does not recompute.
 // Strict sysio::check throws inside payepoch flag true bugs (arithmetic
 // invariants, BPS sums).
@@ -519,10 +533,14 @@ void system_contract::payepoch(uint32_t epoch_index,
                 "payepoch period_emission must equal accrued pending_emission_amount");
 
    // ----- Category splits -----
+   // payepoch transfers compute + capex + governance only. The implicit
+   // capital reserve (period_emission - compute - capex - governance) stays
+   // in sysio's balance and is drained lazily by fundclaim as
+   // sysio.dclaim::onreward fires. Sum-to-10000 BPS means zero reserve;
+   // sum < 10000 leaves the remainder available for capital coverage.
    const int64_t compute_amount    = split_bps(period_emission, cfg.compute_bps);
-   const int64_t capital_amount    = split_bps(period_emission, cfg.capital_bps);
    const int64_t capex_amount      = split_bps(period_emission, cfg.capex_bps);
-   const int64_t governance_amount = period_emission - compute_amount - capital_amount - capex_amount;
+   const int64_t governance_amount = split_bps(period_emission, cfg.governance_bps);
 
    const int64_t producer_pool = split_bps(compute_amount, cfg.producer_bps);
    const int64_t batch_pool    = compute_amount - producer_pool;
@@ -671,13 +689,15 @@ void system_contract::payepoch(uint32_t epoch_index,
    }
 
    // =======================================================================
-   // Category buckets: fixed accounts, no opreg filter.
+   // Category buckets: fixed accounts, no opreg filter. Capital is NOT paid
+   // here -- it drains lazily via fundclaim per incoming OPP claim, so
+   // dclaim has WIRE the moment the claim is credited rather than waiting
+   // for the next pay-epoch.
    // =======================================================================
-   send_wire_transfer(get_self(), CAPITAL_ACCOUNT,    capital_amount,    memo::capital);
    send_wire_transfer(get_self(), CAPEX_OPERATIONS_ACCOUNT, capex_amount,      memo::capex);
    send_wire_transfer(get_self(), GOVERNANCE_ACCOUNT, governance_amount, memo::governance);
 
-   actual_paid += capital_amount + capex_amount + governance_amount;
+   actual_paid += capex_amount + governance_amount;
 
    // =======================================================================
    // State update. accrueepoch already wrote last_epoch_index / last_epoch_time
@@ -705,7 +725,6 @@ void system_contract::payepoch(uint32_t epoch_index,
       .timestamp         = state.last_epoch_time,
       .total_emission    = period_emission,
       .compute_amount    = compute_amount,
-      .capital_amount    = capital_amount,
       .capex_amount      = capex_amount,
       .governance_amount = governance_amount,
    });
@@ -725,6 +744,49 @@ void system_contract::payepoch(uint32_t epoch_index,
          (static_cast<uint64_t>(epoch_index) + 1) - oldest_index;
       if (live_count <= cfg.epoch_log_retention_count) break;
       epoch_table.erase(first_it);
+   }
+}
+
+// fundclaim - transfer up to `amount` WIRE from sysio's drainable pool to
+// sysio.dclaim. Called inline by sysio.dclaim::onreward as each
+// STAKING_REWARD attestation lands, so dclaim is funded against the credit
+// it just took on before the staker can attempt to claim.
+//
+// Never throws. STAKING_REWARD dispatch from sysio.msgch must not be
+// aborted on emissions-side conditions (the never-throw contract for OPP
+// inbound handlers), so a pool-too-small case caps the transfer at what's
+// available and accrues the unfunded delta to t5state.capital_shortfall_total
+// for operator visibility.
+//
+// Negative or zero requests are silent no-ops (defensive). The amount
+// actually transferred counts toward total_distributed -- the curve sees
+// less remaining headroom on its next per-epoch computation and emissions
+// auto-throttle to match real claim load.
+void system_contract::fundclaim(int64_t amount) {
+   require_auth(CAPITAL_ACCOUNT);
+
+   if (amount <= 0) return;
+
+   t5state_t t5s(get_self());
+   if (!t5s.exists()) return; // pre-init: silently absorb
+   auto state = t5s.get();
+
+   const auto cfg = get_emit_cfg(get_self());
+   const int64_t remaining = cfg.t5_distributable - cfg.t5_floor - state.total_distributed;
+   const int64_t to_transfer = (amount <= remaining) ? amount : (remaining > 0 ? remaining : 0);
+   const int64_t shortfall   = amount - to_transfer;
+
+   if (to_transfer > 0) {
+      send_wire_transfer(get_self(), CAPITAL_ACCOUNT, to_transfer, memo::capital);
+      state.total_distributed += to_transfer;
+   }
+
+   if (shortfall > 0) {
+      state.capital_shortfall_total += shortfall;
+   }
+
+   if (to_transfer > 0 || shortfall > 0) {
+      t5s.set(state, get_self());
    }
 }
 

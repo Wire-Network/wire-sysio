@@ -243,6 +243,18 @@ void dclaim::onreward(uint64_t              outpost_id,
    credit_wire(get_self(), wacct, reward_chain, staker_native_addr,
                asset{ static_cast<int64_t>(reward_amount), WIRE_SYM },
                config_window(get_self()));
+
+   // Pull funding from sysio.system's drainable pool so the dclaim balance
+   // covers this credit immediately -- a staker can claim in the next block
+   // rather than waiting for a pay-epoch. sysio.system::fundclaim caps to
+   // the remaining pool and never throws, preserving the never-throw
+   // contract for OPP inbound dispatch.
+   action(
+      permission_level{ get_self(), "active"_n },
+      SYSTEM_ACCOUNT,
+      "fundclaim"_n,
+      std::make_tuple(static_cast<int64_t>(reward_amount))
+   ).send();
 }
 
 // ---------------------------------------------------------------------------

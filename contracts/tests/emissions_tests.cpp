@@ -127,7 +127,6 @@ struct emit_cfg_result {
    int64_t   annual_max_emission;
    int64_t   annual_min_emission;
    uint16_t  compute_bps;
-   uint16_t  capital_bps;
    uint16_t  capex_bps;
    uint16_t  governance_bps;
    uint16_t  producer_bps;
@@ -141,7 +140,7 @@ FC_REFLECT( emit_cfg_result,
    (t5_distributable)(t5_floor)
    (target_annual_decay_bps)
    (annual_initial_emission)(annual_max_emission)(annual_min_emission)
-   (compute_bps)(capital_bps)(capex_bps)(governance_bps)
+   (compute_bps)(capex_bps)(governance_bps)
    (producer_bps)(batch_op_bps)
    (standby_end_rank)(epoch_log_retention_count) )
 
@@ -206,8 +205,14 @@ static int64_t test_apply_decay(int64_t prev_emission,
       (static_cast<__int128>(prev_emission) * factor) / fp::ONE);
 }
 static constexpr uint16_t COMPUTE_BPS            = 4000;
-static constexpr uint16_t CAPITAL_BPS            = 3000;
 static constexpr uint16_t CAPEX_BPS              = 2000;
+static constexpr uint16_t GOV_BPS                = 1000;
+// Implicit capital reserve = whatever the three explicit shares leave behind.
+// At the fixture defaults (4000 + 2000 + 1000), this is 3000 bps. Drained
+// lazily via sysio.dclaim::onreward -> sysio.system::fundclaim, not paid at
+// payepoch -- so it doesn't appear in t5state.total_distributed until the
+// underlying fundclaim transfer happens.
+static constexpr uint16_t IMPLICIT_CAPITAL_BPS   = 10000 - COMPUTE_BPS - CAPEX_BPS - GOV_BPS;
 static constexpr uint16_t PRODUCER_BPS           = 7000;
 
 // Performance-based pay constants (keep in sync with emissions.cpp)
@@ -215,26 +220,18 @@ static constexpr uint32_t T_ACTIVE_PRODUCER_COUNT = 21;
 static constexpr uint32_t T_STANDBY_START_RANK    = 22;
 static constexpr uint32_t T_STANDBY_END_RANK      = 28;
 
-// Helper: compute undistributed producer pool for an emission (when no producers eligible).
-static int64_t compute_producer_pool(int64_t emission) {
-   int64_t compute = test_split_bps(emission, COMPUTE_BPS);
-   return test_split_bps(compute, PRODUCER_BPS);
-}
-
-// Helper: compute batch-op pool for an emission (goes to current rotation group of 7).
-// When no batch-op operators are registered OR the current group has 0 members, the
-// entire batch pool stays in the treasury -- slashed / absent members' shares are not
-// redistributed.
-static int64_t compute_batch_pool(int64_t emission) {
-   int64_t compute = test_split_bps(emission, COMPUTE_BPS);
-   int64_t producer = test_split_bps(compute, PRODUCER_BPS);
-   return compute - producer; // batch_pool = compute - producer (preserves dust)
-}
-
-// Helper: combined producer + batch compute-bucket undistributed amount.
-// In tests with no producers AND no batch-op group, both pools are undistributed.
+// Helper: amount NOT transferred at payepoch when no producers / batch
+// members are paid. Equals producer_pool + batch_pool (compute share, both
+// undistributed) + implicit capital reserve (never paid at payepoch --
+// drained lazily via fundclaim). The implicit reserve naturally absorbs
+// the rounding dust from per-share split_bps floors, so the cleanest
+// definition is `emission - (everything payepoch actually transfers)`,
+// which collapses to `emission - capex_split - gov_split` when no
+// producers / batch members are paid.
 static int64_t compute_undistributed_if_no_operators(int64_t emission) {
-   return compute_producer_pool(emission) + compute_batch_pool(emission);
+   const int64_t capex = test_split_bps(emission, CAPEX_BPS);
+   const int64_t gov   = test_split_bps(emission, GOV_BPS);
+   return emission - capex - gov;
 }
 
 class sysio_emissions_tester : public tester {
@@ -418,6 +415,27 @@ public:
       produce_blocks(1);
    }
 
+   /// Deploy the real sysio.dclaim contract on the placeholder account and
+   /// mark it privileged. Required only by tests that push actions signed by
+   /// sysio.dclaim (e.g. fundclaim, which `require_auth(CAPITAL_ACCOUNT)`):
+   /// the sysio.* accounts get a 0-NET ROA policy, so without a deployed
+   /// contract + privileged flag they cannot afford the inline transaction
+   /// NET. Idempotent.
+   void deploy_dclaim_for_signing() {
+      const account_name DCLAIM = "sysio.dclaim"_n;
+      if (get_roa_policy(DCLAIM, "nodedaddy"_n).is_null()) {
+         auto tr = addpolicy_ram_only("nodedaddy"_n, DCLAIM,
+            asset::from_string("500.0000 SYS"));
+         BOOST_REQUIRE( tr );
+         BOOST_REQUIRE( !tr->except );
+         produce_blocks(1);
+      }
+      set_code( DCLAIM, contracts::dclaim_wasm() );
+      set_abi ( DCLAIM, contracts::dclaim_abi().data() );
+      set_privileged( DCLAIM );
+      produce_blocks(1);
+   }
+
    // -----------------------------
    // sysio.system action helpers
    // -----------------------------
@@ -448,7 +466,6 @@ public:
          ("annual_max_emission",     ANNUAL_MAX_EMISSION)
          ("annual_min_emission",     ANNUAL_MIN_EMISSION)
          ("compute_bps",            COMPUTE_BPS)
-         ("capital_bps",            CAPITAL_BPS)
          ("capex_bps",              CAPEX_BPS)
          ("governance_bps",         uint16_t(1000))
          ("producer_bps",           PRODUCER_BPS)
@@ -493,6 +510,14 @@ public:
          signer,
          "initt5"_n,
          mvo()("start_time", start)
+      );
+   }
+
+   action_result fundclaim( account_name signer, int64_t amount ) {
+      return push_system_action(
+         signer,
+         "fundclaim"_n,
+         mvo()("amount", amount)
       );
    }
 
@@ -1751,7 +1776,7 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_requires_sysio_auth, sysio_emissions_tester 
       ("t5_distributable", int64_t(1)) ("t5_floor", int64_t(0))
       ("target_annual_decay_bps", uint16_t(6940))
       ("annual_initial_emission", int64_t(1)) ("annual_max_emission", int64_t(1)) ("annual_min_emission", int64_t(0))
-      ("compute_bps", uint16_t(10000)) ("capital_bps", uint16_t(0)) ("capex_bps", uint16_t(0)) ("governance_bps", uint16_t(0))
+      ("compute_bps", uint16_t(10000)) ("capex_bps", uint16_t(0)) ("governance_bps", uint16_t(0))
       ("producer_bps", uint16_t(5000)) ("batch_op_bps", uint16_t(5000))
       ("standby_end_rank", uint32_t(28))
       ("epoch_log_retention_count", uint32_t(8640))("pay_cadence_epochs", uint16_t(1));
@@ -1762,7 +1787,8 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_requires_sysio_auth, sysio_emissions_tester 
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( setemitcfg_rejects_bad_category_bps, sysio_emissions_tester ) try {
-   // Category BPS must sum to 10000
+   // compute + capex + governance must be <= 10000 (the remainder is the
+   // implicit capital reserve drained lazily by fundclaim).
    auto cfg = mvo()
       ("t1_allocation", int64_t(1)) ("t2_allocation", int64_t(1)) ("t3_allocation", int64_t(1))
       ("t1_duration", uint32_t(1))  ("t2_duration", uint32_t(1))  ("t3_duration", uint32_t(1))
@@ -1770,14 +1796,14 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_rejects_bad_category_bps, sysio_emissions_te
       ("t5_distributable", int64_t(1)) ("t5_floor", int64_t(0))
       ("target_annual_decay_bps", uint16_t(6940))
       ("annual_initial_emission", int64_t(1)) ("annual_max_emission", int64_t(1)) ("annual_min_emission", int64_t(0))
-      ("compute_bps", uint16_t(5000)) ("capital_bps", uint16_t(3000)) ("capex_bps", uint16_t(2000)) ("governance_bps", uint16_t(500))
+      ("compute_bps", uint16_t(5000)) ("capex_bps", uint16_t(4000)) ("governance_bps", uint16_t(2000))
       ("producer_bps", uint16_t(5000)) ("batch_op_bps", uint16_t(5000))
       ("standby_end_rank", uint32_t(28))
       ("epoch_log_retention_count", uint32_t(8640))("pay_cadence_epochs", uint16_t(1));
 
    auto r = setemitcfg(config::system_account_name, cfg);
    BOOST_REQUIRE( r != success() );
-   require_substr( r, "category BPS must sum to 10000" );
+   require_substr( r, "compute + capex + governance BPS must be <= 10000" );
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( setemitcfg_rejects_bad_compute_subsplit, sysio_emissions_tester ) try {
@@ -1788,7 +1814,7 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_rejects_bad_compute_subsplit, sysio_emission
       ("t5_distributable", int64_t(1)) ("t5_floor", int64_t(0))
       ("target_annual_decay_bps", uint16_t(6940))
       ("annual_initial_emission", int64_t(1)) ("annual_max_emission", int64_t(1)) ("annual_min_emission", int64_t(0))
-      ("compute_bps", uint16_t(4000)) ("capital_bps", uint16_t(3000)) ("capex_bps", uint16_t(2000)) ("governance_bps", uint16_t(1000))
+      ("compute_bps", uint16_t(4000)) ("capex_bps", uint16_t(2000)) ("governance_bps", uint16_t(1000))
       ("producer_bps", uint16_t(6000)) ("batch_op_bps", uint16_t(3000))
       ("standby_end_rank", uint32_t(28))
       ("epoch_log_retention_count", uint32_t(8640))("pay_cadence_epochs", uint16_t(1));
@@ -1806,7 +1832,7 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_rejects_zero_duration, sysio_emissions_teste
       ("t5_distributable", int64_t(1)) ("t5_floor", int64_t(0))
       ("target_annual_decay_bps", uint16_t(6940))
       ("annual_initial_emission", int64_t(1)) ("annual_max_emission", int64_t(1)) ("annual_min_emission", int64_t(0))
-      ("compute_bps", uint16_t(4000)) ("capital_bps", uint16_t(3000)) ("capex_bps", uint16_t(2000)) ("governance_bps", uint16_t(1000))
+      ("compute_bps", uint16_t(4000)) ("capex_bps", uint16_t(2000)) ("governance_bps", uint16_t(1000))
       ("producer_bps", uint16_t(7000)) ("batch_op_bps", uint16_t(3000))
       ("standby_end_rank", uint32_t(28))
       ("epoch_log_retention_count", uint32_t(8640))("pay_cadence_epochs", uint16_t(1));
@@ -1826,7 +1852,7 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_rejects_invalid_decay_target, sysio_emission
          ("t5_distributable", int64_t(1)) ("t5_floor", int64_t(0))
          ("target_annual_decay_bps", target_bps)
          ("annual_initial_emission", int64_t(1)) ("annual_max_emission", int64_t(1)) ("annual_min_emission", int64_t(0))
-         ("compute_bps", uint16_t(4000)) ("capital_bps", uint16_t(3000)) ("capex_bps", uint16_t(2000)) ("governance_bps", uint16_t(1000))
+         ("compute_bps", uint16_t(4000)) ("capex_bps", uint16_t(2000)) ("governance_bps", uint16_t(1000))
          ("producer_bps", uint16_t(7000)) ("batch_op_bps", uint16_t(3000))
          ("standby_end_rank", uint32_t(28))
          ("epoch_log_retention_count", uint32_t(8640))("pay_cadence_epochs", uint16_t(1));
@@ -1859,7 +1885,7 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_rejects_round_to_zero_per_epoch, sysio_emiss
          ("annual_initial_emission", annual_initial)
          ("annual_max_emission", ANNUAL_MAX_EMISSION)
          ("annual_min_emission", int64_t(0))
-         ("compute_bps", COMPUTE_BPS) ("capital_bps", CAPITAL_BPS)
+         ("compute_bps", COMPUTE_BPS)
          ("capex_bps", CAPEX_BPS) ("governance_bps", uint16_t(1000))
          ("producer_bps", PRODUCER_BPS) ("batch_op_bps", uint16_t(3000))
          ("standby_end_rank", T_STANDBY_END_RANK)
@@ -1890,7 +1916,7 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_rejects_bad_standby_rank, sysio_emissions_te
       ("t5_distributable", int64_t(1)) ("t5_floor", int64_t(0))
       ("target_annual_decay_bps", uint16_t(6940))
       ("annual_initial_emission", int64_t(1)) ("annual_max_emission", int64_t(1)) ("annual_min_emission", int64_t(0))
-      ("compute_bps", uint16_t(4000)) ("capital_bps", uint16_t(3000)) ("capex_bps", uint16_t(2000)) ("governance_bps", uint16_t(1000))
+      ("compute_bps", uint16_t(4000)) ("capex_bps", uint16_t(2000)) ("governance_bps", uint16_t(1000))
       ("producer_bps", uint16_t(7000)) ("batch_op_bps", uint16_t(3000))
       ("standby_end_rank", uint32_t(21))
       ("epoch_log_retention_count", uint32_t(8640))("pay_cadence_epochs", uint16_t(1));
@@ -1909,7 +1935,7 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_rejects_standby_rank_over_cap, sysio_emissio
       ("t5_distributable", int64_t(1)) ("t5_floor", int64_t(0))
       ("target_annual_decay_bps", uint16_t(6940))
       ("annual_initial_emission", int64_t(1)) ("annual_max_emission", int64_t(1)) ("annual_min_emission", int64_t(0))
-      ("compute_bps", uint16_t(4000)) ("capital_bps", uint16_t(3000)) ("capex_bps", uint16_t(2000)) ("governance_bps", uint16_t(1000))
+      ("compute_bps", uint16_t(4000)) ("capex_bps", uint16_t(2000)) ("governance_bps", uint16_t(1000))
       ("producer_bps", uint16_t(7000)) ("batch_op_bps", uint16_t(3000))
       ("standby_end_rank", uint32_t(101))
       ("epoch_log_retention_count", uint32_t(8640))("pay_cadence_epochs", uint16_t(1));
@@ -1944,7 +1970,6 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_reconfigurable, sysio_emissions_tester ) try
       ("annual_max_emission", int64_t(3000000000000000LL * 365))
       ("annual_min_emission", int64_t(100000000000000LL * 365))
       ("compute_bps", uint16_t(4000))
-      ("capital_bps", uint16_t(3000))
       ("capex_bps", uint16_t(2000))
       ("governance_bps", uint16_t(1000))
       ("producer_bps", uint16_t(7000))
@@ -1983,7 +2008,6 @@ BOOST_FIXTURE_TEST_CASE( viewemitcfg_returns_current_config, sysio_emissions_tes
    BOOST_REQUIRE_EQUAL( cfg.annual_max_emission, ANNUAL_MAX_EMISSION );
    BOOST_REQUIRE_EQUAL( cfg.annual_min_emission, ANNUAL_MIN_EMISSION );
    BOOST_REQUIRE_EQUAL( cfg.compute_bps, COMPUTE_BPS );
-   BOOST_REQUIRE_EQUAL( cfg.capital_bps, CAPITAL_BPS );
    BOOST_REQUIRE_EQUAL( cfg.capex_bps, CAPEX_BPS );
    BOOST_REQUIRE_EQUAL( cfg.governance_bps, uint16_t(1000) );
    BOOST_REQUIRE_EQUAL( cfg.producer_bps, PRODUCER_BPS );
@@ -2010,7 +2034,6 @@ BOOST_FIXTURE_TEST_CASE( viewemitcfg_reflects_update, sysio_emissions_tester ) t
       ("annual_max_emission", int64_t(1'000'000'000))
       ("annual_min_emission", int64_t(10'000'000))
       ("compute_bps", uint16_t(2500))
-      ("capital_bps", uint16_t(2500))
       ("capex_bps", uint16_t(2500))
       ("governance_bps", uint16_t(2500))
       ("producer_bps", uint16_t(5000))
@@ -2092,7 +2115,7 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_post_initt5_rejects_brick_reduce, sysio_emis
       ("target_annual_decay_bps", TARGET_ANNUAL_DECAY_BPS)
       ("annual_initial_emission", ANNUAL_INITIAL_EMISSION)
       ("annual_max_emission", ANNUAL_MAX_EMISSION) ("annual_min_emission", ANNUAL_MIN_EMISSION)
-      ("compute_bps", COMPUTE_BPS) ("capital_bps", CAPITAL_BPS)
+      ("compute_bps", COMPUTE_BPS)
       ("capex_bps", CAPEX_BPS) ("governance_bps", uint16_t(1000))
       ("producer_bps", PRODUCER_BPS) ("batch_op_bps", uint16_t(3000))
       ("standby_end_rank", T_STANDBY_END_RANK)
@@ -2135,7 +2158,7 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_post_initt5_rejects_unreachable_min_emission
       ("annual_initial_emission", int64_t(0))
       ("annual_max_emission", annual_floor)
       ("annual_min_emission", annual_floor)
-      ("compute_bps", COMPUTE_BPS) ("capital_bps", CAPITAL_BPS)
+      ("compute_bps", COMPUTE_BPS)
       ("capex_bps", CAPEX_BPS) ("governance_bps", uint16_t(1000))
       ("producer_bps", PRODUCER_BPS) ("batch_op_bps", uint16_t(3000))
       ("standby_end_rank", T_STANDBY_END_RANK)
@@ -2232,7 +2255,7 @@ BOOST_FIXTURE_TEST_CASE( gate_block_reason_change_updates_row, sysio_emissions_t
       ("target_annual_decay_bps", TARGET_ANNUAL_DECAY_BPS)
       ("annual_initial_emission", int64_t(0))
       ("annual_max_emission",     ANNUAL_MAX_EMISSION) ("annual_min_emission", int64_t(0))
-      ("compute_bps",            COMPUTE_BPS) ("capital_bps", CAPITAL_BPS)
+      ("compute_bps",            COMPUTE_BPS)
       ("capex_bps",              CAPEX_BPS)   ("governance_bps", uint16_t(1000))
       ("producer_bps",           PRODUCER_BPS)("batch_op_bps", uint16_t(3000))
       ("standby_end_rank",       T_STANDBY_END_RANK)
@@ -2396,13 +2419,13 @@ BOOST_FIXTURE_TEST_CASE( category_split_matches_basis_points, sysio_emissions_te
 
    int64_t total     = log["total_emission"].as<int64_t>();
    int64_t compute   = log["compute_amount"].as<int64_t>();
-   int64_t capital   = log["capital_amount"].as<int64_t>();
    int64_t capex     = log["capex_amount"].as<int64_t>();
 
    BOOST_REQUIRE_EQUAL( compute, test_split_bps(total, COMPUTE_BPS) );
-   BOOST_REQUIRE_EQUAL( capital, test_split_bps(total, CAPITAL_BPS) );
    // capex gets only its base split (no producer dust redirect)
    BOOST_REQUIRE_EQUAL( capex, test_split_bps(total, CAPEX_BPS) );
+   // capital is NOT in the epoch_log -- drained lazily via fundclaim, not at payepoch.
+   BOOST_REQUIRE( !log.get_object().contains("capital_amount") );
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( governance_gets_remainder_no_dust_loss, sysio_emissions_tester ) try {
@@ -2413,13 +2436,12 @@ BOOST_FIXTURE_TEST_CASE( governance_gets_remainder_no_dust_loss, sysio_emissions
 
    auto log = get_epoch_log(1);
    int64_t total   = log["total_emission"].as<int64_t>();
-   int64_t compute = log["compute_amount"].as<int64_t>();
-   int64_t capital = log["capital_amount"].as<int64_t>();
    int64_t gov     = log["governance_amount"].as<int64_t>();
 
-   int64_t capex_base = test_split_bps(total, CAPEX_BPS);
-   int64_t expected_gov = total - compute - capital - capex_base;
-   BOOST_REQUIRE_EQUAL( gov, expected_gov );
+   // governance is its own BPS share of total (independent of compute/capex):
+   // the implicit capital reserve (drained lazily via fundclaim) is what
+   // absorbs any unallocated remainder, not governance.
+   BOOST_REQUIRE_EQUAL( gov, test_split_bps(total, uint16_t(1000)) );
 } FC_LOG_AND_RETHROW()
 
 // ---------------------------------------------------------------------------
@@ -2503,7 +2525,6 @@ BOOST_FIXTURE_TEST_CASE( holding_accounts_receive_correct_amounts, sysio_emissio
 
    auto log = get_epoch_log(1);
    int64_t emission = log["total_emission"].as<int64_t>();
-   int64_t capital  = log["capital_amount"].as<int64_t>();
    int64_t gov      = log["governance_amount"].as<int64_t>();
    int64_t capex_base = test_split_bps(emission, CAPEX_BPS);
 
@@ -2512,7 +2533,9 @@ BOOST_FIXTURE_TEST_CASE( holding_accounts_receive_correct_amounts, sysio_emissio
    int64_t batch_received = get_wire_balance("sysio.batch"_n).get_amount() - batch_before.get_amount();
    int64_t ops_received   = get_wire_balance("sysio.ops"_n).get_amount()   - ops_before.get_amount();
 
-   BOOST_REQUIRE_EQUAL( dclaim_received, capital );
+   // dclaim is not funded at payepoch anymore -- capital draws are lazy
+   // via sysio.dclaim::onreward -> sysio.system::fundclaim.
+   BOOST_REQUIRE_EQUAL( dclaim_received, 0 );
    BOOST_REQUIRE_EQUAL( gov_received, gov );
    // sysio.batch is not an emissions recipient anymore -- batch pay goes to the
    // current rotation group, not a holding account.
@@ -2954,7 +2977,9 @@ BOOST_FIXTURE_TEST_CASE( multi_epoch_cumulative_accounting, sysio_emissions_test
 // ---------------------------------------------------------------------------
 
 BOOST_FIXTURE_TEST_CASE( category_splits_sum_to_emission, sysio_emissions_tester ) try {
-   // Verify compute + capital + capex + governance == total_emission exactly
+   // Verify compute + capex + governance + implicit_capital_reserve == total_emission.
+   // The implicit capital reserve isn't recorded in epoch_log (drained lazily
+   // by fundclaim); back it out from the curve total to confirm the math.
    create_t5_holding_accounts();
    const uint32_t start = head_secs() - ONE_EPOCH - 1;
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
@@ -2963,12 +2988,16 @@ BOOST_FIXTURE_TEST_CASE( category_splits_sum_to_emission, sysio_emissions_tester
    auto log = get_epoch_log(1);
    int64_t emission    = log["total_emission"].as<int64_t>();
    int64_t compute     = log["compute_amount"].as<int64_t>();
-   int64_t capital     = log["capital_amount"].as<int64_t>();
    int64_t capex       = log["capex_amount"].as<int64_t>();
    int64_t governance  = log["governance_amount"].as<int64_t>();
 
-   // Exact sum: governance absorbs remainder, so this must hold exactly
-   BOOST_REQUIRE_EQUAL( compute + capital + capex + governance, emission );
+   // Each non-capital share is its own BPS split of period_emission (no
+   // remainder-absorption). Implicit capital reserve = whatever's left.
+   BOOST_REQUIRE_EQUAL( compute,    test_split_bps(emission, COMPUTE_BPS) );
+   BOOST_REQUIRE_EQUAL( capex,      test_split_bps(emission, CAPEX_BPS) );
+   BOOST_REQUIRE_EQUAL( governance, test_split_bps(emission, uint16_t(1000)) );
+   const int64_t implicit_capital = emission - compute - capex - governance;
+   BOOST_REQUIRE( implicit_capital >= 0 );
 
    // Compute sub-split: producer_pool + batch_pool == compute_amount
    int64_t producer_pool = test_split_bps(compute, PRODUCER_BPS);
@@ -3004,16 +3033,16 @@ BOOST_FIXTURE_TEST_CASE( epoch_log_records_all_fields, sysio_emissions_tester ) 
    BOOST_REQUIRE_EQUAL( log["total_emission"].as<int64_t>(),
       test_scale_annual_to_epoch(ANNUAL_INITIAL_EMISSION, 60) );
 
-   // All category amounts are positive
+   // All recorded category amounts are positive (capital_amount is no
+   // longer in epoch_log -- drained lazily via fundclaim).
    BOOST_REQUIRE( log["compute_amount"].as<int64_t>() > 0 );
-   BOOST_REQUIRE( log["capital_amount"].as<int64_t>() > 0 );
    BOOST_REQUIRE( log["capex_amount"].as<int64_t>() > 0 );
    BOOST_REQUIRE( log["governance_amount"].as<int64_t>() > 0 );
+   BOOST_REQUIRE( !log.get_object().contains("capital_amount") );
 
-   // Category amounts match expected BPS splits
+   // Category amounts match expected BPS splits.
    int64_t emission = log["total_emission"].as<int64_t>();
    BOOST_REQUIRE_EQUAL( log["compute_amount"].as<int64_t>(), test_split_bps(emission, COMPUTE_BPS) );
-   BOOST_REQUIRE_EQUAL( log["capital_amount"].as<int64_t>(), test_split_bps(emission, CAPITAL_BPS) );
    BOOST_REQUIRE_EQUAL( log["capex_amount"].as<int64_t>(), test_split_bps(emission, CAPEX_BPS) );
 } FC_LOG_AND_RETHROW()
 
@@ -3580,7 +3609,7 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_rejects_zero_retention, sysio_emissions_test
       ("target_annual_decay_bps", TARGET_ANNUAL_DECAY_BPS)
       ("annual_initial_emission", ANNUAL_INITIAL_EMISSION)
       ("annual_max_emission", ANNUAL_MAX_EMISSION) ("annual_min_emission", ANNUAL_MIN_EMISSION)
-      ("compute_bps", COMPUTE_BPS) ("capital_bps", CAPITAL_BPS)
+      ("compute_bps", COMPUTE_BPS)
       ("capex_bps", CAPEX_BPS) ("governance_bps", uint16_t(1000))
       ("producer_bps", PRODUCER_BPS) ("batch_op_bps", uint16_t(3000))
       ("standby_end_rank", T_STANDBY_END_RANK)
@@ -3606,7 +3635,7 @@ BOOST_FIXTURE_TEST_CASE( epochlog_prunes_past_retention_cap, sysio_emissions_tes
       ("target_annual_decay_bps", TARGET_ANNUAL_DECAY_BPS)
       ("annual_initial_emission", ANNUAL_INITIAL_EMISSION)
       ("annual_max_emission", ANNUAL_MAX_EMISSION) ("annual_min_emission", ANNUAL_MIN_EMISSION)
-      ("compute_bps", COMPUTE_BPS) ("capital_bps", CAPITAL_BPS)
+      ("compute_bps", COMPUTE_BPS)
       ("capex_bps", CAPEX_BPS) ("governance_bps", uint16_t(1000))
       ("producer_bps", PRODUCER_BPS) ("batch_op_bps", uint16_t(3000))
       ("standby_end_rank", T_STANDBY_END_RANK)
@@ -3787,7 +3816,7 @@ BOOST_FIXTURE_TEST_CASE( pay_cadence_treasury_exhausted_gates_non_pay_epoch, sys
       ("target_annual_decay_bps", TARGET_ANNUAL_DECAY_BPS)
       ("annual_initial_emission", int64_t(0))               // forces per-epoch emission == 0
       ("annual_max_emission", ANNUAL_MAX_EMISSION) ("annual_min_emission", int64_t(0))
-      ("compute_bps", COMPUTE_BPS) ("capital_bps", CAPITAL_BPS)
+      ("compute_bps", COMPUTE_BPS)
       ("capex_bps", CAPEX_BPS) ("governance_bps", uint16_t(1000))
       ("producer_bps", PRODUCER_BPS) ("batch_op_bps", uint16_t(3000))
       ("standby_end_rank", T_STANDBY_END_RANK)
@@ -3846,6 +3875,135 @@ BOOST_FIXTURE_TEST_CASE( pay_cadence_change_via_setemitcfg_takes_effect, sysio_e
       BOOST_REQUIRE_EQUAL( state["pending_emission_amount"].as<int64_t>(), 0 );
       BOOST_REQUIRE_EQUAL( state["period_start_epoch"].as<uint32_t>(), 3u );
    }
+} FC_LOG_AND_RETHROW()
+
+// ---------------------------------------------------------------------------
+// fundclaim: per-onreward immediate funding for sysio.dclaim
+// ---------------------------------------------------------------------------
+
+BOOST_FIXTURE_TEST_CASE( fundclaim_requires_dclaim_auth, sysio_emissions_tester ) try {
+   create_t5_holding_accounts();
+   deploy_dclaim_for_signing();
+   const uint32_t start = head_secs() - ONE_EPOCH - 1;
+   BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
+
+   // alice has no claim to sysio.dclaim's authority.
+   create_user_accounts({ "alice"_n });
+   auto r = fundclaim( "alice"_n, int64_t(1'000'000) );
+   BOOST_REQUIRE( r != success() );
+   require_substr( r, "missing authority of sysio.dclaim" );
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( fundclaim_transfers_and_tracks_distributed, sysio_emissions_tester ) try {
+   create_t5_holding_accounts();
+   deploy_dclaim_for_signing();
+   const uint32_t start = head_secs() - ONE_EPOCH - 1;
+   BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
+
+   const asset sysio_before  = get_wire_balance( config::system_account_name );
+   const asset dclaim_before = get_wire_balance( "sysio.dclaim"_n );
+   const int64_t distributed_before = get_t5_state()["total_distributed"].as<int64_t>();
+
+   const int64_t amt = int64_t(50'000'000'000);   // 50 WIRE
+   BOOST_REQUIRE_EQUAL( success(), fundclaim( "sysio.dclaim"_n, amt ) );
+
+   const asset sysio_after  = get_wire_balance( config::system_account_name );
+   const asset dclaim_after = get_wire_balance( "sysio.dclaim"_n );
+   const auto state = get_t5_state();
+
+   BOOST_REQUIRE_EQUAL( sysio_before.get_amount()  - sysio_after.get_amount(),  amt );
+   BOOST_REQUIRE_EQUAL( dclaim_after.get_amount() - dclaim_before.get_amount(), amt );
+   BOOST_REQUIRE_EQUAL( state["total_distributed"].as<int64_t>(), distributed_before + amt );
+   BOOST_REQUIRE_EQUAL( state["capital_shortfall_total"].as<int64_t>(), 0 );
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( fundclaim_no_op_for_zero_or_negative, sysio_emissions_tester ) try {
+   create_t5_holding_accounts();
+   deploy_dclaim_for_signing();
+   const uint32_t start = head_secs() - ONE_EPOCH - 1;
+   BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
+
+   const asset dclaim_before = get_wire_balance( "sysio.dclaim"_n );
+   const int64_t distributed_before = get_t5_state()["total_distributed"].as<int64_t>();
+
+   BOOST_REQUIRE_EQUAL( success(), fundclaim( "sysio.dclaim"_n, int64_t(0) ) );
+   BOOST_REQUIRE_EQUAL( success(), fundclaim( "sysio.dclaim"_n, int64_t(-100) ) );
+
+   BOOST_REQUIRE_EQUAL( get_wire_balance( "sysio.dclaim"_n ).get_amount(),
+                        dclaim_before.get_amount() );
+   BOOST_REQUIRE_EQUAL( get_t5_state()["total_distributed"].as<int64_t>(),
+                        distributed_before );
+   BOOST_REQUIRE_EQUAL( get_t5_state()["capital_shortfall_total"].as<int64_t>(), 0 );
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( fundclaim_caps_to_remaining_pool_and_records_shortfall, sysio_emissions_tester ) try {
+   // Squeeze t5_distributable down to a small headroom over t5_floor so the
+   // next fundclaim has a hard cap. Verify the partial transfer and the
+   // shortfall accumulator.
+   create_t5_holding_accounts();
+   deploy_dclaim_for_signing();
+   const uint32_t start = head_secs() - ONE_EPOCH - 1;
+   BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
+
+   // Shrink drainable headroom to exactly 1000 subunits via a fresh emitcfg.
+   // The post-init guard requires t5_distributable >= t5_floor + total_distributed,
+   // so set t5_floor to 0 and t5_distributable just above current total_distributed.
+   const int64_t already = get_t5_state()["total_distributed"].as<int64_t>();
+   const int64_t headroom = 1000;
+   auto cfg = mvo()
+      ("t1_allocation", T1_ALLOCATION.get_amount())
+      ("t2_allocation", T2_ALLOCATION.get_amount())
+      ("t3_allocation", T3_ALLOCATION.get_amount())
+      ("t1_duration", T1_DURATION) ("t2_duration", T2_DURATION) ("t3_duration", T3_DURATION)
+      ("min_claimable", MIN_CLAIMABLE_AMOUNT)
+      ("t5_distributable", already + headroom)
+      ("t5_floor", int64_t(0))
+      ("target_annual_decay_bps", TARGET_ANNUAL_DECAY_BPS)
+      ("annual_initial_emission", ANNUAL_INITIAL_EMISSION)
+      ("annual_max_emission", ANNUAL_MAX_EMISSION)
+      // annual_min_emission=0 so the post-init guard (per_epoch_min <= remaining)
+      // doesn't reject the deliberately-tiny pool used by this test.
+      ("annual_min_emission", int64_t(0))
+      ("compute_bps", COMPUTE_BPS)
+      ("capex_bps", CAPEX_BPS) ("governance_bps", GOV_BPS)
+      ("producer_bps", PRODUCER_BPS) ("batch_op_bps", uint16_t(3000))
+      ("standby_end_rank", T_STANDBY_END_RANK)
+      ("epoch_log_retention_count", uint32_t(8640))("pay_cadence_epochs", uint16_t(1));
+   BOOST_REQUIRE_EQUAL( success(), setemitcfg( config::system_account_name, cfg ) );
+
+   const asset dclaim_before = get_wire_balance( "sysio.dclaim"_n );
+
+   // Request 3x the headroom; expect partial transfer of `headroom`, shortfall = 2x.
+   const int64_t request   = headroom * 3;
+   const int64_t shortfall = request - headroom;
+   BOOST_REQUIRE_EQUAL( success(), fundclaim( "sysio.dclaim"_n, request ) );
+
+   const asset dclaim_after = get_wire_balance( "sysio.dclaim"_n );
+   const auto state = get_t5_state();
+   BOOST_REQUIRE_EQUAL( dclaim_after.get_amount() - dclaim_before.get_amount(), headroom );
+   BOOST_REQUIRE_EQUAL( state["total_distributed"].as<int64_t>(), already + headroom );
+   BOOST_REQUIRE_EQUAL( state["capital_shortfall_total"].as<int64_t>(), shortfall );
+
+   // A further request after pool is exhausted is a full shortfall.
+   BOOST_REQUIRE_EQUAL( success(), fundclaim( "sysio.dclaim"_n, int64_t(500) ) );
+   const auto state2 = get_t5_state();
+   BOOST_REQUIRE_EQUAL( get_wire_balance( "sysio.dclaim"_n ).get_amount(),
+                        dclaim_after.get_amount() );
+   BOOST_REQUIRE_EQUAL( state2["total_distributed"].as<int64_t>(), already + headroom );
+   BOOST_REQUIRE_EQUAL( state2["capital_shortfall_total"].as<int64_t>(), shortfall + 500 );
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( fundclaim_silent_when_t5state_missing, sysio_emissions_tester ) try {
+   // initt5 NOT called, so t5state.exists() is false. fundclaim must absorb
+   // the call without throwing or mutating any state.
+   create_t5_holding_accounts();
+   deploy_dclaim_for_signing();
+   const asset dclaim_before = get_wire_balance( "sysio.dclaim"_n );
+
+   BOOST_REQUIRE_EQUAL( success(), fundclaim( "sysio.dclaim"_n, int64_t(1'000'000) ) );
+
+   BOOST_REQUIRE_EQUAL( get_wire_balance( "sysio.dclaim"_n ).get_amount(),
+                        dclaim_before.get_amount() );
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_SUITE_END() // t5_emissions_tests

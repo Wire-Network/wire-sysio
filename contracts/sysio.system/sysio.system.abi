@@ -359,10 +359,6 @@
                     "type": "uint16"
                 },
                 {
-                    "name": "capital_bps",
-                    "type": "uint16"
-                },
-                {
                     "name": "capex_bps",
                     "type": "uint16"
                 },
@@ -462,10 +458,6 @@
                 },
                 {
                     "name": "compute_amount",
-                    "type": "int64"
-                },
-                {
-                    "name": "capital_amount",
                     "type": "int64"
                 },
                 {
@@ -613,6 +605,16 @@
                 {
                     "name": "id",
                     "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "fundclaim",
+            "base": "",
+            "fields": [
+                {
+                    "name": "amount",
+                    "type": "int64"
                 }
             ]
         },
@@ -1301,6 +1303,10 @@
                 {
                     "name": "batch_group_epochs",
                     "type": "uint32[]"
+                },
+                {
+                    "name": "capital_shortfall_total",
+                    "type": "int64"
                 }
             ]
         },
@@ -1647,6 +1653,11 @@
         {
             "name": "expandauth",
             "type": "expandauth",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "fundclaim",
+            "type": "fundclaim",
             "ricardian_contract": ""
         },
         {

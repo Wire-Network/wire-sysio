@@ -63,9 +63,12 @@ struct [[sysio::table("emitcfg"), sysio::contract("sysio.system")]] emission_con
    int64_t   annual_max_emission;     // per-year ceiling
    int64_t   annual_min_emission;     // per-year floor
 
-   // Category splits (basis points, must sum to 10000)
+   // Category splits (basis points). compute + capex + governance must
+   // sum to <= 10000; the remainder is the implicit capital reserve drained
+   // lazily by sysio.dclaim::onreward via sysio.system::fundclaim, not at
+   // payepoch. Sum == 10000 means no implicit reserve (capital draws eat
+   // future periods' headroom).
    uint16_t  compute_bps;
-   uint16_t  capital_bps;
    uint16_t  capex_bps;
    uint16_t  governance_bps;
 
@@ -96,7 +99,7 @@ struct [[sysio::table("emitcfg"), sysio::contract("sysio.system")]] emission_con
       (t5_distributable)(t5_floor)
       (target_annual_decay_bps)
       (annual_initial_emission)(annual_max_emission)(annual_min_emission)
-      (compute_bps)(capital_bps)(capex_bps)(governance_bps)
+      (compute_bps)(capex_bps)(governance_bps)
       (producer_bps)(batch_op_bps)
       (standby_end_rank)(epoch_log_retention_count)
       (pay_cadence_epochs))
@@ -193,10 +196,17 @@ struct [[sysio::table("t5state"), sysio::contract("sysio.system")]] t5_state {
    // on first use; pre-pay-cadence chains see length 0.
    std::vector<uint32_t>  batch_group_epochs;
 
+   // Cumulative shortfall (WIRE subunits) between requested and actually-
+   // funded capital draws. fundclaim caps each request at the remaining
+   // pool; any unfunded delta is added here so under-sized pools are
+   // visible without breaking the OPP-handler never-throw contract.
+   int64_t                capital_shortfall_total = 0;
+
    SYSLIB_SERIALIZE(t5_state,
       (start_time)(epoch_count)(last_epoch_index)
       (last_epoch_time)(last_epoch_emission)(total_distributed)
-      (pending_emission_amount)(period_start_epoch)(batch_group_epochs))
+      (pending_emission_amount)(period_start_epoch)(batch_group_epochs)
+      (capital_shortfall_total))
 };
 
 using t5state_t = sysio::kv::global<"t5state"_n, t5_state>;
@@ -280,15 +290,18 @@ struct [[sysio::table("epochlog"), sysio::contract("sysio.system")]] epoch_log {
    uint32_t               sysio_epoch_index = 0;  // mirrors t5_state.last_epoch_index / sysio.epoch::current_epoch_index
    uint64_t               epoch_count       = 0;  // internal counter of payepoch invocations
    sysio::time_point_sec  timestamp;
+   // Total budget for the period (curve output). compute + capex + governance
+   // are paid out of this at payepoch; the implicit capital reserve
+   // (= total_emission - compute - capex - governance) is drained lazily
+   // by fundclaim across the same period and never appears here.
    int64_t                total_emission    = 0;
    int64_t                compute_amount    = 0;
-   int64_t                capital_amount    = 0;
    int64_t                capex_amount      = 0;
    int64_t                governance_amount = 0;
 
    SYSLIB_SERIALIZE(epoch_log,
       (sysio_epoch_index)(epoch_count)(timestamp)(total_emission)
-      (compute_amount)(capital_amount)(capex_amount)(governance_amount))
+      (compute_amount)(capex_amount)(governance_amount))
 };
 
 using epochlog_t = sysio::kv::table<"epochlog"_n, epochlog_key, epoch_log>;
