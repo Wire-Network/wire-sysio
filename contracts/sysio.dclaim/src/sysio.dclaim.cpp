@@ -101,19 +101,19 @@ void credit_wire(name self, name wacct, ChainKind chain,
    }
 }
 
-/// Dedupe at ingest. Returns true if `(outpost_id, chain, addr)` has not seen
+/// Dedupe at ingest. Returns true if `(chain_code, chain, addr)` has not seen
 /// `ext_ref` (or any >= it) yet — and advances the cursor. Returns false for a
 /// replay / out-of-order duplicate (`ext_ref <= last`). Advancing here (not at
 /// conversion time) means a replay is rejected even while an earlier reward is
 /// still staged awaiting a quote.
-bool cursor_admit(name self, uint64_t outpost_id, ChainKind chain,
+bool cursor_admit(name self, uint64_t chain_code, ChainKind chain,
                   const std::vector<char>& addr, uint64_t ext_ref) {
    dclaim::rwdcursors_t cur(self);
-   auto idx = cur.template get_index<"byoutaddr"_n>();
-   auto it = scan_find(idx, dclaim::outpost_addr_key(outpost_id, chain, addr),
-                       [](const auto& r) { return r.by_outpost_addr(); },
+   auto idx = cur.template get_index<"bychaincode"_n>();
+   auto it = scan_find(idx, dclaim::chaincode_addr_key(chain_code, chain, addr),
+                       [](const auto& r) { return r.by_chaincode_addr(); },
                        [&](const auto& r) {
-                          return r.outpost_id == outpost_id
+                          return r.chain_code == chain_code
                               && r.chain      == chain
                               && r.native_pubkey == addr;
                        });
@@ -123,7 +123,7 @@ bool cursor_admit(name self, uint64_t outpost_id, ChainKind chain,
       });
       cur.emplace(self, dclaim::rwdcur_key{id},
          dclaim::reward_cursor{ .id         = id,
-                             .outpost_id = outpost_id,
+                             .chain_code = chain_code,
                              .chain      = chain,
                              .native_pubkey = addr,
                              .last_external_epoch_ref = ext_ref });
@@ -211,7 +211,7 @@ void dclaim::linkswept(name wire_account, ChainKind chain, std::vector<char> nat
 // ---------------------------------------------------------------------------
 //  onreward — per-staker WIRE-side credit of a STAKING_REWARD
 // ---------------------------------------------------------------------------
-void dclaim::onreward(uint64_t              outpost_id,
+void dclaim::onreward(uint64_t              chain_code,
                    std::string           staker_wire_account,
                    opp::types::ChainKind reward_chain,
                    std::vector<char>     staker_native_addr,
@@ -227,7 +227,7 @@ void dclaim::onreward(uint64_t              outpost_id,
    if (reward_amount == 0 || staker_native_addr.empty()) return;
 
    // Dedupe at ingest so a replay / out-of-order duplicate is rejected.
-   if (!cursor_admit(get_self(), outpost_id, reward_chain,
+   if (!cursor_admit(get_self(), chain_code, reward_chain,
                      staker_native_addr, external_epoch_ref)) {
       return;
    }

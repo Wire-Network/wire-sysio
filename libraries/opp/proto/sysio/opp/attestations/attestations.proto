@@ -289,8 +289,8 @@ message NodeOwnerReg {
 // staker has an AuthX-linked WIRE account, otherwise parked in
 // `unmapped_tokens` keyed by the native address until they link).
 message StakingReward {
-  // Outpost id emitting the reward — identifies the (chain, validator) context.
-  uint64                       outpost_id = 1;
+  // Chain code emitting the reward — identifies the (chain, validator) context.
+  uint64                       chain_code = 1;
   // The staker's WIRE account. May be empty when the staker has not yet
   // completed AuthX linking; in that case the depot parks the reward by
   // `staker_native_address` until the link sweep moves it to the claim ledger.

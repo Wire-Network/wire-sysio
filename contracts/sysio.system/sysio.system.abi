@@ -667,6 +667,28 @@
             ]
         },
         {
+            "name": "limit_auth_change",
+            "base": "",
+            "fields": [
+                {
+                    "name": "version",
+                    "type": "uint8"
+                },
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "allow_perms",
+                    "type": "name[]"
+                },
+                {
+                    "name": "disallow_perms",
+                    "type": "name[]"
+                }
+            ]
+        },
+        {
             "name": "limitauthchg",
             "base": "",
             "fields": [
@@ -681,6 +703,16 @@
                 {
                     "name": "disallow_perms",
                     "type": "name[]"
+                }
+            ]
+        },
+        {
+            "name": "limitauthchg_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "uint64"
                 }
             ]
         },
@@ -1508,38 +1540,6 @@
             ]
         },
         {
-            "name": "limit_auth_change",
-            "base": "",
-            "fields": [
-                {
-                    "name": "version",
-                    "type": "uint8"
-                },
-                {
-                    "name": "account",
-                    "type": "name"
-                },
-                {
-                    "name": "allow_perms",
-                    "type": "name[]"
-                },
-                {
-                    "name": "disallow_perms",
-                    "type": "name[]"
-                }
-            ]
-        },
-        {
-            "name": "limitauthchg_key",
-            "base": "",
-            "fields": [
-                {
-                    "name": "account",
-                    "type": "uint64"
-                }
-            ]
-        },
-        {
             "name": "addtrxp",
             "base": "",
             "fields": [
@@ -1932,6 +1932,14 @@
             "table_id": 13870
         },
         {
+            "name": "limitauthchg",
+            "type": "limit_auth_change",
+            "index_type": "i64",
+            "key_names": ["account"],
+            "key_types": ["uint64"],
+            "table_id": 43800
+        },
+        {
             "name": "nodecount",
             "type": "node_count_state",
             "index_type": "i64",
@@ -1985,14 +1993,6 @@
             "key_names": ["account"],
             "key_types": ["uint64"],
             "table_id": 40639
-        },
-        {
-            "name": "limitauthchg",
-            "type": "limit_auth_change",
-            "index_type": "i64",
-            "key_names": ["account"],
-            "key_types": ["uint64"],
-            "table_id": 43800
         },
         {
             "name": "trxpglobal",
