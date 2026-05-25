@@ -1,6 +1,9 @@
 #pragma once
 
+#include <map>
 #include <memory>
+#include <mutex>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -81,11 +84,32 @@ public:
    const fc::network::solana::solana_public_key& program_id()            const { return _program_id; }
 
 private:
+   /// Resolve `token_code` → SPL mint pubkey via the on-chain
+   /// `OutpostConfig.token_addresses_by_code` table. Returns
+   /// `std::nullopt` for unknown codes OR for native-marker mints
+   /// (`NATIVE_TOKEN_MARKER`, the all-zeroes pubkey the program
+   /// stamps for native-SOL token bindings). Lazy-initialises the
+   /// cache from the chain on first call; subsequent calls hit the
+   /// in-memory map. Thread-safe via `_token_address_mutex`.
+   std::optional<fc::network::solana::solana_public_key>
+   spl_mint_for_token_code(uint64_t token_code);
+
    solana_client_entry_ptr                       _entry;
    fc::network::solana::solana_public_key        _program_id;
    std::shared_ptr<opp_solana_outpost_client>    _program_client;
    uint64_t                                      _outpost_id;
    uint32_t                                      _chain_id;
+
+   /// Lazy cache populated from `OutpostConfig.token_addresses_by_code`
+   /// on first SPL-targeted SwapRemit. Mint pubkey is keyed by the 8-
+   /// byte `slug_name` integer (e.g. `SlugName.from("USDCSOL")`).
+   /// Empty optional values are stored to remember misses without
+   /// re-querying the chain.
+   std::map<uint64_t,
+            std::optional<fc::network::solana::solana_public_key>>
+                                                 _mint_by_token_code;
+   bool                                          _token_address_cache_loaded {false};
+   std::mutex                                    _token_address_mutex;
 };
 
 using outpost_solana_client_ptr = std::shared_ptr<outpost_solana_client>;
@@ -140,6 +164,30 @@ struct reserve_pda_seeds {
 /// caller's responsibility.
 std::vector<reserve_pda_seeds>
 extract_inbound_swap_remit_reserve_seeds(const std::vector<char>& envelope_bytes);
+
+/// Tuple of (token_code, reserve_code, recipient) pulled from every
+/// inbound SWAP_REMIT attestation in the envelope. The relay uses this
+/// to derive the per-attestation reserve_vault PDA + recipient ATA
+/// (`get_associated_token_address(recipient, mint)`) when the target
+/// `token_code` resolves to an SPL mint via `OutpostConfig.token_addresses_by_code`.
+///
+/// Native-SOL targets harmlessly produce the same struct — the relay
+/// just skips the ATA / mint derivation when the mint lookup returns
+/// the native marker. The on-chain `handle_swap_remit` native branch
+/// doesn't reference any of the extra accounts, so they're inert.
+struct swap_remit_spl_target {
+   uint64_t                                token_code;
+   uint64_t                                reserve_code;
+   fc::network::solana::solana_public_key  recipient;
+};
+
+/// Walk every `SWAP_REMIT` attestation in `envelope_bytes` and collect
+/// the SPL-relevant tuple. Caller is responsible for resolving each
+/// `token_code` to a mint pubkey (cached from `OutpostConfig`) before
+/// deriving the recipient ATA + including it in `remaining_accounts`.
+std::vector<swap_remit_spl_target>
+extract_inbound_swap_remit_spl_targets(const std::vector<char>& envelope_bytes);
+
 
 } // namespace outpost_solana_client_detail
 

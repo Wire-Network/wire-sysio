@@ -1045,7 +1045,14 @@
             "index_type": "i64",
             "key_names": ["scope","primary_key"],
             "key_types": ["name","uint64"],
-            "table_id": 62600
+            "table_id": 62600,
+            "secondary_indexes": [
+                {
+                    "name": "byval",
+                    "key_type": "float64",
+                    "table_id": 64649
+                }
+            ]
         },
         {
             "name": "mi_row",
@@ -1085,7 +1092,14 @@
             "index_type": "i64",
             "key_names": ["scope","primary_key"],
             "key_types": ["name","uint64"],
-            "table_id": 13040
+            "table_id": 13040,
+            "secondary_indexes": [
+                {
+                    "name": "byscore",
+                    "key_type": "uint128",
+                    "table_id": 8945
+                }
+            ]
         },
         {
             "name": "sectbl",
@@ -1093,7 +1107,14 @@
             "index_type": "i64",
             "key_names": ["scope","primary_key"],
             "key_types": ["name","uint64"],
-            "table_id": 7439
+            "table_id": 7439,
+            "secondary_indexes": [
+                {
+                    "name": "byage",
+                    "key_type": "uint64",
+                    "table_id": 48144
+                }
+            ]
         }
     ],
     "ricardian_clauses": [],
