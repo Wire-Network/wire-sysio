@@ -188,6 +188,7 @@ struct swap_remit_spl_target {
 std::vector<swap_remit_spl_target>
 extract_inbound_swap_remit_spl_targets(const std::vector<char>& envelope_bytes);
 
+
 } // namespace outpost_solana_client_detail
 
 } // namespace sysio

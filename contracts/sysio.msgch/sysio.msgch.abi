@@ -654,6 +654,10 @@
                 {
                     "name": "ATTESTATION_TYPE_RESERVE_READY",
                     "value": 60961
+                },
+                {
+                    "name": "ATTESTATION_TYPE_EMISSIONS_BLOCKED",
+                    "value": 60962
                 }
             ]
         },

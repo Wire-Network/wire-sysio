@@ -89,6 +89,35 @@ namespace sysio {
 
       using epochstate_t = sysio::kv::global<"epochstate"_n, epoch_state>;
 
+      /// Emissions readiness gate block log. One row per epoch_index that
+      /// the gate has blocked from advancing. Inserted on the first gate
+      /// failure for a given epoch; same-reason retries update last_retry_at
+      /// and retry_count without re-broadcast. Pruned when the gate
+      /// eventually passes for that epoch (advance proceeds normally).
+      struct blocklog_key {
+         uint64_t epoch_index;
+         uint64_t primary_key() const { return epoch_index; }
+         SYSLIB_SERIALIZE(blocklog_key, (epoch_index))
+      };
+
+      struct [[sysio::table("blocklog")]] blocklog_entry {
+         uint32_t                              epoch_index        = 0;
+         sysio::opp::types::EmissionsBlockReason reason           =
+            sysio::opp::types::EMISSIONS_BLOCK_REASON_UNSPECIFIED;
+         int64_t                               attempted_emission = 0;
+         int64_t                               treasury_remaining = 0;
+         int64_t                               sysio_balance      = 0;
+         uint32_t                              first_blocked_at   = 0; // unix seconds
+         uint32_t                              last_retry_at      = 0; // unix seconds
+         uint32_t                              retry_count        = 0;
+
+         SYSLIB_SERIALIZE(blocklog_entry,
+            (epoch_index)(reason)(attempted_emission)(treasury_remaining)
+            (sysio_balance)(first_blocked_at)(last_retry_at)(retry_count))
+      };
+
+      using blocklog_t = sysio::kv::table<"blocklog"_n, blocklog_key, blocklog_entry>;
+
       // Well-known accounts
       static constexpr name CHALG_ACCOUNT  = "sysio.chalg"_n;
       static constexpr name MSGCH_ACCOUNT  = "sysio.msgch"_n;
@@ -96,6 +125,14 @@ namespace sysio {
       static constexpr name OPREG_ACCOUNT  = "sysio.opreg"_n;
       static constexpr name AUTHEX_ACCOUNT = "sysio.authex"_n;
       static constexpr name CHAINS_ACCOUNT = "sysio.chains"_n;
+
+      /// Bounds on `epoch_duration_sec`. Floor is a typo-guard: well below this
+      /// value, `expected_rounds` in sysio.system::payepoch falls back to 1
+      /// for any non-trivial epoch, masking misconfig. Ceiling bounds the
+      /// `(epoch_duration_sec * 2) / TOTAL_BLOCKS_PER_ROUND` arithmetic and
+      /// prevents governance typo from setting a multi-year epoch.
+      static constexpr uint32_t MIN_EPOCH_DURATION_SEC = 60;
+      static constexpr uint32_t MAX_EPOCH_DURATION_SEC = 30u * 24u * 60u * 60u;
 
    private:
 

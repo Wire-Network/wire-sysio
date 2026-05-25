@@ -106,7 +106,8 @@ FC_REFLECT_ENUM(sysio::opp::types::AttestationType,
    (ATTESTATION_TYPE_RESERVE_CREATE)
    (ATTESTATION_TYPE_RESERVE_CREATE_CANCEL)
    (ATTESTATION_TYPE_RESERVE_CREATE_CANCELLED)
-   (ATTESTATION_TYPE_RESERVE_READY))
+   (ATTESTATION_TYPE_RESERVE_READY)
+   (ATTESTATION_TYPE_EMISSIONS_BLOCKED))
 
 // ---------------------------------------------------------------------------
 //  Nested enums on attestation messages
