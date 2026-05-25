@@ -164,7 +164,10 @@ BOOST_FIXTURE_TEST_CASE(queueout_basic, sysio_msgch_tester) { try {
    const uint64_t chain_code = fc::slug_name{"ETH"}.value;
    BOOST_REQUIRE_EQUAL(success(), queueout(chain_code, 60947));
 
-   auto attest = get_attestation(0);
+   // `mint_att_id`'s first call returns id=1 — the `attseq` singleton at
+   // pk=0 is the sequence row itself, so attestation ids start at 1 to
+   // avoid collision with it. See `sysio.msgch.cpp::mint_att_id` docstring.
+   auto attest = get_attestation(1);
    BOOST_REQUIRE(!attest.is_null());
    BOOST_REQUIRE_EQUAL(chain_code, attest["chain_code"].as_uint64());
 } FC_LOG_AND_RETHROW() }
@@ -348,12 +351,14 @@ BOOST_FIXTURE_TEST_CASE(buildenv_writes_envlog_row, sysio_msgch_envlog_tester) {
    BOOST_REQUIRE_EQUAL(success(), buildenv(/*chain_code=*/ETH_OUTPOST_ID));
    produce_blocks();
 
-   auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "envlog"_n, 0);
+   // envlog ids start at 1 (write_envelope_log uses
+   // `std::max<uint64_t>(1, tbl.available_primary_key())`).
+   auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "envlog"_n, 1);
    BOOST_REQUIRE(!data.empty());
    auto row = msgch_abi.binary_to_variant(
       "envelope_log_entry", data,
       abi_serializer::create_yield_function(abi_serializer_max_time));
-   BOOST_REQUIRE_EQUAL(0u, row["id"].as_uint64());
+   BOOST_REQUIRE_EQUAL(1u, row["id"].as_uint64());
    // start = WIRE/1, end = ETH/31337. ABI serializer reflects the
    // ChainKind enum back as its symbolic name; the `chain_id` field is a
    // `vuint32_t` and surfaces as `{"value": N}`.
@@ -393,10 +398,10 @@ BOOST_FIXTURE_TEST_CASE(envlog_evicts_oldest_epoch_on_overflow, sysio_msgch_envl
       ++alive;
       if (id < oldest_alive_id) oldest_alive_id = id;
    }
-   // After 5 inserts and a 2-row head eviction (on the 5th insert when
-   // live_count crossed cap=4), 3 rows remain.
+   // After 5 inserts (ids 1..5) and a 2-row head eviction (on the 5th
+   // insert when live_count crossed cap=4), 3 rows remain: ids 3, 4, 5.
    BOOST_REQUIRE_EQUAL(3u, alive);
-   BOOST_REQUIRE_EQUAL(2u, oldest_alive_id);
+   BOOST_REQUIRE_EQUAL(3u, oldest_alive_id);
 } FC_LOG_AND_RETHROW() }
 
 /// Roster change updates the cap. Start with 1 outpost (cap = 1*2*2 =
@@ -449,10 +454,12 @@ BOOST_FIXTURE_TEST_CASE(buildenv_drops_previous_outenvelopes, sysio_msgch_envlog
    register_outpost(opp::types::CHAIN_KIND_EVM, 31337);
    produce_blocks();
 
+   // outenvelopes ids start at 1 (same `std::max<uint64_t>(1, ...)` pattern
+   // as envlog / attestations).
    BOOST_REQUIRE_EQUAL(success(), queueout(ETH_OUTPOST_ID, 60940));
    BOOST_REQUIRE_EQUAL(success(), buildenv(ETH_OUTPOST_ID));
    produce_blocks();
-   auto first = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "outenvelopes"_n, 0);
+   auto first = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "outenvelopes"_n, 1);
    BOOST_REQUIRE(!first.empty());
 
    BOOST_REQUIRE_EQUAL(success(), queueout(ETH_OUTPOST_ID, 60940));
@@ -460,9 +467,9 @@ BOOST_FIXTURE_TEST_CASE(buildenv_drops_previous_outenvelopes, sysio_msgch_envlog
    produce_blocks();
 
    // First row is now gone (replaced by the second emit).
-   first = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "outenvelopes"_n, 0);
+   first = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "outenvelopes"_n, 1);
    BOOST_REQUIRE(first.empty());
-   auto second = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "outenvelopes"_n, 1);
+   auto second = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "outenvelopes"_n, 2);
    BOOST_REQUIRE(!second.empty());
 } FC_LOG_AND_RETHROW() }
 

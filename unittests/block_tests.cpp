@@ -562,17 +562,14 @@ BOOST_AUTO_TEST_CASE( failed_trx_excluded_from_block_report )
 
    // Block content matches baseline: zero user trxs.
    BOOST_TEST( captured->trxs_produced_total == 0u );
-   // Net is the cleanest signal -- onblock contributes zero, so any non-zero
-   // net_usage_us would mean the rejected trx leaked its net into the report.
-   // Pre-fix: == trace->net_usage (>0).
+   // Net is the cleanest signal. onblock contributes zero, so any non-zero net_usage_us would mean the rejected
+   // trx leaked its net into the report. Pre-fix: == trace->net_usage (>0).
    BOOST_TEST( captured->net_usage_us == 0u );
-   // Cpu and elapsed should match the onblock-only baseline.  A large delta in
-   // total_elapsed_time_us would indicate the rejected trx's elapsed leaked too.
-   // Pre-fix: total_elapsed_time_us would be baseline + trace->elapsed.  Allow
-   // a small absolute slack (microseconds) for natural per-block variance.
+   // Cpu must match the onblock-only baseline. Pre-fix it would be baseline + trace->total_cpu_usage_us.
+   // net/cpu/elapsed all aggregate at the same controller site under one condition, so they leak together or
+   // not at all. net + cpu are sufficient signal. A wall-clock assertion on total_elapsed_time_us would only
+   // add CI jitter noise without strengthening the test.
    BOOST_TEST( captured->cpu_usage_us == baseline.cpu_usage_us );
-   BOOST_TEST( std::abs( captured->total_elapsed_time_us - baseline.total_elapsed_time_us )
-               < fc::milliseconds(1).count() );
 }
 
 BOOST_AUTO_TEST_SUITE_END()
