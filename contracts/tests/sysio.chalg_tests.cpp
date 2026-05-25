@@ -153,8 +153,11 @@ BOOST_AUTO_TEST_SUITE(sysio_chalg_tests)
 BOOST_FIXTURE_TEST_CASE(initchal_basic, sysio_chalg_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), initchal(0));
 
-   // Verify challenge entry written to table (first entry, id=0)
-   auto chal = get_challenge(0);
+   // Verify challenge entry written to table. `initchal` uses
+   // `std::max<uint64_t>(1, challenges.available_primary_key())` so the
+   // first row's PK is 1 (id=0 is reserved as the empty-table sentinel).
+   // `chain_request_id` is the input argument and stays 0.
+   auto chal = get_challenge(1);
    BOOST_REQUIRE(!chal.is_null());
    BOOST_REQUIRE_EQUAL(0, chal["chain_request_id"].as_uint64());
    BOOST_REQUIRE_EQUAL("CHALLENGE_STATUS_CHALLENGE_SENT", chal["status"].as_string());
@@ -171,10 +174,11 @@ BOOST_FIXTURE_TEST_CASE(initchal_requires_msgch_auth, sysio_chalg_tester) { try 
 BOOST_FIXTURE_TEST_CASE(escalate_not_in_response_state, sysio_chalg_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), initchal(0));
 
-   // Challenge is in CHALLENGE_SENT, not RESPONSE_RECEIVED
+   // The row's challenge_id is 1 (see `initchal_basic` for the PK-allocation
+   // rationale). Calling escalate against the row must hit CHALLENGE_SENT.
    BOOST_REQUIRE_EQUAL(
       error("assertion failure with message: challenge must be in RESPONSE_RECEIVED state to escalate"),
-      escalate(0)
+      escalate(1)
    );
 } FC_LOG_AND_RETHROW() }
 
@@ -184,7 +188,7 @@ BOOST_FIXTURE_TEST_CASE(submitres_not_escalated, sysio_chalg_tester) { try {
    auto h = make_hash("test");
    BOOST_REQUIRE_EQUAL(
       error("assertion failure with message: challenge must be escalated for manual resolution"),
-      submitres("resolver1"_n, 0, h, h, h)
+      submitres("resolver1"_n, 1, h, h, h)
    );
 } FC_LOG_AND_RETHROW() }
 

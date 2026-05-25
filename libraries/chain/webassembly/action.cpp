@@ -3,7 +3,7 @@
 #include <sysio/chain/global_property_object.hpp>
 
 namespace sysio { namespace chain { namespace webassembly {
-   int32_t interface::read_action_data(legacy_span<char> memory) const {
+   int32_t interface::read_action_data(span<char> memory) const {
       auto s = context.get_action().data.size();
       auto copy_size = std::min( static_cast<size_t>(memory.size()), s );
       if( copy_size == 0 ) return s;

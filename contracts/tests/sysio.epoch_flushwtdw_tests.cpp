@@ -126,6 +126,7 @@ public:
                       abi_serializer::create_yield_function(abi_serializer_max_time));
    }
 
+
    void deploy(name account, std::vector<uint8_t> wasm, std::vector<char> abi,
                abi_serializer& out_ser) {
       set_code(account, wasm);
@@ -222,6 +223,7 @@ public:
       BOOST_REQUIRE_EQUAL(success(), push(SYSIO_ACCOUNT, sysio_abi, SYSIO_ACCOUNT,
          "initt5"_n, mvo()
             ("start_time", fc::time_point_sec(control->head().block_time()))));
+
 
       BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT,
          "setconfig"_n, mvo()
