@@ -12,6 +12,7 @@
 #include <sysio.opreg/sysio.opreg.hpp>
 #include <sysio.epoch/sysio.epoch.hpp>
 
+#include <algorithm>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -758,6 +759,20 @@ void system_contract::payepoch(uint32_t epoch_index,
 // available and accrues the unfunded delta to t5state.capital_shortfall_total
 // for operator visibility.
 //
+// The transfer cap is the minimum of three caps that all must hold:
+//   * `amount`                                                -- requested
+//   * `lifetime headroom - pending_emission_amount`           -- accounting
+//   * `sysio WIRE balance - pending_emission_amount`          -- balance
+// Both accounting and balance caps reserve `pending_emission_amount` for
+// the next payepoch. `pending_emission_amount` is curve emission already
+// accrued via accrueepoch but not yet transferred; payepoch will distribute
+// it across compute/capital/capex/governance. Drawing against those funds
+// here would either trip the emissions readiness gate at the next epoch
+// boundary (BALANCE_INSUFFICIENT) or cause the inline payepoch transfer
+// to throw "overdrawn balance". The balance cap is the load-bearing one
+// because `sysio.token::transfer` itself throws on overdraw, which would
+// abort the inbound STAKING_REWARD OPP dispatch.
+//
 // Negative or zero requests are silent no-ops (defensive). The amount
 // actually transferred counts toward total_distributed -- the curve sees
 // less remaining headroom on its next per-epoch computation and emissions
@@ -772,8 +787,14 @@ void system_contract::fundclaim(int64_t amount) {
    auto state = t5s.get();
 
    const auto cfg = get_emit_cfg(get_self());
-   const int64_t remaining = cfg.t5_distributable - cfg.t5_floor - state.total_distributed;
-   const int64_t to_transfer = (amount <= remaining) ? amount : (remaining > 0 ? remaining : 0);
+   const int64_t lifetime_headroom    = cfg.t5_distributable - cfg.t5_floor - state.total_distributed;
+   const int64_t pending_reserve      = state.pending_emission_amount;
+   const int64_t sysio_balance        = get_wire_balance(get_self());
+   const int64_t accounting_available = lifetime_headroom - pending_reserve;
+   const int64_t balance_available    = sysio_balance     - pending_reserve;
+
+   const int64_t cap = std::min({amount, accounting_available, balance_available});
+   const int64_t to_transfer = (cap > 0) ? cap : 0;
    const int64_t shortfall   = amount - to_transfer;
 
    if (to_transfer > 0) {
