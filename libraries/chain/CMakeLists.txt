@@ -42,6 +42,10 @@ if("sys-vm-oc" IN_LIST SYSIO_WASM_RUNTIMES)
    option(SYSVMOC_ENABLE_DEVELOPER_OPTIONS "enable developer options for SYS VM OC" OFF)
 endif()
 
+if(NOT LLVM_LIBS)
+   llvm_map_components_to_libnames(LLVM_LIBS support)
+endif()
+
 if("sys-vm" IN_LIST SYSIO_WASM_RUNTIMES OR "sys-vm-jit" IN_LIST SYSIO_WASM_RUNTIMES)
    set(CHAIN_SYSVM_SOURCES "webassembly/runtimes/sys-vm.cpp")
    set(CHAIN_SYSVM_LIBRARIES sys-vm::sys-vm)

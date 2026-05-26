@@ -49,7 +49,7 @@ private:
    using trx_priority_map_t = boost::container::flat_multimap<chain::name, trx_prio>;
 private:
 
-   std::atomic<std::shared_ptr<trx_priority_map_t>>  _trx_priority_map{nullptr};
+   std::shared_ptr<trx_priority_map_t>               _trx_priority_map{};
    chain::block_timestamp_type                       _last_trx_priority_update{}; // only accessed on main thread
 
 private:
