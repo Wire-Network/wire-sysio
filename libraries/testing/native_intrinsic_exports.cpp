@@ -261,7 +261,7 @@ void printdf(double val) {
 
 INTRINSIC_EXPORT
 void printqf(const void* val) {
-   native_context_stack::current()->printqf(aligned_ptr<const float128_t>{(void*)val});
+   native_context_stack::current()->printqf(aligned_ptr<const softfloat128_t>{(void*)val});
 }
 
 INTRINSIC_EXPORT

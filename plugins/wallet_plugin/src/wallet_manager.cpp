@@ -23,11 +23,7 @@ bool valid_filename(const string& name) {
 }
 
 wallet_manager::wallet_manager() {
-#ifdef __APPLE__
-   try {
-      wallets.emplace("SecureEnclave", std::make_unique<se_wallet>());
-   } catch(const std::exception& ) {}
-#endif
+   // Secure Enclave wallet support is not compiled in this target set.
 }
 
 wallet_manager::~wallet_manager() {

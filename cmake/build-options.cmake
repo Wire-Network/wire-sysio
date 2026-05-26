@@ -21,7 +21,12 @@ option(DISABLE_WASM_SPEC_TESTS "disable building of wasm spec unit tests" OFF)
 
 # allocators (mutually exclusive; enforced in cmake/compiler-config.cmake)
 option(ENABLE_TCMALLOC "use tcmalloc (requires gperftools)" OFF)
-option(ENABLE_JEMALLOC "link jemalloc statically into nodeop (via vcpkg)" ON)
+if(APPLE)
+  set(SYSIO_DEFAULT_ENABLE_JEMALLOC OFF)
+else()
+  set(SYSIO_DEFAULT_ENABLE_JEMALLOC ON)
+endif()
+option(ENABLE_JEMALLOC "link jemalloc statically into nodeop (via vcpkg)" ${SYSIO_DEFAULT_ENABLE_JEMALLOC})
 
 # Build Artifact Flags
 option(BUILD_DOXYGEN "Build doxygen documentation on every make" OFF)

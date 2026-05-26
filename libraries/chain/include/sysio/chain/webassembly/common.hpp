@@ -109,8 +109,8 @@ namespace sysio { namespace chain {
       }
       SYS_VM_FROM_WASM(name, (uint64_t e)) { return name{e}; }
       uint64_t to_wasm(name&& n) { return n.to_uint64_t(); }
-      SYS_VM_FROM_WASM(float32_t, (float f)) { return ::to_softfloat32(f); }
-      SYS_VM_FROM_WASM(float64_t, (double f)) { return ::to_softfloat64(f); }
+      SYS_VM_FROM_WASM(softfloat32_t, (float f)) { return ::to_softfloat32(f); }
+      SYS_VM_FROM_WASM(softfloat64_t, (double f)) { return ::to_softfloat64(f); }
    };
 
    using type_converter = basic_type_converter<sysio::vm::execution_interface>;

@@ -1,0 +1,104 @@
+name: "macOS arm64 smoke"
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - ".github/workflows/macos_arm64_smoke.yaml"
+      - ".github/vcpkg-triplets/**"
+      - "cmake/**"
+      - "libraries/**"
+      - "plugins/**"
+      - "programs/**"
+      - "unittests/**"
+      - "tests/**"
+      - "CMakeLists.txt"
+      - "vcpkg.json"
+      - "vcpkg-configuration.json"
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  smoke:
+    name: Build and smoke test on Apple Silicon
+    runs-on: macos-15
+    timeout-minutes: 180
+    env:
+      VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/vcpkg-binary-cache,readwrite"
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: recursive
+
+      - name: Install host tools
+        run: |
+          brew install ninja ccache pkgconf autoconf automake libtool
+
+      - name: Restore vcpkg binary cache
+        uses: actions/cache@v5
+        with:
+          path: ${{ github.workspace }}/vcpkg-binary-cache
+          key: vcpkg-binaries-macos-arm64-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json') }}
+          restore-keys: |
+            vcpkg-binaries-macos-arm64-
+
+      - name: Restore ccache
+        uses: actions/cache@v5
+        with:
+          path: ${{ github.workspace }}/.ccache
+          key: ccache-macos-arm64-${{ github.sha }}
+          restore-keys: |
+            ccache-macos-arm64-
+
+      - name: Configure
+        run: |
+          mkdir -p "$GITHUB_WORKSPACE/vcpkg-binary-cache"
+          ./vcpkg/bootstrap-vcpkg.sh
+
+          export CCACHE_DIR="$GITHUB_WORKSPACE/.ccache"
+          ccache -z || true
+
+          cmake -B build/macos-arm64 -S . -G Ninja \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DCMAKE_TOOLCHAIN_FILE="$PWD/vcpkg/scripts/buildsystems/vcpkg.cmake" \
+            -DVCPKG_TARGET_TRIPLET=arm64-osx \
+            -DBUILD_SYSTEM_CONTRACTS=OFF \
+            -DBUILD_TEST_CONTRACTS=OFF \
+            -DENABLE_CCACHE=ON \
+            -DENABLE_DISTCC=OFF \
+            -DENABLE_TESTS=ON \
+            -DENABLE_JEMALLOC=OFF \
+            -DDISABLE_WASM_SPEC_TESTS=ON
+
+      - name: Build smoke targets
+        run: |
+          cmake --build build/macos-arm64 --target \
+            fc nodeop clio kiod sys-util unit_test plugin_test test_fc \
+            -- -j"$(sysctl -n hw.logicalcpu)"
+
+      - name: Run smoke tests
+        run: |
+          build/macos-arm64/programs/nodeop/nodeop --version
+          build/macos-arm64/programs/clio/clio version client
+          build/macos-arm64/libraries/libfc/test/test_fc --run_test=traits
+          build/macos-arm64/unittests/unit_test --run_test=noop_tests -- --sys-vm
+          build/macos-arm64/unittests/unit_test --run_test=wasm_tests -- --sys-vm
+          build/macos-arm64/tests/plugin_test --report_level=detailed --color_output
+
+      - name: Show diagnostics on failure
+        if: failure()
+        run: |
+          echo "=== vcpkg manifest log ==="
+          cat build/macos-arm64/vcpkg-manifest-install.log || true
+          echo "=== recent vcpkg logs ==="
+          find build/macos-arm64 -type f -name '*.log' -print | while read -r f; do
+            echo "----- $f -----"
+            tail -n 80 "$f"
+          done
+          echo "=== ccache statistics ==="
+          ccache -s || true
