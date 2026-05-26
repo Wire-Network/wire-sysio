@@ -608,6 +608,24 @@ namespace sysiosystem {
                           int64_t  per_epoch_emission);
 
          /**
+          * Fund a sysio.dclaim capital draw against the T5 drainable pool.
+          * Called inline by sysio.dclaim::onreward as each STAKING_REWARD
+          * lands, so dclaim is funded the moment the claim ledger row is
+          * written and the staker can claim immediately. Auth: dclaim.
+          *
+          * Never throws (OPP-handler never-throw contract): if the pool
+          * cannot cover `amount`, the transfer caps at what's available
+          * and the unfunded delta is accrued to t5state.capital_shortfall_total
+          * for operator visibility.
+          *
+          * Amounts actually transferred count toward t5state.total_distributed
+          * so the emission curve auto-throttles via its remaining-headroom
+          * clamp.
+          */
+         [[sysio::action]]
+         void fundclaim(int64_t amount);
+
+         /**
           * Read-only: current T5 treasury emission state.
           */
          [[sysio::action, sysio::read_only]]

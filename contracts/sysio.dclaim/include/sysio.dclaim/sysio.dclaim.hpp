@@ -60,6 +60,7 @@ namespace sysio {
       static constexpr name MSGCH_ACCOUNT  = "sysio.msgch"_n;
       static constexpr name TOKEN_ACCOUNT  = "sysio.token"_n;
       static constexpr name RESERV_ACCOUNT = "sysio.reserv"_n;
+      static constexpr name SYSTEM_ACCOUNT = "sysio"_n;
 
       // WIRE token symbol. 9 decimals system-wide.
       static constexpr symbol WIRE_SYM = symbol("WIRE", 9);

@@ -193,7 +193,6 @@ public:
             ("annual_max_emission",     int64_t(3'000'000'000'000'000LL) * 365)
             ("annual_min_emission",     int64_t(100'000'000'000'000LL) * 365)
             ("compute_bps",            uint16_t(4000))
-            ("capital_bps",            uint16_t(3000))
             ("capex_bps",              uint16_t(2000))
             ("governance_bps",         uint16_t(1000))
             ("producer_bps",           uint16_t(7000))
