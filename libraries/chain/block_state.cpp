@@ -251,6 +251,17 @@ block_state::block_state(snapshot_detail::snapshot_block_state_v1&& sbs)
 
    header_exts = header.validate_and_extract_header_extensions();
 
+   // Verify the core agrees with the header on which block this state represents.
+   // finality_core::current_block_num() comes from links.back().source_block_num, while
+   // block_num() comes from the header. validate_snapshot only enforces the core's internal
+   // invariants; without this check a tampered snapshot can pair a block-N header/id with a
+   // structurally valid core for block M. The valid_t size check below uses
+   // core.current_block_num(), so a matching-sized validation_mroots vector silently agrees
+   // with the tampered core and the disagreement with the header goes undetected.
+   SYS_ASSERT(core.current_block_num() == block_num(), snapshot_exception,
+              "snapshot block_state core.current_block_num {} does not match header.block_num {}",
+              core.current_block_num(), block_num());
+
    // core.latest_qc_claim() is the authoritative reference for downstream QC-claim checks
    // (see verify_basic_proper_block_invariants). For every non-genesis block it equals
    // header.qc_claim by construction (finality_core::next sets latest_qc_claim from the

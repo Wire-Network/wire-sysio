@@ -736,4 +736,35 @@ BOOST_AUTO_TEST_CASE(snapshot_null_valid_rejected) try {
       fc_exception_message_contains("valid_t finality structure"));
 } FC_LOG_AND_RETHROW()
 
+// A tampered snapshot can pair a block-N header/id with a structurally valid finality_core
+// whose current_block_num() is some other M. validate_snapshot only enforces the core's
+// internal invariants, and the valid_t size check uses core.current_block_num() (not
+// block_num()), so a matching-sized validation_mroots vector silently agrees with the
+// tampered core. block_state(snapshot) must reject the block_num disagreement explicitly.
+BOOST_AUTO_TEST_CASE(snapshot_core_block_num_mismatch_rejected) try {
+   savanna_tester chain;
+   chain.produce_blocks(4);
+
+   const auto head_handle = chain.control->head();
+   const auto& live_bsp = block_handle_accessor::get_bsp(head_handle);
+   BOOST_REQUIRE(!live_bsp->core.is_genesis_core());
+   BOOST_REQUIRE_GT(live_bsp->block_num(), 1u);
+
+   snapshot_detail::snapshot_block_state_v1 sbs{*live_bsp};
+   const auto wrong_bn = live_bsp->block_num() + 100;
+
+   // Replace core with a synthetic single-link core whose current_block_num is wrong_bn,
+   // not the header's block_num. The single src==tgt link satisfies validate_snapshot's
+   // invariant 3 (refs.empty() with one self-link), so the failure must come from the
+   // explicit core/header block_num check rather than core.validate_snapshot().
+   sbs.core = finality_core{
+      .links = { qc_link{ .source_block_num = wrong_bn, .target_block_num = wrong_bn, .is_link_strong = false } },
+      .refs  = {},
+      .genesis_timestamp = live_bsp->core.last_final_block_timestamp()
+   };
+
+   BOOST_CHECK_EXCEPTION(block_state{std::move(sbs)}, snapshot_exception,
+      fc_exception_message_contains("core.current_block_num"));
+} FC_LOG_AND_RETHROW()
+
 BOOST_AUTO_TEST_SUITE_END()
