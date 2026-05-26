@@ -53,7 +53,7 @@ jobs:
           uses: actions/cache@v5
           with:
             path: ${{ github.workspace }}/vcpkg-binary-cache
-            key: vcpkg-binaries-${{ matrix.platform }}-${{ hashFiles('vcpkg.json') }}
+            key: vcpkg-binaries-${{ matrix.platform }}-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json', '.github/vcpkg-triplets/**') }}
             restore-keys: |
               vcpkg-binaries-${{ matrix.platform }}-
 
@@ -75,6 +75,9 @@ jobs:
             # volume and persist for actions/cache to save.
             export CCACHE_DIR="$GITHUB_WORKSPACE/.ccache"
             export VCPKG_BINARY_SOURCES="clear;files,$GITHUB_WORKSPACE/vcpkg-binary-cache,readwrite"
+            export VCPKG_TARGET_TRIPLET=x64-linux-release
+            export VCPKG_HOST_TRIPLET=x64-linux-release
+            export VCPKG_OVERLAY_TRIPLETS="$GITHUB_WORKSPACE/.github/vcpkg-triplets"
 
             # Clean intermediate vcpkg artifacts but preserve binary cache and downloads
             rm -rf vcpkg/buildtrees vcpkg/packages vcpkg/vcpkg_installed \
@@ -95,6 +98,9 @@ jobs:
             -DCMAKE_MAKE_PROGRAM=$CMAKE_MAKE_PROGRAM \
             -DCMAKE_TOOLCHAIN_FILE=$PWD/vcpkg/scripts/buildsystems/vcpkg.cmake \
             -DCMAKE_BUILD_TYPE=Release \
+            -DVCPKG_TARGET_TRIPLET=$VCPKG_TARGET_TRIPLET \
+            -DVCPKG_HOST_TRIPLET=$VCPKG_HOST_TRIPLET \
+            -DVCPKG_OVERLAY_TRIPLETS=$VCPKG_OVERLAY_TRIPLETS \
             -DENABLE_CCACHE=ON \
             -DENABLE_TESTS=ON \
             ${CMAKE_PREFIX_PATH:+-DCMAKE_PREFIX_PATH=$CMAKE_PREFIX_PATH}
