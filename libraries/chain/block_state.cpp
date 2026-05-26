@@ -196,6 +196,29 @@ block_state::block_state(snapshot_detail::snapshot_block_state_v1&& sbs)
    , aggregating_qc{}
    , valid(std::move(sbs.valid))
 {
+   // The stored block_id is taken from the snapshot bytes. calculate_id() is a pure
+   // function of header content (excluding producer_signature), so the two MUST agree
+   // for a well-formed block_state. Without this check a tampered snapshot can plant
+   // a block_id that disagrees with the header, and downstream fork_db indexing and
+   // any id() consumer would then treat the forged value as authoritative.
+   {
+      const auto computed_id = header.calculate_id();
+      SYS_ASSERT(block_id == computed_id, snapshot_exception,
+                 "snapshot block_id {} does not match header.calculate_id() {}",
+                 block_id, computed_id);
+   }
+
+   // Snapshots are never taken of the genesis block: the genesis state is reconstructable
+   // from genesis_state via controller::initialize_blockchain_state, so the snapshot-load
+   // path is reserved for resuming from a running chain head. Rejecting block_num() == 1
+   // here also closes a class of bypass attacks where a tampered snapshot installs a
+   // synthetic "genesis-shaped" core (refs={}, single src==tgt link) on a non-genesis
+   // block to make the qc_claim consistency check below indistinguishable from genesis.
+   // controller asserts blog.first_block_num() == 1 at block-log load time, so block 1 is
+   // the canonical genesis block number.
+   SYS_ASSERT(block_num() != 1, snapshot_exception,
+              "snapshots of the genesis block are not supported; initialize from genesis_state instead");
+
    // fc::raw::unpack<shared_ptr<T>> permits null via a leading bool; a tampered
    // snapshot can plant nulls in any of these slots. Null-check BEFORE any code
    // dereferences them (compute_finality_digest / aggregating_qc construction /
@@ -231,8 +254,9 @@ block_state::block_state(snapshot_detail::snapshot_block_state_v1&& sbs)
    // core.latest_qc_claim() is the authoritative reference for downstream QC-claim checks
    // (see verify_basic_proper_block_invariants). For every non-genesis block it equals
    // header.qc_claim by construction (finality_core::next sets latest_qc_claim from the
-   // header's claim). Genesis intentionally differs: core is {1, false}, header is {0, false}.
-   SYS_ASSERT(core.is_genesis_core() || core.latest_qc_claim() == header.qc_claim, snapshot_exception,
+   // header's claim). The genesis case (core {1,false} vs header {0,false}) is already
+   // rejected above as block_num() == 1.
+   SYS_ASSERT(core.latest_qc_claim() == header.qc_claim, snapshot_exception,
               "snapshot block_state core.latest_qc_claim {} does not match header.qc_claim {}",
               core.latest_qc_claim(), header.qc_claim);
 

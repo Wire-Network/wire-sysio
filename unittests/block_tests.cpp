@@ -604,25 +604,80 @@ BOOST_AUTO_TEST_CASE(snapshot_core_header_qc_claim_mismatch_rejected) try {
    // Build a snapshot_block_state_v1 from the live one, then tamper header.qc_claim
    // to something provably different (block_num far in the past, weak). Must NOT
    // match core.latest_qc_claim(), which for a running chain reflects a recent block.
+   // Re-sync block_id to the tampered header so the prior block_id == calculate_id()
+   // consistency check (also added by this PR) does not fire first; we want this case
+   // to exercise the qc_claim invariant specifically.
    snapshot_detail::snapshot_block_state_v1 sbs{*live_bsp};
    sbs.header.qc_claim = qc_claim_t{0, false};
+   sbs.block_id        = sbs.header.calculate_id();
    BOOST_REQUIRE(sbs.core.latest_qc_claim() != sbs.header.qc_claim); // confirm setup
 
    BOOST_CHECK_EXCEPTION(block_state{std::move(sbs)}, snapshot_exception,
       fc_exception_message_contains("core.latest_qc_claim"));
 } FC_LOG_AND_RETHROW()
 
-// Genesis is intentionally exempt: core is constructed with latest_qc_claim={1,false}
-// while header.qc_claim={0,false} (see create_genesis_block). Confirm a genesis-core
-// snapshot loads cleanly despite the qc_claim disagreement.
-BOOST_AUTO_TEST_CASE(snapshot_genesis_core_header_mismatch_allowed) try {
+// Genesis state is reconstructed from genesis_state via initialize_blockchain_state;
+// the snapshot-load path is reserved for resuming from a running chain head and must
+// reject block_num() == 1. This also closes a class of bypass attacks against the
+// qc_claim consistency check (see snapshot_synthetic_genesis_core_rejected below).
+BOOST_AUTO_TEST_CASE(snapshot_of_genesis_rejected) try {
    genesis_state gs;
    auto genesis_bsp = block_state::create_genesis_block(gs);
-   BOOST_REQUIRE(genesis_bsp->core.is_genesis_core());
-   BOOST_REQUIRE(genesis_bsp->core.latest_qc_claim() != genesis_bsp->header.qc_claim); // confirmed design
+   BOOST_REQUIRE_EQUAL(genesis_bsp->block_num(), 1u);
 
    snapshot_detail::snapshot_block_state_v1 sbs{*genesis_bsp};
-   BOOST_CHECK_NO_THROW(block_state{std::move(sbs)});
+   BOOST_CHECK_EXCEPTION(block_state{std::move(sbs)}, snapshot_exception,
+      fc_exception_message_contains("snapshots of the genesis block are not supported"));
+} FC_LOG_AND_RETHROW()
+
+// A tampered non-genesis snapshot can install a synthetic "genesis-shaped" core
+// (refs={}, single src==tgt link) on the head block to make the core look like the
+// chain's IF genesis. validate_snapshot still passes (invariant 3 only requires a
+// single src==tgt link), and the malformed core would be silently accepted if the
+// qc_claim check is exempted on refs.empty(). The block_num() != 1 guard above
+// ensures the exemption only ever applied to the literal genesis block.
+BOOST_AUTO_TEST_CASE(snapshot_synthetic_genesis_core_rejected) try {
+   savanna_tester chain;
+   chain.produce_blocks(4);
+   const auto head_handle = chain.control->head();
+   const auto& live_bsp = block_handle_accessor::get_bsp(head_handle);
+   BOOST_REQUIRE(!live_bsp->core.is_genesis_core());
+   BOOST_REQUIRE_GT(live_bsp->block_num(), 1u);
+
+   snapshot_detail::snapshot_block_state_v1 sbs{*live_bsp};
+
+   // Replace core with a synthetic genesis-shape for this block_num. Satisfies
+   // validate_snapshot's invariant 3 (single link, src==tgt) but its latest_qc_claim
+   // becomes {block_num, false}, which can never match the real header.qc_claim.
+   const auto bn = live_bsp->block_num();
+   sbs.core = finality_core{
+      .links = { qc_link{ .source_block_num = bn, .target_block_num = bn, .is_link_strong = false } },
+      .refs  = {},
+      .genesis_timestamp = live_bsp->core.last_final_block_timestamp()
+   };
+
+   BOOST_CHECK_EXCEPTION(block_state{std::move(sbs)}, snapshot_exception,
+      fc_exception_message_contains("core.latest_qc_claim"));
+} FC_LOG_AND_RETHROW()
+
+// The snapshot constructor used to copy sbs.block_id verbatim into the new state.
+// fork_db indexing and id() consumers then trust that stored id as authoritative.
+// Tampering only the upper hash bytes (preserving the low-32 block_num portion) keeps
+// block_num() consistent so the genesis guard does not fire; the dedicated block_id ==
+// header.calculate_id() check is what must reject this.
+BOOST_AUTO_TEST_CASE(snapshot_block_id_header_mismatch_rejected) try {
+   savanna_tester chain;
+   chain.produce_blocks(4);
+   const auto head_handle = chain.control->head();
+   const auto& live_bsp = block_handle_accessor::get_bsp(head_handle);
+
+   snapshot_detail::snapshot_block_state_v1 sbs{*live_bsp};
+   // Corrupt block_id without touching header. _hash[2] is in the digest portion;
+   // _hash[0]'s low 32 bits hold block_num and are deliberately left alone here.
+   sbs.block_id._hash[2] ^= 0xdeadbeefdeadbeefULL;
+
+   BOOST_CHECK_EXCEPTION(block_state{std::move(sbs)}, snapshot_exception,
+      fc_exception_message_contains("does not match header.calculate_id"));
 } FC_LOG_AND_RETHROW()
 
 // A tampered snapshot can carry a null activated_protocol_features. The snapshot
