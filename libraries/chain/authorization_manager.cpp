@@ -467,7 +467,8 @@ namespace sysio { namespace chain {
          }
 
          account_name payer;
-         for( const auto& [i, declared_auth] : std::views::enumerate(act.authorization) ) {
+         for( size_t i = 0; i < act.authorization.size(); ++i ) {
+            const auto& declared_auth = act.authorization[i];
 
             checktime();
 

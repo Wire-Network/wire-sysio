@@ -14,7 +14,7 @@ namespace sysio {
 using namespace sysio::chain;
 
 int trx_priority_db::get_trx_priority(const transaction& trx) const {
-   const std::shared_ptr<const trx_priority_map_t> map_ptr = _trx_priority_map.load();
+   const std::shared_ptr<const trx_priority_map_t> map_ptr = std::atomic_load(&_trx_priority_map);
    if (map_ptr == nullptr || map_ptr->empty())
       return appbase::priority::low;
 
@@ -136,7 +136,7 @@ void trx_priority_db::on_irreversible_block(const signed_block_ptr& lib, const b
       load_trx_priority_map(chain, *new_map);
 
       if (_last_trx_priority_update == last_chain_update)
-         _trx_priority_map = new_map; // atomic swap
+         std::atomic_store(&_trx_priority_map, new_map); // atomic swap
    } FC_LOG_AND_DROP();
 }
 
