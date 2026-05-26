@@ -85,8 +85,8 @@ BOOST_AUTO_TEST_CASE(keccak256) try {
 /// itself.
 BOOST_AUTO_TEST_CASE(keccak256_class_golden) try {
 
-   using test_kv = std::tuple<std::string, std::string>;
-   const std::vector<test_kv> tests {
+   using test_keccak256_class = std::tuple<std::string, std::string>;
+   const std::vector<test_keccak256_class> tests {
       {
          "",
          "c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
@@ -117,6 +117,13 @@ BOOST_AUTO_TEST_CASE(keccak256_class_golden) try {
 ///
 /// Inputs cover the Keccak-256 sponge rate boundary (1088 bits / 136 bytes)
 /// and a multi-block buffer to exercise the absorbing phase across rounds.
+///
+/// This test is one leg of a three-way pin: the keccak256 case anchors
+/// fc::sha3 against published vectors, keccak256_class_golden anchors
+/// fc::crypto::keccak256 against the same vectors, and this case asserts the
+/// two impls agree across additional inputs. A bug that shifted both impls
+/// identically off-spec would be caught by the golden cases, not this one --
+/// they are complementary, not redundant.
 BOOST_AUTO_TEST_CASE(ethash_fc_sha3_cross_impl_agreement) try {
 
    const std::vector<std::string> corpus = {
@@ -131,7 +138,7 @@ BOOST_AUTO_TEST_CASE(ethash_fc_sha3_cross_impl_agreement) try {
    };
 
    for(const auto& msg : corpus) {
-      BOOST_CHECK_EQUAL(fc::sha3::hash(msg.data(), msg.size(), false).str(),
+      BOOST_CHECK_EQUAL(fc::sha3::hash(msg, false).str(),
                         fc::crypto::keccak256::hash(msg).str());
    }
 
@@ -140,7 +147,7 @@ BOOST_AUTO_TEST_CASE(ethash_fc_sha3_cross_impl_agreement) try {
    std::mt19937_64 rng{0xC0FFEEULL};
    std::string big(100 * 1024, '\0');
    for(auto& c : big) c = static_cast<char>(rng());
-   BOOST_CHECK_EQUAL(fc::sha3::hash(big.data(), big.size(), false).str(),
+   BOOST_CHECK_EQUAL(fc::sha3::hash(big, false).str(),
                      fc::crypto::keccak256::hash(big).str());
 
 } FC_LOG_AND_RETHROW();

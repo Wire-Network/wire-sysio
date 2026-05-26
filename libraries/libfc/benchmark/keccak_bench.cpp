@@ -12,6 +12,7 @@
 #include <ethash/keccak.hpp>
 
 #include <algorithm>
+#include <cassert>
 #include <chrono>
 #include <cstdint>
 #include <cstring>
@@ -27,17 +28,35 @@ using std::chrono::steady_clock;
 
 namespace {
 
+// Volatile sink prevents the optimizer from eliding the measured call.
+// Reading two bytes of the digest is sufficient because Keccak's output
+// depends on every input byte (the sponge absorbs the full message into
+// the state before squeezing any output), so the compiler cannot reduce
+// the hash computation while preserving the observable XOR into `bench_sink`.
 volatile uint8_t bench_sink = 0;
 inline void sink(const void* p, size_t n) {
    const uint8_t* b = static_cast<const uint8_t*>(p);
-   bench_sink ^= static_cast<uint8_t>(b[0] ^ b[n - 1]);
+   bench_sink ^= b[0] ^ b[n - 1];
 }
 
+// Re-seeds with the same constant on every call, so buffers of different
+// sizes share a common prefix. Irrelevant for throughput measurement but
+// worth noting if anyone expects independent random samples across sizes.
 std::vector<uint8_t> make_buffer(size_t n) {
    std::mt19937_64 rng{0xC0FFEEULL};
    std::vector<uint8_t> v(n);
    for (auto& byte : v) byte = static_cast<uint8_t>(rng());
    return v;
+}
+
+// Format a byte count in the largest power-of-1024 unit that gives a whole
+// number, for readable scenario output (e.g. 34603008 -> "33 MiB").
+std::string fmt_size(size_t bytes) {
+   if (bytes >= 1024 * 1024 && bytes % (1024 * 1024) == 0)
+      return std::to_string(bytes / (1024 * 1024)) + " MiB";
+   if (bytes >= 1024 && bytes % 1024 == 0)
+      return std::to_string(bytes / 1024) + " KiB";
+   return std::to_string(bytes) + " B";
 }
 
 struct result {
@@ -50,6 +69,10 @@ struct result {
 
 template <typename F>
 result time_it(const std::string& name, size_t size, int runs, F&& f) {
+   // `runs` must be odd so `times[runs / 2]` returns the exact median rather
+   // than the upper of the two middle values.
+   assert(runs > 0 && runs % 2 == 1);
+
    std::vector<double> times;
    times.reserve(runs);
    for (int i = 0; i < 2; ++i) f();  // warmup
@@ -67,13 +90,13 @@ void print_header() {
    std::cout << std::left
              << std::setw(38) << "scenario"
              << std::right
-             << std::setw(13) << "size(bytes)"
+             << std::setw(10) << "size"
              << std::setw(13) << "median(ms)"
              << std::setw(12) << "min(ms)"
              << std::setw(12) << "max(ms)"
              << std::setw(14) << "MB/s(median)"
              << "\n";
-   std::cout << std::string(102, '-') << "\n";
+   std::cout << std::string(99, '-') << "\n";
 }
 
 void print(const result& r) {
@@ -83,7 +106,7 @@ void print(const result& r) {
    std::cout << std::left
              << std::setw(38) << r.name
              << std::right
-             << std::setw(13) << r.size
+             << std::setw(10) << fmt_size(r.size)
              << std::setw(13) << std::fixed << std::setprecision(4) << r.median_ms
              << std::setw(12) << std::fixed << std::setprecision(4) << r.min_ms
              << std::setw(12) << std::fixed << std::setprecision(4) << r.max_ms
@@ -95,7 +118,7 @@ void print(const result& r) {
 
 int main() {
    std::cout << "Keccak / SHA3 microbenchmark (warmup=2, median of runs)\n";
-   std::cout << "sizes: 32 B (typical digest input) / 4 KiB / 1 MiB / 33 MiB (max wasm memory)\n\n";
+   std::cout << "sizes: 32 B (small) / 4 KiB / 1 MiB / 33 MiB (default max wasm linear memory)\n\n";
 
    print_header();
 
@@ -129,8 +152,9 @@ int main() {
       });
       print(r3);
 
-      // Chunked at 10 KiB (the WASM intrinsic's hashing_checktime_block_size)
-      // -- isolates the streaming-vs-one-shot overhead for fc::sha3.
+      // Chunked at 10 KiB to mirror the WASM intrinsic's per-block checktime
+      // loop (sysio::chain::config::hashing_checktime_block_size). Isolates
+      // the streaming-vs-one-shot overhead for fc::sha3.
       auto r4 = time_it("fc::sha3 keccak (10 KiB chunks)", sz, runs, [&]() {
          fc::sha3::encoder enc;
          constexpr size_t bs = 10 * 1024;
@@ -147,19 +171,22 @@ int main() {
       });
       print(r4);
 
+      // Final cross-impl agreement check at the scenario's input size.
+      // Complements ethash_fc_sha3_cross_impl_agreement in
+      // libraries/libfc/test/crypto/test_hash_functions.cpp, which covers
+      // smaller corpora; the bench reaches sizes up to 33 MiB which the
+      // test suite does not exercise.
+      auto h_ethash = ethash::keccak256(buf.data(), buf.size());
+      auto h_fcsha3 = fc::sha3::hash(reinterpret_cast<const char*>(buf.data()),
+                                     static_cast<uint32_t>(buf.size()), false);
+      if (std::memcmp(h_ethash.bytes, h_fcsha3.data(), 32) != 0) {
+         std::cout << "  !! cross-impl MISMATCH at size " << fmt_size(sz) << "\n";
+         return 1;
+      }
+
       std::cout << "\n";
    }
 
-   // Correctness smoke: ethash vs fc::sha3 keccak must agree byte-for-byte at
-   // the largest size, otherwise consensus parity between the two impls is
-   // already broken.
-   auto buf = make_buffer(33 * 1024 * 1024);
-   auto h_ethash = ethash::keccak256(buf.data(), buf.size());
-   auto h_fcsha3 = fc::sha3::hash(reinterpret_cast<const char*>(buf.data()),
-                                  static_cast<uint32_t>(buf.size()), false);
-   bool agree = std::memcmp(h_ethash.bytes, h_fcsha3.data(), 32) == 0;
-   std::cout << "Cross-impl agreement (ethash vs fc::sha3 keccak, 33 MiB): "
-             << (agree ? "OK" : "MISMATCH") << "\n";
-
-   return agree ? 0 : 1;
+   std::cout << "Cross-impl agreement (ethash vs fc::sha3 keccak, all sizes): OK\n";
+   return 0;
 }
