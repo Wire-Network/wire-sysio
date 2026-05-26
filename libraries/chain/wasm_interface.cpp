@@ -21,7 +21,6 @@
 #include <fc/io/raw.hpp>
 
 #include <softfloat/softfloat.hpp>
-#include <compiler_builtins.hpp>
 #include <boost/asio.hpp>
 #include <fstream>
 #include <string.h>

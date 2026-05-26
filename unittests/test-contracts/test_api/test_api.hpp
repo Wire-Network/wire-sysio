@@ -87,6 +87,70 @@ struct test_types {
    static void string_to_name();
 };
 
+struct test_compiler_builtins {
+   static void test_multi3();
+   static void test_divti3();
+   static void test_divti3_by_0();
+   static void test_divti3_overflow();
+   static void test_udivti3();
+   static void test_udivti3_by_0();
+   static void test_modti3();
+   static void test_modti3_by_0();
+   static void test_modti3_overflow();
+   static void test_umodti3();
+   static void test_umodti3_by_0();
+   static void test_lshlti3();
+   static void test_lshrti3();
+   static void test_ashlti3();
+   static void test_ashrti3();
+   static void test_shift_overflow();
+};
+
+struct test_f128_builtins {
+   // arithmetic
+   static void test_addtf3();
+   static void test_subtf3();
+   static void test_multf3();
+   static void test_divtf3();
+   static void test_negtf2();
+   // conversions: extend / truncate
+   static void test_extendsftf2();
+   static void test_extenddftf2();
+   static void test_trunctfdf2();
+   static void test_trunctfsf2();
+   static void test_float_f128_roundtrip();
+   // f128 -> int
+   static void test_fixtfsi();
+   static void test_fixtfdi();
+   static void test_fixtfti();
+   static void test_fixunstfsi();
+   static void test_fixunstfdi();
+   static void test_fixunstfti();
+   // f32/f64 -> int128
+   static void test_fixsfti();
+   static void test_fixdfti();
+   static void test_fixunssfti();
+   static void test_fixunsdfti();
+   // int -> f64 / f128
+   static void test_floatsidf();
+   static void test_floatsitf();
+   static void test_floatditf();
+   static void test_floatunsitf();
+   static void test_floatunditf();
+   static void test_floattidf();
+   static void test_floatuntidf();
+   static void test_int_f128_roundtrip();
+   // comparisons
+   static void test_eqtf2();
+   static void test_netf2();
+   static void test_getf2();
+   static void test_gttf2();
+   static void test_letf2();
+   static void test_lttf2();
+   static void test_cmptf2();
+   static void test_unordtf2();
+};
+
 struct test_print {
    static void test_prints();
    static void test_prints_l();
@@ -238,22 +302,6 @@ struct test_fixedpoint {
    static void test_multiplication();
    static void test_division();
    static void test_division_by_0();
-};
-
-struct test_compiler_builtins {
-   static void test_multi3();
-   static void test_divti3();
-   static void test_divti3_by_0();
-   static void test_udivti3();
-   static void test_udivti3_by_0();
-   static void test_modti3();
-   static void test_modti3_by_0();
-   static void test_umodti3();
-   static void test_umodti3_by_0();
-   static void test_lshlti3();
-   static void test_lshrti3();
-   static void test_ashlti3();
-   static void test_ashrti3();
 };
 
 struct test_extended_memory {

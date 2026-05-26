@@ -29,11 +29,13 @@ add_executable( test_fc
         variant/test_variant_visitor.cpp
         variant_estimated_size/test_variant_estimated_size.cpp
         test_base64.cpp
+        test_slug_name.cpp
         test_traits.cpp
         test_escape_str.cpp
         test_bls.cpp
         test_bitset.cpp
         test_ordered_diff.cpp
+        test_opreg_status.cpp
         parallel/test_worker_task_queue.cpp
         task/test_retry.cpp
         main.cpp

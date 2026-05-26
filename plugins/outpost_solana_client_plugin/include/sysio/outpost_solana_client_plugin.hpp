@@ -16,6 +16,26 @@ using namespace fc::network::solana;
 /// both speak a single constant when locating the program's IDL entry.
 inline constexpr const char* OPP_SOLANA_OUTPOST_PROGRAM_NAME = "opp_outpost";
 
+/// Interval between successive `getSignaturesForAddress` + log-scan attempts
+/// inside the underwriter daemon's `verify_source_deposit_sol`. Kept long
+/// enough to keep the RPC load production-acceptable — a tighter interval is
+/// reserved for tighter-budget flows (e.g. tx-confirmation polling at the
+/// `processed` commitment level, ~400ms).
+///
+/// Shared with the underwriter plugin so the production-tuning lever lives
+/// in one place per chain client.
+inline constexpr auto SOL_SWAP_DEPOSIT_POLL_INTERVAL = fc::seconds(15);
+
+/// Total wall-clock budget for `verify_source_deposit_sol` to find the
+/// `SwapDeposit` marker log line emitted by `opp-outpost::request_swap`.
+/// On expiry the verifier returns `false` and the underwriter's outer poll
+/// loop reattempts on its next tick. 120s comfortably covers:
+///   - the slot it took for `request_swap` to land + finalize, AND
+///   - the RPC `getSignaturesForAddress` window (default ~1000 sigs back),
+///   - across an `solana-test-validator` cluster (no ledger pruning within
+///     this horizon) and a production RPC (≥ 2 epochs of tx history).
+inline constexpr auto SOL_SWAP_DEPOSIT_TOTAL_TIMEOUT = fc::seconds(120);
+
 struct solana_client_entry_t {
    std::string                        id;
    std::string                        url;
@@ -51,18 +71,39 @@ struct opp_solana_outpost_client : fc::network::solana::solana_program_client {
    /// bytes — overwritten on every emit. The WIRE batch operator reads
    /// this to relay the envelope back to WIRE.
    fc::network::solana::solana_public_key latest_outbound_envelope_pda;
+   /// Outpost lamport vault. Holds escrowed collateral deposited via
+   /// `deposit`; drained on inbound WITHDRAW_REMIT / SLASH /
+   /// DEPOSIT_REVERT by the program's signed system_program::transfer
+   /// CPI. Pre-derived from seed `outpost_vault`.
+   fc::network::solana::solana_public_key vault_pda;
+   /// Outpost Reserve PDA — receives slashed-collateral routing and
+   /// DEPOSIT_REVERT penalties. Pre-derived from seed `outpost_reserve`.
+   fc::network::solana::solana_public_key reserve_pda;
 
    /// `initialize(consensus_threshold: u32) -> signature`.
    solana_program_tx_fn<std::string, uint32_t>             initialize;
-   /// `epoch_in(epoch_index, chunk_index, total_chunks, total_bytes, chunk_data) -> signature`.
+   /// `epoch_in(epoch_index, chunk_index, total_chunks, total_bytes, chunk_data,
+   ///           extra_remaining_accounts) -> signature`.
+   ///
    /// Inbound delivery is chunked: Solana's 1 232-byte tx MTU can't carry
    /// a full OPP envelope at production roster sizes, so the caller streams
    /// the envelope into a per-(epoch, signer) staging PDA and the program
    /// auto-finalizes on the last chunk. epoch_index selects both the
    /// per-epoch EpochDeliveries PDA and the per-(epoch, signer) chunk-buffer
    /// PDA.
+   ///
+   /// `extra_remaining_accounts` is appended past the IDL's account list
+   /// as Anchor `remaining_accounts`. The on-chain WITHDRAW_REMIT and
+   /// DEPOSIT_REVERT handlers need to CPI-transfer to operator /
+   /// depositor wallets, which Solana requires be declared on the tx;
+   /// the cranker (`outpost_solana_client::deliver_outbound_envelope`)
+   /// decodes the envelope, extracts `op_address.address` pubkeys from
+   /// inbound WITHDRAW_REMIT / DEPOSIT_REVERT attestations, and passes
+   /// them here. Non-final chunks ignore the slice — only the
+   /// finalize-triggering chunk's account list matters for dispatch.
    solana_program_tx_fn<std::string, uint32_t, uint16_t, uint16_t, uint32_t,
-                         std::vector<uint8_t>> epoch_in;
+                         std::vector<uint8_t>,
+                         std::vector<fc::network::solana::solana_public_key>> epoch_in;
    /// `cleanup_envelope_chunks(epoch_index) -> signature`.
    /// Permissionless reaper for chunk buffers an operator started but
    /// never finished. Callable once the chain has advanced past
@@ -74,6 +115,12 @@ struct opp_solana_outpost_client : fc::network::solana::solana_program_client {
    solana_program_tx_fn<std::string, int32_t, std::vector<uint8_t>> add_attestation;
    /// `deposit(operator_type: u8, wire_account_name: string, amount: u64) -> signature`.
    solana_program_tx_fn<std::string, uint8_t, std::string, uint64_t> deposit;
+   /// `commit_underwrite(uic_bytes: bytes) -> signature`.
+   /// Relays an underwriter's signed `UnderwriteIntentCommit` to the
+   /// outpost as opaque bytes. The on-chain handler stores the bytes
+   /// for the next outbound envelope so the batch operator can relay
+   /// the COMMIT back to the depot; no other state changes.
+   solana_program_tx_fn<std::string, std::vector<uint8_t>> commit_underwrite;
 
    opp_solana_outpost_client(const solana_client_ptr& client,
                              const fc::network::solana::solana_public_key& prog_id,
@@ -98,6 +145,17 @@ struct opp_solana_outpost_client : fc::network::solana::solana_program_client {
       , latest_outbound_envelope_pda(fc::network::solana::system::find_program_address(
            {std::vector<uint8_t>{'l','a','t','e','s','t','_','o','u','t','b','o','u','n','d','_','e','n','v','e','l','o','p','e'}},
            prog_id).first)
+      , vault_pda(fc::network::solana::system::find_program_address(
+           {std::vector<uint8_t>{'o','u','t','p','o','s','t','_','v','a','u','l','t'}},
+           prog_id).first)
+      // v6: SOL outpost reserve aggregate is seeded with b"reserve_aggregate"
+      // (see `RESERVE_AGGREGATE_SEED` in programs/opp-outpost/src/state/reserve.rs).
+      // Previously this used b"outpost_reserve" which derived to a non-existent
+      // PDA → epoch_in's `reserve_aggregate` account validation failed with
+      // fc::assert_exception 10.
+      , reserve_pda(fc::network::solana::system::find_program_address(
+           {std::vector<uint8_t>{'r','e','s','e','r','v','e','_','a','g','g','r','e','g','a','t','e'}},
+           prog_id).first)
       // OPP writes default to the confirmed variant — any state-changing
       // call on this client is consensus-critical and must not silently
       // drop (see epoch-859 stall RCA). `execute_tx_and_confirm` + default
@@ -111,7 +169,8 @@ struct opp_solana_outpost_client : fc::network::solana::solana_program_client {
                         uint16_t chunk_index,
                         uint16_t total_chunks,
                         uint32_t total_bytes,
-                        std::vector<uint8_t> chunk_data) -> std::string {
+                        std::vector<uint8_t> chunk_data,
+                        std::vector<fc::network::solana::solana_public_key> extra_remaining_accounts) -> std::string {
            const std::vector<uint8_t> epoch_seed = {
               static_cast<uint8_t>(epoch_index & 0xFF),
               static_cast<uint8_t>((epoch_index >>  8) & 0xFF),
@@ -148,6 +207,10 @@ struct opp_solana_outpost_client : fc::network::solana::solana_program_client {
               {"outbound_message_buffer",   outbound_message_buffer_pda},
               {"outbound_envelopes",        outbound_envelopes_pda},
               {"latest_outbound_envelope",  latest_outbound_envelope_pda},
+              {"vault",                     vault_pda},
+              // v6 IDL field is `reserve_aggregate` (matches the Anchor
+              // `#[derive(Accounts)]` field name in epoch_in.rs / Initialize).
+              {"reserve_aggregate",         reserve_pda},
            };
            auto& instr = get_idl("epoch_in");
            program_invoke_data_items params = {
@@ -186,9 +249,22 @@ struct opp_solana_outpost_client : fc::network::solana::solana_program_client {
               pre_ixs.push_back(
                  fc::network::solana::system::compute_budget::request_heap_frame(256'000));
            }
-           return execute_tx_and_confirm(instr,
-                                         resolve_accounts(instr, params, overrides),
-                                         params, pre_ixs);
+           // Resolve the IDL's declared accounts first, then append any
+           // extra `remaining_accounts` the cranker decoded from the
+           // inbound envelope (operator / depositor wallets that
+           // WITHDRAW_REMIT / DEPOSIT_REVERT handlers need to address).
+           // Anchor's runtime exposes everything past the IDL's
+           // declared accounts as `ctx.remaining_accounts`; the
+           // operator pubkeys land there in order. They're marked
+           // writable (the CPI transfer adds lamports) and non-signer
+           // (the operator isn't signing this tx).
+           auto accounts = resolve_accounts(instr, params, overrides);
+           accounts.reserve(accounts.size() + extra_remaining_accounts.size());
+           for (const auto& extra_pk : extra_remaining_accounts) {
+              accounts.push_back(
+                 fc::network::solana::account_meta::writable(extra_pk, /*is_signer=*/false));
+           }
+           return execute_tx_and_confirm(instr, accounts, params, pre_ixs);
         })
       , cleanup_envelope_chunks([this](uint32_t epoch_index) -> std::string {
            const std::vector<uint8_t> epoch_seed = {
@@ -231,7 +307,22 @@ struct opp_solana_outpost_client : fc::network::solana::solana_program_client {
            return execute_tx_and_confirm(instr, resolve_accounts(instr, params, overrides), params);
         })
       , add_attestation(create_tx_and_confirm<std::string, int32_t, std::vector<uint8_t>>(get_idl("add_attestation")))
-      , deposit(create_tx_and_confirm<std::string, uint8_t, std::string, uint64_t>(get_idl("deposit"))) {}
+      , deposit(create_tx_and_confirm<std::string, uint8_t, std::string, uint64_t>(get_idl("deposit")))
+      // commit_underwrite is `(uic_bytes: bytes) -> signature`. The IDL declares
+      // three accounts — `underwriter` (signer, default-resolved from the
+      // client), `operator_registry` (PDA), and `outbound_message_buffer`
+      // (PDA). IDL v2 (Anchor 0.31+) does not embed PDA seeds, so the typed
+      // wrapper must inject the pre-derived PDAs as overrides — same pattern
+      // as `epoch_in` / `emit_outbound_envelope` above.
+      , commit_underwrite([this](std::vector<uint8_t> uic_bytes) -> std::string {
+           account_overrides_t overrides = {
+              {"operator_registry",        operator_registry_pda},
+              {"outbound_message_buffer",  outbound_message_buffer_pda},
+           };
+           auto& instr = get_idl("commit_underwrite");
+           program_invoke_data_items params = {fc::variant(uic_bytes)};
+           return execute_tx_and_confirm(instr, resolve_accounts(instr, params, overrides), params);
+        }) {}
 };
 
 class outpost_solana_client_plugin : public appbase::plugin<outpost_solana_client_plugin> {
@@ -260,13 +351,13 @@ public:
     * and constructs an `outpost_solana_client` bound to the given program id.
     *
     * @param sol_client_id  Id passed to `--outpost-solana-client`.
-    * @param outpost_id     Outpost id from `sysio.epoch::outposts`.
+    * @param chain_code     Outpost id from `sysio.epoch::outposts`.
     * @param chain_id       Numeric chain id from the outpost row (Solana = 0).
     * @param program_id     Base58 address of the deployed OPP outpost program.
     * @throws fc::exception if the client id is unknown or no matching IDL is loaded.
     */
    std::shared_ptr<outpost_client> create_outpost_client(const std::string& sol_client_id,
-                                                       uint64_t           outpost_id,
+                                                       uint64_t           chain_code,
                                                        uint32_t           chain_id,
                                                        const std::string& program_id);
 

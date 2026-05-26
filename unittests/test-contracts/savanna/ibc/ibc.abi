@@ -417,7 +417,19 @@
             "index_type": "i64",
             "key_names": ["scope","primary_key"],
             "key_types": ["name","uint64"],
-            "table_id": 41097
+            "table_id": 41097,
+            "secondary_indexes": [
+                {
+                    "name": "merkleroot",
+                    "key_type": "checksum256",
+                    "table_id": 6538
+                },
+                {
+                    "name": "expiry",
+                    "key_type": "uint64",
+                    "table_id": 6539
+                }
+            ]
         },
         {
             "name": "policies",
@@ -425,7 +437,14 @@
             "index_type": "i64",
             "key_names": ["scope","primary_key"],
             "key_types": ["name","uint64"],
-            "table_id": 7465
+            "table_id": 7465,
+            "secondary_indexes": [
+                {
+                    "name": "expiry",
+                    "key_type": "uint64",
+                    "table_id": 13866
+                }
+            ]
         },
         {
             "name": "storedpolicy",

@@ -39,6 +39,68 @@ public:
       abi_def abi;
       BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt->abi, abi), true);
       abi_ser.set_abi(abi, abi_serializer::create_yield_function(abi_serializer_max_time));
+
+      // Deploy sysio.system, init, and set default emission config
+      set_code( config::system_account_name, test_contracts::sysio_system_wasm() );
+      set_abi ( config::system_account_name, test_contracts::sysio_system_abi() );
+      produce_blocks(1);
+
+      base_tester::push_action(config::system_account_name, "init"_n,
+                               config::system_account_name, mutable_variant_object()
+                               ("version", 0)
+                               ("core", symbol(CORE_SYMBOL).to_string()));
+      produce_blocks(1);
+
+      // Load system ABI serializer for setemitcfg
+      {
+         const auto* sys_accnt = control->find_account_metadata( config::system_account_name );
+         BOOST_REQUIRE( sys_accnt != nullptr );
+         abi_def sys_abi;
+         BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(sys_accnt->abi, sys_abi), true);
+         sys_abi_ser.set_abi(sys_abi, abi_serializer::create_yield_function(abi_serializer_max_time));
+      }
+
+      setup_emission_config();
+   }
+
+   void setup_emission_config() {
+      auto cfg = mvo()
+         ("t1_allocation",          int64_t(7500000000000000))
+         ("t2_allocation",          int64_t(1000000000000000))
+         ("t3_allocation",          int64_t(100000000000000))
+         ("t1_duration",            uint32_t(12u * 30u * 24u * 3600u))
+         ("t2_duration",            uint32_t(24u * 30u * 24u * 3600u))
+         ("t3_duration",            uint32_t(36u * 30u * 24u * 3600u))
+         ("min_claimable",          int64_t(10000000000))
+         ("t5_distributable",       int64_t(375000000000000000LL))
+         ("t5_floor",               int64_t(125000000000000000LL))
+         ("target_annual_decay_bps", uint16_t(6940))
+         ("annual_initial_emission", int64_t(563150000000000LL * 365))
+         ("annual_max_emission",     int64_t(3000000000000000LL * 365))
+         ("annual_min_emission",     int64_t(100000000000000LL * 365))
+         ("compute_bps",            uint16_t(4000))
+         ("capital_bps",            uint16_t(3000))
+         ("capex_bps",              uint16_t(2000))
+         ("governance_bps",         uint16_t(1000))
+         ("producer_bps",           uint16_t(7000))
+         ("batch_op_bps",           uint16_t(3000))
+         ("standby_end_rank",       uint32_t(28))
+         ("epoch_log_retention_count", uint32_t(8640))("pay_cadence_epochs", uint16_t(1));
+
+      auto act_type = sys_abi_ser.get_action_type("setemitcfg"_n);
+      action act;
+      act.account = config::system_account_name;
+      act.name = "setemitcfg"_n;
+      act.authorization = {{config::system_account_name, config::active_name}};
+      act.data = sys_abi_ser.variant_to_binary(act_type, mvo()("cfg", cfg),
+         abi_serializer::create_yield_function(abi_serializer_max_time));
+
+      signed_transaction trx;
+      trx.actions.push_back(std::move(act));
+      set_transaction_headers(trx);
+      trx.sign(get_private_key(config::system_account_name, "active"), control->get_chain_id());
+      push_transaction(trx);
+      produce_blocks(1);
    }
 
    action_result push_action( const account_name& signer, const action_name &name, const variant_object &data ) {
@@ -174,6 +236,7 @@ public:
    }
 
    abi_serializer abi_ser;
+   abi_serializer sys_abi_ser;
 };
 
 BOOST_AUTO_TEST_SUITE(sysio_roa_tests)
@@ -405,15 +468,7 @@ BOOST_FIXTURE_TEST_CASE( newuser_tld_test, sysio_roa_tester ) try {
 
 
 BOOST_FIXTURE_TEST_CASE( verify_ram, sysio_roa_tester ) try {
-   // load system contract for newaccount functionality
-   set_code( config::system_account_name, test_contracts::sysio_system_wasm() );
-   set_abi( config::system_account_name, test_contracts::sysio_system_abi() );
-
-   base_tester::push_action(config::system_account_name, "init"_n,
-                            config::system_account_name, mutable_variant_object()
-                            ("version", 0)
-                            ("core", symbol(CORE_SYMBOL).to_string()));
-   produce_block();
+   // system contract + init + emission config already done in base constructor
 
    // roa has been activated with NODE_DADDY as a node owner
    // Accounts already created with ROA policy { "alice"_n, "bob"_n, "carol"_n, "darcy"_n }
@@ -651,14 +706,7 @@ BOOST_FIXTURE_TEST_CASE( extend_policy_test, sysio_roa_tester ) try {
 
 // Verifies that reducepolicy correctly decreases RAM bytes in the reslimit table.
 BOOST_FIXTURE_TEST_CASE( reducepolicy_ram_accounting, sysio_roa_tester ) try {
-   // Load system contract for newaccount + addpolicy/reducepolicy
-   set_code( config::system_account_name, test_contracts::sysio_system_wasm() );
-   set_abi( config::system_account_name, test_contracts::sysio_system_abi() );
-   base_tester::push_action(config::system_account_name, "init"_n,
-                            config::system_account_name, mutable_variant_object()
-                            ("version", 0)
-                            ("core", symbol(CORE_SYMBOL).to_string()));
-   produce_block();
+   // system contract + init + emission config already done in base constructor
 
    // Register node owners (need 21 for ROA activation)
    std::array<account_name, 21> node_owners = { NODE_DADDY };
@@ -720,13 +768,7 @@ BOOST_FIXTURE_TEST_CASE( reducepolicy_ram_accounting, sysio_roa_tester ) try {
 // Verifies that reducing an entire policy to zero correctly removes it and
 // that a second reducepolicy on a different policy also works correctly.
 BOOST_FIXTURE_TEST_CASE( reducepolicy_full_then_second, sysio_roa_tester ) try {
-   set_code( config::system_account_name, test_contracts::sysio_system_wasm() );
-   set_abi( config::system_account_name, test_contracts::sysio_system_abi() );
-   base_tester::push_action(config::system_account_name, "init"_n,
-                            config::system_account_name, mutable_variant_object()
-                            ("version", 0)
-                            ("core", symbol(CORE_SYMBOL).to_string()));
-   produce_block();
+   // system contract + init + emission config already done in base constructor
 
    std::array<account_name, 21> node_owners = { NODE_DADDY };
    for (size_t i = 1; i < node_owners.size(); i++) {
@@ -791,13 +833,7 @@ BOOST_FIXTURE_TEST_CASE( reducepolicy_full_then_second, sysio_roa_tester ) try {
 
 // Verifies that creating multiple users correctly decreases sysio's reslimit RAM.
 BOOST_FIXTURE_TEST_CASE( newuser_sysio_ram_decreases, sysio_roa_tester ) try {
-   set_code( config::system_account_name, test_contracts::sysio_system_wasm() );
-   set_abi( config::system_account_name, test_contracts::sysio_system_abi() );
-   base_tester::push_action(config::system_account_name, "init"_n,
-                            config::system_account_name, mutable_variant_object()
-                            ("version", 0)
-                            ("core", symbol(CORE_SYMBOL).to_string()));
-   produce_block();
+   // system contract + init + emission config already done in base constructor
 
    std::array<account_name, 21> node_owners = { NODE_DADDY };
    for (size_t i = 1; i < node_owners.size(); i++) {
@@ -840,13 +876,7 @@ public:
    std::array<account_name, 21> node_owners;
 
    sysio_roa_full_tester() {
-      set_code( config::system_account_name, test_contracts::sysio_system_wasm() );
-      set_abi( config::system_account_name, test_contracts::sysio_system_abi() );
-      base_tester::push_action(config::system_account_name, "init"_n,
-                               config::system_account_name, mutable_variant_object()
-                               ("version", 0)
-                               ("core", symbol(CORE_SYMBOL).to_string()));
-      produce_block();
+      // system contract + init + emission config already done in base constructor
 
       node_owners[0] = NODE_DADDY;
       for (size_t i = 1; i < node_owners.size(); i++) {
@@ -1248,6 +1278,51 @@ BOOST_FIXTURE_TEST_CASE( extendpolicy_blocks_reduce, sysio_roa_full_tester ) try
    // But expand should still work
    BOOST_REQUIRE_NO_THROW(
       expand_roa_policy(node_owners[2], user, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0));
+} FC_LOG_AND_RETHROW()
+
+// =============================================================================
+// finalizereg auth + status validation
+// =============================================================================
+//
+// finalizereg gates registration confirmation/rejection on:
+//   1. require_auth(get_self())     -- only sysio.roa can finalize
+//   2. status == 2 || status == 3   -- "confirm" or "reject"
+//   3. roa state.is_active          -- ROA must be activated
+//   4. record exists in nodeownerreg + record.status == 1 (PENDING)
+//
+// These tests cover (1), (2), and (4). The full setpending->finalizereg happy
+// path requires the auth.ext signed flow and is left to a follow-up; once
+// that fixture is in place, add coverage for confirm + reject + tier carry-
+// through to the inline addnodeowner.
+
+BOOST_FIXTURE_TEST_CASE( finalizereg_requires_self_auth, sysio_roa_full_tester ) try {
+   // Non-self caller is rejected before any state check.
+   auto result = push_action("alice"_n, "finalizereg"_n,
+      mvo()("owner", "alice"_n)("status", uint8_t(2)) );
+   BOOST_REQUIRE_EQUAL( error("missing authority of sysio.roa"), result );
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( finalizereg_rejects_invalid_status, sysio_roa_full_tester ) try {
+   // Status validation runs before record-existence check, so we don't need
+   // a real PENDING row to exercise these. uint8_t allows 0..255; the check
+   // accepts only 2 (confirm) and 3 (reject). Everything else must error.
+   for (uint8_t bad_status : { uint8_t(0), uint8_t(1), uint8_t(4), uint8_t(255) }) {
+      auto result = push_action(ROA, "finalizereg"_n,
+         mvo()("owner", "alice"_n)("status", bad_status) );
+      BOOST_REQUIRE_EQUAL(
+         error("assertion failure with message: Invalid status: Can only confirm (2) or reject (3)"),
+         result );
+   }
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( finalizereg_rejects_missing_record, sysio_roa_full_tester ) try {
+   // Auth + status + is_active all pass, but no nodeownerreg row exists for
+   // "norecord"_n. Must error explicitly rather than silently no-op.
+   auto result = push_action(ROA, "finalizereg"_n,
+      mvo()("owner", "norecord"_n)("status", uint8_t(2)) );
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: No registration record found"),
+      result );
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_SUITE_END()
