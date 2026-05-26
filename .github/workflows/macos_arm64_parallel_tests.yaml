@@ -43,7 +43,7 @@ jobs:
         uses: actions/cache@v5
         with:
           path: ${{ github.workspace }}/vcpkg-binary-cache
-          key: vcpkg-binaries-macos-arm64-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json') }}
+          key: vcpkg-binaries-macos-arm64-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json', '.github/vcpkg-triplets/arm64-osx-release.cmake') }}
           restore-keys: |
             vcpkg-binaries-macos-arm64-
 
@@ -61,18 +61,22 @@ jobs:
           ./vcpkg/bootstrap-vcpkg.sh
 
           export CCACHE_DIR="$GITHUB_WORKSPACE/.ccache"
+          export VCPKG_TARGET_TRIPLET=arm64-osx-release
+          export VCPKG_HOST_TRIPLET=arm64-osx-release
+          export VCPKG_OVERLAY_TRIPLETS="$GITHUB_WORKSPACE/.github/vcpkg-triplets"
           ccache -z || true
 
           cmake -B build/macos-arm64 -S . -G Ninja \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_TOOLCHAIN_FILE="$PWD/vcpkg/scripts/buildsystems/vcpkg.cmake" \
-            -DVCPKG_TARGET_TRIPLET=arm64-osx \
+            -DVCPKG_TARGET_TRIPLET="$VCPKG_TARGET_TRIPLET" \
+            -DVCPKG_HOST_TRIPLET="$VCPKG_HOST_TRIPLET" \
+            -DVCPKG_OVERLAY_TRIPLETS="$VCPKG_OVERLAY_TRIPLETS" \
             -DBUILD_SYSTEM_CONTRACTS=OFF \
             -DBUILD_TEST_CONTRACTS=OFF \
             -DENABLE_CCACHE=ON \
             -DENABLE_DISTCC=OFF \
             -DENABLE_TESTS=ON \
-            -DENABLE_JEMALLOC=OFF \
             -DDISABLE_WASM_SPEC_TESTS=ON
 
       - name: Build test targets
