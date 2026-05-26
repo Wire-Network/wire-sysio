@@ -49,7 +49,7 @@ constexpr uint32_t ACTIVE_PRODUCER_WEIGHT = 15; // > any standby weight (1..cfg.
 // Basis-point denominator for all category / sub-split ratios.
 constexpr int64_t  BPS_DENOMINATOR        = 10000;
 
-constexpr sysio::name CAPITAL_ACCOUNT            = "sysio.cap"_n;
+constexpr sysio::name CAPITAL_ACCOUNT            = "sysio.dclaim"_n;
 constexpr sysio::name GOVERNANCE_ACCOUNT         = "sysio.gov"_n;
 // Capex ("capital expenditure") bucket lives on sysio.ops -- operational spend.
 constexpr sysio::name CAPEX_OPERATIONS_ACCOUNT   = "sysio.ops"_n;

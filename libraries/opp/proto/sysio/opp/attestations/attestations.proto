@@ -277,16 +277,42 @@ message NodeOwnerReg {
   sysio.opp.types.ChainAddress nft_address   = 3;
 }
 
-// Staking reward distribution (Outpost -> Depot).
+// Staking reward distribution (Outpost -> Depot), per staker per source-chain
+// reward period.
+//
+// Emitted by an outpost when a staker's slice of a validator-reward
+// distribution has been computed. `sysio.msgch` routes it two ways: the
+// aggregate native amount credits the outpost-side reserve
+// (`sysio.reserv::onreward`, keeps `swapquote` solvent), and the per-staker
+// body is dispatched to `sysio.cap::onreward`, which prices native -> WIRE off
+// the reserve and credits the staker's claim ledger (`pending_claims` if the
+// staker has an AuthX-linked WIRE account, otherwise parked in
+// `unmapped_tokens` keyed by the native address until they link).
 message StakingReward {
-  uint64                       outpost_id          = 1;
+  // Chain code emitting the reward — identifies the (chain, validator) context.
+  uint64                       chain_code = 1;
+  // The staker's WIRE account. May be empty when the staker has not yet
+  // completed AuthX linking; in that case the depot parks the reward by
+  // `staker_native_address` until the link sweep moves it to the claim ledger.
   sysio.opp.types.WireAccount  staker_wire_account = 2;
-  uint32                       share_bps           = 3;
-  uint64                       period_start_ms     = 4;
-  uint64                       period_end_ms       = 5;
-  sysio.opp.types.TokenAmount  reward_amount       = 6;
-  uint64                       chain_code          = 7;
-  uint64                       reserve_code        = 8;
+  // The staker's share of the reward in basis points (10000 = 100%).
+  // Informational / audit only — `reward_amount` is already the staker's
+  // absolute, already-prorated portion (the depot does not re-split).
+  uint32                       share_bps = 3;
+  // WIRE epoch index in which this reward is being recorded. Informational for
+  // roll-up / audit; dedupe and pruning key off `external_epoch_ref`.
+  uint32                       reward_epoch_index = 4;
+  // Source-chain reward-period reference (the external chain's epoch / period
+  // number for this distribution). Monotonic per (outpost, staker); the depot
+  // dedupes and rolls up against it and rejects anything at or below the last
+  // processed value, so no per-period history is retained (data-leak safe).
+  uint64                       external_epoch_ref = 5;
+  // Absolute reward amount + token kind being credited (native-denominated).
+  sysio.opp.types.TokenAmount  reward_amount = 6;
+  // The staker's native (ETH / SOL / ...) address — the address they staked
+  // from. Always populated so a not-yet-linked staker's reward can be parked
+  // and made claimable the moment they complete AuthX linking.
+  sysio.opp.types.ChainAddress staker_native_address = 7;
 }
 
 message StakeResult {

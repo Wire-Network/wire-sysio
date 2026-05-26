@@ -455,12 +455,14 @@ void emit_swap_remit(name self,
 ///
 /// **Per `feedback_opp_handlers_never_throw.md` — this MUST stay
 /// non-throwing.** It's called from `try_select_winner`, which runs inside
-/// the evalcons inline-action chain; a `check()` failure here halts
-/// consensus. The defensive size+tag bounds catch the obvious cases; the
-/// `sysio::recover_key_nothrow` intrinsic catches everything else the
-/// host crypto path can raise (malformed bytes, unactivated signature
-/// type, recovery math failure, subjective-size limit) and returns
-/// `std::nullopt` instead.
+/// the evalcons inline-action chain; a `check()`/throw here halts
+/// consensus. The defensive size+tag bounds below reject the structurally
+/// invalid signatures before recovery. Recovery itself uses
+/// `sysio::recover_key`; converting its remaining contract-observable
+/// throws (unactivated variant, recovery-math failure) to an rc = -1
+/// sentinel — so this is non-throwing on every input — is tracked as
+/// separate host+CDT work landing in its own PR. Until then a crafted but
+/// size/tag-valid signature can still throw here.
 bool verify_uic_signature(name underwriter,
                            const std::vector<char>& uic_bytes) {
    if (uic_bytes.empty()) return false;

@@ -501,30 +501,33 @@ void dispatch_attestation(name self, uint64_t attestation_id,
          break;
 
       case AttestationType::ATTESTATION_TYPE_STAKING_REWARD:
-         // Outpost-side staker reward — credit the outpost-side reserve.
-         // The matching WIRE-side payout to the staker is a separate
-         // next-epoch action owned by the staking work stream.
-         //
-         // Post v6: chain + reserve + token identity are all carried on
-         // the attestation as codenames; `from_chain` (VM family) is no
-         // longer the routing key.
+         // Per-staker staking reward -> sysio.dclaim claim ledger. The v6
+         // staking-reward path does not deposit back to a reserve (the
+         // external-pool credit and native -> WIRE conversion are
+         // outpost-side), so the pre-v6 reserv::onreward leg is dropped and
+         // reward_amount.amount is forwarded as the WIRE-denominated credit.
          {
             opp::attestations::StakingReward sr;
             auto in = zpp::bits::in{std::span{data.data(), data.size()}, zpp::bits::no_size{}};
             auto rc = in(sr);
             if (rc != zpp::bits::errc{}) break;
-            // Split reward_amount (TokenAmount) into (chain_code, token_code,
-            // reserve_code, amount) on the inline action per the
-            // no-proto-messages-in-actions rule.
             const uint64_t reward_raw =
                static_cast<uint64_t>(static_cast<int64_t>(sr.reward_amount.amount));
+            // staker_wire_account.name is the raw account string (empty =>
+            // staker not yet AuthX-linked, so sysio.dclaim parks by native
+            // address). staker_native_address carries the chain (kind) and
+            // the raw address bytes.
             action(
                permission_level{self, "active"_n},
-               RESERV_ACCOUNT, "onreward"_n,
-               std::make_tuple(sysio::slug_name{sr.chain_code},
-                               sysio::slug_name{sr.reward_amount.token_code},
-                               sysio::slug_name{sr.reserve_code},
-                               reward_raw)
+               "sysio.dclaim"_n, "onreward"_n,
+               std::make_tuple(sr.chain_code,
+                               sr.staker_wire_account.name,
+                               sr.staker_native_address.kind,
+                               sr.staker_native_address.address,
+                               reward_raw,
+                               sr.reward_epoch_index,
+                               sr.external_epoch_ref,
+                               sr.share_bps)
             ).send();
          }
          break;

@@ -52,7 +52,7 @@ public:
       // RAM to new accounts — too small for the sysio.token deploy
       // (~100KB). Doing creation first sidesteps that.
       //
-      // sysio.cap / sysio.gov / sysio.ops are payepoch destinations for
+      // sysio.dclaim / sysio.gov / sysio.ops are payepoch destinations for
       // the capital / governance / capex emission buckets; without them
       // the first pay epoch's WIRE transfer fails with "to account does
       // not exist". sysio.authex is auto-created by base_tester (see
@@ -61,7 +61,7 @@ public:
       create_accounts({
          TOKEN_ACCOUNT, EPOCH_ACCOUNT, OPREG_ACCOUNT, MSGCH_ACCOUNT,
          CHALG_ACCOUNT, CHAINS_ACCOUNT, UWRIT_ACCOUNT, BATCHOP, UWRIT_OP,
-         "sysio.cap"_n, "sysio.gov"_n, "sysio.ops"_n
+         "sysio.dclaim"_n, "sysio.gov"_n, "sysio.ops"_n
       });
       produce_blocks(2);
 

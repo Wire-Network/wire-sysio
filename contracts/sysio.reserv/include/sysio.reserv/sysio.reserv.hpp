@@ -14,6 +14,9 @@
 
 #include <limits>
 
+#include <cstdint>
+#include <limits>
+
 namespace sysio {
 
    /**
