@@ -132,7 +132,7 @@ BOOST_FIXTURE_TEST_CASE(claim_rejects_empty_ledger, sysio_dclaim_tester) { try {
 BOOST_FIXTURE_TEST_CASE(importseed_accepts_credit_batch, sysio_dclaim_tester) { try {
    BOOST_REQUIRE_EQUAL(push_dclaim(DCLAIM_ACCOUNT, "importseed"_n, mvo
       ("chain", ChainKind::CHAIN_KIND_EVM)
-      ("credits", fc::variants{ mvo()("native_address", addr20)("wire_atomic", 982953049502) })),
+      ("credits", fc::variants{ mvo()("native_address", addr20)("wire_atomic", int64_t{982953049502}) })),
       success());
    // Pre-launch import lands as an unmapped balance (unlinked by definition).
    auto u = unmapped_row(1);

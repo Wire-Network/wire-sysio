@@ -1,10 +1,10 @@
-name: "macOS arm64 smoke"
+name: "macOS arm64 parallel tests"
 
 on:
   workflow_dispatch:
   pull_request:
     paths:
-      - ".github/workflows/macos_arm64_smoke.yaml"
+      - ".github/workflows/macos_arm64_parallel_tests.yaml"
       - ".github/vcpkg-triplets/**"
       - "cmake/**"
       - "libraries/**"
@@ -24,8 +24,8 @@ defaults:
     shell: bash
 
 jobs:
-  smoke:
-    name: Build and smoke test on Apple Silicon
+  parallel-tests:
+    name: Build and run parallel tests on Apple Silicon
     runs-on: macos-15
     timeout-minutes: 180
     env:
@@ -75,20 +75,17 @@ jobs:
             -DENABLE_JEMALLOC=OFF \
             -DDISABLE_WASM_SPEC_TESTS=ON
 
-      - name: Build smoke targets
+      - name: Build test targets
         run: |
-          cmake --build build/macos-arm64 --target \
-            fc nodeop clio kiod sys-util unit_test plugin_test test_fc \
-            -- -j"$(sysctl -n hw.logicalcpu)"
+          cmake --build build/macos-arm64 -- -j"$(sysctl -n hw.logicalcpu)"
 
-      - name: Run smoke tests
+      - name: Run parallelizable tests
         run: |
-          build/macos-arm64/programs/nodeop/nodeop --version
-          build/macos-arm64/programs/clio/clio version client
-          build/macos-arm64/libraries/libfc/test/test_fc --run_test=traits
-          build/macos-arm64/unittests/unit_test --run_test=noop_tests -- --sys-vm
-          build/macos-arm64/unittests/unit_test --run_test=wasm_tests -- --sys-vm
-          build/macos-arm64/tests/plugin_test --report_level=detailed --color_output
+          cd build/macos-arm64
+          ctest -j "$(sysctl -n hw.logicalcpu)" \
+            -LE "(nonparallelizable_tests|long_running_tests|wasm_spec_tests)" \
+            --output-on-failure --timeout 1000 \
+            2>&1 | tee "$RUNNER_TEMP/macos-arm64-parallel-ctest.log"
 
       - name: Show diagnostics on failure
         if: failure()
