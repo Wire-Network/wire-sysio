@@ -625,13 +625,27 @@ kms_signer make_kms_signature_provider(const kms_key_ref&             ref,
       // signs the opaque 32-byte value regardless of which hash produced it.
       const auto digest_bytes = fc::crypto::digest_span(digest);
 
-      // Build a Sign request. MessageType=DIGEST tells KMS the 32 bytes are
-      // already a hash; otherwise it would re-hash with SHA-256 and break
-      // any chain that hashes with anything other than SHA-256.
       Aws::KMS::Model::SignRequest req;
       req.SetKeyId(Aws::String{state->key_id});
       req.SetMessage(Aws::Utils::ByteBuffer{digest_bytes.data(), digest_bytes.size()});
+
+      // Build a Sign request. MessageType=DIGEST tells KMS the bytes are
+      // already a hash
       req.SetMessageType(Aws::KMS::Model::MessageType::DIGEST);
+
+      // SigningAlgorithm: KMS's `ECC_SECG_P256K1` key spec (the curve Ethereum
+      // and Bitcoin use) supports exactly one signing-algorithm value -- this
+      // one. The name is misleading: with `MessageType=DIGEST` set above, KMS
+      // does NOT apply SHA-256 to the input. It treats the 32 bytes as an
+      // already-hashed value and signs them via raw ECDSA over secp256k1; the
+      // "SHA_256" portion of the spec only constrains the input length to 32
+      // bytes (the SHA-256 output size), which Ethereum's Keccak-256 digest
+      // also satisfies. ECDSA's math is hash-agnostic -- it reduces the
+      // 32-byte digest modulo the curve order and emits (r, s) -- so the
+      // signature KMS produces over `keccak256(rlp(tx))` is byte-identical to
+      // what a local secp256k1 signer would produce over the same 32 bytes.
+      // The self-verify in `em_sign_keccak` (recover + compare to the pinned
+      // public key) catches any deviation on every signature.
       req.SetSigningAlgorithm(Aws::KMS::Model::SigningAlgorithmSpec::ECDSA_SHA_256);
 
       auto outcome = state->client->Sign(req);
