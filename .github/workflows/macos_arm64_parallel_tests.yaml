@@ -64,7 +64,7 @@ jobs:
           ccache -z || true
 
           cmake -B build/macos-arm64 -S . -G Ninja \
-            -DCMAKE_BUILD_TYPE=Debug \
+            -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_TOOLCHAIN_FILE="$PWD/vcpkg/scripts/buildsystems/vcpkg.cmake" \
             -DVCPKG_TARGET_TRIPLET=arm64-osx \
             -DBUILD_SYSTEM_CONTRACTS=OFF \

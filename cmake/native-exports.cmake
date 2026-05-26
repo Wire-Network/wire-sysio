@@ -14,12 +14,17 @@ macro(link_native_exports TARGET)
       set(NATIVE_INTRINSIC_EXPORTS_SRC "${CMAKE_SOURCE_DIR}/libraries/testing/native_intrinsic_exports.cpp")
       set(NATIVE_EXPORT_LIST "${CMAKE_BINARY_DIR}/native_intrinsic_exports.list")
 
-      # Generate the --dynamic-list file once (shared by all targets).
+      # Generate the platform-specific export list once (shared by all targets).
       if(NOT TARGET native_export_list)
+         if(APPLE)
+            set(NATIVE_EXPORT_LIST_FORMAT exported)
+         else()
+            set(NATIVE_EXPORT_LIST_FORMAT dynamic-list)
+         endif()
          add_custom_command(
             OUTPUT "${NATIVE_EXPORT_LIST}"
             COMMAND python3 "${CMAKE_SOURCE_DIR}/scripts/gen_export_list.py"
-               --format=dynamic-list -o "${NATIVE_EXPORT_LIST}"
+               --format=${NATIVE_EXPORT_LIST_FORMAT} -o "${NATIVE_EXPORT_LIST}"
                "${NATIVE_INTRINSIC_EXPORTS_SRC}"
             DEPENDS "${NATIVE_INTRINSIC_EXPORTS_SRC}" "${CMAKE_SOURCE_DIR}/scripts/gen_export_list.py"
             COMMENT "Generating native intrinsic export list"

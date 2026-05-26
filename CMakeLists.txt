@@ -87,8 +87,9 @@ if(CMAKE_SIZEOF_VOID_P EQUAL 8 AND NOT WIN32)
   endif()
 endif()
 
-# Native-module runtime: only in Debug builds on Linux (used for debugger-attached contract execution).
-if(DEBUG_ENABLED AND CMAKE_SIZEOF_VOID_P EQUAL 8 AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
+# Native-module runtime: only in Debug builds on hosts that can load native contract modules.
+if(DEBUG_ENABLED AND CMAKE_SIZEOF_VOID_P EQUAL 8 AND
+   (CMAKE_SYSTEM_NAME STREQUAL "Linux" OR APPLE))
   list(APPEND SYSIO_WASM_RUNTIMES native-module)
 endif()
 
