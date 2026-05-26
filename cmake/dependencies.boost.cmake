@@ -1,4 +1,4 @@
-set(BOOST_VERSION 1.89.0)
+set(BOOST_VERSION 1.91.0)
 # Ask for the version installed via vcpkg (or omit the version to accept any)
 set(CMAKE_FIND_PACKAGE_PREFER_CONFIG ON)
 
