@@ -34,7 +34,7 @@ int main(int argc, char** argv) {
             auto now = std::chrono::system_clock::now();
             auto now_time = std::chrono::system_clock::to_time_t(now);
             std::tm now_tm{};
-            localtime_r(&now_time, &now_tm);
+            gmtime_r(&now_time, &now_tm);
             std::stringstream now_stream;
             now_stream << std::put_time(&now_tm, "%H:%M:%S");
             auto now_str = now_stream.str();

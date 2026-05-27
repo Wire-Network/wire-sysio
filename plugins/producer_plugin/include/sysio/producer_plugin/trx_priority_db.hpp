@@ -48,7 +48,8 @@ private:
 
    using trx_priority_map_t = boost::container::flat_multimap<chain::name, trx_prio>;
 private:
-
+   // Keep this as a plain shared_ptr and use std::atomic_load/std::atomic_store at access sites. The
+   // AppleClang/libc++ toolchain used by macOS 26 does not provide the C++20 atomic shared_ptr specialization.
    std::shared_ptr<trx_priority_map_t>               _trx_priority_map{};
    chain::block_timestamp_type                       _last_trx_priority_update{}; // only accessed on main thread
 
