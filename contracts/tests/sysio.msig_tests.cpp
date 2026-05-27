@@ -1017,7 +1017,7 @@ BOOST_FIXTURE_TEST_CASE( getproposal_read_only_returns_assembled, sysio_msig_tes
    getproposal_act.name    = "getproposal"_n;
    getproposal_act.authorization = {};
    getproposal_act.data = abi_ser.variant_to_binary(
-      "get_proposal",
+      "getproposal",
       mvo()("proposer", "alice")("proposal_name", "chunkprop"),
       abi_serializer::create_yield_function(abi_serializer_max_time));
 
@@ -1060,7 +1060,7 @@ BOOST_FIXTURE_TEST_CASE( getproposal_read_only_returns_assembled, sysio_msig_tes
 // Sibling of `getproposal_read_only_returns_assembled` for the *inline* path —
 // proves the read-only `getproposal` action also works for proposals small
 // enough to live in a single `proposal` row (chunk_count == 0). The contract
-// branch under test (`get_proposal` line ~395 — the "not is_chunked" leg that
+// branch under test (`getproposal` line ~395 — the "not is_chunked" leg that
 // returns `prop` directly without touching `read_proposal_chunks`) had no
 // direct coverage in the chunked-only sibling test.
 BOOST_FIXTURE_TEST_CASE( getproposal_read_only_inline, sysio_msig_tester ) try {
@@ -1082,7 +1082,7 @@ BOOST_FIXTURE_TEST_CASE( getproposal_read_only_inline, sysio_msig_tester ) try {
    getproposal_act.name    = "getproposal"_n;
    getproposal_act.authorization = {};
    getproposal_act.data = abi_ser.variant_to_binary(
-      "get_proposal",
+      "getproposal",
       mvo()("proposer", "alice")("proposal_name", "smallprop"),
       abi_serializer::create_yield_function(abi_serializer_max_time));
 
