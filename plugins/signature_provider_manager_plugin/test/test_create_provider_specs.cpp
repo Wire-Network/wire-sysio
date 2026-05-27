@@ -340,59 +340,113 @@ BOOST_AUTO_TEST_CASE(solana_signature_provider_spec_options) {
    BOOST_TEST((providers[0]->key_type == chain_key_type_solana));
 }
 
-BOOST_AUTO_TEST_CASE(create_provider_ethereum_kms_spec_routes_through_parser) {
-   // End-to-end check that the plugin's spec parser routes `KMS:` through
-   // `parse_kms_spec` + `make_kms_signature_provider` and returns a provider
-   // whose sign closure is callable. The closure itself is *not* invoked
-   // here -- invocation issues a real KMS::Sign request, which is covered
-   // only by the env-gated live test.
-   using namespace fc::test;
+BOOST_AUTO_TEST_CASE(create_provider_unknown_scheme_throws_with_hint) {
+   // Any `<provider-type>:` not built in (KEY, KIOD) and not registered by
+   // the host application must throw with a clear hint about how to enable
+   // it -- this is the operator-facing surface for a binary that does not
+   // link the relevant extension library.
    using namespace fc::crypto;
 
    auto clean_app = gsl_lite::finally([]() {
       appbase::application::reset_app_singleton();
    });
 
-   keygen_result fixture          = load_keygen_fixture("ethereum", 1);
-   const std::string kms_provider = "KMS:us-east-1:alias/wire-cranker-eth-01";
+   keygen_result fixture          = fc::test::load_keygen_fixture("ethereum", 1);
+   const std::string kms_spec     = "KMS:us-east-1:alias/none";
    const auto provider_spec       = to_signature_provider_spec(
       "kms-eth-01", chain_kind_ethereum, chain_key_type_ethereum,
-      fixture.public_key, kms_provider);
+      fixture.public_key, kms_spec);
 
    auto  tester = create_app();
    auto& mgr    = tester->plugin();
 
-   const auto provider = mgr.create_provider(provider_spec);
+   BOOST_CHECK_THROW(mgr.create_provider(provider_spec),
+                     sysio::chain::plugin_config_exception);
+}
 
-   BOOST_CHECK_EQUAL(provider->key_name, "kms-eth-01");
-   BOOST_TEST((provider->target_chain == chain_kind_ethereum));
-   BOOST_TEST((provider->key_type == chain_key_type_ethereum));
+BOOST_AUTO_TEST_CASE(register_spec_handler_dispatches_custom_scheme) {
+   // The extension API: a host application registers a handler for a custom
+   // scheme via `register_spec_handler` before app().initialize(); the
+   // plugin's spec parser then routes that scheme through the handler. This
+   // test uses a mock handler -- no AWS, no network -- to exercise the
+   // wiring end-to-end and verify the returned provider is in the registry.
+   using namespace fc::crypto;
+
+   auto clean_app = gsl_lite::finally([]() {
+      appbase::application::reset_app_singleton();
+   });
+
+   keygen_result fixture     = fc::test::load_keygen_fixture("ethereum", 1);
+   const auto provider_spec  = to_signature_provider_spec(
+      "mock-eth-01", chain_kind_ethereum, chain_key_type_ethereum,
+      fixture.public_key, "MOCK:anything");
+
+   // Build a tester *without* initializing; we need to register a handler in
+   // the gap between plugin construction and initialize (which parses
+   // --signature-provider options). `register_plugin<>` (static) only
+   // enqueues a name in the static registration list, so call
+   // `_register_plugin<>` directly to construct the instance now --
+   // `_register_plugin<>` is idempotent, so the later `initialize<>` pass is
+   // a no-op for this plugin.
+   auto tester = std::make_unique<sig_provider_tester>();
+   auto& mgr   = tester->app->_register_plugin<signature_provider_manager_plugin>();
+
+   bool handler_called = false;
+   mgr.register_spec_handler(
+      "MOCK",
+      [&handler_called](chain_key_type_t /*key_type*/,
+                        const public_key& /*expected*/,
+                        std::string_view spec_data) -> sysio::provider_spec_result {
+         handler_called = true;
+         BOOST_CHECK_EQUAL(spec_data, "anything");
+         // Trivial signer: returns a default-constructed signature. The
+         // plugin never invokes it in this test -- we only verify routing.
+         return {
+            .signer        = [](fc::crypto::hash256) { return fc::crypto::signature{}; },
+            .private_key   = std::nullopt,
+            .startup_probe = {}
+         };
+      });
+
+   std::vector<const char*> argv{"test_signature_provider_manager_plugin"};
+   BOOST_CHECK(tester->app->initialize<signature_provider_manager_plugin>(
+      argv.size(), const_cast<char**>(argv.data())));
+
+   const auto provider = tester->plugin().create_provider(provider_spec);
+   BOOST_CHECK(handler_called);
+   BOOST_CHECK_EQUAL(provider->key_name, "mock-eth-01");
    BOOST_CHECK(static_cast<bool>(provider->sign));
-   // KMS-backed providers carry no local private key.
    BOOST_CHECK(!provider->private_key.has_value());
 }
 
-BOOST_AUTO_TEST_CASE(create_provider_kms_spec_rejects_solana) {
-   // The plugin must reject a KMS spec for a non-secp256k1 chain at parse
-   // time, not at first sign -- operators should learn early that KMS
-   // can't sign Solana ed25519.
-   using namespace fc::test;
-   using namespace fc::crypto;
-
+BOOST_AUTO_TEST_CASE(register_spec_handler_rejects_builtin_and_duplicates) {
+   // The extension API must refuse to override built-ins and refuse to
+   // re-register the same scheme twice -- both are operator-facing bugs that
+   // would otherwise yield baffling runtime behaviour.
    auto clean_app = gsl_lite::finally([]() {
       appbase::application::reset_app_singleton();
    });
 
-   keygen_result fixture          = load_keygen_fixture("solana", 1);
-   const std::string kms_provider = "KMS:us-east-1:alias/test";
-   const auto provider_spec       = to_signature_provider_spec(
-      "kms-sol-01", chain_kind_solana, chain_key_type_solana,
-      fixture.public_key, kms_provider);
+   // `register_plugin<>` only enqueues the plugin name; the instance is not
+   // constructed until `initialize<>` runs. Use `_register_plugin<>` to
+   // construct the instance now so we can call `register_spec_handler` on
+   // it.
+   auto tester = std::make_unique<sig_provider_tester>();
+   auto& mgr   = tester->app->_register_plugin<signature_provider_manager_plugin>();
 
-   auto  tester = create_app();
-   auto& mgr    = tester->plugin();
+   sysio::spec_handler noop_handler =
+      [](fc::crypto::chain_key_type_t, const fc::crypto::public_key&, std::string_view) {
+         return sysio::provider_spec_result{};
+      };
 
-   BOOST_CHECK_THROW(mgr.create_provider(provider_spec), sysio::chain::pending_impl_exception);
+   BOOST_CHECK_THROW(mgr.register_spec_handler("KEY", noop_handler),
+                     fc::exception);
+   BOOST_CHECK_THROW(mgr.register_spec_handler("KIOD", noop_handler),
+                     fc::exception);
+
+   BOOST_CHECK_NO_THROW(mgr.register_spec_handler("TEST", noop_handler));
+   BOOST_CHECK_THROW(mgr.register_spec_handler("TEST", noop_handler),
+                     fc::exception);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

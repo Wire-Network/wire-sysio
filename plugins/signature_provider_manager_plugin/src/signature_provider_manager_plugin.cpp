@@ -17,17 +17,16 @@
 #include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
 #include <sysio/http_client_plugin/http_client_plugin.hpp>
 
-#include "kms_signature_provider.hpp"
-
 namespace sysio {
 namespace {
 constexpr auto option_name_kiod_timeout = "signature-provider-kiod-timeout";
 
-/// Opt-in flag: when true, plugin_startup() probes every KMS-backed signing key
-/// with a GetPublicKey call so a credential / region / IAM misconfiguration
-/// fails loudly at boot rather than on the first production sign. Default
-/// false, so nodes with no KMS keys and offline test environments are
-/// unaffected.
+/// Opt-in flag: when true, plugin_startup() invokes every registered
+/// `startup_probe` -- today only the AWS KMS handler attaches one (a
+/// `GetPublicKey` call that validates credentials / region / IAM / pinned
+/// key). Default false, so nodes with no probe-registering providers and
+/// offline test environments are unaffected. The option name retains "kms"
+/// for backward compatibility with existing operator configs.
 constexpr auto option_name_kms_startup_check = "signature-provider-kms-startup-check";
 
 std::filesystem::path default_signature_provider_spec_file() {
@@ -45,10 +44,12 @@ public:
    fc::microseconds _kiod_provider_timeout_us;
 
    /**
-    * When true, `plugin_startup()` runs the opt-in AWS KMS startup credential
-    * check. Set from `option_name_kms_startup_check` in `plugin_initialize`.
+    * When true, `plugin_startup()` runs the opt-in startup-probe pass. Set
+    * from `option_name_kms_startup_check` in `plugin_initialize`. The option
+    * name keeps "kms" for backward compatibility with operator configs; the
+    * mechanism is generic and any registered handler may attach a probe.
     */
-   bool _kms_startup_check{false};
+   bool _startup_probe_enabled{false};
 
    fc::crypto::sign_fn make_key_signature_provider(const chain::private_key_type& key) const {
       // KEY: providers (wire / K1 / BLS block signing) always sign a SHA-256
@@ -84,25 +85,7 @@ public:
       };
    }
 
-   /**
-    * Result of building a signing provider from a `<private-key-provider-spec>`:
-    * the signing closure, the local private key (only for `KEY:` specs), and --
-    * for `KMS:` specs only -- the one-shot startup probe.
-    *
-    * `kms_warm_up` is handed back rather than registered inline so the caller
-    * can defer appending it to `_kms_startup_probes` until the provider has
-    * been successfully inserted. A provider rejected by `set_provider()` (a
-    * duplicate key_name or public_key) must not leave an orphan probe behind:
-    * `plugin_startup()` would otherwise probe -- or fail node startup on -- a
-    * KMS key whose provider was never registered.
-    */
-   struct provider_spec_result {
-      fc::crypto::sign_fn                    signer;
-      std::optional<fc::crypto::private_key> private_key;
-      std::function<void()>                  kms_warm_up;  ///< empty for non-KMS specs
-   };
-
-   provider_spec_result create_provider_from_spec(
+   sysio::provider_spec_result create_provider_from_spec(
       fc::crypto::chain_key_type_t key_type,
       const fc::crypto::public_key& public_key,
       const std::string& spec) {
@@ -151,25 +134,29 @@ public:
          return {.signer = make_kiod_signature_provider(spec_data, public_key)};
       }
 
-      if (spec_type_str == "KMS") {
-         // KMS-backed signer: the secret never leaves AWS. `make_kms_signature_provider`
-         // validates the key_type / pubkey-variant pairing at construction; the
-         // closure issues KMS::Sign on each invocation, so credentials and
-         // network access are deferred to first sign rather than spec parse.
-         auto ref = sysio::sigprov::kms::parse_kms_spec(spec_data);
-         auto kms = sysio::sigprov::kms::make_kms_signature_provider(ref, key_type, public_key);
-
-         // Hand the startup probe back to the caller rather than registering it
-         // here. It is appended to `_kms_startup_probes` only once the provider
-         // is successfully inserted, so a provider rejected as a duplicate
-         // leaves no probe for plugin_startup() to run. The probe lets
-         // plugin_startup() -- when the opt-in KMS startup check is enabled --
-         // fail fast on a missing credential, bad region, absent IAM grant, or
-         // wrong pinned key instead of discovering it on the first sign.
-         return {.signer = std::move(kms.sign), .kms_warm_up = std::move(kms.warm_up)};
+      // Any other scheme must have been registered by the host application
+      // (via `register_spec_handler`) before `app().initialize(...)`. The
+      // handler owns parsing its own `spec_data`. If a handler returns a
+      // `startup_probe`, the caller (`create_provider`) appends it to
+      // `_startup_probes` only after `set_provider` succeeds, so a provider
+      // rejected as a duplicate never leaves an orphan probe behind.
+      sysio::spec_handler handler;
+      {
+         std::scoped_lock lock(_signing_providers_mutex);
+         if (auto it = _spec_handlers.find(spec_type_str); it != _spec_handlers.end()) {
+            handler = it->second;
+         }
+      }
+      if (handler) {
+         return handler(key_type, public_key, spec_data);
       }
 
-      SYS_THROW(chain::plugin_config_exception, "Unsupported key provider type \"{}\"", spec_type_str);
+      SYS_THROW(chain::plugin_config_exception,
+                "Unknown provider type \"{}\". Built-in types are KEY and KIOD; "
+                "additional types (e.g. KMS) must be registered by the host "
+                "application via register_spec_handler() before app().initialize() "
+                "-- this binary has no registration for \"{}\".",
+                spec_type_str, spec_type_str);
    }
 
    /**
@@ -417,7 +404,7 @@ public:
       }
       }
 
-      auto [signer, privkey, kms_warm_up] =
+      auto [signer, privkey, startup_probe] =
          create_provider_from_spec(key_type, pubkey, private_key_provider_spec);
       auto provider = std::make_shared<signature_provider_t>(
          signature_provider_t{target_chain, key_type, key_name, pubkey, privkey, signer}
@@ -425,67 +412,90 @@ public:
 
       // Register first. set_provider() throws plugin_config_exception on a
       // duplicate key_name / public_key; reaching the statement after it means
-      // the provider is in the maps. Only then is the KMS startup probe (if
-      // any) retained -- a rejected provider leaves nothing behind for
+      // the provider is in the maps. Only then is the startup probe (if any)
+      // retained -- a rejected provider leaves nothing behind for
       // plugin_startup() to probe.
       set_provider(provider);
 
-      if (kms_warm_up) {
+      if (startup_probe) {
          std::scoped_lock lock(_signing_providers_mutex);
-         _kms_startup_probes.push_back(std::move(kms_warm_up));
+         _startup_probes.push_back(std::move(startup_probe));
       }
       return provider;
    }
 
    /**
-    * Run the opt-in AWS KMS startup credential check.
+    * Register a `<provider-type>:` scheme handler.
     *
-    * For every KMS-backed signing key registered before startup, issue a
-    * single `GetPublicKey` call. That resolves AWS credentials, warms the
-    * client, and verifies the KMS key matches the pinned public key.
+    * Built-in `KEY` and `KIOD` are not registrable. Each non-built-in scheme
+    * may be registered at most once. Host applications register their
+    * extensions (e.g. the `kms` sub-library's `create_kms_provider`) in
+    * `main()` before `app().initialize(...)`, so registrations are in place
+    * by the time `plugin_initialize` parses each `--signature-provider`
+    * option.
+    */
+   void register_spec_handler(std::string scheme, sysio::spec_handler handler) {
+      FC_ASSERT(!scheme.empty(), "spec handler scheme must not be empty");
+      FC_ASSERT(scheme != "KEY" && scheme != "KIOD",
+                "Cannot override built-in spec handler \"{}\"", scheme);
+      FC_ASSERT(static_cast<bool>(handler),
+                "spec handler for \"{}\" must not be empty", scheme);
+      std::scoped_lock lock(_signing_providers_mutex);
+      auto [it, inserted] = _spec_handlers.try_emplace(std::move(scheme), std::move(handler));
+      FC_ASSERT(inserted, "spec handler \"{}\" already registered", it->first);
+   }
+
+   /**
+    * Run the opt-in startup-probe pass.
     *
-    * A permanent misconfiguration -- missing credentials, bad region, absent
-    * IAM grant, or a mismatched public key -- throws
-    * `chain::plugin_config_exception`, which propagates out of
+    * For every provider whose handler attached a `startup_probe`, invoke
+    * that probe. Today only the KMS handler (the `kms` sub-library) does so
+    * -- the probe issues a single `GetPublicKey` call that resolves AWS
+    * credentials, warms the client, and verifies the KMS key matches the
+    * pinned public key.
+    *
+    * A permanent misconfiguration thrown by any probe propagates out of
     * `plugin_startup()` and aborts startup loudly instead of failing on the
-    * first production sign. A transient error (throttle, timeout, KMSInternal)
-    * is logged and skipped -- it is not a misconfiguration, so the lazy
-    * first-sign check is left to retry it rather than killing node startup.
+    * first production sign. A transient error (e.g. KMS throttle / timeout)
+    * is logged and skipped -- the lazy first-sign check is left to retry it
+    * rather than killing node startup.
     *
-    * A no-op unless `_kms_startup_check` is set, and a no-op when no KMS-backed
-    * keys are registered.
+    * A no-op unless `_startup_probe_enabled` is set, and a no-op when no
+    * probes were registered.
     *
     * The probe list is one-shot: this drains it (whether or not the check is
-    * enabled) so it never lingers as a misleading registry of signers. A KMS
-    * key registered after `plugin_startup()` -- e.g. via a future runtime spec
-    * reload -- is not retroactively probed; its pinning check still runs lazily
-    * on the first sign through the closure's shared one-shot guard.
+    * enabled) so it never lingers as a misleading registry of signers. A
+    * provider registered after `plugin_startup()` -- e.g. via a future
+    * runtime spec reload -- is not retroactively probed; its pinning check
+    * (if any) still runs lazily on the first sign through whatever one-shot
+    * guard the handler attaches.
     */
-   void run_kms_startup_check() {
+   void run_startup_probes() {
       // Drain the probe list under the lock. Moving it out both hands the
-      // network-bound GetPublicKey calls a private copy to run without holding
-      // the providers mutex, and empties the member so the one-shot nature of
+      // network-bound probes a private copy to run without holding the
+      // providers mutex, and empties the member so the one-shot nature of
       // the startup check is structural rather than just documented.
       std::vector<std::function<void()>> probes;
       {
          std::scoped_lock lock(_signing_providers_mutex);
-         probes = std::exchange(_kms_startup_probes, {});
+         probes = std::exchange(_startup_probes, {});
       }
-      if (!_kms_startup_check || probes.empty()) {
+      if (!_startup_probe_enabled || probes.empty()) {
          return;
       }
 
-      ilog("Verifying AWS KMS credentials for {} signing key(s) at startup", probes.size());
+      ilog("Running signature-provider startup probes for {} signing key(s)", probes.size());
       std::size_t deferred = 0;
       for (auto& probe : probes) {
          try {
             probe();
          } catch (const chain::signing_transient_exception& e) {
-            // A transient KMS error (throttle, timeout, KMSInternal) at startup
-            // is not a misconfiguration -- don't abort the node over it. Log it
-            // and continue; the lazy first-sign check re-runs the same probe.
+            // A transient signing error (e.g. KMS throttle / KMSInternal /
+            // timeout) at startup is not a misconfiguration -- don't abort the
+            // node over it. Log and continue; the lazy first-sign path
+            // re-runs the same probe.
             ++deferred;
-            wlog("AWS KMS startup credential check: transient error for one "
+            wlog("Signature-provider startup probe: transient error for one "
                  "key, deferring its check to the first sign: {}",
                  e.to_detail_string());
          }
@@ -493,9 +503,9 @@ public:
          // which propagates out of plugin_startup() and aborts startup loudly.
       }
       if (deferred == 0) {
-         ilog("AWS KMS startup credential check passed");
+         ilog("Signature-provider startup probes passed");
       } else {
-         ilog("AWS KMS startup credential check passed; {} key(s) hit a "
+         ilog("Signature-provider startup probes passed; {} key(s) hit a "
               "transient error and will be re-checked on the first sign",
               deferred);
       }
@@ -522,11 +532,21 @@ private:
    std::map<chain::public_key_type, fc::crypto::signature_provider_ptr> _signing_providers_by_pubkey{};
 
    /**
-    * One-shot startup probes, one per KMS-backed signing key, collected as
-    * providers are created. Run by `run_kms_startup_check()` when
-    * `_kms_startup_check` is enabled. Guarded by `_signing_providers_mutex`.
+    * One-shot startup probes, one per provider whose handler attached one
+    * (today: KMS). Collected as providers are created, run by
+    * `run_startup_probes()` when `_startup_probe_enabled` is set. Guarded by
+    * `_signing_providers_mutex`.
     */
-   std::vector<std::function<void()>> _kms_startup_probes{};
+   std::vector<std::function<void()>> _startup_probes{};
+
+   /**
+    * Spec-handler registry for non-built-in `<provider-type>:` schemes.
+    * Populated by the host application's `register_spec_handler()` calls
+    * before `app().initialize(...)`. Looked up in `create_provider_from_spec`
+    * when the scheme is neither `KEY` nor `KIOD`. Guarded by
+    * `_signing_providers_mutex`.
+    */
+   std::map<std::string, sysio::spec_handler> _spec_handlers{};
 };
 
 signature_provider_manager_plugin::signature_provider_manager_plugin()
@@ -545,10 +565,12 @@ void signature_provider_manager_plugin::set_program_options(options_description&
    cfg.add_options()(
       option_name_kms_startup_check,
       boost::program_options::value<bool>()->default_value(false),
-      "Probe every `KMS:` signing key with a GetPublicKey call at startup; "
-      "fail fast if credentials, region, IAM, or the pinned public key are "
-      "wrong. Off by default; has no effect when no KMS-backed keys are "
-      "configured.");
+      "Run startup probes for any registered signing-provider extensions "
+      "(today: AWS KMS, which probes every `KMS:` key with a GetPublicKey "
+      "call so a credentials / region / IAM / pinned-key misconfiguration "
+      "fails fast). Off by default; has no effect when no probe-registering "
+      "providers are configured. The option name retains 'kms' for backward "
+      "compatibility with existing operator configs.");
 }
 
 const char* signature_provider_manager_plugin::signature_provider_help_text() const {
@@ -560,16 +582,11 @@ const char* signature_provider_manager_plugin::signature_provider_help_text() co
       "   <key-type>             key format to parse\n\n"
       "   <public-key>           is a string form of a valid <key-type>\n\n"
       "   <provider-spec>        is a string in the form <provider-type>:<data>\n\n"
-      "       <provider-type>    is KEY, KIOD, or KMS\n\n"
+      "       <provider-type>    KEY and KIOD are built in. Additional types\n"
+      "                          (e.g. KMS) are registered by the host application;\n"
+      "                          this binary supports only the types its main() registers.\n\n"
       "       KEY:<private-key>  is a string containing a private key of the key-type specified\n\n"
-      "       KIOD:<url>         is the URL where kiod is available and the appropriate wallet(s) are unlocked\n\n"
-      "       KMS:<key-ref>      <key-ref> is either a full AWS KMS ARN\n"
-      "                          (arn:aws:kms:<region>:<account>:(key|alias)/<id>) or the\n"
-      "                          shorthand <region>:<key-id-or-alias>. The KMS key must be\n"
-      "                          asymmetric ECC_SECG_P256K1 with usage SIGN_VERIFY; signing\n"
-      "                          uses ECDSA_SHA_256. Credentials come from the standard AWS\n"
-      "                          provider chain (env, shared config, IRSA, IMDS). Currently\n"
-      "                          supports chain_key_type_ethereum only.\n\n";
+      "       KIOD:<url>         is the URL where kiod is available and the appropriate wallet(s) are unlocked\n\n";
 }
 
 void signature_provider_manager_plugin::plugin_initialize(const variables_map& options) {
@@ -577,7 +594,7 @@ void signature_provider_manager_plugin::plugin_initialize(const variables_map& o
       my->_kiod_provider_timeout_us = fc::milliseconds(options.at(option_name_kiod_timeout).as<int32_t>());
 
    if (options.contains(option_name_kms_startup_check))
-      my->_kms_startup_check = options.at(option_name_kms_startup_check).as<bool>();
+      my->_startup_probe_enabled = options.at(option_name_kms_startup_check).as<bool>();
 
    if (options.contains(option_name_provider)) {
       auto specs = options.at(option_name_provider).as<std::vector<std::string>>();
@@ -591,10 +608,11 @@ void signature_provider_manager_plugin::plugin_initialize(const variables_map& o
 }
 
 void signature_provider_manager_plugin::plugin_startup() {
-   // Opt-in AWS KMS credential probe. A no-op unless
-   // `signature-provider-kms-startup-check` is enabled; when enabled, any KMS
-   // misconfiguration throws here and aborts startup loudly.
-   my->run_kms_startup_check();
+   // Opt-in startup-probe pass for any provider whose handler attached a
+   // probe (today: KMS). A no-op unless `signature-provider-kms-startup-check`
+   // is enabled; when enabled, a permanent probe failure throws here and
+   // aborts startup loudly.
+   my->run_startup_probes();
 }
 
 fc::crypto::signature_provider_ptr signature_provider_manager_plugin::create_provider(const std::string& spec) {
@@ -633,6 +651,11 @@ signature_provider_manager_plugin::query_providers(const std::optional<fc::crypt
 void signature_provider_manager_plugin::register_default_signature_providers(
    const std::vector<fc::crypto::chain_key_type_t>& key_types) {
    my->register_default_signature_providers(key_types);
+}
+
+void signature_provider_manager_plugin::register_spec_handler(
+   std::string scheme, sysio::spec_handler handler) {
+   my->register_spec_handler(std::move(scheme), std::move(handler));
 }
 
 std::vector<fc::crypto::signature_provider_ptr> query_signature_providers(

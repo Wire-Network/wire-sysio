@@ -1,14 +1,27 @@
 #pragma once
 
 /**
- * AWS KMS-backed signature provider -- plugin-private header.
+ * AWS KMS-backed signature provider -- public header for the `kms` sub-library
+ * of `signature_provider_manager_plugin`, installed at
+ * `sysio/signature_provider_manager_plugin/kms/`.
  *
- * The KMS provider extends the existing `KEY:` / `KIOD:` spec grammar with a
- * third form, `KMS:<key-ref>`, where the signing key never leaves AWS.
+ * The library implements the `KMS:<key-ref>` spec grammar -- a third form
+ * alongside the built-in `KEY:` and `KIOD:` -- where the signing key never
+ * leaves AWS. The library is NOT linked by the plugin itself; a host
+ * application that wants KMS support links this library and calls
+ *   plugin.register_spec_handler("KMS", &sysio::sigprov::kms::create_kms_provider);
+ * from `main()` before `app().initialize(...)`. The plugin then dispatches
+ * `KMS:` specs through the registered handler with no compile-time dependency
+ * on the AWS SDK.
  *
- * This header is consumed only by the plugin's own translation units and by
- * its tests; it is intentionally not installed under `include/`.
+ * The lower-level helpers (`parse_kms_spec`, `der_to_compact`, `recover_v`,
+ * `spki_der_to_public_key`, `throw_kms_error`, `make_kms_signature_provider`)
+ * are exposed both because they are well-defined operations on KMS-shaped data
+ * and so the test suite can exercise them directly without going through the
+ * plugin.
  */
+
+#include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
 
 #include <fc/crypto/chain_types_reflect.hpp>
 #include <fc/crypto/elliptic_em.hpp>
@@ -307,5 +320,30 @@ kms_signer make_kms_signature_provider(
    const kms_key_ref&            ref,
    fc::crypto::chain_key_type_t  key_type,
    const fc::crypto::public_key& expected_pubkey);
+
+/**
+ * @brief Adapter that fits `signature_provider_manager_plugin`'s
+ *        `sysio::spec_handler` signature.
+ *
+ * Parses `spec_data` with `parse_kms_spec`, builds a `kms_signer` with
+ * `make_kms_signature_provider`, and packages the closures into a
+ * `sysio::provider_spec_result` whose `startup_probe` is the `warm_up`
+ * callback. Suitable for direct registration:
+ *
+ *   plugin.register_spec_handler("KMS", &sysio::sigprov::kms::create_kms_provider);
+ *
+ * @param key_type     chain key type from the surrounding spec
+ * @param expected_pub public key from the surrounding spec
+ * @param spec_data    the spec body after `KMS:`
+ * @throws sysio::chain::plugin_config_exception on malformed spec or
+ *         key-type / pubkey mismatch
+ * @throws sysio::chain::pending_impl_exception if the chain key type is not
+ *         `chain_key_type_ethereum`
+ * @return packaged result ready to install in the plugin's registry
+ */
+sysio::provider_spec_result create_kms_provider(
+   fc::crypto::chain_key_type_t  key_type,
+   const fc::crypto::public_key& expected_pub,
+   std::string_view              spec_data);
 
 } // namespace sysio::sigprov::kms

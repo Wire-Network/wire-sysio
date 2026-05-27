@@ -32,7 +32,7 @@
 
 #include <aws/kms/KMSErrors.h>
 
-#include "../src/kms_signature_provider.hpp"
+#include <sysio/signature_provider_manager_plugin/kms/kms_signature_provider.hpp>
 
 using sysio::sigprov::kms::kms_key_ref;
 using sysio::sigprov::kms::parse_kms_spec;

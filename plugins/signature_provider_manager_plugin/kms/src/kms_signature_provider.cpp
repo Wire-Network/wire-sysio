@@ -11,7 +11,7 @@
 // of every #include.
 #define MAGIC_ENUM_RANGE_MAX 256
 
-#include "kms_signature_provider.hpp"
+#include <sysio/signature_provider_manager_plugin/kms/kms_signature_provider.hpp>
 
 #include <sysio/chain/exceptions.hpp>
 #include <sysio/chain/types.hpp>
@@ -695,6 +695,22 @@ std::shared_ptr<Aws::KMS::KMSClient> get_kms_client(const std::string& region) {
       slot = std::make_shared<Aws::KMS::KMSClient>(cfg);
    }
    return slot;
+}
+
+sysio::provider_spec_result create_kms_provider(
+   fc::crypto::chain_key_type_t  key_type,
+   const fc::crypto::public_key& expected_pub,
+   std::string_view              spec_data) {
+   // Parse the `KMS:`-spec body, build the signer (key-type / pubkey pairing
+   // is validated up front; no KMS network I/O), and package the two closures
+   // into the shape the plugin's registry expects. The `warm_up` callback
+   // becomes the generic `startup_probe`, which the plugin runs from
+   // `plugin_startup()` when its opt-in startup-probe flag is enabled.
+   auto ref = parse_kms_spec(spec_data);
+   auto kms = make_kms_signature_provider(ref, key_type, expected_pub);
+   return {.signer        = std::move(kms.sign),
+           .private_key   = std::nullopt,
+           .startup_probe = std::move(kms.warm_up)};
 }
 
 } // namespace sysio::sigprov::kms
