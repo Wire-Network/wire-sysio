@@ -16,8 +16,8 @@
  *
  * Alphabet: `[A-Z0-9_]+`, max 8 chars. 38-value alphabet (A-Z = 1..26,
  * 0-9 = 27..36, `_` = 37; value 0 reserved for terminator/padding) packed
- * in 6-bit slots: bits [0..5] = char[0], bits [6..11] = char[1], …,
- * bits [42..47] = char[7]. Bits [48..63] are unused (always 0).
+ * most-significant-symbol-first in 6-bit slots: bits [42..47] = char[0], bits [36..41] = char[1], …,
+ * bits [0..5] = char[7]. Bits [48..63] are unused (always 0).
  *
  * Encoded values therefore live in [0, 2^48) — comfortably under JS Number's
  * 2^53 safe-integer limit, so TS code can use plain `number` (not `bigint`).
@@ -58,7 +58,7 @@ struct slug_name {
       for (std::size_t i = 0; i < s.size(); ++i) {
          const auto v = char_to_slot(s[i]);
          sysio::check(v != INVALID_SLOT, "slug_name: invalid character (alphabet is [A-Z0-9_])");
-         out |= (v << (i * 6));
+         out |= (v << (42 - i * 6));   // most-significant-symbol-first
       }
       value = out;
    }
@@ -68,7 +68,7 @@ struct slug_name {
       std::string out;
       out.reserve(8);
       for (std::size_t i = 0; i < 8; ++i) {
-         const auto slot = (value >> (i * 6)) & 0x3F;
+         const auto slot = (value >> (42 - i * 6)) & 0x3F;
          if (slot == 0) break;
          out.push_back(slot_to_char(slot));
       }
@@ -133,7 +133,7 @@ constexpr slug_name operator""_s(const char* s, std::size_t n) {
       if (slot == slug_name::INVALID_SLOT) {
          codename_literal_failed("slug_name literal: invalid character (alphabet is [A-Z0-9_])");
       }
-      out |= (slot << (i * 6));
+      out |= (slot << (42 - i * 6));
    }
    return slug_name{out};
 }
