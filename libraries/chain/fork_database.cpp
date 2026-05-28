@@ -88,7 +88,6 @@ namespace sysio::chain {
       void             remove_impl( block_num_type block_num );
       bsp_t            head_impl(include_root_t include_root) const;
       bool             set_pending_savanna_lib_impl(const block_id_type& id, block_timestamp_type timestamp);
-      bool             is_descendant_of_pending_savanna_lib_impl(const block_id_type& id) const;
       bool             is_descendant_of_impl(const block_id_type& ancestor, const block_id_type& descendant) const;
       branch_t         fetch_branch_impl( const block_id_type& h, uint32_t trim_after_block_num ) const;
       block_branch_t   fetch_block_branch_impl( const block_id_type& h, uint32_t trim_after_block_num ) const;
@@ -365,19 +364,6 @@ namespace sysio::chain {
          return true;
       }
       return false;
-   }
-
-   template<class BSP>
-   bool fork_database_type<BSP>::is_descendant_of_pending_savanna_lib( const block_id_type& id ) const {
-      std::lock_guard g( my->mtx );
-      return my->is_descendant_of_pending_savanna_lib_impl(id);
-   }
-
-   template<class BSP>
-   bool fork_database_impl<BSP>::is_descendant_of_pending_savanna_lib_impl(const block_id_type& id) const {
-      if (pending_savanna_lib_id == id)
-         return true;
-      return is_descendant_of_impl(pending_savanna_lib_id, id);
    }
 
    template<class BSP>
