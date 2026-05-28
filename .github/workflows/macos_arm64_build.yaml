@@ -1,10 +1,10 @@
-name: "macOS arm64 parallel tests"
+name: "macOS arm64 build"
 
 on:
   workflow_dispatch:
   pull_request:
     paths:
-      - ".github/workflows/macos_arm64_parallel_tests.yaml"
+      - ".github/workflows/macos_arm64_build.yaml"
       - ".github/vcpkg-triplets/**"
       - "cmake/**"
       - "libraries/**"
@@ -90,6 +90,12 @@ jobs:
             -LE "(nonparallelizable_tests|long_running_tests|wasm_spec_tests)" \
             --output-on-failure --timeout 1000 \
             2>&1 | tee "$RUNNER_TEMP/macos-arm64-parallel-ctest.log"
+
+      - name: Run nodeop nonparallelizable test
+        run: |
+          cd build/macos-arm64
+          ctest --output-on-failure -R "^nodeop_run_test$" --timeout 1000 \
+            2>&1 | tee "$RUNNER_TEMP/macos-arm64-nodeop-run-test.log"
 
       - name: Show diagnostics on failure
         if: failure()
