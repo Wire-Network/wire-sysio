@@ -8,6 +8,7 @@
 #include <boost/multi_index/composite_key.hpp>
 #include <fc/io/fstream.hpp>
 #include <fc/io/cfile.hpp>
+#include <fmt/format.h>
 #include <fstream>
 #include <mutex>
 
@@ -26,12 +27,10 @@ namespace sysio::chain {
     */
 
    std::string log_fork_comparison(const block_state& bs) {
-      std::string r;
-      r += "[ latest_qc_block_timestamp: " + bs.latest_qc_block_timestamp().to_time_point().to_iso_string() + ", ";
-      r += "timestamp: " + bs.timestamp().to_time_point().to_iso_string() + ", ";
-      r += "id: " + bs.id().str();
-      r += " ]";
-      return r;
+      return fmt::format("[ latest_qc_block_timestamp: {}, timestamp: {}, id: {} ]",
+                         bs.latest_qc_block_timestamp().to_time_point().to_iso_string(),
+                         bs.timestamp().to_time_point().to_iso_string(),
+                         bs.id().str());
    }
 
    struct by_block_id;
