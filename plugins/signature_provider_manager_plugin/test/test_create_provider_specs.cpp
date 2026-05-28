@@ -402,7 +402,7 @@ BOOST_AUTO_TEST_CASE(register_spec_handler_dispatches_custom_scheme) {
          // Trivial signer: returns a default-constructed signature. The
          // plugin never invokes it in this test -- we only verify routing.
          return {
-            .signer        = [](fc::crypto::hash256) { return fc::crypto::signature{}; },
+            .signer        = [](const fc::sha256&) { return fc::crypto::signature{}; },
             .private_key   = std::nullopt,
             .startup_probe = {}
          };
