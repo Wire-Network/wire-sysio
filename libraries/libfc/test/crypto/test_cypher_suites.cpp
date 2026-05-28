@@ -746,4 +746,41 @@ BOOST_AUTO_TEST_CASE(test_wire_eth_signer_signs_via_closure_without_private_key)
    BOOST_CHECK_EQUAL(recovered.to_string({}), pub.to_string({}));
 } FC_LOG_AND_RETHROW();
 
+BOOST_AUTO_TEST_CASE(test_eth_client_signer_passes_keccak_bytes_to_closure) try {
+   // Offline guard for the remote-signer path: em_sign_keccak must hand the
+   // closure the exact 32 keccak bytes it is meant to sign. The other
+   // remote-signer cases sign a digest they captured themselves and ignore the
+   // closure's argument, so without this only the env-gated live KMS test ever
+   // exercises the real argument. Capture the sha256 the closure receives and
+   // assert it is byte-for-byte the keccak digest of the payload.
+   auto key    = private_key::generate(private_key::key_type::em);
+   auto pub    = key.get_public_key();
+   auto em_key = key.get<em::private_key_shim>();
+
+   auto payload = ethereum::to_uint8_span("eth transaction bytes");
+   auto kc      = keccak256::hash(payload);
+
+   bool   closure_called = false;
+   sha256 received;
+   signature_provider_t remote;
+   remote.key_type   = chain_key_type_ethereum;
+   remote.public_key = pub;
+   remote.sign = [&closure_called, &received, em_key, kc](const sha256& d) {
+      closure_called = true;
+      received       = d;
+      return signature(signature::storage_type(em_key.sign_keccak256(kc)));
+   };
+
+   eth_client_signer s(remote);
+   auto sig = s.sign(payload);
+
+   BOOST_TEST(closure_called);
+   const auto kc_bytes  = kc.to_uint8_span();
+   const auto got_bytes = received.to_uint8_span();
+   BOOST_TEST(std::equal(kc_bytes.begin(), kc_bytes.end(), got_bytes.begin()));
+
+   // The self-verifying path still returns a signature that recovers correctly.
+   BOOST_CHECK_EQUAL(s.recover(sig, payload).to_string({}), pub.to_string({}));
+} FC_LOG_AND_RETHROW();
+
 BOOST_AUTO_TEST_SUITE_END()

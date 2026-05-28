@@ -459,6 +459,37 @@ BOOST_AUTO_TEST_CASE(spki_der_to_public_key_rejects_off_curve_point) {
       sysio::chain::plugin_config_exception);
 }
 
+BOOST_AUTO_TEST_CASE(spki_der_to_public_key_pinning_rejects_mismatched_key) {
+   // Public-key pinning -- the security-relevant branch -- exercised offline.
+   //
+   // verify_kms_pubkey() decodes the SubjectPublicKeyInfo that KMS
+   // `GetPublicKey` returns and asserts it equals the operator-pinned key
+   // (`kms_pubkey == state.expected_em_pubkey`); a mismatch is turned into
+   // plugin_config_exception so a spec that pins the WRONG <public-key> is
+   // rejected before any billable Sign. We can't drive verify_kms_pubkey
+   // itself without a live KMSClient -- the GetPublicKey round-trip is covered
+   // by the env-gated kms_live_sign_round_trip above -- but the key-equality
+   // semantics that assertion relies on are exercised here directly: a key
+   // decoded from one KMS SPKI must compare equal to itself and unequal to any
+   // other key. `spki_der_to_public_key` is the exact decode the pin check runs.
+   const auto priv_a = fc::em::private_key::generate();
+   const auto priv_b = fc::em::private_key::generate();
+   const auto pub_a  = priv_a.get_public_key();
+   const auto pub_b  = priv_b.get_public_key();
+   BOOST_REQUIRE(!(pub_a == pub_b)); // sanity: two independent keys must differ
+
+   // KMS hands back key A's SPKI; decode it the way verify_kms_pubkey does.
+   const auto der_a   = point_to_spki_der(pub_a.serialize_uncompressed());
+   const auto kms_pub = sysio::sigprov::kms::spki_der_to_public_key(
+      std::span<const unsigned char>(der_a));
+
+   // Pin matches the key KMS holds -> assertion holds, pin would pass.
+   BOOST_CHECK(kms_pub == pub_a);
+   // Pin names a different key -> assertion fails; this is the branch
+   // verify_kms_pubkey converts into plugin_config_exception.
+   BOOST_CHECK(!(kms_pub == pub_b));
+}
+
 // ---------------------------------------------------------------------------
 // KMSClient cache + AWS SDK lifecycle
 //
