@@ -16,6 +16,8 @@ else()
    endif()
 endif()
 
+llvm_map_components_to_libnames(CHAIN_LLVM_LIBS support)
+
 if("sys-vm-oc" IN_LIST SYSIO_WASM_RUNTIMES)
    enable_language(ASM)
    set(CHAIN_SYSVMOC_SOURCES webassembly/runtimes/sys-vm-oc/code_cache.cpp
@@ -35,15 +37,12 @@ if("sys-vm-oc" IN_LIST SYSIO_WASM_RUNTIMES)
 
    set_source_files_properties(webassembly/runtimes/sys-vm-oc/switch_stack_linux.s PROPERTIES COMPILE_FLAGS "-Wno-unused-command-line-argument")
 
-   llvm_map_components_to_libnames(LLVM_LIBS support core passes mcjit native orcjit orcshared orctargetprocess)
+   llvm_map_components_to_libnames(CHAIN_SYSVMOC_LLVM_LIBS core passes mcjit native orcjit orcshared orctargetprocess)
+   list(APPEND CHAIN_LLVM_LIBS ${CHAIN_SYSVMOC_LLVM_LIBS})
    include_directories(SYSTEM ${LLVM_INCLUDE_DIRS})
    add_definitions(${LLVM_DEFINITIONS})
 
    option(SYSVMOC_ENABLE_DEVELOPER_OPTIONS "enable developer options for SYS VM OC" OFF)
-endif()
-
-if("sys-vm-oc" IN_LIST SYSIO_WASM_RUNTIMES AND NOT LLVM_LIBS)
-   llvm_map_components_to_libnames(LLVM_LIBS support)
 endif()
 
 if("sys-vm" IN_LIST SYSIO_WASM_RUNTIMES OR "sys-vm-jit" IN_LIST SYSIO_WASM_RUNTIMES)
@@ -157,7 +156,7 @@ target_link_libraries(
   softfloat::softfloat
   ${CHAIN_SYSVM_LIBRARIES}
   ${CHAIN_NATIVE_MODULE_LIBRARIES}
-  ${LLVM_LIBS}
+  ${CHAIN_LLVM_LIBS}
   protobuf::libprotobuf
   ${CHAIN_RT_LINKAGE}
   Boost::signals2

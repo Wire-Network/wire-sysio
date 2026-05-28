@@ -20,6 +20,8 @@
 #include <boost/algorithm/string/predicate.hpp>
 
 #include <fc/io/fstream.hpp>
+/// Silence incbin's Apple bitcode warning for test-only embedded WASM fixtures.
+#define INCBIN_SILENCE_BITCODE_WARNING
 #include <fc/io/incbin.h>
 #include <fc/io/json.hpp>
 #include <fc/variant_object.hpp>
