@@ -655,6 +655,13 @@ kms_signer make_kms_signature_provider(const kms_key_ref&             ref,
       const std::span<const unsigned char> der{
          der_buf.GetUnderlyingData(), der_buf.GetLength()};
 
+      // `der_to_eth_signature` -> `recover_v` recovers the pubkey to pick the
+      // recovery id and throws if it doesn't match the pinned key. `em_sign_keccak`
+      // (the caller) then recovers a SECOND time and compares against the
+      // provider's public key. Two EC recoveries per signature is intentional
+      // defense-in-depth, not an oversight: this is the external-chain submission
+      // path, not a hot loop, so the cost is irrelevant -- do not "optimize" either
+      // recovery away.
       const auto compact = der_to_eth_signature(
          der, digest.to_uint8_span(), state->expected_em_pubkey);
 
