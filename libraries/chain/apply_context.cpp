@@ -1070,8 +1070,15 @@ int32_t apply_context::kv_idx_lower_bound(name code, uint16_t table_id,
    auto itr = idx.lower_bound(boost::make_tuple(code, table_id, sv_sec));
 
    if (itr == idx.end() || itr->code != code || itr->table_id != table_id) {
-      auto first = idx.lower_bound(boost::make_tuple(code, table_id));
-      if (first != idx.end() && first->code == code && first->table_id == table_id) {
+      // Seek missed inside (code, table_id). All rows of the table, if any,
+      // lie strictly before itr in the index, so the table is non-empty iff
+      // prev(itr) is in (code, table_id). itr == begin() means no rows below.
+      bool table_has_rows = false;
+      if (itr != idx.begin()) {
+         auto prev = std::prev(itr);
+         table_has_rows = (prev->code == code && prev->table_id == table_id);
+      }
+      if (table_has_rows) {
          const uint32_t slot_index = kv_secondary_iterators.allocate(code, table_id);
          auto& slot = kv_secondary_iterators.get(slot_index);
          slot.status = kv_it_stat::iterator_end;
