@@ -45,6 +45,10 @@ struct slug_name_traits {
    // sysio::slug_name, which also stops at the first zero.
    static constexpr bool zero_terminates = true;
 
+   // MSB-first: the first symbol occupies bits [42..47], the last symbol bits
+   // [0..5]. Byte-identical with the contract-side sysio::slug_name.
+   static constexpr basic_name_endianness packing = basic_name_endianness::MSB;
+
    [[noreturn]] static void throw_invalid( std::string_view in, const char* why ) {
       FC_ASSERT( false, "invalid slug_name '{}': {}", std::string(in), why );
       __builtin_unreachable();

@@ -1,23 +1,27 @@
 #pragma once
 /**
  * @file fc/basic_name.hpp
- * @brief Generic MSB-first packed 64-bit identifier.
+ * @brief Generic packed 64-bit identifier, MSB- or LSB-first per traits.
  *
  * basic_name<Traits> is the shared implementation behind sysio::chain::name and
- * fc::slug_name. Both pack a short string into a uint64_t, most-significant
- * symbol first, so that integer ordering matches string ordering. They differ
- * only in alphabet and length, which Traits supplies.
+ * fc::slug_name. Both pack a short string into a uint64_t. They differ only in
+ * alphabet, length, and packing direction, which Traits supplies.
  *
  * Traits is the policy that specialises the template; it must satisfy the
  * basic_name_traits concept (declared below). alphabet[0] is the pad symbol and
  * any character outside the alphabet maps to symbol 0. zero_terminates selects
  * how to_string() treats a symbol-0 slot — a hard terminator (slug_name) or an
- * ordinary interior character (name's '.').
+ * ordinary interior character (name's '.'). packing selects MSB- or LSB-first
+ * layout; MSB-first makes integer ordering match string ordering, LSB-first
+ * places the first symbol in the low bits (legacy wire formats, locality of
+ * least-significant prefix).
  *
  * The symbol width is derived — the minimal bits to index the alphabet,
- * ceil(log2(alphabet.size())). Symbols are packed most-significant-first; when
- * max_len * width exceeds 64 the final symbol is narrowed to whatever fits —
- * this is exactly why sysio name's 13th symbol is 4 bits (13 * 5 = 65 > 64).
+ * ceil(log2(alphabet.size())). When max_len * width exceeds 64 the final
+ * symbol is narrowed to whatever fits — this is exactly why sysio name's 13th
+ * symbol is 4 bits (13 * 5 = 65 > 64). In MSB layout the narrow symbol sits in
+ * the low bits; in LSB layout it sits in the high bits. In both cases at the
+ * "far end" of the packed value relative to the first symbol.
  *
  * Mapping out-of-alphabet characters to symbol 0 lets one round-trip check —
  * "the input must be the canonical spelling of its own encoding" — serve as the
@@ -38,15 +42,23 @@
 
 namespace fc {
 
-/// Compile-time contract for a basic_name Traits policy: an alphabet and a
-/// length, a zero_terminates flag steering to_string(), and an invalid-input
-/// hook. Enforced in place of a prose list of trait requirements.
+/// Packing direction for basic_name. MSB places the first symbol in the
+/// highest-order bits so integer order matches string lex order; LSB places
+/// the first symbol in the lowest-order bits and is used by formats that
+/// predate the MSB convention.
+enum class basic_name_endianness { MSB, LSB };
+
+/// Compile-time contract for a basic_name Traits policy: an alphabet, a
+/// length, a zero_terminates flag steering to_string(), a packing direction,
+/// and an invalid-input hook. Enforced in place of a prose list of trait
+/// requirements.
 template <typename Traits>
 concept basic_name_traits =
    requires( std::string_view in, const char* why ) {
       { Traits::max_len }                -> std::convertible_to<int>;
       { Traits::alphabet }               -> std::convertible_to<std::string_view>;
       { Traits::zero_terminates }        -> std::convertible_to<bool>;
+      { Traits::packing }                -> std::convertible_to<basic_name_endianness>;
       { Traits::throw_invalid(in, why) } -> std::same_as<void>;
    }
    && Traits::max_len > 0
@@ -80,14 +92,23 @@ struct basic_name {
    }
 
    /// Compile-time literal check: length within bounds and every character in
-   /// the alphabet. Canonicality (trailing pads, an over-wide final symbol) is
-   /// left to the validating constructor's round-trip check.
+   /// the alphabet. For zero_terminates traits the pad symbol (alphabet[0]) is
+   /// additionally rejected; accepting it would let a literal like "A\0B"_s
+   /// compile to the same packed value as "A"_s, while the runtime constructor
+   /// fed the same bytes would throw on the canonical round-trip check. The
+   /// literal path bypasses that constructor, so the check has to live here.
+   /// Canonicality (trailing pads, an over-wide final symbol) is still left to
+   /// the validating constructor's round-trip check.
    static constexpr bool is_valid_literal(std::string_view str) {
       if (str.size() > static_cast<std::size_t>(Traits::max_len))
          return false;
-      for (char c : str)
+      for (char c : str) {
          if (Traits::alphabet.find(c) == std::string_view::npos)
             return false;
+         if constexpr (Traits::zero_terminates) {
+            if (c == Traits::alphabet[0]) return false;
+         }
+      }
       return true;
    }
 
@@ -110,9 +131,11 @@ struct basic_name {
       return s;
    }
 
-   // Total order on the packed value; MSB-first packing makes it match the
-   // decoded string's lexicographic order. Defaulted <=> / == synthesize the
-   // four relational operators and !=.
+   // Total order on the packed value. With MSB packing this matches the
+   // decoded string's lexicographic order; with LSB packing it does not (the
+   // first symbol sits in the low bits, so high-order symbols dominate the
+   // integer comparison). Defaulted <=> / == synthesize the four relational
+   // operators and !=.
    friend constexpr std::strong_ordering operator<=>(basic_name a, basic_name b) = default;
    friend constexpr bool                 operator==(basic_name a, basic_name b) = default;
 
@@ -151,14 +174,21 @@ private:
       return 0;
    }
 
-   // --- MSB-first bit layout. The final symbol absorbs any shortfall when
-   //     max_len * bits > 64. ---
-   /// Bit offset of symbol i. The final symbol sits in the low bits (offset 0).
+   // --- Bit layout. Direction is set by Traits::packing. The final symbol
+   //     absorbs any shortfall when max_len * bits > 64. ---
+   /// Bit offset of symbol i. MSB: symbol 0 occupies the highest bits and the
+   /// final (possibly narrow) symbol sits at offset 0. LSB: symbol 0 occupies
+   /// the lowest bits and the final symbol sits at the high end.
    static constexpr uint32_t shift(int i) {
-      const int s = total_bits - bits * (i + 1);
-      return s > 0 ? static_cast<uint32_t>(s) : 0u;
+      if constexpr (Traits::packing == basic_name_endianness::MSB) {
+         const int s = total_bits - bits * (i + 1);
+         return s > 0 ? static_cast<uint32_t>(s) : 0u;
+      } else {
+         return static_cast<uint32_t>(bits * i);
+      }
    }
    /// Value mask of symbol i (the final symbol may be narrower than `bits`).
+   /// Position depends on packing direction, but width depends only on i.
    static constexpr uint64_t width_mask(int i) {
       const int w = (i == Traits::max_len - 1) ? total_bits - bits * i : bits;
       return (static_cast<uint64_t>(1) << w) - 1;

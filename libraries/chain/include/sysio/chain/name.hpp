@@ -28,6 +28,10 @@ namespace sysio::chain {
       // to_string() keeps interior dots and only trims trailing padding.
       static constexpr bool             zero_terminates = false;
 
+      // MSB-first packing: the first symbol of "sysio" occupies bits [59..63].
+      // Pinned in name_tests.cpp::encoding_golden_values.
+      static constexpr fc::basic_name_endianness packing = fc::basic_name_endianness::MSB;
+
       // Declared here, defined in name.cpp — keeps <sysio/chain/exceptions.hpp>
       // and the SYS_ASSERT machinery out of this very widely-included header.
       [[noreturn]] static void throw_invalid( std::string_view in, const char* why );
