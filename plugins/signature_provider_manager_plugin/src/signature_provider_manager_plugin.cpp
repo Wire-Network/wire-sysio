@@ -82,9 +82,13 @@ public:
       const fc::crypto::public_key& public_key,
       const std::string& spec) {
       using namespace fc::crypto;
-      auto spec_parts = fc::split(spec, ':', 2);
+      constexpr std::size_t max_split = 2;
+      auto spec_parts = fc::split(spec, ':', max_split);
+      FC_ASSERT(spec_parts.size() == max_split, "Provider spec '{}' is malformed. Format: '<spec type>:<spec data>'", spec);
+
       auto spec_type_str = spec_parts[0];
       auto spec_data = spec_parts[1];
+      FC_ASSERT(!spec_data.empty(), "Provider spec '{}' is malformed. Format: '<spec type>:<spec data>' has empty <spec data>", spec);
 
       if (spec_type_str == "KEY") {
          chain::private_key_type privkey;
