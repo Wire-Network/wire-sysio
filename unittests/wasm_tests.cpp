@@ -2345,7 +2345,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( net_usage_tests, T, validating_testers ) try {
 
    int count = 0;
    auto check = [&](int coderepeat, int max_net_usage)-> bool {
-      account_name account{"f_tests"_n.to_uint64_t() + (count++) * 16};
+      account_name account{"f.tests"_n.to_uint64_t() + (count++) * 16};
       chain.create_accounts({account});
 
       std::string code = R"=====(
@@ -2396,7 +2396,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( net_usage_tests, T, validating_testers ) try {
 BOOST_AUTO_TEST_CASE_TEMPLATE( weighted_net_usage_tests, T, validating_testers ) try {
    T chain;
 
-   account_name account = "f_tests"_n;
+   account_name account = "f.tests"_n;
    account_name acc2 = "acc2"_n;
    chain.create_accounts({account, acc2});
    int ver = 0;

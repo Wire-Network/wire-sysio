@@ -144,7 +144,7 @@
             ]
         },
         {
-            "name": "get_proposal",
+            "name": "getproposal",
             "base": "",
             "fields": [
                 {
@@ -412,7 +412,7 @@
         },
         {
             "name": "getproposal",
-            "type": "get_proposal",
+            "type": "getproposal",
             "ricardian_contract": ""
         },
         {

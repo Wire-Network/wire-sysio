@@ -813,4 +813,69 @@ BOOST_FIXTURE_TEST_CASE( fork_switch_dedup_savanna, savanna_cluster::cluster_t )
 
 } FC_LOG_AND_RETHROW()
 
+// Validates the precondition + apply behavior underpinning producer_plugin's fork_db_ahead_on_same_chain
+// code path (plugins/producer_plugin/src/producer_plugin.cpp). When chain.head() is behind fork_db_head()
+// on the same chain -- e.g. blocks accepted into fork_db via on_incoming_block but apply was deferred --
+// the lambda's predicate (fork_db_head().extends(head.id())) returns true, and apply_blocks must catch
+// head up to fork_db_head. The interrupt_trx_test Python integration test exercises the full producing
+// flow end-to-end; this C++ test localizes the predicate + apply pair on a real controller without the
+// producer_plugin in the loop, so a regression points at the controller boundary directly.
+//
+// Mechanism: partition node D off the cluster so the automatic block propagation does not deliver blocks
+// to it; produce blocks on node A; manually feed those blocks into D's fork_db via accept_block (which
+// does NOT apply -- mirroring on_incoming_block before start_block has a chance to drain the queue);
+// then check the predicate and run apply_blocks to verify catch-up.
+BOOST_FIXTURE_TEST_CASE(fork_db_ahead_of_head_on_same_chain, savanna_cluster::cluster_t) try {
+   auto& A = _nodes[0];
+   auto& D = _nodes[3];
+
+   const auto pre_head = D.head();
+   const uint32_t pre_bn = pre_head.block_num();
+
+   // Isolate D so the cluster's signal-driven block propagation doesn't auto-apply blocks A produces.
+   set_partition({&D});
+
+   // Produce 2 blocks on A. With D partitioned, nodes 0/1/2 keep a 3-of-4 quorum so QCs still form and
+   // A's chain advances; D stays at pre_head. The gap is intentionally kept to num_chains_to_final so
+   // fork_db_head's finality_core still tracks pre_head's block_num in its [last_final, current) range:
+   // a 3-block gap would push LIB past pre_head and take it out of range, which is the case that
+   // !is_head_descendant_of_pending_lib() (the sibling condition in the producer_plugin loop) is
+   // responsible for, not fork_db_ahead_on_same_chain.
+   A.produce_blocks(2);
+   const uint32_t src_fhead_bn = A.fork_db_head().block_num();
+   BOOST_REQUIRE_EQUAL(src_fhead_bn, pre_bn + 2);
+   BOOST_REQUIRE_EQUAL(D.head().block_num(), pre_bn);
+
+   // Feed the 3 new blocks into D's fork_db via accept_block -- bypassing node_t::push_block (which would
+   // call tester::push_block -> apply_blocks). Each block must link cleanly because D's pre-partition
+   // chain history is identical to A's.
+   for (uint32_t bn = pre_bn + 1; bn <= src_fhead_bn; ++bn) {
+      auto sb = A.control->fetch_block_by_number(bn);
+      BOOST_REQUIRE(sb);
+      auto accepted = D.control->accept_block(sb->calculate_id(), sb);
+      BOOST_REQUIRE(accepted.block.has_value());
+   }
+
+   // Precondition: head is behind fork_db_head on the same chain.
+   const auto tgt_head  = D.head();
+   const auto tgt_fhead = D.fork_db_head();
+   BOOST_REQUIRE_EQUAL(tgt_head.block_num(), pre_bn);
+   BOOST_REQUIRE_EQUAL(tgt_fhead.block_num(), src_fhead_bn);
+   BOOST_REQUIRE_EQUAL(tgt_head.id(), pre_head.id());
+
+   // The exact predicate from producer_plugin's fork_db_ahead_on_same_chain lambda.
+   BOOST_TEST(tgt_fhead.extends(tgt_head.id()));
+
+   // apply_blocks must catch head up to fork_db_head -- the action the new producer_plugin loop drives
+   // when the predicate fires.
+   auto result = D.control->apply_blocks({}, {});
+   BOOST_REQUIRE(result.status == controller::apply_blocks_result_t::status_t::complete);
+   BOOST_REQUIRE_EQUAL(D.head().block_num(), src_fhead_bn);
+   BOOST_REQUIRE_EQUAL(D.head().id(), tgt_fhead.id());
+
+   // After catch-up the predicate no longer fires (block_handle::extends does not include self).
+   BOOST_TEST(!D.fork_db_head().extends(D.head().id()));
+
+} FC_LOG_AND_RETHROW()
+
 BOOST_AUTO_TEST_SUITE_END()

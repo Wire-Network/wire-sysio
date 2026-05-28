@@ -2459,6 +2459,13 @@ struct controller_impl {
    {
       const auto& pfs = protocol_features.get_protocol_feature_set();
 
+      // Track digests seen earlier in this activation list so duplicates fail here rather than
+      // later in start_block (which only catches duplicates of preactivated features). A duplicate
+      // that wasn't preactivated would otherwise re-run trigger_activation_handler and increment
+      // num_new_protocol_features_activated twice, diverging side effects from a legitimate block.
+      flat_set<digest_type> seen_in_this_activation;
+      seen_in_this_activation.reserve( new_protocol_features.size() );
+
       for( auto itr = new_protocol_features.begin(); itr != new_protocol_features.end(); ++itr ) {
          const auto& f = *itr;
 
@@ -2487,6 +2494,10 @@ struct controller_impl {
          SYS_ASSERT( currently_activated_protocol_features.find( f ) == currently_activated_protocol_features.end(),
                      protocol_feature_exception,
                      "protocol feature with digest '{}' has already been activated", f
+         );
+
+         SYS_ASSERT( seen_in_this_activation.insert( f ).second, protocol_feature_exception,
+                     "protocol feature with digest '{}' appears more than once in the activation list", f
          );
 
          auto dependency_checker = [&currently_activated_protocol_features, &new_protocol_features, &itr]
@@ -2667,43 +2678,7 @@ struct controller_impl {
             }
 
             if( are_multiple_state_roots_supported() ) {
-               // New: Process the s_header from block header extensions
-               auto rcvd_it = b->header_extensions.begin();
-               const auto next_rcvd = [&itr=rcvd_it, end=b->header_extensions.end()](bool include_start) {
-                  if( !include_start ) ++itr;
-                  // find the first s_root_extension in the received block header extensions
-                  return std::find_if(itr, end,
-                     [](const auto& ext) { return ext.first == s_root_extension::extension_id(); }); };
-               auto crtd_it = ab.header().header_extensions.begin();
-               const auto next_crtd = [&itr=crtd_it, end=ab.header().header_extensions.end()](bool include_start) {
-                  if( !include_start ) ++itr;
-                  // find the first s_root_extension in the locally constructed block header extensions
-                  // (which should be the same as the received block header extensions)
-                  return std::find_if(itr, end,
-                     [](const auto& ext) { return ext.first == s_root_extension::extension_id(); }); };
-               uint32_t count = 0;
-               bool rcvd = true;
-               bool crtd = true;
-               bool include_start = true;
-               while( rcvd ) {
-                  rcvd_it = next_rcvd(include_start);
-                  crtd_it = next_crtd(include_start);
-                  ++count;
-                  include_start = false; // only include start for the first iteration
-                  rcvd = rcvd_it != b->header_extensions.end();
-                  crtd = crtd_it != ab.header().header_extensions.end();
-                  SYS_ASSERT( rcvd == crtd, block_validate_exception,
-                              "The received block did{} have {} root header extensions, but the locally constructed one did{}",
-                              (rcvd ? "" : " not"), count, (crtd ? "" : " not") );
-                  if( rcvd && rcvd_it->second != crtd_it->second ) {
-                     s_header rcvd_s_header = fc::raw::unpack<s_header>(rcvd_it->second);
-                     s_header crtd_s_header = fc::raw::unpack<s_header>(crtd_it->second);
-                     SYS_THROW( block_validate_exception,
-                                "The received block root header extension, at slot number {}: {}; and the locally "
-                                "constructed one: {}; don't match!",
-                                count, rcvd_s_header.to_string(), crtd_s_header.to_string() );
-                  }
-               }
+               validate_s_root_extensions_match(b->header_extensions, ab.header().header_extensions);
             }
 
             if( !use_bsp_cached ) {
@@ -2798,9 +2773,6 @@ struct controller_impl {
    // -----------------------------------------------------------------------------
    std::optional<qc_t> verify_basic_proper_block_invariants( const block_id_type& id, const signed_block_ptr& b,
                                                              const block_state& prev ) {
-      if (prev.block_num() <= 1u)
-         return std::nullopt;
-
       SYS_ASSERT( b->block_extensions.empty(), invalid_block_extension, "No block extensions currently supported");
 
       const auto  new_qc_claim = b->qc_claim;
@@ -2816,7 +2788,12 @@ struct controller_impl {
          }
       }
 
-      const auto& prev_qc_claim = prev.header.qc_claim;
+      // Use prev.core.latest_qc_claim() rather than prev.header.qc_claim: for every non-genesis
+      // block they are equal by construction (finality_core::next sets latest_qc_claim from the
+      // header's claim), but genesis intentionally differs (core is {1, false}, header is {0, false}).
+      // The core is the authoritative source, so block 2 can validate cleanly with this reference.
+      // Snapshot-loaded block_state enforces this invariant in block_state(snapshot).
+      const qc_claim_t prev_qc_claim = prev.core.latest_qc_claim();
 
       // validate QC claim against previous block QC info
 
@@ -3261,7 +3238,7 @@ struct controller_impl {
    static checksum256_type calculate_trx_merkle( const deque<transaction_receipt>& trxs) {
       deque<digest_type> trx_digests;
       for( const auto& a : trxs ) {
-         trx_digests.emplace_back( (a.digest)() );
+         trx_digests.emplace_back( a.digest() );
       }
 
       return calc_merkle(std::move(trx_digests));
@@ -3473,7 +3450,12 @@ struct controller_impl {
    }
 
    bool is_head_descendant_of_pending_lib() const {
-      return fork_db_.is_descendant_of_pending_savanna_lib(chain_head.id());
+      // True if pending_savanna_lib is on the chain from chain_head back to fork_db root: pending_savanna_lib is an
+      // ancestor of chain_head, or is chain_head itself. Answered from the head's finality_core, which tracks the
+      // canonical block_ref at each height across [last_final, head). No fork_db walk or mutex required.
+      const auto [pending_id, pending_timestamp] = fork_db_.pending_savanna_lib();
+      if (chain_head.id() == pending_id) return true;
+      return chain_head.extends(pending_id);
    }
 
    void set_savanna_lib(const block_id_type& id, block_timestamp_type timestamp) {

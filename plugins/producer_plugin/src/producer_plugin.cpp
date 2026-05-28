@@ -943,13 +943,14 @@ public:
 
       auto& chain = chain_plug->chain();
 
+      const block_handle fhead = chain.fork_db_head();
+
       // While producing our own block, normally defer applying incoming blocks to avoid disrupting
       // production mid-block. Exception: if the fork-database best head carries a strong QC for a
       // block not in our applied head's ancestry, our head's branch can no longer form a QC that
       // wins fork-choice -- continuing to produce on it is pointless and the resulting blocks would
       // be orphaned at the next fork switch. In that case fall through and apply blocks now.
       if (in_producing_mode()) {
-         const block_handle fhead = chain.fork_db_head();
          if (!fhead.locks_out_branch_of(chain.head())) {
             fc_ilog(_log, "producing, fork database head at: #{} id: {}",
                     fhead.block_num(), fhead.id());
@@ -963,7 +964,7 @@ public:
       }
 
       // no reason to abort_block if we have nothing ready to process
-      if (chain.head().id() == chain.fork_db_head().id()) {
+      if (chain.head().id() == fhead.id()) {
          return {}; // nothing to do
       }
 
@@ -2249,13 +2250,27 @@ producer_plugin_impl::start_block_result producer_plugin_impl::start_block() {
 
       // producers need to be able to start producing on schedule, do not apply blocks as it might take a long time to apply
       // unless head not a child of pending lib, as there is no reason ever to produce on a branch that is not a child of pending lib
-      while (in_speculating_mode() || !chain.is_head_descendant_of_pending_lib()) {
+      // also apply when fork_db head is ahead of our applied head on the same chain -- producing on a stale head when the
+      // canonical chain has already moved on just orphans our blocks at the next fork switch (under Savanna fork choice
+      // by latest_qc_block_timestamp, the chain that finalized first wins regardless of who built locally)
+      auto fork_db_ahead_on_same_chain = [&]() {
+         return chain.fork_db_head().extends(head.id());
+      };
+      while (in_speculating_mode() || !chain.is_head_descendant_of_pending_lib() || fork_db_ahead_on_same_chain()) {
          if (is_configured_producer())
             schedule_delayed_production_loop(this->weak_from_this(), _pending_block_deadline); // interrupt apply_blocks at deadline
 
          auto result = apply_blocks();
-         if (result.status == controller::apply_blocks_result_t::status_t::complete && result.num_blocks_applied == 0)
+         if (result.num_blocks_applied == 0) {
+            // No progress: either nothing to apply (status complete), or apply was interrupted on a block that
+            // cannot complete within deadline (e.g., infinite trx). Exit the loop -- retrying would hit the same
+            // wall, blocking the main thread from servicing net_plugin and fork-choice updates that could deliver
+            // a better head. In producing mode, fall through to produce on the current head (a competing block at
+            // the same height, which fork choice can then prefer over the unapplyable one by timestamp).
+            if (in_speculating_mode() && result.status != controller::apply_blocks_result_t::status_t::complete)
+               return start_block_result::waiting_for_block;
             return start_block_result::succeeded;
+         }
 
          head = chain.head();
          if (head.block_num() == chain.get_pause_at_block_num())
@@ -2839,7 +2854,13 @@ void producer_plugin_impl::schedule_production_loop() {
       _timer.async_wait([this, cid = ++_timer_corelation_id](const boost::system::error_code& ec) {
          if (ec != boost::asio::error::operation_aborted && cid == _timer_corelation_id) {
             interrupt_transaction(controller::interrupt_t::all_trx);
-            app().executor().post(priority::high, exec_queue::read_write, [this]() {
+            // Recheck cid in the posted lambda: another schedule_* call may have bumped _timer_corelation_id between the
+            // timer firing and the post running. Same pattern as schedule_maybe_produce_block / schedule_delayed_production_loop.
+            app().executor().post(priority::high, exec_queue::read_write, [this, cid]() {
+               if (cid != _timer_corelation_id) {
+                  fc_dlog(_log, "Failed-start retry timer expired, skipping");
+                  return;
+               }
                schedule_production_loop();
             });
          }
@@ -2929,7 +2950,17 @@ void producer_plugin_impl::schedule_delayed_production_loop(const std::weak_ptr<
       _timer.async_wait([this, cid = ++_timer_corelation_id](const boost::system::error_code& ec) {
          if (ec != boost::asio::error::operation_aborted && cid == _timer_corelation_id) {
             interrupt_transaction(controller::interrupt_t::all_trx);
-            app().executor().post(priority::high, exec_queue::read_write, [this]() {
+            // Recheck cid inside the posted lambda: between the timer callback firing and the executor
+            // running this lambda, another schedule_* call may have bumped _timer_corelation_id (typically
+            // the schedule_maybe_produce_block invoked after the next start_block). If we ran
+            // schedule_production_loop unconditionally here, the inner schedule_delayed_production_loop
+            // call would bump cid again and starve the just-scheduled produce_block timer. Mirrors the
+            // pattern schedule_maybe_produce_block uses.
+            app().executor().post(priority::high, exec_queue::read_write, [this, cid]() {
+               if (cid != _timer_corelation_id) {
+                  fc_dlog(_log, "Speculative/Production Change timer expired, skipping");
+                  return;
+               }
                schedule_production_loop();
             });
          }

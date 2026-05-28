@@ -13,9 +13,5 @@
     "target",
     "dist"
   ],
-  "references": [
-    {
-      "path": "./tests/app-server/tsconfig.json"
-    }
-  ]
+  "references": []
 }

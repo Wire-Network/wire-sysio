@@ -94,6 +94,7 @@ add_library( sysio_chain
              resource_limits.cpp
              block_log.cpp
              block_root_processor.cpp
+             s_root_extension.cpp
              contract_action_match.cpp
              root_txn_identification.cpp
              transaction_context.cpp

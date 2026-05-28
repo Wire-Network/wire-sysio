@@ -331,11 +331,13 @@ BOOST_AUTO_TEST_SUITE(sysio_msgch_envlog_tests)
 
 namespace {
 
+using fc::slug_name_literals::operator""_s;
+
 /// In v6, `chain_code` is the chain's slug_name value (uint64). All envlog
 /// tests register one EVM-class chain via `register_outpost(...)` which uses
 /// the spelling `"ETH"`. ETH_OUTPOST_ID is the slug_name's packed value.
-constexpr uint64_t ETH_OUTPOST_ID = fc::slug_name_literals::operator""_s("ETH", 3).value;
-constexpr uint64_t SOL_OUTPOST_ID = fc::slug_name_literals::operator""_s("SOL", 3).value;
+constexpr uint64_t ETH_OUTPOST_ID = "ETH"_s.value;
+constexpr uint64_t SOL_OUTPOST_ID = "SOL"_s.value;
 
 } // anonymous namespace
 
