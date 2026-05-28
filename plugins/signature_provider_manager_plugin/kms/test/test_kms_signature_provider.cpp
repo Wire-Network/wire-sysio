@@ -28,6 +28,7 @@
 #include <span>
 #include <string>
 #include <string_view>
+#include <tuple>
 #include <vector>
 
 #include <aws/kms/KMSErrors.h>
@@ -283,21 +284,45 @@ BOOST_AUTO_TEST_CASE(parse_kms_spec_rejects_shorthand_empty_key_id) {
 // credentials, no network, no `KMSClient`.
 // ---------------------------------------------------------------------------
 
-BOOST_AUTO_TEST_CASE(der_to_compact_round_trips_random_signature) {
-   // ECDSA `r` is uniform over [1, N-1]; ~half of generated signatures will
-   // have the high bit of `r` set, exercising the leading-zero pad path in
-   // both `compact_to_der` and `der_to_compact`. Drive several rounds so we
-   // hit both branches deterministically over the suite's lifetime.
-   for (int i = 0; i < 8; ++i) {
-      const auto priv   = fc::em::private_key::generate();
-      const auto digest = fc::crypto::keccak256::hash(std::string{"round-trip"});
-      const auto sig    = priv.sign_compact(digest);
-      const auto rs     = drop_v(sig);
-
+BOOST_AUTO_TEST_CASE(der_to_compact_round_trips_known_answer_vectors) {
+   // Deterministic coverage of the ASN.1 INTEGER pad/strip branches in both
+   // `compact_to_der` (the test encoder) and `der_to_compact` (production).
+   //
+   // The previous version generated random signatures and leaned on the ~50%
+   // odds that a given `r` has its high bit set to exercise the leading-zero
+   // pad path. A run that happened to miss it on every iteration (~1/256 for
+   // eight rounds) would silently drop that coverage. These fixed (r, s)
+   // vectors pin each branch directly. Every component is a valid secp256k1
+   // scalar in [1, n-1] -- the top byte is at most 0x80, well under n's leading
+   // 0xFF -- so libsecp256k1's DER decoder preserves it byte-for-byte across the
+   // round trip (it does not normalise low-S, so a deliberately high-S `s`
+   // survives unchanged too).
+   const auto check_round_trip = [](const std::array<unsigned char, 64>& rs) {
       const auto der     = compact_to_der(rs);
       const auto decoded = sysio::sigprov::kms::der_to_compact(std::span<const unsigned char>(der));
       BOOST_CHECK(decoded == rs);
-   }
+   };
+
+   // Build a 64-byte r||s from the most-significant and least-significant byte
+   // of each 32-byte half (all interior bytes zero). The MSB selects which
+   // branch the encoder takes; the non-zero LSB keeps the scalar in [1, n-1].
+   const auto make_rs = [](unsigned char r_msb, unsigned char r_lsb,
+                           unsigned char s_msb, unsigned char s_lsb) {
+      std::array<unsigned char, 64> rs{};
+      rs[0]  = r_msb;
+      rs[31] = r_lsb;
+      rs[32] = s_msb;
+      rs[63] = s_lsb;
+      return rs;
+   };
+
+   // r high bit set  -> encoder must PREPEND a 0x00 so the INTEGER stays positive.
+   check_round_trip(make_rs(0x80, 0x01, /* s normal */ 0x7F, 0x01));
+   // r top byte zero -> encoder must STRIP the leading 0x00 (minimal INTEGER).
+   check_round_trip(make_rs(0x00, 0x42, /* s normal */ 0x7F, 0x01));
+   // Same two branches exercised on the s INTEGER (s = 0x80.. is also high-S).
+   check_round_trip(make_rs(/* r normal */ 0x7F, 0x01, 0x80, 0x01));
+   check_round_trip(make_rs(/* r normal */ 0x7F, 0x01, 0x00, 0x42));
 }
 
 BOOST_AUTO_TEST_CASE(der_to_compact_rejects_garbage) {
@@ -405,16 +430,33 @@ BOOST_AUTO_TEST_CASE(der_to_eth_signature_normalises_high_s_input) {
 // ---------------------------------------------------------------------------
 
 BOOST_AUTO_TEST_CASE(spki_der_to_public_key_round_trips) {
-   // A well-formed secp256k1 SPKI must decode back to the exact key it wraps.
-   for (int i = 0; i < 4; ++i) {
-      const auto priv = fc::em::private_key::generate();
-      const auto pub  = priv.get_public_key();
+   // Known-answer vector: the secp256k1 generator point G is a fixed,
+   // externally verifiable public key (SEC 2, every secp256k1 reference). A
+   // well-formed SPKI wrapping it must decode back to exactly that key. The
+   // previous version round-tripped four randomly generated keys, which never
+   // pinned a specific answer and re-rolled the input on every run.
+   //
+   // 0x04 || G_x || G_y, big-endian:
+   static constexpr std::array<unsigned char,
+                               std::tuple_size_v<fc::em::public_key_data_uncompressed>> generator = {
+      0x04,
+      0x79, 0xBE, 0x66, 0x7E, 0xF9, 0xDC, 0xBB, 0xAC, // G_x
+      0x55, 0xA0, 0x62, 0x95, 0xCE, 0x87, 0x0B, 0x07,
+      0x02, 0x9B, 0xFC, 0xDB, 0x2D, 0xCE, 0x28, 0xD9,
+      0x59, 0xF2, 0x81, 0x5B, 0x16, 0xF8, 0x17, 0x98,
+      0x48, 0x3A, 0xDA, 0x77, 0x26, 0xA3, 0xC4, 0x65, // G_y
+      0x5D, 0xA4, 0xFB, 0xFC, 0x0E, 0x11, 0x08, 0xA8,
+      0xFD, 0x17, 0xB4, 0x48, 0xA6, 0x85, 0x54, 0x19,
+      0x9C, 0x47, 0xD0, 0x8F, 0xFB, 0x10, 0xD4, 0xB8};
 
-      const auto der     = point_to_spki_der(pub.serialize_uncompressed());
-      const auto decoded = sysio::sigprov::kms::spki_der_to_public_key(
-         std::span<const unsigned char>(der));
-      BOOST_CHECK(decoded == pub);
-   }
+   fc::em::public_key_data_uncompressed g{};
+   std::ranges::copy(generator, g.begin());
+   const auto expected = fc::em::public_key{g}; // validates G is on-curve
+
+   const auto der     = point_to_spki_der(g);
+   const auto decoded = sysio::sigprov::kms::spki_der_to_public_key(
+      std::span<const unsigned char>(der));
+   BOOST_CHECK(decoded == expected);
 }
 
 BOOST_AUTO_TEST_CASE(spki_der_to_public_key_rejects_garbage) {
@@ -454,6 +496,46 @@ BOOST_AUTO_TEST_CASE(spki_der_to_public_key_rejects_off_curve_point) {
    fc::em::public_key_data_uncompressed off_curve{};
    off_curve[0] = 0x04;
    const auto der = point_to_spki_der(off_curve);
+   BOOST_CHECK_THROW(
+      sysio::sigprov::kms::spki_der_to_public_key(std::span<const unsigned char>(der)),
+      sysio::chain::plugin_config_exception);
+}
+
+BOOST_AUTO_TEST_CASE(spki_der_to_public_key_rejects_wrong_algorithm_oid) {
+   // Flip the final octet of the algorithm OID (id-ecPublicKey, bytes 6..12 of
+   // the prefix): the DER stays structurally valid but the algorithm is no
+   // longer id-ecPublicKey. A KMS key that is, say, RSA or EdDSA would land
+   // here -- the parser must reject it rather than mis-read a non-EC key as a
+   // secp256k1 point. The existing wrong-curve test flips the *curve* OID; this
+   // exercises the distinct id-ecPublicKey check.
+   const auto priv = fc::em::private_key::generate();
+   auto der = point_to_spki_der(priv.get_public_key().serialize_uncompressed());
+   der[12] = 0x02; // index 12 = last octet of the id-ecPublicKey OID body
+   BOOST_CHECK_THROW(
+      sysio::sigprov::kms::spki_der_to_public_key(std::span<const unsigned char>(der)),
+      sysio::chain::plugin_config_exception);
+}
+
+BOOST_AUTO_TEST_CASE(spki_der_to_public_key_rejects_trailing_bytes) {
+   // Bytes after the outer SubjectPublicKeyInfo SEQUENCE. DER is a canonical
+   // encoding with no trailing slack, so a buffer longer than the structure it
+   // declares is malformed and must be rejected, not silently truncated.
+   const auto priv = fc::em::private_key::generate();
+   auto der = point_to_spki_der(priv.get_public_key().serialize_uncompressed());
+   der.push_back(0x00); // one stray byte past the declared outer length
+   BOOST_CHECK_THROW(
+      sysio::sigprov::kms::spki_der_to_public_key(std::span<const unsigned char>(der)),
+      sysio::chain::plugin_config_exception);
+}
+
+BOOST_AUTO_TEST_CASE(spki_der_to_public_key_rejects_nonzero_unused_bits) {
+   // The subjectPublicKey BIT STRING begins with an "unused bits" octet that
+   // must be 0x00 for a byte-aligned EC point. A non-zero count would mean the
+   // final byte of the point is partial -- nonsensical for a 65-byte key -- so
+   // it must be rejected rather than have the point silently mis-aligned.
+   const auto priv = fc::em::private_key::generate();
+   auto der = point_to_spki_der(priv.get_public_key().serialize_uncompressed());
+   der[22] = 0x01; // index 22 = the BIT STRING's leading unused-bit count
    BOOST_CHECK_THROW(
       sysio::sigprov::kms::spki_der_to_public_key(std::span<const unsigned char>(der)),
       sysio::chain::plugin_config_exception);

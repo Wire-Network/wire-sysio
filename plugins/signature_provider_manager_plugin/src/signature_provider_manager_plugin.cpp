@@ -48,6 +48,10 @@ public:
     * from `option_name_kms_startup_check` in `plugin_initialize`. The option
     * name keeps "kms" for backward compatibility with operator configs; the
     * mechanism is generic and any registered handler may attach a probe.
+    *
+    * Intentionally a plain `bool`, unlike the atomic members below: it is
+    * written once in `plugin_initialize` and read once in `plugin_startup`,
+    * which run sequentially in the appbase lifecycle.
     */
    bool _startup_probe_enabled{false};
 

@@ -290,13 +290,16 @@ struct kms_signer {
  * `GetPublicKey` failure is retried on the next `Sign`.
  *
  * Each invocation sends an `ECDSA_SHA_256` `Sign` request with
- * `MessageType=DIGEST` (so KMS treats the 32-byte input as already hashed
- * rather than re-hashing with SHA-256), decodes KMS's DER signature,
- * normalises it to low-S, recovers the Ethereum `v` byte by trying both
- * parities and matching against `expected_pubkey`, and returns a 65-byte
- * compact signature. If neither parity recovers to the expected key the call
- * throws `chain::plugin_config_exception`; once pinning has passed this is a
- * defence-in-depth check that should never fire.
+ * `MessageType=DIGEST` so KMS signs the 32-byte digest as-is rather than
+ * re-hashing it. (Why `ECDSA_SHA_256` does not imply a second hash is the
+ * subtle part; the signing-closure implementation in the `.cpp` carries that
+ * full wire-format rationale as the single source of truth, so it is not
+ * restated here.) It then decodes KMS's DER signature, normalises it to low-S,
+ * recovers the Ethereum `v` byte by trying both parities and matching against
+ * `expected_pubkey`, and returns a 65-byte compact signature. If neither parity
+ * recovers to the expected key the call throws `chain::plugin_config_exception`;
+ * once pinning has passed this is a defence-in-depth check that should never
+ * fire.
  *
  * A failed `Sign` or `GetPublicKey` call is classified by retryability: a
  * transient failure (throttle, `KMSInternal`, timeout) throws

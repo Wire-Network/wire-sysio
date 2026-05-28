@@ -633,7 +633,10 @@ kms_signer make_kms_signature_provider(const kms_key_ref&             ref,
 
       // SigningAlgorithm: KMS's `ECC_SECG_P256K1` key spec (the curve Ethereum
       // and Bitcoin use) supports exactly one signing-algorithm value -- this
-      // one. The name is misleading: with `MessageType=DIGEST` set above, KMS
+      // one. This block is the single authoritative explanation of the
+      // DIGEST/ECDSA_SHA_256 wire-format choice; the header doc for
+      // make_kms_signature_provider defers here rather than restating it.
+      // The name is misleading: with `MessageType=DIGEST` set above, KMS
       // does NOT apply SHA-256 to the input. It treats the 32 bytes as an
       // already-hashed value and signs them via raw ECDSA over secp256k1; the
       // "SHA_256" portion of the spec only constrains the input length to 32
