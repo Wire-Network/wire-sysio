@@ -610,7 +610,7 @@ kms_signer make_kms_signature_provider(const kms_key_ref&             ref,
    auto state = std::make_shared<kms_signer_state>(
       get_kms_client(ref.region), ref.key_id, shim.unwrapped());
 
-   fc::crypto::sign_fn sign = [state](fc::crypto::hash256 digest) -> chain::signature_type {
+   fc::crypto::sign_fn sign = [state](const chain::digest_type& digest) -> chain::signature_type {
       // Public-key pinning. Before the first -- and only the first -- billable
       // Sign, fetch the KMS key's own public key with the free GetPublicKey
       // API and assert it matches the key pinned in the spec. This turns the
@@ -621,16 +621,14 @@ kms_signer make_kms_signature_provider(const kms_key_ref&             ref,
       // through `ensure_kms_pubkey_pinned`.
       ensure_kms_pubkey_pinned(*state);
 
-      // The Ethereum signing path hands this closure a keccak256 digest; KMS
-      // signs the opaque 32-byte value regardless of which hash produced it.
-      const auto digest_bytes = fc::crypto::digest_span(digest);
-
+      // Build a Sign request. MessageType=DIGEST tells KMS the 32 bytes are
+      // already a hash; otherwise it would re-hash with SHA-256 and break
+      // any chain that hashes with anything other than SHA-256.
       Aws::KMS::Model::SignRequest req;
       req.SetKeyId(Aws::String{state->key_id});
-      req.SetMessage(Aws::Utils::ByteBuffer{digest_bytes.data(), digest_bytes.size()});
-
-      // Build a Sign request. MessageType=DIGEST tells KMS the bytes are
-      // already a hash
+      req.SetMessage(Aws::Utils::ByteBuffer{
+         digest.to_uint8_span().data(),
+         digest.to_uint8_span().size()});
       req.SetMessageType(Aws::KMS::Model::MessageType::DIGEST);
 
       // SigningAlgorithm: KMS's `ECC_SECG_P256K1` key spec (the curve Ethereum
@@ -658,7 +656,7 @@ kms_signer make_kms_signature_provider(const kms_key_ref&             ref,
          der_buf.GetUnderlyingData(), der_buf.GetLength()};
 
       const auto compact = der_to_eth_signature(
-         der, digest_bytes, state->expected_em_pubkey);
+         der, digest.to_uint8_span(), state->expected_em_pubkey);
 
       return fc::crypto::signature(
          fc::crypto::signature::storage_type{fc::em::signature_shim{compact}});

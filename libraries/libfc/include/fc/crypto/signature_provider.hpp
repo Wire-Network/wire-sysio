@@ -1,41 +1,15 @@
 #pragma once
 #include <fc/crypto/private_key.hpp>
 #include <fc/crypto/public_key.hpp>
-#include <fc/crypto/sha256.hpp>
-#include <fc/crypto/keccak256.hpp>
-#include <fc/exception/exception.hpp>
-
-#include <span>
 
 namespace fc::crypto {
 using signature_provider_id_t  = std::variant<std::string, fc::crypto::public_key>;
 
-/// A 32-byte digest tagged with the hash algorithm that produced it. A signing
-/// closure receives one of these and can dispatch on the active alternative --
-/// e.g. an Ethereum remote signer expects `keccak256`, block signing `sha256`.
-using hash256        = std::variant<sha256, keccak256>;
-
-/// Signing closure stored on every `signature_provider_t`. Takes the digest by
-/// value: a `hash256` is two 32-byte hashes in a variant -- trivially cheap to
-/// copy -- and the closure owns its copy.
-using sign_fn        = std::function<fc::crypto::signature(hash256)>;
-
-/// The raw 32 digest bytes of whichever hash `h` carries. For closures that
-/// sign an opaque 32-byte digest (AWS KMS, kiod) regardless of hash algorithm.
-inline std::span<const uint8_t, 32> digest_span(const hash256& h) {
-   return std::visit([](const auto& d) -> std::span<const uint8_t, 32> {
-      return d.to_uint8_span();
-   }, h);
-}
-
-/// The `sha256` alternative of `h`. Throws if `h` carries a `keccak256`. For
-/// closures that feed a SHA-256-only API (`private_key::sign`) and are only
-/// ever handed a SHA-256 digest -- the assertion catches a wrong-hash bug.
-inline const sha256& as_sha256(const hash256& h) {
-   const sha256* s = std::get_if<sha256>(&h);
-   FC_ASSERT(s, "expected a sha256 digest, but the hash256 carries a keccak256");
-   return *s;
-}
+/// Wire default signing function (sha256 digest)
+//  NOTE: Really this is a 256-bit hash value, that is either a sha256 hash or keccak256 hash
+//        the choice was made earlier to treat the payload as a 256-bit hash and changing all
+//        of the plumbing was considered out of scope
+using sign_fn        = std::function<fc::crypto::signature(const sha256&)>;
 
 /**
  * `signature_provider_entry` constructed provider

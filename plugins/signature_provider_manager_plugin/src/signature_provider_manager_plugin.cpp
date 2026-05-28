@@ -52,11 +52,7 @@ public:
    bool _startup_probe_enabled{false};
 
    fc::crypto::sign_fn make_key_signature_provider(const chain::private_key_type& key) const {
-      // KEY: providers (wire / K1 / BLS block signing) always sign a SHA-256
-      // digest; as_sha256 asserts that and feeds it to private_key::sign.
-      return [key](fc::crypto::hash256 digest) {
-         return key.sign(fc::crypto::as_sha256(digest));
-      };
+      return [key](const chain::digest_type& digest) { return key.sign(digest); };
    }
 
    fc::crypto::sign_fn make_kiod_signature_provider(const string& url_str, const chain::public_key_type& pubkey) const {
@@ -69,13 +65,9 @@ public:
       else
          kiod_url = fc::url(url_str);
 
-      return [to = _kiod_provider_timeout_us, kiod_url, pubkey](fc::crypto::hash256 digest) {
-         // The kiod daemon protocol expects a sha256-typed digest. Rebuild one
-         // from the raw 32 bytes of whichever hash the closure was handed, so a
-         // kiod-backed Ethereum key (keccak digest) keeps working and the kiod
-         // wire format stays byte-identical.
+      return [to = _kiod_provider_timeout_us, kiod_url, pubkey](const chain::digest_type& digest) {
          fc::variant params;
-         fc::to_variant(std::make_pair(as_sha256(digest), pubkey), params);
+         fc::to_variant(std::make_pair(digest, pubkey), params);
          auto deadline = to.count() >= 0 ? fc::time_point::now() + to : fc::time_point::maximum();
          return app()
                 .get_plugin<http_client_plugin>()
@@ -628,8 +620,7 @@ fc::crypto::signature_provider_ptr signature_provider_manager_plugin::create_pro
 
 fc::crypto::sign_fn
 signature_provider_manager_plugin::create_anonymous_provider_from_private_key(chain::private_key_type priv) const {
-   // An anonymous KEY-style provider: signs a SHA-256 digest with a local key.
-   return [priv](fc::crypto::hash256 d) { return priv.sign(fc::crypto::as_sha256(d)); };
+   return [priv](const fc::sha256& d) { return priv.sign(d); };
 }
 
 bool signature_provider_manager_plugin::has_provider(const fc::crypto::signature_provider_id_t& key) {

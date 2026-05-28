@@ -28,9 +28,10 @@ namespace detail {
 ///
 ///  - A provider with a local `em` private key signs in-process.
 ///  - A provider with no local key -- a remote signer such as AWS KMS -- has no
-///    key to sign with directly, so the digest is handed to its `sign` closure
-///    as a `hash256` carrying the `keccak256` alternative; the closure raw-signs
-///    those 32 bytes.
+///    key to sign with directly, so the digest is handed to its `sign` closure.
+///    `sign` is typed on `fc::sha256`, but the closure treats that argument as
+///    an opaque 32-byte digest, so the keccak digest is carried across
+///    byte-for-byte and raw-signed.
 ///
 /// Digest preparation (plain keccak vs. EIP-191 framing) is the caller's job --
 /// it has already happened in `signer_traits::prepare` -- so the remote signer
@@ -51,9 +52,10 @@ inline signature em_sign_keccak(const signature_provider_t& p, const keccak256& 
    FC_ASSERT(static_cast<bool>(p.sign),
              "signature provider has neither a local private key nor a sign function");
 
-   // Hand the keccak digest to the remote signer's closure, correctly typed as
-   // the keccak256 alternative of hash256 -- no byte reinterpretation.
-   const signature sig = p.sign(digest);
+   // Carry the keccak digest into the sha256-typed closure argument unchanged. See
+   // function comment for more information.
+   const auto digest_bytes = digest.to_char_span();
+   const signature sig     = p.sign(sha256(digest_bytes.data(), digest_bytes.size()));
 
    // Self-verify: the remote signer must have raw-signed `digest` with the
    // provider's key. Recover and compare; reject anything else loudly.

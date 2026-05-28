@@ -1233,9 +1233,7 @@ public:
 
          auto sig_provider = _signature_providers.at(key);
 
-         // Block signing uses a SHA-256 digest; wrap it as the sha256
-         // alternative of the provider closure's hash256 argument.
-         return sig_provider->sign(fc::crypto::hash256{digest});
+         return sig_provider->sign(digest);
       } else {
          return chain::signature_type();
       }
