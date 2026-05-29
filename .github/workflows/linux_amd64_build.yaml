@@ -1,4 +1,4 @@
-name: "Build & Test(Parallel ctest)"
+name: "Linux amd64 build & tests"
 
 on:
   push:
