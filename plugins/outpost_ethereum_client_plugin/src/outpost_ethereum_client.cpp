@@ -18,6 +18,7 @@ namespace eth = fc::network::ethereum;
 // ── Op labels used for deadline-exceeded error messages ──────────────────
 constexpr std::string_view OP_DELIVER_OUTBOUND = "deliver_outbound_envelope";
 constexpr std::string_view OP_READ_INBOUND     = "read_inbound_envelope";
+constexpr std::string_view OP_UW_COMMIT        = "uw_commit";
 
 } // namespace
 
@@ -25,24 +26,40 @@ outpost_ethereum_client::outpost_ethereum_client(
    ethereum_client_entry_ptr                         entry,
    std::string                                       opp_addr,
    std::string                                       opp_inbound_addr,
+   std::string                                       operator_registry_addr,
    std::vector<fc::network::ethereum::abi::contract> abis,
-   uint64_t                                          outpost_id,
+   uint64_t                                          chain_code,
    uint32_t                                          chain_id)
    : _entry(std::move(entry))
    , _opp_addr(std::move(opp_addr))
    , _opp_inbound_addr(std::move(opp_inbound_addr))
-   , _outpost_id(outpost_id)
+   , _operator_registry_addr(std::move(operator_registry_addr))
+   , _outpost_id(chain_code)
    , _chain_id(chain_id) {
    FC_ASSERT(_entry && _entry->client, "ethereum_client_entry must carry a client");
-   FC_ASSERT(!_opp_addr.empty(),         "OPP address is required");
-   FC_ASSERT(!_opp_inbound_addr.empty(), "OPPInbound address is required");
 
-   _opp_client         = _entry->client->get_contract<opp_contract_client>(_opp_addr, abis);
-   _opp_inbound_client = _entry->client->get_contract<opp_inbound_contract_client>(_opp_inbound_addr, abis);
+   // Each contract wrapper is materialized only if its address was
+   // supplied. A caller that only consumes one outpost capability (e.g.
+   // the underwriter calling `uw_commit` against OperatorRegistry) can
+   // pass empty strings for the addresses it doesn't use; the methods
+   // covering an unprovisioned wrapper assert on entry with a clear
+   // diagnostic. Per `outpost-client-spi.md`: address configuration is
+   // a per-caller concern; the SPI shape stays uniform.
+   if (!_opp_addr.empty()) {
+      _opp_client = _entry->client->get_contract<opp_contract_client>(_opp_addr, abis);
+   }
+   if (!_opp_inbound_addr.empty()) {
+      _opp_inbound_client =
+         _entry->client->get_contract<opp_inbound_contract_client>(_opp_inbound_addr, abis);
+   }
+   if (!_operator_registry_addr.empty()) {
+      _operator_registry_client =
+         _entry->client->get_contract<operator_registry_contract_client>(_operator_registry_addr, abis);
+   }
 }
 
 sysio::opp::types::ChainKind outpost_ethereum_client::chain_kind() const {
-   return sysio::opp::types::CHAIN_KIND_ETHEREUM;
+   return sysio::opp::types::CHAIN_KIND_EVM;
 }
 
 std::string outpost_ethereum_client::deliver_outbound_envelope(
@@ -52,6 +69,10 @@ std::string outpost_ethereum_client::deliver_outbound_envelope(
    const auto deadline_abs = fc::time_point::now() + deadline;
 
    throw_if_past_deadline(deadline_abs, OP_DELIVER_OUTBOUND);
+   FC_ASSERT(_opp_inbound_client,
+             "outpost_ethereum_client[{}]: deliver_outbound_envelope requires an "
+             "OPPInbound address — pass opp_inbound_addr to create_outpost_client",
+             to_string());
 
    std::string envelope_hex = fc::to_hex(envelope_bytes);
    auto        result       = _opp_inbound_client->epoch_in(envelope_hex);
@@ -66,6 +87,10 @@ std::vector<char> outpost_ethereum_client::read_inbound_envelope(
    fc::microseconds deadline) {
    const auto deadline_abs = fc::time_point::now() + deadline;
    throw_if_past_deadline(deadline_abs, OP_READ_INBOUND);
+   FC_ASSERT(_opp_client,
+             "outpost_ethereum_client[{}]: read_inbound_envelope requires an OPP "
+             "address — pass opp_addr to create_outpost_client",
+             to_string());
 
    // Single view call against the OPP contract's `latestOutboundEnvelope`
    // storage slot, populated by `emitOutboundEnvelope`. The OPP cycle is
@@ -172,6 +197,38 @@ std::vector<char> outpost_ethereum_client::read_inbound_envelope(
    ilog("outpost_ethereum_client[{}]: read inbound envelope epoch={} bytes={}",
         to_string(), epoch_index, out.size());
    return out;
+}
+
+std::string outpost_ethereum_client::uw_commit(
+   uint64_t                 uw_request_id,
+   const std::vector<char>& uic_bytes,
+   fc::microseconds         deadline) {
+   const auto deadline_abs = fc::time_point::now() + deadline;
+   throw_if_past_deadline(deadline_abs, OP_UW_COMMIT);
+
+   FC_ASSERT(_operator_registry_client,
+             "outpost_ethereum_client[{}]: uw_commit requires an OperatorRegistry "
+             "address — pass operator_registry_addr to create_outpost_client",
+             to_string());
+
+   // Solidity `commit(bytes uicBytes)` takes a `bytes` parameter; the
+   // libfc ABI encoder for `dt::bytes` expects a hex-encoded string
+   // (see ethereum_abi.cpp::encode_dynamic_data). Building the variant
+   // around the raw `std::vector<uint8_t>` triggers an `fc::bad_cast`
+   // inside the encoder — the typed wrapper takes the hex form directly.
+   //
+   // The `ethereum_contract_tx_fn<fc::variant, std::string>` signature
+   // binds the argument as a non-const `std::string&`, so the local
+   // must be a non-const lvalue (mirroring the `epoch_in(envelope_hex)`
+   // pattern in `deliver_outbound_envelope`).
+   std::string uic_hex = std::string("0x") +
+      fc::to_hex(uic_bytes.data(), uic_bytes.size());
+
+   const auto result  = _operator_registry_client->commit(uic_hex);
+   const auto tx_hash = result.as_string();
+   ilog("outpost_ethereum_client[{}]: uw_commit confirmed uwreq={} tx_hash={} bytes={}",
+        to_string(), uw_request_id, tx_hash, uic_bytes.size());
+   return tx_hash;
 }
 
 } // namespace sysio

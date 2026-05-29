@@ -14,6 +14,7 @@
 
 #include <sysio/opp/debugging/debugging.pb.h>
 #include <sysio/opp/types/types.pb.h>
+#include <sysio/opp/attestations/attestations.pb.h>
 #include <fc/reflect/reflect.hpp>
 
 // ---------------------------------------------------------------------------
@@ -23,9 +24,8 @@
 FC_REFLECT_ENUM(sysio::opp::types::ChainKind,
    (CHAIN_KIND_UNKNOWN)
    (CHAIN_KIND_WIRE)
-   (CHAIN_KIND_ETHEREUM)
-   (CHAIN_KIND_SOLANA)
-   (CHAIN_KIND_SUI))
+   (CHAIN_KIND_EVM)
+   (CHAIN_KIND_SVM))
 
 FC_REFLECT_ENUM(sysio::opp::types::ChainKeyType,
    (CHAIN_KEY_TYPE_UNKNOWN)
@@ -59,14 +59,21 @@ FC_REFLECT_ENUM(sysio::opp::types::OperatorStatus,
 // ---------------------------------------------------------------------------
 
 FC_REFLECT_ENUM(sysio::opp::types::TokenKind,
-   (TOKEN_KIND_WIRE)
-   (TOKEN_KIND_ETH)
+   (TOKEN_KIND_UNKNOWN)
+   (TOKEN_KIND_NATIVE)
    (TOKEN_KIND_ERC20)
    (TOKEN_KIND_ERC721)
    (TOKEN_KIND_ERC1155)
-   (TOKEN_KIND_LIQETH)
-   (TOKEN_KIND_SOL)
-   (TOKEN_KIND_LIQSOL))
+   (TOKEN_KIND_SPL)
+   (TOKEN_KIND_SPL_NFT)
+   (TOKEN_KIND_LIQ))
+
+// v6 — Reserve lifecycle
+FC_REFLECT_ENUM(sysio::opp::types::ReserveStatus,
+   (RESERVE_STATUS_UNKNOWN)
+   (RESERVE_STATUS_PENDING)
+   (RESERVE_STATUS_ACTIVE)
+   (RESERVE_STATUS_CANCELLED))
 
 // ---------------------------------------------------------------------------
 //  Attestation enums
@@ -81,21 +88,46 @@ FC_REFLECT_ENUM(sysio::opp::types::AttestationType,
    (ATTESTATION_TYPE_PRETOKEN_YIELD)
    (ATTESTATION_TYPE_RESERVE_BALANCE_SHEET)
    (ATTESTATION_TYPE_STAKE_UPDATE)
-   (ATTESTATION_TYPE_NATIVE_YIELD_REWARD)
    (ATTESTATION_TYPE_WIRE_TOKEN_PURCHASE)
    (ATTESTATION_TYPE_CHALLENGE_RESPONSE)
-   (ATTESTATION_TYPE_SLASH_OPERATOR)
-   (ATTESTATION_TYPE_SWAP)
-   (ATTESTATION_TYPE_UNDERWRITE_INTENT)
-   (ATTESTATION_TYPE_UNDERWRITE_CONFIRM)
-   (ATTESTATION_TYPE_UNDERWRITE_REJECT)
-   (ATTESTATION_TYPE_UNDERWRITE_UNLOCK)
-   (ATTESTATION_TYPE_REMIT)
+   (ATTESTATION_TYPE_SWAP_REQUEST)
+   (ATTESTATION_TYPE_SWAP_REMIT)
    (ATTESTATION_TYPE_CHALLENGE_REQUEST)
-   (ATTESTATION_TYPE_EPOCH_SYNC)
    (ATTESTATION_TYPE_OPERATORS)
-   (ATTESTATION_TYPE_REMIT_CONFIRM)
-   (ATTESTATION_TYPE_BATCH_OPERATOR_GROUPS))
+   (ATTESTATION_TYPE_BATCH_OPERATOR_GROUPS)
+   (ATTESTATION_TYPE_NODE_OWNER_REG)
+   (ATTESTATION_TYPE_STAKING_REWARD)
+   (ATTESTATION_TYPE_STAKE_RESULT)
+   (ATTESTATION_TYPE_ATTESTATION_PROCESSING_ERROR)
+   (ATTESTATION_TYPE_UNDERWRITE_INTENT_COMMIT)
+   (ATTESTATION_TYPE_SWAP_REVERT)
+   (ATTESTATION_TYPE_DEPOSIT_REVERT)
+   (ATTESTATION_TYPE_SWAP_REJECTED)
+   (ATTESTATION_TYPE_RESERVE_CREATE)
+   (ATTESTATION_TYPE_RESERVE_CREATE_CANCEL)
+   (ATTESTATION_TYPE_RESERVE_CREATE_CANCELLED)
+   (ATTESTATION_TYPE_RESERVE_READY)
+   (ATTESTATION_TYPE_EMISSIONS_BLOCKED))
+
+// ---------------------------------------------------------------------------
+//  Nested enums on attestation messages
+//
+//  protoc-cpp prefixes nested-enum values with the enum type name (e.g.
+//  `OperatorAction_ActionType_ACTION_TYPE_UNKNOWN`), so the reflection uses
+//  the full prefixed identifier. The string form on `to_string` will carry
+//  the prefix too — JSON consumers that want the bare proto value name
+//  (e.g. "ACTION_TYPE_SLASH") should strip the `OperatorAction_ActionType_`
+//  prefix at their boundary.
+// ---------------------------------------------------------------------------
+
+FC_REFLECT_ENUM(sysio::opp::attestations::OperatorAction_ActionType,
+   (OperatorAction_ActionType_ACTION_TYPE_UNKNOWN)
+   (OperatorAction_ActionType_ACTION_TYPE_DEPOSIT_REQUEST)
+   (OperatorAction_ActionType_ACTION_TYPE_WITHDRAW_REQUEST)
+   (OperatorAction_ActionType_ACTION_TYPE_WITHDRAW_REMIT)
+   (OperatorAction_ActionType_ACTION_TYPE_SLASH))
+
+// ReserveTarget_Kind removed in v6 — ReserveTarget is now (chain_code, reserve_code, TokenAmount).
 
 FC_REFLECT_ENUM(sysio::opp::types::AttestationStatus,
    (ATTESTATION_STATUS_PENDING)

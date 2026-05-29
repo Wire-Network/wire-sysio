@@ -176,7 +176,7 @@ public:
     * One chunk of a chunked proposal's serialized inner trx.
     *
     * Chunks are written by `propose` in increasing `chunk_index` order and read back in the
-    * same order by `exec`/`get_proposal`. Each chunk's `data` is at most `proposal_chunk_size`
+    * same order by `exec`/`getproposal`. Each chunk's `data` is at most `proposal_chunk_size`
     * bytes; the last chunk may be smaller. The total assembled size is recorded on the parent
     * `proposal` row's `total_size` field so the reader can pre-size the output buffer and
     * verify the assembled length matches what was written.
@@ -262,8 +262,8 @@ public:
     * @return The fully assembled proposal struct with `packed_transaction` populated.
     */
    [[sysio::action("getproposal"), sysio::read_only]]
-   proposal get_proposal( name proposer, name proposal_name );
+   proposal getproposal( name proposer, name proposal_name );
 
-   using getproposal_action = sysio::action_wrapper<"getproposal"_n, &multisig::get_proposal>;
+   using getproposal_action = sysio::action_wrapper<"getproposal"_n, &multisig::getproposal>;
 };
 } /// namespace sysio

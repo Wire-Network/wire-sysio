@@ -116,6 +116,7 @@ namespace sysio {
       // Well-known accounts
       static constexpr name EPOCH_ACCOUNT = "sysio.epoch"_n;
       static constexpr name MSGCH_ACCOUNT = "sysio.msgch"_n;
+      static constexpr name OPREG_ACCOUNT = "sysio.opreg"_n;
       static constexpr name UWRIT_ACCOUNT = "sysio.uwrit"_n;
       static constexpr name MSIG_ACCOUNT  = "sysio.msig"_n;
 

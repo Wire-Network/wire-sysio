@@ -131,7 +131,7 @@ outpost_solana_client_plugin::get_idl_files() {
 
 std::shared_ptr<outpost_client>
 outpost_solana_client_plugin::create_outpost_client(const std::string& sol_client_id,
-                                                  uint64_t           outpost_id,
+                                                  uint64_t           chain_code,
                                                   uint32_t           chain_id,
                                                   const std::string& program_id) {
    auto entry = my->get_client(sol_client_id);
@@ -155,7 +155,7 @@ outpost_solana_client_plugin::create_outpost_client(const std::string& sol_clien
              OPP_SOLANA_OUTPOST_PROGRAM_NAME);
 
    return std::make_shared<outpost_solana_client>(
-      entry, program_key, std::move(program_idls), outpost_id, chain_id);
+      entry, program_key, std::move(program_idls), chain_code, chain_id);
 }
 
 } // namespace sysio

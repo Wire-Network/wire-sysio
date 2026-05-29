@@ -100,4 +100,50 @@ BOOST_AUTO_TEST_CASE(consistency_over_large_range) {
    }
 }
 
+// calculate_merkle dispatches to a multi-threaded implementation at two
+// thresholds (detail::calculate_merkle_pow2):
+//   size >= 256  -> 2 threads
+//   size >= 2048 -> 4 threads
+// Output must be byte-identical to the single-threaded path and stable across
+// repeated invocations. Consensus safety depends on this: every node that
+// computes a merkle root over the same input must get the same bytes regardless
+// of how the work is partitioned across threads.
+BOOST_AUTO_TEST_CASE(async_matches_sequential_and_is_reproducible) {
+   // Sizes chosen to span both async thresholds and boundary cases: just below
+   // 256, exactly at 256, between the two thresholds, exactly at 2048, and well
+   // past the 4-thread threshold.
+   const std::vector<size_t> sizes = {
+      255, 256, 257,    // 2-thread boundary
+      512, 1024,        // within 2-thread range
+      2047, 2048, 2049, // 4-thread boundary
+      4096, 8192        // well past
+   };
+
+   // Build the largest vector once; slice with std::span to exercise each size.
+   const std::vector<digest_type> digests = create_test_digests(sizes.back());
+
+   for (size_t n : sizes) {
+      auto input = std::span(digests.begin(), n);
+
+      // Cross-check async calculate_merkle against the purely-sequential
+      // incremental_merkle_tree to pin down the expected byte pattern.
+      incremental_merkle_tree tree;
+      for (size_t j = 0; j < n; ++j) tree.append(digests[j]);
+      const digest_type expected = tree.get_root();
+
+      const digest_type async_first = calculate_merkle(input);
+      BOOST_CHECK_MESSAGE(async_first == expected,
+         "async calculate_merkle diverged from sequential tree at size " << n);
+
+      // Reproducibility: re-running the same computation must return the same
+      // bytes. 10 iterations is enough to surface any thread-race that alters
+      // output (probabilistically; if races existed, they'd show up reliably
+      // at these sizes since the thread pool schedules all slices concurrently).
+      for (int i = 0; i < 10; ++i) {
+         BOOST_CHECK_MESSAGE(calculate_merkle(input) == expected,
+            "calculate_merkle not reproducible at size " << n << " on iteration " << i);
+      }
+   }
+}
+
 BOOST_AUTO_TEST_SUITE_END()

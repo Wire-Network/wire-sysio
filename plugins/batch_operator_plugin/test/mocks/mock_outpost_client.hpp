@@ -37,7 +37,7 @@ public:
       : _kind(kind), _outpost_id(id), _chain_id(cid) {}
 
    sysio::opp::types::ChainKind chain_kind() const override { return _kind; }
-   uint64_t                     outpost_id() const override { return _outpost_id; }
+   uint64_t                     chain_code() const override { return _outpost_id; }
    uint32_t                     chain_id()   const override { return _chain_id; }
    std::string                  to_string()  const override {
       return std::format("{}:{}:{}",
@@ -46,6 +46,12 @@ public:
                          _chain_id);
    }
 
+   struct commit_call {
+      uint64_t          uw_request_id = 0;
+      std::vector<char> uic_bytes;
+      fc::microseconds  deadline;
+   };
+
    /// Deliver response — can be set to either a scripted string or a functor
    /// that produces responses / throws per-call.
    std::function<std::string(const outbound_call&)> deliver_response =
@@ -53,6 +59,11 @@ public:
 
    std::function<std::vector<char>(const inbound_call&)> inbound_response =
       [](const inbound_call&) { return std::vector<char>{}; };
+
+   /// uw_commit response — scripted per call; tests that don't exercise the
+   /// UIC relay path can leave the default in place.
+   std::function<std::string(const commit_call&)> commit_response =
+      [](const commit_call&) { return std::string{"mock-commit-tx"}; };
 
    std::string deliver_outbound_envelope(uint32_t                 epoch_index,
                                          const std::vector<char>& envelope_bytes,
@@ -75,8 +86,20 @@ public:
       return inbound_response(call);
    }
 
+   std::string uw_commit(uint64_t                 uw_request_id,
+                         const std::vector<char>& uic_bytes,
+                         fc::microseconds         deadline) override {
+      commit_call call{uw_request_id, uic_bytes, deadline};
+      {
+         std::lock_guard<std::mutex> lock(_mx);
+         commit_calls.push_back(call);
+      }
+      return commit_response(call);
+   }
+
    std::vector<outbound_call> outbound_calls;
    std::vector<inbound_call>  inbound_calls;
+   std::vector<commit_call>   commit_calls;
 
 private:
    sysio::opp::types::ChainKind _kind;

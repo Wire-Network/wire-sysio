@@ -671,6 +671,8 @@ namespace sysio { namespace chain {
                                  3260000, "Finalizer exception" )
       FC_DECLARE_DERIVED_EXCEPTION( finalizer_safety_exception, finalizer_exception,
                                     3260001, "Finalizer safety file exception" )
+      FC_DECLARE_DERIVED_EXCEPTION( invalid_finalizer_policy_exception, finalizer_exception,
+                                    3260002, "Invalid finalizer policy" )
 
    /// @return true if exception requires transaction to be retried in the next block
    inline bool exception_is_exhausted(const fc::exception& e) {
