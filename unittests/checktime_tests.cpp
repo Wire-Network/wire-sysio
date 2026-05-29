@@ -244,6 +244,8 @@ BOOST_AUTO_TEST_CASE( checktime_speculative_max_trx_test ) { try {
    auto& interrupt_cfg = interrupt_conf_genesis.second.initial_configuration;
    constexpr uint32_t interrupt_max_block_cpu_usage = 1'500'000;
    constexpr uint32_t interrupt_max_transaction_cpu_usage = 1'000'000;
+   constexpr uint32_t interrupt_warmup_billed_cpu_us = 1;
+   constexpr uint32_t interrupt_warmup_max_block_cpu_ms = 10'000;
    // macOS CI runners can have high scheduler latency; interrupt still must beat this widened transaction limit.
    constexpr int64_t interrupt_expected_max_us = 900'000;
 
@@ -253,6 +255,10 @@ BOOST_AUTO_TEST_CASE( checktime_speculative_max_trx_test ) { try {
 
    savanna_tester interrupt_t( interrupt_conf_genesis.first, interrupt_conf_genesis.second );
    setup_pause_contract( interrupt_t );
+
+   // sys-vm-oc compiles synchronously on first execution, so warm the contract outside the measured interrupt window.
+   push_trx( interrupt_t, test_pause_action<WASM_TEST_ACTION("test_checktime", "checktime_pass")>{},
+             interrupt_warmup_billed_cpu_us, UINT32_MAX, interrupt_warmup_max_block_cpu_ms, true, {}, "pause"_n );
 
    // verify interrupt works for speculative trxs
    std::exception_ptr interrupt_thread_exception;
