@@ -1,0 +1,93 @@
+# =============================================================================
+# wire-sysio — Wire node software (nodeop, clio, kiod, system contracts, libfc)
+# =============================================================================
+# C++23, CMake + Ninja, vcpkg-backed. Depends on //wire-cdt:build (CDT supplies
+# the contract compiler). Built natively in-tree via cmake_workspace_build so its
+# the cmake build tree is wire-sysio/build/release (build/<cmake_build_type
+# lowercased>, per CLAUDE.md). The OPP codegen, however, ALWAYS writes to the
+# fixed path wire-sysio/build/opp/{typescript,solidity,solana}/ (independent of
+# build type) — that is what the NEXT link in the chain (wire-libraries-ts)
+# resolves @wireio/opp-*-models from via its .pnpmfile.cjs. See build_defs.bzl.
+#
+# `manual` + requires-network: vcpkg fetches/compiles deps (boost, libsodium,
+# secp256k1, wire-sys-vm, ...) and the node build is large. The CMakeLists
+# defaults CMAKE_TOOLCHAIN_FILE to the in-tree vcpkg, so we don't set it.
+#
+# Native equivalent:
+#   export CC=/usr/bin/clang-18 CXX=/usr/bin/clang++-18
+#   cmake -B build -S . -G Ninja -DCMAKE_BUILD_TYPE=Release && cmake --build build
+# =============================================================================
+
+load("//:build_defs.bzl", "cmake_workspace_build")
+
+package(default_visibility = ["//visibility:public"])
+
+filegroup(
+    name = "srcs",
+    srcs = glob(
+        ["**"],
+        exclude = [
+            "build/**",
+            "vcpkg/**",
+            ".git/**",
+            "node_modules/**",
+            "BUILD.bazel",
+        ],
+    ),
+)
+
+# Flags reproduce wire-sysio/CLAUDE.md's "Configure and Build" recipe.
+#
+# Two flags are load-bearing for the build CHAIN (not just this repo):
+#   * BUILD_SYSTEM_CONTRACTS=ON — builds the system contracts, which is what
+#     emits the OPP codegen into build/opp/ that wire-libraries-ts consumes.
+#     Omit it and sysio builds the node but not the codegen the chain needs.
+#   * CMAKE_PREFIX_PATH = wire-cdt's BUILD dir — compiling those contracts needs
+#     the CDT package (CDTWasmToolchain.cmake / CDTMacros / the wasm compiler)
+#     that CDT exports into wire-cdt/build/release. sysio's find_package(cdt)
+#     resolves it from the prefix path. This is the cdt->sysio dependency edge
+#     made concrete; the //wire-cdt:build dep guarantees that build dir exists
+#     first. ($$PWD = wire-sysio at runtime, so ../wire-cdt/... points at the
+#     sibling repo's build tree.)
+#
+# CLAUDE.md's example uses CMAKE_BUILD_TYPE=Debug; we use Release here so the
+# whole chain shares build/release (cdt included). Flip both repos to Debug
+# together if a debug chain is wanted.
+cmake_workspace_build(
+    name = "build",
+    # CMAKE_BUILD_TYPE is injected from $WIRE_BUILD_TYPE (default Debug).
+    cache_entries = {
+        "CMAKE_C_COMPILER": "/usr/bin/clang-18",
+        "CMAKE_CXX_COMPILER": "/usr/bin/clang++-18",
+        "BUILD_SYSTEM_CONTRACTS": "ON",
+        "BUILD_TEST_CONTRACTS": "ON",
+        "ENABLE_TESTS": "ON",
+        "ENABLE_CCACHE": "ON",
+        "ENABLE_DISTCC": "OFF",
+        # wire-cdt's build dir only (the CDT cmake package) so find_package(cdt)
+        # resolves for contract compilation. $$PWD = wire-sysio and BUILD_TYPE_LC
+        # = the runtime build type, so this tracks cdt's matching build/<type>.
+        "CMAKE_PREFIX_PATH": "$$PWD/../wire-cdt/build/$$BUILD_TYPE_LC",
+    },
+    env = {
+        "CC": "/usr/bin/clang-18",
+        "CXX": "/usr/bin/clang++-18",
+    },
+    compile_commands_merge = {
+        "script": "wire-sysio/cmake/scripts/merge_compile_commands.py",
+        "output": "compile_commands.json",
+        "inputs": [
+            "wire-cdt/build/$$BUILD_TYPE_LC/compile_commands.json",
+            "wire-sysio/build/$$BUILD_TYPE_LC/compile_commands.json",
+        ],
+    },
+    # CDT provides the contract toolchain wire-sysio compiles its contracts with.
+    deps = ["//wire-cdt:build"],
+    generator = "Ninja",
+    tags = [
+        "cpp",
+        "requires-network",
+    ],
+    vcpkg_toolchain = True,
+    working_dir = "wire-sysio",
+)
