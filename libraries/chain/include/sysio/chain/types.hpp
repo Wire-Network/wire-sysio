@@ -548,6 +548,11 @@ namespace sysio::chain {
        * libc++ versions shipped with current AppleClang do not always provide the C++23
        * std::move_only_function API. This wrapper preserves the same move-only capture support
        * needed by next_function without requiring that library feature.
+       *
+       * This is intentionally a narrow polyfill for next_function's current
+       * `void(T&&)` storage shape, not a general std::move_only_function
+       * replacement. If next_function starts storing another callable
+       * signature, extend this wrapper alongside that change.
        */
       template<typename Signature>
       class move_only_function;
