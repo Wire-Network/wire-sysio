@@ -8,7 +8,11 @@
 
 namespace fc::crypto {
 
-// enum instead of enum class so they can be used in contracts (CDT supports enum but not enum class).
+// Unscoped enums kept here for historical reasons. New types should prefer
+// `enum class` per the wire-cdt style guide; both forms compile cleanly in
+// CDT and the wider host build, and enums round-trip as enums everywhere
+// (variants, ABI serializer, cross-contract reads) — never cast to an
+// integer at any boundary.
 enum chain_kind_t : uint8_t {
    chain_kind_unknown = 0,
    chain_kind_wire = 1,

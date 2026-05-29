@@ -59,11 +59,15 @@ void finality_core::validate_snapshot() const {
    }
 
    // Invariant 8 (implied by 3-6): current_block_num - last_final_block_num == refs.size()
+   // Subtraction is safe: invariant 2 (checked above) established lfbn <= links.front().source_block_num,
+   // and by invariant 7's monotonicity links.front().source_block_num <= links.back().source_block_num == cur,
+   // so lfbn <= cur and the unsigned subtraction cannot underflow.
    SYS_ASSERT(cur - lfbn == refs.size(), snapshot_exception,
               "finality_core: current_block_num ({}) - last_final_block_num ({}) != refs.size() ({})",
               cur, lfbn, refs.size());
 
    // Invariant 9 (implied by 1,7): current_block_num - links.front().source_block_num == links.size() - 1
+   // Subtraction is safe by invariant 7's monotonicity (links.front().source_block_num <= cur).
    SYS_ASSERT(cur - links.front().source_block_num == links.size() - 1, snapshot_exception,
               "finality_core: link count mismatch: current_block_num ({}) - front source ({}) != links.size()-1 ({})",
               cur, links.front().source_block_num, links.size() - 1);

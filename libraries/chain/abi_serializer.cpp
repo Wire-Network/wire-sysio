@@ -104,6 +104,14 @@ namespace sysio::chain {
       built_in_types.emplace("varint32",                  pack_unpack<fc::signed_int>());
       built_in_types.emplace("varuint32",                 pack_unpack<fc::unsigned_int>());
 
+      // CDT typedefs `vint64_t` / `vuint64_t` (zpp::bits varint wrappers) to abi
+      // names `varint_int64` / `varint_uint64`. The CDT DataStream operators in
+      // contracts/sysio.opp.common/include/sysio.opp.common/opp_table_types.hpp
+      // serialize them as plain int64/uint64 — the wire format matches the bare
+      // integer type, so the abi-side decode is identical.
+      built_in_types.emplace("varint_int64",              pack_unpack<int64_t>());
+      built_in_types.emplace("varint_uint64",             pack_unpack<uint64_t>());
+
       // TODO: Add proper support for floating point types. For now this is good enough.
       built_in_types.emplace("float32",                   pack_unpack<float>());
       built_in_types.emplace("float64",                   pack_unpack<double>());

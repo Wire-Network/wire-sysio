@@ -2,7 +2,7 @@
 #include <sysio/chain/apply_context.hpp>
 
 namespace sysio { namespace chain { namespace webassembly {
-   int32_t interface::get_active_producers( legacy_span<account_name> producers ) const {
+   int32_t interface::get_active_producers( aligned_span<account_name> producers ) const {
       auto active_producers = context.get_active_producers();
 
       size_t len = active_producers.size();
