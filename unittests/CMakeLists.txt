@@ -125,17 +125,6 @@ foreach(RUNTIME ${SYSIO_WASM_RUNTIMES})
    set_tests_properties(delay_unit_test_${RUNTIME} PROPERTIES COST 3000)
 endforeach()
 
-if(APPLE)
-   foreach(RUNTIME ${SYSIO_WASM_RUNTIMES})
-      if(RUNTIME STREQUAL "native-module" AND NOT BUILD_SYSTEM_CONTRACTS)
-         continue()
-      endif()
-      # checktime aborts during macOS CI process teardown after its assertions pass;
-      # Linux CI remains the coverage path for this timing-sensitive suite.
-      set_property(TEST checktime_unit_test_${RUNTIME} PROPERTY LABELS macos_unsupported_tests)
-   endforeach()
-endif()
-
 ### COVERAGE TESTING ###
 if(ENABLE_COVERAGE_TESTING)
   set(Coverage_NAME ${PROJECT_NAME}_ut_coverage)
