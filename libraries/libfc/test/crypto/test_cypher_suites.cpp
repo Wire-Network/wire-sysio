@@ -783,4 +783,39 @@ BOOST_AUTO_TEST_CASE(test_eth_client_signer_passes_keccak_bytes_to_closure) try 
    BOOST_CHECK_EQUAL(s.recover(sig, payload).to_string({}), pub.to_string({}));
 } FC_LOG_AND_RETHROW();
 
+BOOST_AUTO_TEST_CASE(test_eth_client_signer_self_verify_runs_once_per_provider) try {
+   // The remote-signer self-verify (recover + compare to the provider's key) is
+   // gated to the first sign per provider via signature_provider_t::self_verify_once:
+   // a closure's key and digest framing are fixed for the provider's lifetime, so
+   // re-checking every signature is unnecessary. Pin that behavior here -- sign
+   // correctly on the first call (passes the check and latches the once-flag), then
+   // with the WRONG key on later calls, which must NOT throw because the check no
+   // longer runs. Under the previous per-signature behavior the second sign would
+   // have thrown, so this case is a regression guard for the once-per-provider gate.
+   auto good    = private_key::generate(private_key::key_type::em);
+   auto bad     = private_key::generate(private_key::key_type::em);
+   auto em_good = good.get<em::private_key_shim>();
+   auto em_bad  = bad.get<em::private_key_shim>();
+
+   auto payload = ethereum::to_uint8_span("eth transaction bytes");
+   auto kc      = keccak256::hash(payload);
+
+   int calls = 0;
+   signature_provider_t provider;
+   provider.key_type   = chain_key_type_ethereum;
+   provider.public_key = good.get_public_key();   // provider advertises `good`
+   provider.sign = [&calls, em_good, em_bad, kc](const sha256&) {
+      // First call signs with the advertised key; later calls sign with the
+      // wrong key. Only the first signature is self-verified.
+      const auto& key = (calls++ == 0) ? em_good : em_bad;
+      return signature(signature::storage_type(key.sign_keccak256(kc)));
+   };
+
+   eth_client_signer s(provider);
+   BOOST_CHECK_NO_THROW(s.sign(payload));  // first sign: verified, passes, latches
+   BOOST_CHECK_NO_THROW(s.sign(payload));  // wrong key, but the check is now skipped
+   BOOST_CHECK_NO_THROW(s.sign(payload));  // still skipped
+   BOOST_CHECK_GE(calls, 3);
+} FC_LOG_AND_RETHROW();
+
 BOOST_AUTO_TEST_SUITE_END()

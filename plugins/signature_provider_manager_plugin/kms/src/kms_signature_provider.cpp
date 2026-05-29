@@ -16,6 +16,7 @@
 #include <sysio/chain/exceptions.hpp>
 #include <sysio/chain/types.hpp>
 
+#include <fc/crypto/ethereum/ethereum_utils.hpp>
 #include <fc/exception/exception.hpp>
 #include <fc/string.hpp>
 
@@ -89,12 +90,6 @@ const secp256k1_context* kms_secp_ctx() {
    return ctx;
 }
 
-/// Ethereum's `v` offset: per Yellow-Paper Appendix F, the recovery byte is
-/// `27 + recovery_id`. EIP-155 introduces a chain-id-tagged form for txs,
-/// but the raw signing path used by the cranker / outpost client uses the
-/// pre-EIP-155 (27/28) form.
-constexpr unsigned char eth_v_offset = 27;
-
 /// Process-wide AWS SDK lifecycle. Constructed lazily on first KMS access,
 /// destroyed at static destruction (after the client cache, since the cache
 /// is touched by `get_kms_client` *after* this lifecycle, making it the
@@ -135,7 +130,7 @@ private:
 /// so that `std::function` copies remain cheap and the same `KMSClient` /
 /// expected pubkey are shared across copies of the closure.
 ///
-/// A user-provided constructor is required because `std::once_flag` is neither
+/// A user-provided constructor is required because `std::mutex` is neither
 /// copyable nor movable, which rules out the aggregate / designated-initializer
 /// construction the struct would otherwise allow.
 struct kms_signer_state {
@@ -152,10 +147,17 @@ struct kms_signer_state {
    /// the live KMS key by `verify_kms_pubkey`, then used by `recover_v` to
    /// discriminate between recovery_id 0 and 1.
    fc::em::public_key                   expected_em_pubkey;
-   /// One-shot guard for the GetPublicKey pinning check. The check runs on the
-   /// first `Sign`; `std::call_once` re-runs it only if it threw -- e.g. a
-   /// transient GetPublicKey API error -- and never again once it has passed.
-   std::once_flag                       pin_once;
+   /// Guard for the GetPublicKey pinning check. The check runs on the first
+   /// `Sign` (or the startup probe) and never again once it has passed.
+   ///
+   /// A `std::mutex` + flag is used deliberately, NOT `std::once_flag`:
+   /// `verify_kms_pubkey` throws on a permanent misconfiguration or a transient
+   /// API error, and on glibc an exception unwinding through `std::call_once`'s
+   /// `pthread_once` aborts the process instead of propagating. With the mutex
+   /// the exception propagates cleanly -- so a permanent error fails loudly and
+   /// a transient one can be retried -- and `pinned` is set only after success.
+   std::mutex                           pin_mutex;
+   bool                                 pinned = false;
 };
 
 /// Per-region cache of KMS clients. Lock once on lookup; the SDK's HTTP
@@ -331,8 +333,8 @@ parse_spki_ec_point(std::span<const unsigned char> spki_der) {
 /// non-billable `GetPublicKey` API, decode its SubjectPublicKeyInfo, and assert
 /// it matches the key the operator pinned in the spec. On mismatch this throws
 /// `plugin_config_exception` early -- before any billable `Sign` -- with a
-/// message that names the misconfiguration directly. Invoked exactly once per
-/// closure through `kms_signer_state::pin_once`.
+/// message that names the misconfiguration directly. Invoked at most once per
+/// closure through `ensure_kms_pubkey_pinned`.
 void verify_kms_pubkey(kms_signer_state& state) {
    Aws::KMS::Model::GetPublicKeyRequest req;
    req.SetKeyId(Aws::String{state.key_id});
@@ -354,12 +356,19 @@ void verify_kms_pubkey(kms_signer_state& state) {
               state.key_id);
 }
 
-/// Run the public-key pinning check exactly once for `state`. Both the first
-/// `Sign` and the opt-in startup probe funnel through here, so `std::call_once`
-/// guarantees a single GetPublicKey round-trip -- and retries it only if it
-/// threw (e.g. a transient GetPublicKey API error).
+/// Run the public-key pinning check at most once per `state`. Both the first
+/// `Sign` and the opt-in startup probe funnel through here. A successful check
+/// sets `pinned` so subsequent calls are a cheap no-op; a throwing check (a
+/// permanent misconfiguration or a transient API error) leaves `pinned` false
+/// so the next call retries -- and, crucially, the exception propagates to the
+/// caller rather than aborting the process (see `pin_mutex`). The mutex
+/// serialises concurrent first-signs so only one GetPublicKey round-trip runs.
 void ensure_kms_pubkey_pinned(kms_signer_state& state) {
-   std::call_once(state.pin_once, [&] { verify_kms_pubkey(state); });
+   std::scoped_lock lock(state.pin_mutex);
+   if (!state.pinned) {
+      verify_kms_pubkey(state);   // throws on failure; `pinned` stays false -> retried
+      state.pinned = true;
+   }
 }
 
 } // namespace
@@ -535,7 +544,7 @@ unsigned char recover_v(const std::array<unsigned char, 64>& compact,
    for (unsigned char rec_id = 0; rec_id < 2; ++rec_id) {
       fc::em::compact_signature trial{};
       std::ranges::copy(compact, trial.begin());
-      trial[64] = static_cast<unsigned char>(eth_v_offset + rec_id);
+      trial[64] = static_cast<unsigned char>(fc::crypto::ethereum::v_offset + rec_id);
 
       try {
          auto recovered = fc::em::public_key::recover(trial, digest.data(),
@@ -561,7 +570,7 @@ fc::em::compact_signature der_to_eth_signature(
 
    fc::em::compact_signature out{};
    std::ranges::copy(compact, out.begin());
-   out[64] = static_cast<unsigned char>(eth_v_offset + rec_id);
+   out[64] = static_cast<unsigned char>(fc::crypto::ethereum::v_offset + rec_id);
    return out;
 }
 
@@ -617,8 +626,8 @@ kms_signer make_kms_signature_provider(const kms_key_ref&             ref,
       // common "wrong <public-key> in the spec" mistake into a fast, direct
       // error instead of an opaque recovery failure that would otherwise
       // surface only after a paid Sign. If the opt-in startup probe already
-      // ran the check, this is a no-op -- both paths share `state->pin_once`
-      // through `ensure_kms_pubkey_pinned`.
+      // ran the check, this is a no-op -- both paths share `state`'s pinning
+      // guard through `ensure_kms_pubkey_pinned`.
       ensure_kms_pubkey_pinned(*state);
 
       // Build a Sign request. MessageType=DIGEST tells KMS the 32 bytes are
@@ -676,8 +685,8 @@ kms_signer make_kms_signature_provider(const kms_key_ref&             ref,
    // but issues only the free GetPublicKey -- no billable Sign. An opt-in
    // plugin_startup() calls this so a missing credential, bad region, absent
    // IAM grant, or wrong pinned key fails loudly at boot instead of deep in
-   // production. It shares `state` (hence `pin_once`) with `sign`, so enabling
-   // the probe never doubles the check.
+   // production. It shares `state` (hence the pinning guard) with `sign`, so
+   // enabling the probe never doubles the check.
    std::function<void()> warm_up = [state] { ensure_kms_pubkey_pinned(*state); };
 
    return kms_signer{.sign = std::move(sign), .warm_up = std::move(warm_up)};

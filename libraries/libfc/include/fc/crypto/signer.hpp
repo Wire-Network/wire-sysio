@@ -9,6 +9,7 @@
 
 #include <magic_enum/magic_enum.hpp>
 
+#include <atomic>
 #include <span>
 
 namespace fc::crypto {
@@ -57,15 +58,21 @@ inline signature em_sign_keccak(const signature_provider_t& p, const keccak256& 
    const auto digest_bytes = digest.to_char_span();
    const signature sig     = p.sign(sha256(digest_bytes.data(), digest_bytes.size()));
 
-   // Self-verify: the remote signer must have raw-signed `digest` with the
-   // provider's key. Recover and compare; reject anything else loudly.
-   FC_ASSERT(sig.contains<em::signature_shim>(),
-             "remote signer returned a non-Ethereum signature");
-   const auto recovered = public_key(public_key::storage_type(
-      sig.get<em::signature_shim>().recover_eth(digest)));
-   FC_ASSERT(recovered == p.public_key,
-             "remote signer produced a signature that does not recover to the "
-             "provider's public key -- the signer's key or digest framing is wrong");
+   // Self-verify the remote signer's output once per provider: recover the public
+   // key from `sig` and assert it matches the provider's pinned key, rejecting a
+   // closure wired to the wrong bytes. This is the compensating control for the
+   // sha256/keccak256 type-punning -- DO NOT remove it; see the `sign_fn` NOTE in
+   // signature_provider.hpp for the full rationale (once-per-provider, why atomic).
+   if (!p.self_verified->load(std::memory_order_acquire)) {
+      FC_ASSERT(sig.contains<em::signature_shim>(),
+                "remote signer returned a non-Ethereum signature");
+      const auto recovered = public_key(public_key::storage_type(
+         sig.get<em::signature_shim>().recover_eth(digest)));
+      FC_ASSERT(recovered == p.public_key,
+                "remote signer produced a signature that does not recover to the "
+                "provider's public key -- the signer's key or digest framing is wrong");
+      p.self_verified->store(true, std::memory_order_release);
+   }
    return sig;
 }
 
