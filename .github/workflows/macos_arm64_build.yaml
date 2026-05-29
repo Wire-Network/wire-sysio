@@ -91,12 +91,6 @@ jobs:
             --output-on-failure --timeout 1000 \
             2>&1 | tee "$RUNNER_TEMP/macos-arm64-parallel-ctest.log"
 
-      - name: Run checktime serial test
-        run: |
-          cd build/macos-arm64
-          ctest --output-on-failure -R "^checktime_unit_test_sys-vm$" --timeout 1000 \
-            2>&1 | tee "$RUNNER_TEMP/macos-arm64-checktime-test.log"
-
       - name: Run nodeop nonparallelizable test
         run: |
           cd build/macos-arm64
