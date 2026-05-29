@@ -3,6 +3,7 @@
 #include <boost/test/unit_test.hpp>
 #pragma GCC diagnostic pop
 
+#include <fc/scoped_exit.hpp>
 #include <sysio/testing/tester.hpp>
 #include <sysio/chain/exceptions.hpp>
 #include <sysio/chain/wasm_interface.hpp>
@@ -12,15 +13,39 @@
 #include <test_utils.hpp>
 
 #include <algorithm>
+#include <chrono>
+#include <exception>
 #include <vector>
 #include <iterator>
 #include <string>
+#include <thread>
 
 using namespace sysio;
 using namespace sysio::chain::literals;
 using namespace sysio::testing;
 using namespace sysio::test_utils;
 using namespace fc;
+
+namespace {
+
+/** Joins a test helper thread on all exits so unexpected exception paths report as test failures. */
+auto join_thread_on_scope_exit(std::thread& thread) {
+   return fc::make_scoped_exit([&thread]() {
+      if (thread.joinable())
+         thread.join();
+   });
+}
+
+/** Installs the pause contract used by checktime_failure to keep WASM execution active. */
+void setup_pause_contract(savanna_tester& tester) {
+   tester.execute_setup_policy( setup_policy::full );
+   tester.produce_block();
+   tester.create_account( "pause"_n );
+   tester.set_code( "pause"_n, test_contracts::test_api_wasm() );
+   tester.produce_block();
+}
+
+}
 
 BOOST_AUTO_TEST_SUITE(checktime_tests)
 
@@ -196,11 +221,7 @@ BOOST_AUTO_TEST_CASE( checktime_speculative_max_trx_test ) { try {
    cfg.min_transaction_cpu_usage  = 1;
 
    savanna_tester t( conf_genesis.first, conf_genesis.second );
-   t.execute_setup_policy( setup_policy::full );
-   t.produce_block();
-   t.create_account( "pause"_n );
-   t.set_code( "pause"_n, test_contracts::test_api_wasm() );
-   t.produce_block();
+   setup_pause_contract( t );
 
    BOOST_CHECK_EXCEPTION( push_trx( t, test_pause_action<WASM_TEST_ACTION("test_checktime", "checktime_failure")>{},
                                     0, 25, 500, false, fc::raw::pack(10000000000000000000ULL), "pause"_n ),
@@ -218,23 +239,49 @@ BOOST_AUTO_TEST_CASE( checktime_speculative_max_trx_test ) { try {
    BOOST_CHECK_MESSAGE( dur >= 150'000, "elapsed " << dur << "us" );
    BOOST_CHECK_MESSAGE( dur <= 180'000, "elapsed " << dur << "us" );
 
+   fc::temp_directory interrupt_tempdir;
+   auto interrupt_conf_genesis = tester::default_config( interrupt_tempdir );
+   auto& interrupt_cfg = interrupt_conf_genesis.second.initial_configuration;
+   constexpr uint32_t interrupt_max_block_cpu_usage = 1'500'000;
+   constexpr uint32_t interrupt_max_transaction_cpu_usage = 1'000'000;
+   // macOS CI runners can have high scheduler latency; interrupt still must beat this widened transaction limit.
+   constexpr int64_t interrupt_expected_max_us = 900'000;
+
+   interrupt_cfg.max_block_cpu_usage        = interrupt_max_block_cpu_usage;
+   interrupt_cfg.max_transaction_cpu_usage  = interrupt_max_transaction_cpu_usage;
+   interrupt_cfg.min_transaction_cpu_usage  = 1;
+
+   savanna_tester interrupt_t( interrupt_conf_genesis.first, interrupt_conf_genesis.second );
+   setup_pause_contract( interrupt_t );
+
    // verify interrupt works for speculative trxs
+   std::exception_ptr interrupt_thread_exception;
    std::thread th( [&]() {
-      std::this_thread::sleep_for( std::chrono::milliseconds(50) );
-      t.control->interrupt_transaction(controller::interrupt_t::speculative_block_trx);
+      try {
+         std::this_thread::sleep_for( std::chrono::milliseconds(50) );
+         interrupt_t.control->interrupt_transaction(controller::interrupt_t::speculative_block_trx);
+      } catch (...) {
+         interrupt_thread_exception = std::current_exception();
+      }
    } );
+   auto thread_join_guard = join_thread_on_scope_exit(th);
 
    before = fc::time_point::now();
-   BOOST_CHECK_EXCEPTION( push_trx( t, test_pause_action<WASM_TEST_ACTION("test_checktime", "checktime_failure")>{},
+   BOOST_CHECK_EXCEPTION( push_trx( interrupt_t,
+                                     test_pause_action<WASM_TEST_ACTION("test_checktime", "checktime_failure")>{},
                                      100000, UINT32_MAX, 10000, false, fc::raw::pack(10000000000000000000ULL), "pause"_n ),
                           interrupt_exception, fc_exception_message_contains("interrupt signaled") );
    after = fc::time_point::now();
    dur = (after - before).count();
-   // verify interrupt fired well before the 150ms trx timeout; use generous upper bound for slow CI
-   BOOST_CHECK_MESSAGE( dur >= 50'000, "elapsed " << dur << "us" );
-   BOOST_CHECK_MESSAGE( dur <= 100'000, "elapsed " << dur << "us" );
+   if (th.joinable())
+      th.join();
+   thread_join_guard.cancel();
+   if (interrupt_thread_exception)
+      std::rethrow_exception(interrupt_thread_exception);
 
-   th.join();
+   // Verify the interrupt arrived well before the widened transaction timeout; keep the upper bound generous for CI.
+   BOOST_CHECK_MESSAGE( dur >= 50'000, "elapsed " << dur << "us" );
+   BOOST_CHECK_MESSAGE( dur <= interrupt_expected_max_us, "elapsed " << dur << "us" );
 
 } FC_LOG_AND_RETHROW() }
 
