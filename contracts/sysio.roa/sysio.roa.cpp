@@ -913,6 +913,52 @@ namespace sysio {
 
         return new_username;
     }
+
+    void roa::newnameduser(const name& account, const public_key& pubkey, uint8_t tier) {
+        // Dispatched by the OPP depot (sysio.msgch) in the NFT node-owner claim flow, the same way
+        // as nodeownreg: msgch sends this inline declaring {sysio.roa, active}, accepted via the
+        // msgch@sysio.code delegation on sysio.roa.active wired at bootstrap.
+        require_auth(get_self());
+
+        roastate_t roastate(get_self());
+        auto state = roastate.get();
+        check(state.is_active, "ROA is not active yet");
+
+        // Idempotent: if the account already exists, the create step is already done. A key or tier
+        // mismatch on a pre-existing account is caught downstream by nodeownreg's soft-fail.
+        if (is_account(account)) return;
+
+        // Tier-based name rules. The claim DApp pre-validates names, so a bad one here means a depot
+        // bug -> abort. Charset ([a-z1-5.]) is already enforced by the name type. Tier-1 owners take
+        // a short 2-6 char prefix (their sub-accounts become <prefix>.<random>); tier 2/3 take a
+        // full-length vanity name.
+        check(tier >= 1 && tier <= 3, "Tier level must be between 1 and 3");
+        size_t len = account.length();
+        if (tier == 1) {
+            check(len >= 2 && len <= 6, "Tier-1 owner name must be a 2-6 character prefix");
+        } else {
+            check(len >= 1 && len <= 12, "Name must be 1-12 characters");
+        }
+
+        // Create the account with the holder's K1 key as both owner and active.
+        auto auth = sysiosystem::authority{1, {{pubkey, 1}}, {}};
+        action(permission_level{get_self(), "active"_n}, "sysio"_n, "newaccount"_n,
+               std::make_tuple(get_self(), account, auth, auth)).send();
+
+        // Fund the fixed newaccount_ram from sysio's pool (same model as newuser): bucket the RAM
+        // under sysio.acct and draw it from sysio. The inline newaccount's transfer_ram (sysio.system)
+        // moves the matching chain quota from sysio to the new account.
+        auto sys_symbol = state.total_sys.symbol;
+        int64_t ram_weight_amount = sysiosystem::newaccount_ram / state.bytes_per_unit;
+        policies_t policies(get_self(), "sysio"_n.value);
+        auto pol_key = policy_key{"sysio.acct"_n.value};
+        policies.get(pol_key, "Missing sysio.acct policy");
+        policies.modify(get_self(), pol_key, [&](auto& row) {
+            row.ram_weight.amount += ram_weight_amount;
+        });
+        increase_reslimit("sysio.acct"_n, {0, sys_symbol}, {0, sys_symbol}, sysiosystem::newaccount_ram, true);
+        decrease_reslimit("sysio"_n, sysiosystem::newaccount_ram);
+    }
 };
 
 // namespace roa

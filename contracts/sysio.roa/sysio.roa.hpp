@@ -159,6 +159,22 @@ namespace sysio {
             name newuser(const name& creator, const name& nonce, const public_key& pubkey);
 
             /**
+             * @brief Create a node-owner account with a user-chosen (vanity) name and the holder's
+             * K1 key as owner/active, funded with the fixed newaccount_ram from sysio's pool. The
+             * create step of the OPP NFT claim flow (create -> createlink -> nodeownreg).
+             *
+             * Dispatched by the OPP depot (sysio.msgch) as {sysio.roa, active} via delegation, like
+             * nodeownreg. Idempotent: a no-op if the account already exists. Tier-based name rules:
+             * tier-1 = 2-6 char prefix; tier 2/3 = up to 12 chars.
+             *
+             * @param account The user-chosen account name.
+             * @param pubkey  The holder's K1 public key (becomes owner and active).
+             * @param tier    Node-owner tier 1/2/3 (selects the name-length rule).
+             */
+            [[sysio::action]]
+            void newnameduser(const name& account, const public_key& pubkey, uint8_t tier);
+
+            /**
              * @brief Gifts an account exactly the RAM consumed since `usage_before`.
              *
              * Called by sysio.authex after createlink adds an external-chain key to an

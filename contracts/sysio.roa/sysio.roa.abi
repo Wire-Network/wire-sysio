@@ -152,6 +152,24 @@
             ]
         },
         {
+            "name": "newnameduser",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "pubkey",
+                    "type": "public_key"
+                },
+                {
+                    "name": "tier",
+                    "type": "uint8"
+                }
+            ]
+        },
+        {
             "name": "newuser",
             "base": "",
             "fields": [
@@ -541,6 +559,11 @@
         {
             "name": "initnodereg",
             "type": "initnodereg",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "newnameduser",
+            "type": "newnameduser",
             "ricardian_contract": ""
         },
         {

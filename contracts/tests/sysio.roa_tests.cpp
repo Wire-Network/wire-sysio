@@ -1415,4 +1415,41 @@ BOOST_FIXTURE_TEST_CASE( setsysabi_gifts_exact_from_sysio, sysio_roa_tester ) tr
    BOOST_REQUIRE_EQUAL( sysio_q0 - sysio_q1, delta );  // conserving: gift came out of sysio's pool
 } FC_LOG_AND_RETHROW()
 
+// ---- newnameduser: depot-created vanity-named account, funded from sysio ----
+
+BOOST_FIXTURE_TEST_CASE( newnameduser_creates_funds_idempotent, sysio_roa_tester ) try {
+   auto& rlm = control->get_resource_limits_manager();
+   int64_t n, cpu;
+   int64_t sysio_q0;  rlm.get_account_limits("sysio"_n, sysio_q0, n, cpu);
+
+   auto pub = get_public_key("alice"_n, "owner");  // stand-in for the holder's K1 key
+   BOOST_REQUIRE_EQUAL( success(),
+      push_action(ROA, "newnameduser"_n, mvo()("account","vanityname")("pubkey",pub)("tier",2)) );
+   produce_blocks();
+
+   // account exists and was funded the fixed newaccount_ram out of sysio's pool (chain quota)
+   BOOST_REQUIRE( rlm.get_account_ram_usage("vanityname"_n) >= 0 );
+   int64_t sysio_q1;  rlm.get_account_limits("sysio"_n, sysio_q1, n, cpu);
+   BOOST_REQUIRE_EQUAL( sysio_q0 - sysio_q1, (int64_t)newaccount_ram );
+
+   // idempotent: re-calling on the existing account is a no-op (no error, no double-fund)
+   BOOST_REQUIRE_EQUAL( success(),
+      push_action(ROA, "newnameduser"_n, mvo()("account","vanityname")("pubkey",pub)("tier",2)) );
+   produce_blocks();
+   int64_t sysio_q2;  rlm.get_account_limits("sysio"_n, sysio_q2, n, cpu);
+   BOOST_REQUIRE_EQUAL( sysio_q1, sysio_q2 );
+} FC_LOG_AND_RETHROW()
+
+// tier-1 owner names must be a 2-6 char prefix; tier 2/3 up to 12.
+BOOST_FIXTURE_TEST_CASE( newnameduser_tier_name_rules, sysio_roa_tester ) try {
+   auto pub = get_public_key("alice"_n, "owner");
+   // tier-1 name longer than 6 chars rejected
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: Tier-1 owner name must be a 2-6 character prefix"),
+      push_action(ROA, "newnameduser"_n, mvo()("account","toolongt1")("pubkey",pub)("tier",1)) );
+   // tier-1 short prefix accepted
+   BOOST_REQUIRE_EQUAL( success(),
+      push_action(ROA, "newnameduser"_n, mvo()("account","acme")("pubkey",pub)("tier",1)) );
+} FC_LOG_AND_RETHROW()
+
 BOOST_AUTO_TEST_SUITE_END()
