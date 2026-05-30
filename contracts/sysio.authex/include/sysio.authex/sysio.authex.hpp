@@ -215,15 +215,6 @@ namespace sysio {
         const sysio::public_key &pub_key,
         const uint64_t nonce);
 
-    /**
-     * @brief Listens for notifications from sysio contract when 'auth.ext' permission is removed from a users account. Upon receiving a notify (from sysio's 'deleteauth'), the link table is updated to reflect the change.
-     *
-     * @param account       the account name of the user which had the permission removed.
-     * @param permission    the permission which was removed.
-     */
-    [[sysio::on_notify("sysio::deleteauth")]]
-    void onmanualrmv(const name& account, const name& permission);
-
     // ! For testing only, remove before MAINNET deployment.
     [[sysio::action]] void clearlinks();
 

@@ -158,6 +158,21 @@ namespace sysio {
             [[sysio::action]]
             name newuser(const name& creator, const name& nonce, const public_key& pubkey);
 
+            /**
+             * @brief Gifts an account exactly the RAM consumed since `usage_before`.
+             *
+             * Called by sysio.authex after createlink adds an external-chain key to an
+             * account's `active` permission: it gifts `get_ram_usage(account) - usage_before`
+             * (drawn from sysio's pool), so each link adds only the RAM it actually used.
+             * RAM is checked at transaction end, so usage already reflects the key-add when
+             * this runs. Callable only by `sysio.authex`.
+             *
+             * @param account      The account to receive the RAM.
+             * @param usage_before The account's `get_ram_usage` snapshot before the key-add.
+             */
+            [[sysio::action]]
+            void giftram(const name& account, int64_t usage_before);
+
         private:
 
             /**

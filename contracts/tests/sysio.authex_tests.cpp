@@ -2,7 +2,9 @@
 #include <sysio/testing/tester.hpp>
 #include <sysio/chain/abi_serializer.hpp>
 #include <sysio/chain/authorization_manager.hpp>
+#include <sysio/chain/resource_limits.hpp>
 #include "contracts.hpp"
+#include <test_contracts.hpp>
 
 #include <fc/variant_object.hpp>
 #include <fc/crypto/hex.hpp>
@@ -61,6 +63,11 @@ public:
       set_abi( AUTHEX, contracts::authex_abi().data() );
       set_privileged( AUTHEX );
 
+      // sysio.system provides the `expandauth` action that createlink uses to add the
+      // ETH key to `active`. (sysio.roa is already deployed + activated by the base tester.)
+      set_code( "sysio"_n, test_contracts::sysio_system_wasm() );
+      set_abi(  "sysio"_n, test_contracts::sysio_system_abi() );
+
       produce_blocks();
 
       const auto* accnt = control->find_account_metadata( AUTHEX );
@@ -68,6 +75,8 @@ public:
       abi_def abi;
       BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt->abi, abi), true);
       abi_ser.set_abi(abi, abi_serializer::create_yield_function(abi_serializer_max_time));
+      // Note: the base tester already gives created accounts a ROA reslimit, so
+      // createlink's per-link RAM gift (roa::giftram) has a reslimit to grow.
    }
 
    action_result push_action( const account_name& signer, const action_name& name, const variant_object& data ) {
@@ -197,16 +206,39 @@ BOOST_FIXTURE_TEST_CASE( createlink_eth_success, sysio_authex_tester ) try {
    BOOST_REQUIRE_EQUAL( success(), createlink("alice"_n, ChainKind::CHAIN_KIND_EVM, "alice", link.sig, link.pub, link.nonce) );
    produce_blocks();
 
-   // Verify that alice now has a permission named "ex.eth" with the linked public key
+   // The ETH key is now added to `active` (no dedicated `ex.*` permission anymore).
    auto& auth_mgr = control->get_authorization_manager();
-   const auto* perm = auth_mgr.find_permission({"alice"_n, "ex.eth"_n});
-   BOOST_REQUIRE( perm != nullptr );
+   const auto* active = auth_mgr.find_permission({"alice"_n, "active"_n});
+   BOOST_REQUIRE( active != nullptr );
+   auto auth = active->auth.to_authority();
+   BOOST_TEST_MESSAGE("[ACTIVE] keys=" << auth.keys.size() << "  link.pub=" << fc::variant(link.pub).as_string());
+   for (const auto& kw : auth.keys) BOOST_TEST_MESSAGE("   active key: " << fc::variant(kw.key).as_string());
+   bool eth_in_active = false;
+   for (const auto& kw : auth.keys) { if (kw.key == link.pub) { eth_in_active = true; break; } }
+   BOOST_CHECK( eth_in_active );  // diagnostic — tighten once the dump is understood
+   // No `ex.eth` permission is created anymore.
+   BOOST_REQUIRE( auth_mgr.find_permission({"alice"_n, "ex.eth"_n}) == nullptr );
+} FC_LOG_AND_RETHROW()
 
-   auto auth = perm->auth.to_authority();
-   BOOST_REQUIRE_EQUAL( auth.keys.size(), 1u );
-   BOOST_REQUIRE_EQUAL( auth.keys[0].key, link.pub );
-   BOOST_REQUIRE_EQUAL( auth.keys[0].weight, 1u );
-   BOOST_REQUIRE_EQUAL( auth.threshold, 1u );
+// ——— createlink: per-link RAM gift measurement ———
+
+BOOST_FIXTURE_TEST_CASE( createlink_ram_gift_measure, sysio_authex_tester ) try {
+   auto& rlm = control->get_resource_limits_manager();
+   int64_t q0, net, cpu;
+   rlm.get_account_limits("alice"_n, q0, net, cpu);
+   int64_t u0 = rlm.get_account_ram_usage("alice"_n);
+
+   auto link = make_eth_link("alice", now_ms());
+   BOOST_REQUIRE_EQUAL( success(), createlink("alice"_n, ChainKind::CHAIN_KIND_EVM, "alice", link.sig, link.pub, link.nonce) );
+   produce_blocks();
+
+   int64_t q1;
+   rlm.get_account_limits("alice"_n, q1, net, cpu);
+   int64_t u1 = rlm.get_account_ram_usage("alice"_n);
+   BOOST_TEST_MESSAGE("[RAM] createlink eth: usage delta " << (u1 - u0)
+      << " B; gift " << (q1 - q0) << " B");
+   BOOST_REQUIRE_EQUAL( q1 - q0, u1 - u0 );  // gift exactly covers the per-link usage
+   BOOST_REQUIRE( u1 <= q1 );                 // account ends within quota
 } FC_LOG_AND_RETHROW()
 
 // ——— createlink: duplicate pubkey ———

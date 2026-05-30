@@ -199,6 +199,28 @@ namespace sysio {
         }
     }
 
+    void roa::giftram(const name& account, int64_t usage_before) {
+        require_auth("sysio.authex"_n);
+        check(is_account(account), "account does not exist");
+
+        // Gift exactly the RAM the caller's preceding action consumed on `account`
+        // (e.g. createlink adding an external key to `active`). RAM is checked at
+        // transaction end, so usage already reflects that growth when this runs.
+        int64_t delta = get_ram_usage(account) - usage_before;
+        check(delta >= 0, "ram usage did not increase");
+        if (delta == 0) return;
+
+        roastate_t roastate(get_self());
+        auto state = roastate.get();
+        check(state.is_active, "ROA is not active yet");
+        auto sym = state.total_sys.symbol;
+
+        // ROA bookkeeping + chain quota, drawn from sysio's pool (mirrors newaccount gifting).
+        increase_reslimit(account, asset(0, sym), asset(0, sym), delta, true);
+        add_system_resources(account, 0, 0, delta);
+        decrease_reslimit("sysio"_n, delta);
+    }
+
     void roa::addpolicy(const name& owner, const name& issuer, const asset& net_weight, const asset& cpu_weight, const asset& ram_weight,
                         const uint32_t& time_block, const uint8_t& network_gen)
     {
