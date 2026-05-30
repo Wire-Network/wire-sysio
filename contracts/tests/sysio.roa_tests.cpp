@@ -1279,51 +1279,6 @@ BOOST_FIXTURE_TEST_CASE( extendpolicy_blocks_reduce, sysio_roa_full_tester ) try
       expand_roa_policy(node_owners[2], user, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0));
 } FC_LOG_AND_RETHROW()
 
-// =============================================================================
-// finalizereg auth + status validation
-// =============================================================================
-//
-// finalizereg gates registration confirmation/rejection on:
-//   1. require_auth(get_self())     -- only sysio.roa can finalize
-//   2. status == 2 || status == 3   -- "confirm" or "reject"
-//   3. roa state.is_active          -- ROA must be activated
-//   4. record exists in nodeownerreg + record.status == 1 (PENDING)
-//
-// These tests cover (1), (2), and (4). The full setpending->finalizereg happy
-// path requires the auth.ext signed flow and is left to a follow-up; once
-// that fixture is in place, add coverage for confirm + reject + tier carry-
-// through to the inline addnodeowner.
-
-BOOST_FIXTURE_TEST_CASE( finalizereg_requires_self_auth, sysio_roa_full_tester ) try {
-   // Non-self caller is rejected before any state check.
-   auto result = push_action("alice"_n, "finalizereg"_n,
-      mvo()("owner", "alice"_n)("status", uint8_t(2)) );
-   BOOST_REQUIRE_EQUAL( error("missing authority of sysio.roa"), result );
-} FC_LOG_AND_RETHROW()
-
-BOOST_FIXTURE_TEST_CASE( finalizereg_rejects_invalid_status, sysio_roa_full_tester ) try {
-   // Status validation runs before record-existence check, so we don't need
-   // a real PENDING row to exercise these. uint8_t allows 0..255; the check
-   // accepts only 2 (confirm) and 3 (reject). Everything else must error.
-   for (uint8_t bad_status : { uint8_t(0), uint8_t(1), uint8_t(4), uint8_t(255) }) {
-      auto result = push_action(ROA, "finalizereg"_n,
-         mvo()("owner", "alice"_n)("status", bad_status) );
-      BOOST_REQUIRE_EQUAL(
-         error("assertion failure with message: Invalid status: Can only confirm (2) or reject (3)"),
-         result );
-   }
-} FC_LOG_AND_RETHROW()
-
-BOOST_FIXTURE_TEST_CASE( finalizereg_rejects_missing_record, sysio_roa_full_tester ) try {
-   // Auth + status + is_active all pass, but no nodeownerreg row exists for
-   // "norecord"_n. Must error explicitly rather than silently no-op.
-   auto result = push_action(ROA, "finalizereg"_n,
-      mvo()("owner", "norecord"_n)("status", uint8_t(2)) );
-   BOOST_REQUIRE_EQUAL(
-      error("assertion failure with message: No registration record found"),
-      result );
-} FC_LOG_AND_RETHROW()
-
 // ---- setsyscode / setsysabi: exact, conserving, bidirectional RAM from sysio ----
 
 // setsyscode deploys code, makes the account privileged, and gifts exactly the RAM the code

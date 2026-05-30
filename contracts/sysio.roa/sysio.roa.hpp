@@ -99,37 +99,6 @@ namespace sysio {
             void reducepolicy(const name& owner, const name& issuer, const asset& net_weight, const asset& cpu_weight, const asset& ram_weight, const uint8_t& network_gen);
 
 
-            /**
-             * @brief Initiates the node registration process.
-             *
-             * @param owner The account name of the node owner.
-             * @param tier Tier level of the node owner.
-             */
-            [[sysio::action]]
-            void initnodereg(const name& owner);
-
-
-            /**
-             * @brief After the Node Owner deposits their Wire-Node NFT to the NodeMan contract on Ethereum this action is called to update their intent with the transaction ID and Signature of the Eth Deposit setting the status of their registration to pending (1)
-             *
-             * @param owner The account name of the node owner.
-             * @param tier The tier level of the node owner.
-             * @param trx_id The transaction ID of the transaction on Ethereum.
-             * @param block_num The block number on ETH that the deposit was in.
-             * @param sig The signature of the Ethereum deposit
-             */
-            [[sysio::action]]
-            void setpending(const name& owner, const uint8_t& tier ,const checksum256& trx_id, const uint128_t& block_num, const bytes& sig);
-
-            /**
-             * @brief Finalizes registration process.
-             *
-             * @param owner Account name of the node owner.
-             * @param status Status of deposit state: 2-> CONFIRMED / 3-> REJECTED
-             */
-            [[sysio::action]]
-            void finalizereg(const name& owner,const uint8_t& status);
-
             [[sysio::action]]
             void forcereg(const name& owner, const uint8_t& tier);
 
