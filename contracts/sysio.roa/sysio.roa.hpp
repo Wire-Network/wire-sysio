@@ -164,14 +164,40 @@ namespace sysio {
              * Called by sysio.authex after createlink adds an external-chain key to an
              * account's `active` permission: it gifts `get_ram_usage(account) - usage_before`
              * (drawn from sysio's pool), so each link adds only the RAM it actually used.
-             * RAM is checked at transaction end, so usage already reflects the key-add when
-             * this runs. Callable only by `sysio.authex`.
+             * RAM is checked at transaction end, so usage already reflects the change when this
+             * runs. The reconciliation is bidirectional: `delta > 0` gifts from sysio's pool,
+             * `delta < 0` reclaims back to it (e.g. re-deploying a smaller contract). Callable by
+             * `sysio.authex` (createlink) or `sysio.roa` itself (setsyscode/setsysabi).
              *
-             * @param account      The account to receive the RAM.
-             * @param usage_before The account's `get_ram_usage` snapshot before the key-add.
+             * @param account      The account to reconcile.
+             * @param usage_before The account's `get_ram_usage` snapshot before the change.
              */
             [[sysio::action]]
             void giftram(const name& account, int64_t usage_before);
+
+            /**
+             * @brief Deploy a system contract's code to `account`, making it privileged, and gift
+             * the exact RAM the code consumes out of sysio's pool (via giftram, measured after).
+             * Re-callable: a smaller re-deploy reclaims the freed RAM. Callable by `sysio`.
+             *
+             * @param account   The account to set code on.
+             * @param vmtype    VM type (0 for wasm).
+             * @param vmversion VM version (0).
+             * @param code      The contract wasm bytes.
+             */
+            [[sysio::action]]
+            void setsyscode(const name& account, uint8_t vmtype, uint8_t vmversion, const bytes& code);
+
+            /**
+             * @brief Set a system contract's abi on `account` and gift the exact RAM it consumes
+             * out of sysio's pool (via giftram, measured after). Re-callable: a smaller/cleared abi
+             * reclaims the freed RAM. Callable by `sysio`.
+             *
+             * @param account The account to set the abi on.
+             * @param abi     The serialized abi bytes.
+             */
+            [[sysio::action]]
+            void setsysabi(const name& account, const bytes& abi);
 
         private:
 

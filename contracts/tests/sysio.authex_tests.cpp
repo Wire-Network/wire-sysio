@@ -227,6 +227,9 @@ BOOST_FIXTURE_TEST_CASE( createlink_ram_gift_measure, sysio_authex_tester ) try 
    int64_t q0, net, cpu;
    rlm.get_account_limits("alice"_n, q0, net, cpu);
    int64_t u0 = rlm.get_account_ram_usage("alice"_n);
+   // sysio's chain quota is the account-RAM pool the gift must be drawn from.
+   int64_t sysio_q0, snet, scpu;
+   rlm.get_account_limits("sysio"_n, sysio_q0, snet, scpu);
 
    auto link = make_eth_link("alice", now_ms());
    BOOST_REQUIRE_EQUAL( success(), createlink("alice"_n, ChainKind::CHAIN_KIND_EVM, "alice", link.sig, link.pub, link.nonce) );
@@ -235,10 +238,15 @@ BOOST_FIXTURE_TEST_CASE( createlink_ram_gift_measure, sysio_authex_tester ) try 
    int64_t q1;
    rlm.get_account_limits("alice"_n, q1, net, cpu);
    int64_t u1 = rlm.get_account_ram_usage("alice"_n);
+   int64_t sysio_q1;
+   rlm.get_account_limits("sysio"_n, sysio_q1, snet, scpu);
    BOOST_TEST_MESSAGE("[RAM] createlink eth: usage delta " << (u1 - u0)
-      << " B; gift " << (q1 - q0) << " B");
-   BOOST_REQUIRE_EQUAL( q1 - q0, u1 - u0 );  // gift exactly covers the per-link usage
-   BOOST_REQUIRE( u1 <= q1 );                 // account ends within quota
+      << " B; gift " << (q1 - q0) << " B; sysio pool delta " << (sysio_q1 - sysio_q0) << " B");
+   BOOST_REQUIRE_EQUAL( q1 - q0, u1 - u0 );        // gift exactly covers the per-link usage
+   BOOST_REQUIRE( u1 <= q1 );                       // account ends within quota
+   // Conservation: the gift is a transfer out of sysio's pool, not a fresh mint —
+   // sysio loses exactly what alice gains, so total chain RAM is unchanged.
+   BOOST_REQUIRE_EQUAL( sysio_q0 - sysio_q1, q1 - q0 );
 } FC_LOG_AND_RETHROW()
 
 // ——— createlink: duplicate pubkey ———

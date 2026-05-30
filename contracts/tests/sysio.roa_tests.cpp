@@ -1324,4 +1324,95 @@ BOOST_FIXTURE_TEST_CASE( finalizereg_rejects_missing_record, sysio_roa_full_test
       result );
 } FC_LOG_AND_RETHROW()
 
+// ---- setsyscode / setsysabi: exact, conserving, bidirectional RAM from sysio ----
+
+// setsyscode deploys code, makes the account privileged, and gifts exactly the RAM the code
+// consumes out of sysio's pool (a conserving transfer, not a mint).
+BOOST_FIXTURE_TEST_CASE( setsyscode_gifts_exact_from_sysio, sysio_roa_tester ) try {
+   // System-contract targets always have a finite ROA quota in prod; give alice one.
+   BOOST_REQUIRE_EQUAL( success(), regnodeowner("alice"_n, 1) );
+   produce_blocks();
+
+   auto& rlm = control->get_resource_limits_manager();
+   int64_t n, cpu;
+   int64_t sysio_q0;  rlm.get_account_limits("sysio"_n, sysio_q0, n, cpu);
+   int64_t alice_q0;  rlm.get_account_limits("alice"_n, alice_q0, n, cpu);
+   int64_t alice_u0 = rlm.get_account_ram_usage("alice"_n);
+   int64_t sysio_res0 = get_reslimit("sysio"_n)["ram_bytes"].as<int64_t>();
+   int64_t acct_res0  = get_reslimit("sysio.acct"_n)["ram_bytes"].as<int64_t>();
+
+   auto wasm = test_contracts::sysio_token_wasm();
+   BOOST_REQUIRE_EQUAL( success(),
+      push_action(config::system_account_name, "setsyscode"_n, mvo()
+         ("account","alice")("vmtype",0)("vmversion",0)("code", bytes(wasm.begin(), wasm.end()))) );
+   produce_blocks();
+
+   int64_t delta = rlm.get_account_ram_usage("alice"_n) - alice_u0;
+   BOOST_REQUIRE_GT( delta, 0 );
+
+   // account is now privileged
+   const auto* meta = control->find_account_metadata("alice"_n);
+   BOOST_REQUIRE( meta != nullptr && meta->is_privileged() );
+
+   // exact gift to alice
+   int64_t alice_q1;  rlm.get_account_limits("alice"_n, alice_q1, n, cpu);
+   BOOST_REQUIRE_EQUAL( alice_q1 - alice_q0, delta );
+
+   // conserving transfer out of sysio: chain quota + reslimit pool drop by delta, sysio.acct bucket rises
+   int64_t sysio_q1;  rlm.get_account_limits("sysio"_n, sysio_q1, n, cpu);
+   BOOST_REQUIRE_EQUAL( sysio_q0 - sysio_q1, delta );
+   BOOST_REQUIRE_EQUAL( sysio_res0 - get_reslimit("sysio"_n)["ram_bytes"].as<int64_t>(), delta );
+   BOOST_REQUIRE_EQUAL( get_reslimit("sysio.acct"_n)["ram_bytes"].as<int64_t>() - acct_res0, delta );
+} FC_LOG_AND_RETHROW()
+
+// Re-deploying a smaller contract reclaims the freed RAM back to sysio's pool (delta < 0).
+BOOST_FIXTURE_TEST_CASE( setsyscode_redeploy_reclaims_to_sysio, sysio_roa_tester ) try {
+   BOOST_REQUIRE_EQUAL( success(), regnodeowner("alice"_n, 1) );
+   produce_blocks();
+   auto& rlm = control->get_resource_limits_manager();
+   int64_t n, cpu;
+
+   auto big = test_contracts::sysio_system_wasm();
+   BOOST_REQUIRE_EQUAL( success(),
+      push_action(config::system_account_name, "setsyscode"_n, mvo()
+         ("account","alice")("vmtype",0)("vmversion",0)("code", bytes(big.begin(), big.end()))) );
+   produce_blocks();
+   int64_t sysio_q_mid;  rlm.get_account_limits("sysio"_n, sysio_q_mid, n, cpu);
+   int64_t alice_u_mid = rlm.get_account_ram_usage("alice"_n);
+
+   auto small = test_contracts::noop_wasm();
+   BOOST_REQUIRE_EQUAL( success(),
+      push_action(config::system_account_name, "setsyscode"_n, mvo()
+         ("account","alice")("vmtype",0)("vmversion",0)("code", bytes(small.begin(), small.end()))) );
+   produce_blocks();
+
+   int64_t reclaimed = alice_u_mid - rlm.get_account_ram_usage("alice"_n);
+   BOOST_REQUIRE_GT( reclaimed, 0 );  // usage dropped
+   int64_t sysio_q_end;  rlm.get_account_limits("sysio"_n, sysio_q_end, n, cpu);
+   BOOST_REQUIRE_EQUAL( sysio_q_end - sysio_q_mid, reclaimed );  // sysio pool recovered exactly the freed bytes
+} FC_LOG_AND_RETHROW()
+
+// setsysabi gifts the exact abi RAM out of sysio's pool too.
+BOOST_FIXTURE_TEST_CASE( setsysabi_gifts_exact_from_sysio, sysio_roa_tester ) try {
+   BOOST_REQUIRE_EQUAL( success(), regnodeowner("alice"_n, 1) );
+   produce_blocks();
+   auto& rlm = control->get_resource_limits_manager();
+   int64_t n, cpu;
+   int64_t sysio_q0;  rlm.get_account_limits("sysio"_n, sysio_q0, n, cpu);
+   int64_t alice_u0 = rlm.get_account_ram_usage("alice"_n);
+
+   // setabi expects a packed abi_def, not the json text.
+   abi_def def = fc::json::from_string(test_contracts::sysio_token_abi()).as<abi_def>();
+   auto packed = fc::raw::pack(def);
+   BOOST_REQUIRE_EQUAL( success(),
+      push_action(config::system_account_name, "setsysabi"_n, mvo()
+         ("account","alice")("abi", packed)) );
+   produce_blocks();
+
+   int64_t delta = rlm.get_account_ram_usage("alice"_n) - alice_u0;
+   BOOST_REQUIRE_GT( delta, 0 );
+   int64_t sysio_q1;  rlm.get_account_limits("sysio"_n, sysio_q1, n, cpu);
+   BOOST_REQUIRE_EQUAL( sysio_q0 - sysio_q1, delta );  // conserving: gift came out of sysio's pool
+} FC_LOG_AND_RETHROW()
+
 BOOST_AUTO_TEST_SUITE_END()

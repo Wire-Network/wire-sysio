@@ -418,6 +418,42 @@
             ]
         },
         {
+            "name": "setsysabi",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "abi",
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
+            "name": "setsyscode",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "vmtype",
+                    "type": "uint8"
+                },
+                {
+                    "name": "vmversion",
+                    "type": "uint8"
+                },
+                {
+                    "name": "code",
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
             "name": "sponsor",
             "base": "",
             "fields": [
@@ -525,6 +561,16 @@
         {
             "name": "setpending",
             "type": "setpending",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "setsysabi",
+            "type": "setsysabi",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "setsyscode",
+            "type": "setsyscode",
             "ricardian_contract": ""
         }
     ],
