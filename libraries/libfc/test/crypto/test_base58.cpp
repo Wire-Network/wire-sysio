@@ -172,4 +172,35 @@ BOOST_AUTO_TEST_CASE(from_base58_into_undersized_buffer_throws) {
    BOOST_CHECK_THROW(fc::from_base58(b58, buf.data(), buf.size()), fc::assert_exception);
 }
 
+BOOST_AUTO_TEST_CASE(to_base58_invokes_yield_even_for_small_inputs) {
+   // Deadline-bound callers (e.g. abi_serializer) pass a yield that throws
+   // once a deadline expires, and rely on to_base58 invoking it so an
+   // already-expired deadline is observed. The in-loop yield only fires
+   // every 64 input bytes and sits after the leading-zero skip, so key-,
+   // signature-, empty-, and all-zero-sized inputs must be covered by the
+   // unconditional entry/exit yields.
+   const auto count_yields = [](const std::vector<char>& in) {
+      int calls = 0;
+      fc::to_base58(in.data(), in.size(), fc::yield_function_t{[&calls]() { ++calls; }});
+      return calls;
+   };
+
+   // 32-byte private key: well under the 64-byte in-loop cadence.
+   BOOST_CHECK_GT(count_yields(std::vector<char>(32, char{0x11})), 0);
+   // 65-byte signature: still under two full cadence intervals.
+   BOOST_CHECK_GT(count_yields(std::vector<char>(65, char{0x22})), 0);
+   // Empty input: the conversion loop never runs.
+   BOOST_CHECK_GT(count_yields(std::vector<char>{}), 0);
+   // All-zero input: every byte is skipped before the loop, so the
+   // in-loop yield is unreachable.
+   BOOST_CHECK_GT(count_yields(std::vector<char>(40, char{0})), 0);
+
+   // A large non-zero input must additionally hit the periodic in-loop
+   // yield, so it observes a deadline that expires mid-encode rather than
+   // only at entry/exit.
+   const int small_calls = count_yields(std::vector<char>(32, char{0x11}));
+   const int large_calls = count_yields(std::vector<char>(256, char{0x33}));
+   BOOST_CHECK_GT(large_calls, small_calls);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

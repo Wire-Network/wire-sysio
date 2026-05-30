@@ -62,11 +62,19 @@ constexpr int8_t b58_reverse[256] = {
 /// the partial quotient in base58. Leading zero bytes in the input are
 /// preserved as leading '1' characters in the output.
 ///
-/// `yield` is invoked periodically so a deadline-bound caller
-/// (abi_serializer with a deadline yield) can interrupt the O(n*m)
-/// loop before it finishes on attacker-controlled large inputs.
-std::string encode_base58(const unsigned char* pbegin, const unsigned char* pend,
+/// `yield` is invoked unconditionally on entry and again after the
+/// conversion loop, plus periodically inside the loop. A deadline-bound
+/// caller (abi_serializer with a deadline yield) can therefore interrupt
+/// even small key/signature encodes -- whose input length never reaches
+/// the in-loop yield cadence and whose leading-zero bytes are skipped
+/// before the loop -- and can abort the O(n*m) encode of an
+/// attacker-controlled large input partway through.
+std::string encode_base58(const char* pbegin, const char* pend,
                           const fc::yield_function_t& yield) {
+   // Honor an already-expired deadline before doing any work. Small
+   // inputs (32/33/65-byte keys and signatures) and all-zero inputs
+   // would otherwise reach no yield site at all.
+   yield();
    size_t zeroes = 0;
    while (pbegin != pend && *pbegin == 0) {
       ++pbegin;
@@ -80,7 +88,7 @@ std::string encode_base58(const unsigned char* pbegin, const unsigned char* pend
    while (pbegin != pend) {
       if ((++outer & 0x3F) == 0) // every 64 input bytes
          yield();
-      int carry = *pbegin;
+      int carry = static_cast<unsigned char>(*pbegin);
       size_t i = 0;
       // b58 = b58 * 256 + carry, walking from least to most significant digit.
       for (auto it = b58.rbegin(); (carry != 0 || i < length) && it != b58.rend(); ++it, ++i) {
@@ -92,6 +100,10 @@ std::string encode_base58(const unsigned char* pbegin, const unsigned char* pend
       length = i;
       ++pbegin;
    }
+   // Final deadline checkpoint: the in-loop yield only fires on multiples
+   // of the cadence, so a deadline that expired late in a non-multiple
+   // length is observed here before the result propagates.
+   yield();
    auto it = b58.begin() + (size - length);
    while (it != b58.end() && *it == 0)
       ++it;
@@ -156,8 +168,7 @@ bool decode_base58(const char* psz, std::vector<unsigned char>& vch) {
 namespace fc {
 
 std::string to_base58(const char* d, size_t s, const fc::yield_function_t& yield) {
-   const auto* p = reinterpret_cast<const unsigned char*>(d);
-   return encode_base58(p, p + s, yield);
+   return encode_base58(d, d + s, yield);
 }
 
 std::string to_base58(const std::vector<char>& d, const fc::yield_function_t& yield) {
@@ -171,8 +182,9 @@ std::vector<char> from_base58(const std::string& base58_str) {
    if (!decode_base58(base58_str.c_str(), out)) {
       FC_THROW_EXCEPTION(parse_error_exception, "Unable to decode base58 string {}", base58_str);
    }
-   return std::vector<char>(reinterpret_cast<const char*>(out.data()),
-                            reinterpret_cast<const char*>(out.data()) + out.size());
+   // Range constructor converts each unsigned char to char value-by-value,
+   // avoiding a reinterpret_cast of the underlying pointer.
+   return std::vector<char>(out.begin(), out.end());
 }
 
 size_t from_base58(const std::string& base58_str, char* out_data, size_t out_data_len) {
