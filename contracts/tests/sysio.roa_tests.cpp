@@ -138,6 +138,22 @@ public:
       return fc::variant();
    }
 
+   // Read the nodeownerreg audit row (status/reason/tier) written by nodeownreg's soft-fail path.
+   fc::variant get_nodeownerreg( account_name acc )
+   {
+      const auto& db = control->db();
+      auto key = make_kv_scoped_key(static_cast<uint64_t>(NETWORK_GEN), acc.to_uint64_t());
+      const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
+      auto it = kv_idx.find(boost::make_tuple(ROA, compute_table_id(name("nodeownerreg").to_uint64_t()), key.to_string_view()));
+      if (it != kv_idx.end()) {
+         const vector<char> data(it->value.data(), it->value.data() + it->value.size());
+         if (!data.empty()) {
+            return abi_ser.binary_to_variant( "nodeownerreg", data, abi_serializer::create_yield_function(abi_serializer_max_time) );
+         }
+      }
+      return fc::variant();
+   }
+
    fc::variant get_sponsorship( account_name acc, account_name nonce)
    {
       const auto& db = control->db();
@@ -1434,99 +1450,120 @@ public:
       );
    }
 
+   // nodeownerreg status + reject_reason values (mirror sysio.roa.hpp)
+   static constexpr uint64_t CONFIRMED = 2, REJECTED = 3;
+   static constexpr uint64_t R_OWNER_NOT_ACCOUNT = 1, R_NO_AUTHEX_LINK = 2, R_KEY_MISMATCH = 3, R_DUPLICATE = 4;
+
+   // TODO(depot-auth): mirror the real claim flow once createlink accepts depot auth — create the
+   // claim account via newnameduser (finite, sysio-funded) and have the DEPOT push createlink. For
+   // now these tests use the base "alice" account: a freshly-created (newnameduser) account is
+   // funded RAM but 0 NET/CPU, so it cannot push its own createlink ("net usage too high"); the
+   // base account has unlimited RAM + NET/CPU, and giftram correctly no-ops for unlimited RAM.
+
    abi_serializer authex_abi_ser;
 };
 
-// Happy path: ETH link exists and matches -> nodeownreg succeeds
+// Happy path: funded account + matching ETH link -> nodeownreg confirms registration.
 BOOST_FIXTURE_TEST_CASE( nodeownreg_happy_path, sysio_roa_nodeownreg_tester ) try {
+   auto owner = "alice"_n;
    auto link = make_eth_link("alice");
-   BOOST_REQUIRE_EQUAL(success(), createlink("alice"_n, CHAIN_KIND_ETHEREUM, link.sig, link.pub, link.nonce));
+   BOOST_REQUIRE_EQUAL(success(), createlink(owner, CHAIN_KIND_ETHEREUM, link.sig, link.pub, link.nonce));
    produce_blocks();
 
-   BOOST_REQUIRE_EQUAL(success(), nodeownreg("alice"_n, 1, link.pub));
+   BOOST_REQUIRE_EQUAL(success(), nodeownreg(owner, 1, link.pub));
    produce_blocks();
 
-   auto alice_owner = get_nodeowner("alice"_n);
-   BOOST_REQUIRE_EQUAL(alice_owner.is_null(), false);
-   BOOST_REQUIRE_EQUAL(alice_owner["tier"].as<uint32_t>(), 1);
+   auto reg = get_nodeowner(owner);
+   BOOST_REQUIRE_EQUAL(reg.is_null(), false);
+   BOOST_REQUIRE_EQUAL(reg["tier"].as<uint32_t>(), 1);
+   auto audit = get_nodeownerreg(owner);
+   BOOST_REQUIRE_EQUAL(audit.is_null(), false);
+   BOOST_REQUIRE_EQUAL(audit["status"].as<uint64_t>(), CONFIRMED);
 } FC_LOG_AND_RETHROW()
 
-// Wrong ETH pub key -> should fail
+// Wrong ETH key -> soft-fail: REJECTED/KEY_MISMATCH, not registered, no abort.
 BOOST_FIXTURE_TEST_CASE( nodeownreg_wrong_pubkey, sysio_roa_nodeownreg_tester ) try {
+   auto owner = "alice"_n;
    auto link = make_eth_link("alice");
-   BOOST_REQUIRE_EQUAL(success(), createlink("alice"_n, CHAIN_KIND_ETHEREUM, link.sig, link.pub, link.nonce));
+   BOOST_REQUIRE_EQUAL(success(), createlink(owner, CHAIN_KIND_ETHEREUM, link.sig, link.pub, link.nonce));
    produce_blocks();
 
-   // Generate a different key
    auto wrong_key = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em).get_public_key();
+   BOOST_REQUIRE_EQUAL(success(), nodeownreg(owner, 1, wrong_key));
+   produce_blocks();
 
-   BOOST_REQUIRE_EQUAL(
-      error("assertion failure with message: ETH key does not match the linked key for this account"),
-      nodeownreg("alice"_n, 1, wrong_key));
+   BOOST_REQUIRE(get_nodeowner(owner).is_null());
+   auto audit = get_nodeownerreg(owner);
+   BOOST_REQUIRE_EQUAL(audit["status"].as<uint64_t>(), REJECTED);
+   BOOST_REQUIRE_EQUAL(audit["reason"].as<uint64_t>(), R_KEY_MISMATCH);
 } FC_LOG_AND_RETHROW()
 
-// No ETH link -> should fail
+// No ETH link -> soft-fail: REJECTED/NO_AUTHEX_LINK.
 BOOST_FIXTURE_TEST_CASE( nodeownreg_no_link, sysio_roa_nodeownreg_tester ) try {
+   auto owner = "alice"_n;
    auto random_key = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em).get_public_key();
-   BOOST_REQUIRE_EQUAL(
-      error("assertion failure with message: Owner has no ETH link in sysio.authex"),
-      nodeownreg("alice"_n, 1, random_key));
+   BOOST_REQUIRE_EQUAL(success(), nodeownreg(owner, 1, random_key));
+   produce_blocks();
+
+   BOOST_REQUIRE(get_nodeowner(owner).is_null());
+   auto audit = get_nodeownerreg(owner);
+   BOOST_REQUIRE_EQUAL(audit["status"].as<uint64_t>(), REJECTED);
+   BOOST_REQUIRE_EQUAL(audit["reason"].as<uint64_t>(), R_NO_AUTHEX_LINK);
 } FC_LOG_AND_RETHROW()
 
-// Already registered -> should fail
+// Already registered (replay) -> soft-fail: REJECTED/DUPLICATE, no abort.
 BOOST_FIXTURE_TEST_CASE( nodeownreg_already_registered, sysio_roa_nodeownreg_tester ) try {
+   auto owner = "alice"_n;
    auto link = make_eth_link("alice");
-   BOOST_REQUIRE_EQUAL(success(), createlink("alice"_n, CHAIN_KIND_ETHEREUM, link.sig, link.pub, link.nonce));
+   BOOST_REQUIRE_EQUAL(success(), createlink(owner, CHAIN_KIND_ETHEREUM, link.sig, link.pub, link.nonce));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(success(), nodeownreg(owner, 1, link.pub));
    produce_blocks();
 
-   BOOST_REQUIRE_EQUAL(success(), nodeownreg("alice"_n, 1, link.pub));
+   BOOST_REQUIRE_EQUAL(success(), nodeownreg(owner, 2, link.pub));
    produce_blocks();
-
-   BOOST_REQUIRE_EQUAL(
-      error("assertion failure with message: This account is already registered."),
-      nodeownreg("alice"_n, 2, link.pub));
+   auto audit = get_nodeownerreg(owner);
+   BOOST_REQUIRE_EQUAL(audit["status"].as<uint64_t>(), REJECTED);
+   BOOST_REQUIRE_EQUAL(audit["reason"].as<uint64_t>(), R_DUPLICATE);
 } FC_LOG_AND_RETHROW()
 
-// Invalid tier -> should fail
+// Invalid tier is an envelope error (depot misuse) -> hard abort.
 BOOST_FIXTURE_TEST_CASE( nodeownreg_invalid_tier, sysio_roa_nodeownreg_tester ) try {
+   auto owner = "alice"_n;
    auto link = make_eth_link("alice");
-   BOOST_REQUIRE_EQUAL(success(), createlink("alice"_n, CHAIN_KIND_ETHEREUM, link.sig, link.pub, link.nonce));
+   BOOST_REQUIRE_EQUAL(success(), createlink(owner, CHAIN_KIND_ETHEREUM, link.sig, link.pub, link.nonce));
    produce_blocks();
 
    BOOST_REQUIRE_EQUAL(
       error("assertion failure with message: Tier level must be between 1 and 3"),
-      nodeownreg("alice"_n, 0, link.pub));
-
+      nodeownreg(owner, 0, link.pub));
    BOOST_REQUIRE_EQUAL(
       error("assertion failure with message: Tier level must be between 1 and 3"),
-      nodeownreg("alice"_n, 4, link.pub));
+      nodeownreg(owner, 4, link.pub));
 } FC_LOG_AND_RETHROW()
 
-// Non-EM key (K1) -> should be rejected with a clear type error rather than
-// falling through to an equality-mismatch error.
+// Non-EM key is an envelope error (depot misuse) -> hard abort.
 BOOST_FIXTURE_TEST_CASE( nodeownreg_non_em_key, sysio_roa_nodeownreg_tester ) try {
+   auto owner = "alice"_n;
    auto link = make_eth_link("alice");
-   BOOST_REQUIRE_EQUAL(success(), createlink("alice"_n, CHAIN_KIND_ETHEREUM, link.sig, link.pub, link.nonce));
+   BOOST_REQUIRE_EQUAL(success(), createlink(owner, CHAIN_KIND_ETHEREUM, link.sig, link.pub, link.nonce));
    produce_blocks();
 
-   // Pass a K1 (Antelope/EOSIO native) key instead of an EM key.
    auto k1_pub = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::k1).get_public_key();
-
    BOOST_REQUIRE_EQUAL(
       error("assertion failure with message: eth_pub_key must be an EM (secp256k1) public key"),
-      nodeownreg("alice"_n, 1, k1_pub));
+      nodeownreg(owner, 1, k1_pub));
 } FC_LOG_AND_RETHROW()
 
-// Unknown owner account -> should fail
+// Unknown owner -> soft-fail: REJECTED/OWNER_NOT_ACCOUNT.
 BOOST_FIXTURE_TEST_CASE( nodeownreg_owner_not_account, sysio_roa_nodeownreg_tester ) try {
-   auto link = make_eth_link("alice");
-   BOOST_REQUIRE_EQUAL(success(), createlink("alice"_n, CHAIN_KIND_ETHEREUM, link.sig, link.pub, link.nonce));
+   auto k = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em).get_public_key();
+   BOOST_REQUIRE_EQUAL(success(), nodeownreg("ghostuser"_n, 1, k));
    produce_blocks();
 
-   // "ghostuser" is not created by either tester fixture.
-   BOOST_REQUIRE_EQUAL(
-      error("assertion failure with message: Owner account does not exist"),
-      nodeownreg("ghostuser"_n, 1, link.pub));
+   auto audit = get_nodeownerreg("ghostuser"_n);
+   BOOST_REQUIRE_EQUAL(audit["status"].as<uint64_t>(), REJECTED);
+   BOOST_REQUIRE_EQUAL(audit["reason"].as<uint64_t>(), R_OWNER_NOT_ACCOUNT);
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_SUITE_END()

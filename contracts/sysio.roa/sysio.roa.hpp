@@ -290,6 +290,20 @@ namespace sysio {
                 SYSLIB_SERIALIZE(nodeownerreg_key, (owner))
             };
 
+            // Registration status values for `nodeownerreg::status`.
+            enum reg_status : uint8_t { INTENT = 0, PENDING = 1, CONFIRMED = 2, REJECTED = 3 };
+
+            // Rejection reason for `nodeownerreg::reason` (only meaningful when status == REJECTED).
+            // Under trust-OPP, nodeownreg soft-fails claim-payload errors by recording one of these
+            // instead of aborting the dispatching transaction, so the failure is queryable on Wire.
+            enum reject_reason : uint8_t {
+                NONE              = 0,  // not rejected
+                OWNER_NOT_ACCOUNT = 1,  // owner is not an existing account
+                NO_AUTHEX_LINK    = 2,  // owner has no ETH link in sysio.authex
+                KEY_MISMATCH      = 3,  // linked ETH key differs from the claimed key
+                DUPLICATE         = 4   // owner is already a registered node owner
+            };
+
             struct [[sysio::table("nodeownerreg")]] nodeownerreg {
                 name owner;                     // Node Owners account name
                 uint8_t status;                 // Node Owners registration status 0-> INTENT / 1-> PENDING  / 2-> CONFIRMED / 3-> REJECTED
@@ -297,12 +311,13 @@ namespace sysio {
                 bytes trx_signature;            // Transaction Signature of Ethereum deposit
                 uint8_t tier;                   // Tier of Node Owner
                 uint128_t block_num;            // Ethereum Block number the deposit transaction is included in
+                uint8_t reason;                 // Rejection reason (see reject_reason); NONE(0) unless status == REJECTED
 
                 uint64_t by_tier() const { return static_cast<uint64_t>(tier); }
                 uint64_t by_status() const {return static_cast<uint64_t>(status); }
                 checksum256 by_trxid() const {return trx_id; }
 
-                SYSLIB_SERIALIZE(nodeownerreg, (owner)(status)(trx_id)(trx_signature)(tier)(block_num))
+                SYSLIB_SERIALIZE(nodeownerreg, (owner)(status)(trx_id)(trx_signature)(tier)(block_num)(reason))
             };
 
             using nodeownerreg_t = kv::scoped_table<"nodeownerreg"_n, nodeownerreg_key, nodeownerreg,
@@ -363,6 +378,20 @@ namespace sysio {
              */
 
             void regnodeowner(const name& owner, const uint8_t& tier);
+
+            /**
+             * @brief Upsert a row in the `nodeownerreg` audit table. Used by `nodeownreg` to
+             *        record the outcome of an OPP claim: CONFIRMED on success, or REJECTED with a
+             *        `reject_reason` for a claim-payload failure (trust-OPP soft-fail). Reusing the
+             *        existing table keeps the claim outcome queryable on Wire without aborting the
+             *        dispatching transaction.
+             *
+             * @param owner   The claimed account name.
+             * @param tier    The claimed tier.
+             * @param status  reg_status to record (CONFIRMED or REJECTED).
+             * @param reason  reject_reason; reject_reason::NONE for a CONFIRMED row.
+             */
+            void record_nodereg(const name& owner, const uint8_t& tier, uint8_t status, uint8_t reason);
 
 
             /**

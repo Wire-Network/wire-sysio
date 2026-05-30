@@ -562,37 +562,103 @@ namespace sysio {
     };
 
     void roa::nodeownreg(const name& owner, const uint8_t& tier, const public_key& eth_pub_key) {
-        // Authorized by depot/batch operator processing OPP messages.
-        // TODO: refine to depot account once it is finalized.
+        // Dispatched by the OPP depot — sysio.msgch — when it processes an inbound
+        // ATTESTATION_TYPE_NODE_OWNER_REG attestation. Following the opreg::depositinle
+        // precedent (sysio.msgch.cpp), msgch sends this inline action declaring sysio.roa's
+        // own permission_level{get_self(), active}; the chain accepts that declaration
+        // because sysio.roa.active trusts msgch@sysio.code via a code-permission delegation
+        // wired at bootstrap (the same shape as the sysio.opreg grant). So require_auth on
+        // get_self() is the correct gate: only the delegated depot dispatch can satisfy it.
+        // (Wiring the msgch NODE_OWNER_REG dispatch case + the roa.active delegation is the
+        //  separate depot-dispatch deliverable that lands after #359.)
         require_auth(get_self());
 
+        // ---- Envelope checks (depot misuse) ----
+        // Trust-OPP: well-formed traffic cannot trip these, so a failure means the depot has a
+        // bug — abort loudly. These are NOT claim-payload errors and must not be soft-failed.
         check(tier > 0 && tier <= 3, "Tier level must be between 1 and 3");
         // EVM links in sysio.authex store EM (secp256k1) keys exclusively. Reject
         // other variants up-front so the downstream equality-mismatch error doesn't
         // hide a key-type bug at the caller.
         check(eth_pub_key.index() == fc::crypto::key_type_em,
               "eth_pub_key must be an EM (secp256k1) public key");
-        check(is_account(owner), "Owner account does not exist");
 
-        // Verify the depositor's ETH public key is linked to `owner` via
-        // sysio.authex's links table. Cross-contract kv::table read.
+        // ---- Claim-payload checks (trust-OPP soft-fail) ----
+        // The OPP envelope can be well-formed while the claim inside it points to a misconfigured
+        // Wire account. Aborting the dispatching transaction here would be bad UX, leave no audit
+        // row, and give the batch operator undefined retry semantics. Instead record a REJECTED row
+        // with a reason and return success, so the dispatching transaction commits and the failure
+        // is queryable on Wire (no outbound error attestation by design).
+
+        // (4) owner must be an existing account
+        if (!is_account(owner)) {
+            record_nodereg(owner, tier, REJECTED, OWNER_NOT_ACCOUNT);
+            return;
+        }
+
+        // (5)(6) the depositor's ETH public key must be linked to `owner` via sysio.authex's
+        // links table (cross-contract kv::table read) and must match the claimed key.
         //
-        // EVM-only by design: NFT deposits land on Ethereum. If the flow is
-        // ever extended to SVM (Solana) or another ChainKind, promote the
-        // chain kind to an action parameter and look up the matching link
-        // instead of hardcoding CHAIN_KIND_EVM.
+        // EVM-only by design: NFT deposits land on Ethereum. If the flow is ever extended to SVM
+        // (Solana) or another ChainKind, promote the chain kind to an action parameter and look up
+        // the matching link instead of hardcoding CHAIN_KIND_EVM.
         authex::links_t links("sysio.authex"_n);
         auto by_namechain = links.get_index<"bynamechain"_n>();
         const uint128_t name_chain = to_namechain_key(owner, opp::types::ChainKind::CHAIN_KIND_EVM);
         auto itr = by_namechain.find(name_chain);
 
-        check(itr != by_namechain.end(), "Owner has no ETH link in sysio.authex");
-        check(itr->pub_key == eth_pub_key, "ETH key does not match the linked key for this account");
+        if (itr == by_namechain.end()) {
+            record_nodereg(owner, tier, REJECTED, NO_AUTHEX_LINK);
+            return;
+        }
+        if (itr->pub_key != eth_pub_key) {
+            record_nodereg(owner, tier, REJECTED, KEY_MISMATCH);
+            return;
+        }
+
+        // (7) must not already be a registered node owner. This is a replay / double-claim, not a
+        // hard failure — record DUPLICATE and return so the claim is idempotent and auditable.
+        {
+            roastate_t roastate(get_self());
+            auto state = roastate.get();
+            check(state.is_active, "ROA is not active yet");
+            nodeowners_t nodeowners(get_self(), state.network_gen);
+            if (nodeowners.contains(nodeowner_key{owner.value})) {
+                record_nodereg(owner, tier, REJECTED, DUPLICATE);
+                return;
+            }
+        }
 
         regnodeowner(owner, tier);
+        record_nodereg(owner, tier, CONFIRMED, NONE);
     };
 
     // ---- Private Helper Function ----
+
+    void roa::record_nodereg(const name& owner, const uint8_t& tier, uint8_t status, uint8_t reason) {
+        roastate_t roastate(get_self());
+        auto state = roastate.get();
+
+        nodeownerreg_t nodereg(get_self(), state.network_gen);
+        auto reg_key = nodeownerreg_key{owner.value};
+
+        auto write = [&](auto& row) {
+            row.owner  = owner;
+            row.status = status;
+            row.tier   = tier;
+            row.reason = reason;
+            // trx_id / trx_signature / block_num are unused under trust-OPP (the OPP envelope is the
+            // deposit proof); leave them at their default-constructed values.
+        };
+
+        if (nodereg.contains(reg_key)) {
+            nodereg.modify(get_self(), reg_key, write);
+        } else {
+            nodeownerreg row{};
+            write(row);
+            nodereg.emplace(get_self(), reg_key, row);
+        }
+    }
 
     void roa::regnodeowner(const name& owner, const uint8_t& tier) {
 

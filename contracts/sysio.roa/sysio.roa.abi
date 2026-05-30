@@ -200,6 +200,10 @@
                 {
                     "name": "block_num",
                     "type": "uint128"
+                },
+                {
+                    "name": "reason",
+                    "type": "uint8"
                 }
             ]
         },
