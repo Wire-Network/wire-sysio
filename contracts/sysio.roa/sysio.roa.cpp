@@ -721,21 +721,17 @@ namespace sysio {
         auto sp_key = sponsor_key{nonce.value};
         check(!sponsors.contains(sp_key), "Sponsor entry for this nonce already exists");
 
-        // Get the creator's suffix (e.g., "com" from "node.com", or "myname" from "myname")
-        name creator_suffix = creator.suffix();
-        if (creator_suffix == creator)
-           creator_suffix = name();
-        std::string suffix_str = creator_suffix.to_string();
-        size_t suffix_len = suffix_str.size();
+        // Build the sub-account name as "<prefix>.<generated>", where the prefix is the creator's
+        // (tier-1 owner's) own name — e.g. owner "acme" gets sub-accounts "acme.<random>". This
+        // flips the older "<generated>.<suffix>" construction. ROA is privileged, so it can mint
+        // any name regardless of Antelope's suffix-namespace ownership rule.
+        std::string prefix_str = creator.to_string();
+        size_t prefix_len = prefix_str.size();
 
-        // Create a name like "[generated].[suffix]"
         const size_t NAME_LENGTH = 12;
-        const size_t dot_len = suffix_len > 0 ? 1 : 0;
-
-        // Calculate length of the randomly generated prefix
-        // e.g., suffix="com" (3), gen_len = 12 - 3 - 1 = 8. name: "abcdefgh.com"
-        check(suffix_len < (NAME_LENGTH - 1), "Creator suffix is too long to generate a new username under it");
-        size_t gen_len = NAME_LENGTH - suffix_len - dot_len;
+        // Need room for "<prefix>." plus at least one generated char.
+        check(prefix_len + 2 <= NAME_LENGTH, "Creator name is too long to generate a sub-account under it");
+        size_t gen_len = NAME_LENGTH - prefix_len - 1; // chars after "<prefix>."
 
         // Try up to 3 times to generate a unique username
         name new_username;
@@ -746,29 +742,36 @@ namespace sysio {
         char uname_str[NAME_LENGTH + 1];
         uname_str[NAME_LENGTH] = 0; // ensure null-termination
 
-        // Pre-fill the buffer with ".suffix"
-        if (suffix_len > 0) {
-           uname_str[gen_len] = '.';
-           std::memcpy(uname_str + gen_len + 1, suffix_str.c_str(), suffix_len);
-        }
+        // Pre-fill the buffer with "<prefix>."
+        std::memcpy(uname_str, prefix_str.c_str(), prefix_len);
+        uname_str[prefix_len] = '.';
+
+        static constexpr char charmap[] = {'1','2','3','4','5',
+           'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o',
+           'p','q','r','s','t','u','v','w','x','y','z'};
+        constexpr size_t charmap_len = sizeof(charmap) / sizeof(charmap[0]);
+
+        // Cheap pseudo-random generator: a splitmix64 finalizer over nonce/attempt/block_num. No
+        // crypto is needed here — uniqueness is enforced by the is_account retry below; we only
+        // need variation — so this avoids a sha256 intrinsic call per attempt.
+        auto mix = [](uint64_t z) {
+            z += 0x9E3779B97F4A7C15ULL;
+            z = (z ^ (z >> 30)) * 0xBF58476D1CE4E5B9ULL;
+            z = (z ^ (z >> 27)) * 0x94D049BB133111EBULL;
+            return z ^ (z >> 31);
+        };
 
         for (uint8_t attempt = 0; attempt < 3; ++attempt) {
-            // Hash nonce + attempt + block_num to generate username
-            std::string input = nonce.to_string() + std::to_string(attempt) + std::to_string(block_num);
-            checksum256 hash = sha256(input.c_str(), input.size());
+            uint64_t x = nonce.value ^ (static_cast<uint64_t>(block_num) << 32)
+                         ^ (static_cast<uint64_t>(attempt) * 0x9E3779B97F4A7C15ULL);
 
-            static constexpr char charmap[] = {'1','2','3','4','5',
-               'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o',
-               'p','q','r','s','t','u','v','w','x','y','z'};
-            constexpr size_t charmap_len = sizeof(charmap) / sizeof(charmap[0]);
-
-            // Use hash to fill the generated part (prefix) of the account name
+            // Fill the generated portion after "<prefix>."
             for (size_t i = 0; i < gen_len; ++i) {
-                auto offset = hash.extract_as_byte_array()[i] % charmap_len;
-                uname_str[i] = charmap[offset];
+                x = mix(x);
+                uname_str[prefix_len + 1 + i] = charmap[x % charmap_len];
             }
 
-            // `uname_str` now holds "[generated].[suffix]"
+            // `uname_str` now holds "<prefix>.<generated>"
             new_username = name(uname_str);
 
             if (!is_account(new_username)) {

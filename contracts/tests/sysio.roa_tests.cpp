@@ -364,107 +364,35 @@ BOOST_FIXTURE_TEST_CASE( newuser_multiple_creators_test, sysio_roa_tester ) try 
 
 } FC_LOG_AND_RETHROW()
 
-BOOST_FIXTURE_TEST_CASE( newuser_nonce_collision, sysio_roa_tester ) try {
-   auto result = regnodeowner("alice"_n, 1);
-   BOOST_REQUIRE_EQUAL(success(), result);
-   result = regnodeowner("bob"_n, 1);
-   BOOST_REQUIRE_EQUAL(success(), result);
-   result = regnodeowner("carol"_n, 1);
-   BOOST_REQUIRE_EQUAL(success(), result);
-   result = regnodeowner("darcy"_n, 1);
-   BOOST_REQUIRE_EQUAL(success(), result);
+// With the <prefix>.<random> model the prefix is the creator, so the same nonce across DIFFERENT
+// creators no longer collides — each name differs by prefix. All four succeed with distinct names.
+BOOST_FIXTURE_TEST_CASE( newuser_same_nonce_distinct_creators, sysio_roa_tester ) try {
+   for (auto owner : {"alice"_n, "bob"_n, "carol"_n, "darcy"_n})
+      BOOST_REQUIRE_EQUAL(success(), regnodeowner(owner, 1));
    produce_blocks(1);
 
-   auto alice_owner = get_nodeowner("alice"_n);
-   BOOST_REQUIRE_EQUAL(alice_owner.is_null(), false);
-   BOOST_REQUIRE_EQUAL(alice_owner["tier"].as<uint32_t>(), 1);
-   auto bob_owner = get_nodeowner("bob"_n);
-   BOOST_REQUIRE_EQUAL(bob_owner.is_null(), false);
-   BOOST_REQUIRE_EQUAL(bob_owner["tier"].as<uint32_t>(), 1);
-   auto carol_owner = get_nodeowner("carol"_n);
-   BOOST_REQUIRE_EQUAL(carol_owner.is_null(), false);
-   BOOST_REQUIRE_EQUAL(carol_owner["tier"].as<uint32_t>(), 1);
-   auto darcy_owner = get_nodeowner("darcy"_n);
-   BOOST_REQUIRE_EQUAL(darcy_owner.is_null(), false);
-   BOOST_REQUIRE_EQUAL(darcy_owner["tier"].as<uint32_t>(), 1);
-
-
-   // First three will succeed, but then we run out of collision attempts
    auto same_nonce = "inauspicious"_n;
-   auto newuser_result = newuser("alice"_n, same_nonce, get_public_key("alice"_n, "active"));
-   auto newuser_result2 = newuser("bob"_n, same_nonce, get_public_key("bob"_n, "active"));
-   auto newuser_result3 = newuser("carol"_n, same_nonce, get_public_key("carol"_n, "active"));
-
-   BOOST_REQUIRE_EXCEPTION(
-        newuser("darcy"_n, same_nonce, get_public_key("darcy"_n, "active")),
-        sysio_assert_message_exception,
-        sysio_assert_message_is("Failed to generate a unique account name after 3 attempts"));
-
+   auto ra = newuser("alice"_n, same_nonce, get_public_key("alice"_n, "active"));
+   auto rb = newuser("bob"_n,   same_nonce, get_public_key("bob"_n,   "active"));
+   auto rc = newuser("carol"_n, same_nonce, get_public_key("carol"_n, "active"));
+   auto rd = newuser("darcy"_n, same_nonce, get_public_key("darcy"_n, "active"));
    produce_blocks(1);
+
+   auto na = fc::raw::unpack<name>(ra->action_traces[0].return_value);
+   auto nb = fc::raw::unpack<name>(rb->action_traces[0].return_value);
+   auto nc = fc::raw::unpack<name>(rc->action_traces[0].return_value);
+   auto nd = fc::raw::unpack<name>(rd->action_traces[0].return_value);
+
+   // names carry the creator prefix and are all distinct
+   BOOST_REQUIRE_EQUAL(na.to_string().substr(0, 6), std::string("alice."));
+   BOOST_REQUIRE_NE(na, nb); BOOST_REQUIRE_NE(na, nc); BOOST_REQUIRE_NE(na, nd);
+   BOOST_REQUIRE_NE(nb, nc); BOOST_REQUIRE_NE(nb, nd); BOOST_REQUIRE_NE(nc, nd);
 
    BOOST_REQUIRE_EQUAL(1, get_sponsor_count("alice"_n));
    BOOST_REQUIRE_EQUAL(1, get_sponsor_count("bob"_n));
    BOOST_REQUIRE_EQUAL(1, get_sponsor_count("carol"_n));
-   BOOST_REQUIRE_EQUAL(0, get_sponsor_count("darcy"_n));
-
+   BOOST_REQUIRE_EQUAL(1, get_sponsor_count("darcy"_n));
 } FC_LOG_AND_RETHROW()
-
-BOOST_FIXTURE_TEST_CASE( newuser_tld_test, sysio_roa_tester ) try {
-
-   create_accounts( { "alice.com"_n, "bob.m"_n, "a.longonexxx"_n }, false, false, false, false );
-   produce_blocks(1);
-   auto result = regnodeowner("alice.com"_n, 1);
-   BOOST_REQUIRE_EQUAL(success(), result);
-   result = regnodeowner("bob.m"_n, 1);
-   BOOST_REQUIRE_EQUAL(success(), result);
-   result = regnodeowner("a.longonexxx"_n, 1);
-   BOOST_REQUIRE_EQUAL(success(), result);
-   produce_blocks(1);
-
-   auto alice_owner = get_nodeowner("alice.com"_n);
-   BOOST_REQUIRE_EQUAL(alice_owner.is_null(), false);
-   BOOST_REQUIRE_EQUAL(alice_owner["tier"].as<uint32_t>(), 1);
-
-   auto empty = get_sponsorship("alice.com"_n, "nonce1"_n);
-   BOOST_REQUIRE_EQUAL(empty.is_null(), true);
-   BOOST_REQUIRE_EQUAL(0, get_sponsor_count("alice.com"_n));
-
-   auto newuser_result = newuser("alice.com"_n, "nonce1"_n, get_public_key("alice.com"_n, "active"));
-   BOOST_REQUIRE_EQUAL(2, newuser_result->action_traces.size());
-   auto newuser_action_trace = newuser_result->action_traces[0];
-   BOOST_REQUIRE_EQUAL(newuser_action_trace.act.name, "newuser"_n);
-   BOOST_REQUIRE_EQUAL(newuser_action_trace.receiver, ROA);
-   BOOST_REQUIRE_EQUAL(newuser_action_trace.act.account, ROA);
-   auto new_name = fc::raw::unpack<name>(newuser_action_trace.return_value);
-   BOOST_REQUIRE_NE(""_n, new_name);
-   BOOST_TEST(new_name.suffix() == "alice.com"_n.suffix());
-   BOOST_TEST(new_name.suffix() == "com"_n);
-
-   auto newaccount_action_trace = newuser_result->action_traces[1];
-   BOOST_REQUIRE_EQUAL(newaccount_action_trace.act.name, "newaccount"_n);
-   BOOST_REQUIRE_EQUAL(newaccount_action_trace.receiver, "sysio"_n);
-   BOOST_REQUIRE_EQUAL(newaccount_action_trace.act.account, "sysio"_n);
-   produce_blocks(1);
-
-   BOOST_REQUIRE_EQUAL(1, get_sponsor_count("alice.com"_n));
-   auto sponsorship = get_sponsorship("alice.com"_n, "nonce1"_n);
-   BOOST_REQUIRE_EQUAL(sponsorship.is_null(), false);
-   BOOST_REQUIRE_EQUAL(sponsorship["username"].as<name>(), new_name);
-
-   newuser_result = newuser("bob.m"_n, "nonce1"_n, get_public_key("bob.m"_n, "active"));
-   BOOST_REQUIRE_EQUAL(2, newuser_result->action_traces.size());
-   newuser_action_trace = newuser_result->action_traces[0];
-   new_name = fc::raw::unpack<name>(newuser_action_trace.return_value);
-   BOOST_TEST(new_name.suffix() == "m"_n);
-
-   newuser_result = newuser("a.longonexxx"_n, "nonce1"_n, get_public_key("a.longonexxx"_n, "active"));
-   BOOST_REQUIRE_EQUAL(2, newuser_result->action_traces.size());
-   newuser_action_trace = newuser_result->action_traces[0];
-   new_name = fc::raw::unpack<name>(newuser_action_trace.return_value);
-   BOOST_TEST(new_name.suffix() == "longonexxx"_n);
-
-} FC_LOG_AND_RETHROW()
-
 
 BOOST_FIXTURE_TEST_CASE( verify_ram, sysio_roa_tester ) try {
    // system contract + init + emission config already done in base constructor
