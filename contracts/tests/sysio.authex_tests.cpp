@@ -18,6 +18,9 @@
 #include <sysio/opp/opp.hpp>     // FC_REFLECT_ENUM for sysio::opp::types::ChainKind
 #include <magic_enum/magic_enum.hpp>
 
+#include <algorithm>
+#include <cstring>
+
 using namespace sysio::testing;
 using namespace sysio;
 using namespace sysio::chain;
@@ -280,17 +283,62 @@ BOOST_FIXTURE_TEST_CASE( createlink_duplicate_chain_for_user, sysio_authex_teste
 // ——— clearlinks + re-create ———
 
 BOOST_FIXTURE_TEST_CASE( clearlinks_then_recreate, sysio_authex_tester ) try {
+   // Compressed 33-byte form the chain stores and compares for an EM key.
+   auto compressed = [](const fc::crypto::public_key& pk) {
+      return pk.get<fc::em::public_key_shim>().serialize();   // std::array<char,33>
+   };
+   // True iff the two keys order DIFFERENTLY under signed-char vs unsigned-byte
+   // comparison -- the pair that exposes the canonical-ordering bug. The chain
+   // orders authority keys unsigned (validate() -> memcmp); sysio.system's
+   // expandauth sorts them CDT-side, so the two orderings must agree or updateauth
+   // rejects the merged `active` authority as unsorted.
+   auto signed_unsigned_disagree = [&](const fc::crypto::public_key& a, const fc::crypto::public_key& b) {
+      const auto ca = compressed(a);
+      const auto cb = compressed(b);
+      const bool unsigned_lt = std::memcmp(ca.data(), cb.data(), ca.size()) < 0;
+      const bool signed_lt   = std::lexicographical_compare(ca.begin(), ca.end(), cb.begin(), cb.end());
+      return unsigned_lt != signed_lt;
+   };
+
    auto link1 = make_eth_link("alice", now_ms());
+
+   // Pick a second EM key that, with link1, exposes the signed/unsigned ordering
+   // disagreement, so this case deterministically exercises the canonical sort every
+   // run instead of tripping it ~25% of the time on random keys. Both EM keys end up
+   // in `active` together (clearlinks wipes only the links table, not the key the
+   // first createlink added), forcing the EM-vs-EM comparison the bug lived in.
+   em_link_data link2;
+   bool found = false;
+   for (int i = 0; i < 256 && !found; ++i) {
+      link2 = make_eth_link("alice", now_ms());
+      found = signed_unsigned_disagree(link1.pub, link2.pub);
+   }
+   BOOST_REQUIRE_MESSAGE(found, "could not generate an EM key pair exposing signed/unsigned ordering");
+
    BOOST_REQUIRE_EQUAL( success(), createlink("alice"_n, ChainKind::CHAIN_KIND_EVM, "alice", link1.sig, link1.pub, link1.nonce) );
    produce_blocks();
 
-   // Clear and re-create should work
    BOOST_REQUIRE_EQUAL( success(), clearlinks(AUTHEX) );
    produce_blocks();
 
-   auto link2 = make_eth_link("alice", now_ms());
+   // Before the fix (CDT ecc_public_key was signed `char`) this createlink failed
+   // for the chosen pair with "Invalid authority"; with the canonical unsigned
+   // ordering the contract's sort matches the chain and it always succeeds.
    BOOST_REQUIRE_EQUAL( success(), createlink("alice"_n, ChainKind::CHAIN_KIND_EVM, "alice", link2.sig, link2.pub, link2.nonce) );
    produce_blocks();
+
+   // Both EM keys now coexist in `active`, and the chain accepted the contract's
+   // sorted authority -- so its keys are in canonical (unsigned) order.
+   auto& auth_mgr = control->get_authorization_manager();
+   const auto* active = auth_mgr.find_permission({"alice"_n, "active"_n});
+   BOOST_REQUIRE( active != nullptr );
+   const auto auth = active->auth.to_authority();
+   size_t em_keys = 0;
+   for (const auto& kw : auth.keys)
+      if (fc::variant(kw.key).as_string().rfind("PUB_EM_", 0) == 0) ++em_keys;
+   BOOST_CHECK_EQUAL( em_keys, 2u );
+   BOOST_CHECK( std::is_sorted(auth.keys.begin(), auth.keys.end(),
+      [](const key_weight& a, const key_weight& b){ return a.key < b.key; }) );
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_SUITE_END()
