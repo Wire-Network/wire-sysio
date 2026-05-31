@@ -117,7 +117,7 @@
     "enums": [
         {
             "name": "ChainKind",
-            "type": "int64",
+            "type": "int32",
             "values": [
                 {
                     "name": "CHAIN_KIND_UNKNOWN",
