@@ -210,6 +210,14 @@ namespace sysio {
               "giftram: must be authorized by sysio.authex or sysio.roa");
         check(is_account(account), "account does not exist");
 
+        // Unlimited-RAM accounts (privileged/system, or not yet ROA-managed) have no RAM
+        // constraint to satisfy and must NOT be shrunk to a finite limit — skip the gift.
+        // (When the depot-auth work lands and createlink is driven for freshly-created finite
+        //  accounts, this delta>0 path is exercised; see the nodeownreg tests' TODO.)
+        int64_t cur_ram, cur_net, cur_cpu;
+        get_resource_limits(account, cur_ram, cur_net, cur_cpu);
+        if (cur_ram < 0) return;
+
         // Reconcile `account`'s gifted RAM to its *exact* current usage. The preceding inline
         // action (createlink / setcode / setabi) already ran, so usage reflects the change. RAM is
         // checked at transaction end, so the transient over/under in between is fine.
