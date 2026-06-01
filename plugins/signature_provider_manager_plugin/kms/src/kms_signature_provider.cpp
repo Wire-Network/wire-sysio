@@ -669,13 +669,15 @@ kms_signer make_kms_signature_provider(const kms_key_ref&             ref,
       const std::span<const unsigned char> der{
          der_buf.GetUnderlyingData(), der_buf.GetLength()};
 
-      // `der_to_eth_signature` -> `recover_v` recovers the pubkey to pick the
-      // recovery id and throws if it doesn't match the pinned key. `em_sign_keccak`
-      // (the caller) then recovers a SECOND time and compares against the
-      // provider's public key. Two EC recoveries per signature is intentional
-      // defense-in-depth, not an oversight: this is the external-chain submission
-      // path, not a hot loop, so the cost is irrelevant -- do not "optimize" either
-      // recovery away.
+      // `der_to_eth_signature` -> `recover_v` recovers the signer to pick the
+      // recovery id AND throws if it does not match the pinned key. That runs on
+      // every sign and is the per-signature guarantee that KMS signed with the
+      // expected key -- keep it. `em_sign_keccak` (the caller) recovers once more,
+      // but only on the first sign per provider (gated by
+      // `signature_provider_t::self_verified`): a one-time structural check that
+      // the keccak digest survived the `sha256`-typed closure boundary. So the
+      // first sign does two recoveries and every later sign one; this is the
+      // external-chain submission path, not a hot loop, so neither cost matters.
       const auto compact = der_to_eth_signature(
          der, digest.to_uint8_span(), state->expected_em_pubkey);
 
