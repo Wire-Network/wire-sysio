@@ -1,16 +1,3 @@
-// magic_enum resolves an enum value to its name only when the value falls
-// inside [MAGIC_ENUM_RANGE_MIN, MAGIC_ENUM_RANGE_MAX] (default -128..128).
-// AWS KMS's service-specific error codes (Aws::KMS::KMSErrors) begin at
-// Aws::Client::CoreErrors::SERVICE_EXTENSION_START_RANGE + 1 = 129 and run up
-// to 176, so under the default ceiling magic_enum::enum_name() would return ""
-// for every KMS-specific error in throw_kms_error() -- precisely the transient
-// vs. permanent triage cases that matter most. Raise the ceiling to 256 (well
-// above the highest KMS error value, 176). This must be defined before
-// <magic_enum/magic_enum.hpp> is first included anywhere in this translation
-// unit -- including transitively through the headers below -- so it sits ahead
-// of every #include.
-#define MAGIC_ENUM_RANGE_MAX 256
-
 #include <sysio/signature_provider_manager_plugin/kms/kms_signature_provider.hpp>
 
 #include <sysio/chain/exceptions.hpp>
@@ -45,6 +32,18 @@
 #include <memory>
 #include <mutex>
 #include <span>
+
+// KMSErrors codes begin at 129 (SERVICE_EXTENSION_START_RANGE + 1) and run to
+// 176, above magic_enum's default ceiling of 127, so enum_name() returns "" for
+// them without a wider range. Scope the widening to this one enum rather than the
+// global MAGIC_ENUM_RANGE_MAX macro, which would affect every enum in the TU
+// (incl. transitively-included chain enums) and risk an ODR mismatch with other
+// TUs at the default range.
+template<>
+struct magic_enum::customize::enum_range<Aws::KMS::KMSErrors> {
+   static constexpr int min = 0;
+   static constexpr int max = 256;
+};
 
 namespace sysio::sigprov::kms {
 
