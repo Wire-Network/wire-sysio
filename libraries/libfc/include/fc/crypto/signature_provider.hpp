@@ -24,8 +24,11 @@ using signature_provider_id_t  = std::variant<std::string, fc::crypto::public_ke
 //        output is used. That recover-and-compare is the compensating control for
 //        the lost compile-time digest distinction -- DO NOT remove it as
 //        "redundant." It is distinct from the KMS provider's own `recover_v`,
-//        which only picks the recovery id inside the closure; this validates, from
-//        outside, that the returned signature recovers to the pinned key.
+//        which runs inside the closure on every sign -- it picks the recovery id
+//        and also rejects a signature that does not recover to the pinned key;
+//        this self-verify instead runs once per provider and validates, from
+//        outside the closure, that the digest crossed the `sha256`-typed boundary
+//        uncorrupted.
 //
 //        It runs once per provider: a closure's key and framing are fixed, so the
 //        first signature is representative. `signature_provider_t::self_verified`
