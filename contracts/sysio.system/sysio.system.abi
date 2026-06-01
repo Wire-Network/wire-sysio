@@ -157,24 +157,6 @@
             ]
         },
         {
-            "name": "block_info_record",
-            "base": "",
-            "fields": [
-                {
-                    "name": "version",
-                    "type": "uint8"
-                },
-                {
-                    "name": "block_height",
-                    "type": "uint32"
-                },
-                {
-                    "name": "block_timestamp",
-                    "type": "time_point"
-                }
-            ]
-        },
-        {
             "name": "block_signing_authority_v0",
             "base": "",
             "fields": [
@@ -271,16 +253,6 @@
                 {
                     "name": "max_kv_secondary_key_size",
                     "type": "uint32"
-                }
-            ]
-        },
-        {
-            "name": "blockinfo_key",
-            "base": "",
-            "fields": [
-                {
-                    "name": "block_height",
-                    "type": "uint64"
                 }
             ]
         },
@@ -505,28 +477,6 @@
                 {
                     "name": "sysio_epoch_index",
                     "type": "uint64"
-                }
-            ]
-        },
-        {
-            "name": "expandauth",
-            "base": "",
-            "fields": [
-                {
-                    "name": "account",
-                    "type": "name"
-                },
-                {
-                    "name": "permission",
-                    "type": "name"
-                },
-                {
-                    "name": "keys",
-                    "type": "key_weight[]"
-                },
-                {
-                    "name": "accounts",
-                    "type": "permission_level_weight[]"
                 }
             ]
         },
@@ -1427,6 +1377,34 @@
             ]
         },
         {
+            "name": "block_info_record",
+            "base": "",
+            "fields": [
+                {
+                    "name": "version",
+                    "type": "uint8"
+                },
+                {
+                    "name": "block_height",
+                    "type": "uint32"
+                },
+                {
+                    "name": "block_timestamp",
+                    "type": "time_point"
+                }
+            ]
+        },
+        {
+            "name": "blockinfo_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "block_height",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "delpeerkey",
             "base": "",
             "fields": [
@@ -1651,11 +1629,6 @@
             "ricardian_contract": ""
         },
         {
-            "name": "expandauth",
-            "type": "expandauth",
-            "ricardian_contract": ""
-        },
-        {
             "name": "fundclaim",
             "type": "fundclaim",
             "ricardian_contract": ""
@@ -1856,14 +1829,6 @@
             "table_id": 49446
         },
         {
-            "name": "blockinfo",
-            "type": "block_info_record",
-            "index_type": "i64",
-            "key_names": ["block_height"],
-            "key_types": ["uint64"],
-            "table_id": 21782
-        },
-        {
             "name": "emissionmngr",
             "type": "emission_state",
             "index_type": "i64",
@@ -1977,6 +1942,14 @@
             "key_names": ["name"],
             "key_types": ["name"],
             "table_id": 22391
+        },
+        {
+            "name": "blockinfo",
+            "type": "block_info_record",
+            "index_type": "i64",
+            "key_names": ["block_height"],
+            "key_types": ["uint64"],
+            "table_id": 21782
         },
         {
             "name": "peerkeys",

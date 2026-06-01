@@ -4,7 +4,6 @@
 #include <sysio/chain/authorization_manager.hpp>
 #include <sysio/chain/resource_limits.hpp>
 #include "contracts.hpp"
-#include <test_contracts.hpp>
 
 #include <fc/variant_object.hpp>
 #include <fc/crypto/hex.hpp>
@@ -17,9 +16,6 @@
 #include <fc/crypto/ripemd160.hpp>
 #include <sysio/opp/opp.hpp>     // FC_REFLECT_ENUM for sysio::opp::types::ChainKind
 #include <magic_enum/magic_enum.hpp>
-
-#include <algorithm>
-#include <cstring>
 
 using namespace sysio::testing;
 using namespace sysio;
@@ -66,11 +62,6 @@ public:
       set_abi( AUTHEX, contracts::authex_abi().data() );
       set_privileged( AUTHEX );
 
-      // sysio.system provides the `expandauth` action that createlink uses to add the
-      // ETH key to `active`. (sysio.roa is already deployed + activated by the base tester.)
-      set_code( "sysio"_n, test_contracts::sysio_system_wasm() );
-      set_abi(  "sysio"_n, test_contracts::sysio_system_abi() );
-
       produce_blocks();
 
       const auto* accnt = control->find_account_metadata( AUTHEX );
@@ -78,8 +69,6 @@ public:
       abi_def abi;
       BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt->abi, abi), true);
       abi_ser.set_abi(abi, abi_serializer::create_yield_function(abi_serializer_max_time));
-      // Note: the base tester already gives created accounts a ROA reslimit, so
-      // createlink's per-link RAM gift (roa::giftram) has a reslimit to grow.
    }
 
    action_result push_action( const account_name& signer, const action_name& name, const variant_object& data ) {
@@ -209,23 +198,20 @@ BOOST_FIXTURE_TEST_CASE( createlink_eth_success, sysio_authex_tester ) try {
    BOOST_REQUIRE_EQUAL( success(), createlink("alice"_n, ChainKind::CHAIN_KIND_EVM, "alice", link.sig, link.pub, link.nonce) );
    produce_blocks();
 
-   // The ETH key is now added to `active` (no dedicated `ex.*` permission anymore).
+   // The verified EM key is recorded in the links table only -- it must NOT be added
+   // to `active` (or any) permission, and no `ex.*` permission is created.
    auto& auth_mgr = control->get_authorization_manager();
    const auto* active = auth_mgr.find_permission({"alice"_n, "active"_n});
    BOOST_REQUIRE( active != nullptr );
-   auto auth = active->auth.to_authority();
-   BOOST_TEST_MESSAGE("[ACTIVE] keys=" << auth.keys.size() << "  link.pub=" << fc::variant(link.pub).as_string());
-   for (const auto& kw : auth.keys) BOOST_TEST_MESSAGE("   active key: " << fc::variant(kw.key).as_string());
-   bool eth_in_active = false;
-   for (const auto& kw : auth.keys) { if (kw.key == link.pub) { eth_in_active = true; break; } }
-   BOOST_CHECK( eth_in_active );  // diagnostic — tighten once the dump is understood
-   // No `ex.eth` permission is created anymore.
+   const auto auth = active->auth.to_authority();
+   for (const auto& kw : auth.keys)
+      BOOST_CHECK_MESSAGE( kw.key != link.pub, "EM key must not be added to active" );
    BOOST_REQUIRE( auth_mgr.find_permission({"alice"_n, "ex.eth"_n}) == nullptr );
 } FC_LOG_AND_RETHROW()
 
-// ——— createlink: per-link RAM gift measurement ———
+// --- createlink: account bears no RAM cost (link row is sysio-paid) ---
 
-BOOST_FIXTURE_TEST_CASE( createlink_ram_gift_measure, sysio_authex_tester ) try {
+BOOST_FIXTURE_TEST_CASE( createlink_no_account_ram_cost, sysio_authex_tester ) try {
    auto& rlm = control->get_resource_limits_manager();
    int64_t q0, net, cpu;
    rlm.get_account_limits("alice"_n, q0, net, cpu);
@@ -238,10 +224,10 @@ BOOST_FIXTURE_TEST_CASE( createlink_ram_gift_measure, sysio_authex_tester ) try 
    int64_t q1;
    rlm.get_account_limits("alice"_n, q1, net, cpu);
    int64_t u1 = rlm.get_account_ram_usage("alice"_n);
-   BOOST_TEST_MESSAGE("[RAM] createlink eth: usage delta " << (u1 - u0)
-      << " B; gift " << (q1 - q0) << " B");
-   BOOST_REQUIRE_EQUAL( q1 - q0, u1 - u0 );  // gift exactly covers the per-link usage
-   BOOST_REQUIRE( u1 <= q1 );                 // account ends within quota
+   // The link row is billed to sysio and no permission is changed, so the account's
+   // own RAM usage and quota are untouched -- linking is free to the account.
+   BOOST_CHECK_EQUAL( u1, u0 );
+   BOOST_CHECK_EQUAL( q1, q0 );
 } FC_LOG_AND_RETHROW()
 
 // ——— createlink: duplicate pubkey ———
@@ -283,62 +269,27 @@ BOOST_FIXTURE_TEST_CASE( createlink_duplicate_chain_for_user, sysio_authex_teste
 // ——— clearlinks + re-create ———
 
 BOOST_FIXTURE_TEST_CASE( clearlinks_then_recreate, sysio_authex_tester ) try {
-   // Compressed 33-byte form the chain stores and compares for an EM key.
-   auto compressed = [](const fc::crypto::public_key& pk) {
-      return pk.get<fc::em::public_key_shim>().serialize();   // std::array<char,33>
-   };
-   // True iff the two keys order DIFFERENTLY under signed-char vs unsigned-byte
-   // comparison -- the pair that exposes the canonical-ordering bug. The chain
-   // orders authority keys unsigned (validate() -> memcmp); sysio.system's
-   // expandauth sorts them CDT-side, so the two orderings must agree or updateauth
-   // rejects the merged `active` authority as unsorted.
-   auto signed_unsigned_disagree = [&](const fc::crypto::public_key& a, const fc::crypto::public_key& b) {
-      const auto ca = compressed(a);
-      const auto cb = compressed(b);
-      const bool unsigned_lt = std::memcmp(ca.data(), cb.data(), ca.size()) < 0;
-      const bool signed_lt   = std::lexicographical_compare(ca.begin(), ca.end(), cb.begin(), cb.end());
-      return unsigned_lt != signed_lt;
-   };
-
    auto link1 = make_eth_link("alice", now_ms());
-
-   // Pick a second EM key that, with link1, exposes the signed/unsigned ordering
-   // disagreement, so this case deterministically exercises the canonical sort every
-   // run instead of tripping it ~25% of the time on random keys. Both EM keys end up
-   // in `active` together (clearlinks wipes only the links table, not the key the
-   // first createlink added), forcing the EM-vs-EM comparison the bug lived in.
-   em_link_data link2;
-   bool found = false;
-   for (int i = 0; i < 256 && !found; ++i) {
-      link2 = make_eth_link("alice", now_ms());
-      found = signed_unsigned_disagree(link1.pub, link2.pub);
-   }
-   BOOST_REQUIRE_MESSAGE(found, "could not generate an EM key pair exposing signed/unsigned ordering");
-
    BOOST_REQUIRE_EQUAL( success(), createlink("alice"_n, ChainKind::CHAIN_KIND_EVM, "alice", link1.sig, link1.pub, link1.nonce) );
    produce_blocks();
 
+   // clearlinks wipes the links table; a fresh createlink for the same account+chain
+   // must then succeed (the prior link no longer trips the duplicate checks).
    BOOST_REQUIRE_EQUAL( success(), clearlinks(AUTHEX) );
    produce_blocks();
 
-   // Before the fix (CDT ecc_public_key was signed `char`) this createlink failed
-   // for the chosen pair with "Invalid authority"; with the canonical unsigned
-   // ordering the contract's sort matches the chain and it always succeeds.
+   auto link2 = make_eth_link("alice", now_ms());
    BOOST_REQUIRE_EQUAL( success(), createlink("alice"_n, ChainKind::CHAIN_KIND_EVM, "alice", link2.sig, link2.pub, link2.nonce) );
    produce_blocks();
 
-   // Both EM keys now coexist in `active`, and the chain accepted the contract's
-   // sorted authority -- so its keys are in canonical (unsigned) order.
+   // Linking never touches the account's permissions: neither EM key landed in `active`.
    auto& auth_mgr = control->get_authorization_manager();
    const auto* active = auth_mgr.find_permission({"alice"_n, "active"_n});
    BOOST_REQUIRE( active != nullptr );
    const auto auth = active->auth.to_authority();
-   size_t em_keys = 0;
    for (const auto& kw : auth.keys)
-      if (fc::variant(kw.key).as_string().rfind("PUB_EM_", 0) == 0) ++em_keys;
-   BOOST_CHECK_EQUAL( em_keys, 2u );
-   BOOST_CHECK( std::is_sorted(auth.keys.begin(), auth.keys.end(),
-      [](const key_weight& a, const key_weight& b){ return a.key < b.key; }) );
+      BOOST_CHECK_MESSAGE( fc::variant(kw.key).as_string().rfind("PUB_EM_", 0) != 0,
+                           "no EM key should be in active" );
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_SUITE_END()
