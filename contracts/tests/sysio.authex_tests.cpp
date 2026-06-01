@@ -4,7 +4,6 @@
 #include <sysio/chain/authorization_manager.hpp>
 #include <sysio/chain/resource_limits.hpp>
 #include "contracts.hpp"
-#include <test_contracts.hpp>
 
 #include <fc/variant_object.hpp>
 #include <fc/crypto/hex.hpp>
@@ -63,11 +62,6 @@ public:
       set_abi( AUTHEX, contracts::authex_abi().data() );
       set_privileged( AUTHEX );
 
-      // sysio.system provides the `expandauth` action that createlink uses to add the
-      // ETH key to `active`. (sysio.roa is already deployed + activated by the base tester.)
-      set_code( "sysio"_n, test_contracts::sysio_system_wasm() );
-      set_abi(  "sysio"_n, test_contracts::sysio_system_abi() );
-
       produce_blocks();
 
       const auto* accnt = control->find_account_metadata( AUTHEX );
@@ -75,8 +69,6 @@ public:
       abi_def abi;
       BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt->abi, abi), true);
       abi_ser.set_abi(abi, abi_serializer::create_yield_function(abi_serializer_max_time));
-      // Note: the base tester already gives created accounts a ROA reslimit, so
-      // createlink's per-link RAM gift (roa::giftram) has a reslimit to grow.
    }
 
    action_result push_action( const account_name& signer, const action_name& name, const variant_object& data ) {
@@ -206,31 +198,24 @@ BOOST_FIXTURE_TEST_CASE( createlink_eth_success, sysio_authex_tester ) try {
    BOOST_REQUIRE_EQUAL( success(), createlink("alice"_n, ChainKind::CHAIN_KIND_EVM, "alice", link.sig, link.pub, link.nonce) );
    produce_blocks();
 
-   // The ETH key is now added to `active` (no dedicated `ex.*` permission anymore).
+   // The verified EM key is recorded in the links table only -- it must NOT be added
+   // to `active` (or any) permission, and no `ex.*` permission is created.
    auto& auth_mgr = control->get_authorization_manager();
    const auto* active = auth_mgr.find_permission({"alice"_n, "active"_n});
    BOOST_REQUIRE( active != nullptr );
-   auto auth = active->auth.to_authority();
-   BOOST_TEST_MESSAGE("[ACTIVE] keys=" << auth.keys.size() << "  link.pub=" << fc::variant(link.pub).as_string());
-   for (const auto& kw : auth.keys) BOOST_TEST_MESSAGE("   active key: " << fc::variant(kw.key).as_string());
-   bool eth_in_active = false;
-   for (const auto& kw : auth.keys) { if (kw.key == link.pub) { eth_in_active = true; break; } }
-   BOOST_CHECK( eth_in_active );  // diagnostic — tighten once the dump is understood
-   // No `ex.eth` permission is created anymore.
+   const auto auth = active->auth.to_authority();
+   for (const auto& kw : auth.keys)
+      BOOST_CHECK_MESSAGE( kw.key != link.pub, "EM key must not be added to active" );
    BOOST_REQUIRE( auth_mgr.find_permission({"alice"_n, "ex.eth"_n}) == nullptr );
 } FC_LOG_AND_RETHROW()
 
-// ——— createlink: per-link RAM gift measurement ———
+// --- createlink: account bears no RAM cost (link row is sysio-paid) ---
 
-BOOST_FIXTURE_TEST_CASE( createlink_ram_gift_measure, sysio_authex_tester ) try {
+BOOST_FIXTURE_TEST_CASE( createlink_no_account_ram_cost, sysio_authex_tester ) try {
    auto& rlm = control->get_resource_limits_manager();
    int64_t q0, net, cpu;
    rlm.get_account_limits("alice"_n, q0, net, cpu);
    int64_t u0 = rlm.get_account_ram_usage("alice"_n);
-   // sysio's chain quota is the account-RAM pool the gift must be drawn from.
-   int64_t sysio_q0, snet, scpu;
-   rlm.get_account_limits("sysio"_n, sysio_q0, snet, scpu);
-
    auto link = make_eth_link("alice", now_ms());
    BOOST_REQUIRE_EQUAL( success(), createlink("alice"_n, ChainKind::CHAIN_KIND_EVM, "alice", link.sig, link.pub, link.nonce) );
    produce_blocks();
@@ -238,15 +223,10 @@ BOOST_FIXTURE_TEST_CASE( createlink_ram_gift_measure, sysio_authex_tester ) try 
    int64_t q1;
    rlm.get_account_limits("alice"_n, q1, net, cpu);
    int64_t u1 = rlm.get_account_ram_usage("alice"_n);
-   int64_t sysio_q1;
-   rlm.get_account_limits("sysio"_n, sysio_q1, snet, scpu);
-   BOOST_TEST_MESSAGE("[RAM] createlink eth: usage delta " << (u1 - u0)
-      << " B; gift " << (q1 - q0) << " B; sysio pool delta " << (sysio_q1 - sysio_q0) << " B");
-   BOOST_REQUIRE_EQUAL( q1 - q0, u1 - u0 );        // gift exactly covers the per-link usage
-   BOOST_REQUIRE( u1 <= q1 );                       // account ends within quota
-   // Conservation: the gift is a transfer out of sysio's pool, not a fresh mint —
-   // sysio loses exactly what alice gains, so total chain RAM is unchanged.
-   BOOST_REQUIRE_EQUAL( sysio_q0 - sysio_q1, q1 - q0 );
+   // The link row is billed to sysio and no permission is changed, so the account's
+   // own RAM usage and quota are untouched -- linking is free to the account.
+   BOOST_CHECK_EQUAL( u1, u0 );
+   BOOST_CHECK_EQUAL( q1, q0 );
 } FC_LOG_AND_RETHROW()
 
 // ——— createlink: duplicate pubkey ———
@@ -292,13 +272,23 @@ BOOST_FIXTURE_TEST_CASE( clearlinks_then_recreate, sysio_authex_tester ) try {
    BOOST_REQUIRE_EQUAL( success(), createlink("alice"_n, ChainKind::CHAIN_KIND_EVM, "alice", link1.sig, link1.pub, link1.nonce) );
    produce_blocks();
 
-   // Clear and re-create should work
+   // clearlinks wipes the links table; a fresh createlink for the same account+chain
+   // must then succeed (the prior link no longer trips the duplicate checks).
    BOOST_REQUIRE_EQUAL( success(), clearlinks(AUTHEX) );
    produce_blocks();
 
    auto link2 = make_eth_link("alice", now_ms());
    BOOST_REQUIRE_EQUAL( success(), createlink("alice"_n, ChainKind::CHAIN_KIND_EVM, "alice", link2.sig, link2.pub, link2.nonce) );
    produce_blocks();
+
+   // Linking never touches the account's permissions: neither EM key landed in `active`.
+   auto& auth_mgr = control->get_authorization_manager();
+   const auto* active = auth_mgr.find_permission({"alice"_n, "active"_n});
+   BOOST_REQUIRE( active != nullptr );
+   const auto auth = active->auth.to_authority();
+   for (const auto& kw : auth.keys)
+      BOOST_CHECK_MESSAGE( fc::variant(kw.key).as_string().rfind("PUB_EM_", 0) != 0,
+                           "no EM key should be in active" );
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_SUITE_END()
