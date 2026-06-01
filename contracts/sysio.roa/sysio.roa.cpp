@@ -205,21 +205,22 @@ namespace sysio {
     }
 
     void roa::giftram(const name& account, int64_t usage_before) {
-        // Called by sysio.authex (createlink) or by sysio.roa itself (setsyscode/setsysabi).
-        check(has_auth("sysio.authex"_n) || has_auth(get_self()),
-              "giftram: must be authorized by sysio.authex or sysio.roa");
+        // Authorized by sysio.roa itself (setsyscode/setsysabi inline-call it; a follow-on PR
+        // drives it for per-contract RAM gifting). createlink no longer calls giftram -- it
+        // records the EM link only and bills the row to sysio -- so sysio.authex is not an authorizer.
+        require_auth(get_self());
         check(is_account(account), "account does not exist");
 
         // Unlimited-RAM accounts (privileged/system, or not yet ROA-managed) have no RAM
         // constraint to satisfy and must NOT be shrunk to a finite limit — skip the gift.
-        // (When the depot-auth work lands and createlink is driven for freshly-created finite
-        //  accounts, this delta>0 path is exercised; see the nodeownreg tests' TODO.)
+        // (The delta>0 path is exercised when a finite account's RAM grows -- e.g. setsyscode
+        //  deploying a contract, or the depot-driven node-owner flow; see the nodeownreg tests' TODO.)
         int64_t cur_ram, cur_net, cur_cpu;
         get_resource_limits(account, cur_ram, cur_net, cur_cpu);
         if (cur_ram < 0) return;
 
         // Reconcile `account`'s gifted RAM to its *exact* current usage. The preceding inline
-        // action (createlink / setcode / setabi) already ran, so usage reflects the change. RAM is
+        // action (setcode / setabi) already ran, so usage reflects the change. RAM is
         // checked at transaction end, so the transient over/under in between is fine.
         //   delta > 0 → gift from sysio's pool;  delta < 0 → reclaim back to it (e.g. re-deploying
         //   a smaller contract returns RAM). Always a *conserving transfer* with sysio — never a

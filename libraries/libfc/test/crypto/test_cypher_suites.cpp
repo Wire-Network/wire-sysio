@@ -299,6 +299,27 @@ BOOST_AUTO_TEST_CASE(test_em_is_canonical) try {
    BOOST_TEST(!em::public_key::is_canonical(non_canonical.get<em::signature_shim>()._data));
 } FC_LOG_AND_RETHROW();
 
+// public_key::operator< must order key bytes UNSIGNED (it routes through
+// less_comparator -> std::memcmp). authority validate() relies on this exact
+// ordering, and CDT-side contract code sorts keys with the same semantics, so a
+// regression to signed-char comparison here would silently disagree with the
+// contract for any key byte >= 0x80 and make valid authorities look unsorted.
+// Two EM keys (same variant index) differing first at a high-bit byte pin it.
+BOOST_AUTO_TEST_CASE(test_em_ordering_is_unsigned) try {
+   auto make_em = [](unsigned char second_byte) {
+      std::array<char, 33> d{};
+      d[0] = static_cast<char>(0x02);          // compressed-point prefix
+      d[1] = static_cast<char>(second_byte);   // first differing byte
+      return public_key(em::public_key_shim(d));
+   };
+   const auto k_hi = make_em(0x80);  // 128 unsigned, -128 if compared as signed char
+   const auto k_lo = make_em(0x01);  //   1 unsigned,    1 signed
+
+   // memcmp orders 0x80 (128) after 0x01 (1); signed char would invert both.
+   BOOST_TEST(  (k_lo < k_hi) );
+   BOOST_TEST( !(k_hi < k_lo) );
+} FC_LOG_AND_RETHROW();
+
 BOOST_AUTO_TEST_CASE(test_ed_pub_str) try {
    auto pub_str = "5oNDL3swdJJF1g9DzJiZ4ynHXgszjAEpUkxVYejchzrY";
    auto pub_key = fc::crypto::public_key::from_string(pub_str, public_key::key_type::ed);

@@ -1,24 +1,9 @@
 #include <cstdint>
 #include <sysio.authex/sysio.authex.hpp>
-#include <sysio.system/native.hpp>
 #include <sysio/print.hpp>
-#include <sysio/system.hpp>   // get_ram_usage
 
 namespace {
 using namespace sysio;
-
-// ABI of sysio.roa::giftram, for the inline call in createlink.
-struct giftram_args {
-   name    account;
-   int64_t usage_before;
-};
-
-struct expandauth {
-   name account;
-   name permission;
-   std::vector<key_weight> new_keys;
-   std::vector<sysiosystem::permission_level_weight> new_accounts;
-};
 
 using ed_raw_key_t = std::array<uint8_t, 32>;
 
@@ -134,24 +119,11 @@ namespace sysio {
       .pub_key = verified_pub_key,
    });
 
-   // Snapshot RAM usage before the inline auth change below; giftram (which runs after
-   // it) gifts exactly the delta it consumes. RAM is checked at transaction end, so the
-   // temporary overage in between is fine.
-   int64_t usage_before = get_ram_usage(account);
-
-   // AMEND `active` PERMISSIONS
-   action(permission_level{"sysio"_n, "active"_n}, "sysio"_n, "expandauth"_n,
-          expandauth{account, "active"_n,
-
-                     std::vector<key_weight>{key_weight{verified_pub_key, 1}},
-                     std::vector<sysiosystem::permission_level_weight>{}})
-      .send();
-
-   // GIFT exactly the RAM the active key-add consumes, via sysio.roa::giftram (runs after
-   // expandauth → sees the post-add usage), drawn from sysio's pool.
-   action(permission_level{get_self(), "owner"_n}, "sysio.roa"_n, "giftram"_n,
-          giftram_args{account, usage_before})
-      .send();
+   // The verified key is recorded in the links table only; it is NOT added to the
+   // account's `active` (or any) permission, so the link grants no Wire signing
+   // authority. Downstream consumers (OPERATORS attestation, ETH address derivation)
+   // read the link record. The row is billed to sysio (links.emplace above), so
+   // createlink charges the account no RAM -- no gift is needed.
 }
 
 
