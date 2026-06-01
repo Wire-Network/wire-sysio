@@ -654,8 +654,10 @@ kms_signer make_kms_signature_provider(const kms_key_ref&             ref,
       // 32-byte digest modulo the curve order and emits (r, s) -- so the
       // signature KMS produces over `keccak256(rlp(tx))` is byte-identical to
       // what a local secp256k1 signer would produce over the same 32 bytes.
-      // The self-verify in `em_sign_keccak` (recover + compare to the pinned
-      // public key) catches any deviation on every signature.
+      // `recover_v` below recovers the signer from each signature and rejects any
+      // that does not match the pinned key, so a deviation is caught on every
+      // sign; the once-per-provider self-verify in `em_sign_keccak` is a separate,
+      // structural check that the keccak digest reached the closure intact.
       req.SetSigningAlgorithm(Aws::KMS::Model::SigningAlgorithmSpec::ECDSA_SHA_256);
 
       auto outcome = state->client->Sign(req);
