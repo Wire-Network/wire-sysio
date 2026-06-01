@@ -168,6 +168,15 @@ bool decode_base58(const char* psz, std::vector<unsigned char>& vch) {
 namespace fc {
 
 std::string to_base58(const char* d, size_t s, const fc::yield_function_t& yield) {
+   // Empty input encodes to an empty string. Return directly rather than
+   // forming d + s: that is undefined behavior when d is null (an empty
+   // std::vector's data() is permitted to return nullptr), and there is no
+   // work to interrupt, so no yield is needed. A null pointer paired with a
+   // non-zero length is a caller bug and is rejected rather than turned into
+   // an invalid [d, d + s) range.
+   if (s == 0)
+      return std::string();
+   FC_ASSERT(d != nullptr, "to_base58 called with null data pointer and non-zero length {}", s);
    return encode_base58(d, d + s, yield);
 }
 

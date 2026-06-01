@@ -42,8 +42,18 @@ const std::vector<std::pair<std::string, std::string>> k_bitcoin_vectors = {
 BOOST_AUTO_TEST_SUITE(base58_tests)
 
 BOOST_AUTO_TEST_CASE(empty_input_encodes_to_empty_string) {
+   // A null pointer with zero length is explicitly supported: to_base58
+   // returns an empty string before forming d + s, so no pointer arithmetic
+   // is performed on the null pointer.
    BOOST_CHECK_EQUAL(fc::to_base58(nullptr, 0, fc::yield_function_t{}), "");
    BOOST_CHECK_EQUAL(fc::to_base58(std::vector<char>{}, fc::yield_function_t{}), "");
+}
+
+BOOST_AUTO_TEST_CASE(null_data_with_nonzero_length_throws) {
+   // A null data pointer is only valid for empty input. A non-zero length
+   // paired with a null pointer is a caller bug and must be rejected rather
+   // than used to form an invalid range.
+   BOOST_CHECK_THROW(fc::to_base58(nullptr, 5, fc::yield_function_t{}), fc::assert_exception);
 }
 
 BOOST_AUTO_TEST_CASE(empty_string_decodes_to_empty_vector) {
@@ -177,8 +187,9 @@ BOOST_AUTO_TEST_CASE(to_base58_invokes_yield_even_for_small_inputs) {
    // once a deadline expires, and rely on to_base58 invoking it so an
    // already-expired deadline is observed. The in-loop yield only fires
    // every 64 input bytes and sits after the leading-zero skip, so key-,
-   // signature-, empty-, and all-zero-sized inputs must be covered by the
-   // unconditional entry/exit yields.
+   // signature-, and all-zero-sized inputs must be covered by the
+   // unconditional entry/exit yields. Empty input is the exception: it does
+   // no work and returns immediately without yielding.
    const auto count_yields = [](const std::vector<char>& in) {
       int calls = 0;
       fc::to_base58(in.data(), in.size(), fc::yield_function_t{[&calls]() { ++calls; }});
@@ -189,11 +200,11 @@ BOOST_AUTO_TEST_CASE(to_base58_invokes_yield_even_for_small_inputs) {
    BOOST_CHECK_GT(count_yields(std::vector<char>(32, char{0x11})), 0);
    // 65-byte signature: still under two full cadence intervals.
    BOOST_CHECK_GT(count_yields(std::vector<char>(65, char{0x22})), 0);
-   // Empty input: the conversion loop never runs.
-   BOOST_CHECK_GT(count_yields(std::vector<char>{}), 0);
-   // All-zero input: every byte is skipped before the loop, so the
-   // in-loop yield is unreachable.
+   // All-zero input: every byte is skipped before the loop, so the in-loop
+   // yield is unreachable and the entry/exit yields must cover it.
    BOOST_CHECK_GT(count_yields(std::vector<char>(40, char{0})), 0);
+   // Empty input does no work and returns before reaching any yield site.
+   BOOST_CHECK_EQUAL(count_yields(std::vector<char>{}), 0);
 
    // A large non-zero input must additionally hit the periodic in-loop
    // yield, so it observes a deadline that expires mid-encode rather than
