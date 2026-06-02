@@ -51,6 +51,21 @@ all the same base58check:
 In short: `K1`/`R1`/`WA` share the salted base58check scheme; `ED` is base58 but
 checksum-less; `BLS` is base64url with an unsalted checksum; `EM` is hex.
 
+The above are the **string** forms. When a key is serialized in **binary** -- in action
+data, a contract table, or a signature -- it is a tagged variant: a leading 1-byte index
+identifies the type, followed by the raw key bytes. The index is the variant discriminant:
+
+| index | 0  | 1  | 2  | 3  | 4  | 5   |
+|-------|----|----|----|----|----|-----|
+| type  | K1 | R1 | WA | EM | ED | BLS |
+
+That index is how `K1`, `R1`, and `EM` are told apart even though all three are the same
+33-byte secp256k1 point -- so a binary `public_key` is self-describing, and any of the six
+types is unambiguous with no external context. The exception is OPP attestation `bytes`
+fields (e.g. `actor_pub_key`): those carry the bare key bytes with **no** index, so the
+type is supplied out of band by `ChainKind` (see the OPP section below) -- which is why
+those fields only cover the external-chain key types.
+
 ## Signing performance: K1 vs R1
 
 K1 (secp256k1) is faster than R1 (secp256r1 / NIST P-256), both for signing and
@@ -112,31 +127,47 @@ or Solana (`ED`) key can additionally be *linked* to the account
 
 ## OPP protobuf form
 
-OPP attestation messages carry public keys as raw protobuf `bytes`, **not** the
-`PUB_*_` string. Example (`libraries/opp/proto/sysio/opp/attestations/attestations.proto`):
+OPP attestation messages carry public keys as protobuf fields, **not** the `PUB_*_`
+string. There are two carriage forms, both defined in
+`libraries/opp/proto/sysio/opp/attestations/attestations.proto`:
 
-```proto
-message NodeOwnerRegistration {
-  bytes actor_pub_key = 2;   // depositor's external-chain public key
-  ...
-}
-```
+**1. External-chain key as raw `bytes`, curve implied by `ChainKind`.** The depositor's
+key on the originating chain rides as a bare `bytes` field (e.g. `actor_pub_key`); the
+depot (`sysio.msgch`) rebuilds a Wire `public_key` via
+`public_key_from_op_address(chain_kind, bytes)`:
 
-The depot (`sysio.msgch`) converts those bytes into a Wire `public_key` via
-`public_key_from_op_address(chain_kind, bytes)` before dispatching to a contract.
-The bytes are the curve's serialized point keyed by `ChainKind`:
+| `ChainKind`       | Wire key type | `bytes` length / form                              |
+|-------------------|---------------|----------------------------------------------------|
+| `CHAIN_KIND_EVM`  | `EM`          | 33 -- compressed secp256k1 (0x02/0x03 prefix + 32-byte X) |
+| `CHAIN_KIND_SVM`  | `ED`          | 32 -- raw ed25519 point                             |
+| `CHAIN_KIND_WIRE` | `K1`          | 33 -- compressed secp256k1                          |
 
-| `ChainKind`            | Wire key type | `bytes` length / form               |
-|------------------------|---------------|-------------------------------------|
-| `CHAIN_KIND_EVM`       | `EM`          | 33 -- compressed secp256k1 (1-byte 0x02/0x03 prefix + 32-byte X) |
-| `CHAIN_KIND_SVM`       | `ED`          | 32 -- raw ed25519 point              |
-| `CHAIN_KIND_WIRE`      | `K1`          | 33 -- compressed secp256k1           |
+**2. Typed key in a `WireKey` message.** `WireKey` is `{key_type, key}`: `key_type` (the
+`WireKeyType` enum) names the `public_key` variant and `key` holds the **raw** key bytes
+with **no** variant-index prefix (the prefix is unneeded -- `key_type` is the discriminant):
 
-Only external-chain keys (`EM`, `ED`) actually ride OPP messages -- they originate on
-external chains (Ethereum/Solana). Wire-native keys (`K1`/`R1`/`BLS`/`WA`) are never
-carried in OPP attestations; a Wire account's link to an external key lives in the
-`sysio.authex::links` table (queried by `nodeownreg` via the `bynamechain` index),
-not in the OPP payload.
+| `WireKeyType`      | Variant | `key` form                  |
+|--------------------|---------|-----------------------------|
+| `WIRE_KEY_TYPE_K1` | 0 (K1)  | 33 -- compressed secp256k1   |
+| `WIRE_KEY_TYPE_R1` | 1 (R1)  | 33 -- compressed secp256r1   |
+| `WIRE_KEY_TYPE_EM` | 3 (EM)  | 33 -- compressed secp256k1   |
+| `WIRE_KEY_TYPE_ED` | 4 (ED)  | 32 -- raw ed25519            |
+
+(`WIRE_KEY_TYPE_WA` and `_BLS` exist in the enum but the node-owner depot decode does
+not accept them as account keys: WebAuthn is variable-length and BLS is a
+consensus/finalizer key, never an account owner/active authority.)
+
+`WireKey` is a standalone message, deliberately **not** a field on the shared `ChainAddress`:
+adding a usually-default field to `ChainAddress` would be omitted by proto3 on the wire but
+expected by the regenerated abi, breaking the table decodes of every contract that stores a
+`ChainAddress`.
+
+`NodeOwnerRegistration` uses both forms: the depositor's external key as `actor_pub_key`
+(form 1, EVM) and the **new Wire account's** owner/active key as `wire_pub_key` (form 2, a
+`WireKey`). So a Wire-native key *does* ride this attestation -- it is the account key being
+established. The depot creates the account from `wire_pub_key`, registers the owner, and
+records the depositor's external key in `sysio.authex::links` (keyed by account+chain via
+the `bynamechain` index), which is separate from the account's own owner/active authority.
 
 ## Using an existing Ethereum keypair as a Wire K1 key
 

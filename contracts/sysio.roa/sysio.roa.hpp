@@ -103,17 +103,27 @@ namespace sysio {
             void forcereg(const name& owner, const uint8_t& tier);
 
             /**
-             * @brief Registers a node owner directly when the depot processes an
-             *        inbound OPP NodeOwnerRegistration attestation. Verifies the
-             *        depositor's ETH public key is linked to the owner's Wire account
-             *        via the sysio.authex links table.
+             * @brief Registers a node owner when the depot (sysio.msgch) processes an inbound OPP
+             *        NodeOwnerRegistration attestation. The register step of the NFT claim flow; the
+             *        depot inline-sends newnameduser (account create) immediately before this so the
+             *        account already exists when nodeownreg runs.
              *
-             * @param owner          The Wire account to register as node owner (must exist).
-             * @param tier           Node owner tier: 1, 2, or 3.
-             * @param eth_pub_key    The ETH public key of the depositor (in Wire PUB_EM format).
+             * Trust-OPP: the OPP envelope is the deposit proof, so this RECORDS the depositor's ETH
+             * key as a sysio.authex link (inline recordlink) rather than verifying a pre-existing
+             * createlink. Claim-payload problems (bad name, account controlled by a different key,
+             * already registered) are soft-failed -- recorded in `nodeownerreg` with a reject_reason
+             * and returned -- never thrown, so the dispatching transaction commits. Depot/system
+             * invariants (tier range, ETH key type, ROA active) stay hard checks.
+             *
+             * @param owner        The Wire account to register as node owner (created in-flow if absent).
+             * @param tier         Node owner tier: 1, 2, or 3.
+             * @param eth_pub_key  The depositor's ETH public key (Wire PUB_EM format); recorded as the link.
+             * @param wire_pub_key The Wire account owner/active key the claim specified; an existing
+             *                     account must be controlled by exactly this key or the claim is rejected.
              */
             [[sysio::action]]
-            void nodeownreg(const name& owner, const uint8_t& tier, const public_key& eth_pub_key);
+            void nodeownreg(const name& owner, const uint8_t& tier, const public_key& eth_pub_key,
+                            const public_key& wire_pub_key);
 
             /**
              * @brief Creates a new user account on the network and records the sponsor mapping.
@@ -296,12 +306,16 @@ namespace sysio {
             // Rejection reason for `nodeownerreg::reason` (only meaningful when status == REJECTED).
             // Under trust-OPP, nodeownreg soft-fails claim-payload errors by recording one of these
             // instead of aborting the dispatching transaction, so the failure is queryable on Wire.
+            // (Values renumbered for the create-in-flow model: the ETH link is now *recorded* via
+            // sysio.authex::recordlink rather than verified against a pre-existing createlink, so the
+            // former NO_AUTHEX_LINK / KEY_MISMATCH reasons no longer apply. Pre-launch: no stored rows
+            // to migrate.)
             enum reject_reason : uint8_t {
-                NONE              = 0,  // not rejected
-                OWNER_NOT_ACCOUNT = 1,  // owner is not an existing account
-                NO_AUTHEX_LINK    = 2,  // owner has no ETH link in sysio.authex
-                KEY_MISMATCH      = 3,  // linked ETH key differs from the claimed key
-                DUPLICATE         = 4   // owner is already a registered node owner
+                NONE                 = 0,  // not rejected
+                NAME_INVALID         = 1,  // chosen account name violates the tier's length rule
+                OWNER_NOT_ACCOUNT    = 2,  // account does not exist (creation did not occur)
+                ACCOUNT_KEY_MISMATCH = 3,  // existing account's active authority != the single claimed wire key
+                DUPLICATE            = 4   // owner is already a registered node owner
             };
 
             struct [[sysio::table("nodeownerreg")]] nodeownerreg {
@@ -392,6 +406,31 @@ namespace sysio {
              * @param reason  reject_reason; reject_reason::NONE for a CONFIRMED row.
              */
             void record_nodereg(const name& owner, const uint8_t& tier, uint8_t status, uint8_t reason);
+
+            /**
+             * @brief Whether `account`'s name satisfies the node-owner name-length rule for `tier`.
+             *        Tier-1 owners take a short 2-6 char prefix (sub-accounts become <prefix>.<random>);
+             *        tier 2/3 take a 1-12 char vanity name. Shared by newnameduser (gates creation) and
+             *        nodeownreg (records NAME_INVALID) so the rule lives in one place.
+             *
+             * @param account The chosen account name.
+             * @param tier    Node-owner tier (must already be validated to 1-3).
+             * @return true if the name length is valid for the tier.
+             */
+            static bool valid_name_for_tier(const name& account, uint8_t tier);
+
+            /**
+             * @brief Whether `key` can satisfy `account`'s `active` authority by itself -- i.e. it
+             *        appears among the active keys with weight >= threshold. Passes for a
+             *        newnameduser-created account ({key}) and for a standard account that also carries
+             *        the benign <account>@sysio.code entry; rejects an account a different key controls
+             *        (that key won't be present) and a multi-sig where `key` alone is insufficient.
+             *
+             * @param account The account whose active permission to inspect.
+             * @param key     The claimed owner/active public key.
+             * @return true if `key` alone controls `account`'s active permission.
+             */
+            static bool active_key_matches(const name& account, const public_key& key);
 
 
             /**

@@ -13,6 +13,7 @@
 #include <sysio/chain/authority.hpp>
 #include <sysio/chain/authorization_manager.hpp>
 #include <sysio/chain/permission_object.hpp>
+#include <sysio/chain/kv_table_objects.hpp>   // kv_index / by_code_key for reading sysio.roa kv tables
 #include <sysio/opp/opp.hpp>
 #include <sysio/opp/opp.pb.h>
 #include <sysio/opp/attestations/attestations.pb.h>
@@ -170,6 +171,37 @@ std::string encode_operator_action(
    return out;
 }
 
+/// Extract the raw 33-byte compressed point from a K1 `public_key` (no variant-index prefix) --
+/// the form `WireKey.key` carries for a `WIRE_KEY_TYPE_K1` key. fc packs a K1 public_key as
+/// [1-byte variant index 0][33-byte point]; strip the index byte.
+std::vector<char> k1_pubkey_bytes(const fc::crypto::public_key& pk) {
+   auto packed = fc::raw::pack(pk);
+   BOOST_REQUIRE_EQUAL(packed.size(), 34u);   // index(1) + compressed point(33)
+   return std::vector<char>(packed.begin() + 1, packed.end());
+}
+
+/// Encode a NodeOwnerRegistration attestation payload: the Wire account name + tier, the new
+/// account's owner/active key as a `WireKey` (key_type + raw bytes), and the depositor's ETH key.
+std::string encode_node_owner_registration(
+   const std::string& account,
+   uint32_t tier,
+   sysio::opp::types::WireKeyType wire_key_type,
+   const std::vector<char>& wire_key_bytes,
+   const std::vector<char>& eth_pubkey_bytes)
+{
+   sysio::opp::attestations::NodeOwnerRegistration reg;
+   reg.mutable_account()->set_name(account);
+   reg.set_tier(tier);
+   reg.set_actor_pub_key(eth_pubkey_bytes.data(), eth_pubkey_bytes.size());
+   auto* wk = reg.mutable_wire_pub_key();
+   wk->set_key_type(wire_key_type);
+   wk->set_key(wire_key_bytes.data(), wire_key_bytes.size());
+
+   std::string out;
+   reg.SerializeToString(&out);
+   return out;
+}
+
 } // anonymous namespace
 
 class sysio_dispatch_tester : public tester {
@@ -183,8 +215,14 @@ public:
    static constexpr auto TOKEN_ACCOUNT  = "sysio.token"_n;
    static constexpr auto AUTHEX_ACCOUNT = "sysio.authex"_n;
    static constexpr auto CHAINS_ACCOUNT = "sysio.chains"_n;
+   static constexpr auto ROA_ACCOUNT    = "sysio.roa"_n;
    static constexpr auto BATCHOP        = "batchop.a"_n;
    static constexpr auto UWRIT_OP       = "uwrit.alice"_n;
+   // Pre-created claim account for the NodeOwnerRegistration test: a fresh single-key account, so
+   // nodeownreg's active_key_matches succeeds when the claim carries that same key (existing-account
+   // path -- exercises the dispatch decode + routing without the account-creation machinery).
+   static constexpr auto CLAIM_ACCOUNT  = "claimacct"_n;
+   static constexpr uint64_t ROA_NETWORK_GEN = 0;
 
    sysio_dispatch_tester() {
       produce_blocks(2);
@@ -194,6 +232,12 @@ public:
          RESERV_ACCOUNT, CHALG_ACCOUNT, TOKEN_ACCOUNT, CHAINS_ACCOUNT,
          BATCHOP, UWRIT_OP
       });
+      // CLAIM_ACCOUNT with NO roa policy (include_roa_policy=false) so it has no pre-existing
+      // reslimit -- regnodeowner creates that, and would throw "Resource limit already exist"
+      // otherwise. include_code=true leaves the standard <account>@sysio.code on active, which
+      // exercises active_key_matches against a real (non-single-entry) authority.
+      create_account(CLAIM_ACCOUNT, config::system_account_name,
+                     /*multisig=*/false, /*include_code=*/true, /*include_roa_policy=*/false);
       produce_blocks(2);
 
       deploy(MSGCH_ACCOUNT,  contracts::msgch_wasm(),   contracts::msgch_abi(),   msgch_abi);
@@ -203,8 +247,23 @@ public:
       deploy(RESERV_ACCOUNT, contracts::reserve_wasm(), contracts::reserve_abi(), reserv_abi);
       deploy(AUTHEX_ACCOUNT, contracts::authex_wasm(),  contracts::authex_abi(),  authex_abi);
       deploy(CHAINS_ACCOUNT, contracts::chains_wasm(),  contracts::chains_abi(),  chains_abi);
+      // sysio.roa is a genesis system account already running this build's code (active, with the
+      // sysio.acct policy), so re-deploying it would fail set_exact_code. Just load its on-chain abi
+      // for the kv table reads below.
+      {
+         const auto* roa_acct = control->find_account_metadata(ROA_ACCOUNT);
+         BOOST_REQUIRE(roa_acct != nullptr);
+         abi_def roa_parsed;
+         BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(roa_acct->abi, roa_parsed), true);
+         roa_abi.set_abi(std::move(roa_parsed),
+                         abi_serializer::create_yield_function(abi_serializer_max_time));
+      }
 
       grant_code_authors(OPREG_ACCOUNT, {MSGCH_ACCOUNT});
+      // NodeOwnerRegistration delegations (the production analogue is wired in ClusterManager):
+      // msgch -> sysio.roa (newnameduser/nodeownreg), and sysio.roa -> sysio.authex (recordlink).
+      grant_code_authors(ROA_ACCOUNT,    {MSGCH_ACCOUNT});
+      grant_code_authors(AUTHEX_ACCOUNT, {ROA_ACCOUNT});
 
       produce_blocks();
    }
@@ -377,7 +436,37 @@ public:
       return fc::variant();
    }
 
-   abi_serializer msgch_abi, opreg_abi, uwrit_abi, epoch_abi, reserv_abi, authex_abi, chains_abi;
+   // Read sysio.roa's kv tables (scoped by network_gen). `nodeowners` proves registration;
+   // `nodeownerreg` is the audit row (status / reject_reason).
+   fc::variant get_nodeowner(name acc) {
+      const auto& db = control->db();
+      auto key = chain::make_kv_scoped_key(ROA_NETWORK_GEN, acc.to_uint64_t());
+      const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
+      auto it = kv_idx.find(boost::make_tuple(ROA_ACCOUNT,
+                  chain::compute_table_id(name("nodeowners").to_uint64_t()), key.to_string_view()));
+      if (it != kv_idx.end() && it->value.size()) {
+         std::vector<char> data(it->value.data(), it->value.data() + it->value.size());
+         return roa_abi.binary_to_variant("nodeowners", data,
+            abi_serializer::create_yield_function(abi_serializer_max_time));
+      }
+      return fc::variant();
+   }
+
+   fc::variant get_nodeownerreg(name acc) {
+      const auto& db = control->db();
+      auto key = chain::make_kv_scoped_key(ROA_NETWORK_GEN, acc.to_uint64_t());
+      const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
+      auto it = kv_idx.find(boost::make_tuple(ROA_ACCOUNT,
+                  chain::compute_table_id(name("nodeownerreg").to_uint64_t()), key.to_string_view()));
+      if (it != kv_idx.end() && it->value.size()) {
+         std::vector<char> data(it->value.data(), it->value.data() + it->value.size());
+         return roa_abi.binary_to_variant("nodeownerreg", data,
+            abi_serializer::create_yield_function(abi_serializer_max_time));
+      }
+      return fc::variant();
+   }
+
+   abi_serializer msgch_abi, opreg_abi, uwrit_abi, epoch_abi, reserv_abi, authex_abi, chains_abi, roa_abi;
 
    std::vector<char> uwrit_op_eth_pubkey;
 };
@@ -469,6 +558,38 @@ BOOST_FIXTURE_TEST_CASE(dispatch_silently_drops_out_of_scope_types, sysio_dispat
    BOOST_REQUIRE(!op.is_null());
    const auto& balances = op["balances"].get_array();
    BOOST_REQUIRE_EQUAL(0u, balances.size());
+} FC_LOG_AND_RETHROW() }
+
+// NodeOwnerRegistration: msgch decodes the attestation and inline-sends sysio.roa::newnameduser then
+// nodeownreg. CLAIM_ACCOUNT pre-exists with a single-key active, so newnameduser no-ops and the
+// claim's matching wire key drives nodeownreg's existing-account path to CONFIRMED (registers the
+// owner and inline-records the depositor's ETH link in sysio.authex). Exercises the full dispatch:
+// proto decode (account name + WireKey + ETH key) -> routing -> both roa actions -> recordlink.
+BOOST_FIXTURE_TEST_CASE(dispatch_routes_node_owner_reg_to_roa, sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+
+   const auto eth_code = fc::slug_name{"ETH"}.value;
+   // The claim must carry CLAIM_ACCOUNT's own active key so nodeownreg's active_key_matches passes.
+   auto wire_key = k1_pubkey_bytes(get_public_key(CLAIM_ACCOUNT, "active"));
+   // Depositor's ETH key (EM, 33-byte compressed).
+   auto eth_pub = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em).get_public_key();
+   auto eth_bytes = em_pubkey_bytes(eth_pub);
+
+   auto payload = encode_node_owner_registration(
+      CLAIM_ACCOUNT.to_string(), /*tier=*/2,
+      sysio::opp::types::WIRE_KEY_TYPE_K1, wire_key, eth_bytes);
+   auto envelope = encode_envelope_with_one_attestation(
+      current_epoch(), sysio::opp::types::ATTESTATION_TYPE_NODE_OWNER_REG, payload);
+
+   BOOST_REQUIRE_EQUAL(success(), deliver(/*chain_code=*/eth_code, envelope));
+
+   // Registered at the claimed tier, audited CONFIRMED.
+   auto reg = get_nodeowner(CLAIM_ACCOUNT);
+   BOOST_REQUIRE(!reg.is_null());
+   BOOST_REQUIRE_EQUAL(reg["tier"].as<uint32_t>(), 2u);
+   auto audit = get_nodeownerreg(CLAIM_ACCOUNT);
+   BOOST_REQUIRE(!audit.is_null());
+   BOOST_REQUIRE_EQUAL(audit["status"].as<uint64_t>(), 2u);  // CONFIRMED
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()

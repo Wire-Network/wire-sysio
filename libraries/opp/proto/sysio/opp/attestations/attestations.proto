@@ -126,12 +126,16 @@ message ReserveDisbursement {
 message NodeOwnerRegistration {
   sysio.opp.types.ChainAddress actor          = 1;  // Depositor's ETH address (for reference)
   bytes                        actor_pub_key  = 2;  // Depositor's full ETH public key (for on-chain verification)
-  sysio.opp.types.WireAccount  wire_account   = 3;  // Pre-existing Wire account to register
+  sysio.opp.types.WireAccount  account        = 3;  // Wire account to register; created in-flow with wire_pub_key if it does not yet exist
   uint32                       tier           = 4;  // Node owner tier: 1, 2, or 3
   sysio.opp.types.ChainAddress token_contract = 5;  // ERC1155 contract address
   uint64                       token_id       = 6;  // NFT token ID
   uint64                       token_amount   = 7;  // ERC1155 token amount
   uint64                       timestamp      = 8;  // Deposit block timestamp (seconds)
+  // Wire account owner/active key: key_type names the Wire public_key variant (K1/R1/WA/EM/ED/BLS)
+  // and `key` is the raw key bytes (no variant-index prefix). The depot builds the on-chain
+  // sysio::public_key from (key_type, key).
+  sysio.opp.types.WireKey      wire_pub_key   = 9;
 }
 
 // ---------------------------------------------------------------------------

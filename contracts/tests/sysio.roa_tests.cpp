@@ -1343,51 +1343,47 @@ BOOST_FIXTURE_TEST_CASE( newnameduser_creates_funds_idempotent, sysio_roa_tester
    BOOST_REQUIRE_EQUAL( sysio_q1, sysio_q2 );
 } FC_LOG_AND_RETHROW()
 
-// tier-1 owner names must be a 2-6 char prefix; tier 2/3 up to 12.
+// tier-1 owner names must be a 2-6 char prefix; an out-of-range name is soft-skipped (non-throwing,
+// so the depot dispatch never aborts) -- the account is simply not created. Verified via sysio's RAM
+// pool: a creation draws exactly newaccount_ram from sysio, a soft-skip draws nothing. (We avoid
+// find_account_metadata here -- that host query lags an inline-created account by a block.)
 BOOST_FIXTURE_TEST_CASE( newnameduser_tier_name_rules, sysio_roa_tester ) try {
+   auto& rlm = control->get_resource_limits_manager();
+   int64_t n, cpu, q0, q1, q2;
    auto pub = get_public_key("alice"_n, "owner");
-   // tier-1 name longer than 6 chars rejected
-   BOOST_REQUIRE_EQUAL(
-      error("assertion failure with message: Tier-1 owner name must be a 2-6 character prefix"),
+
+   // tier-1 name longer than 6 chars: soft-skipped -> no account, nothing drawn from sysio.
+   rlm.get_account_limits("sysio"_n, q0, n, cpu);
+   BOOST_REQUIRE_EQUAL( success(),
       push_action(ROA, "newnameduser"_n, mvo()("account","toolongt1")("pubkey",pub)("tier",1)) );
-   // tier-1 short prefix accepted
+   produce_blocks();
+   rlm.get_account_limits("sysio"_n, q1, n, cpu);
+   BOOST_REQUIRE_EQUAL( q0, q1 );
+
+   // tier-1 short prefix accepted -> account created, funded newaccount_ram from sysio's pool.
    BOOST_REQUIRE_EQUAL( success(),
       push_action(ROA, "newnameduser"_n, mvo()("account","acme")("pubkey",pub)("tier",1)) );
+   produce_blocks();
+   rlm.get_account_limits("sysio"_n, q2, n, cpu);
+   BOOST_REQUIRE_EQUAL( q1 - q2, (int64_t)newaccount_ram );
 } FC_LOG_AND_RETHROW()
 
 // ---------------------------------------------------------------------------
-// nodeownreg tests (OPP Node Owner NFT Registration via authex cross-contract)
+// nodeownreg tests (OPP Node Owner NFT claim: create-in-flow + register + record ETH link)
+//
+// Under the create-in-flow model the depot (sysio.msgch) inline-sends newnameduser (creates the
+// account with the claimed wire key) then nodeownreg (registers + records the depositor's ETH key
+// via an inline sysio.authex::recordlink). These unit tests drive the two sysio.roa actions
+// directly, signed by ROA, the same way the depot would. The fixture wires the
+// sysio.authex.active <- sysio.roa@sysio.code delegation that authorizes the inline recordlink.
 // ---------------------------------------------------------------------------
-
-/**
- * @brief Replicate authex's pubkey_to_string for EM keys.
- *
- * Builds the same `PUB_EM_<hex>` string that sysio.authex hashes when
- * signing/verifying the createlink message. Must match the contract side
- * byte-for-byte so the host-built signature is accepted on-chain.
- */
-static std::string contract_pubkey_to_string(const fc::crypto::public_key& pk) {
-   const auto& shim = pk.get<fc::em::public_key_shim>();
-   auto compressed = shim.serialize();
-   return "PUB_EM_" + fc::to_hex(compressed.data(), compressed.size());
-}
-
-static std::string build_link_message(
-   const fc::crypto::public_key& pub_key,
-   const std::string& account,
-   uint8_t chain_kind,
-   uint64_t nonce
-) {
-   auto pub_key_str = contract_pubkey_to_string(pub_key);
-   return pub_key_str + "|" + account + "|" + std::to_string(chain_kind) + "|" + std::to_string(nonce) + "|createlink auth";
-}
 
 class sysio_roa_nodeownreg_tester : public sysio_roa_tester {
 public:
    static constexpr auto AUTHEX = "sysio.authex"_n;
 
    sysio_roa_nodeownreg_tester() {
-      // Deploy authex contract
+      // Deploy authex -- the node-owner flow inline-records the depositor's ETH link there.
       set_code( AUTHEX, contracts::authex_wasm() );
       set_abi( AUTHEX, contracts::authex_abi().data() );
       set_privileged( AUTHEX );
@@ -1398,172 +1394,155 @@ public:
       abi_def abi;
       BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt->abi, abi), true);
       authex_abi_ser.set_abi(abi, abi_serializer::create_yield_function(abi_serializer_max_time));
+
+      // Delegate sysio.authex.active to sysio.roa@sysio.code so nodeownreg's inline recordlink
+      // (declared {sysio.authex, active}) is authorized -- the same code-permission grant the
+      // production bootstrap wires. Without it the inline send fails auth and aborts the claim.
+      // A single co-signer is trivially sorted, so no accounts re-sort is needed.
+      authority a( get_public_key( AUTHEX, "active" ) );
+      a.accounts.push_back( permission_level_weight{ { ROA, config::sysio_code_name }, 1 } );
+      set_authority( AUTHEX, config::active_name, a, config::owner_name );
+      produce_blocks();
    }
 
-   struct em_link_data {
-      fc::crypto::private_key priv;
-      fc::crypto::public_key  pub;
-      fc::crypto::signature   sig;
-      uint64_t                nonce;
-   };
-
-   static constexpr uint8_t CHAIN_KIND_ETHEREUM = 2;
-
-   uint64_t now_ms() {
-      return control->head().block_time().time_since_epoch().count() / 1000;
-   }
-
-   em_link_data make_eth_link(const std::string& account) {
-      uint64_t nonce = now_ms();
-      auto priv = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em);
-      auto pub  = priv.get_public_key();
-      auto msg  = build_link_message(pub, account, CHAIN_KIND_ETHEREUM, nonce);
-      auto msg_hash = fc::crypto::keccak256::hash(msg);
-      auto sig = priv.sign(fc::sha256(reinterpret_cast<const char*>(msg_hash.data()), 32));
-      return { priv, pub, sig, nonce };
-   }
-
-   action_result createlink(const account_name& signer, uint8_t chain_kind,
-                             const fc::crypto::signature& sig,
-                             const fc::crypto::public_key& pub_key, uint64_t nonce)
-   {
-      string action_type_name = authex_abi_ser.get_action_type("createlink"_n);
-      action act;
-      act.account = AUTHEX;
-      act.name    = "createlink"_n;
-      act.data    = authex_abi_ser.variant_to_binary( action_type_name, mvo()
-         ("chain_kind", chain_kind)
-         ("account",    signer)
-         ("sig",        sig)
-         ("pub_key",    pub_key)
-         ("nonce",      nonce),
-         abi_serializer::create_yield_function(abi_serializer_max_time)
-      );
-      return base_tester::push_action( std::move(act), signer.to_uint64_t() );
-   }
-
-   action_result nodeownreg(const name& owner, uint8_t tier, const fc::crypto::public_key& eth_pub_key) {
+   // Push nodeownreg the way the depot does: signed by ROA (which carries sysio.roa.active).
+   action_result nodeownreg(const name& owner, uint8_t tier,
+                            const fc::crypto::public_key& eth_pub_key,
+                            const fc::crypto::public_key& wire_pub_key) {
       return push_action(ROA, "nodeownreg"_n, mvo()
          ("owner", owner)
          ("tier", tier)
          ("eth_pub_key", eth_pub_key)
-      );
+         ("wire_pub_key", wire_pub_key));
    }
 
-   // nodeownerreg status + reject_reason values (mirror sysio.roa.hpp)
-   static constexpr uint64_t CONFIRMED = 2, REJECTED = 3;
-   static constexpr uint64_t R_OWNER_NOT_ACCOUNT = 1, R_NO_AUTHEX_LINK = 2, R_KEY_MISMATCH = 3, R_DUPLICATE = 4;
+   // Create the claim account in-flow (depot path) with `wire_pub_key` as owner/active.
+   action_result newnameduser(const name& account, const fc::crypto::public_key& wire_pub_key, uint8_t tier) {
+      return push_action(ROA, "newnameduser"_n, mvo()
+         ("account", account)("pubkey", wire_pub_key)("tier", tier));
+   }
 
-   // TODO(depot-auth): mirror the real claim flow once createlink accepts depot auth — create the
-   // claim account via newnameduser (finite, sysio-funded) and have the DEPOT push createlink. For
-   // now these tests use the base "alice" account: a freshly-created (newnameduser) account is
-   // funded RAM but 0 NET/CPU, so it cannot push its own createlink ("net usage too high"); the
-   // base account has unlimited RAM + NET/CPU, and giftram correctly no-ops for unlimited RAM.
+   static fc::crypto::public_key gen_em_key() {
+      return fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em).get_public_key();
+   }
+   static fc::crypto::public_key gen_k1_key() {
+      return fc::crypto::private_key::generate(fc::crypto::private_key::key_type::k1).get_public_key();
+   }
+
+   // nodeownerreg reg_status + reject_reason values (mirror sysio.roa.hpp).
+   static constexpr uint64_t CONFIRMED = 2, REJECTED = 3;
+   static constexpr uint64_t R_NAME_INVALID = 1, R_OWNER_NOT_ACCOUNT = 2,
+                             R_ACCOUNT_KEY_MISMATCH = 3, R_DUPLICATE = 4;
 
    abi_serializer authex_abi_ser;
 };
 
-// Happy path: funded account + matching ETH link -> nodeownreg confirms registration.
+// Happy path: depot creates the account with the claimed wire key, then nodeownreg registers and
+// records the depositor's ETH link.
 BOOST_FIXTURE_TEST_CASE( nodeownreg_happy_path, sysio_roa_nodeownreg_tester ) try {
-   auto owner = "alice"_n;
-   auto link = make_eth_link("alice");
-   BOOST_REQUIRE_EQUAL(success(), createlink(owner, CHAIN_KIND_ETHEREUM, link.sig, link.pub, link.nonce));
+   const auto owner    = "claimacct"_n;
+   const auto wire_pub = gen_k1_key();
+   const auto eth_pub  = gen_em_key();
+
+   BOOST_REQUIRE_EQUAL(success(), newnameduser(owner, wire_pub, 2));
    produce_blocks();
 
-   BOOST_REQUIRE_EQUAL(success(), nodeownreg(owner, 1, link.pub));
+   BOOST_REQUIRE_EQUAL(success(), nodeownreg(owner, 2, eth_pub, wire_pub));
    produce_blocks();
 
+   // A CONFIRMED registration proves the account was created with wire_pub: nodeownreg's
+   // active_key_matches requires the account to exist and be controlled by exactly that key, so
+   // reaching CONFIRMED (rather than OWNER_NOT_ACCOUNT / ACCOUNT_KEY_MISMATCH) is the existence proof.
    auto reg = get_nodeowner(owner);
    BOOST_REQUIRE_EQUAL(reg.is_null(), false);
-   BOOST_REQUIRE_EQUAL(reg["tier"].as<uint32_t>(), 1);
+   BOOST_REQUIRE_EQUAL(reg["tier"].as<uint32_t>(), 2);
    auto audit = get_nodeownerreg(owner);
    BOOST_REQUIRE_EQUAL(audit.is_null(), false);
    BOOST_REQUIRE_EQUAL(audit["status"].as<uint64_t>(), CONFIRMED);
+   // nodeownreg returning success implies the inline recordlink ({sysio.authex, active}) was
+   // authorized and ran -- an unauthorized inline send would have aborted the whole transaction.
+   // recordlink's own table effects are covered by the sysio.authex unit tests.
 } FC_LOG_AND_RETHROW()
 
-// Wrong ETH key -> soft-fail: REJECTED/KEY_MISMATCH, not registered, no abort.
-BOOST_FIXTURE_TEST_CASE( nodeownreg_wrong_pubkey, sysio_roa_nodeownreg_tester ) try {
-   auto owner = "alice"_n;
-   auto link = make_eth_link("alice");
-   BOOST_REQUIRE_EQUAL(success(), createlink(owner, CHAIN_KIND_ETHEREUM, link.sig, link.pub, link.nonce));
+// Existing account controlled by a different key than the claim -> REJECTED/ACCOUNT_KEY_MISMATCH.
+BOOST_FIXTURE_TEST_CASE( nodeownreg_account_key_mismatch, sysio_roa_nodeownreg_tester ) try {
+   const auto owner   = "claimacct"_n;
+   const auto real_k  = gen_k1_key();   // key the account is actually created with
+   const auto claimed = gen_k1_key();   // a different key in the claim
+   const auto eth_pub = gen_em_key();
+
+   BOOST_REQUIRE_EQUAL(success(), newnameduser(owner, real_k, 2));
    produce_blocks();
 
-   auto wrong_key = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em).get_public_key();
-   BOOST_REQUIRE_EQUAL(success(), nodeownreg(owner, 1, wrong_key));
-   produce_blocks();
-
-   BOOST_REQUIRE(get_nodeowner(owner).is_null());
-   auto audit = get_nodeownerreg(owner);
-   BOOST_REQUIRE_EQUAL(audit["status"].as<uint64_t>(), REJECTED);
-   BOOST_REQUIRE_EQUAL(audit["reason"].as<uint64_t>(), R_KEY_MISMATCH);
-} FC_LOG_AND_RETHROW()
-
-// No ETH link -> soft-fail: REJECTED/NO_AUTHEX_LINK.
-BOOST_FIXTURE_TEST_CASE( nodeownreg_no_link, sysio_roa_nodeownreg_tester ) try {
-   auto owner = "alice"_n;
-   auto random_key = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em).get_public_key();
-   BOOST_REQUIRE_EQUAL(success(), nodeownreg(owner, 1, random_key));
+   BOOST_REQUIRE_EQUAL(success(), nodeownreg(owner, 2, eth_pub, claimed));
    produce_blocks();
 
    BOOST_REQUIRE(get_nodeowner(owner).is_null());
    auto audit = get_nodeownerreg(owner);
    BOOST_REQUIRE_EQUAL(audit["status"].as<uint64_t>(), REJECTED);
-   BOOST_REQUIRE_EQUAL(audit["reason"].as<uint64_t>(), R_NO_AUTHEX_LINK);
+   BOOST_REQUIRE_EQUAL(audit["reason"].as<uint64_t>(), R_ACCOUNT_KEY_MISMATCH);
 } FC_LOG_AND_RETHROW()
 
-// Already registered (replay) -> soft-fail: REJECTED/DUPLICATE, no abort.
+// Name invalid for the tier (tier-1 name > 6 chars) -> REJECTED/NAME_INVALID (account need not exist).
+BOOST_FIXTURE_TEST_CASE( nodeownreg_name_invalid, sysio_roa_nodeownreg_tester ) try {
+   const auto owner = "toolongname"_n;   // 11 chars: valid charset, too long for tier 1
+   BOOST_REQUIRE_EQUAL(success(), nodeownreg(owner, 1, gen_em_key(), gen_k1_key()));
+   produce_blocks();
+
+   BOOST_REQUIRE(get_nodeowner(owner).is_null());
+   auto audit = get_nodeownerreg(owner);
+   BOOST_REQUIRE_EQUAL(audit["status"].as<uint64_t>(), REJECTED);
+   BOOST_REQUIRE_EQUAL(audit["reason"].as<uint64_t>(), R_NAME_INVALID);
+} FC_LOG_AND_RETHROW()
+
+// Valid-for-tier name that is not an account -> REJECTED/OWNER_NOT_ACCOUNT.
+BOOST_FIXTURE_TEST_CASE( nodeownreg_owner_not_account, sysio_roa_nodeownreg_tester ) try {
+   const auto owner = "ghost"_n;   // 5 chars: valid for tier 1, but no account was created
+   BOOST_REQUIRE_EQUAL(success(), nodeownreg(owner, 1, gen_em_key(), gen_k1_key()));
+   produce_blocks();
+
+   BOOST_REQUIRE(get_nodeowner(owner).is_null());
+   auto audit = get_nodeownerreg(owner);
+   BOOST_REQUIRE_EQUAL(audit["status"].as<uint64_t>(), REJECTED);
+   BOOST_REQUIRE_EQUAL(audit["reason"].as<uint64_t>(), R_OWNER_NOT_ACCOUNT);
+} FC_LOG_AND_RETHROW()
+
+// Replay after a successful claim -> REJECTED/DUPLICATE, no abort.
 BOOST_FIXTURE_TEST_CASE( nodeownreg_already_registered, sysio_roa_nodeownreg_tester ) try {
-   auto owner = "alice"_n;
-   auto link = make_eth_link("alice");
-   BOOST_REQUIRE_EQUAL(success(), createlink(owner, CHAIN_KIND_ETHEREUM, link.sig, link.pub, link.nonce));
+   const auto owner    = "claimacct"_n;
+   const auto wire_pub = gen_k1_key();
+   const auto eth_pub  = gen_em_key();
+
+   BOOST_REQUIRE_EQUAL(success(), newnameduser(owner, wire_pub, 2));
    produce_blocks();
-   BOOST_REQUIRE_EQUAL(success(), nodeownreg(owner, 1, link.pub));
+   BOOST_REQUIRE_EQUAL(success(), nodeownreg(owner, 2, eth_pub, wire_pub));
    produce_blocks();
 
-   BOOST_REQUIRE_EQUAL(success(), nodeownreg(owner, 2, link.pub));
+   BOOST_REQUIRE_EQUAL(success(), nodeownreg(owner, 2, eth_pub, wire_pub));
    produce_blocks();
    auto audit = get_nodeownerreg(owner);
    BOOST_REQUIRE_EQUAL(audit["status"].as<uint64_t>(), REJECTED);
    BOOST_REQUIRE_EQUAL(audit["reason"].as<uint64_t>(), R_DUPLICATE);
 } FC_LOG_AND_RETHROW()
 
-// Invalid tier is an envelope error (depot misuse) -> hard abort.
+// Invalid tier is a depot/system invariant -> hard abort (not a soft-fail).
 BOOST_FIXTURE_TEST_CASE( nodeownreg_invalid_tier, sysio_roa_nodeownreg_tester ) try {
-   auto owner = "alice"_n;
-   auto link = make_eth_link("alice");
-   BOOST_REQUIRE_EQUAL(success(), createlink(owner, CHAIN_KIND_ETHEREUM, link.sig, link.pub, link.nonce));
-   produce_blocks();
-
+   const auto wire_pub = gen_k1_key();
+   const auto eth_pub  = gen_em_key();
    BOOST_REQUIRE_EQUAL(
       error("assertion failure with message: Tier level must be between 1 and 3"),
-      nodeownreg(owner, 0, link.pub));
+      nodeownreg("someacct"_n, 0, eth_pub, wire_pub));
    BOOST_REQUIRE_EQUAL(
       error("assertion failure with message: Tier level must be between 1 and 3"),
-      nodeownreg(owner, 4, link.pub));
+      nodeownreg("someacct"_n, 4, eth_pub, wire_pub));
 } FC_LOG_AND_RETHROW()
 
-// Non-EM key is an envelope error (depot misuse) -> hard abort.
+// Non-EM depositor key is a depot invariant -> hard abort.
 BOOST_FIXTURE_TEST_CASE( nodeownreg_non_em_key, sysio_roa_nodeownreg_tester ) try {
-   auto owner = "alice"_n;
-   auto link = make_eth_link("alice");
-   BOOST_REQUIRE_EQUAL(success(), createlink(owner, CHAIN_KIND_ETHEREUM, link.sig, link.pub, link.nonce));
-   produce_blocks();
-
-   auto k1_pub = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::k1).get_public_key();
+   const auto wire_pub = gen_k1_key();
    BOOST_REQUIRE_EQUAL(
       error("assertion failure with message: eth_pub_key must be an EM (secp256k1) public key"),
-      nodeownreg(owner, 1, k1_pub));
-} FC_LOG_AND_RETHROW()
-
-// Unknown owner -> soft-fail: REJECTED/OWNER_NOT_ACCOUNT.
-BOOST_FIXTURE_TEST_CASE( nodeownreg_owner_not_account, sysio_roa_nodeownreg_tester ) try {
-   auto k = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em).get_public_key();
-   BOOST_REQUIRE_EQUAL(success(), nodeownreg("ghostuser"_n, 1, k));
-   produce_blocks();
-
-   auto audit = get_nodeownerreg("ghostuser"_n);
-   BOOST_REQUIRE_EQUAL(audit["status"].as<uint64_t>(), REJECTED);
-   BOOST_REQUIRE_EQUAL(audit["reason"].as<uint64_t>(), R_OWNER_NOT_ACCOUNT);
+      nodeownreg("someacct"_n, 1, gen_k1_key(), wire_pub));   // K1 depositor key -> reject
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_SUITE_END()
