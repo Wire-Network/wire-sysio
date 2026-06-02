@@ -96,6 +96,17 @@ cmake_workspace_build(
         '{ echo "OPP solidity bundle missing under build/opp — sysio build did not emit it" >&2; exit 1; }',
         "( cd build/opp/solidity && pnpm i --force --no-frozen-lockfile && npm link )",
     ],
+    # BEFORE cmake: install the global OPP protoc plugin and build the proto*
+    # codegen tools (protoc-gen-solidity / protoc-gen-solana / protobuf-bundler).
+    # cmake's OPP-bundle generation invokes these during the build, so they must
+    # exist first. Mirrors wire-devcontainer/scripts/wire-local-setup.bash Stage 2
+    # ("Building OPP Bundles"). The `cd` is in a subshell so cmake still runs from
+    # the wire-sysio root.
+    pre_build_steps = [
+        "npm i -g @protobuf-ts/plugin",
+        "pnpm i -g @protobuf-ts/plugin",
+        "( cd libraries/opp/tools && pnpm install --force --no-frozen-lockfile && pnpm --filter 'proto*' dist )",
+    ],
     tags = [
         "cpp",
         "requires-network",
