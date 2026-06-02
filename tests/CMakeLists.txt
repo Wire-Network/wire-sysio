@@ -23,6 +23,9 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cluster_launcher.py ${CMAKE_CURRENT_B
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/distributed-transactions-test.py ${CMAKE_CURRENT_BINARY_DIR}/distributed-transactions-test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/sysio_util_bls_test.py ${CMAKE_CURRENT_BINARY_DIR}/sysio_util_bls_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/sysio_util_snapshot_info_test.py ${CMAKE_CURRENT_BINARY_DIR}/sysio_util_snapshot_info_test.py COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/metamask/push_metamask_trx.py     ${CMAKE_CURRENT_BINARY_DIR}/metamask/push_metamask_trx.py     COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/metamask/metamask-sign.html       ${CMAKE_CURRENT_BINARY_DIR}/metamask/metamask-sign.html       COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/metamask/README.md                ${CMAKE_CURRENT_BINARY_DIR}/metamask/README.md                COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/clio_em_key_test.py ${CMAKE_CURRENT_BINARY_DIR}/clio_em_key_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/sample-cluster-map.json ${CMAKE_CURRENT_BINARY_DIR}/sample-cluster-map.json COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/restart-scenarios-test.py ${CMAKE_CURRENT_BINARY_DIR}/restart-scenarios-test.py COPYONLY)
@@ -236,6 +239,8 @@ add_np_test(NAME liveness_test COMMAND tests/liveness_test.py -v ${UNSHARE})
 add_np_test(NAME nodeop_chainbase_allocation_test COMMAND tests/nodeop_chainbase_allocation_test.py -v ${UNSHARE})
 
 add_np_test(NAME nodeop_signal_throw_test COMMAND tests/nodeop_signal_throw_test.py -v ${UNSHARE})
+
+add_np_test(NAME metamask_trx_signing_test COMMAND tests/metamask/push_metamask_trx.py --simulate -v ${UNSHARE})
 
 add_lr_test(NAME nodeop_startup_catchup_lr_test COMMAND tests/nodeop_startup_catchup.py -v ${UNSHARE})
 
