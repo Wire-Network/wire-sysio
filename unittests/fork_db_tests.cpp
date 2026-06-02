@@ -251,6 +251,39 @@ BOOST_FIXTURE_TEST_CASE(is_child_of, generate_fork_db_state) try {
 
 } FC_LOG_AND_RETHROW();
 
+// Direct test of block_handle::extends. The helper is a thin wrapper over finality_core::extends with a null-bsp
+// guard; it is indirectly exercised by is_head_descendant_of_pending_lib but not pinned by its own test. This pins
+// the wrapper's contract so a future change (e.g., dropping the null guard) does not slip past the integration tests.
+BOOST_FIXTURE_TEST_CASE(block_handle_extends_test, generate_fork_db_state) try {
+   block_handle h_bsp13a{bsp13a};
+
+   // Self -> false. finality_core::extends requires block_num < current_block_num, so a block does not extend itself.
+   BOOST_TEST(!h_bsp13a.extends(bsp13a->id()));
+
+   // Strict ancestors on the same branch -> true.
+   BOOST_TEST(h_bsp13a.extends(bsp12a->id()));
+   BOOST_TEST(h_bsp13a.extends(bsp11a->id()));
+   BOOST_TEST(h_bsp13a.extends(root->id()));
+
+   // Sibling branches -> false (block_num is in tracking range but block_id differs).
+   BOOST_TEST(!h_bsp13a.extends(bsp11b->id()));
+   BOOST_TEST(!h_bsp13a.extends(bsp12b->id()));
+
+   // block_num below the tracking range (< last_final_block_num) -> false. Catches a regression where extends
+   // widens its lower bound: a synthetic id at block_num 9 sits below root's 10 and must never be accepted.
+   BOOST_TEST(!h_bsp13a.extends(make_block_id(9)));
+
+   // block_num at or above current_block_num on a sibling -> false. Catches a regression where extends widens
+   // its upper bound: bsp13b is at block 13 (== current_block_num of bsp13a) and bsp14b is at block 14 (>),
+   // both on branch b; neither must be reported as extended.
+   BOOST_TEST(!h_bsp13a.extends(bsp13b->id()));
+   BOOST_TEST(!h_bsp13a.extends(bsp14b->id()));
+
+   // Default-constructed (null _bsp) -> false. Without the null guard this would crash.
+   BOOST_TEST(!block_handle{}.extends(root->id()));
+
+} FC_LOG_AND_RETHROW();
+
 // Tests for block_handle::locks_out_branch_of()
 // ----------------------------------------------
 // Build two branches of equal length sharing a common root, attach blocks with
@@ -324,6 +357,162 @@ BOOST_AUTO_TEST_CASE(locks_out_branch_of_test) try {
    BOOST_TEST(!h13a_weak.locks_out_branch_of(h12b));
    BOOST_TEST(!h13a_weak.locks_out_branch_of(h11b));
 
+   // Head higher than `this`, on the same branch (head extends this) -> not locked out. The first extends check
+   // (_bsp->core.extends(head_id)) returns false because head_id is past this->current_block_num, but the qc_target
+   // check then catches that head extends qc_target.
+   block_state_ptr bsp14a_on_strong = test_block_state_accessor::make_unique_block_state(14, bsp13a_strong);
+   block_handle h14a_on_strong{bsp14a_on_strong};
+   BOOST_TEST(!h13a_strong.locks_out_branch_of(h14a_on_strong));
+
+   // Head higher than `this`, on a different branch -> still locked out (head doesn't extend qc_target).
+   block_state_ptr bsp14b_on_strong = test_block_state_accessor::make_unique_block_state(14, bsp13b_strong);
+   block_handle h14b_on_strong{bsp14b_on_strong};
+   BOOST_TEST(h13a_strong.locks_out_branch_of(h14b_on_strong));
+
+   // `this` is the genesis block: create_core_for_genesis_block yields latest_qc_claim().is_strong_qc == false,
+   // so the strong-QC early return fires and no head is ever reported as locked out.
+   BOOST_TEST(!h_root.locks_out_branch_of(h12b));
+
+} FC_LOG_AND_RETHROW();
+
+// Tests for is_head_descendant_of_pending_lib, exercised via its underlying
+// helper: head.id() == pending_savanna_lib_id || head_bsp->core.extends(pending_savanna_lib_id).
+// `set_pending_savanna_lib` is monotonic in block_num, so each case uses a fresh
+// fixture whose pending_lib begins unset.
+
+namespace {
+   bool extends_or_equal(const block_state_ptr& head_bsp, const block_id_type& pending_lib_id) {
+      if (head_bsp->id() == pending_lib_id) return true;
+      return head_bsp->core.extends(pending_lib_id);
+   }
+
+   void check(fork_database_t& fork_db,
+              const block_state_ptr& pending_lib,
+              const std::vector<block_state_ptr>& heads,
+              const std::vector<block_state_ptr>& expected_true) {
+      fork_db.set_pending_savanna_lib(pending_lib->id(), pending_lib->timestamp());
+      const auto pid = pending_lib->id();
+      std::set<block_id_type> true_set;
+      for (const auto& b : expected_true) true_set.insert(b->id());
+      for (const auto& h : heads) {
+         const bool expected = true_set.count(h->id()) > 0;
+         BOOST_TEST_CONTEXT("pending_lib=#" << pending_lib->block_num() << " " << pending_lib->id().str().substr(8, 8)
+                            << ", head=#" << h->block_num() << " " << h->id().str().substr(8, 8)) {
+            BOOST_TEST(extends_or_equal(h, pid) == expected);
+         }
+      }
+   }
+} // anonymous
+
+BOOST_FIXTURE_TEST_CASE(pending_lib_eq_root, generate_fork_db_state) try {
+   // pending_lib at the genesis root -- every block is a descendant (or root itself)
+   const std::vector<block_state_ptr> heads = {root, bsp11a, bsp12a, bsp13a, bsp11b, bsp12b, bsp13b, bsp14b,
+                                                bsp11c, bsp12c, bsp13c, bsp12bb, bsp13bb, bsp13bbb, bsp12bbb};
+   check(fork_db, root, heads, heads);
+} FC_LOG_AND_RETHROW();
+
+BOOST_FIXTURE_TEST_CASE(pending_lib_at_fork_point_11a, generate_fork_db_state) try {
+   // pending_lib at bsp11a -- only branch a's blocks (and bsp11a itself) extend it
+   const std::vector<block_state_ptr> heads = {root, bsp11a, bsp12a, bsp13a, bsp11b, bsp12b, bsp13b, bsp14b,
+                                                bsp11c, bsp12c, bsp13c, bsp12bb, bsp13bb, bsp13bbb, bsp12bbb};
+   check(fork_db, bsp11a, heads, {bsp11a, bsp12a, bsp13a});
+} FC_LOG_AND_RETHROW();
+
+BOOST_FIXTURE_TEST_CASE(pending_lib_on_branch_a, generate_fork_db_state) try {
+   // pending_lib at bsp12a on branch a -- only bsp12a and bsp13a extend it
+   const std::vector<block_state_ptr> heads = {root, bsp11a, bsp12a, bsp13a, bsp11b, bsp12b, bsp13b, bsp14b,
+                                                bsp11c, bsp12c, bsp13c, bsp12bb, bsp13bb, bsp13bbb, bsp12bbb};
+   check(fork_db, bsp12a, heads, {bsp12a, bsp13a});
+} FC_LOG_AND_RETHROW();
+
+BOOST_FIXTURE_TEST_CASE(pending_lib_on_subbranch_bb, generate_fork_db_state) try {
+   // pending_lib at bsp12bb on the bb sub-branch -- only bsp12bb, bsp13bb, bsp13bbb extend it
+   const std::vector<block_state_ptr> heads = {root, bsp11a, bsp12a, bsp13a, bsp11b, bsp12b, bsp13b, bsp14b,
+                                                bsp11c, bsp12c, bsp13c, bsp12bb, bsp13bb, bsp13bbb, bsp12bbb};
+   check(fork_db, bsp12bb, heads, {bsp12bb, bsp13bb, bsp13bbb});
+} FC_LOG_AND_RETHROW();
+
+BOOST_FIXTURE_TEST_CASE(pending_lib_at_deepest_14b, generate_fork_db_state) try {
+   // pending_lib at bsp14b -- only bsp14b itself qualifies (nothing descends from it)
+   const std::vector<block_state_ptr> heads = {root, bsp11a, bsp12a, bsp13a, bsp11b, bsp12b, bsp13b, bsp14b,
+                                                bsp11c, bsp12c, bsp13c, bsp12bb, bsp13bb, bsp13bbb, bsp12bbb};
+   check(fork_db, bsp14b, heads, {bsp14b});
+} FC_LOG_AND_RETHROW();
+
+// Direct controller-level test of is_head_descendant_of_pending_lib. The pending_lib_* fixture tests above verify
+// the underlying logic via a local mirror across many (head, pending_lib) combinations on a synthetic fork_db;
+// this one drives a real controller through repeated produce_blocks + set_savanna_lib steps to exercise each
+// branch of the controller method and catch wiring bugs (wrong destructured field, swapped comparison, wrong
+// fork_db accessor). set_savanna_lib is monotonic in block_num, so pending_lib only advances forward across
+// stages; head is advanced via produce_blocks between stages to expose new (head, pending_lib) pairs.
+BOOST_AUTO_TEST_CASE(controller_is_head_descendant_of_pending_lib_test) try {
+   nonce = 0;
+   // setup_policy::none keeps the test light and avoids contract setup; QCs do not form here so pending_lib does
+   // not advance on its own.
+   sysio::testing::tester c{sysio::testing::setup_policy::none};
+   c.produce_blocks(5);
+
+   auto& chain = *c.control;
+   auto id_at = [&](uint32_t bn) {
+      auto id = chain.chain_block_id_for_num(bn);
+      BOOST_REQUIRE(id.has_value());
+      return *id;
+   };
+   auto ts_at = [&](uint32_t bn) {
+      auto sb = chain.fetch_block_by_number(bn);
+      BOOST_REQUIRE(sb);
+      return sb->timestamp;
+   };
+
+   // Stage 1 -- ancestor branch, distant: pending_lib at an early block (block 2), head several blocks ahead.
+   const uint32_t early_bn = 2;
+   chain.set_savanna_lib(id_at(early_bn), ts_at(early_bn));
+   BOOST_REQUIRE_GT(chain.head().block_num(), early_bn);
+   BOOST_TEST(chain.is_head_descendant_of_pending_lib());
+
+   // Stage 2 -- ancestor branch, closer: advance head, then set pending_lib to a more recent ancestor.
+   c.produce_blocks(2);
+   const uint32_t closer_bn = 4;
+   chain.set_savanna_lib(id_at(closer_bn), ts_at(closer_bn));
+   BOOST_TEST(chain.is_head_descendant_of_pending_lib());
+
+   // Stage 3 -- equality branch: pending_lib set to current head; chain_head.id() == pending_id short-circuit.
+   const auto h_eq = chain.head();
+   chain.set_savanna_lib(h_eq.id(), h_eq.timestamp());
+   BOOST_TEST(chain.is_head_descendant_of_pending_lib());
+
+   // Stage 4 -- ancestor branch, after head advances past the equality-pinned pending_lib. pending_lib stays where
+   // it was (no further set_savanna_lib call); head's finality_core must still recognize the now-older lib.
+   c.produce_blocks(3);
+   BOOST_REQUIRE_GT(chain.head().block_num(), h_eq.block_num());
+   BOOST_TEST(chain.is_head_descendant_of_pending_lib());
+
+   // Stage 5 -- ancestor branch, immediate parent: pending_lib at head - 1.
+   const uint32_t parent_bn = chain.head().block_num() - 1;
+   chain.set_savanna_lib(id_at(parent_bn), ts_at(parent_bn));
+   BOOST_TEST(chain.is_head_descendant_of_pending_lib());
+
+   // Stage 6 -- equality branch at the latest head.
+   const auto h_eq2 = chain.head();
+   chain.set_savanna_lib(h_eq2.id(), h_eq2.timestamp());
+   BOOST_TEST(chain.is_head_descendant_of_pending_lib());
+
+   // Stage 7 -- negative branch, pending_lib past head: fabricated id at head.block_num()+1. set_savanna_lib only
+   // accepts forward movement, but does not require new_lib <= head.block_num. head can neither equal nor extend
+   // an id whose block_num is at or past head's current_block_num.
+   const auto h_neg = chain.head();
+   const block_id_type fake_above = make_block_id(h_neg.block_num() + 1);
+   chain.set_savanna_lib(fake_above, h_neg.timestamp());
+   BOOST_TEST(!chain.is_head_descendant_of_pending_lib());
+
+   // Stage 8 -- negative branch, pending_lib at a block_num head has now caught up to but with a synthetic id that
+   // does not match the real block at that height. extends() finds a ref at fake_above's block_num but the ids
+   // differ, so the answer is still false. Distinct from stage 7 in that head's tracking range now covers the
+   // pending_lib's block_num; this pins the "different id at same height" branch of finality_core::extends.
+   c.produce_blocks(5);
+   const uint32_t fake_bn = block_header::num_from_id(fake_above);
+   BOOST_REQUIRE_GT(chain.head().block_num(), fake_bn);
+   BOOST_TEST(!chain.is_head_descendant_of_pending_lib());
 } FC_LOG_AND_RETHROW();
 
 // Tests that locks_out_branch_of returns false when the QC target is in head's ancestry but is older than head's
@@ -377,6 +566,15 @@ BOOST_AUTO_TEST_CASE(locks_out_branch_of_lib_advanced_past_shared_ancestor) try 
    block_handle h13a_shared{bsp13a_shared};
    block_handle h14b{bsp14b};
    BOOST_TEST(!h13a_shared.locks_out_branch_of(h14b));
+
+   // Boundary: qc.block_num exactly equals head's last_final_block_num. bsp13b's lib is the shared ancestor
+   // (block 11) itself, and bsp13a_shared carries a strong QC for that same block 11. The strict
+   // `qc.block_num < head.last_final` guard does NOT fire here (11 < 11 is false); the not-locked-out result
+   // must instead come from head.extends(qc_target) -- per Savanna safety, the block at head's last_final
+   // height is head's own final block, so head's core reference at 11 equals the shared qc_target.
+   block_handle h13b{bsp13b};
+   BOOST_REQUIRE_EQUAL(bsp13b->core.last_final_block_num(), 11u);
+   BOOST_TEST(!h13a_shared.locks_out_branch_of(h13b));
 
 } FC_LOG_AND_RETHROW();
 

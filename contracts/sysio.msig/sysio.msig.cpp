@@ -43,7 +43,7 @@ static std::vector<char> read_proposal_chunks(const multisig::proposal& prop, na
 ///
 /// Used by approve / unapprove / exec, where the proposal is consumed and chunked
 /// metadata fields the caller still needs (e.g. chunk_count) should be snapshotted
-/// into locals before the std::move at the call site. `get_proposal` uses
+/// into locals before the std::move at the call site. `getproposal` uses
 /// `read_proposal_chunks` directly because it preserves `prop` for return.
 static std::vector<char> assemble_packed_trx(multisig::proposal&& prop, name self, name proposer) {
    if (!is_chunked(prop)) {
@@ -424,7 +424,7 @@ void multisig::invalidate( name account ) {
       [&](auto& i) { i.last_invalidation_time = current_time_point(); } );
 }
 
-multisig::proposal multisig::get_proposal( name proposer, name proposal_name ) {
+multisig::proposal multisig::getproposal( name proposer, name proposal_name ) {
    // Read-only action: invoked via /v1/chain/send_read_only_transaction. The chain skips
    // `max_action_return_value_size` in read-only context, so we can return arbitrarily
    // large reassembled blobs without bumping any chain limit.

@@ -1,5 +1,6 @@
 #include <sysio/chain/global_property_object.hpp>
 #include <sysio/chain/authorization_manager.hpp>
+#include <sysio/chain/proposer_policy.hpp>
 #include <sysio/testing/tester.hpp>
 
 #include <boost/test/unit_test.hpp>
@@ -120,10 +121,11 @@ BOOST_AUTO_TEST_CASE(satisfiable_msig_test) try {
            producer_authority{"alice"_n, block_signing_authority_v0{2, {{get_public_key("alice"_n, "bs1"), 1}}}}
    };
 
-   // ensure that the entries in a wtmsig schedule are rejected if not satisfiable
+   // Threshold (2) exceeds sum of key weights (1) — rejected by proposer_policy::validate()
+   // (via set_proposed_producers_common). Error message prefix is "proposer policy version N:".
    BOOST_REQUIRE_EXCEPTION(
       chain.set_producer_schedule( sch1 ), wasm_execution_error,
-      fc_exception_message_is( "producer schedule includes an unsatisfiable authority for alice" )
+      fc_exception_message_contains( "not satisfiable by sum of key weights" )
    );
 
 } FC_LOG_AND_RETHROW()
@@ -139,10 +141,10 @@ BOOST_AUTO_TEST_CASE(duplicate_producers_test) try {
            producer_authority{"alice"_n, block_signing_authority_v0{1, {{get_public_key("alice"_n, "bs2"), 1}}}}
    };
 
-   // ensure that the schedule is rejected if it has duplicate producers in it
+   // Duplicate producer name rejected by proposer_policy::validate().
    BOOST_REQUIRE_EXCEPTION(
       chain.set_producer_schedule( sch1 ), wasm_execution_error,
-      fc_exception_message_is( "duplicate producer name in producer schedule" )
+      fc_exception_message_contains( "duplicate producer name" )
    );
 
 } FC_LOG_AND_RETHROW()
@@ -155,19 +157,91 @@ BOOST_FIXTURE_TEST_CASE( duplicate_keys_test, validating_tester ) try {
            producer_authority{"alice"_n, block_signing_authority_v0{2, {{get_public_key("alice"_n, "bs1"), 1}, {get_public_key("alice"_n, "bs1"), 1}}}}
    };
 
-   // ensure that the schedule is rejected if it has duplicate keys for a single producer in it
+   // Duplicate keys within a single producer's authority rejected by proposer_policy::validate().
    BOOST_REQUIRE_EXCEPTION(
       set_producer_schedule( sch1 ), wasm_execution_error,
-      fc_exception_message_is( "producer schedule includes a duplicated key for alice" )
+      fc_exception_message_contains( "authority has duplicate key" )
    );
 
-   // ensure that multiple producers are allowed to share keys
+   // Multiple producers are allowed to share keys (key-uniqueness is per-authority, not global).
    vector<producer_authority> sch2 = {
            producer_authority{"alice"_n, block_signing_authority_v0{1, {{get_public_key("alice"_n, "bs1"), 1}}}},
            producer_authority{"bob"_n,   block_signing_authority_v0{1, {{get_public_key("alice"_n, "bs1"), 1}}}}
    };
 
    set_producer_schedule( sch2 );
+} FC_LOG_AND_RETHROW()
+
+// Empty producer schedule is rejected by proposer_policy::validate().
+// Note: the transaction_context::set_proposed_producers() early-return-on-empty is
+// behind this check so it never fires when the intrinsic is called via setprods.
+BOOST_AUTO_TEST_CASE(empty_producer_schedule_test) try {
+   savanna_tester chain;
+   chain.produce_block();
+
+   vector<producer_authority> empty_sch;
+
+   BOOST_REQUIRE_EXCEPTION(
+      chain.set_producer_schedule( empty_sch ), wasm_execution_error,
+      fc_exception_message_contains( "producer schedule must not be empty" )
+   );
+} FC_LOG_AND_RETHROW()
+
+// Happy-path direct test for proposer_policy::validate(). Guards against the
+// method ever accidentally rejecting legitimate input — complements the negative
+// tests below. The set_producer_schedule tests give indirect coverage, but a
+// direct call pins the contract cheaply.
+BOOST_AUTO_TEST_CASE(validate_accepts_well_formed_policy) try {
+   proposer_policy pol;
+   pol.proposer_schedule.version = 1;
+   pol.proposer_schedule.producers = {
+      producer_authority{ "alice"_n, block_signing_authority_v0{ 1, {{ get_public_key("alice"_n, "bs1"), 1 }} } },
+      producer_authority{ "bob"_n,   block_signing_authority_v0{ 2, {{ get_public_key("bob"_n,   "bs1"), 1 },
+                                                                    { get_public_key("bob"_n,   "bs2"), 1 }} } }
+   };
+   BOOST_CHECK_NO_THROW(pol.validate());
+} FC_LOG_AND_RETHROW()
+
+// proposer_policy::validate() caps producer count at config::max_producers.
+// Tested directly against validate() rather than through set_producer_schedule
+// because creating > max_producers accounts in one test exhausts block CPU
+// budget. The intrinsic wiring is already exercised by the other tests in this
+// suite; this test verifies the specific branch in validate().
+BOOST_AUTO_TEST_CASE(validate_rejects_too_many_producers) try {
+   proposer_policy pol;
+   const size_t n = config::max_producers + 1;
+   pol.proposer_schedule.version = 1;
+   pol.proposer_schedule.producers.reserve(n);
+   // Build deterministic valid account names ("paa", "pab", ..., "pzz", ...).
+   for (size_t i = 0; i < n; ++i) {
+      std::string nm = "p";
+      for (size_t v = i; nm.size() < 12; ) {
+         nm.push_back(static_cast<char>('a' + (v % 26)));
+         v /= 26;
+         if (v == 0) break;
+      }
+      pol.proposer_schedule.producers.push_back(
+         producer_authority{ account_name{nm},
+                             block_signing_authority_v0{ 1, {{ get_public_key(account_name{nm}, "bs1"), 1 }} } });
+   }
+   BOOST_CHECK_EXCEPTION(pol.validate(), producer_schedule_exception,
+      fc_exception_message_contains("exceeds max"));
+} FC_LOG_AND_RETHROW()
+
+// proposer_policy::validate() rejects a per-authority threshold of zero.
+BOOST_AUTO_TEST_CASE(authority_threshold_zero_test) try {
+   savanna_tester chain;
+   chain.create_accounts( {"alice"_n} );
+   chain.produce_block();
+
+   vector<producer_authority> sch = {
+      producer_authority{ "alice"_n, block_signing_authority_v0{ 0, {{ get_public_key("alice"_n, "bs1"), 1 }} } }
+   };
+
+   BOOST_REQUIRE_EXCEPTION(
+      chain.set_producer_schedule( sch ), wasm_execution_error,
+      fc_exception_message_contains( "authority threshold must be positive" )
+   );
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_CASE( large_authority_overflow_test ) try {

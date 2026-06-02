@@ -126,9 +126,13 @@ BOOST_AUTO_TEST_CASE( double_activation ) try {
 
    c.schedule_protocol_features_wo_preactivation( {*d} );
 
+   // _start_block concatenates the wo-preactivation list onto the preactivated list,
+   // producing a duplicate digest. check_protocol_features now detects the duplicate
+   // earlier (by dedup on its own activation-list scan) rather than at start_block's
+   // preactivation-map check. Both paths reject; this one is just earlier and more specific.
    BOOST_CHECK_EXCEPTION(  c.produce_block();,
-                           block_validate_exception,
-                           fc_exception_message_starts_with( "attempted duplicate activation within a single block:" )
+                           protocol_feature_exception,
+                           fc_exception_message_contains( "appears more than once in the activation list" )
    );
 
    c.protocol_features_to_be_activated_wo_preactivation.clear();
@@ -379,7 +383,7 @@ BOOST_AUTO_TEST_CASE( disallow_empty_producer_schedule_test ) { try {
    c.produce_block();
    BOOST_REQUIRE_EXCEPTION( c.set_producers_legacy( {} ),
                             wasm_execution_error,
-                            fc_exception_message_is( "Producer schedule cannot be empty" ) );
+                            fc_exception_message_contains( "producer schedule must not be empty" ) );
 
    // Setting non empty producer schedule should still be fine
    vector<name> producer_names = {"alice"_n,"bob"_n,"carol"_n};
@@ -1007,6 +1011,95 @@ BOOST_AUTO_TEST_CASE( ram_restrictions_with_roa_test ) { try {
    );
 
    c.produce_block();
+
+} FC_LOG_AND_RETHROW() }
+
+// ROA limit enforcement on KV storage operations.
+// All multi_index operations route through kv_set/kv_idx_store internally,
+// so this tests the KV billing path hitting the ROA RAM ceiling.
+BOOST_AUTO_TEST_CASE( kv_roa_limit_enforcement ) { try {
+   tester c( setup_policy::full );
+   c.produce_block();
+
+   const auto& tester1_account = account_name("tester1");
+   const auto& alice_account = account_name("alice");
+
+   c.create_accounts( {tester1_account, alice_account}, false, true, false );
+   c.add_roa_policy(c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "0.0986 SYS", 0, 0);
+   // Give alice a small RAM quota — enough for small data but not large
+   c.add_roa_policy(c.NODE_DADDY, alice_account, "1.0000 SYS", "1.0000 SYS", "0.0100 SYS", 0, 0);
+   c.produce_block();
+
+   c.set_code( tester1_account, test_contracts::ram_restrictions_test_wasm() );
+   c.set_abi( tester1_account, test_contracts::ram_restrictions_test_abi() );
+   c.produce_block();
+
+   // Small store works (within quota)
+   auto alice_payer = vector<permission_level>{
+      {alice_account, config::sysio_payer_name}, {alice_account, config::active_name}};
+   c.push_action( tester1_account, "setdata"_n, alice_payer, mutable_variant_object()
+      ("len1", 10)("len2", 0)("payer", alice_account) );
+   c.produce_block();
+
+   // Large store exceeds alice's ROA RAM quota (kv_set -> update_db_usage -> ram limit)
+   BOOST_REQUIRE_EXCEPTION(
+      c.push_action( tester1_account, "setdata"_n, alice_payer, mutable_variant_object()
+         ("len1", 100000)("len2", 0)("payer", alice_account) ),
+      ram_usage_exceeded,
+      fc_exception_message_contains("has insufficient ram")
+   );
+
+} FC_LOG_AND_RETHROW() }
+
+// Privileged sysio.* contract bypasses payer authorization.
+// validate_account_ram_deltas allows sysio.* privileged contracts to bill
+// any account's RAM without sysio.payer permission.
+BOOST_AUTO_TEST_CASE( privileged_kv_payer_bypass ) { try {
+   tester c( setup_policy::full );
+   c.produce_block();
+
+   const auto& priv_account = account_name("sysio.test");
+   const auto& alice_account = account_name("alice");
+
+   c.create_account( priv_account, config::system_account_name, false, true, false, false );
+   c.create_accounts( {alice_account}, false, true, false );
+   c.add_roa_policy(c.NODE_DADDY, alice_account, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0, 0);
+   c.produce_block();
+
+   c.set_code( priv_account, test_contracts::ram_restrictions_test_wasm() );
+   c.set_abi( priv_account, test_contracts::ram_restrictions_test_abi() );
+   c.set_privileged( priv_account );
+   c.produce_block();
+
+   // Privileged sysio.* contract billing alice WITHOUT sysio.payer auth succeeds
+   auto alice_ram_before = c.control->get_resource_limits_manager().get_account_ram_usage(alice_account);
+   c.push_action( priv_account, "setdata"_n, priv_account, mutable_variant_object()
+      ("len1", 10)("len2", 0)("payer", alice_account) );
+   c.produce_block();
+
+   // alice's RAM increased even though she didn't authorize
+   auto alice_ram_after = c.control->get_resource_limits_manager().get_account_ram_usage(alice_account);
+   BOOST_REQUIRE_GT(alice_ram_after, alice_ram_before);
+
+   // Non-sysio privileged contract still requires sysio.payer auth
+   const auto& priv2_account = account_name("privtest");
+   c.create_accounts( {priv2_account}, false, true, false );
+   c.add_roa_policy(c.NODE_DADDY, priv2_account, "1.0000 SYS", "1.0000 SYS", "0.0986 SYS", 0, 0);
+   c.produce_block();
+   c.set_code( priv2_account, test_contracts::ram_restrictions_test_wasm() );
+   c.set_abi( priv2_account, test_contracts::ram_restrictions_test_abi() );
+   c.set_privileged( priv2_account );
+   c.produce_block();
+
+   // Privileged but NOT sysio.* — skips the unprivileged has_authorization check
+   // (Path 1 in validate_account_ram_deltas) but still fails the sysio.payer
+   // permission check (Path 2) -> unsatisfied_authorization.
+   BOOST_REQUIRE_EXCEPTION(
+      c.push_action( priv2_account, "setdata"_n, priv2_account, mutable_variant_object()
+         ("len1", 10)("len2", 0)("payer", alice_account) ),
+      unsatisfied_authorization,
+      fc_exception_message_contains("Missing")
+   );
 
 } FC_LOG_AND_RETHROW() }
 

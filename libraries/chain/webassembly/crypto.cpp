@@ -286,7 +286,7 @@ namespace sysio::chain::webassembly {
       // sanity‐check sizes
       if( result.size() != BLAKE2B256_DIGEST_LENGTH )
          return return_code::failure;
-  
+
       // BLAKE2B256 takes uint8_t*, so cast away const‐char
       auto in_bytes = reinterpret_cast<const uint8_t*>(data.data());
       auto out_bytes = reinterpret_cast<uint8_t*>(result.data());
@@ -474,7 +474,7 @@ namespace sysio::chain::webassembly {
    int32_t interface::bls_fp_mod(span<const char> s, span<char> result) const {
       // s is scalar.
       if(s.size() != 64 ||  result.size() != 48)
-         return return_code::failure;  
+         return return_code::failure;
       std::array<uint64_t, 8> k = bls12_381::scalar::fromBytesLE<8>(std::span<const uint8_t, 64>((const uint8_t*)s.data(), 64));
       bls12_381::fp e = bls12_381::fp::modPrime<8>(k);
       e.toBytesLE(std::span<uint8_t, 48>((uint8_t*)result.data(), 48), from_mont::yes);

@@ -1,5 +1,6 @@
 #include "sysio.roa.hpp"
 #include "sysio.system/native.hpp"
+#include "sysio.system/emissions.hpp"
 
 namespace sysio {
 
@@ -94,18 +95,20 @@ namespace sysio {
 
         const int64_t total_amount = total_sys.amount; // smallest units
 
-        // Fractions per node (rational approach):
+        // Fractions per node (rational approach). Tier counts come from the
+        // shared constants in sysio.system/emissions.hpp so this matches
+        // sysio.system::addnodeowner's per-tier cap exactly.
         // T1: 4% = 4/100 (add 50 for rounding)
         int64_t t1_per_node = (total_amount * 4 + 50) / 100;
-        int64_t t1_total = t1_per_node * 21;
+        int64_t t1_total = t1_per_node * sysiosystem::emissions::T1_MAX_NODE_OWNERS;
 
         // T2: 0.0015 = 15/10,000 (add 5,000 for rounding)
         int64_t t2_per_node = (total_amount * 15 + 5000) / 10000;
-        int64_t t2_total = t2_per_node * 84;
+        int64_t t2_total = t2_per_node * sysiosystem::emissions::T2_MAX_NODE_OWNERS;
 
         // T3: 0.00003 = 3/100,000 (add 50,000 for rounding)
         int64_t t3_per_node = (total_amount * 3 + 50000) / 100000;
-        int64_t t3_total = t3_per_node * 1000;
+        int64_t t3_total = t3_per_node * sysiosystem::emissions::T3_MAX_NODE_OWNERS;
 
         // Allocated sum
         int64_t allocated = t1_total + t2_total + t3_total;
@@ -522,35 +525,28 @@ namespace sysio {
         });
     };
 
-    void roa::finalizereg(const name& owner,const uint8_t& status) {
+    void roa::finalizereg(const name& owner, const uint8_t& status) {
+        require_auth(get_self());
+
+        check(status == 2 || status == 3, "Invalid status: Can only confirm (2) or reject (3)");
 
         roastate_t roastate(get_self());
         auto state = roastate.get();
         check(state.is_active, "ROA is not active yet");
 
-
         nodeownerreg_t nodereg(get_self(), state.network_gen);
         auto reg_key = nodeownerreg_key{owner.value};
 
-        check(nodereg.contains(reg_key),"No registration record found !");
+        check(nodereg.contains(reg_key), "No registration record found");
         auto existing = nodereg.get(reg_key);
 
-        check(existing.status == 1, "Registration is not in 1 ( PENDING ) state.");
+        check(existing.status == 1, "Registration is not in 1 (PENDING) state.");
 
-        check(status == 3 || status == 4, "Invalid status: Can only confirm (2) or reject (3)");
-
-        if(status == 2){
-
+        if (status == 2) {
             regnodeowner(owner, existing.tier);
-
-            nodereg.modify(get_self(), reg_key, [&](auto &row){
-                row.status = 2;
-            });
-
+            nodereg.modify(get_self(), reg_key, [&](auto &row){ row.status = 2; });
         } else {
-            nodereg.modify(get_self(), reg_key, [&](auto &row){
-                row.status = 3;
-            });
+            nodereg.modify(get_self(), reg_key, [&](auto &row){ row.status = 3; });
         }
     };
 
@@ -659,6 +655,21 @@ namespace sysio {
             .allocated_ram = allocated_ram,
             .network_gen = state.network_gen,
         });
+
+        // Register the node owner with sysio.system emissions. Guarded on
+        // emitcfg_t::exists() so that bootstrap paths which do not deploy
+        // sysio.system (loadSystemContract=False in Cluster.py) or which run
+        // forcereg before setemitcfg continue to work -- the emissions
+        // distribution row is simply skipped in that case.
+        sysiosystem::emissions::emitcfg_t emitcfg("sysio"_n);
+        if (emitcfg.exists()) {
+            action(
+               {get_self(), "active"_n},
+               "sysio"_n,
+               "addnodeowner"_n,
+               std::make_tuple(owner, tier)
+            ).send();
+        }
 
         // TODO: Notify Council contract if needed
     };

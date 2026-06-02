@@ -4,3 +4,10 @@ target_link_libraries(variant_bench
    fc
    ${PLATFORM_SPECIFIC_LIBS}
 )
+
+add_executable(keccak_bench EXCLUDE_FROM_ALL keccak_bench.cpp)
+
+target_link_libraries(keccak_bench
+   fc
+   ${PLATFORM_SPECIFIC_LIBS}
+)

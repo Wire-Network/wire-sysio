@@ -70,12 +70,12 @@ message Envelope {
    uint32         epoch_index            = 6;
    uint32         epoch_envelope_index   = 7;
 
-   bytes          merkle                 = 15; // 32 bytes
+   // Slot 15 was `bytes merkle` — removed; do not reuse.
 
    bytes          previous_envelope_hash = 20; // 32 bytes
 
-   bytes          start_message_id       = 30; // 32 bytes
-   bytes          end_message_id         = 31; // 32 bytes
+   // Slot 30 was `bytes start_message_id` — removed; do not reuse.
+   // Slot 31 was `bytes end_message_id`   — removed; do not reuse.
 
    repeated Message messages             = 40;
 }

@@ -38,6 +38,12 @@ public:
    void write(const std::filesystem::path& state_file);
    bool read(const std::filesystem::path& state_file);
 
+   // Returns true if `id` is a strict ancestor of this block within the finality_core's tracking range
+   // (block_num in [last_final_block_num, current_block_num)). A block does not extend itself.
+   bool extends(const block_id_type& id) const {
+      return _bsp && _bsp->core.extends(id);
+   }
+
    // Returns true iff this block carries a strong QC whose target is not in `head_handle`'s ancestry. Under Savanna's
    // strong-vote locking, finalizers locked on the QC target cannot later vote on any branch that does not extend it,
    // so a head whose branch does not include the QC target can never be covered by a future QC; it is permanently
@@ -65,6 +71,10 @@ public:
       // QC target is in head's ancestry; head's branch shares the QC's anchor. The block_num check covers qc_target
       // older than head's last_final (outside head's tracking window): finalization past qc_target is only possible
       // when qc_target is on head's branch.
+      // get_block_reference's precondition is last_final_block_num() <= qc.block_num < current_block_num(). It holds
+      // here: a strong qc implies a non-genesis core (the genesis core's latest_qc_claim has is_strong_qc == false and
+      // would have hit the early return above), and every non-genesis core satisfies the finality_core invariant
+      // last_final_block_num() <= latest_qc_claim().block_num < current_block_num().
       const auto& qc_target_id = _bsp->core.get_block_reference(qc.block_num).block_id;
       if (head_id == qc_target_id || head_handle._bsp->core.extends(qc_target_id) ||
           qc.block_num < head_handle._bsp->core.last_final_block_num())
@@ -72,11 +82,6 @@ public:
 
       // Head's branch and the QC target are incompatible; locked out.
       return true;
-   }
-  
-   // Returns true if `id` is in this block's ancestry (or is this block itself within the finality_core's tracking range).
-   bool extends(const block_id_type& id) const {
-      return _bsp && _bsp->core.extends(id);
    }
 };
 
