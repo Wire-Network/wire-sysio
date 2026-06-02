@@ -154,6 +154,31 @@
             "fields": []
         },
         {
+            "name": "glpbact",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "glpbnf",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "glpbnx",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "glpbown",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "glpbsz",
+            "base": "",
+            "fields": []
+        },
+        {
             "name": "nop",
             "base": "",
             "fields": []
@@ -553,6 +578,31 @@
         {
             "name": "gcfdcf",
             "type": "gcfdcf",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "glpbact",
+            "type": "glpbact",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "glpbnf",
+            "type": "glpbnf",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "glpbnx",
+            "type": "glpbnx",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "glpbown",
+            "type": "glpbown",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "glpbsz",
+            "type": "glpbsz",
             "ricardian_contract": ""
         },
         {

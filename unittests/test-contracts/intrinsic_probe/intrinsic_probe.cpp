@@ -21,8 +21,11 @@
 
 #include <sysio/sysio.hpp>
 #include <sysio/transaction.hpp>  // raw::{read_transaction, get_action, get_context_free_data}
+#include <sysio/crypto.hpp>       // public_key -- decoding the authority returned by get_permission_lower_bound
+#include <sysio/time.hpp>         // time_point -- the last_updated field of a permission record
 #include <cstring>
 #include <cstdint>
+#include <vector>
 
 // -----------------------------------------------------------------------------
 // Raw host intrinsic declarations. Listed here instead of via <sysio/...> so
@@ -83,6 +86,16 @@ __attribute__((sysio_wasm_import))
 int32_t check_transaction_authorization( const char* trx_data,  uint32_t trx_len,
                                          const char* pubs_data, uint32_t pubs_len,
                                          const char* perms_data, uint32_t perms_len );
+
+// get_permission_lower_bound: aligned_span<char> out-param (buffer). Wire-specific intrinsic
+// (libraries/chain/webassembly/permission.cpp) backing CDT's sysio::get_permission wrapper, used on-chain by
+// sysio.roa::active_key_matches and sysio.uwrit to read an account's authority. by_owner lower_bound on
+// (account, permission); returns -1 when no permission for `account` exists at/after the key, else the full
+// serialized record size (which may exceed buffer_size -- the size-query-then-fetch contract). The serialized
+// payload is pack(perm_name) ++ pack(parent_name) ++ pack(last_updated) ++ pack(authority).
+__attribute__((sysio_wasm_import))
+int32_t get_permission_lower_bound( uint64_t account, uint64_t permission,
+                                    char* buffer, uint32_t buffer_size );
 
 __attribute__((sysio_wasm_import))
 int32_t get_active_producers( void* producers, uint32_t datalen );
@@ -302,6 +315,55 @@ constexpr uint64_t FP128_LARGE_HI = 0x407E000000000000ULL;
 constexpr uint64_t I128_ZERO      = 0x0000000000000000ULL;
 constexpr uint64_t I128_ONE_HI    = 0x0000000000000000ULL;
 constexpr uint64_t U64_MAX        = 0xFFFFFFFFFFFFFFFFULL;
+
+// -----------------------------------------------------------------------------
+// get_permission_lower_bound record layout. A byte-for-byte mirror of CDT's
+// sysio::permission_record / perm_authority (libraries/sysiolib/contracts/sysio/permission.hpp): the exact
+// shape on-chain consumers (sysio.roa::active_key_matches, sysio.uwrit) unpack from this intrinsic's output.
+// Defined locally so the probe verifies the raw host serialization against the real consumer contract without
+// routing the CALL through the CDT wrapper. Note the host also packs a trailing `waits` vector that the
+// consumer struct intentionally omits -- unpack stops after `accounts` and tolerates the trailing bytes.
+// -----------------------------------------------------------------------------
+struct probe_key_weight {
+   public_key key;
+   uint16_t   weight;
+   SYSLIB_SERIALIZE( probe_key_weight, (key)(weight) )
+};
+struct probe_level_weight {
+   permission_level permission;
+   uint16_t         weight;
+   SYSLIB_SERIALIZE( probe_level_weight, (permission)(weight) )
+};
+struct probe_authority {
+   uint32_t                         threshold = 0;
+   std::vector<probe_key_weight>    keys;
+   std::vector<probe_level_weight>  accounts;
+   SYSLIB_SERIALIZE( probe_authority, (threshold)(keys)(accounts) )
+};
+struct probe_perm_record {
+   name            perm_name;
+   name            parent;
+   time_point      last_updated;
+   probe_authority auth;
+   SYSLIB_SERIALIZE( probe_perm_record, (perm_name)(parent)(last_updated)(auth) )
+};
+
+// Probe buffer big enough for a created account's owner/active record. A single K1 key_weight is ~36 bytes;
+// the full record (name + parent + last_updated + threshold + one key + empty accounts + empty waits) is well
+// under 128 bytes. 256 leaves generous headroom and lets the small-buffer probe pick an 8-byte window safely.
+constexpr uint32_t PERM_BUF_CAPACITY = 256;
+
+// Permission-name probe points relative to a freshly-created account's two permissions. sysio name ordering is
+// lexicographic over ".12345a-z", so by first character: active('a') < between('m') < owner('o') < past('z').
+//   * "active"/"owner" hit exact rows.
+//   * "myperm" sorts strictly between them, so lower_bound rolls forward to the NEXT existing row (owner) --
+//     the intrinsic is a lower-bound primitive, not an exact lookup; the CDT wrapper layers exact-match on top.
+//   * "znotaperm" sorts after every permission the account has, so lower_bound rolls past all of self's rows
+//     and the host's owner-mismatch guard returns -1.
+constexpr auto PERM_ACTIVE  = "active"_n;
+constexpr auto PERM_OWNER   = "owner"_n;
+constexpr auto PERM_BETWEEN = "myperm"_n;
+constexpr auto PERM_PAST    = "znotaperm"_n;
 
 } // namespace
 
@@ -1298,6 +1360,99 @@ public:
    [[sysio::action]]
    void sarvem() {
       set_action_return_value( nullptr, 0 );
+   }
+
+   // =============================================================================
+   // P2 -- get_permission_lower_bound
+   //
+   // Wire-specific intrinsic backing CDT's sysio::get_permission -- the only host path a contract has to read
+   // another account's authority on-chain (sysio.roa::active_key_matches, sysio.uwrit). These probes pin the
+   // pieces the CDT wrapper and its callers depend on: the serialized record layout, the size-query /
+   // small-buffer contract, the not-found -1 sentinel, and the lower-bound (NOT exact-match) lookup semantics.
+   // All queries target get_self(), whose owner/active permissions the Boost driver creates with a single K1
+   // key at threshold 1. Not privileged-gated, so these run from the ordinary (non-priv) probe account.
+   // =============================================================================
+
+   // Golden: the account's `active` row deserializes to the documented record -- name=active, parent=owner,
+   // threshold 1, and at least one key that satisfies the threshold by itself.
+   [[sysio::action]]
+   void glpbact() {
+      char buf[PERM_BUF_CAPACITY] = {};
+      int32_t sz = get_permission_lower_bound( get_self().value, PERM_ACTIVE.value, buf, sizeof(buf) );
+      check( sz > 0, "get_permission_lower_bound(self, active) must find the active permission" );
+      check( static_cast<uint32_t>(sz) <= sizeof(buf), "active record larger than probe buffer" );
+
+      auto rec = unpack<probe_perm_record>( buf, static_cast<size_t>(sz) );
+      check( rec.perm_name == PERM_ACTIVE, "record perm_name must be active" );
+      check( rec.parent    == PERM_OWNER,  "active's parent permission must be owner" );
+      check( rec.auth.threshold == 1, "created account active threshold must be 1" );
+      check( rec.auth.keys.size() >= 1, "active must carry at least one key" );
+      bool key_meets_threshold = false;
+      for ( const auto& kw : rec.auth.keys )
+         if ( kw.weight >= rec.auth.threshold ) key_meets_threshold = true;
+      check( key_meets_threshold, "active must have a key whose weight meets the threshold" );
+   }
+
+   // The `owner` row is the authority root: its parent permission name is the empty name (the host leaves
+   // parent_name default-constructed when the parent OID is 0).
+   [[sysio::action]]
+   void glpbown() {
+      char buf[PERM_BUF_CAPACITY] = {};
+      int32_t sz = get_permission_lower_bound( get_self().value, PERM_OWNER.value, buf, sizeof(buf) );
+      check( sz > 0, "get_permission_lower_bound(self, owner) must find the owner permission" );
+
+      auto rec = unpack<probe_perm_record>( buf, static_cast<size_t>(sz) );
+      check( rec.perm_name == PERM_OWNER, "record perm_name must be owner" );
+      check( rec.parent.value == 0, "owner's parent must be the empty/root name" );
+      check( rec.auth.threshold == 1, "owner threshold must be 1" );
+      check( rec.auth.keys.size() >= 1, "owner must carry at least one key" );
+   }
+
+   // Size-query + small-buffer contract: a zero-length buffer returns the full record size without writing; an
+   // under-sized buffer returns the SAME full size and copies only min(buffer_size, size) bytes -- here the
+   // 8-byte perm_name prefix -- without writing past the caller's window. The 8-byte window is wedged inside a
+   // 0xAA canary so any over- or under-run surfaces as a corrupted canary byte.
+   [[sysio::action]]
+   void glpbsz() {
+      int32_t full = get_permission_lower_bound( get_self().value, PERM_ACTIVE.value, nullptr, 0 );
+      check( full > 8, "active record must be larger than the 8-byte name prefix" );
+
+      unsigned char canary[24];
+      std::memset( canary, 0xAA, sizeof(canary) );
+      char* window = reinterpret_cast<char*>( canary + 8 );   // 8-byte window at [8,16), guarded on both sides
+      int32_t sz = get_permission_lower_bound( get_self().value, PERM_ACTIVE.value, window, 8 );
+      check( sz == full, "size-query and small-buffer calls must return the same full record size" );
+
+      uint64_t name_val = 0;
+      std::memcpy( &name_val, window, sizeof(name_val) );
+      check( name_val == PERM_ACTIVE.value, "small buffer must still receive the 8-byte perm_name prefix" );
+      for ( int i = 0; i < 8; ++i )
+         check( canary[i] == 0xAA, "get_permission_lower_bound wrote before the caller's buffer window" );
+      for ( int i = 16; i < 24; ++i )
+         check( canary[i] == 0xAA, "get_permission_lower_bound wrote past the 8-byte buffer window" );
+   }
+
+   // Lower-bound, not exact-match: a permission name sorting strictly between active and owner rolls forward to
+   // the NEXT existing row of the SAME account (owner) and returns its record -- it does NOT return -1. This is
+   // exactly why CDT's sysio::get_permission re-checks the returned perm_name against the requested one.
+   [[sysio::action]]
+   void glpbnx() {
+      char buf[PERM_BUF_CAPACITY] = {};
+      int32_t sz = get_permission_lower_bound( get_self().value, PERM_BETWEEN.value, buf, sizeof(buf) );
+      check( sz > 0, "lower_bound of a between-name must return the next permission row, not -1" );
+
+      auto rec = unpack<probe_perm_record>( buf, static_cast<size_t>(sz) );
+      check( rec.perm_name == PERM_OWNER,
+             "lower_bound(self, <name between active and owner>) must return owner (the next row)" );
+   }
+
+   // Not found: a permission name sorting after every row the account has makes by_owner lower_bound roll past
+   // all of self's rows (onto the next account, or end()); the host's owner-mismatch guard returns -1.
+   [[sysio::action]]
+   void glpbnf() {
+      char buf[PERM_BUF_CAPACITY] = {};
+      int32_t sz = get_permission_lower_bound( get_self().value, PERM_PAST.value, buf, sizeof(buf) );
+      check( sz == -1, "query for a permission past all of self's permissions must return -1" );
    }
 
    // =============================================================================
