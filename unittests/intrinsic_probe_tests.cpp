@@ -481,4 +481,31 @@ BOOST_FIXTURE_TEST_CASE(send_inline_empty, intrinsic_probe_fixture) {
 BOOST_FIXTURE_TEST_CASE(set_action_return_value_ok,    intrinsic_probe_fixture) { BOOST_CHECK_NO_THROW(t.run("sarvok"_n)); }
 BOOST_FIXTURE_TEST_CASE(set_action_return_value_empty, intrinsic_probe_fixture) { BOOST_CHECK_NO_THROW(t.run("sarvem"_n)); }
 
+// =============================================================================
+// I. get_permission_lower_bound (P2)
+//
+// Wire-specific intrinsic (libraries/chain/webassembly/permission.cpp) backing CDT's sysio::get_permission --
+// the only host path a contract has to read another account's authority on-chain (sysio.roa::active_key_matches,
+// sysio.uwrit). Each probe queries get_self()'s owner/active permissions (created with a single K1 key at
+// threshold 1) and self-verifies the record via in-contract check(); the driver asserts the host stays silent,
+// so any layout / size-query / sentinel / lower-bound-semantics regression surfaces as a
+// sysio_assert_message_exception here. Not privileged-gated, so all run from the ordinary probe account.
+// =============================================================================
+
+BOOST_FIXTURE_TEST_CASE(get_permission_lower_bound_active_golden, intrinsic_probe_fixture) {
+   BOOST_CHECK_NO_THROW(t.run("glpbact"_n));
+}
+BOOST_FIXTURE_TEST_CASE(get_permission_lower_bound_owner_root_parent, intrinsic_probe_fixture) {
+   BOOST_CHECK_NO_THROW(t.run("glpbown"_n));
+}
+BOOST_FIXTURE_TEST_CASE(get_permission_lower_bound_size_query, intrinsic_probe_fixture) {
+   BOOST_CHECK_NO_THROW(t.run("glpbsz"_n));
+}
+BOOST_FIXTURE_TEST_CASE(get_permission_lower_bound_next_not_exact, intrinsic_probe_fixture) {
+   BOOST_CHECK_NO_THROW(t.run("glpbnx"_n));
+}
+BOOST_FIXTURE_TEST_CASE(get_permission_lower_bound_not_found, intrinsic_probe_fixture) {
+   BOOST_CHECK_NO_THROW(t.run("glpbnf"_n));
+}
+
 BOOST_AUTO_TEST_SUITE_END()
