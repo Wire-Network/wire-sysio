@@ -80,13 +80,28 @@ cmake_workspace_build(
             "wire-sysio/build/$$BUILD_TYPE_LC/compile_commands.json",
         ],
     },
-    # CDT provides the contract toolchain wire-sysio compiles its contracts with.
-    deps = ["//wire-cdt:build"],
     generator = "Ninja",
+    # After the build emits the OPP bundles at the FIXED path build/opp/
+    # (independent of build type), install the SOLIDITY bundle's deps and
+    # globally `npm link` it, so wire-ethereum (npm-based) can
+    # `npm link @wireio/opp-solidity-models` and resolve the FRESH, current-proto
+    # bundle instead of the stale PUBLISHED @wireio/opp-solidity-models on npm
+    # (which lacks newer types like AttestationType). Mirrors
+    # wire-devcontainer/scripts/wire-local-setup.bash. The TYPESCRIPT bundle
+    # needs NO link here — wire-libraries-ts and wire-tools-ts discover
+    # @wireio/opp-typescript-models automatically via their .pnpmfile.cjs.
+    # $$PWD = wire-sysio at runtime.
+    post_build_steps = [
+        "[ -d build/opp/solidity ] || " +
+        '{ echo "OPP solidity bundle missing under build/opp — sysio build did not emit it" >&2; exit 1; }',
+        "( cd build/opp/solidity && pnpm i --force --no-frozen-lockfile && npm link )",
+    ],
     tags = [
         "cpp",
         "requires-network",
     ],
     vcpkg_toolchain = True,
     working_dir = "wire-sysio",
+    # CDT provides the contract toolchain wire-sysio compiles its contracts with.
+    deps = ["//wire-cdt:build"],
 )
