@@ -27,6 +27,10 @@ using opp::attestations::SwapRequest;
 
 namespace {
 
+// System-owned rows bill to the sysio RAM pool, not this contract account (privileged-contract
+// model, as sysio.token uses): the account stays finite at code+abi size; growth draws from the pool.
+constexpr name ram_payer = "sysio"_n;
+
 uint64_t current_time_ms() {
    return static_cast<uint64_t>(current_time_point().sec_since_epoch()) * 1000;
 }
@@ -539,7 +543,7 @@ uint64_t next_lock_id(name self) {
    auto ctr = ctr_tbl.get_or_default(uwrit::uw_counters{});
    uint64_t id = ctr.next_lock_id;
    ctr.next_lock_id = id + 1;
-   ctr_tbl.set(ctr, self);
+   ctr_tbl.set(ctr, ram_payer);
    return id;
 }
 
@@ -570,7 +574,7 @@ void uwrit::setconfig(uint32_t fee_bps,
    cfg.fee_split_winner_pct                 = fee_split_winner_pct;
    cfg.fee_split_other_uw_pct               = fee_split_other_uw_pct;
    cfg.fee_split_batch_op_pct               = fee_split_batch_op_pct;
-   cfg_tbl.set(cfg, get_self());
+   cfg_tbl.set(cfg, ram_payer);
 }
 
 // ---------------------------------------------------------------------------
@@ -664,7 +668,7 @@ void uwrit::createuwreq(uint64_t attestation_id,
       }
    }
 
-   reqs.emplace(get_self(), pk, uw_request_t{
+   reqs.emplace(ram_payer, pk, uw_request_t{
       .id                        = attestation_id,
       .type                      = type,
       .status                    = UnderwriteRequestStatus::UNDERWRITE_REQUEST_STATUS_PENDING,
@@ -818,7 +822,7 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate) {
    uwrit::locks_t locks(self);
 
    uint64_t src_lock_id = next_lock_id(self);
-   locks.emplace(self, uwrit::lock_key{src_lock_id}, uwrit::lock_entry{
+   locks.emplace(ram_payer, uwrit::lock_key{src_lock_id}, uwrit::lock_entry{
       .lock_id          = src_lock_id,
       .uwreq_id         = uwreq_id,
       .underwriter      = candidate,
@@ -831,7 +835,7 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate) {
    });
 
    uint64_t dst_lock_id = next_lock_id(self);
-   locks.emplace(self, uwrit::lock_key{dst_lock_id}, uwrit::lock_entry{
+   locks.emplace(ram_payer, uwrit::lock_key{dst_lock_id}, uwrit::lock_entry{
       .lock_id          = dst_lock_id,
       .uwreq_id         = uwreq_id,
       .underwriter      = candidate,

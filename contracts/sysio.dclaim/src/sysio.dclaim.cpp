@@ -10,6 +10,10 @@ namespace {
 
 using opp::types::ChainKind;
 
+// System-owned rows bill to the sysio RAM pool, not this contract account (privileged-contract
+// model, as sysio.token uses): the account stays finite at code+abi size; growth draws from the pool.
+constexpr name ram_payer = "sysio"_n;
+
 /// Deterministic wall-clock seconds (block time). Used for the claimable
 /// window; epoch indices carried on the attestation are for audit only.
 uint32_t now_sec() {
@@ -45,7 +49,7 @@ uint64_t next_id(name self, Pick pick) {
    dclaim::cap_counters c = cnt.get_or_default(dclaim::cap_counters{});
    uint64_t& field = pick(c);
    uint64_t id = field++;
-   cnt.set(c, self);
+   cnt.set(c, ram_payer);
    return id;
 }
 
@@ -62,7 +66,7 @@ void credit_wire(name self, name wacct, ChainKind chain,
       dclaim::pclaims_t pclaims(self);
       auto it = pclaims.find(dclaim::pclaim_key{wacct.value});
       if (it == pclaims.end()) {
-         pclaims.emplace(self, dclaim::pclaim_key{wacct.value},
+         pclaims.emplace(ram_payer, dclaim::pclaim_key{wacct.value},
             dclaim::pending_claim{ .wire_account = wacct,
                                 .balance      = amt,
                                 .expires_at_sec = exp });
@@ -86,7 +90,7 @@ void credit_wire(name self, name wacct, ChainKind chain,
       uint64_t id = next_id(self, [](dclaim::cap_counters& c) -> uint64_t& {
          return c.next_unmapped_id;
       });
-      unmapped.emplace(self, dclaim::unmapped_key{id},
+      unmapped.emplace(ram_payer, dclaim::unmapped_key{id},
          dclaim::unmapped_token{ .id             = id,
                               .chain_kind     = chain,
                               .native_pubkey  = addr,
@@ -121,7 +125,7 @@ bool cursor_admit(name self, uint64_t chain_code, ChainKind chain,
       uint64_t id = next_id(self, [](dclaim::cap_counters& c) -> uint64_t& {
          return c.next_cursor_id;
       });
-      cur.emplace(self, dclaim::rwdcur_key{id},
+      cur.emplace(ram_payer, dclaim::rwdcur_key{id},
          dclaim::reward_cursor{ .id         = id,
                              .chain_code = chain_code,
                              .chain      = chain,
@@ -146,7 +150,7 @@ void dclaim::setconfig() {
    require_auth(get_self());
    capcfg_t cfg(get_self());
    if (!cfg.exists()) {
-      cfg.set(cap_config{}, get_self());
+      cfg.set(cap_config{}, ram_payer);
    }
 }
 
@@ -159,7 +163,7 @@ void dclaim::setclmwindow(uint32_t window_sec) {
    capcfg_t cfg(get_self());
    cap_config c = cfg.get_or_default(cap_config{});
    c.claim_window_sec = window_sec;
-   cfg.set(c, get_self());
+   cfg.set(c, ram_payer);
 }
 
 // ---------------------------------------------------------------------------
@@ -322,7 +326,7 @@ void dclaim::importdone() {
    cap_config current = cfg.get_or_default(cap_config{});
    check(!current.imported_complete, "import already finalized");
    current.imported_complete = true;
-   cfg.set(current, get_self());
+   cfg.set(current, ram_payer);
 }
 
 } // namespace sysio

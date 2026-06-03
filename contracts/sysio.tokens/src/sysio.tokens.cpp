@@ -5,6 +5,10 @@ namespace sysio {
 
 namespace {
 
+// System-owned rows bill to the sysio RAM pool, not this contract account (privileged-contract
+// model, as sysio.token uses): the account stays finite at code+abi size; growth draws from the pool.
+constexpr name ram_payer = "sysio"_n;
+
 uint64_t current_time_ms() {
    return static_cast<uint64_t>(current_time_point().sec_since_epoch()) * 1000;
 }
@@ -46,7 +50,7 @@ void tokens::regtoken(opp::types::TokenKind    kind,
    const auto now = current_time_ms();
    const bool bootstrap = is_bootstrap_window();
 
-   tbl.emplace(get_self(), pk, token_row{
+   tbl.emplace(ram_payer, pk, token_row{
       .code               = code,
       .kind               = kind,
       .symbol_name        = std::move(symbol_name),
@@ -68,7 +72,7 @@ void tokens::activtoken(sysio::slug_name code) {
    sysio::check(it != tbl.end(), "sysio.tokens: token code not registered");
    sysio::check(!it->active, "sysio.tokens: token is already active");
 
-   tbl.modify(get_self(), pk, [&](auto& row) {
+   tbl.modify(ram_payer, pk, [&](auto& row) {
       row.active          = true;
       row.activated_at_ms = current_time_ms();
    });
@@ -99,7 +103,7 @@ void tokens::regctok(sysio::slug_name   chain_code,
       }
    }
 
-   tbl.emplace(get_self(), pk, chain_token_row{
+   tbl.emplace(ram_payer, pk, chain_token_row{
       .chain_code         = chain_code,
       .token_code         = token_code,
       .contract_addr      = std::move(contract_addr),
@@ -131,7 +135,7 @@ void tokens::activctok(sysio::slug_name chain_code, sysio::slug_name token_code)
       }
    }
 
-   tbl.modify(get_self(), pk, [&](auto& row) {
+   tbl.modify(ram_payer, pk, [&](auto& row) {
       row.active          = true;
       row.activated_at_ms = current_time_ms();
    });

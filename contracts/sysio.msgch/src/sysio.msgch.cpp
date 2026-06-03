@@ -30,6 +30,10 @@ constexpr auto     CHAINS_ACCOUNT  = "sysio.chains"_n;
 constexpr auto     RESERV_ACCOUNT  = "sysio.reserv"_n;
 constexpr auto     ROA_ACCOUNT     = "sysio.roa"_n;
 
+// System-owned rows bill to the sysio RAM pool, not this contract account (privileged-contract
+// model, as sysio.token uses): the account stays finite at code+abi size; growth draws from the pool.
+constexpr name     ram_payer       = "sysio"_n;
+
 /// WIRE chain numeric id used in `opp::Endpoints` rows on the audit log.
 /// One end of every cross-chain envelope is always WIRE.
 constexpr uint32_t WIRE_CHAIN_ID  = 1;
@@ -79,7 +83,7 @@ uint64_t mint_att_id(name self) {
    msgch::att_seq_t seq(self);
    msgch::att_seq_key pk{0};
    if (!seq.contains(pk)) {
-      seq.emplace(self, pk, msgch::att_seq_entry{ .id = 0, .next = 2 });
+      seq.emplace(ram_payer, pk, msgch::att_seq_entry{ .id = 0, .next = 2 });
       return 1;
    }
    auto row = seq.get(pk);
@@ -112,7 +116,7 @@ void write_envelope_log(name self,
                         const checksum256&           checksum) {
    sysio::msgch::envelope_log_t tbl(self);
    const uint64_t new_id = std::max<uint64_t>(1, tbl.available_primary_key());
-   tbl.emplace(self, sysio::msgch::id_key{new_id}, sysio::msgch::envelope_log_entry{
+   tbl.emplace(ram_payer, sysio::msgch::id_key{new_id}, sysio::msgch::envelope_log_entry{
       .id          = new_id,
       .endpoints   = endpoints,
       .epoch_index = epoch_index,
@@ -782,7 +786,7 @@ void msgch::deliver(name batch_op_name, uint64_t chain_code, std::vector<char> d
    // Store envelope
    uint64_t env_id = std::max<uint64_t>(1, envs.available_primary_key());
 
-   envs.emplace(get_self(), id_key{env_id}, envelope_entry{
+   envs.emplace(ram_payer, id_key{env_id}, envelope_entry{
       .id            = env_id,
       .chain_code    = chain_code,
       .epoch_index   = epoch,
@@ -917,7 +921,7 @@ void msgch::evalcons(uint64_t chain_code, uint32_t epoch_index) {
    messages_t msgs(get_self());
    uint64_t msg_id = std::max<uint64_t>(1, msgs.available_primary_key());
 
-   msgs.emplace(get_self(), id_key{msg_id}, message_entry{
+   msgs.emplace(ram_payer, id_key{msg_id}, message_entry{
       .id           = msg_id,
       .chain_code   = chain_code,
       .epoch_index  = epoch,
@@ -960,7 +964,7 @@ void msgch::evalcons(uint64_t chain_code, uint32_t epoch_index) {
          // with `status = PROCESSED` directly so the secondary index
          // `bystatus` query in `buildenv` skips them — the dispatch
          // call below is the row's full lifecycle on the depot.
-         atts.emplace(get_self(), id_key{att_id}, attestation_entry{
+         atts.emplace(ram_payer, id_key{att_id}, attestation_entry{
             .id                  = att_id,
             .chain_code          = chain_code,
             .epoch_index         = epoch,
@@ -1045,7 +1049,7 @@ void msgch::evalcons(uint64_t chain_code, uint32_t epoch_index) {
    outpost_consensus_t opcons(get_self());
    auto opc_pk = outpost_consensus_key{chain_code};
    if (!opcons.contains(opc_pk)) {
-      opcons.emplace(get_self(), opc_pk, outpost_consensus_entry{
+      opcons.emplace(ram_payer, opc_pk, outpost_consensus_entry{
          .chain_code        = chain_code,
          .epoch_index       = epoch_index,
          .consensus_reached = true,
@@ -1124,7 +1128,7 @@ void msgch::queueout(uint64_t chain_code,
    attestations_t atts(get_self());
    uint64_t att_id = mint_att_id(get_self());
 
-   atts.emplace(get_self(), id_key{att_id}, attestation_entry{
+   atts.emplace(ram_payer, id_key{att_id}, attestation_entry{
       .id                  = att_id,
       .chain_code          = chain_code,
       .epoch_index         = current_epoch_index(),
@@ -1252,7 +1256,7 @@ void msgch::buildenv(uint64_t chain_code) {
    outenvelopes_t envelopes(get_self());
    uint64_t out_id = std::max<uint64_t>(1, envelopes.available_primary_key());
 
-   envelopes.emplace(get_self(), id_key{out_id}, outbound_envelope{
+   envelopes.emplace(ram_payer, id_key{out_id}, outbound_envelope{
       .id            = out_id,
       .chain_code    = chain_code,
       .epoch_index   = epoch,
