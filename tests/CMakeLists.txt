@@ -259,11 +259,6 @@ add_np_test(NAME producer_rank_test COMMAND tests/producer_rank_test.py -v)
 add_p_test(NAME sysio_util_bls_test COMMAND tests/sysio_util_bls_test.py)
 add_p_test(NAME clio_em_key_test COMMAND tests/clio_em_key_test.py)
 add_p_test(NAME sysio_util_snapshot_info_test COMMAND tests/sysio_util_snapshot_info_test.py)
-if(APPLE)
-   # The reference snapshot is generated on Linux and is not currently portable
-   # through sys-util's snapshot root validation on macOS.
-   set_property(TEST sysio_util_snapshot_info_test PROPERTY LABELS macos_unsupported_tests)
-endif()
 
 add_np_test(NAME http_plugin_test COMMAND tests/http_plugin_test.py TIMEOUT 200)
 
