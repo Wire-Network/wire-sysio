@@ -615,10 +615,9 @@ int64_t apply_context::kv_set(uint16_t table_id, uint64_t payer_val, const char*
    SYS_ASSERT( value_size <= control.get_global_properties().configuration.max_kv_value_size, kv_value_too_large,
                "KV value size {} exceeds maximum {}", value_size, control.get_global_properties().configuration.max_kv_value_size );
 
-   // Resolve payer: 0 = receiver (default), non-zero = explicit.
    // Authorization is enforced at the transaction level via unauthorized_ram_usage_increase.
-   account_name payer = (payer_val == 0) ? receiver : account_name(payer_val);
-
+   // payer_val == 0 is the CDT `same_payer` sentinel (name{}); it is resolved per-branch below --
+   // "keep the existing payer" on update, "the receiver pays" on insert.
    auto sv_key = to_sv(key, key_size);
    const auto& idx = db.get_index<kv_index, by_code_key>();
    auto itr = idx.find(boost::make_tuple(receiver, table_id, sv_key));
@@ -628,8 +627,11 @@ int64_t apply_context::kv_set(uint16_t table_id, uint64_t payer_val, const char*
       int64_t old_billable = kv_object_ram(*itr);
       int64_t new_billable = kv_object_ram(key_size, value_size);
 
-      // Handle payer change
+      // `same_payer` (payer_val == 0) must KEEP the existing payer, not move the row's RAM onto the
+      // receiver -- otherwise modify(same_payer, ...) silently re-bills any row whose payer differs
+      // from the contract account (e.g. a row billed to the `sysio` pool).
       account_name old_payer = itr->payer;
+      account_name payer = (payer_val == 0) ? old_payer : account_name(payer_val);
       if (payer != old_payer) {
          update_db_usage(old_payer, -old_billable);
          update_db_usage(payer, new_billable);
@@ -658,7 +660,9 @@ int64_t apply_context::kv_set(uint16_t table_id, uint64_t payer_val, const char*
 
       return new_billable - old_billable;
    } else {
-      // Create new
+      // Create new. A brand-new row has no prior payer, so `same_payer` (payer_val == 0) defaults to
+      // the receiver -- the contract account pays for rows it creates without naming a payer.
+      account_name payer = (payer_val == 0) ? receiver : account_name(payer_val);
       const auto& obj = db.create<kv_object>([&](auto& o) {
          o.code = receiver;
          o.payer = payer;
@@ -1011,8 +1015,10 @@ void apply_context::kv_idx_update(uint64_t payer_val, uint16_t table_id,
 
    SYS_ASSERT( itr != idx.end(), kv_key_not_found, "KV secondary index entry not found for update" );
 
-   account_name payer = (payer_val == 0) ? receiver : account_name(payer_val);
+   // `same_payer` (payer_val == 0) keeps the existing index entry's payer rather than re-billing it
+   // to the receiver, matching the primary-row semantics in kv_set.
    account_name old_payer = itr->payer;
+   account_name payer = (payer_val == 0) ? old_payer : account_name(payer_val);
 
    int64_t old_billable = kv_index_object_ram(*itr);
    int64_t new_billable = kv_index_object_ram(new_sec_key_size, pri_key_size);

@@ -2094,6 +2094,46 @@ public:
                    pk, sizeof(pk), sec_key, sizeof(sec_key));
    }
 
+   // ── Payer-billing route probes ──────────────────────────────────────────────
+   // Parameterized actions so payer_choice_test can assert who is billed on every
+   // RAM-affecting kv route that payer_choice_test does not already cover.
+
+   // bilkvera: primary insert billed to `pa`, then erase. kv_erase must refund the
+   // row's payer (pa), so pa's net RAM is zero -- not the receiver's.
+   [[sysio::action]]
+   void bilkvera(sysio::name pa) {
+      char k[]   = {0x42, 0x45, 0x52, 0x01};   // "BER\x01"
+      char val[] = "eraseval";
+      kv_set(test_table_id, pa.value, k, sizeof(k), val, sizeof(val));
+      kv_erase(test_table_id, k, sizeof(k));
+   }
+
+   // bilidxchg: secondary entry stored billed to `pa`, then its key updated billed
+   // to `pb`. pb != {} -> payer change (pa refunded, pb billed); pb == {}
+   // (same_payer) -> the existing payer (pa) must be kept, NOT moved to the
+   // receiver. Both secondary keys are 5 bytes so the update carries zero size delta.
+   [[sysio::action]]
+   void bilidxchg(sysio::name pa, sysio::name pb) {
+      static constexpr uint32_t sec_tid = 113;
+      char pri[]   = {0x43, 0x48, 0x47, 0x01};            // "CHG\x01"
+      char sec_a[] = {0x01, 0x02, 0x03, 0x04, 0x05};
+      char sec_b[] = {0x06, 0x07, 0x08, 0x09, 0x0a};
+      kv_idx_store(pa.value, sec_tid, pri, sizeof(pri), sec_a, sizeof(sec_a));
+      kv_idx_update(pb.value, sec_tid, pri, sizeof(pri),
+                    sec_a, sizeof(sec_a), sec_b, sizeof(sec_b));
+   }
+
+   // bilidxrm: secondary entry stored billed to `pa`, then removed. kv_idx_remove
+   // must refund the entry's payer (pa), so pa's net RAM is zero.
+   [[sysio::action]]
+   void bilidxrm(sysio::name pa) {
+      static constexpr uint32_t sec_tid = 114;
+      char pri[] = {0x52, 0x4d, 0x56, 0x01};              // "RMV\x01"
+      char sec[] = {0x0b, 0x0c, 0x0d, 0x0e, 0x0f};
+      kv_idx_store(pa.value, sec_tid, pri, sizeof(pri), sec, sizeof(sec));
+      kv_idx_remove(sec_tid, pri, sizeof(pri), sec, sizeof(sec));
+   }
+
    // ═══════════════════════════════════════════════════════════════════════════
    // Cross-scope secondary index isolation tests
    // Verify that secondary index iteration in one scope does not leak entries
