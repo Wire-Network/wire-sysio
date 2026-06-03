@@ -59,6 +59,19 @@ struct s_root_extension {
     }
 };
 
+// Walks the s_root_extension entries in `received` and `constructed` in order,
+// asserting that there are the same number of them and that each corresponding
+// pair has identical packed bytes. Other extension types (e.g. protocol_feature_activation)
+// are ignored — only entries with extension_id() == s_root_extension::extension_id()
+// are compared. Throws block_validate_exception on any mismatch.
+//
+// Precondition: both inputs must already be in the canonical ascending-id order
+// that block_header::validate_and_extract_header_extensions enforces. Same-id
+// entries preserve insertion order, which is the order s_root_extensions were
+// added by block_header_state::next when building the block.
+void validate_s_root_extensions_match(const extensions_type& received,
+                                      const extensions_type& constructed);
+
 }} // namespace sysio::chain
 
 FC_REFLECT(sysio::chain::s_header,

@@ -37,6 +37,13 @@ jobs:
         with:
           version: "10.32.1"
 
+      - name: Install deps
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          cd ./libraries/opp/tools
+          pnpm install
+        
       - name: Generate & Publish OPP Bundles
         if: github.event_name == 'push'
         env:

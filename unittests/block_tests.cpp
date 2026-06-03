@@ -1,10 +1,21 @@
 #include <boost/test/unit_test.hpp>
 #include <sysio/testing/tester.hpp>
+#include <sysio/chain/snapshot_detail.hpp>
+#include <sysio/chain/block_handle.hpp>
+#include <sysio/chain/genesis_state.hpp>
 #include <test_contracts.hpp>
 
 using namespace sysio;
 using namespace testing;
 using namespace chain;
+
+// Accessor reaches into block_handle's private internal() for tests that need
+// the underlying block_state_ptr. block_handle declares friend block_handle_accessor.
+namespace sysio::chain {
+   struct block_handle_accessor {
+      static const block_state_ptr& get_bsp(const block_handle& h) { return h.internal(); }
+   };
+}
 
 BOOST_AUTO_TEST_SUITE(block_tests)
 
@@ -571,5 +582,189 @@ BOOST_AUTO_TEST_CASE( failed_trx_excluded_from_block_report )
    // add CI jitter noise without strengthening the test.
    BOOST_TEST( captured->cpu_usage_us == baseline.cpu_usage_us );
 }
+
+// Regression test for the snapshot hardening invariant added in block_state(snapshot).
+// For any non-genesis block_state, core.latest_qc_claim() must equal header.qc_claim
+// (finality_core::next sets latest_qc_claim from the header's claim). A snapshot with
+// the two disagreeing would break verify_basic_proper_block_invariants' assumption
+// that the core is the authoritative QC-claim reference. Snapshot loading must reject.
+BOOST_AUTO_TEST_CASE(snapshot_core_header_qc_claim_mismatch_rejected) try {
+   savanna_tester chain;
+   chain.produce_blocks(4); // past genesis
+
+   // controller::head() returns block_handle by value; bind to a named local so its
+   // embedded shared_ptr outlives live_bsp (a reference into it). Without this the
+   // temporary dies at the end of the full-expression and the get_bsp() reference
+   // dangles; clang and the sanitizer builds reuse the stack and read garbage.
+   const auto head_handle = chain.control->head();
+   const auto& live_bsp = block_handle_accessor::get_bsp(head_handle);
+   BOOST_REQUIRE(!live_bsp->core.is_genesis_core());
+   BOOST_REQUIRE(live_bsp->core.latest_qc_claim() == live_bsp->header.qc_claim); // sanity
+
+   // Build a snapshot_block_state_v1 from the live one, then tamper header.qc_claim
+   // to something provably different (block_num far in the past, weak). Must NOT
+   // match core.latest_qc_claim(), which for a running chain reflects a recent block.
+   // Re-sync block_id to the tampered header so the prior block_id == calculate_id()
+   // consistency check (also added by this PR) does not fire first; we want this case
+   // to exercise the qc_claim invariant specifically.
+   snapshot_detail::snapshot_block_state_v1 sbs{*live_bsp};
+   sbs.header.qc_claim = qc_claim_t{0, false};
+   sbs.block_id        = sbs.header.calculate_id();
+   BOOST_REQUIRE(sbs.core.latest_qc_claim() != sbs.header.qc_claim); // confirm setup
+
+   BOOST_CHECK_EXCEPTION(block_state{std::move(sbs)}, snapshot_exception,
+      fc_exception_message_contains("core.latest_qc_claim"));
+} FC_LOG_AND_RETHROW()
+
+// Genesis state is reconstructed from genesis_state via initialize_blockchain_state;
+// the snapshot-load path is reserved for resuming from a running chain head and must
+// reject block_num() == 1. This also closes a class of bypass attacks against the
+// qc_claim consistency check (see snapshot_synthetic_genesis_core_rejected below).
+BOOST_AUTO_TEST_CASE(snapshot_of_genesis_rejected) try {
+   genesis_state gs;
+   auto genesis_bsp = block_state::create_genesis_block(gs);
+   BOOST_REQUIRE_EQUAL(genesis_bsp->block_num(), 1u);
+
+   snapshot_detail::snapshot_block_state_v1 sbs{*genesis_bsp};
+   BOOST_CHECK_EXCEPTION(block_state{std::move(sbs)}, snapshot_exception,
+      fc_exception_message_contains("snapshots of the genesis block are not supported"));
+} FC_LOG_AND_RETHROW()
+
+// A tampered non-genesis snapshot can install a synthetic "genesis-shaped" core
+// (refs={}, single src==tgt link) on the head block to make the core look like the
+// chain's IF genesis. validate_snapshot still passes (invariant 3 only requires a
+// single src==tgt link), and the malformed core would be silently accepted if the
+// qc_claim check is exempted on refs.empty(). The block_num() != 1 guard above
+// ensures the exemption only ever applied to the literal genesis block.
+BOOST_AUTO_TEST_CASE(snapshot_synthetic_genesis_core_rejected) try {
+   savanna_tester chain;
+   chain.produce_blocks(4);
+   const auto head_handle = chain.control->head();
+   const auto& live_bsp = block_handle_accessor::get_bsp(head_handle);
+   BOOST_REQUIRE(!live_bsp->core.is_genesis_core());
+   BOOST_REQUIRE_GT(live_bsp->block_num(), 1u);
+
+   snapshot_detail::snapshot_block_state_v1 sbs{*live_bsp};
+
+   // Replace core with a synthetic genesis-shape for this block_num. Satisfies
+   // validate_snapshot's invariant 3 (single link, src==tgt) but its latest_qc_claim
+   // becomes {block_num, false}, which can never match the real header.qc_claim.
+   const auto bn = live_bsp->block_num();
+   sbs.core = finality_core{
+      .links = { qc_link{ .source_block_num = bn, .target_block_num = bn, .is_link_strong = false } },
+      .refs  = {},
+      .genesis_timestamp = live_bsp->core.last_final_block_timestamp()
+   };
+
+   BOOST_CHECK_EXCEPTION(block_state{std::move(sbs)}, snapshot_exception,
+      fc_exception_message_contains("core.latest_qc_claim"));
+} FC_LOG_AND_RETHROW()
+
+// The snapshot constructor used to copy sbs.block_id verbatim into the new state.
+// fork_db indexing and id() consumers then trust that stored id as authoritative.
+// Tampering only the upper hash bytes (preserving the low-32 block_num portion) keeps
+// block_num() consistent so the genesis guard does not fire; the dedicated block_id ==
+// header.calculate_id() check is what must reject this.
+BOOST_AUTO_TEST_CASE(snapshot_block_id_header_mismatch_rejected) try {
+   savanna_tester chain;
+   chain.produce_blocks(4);
+   const auto head_handle = chain.control->head();
+   const auto& live_bsp = block_handle_accessor::get_bsp(head_handle);
+
+   snapshot_detail::snapshot_block_state_v1 sbs{*live_bsp};
+   // Corrupt block_id without touching header. _hash[2] is in the digest portion;
+   // _hash[0]'s low 32 bits hold block_num and are deliberately left alone here.
+   sbs.block_id._hash[2] ^= 0xdeadbeefdeadbeefULL;
+
+   BOOST_CHECK_EXCEPTION(block_state{std::move(sbs)}, snapshot_exception,
+      fc_exception_message_contains("does not match header.calculate_id"));
+} FC_LOG_AND_RETHROW()
+
+// A tampered snapshot can carry a null activated_protocol_features. The snapshot
+// block_state ctor reaches it transitively via compute_finality_digest -> compute_base_digest,
+// which asserts then dereferences the pointer. The ctor must reject with snapshot_exception
+// before the digest path runs.
+BOOST_AUTO_TEST_CASE(snapshot_null_activated_protocol_features_rejected) try {
+   savanna_tester chain;
+   chain.produce_blocks(4);
+
+   const auto head_handle = chain.control->head();
+   const auto& live_bsp = block_handle_accessor::get_bsp(head_handle);
+
+   snapshot_detail::snapshot_block_state_v1 sbs{*live_bsp};
+   sbs.activated_protocol_features.reset(); // null out before construction
+
+   BOOST_CHECK_EXCEPTION(block_state{std::move(sbs)}, snapshot_exception,
+      fc_exception_message_contains("activated_protocol_features"));
+} FC_LOG_AND_RETHROW()
+
+// A tampered snapshot can carry an empty / malformed finality_core. Without validating
+// the core first, compute_finality_digest's call to core.latest_qc_claim() would assert
+// on the empty links vector. The ctor must reject with snapshot_exception instead.
+BOOST_AUTO_TEST_CASE(snapshot_empty_core_rejected) try {
+   savanna_tester chain;
+   chain.produce_blocks(4);
+
+   const auto head_handle = chain.control->head();
+   const auto& live_bsp = block_handle_accessor::get_bsp(head_handle);
+
+   snapshot_detail::snapshot_block_state_v1 sbs{*live_bsp};
+   sbs.core = finality_core{}; // default-initialized: links and refs both empty
+
+   BOOST_CHECK_EXCEPTION(block_state{std::move(sbs)}, snapshot_exception,
+      fc_exception_message_contains("links must not be empty"));
+} FC_LOG_AND_RETHROW()
+
+// A snapshot is never taken at genesis, so every snapshot block_state must carry a
+// valid_t (finality-tree) structure. A tampered snapshot that nulls it out must be
+// rejected at construction: get_validation_mroot() would otherwise return an empty
+// digest (after a debug-only assert) and the corruption would surface only later as
+// a finality_mroot mismatch in apply_block.
+BOOST_AUTO_TEST_CASE(snapshot_null_valid_rejected) try {
+   savanna_tester chain;
+   chain.produce_blocks(4);
+
+   const auto head_handle = chain.control->head();
+   const auto& live_bsp = block_handle_accessor::get_bsp(head_handle);
+   BOOST_REQUIRE(!live_bsp->core.is_genesis_core());
+
+   snapshot_detail::snapshot_block_state_v1 sbs{*live_bsp};
+   BOOST_REQUIRE(sbs.valid); // a validated head block carries a valid_t structure
+   sbs.valid.reset();        // tamper: null it out before construction
+
+   BOOST_CHECK_EXCEPTION(block_state{std::move(sbs)}, snapshot_exception,
+      fc_exception_message_contains("valid_t finality structure"));
+} FC_LOG_AND_RETHROW()
+
+// A tampered snapshot can pair a block-N header/id with a structurally valid finality_core
+// whose current_block_num() is some other M. validate_snapshot only enforces the core's
+// internal invariants, and the valid_t size check uses core.current_block_num() (not
+// block_num()), so a matching-sized validation_mroots vector silently agrees with the
+// tampered core. block_state(snapshot) must reject the block_num disagreement explicitly.
+BOOST_AUTO_TEST_CASE(snapshot_core_block_num_mismatch_rejected) try {
+   savanna_tester chain;
+   chain.produce_blocks(4);
+
+   const auto head_handle = chain.control->head();
+   const auto& live_bsp = block_handle_accessor::get_bsp(head_handle);
+   BOOST_REQUIRE(!live_bsp->core.is_genesis_core());
+   BOOST_REQUIRE_GT(live_bsp->block_num(), 1u);
+
+   snapshot_detail::snapshot_block_state_v1 sbs{*live_bsp};
+   const auto wrong_bn = live_bsp->block_num() + 100;
+
+   // Replace core with a synthetic single-link core whose current_block_num is wrong_bn,
+   // not the header's block_num. The single src==tgt link satisfies validate_snapshot's
+   // invariant 3 (refs.empty() with one self-link), so the failure must come from the
+   // explicit core/header block_num check rather than core.validate_snapshot().
+   sbs.core = finality_core{
+      .links = { qc_link{ .source_block_num = wrong_bn, .target_block_num = wrong_bn, .is_link_strong = false } },
+      .refs  = {},
+      .genesis_timestamp = live_bsp->core.last_final_block_timestamp()
+   };
+
+   BOOST_CHECK_EXCEPTION(block_state{std::move(sbs)}, snapshot_exception,
+      fc_exception_message_contains("core.current_block_num"));
+} FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_SUITE_END()

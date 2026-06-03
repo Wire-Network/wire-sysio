@@ -184,39 +184,137 @@ block_state::block_state(snapshot_detail::snapshot_block_state_v1&& sbs)
          .last_pending_finalizer_policy_digest = sbs.last_pending_finalizer_policy_digest,
          .last_pending_finalizer_policy_start_timestamp = sbs.last_pending_finalizer_policy_start_timestamp
       }
-   , strong_digest(compute_finality_digest())
-   , weak_digest(create_weak_digest(strong_digest))
-   , aggregating_qc(active_finalizer_policy,
-                    pending_finalizer_policy ? pending_finalizer_policy->second : finalizer_policy_ptr{}) // just in case we receive votes
+   // strong_digest / weak_digest / aggregating_qc are value-initialized here and
+   // assigned their real values in the body after null-guards. compute_finality_digest()
+   // and aggregating_qc_sig_t's ctor both dereference active_finalizer_policy; a
+   // tampered snapshot with null pointers would crash inside the member init list
+   // before we could SYS_ASSERT on them. Explicit {} forces value-init (matters for
+   // weak_digest_t = std::array<uint8_t,N>, whose default-init leaves bytes
+   // indeterminate).
+   , strong_digest{}
+   , weak_digest{}
+   , aggregating_qc{}
    , valid(std::move(sbs.valid))
 {
-   header_exts = header.validate_and_extract_header_extensions();
+   // The stored block_id is taken from the snapshot bytes. calculate_id() is a pure
+   // function of header content (excluding producer_signature), so the two MUST agree
+   // for a well-formed block_state. Without this check a tampered snapshot can plant
+   // a block_id that disagrees with the header, and downstream fork_db indexing and
+   // any id() consumer would then treat the forged value as authoritative.
+   {
+      const auto computed_id = header.calculate_id();
+      SYS_ASSERT(block_id == computed_id, snapshot_exception,
+                 "snapshot block_id {} does not match header.calculate_id() {}",
+                 block_id, computed_id);
+   }
 
-   // Snapshot hardening: validate finality_core invariants
-   core.validate_snapshot();
+   // Snapshots are never taken of the genesis block: the genesis state is reconstructable
+   // from genesis_state via controller::initialize_blockchain_state, so the snapshot-load
+   // path is reserved for resuming from a running chain head. Rejecting block_num() == 1
+   // here also closes a class of bypass attacks where a tampered snapshot installs a
+   // synthetic "genesis-shaped" core (refs={}, single src==tgt link) on a non-genesis
+   // block to make the qc_claim consistency check below indistinguishable from genesis.
+   // controller asserts blog.first_block_num() == 1 at block-log load time, so block 1 is
+   // the canonical genesis block number.
+   SYS_ASSERT(block_num() != 1, snapshot_exception,
+              "snapshots of the genesis block are not supported; initialize from genesis_state instead");
 
-   // Snapshot hardening: validate finalizer policies
+   // fc::raw::unpack<shared_ptr<T>> permits null via a leading bool; a tampered
+   // snapshot can plant nulls in any of these slots. Null-check BEFORE any code
+   // dereferences them (compute_finality_digest / aggregating_qc construction /
+   // policy validate() calls all require non-null pointers). activated_protocol_features
+   // is reached through compute_base_digest() from compute_finality_digest() below.
+   SYS_ASSERT(activated_protocol_features, snapshot_exception, "activated_protocol_features must not be null");
    SYS_ASSERT(active_finalizer_policy, snapshot_exception, "active_finalizer_policy must not be null");
    SYS_ASSERT(active_proposer_policy, snapshot_exception, "active_proposer_policy must not be null");
-   active_finalizer_policy->validate_snapshot();
    if (pending_finalizer_policy) {
-      pending_finalizer_policy->second->validate_snapshot();
+      SYS_ASSERT(pending_finalizer_policy->second, snapshot_exception,
+                 "pending_finalizer_policy must not contain a null policy");
    }
    for (const auto& [_, pol] : proposed_finalizer_policies) {
-      pol->validate_snapshot();
-   }
-   if (latest_qc_claim_block_active_finalizer_policy) {
-      latest_qc_claim_block_active_finalizer_policy->validate_snapshot();
+      SYS_ASSERT(pol, snapshot_exception, "proposed_finalizer_policies entry must not be null");
    }
 
-   // Snapshot hardening: validate valid_t
-   if (valid) {
-      valid->validation_tree.validate_snapshot();
-      auto expected_size = core.current_block_num() - core.last_final_block_num() + 1;
-      SYS_ASSERT(valid->validation_mroots.size() == expected_size, snapshot_exception,
-                 "valid_t.validation_mroots size ({}) != expected ({})",
-                 valid->validation_mroots.size(), expected_size);
+   // Snapshot hardening: validate finality_core invariants BEFORE computing digests.
+   // compute_finality_digest() calls core.latest_qc_claim() (asserts !links.empty()) and
+   // core.get_block_reference() (asserts bounds on refs); an empty or malformed core
+   // would assert/segfault inside the digest path before we could throw snapshot_exception.
+   core.validate_snapshot();
+
+   // Now safe to compute state that depends on active_finalizer_policy / activated_protocol_features / core.
+   strong_digest  = compute_finality_digest();
+   weak_digest    = create_weak_digest(strong_digest);
+   aggregating_qc = aggregating_qc_t{
+      active_finalizer_policy,
+      pending_finalizer_policy ? pending_finalizer_policy->second : finalizer_policy_ptr{}
+   };
+
+   header_exts = header.validate_and_extract_header_extensions();
+
+   // Verify the core agrees with the header on which block this state represents.
+   // finality_core::current_block_num() comes from links.back().source_block_num, while
+   // block_num() comes from the header. validate_snapshot only enforces the core's internal
+   // invariants; without this check a tampered snapshot can pair a block-N header/id with a
+   // structurally valid core for block M. The valid_t size check below uses
+   // core.current_block_num(), so a matching-sized validation_mroots vector silently agrees
+   // with the tampered core and the disagreement with the header goes undetected.
+   SYS_ASSERT(core.current_block_num() == block_num(), snapshot_exception,
+              "snapshot block_state core.current_block_num {} does not match header.block_num {}",
+              core.current_block_num(), block_num());
+
+   // core.latest_qc_claim() is the authoritative reference for downstream QC-claim checks
+   // (see verify_basic_proper_block_invariants). For every non-genesis block it equals
+   // header.qc_claim by construction (finality_core::next sets latest_qc_claim from the
+   // header's claim). The genesis case (core {1,false} vs header {0,false}) is already
+   // rejected above as block_num() == 1.
+   SYS_ASSERT(core.latest_qc_claim() == header.qc_claim, snapshot_exception,
+              "snapshot block_state core.latest_qc_claim {} does not match header.qc_claim {}",
+              core.latest_qc_claim(), header.qc_claim);
+
+   // Snapshot hardening: validate finalizer and proposer policies.
+   // Uses the shared validate() methods (same checks the set_finalizers /
+   // set_proposed_producers intrinsics enforce); rewraps as snapshot_exception.
+   auto validate_fin_pol = [](const finalizer_policy& p, const char* which) {
+      try { p.validate(); }
+      catch (const invalid_finalizer_policy_exception& e) {
+         SYS_THROW(snapshot_exception, "snapshot: {} finalizer policy invalid: {}", which, e.top_message());
+      }
+   };
+   auto validate_prop_pol = [](const proposer_policy& p, const char* which) {
+      try { p.validate(); }
+      catch (const producer_schedule_exception& e) {
+         SYS_THROW(snapshot_exception, "snapshot: {} proposer policy invalid: {}", which, e.top_message());
+      }
+   };
+   validate_fin_pol(*active_finalizer_policy, "active");
+   if (pending_finalizer_policy) {
+      validate_fin_pol(*pending_finalizer_policy->second, "pending");
    }
+   for (const auto& [_, pol] : proposed_finalizer_policies) {
+      validate_fin_pol(*pol, "proposed");
+   }
+   if (latest_qc_claim_block_active_finalizer_policy) {
+      validate_fin_pol(*latest_qc_claim_block_active_finalizer_policy, "latest_qc_claim_block_active");
+   }
+   validate_prop_pol(*active_proposer_policy, "active");
+   if (latest_proposed_proposer_policy) {
+      validate_prop_pol(*latest_proposed_proposer_policy, "latest_proposed");
+   }
+   if (latest_pending_proposer_policy) {
+      validate_prop_pol(*latest_pending_proposer_policy, "latest_pending");
+   }
+
+   // Snapshot hardening: validate valid_t. A snapshot is never taken at genesis, so
+   // every snapshot block_state must carry a valid_t (finality-tree) structure. A null
+   // valid is a tampered or truncated snapshot; without this check get_validation_mroot()
+   // would later return an empty digest (after a debug-only assert) and the corruption
+   // would surface only indirectly as a finality_mroot mismatch in apply_block.
+   SYS_ASSERT(valid, snapshot_exception, "snapshot block_state must have a valid_t finality structure");
+   valid->validation_tree.validate_snapshot();
+   auto expected_size = core.current_block_num() - core.last_final_block_num() + 1;
+   SYS_ASSERT(valid->validation_mroots.size() == expected_size, snapshot_exception,
+              "valid_t.validation_mroots size ({}) != expected ({})",
+              valid->validation_mroots.size(), expected_size);
 }
 
 deque<transaction_metadata_ptr> block_state::extract_trxs_metas() {
@@ -302,6 +400,12 @@ valid_t block_state::new_valid(const block_header_state& next_bhs, const digest_
 
 digest_type block_state::get_validation_mroot(block_num_type target_block_num) const {
    if (!valid) {
+      // The only legitimate case where a block_state has no valid structure is
+      // the Savanna genesis core (created without a finality tree). Any other
+      // null-valid is a construction or serialization bug; catching it here
+      // produces a clearer failure than the downstream finality_mroot mismatch
+      // apply_block would report.
+      assert(core.is_genesis_core());
       return digest_type{};
    }
 

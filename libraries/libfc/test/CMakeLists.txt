@@ -1,5 +1,6 @@
 
 add_executable( test_fc
+        crypto/test_base58.cpp
         crypto/test_blake2.cpp
         crypto/test_bls.cpp
         crypto/test_cypher_suites.cpp

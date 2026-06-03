@@ -286,4 +286,45 @@ BOOST_AUTO_TEST_CASE(trx_extension_rejected_on_push) {
    );
 }
 
+// Regression test for verify_signee's dedup assumption. verify_signee (block_state.cpp)
+// collects recovered keys into std::set<public_key_type> and relies on set equality to
+// detect "block signed by same key twice". The equality semantics come from
+// public_key_type's defaulted <=>, which in turn compares the underlying std::variant
+// of curve-specific shim types. If recover() ever produces two structurally-distinct
+// public_key_type values that represent the same logical key (e.g. different internal
+// encodings of the same curve point), the "same key twice" check would silently miss
+// and keys_satisfy_and_relevant would over-count relevant signatures.
+//
+// This test recovers the same key via two fresh calls with identical inputs and
+// asserts the set collapses them to one entry. It's never expected to fail today but
+// catches a regression if recover() or the variant ordering changes.
+BOOST_AUTO_TEST_CASE(recovered_keys_dedup_in_set) try {
+   auto priv = fc::crypto::private_key::generate();
+   auto digest = fc::sha256::hash("hello world");
+   auto sig = priv.sign(digest);
+
+   // Two fresh recover calls with the same inputs should yield the same public_key_type.
+   auto pk1 = fc::crypto::public_key::recover(sig, digest);
+   auto pk2 = fc::crypto::public_key::recover(sig, digest);
+   BOOST_CHECK(pk1 == pk2);
+
+   // Insertion into std::set should collapse them.
+   std::set<fc::crypto::public_key> keys;
+   auto [it1, inserted1] = keys.emplace(pk1);
+   BOOST_CHECK(inserted1);
+   auto [it2, inserted2] = keys.emplace(pk2);
+   BOOST_CHECK(!inserted2); // second emplace must be rejected -- same key
+   BOOST_REQUIRE_EQUAL(keys.size(), 1u);
+
+   // Paired with verify_signee's direct call shape: recover into set via distinct
+   // loop iterations and confirm count is 1.
+   std::vector<fc::crypto::signature> sigs{sig, sig};
+   std::set<fc::crypto::public_key> keys2;
+   for (const auto& s : sigs) {
+      auto [iter, inserted] = keys2.emplace(fc::crypto::public_key::recover(s, digest));
+      (void)iter; (void)inserted;
+   }
+   BOOST_REQUIRE_EQUAL(keys2.size(), 1u);
+} FC_LOG_AND_RETHROW()
+
 BOOST_AUTO_TEST_SUITE_END()
