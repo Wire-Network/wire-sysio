@@ -15,6 +15,18 @@ option(DISABLE_LLVM_LINKAGE_OVERRIDE "Disable LLVM linkage override" OFF)
 option(ENABLE_OC "Enable sysvm-oc on supported platforms" ON)
 option(SYSIO_ENABLE_DEVELOPER_OPTIONS "enable developer options for WIRE" OFF)
 
+if(APPLE AND CMAKE_SYSTEM_PROCESSOR MATCHES "^(arm64|aarch64)$")
+  set(SYSIO_DEFAULT_SYS_VM_JIT_IS_DEFAULT OFF)
+else()
+  set(SYSIO_DEFAULT_SYS_VM_JIT_IS_DEFAULT ON)
+endif()
+option(SYSIO_SYS_VM_JIT_IS_DEFAULT "Use sys-vm-jit as the default WASM runtime when it is compiled in" ${SYSIO_DEFAULT_SYS_VM_JIT_IS_DEFAULT})
+
+# macOS arm64 builds are developer-only, but sys-vm must remain the default runtime.
+if(APPLE AND CMAKE_SYSTEM_PROCESSOR MATCHES "^(arm64|aarch64)$" AND SYSIO_SYS_VM_JIT_IS_DEFAULT)
+  message(FATAL_ERROR "SYSIO_SYS_VM_JIT_IS_DEFAULT must remain OFF for macOS arm64 builds")
+endif()
+
 option(ENABLE_MULTIVERSION_PROTOCOL_TEST "Enable nodeop multiversion protocol test" OFF)
 option(ENABLE_COVERAGE_TESTING "Build WIRE for code coverage analysis" OFF)
 option(DISABLE_WASM_SPEC_TESTS "disable building of wasm spec unit tests" OFF)

@@ -737,7 +737,7 @@ class PtbArgumentsHandler(object):
         ptbBaseParserGroup.add_argument("--abi-file", type=str, help=argparse.SUPPRESS if suppressHelp else "ABI file name for contract", default="sysio.system.abi")
         ptbBaseParserGroup.add_argument("--user-trx-data-file", type=str, help=argparse.SUPPRESS if suppressHelp else "Path to transaction data JSON file")
         ptbBaseParserGroup.add_argument("--wasm-runtime", type=str, help=argparse.SUPPRESS if suppressHelp else "Override default WASM runtime (\"sys-vm-jit\", \"sys-vm\")\
-                                         \"sys-vm-jit\" : A WebAssembly runtime that compiles WebAssembly code to native x86 code prior to\
+                                         \"sys-vm-jit\" : A WebAssembly runtime that compiles WebAssembly code to native host code prior to\
                                          execution. \"sys-vm\" : A WebAssembly interpreter.",
                                          choices=["sys-vm-jit", "sys-vm"], default="sys-vm-jit")
         ptbBaseParserGroup.add_argument("--contracts-console", help=argparse.SUPPRESS if suppressHelp else "print contract's output to console", action='store_true')

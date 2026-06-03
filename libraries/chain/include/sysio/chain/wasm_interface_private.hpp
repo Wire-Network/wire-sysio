@@ -15,11 +15,6 @@
 #include <sysio/chain/thread_utils.hpp>
 #include <fc/scoped_exit.hpp>
 
-#include "IR/Module.h"
-#include "Platform/Platform.h"
-#include "WAST/WAST.h"
-#include "IR/Validate.h"
-
 #include <sysio/chain/webassembly/sys-vm.hpp>
 #include <sysio/vm/allocator.hpp>
 
@@ -31,7 +26,6 @@
 
 using namespace fc;
 using namespace sysio::chain::webassembly;
-using namespace IR;
 
 using boost::multi_index_container;
 
@@ -87,10 +81,14 @@ struct sysvmoc_tier {
          if(vm == wasm_interface::vm_type::sys_vm)
             runtime_interface = std::make_unique<webassembly::sys_vm_runtime::sys_vm_runtime<sysio::vm::interpreter>>();
 #endif
-#ifdef SYSIO_SYS_VM_JIT_RUNTIME_ENABLED
+#if defined(SYSIO_SYS_VM_JIT_RUNTIME_ENABLED) && defined(SYS_VM_HAS_JIT_BACKEND)
          if(vm == wasm_interface::vm_type::sys_vm_jit && profile) {
+#ifdef SYS_VM_HAS_JIT_PROFILE
             sysio::vm::set_profile_interval_us(200);
             runtime_interface = std::make_unique<webassembly::sys_vm_runtime::sys_vm_profile_runtime>();
+#else
+            SYS_THROW(wasm_exception, "sys-vm-jit profiling is not supported on this platform and/or configuration");
+#endif
          }
          if(vm == wasm_interface::vm_type::sys_vm_jit && !profile)
             runtime_interface = std::make_unique<webassembly::sys_vm_runtime::sys_vm_runtime<sysio::vm::jit>>();

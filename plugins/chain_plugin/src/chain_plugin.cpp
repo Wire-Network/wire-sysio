@@ -258,7 +258,7 @@ void chain_plugin::set_program_options(options_description& cli, options_descrip
    std::string delim;
 #ifdef SYSIO_SYS_VM_JIT_RUNTIME_ENABLED
    wasm_runtime_opt += " \"sys-vm-jit\"";
-   wasm_runtime_desc += "\"sys-vm-jit\" : A WebAssembly runtime that compiles WebAssembly code to native x86 code prior to execution.\n";
+   wasm_runtime_desc += "\"sys-vm-jit\" : A WebAssembly runtime that compiles WebAssembly code to native host code prior to execution.\n";
    delim = ", ";
 #endif
 

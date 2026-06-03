@@ -83,6 +83,7 @@ jobs:
 
           cmake -B build/macos-arm64 -S . -G Ninja \
             -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_OSX_ARCHITECTURES=arm64 \
             -DCMAKE_TOOLCHAIN_FILE="$PWD/vcpkg/scripts/buildsystems/vcpkg.cmake" \
             -DVCPKG_TARGET_TRIPLET="$VCPKG_TARGET_TRIPLET" \
             -DVCPKG_HOST_TRIPLET="$VCPKG_HOST_TRIPLET" \
@@ -92,6 +93,7 @@ jobs:
             -DENABLE_CCACHE=ON \
             -DENABLE_DISTCC=OFF \
             -DENABLE_TESTS=ON \
+            -DSYSIO_SYS_VM_JIT_IS_DEFAULT=OFF \
             -DDISABLE_WASM_SPEC_TESTS=OFF
 
       - name: Build test targets

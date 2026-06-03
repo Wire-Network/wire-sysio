@@ -59,11 +59,13 @@ class sys_vm_runtime : public sysio::chain::wasm_runtime_interface {
    friend class sys_vm_instantiated_module;
 };
 
+#ifdef SYS_VM_HAS_JIT_PROFILE
 class sys_vm_profile_runtime : public sysio::chain::wasm_runtime_interface {
    public:
       sys_vm_profile_runtime();
       std::unique_ptr<wasm_instantiated_module_interface> instantiate_module(const char* code_bytes, size_t code_size,
                                                                              const digest_type& code_hash, const uint8_t& vm_type, const uint8_t& vm_version) override;
 };
+#endif
 
 }}}}// sysio::chain::webassembly::sys_vm_runtime

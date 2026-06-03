@@ -122,7 +122,7 @@ namespace sysio::chain::config {
   // Iterator limit is hardcoded (ephemeral per-transaction, bounded by CPU)
   static constexpr uint32_t   max_kv_iterators                  = 1024;
 
-#ifdef SYSIO_SYS_VM_JIT_RUNTIME_ENABLED
+#if defined(SYSIO_SYS_VM_JIT_RUNTIME_ENABLED) && defined(SYSIO_SYS_VM_JIT_IS_DEFAULT)
   static constexpr auto default_wasm_runtime = sysio::chain::wasm_interface::vm_type::sys_vm_jit;
 #else
   const static sysio::chain::wasm_interface::vm_type default_wasm_runtime = sysio::chain::wasm_interface::vm_type::sys_vm;

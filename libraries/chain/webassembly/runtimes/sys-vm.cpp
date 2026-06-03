@@ -14,6 +14,7 @@
 #endif
 #include <boost/hana/string.hpp>
 #include <boost/hana/equal.hpp>
+#include <type_traits>
 
 namespace sysio { namespace chain { namespace webassembly { namespace sys_vm_runtime {
 
@@ -176,7 +177,7 @@ class sys_vm_instantiated_module : public wasm_instantiated_module_interface {
       std::unique_ptr<backend_t> _instantiated_module;
 };
 
-#ifdef __x86_64__
+#ifdef SYS_VM_HAS_JIT_PROFILE
 class sys_vm_profiling_module : public wasm_instantiated_module_interface {
       using backend_t = sysio::vm::backend<sys_vm_host_functions_t, sysio::vm::jit_profile, webassembly::sys_vm_runtime::apply_options, vm::profile_instr_map>;
    public:
@@ -264,14 +265,20 @@ std::unique_ptr<wasm_instantiated_module_interface> sys_vm_runtime<Impl>::instan
       sys_vm_host_functions_t::resolve(bkend->get_module());
       return std::make_unique<sys_vm_instantiated_module<Impl>>(this, std::move(bkend));
    } catch(sysio::vm::exception& e) {
-      FC_THROW_EXCEPTION(wasm_execution_error, "Error building sys-vm interp: {}", e.what());
+      if constexpr (std::is_same_v<Impl, sysio::vm::interpreter>) {
+         FC_THROW_EXCEPTION(wasm_execution_error, "Error building sys-vm interpreter: {}", e.what());
+      } else {
+         FC_THROW_EXCEPTION(wasm_execution_error, "Error building sys-vm-jit: {}", e.what());
+      }
    }
 }
 
 template class sys_vm_runtime<sysio::vm::interpreter>;
-#ifdef __x86_64__
+#ifdef SYS_VM_HAS_JIT_BACKEND
 template class sys_vm_runtime<sysio::vm::jit>;
+#endif
 
+#ifdef SYS_VM_HAS_JIT_PROFILE
 sys_vm_profile_runtime::sys_vm_profile_runtime() {}
 
 std::unique_ptr<wasm_instantiated_module_interface> sys_vm_profile_runtime::instantiate_module(const char* code_bytes, size_t code_size,
@@ -286,7 +293,7 @@ std::unique_ptr<wasm_instantiated_module_interface> sys_vm_profile_runtime::inst
       sys_vm_host_functions_t::resolve(bkend->get_module());
       return std::make_unique<sys_vm_profiling_module>(std::move(bkend), code_bytes, code_size);
    } catch(sysio::vm::exception& e) {
-      FC_THROW_EXCEPTION(wasm_execution_error, "Error building sys-vm interp: {}", e.what());
+      FC_THROW_EXCEPTION(wasm_execution_error, "Error building sys-vm-jit profile: {}", e.what());
    }
 }
 #endif

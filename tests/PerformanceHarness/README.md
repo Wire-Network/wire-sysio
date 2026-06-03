@@ -593,7 +593,7 @@ Performance Test Basic Base:
                         Path to transaction data JSON file
   --wasm-runtime {sys-vm-jit,sys-vm}
                         Override default WASM runtime ("sys-vm-jit", "sys-vm")
-                        "sys-vm-jit" : A WebAssembly runtime that compiles WebAssembly code to native x86 code prior to execution.
+                        "sys-vm-jit" : A WebAssembly runtime that compiles WebAssembly code to native host code prior to execution.
                         "sys-vm" : A WebAssembly interpreter.
   --contracts-console   print contract's output to console
   --sys-vm-oc-cache-size-mb SYS_VM_OC_CACHE_SIZE_MB
@@ -750,7 +750,7 @@ Performance Test Basic Base:
                         Path to transaction data JSON file (default: None)
   --wasm-runtime {sys-vm-jit,sys-vm}
                         Override default WASM runtime ("sys-vm-jit", "sys-vm")
-                        "sys-vm-jit" : A WebAssembly runtime that compiles WebAssembly code to native x86 code prior to execution.
+                        "sys-vm-jit" : A WebAssembly runtime that compiles WebAssembly code to native host code prior to execution.
                         "sys-vm" : A WebAssembly interpreter. (default: sys-vm-jit)
   --contracts-console   print contract's output to console (default: False)
   --sys-vm-oc-cache-size-mb SYS_VM_OC_CACHE_SIZE_MB

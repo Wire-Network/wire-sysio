@@ -176,6 +176,18 @@ target_include_directories( sysio_chain
                             )
 target_compile_definitions( sysio_chain PUBLIC ${CHAIN_NATIVE_MODULE_DEFINITIONS} )
 
+if("sys-vm-jit" IN_LIST SYSIO_WASM_RUNTIMES)
+   target_compile_definitions(sysio_chain PUBLIC SYS_VM_HAS_JIT_BACKEND)
+
+   if(CMAKE_SYSTEM_PROCESSOR STREQUAL x86_64 OR CMAKE_SYSTEM_PROCESSOR STREQUAL amd64)
+      target_compile_definitions(sysio_chain PUBLIC SYS_VM_HAS_JIT_PROFILE)
+   endif()
+
+   if(SYSIO_SYS_VM_JIT_IS_DEFAULT)
+      target_compile_definitions(sysio_chain PUBLIC SYSIO_SYS_VM_JIT_IS_DEFAULT)
+   endif()
+endif()
+
 add_library(sysio_chain_wrap INTERFACE )
 target_link_libraries(sysio_chain_wrap INTERFACE sysio_chain)
 
