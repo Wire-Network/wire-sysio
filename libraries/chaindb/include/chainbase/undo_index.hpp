@@ -2,6 +2,7 @@
 
 #include <chainbase/scope_exit.hpp>
 #include <boost/multi_index_container_fwd.hpp>
+#include <boost/multi_index/member.hpp>
 #include <boost/intrusive/set.hpp>
 #include <boost/intrusive/avltree.hpp>
 #include <boost/intrusive/slist.hpp>
@@ -16,11 +17,87 @@
 #include <boost/core/demangle.hpp>
 #include <boost/interprocess/interprocess_fwd.hpp>
 #include <cassert>
+#include <array>
+#include <functional>
 #include <memory>
+#include <optional>
+#include <span>
+#include <string_view>
 #include <type_traits>
+#include <variant>
 #include <sstream>
 
 namespace chainbase {
+
+   namespace detail {
+      // Types whose value-copy leaves the copy aliasing the source's storage
+      // (e.g. copy just duplicates a pointer, pointer+length, or wraps a
+      // reference). Such types are `std::is_trivially_copyable_v` but a
+      // snapshot still observes later mutations through the original, which
+      // would defeat undo_index::post_modify's pre/post-key comparison fast
+      // path. Not exhaustive for user-defined structs with aliasing members
+      // (reflection would be needed) -- when adding a new secondary index,
+      // verify the key field type is genuinely value-owning.
+      template<typename T>
+      struct is_shallow_copy
+         : std::bool_constant<std::is_pointer_v<T> || std::is_member_pointer_v<T>> {};
+      template<typename T>
+      struct is_shallow_copy<std::reference_wrapper<T>> : std::true_type {};
+      template<typename CharT, typename Traits>
+      struct is_shallow_copy<std::basic_string_view<CharT, Traits>> : std::true_type {};
+      template<typename T, std::size_t N>
+      struct is_shallow_copy<std::span<T, N>> : std::true_type {};
+      // Aggregates: recurse into element / alternative types so nested aliasing
+      // members are caught (e.g. std::optional<std::string_view>,
+      // std::variant<int*, int>, int*[4], std::array<std::optional<T*>, N>).
+      template<typename T, std::size_t N>
+      struct is_shallow_copy<std::array<T, N>> : is_shallow_copy<T> {};
+      template<typename T, std::size_t N>
+      struct is_shallow_copy<T[N]> : is_shallow_copy<T> {};
+      template<typename T>
+      struct is_shallow_copy<std::optional<T>> : is_shallow_copy<T> {};
+      template<typename... Ts>
+      struct is_shallow_copy<std::variant<Ts...>>
+         : std::bool_constant<(is_shallow_copy<Ts>::value || ...)> {};
+      template<typename T>
+      inline constexpr bool is_shallow_copy_v = is_shallow_copy<T>::value;
+
+      // Trait: the fast-path key-compare in undo_index::post_modify is only
+      // sound when the index's key extractor is a plain
+      // `boost::multi_index::member<T,F,PMF>` AND the field type F is trivially
+      // copyable AND its copy is not shallow/aliasing. Other extractors
+      // (`composite_key<...>` returning a `composite_key_result` that holds
+      // `const value_type&`, `const_mem_fun`, user-defined extractors) all
+      // fall through to the false primary. Exposed at namespace scope so new
+      // tables can static_assert their extractors against it.
+      template<typename Extractor>
+      struct fast_path_eligible_impl : std::false_type {};
+      template<typename MC, typename MF, MF MC::*PMF>
+      struct fast_path_eligible_impl<boost::multi_index::member<MC, MF, PMF>>
+         : std::bool_constant<std::is_trivially_copyable_v<MF>
+                              && !is_shallow_copy_v<MF>> {};
+      template<typename Extractor>
+      inline constexpr bool fast_path_eligible_v = fast_path_eligible_impl<Extractor>::value;
+
+      // Compile-time fingerprint so regressions in the trait fail at parse
+      // time (not only when a future caller trips them).
+      static_assert(!is_shallow_copy_v<uint64_t>);
+      static_assert(!is_shallow_copy_v<std::array<uint64_t, 4>>);
+      static_assert(!is_shallow_copy_v<std::optional<uint64_t>>);
+      static_assert(!is_shallow_copy_v<std::variant<uint32_t, uint64_t>>);
+      static_assert( is_shallow_copy_v<int*>);
+      static_assert( is_shallow_copy_v<const char*>);
+      static_assert( is_shallow_copy_v<std::string_view>);
+      static_assert( is_shallow_copy_v<std::reference_wrapper<int>>);
+      static_assert( is_shallow_copy_v<std::span<int>>);
+      static_assert( is_shallow_copy_v<std::array<int*, 2>>);
+      static_assert( is_shallow_copy_v<int*[4]>);
+      static_assert( is_shallow_copy_v<std::optional<int*>>);
+      static_assert( is_shallow_copy_v<std::optional<std::string_view>>);
+      static_assert( is_shallow_copy_v<std::variant<int, int*>>);
+      static_assert( is_shallow_copy_v<std::array<std::optional<int*>, 3>>);
+   }
+
    struct constructor_tag {};
 
    // Adapts multi_index's idea of keys to intrusive
@@ -383,12 +460,17 @@ namespace chainbase {
          value_type* backup = on_modify(obj);
          value_type& node_ref = const_cast<value_type&>(obj);
          bool success = false;
+         // Snapshot secondary-index keys so post_modify can skip per-index fixup
+         // for indexes whose key did not change. Most modifies on
+         // account/resource tables touch only non-indexed fields; without this
+         // snapshot each such modify still walks every secondary index.
+         auto pre_keys = extract_secondary_keys(node_ref);
          {
             auto guard0 = scope_exit{[&]{
-               if(!post_modify<true, 1>(node_ref)) { // The object id cannot be modified
+               if(!post_modify<true, 1>(node_ref, pre_keys)) { // The object id cannot be modified
                   if(backup) {
                      node_ref = std::move(*backup);
-                     bool success = post_modify<true, 1>(node_ref);
+                     bool success = post_modify<true, 1>(node_ref); // full walk: tree position may be off
                      (void)success;
                      assert(success);
                      assert(backup == &_old_values.front());
@@ -487,6 +569,18 @@ namespace chainbase {
 
       session start_undo_session( bool enabled ) {
          return session{*this, enabled};
+      }
+
+      // Starts a new undo session without creating a session RAII object.
+      // Used by database::start_undo_session to avoid per-index heap allocations.
+      // Exception safety: strong
+      int64_t add_session() {
+         _undo_stack.emplace_back();
+         _undo_stack.back().old_values_end = _old_values.empty()?nullptr:&*_old_values.begin();
+         _undo_stack.back().removed_values_end = _removed_values.empty()?nullptr:&*_removed_values.begin();
+         _undo_stack.back().old_next_id = _next_id;
+         _undo_stack.back().ctime = ++_monotonic_revision;
+         return ++_revision;
       }
 
       void set_revision( uint64_t revision ) {
@@ -680,17 +774,6 @@ namespace chainbase {
                                      [this](pointer p) { dispose_node(*p); });
       }
 
-      // starts a new undo session.
-      // Exception safety: strong
-      int64_t add_session() {
-         _undo_stack.emplace_back();
-         _undo_stack.back().old_values_end = _old_values.empty()?nullptr:&*_old_values.begin();
-         _undo_stack.back().removed_values_end = _removed_values.empty()?nullptr:&*_removed_values.begin();
-         _undo_stack.back().old_next_id = _next_id;
-         _undo_stack.back().ctime = ++_monotonic_revision;
-         return ++_revision;
-      }
-
       template<int N = 0>
       bool insert_impl(value_type& p) {
          if constexpr (N < sizeof...(Indices)) {
@@ -736,6 +819,100 @@ namespace chainbase {
                }
             }
             return post_modify<unique, N+1>(p);
+         }
+         return true;
+      }
+
+      // Extract secondary-index keys (indexes 1..N-1) into a tuple. For
+      // indexes whose extractor is fast-path-eligible the tuple slot holds a
+      // value-typed copy of the field. For ineligible indexes the slot is
+      // monostate; post_modify ignores that slot via the same compile-time
+      // guard. Index 0 is the id index, which is immutable across modify.
+      template<int M = 1>
+      auto extract_secondary_keys(const value_type& p) const {
+         if constexpr (M < sizeof...(Indices)) {
+            using idx_t = std::tuple_element_t<M, std::tuple<Indices...>>;
+            using key_extractor = typename idx_t::key_from_value_type;
+            if constexpr (detail::fast_path_eligible_v<key_extractor>) {
+               using extractor = get_key<key_extractor, value_type>;
+               return std::tuple_cat(std::make_tuple(extractor{}(p)),
+                                     extract_secondary_keys<M+1>(p));
+            } else {
+               return std::tuple_cat(std::make_tuple(std::monostate{}),
+                                     extract_secondary_keys<M+1>(p));
+            }
+         } else {
+            return std::tuple<>{};
+         }
+      }
+
+      // post_modify with pre-key snapshot. For fast-path-eligible indexes,
+      // compare the saved pre-key to the current key; if unchanged, skip
+      // fixup entirely. Otherwise fall through to the full iterator_to +
+      // neighbor-compare walk that the original post_modify uses. Ineligible
+      // indexes always take the full walk regardless of pre_keys contents.
+      template<bool unique, int N, typename Keys>
+      bool post_modify(value_type& p, const Keys& pre_keys) {
+         if constexpr (N < sizeof...(Indices)) {
+            using idx_t = std::tuple_element_t<N, std::tuple<Indices...>>;
+            using key_extractor = typename idx_t::key_from_value_type;
+            if constexpr (detail::fast_path_eligible_v<key_extractor>) {
+               using extractor = get_key<key_extractor, value_type>;
+               using compare_t = typename idx_t::compare_type;
+               auto k_now = extractor{}(p);
+               const auto& k_pre = std::get<N-1>(pre_keys);
+               compare_t cmp;
+               if (!cmp(k_now, k_pre) && !cmp(k_pre, k_now)) {
+#ifndef NDEBUG
+                  // Paranoia (Debug only, zero cost in Release): verify the
+                  // tree is actually still sorted around p. Catches any future
+                  // trait regression or user-struct aliasing bug that would
+                  // make the fast path skip when it shouldn't. For
+                  // ordered_unique, neighbors must be strictly less/greater,
+                  // so value_comp must return true in both directions.
+                  auto& idx_dbg = std::get<N>(_indices);
+                  auto it_dbg = idx_dbg.iterator_to(p);
+                  if (it_dbg != idx_dbg.begin()) {
+                     auto prev_dbg = it_dbg; --prev_dbg;
+                     assert(idx_dbg.value_comp()(*prev_dbg, p)
+                            && "post_modify fast-path skipped but prev >= p");
+                  }
+                  ++it_dbg;
+                  if (it_dbg != idx_dbg.end()) {
+                     assert(idx_dbg.value_comp()(p, *it_dbg)
+                            && "post_modify fast-path skipped but p >= next");
+                  }
+#endif
+                  return post_modify<unique, N+1>(p, pre_keys);
+               }
+               // Key changed: fall through to the full fixup below.
+            }
+            auto& idx = std::get<N>(_indices);
+            auto iter = idx.iterator_to(p);
+            bool fixup = false;
+            if (iter != idx.begin()) {
+               auto copy = iter;
+               --copy;
+               if (!idx.value_comp()(*copy, p)) fixup = true;
+            }
+            ++iter;
+            if (iter != idx.end()) {
+               if(!idx.value_comp()(p, *iter)) fixup = true;
+            }
+            if(fixup) {
+               auto iter2 = idx.iterator_to(p);
+               idx.erase(iter2);
+               if constexpr (unique) {
+                  auto [new_pos, inserted] = idx.insert_unique(p);
+                  if (!inserted) {
+                     idx.insert_before(new_pos, p);
+                     return false;
+                  }
+               } else {
+                  idx.insert_equal(p);
+               }
+            }
+            return post_modify<unique, N+1>(p, pre_keys);
          }
          return true;
       }

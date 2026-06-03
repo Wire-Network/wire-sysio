@@ -93,9 +93,9 @@ namespace fc {
            static private_key regenerate( const private_key_secret& secret );
 
            /**
-            * @brief
-            * @param pub_key_str Public key in ethereum format 0x<128 hex chars>
-            * @return public key
+            * @brief Parse an Ethereum-native private key (the raw secret a wallet exports).
+            * @param priv_key_str 32-byte secret as hex, with or without a 0x prefix.
+            * @return the corresponding em private key
             */
            static private_key from_native_string( const std::string& priv_key_str );
 
