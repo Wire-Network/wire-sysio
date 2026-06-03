@@ -77,7 +77,7 @@ jobs:
             -DENABLE_CCACHE=ON \
             -DENABLE_DISTCC=OFF \
             -DENABLE_TESTS=ON \
-            -DDISABLE_WASM_SPEC_TESTS=ON
+            -DDISABLE_WASM_SPEC_TESTS=OFF
 
       - name: Build test targets
         run: |
@@ -87,7 +87,7 @@ jobs:
         run: |
           cd build/macos-arm64
           ctest -j "$(sysctl -n hw.logicalcpu)" \
-            -LE "(nonparallelizable_tests|long_running_tests|wasm_spec_tests|macos_unsupported_tests)" \
+            -LE "(nonparallelizable_tests|long_running_tests)" \
             --output-on-failure --timeout 1000 \
             2>&1 | tee "$RUNNER_TEMP/macos-arm64-parallel-ctest.log"
 
@@ -96,6 +96,12 @@ jobs:
           cd build/macos-arm64
           ctest --output-on-failure -R "^nodeop_run_test$" --timeout 1000 \
             2>&1 | tee "$RUNNER_TEMP/macos-arm64-nodeop-run-test.log"
+
+      - name: Run ship streamer test
+        run: |
+          cd build/macos-arm64
+          ctest --output-on-failure -R "^ship_streamer_test$" --timeout 1000 \
+            2>&1 | tee "$RUNNER_TEMP/macos-arm64-ship-streamer-test.log"
 
       - name: Show diagnostics on failure
         if: failure()
