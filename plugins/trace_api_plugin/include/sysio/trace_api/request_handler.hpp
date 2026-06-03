@@ -214,8 +214,14 @@ namespace sysio::trace_api {
          std::optional<uint32_t> current_slice;
          bool skip_current_slice = false;
 
-         const uint32_t end = query.block_num_end;
-         for (uint32_t block_num = query.block_num_start; block_num <= end; ++block_num) {
+         // Drive the scan with a 64-bit counter.  block_num_end can be UINT32_MAX (its default, and
+         // unvalidated client input on the HTTP path), so a uint32_t counter would wrap from UINT32_MAX
+         // back to 0 at ++block_num and spin forever.  bn stays in [start, end+1] and never wraps; the
+         // HTTP-side clamp is then only a range bound, not the sole thing preventing an infinite loop.
+         const uint64_t end = query.block_num_end;
+         for (uint64_t bn = query.block_num_start; bn <= end; ++bn) {
+            // bn <= end <= UINT32_MAX throughout the loop body, so this narrowing is value-preserving.
+            const uint32_t block_num = static_cast<uint32_t>(bn);
             if (skip_eligible) {
                const uint32_t slice = logfile_provider.slice_number(block_num);
                if (!current_slice || *current_slice != slice) {
@@ -232,11 +238,12 @@ namespace sysio::trace_api {
                   }
                }
                if (skip_current_slice) {
-                  // Jump block_num to the last block of this slice so the for-loop's ++block_num takes us to the
-                  // first block of the next slice.  Clamp to the query's end so we don't wrap around if this is
-                  // the last slice in the range.
-                  const uint32_t slice_last = (slice + 1) * stride - 1;
-                  block_num = std::min(slice_last, end);
+                  // Jump bn to the last block of this slice so the for-loop's ++bn takes us to the first block
+                  // of the next slice.  Compute in 64-bit: (slice+1)*stride overflows uint32_t near the top of
+                  // the range and would wrap slice_last to a small value, driving bn *backwards* into an
+                  // infinite loop.  Clamp to the query's end so the last slice in the range doesn't overshoot.
+                  const uint64_t slice_last = (uint64_t{slice} + 1) * stride - 1;
+                  bn = std::min(slice_last, end);
                   continue;
                }
             }

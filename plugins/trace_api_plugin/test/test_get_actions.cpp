@@ -1,6 +1,8 @@
 #include <boost/test/unit_test.hpp>
 
+#include <limits>
 #include <set>
+#include <stdexcept>
 
 #include <fc/filesystem.hpp>
 
@@ -24,6 +26,7 @@ struct get_actions_fixture {
       mock_logfile_provider(get_actions_fixture& f) : fixture(f) {}
 
       get_block_t get_block(uint32_t height) {
+         fixture.bump_scan_guard();
          auto it = fixture.blocks.find(height);
          if (it == fixture.blocks.end()) return {};
          // pending_blocks is a per-block override for tests that need to exercise
@@ -35,7 +38,8 @@ struct get_actions_fixture {
       // Stride/slice mapping is a fixture knob so tests can exercise the per-slice bloom skip path with a small
       // stride rather than the production default of 10,000 blocks.
       uint32_t slice_stride() const noexcept { return fixture.mock_slice_stride; }
-      uint32_t slice_number(uint32_t block_num) const noexcept { return block_num / fixture.mock_slice_stride; }
+      // Not noexcept: bump_scan_guard() may throw to break a non-terminating scan (see scan_guard).
+      uint32_t slice_number(uint32_t block_num) const { fixture.bump_scan_guard(); return block_num / fixture.mock_slice_stride; }
 
       // Default: no sidecar -> invalid bloom_reader -> may_contain_* returns true -> caller scans as before.  Tests
       // that want to exercise skipping install a function that returns a valid reader for specific slices.
@@ -96,6 +100,18 @@ struct get_actions_fixture {
    std::set<uint32_t>                 pending_blocks; // blocks that should report "pending" instead of the default "irreversible"
    uint32_t mock_slice_stride = 10;
    std::function<bloom_reader(uint32_t)> mock_get_bloom = [](uint32_t) { return bloom_reader{}; };
+
+   // Optional runaway-scan guard.  When non-zero, the mock throws once get_block + slice_number have
+   // together been called more than this many times.  This turns a scan loop that fails to terminate
+   // (e.g. a uint32_t block_num wrapping at UINT32_MAX) into a fast, localized failure instead of a hang
+   // that would stall the entire test binary.  Disabled (0) by default so the other tests are unaffected.
+   uint64_t scan_guard = 0;
+   uint64_t scan_calls = 0;
+   void bump_scan_guard() {
+      if (scan_guard != 0 && ++scan_calls > scan_guard)
+         throw std::runtime_error("get_actions_impl exceeded scan guard -- probable non-terminating scan");
+   }
+
    impl_type impl;
 };
 
@@ -631,6 +647,58 @@ BOOST_FIXTURE_TEST_CASE(bloom_not_consulted_when_no_filter, get_actions_fixture)
    q.block_num_end   = 14;
    auto r = get_actions(q);
    BOOST_CHECK_EQUAL(r.actions.size(), 14u);
+}
+
+// Regression: block_num_end defaults to (and the HTTP layer accepts) UINT32_MAX, which is unvalidated
+// client input.  The scan loop drove a uint32_t counter, so once block_num reached UINT32_MAX the
+// ++block_num wrapped back to 0 and the loop ran forever, re-scanning the whole range on every wrap.  A
+// single request with a high block_num_start and the default end was enough to hang the API thread.  A
+// 64-bit loop counter terminates correctly.  scan_guard turns a re-introduced wrap into a fast failure.
+BOOST_FIXTURE_TEST_CASE(scan_terminates_at_uint32_max_end, get_actions_fixture)
+{
+   constexpr uint32_t max_block = std::numeric_limits<uint32_t>::max();
+   blocks[max_block] = make_block(max_block, {
+      make_trx(TRX1, max_block, { make_action(1, "a"_n, "tok"_n, "transfer"_n) })
+   });
+
+   scan_guard = 1000; // far above the 3-block range below; trips fast if the counter wraps.
+
+   action_query q;
+   q.block_num_start = max_block - 2; // only blocks [max-2, max] are in range
+   q.block_num_end   = max_block;     // the value that used to wrap the uint32_t counter
+
+   auto r = get_actions(q);
+
+   BOOST_REQUIRE_EQUAL(r.actions.size(), 1u);
+   BOOST_TEST(r.actions[0].get_object()["block_num"].as<uint32_t>() == max_block);
+}
+
+// Regression for the per-slice bloom skip-jump near the top of the range.  slice_last was computed as
+// (slice+1)*stride - 1 in uint32_t; for block_num near UINT32_MAX, (slice+1)*stride overflows and wraps
+// to a small value, so std::min(slice_last, end) drove block_num *backwards* and the scan looped forever.
+// Computing the jump in 64-bit keeps it monotonic.  An empty-but-valid bloom makes every slice
+// skip-eligible, so the very first iteration exercises the jump from the top of the range.
+BOOST_FIXTURE_TEST_CASE(bloom_skip_jump_terminates_near_uint32_max, get_actions_fixture)
+{
+   fc::temp_directory tempdir;
+   mock_slice_stride = 10;
+
+   // Empty bloom: valid() is true, every receiver probe misses -> every slice is skip-eligible.
+   bloom_builder b;
+   const auto bloom_path = tempdir.path() / "empty_bloom.log";
+   b.finalize_and_write(bloom_path);
+   mock_get_bloom = [bloom_path](uint32_t) -> bloom_reader { return bloom_reader{bloom_path}; };
+
+   scan_guard = 1000; // trips fast if the slice jump sends block_num backwards and re-scans.
+
+   action_query q;
+   q.block_num_start = std::numeric_limits<uint32_t>::max() - 5;
+   q.block_num_end   = std::numeric_limits<uint32_t>::max();
+   q.receiver        = "alice"_n; // skip_eligible == true
+
+   // The bloom misses every slice, so nothing is scanned; the scan must still terminate.
+   auto r = get_actions(q);
+   BOOST_TEST(r.actions.empty());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

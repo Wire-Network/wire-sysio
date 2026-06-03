@@ -12,6 +12,8 @@
 
 #include <boost/signals2/connection.hpp>
 
+#include <algorithm>
+
 using namespace sysio::trace_api;
 using namespace sysio::trace_api::configuration_utils;
 using namespace sysio::chain::literals;
@@ -459,10 +461,15 @@ struct trace_api_rpc_plugin_impl : public std::enable_shared_from_this<trace_api
    // Silently clamp block_num_end so the scan spans at most max_block_range blocks.
    // No 400 returned -- wide-range requests are a normal pagination pattern.
    // The response envelope reports the actual range so clients can detect the clamp.
+   //
+   // Always reduce block_num_end to min(requested end, start + range - 1), computing the span
+   // limit in 64-bit.  The earlier "clamp only when max_end < end" form left block_num_end at
+   // UINT32_MAX when block_num_start sat within max_block_range-1 of the top (max_end then exceeds
+   // any uint32_t end), relying on the near-the-top range being naturally small.  Reducing
+   // unconditionally keeps the range bound robust regardless of max_block_range.
    void clamp_block_end(action_query& query) const {
       const uint64_t max_end = uint64_t{query.block_num_start} + max_block_range - 1;
-      if (max_end < query.block_num_end)
-         query.block_num_end = static_cast<uint32_t>(max_end);
+      query.block_num_end = static_cast<uint32_t>(std::min<uint64_t>(query.block_num_end, max_end));
    }
 
    std::shared_ptr<trace_api_common_impl> common;
