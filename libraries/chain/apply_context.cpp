@@ -616,8 +616,9 @@ int64_t apply_context::kv_set(uint16_t table_id, uint64_t payer_val, const char*
                "KV value size {} exceeds maximum {}", value_size, control.get_global_properties().configuration.max_kv_value_size );
 
    // Authorization is enforced at the transaction level via unauthorized_ram_usage_increase.
-   // payer_val == 0 is the CDT `same_payer` sentinel (name{}); it is resolved per-branch below --
-   // "keep the existing payer" on update, "the receiver pays" on insert.
+   // payer_val == 0 is the CDT `same_payer` sentinel (name{}): valid only on update, where it keeps
+   // the existing payer. A new row has no existing payer to keep, so 0 is rejected on insert below --
+   // matching the classic db_store_i64 / generic_index::store `invalid_table_payer` assert.
    auto sv_key = to_sv(key, key_size);
    const auto& idx = db.get_index<kv_index, by_code_key>();
    auto itr = idx.find(boost::make_tuple(receiver, table_id, sv_key));
@@ -660,9 +661,10 @@ int64_t apply_context::kv_set(uint16_t table_id, uint64_t payer_val, const char*
 
       return new_billable - old_billable;
    } else {
-      // Create new. A brand-new row has no prior payer, so `same_payer` (payer_val == 0) defaults to
-      // the receiver -- the contract account pays for rows it creates without naming a payer.
-      account_name payer = (payer_val == 0) ? receiver : account_name(payer_val);
+      // Create new. A brand-new row has no existing payer to keep, so `same_payer` (payer_val == 0)
+      // is invalid on insert -- the caller must name the account that pays for the new row.
+      SYS_ASSERT( payer_val != 0, invalid_table_payer, "must specify a valid account to pay for new record" );
+      account_name payer = account_name(payer_val);
       const auto& obj = db.create<kv_object>([&](auto& o) {
          o.code = receiver;
          o.payer = payer;
@@ -967,7 +969,10 @@ void apply_context::kv_idx_store(uint64_t payer_val, uint16_t table_id,
    SYS_ASSERT( pri_key_size <= control.get_global_properties().configuration.max_kv_key_size, kv_key_too_large,
                "KV primary key size {} exceeds maximum {}", pri_key_size, control.get_global_properties().configuration.max_kv_key_size );
 
-   account_name payer = (payer_val == 0) ? receiver : account_name(payer_val);
+   // kv_idx_store always creates a new entry; `same_payer` (payer_val == 0) is invalid on insert
+   // (no existing payer to keep), matching kv_set's create branch and classic generic_index::store.
+   SYS_ASSERT( payer_val != 0, invalid_table_payer, "must specify a valid account to pay for new record" );
+   account_name payer = account_name(payer_val);
 
    db.create<kv_index_object>([&](auto& o) {
       o.code = receiver;

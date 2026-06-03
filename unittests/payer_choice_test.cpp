@@ -256,13 +256,14 @@ BOOST_AUTO_TEST_SUITE(payer_choice_test)
 
     // =========================================================================
     // Complete kv RAM-billing route coverage. Every RAM-affecting kv route in
-    // apply_context is exercised here with a payer distinct from the contract,
-    // so that mis-billing to the receiver (the class of bug fixed in kv_set /
-    // kv_idx_update) is caught on every route:
-    //   kv_set insert       -> kv_payer_billing (explicit), probe payzero (=0)
+    // apply_context is exercised here with a payer distinct from the contract, so
+    // that mis-billing to the receiver (the class of bug fixed in kv_set /
+    // kv_idx_update) is caught on every route. payer == 0 (same_payer) is valid
+    // only on update (keeps the existing payer); on insert it is rejected:
+    //   kv_set insert        -> kv_payer_billing (explicit), insert-0 throws (below)
     //   kv_set update        -> change (below), same_payer (above)
     //   kv_erase             -> refund row payer (below)
-    //   kv_idx_store insert  -> kv_idx_payer_billing (explicit), payer=0 (below)
+    //   kv_idx_store insert  -> kv_idx_payer_billing (explicit), insert-0 throws (below)
     //   kv_idx_update        -> change (below), same_payer (below)
     //   kv_idx_remove        -> refund entry payer (below)
     // =========================================================================
@@ -300,31 +301,38 @@ BOOST_AUTO_TEST_SUITE(payer_choice_test)
         BOOST_REQUIRE_EQUAL(ram(CONTRACT), c0);
     } FC_LOG_AND_RETHROW();
 
-    // kv_idx_store with payer == {} bills the receiver (contract) for both the
-    // primary row and the secondary entry; alice is uninvolved.
-    BOOST_FIXTURE_TEST_CASE(kv_idx_store_payer_zero_bills_receiver, kv_billing_fixture) try {
+    // kv_set INSERT with payer == {} is rejected: a brand-new row has no existing payer
+    // to keep, so same_payer (0) must throw invalid_table_payer. tstpayerself does a bare
+    // kv_set(test_table_id, 0, ...) on a fresh key; to self-pay a contract names the receiver.
+    BOOST_FIXTURE_TEST_CASE(kv_set_insert_payer_zero_throws, kv_billing_fixture) try {
         deploy_kv_api();
-        const auto alice0 = ram(ALICE), c0 = ram(CONTRACT);
-
-        push_action(CONTRACT, "tstidxpayer"_n, CONTRACT,
-                    mutable_variant_object()("payer", account_name{}));
-        produce_block();
-
-        BOOST_REQUIRE_GT(ram(CONTRACT), c0);       // receiver billed (no payer named)
-        BOOST_REQUIRE_EQUAL(ram(ALICE), alice0);
+        BOOST_REQUIRE_EXCEPTION(
+            push_action(CONTRACT, "tstpayerself"_n, CONTRACT, mutable_variant_object()),
+            invalid_table_payer,
+            fc_exception_message_contains("must specify a valid account"));
     } FC_LOG_AND_RETHROW();
 
-    // kv_idx_update with an explicit different payer moves the secondary entry's
-    // RAM from the old payer to the new one. The chain forbids naming two distinct
-    // payers in one transaction, so the entry is first stored billed to the receiver
-    // (payer {}), then updated billed to carol -- exercising the move branch
-    // (payer != old_payer) with a single named payer.
+    // kv_idx_store INSERT with payer == {} is rejected for the same reason -- a new secondary
+    // entry has no existing payer to keep. idxnopay does a bare kv_idx_store(0, ...).
+    BOOST_FIXTURE_TEST_CASE(kv_idx_store_payer_zero_throws, kv_billing_fixture) try {
+        deploy_kv_api();
+        BOOST_REQUIRE_EXCEPTION(
+            push_action(CONTRACT, "idxnopay"_n, CONTRACT, mutable_variant_object()),
+            invalid_table_payer,
+            fc_exception_message_contains("must specify a valid account"));
+    } FC_LOG_AND_RETHROW();
+
+    // kv_idx_update with an explicit different payer moves the secondary entry's RAM from
+    // the old payer to the new one. The chain forbids naming two distinct payers in one
+    // transaction, so the entry is first stored billed to the receiver (named explicitly --
+    // 0 is no longer accepted on insert), then updated onto carol. The receiver nets zero
+    // (billed by store, refunded by update), so only carol must authorize as payer.
     BOOST_FIXTURE_TEST_CASE(kv_idx_update_payer_change_moves_billing, kv_billing_fixture) try {
         deploy_kv_api();
         const auto carol0 = ram(CAROL), c0 = ram(CONTRACT);
 
         push_action(CONTRACT, "bilidxchg"_n, pay(CAROL),
-                    mutable_variant_object()("pa", account_name{})("pb", CAROL));
+                    mutable_variant_object()("pa", CONTRACT)("pb", CAROL));
         produce_block();
 
         BOOST_REQUIRE_GT(ram(CAROL), carol0);      // entry moved onto carol

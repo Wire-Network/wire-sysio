@@ -52,6 +52,11 @@
             ]
         },
         {
+            "name": "idxnopay",
+            "base": "",
+            "fields": []
+        },
+        {
             "name": "mi_row",
             "base": "",
             "fields": [
@@ -837,6 +842,11 @@
         {
             "name": "bilkvera",
             "type": "bilkvera",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "idxnopay",
+            "type": "idxnopay",
             "ricardian_contract": ""
         },
         {
