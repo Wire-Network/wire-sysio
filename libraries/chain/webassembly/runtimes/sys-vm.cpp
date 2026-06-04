@@ -266,9 +266,9 @@ std::unique_ptr<wasm_instantiated_module_interface> sys_vm_runtime<Impl>::instan
       return std::make_unique<sys_vm_instantiated_module<Impl>>(this, std::move(bkend));
    } catch(sysio::vm::exception& e) {
       if constexpr (std::is_same_v<Impl, sysio::vm::interpreter>) {
-         FC_THROW_EXCEPTION(wasm_execution_error, "Error building sys-vm interpreter: {}", e.what());
+         FC_THROW_EXCEPTION(wasm_execution_error, "Error building sys-vm interpreter: {} ({})", e.what(), e.detail());
       } else {
-         FC_THROW_EXCEPTION(wasm_execution_error, "Error building sys-vm-jit: {}", e.what());
+         FC_THROW_EXCEPTION(wasm_execution_error, "Error building sys-vm-jit: {} ({})", e.what(), e.detail());
       }
    }
 }

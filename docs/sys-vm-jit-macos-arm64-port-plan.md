@@ -488,6 +488,12 @@ Do not include macOS arm64 `sys-vm-jit` merely because it works. It must demonst
 
 Deliverable: a checked-in or attached profiling report that justifies including macOS arm64 `sys-vm-jit`, or a decision to defer inclusion until it provides measurable value.
 
+Current report: [sys-vm-jit macOS arm64 Benchmark Report](sys-vm-jit-macos-arm64-benchmark-report.md) records the
+first native arm64 validation and benchmark pass. The current decision is to include `sys-vm-jit` as an opt-in
+developer/runtime experiment because hot VM execution is materially faster than `sys-vm`, while keeping `sys-vm` as the
+macOS arm64 default and treating existing chain-level unit-test wall-clock measurements as correctness validation rather
+than isolated JIT throughput.
+
 ## Phase 11: CI Rollout
 
 1. Add a macOS arm64 JIT job that only builds `sys-vm-jit` and runs smoke tests.
