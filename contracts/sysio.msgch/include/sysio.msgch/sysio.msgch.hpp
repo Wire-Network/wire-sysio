@@ -189,9 +189,6 @@ namespace sysio {
          uint64_t    chain_code;
          uint32_t    epoch_index;
          checksum256 envelope_hash;
-         checksum256 merkle_root;
-         checksum256 start_message_id;
-         checksum256 end_message_id;
          opp::types::EnvelopeStatus status;
          std::vector<char> raw_envelope;
 
@@ -201,8 +198,7 @@ namespace sysio {
          }
 
          SYSLIB_SERIALIZE(outbound_envelope,
-            (id)(chain_code)(epoch_index)(envelope_hash)(merkle_root)
-            (start_message_id)(end_message_id)(status)(raw_envelope))
+            (id)(chain_code)(epoch_index)(envelope_hash)(status)(raw_envelope))
       };
 
       using outenvelopes_t = sysio::kv::table<"outenvelopes"_n, id_key, outbound_envelope,

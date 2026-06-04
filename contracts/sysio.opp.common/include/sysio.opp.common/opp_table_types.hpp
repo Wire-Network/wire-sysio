@@ -266,18 +266,19 @@ DataStream& operator>>(DataStream& ds, Message& t) {
    return ds >> t.header >> t.payload;
 }
 
-// Envelope: trimmed v6 — merkle/start_message_id/end_message_id removed
+// Envelope: inline-consensus fields. Legacy merkle/range metadata was removed
+// from the schema and is not stored in CDT table serialization.
 template <typename DataStream>
 DataStream& operator<<(DataStream& ds, const Envelope& t) {
    return ds << t.envelope_hash << t.endpoints << t.epoch_timestamp
              << t.epoch_index << t.epoch_envelope_index
-             << t.previous_envelope_hash;
+             << t.previous_envelope_hash << t.messages;
 }
 template <typename DataStream>
 DataStream& operator>>(DataStream& ds, Envelope& t) {
    return ds >> t.envelope_hash >> t.endpoints >> t.epoch_timestamp
              >> t.epoch_index >> t.epoch_envelope_index
-             >> t.previous_envelope_hash;
+             >> t.previous_envelope_hash >> t.messages;
 }
 
 } // namespace sysio::opp

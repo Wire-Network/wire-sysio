@@ -99,6 +99,25 @@ namespace sysio {
             void reducepolicy(const name& owner, const name& issuer, const asset& net_weight, const asset& cpu_weight, const asset& ram_weight, const uint8_t& network_gen);
 
 
+            /**
+             * @brief Directly register `owner` as a node owner at `tier`, bypassing the OPP claim
+             *        flow. Privileged bootstrap/test path -- NOT the production registration route.
+             *
+             * Requires `sysio.roa` active authority, so it is governance/system-only and never
+             * user-callable. It exists to seed node owners where the full OPP machinery is absent or
+             * unnecessary: the C++ unit-test base tester (registers `nodedaddy` as the default policy
+             * issuer for the suite), emissions tests, the TestHarness bios bootstrap, and dev clusters.
+             *
+             * Production node-owner registration goes through `nodeownreg` instead -- dispatched by
+             * the OPP depot (sysio.msgch) on an inbound NodeOwnerRegistration attestation, or
+             * governance-signed during bootstrap. Beyond the tier-range check, `forcereg` performs
+             * none of `nodeownreg`'s claim-payload validation (no tier name-rule check, no active-key
+             * match, no sysio.authex link) and writes no `nodeownerreg` audit row -- it simply
+             * allocates the tier's SYS via the shared `regnodeowner` helper.
+             *
+             * @param owner The account to register as a node owner.
+             * @param tier  Node owner tier: 1, 2, or 3.
+             */
             [[sysio::action]]
             void forcereg(const name& owner, const uint8_t& tier);
 
@@ -169,13 +188,14 @@ namespace sysio {
             /**
              * @brief Gifts an account exactly the RAM consumed since `usage_before`.
              *
-             * Called by sysio.authex after createlink adds an external-chain key to an
-             * account's `active` permission: it gifts `get_ram_usage(account) - usage_before`
-             * (drawn from sysio's pool), so each link adds only the RAM it actually used.
+             * Authorized by `sysio.roa` itself: it gifts `get_ram_usage(account) - usage_before`
+             * (drawn from sysio's pool), so a change adds only the RAM it actually used.
              * RAM is checked at transaction end, so usage already reflects the change when this
              * runs. The reconciliation is bidirectional: `delta > 0` gifts from sysio's pool,
-             * `delta < 0` reclaims back to it (e.g. re-deploying a smaller contract). Callable by
-             * `sysio.authex` (createlink) or `sysio.roa` itself (setsyscode/setsysabi).
+             * `delta < 0` reclaims back to it (e.g. re-deploying a smaller contract). Inline-called
+             * by setsyscode/setsysabi (a follow-on PR drives per-contract gifting). createlink no
+             * longer calls giftram -- it records the external-chain link only and bills the row to
+             * sysio -- so `sysio.authex` is not an authorizer.
              *
              * @param account      The account to reconcile.
              * @param usage_before The account's `get_ram_usage` snapshot before the change.
@@ -300,8 +320,10 @@ namespace sysio {
                 SYSLIB_SERIALIZE(nodeownerreg_key, (owner))
             };
 
-            // Registration status values for `nodeownerreg::status`.
-            enum reg_status : uint8_t { INTENT = 0, PENDING = 1, CONFIRMED = 2, REJECTED = 3 };
+            // Registration outcome recorded in `nodeownerreg::status`. Create-in-flow nodeownreg
+            // resolves a claim in a single action, recording a terminal status directly -- there is
+            // no intermediate INTENT/PENDING state (those belonged to the retired multi-step flow).
+            enum reg_status : uint8_t { CONFIRMED = 0, REJECTED = 1 };
 
             // Rejection reason for `nodeownerreg::reason` (only meaningful when status == REJECTED).
             // Under trust-OPP, nodeownreg soft-fails claim-payload errors by recording one of these
@@ -320,7 +342,7 @@ namespace sysio {
 
             struct [[sysio::table("nodeownerreg")]] nodeownerreg {
                 name owner;                     // Node Owners account name
-                uint8_t status;                 // Node Owners registration status 0-> INTENT / 1-> PENDING  / 2-> CONFIRMED / 3-> REJECTED
+                uint8_t status;                 // Registration outcome (reg_status): 0 -> CONFIRMED / 1 -> REJECTED
                 checksum256 trx_id;             // Transaction Id of Ethereum deposit
                 bytes trx_signature;            // Transaction Signature of Ethereum deposit
                 uint8_t tier;                   // Tier of Node Owner

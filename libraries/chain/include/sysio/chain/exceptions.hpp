@@ -531,7 +531,8 @@ namespace sysio { namespace chain {
 
    FC_DECLARE_DERIVED_EXCEPTION( contract_exception,           chain_exception,
                                  3160000, "Contract exception" )
-      // invalid_table_payer       3160001  (removed: legacy db_* only)
+      FC_DECLARE_DERIVED_EXCEPTION( invalid_table_payer,             contract_exception,
+                                    3160001, "Must specify a valid account to pay for new record" )
       FC_DECLARE_DERIVED_EXCEPTION( table_access_violation,          contract_exception,
                                     3160002, "Table access violation" )
       // invalid_table_iterator    3160003  (removed: legacy db_* only)

@@ -19,7 +19,7 @@ import urllib.request
 from TestHarness import Account, Cluster, TestHelper, Utils, WalletMgr
 
 # nodeownerreg reg_status + reject_reason values (mirror sysio.roa.hpp).
-CONFIRMED, REJECTED = 2, 3
+CONFIRMED, REJECTED = 0, 1
 R_NAME_INVALID, R_OWNER_NOT_ACCOUNT, R_ACCOUNT_KEY_MISMATCH, R_DUPLICATE = 1, 2, 3, 4
 
 

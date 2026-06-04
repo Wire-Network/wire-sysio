@@ -602,6 +602,27 @@ BOOST_FIXTURE_TEST_CASE( verify_ram, sysio_roa_tester ) try {
 
 } FC_LOG_AND_RETHROW()
 
+// The byte price must keep newaccount_ram evenly divisible: newuser/newnameduser convert the fixed
+// newaccount_ram seed to policy units by integer division while moving the full newaccount_ram bytes,
+// so an indivisible price under-records the sysio.acct policy. activateroa and setbyteprice share
+// check_divisible_byte_price; exercise it here through setbyteprice (roa is already active, activated
+// by the bootstrap with the divisible default 104).
+BOOST_FIXTURE_TEST_CASE( byteprice_divisibility_guard, sysio_roa_tester ) try {
+   BOOST_REQUIRE_EXCEPTION(
+      base_tester::push_action(ROA, "setbyteprice"_n, ROA, mvo()("bytes_per_unit", newaccount_ram + 1)),
+      sysio_assert_message_exception,
+      sysio_assert_message_is("newaccount_ram needs to be evenly divisable to avoid dust"));
+
+   // zero would divide-by-zero in the unit conversion; rejected up front.
+   BOOST_REQUIRE_EXCEPTION(
+      base_tester::push_action(ROA, "setbyteprice"_n, ROA, mvo()("bytes_per_unit", 0)),
+      sysio_assert_message_exception,
+      sysio_assert_message_is("bytes_per_unit must be positive"));
+
+   // a divisible price is accepted (newaccount_ram % 104 == 0).
+   base_tester::push_action(ROA, "setbyteprice"_n, ROA, mvo()("bytes_per_unit", 104));
+} FC_LOG_AND_RETHROW()
+
 BOOST_FIXTURE_TEST_CASE( extend_policy_test, sysio_roa_tester ) try {
     auto result = regnodeowner("alice"_n, 1);
     BOOST_REQUIRE_EQUAL(success(), result);
@@ -1166,6 +1187,28 @@ BOOST_FIXTURE_TEST_CASE( newuser_sysio_acct_policy_tracking, sysio_roa_full_test
    BOOST_TEST(updated_ram_weight == initial_ram_weight + 2 * ram_weight_per_user);
 } FC_LOG_AND_RETHROW()
 
+// setbyteprice after activation must not skew the sysio.acct bucket: newuser converts newaccount_ram
+// at the bucket's frozen creation price (104), not the live one, so it still records
+// newaccount_ram/104 units after a price change -- otherwise the policy ram_weight would no longer
+// map to the bytes actually moved. (Comment-2 drift guard.)
+BOOST_FIXTURE_TEST_CASE( sysio_acct_bucket_uses_frozen_price, sysio_roa_full_tester ) try {
+   auto p = get_policy("sysio.acct"_n, "sysio"_n);
+   int64_t initial_ram_weight = p["ram_weight"].as<asset>().get_amount();
+
+   // Move the global price to another valid divisor of newaccount_ram (1144 = 2^3*11*13); 8 != 104.
+   base_tester::push_action(ROA, "setbyteprice"_n, ROA, mvo()("bytes_per_unit", 8));
+   produce_block();
+
+   create_newuser(node_owners[2]);
+   produce_block();
+
+   p = get_policy("sysio.acct"_n, "sysio"_n);
+   int64_t updated_ram_weight = p["ram_weight"].as<asset>().get_amount();
+
+   // Frozen price (104) is used: +newaccount_ram/104 = +11, NOT the live-price +newaccount_ram/8 = +143.
+   BOOST_TEST(updated_ram_weight == initial_ram_weight + (int64_t)newaccount_ram / 104);
+} FC_LOG_AND_RETHROW()
+
 // ===== 10. extendpolicy validation =====
 
 // Extend non-existent policy should fail
@@ -1318,6 +1361,23 @@ BOOST_FIXTURE_TEST_CASE( setsysabi_gifts_exact_from_sysio, sysio_roa_tester ) tr
    BOOST_REQUIRE_EQUAL( sysio_q0 - sysio_q1, delta );  // conserving: gift came out of sysio's pool
 } FC_LOG_AND_RETHROW()
 
+// A target that was never brought under ROA management still has an unlimited (-1) RAM limit.
+// setsyscode must reject it -- giftram cannot account an exact byte transfer against an unlimited
+// limit -- rather than deploy the code and silently skip the funding. Prod avoids this by creating
+// the account with a finite (0) quota first; this covers the raw system-account path.
+BOOST_FIXTURE_TEST_CASE( setsyscode_rejects_unlimited_ram_target, sysio_roa_tester ) try {
+   auto& rlm = control->get_resource_limits_manager();
+   int64_t r, n, cpu;
+   rlm.get_account_limits("alice"_n, r, n, cpu);
+   BOOST_REQUIRE_LT( r, 0 );  // precondition: alice has unlimited RAM (no ROA quota yet)
+
+   auto wasm = test_contracts::sysio_token_wasm();
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: giftram target must have a finite RAM limit"),
+      push_action(config::system_account_name, "setsyscode"_n, mvo()
+         ("account","alice")("vmtype",0)("vmversion",0)("code", bytes(wasm.begin(), wasm.end()))) );
+} FC_LOG_AND_RETHROW()
+
 // ---- newnameduser: depot-created vanity-named account, funded from sysio ----
 
 BOOST_FIXTURE_TEST_CASE( newnameduser_creates_funds_idempotent, sysio_roa_tester ) try {
@@ -1430,7 +1490,7 @@ public:
    }
 
    // nodeownerreg reg_status + reject_reason values (mirror sysio.roa.hpp).
-   static constexpr uint64_t CONFIRMED = 2, REJECTED = 3;
+   static constexpr uint64_t CONFIRMED = 0, REJECTED = 1;
    static constexpr uint64_t R_NAME_INVALID = 1, R_OWNER_NOT_ACCOUNT = 2,
                              R_ACCOUNT_KEY_MISMATCH = 3, R_DUPLICATE = 4;
 
@@ -1543,6 +1603,44 @@ BOOST_FIXTURE_TEST_CASE( nodeownreg_non_em_key, sysio_roa_nodeownreg_tester ) tr
    BOOST_REQUIRE_EQUAL(
       error("assertion failure with message: eth_pub_key must be an EM (secp256k1) public key"),
       nodeownreg("someacct"_n, 1, gen_k1_key(), wire_pub));   // K1 depositor key -> reject
+} FC_LOG_AND_RETHROW()
+
+// ---- activateroa supply validation ----
+
+// Deploys sysio.roa privileged but does NOT call activateroa (the standard fixtures auto-activate via
+// init_roa with a fixed 75496 SYS supply), so activateroa's own input validation can be exercised
+// directly with arbitrary supplies.
+class roa_unactivated_tester : public tester {
+public:
+   roa_unactivated_tester() : tester(setup_policy::full_except_do_not_set_finalizers) {
+      create_account(ROA,              config::system_account_name, false, true,  false, false);
+      create_account("sysio.acct"_n,   config::system_account_name, false, false, false, false);
+      create_account("sysio.authex"_n, config::system_account_name, false, false, false, false);
+      set_contract(ROA, contracts::roa_wasm(), contracts::roa_abi().data());
+      push_action(config::system_account_name, "setpriv"_n, config::system_account_name,
+                  mvo()("account", ROA)("is_priv", 1));
+      produce_block();
+   }
+
+   transaction_trace_ptr activate(const std::string& total_sys, uint64_t bytes_per_unit) {
+      return base_tester::push_action(ROA, "activateroa"_n, ROA,
+                                      mvo()("total_sys", total_sys)("bytes_per_unit", bytes_per_unit));
+   }
+};
+
+// A supply so small that tier rounding makes the node-owner reserve exceed it (total 13 -> reserve 21,
+// leftover -8) must be rejected, not silently underflow the signed->unsigned byte conversion and
+// activate ROA with garbage reslimits.
+BOOST_FIXTURE_TEST_CASE( activateroa_rejects_tiny_supply, roa_unactivated_tester ) try {
+   BOOST_REQUIRE_EXCEPTION(
+      activate("0.0013 SYS", 104),  // 13 smallest units; reserve rounds to 21 > 13
+      sysio_assert_message_exception,
+      sysio_assert_message_is("Total SYS too small: node-owner reserve exceeds supply"));
+} FC_LOG_AND_RETHROW()
+
+// A normal supply still activates cleanly through the same guards.
+BOOST_FIXTURE_TEST_CASE( activateroa_accepts_normal_supply, roa_unactivated_tester ) try {
+   BOOST_REQUIRE_NO_THROW( activate("75496.0000 SYS", 104) );
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_SUITE_END()
