@@ -582,6 +582,27 @@ BOOST_FIXTURE_TEST_CASE( verify_ram, sysio_roa_tester ) try {
 
 } FC_LOG_AND_RETHROW()
 
+// The byte price must keep newaccount_ram evenly divisible: newuser/newnameduser convert the fixed
+// newaccount_ram seed to policy units by integer division while moving the full newaccount_ram bytes,
+// so an indivisible price under-records the sysio.acct policy. activateroa and setbyteprice share
+// check_divisible_byte_price; exercise it here through setbyteprice (roa is already active, activated
+// by the bootstrap with the divisible default 104).
+BOOST_FIXTURE_TEST_CASE( byteprice_divisibility_guard, sysio_roa_tester ) try {
+   BOOST_REQUIRE_EXCEPTION(
+      base_tester::push_action(ROA, "setbyteprice"_n, ROA, mvo()("bytes_per_unit", newaccount_ram + 1)),
+      sysio_assert_message_exception,
+      sysio_assert_message_is("newaccount_ram needs to be evenly divisable to avoid dust"));
+
+   // zero would divide-by-zero in the unit conversion; rejected up front.
+   BOOST_REQUIRE_EXCEPTION(
+      base_tester::push_action(ROA, "setbyteprice"_n, ROA, mvo()("bytes_per_unit", 0)),
+      sysio_assert_message_exception,
+      sysio_assert_message_is("bytes_per_unit must be positive"));
+
+   // a divisible price is accepted (newaccount_ram % 104 == 0).
+   base_tester::push_action(ROA, "setbyteprice"_n, ROA, mvo()("bytes_per_unit", 104));
+} FC_LOG_AND_RETHROW()
+
 BOOST_FIXTURE_TEST_CASE( extend_policy_test, sysio_roa_tester ) try {
     auto result = regnodeowner("alice"_n, 1);
     BOOST_REQUIRE_EQUAL(success(), result);

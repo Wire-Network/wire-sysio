@@ -146,13 +146,14 @@ namespace sysio {
             /**
              * @brief Gifts an account exactly the RAM consumed since `usage_before`.
              *
-             * Called by sysio.authex after createlink adds an external-chain key to an
-             * account's `active` permission: it gifts `get_ram_usage(account) - usage_before`
-             * (drawn from sysio's pool), so each link adds only the RAM it actually used.
+             * Authorized by `sysio.roa` itself: it gifts `get_ram_usage(account) - usage_before`
+             * (drawn from sysio's pool), so a change adds only the RAM it actually used.
              * RAM is checked at transaction end, so usage already reflects the change when this
              * runs. The reconciliation is bidirectional: `delta > 0` gifts from sysio's pool,
-             * `delta < 0` reclaims back to it (e.g. re-deploying a smaller contract). Callable by
-             * `sysio.authex` (createlink) or `sysio.roa` itself (setsyscode/setsysabi).
+             * `delta < 0` reclaims back to it (e.g. re-deploying a smaller contract). Inline-called
+             * by setsyscode/setsysabi (a follow-on PR drives per-contract gifting). createlink no
+             * longer calls giftram -- it records the external-chain link only and bills the row to
+             * sysio -- so `sysio.authex` is not an authorizer.
              *
              * @param account      The account to reconcile.
              * @param usage_before The account's `get_ram_usage` snapshot before the change.
