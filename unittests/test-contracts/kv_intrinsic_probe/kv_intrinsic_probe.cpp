@@ -884,13 +884,14 @@ public:
       kv_it_status(0);
    }
 
-   // kv_set with payer=0 bills the receiver.
+   // kv_set INSERT with payer=0 is rejected. 0 is the CDT `same_payer` sentinel (name{}),
+   // valid only on UPDATE where it keeps the row's existing payer. A brand-new row has no
+   // existing payer to keep, so the host throws invalid_table_payer rather than silently
+   // billing the receiver. CDT wrappers never emit payer=0 on insert; a raw intrinsic caller
+   // can -- this probes that boundary. kv_set traps, so the transaction aborts on this call.
    [[sysio::action]]
    void payzero() {
-      // Intentionally pass 0 for payer to exercise the default-to-receiver path.
       const char k[] = {'K'};
-      int64_t id = kv_set(tid_payzero, /*payer=*/0, k, sizeof(k), "v", 1);
-      check(id >= 0, "kv_set(payer=0) must succeed and bill the receiver");
-      kv_erase(tid_payzero, k, sizeof(k));
+      kv_set(tid_payzero, /*payer=*/0, k, sizeof(k), "v", 1);
    }
 };

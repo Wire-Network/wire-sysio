@@ -2192,7 +2192,7 @@ int main( int argc, char** argv ) {
       auto sig    = fc::crypto::signature::from_string(em_recover_sig, fc::crypto::signature::sig_type::em);
       auto digest = parse_sha256_hex(em_recover_digest);
       // public_key::recover dispatches to em::recover, which applies the same EIP-191 envelope before recovery.
-      // Emit the prefixed PUB_EM_ form so it compares directly against an expandauth-registered key.
+      // Emit the prefixed PUB_EM_ form so it compares directly against a key registered in an account's authority.
       auto pubk = fc::crypto::public_key::recover(sig, digest);
       std::cout << localized("Public key: ${key}", ("key", pubk.to_string({}, true)) ) << std::endl;
    });

@@ -4,6 +4,40 @@
     "types": [],
     "structs": [
         {
+            "name": "bilidxchg",
+            "base": "",
+            "fields": [
+                {
+                    "name": "pa",
+                    "type": "name"
+                },
+                {
+                    "name": "pb",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "bilidxrm",
+            "base": "",
+            "fields": [
+                {
+                    "name": "pa",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "bilkvera",
+            "base": "",
+            "fields": [
+                {
+                    "name": "pa",
+                    "type": "name"
+                }
+            ]
+        },
+        {
             "name": "dbl_row",
             "base": "",
             "fields": [
@@ -16,6 +50,11 @@
                     "type": "float64"
                 }
             ]
+        },
+        {
+            "name": "idxnopay",
+            "base": "",
+            "fields": []
         },
         {
             "name": "mi_row",
@@ -790,6 +829,26 @@
         }
     ],
     "actions": [
+        {
+            "name": "bilidxchg",
+            "type": "bilidxchg",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "bilidxrm",
+            "type": "bilidxrm",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "bilkvera",
+            "type": "bilkvera",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "idxnopay",
+            "type": "idxnopay",
+            "ricardian_contract": ""
+        },
         {
             "name": "ramerase",
             "type": "ramerase",

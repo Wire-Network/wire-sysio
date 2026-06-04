@@ -397,8 +397,11 @@ BOOST_FIXTURE_TEST_CASE(sec_erase_returns_next, kv_api_fresh_tester) {
 // (kv::raw_table and old kv::table tests removed -- types dropped in table_id migration)
 
 // payer validation tests
-BOOST_FIXTURE_TEST_CASE(payer_self_allowed, kv_api_tester) {
-   BOOST_CHECK_NO_THROW(run_action("tstpayerself"_n));
+// kv_set INSERT with payer=0 (same_payer) is rejected: a brand-new row has no existing
+// payer to keep, so 0 must throw invalid_table_payer. To self-pay, a contract names the
+// receiver explicitly (kv_set(tid, get_self().value, ...)).
+BOOST_FIXTURE_TEST_CASE(payer_zero_insert_rejected, kv_api_tester) {
+   BOOST_CHECK_THROW(run_action("tstpayerself"_n), sysio::chain::invalid_table_payer);
 }
 
 BOOST_FIXTURE_TEST_CASE(payer_other_requires_auth, kv_api_tester) {
@@ -824,7 +827,10 @@ BOOST_FIXTURE_TEST_CASE(payer_change_with_shrink, kv_payer_billing_tester) {
    BOOST_REQUIRE_EQUAL(bob_after - bob_before, small_billable);
 }
 
-// Payer change back to self (payer=0 means receiver)
+// Payer change to the contract itself: naming the receiver explicitly as the new payer on
+// an update moves the row's RAM from alice onto the contract account. payer == 0 no longer
+// means "receiver" on update -- it is the `same_payer` sentinel and keeps the existing payer
+// (covered by payer_choice_test) -- so moving billing onto the contract must name it explicitly.
 BOOST_FIXTURE_TEST_CASE(payer_change_back_to_self, kv_payer_billing_tester) {
    const uint32_t VAL_SIZE = 100;
    int64_t expected_billable = 4 + VAL_SIZE + KV_OVERHEAD;
@@ -832,11 +838,11 @@ BOOST_FIXTURE_TEST_CASE(payer_change_back_to_self, kv_payer_billing_tester) {
    // Create with payer=alice
    ram_pyr_set(1, VAL_SIZE, "alice"_n);
 
-   // Change payer back to receiver (payer=0 means receiver=test_account)
-   // Only test_account needs to sign since alice's delta is negative
+   // Move the payer onto the contract by naming it explicitly. Only test_account needs to sign:
+   // it authorizes its own (positive) RAM delta, and alice's delta is a refund needing no auth.
    auto alice_before = get_ram_usage("alice"_n);
    auto contract_before = get_ram_usage(test_account);
-   ram_pyr_set(1, VAL_SIZE, name{0});
+   ram_pyr_set(1, VAL_SIZE, test_account);
    auto alice_after = get_ram_usage("alice"_n);
    auto contract_after = get_ram_usage(test_account);
 
