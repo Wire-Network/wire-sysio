@@ -129,6 +129,14 @@ namespace sysio {
         // Leftover
         int64_t leftover = total_amount - allocated;
 
+        // Guard the signed->unsigned conversion below. For a very small supply, tier rounding can push
+        // the node-owner reserve (`allocated`) past `total_amount`, making `leftover` negative; casting
+        // that to uint64_t would underflow into a huge byte count that sails past the sysio_gross check
+        // and activates ROA with garbage reslimits. Require a positive supply whose reserve fits, so
+        // `leftover` is non-negative before the conversion.
+        check(total_amount > 0, "Total SYS must be positive");
+        check(allocated <= total_amount, "Total SYS too small: node-owner reserve exceeds supply");
+
         // Convert the leftover (SYS units) to bytes and partition it so the grand total of all
         // reslimits stays exactly total_sys * bytes_per_unit — nothing is minted on top:
         //   T = node-owner reserve (allocated above) + roa allocation + sysio pool.
@@ -138,7 +146,7 @@ namespace sysio {
         // system contracts are deliberately NOT pre-allocated here — they self-fund exactly. The
         // only deduction is the sysio.acct account-creation bucket seed, taken out of sysio's
         // share so it stays conserved.
-        uint64_t leftover_bytes = (uint64_t)(leftover * bytes_per_unit);
+        uint64_t leftover_bytes = (uint64_t)leftover * bytes_per_unit;  // leftover >= 0, guarded above
         uint64_t roa_ram_bytes = leftover_bytes / 2;
         const uint64_t acct_seed_bytes = sysiosystem::newaccount_ram;
         uint64_t sysio_gross = leftover_bytes - roa_ram_bytes;

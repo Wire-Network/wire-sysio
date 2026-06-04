@@ -1395,4 +1395,42 @@ BOOST_FIXTURE_TEST_CASE( newnameduser_tier_name_rules, sysio_roa_tester ) try {
       push_action(ROA, "newnameduser"_n, mvo()("account","acme")("pubkey",pub)("tier",1)) );
 } FC_LOG_AND_RETHROW()
 
+// ---- activateroa supply validation ----
+
+// Deploys sysio.roa privileged but does NOT call activateroa (the standard fixtures auto-activate via
+// init_roa with a fixed 75496 SYS supply), so activateroa's own input validation can be exercised
+// directly with arbitrary supplies.
+class roa_unactivated_tester : public tester {
+public:
+   roa_unactivated_tester() : tester(setup_policy::full_except_do_not_set_finalizers) {
+      create_account(ROA,              config::system_account_name, false, true,  false, false);
+      create_account("sysio.acct"_n,   config::system_account_name, false, false, false, false);
+      create_account("sysio.authex"_n, config::system_account_name, false, false, false, false);
+      set_contract(ROA, contracts::roa_wasm(), contracts::roa_abi().data());
+      push_action(config::system_account_name, "setpriv"_n, config::system_account_name,
+                  mvo()("account", ROA)("is_priv", 1));
+      produce_block();
+   }
+
+   transaction_trace_ptr activate(const std::string& total_sys, uint64_t bytes_per_unit) {
+      return base_tester::push_action(ROA, "activateroa"_n, ROA,
+                                      mvo()("total_sys", total_sys)("bytes_per_unit", bytes_per_unit));
+   }
+};
+
+// A supply so small that tier rounding makes the node-owner reserve exceed it (total 13 -> reserve 21,
+// leftover -8) must be rejected, not silently underflow the signed->unsigned byte conversion and
+// activate ROA with garbage reslimits.
+BOOST_FIXTURE_TEST_CASE( activateroa_rejects_tiny_supply, roa_unactivated_tester ) try {
+   BOOST_REQUIRE_EXCEPTION(
+      activate("0.0013 SYS", 104),  // 13 smallest units; reserve rounds to 21 > 13
+      sysio_assert_message_exception,
+      sysio_assert_message_is("Total SYS too small: node-owner reserve exceeds supply"));
+} FC_LOG_AND_RETHROW()
+
+// A normal supply still activates cleanly through the same guards.
+BOOST_FIXTURE_TEST_CASE( activateroa_accepts_normal_supply, roa_unactivated_tester ) try {
+   BOOST_REQUIRE_NO_THROW( activate("75496.0000 SYS", 104) );
+} FC_LOG_AND_RETHROW()
+
 BOOST_AUTO_TEST_SUITE_END()
