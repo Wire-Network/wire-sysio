@@ -18,6 +18,18 @@ namespace sysio {
         return account.prefix() == "sysio"_n;
     }
 
+    // Reject a byte price that cannot represent newaccount_ram exactly. newuser/newnameduser convert
+    // the fixed newaccount_ram seed to policy units by integer division (newaccount_ram /
+    // bytes_per_unit) while moving the full newaccount_ram bytes; unless bytes_per_unit divides it
+    // evenly the recorded units under-count the bytes actually moved, leaving dust in the sysio.acct
+    // policy. Enforce it wherever the price is set -- activateroa (initial) and setbyteprice (later)
+    // -- so the conversion is always exact. The positivity guard also avoids a divide-by-zero.
+    static void check_divisible_byte_price(uint64_t bytes_per_unit) {
+        check(bytes_per_unit > 0, "bytes_per_unit must be positive");
+        check(sysiosystem::newaccount_ram == (sysiosystem::newaccount_ram / bytes_per_unit) * bytes_per_unit,
+              "newaccount_ram needs to be evenly divisable to avoid dust");
+    }
+
     void roa::set_reslimit(const name& owner, const asset& net_weight, const asset& cpu_weight, int64_t ram_bytes) {
         bool sysio_acct = is_sysio_account(owner);
 
@@ -96,6 +108,7 @@ namespace sysio {
 
         check(!state.is_active, "Contract already activated.");
         check(total_sys.symbol == symbol("SYS", 4), "Total SYS must be SYS.");
+        check_divisible_byte_price(bytes_per_unit);
 
         state.is_active = true;
         state.total_sys = total_sys;
@@ -184,8 +197,7 @@ namespace sysio {
 
         // Make sure ROA 'is_active' first.
         check(state.is_active, "ROA is not currently active");
-        check(sysiosystem::newaccount_ram == (sysiosystem::newaccount_ram / bytes_per_unit) * bytes_per_unit,
-              "newaccount_ram needs to be evenly divisable to avoid dust");
+        check_divisible_byte_price(bytes_per_unit);
 
         state.bytes_per_unit = bytes_per_unit;
 

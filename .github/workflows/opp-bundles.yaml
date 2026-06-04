@@ -1,0 +1,55 @@
+name: "OPP Bundles"
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - "libraries/opp/**"
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches:
+      - master
+    paths:
+      - "libraries/opp/**"
+
+permissions:
+  contents: read
+
+jobs:
+  opp-bundles:
+    name: Generate OPP Bundles
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install fish shell
+        run: |
+          sudo apt-add-repository -y ppa:fish-shell/release-4
+          sudo apt-get update
+          sudo apt-get install -y fish
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: "10.32.1"
+
+      - name: Install deps
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          cd ./libraries/opp/tools
+          pnpm install
+        
+      - name: Generate & Publish OPP Bundles
+        if: github.event_name == 'push'
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: fish ./libraries/opp/tools/scripts/generate-opp-bundles.fish --publish
+
+      - name: Validate OPP Bundles
+        if: github.event_name == 'pull_request'
+        run: fish ./libraries/opp/tools/scripts/generate-opp-bundles.fish
