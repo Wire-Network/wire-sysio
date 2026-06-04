@@ -24,10 +24,14 @@ namespace wasm_constraints = sysio::chain::wasm_constraints;
 
 namespace {
 
-  struct checktime_watchdog {
-     checktime_watchdog(transaction_checktime_timer& timer) : _timer(timer) {}
-     template<typename F>
-     struct guard {
+   struct checktime_watchdog {
+      checktime_watchdog(transaction_checktime_timer& timer) : _timer(timer) {}
+      /// True deadline expiry must still interrupt JIT execution; cooperative fork interruption must not.
+      bool should_interrupt_execution_thread() const {
+         return _timer.timer_state() == platform_timer::state_t::timed_out;
+      }
+      template<typename F>
+      struct guard {
         guard(transaction_checktime_timer& timer, F&& func)
            : _timer(timer), _func(std::forward<F>(func)) {
            _timer.set_expiration_callback(&callback, this);
@@ -177,7 +181,7 @@ class sys_vm_instantiated_module : public wasm_instantiated_module_interface {
       std::unique_ptr<backend_t> _instantiated_module;
 };
 
-#ifdef SYS_VM_HAS_JIT_PROFILE
+#if SYS_VM_HAS_JIT_PROFILE
 class sys_vm_profiling_module : public wasm_instantiated_module_interface {
       using backend_t = sysio::vm::backend<sys_vm_host_functions_t, sysio::vm::jit_profile, webassembly::sys_vm_runtime::apply_options, vm::profile_instr_map>;
    public:
@@ -274,11 +278,11 @@ std::unique_ptr<wasm_instantiated_module_interface> sys_vm_runtime<Impl>::instan
 }
 
 template class sys_vm_runtime<sysio::vm::interpreter>;
-#ifdef SYS_VM_HAS_JIT_BACKEND
+#if SYS_VM_HAS_JIT_BACKEND
 template class sys_vm_runtime<sysio::vm::jit>;
 #endif
 
-#ifdef SYS_VM_HAS_JIT_PROFILE
+#if SYS_VM_HAS_JIT_PROFILE
 sys_vm_profile_runtime::sys_vm_profile_runtime() {}
 
 std::unique_ptr<wasm_instantiated_module_interface> sys_vm_profile_runtime::instantiate_module(const char* code_bytes, size_t code_size,

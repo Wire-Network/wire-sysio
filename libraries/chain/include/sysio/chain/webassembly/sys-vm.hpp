@@ -59,7 +59,7 @@ class sys_vm_runtime : public sysio::chain::wasm_runtime_interface {
    friend class sys_vm_instantiated_module;
 };
 
-#ifdef SYS_VM_HAS_JIT_PROFILE
+#if SYS_VM_HAS_JIT_PROFILE
 class sys_vm_profile_runtime : public sysio::chain::wasm_runtime_interface {
    public:
       sys_vm_profile_runtime();

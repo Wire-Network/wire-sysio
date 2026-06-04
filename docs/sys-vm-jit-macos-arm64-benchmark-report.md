@@ -11,9 +11,9 @@ This report covers the first native Apple Silicon `sys-vm-jit` integration build
 - CMake architecture: `-DCMAKE_OSX_ARCHITECTURES=arm64`
 - vcpkg triplet: `arm64-osx`
 - JIT default: `sys-vm-jit` is selected by default for macOS arm64 when the backend is compiled in.
-- `wire-sys-vm`: `1.1.1#11`
-- `wire-vcpkg-registry`: `fa3a78b3aa09310bad0ceca37de8898ac09291a4`
-- `eos-vm`: `0fdc743a084c97fbc17f8a11a9fe463cb9d43ab1`
+- `wire-sys-vm`: `1.2.0`
+- `wire-vcpkg-registry`: `9a10009e77cac0452876e47d0b97470d962d72e7`
+- `eos-vm`: `d3443307accf6b17e2cc8c4af45d1ec7fda5cdfc`
 
 The local build was configured with `-DDISABLE_WASM_SPEC_TESTS=ON`, so this report does not claim a full WASM spec
 CTest sweep.
