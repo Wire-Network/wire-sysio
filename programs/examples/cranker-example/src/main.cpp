@@ -3,10 +3,6 @@
 #include <sysio/cron_plugin.hpp>
 #include <sysio/outpost_ethereum_client_plugin.hpp>
 
-#include <ctime>
-#include <iomanip>
-#include <sstream>
-
 using namespace appbase;
 using namespace sysio;
 using namespace sysio::chain;
@@ -31,17 +27,11 @@ int main(int argc, char** argv) {
             .milliseconds = {cron_service::job_schedule::step_value{5000}}
          },
          [&]() {
-            auto now = std::chrono::system_clock::now();
-            auto now_time = std::chrono::system_clock::to_time_t(now);
-            std::tm now_tm{};
-            gmtime_r(&now_time, &now_tm);
-            std::stringstream now_stream;
-            now_stream << std::put_time(&now_tm, "%H:%M:%S");
-            auto now_str = now_stream.str();
-            ilog("{}: Getting ethereum gas price", now_str);
+            // The logging framework already timestamps log messages.
+            ilog("Getting ethereum gas price");
 
             auto current_price = eth_client->client->get_gas_price();
-            ilog("{}: Current Price> {}WEI", now_str, current_price.str());
+            ilog("Current Price> {}WEI", current_price.str());
          },
          cron_service::job_metadata_t{
             .one_at_a_time = true, .tags = {"ethereum", "gas"}, .label = "cron_5s_heartbeat"});

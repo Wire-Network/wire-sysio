@@ -564,7 +564,8 @@ namespace sysio::chain {
          move_only_function(std::nullptr_t) noexcept {}
 
          template<typename F>
-            requires (!std::is_same_v<std::decay_t<F>, move_only_function>)
+            requires (!std::is_same_v<std::decay_t<F>, move_only_function> &&
+                      std::is_invocable_r_v<void, std::decay_t<F>&, Arg&&>)
          move_only_function(F&& f)
             : _callable(std::make_unique<callable<std::decay_t<F>>>(std::forward<F>(f))) {}
 

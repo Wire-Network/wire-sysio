@@ -1,6 +1,5 @@
 #pragma once
 
-#include <atomic>
 #include <memory>
 #include <mutex>
 #include <sysio/chain/block.hpp>
@@ -8,59 +7,6 @@
 #include <sysio/chain/transaction.hpp>
 
 namespace sysio {
-
-namespace producer_plugin_detail {
-
-/**
- * Shared pointer snapshot slot using the standard atomic specialization.
- */
-#if defined(__cpp_lib_atomic_shared_ptr) && __cpp_lib_atomic_shared_ptr >= 201711L
-template <typename T>
-using atomic_shared_ptr = std::atomic<std::shared_ptr<T>>;
-#else
-/**
- * Shared pointer snapshot slot with mutex-backed atomic semantics.
- *
- * Some AppleClang/libc++ toolchains do not provide the C++20 `std::atomic<std::shared_ptr<T>>` specialization, and
- * the older `std::atomic_load` / `std::atomic_store` free functions are deprecated. This fallback exposes only the
- * operations this project currently needs: load the current immutable snapshot and replace it with a new snapshot.
- */
-template <typename T>
-class atomic_shared_ptr {
-public:
-   using ptr_type = std::shared_ptr<T>;
-
-   atomic_shared_ptr() = default;
-   atomic_shared_ptr(const atomic_shared_ptr&) = delete;
-   atomic_shared_ptr& operator=(const atomic_shared_ptr&) = delete;
-
-   /**
-    * Return a shared ownership copy of the current pointer.
-    */
-   ptr_type load(std::memory_order order = std::memory_order_seq_cst) const {
-      // Mutex provides sequentially-consistent semantics regardless of the requested order, so this is a no-op here.
-      (void)order;
-      std::scoped_lock lock{_mutex};
-      return _ptr;
-   }
-
-   /**
-    * Replace the current pointer with `ptr`.
-    */
-   void store(ptr_type ptr, std::memory_order order = std::memory_order_seq_cst) {
-      // Mutex provides sequentially-consistent semantics regardless of the requested order, so this is a no-op here.
-      (void)order;
-      std::scoped_lock lock{_mutex};
-      _ptr = std::move(ptr);
-   }
-
-private:
-   mutable std::mutex _mutex{};
-   ptr_type _ptr{};
-};
-#endif
-
-} // namespace producer_plugin_detail
 
 /**
  * Manages transaction priorities in a thread-safe manner.
@@ -107,8 +53,10 @@ private:
    using trx_priority_map_ptr = std::shared_ptr<const trx_priority_map_t>;
 
 private:
-   /// Immutable map snapshot, atomically replaced on refresh.
-   producer_plugin_detail::atomic_shared_ptr<const trx_priority_map_t> _trx_priority_map{};
+   /// Guards replacement and snapshot reads of `_trx_priority_map`.
+   mutable std::mutex _trx_priority_map_mutex{};
+   /// Immutable map snapshot, replaced on refresh while readers keep shared ownership of older snapshots.
+   trx_priority_map_ptr _trx_priority_map{};
    chain::block_timestamp_type _last_trx_priority_update{}; // only accessed on main thread
 
 private:

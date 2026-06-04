@@ -23,7 +23,8 @@ bool valid_filename(const string& name) {
 }
 
 wallet_manager::wallet_manager() {
-   // TODO: Re-enable Secure Enclave wallet support once the Apple-specific key backend is available here.
+   // Secure Enclave wallet support is intentionally not registered in this developer build path until the
+   // Apple-specific key backend is available here.
 }
 
 wallet_manager::~wallet_manager() {

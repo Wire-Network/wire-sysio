@@ -62,7 +62,7 @@ cmake -B build/macos-arm64 -S . -G Ninja \
   -DENABLE_CCACHE=ON \
   -DENABLE_TESTS=ON \
   -DENABLE_JEMALLOC=OFF \
-  -DDISABLE_WASM_SPEC_TESTS=ON \
+  -DDISABLE_WASM_SPEC_TESTS=OFF \
   -DCMAKE_TOOLCHAIN_FILE=$PWD/vcpkg/scripts/buildsystems/vcpkg.cmake
 
 cmake --build build/macos-arm64 --target fc nodeop clio kiod sys-util unit_test plugin_test test_fc -- -j"$(sysctl -n hw.logicalcpu)"
