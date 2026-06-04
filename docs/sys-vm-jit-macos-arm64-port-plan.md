@@ -2,7 +2,7 @@
 
 ## Goal
 
-Enable `sys-vm-jit` on Apple Silicon macOS as an opt-in developer/test WASM runtime for local development, CI, replay experiments, and performance investigation. All macOS builds are developer-only regardless of WASM runtime. This port must not imply production deployment support for macOS, and `sys-vm` remains the macOS arm64 default.
+Enable `sys-vm-jit` on Apple Silicon macOS as the default developer/test WASM runtime for local development, CI, replay experiments, and performance investigation. All macOS builds are developer-only regardless of WASM runtime. This port must not imply production deployment support for macOS. Once the arm64 JIT backend is validated, a normal macOS arm64 configure should build and select `sys-vm-jit` automatically, without requiring a special CMake option to enable it.
 
 This plan is scoped to the `sys-vm-jit` runtime backed by the external `wire-sys-vm` package. It does not port `sys-vm-oc`; the OC runtime has separate Linux/x86_64 assumptions around LLVM object generation, executable cache mappings, GS segment helpers, and stack switching.
 
@@ -33,7 +33,7 @@ The real architecture dependency is inside `wire-sys-vm`:
 - The JIT allocator is accessed through `jit_allocator::instance()`; concurrent JIT compilation must prove the singleton allocator and segment pool are serialized or made thread-safe.
 - `signals.hpp` uses a process-wide timeout flag (`timed_run_has_timed_out`) for timed-run fault classification; that needs a thread/concurrency audit before using arm64 JIT in multi-threaded paths.
 
-There is also a default-runtime coupling in this repo: `libraries/chain/include/sysio/chain/config.hpp` currently makes `sys-vm-jit` the default whenever `SYSIO_SYS_VM_JIT_RUNTIME_ENABLED` is defined. The macOS arm64 rollout must decouple "compiled in" from "default" while preserving the platform-wide developer-only status of macOS builds.
+There is also a default-runtime coupling in this repo: `libraries/chain/include/sysio/chain/config.hpp` currently makes `sys-vm-jit` the default whenever `SYSIO_SYS_VM_JIT_RUNTIME_ENABLED` is defined. The macOS arm64 rollout should make that default explicit and intentional: macOS arm64 should select `sys-vm-jit` automatically only after the backend is present and validated, while other platforms keep their existing defaults unless separately changed.
 
 Additional chain-side issues:
 
@@ -43,21 +43,21 @@ Additional chain-side issues:
 
 ## Success Criteria
 
-1. `nodeop --wasm-runtime sys-vm-jit` starts and executes contracts on macOS arm64.
-2. `sys-vm-jit` passes the same core WASM behavior tests as `sys-vm` on macOS arm64.
-3. JIT output is deterministic for all consensus-relevant WASM semantics, including traps, integer overflow behavior, softfloat-backed `f32`/`f64` behavior, memory bounds checks, call-depth enforcement, and deadline interruption.
-4. JIT memory management uses an Apple Silicon-compatible `MAP_JIT` allocation path, flushes the instruction cache after generated-code writes, and works for normal local macOS developer binaries without requiring signing, hardened-runtime, or `com.apple.security.cs.allow-jit` entitlement support.
-5. Cross-runtime contract scenarios produce the same final state, traces, block/snapshot artifacts, and failure types under `sys-vm` and `sys-vm-jit`.
-6. The build system exposes `sys-vm-jit` on macOS arm64 only when the arm64 JIT backend is present and tested.
-7. CI proves it is building/running native arm64 binaries, not x86_64 under Rosetta.
-8. Documentation and release notes clearly state that macOS builds are developer-only regardless of selected WASM runtime.
-9. Profiling and benchmark data shows `sys-vm-jit` is materially better than `sys-vm` for the intended macOS developer workflows; otherwise the runtime is not included.
-10. `sys-vm-jit` profile mode either works through an explicitly supported `jit_profile` capability or returns a clear unsupported-runtime error; it must not compile a dangling profile path or leave `runtime_interface` null.
+1. A normal macOS arm64 configure builds `sys-vm-jit` and selects it as the default runtime without requiring a special CMake option.
+2. `nodeop` starts and executes contracts on macOS arm64 with the default `sys-vm-jit` runtime, and `nodeop --wasm-runtime sys-vm` remains available for cross-runtime comparison.
+3. `sys-vm-jit` passes the same core WASM behavior tests as `sys-vm` on macOS arm64.
+4. JIT output is deterministic for all consensus-relevant WASM semantics, including traps, integer overflow behavior, softfloat-backed `f32`/`f64` behavior, memory bounds checks, call-depth enforcement, and deadline interruption.
+5. JIT memory management uses an Apple Silicon-compatible `MAP_JIT` allocation path, flushes the instruction cache after generated-code writes, and works for normal local macOS developer binaries without requiring signing, hardened-runtime, or `com.apple.security.cs.allow-jit` entitlement support.
+6. Cross-runtime contract scenarios produce the same final state, traces, block/snapshot artifacts, and failure types under `sys-vm` and `sys-vm-jit`.
+7. The build system exposes and defaults to `sys-vm-jit` on macOS arm64 only when the arm64 JIT backend is present and tested.
+8. CI proves it is building/running native arm64 binaries, not x86_64 under Rosetta.
+9. Documentation and release notes clearly state that macOS builds are developer-only regardless of selected WASM runtime.
+10. Profiling and benchmark data shows `sys-vm-jit` is materially better than `sys-vm` for the intended macOS developer workflows; otherwise the runtime is not included.
+11. `sys-vm-jit` profile mode either works through an explicitly supported `jit_profile` capability or returns a clear unsupported-runtime error; it must not compile a dangling profile path or leave `runtime_interface` null.
 
 ## Non-Goals
 
 - Do not port `sys-vm-oc` as part of this work.
-- Do not make `sys-vm-jit` the default runtime on macOS arm64.
 - Do not add production deployment support for macOS with any WASM runtime.
 - Do not rely on Rosetta x86_64 execution.
 - Do not redesign, replace, or migrate the existing x86_64 hand-written JIT to a shared codegen strategy as part of this port.
@@ -94,18 +94,24 @@ Deliverable: a short design note in the `wire-sys-vm` change or PR explaining th
    - not Windows;
    - `sys-vm::sys-vm` advertises a JIT backend for the target;
    - architecture is x86_64/amd64 or arm64/aarch64.
-4. Fix the default-runtime flip before enabling any macOS arm64 JIT build:
+4. Make the default-runtime selection explicit before enabling any macOS arm64 JIT build:
    - add a CMake-controlled `SYSIO_SYS_VM_JIT_IS_DEFAULT` macro, or equivalent explicit default-runtime macro;
-   - make `default_wasm_runtime` select `sys-vm-jit` only when both `SYSIO_SYS_VM_JIT_RUNTIME_ENABLED` and `SYSIO_SYS_VM_JIT_IS_DEFAULT` are defined;
-   - leave `SYSIO_SYS_VM_JIT_IS_DEFAULT` unset for macOS arm64;
-   - assert that macOS arm64 defaults never select `sys-vm-jit`.
+   - do not expose this as a required manual CMake selection for macOS arm64;
+   - automatically define it for macOS arm64 when `SYSIO_SYS_VM_JIT_RUNTIME_ENABLED` is defined and the validated
+     AArch64 backend is available;
+   - make `default_wasm_runtime` select `sys-vm-jit` only when both `SYSIO_SYS_VM_JIT_RUNTIME_ENABLED` and
+     `SYSIO_SYS_VM_JIT_IS_DEFAULT` are defined;
+   - assert that a standard macOS arm64 configure selects `sys-vm-jit` as the default once the backend is enabled, and
+     that the selected default is a compiled-in runtime.
 5. Audit and remove dead direct WAVM includes:
    - confirm whether `wasm_interface_private.hpp` really needs `IR/Module.h`, `Platform/Platform.h`, `WAST/WAST.h`, `IR/Validate.h`, or `using namespace IR`;
    - if the symbols are unused, remove the direct includes and namespace import instead of treating WAVM availability as a JIT blocker;
    - if a real dependency remains, make it explicit and prove the macOS arm64 vcpkg triplet provides it before enabling JIT.
 6. Update macOS arm64 configure docs and CI commands to include `sys-vm-jit` in the built runtime list once validated.
 
-Deliverable: CMake no longer hard-codes x86_64 as the only JIT-capable architecture, compiling JIT support no longer silently changes the macOS arm64 default runtime, and unnecessary WAVM coupling in `wasm_interface_private.hpp` is removed or proven necessary.
+Deliverable: CMake no longer hard-codes x86_64 as the only JIT-capable architecture, macOS arm64 automatically builds
+and defaults to the validated JIT backend without special CMake configuration, and unnecessary WAVM coupling in
+`wasm_interface_private.hpp` is removed or proven necessary.
 
 ## Phase 3: Hidden Architecture Dependencies
 
@@ -307,18 +313,22 @@ the x86_64 JIT's supported surface.
 5. Update `plugins/chain_plugin/src/chain_plugin.cpp` runtime option description:
    - remove x86-only wording for `sys-vm-jit`;
    - say it compiles WASM to native host code on supported architectures.
-6. Keep macOS arm64 defaulting to `sys-vm` permanently:
+6. Make macOS arm64 default to `sys-vm-jit` automatically after the backend passes validation:
    - implement the Phase 2 `SYSIO_SYS_VM_JIT_IS_DEFAULT` default-selection macro before enabling arm64 JIT;
-   - do not let `SYSIO_SYS_VM_JIT_RUNTIME_ENABLED` alone select `default_wasm_runtime`;
+   - have CMake define it by default for macOS arm64 when the JIT backend is available;
+   - do not require developers or CI to pass a special `-D...` flag to enable or select the JIT;
+   - do not let `SYSIO_SYS_VM_JIT_RUNTIME_ENABLED` alone accidentally select the default on other platforms;
    - add a configure-time or compile-time assertion that the default is a compiled-in runtime.
 7. Document the platform-wide macOS developer-only policy:
    - do not add a JIT-specific production guard, because macOS developer-only status applies regardless of runtime;
    - make docs explicit that `sys-vm`, `sys-vm-jit`, and any other macOS runtime are for development, CI, replay/testing, and benchmarking only;
-   - keep local developer nodes and test binaries able to opt in with `--wasm-runtime sys-vm-jit`;
+   - keep local developer nodes and test binaries able to opt back to the interpreter with `--wasm-runtime sys-vm`;
    - if a production-deployment guard is needed, implement it as a macOS-wide policy outside this JIT port rather than as a `sys-vm-jit` special case.
 8. Add a macOS arm64 build assertion or configure message listing enabled runtimes.
 
-Deliverable: this repo can compile `SYSIO_SYS_VM_JIT_RUNTIME_ENABLED` on macOS arm64 without x86-only includes or template instantiations, while keeping JIT opt-in and preserving the platform-wide developer-only status of macOS builds.
+Deliverable: this repo can compile `SYSIO_SYS_VM_JIT_RUNTIME_ENABLED` on macOS arm64 without x86-only includes or
+template instantiations, while making JIT the normal macOS arm64 default and preserving the platform-wide developer-only
+status of macOS builds.
 
 ## Phase 8: Tests in `wire-sys-vm`
 
@@ -388,9 +398,11 @@ cmake \
   -DENABLE_TESTS=ON \
   -DENABLE_JEMALLOC=OFF \
   -DDISABLE_WASM_SPEC_TESTS=OFF \
-  -DSYSIO_SYS_VM_JIT_IS_DEFAULT=OFF \
   -DCMAKE_TOOLCHAIN_FILE=$PWD/vcpkg/scripts/buildsystems/vcpkg.cmake
 ```
+
+Do not pass a special JIT enable/default option in this baseline command. A correctly implemented macOS arm64 build
+should discover the validated JIT backend, compile it, and select it as the default automatically.
 
 Build:
 
@@ -403,8 +415,10 @@ Smoke tests:
 ```bash
 build/macos-arm64-jit/programs/nodeop/nodeop --version
 build/macos-arm64-jit/programs/clio/clio version client
+build/macos-arm64-jit/unittests/unit_test --run_test=noop_tests
 build/macos-arm64-jit/unittests/unit_test --run_test=noop_tests -- --sys-vm-jit
-build/macos-arm64-jit/unittests/unit_test --run_test=wasm_tests -- --sys-vm-jit
+build/macos-arm64-jit/unittests/unit_test --run_test=wasm_part1_tests -- --sys-vm-jit
+build/macos-arm64-jit/unittests/unit_test --run_test=wasm_part1_tests -- --sys-vm
 build/macos-arm64-jit/libraries/libfc/test/test_fc --run_test=traits
 ```
 
@@ -425,7 +439,7 @@ ctest -j "$(sysctl -n hw.logicalcpu)" -L wasm_spec_tests --output-on-failure --t
 
 Targeted risk tests:
 
-- `wasm_tests`
+- `wasm_part1_tests`, `wasm_part2_tests`, and `wasm_part3_tests`
 - `wasm_config_tests`
 - `checktime_tests`
 - `softfloat_golden_tests`
@@ -459,7 +473,7 @@ Do not include macOS arm64 `sys-vm-jit` merely because it works. It must demonst
 1. Define the benchmark set before optimizing:
    - representative system-contract actions;
    - common developer replay and local-node workflows;
-   - WASM-heavy tests such as `wasm_tests` and selected WASM spec cases;
+   - WASM-heavy tests such as `wasm_part1_tests`, `wasm_part2_tests`, `wasm_part3_tests`, and selected WASM spec cases;
    - softfloat-heavy contracts to measure helper-call overhead;
    - import-heavy contracts to measure host-call bridge overhead;
    - small contracts where JIT compile overhead may dominate;
@@ -482,24 +496,26 @@ Do not include macOS arm64 `sys-vm-jit` merely because it works. It must demonst
    - use scoped timers and external tools such as Instruments or `sample` when hotspot data is needed;
    - include raw commands, logs, and summarized tables.
 5. Make an inclusion decision:
-   - include `sys-vm-jit` only if it gives a clear win for developer workflows after accounting for cold-start and memory overhead;
-   - keep it behind an experimental build option or defer the port if benefits are marginal;
-   - never change the macOS arm64 default from `sys-vm` based on these results.
+   - make `sys-vm-jit` the normal macOS arm64 default only if it gives a clear win for developer workflows after
+     accounting for cold-start and memory overhead;
+   - keep `sys-vm` available through `--wasm-runtime sys-vm` for comparison and fallback;
+   - defer the default switch, or defer the port entirely, if benefits are marginal.
 
 Deliverable: a checked-in or attached profiling report that justifies including macOS arm64 `sys-vm-jit`, or a decision to defer inclusion until it provides measurable value.
 
 Current report: [sys-vm-jit macOS arm64 Benchmark Report](sys-vm-jit-macos-arm64-benchmark-report.md) records the
-first native arm64 validation and benchmark pass. The current decision is to include `sys-vm-jit` as an opt-in
-developer/runtime experiment because hot VM execution is materially faster than `sys-vm`, while keeping `sys-vm` as the
-macOS arm64 default and treating existing chain-level unit-test wall-clock measurements as correctness validation rather
-than isolated JIT throughput.
+first native arm64 validation and benchmark pass. After the final validation gate, the intended decision is to include
+`sys-vm-jit` as the default macOS arm64 developer runtime because hot VM execution is materially faster than `sys-vm`,
+while keeping `sys-vm` available for explicit comparison and treating existing chain-level unit-test wall-clock
+measurements as correctness validation rather than isolated JIT throughput.
 
 ## Phase 11: CI Rollout
 
-1. Add a macOS arm64 JIT job that only builds `sys-vm-jit` and runs smoke tests.
+1. Add a macOS arm64 JIT-default job that builds `sys-vm-jit` and runs smoke tests.
    - use the Phase 9 configure command as the CI baseline;
    - do not omit `-DCMAKE_OSX_ARCHITECTURES=arm64`;
-   - do not omit `-DSYSIO_SYS_VM_JIT_IS_DEFAULT=OFF`.
+   - do not pass a special CMake option to enable or select `sys-vm-jit`;
+   - fail the job if configure output does not show `sys-vm-jit` enabled and selected as the macOS arm64 default.
 2. Promote to targeted unit tests once the job is stable.
 3. Promote to the full macOS arm64 unit-test matrix after spec and chain tests are stable locally.
 4. Keep failures isolated from the existing interpreter-only macOS job during initial rollout.
@@ -510,6 +526,7 @@ than isolated JIT throughput.
    - fail the job if any binary is x86_64 or if Rosetta is detected.
 6. Capture JIT-specific logs as artifacts:
    - configure output showing enabled runtimes;
+   - configure output showing the selected default runtime;
    - `nodeop --version`;
    - targeted Boost.Test logs;
    - WASM spec log.
@@ -524,21 +541,24 @@ Release macOS arm64 `sys-vm-jit` only as a developer/test runtime after:
 2. The Phase 10 profiling report shows `sys-vm-jit` is materially better than `sys-vm` for intended developer workflows.
 3. Deadline interruption behavior is equivalent to `sys-vm`.
 4. Memory protection works for normal local developer binaries without requiring signing or `com.apple.security.cs.allow-jit` entitlement support.
-5. A pre-release CI/developer soak period has exposed `--wasm-runtime sys-vm-jit` as opt-in.
+5. A pre-release CI/developer soak period has exercised `sys-vm-jit` as the default and `--wasm-runtime sys-vm` as an
+   explicit fallback/comparison path.
 6. Cross-runtime state/block/snapshot equivalence tests are stable in CI.
 7. Documentation and release notes state that all macOS builds remain developer-only regardless of runtime.
 
-The release policy remains: macOS arm64 defaults to `sys-vm`; `sys-vm-jit` is opt-in for developers, CI, replay experiments, and benchmarking; macOS builds are developer-only regardless of runtime.
+The release policy remains: macOS arm64 defaults to `sys-vm-jit` after the validation gates pass; `sys-vm` remains
+available through explicit runtime selection for developers, CI comparison, replay experiments, and benchmarking; macOS
+builds are developer-only regardless of runtime.
 
 ## Blocker Checklist
 
-These items must be resolved before macOS arm64 `sys-vm-jit` is exposed as an opt-in chain runtime.
+These items must be resolved before macOS arm64 `sys-vm-jit` is exposed as the default chain runtime.
 
 | Blocker | Resolved In | Required resolution |
 | --- | --- | --- |
 | Anonymous RW `mmap` followed by `mprotect(PROT_EXEC)` is incompatible with Apple Silicon JIT execution. | Phase 4.1 | Redesign `jit_allocator::allocate_segment()` and `end_code<IsJit>()` around `MAP_JIT`, remove the current `mprotect(executable_code, _code_size, PROT_READ | PROT_WRITE)` write step, use Apple write-protect toggles, and preserve Linux/x86_64 behavior. |
 | Generated arm64 code can execute stale instruction-cache contents if the I-cache is not flushed. | Phase 4.2 | Call `__builtin___clear_cache(begin, end)` after generated-code writes and relocation patches before any arm64 JIT execution. |
-| `SYSIO_SYS_VM_JIT_RUNTIME_ENABLED` currently flips `default_wasm_runtime` to `sys-vm-jit`. | Phase 2.4, Phase 7.6 | Add explicit default-selection macro such as `SYSIO_SYS_VM_JIT_IS_DEFAULT`; keep it unset for macOS arm64 and assert the selected default is compiled in. |
+| `SYSIO_SYS_VM_JIT_RUNTIME_ENABLED` currently flips `default_wasm_runtime` to `sys-vm-jit` implicitly. | Phase 2.4, Phase 7.6 | Add explicit default-selection logic such as `SYSIO_SYS_VM_JIT_IS_DEFAULT`; set it automatically for validated macOS arm64 JIT builds, require no manual CMake selection, and assert the selected default is compiled in. |
 | `wasm_interface_private.hpp` has direct WAVM includes that appear unused. | Phase 2.5 | Remove the dead includes and `using namespace IR`; only prove WAVM header availability if a real direct dependency remains. |
 | `sys_vm_profile_runtime` is x86_64-only but the chain profile branch is selected by `SYSIO_SYS_VM_JIT_RUNTIME_ENABLED`. | Phase 3.2, Phase 7.2 | Gate profile mode with `SYS_VM_HAS_JIT_PROFILE` and return a clear unsupported-runtime error on arm64. |
 | Timed-run timeout state appears process-wide, so one thread can affect signal classification in another. | Phase 3.6 | Make timeout/fault classification thread-local or execution-context-owned before multi-threaded arm64 JIT use. |
@@ -564,8 +584,9 @@ These items must be resolved before macOS arm64 `sys-vm-jit` is exposed as an op
    - Mitigation: audit `jit_allocator::instance()` and its segment pool, add explicit synchronization or thread-local ownership, and test concurrent module instantiation.
 9. Large `MAP_JIT` allocation or code-page toggling failures.
    - Mitigation: test under memory pressure, validate segment sizing, and support an alternate interruption path if `PROT_NONE` transitions are unreliable.
-10. Enabling JIT accidentally changes the default runtime.
-   - Mitigation: use an explicit default-selection macro such as `SYSIO_SYS_VM_JIT_IS_DEFAULT` and assert the selected default is intentional.
+10. The default runtime is selected implicitly, inconsistently, or only when a developer remembers a special CMake flag.
+   - Mitigation: use explicit default-selection logic such as `SYSIO_SYS_VM_JIT_IS_DEFAULT`, define it automatically for
+     validated macOS arm64 JIT builds, and assert the selected default is intentional and compiled in.
 11. Dead WAVM includes create unnecessary chain build coupling.
    - Mitigation: remove unused `IR/Module.h`, `Platform/Platform.h`, `WAST/WAST.h`, `IR/Validate.h`, and `using namespace IR` from `wasm_interface_private.hpp`; only keep a dependency if direct symbol use is proven.
 12. `sys_vm_profile_runtime` compiles or fails incorrectly on arm64.
@@ -584,8 +605,9 @@ These items must be resolved before macOS arm64 `sys-vm-jit` is exposed as an op
    - Mitigation: compare state, traces, blocks, snapshots, and failure types across `sys-vm` and `sys-vm-jit`.
 19. Confusion between benchmark/profiling report requirements and `jit_profile` support.
    - Mitigation: leave `jit_profile` x86_64-only for this port and use scoped timers/external profilers for the macOS arm64 inclusion report.
-20. `sys-vm-jit` works but is not worth maintaining on macOS arm64.
-   - Mitigation: require a profiling/inclusion report with clear wins over `sys-vm`; defer or keep experimental if benefits are marginal.
+20. `sys-vm-jit` works but is not worth maintaining as the macOS arm64 default.
+   - Mitigation: require a profiling/inclusion report with clear wins over `sys-vm`; defer the default switch or the port
+     if benefits are marginal.
 21. Excessive churn in the existing x86_64 JIT.
    - Mitigation: mirror the hand-written x86_64 design for AArch64, keep x86_64 changes limited to compatibility seams, and run x86_64 JIT regression tests after each shared plumbing change.
 22. Accidental `sys-vm-oc` scope creep.
@@ -593,7 +615,8 @@ These items must be resolved before macOS arm64 `sys-vm-jit` is exposed as an op
 
 ## Suggested PR Breakdown
 
-1. `wire-sysio`: add explicit default-runtime selection such as `SYSIO_SYS_VM_JIT_IS_DEFAULT`, keep macOS arm64 defaulting to `sys-vm`, and assert the selected default is compiled in.
+1. `wire-sysio`: add explicit default-runtime selection such as `SYSIO_SYS_VM_JIT_IS_DEFAULT`, automatically select
+   `sys-vm-jit` for validated macOS arm64 JIT builds, and assert the selected default is compiled in.
 2. `wire-sysio`: remove dead direct WAVM includes from `wasm_interface_private.hpp`, or prove and document the dependency if direct symbol use remains.
 3. `wire-sys-vm`: add architecture capability macros and keep x86_64 behavior unchanged.
 4. `wire-sys-vm`: add minimal architecture-selection seams for trampoline, x86_64-only `jit_profile`, signal, timeout-state ownership, and architecture config plumbing while preserving x86_64 behavior.
@@ -604,7 +627,8 @@ These items must be resolved before macOS arm64 `sys-vm-jit` is exposed as an op
 9. `wire-sysio`: replace x86_64 JIT gates with capability gates, gate profile mode with `SYS_VM_HAS_JIT_PROFILE`, improve instantiate errors, and expose `sys-vm-jit` on arm64.
 10. `wire-sysio`: update runtime option text and document that macOS builds are developer-only regardless of runtime.
 11. `wire-sysio`: add profiling and benchmark report proving `sys-vm-jit` is worth including over `sys-vm`.
-12. `wire-sysio`: add cross-runtime chain equivalence tests and keep macOS arm64 JIT opt-in for developer/test use.
+12. `wire-sysio`: add cross-runtime chain equivalence tests, with `sys-vm-jit` as the macOS arm64 default and explicit
+    `--wasm-runtime sys-vm` coverage for fallback/comparison.
 13. `wire-sysio`: add macOS arm64 JIT CI smoke tests with native-arm64 assertions.
 
 ## Fuzzing Budget Policy

@@ -10,10 +10,10 @@ This report covers the first native Apple Silicon `sys-vm-jit` integration build
 - Build type: `Release`
 - CMake architecture: `-DCMAKE_OSX_ARCHITECTURES=arm64`
 - vcpkg triplet: `arm64-osx`
-- JIT default: `-DSYSIO_SYS_VM_JIT_IS_DEFAULT=OFF`
-- `wire-sys-vm`: `1.1.1#10`
-- `wire-vcpkg-registry`: `e95cc91626099c197d38881c89ac3aa9348dce3e`
-- `eos-vm`: `9ca8b3fc8173310bf47203c574b5115f7719f9b2`
+- JIT default: `sys-vm-jit` is selected by default for macOS arm64 when the backend is compiled in.
+- `wire-sys-vm`: `1.1.1#11`
+- `wire-vcpkg-registry`: `fa3a78b3aa09310bad0ceca37de8898ac09291a4`
+- `eos-vm`: `0fdc743a084c97fbc17f8a11a9fe463cb9d43ab1`
 
 The local build was configured with `-DDISABLE_WASM_SPEC_TESTS=ON`, so this report does not claim a full WASM spec
 CTest sweep.
@@ -65,20 +65,20 @@ kernel=sum_to
 input=1000
 iterations=20000
 runs=5
-interpreter_avg_ms=309.759
-aarch64_prototype_jit_avg_ms=98.687
-speedup_avg=3.139
+interpreter_avg_ms=315.801
+aarch64_jit_avg_ms=95.378
+speedup_avg=3.320
 checksum=10039950000
 ```
 
 The five raw Release runs were:
 
 ```text
-interpreter_ms=306.602 aarch64_prototype_jit_ms=98.4484 speedup=3.11434
-interpreter_ms=307.179 aarch64_prototype_jit_ms=98.4267 speedup=3.12089
-interpreter_ms=313.512 aarch64_prototype_jit_ms=99.9926 speedup=3.13535
-interpreter_ms=306.085 aarch64_prototype_jit_ms=98.7459 speedup=3.09972
-interpreter_ms=315.415 aarch64_prototype_jit_ms=97.8232 speedup=3.22434
+interpreter_ms=317.995 aarch64_jit_ms=91.8275 speedup=3.46296
+interpreter_ms=307.135 aarch64_jit_ms=103.454 speedup=2.96879
+interpreter_ms=313.852 aarch64_jit_ms=92.1501 speedup=3.40588
+interpreter_ms=314.214 aarch64_jit_ms=91.5273 speedup=3.433
+interpreter_ms=325.808 aarch64_jit_ms=97.9293 speedup=3.32697
 ```
 
 ## Interpretation
@@ -87,8 +87,9 @@ The AArch64 JIT is materially faster than the interpreter in a hot VM execution 
 speedup for the upstream `sum_to` benchmark. The current chain-level unit suites are roughly tied because they are not
 designed to isolate warm JIT execution.
 
-Based on this evidence, `sys-vm-jit` is worth including as an opt-in macOS arm64 developer/runtime experiment, while
-keeping `sys-vm` as the default and keeping all macOS builds developer-only. The next useful benchmark improvement is a
-chain-level warm contract execution harness that separates module instantiation/setup from repeated action execution.
+Based on this evidence, `sys-vm-jit` is worth including as the default macOS arm64 developer runtime while keeping
+`sys-vm` available through explicit runtime selection for comparison and fallback. All macOS builds remain
+developer-only. The next useful benchmark improvement is a chain-level warm contract execution harness that separates
+module instantiation/setup from repeated action execution.
 The existing `kv_benchmark_contract` suite is currently compiled as `perf_benchmarks_disabled` unless the build defines
 `RUN_PERF_BENCHMARKS`, so it was not used for this report.
