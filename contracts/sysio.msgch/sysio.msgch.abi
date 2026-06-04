@@ -295,18 +295,6 @@
                     "type": "checksum256"
                 },
                 {
-                    "name": "merkle_root",
-                    "type": "checksum256"
-                },
-                {
-                    "name": "start_message_id",
-                    "type": "checksum256"
-                },
-                {
-                    "name": "end_message_id",
-                    "type": "checksum256"
-                },
-                {
                     "name": "status",
                     "type": "EnvelopeStatus"
                 },
