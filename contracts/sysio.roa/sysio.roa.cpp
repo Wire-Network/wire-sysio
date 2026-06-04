@@ -575,6 +575,10 @@ namespace sysio {
     };
 
     void roa::forcereg(const name& owner, const uint8_t& tier) {
+        // Privileged bootstrap/test registration -- see the header doc. Governance/system-only
+        // (require_auth self); bypasses the OPP claim path (nodeownreg). Beyond the tier-range guard
+        // it does no name-rule / active-key / authex validation and writes no nodeownerreg audit row
+        // -- it just runs the shared tier allocator.
         require_auth(get_self());
 
         check(tier > 0 && tier <= 3, "Tier level must be between 1 and 3");

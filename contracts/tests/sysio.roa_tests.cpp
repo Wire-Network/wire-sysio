@@ -1451,7 +1451,7 @@ public:
    }
 
    // nodeownerreg reg_status + reject_reason values (mirror sysio.roa.hpp).
-   static constexpr uint64_t CONFIRMED = 2, REJECTED = 3;
+   static constexpr uint64_t CONFIRMED = 0, REJECTED = 1;
    static constexpr uint64_t R_NAME_INVALID = 1, R_OWNER_NOT_ACCOUNT = 2,
                              R_ACCOUNT_KEY_MISMATCH = 3, R_DUPLICATE = 4;
 
