@@ -77,10 +77,12 @@ namespace sysiosystem {
       // Call host function
       sysio::set_finalizers(std::move(fin_policy)); // call host function
 
-      // Store last proposed policy in both cache and DB table
+      // Store last proposed policy in both cache and DB table. This singleton is contract-owned, so
+      // bill get_self(): required on the first store (insert -- a new row must name a payer, 0 is
+      // rejected) and a no-op re-bill of the same account on later updates.
       _last_prop_finalizers.set(
          last_prop_finalizers_info{ .last_proposed_finalizers = proposed_finalizers },
-         same_payer
+         get_self()
       );
       // Ensure not invalidate anyone holding the references to the vector
       // that was returned earlier by get_last_proposed_finalizer

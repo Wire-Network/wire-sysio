@@ -147,10 +147,6 @@ BOOST_FIXTURE_TEST_CASE(aliased_key_value_spans, kv_probe_tester) {
    BOOST_CHECK_NO_THROW(run_action("alias"_n));
 }
 
-BOOST_FIXTURE_TEST_CASE(kv_set_payer_zero_bills_receiver, kv_probe_tester) {
-   BOOST_CHECK_NO_THROW(run_action("payzero"_n));
-}
-
 BOOST_FIXTURE_TEST_CASE(iterator_slot_exhaustion, kv_probe_tester) {
    BOOST_CHECK_THROW(run_action("itlimit"_n), kv_iterator_limit_exceeded);
 }
@@ -169,6 +165,14 @@ BOOST_FIXTURE_TEST_CASE(kv_idx_remove_missing_entry_rejected, kv_probe_tester) {
 
 BOOST_FIXTURE_TEST_CASE(kv_idx_update_missing_entry_rejected, kv_probe_tester) {
    BOOST_CHECK_THROW(run_action("idxupmis"_n), kv_key_not_found);
+}
+
+// kv_set INSERT with payer == 0 (the CDT same_payer sentinel) is rejected with
+// invalid_table_payer: a brand-new row has no existing payer to keep, so same_payer is
+// update-only. payzero drives a raw kv_set(tid, 0, ...) on a fresh key -- an input a CDT
+// wrapper never emits, but the host must trap rather than silently bill the receiver.
+BOOST_FIXTURE_TEST_CASE(kv_set_insert_payer_zero_rejected, kv_probe_tester) {
+   BOOST_CHECK_THROW(run_action("payzero"_n), invalid_table_payer);
 }
 
 // =============================================================================
