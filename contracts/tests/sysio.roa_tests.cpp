@@ -1167,6 +1167,28 @@ BOOST_FIXTURE_TEST_CASE( newuser_sysio_acct_policy_tracking, sysio_roa_full_test
    BOOST_TEST(updated_ram_weight == initial_ram_weight + 2 * ram_weight_per_user);
 } FC_LOG_AND_RETHROW()
 
+// setbyteprice after activation must not skew the sysio.acct bucket: newuser converts newaccount_ram
+// at the bucket's frozen creation price (104), not the live one, so it still records
+// newaccount_ram/104 units after a price change -- otherwise the policy ram_weight would no longer
+// map to the bytes actually moved. (Comment-2 drift guard.)
+BOOST_FIXTURE_TEST_CASE( sysio_acct_bucket_uses_frozen_price, sysio_roa_full_tester ) try {
+   auto p = get_policy("sysio.acct"_n, "sysio"_n);
+   int64_t initial_ram_weight = p["ram_weight"].as<asset>().get_amount();
+
+   // Move the global price to another valid divisor of newaccount_ram (1144 = 2^3*11*13); 8 != 104.
+   base_tester::push_action(ROA, "setbyteprice"_n, ROA, mvo()("bytes_per_unit", 8));
+   produce_block();
+
+   create_newuser(node_owners[2]);
+   produce_block();
+
+   p = get_policy("sysio.acct"_n, "sysio"_n);
+   int64_t updated_ram_weight = p["ram_weight"].as<asset>().get_amount();
+
+   // Frozen price (104) is used: +newaccount_ram/104 = +11, NOT the live-price +newaccount_ram/8 = +143.
+   BOOST_TEST(updated_ram_weight == initial_ram_weight + (int64_t)newaccount_ram / 104);
+} FC_LOG_AND_RETHROW()
+
 // ===== 10. extendpolicy validation =====
 
 // Extend non-existent policy should fail
@@ -1317,6 +1339,23 @@ BOOST_FIXTURE_TEST_CASE( setsysabi_gifts_exact_from_sysio, sysio_roa_tester ) tr
    BOOST_REQUIRE_GT( delta, 0 );
    int64_t sysio_q1;  rlm.get_account_limits("sysio"_n, sysio_q1, n, cpu);
    BOOST_REQUIRE_EQUAL( sysio_q0 - sysio_q1, delta );  // conserving: gift came out of sysio's pool
+} FC_LOG_AND_RETHROW()
+
+// A target that was never brought under ROA management still has an unlimited (-1) RAM limit.
+// setsyscode must reject it -- giftram cannot account an exact byte transfer against an unlimited
+// limit -- rather than deploy the code and silently skip the funding. Prod avoids this by creating
+// the account with a finite (0) quota first; this covers the raw system-account path.
+BOOST_FIXTURE_TEST_CASE( setsyscode_rejects_unlimited_ram_target, sysio_roa_tester ) try {
+   auto& rlm = control->get_resource_limits_manager();
+   int64_t r, n, cpu;
+   rlm.get_account_limits("alice"_n, r, n, cpu);
+   BOOST_REQUIRE_LT( r, 0 );  // precondition: alice has unlimited RAM (no ROA quota yet)
+
+   auto wasm = test_contracts::sysio_token_wasm();
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: giftram target must have a finite RAM limit"),
+      push_action(config::system_account_name, "setsyscode"_n, mvo()
+         ("account","alice")("vmtype",0)("vmversion",0)("code", bytes(wasm.begin(), wasm.end()))) );
 } FC_LOG_AND_RETHROW()
 
 // ---- newnameduser: depot-created vanity-named account, funded from sysio ----
