@@ -2,6 +2,21 @@ name: "macOS arm64 build & tests"
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - master
+    paths:
+      - ".github/workflows/macos_arm64_build.yaml"
+      - ".github/vcpkg-triplets/**"
+      - "cmake/**"
+      - "libraries/**"
+      - "plugins/**"
+      - "programs/**"
+      - "unittests/**"
+      - "tests/**"
+      - "CMakeLists.txt"
+      - "vcpkg.json"
+      - "vcpkg-configuration.json"
   pull_request:
     paths:
       - ".github/workflows/macos_arm64_build.yaml"

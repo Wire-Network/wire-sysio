@@ -79,7 +79,7 @@ if(IS_DIRECTORY "${sysioPrefixDir}/libraries")
 endif()
 # Also add vcpkg dirs if present (for Boost, OpenSSL, etc.).
 set(_sysio_vcpkg_triplet "@VCPKG_TARGET_TRIPLET@")
-if(NOT _sysio_vcpkg_triplet)
+if(NOT _sysio_vcpkg_triplet OR _sysio_vcpkg_triplet STREQUAL "@VCPKG_TARGET_TRIPLET@")
     # Installed/build-tree SysioTester configs normally receive the configured
     # vcpkg triplet above. This fallback is only for ad-hoc template
     # consumption where CMake has not substituted @VCPKG_TARGET_TRIPLET@.

@@ -133,22 +133,12 @@ cmake \
 -DENABLE_DISTCC=OFF \
 -DENABLE_TESTS=ON \
 -DENABLE_JEMALLOC=OFF \
--DDISABLE_WASM_SPEC_TESTS=ON \
+-DDISABLE_WASM_SPEC_TESTS=OFF \
 -DCMAKE_TOOLCHAIN_FILE=$PWD/vcpkg/scripts/buildsystems/vcpkg.cmake
 
 cmake --build $BUILD_DIR --target fc nodeop clio kiod sys-util unit_test plugin_test test_fc -- -j${NUM_JOBS}
 ```
 
-Smoke-test the phase-one macOS build with:
-
-```bash
-$BUILD_DIR/programs/nodeop/nodeop --version
-$BUILD_DIR/programs/clio/clio version client
-$BUILD_DIR/libraries/libfc/test/test_fc --run_test=traits
-$BUILD_DIR/unittests/unit_test --run_test=noop_tests -- --sys-vm
-$BUILD_DIR/unittests/unit_test --run_test=wasm_tests -- --sys-vm
-$BUILD_DIR/tests/plugin_test --report_level=detailed --color_output
-```
 
 ### Configure and Build
 ```bash
