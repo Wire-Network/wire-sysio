@@ -27,20 +27,26 @@ namespace chainbase {
    {
       if ( _read_only_mode )
          BOOST_THROW_EXCEPTION( std::logic_error( "attempting to undo in read-only mode" ) );
-      for( auto& item : _index_list )
-      {
-         item->undo();
-      }
+      undo_from_session();
    }
 
    void database::squash()
    {
       if ( _read_only_mode )
          BOOST_THROW_EXCEPTION( std::logic_error( "attempting to squash in read-only mode" ) );
+      squash_from_session();
+   }
+
+   void database::undo_from_session()
+   {
       for( auto& item : _index_list )
-      {
+         item->undo();
+   }
+
+   void database::squash_from_session()
+   {
+      for( auto& item : _index_list )
          item->squash();
-      }
    }
 
    void database::commit( int64_t revision )
@@ -68,12 +74,22 @@ namespace chainbase {
       if ( _read_only_mode )
          BOOST_THROW_EXCEPTION( std::logic_error( "attempting to start_undo_session in read-only mode" ) );
       if( enabled ) {
-         vector< std::unique_ptr<abstract_session> > _sub_sessions;
-         _sub_sessions.reserve( _index_list.size() );
-         for( auto& item : _index_list ) {
-            _sub_sessions.push_back( item->start_undo_session( enabled ) );
+         // add_undo_session() allocates and can throw partway through the list. No session object
+         // exists yet to unwind them, so roll back the indexes already pushed; otherwise indexes
+         // end up at different undo-stack depths and later undo/squash/commit corrupts state.
+         // Only the indexes pushed so far are undone: undoing all of them would pop a parent
+         // session from the indexes that never received a new one. undo() is noexcept and pops
+         // the just-added (empty) session.
+         size_t added = 0;
+         try {
+            for( ; added < _index_list.size(); ++added )
+               _index_list[added]->add_undo_session();
+         } catch( ... ) {
+            while( added > 0 )
+               _index_list[--added]->undo();
+            throw;
          }
-         return session( std::move( _sub_sessions ) );
+         return session( *this );
       } else {
          return session();
       }

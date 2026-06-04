@@ -133,6 +133,7 @@ namespace sysio { namespace chain {
          using section_t = typename decltype(utils)::index_t::value_type;
 
          snapshot->read_section<section_t>([this, &read_row_count]( auto& section ) {
+            decltype(utils)::preallocate(_db, section.row_count());
             bool more = !section.empty();
             while(more) {
                decltype(utils)::create(_db, [this, &section, &more]( auto &row ) {

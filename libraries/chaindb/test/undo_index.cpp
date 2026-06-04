@@ -4,6 +4,7 @@
 
 #include <boost/multi_index/member.hpp>
 #include <boost/multi_index/ordered_index.hpp>
+#include <boost/multi_index/composite_key.hpp>
 
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/monomorphic.hpp>
@@ -847,6 +848,208 @@ EXCEPTION_TEST_CASE(test_modify_fail) {
 }
 
 struct by_secondary {};
+
+// Regression: modifying a key component of a composite_key secondary index must
+// keep that index sorted. A naive "skip post_modify when keys unchanged" fast
+// path is unsound here because composite_key_result stores a reference to the
+// source value, so any pre-modify snapshot evaluated lazily aliases the
+// (subsequently mutated) object and compares equal to the post-modify key.
+struct composite_element_t {
+   template<typename C>
+   composite_element_t(C&& c, chainbase::constructor_tag) { c(*this); }
+
+   uint64_t id;
+   uint64_t a;
+   uint64_t b;
+};
+
+struct by_ab {};
+
+BOOST_AUTO_TEST_CASE(test_composite_key_modify) {
+   fs::path temp = fs::temp_directory_path() / "pinnable_mapped_file";
+   try {
+      chainbase::pinnable_mapped_file db(temp, true, 1024 * 1024, false, chainbase::pinnable_mapped_file::map_mode::mapped);
+      test_allocator<composite_element_t> alloc(db.get_segment_manager());
+      undo_index_in_segment<composite_element_t, test_allocator<composite_element_t>,
+                            boost::multi_index::ordered_unique<key<&composite_element_t::id>>,
+                            boost::multi_index::ordered_unique<boost::multi_index::tag<by_ab>,
+                               boost::multi_index::composite_key<composite_element_t,
+                                  key<&composite_element_t::a>,
+                                  key<&composite_element_t::b>>>> i0(alloc);
+      // id=0: (a=1, b=0)
+      i0->emplace([](composite_element_t& e) { e.a = 1; e.b = 0; });
+      // id=1: (a=3, b=0)
+      i0->emplace([](composite_element_t& e) { e.a = 3; e.b = 0; });
+
+      // Baseline: secondary index in order (1,0), (3,0).
+      {
+         auto& idx = i0->template get<by_ab>();
+         auto it = idx.begin();
+         BOOST_TEST(it->id == 0u);
+         ++it;
+         BOOST_TEST(it->id == 1u);
+      }
+
+      // Move id=0 from a=1 to a=5 so it should sort after id=1 in by_ab.
+      i0->modify(*i0->find(0u), [](composite_element_t& e) { e.a = 5; });
+
+      // After modify, by_ab must yield (3,0) then (5,0).
+      auto& idx = i0->template get<by_ab>();
+      auto it = idx.begin();
+      BOOST_REQUIRE(it != idx.end());
+      BOOST_TEST(it->id == 1u);
+      BOOST_TEST(it->a == 3u);
+      ++it;
+      BOOST_REQUIRE(it != idx.end());
+      BOOST_TEST(it->id == 0u);
+      BOOST_TEST(it->a == 5u);
+      ++it;
+      BOOST_TEST(it == idx.end());
+   } catch ( ... ) {
+      fs::remove_all( temp );
+      throw;
+   }
+   fs::remove_all( temp );
+}
+
+// Modifying a composite_key component under an active undo session must also
+// leave the tree correctly sorted, and undo must restore the pre-modify value
+// at its pre-modify position.
+BOOST_AUTO_TEST_CASE(test_composite_key_modify_undo) {
+   fs::path temp = fs::temp_directory_path() / "pinnable_mapped_file";
+   try {
+      chainbase::pinnable_mapped_file db(temp, true, 1024 * 1024, false, chainbase::pinnable_mapped_file::map_mode::mapped);
+      test_allocator<composite_element_t> alloc(db.get_segment_manager());
+      undo_index_in_segment<composite_element_t, test_allocator<composite_element_t>,
+                            boost::multi_index::ordered_unique<key<&composite_element_t::id>>,
+                            boost::multi_index::ordered_unique<boost::multi_index::tag<by_ab>,
+                               boost::multi_index::composite_key<composite_element_t,
+                                  key<&composite_element_t::a>,
+                                  key<&composite_element_t::b>>>> i0(alloc);
+      i0->emplace([](composite_element_t& e) { e.a = 1; e.b = 0; }); // id=0
+      i0->emplace([](composite_element_t& e) { e.a = 3; e.b = 0; }); // id=1
+      {
+         auto session = i0->start_undo_session(true);
+         i0->modify(*i0->find(0u), [](composite_element_t& e) { e.a = 5; });
+         // After modify, (3,0) then (5,0).
+         auto& idx = i0->template get<by_ab>();
+         auto it = idx.begin();
+         BOOST_REQUIRE(it != idx.end());
+         BOOST_TEST(it->id == 1u);
+         ++it;
+         BOOST_REQUIRE(it != idx.end());
+         BOOST_TEST(it->id == 0u);
+         BOOST_TEST(it->a == 5u);
+         // Session goes out of scope: undo.
+      }
+      // After undo: back to original (1,0) then (3,0).
+      auto& idx = i0->template get<by_ab>();
+      auto it = idx.begin();
+      BOOST_REQUIRE(it != idx.end());
+      BOOST_TEST(it->id == 0u);
+      BOOST_TEST(it->a == 1u);
+      ++it;
+      BOOST_REQUIRE(it != idx.end());
+      BOOST_TEST(it->id == 1u);
+      BOOST_TEST(it->a == 3u);
+   } catch ( ... ) { fs::remove_all(temp); throw; }
+   fs::remove_all(temp);
+}
+
+// Mix of plain-member secondary index (fast-path eligible) and composite_key
+// (not eligible) on the same container. Modifying a non-key field must touch
+// neither; modifying the composite-key field must reorder the composite index
+// while leaving the plain-member index untouched.
+struct mixed_element_t {
+   template<typename C>
+   mixed_element_t(C&& c, chainbase::constructor_tag) { c(*this); }
+   uint64_t id;
+   uint64_t plain;
+   uint64_t comp_a;
+   uint64_t comp_b;
+   uint64_t val; // not indexed
+};
+struct by_plain {};
+struct by_comp {};
+
+BOOST_AUTO_TEST_CASE(test_mixed_member_and_composite) {
+   fs::path temp = fs::temp_directory_path() / "pinnable_mapped_file";
+   try {
+      chainbase::pinnable_mapped_file db(temp, true, 1024 * 1024, false, chainbase::pinnable_mapped_file::map_mode::mapped);
+      test_allocator<mixed_element_t> alloc(db.get_segment_manager());
+      undo_index_in_segment<mixed_element_t, test_allocator<mixed_element_t>,
+         boost::multi_index::ordered_unique<key<&mixed_element_t::id>>,
+         boost::multi_index::ordered_unique<boost::multi_index::tag<by_plain>, key<&mixed_element_t::plain>>,
+         boost::multi_index::ordered_unique<boost::multi_index::tag<by_comp>,
+            boost::multi_index::composite_key<mixed_element_t,
+               key<&mixed_element_t::comp_a>,
+               key<&mixed_element_t::comp_b>>>> i0(alloc);
+      i0->emplace([](mixed_element_t& e) { e.plain = 10; e.comp_a = 100; e.comp_b = 0; e.val = 1; }); // id=0
+      i0->emplace([](mixed_element_t& e) { e.plain = 20; e.comp_a = 200; e.comp_b = 0; e.val = 2; }); // id=1
+
+      // (1) Modify non-indexed field: both secondary indexes unchanged.
+      i0->modify(*i0->find(0u), [](mixed_element_t& e) { e.val = 99; });
+      {
+         auto& pi = i0->template get<by_plain>();
+         auto it = pi.begin(); BOOST_TEST(it->id == 0u); ++it; BOOST_TEST(it->id == 1u);
+         auto& ci = i0->template get<by_comp>();
+         auto it2 = ci.begin(); BOOST_TEST(it2->id == 0u); ++it2; BOOST_TEST(it2->id == 1u);
+      }
+      // (2) Modify composite-key component: composite index reorders, plain stays.
+      i0->modify(*i0->find(0u), [](mixed_element_t& e) { e.comp_a = 300; });
+      {
+         auto& pi = i0->template get<by_plain>();
+         auto it = pi.begin(); BOOST_TEST(it->id == 0u); ++it; BOOST_TEST(it->id == 1u);
+         auto& ci = i0->template get<by_comp>();
+         auto it2 = ci.begin(); BOOST_TEST(it2->id == 1u); ++it2; BOOST_TEST(it2->id == 0u);
+      }
+      // (3) Modify plain-member key: plain index reorders, composite stays.
+      i0->modify(*i0->find(0u), [](mixed_element_t& e) { e.plain = 30; });
+      {
+         auto& pi = i0->template get<by_plain>();
+         auto it = pi.begin(); BOOST_TEST(it->id == 1u); ++it; BOOST_TEST(it->id == 0u);
+         auto& ci = i0->template get<by_comp>();
+         auto it2 = ci.begin(); BOOST_TEST(it2->id == 1u); ++it2; BOOST_TEST(it2->id == 0u);
+      }
+   } catch ( ... ) { fs::remove_all(temp); throw; }
+   fs::remove_all(temp);
+}
+
+// Modifying a composite-key component in a way that collides with another
+// element's key must properly revert via the backup path (which uses the
+// full-walk post_modify, not the pre_keys fast path).
+BOOST_AUTO_TEST_CASE(test_composite_key_modify_uniqueness_conflict) {
+   fs::path temp = fs::temp_directory_path() / "pinnable_mapped_file";
+   try {
+      chainbase::pinnable_mapped_file db(temp, true, 1024 * 1024, false, chainbase::pinnable_mapped_file::map_mode::mapped);
+      test_allocator<composite_element_t> alloc(db.get_segment_manager());
+      undo_index_in_segment<composite_element_t, test_allocator<composite_element_t>,
+                            boost::multi_index::ordered_unique<key<&composite_element_t::id>>,
+                            boost::multi_index::ordered_unique<boost::multi_index::tag<by_ab>,
+                               boost::multi_index::composite_key<composite_element_t,
+                                  key<&composite_element_t::a>,
+                                  key<&composite_element_t::b>>>> i0(alloc);
+      i0->emplace([](composite_element_t& e) { e.a = 1; e.b = 0; }); // id=0
+      i0->emplace([](composite_element_t& e) { e.a = 2; e.b = 0; }); // id=1
+      auto session = i0->start_undo_session(true);
+      // Try to collide id=0 onto id=1's (a=2, b=0). modify() must detect the
+      // uniqueness violation and revert.
+      BOOST_CHECK_THROW(
+         i0->modify(*i0->find(0u), [](composite_element_t& e) { e.a = 2; }),
+         std::logic_error);
+      // Post-revert: both elements present at their original keys.
+      BOOST_TEST(i0->find(0u)->a == 1u);
+      BOOST_TEST(i0->find(1u)->a == 2u);
+      auto& idx = i0->template get<by_ab>();
+      auto it = idx.begin();
+      BOOST_REQUIRE(it != idx.end());
+      BOOST_TEST(it->id == 0u);
+      ++it;
+      BOOST_REQUIRE(it != idx.end());
+      BOOST_TEST(it->id == 1u);
+   } catch ( ... ) { fs::remove_all(temp); throw; }
+   fs::remove_all(temp);
+}
 
 BOOST_AUTO_TEST_CASE(test_project) {
    fs::path temp = fs::temp_directory_path() / "pinnable_mapped_file";
