@@ -783,10 +783,13 @@ namespace webassembly {
           * (max 256 bytes), values up to 256 KiB.
           *
           * @param table_id - table namespace identifier (lower 16 bits of the DJB2 hash of table name)
-          * @param payer - account to bill for RAM. Pass 0 to bill the executing
-          *   contract. Non-zero payer is accepted but the transaction-level
-          *   `unauthorized_ram_usage_increase` check requires the payer to have
-          *   authorized the action (or net RAM usage must not increase).
+          * @param payer - account to bill for RAM. 0 is the CDT `same_payer` sentinel (name{}) and is
+          *   valid only on update (existing key), where it keeps the row's current payer so billing
+          *   does not move off it. On insert (new key) there is no existing payer to keep, so 0 is
+          *   rejected with `invalid_table_payer` -- the caller must name the paying account. A
+          *   non-zero payer bills that account explicitly; the transaction-level
+          *   `unauthorized_ram_usage_increase` check then requires the payer to have authorized the
+          *   action (or net RAM usage must not increase).
           * @param key - the key bytes
           * @param value - the value bytes
           * @return RAM byte delta (positive on growth, negative on shrink, 0 on same-size update)
@@ -926,7 +929,8 @@ namespace webassembly {
          /**
           * Insert a secondary index entry mapping a secondary key to a primary key.
           *
-          * @param payer - account to bill for RAM (0 = receiver)
+          * @param payer - account to bill for RAM. kv_idx_store always creates a new entry, so a
+          *   paying account must be named; 0 (`same_payer`) is rejected with `invalid_table_payer`.
           * @param table_id - secondary index identifier
           * @param pri_key - primary key bytes this entry points to
           * @param sec_key - secondary key bytes (order-preserving encoded)
@@ -945,7 +949,10 @@ namespace webassembly {
          /**
           * Update a secondary index entry's key (remove old, insert new).
           *
-          * @param payer - account to bill for RAM (0 = receiver)
+          * @param payer - account to bill for RAM. 0 (the CDT `same_payer` sentinel) keeps the
+          *   entry's existing payer -- kv_idx_update always operates on an existing entry, so there
+          *   is no "bill the receiver" default here. Pass a non-zero payer to bill that account
+          *   explicitly.
           * @param table_id - secondary index identifier
           * @param pri_key - primary key (unchanged)
           * @param old_sec_key - current secondary key to replace
