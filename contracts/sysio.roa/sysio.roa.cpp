@@ -139,6 +139,14 @@ namespace sysio {
         // Leftover
         int64_t leftover = total_amount - allocated;
 
+        // Guard the signed->unsigned conversion below. For a very small supply, tier rounding can push
+        // the node-owner reserve (`allocated`) past `total_amount`, making `leftover` negative; casting
+        // that to uint64_t would underflow into a huge byte count that sails past the sysio_gross check
+        // and activates ROA with garbage reslimits. Require a positive supply whose reserve fits, so
+        // `leftover` is non-negative before the conversion.
+        check(total_amount > 0, "Total SYS must be positive");
+        check(allocated <= total_amount, "Total SYS too small: node-owner reserve exceeds supply");
+
         // Convert the leftover (SYS units) to bytes and partition it so the grand total of all
         // reslimits stays exactly total_sys * bytes_per_unit — nothing is minted on top:
         //   T = node-owner reserve (allocated above) + roa allocation + sysio pool.
@@ -148,7 +156,7 @@ namespace sysio {
         // system contracts are deliberately NOT pre-allocated here — they self-fund exactly. The
         // only deduction is the sysio.acct account-creation bucket seed, taken out of sysio's
         // share so it stays conserved.
-        uint64_t leftover_bytes = (uint64_t)(leftover * bytes_per_unit);
+        uint64_t leftover_bytes = (uint64_t)leftover * bytes_per_unit;  // leftover >= 0, guarded above
         uint64_t roa_ram_bytes = leftover_bytes / 2;
         const uint64_t acct_seed_bytes = sysiosystem::newaccount_ram;
         uint64_t sysio_gross = leftover_bytes - roa_ram_bytes;
@@ -233,13 +241,17 @@ namespace sysio {
         require_auth(get_self());
         check(is_account(account), "account does not exist");
 
-        // Unlimited-RAM accounts (privileged/system, or not yet ROA-managed) have no RAM
-        // constraint to satisfy and must NOT be shrunk to a finite limit — skip the gift.
-        // (The delta>0 path is exercised when a finite account's RAM grows -- e.g. setsyscode
-        //  deploying a contract, or the depot-driven node-owner flow; see the nodeownreg tests' TODO.)
+        // giftram records an exact byte transfer between sysio's pool and `account`, so the target
+        // must carry a finite RAM limit. In production an account is brought under ROA management
+        // with a finite (0) quota -- the system contract that creates it sets ram to 0 -- before any
+        // setsyscode/setsysabi or node-owner funding runs, so this always holds. An unlimited (-1)
+        // limit means that step was skipped: the transfer cannot be accounted, so reject it rather
+        // than silently no-op (which would leave the deployed bytes unfunded and break the
+        // conserving-transfer model). setsyscode's inline setpriv flips only the privileged flag, not
+        // the ram limit, so the target stays finite here.
         int64_t cur_ram, cur_net, cur_cpu;
         get_resource_limits(account, cur_ram, cur_net, cur_cpu);
-        if (cur_ram < 0) return;
+        check(cur_ram >= 0, "giftram target must have a finite RAM limit");
 
         // Reconcile `account`'s gifted RAM to its *exact* current usage. The preceding inline
         // action (setcode / setabi) already ran, so usage reflects the change. RAM is
@@ -962,10 +974,13 @@ namespace sysio {
         // It is not expected that sysio.acct will use the RAM. Instead sysio.acct is a placeholder for
         // all RAM provided to individual accounts for the account creation. See sysio.system newaccount.
         auto sys_symbol = state.total_sys.symbol;
-        int64_t ram_weight_amount = sysiosystem::newaccount_ram / state.bytes_per_unit;
         policies_t policies(get_self(), "sysio"_n.value);
         auto pol_key = policy_key{"sysio.acct"_n.value};
-        policies.get(pol_key, "Missing sysio.acct policy");
+        auto acct_pol = policies.get(pol_key, "Missing sysio.acct policy");
+        // Convert at the bucket's own frozen price, not the live global one: setbyteprice may have
+        // moved state.bytes_per_unit since activation, but sysio.acct's ram_weight is denominated at
+        // its creation price, so units must use that to keep ram_weight * price == bytes moved.
+        int64_t ram_weight_amount = sysiosystem::newaccount_ram / acct_pol.bytes_per_unit;
         policies.modify(get_self(), pol_key, [&](auto& row) {
             row.ram_weight.amount += ram_weight_amount;
         });
@@ -1008,10 +1023,13 @@ namespace sysio {
         // under sysio.acct and draw it from sysio. The inline newaccount's transfer_ram (sysio.system)
         // moves the matching chain quota from sysio to the new account.
         auto sys_symbol = state.total_sys.symbol;
-        int64_t ram_weight_amount = sysiosystem::newaccount_ram / state.bytes_per_unit;
         policies_t policies(get_self(), "sysio"_n.value);
         auto pol_key = policy_key{"sysio.acct"_n.value};
-        policies.get(pol_key, "Missing sysio.acct policy");
+        auto acct_pol = policies.get(pol_key, "Missing sysio.acct policy");
+        // Convert at the bucket's own frozen price, not the live global one: setbyteprice may have
+        // moved state.bytes_per_unit since activation, but sysio.acct's ram_weight is denominated at
+        // its creation price, so units must use that to keep ram_weight * price == bytes moved.
+        int64_t ram_weight_amount = sysiosystem::newaccount_ram / acct_pol.bytes_per_unit;
         policies.modify(get_self(), pol_key, [&](auto& row) {
             row.ram_weight.amount += ram_weight_amount;
         });
