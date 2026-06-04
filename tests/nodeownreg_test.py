@@ -130,8 +130,13 @@ try:
     Utils.Print("  Correctly soft-failed ACCOUNT_KEY_MISMATCH")
 
     # ---- Test 3: re-register the owner -> soft-fail DUPLICATE ----
+    # Use a fresh ETH key so the replay is a *distinct* transaction: a byte-identical resubmission of
+    # Test 1's call shares its trx id, so the chain rejects it as tx_duplicate before the contract's
+    # DUPLICATE check can run. The eth key does not affect the duplicate path (the check precedes the
+    # recordlink), so a new EM key still drives the soft-fail.
     Utils.Print("=== Test 3: nodeownreg replay (soft-fail DUPLICATE) ===")
-    assert push_nodeownreg(node, owner, 2, eth_key, wire_key)[0], "nodeownreg replay should soft-fail, not abort"
+    replay_eth_key = wallet_create_key(walletMgr.host, walletMgr.port, "EM")
+    assert push_nodeownreg(node, owner, 2, replay_eth_key, wire_key)[0], "nodeownreg replay should soft-fail, not abort"
     audit_dup = get_audit(node, owner)
     assert int(audit_dup["status"]) == REJECTED and int(audit_dup["reason"]) == R_DUPLICATE, \
         f"expected DUPLICATE, got {audit_dup}"
