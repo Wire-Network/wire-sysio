@@ -2,6 +2,7 @@
 
 import tempfile
 import gzip
+import os
 import shutil
 import json
 
@@ -28,6 +29,10 @@ def test_success():
         with gzip.open(test['file'], 'rb') as compressed_snap_file:
             with tempfile.NamedTemporaryFile('wb') as uncompressed_snap_file:
                 shutil.copyfileobj(compressed_snap_file, uncompressed_snap_file)
+                # sys-util opens this path in a separate process; flush and fsync so macOS CI cannot mmap a
+                # partially-buffered snapshot and fail validation with a root hash mismatch.
+                uncompressed_snap_file.flush()
+                os.fsync(uncompressed_snap_file.fileno())
                 assert(test['result'] == json.loads(Utils.processSysioUtilCmd(f"snapshot info {uncompressed_snap_file.name}", "do snap info", silentErrors=False, exitOnError=True)))
 
 def test_failure():
