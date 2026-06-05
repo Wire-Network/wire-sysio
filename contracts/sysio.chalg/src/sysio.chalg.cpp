@@ -6,6 +6,10 @@ namespace sysio {
 
 using opp::types::ChallengeStatus;
 
+// System-owned rows bill to the sysio RAM pool, not this contract account (privileged-contract
+// model, as sysio.token uses): the account stays finite at code+abi size; growth draws from the pool.
+constexpr name ram_payer = "sysio"_n;
+
 // ---------------------------------------------------------------------------
 //  initchal
 // ---------------------------------------------------------------------------
@@ -31,7 +35,7 @@ void chalg::initchal(uint64_t chain_req_id) {
    c.round            = 1;
    c.status           = ChallengeStatus::CHALLENGE_STATUS_CHALLENGE_SENT;
    c.challenged_at    = now;
-   challenges.emplace(get_self(), challenge_key{next_id}, c);
+   challenges.emplace(ram_payer, challenge_key{next_id}, c);
 
    // TODO: Queue ATTESTATION_TYPE_CHALLENGE_REQUEST to source outpost
    //       via sysio.msgch::queueout inline action.
@@ -114,7 +118,7 @@ void chalg::escalate(uint64_t challenge_id) {
 
       uint64_t next_id = std::max<uint64_t>(1, challenges.available_primary_key());
 
-      challenges.emplace(get_self(), challenge_key{next_id}, challenge_entry{
+      challenges.emplace(ram_payer, challenge_key{next_id}, challenge_entry{
          .id               = next_id,
          .chain_request_id = ch_row.chain_request_id,
          .epoch_index      = ch_row.epoch_index,

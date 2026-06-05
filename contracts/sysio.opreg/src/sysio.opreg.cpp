@@ -23,6 +23,10 @@ namespace {
 
 using namespace sysio::slug_name_literals;
 
+// System-owned rows bill to the sysio RAM pool, not this contract account (privileged-contract
+// model, as sysio.token uses): the account stays finite at code+abi size; growth draws from the pool.
+constexpr name ram_payer = "sysio"_n;
+
 /// Well-known chain code for the WIRE depot itself. Comparisons of the form
 /// `chain == ChainKind::CHAIN_KIND_WIRE` are now `chain_code == kWireChainCode`.
 constexpr sysio::slug_name kWireChainCode = "WIRE"_s;
@@ -162,7 +166,7 @@ void opreg::setconfig(uint32_t max_available_producers,
    cfg.req_prod_collat                  = std::move(req_prod_collat);
    cfg.req_batchop_collat               = std::move(req_batchop_collat);
    cfg.req_uw_collat                    = std::move(req_uw_collat);
-   cfg_tbl.set(cfg, get_self());
+   cfg_tbl.set(cfg, ram_payer);
 }
 
 // ---------------------------------------------------------------------------
@@ -228,7 +232,7 @@ void opreg::regoperator(name account,
    }
 
    auto now = current_time_ms();
-   ops.emplace(get_self(), op_pk, operator_entry{
+   ops.emplace(ram_payer, op_pk, operator_entry{
       .account         = account,
       .type            = type,
       .status          = is_bootstrapped ? OperatorStatus::OPERATOR_STATUS_ACTIVE
@@ -427,7 +431,7 @@ uint64_t next_withdraw_id() {
    auto ctr = real_ctr.get_or_default(opreg::op_counters{});
    uint64_t id = ctr.next_withdraw_id;
    ctr.next_withdraw_id = id + 1;
-   real_ctr.set(ctr, name{"sysio.opreg"_n});
+   real_ctr.set(ctr, ram_payer);
    return id;
 }
 
@@ -436,7 +440,7 @@ uint64_t next_dellog_id() {
    auto ctr = real_ctr.get_or_default(opreg::op_counters{});
    uint64_t id = ctr.next_dellog_id;
    ctr.next_dellog_id = id + 1;
-   real_ctr.set(ctr, name{"sysio.opreg"_n});
+   real_ctr.set(ctr, ram_payer);
    return id;
 }
 
@@ -697,7 +701,7 @@ enqueue_result try_enqueue_withdraw(name account,
    uint64_t request_id = next_withdraw_id();
 
    opreg::wtdwqueue_t queue(name{"sysio.opreg"_n});
-   queue.emplace(name{"sysio.opreg"_n}, opreg::withdraw_key{request_id}, opreg::withdraw_request{
+   queue.emplace(ram_payer, opreg::withdraw_key{request_id}, opreg::withdraw_request{
       .request_id          = request_id,
       .account             = account,
       .chain_code          = chain_code,
@@ -1313,7 +1317,7 @@ void opreg::recorddel(name account, uint32_t epoch, bool delivered) {
 
    dellog_t log(get_self());
    uint64_t id = next_dellog_id();
-   log.emplace(get_self(), delivery_key{id}, delivery_log_entry{
+   log.emplace(ram_payer, delivery_key{id}, delivery_log_entry{
       .log_id    = id,
       .account   = account,
       .epoch     = epoch,
