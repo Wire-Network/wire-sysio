@@ -4,6 +4,7 @@
 #include <sysio/chain/kv_table_objects.hpp>
 #include "sysio.system_tester.hpp"
 #include <contracts.hpp>
+#include <sysio/opp/opp.hpp>
 #include <fc/variant_object.hpp>
 #include <fc/crypto/keccak256.hpp>
 #include <fc/crypto/elliptic_em.hpp>
@@ -1482,6 +1483,19 @@ public:
          ("account", account)("pubkey", wire_pub_key)("tier", tier));
    }
 
+   // Seed an EVM link directly via the depot-only recordlink, signed as sysio.authex. Used to set up
+   // a pre-existing link with a chosen key before a (mismatched) claim.
+   action_result recordlink(const fc::crypto::public_key& pub_key, const name& account) {
+      action act;
+      act.account       = AUTHEX;
+      act.name          = "recordlink"_n;
+      act.authorization = {{AUTHEX, config::active_name}};
+      act.data          = authex_abi_ser.variant_to_binary("recordlink",
+         mvo()("account", account)("chain_kind", opp::types::ChainKind::CHAIN_KIND_EVM)("pub_key", pub_key),
+         abi_serializer::create_yield_function(abi_serializer_max_time));
+      return base_tester::push_action(std::move(act), AUTHEX.to_uint64_t());
+   }
+
    static fc::crypto::public_key gen_em_key() {
       return fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em).get_public_key();
    }
@@ -1492,7 +1506,7 @@ public:
    // nodeownerreg reg_status + reject_reason values (mirror sysio.roa.hpp).
    static constexpr uint64_t CONFIRMED = 0, REJECTED = 1;
    static constexpr uint64_t R_NAME_INVALID = 1, R_OWNER_NOT_ACCOUNT = 2,
-                             R_ACCOUNT_KEY_MISMATCH = 3, R_DUPLICATE = 4;
+                             R_ACCOUNT_KEY_MISMATCH = 3, R_DUPLICATE = 4, R_LINK_KEY_MISMATCH = 5;
 
    abi_serializer authex_abi_ser;
 };
@@ -1541,6 +1555,31 @@ BOOST_FIXTURE_TEST_CASE( nodeownreg_account_key_mismatch, sysio_roa_nodeownreg_t
    auto audit = get_nodeownerreg(owner);
    BOOST_REQUIRE_EQUAL(audit["status"].as<uint64_t>(), REJECTED);
    BOOST_REQUIRE_EQUAL(audit["reason"].as<uint64_t>(), R_ACCOUNT_KEY_MISMATCH);
+} FC_LOG_AND_RETHROW()
+
+// Account already carries a DIFFERENT EVM link (e.g. an operator createlink or an earlier deposit
+// key) -> nodeownreg soft-fails LINK_KEY_MISMATCH rather than recording CONFIRMED against a stale
+// link or silently keeping the old key.
+BOOST_FIXTURE_TEST_CASE( nodeownreg_link_key_mismatch, sysio_roa_nodeownreg_tester ) try {
+   const auto owner    = "claimacct"_n;
+   const auto wire_pub = gen_k1_key();
+   const auto eth_a    = gen_em_key();   // key already linked to the account
+   const auto eth_b    = gen_em_key();   // depositor key in the new claim
+
+   BOOST_REQUIRE_EQUAL(success(), newnameduser(owner, wire_pub, 2));
+   produce_blocks();
+   // Pre-existing EVM link with eth_a; the account is not yet a node owner.
+   BOOST_REQUIRE_EQUAL(success(), recordlink(eth_a, owner));
+   produce_blocks();
+
+   // Claim with a different depositor key -> soft-fail, not registered, link untouched.
+   BOOST_REQUIRE_EQUAL(success(), nodeownreg(owner, 2, eth_b, wire_pub));
+   produce_blocks();
+
+   BOOST_REQUIRE(get_nodeowner(owner).is_null());
+   auto audit = get_nodeownerreg(owner);
+   BOOST_REQUIRE_EQUAL(audit["status"].as<uint64_t>(), REJECTED);
+   BOOST_REQUIRE_EQUAL(audit["reason"].as<uint64_t>(), R_LINK_KEY_MISMATCH);
 } FC_LOG_AND_RETHROW()
 
 // Name invalid for the tier (tier-1 name > 6 chars) -> REJECTED/NAME_INVALID (account need not exist).

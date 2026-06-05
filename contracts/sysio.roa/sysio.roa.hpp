@@ -337,7 +337,8 @@ namespace sysio {
                 NAME_INVALID         = 1,  // chosen account name violates the tier's length rule
                 OWNER_NOT_ACCOUNT    = 2,  // account does not exist (creation did not occur)
                 ACCOUNT_KEY_MISMATCH = 3,  // existing account's active authority != the single claimed wire key
-                DUPLICATE            = 4   // owner is already a registered node owner
+                DUPLICATE            = 4,  // owner is already a registered node owner
+                LINK_KEY_MISMATCH    = 5   // account already carries a different external-chain link key
             };
 
             struct [[sysio::table("nodeownerreg")]] nodeownerreg {

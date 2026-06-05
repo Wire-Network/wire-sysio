@@ -5,6 +5,9 @@
 namespace {
 using namespace sysio;
 
+// sysio funds the RAM for every link row (system-paid) -- createlink and recordlink alike.
+constexpr name link_row_payer = "sysio"_n;
+
 using ed_raw_key_t = std::array<uint8_t, 32>;
 
 [[maybe_unused]] ed_raw_key_t get_ed_raw_key(const sysio::public_key& pub_key) {
@@ -112,7 +115,7 @@ namespace sysio {
       auto last = --links.cend();
       next_key = last->key + 1;
    }
-   links.emplace("sysio"_n, links_key{next_key}, links_s{
+   links.emplace(link_row_payer, links_key{next_key}, links_s{
       .key = next_key,
       .username = account,
       .chain_kind = chain_kind,
@@ -168,7 +171,7 @@ namespace sysio {
       auto last = --links.cend();
       next_key = last->key + 1;
    }
-   links.emplace("sysio"_n, links_key{next_key}, links_s{
+   links.emplace(link_row_payer, links_key{next_key}, links_s{
       .key = next_key,
       .username = account,
       .chain_kind = chain_kind,
