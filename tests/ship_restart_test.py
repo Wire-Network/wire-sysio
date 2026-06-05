@@ -60,7 +60,13 @@ try:
 
     specificExtraNodeopArgs={}
     specificExtraNodeopArgs[prodNodeId]="--plugin sysio::producer_api_plugin"
-    specificExtraNodeopArgs[shipNodeId]="--plugin sysio::state_history_plugin --trace-history --chain-state-history --finality-data-history --state-history-stride 200 --plugin sysio::net_api_plugin --plugin sysio::producer_api_plugin"
+    specificExtraNodeopArgs[shipNodeId]=(
+        "--plugin sysio::state_history_plugin "
+        "--trace-history --chain-state-history --finality-data-history "
+        "--state-history-stride 200 "
+        f"--state-history-endpoint 127.0.0.1:{Utils.shardPort(8080)} "
+        "--plugin sysio::net_api_plugin --plugin sysio::producer_api_plugin"
+    )
 
     if cluster.launch(topo="mesh", pnodes=totalProducerNodes, totalNodes=totalNodes,
                       activateIF=True,

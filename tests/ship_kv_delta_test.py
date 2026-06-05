@@ -58,8 +58,10 @@ try:
     specificExtraNodeopArgs[apiNodeNum] = (
         "--transaction-retry-max-storage-size-gb 100 "
     )
+    shipAddr = f"127.0.0.1:{Utils.shardPort(8080)}"
     specificExtraNodeopArgs[shipNodeNum] = (
         "--plugin sysio::state_history_plugin "
+        f"--state-history-endpoint {shipAddr} "
         "--trace-history --chain-state-history "
         "--plugin sysio::net_api_plugin "
     )
@@ -149,9 +151,6 @@ try:
 
     outFile = os.path.join(shipTempDir, "streamer.out")
     errFile = os.path.join(shipTempDir, "streamer.err")
-
-    # SHiP listens on default port 8080
-    shipAddr = "127.0.0.1:8080"
 
     cmd = (f"tests/ship_streamer --socket-address {shipAddr} "
            f"--start-block-num {startBlockNum} --end-block-num {endBlockNum} "

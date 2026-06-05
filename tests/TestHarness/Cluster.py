@@ -58,12 +58,14 @@ class Cluster(object):
     __WalletName="MyWallet"
     __localHost="localhost"
     __BiosHost="localhost"
-    __BiosPort=8788
+    __BiosPort=Utils.shardPort(8788)
     __LauncherCmdArr=[]
     __bootlog="wire_sysio-ignition-wd/bootlog.txt"
+    __localLaunchPortCheckAttempts=90
+    __localLaunchPortCheckSleepSeconds=2
 
     # pylint: disable=too-many-arguments
-    def __init__(self, localCluster=True, host="localhost", port=8888, walletHost="localhost", walletPort=9899
+    def __init__(self, localCluster=True, host="localhost", port=None, walletHost="localhost", walletPort=None
                  , defproduceraPrvtKey=None, defproducerbPrvtKey=None, staging=False, loggingLevel="debug", loggingLevelDict={}, nodeopVers="", unshared=False, keepRunning=False, keepLogs=False):
         """Cluster container.
         localCluster [True|False] Is cluster local to host.
@@ -88,10 +90,10 @@ class Cluster(object):
         self.wallet=None
         self.walletMgr=None
         self.host=host
-        self.port=port
-        self.p2pBasePort=9876
+        self.port=Utils.shardPort(8888) if port is None else port
+        self.p2pBasePort=Utils.shardPort(9876)
         self.walletHost=walletHost
-        self.walletPort=walletPort
+        self.walletPort=Utils.shardPort(9899) if walletPort is None else walletPort
         self.staging=staging
         self.loggingLevel=loggingLevel
         self.loggingLevelDict=loggingLevelDict
@@ -171,6 +173,31 @@ class Cluster(object):
     # pylint: disable=too-many-return-statements
     # pylint: disable=too-many-branches
     # pylint: disable=too-many-statements
+    def _shutdownLaunchFailure(self):
+        """Terminate nodes started by a failed launch without deleting diagnostic logs."""
+        if self.keepRunning:
+            Utils.Print('Cluster launch failed; cluster left running.')
+            return False
+
+        Utils.Print('Cluster launch failed; shutting down started nodes.')
+        for node in self.nodes:
+            node.kill(signal.SIGTERM)
+        if self.biosNode is not None and (len(self.nodes) == 0 or self.biosNode != self.nodes[0]):
+            self.biosNode.kill(signal.SIGTERM)
+
+        if self.trxGenLauncher is not None:
+            self.trxGenLauncher.killAll()
+
+        return False
+
+    def _portsForLocalLaunch(self, totalNodes):
+        """Return the local HTTP and P2P ports reserved by a cluster launch."""
+        ports = set(range(self.port, self.port + totalNodes + 1))
+        ports.add(self.port - 100)
+        ports.update(range(self.p2pBasePort, self.p2pBasePort + totalNodes + 1))
+        ports.add(self.p2pBasePort - 100)
+        return ports
+
     def launch(self, pnodes=1, unstartedNodes=0, totalNodes=1, prodCount=21, topo="mesh", delay=2, onlyBios=False, dontBootstrap=False,
                totalProducers=None, sharedProducers=0, extraNodeopArgs="", specificExtraNodeopArgs=None, specificNodeopInstances=None, onlySetProds=False,
                pfSetupPolicy=PFSetupPolicy.FULL, alternateVersionLabelsFile=None, associatedNodeLabels=None, loadSystemContract=True,
@@ -247,13 +274,14 @@ class Cluster(object):
 
         self.setAlternateVersionLabels(alternateVersionLabelsFile)
 
-        tries = 30
-        while not Utils.arePortsAvailable(set(range(self.port, self.port+totalNodes+1))):
-            Utils.Print("ERROR: Another process is listening on nodeop default port. wait...")
+        portsToCheck = self._portsForLocalLaunch(totalNodes)
+        tries = Cluster.__localLaunchPortCheckAttempts
+        while not Utils.arePortsAvailable(portsToCheck):
+            Utils.Print("ERROR: Another process is listening on a nodeop launch port. wait...")
             if tries == 0:
                 return False
             tries = tries - 1
-            time.sleep(2)
+            time.sleep(Cluster.__localLaunchPortCheckSleepSeconds)
         loggingLevelDictString = json.dumps(self.loggingLevelDict, separators=(',', ':'))
         args=(f'-p {pnodes} -n {totalNodes} -d {delay} '
               f'-i {datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]} -f {producerFlag} '
@@ -487,17 +515,17 @@ class Cluster(object):
         if self.nodes is None or self.startedNodesCount != len(self.nodes):
             Utils.Print("ERROR: Unable to validate %s instances, expected: %d, actual: %d" %
                           (Utils.SysServerName, self.startedNodesCount, len(self.nodes)))
-            return False
+            return self._shutdownLaunchFailure()
 
         if not self.biosNode or not Utils.waitForBool(self.biosNode.checkPulse, Utils.systemWaitTimeout):
             Utils.Print("ERROR: Bios node doesn't appear to be running...")
-            return False
+            return self._shutdownLaunchFailure()
 
         # ensure cluster node are inter-connected by ensuring everyone has block 1
         Utils.Print("Cluster viability smoke test. Validate every cluster node has block 1. ")
         if not self.waitOnClusterBlockNumSync(1):
             Utils.Print("ERROR: Cluster doesn't seem to be in sync. Some nodes missing block 1")
-            return False
+            return self._shutdownLaunchFailure()
 
         if dontBootstrap:
             Utils.Print("Skipping bootstrap.")
@@ -506,14 +534,14 @@ class Cluster(object):
         Utils.Print("Bootstrap cluster.")
         if not self.bootstrap(launcher, self.biosNode, self.startedNodesCount, prodCount + sharedProducers, totalProducers, pfSetupPolicy, onlyBios, onlySetProds, loadSystemContract, activateIF, biosFinalizer, signatureProviderForNonProducer):
             Utils.Print("ERROR: Bootstrap failed.")
-            return False
+            return self._shutdownLaunchFailure()
 
         # validate iniX accounts can be retrieved
 
         producerKeys=Cluster.parseClusterKeys(totalNodes)
         if producerKeys is None:
             Utils.Print("ERROR: Unable to parse cluster info")
-            return False
+            return self._shutdownLaunchFailure()
 
         def initAccountKeys(account, keys):
             account.ownerPrivateKey=keys["private"]
@@ -703,7 +731,20 @@ class Cluster(object):
         return True
 
     def getNodeP2pPort(self, nodeId: int):
+        """Return the sharded P2P port for a non-BIOS node."""
         return self.p2pBasePort + nodeId
+
+    def getNodeP2pEndpoint(self, nodeId: int):
+        """Return the sharded P2P endpoint for a non-BIOS node."""
+        return f"{self.host}:{self.getNodeP2pPort(nodeId)}"
+
+    def getBiosP2pEndpoint(self):
+        """Return the sharded P2P endpoint for the BIOS node."""
+        return f"{self.host}:{self.p2pBasePort - 100}"
+
+    def getHttpEndpoint(self, nodeId: int):
+        """Return the sharded HTTP endpoint for a non-BIOS node."""
+        return f"{self.host}:{self.port + nodeId}"
 
     def getNode(self, nodeId=0, exitOnError=True):
         if exitOnError and nodeId >= len(self.nodes):

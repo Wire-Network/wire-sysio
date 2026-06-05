@@ -90,8 +90,67 @@ class Utils:
     ConfigDir=f"{DataPath}/"
 
     TimeFmt='%Y-%m-%dT%H:%M:%S.%f'
+    TestPortOffsetEnvVar="SYSIO_TEST_PORT_OFFSET"
+    _testPortOffset=None
     # lock to serialize writes to subprocess_results.log across threads
     _check_output_lock = threading.Lock()
+
+    @staticmethod
+    def getTestPortOffset():
+        """Return the configured per-test port shard offset."""
+        if Utils._testPortOffset is not None:
+            return Utils._testPortOffset
+
+        rawOffset=os.environ.get(Utils.TestPortOffsetEnvVar, "0")
+        try:
+            offset=int(rawOffset)
+        except ValueError as ex:
+            raise RuntimeError(f"{Utils.TestPortOffsetEnvVar} must be an integer, got '{rawOffset}'") from ex
+
+        if offset < 0:
+            raise RuntimeError(f"{Utils.TestPortOffsetEnvVar} must be non-negative, got {offset}")
+
+        Utils._testPortOffset=offset
+        return offset
+
+    @staticmethod
+    def shardPort(port):
+        """Apply the configured test port offset to a raw base port.
+
+        Known local test ports are compacted into a single 256-port shard so
+        adjacent CTest port shards cannot overlap HTTP, P2P, SHiP, or wallet
+        listeners from different tests.
+        """
+        assert(isinstance(port, int))
+        offset=Utils.getTestPortOffset()
+        if offset == 0:
+            return port
+
+        shardBase=8888 + offset
+        compactPortMap={
+            8788: shardBase + 100,
+            7899: shardBase + 150,
+            8080: shardBase + 151,
+            9011: shardBase + 152,
+            8888: shardBase + 200,
+        }
+
+        if port in compactPortMap:
+            shiftedPort=compactPortMap[port]
+        elif 9776 <= port < 9823:
+            shiftedPort=shardBase + 153 + (port - 9776)
+        elif 9876 <= port < 9899:
+            shiftedPort=shardBase + 225 + (port - 9876)
+        elif 9899 <= port <= 9999:
+            shiftedPort=shardBase + min(port - 9899, 99)
+        else:
+            shiftedPort=port + offset
+
+        if shiftedPort < 1 or shiftedPort > 65535:
+            raise RuntimeError(
+                f"Port {port} shifted by {Utils.TestPortOffsetEnvVar}={Utils.getTestPortOffset()} "
+                f"produces invalid port {shiftedPort}")
+        return shiftedPort
 
     @staticmethod
     def timestamp():
@@ -371,7 +430,7 @@ class Utils:
 
     @staticmethod
     def arePortsAvailable(ports):
-        """Check if specified port (as int) or ports (as set) is/are available for listening on."""
+        """Check whether final, already-sharded ports are available for listening on."""
         assert(ports)
         if isinstance(ports, int):
             ports={ports}

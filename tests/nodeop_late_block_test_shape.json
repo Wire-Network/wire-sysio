@@ -56,7 +56,7 @@
         ],
         "peers": [
           "testnet_00",
-          "testnet_01"
+          "testnet_02"
         ],
         "producers": [
           "defproducerd",

@@ -50,8 +50,8 @@ class nodeDefinition:
     data_dir_name: str = field(init=False)
     p2p_port: int = 0
     http_port: int = 0
-    base_p2p_port: ClassVar[int] = 9876
-    base_http_port: ClassVar[int] = 8888
+    base_p2p_port: ClassVar[int] = Utils.shardPort(9876)
+    base_http_port: ClassVar[int] = Utils.shardPort(8888)
     host_name: str = 'localhost'
     public_name: str = 'localhost'
     listen_addr: str = '0.0.0.0'

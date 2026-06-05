@@ -85,7 +85,7 @@ class PerformanceTestBasic:
             def __str__(self) -> str:
                 args = []
                 for field in dataclasses.fields(self):
-                    match = re.search("\w*PluginArgs", field.name)
+                    match = re.search(r"\w*PluginArgs", field.name)
                     if match is not None:
                         args.append(f"{getattr(self, field.name)}")
                 return " ".join(args)
@@ -204,9 +204,11 @@ class PerformanceTestBasic:
         self.testStart = datetime.now(UTC)
         self.testEnd = self.testStart
         self.testNamePath = testNamePath
+        # Keep concurrent CTest runs from sharing performance artifact directories.
+        logDirUniqueSuffix = f"-{self.ptbConfig.targetTps}-{Utils.getTestPortOffset()}-{os.getpid()}"
         self.loggingConfig = PerformanceTestBasic.LoggingConfig(logDirBase=Path(self.ptbConfig.logDirRoot)/f"{self.testNamePath}Logs",
                                                                 logDirTimestamp=f"{self.testStart.strftime('%Y-%m-%d_%H-%M-%S')}",
-                                                                logDirTimestampedOptSuffix = f"-{self.ptbConfig.targetTps}")
+                                                                logDirTimestampedOptSuffix=logDirUniqueSuffix)
 
         self.trxGenLogDirPath = self.loggingConfig.logDirPath/Path("trxGenLogs")
         self.varLogsDirPath = self.loggingConfig.logDirPath/Path("var")
@@ -226,7 +228,7 @@ class PerformanceTestBasic:
         self.nodeopLogPath = self.nodeopLogDir/f"node_{str(self.validationNodeId).zfill(2)}"/"stderr.txt"
 
         # Setup cluster and its wallet manager
-        self.walletMgr=WalletMgr(True, port=7899)
+        self.walletMgr=WalletMgr(True)
         self.cluster=Cluster(loggingLevel=self.clusterConfig.loggingLevel, loggingLevelDict=self.clusterConfig.loggingDict,
                              nodeopVers=self.clusterConfig.nodeopVers,unshared=self.testHelperConfig.unshared,
                              keepRunning=self.clusterConfig.dontKill, keepLogs=self.clusterConfig.keepLogs)

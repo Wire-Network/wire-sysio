@@ -113,7 +113,9 @@ def parseArgs():
     parser.add_argument("abi_file", type=str, help="The path to the contract abi file to use for the supplied transaction action data")
     parser.add_argument("actions_data", type=str, help="The json actions data file or json actions data description string to use")
     parser.add_argument("actions_auths", type=str, help="The json actions auth file or json actions auths description string to use, containting authAcctName to activePrivateKey pairs.")
-    parser.add_argument("connection_pair_list", type=str, help="Comma separated list of endpoint:port combinations to send transactions to", default="localhost:9876")
+    parser.add_argument("connection_pair_list", type=str,
+                        help="Comma separated list of endpoint:port combinations to send transactions to",
+                        default=f"localhost:{Utils.shardPort(9876)}")
     parser.add_argument("endpoint_mode", type=str, help="Endpoint mode (\"p2p\", \"http\"). \
                                                             In \"p2p\" mode transactions will be directed to the p2p endpoint on a producer node. \
                                                             In \"http\" mode transactions will be directed to the http endpoint on an api node.",

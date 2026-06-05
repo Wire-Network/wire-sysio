@@ -38,10 +38,14 @@ try:
     Print(f'producing nodes: {pnodes}, delay between nodes launch: {delay} second{"s" if delay != 1 else ""}')
 
     Print("Stand up cluster")
+    alternateListenEndpoint = f"0.0.0.0:{Utils.shardPort(9779)}"
+    alternatePeerEndpoint = f"localhost:{Utils.shardPort(9779)}"
     specificArgs = {
-        '0': '--agent-name node-00 --p2p-listen-endpoint 0.0.0.0:9876 --p2p-listen-endpoint 0.0.0.0:9779 --p2p-server-address ext-ip0:20000 --p2p-server-address ext-ip1:20001 --plugin sysio::net_api_plugin',
-        '2': '--agent-name node-02 --p2p-peer-address localhost:9779 --plugin sysio::net_api_plugin',
-        '4': '--agent-name node-04 --p2p-peer-address localhost:9876 --plugin sysio::net_api_plugin',
+        '0': f'--agent-name node-00 --p2p-listen-endpoint 0.0.0.0:{cluster.getNodeP2pPort(0)} '
+             f'--p2p-listen-endpoint {alternateListenEndpoint} --p2p-server-address ext-ip0:20000 '
+             f'--p2p-server-address ext-ip1:20001 --plugin sysio::net_api_plugin',
+        '2': f'--agent-name node-02 --p2p-peer-address {alternatePeerEndpoint} --plugin sysio::net_api_plugin',
+        '4': f'--agent-name node-04 --p2p-peer-address {cluster.getNodeP2pEndpoint(0)} --plugin sysio::net_api_plugin',
     }
     if cluster.launch(pnodes=pnodes, totalNodes=total_nodes, topo='line', delay=delay, activateIF=activateIF,
                       specificExtraNodeopArgs=specificArgs) is False:
@@ -73,9 +77,11 @@ try:
         if conn['is_socket_open']:
             open_socket_count += 1
             if conn['last_handshake']['agent'] == 'node-02':
-                assert conn['last_handshake']['p2p_address'].split()[0] == 'localhost:9878', f"Connected node is listening on '{conn['last_handshake']['p2p_address'].split()[0]}' instead of port 9878"
+                expectedEndpoint = cluster.getNodeP2pEndpoint(2)
+                assert conn['last_handshake']['p2p_address'].split()[0] == expectedEndpoint, f"Connected node is listening on '{conn['last_handshake']['p2p_address'].split()[0]}' instead of {expectedEndpoint}"
             elif conn['last_handshake']['agent'] == 'node-04':
-                assert conn['last_handshake']['p2p_address'].split()[0] == 'localhost:9880', f"Connected node is listening on '{conn['last_handshake']['p2p_address'].split()[0]}' instead of port 9880"
+                expectedEndpoint = cluster.getNodeP2pEndpoint(4)
+                assert conn['last_handshake']['p2p_address'].split()[0] == expectedEndpoint, f"Connected node is listening on '{conn['last_handshake']['p2p_address'].split()[0]}' instead of {expectedEndpoint}"
     assert open_socket_count == 2, 'Node 0 is expected to have exactly two open sockets'
 
     connections = cluster.nodes[2].processUrllibRequest('net', 'connections')

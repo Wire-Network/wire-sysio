@@ -1,5 +1,19 @@
+set(SYSIO_TEST_PORT_OFFSET_START 100)
+set(SYSIO_TEST_PORT_OFFSET_STRIDE 256)
+
+function(next_test_port_offset out_var)
+   get_property(next_offset GLOBAL PROPERTY SYSIO_NEXT_TEST_PORT_OFFSET)
+   if(NOT next_offset)
+      set(next_offset "${SYSIO_TEST_PORT_OFFSET_START}")
+   endif()
+
+   math(EXPR next_next_offset "${next_offset} + ${SYSIO_TEST_PORT_OFFSET_STRIDE}")
+   set_property(GLOBAL PROPERTY SYSIO_NEXT_TEST_PORT_OFFSET ${next_next_offset})
+   set(${out_var} ${next_offset} PARENT_SCOPE)
+endfunction()
+
 function(setup_test_common)
-   cmake_parse_arguments(PARSE_ARGV 0 arg "" "NAME;COST;TIMEOUT" "COMMAND")
+   cmake_parse_arguments(PARSE_ARGV 0 arg "AUTO_PORT_OFFSET;AUTO_LR_PORT_OFFSET" "NAME;COST;TIMEOUT;PORT_OFFSET" "COMMAND")
 
    add_test(NAME "${arg_NAME}" COMMAND ${arg_COMMAND} WORKING_DIRECTORY "${CMAKE_BINARY_DIR}")
 
@@ -8,6 +22,16 @@ function(setup_test_common)
    endif()
    if(arg_TIMEOUT)
       set_tests_properties("${arg_NAME}" PROPERTIES TIMEOUT ${arg_TIMEOUT})
+   endif()
+   if(arg_PORT_OFFSET)
+      set(test_port_offset ${arg_PORT_OFFSET})
+   elseif(arg_AUTO_LR_PORT_OFFSET)
+      next_test_port_offset(test_port_offset)
+   elseif(arg_AUTO_PORT_OFFSET)
+      next_test_port_offset(test_port_offset)
+   endif()
+   if(DEFINED test_port_offset)
+      set_tests_properties("${arg_NAME}" PROPERTIES ENVIRONMENT "SYSIO_TEST_PORT_OFFSET=${test_port_offset}")
    endif()
 endfunction()
 
@@ -25,13 +49,13 @@ endfunction()
 function(add_np_test)
    cmake_parse_arguments(PARSE_ARGV 0 arg "" "NAME;COST;TIMEOUT" "COMMAND")
 
-   setup_test_common(${ARGV})
+   setup_test_common(${ARGV} AUTO_PORT_OFFSET)
    set_property(TEST "${arg_NAME}" PROPERTY LABELS nonparallelizable_tests)
 endfunction()
 
 function(add_lr_test)
    cmake_parse_arguments(PARSE_ARGV 0 arg "" "NAME;COST;TIMEOUT" "COMMAND")
 
-   setup_test_common(${ARGV})
+   setup_test_common(${ARGV} AUTO_LR_PORT_OFFSET)
    set_property(TEST "${arg_NAME}" PROPERTY LABELS long_running_tests)
 endfunction()

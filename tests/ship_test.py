@@ -58,7 +58,12 @@ try:
     specificExtraNodeopArgs={}
     # non-producing nodes are at the end of the cluster's nodes, so reserving the last one for state_history_plugin
     shipNodeNum = totalNodes - 1
-    specificExtraNodeopArgs[shipNodeNum]="--plugin sysio::state_history_plugin --sync-fetch-span 200 --plugin sysio::net_api_plugin "
+    specificExtraNodeopArgs[shipNodeNum]=(
+        "--plugin sysio::state_history_plugin "
+        "--sync-fetch-span 200 "
+        f"--state-history-endpoint 127.0.0.1:{Utils.shardPort(8080)} "
+        "--plugin sysio::net_api_plugin "
+    )
 
     if args.unix_socket:
         specificExtraNodeopArgs[shipNodeNum] += "--state-history-unix-socket-path ship.sock"
@@ -82,6 +87,8 @@ try:
     cmd = "%s --num-requests %d" % (shipClient, args.num_requests)
     if args.unix_socket:
         cmd += " -a ws+unix:///%s" % (Utils.getNodeDataDir(shipNodeNum, "ship.sock"))
+    else:
+        cmd += " -a 127.0.0.1:%d" % (Utils.shardPort(8080))
     if Utils.Debug: Utils.Print("cmd: %s" % (cmd))
     clients = []
     files = []
@@ -118,7 +125,7 @@ try:
     minLastBN = sys.maxsize
     for index in range(0, len(clients)):
         done = False
-        shipClientErrorFile = "%s%d.err" % (shipClientFilePrefix, i)
+        shipClientErrorFile = "%s%d.err" % (shipClientFilePrefix, index)
         with open(shipClientErrorFile, "r") as errFile:
             statuses = None
             lines = errFile.readlines()
@@ -139,7 +146,7 @@ try:
                 if statusDesc == "error":
                     Utils.errorExit("ship_client reporting error see: %s." % (shipClientErrorFile))
 
-        assert done, Print("ERROR: Did not find a \"done\" status for client %d" % (i))
+        assert done, Print("ERROR: Did not find a \"done\" status for client %d" % (index))
 
     Print("All clients active from block num: %s to block_num: %s." % (maxFirstBN, minLastBN))
 

@@ -42,9 +42,9 @@ try:
         '--data-dir',
         Utils.DataDir,
         '--http-server-address',
-        'localhost:8888'
+        f'localhost:{TestHelper.DEFAULT_PORT}'
     ]
-    node = Node('localhost', '8888', '00', data_dir=pathlib.Path(Utils.DataDir),
+    node = Node('localhost', TestHelper.DEFAULT_PORT, '00', data_dir=pathlib.Path(Utils.DataDir),
                 config_dir=pathlib.Path(Utils.ConfigDir), cmd=cmd)
 
     time.sleep(1)
@@ -54,8 +54,9 @@ try:
     node.waitForBlock(5)
 
     s = socket.socket()
-    err = s.connect_ex(('localhost',9876))
-    assert err == errno.ECONNREFUSED, 'Connection to port 9876 must be refused'
+    p2pPort = Utils.shardPort(9876)
+    err = s.connect_ex(('localhost', p2pPort))
+    assert err == errno.ECONNREFUSED, f'Connection to port {p2pPort} must be refused'
 
     testSuccessful=True
 finally:
