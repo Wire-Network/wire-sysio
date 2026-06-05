@@ -48,123 +48,121 @@ jobs:
       platform-files: |
         .cicd/platforms
 
-  build-base:
-    name: Run Build Workflow
-    uses: ./.github/workflows/build_base.yaml
+  build-test-package:
+    name: Build, test, and package (${{matrix.platform}})
     needs: [platform-cache]
-    secrets:
-      GH_TOKEN_DEV: ${{ secrets.GH_TOKEN_DEV }}
-    with:
-      platforms: ${{needs.platform-cache.outputs.platforms}}
-      platform-list: ${{needs.platform-cache.outputs.platform-list}}
-
-  v:
-    name: Discover Versions
-    runs-on: ubuntu-latest
-    outputs:
-      cdt-target: ${{steps.versions.outputs.cdt-target}}
-      cdt-prerelease: ${{steps.versions.outputs.cdt-prerelease}}
-      wire-system-contracts-ref: ${{steps.versions.outputs.wire-system-contracts-ref}}
-    steps:
-      - name: Setup wire-cdt and wire-system-contracts versions
-        id: versions
-        env:
-          GH_TOKEN: ${{secrets.GH_TOKEN_DEV}}
-        run: |
-          DEFAULTS_JSON=$(curl -sSfL $(gh api https://api.github.com/repos/${{github.repository}}/contents/.cicd/defaults.json?ref=${{github.sha}} --jq .download_url))
-          echo cdt-target=$(echo "$DEFAULTS_JSON" | jq -r '.wirecdt.target') >> $GITHUB_OUTPUT
-          echo cdt-prerelease=$(echo "$DEFAULTS_JSON" | jq -r '.wirecdt.prerelease') >> $GITHUB_OUTPUT
-          echo wire-system-contracts-ref=$(echo "$DEFAULTS_JSON" | jq -r '.wiresystemcontracts.ref') >> $GITHUB_OUTPUT
-
-          if [[ "${{inputs.override-cdt}}" != "" ]]; then
-            echo cdt-target=${{inputs.override-cdt}} >> $GITHUB_OUTPUT
-          fi
-          if [[ "${{inputs.override-cdt-prerelease}}" == +(true|false) ]]; then
-            echo cdt-prerelease=${{inputs.override-cdt-prerelease}} >> $GITHUB_OUTPUT
-          fi
-          if [[ "${{inputs.override-wire-system-contracts}}" != "" ]]; then
-            echo wire-system-contracts-ref=${{inputs.override-wire-system-contracts}} >> $GITHUB_OUTPUT
-          fi
-
-  package:
-    name: Build deb packages (${{matrix.platform}})
-    needs: [platform-cache, build-base]
-    strategy:
-      fail-fast: false
-      matrix:
-        platform: [ubuntu24, ubsan, asan, asserton, gcc]
-    runs-on:
-      group: core-repo-group
-    timeout-minutes: 15
-    container:
-      image: ${{fromJSON(needs.platform-cache.outputs.platforms)[matrix.platform].image}}
-      credentials:
-        username: dev-wire
-        password: ${{ secrets.GH_TOKEN_DEV }}
-    steps:
-      - uses: actions/checkout@v5
-
-      - name: Download builddir
-        uses: actions/download-artifact@v7
-        with:
-          name: ${{matrix.platform}}-build
-
-      - name: Build packages
-        run: |
-          tar xzf build.tar.gz
-          cd build
-          cpack
-          ../tools/tweak-deb.sh wire-sysio_*.deb
-
-      - name: Install dev package
-        run: |
-          apt-get update && apt-get upgrade -y
-          apt-get install -y ./build/wire-sysio_*.deb
-
-      - name: Upload dev package
-        uses: actions/upload-artifact@v6
-        with:
-          name: wire-sysio-dev-${{matrix.platform}}-amd64
-          path: build/wire-sysio_*.deb
-
-  tests:
-    name: Tests (${{matrix.cfg.name}})
-    needs: [platform-cache, build-base]
     strategy:
       fail-fast: false
       matrix:
         include:
-          - cfg: {name: 'ubuntu24',      base: 'ubuntu24', builddir: 'ubuntu24'}
-          - cfg: {name: 'ubsan',         base: 'ubsan',    builddir: 'ubsan'}
-          - cfg: {name: 'asan',          base: 'asan', builddir: 'asan'}
-          - cfg: {name: 'asserton',      base: 'asserton', builddir: 'asserton'}
-          - cfg: {name: 'gcc',      base: 'gcc', builddir: 'gcc'}
+          - platform: ubuntu24
+            build_jobs: 11
+            run_sharded_np_lr: true
+          - platform: ubsan
+            build_jobs: 11
+            run_sharded_np_lr: true
+          - platform: asan
+            build_jobs: 11
+            run_sharded_np_lr: false
+          - platform: asserton
+            build_jobs: 11
+            run_sharded_np_lr: true
+          - platform: gcc
+            build_jobs: 8
+            run_sharded_np_lr: true
     runs-on:
       group: core-repo-group
     container:
-      image: ${{fromJSON(needs.platform-cache.outputs.platforms)[matrix.cfg.base].image}}
+      image: ${{fromJSON(needs.platform-cache.outputs.platforms)[matrix.platform].image}}
       credentials:
         username: dev-wire
         password: ${{ secrets.GH_TOKEN_DEV }}
       options: --security-opt seccomp=unconfined --mount type=bind,source=/var/lib/systemd/coredump,target=/cores
       volumes:
       - ${{ github.workspace }}:/__w/wire-sysio/wire-sysio
-
-
+    env:
+      CCACHE_MAXSIZE: "10G"
+      CCACHE_COMPRESS: "true"
+      CCACHE_COMPRESSLEVEL: "6"
     steps:
-      - name: Ensure writable workspace
-        run: |
-          echo "User is $USER"
-          echo "Fixing permissions on workspace for user $(whoami)"
-          sudo chown -R $USER:$USER "$GITHUB_WORKSPACE"
-          sudo chmod -R u+rwX "$GITHUB_WORKSPACE"
+      - name: Allow safe directories
+        run: git config --global --add safe.directory '*'
 
       - uses: actions/checkout@v5
-
-      - name: Download builddir
-        uses: actions/download-artifact@v7
         with:
-          name: ${{matrix.cfg.builddir}}-build
+          submodules: recursive
+
+      - name: Restore vcpkg binary cache
+        uses: actions/cache@v5
+        with:
+          path: ${{ github.workspace }}/vcpkg-binary-cache
+          key: vcpkg-binaries-${{ matrix.platform }}-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json', '.github/vcpkg-triplets/**') }}
+          restore-keys: |
+            vcpkg-binaries-${{ matrix.platform }}-
+
+      - name: Restore ccache
+        uses: actions/cache@v5
+        with:
+          path: ${{ github.workspace }}/.ccache
+          key: ccache-${{ matrix.platform }}-${{ github.sha }}
+          restore-keys: |
+            ccache-${{ matrix.platform }}-
+
+      - name: Build
+        run: |
+          echo "Building for ${{ matrix.platform }}"
+
+          # Use $GITHUB_WORKSPACE (container path /__w/...) not ${{ github.workspace }}
+          # (host path /home/runner/work/...) so ccache/vcpkg write to the mounted
+          # volume and persist for actions/cache to save.
+          export CCACHE_DIR="$GITHUB_WORKSPACE/.ccache"
+          export VCPKG_BINARY_SOURCES="clear;files,$GITHUB_WORKSPACE/vcpkg-binary-cache,readwrite"
+          export VCPKG_TARGET_TRIPLET=x64-linux-release
+          export VCPKG_HOST_TRIPLET=x64-linux-release
+          export VCPKG_OVERLAY_TRIPLETS="$GITHUB_WORKSPACE/.github/vcpkg-triplets"
+
+          # Clean intermediate vcpkg artifacts but preserve binary cache and downloads
+          rm -rf vcpkg/buildtrees vcpkg/packages vcpkg/vcpkg_installed \
+                  build/vcpkg_installed ~/.cache/vcpkg ~/.vcpkg
+
+          mkdir -p "$GITHUB_WORKSPACE/vcpkg-binary-cache"
+
+          ./vcpkg/bootstrap-vcpkg.sh
+
+          chown -R $(id -u):$(id -g) $PWD
+
+          # Reset ccache stats for this build
+          ccache -z || true
+
+          cmake -B build -S . -G Ninja ${SYSIO_PLATFORM_HAS_EXTRAS_CMAKE:+-C /extras.cmake} \
+          -DCMAKE_C_COMPILER=$CC \
+          -DCMAKE_CXX_COMPILER=$CXX \
+          -DCMAKE_MAKE_PROGRAM=$CMAKE_MAKE_PROGRAM \
+          -DCMAKE_TOOLCHAIN_FILE=$PWD/vcpkg/scripts/buildsystems/vcpkg.cmake \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DVCPKG_TARGET_TRIPLET=$VCPKG_TARGET_TRIPLET \
+          -DVCPKG_HOST_TRIPLET=$VCPKG_HOST_TRIPLET \
+          -DVCPKG_OVERLAY_TRIPLETS=$VCPKG_OVERLAY_TRIPLETS \
+          -DENABLE_CCACHE=ON \
+          -DENABLE_TESTS=ON \
+          ${CMAKE_PREFIX_PATH:+-DCMAKE_PREFIX_PATH=$CMAKE_PREFIX_PATH}
+
+          cmake --build build -- -j "${{ matrix.build_jobs }}"
+
+          echo "=== ccache statistics ==="
+          ccache -s || true
+
+      - name: Show vcpkg logs if failure
+        if: failure()
+        run: |
+          echo "$PWD"
+          echo "=== vcpkg-manifest-install.log ==="
+          cat build/vcpkg-manifest-install.log || true
+          echo "=== Other vcpkg logs ==="
+          find build -type f -name '*.log' | while read f; do
+            echo "----- $f -----"
+            tail -n 40 "$f"
+          done
 
       - name: Debug environment and workspace
         run: |
@@ -220,7 +218,7 @@ jobs:
 
           echo
           echo "=== CHECK WRITABILITY OF BUILD DIR ==="
-          touch build/debug_write_test 2>&1 || echo "❌ Cannot write to build/"
+          touch build/debug_write_test 2>&1 || echo "Cannot write to build/"
           rm -f build/debug_write_test || true
 
       - name: Run Parallel Tests
@@ -228,14 +226,11 @@ jobs:
           DOCKER_HOST: ${{ env.DOCKER_HOST }}
           DOCKER_CONTEXT: ${{ env.DOCKER_CONTEXT }}
         run: |
-          # https://github.com/actions/runner/issues/2033
-          tar xzf build.tar.gz
-          sudo chown -R $(id -u):$(id -g) $PWD
           cd build
           ctest --output-on-failure -j $(nproc) -LE "(nonparallelizable_tests|long_running_tests)" --timeout 1000
 
       - name: Run Sharded NP/LR Tests
-        if: matrix.cfg.name != 'asan'
+        if: ${{ matrix.run_sharded_np_lr }}
         run: |
           cd build
           test_jobs="$(nproc)"
@@ -246,7 +241,7 @@ jobs:
         uses: actions/upload-artifact@v6
         if: failure()
         with:
-          name: ${{matrix.cfg.name}}-tests-logs
+          name: ${{matrix.platform}}-tests-logs
           if-no-files-found: warn
           path: |
               /cores
@@ -259,108 +254,54 @@ jobs:
           awk 'BEGIN {err = 1} /bmi2/ && /adx/ {err = 0} END {exit err}' /proc/cpuinfo
           build/tools/fsgsbase-enabled
 
-  # libtester-tests:
-  #   name: libtester tests
-  #   needs: [platform-cache, build-base, v, package]
-  #   strategy:
-  #     fail-fast: false
-  #     matrix:
-  #       platform: [ubuntu20, ubuntu22, ubuntu24]
-  #       test: [build-tree, make-dev-install, deb-install]
-  #   runs-on:  ["self-hosted", "enf-x86-midtier"]
-  #   container: ${{ matrix.test != 'deb-install' && fromJSON(needs.platform-cache.outputs.platforms)[matrix.platform].image || matrix.platform == 'ubuntu20' && 'ubuntu:focal' || 'ubuntu:jammy' }}
-  #   env:
-  #     DEBIAN_FRONTEND: noninteractive
-  #     TZ: Etc/UTC
-  #   steps:
-  #     - name: Update Package Index & Upgrade Packages
-  #       run: |
-  #         apt-get update
-  #         apt-get upgrade -y
+      - name: Build packages
+        run: |
+          cd build
+          cpack
+          ../tools/tweak-deb.sh wire-sysio_*.deb
 
-  #     # wire-sysio
-  #     - if: ${{ matrix.test != 'deb-install' }}
-  #       name: Clone sysio
-  #       uses: actions/checkout@v5
-  #       with:
-  #         submodules: recursive
-  #     - if: ${{ matrix.test != 'deb-install' }}
-  #       name: Download sysio builddir
-  #       uses: actions/download-artifact@v6
-  #       with:
-  #         name: ${{matrix.platform}}-build
-  #     - if: ${{ matrix.test != 'deb-install' }}
-  #       name: Extract sysio build
-  #       run: |
-  #         zstdcat build.tar.zst | tar x
-  #     - if: ${{ matrix.test == 'build-tree' }}
-  #       name: Set sysio_DIR env var
-  #       run: |
-  #         echo "sysio_DIR=$PWD/build/lib/cmake/sysio" >> "$GITHUB_ENV"
-  #     - if: ${{ matrix.test == 'make-dev-install' }}
-  #       name: sysio dev-install
-  #       run: |
-  #         cmake --install build
-  #         cmake --install build --component dev
-  #     - if: ${{ matrix.test == 'make-dev-install' }}
-  #       name: Delete sysio artifacts
-  #       run: |
-  #         rm -r *
-  #     # - if: ${{ matrix.test == 'deb-install' }}
-  #     #   name: Download sysio-dev
-  #     #   uses: actions/download-artifact@v6
-  #     #   with:
-  #     #     name: sysio-dev-${{matrix.platform}}-amd64
-  #     # - if: ${{ matrix.test == 'deb-install' }}
-  #     #   name: Install sysio-dev Package
-  #     #   run: |
-  #     #     apt-get install -y ./*.deb
-  #     #     rm ./*.deb
+      - name: Install dev package
+        run: |
+          apt-get update && apt-get upgrade -y
+          apt-get install -y ./build/wire-sysio_*.deb
 
-  #     # CDT
-  #     # - name: Download cdt
-  #     #   uses: AntelopeIO/asset-artifact-download-action@v3
-  #     #   with:
-  #     #     owner: Wire-Network
-  #     #     repo: wire-cdt
-  #     #     file: 'cdt_.*amd64.deb'
-  #     #     target: '${{needs.v.outputs.cdt-target}}'
-  #     #     prereleases: ${{fromJSON(needs.v.outputs.cdt-prerelease)}}
-  #     #     artifact-name: cdt_ubuntu_package_amd64
-  #     # - name: Install cdt Packages
-  #     #   run: |
-  #     #     apt-get install -y ./*.deb
-  #     #     rm ./*.deb
-  #         # CDT
-  #     - name: Download and Install wire-cdt
-  #       run: |
-  #         CDT_VERSION="${{needs.v.outputs.cdt-target}}"
-  #         CDT_URL="https://github.com/Wire-Network/wire-cdt/releases/download/v${CDT_VERSION}/wire-cdt_${CDT_VERSION}_amd64.deb"
-  #         wget -O wire-cdt.deb "$CDT_URL"
-  #         apt-get install -y ./wire-cdt.deb
-  #         rm ./wire-cdt.deb
+      - name: Upload dev package
+        uses: actions/upload-artifact@v6
+        with:
+          name: wire-sysio-dev-${{matrix.platform}}-amd64
+          path: build/wire-sysio_*.deb
 
-  #     # Reference Contracts
-  #     - name: checkout wire-system-contracts
-  #       uses: actions/checkout@v5
-  #       with:
-  #         repository: Wire-Network/wire-system-contracts
-  #         path: wire-system-contracts
-  #         ref: '${{needs.v.outputs.wire-system-contracts-ref}}'
-  #     - if: ${{ matrix.test == 'deb-install' }}
-  #       name: Install wire-system-contracts deps
-  #       run: |
-  #         apt-get -y install cmake build-essential
-  #     - name: Build & Test wire-system-contracts
-  #       run: |
-  #         cmake -S wire-system-contracts -B wire-system-contracts/build -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=On -DSYSTEM_ENABLE_SYSIO_VERSION_CHECK=Off -DSYSTEM_ENABLE_CDT_VERSION_CHECK=Off
-  #         cmake --build wire-system-contracts/build -- -j $(nproc)
-  #         cd wire-system-contracts/build/tests
-  #         ctest --output-on-failure -j $(nproc)
+  v:
+    name: Discover Versions
+    runs-on: ubuntu-latest
+    outputs:
+      cdt-target: ${{steps.versions.outputs.cdt-target}}
+      cdt-prerelease: ${{steps.versions.outputs.cdt-prerelease}}
+      wire-system-contracts-ref: ${{steps.versions.outputs.wire-system-contracts-ref}}
+    steps:
+      - name: Setup wire-cdt and wire-system-contracts versions
+        id: versions
+        env:
+          GH_TOKEN: ${{secrets.GH_TOKEN_DEV}}
+        run: |
+          DEFAULTS_JSON=$(curl -sSfL $(gh api https://api.github.com/repos/${{github.repository}}/contents/.cicd/defaults.json?ref=${{github.sha}} --jq .download_url))
+          echo cdt-target=$(echo "$DEFAULTS_JSON" | jq -r '.wirecdt.target') >> $GITHUB_OUTPUT
+          echo cdt-prerelease=$(echo "$DEFAULTS_JSON" | jq -r '.wirecdt.prerelease') >> $GITHUB_OUTPUT
+          echo wire-system-contracts-ref=$(echo "$DEFAULTS_JSON" | jq -r '.wiresystemcontracts.ref') >> $GITHUB_OUTPUT
+
+          if [[ "${{inputs.override-cdt}}" != "" ]]; then
+            echo cdt-target=${{inputs.override-cdt}} >> $GITHUB_OUTPUT
+          fi
+          if [[ "${{inputs.override-cdt-prerelease}}" == +(true|false) ]]; then
+            echo cdt-prerelease=${{inputs.override-cdt-prerelease}} >> $GITHUB_OUTPUT
+          fi
+          if [[ "${{inputs.override-sys-system-contracts}}" != "" ]]; then
+            echo wire-system-contracts-ref=${{inputs.override-sys-system-contracts}} >> $GITHUB_OUTPUT
+          fi
 
   all-passing:
     name: All Required Tests Passed
-    needs: [ tests ]
+    needs: [ build-test-package ]
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -371,8 +312,8 @@ jobs:
           webhook-url: ${{ secrets.WEBHOOK_URL }}
           notification-type: 1
           workflow-name: "Build & Test Workflow"
-          job-results: "tests:${{ needs.tests.result }}"
+          job-results: "build-test-package:${{ needs.build-test-package.result }}"
           github-context: ${{ toJSON(github) }}
 
-      - if: needs.tests.result != 'success'
+      - if: needs.build-test-package.result != 'success'
         run: false
