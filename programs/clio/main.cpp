@@ -73,6 +73,7 @@ Options:
 #include <unordered_map>
 #include <utility>
 #include <fc/crypto/hex.hpp>
+#include <fc/crypto/keccak256.hpp>
 #include <fc/variant.hpp>
 #include <fc/io/datastream.hpp>
 #include <fc/io/json.hpp>
@@ -2065,6 +2066,41 @@ int main( int argc, char** argv ) {
       std::cout << "WASM hash: " << wasm_hash.str() << std::endl;
    });
 
+   // ---- convert keccak256 ----
+   string keccak_input;
+   bool keccak_hex_input = false;
+   auto keccak_cmd = convert_cmd->add_subcommand("keccak256", localized("Compute Keccak-256 hash of input data"));
+   keccak_cmd->add_option("data", keccak_input, localized("Input data (text by default, or hex with --hex)"))->required();
+   keccak_cmd->add_flag("--hex", keccak_hex_input, localized("Interpret input as hex-encoded bytes"));
+   keccak_cmd->callback([&] {
+      std::vector<uint8_t> bytes;
+      if (keccak_hex_input) {
+         bytes = fc::from_hex(keccak_input);
+      } else {
+         bytes.assign(keccak_input.begin(), keccak_input.end());
+      }
+      auto hash = fc::crypto::keccak256::hash(std::span<const uint8_t>(bytes.data(), bytes.size()));
+      std::cout << hash.str() << std::endl;
+   });
+
+   // ---- convert sha256 ----
+   string sha256_input;
+   bool sha256_hex_input = false;
+   auto sha256_cmd = convert_cmd->add_subcommand("sha256", localized("Compute SHA-256 hash of input data"));
+   sha256_cmd->add_option("data", sha256_input, localized("Input data (text by default, or hex with --hex)"))->required();
+   sha256_cmd->add_flag("--hex", sha256_hex_input, localized("Interpret input as hex-encoded bytes"));
+   sha256_cmd->callback([&] {
+      std::vector<char> bytes;
+      if (sha256_hex_input) {
+         auto hb = fc::from_hex(sha256_input);
+         bytes.assign(hb.begin(), hb.end());
+      } else {
+         bytes.assign(sha256_input.begin(), sha256_input.end());
+      }
+      auto hash = fc::sha256::hash(bytes.data(), bytes.size());
+      std::cout << hash.str() << std::endl;
+   });
+
    string k1_private_key;
    auto k1_private_key_cmd = convert_cmd->add_subcommand("k1_private_key", localized("Generate all forms of K1 key"));
    k1_private_key_cmd->add_option("--private-key", k1_private_key, localized("Private key in to import, prompts if not provided"))->expected(0, 1);
@@ -2195,6 +2231,92 @@ int main( int argc, char** argv ) {
       // Emit the prefixed PUB_EM_ form so it compares directly against a key registered in an account's authority.
       auto pubk = fc::crypto::public_key::recover(sig, digest);
       std::cout << localized("Public key: ${key}", ("key", pubk.to_string({}, true)) ) << std::endl;
+   });
+
+   // ——— Ethereum keypair -> Wire K1 ———
+   // An Ethereum keypair is plain secp256k1, the SAME curve as Wire K1, so an existing Ethereum key can be
+   // reused AS a Wire K1 signing key. Two caveats are surfaced in the help text and matter for the user:
+   //   * K1 signs with Wire's STANDARD secp256k1 scheme, NOT Ethereum's EIP-191 personal_sign. A browser
+   //     wallet (MetaMask) cannot produce K1 signatures for Wire transactions; the private key must live in
+   //     a Wire signer (kiod). To keep signing with the Ethereum wallet, import the key as EM instead
+   //     (`convert em_private_key`), which preserves the EIP-191 path.
+   //   * The Ethereum address is keccak256(uncompressed pubkey)[-20:] -- a hash, not reversible to a key. It
+   //     is printed only so the converted key can be matched to the expected Ethereum account.
+
+   // Standard Ethereum address (low 20 bytes of keccak256 over the 64-byte X||Y) from an EM public key.
+   auto eth_address_of = [](const fc::em::public_key& em_pub) -> std::string {
+      const auto unc = em_pub.serialize_uncompressed();   // 65 bytes: 0x04 || X(32) || Y(32)
+      const auto h = fc::crypto::keccak256::hash(
+         std::span<const uint8_t>{ reinterpret_cast<const uint8_t*>(unc.data()) + 1, 64 });
+      return "0x" + fc::to_hex(reinterpret_cast<const char*>(h.data()) + 12, 20);
+   };
+
+   string eth_k1_secret;
+   auto eth_to_k1_private_cmd = convert_cmd->add_subcommand("eth_to_k1_private",
+      localized("Reuse an existing Ethereum private key as a Wire K1 signing pair (same secp256k1 secret), "
+                "printing PVT_K1_/PUB_K1_ and the matching Ethereum address. NOTE: a K1 key signs with Wire's "
+                "standard scheme, not Ethereum EIP-191 -- MetaMask cannot sign for it, so the private key must "
+                "be held in a Wire signer (kiod). To keep signing with MetaMask instead, use `convert em_private_key`."));
+   eth_to_k1_private_cmd->add_option("--private-key", eth_k1_secret,
+      localized("Raw Ethereum secret: 0x<64 hex> or 64 hex. Omit to enter it at the prompt; passing it here "
+                "exposes the secret in ps/shell history"))->expected(0, 1);
+   eth_to_k1_private_cmd->add_option("-f,--file", key_file, localized("Write key output to this file (or pass --to-console)"));
+   eth_to_k1_private_cmd->add_flag("--to-console", print_console, localized("Print keys to console."));
+   eth_to_k1_private_cmd->callback([&] {
+      if (key_file.empty() && !print_console) {
+         std::cerr << "ERROR: Either indicate a file using \"--file\" or pass \"--to-console\"" << std::endl;
+         return;
+      }
+      if (eth_k1_secret.empty()) {
+         std::cout << localized("Ethereum private key: ");
+         fc::set_console_echo(false);
+         std::getline(std::cin, eth_k1_secret, '\n');
+         fc::set_console_echo(true);
+         std::cout << std::endl;
+      }
+      // Same secp256k1 secret, re-tagged as a Wire K1 key (ecc shim) rather than EM.
+      const auto em_priv = fc::em::private_key::from_native_string(eth_k1_secret);
+      const auto k1_priv = fc::crypto::private_key::regenerate<fc::ecc::private_key_shim>(em_priv.get_secret());
+      const auto k1_pub  = k1_priv.get_public_key();
+      const std::string addr = eth_address_of(em_priv.get_public_key());
+      if (print_console) {
+         std::cout << localized("Private key: ${k}", ("k", k1_priv.to_string({}, true))) << std::endl;
+         std::cout << localized("Public key: ${k}",  ("k", k1_pub.to_string({}, true)))  << std::endl;
+         std::cout << localized("Ethereum address: ${a}", ("a", addr)) << std::endl;
+      } else {
+         std::cerr << localized("saving keys to ${f}", ("f", key_file)) << std::endl;
+         std::ofstream out( key_file.c_str() );
+         out << localized("Private key: ${k}", ("k", k1_priv.to_string({}, true))) << std::endl;
+         out << localized("Public key: ${k}",  ("k", k1_pub.to_string({}, true)))  << std::endl;
+         out << localized("Ethereum address: ${a}", ("a", addr)) << std::endl;
+      }
+   });
+
+   string eth_k1_pubhex;
+   auto eth_to_k1_public_cmd = convert_cmd->add_subcommand("eth_to_k1_public",
+      localized("Convert an Ethereum uncompressed public key (0x04<128 hex>, or 0x<128 hex> for raw X||Y) to a "
+                "Wire PUB_K1_, plus the matching Ethereum address. Use this to register an account's K1 key "
+                "without handling the private key; signing still requires that private key in a Wire signer."));
+   eth_to_k1_public_cmd->add_option("public-key", eth_k1_pubhex,
+      localized("Ethereum uncompressed public key: 0x04 + 128 hex (65 bytes) or 128 hex (64-byte X||Y)"))->required();
+   eth_to_k1_public_cmd->callback([&] {
+      std::string s = eth_k1_pubhex;
+      if (s.rfind("0x", 0) == 0 || s.rfind("0X", 0) == 0) s = s.substr(2);
+      SYSC_ASSERT(s.size() == 130 || s.size() == 128,
+                  "ERROR: expected an uncompressed Ethereum public key: 0x04+128 hex (65 bytes) or 128 hex (64-byte X||Y)");
+      if (s.size() == 130) {
+         SYSC_ASSERT(s.substr(0, 2) == "04", "ERROR: 65-byte form must begin with the 04 uncompressed prefix");
+         s = s.substr(2);   // drop 04; keep X||Y
+      }
+      std::array<char, 65> unc{};
+      unc[0] = static_cast<char>(0x04);
+      fc::from_hex(s, unc.data() + 1, 64);
+      const fc::em::public_key em_pub{ unc };
+      const auto compressed = em_pub.serialize();   // 33-byte compressed point
+      const fc::crypto::public_key k1_pub{
+         fc::crypto::public_key::storage_type{ fc::ecc::public_key_shim{ compressed } } };
+      std::cout << localized("Public key: ${k}", ("k", k1_pub.to_string({}, true))) << std::endl;
+      std::cout << localized("Ethereum address: ${a}", ("a", eth_address_of(em_pub))) << std::endl;
    });
 
    string name_input;

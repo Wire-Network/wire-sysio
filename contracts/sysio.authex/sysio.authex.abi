@@ -65,6 +65,24 @@
                     "type": "public_key"
                 }
             ]
+        },
+        {
+            "name": "recordlink",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "chain_kind",
+                    "type": "ChainKind"
+                },
+                {
+                    "name": "pub_key",
+                    "type": "public_key"
+                }
+            ]
         }
     ],
     "actions": [
@@ -76,6 +94,11 @@
         {
             "name": "createlink",
             "type": "createlink",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "recordlink",
+            "type": "recordlink",
             "ricardian_contract": ""
         }
     ],

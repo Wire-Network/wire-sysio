@@ -200,6 +200,10 @@
                 {
                     "name": "block_num",
                     "type": "uint128"
+                },
+                {
+                    "name": "reason",
+                    "type": "uint8"
                 }
             ]
         },
@@ -244,6 +248,28 @@
                 {
                     "name": "network_gen",
                     "type": "uint8"
+                }
+            ]
+        },
+        {
+            "name": "nodeownreg",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "name"
+                },
+                {
+                    "name": "tier",
+                    "type": "uint8"
+                },
+                {
+                    "name": "eth_pub_key",
+                    "type": "public_key"
+                },
+                {
+                    "name": "wire_pub_key",
+                    "type": "public_key"
                 }
             ]
         },
@@ -509,6 +535,11 @@
         {
             "name": "newuser",
             "type": "newuser",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "nodeownreg",
+            "type": "nodeownreg",
             "ricardian_contract": ""
         },
         {

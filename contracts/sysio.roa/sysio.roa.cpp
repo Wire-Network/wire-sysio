@@ -2,7 +2,17 @@
 #include "sysio.system/native.hpp"
 #include "sysio.system/emissions.hpp"
 
+#include <sysio.authex/sysio.authex.hpp>
+#include <sysio/permission.hpp>   // get_permission -- read an account's active authority in nodeownreg
+
 namespace sysio {
+
+    namespace {
+        // sysio.authex identifiers used by the node-owner depot dispatch (invariant: no magic
+        // literals -- a contract rename is one change here, not scattered across call sites).
+        constexpr name AUTHEX_ACCOUNT    = "sysio.authex"_n;
+        constexpr name AUTHEX_RECORDLINK = "recordlink"_n;
+    } // anonymous namespace
 
     bool is_sysio_account(const name& account) {
         return account.prefix() == "sysio"_n;
@@ -584,6 +594,10 @@ namespace sysio {
     };
 
     void roa::forcereg(const name& owner, const uint8_t& tier) {
+        // Privileged bootstrap/test registration -- see the header doc. Governance/system-only
+        // (require_auth self); bypasses the OPP claim path (nodeownreg). Beyond the tier-range guard
+        // it does no name-rule / active-key / authex validation and writes no nodeownerreg audit row
+        // -- it just runs the shared tier allocator.
         require_auth(get_self());
 
         check(tier > 0 && tier <= 3, "Tier level must be between 1 and 3");
@@ -591,7 +605,142 @@ namespace sysio {
         regnodeowner(owner, tier);
     };
 
+    void roa::nodeownreg(const name& owner, const uint8_t& tier, const public_key& eth_pub_key,
+                         const public_key& wire_pub_key) {
+        // Dispatched by the OPP depot (sysio.msgch) when it processes an inbound
+        // ATTESTATION_TYPE_NODE_OWNER_REG attestation. msgch inline-sends newnameduser (account
+        // create) and then this action, both declaring permission_level{sysio.roa, active}; the
+        // chain accepts that declaration because sysio.roa.active trusts msgch@sysio.code via a
+        // code-permission delegation wired at bootstrap (same shape as the sysio.opreg grant). So
+        // require_auth(get_self()) is the correct gate: only the delegated depot dispatch satisfies
+        // it. Inline actions run depth-first, so newnameduser's newaccount has already executed and
+        // `owner` exists by the time this runs.
+        require_auth(get_self());
+
+        // ---- Envelope / system invariants (depot misuse) ----
+        // Trust-OPP: well-formed traffic cannot trip these, so a failure means the depot has a bug
+        // or the system is misconfigured -- abort loudly. These are NOT claim-payload errors.
+        check(tier > 0 && tier <= 3, "Tier level must be between 1 and 3");
+        // NFT deposits land on Ethereum, so the recorded link is always an EM (secp256k1) key.
+        check(eth_pub_key.index() == fc::crypto::key_type_em,
+              "eth_pub_key must be an EM (secp256k1) public key");
+
+        // ---- Claim-payload checks (trust-OPP soft-fail) ----
+        // The OPP envelope can be well-formed while the claim inside it is bad (the name the user
+        // chose is invalid, names an account they do not control, or is a replay). Aborting the
+        // dispatching transaction would be bad UX, leave no audit row, and give the batch operator
+        // undefined retry semantics. Instead record a REJECTED row with a reason and return, so the
+        // transaction commits and the failure is queryable on Wire (no outbound error attestation).
+
+        // (1) the chosen name must be valid for the tier (newnameduser skipped creation otherwise).
+        if (!valid_name_for_tier(owner, tier)) {
+            record_nodereg(owner, tier, REJECTED, NAME_INVALID);
+            return;
+        }
+
+        // (2) the account must exist. newnameduser creates it in-flow; a valid name that still has
+        // no account means creation did not occur (defensive -- normally unreachable).
+        if (!is_account(owner)) {
+            record_nodereg(owner, tier, REJECTED, OWNER_NOT_ACCOUNT);
+            return;
+        }
+
+        // (3) the account must be controlled by exactly the claimed wire key. For a just-created
+        // account this is the key newnameduser set; for a pre-existing account it proves the claimant
+        // controls it -- an NFT cannot be claimed into an account someone else holds.
+        if (!active_key_matches(owner, wire_pub_key)) {
+            record_nodereg(owner, tier, REJECTED, ACCOUNT_KEY_MISMATCH);
+            return;
+        }
+
+        // (4) must not already be a registered node owner -- a replay / double-claim. Record
+        // DUPLICATE and return so the claim is idempotent and auditable. ROA-active is a hard
+        // system invariant (the network cannot function with ROA inactive).
+        {
+            roastate_t roastate(get_self());
+            auto state = roastate.get();
+            check(state.is_active, "ROA is not active yet");
+            nodeowners_t nodeowners(get_self(), state.network_gen);
+            if (nodeowners.contains(nodeowner_key{owner.value})) {
+                record_nodereg(owner, tier, REJECTED, DUPLICATE);
+                return;
+            }
+        }
+
+        // (5) the account must not already carry a *different* EVM link than this claim. recordlink is
+        // idempotent per (account, chain) and would silently keep the existing key, so a claim with a
+        // new depositor key would otherwise record CONFIRMED against a stale link. Detect that here and
+        // soft-fail rather than overwrite or mis-record.
+        {
+            authex::links_t links(AUTHEX_ACCOUNT);
+            auto by_namechain = links.get_index<"bynamechain"_n>();
+            auto it = by_namechain.find(to_namechain_key(owner, opp::types::ChainKind::CHAIN_KIND_EVM));
+            if (it != by_namechain.end() && it->pub_key != eth_pub_key) {
+                record_nodereg(owner, tier, REJECTED, LINK_KEY_MISMATCH);
+                return;
+            }
+        }
+
+        // Record the depositor's ETH key as a sysio.authex link via the trusted depot-only path.
+        // recordlink requires sysio.authex.active, satisfied by the sysio.roa@sysio.code delegation
+        // on authex; it is idempotent and non-throwing. EVM-only by design (NFT deposits originate
+        // on Ethereum); to extend to another ChainKind, promote the kind to an action parameter.
+        action(permission_level{AUTHEX_ACCOUNT, "active"_n}, AUTHEX_ACCOUNT, AUTHEX_RECORDLINK,
+               std::make_tuple(owner, opp::types::ChainKind::CHAIN_KIND_EVM, eth_pub_key)).send();
+
+        regnodeowner(owner, tier);
+        record_nodereg(owner, tier, CONFIRMED, NONE);
+    };
+
     // ---- Private Helper Function ----
+
+    void roa::record_nodereg(const name& owner, const uint8_t& tier, uint8_t status, uint8_t reason) {
+        roastate_t roastate(get_self());
+        auto state = roastate.get();
+
+        nodeownerreg_t nodereg(get_self(), state.network_gen);
+        auto reg_key = nodeownerreg_key{owner.value};
+
+        auto write = [&](auto& row) {
+            row.owner  = owner;
+            row.status = status;
+            row.tier   = tier;
+            row.reason = reason;
+            // trx_id / trx_signature / block_num are unused under trust-OPP (the OPP envelope is the
+            // deposit proof); leave them at their default-constructed values.
+        };
+
+        if (nodereg.contains(reg_key)) {
+            nodereg.modify(get_self(), reg_key, write);
+        } else {
+            nodeownerreg row{};
+            write(row);
+            nodereg.emplace(get_self(), reg_key, row);
+        }
+    }
+
+    bool roa::valid_name_for_tier(const name& account, uint8_t tier) {
+        const size_t len = account.length();
+        // Tier-1 owners take a short 2-6 char prefix (sub-accounts become <prefix>.<random>);
+        // tier 2/3 take a 1-12 char vanity name.
+        if (tier == 1) return len >= 2 && len <= 6;
+        return len >= 1 && len <= 12;
+    }
+
+    bool roa::active_key_matches(const name& account, const public_key& key) {
+        // The claim is valid iff `key` can satisfy the account's `active` authority by itself: it
+        // appears among the keys with weight >= threshold. We deliberately do NOT require a single-key
+        // authority or an empty `accounts` list -- a standard account also carries an
+        // <account>@sysio.code entry (benign: it grants the account's own contract inline-action
+        // rights, not external control), and newnameduser-created accounts have neither. A claim into
+        // an account a different key controls still fails: that key won't be among `auth.keys`.
+        auto perm = get_permission(account, "active"_n);
+        if (!perm.has_value() || perm->auth.threshold == 0) return false;
+        for (const auto& kw : perm->auth.keys) {
+            if (kw.key == key && kw.weight >= perm->auth.threshold) return true;
+        }
+        return false;
+    }
 
     void roa::regnodeowner(const name& owner, const uint8_t& tier) {
 
@@ -878,19 +1027,15 @@ namespace sysio {
         // mismatch on a pre-existing account is caught downstream by nodeownreg's soft-fail.
         if (is_account(account)) return;
 
-        // Tier-based name rules. The claim DApp pre-validates names, so a bad one here means a depot
-        // bug -> abort. Charset ([a-z1-5.]) is already enforced by the name type. Tier-1 owners take
-        // a short 2-6 char prefix (their sub-accounts become <prefix>.<random>); tier 2/3 take a
-        // full-length vanity name.
+        // Tier is a depot/system invariant -- a bad value means the dispatch is malformed, so abort
+        // (the name charset [a-z1-5.] is already enforced by the name type).
         check(tier >= 1 && tier <= 3, "Tier level must be between 1 and 3");
-        size_t len = account.length();
-        if (tier == 1) {
-            check(len >= 2 && len <= 6, "Tier-1 owner name must be a 2-6 character prefix");
-        } else {
-            check(len >= 1 && len <= 12, "Name must be 1-12 characters");
-        }
+        // The chosen name is claim-payload: if it violates the tier's length rule, skip creation
+        // (non-throwing) and let nodeownreg soft-fail with NAME_INVALID. Without this guard a bad
+        // name would either abort the depot dispatch or create an account the claim then rejects.
+        if (!valid_name_for_tier(account, tier)) return;
 
-        // Create the account with the holder's K1 key as both owner and active.
+        // Create the account with the holder's key as both owner and active.
         auto auth = sysiosystem::authority{1, {{pubkey, 1}}, {}};
         action(permission_level{get_self(), "active"_n}, "sysio"_n, "newaccount"_n,
                std::make_tuple(get_self(), account, auth, auth)).send();

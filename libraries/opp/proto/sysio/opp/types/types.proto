@@ -39,6 +39,31 @@ enum ChainKeyType {
   CHAIN_KEY_TYPE_SUI      = 5;
 }
 
+// Wire public_key variant type. Identifies which `sysio::public_key` alternative the `WireKey.key`
+// raw bytes decode to. The bytes carry NO leading variant-index byte -- this enum is the type
+// discriminant instead. Values are (variant index + 1), leaving 0 for UNKNOWN per the proto3
+// convention used throughout this file. Distinct from `ChainKeyType`, which is keyed on chain family
+// (WIRE/ETHEREUM/SOLANA/...) and cannot express R1 or WebAuthn.
+enum WireKeyType {
+  WIRE_KEY_TYPE_UNKNOWN = 0;
+  WIRE_KEY_TYPE_K1      = 1;   // secp256k1            (sysio::public_key variant index 0)
+  WIRE_KEY_TYPE_R1      = 2;   // secp256r1 / P-256    (1)
+  WIRE_KEY_TYPE_WA      = 3;   // WebAuthn             (2)
+  WIRE_KEY_TYPE_EM      = 4;   // Ethereum secp256k1   (3)
+  WIRE_KEY_TYPE_ED      = 5;   // ed25519              (4)
+  WIRE_KEY_TYPE_BLS     = 6;   // BLS12-381            (5)
+}
+
+// A typed Wire public key. `key` is the bare serialized key bytes (NO leading variant-index byte);
+// `key_type` names the `sysio::public_key` variant they decode to. Kept as its own message rather
+// than a field on the shared `ChainAddress` so that adding it does not change the abi layout of the
+// many contract tables that already store a `ChainAddress` -- a new, usually-default field there is
+// omitted by proto3 on the wire but expected by the regenerated abi, which breaks table decodes.
+message WireKey {
+  WireKeyType key_type = 1;
+  bytes       key      = 2;
+}
+
 // Address on a specific chain.
 message ChainAddress {
   ChainKind kind    = 1;

@@ -99,8 +99,50 @@ namespace sysio {
             void reducepolicy(const name& owner, const name& issuer, const asset& net_weight, const asset& cpu_weight, const asset& ram_weight, const uint8_t& network_gen);
 
 
+            /**
+             * @brief Directly register `owner` as a node owner at `tier`, bypassing the OPP claim
+             *        flow. Privileged bootstrap/test path -- NOT the production registration route.
+             *
+             * Requires `sysio.roa` active authority, so it is governance/system-only and never
+             * user-callable. It exists to seed node owners where the full OPP machinery is absent or
+             * unnecessary: the C++ unit-test base tester (registers `nodedaddy` as the default policy
+             * issuer for the suite), emissions tests, the TestHarness bios bootstrap, and dev clusters.
+             *
+             * Production node-owner registration goes through `nodeownreg` instead -- dispatched by
+             * the OPP depot (sysio.msgch) on an inbound NodeOwnerRegistration attestation, or
+             * governance-signed during bootstrap. Beyond the tier-range check, `forcereg` performs
+             * none of `nodeownreg`'s claim-payload validation (no tier name-rule check, no active-key
+             * match, no sysio.authex link) and writes no `nodeownerreg` audit row -- it simply
+             * allocates the tier's SYS via the shared `regnodeowner` helper.
+             *
+             * @param owner The account to register as a node owner.
+             * @param tier  Node owner tier: 1, 2, or 3.
+             */
             [[sysio::action]]
             void forcereg(const name& owner, const uint8_t& tier);
+
+            /**
+             * @brief Registers a node owner when the depot (sysio.msgch) processes an inbound OPP
+             *        NodeOwnerRegistration attestation. The register step of the NFT claim flow; the
+             *        depot inline-sends newnameduser (account create) immediately before this so the
+             *        account already exists when nodeownreg runs.
+             *
+             * Trust-OPP: the OPP envelope is the deposit proof, so this RECORDS the depositor's ETH
+             * key as a sysio.authex link (inline recordlink) rather than verifying a pre-existing
+             * createlink. Claim-payload problems (bad name, account controlled by a different key,
+             * already registered) are soft-failed -- recorded in `nodeownerreg` with a reject_reason
+             * and returned -- never thrown, so the dispatching transaction commits. Depot/system
+             * invariants (tier range, ETH key type, ROA active) stay hard checks.
+             *
+             * @param owner        The Wire account to register as node owner (created in-flow if absent).
+             * @param tier         Node owner tier: 1, 2, or 3.
+             * @param eth_pub_key  The depositor's ETH public key (Wire PUB_EM format); recorded as the link.
+             * @param wire_pub_key The Wire account owner/active key the claim specified; an existing
+             *                     account must be controlled by exactly this key or the claim is rejected.
+             */
+            [[sysio::action]]
+            void nodeownreg(const name& owner, const uint8_t& tier, const public_key& eth_pub_key,
+                            const public_key& wire_pub_key);
 
             /**
              * @brief Creates a new user account on the network and records the sponsor mapping.
@@ -278,19 +320,41 @@ namespace sysio {
                 SYSLIB_SERIALIZE(nodeownerreg_key, (owner))
             };
 
+            // Registration outcome recorded in `nodeownerreg::status`. Create-in-flow nodeownreg
+            // resolves a claim in a single action, recording a terminal status directly -- there is
+            // no intermediate INTENT/PENDING state (those belonged to the retired multi-step flow).
+            enum reg_status : uint8_t { CONFIRMED = 0, REJECTED = 1 };
+
+            // Rejection reason for `nodeownerreg::reason` (only meaningful when status == REJECTED).
+            // Under trust-OPP, nodeownreg soft-fails claim-payload errors by recording one of these
+            // instead of aborting the dispatching transaction, so the failure is queryable on Wire.
+            // (Values renumbered for the create-in-flow model: the ETH link is now *recorded* via
+            // sysio.authex::recordlink rather than verified against a pre-existing createlink, so the
+            // former NO_AUTHEX_LINK / KEY_MISMATCH reasons no longer apply. Pre-launch: no stored rows
+            // to migrate.)
+            enum reject_reason : uint8_t {
+                NONE                 = 0,  // not rejected
+                NAME_INVALID         = 1,  // chosen account name violates the tier's length rule
+                OWNER_NOT_ACCOUNT    = 2,  // account does not exist (creation did not occur)
+                ACCOUNT_KEY_MISMATCH = 3,  // existing account's active authority != the single claimed wire key
+                DUPLICATE            = 4,  // owner is already a registered node owner
+                LINK_KEY_MISMATCH    = 5   // account already carries a different external-chain link key
+            };
+
             struct [[sysio::table("nodeownerreg")]] nodeownerreg {
                 name owner;                     // Node Owners account name
-                uint8_t status;                 // Node Owners registration status 0-> INTENT / 1-> PENDING  / 2-> CONFIRMED / 3-> REJECTED
+                uint8_t status;                 // Registration outcome (reg_status): 0 -> CONFIRMED / 1 -> REJECTED
                 checksum256 trx_id;             // Transaction Id of Ethereum deposit
                 bytes trx_signature;            // Transaction Signature of Ethereum deposit
                 uint8_t tier;                   // Tier of Node Owner
                 uint128_t block_num;            // Ethereum Block number the deposit transaction is included in
+                uint8_t reason;                 // Rejection reason (see reject_reason); NONE(0) unless status == REJECTED
 
                 uint64_t by_tier() const { return static_cast<uint64_t>(tier); }
                 uint64_t by_status() const {return static_cast<uint64_t>(status); }
                 checksum256 by_trxid() const {return trx_id; }
 
-                SYSLIB_SERIALIZE(nodeownerreg, (owner)(status)(trx_id)(trx_signature)(tier)(block_num))
+                SYSLIB_SERIALIZE(nodeownerreg, (owner)(status)(trx_id)(trx_signature)(tier)(block_num)(reason))
             };
 
             using nodeownerreg_t = kv::scoped_table<"nodeownerreg"_n, nodeownerreg_key, nodeownerreg,
@@ -351,6 +415,45 @@ namespace sysio {
              */
 
             void regnodeowner(const name& owner, const uint8_t& tier);
+
+            /**
+             * @brief Upsert a row in the `nodeownerreg` audit table. Used by `nodeownreg` to
+             *        record the outcome of an OPP claim: CONFIRMED on success, or REJECTED with a
+             *        `reject_reason` for a claim-payload failure (trust-OPP soft-fail). Reusing the
+             *        existing table keeps the claim outcome queryable on Wire without aborting the
+             *        dispatching transaction.
+             *
+             * @param owner   The claimed account name.
+             * @param tier    The claimed tier.
+             * @param status  reg_status to record (CONFIRMED or REJECTED).
+             * @param reason  reject_reason; reject_reason::NONE for a CONFIRMED row.
+             */
+            void record_nodereg(const name& owner, const uint8_t& tier, uint8_t status, uint8_t reason);
+
+            /**
+             * @brief Whether `account`'s name satisfies the node-owner name-length rule for `tier`.
+             *        Tier-1 owners take a short 2-6 char prefix (sub-accounts become <prefix>.<random>);
+             *        tier 2/3 take a 1-12 char vanity name. Shared by newnameduser (gates creation) and
+             *        nodeownreg (records NAME_INVALID) so the rule lives in one place.
+             *
+             * @param account The chosen account name.
+             * @param tier    Node-owner tier (must already be validated to 1-3).
+             * @return true if the name length is valid for the tier.
+             */
+            static bool valid_name_for_tier(const name& account, uint8_t tier);
+
+            /**
+             * @brief Whether `key` can satisfy `account`'s `active` authority by itself -- i.e. it
+             *        appears among the active keys with weight >= threshold. Passes for a
+             *        newnameduser-created account ({key}) and for a standard account that also carries
+             *        the benign <account>@sysio.code entry; rejects an account a different key controls
+             *        (that key won't be present) and a multi-sig where `key` alone is insufficient.
+             *
+             * @param account The account whose active permission to inspect.
+             * @param key     The claimed owner/active public key.
+             * @return true if `key` alone controls `account`'s active permission.
+             */
+            static bool active_key_matches(const name& account, const public_key& key);
 
 
             /**

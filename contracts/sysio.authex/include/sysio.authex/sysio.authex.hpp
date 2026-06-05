@@ -218,6 +218,26 @@ namespace sysio {
     // ! For testing only, remove before MAINNET deployment.
     [[sysio::action]] void clearlinks();
 
+    /**
+     * Record an external-chain public-key link WITHOUT signature verification -- the trusted,
+     * depot-only counterpart to createlink. The OPP NodeOwnerRegistration dispatch has already
+     * established (via the deposit attestation) that `pub_key` belongs to `account`, so this skips
+     * createlink's signature/nonce checks and just inserts the link. `require_auth(get_self())`;
+     * idempotent and non-throwing so the trust-OPP depot dispatch is never aborted.
+     *
+     * Unlike createlink, this does NOT enforce a unique `pub_key`: one external wallet may hold
+     * several WireNodes NFTs and back several Wire accounts, so one ETH key -> many accounts is
+     * permitted here. Idempotency is per (account, chain) via the `bynamechain` index.
+     *
+     * @param account    The WIRE account to link.
+     * @param chain_kind The external chain identifier (opp::types::ChainKind).
+     * @param pub_key     The external chain's public key, Wire format.
+     */
+    [[sysio::action]] void recordlink(
+        const name& account,
+        const opp::types::ChainKind chain_kind,
+        const sysio::public_key& pub_key);
+
     // ----- Tables (public so sister contracts can read via cross-contract kv::table reads) -----
 
     struct links_key {

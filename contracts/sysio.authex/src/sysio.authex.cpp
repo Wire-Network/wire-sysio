@@ -5,6 +5,9 @@
 namespace {
 using namespace sysio;
 
+// sysio funds the RAM for every link row (system-paid) -- createlink and recordlink alike.
+constexpr name link_row_payer = "sysio"_n;
+
 using ed_raw_key_t = std::array<uint8_t, 32>;
 
 [[maybe_unused]] ed_raw_key_t get_ed_raw_key(const sysio::public_key& pub_key) {
@@ -112,7 +115,7 @@ namespace sysio {
       auto last = --links.cend();
       next_key = last->key + 1;
    }
-   links.emplace("sysio"_n, links_key{next_key}, links_s{
+   links.emplace(link_row_payer, links_key{next_key}, links_s{
       .key = next_key,
       .username = account,
       .chain_kind = chain_kind,
@@ -139,6 +142,42 @@ namespace sysio {
       itr = links.erase(itr);
    }
 };
+
+
+// Trusted depot-only link insert -- the counterpart to createlink that skips signature/nonce
+// verification. The OPP NodeOwnerRegistration attestation is the proof; the chain accepts this
+// inline send because sysio.authex.active trusts the caller (sysio.roa@sysio.code). Idempotent and
+// non-throwing so the trust-OPP dispatch never aborts.
+[[sysio::action]] void authex::recordlink(const name& account, const opp::types::ChainKind chain_kind,
+                                          const public_key& pub_key) {
+   require_auth(get_self());
+
+   links_t links(get_self());
+   auto by_namechain = links.get_index<"bynamechain"_n>();
+   // Idempotent: if this account already has a link for this chain, leave the table unchanged and
+   // return (never throw -- the trust-OPP depot dispatch must not abort).
+   //
+   // We deliberately do NOT reject when `pub_key` is already linked to a *different* account: one
+   // external wallet can hold several WireNodes NFTs and therefore legitimately back several Wire
+   // accounts, so one ETH key -> many accounts is allowed on this path. The operator path
+   // (createlink) keeps its 1:1 `bypubkey` check, which also guarantees an operator's link is the
+   // lowest-primary-key row for that key; sysio.msgch's resolve_account_from_op_address does a single
+   // `bypubkey.find()` (lowest-primary-key match), so it still lands on the operator's account rather
+   // than a later node-owner duplicate.
+   if (by_namechain.find(to_namechain_key(account, chain_kind)) != by_namechain.end()) return;
+
+   uint64_t next_key = 0;
+   if (links.cbegin() != links.cend()) {
+      auto last = --links.cend();
+      next_key = last->key + 1;
+   }
+   links.emplace(link_row_payer, links_key{next_key}, links_s{
+      .key = next_key,
+      .username = account,
+      .chain_kind = chain_kind,
+      .pub_key = pub_key,
+   });
+}
 
 
 // ----- PRIVATE HELPER METHODS -----
