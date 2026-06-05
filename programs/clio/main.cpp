@@ -2909,6 +2909,15 @@ int main( int argc, char** argv ) {
    // create wallet
    string wallet_name = "default";
    string password_file;
+   /// CLI11 option storage is referenced by registered callbacks after subcommand setup blocks exit.
+   string wallet_key_str;
+   string wallet_rm_key_str;
+   string wallet_rm_name;
+   string wallet_create_key_type;
+   string new_key_name;
+   string current_key_name;
+   string pub_key_str;
+   string priv_key_str;
    auto create_wallet_cmd = wallet_cmd->add_subcommand("create", localized("Create a new wallet locally"));
    create_wallet_cmd->add_option("-n,--name", wallet_name, localized("The name of the new wallet"))->capture_default_str();
    create_wallet_cmd->add_option("-f,--file", password_file, localized("Name of file to write wallet password output to. (Must be set, unless \"--to-console\" is passed"));
@@ -2974,7 +2983,6 @@ int main( int argc, char** argv ) {
 
    // import keys into wallet
    {
-      string wallet_key_str;
       auto import_wallet_cmd = wallet_cmd->add_subcommand("import", localized("Import private key into wallet"));
       import_wallet_cmd->add_option("-n,--name", wallet_name, localized("The name of the wallet to import key into"));
       import_wallet_cmd->add_option("--private-key", wallet_key_str, localized("Private key to import (WIF, PVT_K1_/PVT_R1_/PVT_EM_ prefixed, or 0x hex for EM)"))->expected(0, 1);
@@ -3002,7 +3010,6 @@ int main( int argc, char** argv ) {
 
    // remove keys from wallet
    {
-      string wallet_rm_key_str;
       auto remove_key_wallet_cmd = wallet_cmd->add_subcommand("remove_key", localized("Remove public_key and associated private_key from wallet"));
       remove_key_wallet_cmd->add_option("-n,--name", wallet_name, localized("The name of the wallet to remove key from"));
       remove_key_wallet_cmd->add_option("key", wallet_rm_key_str, localized("Public key to remove"))->required();
@@ -3021,7 +3028,6 @@ int main( int argc, char** argv ) {
    }
 
    {
-      string wallet_rm_name;
       auto remove_name_wallet_cmd = wallet_cmd->add_subcommand("remove_name", localized("Remove named key set from wallet"));
       remove_name_wallet_cmd->add_option("-n,--name", wallet_name, localized("The name of the wallet to remove key set from"));
       remove_name_wallet_cmd->add_option("name", wallet_rm_name, localized("The named set to remove"))->required();
@@ -3036,7 +3042,6 @@ int main( int argc, char** argv ) {
 
    // create a key within wallet
    {
-      string wallet_create_key_type;
       auto create_key_in_wallet_cmd = wallet_cmd->add_subcommand("create_key", localized("Create private key within wallet"));
       create_key_in_wallet_cmd->add_option("-n,--name", wallet_name, localized("The name of the wallet to create key into"))->capture_default_str();
       create_key_in_wallet_cmd->add_option("key_type", wallet_create_key_type, localized("Key type to create (K1/R1/EM/ED)"))->type_name("K1/R1/EM/ED")->capture_default_str();
@@ -3082,11 +3087,6 @@ int main( int argc, char** argv ) {
 
 
    {
-      std::string new_key_name;
-      std::string current_key_name;
-      std::string pub_key_str;
-      std::string priv_key_str;
-
       struct set_key_name_criteria {
          std::string uri_path;
          std::string value;
