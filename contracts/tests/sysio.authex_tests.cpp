@@ -216,7 +216,6 @@ BOOST_FIXTURE_TEST_CASE( createlink_no_account_ram_cost, sysio_authex_tester ) t
    int64_t q0, net, cpu;
    rlm.get_account_limits("alice"_n, q0, net, cpu);
    int64_t u0 = rlm.get_account_ram_usage("alice"_n);
-
    auto link = make_eth_link("alice", now_ms());
    BOOST_REQUIRE_EQUAL( success(), createlink("alice"_n, ChainKind::CHAIN_KIND_EVM, "alice", link.sig, link.pub, link.nonce) );
    produce_blocks();

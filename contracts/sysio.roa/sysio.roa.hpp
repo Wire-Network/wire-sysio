@@ -99,37 +99,6 @@ namespace sysio {
             void reducepolicy(const name& owner, const name& issuer, const asset& net_weight, const asset& cpu_weight, const asset& ram_weight, const uint8_t& network_gen);
 
 
-            /**
-             * @brief Initiates the node registration process.
-             *
-             * @param owner The account name of the node owner.
-             * @param tier Tier level of the node owner.
-             */
-            [[sysio::action]]
-            void initnodereg(const name& owner);
-
-
-            /**
-             * @brief After the Node Owner deposits their Wire-Node NFT to the NodeMan contract on Ethereum this action is called to update their intent with the transaction ID and Signature of the Eth Deposit setting the status of their registration to pending (1)
-             *
-             * @param owner The account name of the node owner.
-             * @param tier The tier level of the node owner.
-             * @param trx_id The transaction ID of the transaction on Ethereum.
-             * @param block_num The block number on ETH that the deposit was in.
-             * @param sig The signature of the Ethereum deposit
-             */
-            [[sysio::action]]
-            void setpending(const name& owner, const uint8_t& tier ,const checksum256& trx_id, const uint128_t& block_num, const bytes& sig);
-
-            /**
-             * @brief Finalizes registration process.
-             *
-             * @param owner Account name of the node owner.
-             * @param status Status of deposit state: 2-> CONFIRMED / 3-> REJECTED
-             */
-            [[sysio::action]]
-            void finalizereg(const name& owner,const uint8_t& status);
-
             [[sysio::action]]
             void forcereg(const name& owner, const uint8_t& tier);
 
@@ -159,19 +128,62 @@ namespace sysio {
             name newuser(const name& creator, const name& nonce, const public_key& pubkey);
 
             /**
+             * @brief Create a node-owner account with a user-chosen (vanity) name and the holder's
+             * K1 key as owner/active, funded with the fixed newaccount_ram from sysio's pool. The
+             * create step of the OPP NFT claim flow (create -> createlink -> nodeownreg).
+             *
+             * Dispatched by the OPP depot (sysio.msgch) as {sysio.roa, active} via delegation, like
+             * nodeownreg. Idempotent: a no-op if the account already exists. Tier-based name rules:
+             * tier-1 = 2-6 char prefix; tier 2/3 = up to 12 chars.
+             *
+             * @param account The user-chosen account name.
+             * @param pubkey  The holder's K1 public key (becomes owner and active).
+             * @param tier    Node-owner tier 1/2/3 (selects the name-length rule).
+             */
+            [[sysio::action]]
+            void newnameduser(const name& account, const public_key& pubkey, uint8_t tier);
+
+            /**
              * @brief Gifts an account exactly the RAM consumed since `usage_before`.
              *
-             * Called by sysio.authex after createlink adds an external-chain key to an
-             * account's `active` permission: it gifts `get_ram_usage(account) - usage_before`
-             * (drawn from sysio's pool), so each link adds only the RAM it actually used.
-             * RAM is checked at transaction end, so usage already reflects the key-add when
-             * this runs. Callable only by `sysio.authex`.
+             * Authorized by `sysio.roa` itself: it gifts `get_ram_usage(account) - usage_before`
+             * (drawn from sysio's pool), so a change adds only the RAM it actually used.
+             * RAM is checked at transaction end, so usage already reflects the change when this
+             * runs. The reconciliation is bidirectional: `delta > 0` gifts from sysio's pool,
+             * `delta < 0` reclaims back to it (e.g. re-deploying a smaller contract). Inline-called
+             * by setsyscode/setsysabi (a follow-on PR drives per-contract gifting). createlink no
+             * longer calls giftram -- it records the external-chain link only and bills the row to
+             * sysio -- so `sysio.authex` is not an authorizer.
              *
-             * @param account      The account to receive the RAM.
-             * @param usage_before The account's `get_ram_usage` snapshot before the key-add.
+             * @param account      The account to reconcile.
+             * @param usage_before The account's `get_ram_usage` snapshot before the change.
              */
             [[sysio::action]]
             void giftram(const name& account, int64_t usage_before);
+
+            /**
+             * @brief Deploy a system contract's code to `account`, making it privileged, and gift
+             * the exact RAM the code consumes out of sysio's pool (via giftram, measured after).
+             * Re-callable: a smaller re-deploy reclaims the freed RAM. Callable by `sysio`.
+             *
+             * @param account   The account to set code on.
+             * @param vmtype    VM type (0 for wasm).
+             * @param vmversion VM version (0).
+             * @param code      The contract wasm bytes.
+             */
+            [[sysio::action]]
+            void setsyscode(const name& account, uint8_t vmtype, uint8_t vmversion, const bytes& code);
+
+            /**
+             * @brief Set a system contract's abi on `account` and gift the exact RAM it consumes
+             * out of sysio's pool (via giftram, measured after). Re-callable: a smaller/cleared abi
+             * reclaims the freed RAM. Callable by `sysio`.
+             *
+             * @param account The account to set the abi on.
+             * @param abi     The serialized abi bytes.
+             */
+            [[sysio::action]]
+            void setsysabi(const name& account, const bytes& abi);
 
         private:
 
