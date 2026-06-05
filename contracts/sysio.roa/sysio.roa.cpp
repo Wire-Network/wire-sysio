@@ -108,6 +108,14 @@ namespace sysio {
 
         const int64_t total_amount = total_sys.amount; // smallest units
 
+        // Bound the supply so the tier math below (e.g. total_amount * 15) and the later
+        // leftover * bytes_per_unit conversion stay within int64. activateroa is a one-time governance
+        // call at bootstrap with a sane supply (~7.5e8 units), so this only rejects absurd inputs --
+        // far above any real supply and well below where the derived math would overflow.
+        // 1e15 units = 1e11 SYS: ~1e6x any real supply, ~8x below the binding overflow point.
+        constexpr int64_t max_total_sys_amount = 1'000'000'000'000'000; // 1e15
+        check(total_amount > 0 && total_amount <= max_total_sys_amount, "Total SYS out of range");
+
         // Fractions per node (rational approach). Tier counts come from the
         // shared constants in sysio.system/emissions.hpp so this matches
         // sysio.system::addnodeowner's per-tier cap exactly.
@@ -132,9 +140,8 @@ namespace sysio {
         // Guard the signed->unsigned conversion below. For a very small supply, tier rounding can push
         // the node-owner reserve (`allocated`) past `total_amount`, making `leftover` negative; casting
         // that to uint64_t would underflow into a huge byte count that sails past the sysio_gross check
-        // and activates ROA with garbage reslimits. Require a positive supply whose reserve fits, so
-        // `leftover` is non-negative before the conversion.
-        check(total_amount > 0, "Total SYS must be positive");
+        // and activates ROA with garbage reslimits. Require the node-owner reserve to fit the supply
+        // (positivity and the upper bound are already checked above), so `leftover` is non-negative.
         check(allocated <= total_amount, "Total SYS too small: node-owner reserve exceeds supply");
 
         // Convert the leftover (SYS units) to bytes and partition it so the grand total of all

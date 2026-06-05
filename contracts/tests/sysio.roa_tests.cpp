@@ -1433,4 +1433,14 @@ BOOST_FIXTURE_TEST_CASE( activateroa_accepts_normal_supply, roa_unactivated_test
    BOOST_REQUIRE_NO_THROW( activate("75496.0000 SYS", 104) );
 } FC_LOG_AND_RETHROW()
 
+// A supply above the bound is rejected before the tier math (total_amount * 15, leftover *
+// bytes_per_unit) could overflow int64. Defense in depth -- activateroa is a one-time governance call
+// and real supplies are ~1e6x smaller.
+BOOST_FIXTURE_TEST_CASE( activateroa_rejects_oversized_supply, roa_unactivated_tester ) try {
+   BOOST_REQUIRE_EXCEPTION(
+      activate("200000000000.0000 SYS", 104),  // 2e15 units, above the 1e15 bound
+      sysio_assert_message_exception,
+      sysio_assert_message_is("Total SYS out of range"));
+} FC_LOG_AND_RETHROW()
+
 BOOST_AUTO_TEST_SUITE_END()
