@@ -1170,6 +1170,8 @@ namespace sysio {
         last_handshake_recv(),
         last_handshake_sent()
    {
+      /// Incoming listener type is authoritative; a peer's advertised address may only narrow it later.
+      set_connection_type( listen_address );
       fc_dlog( p2p_conn_log, "new connection - {} object created for peer {}:{} from listener {}",
                connection_id, log_remote_endpoint_ip, log_remote_endpoint_port, listen_address );
    }
@@ -3564,7 +3566,7 @@ namespace sysio {
 
          if( incoming() ) {
             if (auto [host, port, type] = net_utils::split_host_port_type(msg.p2p_address); !host.empty())
-               set_connection_type( msg.p2p_address);
+               set_peer_connection_type( msg.p2p_address);
             else
                peer_dlog(p2p_msg_log, this, "Invalid handshake p2p_address {}", msg.p2p_address);
          } else {
@@ -4549,9 +4551,16 @@ namespace sysio {
             if (!p2ps.front().empty()) { // "" for p2p-listen-endpoint means to not listen
                p2p_addresses = p2ps;
                auto addr_count = p2p_addresses.size();
-               std::sort(p2p_addresses.begin(), p2p_addresses.end());
-               auto last = std::unique(p2p_addresses.begin(), p2p_addresses.end());
-               p2p_addresses.erase(last, p2p_addresses.end());
+               /// Preserve endpoint order because p2p-server-address values are paired positionally.
+               vector<string> deduped_p2p_addresses;
+               deduped_p2p_addresses.reserve(p2p_addresses.size());
+               chain::flat_set<string> seen_p2p_addresses;
+               for( const auto& addr : p2p_addresses ) {
+                  if( seen_p2p_addresses.insert(addr).second ) {
+                     deduped_p2p_addresses.emplace_back(addr);
+                  }
+               }
+               p2p_addresses = std::move(deduped_p2p_addresses);
                if( size_t addr_diff = addr_count - p2p_addresses.size(); addr_diff != 0) {
                   fc_wlog( p2p_conn_log, "Removed {} duplicate p2p-listen-endpoint entries", addr_diff);
                }
