@@ -643,14 +643,14 @@ namespace sysio {
       void set_connection_type( const string& peer_addr );
       void set_peer_connection_type( const string& peer_addr );
       bool is_transactions_only_connection()const {
-         return connection_type == net_utils::connection_type::transactions_only;
+         return conn_type == net_utils::connection_type::transactions_only;
       } // thread safe, atomic
-      bool is_blocks_only_connection()const { return connection_type == net_utils::connection_type::blocks_only; }
+      bool is_blocks_only_connection()const { return conn_type == net_utils::connection_type::blocks_only; }
       bool is_transactions_connection() const {
-         return connection_type != net_utils::connection_type::blocks_only;
+         return conn_type != net_utils::connection_type::blocks_only;
       } // thread safe, atomic
       bool is_blocks_connection() const {
-         return connection_type != net_utils::connection_type::transactions_only;
+         return conn_type != net_utils::connection_type::transactions_only;
       } // thread safe, atomic
       uint32_t get_peer_start_block_num() const { return peer_start_block_num.load(); }
       uint32_t get_peer_fork_db_head_block_num() const { return peer_fork_db_head_block_num.load(); }
@@ -690,7 +690,7 @@ namespace sysio {
 
       size_t                          block_sync_rate_limit{0};  // bytes/second, default unlimited
 
-      std::atomic<net_utils::connection_type> connection_type{net_utils::connection_type::both};
+      std::atomic<net_utils::connection_type> conn_type{net_utils::connection_type::both};
       std::atomic<uint32_t>           peer_start_block_num{0};
       std::atomic<uint32_t>           peer_fork_db_head_block_num{0};
       std::atomic<uint32_t>           last_received_block_num{0};
@@ -1171,8 +1171,7 @@ namespace sysio {
         last_handshake_recv(),
         last_handshake_sent()
    {
-      /// Incoming listener's advertised address type is authoritative; a peer's advertised address may only narrow
-      /// it later.
+      /// The locally configured address type is authoritative; a peer's advertised address may only narrow it later.
       set_connection_type( listen_address );
       fc_dlog( p2p_conn_log, "new connection - {} object created for peer {}:{} from listener {}",
                connection_id, log_remote_endpoint_ip, log_remote_endpoint_port, listen_address );
@@ -1206,8 +1205,7 @@ namespace sysio {
 
    // called from connection strand
    void connection::set_connection_type( const std::string& peer_add ) {
-      auto [host, port, type] = net_utils::split_host_port_type(peer_add);
-      if (host.empty()) {
+      if (std::get<0>(net_utils::split_host_port_type( peer_add )).empty()) {
          fc_dlog( p2p_conn_log, "Invalid address: {}", peer_add);
          return;
       }
@@ -1220,11 +1218,8 @@ namespace sysio {
          fc_dlog( p2p_conn_log, "Setting connection - {} type for: {} to transactions only", connection_id, peer_add );
       } else if( new_type == net_utils::connection_type::blocks_only ) {
          fc_dlog( p2p_conn_log, "Setting connection - {} type for: {} to blocks only", connection_id, peer_add );
-      } else {
-         fc_wlog( p2p_conn_log, "Unknown connection - {} type: {}, for {}", connection_id, type, peer_add );
-         return;
       }
-      connection_type = new_type;
+      conn_type = new_type;
    }
 
    // called from connection strand
@@ -1236,7 +1231,7 @@ namespace sysio {
          return;
       }
 
-      const auto current_type = connection_type.load();
+      const auto current_type = conn_type.load();
       const auto new_type = net_utils::narrow_connection_type(current_type, peer_add);
       if( type.empty() ) {
          // peer asked for both, continue with p2p-peer-address type
@@ -1256,7 +1251,9 @@ namespace sysio {
          fc_dlog( p2p_conn_log, "Unknown peer connection - {} type: {}, for {}", connection_id, type, peer_add );
          return;
       }
-      connection_type = new_type;
+      if( new_type != current_type ) {
+         conn_type = new_type;
+      }
    }
 
    std::string connection::state_str(connection_state s) {
