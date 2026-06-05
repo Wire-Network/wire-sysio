@@ -667,6 +667,20 @@ namespace sysio {
             }
         }
 
+        // (5) the account must not already carry a *different* EVM link than this claim. recordlink is
+        // idempotent per (account, chain) and would silently keep the existing key, so a claim with a
+        // new depositor key would otherwise record CONFIRMED against a stale link. Detect that here and
+        // soft-fail rather than overwrite or mis-record.
+        {
+            authex::links_t links(AUTHEX_ACCOUNT);
+            auto by_namechain = links.get_index<"bynamechain"_n>();
+            auto it = by_namechain.find(to_namechain_key(owner, opp::types::ChainKind::CHAIN_KIND_EVM));
+            if (it != by_namechain.end() && it->pub_key != eth_pub_key) {
+                record_nodereg(owner, tier, REJECTED, LINK_KEY_MISMATCH);
+                return;
+            }
+        }
+
         // Record the depositor's ETH key as a sysio.authex link via the trusted depot-only path.
         // recordlink requires sysio.authex.active, satisfied by the sysio.roa@sysio.code delegation
         // on authex; it is idempotent and non-throwing. EVM-only by design (NFT deposits originate
