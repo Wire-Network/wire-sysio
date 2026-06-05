@@ -481,28 +481,6 @@
             ]
         },
         {
-            "name": "expandauth",
-            "base": "",
-            "fields": [
-                {
-                    "name": "account",
-                    "type": "name"
-                },
-                {
-                    "name": "permission",
-                    "type": "name"
-                },
-                {
-                    "name": "keys",
-                    "type": "key_weight[]"
-                },
-                {
-                    "name": "accounts",
-                    "type": "permission_level_weight[]"
-                }
-            ]
-        },
-        {
             "name": "fin_key_id_generator_info",
             "base": "",
             "fields": [
@@ -1648,11 +1626,6 @@
         {
             "name": "delfinkey",
             "type": "delfinkey",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "expandauth",
-            "type": "expandauth",
             "ricardian_contract": ""
         },
         {

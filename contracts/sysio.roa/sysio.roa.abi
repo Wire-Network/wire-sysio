@@ -128,6 +128,20 @@
             ]
         },
         {
+            "name": "giftram",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "usage_before",
+                    "type": "int64"
+                }
+            ]
+        },
+        {
             "name": "initnodereg",
             "base": "",
             "fields": [
@@ -481,6 +495,11 @@
         {
             "name": "forcereg",
             "type": "forcereg",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "giftram",
+            "type": "giftram",
             "ricardian_contract": ""
         },
         {
