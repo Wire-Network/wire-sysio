@@ -13,7 +13,7 @@ function(next_test_port_offset out_var)
 endfunction()
 
 function(setup_test_common)
-   cmake_parse_arguments(PARSE_ARGV 0 arg "AUTO_PORT_OFFSET;AUTO_LR_PORT_OFFSET" "NAME;COST;TIMEOUT;PORT_OFFSET" "COMMAND")
+   cmake_parse_arguments(PARSE_ARGV 0 arg "AUTO_PORT_OFFSET;AUTO_LR_PORT_OFFSET" "NAME;COST;TIMEOUT;PORT_OFFSET" "COMMAND;ENVIRONMENT")
 
    add_test(NAME "${arg_NAME}" COMMAND ${arg_COMMAND} WORKING_DIRECTORY "${CMAKE_BINARY_DIR}")
 
@@ -30,8 +30,12 @@ function(setup_test_common)
    elseif(arg_AUTO_PORT_OFFSET)
       next_test_port_offset(test_port_offset)
    endif()
+   set(test_environment ${arg_ENVIRONMENT})
    if(DEFINED test_port_offset)
-      set_tests_properties("${arg_NAME}" PROPERTIES ENVIRONMENT "SYSIO_TEST_PORT_OFFSET=${test_port_offset}")
+      list(APPEND test_environment "SYSIO_TEST_PORT_OFFSET=${test_port_offset}")
+   endif()
+   if(test_environment)
+      set_tests_properties("${arg_NAME}" PROPERTIES ENVIRONMENT "${test_environment}")
    endif()
 endfunction()
 

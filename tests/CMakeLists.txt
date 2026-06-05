@@ -127,9 +127,9 @@ endif()
 #To run plugin_test with all log from blockchain displayed, put --verbose after --, i.e. plugin_test -- --verbose
 add_p_test(NAME plugin_test COMMAND plugin_test --report_level=detailed --color_output)
 
-add_np_test(NAME nodeop_sanity_test COMMAND tests/nodeop_run_test.py -v --sanity-test PORT_OFFSET 1000)
-add_np_test(NAME nodeop_run_test COMMAND tests/nodeop_run_test.py -v PORT_OFFSET 2000)
-add_np_test(NAME nodeop_lib_test COMMAND tests/nodeop_lib_test.py -n 4 -p 3 -s ring -v PORT_OFFSET 3000)
+add_np_test(NAME nodeop_sanity_test COMMAND tests/nodeop_run_test.py -v --sanity-test)
+add_np_test(NAME nodeop_run_test COMMAND tests/nodeop_run_test.py -v)
+add_np_test(NAME nodeop_lib_test COMMAND tests/nodeop_lib_test.py -n 4 -p 3 -s ring -v)
 add_np_test(NAME block_log_util_test COMMAND tests/block_log_util_test.py -v)
 add_np_test(NAME block_log_retain_blocks_test COMMAND tests/block_log_retain_blocks_test.py -v)
 
@@ -148,7 +148,7 @@ add_np_test(NAME cluster_launcher COMMAND tests/cluster_launcher.py -v)
 add_np_test(NAME transition_to_if COMMAND tests/transition_to_if.py -v)
 
 add_np_test(NAME disaster_recovery COMMAND tests/disaster_recovery.py -v)
-add_np_test(NAME disaster_recovery_2 COMMAND tests/disaster_recovery_2.py -v PORT_OFFSET 6000)
+add_np_test(NAME disaster_recovery_2 COMMAND tests/disaster_recovery_2.py -v)
 add_np_test(NAME disaster_recovery_3 COMMAND tests/disaster_recovery_3.py -v)
 add_np_test(NAME production_pause_max_rev_blks_test COMMAND tests/production_pause_max_rev_blks_test.py -v)
 add_np_test(NAME production_pause_vote_timeout COMMAND tests/production_pause_vote_timeout.py -v)
@@ -158,7 +158,7 @@ add_np_test(NAME ship_reqs_across_svnn_test COMMAND tests/ship_reqs_across_svnn_
 add_np_test(NAME ship_restart_test COMMAND tests/ship_restart_test.py -v)
 add_np_test(NAME ship_test COMMAND tests/ship_test.py -v --num-clients 10 --num-requests 5000)
 add_np_test(NAME ship_test_unix COMMAND tests/ship_test.py -v --num-clients 10 --num-requests 5000 --unix-socket)
-add_np_test(NAME ship_kv_delta_test COMMAND tests/ship_kv_delta_test.py -v PORT_OFFSET 7000)
+add_np_test(NAME ship_kv_delta_test COMMAND tests/ship_kv_delta_test.py -v)
 add_np_test(NAME get_kv_rows_test COMMAND tests/get_kv_rows_test.py -v)
 
 add_lr_test(NAME ship_streamer_test COMMAND tests/ship_streamer_test.py -v --num-clients 10)
@@ -205,11 +205,11 @@ add_p_test(NAME version-label-test COMMAND tests/version-label.sh "v${VERSION_FU
 add_p_test(NAME full-version-label-test COMMAND tests/full-version-label.sh "v${VERSION_FULL}" ${CMAKE_SOURCE_DIR})
 add_np_test(NAME nested_container_multi_index_test COMMAND tests/nested_container_multi_index_test.py -n 2)
 
-add_np_test(NAME p2p_multiple_listen_test COMMAND tests/p2p_multiple_listen_test.py -v PORT_OFFSET 8000)
-add_np_test(NAME p2p_no_listen_test COMMAND tests/p2p_no_listen_test.py -v PORT_OFFSET 13000)
+add_np_test(NAME p2p_multiple_listen_test COMMAND tests/p2p_multiple_listen_test.py -v)
+add_np_test(NAME p2p_no_listen_test COMMAND tests/p2p_no_listen_test.py -v)
 add_lr_test(NAME p2p_sync_throttle_test COMMAND tests/p2p_sync_throttle_test.py -v -d 2)
-add_np_test(NAME p2p_no_blocks_if_test COMMAND tests/p2p_no_blocks_test.py -v -d 2 PORT_OFFSET 9000)
-add_np_test(NAME p2p_peer_auth_test COMMAND tests/p2p_peer_auth_test.py -v PORT_OFFSET 4000)
+add_np_test(NAME p2p_no_blocks_if_test COMMAND tests/p2p_no_blocks_test.py -v -d 2)
+add_np_test(NAME p2p_peer_auth_test COMMAND tests/p2p_peer_auth_test.py -v)
 add_np_test(NAME p2p_peer_scoring_test COMMAND tests/p2p_peer_scoring_test.py -v)
 
 # needs iproute-tc or iproute2 depending on platform
@@ -220,7 +220,7 @@ add_np_test(NAME p2p_peer_scoring_test COMMAND tests/p2p_peer_scoring_test.py -v
 
 add_lr_test(NAME nodeop_forked_chain_lr_test COMMAND tests/nodeop_forked_chain_test.py -v)
 
-add_np_test(NAME nodeop_contrl_c_test COMMAND tests/nodeop_contrl_c_test.py -v PORT_OFFSET 14000)
+add_np_test(NAME nodeop_contrl_c_test COMMAND tests/nodeop_contrl_c_test.py -v)
 
 add_lr_test(NAME nodeop_under_min_avail_ram_lr_test COMMAND tests/nodeop_under_min_avail_ram.py -v)
 
@@ -258,15 +258,14 @@ add_p_test(NAME sysio_util_bls_test COMMAND tests/sysio_util_bls_test.py)
 add_p_test(NAME clio_em_key_test COMMAND tests/clio_em_key_test.py)
 add_p_test(NAME sysio_util_snapshot_info_test COMMAND tests/sysio_util_snapshot_info_test.py)
 
-add_np_test(NAME http_plugin_test COMMAND tests/http_plugin_test.py TIMEOUT 200 PORT_OFFSET 5000)
+add_np_test(NAME http_plugin_test COMMAND tests/http_plugin_test.py TIMEOUT 200)
 
-add_np_test(NAME plugin_http_api_test COMMAND tests/plugin_http_api_test.py TIMEOUT 100 PORT_OFFSET 10000)
+add_np_test(NAME plugin_http_api_test COMMAND tests/plugin_http_api_test.py TIMEOUT 100)
 
-add_np_test(NAME plugin_http_api_test_savanna COMMAND tests/plugin_http_api_test_savanna.py TIMEOUT 340 PORT_OFFSET 11000)
+add_np_test(NAME plugin_http_api_test_savanna COMMAND tests/plugin_http_api_test_savanna.py TIMEOUT 340)
 
-add_np_test(NAME plugin_http_category_api_test COMMAND tests/plugin_http_api_test.py TIMEOUT 100 PORT_OFFSET 12000)
-set_tests_properties(plugin_http_category_api_test PROPERTIES ENVIRONMENT
-                     "SYSIO_TEST_PORT_OFFSET=12000;PLUGIN_HTTP_TEST_CATEGORY=ON")
+add_np_test(NAME plugin_http_category_api_test COMMAND tests/plugin_http_api_test.py TIMEOUT 100 ENVIRONMENT
+            PLUGIN_HTTP_TEST_CATEGORY=ON)
 
 add_np_test(NAME trace_plugin_test COMMAND tests/trace_plugin_test.py -v TIMEOUT 400)
 
