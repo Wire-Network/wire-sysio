@@ -386,3 +386,12 @@ enum ChallengeStatus {
   CHALLENGE_STATUS_RESOLVED          = 2;
   CHALLENGE_STATUS_ESCALATED         = 3;
 }
+
+// Node-owner registration tier (sysio.roa::nodeownreg). Mirrors the MockWireNodes NodeInfo tier and
+// the on-chain `check(tier >= 1 && tier <= 3)` range -- T1/T2/T3 are the only valid registration tiers.
+enum NodeOwnerTier {
+  NODE_OWNER_TIER_UNKNOWN = 0;
+  NODE_OWNER_TIER_T1      = 1;
+  NODE_OWNER_TIER_T2      = 2;
+  NODE_OWNER_TIER_T3      = 3;
+}
