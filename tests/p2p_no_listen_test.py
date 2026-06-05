@@ -54,7 +54,7 @@ try:
     node.waitForBlock(5)
 
     s = socket.socket()
-    p2pPort = Utils.shardPort(9876)
+    p2pPort = Utils.getPort(Utils.PortP2P)
     err = s.connect_ex(('localhost', p2pPort))
     assert err == errno.ECONNREFUSED, f'Connection to port {p2pPort} must be refused'
 

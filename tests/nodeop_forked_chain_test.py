@@ -157,7 +157,7 @@ try:
     shipNodeNum = 0
     specificExtraNodeopArgs[shipNodeNum]=(
         "--plugin sysio::state_history_plugin "
-        f"--state-history-endpoint 127.0.0.1:{Utils.shardPort(8080)}"
+        f"--state-history-endpoint 127.0.0.1:{Utils.getPort(Utils.PortStateHistory)}"
     )
 
     # producer nodes will be mapped to 0 through totalProducerNodes-1, so the number totalProducerNodes will be the non-producing node
@@ -289,7 +289,7 @@ try:
 
     shipClient = "tests/ship_streamer"
     cmd = (
-        f"{shipClient} --socket-address 127.0.0.1:{Utils.shardPort(8080)} "
+        f"{shipClient} --socket-address 127.0.0.1:{Utils.getPort(Utils.PortStateHistory)} "
         f"--start-block-num {start_block_num} --end-block-num {end_block_num} "
         "--fetch-block --fetch-traces --fetch-deltas"
     )

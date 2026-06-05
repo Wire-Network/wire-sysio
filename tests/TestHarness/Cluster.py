@@ -58,7 +58,7 @@ class Cluster(object):
     __WalletName="MyWallet"
     __localHost="localhost"
     __BiosHost="localhost"
-    __BiosPort=Utils.shardPort(8788)
+    __BiosPort=Utils.getPort(Utils.PortBiosHttp)
     __LauncherCmdArr=[]
     __bootlog="wire_sysio-ignition-wd/bootlog.txt"
     __localLaunchPortCheckAttempts=90
@@ -90,10 +90,10 @@ class Cluster(object):
         self.wallet=None
         self.walletMgr=None
         self.host=host
-        self.port=Utils.shardPort(8888) if port is None else port
-        self.p2pBasePort=Utils.shardPort(9876)
+        self.port=Utils.getPort(Utils.PortNodeHttp) if port is None else port
+        self.p2pBasePort=Utils.getPort(Utils.PortP2P)
         self.walletHost=walletHost
-        self.walletPort=Utils.shardPort(9899) if walletPort is None else walletPort
+        self.walletPort=Utils.getPort(Utils.PortWallet) if walletPort is None else walletPort
         self.staging=staging
         self.loggingLevel=loggingLevel
         self.loggingLevelDict=loggingLevelDict
@@ -192,9 +192,9 @@ class Cluster(object):
 
     def _portsForLocalLaunch(self, totalNodes):
         """Return the local HTTP and P2P ports reserved by a cluster launch."""
-        ports = set(range(self.port, self.port + totalNodes + 1))
+        ports = set(range(self.port, self.port + totalNodes))
         ports.add(self.port - 100)
-        ports.update(range(self.p2pBasePort, self.p2pBasePort + totalNodes + 1))
+        ports.update(range(self.p2pBasePort, self.p2pBasePort + totalNodes))
         ports.add(self.p2pBasePort - 100)
         return ports
 

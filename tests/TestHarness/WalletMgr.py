@@ -24,9 +24,9 @@ class WalletMgr(object):
         """Create a wallet manager using sharded default ports when callers omit explicit ports."""
         atexit.register(self.shutdown)
         self.walletd=walletd
-        self.nodeopPort=Utils.shardPort(8888) if nodeopPort is None else nodeopPort
+        self.nodeopPort=Utils.getPort(Utils.PortNodeHttp) if nodeopPort is None else nodeopPort
         self.nodeopHost=nodeopHost
-        self.port=Utils.shardPort(9899) if port is None else port
+        self.port=Utils.getPort(Utils.PortWallet) if port is None else port
         self.usesDefaultWalletPort=port is None
         self.host=host
         self.keepRunning=keepRunning
@@ -53,7 +53,7 @@ class WalletMgr(object):
 
     def findAvailablePort(self):
         """Find an available wallet port within this test's shard."""
-        shardLimit=Utils.shardPort(WalletMgr.__MaxPort) if self.usesDefaultWalletPort else 65535
+        shardLimit=Utils.getPort(Utils.PortWallet, Utils.WalletPortCount - 1) if self.usesDefaultWalletPort else 65535
         for i in range(WalletMgr.__MaxPort):
             port=self.port+i  # pyright: ignore[reportOptionalOperand]
             if Utils.getTestPortOffset() > 0 and port > shardLimit:
@@ -323,9 +323,12 @@ class WalletMgr(object):
             Utils.Print(f"Shutting down wallet manager process {self.walletPid}")
             self.popenProc.send_signal(signal.SIGTERM)
             self.popenProc.wait()
+            self.popenProc=None
+            self.walletPid=None
         elif self.walletPid:
             Utils.Print("Killing wallet manager process %d" % (self.walletPid))
             os.kill(self.walletPid, signal.SIGKILL)
+            self.walletPid=None
         self.cleanup()
 
     def cleanup(self):

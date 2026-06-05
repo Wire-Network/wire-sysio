@@ -34,21 +34,21 @@ namespace net   = boost::asio;      // from <boost/asio.hpp>
 using tcp       = net::ip::tcp;     // from <boost/asio/ip/tcp.hpp>
 
 namespace {
-constexpr uint16_t default_http_port = 8888;
-constexpr uint16_t category_rw_port = 8889;
-constexpr uint16_t category_ro_port = 8890;
-constexpr uint16_t bytes_in_flight_port = 8891;
-constexpr uint16_t requests_in_flight_port = 8892;
-constexpr uint16_t ipv6_probe_port = 9999;
+constexpr uint32_t default_http_index = 0;
+constexpr uint32_t category_rw_index = 1;
+constexpr uint32_t category_ro_index = 2;
+constexpr uint32_t bytes_in_flight_index = 3;
+constexpr uint32_t requests_in_flight_index = 4;
+constexpr uint32_t ipv6_probe_index = 2;
 
-/** Return the string form of a base port after applying this test's shard. */
-std::string test_port(uint16_t port) {
-   return std::to_string(sysio::testing::shard_port(port));
+/** Return the string form of a node HTTP port from this test's shard. */
+std::string test_http_port(uint32_t index) {
+   return std::to_string(sysio::testing::get_port(sysio::testing::port_category::node_http, index));
 }
 
 /** Return host:port with this test's port shard applied. */
-std::string test_endpoint(const std::string& host, uint16_t port) {
-   return host + ":" + test_port(port);
+std::string test_http_endpoint(const std::string& host, uint32_t index) {
+   return host + ":" + test_http_port(index);
 }
 } // namespace
 
@@ -321,8 +321,8 @@ struct http_plugin_test_fixture {
 // -------------------------------------------------------------------------
 BOOST_FIXTURE_TEST_CASE(http_plugin_unit_tests, http_plugin_test_fixture) {
 
-   const uint16_t default_port = sysio::testing::shard_port(default_http_port);
-   const std::string port = test_port(default_http_port);
+   const uint16_t default_port = sysio::testing::get_port(sysio::testing::port_category::node_http);
+   const std::string port = test_http_port(default_http_index);
    const char*       host = "127.0.0.1";
 
    http_plugin::set_defaults({.default_unix_socket_path = "", .default_http_port = default_port, .server_header = "/"});
@@ -420,13 +420,13 @@ class app_log {
 BOOST_AUTO_TEST_CASE(invalid_category_addresses) {
 
    const char* test_name = bu::framework::current_test_case().p_name->c_str();
-   const std::string localhost_rw = test_endpoint("localhost", category_rw_port);
-   const std::string loopback_rw = test_endpoint("127.0.0.1", category_rw_port);
+   const std::string localhost_rw = test_http_endpoint("localhost", category_rw_index);
+   const std::string loopback_rw = test_http_endpoint("127.0.0.1", category_rw_index);
    const std::string chain_ro_localhost = "chain_ro," + localhost_rw;
    const std::string chain_ro_loopback = "chain_ro," + loopback_rw;
    const std::string chain_rw_localhost = "chain_rw," + localhost_rw;
    const std::string node_localhost = "node," + localhost_rw;
-   const std::string unable_to_listen_msg = "unable to listen to port " + test_port(category_rw_port);
+   const std::string unable_to_listen_msg = "unable to listen to port " + test_http_port(category_rw_index);
 
    BOOST_TEST(app_log({test_name, "--plugin=sysio::http_plugin", "--http-server-address",
                                  "http-category-address", "--http-category-address", chain_ro_localhost.c_str()})
@@ -495,11 +495,11 @@ struct http_response_for {
 BOOST_FIXTURE_TEST_CASE(valid_category_addresses, http_plugin_test_fixture) {
    fc::temp_directory dir;
    auto               data_dir = dir.path() / "data";
-   const std::string ro_port = test_port(category_ro_port);
-   const std::string rw_port = test_port(category_rw_port);
-   const std::string ro_loopback = test_endpoint("127.0.0.1", category_ro_port);
-   const std::string ro_localhost = test_endpoint("localhost", category_ro_port);
-   const std::string rw_loopback = test_endpoint("127.0.0.1", category_rw_port);
+   const std::string ro_port = test_http_port(category_ro_index);
+   const std::string rw_port = test_http_port(category_rw_index);
+   const std::string ro_loopback = test_http_endpoint("127.0.0.1", category_ro_index);
+   const std::string ro_localhost = test_http_endpoint("localhost", category_ro_index);
+   const std::string rw_loopback = test_http_endpoint("127.0.0.1", category_rw_index);
    const std::string rw_any = ":" + rw_port;
    const std::string chain_ro = "chain_ro," + ro_loopback;
    const std::string chain_rw = "chain_rw," + rw_any;
@@ -570,7 +570,9 @@ BOOST_FIXTURE_TEST_CASE(valid_category_addresses, http_plugin_test_fixture) {
    bool ip_v6_enabled = [] {
       try {
          net::io_context ioc;
-         tcp::socket s(ioc, tcp::endpoint{net::ip::make_address("::1"), sysio::testing::shard_port(ipv6_probe_port)});
+         tcp::socket s(ioc, tcp::endpoint{net::ip::make_address("::1"),
+                                          sysio::testing::get_port(sysio::testing::port_category::ipv6_probe,
+                                                                   ipv6_probe_index)});
          return true;
       } catch (...) {
          return false;
@@ -610,10 +612,10 @@ bool on_loopback(std::initializer_list<const char*> args){
 }
 
 BOOST_AUTO_TEST_CASE(test_on_loopback) {
-   const std::string loopback_default = test_endpoint("127.0.0.1", default_http_port);
-   const std::string localhost_default = test_endpoint("localhost", default_http_port);
-   const std::string any_default = ":" + test_port(default_http_port);
-   const std::string external_default = test_endpoint("example.com", default_http_port);
+   const std::string loopback_default = test_http_endpoint("127.0.0.1", default_http_index);
+   const std::string localhost_default = test_http_endpoint("localhost", default_http_index);
+   const std::string any_default = ":" + test_http_port(default_http_index);
+   const std::string external_default = test_http_endpoint("example.com", default_http_index);
 
    BOOST_CHECK(on_loopback({"test", "--plugin=sysio::http_plugin", "--http-server-address", "", "--unix-socket-path=a"}));
    BOOST_CHECK(on_loopback({"test", "--plugin=sysio::http_plugin", "--http-server-address", loopback_default.c_str()}));
@@ -623,9 +625,9 @@ BOOST_AUTO_TEST_CASE(test_on_loopback) {
 }
 
 BOOST_FIXTURE_TEST_CASE(bytes_in_flight, http_plugin_test_fixture) {
-   const std::string endpoint = test_endpoint("127.0.0.1", bytes_in_flight_port);
+   const std::string endpoint = test_http_endpoint("127.0.0.1", bytes_in_flight_index);
    const std::string server_address = "--http-server-address=" + endpoint;
-   const std::string port = test_port(bytes_in_flight_port);
+   const std::string port = test_http_port(bytes_in_flight_index);
 
    http_plugin* http_plugin = init({"--plugin=sysio::http_plugin",
                                     server_address.c_str(),
@@ -725,9 +727,9 @@ BOOST_FIXTURE_TEST_CASE(bytes_in_flight, http_plugin_test_fixture) {
 }
 
 BOOST_FIXTURE_TEST_CASE(requests_in_flight, http_plugin_test_fixture) {
-   const std::string endpoint = test_endpoint("127.0.0.1", requests_in_flight_port);
+   const std::string endpoint = test_http_endpoint("127.0.0.1", requests_in_flight_index);
    const std::string server_address = "--http-server-address=" + endpoint;
-   const std::string port = test_port(requests_in_flight_port);
+   const std::string port = test_http_port(requests_in_flight_index);
 
    http_plugin* http_plugin = init({"--plugin=sysio::http_plugin",
                                     server_address.c_str(),

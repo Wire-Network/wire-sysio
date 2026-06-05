@@ -91,6 +91,19 @@ class Utils:
 
     TimeFmt='%Y-%m-%dT%H:%M:%S.%f'
     TestPortOffsetEnvVar="SYSIO_TEST_PORT_OFFSET"
+    PortShip="ship"
+    PortStateHistory="state_history"
+    PortBiosHttp="bios_http"
+    PortNodeHttp="node_http"
+    PortAlternateService="alternate_service"
+    PortPluginHttpPeer="plugin_http_peer"
+    PortPluginHttpLocal="plugin_http_local"
+    PortAlternateP2P="alternate_p2p"
+    PortP2P="p2p"
+    PortWallet="wallet"
+    PortTransactionOnly="transaction_only"
+    PortIpv6Probe="ipv6_probe"
+    WalletPortCount=5
     _testPortOffset=None
     # lock to serialize writes to subprocess_results.log across threads
     _check_output_lock = threading.Lock()
@@ -114,41 +127,66 @@ class Utils:
         return offset
 
     @staticmethod
-    def shardPort(port):
-        """Apply the configured test port offset to a raw base port.
+    def getPort(port_category, index=0):
+        """Return a deterministic port from this test's compact port shard.
 
-        Known local test ports are compacted into a single 256-port shard so
-        adjacent CTest port shards cannot overlap HTTP, P2P, SHiP, or wallet
-        listeners from different tests.
+        port_category names the listener class and index selects a listener
+        within that class.  CTest assigns each test a unique shard offset, and
+        this allocator keeps all known listener classes inside one bounded
+        192-port shard below the ephemeral range.
         """
-        assert(isinstance(port, int))
-        offset=Utils.getTestPortOffset()
-        if offset == 0:
-            return port
+        assert(isinstance(port_category, str))
+        assert(isinstance(index, int))
+        if index < 0:
+            raise RuntimeError(f"Port index must be non-negative, got {index}")
 
-        shardBase=8888 + offset
-        compactPortMap={
-            8788: shardBase + 100,
-            7899: shardBase + 150,
-            8080: shardBase + 151,
-            9011: shardBase + 152,
-            8888: shardBase + 200,
+        slotRanges={
+            Utils.PortShip: (0, 1),
+            Utils.PortStateHistory: (1, 1),
+            Utils.PortBiosHttp: (2, 1),
+            Utils.PortNodeHttp: (3, 88),
+            Utils.PortAlternateService: (91, 1),
+            Utils.PortPluginHttpPeer: (92, 1),
+            Utils.PortPluginHttpLocal: (93, 1),
+            Utils.PortAlternateP2P: (94, 47),
+            Utils.PortP2P: (141, 23),
+            Utils.PortWallet: (164, Utils.WalletPortCount),
+            Utils.PortTransactionOnly: (169, 2),
+            Utils.PortIpv6Probe: (171, 4),
         }
 
-        if port in compactPortMap:
-            shiftedPort=compactPortMap[port]
-        elif 9776 <= port < 9823:
-            shiftedPort=shardBase + 153 + (port - 9776)
-        elif 9876 <= port < 9899:
-            shiftedPort=shardBase + 225 + (port - 9876)
-        elif 9899 <= port <= 9999:
-            shiftedPort=shardBase + min(port - 9899, 99)
+        if port_category not in slotRanges:
+            raise RuntimeError(f"Unknown port category '{port_category}'")
+
+        slotStart, slotCount=slotRanges[port_category]
+        if index >= slotCount:
+            raise RuntimeError(
+                f"Port index {index} is outside category '{port_category}' capacity {slotCount}")
+
+        offset=Utils.getTestPortOffset()
+        if offset == 0:
+            defaultPorts={
+                Utils.PortShip: 7899,
+                Utils.PortStateHistory: 8080,
+                Utils.PortBiosHttp: 8788,
+                Utils.PortNodeHttp: 8888,
+                Utils.PortAlternateService: 8976,
+                Utils.PortPluginHttpPeer: 9009,
+                Utils.PortPluginHttpLocal: 9011,
+                Utils.PortAlternateP2P: 9776,
+                Utils.PortP2P: 9876,
+                Utils.PortWallet: 9899,
+                Utils.PortTransactionOnly: 9902,
+                Utils.PortIpv6Probe: 9997,
+            }
+            shiftedPort=defaultPorts[port_category] + index
         else:
-            shiftedPort=port + offset
+            shiftedPort=8888 + offset + slotStart + index
 
         if shiftedPort < 1 or shiftedPort > 65535:
             raise RuntimeError(
-                f"Port {port} shifted by {Utils.TestPortOffsetEnvVar}={Utils.getTestPortOffset()} "
+                f"Port category '{port_category}' index {index} shifted by "
+                f"{Utils.TestPortOffsetEnvVar}={Utils.getTestPortOffset()} "
                 f"produces invalid port {shiftedPort}")
         return shiftedPort
 

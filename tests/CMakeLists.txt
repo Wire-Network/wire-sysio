@@ -224,7 +224,9 @@ add_np_test(NAME nodeop_contrl_c_test COMMAND tests/nodeop_contrl_c_test.py -v)
 
 add_lr_test(NAME nodeop_under_min_avail_ram_lr_test COMMAND tests/nodeop_under_min_avail_ram.py -v)
 
-add_lr_test(NAME nodeop_irreversible_mode_lr_test COMMAND tests/nodeop_irreversible_mode_test.py -v)
+# This 20-node scenario validates 19 relaunch/replay/snapshot combinations and can exceed the default
+# CTest timeout when the long-running suite is intentionally run with high parallelism.
+add_lr_test(NAME nodeop_irreversible_mode_lr_test COMMAND tests/nodeop_irreversible_mode_test.py -v TIMEOUT 1500)
 
 add_lr_test(NAME nodeop_read_terminate_at_block_lr_test COMMAND tests/nodeop_read_terminate_at_block_test.py -v)
 

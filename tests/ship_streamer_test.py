@@ -69,7 +69,7 @@ try:
         "--plugin sysio::state_history_plugin "
         "--trace-history --chain-state-history "
         "--state-history-stride 200 "
-        f"--state-history-endpoint 127.0.0.1:{Utils.shardPort(8080)} "
+        f"--state-history-endpoint 127.0.0.1:{Utils.getPort(Utils.PortStateHistory)} "
         "--plugin sysio::net_api_plugin --plugin sysio::producer_api_plugin "
     )
     if args.finality_data_history:
@@ -145,7 +145,7 @@ try:
     end_block_num = start_block_num + block_range
 
     shipClient = "tests/ship_streamer"
-    shipSocketAddress = f"127.0.0.1:{Utils.shardPort(8080)}"
+    shipSocketAddress = f"127.0.0.1:{Utils.getPort(Utils.PortStateHistory)}"
 
     def makeShipStreamerCmd(startBlockNum, endBlockNum):
         """Return a ship_streamer command targeting this test's sharded SHiP endpoint."""

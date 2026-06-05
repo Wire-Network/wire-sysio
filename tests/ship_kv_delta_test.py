@@ -58,7 +58,7 @@ try:
     specificExtraNodeopArgs[apiNodeNum] = (
         "--transaction-retry-max-storage-size-gb 100 "
     )
-    shipAddr = f"127.0.0.1:{Utils.shardPort(8080)}"
+    shipAddr = f"127.0.0.1:{Utils.getPort(Utils.PortStateHistory)}"
     specificExtraNodeopArgs[shipNodeNum] = (
         "--plugin sysio::state_history_plugin "
         f"--state-history-endpoint {shipAddr} "

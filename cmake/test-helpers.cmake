@@ -1,5 +1,5 @@
 set(SYSIO_TEST_PORT_OFFSET_START 100)
-set(SYSIO_TEST_PORT_OFFSET_STRIDE 256)
+set(SYSIO_TEST_PORT_OFFSET_STRIDE 192)
 
 function(next_test_port_offset out_var)
    get_property(next_offset GLOBAL PROPERTY SYSIO_NEXT_TEST_PORT_OFFSET)

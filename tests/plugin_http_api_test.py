@@ -53,7 +53,7 @@ class PluginHttpTest(unittest.TestCase):
     config_dir = Path(Utils.getNodeConfigDir(node_id))
     empty_content_dict = {}
     http_post_invalid_param = '{invalid}'
-    p2p_peer_endpoint = f"localhost:{Utils.shardPort(9011)}"
+    p2p_peer_endpoint = f"localhost:{Utils.getPort(Utils.PortPluginHttpLocal)}"
     SYSIO_ACCT_PRIVATE_DEFAULT_KEY = "5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3"
     SYSIO_ACCT_PUBLIC_DEFAULT_KEY = "SYS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV"
 
@@ -89,7 +89,7 @@ class PluginHttpTest(unittest.TestCase):
         self.createDataDir(self)
         self.createConfigDir(self)
         self.kiod.launch()
-        p2pEndpoint = f"{TestHelper.LOCAL_HOST}:{Utils.shardPort(9876)}"
+        p2pEndpoint = f"{TestHelper.LOCAL_HOST}:{Utils.getPort(Utils.PortP2P)}"
         httpServerAddressArg = "" if category_config.ports else (
             f"--http-server-address {TestHelper.LOCAL_HOST}:{TestHelper.DEFAULT_PORT} ")
         plugin_names = ["trace_api_plugin", "test_control_api_plugin", "test_control_plugin", "net_plugin",
@@ -102,7 +102,7 @@ class PluginHttpTest(unittest.TestCase):
                         "%s--p2p-listen-endpoint 0.0.0.0:%d --p2p-server-address %s "
                         "--p2p-peer-address %s --resource-monitor-not-shutdown-on-threshold-exceeded ") % (
                             self.data_dir, self.config_dir, self.data_dir, "\'*\'", "false",
-                            httpServerAddressArg, Utils.shardPort(9876), p2pEndpoint, self.p2p_peer_endpoint)
+                            httpServerAddressArg, Utils.getPort(Utils.PortP2P), p2pEndpoint, self.p2p_peer_endpoint)
         nodeop_flags += category_config.nodeopArgs()
 
         start_nodeop_cmd = ("%s -e -p sysio %s %s ") % (Utils.SysServerPath, nodeop_plugins, nodeop_flags)
@@ -807,7 +807,7 @@ class PluginHttpTest(unittest.TestCase):
         ret_json = self.nodeop.processUrllibRequest(resource, command, payload, endpoint=endpoint)
         self.assertEqual(ret_json["code"], 201)
         self.assertEqual(ret_json["payload"], 'invalid peer address')
-        payload = f"localhost:{Utils.shardPort(9877)}"
+        payload = f"localhost:{Utils.getPort(Utils.PortP2P, 1)}"
         ret_str = self.nodeop.processUrllibRequest(resource, command, payload, returnType=ReturnType.raw, endpoint=endpoint).decode('ascii')
         self.assertEqual("\"added connection\"", ret_str)
 

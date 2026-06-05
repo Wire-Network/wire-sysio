@@ -13,6 +13,8 @@ from TestHarness import Cluster, TestHelper, Utils, WalletMgr
 
 Print=Utils.Print
 errorExit=Utils.errorExit
+advertisedP2pEndpoint0 = 'ext-ip0:20000'
+advertisedP2pEndpoint1 = 'ext-ip1:20001'
 
 args=TestHelper.parse_args({"-p","-n","-d","--keep-logs"
                             ,"--activate-if","--dump-error-details","-v"
@@ -30,6 +32,19 @@ testSuccessful=False
 cluster=Cluster(unshared=args.unshared, keepRunning=args.leave_running, keepLogs=args.keep_logs)
 walletMgr=WalletMgr(True)
 
+def getOpenPeerAddress(node):
+    """Return the single open peer address advertised to the supplied node by node 00."""
+    connections = node.processUrllibRequest('net', 'connections')
+    openPeerAddresses = []
+    for conn in connections['payload']:
+        if conn['is_socket_open']:
+            connectedAgent = conn['last_handshake']['agent']
+            assert connectedAgent == 'node-00', f"Connected node identified as '{connectedAgent}' instead of node-00"
+            openPeerAddresses.append(conn['last_handshake']['p2p_address'].split()[0])
+
+    assert len(openPeerAddresses) == 1, f'Node {node.nodeId} is expected to have exactly one open socket'
+    return openPeerAddresses[0]
+
 try:
     TestHelper.printSystemInfo("BEGIN")
 
@@ -38,12 +53,12 @@ try:
     Print(f'producing nodes: {pnodes}, delay between nodes launch: {delay} second{"s" if delay != 1 else ""}')
 
     Print("Stand up cluster")
-    alternateListenEndpoint = f"0.0.0.0:{Utils.shardPort(9779)}"
-    alternatePeerEndpoint = f"localhost:{Utils.shardPort(9779)}"
+    alternateListenEndpoint = f"0.0.0.0:{Utils.getPort(Utils.PortAlternateP2P, 3)}"
+    alternatePeerEndpoint = f"localhost:{Utils.getPort(Utils.PortAlternateP2P, 3)}"
     specificArgs = {
         '0': f'--agent-name node-00 --p2p-listen-endpoint 0.0.0.0:{cluster.getNodeP2pPort(0)} '
-             f'--p2p-listen-endpoint {alternateListenEndpoint} --p2p-server-address ext-ip0:20000 '
-             f'--p2p-server-address ext-ip1:20001 --plugin sysio::net_api_plugin',
+             f'--p2p-listen-endpoint {alternateListenEndpoint} --p2p-server-address {advertisedP2pEndpoint0} '
+             f'--p2p-server-address {advertisedP2pEndpoint1} --plugin sysio::net_api_plugin',
         '2': f'--agent-name node-02 --p2p-peer-address {alternatePeerEndpoint} --plugin sysio::net_api_plugin',
         '4': f'--agent-name node-04 --p2p-peer-address {cluster.getNodeP2pEndpoint(0)} --plugin sysio::net_api_plugin',
     }
@@ -84,25 +99,15 @@ try:
                 assert conn['last_handshake']['p2p_address'].split()[0] == expectedEndpoint, f"Connected node is listening on '{conn['last_handshake']['p2p_address'].split()[0]}' instead of {expectedEndpoint}"
     assert open_socket_count == 2, 'Node 0 is expected to have exactly two open sockets'
 
-    connections = cluster.nodes[2].processUrllibRequest('net', 'connections')
-    open_socket_count = 0
-    for conn in connections['payload']:
-        if conn['is_socket_open']:
-            open_socket_count += 1
-            assert conn['last_handshake']['agent'] == 'node-00', f"Connected node identified as '{conn['last_handshake']['agent']}' instead of node-00"
-            # Server addresses are paired positionally with listen endpoints:
-            # 9876 -> ext-ip0:20000, 9779 -> ext-ip1:20001.
-            assert conn['last_handshake']['p2p_address'].split()[0] == 'ext-ip1:20001', f"Connected node is advertising '{conn['last_handshake']['p2p_address'].split()[0]}' instead of ext-ip1:20001"
-    assert open_socket_count == 1, 'Node 2 is expected to have exactly one open socket'
+    # Server addresses are paired positionally with listen endpoints:
+    # default listen endpoint -> ext-ip0:20000, alternate listen endpoint -> ext-ip1:20001.
+    node2AdvertisedAddress = getOpenPeerAddress(cluster.nodes[2])
+    assert node2AdvertisedAddress == advertisedP2pEndpoint1, \
+        f"Connected node is advertising '{node2AdvertisedAddress}' instead of {advertisedP2pEndpoint1}"
 
-    connections = cluster.nodes[4].processUrllibRequest('net', 'connections')
-    open_socket_count = 0
-    for conn in connections['payload']:
-        if conn['is_socket_open']:
-            open_socket_count += 1
-            assert conn['last_handshake']['agent'] == 'node-00', f"Connected node identified as '{conn['last_handshake']['agent']}' instead of node-00"
-            assert conn['last_handshake']['p2p_address'].split()[0] == 'ext-ip0:20000', f"Connected node is advertising '{conn['last_handshake']['p2p_address'].split()[0]}' instead of ext-ip0:20000"
-    assert open_socket_count == 1, 'Node 4 is expected to have exactly one open socket'
+    node4AdvertisedAddress = getOpenPeerAddress(cluster.nodes[4])
+    assert node4AdvertisedAddress == advertisedP2pEndpoint0, \
+        f"Connected node is advertising '{node4AdvertisedAddress}' instead of {advertisedP2pEndpoint0}"
 
     testSuccessful=True
 finally:

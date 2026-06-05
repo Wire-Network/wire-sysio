@@ -56,8 +56,8 @@ try:
     # 02 & 03 are connected to the bios node to get blocks until bios node is killed.
     #
     specificExtraNodeopArgs = {}
-    trxOnlyPort02 = Utils.shardPort(9902)
-    trxOnlyPort03 = Utils.shardPort(9903)
+    trxOnlyPort02 = Utils.getPort(Utils.PortTransactionOnly)
+    trxOnlyPort03 = Utils.getPort(Utils.PortTransactionOnly, 1)
     # nonProdNode01 will connect normally but will not send blocks because 02 & 03 have specified :trx only
     specificExtraNodeopArgs[1] = f'--p2p-peer-address localhost:{trxOnlyPort02} --p2p-peer-address localhost:{trxOnlyPort03} '
     # add a trx only listen endpoint to noBlocks02 & noBlocks03
