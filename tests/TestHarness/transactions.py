@@ -12,6 +12,8 @@ from .testUtils import Utils
 
 class Transactions(NodeopQueries):
     retry_num_blocks_default = 1
+    # Default clio action-push timeout, in seconds, used to keep intentionally interrupting transactions bounded.
+    push_message_timeout_default = 45
 
     def __init__(self, host, port, walletMgr=None):
         super().__init__(host, port, walletMgr)
@@ -261,7 +263,9 @@ class Transactions(NodeopQueries):
             return (False, msg)
 
     # returns tuple with transaction execution status and transaction
-    def pushMessage(self, account, action, data, opts, silentErrors=False, signatures=None, expectTrxTrace=True):
+    def pushMessage(self, account, action, data, opts, silentErrors=False, signatures=None, expectTrxTrace=True,
+                    timeout=push_message_timeout_default):
+        """Push an action with clio, bounding the clio subprocess runtime by default."""
         cmd="%s %s push action -j %s %s" % (Utils.SysClientPath, self.sysClientArgs(), account, action)
         cmdArr=cmd.split()
         # not using sign_str, since cmdArr messes up the string
@@ -278,7 +282,7 @@ class Transactions(NodeopQueries):
         while retries > 0:
             retries -= 1
             try:
-                trans=Utils.runCmdArrReturnJson(cmdArr)
+                trans=Utils.runCmdArrReturnJson(cmdArr, timeout=timeout)
                 self.trackCmdTransaction(trans, ignoreNonTrans=True)
                 if Utils.Debug:
                     end=time.perf_counter()
@@ -294,6 +298,12 @@ class Transactions(NodeopQueries):
                     Utils.Print(f"Retrying {cmd} due to: tx_cpu_usage_exceeded")
                     continue # try again
                 return (False, msg)
+            except subprocess.TimeoutExpired as ex:
+                if not silentErrors:
+                    end=time.perf_counter()
+                    Utils.Print("ERROR: Timeout during push message. retry %s. cmd timeout=%s. cmd Duration=%.3f sec." %
+                                (retries, ex.timeout, end - start))
+                return (False, ex)
 
     def setPermission(self, account, code, pType, requirement, waitForTransBlock=False, exitOnError=False, sign=False):
         assert(isinstance(account, Account))
