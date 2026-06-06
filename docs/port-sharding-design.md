@@ -35,6 +35,36 @@ Each offset reserves one 192-port shard. For a nonzero offset, category slots ar
 shard_base = 8888 + SYSIO_TEST_PORT_OFFSET
 ```
 
+## Avoiding Local Listener Ports
+
+By default, CMake assigns compact shards without reserving machine-specific ports. This keeps the allocation
+deterministic across developer machines and CI:
+
+```cmake
+SYSIO_TEST_FORBIDDEN_PORTS=""
+SYSIO_DETECT_LISTENING_TEST_PORTS=OFF
+```
+
+When a developer machine has a long-lived local service inside the generated shard range, pass a semicolon-separated
+list of actual TCP ports that tests must not overlap:
+
+```bash
+cmake -S . -B build/codex-system-contracts -DSYSIO_TEST_FORBIDDEN_PORTS='11434;19981'
+```
+
+The allocator skips any shard whose actual port range contains one of those ports. For example, with
+`SYSIO_TEST_FORBIDDEN_PORTS=11434`, the shard `11292..11483` is skipped because it contains `11434`.
+
+For local-only convenience, CMake can also snapshot currently listening TCP ports during configure and append them to
+the forbidden list:
+
+```bash
+cmake -S . -B build/codex-system-contracts -DSYSIO_DETECT_LISTENING_TEST_PORTS=ON
+```
+
+Detection is intentionally opt-in. It depends on the host state at configure time, so it is useful for local developer
+machines but should not be required for reproducible CI allocation.
+
 ## Category Mapping
 
 New test listener ports must use the logical category API:
