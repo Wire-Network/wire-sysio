@@ -63,19 +63,26 @@ def getHeadLibAndForkDbHead(node: Node):
    forkDbHead =  int(info["fork_db_head_block_num"])
    return head, lib, forkDbHead
 
-# Wait for some time until LIB advance
-def waitForBlksProducedAndLibAdvanced():
+# Return the conservative wait budget for LIB advancement.
+def libAdvanceTimeout():
+   """Return the timeout budget for waiting on LIB advancement in this producer schedule."""
    requiredConfirmation = int(2 / 3 * numOfProducers) + 1
    maxNumOfBlksReqToConfirmLib = (12 * requiredConfirmation - 1) * 2
    # Give 6 seconds buffer time
    bufferTime = 6
-   timeToWait = maxNumOfBlksReqToConfirmLib / 2 + bufferTime
-   time.sleep(timeToWait)
+   return maxNumOfBlksReqToConfirmLib / 2 + bufferTime
+
+# Wait until LIB advances instead of always sleeping for the worst-case LIB advancement budget.
+def waitForBlksProducedAndLibAdvanced(nodeToWatch=None):
+   """Wait for LIB to advance on a live node that should be receiving produced blocks."""
+   nodeToWatch = nodeToWatch if nodeToWatch is not None else producingNode
+   assert nodeToWatch.waitForLibToAdvance(timeout=libAdvanceTimeout()), \
+      "LIB did not advance on node #{} within {} seconds".format(nodeToWatch.nodeId, libAdvanceTimeout())
 
 # Ensure that the relaunched node received blks from producers, in other words head and lib is advancing
 def ensureHeadLibAndForkDbHeadIsAdvancing(nodeToTest):
    head, lib, forkDbHead = getHeadLibAndForkDbHead(nodeToTest)
-   waitForBlksProducedAndLibAdvanced()
+   waitForBlksProducedAndLibAdvanced(nodeToTest)
    headAfterWaiting, libAfterWaiting, forkDbHeadAfterWaiting = getHeadLibAndForkDbHead(nodeToTest)
    assert headAfterWaiting > head and libAfterWaiting > lib and forkDbHeadAfterWaiting > forkDbHead, \
       "Either Head ({} -> {})/ Lib ({} -> {})/ Fork Db Head ({} -> {}) is not advancing".format(head, headAfterWaiting, lib, libAfterWaiting, forkDbHead, forkDbHeadAfterWaiting)
