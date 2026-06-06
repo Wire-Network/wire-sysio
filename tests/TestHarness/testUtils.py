@@ -294,9 +294,10 @@ class Utils:
         return chainSyncStrategies
 
     @staticmethod
-    def checkOutput(cmd, ignoreError=False):
+    def checkOutput(cmd, ignoreError=False, timeout=None):
+        """Run a command and return stdout, optionally bounding the subprocess runtime."""
         popen = Utils.delayedCheckOutput(cmd)
-        return Utils.checkDelayedOutput(popen, cmd, ignoreError=ignoreError)
+        return Utils.checkDelayedOutput(popen, cmd, ignoreError=ignoreError, timeout=timeout)
 
     @staticmethod
     def delayedCheckOutput(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
@@ -307,11 +308,18 @@ class Utils:
         return popen
 
     @staticmethod
-    def checkDelayedOutput(popen, cmd, ignoreError=False):
+    def checkDelayedOutput(popen, cmd, ignoreError=False, timeout=None):
+        """Collect a subprocess result and terminate it if it exceeds the requested timeout."""
         assert isinstance(popen, subprocess.Popen)
         assert isinstance(cmd, (str,list))
         start=Utils.timestamp()
-        (output,error)=popen.communicate()
+        try:
+            (output,error)=popen.communicate(timeout=timeout)
+        except subprocess.TimeoutExpired as ex:
+            popen.kill()
+            (output,error)=popen.communicate()
+            Utils.checkOutputFileWrite(start, cmd, output, error)
+            raise subprocess.TimeoutExpired(cmd=cmd, timeout=ex.timeout, output=output, stderr=error)
         Utils.checkOutputFileWrite(start, cmd, output, error)
         if popen.returncode != 0 and not ignoreError:
             raise subprocess.CalledProcessError(returncode=popen.returncode, cmd=cmd, output=output, stderr=error)
@@ -412,25 +420,29 @@ class Utils:
             raise
 
     @staticmethod
-    def runCmdArrReturnJson(cmdArr, trace=False, silentErrors=True):
-        retStr=Utils.checkOutput(cmdArr)
+    def runCmdArrReturnJson(cmdArr, trace=False, silentErrors=True, timeout=None):
+        """Run a command array and parse its JSON output, optionally with a subprocess timeout."""
+        retStr=Utils.checkOutput(cmdArr, timeout=timeout)
         return Utils.toJson(retStr, trace, silentErrors)
 
     @staticmethod
-    def runCmdReturnStr(cmd, trace=False, ignoreError=False):
+    def runCmdReturnStr(cmd, trace=False, ignoreError=False, timeout=None):
+        """Run a shell command string and return stdout, optionally with a subprocess timeout."""
         cmdArr=shlex.split(cmd)
-        return Utils.runCmdArrReturnStr(cmdArr, ignoreError=ignoreError)
+        return Utils.runCmdArrReturnStr(cmdArr, ignoreError=ignoreError, timeout=timeout)
 
     @staticmethod
-    def runCmdArrReturnStr(cmdArr, trace=False, ignoreError=False):
-        retStr=Utils.checkOutput(cmdArr, ignoreError=ignoreError)
+    def runCmdArrReturnStr(cmdArr, trace=False, ignoreError=False, timeout=None):
+        """Run a command array and return stdout, optionally with a subprocess timeout."""
+        retStr=Utils.checkOutput(cmdArr, ignoreError=ignoreError, timeout=timeout)
         if trace: Utils.Print ("RAW > %s" % (retStr))
         return retStr
 
     @staticmethod
-    def runCmdReturnJson(cmd, trace=False, silentErrors=False):
+    def runCmdReturnJson(cmd, trace=False, silentErrors=False, timeout=None):
+        """Run a shell command string and parse its JSON output, optionally with a subprocess timeout."""
         cmdArr=shlex.split(cmd)
-        return Utils.runCmdArrReturnJson(cmdArr, trace=trace, silentErrors=silentErrors)
+        return Utils.runCmdArrReturnJson(cmdArr, trace=trace, silentErrors=silentErrors, timeout=timeout)
 
     @staticmethod
     def processSysioUtilCmd(cmd, cmdDesc, silentErrors=True, exitOnError=False, exitMsg=None):
