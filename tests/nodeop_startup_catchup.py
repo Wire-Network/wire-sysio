@@ -73,7 +73,9 @@ try:
     specificExtraNodeopArgs[pnodes+13] = f' --sync-fetch-span 89 --read-mode irreversible '
     specificExtraNodeopArgs[pnodes+14] = f' --sync-fetch-span 150 --read-mode irreversible '
     specificExtraNodeopArgs[pnodes+15] = f' --sync-fetch-span 2500 --read-mode irreversible '
+    # Use a line topology so started nodes do not continuously retry every intentionally unstarted catchup node.
     if cluster.launch(prodCount=prodCount, specificExtraNodeopArgs=specificExtraNodeopArgs, activateIF=activateIF, onlyBios=False,
+                      topo="line",
                       pnodes=pnodes, totalNodes=totalNodes, totalProducers=pnodes*prodCount, unstartedNodes=catchupCount,
                       loadSystemContract=True, maximumP2pPerHost=totalNodes+trxGeneratorCnt) is False:
         Utils.errorExit("Failed to stand up eos cluster.")
