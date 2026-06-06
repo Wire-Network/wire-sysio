@@ -652,12 +652,20 @@ class PerformanceTestBasic:
 
     def setupClusterConfig(args) -> ClusterConfig:
 
-        chainPluginArgs = ChainPluginArgs(signatureCpuBillablePct=args.signature_cpu_billable_pct,
+        def supportedPluginArgs(pluginArgsClass, **kwargs):
+            """Return only constructor arguments supported by the generated plugin-args dataclass."""
+            supportedFields = {field.name for field in dataclasses.fields(pluginArgsClass)}
+            return {key: value for key, value in kwargs.items() if key in supportedFields}
+
+        chainPluginArgs = ChainPluginArgs(**supportedPluginArgs(
+                                        ChainPluginArgs,
+                                        signatureCpuBillablePct=args.signature_cpu_billable_pct,
                                         chainThreads=args.chain_threads, databaseMapMode=args.database_map_mode,
                                         wasmRuntime=args.wasm_runtime, contractsConsole=args.contracts_console,
-                                        sysVmOcCacheSizeMb=args.sys_vm_oc_cache_size_mb, sysVmOcCompileThreads=args.sys_vm_oc_compile_threads,
+                                        sysVmOcCacheSizeMb=args.sys_vm_oc_cache_size_mb,
+                                        sysVmOcCompileThreads=args.sys_vm_oc_compile_threads,
                                         blockLogRetainBlocks=args.block_log_retain_blocks,
-                                        chainStateDbSizeMb=args.chain_state_db_size_mb, abiSerializerMaxTimeMs=990000)
+                                        chainStateDbSizeMb=args.chain_state_db_size_mb, abiSerializerMaxTimeMs=990000))
 
         producerPluginArgs = ProducerPluginArgs(disableSubjectiveApiBilling=args.disable_subjective_billing,
                                                 disableSubjectiveP2pBilling=args.disable_subjective_billing,
