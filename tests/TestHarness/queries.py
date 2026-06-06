@@ -240,6 +240,7 @@ class NodeopQueries:
         return self.isBlockPresent(blockNum, blockType=BlockType.lib)
 
     def getTransaction(self, transId, silentErrors=False, exitOnError=False, delayedRetry=True):
+        """Fetch a transaction trace, bounding each poll so missing traces cannot stall bootstrap."""
         assert(isinstance(transId, str))
         exitOnErrorForDelayed=not delayedRetry and exitOnError
         timeout=3
@@ -247,7 +248,7 @@ class NodeopQueries:
         cmd="%s %s" % (cmdDesc, transId)
         msg="(transaction id=%s)" % (transId);
         for i in range(0,(int(60/timeout) - 1)):
-            trans=self.processClioCmd(cmd, cmdDesc, silentErrors=True, exitOnError=exitOnErrorForDelayed, exitMsg=msg)
+            trans=self.processClioCmd(cmd, cmdDesc, silentErrors=True, exitOnError=exitOnErrorForDelayed, exitMsg=msg, timeout=timeout)
             if trans is not None or not delayedRetry:
                 return trans
             if Utils.Debug: Utils.Print("Could not find transaction with id %s, delay and retry" % (transId))
@@ -255,7 +256,7 @@ class NodeopQueries:
 
         self.missingTransaction=True
         # either it is there or the transaction has timed out
-        return self.processClioCmd(cmd, cmdDesc, silentErrors=silentErrors, exitOnError=exitOnError, exitMsg=msg)
+        return self.processClioCmd(cmd, cmdDesc, silentErrors=silentErrors, exitOnError=exitOnError, exitMsg=msg, timeout=timeout)
 
     def isTransInBlock(self, transId, blockId, exitOnError=False):
         """Check if transId is within block identified by blockId"""
@@ -561,7 +562,8 @@ class NodeopQueries:
         keys=list(row["value"].keys())
         return keys
 
-    def processClioCmd(self, cmd, cmdDesc, silentErrors=True, exitOnError=False, exitMsg=None, returnType=ReturnType.json):
+    def processClioCmd(self, cmd, cmdDesc, silentErrors=True, exitOnError=False, exitMsg=None, returnType=ReturnType.json, timeout=None):
+        """Run clio and decode the requested return type, optionally bounding the subprocess runtime."""
         assert(isinstance(returnType, ReturnType))
         cmd="%s %s %s" % (Utils.SysClientPath, self.sysClientArgs(), cmd)
         if Utils.Debug: Utils.Print("cmd: %s" % (cmd))
@@ -576,9 +578,9 @@ class NodeopQueries:
             retries -= 1
             try:
                 if returnType==ReturnType.json:
-                    trans=Utils.runCmdReturnJson(cmd, silentErrors=silentErrors)
+                    trans=Utils.runCmdReturnJson(cmd, silentErrors=silentErrors, timeout=timeout)
                 elif returnType==ReturnType.raw:
-                    trans=Utils.runCmdReturnStr(cmd)
+                    trans=Utils.runCmdReturnStr(cmd, timeout=timeout)
                 else:
                     unhandledEnumType(returnType)
 
@@ -594,6 +596,16 @@ class NodeopQueries:
                         Utils.Print(f"Retrying {cmdDesc} due to: tx_cpu_usage_exceeded")
                         continue # try again
                     errorMsg="Exception during \"%s\". Exception message: %s.  stdout: %s.  cmd Duration=%.3f sec. %s" % (cmdDesc, msg, out, end-start, exitMsg)
+                    if exitOnError:
+                        Utils.cmdError(errorMsg)
+                        Utils.errorExit(errorMsg)
+                    else:
+                        Utils.Print("ERROR: %s" % (errorMsg))
+                return None
+            except subprocess.TimeoutExpired as ex:
+                if not silentErrors:
+                    end=time.perf_counter()
+                    errorMsg="Timeout during \"%s\" after %.3f sec. cmd timeout=%s. %s" % (cmdDesc, end-start, ex.timeout, exitMsg)
                     if exitOnError:
                         Utils.cmdError(errorMsg)
                         Utils.errorExit(errorMsg)
