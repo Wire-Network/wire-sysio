@@ -319,6 +319,10 @@
                 {
                     "name": "consensus_reached",
                     "type": "bool"
+                },
+                {
+                    "name": "winning_checksum",
+                    "type": "checksum256"
                 }
             ]
         },
@@ -347,6 +351,24 @@
                 {
                     "name": "data",
                     "type": "bytes"
+                }
+            ]
+        },
+        {
+            "name": "resolvedisp",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "uint64"
+                },
+                {
+                    "name": "epoch_index",
+                    "type": "uint32"
+                },
+                {
+                    "name": "winning_checksum",
+                    "type": "checksum256"
                 }
             ]
         },
@@ -390,6 +412,11 @@
         {
             "name": "queueout",
             "type": "queueout",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "resolvedisp",
+            "type": "resolvedisp",
             "ricardian_contract": ""
         }
     ],

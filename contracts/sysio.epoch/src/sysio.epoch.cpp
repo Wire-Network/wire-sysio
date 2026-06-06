@@ -320,6 +320,14 @@ void epoch::advance() {
       msgch::envelopes_t envs(MSGCH_ACCOUNT);
       auto oe_idx = envs.get_index<"byoutepoch"_n>();
 
+      msgch::outpost_consensus_t opcons(MSGCH_ACCOUNT);
+
+      // Operators that delivered a NON-canonical envelope for ANY outpost this epoch (deduped).
+      // Slashed once, after the per-outpost loop: an operator that is non-canonical on multiple
+      // outposts must be slashed a single time (opreg::slash throws on a second slash of the same
+      // operator, which would abort advance and stall the chain).
+      std::vector<name> to_slash;
+
       sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
       for (auto op_it = chains_tbl.begin(); op_it != chains_tbl.end(); ++op_it) {
          if (!is_active_outpost(*op_it)) continue;
@@ -328,23 +336,48 @@ void epoch::advance() {
          const uint64_t composite =
             (chain_code << 32) | state.current_epoch_index;
 
-         // Walk the (outpost, epoch) bucket and collect distinct delivering
-         // batch ops. Vector linear-scan is fine — group size is small
+         // Walk the (outpost, epoch) bucket and collect each distinct delivering batch op together
+         // with the checksum it delivered. Vector linear-scan is fine — group size is small
          // (single-digit ops/group in every practical config).
-         std::vector<name> delivered;
+         std::vector<name>        delivered;
+         std::vector<checksum256> delivered_checksums;
          for (auto e = oe_idx.lower_bound(composite);
               e != oe_idx.end() && e->by_outpost_epoch() == composite; ++e) {
             bool already = false;
             for (const auto& d : delivered) {
                if (d == e->batch_op_name) { already = true; break; }
             }
-            if (!already) delivered.push_back(e->batch_op_name);
+            if (!already) {
+               delivered.push_back(e->batch_op_name);
+               delivered_checksums.push_back(e->checksum);
+            }
+         }
+
+         // Canonical envelope checksum for this (outpost, epoch), recorded by msgch consensus or by
+         // dispute resolution. Present only once a winner exists for the expiring epoch; absent it,
+         // nothing is slashed for this outpost (e.g. an outpost that never reached a winner).
+         checksum256 winner{};
+         bool        have_winner = false;
+         {
+            auto opc_pk = msgch::outpost_consensus_key{chain_code};
+            if (opcons.contains(opc_pk)) {
+               auto opc = opcons.get(opc_pk);
+               if (opc.epoch_index == state.current_epoch_index) {
+                  winner      = opc.winning_checksum;
+                  have_winner = true;
+               }
+            }
          }
 
          for (const auto& member : expiring_group) {
-            bool did_deliver = false;
-            for (const auto& d : delivered) {
-               if (d == member) { did_deliver = true; break; }
+            bool        did_deliver = false;
+            checksum256 member_checksum{};
+            for (size_t i = 0; i < delivered.size(); ++i) {
+               if (delivered[i] == member) {
+                  did_deliver     = true;
+                  member_checksum = delivered_checksums[i];
+                  break;
+               }
             }
             action(
                permission_level{get_self(), "owner"_n},
@@ -358,7 +391,32 @@ void epoch::advance() {
                "termcheck"_n,
                std::make_tuple(member)
             ).send();
+
+            // Single slash path (dispute-vote design, per-operator outcome table): a delivered
+            // NON-canonical checksum is a fault -> slash. Silence (no delivery) is never slashed; it
+            // stays on the recorddel/termcheck miss ladder above. Collect here; flush once below.
+            if (did_deliver && have_winner && member_checksum != winner) {
+               bool queued = false;
+               for (const auto& s : to_slash) {
+                  if (s == member) { queued = true; break; }
+               }
+               if (!queued) to_slash.push_back(member);
+            }
          }
+      }
+
+      // Flush the non-canonical slashes. Routed through sysio.chalg (the slashing chokepoint that
+      // holds opreg::slash authority): the slashable bond is moved to the matching LP and the
+      // operator is marked SLASHED.
+      for (const auto& member : to_slash) {
+         action(
+            permission_level{get_self(), "owner"_n},
+            CHALG_ACCOUNT,
+            "slashop"_n,
+            std::make_tuple(member,
+                            std::string("non-canonical OPP envelope delivery, epoch ")
+                               + std::to_string(state.current_epoch_index))
+         ).send();
       }
 
       // NOTE: we intentionally do NOT erase the per-batch-op envelope

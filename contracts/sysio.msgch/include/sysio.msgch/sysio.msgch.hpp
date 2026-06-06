@@ -51,6 +51,13 @@ namespace sysio {
       [[sysio::action]]
       void chkcons();
 
+      /// Dispatch the winning envelope of a resolved OPP dispute. Called inline by
+      /// `sysio.chalg::chkdispute` once the Tier-1 vote selects a canonical checksum. Locates the
+      /// winning envelope's raw bytes among this (outpost, epoch)'s deliveries and runs the shared
+      /// consensus path (store + dispatch attestations, audit log, record the winner on `outpcons`).
+      [[sysio::action]]
+      void resolvedisp(uint64_t chain_code, uint32_t epoch_index, checksum256 winning_checksum);
+
       /// Queue an outbound attestation for an outpost.
       /// Writes to the attestations table with status READY.
       ///
@@ -216,13 +223,20 @@ namespace sysio {
 
       /// Per-outpost consensus tracking for the current epoch.
       /// One row per outpost. Rows reused (not erased) to avoid RAM churn.
+      ///
+      /// `winning_checksum` is the canonical envelope checksum for `epoch_index` — recorded when
+      /// consensus is reached (majority/unanimous path) or when a Tier-1 dispute vote resolves
+      /// (via `resolvedisp`). `sysio.epoch::advance` reads it to classify each operator's delivery:
+      /// a matching checksum is a hit, a non-matching delivered checksum is slashed. Zero until a
+      /// winner exists for the current epoch.
       struct [[sysio::table("outpcons")]] outpost_consensus_entry {
-         uint64_t chain_code;
-         uint32_t epoch_index;
-         bool     consensus_reached;
+         uint64_t    chain_code;
+         uint32_t    epoch_index;
+         bool        consensus_reached;
+         checksum256 winning_checksum;
 
          SYSLIB_SERIALIZE(outpost_consensus_entry,
-            (chain_code)(epoch_index)(consensus_reached))
+            (chain_code)(epoch_index)(consensus_reached)(winning_checksum))
       };
 
       using outpost_consensus_t =
