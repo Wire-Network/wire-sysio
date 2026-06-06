@@ -42,7 +42,7 @@ jobs:
   parallel-tests:
     name: Build and run parallel tests on Apple Silicon
     runs-on: macos-26
-    timeout-minutes: 180
+    timeout-minutes: 360
     env:
       VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/vcpkg-binary-cache,readwrite"
     steps:
@@ -107,17 +107,15 @@ jobs:
             --output-on-failure --timeout 1000 \
             2>&1 | tee "$RUNNER_TEMP/macos-arm64-parallel-ctest.log"
 
-      - name: Run nodeop nonparallelizable test
+      - name: Run sharded NP/LR tests
         run: |
           cd build/macos-arm64
-          ctest --output-on-failure -R "^nodeop_run_test$" --timeout 1000 \
-            2>&1 | tee "$RUNNER_TEMP/macos-arm64-nodeop-run-test.log"
-
-      - name: Run ship streamer test
-        run: |
-          cd build/macos-arm64
-          ctest --output-on-failure -R "^ship_streamer_test$" --timeout 1000 \
-            2>&1 | tee "$RUNNER_TEMP/macos-arm64-ship-streamer-test.log"
+          test_jobs="$(sysctl -n hw.logicalcpu)"
+          echo "Running sharded NP/LR tests with ${test_jobs} jobs"
+          ctest -j "${test_jobs}" \
+            -L "(nonparallelizable_tests|long_running_tests)" \
+            --output-on-failure --timeout 2700 \
+            2>&1 | tee "$RUNNER_TEMP/macos-arm64-np-lr-ctest.log"
 
       - name: Show diagnostics on failure
         if: failure()
