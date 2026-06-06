@@ -53,6 +53,8 @@ testSuccessful=False
 errorInThread=False
 noOC = args.sys_vm_oc_enable == "none"
 allOC = args.sys_vm_oc_enable == "all"
+ocSupported = platform.system() == "Linux"
+ocRequested = args.sys_vm_oc_enable in ("all", "auto") and ocSupported
 
 random.seed(seed) # Use a fixed seed for repeatability.
 # all debuglevel so that "executing ${h} with sys vm oc" is logged
@@ -111,14 +113,15 @@ def startCluster():
     specificExtraNodeopArgs[pnodes]+=" 10000 "
     specificExtraNodeopArgs[pnodes]+=" --read-only-read-window-time-us "
     specificExtraNodeopArgs[pnodes]+=" 510000 "
-    specificExtraNodeopArgs[pnodes]+=" --sys-vm-oc-cache-size-mb "
-    specificExtraNodeopArgs[pnodes]+=" 1 " # set small so there is churn
     specificExtraNodeopArgs[pnodes]+=" --read-only-threads "
     specificExtraNodeopArgs[pnodes]+=str(args.read_only_threads)
-    if args.sys_vm_oc_enable:
-        if platform.system() != "Linux":
-            Print("OC not run on Linux. Skip the test")
-            exit(True) # Do not fail the test
+    if args.sys_vm_oc_enable != "none" and not ocSupported:
+        if allOC or args.wasm_runtime == "sys-vm-oc-forced":
+            Print("sys-vm-oc is unavailable on this platform. Skip the test")
+            exit(0) # Do not fail the test
+    if ocRequested:
+        specificExtraNodeopArgs[pnodes]+=" --sys-vm-oc-cache-size-mb "
+        specificExtraNodeopArgs[pnodes]+=" 1 " # set small so there is churn
         specificExtraNodeopArgs[pnodes]+=" --sys-vm-oc-enable "
         specificExtraNodeopArgs[pnodes]+=args.sys_vm_oc_enable
     if args.wasm_runtime:
@@ -140,9 +143,9 @@ def startCluster():
     # sysio.* should be using oc unless oc tierup disabled
     Utils.Print(f"search: executing {sysioCodeHash} with sys vm oc")
     found = producerNode.findInLog(f"executing {sysioCodeHash} with sys vm oc")
-    assert( found or (noOC and not found) )
+    assert( found or ((noOC or not ocSupported) and not found) )
 
-    if args.sys_vm_oc_enable:
+    if ocRequested:
         verifyOcVirtualMemory()
 
 def verifyOcVirtualMemory():
