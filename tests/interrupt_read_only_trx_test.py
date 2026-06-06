@@ -87,7 +87,7 @@ def startCluster():
     specificExtraNodeopArgs[pnodes]+=str(args.read_only_threads)
     if args.sys_vm_oc_enable:
         if platform.system() != "Linux":
-            Print("OC not run on Linux. Skip the test")
+            Print("sys-vm-oc is unavailable on this platform. Skip the test")
             exit(0) # Do not fail the test
         specificExtraNodeopArgs[pnodes]+=" --sys-vm-oc-enable "
         specificExtraNodeopArgs[pnodes]+=args.sys_vm_oc_enable
