@@ -90,8 +90,23 @@ class Utils:
     ConfigDir=f"{DataPath}/"
 
     TimeFmt='%Y-%m-%dT%H:%M:%S.%f'
+    _nodeopHelpOutput=None
     # lock to serialize writes to subprocess_results.log across threads
     _check_output_lock = threading.Lock()
+
+    @staticmethod
+    def nodeopSupportsOption(option):
+        """Return whether the built nodeop binary advertises the given command-line option."""
+        if Utils._nodeopHelpOutput is None:
+            result=subprocess.run(
+                [Utils.SysServerPath, "--help"],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                universal_newlines=True,
+                check=False)
+            Utils._nodeopHelpOutput=result.stdout
+
+        return option in Utils._nodeopHelpOutput
 
     @staticmethod
     def timestamp():

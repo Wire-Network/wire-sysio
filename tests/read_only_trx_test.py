@@ -5,7 +5,6 @@ import time
 import signal
 import threading
 import os
-import platform
 import traceback
 
 from TestHarness import Account, Cluster, ReturnType, TestHelper, Utils, WalletMgr
@@ -53,7 +52,7 @@ testSuccessful=False
 errorInThread=False
 noOC = args.sys_vm_oc_enable == "none"
 allOC = args.sys_vm_oc_enable == "all"
-ocSupported = platform.system() == "Linux"
+ocSupported = Utils.nodeopSupportsOption("--sys-vm-oc-enable")
 ocRequested = args.sys_vm_oc_enable in ("all", "auto") and ocSupported
 
 random.seed(seed) # Use a fixed seed for repeatability.

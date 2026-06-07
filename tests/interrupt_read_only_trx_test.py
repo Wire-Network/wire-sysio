@@ -4,7 +4,6 @@ import time
 import signal
 import threading
 import os
-import platform
 
 from TestHarness import Account, Cluster, ReturnType, TestHelper, Utils, WalletMgr
 from TestHarness.TestHelper import AppArgs
@@ -42,6 +41,8 @@ Utils.Debug=debug
 testSuccessful=False
 noOC = args.sys_vm_oc_enable == "none"
 allOC = args.sys_vm_oc_enable == "all"
+ocSupported = Utils.nodeopSupportsOption("--sys-vm-oc-enable")
+ocRequested = args.sys_vm_oc_enable in ("all", "auto") and ocSupported
 
 # all debuglevel so that "executing ${h} with sys vm oc" is logged
 cluster=Cluster(loggingLevel="all", unshared=args.unshared, keepRunning=args.leave_running, keepLogs=args.keep_logs)
@@ -81,14 +82,15 @@ def startCluster():
     specificExtraNodeopArgs[pnodes]+=" --contracts-console "
     specificExtraNodeopArgs[pnodes]+=" --read-only-read-window-time-us "
     specificExtraNodeopArgs[pnodes]+=" 3600000000 " # 1hr to test interrupt of ctrl-c
-    specificExtraNodeopArgs[pnodes]+=" --sys-vm-oc-cache-size-mb "
-    specificExtraNodeopArgs[pnodes]+=" 1 " # set small so there is churn
     specificExtraNodeopArgs[pnodes]+=" --read-only-threads "
     specificExtraNodeopArgs[pnodes]+=str(args.read_only_threads)
-    if args.sys_vm_oc_enable:
-        if platform.system() != "Linux":
+    if args.sys_vm_oc_enable != "none" and not ocSupported:
+        if allOC or args.wasm_runtime == "sys-vm-oc-forced":
             Print("sys-vm-oc is unavailable on this platform. Skip the test")
             exit(0) # Do not fail the test
+    if ocRequested:
+        specificExtraNodeopArgs[pnodes]+=" --sys-vm-oc-cache-size-mb "
+        specificExtraNodeopArgs[pnodes]+=" 1 " # set small so there is churn
         specificExtraNodeopArgs[pnodes]+=" --sys-vm-oc-enable "
         specificExtraNodeopArgs[pnodes]+=args.sys_vm_oc_enable
     if args.wasm_runtime:
@@ -111,7 +113,7 @@ def startCluster():
     # sysio.* should be using oc unless oc tierup disabled
     Utils.Print(f"search: executing {sysioCodeHash} with sys vm oc")
     found = producerNode.findInLog(f"executing {sysioCodeHash} with sys vm oc")
-    assert( found or (noOC and not found) )
+    assert( found or ((noOC or not ocSupported) and not found) )
 
 def deployTestContracts():
     Utils.Print("Create payloadless account and deploy payloadless contract")
