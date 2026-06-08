@@ -285,7 +285,23 @@ public:
          ("batch_op_name", BATCHOP.to_string())("chain_code", chain_code)("data", data));
    }
 
+   /// Re-fire evalcons directly (as sysio.msgch, its own auth) for one (outpost, epoch) -- the same
+   /// re-evaluation a post-quorum late delivery drives through deliver.
+   action_result evalcons(uint64_t chain_code, uint32_t epoch_index) {
+      return push(MSGCH_ACCOUNT, msgch_abi, MSGCH_ACCOUNT, "evalcons"_n, mvo()
+         ("chain_code", chain_code)("epoch_index", epoch_index));
+   }
+
    // ── table reads ──────────────────────────────────────────────────────────
+
+   /// `outpcons.epoch_index` for `chain_code` (the durable consensus marker), or -1 if no row.
+   int64_t outpcons_epoch(uint64_t chain_code) {
+      auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "outpcons"_n, chain_code);
+      if (data.empty()) return -1;
+      auto v = msgch_abi.binary_to_variant("outpost_consensus_entry", data,
+         abi_serializer::create_yield_function(abi_serializer_max_time));
+      return v["epoch_index"].as<uint32_t>();
+   }
 
    fc::variant get_dispute(uint64_t id) {
       auto data = get_row_by_id(CHALG_ACCOUNT, CHALG_ACCOUNT, "disputes"_n, id);
@@ -662,6 +678,27 @@ BOOST_FIXTURE_TEST_CASE(slashed_op_excluded_from_scheduling_no_double_slash, sys
    BOOST_REQUIRE(!group_contains(g1, BATCHOP_B));   // slashed -> never re-enters a group
    BOOST_REQUIRE(group_contains(g1, BATCHOP));
    BOOST_REQUIRE(group_contains(g1, BATCHOP_C));
+} FC_LOG_AND_RETHROW() }
+
+// Regression: after consensus, the winning delivery rows have raw_data cleared and the inbound
+// message row is erased, so the idempotency guard must key off the DURABLE outpcons row. A
+// post-quorum re-fire of evalcons (the path a late delivery takes through deliver) must be a benign
+// no-op, not an empty-envelope decode that aborts -- which would also revert the late delivery and
+// drop its envelope row, leaving epoch::advance nothing to classify/slash. Pre-fix this threw
+// "failed to decode inbound OPP Envelope".
+BOOST_FIXTURE_TEST_CASE(post_consensus_evalcons_refire_is_benign_noop, sysio_dispute_tester) { try {
+   const uint32_t epoch = current_epoch();
+   auto env = encode_envelope(epoch, "canonical");
+
+   // 1-op group: the first deliver reaches all-delivered consensus, dispatches, clears raw_data,
+   // erases the inbound message row, and records outpcons for this epoch.
+   BOOST_REQUIRE_EQUAL(success(), deliver(eth_code(), env));
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(epoch), outpcons_epoch(eth_code()));
+
+   // Re-fire evalcons for the same (outpost, epoch): the winning checksum's raw_data is now empty.
+   // The durable guard short-circuits it to a no-op instead of decoding empty bytes and aborting.
+   BOOST_REQUIRE_EQUAL(success(), evalcons(eth_code(), epoch));
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(epoch), outpcons_epoch(eth_code()));  // still recorded
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()

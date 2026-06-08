@@ -731,16 +731,23 @@ void apply_consensus(name self, uint64_t chain_code, uint32_t epoch_index,
                      const std::vector<char>& raw, const checksum256& winning_checksum) {
    const uint128_t composite = opp::outpost_epoch_key(chain_code, epoch_index);
 
-   // Idempotency guard: if an INBOUND message for this (chain_code, epoch) is already on file the
-   // envelope was processed already (post-quorum late delivery, or a re-fired resolvedisp). The
-   // late delivery is a benign no-op.
+   // Idempotency guard, keyed off the DURABLE per-outpost consensus row. `outpcons.epoch_index` is
+   // written only here (apply_consensus) and is never rolled back by chkcons's per-advance reset, so
+   // `epoch_index == this epoch` reliably means the winning envelope for this (outpost, epoch) was
+   // already decoded, dispatched, and logged.
+   //
+   // It must NOT key off the inbound `messages` row: that row is erased after dispatch below, AND the
+   // consensus cleanup clears `raw_data` from every delivery row. So a post-quorum re-fire of evalcons
+   // would otherwise re-group the now-empty winning row and abort here on an empty-envelope decode --
+   // turning a benign late delivery into a hard failure and, because the whole deliver tx reverts,
+   // dropping the late operator's own envelope row that epoch::advance needs to classify/slash. This
+   // no-op returns before any cleanup, so that row persists.
    {
-      msgch::messages_t msgs(self);
-      auto ep_idx = msgs.get_index<"byepoch"_n>();
-      for (auto it = ep_idx.lower_bound(epoch_index);
-           it != ep_idx.end() && it->by_epoch() == epoch_index; ++it) {
-         if (it->chain_code == chain_code
-             && it->direction == MessageDirection::MESSAGE_DIRECTION_INBOUND) {
+      msgch::outpost_consensus_t opcons(self);
+      auto opc_pk = msgch::outpost_consensus_key{chain_code};
+      if (opcons.contains(opc_pk)) {
+         auto opc = opcons.get(opc_pk);
+         if (opc.epoch_index == epoch_index) {
             sysio::print_f("apply_consensus: chain_code=%llu epoch=%u already dispatched, "
                            "treating as benign no-op\n",
                            static_cast<unsigned long long>(chain_code), epoch_index);
