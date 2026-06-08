@@ -1,10 +1,19 @@
 set(SYSIO_TEST_PORT_OFFSET_START 100)
 set(SYSIO_TEST_PORT_OFFSET_STRIDE 192)
+set(SYSIO_TEST_PORT_ANCHOR 8888)
+set(SYSIO_TEST_PORT_EPHEMERAL_FLOOR 32768)
 
 function(next_test_port_offset out_var)
    get_property(next_offset GLOBAL PROPERTY SYSIO_NEXT_TEST_PORT_OFFSET)
    if(NOT next_offset)
       set(next_offset "${SYSIO_TEST_PORT_OFFSET_START}")
+   endif()
+
+   math(EXPR shard_max_port "${SYSIO_TEST_PORT_ANCHOR} + ${next_offset} + ${SYSIO_TEST_PORT_OFFSET_STRIDE} - 1")
+   if(shard_max_port GREATER_EQUAL ${SYSIO_TEST_PORT_EPHEMERAL_FLOOR})
+      message(FATAL_ERROR
+         "CTest port shard ${next_offset} would reach port ${shard_max_port}, "
+         "which is at or above the ${SYSIO_TEST_PORT_EPHEMERAL_FLOOR} ephemeral-port floor")
    endif()
 
    math(EXPR next_next_offset "${next_offset} + ${SYSIO_TEST_PORT_OFFSET_STRIDE}")
@@ -13,7 +22,7 @@ function(next_test_port_offset out_var)
 endfunction()
 
 function(setup_test_common)
-   cmake_parse_arguments(PARSE_ARGV 0 arg "AUTO_PORT_OFFSET;AUTO_LR_PORT_OFFSET" "NAME;COST;TIMEOUT;PORT_OFFSET" "COMMAND;ENVIRONMENT")
+   cmake_parse_arguments(PARSE_ARGV 0 arg "AUTO_PORT_OFFSET" "NAME;COST;TIMEOUT;PORT_OFFSET" "COMMAND;ENVIRONMENT")
 
    add_test(NAME "${arg_NAME}" COMMAND ${arg_COMMAND} WORKING_DIRECTORY "${CMAKE_BINARY_DIR}")
 
@@ -25,8 +34,6 @@ function(setup_test_common)
    endif()
    if(arg_PORT_OFFSET)
       set(test_port_offset ${arg_PORT_OFFSET})
-   elseif(arg_AUTO_LR_PORT_OFFSET)
-      next_test_port_offset(test_port_offset)
    elseif(arg_AUTO_PORT_OFFSET)
       next_test_port_offset(test_port_offset)
    endif()
@@ -60,6 +67,6 @@ endfunction()
 function(add_lr_test)
    cmake_parse_arguments(PARSE_ARGV 0 arg "" "NAME;COST;TIMEOUT" "COMMAND")
 
-   setup_test_common(${ARGV} AUTO_LR_PORT_OFFSET)
+   setup_test_common(${ARGV} AUTO_PORT_OFFSET)
    set_property(TEST "${arg_NAME}" PROPERTY LABELS long_running_tests)
 endfunction()

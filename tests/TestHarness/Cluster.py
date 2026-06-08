@@ -193,9 +193,9 @@ class Cluster(object):
     def _portsForLocalLaunch(self, totalNodes):
         """Return the local HTTP and P2P ports reserved by a cluster launch."""
         ports = set(range(self.port, self.port + totalNodes))
-        ports.add(self.port - 100)
+        ports.add(Utils.getPort(Utils.PortBiosHttp))
         ports.update(range(self.p2pBasePort, self.p2pBasePort + totalNodes))
-        ports.add(self.p2pBasePort - 100)
+        ports.add(Utils.getPort(Utils.PortBiosP2P))
         return ports
 
     def launch(self, pnodes=1, unstartedNodes=0, totalNodes=1, prodCount=21, topo="mesh", delay=2, onlyBios=False, dontBootstrap=False,
@@ -740,7 +740,7 @@ class Cluster(object):
 
     def getBiosP2pEndpoint(self):
         """Return the sharded P2P endpoint for the BIOS node."""
-        return f"{self.host}:{self.p2pBasePort - 100}"
+        return f"{self.host}:{Utils.getPort(Utils.PortBiosP2P)}"
 
     def getHttpEndpoint(self, nodeId: int):
         """Return the sharded HTTP endpoint for a non-BIOS node."""

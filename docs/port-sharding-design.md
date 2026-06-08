@@ -18,10 +18,12 @@ CTest offsets are assigned in `cmake/test-helpers.cmake` by one shared allocator
 ```cmake
 set(SYSIO_TEST_PORT_OFFSET_START 100)
 set(SYSIO_TEST_PORT_OFFSET_STRIDE 192)
+set(SYSIO_TEST_PORT_EPHEMERAL_FLOOR 32768)
 ```
 
 Both `add_np_test()` and `add_lr_test()` call this allocator. The allocator is global, not label-specific, so an NP
-test and an LR test cannot receive the same offset during one CMake configure.
+test and an LR test cannot receive the same offset during one CMake configure. The helper keeps one public
+`AUTO_PORT_OFFSET` flag internally; both labels use it because they intentionally share one offset sequence.
 
 The generated sequence is compact and deterministic:
 
@@ -34,6 +36,9 @@ Each offset reserves one 192-port shard. For a nonzero offset, category slots ar
 ```text
 shard_base = 8888 + SYSIO_TEST_PORT_OFFSET
 ```
+
+CMake fails configuration if a new test would push the conservative shard ceiling
+`8888 + SYSIO_TEST_PORT_OFFSET + 191` into the default Linux ephemeral-port range.
 
 ## Category Mapping
 
@@ -57,7 +62,8 @@ Current category slots are:
 | `alternate_service` | `8976` | `91` | `1` | explicit alternate service listener |
 | `plugin_http_peer` | `9009` | `92` | `1` | plugin HTTP peer endpoint |
 | `plugin_http_local` | `9011` | `93` | `1` | plugin HTTP local endpoint |
-| `alternate_p2p` | `9776` | `94..140` | `47` | alternate P2P/listener endpoints |
+| `bios_p2p` | `9776` | `94` | `1` | BIOS P2P endpoint |
+| `alternate_p2p` | `9777` | `95..140` | `46` | alternate P2P/listener endpoints |
 | `p2p` | `9876` | `141..163` | `23` | normal node P2P endpoints |
 | `wallet` | `9899` | `164..168` | `5` | wallet/kiod endpoints |
 | `transaction_only` | `9902` | `169..170` | `2` | transaction-only P2P endpoints |
@@ -78,7 +84,8 @@ For example, with offsets `100` and `292`:
 | `state_history` | `8989` | `9181` |
 | `bios_http` | `8990` | `9182` |
 | `node_http[0]` | `8991` | `9183` |
-| `alternate_p2p[0]` | `9082` | `9274` |
+| `bios_p2p` | `9082` | `9274` |
+| `alternate_p2p[0]` | `9083` | `9275` |
 | `p2p[0]` | `9129` | `9321` |
 | `wallet[0]` | `9152` | `9344` |
 | `transaction_only[0]` | `9157` | `9349` |
@@ -127,6 +134,7 @@ New test endpoints should use one of these patterns:
 - `Cluster.getHttpEndpoint(node_id)` for node HTTP endpoints.
 - `Cluster.getNodeP2pEndpoint(node_id)` for node P2P endpoints.
 - `Cluster.getBiosP2pEndpoint()` for the BIOS P2P endpoint.
+- `Utils.getPort(Utils.PortBiosHttp)` for the BIOS HTTP endpoint.
 - `sysio::testing::get_port(port_category::state_history)` in C++ test helpers or test binaries.
 
 Do not hardcode shifted port numbers in tests. Keep the unsharded category default local and let the harness assign
@@ -144,7 +152,7 @@ ctest --test-dir build/codex-system-contracts -N -V -L 'nonparallelizable_tests|
   | uniq -d
 ```
 
-Summarize the current offset range and highest compact hot listener port:
+Summarize the current offset range and conservative compact shard ceiling:
 
 ```bash
 python3 - <<'PY'
@@ -169,6 +177,9 @@ print("max_offset", max(offsets))
 print("max_hot_port", 8888 + max(offsets) + 191)
 PY
 ```
+
+The `+191` value is the full reserved shard width, not the highest listener slot currently assigned. The current
+highest assigned slot is `174`, but the wider bound keeps the ephemeral-range check stable as new categories are added.
 
 Run the full NP/LR set with high local concurrency:
 
@@ -218,4 +229,6 @@ That was fixed by moving the Unix socket to the short `/tmp/sysio-ship-<port>.so
 
 Port sharding removes listener collisions; it does not make every NP/LR test safe under unbounded machine load.
 At very high parallelism, many tests bootstrap chains, publish large contracts, run transaction generators, and start
-many `nodeop` processes at once. Treat `-j90` as a collision stress probe, not as the expected CI concurrency level.
+many `nodeop` processes at once. Treat `-j90` as a collision stress probe above the expected CI concurrency level.
+CI intentionally runs the sharded NP/LR set with `-j $(nproc)` so scheduler, sanitizer, and process-interleaving
+flakes are surfaced as failures. These tests are expected to be deterministic under normal CI CPU pressure.

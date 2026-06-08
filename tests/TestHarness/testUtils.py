@@ -94,6 +94,7 @@ class Utils:
     PortShip="ship"
     PortStateHistory="state_history"
     PortBiosHttp="bios_http"
+    PortBiosP2P="bios_p2p"
     PortNodeHttp="node_http"
     PortAlternateService="alternate_service"
     PortPluginHttpPeer="plugin_http_peer"
@@ -148,7 +149,8 @@ class Utils:
             Utils.PortAlternateService: (91, 1),
             Utils.PortPluginHttpPeer: (92, 1),
             Utils.PortPluginHttpLocal: (93, 1),
-            Utils.PortAlternateP2P: (94, 47),
+            Utils.PortBiosP2P: (94, 1),
+            Utils.PortAlternateP2P: (95, 46),
             Utils.PortP2P: (141, 23),
             Utils.PortWallet: (164, Utils.WalletPortCount),
             Utils.PortTransactionOnly: (169, 2),
@@ -169,11 +171,12 @@ class Utils:
                 Utils.PortShip: 7899,
                 Utils.PortStateHistory: 8080,
                 Utils.PortBiosHttp: 8788,
+                Utils.PortBiosP2P: 9776,
                 Utils.PortNodeHttp: 8888,
                 Utils.PortAlternateService: 8976,
                 Utils.PortPluginHttpPeer: 9009,
                 Utils.PortPluginHttpLocal: 9011,
-                Utils.PortAlternateP2P: 9776,
+                Utils.PortAlternateP2P: 9777,
                 Utils.PortP2P: 9876,
                 Utils.PortWallet: 9899,
                 Utils.PortTransactionOnly: 9902,

@@ -13,6 +13,7 @@ from TestHarness import Cluster, TestHelper, Utils, WalletMgr
 
 Print=Utils.Print
 errorExit=Utils.errorExit
+# These endpoints are advertised in handshakes only; the test never binds them.
 advertisedP2pEndpoint0 = 'ext-ip0:20000'
 advertisedP2pEndpoint1 = 'ext-ip1:20001'
 
@@ -53,8 +54,8 @@ try:
     Print(f'producing nodes: {pnodes}, delay between nodes launch: {delay} second{"s" if delay != 1 else ""}')
 
     Print("Stand up cluster")
-    alternateListenEndpoint = f"0.0.0.0:{Utils.getPort(Utils.PortAlternateP2P, 3)}"
-    alternatePeerEndpoint = f"localhost:{Utils.getPort(Utils.PortAlternateP2P, 3)}"
+    alternateListenEndpoint = f"0.0.0.0:{Utils.getPort(Utils.PortAlternateP2P, 2)}"
+    alternatePeerEndpoint = f"localhost:{Utils.getPort(Utils.PortAlternateP2P, 2)}"
     specificArgs = {
         '0': f'--agent-name node-00 --p2p-listen-endpoint 0.0.0.0:{cluster.getNodeP2pPort(0)} '
              f'--p2p-listen-endpoint {alternateListenEndpoint} --p2p-server-address {advertisedP2pEndpoint0} '
