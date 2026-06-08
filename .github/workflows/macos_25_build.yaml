@@ -2,6 +2,22 @@ name: "macOS 25 arm64 build & tests"
 
 on:
   workflow_dispatch:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches:
+      - master
+    paths:
+      - ".github/workflows/macos_25_build.yaml"
+      - ".github/vcpkg-triplets/**"
+      - "cmake/**"
+      - "libraries/**"
+      - "plugins/**"
+      - "programs/**"
+      - "unittests/**"
+      - "tests/**"
+      - "CMakeLists.txt"
+      - "vcpkg.json"
+      - "vcpkg-configuration.json"
 
 permissions:
   contents: read
