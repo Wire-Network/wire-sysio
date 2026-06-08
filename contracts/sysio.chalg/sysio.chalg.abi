@@ -4,66 +4,6 @@
     "types": [],
     "structs": [
         {
-            "name": "challenge_entry",
-            "base": "",
-            "fields": [
-                {
-                    "name": "id",
-                    "type": "uint64"
-                },
-                {
-                    "name": "chain_request_id",
-                    "type": "uint64"
-                },
-                {
-                    "name": "epoch_index",
-                    "type": "uint32"
-                },
-                {
-                    "name": "round",
-                    "type": "uint8"
-                },
-                {
-                    "name": "status",
-                    "type": "ChallengeStatus"
-                },
-                {
-                    "name": "challenge_hash",
-                    "type": "checksum256"
-                },
-                {
-                    "name": "response_hash",
-                    "type": "checksum256"
-                },
-                {
-                    "name": "correct_operators",
-                    "type": "name[]"
-                },
-                {
-                    "name": "faulty_operators",
-                    "type": "name[]"
-                },
-                {
-                    "name": "challenged_at",
-                    "type": "time_point"
-                },
-                {
-                    "name": "responded_at",
-                    "type": "time_point"
-                }
-            ]
-        },
-        {
-            "name": "challenge_key",
-            "base": "",
-            "fields": [
-                {
-                    "name": "id",
-                    "type": "uint64"
-                }
-            ]
-        },
-        {
             "name": "chkdispute",
             "base": "",
             "fields": [
@@ -164,70 +104,6 @@
             ]
         },
         {
-            "name": "enforce",
-            "base": "",
-            "fields": [
-                {
-                    "name": "resolution_id",
-                    "type": "uint64"
-                }
-            ]
-        },
-        {
-            "name": "escalate",
-            "base": "",
-            "fields": [
-                {
-                    "name": "challenge_id",
-                    "type": "uint64"
-                }
-            ]
-        },
-        {
-            "name": "initchal",
-            "base": "",
-            "fields": [
-                {
-                    "name": "chain_req_id",
-                    "type": "uint64"
-                }
-            ]
-        },
-        {
-            "name": "manual_resolution",
-            "base": "",
-            "fields": [
-                {
-                    "name": "id",
-                    "type": "uint64"
-                },
-                {
-                    "name": "challenge_id",
-                    "type": "uint64"
-                },
-                {
-                    "name": "original_chain_hash",
-                    "type": "checksum256"
-                },
-                {
-                    "name": "round1_chain_hash",
-                    "type": "checksum256"
-                },
-                {
-                    "name": "round2_chain_hash",
-                    "type": "checksum256"
-                },
-                {
-                    "name": "msig_proposal",
-                    "type": "name"
-                },
-                {
-                    "name": "is_resolved",
-                    "type": "bool"
-                }
-            ]
-        },
-        {
             "name": "opendispute",
             "base": "",
             "fields": [
@@ -246,16 +122,6 @@
             ]
         },
         {
-            "name": "resolution_key",
-            "base": "",
-            "fields": [
-                {
-                    "name": "id",
-                    "type": "uint64"
-                }
-            ]
-        },
-        {
             "name": "slashop",
             "base": "",
             "fields": [
@@ -266,54 +132,6 @@
                 {
                     "name": "reason",
                     "type": "string"
-                }
-            ]
-        },
-        {
-            "name": "submitres",
-            "base": "",
-            "fields": [
-                {
-                    "name": "submitter",
-                    "type": "name"
-                },
-                {
-                    "name": "challenge_id",
-                    "type": "uint64"
-                },
-                {
-                    "name": "orig_hash",
-                    "type": "checksum256"
-                },
-                {
-                    "name": "r1_hash",
-                    "type": "checksum256"
-                },
-                {
-                    "name": "r2_hash",
-                    "type": "checksum256"
-                }
-            ]
-        },
-        {
-            "name": "submitresp",
-            "base": "",
-            "fields": [
-                {
-                    "name": "challenge_id",
-                    "type": "uint64"
-                },
-                {
-                    "name": "response_hash",
-                    "type": "checksum256"
-                },
-                {
-                    "name": "correct_ops",
-                    "type": "name[]"
-                },
-                {
-                    "name": "faulty_ops",
-                    "type": "name[]"
                 }
             ]
         },
@@ -343,21 +161,6 @@
             "ricardian_contract": ""
         },
         {
-            "name": "enforce",
-            "type": "enforce",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "escalate",
-            "type": "escalate",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "initchal",
-            "type": "initchal",
-            "ricardian_contract": ""
-        },
-        {
             "name": "opendispute",
             "type": "opendispute",
             "ricardian_contract": ""
@@ -368,42 +171,12 @@
             "ricardian_contract": ""
         },
         {
-            "name": "submitres",
-            "type": "submitres",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "submitresp",
-            "type": "submitresp",
-            "ricardian_contract": ""
-        },
-        {
             "name": "votedispute",
             "type": "votedispute",
             "ricardian_contract": ""
         }
     ],
     "tables": [
-        {
-            "name": "challenges",
-            "type": "challenge_entry",
-            "index_type": "i64",
-            "key_names": ["id"],
-            "key_types": ["uint64"],
-            "table_id": 633,
-            "secondary_indexes": [
-                {
-                    "name": "byrequest",
-                    "key_type": "uint64",
-                    "table_id": 56986
-                },
-                {
-                    "name": "byepoch",
-                    "key_type": "uint64",
-                    "table_id": 22792
-                }
-            ]
-        },
         {
             "name": "disputes",
             "type": "dispute_entry",
@@ -431,42 +204,12 @@
             "key_names": ["scope","owner"],
             "key_types": ["name","uint64"],
             "table_id": 51768
-        },
-        {
-            "name": "resolutions",
-            "type": "manual_resolution",
-            "index_type": "i64",
-            "key_names": ["id"],
-            "key_types": ["uint64"],
-            "table_id": 62629
         }
     ],
     "ricardian_clauses": [],
     "variants": [],
     "action_results": [],
     "enums": [
-        {
-            "name": "ChallengeStatus",
-            "type": "int32",
-            "values": [
-                {
-                    "name": "CHALLENGE_STATUS_CHALLENGE_SENT",
-                    "value": 0
-                },
-                {
-                    "name": "CHALLENGE_STATUS_RESPONSE_RECEIVED",
-                    "value": 1
-                },
-                {
-                    "name": "CHALLENGE_STATUS_RESOLVED",
-                    "value": 2
-                },
-                {
-                    "name": "CHALLENGE_STATUS_ESCALATED",
-                    "value": 3
-                }
-            ]
-        },
         {
             "name": "DisputeStatus",
             "type": "int32",
