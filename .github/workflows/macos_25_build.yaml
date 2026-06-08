@@ -28,8 +28,8 @@ defaults:
 
 jobs:
   parallel-tests:
-    name: Build and run parallel tests on macOS 26
-    runs-on: macos-25
+    name: Build and run parallel tests on macOS 15
+    runs-on: macos-15
     timeout-minutes: 180
     env:
       VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/vcpkg-binary-cache,readwrite"
