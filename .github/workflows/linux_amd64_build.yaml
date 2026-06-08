@@ -39,6 +39,7 @@ defaults:
 jobs:
   platform-cache:
     name: Platform Cache
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
     uses: Wire-Network/platform-cache-workflow/.github/workflows/platformcache.yaml@v2
     permissions:
       packages: write
@@ -50,6 +51,7 @@ jobs:
 
   build-base:
     name: Run Build Workflow
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
     uses: ./.github/workflows/build_base.yaml
     needs: [platform-cache]
     secrets:
@@ -60,6 +62,7 @@ jobs:
 
   v:
     name: Discover Versions
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
     runs-on: ubuntu-latest
     outputs:
       cdt-target: ${{steps.versions.outputs.cdt-target}}
@@ -88,6 +91,7 @@ jobs:
 
   package:
     name: Build deb packages (${{matrix.platform}})
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
     needs: [platform-cache, build-base]
     strategy:
       fail-fast: false
@@ -129,6 +133,7 @@ jobs:
 
   tests:
     name: Tests (${{matrix.cfg.name}})
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
     needs: [platform-cache, build-base]
     strategy:
       fail-fast: false
@@ -252,6 +257,7 @@ jobs:
 
   np-tests:
     name: NP Tests (${{ matrix.cfg.name }})
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
     needs: [platform-cache, build-base]
     strategy:
       fail-fast: false
@@ -324,6 +330,7 @@ jobs:
 
   lr-tests:
     name: LR Tests (${{matrix.cfg.name}})
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
     needs: [platform-cache, build-base]
     strategy:
       fail-fast: false
@@ -495,7 +502,7 @@ jobs:
   all-passing:
     name: All Required Tests Passed
     needs: [ tests, np-tests, lr-tests ]
-    if: always()
+    if: ${{ always() && (github.event_name != 'pull_request' || github.event.pull_request.draft == false) }}
     runs-on: ubuntu-latest
     steps:
       - name: Send Notification
