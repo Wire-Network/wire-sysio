@@ -185,6 +185,17 @@ FC_REFLECT_ENUM(sysio::opp::types::ChallengeStatus,
    (CHALLENGE_STATUS_RESOLVED)
    (CHALLENGE_STATUS_ESCALATED))
 
+FC_REFLECT_ENUM(sysio::opp::types::DisputeStatus,
+   (DISPUTE_STATUS_UNKNOWN)
+   (DISPUTE_STATUS_OPEN)
+   (DISPUTE_STATUS_RESOLVED))
+
+FC_REFLECT_ENUM(sysio::opp::types::NodeOwnerTier,
+   (NODE_OWNER_TIER_UNKNOWN)
+   (NODE_OWNER_TIER_T1)
+   (NODE_OWNER_TIER_T2)
+   (NODE_OWNER_TIER_T3))
+
 // ---------------------------------------------------------------------------
 //  Encoding enums
 // ---------------------------------------------------------------------------

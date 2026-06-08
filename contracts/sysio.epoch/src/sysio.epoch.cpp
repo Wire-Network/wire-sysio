@@ -1,6 +1,7 @@
 #include <sysio.epoch/sysio.epoch.hpp>
 #include <sysio.opreg/sysio.opreg.hpp>
 #include <sysio.msgch/sysio.msgch.hpp>
+#include <sysio.opp.common/opp_keys.hpp>
 #include <sysio.authex/sysio.authex.hpp>
 #include <sysio.token/sysio.token.hpp>
 // Canonical sysio.system emissions types + compute_epoch_emission. The
@@ -333,8 +334,8 @@ void epoch::advance() {
          if (!is_active_outpost(*op_it)) continue;
 
          const uint64_t chain_code = op_it->code.value;
-         const uint64_t composite =
-            (chain_code << 32) | state.current_epoch_index;
+         const uint128_t composite =
+            opp::outpost_epoch_key(chain_code, state.current_epoch_index);
 
          // Walk the (outpost, epoch) bucket and collect each distinct delivering batch op together
          // with the checksum it delivered. Vector linear-scan is fine — group size is small
@@ -408,6 +409,18 @@ void epoch::advance() {
       // Flush the non-canonical slashes. Routed through sysio.chalg (the slashing chokepoint that
       // holds opreg::slash authority): the slashable bond is moved to the matching LP and the
       // operator is marked SLASHED.
+      //
+      // Invariant — no cross-epoch double slash: opreg::slash THROWS on an already-SLASHED operator,
+      // which would abort advance and stall OPP epoch advancement. A slashed operator is guaranteed
+      // never to reappear in a later expiring group, so advance never attempts a second slash of it:
+      //   1. this flush runs BEFORE the window-slide below, so the operator is already SLASHED when
+      //      the next tail group is formed;
+      //   2. the new-tail filter pulls OPERATOR_STATUS_ACTIVE operators only (see the schedule slide
+      //      below), so a SLASHED operator is excluded from every newly-formed group; and
+      //   3. resident-exclusion keeps an operator in at most one group within the window, so the
+      //      operator slashed for THIS (expiring) group is not also sitting in a future
+      //      already-scheduled group.
+      // If any of those three scheduling facts change, this single-slash path must be revisited.
       for (const auto& member : to_slash) {
          action(
             permission_level{get_self(), "owner"_n},

@@ -419,7 +419,7 @@
                 },
                 {
                     "name": "byoutepoch",
-                    "key_type": "uint64",
+                    "key_type": "uint128",
                     "table_id": 11568
                 }
             ]

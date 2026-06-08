@@ -8,6 +8,7 @@
 #include <sysio/opp/types/types.pb.hpp>
 #include <sysio.opp.common/slug_name.hpp>
 #include <sysio.opp.common/opp_table_types.hpp>
+#include <sysio.opp.common/opp_keys.hpp>
 
 namespace sysio {
 
@@ -111,8 +112,8 @@ namespace sysio {
          std::vector<char>         raw_data;
          time_point                received_at{};
 
-         uint64_t by_outpost_epoch() const {
-            return (static_cast<uint64_t>(chain_code) << 32) | epoch_index;
+         uint128_t by_outpost_epoch() const {
+            return opp::outpost_epoch_key(chain_code, epoch_index);
          }
          uint64_t by_batch_op() const { return batch_op_name.value; }
 
@@ -123,7 +124,7 @@ namespace sysio {
 
       using envelopes_t = sysio::kv::table<"envelopes"_n, id_key, envelope_entry,
          sysio::kv::index<"byoutepoch"_n,
-            sysio::const_mem_fun<envelope_entry, uint64_t, &envelope_entry::by_outpost_epoch>>,
+            sysio::const_mem_fun<envelope_entry, uint128_t, &envelope_entry::by_outpost_epoch>>,
          sysio::kv::index<"bybatchop"_n,
             sysio::const_mem_fun<envelope_entry, uint64_t, &envelope_entry::by_batch_op>>
       >;
@@ -200,8 +201,8 @@ namespace sysio {
          std::vector<char> raw_envelope;
 
          uint64_t by_outpost() const { return chain_code; }
-         uint64_t by_outpost_epoch() const {
-            return (static_cast<uint64_t>(chain_code) << 32) | epoch_index;
+         uint128_t by_outpost_epoch() const {
+            return opp::outpost_epoch_key(chain_code, epoch_index);
          }
 
          SYSLIB_SERIALIZE(outbound_envelope,
@@ -212,7 +213,7 @@ namespace sysio {
          sysio::kv::index<"byoutpost"_n,
             sysio::const_mem_fun<outbound_envelope, uint64_t, &outbound_envelope::by_outpost>>,
          sysio::kv::index<"byoutepoch"_n,
-            sysio::const_mem_fun<outbound_envelope, uint64_t, &outbound_envelope::by_outpost_epoch>>
+            sysio::const_mem_fun<outbound_envelope, uint128_t, &outbound_envelope::by_outpost_epoch>>
       >;
 
       /// Per-outpost consensus primary key.

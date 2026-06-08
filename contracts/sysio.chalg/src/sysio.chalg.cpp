@@ -265,7 +265,7 @@ void chalg::opendispute(uint64_t chain_code,
    // At most one dispute per (outpost, epoch). evalcons gates on this too, but enforce it here so
    // the inline call is idempotent under re-fired deliveries.
    auto oe_idx = disputes.get_index<"byoutepoch"_n>();
-   uint64_t composite = (static_cast<uint64_t>(chain_code) << 32) | epoch_index;
+   uint128_t composite = opp::outpost_epoch_key(chain_code, epoch_index);
    check(oe_idx.find(composite) == oe_idx.end(),
          "a dispute already exists for this outpost+epoch");
 

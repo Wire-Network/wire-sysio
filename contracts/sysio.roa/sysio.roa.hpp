@@ -235,7 +235,9 @@ namespace sysio {
             // vote. These tables remain writable only by sysio.roa's own actions.
 
             /**
-             * Config variables for ROA.
+             * ROA global-state singleton: activation flag, total SYS, bytes-per-unit, and the
+             * active network generation. Public so sibling system contracts can read `network_gen`
+             * cross-contract (see the access note above); writable only by sysio.roa's own actions.
              */
             struct [[sysio::table("roastate")]] roa_state {
                 bool is_active = false;
