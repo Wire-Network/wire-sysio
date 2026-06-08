@@ -6,8 +6,15 @@
 ///                     dispute-must-be-open
 ///   * chkdispute   -- the Tier-1 tally rule: fast path (votes >= floor(N/2)+1 any time) and the
 ///                     post-deadline relaxation (cast >= Q AND a strict majority of cast votes),
-///                     plus the non-resolving waits (sub-quorum, deadline tie). The fast-path resolve
-///                     also exercises the winner dispatch (sysio.msgch::resolvedisp) + epoch unpause.
+///                     plus the non-resolving waits (sub-quorum before the deadline, tie after it).
+///                     The fast-path and post-deadline resolves both exercise the winner dispatch
+///                     (sysio.msgch::resolvedisp) + epoch unpause.
+///   * slash gate   -- the ACTIVE-only scheduling filter (shared by sysio.epoch::advance's
+///                     window-slide and schbatchgps) drops a SLASHED batch op from the eligible
+///                     pool, so it is never re-placed where advance could attempt a second
+///                     (aborting) slash of it (the no-cross-epoch-double-slash invariant). Also
+///                     covers the widened slashop auth (callable by sysio.epoch) and opreg's
+///                     already-slashed guard.
 ///
 /// The full 3-way deliver -> auto-opendispute -> resolve -> slash path (and the slash economics) is
 /// exercised end-to-end by the TS flow `flow-batch-operator-slashing`; here disputes are opened
@@ -302,6 +309,40 @@ public:
       return v["current_epoch_index"].as<uint32_t>();
    }
 
+   /// Members of the active batch-op group (epoch_state.batch_op_groups[current_batch_op_group]).
+   std::vector<name> current_group() {
+      std::vector<name> members;
+      auto data = get_row_by_account(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "epochstate"_n, "epochstate"_n);
+      if (data.empty()) return members;
+      auto v = epoch_abi.binary_to_variant("epoch_state", data,
+         abi_serializer::create_yield_function(abi_serializer_max_time));
+      const uint64_t cur = v["current_batch_op_group"].as_uint64();
+      const auto& groups = v["batch_op_groups"].get_array();
+      if (cur >= groups.size()) return members;
+      for (const auto& m : groups[cur].get_array()) members.push_back(m.as<name>());
+      return members;
+   }
+
+   static bool group_contains(const std::vector<name>& g, name who) {
+      return std::find(g.begin(), g.end(), who) != g.end();
+   }
+
+   /// opreg operator status as its enum spelling (e.g. "OPERATOR_STATUS_SLASHED"), or "" if absent.
+   std::string operator_status(name op) {
+      auto data = get_row_by_id(OPREG_ACCOUNT, OPREG_ACCOUNT, "operators"_n, op.value);
+      if (data.empty()) return {};
+      auto v = opreg_abi.binary_to_variant("operator_entry", data,
+         abi_serializer::create_yield_function(abi_serializer_max_time));
+      return v["status"].as_string();
+   }
+
+   /// Slash `op` through sysio.chalg::slashop, authorised as `signer` (default sysio.epoch, the
+   /// widened auth path). Lands in its own block like the other action helpers.
+   action_result slashop(name op, name signer = EPOCH_ACCOUNT) {
+      return push(CHALG_ACCOUNT, chalg_abi, signer, "slashop"_n, mvo()
+         ("operator_acct", op.to_string())("reason", std::string("test non-canonical delivery")));
+   }
+
    abi_serializer chalg_abi, epoch_abi, msgch_abi, opreg_abi, uwrit_abi, chains_abi, roa_abi, system_abi;
 };
 
@@ -498,6 +539,129 @@ BOOST_FIXTURE_TEST_CASE(chkdispute_sub_quorum_waits, sysio_dispute_tester) { try
    BOOST_REQUIRE_EQUAL(success(), votedispute("voter1"_n, 1, cs_a));
    BOOST_REQUIRE_EQUAL(success(), chkdispute(1));
    BOOST_REQUIRE_EQUAL("DISPUTE_STATUS_OPEN", get_dispute(1)["status"].as_string());
+} FC_LOG_AND_RETHROW() }
+
+// Post-deadline relaxation: with N=4 (Q=3), a checksum that holds a STRICT MAJORITY of the cast votes
+// (but fewer than Q, so the fast path never fires) resolves only AFTER the 24h deadline, provided a
+// quorum of votes was cast (cast >= Q). Two of three cast votes -> resolves post-deadline; also
+// exercises winner dispatch (resolvedisp) + unpause on the relaxed path.
+BOOST_FIXTURE_TEST_CASE(chkdispute_post_deadline_majority_resolves, sysio_dispute_tester) { try {
+   register_node_owner("voter1"_n, 1);
+   register_node_owner("voter2"_n, 1);
+   register_node_owner("voter3"_n, 1);
+   register_node_owner("voter4"_n, 1);   // N = 4, Q = 3
+
+   const uint32_t epoch = current_epoch();
+
+   auto winner_bytes = encode_envelope(epoch, "x");
+   auto cs_x = fc::sha256::hash(winner_bytes.data(), winner_bytes.size());
+   auto cs_y = fc::sha256::hash(std::string("y"));
+   auto cs_z = fc::sha256::hash(std::string("z"));
+
+   std::vector<fc::variant> cands{
+      candidate(cs_x, {BATCHOP}),
+      candidate(cs_y, {"voter1"_n}),
+      candidate(cs_z, {"voter2"_n}),
+   };
+   // Open first so the subsequent deliver hits evalcons's open-dispute gate and retains raw_data,
+   // giving resolvedisp the winning bytes to re-dispatch on resolution.
+   BOOST_REQUIRE_EQUAL(success(), opendispute(eth_code(), epoch, cands));
+   BOOST_REQUIRE_EQUAL(success(), deliver(eth_code(), winner_bytes));
+
+   // cast = 3 (x=2, y=1). x has a strict majority of cast but only 2 < Q=3 -> no fast path.
+   BOOST_REQUIRE_EQUAL(success(), votedispute("voter1"_n, 1, cs_x));
+   BOOST_REQUIRE_EQUAL(success(), votedispute("voter2"_n, 1, cs_x));
+   BOOST_REQUIRE_EQUAL(success(), votedispute("voter3"_n, 1, cs_y));
+
+   // Before the deadline the relaxed rule does not apply -> still open.
+   BOOST_REQUIRE_EQUAL(success(), chkdispute(1));
+   BOOST_REQUIRE_EQUAL("DISPUTE_STATUS_OPEN", get_dispute(1)["status"].as_string());
+
+   // Cross the 24h voting window, then crank: cast(3) >= Q(3) AND 2*votes_x(4) > cast(3) -> x wins.
+   produce_block(fc::seconds(24 * 60 * 60 + 1));
+   BOOST_REQUIRE_EQUAL(success(), chkdispute(1));
+
+   auto d = get_dispute(1);
+   BOOST_REQUIRE_EQUAL("DISPUTE_STATUS_RESOLVED", d["status"].as_string());
+   BOOST_REQUIRE_EQUAL(cs_x.str(), d["winning_checksum"].as_string());
+   BOOST_REQUIRE(!epoch_paused());
+} FC_LOG_AND_RETHROW() }
+
+// Deadline tie: with N=4 (Q=3), an even split of all cast votes (2 vs 2) has a quorum but NO strict
+// majority of cast, so even after the deadline the dispute does not resolve (no plurality / tie-break).
+BOOST_FIXTURE_TEST_CASE(chkdispute_deadline_tie_waits, sysio_dispute_tester) { try {
+   register_node_owner("voter1"_n, 1);
+   register_node_owner("voter2"_n, 1);
+   register_node_owner("voter3"_n, 1);
+   register_node_owner("voter4"_n, 1);   // N = 4, Q = 3
+
+   const uint32_t epoch = current_epoch();
+   auto cs_x = fc::sha256::hash(std::string("x"));
+   auto cs_y = fc::sha256::hash(std::string("y"));
+   auto cs_z = fc::sha256::hash(std::string("z"));
+   std::vector<fc::variant> cands{
+      candidate(cs_x, {BATCHOP}),
+      candidate(cs_y, {"voter1"_n}),
+      candidate(cs_z, {"voter2"_n}),
+   };
+   BOOST_REQUIRE_EQUAL(success(), opendispute(eth_code(), epoch, cands));
+
+   // cast = 4, split 2 (x) / 2 (y): 2*2 == cast, not a strict majority of cast.
+   BOOST_REQUIRE_EQUAL(success(), votedispute("voter1"_n, 1, cs_x));
+   BOOST_REQUIRE_EQUAL(success(), votedispute("voter2"_n, 1, cs_x));
+   BOOST_REQUIRE_EQUAL(success(), votedispute("voter3"_n, 1, cs_y));
+   BOOST_REQUIRE_EQUAL(success(), votedispute("voter4"_n, 1, cs_y));
+
+   produce_block(fc::seconds(24 * 60 * 60 + 1));
+   BOOST_REQUIRE_EQUAL(success(), chkdispute(1));
+   BOOST_REQUIRE_EQUAL("DISPUTE_STATUS_OPEN", get_dispute(1)["status"].as_string());
+   BOOST_REQUIRE(epoch_paused());   // unresolved dispute keeps the epoch paused
+} FC_LOG_AND_RETHROW() }
+
+// No cross-epoch double slash: the ACTIVE-only scheduling filter -- shared verbatim by
+// sysio.epoch::advance's window-slide and schbatchgps -- drops a SLASHED batch op from the eligible
+// pool, so a slashed op is never re-placed into a future group where advance could attempt a second
+// (aborting) slash of it. This exercises that filter directly via schbatchgps (advance's own slide is
+// additionally gated by emissions readiness, out of scope here), plus the widened slashop auth
+// (callable by sysio.epoch) and opreg's already-slashed guard. The full delivery-driven slash through
+// advance is covered end-to-end by the TS flow flow-batch-operator-slashing.
+BOOST_FIXTURE_TEST_CASE(slashed_op_excluded_from_scheduling_no_double_slash, sysio_dispute_tester) { try {
+   constexpr auto BATCHOP_B = "batchop.b"_n;
+   constexpr auto BATCHOP_C = "batchop.c"_n;
+   for (auto op : {BATCHOP_B, BATCHOP_C})
+      create_account(op, config::system_account_name, false, true, /*include_roa_policy=*/false);
+   auto regop = [&](name op) {
+      return push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "regoperator"_n, mvo()
+         ("account", op.to_string())("type", OperatorType::OPERATOR_TYPE_BATCH)("is_bootstrapped", true));
+   };
+   BOOST_REQUIRE_EQUAL(success(), regop(BATCHOP_B));
+
+   // Single 2-member group; with a and b the only ACTIVE batch ops, both are placed.
+   BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "setconfig"_n, mvo()
+      ("epoch_duration_sec", 60)("operators_per_epoch", 2)("batch_operator_minimum_active", 2)
+      ("batch_op_groups", 1)("epoch_retention_envelope_log_count", 200)));
+   BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "schbatchgps"_n, mvo()));
+   auto g0 = current_group();
+   BOOST_REQUIRE(group_contains(g0, BATCHOP));
+   BOOST_REQUIRE(group_contains(g0, BATCHOP_B));
+
+   // Slash batchop.b as sysio.epoch (the widened auth path).
+   BOOST_REQUIRE_EQUAL(success(), slashop(BATCHOP_B));
+   BOOST_REQUIRE_EQUAL("OPERATOR_STATUS_SLASHED", operator_status(BATCHOP_B));
+
+   // opreg aborts a second slash -- exactly the abort the scheduling exclusion below must prevent
+   // advance from ever triggering.
+   BOOST_REQUIRE_EQUAL(error("assertion failure with message: operator already slashed"),
+                       slashop(BATCHOP_B));
+
+   // Bring c online so two ACTIVE ops remain, then re-schedule: the filter keeps the live ops
+   // (a, c) and drops the slashed one (b).
+   BOOST_REQUIRE_EQUAL(success(), regop(BATCHOP_C));
+   BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "schbatchgps"_n, mvo()));
+   auto g1 = current_group();
+   BOOST_REQUIRE(!group_contains(g1, BATCHOP_B));   // slashed -> never re-enters a group
+   BOOST_REQUIRE(group_contains(g1, BATCHOP));
+   BOOST_REQUIRE(group_contains(g1, BATCHOP_C));
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()

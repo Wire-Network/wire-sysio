@@ -728,7 +728,7 @@ void dispatch_attestation(name self, uint64_t attestation_id,
 /// so `sysio.epoch::advance` can classify each operator's delivery as canonical or slashable.
 void apply_consensus(name self, uint64_t chain_code, uint32_t epoch_index,
                      const std::vector<char>& raw, const checksum256& winning_checksum) {
-   const uint64_t composite = (static_cast<uint64_t>(chain_code) << 32) | epoch_index;
+   const uint128_t composite = opp::outpost_epoch_key(chain_code, epoch_index);
 
    // Idempotency guard: if an INBOUND message for this (chain_code, epoch) is already on file the
    // envelope was processed already (post-quorum late delivery, or a re-fired resolvedisp). The
@@ -955,7 +955,7 @@ void msgch::deliver(name batch_op_name, uint64_t chain_code, std::vector<char> d
    // Prevent duplicate delivery from same operator for same outpost+epoch
    envelopes_t envs(get_self());
    auto oe_idx = envs.get_index<"byoutepoch"_n>();
-   uint64_t composite = (static_cast<uint64_t>(chain_code) << 32) | epoch;
+   uint128_t composite = opp::outpost_epoch_key(chain_code, epoch);
    for (auto it = oe_idx.lower_bound(composite);
         it != oe_idx.end() && it->by_outpost_epoch() == composite; ++it) {
       if (it->batch_op_name == batch_op_name) {
@@ -1000,7 +1000,7 @@ void msgch::evalcons(uint64_t chain_code, uint32_t epoch_index) {
 
    envelopes_t envs(get_self());
    auto oe_idx = envs.get_index<"byoutepoch"_n>();
-   uint64_t composite = (static_cast<uint64_t>(chain_code) << 32) | epoch_index;
+   uint128_t composite = opp::outpost_epoch_key(chain_code, epoch_index);
 
    // If a dispute has been opened for this (outpost, epoch), the dispute-vote flow owns its
    // resolution and winner dispatch (via `resolvedisp`). evalcons is a no-op for this bucket so a
@@ -1090,8 +1090,10 @@ void msgch::chkcons() {
    uint32_t epoch = current_epoch_index();
 
    // Open-dispute gate: if any OPP dispute for the current epoch is still OPEN, hold advancement.
-   // The epoch is paused while a dispute is open, but gating here also prevents chkcons from
-   // resetting per-outpost consensus state mid-dispute.
+   // Two overlapping holds protect a disputed epoch: `sysio.epoch::is_paused` (set by opendispute)
+   // is the hard stop -- advance() itself throws while paused -- and this gate is the soft one that
+   // returns BEFORE chkcons triggers advance, so it neither hits that throw nor resets per-outpost
+   // consensus state mid-dispute. chkdispute clears both on resolution (resolvedisp + unpause).
    {
       chalg::disputes_t disputes(CHALG_ACCOUNT);
       auto ep_idx = disputes.get_index<"byepoch"_n>();
@@ -1158,7 +1160,7 @@ void msgch::resolvedisp(uint64_t chain_code, uint32_t epoch_index, checksum256 w
    // bytes are still on file. Copy them out before apply_consensus drains the rows.
    envelopes_t envs(get_self());
    auto oe_idx = envs.get_index<"byoutepoch"_n>();
-   uint64_t composite = (static_cast<uint64_t>(chain_code) << 32) | epoch_index;
+   uint128_t composite = opp::outpost_epoch_key(chain_code, epoch_index);
 
    std::vector<char> raw;
    bool found = false;
@@ -1170,6 +1172,10 @@ void msgch::resolvedisp(uint64_t chain_code, uint32_t epoch_index, checksum256 w
          break;
       }
    }
+   // Asserted-unreachable in normal operation: the winning checksum is a dispute candidate, every
+   // candidate came from a delivered envelope, and the dispute path retains raw_data (above). If it
+   // ever fired it reverts the chkdispute crank (the dispute stays OPEN, the epoch stays paused) -- a
+   // safe stall, not state corruption.
    check(found, "resolvedisp: winning envelope not found for this outpost+epoch");
 
    apply_consensus(get_self(), chain_code, epoch_index, raw, winning_checksum);

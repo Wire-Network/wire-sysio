@@ -7,6 +7,7 @@
 #include <sysio/crypto.hpp>
 #include <sysio/system.hpp>
 #include <sysio/opp/types/types.pb.hpp>
+#include <sysio.opp.common/opp_keys.hpp>
 
 namespace sysio {
 
@@ -19,7 +20,10 @@ namespace sysio {
       /// the per-row record on `dispute_entry::candidates`.
       struct dispute_candidate {
          checksum256       checksum;   ///< sha256 of the candidate envelope bytes
-         std::vector<name> operators;  ///< batch operators that delivered this checksum
+         /// Batch operators that delivered this checksum. Audit / off-chain only — the on-chain
+         /// slash path classifies via `outpcons.winning_checksum` vs each delivered checksum in
+         /// `sysio.epoch::advance`, not this list; it is never read back on chain.
+         std::vector<name> operators;
 
          SYSLIB_SERIALIZE(dispute_candidate, (checksum)(operators))
       };
@@ -85,8 +89,8 @@ namespace sysio {
          std::vector<dispute_candidate> candidates;
 
          uint64_t by_epoch() const { return epoch_index; }
-         uint64_t by_outpost_epoch() const {
-            return (static_cast<uint64_t>(chain_code) << 32) | epoch_index;
+         uint128_t by_outpost_epoch() const {
+            return opp::outpost_epoch_key(chain_code, epoch_index);
          }
 
          SYSLIB_SERIALIZE(dispute_entry,
@@ -98,7 +102,7 @@ namespace sysio {
          sysio::kv::index<"byepoch"_n,
             sysio::const_mem_fun<dispute_entry, uint64_t, &dispute_entry::by_epoch>>,
          sysio::kv::index<"byoutepoch"_n,
-            sysio::const_mem_fun<dispute_entry, uint64_t, &dispute_entry::by_outpost_epoch>>
+            sysio::const_mem_fun<dispute_entry, uint128_t, &dispute_entry::by_outpost_epoch>>
       >;
 
       /// Dispute-vote primary key (the voting Tier-1 owner). The vote table is scoped by

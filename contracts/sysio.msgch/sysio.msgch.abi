@@ -464,7 +464,7 @@
             "secondary_indexes": [
                 {
                     "name": "byoutepoch",
-                    "key_type": "uint64",
+                    "key_type": "uint128",
                     "table_id": 57096
                 },
                 {
@@ -522,7 +522,7 @@
                 },
                 {
                     "name": "byoutepoch",
-                    "key_type": "uint64",
+                    "key_type": "uint128",
                     "table_id": 12275
                 }
             ]
