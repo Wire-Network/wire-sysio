@@ -26,17 +26,18 @@ namespace {
 
    struct checktime_watchdog {
       checktime_watchdog(transaction_checktime_timer& timer) : _timer(timer) {}
-      /// True deadline expiry must still interrupt JIT execution; cooperative fork interruption must not.
+      /// Deadline expiry and controller-requested cooperative interrupts both need to break active WASM execution.
       bool should_interrupt_execution_thread() const {
-         return _timer.timer_state() == platform_timer::state_t::timed_out;
+         const auto state = _timer.timer_state();
+         return state == platform_timer::state_t::timed_out || state == platform_timer::state_t::interrupted;
       }
       template<typename F>
       struct guard {
         guard(transaction_checktime_timer& timer, F&& func)
            : _timer(timer), _func(std::forward<F>(func)) {
            _timer.set_expiration_callback(&callback, this);
-           platform_timer::state_t expired = _timer.timer_state();
-           if(expired == platform_timer::state_t::timed_out || expired == platform_timer::state_t::interrupted) {
+           // This temporary only wraps the timer reference long enough to reuse the same sys-vm watchdog hook.
+           if(checktime_watchdog{_timer}.should_interrupt_execution_thread()) {
               _func(); // it's harmless if _func is invoked twice
            }
         }

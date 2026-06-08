@@ -143,6 +143,9 @@ target_link_libraries(ship_client sysio_chain Boost::program_options Boost::syst
 add_executable(ship_streamer ship_streamer.cpp)
 target_link_libraries(ship_streamer sysio_chain Boost::program_options Boost::system Boost::asio Boost::beast Threads::Threads)
 
+# Keep Python SHiP integration-test helpers available when building the plugin test target used by local test sweeps.
+add_dependencies(plugin_test ship_client ship_streamer)
+
 add_np_test(NAME cluster_launcher COMMAND tests/cluster_launcher.py -v)
 
 add_np_test(NAME transition_to_if COMMAND tests/transition_to_if.py -v)
