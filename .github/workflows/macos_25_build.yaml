@@ -1,0 +1,104 @@
+name: "macOS 25 arm64 build & tests"
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  parallel-tests:
+    name: Build and run parallel tests on macOS 25
+    runs-on: macos-25
+    timeout-minutes: 180
+    env:
+      VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/vcpkg-binary-cache,readwrite"
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: recursive
+
+      - name: Install host tools
+        run: |
+          brew install ninja ccache pkgconf autoconf automake libtool
+
+      - name: Restore vcpkg binary cache
+        uses: actions/cache@v5
+        with:
+          path: ${{ github.workspace }}/vcpkg-binary-cache
+          key: vcpkg-binaries-macos-25-arm64-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json', '.github/vcpkg-triplets/arm64-osx-release.cmake') }}
+          restore-keys: |
+            vcpkg-binaries-macos-25-arm64-
+
+      - name: Restore ccache
+        uses: actions/cache@v5
+        with:
+          path: ${{ github.workspace }}/.ccache
+          key: ccache-macos-25-arm64-${{ github.sha }}
+          restore-keys: |
+            ccache-macos-25-arm64-
+
+      - name: Configure
+        run: |
+          mkdir -p "$GITHUB_WORKSPACE/vcpkg-binary-cache"
+          ./vcpkg/bootstrap-vcpkg.sh
+
+          export CCACHE_DIR="$GITHUB_WORKSPACE/.ccache"
+          export VCPKG_TARGET_TRIPLET=arm64-osx-release
+          export VCPKG_HOST_TRIPLET=arm64-osx-release
+          export VCPKG_OVERLAY_TRIPLETS="$GITHUB_WORKSPACE/.github/vcpkg-triplets"
+          ccache -z || true
+
+          cmake -B build/macos-25-arm64 -S . -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_TOOLCHAIN_FILE="$PWD/vcpkg/scripts/buildsystems/vcpkg.cmake" \
+            -DVCPKG_TARGET_TRIPLET="$VCPKG_TARGET_TRIPLET" \
+            -DVCPKG_HOST_TRIPLET="$VCPKG_HOST_TRIPLET" \
+            -DVCPKG_OVERLAY_TRIPLETS="$VCPKG_OVERLAY_TRIPLETS" \
+            -DBUILD_SYSTEM_CONTRACTS=OFF \
+            -DBUILD_TEST_CONTRACTS=OFF \
+            -DENABLE_CCACHE=ON \
+            -DENABLE_DISTCC=OFF \
+            -DENABLE_TESTS=ON \
+            -DDISABLE_WASM_SPEC_TESTS=OFF
+
+      - name: Build test targets
+        run: |
+          cmake --build build/macos-25-arm64 -- -j"$(sysctl -n hw.logicalcpu)"
+
+      - name: Run parallelizable tests
+        run: |
+          cd build/macos-25-arm64
+          ctest -j "$(sysctl -n hw.logicalcpu)" \
+            -LE "(nonparallelizable_tests|long_running_tests)" \
+            --output-on-failure --timeout 1000 \
+            2>&1 | tee "$RUNNER_TEMP/macos-25-arm64-parallel-ctest.log"
+
+      - name: Run nodeop nonparallelizable test
+        run: |
+          cd build/macos-25-arm64
+          ctest --output-on-failure -R "^nodeop_run_test$" --timeout 1000 \
+            2>&1 | tee "$RUNNER_TEMP/macos-25-arm64-nodeop-run-test.log"
+
+      - name: Run ship streamer test
+        run: |
+          cd build/macos-25-arm64
+          ctest --output-on-failure -R "^ship_streamer_test$" --timeout 1000 \
+            2>&1 | tee "$RUNNER_TEMP/macos-25-arm64-ship-streamer-test.log"
+
+      - name: Show diagnostics on failure
+        if: failure()
+        run: |
+          echo "=== vcpkg manifest log ==="
+          cat build/macos-25-arm64/vcpkg-manifest-install.log || true
+          echo "=== recent vcpkg logs ==="
+          find build/macos-25-arm64 -type f -name '*.log' -print | while read -r f; do
+            echo "----- $f -----"
+            tail -n 80 "$f"
+          done
+          echo "=== ccache statistics ==="
+          ccache -s || true
