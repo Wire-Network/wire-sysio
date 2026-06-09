@@ -129,7 +129,7 @@
     {
       "name": "wire-sys-vm",
       "version": "1.2.0",
-      "port-version": 1
+      "port-version": 7
     },
     {
       "name": "nlohmann-json",
