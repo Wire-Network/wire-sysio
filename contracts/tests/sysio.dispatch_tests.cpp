@@ -404,6 +404,20 @@ public:
       return v["current_epoch_index"].as<uint32_t>();
    }
 
+   /// Permissionless consensus-and-time crank that triggers sysio.epoch::advance.
+   action_result chkcons() {
+      return push(MSGCH_ACCOUNT, msgch_abi, BATCHOP, "chkcons"_n, mvo());
+   }
+
+   /// Read the sysio.epoch `blocklog` row for `epoch_index` (written by advance()'s emissions gate
+   /// when it blocks). `retry_count` counts how many times advance re-attempted and re-blocked.
+   fc::variant get_blocklog(uint32_t epoch_index) {
+      auto data = get_row_by_id(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "blocklog"_n, epoch_index);
+      return data.empty() ? fc::variant() : epoch_abi.binary_to_variant(
+         "blocklog_entry", data,
+         abi_serializer::create_yield_function(abi_serializer_max_time));
+   }
+
    fc::variant get_operator(name account) {
       auto data = get_row_by_account(OPREG_ACCOUNT, OPREG_ACCOUNT,
                                      "operators"_n, account);
@@ -590,6 +604,75 @@ BOOST_FIXTURE_TEST_CASE(dispatch_routes_node_owner_reg_to_roa, sysio_dispatch_te
    auto audit = get_nodeownerreg(CLAIM_ACCOUNT);
    BOOST_REQUIRE(!audit.is_null());
    BOOST_REQUIRE_EQUAL(audit["status"].as<uint64_t>(), 0u);  // CONFIRMED
+} FC_LOG_AND_RETHROW() }
+
+/// Regression: a non-advancing advance() must not permanently strand the epoch.
+///
+/// When every active outpost has reached consensus and the wall clock has passed, chkcons triggers
+/// sysio.epoch::advance. advance can legally return WITHOUT bumping the epoch when emissions are not
+/// ready -- its emissions gate records a block and returns gracefully, it does not throw. The earlier
+/// chkcons cleared per-outpost consensus_reached BEFORE calling advance, so that graceful return
+/// committed the cleared state and nothing re-armed it (apply_consensus does not re-fire for an
+/// already-complete delivery set) -- permanently stalling advancement even once emissions later became
+/// ready.
+///
+/// This fixture never deploys sysio.system, so the emissions gate always blocks (CONFIG_MISSING):
+/// exactly the non-advancing path. After consensus, each chkcons must re-attempt advance, which the
+/// gate records as blocklog.retry_count. Pre-fix, the second chkcons bailed at the consensus gate
+/// (retry_count would stay 1) and the epoch was stuck forever.
+BOOST_FIXTURE_TEST_CASE(chkcons_survives_non_advancing_advance, sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+   const auto eth_code = fc::slug_name{"ETH"}.value;
+
+   // This fixture deploys no sysio.system, so even the genesis advance in bootstrap gate-blocked; the
+   // chain sits at `epoch0`. advance() always targets the next epoch, whose blocklog row counts gate
+   // re-attempts.
+   const uint32_t epoch0 = current_epoch();
+   const uint32_t target = epoch0 + 1;
+
+   // operators_per_epoch == 1, so a single delivery is Option-A unanimous consensus; apply_consensus
+   // records the outpcons row for ETH at epoch0.
+   auto operator_payload = encode_operator_action(
+      sysio::opp::attestations::OperatorAction::ACTION_TYPE_DEPOSIT_REQUEST,
+      sysio::opp::types::CHAIN_KIND_EVM,
+      uwrit_op_eth_pubkey,
+      /*chain_code_v=*/ eth_code,
+      /*token_code_v=*/ eth_code,
+      /*amount=*/ 1'000'000);
+   auto envelope = encode_envelope_with_one_attestation(
+      epoch0,
+      sysio::opp::types::ATTESTATION_TYPE_OPERATOR_ACTION,
+      operator_payload);
+   BOOST_REQUIRE_EQUAL(success(), deliver(/*chain_code=*/eth_code, envelope));
+   produce_blocks();   // land the deliver in its own block (this fixture's push does not)
+
+   auto retry_count = [&]() -> uint32_t {
+      auto bl = get_blocklog(target);
+      return bl.is_null() ? 0u : bl["retry_count"].as<uint32_t>();
+   };
+   const uint32_t rc0 = retry_count();
+
+   // Pass the wall clock (epoch_duration_sec == 60) so chkcons will fire advance, then refresh the head
+   // so the subsequent push is stamped against the post-skip time and does not expire.
+   produce_block(fc::seconds(120));
+   produce_blocks();
+
+   // First chkcons fires advance, which gate-blocks on missing emissions and returns without advancing.
+   // The epoch is unchanged and the gate bumps retry_count -- confirming advance was actually attempted.
+   BOOST_REQUIRE_EQUAL(success(), chkcons());
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(current_epoch(), epoch0);
+   const uint32_t rc1 = retry_count();
+   BOOST_REQUIRE_EQUAL(rc1, rc0 + 1);
+
+   // REGRESSION: the per-outpost consensus signal must survive the non-advancing advance, so the second
+   // chkcons re-attempts advance (retry_count -> rc1 + 1). Pre-fix, chkcons cleared consensus_reached
+   // before calling advance, so this second call bailed at the consensus gate and never re-attempted --
+   // retry_count would stay at rc1 and the epoch would be permanently stranded.
+   BOOST_REQUIRE_EQUAL(success(), chkcons());
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(current_epoch(), epoch0);
+   BOOST_REQUIRE_EQUAL(retry_count(), rc1 + 1);
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()
