@@ -40,10 +40,17 @@ defaults:
 
 jobs:
   parallel-tests:
-    name: Build and run parallel tests on Apple Silicon
-    runs-on: macos-26
+    name: Build and run parallel tests on Apple Silicon (${{ matrix.runner }})
+    runs-on: ${{ matrix.runner }}
     timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      matrix:
+        runner:
+          - macos-15
+          - macos-26
     env:
+      BUILD_DIR: build/macos-arm64-${{ matrix.runner }}
       VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/vcpkg-binary-cache,readwrite"
     steps:
       - uses: actions/checkout@v5
@@ -58,16 +65,18 @@ jobs:
         uses: actions/cache@v5
         with:
           path: ${{ github.workspace }}/vcpkg-binary-cache
-          key: vcpkg-binaries-macos-arm64-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json', '.github/vcpkg-triplets/arm64-osx-release.cmake') }}
+          key: vcpkg-binaries-macos-arm64-${{ matrix.runner }}-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json', '.github/vcpkg-triplets/arm64-osx-release.cmake') }}
           restore-keys: |
+            vcpkg-binaries-macos-arm64-${{ matrix.runner }}-
             vcpkg-binaries-macos-arm64-
 
       - name: Restore ccache
         uses: actions/cache@v5
         with:
           path: ${{ github.workspace }}/.ccache
-          key: ccache-macos-arm64-${{ github.sha }}
+          key: ccache-macos-arm64-${{ matrix.runner }}-${{ github.sha }}
           restore-keys: |
+            ccache-macos-arm64-${{ matrix.runner }}-
             ccache-macos-arm64-
 
       - name: Configure
@@ -81,7 +90,7 @@ jobs:
           export VCPKG_OVERLAY_TRIPLETS="$GITHUB_WORKSPACE/.github/vcpkg-triplets"
           ccache -z || true
 
-          cmake -B build/macos-arm64 -S . -G Ninja \
+          cmake -B "$BUILD_DIR" -S . -G Ninja \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_TOOLCHAIN_FILE="$PWD/vcpkg/scripts/buildsystems/vcpkg.cmake" \
             -DVCPKG_TARGET_TRIPLET="$VCPKG_TARGET_TRIPLET" \
@@ -96,35 +105,35 @@ jobs:
 
       - name: Build test targets
         run: |
-          cmake --build build/macos-arm64 -- -j"$(sysctl -n hw.logicalcpu)"
+          cmake --build "$BUILD_DIR" -- -j"$(sysctl -n hw.logicalcpu)"
 
       - name: Run parallelizable tests
         run: |
-          cd build/macos-arm64
+          cd "$BUILD_DIR"
           ctest -j "$(sysctl -n hw.logicalcpu)" \
             -LE "(nonparallelizable_tests|long_running_tests)" \
             --output-on-failure --timeout 1000 \
-            2>&1 | tee "$RUNNER_TEMP/macos-arm64-parallel-ctest.log"
+            2>&1 | tee "$RUNNER_TEMP/macos-arm64-${{ matrix.runner }}-parallel-ctest.log"
 
       - name: Run nodeop nonparallelizable test
         run: |
-          cd build/macos-arm64
+          cd "$BUILD_DIR"
           ctest --output-on-failure -R "^nodeop_run_test$" --timeout 1000 \
-            2>&1 | tee "$RUNNER_TEMP/macos-arm64-nodeop-run-test.log"
+            2>&1 | tee "$RUNNER_TEMP/macos-arm64-${{ matrix.runner }}-nodeop-run-test.log"
 
       - name: Run ship streamer test
         run: |
-          cd build/macos-arm64
+          cd "$BUILD_DIR"
           ctest --output-on-failure -R "^ship_streamer_test$" --timeout 1000 \
-            2>&1 | tee "$RUNNER_TEMP/macos-arm64-ship-streamer-test.log"
+            2>&1 | tee "$RUNNER_TEMP/macos-arm64-${{ matrix.runner }}-ship-streamer-test.log"
 
       - name: Show diagnostics on failure
         if: failure()
         run: |
           echo "=== vcpkg manifest log ==="
-          cat build/macos-arm64/vcpkg-manifest-install.log || true
+          cat "$BUILD_DIR/vcpkg-manifest-install.log" || true
           echo "=== recent vcpkg logs ==="
-          find build/macos-arm64 -type f -name '*.log' -print | while read -r f; do
+          find "$BUILD_DIR" -type f -name '*.log' -print | while read -r f; do
             echo "----- $f -----"
             tail -n 80 "$f"
           done
