@@ -2,6 +2,7 @@
 
 #include <sysio/http_plugin/common.hpp>
 #include <sysio/http_plugin/api_category.hpp>
+#include <sysio/http_plugin/bounded_file_body.hpp>
 
 #include <fc/io/json.hpp>
 #include <fc/time.hpp>
@@ -84,8 +85,9 @@ class beast_http_session : public detail::abstract_conn,
    // HTTP response object
    std::optional<http::response<http::string_body>> res_;
 
-   // HTTP file response object (for send_file_response)
-   std::optional<http::response<http::file_body>> file_res_;
+   // HTTP file response object (for send_file_response); bounded_file_body so Range
+   // responses stop at the end of the requested range instead of running to EOF
+   std::optional<http::response<bounded_file_body>> file_res_;
 
    std::string remote_endpoint_;
    std::string local_address_;
@@ -479,7 +481,7 @@ public:
                                    std::string_view content_type,
                                    std::optional<std::pair<uint64_t,uint64_t>> byte_range = {}) final {
       beast::error_code ec;
-      http::file_body::value_type body;
+      bounded_file_body::value_type body;
       body.open(file_path.c_str(), beast::file_mode::scan, ec);
       if (ec) {
          error_results results{404, "File not found"};
@@ -504,13 +506,9 @@ public:
 
          auto range_len = range_end - range_start + 1;
          file_res_->result(http::status::partial_content);
-         // Seek to the start of the range
-         file_res_->body().seek(range_start, ec);
-         if (ec) {
-            error_results results{500, "Seek failed"};
-            send_response(fc::json::to_string(results, fc::time_point::maximum()), 500);
-            return;
-         }
+         // Bound the body to the requested range; the writer seeks to range_start and
+         // stops after range_len bytes so the response cannot over-send to EOF.
+         file_res_->body().set_range(range_start, range_len);
          file_res_->set(http::field::content_range,
             "bytes " + std::to_string(range_start) + "-" + std::to_string(range_end) + "/" + std::to_string(file_size));
          file_res_->content_length(range_len);

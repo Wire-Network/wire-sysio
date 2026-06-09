@@ -3,8 +3,10 @@
 import json
 import os
 import signal
+import socket
 import urllib.request
 import urllib.error
+import urllib.parse
 
 from TestHarness import Account, Cluster, TestHelper, Utils, WalletMgr
 from TestHarness.testUtils import ReturnType
@@ -265,6 +267,76 @@ try:
         assert len(partialData) == (rangeEnd - rangeStart + 1)
         assert partialData == diskData[rangeStart:rangeEnd+1]
 
+    # Test 6b: mid-file range. A range ending before EOF must return exactly the
+    # requested bytes; a server that streams from the seek position to EOF would
+    # return the correct prefix but over-send, which Test 6c detects.
+    rangeStart = fileSize // 2
+    rangeEnd = rangeStart + 4095
+    assert rangeEnd < fileSize - 1, f"snapshot too small ({fileSize} bytes) for mid-file range test"
+
+    req = urllib.request.Request(downloadUrl, data=payload, method="POST")
+    req.add_header("Content-Type", "application/json")
+    req.add_header("Range", f"bytes={rangeStart}-{rangeEnd}")
+
+    with urllib.request.urlopen(req) as response:
+        assert response.getcode() == 206, f"Expected 206, got {response.getcode()}"
+        contentRange = response.getheader("Content-Range")
+        expectedRange = f"bytes {rangeStart}-{rangeEnd}/{fileSize}"
+        assert contentRange == expectedRange, f"Content-Range: expected '{expectedRange}', got '{contentRange}'"
+
+        partialData = response.read()
+        assert len(partialData) == (rangeEnd - rangeStart + 1)
+        assert partialData == diskData[rangeStart:rangeEnd+1]
+
+    # Test 6c: over-send detection. urllib stops reading at Content-Length, so it
+    # cannot tell whether the server wrote bytes past the advertised range. Issue
+    # the same mid-file range request on a raw socket, read until the server closes
+    # the connection, and verify the body is exactly the advertised length.
+    parsed = urllib.parse.urlparse(node0.endpointHttp)
+    rawRequest = (
+        f"POST /v1/snapshot/download HTTP/1.1\r\n"
+        f"Host: {parsed.hostname}:{parsed.port}\r\n"
+        f"Content-Type: application/json\r\n"
+        f"Content-Length: {len(payload)}\r\n"
+        f"Range: bytes={rangeStart}-{rangeEnd}\r\n"
+        f"Connection: close\r\n"
+        f"\r\n"
+    ).encode() + payload
+
+    with socket.create_connection((parsed.hostname, parsed.port), timeout=60) as sock:
+        sock.sendall(rawRequest)
+        rawResponse = b""
+        while True:
+            chunk = sock.recv(65536)
+            if not chunk:
+                break
+            rawResponse += chunk
+
+    headerEnd = rawResponse.find(b"\r\n\r\n")
+    assert headerEnd != -1, "No header terminator in raw range response"
+    statusLine = rawResponse[:rawResponse.find(b"\r\n")].decode()
+    assert " 206 " in statusLine, f"Expected 206 status in raw response, got: {statusLine}"
+    rawBody = rawResponse[headerEnd + 4:]
+    expectedLen = rangeEnd - rangeStart + 1
+    assert len(rawBody) == expectedLen, \
+        f"Server over-sent range response: {len(rawBody)} body bytes on the wire, expected {expectedLen}"
+    assert rawBody == diskData[rangeStart:rangeEnd+1]
+
+    # Test 6d: a range end past EOF is clamped to the last byte of the file
+    rangeStart = fileSize - 100
+    req = urllib.request.Request(downloadUrl, data=payload, method="POST")
+    req.add_header("Content-Type", "application/json")
+    req.add_header("Range", f"bytes={rangeStart}-{fileSize + 1000}")
+
+    with urllib.request.urlopen(req) as response:
+        assert response.getcode() == 206, f"Expected 206, got {response.getcode()}"
+        contentRange = response.getheader("Content-Range")
+        expectedRange = f"bytes {rangeStart}-{fileSize - 1}/{fileSize}"
+        assert contentRange == expectedRange, f"Content-Range: expected '{expectedRange}', got '{contentRange}'"
+
+        partialData = response.read()
+        assert partialData == diskData[rangeStart:]
+
     Print("Test 6 PASSED")
 
     # ---------------------------------------------------------------
@@ -300,7 +372,9 @@ try:
     # The bootstrap node loads from the snapshot, syncs forward, and
     # eventually reaches the block containing the attestation. The
     # verify_snapshot_attestation check retries on each irreversible block
-    # until it finds the record (or gives up after 200 blocks).
+    # until it finds the record; for auto-fetched snapshots a record still
+    # missing after a grace window past the snapshot height is fatal, while
+    # manual --snapshot downgrades to a warning at the chain tip.
 
     # ---------------------------------------------------------------
     # Test 8: Bootstrap from snapshot endpoint (latest)
@@ -322,8 +396,9 @@ try:
 
     assert node0.waitForHeadToAdvance(), "Head did not advance after vote"
 
+    # KV table rows are returned as {"key": {...}, "value": {...}}
     records = node0.getTableRows("sysio", "sysio", "snaprecords")
-    found = any(r["block_num"] == snap2BlockNum for r in records)
+    found = any(r["value"]["block_num"] == snap2BlockNum for r in records)
     assert found, f"Attestation record not created for block {snap2BlockNum}"
 
     # Wait for attestation to become irreversible so the bootstrap node
@@ -352,7 +427,7 @@ try:
     # Verify attestation records accessible on bootstrap node
     records = bootstrapNode.getTableRows("sysio", "sysio", "snaprecords")
     assert records is not None, "Failed to read snaprecords on bootstrap node"
-    found = any(r["block_num"] == snap2BlockNum for r in records)
+    found = any(r["value"]["block_num"] == snap2BlockNum for r in records)
     assert found, f"Attestation for block {snap2BlockNum} not found on bootstrap node"
 
     Print("Test 8 PASSED")
@@ -393,7 +468,7 @@ try:
         "LIB did not advance on bootstrap node with specific block"
 
     records = bootstrapNode.getTableRows("sysio", "sysio", "snaprecords")
-    found = any(r["block_num"] == snapBlockNum for r in records)
+    found = any(r["value"]["block_num"] == snapBlockNum for r in records)
     assert found, f"First snapshot attestation not found after specific-block bootstrap"
 
     Print("Test 9 PASSED")

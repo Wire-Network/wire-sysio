@@ -300,7 +300,7 @@ When `snapshot_auto_fetched == true`, the attestation check in `verify_snapshot_
 
 **Retry-based verification:** The attestation check (`verify_snapshot_attestation()`) runs on each irreversible block after the snapshot block. In the real-world flow, a snapshot is taken first, then providers independently generate their own snapshots (which can take minutes), submit votes, reach quorum, and the attestation becomes irreversible. The bootstrap node loads the snapshot, syncs forward, and eventually reaches the block containing the attestation record.
 
-The timeout is 12,500 blocks (~104 minutes at 0.5s block time), which is half the snapshot interval of 25,000 blocks. This provides ample time for providers to generate, vote, and reach quorum before the next snapshot is due.
+The check retries on each finalized block while the node is still catching up (finalized block time more than ~30 seconds behind wall-clock). Once the node reaches the live chain tip, a missing record is a warning for manual `--snapshot` (verification is skipped). For auto-fetched snapshots the record may legitimately still be in flight -- a node bootstrapping from a recently-taken snapshot reaches the tip before the providers' votes land -- so the check keeps retrying for a grace window of 12,500 finalized blocks past the snapshot height (half the 25,000-block provider snapshot interval) before shutting the node down.
 
 **Note:** Verification happens *after* sync, not before. The node loads the snapshot optimistically, syncs to head, then checks the on-chain record. This avoids a chicken-and-egg problem (can't query on-chain state before having chain state).
 

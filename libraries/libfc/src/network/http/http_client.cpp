@@ -4,7 +4,6 @@
 #include <fc/static_variant.hpp>
 
 #include <filesystem>
-#include <fstream>
 
 #include <boost/beast/core.hpp>
 #include <boost/beast/http.hpp>
@@ -131,6 +130,27 @@ public:
    error_code sync_read_with_timeout(SyncReadStream& s, boost::beast::flat_buffer& buffer, http::response<http::string_body>& res, const deadline_type& deadline ) {
       return sync_do_with_deadline(s, deadline, [&s, &buffer, &res](std::optional<error_code>& final_ec){
          http::async_read(s, buffer, res, [&final_ec]( const error_code& ec, std::size_t ) {
+            final_ec.emplace(ec);
+         });
+      });
+   }
+
+   /// Read only the response header into @p parser, honoring @p deadline. Used by the
+   /// streaming download path to inspect the status line before committing the body to a file.
+   template<typename SyncReadStream, typename Parser>
+   error_code sync_read_header_with_timeout(SyncReadStream& s, boost::beast::flat_buffer& buffer, Parser& parser, const deadline_type& deadline ) {
+      return sync_do_with_deadline(s, deadline, [&s, &buffer, &parser](std::optional<error_code>& final_ec){
+         http::async_read_header(s, buffer, parser, [&final_ec]( const error_code& ec, std::size_t ) {
+            final_ec.emplace(ec);
+         });
+      });
+   }
+
+   /// Read the remainder of the response (the body) into @p parser, honoring @p deadline.
+   template<typename SyncReadStream, typename Parser>
+   error_code sync_read_parser_with_timeout(SyncReadStream& s, boost::beast::flat_buffer& buffer, Parser& parser, const deadline_type& deadline ) {
+      return sync_do_with_deadline(s, deadline, [&s, &buffer, &parser](std::optional<error_code>& final_ec){
+         http::async_read(s, buffer, parser, [&final_ec]( const error_code& ec, std::size_t ) {
             final_ec.emplace(ec);
          });
       });
@@ -369,8 +389,7 @@ public:
    }
 
    void post_to_file(const url& dest, const variant& payload, const std::filesystem::path& final_dest, const fc::time_point& deadline_time) {
-      static const deadline_type epoch(boost::gregorian::date(1970, 1, 1));
-      auto deadline = epoch + boost::posix_time::microseconds(deadline_time.time_since_epoch().count());
+      auto deadline = deadline_time.to_system_clock();
       FC_ASSERT(dest.host(), "No host set on URL");
 
       std::string path = dest.path() ? dest.path()->generic_string() : "/";
@@ -403,32 +422,53 @@ public:
       error_code ec = std::visit(write_request_visitor(this, req, deadline), conn_iter->second);
       FC_ASSERT(!ec, "Failed to send POST request: {}", ec.message());
 
-      // Use string_body response — for very large files this buffers in memory.
-      // A streaming approach would be better for multi-GB files but requires
-      // more extensive Beast integration. For bootstrap (one-time operation), this works.
+      // Stream the response body straight to disk through a file_body parser: snapshot
+      // downloads are multi-GB, so buffering the payload in a string_body response could
+      // exhaust memory long before the data reaches its hash check.
       boost::beast::flat_buffer buffer;
-      http::response<http::string_body> res;
+      http::response_parser<http::file_body> parser;
+      // The download exceeds the parser's default body-size limit; the transfer is bounded
+      // by the caller's deadline and by available disk space instead.
+      parser.body_limit(boost::none);
 
-      ec = std::visit(read_response_visitor(this, buffer, res, deadline), conn_iter->second);
-      FC_ASSERT(!ec, "Failed to read response: {}", ec.message());
+      ec = std::visit([&](auto& stream) {
+         return sync_read_header_with_timeout(*stream, buffer, parser, deadline);
+      }, conn_iter->second);
+      FC_ASSERT(!ec, "Failed to read response header: {}", ec.message());
 
-      FC_ASSERT(res.result() == http::status::ok || res.result() == http::status::partial_content,
-                "HTTP POST failed with status {}: {}", (int)res.result(), res.body().substr(0, 200));
+      const auto status = parser.get().result();
+      if (status != http::status::ok && status != http::status::partial_content) {
+         // Error responses carry small diagnostic bodies; read into memory for the message.
+         // Best effort: on a read failure the throw below reports whatever body arrived.
+         http::response_parser<http::string_body> err_parser{std::move(parser)};
+         if (!err_parser.is_done()) {
+            std::visit([&](auto& stream) {
+               return sync_read_parser_with_timeout(*stream, buffer, err_parser, deadline);
+            }, conn_iter->second);
+         }
+         FC_THROW("HTTP POST failed with status {}: {}", (int)status, err_parser.get().body().substr(0, 200));
+      }
 
       // Write to temp file then rename
       auto temp_path = final_dest;
       temp_path += ".downloading";
       auto cleanup = make_scoped_exit([&temp_path](){
-         std::error_code ec;
-         std::filesystem::remove(temp_path, ec);
+         std::error_code rm_ec;
+         std::filesystem::remove(temp_path, rm_ec);
       });
 
-      {
-         std::ofstream ofs(temp_path, std::ios::binary);
-         FC_ASSERT(ofs.good(), "Failed to open temp file for writing: {}", temp_path.string());
-         ofs.write(res.body().data(), res.body().size());
-         FC_ASSERT(ofs.good(), "Failed to write snapshot data to: {}", temp_path.string());
+      http::file_body::value_type file;
+      file.open(temp_path.c_str(), boost::beast::file_mode::write, ec);
+      FC_ASSERT(!ec, "Failed to open temp file {} for writing: {}", temp_path.string(), ec.message());
+      parser.get().body() = std::move(file);
+
+      if (!parser.is_done()) {
+         ec = std::visit([&](auto& stream) {
+            return sync_read_parser_with_timeout(*stream, buffer, parser, deadline);
+         }, conn_iter->second);
+         FC_ASSERT(!ec, "Failed to read response body: {}", ec.message());
       }
+      parser.get().body().close();
 
       std::error_code rename_ec;
       std::filesystem::rename(temp_path, final_dest, rename_ec);

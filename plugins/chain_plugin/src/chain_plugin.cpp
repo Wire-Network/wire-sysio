@@ -1614,32 +1614,45 @@ void chain_plugin_impl::verify_snapshot_attestation(const signed_block_ptr& lib_
          // The snaprecords row is created by votesnaphash transactions that only land a few blocks
          // after the snapshot height, so on a fresh bootstrap it may not have synced into state by
          // the time the first finalized block past the snapshot height arrives. Keep retrying on
-         // later finalized blocks; only conclude the height was never attested once the node has
-         // caught up to the live chain tip. snapshot_loaded_block_num is left set so the caller
-         // retries. This is local, non-consensus bookkeeping, so comparing the finalized block time
-         // against wall-clock to detect "caught up" is appropriate.
+         // later finalized blocks; only conclude the height was never attested after catching up
+         // to the live chain tip (plus, for auto-fetched snapshots, the grace window below).
+         // snapshot_loaded_block_num is left set so the caller retries. This is local,
+         // non-consensus bookkeeping, so comparing the finalized block time against wall-clock
+         // to detect "caught up" is appropriate.
          const auto caught_up_tolerance = fc::seconds(30);
          const bool caught_up = fc::time_point::now() - lib_block->timestamp.to_time_point() < caught_up_tolerance;
-         if (caught_up) {
+         if (!caught_up)
+            return; // retry on the next finalized block while still catching up
+
+         if (snapshot_auto_fetched) {
+            // A node bootstrapping from a recently-taken snapshot reaches the live tip before the
+            // providers' votesnaphash transactions (which must be generated, voted, and reach
+            // quorum) have landed, so being at the tip without a record is not yet conclusive.
+            // Keep retrying for a grace window of finalized blocks past the snapshot height --
+            // half the 25,000-block provider snapshot interval -- before giving up.
+            constexpr uint32_t max_blocks_to_wait = 12500;
+            if (lib_block->block_num() < snap_block_num + max_blocks_to_wait)
+               return; // retry on the next finalized block while the attestation can still arrive
+
+            // A snapshot fetched via --snapshot-endpoint came from an untrusted remote provider;
+            // without an on-chain attestation there is nothing tying its content to the chain,
+            // so refusing to run is the only safe outcome.
             snapshot_loaded_block_num.reset();
-            if (snapshot_auto_fetched) {
-               // A snapshot fetched via --snapshot-endpoint came from an untrusted remote
-               // provider; without an on-chain attestation there is nothing tying its content
-               // to the chain, so refusing to run is the only safe outcome.
-               elog("FATAL: No attested snapshot record found for block #{} after syncing to the chain tip. "
-                    "Auto-fetched snapshots require on-chain attestation for security. "
-                    "The node has been stopped. It is highly recommended that you delete this chain state "
-                    "and acquire a snapshot from a trusted source before restarting.",
-                    snap_block_num);
-               app().quit();
-               return;
-            }
-            wlog("No attested snapshot record found for block #{} after syncing to the chain tip. "
-                 "Skipping snapshot verification. "
-                 "Only snapshots taken at attested block heights can be verified.",
-                 snap_block_num);
+            elog("FATAL: No attested snapshot record found for block #{} after syncing {} blocks past it. "
+                 "Auto-fetched snapshots require on-chain attestation for security. "
+                 "The node has been stopped. It is highly recommended that you delete this chain state "
+                 "and acquire a snapshot from a trusted source before restarting.",
+                 snap_block_num, lib_block->block_num() - snap_block_num);
+            app().quit();
+            return;
          }
-         return; // retry on the next finalized block while still catching up
+
+         snapshot_loaded_block_num.reset();
+         wlog("No attested snapshot record found for block #{} after syncing to the chain tip. "
+              "Skipping snapshot verification. "
+              "Only snapshots taken at attested block heights can be verified.",
+              snap_block_num);
+         return;
       }
 
       // The record is present -- this attempt is terminal regardless of the outcome below.
