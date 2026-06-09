@@ -160,9 +160,10 @@ try:
     Print("Cycle through catchup scenarios")
     twoRounds=21*2*12
     twoRoundsTimeout=(twoRounds/2 + 10)  #2 rounds in seconds + some leeway
+    catchupLaunchTimeout=180
     for catchup_num in range(0, catchupCount):
         Print("Start catchup node")
-        cluster.launchUnstarted()
+        cluster.launchUnstarted(timeout=catchupLaunchTimeout)
         lastLibNum=lib(node0)
         # verify producer lib is still advancing
         waitForBlock(node0, lastLibNum+1, timeout=twoRoundsTimeout, blockType=BlockType.lib)
