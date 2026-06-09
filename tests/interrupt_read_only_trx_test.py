@@ -88,11 +88,12 @@ def startCluster():
         if allOC or args.wasm_runtime == "sys-vm-oc-forced":
             Print("sys-vm-oc is unavailable on this platform. Skip the test")
             exit(0) # Do not fail the test
+    if ocSupported:
+        specificExtraNodeopArgs[pnodes]+=" --sys-vm-oc-enable "
+        specificExtraNodeopArgs[pnodes]+=args.sys_vm_oc_enable
     if ocRequested:
         specificExtraNodeopArgs[pnodes]+=" --sys-vm-oc-cache-size-mb "
         specificExtraNodeopArgs[pnodes]+=" 1 " # set small so there is churn
-        specificExtraNodeopArgs[pnodes]+=" --sys-vm-oc-enable "
-        specificExtraNodeopArgs[pnodes]+=args.sys_vm_oc_enable
     if args.wasm_runtime:
         specificExtraNodeopArgs[pnodes]+=" --wasm-runtime "
         specificExtraNodeopArgs[pnodes]+=args.wasm_runtime
@@ -113,7 +114,10 @@ def startCluster():
     # sysio.* should be using oc unless oc tierup disabled
     Utils.Print(f"search: executing {sysioCodeHash} with sys vm oc")
     found = producerNode.findInLog(f"executing {sysioCodeHash} with sys vm oc")
-    assert( found or ((noOC or not ocSupported) and not found) )
+    if noOC or not ocSupported:
+        assert(not found)
+    else:
+        assert(found)
 
 def deployTestContracts():
     Utils.Print("Create payloadless account and deploy payloadless contract")

@@ -651,9 +651,14 @@ class PerformanceTestBasic:
     def setupClusterConfig(args) -> ClusterConfig:
 
         def supportedPluginArgs(pluginArgsClass, **kwargs):
-            """Return only constructor arguments supported by the generated plugin-args dataclass."""
+            """Drop only constructor arguments for chain-plugin options compiled out of this nodeop build."""
+            conditionallySupportedFields = {"sysVmOcCacheSizeMb", "sysVmOcCompileThreads"}
             supportedFields = {field.name for field in dataclasses.fields(pluginArgsClass)}
-            return {key: value for key, value in kwargs.items() if key in supportedFields}
+            return {
+                key: value
+                for key, value in kwargs.items()
+                if key in supportedFields or key not in conditionallySupportedFields
+            }
 
         chainPluginArgs = ChainPluginArgs(**supportedPluginArgs(
                                         ChainPluginArgs,

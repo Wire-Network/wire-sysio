@@ -97,16 +97,22 @@ class Utils:
     @staticmethod
     def nodeopSupportsOption(option):
         """Return whether the built nodeop binary advertises the given command-line option."""
-        if Utils._nodeopHelpOutput is None:
-            result=subprocess.run(
-                [Utils.SysServerPath, "--help"],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                universal_newlines=True,
-                check=False)
-            Utils._nodeopHelpOutput=result.stdout
+        with Utils._check_output_lock:
+            if Utils._nodeopHelpOutput is None:
+                result=subprocess.run(
+                    [Utils.SysServerPath, "--help"],
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    universal_newlines=True,
+                    check=False)
+                if result.returncode != 0 or not result.stdout.strip():
+                    raise RuntimeError(
+                        f"Unable to inspect nodeop options with '{Utils.SysServerPath} --help': "
+                        f"return code {result.returncode}, output: {result.stdout}"
+                    )
+                Utils._nodeopHelpOutput=result.stdout
 
-        return option in Utils._nodeopHelpOutput
+        return re.search(rf"(^|\s){re.escape(option)}([=\s]|$)", Utils._nodeopHelpOutput) is not None
 
     @staticmethod
     def timestamp():
