@@ -12,11 +12,27 @@
 #include <boost/algorithm/string/predicate.hpp>
 
 #include <test_contracts.hpp>
+#include <test_utils.hpp>
 
 using namespace sysio;
 using namespace sysio::chain;
 using namespace sysio::testing;
 using namespace fc;
+
+namespace {
+
+/// Minimal action descriptor used to push payloadless::doitforever through the unit-test helper.
+struct payloadless_doitforever_action {
+   static account_name get_account() {
+      return "payloadless"_n;
+   }
+
+   static action_name get_name() {
+      return "doitforever"_n;
+   }
+};
+
+} // namespace
 
 template<typename T>
 class payloadless_tester : public T {
@@ -37,6 +53,19 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( test_doit, T, payloadless_testers ) {
    auto trace = chain.push_action("payloadless"_n, "doit"_n, "payloadless"_n, mutable_variant_object());
    auto msg = trace->action_traces.front().console;
    BOOST_CHECK_EQUAL(msg == "Im a payloadless action", true);
+}
+
+BOOST_AUTO_TEST_CASE_TEMPLATE( test_doitforever_cpu_limit, T, payloadless_testers ) {
+   T chain;
+
+   chain.create_accounts( {"payloadless"_n} );
+   chain.set_code( "payloadless"_n, test_contracts::payloadless_wasm() );
+   chain.set_abi( "payloadless"_n, test_contracts::payloadless_abi() );
+
+   BOOST_CHECK_EXCEPTION( sysio::test_utils::push_trx( chain, payloadless_doitforever_action{},
+                                                       5000, 10, 200, false, {}, "payloadless"_n ),
+                          tx_cpu_usage_exceeded,
+                          fc_exception_message_contains( "reached speculative executed adjusted trx max time" ) );
 }
 
 // test GH#3916 - contract api action with no parameters fails when called from clio
