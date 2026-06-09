@@ -731,16 +731,15 @@ void apply_consensus(name self, uint64_t chain_code, uint32_t epoch_index,
    const uint128_t composite = opp::outpost_epoch_key(chain_code, epoch_index);
 
    // Idempotency guard, keyed off the DURABLE per-outpost consensus row. `outpcons.epoch_index` is
-   // written only here (apply_consensus) and is never rolled back by chkcons's per-advance reset, so
-   // `epoch_index == this epoch` reliably means the winning envelope for this (outpost, epoch) was
-   // already decoded, dispatched, and logged.
+   // written only here (apply_consensus) and never cleared, so `epoch_index == this epoch` reliably
+   // means the winning envelope for this (outpost, epoch) was already decoded, dispatched, and logged.
+   // chkcons keys its advance gate off this same signal.
    //
-   // It must NOT key off the inbound `messages` row: that row is erased after dispatch below, AND the
-   // consensus cleanup clears `raw_data` from every delivery row. So a post-quorum re-fire of evalcons
-   // would otherwise re-group the now-empty winning row and abort here on an empty-envelope decode --
-   // turning a benign late delivery into a hard failure and, because the whole deliver tx reverts,
-   // dropping the late operator's own envelope row that epoch::advance needs to classify/slash. This
-   // no-op returns before any cleanup, so that row persists.
+   // The guard matters because the consensus cleanup below clears `raw_data` from every delivery row.
+   // Without it, a post-quorum re-fire of evalcons would re-group the now-empty winning row and abort
+   // here on an empty-envelope decode -- turning a benign late delivery into a hard failure and, because
+   // the whole deliver tx reverts, dropping the late operator's own envelope row that epoch::advance
+   // needs to classify/slash. This no-op returns before any cleanup, so that row persists.
    {
       msgch::outpost_consensus_t opcons(self);
       auto opc_pk = msgch::outpost_consensus_key{chain_code};
@@ -1094,8 +1093,8 @@ void msgch::chkcons() {
    // Open-dispute gate: if any OPP dispute for the current epoch is still OPEN, hold advancement.
    // Two overlapping holds protect a disputed epoch: `sysio.epoch::is_paused` (set by opendispute)
    // is the hard stop -- advance() itself throws while paused -- and this gate is the soft one that
-   // returns BEFORE chkcons triggers advance, so it neither hits that throw nor resets per-outpost
-   // consensus state mid-dispute. chkdispute clears both on resolution (resolvedisp + unpause).
+   // returns BEFORE chkcons triggers advance, so it never hits that throw mid-dispute. chkdispute
+   // clears both on resolution (resolvedisp + unpause).
    {
       chalg::disputes_t disputes(CHALG_ACCOUNT);
       auto ep_idx = disputes.get_index<"byepoch"_n>();
@@ -1123,7 +1122,13 @@ void msgch::chkcons() {
          break;
       }
       auto opc = opcons.get(opc_pk);
-      if (!opc.consensus_reached || opc.epoch_index != epoch) {
+      // Readiness is the durable `epoch_index == current epoch` signal that apply_consensus writes on
+      // dispatch. We intentionally do NOT also gate on `consensus_reached`: advance() can return without
+      // bumping the epoch (the emissions gate in sysio.epoch::advance returns gracefully), and that
+      // commit is not rolled back, so a pre-emptive reset of consensus_reached would strand the epoch
+      // with nothing to re-arm it -- apply_consensus does not re-fire once the delivery set is complete.
+      // A stale row from a prior epoch fails this check; a fresh dispatch for the new epoch overwrites it.
+      if (opc.epoch_index != epoch) {
          all_consensus = false;
          break;
       }
@@ -1137,12 +1142,11 @@ void msgch::chkcons() {
    auto state = estate.get();
    if (current_time_point() < state.next_epoch_start) return;
 
-   // All conditions met — reset consensus and advance
-   for (auto it = opcons.begin(); it != opcons.end(); ++it) {
-      auto opc_pk = outpost_consensus_key{it.key().chain_code};
-      opcons.modify(same_payer, opc_pk, [&](auto& r) { r.consensus_reached = false; });
-   }
-
+   // All conditions met. Trigger advance. Per-outpost consensus is intentionally NOT reset here:
+   // advance() can legally return without advancing (the emissions gate), and that graceful return does
+   // not roll back a reset done beforehand, which would permanently strand the epoch. Stale consensus is
+   // invalidated instead by the `epoch_index == epoch` check above once advance() actually bumps the
+   // epoch, and the next epoch's dispatch overwrites the row.
    action(
       permission_level{get_self(), "active"_n},
       EPOCH_ACCOUNT,
