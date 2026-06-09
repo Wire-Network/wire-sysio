@@ -12,7 +12,7 @@ from .testUtils import Utils
 
 class Transactions(NodeopQueries):
     retry_num_blocks_default = 1
-    # Default clio action-push timeout, in seconds, used to keep intentionally interrupting transactions bounded.
+    # Default clio action-push subprocess timeout, in seconds, used to bound a stuck push.
     push_message_timeout_default = 45
 
     def __init__(self, host, port, walletMgr=None):
@@ -299,11 +299,15 @@ class Transactions(NodeopQueries):
                     continue # try again
                 return (False, msg)
             except subprocess.TimeoutExpired as ex:
+                msg=str(ex)
+                output=ex.output.decode("utf-8") if ex.output is not None else ""
+                error=ex.stderr.decode("utf-8") if ex.stderr is not None else ""
                 if not silentErrors:
                     end=time.perf_counter()
-                    Utils.Print("ERROR: Timeout during push message. retry %s. cmd timeout=%s. cmd Duration=%.3f sec." %
-                                (retries, ex.timeout, end - start))
-                return (False, ex)
+                    Utils.Print(
+                        "ERROR: Timeout during push message. retry %s. cmd timeout=%s. stderr: %s. stdout: %s. cmd Duration=%.3f sec." %
+                        (retries, ex.timeout, error, output, end - start))
+                return (False, msg)
 
     def setPermission(self, account, code, pType, requirement, waitForTransBlock=False, exitOnError=False, sign=False):
         assert(isinstance(account, Account))

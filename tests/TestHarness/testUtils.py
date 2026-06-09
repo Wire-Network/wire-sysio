@@ -222,7 +222,7 @@ class Utils:
             popen.kill()
             (output,error)=popen.communicate()
             Utils.checkOutputFileWrite(start, cmd, output, error)
-            raise subprocess.TimeoutExpired(cmd=cmd, timeout=ex.timeout, output=output, stderr=error)
+            raise subprocess.TimeoutExpired(cmd=cmd, timeout=ex.timeout, output=output, stderr=error) from ex
         Utils.checkOutputFileWrite(start, cmd, output, error)
         if popen.returncode != 0 and not ignoreError:
             raise subprocess.CalledProcessError(returncode=popen.returncode, cmd=cmd, output=output, stderr=error)
@@ -348,7 +348,8 @@ class Utils:
         return Utils.runCmdArrReturnJson(cmdArr, trace=trace, silentErrors=silentErrors, timeout=timeout)
 
     @staticmethod
-    def processSysioUtilCmd(cmd, cmdDesc, silentErrors=True, exitOnError=False, exitMsg=None):
+    def processSysioUtilCmd(cmd, cmdDesc, silentErrors=True, exitOnError=False, exitMsg=None, timeout=None):
+        """Run sys-util and return stdout, optionally bounding the subprocess runtime."""
         cmd="%s %s" % (Utils.SysioClientPath, cmd)
         if Utils.Debug: Utils.Print("cmd: %s" % (cmd))
         if exitMsg is not None:
@@ -358,7 +359,7 @@ class Utils:
         output=None
         start=time.perf_counter()
         try:
-            output=Utils.runCmdReturnStr(cmd)
+            output=Utils.runCmdReturnStr(cmd, timeout=timeout)
 
             if Utils.Debug:
                 end=time.perf_counter()
@@ -368,6 +369,19 @@ class Utils:
                 end=time.perf_counter()
                 msg=ex.stderr.decode("utf-8")
                 errorMsg="Exception during \"%s\". Exception message: %s.  cmd Duration=%.3f sec. %s" % (cmdDesc, msg, end-start, exitMsg)
+                if exitOnError:
+                    Utils.cmdError(errorMsg)
+                    Utils.errorExit(errorMsg)
+                else:
+                    Utils.Print("ERROR: %s" % (errorMsg))
+            return None
+        except subprocess.TimeoutExpired as ex:
+            if not silentErrors:
+                end=time.perf_counter()
+                out=ex.output.decode("utf-8") if ex.output is not None else ""
+                msg=ex.stderr.decode("utf-8") if ex.stderr is not None else ""
+                errorMsg=("Timeout during \"%s\" after %.3f sec. cmd timeout=%s. stderr: %s. stdout: %s. %s" %
+                          (cmdDesc, end-start, ex.timeout, msg, out, exitMsg))
                 if exitOnError:
                     Utils.cmdError(errorMsg)
                     Utils.errorExit(errorMsg)

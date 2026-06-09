@@ -243,20 +243,37 @@ class NodeopQueries:
         """Fetch a transaction trace, bounding each poll so missing traces cannot stall bootstrap."""
         assert(isinstance(transId, str))
         exitOnErrorForDelayed=not delayedRetry and exitOnError
-        timeout=3
+        pollTimeout=3
+        pollBudget=60
+        pollDeadline=time.perf_counter() + pollBudget
         cmdDesc="get transaction_trace"
         cmd="%s %s" % (cmdDesc, transId)
-        msg="(transaction id=%s)" % (transId);
-        for i in range(0,(int(60/timeout) - 1)):
-            trans=self.processClioCmd(cmd, cmdDesc, silentErrors=True, exitOnError=exitOnErrorForDelayed, exitMsg=msg, timeout=timeout)
+        msg="(transaction id=%s)" % (transId)
+        while True:
+            remainingBudget=pollDeadline - time.perf_counter()
+            if remainingBudget <= 0:
+                break
+            finalAttempt=remainingBudget <= pollTimeout
+            timeout=min(pollTimeout, remainingBudget)
+            attemptStart=time.perf_counter()
+            trans=self.processClioCmd(cmd, cmdDesc,
+                                      silentErrors=silentErrors if finalAttempt else True,
+                                      exitOnError=exitOnError if finalAttempt else exitOnErrorForDelayed,
+                                      exitMsg=msg, timeout=timeout)
             if trans is not None or not delayedRetry:
                 return trans
+            if finalAttempt:
+                break
+            remainingBudget=pollDeadline - time.perf_counter()
+            if remainingBudget <= 0:
+                break
             if Utils.Debug: Utils.Print("Could not find transaction with id %s, delay and retry" % (transId))
-            time.sleep(timeout)
+            attemptElapsed=time.perf_counter() - attemptStart
+            time.sleep(min(max(0, pollTimeout - attemptElapsed), remainingBudget))
 
         self.missingTransaction=True
         # either it is there or the transaction has timed out
-        return self.processClioCmd(cmd, cmdDesc, silentErrors=silentErrors, exitOnError=exitOnError, exitMsg=msg, timeout=timeout)
+        return None
 
     def isTransInBlock(self, transId, blockId, exitOnError=False):
         """Check if transId is within block identified by blockId"""
@@ -576,6 +593,7 @@ class NodeopQueries:
         start=time.perf_counter()
         while retries > 0:
             retries -= 1
+            attemptStart=time.perf_counter()
             try:
                 if returnType==ReturnType.json:
                     trans=Utils.runCmdReturnJson(cmd, silentErrors=silentErrors, timeout=timeout)
@@ -586,7 +604,7 @@ class NodeopQueries:
 
                 if Utils.Debug:
                     end=time.perf_counter()
-                    Utils.Print("cmd Duration: %.3f sec" % (end-start))
+                    Utils.Print("cmd Duration: %.3f sec" % (end-attemptStart))
             except subprocess.CalledProcessError as ex:
                 if not silentErrors:
                     end=time.perf_counter()
@@ -605,7 +623,10 @@ class NodeopQueries:
             except subprocess.TimeoutExpired as ex:
                 if not silentErrors:
                     end=time.perf_counter()
-                    errorMsg="Timeout during \"%s\" after %.3f sec. cmd timeout=%s. %s" % (cmdDesc, end-start, ex.timeout, exitMsg)
+                    out=ex.output.decode("utf-8") if ex.output is not None else ""
+                    msg=ex.stderr.decode("utf-8") if ex.stderr is not None else ""
+                    errorMsg=("Timeout during \"%s\" after %.3f sec. cmd timeout=%s. stderr: %s. stdout: %s. %s" %
+                              (cmdDesc, end-attemptStart, ex.timeout, msg, out, exitMsg))
                     if exitOnError:
                         Utils.cmdError(errorMsg)
                         Utils.errorExit(errorMsg)
