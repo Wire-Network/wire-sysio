@@ -103,8 +103,15 @@ std::vector<char> outpost_ethereum_client::read_inbound_envelope(
    // so we get the structured outputs `(uint32 epoch_, bytes data_)`
    // back as a `mutable_variant_object`.
    const auto& abi = _opp_client->get_abi("getLatestOutboundEnvelope");
+   // Read at `finalized`, not `latest`. WIRE consensus on inbound is committed forward against this
+   // read: an operator that reads a slot at `latest` can achieve WIRE-side consensus on it and queue
+   // attestations off it, then watch that slot reorg out of Ethereum's canonical chain seconds later,
+   // leaving WIRE committed to history that no longer exists. `finalized` is the only tag with
+   // cryptoeconomic finality. This is deliberately not operator-configurable: the read commitment is a
+   // consensus parameter, and operators reading at different commitments would deliver divergent
+   // envelopes for the same epoch, manufacturing disputes among honest operators.
    const auto raw_hex_var = _opp_client->get_latest_outbound_envelope(
-      std::string(eth::block_tag_latest));
+      std::string(eth::block_tag_finalized));
    if (!raw_hex_var.is_string()) {
       wlog("outpost_ethereum_client[{}]: getLatestOutboundEnvelope returned non-string variant",
            to_string());

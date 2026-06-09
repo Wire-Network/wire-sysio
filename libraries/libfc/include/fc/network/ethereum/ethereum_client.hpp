@@ -60,6 +60,15 @@ constexpr std::string_view block_tag_pending = "pending";
 constexpr std::string_view block_tag_latest = "latest";
 
 /**
+ * @brief Block tag constant representing the most recent beacon-chain-finalized block.
+ *
+ * Unlike `latest` (canonical head, routinely reorged) this tag only advances on beacon-chain
+ * finality (~2 epochs, ~12.8 min), which carries cryptoeconomic finality and cannot revert without
+ * a third of staked ETH being slashed. Required for reads that downstream consensus commits against.
+ */
+constexpr std::string_view block_tag_finalized = "finalized";
+
+/**
  * @brief Converts a block_tag_t variant to a string
  *
  * @param tag Block tag variant (either string or string_view)
