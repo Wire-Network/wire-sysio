@@ -1336,6 +1336,38 @@ class Cluster(object):
             Utils.Print("ERROR: Failed to set sysio.roa as privileged")
             return None
 
+        sysioAuthexAccount = copy.deepcopy(sysioAccount)
+        sysioAuthexAccount.name = 'sysio.authex'
+        contract="sysio.authex"
+        contractDir=str(self.libTestingContractsPath / contract)
+        wasmFile="%s.wasm" % (contract)
+        abiFile="%s.abi" % (contract)
+        Utils.Print("Publish %s contract" % (contract))
+        trans=biosNode.publishContract(sysioAuthexAccount, contractDir, wasmFile, abiFile, waitForTransBlock=True)
+        if trans is None:
+            Utils.Print("ERROR: Failed to publish contract %s." % (contract))
+            return None
+
+        trans=biosNode.setPriv(sysioAuthexAccount, sysioAccount, isPriv=True, waitForTransBlock=True)
+        if trans is None:
+            Utils.Print("ERROR: Failed to set sysio.authex as privileged")
+            return None
+
+        # Delegate sysio.authex.active to sysio.roa@sysio.code so sysio.roa::nodeownreg's inline
+        # sysio.authex::recordlink is authorized (mirrors the production ClusterManager grant).
+        # accounts is sorted by actor (sysio.authex < sysio.roa) as the authority encoding requires.
+        Utils.Print("Delegate sysio.authex.active to sysio.roa@sysio.code")
+        authexAuth=('{"account":"sysio.authex","permission":"active","parent":"owner","auth":'
+                    '{"threshold":1,"keys":[{"key":"%s","weight":1}],'
+                    '"accounts":[{"permission":{"actor":"sysio.authex","permission":"sysio.code"},"weight":1},'
+                    '{"permission":{"actor":"sysio.roa","permission":"sysio.code"},"weight":1}],'
+                    '"waits":[]}}' % sysioAuthexAccount.activePublicKey)
+        trans=biosNode.pushMessage('sysio', 'updateauth', authexAuth, '--permission sysio.authex@owner')
+        transId=Node.getTransId(trans[1])
+        if not biosNode.waitForTransactionInBlock(transId):
+            Utils.Print("ERROR: Failed to delegate sysio.authex.active to sysio.roa@sysio.code (tx %s)" % transId)
+            return None
+
         if loadSystemContract:
             Utils.Print("Set default emission config")
             action="setemitcfg"

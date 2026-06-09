@@ -30,6 +30,11 @@ namespace {
 
 constexpr name SYSTEM_ACCOUNT     = "sysio"_n;
 constexpr name TOKEN_ACCOUNT      = "sysio.token"_n;
+
+// System-owned rows are billed to the sysio RAM pool rather than to this contract account (the
+// privileged-contract model sysio.token uses): the contract account stays finite at its code+abi
+// size while table growth draws from sysio's pool. Permitted because the contract is privileged.
+constexpr name ram_payer          = "sysio"_n;
 constexpr symbol WIRE_SYMBOL{"WIRE", 9};
 
 /// True when a chains row represents an active outpost (i.e. not the depot
@@ -172,7 +177,7 @@ void record_gate_block(name self, uint32_t epoch_index, const emissions_gate_res
    const uint32_t now_secs = static_cast<uint32_t>(current_time_point().sec_since_epoch());
 
    if (!log_tbl.contains(pk)) {
-      log_tbl.emplace(self, pk, epoch::blocklog_entry{
+      log_tbl.emplace(ram_payer, pk, epoch::blocklog_entry{
          .epoch_index        = epoch_index,
          .reason             = gate.reason,
          .attempted_emission = gate.emission_amount,
@@ -189,7 +194,7 @@ void record_gate_block(name self, uint32_t epoch_index, const emissions_gate_res
    const auto existing = log_tbl.get(pk);
    const bool reason_changed = existing.reason != gate.reason;
 
-   log_tbl.modify(self, pk, [&](auto& row) {
+   log_tbl.modify(ram_payer, pk, [&](auto& row) {
       row.reason             = gate.reason;
       row.attempted_emission = gate.emission_amount;
       row.treasury_remaining = gate.treasury_remaining;
@@ -244,7 +249,7 @@ void epoch::setconfig(uint32_t epoch_duration_sec,
    cfg.batch_operator_minimum_active = batch_operator_minimum_active;
    cfg.batch_op_groups = batch_op_groups;
    cfg.epoch_retention_envelope_log_count = epoch_retention_envelope_log_count;
-   cfg_tbl.set(cfg, get_self());
+   cfg_tbl.set(cfg, ram_payer);
 }
 
 // ---------------------------------------------------------------------------
@@ -450,7 +455,7 @@ void epoch::advance() {
    // Note: last_elected_epoch tracking is epoch-internal state.
    // No operator table writes needed — group membership is in epoch_state.batch_op_groups.
 
-   state_tbl.set(state, get_self());
+   state_tbl.set(state, ram_payer);
 
    // Drain matured rows from `sysio.opreg::wtdwqueue`. Operators that queued
    // a withdrawal at least WITHDRAW_WAIT_EPOCHS ago are now eligible — opreg
@@ -711,7 +716,7 @@ void epoch::schbatchgps() {
    epoch_state state = state_tbl.get_or_default(epoch_state{});
    state.batch_op_groups = new_groups;
    state.current_batch_op_group = 0; // front-of-window is always current
-   state_tbl.set(state, get_self());
+   state_tbl.set(state, ram_payer);
 }
 
 // ---------------------------------------------------------------------------
@@ -723,7 +728,7 @@ void epoch::pause() {
    epochstate_t state_tbl(get_self());
    epoch_state state = state_tbl.get_or_default(epoch_state{});
    state.is_paused = true;
-   state_tbl.set(state, get_self());
+   state_tbl.set(state, ram_payer);
 }
 
 void epoch::unpause() {
@@ -733,7 +738,7 @@ void epoch::unpause() {
    check(state_tbl.exists(), "epoch state not initialized");
    auto state = state_tbl.get();
    state.is_paused = false;
-   state_tbl.set(state, get_self());
+   state_tbl.set(state, ram_payer);
 }
 
 } // namespace sysio

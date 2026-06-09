@@ -642,10 +642,16 @@ namespace sysio {
 
       void set_connection_type( const string& peer_addr );
       void set_peer_connection_type( const string& peer_addr );
-      bool is_transactions_only_connection()const { return connection_type == transactions_only; } // thread safe, atomic
-      bool is_blocks_only_connection()const { return connection_type == blocks_only; }
-      bool is_transactions_connection() const { return connection_type != blocks_only; } // thread safe, atomic
-      bool is_blocks_connection() const { return connection_type != transactions_only; } // thread safe, atomic
+      bool is_transactions_only_connection()const {
+         return conn_type == net_utils::connection_type::transactions_only;
+      } // thread safe, atomic
+      bool is_blocks_only_connection()const { return conn_type == net_utils::connection_type::blocks_only; }
+      bool is_transactions_connection() const {
+         return conn_type != net_utils::connection_type::blocks_only;
+      } // thread safe, atomic
+      bool is_blocks_connection() const {
+         return conn_type != net_utils::connection_type::transactions_only;
+      } // thread safe, atomic
       uint32_t get_peer_start_block_num() const { return peer_start_block_num.load(); }
       uint32_t get_peer_fork_db_head_block_num() const { return peer_fork_db_head_block_num.load(); }
       uint32_t get_last_received_block_num() const { return last_received_block_num.load(); }
@@ -681,15 +687,10 @@ namespace sysio {
       std::atomic<connection_state> conn_state{connection_state::connecting};
 
       const string            peer_addr;
-      enum connection_types : char {
-         both,
-         transactions_only,
-         blocks_only
-      };
 
       size_t                          block_sync_rate_limit{0};  // bytes/second, default unlimited
 
-      std::atomic<connection_types>   connection_type{both};
+      std::atomic<net_utils::connection_type> conn_type{net_utils::connection_type::both};
       std::atomic<uint32_t>           peer_start_block_num{0};
       std::atomic<uint32_t>           peer_fork_db_head_block_num{0};
       std::atomic<uint32_t>           last_received_block_num{0};
@@ -1170,6 +1171,8 @@ namespace sysio {
         last_handshake_recv(),
         last_handshake_sent()
    {
+      /// The locally configured address type is authoritative; a peer's advertised address may only narrow it later.
+      set_connection_type( listen_address );
       fc_dlog( p2p_conn_log, "new connection - {} object created for peer {}:{} from listener {}",
                connection_id, log_remote_endpoint_ip, log_remote_endpoint_port, listen_address );
    }
@@ -1202,21 +1205,21 @@ namespace sysio {
 
    // called from connection strand
    void connection::set_connection_type( const std::string& peer_add ) {
-      auto [host, port, type] = net_utils::split_host_port_type(peer_add);
-      if (host.empty()) {
+      if (std::get<0>(net_utils::split_host_port_type( peer_add )).empty()) {
          fc_dlog( p2p_conn_log, "Invalid address: {}", peer_add);
-      } else if( type.empty() ) {
-         fc_dlog( p2p_conn_log, "Setting connection - {} type for: {} to both transactions and blocks", connection_id, peer_add );
-         connection_type = both;
-      } else if( type == "trx" ) {
-         fc_dlog( p2p_conn_log, "Setting connection - {} type for: {} to transactions only", connection_id, peer_add );
-         connection_type = transactions_only;
-      } else if( type == "blk" ) {
-         fc_dlog( p2p_conn_log, "Setting connection - {} type for: {} to blocks only", connection_id, peer_add );
-         connection_type = blocks_only;
-      } else {
-         fc_wlog( p2p_conn_log, "Unknown connection - {} type: {}, for {}", connection_id, type, peer_add );
+         return;
       }
+
+      const auto new_type = net_utils::type_from_address(peer_add);
+      if( new_type == net_utils::connection_type::both ) {
+         fc_dlog( p2p_conn_log, "Setting connection - {} type for: {} to both transactions and blocks",
+                  connection_id, peer_add );
+      } else if( new_type == net_utils::connection_type::transactions_only ) {
+         fc_dlog( p2p_conn_log, "Setting connection - {} type for: {} to transactions only", connection_id, peer_add );
+      } else if( new_type == net_utils::connection_type::blocks_only ) {
+         fc_dlog( p2p_conn_log, "Setting connection - {} type for: {} to blocks only", connection_id, peer_add );
+      }
+      conn_type = new_type;
    }
 
    // called from connection strand
@@ -1225,20 +1228,31 @@ namespace sysio {
       auto [host, port, type] = net_utils::split_host_port_type(peer_add);
       if (host.empty()) {
          fc_dlog( p2p_conn_log, "Invalid peer address: {}", peer_add);
-      } else if( type.empty() ) {
+         return;
+      }
+
+      const auto current_type = conn_type.load();
+      const auto new_type = net_utils::narrow_connection_type(current_type, peer_add);
+      if( type.empty() ) {
          // peer asked for both, continue with p2p-peer-address type
-      } else if( type == "trx" ) {
-         if (connection_type == both) { // only switch to trx if p2p-peer-address didn't specify a connection type
-            fc_dlog( p2p_conn_log, "Setting peer connection - {} type for: {} to transactions only", connection_id, peer_add );
-            connection_type = transactions_only;
+      } else if( type == net_utils::trx_connection_type ) {
+         // only switch to trx if p2p-peer-address didn't specify a connection type
+         if (current_type == net_utils::connection_type::both) {
+            fc_dlog( p2p_conn_log, "Setting peer connection - {} type for: {} to transactions only",
+                     connection_id, peer_add );
          }
-      } else if( type == "blk" ) {
-         if (connection_type == both) { // only switch to blocks if p2p-peer-address didn't specify a connection type
-            fc_dlog( p2p_conn_log, "Setting peer connection - {} type for: {} to blocks only", connection_id, peer_add );
-            connection_type = blocks_only;
+      } else if( type == net_utils::blk_connection_type ) {
+         // only switch to blocks if p2p-peer-address didn't specify a connection type
+         if (current_type == net_utils::connection_type::both) {
+            fc_dlog( p2p_conn_log, "Setting peer connection - {} type for: {} to blocks only",
+                     connection_id, peer_add );
          }
       } else {
          fc_dlog( p2p_conn_log, "Unknown peer connection - {} type: {}, for {}", connection_id, type, peer_add );
+         return;
+      }
+      if( new_type != current_type ) {
+         conn_type = new_type;
       }
    }
 
@@ -3564,7 +3578,7 @@ namespace sysio {
 
          if( incoming() ) {
             if (auto [host, port, type] = net_utils::split_host_port_type(msg.p2p_address); !host.empty())
-               set_connection_type( msg.p2p_address);
+               set_peer_connection_type( msg.p2p_address);
             else
                peer_dlog(p2p_msg_log, this, "Invalid handshake p2p_address {}", msg.p2p_address);
          } else {
@@ -4549,9 +4563,8 @@ namespace sysio {
             if (!p2ps.front().empty()) { // "" for p2p-listen-endpoint means to not listen
                p2p_addresses = p2ps;
                auto addr_count = p2p_addresses.size();
-               std::sort(p2p_addresses.begin(), p2p_addresses.end());
-               auto last = std::unique(p2p_addresses.begin(), p2p_addresses.end());
-               p2p_addresses.erase(last, p2p_addresses.end());
+               /// Preserve endpoint order because p2p-server-address values are paired positionally.
+               p2p_addresses = net_utils::dedupe_preserve_order(p2p_addresses);
                if( size_t addr_diff = addr_count - p2p_addresses.size(); addr_diff != 0) {
                   fc_wlog( p2p_conn_log, "Removed {} duplicate p2p-listen-endpoint entries", addr_diff);
                }

@@ -12,6 +12,10 @@ namespace sysio {
 
 namespace {
 
+// System-owned rows bill to the sysio RAM pool, not this contract account (privileged-contract
+// model, as sysio.token uses): the account stays finite at code+abi size; growth draws from the pool.
+constexpr name ram_payer = "sysio"_n;
+
 uint64_t current_time_ms() {
    return static_cast<uint64_t>(current_time_point().sec_since_epoch()) * 1000;
 }
@@ -97,7 +101,7 @@ void reserve::regreserve(sysio::slug_name chain_code,
    sysio::check(tbl.find(pk) == tbl.end(), "reserve already registered");
 
    const auto now = current_time_ms();
-   tbl.emplace(get_self(), pk, reserve_row{
+   tbl.emplace(ram_payer, pk, reserve_row{
       .chain_code             = chain_code,
       .token_code             = token_code,
       .reserve_code           = reserve_code,
@@ -150,7 +154,7 @@ void reserve::oncrtreserve(sysio::slug_name       chain_code,
    creator.address = std::move(creator_chain_addr);
 
    const auto now = current_time_ms();
-   tbl.emplace(get_self(), pk, reserve_row{
+   tbl.emplace(ram_payer, pk, reserve_row{
       .chain_code             = chain_code,
       .token_code             = token_code,
       .reserve_code           = reserve_code,
@@ -185,7 +189,7 @@ void reserve::matchreserve(sysio::slug_name chain_code,
    sysio::check(wire_amount == it->requested_wire_amount,
                 "matchreserve: wire_amount must equal requested_wire_amount exactly");
 
-   tbl.modify(get_self(), pk, [&](auto& row) {
+   tbl.modify(ram_payer, pk, [&](auto& row) {
       row.status              = opp::types::RESERVE_STATUS_ACTIVE;
       row.reserve_wire_amount = wire_amount;
       row.activated_at_ms     = current_time_ms();
@@ -233,7 +237,7 @@ void reserve::oncnclrsv(sysio::slug_name       chain_code,
       return;
    }
 
-   tbl.modify(get_self(), pk, [&](auto& row) {
+   tbl.modify(ram_payer, pk, [&](auto& row) {
       row.status          = opp::types::RESERVE_STATUS_CANCELLED;
       row.cancelled_at_ms = current_time_ms();
    });
@@ -294,7 +298,7 @@ void reserve::debit(sysio::slug_name chain_code,
    sysio::check(it->reserve_chain_amount >= amount,
                 "insufficient reserve_chain_amount for SWAP_REMIT debit");
 
-   tbl.modify(get_self(), pk, [&](auto& row) {
+   tbl.modify(ram_payer, pk, [&](auto& row) {
       row.reserve_chain_amount -= amount;
    });
 }
@@ -320,7 +324,7 @@ void reserve::onreject(checksum256       /*original_swap_remit_id*/,
       sysio::print("onreject: reserve not ACTIVE; silently skipping\n");
       return;
    }
-   tbl.modify(get_self(), pk, [&](auto& row) {
+   tbl.modify(ram_payer, pk, [&](auto& row) {
       row.reserve_chain_amount += unremitted_amount;
    });
 }
@@ -343,7 +347,7 @@ void reserve::onreward(sysio::slug_name chain_code,
       sysio::print("onreward: reserve not ACTIVE; silently skipping\n");
       return;
    }
-   tbl.modify(get_self(), pk, [&](auto& row) {
+   tbl.modify(ram_payer, pk, [&](auto& row) {
       row.reserve_chain_amount += outpost_amount;
    });
 }

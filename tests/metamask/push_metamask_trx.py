@@ -4,8 +4,8 @@
 What this exercises:
     1. Stand up a single-node TestHarness cluster.
     2. Create a test account with K1 keys on its active permission.
-    3. Append a Metamask-style EM pubkey to the active permission via
-       sysio::expandauth.
+    3. Add a Metamask-style EM pubkey to the active permission via
+       sysio::updateauth (re-setting active to {K1 key, EM key}).
     4. Seed the test account by transferring SYS from `sysio` (the bootstrap
        issues the full max_supply to `sysio`, so issuing more would exceed it).
     5. For each of two rounds, build an unsigned `sysio.token::transfer`,
@@ -449,7 +449,7 @@ def main() -> int:
         wallet = wallet_mgr.create("mm_test")
 
         # Import the bootstrap accounts we need to sign as:
-        #   sysio  -> calls expandauth, issue/transfer of test tokens.
+        #   sysio  -> issue/transfer of test tokens.
         #   defproducera -> creator of the test account.
         defproducera = cluster.defproduceraAccount
         sysio_account = cluster.sysioAccount
@@ -474,18 +474,32 @@ def main() -> int:
         em_info, sim_priv_em = _create_em_key(args.simulate, args.sim_private_key)
         Print(json.dumps(em_info, indent=2))
 
-        Print("calling sysio::expandauth to add the EM key to active permission")
-        expand_action_data = {
+        # Add the EM key to the test account's active authority via the standard updateauth action.
+        # updateauth replaces the authority, so we re-set active to the account's existing K1 key plus
+        # the EM key, keeping them sorted by public-key type (the K1 key sorts before the EM key).
+        # threshold 1 leaves either key able to authorize on its own, so the EM key can sign the
+        # transfers below. The account modifies its own permission, so this is signed by its active
+        # (K1) key.
+        Print("adding the EM key to the active permission via sysio::updateauth")
+        update_action_data = {
             "account": test.name,
             "permission": "active",
-            "keys": [{"key": em_info["wire_pub_em"], "weight": 1}],
-            "accounts": [],
+            "parent": "owner",
+            "auth": {
+                "threshold": 1,
+                "keys": [
+                    {"key": test.activePublicKey, "weight": 1},
+                    {"key": em_info["wire_pub_em"], "weight": 1},
+                ],
+                "accounts": [],
+                "waits": [],
+            },
         }
-        success, _ = node.pushMessage("sysio", "expandauth",
-                                      json.dumps(expand_action_data),
-                                      opts="-p sysio@active")
+        success, _ = node.pushMessage("sysio", "updateauth",
+                                      json.dumps(update_action_data),
+                                      opts=f"-p {test.name}@active")
         if not success:
-            errorExit("expandauth failed")
+            errorExit("updateauth (add EM key to active) failed")
 
         # The bootstrap issues the full max_supply to `sysio`, so just transfer
         # from sysio to the test account. Issuing more would exceed max_supply.

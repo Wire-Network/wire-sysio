@@ -5,6 +5,10 @@ namespace sysio {
 
 namespace {
 
+// System-owned rows bill to the sysio RAM pool, not this contract account (privileged-contract
+// model, as sysio.token uses): the account stays finite at code+abi size; growth draws from the pool.
+constexpr name ram_payer = "sysio"_n;
+
 uint64_t current_time_ms() {
    return static_cast<uint64_t>(current_time_point().sec_since_epoch()) * 1000;
 }
@@ -53,7 +57,7 @@ void chains::regchain(opp::types::ChainKind kind,
    const auto now = current_time_ms();
    const bool bootstrap = is_bootstrap_window();
 
-   tbl.emplace(get_self(), pk, chain_row{
+   tbl.emplace(ram_payer, pk, chain_row{
       .code               = code,
       .kind               = kind,
       .external_chain_id  = external_chain_id,
@@ -75,7 +79,7 @@ void chains::activchain(sysio::slug_name code) {
    sysio::check(it != tbl.end(), "sysio.chains: chain code not registered");
    sysio::check(!it->active, "sysio.chains: chain is already active");
 
-   tbl.modify(get_self(), pk, [&](auto& row) {
+   tbl.modify(ram_payer, pk, [&](auto& row) {
       row.active          = true;
       row.activated_at_ms = current_time_ms();
    });

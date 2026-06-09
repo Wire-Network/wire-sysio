@@ -53,6 +53,16 @@ KAT_SIG_EM     = ("SIG_EM_0xea0847dc6f2c9a189b85f01e9a1d51931ac92ee381b67641384b
 # in the metamask harness relies on).
 KAT_WRONG_DIGEST = KAT_DIGEST[:-1] + ("5" if KAT_DIGEST[-1] != "5" else "6")
 
+# --- eth_to_k1 known-answer vector (same EIP-155 0x46*32 key as KAT_ETH_SECRET) ---
+# External anchor: 0x46*32 is EIP-155's worked example and its sender address is
+# published in the spec. PVT_K1_/PUB_K1_ are Wire's own encoding of that same
+# secp256k1 secret (compressed point); PUB_K1_ is the compression of the very
+# uncompressed point the eth_account-generated KAT_PUB_EM encodes, so it stays
+# anchored to that external vector, not to the code under test.
+KAT_ETH_ADDRESS = "0x9d8a62f656a8d1615c1294fd71e9cfb3e4855a4f"   # EIP-155 example sender
+KAT_PVT_K1      = "PVT_K1_Xx4wsMynSZ39WiwEn8wzRL9trcKK33ZzwaZKJmymYx5UTjKvv"
+KAT_PUB_K1      = "PUB_K1_5TrYnZP1RkDSUMzBY4GanCy6AP68kCMdkAb5EACkAwkdc8tm4t"
+
 testSuccessful = False
 
 
@@ -179,6 +189,41 @@ def test_error_handling():
     clio("convert", "em_recover", "SIG_EM_0xdeadbeef", KAT_DIGEST, expect_fail=True)       # malformed sig
 
 
+def test_eth_to_k1():
+    """Reuse an Ethereum keypair as a Wire K1 signing key (same secp256k1 secret).
+
+    Anchored on the EIP-155 example address (external truth). The private and
+    public conversion paths must agree, and the public path is fed the very
+    uncompressed pubkey the eth_account-generated KAT_PUB_EM encodes -- tying
+    K1 back to the cross-impl EM vector above.
+    """
+    # raw Ethereum secret -> PVT_K1_/PUB_K1_ + the EIP-155 address
+    r = clio("convert", "eth_to_k1_private", "--private-key", KAT_ETH_SECRET, "--to-console")
+    assert r["Private key"] == KAT_PVT_K1, r["Private key"]
+    assert r["Public key"] == KAT_PUB_K1, r["Public key"]
+    assert r["Ethereum address"].lower() == KAT_ETH_ADDRESS, r["Ethereum address"]
+
+    # public path: the EIP-155 uncompressed pubkey (== KAT_PUB_EM minus its prefix)
+    # -> the SAME PUB_K1_ + address. Proves the two paths agree and binds the K1
+    # point to the eth_account EM vector.
+    uncompressed = KAT_PUB_EM[len("PUB_EM_"):]
+    rp = clio("convert", "eth_to_k1_public", uncompressed)
+    assert rp["Public key"] == KAT_PUB_K1, rp["Public key"]
+    assert rp["Ethereum address"].lower() == KAT_ETH_ADDRESS, rp["Ethereum address"]
+    # the 0x-prefixed form is accepted identically
+    assert clio("convert", "eth_to_k1_public", "0x" + uncompressed)["Public key"] == KAT_PUB_K1
+
+    # the same secret imported as EM (existing path) must give the reference PUB_EM_:
+    # i.e. the K1 and EM import paths agree on the underlying curve point.
+    assert clio("convert", "em_private_key", "--private-key", KAT_ETH_SECRET,
+                "--to-console")["Public key"] == KAT_PUB_EM
+
+    # error paths for the public command's length/prefix validation (the private
+    # command shares em_private_key's lenient raw-secret parse, so it is not retested here).
+    clio("convert", "eth_to_k1_public", "04abcd", expect_fail=True)                 # too short
+    clio("convert", "eth_to_k1_public", "05" + uncompressed[2:], expect_fail=True)  # 65-byte, wrong prefix
+
+
 try:
     test_create_key_em_roundtrip()
     test_create_key_sol()
@@ -186,6 +231,7 @@ try:
     test_known_answer_vector()
     test_recover_is_digest_bound()
     test_error_handling()
+    test_eth_to_k1()
     testSuccessful = True
 except Exception as e:
     Print(e)

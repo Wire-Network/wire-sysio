@@ -4,8 +4,8 @@ End-to-end test that a Wire transaction signed by **MetaMask** (or any wallet th
 exposes EIP-191 `personal_sign` over secp256k1) is accepted by `nodeop`.
 
 Wire supports this in C++ -- `signature_shim::recover()` applies the EIP-191
-prefix to a `sha256` transaction digest and recovers an `em::public_key`, and
-the `expandauth_sign_with_eth_key` unit test proves the full in-process flow.
+prefix to a `sha256` transaction digest and recovers an `em::public_key`, which
+the chain accepts wherever that key satisfies the signer's authority.
 This directory adds the **external-signer** half: real MetaMask in a browser,
 signing a real trx that gets pushed to nodeop.
 
@@ -24,7 +24,7 @@ chain round-trip.
 | File | Role |
 | ---- | ---- |
 | `metamask-sign.html` | Static page that talks to MetaMask via `window.ethereum`. Calls `personal_sign` on a 32-byte digest, locally ecRecovers the public key, and displays both raw hex (MetaMask format) and Wire's `SIG_EM_` / `PUB_EM_` forms ready to paste into the push helper. |
-| `push_metamask_trx.py` | TestHarness-driven end-to-end test. Stands up a single-node cluster, creates an account, calls `expandauth` to add the EM key, seeds it with SYS transferred from `sysio`, builds two unsigned `sysio.token::transfer` trxs, signs each digest (via clio in `--simulate`, or pasted-from-browser in manual mode), and pushes one via HTTP `send_transaction2` and one via `clio push transaction`. |
+| `push_metamask_trx.py` | TestHarness-driven end-to-end test. Stands up a single-node cluster, creates an account, uses `updateauth` to add the EM key to its active authority, seeds it with SYS transferred from `sysio`, builds two unsigned `sysio.token::transfer` trxs, signs each digest (via clio in `--simulate`, or pasted-from-browser in manual mode), and pushes one via HTTP `send_transaction2` and one via `clio push transaction`. |
 
 
 ## Quick offline sanity check
@@ -59,7 +59,7 @@ The script:
 1. Launches a single-node cluster via TestHarness.
 2. Creates `mmtest11`, gives it K1 keys.
 3. Generates an EM keypair with `clio create key --em` and adds the `PUB_EM_`
-   to `mmtest11@active` via `sysio::expandauth`. (`--sim-private-key` pins a
+   to `mmtest11@active` via `sysio::updateauth`. (`--sim-private-key` pins a
    fixed `PVT_EM_` or raw `0x` Ethereum secret for reproducibility.)
 4. Transfers `100.0000 SYS` from `sysio` to `mmtest11` (bootstrap issued the
    full max_supply to `sysio`, so just transfer instead of `issue`).
@@ -92,7 +92,7 @@ Windows side) serve it instead, e.g. from `tests/metamask/`:
 1. Spin up the cluster as above.
 2. Prompt for your Wire `PUB_EM_` -- the HTML page shows it once you sign any
    test message.
-3. Add the `PUB_EM_` to the test account via `expandauth`.
+3. Add the `PUB_EM_` to the test account via `updateauth`.
 4. Print the trx `sig_digest`. Paste that into the HTML page's "Digest to sign"
    field, click "Sign with Metamask", copy the `SIG_EM_` value.
 5. Paste the `SIG_EM_` back into the script. It is recovered offline via

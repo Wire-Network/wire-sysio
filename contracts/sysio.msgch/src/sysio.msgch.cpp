@@ -7,10 +7,12 @@
 #include <sysio/opp/attestations/attestations.pb.hpp>
 #include <zpp_bits.h>
 #include <algorithm>
+#include <optional>
 
 namespace sysio {
 
 using opp::types::ChainKind;
+using opp::types::WireKeyType;
 using opp::types::MessageDirection;
 using opp::types::MessageStatus;
 using opp::types::EnvelopeStatus;
@@ -26,6 +28,11 @@ constexpr auto     CHALG_ACCOUNT   = "sysio.chalg"_n;
 constexpr auto     AUTHEX_ACCOUNT  = "sysio.authex"_n;
 constexpr auto     CHAINS_ACCOUNT  = "sysio.chains"_n;
 constexpr auto     RESERV_ACCOUNT  = "sysio.reserv"_n;
+constexpr auto     ROA_ACCOUNT     = "sysio.roa"_n;
+
+// System-owned rows bill to the sysio RAM pool, not this contract account (privileged-contract
+// model, as sysio.token uses): the account stays finite at code+abi size; growth draws from the pool.
+constexpr name     ram_payer       = "sysio"_n;
 
 /// WIRE chain numeric id used in `opp::Endpoints` rows on the audit log.
 /// One end of every cross-chain envelope is always WIRE.
@@ -76,7 +83,7 @@ uint64_t mint_att_id(name self) {
    msgch::att_seq_t seq(self);
    msgch::att_seq_key pk{0};
    if (!seq.contains(pk)) {
-      seq.emplace(self, pk, msgch::att_seq_entry{ .id = 0, .next = 2 });
+      seq.emplace(ram_payer, pk, msgch::att_seq_entry{ .id = 0, .next = 2 });
       return 1;
    }
    auto row = seq.get(pk);
@@ -109,7 +116,7 @@ void write_envelope_log(name self,
                         const checksum256&           checksum) {
    sysio::msgch::envelope_log_t tbl(self);
    const uint64_t new_id = std::max<uint64_t>(1, tbl.available_primary_key());
-   tbl.emplace(self, sysio::msgch::id_key{new_id}, sysio::msgch::envelope_log_entry{
+   tbl.emplace(ram_payer, sysio::msgch::id_key{new_id}, sysio::msgch::envelope_log_entry{
       .id          = new_id,
       .endpoints   = endpoints,
       .epoch_index = epoch_index,
@@ -389,6 +396,113 @@ void dispatch_reserve_create_cancel(name self, const std::vector<char>& data) {
    ).send();
 }
 
+/// Validate and parse `s` (from `WireAccount.name`) into a sysio::name. The name string
+/// constructor aborts on an out-of-charset character, so we pre-validate here to keep the depot
+/// dispatch non-throwing. Returns nullopt for an empty, over-long (>12), or out-of-charset name.
+/// The tier-specific length rule (tier-1 = 2-6, tier 2/3 = 1-12) is enforced later by nodeownreg;
+/// here we only guarantee the name is constructible and within the node-owner budget.
+std::optional<name> parse_owner_name(const std::string& s) {
+   if (s.empty() || s.size() > 12) return std::nullopt;
+   for (char c : s) {
+      // sysio base32 alphabet: '.', '1'-'5', 'a'-'z'. Anything else aborts in name's ctor.
+      const bool ok = (c == '.') || (c >= '1' && c <= '5') || (c >= 'a' && c <= 'z');
+      if (!ok) return std::nullopt;
+   }
+   return name{std::string_view{s}};
+}
+
+/// Build a sysio::public_key from a WireKeyType + the raw key bytes carried in
+/// `ChainAddress.address` (NodeOwnerRegistration.address) -- the bytes have NO variant-index prefix;
+/// `key_type` is the discriminant. Returns nullopt on a length mismatch or an unsupported key type
+/// so the caller can soft-drop. K1/R1/EM are the 33-byte secp256k1 point (variant 0/1/3), ED is the
+/// 32-byte ed25519 point (variant 4). WA (variable-length WebAuthn -- can't be length-validated
+/// without risking a datastream abort) and BLS (a finalizer/consensus key, never an account
+/// owner/active authority) are not valid node-owner account keys and are rejected.
+std::optional<sysio::public_key> public_key_from_wire_key(WireKeyType kt, const std::vector<char>& b) {
+   // Validate + copy the 33-byte compressed secp256k1 point shared by K1/R1/EM.
+   auto as_ecc = [&]() -> std::optional<sysio::ecc_public_key> {
+      if (b.size() != 33) return std::nullopt;
+      sysio::ecc_public_key arr;
+      std::copy(b.begin(), b.end(), arr.begin());
+      return arr;
+   };
+   sysio::public_key pk;
+   switch (kt) {
+      case WireKeyType::WIRE_KEY_TYPE_K1: { auto a = as_ecc(); if (!a) return std::nullopt; pk.emplace<0>(*a); return pk; }
+      case WireKeyType::WIRE_KEY_TYPE_R1: { auto a = as_ecc(); if (!a) return std::nullopt; pk.emplace<1>(*a); return pk; }
+      case WireKeyType::WIRE_KEY_TYPE_EM: { auto a = as_ecc(); if (!a) return std::nullopt; pk.emplace<3>(*a); return pk; }
+      case WireKeyType::WIRE_KEY_TYPE_ED: {
+         if (b.size() != 32) return std::nullopt;
+         sysio::ed_public_key arr;
+         std::copy(b.begin(), b.end(), reinterpret_cast<char*>(arr.data()));
+         pk.emplace<4>(arr);
+         return pk;
+      }
+      default:  // WIRE_KEY_TYPE_UNKNOWN / WA / BLS
+         return std::nullopt;
+   }
+}
+
+/// Build an EM (secp256k1) public_key from a depositor's Ethereum public key carried as raw bytes:
+/// either the 33-byte compressed point (0x02/0x03 prefix) or the 65-byte uncompressed point (0x04
+/// prefix + X + Y). Returns nullopt on any other shape so the caller soft-drops. authex stores EM as
+/// the 33-byte compressed form, so an uncompressed input is compressed here (prefix carries Y parity).
+std::optional<sysio::public_key> em_pubkey_from_eth_bytes(const std::vector<char>& b) {
+   sysio::ecc_public_key compressed{};  // std::array, 33 bytes
+   if (b.size() == 33 && (static_cast<uint8_t>(b[0]) == 0x02 || static_cast<uint8_t>(b[0]) == 0x03)) {
+      std::copy(b.begin(), b.end(), compressed.begin());
+   } else if (b.size() == 65 && static_cast<uint8_t>(b[0]) == 0x04) {
+      // Compressed prefix = 0x02 if Y is even, 0x03 if odd; Y is bytes [33,65), parity is its LSB.
+      compressed[0] = static_cast<char>(0x02 | (static_cast<uint8_t>(b[64]) & 1));
+      std::copy(b.begin() + 1, b.begin() + 33, compressed.begin() + 1);  // X coordinate
+   } else {
+      return std::nullopt;
+   }
+   sysio::public_key pk;
+   pk.emplace<3>(compressed);  // variant index 3 = EM
+   return pk;
+}
+
+/// Decode an inbound NodeOwnerRegistration attestation and drive the NFT node-owner claim: create
+/// the vanity-named Wire account from the claim's wire_pub_key, then register the owner and record
+/// the depositor's ETH link. Both steps are inline-sent to sysio.roa declaring {sysio.roa, active}
+/// (accepted via the msgch@sysio.code delegation on sysio.roa.active), newnameduser first so its
+/// newaccount runs depth-first and the account exists before nodeownreg executes.
+///
+/// Trust-OPP: a malformed envelope (undecodable proto, unparseable name, unusable key bytes,
+/// out-of-range tier) is silently dropped here -- nothing is sent. A well-formed envelope whose
+/// *claim* is bad (name wrong length for tier, account held by a different key, already registered)
+/// is soft-failed inside nodeownreg, which records a REJECTED audit row. Neither path aborts the
+/// dispatching transaction.
+void dispatch_node_owner_reg(const std::vector<char>& data) {
+   opp::attestations::NodeOwnerRegistration reg;
+   {
+      auto in = zpp::bits::in{std::span{data.data(), data.size()}, zpp::bits::no_size{}};
+      if (in(reg) != zpp::bits::errc{}) return;  // malformed proto; drop
+   }
+
+   const uint32_t tier_raw = reg.tier;
+   if (tier_raw < 1 || tier_raw > 3) return;      // unusable tier; drop
+   const uint8_t tier = static_cast<uint8_t>(tier_raw);
+
+   auto owner = parse_owner_name(reg.account.name);
+   if (!owner) return;                            // unparseable account name; drop
+
+   auto wire_pk = public_key_from_wire_key(reg.wire_pub_key.key_type, reg.wire_pub_key.key);
+   if (!wire_pk) return;                          // unusable owner/active key; drop
+
+   auto eth_pk = em_pubkey_from_eth_bytes(reg.actor_pub_key);
+   if (!eth_pk) return;                           // unusable depositor ETH key; drop
+
+   // 1) Create the account (idempotent; soft-skips a name that breaks the tier rule).
+   action(permission_level{ROA_ACCOUNT, "active"_n}, ROA_ACCOUNT, "newnameduser"_n,
+          std::make_tuple(*owner, *wire_pk, tier)).send();
+
+   // 2) Register the owner + record the ETH link, with claim-payload soft-fail + audit recording.
+   action(permission_level{ROA_ACCOUNT, "active"_n}, ROA_ACCOUNT, "nodeownreg"_n,
+          std::make_tuple(*owner, tier, *eth_pk, *wire_pk)).send();
+}
+
 /// Per-attestation dispatch entry. Called from the inbound extraction loop
 /// in `evalcons` after a consensus envelope has been unpacked. Dispatch is
 /// best-effort — silently no-ops on unknown / out-of-scope types so the
@@ -589,10 +703,15 @@ void dispatch_attestation(name self, uint64_t attestation_id,
       case AttestationType::ATTESTATION_TYPE_DEPOSIT_REVERT:
       case AttestationType::ATTESTATION_TYPE_OPERATORS:
       case AttestationType::ATTESTATION_TYPE_BATCH_OPERATOR_GROUPS:
+      case AttestationType::ATTESTATION_TYPE_NODE_OWNER_REG:
+         // NFT node-owner claim: create the account + register + record the ETH link. Self-contained
+         // (decodes NodeOwnerRegistration, inline-sends sysio.roa); soft-drops a malformed envelope.
+         dispatch_node_owner_reg(data);
+         break;
+
       case AttestationType::ATTESTATION_TYPE_PRETOKEN_PURCHASE:
       case AttestationType::ATTESTATION_TYPE_PRETOKEN_YIELD:
       case AttestationType::ATTESTATION_TYPE_WIRE_TOKEN_PURCHASE:
-      case AttestationType::ATTESTATION_TYPE_NODE_OWNER_REG:
       case AttestationType::ATTESTATION_TYPE_ATTESTATION_PROCESSING_ERROR:
       case AttestationType::ATTESTATION_TYPE_UNSPECIFIED:
       default:
@@ -667,7 +786,7 @@ void msgch::deliver(name batch_op_name, uint64_t chain_code, std::vector<char> d
    // Store envelope
    uint64_t env_id = std::max<uint64_t>(1, envs.available_primary_key());
 
-   envs.emplace(get_self(), id_key{env_id}, envelope_entry{
+   envs.emplace(ram_payer, id_key{env_id}, envelope_entry{
       .id            = env_id,
       .chain_code    = chain_code,
       .epoch_index   = epoch,
@@ -802,7 +921,7 @@ void msgch::evalcons(uint64_t chain_code, uint32_t epoch_index) {
    messages_t msgs(get_self());
    uint64_t msg_id = std::max<uint64_t>(1, msgs.available_primary_key());
 
-   msgs.emplace(get_self(), id_key{msg_id}, message_entry{
+   msgs.emplace(ram_payer, id_key{msg_id}, message_entry{
       .id           = msg_id,
       .chain_code   = chain_code,
       .epoch_index  = epoch,
@@ -845,7 +964,7 @@ void msgch::evalcons(uint64_t chain_code, uint32_t epoch_index) {
          // with `status = PROCESSED` directly so the secondary index
          // `bystatus` query in `buildenv` skips them — the dispatch
          // call below is the row's full lifecycle on the depot.
-         atts.emplace(get_self(), id_key{att_id}, attestation_entry{
+         atts.emplace(ram_payer, id_key{att_id}, attestation_entry{
             .id                  = att_id,
             .chain_code          = chain_code,
             .epoch_index         = epoch,
@@ -930,7 +1049,7 @@ void msgch::evalcons(uint64_t chain_code, uint32_t epoch_index) {
    outpost_consensus_t opcons(get_self());
    auto opc_pk = outpost_consensus_key{chain_code};
    if (!opcons.contains(opc_pk)) {
-      opcons.emplace(get_self(), opc_pk, outpost_consensus_entry{
+      opcons.emplace(ram_payer, opc_pk, outpost_consensus_entry{
          .chain_code        = chain_code,
          .epoch_index       = epoch_index,
          .consensus_reached = true,
@@ -1009,7 +1128,7 @@ void msgch::queueout(uint64_t chain_code,
    attestations_t atts(get_self());
    uint64_t att_id = mint_att_id(get_self());
 
-   atts.emplace(get_self(), id_key{att_id}, attestation_entry{
+   atts.emplace(ram_payer, id_key{att_id}, attestation_entry{
       .id                  = att_id,
       .chain_code          = chain_code,
       .epoch_index         = current_epoch_index(),
@@ -1137,7 +1256,7 @@ void msgch::buildenv(uint64_t chain_code) {
    outenvelopes_t envelopes(get_self());
    uint64_t out_id = std::max<uint64_t>(1, envelopes.available_primary_key());
 
-   envelopes.emplace(get_self(), id_key{out_id}, outbound_envelope{
+   envelopes.emplace(ram_payer, id_key{out_id}, outbound_envelope{
       .id            = out_id,
       .chain_code    = chain_code,
       .epoch_index   = epoch,

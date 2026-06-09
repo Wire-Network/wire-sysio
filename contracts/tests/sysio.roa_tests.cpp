@@ -3,7 +3,12 @@
 #include <sysio/chain/abi_serializer.hpp>
 #include <sysio/chain/kv_table_objects.hpp>
 #include "sysio.system_tester.hpp"
+#include <contracts.hpp>
+#include <sysio/opp/opp.hpp>
 #include <fc/variant_object.hpp>
+#include <fc/crypto/keccak256.hpp>
+#include <fc/crypto/elliptic_em.hpp>
+#include <fc/crypto/private_key.hpp>
 #include <boost/test/unit_test.hpp>
 #include <string>
 #include <type_traits>
@@ -129,6 +134,22 @@ public:
          const vector<char> data(it->value.data(), it->value.data() + it->value.size());
          if (!data.empty()) {
             return abi_ser.binary_to_variant( "nodeowners", data, abi_serializer::create_yield_function(abi_serializer_max_time) );
+         }
+      }
+      return fc::variant();
+   }
+
+   // Read the nodeownerreg audit row (status/reason/tier) written by nodeownreg's soft-fail path.
+   fc::variant get_nodeownerreg( account_name acc )
+   {
+      const auto& db = control->db();
+      auto key = make_kv_scoped_key(static_cast<uint64_t>(NETWORK_GEN), acc.to_uint64_t());
+      const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
+      auto it = kv_idx.find(boost::make_tuple(ROA, compute_table_id(name("nodeownerreg").to_uint64_t()), key.to_string_view()));
+      if (it != kv_idx.end()) {
+         const vector<char> data(it->value.data(), it->value.data() + it->value.size());
+         if (!data.empty()) {
+            return abi_ser.binary_to_variant( "nodeownerreg", data, abi_serializer::create_yield_function(abi_serializer_max_time) );
          }
       }
       return fc::variant();
@@ -364,107 +385,35 @@ BOOST_FIXTURE_TEST_CASE( newuser_multiple_creators_test, sysio_roa_tester ) try 
 
 } FC_LOG_AND_RETHROW()
 
-BOOST_FIXTURE_TEST_CASE( newuser_nonce_collision, sysio_roa_tester ) try {
-   auto result = regnodeowner("alice"_n, 1);
-   BOOST_REQUIRE_EQUAL(success(), result);
-   result = regnodeowner("bob"_n, 1);
-   BOOST_REQUIRE_EQUAL(success(), result);
-   result = regnodeowner("carol"_n, 1);
-   BOOST_REQUIRE_EQUAL(success(), result);
-   result = regnodeowner("darcy"_n, 1);
-   BOOST_REQUIRE_EQUAL(success(), result);
+// With the <prefix>.<random> model the prefix is the creator, so the same nonce across DIFFERENT
+// creators no longer collides — each name differs by prefix. All four succeed with distinct names.
+BOOST_FIXTURE_TEST_CASE( newuser_same_nonce_distinct_creators, sysio_roa_tester ) try {
+   for (auto owner : {"alice"_n, "bob"_n, "carol"_n, "darcy"_n})
+      BOOST_REQUIRE_EQUAL(success(), regnodeowner(owner, 1));
    produce_blocks(1);
 
-   auto alice_owner = get_nodeowner("alice"_n);
-   BOOST_REQUIRE_EQUAL(alice_owner.is_null(), false);
-   BOOST_REQUIRE_EQUAL(alice_owner["tier"].as<uint32_t>(), 1);
-   auto bob_owner = get_nodeowner("bob"_n);
-   BOOST_REQUIRE_EQUAL(bob_owner.is_null(), false);
-   BOOST_REQUIRE_EQUAL(bob_owner["tier"].as<uint32_t>(), 1);
-   auto carol_owner = get_nodeowner("carol"_n);
-   BOOST_REQUIRE_EQUAL(carol_owner.is_null(), false);
-   BOOST_REQUIRE_EQUAL(carol_owner["tier"].as<uint32_t>(), 1);
-   auto darcy_owner = get_nodeowner("darcy"_n);
-   BOOST_REQUIRE_EQUAL(darcy_owner.is_null(), false);
-   BOOST_REQUIRE_EQUAL(darcy_owner["tier"].as<uint32_t>(), 1);
-
-
-   // First three will succeed, but then we run out of collision attempts
    auto same_nonce = "inauspicious"_n;
-   auto newuser_result = newuser("alice"_n, same_nonce, get_public_key("alice"_n, "active"));
-   auto newuser_result2 = newuser("bob"_n, same_nonce, get_public_key("bob"_n, "active"));
-   auto newuser_result3 = newuser("carol"_n, same_nonce, get_public_key("carol"_n, "active"));
-
-   BOOST_REQUIRE_EXCEPTION(
-        newuser("darcy"_n, same_nonce, get_public_key("darcy"_n, "active")),
-        sysio_assert_message_exception,
-        sysio_assert_message_is("Failed to generate a unique account name after 3 attempts"));
-
+   auto ra = newuser("alice"_n, same_nonce, get_public_key("alice"_n, "active"));
+   auto rb = newuser("bob"_n,   same_nonce, get_public_key("bob"_n,   "active"));
+   auto rc = newuser("carol"_n, same_nonce, get_public_key("carol"_n, "active"));
+   auto rd = newuser("darcy"_n, same_nonce, get_public_key("darcy"_n, "active"));
    produce_blocks(1);
+
+   auto na = fc::raw::unpack<name>(ra->action_traces[0].return_value);
+   auto nb = fc::raw::unpack<name>(rb->action_traces[0].return_value);
+   auto nc = fc::raw::unpack<name>(rc->action_traces[0].return_value);
+   auto nd = fc::raw::unpack<name>(rd->action_traces[0].return_value);
+
+   // names carry the creator prefix and are all distinct
+   BOOST_REQUIRE_EQUAL(na.to_string().substr(0, 6), std::string("alice."));
+   BOOST_REQUIRE_NE(na, nb); BOOST_REQUIRE_NE(na, nc); BOOST_REQUIRE_NE(na, nd);
+   BOOST_REQUIRE_NE(nb, nc); BOOST_REQUIRE_NE(nb, nd); BOOST_REQUIRE_NE(nc, nd);
 
    BOOST_REQUIRE_EQUAL(1, get_sponsor_count("alice"_n));
    BOOST_REQUIRE_EQUAL(1, get_sponsor_count("bob"_n));
    BOOST_REQUIRE_EQUAL(1, get_sponsor_count("carol"_n));
-   BOOST_REQUIRE_EQUAL(0, get_sponsor_count("darcy"_n));
-
+   BOOST_REQUIRE_EQUAL(1, get_sponsor_count("darcy"_n));
 } FC_LOG_AND_RETHROW()
-
-BOOST_FIXTURE_TEST_CASE( newuser_tld_test, sysio_roa_tester ) try {
-
-   create_accounts( { "alice.com"_n, "bob.m"_n, "a.longonexxx"_n }, false, false, false, false );
-   produce_blocks(1);
-   auto result = regnodeowner("alice.com"_n, 1);
-   BOOST_REQUIRE_EQUAL(success(), result);
-   result = regnodeowner("bob.m"_n, 1);
-   BOOST_REQUIRE_EQUAL(success(), result);
-   result = regnodeowner("a.longonexxx"_n, 1);
-   BOOST_REQUIRE_EQUAL(success(), result);
-   produce_blocks(1);
-
-   auto alice_owner = get_nodeowner("alice.com"_n);
-   BOOST_REQUIRE_EQUAL(alice_owner.is_null(), false);
-   BOOST_REQUIRE_EQUAL(alice_owner["tier"].as<uint32_t>(), 1);
-
-   auto empty = get_sponsorship("alice.com"_n, "nonce1"_n);
-   BOOST_REQUIRE_EQUAL(empty.is_null(), true);
-   BOOST_REQUIRE_EQUAL(0, get_sponsor_count("alice.com"_n));
-
-   auto newuser_result = newuser("alice.com"_n, "nonce1"_n, get_public_key("alice.com"_n, "active"));
-   BOOST_REQUIRE_EQUAL(2, newuser_result->action_traces.size());
-   auto newuser_action_trace = newuser_result->action_traces[0];
-   BOOST_REQUIRE_EQUAL(newuser_action_trace.act.name, "newuser"_n);
-   BOOST_REQUIRE_EQUAL(newuser_action_trace.receiver, ROA);
-   BOOST_REQUIRE_EQUAL(newuser_action_trace.act.account, ROA);
-   auto new_name = fc::raw::unpack<name>(newuser_action_trace.return_value);
-   BOOST_REQUIRE_NE(""_n, new_name);
-   BOOST_TEST(new_name.suffix() == "alice.com"_n.suffix());
-   BOOST_TEST(new_name.suffix() == "com"_n);
-
-   auto newaccount_action_trace = newuser_result->action_traces[1];
-   BOOST_REQUIRE_EQUAL(newaccount_action_trace.act.name, "newaccount"_n);
-   BOOST_REQUIRE_EQUAL(newaccount_action_trace.receiver, "sysio"_n);
-   BOOST_REQUIRE_EQUAL(newaccount_action_trace.act.account, "sysio"_n);
-   produce_blocks(1);
-
-   BOOST_REQUIRE_EQUAL(1, get_sponsor_count("alice.com"_n));
-   auto sponsorship = get_sponsorship("alice.com"_n, "nonce1"_n);
-   BOOST_REQUIRE_EQUAL(sponsorship.is_null(), false);
-   BOOST_REQUIRE_EQUAL(sponsorship["username"].as<name>(), new_name);
-
-   newuser_result = newuser("bob.m"_n, "nonce1"_n, get_public_key("bob.m"_n, "active"));
-   BOOST_REQUIRE_EQUAL(2, newuser_result->action_traces.size());
-   newuser_action_trace = newuser_result->action_traces[0];
-   new_name = fc::raw::unpack<name>(newuser_action_trace.return_value);
-   BOOST_TEST(new_name.suffix() == "m"_n);
-
-   newuser_result = newuser("a.longonexxx"_n, "nonce1"_n, get_public_key("a.longonexxx"_n, "active"));
-   BOOST_REQUIRE_EQUAL(2, newuser_result->action_traces.size());
-   newuser_action_trace = newuser_result->action_traces[0];
-   new_name = fc::raw::unpack<name>(newuser_action_trace.return_value);
-   BOOST_TEST(new_name.suffix() == "longonexxx"_n);
-
-} FC_LOG_AND_RETHROW()
-
 
 BOOST_FIXTURE_TEST_CASE( verify_ram, sysio_roa_tester ) try {
    // system contract + init + emission config already done in base constructor
@@ -652,6 +601,27 @@ BOOST_FIXTURE_TEST_CASE( verify_ram, sysio_roa_tester ) try {
 
    produce_block();
 
+} FC_LOG_AND_RETHROW()
+
+// The byte price must keep newaccount_ram evenly divisible: newuser/newnameduser convert the fixed
+// newaccount_ram seed to policy units by integer division while moving the full newaccount_ram bytes,
+// so an indivisible price under-records the sysio.acct policy. activateroa and setbyteprice share
+// check_divisible_byte_price; exercise it here through setbyteprice (roa is already active, activated
+// by the bootstrap with the divisible default 104).
+BOOST_FIXTURE_TEST_CASE( byteprice_divisibility_guard, sysio_roa_tester ) try {
+   BOOST_REQUIRE_EXCEPTION(
+      base_tester::push_action(ROA, "setbyteprice"_n, ROA, mvo()("bytes_per_unit", newaccount_ram + 1)),
+      sysio_assert_message_exception,
+      sysio_assert_message_is("newaccount_ram needs to be evenly divisable to avoid dust"));
+
+   // zero would divide-by-zero in the unit conversion; rejected up front.
+   BOOST_REQUIRE_EXCEPTION(
+      base_tester::push_action(ROA, "setbyteprice"_n, ROA, mvo()("bytes_per_unit", 0)),
+      sysio_assert_message_exception,
+      sysio_assert_message_is("bytes_per_unit must be positive"));
+
+   // a divisible price is accepted (newaccount_ram % 104 == 0).
+   base_tester::push_action(ROA, "setbyteprice"_n, ROA, mvo()("bytes_per_unit", 104));
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( extend_policy_test, sysio_roa_tester ) try {
@@ -1218,6 +1188,28 @@ BOOST_FIXTURE_TEST_CASE( newuser_sysio_acct_policy_tracking, sysio_roa_full_test
    BOOST_TEST(updated_ram_weight == initial_ram_weight + 2 * ram_weight_per_user);
 } FC_LOG_AND_RETHROW()
 
+// setbyteprice after activation must not skew the sysio.acct bucket: newuser converts newaccount_ram
+// at the bucket's frozen creation price (104), not the live one, so it still records
+// newaccount_ram/104 units after a price change -- otherwise the policy ram_weight would no longer
+// map to the bytes actually moved. (Comment-2 drift guard.)
+BOOST_FIXTURE_TEST_CASE( sysio_acct_bucket_uses_frozen_price, sysio_roa_full_tester ) try {
+   auto p = get_policy("sysio.acct"_n, "sysio"_n);
+   int64_t initial_ram_weight = p["ram_weight"].as<asset>().get_amount();
+
+   // Move the global price to another valid divisor of newaccount_ram (1144 = 2^3*11*13); 8 != 104.
+   base_tester::push_action(ROA, "setbyteprice"_n, ROA, mvo()("bytes_per_unit", 8));
+   produce_block();
+
+   create_newuser(node_owners[2]);
+   produce_block();
+
+   p = get_policy("sysio.acct"_n, "sysio"_n);
+   int64_t updated_ram_weight = p["ram_weight"].as<asset>().get_amount();
+
+   // Frozen price (104) is used: +newaccount_ram/104 = +11, NOT the live-price +newaccount_ram/8 = +143.
+   BOOST_TEST(updated_ram_weight == initial_ram_weight + (int64_t)newaccount_ram / 104);
+} FC_LOG_AND_RETHROW()
+
 // ===== 10. extendpolicy validation =====
 
 // Extend non-existent policy should fail
@@ -1279,49 +1271,425 @@ BOOST_FIXTURE_TEST_CASE( extendpolicy_blocks_reduce, sysio_roa_full_tester ) try
       expand_roa_policy(node_owners[2], user, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0));
 } FC_LOG_AND_RETHROW()
 
-// =============================================================================
-// finalizereg auth + status validation
-// =============================================================================
-//
-// finalizereg gates registration confirmation/rejection on:
-//   1. require_auth(get_self())     -- only sysio.roa can finalize
-//   2. status == 2 || status == 3   -- "confirm" or "reject"
-//   3. roa state.is_active          -- ROA must be activated
-//   4. record exists in nodeownerreg + record.status == 1 (PENDING)
-//
-// These tests cover (1), (2), and (4). The full setpending->finalizereg happy
-// path requires the auth.ext signed flow and is left to a follow-up; once
-// that fixture is in place, add coverage for confirm + reject + tier carry-
-// through to the inline addnodeowner.
+// ---- setsyscode / setsysabi: exact, conserving, bidirectional RAM from sysio ----
 
-BOOST_FIXTURE_TEST_CASE( finalizereg_requires_self_auth, sysio_roa_full_tester ) try {
-   // Non-self caller is rejected before any state check.
-   auto result = push_action("alice"_n, "finalizereg"_n,
-      mvo()("owner", "alice"_n)("status", uint8_t(2)) );
-   BOOST_REQUIRE_EQUAL( error("missing authority of sysio.roa"), result );
+// setsyscode deploys code, makes the account privileged, and gifts exactly the RAM the code
+// consumes out of sysio's pool (a conserving transfer, not a mint).
+BOOST_FIXTURE_TEST_CASE( setsyscode_gifts_exact_from_sysio, sysio_roa_tester ) try {
+   // System-contract targets always have a finite ROA quota in prod; give alice one.
+   BOOST_REQUIRE_EQUAL( success(), regnodeowner("alice"_n, 1) );
+   produce_blocks();
+
+   auto& rlm = control->get_resource_limits_manager();
+   int64_t n, cpu;
+   int64_t sysio_q0;  rlm.get_account_limits("sysio"_n, sysio_q0, n, cpu);
+   int64_t alice_q0;  rlm.get_account_limits("alice"_n, alice_q0, n, cpu);
+   int64_t alice_u0 = rlm.get_account_ram_usage("alice"_n);
+   int64_t sysio_res0 = get_reslimit("sysio"_n)["ram_bytes"].as<int64_t>();
+   int64_t acct_res0  = get_reslimit("sysio.acct"_n)["ram_bytes"].as<int64_t>();
+
+   auto wasm = test_contracts::sysio_token_wasm();
+   BOOST_REQUIRE_EQUAL( success(),
+      push_action(config::system_account_name, "setsyscode"_n, mvo()
+         ("account","alice")("vmtype",0)("vmversion",0)("code", bytes(wasm.begin(), wasm.end()))) );
+   produce_blocks();
+
+   int64_t delta = rlm.get_account_ram_usage("alice"_n) - alice_u0;
+   BOOST_REQUIRE_GT( delta, 0 );
+
+   // account is now privileged
+   const auto* meta = control->find_account_metadata("alice"_n);
+   BOOST_REQUIRE( meta != nullptr && meta->is_privileged() );
+
+   // exact gift to alice
+   int64_t alice_q1;  rlm.get_account_limits("alice"_n, alice_q1, n, cpu);
+   BOOST_REQUIRE_EQUAL( alice_q1 - alice_q0, delta );
+
+   // conserving transfer out of sysio: chain quota + reslimit pool drop by delta, sysio.acct bucket rises
+   int64_t sysio_q1;  rlm.get_account_limits("sysio"_n, sysio_q1, n, cpu);
+   BOOST_REQUIRE_EQUAL( sysio_q0 - sysio_q1, delta );
+   BOOST_REQUIRE_EQUAL( sysio_res0 - get_reslimit("sysio"_n)["ram_bytes"].as<int64_t>(), delta );
+   BOOST_REQUIRE_EQUAL( get_reslimit("sysio.acct"_n)["ram_bytes"].as<int64_t>() - acct_res0, delta );
 } FC_LOG_AND_RETHROW()
 
-BOOST_FIXTURE_TEST_CASE( finalizereg_rejects_invalid_status, sysio_roa_full_tester ) try {
-   // Status validation runs before record-existence check, so we don't need
-   // a real PENDING row to exercise these. uint8_t allows 0..255; the check
-   // accepts only 2 (confirm) and 3 (reject). Everything else must error.
-   for (uint8_t bad_status : { uint8_t(0), uint8_t(1), uint8_t(4), uint8_t(255) }) {
-      auto result = push_action(ROA, "finalizereg"_n,
-         mvo()("owner", "alice"_n)("status", bad_status) );
-      BOOST_REQUIRE_EQUAL(
-         error("assertion failure with message: Invalid status: Can only confirm (2) or reject (3)"),
-         result );
-   }
+// Re-deploying a smaller contract reclaims the freed RAM back to sysio's pool (delta < 0).
+BOOST_FIXTURE_TEST_CASE( setsyscode_redeploy_reclaims_to_sysio, sysio_roa_tester ) try {
+   BOOST_REQUIRE_EQUAL( success(), regnodeowner("alice"_n, 1) );
+   produce_blocks();
+   auto& rlm = control->get_resource_limits_manager();
+   int64_t n, cpu;
+
+   auto big = test_contracts::sysio_system_wasm();
+   BOOST_REQUIRE_EQUAL( success(),
+      push_action(config::system_account_name, "setsyscode"_n, mvo()
+         ("account","alice")("vmtype",0)("vmversion",0)("code", bytes(big.begin(), big.end()))) );
+   produce_blocks();
+   int64_t sysio_q_mid;  rlm.get_account_limits("sysio"_n, sysio_q_mid, n, cpu);
+   int64_t alice_u_mid = rlm.get_account_ram_usage("alice"_n);
+
+   auto small = test_contracts::noop_wasm();
+   BOOST_REQUIRE_EQUAL( success(),
+      push_action(config::system_account_name, "setsyscode"_n, mvo()
+         ("account","alice")("vmtype",0)("vmversion",0)("code", bytes(small.begin(), small.end()))) );
+   produce_blocks();
+
+   int64_t reclaimed = alice_u_mid - rlm.get_account_ram_usage("alice"_n);
+   BOOST_REQUIRE_GT( reclaimed, 0 );  // usage dropped
+   int64_t sysio_q_end;  rlm.get_account_limits("sysio"_n, sysio_q_end, n, cpu);
+   BOOST_REQUIRE_EQUAL( sysio_q_end - sysio_q_mid, reclaimed );  // sysio pool recovered exactly the freed bytes
 } FC_LOG_AND_RETHROW()
 
-BOOST_FIXTURE_TEST_CASE( finalizereg_rejects_missing_record, sysio_roa_full_tester ) try {
-   // Auth + status + is_active all pass, but no nodeownerreg row exists for
-   // "norecord"_n. Must error explicitly rather than silently no-op.
-   auto result = push_action(ROA, "finalizereg"_n,
-      mvo()("owner", "norecord"_n)("status", uint8_t(2)) );
+// setsysabi gifts the exact abi RAM out of sysio's pool too.
+BOOST_FIXTURE_TEST_CASE( setsysabi_gifts_exact_from_sysio, sysio_roa_tester ) try {
+   BOOST_REQUIRE_EQUAL( success(), regnodeowner("alice"_n, 1) );
+   produce_blocks();
+   auto& rlm = control->get_resource_limits_manager();
+   int64_t n, cpu;
+   int64_t sysio_q0;  rlm.get_account_limits("sysio"_n, sysio_q0, n, cpu);
+   int64_t alice_u0 = rlm.get_account_ram_usage("alice"_n);
+
+   // setabi expects a packed abi_def, not the json text.
+   abi_def def = fc::json::from_string(test_contracts::sysio_token_abi()).as<abi_def>();
+   auto packed = fc::raw::pack(def);
+   BOOST_REQUIRE_EQUAL( success(),
+      push_action(config::system_account_name, "setsysabi"_n, mvo()
+         ("account","alice")("abi", packed)) );
+   produce_blocks();
+
+   int64_t delta = rlm.get_account_ram_usage("alice"_n) - alice_u0;
+   BOOST_REQUIRE_GT( delta, 0 );
+   int64_t sysio_q1;  rlm.get_account_limits("sysio"_n, sysio_q1, n, cpu);
+   BOOST_REQUIRE_EQUAL( sysio_q0 - sysio_q1, delta );  // conserving: gift came out of sysio's pool
+} FC_LOG_AND_RETHROW()
+
+// A target that was never brought under ROA management still has an unlimited (-1) RAM limit.
+// setsyscode must reject it -- giftram cannot account an exact byte transfer against an unlimited
+// limit -- rather than deploy the code and silently skip the funding. Prod avoids this by creating
+// the account with a finite (0) quota first; this covers the raw system-account path.
+BOOST_FIXTURE_TEST_CASE( setsyscode_rejects_unlimited_ram_target, sysio_roa_tester ) try {
+   auto& rlm = control->get_resource_limits_manager();
+   int64_t r, n, cpu;
+   rlm.get_account_limits("alice"_n, r, n, cpu);
+   BOOST_REQUIRE_LT( r, 0 );  // precondition: alice has unlimited RAM (no ROA quota yet)
+
+   auto wasm = test_contracts::sysio_token_wasm();
    BOOST_REQUIRE_EQUAL(
-      error("assertion failure with message: No registration record found"),
-      result );
+      error("assertion failure with message: giftram target must have a finite RAM limit"),
+      push_action(config::system_account_name, "setsyscode"_n, mvo()
+         ("account","alice")("vmtype",0)("vmversion",0)("code", bytes(wasm.begin(), wasm.end()))) );
+} FC_LOG_AND_RETHROW()
+
+// ---- newnameduser: depot-created vanity-named account, funded from sysio ----
+
+BOOST_FIXTURE_TEST_CASE( newnameduser_creates_funds_idempotent, sysio_roa_tester ) try {
+   auto& rlm = control->get_resource_limits_manager();
+   int64_t n, cpu;
+   int64_t sysio_q0;  rlm.get_account_limits("sysio"_n, sysio_q0, n, cpu);
+
+   auto pub = get_public_key("alice"_n, "owner");  // stand-in for the holder's K1 key
+   BOOST_REQUIRE_EQUAL( success(),
+      push_action(ROA, "newnameduser"_n, mvo()("account","vanityname")("pubkey",pub)("tier",2)) );
+   produce_blocks();
+
+   // account exists and was funded the fixed newaccount_ram out of sysio's pool (chain quota)
+   BOOST_REQUIRE( rlm.get_account_ram_usage("vanityname"_n) >= 0 );
+   int64_t sysio_q1;  rlm.get_account_limits("sysio"_n, sysio_q1, n, cpu);
+   BOOST_REQUIRE_EQUAL( sysio_q0 - sysio_q1, (int64_t)newaccount_ram );
+
+   // idempotent: re-calling on the existing account is a no-op (no error, no double-fund)
+   BOOST_REQUIRE_EQUAL( success(),
+      push_action(ROA, "newnameduser"_n, mvo()("account","vanityname")("pubkey",pub)("tier",2)) );
+   produce_blocks();
+   int64_t sysio_q2;  rlm.get_account_limits("sysio"_n, sysio_q2, n, cpu);
+   BOOST_REQUIRE_EQUAL( sysio_q1, sysio_q2 );
+} FC_LOG_AND_RETHROW()
+
+// tier-1 owner names must be a 2-6 char prefix; an out-of-range name is soft-skipped (non-throwing,
+// so the depot dispatch never aborts) -- the account is simply not created. Verified via sysio's RAM
+// pool: a creation draws exactly newaccount_ram from sysio, a soft-skip draws nothing. (We avoid
+// find_account_metadata here -- that host query lags an inline-created account by a block.)
+BOOST_FIXTURE_TEST_CASE( newnameduser_tier_name_rules, sysio_roa_tester ) try {
+   auto& rlm = control->get_resource_limits_manager();
+   int64_t n, cpu, q0, q1, q2;
+   auto pub = get_public_key("alice"_n, "owner");
+
+   // tier-1 name longer than 6 chars: soft-skipped -> no account, nothing drawn from sysio.
+   rlm.get_account_limits("sysio"_n, q0, n, cpu);
+   BOOST_REQUIRE_EQUAL( success(),
+      push_action(ROA, "newnameduser"_n, mvo()("account","toolongt1")("pubkey",pub)("tier",1)) );
+   produce_blocks();
+   rlm.get_account_limits("sysio"_n, q1, n, cpu);
+   BOOST_REQUIRE_EQUAL( q0, q1 );
+
+   // tier-1 short prefix accepted -> account created, funded newaccount_ram from sysio's pool.
+   BOOST_REQUIRE_EQUAL( success(),
+      push_action(ROA, "newnameduser"_n, mvo()("account","acme")("pubkey",pub)("tier",1)) );
+   produce_blocks();
+   rlm.get_account_limits("sysio"_n, q2, n, cpu);
+   BOOST_REQUIRE_EQUAL( q1 - q2, (int64_t)newaccount_ram );
+} FC_LOG_AND_RETHROW()
+
+// ---------------------------------------------------------------------------
+// nodeownreg tests (OPP Node Owner NFT claim: create-in-flow + register + record ETH link)
+//
+// Under the create-in-flow model the depot (sysio.msgch) inline-sends newnameduser (creates the
+// account with the claimed wire key) then nodeownreg (registers + records the depositor's ETH key
+// via an inline sysio.authex::recordlink). These unit tests drive the two sysio.roa actions
+// directly, signed by ROA, the same way the depot would. The fixture wires the
+// sysio.authex.active <- sysio.roa@sysio.code delegation that authorizes the inline recordlink.
+// ---------------------------------------------------------------------------
+
+class sysio_roa_nodeownreg_tester : public sysio_roa_tester {
+public:
+   static constexpr auto AUTHEX = "sysio.authex"_n;
+
+   sysio_roa_nodeownreg_tester() {
+      // Deploy authex -- the node-owner flow inline-records the depositor's ETH link there.
+      set_code( AUTHEX, contracts::authex_wasm() );
+      set_abi( AUTHEX, contracts::authex_abi().data() );
+      set_privileged( AUTHEX );
+      produce_blocks();
+
+      const auto* accnt = control->find_account_metadata( AUTHEX );
+      BOOST_REQUIRE( accnt != nullptr );
+      abi_def abi;
+      BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt->abi, abi), true);
+      authex_abi_ser.set_abi(abi, abi_serializer::create_yield_function(abi_serializer_max_time));
+
+      // Delegate sysio.authex.active to sysio.roa@sysio.code so nodeownreg's inline recordlink
+      // (declared {sysio.authex, active}) is authorized -- the same code-permission grant the
+      // production bootstrap wires. Without it the inline send fails auth and aborts the claim.
+      // A single co-signer is trivially sorted, so no accounts re-sort is needed.
+      authority a( get_public_key( AUTHEX, "active" ) );
+      a.accounts.push_back( permission_level_weight{ { ROA, config::sysio_code_name }, 1 } );
+      set_authority( AUTHEX, config::active_name, a, config::owner_name );
+      produce_blocks();
+   }
+
+   // Push nodeownreg the way the depot does: signed by ROA (which carries sysio.roa.active).
+   action_result nodeownreg(const name& owner, uint8_t tier,
+                            const fc::crypto::public_key& eth_pub_key,
+                            const fc::crypto::public_key& wire_pub_key) {
+      return push_action(ROA, "nodeownreg"_n, mvo()
+         ("owner", owner)
+         ("tier", tier)
+         ("eth_pub_key", eth_pub_key)
+         ("wire_pub_key", wire_pub_key));
+   }
+
+   // Create the claim account in-flow (depot path) with `wire_pub_key` as owner/active.
+   action_result newnameduser(const name& account, const fc::crypto::public_key& wire_pub_key, uint8_t tier) {
+      return push_action(ROA, "newnameduser"_n, mvo()
+         ("account", account)("pubkey", wire_pub_key)("tier", tier));
+   }
+
+   // Seed an EVM link directly via the depot-only recordlink, signed as sysio.authex. Used to set up
+   // a pre-existing link with a chosen key before a (mismatched) claim.
+   action_result recordlink(const fc::crypto::public_key& pub_key, const name& account) {
+      action act;
+      act.account       = AUTHEX;
+      act.name          = "recordlink"_n;
+      act.authorization = {{AUTHEX, config::active_name}};
+      act.data          = authex_abi_ser.variant_to_binary("recordlink",
+         mvo()("account", account)("chain_kind", opp::types::ChainKind::CHAIN_KIND_EVM)("pub_key", pub_key),
+         abi_serializer::create_yield_function(abi_serializer_max_time));
+      return base_tester::push_action(std::move(act), AUTHEX.to_uint64_t());
+   }
+
+   static fc::crypto::public_key gen_em_key() {
+      return fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em).get_public_key();
+   }
+   static fc::crypto::public_key gen_k1_key() {
+      return fc::crypto::private_key::generate(fc::crypto::private_key::key_type::k1).get_public_key();
+   }
+
+   // nodeownerreg reg_status + reject_reason values (mirror sysio.roa.hpp).
+   static constexpr uint64_t CONFIRMED = 0, REJECTED = 1;
+   static constexpr uint64_t R_NAME_INVALID = 1, R_OWNER_NOT_ACCOUNT = 2,
+                             R_ACCOUNT_KEY_MISMATCH = 3, R_DUPLICATE = 4, R_LINK_KEY_MISMATCH = 5;
+
+   abi_serializer authex_abi_ser;
+};
+
+// Happy path: depot creates the account with the claimed wire key, then nodeownreg registers and
+// records the depositor's ETH link.
+BOOST_FIXTURE_TEST_CASE( nodeownreg_happy_path, sysio_roa_nodeownreg_tester ) try {
+   const auto owner    = "claimacct"_n;
+   const auto wire_pub = gen_k1_key();
+   const auto eth_pub  = gen_em_key();
+
+   BOOST_REQUIRE_EQUAL(success(), newnameduser(owner, wire_pub, 2));
+   produce_blocks();
+
+   BOOST_REQUIRE_EQUAL(success(), nodeownreg(owner, 2, eth_pub, wire_pub));
+   produce_blocks();
+
+   // A CONFIRMED registration proves the account was created with wire_pub: nodeownreg's
+   // active_key_matches requires the account to exist and be controlled by exactly that key, so
+   // reaching CONFIRMED (rather than OWNER_NOT_ACCOUNT / ACCOUNT_KEY_MISMATCH) is the existence proof.
+   auto reg = get_nodeowner(owner);
+   BOOST_REQUIRE_EQUAL(reg.is_null(), false);
+   BOOST_REQUIRE_EQUAL(reg["tier"].as<uint32_t>(), 2);
+   auto audit = get_nodeownerreg(owner);
+   BOOST_REQUIRE_EQUAL(audit.is_null(), false);
+   BOOST_REQUIRE_EQUAL(audit["status"].as<uint64_t>(), CONFIRMED);
+   // nodeownreg returning success implies the inline recordlink ({sysio.authex, active}) was
+   // authorized and ran -- an unauthorized inline send would have aborted the whole transaction.
+   // recordlink's own table effects are covered by the sysio.authex unit tests.
+} FC_LOG_AND_RETHROW()
+
+// Existing account controlled by a different key than the claim -> REJECTED/ACCOUNT_KEY_MISMATCH.
+BOOST_FIXTURE_TEST_CASE( nodeownreg_account_key_mismatch, sysio_roa_nodeownreg_tester ) try {
+   const auto owner   = "claimacct"_n;
+   const auto real_k  = gen_k1_key();   // key the account is actually created with
+   const auto claimed = gen_k1_key();   // a different key in the claim
+   const auto eth_pub = gen_em_key();
+
+   BOOST_REQUIRE_EQUAL(success(), newnameduser(owner, real_k, 2));
+   produce_blocks();
+
+   BOOST_REQUIRE_EQUAL(success(), nodeownreg(owner, 2, eth_pub, claimed));
+   produce_blocks();
+
+   BOOST_REQUIRE(get_nodeowner(owner).is_null());
+   auto audit = get_nodeownerreg(owner);
+   BOOST_REQUIRE_EQUAL(audit["status"].as<uint64_t>(), REJECTED);
+   BOOST_REQUIRE_EQUAL(audit["reason"].as<uint64_t>(), R_ACCOUNT_KEY_MISMATCH);
+} FC_LOG_AND_RETHROW()
+
+// Account already carries a DIFFERENT EVM link (e.g. an operator createlink or an earlier deposit
+// key) -> nodeownreg soft-fails LINK_KEY_MISMATCH rather than recording CONFIRMED against a stale
+// link or silently keeping the old key.
+BOOST_FIXTURE_TEST_CASE( nodeownreg_link_key_mismatch, sysio_roa_nodeownreg_tester ) try {
+   const auto owner    = "claimacct"_n;
+   const auto wire_pub = gen_k1_key();
+   const auto eth_a    = gen_em_key();   // key already linked to the account
+   const auto eth_b    = gen_em_key();   // depositor key in the new claim
+
+   BOOST_REQUIRE_EQUAL(success(), newnameduser(owner, wire_pub, 2));
+   produce_blocks();
+   // Pre-existing EVM link with eth_a; the account is not yet a node owner.
+   BOOST_REQUIRE_EQUAL(success(), recordlink(eth_a, owner));
+   produce_blocks();
+
+   // Claim with a different depositor key -> soft-fail, not registered, link untouched.
+   BOOST_REQUIRE_EQUAL(success(), nodeownreg(owner, 2, eth_b, wire_pub));
+   produce_blocks();
+
+   BOOST_REQUIRE(get_nodeowner(owner).is_null());
+   auto audit = get_nodeownerreg(owner);
+   BOOST_REQUIRE_EQUAL(audit["status"].as<uint64_t>(), REJECTED);
+   BOOST_REQUIRE_EQUAL(audit["reason"].as<uint64_t>(), R_LINK_KEY_MISMATCH);
+} FC_LOG_AND_RETHROW()
+
+// Name invalid for the tier (tier-1 name > 6 chars) -> REJECTED/NAME_INVALID (account need not exist).
+BOOST_FIXTURE_TEST_CASE( nodeownreg_name_invalid, sysio_roa_nodeownreg_tester ) try {
+   const auto owner = "toolongname"_n;   // 11 chars: valid charset, too long for tier 1
+   BOOST_REQUIRE_EQUAL(success(), nodeownreg(owner, 1, gen_em_key(), gen_k1_key()));
+   produce_blocks();
+
+   BOOST_REQUIRE(get_nodeowner(owner).is_null());
+   auto audit = get_nodeownerreg(owner);
+   BOOST_REQUIRE_EQUAL(audit["status"].as<uint64_t>(), REJECTED);
+   BOOST_REQUIRE_EQUAL(audit["reason"].as<uint64_t>(), R_NAME_INVALID);
+} FC_LOG_AND_RETHROW()
+
+// Valid-for-tier name that is not an account -> REJECTED/OWNER_NOT_ACCOUNT.
+BOOST_FIXTURE_TEST_CASE( nodeownreg_owner_not_account, sysio_roa_nodeownreg_tester ) try {
+   const auto owner = "ghost"_n;   // 5 chars: valid for tier 1, but no account was created
+   BOOST_REQUIRE_EQUAL(success(), nodeownreg(owner, 1, gen_em_key(), gen_k1_key()));
+   produce_blocks();
+
+   BOOST_REQUIRE(get_nodeowner(owner).is_null());
+   auto audit = get_nodeownerreg(owner);
+   BOOST_REQUIRE_EQUAL(audit["status"].as<uint64_t>(), REJECTED);
+   BOOST_REQUIRE_EQUAL(audit["reason"].as<uint64_t>(), R_OWNER_NOT_ACCOUNT);
+} FC_LOG_AND_RETHROW()
+
+// Replay after a successful claim -> REJECTED/DUPLICATE, no abort.
+BOOST_FIXTURE_TEST_CASE( nodeownreg_already_registered, sysio_roa_nodeownreg_tester ) try {
+   const auto owner    = "claimacct"_n;
+   const auto wire_pub = gen_k1_key();
+   const auto eth_pub  = gen_em_key();
+
+   BOOST_REQUIRE_EQUAL(success(), newnameduser(owner, wire_pub, 2));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(success(), nodeownreg(owner, 2, eth_pub, wire_pub));
+   produce_blocks();
+
+   BOOST_REQUIRE_EQUAL(success(), nodeownreg(owner, 2, eth_pub, wire_pub));
+   produce_blocks();
+   auto audit = get_nodeownerreg(owner);
+   BOOST_REQUIRE_EQUAL(audit["status"].as<uint64_t>(), REJECTED);
+   BOOST_REQUIRE_EQUAL(audit["reason"].as<uint64_t>(), R_DUPLICATE);
+} FC_LOG_AND_RETHROW()
+
+// Invalid tier is a depot/system invariant -> hard abort (not a soft-fail).
+BOOST_FIXTURE_TEST_CASE( nodeownreg_invalid_tier, sysio_roa_nodeownreg_tester ) try {
+   const auto wire_pub = gen_k1_key();
+   const auto eth_pub  = gen_em_key();
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: Tier level must be between 1 and 3"),
+      nodeownreg("someacct"_n, 0, eth_pub, wire_pub));
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: Tier level must be between 1 and 3"),
+      nodeownreg("someacct"_n, 4, eth_pub, wire_pub));
+} FC_LOG_AND_RETHROW()
+
+// Non-EM depositor key is a depot invariant -> hard abort.
+BOOST_FIXTURE_TEST_CASE( nodeownreg_non_em_key, sysio_roa_nodeownreg_tester ) try {
+   const auto wire_pub = gen_k1_key();
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: eth_pub_key must be an EM (secp256k1) public key"),
+      nodeownreg("someacct"_n, 1, gen_k1_key(), wire_pub));   // K1 depositor key -> reject
+} FC_LOG_AND_RETHROW()
+
+// ---- activateroa supply validation ----
+
+// Deploys sysio.roa privileged but does NOT call activateroa (the standard fixtures auto-activate via
+// init_roa with a fixed 75496 SYS supply), so activateroa's own input validation can be exercised
+// directly with arbitrary supplies.
+class roa_unactivated_tester : public tester {
+public:
+   roa_unactivated_tester() : tester(setup_policy::full_except_do_not_set_finalizers) {
+      create_account(ROA,              config::system_account_name, false, true,  false, false);
+      create_account("sysio.acct"_n,   config::system_account_name, false, false, false, false);
+      create_account("sysio.authex"_n, config::system_account_name, false, false, false, false);
+      set_contract(ROA, contracts::roa_wasm(), contracts::roa_abi().data());
+      push_action(config::system_account_name, "setpriv"_n, config::system_account_name,
+                  mvo()("account", ROA)("is_priv", 1));
+      produce_block();
+   }
+
+   transaction_trace_ptr activate(const std::string& total_sys, uint64_t bytes_per_unit) {
+      return base_tester::push_action(ROA, "activateroa"_n, ROA,
+                                      mvo()("total_sys", total_sys)("bytes_per_unit", bytes_per_unit));
+   }
+};
+
+// A supply so small that tier rounding makes the node-owner reserve exceed it (total 13 -> reserve 21,
+// leftover -8) must be rejected, not silently underflow the signed->unsigned byte conversion and
+// activate ROA with garbage reslimits.
+BOOST_FIXTURE_TEST_CASE( activateroa_rejects_tiny_supply, roa_unactivated_tester ) try {
+   BOOST_REQUIRE_EXCEPTION(
+      activate("0.0013 SYS", 104),  // 13 smallest units; reserve rounds to 21 > 13
+      sysio_assert_message_exception,
+      sysio_assert_message_is("Total SYS too small: node-owner reserve exceeds supply"));
+} FC_LOG_AND_RETHROW()
+
+// A normal supply still activates cleanly through the same guards.
+BOOST_FIXTURE_TEST_CASE( activateroa_accepts_normal_supply, roa_unactivated_tester ) try {
+   BOOST_REQUIRE_NO_THROW( activate("75496.0000 SYS", 104) );
+} FC_LOG_AND_RETHROW()
+
+// A supply above the bound is rejected before the tier math (total_amount * 15, leftover *
+// bytes_per_unit) could overflow int64. Defense in depth -- activateroa is a one-time governance call
+// and real supplies are ~1e6x smaller.
+BOOST_FIXTURE_TEST_CASE( activateroa_rejects_oversized_supply, roa_unactivated_tester ) try {
+   BOOST_REQUIRE_EXCEPTION(
+      activate("200000000000.0000 SYS", 104),  // 2e15 units, above the 1e15 bound
+      sysio_assert_message_exception,
+      sysio_assert_message_is("Total SYS out of range"));
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_SUITE_END()

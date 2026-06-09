@@ -193,12 +193,7 @@ namespace sysiosystem {
          void deleteauth( name                   account,
                           name                   permission,
                           binary_extension<name> authorized_by ) {
-           // Sig EM/ED/... ex.(eth|sol|sui) catch: only sysio.authex can remove ex.* permission
-           if (permission.prefix() == name("ex")) {
-             require_recipient(name("sysio.authex"));
-           } else {
-             check_auth_change(get_self(), account, authorized_by);
-           }
+           check_auth_change(get_self(), account, authorized_by);
          }
 
          /**

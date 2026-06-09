@@ -100,20 +100,6 @@
             ]
         },
         {
-            "name": "finalizereg",
-            "base": "",
-            "fields": [
-                {
-                    "name": "owner",
-                    "type": "name"
-                },
-                {
-                    "name": "status",
-                    "type": "uint8"
-                }
-            ]
-        },
-        {
             "name": "forcereg",
             "base": "",
             "fields": [
@@ -128,12 +114,34 @@
             ]
         },
         {
-            "name": "initnodereg",
+            "name": "giftram",
             "base": "",
             "fields": [
                 {
-                    "name": "owner",
+                    "name": "account",
                     "type": "name"
+                },
+                {
+                    "name": "usage_before",
+                    "type": "int64"
+                }
+            ]
+        },
+        {
+            "name": "newnameduser",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "pubkey",
+                    "type": "public_key"
+                },
+                {
+                    "name": "tier",
+                    "type": "uint8"
                 }
             ]
         },
@@ -192,6 +200,10 @@
                 {
                     "name": "block_num",
                     "type": "uint128"
+                },
+                {
+                    "name": "reason",
+                    "type": "uint8"
                 }
             ]
         },
@@ -236,6 +248,28 @@
                 {
                     "name": "network_gen",
                     "type": "uint8"
+                }
+            ]
+        },
+        {
+            "name": "nodeownreg",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "name"
+                },
+                {
+                    "name": "tier",
+                    "type": "uint8"
+                },
+                {
+                    "name": "eth_pub_key",
+                    "type": "public_key"
+                },
+                {
+                    "name": "wire_pub_key",
+                    "type": "public_key"
                 }
             ]
         },
@@ -378,27 +412,37 @@
             ]
         },
         {
-            "name": "setpending",
+            "name": "setsysabi",
             "base": "",
             "fields": [
                 {
-                    "name": "owner",
+                    "name": "account",
                     "type": "name"
                 },
                 {
-                    "name": "tier",
+                    "name": "abi",
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
+            "name": "setsyscode",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "vmtype",
                     "type": "uint8"
                 },
                 {
-                    "name": "trx_id",
-                    "type": "checksum256"
+                    "name": "vmversion",
+                    "type": "uint8"
                 },
                 {
-                    "name": "block_num",
-                    "type": "uint128"
-                },
-                {
-                    "name": "sig",
+                    "name": "code",
                     "type": "bytes"
                 }
             ]
@@ -474,23 +518,28 @@
             "ricardian_contract": ""
         },
         {
-            "name": "finalizereg",
-            "type": "finalizereg",
-            "ricardian_contract": ""
-        },
-        {
             "name": "forcereg",
             "type": "forcereg",
             "ricardian_contract": ""
         },
         {
-            "name": "initnodereg",
-            "type": "initnodereg",
+            "name": "giftram",
+            "type": "giftram",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "newnameduser",
+            "type": "newnameduser",
             "ricardian_contract": ""
         },
         {
             "name": "newuser",
             "type": "newuser",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "nodeownreg",
+            "type": "nodeownreg",
             "ricardian_contract": ""
         },
         {
@@ -504,8 +553,13 @@
             "ricardian_contract": ""
         },
         {
-            "name": "setpending",
-            "type": "setpending",
+            "name": "setsysabi",
+            "type": "setsysabi",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "setsyscode",
+            "type": "setsyscode",
             "ricardian_contract": ""
         }
     ],
