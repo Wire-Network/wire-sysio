@@ -239,7 +239,10 @@ public:
    void enable_accept_transactions();
    void plugin_initialize(const variables_map& options);
    void plugin_startup();
-   void verify_snapshot_attestation();
+   /// Verify the loaded snapshot against its on-chain attestation. Invoked from the
+   /// irreversible-block handler with the just-finalized block; retries on later finalized
+   /// blocks until the attestation record appears or the node catches up to the chain tip.
+   void verify_snapshot_attestation(const signed_block_ptr& lib_block);
 
 private:
    static void log_guard_exception(const chain::guard_exception& e);
@@ -1190,9 +1193,10 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
             _get_info_db->on_irreversible_block(block, id);
          }
 
-         // One-time snapshot attestation verification after syncing past the snapshot block
+         // Snapshot attestation verification after syncing past the snapshot block. May retry on
+         // subsequent finalized blocks until the on-chain record syncs into state (see below).
          if (snapshot_loaded_block_num && block->block_num() > *snapshot_loaded_block_num) {
-            verify_snapshot_attestation();
+            verify_snapshot_attestation(block);
          }
 
          irreversible_block_channel.publish( priority::low, t );
@@ -1467,14 +1471,10 @@ bool chain_plugin::accept_transactions() const {
    return my->accept_transactions;
 }
 
-void chain_plugin_impl::verify_snapshot_attestation() {
+void chain_plugin_impl::verify_snapshot_attestation(const signed_block_ptr& lib_block) {
    if (!snapshot_loaded_block_num) return;
 
-   auto snap_block_num = *snapshot_loaded_block_num;
-   // Clear so we only check once
-   snapshot_loaded_block_num.reset();
-
-   ilog("Verifying snapshot attestation for block #{}", snap_block_num);
+   const auto snap_block_num = *snapshot_loaded_block_num;
 
    try {
       // Read the attested record from the system contract's `snaprecords` table through the
@@ -1497,26 +1497,41 @@ void chain_plugin_impl::verify_snapshot_attestation() {
       auto rows = app().get_plugin<chain_plugin>().read_table_rows(
          std::move(p), abi_serializer_max_time_us, "snapshot_attest", not_shutting_down).rows;
 
-      if (rows.empty() || !rows[0].is_object() ||
-          rows[0].get_object()["block_num"].as_uint64() != snap_block_num) {
-         wlog("No attested snapshot record found for block #{}. "
-              "Skipping snapshot verification. "
-              "Only snapshots taken at attested block heights can be verified.",
-              snap_block_num);
-         return;
+      const bool have_record = !rows.empty() && rows[0].is_object() &&
+                               rows[0].get_object()["block_num"].as_uint64() == snap_block_num;
+
+      if (!have_record) {
+         // The snaprecords row is created by votesnaphash transactions that only land a few blocks
+         // after the snapshot height, so on a fresh bootstrap it may not have synced into state by
+         // the time the first finalized block past the snapshot height arrives. Keep retrying on
+         // later finalized blocks; only conclude the height was never attested once the node has
+         // caught up to the live chain tip. snapshot_loaded_block_num is left set so the caller
+         // retries. This is local, non-consensus bookkeeping, so comparing the finalized block time
+         // against wall-clock to detect "caught up" is appropriate.
+         const auto caught_up_tolerance = fc::seconds(30);
+         const bool caught_up = fc::time_point::now() - lib_block->timestamp.to_time_point() < caught_up_tolerance;
+         if (caught_up) {
+            snapshot_loaded_block_num.reset();
+            wlog("No attested snapshot record found for block #{} after syncing to the chain tip. "
+                 "Skipping snapshot verification. "
+                 "Only snapshots taken at attested block heights can be verified.",
+                 snap_block_num);
+         }
+         return; // retry on the next finalized block while still catching up
       }
+
+      // The record is present -- this attempt is terminal regardless of the outcome below.
+      snapshot_loaded_block_num.reset();
 
       // snap_record.snapshot_hash is a checksum256; with json=true the ABI serializer renders
       // it as lowercase hex, the same form fc::crypto::blake3::str() produces.
-      auto on_chain_hash = rows[0].get_object()["snapshot_hash"].as_string();
-      bool hash_match = on_chain_hash == snapshot_loaded_root_hash.str();
-
-      if (!hash_match) {
+      const auto on_chain_hash = rows[0].get_object()["snapshot_hash"].as_string();
+      if (on_chain_hash != snapshot_loaded_root_hash.str()) {
          elog("FATAL: Snapshot hash mismatch for block #{}! "
               "On-chain attested hash: {}, loaded snapshot hash: {}. "
               "This snapshot does NOT match the on-chain attestation and MUST NOT be trusted - "
               "it may be corrupted or tampered with. The node has been stopped. "
-              "It is strongly recommended that you delete this chain state and acquire a new "
+              "It is highly recommended that you delete this chain state and acquire a new "
               "snapshot from a trusted source before restarting.",
               snap_block_num, on_chain_hash, snapshot_loaded_root_hash.str());
          app().quit();
@@ -1527,13 +1542,17 @@ void chain_plugin_impl::verify_snapshot_attestation() {
            snap_block_num, snapshot_loaded_root_hash.str());
 
    } catch (const fc::exception& e) {
-      elog("Error verifying snapshot attestation for block #{}: {}. "
-           "To continue syncing without snapshot verification, restart without the --snapshot option.",
+      snapshot_loaded_block_num.reset();
+      elog("FATAL: Error verifying snapshot attestation for block #{}: {}. "
+           "The node has been stopped. It is highly recommended that you delete this chain state "
+           "and acquire a new snapshot from a trusted source before restarting.",
            snap_block_num, e.to_detail_string());
       app().quit();
    } catch (const std::exception& e) {
-      elog("Error verifying snapshot attestation for block #{}: {}. "
-           "To continue syncing without snapshot verification, restart without the --snapshot option.",
+      snapshot_loaded_block_num.reset();
+      elog("FATAL: Error verifying snapshot attestation for block #{}: {}. "
+           "The node has been stopped. It is highly recommended that you delete this chain state "
+           "and acquire a new snapshot from a trusted source before restarting.",
            snap_block_num, e.what());
       app().quit();
    }

@@ -205,6 +205,16 @@ public:
    snapshot_schedule_result unschedule_snapshot(uint32_t sri);
    get_snapshot_requests_result get_snapshot_requests();
 
+   /**
+    * Find a scheduled request by its recurrence parameters.
+    *
+    * @param block_spacing   recurrence interval in blocks (0 for a one-time request)
+    * @param start_block_num first eligible block height
+    * @param end_block_num   last eligible block height
+    * @return the matching request id, or std::nullopt when no such request is scheduled
+    */
+   std::optional<uint32_t> find_snapshot_request(uint32_t block_spacing, uint32_t start_block_num, uint32_t end_block_num) const;
+
    // initialize with storage
    void set_db_path(fs::path db_path);
 

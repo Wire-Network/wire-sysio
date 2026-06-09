@@ -65,10 +65,16 @@ void snapshot_scheduler::on_irreversible_block(const signed_block_ptr& lib, cons
    }
 }
 
+std::optional<uint32_t> snapshot_scheduler::find_snapshot_request(uint32_t block_spacing, uint32_t start_block_num, uint32_t end_block_num) const {
+   const auto& snapshot_by_value = _snapshot_requests.get<by_snapshot_value>();
+   auto existing = snapshot_by_value.find(std::make_tuple(block_spacing, start_block_num, end_block_num));
+   if (existing == snapshot_by_value.end())
+      return std::nullopt;
+   return existing->snapshot_request_id;
+}
+
 snapshot_scheduler::snapshot_schedule_result snapshot_scheduler::schedule_snapshot(const snapshot_request_information& sri) {
-   auto& snapshot_by_value = _snapshot_requests.get<by_snapshot_value>();
-   auto existing = snapshot_by_value.find(std::make_tuple(sri.block_spacing, sri.start_block_num, sri.end_block_num));
-   SYS_ASSERT(existing == snapshot_by_value.end(), chain::duplicate_snapshot_request, "Duplicate snapshot request");
+   SYS_ASSERT(!find_snapshot_request(sri.block_spacing, sri.start_block_num, sri.end_block_num), chain::duplicate_snapshot_request, "Duplicate snapshot request");
    SYS_ASSERT(sri.start_block_num <= sri.end_block_num, chain::invalid_snapshot_request, "End block number should be greater or equal to start block number");
    SYS_ASSERT(sri.start_block_num + sri.block_spacing <= sri.end_block_num, chain::invalid_snapshot_request, "Block spacing exceeds defined by start and end range");
 

@@ -1798,9 +1798,18 @@ void producer_plugin_impl::plugin_startup() {
          sri.start_block_num = _snapshot_provider_block_spacing - 1;
          sri.end_block_num = std::numeric_limits<uint32_t>::max();
          sri.snapshot_description = "snapshot-provider auto";
-         auto result = _snapshot_scheduler.schedule_snapshot(sri);
-         ilog("Snapshot provider mode: auto-scheduled snapshots every {} blocks (request id {})",
-              _snapshot_provider_block_spacing, result.snapshot_request_id);
+
+         // The auto-schedule is persisted to snapshot-schedule.json and reloaded by set_db_path()
+         // on restart, so only schedule it when an identical request is not already present;
+         // otherwise schedule_snapshot() would throw duplicate_snapshot_request on every restart.
+         if (auto existing = _snapshot_scheduler.find_snapshot_request(sri.block_spacing, sri.start_block_num, sri.end_block_num)) {
+            ilog("Snapshot provider mode: reusing persisted auto-schedule for every {} blocks (request id {})",
+                 _snapshot_provider_block_spacing, *existing);
+         } else {
+            auto result = _snapshot_scheduler.schedule_snapshot(sri);
+            ilog("Snapshot provider mode: auto-scheduled snapshots every {} blocks (request id {})",
+                 _snapshot_provider_block_spacing, result.snapshot_request_id);
+         }
       }
 
       if (is_configured_producer()) { // track votes if producer to verify votes are being processed
