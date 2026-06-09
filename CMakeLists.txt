@@ -33,6 +33,20 @@ project(wire-sysio)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(build-options NO_POLICY_SCOPE)
 include(build-init NO_POLICY_SCOPE)
+
+# Linux arm64 is not a supported host yet; fail during configure before
+# dependency discovery or WASM runtime selection can report misleading errors.
+set(SYSIO_ARM64_HOST OFF)
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "^(arm64|aarch64|ARM64|AARCH64)$")
+  set(SYSIO_ARM64_HOST ON)
+endif()
+
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND SYSIO_ARM64_HOST)
+  message(FATAL_ERROR
+    "Linux arm64/aarch64 is not currently supported. "
+    "Supported arm64 host is macOS Apple Silicon; supported Linux host is x86_64.")
+endif()
+
 include(compiler-config NO_POLICY_SCOPE)
 include(dependencies NO_POLICY_SCOPE)
 include(linker-config NO_POLICY_SCOPE)
