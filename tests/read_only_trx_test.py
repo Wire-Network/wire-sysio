@@ -140,12 +140,16 @@ def startCluster():
     apiNode = cluster.nodes[-1]
 
     sysioCodeHash = getCodeHash(producerNode, "sysio.token")
-    # sysio.* should be using oc unless oc tierup disabled
-    Utils.Print(f"search: executing {sysioCodeHash} with sys vm oc")
-    found = producerNode.findInLog(f"executing {sysioCodeHash} with sys vm oc")
+    # sysio.* should be using oc unless oc tierup disabled.
+    # Check the node where the OC setting was applied: apiNode has --sys-vm-oc-enable,
+    # producerNode runs with the default (OC enabled when supported).
     if noOC or not ocSupported:
+        Utils.Print(f"search apiNode: executing {sysioCodeHash} with sys vm oc (expect absent)")
+        found = apiNode.findInLog(f"executing {sysioCodeHash} with sys vm oc")
         assert(not found)
     else:
+        Utils.Print(f"search producerNode: executing {sysioCodeHash} with sys vm oc (expect present)")
+        found = producerNode.findInLog(f"executing {sysioCodeHash} with sys vm oc")
         assert(found)
 
     if ocRequested:
