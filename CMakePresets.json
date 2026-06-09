@@ -1,0 +1,78 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 21,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "base-sysio",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "toolchainFile": "${sourceDir}/vcpkg/scripts/buildsystems/vcpkg.cmake",
+      "environment": {
+        "CC": "/usr/bin/clang-18",
+        "CXX": "/usr/bin/clang++-18"
+      },
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "/usr/bin/clang-18",
+        "CMAKE_CXX_COMPILER": "/usr/bin/clang++-18",
+        "BUILD_SYSTEM_CONTRACTS": "ON",
+        "BUILD_TEST_CONTRACTS": "ON",
+        "ENABLE_TESTS": "ON",
+        "ENABLE_CCACHE": "ON",
+        "ENABLE_DISTCC": "OFF",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "VCPKG_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "debug-sysio",
+      "displayName": "Debug SYSIO (clang-18, Ninja, vcpkg)",
+      "description": "Debug SYSIO build matching //wire-sysio:build with WIRE_BUILD_TYPE=Debug (the Bazel default). Resolves the CDT package from the sibling wire-cdt debug tree; vcpkg ports always build Release.",
+      "inherits": "base-sysio",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_PREFIX_PATH": "${sourceDir}/../wire-cdt/build/debug"
+      }
+    },
+    {
+      "name": "release-sysio",
+      "displayName": "Release SYSIO (clang-18, Ninja, vcpkg)",
+      "description": "Release SYSIO build matching //wire-sysio:build with WIRE_BUILD_TYPE=Release. Resolves the CDT package from the sibling wire-cdt release tree; vcpkg ports always build Release.",
+      "inherits": "base-sysio",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_PREFIX_PATH": "${sourceDir}/../wire-cdt/build/release"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "debug-sysio",
+      "configurePreset": "debug-sysio"
+    },
+    {
+      "name": "release-sysio",
+      "configurePreset": "release-sysio"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "debug-sysio",
+      "configurePreset": "debug-sysio",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "release-sysio",
+      "configurePreset": "release-sysio",
+      "output": {
+        "outputOnFailure": true
+      }
+    }
+  ]
+}
