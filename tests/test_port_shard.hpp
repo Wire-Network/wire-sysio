@@ -1,10 +1,13 @@
 #pragma once
 
+#include <charconv>
 #include <cstdint>
 #include <cstdlib>
 #include <limits>
 #include <stdexcept>
 #include <string>
+#include <string_view>
+#include <system_error>
 
 namespace sysio::testing {
 
@@ -13,7 +16,8 @@ inline constexpr uint16_t default_state_history_port = 8080;
 inline constexpr uint32_t compact_shard_anchor_port = 8888;
 inline constexpr uint32_t compact_http_first_port = 8888;
 inline constexpr uint32_t compact_http_last_port = 8975;
-inline constexpr uint32_t compact_alternate_first_port = 9776;
+inline constexpr uint32_t compact_bios_p2p_port = 9776;
+inline constexpr uint32_t compact_alternate_first_port = 9777;
 inline constexpr uint32_t compact_alternate_last_port = 9822;
 inline constexpr uint32_t compact_p2p_first_port = 9876;
 inline constexpr uint32_t compact_p2p_last_port = 9898;
@@ -28,10 +32,10 @@ inline constexpr uint32_t compact_http_slot = 3;
 inline constexpr uint32_t compact_alternate_service_slot = 91;
 inline constexpr uint32_t compact_plugin_http_peer_slot = 92;
 inline constexpr uint32_t compact_plugin_http_local_slot = 93;
-inline constexpr uint32_t compact_alternate_p2p_slot = 94;
+inline constexpr uint32_t compact_bios_p2p_slot = 94;
+inline constexpr uint32_t compact_alternate_p2p_slot = 95;
 inline constexpr uint32_t compact_p2p_slot = 141;
 inline constexpr uint32_t compact_wallet_base_slot = 164;
-inline constexpr uint32_t compact_wallet_slot = 165;
 inline constexpr uint32_t compact_ipv6_probe_slot = 171;
 inline constexpr uint32_t wallet_port_count = 5;
 
@@ -40,6 +44,7 @@ enum class port_category {
    ship,
    state_history,
    bios_http,
+   bios_p2p,
    node_http,
    alternate_service,
    plugin_http_peer,
@@ -57,11 +62,18 @@ inline uint32_t test_port_offset() {
    if(raw_offset == nullptr || raw_offset[0] == '\0')
       return 0;
 
-   try {
-      return static_cast<uint32_t>(std::stoul(raw_offset));
-   } catch(const std::exception& ex) {
-      throw std::runtime_error(std::string(test_port_offset_env_var) + " must be an unsigned integer: " + ex.what());
-   }
+   std::string_view offset_view{raw_offset};
+   if(offset_view.front() == '-')
+      throw std::runtime_error(std::string(test_port_offset_env_var) + " must be non-negative");
+
+   uint32_t offset = 0;
+   const auto* begin = offset_view.data();
+   const auto* end = begin + offset_view.size();
+   auto [ptr, ec] = std::from_chars(begin, end, offset);
+   if(ec != std::errc{} || ptr != end)
+      throw std::runtime_error(std::string(test_port_offset_env_var) + " must be an unsigned 32-bit integer");
+
+   return offset;
 }
 
 /** Return a deterministic port for a listener class and index in this test's shard. */
@@ -83,6 +95,10 @@ inline uint16_t get_port(port_category category, uint32_t index = 0) {
    case port_category::bios_http:
       slot_start = compact_bios_http_slot;
       unsharded_base_port = 8788;
+      break;
+   case port_category::bios_p2p:
+      slot_start = compact_bios_p2p_slot;
+      unsharded_base_port = compact_bios_p2p_port;
       break;
    case port_category::node_http:
       slot_start = compact_http_slot;
@@ -117,7 +133,7 @@ inline uint16_t get_port(port_category category, uint32_t index = 0) {
       unsharded_base_port = 9899;
       break;
    case port_category::transaction_only:
-      slot_start = compact_wallet_slot + wallet_port_count - 1;
+      slot_start = compact_wallet_base_slot + wallet_port_count;
       slot_count = 2;
       unsharded_base_port = 9902;
       break;

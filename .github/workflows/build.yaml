@@ -109,48 +109,11 @@ jobs:
             ccache-${{ matrix.platform }}-
 
       - name: Build
+        id: build
+        env:
+          SYSIO_PLATFORM_NAME: ${{ matrix.platform }}
         run: |
-          echo "Building for ${{ matrix.platform }}"
-
-          # Use $GITHUB_WORKSPACE (container path /__w/...) not ${{ github.workspace }}
-          # (host path /home/runner/work/...) so ccache/vcpkg write to the mounted
-          # volume and persist for actions/cache to save.
-          export CCACHE_DIR="$GITHUB_WORKSPACE/.ccache"
-          export VCPKG_BINARY_SOURCES="clear;files,$GITHUB_WORKSPACE/vcpkg-binary-cache,readwrite"
-          export VCPKG_TARGET_TRIPLET=x64-linux-release
-          export VCPKG_HOST_TRIPLET=x64-linux-release
-          export VCPKG_OVERLAY_TRIPLETS="$GITHUB_WORKSPACE/.github/vcpkg-triplets"
-
-          # Clean intermediate vcpkg artifacts but preserve binary cache and downloads
-          rm -rf vcpkg/buildtrees vcpkg/packages vcpkg/vcpkg_installed \
-                  build/vcpkg_installed ~/.cache/vcpkg ~/.vcpkg
-
-          mkdir -p "$GITHUB_WORKSPACE/vcpkg-binary-cache"
-
-          ./vcpkg/bootstrap-vcpkg.sh
-
-          chown -R $(id -u):$(id -g) $PWD
-
-          # Reset ccache stats for this build
-          ccache -z || true
-
-          cmake -B build -S . -G Ninja ${SYSIO_PLATFORM_HAS_EXTRAS_CMAKE:+-C /extras.cmake} \
-          -DCMAKE_C_COMPILER=$CC \
-          -DCMAKE_CXX_COMPILER=$CXX \
-          -DCMAKE_MAKE_PROGRAM=$CMAKE_MAKE_PROGRAM \
-          -DCMAKE_TOOLCHAIN_FILE=$PWD/vcpkg/scripts/buildsystems/vcpkg.cmake \
-          -DCMAKE_BUILD_TYPE=Release \
-          -DVCPKG_TARGET_TRIPLET=$VCPKG_TARGET_TRIPLET \
-          -DVCPKG_HOST_TRIPLET=$VCPKG_HOST_TRIPLET \
-          -DVCPKG_OVERLAY_TRIPLETS=$VCPKG_OVERLAY_TRIPLETS \
-          -DENABLE_CCACHE=ON \
-          -DENABLE_TESTS=ON \
-          ${CMAKE_PREFIX_PATH:+-DCMAKE_PREFIX_PATH=$CMAKE_PREFIX_PATH}
-
-          cmake --build build -- -j "${{ matrix.build_jobs }}"
-
-          echo "=== ccache statistics ==="
-          ccache -s || true
+          bash .github/scripts/build-sysio.sh "${{ matrix.build_jobs }}"
 
       - name: Show vcpkg logs if failure
         if: failure()
@@ -230,9 +193,13 @@ jobs:
           ctest --output-on-failure -j $(nproc) -LE "(nonparallelizable_tests|long_running_tests)" --timeout 1000
 
       - name: Run Sharded NP/LR Tests
-        if: ${{ matrix.run_sharded_np_lr }}
+        if: ${{ steps.build.outcome == 'success' && matrix.run_sharded_np_lr && !cancelled() }}
         run: |
           cd build
+          # Run against all CPUs available to the CI container. These NP/LR tests are
+          # expected to be deterministic under CI scheduling pressure; flakes caused
+          # by host load, sanitizer overhead, or process interleaving are test bugs
+          # that should remain visible instead of being hidden by an artificial cap.
           test_jobs="$(nproc)"
           echo "Running sharded NP/LR tests with ${test_jobs} jobs"
           ctest --output-on-failure -j "${test_jobs}" -L "(nonparallelizable_tests|long_running_tests)" --timeout 2700
@@ -250,11 +217,13 @@ jobs:
               build/PerformanceHarnessScenarioRunnerLogs/
 
       - name: Check CPU Features
+        if: ${{ steps.build.outcome == 'success' && !cancelled() }}
         run: |
           awk 'BEGIN {err = 1} /bmi2/ && /adx/ {err = 0} END {exit err}' /proc/cpuinfo
           build/tools/fsgsbase-enabled
 
       - name: Build packages
+        if: ${{ steps.build.outcome == 'success' && !cancelled() }}
         run: |
           cd build
           cpack
