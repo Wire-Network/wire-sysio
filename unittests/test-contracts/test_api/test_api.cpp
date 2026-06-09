@@ -8,6 +8,7 @@
 #include "test_checktime.cpp"
 #include "test_compiler_builtins.cpp"
 #include "test_crypto.cpp"
+#include "test_f128_builtins.cpp"
 #include "test_datastream.cpp"
 #include "test_permission.cpp"
 #include "test_print.cpp"
@@ -36,19 +37,65 @@ extern "C" {
       WASM_TEST_HANDLER( test_types, string_to_name );
 
       //test_compiler_builtins
-      WASM_TEST_HANDLER( test_compiler_builtins, test_multi3       );
-      WASM_TEST_HANDLER( test_compiler_builtins, test_divti3       );
-      WASM_TEST_HANDLER( test_compiler_builtins, test_divti3_by_0  );
-      WASM_TEST_HANDLER( test_compiler_builtins, test_udivti3      );
-      WASM_TEST_HANDLER( test_compiler_builtins, test_udivti3_by_0 );
-      WASM_TEST_HANDLER( test_compiler_builtins, test_modti3       );
-      WASM_TEST_HANDLER( test_compiler_builtins, test_modti3_by_0  );
-      WASM_TEST_HANDLER( test_compiler_builtins, test_umodti3      );
-      WASM_TEST_HANDLER( test_compiler_builtins, test_umodti3_by_0 );
-      WASM_TEST_HANDLER( test_compiler_builtins, test_lshlti3      );
-      WASM_TEST_HANDLER( test_compiler_builtins, test_lshrti3      );
-      WASM_TEST_HANDLER( test_compiler_builtins, test_ashlti3      );
-      WASM_TEST_HANDLER( test_compiler_builtins, test_ashrti3      );
+      WASM_TEST_HANDLER( test_compiler_builtins, test_multi3          );
+      WASM_TEST_HANDLER( test_compiler_builtins, test_divti3          );
+      WASM_TEST_HANDLER( test_compiler_builtins, test_divti3_by_0     );
+      WASM_TEST_HANDLER( test_compiler_builtins, test_divti3_overflow );
+      WASM_TEST_HANDLER( test_compiler_builtins, test_udivti3         );
+      WASM_TEST_HANDLER( test_compiler_builtins, test_udivti3_by_0    );
+      WASM_TEST_HANDLER( test_compiler_builtins, test_modti3          );
+      WASM_TEST_HANDLER( test_compiler_builtins, test_modti3_by_0     );
+      WASM_TEST_HANDLER( test_compiler_builtins, test_modti3_overflow );
+      WASM_TEST_HANDLER( test_compiler_builtins, test_umodti3         );
+      WASM_TEST_HANDLER( test_compiler_builtins, test_umodti3_by_0    );
+      WASM_TEST_HANDLER( test_compiler_builtins, test_lshlti3         );
+      WASM_TEST_HANDLER( test_compiler_builtins, test_lshrti3         );
+      WASM_TEST_HANDLER( test_compiler_builtins, test_ashlti3         );
+      WASM_TEST_HANDLER( test_compiler_builtins, test_ashrti3         );
+      WASM_TEST_HANDLER( test_compiler_builtins, test_shift_overflow  );
+
+      //test_f128_builtins -- arithmetic
+      WASM_TEST_HANDLER( test_f128_builtins, test_addtf3 );
+      WASM_TEST_HANDLER( test_f128_builtins, test_subtf3 );
+      WASM_TEST_HANDLER( test_f128_builtins, test_multf3 );
+      WASM_TEST_HANDLER( test_f128_builtins, test_divtf3 );
+      WASM_TEST_HANDLER( test_f128_builtins, test_negtf2 );
+      //test_f128_builtins -- conversions
+      WASM_TEST_HANDLER( test_f128_builtins, test_extendsftf2 );
+      WASM_TEST_HANDLER( test_f128_builtins, test_extenddftf2 );
+      WASM_TEST_HANDLER( test_f128_builtins, test_trunctfdf2 );
+      WASM_TEST_HANDLER( test_f128_builtins, test_trunctfsf2 );
+      WASM_TEST_HANDLER( test_f128_builtins, test_float_f128_roundtrip );
+      //test_f128_builtins -- f128 -> int
+      WASM_TEST_HANDLER( test_f128_builtins, test_fixtfsi );
+      WASM_TEST_HANDLER( test_f128_builtins, test_fixtfdi );
+      WASM_TEST_HANDLER( test_f128_builtins, test_fixtfti );
+      WASM_TEST_HANDLER( test_f128_builtins, test_fixunstfsi );
+      WASM_TEST_HANDLER( test_f128_builtins, test_fixunstfdi );
+      WASM_TEST_HANDLER( test_f128_builtins, test_fixunstfti );
+      //test_f128_builtins -- f32/f64 -> int128
+      WASM_TEST_HANDLER( test_f128_builtins, test_fixsfti );
+      WASM_TEST_HANDLER( test_f128_builtins, test_fixdfti );
+      WASM_TEST_HANDLER( test_f128_builtins, test_fixunssfti );
+      WASM_TEST_HANDLER( test_f128_builtins, test_fixunsdfti );
+      //test_f128_builtins -- int -> f64 / f128
+      WASM_TEST_HANDLER( test_f128_builtins, test_floatsidf );
+      WASM_TEST_HANDLER( test_f128_builtins, test_floatsitf );
+      WASM_TEST_HANDLER( test_f128_builtins, test_floatditf );
+      WASM_TEST_HANDLER( test_f128_builtins, test_floatunsitf );
+      WASM_TEST_HANDLER( test_f128_builtins, test_floatunditf );
+      WASM_TEST_HANDLER( test_f128_builtins, test_floattidf );
+      WASM_TEST_HANDLER( test_f128_builtins, test_floatuntidf );
+      WASM_TEST_HANDLER( test_f128_builtins, test_int_f128_roundtrip );
+      //test_f128_builtins -- comparisons
+      WASM_TEST_HANDLER( test_f128_builtins, test_eqtf2 );
+      WASM_TEST_HANDLER( test_f128_builtins, test_netf2 );
+      WASM_TEST_HANDLER( test_f128_builtins, test_getf2 );
+      WASM_TEST_HANDLER( test_f128_builtins, test_gttf2 );
+      WASM_TEST_HANDLER( test_f128_builtins, test_letf2 );
+      WASM_TEST_HANDLER( test_f128_builtins, test_lttf2 );
+      WASM_TEST_HANDLER( test_f128_builtins, test_cmptf2 );
+      WASM_TEST_HANDLER( test_f128_builtins, test_unordtf2 );
 
       //test_action
       WASM_TEST_HANDLER   ( test_action, read_action_normal         );
@@ -154,7 +201,6 @@ extern "C" {
 
       // test permission
       WASM_TEST_HANDLER_EX( test_permission, check_authorization        );
-      WASM_TEST_HANDLER_EX( test_permission, test_account_creation_time );
 
       //unhandled test call
       sysio_assert( false, "Unknown Test ahhh!" );

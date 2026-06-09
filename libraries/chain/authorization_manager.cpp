@@ -64,15 +64,43 @@ namespace sysio { namespace chain {
                SYS_ASSERT(row.owner == name(), snapshot_exception, "Unexpected owner name on reserved permission 0");
                SYS_ASSERT(row.auth.accounts.size() == 0,  snapshot_exception, "Unexpected auth accounts on reserved permission 0");
                SYS_ASSERT(row.auth.keys.size() == 0,  snapshot_exception, "Unexpected auth keys on reserved permission 0");
-               SYS_ASSERT(row.auth.waits.size() == 0,  snapshot_exception, "Unexpected auth waits on reserved permission 0");
                SYS_ASSERT(row.auth.threshold == 0,  snapshot_exception, "Unexpected auth threshold on reserved permission 0");
                SYS_ASSERT(row.last_updated == time_point(),  snapshot_exception, "Unexpected auth last updated on reserved permission 0");
                value.parent = 0;
-            } else if ( row.parent != permission_name()){
-               const auto& parent = db.get<permission_object, by_owner>(boost::make_tuple(row.owner, row.parent));
+            } else {
+               // Validate authority threshold > 0 for non-reserved permissions
+               SYS_ASSERT(row.auth.threshold > 0, snapshot_exception,
+                          "Permission {}@{} has threshold 0, which allows unauthorized transactions",
+                          row.owner, row.name);
 
-               SYS_ASSERT(parent.id != 0, snapshot_exception, "Unexpected mapping to reserved permission 0");
-               value.parent = parent.id;
+               // Validate key types
+               using key_type = fc::crypto::public_key::key_type;
+               for (const key_weight& k : row.auth.keys) {
+                  SYS_ASSERT(k.key.contains_type(key_type::k1, key_type::r1, key_type::wa, key_type::em, key_type::ed),
+                             snapshot_exception,
+                             "Permission {}@{} contains unactivated key type", row.owner, row.name);
+               }
+
+               if (row.parent != permission_name()) {
+                  const auto& parent = db.get<permission_object, by_owner>(boost::make_tuple(row.owner, row.parent));
+                  SYS_ASSERT(parent.id != 0, snapshot_exception, "Unexpected mapping to reserved permission 0");
+                  value.parent = parent.id;
+
+                  // Walk parent chain to root -- parents have lower IDs so are already loaded
+                  uint32_t depth = 1;
+                  auto cur_parent = parent.parent;
+                  while (cur_parent._id != 0) {
+                     ++depth;
+                     SYS_ASSERT(depth <= config::default_max_auth_depth, snapshot_exception, // 6
+                                "Permission {}@{} exceeds max authority depth -- possible circular parent",
+                                row.owner, row.name);
+                     const auto* pp = db.find<permission_object>(cur_parent);
+                     SYS_ASSERT(pp != nullptr, snapshot_exception,
+                                "Permission {}@{} parent chain references non-existent permission",
+                                row.owner, row.name);
+                     cur_parent = pp->parent;
+                  }
+               }
             }
          }
       };
@@ -105,6 +133,7 @@ namespace sysio { namespace chain {
          using section_t = typename decltype(utils)::index_t::value_type;
 
          snapshot->read_section<section_t>([this, &read_row_count]( auto& section ) {
+            decltype(utils)::preallocate(_db, section.row_count());
             bool more = !section.empty();
             while(more) {
                decltype(utils)::create(_db, [this, &section, &more]( auto &row ) {
@@ -290,25 +319,20 @@ namespace sysio { namespace chain {
                   "updateauth action should only have one declared authorization" );
       const auto& auth = auths[0];
 
-      
-      // Prevents users from updating / adding '**.ext' special permissions.
-      if(update.permission.suffix() == name("ext")) {
-         SYS_ASSERT( auth.actor == name("sysio"), invalid_permission, "Protected permission namespace. Only 'sysio' can update or add '**.ext' permissions." );
-      } else {
-         SYS_ASSERT( (auth.actor == update.account), irrelevant_auth_exception,
-                     "the owner of the affected permission needs to be the actor of the declared authorization" );
-                     
-         const auto* min_permission = find_permission({update.account, update.permission});
-         if( !min_permission ) { // creating a new permission
-            min_permission = &get_permission({update.account, update.parent});
-         }
 
-         SYS_ASSERT( get_permission(auth).satisfies( *min_permission,
-                                                   _db.get_index<permission_index>().indices() ),
-                     irrelevant_auth_exception,
-                     "updateauth action declares irrelevant authority '{}'; minimum authority is {}",
-                     auth, permission_level{update.account, min_permission->name} );
+      SYS_ASSERT( (auth.actor == update.account), irrelevant_auth_exception,
+                  "the owner of the affected permission needs to be the actor of the declared authorization" );
+
+      const auto* min_permission = find_permission({update.account, update.permission});
+      if( !min_permission ) { // creating a new permission
+         min_permission = &get_permission({update.account, update.parent});
       }
+
+      SYS_ASSERT( get_permission(auth).satisfies( *min_permission,
+                                                  _db.get_index<permission_index>().indices() ),
+                  irrelevant_auth_exception,
+                  "updateauth action declares irrelevant authority '{}'; minimum authority is {}",
+                  auth, permission_level{update.account, min_permission->name} );
    }
 
    void authorization_manager::check_deleteauth_authorization( const deleteauth& del,
@@ -454,12 +478,15 @@ namespace sysio { namespace chain {
             if( !special_case ) {
                auto min_permission_name = lookup_minimum_permission(declared_auth.actor, act.account, act.name);
                if( min_permission_name ) { // since special cases were already handled, it should only be false if the permission is sysio.any
-                  const auto& min_permission = get_permission({declared_auth.actor, *min_permission_name});
-                  SYS_ASSERT( get_permission(declared_auth).satisfies( min_permission,
-                                                                       _db.get_index<permission_index>().indices() ),
-                              irrelevant_auth_exception,
-                              "action declares irrelevant authority '{}'; minimum authority is {}",
-                              declared_auth, permission_level{min_permission.owner, min_permission.name} );
+                  // If the declared permission matches the minimum, it trivially satisfies — skip DB lookups and hierarchy walk
+                  if( declared_auth.permission != *min_permission_name ) {
+                     const auto& min_permission = get_permission({declared_auth.actor, *min_permission_name});
+                     SYS_ASSERT( get_permission(declared_auth).satisfies( min_permission,
+                                                                          _db.get_index<permission_index>().indices() ),
+                                 irrelevant_auth_exception,
+                                 "action declares irrelevant authority '{}'; minimum authority is {}",
+                                 declared_auth, permission_level{min_permission.owner, min_permission.name} );
+                  }
                }
             }
 

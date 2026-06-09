@@ -94,6 +94,7 @@ void resource_limits_manager::add_to_snapshot( const snapshot_writer_ptr& snapsh
 void resource_limits_manager::read_from_snapshot( const snapshot_reader_ptr& snapshot, std::atomic_size_t& read_row_count, boost::asio::io_context& ctx ) {
    resource_index_set::walk_indices_via_post(ctx, [this, &snapshot, &read_row_count]( auto utils ){
       snapshot->read_section<typename decltype(utils)::index_t::value_type>([this, &read_row_count]( auto& section ) {
+         decltype(utils)::preallocate(_db, section.row_count());
          bool more = !section.empty();
          while(more) {
             decltype(utils)::create(_db, [this, &section, &more]( auto &row ) {
@@ -103,6 +104,38 @@ void resource_limits_manager::read_from_snapshot( const snapshot_reader_ptr& sna
          }
       });
    });
+}
+
+void resource_limits_manager::validate_snapshot_state() const {
+   const auto& config_idx = _db.get_index<resource_limits_config_index>();
+   SYS_ASSERT(config_idx.size() == 1, snapshot_exception,
+              "Expected exactly 1 resource_limits_config_object, found {}", config_idx.size());
+
+   const auto& state_idx = _db.get_index<resource_limits_state_index>();
+   SYS_ASSERT(state_idx.size() == 1, snapshot_exception,
+              "Expected exactly 1 resource_limits_state_object, found {}", state_idx.size());
+
+   const auto& config = _db.get<resource_limits_config_object>();
+   config.cpu_limit_parameters.validate();
+   config.net_limit_parameters.validate();
+   SYS_ASSERT(config.cpu_limit_parameters.max > 0, snapshot_exception,
+              "resource_limits_config_object cpu_limit_parameters.max must be positive");
+   SYS_ASSERT(config.net_limit_parameters.max > 0, snapshot_exception,
+              "resource_limits_config_object net_limit_parameters.max must be positive");
+   SYS_ASSERT(config.cpu_limit_parameters.max_multiplier > 0, snapshot_exception,
+              "resource_limits_config_object cpu_limit_parameters.max_multiplier must be positive");
+   SYS_ASSERT(config.net_limit_parameters.max_multiplier > 0, snapshot_exception,
+              "resource_limits_config_object net_limit_parameters.max_multiplier must be positive");
+   SYS_ASSERT(config.account_cpu_usage_average_window > 0, snapshot_exception,
+              "resource_limits_config_object account_cpu_usage_average_window must be positive");
+   SYS_ASSERT(config.account_net_usage_average_window > 0, snapshot_exception,
+              "resource_limits_config_object account_net_usage_average_window must be positive");
+
+   const auto& state = _db.get<resource_limits_state_object>();
+   SYS_ASSERT(state.virtual_cpu_limit > 0, snapshot_exception,
+              "resource_limits_state_object virtual_cpu_limit must be positive");
+   SYS_ASSERT(state.virtual_net_limit > 0, snapshot_exception,
+              "resource_limits_state_object virtual_net_limit must be positive");
 }
 
 int64_t resource_limits_manager::initialize_account(const account_name& account, bool is_trx_transient) {
@@ -153,10 +186,19 @@ void resource_limits_manager::add_transaction_usage(const accounts_billing_t& ac
    for( const auto& [a, billing] : accounts ) {
 
       const auto& usage = _db.get<resource_object,by_owner>( a );
-      int64_t unused;
+
+      // Inline the net/cpu weight lookup to avoid the redundant resource_object fetch
+      // that get_account_limits() would perform (it re-fetches the same object we already have).
       int64_t net_weight;
       int64_t cpu_weight;
-      get_account_limits( a, unused, net_weight, cpu_weight );
+      const auto* pending = _db.find<resource_pending_object,by_owner>( a );
+      if( pending ) {
+         net_weight = pending->net_weight;
+         cpu_weight = pending->cpu_weight;
+      } else {
+         net_weight = usage.net_weight;
+         cpu_weight = usage.cpu_weight;
+      }
 
       _db.modify( usage, [&]( auto& bu ){
           bu.net_usage.add( billing.net_usage, time_slot, config.account_net_usage_average_window );

@@ -6,6 +6,7 @@
 #include <sysio/crypto.hpp>
 #include <sysio/fixed_bytes.hpp>
 #include <sysio/ignore.hpp>
+#include <sysio/kv_table.hpp>
 #include <sysio/print.hpp>
 #include <sysio/privileged.hpp>
 #include <sysio/producer_schedule.hpp>
@@ -49,35 +50,20 @@ namespace sysiosystem {
    };
 
    /**
-    * Wait weight.
-    *
-    * A wait weight is defined by a number of seconds to wait for and a weight.
-    */
-   struct wait_weight {
-      uint32_t           wait_sec;
-      uint16_t           weight;
-
-      // explicit serialization macro is not necessary, used here only to improve compilation time
-      SYSLIB_SERIALIZE( wait_weight, (wait_sec)(weight) )
-   };
-
-   /**
     * Blockchain authority.
     *
     * An authority is defined by:
     * - a vector of key_weights (a key_weight is a public key plus a weight),
     * - a vector of permission_level_weights, (a permission_level is an account name plus a permission name)
-    * - a vector of wait_weights (a wait_weight is defined by a number of seconds to wait and a weight)
     * - a threshold value
     */
    struct authority {
       uint32_t                              threshold = 0;
       std::vector<key_weight>               keys;
       std::vector<permission_level_weight>  accounts;
-      std::vector<wait_weight>              waits;
 
       // explicit serialization macro is not necessary, used here only to improve compilation time
-      SYSLIB_SERIALIZE( authority, (threshold)(keys)(accounts)(waits) )
+      SYSLIB_SERIALIZE( authority, (threshold)(keys)(accounts) )
    };
 
    /**
@@ -108,6 +94,11 @@ namespace sysiosystem {
                                      (schedule_version)(new_producers))
    };
 
+   struct abihash_key {
+      uint64_t owner;
+      SYSLIB_SERIALIZE(abihash_key, (owner))
+   };
+
    /**
     * abi_hash is the structure underlying the abihash table and consists of:
     * - `owner`: the account owner of the contract's abi
@@ -116,10 +107,11 @@ namespace sysiosystem {
    struct [[sysio::table("abihash"), sysio::contract("sysio.system")]] abi_hash {
       name              owner;
       checksum256       hash;
-      uint64_t primary_key()const { return owner.value; }
 
       SYSLIB_SERIALIZE( abi_hash, (owner)(hash) )
    };
+
+   using abi_hash_table = sysio::kv::table< "abihash"_n, abihash_key, abi_hash >;
 
    void check_auth_change(name contract, name account, const binary_extension<name>& authorized_by);
 
@@ -201,8 +193,7 @@ namespace sysiosystem {
          void deleteauth( name                   account,
                           name                   permission,
                           binary_extension<name> authorized_by ) {
-            if (permission == name("auth.ext")) require_recipient(name("auth.msg")); // Sig EM auth.ext catch: only auth.msg can remove auth.ext permission
-            else check_auth_change(get_self(), account, authorized_by);
+           check_auth_change(get_self(), account, authorized_by);
          }
 
          /**

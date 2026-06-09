@@ -5,7 +5,7 @@ namespace sysiosystem {
 
    void system_contract::limitauthchg(const name& account, const std::vector<name>& allow_perms,
                                       const std::vector<name>& disallow_perms) {
-      limit_auth_change_table table(get_self(), get_self().value);
+      limit_auth_change_table table(get_self());
       require_auth(account);
       sysio::check(allow_perms.empty() || disallow_perms.empty(), "either allow_perms or disallow_perms must be empty");
       sysio::check(allow_perms.empty() ||
@@ -14,23 +14,22 @@ namespace sysiosystem {
       sysio::check(disallow_perms.empty() ||
                    std::find(disallow_perms.begin(), disallow_perms.end(), "owner"_n) == disallow_perms.end(),
                    "disallow_perms contains owner");
-      auto it = table.find(account.value);
+      auto key = limitauthchg_key{account.value};
       if(!allow_perms.empty() || !disallow_perms.empty()) {
-         if(it == table.end()) {
-            table.emplace(account, [&](auto& row){
-               row.account = account;
+         table.upsert(account, key,
+            limit_auth_change{
+               .version = 0,
+               .account = account,
+               .allow_perms = allow_perms,
+               .disallow_perms = disallow_perms,
+            },
+            [&](auto& row){
                row.allow_perms = allow_perms;
                row.disallow_perms = disallow_perms;
             });
-         } else {
-            table.modify(it, account, [&](auto& row){
-               row.allow_perms = allow_perms;
-               row.disallow_perms = disallow_perms;
-            });
-         }
       } else {
-         if(it != table.end())
-            table.erase(it);
+         if(table.contains(key))
+            table.erase(key);
       }
    }
 
@@ -38,18 +37,19 @@ namespace sysiosystem {
       name by(authorized_by.has_value() ? authorized_by.value().value : 0);
       if(by.value)
          sysio::require_auth({account, by});
-      limit_auth_change_table table(contract, contract.value);
-      auto it = table.find(account.value);
-      if(it == table.end())
+      limit_auth_change_table table(contract);
+      auto key = limitauthchg_key{account.value};
+      if(!table.contains(key))
          return;
+      auto row = table.get(key);
       sysio::check(by.value, "authorized_by is required for this account");
-      if(!it->allow_perms.empty())
+      if(!row.allow_perms.empty())
          sysio::check(
-            std::find(it->allow_perms.begin(), it->allow_perms.end(), by) != it->allow_perms.end(),
+            std::find(row.allow_perms.begin(), row.allow_perms.end(), by) != row.allow_perms.end(),
             "authorized_by does not appear in allow_perms");
       else
          sysio::check(
-            std::find(it->disallow_perms.begin(), it->disallow_perms.end(), by) == it->disallow_perms.end(),
+            std::find(row.disallow_perms.begin(), row.disallow_perms.end(), by) == row.disallow_perms.end(),
             "authorized_by appears in disallow_perms");
    }
 

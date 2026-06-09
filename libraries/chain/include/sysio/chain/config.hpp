@@ -14,6 +14,7 @@ namespace sysio::chain::config {
   const static auto fork_db_filename            = "fork_db.dat";
   const static auto safety_filename             = "safety.dat";
   const static auto chain_head_filename         = "chain_head.dat";
+  const static auto transaction_dedup_filename  = "transaction_dedup.bin";
   static constexpr auto default_state_size            = 1*1024*1024*1024ll;
   static constexpr auto default_state_guard_size      =    128*1024*1024ll;
 
@@ -55,8 +56,8 @@ namespace sysio::chain::config {
   static constexpr uint32_t   default_max_block_net_usage                  = 1024 * 1024; /// at 500ms blocks and 200byte trx, this enables ~10,000 TPS burst
   static constexpr uint32_t   default_target_block_net_usage_pct           = 10 * percent_1; /// we target 1000 TPS
   static constexpr uint32_t   default_max_transaction_net_usage            = default_max_block_net_usage / 2;
-  static constexpr uint32_t   default_base_per_transaction_net_usage       = 12;  // 12 bytes (11 bytes for worst case of transaction_receipt_header + 1 byte for static_variant tag)
-  static constexpr uint32_t   default_net_usage_leeway                     = 500; // is this reasonable?
+  static constexpr uint32_t   default_base_per_transaction_net_usage       = 12;  // retained for chain_config compat; no longer used in billing (see billable_net_per_action_overhead)
+  static constexpr uint32_t   default_net_usage_leeway                     = 500; // bytes of NET leeway for transactions
   static constexpr uint32_t   default_context_free_discount_net_usage_num  = 0; // Wire does not support discount of context free data
   static constexpr uint32_t   default_context_free_discount_net_usage_den  = 1; // Wire does not support discount of context free data
   static constexpr uint32_t   transaction_id_net_usage                     = 32; // 32 bytes for the size of a transaction id
@@ -69,18 +70,17 @@ namespace sysio::chain::config {
   static constexpr uint32_t   default_subjective_cpu_us                    = 300000; /// default subjective cpu given to each account
 
   static constexpr uint32_t   default_max_trx_lifetime                     = 60*60; // 1 hour
-  static constexpr uint32_t   default_deferred_trx_expiration_window       = 0; // deferred trx not supported by Wire
   static constexpr uint32_t   default_max_trx_delay                        = 45*24*3600; // 45 days
-  static constexpr uint32_t   default_max_inline_action_size               = 512 * 1024;   // 512 KB
+  static constexpr uint32_t   default_max_inline_action_size               = 512 * 1024;   // 512 KiB
   static constexpr uint16_t   default_max_inline_action_depth              = 4;
   static constexpr uint16_t   default_max_auth_depth                       = 6;
   static constexpr uint32_t   default_sig_cpu_bill_pct                     = 50 * percent_1; // billable percentage of signature recovery
   static constexpr uint32_t   default_produce_block_offset_ms              = 450;
   static constexpr uint32_t   default_production_pause_vote_timeout_ms     = 6u*1000u; // 6 seconds
-  static constexpr uint16_t   default_controller_thread_pool_size          = 2;
+  static constexpr uint16_t   default_controller_thread_pool_size          = 4;
   static constexpr uint16_t   default_vote_thread_pool_size                = 4;
   static constexpr uint32_t   default_max_variable_signature_length        = 16384u;
-  static constexpr uint32_t   default_max_action_return_value_size         = 256;
+  static constexpr uint32_t   default_max_action_return_value_size         = 1024;
   static constexpr uint32_t   default_max_reversible_blocks                = 3600u;
 
   static constexpr uint32_t   default_max_transaction_finality_status_success_duration_sec = 180;
@@ -104,13 +104,23 @@ namespace sysio::chain::config {
   // Should be large enough to allow recovery from badly set blockchain parameters without a hard fork
   // (unless net_usage_leeway is set to 0 and so are the net limits of all accounts that can help with resetting blockchain parameters).
 
-  static constexpr uint32_t   fixed_net_overhead_of_packed_trx = 16; // is this reasonable?
+  static constexpr uint32_t   fixed_net_overhead_of_packed_trx = 16; // fixed NET overhead per packed_transaction (sigs, extensions, header)
 
   static constexpr uint32_t   fixed_overhead_shared_vector_ram_bytes = 16; ///< overhead accounts for fixed portion of size of shared_vector field
   static constexpr uint32_t   overhead_per_row_per_index_ram_bytes = 32;    ///< overhead accounts for basic tracking structures in a row per index
   static constexpr uint32_t   setcode_ram_bytes_multiplier       = 10;     ///< multiplier on contract size to account for multiple copies and cached compilation
 
   static constexpr uint32_t   hashing_checktime_block_size       = 10*1024;  /// call checktime from hashing intrinsic once per this number of bytes
+
+  // KV default limits — on-chain consensus values are in chain_config
+  static constexpr uint32_t   default_max_kv_key_size           = 256;       ///< maximum KV primary key size in bytes
+  static constexpr uint32_t   default_max_kv_value_size         = 256*1024;  ///< maximum KV value size (256 KiB)
+  static constexpr uint32_t   default_max_kv_secondary_key_size = 256;       ///< maximum KV secondary key size in bytes
+  // KV absolute upper bounds (governance cannot exceed these)
+  static constexpr uint32_t   max_kv_key_size_limit             = 1024;      ///< absolute max for primary and secondary key sizes
+  static constexpr uint32_t   max_kv_value_size_limit           = 1024*1024; ///< absolute max for value size (1 MiB)
+  // Iterator limit is hardcoded (ephemeral per-transaction, bounded by CPU)
+  static constexpr uint32_t   max_kv_iterators                  = 1024;
 
 #ifdef SYSIO_SYS_VM_JIT_RUNTIME_ENABLED
   static constexpr auto default_wasm_runtime = sysio::chain::wasm_interface::vm_type::sys_vm_jit;

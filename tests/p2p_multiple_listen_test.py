@@ -83,8 +83,10 @@ try:
     for conn in connections['payload']:
         if conn['is_socket_open']:
             open_socket_count += 1
-            assert conn['last_handshake']['agent'] == 'node-00', f"Connected node identifed as '{conn['last_handshake']['agent']}' instead of node-00"
-            assert conn['last_handshake']['p2p_address'].split()[0] == 'ext-ip0:20000', f"Connected node is advertising '{conn['last_handshake']['p2p_address'].split()[0]}' instead of ext-ip0:20000"
+            assert conn['last_handshake']['agent'] == 'node-00', f"Connected node identified as '{conn['last_handshake']['agent']}' instead of node-00"
+            # Server addresses are paired positionally with listen endpoints:
+            # 9876 -> ext-ip0:20000, 9779 -> ext-ip1:20001.
+            assert conn['last_handshake']['p2p_address'].split()[0] == 'ext-ip1:20001', f"Connected node is advertising '{conn['last_handshake']['p2p_address'].split()[0]}' instead of ext-ip1:20001"
     assert open_socket_count == 1, 'Node 2 is expected to have exactly one open socket'
 
     connections = cluster.nodes[4].processUrllibRequest('net', 'connections')
@@ -92,8 +94,8 @@ try:
     for conn in connections['payload']:
         if conn['is_socket_open']:
             open_socket_count += 1
-            assert conn['last_handshake']['agent'] == 'node-00', f"Connected node identifed as '{conn['last_handshake']['agent']}' instead of node-00"
-            assert conn['last_handshake']['p2p_address'].split()[0] == 'ext-ip1:20001', f"Connected node is advertising '{conn['last_handshake']['p2p_address'].split()[0]} 'instead of ext-ip1:20001"
+            assert conn['last_handshake']['agent'] == 'node-00', f"Connected node identified as '{conn['last_handshake']['agent']}' instead of node-00"
+            assert conn['last_handshake']['p2p_address'].split()[0] == 'ext-ip0:20000', f"Connected node is advertising '{conn['last_handshake']['p2p_address'].split()[0]}' instead of ext-ip0:20000"
     assert open_socket_count == 1, 'Node 4 is expected to have exactly one open socket'
 
     testSuccessful=True

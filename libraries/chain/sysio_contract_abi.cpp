@@ -116,18 +116,10 @@ abi_def sysio_contract_abi(const abi_def& sysio_system_abi)
    });
 
    sys_abi.structs.emplace_back( struct_def {
-      "wait_weight", "", {
-         {"wait_sec", "uint32"},
-         {"weight", "weight_type"}
-      }
-   });
-
-   sys_abi.structs.emplace_back( struct_def {
       "authority", "", {
          {"threshold", "uint32"},
          {"keys", "key_weight[]"},
-         {"accounts", "permission_level_weight[]"},
-         {"waits", "wait_weight[]"}
+         {"accounts", "permission_level_weight[]"}
       }
    });
 

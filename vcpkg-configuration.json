@@ -3,13 +3,15 @@
   "default-registry": {
     "kind": "git",
     "baseline": "74e6536215718009aae747d86d84b78376bf9e09",
+    "reference": "bc71aa640f89933294f16e004b212c7fd3183eed",
     "repository": "https://github.com/Microsoft/vcpkg"
   },
   "registries": [
     {
       "kind": "git",
       "repository": "https://github.com/wire-network/wire-vcpkg-registry",
-      "baseline": "f941f19ffa37df111e97cb32652d6d30aeaa16f3",
+      "baseline": "23aa4018992d85602a4b5c30104a623e708b4b3e",
+      "reference": "23aa4018992d85602a4b5c30104a623e708b4b3e",
       "packages": [
         "boost",
         "softfloat",

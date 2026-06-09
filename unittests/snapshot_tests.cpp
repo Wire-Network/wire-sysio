@@ -1083,6 +1083,136 @@ BOOST_AUTO_TEST_CASE( snapshot_large_benchmark )
    msg(fmt::format("Read:     {:.1f}s ({:.0f} MB/s)", (double)read_ms / 1000, read_throughput));
 }
 
+// BLAKE3 encoder buffer bypass threshold benchmark
+// Tests whether `pos + len >= X * buf_size` threshold (flushing early when
+// buffer-plus-incoming exceeds a fraction of buffer capacity) beats the
+// current `len >= buf_size` strategy.
+//
+// Run with: ./unit_test --run_test=snapshot_part2_tests/blake3_buffer_threshold_benchmark -- --sys-vm
+BOOST_AUTO_TEST_CASE( blake3_buffer_threshold_benchmark )
+{
+   auto msg = [](const std::string& s) { BOOST_TEST_MESSAGE(s); };
+
+   static constexpr size_t buf_size = 64 * 1024; // matches blake3_encoder
+
+   // Inline encoder that accepts a threshold multiplier
+   struct bench_encoder {
+      blake3_encoder enc;
+      char           buf[buf_size];
+      size_t         pos = 0;
+      double         threshold; // 0 = current strategy
+
+      explicit bench_encoder(double t) : threshold(t) {}
+
+      void reset() { pos = 0; enc.reset(); }
+
+      void flush() {
+         if(pos > 0) {
+            enc.write(buf, pos);
+            pos = 0;
+         }
+      }
+
+      void write(const char* d, size_t len) {
+         bool bypass;
+         if(threshold == 0)
+            bypass = (len >= buf_size);
+         else
+            bypass = (len >= buf_size || pos + len >= (size_t)(threshold * buf_size));
+
+         if(bypass) {
+            flush();
+            enc.write(d, len);
+            return;
+         }
+         while(len > 0) {
+            size_t space = buf_size - pos;
+            size_t chunk = len < space ? len : space;
+            memcpy(buf + pos, d, chunk);
+            pos += chunk;
+            d += chunk;
+            len -= chunk;
+            if(pos == buf_size) flush();
+         }
+      }
+
+      fc::crypto::blake3 finalize() {
+         flush();
+         return enc.result();
+      }
+   };
+
+   // Generate source data
+   constexpr size_t src_size = 1 << 20; // 1 MB
+   std::vector<char> src(src_size);
+   uint64_t seed = 0x12345678ABCDEF01ULL;
+   for(auto& c : src) { seed ^= seed << 13; seed ^= seed >> 7; seed ^= seed << 17; c = seed & 0xFF; }
+
+   // Write patterns
+   struct pattern {
+      std::vector<size_t> sizes;
+      size_t total = 0;
+      const char* name;
+   };
+
+   auto make_pattern = [&](const char* name, auto size_fn) {
+      pattern p; p.name = name;
+      constexpr size_t target = 100 * 1024 * 1024; // 100 MB
+      std::mt19937 rng(42);
+      while(p.total < target) { size_t s = size_fn(rng); p.sizes.push_back(s); p.total += s; }
+      return p;
+   };
+
+   auto small    = make_pattern("small (1-8B)",         [](auto& r) -> size_t { return 1 << (r() % 4); });
+   auto mixed    = make_pattern("mixed (1B-60KB)",      [](auto& r) -> size_t {
+      int x = r() % 100;
+      if(x < 60) return 1 + (r() % 8);
+      if(x < 80) return 100 + (r() % 900);
+      if(x < 95) return 1000 + (r() % 9000);
+      return 30000 + (r() % 30000);
+   });
+   auto boundary = make_pattern("boundary (50KB+40-60KB)", [](auto& r) -> size_t {
+      // Alternate: many small writes filling ~50KB, then a near-boundary write
+      static int phase = 0;
+      static size_t filled = 0;
+      if(filled < 50000) { size_t s = 4 + (r() % 5); filled += s; return s; }
+      filled = 0;
+      return 40000 + (r() % 20000);
+   });
+
+   std::vector<pattern*> patterns = {&small, &mixed, &boundary};
+   double thresholds[] = {0, 1.0, 1.5, 1.75};
+   const char* labels[] = {"current (len>=buf)", "x=1.0", "x=1.5", "x=1.75"};
+
+   msg("=== BLAKE3 BUFFER THRESHOLD BENCHMARK ===");
+   msg(fmt::format("Buffer: {} KB, Data per run: 100 MB, Iterations: 5\n", buf_size / 1024));
+   msg(fmt::format("{:<30s}  {:>14s}  {:>14s}  {:>14s}  {:>14s}", "Pattern", labels[0], labels[1], labels[2], labels[3]));
+   msg(std::string(92, '-'));
+
+   for(auto* pat : patterns) {
+      std::string line = fmt::format("{:<30s}", pat->name);
+      for(int t = 0; t < 4; t++) {
+         constexpr int iterations = 5;
+         bench_encoder enc(thresholds[t]);
+         auto start = std::chrono::high_resolution_clock::now();
+         for(int iter = 0; iter < iterations; iter++) {
+            enc.reset();
+            size_t offset = 0;
+            for(size_t sz : pat->sizes) {
+               enc.write(src.data() + (offset % (src_size - 65536)), sz);
+               offset += sz;
+            }
+            enc.finalize();
+         }
+         auto elapsed = std::chrono::duration<double, std::milli>(
+            std::chrono::high_resolution_clock::now() - start).count() / iterations;
+         line += fmt::format("  {:>11.2f} ms", elapsed);
+      }
+      msg(line);
+   }
+   msg("\nLower is better.");
+}
+
 #endif // RUN_PERF_BENCHMARKS
 
 // --- ^^^^

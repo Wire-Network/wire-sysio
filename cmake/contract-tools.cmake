@@ -10,9 +10,18 @@ message(STATUS "CDT_ROOT is set to: ${CDT_ROOT}")
 
 if(BUILD_SYSTEM_CONTRACTS AND NOT CDT_BUILD)
   set(SYSIO_WASM_OLD_BEHAVIOR "Off")
+  set(CDT_CONTRACT_INCLUDE_PATH "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/include")
+  message(NOTICE "CDT_CONTRACT_INCLUDE_PATH = ${CDT_CONTRACT_INCLUDE_PATH}")
   find_package(cdt REQUIRED)
   set(
-    CDT_CMAKE_ARGS -DCDT_ROOT=${CDT_ROOT} -DCMAKE_TOOLCHAIN_FILE=${CDT_ROOT}/lib/cmake/cdt/CDTWasmToolchain.cmake -DCMAKE_PREFIX_PATH=${CMAKE_BINARY_DIR}  -DBUILD_SYSTEM_CONTRACTS=ON -DBUILD_TEST_CONTRACTS=${BUILD_TEST_CONTRACTS} -DCDT_BUILD=ON
+    CDT_CMAKE_ARGS
+          -DCDT_ROOT=${CDT_ROOT}
+          -DCMAKE_TOOLCHAIN_FILE=${CDT_ROOT}/lib/cmake/cdt/CDTWasmToolchain.cmake
+          -DCMAKE_PREFIX_PATH=${CMAKE_BINARY_DIR}
+          -DBUILD_SYSTEM_CONTRACTS=ON
+          -DBUILD_TEST_CONTRACTS=${BUILD_TEST_CONTRACTS}
+          -DCDT_BUILD=ON
+          -DCDT_CONTRACT_INCLUDE_PATH=${CDT_CONTRACT_INCLUDE_PATH}
   )
   if (CDT_ROOT AND EXISTS ${CDT_ROOT}/lib/cmake/cdt/cdt-config.cmake)
       list(APPEND CDT_CMAKE_ARGS -DCDT_ROOT=${CDT_ROOT})
@@ -44,6 +53,24 @@ function(contracts_target TARGET)
   endif()
 
   cmake_parse_arguments(ARG "" "SOURCE_DIR;BINARY_DIR" "" ${ARGN})
+
+  # Collect CMakeLists.txt files so the parent build re-runs cmake when
+  # contract build structure changes (e.g. new contracts added/removed).
+  file(GLOB_RECURSE _contract_cmake_files "${ARG_SOURCE_DIR}/CMakeLists.txt"
+                                          "${ARG_SOURCE_DIR}/*/CMakeLists.txt")
+  set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${_contract_cmake_files})
+
+  # Also collect source files so the ExternalProject reconfigures when
+  # contract code changes on branch switch.  Without this, stale object
+  # files and ABIs from a previous branch persist and cause link errors
+  # (e.g. undefined symbols for actions that no longer exist).
+  # These are only added to the check_reconfigure step DEPENDS below,
+  # NOT to CMAKE_CONFIGURE_DEPENDS, to avoid re-running the parent cmake
+  # on every source edit.
+  file(GLOB_RECURSE _contract_source_files "${ARG_SOURCE_DIR}/*.cpp"
+                                           "${ARG_SOURCE_DIR}/*.hpp"
+                                           "${ARG_SOURCE_DIR}/*.h")
+
   ExternalProject_Add(
     ${TARGET}
     SOURCE_DIR ${ARG_SOURCE_DIR}
@@ -55,6 +82,34 @@ function(contracts_target TARGET)
     INSTALL_COMMAND ""
     BUILD_ALWAYS 1
   )
+
+  # Force the ExternalProject to re-configure when any contract file changes
+  # (e.g. source files added/removed or modified on a different branch).
+  ExternalProject_Add_Step(${TARGET} check_reconfigure
+    DEPENDEES download
+    DEPENDERS configure
+    DEPENDS ${_contract_cmake_files} ${_contract_source_files}
+    COMMENT "Checking if ${TARGET} needs reconfiguration"
+  )
+
+  # When contract headers change (e.g. branch switch adding/removing
+  # [[sysio::action]] attributes), the inner build's cached dependency
+  # info may be stale, leaving .obj files that reference removed symbols
+  # and preventing ABI/native-dispatch regeneration.  Force a clean build
+  # so everything is compiled fresh from the updated headers.
+  file(GLOB_RECURSE _contract_header_files
+    "${ARG_SOURCE_DIR}/*.hpp"
+    "${ARG_SOURCE_DIR}/*.h")
+
+  if(_contract_header_files)
+    ExternalProject_Add_Step(${TARGET} force_clean_on_header_change
+      DEPENDEES configure
+      DEPENDERS build
+      DEPENDS ${_contract_header_files}
+      COMMAND ${CMAKE_COMMAND} --build "${ARG_BINARY_DIR}" --target clean
+      COMMENT "Contract headers changed – cleaning build for ${TARGET}"
+    )
+  endif()
 
   # Expose the build step as a separate target for better dependency tracking
   ExternalProject_Add_StepTargets(${TARGET} build)

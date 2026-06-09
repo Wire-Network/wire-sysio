@@ -77,10 +77,16 @@ void snapshot_scheduler::on_irreversible_block(const signed_block_ptr& lib, cons
    }
 }
 
+std::optional<uint32_t> snapshot_scheduler::find_snapshot_request(uint32_t block_spacing, uint32_t start_block_num, uint32_t end_block_num) const {
+   const auto& snapshot_by_value = _snapshot_requests.get<by_snapshot_value>();
+   auto existing = snapshot_by_value.find(std::make_tuple(block_spacing, start_block_num, end_block_num));
+   if (existing == snapshot_by_value.end())
+      return std::nullopt;
+   return existing->snapshot_request_id;
+}
+
 snapshot_scheduler::snapshot_schedule_result snapshot_scheduler::schedule_snapshot(const snapshot_request_information& sri) {
-   auto& snapshot_by_value = _snapshot_requests.get<by_snapshot_value>();
-   auto existing = snapshot_by_value.find(std::make_tuple(sri.block_spacing, sri.start_block_num, sri.end_block_num));
-   SYS_ASSERT(existing == snapshot_by_value.end(), chain::duplicate_snapshot_request, "Duplicate snapshot request");
+   SYS_ASSERT(!find_snapshot_request(sri.block_spacing, sri.start_block_num, sri.end_block_num), chain::duplicate_snapshot_request, "Duplicate snapshot request");
    SYS_ASSERT(sri.start_block_num <= sri.end_block_num, chain::invalid_snapshot_request, "End block number should be greater or equal to start block number");
    SYS_ASSERT(sri.start_block_num + sri.block_spacing <= sri.end_block_num, chain::invalid_snapshot_request, "Block spacing exceeds defined by start and end range");
 
@@ -214,7 +220,7 @@ void snapshot_scheduler::create_snapshot(next_function<snapshot_information> nex
 
          ilog("Snapshot creation at block {} complete; snapshot placed at {}", head_block_num, snapshot_path.string());
          snapshot_information si{head_id, head_block_num, head_block_time, chain_snapshot_header::current_version, snapshot_path.generic_string(), captured_root_hash};
-         next(si);
+         next(snapshot_information{si});
 
          // Notify all registered finalized callbacks
          for (const auto& cb : _snapshot_finalized_cbs) {
@@ -239,9 +245,12 @@ void snapshot_scheduler::create_snapshot(next_function<snapshot_information> nex
    if(existing != pending_by_id.end()) {
       // if a snapshot at this block is already pending, attach this requests handler to it
       pending_by_id.modify(existing, [&next](auto& entry) {
-         entry.next = [prev = entry.next, next](const next_function_variant<snapshot_information>& res) {
-            prev(res);
-            next(res);
+         entry.next = [prev = entry.next, next](next_function_variant<snapshot_information>&& res) {
+            // Fan-out to two next_functions: each must receive its own variant copy
+            // so neither sees a moved-from value.  next_function::operator() is
+            // rvalue-only, so the copy is required and visible.
+            prev(next_function_variant<snapshot_information>{res});
+            next(std::move(res));
          };
       });
    } else {

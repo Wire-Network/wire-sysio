@@ -11,7 +11,7 @@
 #include <boost/beast/version.hpp>
 #include <boost/asio/connect.hpp>
 #include <boost/asio/ip/tcp.hpp>
-#include <boost/asio/deadline_timer.hpp>
+#include <boost/asio/system_timer.hpp>
 #include <boost/asio/local/stream_protocol.hpp>
 
 using tcp = boost::asio::ip::tcp;       // from <boost/asio/ip/tcp.hpp>
@@ -36,7 +36,7 @@ public:
    using connection_map = std::map<host_key, connection>;
    using unix_url_split_map = std::map<std::string, fc::url>;
    using error_code = boost::system::error_code;
-   using deadline_type = boost::posix_time::ptime;
+   using deadline_type = std::chrono::system_clock::time_point;
 
    http_client_impl()
    :_ioc()
@@ -51,7 +51,7 @@ public:
    template<typename SyncReadStream, typename Fn, typename CancelFn>
    error_code sync_do_with_deadline( SyncReadStream& s, deadline_type deadline, Fn f, CancelFn cf ) {
       bool timer_expired = false;
-      boost::asio::deadline_timer timer(_ioc);
+      boost::asio::system_timer timer(_ioc);
 
       timer.expires_at(deadline);
       bool timer_cancelled = false;
@@ -251,8 +251,7 @@ public:
    };
 
    variant post_sync(const url& dest, const variant& payload, const fc::time_point& _deadline) {
-      static const deadline_type epoch(boost::gregorian::date(1970, 1, 1));
-      auto deadline = epoch + boost::posix_time::microseconds(_deadline.time_since_epoch().count());
+      auto deadline = _deadline.to_system_clock();
       FC_ASSERT(dest.host(), "No host set on URL");
 
       std::string path = dest.path() ? dest.path()->generic_string() : "/";

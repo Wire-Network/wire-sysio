@@ -267,10 +267,6 @@ def _create_cluster(
     launcher.define_network()
     launcher.generate()
 
-    # Patch config.ini files if --http-insecure was requested
-    if http_insecure:
-        _patch_configs_http_insecure(data_path)
-
     # --- Start all nodes ---
     bios_node = None
     nodes: list[Any] = []
@@ -351,6 +347,10 @@ def _create_cluster(
     _echo("Shutting down nodes after bootstrap...")
     for n in nodes:
         n.kill(signal.SIGTERM)
+
+    # Patch config.ini files with permissive HTTP settings (takes effect on next 'run')
+    if http_insecure:
+        _patch_configs_http_insecure(data_path)
 
     _echo("Cluster created and bootstrapped successfully.")
     _echo(f"Chain directory: {chain_dir}")
@@ -469,7 +469,8 @@ def _bootstrap(  # noqa: C901, PLR0912, PLR0915
             "sysio.wrap",
             "sysio.roa",
             "sysio.acct",
-            "carl",
+            "sysio.authex",
+            "dev.owner1",
         ]
         acct_trans = []
         for acct_name in system_accounts:
@@ -636,7 +637,7 @@ def _bootstrap(  # noqa: C901, PLR0912, PLR0915
         _echo("Deploying sysio.roa contract...")
         sysio_roa_account = copy.deepcopy(sysio_account)
         sysio_roa_account.name = "sysio.roa"
-        contract_dir = str(lib_testing_contracts / "sysio.roa")
+        contract_dir = str(contracts_path / "sysio.roa")
         trans = bios_node.publishContract(
             sysio_roa_account,
             contract_dir,
@@ -663,14 +664,76 @@ def _bootstrap(  # noqa: C901, PLR0912, PLR0915
         if not bios_node.waitForTransactionInBlock(trans_id):
             raise click.ClickException("Failed to validate ROA activation.")
 
-        # Register carl as tier 1 node owner
-        _echo("Registering carl as tier-1 node owner...")
+        # Register dev.owner1 as tier 1 node owner
+        _echo("Registering dev.owner1 as tier-1 node owner...")
         trans = bios_node.pushMessage(
-            "sysio.roa", "forcereg", '{"owner": carl, "tier": 1}', "-p sysio.roa"
+            "sysio.roa", "forcereg", '{"owner": dev.owner1, "tier": 1}', "-p sysio.roa"
         )
         trans_id = Node.getTransId(trans[1])
         if not bios_node.waitForTransactionInBlock(trans_id):
-            raise click.ClickException("Failed to register carl.")
+            raise click.ClickException("Failed to register dev.owner1.")
+
+        # Deploy sysio.authex
+        _echo("Deploying sysio.authex contract...")
+        sysio_authex_account = copy.deepcopy(sysio_account)
+        sysio_authex_account.name = "sysio.authex"
+        contract_dir = str(contracts_path / "sysio.authex")
+        trans = bios_node.publishContract(
+            sysio_authex_account,
+            contract_dir,
+            "sysio.authex.wasm",
+            "sysio.authex.abi",
+            waitForTransBlock=True,
+        )
+        if trans is None:
+            raise click.ClickException("Failed to publish sysio.authex contract.")
+
+        trans = bios_node.setPriv(
+            sysio_authex_account, sysio_account, isPriv=True, waitForTransBlock=True
+        )
+        if trans is None:
+            raise click.ClickException("Failed to set sysio.authex as privileged.")
+
+        txn = {
+            "actions": [{
+                "account": "sysio",
+                "name": "updateauth",
+                "data": {
+                    "account": "sysio.authex",
+                    "permission": "owner",
+                    "parent": "",
+                    "auth": {
+                        "threshold": 1,
+                        "keys": [
+                            {
+                                "key": sysio_account.activePublicKey,
+                                "weight": 1
+                            }
+                        ],
+                        "accounts": [
+                            {
+                                "permission": {
+                                    "actor": "sysio.authex",
+                                    "permission": "sysio.code"
+                                },
+                                "weight": 1
+                            }
+                        ]
+                    }
+                },
+                "authorization": [
+                    {
+                        "actor": "sysio.authex",
+                        "permission": "owner"
+                    },
+                    {
+                        "actor": "sysio",
+                        "permission": "active"
+                    }
+                ]
+            }]
+        }
+        bios_node.pushTransaction(txn)
 
         # Init system contract
         _echo("Initializing system contract...")

@@ -28,7 +28,7 @@ namespace sysio::chain {
 
    constexpr auto format_as(const vote_message& vm) {
       return fmt::format("vote_message{{block: #{}:{}.., {}, finalizer_key: {}..}}",
-                         block_header::num_from_id(vm.block_id), vm.block_id.str().substr(8, 16),
+                         block_header::num_from_id(vm.block_id), vm.block_id.short_id(),
                          vm.strong ? "strong" : "weak",
                          vm.finalizer_key.to_string().substr(0, 10));
    }

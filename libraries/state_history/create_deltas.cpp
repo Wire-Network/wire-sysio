@@ -9,10 +9,6 @@ bool include_delta(const T& old, const T& curr) {
    return true;
 }
 
-bool include_delta(const chain::table_id_object& old, const chain::table_id_object& curr) {
-   return old.payer != curr.payer;
-}
-
 bool include_delta(const chain::resource_limits::resource_limits_state_object& old,
                    const chain::resource_limits::resource_limits_state_object& curr) {
    return                                                                                       //
@@ -53,24 +49,7 @@ void pack_deltas(boost::iostreams::filtering_ostreambuf& obuf, const chainbase::
 
    fc::datastream<boost::iostreams::filtering_ostreambuf&> ds{obuf};
 
-   const auto&                                       table_id_index = db.get_index<chain::table_id_multi_index>();
-   std::map<uint64_t, const chain::table_id_object*> removed_table_id;
-   for (auto& rem : table_id_index.last_undo_session().removed_values)
-      removed_table_id[rem.id._id] = &rem;
-
-   auto get_table_id = [&](uint64_t tid) -> const chain::table_id_object& {
-      auto obj = table_id_index.find(tid);
-      if (obj)
-         return *obj;
-      auto it = removed_table_id.find(tid);
-      SYS_ASSERT(it != removed_table_id.end(), chain::plugin_exception, "can not found table id {}", tid);
-      return *it->second;
-   };
-
    auto pack_row          = [&](auto& ds, auto& row) { fc::raw::pack(ds, make_history_serial_wrapper(db, row)); };
-   auto pack_contract_row = [&](auto& ds, auto& row) {
-      fc::raw::pack(ds, make_history_context_wrapper(db, get_table_id(row.t_id._id), row));
-   };
 
    auto process_table = [&](auto& ds, auto* name, auto& index, auto& pack_row) {
 
@@ -139,13 +118,12 @@ void pack_deltas(boost::iostreams::filtering_ostreambuf& obuf, const chainbase::
    int num_tables = std::apply(
        [&has_table](auto... args) { return (has_table(args) + ... ); },
        std::tuple<chain::account_index*, chain::account_metadata_index*, chain::code_index*,
-                  chain::table_id_multi_index*, chain::key_value_index*, chain::index64_index*, chain::index128_index*,
-                  chain::index256_index*, chain::index_double_index*, chain::index_long_double_index*,
                   chain::global_property_multi_index*,
                   chain::protocol_state_multi_index*, chain::permission_index*, chain::permission_link_index*,
                   chain::resource_limits::resource_index*,
                   chain::resource_limits::resource_limits_state_index*,
-                  chain::resource_limits::resource_limits_config_index*>());
+                  chain::resource_limits::resource_limits_config_index*,
+                  chain::kv_index*, chain::kv_index_index*>());
 
    fc::raw::pack(ds, fc::unsigned_int(num_tables));
 
@@ -153,13 +131,10 @@ void pack_deltas(boost::iostreams::filtering_ostreambuf& obuf, const chainbase::
    process_table(ds, "account_metadata", db.get_index<chain::account_metadata_index>(), pack_row);
    process_table(ds, "code", db.get_index<chain::code_index>(), pack_row);
 
-   process_table(ds, "contract_table", db.get_index<chain::table_id_multi_index>(), pack_row);
-   process_table(ds, "contract_row", db.get_index<chain::key_value_index>(), pack_contract_row);
-   process_table(ds, "contract_index64", db.get_index<chain::index64_index>(), pack_contract_row);
-   process_table(ds, "contract_index128", db.get_index<chain::index128_index>(), pack_contract_row);
-   process_table(ds, "contract_index256", db.get_index<chain::index256_index>(), pack_contract_row);
-   process_table(ds, "contract_index_double", db.get_index<chain::index_double_index>(), pack_contract_row);
-   process_table(ds, "contract_index_long_double", db.get_index<chain::index_long_double_index>(), pack_contract_row);
+   // All KV rows are emitted as "contract_row_kv" with table_id.
+   // Clients resolve table_id → table name via contract ABI.
+   process_table(ds, "contract_row_kv", db.get_index<chain::kv_index>(), pack_row);
+   process_table(ds, "contract_index_kv", db.get_index<chain::kv_index_index>(), pack_row);
 
    process_table(ds, "global_property", db.get_index<chain::global_property_multi_index>(), pack_row);
    process_table(ds, "protocol_state", db.get_index<chain::protocol_state_multi_index>(), pack_row);

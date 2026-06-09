@@ -61,15 +61,7 @@ namespace fc { namespace crypto {
 
          signature sign(const sha256& digest) const;
 
-         template< typename KeyType = ecc::private_key_shim >
-         static private_key generate() {
-            return private_key(storage_type(KeyType::generate()));
-         }
-
-         template< typename KeyType = r1::private_key_shim >
-         static private_key generate_r1() {
-            return private_key(storage_type(KeyType::generate()));
-         }
+         static private_key generate(key_type t = key_type::k1);
 
          template< typename KeyType = ecc::private_key_shim >
          static private_key regenerate( const typename KeyType::data_type& data ) {

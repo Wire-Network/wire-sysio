@@ -1,0 +1,11 @@
+[package]
+name = "hello-world-proto-test"
+version = "0.1.0"
+edition = "2021"
+
+[features]
+default = []
+borsh = ["dep:borsh"]
+
+[dependencies]
+borsh = { version = "1", optional = true }

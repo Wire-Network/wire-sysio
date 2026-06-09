@@ -1,0 +1,397 @@
+syntax = "proto3";
+
+package sysio.opp.types;
+
+option cc_enable_arenas = true;
+
+// ---------------------------------------------------------------------------
+//  Chain identifier — VM family enum (post data-model refactor)
+//
+//  Per-chain INSTANCES (e.g. ETHEREUM-MAINNET vs POLYGON vs ARBITRUM) are
+//  distinguished by `Chain.code` (slug_name / uint64) + `Chain.external_chain_id`.
+//  This enum identifies only the VM family.
+// ---------------------------------------------------------------------------
+
+enum ChainKind  {
+  CHAIN_KIND_UNKNOWN = 0;
+  CHAIN_KIND_WIRE    = 1;   // The WIRE depot itself (singleton; Chain.code = "WIRE")
+  CHAIN_KIND_EVM     = 2;   // All EVM-compatible chains (Ethereum, Polygon, BSC, Arbitrum, Optimism, Base, …)
+  CHAIN_KIND_SVM     = 3;   // Solana Virtual Machine chains (Solana mainnet, Eclipse, …)
+
+  // Slots 4+ reserved. Slot 4 was previously CHAIN_KIND_SUI; do not reuse.
+}
+
+// Chain instance identifier — used by `Envelope.Endpoints` to identify
+// source / destination chains by `(ChainKind, external_chain_id)`. The
+// first-class registry row is `Chain` (defined below); `ChainId` is the
+// compact projection carried on the OPP wire for envelope endpoints.
+message ChainId {
+  ChainKind kind = 1;
+  uint32    id   = 2;
+}
+
+enum ChainKeyType {
+  CHAIN_KEY_TYPE_UNKNOWN  = 0;
+  CHAIN_KEY_TYPE_WIRE     = 1;
+  CHAIN_KEY_TYPE_WIRE_BLS = 2;
+  CHAIN_KEY_TYPE_ETHEREUM = 3;
+  CHAIN_KEY_TYPE_SOLANA   = 4;
+  CHAIN_KEY_TYPE_SUI      = 5;
+}
+
+// Wire public_key variant type. Identifies which `sysio::public_key` alternative the `WireKey.key`
+// raw bytes decode to. The bytes carry NO leading variant-index byte -- this enum is the type
+// discriminant instead. Values are (variant index + 1), leaving 0 for UNKNOWN per the proto3
+// convention used throughout this file. Distinct from `ChainKeyType`, which is keyed on chain family
+// (WIRE/ETHEREUM/SOLANA/...) and cannot express R1 or WebAuthn.
+enum WireKeyType {
+  WIRE_KEY_TYPE_UNKNOWN = 0;
+  WIRE_KEY_TYPE_K1      = 1;   // secp256k1            (sysio::public_key variant index 0)
+  WIRE_KEY_TYPE_R1      = 2;   // secp256r1 / P-256    (1)
+  WIRE_KEY_TYPE_WA      = 3;   // WebAuthn             (2)
+  WIRE_KEY_TYPE_EM      = 4;   // Ethereum secp256k1   (3)
+  WIRE_KEY_TYPE_ED      = 5;   // ed25519              (4)
+  WIRE_KEY_TYPE_BLS     = 6;   // BLS12-381            (5)
+}
+
+// A typed Wire public key. `key` is the bare serialized key bytes (NO leading variant-index byte);
+// `key_type` names the `sysio::public_key` variant they decode to. Kept as its own message rather
+// than a field on the shared `ChainAddress` so that adding it does not change the abi layout of the
+// many contract tables that already store a `ChainAddress` -- a new, usually-default field there is
+// omitted by proto3 on the wire but expected by the regenerated abi, which breaks table decodes.
+message WireKey {
+  WireKeyType key_type = 1;
+  bytes       key      = 2;
+}
+
+// Address on a specific chain.
+message ChainAddress {
+  ChainKind kind    = 1;
+  bytes     address = 2;
+}
+
+message ChainSignature {
+  ChainAddress actor     = 1;
+  ChainKeyType key_type  = 2;
+  bytes        signature = 3;
+}
+
+message WireAccount {
+  string name = 1;
+}
+
+message WirePermission {
+  WireAccount account    = 1;
+  string      permission = 2;   // e.g. "active", "owner"
+}
+
+enum UnderwriteRequestStatus {
+  UNDERWRITE_REQUEST_STATUS_PENDING   = 0;
+  UNDERWRITE_REQUEST_STATUS_CONFIRMED = 1;
+  UNDERWRITE_REQUEST_STATUS_REJECTED  = 2;
+  UNDERWRITE_REQUEST_STATUS_COMPLETED = 3;
+  UNDERWRITE_REQUEST_STATUS_EXPIRED   = 4;
+}
+
+// ---------------------------------------------------------------------------
+//  Token standards
+//
+//  Per-token identity (ETH, USDC, POLY, LIQETH, …) is data, NOT enum values.
+//  This enum carries only the TOKEN STANDARD; individual tokens get a
+//  `Token` registry row keyed by `Token.code` (slug_name / uint64).
+// ---------------------------------------------------------------------------
+
+enum TokenKind {
+  TOKEN_KIND_UNKNOWN  = 0;
+  TOKEN_KIND_NATIVE   = 1;   // chain-native asset (ETH on EVM, SOL on SVM, WIRE on WIRE)
+  TOKEN_KIND_ERC20    = 2;
+  TOKEN_KIND_ERC721   = 3;
+  TOKEN_KIND_ERC1155  = 4;
+  TOKEN_KIND_SPL      = 5;
+  TOKEN_KIND_SPL_NFT  = 6;
+  TOKEN_KIND_LIQ      = 7;   // liquid-staking receipt (liqEth / liqSol / future liqX)
+
+  // Pre-refactor slots — DO NOT REUSE:
+  //   256 was TOKEN_KIND_ETH
+  //   257 was TOKEN_KIND_ERC20 (re-issued at slot 2)
+  //   258 was TOKEN_KIND_ERC721 (re-issued at slot 3)
+  //   259 was TOKEN_KIND_ERC1155 (re-issued at slot 4)
+  //   496 was TOKEN_KIND_LIQETH
+  //   512 was TOKEN_KIND_SOL
+  //   752 was TOKEN_KIND_LIQSOL
+  // Tokens are now data — register via sysio.tokens::regtoken.
+}
+
+// Token amount in code-keyed form. `token_code` is a packed
+// `sysio::slug_name` / `fc::slug_name` value (alphabet [A-Z0-9_]+, ≤8 chars).
+message TokenAmount {
+  uint64 token_code = 1;
+  int64  amount     = 2;
+}
+
+// ---------------------------------------------------------------------------
+//  Reserve lifecycle
+// ---------------------------------------------------------------------------
+
+enum ReserveStatus {
+  RESERVE_STATUS_UNKNOWN   = 0;
+  RESERVE_STATUS_PENDING   = 1;   // created on outpost; awaiting depot-side match
+  RESERVE_STATUS_ACTIVE    = 2;   // matched / bootstrap-seeded; usable for swaps
+  RESERVE_STATUS_CANCELLED = 3;   // creator cancelled before match landed
+}
+
+// ---------------------------------------------------------------------------
+//  Registry entities (Chain / Token / ChainToken / Reserve / ReserveTarget)
+//
+//  These are the proto carriers for the depot's registry tables on the new
+//  contracts `sysio.chains` and `sysio.tokens` (+ existing `sysio.reserv`).
+//  Wire format: `code` fields are uint64 (packed slug_name); see slug_name.hpp
+//  on the contract side and fc/slug_name.hpp on the host side.
+// ---------------------------------------------------------------------------
+
+message Chain {
+  ChainKind kind                = 1;
+  uint64    code                = 2;   // PRIMARY KEY — slug_name
+  uint32    external_chain_id   = 3;   // e.g. 1 (ETH mainnet), 137 (Polygon), 0 (WIRE / SOL mainnet)
+  string    name                = 4;
+  string    description         = 5;
+  bool      is_depot            = 6;   // exactly one row has true (code = "WIRE")
+  bool      active              = 7;
+  uint64    registered_at_ms    = 8;
+  uint64    activated_at_ms     = 9;
+}
+
+message Token {
+  TokenKind    kind              = 1;
+  uint64       code              = 2;   // PRIMARY KEY — slug_name
+  string       symbol_name       = 3;   // "Ethereum" / "USD Coin" / "Liquid ETH"
+  string       description       = 4;
+  uint32       precision         = 5;   // default 9
+  ChainAddress address           = 6;   // canonical chain-of-origin address for non-native tokens; empty for NATIVE
+  bool         active            = 7;
+  uint64       registered_at_ms  = 8;
+  uint64       activated_at_ms   = 9;
+}
+
+message ChainToken {
+  uint64 chain_code            = 1;
+  uint64 token_code            = 2;
+  bytes  contract_addr         = 3;   // chain-specific encoding; empty for native
+  // (field 4 retired — `precision_override` was removed; precision conversion
+  //  is purely an outpost-internal concern, not depot-tracked state.)
+  reserved 4;
+  reserved "precision_override";
+  bool   is_native             = 5;   // exactly one per Chain
+  bool   active                = 6;
+  uint64 registered_at_ms      = 7;
+  uint64 activated_at_ms       = 8;
+}
+
+message Reserve {
+  uint64        chain_code              = 1;
+  uint64        token_code              = 2;
+  uint64        code                    = 3;
+  string        name                    = 4;
+  string        description             = 5;
+  ReserveStatus status                  = 6;
+  uint64        reserve_chain_amount    = 7;
+  uint64        reserve_wire_amount     = 8;
+  uint32        connector_weight_bps    = 9;   // Bancor weight (5000 = 50%, pure constant product)
+  ChainAddress  creator_addr            = 10;
+  uint64        requested_wire_amount   = 11;
+  uint64        external_token_amount   = 12;
+  uint64        registered_at_ms        = 13;
+  uint64        activated_at_ms         = 14;
+  uint64        cancelled_at_ms         = 15;
+}
+
+// Slash / reward routing target. Identifies (chain, reserve_code, amount)
+// so the outpost can find the matching reserve unambiguously even when
+// multiple reserves exist for the same (chain, token) pair.
+message ReserveTarget {
+  uint64      chain_code   = 1;
+  uint64      reserve_code = 2;
+  TokenAmount amount       = 3;
+}
+
+// ---------------------------------------------------------------------------
+//  Encoding flags
+// ---------------------------------------------------------------------------
+
+enum Endianness {
+  ENDIANNESS_BIG    = 0;
+  ENDIANNESS_LITTLE = 1;
+}
+
+enum HashAlgorithm {
+  HASH_ALGORITHM_KECCAK256  = 0;
+  HASH_ALGORITHM_SHA256     = 1;
+  HASH_ALGORITHM_RESERVED_1 = 2;
+  HASH_ALGORITHM_RESERVED_2 = 3;
+}
+
+enum LengthEncoding {
+  LENGTH_ENCODING_VARUINT = 0;
+  LENGTH_ENCODING_UINT32  = 1;
+}
+
+message EncodingFlags {
+  Endianness     endianness      = 1;
+  HashAlgorithm  hash_algorithm  = 2;
+  LengthEncoding length_encoding = 3;
+}
+
+// ---------------------------------------------------------------------------
+//  Attestation discriminant
+// ---------------------------------------------------------------------------
+
+enum AttestationType {
+  ATTESTATION_TYPE_UNSPECIFIED = 0;
+  ATTESTATION_TYPE_OPERATOR_ACTION = 2001; // 0x07D1
+  ATTESTATION_TYPE_STAKE = 3001;
+  ATTESTATION_TYPE_UNSTAKE = 3002;
+  // DEPRECATED — pre-launch only, do not use in new code.
+  ATTESTATION_TYPE_PRETOKEN_PURCHASE = 3004;
+  // DEPRECATED — pre-launch only, do not use in new code.
+  ATTESTATION_TYPE_PRETOKEN_YIELD = 3006;
+  ATTESTATION_TYPE_RESERVE_BALANCE_SHEET = 43520; // 0xAA00
+  ATTESTATION_TYPE_STAKE_UPDATE = 60928; // 0xEE00
+  // 60929 (0xEE01) was ATTESTATION_TYPE_NATIVE_YIELD_REWARD — removed; do not reuse.
+  // DEPRECATED — pre-launch only, do not use in new code.
+  ATTESTATION_TYPE_WIRE_TOKEN_PURCHASE = 60930;
+  ATTESTATION_TYPE_CHALLENGE_RESPONSE = 60932;
+  // 60933 was standalone SLASH_OPERATOR — removed; SLASH is now an OperatorAction sub-type.
+  ATTESTATION_TYPE_SWAP_REQUEST = 60934;
+  // 60935 was ATTESTATION_TYPE_UNDERWRITE_INTENT — removed; do not reuse.
+  // 60936 was ATTESTATION_TYPE_UNDERWRITE_CONFIRM — removed; do not reuse.
+  // 60937 was ATTESTATION_TYPE_UNDERWRITE_REJECT — removed; do not reuse.
+  // 60938 was ATTESTATION_TYPE_UNDERWRITE_UNLOCK — removed; do not reuse.
+  ATTESTATION_TYPE_SWAP_REMIT = 60944;
+  ATTESTATION_TYPE_CHALLENGE_REQUEST = 60945;
+  // 60946 was ATTESTATION_TYPE_EPOCH_SYNC — removed; do not reuse.
+  ATTESTATION_TYPE_OPERATORS = 60947;
+  // 60948 was ATTESTATION_TYPE_REMIT_CONFIRM — removed; do not reuse.
+  ATTESTATION_TYPE_BATCH_OPERATOR_GROUPS = 60943;
+  ATTESTATION_TYPE_NODE_OWNER_REG = 60949;
+  ATTESTATION_TYPE_STAKING_REWARD = 60950;
+  ATTESTATION_TYPE_STAKE_RESULT = 60951;
+  ATTESTATION_TYPE_ATTESTATION_PROCESSING_ERROR = 60952;
+
+  ATTESTATION_TYPE_UNDERWRITE_INTENT_COMMIT = 60953;
+  // 60954 was ATTESTATION_TYPE_UNDERWRITE_INTENT_REJECT — removed; do not reuse.
+  ATTESTATION_TYPE_SWAP_REVERT    = 60955;
+  ATTESTATION_TYPE_DEPOSIT_REVERT = 60956;
+  ATTESTATION_TYPE_SWAP_REJECTED  = 60957;
+
+  // ---------------------------------------------------------------------------
+  //  Reserve-flow attestations (v6 data-model refactor, 2026-05-19)
+  //  Outpost-initiated reserve creation with depot-side matching handshake.
+  // ---------------------------------------------------------------------------
+  ATTESTATION_TYPE_RESERVE_CREATE           = 60958; // 0xEE1E  outpost → depot
+  ATTESTATION_TYPE_RESERVE_CREATE_CANCEL    = 60959; // 0xEE1F  outpost → depot
+  ATTESTATION_TYPE_RESERVE_CREATE_CANCELLED = 60960; // 0xEE20  depot   → outpost
+  ATTESTATION_TYPE_RESERVE_READY            = 60961; // 0xEE21  depot   → outpost
+  ATTESTATION_TYPE_EMISSIONS_BLOCKED        = 60962; // 0xEE22
+}
+
+// Reason codes for ATTESTATION_TYPE_EMISSIONS_BLOCKED. Emitted by
+// sysio.epoch::advance when its emissions readiness gate cannot pay
+// the next epoch.
+enum EmissionsBlockReason {
+  EMISSIONS_BLOCK_REASON_UNSPECIFIED          = 0;
+  EMISSIONS_BLOCK_REASON_CONFIG_MISSING       = 1; // sysio.system::setemitcfg not called
+  EMISSIONS_BLOCK_REASON_STATE_UNINITIALIZED  = 2; // sysio.system::initt5 not called
+  EMISSIONS_BLOCK_REASON_TREASURY_EXHAUSTED   = 3; // t5_distributable - t5_floor - total_distributed <= 0
+  EMISSIONS_BLOCK_REASON_BALANCE_INSUFFICIENT = 4; // sysio's WIRE balance < computed emission
+}
+
+// ---------------------------------------------------------------------------
+//  Staker / Operator lifecycle
+// ---------------------------------------------------------------------------
+
+enum StakeStatus {
+  STAKE_STATUS_UNKNOWN    = 0;
+  STAKE_STATUS_WARMUP     = 1;
+  STAKE_STATUS_COOLDOWN   = 2;
+  STAKE_STATUS_ACTIVE     = 3;
+  STAKE_STATUS_TERMINATED = 240;
+  STAKE_STATUS_SLASHED    = 241;
+}
+
+enum OperatorType {
+  OPERATOR_TYPE_UNKNOWN     = 0;
+  OPERATOR_TYPE_PRODUCER    = 1;
+  OPERATOR_TYPE_BATCH       = 2;
+  OPERATOR_TYPE_UNDERWRITER = 3;
+  OPERATOR_TYPE_CHALLENGER  = 4;
+}
+
+enum OperatorStatus {
+  OPERATOR_STATUS_UNKNOWN    = 0;
+  OPERATOR_STATUS_WARMUP     = 1;
+  OPERATOR_STATUS_COOLDOWN   = 2;
+  OPERATOR_STATUS_ACTIVE     = 3;
+  OPERATOR_STATUS_TERMINATED = 240;
+  OPERATOR_STATUS_SLASHED    = 241;
+}
+
+// ---------------------------------------------------------------------------
+//  Depot contract state enums
+// ---------------------------------------------------------------------------
+
+enum ChainRequestStatus {
+  CHAIN_REQUEST_STATUS_PENDING        = 0;
+  CHAIN_REQUEST_STATUS_COLLECTING     = 1;
+  CHAIN_REQUEST_STATUS_CONSENSUS_OK   = 2;
+  CHAIN_REQUEST_STATUS_CONSENSUS_FAIL = 3;
+  CHAIN_REQUEST_STATUS_CHALLENGED     = 4;
+}
+
+enum MessageDirection {
+  MESSAGE_DIRECTION_INBOUND  = 0;
+  MESSAGE_DIRECTION_OUTBOUND = 1;
+}
+
+enum MessageStatus {
+  MESSAGE_STATUS_PENDING   = 0;
+  MESSAGE_STATUS_READY     = 1;
+  MESSAGE_STATUS_PROCESSED = 2;
+  MESSAGE_STATUS_CANCELLED = 3;
+}
+
+enum EnvelopeStatus {
+  ENVELOPE_STATUS_PENDING_DELIVERY = 0;
+  ENVELOPE_STATUS_DELIVERED        = 1;
+  ENVELOPE_STATUS_CONFIRMED        = 2;
+}
+
+enum AttestationStatus {
+  ATTESTATION_STATUS_PENDING   = 0;
+  ATTESTATION_STATUS_READY     = 1;
+  ATTESTATION_STATUS_PROCESSED = 2;
+}
+
+enum UnderwriteStatus {
+  UNDERWRITE_STATUS_INTENT_CREATED   = 0;
+  UNDERWRITE_STATUS_INTENT_SUBMITTED = 1;
+  UNDERWRITE_STATUS_INTENT_CONFIRMED = 2;
+  UNDERWRITE_STATUS_READY            = 3;
+  UNDERWRITE_STATUS_RELEASED         = 5;
+  UNDERWRITE_STATUS_SLASHED          = 10;
+}
+
+enum ChallengeStatus {
+  CHALLENGE_STATUS_CHALLENGE_SENT    = 0;
+  CHALLENGE_STATUS_RESPONSE_RECEIVED = 1;
+  CHALLENGE_STATUS_RESOLVED          = 2;
+  CHALLENGE_STATUS_ESCALATED         = 3;
+}
+
+// Node-owner registration tier (sysio.roa::nodeownreg). Mirrors the MockWireNodes NodeInfo tier and
+// the on-chain `check(tier >= 1 && tier <= 3)` range -- T1/T2/T3 are the only valid registration tiers.
+enum NodeOwnerTier {
+  NODE_OWNER_TIER_UNKNOWN = 0;
+  NODE_OWNER_TIER_T1      = 1;
+  NODE_OWNER_TIER_T2      = 2;
+  NODE_OWNER_TIER_T3      = 3;
+}

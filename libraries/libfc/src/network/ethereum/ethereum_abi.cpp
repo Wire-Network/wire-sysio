@@ -784,7 +784,9 @@ std::string abi::to_event_signature(const contract& contract) {
 fc::crypto::keccak256 abi::to_event_topic(const contract& contract) {
    FC_ASSERT(contract.type == invoke_target_type::event, "ABI contract must be an event");
    auto signature = abi::to_event_signature(contract);
-   return fc::crypto::keccak256::hash(signature);
+   auto topic = fc::crypto::keccak256::hash(signature);
+   dlog("abi::to_event_topic: name={}, signature={}, topic=0x{}", contract.name, signature, topic.str());
+   return topic;
 }
 
 /**
@@ -807,7 +809,15 @@ std::vector<abi::contract> abi::parse_contracts(const std::filesystem::path& jso
       json_var.is_object() && json_var.get_object().contains("abi") && json_var.get_object()["abi"].is_array(),
       "ABI file must contain either an array of contracts or an object with a member (\"abi\") with an array value");
    auto& json_obj = json_var.get_object();
-   return json_obj["abi"].as<std::vector<abi::contract>>();
+   auto contracts = json_obj["abi"].as<std::vector<abi::contract>>();
+
+   // Propagate file-level address to each contract entry if present
+   if (json_obj.contains("address") && json_obj["address"].is_string()) {
+      auto addr = json_obj["address"].as_string();
+      for (auto& c : contracts) c.contract_address = addr;
+   }
+
+   return contracts;
 }
 
 /**
@@ -1001,7 +1011,13 @@ void fc::from_variant(const fc::variant& var, fc::network::ethereum::abi::compon
              data_type_str);
 
    auto base_type_str = data_type_match[1].str();
-   vo.name = obj["name"].as_string();
+   // ABI components on anonymous parameters (e.g. event params declared
+   // without an identifier, return values without a name, struct fields
+   // whose intermediate codec strips the name) emit `{"type": "...", ...}`
+   // with no `name` field. Leave `vo.name` at its default empty string
+   // rather than throwing `key_not_found_exception` — the unnamed slot
+   // is still structurally valid and the rest of the entry parses.
+   if (obj.contains("name")) vo.name = obj["name"].as_string();
    vo.type = fc::reflector<data_type>::from_string(base_type_str);
    bool is_list = data_type_match[2].str().starts_with("[");
    if (is_list) {
@@ -1048,15 +1064,16 @@ void fc::from_variant(const fc::variant& var, fc::network::ethereum::abi::contra
 
    FC_ASSERT(var.is_object(), "Variant must be an object to deserialize ABI contract");
    auto& obj = var.get_object();
-   vo.name = obj["name"].as_string();
+   // Solidity's `receive()` and `fallback()` ABI entries omit the
+   // `name` field entirely — they're matched by `"type"` alone. Read
+   // defensively so the contract parser doesn't throw
+   // `key_not_found_exception` on those entries.
+   if (obj.contains("name")) vo.name = obj["name"].as_string();
    auto type_str = obj["type"].as_string();
    vo.type = fc::reflector<fc::network::ethereum::abi::invoke_target_type>::from_string(type_str.c_str());
 
    auto parse_components = [&](std::vector<component_type>& vo_list, const std::string& list_name) {
-      auto list_prop_exists = obj.contains(list_name.c_str());
-      if (!list_prop_exists || !obj[list_name].is_array()) {
-         dlog("ABI property is not set or not array (name={},exists={},is_array={})", list_name, list_prop_exists,
-              obj[list_name].is_array(), "ABI contract inputs must be an array");
+      if (!obj.contains(list_name.c_str()) || !obj[list_name].is_array()) {
          return;
       }
 

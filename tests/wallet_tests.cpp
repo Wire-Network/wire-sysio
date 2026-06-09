@@ -214,7 +214,7 @@ BOOST_AUTO_TEST_CASE(wallet_manager_test)
    wm.lock("testgen");
    std::filesystem::remove("testgen.wallet");
 
-   const string test_key_create_types[] = {"K1", "R1", "k1", ""};
+   const string test_key_create_types[] = {"K1", "R1", "EM", "ED", "k1", ""};
    for(const string& key_type_to_create : test_key_create_types) {
       string pw = wm.create("testgen");
 

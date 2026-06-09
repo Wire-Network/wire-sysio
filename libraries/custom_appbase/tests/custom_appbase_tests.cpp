@@ -567,11 +567,34 @@ BOOST_AUTO_TEST_CASE( execute_from_read_only_and_read_exclusive_queues ) {
 
 // verify tasks from both queues (read_only, read_exclusive) are processed in read window
 BOOST_AUTO_TEST_CASE( execute_many_from_read_only_and_read_exclusive_queues ) {
-   scoped_app_thread app;
+   // Delay exec() so the read window is established before the main thread enters its exec() loop.
+   //
+   // priority_queue_executor::exec_window_ is plain, non-atomic data, and the executor relies on it being
+   // owned by the main exec thread: it is read only in execute_highest() (driven by application_base::exec()
+   // on the main thread) and never read by execute_highest_read() (the read-thread pool path). In production
+   // it is also written only on the main thread -- producer_plugin posts switch_to_read_window() to the
+   // read_write queue, and posts switch_to_write_window() to read_only only after every read task has
+   // returned, so the main thread is the sole io_context poller that runs it. The read window's lock-free
+   // write phase is therefore safe because the read pool is provably idle whenever the main thread takes it.
+   //
+   // This test instead flips the window from a third thread. With immediate exec() the constructor releases
+   // the start_exec future before set_to_read_window() runs, so there is no happens-before edge between the
+   // flip here and the main thread's reads of exec_window_. The main thread can keep observing the stale
+   // write window and run the lock-free execute_highest() path on the read_only heap while a read thread
+   // pops that same heap under the lock, corrupting the priority queue (observed as a SEGV in
+   // binomial_heap::pop() under ASan). Establishing the window before start_exec() makes the start_exec
+   // promise/future the publishing edge and leaves exec_window_ unmodified for the rest of the run, so the
+   // main thread sees a stable read window -- matching production and the execute_from_read_only_and_
+   // read_exclusive_queues sibling test.
+   scoped_app_thread app(true);
 
    // set to run functions from read_only & read_exclusive queues only
    app->executor().init_read_threads(3);
    app->executor().set_to_read_window([](){return false;});
+
+   // enter exec() now that the read window (and its locking) is published to the main thread, before any
+   // read threads start and before any tasks are posted
+   app.start_exec();
 
    // post functions
    constexpr int num_expected = 600;

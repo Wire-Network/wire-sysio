@@ -222,8 +222,14 @@ try:
 
     Print("Set new producers b,h,m,r")
     assert cluster.setProds(["defproducerb", "defproducerh", "defproducerm", "defproducerr"]), "setprods failed"
-    setProdsBlockNum = cluster.biosNode.getBlockNum()
-    assert cluster.biosNode.waitForBlock(setProdsBlockNum+12+12+1), "Block of new producers not reached"
+
+    Print("Wait for new producer schedule to become active")
+    expected_new_prods = {"defproducerb", "defproducerh", "defproducerm", "defproducerr"}
+    def newScheduleActive():
+        prods = cluster.nodes[0].getProducerSchedule()
+        return set(prods) == expected_new_prods
+    assert Utils.waitForBool(newScheduleActive, timeout=60), \
+        "Timed out waiting for new producer schedule to become active"
 
     Print("Verify new gossip connections")
     scheduled_producers = cluster.nodes[0].getProducerSchedule()

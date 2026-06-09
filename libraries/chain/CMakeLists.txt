@@ -58,11 +58,11 @@ set(CHAIN_WEBASSEMBLY_SOURCES
    webassembly/authorization.cpp
    webassembly/cf_system.cpp
    webassembly/cf_transaction.cpp
-   webassembly/compiler_builtins.cpp
    webassembly/context_free.cpp
    webassembly/console.cpp
    webassembly/crypto.cpp
    webassembly/database.cpp
+   webassembly/kv_database.cpp
    webassembly/memory.cpp
    webassembly/permission.cpp
    webassembly/privileged.cpp
@@ -91,9 +91,11 @@ add_library( sysio_chain
              resource_limits.cpp
              block_log.cpp
              block_root_processor.cpp
+             s_root_extension.cpp
              contract_action_match.cpp
              root_txn_identification.cpp
              transaction_context.cpp
+             transaction_dedup.cpp
              sysio_contract.cpp
              sysio_contract_abi.cpp
              sysio_contract_abi_bin.cpp
@@ -150,7 +152,6 @@ target_link_libraries(
   WAST
   WASM
   softfloat::softfloat
-  builtins
   ${CHAIN_SYSVM_LIBRARIES}
   ${CHAIN_NATIVE_MODULE_LIBRARIES}
   ${LLVM_LIBS}

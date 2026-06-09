@@ -1,9 +1,10 @@
 #pragma once
 
 #include <sysio/contract.hpp>
-#include <sysio/multi_index.hpp>
+#include <sysio/kv_table.hpp>
+#include <sysio/kv_global.hpp>
 #include <sysio/name.hpp>
-#include <sysio/singleton.hpp>
+#include <sysio/system.hpp>
 #include <sysio/time.hpp>
 
 namespace sysiosystem {
@@ -16,13 +17,17 @@ enum trx_match_type : uint8_t {
    first = 1,   // trx first action matches
    any = 2      // trx has any action that matches
 };
+
+struct trxprio_key {
+   uint64_t priority;
+   SYSLIB_SERIALIZE(trxprio_key, (priority))
+};
+
 struct [[sysio::table("trxpriority"), sysio::contract("sysio.system")]] trx_prio {
    short priority = 0;
    name receiver{};
    name action_name{};
    trx_match_type match_type = only;
-
-   uint64_t primary_key() const { return priority; } // order doesn't matter just used for uniqueness
 
    SYSLIB_SERIALIZE(trx_prio, (priority)(receiver)(action_name)(match_type))
 };
@@ -35,8 +40,8 @@ struct [[sysio::table("trxpglobal"), sysio::contract("sysio.system")]] trx_prio_
 };
 
 // -------------------------------------------------------------------------------------------------
-using trx_priority_table = sysio::multi_index<"trxpriority"_n, trx_prio>;
-using global_trx_prio_singleton = sysio::singleton< "trxpglobal"_n, trx_prio_global >;
+using trx_priority_table = sysio::kv::table<"trxpriority"_n, trxprio_key, trx_prio>;
+using global_trx_prio_singleton = sysio::kv::global< "trxpglobal"_n, trx_prio_global >;
 
 // -------------------------------------------------------------------------------------------------
 struct [[sysio::contract("sysio.system")]] trx_priority : public sysio::contract {
@@ -46,8 +51,16 @@ private:
 
 public:
 
-   trx_priority(name s, name code, sysio::datastream<const char*> ds);
-   ~trx_priority();
+   trx_priority(name s, name code, sysio::datastream<const char*> ds)
+      : sysio::contract(s, code, ds),
+        _global(get_self())
+   {
+      _gstate = _global.get_or_default(trx_prio_global{});
+   }
+
+   ~trx_priority() {
+      _global.set(_gstate, get_self());
+   }
 
    /**
     * Action to register a transaction priority.

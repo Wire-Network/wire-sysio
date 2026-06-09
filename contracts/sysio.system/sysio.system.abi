@@ -3,6 +3,10 @@
     "version": "sysio::abi/1.2",
     "types": [
         {
+            "new_type_name": "B_vector_name_E",
+            "type": "name[]"
+        },
+        {
             "new_type_name": "block_signing_authority",
             "type": "variant_block_signing_authority_v0"
         },
@@ -31,6 +35,34 @@
             ]
         },
         {
+            "name": "abihash_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "accrueepoch",
+            "base": "",
+            "fields": [
+                {
+                    "name": "epoch_index",
+                    "type": "uint32"
+                },
+                {
+                    "name": "batch_group_index",
+                    "type": "uint8"
+                },
+                {
+                    "name": "per_epoch_emission",
+                    "type": "int64"
+                }
+            ]
+        },
+        {
             "name": "actfinkey",
             "base": "",
             "fields": [
@@ -55,6 +87,20 @@
             ]
         },
         {
+            "name": "addnodeowner",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account_name",
+                    "type": "name"
+                },
+                {
+                    "name": "tier",
+                    "type": "uint8"
+                }
+            ]
+        },
+        {
             "name": "authority",
             "base": "",
             "fields": [
@@ -69,10 +115,6 @@
                 {
                     "name": "accounts",
                     "type": "permission_level_weight[]"
-                },
-                {
-                    "name": "waits",
-                    "type": "wait_weight[]"
                 }
             ]
         },
@@ -181,10 +223,6 @@
                     "type": "uint32"
                 },
                 {
-                    "name": "deferred_trx_expiration_window",
-                    "type": "uint32"
-                },
-                {
                     "name": "max_transaction_delay",
                     "type": "uint32"
                 },
@@ -199,6 +237,32 @@
                 {
                     "name": "max_authority_depth",
                     "type": "uint16"
+                },
+                {
+                    "name": "max_action_return_value_size",
+                    "type": "uint32"
+                },
+                {
+                    "name": "max_kv_key_size",
+                    "type": "uint32"
+                },
+                {
+                    "name": "max_kv_value_size",
+                    "type": "uint32"
+                },
+                {
+                    "name": "max_kv_secondary_key_size",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "claimnodedis",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account_name",
+                    "type": "name"
                 }
             ]
         },
@@ -241,6 +305,188 @@
                 {
                     "name": "account",
                     "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "emission_config",
+            "base": "",
+            "fields": [
+                {
+                    "name": "t1_allocation",
+                    "type": "int64"
+                },
+                {
+                    "name": "t2_allocation",
+                    "type": "int64"
+                },
+                {
+                    "name": "t3_allocation",
+                    "type": "int64"
+                },
+                {
+                    "name": "t1_duration",
+                    "type": "uint32"
+                },
+                {
+                    "name": "t2_duration",
+                    "type": "uint32"
+                },
+                {
+                    "name": "t3_duration",
+                    "type": "uint32"
+                },
+                {
+                    "name": "min_claimable",
+                    "type": "int64"
+                },
+                {
+                    "name": "t5_distributable",
+                    "type": "int64"
+                },
+                {
+                    "name": "t5_floor",
+                    "type": "int64"
+                },
+                {
+                    "name": "target_annual_decay_bps",
+                    "type": "uint16"
+                },
+                {
+                    "name": "annual_initial_emission",
+                    "type": "int64"
+                },
+                {
+                    "name": "annual_max_emission",
+                    "type": "int64"
+                },
+                {
+                    "name": "annual_min_emission",
+                    "type": "int64"
+                },
+                {
+                    "name": "compute_bps",
+                    "type": "uint16"
+                },
+                {
+                    "name": "capex_bps",
+                    "type": "uint16"
+                },
+                {
+                    "name": "governance_bps",
+                    "type": "uint16"
+                },
+                {
+                    "name": "producer_bps",
+                    "type": "uint16"
+                },
+                {
+                    "name": "batch_op_bps",
+                    "type": "uint16"
+                },
+                {
+                    "name": "standby_end_rank",
+                    "type": "uint32"
+                },
+                {
+                    "name": "epoch_log_retention_count",
+                    "type": "uint32"
+                },
+                {
+                    "name": "pay_cadence_epochs",
+                    "type": "uint16"
+                }
+            ]
+        },
+        {
+            "name": "emission_state",
+            "base": "",
+            "fields": [
+                {
+                    "name": "node_rewards_start",
+                    "type": "time_point_sec"
+                }
+            ]
+        },
+        {
+            "name": "epoch_info_result",
+            "base": "",
+            "fields": [
+                {
+                    "name": "epoch_count",
+                    "type": "uint64"
+                },
+                {
+                    "name": "last_epoch_index",
+                    "type": "uint32"
+                },
+                {
+                    "name": "last_epoch_time",
+                    "type": "time_point_sec"
+                },
+                {
+                    "name": "last_epoch_emission",
+                    "type": "int64"
+                },
+                {
+                    "name": "total_distributed",
+                    "type": "int64"
+                },
+                {
+                    "name": "treasury_remaining",
+                    "type": "int64"
+                },
+                {
+                    "name": "next_emission_est",
+                    "type": "int64"
+                },
+                {
+                    "name": "seconds_until_next",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "epoch_log",
+            "base": "",
+            "fields": [
+                {
+                    "name": "sysio_epoch_index",
+                    "type": "uint32"
+                },
+                {
+                    "name": "epoch_count",
+                    "type": "uint64"
+                },
+                {
+                    "name": "timestamp",
+                    "type": "time_point_sec"
+                },
+                {
+                    "name": "total_emission",
+                    "type": "int64"
+                },
+                {
+                    "name": "compute_amount",
+                    "type": "int64"
+                },
+                {
+                    "name": "capex_amount",
+                    "type": "int64"
+                },
+                {
+                    "name": "governance_amount",
+                    "type": "int64"
+                }
+            ]
+        },
+        {
+            "name": "epochlog_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "sysio_epoch_index",
+                    "type": "uint64"
                 }
             ]
         },
@@ -331,6 +577,36 @@
             ]
         },
         {
+            "name": "finalizer_key_t",
+            "base": "",
+            "fields": [
+                {
+                    "name": "finalizer_name",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "finkey_key_t",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "fundclaim",
+            "base": "",
+            "fields": [
+                {
+                    "name": "amount",
+                    "type": "int64"
+                }
+            ]
+        },
+        {
             "name": "getsnaphash",
             "base": "",
             "fields": [
@@ -351,6 +627,16 @@
                 {
                     "name": "core",
                     "type": "symbol"
+                }
+            ]
+        },
+        {
+            "name": "initt5",
+            "base": "",
+            "fields": [
+                {
+                    "name": "start_time",
+                    "type": "time_point_sec"
                 }
             ]
         },
@@ -445,12 +731,102 @@
             ]
         },
         {
+            "name": "node_claim_result",
+            "base": "",
+            "fields": [
+                {
+                    "name": "total_allocation",
+                    "type": "asset"
+                },
+                {
+                    "name": "claimed",
+                    "type": "asset"
+                },
+                {
+                    "name": "claimable",
+                    "type": "asset"
+                },
+                {
+                    "name": "can_claim",
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "node_count_state",
+            "base": "",
+            "fields": [
+                {
+                    "name": "t1_count",
+                    "type": "uint32"
+                },
+                {
+                    "name": "t2_count",
+                    "type": "uint32"
+                },
+                {
+                    "name": "t3_count",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "node_owner_distribution",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account_name",
+                    "type": "name"
+                },
+                {
+                    "name": "total_allocation",
+                    "type": "asset"
+                },
+                {
+                    "name": "claimed",
+                    "type": "asset"
+                },
+                {
+                    "name": "total_duration",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "nodedist_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account_name",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "onblock",
             "base": "",
             "fields": [
                 {
                     "name": "header",
                     "type": "block_header"
+                }
+            ]
+        },
+        {
+            "name": "payepoch",
+            "base": "",
+            "fields": [
+                {
+                    "name": "epoch_index",
+                    "type": "uint32"
+                },
+                {
+                    "name": "batch_op_groups",
+                    "type": "B_vector_name_E[]"
+                },
+                {
+                    "name": "period_emission",
+                    "type": "int64"
                 }
             ]
         },
@@ -535,6 +911,18 @@
                 {
                     "name": "producer_authority",
                     "type": "block_signing_authority"
+                },
+                {
+                    "name": "last_block_num",
+                    "type": "uint32"
+                },
+                {
+                    "name": "current_round_blocks",
+                    "type": "uint16"
+                },
+                {
+                    "name": "eligible_rounds",
+                    "type": "uint32"
                 }
             ]
         },
@@ -549,6 +937,16 @@
                 {
                     "name": "block_signing_key",
                     "type": "public_key"
+                }
+            ]
+        },
+        {
+            "name": "producer_key_t",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "uint64"
                 }
             ]
         },
@@ -761,6 +1159,26 @@
             ]
         },
         {
+            "name": "setemitcfg",
+            "base": "",
+            "fields": [
+                {
+                    "name": "cfg",
+                    "type": "emission_config"
+                }
+            ]
+        },
+        {
+            "name": "setinittime",
+            "base": "",
+            "fields": [
+                {
+                    "name": "no_reward_init_time",
+                    "type": "time_point_sec"
+                }
+            ]
+        },
+        {
             "name": "setparams",
             "base": "",
             "fields": [
@@ -871,12 +1289,22 @@
             ]
         },
         {
+            "name": "snap_provider_key_t",
+            "base": "",
+            "fields": [
+                {
+                    "name": "snap_account",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "snap_record",
             "base": "",
             "fields": [
                 {
                     "name": "block_num",
-                    "type": "uint64"
+                    "type": "uint32"
                 },
                 {
                     "name": "block_id",
@@ -889,6 +1317,16 @@
                 {
                     "name": "attested_at_block",
                     "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "snap_record_key_t",
+            "base": "",
+            "fields": [
+                {
+                    "name": "block_num",
+                    "type": "uint64"
                 }
             ]
         },
@@ -919,6 +1357,16 @@
             ]
         },
         {
+            "name": "snap_vote_key_t",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "sysio_global_state",
             "base": "blockchain_parameters",
             "fields": [
@@ -945,6 +1393,52 @@
                 {
                     "name": "last_producer_schedule_size",
                     "type": "uint16"
+                }
+            ]
+        },
+        {
+            "name": "t5_state",
+            "base": "",
+            "fields": [
+                {
+                    "name": "start_time",
+                    "type": "time_point_sec"
+                },
+                {
+                    "name": "epoch_count",
+                    "type": "uint64"
+                },
+                {
+                    "name": "last_epoch_index",
+                    "type": "uint32"
+                },
+                {
+                    "name": "last_epoch_time",
+                    "type": "time_point_sec"
+                },
+                {
+                    "name": "last_epoch_emission",
+                    "type": "int64"
+                },
+                {
+                    "name": "total_distributed",
+                    "type": "int64"
+                },
+                {
+                    "name": "pending_emission_amount",
+                    "type": "int64"
+                },
+                {
+                    "name": "period_start_epoch",
+                    "type": "uint32"
+                },
+                {
+                    "name": "batch_group_epochs",
+                    "type": "uint32[]"
+                },
+                {
+                    "name": "capital_shortfall_total",
+                    "type": "int64"
                 }
             ]
         },
@@ -1007,6 +1501,26 @@
             ]
         },
         {
+            "name": "viewemitcfg",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "viewepoch",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "viewnodedist",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account_name",
+                    "type": "name"
+                }
+            ]
+        },
+        {
             "name": "votesnaphash",
             "base": "",
             "fields": [
@@ -1021,20 +1535,6 @@
                 {
                     "name": "snapshot_hash",
                     "type": "checksum256"
-                }
-            ]
-        },
-        {
-            "name": "wait_weight",
-            "base": "",
-            "fields": [
-                {
-                    "name": "wait_sec",
-                    "type": "uint32"
-                },
-                {
-                    "name": "weight",
-                    "type": "uint16"
                 }
             ]
         },
@@ -1063,6 +1563,16 @@
                 {
                     "name": "block_timestamp",
                     "type": "time_point"
+                }
+            ]
+        },
+        {
+            "name": "blockinfo_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "block_height",
+                    "type": "uint64"
                 }
             ]
         },
@@ -1096,6 +1606,16 @@
                 {
                     "name": "data",
                     "type": "variant_v0_data"
+                }
+            ]
+        },
+        {
+            "name": "peerkey_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "uint64"
                 }
             ]
         },
@@ -1156,6 +1676,16 @@
                 {
                     "name": "disallow_perms",
                     "type": "name[]"
+                }
+            ]
+        },
+        {
+            "name": "limitauthchg_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "uint64"
                 }
             ]
         },
@@ -1222,9 +1752,24 @@
                     "type": "block_timestamp_type"
                 }
             ]
+        },
+        {
+            "name": "trxprio_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "priority",
+                    "type": "uint64"
+                }
+            ]
         }
     ],
     "actions": [
+        {
+            "name": "accrueepoch",
+            "type": "accrueepoch",
+            "ricardian_contract": ""
+        },
         {
             "name": "actfinkey",
             "type": "actfinkey",
@@ -1233,6 +1778,16 @@
         {
             "name": "activate",
             "type": "activate",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "addnodeowner",
+            "type": "addnodeowner",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "claimnodedis",
+            "type": "claimnodedis",
             "ricardian_contract": ""
         },
         {
@@ -1251,6 +1806,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "fundclaim",
+            "type": "fundclaim",
+            "ricardian_contract": ""
+        },
+        {
             "name": "getsnaphash",
             "type": "getsnaphash",
             "ricardian_contract": ""
@@ -1258,6 +1818,11 @@
         {
             "name": "init",
             "type": "init",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "initt5",
+            "type": "initt5",
             "ricardian_contract": ""
         },
         {
@@ -1278,6 +1843,11 @@
         {
             "name": "onblock",
             "type": "onblock",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "payepoch",
+            "type": "payepoch",
             "ricardian_contract": ""
         },
         {
@@ -1336,6 +1906,16 @@
             "ricardian_contract": ""
         },
         {
+            "name": "setemitcfg",
+            "type": "setemitcfg",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "setinittime",
+            "type": "setinittime",
+            "ricardian_contract": ""
+        },
+        {
             "name": "setparams",
             "type": "setparams",
             "ricardian_contract": ""
@@ -1386,6 +1966,21 @@
             "ricardian_contract": ""
         },
         {
+            "name": "viewemitcfg",
+            "type": "viewemitcfg",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "viewepoch",
+            "type": "viewepoch",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "viewnodedist",
+            "type": "viewnodedist",
+            "ricardian_contract": ""
+        },
+        {
             "name": "votesnaphash",
             "type": "votesnaphash",
             "ricardian_contract": ""
@@ -1426,113 +2021,210 @@
             "name": "abihash",
             "type": "abi_hash",
             "index_type": "i64",
-            "key_names": [],
-            "key_types": []
+            "key_names": ["owner"],
+            "key_types": ["uint64"],
+            "table_id": 49446
+        },
+        {
+            "name": "emissionmngr",
+            "type": "emission_state",
+            "index_type": "i64",
+            "key_names": ["name"],
+            "key_types": ["name"],
+            "table_id": 22828
+        },
+        {
+            "name": "emitcfg",
+            "type": "emission_config",
+            "index_type": "i64",
+            "key_names": ["name"],
+            "key_types": ["name"],
+            "table_id": 25207
+        },
+        {
+            "name": "epochlog",
+            "type": "epoch_log",
+            "index_type": "i64",
+            "key_names": ["sysio_epoch_index"],
+            "key_types": ["uint64"],
+            "table_id": 42042
         },
         {
             "name": "finalizers",
             "type": "finalizer_info",
             "index_type": "i64",
-            "key_names": [],
-            "key_types": []
+            "key_names": ["finalizer_name"],
+            "key_types": ["uint64"],
+            "table_id": 15281
         },
         {
             "name": "finkeyidgen",
             "type": "fin_key_id_generator_info",
             "index_type": "i64",
-            "key_names": [],
-            "key_types": []
+            "key_names": ["name"],
+            "key_types": ["name"],
+            "table_id": 58998
         },
         {
             "name": "finkeys",
             "type": "finalizer_key_info",
             "index_type": "i64",
-            "key_names": [],
-            "key_types": []
+            "key_names": ["id"],
+            "key_types": ["uint64"],
+            "table_id": 10503,
+            "secondary_indexes": [
+                {
+                    "name": "byfinname",
+                    "key_type": "uint64",
+                    "table_id": 14771
+                },
+                {
+                    "name": "byfinkey",
+                    "key_type": "checksum256",
+                    "table_id": 15332
+                }
+            ]
         },
         {
             "name": "global",
             "type": "sysio_global_state",
             "index_type": "i64",
-            "key_names": [],
-            "key_types": []
+            "key_names": ["name"],
+            "key_types": ["name"],
+            "table_id": 58088
         },
         {
             "name": "lastpropfins",
             "type": "last_prop_finalizers_info",
             "index_type": "i64",
-            "key_names": [],
-            "key_types": []
+            "key_names": ["name"],
+            "key_types": ["name"],
+            "table_id": 13870
+        },
+        {
+            "name": "nodecount",
+            "type": "node_count_state",
+            "index_type": "i64",
+            "key_names": ["name"],
+            "key_types": ["name"],
+            "table_id": 60614
+        },
+        {
+            "name": "nodedist",
+            "type": "node_owner_distribution",
+            "index_type": "i64",
+            "key_names": ["account_name"],
+            "key_types": ["uint64"],
+            "table_id": 49260
         },
         {
             "name": "producers",
             "type": "producer_info",
             "index_type": "i64",
-            "key_names": [],
-            "key_types": []
+            "key_names": ["owner"],
+            "key_types": ["uint64"],
+            "table_id": 11791,
+            "secondary_indexes": [
+                {
+                    "name": "prodrank",
+                    "key_type": "uint64",
+                    "table_id": 31113
+                }
+            ]
         },
         {
             "name": "snapconfig",
             "type": "snap_config",
             "index_type": "i64",
-            "key_names": [],
-            "key_types": []
+            "key_names": ["name"],
+            "key_types": ["name"],
+            "table_id": 45242
         },
         {
             "name": "snapprovs",
             "type": "snap_provider",
             "index_type": "i64",
-            "key_names": [],
-            "key_types": []
+            "key_names": ["snap_account"],
+            "key_types": ["uint64"],
+            "table_id": 42185,
+            "secondary_indexes": [
+                {
+                    "name": "byproducer",
+                    "key_type": "uint64",
+                    "table_id": 27665
+                }
+            ]
         },
         {
             "name": "snaprecords",
             "type": "snap_record",
             "index_type": "i64",
-            "key_names": [],
-            "key_types": []
+            "key_names": ["block_num"],
+            "key_types": ["uint64"],
+            "table_id": 43128
         },
         {
             "name": "snapvotes",
             "type": "snap_vote",
             "index_type": "i64",
-            "key_names": [],
-            "key_types": []
+            "key_names": ["id"],
+            "key_types": ["uint64"],
+            "table_id": 6736,
+            "secondary_indexes": [
+                {
+                    "name": "byblocknum",
+                    "key_type": "uint64",
+                    "table_id": 8321
+                }
+            ]
+        },
+        {
+            "name": "t5state",
+            "type": "t5_state",
+            "index_type": "i64",
+            "key_names": ["name"],
+            "key_types": ["name"],
+            "table_id": 22391
         },
         {
             "name": "blockinfo",
             "type": "block_info_record",
             "index_type": "i64",
-            "key_names": [],
-            "key_types": []
+            "key_names": ["block_height"],
+            "key_types": ["uint64"],
+            "table_id": 21782
         },
         {
             "name": "peerkeys",
             "type": "peer_key",
             "index_type": "i64",
-            "key_names": [],
-            "key_types": []
+            "key_names": ["account"],
+            "key_types": ["uint64"],
+            "table_id": 40639
         },
         {
             "name": "limitauthchg",
             "type": "limit_auth_change",
             "index_type": "i64",
-            "key_names": [],
-            "key_types": []
+            "key_names": ["account"],
+            "key_types": ["uint64"],
+            "table_id": 43800
         },
         {
             "name": "trxpglobal",
             "type": "trx_prio_global",
             "index_type": "i64",
-            "key_names": [],
-            "key_types": []
+            "key_names": ["name"],
+            "key_types": ["name"],
+            "table_id": 39268
         },
         {
             "name": "trxpriority",
             "type": "trx_prio",
             "index_type": "i64",
-            "key_names": [],
-            "key_types": []
+            "key_names": ["priority"],
+            "key_types": ["uint64"],
+            "table_id": 25995
         }
     ],
     "ricardian_clauses": [],
@@ -1550,6 +2242,18 @@
         {
             "name": "getsnaphash",
             "result_type": "snap_record"
+        },
+        {
+            "name": "viewemitcfg",
+            "result_type": "emission_config"
+        },
+        {
+            "name": "viewepoch",
+            "result_type": "epoch_info_result"
+        },
+        {
+            "name": "viewnodedist",
+            "result_type": "node_claim_result"
         },
         {
             "name": "getpeerkeys",

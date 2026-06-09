@@ -9,14 +9,11 @@ namespace sysio { namespace chain {
    using account_subjective_cpu_bill_t = flat_map<account_name, fc::microseconds>;
    using action_payers_t = flat_set<account_name>;
 
-   /**
-    *  This extension is for including an ED25519 public key in a transaction for signature verification. Generic public_key_type was used to future proof
-    *  in the scenario where another ED25519 curve variant is added. We don't want to add another extension per variant.
-    */
-   struct ed_pubkey_extension {
-      static constexpr uint16_t        extension_id() { return 0x8000; } // 32768 in decimal
-      static constexpr bool            enforce_unique() { return false; }
-      public_key_type                  pubkey; // 32-byte public key
+   // No transaction extensions remain. Keep the type infrastructure for future use.
+   // Remove placeholder when a transaction extension is needed.
+   struct transaction_extension_placeholder {
+      static constexpr uint16_t extension_id() { return 0xFFFF; }
+      static constexpr bool     enforce_unique() { return true; }
    };
 
    namespace detail {
@@ -28,7 +25,7 @@ namespace sysio { namespace chain {
    }
 
    using transaction_extension_types = detail::transaction_extension_types<
-      ed_pubkey_extension
+      transaction_extension_placeholder
    >;
 
    using transaction_extension = transaction_extension_types::transaction_extension_t;
@@ -203,8 +200,6 @@ namespace sysio { namespace chain {
 
    using packed_transaction_ptr = std::shared_ptr<const packed_transaction>;
 
-   uint128_t transaction_id_to_sender_id( const transaction_id_type& tid );
-
 } } /// namespace sysio::chain
 
 FC_REFLECT( sysio::chain::transaction_header, (expiration)(ref_block_num)(ref_block_prefix)
@@ -214,4 +209,4 @@ FC_REFLECT_DERIVED( sysio::chain::signed_transaction, (sysio::chain::transaction
 FC_REFLECT_ENUM( sysio::chain::packed_transaction::compression_type, (none)(zlib))
 // @ignore unpacked_trx
 FC_REFLECT( sysio::chain::packed_transaction, (signatures)(compression)(packed_context_free_data)(packed_trx) )
-FC_REFLECT( sysio::chain::ed_pubkey_extension, (pubkey) )
+FC_REFLECT( sysio::chain::transaction_extension_placeholder, )

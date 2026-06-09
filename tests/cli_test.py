@@ -207,8 +207,7 @@ def clio_abi_file_test():
               "weight": 1
             }
           ],
-          "accounts": [],
-          "waits": []
+          "accounts": []
         },
         "active": {
           "threshold": 1,
@@ -217,14 +216,13 @@ def clio_abi_file_test():
               "weight": 1
             }
           ],
-          "accounts": [],
-          "waits": []
+          "accounts": []
         }
     }"""
 
     cmd = ['./programs/clio/clio', '-u','http://127.0.0.1:12345', '--abi-file', system_abi_file_arg, 'convert', 'pack_action_data', account, action, unpacked_action_data]
     # the packed data hex changed because of the change to sysio in unpacked_action_data above
-    packed_action_data = '0000000000eab0c70000000000000e3d01000000010002c0ded2bc1f1305fb0faac5e6c03ee3a1924234985427b6167ca569d13df435cf0100000001000000010002c0ded2bc1f1305fb0faac5e6c03ee3a1924234985427b6167ca569d13df435cf01000000'
+    packed_action_data = '0000000000eab0c70000000000000e3d01000000010002c0ded2bc1f1305fb0faac5e6c03ee3a1924234985427b6167ca569d13df435cf01000001000000010002c0ded2bc1f1305fb0faac5e6c03ee3a1924234985427b6167ca569d13df435cf010000'
     outs, errs = processClioCommand(cmd)
     actual = outs.strip()
     assert(actual.decode('utf-8') == packed_action_data)
@@ -262,8 +260,7 @@ def clio_abi_file_test():
                     "weight": 1
                     }
                 ],
-                "accounts": [],
-                "waits": []
+                "accounts": []
                 },
                 "active": {
                 "threshold": 1,
@@ -272,11 +269,10 @@ def clio_abi_file_test():
                     "weight": 1
                     }
                 ],
-                "accounts": [],
-                "waits": []
+                "accounts": []
                 }
             },
-            "hex_data": "0000000000ea30550000000000000e3d01000000010002c0ded2bc1f1305fb0faac5e6c03ee3a1924234985427b6167ca569d13df435cf0100000001000000010002c0ded2bc1f1305fb0faac5e6c03ee3a1924234985427b6167ca569d13df435cf01000000"
+            "hex_data": "0000000000ea30550000000000000e3d01000000010002c0ded2bc1f1305fb0faac5e6c03ee3a1924234985427b6167ca569d13df435cf01000001000000010002c0ded2bc1f1305fb0faac5e6c03ee3a1924234985427b6167ca569d13df435cf010000"
             },
             {
             "account": "sysio.token",
@@ -301,7 +297,7 @@ def clio_abi_file_test():
         "context_free_data": []
     }"""
 
-    expected_output = b'3aacf360ee010b864b7e00000000020000000000eab0c700409e9a2264b89a010000000000eab0c700000000a8ed3232660000000000eab0c70000000000000e3d01000000010002c0ded2bc1f1305fb0faac5e6c03ee3a1924234985427b6167ca569d13df435cf0100000001000000010002c0ded2bc1f1305fb0faac5e6c03ee3a1924234985427b6167ca569d13df435cf0100000000a6823403eab0c7000000572d3ccdcd010000000000008c3100000000a8ed3232260000000000008c31000000000000ce39a08601000000000004535953000000000568656c6c6f00'
+    expected_output = b'3aacf360ee010b864b7e00000000020000000000eab0c700409e9a2264b89a010000000000eab0c700000000a8ed3232640000000000eab0c70000000000000e3d01000000010002c0ded2bc1f1305fb0faac5e6c03ee3a1924234985427b6167ca569d13df435cf01000001000000010002c0ded2bc1f1305fb0faac5e6c03ee3a1924234985427b6167ca569d13df435cf01000000a6823403eab0c7000000572d3ccdcd010000000000008c3100000000a8ed3232260000000000008c31000000000000ce39a08601000000000004535953000000000568656c6c6f00'
     cmd = ['./programs/clio/clio', '-u','http://127.0.0.1:12345', '--abi-file', system_abi_file_arg, token_abi_file_arg, 'convert', 'pack_transaction', '--pack-action-data', unpacked_trx]
     outs, errs = processClioCommand(cmd)
     assert(expected_output in outs)
@@ -313,7 +309,7 @@ def clio_abi_file_test():
         ],
         "compression": "none",
         "packed_context_free_data": "",
-        "packed_trx": "3aacf360ee010b864b7e00000000020000000000eab0c700409e9a2264b89a010000000000eab0c700000000a8ed3232660000000000eab0c70000000000000e3d01000000010002c0ded2bc1f1305fb0faac5e6c03ee3a1924234985427b6167ca569d13df435cf0100000001000000010002c0ded2bc1f1305fb0faac5e6c03ee3a1924234985427b6167ca569d13df435cf0100000000a6823403eab0c7000000572d3ccdcd010000000000008c3100000000a8ed3232260000000000008c31000000000000ce39a08601000000000004535953000000000568656c6c6f00"
+        "packed_trx": "3aacf360ee010b864b7e00000000020000000000eab0c700409e9a2264b89a010000000000eab0c700000000a8ed3232640000000000eab0c70000000000000e3d01000000010002c0ded2bc1f1305fb0faac5e6c03ee3a1924234985427b6167ca569d13df435cf01000001000000010002c0ded2bc1f1305fb0faac5e6c03ee3a1924234985427b6167ca569d13df435cf01000000a6823403eab0c7000000572d3ccdcd010000000000008c3100000000a8ed3232260000000000008c31000000000000ce39a08601000000000004535953000000000568656c6c6f00"
     }"""
     cmd = ['./programs/clio/clio', '-u','http://127.0.0.1:12345', '--abi-file', system_abi_file_arg, token_abi_file_arg, 'convert', 'unpack_transaction', '--unpack-action-data', packed_trx]
     outs, errs = processClioCommand(cmd)
@@ -475,6 +471,42 @@ def clio_protobuf_abi_test():
     assert b'"note": "test"' in outs, "unpack missing note=test"
     Utils.Print("protobuf pbaction round-trip OK")
 
+def clio_convert_name_test():
+    """Test 'clio convert name' prints both interpretations and exits non-zero on bad input"""
+    # Valid sysio::name only ("sysio" contains letters, so stoull throws std::invalid_argument)
+    completed = subprocess.run(['./programs/clio/clio', '--no-auto-kiod', 'convert', 'name', 'sysio'],
+                               check=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    assert completed.returncode == 0, f"stderr={completed.stderr!r}"
+    assert b'As sysio::name : "sysio" -> uint64_t: 14389258095169634304' in completed.stdout
+    assert b'As uint64_t' not in completed.stdout
+
+    # Valid uint64_t only (20 digits, exceeds sysio::name's 13-char limit)
+    completed = subprocess.run(['./programs/clio/clio', '--no-auto-kiod', 'convert', 'name', '14389258095169634304'],
+                               check=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    assert completed.returncode == 0, f"stderr={completed.stderr!r}"
+    assert b'As uint64_t    : 14389258095169634304 -> sysio::name: "sysio"' in completed.stdout
+    assert b'As sysio::name' not in completed.stdout
+
+    # Valid under both interpretations: "12345" is a valid sysio::name and a valid uint64_t
+    completed = subprocess.run(['./programs/clio/clio', '--no-auto-kiod', 'convert', 'name', '12345'],
+                               check=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    assert completed.returncode == 0, f"stderr={completed.stderr!r}"
+    assert b'As sysio::name : "12345" -> uint64_t: 614251516705898496' in completed.stdout
+    assert b'As uint64_t    : 12345 -> sysio::name: "..........s3d"' in completed.stdout
+
+    # 0x-prefixed hex parses as uint64_t; not a valid name
+    completed = subprocess.run(['./programs/clio/clio', '--no-auto-kiod', 'convert', 'name', '0xdeadbeef'],
+                               check=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    assert completed.returncode == 0, f"stderr={completed.stderr!r}"
+    assert b'As uint64_t    : 3735928559 -> sysio::name: "......aypqzij"' in completed.stdout
+    assert b'As sysio::name' not in completed.stdout
+
+    # Neither interpretation valid: uppercase letters are not legal in names, and not a number
+    completed = subprocess.run(['./programs/clio/clio', '--no-auto-kiod', 'convert', 'name', 'INVALID'],
+                               check=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    assert completed.returncode != 0, "expected non-zero exit for invalid input"
+    assert b'ERROR: Input is neither a valid sysio::name nor a uint64_t' in completed.stderr
+
 nodeop_help_test()
 
 clio_help_test(['--help'])
@@ -486,6 +518,8 @@ cli11_bugfix_test()
 
 cli11_optional_option_arg_test()
 clio_sign_test()
+
+clio_convert_name_test()
 
 clio_abi_file_test()
 clio_protobuf_abi_test()

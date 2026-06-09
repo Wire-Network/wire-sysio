@@ -6,6 +6,8 @@
 #include <fc/log/logger.hpp>
 #include <fc/network/solana/solana_borsh.hpp>
 #include <fc/network/solana/solana_client.hpp>
+#include <fc/task/retry.hpp>
+#include <magic_enum/magic_enum.hpp>
 #include <thread>
 
 namespace fc::network::solana {
@@ -143,7 +145,7 @@ void solana_program_client::encode_type(borsh::encoder& encoder, const fc::varia
          encoder.write_u64(value.as_uint64());
          break;
       case idl::primitive_type::u128:
-         encoder.write_u128(fc::uint128(value.as_string()));
+         encoder.write_u128(fc::uint128_from_string(value.as_string()));
          break;
       case idl::primitive_type::u256:
          encoder.write_u256(fc::to_uint256(value));
@@ -161,7 +163,7 @@ void solana_program_client::encode_type(borsh::encoder& encoder, const fc::varia
          encoder.write_i64(value.as_int64());
          break;
       case idl::primitive_type::i128:
-         encoder.write_i128(fc::int128(value.as_string()));
+         encoder.write_i128(fc::int128_from_string(value.as_string()));
          break;
       case idl::primitive_type::i256:
          encoder.write_i256(fc::to_int256(value));
@@ -201,7 +203,7 @@ void solana_program_client::encode_type(borsh::encoder& encoder, const fc::varia
       case idl::primitive_type::pubkey: {
          // Handle pubkey as base58 string or as object with data field
          if (value.is_string()) {
-            encoder.write_pubkey(solana_public_key::from_base58(value.as_string()));
+            encoder.write_pubkey(solana_public_key::from_base58_string(value.as_string()));
          } else if (value.is_object()) {
             auto obj = value.get_object();
             if (obj.contains("data")) {
@@ -209,7 +211,7 @@ void solana_program_client::encode_type(borsh::encoder& encoder, const fc::varia
                auto data_arr = obj["data"].get_array();
                solana_public_key pk;
                for (size_t i = 0; i < 32 && i < data_arr.size(); ++i) {
-                  pk.data[i] = static_cast<uint8_t>(data_arr[i].as_uint64());
+                  pk._data[i] = static_cast<uint8_t>(data_arr[i].as_uint64());
                }
                encoder.write_pubkey(pk);
             } else {
@@ -392,7 +394,7 @@ fc::variant solana_program_client::decode_type(borsh::decoder& decoder, const id
       case idl::primitive_type::u64:
          return fc::variant(decoder.read_u64());
       case idl::primitive_type::u128:
-         return fc::variant(decoder.read_u128().str());
+         return fc::variant(fc::to_string(decoder.read_u128()));
       case idl::primitive_type::u256:
          return fc::variant(decoder.read_u256().str());
       case idl::primitive_type::i8:
@@ -404,7 +406,7 @@ fc::variant solana_program_client::decode_type(borsh::decoder& decoder, const id
       case idl::primitive_type::i64:
          return fc::variant(decoder.read_i64());
       case idl::primitive_type::i128:
-         return fc::variant(decoder.read_i128().str());
+         return fc::variant(fc::to_string(decoder.read_i128()));
       case idl::primitive_type::i256:
          return fc::variant(decoder.read_i256().str());
       case idl::primitive_type::f32:
@@ -419,7 +421,7 @@ fc::variant solana_program_client::decode_type(borsh::decoder& decoder, const id
             fc::base64_encode(reinterpret_cast<const char*>(bytes.data()), static_cast<unsigned int>(bytes.size())));
       }
       case idl::primitive_type::pubkey:
-         return fc::variant(decoder.read_pubkey().to_base58());
+         return fc::variant(decoder.read_pubkey().to_string(fc::yield_function_t{}));
       default:
          FC_THROW("Unsupported primitive type: {}", static_cast<int>(type.get_primitive()));
       }
@@ -570,6 +572,34 @@ std::string solana_program_client::execute_tx(const idl::instruction& instr, con
    return client->send_transaction(tx);
 }
 
+std::string solana_program_client::execute_tx_and_confirm(const idl::instruction& instr,
+                                                           const std::vector<account_meta>& accounts,
+                                                           const program_invoke_data_items& params,
+                                                           const solana_confirm_options& opts) {
+   // Delegate to the pre-instructions overload with an empty prefix so we
+   // have a single tx-build path; both overloads stay source-compatible
+   // for every existing caller.
+   return execute_tx_and_confirm(instr, accounts, params, {}, opts);
+}
+
+std::string solana_program_client::execute_tx_and_confirm(const idl::instruction& instr,
+                                                           const std::vector<account_meta>& accounts,
+                                                           const program_invoke_data_items& params,
+                                                           const std::vector<instruction>& pre_instructions,
+                                                           const solana_confirm_options& opts) {
+   auto idl_instruction = build_instruction(instr, accounts, params);
+
+   std::vector<instruction> all_instructions;
+   all_instructions.reserve(pre_instructions.size() + 1);
+   all_instructions.insert(all_instructions.end(),
+                           pre_instructions.begin(), pre_instructions.end());
+   all_instructions.push_back(std::move(idl_instruction));
+
+   auto tx = client->create_transaction(all_instructions, client->get_pubkey());
+   client->sign_transaction(tx);
+   return client->send_transaction_and_confirm(tx, opts);
+}
+
 std::pair<solana_public_key, uint8_t> solana_program_client::derive_pda(const std::vector<idl::pda_seed>& pda_seeds,
                                                                         const program_invoke_data_items& params) {
    std::vector<std::vector<uint8_t>> seeds;
@@ -658,6 +688,21 @@ std::vector<account_meta> solana_program_client::resolve_accounts(const idl::ins
          pk = client->get_pubkey();
          resolved = true;
       }
+      // IDL v2 omits the `address` field for well-known programs; fall back to
+      // a built-in table so callers don't have to override every instruction.
+      else {
+         static const std::map<std::string, solana_public_key> well_known = {
+            {"system_program",             system::program_ids::SYSTEM_PROGRAM},
+            {"token_program",              system::program_ids::TOKEN_PROGRAM},
+            {"associated_token_program",   system::program_ids::ASSOCIATED_TOKEN_PROGRAM},
+            {"compute_budget_program",     system::program_ids::COMPUTE_BUDGET_PROGRAM},
+         };
+         auto it = well_known.find(acct.name);
+         if (it != well_known.end()) {
+            pk = it->second;
+            resolved = true;
+         }
+      }
 
       FC_ASSERT(resolved, "Could not resolve account '{}' - provide it in account_overrides", acct.name);
 
@@ -681,7 +726,7 @@ std::vector<account_meta> solana_program_client::resolve_accounts(const idl::ins
 solana_client::solana_client(const signature_provider_ptr& sig_provider,
                              const std::variant<std::string, fc::url>& url_source)
    : _signature_provider(sig_provider)
-   , _pubkey(solana_public_key::from_public_key(_signature_provider->public_key))
+   , _pubkey(from_fc_public_key(_signature_provider->public_key))
    , _client(json_rpc_client::create(url_source)) {}
 
 fc::variant solana_client::execute(const std::string& method, const fc::variant& params) {
@@ -709,7 +754,7 @@ std::optional<account_info> solana_client::get_account_info(const pubkey_compat_
    config("commitment", to_string(commitment));
    config("encoding", "base64");
 
-   fc::variants params{addr.to_base58(), config};
+   fc::variants params{addr.to_string(fc::yield_function_t{}), config};
    auto result = execute("getAccountInfo", params);
 
    if (result.is_null() || !result.is_object())
@@ -722,7 +767,7 @@ std::optional<account_info> solana_client::get_account_info(const pubkey_compat_
    auto value = obj["value"].get_object();
    account_info info;
    info.lamports = value["lamports"].as_uint64();
-   info.owner = solana_public_key::from_base58(value["owner"].as_string());
+   info.owner = solana_public_key::from_base58_string(value["owner"].as_string());
    info.executable = value["executable"].as_bool();
    info.rent_epoch = value["rentEpoch"].as_uint64();
 
@@ -742,7 +787,7 @@ std::optional<account_info> solana_client::get_account_info(const pubkey_compat_
 
 uint64_t solana_client::get_balance(const pubkey_compat_t& address, commitment_t commitment) {
    auto addr = to_pubkey(address);
-   fc::variants params{addr.to_base58(), build_config(commitment)};
+   fc::variants params{addr.to_string(fc::yield_function_t{}), build_config(commitment)};
    auto result = execute("getBalance", params);
 
    auto obj = result.get_object();
@@ -753,7 +798,7 @@ std::vector<std::optional<account_info>>
 solana_client::get_multiple_accounts(const std::vector<solana_public_key>& addresses, commitment_t commitment) {
    fc::variants addr_list;
    for (const auto& addr : addresses) {
-      addr_list.push_back(addr.to_base58());
+      addr_list.push_back(addr.to_string(fc::yield_function_t{}));
    }
 
    fc::mutable_variant_object config;
@@ -775,7 +820,7 @@ solana_client::get_multiple_accounts(const std::vector<solana_public_key>& addre
       auto value = v.get_object();
       account_info info;
       info.lamports = value["lamports"].as_uint64();
-      info.owner = solana_public_key::from_base58(value["owner"].as_string());
+      info.owner = solana_public_key::from_base58_string(value["owner"].as_string());
       info.executable = value["executable"].as_bool();
       info.rent_epoch = value["rentEpoch"].as_uint64();
 
@@ -967,7 +1012,7 @@ std::optional<uint64_t> solana_client::get_fee_for_message(const std::string& me
 std::vector<fc::variant> solana_client::get_recent_prioritization_fees(const std::vector<solana_public_key>& accounts) {
    fc::variants addr_list;
    for (const auto& addr : accounts) {
-      addr_list.push_back(addr.to_base58());
+      addr_list.push_back(addr.to_string(fc::yield_function_t{}));
    }
 
    fc::variants params;
@@ -996,7 +1041,7 @@ fc::variant solana_client::get_inflation_reward(const std::vector<solana_public_
                                                 std::optional<uint64_t> epoch) {
    fc::variants addr_list;
    for (const auto& addr : addresses) {
-      addr_list.push_back(addr.to_base58());
+      addr_list.push_back(addr.to_string(fc::yield_function_t{}));
    }
 
    fc::mutable_variant_object config;
@@ -1040,7 +1085,7 @@ uint64_t solana_client::get_stake_minimum_delegation(commitment_t commitment) {
 
 fc::variant solana_client::get_token_account_balance(const pubkey_compat_t& token_account, commitment_t commitment) {
    auto addr = to_pubkey(token_account);
-   fc::variants params{addr.to_base58(), build_config(commitment)};
+   fc::variants params{addr.to_string(fc::yield_function_t{}), build_config(commitment)};
    return execute("getTokenAccountBalance", params);
 }
 
@@ -1051,7 +1096,7 @@ fc::variant solana_client::get_token_accounts_by_delegate(const pubkey_compat_t&
    config("commitment", to_string(commitment));
    config("encoding", "jsonParsed");
 
-   fc::variants params{addr.to_base58(), filter, config};
+   fc::variants params{addr.to_string(fc::yield_function_t{}), filter, config};
    return execute("getTokenAccountsByDelegate", params);
 }
 
@@ -1062,19 +1107,19 @@ fc::variant solana_client::get_token_accounts_by_owner(const pubkey_compat_t& ow
    config("commitment", to_string(commitment));
    config("encoding", "jsonParsed");
 
-   fc::variants params{addr.to_base58(), filter, config};
+   fc::variants params{addr.to_string(fc::yield_function_t{}), filter, config};
    return execute("getTokenAccountsByOwner", params);
 }
 
 fc::variant solana_client::get_token_largest_accounts(const pubkey_compat_t& mint, commitment_t commitment) {
    auto addr = to_pubkey(mint);
-   fc::variants params{addr.to_base58(), build_config(commitment)};
+   fc::variants params{addr.to_string(fc::yield_function_t{}), build_config(commitment)};
    return execute("getTokenLargestAccounts", params);
 }
 
 fc::variant solana_client::get_token_supply(const pubkey_compat_t& mint, commitment_t commitment) {
    auto addr = to_pubkey(mint);
-   fc::variants params{addr.to_base58(), build_config(commitment)};
+   fc::variants params{addr.to_string(fc::yield_function_t{}), build_config(commitment)};
    return execute("getTokenSupply", params);
 }
 
@@ -1107,7 +1152,7 @@ std::vector<fc::variant> solana_client::get_signatures_for_address(const pubkey_
    if (until)
       config("until", *until);
 
-   fc::variants params{addr.to_base58(), config};
+   fc::variants params{addr.to_string(fc::yield_function_t{}), config};
    return execute("getSignaturesForAddress", params).get_array();
 }
 
@@ -1195,7 +1240,7 @@ fc::variant solana_client::simulate_transaction(const transaction& tx, commitmen
 
 std::string solana_client::request_airdrop(const pubkey_compat_t& address, uint64_t lamports, commitment_t commitment) {
    auto addr = to_pubkey(address);
-   fc::variants params{addr.to_base58(), lamports, build_config(commitment)};
+   fc::variants params{addr.to_string(fc::yield_function_t{}), lamports, build_config(commitment)};
    return execute("requestAirdrop", params).as_string();
 }
 
@@ -1214,7 +1259,7 @@ fc::variant solana_client::get_program_accounts(const pubkey_compat_t& program_i
       config("filters", filters);
    }
 
-   fc::variants params{addr.to_base58(), config};
+   fc::variants params{addr.to_string(fc::yield_function_t{}), config};
    return execute("getProgramAccounts", params);
 }
 
@@ -1301,7 +1346,7 @@ transaction solana_client::create_transaction(const std::vector<instruction>& in
 
    // Get a fresh blockhash
    auto bh_info = get_latest_blockhash();
-   tx.msg.recent_blockhash = solana_public_key::from_base58(bh_info.blockhash);
+   tx.msg.recent_blockhash = solana_public_key::from_base58_string(bh_info.blockhash);
 
    // Collect all unique accounts
    std::vector<account_meta> all_accounts;
@@ -1412,7 +1457,7 @@ transaction solana_client::sign_transaction(transaction& tx) {
    // Find the fee payer's position (should be index 0)
    for (size_t i = 0; i < tx.msg.account_keys.size(); ++i) {
       if (tx.msg.account_keys[i] == _pubkey) {
-         tx.signatures[i] = solana_signature::from_ed_signature(ed_sig);
+         tx.signatures[i] = from_ed_signature(ed_sig);
          break;
       }
    }
@@ -1454,6 +1499,55 @@ std::string solana_client::send_and_confirm_transaction(const transaction& tx, c
    }
 
    FC_THROW("Transaction confirmation timeout");
+}
+
+namespace {
+   /// True when `confirmation_status` string from `getSignatureStatuses` is
+   /// at least as advanced as the requested `target`. Commitment ordering is
+   /// `processed < confirmed < finalized`; an RPC reporting "finalized"
+   /// satisfies every lesser target. Empty status string means the cluster
+   /// has not observed the tx yet — never sufficient.
+   bool has_reached_commitment(const std::string& confirmation_status, commitment_t target) {
+      if (confirmation_status.empty()) return false;
+
+      // Map the RPC's string back to the enum. Unknown strings are treated
+      // as "not yet confirmed" — safer than guessing.
+      auto observed = magic_enum::enum_cast<commitment_t>(confirmation_status);
+      if (!observed.has_value()) return false;
+
+      // Enum declaration order (processed=0, confirmed=1, finalized=2) encodes
+      // the monotonic commitment strength we compare against.
+      return magic_enum::enum_integer(*observed) >= magic_enum::enum_integer(target);
+   }
+} // namespace
+
+std::string solana_client::send_transaction_and_confirm(const transaction& tx,
+                                                         const solana_confirm_options& opts) {
+   // Submit once — send_transaction is fire-and-forget by design. We wrap
+   // the poll-until-confirmed step in `fc::task::retry_until` so backoff +
+   // deadline semantics are shared with the Ethereum client.
+   const std::string sig = send_transaction(tx, /*skip_preflight=*/false, opts.commitment);
+
+   return fc::task::retry_until<std::string>(
+      "solana:send_transaction_and_confirm",
+      opts.retry,
+      [this, sig, target = opts.commitment]() -> std::optional<std::string> {
+         auto statuses = get_signature_statuses({sig}, false);
+         if (statuses.value.empty() || !statuses.value[0].has_value()) {
+            return std::nullopt; // cluster hasn't observed the tx yet — retry
+         }
+         const auto& s = *statuses.value[0];
+         if (s.err.has_value()) {
+            // Fatal: the tx ran and failed. No amount of waiting fixes that;
+            // propagate so the caller's retry logic (at the batch-op layer)
+            // can re-submit with a fresh blockhash / nonce.
+            FC_THROW("Transaction failed: {}", *s.err);
+         }
+         if (has_reached_commitment(s.confirmation_status, target)) {
+            return sig; // done — reached the requested commitment level
+         }
+         return std::nullopt; // seen, not yet at target commitment — retry
+      });
 }
 
 } // namespace fc::network::solana

@@ -133,11 +133,14 @@ public:
          ("max_transaction_cpu_usage", 1000000 + n )
          ("min_transaction_cpu_usage", 100 + n )
          ("max_transaction_lifetime", 3600 + n)
-         ("deferred_trx_expiration_window", 600 + n)
          ("max_transaction_delay", 10*86400+n)
-         ("max_inline_action_size", 512*1024 + n)
+         ("max_inline_action_size", 524287 + n)
          ("max_inline_action_depth", 4 + n)
          ("max_authority_depth", 6 + n)
+         ("max_action_return_value_size", 1024 + n)
+         ("max_kv_key_size", 256 + n)
+         ("max_kv_value_size", 262144 + n)
+         ("max_kv_secondary_key_size", 256 + n)
          ("max_ram_size", (n % 10 + 1) * 1024 * 1024)
          ("ram_reserve_ratio", 100 + n);
    }

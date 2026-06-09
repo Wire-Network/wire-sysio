@@ -331,6 +331,13 @@ struct program {
    std::string name;
    std::string version;
 
+   /// Deployed program address (base58). Populated from the IDL's
+   /// top-level `address` field (Anchor IDL v2) or `metadata.address`
+   /// (older variant). Empty when the IDL JSON does not include it —
+   /// consumers must either fall back to a configured override or
+   /// refuse to operate against that program.
+   std::string address;
+
    // Program instructions
    std::vector<instruction> instructions;
 

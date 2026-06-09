@@ -1,3 +1,9 @@
+core
+.claude/
+.remember
+*.tsbuildinfo
+.env
+.local*/
 .idea
 .run
 .vscode-ctags
@@ -29,6 +35,8 @@ moc_*
 config-dir/
 genesis.json
 hardfork.hpp
+
+contracts/sysio.authex/original/
 
 libraries/utilities/git_revision.cpp
 libraries/egenesis/egenesis_brief.cpp
@@ -102,7 +110,8 @@ CMakeLists.txt.user
 node_modules
 package-lock.json
 
-/snapshots
+/snapshot*
+/test
 
 cliff.toml
 !cmake/build-options.cmake

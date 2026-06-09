@@ -1,23 +1,25 @@
 #pragma once
 
+#include <charconv>
 #include <deque>
 #include <map>
 #include <memory>
 #include <set>
+#include <string_view>
+#include <system_error>
 #include <unordered_map>
 #include <unordered_set>
 #include <variant>
 #include <vector>
 
 #include <boost/multi_index_container_fwd.hpp>
-#include <boost/multiprecision/cpp_int.hpp>
 
 #include <fmt/format.h>
 
 #include <fc/container/deque_fwd.hpp>
 #include <fc/container/flat_fwd.hpp>
 #include <fc/int128.hpp>
-#include <fc/int256.hpp>
+#include <fc/int256_fwd.hpp>
 #include <fc/string.hpp>
 #include <fc/time.hpp>
 
@@ -53,28 +55,6 @@ namespace fc
    template<typename T, typename... Args> void to_variant( const boost::multi_index_container<T,Args...>& s, fc::variant& v );
    template<typename T, typename... Args> void from_variant( const fc::variant& v, boost::multi_index_container<T,Args...>& s );
 
-   template<size_t Size>
-   using UInt = boost::multiprecision::number<
-         boost::multiprecision::cpp_int_backend<Size, Size, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked, void> >;
-   template<size_t Size>
-   using Int = boost::multiprecision::number<
-         boost::multiprecision::cpp_int_backend<Size, Size, boost::multiprecision::signed_magnitude, boost::multiprecision::unchecked, void> >;
-
-   void to_variant( const UInt<8>& n, fc::variant& v );
-   void from_variant( const fc::variant& v, UInt<8>& n );
-
-   void to_variant( const UInt<16>& n, fc::variant& v );
-   void from_variant( const fc::variant& v, UInt<16>& n );
-
-   void to_variant( const UInt<32>& n, fc::variant& v );
-   void from_variant( const fc::variant& v, UInt<32>& n );
-
-   void to_variant( const UInt<64>& n, fc::variant& v );
-   void from_variant( const fc::variant& v, UInt<64>& n );
-
-   template<typename T> void to_variant( const boost::multiprecision::number<T>& n, fc::variant& v );
-   template<typename T> void from_variant( const fc::variant& v, boost::multiprecision::number<T>& n );
-
    template<typename T> void to_variant( const safe<T>& s, fc::variant& v );
    template<typename T> void from_variant( const fc::variant& v, safe<T>& s );
    template<typename T> void to_variant( const std::unique_ptr<T>& s, fc::variant& v );
@@ -98,10 +78,7 @@ namespace fc
    void to_variant( const int32_t& var,  fc::variant& vo );
    void from_variant( const fc::variant& var,  int32_t& vo );
 
-   void to_variant( const unsigned __int128& var,  fc::variant& vo );
-   void from_variant( const fc::variant& var,  unsigned __int128& vo );
-   void to_variant( const __int128& var,  fc::variant& vo );
-   void from_variant( const fc::variant& var,  __int128& vo );
+   // to_variant/from_variant for __int128 types declared in fc/int128.hpp
 
    void to_variant( const variant_object& var,  fc::variant& vo );
    void from_variant( const fc::variant& var,  variant_object& vo );
@@ -198,20 +175,24 @@ namespace fc
       public:
         enum type_id
         {
-           null_type   = 0,
-           int64_type  = 1,
-           uint64_type = 2,
-           int128_type = 3,
-           uint128_type = 4,
-           int256_type = 5,
-           uint256_type = 6,
-           double_type = 7,
-           bool_type   = 8,
-           string_type = 9,
-           array_type  = 10,
-           object_type = 11,
-           blob_type   = 12
+           null_type       = 0,
+           int64_type      = 1,
+           uint64_type     = 2,
+           int128_type     = 3,
+           uint128_type    = 4,
+           int256_type     = 5,
+           uint256_type    = 6,
+           double_type     = 7,
+           bool_type       = 8,
+           string_type     = 9,  // heap-allocated std::string
+           array_type      = 10,
+           object_type     = 11,
+           blob_type       = 12,
+           string_sso_type = 13  // inline short string (<= 14 bytes); content in bytes 0..13, length in byte 14
         };
+        /// Maximum string length stored inline (rest of the 16-byte buffer:
+        /// 14 bytes content + 1 byte length + 1 byte type tag).
+        static constexpr std::size_t sso_max_length = 14;
 
         /// Constructs a null_type variant
         variant();
@@ -234,12 +215,13 @@ namespace fc
         variant( int64_t val );
         variant( fc::uint128 val );
         variant( fc::int128 val );
-        variant( fc::uint256 val );
-        variant( fc::int256 val );
+        variant( const fc::uint256& val );
+        variant( const fc::int256& val );
         variant( double val );
         variant( bool val );
         variant( blob val );
         variant( std::string val );
+        variant( std::string_view val );
         variant( variant_object );
         variant( mutable_variant_object );
         variant( variants );
@@ -264,7 +246,7 @@ namespace fc
               virtual void handle( const fc::uint256_t& v )const      = 0;
               virtual void handle( const double& v )const        = 0;
               virtual void handle( const bool& v )const          = 0;
-              virtual void handle( const std::string& v )const   = 0;
+              virtual void handle( std::string_view v )const     = 0;
               virtual void handle( const variant_object& v)const = 0;
               virtual void handle( const variants& v)const       = 0;
               virtual void handle( const blob& v)const           = 0;
@@ -303,6 +285,38 @@ namespace fc
         fc::int256                  as_int256()const;
         fc::uint256                 as_uint256()const;
 
+        /**
+         * Convert variant to an enum value. Handles both integer and string
+         * representations (ABI serializer may return either depending on
+         * whether enum definitions are present).
+         *
+         * @tparam EnumType A C++ enum type (e.g., sysio::opp::types::ChainKind)
+         * @return The enum value cast from the variant's integer value
+         */
+        template<typename EnumType>
+        EnumType as_enum_value() const {
+           if (is_integer() || is_numeric())
+              return static_cast<EnumType>(as_int64());
+           if (is_string()) {
+              // std::from_chars is non-throwing: avoids the stoll exception round-trip on the invalid-text fallback
+              // (the dominant cost on bad input -- ~4 us per call -- and ~25% of the valid-text path too).
+              // Intentionally STRICTER than the previous std::stoll-based code:
+              //   - leading minus accepted (matches stoll)
+              //   - leading '+' REJECTED (stoll accepted, e.g. "+1")
+              //   - leading whitespace REJECTED (stoll accepted, e.g. " 1")
+              //   - suffix garbage silently ignored, e.g. "1abc" yields 1 (matches stoll)
+              // The ABI serializer never emits whitespace- or sign-prefixed enum strings, so the stricter contract
+              // surfaces malformed input as an exception rather than silently parsing it.
+              std::string_view s = get_string();
+              int64_t parsed = 0;
+              auto [ptr, ec] = std::from_chars(s.data(), s.data() + s.size(), parsed);
+              if (ec == std::errc{}) {
+                 return static_cast<EnumType>(parsed);
+              }
+           }
+           throw std::runtime_error("Cannot convert variant to enum value");
+        }
+
         bool                        as_bool()const;
         double                      as_double()const;
 
@@ -316,7 +330,17 @@ namespace fc
         std::string                 as_string()const;
 
         /// @pre  get_type() == string_type
-        const std::string&          get_string()const;
+        ///
+        /// Returns a non-owning view of the variant's string bytes.  The view is
+        /// valid until the variant is destroyed, mutated (assignment, move-from,
+        /// clear), or the underlying string is modified through any other means.
+        /// Was `const std::string&` historically; changed to `std::string_view`
+        /// so a future inline-string (SSO) encoding can return a view of the
+        /// inline bytes without materialising a heap std::string.  Callers that
+        /// need an owning copy should use as_string() (returns std::string by
+        /// value); callers that need a null-terminated c_str must construct
+        /// std::string explicitly first.
+        std::string_view            get_string()const;
 
         /// @throw if get_type() != array_type | null_type
         variants&                   get_array();
@@ -373,6 +397,9 @@ namespace fc
            return *this = variant( fc::forward<T>(v) );
         }
 
+        // Aliasing detector for operator=(const variant&); exposed for unit testing.
+        static bool _rhs_not_aliased( const variant* lhs, const variant& v );
+
         template<typename T>
         explicit variant( const std::optional<T>& v )
         {
@@ -403,6 +430,10 @@ namespace fc
    void from_variant( const fc::variant& var,  int64_t& vo );
    /** @ingroup Serializable */
    void from_variant( const fc::variant& var,  uint64_t& vo );
+   /** @ingroup Serializable */
+   void to_variant( const fc::int256& val, fc::variant& vo );
+   /** @ingroup Serializable */
+   void to_variant( const fc::uint256& val, fc::variant& vo );
    /** @ingroup Serializable */
    void from_variant( const fc::variant& var,  fc::int256& vo );
    /** @ingroup Serializable */
@@ -747,17 +778,17 @@ namespace fc
       for( const auto& item : vars )
          c.insert( item.as<T>() );
    }
-   template<typename T> void to_variant( const boost::multiprecision::number<T>& n, fc::variant& v ) {
-      v = n.str();
-   }
-   template<typename T> void from_variant( const fc::variant& v, boost::multiprecision::number<T>& n ) {
-      n = boost::multiprecision::number<T>(v.get_string());
-   }
+   // Generic boost::multiprecision to_variant/from_variant moved to fc/variant_multiprecision.hpp
 
-   fc::variant operator + ( const fc::variant& a, const fc::variant& b );
-   fc::variant operator - ( const fc::variant& a, const fc::variant& b );
-   fc::variant operator * ( const fc::variant& a, const fc::variant& b );
-   fc::variant operator / ( const fc::variant& a, const fc::variant& b );
+   // Arithmetic on variants is not supported. The previous implementations
+   // were unused dead code and `operator-` contained a never-reached loop bug.
+   // If a use case ever appears, perform the conversion explicitly
+   // (e.g. `a.as_int64() + b.as_int64()`) rather than relying on a generic
+   // multi-type operator with surprising coercion rules.
+   fc::variant operator + ( const fc::variant& a, const fc::variant& b ) = delete;
+   fc::variant operator - ( const fc::variant& a, const fc::variant& b ) = delete;
+   fc::variant operator * ( const fc::variant& a, const fc::variant& b ) = delete;
+   fc::variant operator / ( const fc::variant& a, const fc::variant& b ) = delete;
 
    bool operator == ( const fc::variant& a, const fc::variant& b );
    bool operator != ( const fc::variant& a, const fc::variant& b );
@@ -768,5 +799,5 @@ namespace fc
 
 #include <fc/reflect/reflect.hpp>
 FC_REFLECT_TYPENAME( fc::variant )
-FC_REFLECT_ENUM( fc::variant::type_id, (null_type)(int64_type)(uint64_type)(int128_type)(uint128_type)(int256_type)(uint256_type)(double_type)(bool_type)(string_type)(array_type)(object_type)(blob_type) )
+FC_REFLECT_ENUM( fc::variant::type_id, (null_type)(int64_type)(uint64_type)(int128_type)(uint128_type)(int256_type)(uint256_type)(double_type)(bool_type)(string_type)(array_type)(object_type)(blob_type)(string_sso_type) )
 FC_REFLECT( fc::blob, (data) );

@@ -89,7 +89,7 @@ BOOST_AUTO_TEST_CASE(test_r1) try {
 BOOST_AUTO_TEST_CASE(test_k1_recovery) try {
    auto payload = "Test Cases";
    auto digest = sha256::hash(payload, const_strlen(payload));
-   auto key = private_key::generate<ecc::private_key_shim>();
+   auto key = private_key::generate();
    auto pub = key.get_public_key();
    auto sig = key.sign(digest);
 
@@ -108,7 +108,7 @@ BOOST_AUTO_TEST_CASE(test_k1_recovery) try {
 BOOST_AUTO_TEST_CASE(test_r1_recovery) try {
    auto payload = "Test Cases";
    auto digest = sha256::hash(payload, const_strlen(payload));
-   auto key = private_key::generate<r1::private_key_shim>();
+   auto key = private_key::generate(private_key::key_type::r1);
    auto pub = key.get_public_key();
    auto sig = key.sign(digest);
 
@@ -125,7 +125,7 @@ BOOST_AUTO_TEST_CASE(test_r1_recovery) try {
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE(test_k1_recyle) try {
-   auto key = private_key::generate<ecc::private_key_shim>();
+   auto key = private_key::generate();
    auto pub = key.get_public_key();
    auto pub_str = pub.to_string({});
    auto recycled_pub = public_key::from_string(pub_str);
@@ -134,7 +134,7 @@ BOOST_AUTO_TEST_CASE(test_k1_recyle) try {
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE(test_r1_recyle) try {
-   auto key = private_key::generate<r1::private_key_shim>();
+   auto key = private_key::generate(private_key::key_type::r1);
    auto pub = key.get_public_key();
    auto pub_str = pub.to_string({});
    auto recycled_pub = public_key::from_string(pub_str);
@@ -143,7 +143,7 @@ BOOST_AUTO_TEST_CASE(test_r1_recyle) try {
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE(test_em) try {
-   auto key = fc::crypto::private_key::generate<em::private_key_shim>();
+   auto key = fc::crypto::private_key::generate(private_key::key_type::em);
    auto pub = key.get_public_key();
    auto priv_str = key.to_string({});
    auto pub_str = pub.to_string({});
@@ -168,7 +168,7 @@ BOOST_AUTO_TEST_CASE(test_em) try {
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE(test_em_alt) try {
-   auto key = fc::crypto::private_key::generate<em::private_key_shim>();
+   auto key = fc::crypto::private_key::generate(private_key::key_type::em);
    auto pub = key.get_public_key();
    auto priv_str = key.to_string({}, true);
    auto pub_str = pub.to_string({}, true);
@@ -192,10 +192,56 @@ BOOST_AUTO_TEST_CASE(test_em_alt) try {
    BOOST_CHECK_EQUAL(key.to_string({}, true), test_private_key2.to_string({}, true));
 } FC_LOG_AND_RETHROW();
 
+BOOST_AUTO_TEST_CASE(test_em_compressed_prefix_roundtrip) try {
+   // Parsing a compressed (33-byte) secp256k1 public key from hex must preserve
+   // the SEC1 prefix byte (0x02 = even y, 0x03 = odd y). Normalizing 0x03 to
+   // 0x02 silently flips to the wrong curve point and breaks Ethereum address
+   // derivation / signature verification for roughly half of all keys.
+   bool saw_02 = false;
+   bool saw_03 = false;
+   for (int i = 0; i < 80 && (!saw_02 || !saw_03); ++i) {
+      auto priv = private_key::generate(private_key::key_type::em);
+      auto pub  = priv.get_public_key();
+      const auto& compressed = pub.get<em::public_key_shim>()._data;
+      const uint8_t prefix = static_cast<uint8_t>(compressed[0]);
+      BOOST_TEST((prefix == 0x02 || prefix == 0x03));
+
+      const std::string compressed_hex = fc::to_hex(compressed, true); // "0x" + 66 hex chars
+      BOOST_CHECK_EQUAL(compressed_hex.size(), 68u);
+
+      auto parsed = public_key::from_string(compressed_hex, public_key::key_type::em);
+      const auto& parsed_bytes = parsed.get<em::public_key_shim>()._data;
+
+      BOOST_CHECK_EQUAL(static_cast<unsigned>(static_cast<uint8_t>(parsed_bytes[0])),
+                        static_cast<unsigned>(prefix));
+      BOOST_CHECK(std::equal(compressed.begin(), compressed.end(), parsed_bytes.begin()));
+
+      if (prefix == 0x02) saw_02 = true;
+      if (prefix == 0x03) saw_03 = true;
+   }
+   BOOST_CHECK_MESSAGE(saw_02, "did not sample any 0x02-prefix EM key in 80 iterations");
+   BOOST_CHECK_MESSAGE(saw_03, "did not sample any 0x03-prefix EM key in 80 iterations");
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(test_em_rejects_bare_x_hex) try {
+   // Bare 32-byte x-coordinate (64 hex chars) does not carry y-parity and
+   // cannot identify a unique curve point, so it must be rejected rather
+   // than silently defaulted to even y.
+   auto priv = private_key::generate(private_key::key_type::em);
+   auto pub  = priv.get_public_key();
+   const auto& compressed = pub.get<em::public_key_shim>()._data;
+   const std::string bare_x_hex =
+      std::string("0x") + fc::to_hex(compressed.data() + 1, compressed.size() - 1);
+   BOOST_CHECK_EQUAL(bare_x_hex.size(), 66u); // "0x" + 64 hex chars
+
+   BOOST_CHECK_THROW(public_key::from_string(bare_x_hex, public_key::key_type::em),
+                     fc::exception);
+} FC_LOG_AND_RETHROW();
+
 BOOST_AUTO_TEST_CASE(test_em_recovery_of_trx) try {
    auto        payload    = "Test Cases";
    auto        digest_raw = fc::sha256::hash(payload); // pretend payload is a transaction
-   auto        key     = fc::crypto::private_key::generate<em::private_key_shim>();
+   auto        key     = fc::crypto::private_key::generate(private_key::key_type::em);
    auto        pub     = key.get_public_key();
    auto        sig     = key.sign(digest_raw);
    std::string sig_str = sig.to_string({});
@@ -218,7 +264,7 @@ BOOST_AUTO_TEST_CASE(test_em_recovery_of_trx) try {
 BOOST_AUTO_TEST_CASE(test_em_recovery_of_eth) try {
    auto        payload    = "Test Cases";
    auto        digest_raw = ethereum::hash_message(ethereum::to_uint8_span(payload)); // pretend payload is an eth transaction (not EIP-191)
-   auto        key     = fc::crypto::private_key::generate<em::private_key_shim>();
+   auto        key     = fc::crypto::private_key::generate(private_key::key_type::em);
    auto        pub     = key.get_public_key();
    auto        sig     = signature(signature::storage_type(key.get<em::private_key_shim>().sign_keccak256(digest_raw)));
    std::string sig_str = sig.to_string({});
@@ -242,7 +288,7 @@ BOOST_AUTO_TEST_CASE(test_em_is_canonical) try {
    fc::sha256 msg = fc::sha256::hash(std::string("hello canonical world"));
 
    // Generate a private key
-   auto priv = fc::crypto::private_key::generate<em::private_key_shim>();
+   auto priv = fc::crypto::private_key::generate(private_key::key_type::em);
    auto sig = priv.sign(msg);
 
    // Force S > n/2 to simulate a non-canonical signature
@@ -251,6 +297,27 @@ BOOST_AUTO_TEST_CASE(test_em_is_canonical) try {
 
    BOOST_TEST(em::public_key::is_canonical(sig.get<em::signature_shim>()._data));
    BOOST_TEST(!em::public_key::is_canonical(non_canonical.get<em::signature_shim>()._data));
+} FC_LOG_AND_RETHROW();
+
+// public_key::operator< must order key bytes UNSIGNED (it routes through
+// less_comparator -> std::memcmp). authority validate() relies on this exact
+// ordering, and CDT-side contract code sorts keys with the same semantics, so a
+// regression to signed-char comparison here would silently disagree with the
+// contract for any key byte >= 0x80 and make valid authorities look unsorted.
+// Two EM keys (same variant index) differing first at a high-bit byte pin it.
+BOOST_AUTO_TEST_CASE(test_em_ordering_is_unsigned) try {
+   auto make_em = [](unsigned char second_byte) {
+      std::array<char, 33> d{};
+      d[0] = static_cast<char>(0x02);          // compressed-point prefix
+      d[1] = static_cast<char>(second_byte);   // first differing byte
+      return public_key(em::public_key_shim(d));
+   };
+   const auto k_hi = make_em(0x80);  // 128 unsigned, -128 if compared as signed char
+   const auto k_lo = make_em(0x01);  //   1 unsigned,    1 signed
+
+   // memcmp orders 0x80 (128) after 0x01 (1); signed char would invert both.
+   BOOST_TEST(  (k_lo < k_hi) );
+   BOOST_TEST( !(k_hi < k_lo) );
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE(test_ed_pub_str) try {
@@ -280,13 +347,21 @@ BOOST_AUTO_TEST_CASE(test_ed_priv_str) try {
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE(test_ed_sig_str) try {
-   auto sig_str = "4cdd1oX7cfVALfr26tP52BZ6cSzrgnNGtYD7BFhm6FFeZV5sPTnRvg6NRn8yC6DbEikXcrNChBM5vVJnTgKhGhVu";
-   auto sig = fc::crypto::signature::from_string(sig_str, signature::sig_type::ed);
-   BOOST_CHECK_EQUAL(sig_str, sig.to_string({}));
+   // Generate a real 96-byte ED25519 signature (64 sig + 32 embedded pubkey)
+   auto priv = fc::crypto::private_key::generate(private_key::key_type::ed);
+   auto digest = fc::sha256::hash(std::string("test_ed_sig_str"));
+   auto sig = priv.sign(digest);
+   auto sig_str = sig.to_string({});
+   BOOST_TEST(!sig_str.empty());
+   // Roundtrip: base58 -> signature -> base58
+   auto sig_rt = fc::crypto::signature::from_string(sig_str, signature::sig_type::ed);
+   BOOST_CHECK_EQUAL(sig_str, sig_rt.to_string({}));
+   // Prefixed form
    BOOST_TEST(sig.to_string({}, true).starts_with("SIG_ED_"));
    BOOST_TEST(sig.to_string({}, true).ends_with(sig_str));
    auto sig2 = fc::crypto::signature::from_string(sig.to_string({}, true));
    BOOST_CHECK_EQUAL(sig.to_string({}), sig2.to_string({}));
+   // Variant roundtrip
    fc::variant test_sig_variant{sig};
    signature test_sig2 = test_sig_variant.as<signature>();
    BOOST_CHECK_EQUAL(sig.to_string({}), test_sig2.to_string({}));
@@ -333,7 +408,7 @@ BOOST_AUTO_TEST_CASE(test_bls_sig_str) try {
 
 // --- sign_eth (shim-level): recovery round-trip with multiple messages ---
 BOOST_AUTO_TEST_CASE(test_sign_eth_recovery_roundtrip) try {
-   auto key = fc::crypto::private_key::generate<em::private_key_shim>();
+   auto key = fc::crypto::private_key::generate(private_key::key_type::em);
    auto pub = key.get_public_key();
    auto& em_key = key.get<em::private_key_shim>();
 
@@ -352,7 +427,7 @@ BOOST_AUTO_TEST_CASE(test_sign_eth_recovery_roundtrip) try {
 
 // --- sign_eth (shim-level): signing the same message twice produces the same signature (deterministic RFC-6979 nonce) ---
 BOOST_AUTO_TEST_CASE(test_sign_eth_deterministic) try {
-   auto key = fc::crypto::private_key::generate<em::private_key_shim>();
+   auto key = fc::crypto::private_key::generate(private_key::key_type::em);
    auto& em_key = key.get<em::private_key_shim>();
    auto digest = ethereum::hash_message(ethereum::to_uint8_span("determinism check"));
 
@@ -364,7 +439,7 @@ BOOST_AUTO_TEST_CASE(test_sign_eth_deterministic) try {
 
 // --- sign_solana (shim-level) + verify_solana round-trip ---
 BOOST_AUTO_TEST_CASE(test_sign_solana_verify_roundtrip) try {
-   auto key = fc::crypto::private_key::generate<ed::private_key_shim>();
+   auto key = fc::crypto::private_key::generate(private_key::key_type::ed);
    auto pub = key.get_public_key();
    auto& ed_key = key.get<ed::private_key_shim>();
    auto& ed_pub = pub.get<ed::public_key_shim>();
@@ -378,7 +453,7 @@ BOOST_AUTO_TEST_CASE(test_sign_solana_verify_roundtrip) try {
 
 // --- verify_solana rejects a tampered message ---
 BOOST_AUTO_TEST_CASE(test_verify_solana_rejects_tampered_message) try {
-   auto key = fc::crypto::private_key::generate<ed::private_key_shim>();
+   auto key = fc::crypto::private_key::generate(private_key::key_type::ed);
    auto pub = key.get_public_key();
    auto& ed_key = key.get<ed::private_key_shim>();
    auto& ed_pub = pub.get<ed::public_key_shim>();
@@ -396,9 +471,9 @@ BOOST_AUTO_TEST_CASE(test_verify_solana_rejects_tampered_message) try {
 
 // --- verify_solana rejects wrong public key ---
 BOOST_AUTO_TEST_CASE(test_verify_solana_rejects_wrong_key) try {
-   auto key1 = fc::crypto::private_key::generate<ed::private_key_shim>();
+   auto key1 = fc::crypto::private_key::generate(private_key::key_type::ed);
    auto pub1 = key1.get_public_key();
-   auto key2 = fc::crypto::private_key::generate<ed::private_key_shim>();
+   auto key2 = fc::crypto::private_key::generate(private_key::key_type::ed);
    auto pub2 = key2.get_public_key();
 
    auto msg = ethereum::to_uint8_span("signed by key1");
@@ -410,7 +485,7 @@ BOOST_AUTO_TEST_CASE(test_verify_solana_rejects_wrong_key) try {
 
 // --- sign_solana (shim-level) on binary data (non-UTF8) ---
 BOOST_AUTO_TEST_CASE(test_sign_solana_binary_payload) try {
-   auto key = fc::crypto::private_key::generate<ed::private_key_shim>();
+   auto key = fc::crypto::private_key::generate(private_key::key_type::ed);
    auto pub = key.get_public_key();
    auto& ed_key = key.get<ed::private_key_shim>();
    auto& ed_pub = pub.get<ed::public_key_shim>();
@@ -425,10 +500,10 @@ BOOST_AUTO_TEST_CASE(test_sign_solana_binary_payload) try {
 
 // --- Solana verify rejects non-ED key types via FC_ASSERT ---
 BOOST_AUTO_TEST_CASE(test_verify_solana_rejects_non_ed_key) try {
-   auto em_key = fc::crypto::private_key::generate<em::private_key_shim>();
+   auto em_key = fc::crypto::private_key::generate(private_key::key_type::em);
    auto em_pub = em_key.get_public_key();
 
-   auto ed_priv = fc::crypto::private_key::generate<ed::private_key_shim>();
+   auto ed_priv = fc::crypto::private_key::generate(private_key::key_type::ed);
    auto& ed_key = ed_priv.get<ed::private_key_shim>();
    auto msg = ethereum::to_uint8_span("test");
    auto ed_sig = ed_key.sign_raw(msg.data(), msg.size());
@@ -462,7 +537,7 @@ signature_provider_t make_provider(const private_key& key, chain_key_type_t key_
 } // anonymous namespace
 
 BOOST_AUTO_TEST_CASE(test_eth_client_signer_sign_recover) try {
-   auto key      = private_key::generate<em::private_key_shim>();
+   auto key      = private_key::generate(private_key::key_type::em);
    auto pub      = key.get_public_key();
    auto provider = make_provider(key, chain_key_type_ethereum);
 
@@ -476,7 +551,7 @@ BOOST_AUTO_TEST_CASE(test_eth_client_signer_sign_recover) try {
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE(test_wire_eth_signer_sign_recover) try {
-   auto key      = private_key::generate<em::private_key_shim>();
+   auto key      = private_key::generate(private_key::key_type::em);
    auto pub      = key.get_public_key();
    auto provider = make_provider(key, chain_key_type_ethereum);
 
@@ -491,7 +566,7 @@ BOOST_AUTO_TEST_CASE(test_wire_eth_signer_sign_recover) try {
 
 // --- wire_eth_signer must produce the same signature as em::sign_sha256 (the shim-level Wire signing path) ---
 BOOST_AUTO_TEST_CASE(test_wire_eth_signer_matches_sign_sha256) try {
-   auto key      = private_key::generate<em::private_key_shim>();
+   auto key      = private_key::generate(private_key::key_type::em);
    auto provider = make_provider(key, chain_key_type_ethereum);
    auto& em_key  = key.get<em::private_key_shim>();
 
@@ -511,7 +586,7 @@ BOOST_AUTO_TEST_CASE(test_wire_eth_signer_matches_sign_sha256) try {
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE(test_sol_client_signer_sign_verify) try {
-   auto key      = private_key::generate<ed::private_key_shim>();
+   auto key      = private_key::generate(private_key::key_type::ed);
    auto pub      = key.get_public_key();
    auto provider = make_provider(key, chain_key_type_solana);
 
@@ -528,7 +603,7 @@ BOOST_AUTO_TEST_CASE(test_sol_client_signer_sign_verify) try {
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE(test_wire_signer_k1) try {
-   auto key      = private_key::generate<ecc::private_key_shim>();
+   auto key      = private_key::generate();
    auto pub      = key.get_public_key();
    auto provider = make_provider(key, chain_key_type_wire);
 
@@ -543,7 +618,7 @@ BOOST_AUTO_TEST_CASE(test_wire_signer_k1) try {
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE(test_wire_signer_ed) try {
-   auto key      = private_key::generate<ed::private_key_shim>();
+   auto key      = private_key::generate(private_key::key_type::ed);
    auto pub      = key.get_public_key();
    auto provider = make_provider(key, chain_key_type_solana);
 
@@ -559,7 +634,7 @@ BOOST_AUTO_TEST_CASE(test_wire_signer_ed) try {
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE(test_wire_signer_sol) try {
-   auto key      = private_key::generate<ed::private_key_shim>();
+   auto key      = private_key::generate(private_key::key_type::ed);
    auto pub      = key.get_public_key();
    auto provider = make_provider(key, chain_key_type_solana);
 
@@ -584,7 +659,7 @@ BOOST_AUTO_TEST_CASE(test_wire_signer_sol) try {
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE(test_signer_rejects_wrong_key_type) try {
-   auto key      = private_key::generate<ecc::private_key_shim>();
+   auto key      = private_key::generate();
    auto provider = make_provider(key, chain_key_type_wire);
 
    // Trying to use a K1 provider with eth_client_signer should fail

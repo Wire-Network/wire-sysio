@@ -30,7 +30,7 @@ namespace sysio { namespace chain {
     *
     * File format v1:
     *   [Header]  (8 bytes)
-    *     magic:        uint32_t  (0x57495245 "WIRE")
+    *     magic:        uint32_t  (0x45524957 "WIRE" - bytes 'W','I','R','E' on disk)
     *     version:      uint32_t  (1)
     *
     *   [Section Data]
@@ -158,7 +158,8 @@ namespace sysio { namespace chain {
 
    class snapshot_writer {
       public:
-         static constexpr uint32_t magic_number = 0x57495245; // WIRE in ASCII
+         // Stored little-endian; bytes on disk are 'W','I','R','E' so a hex dump reads "WIRE".
+         static constexpr uint32_t magic_number = 0x45524957;
          static constexpr uint32_t max_threads  = 4;
 
          class section_writer {
@@ -166,6 +167,12 @@ namespace sysio { namespace chain {
                template<typename T>
                void add_row( const T& row, const chainbase::database& db ) {
                   _writer.write_row(detail::make_row_writer(detail::snapshot_row_traits<T>::to_snapshot_row(row, db)));
+               }
+
+               /// Overload for types whose snapshot_type == value_type (no db-dependent transformation).
+               template<typename T>
+               auto add_row( const T& row ) -> std::enable_if_t<std::is_same_v<std::decay_t<T>, typename detail::snapshot_row_traits<T>::snapshot_type>> {
+                  _writer.write_row(detail::make_row_writer(row));
                }
 
             private:
@@ -202,6 +209,15 @@ namespace sysio { namespace chain {
    };
 
    using snapshot_writer_ptr = std::shared_ptr<snapshot_writer>;
+
+   /// Section metadata shared by threaded_snapshot_writer and threaded_snapshot_reader.
+   struct snapshot_section_entry {
+      std::string        name;
+      uint64_t           data_offset = 0;
+      uint64_t           data_size = 0;
+      uint64_t           row_count = 0;
+      fc::crypto::blake3 hash;
+   };
 
    namespace detail {
       struct abstract_snapshot_row_reader {
@@ -305,6 +321,10 @@ namespace sysio { namespace chain {
                   return _reader.empty();
                }
 
+               size_t row_count() const {
+                  return _reader.section_row_count();
+               }
+
             private:
                friend class snapshot_reader;
                section_reader(snapshot_reader& _reader)
@@ -333,6 +353,7 @@ namespace sysio { namespace chain {
       virtual void return_to_header() = 0;
 
       virtual size_t total_row_count() = 0;
+      virtual size_t section_row_count() const = 0;
 
       virtual bool supports_threading() const {return false;}
 
@@ -376,6 +397,7 @@ namespace sysio { namespace chain {
          void clear_section() override;
          void return_to_header() override;
          size_t total_row_count() override;
+         size_t section_row_count() const override;
          bool has_section( const std::string& section_name ) const override;
 
       private:
@@ -411,14 +433,6 @@ namespace sysio { namespace chain {
          void write_end_section() override;
 
       private:
-         struct section_info {
-            std::string  name;
-            uint64_t     data_offset = 0;
-            uint64_t     data_size = 0;
-            uint64_t     row_count = 0;
-            fc::crypto::blake3 hash;
-         };
-
          /// Buffering streambuf that incrementally BLAKE3-hashes all writes
          /// before forwarding them to the underlying file streambuf.
          class hashing_streambuf : public std::streambuf {
@@ -440,7 +454,7 @@ namespace sysio { namespace chain {
                              std::ios_base::openmode = std::ios_base::out) override;
 
          private:
-            bool flush_buffer();
+            void flush_buffer();
             std::streambuf*    sink_ = nullptr;
             blake3_encoder     hasher_;
             std::vector<char>  buf_;
@@ -456,7 +470,7 @@ namespace sysio { namespace chain {
          uint64_t                       current_section_offset_ = 0;
          uint64_t                       current_row_count_ = 0;
 
-         std::vector<section_info>      sections_;
+         std::vector<snapshot_section_entry> sections_;
          fc::crypto::blake3             root_hash_;
    };
 
@@ -487,6 +501,7 @@ namespace sysio { namespace chain {
          void clear_section() override;
          void return_to_header() override;
          size_t total_row_count() override;
+         size_t section_row_count() const override;
 
       private:
          bool validate_section() const;
@@ -512,6 +527,7 @@ namespace sysio { namespace chain {
          void clear_section() override;
          void return_to_header() override;
          size_t total_row_count() override;
+         size_t section_row_count() const override;
          bool supports_threading() const override {return true;}
 
          bool has_section( const std::string& section_name ) const override;
@@ -524,19 +540,11 @@ namespace sysio { namespace chain {
          fc::crypto::blake3 get_root_hash() const { return root_hash_; }
 
       private:
-         struct section_entry {
-            std::string        name;
-            uint64_t           data_offset = 0;
-            uint64_t           data_size = 0;
-            uint64_t           row_count = 0;
-            fc::crypto::blake3 hash;
-         };
-
          fc::random_access_file                   snapshot_file;
          const boost::interprocess::mapped_region mapped_snap;
          const char* const                        mapped_snap_addr;
 
-         std::vector<section_entry>               section_index_;
+         std::vector<snapshot_section_entry>       section_index_;
          fc::crypto::blake3                       root_hash_;
          bool                                     index_loaded_ = false;
          bool                                     validated_ = false;

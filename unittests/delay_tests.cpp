@@ -215,7 +215,7 @@ BOOST_AUTO_TEST_CASE( link_delay_direct_test ) { try {
            ("account", "tester")
            ("permission", "first")
            ("parent", "active")
-           ("auth",  authority(chain.get_public_key(tester_account, "first"), 10))
+           ("auth",  authority(chain.get_public_key(tester_account, "first")))
    );
 
    chain.produce_block();
@@ -337,7 +337,7 @@ BOOST_AUTO_TEST_CASE( link_delay_direct_walk_parent_permissions_test ) { try {
            ("account", "tester")
            ("permission", "first")
            ("parent", "active")
-           ("auth",  authority(chain.get_public_key(tester_account, "first"), 20))
+           ("auth",  authority(chain.get_public_key(tester_account, "first")))
    );
 
    chain.produce_block();
@@ -401,7 +401,7 @@ BOOST_AUTO_TEST_CASE( link_delay_permission_change_test ) { try {
            ("account", "tester")
            ("permission", "first")
            ("parent", "active")
-           ("auth",  authority(chain.get_public_key(tester_account, "first"), 10))
+           ("auth",  authority(chain.get_public_key(tester_account, "first")))
    );
    chain.push_action(config::system_account_name, linkauth::get_name(), tester_account, fc::mutable_variant_object()
            ("account", "tester")
@@ -548,7 +548,7 @@ BOOST_AUTO_TEST_CASE( link_delay_permission_change_with_delay_heirarchy_test ) {
            ("account", "tester")
            ("permission", "first")
            ("parent", "active")
-           ("auth",  authority(chain.get_public_key(tester_account, "first"), 10))
+           ("auth",  authority(chain.get_public_key(tester_account, "first")))
    );
    chain.push_action(config::system_account_name, updateauth::get_name(), tester_account, fc::mutable_variant_object()
            ("account", "tester")
@@ -706,7 +706,7 @@ BOOST_AUTO_TEST_CASE( link_delay_link_change_heirarchy_test ) { try {
            ("account", "tester")
            ("permission", "first")
            ("parent", "active")
-           ("auth",  authority(chain.get_public_key(tester_account, "first"), 10))
+           ("auth",  authority(chain.get_public_key(tester_account, "first")))
    );
    chain.push_action(config::system_account_name, updateauth::get_name(), tester_account, fc::mutable_variant_object()
            ("account", "tester")
@@ -877,7 +877,7 @@ BOOST_AUTO_TEST_CASE( max_transaction_delay_execute ) { try {
                      ("account", "tester")
                      ("permission", "first")
                      ("parent", "active")
-                     ("auth",  authority(chain.get_public_key(tester_account, "first"), 30*86400)) // 30 days delay
+                     ("auth",  authority(chain.get_public_key(tester_account, "first")))
    );
 
    trace = chain.push_action(config::system_account_name, linkauth::get_name(), tester_account, fc::mutable_variant_object()

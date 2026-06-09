@@ -11,10 +11,10 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_EXTENSIONS ON)
 set(CXX_STANDARD_REQUIRED ON)
 
-set(VERSION_MAJOR 5)
-set(VERSION_MINOR 2)
+set(VERSION_MAJOR 1)
+set(VERSION_MINOR 0)
 set(VERSION_PATCH 0)
-set(VERSION_SUFFIX rc1)
+set(VERSION_SUFFIX dev)
 
 if(VERSION_SUFFIX)
   set(VERSION_FULL "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}-${VERSION_SUFFIX}")
@@ -25,8 +25,8 @@ endif()
 project(wire-sysio)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-include(build-init NO_POLICY_SCOPE)
 include(build-options NO_POLICY_SCOPE)
+include(build-init NO_POLICY_SCOPE)
 include(compiler-config NO_POLICY_SCOPE)
 include(dependencies NO_POLICY_SCOPE)
 include(linker-config NO_POLICY_SCOPE)
@@ -39,15 +39,8 @@ include(contract-tools NO_POLICY_SCOPE)
 include(CTest) # suppresses DartConfiguration.tcl error
 enable_testing()
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-
 include(GNUInstallDirs)
-include(MASSigning)
-include(AddTestHelpers)
-
-# Options
-option(ENABLE_WERROR "Enable `-Werror` compilation flag." Off)
-option(ENABLE_WEXTRA "Enable `-Wextra` compilation flag." Off)
+include(test-helpers)
 
 set(CLI_CLIENT_EXECUTABLE_NAME clio)
 set(NODE_EXECUTABLE_NAME nodeop)
@@ -70,10 +63,6 @@ if("${CMAKE_GENERATOR}" STREQUAL "Ninja")
 endif()
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS "ON")
-set(BUILD_DOXYGEN FALSE CACHE BOOL "Build doxygen documentation on every make")
-set(ENABLE_MULTIVERSION_PROTOCOL_TEST FALSE CACHE BOOL "Enable nodeop multiversion protocol test")
-
-option(ENABLE_OC "Enable sysvm-oc on supported platforms" ON)
 
 # WASM runtimes to enable. Each runtime in this list will have:
 #  * definition SYSIO_<RUNTIME>_RUNTIME_ENABLED defined in public libchain interface
@@ -93,56 +82,14 @@ if(CMAKE_SIZEOF_VOID_P EQUAL 8 AND NOT WIN32)
 endif()
 
 # Native-module runtime: only in Debug builds (used for debugger-attached contract execution)
-if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND CMAKE_SIZEOF_VOID_P EQUAL 8 AND NOT WIN32)
+if(DEBUG_ENABLED AND CMAKE_SIZEOF_VOID_P EQUAL 8 AND NOT WIN32)
   list(APPEND SYSIO_WASM_RUNTIMES native-module)
 endif()
 
-if(UNIX)
-  if(APPLE)
-    set(whole_archive_flag "-force_load")
-    set(no_whole_archive_flag "")
-  else()
-    set(whole_archive_flag "--whole-archive")
-    set(no_whole_archive_flag "--no-whole-archive")
-  endif()
-else()
-  set(whole_archive_flag "--whole-archive")
-  set(no_whole_archive_flag "--no-whole-archive")
-endif()
-
-if(APPLE AND UNIX)
-  # Apple Specific Options Here
-  message(STATUS "Configuring WIRE on macOS")
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}   -Wall -Wno-deprecated-declarations")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-deprecated-declarations")
-else()
-  # Linux Specific Options Here
-  message(STATUS "Configuring WIRE on Linux")
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}   -Wall")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
-  if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-    if(CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 4.0.0 OR CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 4.0.0)
-      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-invalid-partial-specialization")
-    endif()
-  endif()
-endif()
-
-if(ENABLE_WERROR)
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}   -Werror")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
-endif()
-if(ENABLE_WEXTRA)
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}   -Wextra")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra")
-endif()
-
-option(SYSIO_ENABLE_DEVELOPER_OPTIONS "enable developer options for WIRE" OFF)
 
 # based on http://www.delorie.com/gnu/docs/gdb/gdb_70.html
 # uncomment this line to tell GDB about macros (slows compile times)
 # set( CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -gdwarf-2 -g3" )
-
-set(ENABLE_COVERAGE_TESTING FALSE CACHE BOOL "Build WIRE for code coverage analysis")
 
 if(ENABLE_COVERAGE_TESTING)
   set(CMAKE_C_FLAGS "--coverage ${CMAKE_C_FLAGS}")
@@ -165,18 +112,6 @@ if(CORE_SYMBOL_NAME_LENGTH GREATER 7)
 endif()
 
 message(STATUS "Using '${CORE_SYMBOL_NAME}' as CORE symbol name")
-
-option(ENABLE_TCMALLOC "use tcmalloc (requires gperftools)" OFF)
-if(ENABLE_TCMALLOC)
-  find_package(Gperftools REQUIRED)
-  message(STATUS "Compiling Wire with TCMalloc")
-  #if doing this by the book, simply link_libraries( ${GPERFTOOLS_TCMALLOC} ) here. That will
-  #give the performance benefits of tcmalloc but since it won't be linked last
-  #the heap profiler & checker may not be accurate. This here is rather undocumented behavior
-  #to stuff a library toward the end of the link list
-  set(CMAKE_C_STANDARD_LIBRARIES "${CMAKE_C_STANDARD_LIBRARIES} ${GPERFTOOLS_TCMALLOC}")
-  set(CMAKE_CXX_STANDARD_LIBRARIES "${CMAKE_CXX_STANDARD_LIBRARIES} ${GPERFTOOLS_TCMALLOC}")
-endif()
 
 # sysio includes a bundled BoringSSL which conflicts with OpenSSL. Make sure any other bundled libraries (such as boost)
 # do not attempt to use an external OpenSSL in any manner
@@ -205,8 +140,6 @@ add_subdirectory(benchmark)
 
 add_subdirectory(contracts)
 add_subdirectory(contracts/tests)
-
-option(DISABLE_WASM_SPEC_TESTS "disable building of wasm spec unit tests" OFF)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/sysio.version.in ${CMAKE_CURRENT_BINARY_DIR}/sysio.version.hpp)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/sysio.version.hpp DESTINATION ${CMAKE_INSTALL_FULL_INCLUDEDIR})
@@ -242,10 +175,6 @@ install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/tests/TestHarness DESTINATION ${CM
   PATTERN "*.json"
   PATTERN "__pycache__" EXCLUDE
   PATTERN "CMakeFiles" EXCLUDE)
-
-# install(DIRECTORY "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/share/softfloat/" DESTINATION share/softfloat)
-install(DIRECTORY "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/include/" DESTINATION include)
-install(DIRECTORY "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/lib/" DESTINATION lib)
 
 if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.21)
   # Cmake versions < 3.21 did not support installing symbolic links to a directory via install(FILES ...)
@@ -299,8 +228,5 @@ endif()
 # )
 
 include(doxygen)
-
-option(ENABLE_SYSIO_DEV_DEB "Enable building the sysio-dev .deb package" OFF)
-option(ENABLE_SPRING_DEV_DEB "Enable building the spring-dev .deb package" OFF)
 
 include(cmake/package.cmake)

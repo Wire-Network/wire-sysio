@@ -164,6 +164,8 @@ try:
     Print(f"Snapshot: block_num={snapBlockNum}, block_id={snapBlockId}, root_hash={snapRootHash}")
 
     assert snapRootHash is not None and snapRootHash != "", "Snapshot root_hash should not be empty"
+    assert len(snapRootHash) == 64 and all(c in '0123456789abcdef' for c in snapRootHash), \
+        f"Snapshot root_hash should be a 64-char hex string, got: {snapRootHash}"
 
     Print(f"Submit votesnaphash from {snapProv1.name}")
     success, trans = node0.pushMessage("sysio", "votesnaphash",
@@ -185,12 +187,14 @@ try:
     assert records is not None, "Failed to read snaprecords table"
     assert len(records) >= 1, f"Expected at least 1 attested record, got {len(records)}"
 
+    # KV table rows are returned as {"key": {...}, "value": {...}}
     found = False
     for rec in records:
-        if rec["block_num"] == snapBlockNum:
+        val = rec["value"]
+        if val["block_num"] == snapBlockNum:
             found = True
-            onChainHash = rec["snapshot_hash"]
-            Print(f"On-chain record: block_num={rec['block_num']}, snapshot_hash={onChainHash}")
+            onChainHash = val["snapshot_hash"]
+            Print(f"On-chain record: block_num={val['block_num']}, snapshot_hash={onChainHash}")
             assert onChainHash == snapRootHash, \
                 f"Hash mismatch! on-chain={onChainHash} vs snapshot={snapRootHash}"
             break
@@ -238,7 +242,7 @@ try:
 
     Print("Verify second attested record")
     records = node0.getTableRows("sysio", "sysio", "snaprecords")
-    found2 = any(r["block_num"] == snap2BlockNum for r in records)
+    found2 = any(r["value"]["block_num"] == snap2BlockNum for r in records)
     assert found2, f"No attested record for block {snap2BlockNum}"
 
     Print("Test 2 PASSED: Multiple provider votes and attestation")
@@ -299,7 +303,7 @@ try:
 
     # Verify the attestation record exists on the producing node
     records = node0.getTableRows("sysio", "sysio", "snaprecords")
-    found = any(r["block_num"] == attestBlockNum for r in records)
+    found = any(r["value"]["block_num"] == attestBlockNum for r in records)
     assert found, f"Attestation record not created for block {attestBlockNum}"
     Print(f"Attestation record confirmed for block {attestBlockNum}")
 
@@ -334,7 +338,7 @@ try:
     assert records is not None, "Failed to read snaprecords on synced node"
     assert len(records) >= 1, f"Expected attestation records after sync, got {len(records)}"
 
-    found = any(r["block_num"] == attestBlockNum for r in records)
+    found = any(r["value"]["block_num"] == attestBlockNum for r in records)
     assert found, f"Attestation for block {attestBlockNum} not found after sync"
 
     Print("Test 4 PASSED: Attested snapshot loaded, synced, and verified")
@@ -354,8 +358,8 @@ try:
 
     providers = node0.getTableRows("sysio", "sysio", "snapprovs")
     assert len(providers) == 1, f"Expected 1 provider after deregistration, got {len(providers)}"
-    assert providers[0]["snap_account"] == snapProv1.name, \
-        f"Remaining provider should be {snapProv1.name}, got {providers[0]['snap_account']}"
+    assert providers[0]["value"]["snap_account"] == snapProv1.name, \
+        f"Remaining provider should be {snapProv1.name}, got {providers[0]['value']['snap_account']}"
 
     Print("Test 5 PASSED: Provider deregistration works")
 

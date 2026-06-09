@@ -95,7 +95,7 @@ try:
     testerbAccount=accounts[3]
     testerbAccount.name="testerb11111"
     testerbOwner = testerbAccount.ownerPublicKey
-    testerbAccount.ownerPublicKey = '{"threshold":1, "accounts":[{"permission":{"actor": "' + testeraAccount.name + '", "permission":"owner"}, "weight": 1}],"keys":[{"key": "' +testerbOwner +  '", "weight": 1}],"waits":[]}'
+    testerbAccount.ownerPublicKey = '{"threshold":1, "accounts":[{"permission":{"actor": "' + testeraAccount.name + '", "permission":"owner"}, "weight": 1}],"keys":[{"key": "' +testerbOwner +  '", "weight": 1}]}'
 
     PRV_KEY1=testeraAccount.ownerPrivateKey
     PUB_KEY1=testeraAccount.ownerPublicKey
@@ -365,7 +365,7 @@ try:
     row0=node.getTableRow(contract, currencyAccount.name, table, 0)
     try:
         assert(row0)
-        assert(row0["balance"] == "100000.0000 CUR")
+        assert(row0["value"]["balance"] == "100000.0000 CUR")
     except (AssertionError, KeyError) as _:
         Print("ERROR: Failed get table row assertion. %s" % (row0))
         raise

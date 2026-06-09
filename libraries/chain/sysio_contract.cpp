@@ -1,5 +1,4 @@
 #include <sysio/chain/sysio_contract.hpp>
-#include <sysio/chain/contract_table_objects.hpp>
 
 #include <sysio/chain/controller.hpp>
 #include <sysio/chain/transaction_context.hpp>
@@ -23,12 +22,6 @@
 #include <fc/io/raw.hpp>
 
 namespace sysio::chain {
-
-
-uint128_t transaction_id_to_sender_id( const transaction_id_type& tid ) {
-   fc::uint128 _id = fc::to_uint128(tid._hash[3], tid._hash[2]);
-   return (unsigned __int128)_id;
-}
 
 void validate_authority_precondition( const apply_context& context, const authority& auth ) {
    for(const auto& a : auth.accounts) {
@@ -93,7 +86,6 @@ void apply_sysio_newaccount(apply_context& context) {
       int ram_delta = 0;
       db.create<account_object>([&](auto& a) {
          a.name = create.name;
-         a.creation_date = context.control.pending_block_time();
       });
       ram_delta += config::billable_size_v<account_object>;
 
@@ -268,10 +260,7 @@ void apply_sysio_updateauth(apply_context& context) {
 
    auto update = context.get_action().data_as<updateauth>();
 
-   // ** NEW ADDED IF STATEMENT **
-   if( update.permission.suffix() != name("ext")) {
-      context.require_authorization(update.account); // only here to mark the single authority on this action as used
-   }
+   context.require_authorization(update.account); // only here to mark the single authority on this action as used
 
    auto& authorization = context.control.get_mutable_authorization_manager();
    auto& db = context.db;
@@ -290,13 +279,6 @@ void apply_sysio_updateauth(apply_context& context) {
       SYS_ASSERT(update.parent.empty(), action_validate_exception, "Cannot change owner authority's parent");
    else
       SYS_ASSERT(!update.parent.empty(), action_validate_exception, "Only owner permission can have empty parent" );
-
-   if( update.auth.waits.size() > 0 ) {
-      auto max_delay = context.control.get_global_properties().configuration.max_transaction_delay;
-      SYS_ASSERT( update.auth.waits.back().wait_sec <= max_delay, action_validate_exception,
-                  "Cannot set delay longer than max_transacton_delay, which is {} seconds",
-                  max_delay );
-   }
 
    validate_authority_precondition(context, update.auth);
 

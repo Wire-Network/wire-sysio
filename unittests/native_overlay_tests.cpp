@@ -9,6 +9,8 @@
 #include <fc/variant_object.hpp>
 #include <fc/crypto/sha256.hpp>
 
+#include <dlfcn.h>
+
 #include <test_contracts.hpp>
 
 using namespace sysio::testing;
@@ -132,6 +134,50 @@ BOOST_AUTO_TEST_CASE(overlay_falls_through_to_wasm) { try {
 
    // If we get here without throwing, WASM fallback works
    BOOST_REQUIRE(true);
+
+} FC_LOG_AND_RETHROW() }
+
+// Verify all native .so contract files load successfully (dlopen + dlsym apply).
+// This ensures the KV intrinsic exports link correctly for all production contracts.
+BOOST_AUTO_TEST_CASE(all_native_so_load) { try {
+   namespace fs = std::filesystem;
+   fs::path contracts_dir = fs::path(NATIVE_CONTRACTS_DIR);
+
+   struct so_info { std::string dir; std::string file; };
+   std::vector<so_info> native_contracts = {
+      {"sysio.bios",   "sysio.bios_native.so"},
+      {"sysio.token",  "sysio.token_native.so"},
+      {"sysio.msig",   "sysio.msig_native.so"},
+      {"sysio.system", "sysio.system_native.so"},
+      {"sysio.roa",    "sysio.roa_native.so"},
+      {"sysio.wrap",   "sysio.wrap_native.so"},
+      {"sysio.authex", "sysio.authex_native.so"},
+   };
+
+   for (const auto& nc : native_contracts) {
+      fs::path so_path = contracts_dir / nc.dir / nc.file;
+      if (!fs::exists(so_path)) {
+         BOOST_TEST_MESSAGE("Skipping " + nc.file + " (not built)");
+         continue;
+      }
+
+      // dlopen the .so
+      dlerror(); // clear any prior error
+      void* handle = dlopen(so_path.c_str(), RTLD_NOW | RTLD_LOCAL);
+      const char* dl_err = dlerror();
+      BOOST_REQUIRE_MESSAGE(handle != nullptr,
+         nc.file + " failed to load: " + (dl_err ? dl_err : "unknown error"));
+
+      // Verify the 'apply' symbol exists
+      dlerror(); // clear
+      void* apply_sym = dlsym(handle, "apply");
+      dl_err = dlerror();
+      BOOST_REQUIRE_MESSAGE(apply_sym != nullptr,
+         nc.file + " missing 'apply' symbol: " + (dl_err ? dl_err : "unknown error"));
+
+      BOOST_TEST_MESSAGE(nc.file + " loaded and verified");
+      dlclose(handle);
+   }
 
 } FC_LOG_AND_RETHROW() }
 

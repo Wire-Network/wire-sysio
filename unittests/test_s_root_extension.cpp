@@ -113,4 +113,128 @@ BOOST_AUTO_TEST_CASE(something_to_report) {
    } FC_LOG_AND_RETHROW()
 }
 
+// Direct unit tests for the validate_s_root_extensions_match helper extracted
+// from apply_block. Each test builds received/constructed extension vectors by
+// hand and verifies the helper accepts or rejects as expected.
+namespace {
+
+// Build a packed s_root_extension with distinct-but-valid fields. The `nonce`
+// byte perturbs current_s_id so two entries with different nonces compare
+// unequal after packing.
+std::vector<char> make_sre(uint8_t nonce) {
+   s_header h;
+   h.contract_name = "sysio"_n;
+   h.previous_s_id = checksum256_type();
+   h.current_s_id  = checksum256_type();
+   h.current_s_id._hash[0] = nonce; // differentiate payloads
+   h.current_s_root = checksum256_type();
+   h.previous_block_num = 0;
+   return fc::raw::pack(s_root_extension(h));
+}
+
+// Append an s_root_extension entry to an extensions_type.
+void push_sre(extensions_type& v, uint8_t nonce) {
+   v.emplace_back(s_root_extension::extension_id(), make_sre(nonce));
+}
+
+// Append a non-s_root extension entry (extension_id = 0) with arbitrary bytes.
+// Used to verify the helper filters by extension_id rather than just position.
+void push_other(extensions_type& v, const std::string& s) {
+   v.emplace_back(uint16_t{0}, std::vector<char>(s.begin(), s.end()));
+}
+
+} // namespace
+
+BOOST_AUTO_TEST_CASE(validate_match_zero_entries) {
+   extensions_type received;
+   extensions_type constructed;
+   BOOST_CHECK_NO_THROW(validate_s_root_extensions_match(received, constructed));
+}
+
+BOOST_AUTO_TEST_CASE(validate_match_zero_among_other_extensions) {
+   // No s_root_extensions on either side, but both have unrelated extensions.
+   // Helper must filter by extension_id and accept.
+   extensions_type received;    push_other(received,    "pfa_bytes");
+   extensions_type constructed; push_other(constructed, "pfa_bytes_different"); // different content - ignored
+   BOOST_CHECK_NO_THROW(validate_s_root_extensions_match(received, constructed));
+}
+
+BOOST_AUTO_TEST_CASE(validate_match_one_entry) {
+   extensions_type received;    push_sre(received,    1);
+   extensions_type constructed; push_sre(constructed, 1);
+   BOOST_CHECK_NO_THROW(validate_s_root_extensions_match(received, constructed));
+}
+
+BOOST_AUTO_TEST_CASE(validate_match_three_entries_in_order) {
+   extensions_type received;
+   push_sre(received, 1); push_sre(received, 2); push_sre(received, 3);
+   extensions_type constructed;
+   push_sre(constructed, 1); push_sre(constructed, 2); push_sre(constructed, 3);
+   BOOST_CHECK_NO_THROW(validate_s_root_extensions_match(received, constructed));
+}
+
+BOOST_AUTO_TEST_CASE(validate_match_three_entries_with_interleaved_other) {
+   // s_root_extensions interleaved with other extension types. The helper only
+   // compares s_root_extensions by position-within-sre, ignoring everything else.
+   extensions_type received;
+   push_other(received, "x");
+   push_sre(received, 1);
+   push_other(received, "y");
+   push_sre(received, 2);
+   push_sre(received, 3);
+   extensions_type constructed;
+   push_sre(constructed, 1);
+   push_other(constructed, "z"); // different position of "other" - should not matter
+   push_sre(constructed, 2);
+   push_sre(constructed, 3);
+   BOOST_CHECK_NO_THROW(validate_s_root_extensions_match(received, constructed));
+}
+
+BOOST_AUTO_TEST_CASE(validate_rejects_received_has_more) {
+   extensions_type received;
+   push_sre(received, 1); push_sre(received, 2);
+   extensions_type constructed;
+   push_sre(constructed, 1);
+   BOOST_CHECK_EXCEPTION(validate_s_root_extensions_match(received, constructed),
+      block_validate_exception,
+      fc_exception_message_contains("count mismatch"));
+}
+
+BOOST_AUTO_TEST_CASE(validate_rejects_constructed_has_more) {
+   extensions_type received;
+   push_sre(received, 1);
+   extensions_type constructed;
+   push_sre(constructed, 1); push_sre(constructed, 2);
+   BOOST_CHECK_EXCEPTION(validate_s_root_extensions_match(received, constructed),
+      block_validate_exception,
+      fc_exception_message_contains("count mismatch"));
+}
+
+BOOST_AUTO_TEST_CASE(validate_rejects_only_one_side_has_sre) {
+   extensions_type received;
+   push_sre(received, 1);
+   extensions_type constructed; // empty
+   BOOST_CHECK_EXCEPTION(validate_s_root_extensions_match(received, constructed),
+      block_validate_exception,
+      fc_exception_message_contains("count mismatch"));
+}
+
+BOOST_AUTO_TEST_CASE(validate_rejects_payload_mismatch_at_first_slot) {
+   extensions_type received;    push_sre(received,    1);
+   extensions_type constructed; push_sre(constructed, 2);
+   BOOST_CHECK_EXCEPTION(validate_s_root_extensions_match(received, constructed),
+      block_validate_exception,
+      fc_exception_message_contains("payload mismatch at slot 1"));
+}
+
+BOOST_AUTO_TEST_CASE(validate_rejects_payload_mismatch_at_second_slot) {
+   extensions_type received;
+   push_sre(received, 1); push_sre(received, 2);
+   extensions_type constructed;
+   push_sre(constructed, 1); push_sre(constructed, 99);
+   BOOST_CHECK_EXCEPTION(validate_s_root_extensions_match(received, constructed),
+      block_validate_exception,
+      fc_exception_message_contains("payload mismatch at slot 2"));
+}
+
 BOOST_AUTO_TEST_SUITE_END()

@@ -1,0 +1,164 @@
+{
+    "____comment": "This file was generated with sysio-abigen. DO NOT EDIT ",
+    "version": "sysio::abi/1.2",
+    "types": [],
+    "structs": [
+        {
+            "name": "clearlinks",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "createlink",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_kind",
+                    "type": "ChainKind"
+                },
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "sig",
+                    "type": "signature"
+                },
+                {
+                    "name": "pub_key",
+                    "type": "public_key"
+                },
+                {
+                    "name": "nonce",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "links_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "key",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "links_s",
+            "base": "",
+            "fields": [
+                {
+                    "name": "key",
+                    "type": "uint64"
+                },
+                {
+                    "name": "username",
+                    "type": "name"
+                },
+                {
+                    "name": "chain_kind",
+                    "type": "ChainKind"
+                },
+                {
+                    "name": "pub_key",
+                    "type": "public_key"
+                }
+            ]
+        },
+        {
+            "name": "recordlink",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "chain_kind",
+                    "type": "ChainKind"
+                },
+                {
+                    "name": "pub_key",
+                    "type": "public_key"
+                }
+            ]
+        }
+    ],
+    "actions": [
+        {
+            "name": "clearlinks",
+            "type": "clearlinks",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "createlink",
+            "type": "createlink",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "recordlink",
+            "type": "recordlink",
+            "ricardian_contract": ""
+        }
+    ],
+    "tables": [
+        {
+            "name": "links",
+            "type": "links_s",
+            "index_type": "i64",
+            "key_names": ["key"],
+            "key_types": ["uint64"],
+            "table_id": 27043,
+            "secondary_indexes": [
+                {
+                    "name": "bynamechain",
+                    "key_type": "uint128",
+                    "table_id": 52000
+                },
+                {
+                    "name": "byname",
+                    "key_type": "uint64",
+                    "table_id": 41817
+                },
+                {
+                    "name": "bypubkey",
+                    "key_type": "checksum256",
+                    "table_id": 14415
+                },
+                {
+                    "name": "bychain",
+                    "key_type": "uint64",
+                    "table_id": 39647
+                }
+            ]
+        }
+    ],
+    "ricardian_clauses": [],
+    "variants": [],
+    "action_results": [],
+    "enums": [
+        {
+            "name": "ChainKind",
+            "type": "int32",
+            "values": [
+                {
+                    "name": "CHAIN_KIND_UNKNOWN",
+                    "value": 0
+                },
+                {
+                    "name": "CHAIN_KIND_WIRE",
+                    "value": 1
+                },
+                {
+                    "name": "CHAIN_KIND_EVM",
+                    "value": 2
+                },
+                {
+                    "name": "CHAIN_KIND_SVM",
+                    "value": 3
+                }
+            ]
+        }
+    ]
+}

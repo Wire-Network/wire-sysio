@@ -51,10 +51,6 @@
                 {
                     "name": "accounts",
                     "type": "permission_level_weight[]"
-                },
-                {
-                    "name": "waits",
-                    "type": "wait_weight[]"
                 }
             ]
         },
@@ -731,20 +727,6 @@
                 {
                     "name": "authorized_by",
                     "type": "name$"
-                }
-            ]
-        },
-        {
-            "name": "wait_weight",
-            "base": "",
-            "fields": [
-                {
-                    "name": "wait_sec",
-                    "type": "uint32"
-                },
-                {
-                    "name": "weight",
-                    "type": "uint16"
                 }
             ]
         },

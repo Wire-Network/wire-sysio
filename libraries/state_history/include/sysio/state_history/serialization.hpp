@@ -1,7 +1,7 @@
 #pragma once
 
 #include <sysio/chain/account_object.hpp>
-#include <sysio/chain/contract_table_objects.hpp>
+#include <sysio/chain/kv_table_objects.hpp>
 #include <sysio/chain/controller.hpp>
 #include <sysio/chain/exceptions.hpp>
 #include <sysio/chain/global_property_object.hpp>
@@ -153,7 +153,8 @@ void history_pack_big_bytes(datastream<ST>& ds, const sysio::chain::bytes& v) {
 template <typename ST>
 void history_pack_big_bytes(datastream<ST>& ds, const sysio::chain::shared_blob& b) {
    fc::raw::pack(ds, unsigned_int((uint32_t)b.size()));
-   ds.write(b.data(), b.size());
+   if (b.size())
+      ds.write(b.data(), b.size());
 }
 
 template <typename ST>
@@ -194,7 +195,7 @@ template <typename ST>
 datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper<sysio::chain::account_object>& obj) {
    fc::raw::pack(ds, fc::unsigned_int(0));
    fc::raw::pack(ds, as_type<uint64_t>(obj.obj.name.to_uint64_t()));
-   fc::raw::pack(ds, as_type<sysio::chain::block_timestamp_type>(obj.obj.creation_date));
+   fc::raw::pack(ds, sysio::chain::block_timestamp_type{}); // creation_date removed from account_object; emit zero for ABI compat
    const auto* account_metadata = obj.db.find<sysio::chain::account_metadata_object, sysio::chain::by_name>(obj.obj.name);
    if (account_metadata != nullptr) {
       fc::raw::pack(ds, as_type<sysio::chain::shared_string>(account_metadata->abi));
@@ -230,93 +231,34 @@ datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper_stat
    return ds;
 }
 
-template <typename ST>
-datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper_stateless<sysio::chain::table_id_object>& obj) {
-   fc::raw::pack(ds, fc::unsigned_int(0));
-   fc::raw::pack(ds, as_type<uint64_t>(obj.obj.code.to_uint64_t()));
-   fc::raw::pack(ds, as_type<uint64_t>(obj.obj.scope.to_uint64_t()));
-   fc::raw::pack(ds, as_type<uint64_t>(obj.obj.table.to_uint64_t()));
-   fc::raw::pack(ds, as_type<uint64_t>(obj.obj.payer.to_uint64_t()));
-   return ds;
-}
+// KV database objects — serialized as contract_row_kv with table_id.
+// Clients resolve table_id → table name via contract ABI.
 
 template <typename ST>
-datastream<ST>& operator<<(datastream<ST>& ds, const history_context_wrapper_stateless<sysio::chain::table_id_object, sysio::chain::key_value_object>& obj) {
-   fc::raw::pack(ds, fc::unsigned_int(0));
-   fc::raw::pack(ds, as_type<uint64_t>(obj.context.code.to_uint64_t()));
-   fc::raw::pack(ds, as_type<uint64_t>(obj.context.scope.to_uint64_t()));
-   fc::raw::pack(ds, as_type<uint64_t>(obj.context.table.to_uint64_t()));
-   fc::raw::pack(ds, as_type<uint64_t>(obj.obj.primary_key));
+datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper<sysio::chain::kv_object>& obj) {
+   fc::raw::pack(ds, fc::unsigned_int(0)); // struct_version
+   fc::raw::pack(ds, as_type<uint64_t>(obj.obj.code.to_uint64_t()));
    fc::raw::pack(ds, as_type<uint64_t>(obj.obj.payer.to_uint64_t()));
+   fc::raw::pack(ds, as_type<uint16_t>(obj.obj.table_id));
+   sysio::chain::bytes key_bytes(obj.obj.key.data(), obj.obj.key.data() + obj.obj.key.size());
+   history_pack_big_bytes(ds, key_bytes);
    history_pack_big_bytes(ds, obj.obj.value);
    return ds;
 }
 
-template <typename ST, typename T>
-void serialize_secondary_index_data(datastream<ST>& ds, const T& obj) {
-   fc::raw::pack(ds, obj);
-}
-
 template <typename ST>
-void serialize_secondary_index_data(datastream<ST>& ds, const float64_t& obj) {
-   uint64_t i;
-   memcpy(&i, &obj, sizeof(i));
-   fc::raw::pack(ds, i);
-}
-
-template <typename ST>
-void serialize_secondary_index_data(datastream<ST>& ds, const float128_t& obj) {
-   __uint128_t i;
-   memcpy(&i, &obj, sizeof(i));
-   fc::raw::pack(ds, i);
-}
-
-template <typename ST>
-void serialize_secondary_index_data(datastream<ST>& ds, const sysio::chain::key256_t& obj) {
-   auto rev = [&](__uint128_t x) {
-      char* ch = reinterpret_cast<char*>(&x);
-      std::reverse(ch, ch + sizeof(x));
-      return x;
-   };
-   fc::raw::pack(ds, rev(obj[0]));
-   fc::raw::pack(ds, rev(obj[1]));
-}
-
-template <typename ST, typename T>
-datastream<ST>& serialize_secondary_index(datastream<ST>& ds, const sysio::chain::table_id_object& context, const T& obj) {
-   fc::raw::pack(ds, fc::unsigned_int(0));
-   fc::raw::pack(ds, as_type<uint64_t>(context.code.to_uint64_t()));
-   fc::raw::pack(ds, as_type<uint64_t>(context.scope.to_uint64_t()));
-   fc::raw::pack(ds, as_type<uint64_t>(context.table.to_uint64_t()));
-   fc::raw::pack(ds, as_type<uint64_t>(obj.primary_key));
-   fc::raw::pack(ds, as_type<uint64_t>(obj.payer.to_uint64_t()));
-   serialize_secondary_index_data(ds, obj.secondary_key);
+datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper<sysio::chain::kv_index_object>& obj) {
+   fc::raw::pack(ds, fc::unsigned_int(0)); // struct_version
+   fc::raw::pack(ds, as_type<uint64_t>(obj.obj.code.to_uint64_t()));
+   fc::raw::pack(ds, as_type<uint64_t>(obj.obj.payer.to_uint64_t()));
+   fc::raw::pack(ds, as_type<uint16_t>(obj.obj.table_id));
+   history_pack_varuint64(ds, obj.obj.sec_key.size());
+   if (obj.obj.sec_key.size() > 0)
+      ds.write(obj.obj.sec_key.data(), obj.obj.sec_key.size());
+   history_pack_varuint64(ds, obj.obj.pri_key.size());
+   if (obj.obj.pri_key.size() > 0)
+      ds.write(obj.obj.pri_key.data(), obj.obj.pri_key.size());
    return ds;
-}
-
-template <typename ST>
-datastream<ST>& operator<<(datastream<ST>& ds, const history_context_wrapper_stateless<sysio::chain::table_id_object, sysio::chain::index64_object>& obj) {
-   return serialize_secondary_index(ds, obj.context, obj.obj);
-}
-
-template <typename ST>
-datastream<ST>& operator<<(datastream<ST>& ds, const history_context_wrapper_stateless<sysio::chain::table_id_object, sysio::chain::index128_object>& obj) {
-   return serialize_secondary_index(ds, obj.context, obj.obj);
-}
-
-template <typename ST>
-datastream<ST>& operator<<(datastream<ST>& ds, const history_context_wrapper_stateless<sysio::chain::table_id_object, sysio::chain::index256_object>& obj) {
-   return serialize_secondary_index(ds, obj.context, obj.obj);
-}
-
-template <typename ST>
-datastream<ST>& operator<<(datastream<ST>& ds, const history_context_wrapper_stateless<sysio::chain::table_id_object, sysio::chain::index_double_object>& obj) {
-   return serialize_secondary_index(ds, obj.context, obj.obj);
-}
-
-template <typename ST>
-datastream<ST>& operator<<(datastream<ST>& ds, const history_context_wrapper_stateless<sysio::chain::table_id_object, sysio::chain::index_long_double_object>& obj) {
-   return serialize_secondary_index(ds, obj.context, obj.obj);
 }
 
 template <typename ST>
@@ -343,7 +285,7 @@ datastream<ST>& operator<<(datastream<ST>&                                      
 
 template <typename ST>
 datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper_stateless<sysio::chain::chain_config>& obj) {
-   fc::raw::pack(ds, fc::unsigned_int(1));
+   fc::raw::pack(ds, fc::unsigned_int(0)); // variant index: chain_config_v0
    fc::raw::pack(ds, as_type<uint64_t>(obj.obj.max_block_net_usage));
    fc::raw::pack(ds, as_type<uint32_t>(obj.obj.target_block_net_usage_pct));
    fc::raw::pack(ds, as_type<uint32_t>(obj.obj.max_transaction_net_usage));
@@ -356,12 +298,14 @@ datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper_stat
    fc::raw::pack(ds, as_type<uint32_t>(obj.obj.max_transaction_cpu_usage));
    fc::raw::pack(ds, as_type<uint32_t>(obj.obj.min_transaction_cpu_usage));
    fc::raw::pack(ds, as_type<uint32_t>(obj.obj.max_transaction_lifetime));
-   fc::raw::pack(ds, as_type<uint32_t>(obj.obj.deferred_trx_expiration_window));
    fc::raw::pack(ds, as_type<uint32_t>(obj.obj.max_transaction_delay));
    fc::raw::pack(ds, as_type<uint32_t>(obj.obj.max_inline_action_size));
    fc::raw::pack(ds, as_type<uint16_t>(obj.obj.max_inline_action_depth));
    fc::raw::pack(ds, as_type<uint16_t>(obj.obj.max_authority_depth));
    fc::raw::pack(ds, as_type<uint32_t>(obj.obj.max_action_return_value_size));
+   fc::raw::pack(ds, as_type<uint32_t>(obj.obj.max_kv_key_size));
+   fc::raw::pack(ds, as_type<uint32_t>(obj.obj.max_kv_value_size));
+   fc::raw::pack(ds, as_type<uint32_t>(obj.obj.max_kv_secondary_key_size));
    return ds;
 }
 
@@ -430,18 +374,13 @@ datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper_stat
 }
 
 template <typename ST>
-datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper_stateless<sysio::chain::wait_weight>& obj) {
-   fc::raw::pack(ds, as_type<uint32_t>(obj.obj.wait_sec));
-   fc::raw::pack(ds, as_type<uint16_t>(obj.obj.weight));
-   return ds;
-}
-
-template <typename ST>
 datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper<sysio::chain::shared_authority>& obj) {
    fc::raw::pack(ds, as_type<uint32_t>(obj.obj.threshold));
    history_serialize_container(ds, obj.db, obj.obj.keys);
    history_serialize_container(ds, obj.db, obj.obj.accounts);
-   history_serialize_container(ds, obj.db, obj.obj.waits);
+   fc::raw::pack(ds, fc::unsigned_int(0)); // empty waits — SHiP binary compatibility, wait_weight[] still in ABI
+                                           // was vector<struct wait_weight{uint32_t wait_sec; weight_type weight;}>
+
    return ds;
 }
 
@@ -642,8 +581,8 @@ datastream<ST>& operator<<(datastream<ST>& ds, const history_context_wrapper_sta
    if (trace.receipt) {
       fc::raw::pack(ds, as_type<uint8_t>(sysio::chain::transaction_receipt_header::status_enum::executed)); // executed is 0
       fc::raw::pack(ds, as_type<uint32_t>(trace.total_cpu_usage_us));
-      // Round up net_usage to the nearest multiple of 8 bytes
-      fc::raw::pack(ds, as_type<fc::unsigned_int>(((trace.net_usage + 7)/8)*8));
+      // net_usage_words: number of 8-byte words, rounded up
+      fc::raw::pack(ds, as_type<fc::unsigned_int>((trace.net_usage + 7)/8));
    } else {
       fc::raw::pack(ds, uint8_t(obj.context.first));
       fc::raw::pack(ds, uint32_t(0));

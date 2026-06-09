@@ -19,8 +19,8 @@
 using namespace sysio::chain;
 using sysio::chain::webassembly::native_module::native_context_stack;
 
-// Helper: construct legacy_span from pointer + size
-// legacy_span<const char> = argument_proxy<span<const char>> with constructor (void*, uint32_t)
+// Helper: construct aligned_span from pointer + size
+// aligned_span<const char> = argument_proxy<span<const char>> with constructor (void*, uint32_t)
 // For native code, memory is already in host address space - no WASM bounds checking needed.
 
 // ============================================================================
@@ -34,7 +34,7 @@ void sysio_assert(uint32_t test, const char* msg) {
 
 INTRINSIC_EXPORT
 void sysio_assert_message(uint32_t test, const char* msg, uint32_t msg_len) {
-   native_context_stack::current()->sysio_assert_message(test, legacy_span<const char>{(void*)msg, msg_len});
+   native_context_stack::current()->sysio_assert_message(test, aligned_span<const char>{(void*)msg, msg_len});
 }
 
 INTRINSIC_EXPORT
@@ -60,7 +60,7 @@ uint32_t get_block_num() {
 
 INTRINSIC_EXPORT
 bool is_feature_activated(const void* feature_digest) {
-   return native_context_stack::current()->is_feature_activated(legacy_ptr<const digest_type>{(void*)feature_digest});
+   return native_context_stack::current()->is_feature_activated(aligned_ptr<const digest_type>{(void*)feature_digest});
 }
 
 INTRINSIC_EXPORT
@@ -79,7 +79,7 @@ int64_t get_ram_usage(uint64_t account) {
 
 INTRINSIC_EXPORT
 uint32_t read_action_data(void* msg, uint32_t len) {
-   return native_context_stack::current()->read_action_data(legacy_span<char>{msg, len});
+   return native_context_stack::current()->read_action_data(aligned_span<char>{msg, len});
 }
 
 INTRINSIC_EXPORT
@@ -146,73 +146,73 @@ uint32_t get_code_hash(uint64_t account, uint32_t struct_version, char* result_b
 INTRINSIC_EXPORT
 void assert_sha256(const char* data, uint32_t datalen, const void* hash_val) {
    native_context_stack::current()->assert_sha256(
-      legacy_span<const char>{(void*)data, datalen},
-      legacy_ptr<const fc::sha256>{(void*)hash_val});
+      aligned_span<const char>{(void*)data, datalen},
+      aligned_ptr<const fc::sha256>{(void*)hash_val});
 }
 
 INTRINSIC_EXPORT
 void assert_sha1(const char* data, uint32_t datalen, const void* hash_val) {
    native_context_stack::current()->assert_sha1(
-      legacy_span<const char>{(void*)data, datalen},
-      legacy_ptr<const fc::sha1>{(void*)hash_val});
+      aligned_span<const char>{(void*)data, datalen},
+      aligned_ptr<const fc::sha1>{(void*)hash_val});
 }
 
 INTRINSIC_EXPORT
 void assert_sha512(const char* data, uint32_t datalen, const void* hash_val) {
    native_context_stack::current()->assert_sha512(
-      legacy_span<const char>{(void*)data, datalen},
-      legacy_ptr<const fc::sha512>{(void*)hash_val});
+      aligned_span<const char>{(void*)data, datalen},
+      aligned_ptr<const fc::sha512>{(void*)hash_val});
 }
 
 INTRINSIC_EXPORT
 void assert_ripemd160(const char* data, uint32_t datalen, const void* hash_val) {
    native_context_stack::current()->assert_ripemd160(
-      legacy_span<const char>{(void*)data, datalen},
-      legacy_ptr<const fc::ripemd160>{(void*)hash_val});
+      aligned_span<const char>{(void*)data, datalen},
+      aligned_ptr<const fc::ripemd160>{(void*)hash_val});
 }
 
 INTRINSIC_EXPORT
 void sha256(const char* data, uint32_t datalen, void* hash_val) {
    native_context_stack::current()->sha256(
-      legacy_span<const char>{(void*)data, datalen},
-      legacy_ptr<fc::sha256>{hash_val});
+      aligned_span<const char>{(void*)data, datalen},
+      aligned_ptr<fc::sha256>{hash_val});
 }
 
 INTRINSIC_EXPORT
 void sha1(const char* data, uint32_t datalen, void* hash_val) {
    native_context_stack::current()->sha1(
-      legacy_span<const char>{(void*)data, datalen},
-      legacy_ptr<fc::sha1>{hash_val});
+      aligned_span<const char>{(void*)data, datalen},
+      aligned_ptr<fc::sha1>{hash_val});
 }
 
 INTRINSIC_EXPORT
 void sha512(const char* data, uint32_t datalen, void* hash_val) {
    native_context_stack::current()->sha512(
-      legacy_span<const char>{(void*)data, datalen},
-      legacy_ptr<fc::sha512>{hash_val});
+      aligned_span<const char>{(void*)data, datalen},
+      aligned_ptr<fc::sha512>{hash_val});
 }
 
 INTRINSIC_EXPORT
 void ripemd160(const char* data, uint32_t datalen, void* hash_val) {
    native_context_stack::current()->ripemd160(
-      legacy_span<const char>{(void*)data, datalen},
-      legacy_ptr<fc::ripemd160>{hash_val});
+      aligned_span<const char>{(void*)data, datalen},
+      aligned_ptr<fc::ripemd160>{hash_val});
 }
 
 INTRINSIC_EXPORT
 int32_t recover_key(const void* digest, const char* sig, size_t siglen, char* pub, size_t publen) {
    return native_context_stack::current()->recover_key(
-      legacy_ptr<const fc::sha256>{(void*)digest},
-      legacy_span<const char>{(void*)sig, (uint32_t)siglen},
-      legacy_span<char>{(void*)pub, (uint32_t)publen});
+      aligned_ptr<const fc::sha256>{(void*)digest},
+      aligned_span<const char>{(void*)sig, (uint32_t)siglen},
+      aligned_span<char>{(void*)pub, (uint32_t)publen});
 }
 
 INTRINSIC_EXPORT
 void assert_recover_key(const void* digest, const char* sig, size_t siglen, const char* pub, size_t publen) {
    native_context_stack::current()->assert_recover_key(
-      legacy_ptr<const fc::sha256>{(void*)digest},
-      legacy_span<const char>{(void*)sig, (uint32_t)siglen},
-      legacy_span<const char>{(void*)pub, (uint32_t)publen});
+      aligned_ptr<const fc::sha256>{(void*)digest},
+      aligned_span<const char>{(void*)sig, (uint32_t)siglen},
+      aligned_span<const char>{(void*)pub, (uint32_t)publen});
 }
 
 // ============================================================================
@@ -226,7 +226,7 @@ void prints(const char* str) {
 
 INTRINSIC_EXPORT
 void prints_l(const char* str, uint32_t len) {
-   native_context_stack::current()->prints_l(legacy_span<const char>{(void*)str, len});
+   native_context_stack::current()->prints_l(aligned_span<const char>{(void*)str, len});
 }
 
 INTRINSIC_EXPORT
@@ -241,12 +241,12 @@ void printui(uint64_t val) {
 
 INTRINSIC_EXPORT
 void printi128(const void* val) {
-   native_context_stack::current()->printi128(legacy_ptr<const __int128>{(void*)val});
+   native_context_stack::current()->printi128(aligned_ptr<const __int128>{(void*)val});
 }
 
 INTRINSIC_EXPORT
 void printui128(const void* val) {
-   native_context_stack::current()->printui128(legacy_ptr<const unsigned __int128>{(void*)val});
+   native_context_stack::current()->printui128(aligned_ptr<const unsigned __int128>{(void*)val});
 }
 
 INTRINSIC_EXPORT
@@ -261,7 +261,7 @@ void printdf(double val) {
 
 INTRINSIC_EXPORT
 void printqf(const void* val) {
-   native_context_stack::current()->printqf(legacy_ptr<const float128_t>{(void*)val});
+   native_context_stack::current()->printqf(aligned_ptr<const float128_t>{(void*)val});
 }
 
 INTRINSIC_EXPORT
@@ -271,378 +271,121 @@ void printn(uint64_t name_val) {
 
 INTRINSIC_EXPORT
 void printhex(const void* data, uint32_t datalen) {
-   native_context_stack::current()->printhex(legacy_span<const char>{(void*)data, datalen});
+   native_context_stack::current()->printhex(aligned_span<const char>{(void*)data, datalen});
 }
 
 // ============================================================================
-// Database - Primary i64 index
+// KV Database
 // ============================================================================
 
 INTRINSIC_EXPORT
-int32_t db_store_i64(uint64_t scope, uint64_t table, uint64_t payer, uint64_t id, const void* data, uint32_t len) {
-   return native_context_stack::current()->db_store_i64(scope, table, payer, id,
-      legacy_span<const char>{(void*)data, len});
+int64_t kv_set(uint32_t table_id, uint64_t payer, const char* key, uint32_t key_len, const char* value, uint32_t value_len) {
+   return native_context_stack::current()->kv_set(table_id, payer, aligned_span<const char>{(void*)key, key_len}, aligned_span<const char>{(void*)value, value_len});
 }
 
 INTRINSIC_EXPORT
-void db_update_i64(int32_t itr, uint64_t payer, const void* data, uint32_t len) {
-   native_context_stack::current()->db_update_i64(itr, payer,
-      legacy_span<const char>{(void*)data, len});
+int32_t kv_get(uint32_t table_id, uint64_t code, const char* key, uint32_t key_len, char* value, uint32_t value_len) {
+   return native_context_stack::current()->kv_get(table_id, code, aligned_span<const char>{(void*)key, key_len}, aligned_span<char>{(void*)value, value_len});
 }
 
 INTRINSIC_EXPORT
-void db_remove_i64(int32_t itr) {
-   native_context_stack::current()->db_remove_i64(itr);
+int64_t kv_erase(uint32_t table_id, const char* key, uint32_t key_len) {
+   return native_context_stack::current()->kv_erase(table_id, aligned_span<const char>{(void*)key, key_len});
 }
 
 INTRINSIC_EXPORT
-int32_t db_get_i64(int32_t itr, void* data, uint32_t len) {
-   return native_context_stack::current()->db_get_i64(itr, legacy_span<char>{data, len});
+int32_t kv_contains(uint32_t table_id, uint64_t code, const char* key, uint32_t key_len) {
+   return native_context_stack::current()->kv_contains(table_id, code, aligned_span<const char>{(void*)key, key_len});
 }
 
 INTRINSIC_EXPORT
-int32_t db_next_i64(int32_t itr, uint64_t* primary) {
-   return native_context_stack::current()->db_next_i64(itr, legacy_ptr<uint64_t>{(void*)primary});
+uint32_t kv_it_create(uint32_t table_id, uint64_t code, const char* prefix, uint32_t prefix_len) {
+   return native_context_stack::current()->kv_it_create(table_id, code, aligned_span<const char>{(void*)prefix, prefix_len});
 }
 
 INTRINSIC_EXPORT
-int32_t db_previous_i64(int32_t itr, uint64_t* primary) {
-   return native_context_stack::current()->db_previous_i64(itr, legacy_ptr<uint64_t>{(void*)primary});
+void kv_it_destroy(uint32_t handle) {
+   native_context_stack::current()->kv_it_destroy(handle);
 }
 
 INTRINSIC_EXPORT
-int32_t db_find_i64(uint64_t code, uint64_t scope, uint64_t table, uint64_t id) {
-   return native_context_stack::current()->db_find_i64(code, scope, table, id);
+int32_t kv_it_status(uint32_t handle) {
+   return native_context_stack::current()->kv_it_status(handle);
 }
 
 INTRINSIC_EXPORT
-int32_t db_lowerbound_i64(uint64_t code, uint64_t scope, uint64_t table, uint64_t id) {
-   return native_context_stack::current()->db_lowerbound_i64(code, scope, table, id);
+int32_t kv_it_next(uint32_t handle) {
+   return native_context_stack::current()->kv_it_next(handle);
 }
 
 INTRINSIC_EXPORT
-int32_t db_upperbound_i64(uint64_t code, uint64_t scope, uint64_t table, uint64_t id) {
-   return native_context_stack::current()->db_upperbound_i64(code, scope, table, id);
+int32_t kv_it_prev(uint32_t handle) {
+   return native_context_stack::current()->kv_it_prev(handle);
 }
 
 INTRINSIC_EXPORT
-int32_t db_end_i64(uint64_t code, uint64_t scope, uint64_t table) {
-   return native_context_stack::current()->db_end_i64(code, scope, table);
-}
-
-// ============================================================================
-// Database - idx64 secondary index
-// ============================================================================
-
-INTRINSIC_EXPORT
-int32_t db_idx64_store(uint64_t scope, uint64_t table, uint64_t payer, uint64_t id, const uint64_t* secondary) {
-   return native_context_stack::current()->db_idx64_store(scope, table, payer, id,
-      legacy_ptr<const uint64_t>{(void*)secondary});
+int32_t kv_it_lower_bound(uint32_t handle, const char* key, uint32_t key_len) {
+   return native_context_stack::current()->kv_it_lower_bound(handle, aligned_span<const char>{(void*)key, key_len});
 }
 
 INTRINSIC_EXPORT
-void db_idx64_update(int32_t itr, uint64_t payer, const uint64_t* secondary) {
-   native_context_stack::current()->db_idx64_update(itr, payer,
-      legacy_ptr<const uint64_t>{(void*)secondary});
+int32_t kv_it_key(uint32_t handle, uint32_t offset, char* dest, uint32_t dest_len, uint32_t* actual_size) {
+   return native_context_stack::current()->kv_it_key(handle, offset, aligned_span<char>{(void*)dest, dest_len}, aligned_ptr<uint32_t>{actual_size});
 }
 
 INTRINSIC_EXPORT
-void db_idx64_remove(int32_t itr) {
-   native_context_stack::current()->db_idx64_remove(itr);
+int32_t kv_it_value(uint32_t handle, uint32_t offset, char* dest, uint32_t dest_len, uint32_t* actual_size) {
+   return native_context_stack::current()->kv_it_value(handle, offset, aligned_span<char>{(void*)dest, dest_len}, aligned_ptr<uint32_t>{actual_size});
 }
 
 INTRINSIC_EXPORT
-int32_t db_idx64_find_secondary(uint64_t code, uint64_t scope, uint64_t table, const uint64_t* secondary, uint64_t* primary) {
-   return native_context_stack::current()->db_idx64_find_secondary(code, scope, table,
-      legacy_ptr<const uint64_t>{(void*)secondary},
-      legacy_ptr<uint64_t>{(void*)primary});
+void kv_idx_store(uint64_t payer, uint32_t table_id, const char* pri_key, uint32_t pri_key_len, const char* sec_key, uint32_t sec_key_len) {
+   native_context_stack::current()->kv_idx_store(payer, table_id, span<const char>{pri_key, pri_key_len}, span<const char>{sec_key, sec_key_len});
 }
 
 INTRINSIC_EXPORT
-int32_t db_idx64_find_primary(uint64_t code, uint64_t scope, uint64_t table, uint64_t* secondary, uint64_t primary) {
-   return native_context_stack::current()->db_idx64_find_primary(code, scope, table,
-      legacy_ptr<uint64_t>{(void*)secondary}, primary);
+void kv_idx_remove(uint32_t table_id, const char* pri_key, uint32_t pri_key_len, const char* sec_key, uint32_t sec_key_len) {
+   native_context_stack::current()->kv_idx_remove(table_id, span<const char>{pri_key, pri_key_len}, span<const char>{sec_key, sec_key_len});
 }
 
 INTRINSIC_EXPORT
-int32_t db_idx64_lowerbound(uint64_t code, uint64_t scope, uint64_t table, uint64_t* secondary, uint64_t* primary) {
-   return native_context_stack::current()->db_idx64_lowerbound(code, scope, table,
-      legacy_ptr<uint64_t, 8>{(void*)secondary},
-      legacy_ptr<uint64_t, 8>{(void*)primary});
+void kv_idx_update(uint64_t payer, uint32_t table_id, const char* pri_key, uint32_t pri_key_len, const char* old_sec_key, uint32_t old_sec_key_len, const char* new_sec_key, uint32_t new_sec_key_len) {
+   native_context_stack::current()->kv_idx_update(payer, table_id, span<const char>{pri_key, pri_key_len}, span<const char>{old_sec_key, old_sec_key_len}, span<const char>{new_sec_key, new_sec_key_len});
 }
 
 INTRINSIC_EXPORT
-int32_t db_idx64_upperbound(uint64_t code, uint64_t scope, uint64_t table, uint64_t* secondary, uint64_t* primary) {
-   return native_context_stack::current()->db_idx64_upperbound(code, scope, table,
-      legacy_ptr<uint64_t, 8>{(void*)secondary},
-      legacy_ptr<uint64_t, 8>{(void*)primary});
+int32_t kv_idx_find_secondary(uint64_t code, uint32_t table_id, const char* sec_key, uint32_t sec_key_len) {
+   return native_context_stack::current()->kv_idx_find_secondary(code, table_id, aligned_span<const char>{(void*)sec_key, sec_key_len});
 }
 
 INTRINSIC_EXPORT
-int32_t db_idx64_end(uint64_t code, uint64_t scope, uint64_t table) {
-   return native_context_stack::current()->db_idx64_end(code, scope, table);
+int32_t kv_idx_lower_bound(uint64_t code, uint32_t table_id, const char* sec_key, uint32_t sec_key_len) {
+   return native_context_stack::current()->kv_idx_lower_bound(code, table_id, aligned_span<const char>{(void*)sec_key, sec_key_len});
 }
 
 INTRINSIC_EXPORT
-int32_t db_idx64_next(int32_t itr, uint64_t* primary) {
-   return native_context_stack::current()->db_idx64_next(itr, legacy_ptr<uint64_t>{(void*)primary});
+int32_t kv_idx_next(uint32_t handle) {
+   return native_context_stack::current()->kv_idx_next(handle);
 }
 
 INTRINSIC_EXPORT
-int32_t db_idx64_previous(int32_t itr, uint64_t* primary) {
-   return native_context_stack::current()->db_idx64_previous(itr, legacy_ptr<uint64_t>{(void*)primary});
-}
-
-// ============================================================================
-// Database - idx128 secondary index
-// ============================================================================
-
-INTRINSIC_EXPORT
-int32_t db_idx128_store(uint64_t scope, uint64_t table, uint64_t payer, uint64_t id, const __uint128_t* secondary) {
-   return native_context_stack::current()->db_idx128_store(scope, table, payer, id,
-      legacy_ptr<const uint128_t>{(void*)secondary});
+int32_t kv_idx_prev(uint32_t handle) {
+   return native_context_stack::current()->kv_idx_prev(handle);
 }
 
 INTRINSIC_EXPORT
-void db_idx128_update(int32_t itr, uint64_t payer, const __uint128_t* secondary) {
-   native_context_stack::current()->db_idx128_update(itr, payer,
-      legacy_ptr<const uint128_t>{(void*)secondary});
+int32_t kv_idx_key(uint32_t handle, uint32_t offset, char* dest, uint32_t dest_len, uint32_t* actual_size) {
+   return native_context_stack::current()->kv_idx_key(handle, offset, aligned_span<char>{(void*)dest, dest_len}, aligned_ptr<uint32_t>{actual_size});
 }
 
 INTRINSIC_EXPORT
-void db_idx128_remove(int32_t itr) {
-   native_context_stack::current()->db_idx128_remove(itr);
+int32_t kv_idx_primary_key(uint32_t handle, uint32_t offset, char* dest, uint32_t dest_len, uint32_t* actual_size) {
+   return native_context_stack::current()->kv_idx_primary_key(handle, offset, aligned_span<char>{(void*)dest, dest_len}, aligned_ptr<uint32_t>{actual_size});
 }
 
 INTRINSIC_EXPORT
-int32_t db_idx128_find_secondary(uint64_t code, uint64_t scope, uint64_t table, const __uint128_t* secondary, uint64_t* primary) {
-   return native_context_stack::current()->db_idx128_find_secondary(code, scope, table,
-      legacy_ptr<const uint128_t>{(void*)secondary},
-      legacy_ptr<uint64_t>{(void*)primary});
-}
-
-INTRINSIC_EXPORT
-int32_t db_idx128_find_primary(uint64_t code, uint64_t scope, uint64_t table, __uint128_t* secondary, uint64_t primary) {
-   return native_context_stack::current()->db_idx128_find_primary(code, scope, table,
-      legacy_ptr<uint128_t>{(void*)secondary}, primary);
-}
-
-INTRINSIC_EXPORT
-int32_t db_idx128_lowerbound(uint64_t code, uint64_t scope, uint64_t table, __uint128_t* secondary, uint64_t* primary) {
-   return native_context_stack::current()->db_idx128_lowerbound(code, scope, table,
-      legacy_ptr<uint128_t, 16>{(void*)secondary},
-      legacy_ptr<uint64_t, 8>{(void*)primary});
-}
-
-INTRINSIC_EXPORT
-int32_t db_idx128_upperbound(uint64_t code, uint64_t scope, uint64_t table, __uint128_t* secondary, uint64_t* primary) {
-   return native_context_stack::current()->db_idx128_upperbound(code, scope, table,
-      legacy_ptr<uint128_t, 16>{(void*)secondary},
-      legacy_ptr<uint64_t, 8>{(void*)primary});
-}
-
-INTRINSIC_EXPORT
-int32_t db_idx128_end(uint64_t code, uint64_t scope, uint64_t table) {
-   return native_context_stack::current()->db_idx128_end(code, scope, table);
-}
-
-INTRINSIC_EXPORT
-int32_t db_idx128_next(int32_t itr, uint64_t* primary) {
-   return native_context_stack::current()->db_idx128_next(itr, legacy_ptr<uint64_t>{(void*)primary});
-}
-
-INTRINSIC_EXPORT
-int32_t db_idx128_previous(int32_t itr, uint64_t* primary) {
-   return native_context_stack::current()->db_idx128_previous(itr, legacy_ptr<uint64_t>{(void*)primary});
-}
-
-// ============================================================================
-// Database - idx256 secondary index
-// ============================================================================
-
-INTRINSIC_EXPORT
-int32_t db_idx256_store(uint64_t scope, uint64_t table, uint64_t payer, uint64_t id, const __uint128_t* data, uint32_t data_len) {
-   return native_context_stack::current()->db_idx256_store(scope, table, payer, id,
-      legacy_span<const uint128_t>{(void*)data, data_len});
-}
-
-INTRINSIC_EXPORT
-void db_idx256_update(int32_t itr, uint64_t payer, const __uint128_t* data, uint32_t data_len) {
-   native_context_stack::current()->db_idx256_update(itr, payer,
-      legacy_span<const uint128_t>{(void*)data, data_len});
-}
-
-INTRINSIC_EXPORT
-void db_idx256_remove(int32_t itr) {
-   native_context_stack::current()->db_idx256_remove(itr);
-}
-
-INTRINSIC_EXPORT
-int32_t db_idx256_find_secondary(uint64_t code, uint64_t scope, uint64_t table, const __uint128_t* data, uint32_t data_len, uint64_t* primary) {
-   return native_context_stack::current()->db_idx256_find_secondary(code, scope, table,
-      legacy_span<const uint128_t>{(void*)data, data_len},
-      legacy_ptr<uint64_t>{(void*)primary});
-}
-
-INTRINSIC_EXPORT
-int32_t db_idx256_find_primary(uint64_t code, uint64_t scope, uint64_t table, __uint128_t* data, uint32_t data_len, uint64_t primary) {
-   return native_context_stack::current()->db_idx256_find_primary(code, scope, table,
-      legacy_span<uint128_t>{(void*)data, data_len}, primary);
-}
-
-INTRINSIC_EXPORT
-int32_t db_idx256_lowerbound(uint64_t code, uint64_t scope, uint64_t table, __uint128_t* data, uint32_t data_len, uint64_t* primary) {
-   return native_context_stack::current()->db_idx256_lowerbound(code, scope, table,
-      legacy_span<uint128_t>{(void*)data, data_len},
-      legacy_ptr<uint64_t, 8>{(void*)primary});
-}
-
-INTRINSIC_EXPORT
-int32_t db_idx256_upperbound(uint64_t code, uint64_t scope, uint64_t table, __uint128_t* data, uint32_t data_len, uint64_t* primary) {
-   return native_context_stack::current()->db_idx256_upperbound(code, scope, table,
-      legacy_span<uint128_t>{(void*)data, data_len},
-      legacy_ptr<uint64_t, 8>{(void*)primary});
-}
-
-INTRINSIC_EXPORT
-int32_t db_idx256_end(uint64_t code, uint64_t scope, uint64_t table) {
-   return native_context_stack::current()->db_idx256_end(code, scope, table);
-}
-
-INTRINSIC_EXPORT
-int32_t db_idx256_next(int32_t itr, uint64_t* primary) {
-   return native_context_stack::current()->db_idx256_next(itr, legacy_ptr<uint64_t>{(void*)primary});
-}
-
-INTRINSIC_EXPORT
-int32_t db_idx256_previous(int32_t itr, uint64_t* primary) {
-   return native_context_stack::current()->db_idx256_previous(itr, legacy_ptr<uint64_t>{(void*)primary});
-}
-
-// ============================================================================
-// Database - idx_double secondary index
-// ============================================================================
-
-INTRINSIC_EXPORT
-int32_t db_idx_double_store(uint64_t scope, uint64_t table, uint64_t payer, uint64_t id, const double* secondary) {
-   return native_context_stack::current()->db_idx_double_store(scope, table, payer, id,
-      legacy_ptr<const float64_t>{(void*)secondary});
-}
-
-INTRINSIC_EXPORT
-void db_idx_double_update(int32_t itr, uint64_t payer, const double* secondary) {
-   native_context_stack::current()->db_idx_double_update(itr, payer,
-      legacy_ptr<const float64_t>{(void*)secondary});
-}
-
-INTRINSIC_EXPORT
-void db_idx_double_remove(int32_t itr) {
-   native_context_stack::current()->db_idx_double_remove(itr);
-}
-
-INTRINSIC_EXPORT
-int32_t db_idx_double_find_secondary(uint64_t code, uint64_t scope, uint64_t table, const double* secondary, uint64_t* primary) {
-   return native_context_stack::current()->db_idx_double_find_secondary(code, scope, table,
-      legacy_ptr<const float64_t>{(void*)secondary},
-      legacy_ptr<uint64_t>{(void*)primary});
-}
-
-INTRINSIC_EXPORT
-int32_t db_idx_double_find_primary(uint64_t code, uint64_t scope, uint64_t table, double* secondary, uint64_t primary) {
-   return native_context_stack::current()->db_idx_double_find_primary(code, scope, table,
-      legacy_ptr<float64_t>{(void*)secondary}, primary);
-}
-
-INTRINSIC_EXPORT
-int32_t db_idx_double_lowerbound(uint64_t code, uint64_t scope, uint64_t table, double* secondary, uint64_t* primary) {
-   return native_context_stack::current()->db_idx_double_lowerbound(code, scope, table,
-      legacy_ptr<float64_t, 8>{(void*)secondary},
-      legacy_ptr<uint64_t, 8>{(void*)primary});
-}
-
-INTRINSIC_EXPORT
-int32_t db_idx_double_upperbound(uint64_t code, uint64_t scope, uint64_t table, double* secondary, uint64_t* primary) {
-   return native_context_stack::current()->db_idx_double_upperbound(code, scope, table,
-      legacy_ptr<float64_t, 8>{(void*)secondary},
-      legacy_ptr<uint64_t, 8>{(void*)primary});
-}
-
-INTRINSIC_EXPORT
-int32_t db_idx_double_end(uint64_t code, uint64_t scope, uint64_t table) {
-   return native_context_stack::current()->db_idx_double_end(code, scope, table);
-}
-
-INTRINSIC_EXPORT
-int32_t db_idx_double_next(int32_t itr, uint64_t* primary) {
-   return native_context_stack::current()->db_idx_double_next(itr, legacy_ptr<uint64_t>{(void*)primary});
-}
-
-INTRINSIC_EXPORT
-int32_t db_idx_double_previous(int32_t itr, uint64_t* primary) {
-   return native_context_stack::current()->db_idx_double_previous(itr, legacy_ptr<uint64_t>{(void*)primary});
-}
-
-// ============================================================================
-// Database - idx_long_double secondary index
-// ============================================================================
-
-INTRINSIC_EXPORT
-int32_t db_idx_long_double_store(uint64_t scope, uint64_t table, uint64_t payer, uint64_t id, const long double* secondary) {
-   return native_context_stack::current()->db_idx_long_double_store(scope, table, payer, id,
-      legacy_ptr<const float128_t>{(void*)secondary});
-}
-
-INTRINSIC_EXPORT
-void db_idx_long_double_update(int32_t itr, uint64_t payer, const long double* secondary) {
-   native_context_stack::current()->db_idx_long_double_update(itr, payer,
-      legacy_ptr<const float128_t>{(void*)secondary});
-}
-
-INTRINSIC_EXPORT
-void db_idx_long_double_remove(int32_t itr) {
-   native_context_stack::current()->db_idx_long_double_remove(itr);
-}
-
-INTRINSIC_EXPORT
-int32_t db_idx_long_double_find_secondary(uint64_t code, uint64_t scope, uint64_t table, const long double* secondary, uint64_t* primary) {
-   return native_context_stack::current()->db_idx_long_double_find_secondary(code, scope, table,
-      legacy_ptr<const float128_t>{(void*)secondary},
-      legacy_ptr<uint64_t>{(void*)primary});
-}
-
-INTRINSIC_EXPORT
-int32_t db_idx_long_double_find_primary(uint64_t code, uint64_t scope, uint64_t table, long double* secondary, uint64_t primary) {
-   return native_context_stack::current()->db_idx_long_double_find_primary(code, scope, table,
-      legacy_ptr<float128_t>{(void*)secondary}, primary);
-}
-
-INTRINSIC_EXPORT
-int32_t db_idx_long_double_lowerbound(uint64_t code, uint64_t scope, uint64_t table, long double* secondary, uint64_t* primary) {
-   return native_context_stack::current()->db_idx_long_double_lowerbound(code, scope, table,
-      legacy_ptr<float128_t, 8>{(void*)secondary},
-      legacy_ptr<uint64_t, 8>{(void*)primary});
-}
-
-INTRINSIC_EXPORT
-int32_t db_idx_long_double_upperbound(uint64_t code, uint64_t scope, uint64_t table, long double* secondary, uint64_t* primary) {
-   return native_context_stack::current()->db_idx_long_double_upperbound(code, scope, table,
-      legacy_ptr<float128_t, 8>{(void*)secondary},
-      legacy_ptr<uint64_t, 8>{(void*)primary});
-}
-
-INTRINSIC_EXPORT
-int32_t db_idx_long_double_end(uint64_t code, uint64_t scope, uint64_t table) {
-   return native_context_stack::current()->db_idx_long_double_end(code, scope, table);
-}
-
-INTRINSIC_EXPORT
-int32_t db_idx_long_double_next(int32_t itr, uint64_t* primary) {
-   return native_context_stack::current()->db_idx_long_double_next(itr, legacy_ptr<uint64_t>{(void*)primary});
-}
-
-INTRINSIC_EXPORT
-int32_t db_idx_long_double_previous(int32_t itr, uint64_t* primary) {
-   return native_context_stack::current()->db_idx_long_double_previous(itr, legacy_ptr<uint64_t>{(void*)primary});
+void kv_idx_destroy(uint32_t handle) {
+   native_context_stack::current()->kv_idx_destroy(handle);
 }
 
 // ============================================================================
@@ -651,17 +394,17 @@ int32_t db_idx_long_double_previous(int32_t itr, uint64_t* primary) {
 
 INTRINSIC_EXPORT
 void send_inline(char* serialized_action, size_t size) {
-   native_context_stack::current()->send_inline(legacy_span<const char>{(void*)serialized_action, (uint32_t)size});
+   native_context_stack::current()->send_inline(aligned_span<const char>{(void*)serialized_action, (uint32_t)size});
 }
 
 INTRINSIC_EXPORT
 void send_context_free_inline(char* serialized_action, size_t size) {
-   native_context_stack::current()->send_context_free_inline(legacy_span<const char>{(void*)serialized_action, (uint32_t)size});
+   native_context_stack::current()->send_context_free_inline(aligned_span<const char>{(void*)serialized_action, (uint32_t)size});
 }
 
 INTRINSIC_EXPORT
 int32_t read_transaction(char* buffer, size_t buffer_size) {
-   return native_context_stack::current()->read_transaction(legacy_span<char>{(void*)buffer, (uint32_t)buffer_size});
+   return native_context_stack::current()->read_transaction(aligned_span<char>{(void*)buffer, (uint32_t)buffer_size});
 }
 
 INTRINSIC_EXPORT
@@ -687,13 +430,13 @@ int32_t tapos_block_prefix() {
 INTRINSIC_EXPORT
 int32_t get_action(uint32_t type, uint32_t index, char* buffer, size_t buffer_size) {
    return native_context_stack::current()->get_action(type, index,
-      legacy_span<char>{(void*)buffer, (uint32_t)buffer_size});
+      aligned_span<char>{(void*)buffer, (uint32_t)buffer_size});
 }
 
 INTRINSIC_EXPORT
 int32_t get_context_free_data(uint32_t index, char* buffer, size_t buffer_size) {
    return native_context_stack::current()->get_context_free_data(index,
-      legacy_span<char>{(void*)buffer, (uint32_t)buffer_size});
+      aligned_span<char>{(void*)buffer, (uint32_t)buffer_size});
 }
 
 // ============================================================================
@@ -708,21 +451,21 @@ void set_resource_limits(uint64_t account, int64_t ram_bytes, int64_t net_weight
 INTRINSIC_EXPORT
 void get_resource_limits(uint64_t account, int64_t* ram_bytes, int64_t* net_weight, int64_t* cpu_weight) {
    native_context_stack::current()->get_resource_limits(name{account},
-      legacy_ptr<int64_t, 8>{(void*)ram_bytes},
-      legacy_ptr<int64_t, 8>{(void*)net_weight},
-      legacy_ptr<int64_t, 8>{(void*)cpu_weight});
+      aligned_ptr<int64_t, 8>{(void*)ram_bytes},
+      aligned_ptr<int64_t, 8>{(void*)net_weight},
+      aligned_ptr<int64_t, 8>{(void*)cpu_weight});
 }
 
 INTRINSIC_EXPORT
 uint32_t get_blockchain_parameters_packed(char* data, uint32_t datalen) {
    return native_context_stack::current()->get_blockchain_parameters_packed(
-      legacy_span<char>{(void*)data, datalen});
+      aligned_span<char>{(void*)data, datalen});
 }
 
 INTRINSIC_EXPORT
 void set_blockchain_parameters_packed(const char* data, uint32_t datalen) {
    native_context_stack::current()->set_blockchain_parameters_packed(
-      legacy_span<const char>{(void*)data, datalen});
+      aligned_span<const char>{(void*)data, datalen});
 }
 
 INTRINSIC_EXPORT
@@ -741,13 +484,13 @@ void set_parameters_packed(const char* params, uint32_t params_len) {
 INTRINSIC_EXPORT
 uint32_t get_wasm_parameters_packed(char* data, uint32_t datalen, uint32_t max_version) {
    return native_context_stack::current()->get_wasm_parameters_packed(
-      legacy_span<char>{(void*)data, datalen}, max_version);
+      aligned_span<char>{(void*)data, datalen}, max_version);
 }
 
 INTRINSIC_EXPORT
 void set_wasm_parameters_packed(const char* data, uint32_t datalen) {
    native_context_stack::current()->set_wasm_parameters_packed(
-      legacy_span<const char>{(void*)data, datalen});
+      aligned_span<const char>{(void*)data, datalen});
 }
 
 INTRINSIC_EXPORT
@@ -762,25 +505,25 @@ void set_privileged(uint64_t account, bool is_priv) {
 
 INTRINSIC_EXPORT
 void preactivate_feature(const void* feature_digest) {
-   native_context_stack::current()->preactivate_feature(legacy_ptr<const digest_type>{(void*)feature_digest});
+   native_context_stack::current()->preactivate_feature(aligned_ptr<const digest_type>{(void*)feature_digest});
 }
 
 INTRINSIC_EXPORT
 int64_t set_proposed_producers(const char* data, size_t datalen) {
    return native_context_stack::current()->set_proposed_producers(
-      legacy_span<const char>{(void*)data, (uint32_t)datalen});
+      aligned_span<const char>{(void*)data, (uint32_t)datalen});
 }
 
 INTRINSIC_EXPORT
 int64_t set_proposed_producers_ex(uint64_t format, const char* data, size_t datalen) {
    return native_context_stack::current()->set_proposed_producers_ex(format,
-      legacy_span<const char>{(void*)data, (uint32_t)datalen});
+      aligned_span<const char>{(void*)data, (uint32_t)datalen});
 }
 
 INTRINSIC_EXPORT
 int32_t get_active_producers(uint64_t* producers, uint32_t datalen) {
    return native_context_stack::current()->get_active_producers(
-      legacy_span<name>{(void*)producers, datalen});
+      aligned_span<name>{(void*)producers, datalen});
 }
 
 INTRINSIC_EXPORT
@@ -798,9 +541,9 @@ int32_t check_transaction_authorization(const char* trx_data, uint32_t trx_size,
                                         const char* pubkeys_data, uint32_t pubkeys_size,
                                         const char* perms_data, uint32_t perms_size) {
    return native_context_stack::current()->check_transaction_authorization(
-      legacy_span<const char>{(void*)trx_data, trx_size},
-      legacy_span<const char>{(void*)pubkeys_data, pubkeys_size},
-      legacy_span<const char>{(void*)perms_data, perms_size});
+      aligned_span<const char>{(void*)trx_data, trx_size},
+      aligned_span<const char>{(void*)pubkeys_data, pubkeys_size},
+      aligned_span<const char>{(void*)perms_data, perms_size});
 }
 
 INTRINSIC_EXPORT
@@ -810,14 +553,14 @@ int32_t check_permission_authorization(uint64_t account, uint64_t permission,
                                        uint64_t delay_us) {
    return native_context_stack::current()->check_permission_authorization(
       name{account}, name{permission},
-      legacy_span<const char>{(void*)pubkeys_data, pubkeys_size},
-      legacy_span<const char>{(void*)perms_data, perms_size},
+      aligned_span<const char>{(void*)pubkeys_data, pubkeys_size},
+      aligned_span<const char>{(void*)perms_data, perms_size},
       delay_us);
 }
 
 INTRINSIC_EXPORT
-int64_t get_account_creation_time(uint64_t account) {
-   return native_context_stack::current()->get_account_creation_time(name{account});
+int32_t get_permission_lower_bound(uint64_t account, uint64_t permission, char* buffer, uint32_t buffer_size) {
+   return native_context_stack::current()->get_permission_lower_bound(name{account}, name{permission}, span<char>{buffer, buffer_size});
 }
 
 // ============================================================================

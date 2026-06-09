@@ -100,20 +100,6 @@
             ]
         },
         {
-            "name": "finalizereg",
-            "base": "",
-            "fields": [
-                {
-                    "name": "owner",
-                    "type": "name"
-                },
-                {
-                    "name": "status",
-                    "type": "uint8"
-                }
-            ]
-        },
-        {
             "name": "forcereg",
             "base": "",
             "fields": [
@@ -128,12 +114,34 @@
             ]
         },
         {
-            "name": "initnodereg",
+            "name": "giftram",
             "base": "",
             "fields": [
                 {
-                    "name": "owner",
+                    "name": "account",
                     "type": "name"
+                },
+                {
+                    "name": "usage_before",
+                    "type": "int64"
+                }
+            ]
+        },
+        {
+            "name": "newnameduser",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "pubkey",
+                    "type": "public_key"
+                },
+                {
+                    "name": "tier",
+                    "type": "uint8"
                 }
             ]
         },
@@ -152,6 +160,16 @@
                 {
                     "name": "pubkey",
                     "type": "public_key"
+                }
+            ]
+        },
+        {
+            "name": "nodeowner_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "uint64"
                 }
             ]
         },
@@ -182,6 +200,20 @@
                 {
                     "name": "block_num",
                     "type": "uint128"
+                },
+                {
+                    "name": "reason",
+                    "type": "uint8"
+                }
+            ]
+        },
+        {
+            "name": "nodeownerreg_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "uint64"
                 }
             ]
         },
@@ -220,6 +252,28 @@
             ]
         },
         {
+            "name": "nodeownreg",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "name"
+                },
+                {
+                    "name": "tier",
+                    "type": "uint8"
+                },
+                {
+                    "name": "eth_pub_key",
+                    "type": "public_key"
+                },
+                {
+                    "name": "wire_pub_key",
+                    "type": "public_key"
+                }
+            ]
+        },
+        {
             "name": "policies",
             "base": "",
             "fields": [
@@ -250,6 +304,16 @@
                 {
                     "name": "time_block",
                     "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "policy_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "uint64"
                 }
             ]
         },
@@ -306,6 +370,16 @@
             ]
         },
         {
+            "name": "reslimit_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "roa_state",
             "base": "",
             "fields": [
@@ -338,27 +412,37 @@
             ]
         },
         {
-            "name": "setpending",
+            "name": "setsysabi",
             "base": "",
             "fields": [
                 {
-                    "name": "owner",
+                    "name": "account",
                     "type": "name"
                 },
                 {
-                    "name": "tier",
+                    "name": "abi",
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
+            "name": "setsyscode",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "vmtype",
                     "type": "uint8"
                 },
                 {
-                    "name": "trx_id",
-                    "type": "checksum256"
+                    "name": "vmversion",
+                    "type": "uint8"
                 },
                 {
-                    "name": "block_num",
-                    "type": "uint128"
-                },
-                {
-                    "name": "sig",
+                    "name": "code",
                     "type": "bytes"
                 }
             ]
@@ -378,6 +462,16 @@
             ]
         },
         {
+            "name": "sponsor_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "nonce",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "sponsorcount",
             "base": "",
             "fields": [
@@ -387,6 +481,16 @@
                 },
                 {
                     "name": "count",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "sponsorcount_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
                     "type": "uint64"
                 }
             ]
@@ -414,23 +518,28 @@
             "ricardian_contract": ""
         },
         {
-            "name": "finalizereg",
-            "type": "finalizereg",
-            "ricardian_contract": ""
-        },
-        {
             "name": "forcereg",
             "type": "forcereg",
             "ricardian_contract": ""
         },
         {
-            "name": "initnodereg",
-            "type": "initnodereg",
+            "name": "giftram",
+            "type": "giftram",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "newnameduser",
+            "type": "newnameduser",
             "ricardian_contract": ""
         },
         {
             "name": "newuser",
             "type": "newuser",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "nodeownreg",
+            "type": "nodeownreg",
             "ricardian_contract": ""
         },
         {
@@ -444,8 +553,13 @@
             "ricardian_contract": ""
         },
         {
-            "name": "setpending",
-            "type": "setpending",
+            "name": "setsysabi",
+            "type": "setsysabi",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "setsyscode",
+            "type": "setsyscode",
             "ricardian_contract": ""
         }
     ],
@@ -454,50 +568,88 @@
             "name": "nodeownerreg",
             "type": "nodeownerreg",
             "index_type": "i64",
-            "key_names": [],
-            "key_types": []
+            "key_names": ["scope","owner"],
+            "key_types": ["name","uint64"],
+            "table_id": 25131,
+            "secondary_indexes": [
+                {
+                    "name": "bytier",
+                    "key_type": "uint64",
+                    "table_id": 9501
+                },
+                {
+                    "name": "bystatus",
+                    "key_type": "uint64",
+                    "table_id": 13229
+                },
+                {
+                    "name": "bytrxid",
+                    "key_type": "checksum256",
+                    "table_id": 31764
+                }
+            ]
         },
         {
             "name": "nodeowners",
             "type": "nodeowners",
             "index_type": "i64",
-            "key_names": [],
-            "key_types": []
+            "key_names": ["scope","owner"],
+            "key_types": ["name","uint64"],
+            "table_id": 19032,
+            "secondary_indexes": [
+                {
+                    "name": "bytier",
+                    "key_type": "uint64",
+                    "table_id": 59978
+                }
+            ]
         },
         {
             "name": "policies",
             "type": "policies",
             "index_type": "i64",
-            "key_names": [],
-            "key_types": []
+            "key_names": ["scope","owner"],
+            "key_types": ["name","uint64"],
+            "table_id": 7465
         },
         {
             "name": "reslimit",
             "type": "reslimit",
             "index_type": "i64",
-            "key_names": [],
-            "key_types": []
+            "key_names": ["owner"],
+            "key_types": ["uint64"],
+            "table_id": 39017
         },
         {
             "name": "roastate",
             "type": "roa_state",
             "index_type": "i64",
-            "key_names": [],
-            "key_types": []
+            "key_names": ["name"],
+            "key_types": ["name"],
+            "table_id": 40960
         },
         {
             "name": "sponsorcount",
             "type": "sponsorcount",
             "index_type": "i64",
-            "key_names": [],
-            "key_types": []
+            "key_names": ["scope","owner"],
+            "key_types": ["name","uint64"],
+            "table_id": 30086
         },
         {
             "name": "sponsors",
             "type": "sponsor",
             "index_type": "i64",
-            "key_names": [],
-            "key_types": []
+            "key_names": ["scope","nonce"],
+            "key_types": ["name","uint64"],
+            "table_id": 25433,
+            "secondary_indexes": [
+                {
+                    "name": "byusername",
+                    "key_type": "uint64",
+                    "table_id": 35688
+                }
+            ]
         }
     ],
     "ricardian_clauses": [],

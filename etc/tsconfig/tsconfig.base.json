@@ -1,0 +1,57 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "declaration": true,
+    "declarationMap": true,
+    "lib": [
+      "DOM",
+      "DOM.Iterable",
+      "ESNext"
+    ],
+    "jsx": "react-jsx",
+    "allowJs": false,
+    "downlevelIteration": true,
+    "module": "ESNext",
+    "moduleDetection": "force",
+    "moduleResolution": "bundler",
+    "composite": true,
+    "incremental": true,
+    "strict": false,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "allowSyntheticDefaultImports": true,
+    "noImplicitAny": false,
+    "disableSizeLimit": false,
+    "preserveConstEnums": true,
+    "resolveJsonModule": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "inlineSourceMap": true,
+    "inlineSources": true,
+    "sourceMap": false,
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "preserveWatchOutput": true,
+    "target": "ES2022",
+    "paths": {
+
+    }
+  },
+  "include": [
+    "src",
+    "types"
+  ],
+  "exclude": [
+    "lib",
+    "dist",
+    "target",
+    "node_modules",
+    "**/*.js",
+    "**/lib/**",
+    "**/dist/**",
+    "**/target/**",
+    "**/node_modules/**"
+  ]
+}

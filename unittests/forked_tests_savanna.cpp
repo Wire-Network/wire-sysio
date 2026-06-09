@@ -723,4 +723,159 @@ BOOST_FIXTURE_TEST_CASE( push_block_returns_forked_transactions_savanna, savanna
 
 } FC_LOG_AND_RETHROW()
 
+// Test that transaction dedup correctly handles fork switches.
+// Transactions recorded on the losing fork must be undone from the dedup table
+// so they can be re-applied (or re-pushed) on the winning fork without tx_duplicate errors.
+BOOST_FIXTURE_TEST_CASE( fork_switch_dedup_savanna, savanna_cluster::cluster_t ) try {
+   auto& A = _nodes[0]; auto& C = _nodes[2]; auto& D = _nodes[3];
+
+   A.produce_block();
+   A.create_accounts({"alice"_n});
+   A.produce_blocks(3);
+
+   auto fork_block_num = A.head().block_num();
+   dlog("fork point: block {} lib {}", fork_block_num, A.last_irreversible_block_num());
+
+   // Split the network so finality stops advancing
+   set_partition({&C, &D});
+
+   // --- Build the losing fork on A with a transaction ---
+   signed_block_ptr cb = A.produce_block();
+
+   // Create a transaction on A's fork
+   transaction_trace_ptr trace_alice_trx;
+   {
+      signed_transaction trx;
+      trx.actions.emplace_back(
+         vector<permission_level>{{config::system_account_name, config::active_name}},
+         newaccount{
+            .creator = config::system_account_name,
+            .name    = "bob"_n,
+            .owner   = authority(get_public_key("bob"_n, "owner")),
+            .active  = authority(get_public_key("bob"_n, "active")),
+         });
+      trx.expiration = fc::time_point_sec{A.head().block_time() + fc::seconds(60)};
+      trx.set_reference_block(cb->calculate_id());
+      trx.sign(get_private_key(config::system_account_name, "active"), A.get_chain_id());
+      trace_alice_trx = A.push_transaction(trx);
+      BOOST_REQUIRE(trace_alice_trx->receipt);
+   }
+   A.produce_block();
+   A.produce_blocks(2);
+
+   // Verify bob exists on A's fork and the trx is known
+   BOOST_CHECK_EQUAL(A.get_account("bob"_n).name, "bob"_n);
+   BOOST_CHECK(A.control->is_known_unexpired_transaction(trace_alice_trx->id));
+
+   // --- Build a longer winning fork on C ---
+   C.produce_block();
+   C.produce_block(fc::milliseconds(config::block_interval_ms * 14)); // skip blocks to get ahead
+   for (int i = 0; i < 25; ++i)
+      C.produce_block();
+
+   // --- Push C's blocks to A, triggering fork switch ---
+   // This calls pop_block for each block on A's fork, which must undo dedup entries
+   for (uint32_t n = fork_block_num + 1; n <= C.head().block_num(); ++n) {
+      auto fb = C.fetch_block_by_number(n);
+      push_block(0, fb);
+   }
+
+   // After fork switch:
+   // - bob should NOT exist (forked out)
+   BOOST_REQUIRE_EXCEPTION(A.get_account("bob"_n), fc::exception,
+                           [](const fc::exception& e) {
+                              return std::string(e.what()).find("bob") != std::string::npos;
+                           });
+   // - The transaction should no longer be known (dedup was undone)
+   BOOST_CHECK(!A.control->is_known_unexpired_transaction(trace_alice_trx->id));
+
+   // - The transaction should be in the unapplied queue (forked out transactions)
+   BOOST_CHECK_EQUAL(1u, A.get_unapplied_transaction_queue().size());
+   BOOST_CHECK_EQUAL(trace_alice_trx->id, A.get_unapplied_transaction_queue().begin()->id());
+
+   // - Producing a new block should re-apply the forked-out transaction
+   //   This will fail with tx_duplicate if the dedup was not properly undone
+   auto result = A.produce_block_ex(fc::milliseconds(config::block_interval_ms), true);
+   bool found_bob_trx = false;
+   for (auto& t : result.unapplied_transaction_traces) {
+      if (t->id == trace_alice_trx->id) {
+         BOOST_CHECK(!!t->receipt); // should succeed, not duplicate
+         found_bob_trx = true;
+      }
+   }
+   BOOST_CHECK(found_bob_trx);
+
+   // bob should now exist on the winning fork
+   BOOST_CHECK_EQUAL(A.get_account("bob"_n).name, "bob"_n);
+
+   // And the transaction should be known again (re-recorded in dedup)
+   BOOST_CHECK(A.control->is_known_unexpired_transaction(trace_alice_trx->id));
+
+} FC_LOG_AND_RETHROW()
+
+// Validates the precondition + apply behavior underpinning producer_plugin's fork_db_ahead_on_same_chain
+// code path (plugins/producer_plugin/src/producer_plugin.cpp). When chain.head() is behind fork_db_head()
+// on the same chain -- e.g. blocks accepted into fork_db via on_incoming_block but apply was deferred --
+// the lambda's predicate (fork_db_head().extends(head.id())) returns true, and apply_blocks must catch
+// head up to fork_db_head. The interrupt_trx_test Python integration test exercises the full producing
+// flow end-to-end; this C++ test localizes the predicate + apply pair on a real controller without the
+// producer_plugin in the loop, so a regression points at the controller boundary directly.
+//
+// Mechanism: partition node D off the cluster so the automatic block propagation does not deliver blocks
+// to it; produce blocks on node A; manually feed those blocks into D's fork_db via accept_block (which
+// does NOT apply -- mirroring on_incoming_block before start_block has a chance to drain the queue);
+// then check the predicate and run apply_blocks to verify catch-up.
+BOOST_FIXTURE_TEST_CASE(fork_db_ahead_of_head_on_same_chain, savanna_cluster::cluster_t) try {
+   auto& A = _nodes[0];
+   auto& D = _nodes[3];
+
+   const auto pre_head = D.head();
+   const uint32_t pre_bn = pre_head.block_num();
+
+   // Isolate D so the cluster's signal-driven block propagation doesn't auto-apply blocks A produces.
+   set_partition({&D});
+
+   // Produce 2 blocks on A. With D partitioned, nodes 0/1/2 keep a 3-of-4 quorum so QCs still form and
+   // A's chain advances; D stays at pre_head. The gap is intentionally kept to num_chains_to_final so
+   // fork_db_head's finality_core still tracks pre_head's block_num in its [last_final, current) range:
+   // a 3-block gap would push LIB past pre_head and take it out of range, which is the case that
+   // !is_head_descendant_of_pending_lib() (the sibling condition in the producer_plugin loop) is
+   // responsible for, not fork_db_ahead_on_same_chain.
+   A.produce_blocks(2);
+   const uint32_t src_fhead_bn = A.fork_db_head().block_num();
+   BOOST_REQUIRE_EQUAL(src_fhead_bn, pre_bn + 2);
+   BOOST_REQUIRE_EQUAL(D.head().block_num(), pre_bn);
+
+   // Feed the 3 new blocks into D's fork_db via accept_block -- bypassing node_t::push_block (which would
+   // call tester::push_block -> apply_blocks). Each block must link cleanly because D's pre-partition
+   // chain history is identical to A's.
+   for (uint32_t bn = pre_bn + 1; bn <= src_fhead_bn; ++bn) {
+      auto sb = A.control->fetch_block_by_number(bn);
+      BOOST_REQUIRE(sb);
+      auto accepted = D.control->accept_block(sb->calculate_id(), sb);
+      BOOST_REQUIRE(accepted.block.has_value());
+   }
+
+   // Precondition: head is behind fork_db_head on the same chain.
+   const auto tgt_head  = D.head();
+   const auto tgt_fhead = D.fork_db_head();
+   BOOST_REQUIRE_EQUAL(tgt_head.block_num(), pre_bn);
+   BOOST_REQUIRE_EQUAL(tgt_fhead.block_num(), src_fhead_bn);
+   BOOST_REQUIRE_EQUAL(tgt_head.id(), pre_head.id());
+
+   // The exact predicate from producer_plugin's fork_db_ahead_on_same_chain lambda.
+   BOOST_TEST(tgt_fhead.extends(tgt_head.id()));
+
+   // apply_blocks must catch head up to fork_db_head -- the action the new producer_plugin loop drives
+   // when the predicate fires.
+   auto result = D.control->apply_blocks({}, {});
+   BOOST_REQUIRE(result.status == controller::apply_blocks_result_t::status_t::complete);
+   BOOST_REQUIRE_EQUAL(D.head().block_num(), src_fhead_bn);
+   BOOST_REQUIRE_EQUAL(D.head().id(), tgt_fhead.id());
+
+   // After catch-up the predicate no longer fires (block_handle::extends does not include self).
+   BOOST_TEST(!D.fork_db_head().extends(D.head().id()));
+
+} FC_LOG_AND_RETHROW()
+
 BOOST_AUTO_TEST_SUITE_END()

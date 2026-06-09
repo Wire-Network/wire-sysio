@@ -349,7 +349,10 @@ class NodeopQueries:
 
     def getTable(self, contract, scope, table, exitOnError=False):
         cmdDesc = "get table"
-        cmd=f"{cmdDesc} --time-limit 999 {contract} {scope} {table}"
+        if scope:
+            cmd=f"{cmdDesc} --time-limit 999 {contract} {table} --scope {scope}"
+        else:
+            cmd=f"{cmdDesc} --time-limit 999 {contract} {table}"
         msg=f"contract={contract}, scope={scope}, table={table}"
         return self.processClioCmd(cmd, cmdDesc, exitOnError=exitOnError, exitMsg=msg)
 
@@ -359,9 +362,9 @@ class NodeopQueries:
         table="accounts"
         trans = self.getTable(contract, scope, table, exitOnError=True)
         try:
-            return trans["rows"][0]["balance"]
+            return trans["rows"][0]["value"]["balance"]
         except (TypeError, KeyError) as _:
-            print("transaction[rows][0][balance] not found. Transaction: %s" % (trans))
+            print("transaction[rows][0][value][balance] not found. Transaction: %s" % (trans))
             raise
 
     def getCurrencyBalance(self, contract, account, symbol=CORE_SYMBOL, exitOnError=False):
@@ -555,7 +558,7 @@ class NodeopQueries:
 
     def getTableColumns(self, contract, scope, table):
         row=self.getTableRow(contract, scope, table, 0)
-        keys=list(row.keys())
+        keys=list(row["value"].keys())
         return keys
 
     def processClioCmd(self, cmd, cmdDesc, silentErrors=True, exitOnError=False, exitMsg=None, returnType=ReturnType.json):

@@ -44,6 +44,7 @@ class transaction_metadata {
    public:
       fc::microseconds                                           elapsed;                // not thread safe
       accounts_billing_t                                         prev_accounts_billing;  // not thread safe
+      bool                                                       prev_succeeded = false; // not thread safe
 
    private:
       struct private_type{};

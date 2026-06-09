@@ -2,6 +2,7 @@
 #include <fc/log/logger.hpp>
 
 #include <sysio/outpost_solana_client_plugin.hpp>
+#include <sysio/outpost_solana_client_plugin/outpost_solana_client.hpp>
 
 namespace sysio {
 
@@ -126,6 +127,35 @@ solana_client_entry_ptr outpost_solana_client_plugin::get_client(const std::stri
 const std::vector<std::pair<std::filesystem::path, std::vector<fc::network::solana::idl::program>>>&
 outpost_solana_client_plugin::get_idl_files() {
    return my->get_idl_files();
+}
+
+std::shared_ptr<outpost_client>
+outpost_solana_client_plugin::create_outpost_client(const std::string& sol_client_id,
+                                                  uint64_t           chain_code,
+                                                  uint32_t           chain_id,
+                                                  const std::string& program_id) {
+   auto entry = my->get_client(sol_client_id);
+   FC_ASSERT(entry, "Unknown solana client id: {}", sol_client_id);
+   FC_ASSERT(!program_id.empty(), "Solana program id is required");
+
+   auto program_key = fc::crypto::solana::solana_public_key::from_base58_string(program_id);
+
+   // Filter the loaded IDL set down to programs whose name matches the OPP
+   // outpost program so we don't construct a client around an unrelated IDL.
+   std::vector<fc::network::solana::idl::program> program_idls;
+   for (auto& [path, programs] : my->get_idl_files()) {
+      for (auto& p : programs) {
+         if (p.name == OPP_SOLANA_OUTPOST_PROGRAM_NAME) {
+            program_idls.push_back(p);
+         }
+      }
+   }
+   FC_ASSERT(!program_idls.empty(),
+             "IDL for program '{}' not loaded — pass --solana-idl-file",
+             OPP_SOLANA_OUTPOST_PROGRAM_NAME);
+
+   return std::make_shared<outpost_solana_client>(
+      entry, program_key, std::move(program_idls), chain_code, chain_id);
 }
 
 } // namespace sysio
