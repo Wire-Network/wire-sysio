@@ -251,25 +251,19 @@ class NodeopQueries:
         msg="(transaction id=%s)" % (transId)
         while True:
             remainingBudget=pollDeadline - time.perf_counter()
-            if remainingBudget <= 0:
-                break
             finalAttempt=remainingBudget <= pollTimeout
-            timeout=min(pollTimeout, remainingBudget)
             attemptStart=time.perf_counter()
             trans=self.processClioCmd(cmd, cmdDesc,
                                       silentErrors=silentErrors if finalAttempt else True,
                                       exitOnError=exitOnError if finalAttempt else exitOnErrorForDelayed,
-                                      exitMsg=msg, timeout=timeout)
+                                      exitMsg=msg, timeout=pollTimeout)
             if trans is not None or not delayedRetry:
                 return trans
             if finalAttempt:
                 break
-            remainingBudget=pollDeadline - time.perf_counter()
-            if remainingBudget <= 0:
-                break
             if Utils.Debug: Utils.Print("Could not find transaction with id %s, delay and retry" % (transId))
             attemptElapsed=time.perf_counter() - attemptStart
-            time.sleep(min(max(0, pollTimeout - attemptElapsed), remainingBudget))
+            time.sleep(max(0, pollTimeout - attemptElapsed))
 
         self.missingTransaction=True
         # either it is there or the transaction has timed out
@@ -608,12 +602,12 @@ class NodeopQueries:
             except subprocess.CalledProcessError as ex:
                 if not silentErrors:
                     end=time.perf_counter()
-                    out=ex.output.decode("utf-8")
-                    msg=ex.stderr.decode("utf-8")
+                    out=Utils.decodeProcessOutput(ex.output)
+                    msg=Utils.decodeProcessOutput(ex.stderr)
                     if retries > 0 and "tx_cpu_usage_exceeded" in out:
                         Utils.Print(f"Retrying {cmdDesc} due to: tx_cpu_usage_exceeded")
                         continue # try again
-                    errorMsg="Exception during \"%s\". Exception message: %s.  stdout: %s.  cmd Duration=%.3f sec. %s" % (cmdDesc, msg, out, end-start, exitMsg)
+                    errorMsg="Exception during \"%s\". Exception message: %s.  stdout: %s.  cmd Duration=%.3f sec. %s" % (cmdDesc, msg, out, end-attemptStart, exitMsg)
                     if exitOnError:
                         Utils.cmdError(errorMsg)
                         Utils.errorExit(errorMsg)
@@ -623,8 +617,8 @@ class NodeopQueries:
             except subprocess.TimeoutExpired as ex:
                 if not silentErrors:
                     end=time.perf_counter()
-                    out=ex.output.decode("utf-8") if ex.output is not None else ""
-                    msg=ex.stderr.decode("utf-8") if ex.stderr is not None else ""
+                    out=Utils.decodeProcessOutput(ex.output)
+                    msg=Utils.decodeProcessOutput(ex.stderr)
                     errorMsg=("Timeout during \"%s\" after %.3f sec. cmd timeout=%s. stderr: %s. stdout: %s. %s" %
                               (cmdDesc, end-attemptStart, ex.timeout, msg, out, exitMsg))
                     if exitOnError:

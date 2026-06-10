@@ -199,6 +199,8 @@ class Utils:
     @staticmethod
     def checkOutput(cmd, ignoreError=False, timeout=None):
         """Run a command and return stdout, optionally bounding the subprocess runtime."""
+        assert timeout is None or isinstance(cmd, list), (
+            "timeout with shell command strings can leave orphaned children")
         popen = Utils.delayedCheckOutput(cmd)
         return Utils.checkDelayedOutput(popen, cmd, ignoreError=ignoreError, timeout=timeout)
 
@@ -226,7 +228,12 @@ class Utils:
         Utils.checkOutputFileWrite(start, cmd, output, error)
         if popen.returncode != 0 and not ignoreError:
             raise subprocess.CalledProcessError(returncode=popen.returncode, cmd=cmd, output=output, stderr=error)
-        return output.decode("utf-8") if popen.returncode == 0 else error.decode("utf-8")
+        return Utils.decodeProcessOutput(output) if popen.returncode == 0 else Utils.decodeProcessOutput(error)
+
+    @staticmethod
+    def decodeProcessOutput(output):
+        """Decode subprocess bytes without hiding diagnostics if a killed process wrote partial UTF-8."""
+        return output.decode("utf-8", errors="replace") if output is not None else ""
 
     @staticmethod
     def errorExit(msg="", raw=False, errorCode=1):
@@ -367,7 +374,7 @@ class Utils:
         except subprocess.CalledProcessError as ex:
             if not silentErrors:
                 end=time.perf_counter()
-                msg=ex.stderr.decode("utf-8")
+                msg=Utils.decodeProcessOutput(ex.stderr)
                 errorMsg="Exception during \"%s\". Exception message: %s.  cmd Duration=%.3f sec. %s" % (cmdDesc, msg, end-start, exitMsg)
                 if exitOnError:
                     Utils.cmdError(errorMsg)
@@ -378,8 +385,8 @@ class Utils:
         except subprocess.TimeoutExpired as ex:
             if not silentErrors:
                 end=time.perf_counter()
-                out=ex.output.decode("utf-8") if ex.output is not None else ""
-                msg=ex.stderr.decode("utf-8") if ex.stderr is not None else ""
+                out=Utils.decodeProcessOutput(ex.output)
+                msg=Utils.decodeProcessOutput(ex.stderr)
                 errorMsg=("Timeout during \"%s\" after %.3f sec. cmd timeout=%s. stderr: %s. stdout: %s. %s" %
                           (cmdDesc, end-start, ex.timeout, msg, out, exitMsg))
                 if exitOnError:
