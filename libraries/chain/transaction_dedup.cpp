@@ -4,7 +4,6 @@
 #include <fc/log/logger.hpp>
 
 #include <filesystem>
-#include <ranges>
 
 namespace sysio::chain {
 
@@ -14,17 +13,19 @@ transaction_dedup::transaction_dedup() {
 
 void transaction_dedup::reset() {
    map_.clear();
-   deque_.clear();
+   index_.clear();
    map_.reserve(default_map_capacity);
    committed_revisions_.clear();
    pending_revision_.reset();
+   current_added_.clear();
    session_stack_.clear();
 }
 
 void transaction_dedup::record(const transaction_id_type& id, fc::time_point_sec expiration) {
    auto [it, inserted] = map_.emplace(id, expiration);
    SYS_ASSERT(inserted, tx_duplicate, "duplicate transaction {}", id);
-   deque_.emplace_back(id, expiration);
+   index_.emplace(expiration, id);
+   current_added_.emplace_back(id, expiration);
 }
 
 bool transaction_dedup::is_known(const transaction_id_type& id) const {
@@ -32,24 +33,22 @@ bool transaction_dedup::is_known(const transaction_id_type& id) const {
 }
 
 std::pair<uint32_t, size_t> transaction_dedup::clear_expired(fc::time_point block_time) {
-   // clear_expired must not be called after record() within the same block.
-   // If record() was called, deque_ would be larger than deque_size_at_start.
-   assert(!pending_revision_ || deque_.size() == pending_revision_->deque_size_at_start);
-   const auto total = deque_.size();
-   // Scan for the expiration boundary so they can be removed in one erase call
-   auto it = deque_.begin();
-   while (it != deque_.end() && block_time > it->second.to_time_point())
-      ++it;
-   const auto num_removed = static_cast<uint32_t>(it - deque_.begin());
-   if (num_removed > 0) {
-      for (auto scan = deque_.begin(); scan != it; ++scan) {
-         map_.erase(scan->first);
-         if (pending_revision_)
-            pending_revision_->expired.push_back(*scan);
-      }
-      deque_.erase(deque_.begin(), it);
+   // clear_expired must not be called after record() within the same block; record() appends to
+   // current_added_, which start_block_revision just cleared.
+   assert(!pending_revision_ || current_added_.empty());
+   const auto total = index_.size();
+   // The index is sorted by (expiration, id), so expired entries form a complete prefix:
+   // everything expired is removed, not just a run that happens to sit at the front of
+   // insertion order. Leaving stragglers behind would make the retained set -- and the
+   // integrity hash derived from it -- depend on the order entries were recorded.
+   uint32_t num_removed = 0;
+   auto it = index_.begin();
+   while (it != index_.end() && block_time > it->first.to_time_point()) {
+      map_.erase(it->second);
       if (pending_revision_)
-         pending_revision_->deque_size_at_start = deque_.size();
+         pending_revision_->expired.emplace_back(it->second, it->first);
+      it = index_.erase(it);
+      ++num_removed;
    }
    return {num_removed, total};
 }
@@ -57,7 +56,7 @@ std::pair<uint32_t, size_t> transaction_dedup::clear_expired(fc::time_point bloc
 // --- Transaction-level undo session management ---
 
 void transaction_dedup::push_session() {
-   session_stack_.push_back(deque_.size());
+   session_stack_.push_back(current_added_.size());
 }
 
 void transaction_dedup::squash_session() {
@@ -68,15 +67,10 @@ void transaction_dedup::squash_session() {
 void transaction_dedup::undo_session() {
    if (session_stack_.empty())
       return;
-   auto restore_size = session_stack_.back();
+   const size_t restore_size = session_stack_.back();
    session_stack_.pop_back();
-   for (auto it = deque_.begin() + restore_size; it != deque_.end(); ++it)
-      map_.erase(it->first);
-   deque_.erase(deque_.begin() + restore_size, deque_.end());
-   // Sessions are always pushed after clear_expired runs, so undo can never
-   // shrink the deque below the block revision's start point. If this fires,
-   // the call ordering in start_block has been broken.
-   assert(!pending_revision_ || deque_.size() >= pending_revision_->deque_size_at_start);
+   assert(restore_size <= current_added_.size());
+   erase_current_added_from(restore_size);
 }
 
 // --- Block-level revision management ---
@@ -85,7 +79,9 @@ void transaction_dedup::start_block_revision(uint32_t block_num) {
    // If there's an uncommitted pending revision, abort it first (shouldn't happen normally)
    if (pending_revision_)
       abort_block_revision();
-   pending_revision_ = block_revision{block_num, deque_.size(), {}};
+   pending_revision_ = block_revision{block_num, {}, {}};
+   // Entries recorded outside any block revision belong to pre-block state and are not undoable.
+   current_added_.clear();
    session_stack_.clear();
 }
 
@@ -93,6 +89,8 @@ void transaction_dedup::commit_block_revision() {
    if (!pending_revision_)
       return;
    session_stack_.clear();
+   pending_revision_->added = std::move(current_added_);
+   current_added_.clear();
    committed_revisions_.push_back(std::move(*pending_revision_));
    pending_revision_.reset();
 }
@@ -102,31 +100,28 @@ void transaction_dedup::abort_block_revision() {
       return;
    session_stack_.clear();
    // Undo entries added during this block
-   for (auto it = deque_.begin() + pending_revision_->deque_size_at_start; it != deque_.end(); ++it)
-      map_.erase(it->first);
-   deque_.erase(deque_.begin() + pending_revision_->deque_size_at_start, deque_.end());
-   // Restore entries that were cleared by clear_expired during this block (push to front)
-   for (const auto& entry : std::views::reverse(pending_revision_->expired)) {
-      deque_.push_front(entry);
-      map_.emplace(entry.first, entry.second);
-   }
+   erase_current_added_from(0);
+   // Restore entries that were cleared by clear_expired during this block
+   restore_expired(*pending_revision_);
    pending_revision_.reset();
 }
 
 void transaction_dedup::pop_block_revision() {
+   // pop_block always runs with no block in progress; abort defensively if that ever changes so
+   // the pending revision's cleared entries are restored rather than stranded.
+   if (pending_revision_)
+      abort_block_revision();
    if (committed_revisions_.empty())
       return;
 
    const auto& rev = committed_revisions_.back();
-   // Undo entries added during this block (back to the size at block start)
-   for (auto it = deque_.begin() + rev.deque_size_at_start; it != deque_.end(); ++it)
-      map_.erase(it->first);
-   deque_.erase(deque_.begin() + rev.deque_size_at_start, deque_.end());
-   // Restore entries that were cleared by clear_expired during this block
-   for (const auto& entry : std::views::reverse(rev.expired)) {
-      deque_.push_front(entry);
-      map_.emplace(entry.first, entry.second);
+   // Undo entries added during this block
+   for (const auto& [id, exp] : rev.added) {
+      map_.erase(id);
+      index_.erase(sorted_entry{exp, id});
    }
+   // Restore entries that were cleared by clear_expired during this block
+   restore_expired(rev);
    committed_revisions_.pop_back();
 }
 
@@ -136,6 +131,22 @@ void transaction_dedup::commit_to_lib(uint32_t block_num) {
       ++it;
    }
    committed_revisions_.erase(committed_revisions_.begin(), it);
+}
+
+void transaction_dedup::restore_expired(const block_revision& rev) {
+   for (const auto& [id, exp] : rev.expired) {
+      map_.emplace(id, exp);
+      index_.emplace(exp, id);
+   }
+}
+
+void transaction_dedup::erase_current_added_from(size_t first) {
+   for (size_t i = first; i < current_added_.size(); ++i) {
+      const auto& [id, exp] = current_added_[i];
+      map_.erase(id);
+      index_.erase(sorted_entry{exp, id});
+   }
+   current_added_.resize(first);
 }
 
 // --- File persistence (uses snapshot format for integrity and code reuse) ---
@@ -172,7 +183,10 @@ bool transaction_dedup::read_from_file(const std::filesystem::path& filepath) {
 
 void transaction_dedup::add_to_snapshot(const snapshot_writer_ptr& snapshot) const {
    snapshot->write_section("sysio::chain::transaction_dedup", [this](auto& section) {
-      for (const auto& [id, exp] : deque_) {
+      // index_ iterates in (expiration, id) order: canonical for a given logical entry set, so
+      // the serialized section -- and the integrity hash folded over it -- is identical across
+      // nodes regardless of the record/undo path that produced the set.
+      for (const auto& [exp, id] : index_) {
          section.add_row(snapshot_transaction_dedup_entry{id, exp});
       }
    });
@@ -187,11 +201,11 @@ void transaction_dedup::read_from_snapshot(const snapshot_reader_ptr& snapshot) 
          snapshot_transaction_dedup_entry entry;
          more = section.read_row(entry);
          map_.emplace(entry.trx_id, entry.expiration);
-         deque_.emplace_back(entry.trx_id, entry.expiration);
+         index_.emplace(entry.expiration, entry.trx_id);
       }
    });
 
-   ilog("Read {} transaction dedup entries from snapshot", deque_.size());
+   ilog("Read {} transaction dedup entries from snapshot", index_.size());
 }
 
 } // namespace sysio::chain

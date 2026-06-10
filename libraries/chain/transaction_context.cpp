@@ -302,7 +302,12 @@ namespace sysio::chain {
       }
 
       init();
-      if ( !is_read_only() && trx.expiration.to_time_point() >= control.pending_lib_time() ) {
+      // Record unconditionally for every applied (non-read-only) transaction. The dedup set is
+      // folded into the integrity hash and snapshots, so gating the record on any node-local
+      // observation (e.g. the previously used pending LIB time, which differs between a replaying
+      // node and a live one) makes otherwise-identical nodes diverge on auxiliary state.
+      // Expired entries are pruned deterministically by clear_expired at the next block start.
+      if ( !is_read_only() ) {
          record_transaction( packed_trx.id(), trx.expiration );
       }
    }

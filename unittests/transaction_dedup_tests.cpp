@@ -5,6 +5,7 @@
 
 #include <fc/crypto/sha256.hpp>
 #include <fc/filesystem.hpp>
+#include <fc/io/json.hpp>
 
 using namespace sysio::chain;
 
@@ -15,6 +16,16 @@ static transaction_id_type make_id(uint64_t n) {
 
 static fc::time_point_sec make_exp(uint32_t seconds_from_epoch) {
    return fc::time_point_sec(seconds_from_epoch);
+}
+
+// Serialize the dedup set the same way controller snapshots and integrity hashing do
+// (add_to_snapshot), rendered to a JSON string so tests can compare content AND order.
+static std::string serialize(const transaction_dedup& d) {
+   fc::mutable_variant_object storage;
+   auto writer = std::make_shared<variant_snapshot_writer>(storage);
+   d.add_to_snapshot(writer);
+   writer->finalize();
+   return fc::json::to_string(fc::variant(storage), fc::time_point::maximum());
 }
 
 BOOST_AUTO_TEST_SUITE(transaction_dedup_tests)
@@ -405,6 +416,131 @@ BOOST_AUTO_TEST_CASE(file_round_trip) {
 BOOST_AUTO_TEST_CASE(file_missing_returns_false) {
    transaction_dedup d;
    BOOST_CHECK(!d.read_from_file("/tmp/nonexistent_dedup_file.bin"));
+}
+
+// ---- Determinism: complete expiry pruning + canonical serialization order ----
+//
+// The serialized dedup set feeds calculate_integrity_hash and snapshots, so the entry set AND its
+// order must be a pure function of logical chain state: independent of record order, undo path,
+// and fork switches. These cases pin the two defects that broke that: clear_expired leaving
+// expired entries that sat behind a longer-lived one in insertion order, and undo restoring
+// entries at a different position than they originally held.
+
+BOOST_AUTO_TEST_CASE(clear_expired_removes_all_expired) {
+   // exp=50 recorded BETWEEN two longer-lived entries: insertion order must not shelter it.
+   transaction_dedup d;
+   d.record(make_id(1), make_exp(200));
+   d.record(make_id(2), make_exp(50));
+   d.record(make_id(3), make_exp(300));
+
+   auto [removed, total] = d.clear_expired(fc::time_point(fc::seconds(100)));
+   BOOST_CHECK_EQUAL(removed, 1u);
+   BOOST_CHECK_EQUAL(total, 3u);
+   BOOST_CHECK(d.is_known(make_id(1)));
+   BOOST_CHECK(!d.is_known(make_id(2)));
+   BOOST_CHECK(d.is_known(make_id(3)));
+   BOOST_CHECK_EQUAL(d.size(), 2u);
+}
+
+BOOST_AUTO_TEST_CASE(clear_expired_removes_scattered_and_respects_boundary) {
+   transaction_dedup d;
+   d.record(make_id(1), make_exp(500));
+   d.record(make_id(2), make_exp(10));
+   d.record(make_id(3), make_exp(400));
+   d.record(make_id(4), make_exp(20));
+   d.record(make_id(5), make_exp(30));
+   d.record(make_id(6), make_exp(100)); // exactly at the boundary: NOT expired (strict <)
+
+   auto [removed, total] = d.clear_expired(fc::time_point(fc::seconds(100)));
+   BOOST_CHECK_EQUAL(removed, 3u);
+   BOOST_CHECK_EQUAL(total, 6u);
+   BOOST_CHECK(d.is_known(make_id(1)));
+   BOOST_CHECK(!d.is_known(make_id(2)));
+   BOOST_CHECK(d.is_known(make_id(3)));
+   BOOST_CHECK(!d.is_known(make_id(4)));
+   BOOST_CHECK(!d.is_known(make_id(5)));
+   BOOST_CHECK(d.is_known(make_id(6)));
+   BOOST_CHECK_EQUAL(d.size(), 3u);
+}
+
+BOOST_AUTO_TEST_CASE(serialization_is_insertion_order_independent) {
+   transaction_dedup a, b;
+   a.record(make_id(1), make_exp(100));
+   a.record(make_id(2), make_exp(50));
+   a.record(make_id(3), make_exp(75));
+
+   b.record(make_id(3), make_exp(75));
+   b.record(make_id(1), make_exp(100));
+   b.record(make_id(2), make_exp(50));
+
+   BOOST_CHECK_EQUAL(serialize(a), serialize(b));
+}
+
+BOOST_AUTO_TEST_CASE(serialization_identical_after_abort) {
+   transaction_dedup d;
+   d.record(make_id(1), make_exp(10));
+   d.record(make_id(2), make_exp(200));
+   d.record(make_id(3), make_exp(20));
+   const auto before = serialize(d);
+
+   d.start_block_revision(1);
+   d.clear_expired(fc::time_point(fc::seconds(100))); // removes ids 1 and 3
+   d.push_session();
+   d.record(make_id(4), make_exp(300));
+   d.squash_session();
+   d.push_session();
+   d.record(make_id(5), make_exp(250));
+   d.undo_session();
+   d.abort_block_revision();
+
+   BOOST_CHECK_EQUAL(serialize(d), before);
+}
+
+BOOST_AUTO_TEST_CASE(serialization_identical_after_pop) {
+   transaction_dedup d;
+   d.record(make_id(1), make_exp(10));
+   d.record(make_id(2), make_exp(200));
+   d.record(make_id(3), make_exp(20));
+   const auto before = serialize(d);
+
+   d.start_block_revision(1);
+   d.clear_expired(fc::time_point(fc::seconds(100)));
+   d.record(make_id(4), make_exp(300));
+   d.commit_block_revision();
+   BOOST_CHECK(!d.is_known(make_id(1)));
+   BOOST_CHECK(d.is_known(make_id(4)));
+
+   d.pop_block_revision();
+
+   BOOST_CHECK_EQUAL(serialize(d), before);
+}
+
+BOOST_AUTO_TEST_CASE(serialization_path_independent_across_fork_switch) {
+   // Node A applies blocks 1,2 directly. Node B applies 1,2', pops 2', then applies 2.
+   // Same final logical chain -> byte-identical serialization.
+   transaction_dedup a, b;
+   auto apply_block1 = [&](transaction_dedup& d) {
+      d.start_block_revision(1);
+      d.record(make_id(1), make_exp(100));
+      d.commit_block_revision();
+   };
+   auto apply_block2 = [&](transaction_dedup& d) {
+      d.start_block_revision(2);
+      d.record(make_id(2), make_exp(60));
+      d.record(make_id(3), make_exp(90));
+      d.commit_block_revision();
+   };
+   apply_block1(a);
+   apply_block2(a);
+
+   apply_block1(b);
+   b.start_block_revision(2);
+   b.record(make_id(9), make_exp(70)); // fork block 2'
+   b.commit_block_revision();
+   b.pop_block_revision();             // switch forks
+   apply_block2(b);
+
+   BOOST_CHECK_EQUAL(serialize(a), serialize(b));
 }
 
 // ---- Reset ----
