@@ -72,17 +72,23 @@ void snapshot_attest::votesnaphash(name snap_account, checksum256 block_id, chec
    uint32_t block_num = block_info::block_height_from_id(block_id);
    check(block_num > 0, "invalid block_id");
 
-   // Check for disagreement against any already-attested record.
+   // Check for disagreement against any already-attested record. Both the snapshot hash and the
+   // block id must match: an equal hash under a different block id is still a different
+   // attestation (the voter is on a different fork at this height).
    // Uses snap_hash_disagreement_error code so nodeop can detect this specific failure
    // without fragile string matching (see producer_plugin.cpp::submit_snapshot_vote).
    snap_records_table records(get_self());
    snap_record_key_t  rec_key{static_cast<uint64_t>(block_num)};
    auto rec_itr = records.find(rec_key);
    if (rec_itr != records.end()) {
-      check(rec_itr->snapshot_hash == snapshot_hash, snap_hash_disagreement_error);
+      check(rec_itr->snapshot_hash == snapshot_hash && rec_itr->block_id == block_id,
+            snap_hash_disagreement_error);
    }
 
-   // Find or create the vote entry for this block_num + snapshot_hash
+   // Find or create the vote entry for this block_num + block_id + snapshot_hash. Votes only
+   // aggregate toward quorum when they agree on BOTH the block id and the snapshot hash;
+   // otherwise votes for different forks at the same height could jointly attest a record whose
+   // block_id is whichever vote arrived first.
    snap_votes_table votes(get_self());
    auto by_bn = votes.get_index<"byblocknum"_n>();
 
@@ -91,7 +97,7 @@ void snapshot_attest::votesnaphash(name snap_account, checksum256 block_id, chec
    bool     found       = false;
    for (auto itr = by_bn.lower_bound(static_cast<uint64_t>(block_num));
         itr != by_bn.end() && itr->block_num == block_num; ++itr) {
-      if (itr->snapshot_hash == snapshot_hash) {
+      if (itr->block_id == block_id && itr->snapshot_hash == snapshot_hash) {
          // Check voter hasn't already voted
          for (const auto& v : itr->voters) {
             check(v != snap_account, "snap_account has already voted for this snapshot");

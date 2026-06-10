@@ -41,6 +41,28 @@
 const std::string deep_mind_logger_name("dmlog");
 sysio::chain::deep_mind_handler _deep_mind_log;
 
+namespace {
+
+/// sysio.system snapshot-attestation contract identifiers
+/// (see contracts/sysio.system/include/sysio.system/snapshot_attest.hpp).
+namespace snapshot_attest {
+   constexpr auto table_snaprecords = "snaprecords";
+   namespace field {
+      constexpr auto block_num     = "block_num";
+      constexpr auto snapshot_hash = "snapshot_hash";
+   }
+}
+
+/// Finalized-block grace window past the snapshot height during which a missing snaprecords row keeps
+/// snapshot-attestation verification pending even after this node has caught up to the live chain tip.
+/// A node bootstrapping from a recently-taken snapshot reaches the tip before the providers'
+/// votesnaphash transactions (which must be generated, voted on, and reach quorum) have landed, so a
+/// missing record at the tip is not immediately conclusive. Half of producer_plugin's 25,000-block
+/// provider snapshot interval (_snapshot_provider_block_spacing).
+constexpr uint32_t snapshot_attestation_grace_blocks = 12500;
+
+} // anonymous namespace
+
 namespace std {
    // declare operator<< for boost program options of vector<string>
    std::ostream& operator<<(std::ostream& osm, const std::vector<std::string>& v) {
@@ -1477,47 +1499,88 @@ void chain_plugin_impl::verify_snapshot_attestation(const signed_block_ptr& lib_
    const auto snap_block_num = *snapshot_loaded_block_num;
 
    try {
-      // Read the attested record from the system contract's `snaprecords` table through the
-      // supported read path, which performs ABI decoding and abstracts the table store. The
-      // contract creates the table as records(get_self(), get_self().value), so both the
-      // code and the scope are the system account.
-      chain_apis::read_only::get_table_rows_params p;
-      p.json        = true;
-      p.code        = config::system_account_name;
-      p.scope       = config::system_account_name.to_string();
-      p.table       = "snaprecords";
-      p.lower_bound = std::to_string(snap_block_num);
-      p.limit       = 1;
-      p.values_only = true;
+      // A system contract deployed before snapshot attestation existed does not declare the
+      // snaprecords table in its ABI, so there is no record to read and the table query below
+      // would log an error on every finalized block while syncing. Detect that case explicitly so
+      // a chain without attestation support downgrades to the warning below instead of producing a
+      // stream of query errors. The ABI is re-checked on every attempt because a system-contract
+      // upgrade that adds attestation support can land while this node is still syncing.
+      bool attestation_supported = false;
+      if (const auto* sys_meta = chain->find_account_metadata(config::system_account_name)) {
+         if (abi_def abi; abi_serializer::to_abi(sys_meta->abi, abi)) {
+            for (const auto& t : abi.tables) {
+               if (t.name == snapshot_attest::table_snaprecords) {
+                  attestation_supported = true;
+                  break;
+               }
+            }
+         }
+      }
 
-      // verify_snapshot_attestation() runs on the main thread from the irreversible-block
-      // handler during sync, so read_table_rows takes its inline main-thread fast path and
-      // never consults the shutdown flag.
-      static const std::atomic<bool> not_shutting_down{false};
-      auto rows = app().get_plugin<chain_plugin>().read_table_rows(
-         std::move(p), abi_serializer_max_time_us, "snapshot_attest", not_shutting_down).rows;
+      bool        have_record = false;
+      fc::variant record_row;
+      if (attestation_supported) {
+         // Read the attested record from the system contract's `snaprecords` table through the
+         // supported read path, which performs ABI decoding and abstracts the table store. The
+         // contract creates the table as records(get_self(), get_self().value), so both the
+         // code and the scope are the system account.
+         chain_apis::read_only::get_table_rows_params p;
+         p.json        = true;
+         p.code        = config::system_account_name;
+         p.scope       = config::system_account_name.to_string();
+         p.table       = snapshot_attest::table_snaprecords;
+         p.lower_bound = std::to_string(snap_block_num);
+         p.limit       = 1;
+         p.values_only = true;
 
-      const bool have_record = !rows.empty() && rows[0].is_object() &&
-                               rows[0].get_object()["block_num"].as_uint64() == snap_block_num;
+         // verify_snapshot_attestation() runs on the main thread from the irreversible-block
+         // handler during sync, so read_table_rows takes its inline main-thread fast path and
+         // never consults the shutdown flag.
+         static const std::atomic<bool> not_shutting_down{false};
+         auto rows = app().get_plugin<chain_plugin>().read_table_rows(
+            std::move(p), abi_serializer_max_time_us, "snapshot_attest", not_shutting_down).rows;
+
+         if (!rows.empty() && rows[0].is_object() &&
+             rows[0].get_object()[snapshot_attest::field::block_num].as_uint64() == snap_block_num) {
+            have_record = true;
+            record_row  = std::move(rows[0]);
+         }
+      }
 
       if (!have_record) {
          // The snaprecords row is created by votesnaphash transactions that only land a few blocks
          // after the snapshot height, so on a fresh bootstrap it may not have synced into state by
          // the time the first finalized block past the snapshot height arrives. Keep retrying on
-         // later finalized blocks; only conclude the height was never attested once the node has
-         // caught up to the live chain tip. snapshot_loaded_block_num is left set so the caller
-         // retries. This is local, non-consensus bookkeeping, so comparing the finalized block time
-         // against wall-clock to detect "caught up" is appropriate.
+         // later finalized blocks; snapshot_loaded_block_num is left set so the caller retries.
+         // This is local, non-consensus bookkeeping, so comparing the finalized block time against
+         // wall-clock to detect "caught up" is appropriate.
          const auto caught_up_tolerance = fc::seconds(30);
          const bool caught_up = fc::time_point::now() - lib_block->timestamp.to_time_point() < caught_up_tolerance;
-         if (caught_up) {
+         if (!caught_up)
+            return; // retry on the next finalized block while still catching up
+
+         if (!attestation_supported) {
             snapshot_loaded_block_num.reset();
-            wlog("No attested snapshot record found for block #{} after syncing to the chain tip. "
-                 "Skipping snapshot verification. "
-                 "Only snapshots taken at attested block heights can be verified.",
-                 snap_block_num);
+            wlog("The deployed system contract does not declare a '{}' table, so this chain does not "
+                 "support snapshot attestation. Skipping snapshot verification for block #{}.",
+                 snapshot_attest::table_snaprecords, snap_block_num);
+            return;
          }
-         return; // retry on the next finalized block while still catching up
+
+         // Even at the live tip a missing record is not yet conclusive -- the providers'
+         // votesnaphash transactions may still be in flight (see
+         // snapshot_attestation_grace_blocks). Keep verification pending for a deterministic
+         // window of finalized blocks past the snapshot height before concluding the height was
+         // never attested.
+         if (lib_block->block_num() < snap_block_num + snapshot_attestation_grace_blocks)
+            return; // retry on the next finalized block while the attestation can still arrive
+
+         snapshot_loaded_block_num.reset();
+         wlog("No attested snapshot record found for block #{} after syncing to the chain tip and "
+              "waiting {} blocks past the snapshot height. Skipping snapshot verification. "
+              "Only snapshots taken at attested block heights can be verified.",
+              snap_block_num, lib_block->block_num() - snap_block_num);
+         return;
       }
 
       // The record is present -- this attempt is terminal regardless of the outcome below.
@@ -1525,7 +1588,7 @@ void chain_plugin_impl::verify_snapshot_attestation(const signed_block_ptr& lib_
 
       // snap_record.snapshot_hash is a checksum256; with json=true the ABI serializer renders
       // it as lowercase hex, the same form fc::crypto::blake3::str() produces.
-      const auto on_chain_hash = rows[0].get_object()["snapshot_hash"].as_string();
+      const auto on_chain_hash = record_row.get_object()[snapshot_attest::field::snapshot_hash].as_string();
       if (on_chain_hash != snapshot_loaded_root_hash.str()) {
          elog("FATAL: Snapshot hash mismatch for block #{}! "
               "On-chain attested hash: {}, loaded snapshot hash: {}. "
