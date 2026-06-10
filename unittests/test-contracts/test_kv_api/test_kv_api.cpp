@@ -1860,6 +1860,86 @@ public:
       kv_it_destroy(h);
    }
 
+   // --- tstnexteras: erase row under iterator, reinsert same key, kv_it_next must ADVANCE.
+   // Pins the slow-path re-seek in apply_context::kv_it_next: the erase+reinsert leaves the
+   // iterator's cached row id stale, and a lower_bound re-seek would land back on the
+   // reinserted key so next would return the same key forever. The host must seek strictly
+   // past the current key (upper_bound) and land on key2.
+   [[sysio::action]]
+   void tstnexteras() {
+      char prefix[] = {(char)0xF6};
+      char key1[] = {(char)0xF6, 0x01};
+      char key2[] = {(char)0xF6, 0x02};
+      char val1[] = "original";
+      char val2[] = "replaced";
+
+      kv_set(test_table_id, get_self().value, key1, sizeof(key1), val1, sizeof(val1));
+      kv_set(test_table_id, get_self().value, key2, sizeof(key2), val1, sizeof(val1));
+
+      uint32_t h = kv_it_create(test_table_id, get_self().value, prefix, sizeof(prefix));
+      int32_t st = kv_it_lower_bound(h, key1, sizeof(key1));
+      check(st == 0, "tstnexteras: should find key1");
+
+      // Erase and reinsert key1 -- same key bytes, fresh row (stale cached id)
+      kv_erase(test_table_id, key1, sizeof(key1));
+      kv_set(test_table_id, get_self().value, key1, sizeof(key1), val2, sizeof(val2));
+
+      int32_t next_st = kv_it_next(h);
+      check(next_st == 0, "tstnexteras: next after erase+reinsert should land on key2");
+
+      uint32_t actual = 0;
+      char kbuf[4] = {};
+      int32_t key_st = kv_it_key(h, 0, kbuf, sizeof(kbuf), &actual);
+      check(key_st == 0, "tstnexteras: key read should succeed");
+      check(actual == sizeof(key2), "tstnexteras: key size should match");
+      check(kbuf[1] == 0x02, "tstnexteras: iterator must advance to key2, not revisit reinserted key1");
+
+      // And from key2, next reaches end
+      check(kv_it_next(h) == 1, "tstnexteras: next from last key should reach end");
+
+      kv_it_destroy(h);
+   }
+
+   // --- tstidxnxtras: secondary-index analog of tstnexteras.
+   // Remove + re-store the (sec, pri) entry under the iterator, then kv_idx_next must advance
+   // to the next entry rather than re-finding the reinserted one via a lower_bound re-seek.
+   [[sysio::action]]
+   void tstidxnxtras() {
+      const uint32_t sec_tid = test_sec_table_id;
+      const uint64_t self = get_self().value;
+      const char sec1[] = "nxe1";
+      const char sec2[] = "nxe2";
+      const char pri1[] = {0x7A, 0x01};
+      const char pri2[] = {0x7A, 0x02};
+
+      kv_idx_store(self, sec_tid, pri1, sizeof(pri1), sec1, sizeof(sec1));
+      kv_idx_store(self, sec_tid, pri2, sizeof(pri2), sec2, sizeof(sec2));
+
+      int32_t h = kv_idx_find_secondary(self, sec_tid, sec1, sizeof(sec1));
+      check(h >= 0, "tstidxnxtras: should find sec1");
+
+      // Remove and re-store the entry under the iterator -- same keys, fresh row
+      kv_idx_remove(sec_tid, pri1, sizeof(pri1), sec1, sizeof(sec1));
+      kv_idx_store(self, sec_tid, pri1, sizeof(pri1), sec1, sizeof(sec1));
+
+      int32_t next_st = kv_idx_next((uint32_t)h);
+      check(next_st == 0, "tstidxnxtras: next after remove+restore should land on sec2");
+
+      uint32_t sk_sz = 0;
+      char sk_buf[8] = {};
+      int32_t key_st = kv_idx_key((uint32_t)h, 0, sk_buf, sizeof(sk_buf), &sk_sz);
+      check(key_st == 0, "tstidxnxtras: sec key read should succeed");
+      check(sk_sz == sizeof(sec2), "tstidxnxtras: sec key size should match");
+      check(memcmp(sk_buf, sec2, sizeof(sec2)) == 0,
+            "tstidxnxtras: iterator must advance to sec2, not revisit reinserted sec1");
+
+      kv_idx_destroy((uint32_t)h);
+
+      // Cleanup so reruns within the same chain state start fresh
+      kv_idx_remove(sec_tid, pri1, sizeof(pri1), sec1, sizeof(sec1));
+      kv_idx_remove(sec_tid, pri2, sizeof(pri2), sec2, sizeof(sec2));
+   }
+
    // ─── tstprevbgn: kv_it_prev from begin position should return end status
    [[sysio::action]]
    void tstprevbgn() {

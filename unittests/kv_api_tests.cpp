@@ -428,6 +428,17 @@ BOOST_FIXTURE_TEST_CASE(iterator_erase_reinsert_same_key, kv_api_tester) {
    BOOST_CHECK_NO_THROW(run_action("tstreraseins"_n));
 }
 
+BOOST_FIXTURE_TEST_CASE(iterator_next_after_erase_reinsert_advances, kv_api_tester) {
+   // kv_it_next with a stale cached row (erase + reinsert at the same key) must advance to the
+   // NEXT key instead of re-finding the reinserted current key and spinning in place
+   BOOST_CHECK_NO_THROW(run_action("tstnexteras"_n));
+}
+
+BOOST_FIXTURE_TEST_CASE(idx_iterator_next_after_remove_restore_advances, kv_api_tester) {
+   // secondary-index analog: kv_idx_next must advance past a removed-and-restored (sec, pri) entry
+   BOOST_CHECK_NO_THROW(run_action("tstidxnxtras"_n));
+}
+
 BOOST_FIXTURE_TEST_CASE(iterator_prev_from_begin, kv_api_tester) {
    // kv_it_prev from the first element should return end status
    BOOST_CHECK_NO_THROW(run_action("tstprevbgn"_n));
