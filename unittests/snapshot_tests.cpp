@@ -1,7 +1,9 @@
 #include <sstream>
 
+#include <sysio/chain/authorization_manager.hpp>
 #include <sysio/chain/block_log.hpp>
 #include <sysio/chain/global_property_object.hpp>
+#include <sysio/chain/permission_object.hpp>
 #include <sysio/chain/snapshot.hpp>
 #include <sysio/chain/s_root_extension.hpp>
 #include <sysio/chain/contract_table_objects.hpp>
@@ -443,6 +445,111 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(test_s_root_in_snapshot, SNAPSHOT_SUITE, snapshot_
 BOOST_AUTO_TEST_CASE_TEMPLATE(test_chain_id_in_snapshot, SNAPSHOT_SUITE, snapshot_suites)
 {
    chain_id_in_snapshot_test<savanna_tester, SNAPSHOT_SUITE>();
+}
+
+// Permission parent chains deeper than config::default_max_auth_depth (6) are legal: creation
+// (updateauth) never caps chain depth -- only authority *satisfaction* recursion is bounded, by
+// the separate max_authority_depth config. A snapshot of such a chain must therefore load. The
+// load-time parent-chain walk previously reused default_max_auth_depth as its bound and threw
+// snapshot_exception for any honest chain deeper than 6, so every node restarting or onboarding
+// from such a snapshot failed.
+template<typename TESTER, typename SNAPSHOT_SUITE>
+void deep_permission_chain_in_snapshot_test()
+{
+   TESTER chain;
+   const auto deep_account = "deepperms"_n;
+   chain.create_account(deep_account);
+   chain.produce_block();
+
+   // Build a custom permission chain twice as deep as default_max_auth_depth:
+   // active <- deepa <- deepb <- ... (12 links). Letter suffixes only: digits 6-9
+   // are not valid name characters.
+   constexpr uint32_t chain_depth = 2 * config::default_max_auth_depth;
+   std::string parent = "active";
+   for (uint32_t i = 0; i < chain_depth; ++i) {
+      const std::string perm = std::string("deep") + static_cast<char>('a' + i);
+      chain.set_authority(deep_account, name(perm),
+                          authority(chain.get_public_key(deep_account, perm)),
+                          name(parent));
+      parent = perm;
+   }
+   chain.produce_block();
+   chain.control->abort_block();
+
+   auto writer = SNAPSHOT_SUITE::get_writer();
+   chain.control->write_snapshot(writer);
+   auto snapshot = SNAPSHOT_SUITE::finalize(writer);
+
+   // Loading must succeed; depth alone is not corruption.
+   snapshotted_tester snap_chain(chain.get_config(), SNAPSHOT_SUITE::get_reader(snapshot), 0);
+   verify_integrity_hash<SNAPSHOT_SUITE>(*chain.control, *snap_chain.control);
+
+   // The deepest permission survived the round trip with its parent chain intact.
+   const auto& po = snap_chain.control->get_authorization_manager().get_permission(
+      permission_level{deep_account, name(parent)});
+   BOOST_TEST(po.name == name(parent));
+}
+
+BOOST_AUTO_TEST_CASE_TEMPLATE(test_deep_permission_chain_in_snapshot, SNAPSHOT_SUITE, snapshot_suites)
+{
+   deep_permission_chain_in_snapshot_test<savanna_tester, SNAPSHOT_SUITE>();
+}
+
+// A permission row carrying a structurally invalid authority -- here a duplicated key entry,
+// which both breaks the strict key ordering updateauth enforces at creation and double-counts
+// that key's weight toward threshold -- must be rejected at snapshot load rather than silently
+// reconstructed into chain state. Uses the variant snapshot format so the row can be mutated.
+BOOST_AUTO_TEST_CASE(test_invalid_authority_in_snapshot_rejected)
+{
+   savanna_tester chain;
+   const auto victim = "victim"_n;
+   chain.create_account(victim);
+   chain.produce_block();
+   chain.control->abort_block();
+
+   auto writer = variant_snapshot_suite::get_writer();
+   chain.control->write_snapshot(writer);
+   auto snapshot = variant_snapshot_suite::finalize(writer);
+
+   // Rebuild the snapshot variant with victim@active's first key entry duplicated.
+   const std::string perm_section = chain::detail::snapshot_section_traits<permission_object>::section_name();
+   uint32_t mutated_rows = 0;
+   fc::variants new_sections;
+   for (const auto& section : snapshot["sections"].get_array()) {
+      if (section["name"].as_string() != perm_section) {
+         new_sections.push_back(section);
+         continue;
+      }
+      fc::variants new_rows;
+      for (const auto& row : section["rows"].get_array()) {
+         const auto& ro = row.get_object();
+         if (ro["owner"].as_string() == victim.to_string() && ro["name"].as_string() == "active") {
+            fc::variants keys = ro["auth"]["keys"].get_array();
+            BOOST_REQUIRE(!keys.empty());
+            keys.push_back(keys.front());
+            new_rows.emplace_back(
+               fc::mutable_variant_object(ro)
+                  ("auth", fc::mutable_variant_object(ro["auth"].get_object())("keys", std::move(keys))));
+            ++mutated_rows;
+         } else {
+            new_rows.push_back(row);
+         }
+      }
+      new_sections.emplace_back(fc::mutable_variant_object()("name", section["name"])("rows", std::move(new_rows)));
+   }
+   BOOST_REQUIRE_EQUAL(mutated_rows, 1u);
+   fc::variant mutated = fc::mutable_variant_object()
+      ("version", snapshot["version"])
+      ("sections", std::move(new_sections));
+
+   // The exception must point at the mutated row -- not at some other permission tripping the
+   // check incidentally (e.g. sysio.null's deliberately empty authority, which is exempt).
+   BOOST_REQUIRE_EXCEPTION(
+      snapshotted_tester(chain.get_config(), variant_snapshot_suite::get_reader(mutated), 0),
+      snapshot_exception,
+      [](const snapshot_exception& e) {
+         return e.to_detail_string().find("victim@active has invalid authority") != std::string::npos;
+      });
 }
 
 BOOST_AUTO_TEST_SUITE_END()
