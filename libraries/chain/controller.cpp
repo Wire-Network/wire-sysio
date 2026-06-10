@@ -1841,7 +1841,7 @@ struct controller_impl {
       authority system_auth(genesis.initial_key);
       create_native_account( genesis.initial_timestamp, sysio::chain::config::system_account_name, system_auth, system_auth, true );
 
-      auto empty_authority = authority(1, {}, {});
+      auto empty_authority = genesis_empty_authority();
       auto active_producers_authority = authority(1, {}, {});
       active_producers_authority.accounts.push_back({{sysio::chain::config::system_account_name, sysio::chain::config::active_name}, 1});
 

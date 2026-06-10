@@ -207,12 +207,25 @@ void transaction_dedup::read_from_snapshot(const snapshot_reader_ptr& snapshot) 
       while (more) {
          snapshot_transaction_dedup_entry entry;
          more = section.read_row(entry);
-         map_.emplace(entry.trx_id, entry.expiration);
+         // Honest nodes serialize each id exactly once, so a repeated id means the section is
+         // corrupt or hand-crafted. Silently ignoring the failed insert would break the
+         // map/index invariant: the map keeps only the first row while the index gains an
+         // (expiration, id) entry per row, so size() disagrees with the serialized contents and
+         // the phantom index entry outlives its map entry -- clear_expired then erases the id at
+         // the WRONG expiration (or re-recording the id strands the stale index row for good).
+         const bool inserted = map_.emplace(entry.trx_id, entry.expiration).second;
+         SYS_ASSERT(inserted, snapshot_exception,
+                    "duplicate transaction {} in dedup snapshot section", entry.trx_id);
          // Current-format rows arrive in (expiration, id) order, so hinting the end makes the
          // tree build amortized O(1) per row instead of O(log n) -- ~11x faster on large sets.
          // Old insertion-ordered snapshots ignore a wrong hint and insert correctly at full cost.
          index_.emplace_hint(index_.end(), entry.expiration, entry.trx_id);
       }
+      // map_ keys on the id alone, so every accepted row's (expiration, id) pair is necessarily
+      // new to index_; equal sizes prove the index insert landed for every row as well.
+      SYS_ASSERT(map_.size() == index_.size(), snapshot_exception,
+                 "transaction dedup map/index size mismatch after snapshot load ({} vs {})",
+                 map_.size(), index_.size());
    });
 
    ilog("Read {} transaction dedup entries from snapshot", index_.size());

@@ -83,11 +83,19 @@ namespace sysio { namespace chain {
 
                // Reject structurally invalid authorities: unsorted or duplicate keys/accounts, or a
                // threshold no weight combination can satisfy. newaccount and updateauth enforce the
-               // same predicate at creation, so any non-empty row failing it is corrupt or
-               // hand-crafted. Deliberately EMPTY authorities (no keys and no accounts) are exempt:
-               // genesis creates sysio.null's permissions and sysio.prods@owner with empty_authority,
-               // permanently unsatisfiable by design, and validate() rejects those as threshold-unreachable.
-               const bool deliberately_empty = row.auth.keys.empty() && row.auth.accounts.empty();
+               // same predicate at creation, so any row failing it is corrupt or hand-crafted --
+               // except the three permissions genesis deliberately creates permanently unsatisfiable:
+               // sysio.null@owner, sysio.null@active, and sysio.prods@owner, each holding exactly
+               // genesis_empty_authority(), which validate() rejects as threshold-unreachable. Their
+               // unsatisfiability means updateauth can never have altered them, so the exemption is
+               // scoped to exactly those rows with exactly that value; an empty authority anywhere
+               // else (or any other invalid value on these rows) fails the check like the corrupt
+               // row it is.
+               const bool deliberately_empty =
+                  row.auth == genesis_empty_authority() &&
+                  ((row.owner == config::null_account_name &&
+                    (row.name == config::owner_name || row.name == config::active_name)) ||
+                   (row.owner == config::producers_account_name && row.name == config::owner_name));
                SYS_ASSERT(deliberately_empty || validate(row.auth), snapshot_exception,
                           "Permission {}@{} has invalid authority", row.owner, row.name);
 

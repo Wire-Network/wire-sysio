@@ -552,6 +552,80 @@ BOOST_AUTO_TEST_CASE(test_invalid_authority_in_snapshot_rejected)
       });
 }
 
+// The empty-authority exemption is scoped to the three rows genesis deliberately creates
+// unsatisfiable (sysio.null@owner, sysio.null@active, sysio.prods@owner). newaccount and
+// updateauth reject empty authorities everywhere else via validate(), so a hand-crafted snapshot
+// row carrying one on any other permission -- or carrying a non-genesis value on an exempt row --
+// must be rejected rather than loaded past the structural checks.
+BOOST_AUTO_TEST_CASE(test_unscoped_empty_authority_in_snapshot_rejected)
+{
+   savanna_tester chain;
+   const auto victim = "victim"_n;
+   chain.create_account(victim);
+   chain.produce_block();
+   chain.control->abort_block();
+
+   auto writer = variant_snapshot_suite::get_writer();
+   chain.control->write_snapshot(writer);
+   auto snapshot = variant_snapshot_suite::finalize(writer);
+
+   // Rebuild the snapshot variant with <owner>@<perm>'s auth object rewritten by `mutate`.
+   const std::string perm_section = chain::detail::snapshot_section_traits<permission_object>::section_name();
+   auto mutate_auth = [&](const std::string& owner, const std::string& perm, auto&& mutate) -> fc::variant {
+      uint32_t mutated_rows = 0;
+      fc::variants new_sections;
+      for (const auto& section : snapshot["sections"].get_array()) {
+         if (section["name"].as_string() != perm_section) {
+            new_sections.push_back(section);
+            continue;
+         }
+         fc::variants new_rows;
+         for (const auto& row : section["rows"].get_array()) {
+            const auto& ro = row.get_object();
+            if (ro["owner"].as_string() == owner && ro["name"].as_string() == perm) {
+               new_rows.emplace_back(fc::mutable_variant_object(ro)("auth", mutate(ro["auth"].get_object())));
+               ++mutated_rows;
+            } else {
+               new_rows.push_back(row);
+            }
+         }
+         new_sections.emplace_back(fc::mutable_variant_object()("name", section["name"])("rows", std::move(new_rows)));
+      }
+      BOOST_REQUIRE_EQUAL(mutated_rows, 1u);
+      return fc::mutable_variant_object()
+         ("version", snapshot["version"])
+         ("sections", std::move(new_sections));
+   };
+   auto empty_auth = [](const fc::variant_object& auth) {
+      return fc::mutable_variant_object(auth)("threshold", 1)("keys", fc::variants{})("accounts", fc::variants{});
+   };
+   auto expect_rejected = [&](const fc::variant& mutated, int ordinal, const std::string& msg) {
+      BOOST_REQUIRE_EXCEPTION(
+         snapshotted_tester(chain.get_config(), variant_snapshot_suite::get_reader(mutated), ordinal),
+         snapshot_exception,
+         [&](const snapshot_exception& e) {
+            return e.to_detail_string().find(msg) != std::string::npos;
+         });
+   };
+
+   // Exactly the empty shape genesis gives sysio.null -- but on a normal account: rejected.
+   expect_rejected(mutate_auth(victim.to_string(), "active", empty_auth), 0,
+                   "victim@active has invalid authority");
+
+   // Empty authority on a non-exempt permission of an exempt-listed account: only
+   // sysio.prods@owner is genesis-empty; @active must stay subject to the structural check.
+   expect_rejected(mutate_auth("sysio.prods", "active", empty_auth), 1,
+                   "sysio.prods@active has invalid authority");
+
+   // An exempt row must carry exactly the genesis value: bumping the threshold of the
+   // (legitimately empty) sysio.null@owner row is corruption, not a wider exemption.
+   expect_rejected(mutate_auth("sysio.null", "owner",
+                               [](const fc::variant_object& auth) {
+                                  return fc::mutable_variant_object(auth)("threshold", 2);
+                               }),
+                   2, "sysio.null@owner has invalid authority");
+}
+
 // Permission parent integrity at load is guaranteed by name resolution against already-loaded
 // rows (ids strictly decrease toward the root, so every ancestor precedes its children): a row
 // whose parent cannot be resolved is corrupt -- a dangling reference, or a parent cycle, which

@@ -461,6 +461,60 @@ BOOST_AUTO_TEST_CASE(snapshot_load_accepts_unsorted_rows) {
    BOOST_CHECK_EQUAL(serialize(unsorted_load), serialize(recorded));
 }
 
+// Builds a dedup section carrying make_id(1) twice -- a shape no honest node serializes (ids are
+// unique) but a corrupted or hand-crafted snapshot can. Silently ignoring the failed map insert
+// would split the map/index invariant: the map keeps only the first row while the index keeps an
+// (expiration, id) entry per row, so size() disagrees with the serialized contents and the
+// phantom index entry outlives its map entry.
+static fc::variant make_duplicate_id_snapshot(fc::time_point_sec second_exp) {
+   fc::mutable_variant_object storage;
+   auto writer = std::make_shared<variant_snapshot_writer>(storage);
+   writer->write_section("sysio::chain::transaction_dedup", [&](auto& section) {
+      section.add_row(snapshot_transaction_dedup_entry{make_id(1), make_exp(100)});
+      section.add_row(snapshot_transaction_dedup_entry{make_id(2), make_exp(200)});
+      section.add_row(snapshot_transaction_dedup_entry{make_id(1), second_exp});
+   });
+   writer->finalize();
+   return fc::variant(storage);
+}
+
+BOOST_AUTO_TEST_CASE(snapshot_load_rejects_duplicate_ids) {
+   // The dangerous shape: same id under a DIFFERENT expiration, so map and index would disagree
+   // about which expiration the id carries.
+   fc::variant different_exp = make_duplicate_id_snapshot(make_exp(300));
+   transaction_dedup d;
+   BOOST_CHECK_THROW(d.read_from_snapshot(std::make_shared<variant_snapshot_reader>(different_exp)),
+                     snapshot_exception);
+
+   // Same id under the SAME expiration is equally corrupt: each id is serialized exactly once.
+   fc::variant same_exp = make_duplicate_id_snapshot(make_exp(100));
+   transaction_dedup d2;
+   BOOST_CHECK_THROW(d2.read_from_snapshot(std::make_shared<variant_snapshot_reader>(same_exp)),
+                     snapshot_exception);
+}
+
+BOOST_AUTO_TEST_CASE(file_load_rejects_duplicate_ids) {
+   fc::temp_directory tmp_dir;
+   auto tmp = tmp_dir.path() / "dup_dedup.bin";
+   {
+      auto writer = std::make_shared<threaded_snapshot_writer>(tmp);
+      writer->write_section("sysio::chain::transaction_dedup", [](auto& section) {
+         section.add_row(snapshot_transaction_dedup_entry{make_id(1), make_exp(100)});
+         section.add_row(snapshot_transaction_dedup_entry{make_id(1), make_exp(300)});
+      });
+      writer->finalize();
+   }
+
+   // The file-load path treats a corrupt file as best-effort: it must report failure and leave
+   // the dedup set empty, including any state present before the attempted load.
+   transaction_dedup d;
+   d.record(make_id(7), make_exp(700));
+   BOOST_CHECK(!d.read_from_file(tmp));
+   BOOST_CHECK_EQUAL(d.size(), 0u);
+   BOOST_CHECK(!d.is_known(make_id(1)));
+   BOOST_CHECK(!d.is_known(make_id(7)));
+}
+
 // ---- Determinism: complete expiry pruning + canonical serialization order ----
 //
 // The serialized dedup set feeds calculate_integrity_hash and snapshots, so the entry set AND its
