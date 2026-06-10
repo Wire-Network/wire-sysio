@@ -266,9 +266,12 @@ class Utils:
         return chainSyncStrategies
 
     @staticmethod
-    def checkOutput(cmd, ignoreError=False):
+    def checkOutput(cmd, ignoreError=False, timeout=None):
+        """Run a command and return stdout, optionally bounding the subprocess runtime."""
+        assert timeout is None or isinstance(cmd, list), (
+            "timeout with shell command strings can leave orphaned children")
         popen = Utils.delayedCheckOutput(cmd)
-        return Utils.checkDelayedOutput(popen, cmd, ignoreError=ignoreError)
+        return Utils.checkDelayedOutput(popen, cmd, ignoreError=ignoreError, timeout=timeout)
 
     @staticmethod
     def delayedCheckOutput(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
@@ -279,15 +282,27 @@ class Utils:
         return popen
 
     @staticmethod
-    def checkDelayedOutput(popen, cmd, ignoreError=False):
+    def checkDelayedOutput(popen, cmd, ignoreError=False, timeout=None):
+        """Collect a subprocess result and terminate it if it exceeds the requested timeout."""
         assert isinstance(popen, subprocess.Popen)
         assert isinstance(cmd, (str,list))
         start=Utils.timestamp()
-        (output,error)=popen.communicate()
+        try:
+            (output,error)=popen.communicate(timeout=timeout)
+        except subprocess.TimeoutExpired as ex:
+            popen.kill()
+            (output,error)=popen.communicate()
+            Utils.checkOutputFileWrite(start, cmd, output, error)
+            raise subprocess.TimeoutExpired(cmd=cmd, timeout=ex.timeout, output=output, stderr=error) from ex
         Utils.checkOutputFileWrite(start, cmd, output, error)
         if popen.returncode != 0 and not ignoreError:
             raise subprocess.CalledProcessError(returncode=popen.returncode, cmd=cmd, output=output, stderr=error)
-        return output.decode("utf-8") if popen.returncode == 0 else error.decode("utf-8")
+        return Utils.decodeProcessOutput(output) if popen.returncode == 0 else Utils.decodeProcessOutput(error)
+
+    @staticmethod
+    def decodeProcessOutput(output):
+        """Decode subprocess bytes without hiding diagnostics if a killed process wrote partial UTF-8."""
+        return output.decode("utf-8", errors="replace") if output is not None else ""
 
     @staticmethod
     def errorExit(msg="", raw=False, errorCode=1):
@@ -384,28 +399,33 @@ class Utils:
             raise
 
     @staticmethod
-    def runCmdArrReturnJson(cmdArr, trace=False, silentErrors=True):
-        retStr=Utils.checkOutput(cmdArr)
+    def runCmdArrReturnJson(cmdArr, trace=False, silentErrors=True, timeout=None):
+        """Run a command array and parse its JSON output, optionally with a subprocess timeout."""
+        retStr=Utils.checkOutput(cmdArr, timeout=timeout)
         return Utils.toJson(retStr, trace, silentErrors)
 
     @staticmethod
-    def runCmdReturnStr(cmd, trace=False, ignoreError=False):
+    def runCmdReturnStr(cmd, trace=False, ignoreError=False, timeout=None):
+        """Run a shell command string and return stdout, optionally with a subprocess timeout."""
         cmdArr=shlex.split(cmd)
-        return Utils.runCmdArrReturnStr(cmdArr, ignoreError=ignoreError)
+        return Utils.runCmdArrReturnStr(cmdArr, ignoreError=ignoreError, timeout=timeout)
 
     @staticmethod
-    def runCmdArrReturnStr(cmdArr, trace=False, ignoreError=False):
-        retStr=Utils.checkOutput(cmdArr, ignoreError=ignoreError)
+    def runCmdArrReturnStr(cmdArr, trace=False, ignoreError=False, timeout=None):
+        """Run a command array and return stdout, optionally with a subprocess timeout."""
+        retStr=Utils.checkOutput(cmdArr, ignoreError=ignoreError, timeout=timeout)
         if trace: Utils.Print ("RAW > %s" % (retStr))
         return retStr
 
     @staticmethod
-    def runCmdReturnJson(cmd, trace=False, silentErrors=False):
+    def runCmdReturnJson(cmd, trace=False, silentErrors=False, timeout=None):
+        """Run a shell command string and parse its JSON output, optionally with a subprocess timeout."""
         cmdArr=shlex.split(cmd)
-        return Utils.runCmdArrReturnJson(cmdArr, trace=trace, silentErrors=silentErrors)
+        return Utils.runCmdArrReturnJson(cmdArr, trace=trace, silentErrors=silentErrors, timeout=timeout)
 
     @staticmethod
-    def processSysioUtilCmd(cmd, cmdDesc, silentErrors=True, exitOnError=False, exitMsg=None):
+    def processSysioUtilCmd(cmd, cmdDesc, silentErrors=True, exitOnError=False, exitMsg=None, timeout=None):
+        """Run sys-util and return stdout, optionally bounding the subprocess runtime."""
         cmd="%s %s" % (Utils.SysioClientPath, cmd)
         if Utils.Debug: Utils.Print("cmd: %s" % (cmd))
         if exitMsg is not None:
@@ -415,7 +435,7 @@ class Utils:
         output=None
         start=time.perf_counter()
         try:
-            output=Utils.runCmdReturnStr(cmd)
+            output=Utils.runCmdReturnStr(cmd, timeout=timeout)
 
             if Utils.Debug:
                 end=time.perf_counter()
@@ -423,8 +443,21 @@ class Utils:
         except subprocess.CalledProcessError as ex:
             if not silentErrors:
                 end=time.perf_counter()
-                msg=ex.stderr.decode("utf-8")
+                msg=Utils.decodeProcessOutput(ex.stderr)
                 errorMsg="Exception during \"%s\". Exception message: %s.  cmd Duration=%.3f sec. %s" % (cmdDesc, msg, end-start, exitMsg)
+                if exitOnError:
+                    Utils.cmdError(errorMsg)
+                    Utils.errorExit(errorMsg)
+                else:
+                    Utils.Print("ERROR: %s" % (errorMsg))
+            return None
+        except subprocess.TimeoutExpired as ex:
+            if not silentErrors:
+                end=time.perf_counter()
+                out=Utils.decodeProcessOutput(ex.output)
+                msg=Utils.decodeProcessOutput(ex.stderr)
+                errorMsg=("Timeout during \"%s\" after %.3f sec. cmd timeout=%s. stderr: %s. stdout: %s. %s" %
+                          (cmdDesc, end-start, ex.timeout, msg, out, exitMsg))
                 if exitOnError:
                     Utils.cmdError(errorMsg)
                     Utils.errorExit(errorMsg)
