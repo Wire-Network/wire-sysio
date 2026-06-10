@@ -568,6 +568,11 @@
             "fields": []
         },
         {
+            "name": "tstidxnxtras",
+            "base": "",
+            "fields": []
+        },
+        {
             "name": "tstidxpayer",
             "base": "",
             "fields": [
@@ -629,6 +634,11 @@
         },
         {
             "name": "tstmutupdval",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tstnexteras",
             "base": "",
             "fields": []
         },
@@ -1200,6 +1210,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "tstidxnxtras",
+            "type": "tstidxnxtras",
+            "ricardian_contract": ""
+        },
+        {
             "name": "tstidxpayer",
             "type": "tstidxpayer",
             "ricardian_contract": ""
@@ -1257,6 +1272,11 @@
         {
             "name": "tstmutupdval",
             "type": "tstmutupdval",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstnexteras",
+            "type": "tstnexteras",
             "ricardian_contract": ""
         },
         {
