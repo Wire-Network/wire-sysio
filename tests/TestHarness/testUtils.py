@@ -78,6 +78,12 @@ class Utils:
 
     SysServerName="nodeop"
     SysServerPath=str(testBinPath / SysServerName)
+    SysVmOcEnableOption="--sys-vm-oc-enable"
+    SysVmOcEnableAll="all"
+    SysVmOcEnableAuto="auto"
+    SysVmOcEnableNone="none"
+    SysVmOcForcedRuntime="sys-vm-oc-forced"
+    SysVmOcExecutionLogSuffix="with sys vm oc"
 
     ShuttingDown=False
 
@@ -90,8 +96,71 @@ class Utils:
     ConfigDir=f"{DataPath}/"
 
     TimeFmt='%Y-%m-%dT%H:%M:%S.%f'
-    # lock to serialize writes to subprocess_results.log across threads
+    _nodeopHelpOutput=None
+    # Lock subprocess_results.log writes and cached nodeop option discovery across threads.
     _check_output_lock = threading.Lock()
+
+    @staticmethod
+    def nodeopSupportsOption(option):
+        """Return whether the built nodeop binary advertises the given command-line option."""
+        with Utils._check_output_lock:
+            if Utils._nodeopHelpOutput is None:
+                try:
+                    result=subprocess.run(
+                        [Utils.SysServerPath, "--help"],
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.STDOUT,
+                        text=True,
+                        check=False)
+                except OSError as ex:
+                    raise RuntimeError(
+                        f"Unable to inspect nodeop options with '{Utils.SysServerPath} --help': {ex}"
+                    ) from ex
+                if result.returncode != 0 or not result.stdout.strip():
+                    raise RuntimeError(
+                        f"Unable to inspect nodeop options with '{Utils.SysServerPath} --help': "
+                        f"return code {result.returncode}, output: {result.stdout}"
+                    )
+                Utils._nodeopHelpOutput=result.stdout
+
+        return re.search(rf"^\s*{re.escape(option)}([=\s]|$)", Utils._nodeopHelpOutput, re.MULTILINE) is not None
+
+    @staticmethod
+    def nodeopSupportsSysVmOc():
+        """Return whether the built nodeop binary accepts SYS VM OC command-line options."""
+        return Utils.nodeopSupportsOption(Utils.SysVmOcEnableOption)
+
+    @staticmethod
+    def shouldSkipBecauseSysVmOcUnavailable(sysVmOcEnable, wasmRuntime):
+        """Return whether the requested test configuration requires SYS VM OC when nodeop lacks it."""
+        ocRequired = sysVmOcEnable == Utils.SysVmOcEnableAll or wasmRuntime == Utils.SysVmOcForcedRuntime
+        return ocRequired and not Utils.nodeopSupportsSysVmOc()
+
+    @staticmethod
+    def sysVmOcExecutionExpected(sysVmOcEnable):
+        """Return whether the SYS VM OC tier-up setting should produce OC execution when supported."""
+        return sysVmOcEnable in (Utils.SysVmOcEnableAll, Utils.SysVmOcEnableAuto) and Utils.nodeopSupportsSysVmOc()
+
+    @staticmethod
+    def assertInitialSysVmOcLogState(producerNode, apiNode, codeHash, sysVmOcEnable, ocSupported):
+        """Verify bootstrap SYS VM OC logging on the node whose configuration controls the expectation."""
+        logText = f"executing {codeHash} {Utils.SysVmOcExecutionLogSuffix}"
+        if sysVmOcEnable == Utils.SysVmOcEnableNone or not ocSupported:
+            Utils.Print(f"search apiNode: {logText} (expect absent)")
+            found = apiNode.findInLog(logText)
+            assert(not found)
+        else:
+            Utils.Print(f"search producerNode: {logText} (expect present)")
+            found = producerNode.findInLog(logText)
+            assert(found)
+
+    @staticmethod
+    def assertSysVmOcLogAbsent(node, codeHash, nodeLabel):
+        """Verify the selected node did not log SYS VM OC execution for the supplied code hash."""
+        logText = f"executing {codeHash} {Utils.SysVmOcExecutionLogSuffix}"
+        Utils.Print(f"search {nodeLabel}: {logText} (expect absent)")
+        found = node.findInLog(logText)
+        assert(not found)
 
     @staticmethod
     def timestamp():

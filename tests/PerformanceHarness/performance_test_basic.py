@@ -85,7 +85,7 @@ class PerformanceTestBasic:
             def __str__(self) -> str:
                 args = []
                 for field in dataclasses.fields(self):
-                    match = re.search("\w*PluginArgs", field.name)
+                    match = re.search(r"\w*PluginArgs", field.name)
                     if match is not None:
                         args.append(f"{getattr(self, field.name)}")
                 return " ".join(args)
@@ -126,7 +126,7 @@ class PerformanceTestBasic:
             # Producer Nodes are index [0, producerNodeCount) and non-producer nodes (validationNodeCount, apiNodeCount) nodes follow the producer nodes [producerNodeCount, _totalNodes)
             self._producerNodeIds = list(range(0, self.producerNodeCount))
             self._validationNodeIds = list(range(self.producerNodeCount, self.producerNodeCount + self.validationNodeCount))
-            self._apiNodeIds = list(range(self.producerNodeCount + self.validationNodeCount, self.producerNodeCount + self.validationNodeCount + self.validationNodeCount))
+            self._apiNodeIds = list(range(self.producerNodeCount + self.validationNodeCount, self.producerNodeCount + self.validationNodeCount + self.apiNodeCount))
 
             def configureValidationNodes():
                 validationNodeSpecificNodeopStr = ""
@@ -650,12 +650,30 @@ class PerformanceTestBasic:
 
     def setupClusterConfig(args) -> ClusterConfig:
 
-        chainPluginArgs = ChainPluginArgs(signatureCpuBillablePct=args.signature_cpu_billable_pct,
+        def supportedPluginArgs(pluginArgsClass, **kwargs):
+            """Drop only constructor arguments for chain-plugin options compiled out of this nodeop build."""
+            conditionallySupportedFields = {"sysVmOcCacheSizeMb", "sysVmOcCompileThreads"}
+            supportedFields = {field.name for field in dataclasses.fields(pluginArgsClass)}
+            supportedArgs = {}
+            for key, value in kwargs.items():
+                if key in supportedFields or key not in conditionallySupportedFields:
+                    supportedArgs[key] = value
+                else:
+                    print(f"Skipping unsupported chain_plugin argument '{key}' for this nodeop build")
+            return supportedArgs
+
+        if args.non_prods_sys_vm_oc_enable and not Utils.nodeopSupportsSysVmOc():
+            Utils.errorExit("--non-prods-sys-vm-oc-enable requires a nodeop build with SYS VM OC support")
+
+        chainPluginArgs = ChainPluginArgs(**supportedPluginArgs(
+                                        ChainPluginArgs,
+                                        signatureCpuBillablePct=args.signature_cpu_billable_pct,
                                         chainThreads=args.chain_threads, databaseMapMode=args.database_map_mode,
                                         wasmRuntime=args.wasm_runtime, contractsConsole=args.contracts_console,
-                                        sysVmOcCacheSizeMb=args.sys_vm_oc_cache_size_mb, sysVmOcCompileThreads=args.sys_vm_oc_compile_threads,
+                                        sysVmOcCacheSizeMb=args.sys_vm_oc_cache_size_mb,
+                                        sysVmOcCompileThreads=args.sys_vm_oc_compile_threads,
                                         blockLogRetainBlocks=args.block_log_retain_blocks,
-                                        chainStateDbSizeMb=args.chain_state_db_size_mb, abiSerializerMaxTimeMs=990000)
+                                        chainStateDbSizeMb=args.chain_state_db_size_mb, abiSerializerMaxTimeMs=990000))
 
         producerPluginArgs = ProducerPluginArgs(disableSubjectiveApiBilling=args.disable_subjective_billing,
                                                 disableSubjectiveP2pBilling=args.disable_subjective_billing,
