@@ -311,6 +311,35 @@ BOOST_AUTO_TEST_CASE(find_block_id_pruned) { try {
    BOOST_REQUIRE(log_utils::find_block_id(t.stem(), 20) == utils_fixture::id_for(20, 'A'));
 } FC_LOG_AND_RETHROW() }
 
+BOOST_AUTO_TEST_CASE(fork_mismatch_messages_carry_ids) { try {
+   utils_fixture t;
+   t.add_range(2, 10, 'A', 'A');
+
+   //rewind path: the expected id, the recorded id, and the recorded id's own block number must all be
+   // reported, so a corrupt index (which resolves to some unrelated block's entry) is tellable from a
+   // genuine fork without further digging
+   BOOST_CHECK_EXCEPTION(t.add(8, 'X', 'Z'), plugin_exception, [](const plugin_exception& e) {
+      const std::string d = e.to_detail_string();
+      return d.find("missed a fork change") != std::string::npos &&
+             d.find(utils_fixture::id_for(7, 'Z').str()) != std::string::npos && //what the incoming block expected
+             d.find(utils_fixture::id_for(7, 'A').str()) != std::string::npos && //what the log recorded
+             d.find("an id for block 7") != std::string::npos;
+   });
+
+   //append path: same information, sourced from the in-memory last_block_id
+   BOOST_CHECK_EXCEPTION(t.add(11, 'X', 'Z'), plugin_exception, [](const plugin_exception& e) {
+      const std::string d = e.to_detail_string();
+      return d.find("missed a fork change") != std::string::npos &&
+             d.find(utils_fixture::id_for(10, 'Z').str()) != std::string::npos &&
+             d.find(utils_fixture::id_for(10, 'A').str()) != std::string::npos &&
+             d.find("block 10") != std::string::npos;
+   });
+
+   //neither failed write may disturb the log
+   t.close();
+   t.check_serves(2, 10);
+} FC_LOG_AND_RETHROW() }
+
 BOOST_AUTO_TEST_CASE(find_block_id_empty_and_damaged) { try {
    utils_fixture empty;
    empty.close();

@@ -240,14 +240,27 @@ private:
       SYS_ASSERT(block_num >= _index_begin_block, chain::plugin_exception, "block {} is before start block {} of {}",
                  block_num, _begin_block, log.display_path().string());
       if(block_num == _end_block) //appending at the end of known blocks; can shortcut some checks since we have last_block_id readily available
-         SYS_ASSERT(prev_id == last_block_id, chain::plugin_exception, "missed a fork change in {}", log.display_path().string());
+         SYS_ASSERT(prev_id == last_block_id, chain::plugin_exception,
+                    "missed a fork change in {}; appending block {} with previous id {} but the log's last entry is "
+                    "block {} with id {}",
+                    log.display_path().string(), block_num, prev_id, _end_block - 1, last_block_id);
       else {                      //seeing a block num we've seen before OR first block in the log; prepare some extra checks
          //find the previous block id as a sanity check. This might not be in our log due to log splitting. It also might not be present at all if this is the first
          // block written, so don't require this lookup to succeed, just require the id to match if the lookup succeeded.
          if(std::optional<chain::block_id_type> local_id_found = get_block_id(block_num-1))
-            SYS_ASSERT(local_id_found == prev_id, chain::plugin_exception, "missed a fork change in {}", log.display_path().string());
+            //spelling out both ids and the recorded id's own block number makes a damaged index distinguishable
+            // from a genuine fork at a glance: an id for some unrelated block means the index is misdirecting reads
+            SYS_ASSERT(local_id_found == prev_id, chain::plugin_exception,
+                       "missed a fork change in {}; block {} has previous id {} but the index resolves block {} "
+                       "to id {}, an id for block {} (a block number mismatch means a corrupt index, not a fork; "
+                       "verify with 'sys-util ship-log block-id' and rebuild with 'sys-util ship-log make-index')",
+                       log.display_path().string(), block_num, prev_id, block_num - 1, *local_id_found,
+                       chain::block_header::num_from_id(*local_id_found));
          else if(std::optional<chain::block_id_type> non_local_id_found = non_local_get_block_id(block_num-1))
-            SYS_ASSERT(non_local_id_found == prev_id, chain::plugin_exception, "missed a fork change in {}", log.display_path().string());
+            SYS_ASSERT(non_local_id_found == prev_id, chain::plugin_exception,
+                       "missed a fork change in {}; block {} has previous id {} but block {} is recorded as {} "
+                       "elsewhere in the catalog or chain",
+                       log.display_path().string(), block_num, prev_id, block_num - 1, *non_local_id_found);
          //we don't want to re-write blocks that we already have, so check if the existing block_id recorded in the log matches and if so, bail
          if(get_block_id(block_num) == id)
             return;
