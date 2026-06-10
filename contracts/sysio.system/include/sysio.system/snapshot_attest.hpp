@@ -17,7 +17,8 @@ using sysio::name;
 // Max producer rank eligible to register as snapshot provider
 static constexpr uint32_t max_snap_provider_rank = 30;
 
-// Error code for snapshot hash disagreement -- checked by nodeop to trigger shutdown.
+// Error code for snapshot attestation disagreement (snapshot hash or block id differs from the
+// already-attested record) -- checked by nodeop to trigger shutdown.
 // If this value changes, update the corresponding check in producer_plugin.cpp.
 static constexpr uint64_t snap_hash_disagreement_error = 9001;
 
@@ -122,8 +123,10 @@ struct [[sysio::contract("sysio.system")]] snapshot_attest : public sysio::contr
    void delsnapprov(name account);
 
    /**
-    * Submit a snapshot hash vote. Accumulates votes; when quorum is reached,
-    * creates an attested snap_record and purges older votes.
+    * Submit a snapshot hash vote. Votes aggregate per (block_num, block_id, snapshot_hash);
+    * when quorum is reached, creates an attested snap_record and purges older votes.
+    * Rejects with snap_hash_disagreement_error when an attested record already exists for the
+    * height and either the snapshot hash or the block id differs from it.
     */
    [[sysio::action]]
    void votesnaphash(name snap_account, checksum256 block_id, checksum256 snapshot_hash);

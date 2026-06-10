@@ -97,8 +97,10 @@ public:
          "snap_provider", data, abi_serializer::create_yield_function(abi_serializer_max_time));
    }
 
-   // Make a fake block_id with a specific block number embedded in big-endian
-   static fc::sha256 make_block_id(uint32_t block_num) {
+   // Make a fake block_id with a specific block number embedded in big-endian.
+   // `fork` differentiates block ids that share the same height, emulating blocks
+   // from competing forks (same first-4-byte height prefix, different remainder).
+   static fc::sha256 make_block_id(uint32_t block_num, uint8_t fork = 0) {
       fc::sha256 id;
       memset(id.data(), 0, id.data_size());
       auto* data = id.data();
@@ -107,6 +109,7 @@ public:
       data[1] = static_cast<char>((block_num >> 16) & 0xFF);
       data[2] = static_cast<char>((block_num >> 8) & 0xFF);
       data[3] = static_cast<char>(block_num & 0xFF);
+      data[8] = static_cast<char>(fork);
       return id;
    }
 
@@ -356,6 +359,54 @@ BOOST_FIXTURE_TEST_CASE(disagreement_detection, snapshot_attest_tester) { try {
    // snap_hash_disagreement_error = 9001 (defined in snapshot_attest.hpp)
    BOOST_REQUIRE_EQUAL(wasm_assert_code(9001),
                         votesnaphash("snapprov2"_n, bid, bad_hash));
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(blockid_mismatch_votes_not_aggregated, snapshot_attest_tester) { try {
+   // 2 providers, quorum = max(2, ceil(2*50/100)) = 2
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2, 50));
+   produce_blocks();
+
+   // Same height and same snapshot hash, but different block ids (competing forks)
+   auto bid_a  = make_block_id(8000);
+   auto bid_b  = make_block_id(8000, 1);
+   auto shash  = make_snap_hash(8);
+
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, bid_a, shash));
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov2"_n, bid_b, shash));
+
+   // The two votes agree on the hash but not the block id, so they must NOT
+   // jointly reach the quorum of 2.
+   BOOST_REQUIRE_EQUAL(true, getsnaphash(8000).is_null());
+
+   // A second vote for the same (block_id, hash) pair reaches quorum and the
+   // attested record carries that pair's block id.
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov2"_n, bid_a, shash));
+   auto rec = getsnaphash(8000);
+   BOOST_REQUIRE_EQUAL(false, rec.is_null());
+   BOOST_REQUIRE_EQUAL(bid_a.str(), rec["block_id"].as_string());
+   BOOST_REQUIRE_EQUAL(shash.str(), rec["snapshot_hash"].as_string());
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(record_blockid_disagreement, snapshot_attest_tester) { try {
+   // 2 providers, quorum = max(1, ceil(2*50/100)) = 1
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1, 50));
+   produce_blocks();
+
+   auto bid_a = make_block_id(9000);
+   auto bid_b = make_block_id(9000, 1);
+   auto shash = make_snap_hash(9);
+
+   // Attest with one vote (quorum=1)
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, bid_a, shash));
+   BOOST_REQUIRE_EQUAL(false, getsnaphash(9000).is_null());
+
+   // Same snapshot hash under a different block id disagrees with the attested record
+   BOOST_REQUIRE_EQUAL(wasm_assert_code(9001),
+                        votesnaphash("snapprov2"_n, bid_b, shash));
 } FC_LOG_AND_RETHROW() }
 
 // ---------------------------------------------------------------------------
