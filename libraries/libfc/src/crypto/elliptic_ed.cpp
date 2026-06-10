@@ -2,15 +2,20 @@
 
 #include <openssl/bn.h>
 
+#include <mutex>
+
 namespace fc { namespace crypto { namespace ed {
 
-   // Ensure libsodium is initialized exactly once
+   // Ensure libsodium is initialized exactly once. sodium_init() is idempotent after it has returned, but it is
+   // NOT safe to call concurrently before the first call completes, and signature recovery runs on a thread
+   // pool. std::call_once serializes the first initialization; if init fails the flag stays unset, so a later
+   // call retries instead of silently proceeding uninitialized.
    static void sodium_init_guard() {
-      // capture the return value into a variable to avoid compiler warnings
-      int init_result = sodium_init();
-
-      if (init_result < 0)
-         FC_THROW_EXCEPTION(exception, "Failed to initialize libsodium");
+      static std::once_flag init_flag;
+      std::call_once(init_flag, []() {
+         if (sodium_init() < 0)
+            FC_THROW_EXCEPTION(exception, "Failed to initialize libsodium");
+      });
    }
 
    private_key_shim private_key_shim::generate() {
