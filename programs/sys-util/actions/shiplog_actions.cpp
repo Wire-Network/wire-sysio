@@ -78,10 +78,21 @@ void shiplog_actions::setup(CLI::App& app) {
                    "any <stem>.log / retained <stem>-<first>-<last>.log bundle.");
 
    // subcommand - info
-   sub->add_subcommand("info", "Report each log's version, block range, size, and index health by examining only its "
-                               "endpoints (fast; does not detect damage in the middle of the file). Without --log, "
-                               "every *.log in the state-history directory is reported.")
+   sub->add_subcommand("info", "Report each log's version, block range, endpoint block ids, size, and index health by "
+                               "examining only its endpoints (fast; does not detect damage in the middle of the "
+                               "file). Without --log, every *.log in the state-history directory is reported.")
       ->callback([err_guard]() { err_guard(&shiplog_actions::info); });
+
+   // subcommand - block-id
+   auto* bid = sub->add_subcommand("block-id", "Print the block id each log records for a given block number (the "
+                                               "canonical entry when a fork switch wrote several). The index is used "
+                                               "only after verification, so a stale index cannot misattribute an id. "
+                                               "Use when nodeop reports 'missed a fork change': compare what the log "
+                                               "recorded against the block log or another node to see which history "
+                                               "the log holds. Without --log, every *.log in the directory is "
+                                               "queried. Exits 0 when at least one log records the block.")
+                  ->callback([err_guard]() { err_guard(&shiplog_actions::block_id); });
+   bid->add_option("--block,-b", opt->block_num, "The block number to look up.")->required();
 
    // subcommand - smoke-test
    auto* smoke = sub->add_subcommand("smoke-test", "Validate every entry of the log (headers, position trailers, "
@@ -207,6 +218,11 @@ int shiplog_actions::info() {
                       << s.last_block << "\n";
          else
             std::cout << "  blocks:  starts at " << s.first_block << ", tail is DAMAGED (run smoke-test or repair)\n";
+         //a pruned log's first id belongs to its pre-prune first block, hence the explicit block numbers
+         if(s.first_block_id)
+            std::cout << "  first:   " << s.first_block_id->str() << " (block " << s.first_block << ")\n";
+         if(s.last_block_id)
+            std::cout << "  last:    " << s.last_block_id->str() << " (block " << s.last_block << ")\n";
       }
       std::cout << "  index:   " << magic_enum::enum_name(s.index);
       if(s.index_size)
@@ -214,6 +230,31 @@ int shiplog_actions::info() {
       std::cout << "\n";
    }
    return 0;
+}
+
+int shiplog_actions::block_id() {
+   bool found = false;
+   for(const std::filesystem::path& stem : resolve_stems()) {
+      std::cout << stem.string() << ".log:\n";
+      try {
+         if(const std::optional<block_id_type> id = log_utils::find_block_id(stem, opt->block_num, report_progress)) {
+            std::cout << "  block " << opt->block_num << ": " << id->str() << "\n";
+            found = true;
+         } else {
+            const log_utils::log_summary s = log_utils::summarize_log(stem);
+            if(s.log_size == 0)
+               std::cout << "  block " << opt->block_num << " not present (log is empty)\n";
+            else
+               std::cout << "  block " << opt->block_num << " not present (log spans blocks "
+                         << (s.pruned ? s.last_block - *s.pruned_block_count + 1 : s.first_block) << "-"
+                         << s.last_block << ")\n";
+         }
+      } catch(const fc::exception& e) {
+         //a damaged log must not end a directory-wide query; report it and keep going
+         std::cout << "  ERROR: " << e.top_message() << "\n";
+      }
+   }
+   return found ? 0 : 1;
 }
 
 int shiplog_actions::smoke_test() {

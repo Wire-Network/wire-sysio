@@ -227,6 +227,109 @@ BOOST_AUTO_TEST_CASE(index_status_detection) { try {
    t.check_serves(2, 30);
 } FC_LOG_AND_RETHROW() }
 
+BOOST_AUTO_TEST_CASE(find_block_id_and_endpoint_ids) { try {
+   utils_fixture t;
+   t.add_range(2, 40, 'A', 'A');
+   //fork: rewrite 30..32 so those heights have canonical 'B' entries with stale 'A' entries lingering
+   t.add(30, 'B', 'A');
+   t.add_range(31, 32, 'B', 'B');
+   t.close();
+
+   //the summary reports the ids recorded at the endpoints
+   const log_utils::log_summary s = log_utils::summarize_log(t.stem());
+   BOOST_REQUIRE(s.first_block_id && *s.first_block_id == utils_fixture::id_for(2, 'A'));
+   BOOST_REQUIRE(s.last_block_id && *s.last_block_id == utils_fixture::id_for(32, 'B'));
+
+   //index fast path, including the canonical (latest-written) answer for fork-overwritten heights
+   BOOST_REQUIRE(log_utils::find_block_id(t.stem(), 2) == utils_fixture::id_for(2, 'A'));
+   BOOST_REQUIRE(log_utils::find_block_id(t.stem(), 29) == utils_fixture::id_for(29, 'A'));
+   BOOST_REQUIRE(log_utils::find_block_id(t.stem(), 30) == utils_fixture::id_for(30, 'B'));
+   BOOST_REQUIRE(log_utils::find_block_id(t.stem(), 32) == utils_fixture::id_for(32, 'B'));
+
+   //out of range: before the first block, and past the head even though stale 'A' entries for
+   // 33..40 physically remain in the file
+   BOOST_REQUIRE(!log_utils::find_block_id(t.stem(), 1));
+   BOOST_REQUIRE(!log_utils::find_block_id(t.stem(), 33));
+
+   //no index at all: the read-only walk gives the same answers
+   std::filesystem::remove(t.index_path());
+   BOOST_REQUIRE(log_utils::find_block_id(t.stem(), 2) == utils_fixture::id_for(2, 'A'));
+   BOOST_REQUIRE(log_utils::find_block_id(t.stem(), 30) == utils_fixture::id_for(30, 'B'));
+   BOOST_REQUIRE(!std::filesystem::exists(t.index_path())); //and it really was read-only
+} FC_LOG_AND_RETHROW() }
+
+BOOST_AUTO_TEST_CASE(find_block_id_distrusts_bad_index) { try {
+   utils_fixture t;
+   t.add_range(2, 25, 'A', 'A');
+   t.close();
+
+   //point block 10's slot at block 11's entry: the index keeps its expected size and its final
+   // slot, so the shallow open-time checks (and a naive lookup) would happily trust it
+   const uint64_t pos11 = t.index_slot(11, 2);
+   {
+      std::fstream f(t.index_path(), std::ios::binary | std::ios::in | std::ios::out);
+      f.seekp((10 - 2) * sizeof(uint64_t));
+      f.write(reinterpret_cast<const char*>(&pos11), sizeof(pos11));
+      BOOST_REQUIRE(f.good());
+   }
+   //the poisoned slot is detected and the answer comes from walking the log instead
+   BOOST_REQUIRE(log_utils::find_block_id(t.stem(), 10) == utils_fixture::id_for(10, 'A'));
+   //unpoisoned slots still resolve (fast path)
+   BOOST_REQUIRE(log_utils::find_block_id(t.stem(), 11) == utils_fixture::id_for(11, 'A'));
+
+   //a final slot that disagrees with the log fails the shallow check; everything walks
+   {
+      std::fstream f(t.index_path(), std::ios::binary | std::ios::in | std::ios::out);
+      f.seekp((25 - 2) * sizeof(uint64_t));
+      const uint64_t junk = 1;
+      f.write(reinterpret_cast<const char*>(&junk), sizeof(junk));
+      BOOST_REQUIRE(f.good());
+   }
+   BOOST_REQUIRE(log_utils::find_block_id(t.stem(), 25) == utils_fixture::id_for(25, 'A'));
+} FC_LOG_AND_RETHROW() }
+
+BOOST_AUTO_TEST_CASE(find_block_id_pruned) { try {
+   utils_fixture t(4 /*prune_blocks*/);
+   const size_t entry_size = 4096 + 2048; //large enough that hole punching actually frees blocks
+   t.add_range(2, 20, 'A', 'A', entry_size);
+   t.close();
+
+   const log_utils::log_summary s = log_utils::summarize_log(t.stem());
+   BOOST_REQUIRE(s.pruned && s.tail_ok);
+   //a pruned log's first header is the stub for its pre-prune first block; the id is still real
+   BOOST_REQUIRE(s.first_block_id && *s.first_block_id == utils_fixture::id_for(2, 'A'));
+   BOOST_REQUIRE(s.last_block_id && *s.last_block_id == utils_fixture::id_for(20, 'A'));
+
+   const uint32_t first_servable = s.last_block - *s.pruned_block_count + 1;
+   BOOST_REQUIRE(log_utils::find_block_id(t.stem(), 20) == utils_fixture::id_for(20, 'A'));
+   BOOST_REQUIRE(log_utils::find_block_id(t.stem(), first_servable) == utils_fixture::id_for(first_servable, 'A'));
+   BOOST_REQUIRE(!log_utils::find_block_id(t.stem(), first_servable - 1)); //pruned away
+   BOOST_REQUIRE(!log_utils::find_block_id(t.stem(), 21));
+
+   //the backward trailer-chain walk handles pruned logs when the index is gone
+   std::filesystem::remove(t.index_path());
+   BOOST_REQUIRE(log_utils::find_block_id(t.stem(), 20) == utils_fixture::id_for(20, 'A'));
+} FC_LOG_AND_RETHROW() }
+
+BOOST_AUTO_TEST_CASE(find_block_id_empty_and_damaged) { try {
+   utils_fixture empty;
+   empty.close();
+   BOOST_REQUIRE(!log_utils::find_block_id(empty.stem(), 1));
+   BOOST_REQUIRE(!log_utils::summarize_log(empty.stem()).first_block_id);
+   BOOST_REQUIRE(!log_utils::summarize_log(empty.stem()).last_block_id);
+
+   utils_fixture t;
+   t.add_range(2, 10, 'A', 'A');
+   t.close();
+   t.append_garbage(33); //torn tail
+
+   const log_utils::log_summary s = log_utils::summarize_log(t.stem());
+   BOOST_REQUIRE(s.first_block_id && !s.last_block_id);
+   BOOST_CHECK_EXCEPTION(log_utils::find_block_id(t.stem(), 5), plugin_exception, [](const plugin_exception& e) {
+      return e.to_detail_string().find("damaged") != std::string::npos;
+   });
+} FC_LOG_AND_RETHROW() }
+
 BOOST_AUTO_TEST_CASE(repair_truncated_tail) { try {
    utils_fixture t;
    t.add_range(2, 40, 'A', 'A');

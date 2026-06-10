@@ -12,6 +12,7 @@ struct shiplog_options {
    std::string log_name; ///< --log: a well-known stem (trace_history, ...) or a path to a bundle
    uint32_t    first_block = 0;
    uint32_t    last_block  = std::numeric_limits<uint32_t>::max();
+   uint32_t    block_num   = 0; ///< --block: the block a block-id lookup asks about
    std::string output_dir;
    uint32_t    stride = 0;
 
@@ -41,6 +42,7 @@ protected:
    std::vector<std::filesystem::path> resolve_stems() const;
 
    int info();
+   int block_id();
    int smoke_test();
    int make_index();
    int trim();

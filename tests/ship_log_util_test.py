@@ -119,6 +119,13 @@ try:
     prodNode.processUrllibRequest("producer", "pause", exitOnError=True)
     headBlock = prodNode.getHeadBlockNum()
     shipNode.waitForBlock(headBlock)
+
+    # capture chain block ids while the node is still up; the offline block-id checks below compare
+    # what the ship logs recorded against these
+    chainIds = {n: shipNode.getBlock(n)["id"] for n in (headBlock - 1, headBlock)}
+    retainedProbeBlock = shipStride // 2
+    retainedProbeId = shipNode.getBlock(retainedProbeBlock)["id"]
+
     prodNode.kill(signal.SIGTERM)
     shipNode.kill(signal.SIGTERM)
 
@@ -148,6 +155,18 @@ try:
     retained = sorted(f for f in os.listdir(retainedDir) if re.match(r"chain_state_history-\d+-\d+\.log$", f))
     assert retained, f"expected retained bundles in {retainedDir}"
     shipLogUtil("smoke-test", "--log", os.path.join(retainedDir, retained[0]), "--deep")
+
+    # -------- block-id reports the ids the logs actually recorded
+    Print("block-id matches the chain")
+    _, bidOut = shipLogUtil("block-id", "--state-history-dir", shipDir, "--block", headLast)
+    assert bidOut.count(chainIds[headLast]) == 3, \
+        f"expected all three head logs to record {chainIds[headLast]} for block {headLast}:\n{bidOut}"
+    _, bidOut = shipLogUtil("block-id", "--log", os.path.join(retainedDir, retained[0]),
+                            "--block", retainedProbeBlock)
+    assert retainedProbeId in bidOut, \
+        f"retained bundle did not record {retainedProbeId} for block {retainedProbeBlock}:\n{bidOut}"
+    # block 1 predates every ship log; the lookup reports not-present and exits non-zero
+    shipLogUtil("block-id", "--state-history-dir", shipDir, "--block", 1, expectSuccess=False)
 
     # -------- make-index reproduces the index nodeop wrote, byte for byte
     Print("make-index byte-equality test")

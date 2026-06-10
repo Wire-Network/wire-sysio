@@ -1,5 +1,7 @@
 #pragma once
 
+#include <sysio/chain/types.hpp>
+
 #include <cstdint>
 #include <filesystem>
 #include <functional>
@@ -242,6 +244,9 @@ struct log_summary {
    uint32_t                last_block  = 0;     ///< from the last entry (tail_ok only)
    uint64_t                index_size  = 0;     ///< bytes; 0 when the index file is missing
    index_status            index       = index_status::missing; ///< shallow assessment only
+
+   std::optional<chain::block_id_type> first_block_id; ///< id recorded for first_block (valid_first_header only)
+   std::optional<chain::block_id_type> last_block_id;  ///< id recorded for last_block (tail_ok only)
 };
 
 /**
@@ -250,5 +255,23 @@ struct log_summary {
  * that. Never throws on corruption; problems are reported through the summary's flags.
  */
 log_summary summarize_log(const std::filesystem::path& stem);
+
+/**
+ * Read the block id the log records for @p block_num. The on-disk index is used only after it
+ * passes the same shallow checks state_history_log applies on open AND its slot's entry is
+ * verified to actually hold @p block_num; on any disagreement the answer comes from a read-only
+ * walk of the log instead, so a stale or corrupt index can never misattribute an id. When a fork
+ * switch left multiple entries for @p block_num the id of the latest-written (canonical) entry is
+ * returned, matching what the library serves. Read-only.
+ *
+ * This is the tool for diagnosing nodeop's "missed a fork change" error: it prints which history
+ * the log actually recorded so it can be compared against the block log or another node.
+ *
+ * @return the recorded id, or nullopt when the log does not contain @p block_num (outside its
+ *         block range, or pruned away)
+ * @throws chain::plugin_exception if the log's endpoints are damaged (run repair first)
+ */
+std::optional<chain::block_id_type> find_block_id(const std::filesystem::path& stem, uint32_t block_num,
+                                                  const progress_func& progress = {});
 
 } // namespace sysio::state_history::log_utils

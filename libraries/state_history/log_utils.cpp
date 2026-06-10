@@ -277,6 +277,8 @@ struct endpoints {
    bool                    tail_ok        = false; ///< trailing position trailer leads to a coherent last entry
    uint32_t                last_block     = 0;
    uint64_t                last_entry_pos = 0;
+   chain::block_id_type    first_id; ///< id recorded for first_block (valid_first only)
+   chain::block_id_type    last_id;  ///< id recorded for last_block (tail_ok only)
 };
 
 endpoints probe_endpoints(fc::random_access_file& log, uint64_t size) {
@@ -291,6 +293,7 @@ endpoints probe_endpoints(fc::random_access_file& log, uint64_t size) {
       e.version     = get_ship_version(first.magic);
       e.pruned      = is_ship_log_pruned(first.magic);
       e.first_block = chain::block_header::num_from_id(first.block_id);
+      e.first_id    = first.block_id;
       if(e.pruned)
          e.pruned_count = log.unpack_from<uint32_t>(size - sizeof(uint32_t));
 
@@ -306,6 +309,7 @@ endpoints probe_endpoints(fc::random_access_file& log, uint64_t size) {
       e.tail_ok        = true;
       e.last_block     = chain::block_header::num_from_id(last.block_id);
       e.last_entry_pos = last_pos;
+      e.last_id        = last.block_id;
    } catch(const std::exception&) {
       //treat any short read or parse failure as "endpoint not OK"; the flags already say so
    }
@@ -1136,6 +1140,10 @@ log_summary summarize_log(const std::filesystem::path& stem_in) {
    s.first_block        = e.first_block;
    s.tail_ok            = e.tail_ok;
    s.last_block         = e.last_block;
+   if(e.valid_first)
+      s.first_block_id = e.first_id;
+   if(e.tail_ok)
+      s.last_block_id = e.last_id;
 
    const std::filesystem::path ip = index_path_of(stem);
    if(std::filesystem::exists(ip))
@@ -1156,6 +1164,50 @@ log_summary summarize_log(const std::filesystem::path& stem_in) {
                    : index_status::mismatched;
    }
    return s;
+}
+
+std::optional<chain::block_id_type> find_block_id(const std::filesystem::path& stem_in, uint32_t block_num,
+                                                  const progress_func& progress) {
+   const std::filesystem::path stem = normalize_stem(stem_in);
+   fc::random_access_file      log  = open_log_readonly(stem);
+   const uint64_t              size = log.size();
+   if(size == 0)
+      return std::nullopt;
+
+   const endpoints e = probe_endpoints(log, size);
+   SYS_ASSERT(e.valid_first && e.tail_ok, chain::plugin_exception,
+              "{}.log is damaged; run smoke-test to map the damage or repair it first", stem.string());
+
+   uint32_t first_servable = e.first_block;
+   if(e.pruned) {
+      SYS_ASSERT(*e.pruned_count > 0 && *e.pruned_count <= e.last_block, chain::plugin_exception,
+                 "pruned log {}.log has an implausible trailing block count {}", stem.string(), *e.pruned_count);
+      first_servable = e.last_block - *e.pruned_count + 1;
+   }
+   if(block_num < first_servable || block_num > e.last_block)
+      return std::nullopt;
+
+   //index fast path: the same shallow validation state_history_log applies on open, plus a check
+   // that the slot's entry really holds the requested block; any disagreement falls through to
+   // walking the log so a stale index cannot misattribute an id
+   const std::filesystem::path ip            = index_path_of(stem);
+   const uint64_t              expected_size = (uint64_t(e.last_block) - e.first_block + 1) * sizeof(uint64_t);
+   if(std::filesystem::exists(ip) && std::filesystem::file_size(ip) == expected_size) {
+      fc::random_access_file index(ip, fc::random_access_file::read_only);
+      if(index.unpack_from<uint64_t>(expected_size - sizeof(uint64_t)) == e.last_entry_pos) {
+         const uint64_t pos = index.unpack_from<uint64_t>((uint64_t(block_num) - e.first_block) * sizeof(uint64_t));
+         if(pos + packed_header_size <= size) {
+            const log_header hdr = log.unpack_from<log_header>(pos);
+            if(is_ship(hdr.magic) && is_ship_supported_version(hdr.magic) &&
+               chain::block_header::num_from_id(hdr.block_id) == block_num)
+               return hdr.block_id;
+         }
+      }
+   }
+
+   const computed_index ci = e.pruned ? compute_index_pruned(log, size, e, stem, progress)
+                                      : compute_index_forward(log, size, stem, progress);
+   return log.unpack_from<log_header>(ci.slots[uint64_t(block_num) - ci.index_first]).block_id;
 }
 
 } // namespace sysio::state_history::log_utils
