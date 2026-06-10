@@ -118,9 +118,14 @@ private:
    state_history_log(state_history_log&&) = default;
    state_history_log& operator=(state_history_log&&) = default;
 
+   /**
+    * @param force_write when set, an index that disagrees with its log is regenerated instead of
+    *                    being a fatal error (the log itself still auto-recovers exactly as before)
+    */
    state_history_log(const std::filesystem::path& log_dir_and_stem,
                      non_local_get_block_id_func non_local_get_block_id = no_non_local_get_block_id_func,
-                     const std::optional<state_history::prune_config>& prune_conf = std::nullopt) :
+                     const std::optional<state_history::prune_config>& prune_conf = std::nullopt,
+                     bool force_write = false) :
      prune_config(prune_conf), non_local_get_block_id(non_local_get_block_id),
      log(std::filesystem::path(log_dir_and_stem).replace_extension("log")),
      index(std::filesystem::path(log_dir_and_stem).replace_extension("index")) {
@@ -135,7 +140,19 @@ private:
 
       check_log_on_init();
       check_index_on_init();
-      check_log_and_index_on_init();
+      try {
+         check_log_and_index_on_init();
+      } catch(const std::bad_alloc&) {
+         throw;
+      } catch(const std::exception& e) {
+         if(!force_write)
+            throw;
+         wlog("{} disagrees with its log ({}); force-write is set so it will be regenerated",
+              index.display_path().string(), e.what());
+         index.resize(0);
+         check_index_on_init();
+         check_log_and_index_on_init();
+      }
 
       //check for conversions to/from pruned log, as long as log contains something
       if(!empty()) {

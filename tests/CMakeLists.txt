@@ -63,6 +63,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/nodeop_producer_watermark_test.py ${C
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cli_test.py ${CMAKE_CURRENT_BINARY_DIR}/cli_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ship_reqs_across_svnn_test.py ${CMAKE_CURRENT_BINARY_DIR}/ship_reqs_across_svnn_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ship_restart_test.py ${CMAKE_CURRENT_BINARY_DIR}/ship_restart_test.py COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ship_log_util_test.py ${CMAKE_CURRENT_BINARY_DIR}/ship_log_util_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ship_test.py ${CMAKE_CURRENT_BINARY_DIR}/ship_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ship_kv_delta_test.py ${CMAKE_CURRENT_BINARY_DIR}/ship_kv_delta_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/get_kv_rows_test.py ${CMAKE_CURRENT_BINARY_DIR}/get_kv_rows_test.py COPYONLY)
@@ -162,6 +163,7 @@ add_np_test(NAME production_restart COMMAND tests/production_restart.py -v ${UNS
 
 add_np_test(NAME ship_reqs_across_svnn_test COMMAND tests/ship_reqs_across_svnn_test.py -v ${UNSHARE})
 add_np_test(NAME ship_restart_test COMMAND tests/ship_restart_test.py -v ${UNSHARE})
+add_np_test(NAME ship_log_util_test COMMAND tests/ship_log_util_test.py -v ${UNSHARE})
 add_np_test(NAME ship_test COMMAND tests/ship_test.py -v --num-clients 10 --num-requests 5000 ${UNSHARE})
 add_np_test(NAME ship_test_unix COMMAND tests/ship_test.py -v --num-clients 10 --num-requests 5000 ${UNSHARE} --unix-socket)
 add_np_test(NAME ship_kv_delta_test COMMAND tests/ship_kv_delta_test.py -v ${UNSHARE})
