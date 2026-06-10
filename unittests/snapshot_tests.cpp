@@ -552,6 +552,74 @@ BOOST_AUTO_TEST_CASE(test_invalid_authority_in_snapshot_rejected)
       });
 }
 
+// Permission parent integrity at load is guaranteed by name resolution against already-loaded
+// rows (ids strictly decrease toward the root, so every ancestor precedes its children): a row
+// whose parent cannot be resolved is corrupt -- a dangling reference, or a parent cycle, which
+// necessarily places some parent after its child in row order. Both shapes must be rejected
+// with an error naming the offending row. Uses the variant format so rows can be mutated.
+BOOST_AUTO_TEST_CASE(test_corrupt_permission_parent_in_snapshot_rejected)
+{
+   savanna_tester chain;
+   const auto victim = "victim"_n;
+   chain.create_account(victim);
+   // Two custom permissions: custa under active, custb under custa.
+   chain.set_authority(victim, "custa"_n, authority(chain.get_public_key(victim, "custa")), "active"_n);
+   chain.set_authority(victim, "custb"_n, authority(chain.get_public_key(victim, "custb")), "custa"_n);
+   chain.produce_block();
+   chain.control->abort_block();
+
+   auto writer = variant_snapshot_suite::get_writer();
+   chain.control->write_snapshot(writer);
+   auto snapshot = variant_snapshot_suite::finalize(writer);
+
+   // Rebuild the snapshot variant with victim@<perm>'s parent name rewritten.
+   const std::string perm_section = chain::detail::snapshot_section_traits<permission_object>::section_name();
+   auto mutate_parent = [&](const std::string& perm, const std::string& new_parent) -> fc::variant {
+      uint32_t mutated_rows = 0;
+      fc::variants new_sections;
+      for (const auto& section : snapshot["sections"].get_array()) {
+         if (section["name"].as_string() != perm_section) {
+            new_sections.push_back(section);
+            continue;
+         }
+         fc::variants new_rows;
+         for (const auto& row : section["rows"].get_array()) {
+            const auto& ro = row.get_object();
+            if (ro["owner"].as_string() == victim.to_string() && ro["name"].as_string() == perm) {
+               new_rows.emplace_back(fc::mutable_variant_object(ro)("parent", new_parent));
+               ++mutated_rows;
+            } else {
+               new_rows.push_back(row);
+            }
+         }
+         new_sections.emplace_back(fc::mutable_variant_object()("name", section["name"])("rows", std::move(new_rows)));
+      }
+      BOOST_REQUIRE_EQUAL(mutated_rows, 1u);
+      return fc::mutable_variant_object()
+         ("version", snapshot["version"])
+         ("sections", std::move(new_sections));
+   };
+
+   // Parent cycle: custa's parent rewritten to custb while custb's parent is custa. custa loads
+   // first, custb is not yet present, so the load must fail on the unresolvable parent.
+   fc::variant cyclic = mutate_parent("custa", "custb");
+   BOOST_REQUIRE_EXCEPTION(
+      snapshotted_tester(chain.get_config(), variant_snapshot_suite::get_reader(cyclic), 0),
+      snapshot_exception,
+      [](const snapshot_exception& e) {
+         return e.to_detail_string().find("victim@custa references parent custb") != std::string::npos;
+      });
+
+   // Dangling parent: references a permission name that exists nowhere in the snapshot.
+   fc::variant dangling = mutate_parent("custb", "nosuchperm");
+   BOOST_REQUIRE_EXCEPTION(
+      snapshotted_tester(chain.get_config(), variant_snapshot_suite::get_reader(dangling), 1),
+      snapshot_exception,
+      [](const snapshot_exception& e) {
+         return e.to_detail_string().find("victim@custb references parent nosuchperm") != std::string::npos;
+      });
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 BOOST_AUTO_TEST_SUITE(snapshot_part2_tests)
 

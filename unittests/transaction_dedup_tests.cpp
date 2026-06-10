@@ -9,6 +9,16 @@
 
 using namespace sysio::chain;
 
+namespace sysio::chain {
+/// White-box accessor (befriended by transaction_dedup): the undo-bookkeeping vector has no
+/// public surface, but its growth characteristics are a regression target -- an irreversible
+/// replay records every input transaction with no undo context, and the bookkeeping must not
+/// accumulate for the duration of the replay.
+struct transaction_dedup_test_access {
+   static size_t undo_bookkeeping_size(const transaction_dedup& d) { return d.current_added_.size(); }
+};
+} // namespace sysio::chain
+
 // Helper: create a deterministic transaction id from an integer
 static transaction_id_type make_id(uint64_t n) {
    return fc::sha256::hash(reinterpret_cast<const char*>(&n), sizeof(n));
@@ -574,6 +584,52 @@ BOOST_AUTO_TEST_CASE(serialization_path_independent_across_fork_switch) {
    apply_block2(b);
 
    BOOST_CHECK_EQUAL(serialize(a), serialize(b));
+}
+
+// ---- Undo bookkeeping lifecycle ----
+//
+// current_added_ exists solely so sessions and block revisions can undo records. With no undo
+// context active nothing can ever revert (or clear) an entry, so record() must not append --
+// an irreversible replay records every input transaction that way, and appending would grow
+// the vector for the entire replay (~40 bytes per replayed transaction).
+
+BOOST_AUTO_TEST_CASE(no_undo_bookkeeping_without_undo_context) {
+   transaction_dedup d;
+   // Replay-style records: no block revision, no session.
+   for (uint64_t i = 1; i <= 100; ++i)
+      d.record(make_id(i), make_exp(100 + static_cast<uint32_t>(i)));
+   BOOST_CHECK_EQUAL(d.size(), 100u);
+   BOOST_CHECK_EQUAL(transaction_dedup_test_access::undo_bookkeeping_size(d), 0u);
+
+   // The entries are still fully live: expirable and serialized canonically.
+   auto [removed, total] = d.clear_expired(fc::time_point(fc::seconds(150)));
+   BOOST_CHECK_EQUAL(removed, 49u); // expirations 101..149 (strict <)
+   BOOST_CHECK_EQUAL(total, 100u);
+
+   // With an undo context open, bookkeeping tracks records again and drains on commit.
+   d.start_block_revision(1);
+   d.record(make_id(200), make_exp(300));
+   BOOST_CHECK_EQUAL(transaction_dedup_test_access::undo_bookkeeping_size(d), 1u);
+   d.commit_block_revision();
+   BOOST_CHECK_EQUAL(transaction_dedup_test_access::undo_bookkeeping_size(d), 0u);
+   BOOST_CHECK(d.is_known(make_id(200)));
+}
+
+BOOST_AUTO_TEST_CASE(undo_session_without_block_revision_reverts_records) {
+   // The controller can open a session with no block revision (transactions requiring checks
+   // during irreversible replay). Records made under such a session must remain undoable even
+   // though replay-style records outside any context bypass the bookkeeping.
+   transaction_dedup d;
+   d.record(make_id(1), make_exp(100)); // pre-session, not undoable
+   d.push_session();
+   d.record(make_id(2), make_exp(200));
+   BOOST_CHECK_EQUAL(transaction_dedup_test_access::undo_bookkeeping_size(d), 1u);
+   BOOST_CHECK(d.is_known(make_id(2)));
+   d.undo_session();
+   BOOST_CHECK(!d.is_known(make_id(2)));
+   BOOST_CHECK(d.is_known(make_id(1)));
+   BOOST_CHECK_EQUAL(d.size(), 1u);
+   BOOST_CHECK_EQUAL(transaction_dedup_test_access::undo_bookkeeping_size(d), 0u);
 }
 
 // ---- Reset ----

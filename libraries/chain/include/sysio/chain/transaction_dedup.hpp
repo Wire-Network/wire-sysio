@@ -79,6 +79,10 @@ public:
    size_t size() const { return map_.size(); }
 
 private:
+   /// White-box introspection for unit tests (e.g. asserting the undo bookkeeping stays empty
+   /// when no undo context is active); defined by the test translation unit only.
+   friend struct transaction_dedup_test_access;
+
    /// Sorted-index key: (expiration, id). Expiration first so clear_expired removes a complete
    /// prefix; id second to break ties canonically.
    using sorted_entry = std::pair<fc::time_point_sec, transaction_id_type>;
@@ -104,9 +108,11 @@ private:
    std::deque<block_revision>    committed_revisions_;  // committed blocks (trimmed at LIB)
    std::optional<block_revision> pending_revision_;     // current in-progress block
 
-   /// Entries recorded since block start, in record order. Pure undo bookkeeping for the current
-   /// block (session watermarks index into it); never serialized, so its insertion ordering
-   /// cannot leak into snapshots or the integrity hash.
+   /// Entries recorded since block start while an undo context (block revision or session) was
+   /// active, in record order. Pure undo bookkeeping for the current block (session watermarks
+   /// index into it); never serialized, so its insertion ordering cannot leak into snapshots or
+   /// the integrity hash. Records made with no undo context (irreversible replay) bypass it --
+   /// they are not undoable, and appending them would grow this vector for an entire replay.
    std::vector<dedup_entry> current_added_;
    std::vector<size_t>      session_stack_;  // watermarks into current_added_ for trx-level undo
 };

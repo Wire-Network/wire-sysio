@@ -81,9 +81,9 @@ namespace sysio { namespace chain {
                              "Permission {}@{} contains unactivated key type", row.owner, row.name);
                }
 
-               // Reject structurally invalid authorities: unsorted or duplicate keys/accounts, zero
-               // weights, or a threshold no weight combination can satisfy. newaccount and updateauth
-               // enforce the same predicate at creation, so any non-empty row failing it is corrupt or
+               // Reject structurally invalid authorities: unsorted or duplicate keys/accounts, or a
+               // threshold no weight combination can satisfy. newaccount and updateauth enforce the
+               // same predicate at creation, so any non-empty row failing it is corrupt or
                // hand-crafted. Deliberately EMPTY authorities (no keys and no accounts) are exempt:
                // genesis creates sysio.null's permissions and sysio.prods@owner with empty_authority,
                // permanently unsatisfiable by design, and validate() rejects those as threshold-unreachable.
@@ -92,32 +92,29 @@ namespace sysio { namespace chain {
                           "Permission {}@{} has invalid authority", row.owner, row.name);
 
                if (row.parent != permission_name()) {
-                  const auto& parent = db.get<permission_object, by_owner>(boost::make_tuple(row.owner, row.parent));
-                  SYS_ASSERT(parent.id != 0, snapshot_exception, "Unexpected mapping to reserved permission 0");
-                  value.parent = parent.id;
-
-                  // Walk the parent chain to the root as a corruption guard against cycles and dangling
-                  // parents. Parents resolve through rows that loaded earlier (lower ids), so a valid chain
-                  // reaches the root within one step per loaded permission; only a cycle can run longer
-                  // (pigeonhole). Permission-chain depth itself is intentionally NOT capped: nothing limits
-                  // it at creation (updateauth builds arbitrarily deep trees), so a load-time depth cap
-                  // would reject snapshots of honest chains. config::default_max_auth_depth seeds
-                  // max_authority_depth, which bounds authority *satisfaction* recursion -- a different
-                  // axis -- and must not be reused here.
-                  const size_t max_chain_len = db.get_index<permission_index>().size() + 1;
-                  size_t chain_len = 1;
-                  auto cur_parent = parent.parent;
-                  while (cur_parent._id != 0) {
-                     ++chain_len;
-                     SYS_ASSERT(chain_len <= max_chain_len, snapshot_exception,
-                                "Permission {}@{} parent chain forms a cycle",
-                                row.owner, row.name);
-                     const auto* pp = db.find<permission_object>(cur_parent);
-                     SYS_ASSERT(pp != nullptr, snapshot_exception,
-                                "Permission {}@{} parent chain references non-existent permission",
-                                row.owner, row.name);
-                     cur_parent = pp->parent;
-                  }
+                  // Parents resolve by (owner, name) against rows already inserted, so a row whose
+                  // parent is not yet present is corrupt: either it references a permission that
+                  // exists nowhere (dangling), or the rows form a parent cycle (in a valid snapshot
+                  // ids strictly decrease toward the root, so every ancestor precedes its children;
+                  // a cycle necessarily places some parent after its child). This is O(1) per row --
+                  // a previous per-row ancestry walk made snapshot load quadratic in an account's
+                  // permission-chain depth. Chain depth itself is intentionally NOT capped: nothing
+                  // limits it at creation (updateauth builds arbitrarily deep trees), so a load-time
+                  // depth cap would reject snapshots of honest chains. config::default_max_auth_depth
+                  // seeds max_authority_depth, which bounds authority *satisfaction* recursion -- a
+                  // different axis -- and must not be reused here.
+                  const auto* parent = db.find<permission_object, by_owner>(boost::make_tuple(row.owner, row.parent));
+                  SYS_ASSERT(parent != nullptr, snapshot_exception,
+                             "Permission {}@{} references parent {} not loaded earlier in the snapshot"
+                             " -- dangling parent or parent cycle",
+                             row.owner, row.name, row.parent);
+                  SYS_ASSERT(parent->id != 0, snapshot_exception, "Unexpected mapping to reserved permission 0");
+                  // Rows insert in id order, so a resolved parent always carries a lower id than the
+                  // row being loaded. Guards the ordering assumption above against future loader changes.
+                  SYS_ASSERT(parent->id < value.id, snapshot_exception,
+                             "Permission {}@{} resolved a parent with a higher id -- snapshot rows are"
+                             " not in creation order", row.owner, row.name);
+                  value.parent = parent->id;
                }
             }
          }

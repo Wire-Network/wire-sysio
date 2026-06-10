@@ -302,12 +302,17 @@ namespace sysio::chain {
       }
 
       init();
-      // Record unconditionally for every applied (non-read-only) transaction. The dedup set is
+      // Record unconditionally for every applied non-transient transaction. The dedup set is
       // folded into the integrity hash and snapshots, so gating the record on any node-local
       // observation (e.g. the previously used pending LIB time, which differs between a replaying
       // node and a live one) makes otherwise-identical nodes diverge on auxiliary state.
       // Expired entries are pruned deterministically by clear_expired at the next block start.
-      if ( !is_read_only() ) {
+      // Transient transactions (read-only, dry-run) never persist in a block, so they must not
+      // leave dedup entries -- and read-only transactions additionally execute concurrently on
+      // other threads, where mutating shared dedup state would be a data race. This matches
+      // Spring, where record_transaction is gated on !is_transient(); it also means a dry-run of
+      // an already-known transaction executes instead of failing tx_duplicate.
+      if ( !is_transient() ) {
          record_transaction( packed_trx.id(), trx.expiration );
       }
    }

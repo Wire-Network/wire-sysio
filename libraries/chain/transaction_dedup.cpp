@@ -25,7 +25,14 @@ void transaction_dedup::record(const transaction_id_type& id, fc::time_point_sec
    auto [it, inserted] = map_.emplace(id, expiration);
    SYS_ASSERT(inserted, tx_duplicate, "duplicate transaction {}", id);
    index_.emplace(expiration, id);
-   current_added_.emplace_back(id, expiration);
+   // Keep undo bookkeeping only while an undo context exists -- an open block revision or an
+   // active session -- because only those paths can ever revert the entry. Recording without one
+   // must not append: nothing would consume or clear the entries until the next
+   // start_block_revision, and an irreversible replay (which records every input transaction
+   // with no revisions and no sessions) would otherwise accumulate bookkeeping for every
+   // replayed transaction for the entire duration of the replay.
+   if (pending_revision_ || !session_stack_.empty())
+      current_added_.emplace_back(id, expiration);
 }
 
 bool transaction_dedup::is_known(const transaction_id_type& id) const {
