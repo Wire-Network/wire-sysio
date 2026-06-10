@@ -474,6 +474,53 @@ try:
     Print("Test 9 PASSED")
 
     # ---------------------------------------------------------------
+    # Test 10: max-bytes-in-flight admission control on raw downloads
+    # ---------------------------------------------------------------
+    # Raw file downloads must obey the same http-max-bytes-in-flight cap as
+    # JSON responses: an unranged download larger than the cap is rejected
+    # with 503 before anything is sent, while admission control sees the
+    # CLAMPED payload length, so an absurd raw Range end on a small tail
+    # window still passes.
+    Print("=== Test 10: download admission control (http-max-bytes-in-flight) ===")
+
+    assert fileSize > 1024 * 1024, \
+        f"snapshot ({fileSize} bytes) must exceed the 1 MiB cap for this test"
+
+    Print("Relaunch API node with --http-max-bytes-in-flight-mb 1")
+    node0.kill(signal.SIGTERM)
+    isRelaunchSuccess = node0.relaunch(addSwapFlags={"--http-max-bytes-in-flight-mb": "1"})
+    assert isRelaunchSuccess, "Failed to relaunch API node with reduced in-flight cap"
+    assert node0.waitForLibToAdvance(timeout=60), "LIB did not advance after API node relaunch"
+
+    # Full-file download exceeds the 1 MiB cap: expect the standard 503 busy
+    # rejection instead of a streamed body.
+    req = urllib.request.Request(downloadUrl, data=payload, method="POST")
+    req.add_header("Content-Type", "application/json")
+    try:
+        with urllib.request.urlopen(req) as response:
+            assert False, f"Expected 503 over-cap rejection, got {response.getcode()}"
+    except urllib.error.HTTPError as e:
+        assert e.code == 503, f"Expected 503 over-cap rejection, got {e.code}"
+
+    # A raw Range end far past EOF clamps to a tiny tail window, and admission
+    # control must track the clamped length -- not the raw request -- so this
+    # succeeds under the same 1 MiB cap.
+    rangeStart = fileSize - 4096
+    req = urllib.request.Request(downloadUrl, data=payload, method="POST")
+    req.add_header("Content-Type", "application/json")
+    req.add_header("Range", f"bytes={rangeStart}-18446744073709551615")
+
+    with urllib.request.urlopen(req) as response:
+        assert response.getcode() == 206, f"Expected 206, got {response.getcode()}"
+        contentRange = response.getheader("Content-Range")
+        expectedRange = f"bytes {rangeStart}-{fileSize - 1}/{fileSize}"
+        assert contentRange == expectedRange, f"Content-Range: expected '{expectedRange}', got '{contentRange}'"
+        partialData = response.read()
+        assert partialData == diskData[rangeStart:]
+
+    Print("Test 10 PASSED")
+
+    # ---------------------------------------------------------------
     Print("All snapshot API and bootstrap tests PASSED")
     testSuccessful=True
 finally:

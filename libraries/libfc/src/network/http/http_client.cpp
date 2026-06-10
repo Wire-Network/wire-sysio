@@ -436,8 +436,11 @@ public:
       }, conn_iter->second);
       FC_ASSERT(!ec, "Failed to read response header: {}", ec.message());
 
+      // Require exactly 200 OK: this client never sends Range requests, so 206 Partial Content
+      // can only come from a broken or hostile endpoint/proxy, and renaming a partial body into
+      // the final destination would hand the caller a truncated file.
       const auto status = parser.get().result();
-      if (status != http::status::ok && status != http::status::partial_content) {
+      if (status != http::status::ok) {
          // Error responses carry small diagnostic bodies; read into memory for the message.
          // Best effort: on a read failure the throw below reports whatever body arrived.
          http::response_parser<http::string_body> err_parser{std::move(parser)};

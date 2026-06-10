@@ -491,27 +491,45 @@ public:
 
       auto const file_size = body.size();
 
-      file_res_.emplace();
-      file_res_->body() = std::move(body);
-
+      // Clamp the range and compute the exact payload length before anything is committed: the
+      // in-flight accounting below must track what will actually be sent, not the raw request (a
+      // Range like bytes=1-18446744073709551615 must neither inflate bytes_in_flight nor overflow
+      // the length computation), and admission control must see the same number.
+      uint64_t range_start = 0;
+      uint64_t range_end   = 0;
+      uint64_t payload_len = file_size;
       if (byte_range) {
-         auto [range_start, range_end] = *byte_range;
+         range_start = byte_range->first;
+         range_end   = byte_range->second;
          if (range_end >= file_size)
             range_end = file_size - 1;
-         if (range_start > range_end) {
+         if (file_size == 0 || range_start > range_end) {
             error_results results{416, "Range Not Satisfiable"};
             send_response(fc::json::to_string(results, fc::time_point::maximum()), 416);
             return;
          }
+         payload_len = range_end - range_start + 1;
+      }
 
-         auto range_len = range_end - range_start + 1;
+      // Raw file downloads obey the same max-bytes-in-flight admission control as JSON responses;
+      // reject with the standard 503 busy response before any response state is built. The file
+      // handle opened above to learn the size is dropped on return.
+      if (auto error_str = verify_max_bytes_in_flight(payload_len); !error_str.empty()) {
+         send_busy_response(std::move(error_str));
+         return;
+      }
+
+      file_res_.emplace();
+      file_res_->body() = std::move(body);
+
+      if (byte_range) {
          file_res_->result(http::status::partial_content);
          // Bound the body to the requested range; the writer seeks to range_start and
-         // stops after range_len bytes so the response cannot over-send to EOF.
-         file_res_->body().set_range(range_start, range_len);
+         // stops after payload_len bytes so the response cannot over-send to EOF.
+         file_res_->body().set_range(range_start, payload_len);
          file_res_->set(http::field::content_range,
             "bytes " + std::to_string(range_start) + "-" + std::to_string(range_end) + "/" + std::to_string(file_size));
-         file_res_->content_length(range_len);
+         file_res_->content_length(payload_len);
       } else {
          file_res_->result(code);
          file_res_->content_length(file_size);
@@ -525,7 +543,7 @@ public:
          file_res_->set(http::field::server, plugin_state_->server_header);
       file_res_->keep_alive(false); // close after file transfer
 
-      auto tracked_size = byte_range ? (byte_range->second - byte_range->first + 1) : file_size;
+      const auto tracked_size = payload_len;
       increment_bytes_in_flight(tracked_size);
       write_begin_ = steady_clock::now();
       auto dt = write_begin_ - handle_begin_;
