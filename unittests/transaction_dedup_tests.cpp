@@ -418,6 +418,39 @@ BOOST_AUTO_TEST_CASE(file_missing_returns_false) {
    BOOST_CHECK(!d.read_from_file("/tmp/nonexistent_dedup_file.bin"));
 }
 
+BOOST_AUTO_TEST_CASE(snapshot_load_accepts_unsorted_rows) {
+   // Snapshots written before the sorted index existed carry rows in insertion order.
+   // read_from_snapshot hints the tree's end for the sorted current format; a wrong hint on
+   // old-format rows must not affect the result: any row order must load and re-serialize in
+   // canonical (expiration, id) order.
+   fc::mutable_variant_object storage;
+   auto writer = std::make_shared<variant_snapshot_writer>(storage);
+   writer->write_section("sysio::chain::transaction_dedup", [](auto& section) {
+      // Deliberately not sorted by (expiration, id)
+      section.add_row(snapshot_transaction_dedup_entry{make_id(3), make_exp(300)});
+      section.add_row(snapshot_transaction_dedup_entry{make_id(1), make_exp(100)});
+      section.add_row(snapshot_transaction_dedup_entry{make_id(2), make_exp(200)});
+   });
+   writer->finalize();
+
+   // The reader holds a reference to the variant, so it must outlive the reader.
+   fc::variant snapshot_data(storage);
+   transaction_dedup unsorted_load;
+   unsorted_load.read_from_snapshot(std::make_shared<variant_snapshot_reader>(snapshot_data));
+
+   BOOST_CHECK_EQUAL(unsorted_load.size(), 3u);
+   BOOST_CHECK(unsorted_load.is_known(make_id(1)));
+   BOOST_CHECK(unsorted_load.is_known(make_id(2)));
+   BOOST_CHECK(unsorted_load.is_known(make_id(3)));
+
+   // Canonical serialization: identical to recording the same entries directly.
+   transaction_dedup recorded;
+   recorded.record(make_id(1), make_exp(100));
+   recorded.record(make_id(2), make_exp(200));
+   recorded.record(make_id(3), make_exp(300));
+   BOOST_CHECK_EQUAL(serialize(unsorted_load), serialize(recorded));
+}
+
 // ---- Determinism: complete expiry pruning + canonical serialization order ----
 //
 // The serialized dedup set feeds calculate_integrity_hash and snapshots, so the entry set AND its
