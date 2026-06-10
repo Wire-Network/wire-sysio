@@ -6,6 +6,7 @@ import shutil
 import signal
 import subprocess
 import tempfile
+import time
 
 from TestHarness import Cluster, TestHelper, Utils, WalletMgr
 
@@ -117,12 +118,22 @@ try:
 
     Print("Pause producer and stop both nodes")
     prodNode.processUrllibRequest("producer", "pause", exitOnError=True)
+    # pause can return while one more block is mid-production; wait for the head to settle so the
+    # ids captured below cover every block the ship logs can end on
     headBlock = prodNode.getHeadBlockNum()
+    for _ in range(60):
+        time.sleep(1)
+        newHead = prodNode.getHeadBlockNum()
+        if newHead == headBlock:
+            break
+        headBlock = newHead
+    else:
+        Utils.errorExit(f"producer head did not settle after pause (still advancing at {headBlock})")
     shipNode.waitForBlock(headBlock)
 
     # capture chain block ids while the node is still up; the offline block-id checks below compare
     # what the ship logs recorded against these
-    chainIds = {n: shipNode.getBlock(n)["id"] for n in (headBlock - 1, headBlock)}
+    chainIds = {n: shipNode.getBlock(n)["id"] for n in range(max(2, headBlock - 3), headBlock + 1)}
     retainedProbeBlock = shipStride // 2
     retainedProbeId = shipNode.getBlock(retainedProbeBlock)["id"]
 
@@ -158,6 +169,8 @@ try:
 
     # -------- block-id reports the ids the logs actually recorded
     Print("block-id matches the chain")
+    assert headLast in chainIds, \
+        f"chain_state head log ends at {headLast}, outside the captured ids {sorted(chainIds)}"
     _, bidOut = shipLogUtil("block-id", "--state-history-dir", shipDir, "--block", headLast)
     assert bidOut.count(chainIds[headLast]) == 3, \
         f"expected all three head logs to record {chainIds[headLast]} for block {headLast}:\n{bidOut}"
