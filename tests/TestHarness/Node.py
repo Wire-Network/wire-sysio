@@ -509,7 +509,8 @@ class Node(Transactions):
             Utils.errorExit("Cannot find unstarted node since %s file does not exist" % startFile)
         return startFile
 
-    def launchUnstarted(self, waitForAlive=True):
+    def launchUnstarted(self, waitForAlive=True, timeout=Utils.systemWaitTimeout):
+        """Launch a previously configured node and wait up to timeout seconds for it to answer get_info."""
         Utils.Print("launchUnstarted cmd: %s" % (self.cmd))
         self.popenProc = self.launchCmd(self.cmd, self.data_dir, self.launch_time)
 
@@ -524,7 +525,7 @@ class Node(Transactions):
                 pass
             return False
 
-        isAlive=Utils.waitForBool(isNodeAlive)
+        isAlive=Utils.waitForBool(isNodeAlive, timeout=timeout)
 
         if isAlive:
             if Utils.Debug: Utils.Print("Node launch was successful.")

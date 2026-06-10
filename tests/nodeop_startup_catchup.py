@@ -73,7 +73,9 @@ try:
     specificExtraNodeopArgs[pnodes+13] = f' --sync-fetch-span 89 --read-mode irreversible '
     specificExtraNodeopArgs[pnodes+14] = f' --sync-fetch-span 150 --read-mode irreversible '
     specificExtraNodeopArgs[pnodes+15] = f' --sync-fetch-span 2500 --read-mode irreversible '
+    # Use a line topology so started nodes do not continuously retry every intentionally unstarted catchup node.
     if cluster.launch(prodCount=prodCount, specificExtraNodeopArgs=specificExtraNodeopArgs, activateIF=activateIF, onlyBios=False,
+                      topo="line",
                       pnodes=pnodes, totalNodes=totalNodes, totalProducers=pnodes*prodCount, unstartedNodes=catchupCount,
                       loadSystemContract=True, maximumP2pPerHost=totalNodes+trxGeneratorCnt) is False:
         Utils.errorExit("Failed to stand up eos cluster.")
@@ -158,9 +160,10 @@ try:
     Print("Cycle through catchup scenarios")
     twoRounds=21*2*12
     twoRoundsTimeout=(twoRounds/2 + 10)  #2 rounds in seconds + some leeway
+    catchupLaunchTimeout=180
     for catchup_num in range(0, catchupCount):
         Print("Start catchup node")
-        cluster.launchUnstarted()
+        cluster.launchUnstarted(timeout=catchupLaunchTimeout)
         lastLibNum=lib(node0)
         # verify producer lib is still advancing
         waitForBlock(node0, lastLibNum+1, timeout=twoRoundsTimeout, blockType=BlockType.lib)

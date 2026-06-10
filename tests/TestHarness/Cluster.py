@@ -765,14 +765,15 @@ class Cluster(object):
         nodes += self.getNodes()
         return nodes
 
-    def launchUnstarted(self, numToLaunch=1):
+    def launchUnstarted(self, numToLaunch=1, timeout=Utils.systemWaitTimeout):
+        """Launch queued unstarted nodes and wait up to timeout seconds for each node to answer get_info."""
         assert(isinstance(numToLaunch, int))
         assert(numToLaunch>0)
         launchList=self.unstartedNodes[:numToLaunch]
         del self.unstartedNodes[:numToLaunch]
         for node in launchList:
             # the node number is indexed off of the started nodes list
-            node.launchUnstarted()
+            node.launchUnstarted(timeout=timeout)
             self.nodes.append(node)
 
     # Spread funds across accounts with transactions spread through cluster nodes.

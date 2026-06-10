@@ -240,22 +240,34 @@ class NodeopQueries:
         return self.isBlockPresent(blockNum, blockType=BlockType.lib)
 
     def getTransaction(self, transId, silentErrors=False, exitOnError=False, delayedRetry=True):
+        """Fetch a transaction trace, bounding each poll so missing traces cannot stall bootstrap."""
         assert(isinstance(transId, str))
         exitOnErrorForDelayed=not delayedRetry and exitOnError
-        timeout=3
+        pollTimeout=3
+        pollBudget=60
+        pollDeadline=time.perf_counter() + pollBudget
         cmdDesc="get transaction_trace"
         cmd="%s %s" % (cmdDesc, transId)
-        msg="(transaction id=%s)" % (transId);
-        for i in range(0,(int(60/timeout) - 1)):
-            trans=self.processClioCmd(cmd, cmdDesc, silentErrors=True, exitOnError=exitOnErrorForDelayed, exitMsg=msg)
+        msg="(transaction id=%s)" % (transId)
+        while True:
+            remainingBudget=pollDeadline - time.perf_counter()
+            finalAttempt=remainingBudget <= pollTimeout
+            attemptStart=time.perf_counter()
+            trans=self.processClioCmd(cmd, cmdDesc,
+                                      silentErrors=silentErrors if finalAttempt else True,
+                                      exitOnError=exitOnError if finalAttempt else exitOnErrorForDelayed,
+                                      exitMsg=msg, timeout=pollTimeout)
             if trans is not None or not delayedRetry:
                 return trans
+            if finalAttempt:
+                break
             if Utils.Debug: Utils.Print("Could not find transaction with id %s, delay and retry" % (transId))
-            time.sleep(timeout)
+            attemptElapsed=time.perf_counter() - attemptStart
+            time.sleep(max(0, pollTimeout - attemptElapsed))
 
         self.missingTransaction=True
         # either it is there or the transaction has timed out
-        return self.processClioCmd(cmd, cmdDesc, silentErrors=silentErrors, exitOnError=exitOnError, exitMsg=msg)
+        return None
 
     def isTransInBlock(self, transId, blockId, exitOnError=False):
         """Check if transId is within block identified by blockId"""
@@ -561,7 +573,8 @@ class NodeopQueries:
         keys=list(row["value"].keys())
         return keys
 
-    def processClioCmd(self, cmd, cmdDesc, silentErrors=True, exitOnError=False, exitMsg=None, returnType=ReturnType.json):
+    def processClioCmd(self, cmd, cmdDesc, silentErrors=True, exitOnError=False, exitMsg=None, returnType=ReturnType.json, timeout=None):
+        """Run clio and decode the requested return type, optionally bounding the subprocess runtime."""
         assert(isinstance(returnType, ReturnType))
         cmd="%s %s %s" % (Utils.SysClientPath, self.sysClientArgs(), cmd)
         if Utils.Debug: Utils.Print("cmd: %s" % (cmd))
@@ -574,26 +587,40 @@ class NodeopQueries:
         start=time.perf_counter()
         while retries > 0:
             retries -= 1
+            attemptStart=time.perf_counter()
             try:
                 if returnType==ReturnType.json:
-                    trans=Utils.runCmdReturnJson(cmd, silentErrors=silentErrors)
+                    trans=Utils.runCmdReturnJson(cmd, silentErrors=silentErrors, timeout=timeout)
                 elif returnType==ReturnType.raw:
-                    trans=Utils.runCmdReturnStr(cmd)
+                    trans=Utils.runCmdReturnStr(cmd, timeout=timeout)
                 else:
                     unhandledEnumType(returnType)
 
                 if Utils.Debug:
                     end=time.perf_counter()
-                    Utils.Print("cmd Duration: %.3f sec" % (end-start))
+                    Utils.Print("cmd Duration: %.3f sec" % (end-attemptStart))
             except subprocess.CalledProcessError as ex:
                 if not silentErrors:
                     end=time.perf_counter()
-                    out=ex.output.decode("utf-8")
-                    msg=ex.stderr.decode("utf-8")
+                    out=Utils.decodeProcessOutput(ex.output)
+                    msg=Utils.decodeProcessOutput(ex.stderr)
                     if retries > 0 and "tx_cpu_usage_exceeded" in out:
                         Utils.Print(f"Retrying {cmdDesc} due to: tx_cpu_usage_exceeded")
                         continue # try again
-                    errorMsg="Exception during \"%s\". Exception message: %s.  stdout: %s.  cmd Duration=%.3f sec. %s" % (cmdDesc, msg, out, end-start, exitMsg)
+                    errorMsg="Exception during \"%s\". Exception message: %s.  stdout: %s.  cmd Duration=%.3f sec. %s" % (cmdDesc, msg, out, end-attemptStart, exitMsg)
+                    if exitOnError:
+                        Utils.cmdError(errorMsg)
+                        Utils.errorExit(errorMsg)
+                    else:
+                        Utils.Print("ERROR: %s" % (errorMsg))
+                return None
+            except subprocess.TimeoutExpired as ex:
+                if not silentErrors:
+                    end=time.perf_counter()
+                    out=Utils.decodeProcessOutput(ex.output)
+                    msg=Utils.decodeProcessOutput(ex.stderr)
+                    errorMsg=("Timeout during \"%s\" after %.3f sec. cmd timeout=%s. stderr: %s. stdout: %s. %s" %
+                              (cmdDesc, end-attemptStart, ex.timeout, msg, out, exitMsg))
                     if exitOnError:
                         Utils.cmdError(errorMsg)
                         Utils.errorExit(errorMsg)
