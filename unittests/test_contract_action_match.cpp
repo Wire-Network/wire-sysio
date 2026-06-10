@@ -112,9 +112,14 @@ BOOST_AUTO_TEST_CASE(malformed_contract_names) {
 
       BOOST_CHECK(matcher.is_action_match("add.match"_n));
       BOOST_CHECK(matcher.is_action_match("big"_n));
+      // prefix semantics, mirroring the contract-name prefix matcher: a name one dot-segment
+      // under the prefix matches. The action prefix arm was previously a copy of the exact arm,
+      // so "big.blue" wrongly failed to match here.
+      BOOST_CHECK(matcher.is_action_match("big.blue"_n));
 
       BOOST_CHECK(!matcher.is_action_match("blue"_n));
-      BOOST_CHECK(!matcher.is_action_match("big.blue"_n));
+      BOOST_CHECK(!matcher.is_action_match("big.blue.red"_n)); // two segments deep: prefix() is "big.blue"
+      BOOST_CHECK(!matcher.is_action_match("bigblue"_n));      // not a dot boundary
       BOOST_CHECK(!matcher.is_action_match("bi"_n));
 
       BOOST_CHECK(!matcher.is_action_match("red"_n));
