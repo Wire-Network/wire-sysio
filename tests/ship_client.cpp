@@ -11,6 +11,8 @@
 #include <regex>
 #include <string>
 
+#include "test_port_shard.hpp"
+
 using mvo = fc::mutable_variant_object;
 using tcp = boost::asio::ip::tcp;
 using unixs = boost::asio::local::stream_protocol;
@@ -31,7 +33,7 @@ int main(int argc, char* argv[]) {
 
    bpo::options_description cli("ship_client command line options");
    bool help = false;
-   std::string socket_address = "127.0.0.1:8080";
+   std::string socket_address = sysio::testing::default_state_history_endpoint();
    uint32_t num_requests = 1;
 
    cli.add_options()

@@ -123,7 +123,7 @@ try:
 
     Print("Relaunching the non-producing bridge node to connect the nodes")
     if not nonProdNode.relaunch():
-        errorExit(f"Failure - (non-production) node {nonProdNode.nodeNum} should have restarted")
+        errorExit(f"Failure - (non-production) node {nonProdNode.nodeId} should have restarted")
 
     while prodD.getInfo()['last_irreversible_block_num'] < transBlockNum:
         Print("Wait for LIB to move, which indicates prodD may have forked out the branch")

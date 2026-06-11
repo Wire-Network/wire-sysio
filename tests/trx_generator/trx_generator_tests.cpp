@@ -2,6 +2,7 @@
 #include <trx_generator.hpp>
 #include <http_client_async.hpp>
 #include <simple_rest_server.hpp>
+#include <test_port_shard.hpp>
 
 #define BOOST_TEST_MODULE trx_generator_tests
 #include <boost/test/included/unit_test.hpp>
@@ -488,7 +489,7 @@ BOOST_AUTO_TEST_CASE(account_name_generator_tests)
 BOOST_AUTO_TEST_CASE(simple_http_client_async_test) {
 
    const std::string host     = "127.0.0.1"s;
-   constexpr unsigned short     port     = 8888;
+   const unsigned short port = get_port(port_category::node_http);
 
    // Start Server
    echo_server_impl               server = echo_server_impl();

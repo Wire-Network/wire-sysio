@@ -50,8 +50,10 @@ class nodeDefinition:
     data_dir_name: str = field(init=False)
     p2p_port: int = 0
     http_port: int = 0
-    base_p2p_port: ClassVar[int] = 9876
-    base_http_port: ClassVar[int] = 8888
+    base_p2p_port: ClassVar[int] = Utils.getPort(Utils.PortP2P)
+    base_http_port: ClassVar[int] = Utils.getPort(Utils.PortNodeHttp)
+    bios_p2p_port: ClassVar[int] = Utils.getPort(Utils.PortBiosP2P)
+    bios_http_port: ClassVar[int] = Utils.getPort(Utils.PortBiosHttp)
     host_name: str = 'localhost'
     public_name: str = 'localhost'
     listen_addr: str = '0.0.0.0'
@@ -75,11 +77,13 @@ class nodeDefinition:
 
     @classmethod
     def p2p_bios_port(cls):
-        return cls.base_p2p_port - 100
+        """Return the BIOS P2P listener port assigned to this test shard."""
+        return cls.bios_p2p_port
 
     @classmethod
     def http_bios_port(cls):
-        return cls.base_http_port - 100
+        """Return the BIOS HTTP listener port assigned to this test shard."""
+        return cls.bios_http_port
 
     @classmethod
     def create_p2p_port_generator(cls):

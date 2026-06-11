@@ -96,9 +96,109 @@ class Utils:
     ConfigDir=f"{DataPath}/"
 
     TimeFmt='%Y-%m-%dT%H:%M:%S.%f'
+    TestPortOffsetEnvVar="SYSIO_TEST_PORT_OFFSET"
+    PortShip="ship"
+    PortStateHistory="state_history"
+    PortBiosHttp="bios_http"
+    PortBiosP2P="bios_p2p"
+    PortNodeHttp="node_http"
+    PortAlternateService="alternate_service"
+    PortPluginHttpPeer="plugin_http_peer"
+    PortPluginHttpLocal="plugin_http_local"
+    PortAlternateP2P="alternate_p2p"
+    PortP2P="p2p"
+    PortWallet="wallet"
+    PortTransactionOnly="transaction_only"
+    PortIpv6Probe="ipv6_probe"
+    WalletPortCount=5
+    _testPortOffset=None
     _nodeopHelpOutput=None
     # Lock subprocess_results.log writes and cached nodeop option discovery across threads.
     _check_output_lock = threading.Lock()
+
+    @staticmethod
+    def getTestPortOffset():
+        """Return the configured per-test port shard offset."""
+        if Utils._testPortOffset is not None:
+            return Utils._testPortOffset
+
+        rawOffset=os.environ.get(Utils.TestPortOffsetEnvVar, "0")
+        try:
+            offset=int(rawOffset)
+        except ValueError as ex:
+            raise RuntimeError(f"{Utils.TestPortOffsetEnvVar} must be an integer, got '{rawOffset}'") from ex
+
+        if offset < 0:
+            raise RuntimeError(f"{Utils.TestPortOffsetEnvVar} must be non-negative, got {offset}")
+
+        Utils._testPortOffset=offset
+        return offset
+
+    @staticmethod
+    def getPort(port_category, index=0):
+        """Return a deterministic port from this test's compact port shard.
+
+        port_category names the listener class and index selects a listener
+        within that class.  CTest assigns each test a unique shard offset, and
+        this allocator keeps all known listener classes inside one bounded
+        192-port shard below the ephemeral range.
+        """
+        assert(isinstance(port_category, str))
+        assert(isinstance(index, int))
+        if index < 0:
+            raise RuntimeError(f"Port index must be non-negative, got {index}")
+
+        slotRanges={
+            Utils.PortShip: (0, 1),
+            Utils.PortStateHistory: (1, 1),
+            Utils.PortBiosHttp: (2, 1),
+            Utils.PortNodeHttp: (3, 88),
+            Utils.PortAlternateService: (91, 1),
+            Utils.PortPluginHttpPeer: (92, 1),
+            Utils.PortPluginHttpLocal: (93, 1),
+            Utils.PortBiosP2P: (94, 1),
+            Utils.PortAlternateP2P: (95, 46),
+            Utils.PortP2P: (141, 23),
+            Utils.PortWallet: (164, Utils.WalletPortCount),
+            Utils.PortTransactionOnly: (169, 2),
+            Utils.PortIpv6Probe: (171, 4),
+        }
+
+        if port_category not in slotRanges:
+            raise RuntimeError(f"Unknown port category '{port_category}'")
+
+        slotStart, slotCount=slotRanges[port_category]
+        if index >= slotCount:
+            raise RuntimeError(
+                f"Port index {index} is outside category '{port_category}' capacity {slotCount}")
+
+        offset=Utils.getTestPortOffset()
+        if offset == 0:
+            defaultPorts={
+                Utils.PortShip: 7899,
+                Utils.PortStateHistory: 8080,
+                Utils.PortBiosHttp: 8788,
+                Utils.PortBiosP2P: 9776,
+                Utils.PortNodeHttp: 8888,
+                Utils.PortAlternateService: 8976,
+                Utils.PortPluginHttpPeer: 9009,
+                Utils.PortPluginHttpLocal: 9011,
+                Utils.PortAlternateP2P: 9777,
+                Utils.PortP2P: 9876,
+                Utils.PortWallet: 9899,
+                Utils.PortTransactionOnly: 9902,
+                Utils.PortIpv6Probe: 9997,
+            }
+            shiftedPort=defaultPorts[port_category] + index
+        else:
+            shiftedPort=8888 + offset + slotStart + index
+
+        if shiftedPort < 1 or shiftedPort > 65535:
+            raise RuntimeError(
+                f"Port category '{port_category}' index {index} shifted by "
+                f"{Utils.TestPortOffsetEnvVar}={Utils.getTestPortOffset()} "
+                f"produces invalid port {shiftedPort}")
+        return shiftedPort
 
     @staticmethod
     def nodeopSupportsOption(option):
@@ -473,7 +573,7 @@ class Utils:
 
     @staticmethod
     def arePortsAvailable(ports):
-        """Check if specified port (as int) or ports (as set) is/are available for listening on."""
+        """Check whether final, already-sharded ports are available for listening on."""
         assert(ports)
         if isinstance(ports, int):
             ports={ports}

@@ -49,6 +49,12 @@ testSuccessful=False
 
 WalletdName=Utils.SysWalletName
 shipTempDir=None
+shipUnixSocketPath=None
+shipUnixSocketPathTemplate="/tmp/sysio-ship-%d.sock"
+
+def getShipUnixSocketPath():
+    """Return a short Unix socket path that stays within sockaddr_un path limits."""
+    return shipUnixSocketPathTemplate % (Utils.getPort(Utils.PortStateHistory))
 
 try:
     TestHelper.printSystemInfo("BEGIN")
@@ -58,10 +64,18 @@ try:
     specificExtraNodeopArgs={}
     # non-producing nodes are at the end of the cluster's nodes, so reserving the last one for state_history_plugin
     shipNodeNum = totalNodes - 1
-    specificExtraNodeopArgs[shipNodeNum]="--plugin sysio::state_history_plugin --sync-fetch-span 200 --plugin sysio::net_api_plugin "
+    specificExtraNodeopArgs[shipNodeNum]=(
+        "--plugin sysio::state_history_plugin "
+        "--sync-fetch-span 200 "
+        f"--state-history-endpoint 127.0.0.1:{Utils.getPort(Utils.PortStateHistory)} "
+        "--plugin sysio::net_api_plugin "
+    )
 
     if args.unix_socket:
-        specificExtraNodeopArgs[shipNodeNum] += "--state-history-unix-socket-path ship.sock"
+        shipUnixSocketPath = getShipUnixSocketPath()
+        if os.path.exists(shipUnixSocketPath):
+            os.unlink(shipUnixSocketPath)
+        specificExtraNodeopArgs[shipNodeNum] += f"--state-history-unix-socket-path {shipUnixSocketPath}"
 
     if cluster.launch(pnodes=totalProducerNodes,
                       totalNodes=totalNodes, totalProducers=totalProducers, activateIF=activateIF,
@@ -81,7 +95,9 @@ try:
     shipClient = "tests/ship_client"
     cmd = "%s --num-requests %d" % (shipClient, args.num_requests)
     if args.unix_socket:
-        cmd += " -a ws+unix:///%s" % (Utils.getNodeDataDir(shipNodeNum, "ship.sock"))
+        cmd += " -a ws+unix:///%s" % (shipUnixSocketPath)
+    else:
+        cmd += " -a 127.0.0.1:%d" % (Utils.getPort(Utils.PortStateHistory))
     if Utils.Debug: Utils.Print("cmd: %s" % (cmd))
     clients = []
     files = []
@@ -118,7 +134,7 @@ try:
     minLastBN = sys.maxsize
     for index in range(0, len(clients)):
         done = False
-        shipClientErrorFile = "%s%d.err" % (shipClientFilePrefix, i)
+        shipClientErrorFile = "%s%d.err" % (shipClientFilePrefix, index)
         with open(shipClientErrorFile, "r") as errFile:
             statuses = None
             lines = errFile.readlines()
@@ -139,7 +155,7 @@ try:
                 if statusDesc == "error":
                     Utils.errorExit("ship_client reporting error see: %s." % (shipClientErrorFile))
 
-        assert done, Print("ERROR: Did not find a \"done\" status for client %d" % (i))
+        assert done, Print("ERROR: Did not find a \"done\" status for client %d" % (index))
 
     Print("All clients active from block num: %s to block_num: %s." % (maxFirstBN, minLastBN))
 
@@ -194,6 +210,8 @@ finally:
     if shipTempDir is not None:
         if testSuccessful and not args.keep_logs:
             shutil.rmtree(shipTempDir, ignore_errors=True)
+    if shipUnixSocketPath is not None and os.path.exists(shipUnixSocketPath):
+        os.unlink(shipUnixSocketPath)
 
 errorCode = 0 if testSuccessful else 1
 exit(errorCode)

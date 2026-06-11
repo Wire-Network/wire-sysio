@@ -12,6 +12,8 @@
 #include <regex>
 #include <string>
 
+#include "test_port_shard.hpp"
+
 using mvo = fc::mutable_variant_object;
 
 namespace bpo = boost::program_options;
@@ -26,7 +28,7 @@ int main(int argc, char* argv[]) {
 
    bpo::options_description cli("ship_streamer command line options");
    bool help = false;
-   std::string socket_address = "127.0.0.1:8080";
+   std::string socket_address = sysio::testing::default_state_history_endpoint();
    uint32_t start_block_num = 1;
    uint32_t end_block_num = std::numeric_limits<u_int32_t>::max()-1;
    bool irreversible_only = false;
