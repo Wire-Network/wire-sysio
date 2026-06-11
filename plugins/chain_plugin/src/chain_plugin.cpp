@@ -1529,7 +1529,13 @@ void chain_plugin_impl::verify_snapshot_attestation(const signed_block_ptr& lib_
          p.code        = config::system_account_name;
          p.scope       = config::system_account_name.to_string();
          p.table       = snapshot_attest::table_snaprecords;
-         p.lower_bound = std::to_string(snap_block_num);
+         // Bounds on the unified table read are JSON key *objects* keyed by the table's ABI
+         // key_names -- be_key_codec::encode_key rejects bare scalars -- so the bound must be
+         // {"block_num": N}, not "N". A bare scalar throws inside the scan, which run_scan
+         // collapses to an empty result, making every lookup silently miss.
+         p.lower_bound = fc::json::to_string(
+            fc::mutable_variant_object()(snapshot_attest::field::block_num, snap_block_num),
+            fc::time_point::maximum());
          p.limit       = 1;
          p.values_only = true;
 

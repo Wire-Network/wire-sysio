@@ -15,6 +15,8 @@ from TestHarness.TestHelper import AppArgs
 #  - Snapshot hash voting (votesnaphash) with quorum
 #  - Attested record creation and querying (snaprecords table)
 #  - Snapshot restart preserves attestation records
+#  - chain_plugin verifies the loaded snapshot against the on-chain
+#    attestation and logs the successful verification
 #
 #  Cluster layout:
 #    Node 0: producer (defproducera) — takes snapshots, pushes actions
@@ -273,6 +275,9 @@ try:
     #   5. Node 2 syncs from producing nodes (0 and 1) to catch up
     #   6. Once LIB advances past snapshot block, verification triggers
     #   7. Verify attestation records are accessible on synced node
+    #   8. Assert node 2 logged successful attestation verification of the
+    #      loaded snapshot (proves verify_snapshot_attestation() ran to a
+    #      terminal success, not just that the table synced)
     Print("=== Test 4: Load attested snapshot, sync, and verify ===")
 
     Print("Wait for LIB to advance past earlier attestation blocks")
@@ -340,6 +345,18 @@ try:
 
     found = any(r["value"]["block_num"] == attestBlockNum for r in records)
     assert found, f"Attestation for block {attestBlockNum} not found after sync"
+
+    # The table read above proves the record synced into state, but would still
+    # pass if chain_plugin's verification skipped early. Assert the restarted
+    # node actually logged the terminal verification success for the loaded
+    # snapshot's exact block and hash. Verification stays pending until the
+    # snaprecords row is visible in synced state, so poll the log rather than
+    # checking once.
+    Print("Verify chain_plugin logged successful attestation verification")
+    verifiedLogLine = (f"Snapshot attestation verified successfully for block #{attestBlockNum}: "
+                       f"hash {attestRootHash} matches on-chain record")
+    assert Utils.waitForBool(lambda: validationNode.findInLog(verifiedLogLine) is not None, timeout=90), \
+        f"Restarted node did not log successful attestation verification: '{verifiedLogLine}'"
 
     Print("Test 4 PASSED: Attested snapshot loaded, synced, and verified")
 
