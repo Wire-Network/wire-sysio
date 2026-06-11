@@ -184,6 +184,15 @@ jobs:
           touch build/debug_write_test 2>&1 || echo "Cannot write to build/"
           rm -f build/debug_write_test || true
 
+      - name: Restore CTest cost data
+        uses: actions/cache/restore@v5
+        with:
+          # CTest uses this file to schedule higher-cost tests first when running with -j.
+          path: build/Testing/Temporary/CTestCostData.txt
+          key: ctest-cost-${{ matrix.platform }}-${{ github.sha }}
+          restore-keys: |
+            ctest-cost-${{ matrix.platform }}-
+
       - name: Run Parallel Tests
         env:
           DOCKER_HOST: ${{ env.DOCKER_HOST }}
@@ -203,6 +212,14 @@ jobs:
           test_jobs="$(nproc)"
           echo "Running sharded NP/LR tests with ${test_jobs} jobs"
           ctest --output-on-failure -j "${test_jobs}" -L "(nonparallelizable_tests|long_running_tests)" --timeout 2700
+
+      - name: Save CTest cost data
+        if: ${{ always() && hashFiles('build/Testing/Temporary/CTestCostData.txt') != '' }}
+        uses: actions/cache/save@v5
+        with:
+          # Caches are immutable, so save each run under a unique key and restore by platform prefix.
+          path: build/Testing/Temporary/CTestCostData.txt
+          key: ctest-cost-${{ matrix.platform }}-${{ github.run_id }}-${{ github.run_attempt }}
 
       - name: Upload core files from failed tests
         uses: actions/upload-artifact@v6
