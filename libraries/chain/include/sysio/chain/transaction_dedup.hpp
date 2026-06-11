@@ -7,16 +7,24 @@
 
 #include <deque>
 #include <filesystem>
+#include <set>
 #include <utility>
 #include <vector>
 
 namespace sysio::chain {
 
 /// High-performance transaction deduplication index.
-/// Replaces the chainbase transaction_multi_index with O(1) amortized operations.
+/// Replaces the chainbase transaction_multi_index with O(1) membership tests.
 ///
 /// Supports revision-based undo (like chainbase) so that pop_block during a fork
 /// switch correctly restores the dedup state.
+///
+/// Determinism contract: the entry set and its serialized order are a pure function of the
+/// logical chain state, independent of the path a node took to reach it (live sync, replay,
+/// fork switches, snapshot load). The sorted index makes serialization order canonical, and
+/// clear_expired removes ALL expired entries (a complete prefix of the sorted order), so two
+/// honest nodes at the same block always serialize byte-identical sections. This matters
+/// because the serialized form feeds calculate_integrity_hash and snapshots.
 class transaction_dedup {
 public:
    using dedup_entry = std::pair<transaction_id_type, fc::time_point_sec>;
@@ -34,8 +42,8 @@ public:
    /// O(1) membership test.
    bool is_known(const transaction_id_type& id) const;
 
-   /// Remove expired transactions, saving removed entries in the current block
-   /// revision so they can be restored on undo. Returns {num_removed, total_before_removal}.
+   /// Remove ALL entries with expiration earlier than block_time, saving removed entries in the
+   /// current block revision so they can be restored on undo. Returns {num_removed, total_before_removal}.
    std::pair<uint32_t, size_t> clear_expired(fc::time_point block_time);
 
    /// Transaction-level undo session management (within current block).
@@ -58,31 +66,55 @@ public:
    /// Called when LIB advances (mirrors chainbase db.commit(block_num)).
    void commit_to_lib(uint32_t block_num);
 
-   /// Persistence — uses snapshot format for integrity (BLAKE3) and code reuse.
+   /// Persistence -- uses snapshot format for integrity (BLAKE3) and code reuse.
    void write_to_file(const std::filesystem::path& filepath) const;
    bool read_from_file(const std::filesystem::path& filepath);
 
-   /// Snapshot support.
+   /// Snapshot support. Rows are written in (expiration, id) order -- canonical for any node at
+   /// the same logical state -- and re-sorted on read, so snapshots produced by older versions
+   /// (insertion order) load correctly.
    void add_to_snapshot(const snapshot_writer_ptr& snapshot) const;
    void read_from_snapshot(const snapshot_reader_ptr& snapshot);
 
    size_t size() const { return map_.size(); }
 
 private:
-   boost::unordered_flat_map<transaction_id_type, fc::time_point_sec> map_;
-   std::deque<dedup_entry> deque_;
+   /// White-box introspection for unit tests (e.g. asserting the undo bookkeeping stays empty
+   /// when no undo context is active); defined by the test translation unit only.
+   friend struct transaction_dedup_test_access;
+
+   /// Sorted-index key: (expiration, id). Expiration first so clear_expired removes a complete
+   /// prefix; id second to break ties canonically.
+   using sorted_entry = std::pair<fc::time_point_sec, transaction_id_type>;
 
    /// Per-block revision for undo support. Tracks what changed so it can be reversed.
    struct block_revision {
       uint32_t                 block_num = 0;
-      size_t                   deque_size_at_start = 0;
-      std::vector<dedup_entry> expired;           // entries removed by clear_expired (restorable on undo)
+      std::vector<dedup_entry> added;             // entries recorded during this block (removed on undo)
+      std::vector<dedup_entry> expired;           // entries removed by clear_expired (restored on undo)
    };
+
+   /// Re-insert entries removed by clear_expired during the given revision. The sorted index
+   /// makes reinsertion order irrelevant, so undo reproduces the exact pre-block state (and
+   /// serialization order) on every node.
+   void restore_expired(const block_revision& rev);
+
+   /// Remove entries recorded during the current (pending) block from map_ and index_.
+   void erase_current_added_from(size_t first);
+
+   boost::unordered_flat_map<transaction_id_type, fc::time_point_sec> map_;
+   std::set<sorted_entry> index_;   // same contents as map_, in canonical (expiration, id) order
 
    std::deque<block_revision>    committed_revisions_;  // committed blocks (trimmed at LIB)
    std::optional<block_revision> pending_revision_;     // current in-progress block
 
-   std::vector<size_t> session_stack_;  // transaction-level undo within current block
+   /// Entries recorded since block start while an undo context (block revision or session) was
+   /// active, in record order. Pure undo bookkeeping for the current block (session watermarks
+   /// index into it); never serialized, so its insertion ordering cannot leak into snapshots or
+   /// the integrity hash. Records made with no undo context (irreversible replay) bypass it --
+   /// they are not undoable, and appending them would grow this vector for an entire replay.
+   std::vector<dedup_entry> current_added_;
+   std::vector<size_t>      session_stack_;  // watermarks into current_added_ for trx-level undo
 };
 
 /// Snapshot row type for transaction dedup entries.

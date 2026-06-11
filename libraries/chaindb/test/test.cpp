@@ -502,6 +502,74 @@ BOOST_AUTO_TEST_CASE(shared_vector_apis_segment_alloc) {
    BOOST_REQUIRE(lost == num_blocks_allocated * 8 || lost == num_blocks_allocated * 16);
 }
 
+// -------------------------------------------------------------------------------------------
+//   small_size_allocator: zero-byte allocations take the smallest size class (malloc(0)
+//   semantics -- valid, unique, deallocatable pointer) instead of (0 - 1) wrapping past the
+//   end of the size-class array in release builds.
+// -------------------------------------------------------------------------------------------
+BOOST_AUTO_TEST_CASE(small_size_allocator_zero_size) {
+   temp_directory temp_dir;
+   const auto& temp = temp_dir.path();
+
+   pinnable_mapped_file pmf(temp, true, 1024 * 1024, false, pinnable_mapped_file::map_mode::mapped);
+   auto ss_alloc = pinnable_mapped_file::get_small_size_allocator((std::byte*)pmf.get_segment_manager());
+
+   auto p0 = ss_alloc->allocate(0);
+   auto p1 = ss_alloc->allocate(0);
+   BOOST_REQUIRE(p0);
+   BOOST_REQUIRE(p1);
+   BOOST_REQUIRE(p0 != p1); // live zero-size allocations are distinct
+   ss_alloc->deallocate(p0, 0);
+   ss_alloc->deallocate(p1, 0);
+
+   // round-trip again through the freelist without corruption
+   auto p2 = ss_alloc->allocate(0);
+   BOOST_REQUIRE(p2);
+   ss_alloc->deallocate(p2, 0);
+}
+
+// -------------------------------------------------------------------------------------------
+//   chainbase_node_allocator::preallocate: accounts for capacity already on hand (freelist +
+//   unconsumed block remnant) instead of stranding the remnant, and carves enough that the
+//   requested node count is satisfiable without touching the segment again.
+// -------------------------------------------------------------------------------------------
+BOOST_AUTO_TEST_CASE(node_allocator_preallocate_accounting) {
+   temp_directory temp_dir;
+   const auto& temp = temp_dir.path();
+
+   pinnable_mapped_file pmf(temp, true, 8 * 1024 * 1024, false, pinnable_mapped_file::map_mode::mapped);
+   auto seg_mgr = pmf.get_segment_manager();
+
+   struct test_node { char data[64]; };
+   chainbase::node_allocator<test_node> alloc(seg_mgr);
+
+   // Warm the allocator: carve a batch, consume one node, return it to the freelist.
+   auto p = alloc.allocate(1);
+   alloc.deallocate(p, 1);
+   const size_t on_hand_before = alloc.freelist_memory_usage();
+   BOOST_REQUIRE_GT(on_hand_before, 0u); // freelist entry + block remnant
+
+   // A request satisfiable from on-hand capacity must not carve (or strand) anything.
+   alloc.preallocate(1);
+   BOOST_REQUIRE_EQUAL(alloc.freelist_memory_usage(), on_hand_before);
+
+   // A large request keeps the prior remnant reachable and provides >= num nodes of capacity.
+   constexpr size_t num = 1000;
+   alloc.preallocate(num);
+   BOOST_REQUIRE_GE(alloc.freelist_memory_usage(), num * sizeof(test_node));
+
+   // The preallocated capacity covers num allocations without another segment carve.
+   const size_t seg_free_before = seg_mgr->get_free_memory();
+   std::vector<decltype(alloc.allocate(1))> nodes;
+   nodes.reserve(num);
+   for (size_t i = 0; i < num; ++i)
+      nodes.push_back(alloc.allocate(1));
+   BOOST_REQUIRE_EQUAL(seg_mgr->get_free_memory(), seg_free_before);
+
+   for (auto& n : nodes)
+      alloc.deallocate(n, 1);
+}
+
 // -----------------------------------------------------------------------------
 //   Test `shared_cow_string` APIs - in addition to what's already tested above
 // -----------------------------------------------------------------------------

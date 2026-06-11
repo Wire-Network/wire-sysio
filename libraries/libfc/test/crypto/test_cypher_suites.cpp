@@ -367,6 +367,35 @@ BOOST_AUTO_TEST_CASE(test_ed_sig_str) try {
    BOOST_CHECK_EQUAL(sig.to_string({}), test_sig2.to_string({}));
 } FC_LOG_AND_RETHROW();
 
+// --- ed25519 recovery KAT: public_key::recover is the single verification path shared by
+// transaction authorization, the recover_key intrinsic, and the assert_recover_key intrinsic.
+// Pins that (a) recover returns the signer's embedded pub, (b) the payload actually signed is
+// the HEX-ENCODED digest (Phantom-wallet compatibility -- see ed::private_key_shim::sign_sha256),
+// not the raw 32 digest bytes, and (c) recovery against a different digest throws rather than
+// returning a key. A host-side ed verify that disagrees on (b) -- as assert_recover_key once
+// did by verifying over the raw bytes -- rejects every signature this path accepts.
+BOOST_AUTO_TEST_CASE(test_ed_recovery) try {
+   auto priv = private_key::generate(private_key::key_type::ed);
+   auto pub = priv.get_public_key();
+   auto digest = sha256::hash(std::string("wire ed recovery payload"));
+   auto sig = priv.sign(digest);
+
+   // (a) full-path recovery agrees with the signer's public key
+   auto recovered = public_key::recover(sig, digest);
+   BOOST_CHECK_EQUAL(recovered.to_string({}), pub.to_string({}));
+
+   // (b) the signed payload is the hex-encoded digest, not the raw digest bytes
+   auto& ed_sig = sig.get<ed::signature_shim>();
+   auto& ed_pub = pub.get<ed::public_key_shim>();
+   const std::string hex = fc::to_hex(digest.data(), digest.data_size());
+   BOOST_TEST( ed_sig.verify_solana(reinterpret_cast<const uint8_t*>(hex.data()), hex.size(), ed_pub));
+   BOOST_TEST(!ed_sig.verify_solana(reinterpret_cast<const uint8_t*>(digest.data()), digest.data_size(), ed_pub));
+
+   // (c) a mismatched digest must not recover
+   auto wrong_digest = sha256::hash(std::string("some other payload"));
+   BOOST_CHECK_THROW(public_key::recover(sig, wrong_digest), fc::exception);
+} FC_LOG_AND_RETHROW();
+
 BOOST_AUTO_TEST_CASE(test_bls_pub_str) try {
    auto pub_str = "PUB_BLS_no1gZTuy-0iL_FVrc6q4ow5KtTtdv6ZQ3Cq73Jwl32qRNC9AEQaWsESaoN4Y9NAVRmRGnbEekzgo6YlwbztPeoWhWzvHiOALTFKegRXlRxVbM4naOg33cZOSdS25i_MXywteRA";
    auto pub_key = fc::crypto::public_key::from_string(pub_str, public_key::key_type::bls);

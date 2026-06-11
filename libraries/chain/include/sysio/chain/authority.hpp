@@ -225,6 +225,13 @@ struct authority {
    }
 };
 
+/// The exact authority genesis assigns to its deliberately unsatisfiable native permissions
+/// (sysio.null@owner, sysio.null@active, sysio.prods@owner): threshold 1 with no keys and no
+/// accounts. No weight combination can reach the threshold, so the permission can never be
+/// satisfied -- and, since satisfying it is a precondition of updateauth, never altered after
+/// genesis. validate() deliberately rejects this shape as threshold-unreachable.
+inline authority genesis_empty_authority() { return authority(1, {}, {}); }
+
 
 struct shared_authority {
    explicit shared_authority() = default;
