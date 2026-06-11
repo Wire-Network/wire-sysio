@@ -1897,14 +1897,10 @@ producer_plugin::schedule_snapshot(const chain::snapshot_scheduler::snapshot_req
    if(sri.end_block_num == 0)
       sri.end_block_num = std::numeric_limits<uint32_t>::max();
 
-   // just rethrow errors to caller
-   auto next = [](const chain::next_function_variant<snapshot_scheduler::snapshot_information>& result) {
-      if(std::holds_alternative<fc::exception_ptr>(result)) {
-         std::get<fc::exception_ptr>(result)->rethrow();
-      }
-   };
-
-   return my->_snapshot_scheduler.schedule_snapshot(sri, std::move(next));
+   // validation errors are thrown to the HTTP caller; store no completion callback so execution
+   // results of scheduled snapshots are logged by the scheduler as before (only create_snapshot
+   // requests carry a response callback)
+   return my->_snapshot_scheduler.schedule_snapshot(sri, {});
 }
 
 chain::snapshot_scheduler::snapshot_schedule_result

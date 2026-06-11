@@ -191,8 +191,9 @@ public:
    void on_irreversible_block(const signed_block_ptr& lib, const block_id_type& block_id, const chain::controller& chain);
 
    // snapshot scheduler handlers
-   // schedule a snapshot request; next is called with the snapshot_information (or error) when a
-   // snapshot produced by this request is finalized, and with any scheduling validation error
+   // schedule a snapshot request; scheduling validation errors are thrown to the caller.
+   // next (may be empty) is stored on the request and called with the snapshot_information
+   // (or execution error) when a snapshot produced by this request completes
    snapshot_schedule_result schedule_snapshot(const snapshot_request_information& sri, next_function<snapshot_information> next);
    snapshot_schedule_result unschedule_snapshot(uint32_t sri);
    // remove requests that are expired at the given irreversible block height
