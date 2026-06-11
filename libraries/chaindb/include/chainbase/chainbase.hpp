@@ -372,6 +372,36 @@ namespace chainbase {
             _index_list.push_back( new_index );
          }
 
+         /// Register a non-segment undo participant (e.g. a heap-backed structure such as the
+         /// transaction dedup) so that start_undo_session / squash / undo / commit / set_revision
+         /// drive it in lockstep with the segment indices -- removing the need for any caller to
+         /// hand-pair its own undo operations with the database's. The participant must already be
+         /// at a revision range consistent with the existing indices, exactly as add_index requires,
+         /// so a stale or mismatched participant is rejected at registration rather than diverging
+         /// silently later.
+         void add_undo_participant( std::unique_ptr<abstract_index> participant ) {
+            const uint32_t type_id = participant->type_id();
+            if( !( _index_map.size() <= type_id || _index_map[ type_id ] == nullptr ) ) {
+               BOOST_THROW_EXCEPTION( std::logic_error( participant->type_name() + "::type_id is already in use" ) );
+            }
+            if( _index_list.size() > 0 ) {
+               auto expected = _index_list.front()->undo_stack_revision_range();
+               auto got      = participant->undo_stack_revision_range();
+               if( got.first != expected.first || got.second != expected.second ) {
+                  BOOST_THROW_EXCEPTION( std::logic_error(
+                     "undo participant " + participant->type_name() + " has revision range [" +
+                     std::to_string(got.first) + ", " + std::to_string(got.second) +
+                     "] inconsistent with the database (revision range [" +
+                     std::to_string(expected.first) + ", " + std::to_string(expected.second) +
+                     "]); corrupted or mismatched state?" ) );
+               }
+            }
+            if( type_id >= _index_map.size() )
+               _index_map.resize( type_id + 1 );
+            _index_list.push_back( participant.get() );
+            _index_map[ type_id ].reset( participant.release() );
+         }
+
          segment_manager* get_segment_manager() {
             return _db_file.get_segment_manager();
          }
