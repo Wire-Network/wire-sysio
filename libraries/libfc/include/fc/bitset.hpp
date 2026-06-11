@@ -213,8 +213,7 @@ inline void to_variant(const fc::bitset& bs, fc::variant& v) {
 }
 
 inline void from_variant(const fc::variant& v, fc::bitset& bs) {
-   std::string s = v.get_string();
-   bs            = fc::bitset(s);
+   bs = fc::bitset(v.get_string());
 }
 
 } // namespace fc

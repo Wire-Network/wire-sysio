@@ -62,6 +62,15 @@ private:
    /// avoid re-delivering the same envelope inside a single epoch across
    /// cron re-fires.
    uint32_t _last_outbound_epoch = 0;
+
+   /// Last epoch for which a path-2 consensus-retry re-delivery was issued.
+   /// Bounds the retry at one tx per epoch even when cron fires repeatedly
+   /// after the boundary elapses but before consensus tips. The retry
+   /// itself is idempotent on both the ETH and SOL outpost contracts:
+   /// re-submitting the same envelope from the same operator re-runs the
+   /// dual-path consensus check without re-recording the delivery. See
+   /// .claude/rules/opp-consensus.md.
+   uint32_t _last_consensus_retry_epoch = 0;
 };
 
 } // namespace sysio

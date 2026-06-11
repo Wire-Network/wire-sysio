@@ -14,6 +14,54 @@
             "fields": []
         },
         {
+            "name": "blocklog_entry",
+            "base": "",
+            "fields": [
+                {
+                    "name": "epoch_index",
+                    "type": "uint32"
+                },
+                {
+                    "name": "reason",
+                    "type": "EmissionsBlockReason"
+                },
+                {
+                    "name": "attempted_emission",
+                    "type": "int64"
+                },
+                {
+                    "name": "treasury_remaining",
+                    "type": "int64"
+                },
+                {
+                    "name": "sysio_balance",
+                    "type": "int64"
+                },
+                {
+                    "name": "first_blocked_at",
+                    "type": "uint32"
+                },
+                {
+                    "name": "last_retry_at",
+                    "type": "uint32"
+                },
+                {
+                    "name": "retry_count",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "blocklog_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "epoch_index",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "epoch_config",
             "base": "",
             "fields": [
@@ -34,7 +82,7 @@
                     "type": "uint32"
                 },
                 {
-                    "name": "attestation_retention_epoch_count",
+                    "name": "epoch_retention_envelope_log_count",
                     "type": "uint32"
                 }
             ]
@@ -74,72 +122,14 @@
             ]
         },
         {
-            "name": "initgroups",
-            "base": "",
-            "fields": []
-        },
-        {
-            "name": "outpost_info",
-            "base": "",
-            "fields": [
-                {
-                    "name": "id",
-                    "type": "uint64"
-                },
-                {
-                    "name": "chain_kind",
-                    "type": "ChainKind"
-                },
-                {
-                    "name": "chain_id",
-                    "type": "uint32"
-                },
-                {
-                    "name": "last_inbound_msg_id",
-                    "type": "checksum256"
-                },
-                {
-                    "name": "last_outbound_msg_id",
-                    "type": "checksum256"
-                },
-                {
-                    "name": "last_inbound_epoch",
-                    "type": "uint32"
-                },
-                {
-                    "name": "last_outbound_epoch",
-                    "type": "uint32"
-                }
-            ]
-        },
-        {
-            "name": "outpost_key",
-            "base": "",
-            "fields": [
-                {
-                    "name": "id",
-                    "type": "uint64"
-                }
-            ]
-        },
-        {
             "name": "pause",
             "base": "",
             "fields": []
         },
         {
-            "name": "regoutpost",
+            "name": "schbatchgps",
             "base": "",
-            "fields": [
-                {
-                    "name": "chain_kind",
-                    "type": "ChainKind"
-                },
-                {
-                    "name": "chain_id",
-                    "type": "uint32"
-                }
-            ]
+            "fields": []
         },
         {
             "name": "setconfig",
@@ -162,7 +152,7 @@
                     "type": "uint32"
                 },
                 {
-                    "name": "attestation_retention_epoch_count",
+                    "name": "epoch_retention_envelope_log_count",
                     "type": "uint32"
                 }
             ]
@@ -180,18 +170,13 @@
             "ricardian_contract": ""
         },
         {
-            "name": "initgroups",
-            "type": "initgroups",
-            "ricardian_contract": ""
-        },
-        {
             "name": "pause",
             "type": "pause",
             "ricardian_contract": ""
         },
         {
-            "name": "regoutpost",
-            "type": "regoutpost",
+            "name": "schbatchgps",
+            "type": "schbatchgps",
             "ricardian_contract": ""
         },
         {
@@ -207,6 +192,14 @@
     ],
     "tables": [
         {
+            "name": "blocklog",
+            "type": "blocklog_entry",
+            "index_type": "i64",
+            "key_names": ["epoch_index"],
+            "key_types": ["uint64"],
+            "table_id": 60163
+        },
+        {
             "name": "epochcfg",
             "type": "epoch_config",
             "index_type": "i64",
@@ -221,21 +214,6 @@
             "key_names": ["name"],
             "key_types": ["name"],
             "table_id": 59387
-        },
-        {
-            "name": "outposts",
-            "type": "outpost_info",
-            "index_type": "i64",
-            "key_names": ["id"],
-            "key_types": ["uint64"],
-            "table_id": 18067,
-            "secondary_indexes": [
-                {
-                    "name": "bychain",
-                    "key_type": "uint64",
-                    "table_id": 26575
-                }
-            ]
         }
     ],
     "ricardian_clauses": [],
@@ -243,27 +221,27 @@
     "action_results": [],
     "enums": [
         {
-            "name": "ChainKind",
+            "name": "EmissionsBlockReason",
             "type": "int32",
             "values": [
                 {
-                    "name": "CHAIN_KIND_UNKNOWN",
+                    "name": "EMISSIONS_BLOCK_REASON_UNSPECIFIED",
                     "value": 0
                 },
                 {
-                    "name": "CHAIN_KIND_WIRE",
+                    "name": "EMISSIONS_BLOCK_REASON_CONFIG_MISSING",
                     "value": 1
                 },
                 {
-                    "name": "CHAIN_KIND_ETHEREUM",
+                    "name": "EMISSIONS_BLOCK_REASON_STATE_UNINITIALIZED",
                     "value": 2
                 },
                 {
-                    "name": "CHAIN_KIND_SOLANA",
+                    "name": "EMISSIONS_BLOCK_REASON_TREASURY_EXHAUSTED",
                     "value": 3
                 },
                 {
-                    "name": "CHAIN_KIND_SUI",
+                    "name": "EMISSIONS_BLOCK_REASON_BALANCE_INSUFFICIENT",
                     "value": 4
                 }
             ]

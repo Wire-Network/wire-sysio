@@ -1,0 +1,1463 @@
+// Adversarial probe of the non-kv host intrinsics.
+// Companion to unittests/test-contracts/kv_intrinsic_probe/ which covers the
+// 22 kv_* intrinsics. This contract exercises the remaining host ABI with
+// inputs that CDT's wrappers would never emit -- zero-length spans,
+// wasm-boundary-crossing pointers, misaligned pointers for the
+// aligned_ptr<fc::sha*>-style aligned-proxy intrinsics, pointer-aliased
+// arguments, null pointer + non-zero size, and the specific edge values
+// that the 128-bit compiler_builtins and softfloat entry points are
+// expected to handle.
+//
+// Using extern "C" + __attribute__((sysio_wasm_import)) for every intrinsic
+// at the call site (not via <sysio/crypto.hpp>, <sysio/privileged.hpp>, etc.)
+// makes the ABI being exercised explicit at the point of use, and lets a
+// reviewer see the adversarial input directly without tracing through CDT
+// wrappers.
+//
+// One [[sysio::action]] per probe. Accepted-behavior actions return normally;
+// rejection probes call the host intrinsic with adversarial input and rely on
+// the host to throw a specific exception type that the Boost driver pins via
+// BOOST_CHECK_THROW.
+
+#include <sysio/sysio.hpp>
+#include <sysio/transaction.hpp>  // raw::{read_transaction, get_action, get_context_free_data}
+#include <sysio/crypto.hpp>       // public_key -- decoding the authority returned by get_permission_lower_bound
+#include <sysio/time.hpp>         // time_point -- the last_updated field of a permission record
+#include <cstring>
+#include <cstdint>
+#include <vector>
+
+// -----------------------------------------------------------------------------
+// Raw host intrinsic declarations. Listed here instead of via <sysio/...> so
+// every adversarial input is explicit about the ABI it is exercising.
+// -----------------------------------------------------------------------------
+extern "C" {
+
+// --- Hash intrinsics (aligned_span<const char> data, aligned_ptr<[const] fc::sha*> hash) ---
+__attribute__((sysio_wasm_import))
+void sha256( const char* data, uint32_t length, void* hash );
+__attribute__((sysio_wasm_import))
+void sha1( const char* data, uint32_t length, void* hash );
+__attribute__((sysio_wasm_import))
+void sha512( const char* data, uint32_t length, void* hash );
+__attribute__((sysio_wasm_import))
+void ripemd160( const char* data, uint32_t length, void* hash );
+
+__attribute__((sysio_wasm_import))
+void assert_sha256( const char* data, uint32_t length, const void* hash );
+__attribute__((sysio_wasm_import))
+void assert_sha1( const char* data, uint32_t length, const void* hash );
+__attribute__((sysio_wasm_import))
+void assert_sha512( const char* data, uint32_t length, const void* hash );
+__attribute__((sysio_wasm_import))
+void assert_ripemd160( const char* data, uint32_t length, const void* hash );
+
+// --- Signature recovery (aligned_ptr<const fc::sha256> digest, aligned_span<[const] char>) ---
+__attribute__((sysio_wasm_import))
+int32_t recover_key( const void* digest, const char* sig, uint32_t siglen,
+                     char* pub, uint32_t publen );
+__attribute__((sysio_wasm_import))
+void    assert_recover_key( const void* digest, const char* sig, uint32_t siglen,
+                            const char* pub, uint32_t publen );
+
+// --- Privileged intrinsics registered with privileged_check precondition
+//     (libraries/chain/webassembly/runtimes/sys-vm.cpp). Calling from a
+//     non-privileged account throws `unaccessible_api` BEFORE the host body
+//     runs; the body itself may have further guards (digest validity,
+//     read-only tx, range checks on resource limits, etc.). ---
+__attribute__((sysio_wasm_import))
+void preactivate_feature( const void* feature_digest );  // aligned_ptr<const digest_type>
+
+// --- P2 -- resource/auth/producer intrinsics ---
+//  get_resource_limits: 3 x aligned_ptr<int64_t, 8> out-params
+//  set_resource_limits: priv-gated, plain scalar args
+//  check_transaction_authorization: aligned_span<const char> x 3
+//  get_active_producers: aligned_span<account_name> out (uint64_t[])
+//  set_proposed_producers[_ex]: priv-gated, aligned_span<const char>
+//  get/set_blockchain_parameters_packed: aligned_span<[const] char>
+__attribute__((sysio_wasm_import))
+void get_resource_limits( uint64_t account, void* ram_bytes,
+                          void* net_weight, void* cpu_weight );
+__attribute__((sysio_wasm_import))
+void set_resource_limits( uint64_t account, int64_t ram_bytes,
+                          int64_t net_weight, int64_t cpu_weight );
+
+__attribute__((sysio_wasm_import))
+int32_t check_transaction_authorization( const char* trx_data,  uint32_t trx_len,
+                                         const char* pubs_data, uint32_t pubs_len,
+                                         const char* perms_data, uint32_t perms_len );
+
+// get_permission_lower_bound: aligned_span<char> out-param (buffer). Wire-specific intrinsic
+// (libraries/chain/webassembly/permission.cpp) backing CDT's sysio::get_permission wrapper, used on-chain by
+// sysio.roa::active_key_matches and sysio.uwrit to read an account's authority. by_owner lower_bound on
+// (account, permission); returns -1 when no permission for `account` exists at/after the key, else the full
+// serialized record size (which may exceed buffer_size -- the size-query-then-fetch contract). The serialized
+// payload is pack(perm_name) ++ pack(parent_name) ++ pack(last_updated) ++ pack(authority).
+__attribute__((sysio_wasm_import))
+int32_t get_permission_lower_bound( uint64_t account, uint64_t permission,
+                                    char* buffer, uint32_t buffer_size );
+
+__attribute__((sysio_wasm_import))
+int32_t get_active_producers( void* producers, uint32_t datalen );
+__attribute__((sysio_wasm_import))
+int64_t set_proposed_producers( const char* data, uint32_t datalen );
+
+__attribute__((sysio_wasm_import))
+uint32_t get_blockchain_parameters_packed( char* data, uint32_t datalen );
+__attribute__((sysio_wasm_import))
+void     set_blockchain_parameters_packed( const char* data, uint32_t datalen );
+
+// set_action_return_value lives only in capi/sysio/action.h (no
+// sysio::internal_use_do_not_use wrapper in contracts/sysio/action.hpp),
+// so it is declared here directly. Signature matches the capi header.
+__attribute__((sysio_wasm_import))
+void set_action_return_value( void* return_value, uint32_t size );
+
+// --- 128-bit integer compiler builtins (aligned_ptr<[u]int128_t> ret) ---
+// Declaring the output as void* (rather than __int128*/&) lets the unaligned
+// probes pass an intentionally misaligned address without triggering C++
+// alignment UB on the caller side; the WASM import ABI is untyped pointers
+// and the host's argument_proxy<__int128_t*, 16> handles alignment via
+// memcpy on entry / exit.
+__attribute__((sysio_wasm_import))
+void __multi3 ( void* ret, uint64_t la, uint64_t ha, uint64_t lb, uint64_t hb );
+__attribute__((sysio_wasm_import))
+void __divti3 ( void* ret, uint64_t la, uint64_t ha, uint64_t lb, uint64_t hb );
+__attribute__((sysio_wasm_import))
+void __udivti3( void* ret, uint64_t la, uint64_t ha, uint64_t lb, uint64_t hb );
+__attribute__((sysio_wasm_import))
+void __modti3 ( void* ret, uint64_t la, uint64_t ha, uint64_t lb, uint64_t hb );
+__attribute__((sysio_wasm_import))
+void __umodti3( void* ret, uint64_t la, uint64_t ha, uint64_t lb, uint64_t hb );
+__attribute__((sysio_wasm_import))
+void __ashlti3( void* ret, uint64_t low, uint64_t high, uint32_t shift );
+__attribute__((sysio_wasm_import))
+void __ashrti3( void* ret, uint64_t low, uint64_t high, uint32_t shift );
+__attribute__((sysio_wasm_import))
+void __lshlti3( void* ret, uint64_t low, uint64_t high, uint32_t shift );
+__attribute__((sysio_wasm_import))
+void __lshrti3( void* ret, uint64_t low, uint64_t high, uint32_t shift );
+
+// --- float128 (quad) compiler builtins (aligned_ptr<float128_t> ret) ---
+__attribute__((sysio_wasm_import))
+void __addtf3 ( void* ret, uint64_t la, uint64_t ha, uint64_t lb, uint64_t hb );
+__attribute__((sysio_wasm_import))
+void __subtf3 ( void* ret, uint64_t la, uint64_t ha, uint64_t lb, uint64_t hb );
+__attribute__((sysio_wasm_import))
+void __multf3 ( void* ret, uint64_t la, uint64_t ha, uint64_t lb, uint64_t hb );
+__attribute__((sysio_wasm_import))
+void __divtf3 ( void* ret, uint64_t la, uint64_t ha, uint64_t lb, uint64_t hb );
+__attribute__((sysio_wasm_import))
+void __fixtfti( void* ret, uint64_t la, uint64_t ha );
+// __cmptf2 has no aligned_ptr -- uint64_t quad-pairs in, int32_t out; no
+// alignment concerns. Used by the probes below to verify float128 results
+// without having to hand-compute the exact destination bit pattern.
+__attribute__((sysio_wasm_import))
+int32_t __cmptf2( uint64_t la, uint64_t ha, uint64_t lb, uint64_t hb );
+__attribute__((sysio_wasm_import))
+int32_t __unordtf2( uint64_t la, uint64_t ha, uint64_t lb, uint64_t hb );
+
+} // extern "C"
+
+// action_data_size / read_action_data are the host intrinsics that feed the
+// recover_key probes their (digest, sig, pub) triple from the Boost driver.
+// CDT's <sysio/action.hpp> already declares them under sysio::internal_use_*
+// with the same sysio_wasm_import attribute, so we reuse those wrappers
+// directly (re-declaring them here collides with the CDT-provided decls).
+
+using namespace sysio;
+
+// CDT buries several host intrinsics (raw::prints / raw::sysio_assert / raw::send_inline /
+// raw::get_action / raw::read_transaction / set_action_return_value / ...) in
+// `sysio::internal_use_do_not_use`. Intentional: CDT wants contract authors
+// to go through the C++ wrappers. The probe contract IS the "do not use"
+// path -- we want the raw ABI without any CDT-side validation between us and
+// the host -- so alias it once and call through.
+namespace raw = ::sysio::internal_use_do_not_use;
+
+namespace {
+// -----------------------------------------------------------------------------
+// Hash digest sizes. Named constants per CLAUDE.md "no magic literals".
+// -----------------------------------------------------------------------------
+constexpr uint32_t SHA1_SIZE   = 20;
+constexpr uint32_t SHA256_SIZE = 32;
+constexpr uint32_t SHA512_SIZE = 64;
+constexpr uint32_t RIPE_SIZE   = 20;
+
+// -----------------------------------------------------------------------------
+// FIPS / SYSIO-canonical hash test vectors. Identical to the vectors in
+// unittests/test-contracts/test_api/test_crypto.cpp so these probes can be
+// cross-checked against that suite.
+// -----------------------------------------------------------------------------
+constexpr char TEST_ABC[]   = "abc";
+constexpr uint32_t TEST_ABC_LEN = 3;  // excludes terminator; host sees only these bytes
+
+constexpr unsigned char ABC_SHA1[SHA1_SIZE] = {
+   0xa9, 0x99, 0x3e, 0x36, 0x47, 0x06, 0x81, 0x6a, 0xba, 0x3e,
+   0x25, 0x71, 0x78, 0x50, 0xc2, 0x6c, 0x9c, 0xd0, 0xd8, 0x9d
+};
+constexpr unsigned char ABC_SHA256[SHA256_SIZE] = {
+   0xba, 0x78, 0x16, 0xbf, 0x8f, 0x01, 0xcf, 0xea,
+   0x41, 0x41, 0x40, 0xde, 0x5d, 0xae, 0x22, 0x23,
+   0xb0, 0x03, 0x61, 0xa3, 0x96, 0x17, 0x7a, 0x9c,
+   0xb4, 0x10, 0xff, 0x61, 0xf2, 0x00, 0x15, 0xad
+};
+constexpr unsigned char ABC_SHA512[SHA512_SIZE] = {
+   0xdd, 0xaf, 0x35, 0xa1, 0x93, 0x61, 0x7a, 0xba,
+   0xcc, 0x41, 0x73, 0x49, 0xae, 0x20, 0x41, 0x31,
+   0x12, 0xe6, 0xfa, 0x4e, 0x89, 0xa9, 0x7e, 0xa2,
+   0x0a, 0x9e, 0xee, 0xe6, 0x4b, 0x55, 0xd3, 0x9a,
+   0x21, 0x92, 0x99, 0x2a, 0x27, 0x4f, 0xc1, 0xa8,
+   0x36, 0xba, 0x3c, 0x23, 0xa3, 0xfe, 0xeb, 0xbd,
+   0x45, 0x4d, 0x44, 0x23, 0x64, 0x3c, 0xe8, 0x0e,
+   0x2a, 0x9a, 0xc9, 0x4f, 0xa5, 0x4c, 0xa4, 0x9f
+};
+constexpr unsigned char ABC_RIPE[RIPE_SIZE] = {
+   0x8e, 0xb2, 0x08, 0xf7, 0xe0, 0x5d, 0x98, 0x7a, 0x9b, 0x04,
+   0x4a, 0x8e, 0x98, 0xc6, 0xb0, 0x87, 0xf1, 0x5a, 0x0b, 0xfc
+};
+
+constexpr unsigned char EMPTY_SHA1[SHA1_SIZE] = {
+   0xda, 0x39, 0xa3, 0xee, 0x5e, 0x6b, 0x4b, 0x0d, 0x32, 0x55,
+   0xbf, 0xef, 0x95, 0x60, 0x18, 0x90, 0xaf, 0xd8, 0x07, 0x09
+};
+constexpr unsigned char EMPTY_SHA256[SHA256_SIZE] = {
+   0xe3, 0xb0, 0xc4, 0x42, 0x98, 0xfc, 0x1c, 0x14,
+   0x9a, 0xfb, 0xf4, 0xc8, 0x99, 0x6f, 0xb9, 0x24,
+   0x27, 0xae, 0x41, 0xe4, 0x64, 0x9b, 0x93, 0x4c,
+   0xa4, 0x95, 0x99, 0x1b, 0x78, 0x52, 0xb8, 0x55
+};
+constexpr unsigned char EMPTY_SHA512[SHA512_SIZE] = {
+   0xcf, 0x83, 0xe1, 0x35, 0x7e, 0xef, 0xb8, 0xbd,
+   0xf1, 0x54, 0x28, 0x50, 0xd6, 0x6d, 0x80, 0x07,
+   0xd6, 0x20, 0xe4, 0x05, 0x0b, 0x57, 0x15, 0xdc,
+   0x83, 0xf4, 0xa9, 0x21, 0xd3, 0x6c, 0xe9, 0xce,
+   0x47, 0xd0, 0xd1, 0x3c, 0x5d, 0x85, 0xf2, 0xb0,
+   0xff, 0x83, 0x18, 0xd2, 0x87, 0x7e, 0xec, 0x2f,
+   0x63, 0xb9, 0x31, 0xbd, 0x47, 0x41, 0x7a, 0x81,
+   0xa5, 0x38, 0x32, 0x7a, 0xf9, 0x27, 0xda, 0x3e
+};
+constexpr unsigned char EMPTY_RIPE[RIPE_SIZE] = {
+   0x9c, 0x11, 0x85, 0xa5, 0xc5, 0xe9, 0xfc, 0x54, 0x61, 0x28,
+   0x08, 0x97, 0x7e, 0xe8, 0xf5, 0x48, 0xb2, 0x25, 0x8d, 0x31
+};
+
+// -----------------------------------------------------------------------------
+// Padding used by the unaligned-pointer probes. Size picks up +3 past any
+// plausible natural alignment so that offsetting into the buffer lands the
+// hash pointer on an address that no aligned_ptr alignment requirement will
+// accept without the argument_proxy copy path engaging.
+// -----------------------------------------------------------------------------
+constexpr uint32_t UNALIGNED_OFFSET = 3;
+constexpr uint32_t BIG_INPUT_LEN    = 1024;
+
+// -----------------------------------------------------------------------------
+// Adversarial "wrong" hash used by assert_* rejection probes. All zeros is
+// guaranteed not to match any non-empty SHA-family or RIPEMD output.
+// -----------------------------------------------------------------------------
+constexpr unsigned char ZERO_HASH64[SHA512_SIZE] = {};
+
+// -----------------------------------------------------------------------------
+// recover_key action-data layout. Mirrors the shape used by
+// test_api/test_crypto.cpp's sig_hash_key_header so the Boost driver can
+// build the blob with fc::private_key / fc::signature packing.
+// -----------------------------------------------------------------------------
+struct sig_hash_key_header {
+   unsigned char hash[SHA256_SIZE];  // 32-byte digest
+   uint32_t      pk_len;             // bytes of packed public key following sig
+   uint32_t      sig_len;            // bytes of packed signature following header
+};
+constexpr uint32_t RECOVER_BUF_CAPACITY = 512;
+constexpr uint32_t MAX_RECOVERED_PUB    = 128;
+// Large buffer for the recbigwa probe -- WA sig with auth_data + client_json > 16 KiB (the subjective
+// variable-size default). Lives at file scope rather than on the wasm stack because CDT's stack is not
+// configured for >8 KiB per-frame allocations.
+constexpr uint32_t BIG_WA_BUF_CAPACITY  = 32 * 1024;
+
+// -----------------------------------------------------------------------------
+// float128 (IEEE 754 binary128) bit patterns, split into (low, high) uint64_t
+// pairs matching the host ABI. Computed by hand; validated by Python and by
+// round-tripping through __cmptf2 in the golden probes.
+//
+// Layout: 1 sign | 15 exponent | 112 fraction  (bias = 16383)
+//   1.0 = exp=16383=0x3FFF, frac=0     -> 0x3FFF_0000_0000_0000 << 64
+//   2.0 = exp=16384=0x4000, frac=0     -> 0x4000_0000_0000_0000 << 64
+//   3.0 = 1.5*2^1, exp=16384, frac bit[111]=1 -> 0x4000_8000_0000_0000 << 64
+//   6.0 = 1.5*2^2, exp=16385, frac bit[111]=1 -> 0x4001_8000_0000_0000 << 64
+//   +Inf = exp=0x7FFF, frac=0          -> 0x7FFF_0000_0000_0000 << 64
+//   qNaN = exp=0x7FFF, frac bit[111]=1 -> 0x7FFF_8000_0000_0000 << 64
+// -----------------------------------------------------------------------------
+constexpr uint64_t FP128_ZERO_LO = 0x0000000000000000ULL;
+constexpr uint64_t FP128_ZERO_HI = 0x0000000000000000ULL;
+constexpr uint64_t FP128_ONE_LO  = 0x0000000000000000ULL;
+constexpr uint64_t FP128_ONE_HI  = 0x3FFF000000000000ULL;
+constexpr uint64_t FP128_TWO_LO  = 0x0000000000000000ULL;
+constexpr uint64_t FP128_TWO_HI  = 0x4000000000000000ULL;
+constexpr uint64_t FP128_THREE_LO = 0x0000000000000000ULL;
+constexpr uint64_t FP128_THREE_HI = 0x4000800000000000ULL;
+constexpr uint64_t FP128_SIX_LO  = 0x0000000000000000ULL;
+constexpr uint64_t FP128_SIX_HI  = 0x4001800000000000ULL;
+constexpr uint64_t FP128_INF_LO  = 0x0000000000000000ULL;
+constexpr uint64_t FP128_INF_HI  = 0x7FFF000000000000ULL;
+constexpr uint64_t FP128_NAN_LO  = 0x0000000000000000ULL;
+constexpr uint64_t FP128_NAN_HI  = 0x7FFF800000000000ULL;
+
+// Large finite float128 that comfortably exceeds INT128_MAX when truncated:
+// 2^127 = exp=16383+127=0x407E, frac=0 -> 0x407E_0000_0000_0000 << 64.
+constexpr uint64_t FP128_LARGE_LO = 0x0000000000000000ULL;
+constexpr uint64_t FP128_LARGE_HI = 0x407E000000000000ULL;
+
+// -----------------------------------------------------------------------------
+// Bit-pattern constants for the 128-bit integer probes. Verification uses
+// read-back memcpy into uint64_t pairs so we never rely on the compiler
+// emitting a second call into the same intrinsic we are testing.
+// -----------------------------------------------------------------------------
+constexpr uint64_t I128_ZERO      = 0x0000000000000000ULL;
+constexpr uint64_t I128_ONE_HI    = 0x0000000000000000ULL;
+constexpr uint64_t U64_MAX        = 0xFFFFFFFFFFFFFFFFULL;
+
+// -----------------------------------------------------------------------------
+// get_permission_lower_bound record layout. A byte-for-byte mirror of CDT's
+// sysio::permission_record / perm_authority (libraries/sysiolib/contracts/sysio/permission.hpp): the exact
+// shape on-chain consumers (sysio.roa::active_key_matches, sysio.uwrit) unpack from this intrinsic's output.
+// Defined locally so the probe verifies the raw host serialization against the real consumer contract without
+// routing the CALL through the CDT wrapper. Note the host also packs a trailing `waits` vector that the
+// consumer struct intentionally omits -- unpack stops after `accounts` and tolerates the trailing bytes.
+// -----------------------------------------------------------------------------
+struct probe_key_weight {
+   public_key key;
+   uint16_t   weight;
+   SYSLIB_SERIALIZE( probe_key_weight, (key)(weight) )
+};
+struct probe_level_weight {
+   permission_level permission;
+   uint16_t         weight;
+   SYSLIB_SERIALIZE( probe_level_weight, (permission)(weight) )
+};
+struct probe_authority {
+   uint32_t                         threshold = 0;
+   std::vector<probe_key_weight>    keys;
+   std::vector<probe_level_weight>  accounts;
+   SYSLIB_SERIALIZE( probe_authority, (threshold)(keys)(accounts) )
+};
+struct probe_perm_record {
+   name            perm_name;
+   name            parent;
+   time_point      last_updated;
+   probe_authority auth;
+   SYSLIB_SERIALIZE( probe_perm_record, (perm_name)(parent)(last_updated)(auth) )
+};
+
+// Probe buffer big enough for a created account's owner/active record. A single K1 key_weight is ~36 bytes;
+// the full record (name + parent + last_updated + threshold + one key + empty accounts + empty waits) is well
+// under 128 bytes. 256 leaves generous headroom and lets the small-buffer probe pick an 8-byte window safely.
+constexpr uint32_t PERM_BUF_CAPACITY = 256;
+
+// Permission-name probe points relative to a freshly-created account's two permissions. sysio name ordering is
+// lexicographic over ".12345a-z", so by first character: active('a') < between('m') < owner('o') < past('z').
+//   * "active"/"owner" hit exact rows.
+//   * "myperm" sorts strictly between them, so lower_bound rolls forward to the NEXT existing row (owner) --
+//     the intrinsic is a lower-bound primitive, not an exact lookup; the CDT wrapper layers exact-match on top.
+//   * "znotaperm" sorts after every permission the account has, so lower_bound rolls past all of self's rows
+//     and the host's owner-mismatch guard returns -1.
+constexpr auto PERM_ACTIVE  = "active"_n;
+constexpr auto PERM_OWNER   = "owner"_n;
+constexpr auto PERM_BETWEEN = "myperm"_n;
+constexpr auto PERM_PAST    = "znotaperm"_n;
+
+} // namespace
+
+// File-scope static buffer for the recbigwa probe. See BIG_WA_BUF_CAPACITY comment above.
+static unsigned char big_wa_buf[BIG_WA_BUF_CAPACITY];
+
+class [[sysio::contract("intrinsic_probe")]] intrinsic_probe : public contract {
+public:
+   using contract::contract;
+
+   // =============================================================================
+   // P1 -- sha256
+   // =============================================================================
+
+   // Golden. Verifies the host produces the FIPS-canonical SHA-256 of "abc".
+   [[sysio::action]]
+   void sha2ok() {
+      unsigned char out[SHA256_SIZE] = {};
+      sha256( TEST_ABC, TEST_ABC_LEN, out );
+      check( std::memcmp(out, ABC_SHA256, SHA256_SIZE) == 0, "sha256('abc') mismatch" );
+   }
+
+   // Zero-length input. aligned_span<const char> with size 0 must be accepted
+   // and must produce the FIPS empty-string hash, regardless of whether data
+   // is nullptr or a valid pointer.
+   [[sysio::action]]
+   void sha2em() {
+      unsigned char out[SHA256_SIZE] = {};
+      sha256( nullptr, 0, out );
+      check( std::memcmp(out, EMPTY_SHA256, SHA256_SIZE) == 0,
+             "sha256(empty) mismatch when data=nullptr" );
+
+      // Non-null data pointer with length=0 must be treated identically.
+      char placeholder = 'x';
+      std::memset(out, 0, SHA256_SIZE);
+      sha256( &placeholder, 0, out );
+      check( std::memcmp(out, EMPTY_SHA256, SHA256_SIZE) == 0,
+             "sha256(empty) mismatch when data=&x but length=0" );
+   }
+
+   // Large input (10KB of zeros). Tests that the host accepts a span sized
+   // above any natural stack-buffer threshold without path changes.
+   [[sysio::action]]
+   void sha2big() {
+      char buf[BIG_INPUT_LEN] = {};
+      unsigned char out[SHA256_SIZE] = {};
+      sha256( buf, BIG_INPUT_LEN, out );
+      // SHA-256 over 10K of zeros is deterministic; we don't hardcode the
+      // exact bytes (golden vectors above cover correctness) but pin that
+      // the output is not simply uninitialized / still-zero, which would
+      // mean the intrinsic silently no-op'd.
+      unsigned char acc = 0;
+      for ( unsigned char c : out ) acc = acc | c;
+      check( acc != 0, "sha256 over 10K zeros produced an all-zero output" );
+   }
+
+   // Unaligned hash-output pointer. argument_proxy<fc::sha256*, 8> copies the
+   // pointee into an aligned stack temporary, runs the intrinsic, then copies
+   // back on destructor. Offsetting by UNALIGNED_OFFSET from a 16-aligned base
+   // guarantees the pointer is not 8-aligned, forcing the copy-out path.
+   [[sysio::action]]
+   void sha2ual() {
+      alignas(16) unsigned char buf[SHA256_SIZE + UNALIGNED_OFFSET + 8] = {};
+      unsigned char* out = buf + UNALIGNED_OFFSET;
+      sha256( TEST_ABC, TEST_ABC_LEN, out );
+      check( std::memcmp(out, ABC_SHA256, SHA256_SIZE) == 0,
+             "sha256('abc') via unaligned out-ptr mismatch -- copy-out path regression" );
+   }
+
+   // =============================================================================
+   // P1 -- sha1
+   // =============================================================================
+
+   [[sysio::action]]
+   void sha1ok() {
+      unsigned char out[SHA1_SIZE] = {};
+      sha1( TEST_ABC, TEST_ABC_LEN, out );
+      check( std::memcmp(out, ABC_SHA1, SHA1_SIZE) == 0, "sha1('abc') mismatch" );
+   }
+
+   [[sysio::action]]
+   void sha1em() {
+      unsigned char out[SHA1_SIZE] = {};
+      sha1( nullptr, 0, out );
+      check( std::memcmp(out, EMPTY_SHA1, SHA1_SIZE) == 0,
+             "sha1(empty) mismatch when data=nullptr" );
+   }
+
+   [[sysio::action]]
+   void sha1big() {
+      char buf[BIG_INPUT_LEN] = {};
+      unsigned char out[SHA1_SIZE] = {};
+      sha1( buf, BIG_INPUT_LEN, out );
+      unsigned char acc = 0;
+      for ( unsigned char c : out ) acc = acc | c;
+      check( acc != 0, "sha1 over 10K zeros produced an all-zero output" );
+   }
+
+   [[sysio::action]]
+   void sha1ual() {
+      alignas(16) unsigned char buf[SHA1_SIZE + UNALIGNED_OFFSET + 8] = {};
+      unsigned char* out = buf + UNALIGNED_OFFSET;
+      sha1( TEST_ABC, TEST_ABC_LEN, out );
+      check( std::memcmp(out, ABC_SHA1, SHA1_SIZE) == 0,
+             "sha1('abc') via unaligned out-ptr mismatch" );
+   }
+
+   // =============================================================================
+   // P1 -- sha512
+   // =============================================================================
+
+   [[sysio::action]]
+   void sha5ok() {
+      unsigned char out[SHA512_SIZE] = {};
+      sha512( TEST_ABC, TEST_ABC_LEN, out );
+      check( std::memcmp(out, ABC_SHA512, SHA512_SIZE) == 0, "sha512('abc') mismatch" );
+   }
+
+   [[sysio::action]]
+   void sha5em() {
+      unsigned char out[SHA512_SIZE] = {};
+      sha512( nullptr, 0, out );
+      check( std::memcmp(out, EMPTY_SHA512, SHA512_SIZE) == 0,
+             "sha512(empty) mismatch when data=nullptr" );
+   }
+
+   [[sysio::action]]
+   void sha5big() {
+      char buf[BIG_INPUT_LEN] = {};
+      unsigned char out[SHA512_SIZE] = {};
+      sha512( buf, BIG_INPUT_LEN, out );
+      unsigned char acc = 0;
+      for ( unsigned char c : out ) acc = acc | c;
+      check( acc != 0, "sha512 over 10K zeros produced an all-zero output" );
+   }
+
+   [[sysio::action]]
+   void sha5ual() {
+      alignas(16) unsigned char buf[SHA512_SIZE + UNALIGNED_OFFSET + 8] = {};
+      unsigned char* out = buf + UNALIGNED_OFFSET;
+      sha512( TEST_ABC, TEST_ABC_LEN, out );
+      check( std::memcmp(out, ABC_SHA512, SHA512_SIZE) == 0,
+             "sha512('abc') via unaligned out-ptr mismatch" );
+   }
+
+   // =============================================================================
+   // P1 -- ripemd160
+   // =============================================================================
+
+   [[sysio::action]]
+   void ripeok() {
+      unsigned char out[RIPE_SIZE] = {};
+      ripemd160( TEST_ABC, TEST_ABC_LEN, out );
+      check( std::memcmp(out, ABC_RIPE, RIPE_SIZE) == 0, "ripemd160('abc') mismatch" );
+   }
+
+   [[sysio::action]]
+   void ripeem() {
+      unsigned char out[RIPE_SIZE] = {};
+      ripemd160( nullptr, 0, out );
+      check( std::memcmp(out, EMPTY_RIPE, RIPE_SIZE) == 0,
+             "ripemd160(empty) mismatch when data=nullptr" );
+   }
+
+   [[sysio::action]]
+   void ripebig() {
+      char buf[BIG_INPUT_LEN] = {};
+      unsigned char out[RIPE_SIZE] = {};
+      ripemd160( buf, BIG_INPUT_LEN, out );
+      unsigned char acc = 0;
+      for ( unsigned char c : out ) acc = acc | c;
+      check( acc != 0, "ripemd160 over 10K zeros produced an all-zero output" );
+   }
+
+   [[sysio::action]]
+   void ripeual() {
+      alignas(16) unsigned char buf[RIPE_SIZE + UNALIGNED_OFFSET + 8] = {};
+      unsigned char* out = buf + UNALIGNED_OFFSET;
+      ripemd160( TEST_ABC, TEST_ABC_LEN, out );
+      check( std::memcmp(out, ABC_RIPE, RIPE_SIZE) == 0,
+             "ripemd160('abc') via unaligned out-ptr mismatch" );
+   }
+
+   // =============================================================================
+   // P1 -- assert_sha256
+   //
+   // Host throws crypto_api_exception "hash mismatch" if the computed digest
+   // does not equal the provided digest. Both the accepted and rejection
+   // paths exercise the aligned_ptr<const fc::sha256> copy-in path.
+   // =============================================================================
+
+   // Correct hash: no throw.
+   [[sysio::action]]
+   void asha2ok() {
+      assert_sha256( TEST_ABC, TEST_ABC_LEN, ABC_SHA256 );
+   }
+
+   // Wrong hash: host must throw. If we reach check() below the host's
+   // precondition silently accepted a mismatch -- regression.
+   [[sysio::action]]
+   void asha2ng() {
+      assert_sha256( TEST_ABC, TEST_ABC_LEN, ZERO_HASH64 );
+      check( false, "assert_sha256 with all-zero hash should have thrown" );
+   }
+
+   // Empty input with correct empty-string hash.
+   [[sysio::action]]
+   void asha2em() {
+      assert_sha256( nullptr, 0, EMPTY_SHA256 );
+   }
+
+   // Unaligned const-hash pointer: copy-in path for const argument_proxy.
+   [[sysio::action]]
+   void asha2ua() {
+      alignas(16) unsigned char buf[SHA256_SIZE + UNALIGNED_OFFSET + 8] = {};
+      unsigned char* unaligned = buf + UNALIGNED_OFFSET;
+      std::memcpy( unaligned, ABC_SHA256, SHA256_SIZE );
+      assert_sha256( TEST_ABC, TEST_ABC_LEN, unaligned );
+   }
+
+   // =============================================================================
+   // P1 -- assert_sha1 / assert_sha512 / assert_ripemd160
+   // =============================================================================
+
+   [[sysio::action]] void asha1ok() {
+      assert_sha1( TEST_ABC, TEST_ABC_LEN, ABC_SHA1 );
+   }
+   [[sysio::action]] void asha1ng() {
+      assert_sha1( TEST_ABC, TEST_ABC_LEN, ZERO_HASH64 );
+      check( false, "assert_sha1 with all-zero hash should have thrown" );
+   }
+   [[sysio::action]] void asha1em() {
+      assert_sha1( nullptr, 0, EMPTY_SHA1 );
+   }
+   [[sysio::action]] void asha1ua() {
+      alignas(16) unsigned char buf[SHA1_SIZE + UNALIGNED_OFFSET + 8] = {};
+      unsigned char* unaligned = buf + UNALIGNED_OFFSET;
+      std::memcpy( unaligned, ABC_SHA1, SHA1_SIZE );
+      assert_sha1( TEST_ABC, TEST_ABC_LEN, unaligned );
+   }
+
+   [[sysio::action]] void asha5ok() {
+      assert_sha512( TEST_ABC, TEST_ABC_LEN, ABC_SHA512 );
+   }
+   [[sysio::action]] void asha5ng() {
+      assert_sha512( TEST_ABC, TEST_ABC_LEN, ZERO_HASH64 );
+      check( false, "assert_sha512 with all-zero hash should have thrown" );
+   }
+   [[sysio::action]] void asha5em() {
+      assert_sha512( nullptr, 0, EMPTY_SHA512 );
+   }
+   [[sysio::action]] void asha5ua() {
+      alignas(16) unsigned char buf[SHA512_SIZE + UNALIGNED_OFFSET + 8] = {};
+      unsigned char* unaligned = buf + UNALIGNED_OFFSET;
+      std::memcpy( unaligned, ABC_SHA512, SHA512_SIZE );
+      assert_sha512( TEST_ABC, TEST_ABC_LEN, unaligned );
+   }
+
+   [[sysio::action]] void aripeok() {
+      assert_ripemd160( TEST_ABC, TEST_ABC_LEN, ABC_RIPE );
+   }
+   [[sysio::action]] void aripeng() {
+      assert_ripemd160( TEST_ABC, TEST_ABC_LEN, ZERO_HASH64 );
+      check( false, "assert_ripemd160 with all-zero hash should have thrown" );
+   }
+   [[sysio::action]] void aripeem() {
+      assert_ripemd160( nullptr, 0, EMPTY_RIPE );
+   }
+   [[sysio::action]] void aripeua() {
+      alignas(16) unsigned char buf[RIPE_SIZE + UNALIGNED_OFFSET + 8] = {};
+      unsigned char* unaligned = buf + UNALIGNED_OFFSET;
+      std::memcpy( unaligned, ABC_RIPE, RIPE_SIZE );
+      assert_ripemd160( TEST_ABC, TEST_ABC_LEN, unaligned );
+   }
+
+   // =============================================================================
+   // P1 -- recover_key / assert_recover_key
+   //
+   // A deterministic (digest, sig, pub) triple is constructed by the Boost
+   // driver via fc::private_key::regenerate and passed as action data so the
+   // probe contract never embeds a brittle pre-computed secp256k1 vector.
+   //
+   // Failure-mode coverage (pinning host behavior path by path; these are the
+   // surfaces the signature-recovery exception-cleanup follow-on PR will touch):
+   //   - Structural unpack failures: empty / truncated / invalid variant tag.
+   //   - secp256k1 recovery math failures: bad recovery byte / out-of-curve r,s.
+   //   - Mathematically-valid-but-wrong sig: recovery succeeds, pub differs.
+   //   - Small dest buffer: fixed-size (K1) asserts, variable-size truncates.
+   //   - argument_proxy copy-in on the aligned_ptr<const fc::sha256> digest.
+   // =============================================================================
+
+   // Golden: host recovers the exact pub the driver embedded.
+   [[sysio::action]]
+   void recok() {
+      unsigned char buf[RECOVER_BUF_CAPACITY] = {};
+      uint32_t n = sysio::action_data_size();
+      check( n >= sizeof(sig_hash_key_header), "recover_key action data too short" );
+      check( n <= RECOVER_BUF_CAPACITY, "recover_key action data larger than probe buffer" );
+      sysio::read_action_data( buf, n );
+
+      const auto* hdr = reinterpret_cast<const sig_hash_key_header*>(buf);
+      const char* sig_ptr = reinterpret_cast<const char*>(buf) + sizeof(*hdr);
+      const char* pub_ptr = sig_ptr + hdr->sig_len;
+      check( sizeof(*hdr) + hdr->sig_len + hdr->pk_len == n,
+             "recover_key action data length does not match header" );
+
+      char recovered[MAX_RECOVERED_PUB] = {};
+      int32_t rc = recover_key( hdr->hash, sig_ptr, hdr->sig_len,
+                                recovered, sizeof(recovered) );
+      check( rc == static_cast<int32_t>(hdr->pk_len),
+             "recover_key returned unexpected size" );
+      check( std::memcmp(recovered, pub_ptr, hdr->pk_len) == 0,
+             "recovered public key does not match driver-supplied pub" );
+   }
+
+   // Small pub buffer. Post-normalization contract: recover_key with a pub buffer smaller than the required key size
+   // must NOT throw, must NOT write past the caller's window, and must return the full required key size so the caller
+   // can re-call with a properly-sized buffer. Applies uniformly to both fixed-size (k1/r1/em) and variable-size
+   // (wa/ed) key types; prior to the host-side normalization the k1/r1/em path FC_ASSERT'd through fc::datastream while
+   // wa/ed silently truncated.
+   //
+   // The 4-byte small_pub window is wedged inside a 32-byte canary region so that any host-side write past the window
+   // surfaces as a canary byte change. Driver verifies the in-contract checks via the probe's own check() calls -- any
+   // host misbehavior surfaces as a sysio_assert_message_exception rather than BOOST_CHECK_NO_THROW noise.
+   [[sysio::action]]
+   void recsmpub() {
+      unsigned char buf[RECOVER_BUF_CAPACITY] = {};
+      uint32_t n = sysio::action_data_size();
+      check( n <= RECOVER_BUF_CAPACITY, "recsmpub action data too large" );
+      sysio::read_action_data( buf, n );
+
+      const auto* hdr = reinterpret_cast<const sig_hash_key_header*>(buf);
+      const char* sig_ptr = reinterpret_cast<const char*>(buf) + sizeof(*hdr);
+
+      unsigned char canary[32];
+      std::memset(canary, 0xaa, sizeof(canary));
+      char* small_pub = reinterpret_cast<char*>(canary + 8);
+      constexpr uint32_t small_pub_len = 4;
+
+      int32_t rc = recover_key( hdr->hash, sig_ptr, hdr->sig_len, small_pub, small_pub_len );
+      check( rc == static_cast<int32_t>(hdr->pk_len),
+             "recover_key with small pub buffer must return the full required key size, not throw" );
+      // Partial-write contract: host writes min(buffer_size, pub_len) bytes of the packed K1 key into the window. The
+      // K1 variant tag is index 0, so small_pub[0] must be 0 after the call -- if the byte is still the canary 0xaa
+      // the host regressed to a no-write-on-small-buffer path.
+      check( static_cast<unsigned char>(small_pub[0]) != 0xaa,
+             "recover_key did not write partial pub bytes into the small buffer "
+             "(still canary 0xaa; expected K1 variant tag or subsequent key bytes)" );
+      for ( int i = 0; i < 8; ++i )
+         check( canary[i] == 0xaa, "recover_key wrote past pub buffer start -- canary before window corrupted" );
+      for ( int i = 8 + small_pub_len; i < 32; ++i )
+         check( canary[i] == 0xaa, "recover_key wrote past pub buffer end -- canary after window corrupted" );
+   }
+
+   // Unaligned digest pointer. aligned_ptr<const fc::sha256, 8> forces the
+   // argument_proxy copy-in path when the wasm pointer is not 8-aligned.
+   [[sysio::action]]
+   void recuald() {
+      unsigned char buf[RECOVER_BUF_CAPACITY] = {};
+      uint32_t n = sysio::action_data_size();
+      check( n <= RECOVER_BUF_CAPACITY, "recuald action data too large" );
+      sysio::read_action_data( buf, n );
+
+      const auto* hdr = reinterpret_cast<const sig_hash_key_header*>(buf);
+      const char* sig_ptr = reinterpret_cast<const char*>(buf) + sizeof(*hdr);
+      const char* pub_ptr = sig_ptr + hdr->sig_len;
+
+      alignas(16) unsigned char digbuf[SHA256_SIZE + UNALIGNED_OFFSET + 8] = {};
+      unsigned char* unaligned_digest = digbuf + UNALIGNED_OFFSET;
+      std::memcpy( unaligned_digest, hdr->hash, SHA256_SIZE );
+
+      char recovered[MAX_RECOVERED_PUB] = {};
+      int32_t rc = recover_key( unaligned_digest, sig_ptr, hdr->sig_len,
+                                recovered, sizeof(recovered) );
+      check( rc == static_cast<int32_t>(hdr->pk_len),
+             "recover_key(unaligned digest) returned unexpected size" );
+      check( std::memcmp(recovered, pub_ptr, hdr->pk_len) == 0,
+             "recover_key(unaligned digest) pub mismatch -- copy-in path regression" );
+   }
+
+   // Structural corruption: byte 0 of the signature is the fc::raw variant tag. Setting it to 0x7F (max
+   // single-byte unsigned_int) is guaranteed above any currently-registered signature variant index, so fc::raw's
+   // variant unpack rejects during sig decoding, before any secp256k1 math runs. Post-never-throw: recover_key
+   // returns -1 on this path rather than throwing.
+   [[sysio::action]]
+   void recbadvar() {
+      unsigned char buf[RECOVER_BUF_CAPACITY] = {};
+      uint32_t n = sysio::action_data_size();
+      check( n <= RECOVER_BUF_CAPACITY, "recbadvar action data too large" );
+      sysio::read_action_data( buf, n );
+
+      auto* hdr = reinterpret_cast<sig_hash_key_header*>(buf);
+      char* sig_ptr = reinterpret_cast<char*>(buf) + sizeof(*hdr);
+      check( hdr->sig_len >= 1, "sig too short to corrupt variant tag" );
+      sig_ptr[0] = static_cast<char>(0x7F);
+
+      char recovered[MAX_RECOVERED_PUB] = {};
+      int32_t rc = recover_key( hdr->hash, sig_ptr, hdr->sig_len, recovered, sizeof(recovered) );
+      check( rc == -1, "recover_key with invalid variant tag (0x7F) must return -1, not throw" );
+   }
+
+   // secp256k1 recovery math: byte 1 of a K1 sig is the recovery byte (canonical range [31, 35), legacy [27, 30]).
+   // Setting it outside the accepted range triggers FC_THROW_EXCEPTION in elliptic_secp256k1.cpp which recover_key
+   // now catches and surfaces as rc = -1 instead of propagating.
+   [[sysio::action]]
+   void recbadrec() {
+      unsigned char buf[RECOVER_BUF_CAPACITY] = {};
+      uint32_t n = sysio::action_data_size();
+      check( n <= RECOVER_BUF_CAPACITY, "recbadrec action data too large" );
+      sysio::read_action_data( buf, n );
+
+      auto* hdr = reinterpret_cast<sig_hash_key_header*>(buf);
+      char* sig_ptr = reinterpret_cast<char*>(buf) + sizeof(*hdr);
+      check( hdr->sig_len >= 2, "sig too short to corrupt recovery byte" );
+      sig_ptr[1] = static_cast<char>(0x00);  // out of [27, 35)
+
+      char recovered[MAX_RECOVERED_PUB] = {};
+      int32_t rc = recover_key( hdr->hash, sig_ptr, hdr->sig_len, recovered, sizeof(recovered) );
+      check( rc == -1, "recover_key with out-of-range recovery byte must return -1" );
+   }
+
+   // Valid structure, valid recovery byte, corrupted r/s. Two acceptable outcomes:
+   //   - Math succeeds and produces a DIFFERENT public key than the signer originally used (rc == pk_len, recovered
+   //     != original pub).
+   //   - Math rejects the curve point (rc == -1).
+   // Both outcomes are fine; the bad outcome the probe protects against is "math succeeds AND silently returns the
+   // ORIGINAL pub" -- that would mean recover_key is acting as a verifier and one-bit sig corruptions are getting
+   // swept under the rug, which violates the "compare-recovered-against-known-authorized" pattern that is the only
+   // safe way to use recover_key.
+   [[sysio::action]]
+   void recbadrs() {
+      unsigned char buf[RECOVER_BUF_CAPACITY] = {};
+      uint32_t n = sysio::action_data_size();
+      check( n <= RECOVER_BUF_CAPACITY, "recbadrs action data too large" );
+      sysio::read_action_data( buf, n );
+
+      auto* hdr = reinterpret_cast<sig_hash_key_header*>(buf);
+      char* sig_ptr = reinterpret_cast<char*>(buf) + sizeof(*hdr);
+      const char* pub_ptr = sig_ptr + hdr->sig_len;
+      check( hdr->sig_len >= 10, "sig too short to corrupt deep r/s bytes" );
+      // Corrupt a byte well inside the r component. A small bit flip keeps (r, s) on-curve with overwhelming
+      // probability -- we want the math to succeed and return a different valid pub.
+      sig_ptr[9] = sig_ptr[9] ^ 0x01;
+
+      char recovered[MAX_RECOVERED_PUB] = {};
+      int32_t rc = recover_key( hdr->hash, sig_ptr, hdr->sig_len, recovered, sizeof(recovered) );
+      if ( rc == -1 ) return;  // math rejected the corrupted curve point; acceptable.
+      check( rc == static_cast<int32_t>(hdr->pk_len),
+             "recover_key(corrupt r) must return -1 on math failure or full pub size on success -- got neither" );
+      check( std::memcmp(recovered, pub_ptr, hdr->pk_len) != 0,
+             "recover_key on r-corrupted sig silently recovered the ORIGINAL pub -- never-verifier contract broken" );
+   }
+
+   // Short sig (1 byte): valid variant tag but no shim content. fc::raw unpack of the shim bytes hits datastream
+   // end; recover_key catches the unpack failure and returns -1.
+   [[sysio::action]]
+   void recshort() {
+      unsigned char buf[RECOVER_BUF_CAPACITY] = {};
+      uint32_t n = sysio::action_data_size();
+      check( n <= RECOVER_BUF_CAPACITY, "recshort action data too large" );
+      sysio::read_action_data( buf, n );
+
+      const auto* hdr = reinterpret_cast<const sig_hash_key_header*>(buf);
+      const char* sig_ptr = reinterpret_cast<const char*>(buf) + sizeof(*hdr);
+
+      char recovered[MAX_RECOVERED_PUB] = {};
+      int32_t rc = recover_key( hdr->hash, sig_ptr, 1, recovered, sizeof(recovered) );
+      check( rc == -1, "recover_key with truncated sig (1 byte) must return -1, not throw" );
+   }
+
+   // Zero-length sig: datastream runs dry before the variant tag itself; recover_key returns -1.
+   [[sysio::action]]
+   void recempsig() {
+      unsigned char dig[SHA256_SIZE] = {};
+      char recovered[MAX_RECOVERED_PUB] = {};
+      int32_t rc = recover_key( dig, nullptr, 0, recovered, sizeof(recovered) );
+      check( rc == -1, "recover_key with empty signature must return -1, not throw" );
+   }
+
+   // Zero-size pub buffer: size-query pattern. recover_key must return the full required pub size without writing
+   // to the (zero-length) buffer, so callers can use "query with size=0, allocate exactly, call again" when they
+   // don't want CDT's 256-byte optimistic pre-allocation.
+   [[sysio::action]]
+   void recqsize() {
+      unsigned char buf[RECOVER_BUF_CAPACITY] = {};
+      uint32_t n = sysio::action_data_size();
+      check( n <= RECOVER_BUF_CAPACITY, "recqsize action data too large" );
+      sysio::read_action_data( buf, n );
+
+      const auto* hdr = reinterpret_cast<const sig_hash_key_header*>(buf);
+      const char* sig_ptr = reinterpret_cast<const char*>(buf) + sizeof(*hdr);
+
+      int32_t rc = recover_key( hdr->hash, sig_ptr, hdr->sig_len, nullptr, 0 );
+      check( rc == static_cast<int32_t>(hdr->pk_len),
+             "recover_key with zero-size pub buffer must return the full required key size" );
+   }
+
+   // WebAuthn signature whose auth_data + client_json exceeds the subjective variable-size limit (default 16 KiB
+   // from controller_config::maximum_variable_signature_length). Pins the ONE throw recover_key still raises
+   // after the never-throw-for-contract-observable-failures cleanup: the subjective per-node DoS guard against
+   // WA-sig variable-size abuse during speculative block production. See the DEFERRED note in
+   // libraries/chain/webassembly/crypto.cpp::recover_key for the full rationale and the path to removing it.
+   //
+   // Raw WA sig bytes are passed as action data with no header framing; the driver constructs a WA-variant
+   // blob large enough to trigger the cap but small enough to fit in max_transaction_net_usage.
+   [[sysio::action]]
+   void recbigwa() {
+      uint32_t n = sysio::action_data_size();
+      check( n <= BIG_WA_BUF_CAPACITY, "recbigwa action data exceeds probe static buffer" );
+      sysio::read_action_data( big_wa_buf, n );
+
+      unsigned char dig[SHA256_SIZE] = {};
+      char recovered[MAX_RECOVERED_PUB] = {};
+      int32_t rc = recover_key( dig, reinterpret_cast<const char*>(big_wa_buf), n,
+                                recovered, sizeof(recovered) );
+      (void) rc;
+      check( false, "recover_key with WA sig exceeding subjective variable-size limit must throw "
+                    "sig_variable_size_limit_exception during speculative-block production" );
+   }
+
+   // assert_recover_key: matching digest + sig + pub -> no throw.
+   [[sysio::action]]
+   void arecok() {
+      unsigned char buf[RECOVER_BUF_CAPACITY] = {};
+      uint32_t n = sysio::action_data_size();
+      check( n <= RECOVER_BUF_CAPACITY, "arecok action data too large" );
+      sysio::read_action_data( buf, n );
+
+      const auto* hdr = reinterpret_cast<const sig_hash_key_header*>(buf);
+      const char* sig_ptr = reinterpret_cast<const char*>(buf) + sizeof(*hdr);
+      const char* pub_ptr = sig_ptr + hdr->sig_len;
+
+      assert_recover_key( hdr->hash, sig_ptr, hdr->sig_len, pub_ptr, hdr->pk_len );
+   }
+
+   // assert_recover_key: recovery succeeds but recovered pub != supplied pub
+   // -> SYS_ASSERT(check == p, crypto_api_exception, "...") fires.
+   [[sysio::action]]
+   void arecng() {
+      unsigned char buf[RECOVER_BUF_CAPACITY] = {};
+      uint32_t n = sysio::action_data_size();
+      check( n <= RECOVER_BUF_CAPACITY, "arecng action data too large" );
+      sysio::read_action_data( buf, n );
+
+      const auto* hdr = reinterpret_cast<const sig_hash_key_header*>(buf);
+      const char* sig_ptr = reinterpret_cast<const char*>(buf) + sizeof(*hdr);
+      const char* pub_ptr = sig_ptr + hdr->sig_len;
+
+      unsigned char wrong_pub[MAX_RECOVERED_PUB] = {};
+      check( hdr->pk_len <= sizeof(wrong_pub), "pub too large for wrong-pub buffer" );
+      std::memcpy(wrong_pub, pub_ptr, hdr->pk_len);
+      // Flip a byte past the variant-tag byte so the variant type still
+      // matches the sig's (preventing the earlier SYS_ASSERT on type match)
+      // and the mismatch surfaces specifically as a pub-equality failure.
+      if ( hdr->pk_len > 1 ) wrong_pub[1] = wrong_pub[1] ^ 0x01;
+      assert_recover_key( hdr->hash, sig_ptr, hdr->sig_len,
+                          reinterpret_cast<const char*>(wrong_pub), hdr->pk_len );
+      check( false, "assert_recover_key with altered pub should have thrown "
+                    "\"Error expected key different than recovered key\"" );
+   }
+
+   // assert_recover_key: recovery math itself fails (bad recovery byte) -
+   // host throws BEFORE the pub-equality compare. Pins that the error path
+   // is the recovery failure, not the compare.
+   [[sysio::action]]
+   void arecbadrec() {
+      unsigned char buf[RECOVER_BUF_CAPACITY] = {};
+      uint32_t n = sysio::action_data_size();
+      check( n <= RECOVER_BUF_CAPACITY, "arecbadrec action data too large" );
+      sysio::read_action_data( buf, n );
+
+      auto* hdr = reinterpret_cast<sig_hash_key_header*>(buf);
+      char* sig_ptr = reinterpret_cast<char*>(buf) + sizeof(*hdr);
+      const char* pub_ptr = sig_ptr + hdr->sig_len;
+      check( hdr->sig_len >= 2, "sig too short to corrupt" );
+      sig_ptr[1] = static_cast<char>(0x00);
+
+      assert_recover_key( hdr->hash, sig_ptr, hdr->sig_len,
+                          pub_ptr, hdr->pk_len );
+      check( false, "assert_recover_key with out-of-range recovery byte must throw" );
+   }
+
+   // assert_recover_key: digest+sig are K1, pub is forged to claim variant
+   // R1 (index 1 in fc::public_key's variant). Host's explicit SYS_ASSERT
+   // "Public key type does not match signature type" fires BEFORE the
+   // secp256k1 recovery math runs.
+   [[sysio::action]]
+   void arecpubty() {
+      unsigned char buf[RECOVER_BUF_CAPACITY] = {};
+      uint32_t n = sysio::action_data_size();
+      check( n <= RECOVER_BUF_CAPACITY, "arecpubty action data too large" );
+      sysio::read_action_data( buf, n );
+
+      const auto* hdr = reinterpret_cast<const sig_hash_key_header*>(buf);
+      const char* sig_ptr = reinterpret_cast<const char*>(buf) + sizeof(*hdr);
+      const char* pub_ptr = sig_ptr + hdr->sig_len;
+
+      unsigned char forged[MAX_RECOVERED_PUB] = {};
+      check( hdr->pk_len <= sizeof(forged), "pub too large for forged buffer" );
+      std::memcpy(forged, pub_ptr, hdr->pk_len);
+      forged[0] = 0x01;  // R1 variant tag; driver vector is K1 (tag 0)
+      assert_recover_key( hdr->hash, sig_ptr, hdr->sig_len,
+                          reinterpret_cast<const char*>(forged), hdr->pk_len );
+      check( false, "assert_recover_key with pub variant mismatched to sig "
+                    "variant must throw \"Public key type does not match signature type\"" );
+   }
+
+   // assert_recover_key with empty sig -> throws at unpack step.
+   [[sysio::action]]
+   void arecempsig() {
+      unsigned char dig[SHA256_SIZE] = {};
+      const char* pub_placeholder = "\x00";
+      assert_recover_key( dig, nullptr, 0, pub_placeholder, 0 );
+      check( false, "assert_recover_key with empty signature must throw" );
+   }
+
+   // =============================================================================
+   // P1 -- preactivate_feature
+   //
+   // Registered with privileged_check in runtimes/sys-vm.cpp line 359. The
+   // priv gate fires BEFORE the aligned_ptr<const digest_type> copy-in, so the
+   // non-privileged probe never reaches the digest read. The priv body then
+   // dispatches into controller::preactivate_feature which validates the
+   // digest against known features.
+   //
+   // Driver supplies action data = 32-byte digest for the accepted path (a
+   // real unactivated-feature digest it computes off the controller). The
+   // rejection probes use local buffers since they trap before the digest
+   // matters (non-priv) or use a hardcoded sentinel (not-a-feature).
+   // =============================================================================
+
+   // Privileged account + valid unactivated feature digest -> host accepts.
+   // Driver computes the digest of a pre-registered unactivated feature and
+   // passes it as the full 32-byte action data payload.
+   [[sysio::action]]
+   void preactok() {
+      unsigned char digest[SHA256_SIZE] = {};
+      uint32_t n = sysio::action_data_size();
+      check( n == SHA256_SIZE, "preactok action data must be exactly 32 bytes" );
+      sysio::read_action_data( digest, n );
+      preactivate_feature( digest );
+   }
+
+   // Non-privileged account -> privileged_check SYS_ASSERT fires with
+   // unaccessible_api. Digest bytes are irrelevant (never read).
+   [[sysio::action]]
+   void preactnp() {
+      unsigned char dummy_digest[SHA256_SIZE] = {};
+      preactivate_feature( dummy_digest );
+      check( false, "preactivate_feature from non-priv account must throw "
+                    "unaccessible_api" );
+   }
+
+   // Privileged account + bogus (all-zero) digest that does not correspond
+   // to any registered protocol feature -> controller::preactivate_feature
+   // rejects (fc::exception, "unknown feature digest" or similar).
+   [[sysio::action]]
+   void preactbog() {
+      unsigned char zeros[SHA256_SIZE] = {};
+      preactivate_feature( zeros );
+      check( false, "preactivate_feature with all-zero digest must throw" );
+   }
+
+   // =============================================================================
+   // P2 -- resource / auth / producer / blockchain-parameters intrinsics
+   //
+   // Covers the aligned_ptr<int64_t, 8> out-param path (get_resource_limits),
+   // the aligned_span<const char> and aligned_span<account_name> producer
+   // paths, and the privileged_check gating on each set_* op. Small-buffer
+   // probes pin the "returns required size, does not overflow caller" contract
+   // that get_blockchain_parameters_packed documents.
+   // =============================================================================
+
+   // get_resource_limits with 3 aligned out-pointers -> host writes 3 int64_t
+   // values into the caller's buffer. Self-lookup -- self() always exists.
+   [[sysio::action]]
+   void reslimok() {
+      int64_t ram = -99, net_w = -99, cpu_w = -99;
+      get_resource_limits( get_self().value, &ram, &net_w, &cpu_w );
+      // Any account has non-zero RAM after being created. net and cpu can be
+      // any non-negative stake-weighted value. We pin only that the host
+      // actually wrote the outputs (the default sentinel -99 is gone).
+      check( ram != -99 && net_w != -99 && cpu_w != -99,
+             "get_resource_limits did not write all three out-params" );
+   }
+
+   // get_resource_limits with 3 intentionally-misaligned out-pointers.
+   // Offset +1, +3, +5 bytes into a 16-aligned buffer guarantees none of
+   // the pointers is 8-aligned, forcing argument_proxy<int64_t*, 8>'s
+   // copy-in + copy-back memcpy paths for each of the three out-params.
+   [[sysio::action]]
+   void reslimua() {
+      alignas(16) unsigned char buf[64] = {};
+      void* ram_ptr   = buf + 1;   // offset 1
+      void* net_ptr   = buf + 9 + 3;   // offset 12
+      void* cpu_ptr   = buf + 32 + 5;  // offset 37
+      // Preload known sentinel via memcpy so we can detect host write-back.
+      int64_t sentinel = -99;
+      std::memcpy(ram_ptr, &sentinel, 8);
+      std::memcpy(net_ptr, &sentinel, 8);
+      std::memcpy(cpu_ptr, &sentinel, 8);
+
+      get_resource_limits( get_self().value, ram_ptr, net_ptr, cpu_ptr );
+
+      int64_t ram = 0, net_w = 0, cpu_w = 0;
+      std::memcpy(&ram,   ram_ptr, 8);
+      std::memcpy(&net_w, net_ptr, 8);
+      std::memcpy(&cpu_w, cpu_ptr, 8);
+      check( ram != -99 && net_w != -99 && cpu_w != -99,
+             "get_resource_limits unaligned -- copy-back path regression" );
+   }
+
+   // set_resource_limits with a privileged receiver -> host body runs.
+   // Read current limits first so we restore them after the probe and don't
+   // leak state across the shared tester.
+   [[sysio::action]]
+   void setreslim() {
+      int64_t ram = 0, net_w = 0, cpu_w = 0;
+      get_resource_limits( get_self().value, &ram, &net_w, &cpu_w );
+      // Bump RAM by 1, then restore. No-op against the test if the account
+      // already has headroom in its RAM stake.
+      set_resource_limits( get_self().value, ram + 1, net_w, cpu_w );
+      set_resource_limits( get_self().value, ram,     net_w, cpu_w );
+   }
+
+   // set_resource_limits from a non-privileged account -> privileged_check
+   // SYS_ASSERT fires with unaccessible_api BEFORE the host body runs.
+   [[sysio::action]]
+   void setresnp() {
+      set_resource_limits( get_self().value, -1, -1, -1 );
+      check( false, "set_resource_limits from non-priv account must throw "
+                    "unaccessible_api" );
+   }
+
+   // get_active_producers with a buffer sized for at least one producer.
+   // Host returns bytes written, capped by buffer capacity.
+   [[sysio::action]]
+   void actprdok() {
+      uint64_t buf[64] = {};   // 64 slots * 8 bytes = 512 bytes
+      int32_t rc = get_active_producers( buf, sizeof(buf) );
+      check( rc >= 0, "get_active_producers returned negative size" );
+      check( static_cast<uint32_t>(rc) <= sizeof(buf),
+             "get_active_producers returned more than buffer capacity" );
+   }
+
+   // get_active_producers with size=0 -> host returns required bytes without
+   // touching the buffer. Pins the "report required size via zero-size query"
+   // contract.
+   [[sysio::action]]
+   void actprdsm() {
+      int32_t rc = get_active_producers( nullptr, 0 );
+      check( rc >= 0, "get_active_producers(nullptr, 0) must return required "
+                      "size without writing" );
+   }
+
+   // set_proposed_producers from a non-privileged account -> throws
+   // unaccessible_api. Payload bytes are irrelevant; the priv gate fires
+   // first.
+   [[sysio::action]]
+   void sprodnp() {
+      unsigned char dummy[1] = {0};
+      (void) set_proposed_producers(
+         reinterpret_cast<const char*>(dummy), sizeof(dummy) );
+      check( false, "set_proposed_producers from non-priv account must throw "
+                    "unaccessible_api" );
+   }
+
+   // get_blockchain_parameters_packed with size=0 -> host returns the
+   // required byte count without touching the (null) buffer. Pins the
+   // conventional "query size first, then allocate" pattern.
+   [[sysio::action]]
+   void bcpgetsm() {
+      uint32_t rc = get_blockchain_parameters_packed( nullptr, 0 );
+      check( rc > 0, "get_blockchain_parameters_packed(nullptr, 0) must "
+                     "return non-zero required size" );
+   }
+
+   // get_blockchain_parameters_packed with a generous buffer -> host packs
+   // the parameters and returns bytes written.
+   [[sysio::action]]
+   void bcpgetok() {
+      char buf[512] = {};
+      uint32_t required = get_blockchain_parameters_packed( nullptr, 0 );
+      check( required <= sizeof(buf),
+             "blockchain parameters size exceeds probe buffer" );
+      uint32_t rc = get_blockchain_parameters_packed( buf, sizeof(buf) );
+      check( rc == required,
+             "get_blockchain_parameters_packed byte count mismatch between "
+             "size-query and actual-read" );
+   }
+
+   // set_blockchain_parameters_packed from a non-privileged account ->
+   // throws unaccessible_api.
+   [[sysio::action]]
+   void bcpsetnp() {
+      unsigned char dummy[1] = {0};
+      set_blockchain_parameters_packed(
+         reinterpret_cast<const char*>(dummy), sizeof(dummy) );
+      check( false, "set_blockchain_parameters_packed from non-priv account "
+                    "must throw unaccessible_api" );
+   }
+
+   // check_transaction_authorization with all-empty spans. The host tries to
+   // unpack the trx / pubs / perms buffers and fails; datastream runs dry.
+   // Pins that an all-empty input is not silently accepted as "empty
+   // authorization set is sufficient".
+   [[sysio::action]]
+   void chktrxem() {
+      int32_t rc = check_transaction_authorization( nullptr, 0,
+                                                    nullptr, 0,
+                                                    nullptr, 0 );
+      (void)rc;
+      check( false, "check_transaction_authorization with all-empty spans "
+                    "must throw during trx unpack" );
+   }
+
+
+   // =============================================================================
+   // P3 -- console / IO / action-data intrinsics
+   //
+   // Covers the remaining aligned_span / null_terminated_ptr surface. raw::prints /
+   // raw::sysio_assert take null_terminated_ptr (host walks memory for \0), so the
+   // validator cost is per-call proportional to the string length. The *_l /
+   // *_message variants use aligned_span<const char> with explicit size and
+   // are the path the cleanup PR will keep. Remaining aligned_span<char>
+   // readers (read_action_data, get_context_free_data, raw::get_action,
+   // raw::read_transaction) document a "size=0 returns required size" contract
+   // that the small-buffer probes here pin in place.
+   //
+   // CDT's capi/sysio/{print,system,action,transaction}.h declares all these
+   // intrinsics globally with __attribute__((sysio_wasm_import)), so we call
+   // them directly rather than re-declaring in this file's extern "C" block.
+   // =============================================================================
+
+   // raw::prints: null_terminated_ptr. Host walks memory until \0 -- probe with
+   // a normal C string and an empty C string (single \0 byte).
+   [[sysio::action]]
+   void printok() {
+      raw::prints( "probe-print-test" );
+      raw::prints( "" );  // empty C string
+   }
+
+   // raw::prints_l: aligned_span<const char>. Zero-length legal (no bytes printed).
+   // Non-null data with length 0 also legal and must behave identically.
+   [[sysio::action]]
+   void printlem() {
+      raw::prints_l( nullptr, 0 );
+      const char msg[] = "xyz";
+      raw::prints_l( msg, 3 );
+   }
+
+   // printhex: aligned_span<const char> of raw bytes. Zero-length legal.
+   [[sysio::action]]
+   void phxok() {
+      const unsigned char data[] = { 0xde, 0xad, 0xbe, 0xef };
+      printhex( data, sizeof(data) );
+      printhex( nullptr, 0 );
+   }
+
+   // raw::sysio_assert with test != 0: no-op. Pins that the null_terminated_ptr
+   // msg is NOT walked when test is truthy (host short-circuits).
+   [[sysio::action]]
+   void sasok() {
+      raw::sysio_assert( 1, "should not throw" );
+   }
+
+   // raw::sysio_assert with test == 0: host walks the null_terminated_ptr msg,
+   // wraps in sysio_assert_message_exception, throws.
+   [[sysio::action]]
+   void sasng() {
+      raw::sysio_assert( 0, "probe-sysio-assert-should-throw" );
+      check( false, "raw::sysio_assert(0, ...) did not throw" );
+   }
+
+   // raw::sysio_assert_message with test != 0: no-op.
+   [[sysio::action]]
+   void samok() {
+      const char msg[] = "ok";
+      raw::sysio_assert_message( 1, msg, sizeof(msg) - 1 );
+   }
+
+   // raw::sysio_assert_message with test == 0: throws with msg included in the
+   // exception string.
+   [[sysio::action]]
+   void samng() {
+      const char msg[] = "probe-assert-message-should-throw";
+      raw::sysio_assert_message( 0, msg, sizeof(msg) - 1 );
+      check( false, "raw::sysio_assert_message(0, ...) did not throw" );
+   }
+
+   // raw::sysio_assert_message with test == 0 AND empty msg span. Pins that an
+   // empty-message rejection does not crash on a zero-length aligned_span.
+   [[sysio::action]]
+   void samngem() {
+      raw::sysio_assert_message( 0, nullptr, 0 );
+      check( false, "raw::sysio_assert_message(0, nullptr, 0) did not throw" );
+   }
+
+   // read_action_data with buffer >= action_data_size. Pins the identity
+   // "rc == action_data_size() when buffer fits".
+   [[sysio::action]]
+   void radok() {
+      char buf[64] = {};
+      uint32_t sz = action_data_size();
+      check( sz <= sizeof(buf), "action data larger than probe buffer" );
+      uint32_t rc = read_action_data( buf, sz );
+      check( rc == sz, "read_action_data rc mismatches action_data_size" );
+   }
+
+   // read_action_data with size=0: returns 0 (empty-buffer identity). Legacy
+   // span<char> with size 0 must be accepted.
+   [[sysio::action]]
+   void radsm() {
+      uint32_t rc = read_action_data( nullptr, 0 );
+      check( rc == 0, "read_action_data(nullptr, 0) should return 0" );
+   }
+
+   // raw::get_action with type=1 (action) index=0 -> current action serialized
+   // size. Positive on success.
+   [[sysio::action]]
+   void gacok() {
+      char buf[512] = {};
+      int rc = raw::get_action( 1, 0, buf, sizeof(buf) );
+      check( rc > 0, "raw::get_action(type=1, index=0) should return positive size" );
+   }
+
+   // raw::get_action with invalid type. apply_context::get_action asserts
+   // act_ptr != nullptr AFTER the type-vs-0/1 branches, so type=99 (neither
+   // context-free nor action) reaches the SYS_ASSERT and throws
+   // action_not_found_exception. The -1 sentinel is only for valid-type,
+   // out-of-range INDEX.
+   [[sysio::action]]
+   void gacbad() {
+      char buf[64] = {};
+      int rc = raw::get_action( 99, 0, buf, sizeof(buf) );
+      (void)rc;
+      check( false, "raw::get_action(type=99) must throw action_not_found_exception" );
+   }
+
+   // raw::read_transaction with adequate buffer. The host returns bytes written.
+   [[sysio::action]]
+   void rtxok() {
+      char buf[2048] = {};
+      size_t needed = raw::read_transaction( nullptr, 0 );
+      check( needed > 0,            "raw::read_transaction(nullptr, 0) returned 0" );
+      check( needed <= sizeof(buf), "transaction larger than probe buffer" );
+      size_t rc = raw::read_transaction( buf, sizeof(buf) );
+      check( rc == needed, "raw::read_transaction bytes written != size query" );
+   }
+
+   // raw::read_transaction with size=0 -> returns required size without touching
+   // the null buffer.
+   [[sysio::action]]
+   void rtxsm() {
+      size_t rc = raw::read_transaction( nullptr, 0 );
+      check( rc > 0, "raw::read_transaction(nullptr, 0) should return required size" );
+   }
+
+   // raw::get_context_free_data is registered context-free-only
+   // (REGISTER_ALIGNED_CF_ONLY_HOST_FUNCTION). Its context_free_check
+   // precondition fires BEFORE the host body and SYS_ASSERTs unaccessible_api
+   // ("this API may only be called from context_free apply") whenever the
+   // calling apply context is not context free. This probe drives it from a
+   // regular action, so the gate must throw before the aligned_span<char>
+   // buffer is ever adapted -- the arguments are deliberately bogus (null
+   // data, zero length) to prove the rejection is unconditional on the span.
+   // Mirrors the privileged_check rejection probes (preactnp / setresnp).
+   [[sysio::action]]
+   void gcfdcf() {
+      raw::get_context_free_data( 0, nullptr, 0 );
+      check( false, "raw::get_context_free_data from non-context-free apply "
+                    "must throw unaccessible_api" );
+   }
+
+   // raw::send_inline with empty span -> host tries to unpack and fails. Pins
+   // that a zero-length aligned_span is NOT silently converted to a default
+   // action.
+   [[sysio::action]]
+   void sinlem() {
+      raw::send_inline( nullptr, 0 );
+      check( false, "raw::send_inline(empty span) must throw during action unpack" );
+   }
+
+   // set_action_return_value (uses plain span<const char>, not legacy) with
+   // a normal byte buffer -> no throw, value is stored on the action trace.
+   [[sysio::action]]
+   void sarvok() {
+      const char retval[] = "probe-return-value";
+      set_action_return_value( const_cast<char*>(retval), sizeof(retval) - 1 );
+   }
+
+   // set_action_return_value with empty span. Pins that a zero-length
+   // return value is legal.
+   [[sysio::action]]
+   void sarvem() {
+      set_action_return_value( nullptr, 0 );
+   }
+
+   // =============================================================================
+   // P2 -- get_permission_lower_bound
+   //
+   // Wire-specific intrinsic backing CDT's sysio::get_permission -- the only host path a contract has to read
+   // another account's authority on-chain (sysio.roa::active_key_matches, sysio.uwrit). These probes pin the
+   // pieces the CDT wrapper and its callers depend on: the serialized record layout, the size-query /
+   // small-buffer contract, the not-found -1 sentinel, and the lower-bound (NOT exact-match) lookup semantics.
+   // All queries target get_self(), whose owner/active permissions the Boost driver creates with a single K1
+   // key at threshold 1. Not privileged-gated, so these run from the ordinary (non-priv) probe account.
+   // =============================================================================
+
+   // Golden: the account's `active` row deserializes to the documented record -- name=active, parent=owner,
+   // threshold 1, and at least one key that satisfies the threshold by itself.
+   [[sysio::action]]
+   void glpbact() {
+      char buf[PERM_BUF_CAPACITY] = {};
+      int32_t sz = get_permission_lower_bound( get_self().value, PERM_ACTIVE.value, buf, sizeof(buf) );
+      check( sz > 0, "get_permission_lower_bound(self, active) must find the active permission" );
+      check( static_cast<uint32_t>(sz) <= sizeof(buf), "active record larger than probe buffer" );
+
+      auto rec = unpack<probe_perm_record>( buf, static_cast<size_t>(sz) );
+      check( rec.perm_name == PERM_ACTIVE, "record perm_name must be active" );
+      check( rec.parent    == PERM_OWNER,  "active's parent permission must be owner" );
+      check( rec.auth.threshold == 1, "created account active threshold must be 1" );
+      check( rec.auth.keys.size() >= 1, "active must carry at least one key" );
+      bool key_meets_threshold = false;
+      for ( const auto& kw : rec.auth.keys )
+         if ( kw.weight >= rec.auth.threshold ) key_meets_threshold = true;
+      check( key_meets_threshold, "active must have a key whose weight meets the threshold" );
+   }
+
+   // The `owner` row is the authority root: its parent permission name is the empty name (the host leaves
+   // parent_name default-constructed when the parent OID is 0).
+   [[sysio::action]]
+   void glpbown() {
+      char buf[PERM_BUF_CAPACITY] = {};
+      int32_t sz = get_permission_lower_bound( get_self().value, PERM_OWNER.value, buf, sizeof(buf) );
+      check( sz > 0, "get_permission_lower_bound(self, owner) must find the owner permission" );
+
+      auto rec = unpack<probe_perm_record>( buf, static_cast<size_t>(sz) );
+      check( rec.perm_name == PERM_OWNER, "record perm_name must be owner" );
+      check( rec.parent.value == 0, "owner's parent must be the empty/root name" );
+      check( rec.auth.threshold == 1, "owner threshold must be 1" );
+      check( rec.auth.keys.size() >= 1, "owner must carry at least one key" );
+   }
+
+   // Size-query + small-buffer contract: a zero-length buffer returns the full record size without writing; an
+   // under-sized buffer returns the SAME full size and copies only min(buffer_size, size) bytes -- here the
+   // 8-byte perm_name prefix -- without writing past the caller's window. The 8-byte window is wedged inside a
+   // 0xAA canary so any over- or under-run surfaces as a corrupted canary byte.
+   [[sysio::action]]
+   void glpbsz() {
+      int32_t full = get_permission_lower_bound( get_self().value, PERM_ACTIVE.value, nullptr, 0 );
+      check( full > 8, "active record must be larger than the 8-byte name prefix" );
+
+      unsigned char canary[24];
+      std::memset( canary, 0xAA, sizeof(canary) );
+      char* window = reinterpret_cast<char*>( canary + 8 );   // 8-byte window at [8,16), guarded on both sides
+      int32_t sz = get_permission_lower_bound( get_self().value, PERM_ACTIVE.value, window, 8 );
+      check( sz == full, "size-query and small-buffer calls must return the same full record size" );
+
+      uint64_t name_val = 0;
+      std::memcpy( &name_val, window, sizeof(name_val) );
+      check( name_val == PERM_ACTIVE.value, "small buffer must still receive the 8-byte perm_name prefix" );
+      for ( int i = 0; i < 8; ++i )
+         check( canary[i] == 0xAA, "get_permission_lower_bound wrote before the caller's buffer window" );
+      for ( int i = 16; i < 24; ++i )
+         check( canary[i] == 0xAA, "get_permission_lower_bound wrote past the 8-byte buffer window" );
+   }
+
+   // Lower-bound, not exact-match: a permission name sorting strictly between active and owner rolls forward to
+   // the NEXT existing row of the SAME account (owner) and returns its record -- it does NOT return -1. This is
+   // exactly why CDT's sysio::get_permission re-checks the returned perm_name against the requested one.
+   [[sysio::action]]
+   void glpbnx() {
+      char buf[PERM_BUF_CAPACITY] = {};
+      int32_t sz = get_permission_lower_bound( get_self().value, PERM_BETWEEN.value, buf, sizeof(buf) );
+      check( sz > 0, "lower_bound of a between-name must return the next permission row, not -1" );
+
+      auto rec = unpack<probe_perm_record>( buf, static_cast<size_t>(sz) );
+      check( rec.perm_name == PERM_OWNER,
+             "lower_bound(self, <name between active and owner>) must return owner (the next row)" );
+   }
+
+   // Not found: a permission name sorting after every row the account has makes by_owner lower_bound roll past
+   // all of self's rows (onto the next account, or end()); the host's owner-mismatch guard returns -1.
+   [[sysio::action]]
+   void glpbnf() {
+      char buf[PERM_BUF_CAPACITY] = {};
+      int32_t sz = get_permission_lower_bound( get_self().value, PERM_PAST.value, buf, sizeof(buf) );
+      check( sz == -1, "query for a permission past all of self's permissions must return -1" );
+   }
+
+   // =============================================================================
+   // Wiring-only stub kept so the earlier build-smoke commit remains callable.
+   // =============================================================================
+   [[sysio::action]]
+   void nop() {}
+};

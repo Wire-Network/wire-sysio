@@ -50,6 +50,11 @@ WalletdName=Utils.SysWalletName
 ClientName="clio"
 timeout = .5 * 12 * 2 + 60 # time for finalization with 1 producer + 60 seconds padding
 Utils.setIrreversibleTimeout(timeout)
+expectedExtraPackedDataError="packed_transaction contains extra data beyond transaction struct"
+
+def responseContainsExpectedError(response):
+    """Return true when an HTTP error response contains the expected extra packed-data rejection."""
+    return response is not None and expectedExtraPackedDataError in json.dumps(response)
 
 try:
     TestHelper.printSystemInfo("BEGIN")
@@ -158,11 +163,10 @@ try:
         if i == 0:
             packedTrx["packed_trx"] = packed_trx_param + "00000000"
 
-        sentTrx = node.processUrllibRequest("chain", "send_transaction2", {"transaction": packedTrx}, silentErrors=True, exitOnError=False)
+        sentTrx = node.processUrllibRequest("chain", "send_transaction2", {"transaction": packedTrx}, silentErrors=i != 0, exitOnError=False)
         Print("sent transaction json: %s" % (sentTrx))
         if i == 0:
-            assert sentTrx is None, "Should have failed to send transaction with extra data"
-            assert node.findInLog("packed_transaction contains extra data"), "Should have found failed log message"
+            assert responseContainsExpectedError(sentTrx), "Should have rejected transaction with extra packed data"
             continue
 
         trx_id = sentTrx["payload"]["transaction_id"]

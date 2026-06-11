@@ -23,6 +23,7 @@
 #include <vector>
 #include <deque>
 #include <cstdint>
+#include <functional>
 
 #define OBJECT_CTOR1(NAME) \
     public: \
@@ -507,13 +508,30 @@ namespace sysio::chain {
    template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
    template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
 
-   // next_function is a function passed to an API (like send_transaction) and which is called at the end of
-   // the API processing on the main thread. The type T is a description of the API result that can be
+   // next_function is a function passed to an API (like send_transaction) and which is called at the end
+   // of the API processing on the main thread. The type T is a description of the API result that can be
    // serialized as output.
    // The function accepts a variant which can contain an exception_ptr (if an exception occured while
    // processing the API) or the result T.
    // The third option is a function which can be executed in a multithreaded context (likely on the
    // http_plugin thread pool) and which completes the API processing and returns the result T.
+   //
+   // The user-provided callable is held inside a std::move_only_function so consume-on-call captures
+   // (e.g. [cb = std::move(cb)] mutable {...}) work correctly. The outer wrapper is copyable via a
+   // shared_ptr indirection - required because the callback travels through paths that copy
+   // (boost::signals2 slot dispatch, boost::multi_index value storage, lambdas captured by [=],
+   // CATCH_AND_CALL fallbacks held alongside an async capture in the same scope). All copies share
+   // the same underlying callable; if the underlying lambda consumes its captures, calling through
+   // any copy after the first invocation reaches an exhausted state.
+   //
+   // Invocation contract (load-bearing):
+   //   * Exactly one invocation across the lifetime of all copies. Calling more than once -- whether
+   //     through one copy or across copies -- is undefined: the underlying move_only_function may
+   //     have already moved out its captures.
+   //   * Single-threaded invocation. operator() is declared const but mutates the shared
+   //     move_only_function; concurrent invocation across copies on different threads is a data race.
+   //     The bind_stream / chain_plugin response paths hand the callback off to one thread (typically
+   //     the http pool) where the single invocation runs; the producing thread must not also invoke.
    // -------------------------------------------------------------------------------------------------------
    template<typename T>
    using t_or_exception = std::variant<T, fc::exception_ptr>;
@@ -522,7 +540,34 @@ namespace sysio::chain {
    using next_function_variant = std::variant<fc::exception_ptr, T, std::function<t_or_exception<T>()>>;
 
    template<typename T>
-   using next_function = std::function<void(const next_function_variant<T>&)>;
+   class next_function {
+   public:
+      // Rvalue-ref signature lets the consuming closure move the payload out of the variant
+      // (`std::get<T>(std::move(v))`) instead of copying.  Lvalue callers must explicitly
+      // std::move; this is a deliberate compile-time forcing function rather than a silent
+      // copy at the by-value parameter boundary.
+      using element_type = std::move_only_function<void(next_function_variant<T>&&)>;
+
+      next_function() = default;
+      next_function(std::nullptr_t) noexcept {}
+
+      template<typename F>
+         requires (!std::is_same_v<std::decay_t<F>, next_function>)
+      next_function(F&& f)
+         : _f(std::make_shared<element_type>(std::forward<F>(f))) {}
+
+      void operator()(next_function_variant<T>&& v) const {
+         if (!_f || !*_f) [[unlikely]] {
+            throw std::bad_function_call();
+         }
+         (*_f)(std::move(v));
+      }
+
+      explicit operator bool() const noexcept { return _f && static_cast<bool>(*_f); }
+
+   private:
+      std::shared_ptr<element_type> _f;
+   };
 
    // to configure whether a process should be done asynchronously or not
    enum class async_t { no, yes };

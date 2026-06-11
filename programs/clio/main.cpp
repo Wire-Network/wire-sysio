@@ -73,6 +73,7 @@ Options:
 #include <unordered_map>
 #include <utility>
 #include <fc/crypto/hex.hpp>
+#include <fc/crypto/keccak256.hpp>
 #include <fc/variant.hpp>
 #include <fc/io/datastream.hpp>
 #include <fc/io/json.hpp>
@@ -1904,18 +1905,33 @@ int main( int argc, char** argv ) {
 
    bool r1 = false;
    bool k1 = false;
+   bool em = false;
+   bool sol = false;
    string key_file;
    bool print_console = false;
    // create key
-   auto create_key_cmd = create_cmd->add_subcommand("key", localized("Create a new keypair and print the public and private keys"))->callback( [&r1, &k1, &key_file, &print_console](){
+   auto create_key_cmd = create_cmd->add_subcommand("key", localized("Create a new keypair and print the public and private keys"))->callback( [&r1, &k1, &em, &sol, &key_file, &print_console](){
       if (key_file.empty() && !print_console) {
          std::cerr << "ERROR: Either indicate a file using \"--file\" or pass \"--to-console\"" << std::endl;
          return;
       }
 
-      auto pk    = r1 ? private_key_type::generate(crypto::private_key::key_type::r1) : private_key_type::generate();
-      auto privs = pk.to_string({}, k1);
-      auto pubs  = pk.get_public_key().to_string({}, k1);
+      // --k1/--r1/--em/--sol are mutually exclusive (enforced by CLI11 ->excludes()
+      // below, so any combination is a non-zero parse error). No flag => the default
+      // K1 key in its legacy unprefixed form; --k1 => the same K1 key in the prefixed
+      // PVT_K1_/PUB_K1_ form; --r1/--em/--sol => that curve (always prefixed).
+      auto kt = crypto::private_key::key_type::k1;
+      if      (sol) kt = crypto::private_key::key_type::ed;   // Solana ed25519
+      else if (em)  kt = crypto::private_key::key_type::em;   // Ethereum-style secp256k1 (MetaMask personal_sign)
+      else if (r1)  kt = crypto::private_key::key_type::r1;
+
+      // K1 has a legacy unprefixed form; --k1 requests the prefixed PVT_K1_/PUB_K1_
+      // form. r1/em/ed are only ever emitted in their prefixed (PVT_*_/PUB_*_) form.
+      const bool include_prefix = (kt != crypto::private_key::key_type::k1) || k1;
+
+      auto pk    = private_key_type::generate(kt);
+      auto privs = pk.to_string({}, include_prefix);
+      auto pubs  = pk.get_public_key().to_string({}, include_prefix);
       if (print_console) {
          std::cout << localized("Private key: ${key}", ("key",  privs) ) << std::endl;
          std::cout << localized("Public key: ${key}", ("key", pubs ) ) << std::endl;
@@ -1926,8 +1942,14 @@ int main( int argc, char** argv ) {
          out << localized("Public key: ${key}", ("key", pubs ) ) << std::endl;
       }
    });
-   create_key_cmd->add_flag( "--k1", k1, "Generate a key using the K1 curve (Bitcoin) with PUB_K1_ & PVT_K1_ prefix instead of legacy"  );
-   create_key_cmd->add_flag( "--r1", r1, "Generate a key using the R1 curve (iPhone), instead of the K1 curve (Bitcoin)"  );
+   auto k1_flag  = create_key_cmd->add_flag( "--k1", k1, "Generate a key using the K1 curve (Bitcoin) with PUB_K1_ & PVT_K1_ prefix instead of legacy"  );
+   auto r1_flag  = create_key_cmd->add_flag( "--r1", r1, "Generate a key using the R1 curve (iPhone), instead of the K1 curve (Bitcoin)"  );
+   auto em_flag  = create_key_cmd->add_flag( "--em", em, "Generate an EM key (Ethereum-style secp256k1, PUB_EM_/PVT_EM_) for MetaMask/external personal_sign"  );
+   auto sol_flag = create_key_cmd->add_flag( "--sol", sol, "Generate a Solana key (ed25519, PUB_ED_/PVT_ED_) for external Solana signers"  );
+   // --k1/--r1/--em/--sol are mutually exclusive; selecting more than one is a usage error.
+   k1_flag->excludes(r1_flag)->excludes(em_flag)->excludes(sol_flag);
+   r1_flag->excludes(em_flag)->excludes(sol_flag);
+   em_flag->excludes(sol_flag);
    create_key_cmd->add_option("-f,--file", key_file, localized("Name of file to write private/public key output to. (Must be set, unless \"--to-console\" is passed"));
    create_key_cmd->add_flag( "--to-console", print_console, localized("Print private/public keys to console."));
 
@@ -2044,6 +2066,41 @@ int main( int argc, char** argv ) {
       std::cout << "WASM hash: " << wasm_hash.str() << std::endl;
    });
 
+   // ---- convert keccak256 ----
+   string keccak_input;
+   bool keccak_hex_input = false;
+   auto keccak_cmd = convert_cmd->add_subcommand("keccak256", localized("Compute Keccak-256 hash of input data"));
+   keccak_cmd->add_option("data", keccak_input, localized("Input data (text by default, or hex with --hex)"))->required();
+   keccak_cmd->add_flag("--hex", keccak_hex_input, localized("Interpret input as hex-encoded bytes"));
+   keccak_cmd->callback([&] {
+      std::vector<uint8_t> bytes;
+      if (keccak_hex_input) {
+         bytes = fc::from_hex(keccak_input);
+      } else {
+         bytes.assign(keccak_input.begin(), keccak_input.end());
+      }
+      auto hash = fc::crypto::keccak256::hash(std::span<const uint8_t>(bytes.data(), bytes.size()));
+      std::cout << hash.str() << std::endl;
+   });
+
+   // ---- convert sha256 ----
+   string sha256_input;
+   bool sha256_hex_input = false;
+   auto sha256_cmd = convert_cmd->add_subcommand("sha256", localized("Compute SHA-256 hash of input data"));
+   sha256_cmd->add_option("data", sha256_input, localized("Input data (text by default, or hex with --hex)"))->required();
+   sha256_cmd->add_flag("--hex", sha256_hex_input, localized("Interpret input as hex-encoded bytes"));
+   sha256_cmd->callback([&] {
+      std::vector<char> bytes;
+      if (sha256_hex_input) {
+         auto hb = fc::from_hex(sha256_input);
+         bytes.assign(hb.begin(), hb.end());
+      } else {
+         bytes.assign(sha256_input.begin(), sha256_input.end());
+      }
+      auto hash = fc::sha256::hash(bytes.data(), bytes.size());
+      std::cout << hash.str() << std::endl;
+   });
+
    string k1_private_key;
    auto k1_private_key_cmd = convert_cmd->add_subcommand("k1_private_key", localized("Generate all forms of K1 key"));
    k1_private_key_cmd->add_option("--private-key", k1_private_key, localized("Private key in to import, prompts if not provided"))->expected(0, 1);
@@ -2085,6 +2142,181 @@ int main( int argc, char** argv ) {
       auto pubk = fc::crypto::public_key::from_string(k1_public_key, fc::crypto::public_key::key_type::k1);
       std::cout << localized("Public key: ${key}", ("key", pubk.to_string({}) ) ) << std::endl;
       std::cout << localized("Public key: ${key}", ("key", pubk.to_string({}, true) ) ) << std::endl;
+   });
+
+   // EM (Ethereum-style secp256k1) key utilities. These let an external Ethereum signer (MetaMask personal_sign)
+   // interoperate with Wire offline: import a raw Ethereum secret as a Wire PVT_EM_ key, and sign/recover a Wire
+   // transaction sig_digest exactly as nodeop validates it, using libfc's own em path (the same code the chain runs).
+
+   /// Parse a Wire PVT_EM_ string or a raw 0x-prefixed Ethereum hex secret into a unified em private key.
+   /// One helper, used by every em_* subcommand below.
+   auto parse_em_private_key = [](const std::string& s) -> fc::crypto::private_key {
+      if (s.rfind("PVT_EM_", 0) == 0)
+         return fc::crypto::private_key::from_string(s, fc::crypto::private_key::key_type::em);
+      // Raw Ethereum form (what MetaMask / eth tooling exports): 0x<64hex> or 64hex.
+      auto em_priv = fc::em::private_key::from_native_string(s);
+      return fc::crypto::private_key::regenerate<fc::em::private_key_shim>(em_priv.get_secret());
+   };
+
+   /// Parse a 32-byte sha256 digest given as 64 hex chars (optional 0x prefix).
+   auto parse_sha256_hex = [](std::string s) -> fc::sha256 {
+      if (s.rfind("0x", 0) == 0 || s.rfind("0X", 0) == 0)
+         s = s.substr(2);
+      SYSC_ASSERT(s.size() == 64, "ERROR: digest must be a 32-byte sha256 (64 hex chars, 0x optional)");
+      return fc::sha256(s);
+   };
+
+   string em_private_key;
+   auto em_private_key_cmd = convert_cmd->add_subcommand("em_private_key", localized("Convert a raw Ethereum secret (or PVT_EM_) to Wire PVT_EM_/PUB_EM_ key forms"));
+   em_private_key_cmd->add_option("--private-key", em_private_key, localized("PVT_EM_... or a raw 0x Ethereum hex secret. Omit to enter it at the prompt; "
+                                                "passing it here exposes the secret in ps/shell history"))->expected(0, 1);
+   em_private_key_cmd->add_option("-f,--file", key_file, localized("Name of file to write private/public key output to. (Must be set, unless \"--to-console\" is passed"));
+   em_private_key_cmd->add_flag("--to-console", print_console, localized("Print private/public keys to console."));
+   em_private_key_cmd->callback([&] {
+      if (key_file.empty() && !print_console) {
+         std::cerr << "ERROR: Either indicate a file using \"--file\" or pass \"--to-console\"" << std::endl;
+         return;
+      }
+      if (em_private_key.empty()) {
+         std::cout << localized("private key: ");
+         fc::set_console_echo(false);
+         std::getline(std::cin, em_private_key, '\n');
+         fc::set_console_echo(true);
+         std::cout << std::endl;
+      }
+      auto privk = parse_em_private_key(em_private_key);
+      auto pubk  = privk.get_public_key();
+      if (print_console) {
+         std::cout << localized("Private key: ${key}", ("key", privk.to_string({}, true)) ) << std::endl;
+         std::cout << localized("Public key: ${key}",  ("key", pubk.to_string({}, true))  ) << std::endl;
+      } else {
+         std::cerr << localized("saving keys to ${filename}", ("filename", key_file)) << std::endl;
+         std::ofstream out( key_file.c_str() );
+         out << localized("Private key: ${key}", ("key", privk.to_string({}, true)) ) << std::endl;
+         out << localized("Public key: ${key}",  ("key", pubk.to_string({}, true))  ) << std::endl;
+      }
+   });
+
+   string em_sign_digest;
+   string em_sign_priv;
+   auto em_sign_cmd = convert_cmd->add_subcommand("em_sign", localized("Sign a 32-byte sha256 digest with an EM key (EIP-191 personal_sign), printing SIG_EM_"));
+   em_sign_cmd->add_option("digest", em_sign_digest, localized("32-byte sha256 digest, 64 hex chars (0x optional)"))->required();
+   em_sign_cmd->add_option("--private-key", em_sign_priv, localized("PVT_EM_... or a raw 0x Ethereum hex secret. Omit to enter it at the prompt; "
+                                                "passing it here exposes the secret in ps/shell history"))->expected(0, 1);
+   em_sign_cmd->callback([&] {
+      if (em_sign_priv.empty()) {
+         std::cout << localized("private key: ");
+         fc::set_console_echo(false);
+         std::getline(std::cin, em_sign_priv, '\n');
+         fc::set_console_echo(true);
+         std::cout << std::endl;
+      }
+      auto privk  = parse_em_private_key(em_sign_priv);
+      auto digest = parse_sha256_hex(em_sign_digest);
+      // private_key::sign dispatches to em::sign_sha256, which wraps the digest in the EIP-191 personal_sign
+      // envelope before secp256k1 -- identical to what MetaMask produces and to what nodeop recovers. Emit the
+      // prefixed SIG_EM_ form, which is what `clio push transaction --signature` and send_transaction2 expect.
+      std::cout << localized("Signature: ${sig}", ("sig", privk.sign(digest).to_string({}, true)) ) << std::endl;
+   });
+
+   string em_recover_sig;
+   string em_recover_digest;
+   auto em_recover_cmd = convert_cmd->add_subcommand("em_recover", localized("Recover the PUB_EM_ from a SIG_EM_ over a 32-byte sha256 digest (EIP-191)"));
+   em_recover_cmd->add_option("signature", em_recover_sig, localized("SIG_EM_... signature to recover from"))->required();
+   em_recover_cmd->add_option("digest", em_recover_digest, localized("32-byte sha256 digest, 64 hex chars (0x optional)"))->required();
+   em_recover_cmd->callback([&] {
+      auto sig    = fc::crypto::signature::from_string(em_recover_sig, fc::crypto::signature::sig_type::em);
+      auto digest = parse_sha256_hex(em_recover_digest);
+      // public_key::recover dispatches to em::recover, which applies the same EIP-191 envelope before recovery.
+      // Emit the prefixed PUB_EM_ form so it compares directly against a key registered in an account's authority.
+      auto pubk = fc::crypto::public_key::recover(sig, digest);
+      std::cout << localized("Public key: ${key}", ("key", pubk.to_string({}, true)) ) << std::endl;
+   });
+
+   // ——— Ethereum keypair -> Wire K1 ———
+   // An Ethereum keypair is plain secp256k1, the SAME curve as Wire K1, so an existing Ethereum key can be
+   // reused AS a Wire K1 signing key. Two caveats are surfaced in the help text and matter for the user:
+   //   * K1 signs with Wire's STANDARD secp256k1 scheme, NOT Ethereum's EIP-191 personal_sign. A browser
+   //     wallet (MetaMask) cannot produce K1 signatures for Wire transactions; the private key must live in
+   //     a Wire signer (kiod). To keep signing with the Ethereum wallet, import the key as EM instead
+   //     (`convert em_private_key`), which preserves the EIP-191 path.
+   //   * The Ethereum address is keccak256(uncompressed pubkey)[-20:] -- a hash, not reversible to a key. It
+   //     is printed only so the converted key can be matched to the expected Ethereum account.
+
+   // Standard Ethereum address (low 20 bytes of keccak256 over the 64-byte X||Y) from an EM public key.
+   auto eth_address_of = [](const fc::em::public_key& em_pub) -> std::string {
+      const auto unc = em_pub.serialize_uncompressed();   // 65 bytes: 0x04 || X(32) || Y(32)
+      const auto h = fc::crypto::keccak256::hash(
+         std::span<const uint8_t>{ reinterpret_cast<const uint8_t*>(unc.data()) + 1, 64 });
+      return "0x" + fc::to_hex(reinterpret_cast<const char*>(h.data()) + 12, 20);
+   };
+
+   string eth_k1_secret;
+   auto eth_to_k1_private_cmd = convert_cmd->add_subcommand("eth_to_k1_private",
+      localized("Reuse an existing Ethereum private key as a Wire K1 signing pair (same secp256k1 secret), "
+                "printing PVT_K1_/PUB_K1_ and the matching Ethereum address. NOTE: a K1 key signs with Wire's "
+                "standard scheme, not Ethereum EIP-191 -- MetaMask cannot sign for it, so the private key must "
+                "be held in a Wire signer (kiod). To keep signing with MetaMask instead, use `convert em_private_key`."));
+   eth_to_k1_private_cmd->add_option("--private-key", eth_k1_secret,
+      localized("Raw Ethereum secret: 0x<64 hex> or 64 hex. Omit to enter it at the prompt; passing it here "
+                "exposes the secret in ps/shell history"))->expected(0, 1);
+   eth_to_k1_private_cmd->add_option("-f,--file", key_file, localized("Write key output to this file (or pass --to-console)"));
+   eth_to_k1_private_cmd->add_flag("--to-console", print_console, localized("Print keys to console."));
+   eth_to_k1_private_cmd->callback([&] {
+      if (key_file.empty() && !print_console) {
+         std::cerr << "ERROR: Either indicate a file using \"--file\" or pass \"--to-console\"" << std::endl;
+         return;
+      }
+      if (eth_k1_secret.empty()) {
+         std::cout << localized("Ethereum private key: ");
+         fc::set_console_echo(false);
+         std::getline(std::cin, eth_k1_secret, '\n');
+         fc::set_console_echo(true);
+         std::cout << std::endl;
+      }
+      // Same secp256k1 secret, re-tagged as a Wire K1 key (ecc shim) rather than EM.
+      const auto em_priv = fc::em::private_key::from_native_string(eth_k1_secret);
+      const auto k1_priv = fc::crypto::private_key::regenerate<fc::ecc::private_key_shim>(em_priv.get_secret());
+      const auto k1_pub  = k1_priv.get_public_key();
+      const std::string addr = eth_address_of(em_priv.get_public_key());
+      if (print_console) {
+         std::cout << localized("Private key: ${k}", ("k", k1_priv.to_string({}, true))) << std::endl;
+         std::cout << localized("Public key: ${k}",  ("k", k1_pub.to_string({}, true)))  << std::endl;
+         std::cout << localized("Ethereum address: ${a}", ("a", addr)) << std::endl;
+      } else {
+         std::cerr << localized("saving keys to ${f}", ("f", key_file)) << std::endl;
+         std::ofstream out( key_file.c_str() );
+         out << localized("Private key: ${k}", ("k", k1_priv.to_string({}, true))) << std::endl;
+         out << localized("Public key: ${k}",  ("k", k1_pub.to_string({}, true)))  << std::endl;
+         out << localized("Ethereum address: ${a}", ("a", addr)) << std::endl;
+      }
+   });
+
+   string eth_k1_pubhex;
+   auto eth_to_k1_public_cmd = convert_cmd->add_subcommand("eth_to_k1_public",
+      localized("Convert an Ethereum uncompressed public key (0x04<128 hex>, or 0x<128 hex> for raw X||Y) to a "
+                "Wire PUB_K1_, plus the matching Ethereum address. Use this to register an account's K1 key "
+                "without handling the private key; signing still requires that private key in a Wire signer."));
+   eth_to_k1_public_cmd->add_option("public-key", eth_k1_pubhex,
+      localized("Ethereum uncompressed public key: 0x04 + 128 hex (65 bytes) or 128 hex (64-byte X||Y)"))->required();
+   eth_to_k1_public_cmd->callback([&] {
+      std::string s = eth_k1_pubhex;
+      if (s.rfind("0x", 0) == 0 || s.rfind("0X", 0) == 0) s = s.substr(2);
+      SYSC_ASSERT(s.size() == 130 || s.size() == 128,
+                  "ERROR: expected an uncompressed Ethereum public key: 0x04+128 hex (65 bytes) or 128 hex (64-byte X||Y)");
+      if (s.size() == 130) {
+         SYSC_ASSERT(s.substr(0, 2) == "04", "ERROR: 65-byte form must begin with the 04 uncompressed prefix");
+         s = s.substr(2);   // drop 04; keep X||Y
+      }
+      std::array<char, 65> unc{};
+      unc[0] = static_cast<char>(0x04);
+      fc::from_hex(s, unc.data() + 1, 64);
+      const fc::em::public_key em_pub{ unc };
+      const auto compressed = em_pub.serialize();   // 33-byte compressed point
+      const fc::crypto::public_key k1_pub{
+         fc::crypto::public_key::storage_type{ fc::ecc::public_key_shim{ compressed } } };
+      std::cout << localized("Public key: ${k}", ("k", k1_pub.to_string({}, true))) << std::endl;
+      std::cout << localized("Ethereum address: ${a}", ("a", eth_address_of(em_pub))) << std::endl;
    });
 
    string name_input;
@@ -2799,6 +3031,15 @@ int main( int argc, char** argv ) {
    // create wallet
    string wallet_name = "default";
    string password_file;
+   /// CLI11 option storage is referenced by registered callbacks after subcommand setup blocks exit.
+   string wallet_key_str;
+   string wallet_rm_key_str;
+   string wallet_rm_name;
+   string wallet_create_key_type;
+   string new_key_name;
+   string current_key_name;
+   string pub_key_str;
+   string priv_key_str;
    auto create_wallet_cmd = wallet_cmd->add_subcommand("create", localized("Create a new wallet locally"));
    create_wallet_cmd->add_option("-n,--name", wallet_name, localized("The name of the new wallet"))->capture_default_str();
    create_wallet_cmd->add_option("-f,--file", password_file, localized("Name of file to write wallet password output to. (Must be set, unless \"--to-console\" is passed"));
@@ -2864,7 +3105,6 @@ int main( int argc, char** argv ) {
 
    // import keys into wallet
    {
-      string wallet_key_str;
       auto import_wallet_cmd = wallet_cmd->add_subcommand("import", localized("Import private key into wallet"));
       import_wallet_cmd->add_option("-n,--name", wallet_name, localized("The name of the wallet to import key into"));
       import_wallet_cmd->add_option("--private-key", wallet_key_str, localized("Private key to import (WIF, PVT_K1_/PVT_R1_/PVT_EM_ prefixed, or 0x hex for EM)"))->expected(0, 1);
@@ -2892,7 +3132,6 @@ int main( int argc, char** argv ) {
 
    // remove keys from wallet
    {
-      string wallet_rm_key_str;
       auto remove_key_wallet_cmd = wallet_cmd->add_subcommand("remove_key", localized("Remove public_key and associated private_key from wallet"));
       remove_key_wallet_cmd->add_option("-n,--name", wallet_name, localized("The name of the wallet to remove key from"));
       remove_key_wallet_cmd->add_option("key", wallet_rm_key_str, localized("Public key to remove"))->required();
@@ -2911,7 +3150,6 @@ int main( int argc, char** argv ) {
    }
 
    {
-      string wallet_rm_name;
       auto remove_name_wallet_cmd = wallet_cmd->add_subcommand("remove_name", localized("Remove named key set from wallet"));
       remove_name_wallet_cmd->add_option("-n,--name", wallet_name, localized("The name of the wallet to remove key set from"));
       remove_name_wallet_cmd->add_option("name", wallet_rm_name, localized("The named set to remove"))->required();
@@ -2926,7 +3164,6 @@ int main( int argc, char** argv ) {
 
    // create a key within wallet
    {
-      string wallet_create_key_type;
       auto create_key_in_wallet_cmd = wallet_cmd->add_subcommand("create_key", localized("Create private key within wallet"));
       create_key_in_wallet_cmd->add_option("-n,--name", wallet_name, localized("The name of the wallet to create key into"))->capture_default_str();
       create_key_in_wallet_cmd->add_option("key_type", wallet_create_key_type, localized("Key type to create (K1/R1/EM/ED)"))->type_name("K1/R1/EM/ED")->capture_default_str();
@@ -2972,11 +3209,6 @@ int main( int argc, char** argv ) {
 
 
    {
-      std::string new_key_name;
-      std::string current_key_name;
-      std::string pub_key_str;
-      std::string priv_key_str;
-
       struct set_key_name_criteria {
          std::string uri_path;
          std::string value;
@@ -3297,6 +3529,31 @@ int main( int argc, char** argv ) {
       fc::variant requested_perm_var = json_from_file_or_string(requested_perm);
       fc::variant trx_var = json_from_file_or_string(trx_to_push);
 
+      // The propose action takes the inner trx as a `transaction`, and the
+      // chain `transaction` ABI types `action.data` as `bytes`. variant_to_bin
+      // (below) only handles the case where each action's `data` is already a
+      // hex string. If the user handed us structured `data` objects — the
+      // natural shape, the same one `clio push transaction` accepts — the
+      // literal cast below throws "Bad Cast — Invalid cast from object_type to
+      // string" and we fall through to the ABI-resolver-aware decoder, which
+      // fetches each contract's ABI on demand and recursively encodes the
+      // inner action data. Mirrors the fallback in the `push transaction`
+      // callback (~line 3145). Strict superset of the old behavior: if the
+      // input is already in the legacy hex-data form, the literal cast
+      // succeeds and we never enter the catch.
+      try {
+         (void)trx_var.as<transaction>();
+      } catch ( const std::exception& ) {
+         transaction trx;
+         try {
+            abi_serializer::from_variant( trx_var, trx, abi_serializer_resolver,
+                                          abi_serializer::create_yield_function( abi_serializer_max_time ) );
+         } SYS_RETHROW_EXCEPTIONS( transaction_type_exception,
+                                   "Failed to encode proposed transaction. If actions reference contracts whose ABI cannot be fetched, "
+                                   "either deploy them first or pre-encode action data as hex." )
+         trx_var = trx; // implicit conversion serializes vector<char> action data as hex
+      }
+
       auto account_permissions = get_account_permissions(tx_permission);
       if (account_permissions.empty()) {
          if (!proposer.empty()) {
@@ -3327,20 +3584,99 @@ int main( int argc, char** argv ) {
    review_cmd->add_flag( "--show-approvals", show_approvals_in_multisig_review, localized("Show the status of the approvals requested within the proposal") );
 
    review_cmd->callback([&] {
-      const auto result1 = call(get_table_func, fc::mutable_variant_object("json", true)
-                                 ("code", "sysio.msig")
-                                 ("scope", proposer)
-                                 ("table", "proposal")
-                                 ("find", fc::json::to_string(fc::mutable_variant_object("proposal_name", name(proposal_name).to_uint64_t()), fc::time_point::maximum()))
-                           );
+      // Fetch the proposal via the contract's read-only `getproposal` action instead of
+      // reaching into the `proposal` KV row directly. The contract reassembles chunked
+      // proposals on its side and returns a single struct with `packed_transaction`
+      // populated regardless of how the bytes are physically laid out on disk. This
+      // makes clio storage-layout-agnostic — if sysio.msig refactors its tables again
+      // in the future, this code keeps working as long as `getproposal`'s signature
+      // is preserved.
+      auto getproposal_args = fc::mutable_variant_object()
+         ("proposer",      proposer)
+         ("proposal_name", proposal_name);
 
-      const auto& rows1 = result1.get_object()["rows"].get_array();
-      if( rows1.empty() || rows1[0]["value"].get_object()["proposal_name"] != proposal_name ) {
-         std::cerr << "Proposal not found" << std::endl;
-         return;
+      chain::action getproposal_act{
+         {},                                  // no authorization needed for a read-only call
+         "sysio.msig"_n, "getproposal"_n,
+         variant_to_bin( "sysio.msig"_n, "getproposal"_n, fc::variant(getproposal_args) )
+      };
+
+      signed_transaction ro_trx;
+      ro_trx.actions.push_back( getproposal_act );
+
+      // Tapos / expiration: read-only trxs are never broadcast or persisted, but the
+      // chain still validates the header. Use the same defaults `push_transaction` uses.
+      auto info = get_info();
+      ro_trx.expiration = fc::time_point_sec{ info.head_block_time + tx_expiration };
+      ro_trx.set_reference_block( info.last_irreversible_block_id );
+
+      fc::variant result1;
+      try {
+         result1 = call( send_read_only_txn_func,
+                         fc::mutable_variant_object("transaction",
+                            packed_transaction( ro_trx, packed_transaction::compression_type::none )) );
+      } catch( chain::missing_chain_api_plugin_exception& ) {
+         std::cerr << "send_read_only_transaction RPC is not supported by this node — "
+                      "ensure the API node is started with --read-only-threads N (N >= 1) and is "
+                      "not a producer node." << std::endl;
+         throw;
+      } catch( const fc::exception& e ) {
+         // The contract's `proptable.get(..., "proposal not found")` assertion surfaces
+         // here as a generic fc::exception (do_http_call constructs one from the chain's
+         // error envelope at httpc.cpp:83) with code 3050003 / sysio_assert_message
+         // and "proposal not found" embedded in the log message. Print the historical
+         // friendly message for that specific case and rethrow everything else, so
+         // network errors, server errors, parse failures, and unrelated contract
+         // assertions are not silently masked as a missing proposal.
+         if( e.to_string().find("proposal not found") != std::string::npos ) {
+            std::cerr << "Proposal not found" << std::endl;
+            return;
+         }
+         throw;
       }
 
-      const auto& proposal_object = rows1[0]["value"].get_object();
+      // The action's return value is the assembled `proposal` struct. chain_plugin
+      // ABI-decodes it into `return_value_data` when the contract's ABI has an
+      // `action_results` entry for the action — which sysio.msig's ABI does. Pull
+      // the decoded variant out of the trace and use it the same way the old
+      // get_table_rows code path used the row's "value" field.
+      //
+      // The envelope walk is wrapped in a try/catch because any of the
+      // `get_object()` / `get_array()` / `operator[]` accesses can throw on a
+      // misshapen response (bad_cast_exception for wrong types,
+      // key_not_found_exception for missing fields). We take the address of the
+      // final decoded object so `proposal_object` can be used by the downstream
+      // code without duplicating the ~200 KiB packed_transaction field — the
+      // pointed-to variant_object lives inside `result1`, which outlives the try
+      // block. On any parse failure we print the raw response so the user can
+      // diagnose what the node actually returned.
+      const fc::variant_object* proposal_object_ptr = nullptr;
+      try {
+         const auto& processed = result1.get_object()["processed"].get_object();
+         const auto& action_traces = processed["action_traces"].get_array();
+         if( action_traces.empty() ) {
+            std::cerr << "Proposal not found" << std::endl;
+            return;
+         }
+         const auto& first_trace = action_traces[0].get_object();
+         if( !first_trace.contains("return_value_data") ) {
+            std::cerr << "Node returned no decoded action_results for sysio.msig::getproposal — "
+                         "the chain may be running a sysio.msig version that does not expose this action." << std::endl;
+            return;
+         }
+         proposal_object_ptr = &first_trace["return_value_data"].get_object();
+         if( (*proposal_object_ptr)["proposal_name"] != proposal_name ) {
+            std::cerr << "Proposal not found" << std::endl;
+            return;
+         }
+      } catch( const fc::exception& e ) {
+         std::cerr << "Unexpected shape in send_read_only_transaction response from node for "
+                      "sysio.msig::getproposal on " << proposer << "/" << proposal_name << ".\n"
+                      "Error: " << e.to_string() << "\n"
+                      "Response: " << fc::json::to_pretty_string( result1 ) << std::endl;
+         return;
+      }
+      const auto& proposal_object = *proposal_object_ptr;
 
       enum class approval_status {
          unapproved,

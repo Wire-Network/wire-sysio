@@ -133,6 +133,7 @@ namespace sysio { namespace chain {
          using section_t = typename decltype(utils)::index_t::value_type;
 
          snapshot->read_section<section_t>([this, &read_row_count]( auto& section ) {
+            decltype(utils)::preallocate(_db, section.row_count());
             bool more = !section.empty();
             while(more) {
                decltype(utils)::create(_db, [this, &section, &more]( auto &row ) {
@@ -319,24 +320,19 @@ namespace sysio { namespace chain {
       const auto& auth = auths[0];
 
 
-      // Prevents users from updating / adding protected 'ex.*' permissions.
-      if(update.permission.prefix() == name("ex")) {
-         SYS_ASSERT( auth.actor == name("sysio") || auth.actor == name("sysio.authex"), invalid_permission, "Protected permission namespace. Only 'sysio' can update or add 'ex.*' permissions." );
-      } else {
-         SYS_ASSERT( (auth.actor == update.account), irrelevant_auth_exception,
-                     "the owner of the affected permission needs to be the actor of the declared authorization" );
+      SYS_ASSERT( (auth.actor == update.account), irrelevant_auth_exception,
+                  "the owner of the affected permission needs to be the actor of the declared authorization" );
 
-         const auto* min_permission = find_permission({update.account, update.permission});
-         if( !min_permission ) { // creating a new permission
-            min_permission = &get_permission({update.account, update.parent});
-         }
-
-         SYS_ASSERT( get_permission(auth).satisfies( *min_permission,
-                                                   _db.get_index<permission_index>().indices() ),
-                     irrelevant_auth_exception,
-                     "updateauth action declares irrelevant authority '{}'; minimum authority is {}",
-                     auth, permission_level{update.account, min_permission->name} );
+      const auto* min_permission = find_permission({update.account, update.permission});
+      if( !min_permission ) { // creating a new permission
+         min_permission = &get_permission({update.account, update.parent});
       }
+
+      SYS_ASSERT( get_permission(auth).satisfies( *min_permission,
+                                                  _db.get_index<permission_index>().indices() ),
+                  irrelevant_auth_exception,
+                  "updateauth action declares irrelevant authority '{}'; minimum authority is {}",
+                  auth, permission_level{update.account, min_permission->name} );
    }
 
    void authorization_manager::check_deleteauth_authorization( const deleteauth& del,
@@ -482,12 +478,15 @@ namespace sysio { namespace chain {
             if( !special_case ) {
                auto min_permission_name = lookup_minimum_permission(declared_auth.actor, act.account, act.name);
                if( min_permission_name ) { // since special cases were already handled, it should only be false if the permission is sysio.any
-                  const auto& min_permission = get_permission({declared_auth.actor, *min_permission_name});
-                  SYS_ASSERT( get_permission(declared_auth).satisfies( min_permission,
-                                                                       _db.get_index<permission_index>().indices() ),
-                              irrelevant_auth_exception,
-                              "action declares irrelevant authority '{}'; minimum authority is {}",
-                              declared_auth, permission_level{min_permission.owner, min_permission.name} );
+                  // If the declared permission matches the minimum, it trivially satisfies — skip DB lookups and hierarchy walk
+                  if( declared_auth.permission != *min_permission_name ) {
+                     const auto& min_permission = get_permission({declared_auth.actor, *min_permission_name});
+                     SYS_ASSERT( get_permission(declared_auth).satisfies( min_permission,
+                                                                          _db.get_index<permission_index>().indices() ),
+                                 irrelevant_auth_exception,
+                                 "action declares irrelevant authority '{}'; minimum authority is {}",
+                                 declared_auth, permission_level{min_permission.owner, min_permission.name} );
+                  }
                }
             }
 

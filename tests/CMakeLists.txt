@@ -23,6 +23,10 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cluster_launcher.py ${CMAKE_CURRENT_B
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/distributed-transactions-test.py ${CMAKE_CURRENT_BINARY_DIR}/distributed-transactions-test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/sysio_util_bls_test.py ${CMAKE_CURRENT_BINARY_DIR}/sysio_util_bls_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/sysio_util_snapshot_info_test.py ${CMAKE_CURRENT_BINARY_DIR}/sysio_util_snapshot_info_test.py COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/metamask/push_metamask_trx.py     ${CMAKE_CURRENT_BINARY_DIR}/metamask/push_metamask_trx.py     COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/metamask/metamask-sign.html       ${CMAKE_CURRENT_BINARY_DIR}/metamask/metamask-sign.html       COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/metamask/README.md                ${CMAKE_CURRENT_BINARY_DIR}/metamask/README.md                COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/clio_em_key_test.py ${CMAKE_CURRENT_BINARY_DIR}/clio_em_key_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/sample-cluster-map.json ${CMAKE_CURRENT_BINARY_DIR}/sample-cluster-map.json COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/restart-scenarios-test.py ${CMAKE_CURRENT_BINARY_DIR}/restart-scenarios-test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/terminate-scenarios-test.py ${CMAKE_CURRENT_BINARY_DIR}/terminate-scenarios-test.py COPYONLY)
@@ -99,10 +103,12 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/plugin_http_api_test.py ${CMAKE_CURRE
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/plugin_http_api_test_savanna.py ${CMAKE_CURRENT_BINARY_DIR}/plugin_http_api_test_savanna.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/nodeop_contrl_c_test.py ${CMAKE_CURRENT_BINARY_DIR}/nodeop_contrl_c_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/read_only_trx_test.py ${CMAKE_CURRENT_BINARY_DIR}/read_only_trx_test.py COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/multisig_review_test.py ${CMAKE_CURRENT_BINARY_DIR}/multisig_review_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/interrupt_read_only_trx_test.py ${CMAKE_CURRENT_BINARY_DIR}/interrupt_read_only_trx_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/resource_monitor_plugin_test.py ${CMAKE_CURRENT_BINARY_DIR}/resource_monitor_plugin_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/light_validation_sync_test.py ${CMAKE_CURRENT_BINARY_DIR}/light_validation_sync_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/proto_abi_test.py ${CMAKE_CURRENT_BINARY_DIR}/proto_abi_test.py COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/nodeownreg_test.py ${CMAKE_CURRENT_BINARY_DIR}/nodeownreg_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/interrupt_trx_test.py ${CMAKE_CURRENT_BINARY_DIR}/interrupt_trx_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/trace_plugin_test.py ${CMAKE_CURRENT_BINARY_DIR}/trace_plugin_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/nested_container_multi_index_test.py ${CMAKE_CURRENT_BINARY_DIR}/nested_container_multi_index_test.py COPYONLY)
@@ -178,6 +184,7 @@ add_np_test(NAME interrupt-read-only-trx-parallel-test COMMAND tests/interrupt_r
 add_np_test(NAME interrupt-read-only-trx-parallel-if-sys-vm-oc-test COMMAND tests/interrupt_read_only_trx_test.py -p 2 -n 3 --sys-vm-oc-enable all --read-only-threads 16 ${UNSHARE})
 add_np_test(NAME subjective_billing_test COMMAND tests/subjective_billing_test.py -v -p 2 -n 4 ${UNSHARE})
 add_np_test(NAME get_account_test COMMAND tests/get_account_test.py -v -p 2 -n 3 ${UNSHARE})
+add_np_test(NAME multisig_review_test COMMAND tests/multisig_review_test.py -v -p 1 -n 1 ${UNSHARE})
 add_np_test(NAME pause_at_block_test COMMAND tests/pause_at_block_test.py -v ${UNSHARE})
 
 add_np_test(NAME distributed-transactions-test COMMAND tests/distributed-transactions-test.py -d 2 -p 4 -n 6 -v ${UNSHARE})
@@ -233,6 +240,8 @@ add_np_test(NAME nodeop_chainbase_allocation_test COMMAND tests/nodeop_chainbase
 
 add_np_test(NAME nodeop_signal_throw_test COMMAND tests/nodeop_signal_throw_test.py -v ${UNSHARE})
 
+add_np_test(NAME metamask_trx_signing_test COMMAND tests/metamask/push_metamask_trx.py --simulate -v ${UNSHARE})
+
 add_lr_test(NAME nodeop_startup_catchup_lr_test COMMAND tests/nodeop_startup_catchup.py -v ${UNSHARE})
 
 add_np_test(NAME nodeop_short_fork_take_over_test COMMAND tests/nodeop_short_fork_take_over_test.py -v --wallet-port 9905 ${UNSHARE})
@@ -252,6 +261,7 @@ add_np_test(NAME lib_advance_test COMMAND tests/lib_advance_test.py -v ${UNSHARE
 add_np_test(NAME producer_rank_test COMMAND tests/producer_rank_test.py -v ${UNSHARE})
 
 add_p_test(NAME sysio_util_bls_test COMMAND tests/sysio_util_bls_test.py)
+add_p_test(NAME clio_em_key_test COMMAND tests/clio_em_key_test.py)
 add_p_test(NAME sysio_util_snapshot_info_test COMMAND tests/sysio_util_snapshot_info_test.py)
 
 add_np_test(NAME http_plugin_test COMMAND tests/http_plugin_test.py ${UNSHARE} TIMEOUT 200)
@@ -271,6 +281,7 @@ add_lr_test(NAME nodeop_repeat_transaction_lr_test COMMAND tests/nodeop_high_tra
 
 add_np_test(NAME light_validation_sync_test COMMAND tests/light_validation_sync_test.py -v ${UNSHARE})
 add_np_test(NAME proto_abi_test COMMAND tests/proto_abi_test.py -v ${UNSHARE})
+add_np_test(NAME nodeownreg_test COMMAND tests/nodeownreg_test.py -v ${UNSHARE})
 add_np_test(NAME interrupt_trx_test COMMAND tests/interrupt_trx_test.py -v ${UNSHARE})
 
 add_lr_test(NAME auto_bp_peering_test COMMAND tests/auto_bp_peering_test.py -v ${UNSHARE})

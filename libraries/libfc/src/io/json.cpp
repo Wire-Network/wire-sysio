@@ -722,6 +722,7 @@ namespace fc
               os += v.as_bool() ? "true" : "false";
               return;
          case variant::string_type:
+         case variant::string_sso_type:
               os += '"';
               escape_string( v.get_string(), os, yield );
               os += '"';

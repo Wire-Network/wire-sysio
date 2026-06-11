@@ -1565,6 +1565,7 @@ struct controller_impl {
          using utils_t = decltype(utils);
          using value_t = typename decltype(utils)::index_t::value_type;
          snapshot->read_section<value_t>([this, &read_row_count]( auto& section ) {
+            utils_t::preallocate(db, section.row_count());
             bool more = !section.empty();
             while (more) {
                utils_t::create(db, [this, &section, &more](auto& row) {
@@ -1687,6 +1688,7 @@ struct controller_impl {
             // TODO:
          }
          snapshot->read_section<value_t>([this,&rows_loaded]( auto& section ) {
+            decltype(utils)::preallocate(db, section.row_count());
             bool more = !section.empty();
             while(more) {
                decltype(utils)::create(db, [this, &section, &more]( auto &row ) {
@@ -1997,6 +1999,7 @@ struct controller_impl {
 
             trx->prev_accounts_billing = trx_context.accounts_billing;
             trx->elapsed = std::max(trx->elapsed, trace->elapsed);
+            trx->prev_succeeded = true;
             if (!trx->implicit() && !trx->is_read_only()) {
                trace->receipt = push_receipt(*trx->packed_trx(), trx_context.billed_cpu_us);
                bb.pending_trx_metas().emplace_back(trx);
@@ -2057,13 +2060,12 @@ struct controller_impl {
 
          // this code is hit if an exception was thrown, and handled by `handle_exception`
          // ------------------------------------------------------------------------------
+         // _block_report describes block contents on both producer (log_applied + produced_block_metrics) and
+         // receiver (Received log + incoming_block_metrics) paths.  A rejected trx is dropped from the block,
+         // so do not roll its net/cpu/elapsed in -- producer and receiver totals must agree.
          if (!trx->is_transient()) {
             dmlog_applied_transaction(trace);
             emit( applied_transaction, std::tie(trace, trx->packed_trx()), __FILE__, __LINE__ );
-
-            pending->_block_report.total_net_usage += trace->net_usage;
-            if( trace->receipt ) pending->_block_report.total_cpu_usage_us += trace->total_cpu_usage_us;
-            pending->_block_report.total_elapsed_time += trace->elapsed;
          }
 
          return trace;
@@ -2410,12 +2412,17 @@ struct controller_impl {
          return;
       }
 
+      // wire latency is block_timestamp -> first network arrival at this node (received_time, set by net_plugin),
+      // distinct from latency which is block_timestamp -> apply complete. Their difference is the local apply-queue
+      // / in-producing-mode delay. wire latency is 0 when received_time is unset (replay, loaded from disk).
+      const auto& received_time = chain_head.internal()->received_time;
       ilog("Received block {}... #{} @ {} signed by {} " // "Received" instead of "Applied" so it matches existing log output
-           "[trxs: {}, lib: {}, net: {}, cpu: {} us, elapsed: {} us, applying time: {} us, latency: {} ms]",
+           "[trxs: {}, lib: {}, net: {}, cpu: {} us, elapsed: {} us, applying time: {} us, wire latency: {} ms, latency: {} ms]",
            chain_head.id().short_id(), chain_head.block_num(), chain_head.timestamp(), chain_head.producer(),
            chain_head.block()->transactions.size(), chain_head.irreversible_blocknum(),
-           br.total_net_usage, br.total_cpu_usage_us,
-           br.total_elapsed_time, now - br.start_time, (now - chain_head.timestamp()).count() / 1000);
+           br.total_net_usage, br.total_cpu_usage_us, br.total_elapsed_time, now - br.start_time,
+           received_time != fc::time_point() ? (received_time - chain_head.block_time()).count() / 1000 : 0,
+           (now - chain_head.timestamp()).count() / 1000);
 
       if (_update_incoming_block_metrics) {
          _update_incoming_block_metrics({.trxs_incoming_total   = chain_head.block()->transactions.size(),
@@ -2454,6 +2461,13 @@ struct controller_impl {
    {
       const auto& pfs = protocol_features.get_protocol_feature_set();
 
+      // Track digests seen earlier in this activation list so duplicates fail here rather than
+      // later in start_block (which only catches duplicates of preactivated features). A duplicate
+      // that wasn't preactivated would otherwise re-run trigger_activation_handler and increment
+      // num_new_protocol_features_activated twice, diverging side effects from a legitimate block.
+      flat_set<digest_type> seen_in_this_activation;
+      seen_in_this_activation.reserve( new_protocol_features.size() );
+
       for( auto itr = new_protocol_features.begin(); itr != new_protocol_features.end(); ++itr ) {
          const auto& f = *itr;
 
@@ -2482,6 +2496,10 @@ struct controller_impl {
          SYS_ASSERT( currently_activated_protocol_features.find( f ) == currently_activated_protocol_features.end(),
                      protocol_feature_exception,
                      "protocol feature with digest '{}' has already been activated", f
+         );
+
+         SYS_ASSERT( seen_in_this_activation.insert( f ).second, protocol_feature_exception,
+                     "protocol feature with digest '{}' appears more than once in the activation list", f
          );
 
          auto dependency_checker = [&currently_activated_protocol_features, &new_protocol_features, &itr]
@@ -2662,43 +2680,7 @@ struct controller_impl {
             }
 
             if( are_multiple_state_roots_supported() ) {
-               // New: Process the s_header from block header extensions
-               auto rcvd_it = b->header_extensions.begin();
-               const auto next_rcvd = [&itr=rcvd_it, end=b->header_extensions.end()](bool include_start) {
-                  if( !include_start ) ++itr;
-                  // find the first s_root_extension in the received block header extensions
-                  return std::find_if(itr, end,
-                     [](const auto& ext) { return ext.first == s_root_extension::extension_id(); }); };
-               auto crtd_it = ab.header().header_extensions.begin();
-               const auto next_crtd = [&itr=crtd_it, end=ab.header().header_extensions.end()](bool include_start) {
-                  if( !include_start ) ++itr;
-                  // find the first s_root_extension in the locally constructed block header extensions
-                  // (which should be the same as the received block header extensions)
-                  return std::find_if(itr, end,
-                     [](const auto& ext) { return ext.first == s_root_extension::extension_id(); }); };
-               uint32_t count = 0;
-               bool rcvd = true;
-               bool crtd = true;
-               bool include_start = true;
-               while( rcvd ) {
-                  rcvd_it = next_rcvd(include_start);
-                  crtd_it = next_crtd(include_start);
-                  ++count;
-                  include_start = false; // only include start for the first iteration
-                  rcvd = rcvd_it != b->header_extensions.end();
-                  crtd = crtd_it != ab.header().header_extensions.end();
-                  SYS_ASSERT( rcvd == crtd, block_validate_exception,
-                              "The received block did{} have {} root header extensions, but the locally constructed one did{}",
-                              (rcvd ? "" : " not"), count, (crtd ? "" : " not") );
-                  if( rcvd && rcvd_it->second != crtd_it->second ) {
-                     s_header rcvd_s_header = fc::raw::unpack<s_header>(rcvd_it->second);
-                     s_header crtd_s_header = fc::raw::unpack<s_header>(crtd_it->second);
-                     SYS_THROW( block_validate_exception,
-                                "The received block root header extension, at slot number {}: {}; and the locally "
-                                "constructed one: {}; don't match!",
-                                count, rcvd_s_header.to_string(), crtd_s_header.to_string() );
-                  }
-               }
+               validate_s_root_extensions_match(b->header_extensions, ab.header().header_extensions);
             }
 
             if( !use_bsp_cached ) {
@@ -2793,9 +2775,6 @@ struct controller_impl {
    // -----------------------------------------------------------------------------
    std::optional<qc_t> verify_basic_proper_block_invariants( const block_id_type& id, const signed_block_ptr& b,
                                                              const block_state& prev ) {
-      if (prev.block_num() <= 1u)
-         return std::nullopt;
-
       SYS_ASSERT( b->block_extensions.empty(), invalid_block_extension, "No block extensions currently supported");
 
       const auto  new_qc_claim = b->qc_claim;
@@ -2811,7 +2790,12 @@ struct controller_impl {
          }
       }
 
-      const auto& prev_qc_claim = prev.header.qc_claim;
+      // Use prev.core.latest_qc_claim() rather than prev.header.qc_claim: for every non-genesis
+      // block they are equal by construction (finality_core::next sets latest_qc_claim from the
+      // header's claim), but genesis intentionally differs (core is {1, false}, header is {0, false}).
+      // The core is the authoritative source, so block 2 can validate cleanly with this reference.
+      // Snapshot-loaded block_state enforces this invariant in block_state(snapshot).
+      const qc_claim_t prev_qc_claim = prev.core.latest_qc_claim();
 
       // validate QC claim against previous block QC info
 
@@ -2884,7 +2868,8 @@ struct controller_impl {
 
    // thread safe, expected to be called from thread other than the main thread
    // tuple<bool best_head, block_handle new_block_handle>
-   controller::accepted_block_result create_block_state_i( const block_id_type& id, const signed_block_ptr& b, const block_state& prev ) {
+   controller::accepted_block_result create_block_state_i( const block_id_type& id, const signed_block_ptr& b, const block_state& prev,
+                                                           fc::time_point received_time ) {
       std::optional<qc_t> qc = verify_basic_block_invariants(id, b, prev);
       log_and_drop_future<void> verify_qc_future;
       if (qc) {
@@ -2915,6 +2900,8 @@ struct controller_impl {
       SYS_ASSERT( id == bsp->id(), block_validate_exception,
                   "provided id {} does not match block id {}", id, bsp->id() );
 
+      bsp->received_time = received_time;
+
       assert(!!qc == verify_qc_future.valid());
       if (qc) {
          verify_qc_future.get();
@@ -2938,7 +2925,8 @@ struct controller_impl {
    }
 
    // thread safe, expected to be called from thread other than the main thread
-   controller::accepted_block_result create_block_handle( const block_id_type& id, const signed_block_ptr& b ) {
+   controller::accepted_block_result create_block_handle( const block_id_type& id, const signed_block_ptr& b,
+                                                          fc::time_point received_time ) {
       SYS_ASSERT( b, block_validate_exception, "null block" );
 
       if (auto bsp = fork_db_.get_block(id, include_root_t::yes))
@@ -2948,7 +2936,7 @@ struct controller_impl {
       if( !prev )
          return controller::accepted_block_result{.add_result = fork_db_add_t::failure, .block{}};
 
-      return create_block_state_i( id, b, *prev );
+      return create_block_state_i( id, b, *prev, received_time );
    }
 
    // thread safe, QC already verified by verify_proper_block_exts
@@ -3252,7 +3240,7 @@ struct controller_impl {
    static checksum256_type calculate_trx_merkle( const deque<transaction_receipt>& trxs) {
       deque<digest_type> trx_digests;
       for( const auto& a : trxs ) {
-         trx_digests.emplace_back( (a.digest)() );
+         trx_digests.emplace_back( a.digest() );
       }
 
       return calc_merkle(std::move(trx_digests));
@@ -3464,7 +3452,12 @@ struct controller_impl {
    }
 
    bool is_head_descendant_of_pending_lib() const {
-      return fork_db_.is_descendant_of_pending_savanna_lib(chain_head.id());
+      // True if pending_savanna_lib is on the chain from chain_head back to fork_db root: pending_savanna_lib is an
+      // ancestor of chain_head, or is chain_head itself. Answered from the head's finality_core, which tracks the
+      // canonical block_ref at each height across [last_final, head). No fork_db walk or mutex required.
+      const auto [pending_id, pending_timestamp] = fork_db_.pending_savanna_lib();
+      if (chain_head.id() == pending_id) return true;
+      return chain_head.extends(pending_id);
    }
 
    void set_savanna_lib(const block_id_type& id, block_timestamp_type timestamp) {
@@ -3953,8 +3946,9 @@ boost::asio::io_context& controller::get_thread_pool() {
    return my->thread_pool.get_executor();
 }
 
-controller::accepted_block_result controller::accept_block( const block_id_type& id, const signed_block_ptr& b ) const {
-   return my->create_block_handle( id, b );
+controller::accepted_block_result controller::accept_block( const block_id_type& id, const signed_block_ptr& b,
+                                                             fc::time_point received_time ) const {
+   return my->create_block_handle( id, b, received_time );
 }
 
 transaction_trace_ptr controller::push_transaction( const transaction_metadata_ptr& trx,

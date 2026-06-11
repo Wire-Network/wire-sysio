@@ -54,21 +54,31 @@ void qc_t::verify_basic(const finalizer_policies_t& policies) const {
       SYS_ASSERT(policies.pending_finalizer_policy, invalid_qc,
                  "qc {} contains pending policy signature for nonexistent pending finalizer policy", block_num);
 
-      // verify that every finalizer included in both policies voted the same
-      verify_dual_finalizers_votes(policies, active_policy_sig, *pending_policy_sig, block_num);
-
       pending_policy_sig->verify_vote_format(policies.pending_finalizer_policy);
       pending_policy_sig->verify_weights(policies.pending_finalizer_policy);
+
+      // verify that every finalizer included in both policies voted the same
+      verify_dual_finalizers_votes(policies, active_policy_sig, *pending_policy_sig, block_num);
    } else {
       SYS_ASSERT(!policies.pending_finalizer_policy, invalid_qc,
                  "qc {} does not contain pending policy signature for pending finalizer policy", block_num);
    }
 }
 
-// returns true iff the other and I voted in the same way.
+// Returns true iff the other and I voted in the same way.
+//
+// Precondition chain: both *this and `other` must have passed verify_vote_format()
+// before reaching this function. verify_vote_format asserts each qc_sig_t has at
+// least one of strong_votes/weak_votes and that each present bitset's size matches
+// the corresponding policy's finalizer count. Callers (qc_t::verify_basic ->
+// verify_dual_finalizers_votes) run verify_vote_format on both qc_sigs first, so
+// the index-in-range asserts below are coding-error guards, not attacker-input
+// guards.
 bool qc_sig_t::vote_same_at(const qc_sig_t& other, uint32_t my_vote_index, uint32_t other_vote_index) const {
    assert(!strong_votes || my_vote_index < strong_votes->size());
-   assert(!weak_votes || my_vote_index < weak_votes->size());
+   assert(!weak_votes   || my_vote_index < weak_votes->size());
+   assert(!other.strong_votes || other_vote_index < other.strong_votes->size());
+   assert(!other.weak_votes   || other_vote_index < other.weak_votes->size());
 
    // We have already verified the same index has not voted both strong
    // and weak for a given qc_sig_t (I or other).
@@ -454,9 +464,14 @@ aggregate_vote_result_t aggregating_qc_t::aggregate_vote(uint32_t connection_id,
       return r;
    }
 
-   // Check has_voted, return duplicate if the vote is already present in both policies.
+   // Fast-path dedup hint: lock-free atomic reads on has_voted filter out most duplicates
+   // before the expensive BLS verify. This is a performance optimization, NOT the
+   // authoritative dedup — two voters racing here may both pass and both do the BLS verify.
+   // The authoritative check is aggregating_qc_sig_t::check_duplicate() called under the
+   // outer lock from add_vote() below, which ensures no double-counting of weight.
+   //
    // For dual finalizers both policies must have the vote; for single-policy finalizers only
-   // the applicable policy is checked. This rejects duplicates before the expensive BLS verify.
+   // the applicable policy is checked.
    bool active_dup  = active_index  < 0 || active_policy_sig.has_voted(active_index);
    bool pending_dup = pending_index < 0 || pending_policy_sig->has_voted(pending_index);
    if (active_dup && pending_dup) {

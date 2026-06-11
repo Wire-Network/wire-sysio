@@ -1,8 +1,14 @@
 #include <sysio.chalg/sysio.chalg.hpp>
 
+#include <algorithm>
+
 namespace sysio {
 
 using opp::types::ChallengeStatus;
+
+// System-owned rows bill to the sysio RAM pool, not this contract account (privileged-contract
+// model, as sysio.token uses): the account stays finite at code+abi size; growth draws from the pool.
+constexpr name ram_payer = "sysio"_n;
 
 // ---------------------------------------------------------------------------
 //  initchal
@@ -20,7 +26,7 @@ void chalg::initchal(uint64_t chain_req_id) {
 
    auto now = current_time_point();
 
-   uint64_t next_id = challenges.available_primary_key();
+   uint64_t next_id = std::max<uint64_t>(1, challenges.available_primary_key());
 
    challenge_entry c{};
    c.id               = next_id;
@@ -29,7 +35,7 @@ void chalg::initchal(uint64_t chain_req_id) {
    c.round            = 1;
    c.status           = ChallengeStatus::CHALLENGE_STATUS_CHALLENGE_SENT;
    c.challenged_at    = now;
-   challenges.emplace(get_self(), challenge_key{next_id}, c);
+   challenges.emplace(ram_payer, challenge_key{next_id}, c);
 
    // TODO: Queue ATTESTATION_TYPE_CHALLENGE_REQUEST to source outpost
    //       via sysio.msgch::queueout inline action.
@@ -65,10 +71,14 @@ void chalg::submitresp(uint64_t challenge_id,
    // Evaluate: if faulty operators identified, slash them and resolve
    if (!faulty_ops.empty()) {
       for (const auto& faulty : faulty_ops) {
-         // Inline action to sysio.uwrit::slash
+         // Inline action to sysio.opreg::slash — opreg is the canonical bond
+         // ledger; it routes the slashed amount to the matching LP per
+         // (chain, token_kind) and emits SLASH_OPERATOR attestations to the
+         // outposts. uwrit's locks remain alive and are settled (deferred-
+         // slash) by sysio.uwrit::release as each lock resolves.
          action(
             permission_level{get_self(), "active"_n},
-            UWRIT_ACCOUNT,
+            OPREG_ACCOUNT,
             "slash"_n,
             std::make_tuple(faulty, std::string("challenge round ") + std::to_string(ch_row.round))
          ).send();
@@ -106,9 +116,9 @@ void chalg::escalate(uint64_t challenge_id) {
       // Escalate to next automatic round
       auto now = current_time_point();
 
-      uint64_t next_id = challenges.available_primary_key();
+      uint64_t next_id = std::max<uint64_t>(1, challenges.available_primary_key());
 
-      challenges.emplace(get_self(), challenge_key{next_id}, challenge_entry{
+      challenges.emplace(ram_payer, challenge_key{next_id}, challenge_entry{
          .id               = next_id,
          .chain_request_id = ch_row.chain_request_id,
          .epoch_index      = ch_row.epoch_index,
@@ -157,7 +167,7 @@ void chalg::submitres(name submitter,
          "only escalated challenges accept manual resolution");
 
    resolutions_t resolutions(get_self());
-   uint64_t next_id = resolutions.available_primary_key();
+   uint64_t next_id = std::max<uint64_t>(1, resolutions.available_primary_key());
 
    resolutions.emplace(submitter, resolution_key{next_id}, manual_resolution{
       .id                  = next_id,
@@ -215,16 +225,18 @@ void chalg::enforce(uint64_t resolution_id) {
 void chalg::slashop(name operator_acct, std::string reason) {
    require_auth(get_self());
 
-   // Slash via sysio.uwrit
+   // Slash via sysio.opreg — the canonical bond ledger. opreg routes the
+   // slashable portion (`balance - sum(active locks)`) to the matching LP
+   // on each (chain, token_kind) the operator has bond on, marks the
+   // operator SLASHED, and lets sysio.uwrit::release deferred-slash the
+   // locked portion as each underwriter lock resolves. Pause-on-slashing
+   // and outpost roster sync (per-task §7 / §8) are handled by Tasks 6-9.
    action(
       permission_level{get_self(), "active"_n},
-      UWRIT_ACCOUNT,
+      OPREG_ACCOUNT,
       "slash"_n,
       std::make_tuple(operator_acct, reason)
    ).send();
-
-   // TODO: Blacklist operator via sysio.epoch.
-   //       Queue ATTESTATION_TYPE_SLASH_OPERATOR to all outposts.
 }
 
 } // namespace sysio

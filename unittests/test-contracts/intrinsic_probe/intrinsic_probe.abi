@@ -1,0 +1,863 @@
+{
+    "____comment": "This file was generated with sysio-abigen. DO NOT EDIT ",
+    "version": "sysio::abi/1.2",
+    "types": [],
+    "structs": [
+        {
+            "name": "actprdok",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "actprdsm",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "arecbadrec",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "arecempsig",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "arecng",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "arecok",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "arecpubty",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "aripeem",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "aripeng",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "aripeok",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "aripeua",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "asha1em",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "asha1ng",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "asha1ok",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "asha1ua",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "asha2em",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "asha2ng",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "asha2ok",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "asha2ua",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "asha5em",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "asha5ng",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "asha5ok",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "asha5ua",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "bcpgetok",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "bcpgetsm",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "bcpsetnp",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "chktrxem",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "gacbad",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "gacok",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "gcfdcf",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "glpbact",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "glpbnf",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "glpbnx",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "glpbown",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "glpbsz",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "nop",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "phxok",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "preactbog",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "preactnp",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "preactok",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "printlem",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "printok",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "radok",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "radsm",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "recbadrec",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "recbadrs",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "recbadvar",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "recbigwa",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "recempsig",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "recok",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "recqsize",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "recshort",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "recsmpub",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "recuald",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "reslimok",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "reslimua",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "ripebig",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "ripeem",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "ripeok",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "ripeual",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "rtxok",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "rtxsm",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "samng",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "samngem",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "samok",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "sarvem",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "sarvok",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "sasng",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "sasok",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "setreslim",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "setresnp",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "sha1big",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "sha1em",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "sha1ok",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "sha1ual",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "sha2big",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "sha2em",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "sha2ok",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "sha2ual",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "sha5big",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "sha5em",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "sha5ok",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "sha5ual",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "sinlem",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "sprodnp",
+            "base": "",
+            "fields": []
+        }
+    ],
+    "actions": [
+        {
+            "name": "actprdok",
+            "type": "actprdok",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "actprdsm",
+            "type": "actprdsm",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "arecbadrec",
+            "type": "arecbadrec",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "arecempsig",
+            "type": "arecempsig",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "arecng",
+            "type": "arecng",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "arecok",
+            "type": "arecok",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "arecpubty",
+            "type": "arecpubty",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "aripeem",
+            "type": "aripeem",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "aripeng",
+            "type": "aripeng",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "aripeok",
+            "type": "aripeok",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "aripeua",
+            "type": "aripeua",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "asha1em",
+            "type": "asha1em",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "asha1ng",
+            "type": "asha1ng",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "asha1ok",
+            "type": "asha1ok",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "asha1ua",
+            "type": "asha1ua",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "asha2em",
+            "type": "asha2em",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "asha2ng",
+            "type": "asha2ng",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "asha2ok",
+            "type": "asha2ok",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "asha2ua",
+            "type": "asha2ua",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "asha5em",
+            "type": "asha5em",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "asha5ng",
+            "type": "asha5ng",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "asha5ok",
+            "type": "asha5ok",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "asha5ua",
+            "type": "asha5ua",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "bcpgetok",
+            "type": "bcpgetok",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "bcpgetsm",
+            "type": "bcpgetsm",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "bcpsetnp",
+            "type": "bcpsetnp",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "chktrxem",
+            "type": "chktrxem",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "gacbad",
+            "type": "gacbad",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "gacok",
+            "type": "gacok",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "gcfdcf",
+            "type": "gcfdcf",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "glpbact",
+            "type": "glpbact",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "glpbnf",
+            "type": "glpbnf",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "glpbnx",
+            "type": "glpbnx",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "glpbown",
+            "type": "glpbown",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "glpbsz",
+            "type": "glpbsz",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "nop",
+            "type": "nop",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "phxok",
+            "type": "phxok",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "preactbog",
+            "type": "preactbog",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "preactnp",
+            "type": "preactnp",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "preactok",
+            "type": "preactok",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "printlem",
+            "type": "printlem",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "printok",
+            "type": "printok",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "radok",
+            "type": "radok",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "radsm",
+            "type": "radsm",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "recbadrec",
+            "type": "recbadrec",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "recbadrs",
+            "type": "recbadrs",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "recbadvar",
+            "type": "recbadvar",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "recbigwa",
+            "type": "recbigwa",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "recempsig",
+            "type": "recempsig",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "recok",
+            "type": "recok",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "recqsize",
+            "type": "recqsize",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "recshort",
+            "type": "recshort",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "recsmpub",
+            "type": "recsmpub",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "recuald",
+            "type": "recuald",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "reslimok",
+            "type": "reslimok",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "reslimua",
+            "type": "reslimua",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "ripebig",
+            "type": "ripebig",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "ripeem",
+            "type": "ripeem",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "ripeok",
+            "type": "ripeok",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "ripeual",
+            "type": "ripeual",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "rtxok",
+            "type": "rtxok",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "rtxsm",
+            "type": "rtxsm",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "samng",
+            "type": "samng",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "samngem",
+            "type": "samngem",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "samok",
+            "type": "samok",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "sarvem",
+            "type": "sarvem",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "sarvok",
+            "type": "sarvok",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "sasng",
+            "type": "sasng",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "sasok",
+            "type": "sasok",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "setreslim",
+            "type": "setreslim",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "setresnp",
+            "type": "setresnp",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "sha1big",
+            "type": "sha1big",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "sha1em",
+            "type": "sha1em",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "sha1ok",
+            "type": "sha1ok",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "sha1ual",
+            "type": "sha1ual",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "sha2big",
+            "type": "sha2big",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "sha2em",
+            "type": "sha2em",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "sha2ok",
+            "type": "sha2ok",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "sha2ual",
+            "type": "sha2ual",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "sha5big",
+            "type": "sha5big",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "sha5em",
+            "type": "sha5em",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "sha5ok",
+            "type": "sha5ok",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "sha5ual",
+            "type": "sha5ual",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "sinlem",
+            "type": "sinlem",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "sprodnp",
+            "type": "sprodnp",
+            "ricardian_contract": ""
+        }
+    ],
+    "tables": [],
+    "ricardian_clauses": [],
+    "variants": [],
+    "action_results": []
+}

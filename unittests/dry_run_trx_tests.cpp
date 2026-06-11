@@ -237,7 +237,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( linkauth_test, T, dry_run_trx_testers ) { try {
    );
 
    name account = "alice"_n;
-   name code = "sysio_token"_n;
+   name code = "sysio.token"_n;
    name type = "transfer"_n;
    name requirement = "first"_n;
    action act = {
@@ -275,7 +275,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( unlinkauth_test, T, dry_run_trx_testers ) { try {
            ("requirement", "first"));
 
    name account = "alice"_n;
-   name code = "sysio_token"_n;
+   name code = "sysio.token"_n;
    name type = "transfer"_n;
    action act = {
       vector<permission_level>{{"alice"_n, config::active_name}},

@@ -25,7 +25,7 @@ namespace sysio {
                      uint32_t operators_per_epoch,
                      uint32_t batch_operator_minimum_active,
                      uint32_t batch_op_groups,
-                     uint32_t attestation_retention_epoch_count);
+                     uint32_t epoch_retention_envelope_log_count);
 
       /// Advance epoch if duration elapsed (permissionless crank).
       [[sysio::action]]
@@ -33,11 +33,7 @@ namespace sysio {
 
       /// Group assignment — reads AVAILABLE batch ops from sysio.opreg.
       [[sysio::action]]
-      void initgroups();
-
-      /// Register an outpost chain.
-      [[sysio::action]]
-      void regoutpost(opp::types::ChainKind chain_kind, uint32_t chain_id);
+      void schbatchgps();
 
       /// Set global pause (only callable by sysio.chalg).
       [[sysio::action]]
@@ -57,12 +53,21 @@ namespace sysio {
          uint32_t    operators_per_epoch = 7;
          uint32_t    batch_operator_minimum_active = 21;
          uint32_t    batch_op_groups = 3;          // rotation groups (21 / 7)
-         uint32_t    attestation_retention_epoch_count = 1000;
+
+         /// Cap multiplier for the metadata-only `envelope_log` table on
+         /// `sysio.msgch`. Effective row cap is
+         /// `active_outposts * 2 * epoch_retention_envelope_log_count`
+         /// (one inbound + one outbound record per active outpost per
+         /// epoch). Default 200 — matches the SOL/ETH per-direction
+         /// metadata-log cap. Each `evalcons` consensus-reach + `buildenv`
+         /// emit reads this directly; runtime changes via `setconfig`
+         /// take effect on the next write.
+         uint32_t    epoch_retention_envelope_log_count = 200;
 
          SYSLIB_SERIALIZE(epoch_config,
             (epoch_duration_sec)(operators_per_epoch)
             (batch_operator_minimum_active)(batch_op_groups)
-            (attestation_retention_epoch_count))
+            (epoch_retention_envelope_log_count))
       };
 
       using epochcfg_t = sysio::kv::global<"epochcfg"_n, epoch_config>;
@@ -84,36 +89,34 @@ namespace sysio {
 
       using epochstate_t = sysio::kv::global<"epochstate"_n, epoch_state>;
 
-      /// Outpost registry table primary key.
-      struct outpost_key {
-         uint64_t id;
-         uint64_t primary_key() const { return id; }
-         SYSLIB_SERIALIZE(outpost_key, (id))
+      /// Emissions readiness gate block log. One row per epoch_index that
+      /// the gate has blocked from advancing. Inserted on the first gate
+      /// failure for a given epoch; same-reason retries update last_retry_at
+      /// and retry_count without re-broadcast. Pruned when the gate
+      /// eventually passes for that epoch (advance proceeds normally).
+      struct blocklog_key {
+         uint64_t epoch_index;
+         uint64_t primary_key() const { return epoch_index; }
+         SYSLIB_SERIALIZE(blocklog_key, (epoch_index))
       };
 
-      /// Outpost registry table.
-      struct [[sysio::table("outposts")]] outpost_info {
-         uint64_t    id;
-         sysio::opp::types::ChainKind chain_kind;
-         uint32_t    chain_id;
-         checksum256 last_inbound_msg_id;
-         checksum256 last_outbound_msg_id;
-         uint32_t    last_inbound_epoch = 0;
-         uint32_t    last_outbound_epoch = 0;
+      struct [[sysio::table("blocklog")]] blocklog_entry {
+         uint32_t                              epoch_index        = 0;
+         sysio::opp::types::EmissionsBlockReason reason           =
+            sysio::opp::types::EMISSIONS_BLOCK_REASON_UNSPECIFIED;
+         int64_t                               attempted_emission = 0;
+         int64_t                               treasury_remaining = 0;
+         int64_t                               sysio_balance      = 0;
+         uint32_t                              first_blocked_at   = 0; // unix seconds
+         uint32_t                              last_retry_at      = 0; // unix seconds
+         uint32_t                              retry_count        = 0;
 
-         uint64_t by_chain() const {
-            return (static_cast<uint64_t>(chain_kind) << 32) | chain_id;
-         }
-
-         SYSLIB_SERIALIZE(outpost_info,
-            (id)(chain_kind)(chain_id)(last_inbound_msg_id)(last_outbound_msg_id)
-            (last_inbound_epoch)(last_outbound_epoch))
+         SYSLIB_SERIALIZE(blocklog_entry,
+            (epoch_index)(reason)(attempted_emission)(treasury_remaining)
+            (sysio_balance)(first_blocked_at)(last_retry_at)(retry_count))
       };
 
-      using outposts_t = sysio::kv::table<"outposts"_n, outpost_key, outpost_info,
-         sysio::kv::index<"bychain"_n,
-            sysio::const_mem_fun<outpost_info, uint64_t, &outpost_info::by_chain>>
-      >;
+      using blocklog_t = sysio::kv::table<"blocklog"_n, blocklog_key, blocklog_entry>;
 
       // Well-known accounts
       static constexpr name CHALG_ACCOUNT  = "sysio.chalg"_n;
@@ -121,6 +124,15 @@ namespace sysio {
       static constexpr name EPOCH_ACCOUNT  = "sysio.epoch"_n;
       static constexpr name OPREG_ACCOUNT  = "sysio.opreg"_n;
       static constexpr name AUTHEX_ACCOUNT = "sysio.authex"_n;
+      static constexpr name CHAINS_ACCOUNT = "sysio.chains"_n;
+
+      /// Bounds on `epoch_duration_sec`. Floor is a typo-guard: well below this
+      /// value, `expected_rounds` in sysio.system::payepoch falls back to 1
+      /// for any non-trivial epoch, masking misconfig. Ceiling bounds the
+      /// `(epoch_duration_sec * 2) / TOTAL_BLOCKS_PER_ROUND` arithmetic and
+      /// prevents governance typo from setting a multi-year epoch.
+      static constexpr uint32_t MIN_EPOCH_DURATION_SEC = 60;
+      static constexpr uint32_t MAX_EPOCH_DURATION_SEC = 30u * 24u * 60u * 60u;
 
    private:
 

@@ -1,6 +1,8 @@
 #include <fc/exception/exception.hpp>
 #include <fc/bitset.hpp>
 #include <fc/io/raw.hpp>
+#include <fc/io/raw_variant.hpp>
+#include <fc/variant.hpp>
 
 #include <boost/test/unit_test.hpp>
 
@@ -330,6 +332,32 @@ BOOST_AUTO_TEST_CASE(packing_list) {
       ds.seekp(0);
       fc::raw::unpack(ds, t);
       BOOST_TEST((s == t));
+   }
+}
+
+// SSO-encoded variants must wire-pack as the legacy string_type so peers running
+// older code (no SSO) can deserialize them.  pack(variant) normalises the SSO tag
+// (13) to string_type (9) on emit; this round-trip locks the invariant.
+BOOST_AUTO_TEST_CASE(variant_sso_wire_roundtrip)
+{
+   const std::vector<std::string> samples = {
+      "",                     // empty -> SSO branch
+      "x",                    // 1 byte SSO
+      "1234567890ABCD",       // 14 bytes -- exactly at sso_max_length boundary
+      "this string is far too long to fit in the SSO inline buffer" // forces heap
+   };
+   for (const auto& s : samples) {
+      fc::variant src(s);
+      char buf[256];
+      datastream<char*> ds(buf, sizeof(buf));
+      fc::raw::pack(ds, src);
+
+      datastream<const char*> rd(buf, sizeof(buf));
+      fc::variant dst;
+      fc::raw::unpack(rd, dst);
+
+      BOOST_TEST(dst.is_string());
+      BOOST_TEST(dst.get_string() == s);
    }
 }
 

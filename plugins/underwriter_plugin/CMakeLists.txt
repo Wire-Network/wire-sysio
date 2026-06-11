@@ -5,6 +5,7 @@ plugin_target(
         chainbase
         chain_plugin
         cron_plugin
+        http_plugin
         signature_provider_manager_plugin
         outpost_client_plugin
         outpost_ethereum_client_plugin

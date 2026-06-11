@@ -14,7 +14,7 @@
             "fields": [
                 {
                     "name": "chain_kind",
-                    "type": "chain_kind_t"
+                    "type": "ChainKind"
                 },
                 {
                     "name": "account",
@@ -58,7 +58,25 @@
                 },
                 {
                     "name": "chain_kind",
-                    "type": "chain_kind_t"
+                    "type": "ChainKind"
+                },
+                {
+                    "name": "pub_key",
+                    "type": "public_key"
+                }
+            ]
+        },
+        {
+            "name": "recordlink",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "chain_kind",
+                    "type": "ChainKind"
                 },
                 {
                     "name": "pub_key",
@@ -76,6 +94,11 @@
         {
             "name": "createlink",
             "type": "createlink",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "recordlink",
+            "type": "recordlink",
             "ricardian_contract": ""
         }
     ],
@@ -116,28 +139,24 @@
     "action_results": [],
     "enums": [
         {
-            "name": "chain_kind_t",
-            "type": "uint8",
+            "name": "ChainKind",
+            "type": "int32",
             "values": [
                 {
-                    "name": "chain_kind_unknown",
+                    "name": "CHAIN_KIND_UNKNOWN",
                     "value": 0
                 },
                 {
-                    "name": "chain_kind_wire",
+                    "name": "CHAIN_KIND_WIRE",
                     "value": 1
                 },
                 {
-                    "name": "chain_kind_ethereum",
+                    "name": "CHAIN_KIND_EVM",
                     "value": 2
                 },
                 {
-                    "name": "chain_kind_solana",
+                    "name": "CHAIN_KIND_SVM",
                     "value": 3
-                },
-                {
-                    "name": "chain_kind_sui",
-                    "value": 4
                 }
             ]
         }

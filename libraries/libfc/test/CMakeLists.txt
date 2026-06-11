@@ -1,5 +1,6 @@
 
 add_executable( test_fc
+        crypto/test_base58.cpp
         crypto/test_blake2.cpp
         crypto/test_bls.cpp
         crypto/test_cypher_suites.cpp
@@ -20,14 +21,24 @@ add_executable( test_fc
         scoped_exit/test_scoped_exit.cpp
         static_variant/test_static_variant.cpp
         variant/test_variant.cpp
+        variant/test_variant_as.cpp
+        variant/test_variant_assign.cpp
+        variant/test_variant_ctor.cpp
+        variant/test_variant_enum.cpp
+        variant/test_variant_object_misc.cpp
+        variant/test_variant_operators.cpp
+        variant/test_variant_visitor.cpp
         variant_estimated_size/test_variant_estimated_size.cpp
         test_base64.cpp
+        test_slug_name.cpp
         test_traits.cpp
         test_escape_str.cpp
         test_bls.cpp
         test_bitset.cpp
         test_ordered_diff.cpp
+        test_opreg_status.cpp
         parallel/test_worker_task_queue.cpp
+        task/test_retry.cpp
         main.cpp
         )
 target_link_libraries( test_fc fc fc-test )

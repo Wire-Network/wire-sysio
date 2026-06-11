@@ -78,6 +78,12 @@ class Utils:
 
     SysServerName="nodeop"
     SysServerPath=str(testBinPath / SysServerName)
+    SysVmOcEnableOption="--sys-vm-oc-enable"
+    SysVmOcEnableAll="all"
+    SysVmOcEnableAuto="auto"
+    SysVmOcEnableNone="none"
+    SysVmOcForcedRuntime="sys-vm-oc-forced"
+    SysVmOcExecutionLogSuffix="with sys vm oc"
 
     ShuttingDown=False
 
@@ -90,8 +96,71 @@ class Utils:
     ConfigDir=f"{DataPath}/"
 
     TimeFmt='%Y-%m-%dT%H:%M:%S.%f'
-    # lock to serialize writes to subprocess_results.log across threads
+    _nodeopHelpOutput=None
+    # Lock subprocess_results.log writes and cached nodeop option discovery across threads.
     _check_output_lock = threading.Lock()
+
+    @staticmethod
+    def nodeopSupportsOption(option):
+        """Return whether the built nodeop binary advertises the given command-line option."""
+        with Utils._check_output_lock:
+            if Utils._nodeopHelpOutput is None:
+                try:
+                    result=subprocess.run(
+                        [Utils.SysServerPath, "--help"],
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.STDOUT,
+                        text=True,
+                        check=False)
+                except OSError as ex:
+                    raise RuntimeError(
+                        f"Unable to inspect nodeop options with '{Utils.SysServerPath} --help': {ex}"
+                    ) from ex
+                if result.returncode != 0 or not result.stdout.strip():
+                    raise RuntimeError(
+                        f"Unable to inspect nodeop options with '{Utils.SysServerPath} --help': "
+                        f"return code {result.returncode}, output: {result.stdout}"
+                    )
+                Utils._nodeopHelpOutput=result.stdout
+
+        return re.search(rf"^\s*{re.escape(option)}([=\s]|$)", Utils._nodeopHelpOutput, re.MULTILINE) is not None
+
+    @staticmethod
+    def nodeopSupportsSysVmOc():
+        """Return whether the built nodeop binary accepts SYS VM OC command-line options."""
+        return Utils.nodeopSupportsOption(Utils.SysVmOcEnableOption)
+
+    @staticmethod
+    def shouldSkipBecauseSysVmOcUnavailable(sysVmOcEnable, wasmRuntime):
+        """Return whether the requested test configuration requires SYS VM OC when nodeop lacks it."""
+        ocRequired = sysVmOcEnable == Utils.SysVmOcEnableAll or wasmRuntime == Utils.SysVmOcForcedRuntime
+        return ocRequired and not Utils.nodeopSupportsSysVmOc()
+
+    @staticmethod
+    def sysVmOcExecutionExpected(sysVmOcEnable):
+        """Return whether the SYS VM OC tier-up setting should produce OC execution when supported."""
+        return sysVmOcEnable in (Utils.SysVmOcEnableAll, Utils.SysVmOcEnableAuto) and Utils.nodeopSupportsSysVmOc()
+
+    @staticmethod
+    def assertInitialSysVmOcLogState(producerNode, apiNode, codeHash, sysVmOcEnable, ocSupported):
+        """Verify bootstrap SYS VM OC logging on the node whose configuration controls the expectation."""
+        logText = f"executing {codeHash} {Utils.SysVmOcExecutionLogSuffix}"
+        if sysVmOcEnable == Utils.SysVmOcEnableNone or not ocSupported:
+            Utils.Print(f"search apiNode: {logText} (expect absent)")
+            found = apiNode.findInLog(logText)
+            assert(not found)
+        else:
+            Utils.Print(f"search producerNode: {logText} (expect present)")
+            found = producerNode.findInLog(logText)
+            assert(found)
+
+    @staticmethod
+    def assertSysVmOcLogAbsent(node, codeHash, nodeLabel):
+        """Verify the selected node did not log SYS VM OC execution for the supplied code hash."""
+        logText = f"executing {codeHash} {Utils.SysVmOcExecutionLogSuffix}"
+        Utils.Print(f"search {nodeLabel}: {logText} (expect absent)")
+        found = node.findInLog(logText)
+        assert(not found)
 
     @staticmethod
     def timestamp():
@@ -197,9 +266,12 @@ class Utils:
         return chainSyncStrategies
 
     @staticmethod
-    def checkOutput(cmd, ignoreError=False):
+    def checkOutput(cmd, ignoreError=False, timeout=None):
+        """Run a command and return stdout, optionally bounding the subprocess runtime."""
+        assert timeout is None or isinstance(cmd, list), (
+            "timeout with shell command strings can leave orphaned children")
         popen = Utils.delayedCheckOutput(cmd)
-        return Utils.checkDelayedOutput(popen, cmd, ignoreError=ignoreError)
+        return Utils.checkDelayedOutput(popen, cmd, ignoreError=ignoreError, timeout=timeout)
 
     @staticmethod
     def delayedCheckOutput(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
@@ -210,15 +282,27 @@ class Utils:
         return popen
 
     @staticmethod
-    def checkDelayedOutput(popen, cmd, ignoreError=False):
+    def checkDelayedOutput(popen, cmd, ignoreError=False, timeout=None):
+        """Collect a subprocess result and terminate it if it exceeds the requested timeout."""
         assert isinstance(popen, subprocess.Popen)
         assert isinstance(cmd, (str,list))
         start=Utils.timestamp()
-        (output,error)=popen.communicate()
+        try:
+            (output,error)=popen.communicate(timeout=timeout)
+        except subprocess.TimeoutExpired as ex:
+            popen.kill()
+            (output,error)=popen.communicate()
+            Utils.checkOutputFileWrite(start, cmd, output, error)
+            raise subprocess.TimeoutExpired(cmd=cmd, timeout=ex.timeout, output=output, stderr=error) from ex
         Utils.checkOutputFileWrite(start, cmd, output, error)
         if popen.returncode != 0 and not ignoreError:
             raise subprocess.CalledProcessError(returncode=popen.returncode, cmd=cmd, output=output, stderr=error)
-        return output.decode("utf-8") if popen.returncode == 0 else error.decode("utf-8")
+        return Utils.decodeProcessOutput(output) if popen.returncode == 0 else Utils.decodeProcessOutput(error)
+
+    @staticmethod
+    def decodeProcessOutput(output):
+        """Decode subprocess bytes without hiding diagnostics if a killed process wrote partial UTF-8."""
+        return output.decode("utf-8", errors="replace") if output is not None else ""
 
     @staticmethod
     def errorExit(msg="", raw=False, errorCode=1):
@@ -315,28 +399,33 @@ class Utils:
             raise
 
     @staticmethod
-    def runCmdArrReturnJson(cmdArr, trace=False, silentErrors=True):
-        retStr=Utils.checkOutput(cmdArr)
+    def runCmdArrReturnJson(cmdArr, trace=False, silentErrors=True, timeout=None):
+        """Run a command array and parse its JSON output, optionally with a subprocess timeout."""
+        retStr=Utils.checkOutput(cmdArr, timeout=timeout)
         return Utils.toJson(retStr, trace, silentErrors)
 
     @staticmethod
-    def runCmdReturnStr(cmd, trace=False, ignoreError=False):
+    def runCmdReturnStr(cmd, trace=False, ignoreError=False, timeout=None):
+        """Run a shell command string and return stdout, optionally with a subprocess timeout."""
         cmdArr=shlex.split(cmd)
-        return Utils.runCmdArrReturnStr(cmdArr, ignoreError=ignoreError)
+        return Utils.runCmdArrReturnStr(cmdArr, ignoreError=ignoreError, timeout=timeout)
 
     @staticmethod
-    def runCmdArrReturnStr(cmdArr, trace=False, ignoreError=False):
-        retStr=Utils.checkOutput(cmdArr, ignoreError=ignoreError)
+    def runCmdArrReturnStr(cmdArr, trace=False, ignoreError=False, timeout=None):
+        """Run a command array and return stdout, optionally with a subprocess timeout."""
+        retStr=Utils.checkOutput(cmdArr, ignoreError=ignoreError, timeout=timeout)
         if trace: Utils.Print ("RAW > %s" % (retStr))
         return retStr
 
     @staticmethod
-    def runCmdReturnJson(cmd, trace=False, silentErrors=False):
+    def runCmdReturnJson(cmd, trace=False, silentErrors=False, timeout=None):
+        """Run a shell command string and parse its JSON output, optionally with a subprocess timeout."""
         cmdArr=shlex.split(cmd)
-        return Utils.runCmdArrReturnJson(cmdArr, trace=trace, silentErrors=silentErrors)
+        return Utils.runCmdArrReturnJson(cmdArr, trace=trace, silentErrors=silentErrors, timeout=timeout)
 
     @staticmethod
-    def processSysioUtilCmd(cmd, cmdDesc, silentErrors=True, exitOnError=False, exitMsg=None):
+    def processSysioUtilCmd(cmd, cmdDesc, silentErrors=True, exitOnError=False, exitMsg=None, timeout=None):
+        """Run sys-util and return stdout, optionally bounding the subprocess runtime."""
         cmd="%s %s" % (Utils.SysioClientPath, cmd)
         if Utils.Debug: Utils.Print("cmd: %s" % (cmd))
         if exitMsg is not None:
@@ -346,7 +435,7 @@ class Utils:
         output=None
         start=time.perf_counter()
         try:
-            output=Utils.runCmdReturnStr(cmd)
+            output=Utils.runCmdReturnStr(cmd, timeout=timeout)
 
             if Utils.Debug:
                 end=time.perf_counter()
@@ -354,8 +443,21 @@ class Utils:
         except subprocess.CalledProcessError as ex:
             if not silentErrors:
                 end=time.perf_counter()
-                msg=ex.stderr.decode("utf-8")
+                msg=Utils.decodeProcessOutput(ex.stderr)
                 errorMsg="Exception during \"%s\". Exception message: %s.  cmd Duration=%.3f sec. %s" % (cmdDesc, msg, end-start, exitMsg)
+                if exitOnError:
+                    Utils.cmdError(errorMsg)
+                    Utils.errorExit(errorMsg)
+                else:
+                    Utils.Print("ERROR: %s" % (errorMsg))
+            return None
+        except subprocess.TimeoutExpired as ex:
+            if not silentErrors:
+                end=time.perf_counter()
+                out=Utils.decodeProcessOutput(ex.output)
+                msg=Utils.decodeProcessOutput(ex.stderr)
+                errorMsg=("Timeout during \"%s\" after %.3f sec. cmd timeout=%s. stderr: %s. stdout: %s. %s" %
+                          (cmdDesc, end-start, ex.timeout, msg, out, exitMsg))
                 if exitOnError:
                     Utils.cmdError(errorMsg)
                     Utils.errorExit(errorMsg)

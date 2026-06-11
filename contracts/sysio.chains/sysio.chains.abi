@@ -1,0 +1,171 @@
+{
+    "____comment": "This file was generated with sysio-abigen. DO NOT EDIT ",
+    "version": "sysio::abi/1.2",
+    "types": [],
+    "structs": [
+        {
+            "name": "activchain",
+            "base": "",
+            "fields": [
+                {
+                    "name": "code",
+                    "type": "slug_name"
+                }
+            ]
+        },
+        {
+            "name": "chain_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "code",
+                    "type": "slug_name"
+                }
+            ]
+        },
+        {
+            "name": "chain_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "kind",
+                    "type": "ChainKind"
+                },
+                {
+                    "name": "external_chain_id",
+                    "type": "uint32"
+                },
+                {
+                    "name": "name",
+                    "type": "string"
+                },
+                {
+                    "name": "description",
+                    "type": "string"
+                },
+                {
+                    "name": "is_depot",
+                    "type": "bool"
+                },
+                {
+                    "name": "active",
+                    "type": "bool"
+                },
+                {
+                    "name": "registered_at_ms",
+                    "type": "uint64"
+                },
+                {
+                    "name": "activated_at_ms",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "regchain",
+            "base": "",
+            "fields": [
+                {
+                    "name": "kind",
+                    "type": "ChainKind"
+                },
+                {
+                    "name": "code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "external_chain_id",
+                    "type": "uint32"
+                },
+                {
+                    "name": "name",
+                    "type": "string"
+                },
+                {
+                    "name": "description",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "slug_name",
+            "base": "",
+            "fields": [
+                {
+                    "name": "value",
+                    "type": "uint64"
+                }
+            ]
+        }
+    ],
+    "actions": [
+        {
+            "name": "activchain",
+            "type": "activchain",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "regchain",
+            "type": "regchain",
+            "ricardian_contract": ""
+        }
+    ],
+    "tables": [
+        {
+            "name": "chains",
+            "type": "chain_row",
+            "index_type": "i64",
+            "key_names": ["code"],
+            "key_types": ["slug_name"],
+            "table_id": 30109,
+            "secondary_indexes": [
+                {
+                    "name": "bykind",
+                    "key_type": "uint64",
+                    "table_id": 52169
+                },
+                {
+                    "name": "byextid",
+                    "key_type": "uint64",
+                    "table_id": 44550
+                },
+                {
+                    "name": "byactive",
+                    "key_type": "uint64",
+                    "table_id": 40441
+                }
+            ]
+        }
+    ],
+    "ricardian_clauses": [],
+    "variants": [],
+    "action_results": [],
+    "enums": [
+        {
+            "name": "ChainKind",
+            "type": "int32",
+            "values": [
+                {
+                    "name": "CHAIN_KIND_UNKNOWN",
+                    "value": 0
+                },
+                {
+                    "name": "CHAIN_KIND_WIRE",
+                    "value": 1
+                },
+                {
+                    "name": "CHAIN_KIND_EVM",
+                    "value": 2
+                },
+                {
+                    "name": "CHAIN_KIND_SVM",
+                    "value": 3
+                }
+            ]
+        }
+    ]
+}
