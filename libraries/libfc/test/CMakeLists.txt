@@ -33,6 +33,7 @@ add_executable( test_fc
         test_slug_name.cpp
         test_traits.cpp
         test_escape_str.cpp
+        test_exception.cpp
         test_bls.cpp
         test_bitset.cpp
         test_ordered_diff.cpp
