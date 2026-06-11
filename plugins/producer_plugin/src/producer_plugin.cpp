@@ -666,23 +666,6 @@ public:
       return {chain.head().id(), chain.calculate_integrity_hash()};
    }
 
-   void create_snapshot(producer_plugin::next_function<chain::snapshot_scheduler::snapshot_information> next) {
-      chain::controller& chain = chain_plug->chain();
-
-      auto reschedule = fc::make_scoped_exit([this]() { schedule_production_loop(); });
-
-      auto predicate = [&]() -> void {
-         if (chain.is_building_block()) {
-            // abort the pending block
-            abort_block();
-         } else {
-            reschedule.cancel();
-         }
-      };
-
-      _snapshot_scheduler.create_snapshot(std::move(next), chain, predicate);
-   }
-
    void update_runtime_options(const producer_plugin::runtime_options& options);
 
    producer_plugin::runtime_options get_runtime_options() const {
@@ -1868,7 +1851,34 @@ producer_plugin::integrity_hash_information producer_plugin::get_integrity_hash(
 }
 
 void producer_plugin::create_snapshot(producer_plugin::next_function<chain::snapshot_scheduler::snapshot_information> next) {
-   my->create_snapshot(std::move(next));
+   chain::controller& chain = my->chain_plug->chain();
+   const auto head_block_num = chain.head().block_num();
+
+   auto reschedule = fc::make_scoped_exit([my=my]() { my->schedule_production_loop(); });
+
+   if (chain.is_building_block()) {
+      // abort the pending block
+      my->abort_block();
+   } else {
+      reschedule.cancel();
+   }
+
+   if(chain.get_read_mode() == db_read_mode::IRREVERSIBLE) {
+      // /v1/producer/create_snapshot is expected to immediately create a snapshot. When in irreversible mode this
+      // can't be completely faked by scheduling to create on the next start_block as a start_block might never happen.
+      // Create snapshot directly. Since in irreversible mode it can't be forked out there is no need to have the
+      // snapshot scheduler schedule the snapshot, just create it here and now.
+      my->_snapshot_scheduler.create_snapshot(std::move(next), chain);
+   } else {
+      // setup for execute on the next start block
+      chain::snapshot_scheduler::snapshot_request_information sri = {
+         .block_spacing   = 0,
+         .start_block_num = head_block_num + 1,
+         .end_block_num   = std::numeric_limits<uint32_t>::max(),
+         .snapshot_description = ""
+      };
+      my->_snapshot_scheduler.schedule_snapshot(sri, std::move(next));
+   }
 }
 
 chain::snapshot_scheduler::snapshot_schedule_result
@@ -1887,7 +1897,10 @@ producer_plugin::schedule_snapshot(const chain::snapshot_scheduler::snapshot_req
    if(sri.end_block_num == 0)
       sri.end_block_num = std::numeric_limits<uint32_t>::max();
 
-   return my->_snapshot_scheduler.schedule_snapshot(sri);
+   // validation errors are thrown to the HTTP caller; store no completion callback so execution
+   // results of scheduled snapshots are logged by the scheduler as before (only create_snapshot
+   // requests carry a response callback)
+   return my->_snapshot_scheduler.schedule_snapshot(sri, {});
 }
 
 chain::snapshot_scheduler::snapshot_schedule_result

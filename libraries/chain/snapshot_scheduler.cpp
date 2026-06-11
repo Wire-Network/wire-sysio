@@ -15,7 +15,7 @@ void snapshot_scheduler::on_start_block(uint32_t height, chain::controller& chai
          dlog("snapshot scheduler creating a snapshot from the request [start_block_num:{}, end_block_num={}, block_spacing={}], height={}",
               req.start_block_num, req.end_block_num, req.block_spacing, height);
 
-         execute_snapshot(req.snapshot_request_id, chain);
+         execute_snapshot(req.snapshot_request_id, chain, req.next);
          snapshot_executed = true;
       }
    };
@@ -42,12 +42,15 @@ void snapshot_scheduler::on_irreversible_block(const signed_block_ptr& lib, cons
 
       try {
          next(pending->finalize(block_id, chain));
-      }
-      CATCH_AND_CALL(next);
+      } FC_LOG_AND_DROP();
 
       snapshots_by_height.erase(snapshots_by_height.begin());
    }
 
+   unschedule_snapshot_requests(lib_height);
+}
+
+void snapshot_scheduler::unschedule_snapshot_requests(block_num_type lib_height) {
    std::vector<uint32_t> unschedule_snapshot_request_ids;
    for(const auto& req: _snapshot_requests.get<0>()) {
       bool marked_for_deletion = (!req.block_spacing && lib_height >= req.start_block_num) || // if one time snapshot executed or scheduled for the past, it should be gone
@@ -64,14 +67,17 @@ void snapshot_scheduler::on_irreversible_block(const signed_block_ptr& lib, cons
    }
 }
 
-snapshot_scheduler::snapshot_schedule_result snapshot_scheduler::schedule_snapshot(const snapshot_request_information& sri) {
+snapshot_scheduler::snapshot_schedule_result snapshot_scheduler::schedule_snapshot(const snapshot_request_information& sri, next_function<snapshot_information> next) {
+   // validation errors are thrown to the caller; `next` is only stored as the request-completion
+   // callback and must not be used to report scheduling errors, since it is invoked again later
+   // from the block-start path where a throwing callback has no caller to report to
    auto& snapshot_by_value = _snapshot_requests.get<by_snapshot_value>();
    auto existing = snapshot_by_value.find(std::make_tuple(sri.block_spacing, sri.start_block_num, sri.end_block_num));
    SYS_ASSERT(existing == snapshot_by_value.end(), chain::duplicate_snapshot_request, "Duplicate snapshot request");
    SYS_ASSERT(sri.start_block_num <= sri.end_block_num, chain::invalid_snapshot_request, "End block number should be greater or equal to start block number");
    SYS_ASSERT(sri.start_block_num + sri.block_spacing <= sri.end_block_num, chain::invalid_snapshot_request, "Block spacing exceeds defined by start and end range");
 
-   _snapshot_requests.emplace(snapshot_schedule_information{{_snapshot_id++}, {sri.block_spacing, sri.start_block_num, sri.end_block_num, sri.snapshot_description}, {}});
+   _snapshot_requests.emplace(snapshot_schedule_information{{_snapshot_id++}, {sri.block_spacing, sri.start_block_num, sri.end_block_num, sri.snapshot_description}, {}, next});
    x_serialize();
 
    // returning snapshot_schedule_result
@@ -130,11 +136,14 @@ void snapshot_scheduler::add_pending_snapshot_info(const snapshot_information& s
    }
 }
 
-void snapshot_scheduler::execute_snapshot(uint32_t srid, chain::controller& chain) {
+void snapshot_scheduler::execute_snapshot(uint32_t srid, chain::controller& chain, next_function<snapshot_information> http_next) {
    _inflight_sid = srid;
-   auto next = [srid, this](const chain::next_function_variant<snapshot_information>& result) {
+   auto next = [srid, this, http_next](const chain::next_function_variant<snapshot_information>& result) {
+      if (http_next)
+         http_next(chain::next_function_variant<snapshot_information>{result}); // copy; next_function::operator() is rvalue-only
       if(std::holds_alternative<fc::exception_ptr>(result)) {
-         wlog("Snapshot creation error: {}", std::get<fc::exception_ptr>(result)->to_detail_string());
+         if (!http_next)
+            wlog("Snapshot creation error: {}", std::get<fc::exception_ptr>(result)->to_detail_string());
       } else {
          // success, snapshot finalized
          auto snapshot_info = std::get<snapshot_information>(result);
@@ -150,10 +159,10 @@ void snapshot_scheduler::execute_snapshot(uint32_t srid, chain::controller& chai
          }
       }
    };
-   create_snapshot(next, chain, {});
+   create_snapshot(next, chain);
 }
 
-void snapshot_scheduler::create_snapshot(next_function<snapshot_information> next, chain::controller& chain, std::function<void(void)> predicate) {
+void snapshot_scheduler::create_snapshot(next_function<snapshot_information> next, chain::controller& chain) {
    auto head_id = chain.head().id();
    const auto head_block_num = chain.head().block_num();
    const auto head_block_time = chain.head().block_time();
@@ -168,7 +177,6 @@ void snapshot_scheduler::create_snapshot(next_function<snapshot_information> nex
    }
 
    auto write_snapshot = [&](const fs::path& p) -> void {
-      if(predicate) predicate();
       fs::create_directory(p.parent_path());
       auto writer = std::make_shared<threaded_snapshot_writer>(p);
       chain.write_snapshot(writer);
@@ -188,6 +196,7 @@ void snapshot_scheduler::create_snapshot(next_function<snapshot_information> nex
 
          ilog("Snapshot creation at block {} complete; snapshot placed at {}", head_block_num, snapshot_path.string());
          next(snapshot_information{head_id, head_block_num, head_block_time, chain_snapshot_header::current_version, snapshot_path.generic_string()});
+         unschedule_snapshot_requests(head_block_num);
       }
       CATCH_AND_CALL(next);
       return;
@@ -198,18 +207,7 @@ void snapshot_scheduler::create_snapshot(next_function<snapshot_information> nex
    // determine if this snapshot is already in-flight
    auto& pending_by_id = _pending_snapshot_index.get<by_id>();
    auto existing = pending_by_id.find(head_id);
-   if(existing != pending_by_id.end()) {
-      // if a snapshot at this block is already pending, attach this requests handler to it
-      pending_by_id.modify(existing, [&next](auto& entry) {
-         entry.next = [prev = entry.next, next](next_function_variant<snapshot_information>&& res) {
-            // Fan-out to two next_functions: each must receive its own variant copy
-            // so neither sees a moved-from value.  next_function::operator() is
-            // rvalue-only, so the copy is required and visible.
-            prev(next_function_variant<snapshot_information>{res});
-            next(std::move(res));
-         };
-      });
-   } else {
+   if(existing == pending_by_id.end()) { // if a snapshot at this block is already pending, ignore
       const auto& pending_path = pending_snapshot<snapshot_information>::get_pending_path(head_id, _snapshots_dir);
 
       try {
@@ -222,7 +220,7 @@ void snapshot_scheduler::create_snapshot(next_function<snapshot_information> nex
                     "Unable to promote temp snapshot {} to pending {} for block number {}: [code: {}] {}",
                     temp_path.generic_string(), pending_path.generic_string(),
                     head_block_num, ec.value(), ec.message());
-         ilog("Snapshot creation at block {} complete; snapshot will be available once block becomes irreversible", head_block_num);
+         ilog("Snapshot creation at block {} complete; snapshot will be available once block {} becomes irreversible", head_block_num, head_id);
          _pending_snapshot_index.emplace(head_id, head_block_time, next, pending_path.generic_string(), snapshot_path.generic_string());
          add_pending_snapshot_info(snapshot_information{head_id, head_block_num, head_block_time, chain_snapshot_header::current_version, pending_path.generic_string()});
       }
