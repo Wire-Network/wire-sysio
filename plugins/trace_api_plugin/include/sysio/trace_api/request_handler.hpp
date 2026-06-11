@@ -4,6 +4,7 @@
 #include <limits>
 #include <optional>
 #include <type_traits>
+#include <fc/exception/exception.hpp>
 #include <fc/variant.hpp>
 #include <fc/variant_object.hpp>
 #include <sysio/chain/name.hpp>
@@ -72,6 +73,29 @@ namespace sysio::trace_api {
    struct actions_result {
       fc::variants actions;
    };
+
+   /**
+    * Fill query.block_num_start / block_num_end from an already-parsed request body object.
+    *
+    * fc's as<uint32_t>() narrows with a raw static_cast of as_uint64(), so an oversized JSON value
+    * (e.g. 2^32) would silently wrap to a small block number instead of failing, and mixed oversized
+    * values could bypass the start <= end validation after truncation.  Parse through as_uint64()
+    * and range-check explicitly instead; out-of-range values throw, which the HTTP handlers
+    * translate into a 400 response.  Free function so the HTTP handlers' behaviour is unit-testable.
+    *
+    * @throws fc::exception when a present field does not fit in uint32_t.
+    */
+   inline void parse_query_block_range(const fc::variant_object& obj, action_query& query) {
+      auto parse_field = [&obj](const char* field, uint32_t& out) {
+         if (!obj.contains(field))
+            return;
+         const uint64_t value = obj[field].as_uint64();
+         FC_ASSERT(value <= std::numeric_limits<uint32_t>::max(), "{} out of range: {}", field, value);
+         out = static_cast<uint32_t>(value);
+      };
+      parse_field("block_num_start", query.block_num_start);
+      parse_field("block_num_end",   query.block_num_end);
+   }
 
    /**
     * Canonical-only defaulting for the get_actions HTTP layer: when the caller specifies exactly one

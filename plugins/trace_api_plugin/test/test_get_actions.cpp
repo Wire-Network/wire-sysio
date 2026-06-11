@@ -759,6 +759,56 @@ BOOST_FIXTURE_TEST_CASE(bloom_skips_slice_on_recv_action_composite, get_actions_
 // HTTP-layer helpers (free functions shared with trace_api_plugin.cpp handlers)
 // ---------------------------------------------------------------------------
 
+BOOST_AUTO_TEST_CASE(parse_query_block_range_rejects_oversized_values) {
+   constexpr uint64_t too_big = uint64_t{std::numeric_limits<uint32_t>::max()} + 1;
+   // Present fields parse; absent fields keep their defaults.
+   {
+      action_query q;
+      parse_query_block_range(fc::mutable_variant_object()("block_num_start", 100)("block_num_end", 200), q);
+      BOOST_TEST(q.block_num_start == 100u);
+      BOOST_TEST(q.block_num_end == 200u);
+   }
+   {
+      action_query q;
+      parse_query_block_range(fc::mutable_variant_object()("block_num_start", 100), q);
+      BOOST_TEST(q.block_num_start == 100u);
+      BOOST_TEST(q.block_num_end == std::numeric_limits<uint32_t>::max());
+   }
+   {
+      action_query q;
+      parse_query_block_range(fc::mutable_variant_object(), q);
+      BOOST_TEST(q.block_num_start == 0u);
+      BOOST_TEST(q.block_num_end == std::numeric_limits<uint32_t>::max());
+   }
+   // Boundary: exactly uint32 max is accepted.
+   {
+      action_query q;
+      parse_query_block_range(
+         fc::mutable_variant_object()("block_num_end", uint64_t{std::numeric_limits<uint32_t>::max()}), q);
+      BOOST_TEST(q.block_num_end == std::numeric_limits<uint32_t>::max());
+   }
+   // 2^32 used to wrap to block 0 via as<uint32_t>(); it must throw (handler turns this into a 400).
+   {
+      action_query q;
+      BOOST_CHECK_THROW(parse_query_block_range(fc::mutable_variant_object()("block_num_start", too_big), q),
+                        fc::exception);
+   }
+   // Mixed oversized start with small end would have bypassed the start <= end validation after
+   // truncation (2^32 -> 0); it must throw instead of silently passing.
+   {
+      action_query q;
+      BOOST_CHECK_THROW(
+         parse_query_block_range(fc::mutable_variant_object()("block_num_start", too_big)("block_num_end", 5), q),
+         fc::exception);
+   }
+   // Negative values are rejected, not wrapped.
+   {
+      action_query q;
+      BOOST_CHECK_THROW(parse_query_block_range(fc::mutable_variant_object()("block_num_start", -1), q),
+                        fc::exception);
+   }
+}
+
 BOOST_AUTO_TEST_CASE(canonical_default_mirrors_single_filter) {
    // receiver only -> account mirrored
    {

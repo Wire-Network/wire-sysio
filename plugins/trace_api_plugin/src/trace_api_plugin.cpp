@@ -381,10 +381,7 @@ struct trace_api_rpc_plugin_impl : public std::enable_shared_from_this<trace_api
                   query.account = chain::name(obj["account"].as_string());
                if (obj.contains("action"))
                   query.action = chain::name(obj["action"].as_string());
-               if (obj.contains("block_num_start"))
-                  query.block_num_start = obj["block_num_start"].as<uint32_t>();
-               if (obj.contains("block_num_end"))
-                  query.block_num_end = obj["block_num_end"].as<uint32_t>();
+               parse_query_block_range(obj, query);
                if (obj.contains("include_notifications"))
                   include_notifications = obj["include_notifications"].as_bool();
             } catch (...) {
@@ -438,10 +435,7 @@ struct trace_api_rpc_plugin_impl : public std::enable_shared_from_this<trace_api
                   query.receiver = tc;
                   query.account  = tc;
                }
-               if (obj.contains("block_num_start"))
-                  query.block_num_start = obj["block_num_start"].as<uint32_t>();
-               if (obj.contains("block_num_end"))
-                  query.block_num_end = obj["block_num_end"].as<uint32_t>();
+               parse_query_block_range(obj, query);
             } catch (...) {
                error_results results{400, "Bad request body"};
                cb( 400, fc::variant( results ));
