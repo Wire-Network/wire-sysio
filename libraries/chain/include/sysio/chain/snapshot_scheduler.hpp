@@ -176,7 +176,18 @@ private:
    // path to write the snapshots to
    fs::path _snapshots_dir;
 
-   std::function<void(const snapshot_information&)> _snapshot_finalized_cb;
+   std::vector<std::function<void(const snapshot_information&)>> _snapshot_finalized_cbs;
+
+   /**
+    * Invoke every registered snapshot-finalized callback with @p si, logging and swallowing
+    * callback exceptions so a misbehaving subscriber cannot affect other subscribers or the
+    * snapshot pipeline.
+    *
+    * Must be called exactly once per finalized snapshot: from create_snapshot() when the
+    * chain runs in irreversible read mode (the snapshot is final immediately), or from
+    * on_irreversible_block() when a pending snapshot's block becomes irreversible.
+    */
+   void notify_snapshot_finalized(const snapshot_information& si);
 
    void x_serialize() {
       auto& vec = _snapshot_requests.get<as_vector>();
@@ -189,9 +200,14 @@ public:
 
    using snapshot_finalized_callback_t = std::function<void(const snapshot_information&)>;
 
-   // Set a callback invoked on each successful snapshot finalization
-   void set_snapshot_finalized_callback(snapshot_finalized_callback_t cb) {
-      _snapshot_finalized_cb = std::move(cb);
+   /**
+    * Register a callback invoked exactly once for each snapshot that reaches finality --
+    * immediately on creation when the chain runs in irreversible read mode, otherwise when
+    * the snapshot's block becomes irreversible. Fires for scheduled and on-demand snapshots
+    * alike. Callback exceptions are logged and swallowed.
+    */
+   void add_snapshot_finalized_callback(snapshot_finalized_callback_t cb) {
+      _snapshot_finalized_cbs.push_back(std::move(cb));
    }
 
    // snapshot scheduler listener

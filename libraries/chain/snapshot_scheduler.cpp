@@ -42,7 +42,9 @@ void snapshot_scheduler::on_irreversible_block(const signed_block_ptr& lib, cons
       auto next = pending->next;
 
       try {
-         next(pending->finalize(block_id, chain));
+         auto si = pending->finalize(block_id, chain);
+         next(snapshot_information{si});
+         notify_snapshot_finalized(si);
       }
       CATCH_AND_CALL(next);
 
@@ -156,16 +158,11 @@ void snapshot_scheduler::execute_snapshot(uint32_t srid, chain::controller& chai
             });
          }
 
-         // Notify snapshot provider callback if registered
-         if (_snapshot_finalized_cb) {
-            try {
-               _snapshot_finalized_cb(snapshot_info);
-            } catch (const fc::exception& e) {
-               elog("Snapshot finalized callback error: {}", e.to_detail_string());
-            } catch (const std::exception& e) {
-               elog("Snapshot finalized callback error: {}", e.what());
-            }
-         }
+         // Deliberately no notify_snapshot_finalized() here: this `next` is one of possibly
+         // several handlers chained onto the snapshot's completion, while the finalized
+         // callbacks fire once per snapshot from create_snapshot() (irreversible mode) or
+         // on_irreversible_block() (pending promotion). Notifying here as well would invoke
+         // every subscriber twice for scheduled snapshots.
       }
    };
    create_snapshot(next, chain, {});
@@ -207,7 +204,9 @@ void snapshot_scheduler::create_snapshot(next_function<snapshot_information> nex
                     head_block_num, ec.value(), ec.message());
 
          ilog("Snapshot creation at block {} complete; snapshot placed at {}", head_block_num, snapshot_path.string());
-         next(snapshot_information{head_id, head_block_num, head_block_time, chain_snapshot_header::current_version, snapshot_path.generic_string(), captured_root_hash});
+         snapshot_information si{head_id, head_block_num, head_block_time, chain_snapshot_header::current_version, snapshot_path.generic_string(), captured_root_hash};
+         next(snapshot_information{si});
+         notify_snapshot_finalized(si);
       }
       CATCH_AND_CALL(next);
       return;
@@ -247,6 +246,18 @@ void snapshot_scheduler::create_snapshot(next_function<snapshot_information> nex
          add_pending_snapshot_info(snapshot_information{head_id, head_block_num, head_block_time, chain_snapshot_header::current_version, pending_path.generic_string(), captured_root_hash});
       }
       CATCH_AND_CALL(next);
+   }
+}
+
+void snapshot_scheduler::notify_snapshot_finalized(const snapshot_information& si) {
+   for(const auto& cb: _snapshot_finalized_cbs) {
+      try {
+         cb(si);
+      } catch (const fc::exception& e) {
+         elog("Snapshot finalized callback error: {}", e.to_detail_string());
+      } catch (const std::exception& e) {
+         elog("Snapshot finalized callback error: {}", e.what());
+      }
    }
 }
 

@@ -34,6 +34,8 @@
 #include <fc/io/json.hpp>
 #include <fc/scoped_exit.hpp>
 #include <fc/variant.hpp>
+#include <fc/network/http/http_client.hpp>
+#include <fc/network/url.hpp>
 #include <fc/crypto/hex.hpp>
 #include <cstdlib>
 
@@ -222,6 +224,7 @@ public:
    // checked once after syncing past the snapshot block.
    std::optional<uint32_t>    snapshot_loaded_block_num;
    fc::crypto::blake3         snapshot_loaded_root_hash;
+   bool                       snapshot_auto_fetched = false; // true when loaded via --snapshot-endpoint
 
    // --native-contract mappings: account -> path to .so
    std::vector<std::pair<chain::name, std::filesystem::path>> native_contracts;
@@ -265,6 +268,9 @@ public:
    /// irreversible-block handler with the just-finalized block; retries on later finalized
    /// blocks until the attestation record appears or the node catches up to the chain tip.
    void verify_snapshot_attestation(const signed_block_ptr& lib_block);
+   /// Download and hash-check a snapshot from a remote provider, leaving snapshot_path
+   /// pointing at the downloaded file for the normal snapshot-load path to consume.
+   void fetch_snapshot_from_endpoint(const std::string& endpoint_url);
 
 private:
    static void log_guard_exception(const chain::guard_exception& e);
@@ -466,6 +472,12 @@ void chain_plugin::set_program_options(options_description& cli, options_descrip
           "Use RPC endpoint /v1/producer/pause_at_block to pause at a specific block instead. "
           "Combine with truncate-at-block to prune blocks beyond the specified number from the fork database on exit.")
          ("snapshot", bpo::value<std::filesystem::path>(), "File to read Snapshot State from")
+         ("snapshot-endpoint", bpo::value<std::string>(),
+          "Fetch snapshot from URL and bootstrap.\n"
+          "URL formats:\n"
+          "  http://host:port          - fetches latest snapshot\n"
+          "  http://host:port/50000    - fetches snapshot at block 50000\n"
+          "Requires empty database (use --delete-all-blocks to clear existing data).")
          ;
 
 }
@@ -866,9 +878,19 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
          clear_directory_contents( chain_config->state_dir );
       }
 
+      // --snapshot-endpoint: fetch snapshot from remote node and bootstrap
+      if (options.count("snapshot-endpoint")) {
+         SYS_ASSERT(!options.contains("snapshot"), plugin_config_exception,
+                    "--snapshot-endpoint is incompatible with --snapshot; use one or the other");
+         fetch_snapshot_from_endpoint(options.at("snapshot-endpoint").as<std::string>());
+      }
+
       std::optional<chain_id_type> chain_id;
-      if (options.contains( "snapshot" )) {
-         snapshot_path = options.at( "snapshot" ).as<std::filesystem::path>();
+      if (options.contains( "snapshot" ) || snapshot_path) {
+         if (!snapshot_path) {
+            // Only read from CLI option if not already set by --snapshot-endpoint
+            snapshot_path = options.at( "snapshot" ).as<std::filesystem::path>();
+         }
          SYS_ASSERT( std::filesystem::exists(*snapshot_path), plugin_config_exception,
                      "Cannot load snapshot, {} does not exist", snapshot_path->generic_string() );
 
@@ -1493,6 +1515,94 @@ bool chain_plugin::accept_transactions() const {
    return my->accept_transactions;
 }
 
+void chain_plugin_impl::fetch_snapshot_from_endpoint(const std::string& endpoint_url) {
+   // Check for existing chain data
+   auto shared_mem_path = chain_config->state_dir / "shared_memory.bin";
+   auto chain_head_path = chain_config->state_dir / chain_head_filename;
+   SYS_ASSERT(!std::filesystem::is_regular_file(shared_mem_path) &&
+              !std::filesystem::is_regular_file(chain_head_path),
+              plugin_config_exception,
+              "Cannot bootstrap from snapshot endpoint with existing chain data in {}. "
+              "Rerun with --delete-all-blocks --snapshot-endpoint URL to remove "
+              "existing blocks and state before bootstrapping.",
+              chain_config->state_dir.generic_string());
+
+   // Parse block number from URL if present (trailing path component)
+   std::optional<uint32_t> request_block_num;
+   std::string base_url = endpoint_url;
+   {
+      while (!base_url.empty() && base_url.back() == '/') base_url.pop_back();
+      auto last_slash = base_url.rfind('/');
+      if (last_slash != std::string::npos && last_slash > 7) { // past http://
+         auto segment = base_url.substr(last_slash + 1);
+         bool all_digits = !segment.empty() && std::all_of(segment.begin(), segment.end(), ::isdigit);
+         if (all_digits) {
+            request_block_num = std::stoul(segment);
+            base_url = base_url.substr(0, last_slash);
+         }
+      }
+   }
+
+   ilog("Fetching snapshot metadata from endpoint: {}", endpoint_url);
+
+   fc::http_client http_client;
+   fc::variant metadata_response;
+   if (request_block_num) {
+      auto url = fc::url(base_url + "/v1/snapshot/by_block");
+      fc::mutable_variant_object payload;
+      payload("block_num", *request_block_num);
+      metadata_response = http_client.post_sync(url, fc::variant(payload));
+   } else {
+      auto url = fc::url(base_url + "/v1/snapshot/latest");
+      metadata_response = http_client.post_sync(url, fc::variant(fc::mutable_variant_object()));
+   }
+
+   auto snap_block_num = metadata_response["block_num"].as<uint32_t>();
+   auto snap_root_hash = metadata_response["root_hash"].as<fc::crypto::blake3>();
+
+   ilog("Snapshot metadata: block #{}, hash {}", snap_block_num, snap_root_hash.str());
+
+   // Determine snapshots directory (default alongside data-dir)
+   auto snapshots_dir = app().data_dir() / "snapshots";
+   if (!std::filesystem::exists(snapshots_dir)) {
+      std::filesystem::create_directories(snapshots_dir);
+   }
+
+   auto download_dest = snapshots_dir / ("snapshot-bootstrap-" + std::to_string(snap_block_num) + ".bin");
+
+   // Download the snapshot
+   ilog("Downloading snapshot for block #{} to {}", snap_block_num, download_dest.string());
+   {
+      auto download_url = fc::url(base_url + "/v1/snapshot/download");
+      fc::mutable_variant_object download_payload;
+      download_payload("block_num", snap_block_num);
+      http_client.post_to_file(download_url, fc::variant(download_payload), download_dest);
+   }
+
+   // Quick check: compare the root hash stored in the snapshot footer against
+   // the hash advertised by the endpoint. This catches download corruption but
+   // not sophisticated tampering (a tampered file could update the footer hash).
+   // Full integrity verification happens during snapshot loading (validate()),
+   // and on-chain attestation verification happens after syncing.
+   ilog("Verifying snapshot root hash...");
+   {
+      chain::threaded_snapshot_reader reader(download_dest);
+      reader.load_index(); // reads footer + section index (fast)
+      auto stored_hash = reader.get_root_hash();
+
+      SYS_ASSERT(stored_hash == snap_root_hash, plugin_config_exception,
+                 "Snapshot root hash mismatch! Endpoint advertised: {}, file contains: {}. "
+                 "The downloaded snapshot may be corrupted.",
+                 snap_root_hash.str(), stored_hash.str());
+   }
+
+   ilog("Snapshot hash verified successfully. Proceeding with bootstrap from block #{}", snap_block_num);
+
+   snapshot_path = download_dest;
+   snapshot_auto_fetched = true;
+   snapshot_loaded_root_hash = snap_root_hash;
+}
+
 void chain_plugin_impl::verify_snapshot_attestation(const signed_block_ptr& lib_block) {
    if (!snapshot_loaded_block_num) return;
 
@@ -1566,7 +1676,22 @@ void chain_plugin_impl::verify_snapshot_attestation(const signed_block_ptr& lib_
             return; // retry on the next finalized block while still catching up
 
          if (!attestation_supported) {
+            // A chain whose system contract never declares the table cannot produce a record at
+            // all, so there is nothing to wait for. A manual --snapshot downgrades to a warning;
+            // a snapshot fetched via --snapshot-endpoint came from an untrusted remote provider,
+            // so refusing to run is the only safe outcome.
             snapshot_loaded_block_num.reset();
+            if (snapshot_auto_fetched) {
+               elog("FATAL: The deployed system contract does not declare a '{}' table, so this chain "
+                    "does not support snapshot attestation, and auto-fetched snapshots require "
+                    "on-chain attestation for security. Snapshot verification for block #{} cannot be "
+                    "performed. The node has been stopped. It is highly recommended that you delete "
+                    "this chain state and bootstrap from a manually obtained snapshot from a trusted "
+                    "source (--snapshot) instead.",
+                    snapshot_attest::table_snaprecords, snap_block_num);
+               app().quit();
+               return;
+            }
             wlog("The deployed system contract does not declare a '{}' table, so this chain does not "
                  "support snapshot attestation. Skipping snapshot verification for block #{}.",
                  snapshot_attest::table_snaprecords, snap_block_num);
@@ -1574,14 +1699,26 @@ void chain_plugin_impl::verify_snapshot_attestation(const signed_block_ptr& lib_
          }
 
          // Even at the live tip a missing record is not yet conclusive -- the providers'
-         // votesnaphash transactions may still be in flight (see
-         // snapshot_attestation_grace_blocks). Keep verification pending for a deterministic
-         // window of finalized blocks past the snapshot height before concluding the height was
-         // never attested.
+         // votesnaphash transactions (which must be generated, voted on, and reach quorum) may
+         // still be in flight (see snapshot_attestation_grace_blocks). Keep verification pending
+         // for a deterministic window of finalized blocks past the snapshot height before
+         // concluding the height was never attested.
          if (lib_block->block_num() < snap_block_num + snapshot_attestation_grace_blocks)
             return; // retry on the next finalized block while the attestation can still arrive
 
          snapshot_loaded_block_num.reset();
+         if (snapshot_auto_fetched) {
+            // A snapshot fetched via --snapshot-endpoint came from an untrusted remote provider;
+            // without an on-chain attestation there is nothing tying its content to the chain,
+            // so refusing to run is the only safe outcome.
+            elog("FATAL: No attested snapshot record found for block #{} after syncing {} blocks past it. "
+                 "Auto-fetched snapshots require on-chain attestation for security. "
+                 "The node has been stopped. It is highly recommended that you delete this chain state "
+                 "and acquire a snapshot from a trusted source before restarting.",
+                 snap_block_num, lib_block->block_num() - snap_block_num);
+            app().quit();
+            return;
+         }
          wlog("No attested snapshot record found for block #{} after syncing to the chain tip and "
               "waiting {} blocks past the snapshot height. Skipping snapshot verification. "
               "Only snapshots taken at attested block heights can be verified.",
