@@ -96,7 +96,7 @@ namespace sysio::chain {
 
    void transaction_context::initialize() {
       if (!control.skip_db_sessions() && !is_read_only()) {
-         undo_session.emplace(control.mutable_db(), control);
+         undo_session.emplace(control.mutable_db());
       }
 
       trace->id = packed_trx.id();

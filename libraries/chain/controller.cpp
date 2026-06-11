@@ -13,6 +13,7 @@
 #include <sysio/chain/protocol_state_object.hpp>
 #include <sysio/chain/kv_table_objects.hpp>
 #include <sysio/chain/transaction_dedup.hpp>
+#include <sysio/chain/transaction_dedup_undo_index.hpp>
 #include <sysio/chain/genesis_intrinsics.hpp>
 #include <sysio/chain/whitelisted_intrinsics.hpp>
 #include <sysio/chain/database_header_object.hpp>
@@ -916,8 +917,7 @@ struct controller_impl {
 
    void pop_block() {
       uint32_t prev_block_num = pop_prev_block();
-      db.undo();
-      trx_dedup.pop_block_revision();
+      db.undo();   // drives the registered dedup participant to revert this block's reversible changes
       protocol_features.popped_blocks_to(prev_block_num);
    }
 
@@ -1122,8 +1122,7 @@ struct controller_impl {
             // Do it before commit so that in case it throws, DB can be rolled back.
             blog.append( (*bitr)->block, (*bitr)->id(), (*bitr)->block->packed_signed_block() );
 
-            db.commit( (*bitr)->block_num() );
-            trx_dedup.commit_to_lib( (*bitr)->block_num() );
+            db.commit( (*bitr)->block_num() );   // drives the dedup participant's commit (revision == block num)
             root_id = (*bitr)->id();
 
             if (irreversible_mode()) {
@@ -1471,6 +1470,18 @@ struct controller_impl {
       while( db.revision() > chain_head.block_num() ) {
          db.undo();
       }
+
+      // Register the transaction dedup as a chainbase undo participant, so the database drives its
+      // undo lifecycle (add_undo_session / squash / undo / commit) in lockstep with the segment
+      // indices -- the controller no longer hand-pairs dedup undo calls with the database's. The db
+      // is now at head revision; align the dedup before registering. genesis/snapshot loaded the
+      // membership only (revision 0), so set the revision to the database's; existing_state restored
+      // the dedup's revision and undo stack from its file and must already match (a clean shutdown
+      // writes both; an unclean one leaves chainbase dirty and refuses to open, so they cannot
+      // disagree). add_undo_participant validates the revision range, failing loud on any mismatch.
+      if (startup != startup_t::existing_state)
+         trx_dedup.set_revision(static_cast<uint64_t>(db.revision()));
+      db.add_undo_participant(std::make_unique<dedup_undo_index>(trx_dedup));
 
       SYS_ASSERT(conf.terminate_at_block == 0 || conf.terminate_at_block > chain_head.block_num(),
                  plugin_config_exception, "--terminate-at-block {} not greater than chain head {}",
@@ -2085,8 +2096,7 @@ struct controller_impl {
       }
 
       auto guard_pending = fc::make_scoped_exit([this, head_block_num=chain_head.block_num()]() {
-         trx_dedup.abort_block_revision(); // no-op if no pending revision
-         pending.reset();
+         pending.reset();   // destroying the unpushed block session drives the dedup participant's undo
          protocol_features.popped_blocks_to( head_block_num );
       });
 
@@ -2094,9 +2104,10 @@ struct controller_impl {
                   "db revision {} is not on par with head block {}, fork db head {}",
                   db.revision(), chain_head.block_num(), fork_db_head().block_num() );
 
+      // Opening the block's db undo session drives the dedup participant's add_undo_session; for
+      // skip_db_sessions blocks (irreversible/ephemeral) there is no session and the dedup records
+      // permanently, matching the database.
       maybe_session        session = skip_db_sessions(s) ? maybe_session() : maybe_session(db);
-      if (!skip_db_sessions(s))
-         trx_dedup.start_block_revision(chain_head.block_num() + 1);
       building_block_input bbi{chain_head.id(), chain_head.timestamp(), when, chain_head.internal()->get_producer_for_block_at(when).producer_name,
                                new_protocol_feature_activations};
       pending.emplace(std::move(session), *chain_head.internal(), bbi);
@@ -2371,9 +2382,9 @@ struct controller_impl {
          throw;
       }
 
-      // push the state for pending.
+      // push the state for pending. The block's db undo session is kept (not undone), so the dedup
+      // participant's matching undo session likewise remains on its stack until LIB advances.
       pending->push();
-      trx_dedup.commit_block_revision();
    }
 
    void log_applied(controller::block_status s) const {
@@ -3030,8 +3041,7 @@ struct controller_impl {
             emit( irreversible_block, std::tie(bsp->block, bsp->id()), __FILE__, __LINE__ );
 
             if (!skip_db_sessions(controller::block_status::irreversible)) {
-               db.commit(bsp->block_num());
-               trx_dedup.commit_to_lib(bsp->block_num());
+               db.commit(bsp->block_num());   // drives the dedup participant's commit (revision == block num)
             }
          }
 
@@ -3201,8 +3211,7 @@ struct controller_impl {
       deque<transaction_metadata_ptr> applied_trxs;
       if( pending ) {
          applied_trxs = pending->extract_trx_metas();
-         trx_dedup.abort_block_revision();
-         pending.reset();
+         pending.reset();   // destroying the unpushed block session drives the dedup participant's undo
          protocol_features.popped_blocks_to( chain_head.block_num() );
       }
       return applied_trxs;
@@ -4471,17 +4480,6 @@ void controller::record_transaction( const transaction_id_type& id, fc::time_poi
    my->trx_dedup.record(id, expire);
 }
 
-void controller::push_dedup_session() {
-   my->trx_dedup.push_session();
-}
-
-void controller::squash_dedup_session() {
-   my->trx_dedup.squash_session();
-}
-
-void controller::undo_dedup_session() {
-   my->trx_dedup.undo_session();
-}
 
 void controller::set_subjective_cpu_leeway(fc::microseconds leeway) {
    my->subjective_cpu_leeway = leeway;
