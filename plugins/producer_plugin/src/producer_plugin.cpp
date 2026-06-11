@@ -1092,7 +1092,7 @@ public:
             if (std::holds_alternative<fc::exception_ptr>(response)) {
                except_ptr = std::get<fc::exception_ptr>(response);
             } else if (std::get<transaction_trace_ptr>(response)->except) {
-               except_ptr = std::get<transaction_trace_ptr>(response)->except->dynamic_copy_exception();
+               except_ptr = std::get<transaction_trace_ptr>(response)->except;
             }
             _transaction_ack_channel.publish(priority::low, std::pair<fc::exception_ptr, packed_transaction_ptr>(except_ptr, trx));
             next(std::move(response));
@@ -2724,8 +2724,7 @@ producer_plugin_impl::handle_push_result(const transaction_metadata_ptr&        
             if (return_failure_trace) {
                next(trace);
             } else {
-               auto e_ptr = trace->except->dynamic_copy_exception();
-               next(e_ptr);
+               next(trace->except);
             }
          }
       }
