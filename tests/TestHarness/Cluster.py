@@ -493,7 +493,9 @@ class Cluster(object):
             sysdcmd = launcher.construct_command_line(instance)
 
             nodeNum = instance.index
-            node = Node(self.host, self.port + nodeNum, nodeNum, Path(instance.data_dir_name),
+            # Bios port is shard-offset to PortBiosHttp; it no longer equals cluster.port+biosNodeId.
+            node_port = Cluster.__BiosPort if nodeNum == Node.biosNodeId else self.port + nodeNum
+            node = Node(self.host, node_port, nodeNum, Path(instance.data_dir_name),
                         Path(instance.config_dir_name), sysdcmd, unstarted=instance.dont_start,
                         launch_time=launcher.launch_time, walletMgr=self.walletMgr, nodeopVers=self.nodeopVers)
             node.keys = instance.keys

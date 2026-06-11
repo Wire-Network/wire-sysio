@@ -347,7 +347,8 @@ def abi_file_with_nodeop_test():
 
         tries = 30
         nodeopPort = TestHelper.DEFAULT_PORT
-        while not Utils.arePortsAvailable(set(range(nodeopPort, nodeopPort + 1))):
+        p2pPort = Utils.getPort(Utils.PortBiosP2P)
+        while not Utils.arePortsAvailable({nodeopPort, p2pPort}):
             Utils.Print(f"ERROR: Another process is listening on nodeop test port {nodeopPort}. wait...")
             if tries == 0:
                 assert False
@@ -358,7 +359,7 @@ def abi_file_with_nodeop_test():
         os.makedirs(data_dir, exist_ok=True)
         walletMgr = WalletMgr(True)
         walletMgr.launch()
-        cmd = f"./programs/nodeop/nodeop -e -p sysio --signature-provider wire-1,wire,wire,SYS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV,KEY:5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3 --plugin sysio::trace_api_plugin --trace-no-abis --plugin sysio::producer_plugin --plugin sysio::producer_api_plugin --plugin sysio::chain_api_plugin --plugin sysio::chain_plugin --plugin sysio::http_plugin --access-control-allow-origin=* --http-validate-host=false --http-server-address=localhost:{nodeopPort} --max-transaction-time=-1 --resource-monitor-not-shutdown-on-threshold-exceeded " + "--data-dir " + data_dir + " --config-dir " + data_dir
+        cmd = f"./programs/nodeop/nodeop -e -p sysio --signature-provider wire-1,wire,wire,SYS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV,KEY:5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3 --plugin sysio::trace_api_plugin --trace-no-abis --plugin sysio::producer_plugin --plugin sysio::producer_api_plugin --plugin sysio::chain_api_plugin --plugin sysio::chain_plugin --plugin sysio::http_plugin --access-control-allow-origin=* --http-validate-host=false --p2p-listen-endpoint=0.0.0.0:{p2pPort} --http-server-address=localhost:{nodeopPort} --max-transaction-time=-1 --resource-monitor-not-shutdown-on-threshold-exceeded " + "--data-dir " + data_dir + " --config-dir " + data_dir
         node = Node('localhost', nodeopPort, nodeId, data_dir=Path(data_dir), config_dir=Path(data_dir), cmd=shlex.split(cmd), launch_time=datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S'), walletMgr=walletMgr)
         if not node or not Utils.waitForBool(node.checkPulse, timeout=15):
             Utils.Print("ERROR: node doesn't appear to be running...")
