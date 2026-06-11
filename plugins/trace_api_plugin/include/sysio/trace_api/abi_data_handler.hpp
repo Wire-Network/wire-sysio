@@ -7,6 +7,7 @@
 #include <optional>
 #include <unordered_map>
 #include <vector>
+#include <boost/container_hash/hash.hpp>
 #include <sysio/chain/abi_def.hpp>
 #include <sysio/chain/name.hpp>
 #include <sysio/trace_api/trace.hpp>
@@ -22,10 +23,14 @@ namespace sysio {
    /**
     * Data Handler that uses sysio::chain::abi_serializer to decode action data.
     *
-    * ABIs are resolved dynamically via an abi_lookup_fn callback, typically backed
-    * by the abi_log on disk.  Given (account, action_global_sequence) it returns
-    * {effective_abi_global_seq, abi_bytes} -- the setabi record that was in effect
-    * at that action, or nullopt.
+    * ABIs are resolved dynamically via two callbacks, typically backed by the abi_log on disk:
+    *   - abi_seq_resolver_fn: (account, action_global_sequence) -> effective_abi_global_seq of the
+    *     setabi record in effect at that action.  Pure index lookup, no blob I/O - called once per
+    *     decoded action to compute the serializer cache key.
+    *   - abi_blob_fetcher_fn: (account, effective_abi_global_seq) -> abi_bytes for that exact
+    *     recorded version.  Performs the blob read - called only on a serializer cache miss, so
+    *     bulk queries over actions sharing one ABI version pay for a single blob read instead of
+    *     one per action.
     *
     * A bounded LRU caches constructed abi_serializers by (account, effective_abi_global_seq)
     * so bulk queries that span many actions sharing the same ABI version hit the same
@@ -40,14 +45,15 @@ namespace sysio {
     */
    class abi_data_handler {
    public:
-      struct lookup_entry {
-         uint64_t          effective_global_seq = 0;
-         std::vector<char> abi_bytes;
-      };
+      /// Callback: (account, action_global_sequence) -> effective_abi_global_seq in effect at that
+      /// action, or nullopt when no ABI version is recorded.  Called on the HTTP thread per decoded
+      /// action; must be thread-safe and cheap (no blob I/O).
+      using abi_seq_resolver_fn = std::function<std::optional<uint64_t>(chain::name, uint64_t)>;
 
-      /// Callback: (account, action_global_sequence) -> {effective_abi_global_seq, abi_bytes}
-      /// for the ABI version in effect at that action.  Called on the HTTP thread; must be thread-safe.
-      using abi_lookup_fn = std::function<std::optional<lookup_entry>(chain::name, uint64_t)>;
+      /// Callback: (account, effective_abi_global_seq) -> the recorded ABI blob for that exact
+      /// version, or nullopt.  Called on the HTTP thread only on serializer cache misses; must be
+      /// thread-safe.
+      using abi_blob_fetcher_fn = std::function<std::optional<std::vector<char>>(chain::name, uint64_t)>;
 
       enum class decode_status {
          not_attempted,  // no ABI available for this action
@@ -66,9 +72,11 @@ namespace sysio {
       // 256 entries caps cache memory at roughly 130 MB in the worst case.
       static constexpr size_t default_cache_capacity = 256;
 
-      explicit abi_data_handler( exception_handler except_handler, abi_lookup_fn lookup_fn = {},
+      explicit abi_data_handler( exception_handler except_handler, abi_seq_resolver_fn seq_resolver = {},
+                                 abi_blob_fetcher_fn blob_fetcher = {},
                                  size_t cache_capacity = default_cache_capacity )
-      :_abi_lookup_fn( std::move( lookup_fn ) )
+      :_abi_seq_resolver( std::move( seq_resolver ) )
+      ,_abi_blob_fetcher( std::move( blob_fetcher ) )
       ,except_handler( std::move( except_handler ) )
       ,_cache_capacity( cache_capacity )
       {}
@@ -119,12 +127,15 @@ namespace sysio {
       using cache_key = std::pair<chain::name /*account*/, uint64_t /*effective_abi_global_seq*/>;
       struct cache_key_hash {
          size_t operator()(const cache_key& k) const noexcept {
-            return std::hash<chain::name>{}(k.first) ^ (std::hash<uint64_t>{}(k.second) << 1);
+            size_t seed = std::hash<chain::name>{}(k.first);
+            boost::hash_combine(seed, k.second);
+            return seed;
          }
       };
 
-      abi_lookup_fn     _abi_lookup_fn;
-      exception_handler except_handler;
+      abi_seq_resolver_fn _abi_seq_resolver;
+      abi_blob_fetcher_fn _abi_blob_fetcher;
+      exception_handler   except_handler;
 
       // LRU cache of (account, effective_abi_global_seq) -> abi_serializer.
       // _cache_list: MRU at front, LRU at back.  _cache_map: key -> iterator into list.

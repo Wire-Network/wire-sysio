@@ -1469,4 +1469,110 @@ BOOST_AUTO_TEST_SUITE(slice_tests)
       BOOST_CHECK(r1.may_contain_receiver("frank"_n));   // forked-out slice-1 (harmless false positive)
    }
 
+   // A data log with an unparseable record in the MIDDLE (torn write from a crash, with re-applied
+   // blocks appended after it) must not produce a bloom sidecar at all.  A bloom built from the
+   // partial prefix would return authoritative negative probes for receivers recorded after the torn
+   // record - silently dropping their actions from get_actions.  No sidecar -> the query path scans
+   // the slice, which still works because it reads via per-block offsets, not a sequential stream.
+   BOOST_FIXTURE_TEST_CASE(slice_dir_recv_bloom_skipped_on_corrupt_data_log, test_fixture)
+   {
+      fc::temp_directory tempdir;
+      const uint32_t width = 10;
+      test_store_provider sp(tempdir.path(), width);
+
+      auto make_bt = [](uint32_t num, chain::checksum256_type id, chain::name receiver) {
+         block_trace_v0 bt;
+         bt.id = id;
+         bt.number = num;
+         transaction_trace_v0 trx;
+         trx.id = id;
+         trx.block_num = num;
+         action_trace_v0 a{};
+         a.global_sequence = uint64_t{num} * 100;
+         a.receiver        = receiver;
+         a.account         = "sysio.token"_n;
+         a.action          = "transfer"_n;
+         trx.actions.push_back(std::move(a));
+         bt.transactions.push_back(std::move(trx));
+         return bt;
+      };
+
+      sp.append(make_bt(1, "b000000000000000000000000000000000000000000000000000000000000001"_h, "alice"_n));
+
+      // Torn record: raw garbage at EOF, exactly what an interrupted append leaves behind.  0xff
+      // bytes guarantee the variant-index unpack fails deterministically.
+      {
+         fc::cfile trace;
+         BOOST_REQUIRE(sp._slice_directory.find_trace_slice(0, open_state::write, trace));
+         const char garbage[8] = { '\xff', '\xff', '\xff', '\xff', '\xff', '\xff', '\xff', '\xff' };
+         trace.write(garbage, sizeof(garbage));
+         trace.flush();
+      }
+
+      // Post-restart re-applied block lands AFTER the garbage; its blk_offset slot points past it,
+      // so offset-based reads still work even though the stream is desynced at the torn record.
+      sp.append(make_bt(2, "b000000000000000000000000000000000000000000000000000000000000002"_h, "charlie"_n));
+      get_block_t b2 = sp.get_block(2);
+      BOOST_REQUIRE(b2);
+
+      // Maintenance must NOT write a bloom for this slice.
+      sp._slice_directory.run_maintenance_tasks(/*lib=*/15, [](const std::string&){});
+      BOOST_CHECK(!std::filesystem::exists(sp._slice_directory.bloom_slice_path(0)));
+
+      // And it stays that way on subsequent runs (no flapping).
+      sp._slice_directory.run_maintenance_tasks(/*lib=*/16, [](const std::string&){});
+      BOOST_CHECK(!std::filesystem::exists(sp._slice_directory.bloom_slice_path(0)));
+   }
+
+   // The block-offset sidecar is advisory: a filesystem failure writing it must neither abort the
+   // append (which would shut the node down through the extraction except_handler) nor break
+   // get_block, which falls back to the metadata-log scan.
+   BOOST_FIXTURE_TEST_CASE(test_blk_offset_write_failure_is_advisory, test_fixture)
+   {
+      fc::temp_directory tempdir;
+
+      // Block the sidecar path with a non-empty DIRECTORY: opening it as a file fails, and it can't
+      // be removed-and-recreated by the recovery path either.
+      const auto sidecar = tempdir.path() / "trace_blk_idx_0000000000-0000000100.log";
+      std::filesystem::create_directories(sidecar);
+      { std::ofstream(sidecar / "occupied") << "x"; }
+
+      store_provider sp(tempdir.path(), 100, std::optional<uint32_t>(), std::optional<uint32_t>(), 0);
+      BOOST_CHECK_NO_THROW(sp.append(block_trace1));
+
+      // Sidecar unusable -> lookup misses -> metadata-log scan fallback still serves the block.
+      get_block_t b1 = sp.get_block(1);
+      BOOST_REQUIRE(b1);
+      BOOST_REQUIRE_EQUAL(std::get<block_trace_v0>(std::get<0>(*b1)), block_trace1);
+   }
+
+   // Restart recovery: a fresh store_provider over an existing slice dir must pick up the previous
+   // run's LIB and last-recorded-block watermarks from the persisted index slices, so irreversible
+   // blocks do not flip back to "pending" and the query envelope's recorded-end clamp keeps working
+   // before any new chain signal arrives.
+   BOOST_FIXTURE_TEST_CASE(test_watermarks_seed_from_disk_on_reopen, test_fixture)
+   {
+      fc::temp_directory tempdir;
+      {
+         store_provider sp(tempdir.path(), 100, std::optional<uint32_t>(), std::optional<uint32_t>(), 0);
+         BOOST_CHECK_EQUAL(sp.last_recorded_block(), 0u);
+         sp.append(block_trace1);   // block 1
+         sp.append_lib(1);
+         sp.append(block_trace2);   // block 5
+         BOOST_CHECK_EQUAL(sp.last_recorded_block(), 5u);
+      }
+
+      store_provider sp2(tempdir.path(), 100, std::optional<uint32_t>(), std::optional<uint32_t>(), 0);
+      BOOST_CHECK_EQUAL(sp2.last_recorded_block(), 5u);
+
+      // Block 1 was at/below the recorded LIB -> still reported irreversible after the restart.
+      get_block_t b1 = sp2.get_block(1);
+      BOOST_REQUIRE(b1);
+      BOOST_CHECK(std::get<1>(*b1));
+      // Block 5 was beyond LIB -> still pending.
+      get_block_t b5 = sp2.get_block(5);
+      BOOST_REQUIRE(b5);
+      BOOST_CHECK(!std::get<1>(*b5));
+   }
+
 BOOST_AUTO_TEST_SUITE_END()

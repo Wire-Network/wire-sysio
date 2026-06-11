@@ -3,6 +3,7 @@
 #include <sysio/chain/types.hpp>
 #include <fc/io/cfile.hpp>
 #include <fc/reflect/reflect.hpp>
+#include <atomic>
 #include <cstdint>
 #include <filesystem>
 #include <map>
@@ -37,12 +38,16 @@ namespace sysio::trace_api {
 // replaying setabi + lazy-fetch against the chain.
 //
 // Thread-safety:
-//   - append() takes _append_mtx for the cfile write, releases it, then
+//   - append() takes _append_mtx for the file write, releases it, then
 //     takes _index_mtx to insert into the lookup index.  Two mutexes so
 //     lookups never wait for file I/O on a concurrent append.
-//   - lookup() takes _index_mtx briefly to copy (blob_offset, blob_size),
-//     releases it, then pread()s the blob bytes.  pread is atomic w.r.t.
-//     the fd's shared position and safe to issue concurrently.
+//   - Appends go through raw-fd pwrite (one contiguous record per call),
+//     never the buffered FILE*.  A failed write therefore leaves all torn
+//     bytes in the kernel file - never stranded in a user-space stdio
+//     buffer - so recovery is a single resize_file back to _end_offset.
+//   - lookup()/fetch() take _index_mtx briefly to copy (blob_offset,
+//     blob_size), release it, then pread() the blob bytes.  pread is atomic
+//     w.r.t. the fd's shared position and safe to issue concurrently.
 // ---------------------------------------------------------------------------
 
 struct abi_log_header {
@@ -63,10 +68,13 @@ public:
    abi_log(const abi_log&)            = delete;
    abi_log& operator=(const abi_log&) = delete;
 
-   bool valid() const { return _valid; }
+   bool valid() const { return _valid.load(std::memory_order_relaxed); }
 
    // Append a new ABI record.  Thread-safe.  Last-write-wins for duplicate
-   // (account, global_seq) keys.
+   // (account, global_seq) keys.  On a write failure the torn tail is
+   // truncated back to the last good record; if even that fails the log
+   // disables itself (valid() turns false) rather than serve mis-aligned
+   // blob offsets.
    void append(chain::name account, uint64_t global_seq, std::vector<char> abi_bytes);
 
    struct lookup_result {
@@ -74,11 +82,22 @@ public:
       std::vector<char> abi_bytes;
    };
 
-   // Look up the ABI in effect for account at the largest recorded
-   // global_seq <= the query.  Returns nullopt if no record matches.
-   // The returned effective_global_seq is the global_seq the ABI was
-   // recorded at (used as a stable cache key by decoders).
+   // Resolve only the effective global_seq for account at the largest
+   // recorded global_seq <= the query (no blob I/O - cheap enough to call
+   // per action as a cache-key probe).  Returns nullopt if no record
+   // matches.  Thread-safe; may run concurrently with append().
+   std::optional<uint64_t> lookup_seq(chain::name account, uint64_t global_seq) const;
+
+   // Fetch the blob recorded at an exact (account, effective_global_seq)
+   // key as previously resolved by lookup_seq.  Performs the blob pread.
+   // Returns nullopt when the key is not recorded or the read fails.
    // Thread-safe; may run concurrently with append().
+   std::optional<std::vector<char>> fetch(chain::name account, uint64_t effective_global_seq) const;
+
+   // Composition of lookup_seq + fetch: the ABI in effect for account at
+   // global_seq with its blob.  The returned effective_global_seq is the
+   // global_seq the ABI was recorded at (used as a stable cache key by
+   // decoders).  Thread-safe; may run concurrently with append().
    std::optional<lookup_result> lookup(chain::name account, uint64_t global_seq) const;
 
    // Returns true if at least one record exists for the account at any
@@ -119,9 +138,11 @@ private:
    std::mutex                       _append_mtx;
    mutable std::mutex               _index_mtx;
    std::map<index_key, index_entry> _index;
-   fc::cfile                        _cfile;        // held open for appends; reads go through fileno() + pread
+   fc::cfile                        _cfile;        // holds the fd; appends use pwrite, reads use pread (both via fileno())
    uint64_t                         _end_offset{0};
-   bool                             _valid{false};
+   // Atomic because append() can flip it to false (failed tail truncation) while lookups on HTTP
+   // threads read it concurrently.
+   std::atomic<bool>                _valid{false};
 };
 
 } // namespace sysio::trace_api

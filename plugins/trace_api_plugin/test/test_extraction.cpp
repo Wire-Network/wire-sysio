@@ -16,15 +16,19 @@ using namespace sysio::trace_api;
 using namespace sysio::trace_api::test_common;
 using sysio::chain::name;
 using sysio::chain::digest_type;
+using sysio::chain::packed_transaction;
 
 namespace {
+   // producer_block_id defaults to nullopt (a speculative execution); pass a block id to model a
+   // block-context application -- the ABI capture path only runs for block-context traces.
    chain::transaction_trace_ptr make_transaction_trace( const chain::transaction_id_type& id, uint32_t block_number,
-         uint32_t slot, chain::transaction_receipt_header::status_enum status, std::vector<chain::action_trace>&& actions ) {
+         uint32_t slot, chain::transaction_receipt_header::status_enum status, std::vector<chain::action_trace>&& actions,
+         std::optional<chain::block_id_type> producer_block_id = {} ) {
       return std::make_shared<chain::transaction_trace>(chain::transaction_trace{
          id,
          block_number,
          chain::block_timestamp_type(slot),
-         {},
+         producer_block_id,
          chain::transaction_receipt_header{},
          0,
          fc::microseconds(0),
@@ -133,6 +137,10 @@ struct extraction_test_fixture {
 
       std::optional<std::pair<uint32_t,uint32_t>> first_and_last_recorded_blocks() const {
          return std::nullopt; // no prior data in unit tests
+      }
+
+      std::optional<std::pair<uint32_t,uint32_t>> find_index_slice_gap() const {
+         return std::nullopt; // no internal gaps in unit tests
       }
 
       void append_abi(chain::name account, uint64_t global_seq, std::vector<char> abi_bytes) {
@@ -470,7 +478,7 @@ BOOST_FIXTURE_TEST_CASE(lazy_fetch_skipped_for_same_trx_setabi_target, abi_captu
    auto ptrx  = make_packed_trx({ x_foo_action, setabi_action, x_bar_action });
    auto trace = make_transaction_trace(
       ptrx.id(), 1, 1, chain::transaction_receipt_header::executed,
-      { x_foo, setabi, x_bar });
+      { x_foo, setabi, x_bar }, chain::block_id_type{} /*block context*/);
 
    signal(trace, std::make_shared<packed_transaction>(ptrx));
 
@@ -501,7 +509,7 @@ BOOST_FIXTURE_TEST_CASE(prior_setabi_survives_later_setabi_in_same_trx, abi_capt
       auto ptrx = make_packed_trx({ setabi_old });
       auto trace = make_transaction_trace(
          ptrx.id(), 1, 1, chain::transaction_receipt_header::executed,
-         { setabi_old_trace });
+         { setabi_old_trace }, chain::block_id_type{} /*block context*/);
       signal(trace, std::make_shared<packed_transaction>(ptrx));
    }
 
@@ -526,7 +534,7 @@ BOOST_FIXTURE_TEST_CASE(prior_setabi_survives_later_setabi_in_same_trx, abi_capt
       auto ptrx = make_packed_trx({ x_foo_action, setabi_action, x_bar_action });
       auto trace = make_transaction_trace(
          ptrx.id(), 1, 1, chain::transaction_receipt_header::executed,
-         { x_foo, setabi, x_bar });
+         { x_foo, setabi, x_bar }, chain::block_id_type{} /*block context*/);
       signal(trace, std::make_shared<packed_transaction>(ptrx));
    }
 
@@ -560,7 +568,7 @@ BOOST_FIXTURE_TEST_CASE(lazy_fetch_fires_for_non_setabi_target_in_same_trx, abi_
    auto ptrx = make_packed_trx({ y_foo_action, setabi_action });
    auto trace = make_transaction_trace(
       ptrx.id(), 1, 1, chain::transaction_receipt_header::executed,
-      { y_foo, setabi });
+      { y_foo, setabi }, chain::block_id_type{} /*block context*/);
    signal(trace, std::make_shared<packed_transaction>(ptrx));
 
    // Two appends: Y@0 lazy fetch (Y isn't a setabi target) and X@301 setabi.
@@ -571,6 +579,45 @@ BOOST_FIXTURE_TEST_CASE(lazy_fetch_fires_for_non_setabi_target_in_same_trx, abi_
    BOOST_TEST(abi_calls[1].account    == "x"_n);
    BOOST_TEST(abi_calls[1].global_seq == 301u);
    BOOST_TEST(abi_calls[1].abi_bytes  == x_abi);
+}
+
+// Speculative executions (producer_block_id unset) must not feed the ABI log: their
+// global_sequences may never match canonical history, and a speculative-only setabi (or a
+// lazy fetch against speculative state) could record a version that never lands on-chain.
+// The same actions re-signalled WITH a block context capture normally.
+BOOST_FIXTURE_TEST_CASE(speculative_execution_does_not_capture_abis, abi_capture_fixture)
+{
+   auto x_abi = std::vector<char>{'x'};
+   auto y_abi = std::vector<char>{'y'};
+   fetcher_state["y"_n] = y_abi;
+
+   auto y_foo_action  = make_simple_action("y"_n, "foo"_n);
+   auto setabi_action = make_setabi_action("x"_n, x_abi);
+
+   auto y_foo  = make_action_trace(400, y_foo_action,  "y"_n);
+   auto setabi = make_action_trace(401, setabi_action, chain::config::system_account_name);
+
+   auto ptrx = make_packed_trx({ y_foo_action, setabi_action });
+
+   // Speculative pass: no producer_block_id -> nothing recorded (no setabi, no lazy fetch).
+   signal(make_transaction_trace(
+             ptrx.id(), 1, 1, chain::transaction_receipt_header::executed,
+             { y_foo, setabi }),
+          std::make_shared<packed_transaction>(ptrx));
+   BOOST_REQUIRE_EQUAL(abi_calls.size(), 0u);
+
+   // Block-context pass of the same trx: captures as usual.
+   auto y_foo2  = make_action_trace(400, y_foo_action,  "y"_n);
+   auto setabi2 = make_action_trace(401, setabi_action, chain::config::system_account_name);
+   signal(make_transaction_trace(
+             ptrx.id(), 1, 1, chain::transaction_receipt_header::executed,
+             { y_foo2, setabi2 }, chain::block_id_type{} /*block context*/),
+          std::make_shared<packed_transaction>(ptrx));
+   BOOST_REQUIRE_EQUAL(abi_calls.size(), 2u);
+   BOOST_TEST(abi_calls[0].account    == "y"_n);
+   BOOST_TEST(abi_calls[0].global_seq == 0u);
+   BOOST_TEST(abi_calls[1].account    == "x"_n);
+   BOOST_TEST(abi_calls[1].global_seq == 401u);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

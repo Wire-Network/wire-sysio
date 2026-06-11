@@ -11,8 +11,9 @@ namespace {
 
 struct continuity_mock_store {
    // first == nullopt means no data at all
-   continuity_mock_store(std::optional<uint32_t> first_block, std::optional<uint32_t> last_block)
-   : _first_block(first_block), _last_block(last_block) {}
+   continuity_mock_store(std::optional<uint32_t> first_block, std::optional<uint32_t> last_block,
+                         std::optional<std::pair<uint32_t,uint32_t>> gap = std::nullopt)
+   : _first_block(first_block), _last_block(last_block), _gap(gap) {}
 
    template <typename BlockTrace>
    void append(const BlockTrace&) {}
@@ -24,8 +25,13 @@ struct continuity_mock_store {
       return std::make_pair(*_first_block, _last_block.value_or(*_first_block));
    }
 
+   std::optional<std::pair<uint32_t,uint32_t>> find_index_slice_gap() const {
+      return _gap;
+   }
+
    std::optional<uint32_t> _first_block;
    std::optional<uint32_t> _last_block;
+   std::optional<std::pair<uint32_t,uint32_t>> _gap;
 };
 
 struct continuity_fixture {
@@ -35,8 +41,9 @@ struct continuity_fixture {
    // fires only once across multiple block_start signals on the SAME
    // extractor, do not use this fixture; build the extractor inline (see
    // check_only_on_first_block_start below).
-   continuity_fixture(std::optional<uint32_t> first_block, std::optional<uint32_t> last_block)
-   : store_first(first_block), store_last(last_block)
+   continuity_fixture(std::optional<uint32_t> first_block, std::optional<uint32_t> last_block,
+                      std::optional<std::pair<uint32_t,uint32_t>> gap = std::nullopt)
+   : store_first(first_block), store_last(last_block), store_gap(gap)
    {}
 
    bool try_block_start(uint32_t block_num) {
@@ -46,7 +53,7 @@ struct continuity_fixture {
          throw yield_exception("continuity error");
       }};
       chain_extraction_impl_type<continuity_mock_store> impl(
-         continuity_mock_store{store_first, store_last}, std::move(except));
+         continuity_mock_store{store_first, store_last, store_gap}, std::move(except));
       try {
          impl.signal_block_start(block_num);
       } catch (const yield_exception&) {
@@ -57,6 +64,7 @@ struct continuity_fixture {
 
    std::optional<uint32_t> store_first;
    std::optional<uint32_t> store_last;
+   std::optional<std::pair<uint32_t,uint32_t>> store_gap;
 };
 
 } // namespace
@@ -122,6 +130,23 @@ BOOST_AUTO_TEST_SUITE(continuity_tests)
    BOOST_AUTO_TEST_CASE(snapshot_well_before_data_start) {
       continuity_fixture f(50'000'000, 60'000'000);
       BOOST_CHECK(!f.try_block_start(1));
+   }
+
+   // Internal gap: middle slices missing, must error even though the chain head
+   // lines up with the recorded first/last range.
+   BOOST_AUTO_TEST_CASE(internal_gap_detected) {
+      continuity_fixture f(1, 50'000, std::make_pair(20'000u, 29'999u));
+      BOOST_CHECK(!f.try_block_start(50'001)); // exact continuation, but a hole inside
+   }
+
+   BOOST_AUTO_TEST_CASE(internal_gap_detected_on_overlap_start) {
+      continuity_fixture f(1, 50'000, std::make_pair(20'000u, 29'999u));
+      BOOST_CHECK(!f.try_block_start(40'000)); // overlap start, hole still fatal
+   }
+
+   BOOST_AUTO_TEST_CASE(no_internal_gap_passes) {
+      continuity_fixture f(1, 50'000, std::nullopt);
+      BOOST_CHECK(f.try_block_start(50'001));
    }
 
    // check_continuity called only once: subsequent block_start calls do not re-check

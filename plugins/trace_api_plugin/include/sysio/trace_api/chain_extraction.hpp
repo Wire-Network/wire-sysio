@@ -15,13 +15,10 @@
 
 namespace sysio::trace_api {
 
-using chain::transaction_id_type;
-using chain::packed_transaction;
-using namespace sysio::chain::literals;
-
-// Compile-time constants for setabi detection: built from constexpr _n
-// literals so we don't pay a chain::name construction cost on every action.
-inline constexpr chain::name setabi_action_name = "setabi"_n;
+// Compile-time constant for setabi detection so we don't pay a chain::name
+// construction cost on every action.  string_to_name instead of the ""_n
+// literal keeps using-directives out of this widely-included header.
+inline constexpr chain::name setabi_action_name = chain::string_to_name("setabi");
 
 template <typename StoreProvider>
 class chain_extraction_impl_type {
@@ -75,6 +72,16 @@ private:
       } else {
          cached_traces[trace->id] = {trace, t};
       }
+
+      // ABI capture only from block-context executions (production, validation, replay), i.e.
+      // producer_block_id is set.  Speculative executions carry global_sequences that may never
+      // match canonical history, and a speculative-only setabi (or a lazy fetch against
+      // speculative state) could record an ABI version that never lands on-chain, shadowing the
+      // correct version for lookups near that sequence.  Block (re-)execution emits this signal
+      // again with canonical sequences, so skipping the speculative pass loses nothing.  The
+      // trace caching above stays unconditional - on_accepted_block filters it against the
+      // block's actual receipts, which is the long-standing fork/speculation guard for traces.
+      if( !trace->producer_block_id ) return;
 
       // ABI capture: scan all action traces (including inlines) in this transaction.
       //
@@ -176,6 +183,18 @@ private:
          }
          const uint32_t first = recorded->first;
          const uint32_t last  = recorded->second;
+
+         // The first/last range check below cannot see a hole in the MIDDLE of the recorded range
+         // (e.g. an operator deleted or partially copied middle slices); queries inside such a hole
+         // would quietly 404.  Cheap filename-level contiguity check, same recovery guidance.
+         if (const auto gap = store.find_index_slice_gap()) {
+            throw std::runtime_error(fmt::format(
+               "trace_api: trace data is missing slices covering blocks {}..{} (recorded range is [{}, {}]). "
+               "To recover: copy the trace files covering blocks {}..{} from another node, "
+               "or delete the trace directory to start fresh (loses historical traces).",
+               gap->first, gap->second, first, last, gap->first, gap->second));
+         }
+
          // Overlap or exact continuation: chain head is within or just past existing data.
          // Re-applied blocks will overwrite existing slice entries as they are re-recorded.
          if (block_num >= first && block_num <= last + 1)
@@ -224,7 +243,7 @@ private:
          if( onblock_trace )
             traces.emplace_back( to_transaction_trace( *onblock_trace ));
          for( const auto& r : block->transactions ) {
-            const transaction_id_type& id = r.trx.id();
+            const chain::transaction_id_type& id = r.trx.id();
             const auto it = cached_traces.find( id );
             if( it != cached_traces.end() ) {
                traces.emplace_back( to_transaction_trace( it->second ));
@@ -256,7 +275,7 @@ private:
    StoreProvider                                                store;
    exception_handler                                            except_handler;
    abi_fetcher_t                                                abi_fetcher;
-   std::map<transaction_id_type, cache_trace>                   cached_traces;
+   std::map<chain::transaction_id_type, cache_trace>            cached_traces;
    std::optional<cache_trace>                                   onblock_trace;
    bool                                                         startup_checked{false};
 

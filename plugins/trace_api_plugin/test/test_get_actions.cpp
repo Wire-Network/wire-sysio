@@ -701,4 +701,166 @@ BOOST_FIXTURE_TEST_CASE(bloom_skip_jump_terminates_near_uint32_max, get_actions_
    BOOST_TEST(r.actions.empty());
 }
 
+// The composite (receiver, action) bloom can skip a slice even when the receiver alone is present:
+// alice exists in every slice, but only slice 1 ever pairs her with "transfer".  A (receiver, action)
+// query must therefore skip slices 0 and 2 on the composite probe.
+BOOST_FIXTURE_TEST_CASE(bloom_skips_slice_on_recv_action_composite, get_actions_fixture) {
+   fc::temp_directory tempdir;
+
+   mock_slice_stride = 10;
+   for (uint32_t n = 1; n < 30; ++n) {
+      const chain::name act = (n >= 10 && n < 20) ? "transfer"_n : "other"_n;
+      blocks[n] = make_block(n, { make_trx(TRX1, n, { make_action(n, "alice"_n, "alice"_n, act) }) });
+   }
+
+   auto bloom_for = [&tempdir](std::size_t idx, chain::name action) {
+      bloom_builder b;
+      action_trace_v0 a{};
+      a.receiver = "alice"_n;
+      a.account  = "alice"_n;
+      a.action   = action;
+      b.add_action(a);
+      const auto path = tempdir.path() / ("bloom_ra_slice_" + std::to_string(idx) + ".log");
+      b.finalize_and_write(path);
+      return path;
+   };
+   const auto slice0_path = bloom_for(0, "other"_n);
+   const auto slice1_path = bloom_for(1, "transfer"_n);
+   const auto slice2_path = bloom_for(2, "other"_n);
+
+   mock_get_bloom = [slice0_path, slice1_path, slice2_path](uint32_t slice) -> bloom_reader {
+      switch (slice) {
+         case 0: return bloom_reader{slice0_path};
+         case 1: return bloom_reader{slice1_path};
+         case 2: return bloom_reader{slice2_path};
+         default: return bloom_reader{};
+      }
+   };
+
+   action_query q;
+   q.block_num_start = 1;
+   q.block_num_end   = 29;
+   q.receiver        = "alice"_n;
+   q.action          = "transfer"_n;
+
+   auto r = get_actions(q);
+
+   // The receiver probe passes everywhere (alice is in every slice's bloom); only the composite
+   // probe can rule slices 0 and 2 out.  All hits must come from slice 1 (blocks 10..19).
+   BOOST_REQUIRE_EQUAL(r.actions.size(), 10u);
+   for (const auto& a : r.actions) {
+      const auto block_num = a.get_object()["block_num"].as_uint64();
+      BOOST_TEST(block_num >= 10u);
+      BOOST_TEST(block_num <= 19u);
+   }
+}
+
+// ---------------------------------------------------------------------------
+// HTTP-layer helpers (free functions shared with trace_api_plugin.cpp handlers)
+// ---------------------------------------------------------------------------
+
+BOOST_AUTO_TEST_CASE(canonical_default_mirrors_single_filter) {
+   // receiver only -> account mirrored
+   {
+      action_query q;
+      q.receiver = "alice"_n;
+      apply_canonical_default(q, /*include_notifications=*/false);
+      BOOST_REQUIRE(q.account);
+      BOOST_TEST(*q.account == "alice"_n);
+   }
+   // account only -> receiver mirrored
+   {
+      action_query q;
+      q.account = "dex"_n;
+      apply_canonical_default(q, /*include_notifications=*/false);
+      BOOST_REQUIRE(q.receiver);
+      BOOST_TEST(*q.receiver == "dex"_n);
+   }
+   // both set -> untouched
+   {
+      action_query q;
+      q.receiver = "alice"_n;
+      q.account  = "dex"_n;
+      apply_canonical_default(q, /*include_notifications=*/false);
+      BOOST_TEST(*q.receiver == "alice"_n);
+      BOOST_TEST(*q.account  == "dex"_n);
+   }
+   // neither set -> untouched
+   {
+      action_query q;
+      apply_canonical_default(q, /*include_notifications=*/false);
+      BOOST_CHECK(!q.receiver);
+      BOOST_CHECK(!q.account);
+   }
+   // include_notifications opts out of mirroring entirely
+   {
+      action_query q;
+      q.receiver = "alice"_n;
+      apply_canonical_default(q, /*include_notifications=*/true);
+      BOOST_CHECK(!q.account);
+   }
+}
+
+BOOST_AUTO_TEST_CASE(clamp_query_range_bounds_span) {
+   // Within range: untouched.
+   {
+      action_query q;
+      q.block_num_start = 100;
+      q.block_num_end   = 150;
+      clamp_query_range(q, 1000);
+      BOOST_TEST(q.block_num_end == 150u);
+   }
+   // Over range: clamped to start + range - 1.
+   {
+      action_query q;
+      q.block_num_start = 100;
+      q.block_num_end   = std::numeric_limits<uint32_t>::max();
+      clamp_query_range(q, 1000);
+      BOOST_TEST(q.block_num_end == 1099u);
+   }
+   // Near the top of the uint32 range: 64-bit math keeps end at the requested value instead of wrapping.
+   {
+      action_query q;
+      q.block_num_start = std::numeric_limits<uint32_t>::max() - 2;
+      q.block_num_end   = std::numeric_limits<uint32_t>::max();
+      clamp_query_range(q, 1000);
+      BOOST_TEST(q.block_num_end == std::numeric_limits<uint32_t>::max());
+   }
+}
+
+BOOST_AUTO_TEST_CASE(clamp_query_end_to_recorded_bounds_scan) {
+   // Recorded watermark inside the window: end pulled back to it.
+   {
+      action_query q;
+      q.block_num_start = 100;
+      q.block_num_end   = 1099;
+      clamp_query_end_to_recorded(q, /*last_recorded=*/500);
+      BOOST_TEST(q.block_num_end == 500u);
+   }
+   // Watermark beyond the window: untouched.
+   {
+      action_query q;
+      q.block_num_start = 100;
+      q.block_num_end   = 1099;
+      clamp_query_end_to_recorded(q, /*last_recorded=*/5000);
+      BOOST_TEST(q.block_num_end == 1099u);
+   }
+   // Nothing recorded in the window yet: collapses to just below start so resume-at-end+1 retries.
+   {
+      action_query q;
+      q.block_num_start = 100;
+      q.block_num_end   = 1099;
+      clamp_query_end_to_recorded(q, /*last_recorded=*/50);
+      BOOST_TEST(q.block_num_end == 99u);
+   }
+   // Degenerate start == 0 with an empty store: end pinned at 0 (no uint32 underflow).
+   {
+      action_query q;
+      q.block_num_start = 0;
+      q.block_num_end   = 999;
+      clamp_query_end_to_recorded(q, /*last_recorded=*/0);
+      BOOST_TEST(q.block_num_end == 0u);
+   }
+}
+
 BOOST_AUTO_TEST_SUITE_END()

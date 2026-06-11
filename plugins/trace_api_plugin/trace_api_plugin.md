@@ -234,7 +234,7 @@ on receiver, account (contract code), and action name.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `block_num_start` | uint32 | `0` | First block to scan (inclusive). |
-| `block_num_end` | uint32 | `UINT32_MAX` | Last block to scan (inclusive). Silently clamped server-side to `block_num_start + trace-max-block-range - 1`. The response reports the actual range scanned. |
+| `block_num_end` | uint32 | `UINT32_MAX` | Last block to scan (inclusive). Silently clamped server-side to `block_num_start + trace-max-block-range - 1` AND to the last block actually recorded by this node, so the reported range never includes blocks that do not exist yet. The response reports the actual range scanned. |
 | `receiver` | string | *(any)* | Filter: match `act.receiver`. |
 | `account` | string | *(any)* | Filter: match `act.account` (the contract whose code ran). |
 | `action` | string | *(any)* | Filter: match action name. |
@@ -312,14 +312,19 @@ for the cursor pattern.
 
 `block_num_start` and `block_num_end` on the response reflect the actual
 range scanned (after clamping), so a client can detect a clamp and
-resume pagination from `block_num_end + 1`.
+resume pagination from `block_num_end + 1`.  Because the server also
+clamps to its last recorded block, resuming at `block_num_end + 1` can
+never skip blocks that had not been produced (or recorded) at the time
+of the request.  When nothing in the requested window has been recorded
+yet, the response carries `block_num_end == block_num_start - 1`
+("nothing scanned") — retry the same `block_num_start` later.
 
 **Response fields:**
 
 | Field | Description |
 |-------|-------------|
 | `block_num_start` | First block number actually scanned. |
-| `block_num_end` | Last block number actually scanned (after clamping). |
+| `block_num_end` | Last block number actually scanned (after clamping to the range cap and the last recorded block). |
 | `actions` | Array of matching action objects, ordered by `(block_num, global_sequence)`. |
 
 **Action object fields:**
@@ -345,7 +350,7 @@ resume pagination from `block_num_end + 1`.
 | `net_usage` | Producer-set NET usage in bytes for this action (present only for input/top-level actions). |
 | `params` | ABI-decoded action payload (omitted when ABI unavailable or decode failed). |
 | `return_data` | ABI-decoded return value (omitted when ABI unavailable or no return type defined). |
-| `decode_error` | Error message; present only when ABI decoding failed and the response falls back to raw hex. |
+| `decode_error` | Error message; present only when ABI decoding failed. The raw hex `data`/`return_value` fields are always emitted regardless of decode outcome. |
 | `trx_id` | ID of the transaction that contains this action. |
 | `block_num` | Block number. |
 | `block_time` | Block timestamp (ISO-8601). |
@@ -402,7 +407,7 @@ notifications are excluded).
 |-------|------|---------|-------------|
 | `token_contract` | string | `sysio.token` | Contract account to filter on. |
 | `block_num_start` | uint32 | `0` | First block to scan (inclusive). |
-| `block_num_end` | uint32 | `UINT32_MAX` | Last block to scan (inclusive). Silently clamped to `block_num_start + trace-max-block-range - 1`. |
+| `block_num_end` | uint32 | `UINT32_MAX` | Last block to scan (inclusive). Silently clamped to `block_num_start + trace-max-block-range - 1` and to the last recorded block (same semantics as `get_actions`). |
 
 **Request example:**
 
@@ -482,7 +487,13 @@ for more. The response always includes the actual `block_num_start` and
 Within that window, ALL matching actions are returned — there is no
 per-result limit and no in-window cursor.
 
-To page across a wide range, advance `block_num_start` by the response's
+The server clamps the reported `block_num_end` twice: to the
+`trace-max-block-range` window AND to the last block it has actually
+recorded.  Resuming at `block_num_end + 1` is therefore always safe:
+blocks that had not been produced (or had not reached this node) when
+you asked are never reported as scanned, so they cannot be skipped.
+
+To page across a wide range, advance `block_num_start` to the response's
 `block_num_end + 1` each call:
 
 ```
@@ -500,9 +511,11 @@ POST /v1/trace_api/get_actions
 ```
 
 Continue until `block_num_end` returned by the server equals the
-requested `block_num_end` (no clamp happened), or until you catch up to
-the chain head. Use `get_block` or out-of-band head-block knowledge to
-know when to stop.
+requested `block_num_end` (no clamp happened).  When you catch up to the
+chain head, the server's recorded-block clamp shrinks the reported
+window for you: a response with `block_num_end < block_num_start` means
+nothing new is scannable yet — wait and retry the same
+`block_num_start`.
 
 Notes:
 - Within each transaction, actions are sorted by `global_sequence`
@@ -511,6 +524,13 @@ Notes:
 - The maximum supported `trace-max-block-range` is 10,000. Raise it via
   `config.ini` on private/trusted nodes; public nodes should typically
   leave it at the default.
+- There is no per-response row cap: the range cap bounds scan work, not
+  result volume.  A busy receiver over a 10,000-block window can produce
+  a very large response — size your window to your traffic.
+- Retention pruning (`trace-minimum-irreversible-history-blocks`) deletes
+  old slices.  A query into a pruned range returns an empty result
+  indistinguishable from "no matches" — indexers backfilling history must
+  start within the node's retained range.
 
 ---
 
@@ -655,7 +675,7 @@ to raw hex.
 
 On the first `block_start` signal after plugin startup, the trace
 store's recorded block range is compared against the chain's current
-head, and the plugin chooses one of four outcomes:
+head, and the plugin chooses one of five outcomes:
 
 | Situation | Behavior |
 |-----------|----------|
@@ -663,6 +683,7 @@ head, and the plugin chooses one of four outcomes:
 | Chain head is within `[first_recorded, last_recorded + 1]` (exact continuation OR overlap from a snapshot replay) | Silent — re-applied blocks naturally overwrite existing slice entries. |
 | Chain head is **before** the first recorded block | Plugin throws; `error` log, **node shuts down**. |
 | Chain head is **after** `last_recorded + 1` (forward gap) | Plugin throws; `error` log, **node shuts down**. |
+| Index slice files are missing in the **middle** of the recorded range (deleted or partially copied) | Plugin throws; `error` log, **node shuts down**. Detected by filename contiguity, so it catches removed slices, not corrupted-in-place ones. |
 
 The shutdown is intentional: a gap means the trace store is no longer a
 faithful continuous record of chain history, and silently accepting it

@@ -5,9 +5,7 @@
 
 #include <boost/crc.hpp>
 
-#include <cerrno>
 #include <cstring>
-#include <unistd.h>
 
 namespace sysio::trace_api {
 
@@ -16,27 +14,6 @@ namespace {
 // Record layout: header(24) + blob_bytes(blob_size) + crc32(4).
 // CRC covers header + blob_bytes (not itself).
 constexpr uint64_t record_trailer_size = sizeof(uint32_t);
-
-// pread loop that tolerates short reads.  Returns true iff `n` bytes were
-// read into `buf` from `off`.
-bool pread_all(int fd, void* buf, size_t n, uint64_t off) {
-   auto* p = static_cast<char*>(buf);
-   while (n > 0) {
-      const ssize_t r = ::pread(fd, p, n, static_cast<off_t>(off));
-      if (r > 0) {
-         p   += r;
-         off += static_cast<uint64_t>(r);
-         n   -= static_cast<size_t>(r);
-      } else if (r == 0) {
-         return false; // EOF before all bytes read
-      } else if (errno == EINTR) {
-         continue;
-      } else {
-         return false;
-      }
-   }
-   return true;
-}
 
 } // namespace
 
@@ -111,10 +88,9 @@ uint64_t abi_log::recover_from_disk(const std::filesystem::path& path) {
    const uint64_t header_size = sizeof(abi_log_header);
    const uint64_t file_size = std::filesystem::file_size(path);
 
-   // pread correctness: fc::cfile is backed by buffered stdio (FILE*), but
-   // every append() flushes before returning, and the recover scan only runs
-   // during the constructor (before any concurrent append).  Never introduce
-   // unflushed buffered writes on the same cfile or pread may see stale data.
+   // pread correctness: the only buffered (FILE*) write on this cfile is the fresh-file header in
+   // the constructor, which flushes immediately; appends use raw-fd pwrite.  Never introduce
+   // unflushed buffered writes on this cfile or pread may see stale data.
    uint64_t offset = header_size;
    while (offset < file_size) {
       const uint64_t record_start = offset;
@@ -127,9 +103,11 @@ uint64_t abi_log::recover_from_disk(const std::filesystem::path& path) {
       }
 
       record_header rh{};
-      if (!pread_all(_cfile.fileno(), &rh, sizeof(rh), record_start)) {
-         fc_wlog(_log, "trace_api: abi_log {} failed to read record header at offset {}, truncating",
-              path.generic_string(), record_start);
+      try {
+         _cfile.pread(reinterpret_cast<char*>(&rh), sizeof(rh), record_start);
+      } catch (const std::exception& e) {
+         fc_wlog(_log, "trace_api: abi_log {} failed to read record header at offset {}: {}, truncating",
+              path.generic_string(), record_start, e.what());
          break;
       }
 
@@ -144,19 +122,16 @@ uint64_t abi_log::recover_from_disk(const std::filesystem::path& path) {
       }
 
       std::vector<char> blob;
-      if (rh.blob_size > 0) {
-         blob.resize(rh.blob_size);
-         if (!pread_all(_cfile.fileno(), blob.data(), rh.blob_size, blob_file_offset)) {
-            fc_wlog(_log, "trace_api: abi_log {} failed to read blob at offset {}, truncating",
-                 path.generic_string(), blob_file_offset);
-            break;
-         }
-      }
-
       uint32_t stored_crc = 0;
-      if (!pread_all(_cfile.fileno(), &stored_crc, sizeof(stored_crc), crc_offset)) {
-         fc_wlog(_log, "trace_api: abi_log {} failed to read crc at offset {}, truncating",
-              path.generic_string(), crc_offset);
+      try {
+         if (rh.blob_size > 0) {
+            blob.resize(rh.blob_size);
+            _cfile.pread(blob.data(), rh.blob_size, blob_file_offset);
+         }
+         _cfile.pread(reinterpret_cast<char*>(&stored_crc), sizeof(stored_crc), crc_offset);
+      } catch (const std::exception& e) {
+         fc_wlog(_log, "trace_api: abi_log {} failed to read record body at offset {}: {}, truncating",
+              path.generic_string(), record_start, e.what());
          break;
       }
 
@@ -193,28 +168,48 @@ uint64_t abi_log::recover_from_disk(const std::filesystem::path& path) {
 // insert for the same key between our write and our index update, producing
 // a duplicate record.  This is harmless given last-write-wins but not obvious.
 void abi_log::append(chain::name account, uint64_t global_seq, std::vector<char> abi_bytes) {
-   if (!_valid) return;
+   if (!valid()) return;
 
    record_header rh{ account, global_seq, abi_bytes.size() };
    const uint32_t crc = compute_record_crc(rh, abi_bytes.data(), abi_bytes.size());
+
+   // One contiguous buffer so the whole record lands in a single pwrite.  Raw-fd writes (no stdio
+   // buffering) keep failure recovery simple: torn bytes from a partial write are fully in the
+   // kernel file - never half-stranded in a user-space FILE* buffer - so truncating the file back
+   // to _end_offset restores the invariant "file ends exactly at the last good record".
+   std::vector<char> record(sizeof(rh) + abi_bytes.size() + record_trailer_size);
+   std::memcpy(record.data(), &rh, sizeof(rh));
+   if (!abi_bytes.empty())
+      std::memcpy(record.data() + sizeof(rh), abi_bytes.data(), abi_bytes.size());
+   std::memcpy(record.data() + sizeof(rh) + abi_bytes.size(), &crc, sizeof(crc));
 
    uint64_t blob_file_offset = 0;
    {
       std::lock_guard<std::mutex> lock(_append_mtx);
       try {
-         // "ab+" mode always writes at EOF; explicit seek would be a no-op here.
-         _cfile.write(reinterpret_cast<const char*>(&rh), sizeof(rh));
-         if (rh.blob_size > 0)
-            _cfile.write(abi_bytes.data(), abi_bytes.size());
-         _cfile.write(reinterpret_cast<const char*>(&crc), sizeof(crc));
-         _cfile.flush();
-      } catch (...) {
-         fc_wlog(_log, "trace_api: abi_log append failed at offset {}", _end_offset);
+         // NOTE: the fd comes from fopen("ab+") and carries O_APPEND, so on Linux this pwrite appends
+         // at EOF regardless of the offset argument.  That is exactly what we want: "file ends at
+         // _end_offset" is a maintained invariant (restored below on failure), so EOF == _end_offset.
+         _cfile.pwrite(record.data(), record.size(), _end_offset);
+      } catch (const std::exception& e) {
+         fc_wlog(_log, "trace_api: abi_log append of {} bytes at offset {} failed: {}; truncating torn tail",
+                 record.size(), _end_offset, e.what());
+         // Without this truncation, every subsequent append would land at the real (torn) EOF while
+         // its index entry is computed from _end_offset - permanently mis-aligned blob offsets served
+         // to decoders.  resize_file works on the path regardless of the open fd, and concurrent
+         // lookups only pread committed regions below _end_offset, which the truncation never touches.
+         std::error_code ec;
+         std::filesystem::resize_file(_cfile.get_file_path(), _end_offset, ec);
+         if (ec) {
+            fc_wlog(_log, "trace_api: abi_log could not truncate torn tail to offset {}: {}; "
+                          "disabling further ABI capture", _end_offset, ec.message());
+            _valid.store(false, std::memory_order_relaxed);
+         }
          return;
       }
 
       blob_file_offset = _end_offset + sizeof(rh);
-      _end_offset += sizeof(rh) + rh.blob_size + record_trailer_size;
+      _end_offset += record.size();
    }
 
    {
@@ -225,49 +220,71 @@ void abi_log::append(chain::name account, uint64_t global_seq, std::vector<char>
 }
 
 bool abi_log::has_entry(chain::name account) const {
-   if (!_valid) return false;
+   if (!valid()) return false;
    std::lock_guard<std::mutex> lock(_index_mtx);
    auto it = _index.lower_bound({account, 0});
    return it != _index.end() && it->first.first == account;
 }
 
-std::optional<abi_log::lookup_result> abi_log::lookup(chain::name account, uint64_t global_seq) const {
-   // Named local return type so the compiler can NRVO it straight into the
-   // caller's slot.
-   std::optional<lookup_result> result;
-   if (!_valid) return result;
+std::optional<uint64_t> abi_log::lookup_seq(chain::name account, uint64_t global_seq) const {
+   std::optional<uint64_t> result;
+   if (!valid()) return result;
+
+   std::lock_guard<std::mutex> lock(_index_mtx);
+   auto it = _index.upper_bound({account, global_seq});
+   if (it == _index.begin())
+      return result;
+   --it;
+   if (it->first.first != account)
+      return result;
+   result = it->first.second;
+   return result;
+}
+
+std::optional<std::vector<char>> abi_log::fetch(chain::name account, uint64_t effective_global_seq) const {
+   std::optional<std::vector<char>> result;
+   if (!valid()) return result;
 
    uint64_t blob_file_offset = 0;
    uint64_t blob_size        = 0;
-   uint64_t effective_seq    = 0;
-
    {
       std::lock_guard<std::mutex> lock(_index_mtx);
-      auto it = _index.upper_bound({account, global_seq});
-      if (it == _index.begin())
-         return result;
-      --it;
-      if (it->first.first != account)
+      auto it = _index.find({account, effective_global_seq});
+      if (it == _index.end())
          return result;
       blob_file_offset = it->second.blob_file_offset;
       blob_size        = it->second.blob_size;
-      effective_seq    = it->first.second;
    }
 
    if (blob_size == 0) {
-      result.emplace(lookup_result{effective_seq, {}});
+      result.emplace();
       return result;
    }
 
-   // pread correctness: every append() flushes before returning, so the bytes
-   // we're about to read are visible to the underlying fd.  Don't introduce
-   // unflushed buffered writes on the same cfile.
-   std::vector<char> out(blob_size);
-   if (!pread_all(_cfile.fileno(), out.data(), blob_size, blob_file_offset)) {
-      fc_wlog(_log, "trace_api: abi_log pread of {} bytes at {} failed", blob_size, blob_file_offset);
-      return result;
+   // pread correctness: append() pwrite()s the whole record (no user-space buffering) and advances
+   // _end_offset only afterwards, so every indexed blob region is fully visible to the fd by the
+   // time its index entry exists.
+   try {
+      std::vector<char> out(blob_size);
+      _cfile.pread(out.data(), blob_size, blob_file_offset);
+      result.emplace(std::move(out));
+   } catch (const std::exception& e) {
+      fc_wlog(_log, "trace_api: abi_log pread of {} bytes at {} failed: {}", blob_size, blob_file_offset, e.what());
    }
-   result.emplace(lookup_result{effective_seq, std::move(out)});
+   return result;
+}
+
+std::optional<abi_log::lookup_result> abi_log::lookup(chain::name account, uint64_t global_seq) const {
+   // Composition of the two-phase API; kept for callers (and tests) that want the version and the
+   // blob in one call.
+   std::optional<lookup_result> result;
+   const std::optional<uint64_t> effective_seq = lookup_seq(account, global_seq);
+   if (!effective_seq)
+      return result;
+   std::optional<std::vector<char>> blob = fetch(account, *effective_seq);
+   if (!blob)
+      return result;
+   result.emplace(lookup_result{*effective_seq, std::move(*blob)});
    return result;
 }
 
