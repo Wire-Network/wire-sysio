@@ -206,25 +206,50 @@ script).
 ## 4. Snapshot verification on load
 
 When a node starts with `--snapshot`, `chain_plugin` records the loaded snapshot's block
-number and BLAKE3 root hash. Once the node syncs and the first irreversible block advances
-past the snapshot block, it runs a one-time check against the on-chain `snaprecords` table
-(read through the standard table-read path, which performs ABI decoding):
+number and BLAKE3 root hash. Verification is not a single check at a fixed point: starting
+with the first irreversible block past the snapshot height, the node attempts verification
+on every finalized block until it reaches a terminal outcome. The `snaprecords` row for a
+height is created by the providers' `votesnaphash` transactions, which land on-chain some
+blocks *after* that height, so the record can legitimately be absent on early attempts and
+appear on a later one.
+
+Each attempt reads the on-chain `snaprecords` table (through the standard table-read path,
+which performs ABI decoding) and resolves as follows:
 
 | Condition | Result |
 |-----------|--------|
-| No attestation table / no record for the block | Warning only; continue syncing. |
-| Attested hash matches the loaded snapshot hash | Success; logged and continue. |
-| Attested hash differs from the loaded snapshot hash | Fatal error; node halts. |
+| Record found; hash matches the loaded snapshot hash | Success; logged, verification complete. |
+| Record found; hash differs from the loaded snapshot hash | Fatal error; node halts. |
+| No record; node still syncing | Pending; retry on the next finalized block. |
+| No record; caught up; system contract ABI has no `snaprecords` table | Warning (chain does not support attestation); verification skipped. |
+| No record; caught up; within the grace window | Pending; retry on the next finalized block. |
+| No record; caught up; grace window exhausted | Warning (height was never attested); verification skipped. |
+| Unexpected error during verification | Fatal error; node halts. |
 
-Verification happens *after* sync, not before: the node loads the snapshot optimistically and
-syncs to head, then queries on-chain state. Checking earlier is impossible -- there is no
-chain state to query until the snapshot is loaded.
+"Caught up" means the latest finalized block's timestamp is within 30 seconds of wall-clock
+time. The grace window is 12,500 finalized blocks past the snapshot height -- half the fixed
+25,000-block provider snapshot interval -- and exists because a node bootstrapping from a
+fresh snapshot can reach the live tip before the providers' votes for that height have
+landed. A missing record only becomes the terminal "never attested" warning once the node is
+caught up *and* the finalized head is at least 12,500 blocks past the snapshot height.
 
-The permissive behaviour (warn, do not halt, when no record exists) is deliberate for manual
-`--snapshot` use: operators can load their own snapshots, and chains whose system contract
-predates attestation still work. The HTTP bootstrap path
-(`plugins/snapshot_api_plugin/README.md`) applies strict enforcement instead, because an
-auto-fetched snapshot comes from an untrusted peer and must be backed by an attested record.
+Two implementation details worth knowing as an operator:
+
+- The system contract's ABI is re-checked on every attempt, so a system-contract upgrade
+  that adds attestation support while the node is still syncing is picked up and verification
+  proceeds normally.
+- Verification cannot happen before the snapshot is loaded -- there is no chain state to
+  query until then. The node loads the snapshot optimistically and verifies from synced
+  on-chain state as it catches up.
+
+The permissive terminal outcomes (warn and continue when no table or no record exists) are
+deliberate for manual `--snapshot` use: operators can load their own snapshots, and chains
+whose system contract predates attestation still work. A hash *mismatch* is never permissive:
+the node stops, and the recommended recovery is to delete the chain state derived from the
+untrusted snapshot and acquire a fresh snapshot from a trusted source before restarting.
+The HTTP bootstrap path (`plugins/snapshot_api_plugin/README.md`) applies strict enforcement
+instead, because an auto-fetched snapshot comes from an untrusted peer and must be backed by
+an attested record.
 
 ## Operator deployment model
 
