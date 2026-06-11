@@ -1961,7 +1961,7 @@ struct controller_impl {
          auto handle_exception =[&](const auto& e)
          {
             trace->error_code = controller::convert_exception_to_error_code( e );
-            trace->except = e;
+            trace->except = e.dynamic_copy_exception(); // virtual copy preserves the dynamic exception type
             trace->except_ptr = std::current_exception();
             auto now = fc::time_point::now();
             trx_context.update_billed_cpu_time(now);
