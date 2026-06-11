@@ -979,6 +979,17 @@ struct controller_impl {
                // in some tests, the system contract is not set and the return value is empty.
                fc::datastream<const char*> ds(retval.data(), retval.size());
                fc::raw::unpack(ds, res);
+            } else {
+               // Action executed but returned no value: deployed system contract on `sysio`
+               // does not handle getpeerkeys (or its dispatcher doesn't propagate the return).
+               // BP peer-key gossip cannot bootstrap without this; warn once so the cause is
+               // visible (this path is otherwise silent and update_peer_keys() will keep retrying).
+               static std::atomic<bool> warned{false};
+               if (!warned.exchange(true)) {
+                  wlog("getpeerkeys inline read-only action returned empty payload. "
+                       "Deployed system contract on `sysio` may be missing the getpeerkeys handler "
+                       "or its return value. BP peer-key updates and BP-gossip peering will not function.");
+               }
             }
          }
 
