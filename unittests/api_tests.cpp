@@ -1130,6 +1130,52 @@ BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(api_part2_tests)
 
+// get_active_producers treats the buffer length as a byte count (the CDT-side
+// ABI passes bytes): only that many bytes of wasm memory may be validated or
+// written. Regression: when the parameter was a span of account_name the raw
+// length was treated as an element count, validating sizeof(account_name)
+// times the caller's buffer — a byte-sized buffer at the end of linear memory
+// spuriously trapped.
+static const char get_active_producers_byte_len_wast[] = R"=====(
+(module
+ (import "env" "get_active_producers" (func $gap (param i32 i32) (result i32)))
+ (import "env" "sysio_assert" (func $sysio_assert (param i32 i32)))
+ (memory $0 1)
+ (data (i32.const 0) "size query must return the packed byte size")
+ (data (i32.const 64) "full-size buffer must receive all bytes")
+ (data (i32.const 128) "buffer at the end of linear memory must not over-validate")
+ (export "apply" (func $apply))
+ (func $apply (param $0 i64) (param $1 i64) (param $2 i64)
+   ;; size query: the default chain has one active producer (sysio) -> 8 bytes
+   (call $sysio_assert (i32.eq (call $gap (i32.const 1024) (i32.const 0)) (i32.const 8)) (i32.const 0))
+   ;; full-size buffer: all 8 bytes copied
+   (call $sysio_assert (i32.eq (call $gap (i32.const 1024) (i32.const 8)) (i32.const 8)) (i32.const 64))
+   ;; 8-byte buffer flush against the end of the single 64KiB page: exactly
+   ;; 8 bytes must be validated, so the call succeeds
+   (call $sysio_assert (i32.eq (call $gap (i32.const 65528) (i32.const 8)) (i32.const 8)) (i32.const 128))
+ )
+)
+)=====";
+
+BOOST_AUTO_TEST_CASE(get_active_producers_byte_length) { try {
+   tester chain;
+   chain.produce_block();
+   chain.create_account( "gaptest"_n );
+   chain.set_code( "gaptest"_n, get_active_producers_byte_len_wast );
+   chain.produce_block();
+
+   signed_transaction trx;
+   action act;
+   act.account = "gaptest"_n;
+   act.name = name();
+   act.authorization = { { "gaptest"_n, config::active_name } };
+   trx.actions.push_back( act );
+   chain.set_transaction_headers( trx );
+   trx.sign( chain.get_private_key( "gaptest"_n, "active" ), chain.control->get_chain_id() );
+   chain.push_transaction( trx );
+   chain.produce_block();
+} FC_LOG_AND_RETHROW() }
+
 /*************************************************************************************
  * chain_tests test case
  *************************************************************************************/

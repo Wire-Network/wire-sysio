@@ -531,6 +531,13 @@ uint64_t apply_context::next_recv_sequence( const account_object& receiver_accou
    }
 }
 uint64_t apply_context::next_auth_sequence( account_name actor ) {
+   if ( trx_context.is_read_only() ) {
+      // To avoid confusion of duplicated auth sequence number, hard code to be 0.
+      // Mirrors next_global_sequence/next_recv_sequence; read-only transactions
+      // reject authorizations up front, so this is currently unreachable, but the
+      // short-circuit keeps the three sequence helpers uniformly read-only safe.
+      return 0;
+   }
    const auto& amo = db.get<account_object,by_name>( actor );
    db.modify( amo, [&](auto& am ){
       ++am.auth_sequence;
