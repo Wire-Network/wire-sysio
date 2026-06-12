@@ -7,7 +7,7 @@ import signal
 import subprocess
 import shutil
 
-from TestHarness import Cluster, Node, ReturnType, TestHelper, Utils, WalletMgr
+from TestHarness import Cluster, Node, ReturnType, TestHelper, Utils, WalletMgr, CORE_SYMBOL
 
 ###############################################################
 # nodeop_irreversible_mode_test
@@ -193,6 +193,48 @@ try:
       if producingNode.killed:
          relaunchNode(producingNode)
 
+   def ensureInputTrxInReversibleTail(nodeToTest):
+      """Place at least one input transaction in nodeToTest's reversible tail (a block past LIB).
+
+      Switching a node to irreversible mode rolls its state back to LIB; the transaction dedup set
+      must shed the rolled-back reversible blocks' transactions in lockstep, or it stays
+      over-recorded and the node (or anyone restoring a snapshot it then produces) rejects those
+      same canonical blocks with tx_duplicate when they are re-applied. An idle cluster's
+      reversible tail holds only empty blocks, so without this helper that path is exercised only
+      when CI timing happens to leave a transaction there.
+
+      Starts and stops the producer; a steady burst of async transfers keeps transactions landing
+      in every block right up to the moment the producer is killed, so whichever blocks end up past
+      the frozen LIB (LIB trails head and stops advancing once production stops) carry one. A
+      synchronous push-then-stop would race the kill latency: a couple of blocks are produced while
+      the kill completes, letting LIB advance exactly onto the transaction's block. Verified
+      directly by scanning (LIB, head] for a transaction-bearing block; retries with fresh
+      production rounds if the scan comes up empty (raising keeps the failure inside this test
+      case, where executeTest reports it). On return the producer is down, so the
+      transaction-bearing reversible tail stays frozen for the caller to switch modes or snapshot
+      against.
+      """
+      numOfAttempts = 5
+      numOfTransfers = 8
+      for attempt in range(numOfAttempts):
+         startProdNode()
+         # ensure blocks flow end-to-end again before pushing
+         waitForBlksProducedAndLibAdvanced(nodeToTest)
+         for i in range(numOfTransfers):
+            nodeToTest.transferFundsAsync(cluster.sysioAccount, cluster.defproduceraAccount,
+                                          f"0.0001 {CORE_SYMBOL}", f"irr tail {attempt} {i}",
+                                          exitOnError=False)
+            time.sleep(0.25)
+         stopProdNode()
+         head, lib, forkDbHead = getHeadLibAndForkDbHead(nodeToTest)
+         for blockNum in range(lib + 1, head + 1):
+            block = nodeToTest.getBlock(blockNum)
+            if block is not None and len(block["transactions"]) > 0:
+               Utils.Print("input transaction in reversible tail: block {} (lib {}, head {})".format(blockNum, lib, head))
+               return
+         Utils.Print("no input transaction landed in the reversible tail (lib {}, head {}); retrying".format(lib, head))
+      raise RuntimeError("Failed to place an input transaction in the reversible tail of node #{}".format(nodeToTest.nodeId))
+
    # Give some time for it to produce, so lib is advancing
    waitForBlksProducedAndLibAdvanced()
 
@@ -252,18 +294,40 @@ try:
       # Ensure the node condition is as expected after relaunch
       confirmLibOfIrrMode(nodeToTest, headLibAndForkDbHeadBeforeSwitchMode)
 
-   # 3rd test case: Switch mode speculative -> irreversible without replay
-   # Expectation: Node switches mode successfully and forkdb head, head, and lib matches the irreversible mode expectation
+   # 3rd test case: Switch mode speculative -> irreversible without replay, then back
+   # Expectation: Node switches mode successfully and forkdb head, head, and lib matches the irreversible mode expectation;
+   #              switching back to speculative mode re-applies the reversible tail -- including its
+   #              input transaction -- restoring the exact pre-switch head, lib, and forkdb head.
+   #              (The irreversible-mode rollback to LIB must shed the tail's transactions from the
+   #              dedup set, or re-applying the tail fails with tx_duplicate and head sticks at LIB.)
    def switchSpecToIrrMode(nodeIdOfNodeToTest, nodeToTest):
-      # Track head blk num and lib before shutdown
-      headLibAndForkDbHeadBeforeSwitchMode = getHeadLibAndForkDbHead(nodeToTest)
+      try:
+         # Make the switchover non-trivial: an input transaction in the reversible tail is what the
+         # dedup must shed on the rollback and re-record on the way back.
+         ensureInputTrxInReversibleTail(nodeToTest)
 
-      # Kill and relaunch in irreversible mode
-      nodeToTest.kill(signal.SIGTERM)
-      relaunchNode(nodeToTest, addSwapFlags={"--read-mode": "irreversible", "--block-log-retain-blocks":blockLogRetainBlocks})
+         # Track head blk num and lib before shutdown
+         headLibAndForkDbHeadBeforeSwitchMode = getHeadLibAndForkDbHead(nodeToTest)
 
-      # Ensure the node condition is as expected after relaunch
-      confirmHeadLibAndForkDbHeadOfIrrMode(nodeToTest, headLibAndForkDbHeadBeforeSwitchMode)
+         # Kill and relaunch in irreversible mode
+         nodeToTest.kill(signal.SIGTERM)
+         relaunchNode(nodeToTest, addSwapFlags={"--read-mode": "irreversible", "--block-log-retain-blocks":blockLogRetainBlocks})
+
+         # Ensure the node condition is as expected after relaunch
+         confirmHeadLibAndForkDbHeadOfIrrMode(nodeToTest, headLibAndForkDbHeadBeforeSwitchMode)
+
+         # Switch back to speculative mode; the node must re-apply its reversible tail from fork_db,
+         # ending up exactly where it was before the roundtrip (production is down, nothing else moves)
+         nodeToTest.kill(signal.SIGTERM)
+         relaunchNode(nodeToTest, addSwapFlags={"--read-mode": speculativeReadMode, "--block-log-retain-blocks":blockLogRetainBlocks})
+         nodeToTest.waitForBlock(headLibAndForkDbHeadBeforeSwitchMode[0], timeout=10)
+         confirmHeadLibAndForkDbHeadOfSpecMode(nodeToTest)
+         headLibAndForkDbHeadAfterSwitchBack = getHeadLibAndForkDbHead(nodeToTest)
+         assert headLibAndForkDbHeadBeforeSwitchMode == headLibAndForkDbHeadAfterSwitchBack, \
+            "Head, Lib, and Fork Db after switching back to speculative mode is different {} vs {}".format(
+               headLibAndForkDbHeadBeforeSwitchMode, headLibAndForkDbHeadAfterSwitchBack)
+      finally:
+         stopProdNode()
 
    # 4th test case: Switch mode irreversible -> speculative without replay
    # Expectation: Node switches mode successfully and forkdb head, head, and lib matches the speculative mode expectation
@@ -358,8 +422,15 @@ try:
    # Expectation: Node replays and launches successfully
    #              and the head and lib should be advancing after some blocks produced
    #              and forkdb head, head, and lib should stay the same after relaunch
+   #              The reversible tail deliberately carries an input transaction: the irreversible-mode
+   #              rollback must shed it from the dedup set before the snapshot is taken, or the
+   #              snapshot is poisoned -- restoring it rejects the tail's canonical blocks with
+   #              tx_duplicate and the head sticks at the snapshot block.
    def switchToSpecModeWithIrrModeSnapshot(nodeIdOfNodeToTest, nodeToTest):
       try:
+         # Place an input transaction in the reversible tail the snapshot roundtrip must replay
+         ensureInputTrxInReversibleTail(nodeToTest)
+
          # Kill node and backup blocks directory of speculative mode
          headLibAndForkDbHeadBeforeShutdown = getHeadLibAndForkDbHead(nodeToTest)
          nodeToTest.kill(signal.SIGTERM)
@@ -375,6 +446,7 @@ try:
          nodeToTest.removeState()
          recoverBackedupBlksDir(nodeIdOfNodeToTest) # this function will delete the existing blocks dir first
          relaunchNode(nodeToTest, chainArg=" --snapshot {}".format(nodeToTest.getLatestSnapshot()), addSwapFlags={"--read-mode": speculativeReadMode})
+         nodeToTest.waitForBlock(headLibAndForkDbHeadBeforeShutdown[0], timeout=10)
          confirmHeadLibAndForkDbHeadOfSpecMode(nodeToTest)
          # Ensure it automatically replays "reversible blocks", i.e. head lib and fork db should be the same
          headLibAndForkDbHeadAfterRelaunch = getHeadLibAndForkDbHead(nodeToTest)
@@ -394,6 +466,7 @@ try:
          # This time ensure it automatically replays both "irreversible blocks" and "reversible blocks", i.e. the end result should be the same as before shutdown
          nodeToTest.removeState()
          relaunchNode(nodeToTest)
+         nodeToTest.waitForBlock(headLibAndForkDbHeadBeforeShutdown[0], timeout=10)
          headLibAndForkDbHeadAfterRelaunch = getHeadLibAndForkDbHead(nodeToTest)
          assert headLibAndForkDbHeadBeforeShutdown == headLibAndForkDbHeadAfterRelaunch, \
             "2: Head, Lib, and Fork Db after relaunch is different {} vs {}".format(headLibAndForkDbHeadBeforeShutdown, headLibAndForkDbHeadAfterRelaunch)
