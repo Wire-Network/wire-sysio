@@ -227,10 +227,17 @@ namespace sysio {
             [[sysio::action]]
             void setsysabi(const name& account, const bytes& abi);
 
-        private:
+        public:
+
+            // The `roastate` and `nodeowners` tables below are public so sibling system contracts
+            // can read them cross-contract. sysio.chalg resolves the active `network_gen` from
+            // `roastate` and point-looks-up a voter's Tier in `nodeowners` for the OPP dispute
+            // vote. These tables remain writable only by sysio.roa's own actions.
 
             /**
-             * Config variables for ROA.
+             * ROA global-state singleton: activation flag, total SYS, bytes-per-unit, and the
+             * active network generation. Public so sibling system contracts can read `network_gen`
+             * cross-contract (see the access note above); writable only by sysio.roa's own actions.
              */
             struct [[sysio::table("roastate")]] roa_state {
                 bool is_active = false;
@@ -270,6 +277,8 @@ namespace sysio {
             using nodeowners_t = kv::scoped_table<"nodeowners"_n, nodeowner_key, nodeowners,
                 kv::index<"bytier"_n, const_mem_fun<nodeowners, uint64_t, &nodeowners::by_tier>>
             >;
+
+        private:
 
             /**
              * This table is scoped to Node Owner's account names and is used to track all policies issued by Node Owners.

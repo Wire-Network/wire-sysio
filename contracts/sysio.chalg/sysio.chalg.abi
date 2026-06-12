@@ -64,6 +64,106 @@
             ]
         },
         {
+            "name": "chkdispute",
+            "base": "",
+            "fields": [
+                {
+                    "name": "dispute_id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "dispute_candidate",
+            "base": "",
+            "fields": [
+                {
+                    "name": "checksum",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "operators",
+                    "type": "name[]"
+                }
+            ]
+        },
+        {
+            "name": "dispute_entry",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "chain_code",
+                    "type": "uint64"
+                },
+                {
+                    "name": "epoch_index",
+                    "type": "uint32"
+                },
+                {
+                    "name": "status",
+                    "type": "DisputeStatus"
+                },
+                {
+                    "name": "winning_checksum",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "opened_at",
+                    "type": "time_point"
+                },
+                {
+                    "name": "deadline",
+                    "type": "time_point"
+                },
+                {
+                    "name": "candidates",
+                    "type": "dispute_candidate[]"
+                }
+            ]
+        },
+        {
+            "name": "dispute_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "dispute_vote",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "name"
+                },
+                {
+                    "name": "chosen_checksum",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "voted_at",
+                    "type": "time_point"
+                }
+            ]
+        },
+        {
+            "name": "dispute_vote_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "enforce",
             "base": "",
             "fields": [
@@ -124,6 +224,24 @@
                 {
                     "name": "is_resolved",
                     "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "opendispute",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "uint64"
+                },
+                {
+                    "name": "epoch_index",
+                    "type": "uint32"
+                },
+                {
+                    "name": "candidates",
+                    "type": "dispute_candidate[]"
                 }
             ]
         },
@@ -198,9 +316,32 @@
                     "type": "name[]"
                 }
             ]
+        },
+        {
+            "name": "votedispute",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "name"
+                },
+                {
+                    "name": "dispute_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "chosen_checksum",
+                    "type": "checksum256"
+                }
+            ]
         }
     ],
     "actions": [
+        {
+            "name": "chkdispute",
+            "type": "chkdispute",
+            "ricardian_contract": ""
+        },
         {
             "name": "enforce",
             "type": "enforce",
@@ -217,6 +358,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "opendispute",
+            "type": "opendispute",
+            "ricardian_contract": ""
+        },
+        {
             "name": "slashop",
             "type": "slashop",
             "ricardian_contract": ""
@@ -229,6 +375,11 @@
         {
             "name": "submitresp",
             "type": "submitresp",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "votedispute",
+            "type": "votedispute",
             "ricardian_contract": ""
         }
     ],
@@ -252,6 +403,34 @@
                     "table_id": 22792
                 }
             ]
+        },
+        {
+            "name": "disputes",
+            "type": "dispute_entry",
+            "index_type": "i64",
+            "key_names": ["id"],
+            "key_types": ["uint64"],
+            "table_id": 22555,
+            "secondary_indexes": [
+                {
+                    "name": "byepoch",
+                    "key_type": "uint64",
+                    "table_id": 12458
+                },
+                {
+                    "name": "byoutepoch",
+                    "key_type": "uint128",
+                    "table_id": 11568
+                }
+            ]
+        },
+        {
+            "name": "disputevote",
+            "type": "dispute_vote",
+            "index_type": "i64",
+            "key_names": ["scope","owner"],
+            "key_types": ["name","uint64"],
+            "table_id": 51768
         },
         {
             "name": "resolutions",
@@ -285,6 +464,24 @@
                 {
                     "name": "CHALLENGE_STATUS_ESCALATED",
                     "value": 3
+                }
+            ]
+        },
+        {
+            "name": "DisputeStatus",
+            "type": "int32",
+            "values": [
+                {
+                    "name": "DISPUTE_STATUS_UNKNOWN",
+                    "value": 0
+                },
+                {
+                    "name": "DISPUTE_STATUS_OPEN",
+                    "value": 1
+                },
+                {
+                    "name": "DISPUTE_STATUS_RESOLVED",
+                    "value": 2
                 }
             ]
         }
