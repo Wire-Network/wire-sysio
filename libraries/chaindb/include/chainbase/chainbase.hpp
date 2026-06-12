@@ -289,6 +289,15 @@ namespace chainbase {
              return _index_list[0]->revision();
          }
 
+         /// {oldest undoable revision, current revision} for the database. Mirrors revision():
+         /// delegates to the first index, which add_index/add_undo_participant keep in lockstep with
+         /// every other index. Returns {0,0} before any index is registered. Used to align a
+         /// heap-backed undo participant with the segment indices before registering it.
+         std::pair<uint64_t, uint64_t> undo_stack_revision_range()const {
+             if( _index_list.size() == 0 ) return { 0, 0 };
+             return _index_list[0]->undo_stack_revision_range();
+         }
+
          void undo();
          void squash();
          void commit( int64_t revision );

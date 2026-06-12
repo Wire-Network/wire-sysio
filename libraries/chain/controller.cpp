@@ -730,8 +730,18 @@ struct controller_impl {
    controller::config              conf;
    // persist chain_head after vote_processor shutdown, avoids concurrent access, after chain_head & conf since this uses them
    fc::scoped_exit<std::function<void()>> write_chain_head = [&]() { chain_head.write(conf.state_dir / config::chain_head_filename); };
+   // Set true by init() once trx_dedup has been registered as an undo participant and is consistent
+   // with the database. Until then trx_dedup is empty at revision 0; writing it over a good file
+   // would brick the next existing_state restart (the empty range no longer matches the database).
+   bool                            okay_to_persist_dedup = false;
    transaction_dedup               trx_dedup;
-   fc::scoped_exit<std::function<void()>> write_trx_dedup = [&]() { trx_dedup.write_to_file(conf.state_dir / config::transaction_dedup_filename); };
+   // Persist the dedup undo stack only after a successful start (see okay_to_persist_dedup). A
+   // startup that aborts before init() registers the dedup -- e.g. a corrupt SHiP log failing
+   // state_history_plugin::plugin_initialize before chain_plugin::plugin_startup runs -- must NOT
+   // overwrite the previous good file with the still-empty revision-0 dedup.
+   fc::scoped_exit<std::function<void()>> write_trx_dedup = [&]() {
+      if( okay_to_persist_dedup ) trx_dedup.write_to_file(conf.state_dir / config::transaction_dedup_filename);
+   };
    const chain_id_type             chain_id; // read by thread_pool threads, value will not be changed
    std::atomic<bool>               replaying = false;
    bool                            is_producer_node = false; // true if node is configured as a block producer
@@ -1474,14 +1484,43 @@ struct controller_impl {
       // Register the transaction dedup as a chainbase undo participant, so the database drives its
       // undo lifecycle (add_undo_session / squash / undo / commit) in lockstep with the segment
       // indices -- the controller no longer hand-pairs dedup undo calls with the database's. The db
-      // is now at head revision; align the dedup before registering. genesis/snapshot loaded the
-      // membership only (revision 0), so set the revision to the database's; existing_state restored
-      // the dedup's revision and undo stack from its file and must already match (a clean shutdown
-      // writes both; an unclean one leaves chainbase dirty and refuses to open, so they cannot
-      // disagree). add_undo_participant validates the revision range, failing loud on any mismatch.
-      if (startup != startup_t::existing_state)
+      // is now at head revision and is the authoritative source of the reversible revision range;
+      // align the dedup to it before registering:
+      //  - genesis/snapshot loaded membership only (revision 0); a snapshot is an irreversible root,
+      //    so the db has no reversible undo sessions and a plain set_revision matches it.
+      //  - existing_state restored the dedup's revision and undo stack from its on-disk file. That
+      //    file is a best-effort cache, NOT an authoritative store like chainbase's mmap'd segment:
+      //    it can legitimately be missing (first start after upgrading to dedup persistence), stale,
+      //    or empty at revision 0 (a startup that aborts before the chain loads -- e.g. a corrupt
+      //    SHiP log failing another plugin's initialize -- still runs the write-on-exit; the guard on
+      //    write_trx_dedup prevents most such clobbers, but an older build or external tooling could
+      //    still leave one). If the loaded range does not match the db exactly, discard it and
+      //    rebuild an empty undo stack aligned to the db: the node starts with degraded dedup memory
+      //    (self-healing as reversible blocks become irreversible) instead of refusing to start. A
+      //    clean restart matches and keeps the full set -- the fast path.
+      // add_undo_participant re-validates the range, so a logic error here still fails loud rather
+      // than registering a divergent participant.
+      if (startup == startup_t::existing_state) {
+         const auto db_range = db.undo_stack_revision_range();
+         if (trx_dedup.undo_stack_revision_range() != db_range) {
+            const auto dedup_range = trx_dedup.undo_stack_revision_range();
+            wlog( "transaction dedup file revision range [{},{}] does not match database [{},{}]; "
+                  "rebuilding empty dedup aligned to the database (dedup replay protection over the "
+                  "reversible window is rebuilt as those blocks become irreversible)",
+                  dedup_range.first, dedup_range.second, db_range.first, db_range.second );
+            trx_dedup.reset();
+            trx_dedup.set_revision( db_range.first );
+            for( uint64_t r = db_range.first; r < db_range.second; ++r )
+               trx_dedup.add_undo_session();
+         }
+      } else {
          trx_dedup.set_revision(static_cast<uint64_t>(db.revision()));
+      }
       db.add_undo_participant(std::make_unique<dedup_undo_index>(trx_dedup));
+      // The dedup is now registered and consistent with the database; from here a clean shutdown (or
+      // an abort after this point) may safely persist it. Before this point trx_dedup is empty at
+      // revision 0 and must never be written over a good file.
+      okay_to_persist_dedup = true;
 
       SYS_ASSERT(conf.terminate_at_block == 0 || conf.terminate_at_block > chain_head.block_num(),
                  plugin_config_exception, "--terminate-at-block {} not greater than chain head {}",
