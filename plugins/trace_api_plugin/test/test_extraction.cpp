@@ -144,8 +144,14 @@ struct extraction_test_fixture {
          return std::nullopt; // no internal gaps in unit tests
       }
 
-      void append_abi(chain::name account, uint64_t global_seq, std::vector<char> abi_bytes) {
-         fixture.abi_calls.push_back({account, global_seq, std::move(abi_bytes)});
+      void append_abi(uint32_t block_num, chain::name account, uint64_t global_seq, std::vector<char> abi_bytes) {
+         fixture.abi_calls.push_back({block_num, account, global_seq, std::move(abi_bytes)});
+      }
+
+      // Mirrors abi_log::rollback_reversible: records committed by blocks at or above
+      // block_num are discarded (fork replacement).
+      void rollback_abis(uint32_t block_num) {
+         std::erase_if(fixture.abi_calls, [block_num](const auto& c) { return c.block_num >= block_num; });
       }
 
       bool has_abi_entry(chain::name account) const {
@@ -158,6 +164,7 @@ struct extraction_test_fixture {
    };
 
    struct abi_call {
+      uint32_t          block_num = 0;
       chain::name       account;
       uint64_t          global_seq = 0;
       std::vector<char> abi_bytes;
@@ -410,8 +417,14 @@ struct abi_capture_fixture {
       std::optional<std::pair<uint32_t,uint32_t>> first_and_last_recorded_blocks() const { return std::nullopt; }
       std::optional<std::pair<uint32_t,uint32_t>> find_index_slice_gap() const { return std::nullopt; }
 
-      void append_abi(chain::name account, uint64_t global_seq, std::vector<char> abi_bytes) {
-         fixture.abi_calls.push_back({account, global_seq, std::move(abi_bytes)});
+      void append_abi(uint32_t block_num, chain::name account, uint64_t global_seq, std::vector<char> abi_bytes) {
+         fixture.abi_calls.push_back({block_num, account, global_seq, std::move(abi_bytes)});
+      }
+
+      // Mirrors abi_log::rollback_reversible: records committed by blocks at or above
+      // block_num are discarded (fork replacement).
+      void rollback_abis(uint32_t block_num) {
+         std::erase_if(fixture.abi_calls, [block_num](const auto& c) { return c.block_num >= block_num; });
       }
 
       bool has_abi_entry(chain::name account) const {
@@ -424,6 +437,7 @@ struct abi_capture_fixture {
    };
 
    struct abi_call {
+      uint32_t          block_num = 0;
       chain::name       account;
       uint64_t          global_seq = 0;
       std::vector<char> abi_bytes;
@@ -741,6 +755,97 @@ BOOST_FIXTURE_TEST_CASE(lazy_fetch_commits_once_per_block, abi_capture_fixture)
    BOOST_TEST(abi_calls[0].account    == "y"_n);
    BOOST_TEST(abi_calls[0].global_seq == 0u);
    BOOST_TEST(abi_calls[0].abi_bytes  == y_abi);
+}
+
+// The fork-replacement scenario from review: setabi(X) lands in an ACCEPTED block 10 on
+// branch A, then a fork switch replaces block 10 with a branch-B block whose setabi(X)
+// carries a different ABI.  block_start(10) for the replacing block must discard branch A's
+// committed-but-reversible record (store.rollback_abis), leaving exactly branch B's record -
+// otherwise later actions on X could decode with a schema that never existed on the
+// canonical chain.
+BOOST_FIXTURE_TEST_CASE(fork_switch_replaces_committed_abi_records, abi_capture_fixture)
+{
+   auto abi_a = std::vector<char>{'a'};
+   auto abi_b = std::vector<char>{'b'};
+
+   // Branch A: block 10 commits setabi(X, abi_a).
+   auto setabi_a = make_setabi_action("x"_n, abi_a);
+   auto ptrx_a   = make_packed_trx({ setabi_a });
+   signal_block_start(10);
+   signal(make_transaction_trace(
+             ptrx_a.id(), 10, 10, chain::transaction_receipt_header::executed,
+             { make_action_trace(100, setabi_a, chain::config::system_account_name) },
+             chain::block_id_type{} /*block context*/),
+          std::make_shared<packed_transaction>(ptrx_a));
+   accept_block(10, { chain::packed_transaction(ptrx_a) });
+
+   BOOST_REQUIRE_EQUAL(abi_calls.size(), 1u);
+   BOOST_TEST(abi_calls[0].abi_bytes == abi_a);
+
+   // Fork switch: branch B's block 10 starts (discards branch A's record), executes a
+   // different setabi(X, abi_b), and is accepted.
+   auto setabi_b = make_setabi_action("x"_n, abi_b);
+   auto ptrx_b   = make_packed_trx({ setabi_b });
+   signal_block_start(10);
+   signal(make_transaction_trace(
+             ptrx_b.id(), 10, 10, chain::transaction_receipt_header::executed,
+             { make_action_trace(101, setabi_b, chain::config::system_account_name) },
+             chain::block_id_type{} /*block context*/),
+          std::make_shared<packed_transaction>(ptrx_b));
+   accept_block(10, { chain::packed_transaction(ptrx_b) });
+
+   // Only branch B's record survives.
+   BOOST_REQUIRE_EQUAL(abi_calls.size(), 1u);
+   BOOST_TEST(abi_calls[0].block_num  == 10u);
+   BOOST_TEST(abi_calls[0].account    == "x"_n);
+   BOOST_TEST(abi_calls[0].global_seq == 101u);
+   BOOST_TEST(abi_calls[0].abi_bytes  == abi_b);
+}
+
+// Fork replacement must also reset the lazy-fetch "first encounter" decision: if the only
+// record for X was committed by a forked-out block, the rollback at block_start runs BEFORE
+// the replacing block's transactions execute, so has_abi_entry(X) is false again and the
+// lazy fetch re-triggers against canonical state.  Without the rollback-before-collection
+// ordering, X would end up with no record at all on the canonical chain.
+BOOST_FIXTURE_TEST_CASE(fork_switch_retriggers_lazy_fetch, abi_capture_fixture)
+{
+   auto abi_a = std::vector<char>{'a'};
+   auto abi_b = std::vector<char>{'b'};
+
+   // Branch A: block 10 first-encounters X via a plain action; lazy fetch records X@0.
+   fetcher_state["x"_n] = abi_a;
+   auto x_foo  = make_simple_action("x"_n, "foo"_n);
+   auto ptrx_a = make_packed_trx({ x_foo });
+   signal_block_start(10);
+   signal(make_transaction_trace(
+             ptrx_a.id(), 10, 10, chain::transaction_receipt_header::executed,
+             { make_action_trace(100, x_foo, "x"_n) },
+             chain::block_id_type{} /*block context*/),
+          std::make_shared<packed_transaction>(ptrx_a));
+   accept_block(10, { chain::packed_transaction(ptrx_a) });
+
+   BOOST_REQUIRE_EQUAL(abi_calls.size(), 1u);
+   BOOST_TEST(abi_calls[0].abi_bytes == abi_a);
+
+   // Fork switch to branch B, where canonical state carries a different current ABI for X
+   // (e.g. the forked-out branch had a setabi that branch B does not).  The re-encounter of
+   // X must re-fetch from the now-canonical state.
+   fetcher_state["x"_n] = abi_b;
+   auto x_bar  = make_simple_action("x"_n, "bar"_n);
+   auto ptrx_b = make_packed_trx({ x_bar });
+   signal_block_start(10);
+   signal(make_transaction_trace(
+             ptrx_b.id(), 10, 10, chain::transaction_receipt_header::executed,
+             { make_action_trace(110, x_bar, "x"_n) },
+             chain::block_id_type{} /*block context*/),
+          std::make_shared<packed_transaction>(ptrx_b));
+   accept_block(10, { chain::packed_transaction(ptrx_b) });
+
+   BOOST_REQUIRE_EQUAL(abi_calls.size(), 1u);
+   BOOST_TEST(abi_calls[0].block_num  == 10u);
+   BOOST_TEST(abi_calls[0].account    == "x"_n);
+   BOOST_TEST(abi_calls[0].global_seq == 0u);
+   BOOST_TEST(abi_calls[0].abi_bytes  == abi_b);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -16,7 +16,22 @@ namespace sysio::trace_api {
 
 // ---------------------------------------------------------------------------
 // abi_log: append-only on-disk log of ABI records with an in-memory sorted
-// index keyed by (account, global_sequence).
+// index keyed by (account, global_sequence), plus an in-memory overlay of
+// reversible records keyed the same way.
+//
+// Irreversibility invariant: the on-disk file only ever contains records
+// whose block is at or below LIB - a fork can therefore never invalidate a
+// written record, mirroring how the other trace files treat LIB as the
+// finality boundary (e.g. the bloom sidecar is only built for irreversible
+// slices).  Records for blocks above LIB live in the in-memory reversible
+// overlay, which:
+//   - participates in lookups immediately (actions in pending blocks decode),
+//   - is discarded per-block by rollback_reversible() when a fork replaces a
+//     block ("last write wins per block", like slice re-writes), and
+//   - is flushed to the file by flush_irreversible() as LIB advances.
+// The overlay is rebuilt at startup by store_provider from the already
+// recorded on-disk traces for the (LIB, last_recorded] window, so a restart
+// does not lose reversible setabi records.
 //
 // Appends stream records to the end of the file with no rewrite of
 // existing records.  The lookup index lives in memory and is rebuilt by
@@ -48,6 +63,14 @@ namespace sysio::trace_api {
 //   - lookup()/fetch() take _index_mtx briefly to copy (blob_offset,
 //     blob_size), release it, then pread() the blob bytes.  pread is atomic
 //     w.r.t. the fd's shared position and safe to issue concurrently.
+//   - The reversible overlay is guarded by _index_mtx (all overlay
+//     operations are brief, pure-memory map manipulations).  During
+//     flush_irreversible() a record is inserted into the disk index before
+//     it is erased from the overlay, so concurrent lookups never observe a
+//     gap.  A lookup_seq()/fetch() pair that races a fork rollback can see
+//     the record disappear between the two calls; callers treat that as
+//     "no ABI recorded", which is correct - the action being decoded was on
+//     the same forked-out block and is itself being re-written.
 // ---------------------------------------------------------------------------
 
 struct abi_log_header {
@@ -70,12 +93,47 @@ public:
 
    bool valid() const { return _valid.load(std::memory_order_relaxed); }
 
-   // Append a new ABI record.  Thread-safe.  Last-write-wins for duplicate
-   // (account, global_seq) keys.  On a write failure the torn tail is
-   // truncated back to the last good record; if even that fails the log
-   // disables itself (valid() turns false) rather than serve mis-aligned
-   // blob offsets.
-   void append(chain::name account, uint64_t global_seq, std::vector<char> abi_bytes);
+   // Append an irreversible ABI record directly to disk.  Thread-safe.
+   // Last-write-wins for duplicate (account, global_seq) keys.  On a write
+   // failure the torn tail is truncated back to the last good record and
+   // false is returned (the record is lost); if even the truncation fails
+   // the log disables itself (valid() turns false) rather than serve
+   // mis-aligned blob offsets.  Callers must only pass records whose block
+   // is already irreversible - reversible records go through
+   // append_reversible() so a fork can roll them back.
+   bool append(chain::name account, uint64_t global_seq, std::vector<char> abi_bytes);
+
+   // Record an ABI for a block that is not yet irreversible.  In-memory
+   // only; participates in lookups immediately.  The record becomes
+   // permanent when flush_irreversible() passes block_num, or is discarded
+   // by rollback_reversible() if a fork replaces the block.  Last-write-wins
+   // for duplicate (account, global_seq) keys.  No-op when valid() is false
+   // (the log is fully disabled, lookups would never serve the record).
+   // Thread-safe.
+   void append_reversible(uint32_t block_num, chain::name account, uint64_t global_seq,
+                          std::vector<char> abi_bytes);
+
+   // Discard reversible records with block_num >= the given height.  Called
+   // when a block at that height starts being applied: any previously
+   // accepted block at or above it is being replaced by a fork switch, so
+   // its ABI records must stop participating in lookups.  Records already
+   // flushed to disk are never touched (a fork cannot reach below LIB).
+   // Thread-safe.
+   void rollback_reversible(uint32_t block_num);
+
+   // Persist reversible records whose block can no longer fork out
+   // (block_num <= lib) to the on-disk log and drop them from the overlay.
+   // Driven by store_provider::append_lib, i.e. the chain's irreversible
+   // block signal - the same point at which the other trace files treat a
+   // block as final.  A failed disk write leaves the affected records in the
+   // overlay for retry on the next LIB advance.  When the log is disabled
+   // (valid() false) flushable records are dropped instead, so the overlay
+   // cannot grow without bound.  Thread-safe.
+   void flush_irreversible(uint32_t lib);
+
+   // Number of records currently in the reversible overlay.  Test/diagnostic
+   // aid.  Thread-safe.
+   size_t reversible_size() const;
 
    struct lookup_result {
       uint64_t          effective_global_seq = 0; // global_seq of the ABI record that matched
@@ -84,12 +142,14 @@ public:
 
    // Resolve only the effective global_seq for account at the largest
    // recorded global_seq <= the query (no blob I/O - cheap enough to call
-   // per action as a cache-key probe).  Returns nullopt if no record
-   // matches.  Thread-safe; may run concurrently with append().
+   // per action as a cache-key probe).  Resolves over the union of the
+   // on-disk index and the reversible overlay.  Returns nullopt if no
+   // record matches.  Thread-safe; may run concurrently with append().
    std::optional<uint64_t> lookup_seq(chain::name account, uint64_t global_seq) const;
 
    // Fetch the blob recorded at an exact (account, effective_global_seq)
-   // key as previously resolved by lookup_seq.  Performs the blob pread.
+   // key as previously resolved by lookup_seq.  Served from the reversible
+   // overlay when present there, otherwise performs the blob pread.
    // Returns nullopt when the key is not recorded or the read fails.
    // Thread-safe; may run concurrently with append().
    std::optional<std::vector<char>> fetch(chain::name account, uint64_t effective_global_seq) const;
@@ -101,8 +161,9 @@ public:
    std::optional<lookup_result> lookup(chain::name account, uint64_t global_seq) const;
 
    // Returns true if at least one record exists for the account at any
-   // global_sequence.  Used by chain extraction to decide whether to lazy-
-   // fetch an ABI on first encounter.  Thread-safe.
+   // global_sequence, on disk or in the reversible overlay.  Used by chain
+   // extraction to decide whether to lazy-fetch an ABI on first encounter.
+   // Thread-safe.
    bool has_entry(chain::name account) const;
 
 private:
@@ -123,6 +184,15 @@ private:
    };
    using index_key = std::pair<chain::name /*account*/, uint64_t /*global_seq*/>;
 
+   // One reversible (above-LIB) record: the blob is held in memory because the
+   // file only ever contains irreversible records.  block_num is the accepted
+   // block that committed the record; rollback_reversible and
+   // flush_irreversible partition the overlay by it.
+   struct reversible_entry {
+      uint32_t          block_num = 0;
+      std::vector<char> abi_bytes;
+   };
+
    // Walk the log file from the header onwards.  Returns the offset of the
    // end of the last valid record.  The file is truncated at that offset if
    // any trailing bytes were discarded due to CRC failure or truncation.
@@ -131,13 +201,14 @@ private:
    static uint32_t compute_record_crc(const record_header& hdr, const char* blob, uint64_t blob_size);
 
    // _append_mtx serializes the cfile write + _end_offset update.
-   // _index_mtx guards _index.  Separate so lookups never block on a
-   // concurrent append's file I/O.  Append acquires _append_mtx first and
-   // always releases it before acquiring _index_mtx, so no deadlock is
-   // possible (lookups only take _index_mtx).
-   std::mutex                       _append_mtx;
-   mutable std::mutex               _index_mtx;
-   std::map<index_key, index_entry> _index;
+   // _index_mtx guards _index and _reversible.  Separate so lookups never
+   // block on a concurrent append's file I/O.  Append acquires _append_mtx
+   // first and always releases it before acquiring _index_mtx, so no
+   // deadlock is possible (lookups only take _index_mtx).
+   std::mutex                            _append_mtx;
+   mutable std::mutex                    _index_mtx;
+   std::map<index_key, index_entry>      _index;
+   std::map<index_key, reversible_entry> _reversible;
    fc::cfile                        _cfile;        // holds the fd; appends use pwrite, reads use pread (both via fileno())
    uint64_t                         _end_offset{0};
    // Atomic because append() can flip it to false (failed tail truncation) while lookups on HTTP

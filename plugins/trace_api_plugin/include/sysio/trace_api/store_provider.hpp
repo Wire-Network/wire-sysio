@@ -434,11 +434,22 @@ namespace sysio::trace_api {
       bloom_reader get_bloom(uint32_t slice_number) const;
 
       /**
-       * Record an ABI version for an account at a given global_sequence.
-       * global_seq == 0 means "captured lazily; exact seq unknown".
+       * Record an ABI version for an account at a given global_sequence, committed by the
+       * accepted block block_num.  global_seq == 0 means "captured lazily; exact seq unknown".
+       * The record stays in the in-memory reversible overlay (immediately visible to lookups)
+       * until LIB passes block_num - append_lib then flushes it to the on-disk abi log - or
+       * until a fork replaces the block, in which case rollback_abis discards it.
        * Thread-safe; may be called from the extraction thread.
        */
-      void append_abi(chain::name account, uint64_t global_seq, std::vector<char> abi_bytes);
+      void append_abi(uint32_t block_num, chain::name account, uint64_t global_seq, std::vector<char> abi_bytes);
+
+      /**
+       * Discard reversible ABI records for blocks at or above block_num.  Called by chain
+       * extraction on block_start: a block starting at that height means any previously
+       * accepted block at or above it is being replaced by a fork switch.  Records already
+       * flushed to disk (at or below LIB) are never touched.  Thread-safe.
+       */
+      void rollback_abis(uint32_t block_num);
 
       /**
        * Resolve the effective ABI version for account at global_seq: the global_seq of the recorded
@@ -592,6 +603,19 @@ namespace sysio::trace_api {
       // block through the block-offset sidecar.  Returns nullopt when the sidecar or trace data
       // cannot resolve the block - callers fall back to scanning the slice's trx_id log.
       std::optional<bool> confirm_trx_in_block(uint32_t block_num, const chain::transaction_id_type& trx_id);
+
+      // Constructor-time rebuild of the abi log's reversible overlay from the traces already
+      // recorded on disk for the (LIB, last_recorded] window.  Reversible ABI records live only
+      // in memory, so without this a restart would permanently lose every setabi committed in a
+      // block that had not yet reached LIB at shutdown (the live signals for those blocks do not
+      // re-fire on a clean restart).  The recorded setabi action traces carry the exact
+      // global_sequence and ABI bytes, so the rebuilt records are identical to what live capture
+      // produced.  Lazy-fetch (seq 0) records are intentionally NOT rebuilt: their bytes came
+      // from chain state at collection time; if the account had no in-window setabi the next
+      // encounter re-fetches the identical ABI, and if it did, the pre-setabi bytes are no
+      // longer reachable anywhere.  Advisory: per-block read failures are logged and skipped
+      // (decode degrades to raw hex), never fatal.
+      void rebuild_reversible_abis();
 
       // ABI sidecar: one global append-only log in the slice directory.
       // abi_log serialises its own writes and allows concurrent lookups.

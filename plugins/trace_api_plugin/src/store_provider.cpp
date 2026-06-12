@@ -1,5 +1,6 @@
 #include <sysio/trace_api/store_provider.hpp>
 #include <sysio/trace_api/logging.hpp>
+#include <sysio/chain/config.hpp>
 
 #include <fc/io/raw.hpp>
 #include <fc/variant_object.hpp>
@@ -54,7 +55,11 @@ namespace sysio::trace_api {
       store_provider::store_provider(const std::filesystem::path& slice_dir, uint32_t stride_width, std::optional<uint32_t> minimum_irreversible_history_blocks,
                                   std::optional<uint32_t> minimum_uncompressed_irreversible_history_blocks, size_t compression_seek_point_stride)
    : _slice_directory(slice_dir, stride_width, minimum_irreversible_history_blocks, minimum_uncompressed_irreversible_history_blocks, compression_seek_point_stride)
-   , _abi_log(slice_dir / "abi_log.log") {}
+   , _abi_log(slice_dir / "abi_log.log") {
+      // Both watermarks (best_known_lib, last_recorded_block) are seeded from disk by the
+      // slice_directory constructor above, so the reversible window is known here.
+      rebuild_reversible_abis();
+   }
 
    template<typename BlockTrace>
    void store_provider::append(const BlockTrace& bt) {
@@ -88,6 +93,9 @@ namespace sysio::trace_api {
       append_store(le, index);
       _slice_directory.find_or_create_trx_id_slice(slice_number, open_state::write, trx_id);
       append_store(le, trx_id);
+      // Blocks at or below lib can no longer fork out: persist their ABI records to the
+      // on-disk abi log, the same finality boundary the other trace files key off.
+      _abi_log.flush_irreversible(lib);
       _slice_directory.set_lib(lib);
    }
 
@@ -635,8 +643,57 @@ namespace sysio::trace_api {
       return _slice_directory.first_and_last_recorded_blocks();
    }
 
-   void store_provider::append_abi(chain::name account, uint64_t global_seq, std::vector<char> abi_bytes) {
-      _abi_log.append(account, global_seq, std::move(abi_bytes));
+   void store_provider::append_abi(uint32_t block_num, chain::name account, uint64_t global_seq, std::vector<char> abi_bytes) {
+      _abi_log.append_reversible(block_num, account, global_seq, std::move(abi_bytes));
+   }
+
+   void store_provider::rollback_abis(uint32_t block_num) {
+      _abi_log.rollback_reversible(block_num);
+   }
+
+   void store_provider::rebuild_reversible_abis() {
+      const uint32_t lib  = _slice_directory.best_known_lib();
+      const uint32_t last = _slice_directory.last_recorded_block();
+      // last == 0 means nothing was ever recorded; otherwise the reversible window is
+      // (lib, last].  On a healthy Savanna node this is a handful of blocks at most.
+      if (last == 0 || last <= lib)
+         return;
+
+      uint32_t rebuilt = 0;
+      for (uint32_t block_num = lib + 1; block_num <= last; ++block_num) {
+         try {
+            get_block_t bt = get_block(block_num);
+            if (!bt)
+               continue; // hole in the reversible window (e.g. fork overwrite gap) - nothing to rebuild
+            const auto& block = std::get<block_trace_v0>(std::get<0>(*bt));
+            for (const auto& trx : block.transactions) {
+               for (const auto& at : trx.actions) {
+                  // Same detection as chain_extraction's live capture: a setabi action on the
+                  // system account.  The recorded action trace carries the exact
+                  // global_sequence and the raw action payload (target account + ABI bytes).
+                  if (at.account != chain::config::system_account_name || at.action != setabi_action_name)
+                     continue;
+                  try {
+                     auto [target, abi_bytes] = unpack_setabi_data(at.data);
+                     _abi_log.append_reversible(block_num, target, at.global_sequence,
+                                                std::vector<char>(abi_bytes.begin(), abi_bytes.end()));
+                     ++rebuilt;
+                  } catch (const std::exception& e) {
+                     fc_wlog(_log, "trace_api: failed to unpack recorded setabi at global_seq {} while rebuilding "
+                                   "reversible ABIs: {}", at.global_sequence, e.what());
+                  }
+               }
+            }
+         } catch (const std::exception& e) {
+            // Advisory: a block that cannot be read only degrades decoding of its (reversible)
+            // setabi targets to raw hex; it must not block startup.
+            fc_wlog(_log, "trace_api: failed to read block {} while rebuilding reversible ABIs: {}",
+                    block_num, e.what());
+         }
+      }
+      if (rebuilt > 0)
+         fc_ilog(_log, "trace_api: rebuilt {} reversible ABI record(s) from recorded traces for blocks ({}, {}]",
+                 rebuilt, lib, last);
    }
 
    std::optional<uint64_t> store_provider::lookup_abi_seq(chain::name account, uint64_t global_seq) const {

@@ -915,6 +915,15 @@ whatever sidecars exist for the slice covering a given block.
 each contract account across all `setabi` transactions observed since
 the node started (or since the file was first written).
 
+The file only ever contains records for **irreversible** blocks — a
+record is appended exactly when LIB passes the block that committed it,
+the same finality boundary the other trace files key off (e.g. the bloom
+sidecar is only built for fully irreversible slices). A fork can
+therefore never invalidate a written record, so the file needs no block
+tagging, tombstones, or rewrite. Records for blocks above LIB live in an
+in-memory reversible overlay (see
+[ABI capture mechanics](#abi-capture-mechanics)).
+
 Format:
 
 ```
@@ -929,9 +938,10 @@ Records (repeated until EOF):
 
 An in-memory index keyed by `(account, global_sequence)` is built at
 startup by walking the file record-by-record and validating each CRC.
-Runtime lookups go through the index; the matching blob is then read
-from the file via `pread()`. Appends stream new records to the end of
-the file under a mutex, with no rewrite of existing records.
+Runtime lookups resolve over the union of this index and the reversible
+overlay; a disk-resolved blob is then read from the file via `pread()`.
+Appends stream new records to the end of the file under a mutex, with no
+rewrite of existing records.
 
 Writes are not fsync'd; the on-disk tail may lose the last few records
 on a kernel crash. On startup the recovery scan detects torn or
@@ -943,7 +953,7 @@ any lost records are rebuilt the next time their contract is touched
 
 ### ABI capture mechanics
 
-ABI records enter `abi_log.log` through two paths:
+ABI records enter the ABI store through two paths:
 
 1. **`setabi` observation** — every time a transaction contains a
    `sysio::setabi` action, the plugin decodes the action's payload and
@@ -952,13 +962,51 @@ ABI records enter `abi_log.log` through two paths:
    global_sequence.
 
 2. **Lazy current-ABI fetch** — on the first action observed for an
-   account that has no prior `abi_log` entry, the plugin reads the
+   account that has no prior ABI record, the plugin reads the
    account's current ABI from the chain DB and records it at
    `global_sequence = 0`. The `0` is a sentinel meaning "ABI as of
    first observation; exact recorded sequence unknown." Lookups step
    back from the query `global_sequence` to the largest recorded entry
    ≤ query, so a 0 sentinel matches any action of that account that
    predates the first recorded real setabi.
+
+#### Fork handling and irreversibility
+
+A captured record moves through three phases, mirroring how the trace
+slices treat blocks:
+
+1. **Collect** — candidates are gathered per transaction at execution
+   time; nothing is recorded for executions that never land in an
+   accepted block (speculative relays, aborted production rounds).
+2. **Commit (reversible)** — when a block is accepted, its
+   transactions' candidates enter an in-memory reversible overlay,
+   tagged with the accepting block's number. Overlay records
+   participate in lookups immediately, so actions in `pending` blocks
+   decode normally.
+3. **Flush (irreversible)** — when the chain's irreversible-block
+   signal passes a record's block, the record is appended to
+   `abi_log.log` and leaves the overlay. Only this phase writes to
+   disk.
+
+If a fork replaces an accepted block, the replacing block's
+`block_start` discards every overlay record tagged with an equal or
+higher block number — before the replacing block's transactions
+execute, so the lazy fetch's "first encounter" decision also sees the
+canonical state. A `setabi` that only ever existed on a forked-out
+branch therefore never reaches the file and stops resolving the moment
+the fork switch begins.
+
+**Restarts.** The overlay is memory-only, and the accepted-block
+signals for blocks between LIB and head do not re-fire on a clean
+restart. The plugin instead rebuilds the overlay at startup from the
+already-recorded traces in that window: a recorded `setabi` action
+trace carries the exact `global_sequence` and ABI payload, so the
+rebuilt records are identical to live capture. Lazy-fetch (seq-0)
+records are not rebuilt — if the account had no in-window `setabi` the
+next encounter re-fetches the identical bytes from chain state, and if
+it did, the pre-`setabi` ABI is no longer reachable anywhere; the
+affected sliver of history returns raw hex rather than risking a wrong
+decode.
 
 #### Same-transaction `setabi` caveat
 

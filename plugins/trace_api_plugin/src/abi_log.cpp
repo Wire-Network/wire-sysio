@@ -167,8 +167,8 @@ uint64_t abi_log::recover_from_disk(const std::filesystem::path& path) {
 // strictly atomic across the two mutexes; a concurrent caller could slip an
 // insert for the same key between our write and our index update, producing
 // a duplicate record.  This is harmless given last-write-wins but not obvious.
-void abi_log::append(chain::name account, uint64_t global_seq, std::vector<char> abi_bytes) {
-   if (!valid()) return;
+bool abi_log::append(chain::name account, uint64_t global_seq, std::vector<char> abi_bytes) {
+   if (!valid()) return false;
 
    record_header rh{ account, global_seq, abi_bytes.size() };
    const uint32_t crc = compute_record_crc(rh, abi_bytes.data(), abi_bytes.size());
@@ -205,7 +205,7 @@ void abi_log::append(chain::name account, uint64_t global_seq, std::vector<char>
                           "disabling further ABI capture", _end_offset, ec.message());
             _valid.store(false, std::memory_order_relaxed);
          }
-         return;
+         return false;
       }
 
       blob_file_offset = _end_offset + sizeof(rh);
@@ -217,13 +217,83 @@ void abi_log::append(chain::name account, uint64_t global_seq, std::vector<char>
       // std::map::operator[] — duplicate (account, global_seq) silently overwrites (last-write-wins).
       _index[{rh.account, rh.global_seq}] = index_entry{blob_file_offset, rh.blob_size};
    }
+   return true;
+}
+
+void abi_log::append_reversible(uint32_t block_num, chain::name account, uint64_t global_seq,
+                                std::vector<char> abi_bytes) {
+   if (!valid()) return;
+   std::lock_guard<std::mutex> lock(_index_mtx);
+   // std::map::operator[] — duplicate (account, global_seq) silently overwrites (last-write-wins).
+   // A replay that re-commits a key already flushed to disk leaves both copies; fetch prefers the
+   // overlay and the bytes are identical, so the duplication is harmless and resolves at flush.
+   _reversible[{account, global_seq}] = reversible_entry{block_num, std::move(abi_bytes)};
+}
+
+void abi_log::rollback_reversible(uint32_t block_num) {
+   std::lock_guard<std::mutex> lock(_index_mtx);
+   for (auto it = _reversible.begin(); it != _reversible.end();) {
+      if (it->second.block_num >= block_num)
+         it = _reversible.erase(it);
+      else
+         ++it;
+   }
+}
+
+void abi_log::flush_irreversible(uint32_t lib) {
+   if (!valid()) {
+      // The disk log is disabled, so these records can never be persisted and lookups never serve
+      // them (valid() gates every read path).  Drop the flushable range so the overlay stays
+      // bounded on a node running in this degraded state.
+      std::lock_guard<std::mutex> lock(_index_mtx);
+      for (auto it = _reversible.begin(); it != _reversible.end();) {
+         if (it->second.block_num <= lib)
+            it = _reversible.erase(it);
+         else
+            ++it;
+      }
+      return;
+   }
+
+   // Snapshot the flushable set under the lock (blob copies - flushes are rare and ABIs are
+   // small), then write outside it so lookups never wait on file I/O.
+   std::vector<std::pair<index_key, std::vector<char>>> flushable;
+   {
+      std::lock_guard<std::mutex> lock(_index_mtx);
+      for (const auto& [key, entry] : _reversible) {
+         if (entry.block_num <= lib)
+            flushable.emplace_back(key, entry.abi_bytes);
+      }
+   }
+
+   for (auto& [key, bytes] : flushable) {
+      // append() inserts into _index before we erase from the overlay, so concurrent lookups
+      // always find the record in at least one of the two maps.
+      if (!append(key.first, key.second, std::move(bytes))) {
+         // Disk write failed; the record is still in the overlay - leave it (and the rest of the
+         // flushable range) for retry on the next LIB advance rather than lose it.
+         fc_wlog(_log, "trace_api: abi_log flush at lib {} failed for account {} seq {}; will retry",
+                 lib, key.first, key.second);
+         return;
+      }
+      std::lock_guard<std::mutex> lock(_index_mtx);
+      _reversible.erase(key);
+   }
+}
+
+size_t abi_log::reversible_size() const {
+   std::lock_guard<std::mutex> lock(_index_mtx);
+   return _reversible.size();
 }
 
 bool abi_log::has_entry(chain::name account) const {
    if (!valid()) return false;
    std::lock_guard<std::mutex> lock(_index_mtx);
    auto it = _index.lower_bound({account, 0});
-   return it != _index.end() && it->first.first == account;
+   if (it != _index.end() && it->first.first == account)
+      return true;
+   auto rit = _reversible.lower_bound({account, 0});
+   return rit != _reversible.end() && rit->first.first == account;
 }
 
 std::optional<uint64_t> abi_log::lookup_seq(chain::name account, uint64_t global_seq) const {
@@ -231,13 +301,20 @@ std::optional<uint64_t> abi_log::lookup_seq(chain::name account, uint64_t global
    if (!valid()) return result;
 
    std::lock_guard<std::mutex> lock(_index_mtx);
-   auto it = _index.upper_bound({account, global_seq});
-   if (it == _index.begin())
-      return result;
-   --it;
-   if (it->first.first != account)
-      return result;
-   result = it->first.second;
+   // Largest recorded seq <= the query across the union of the on-disk index and the reversible
+   // overlay.  Both maps share the key type, so one generic probe serves both.
+   auto probe = [&](const auto& map) {
+      auto it = map.upper_bound(index_key{account, global_seq});
+      if (it == map.begin())
+         return;
+      --it;
+      if (it->first.first != account)
+         return;
+      if (!result || it->first.second > *result)
+         result = it->first.second;
+   };
+   probe(_index);
+   probe(_reversible);
    return result;
 }
 
@@ -249,6 +326,13 @@ std::optional<std::vector<char>> abi_log::fetch(chain::name account, uint64_t ef
    uint64_t blob_size        = 0;
    {
       std::lock_guard<std::mutex> lock(_index_mtx);
+      // Overlay first: reversible records have no disk presence, and during a flush a record
+      // briefly exists in both maps with identical bytes, so overlay-first is always consistent.
+      auto rit = _reversible.find({account, effective_global_seq});
+      if (rit != _reversible.end()) {
+         result.emplace(rit->second.abi_bytes);
+         return result;
+      }
       auto it = _index.find({account, effective_global_seq});
       if (it == _index.end())
          return result;

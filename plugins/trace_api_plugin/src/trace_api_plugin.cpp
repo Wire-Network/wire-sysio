@@ -104,8 +104,12 @@ namespace {
          return store->find_index_slice_gap();
       }
 
-      void append_abi(chain::name account, uint64_t global_seq, std::vector<char> abi_bytes) {
-         store->append_abi(account, global_seq, std::move(abi_bytes));
+      void append_abi(uint32_t block_num, chain::name account, uint64_t global_seq, std::vector<char> abi_bytes) {
+         store->append_abi(block_num, account, global_seq, std::move(abi_bytes));
+      }
+
+      void rollback_abis(uint32_t block_num) {
+         store->rollback_abis(block_num);
       }
 
       std::optional<uint64_t> lookup_abi_seq(chain::name account, uint64_t global_seq) const {

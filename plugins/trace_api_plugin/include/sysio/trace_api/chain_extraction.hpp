@@ -15,11 +15,6 @@
 
 namespace sysio::trace_api {
 
-// Compile-time constant for setabi detection so we don't pay a chain::name
-// construction cost on every action.  string_to_name instead of the ""_n
-// literal keeps using-directives out of this widely-included header.
-inline constexpr chain::name setabi_action_name = chain::string_to_name("setabi");
-
 template <typename StoreProvider>
 class chain_extraction_impl_type {
 public:
@@ -31,7 +26,7 @@ public:
 
    /**
     * Chain Extractor for capturing transaction traces, action traces, and block info.
-    * @param store provider of append, append_lib, and append_abi
+    * @param store provider of append, append_lib, append_abi, and rollback_abis
     * @param except_handler called on exceptions, logging if any is left to the user
     * @param abi_fetcher optional callback to lazily fetch the current ABI for an account;
     *                    called on first encounter of each account; receives global_seq 0
@@ -76,7 +71,7 @@ private:
    }
 
    /**
-    * ABI capture, phase 1 of 2 (collect).  Nothing is written to the abi log here: at
+    * ABI capture, phase 1 of 3 (collect).  Nothing is written to the abi log here: at
     * execution time it is unknowable whether this transaction's global_sequences become
     * canonical.  A speculative relay execution may never land on-chain, and even a producer's
     * own production round can be aborted and its transactions re-executed later with different
@@ -89,6 +84,11 @@ private:
     * node's canonical re-execution of a relayed transaction overwrites any earlier speculative
     * collection for the same transaction id (so a lazy fetch that read speculative state can
     * never be committed - the execution that commits is the one whose state was canonical).
+    *
+    * Even an accepted block can later fork out, so commit (phase 2) only places records in
+    * the store's in-memory reversible overlay; they become permanent on disk in phase 3 when
+    * LIB passes their block (store.append_lib), and are discarded by store.rollback_abis when
+    * a fork replaces their block - see on_block_start.
     */
    void collect_abi_ops(const chain::transaction_trace& trace) {
       // First pass: collect setabi targets in this trx so the second pass can
@@ -104,12 +104,7 @@ private:
          if (at.act.account == chain::config::system_account_name &&
              at.act.name    == setabi_action_name) {
             try {
-               chain::name target;
-               chain::bytes abi_bytes;
-               auto ds = fc::datastream<const char*>(at.act.data.data(), at.act.data.size());
-               fc::raw::unpack(ds, target);
-               fc::raw::unpack(ds, abi_bytes);
-               setabi_targets_this_trx.insert(target);
+               setabi_targets_this_trx.insert(unpack_setabi_data(at.act.data).first);
             } catch (const std::exception& e) {
                fc_wlog(_log, "trace_api: failed to unpack setabi data (collecting targets) at global_seq {}: {}",
                        at.receipt->global_sequence, e.what());
@@ -156,11 +151,7 @@ private:
          if (at.act.account == chain::config::system_account_name &&
              at.act.name    == setabi_action_name) {
             try {
-               chain::name target_account;
-               chain::bytes abi_bytes;
-               auto ds = fc::datastream<const char*>(at.act.data.data(), at.act.data.size());
-               fc::raw::unpack(ds, target_account);
-               fc::raw::unpack(ds, abi_bytes);
+               auto [target_account, abi_bytes] = unpack_setabi_data(at.act.data);
                ops.push_back({abi_op_kind::setabi,
                               target_account,
                               at.receipt->global_sequence,
@@ -182,23 +173,28 @@ private:
    }
 
    /**
-    * ABI capture, phase 2 of 2 (commit): write the candidates collected for a transaction
+    * ABI capture, phase 2 of 3 (commit): record the candidates collected for a transaction
     * that made it into an accepted block.  Called from store_block_trace before the block's
     * traces are appended, so a trace is never readable before the ABI that decodes it.
     * has_abi_entry is re-checked for lazy fetches: an earlier transaction in this block, or
     * a block accepted between collection and now, may have recorded the account already.
+    *
+    * The records carry the accepted block's number: they stay reversible (in-memory,
+    * discarded by store.rollback_abis if a fork replaces the block) until LIB passes
+    * block_num, at which point store.append_lib flushes them to the on-disk abi log
+    * (phase 3) - the same point at which the other trace files treat a block as final.
     */
-   void commit_abi_ops(const chain::transaction_id_type& trx_id) {
+   void commit_abi_ops(uint32_t block_num, const chain::transaction_id_type& trx_id) {
       auto it = pending_abi_ops.find(trx_id);
       if (it == pending_abi_ops.end()) return;
       for (auto& op : it->second) {
          switch (op.kind) {
          case abi_op_kind::lazy_fetch:
             if (!store.has_abi_entry(op.account))
-               store.append_abi(op.account, 0, std::move(op.abi_bytes));
+               store.append_abi(block_num, op.account, 0, std::move(op.abi_bytes));
             break;
          case abi_op_kind::setabi:
-            store.append_abi(op.account, op.global_sequence, std::move(op.abi_bytes));
+            store.append_abi(block_num, op.account, op.global_sequence, std::move(op.abi_bytes));
             break;
          }
       }
@@ -219,6 +215,13 @@ private:
          check_continuity(block_num);
       }
       clear_caches();
+      // Fork replacement for committed-but-reversible ABI records: a block_start at
+      // height H means any previously accepted block at height >= H is being replaced
+      // (fork switch) - its ABI records must stop participating in lookups, exactly as
+      // the trace slices overwrite per-block on re-application.  In normal forward
+      // operation no record at or above H exists and this is a no-op.  Records at or
+      // below LIB live on disk and are never touched (a fork cannot reach below LIB).
+      store.rollback_abis(block_num);
    }
 
    void check_continuity(uint32_t block_num) {
@@ -290,7 +293,7 @@ private:
          tt.ids.reserve(block->transactions.size() + 1);
          if( onblock_trace ) {
             traces.emplace_back( to_transaction_trace( *onblock_trace ));
-            commit_abi_ops( onblock_trace->trace->id );
+            commit_abi_ops( bt.number, onblock_trace->trace->id );
          }
          for( const auto& r : block->transactions ) {
             const chain::transaction_id_type& id = r.trx.id();
@@ -298,7 +301,7 @@ private:
             if( it != cached_traces.end() ) {
                traces.emplace_back( to_transaction_trace( it->second ));
             }
-            commit_abi_ops( id );
+            commit_abi_ops( bt.number, id );
             tt.ids.emplace_back(id);
          }
          bt.transactions = std::move( traces );

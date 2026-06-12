@@ -19,6 +19,7 @@ struct continuity_mock_store {
    void append(const BlockTrace&) {}
    void append_lib(uint32_t) {}
    void append_trx_ids(block_trxs_entry) {}
+   void rollback_abis(uint32_t) {}
 
    std::optional<std::pair<uint32_t,uint32_t>> first_and_last_recorded_blocks() const {
       if (!_first_block) return std::nullopt;

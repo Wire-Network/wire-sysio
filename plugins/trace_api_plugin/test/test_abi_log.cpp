@@ -310,4 +310,175 @@ BOOST_FIXTURE_TEST_CASE(many_accounts_many_versions, abi_log_fixture) {
    }
 }
 
+// ---------------------------------------------------------------------------
+// Reversible overlay: records above LIB live in memory, participate in
+// lookups immediately, roll back per block on fork replacement, and reach
+// disk only via flush_irreversible.
+// ---------------------------------------------------------------------------
+
+BOOST_FIXTURE_TEST_CASE(reversible_record_participates_in_lookup, abi_log_fixture) {
+   abi_log log(log_path());
+   auto blob = make_abi("rev-abi");
+   log.append_reversible(10, "acct"_n, 100, blob);
+
+   BOOST_CHECK(log.has_entry("acct"_n));
+   BOOST_CHECK_EQUAL(log.reversible_size(), 1u);
+
+   auto seq = log.lookup_seq("acct"_n, 150);
+   BOOST_REQUIRE(seq.has_value());
+   BOOST_CHECK_EQUAL(*seq, 100u);
+
+   auto fetched = log.fetch("acct"_n, 100);
+   BOOST_REQUIRE(fetched.has_value());
+   BOOST_CHECK(*fetched == blob);
+
+   auto result = log.lookup("acct"_n, 100);
+   BOOST_REQUIRE(result.has_value());
+   BOOST_CHECK_EQUAL(result->effective_global_seq, 100u);
+   BOOST_CHECK(result->abi_bytes == blob);
+}
+
+BOOST_FIXTURE_TEST_CASE(unflushed_reversible_record_does_not_survive_restart, abi_log_fixture) {
+   // Session 1: a reversible record is never flushed (its block never reached LIB here).
+   with_log([&](abi_log& log) {
+      log.append_reversible(10, "acct"_n, 100, make_abi("rev-abi"));
+      BOOST_CHECK(log.lookup("acct"_n, 100).has_value());
+   });
+
+   // Session 2: the on-disk file must not contain it - the file only ever holds
+   // irreversible records.  (store_provider's startup rebuild from recorded traces
+   // is what restores the overlay on a real node.)
+   with_log([&](abi_log& log) {
+      BOOST_CHECK(!log.has_entry("acct"_n));
+      BOOST_CHECK(!log.lookup("acct"_n, 100));
+      BOOST_CHECK_EQUAL(log.reversible_size(), 0u);
+   });
+}
+
+BOOST_FIXTURE_TEST_CASE(rollback_discards_records_at_and_above_height, abi_log_fixture) {
+   abi_log log(log_path());
+   log.append_reversible(10, "a"_n, 100, make_abi("a-10"));
+   log.append_reversible(11, "b"_n, 200, make_abi("b-11"));
+   log.append_reversible(12, "c"_n, 300, make_abi("c-12"));
+
+   // Fork switch: a new block at height 11 replaces the old 11 and 12.
+   log.rollback_reversible(11);
+
+   BOOST_CHECK(log.has_entry("a"_n));
+   BOOST_CHECK(!log.has_entry("b"_n));
+   BOOST_CHECK(!log.has_entry("c"_n));
+   BOOST_CHECK_EQUAL(log.reversible_size(), 1u);
+   BOOST_CHECK(log.lookup("a"_n, 100).has_value());
+   BOOST_CHECK(!log.lookup_seq("b"_n, 250));
+   BOOST_CHECK(!log.lookup_seq("c"_n, 350));
+}
+
+BOOST_FIXTURE_TEST_CASE(flush_moves_records_at_or_below_lib_to_disk, abi_log_fixture) {
+   // Session 1: two reversible records; LIB advances past only the first.
+   with_log([&](abi_log& log) {
+      log.append_reversible(10, "a"_n, 100, make_abi("a-abi"));
+      log.append_reversible(12, "b"_n, 200, make_abi("b-abi"));
+
+      log.flush_irreversible(11);
+
+      // Flushed record left the overlay; the still-reversible one remains, and
+      // both keep resolving.
+      BOOST_CHECK_EQUAL(log.reversible_size(), 1u);
+      BOOST_CHECK(log.lookup("a"_n, 100).has_value());
+      BOOST_CHECK(log.lookup("b"_n, 200).has_value());
+   });
+
+   // Session 2: only the flushed record survived on disk.
+   with_log([&](abi_log& log) {
+      auto a = log.lookup("a"_n, 100);
+      BOOST_REQUIRE(a.has_value());
+      BOOST_CHECK(a->abi_bytes == make_abi("a-abi"));
+      BOOST_CHECK(!log.has_entry("b"_n));
+   });
+}
+
+BOOST_FIXTURE_TEST_CASE(forked_out_abi_never_reaches_disk, abi_log_fixture) {
+   // The review scenario: setabi(X) lands in block 10 on branch A; branch B
+   // replaces block 10 with a different setabi(X).  After the fork switch and
+   // LIB passing 10, only branch B's record may exist - anywhere.
+   with_log([&](abi_log& log) {
+      log.append_reversible(10, "x"_n, 100, make_abi("branch-a"));
+      // Fork switch: block_start(10) on branch B.
+      log.rollback_reversible(10);
+      log.append_reversible(10, "x"_n, 101, make_abi("branch-b"));
+
+      log.flush_irreversible(10);
+      BOOST_CHECK_EQUAL(log.reversible_size(), 0u);
+   });
+
+   with_log([&](abi_log& log) {
+      // The forked-out record participates in nothing: a query at its seq finds
+      // no record at all (101 > 100), and the canonical record resolves.
+      BOOST_CHECK(!log.lookup_seq("x"_n, 100));
+      auto r = log.lookup("x"_n, 150);
+      BOOST_REQUIRE(r.has_value());
+      BOOST_CHECK_EQUAL(r->effective_global_seq, 101u);
+      BOOST_CHECK(r->abi_bytes == make_abi("branch-b"));
+   });
+}
+
+BOOST_FIXTURE_TEST_CASE(lookup_resolves_across_disk_and_overlay, abi_log_fixture) {
+   abi_log log(log_path());
+   // Older version already irreversible (on disk), newer one still reversible.
+   log.append("x"_n, 5, make_abi("disk-v1"));
+   log.append_reversible(20, "x"_n, 100, make_abi("rev-v2"));
+
+   // Query between the two -> disk record wins (largest seq <= query).
+   auto mid = log.lookup("x"_n, 50);
+   BOOST_REQUIRE(mid.has_value());
+   BOOST_CHECK_EQUAL(mid->effective_global_seq, 5u);
+   BOOST_CHECK(mid->abi_bytes == make_abi("disk-v1"));
+
+   // Query at/after the reversible record -> overlay record wins.
+   auto post = log.lookup("x"_n, 100);
+   BOOST_REQUIRE(post.has_value());
+   BOOST_CHECK_EQUAL(post->effective_global_seq, 100u);
+   BOOST_CHECK(post->abi_bytes == make_abi("rev-v2"));
+
+   // Before both -> nothing.
+   BOOST_CHECK(!log.lookup("x"_n, 4));
+
+   // A fork rollback removes the overlay record; the disk record now resolves
+   // for the later seq too.
+   log.rollback_reversible(20);
+   auto after_rollback = log.lookup("x"_n, 100);
+   BOOST_REQUIRE(after_rollback.has_value());
+   BOOST_CHECK_EQUAL(after_rollback->effective_global_seq, 5u);
+}
+
+BOOST_FIXTURE_TEST_CASE(flush_is_incremental_as_lib_advances, abi_log_fixture) {
+   abi_log log(log_path());
+   log.append_reversible(10, "a"_n, 100, make_abi("a-abi"));
+   log.append_reversible(11, "b"_n, 200, make_abi("b-abi"));
+   log.append_reversible(12, "c"_n, 300, make_abi("c-abi"));
+
+   log.flush_irreversible(10);
+   BOOST_CHECK_EQUAL(log.reversible_size(), 2u);
+   log.flush_irreversible(12);
+   BOOST_CHECK_EQUAL(log.reversible_size(), 0u);
+
+   // All three resolve from disk now (and a repeat flush is a no-op).
+   log.flush_irreversible(12);
+   BOOST_CHECK(log.lookup("a"_n, 100).has_value());
+   BOOST_CHECK(log.lookup("b"_n, 200).has_value());
+   BOOST_CHECK(log.lookup("c"_n, 300).has_value());
+}
+
+BOOST_FIXTURE_TEST_CASE(reversible_last_write_wins_for_duplicate_key, abi_log_fixture) {
+   abi_log log(log_path());
+   // A replay re-commits the same (account, seq); the later write wins.
+   log.append_reversible(10, "acct"_n, 100, make_abi("first"));
+   log.append_reversible(10, "acct"_n, 100, make_abi("second"));
+   BOOST_CHECK_EQUAL(log.reversible_size(), 1u);
+
+   auto r = log.lookup("acct"_n, 100);
+   BOOST_REQUIRE(r.has_value());
+   BOOST_CHECK(r->abi_bytes == make_abi("second"));
+}
+
 BOOST_AUTO_TEST_SUITE_END()

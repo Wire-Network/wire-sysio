@@ -1,7 +1,9 @@
 #include <boost/test/unit_test.hpp>
 #include <fc/io/cfile.hpp>
+#include <fc/io/raw.hpp>
 #include <sysio/trace_api/test_common.hpp>
 #include <sysio/trace_api/store_provider.hpp>
+#include <sysio/chain/config.hpp>
 #include <fc/crypto/elliptic_ed.hpp>
 
 using namespace sysio;
@@ -1573,6 +1575,123 @@ BOOST_AUTO_TEST_SUITE(slice_tests)
       get_block_t b5 = sp2.get_block(5);
       BOOST_REQUIRE(b5);
       BOOST_CHECK(!std::get<1>(*b5));
+   }
+
+   // Build a single-transaction block trace whose only action is a recorded sysio::setabi -
+   // the shape store_provider::rebuild_reversible_abis scans for at startup.
+   block_trace_v0 make_setabi_block_trace(uint32_t number, chain::name target, uint64_t global_seq,
+                                          const std::vector<char>& abi) {
+      chain::bytes abi_bytes(abi.begin(), abi.end());
+      chain::bytes data;
+      fc::datastream<size_t> ps;
+      fc::raw::pack(ps, target, abi_bytes);
+      data.resize(ps.tellp());
+      fc::datastream<char*> ds(data.data(), data.size());
+      fc::raw::pack(ds, target, abi_bytes);
+
+      return block_trace_v0 {
+         .id           = fc::sha256::hash(std::to_string(number)),
+         .number       = number,
+         .previous_id  = fc::sha256::hash(std::to_string(number - 1)),
+         .timestamp    = chain::block_timestamp_type(number),
+         .producer     = "bp.one"_n,
+         .transactions = {
+            transaction_trace_v0 {
+               .id      = fc::sha256::hash("setabi-trx-" + std::to_string(number)),
+               .actions = {
+                  {
+                     .global_sequence = global_seq,
+                     .receiver        = chain::config::system_account_name,
+                     .account         = chain::config::system_account_name,
+                     .action          = setabi_action_name,
+                     .authorization   = {{ target, "active"_n }},
+                     .data            = data
+                  }
+               }
+            }
+         }
+      };
+   }
+
+   // append_lib must flush reversible ABI records at/below LIB to the on-disk abi log: they
+   // survive a restart even though the reversible overlay is memory-only (and the startup
+   // rebuild has nothing to do here - the whole window is at/below LIB after the flush).
+   BOOST_FIXTURE_TEST_CASE(test_abi_flush_at_lib_survives_restart, test_fixture)
+   {
+      fc::temp_directory tempdir;
+      const auto abi = std::vector<char>{'a', 'b', 'i'};
+      {
+         store_provider sp(tempdir.path(), 100, std::optional<uint32_t>(), std::optional<uint32_t>(), 0);
+         sp.append(block_trace1);   // block 1
+         sp.append_abi(1, "acct"_n, 100, abi);
+         BOOST_REQUIRE(sp.lookup_abi_seq("acct"_n, 100).has_value());
+         sp.append_lib(1);          // block 1 final -> record flushed to disk
+      }
+
+      store_provider sp2(tempdir.path(), 100, std::optional<uint32_t>(), std::optional<uint32_t>(), 0);
+      auto seq = sp2.lookup_abi_seq("acct"_n, 150);
+      BOOST_REQUIRE(seq.has_value());
+      BOOST_CHECK_EQUAL(*seq, 100u);
+      auto fetched = sp2.fetch_abi("acct"_n, 100);
+      BOOST_REQUIRE(fetched.has_value());
+      BOOST_CHECK(*fetched == abi);
+      BOOST_CHECK(sp2.has_abi_entry("acct"_n));
+   }
+
+   // A reversible (above-LIB) ABI record must NOT reach the file - but a restart must not
+   // lose it either: the startup rebuild re-extracts it from the recorded setabi action
+   // trace in the (LIB, last_recorded] window.  Once LIB later passes the block, the record
+   // moves to disk and the trace scan is no longer needed.
+   BOOST_FIXTURE_TEST_CASE(test_reversible_abi_rebuilt_from_traces_on_restart, test_fixture)
+   {
+      fc::temp_directory tempdir;
+      const auto abi = std::vector<char>{'x', 'y', 'z'};
+      {
+         store_provider sp(tempdir.path(), 100, std::optional<uint32_t>(), std::optional<uint32_t>(), 0);
+         sp.append(block_trace1);                                  // block 1
+         sp.append_lib(1);                                         // LIB = 1
+         sp.append(make_setabi_block_trace(5, "x"_n, 500, abi));   // block 5, reversible
+         sp.append_abi(5, "x"_n, 500, abi);                        // live capture's commit
+         BOOST_REQUIRE(sp.lookup_abi_seq("x"_n, 500).has_value());
+      }
+
+      // Restart: the overlay is memory-only, but the setabi is rebuilt from block 5's
+      // recorded trace (the live signals for blocks 2..5 do not re-fire on a clean restart).
+      store_provider sp2(tempdir.path(), 100, std::optional<uint32_t>(), std::optional<uint32_t>(), 0);
+      auto seq = sp2.lookup_abi_seq("x"_n, 600);
+      BOOST_REQUIRE(seq.has_value());
+      BOOST_CHECK_EQUAL(*seq, 500u);
+      auto fetched = sp2.fetch_abi("x"_n, 500);
+      BOOST_REQUIRE(fetched.has_value());
+      BOOST_CHECK(*fetched == abi);
+
+      // LIB advances past block 5 -> the rebuilt record is flushed to disk; a further
+      // restart serves it from the file alone.
+      sp2.append_lib(5);
+      store_provider sp3(tempdir.path(), 100, std::optional<uint32_t>(), std::optional<uint32_t>(), 0);
+      auto final_seq = sp3.lookup_abi_seq("x"_n, 600);
+      BOOST_REQUIRE(final_seq.has_value());
+      BOOST_CHECK_EQUAL(*final_seq, 500u);
+   }
+
+   // rollback_abis discards reversible records for blocks at/above the given height (fork
+   // replacement), and a subsequent re-commit for the replacing block resolves instead.
+   BOOST_FIXTURE_TEST_CASE(test_abi_rollback_discards_reversible_records, test_fixture)
+   {
+      fc::temp_directory tempdir;
+      store_provider sp(tempdir.path(), 100, std::optional<uint32_t>(), std::optional<uint32_t>(), 0);
+
+      sp.append_abi(5, "x"_n, 500, std::vector<char>{'a'});
+      BOOST_REQUIRE(sp.lookup_abi_seq("x"_n, 500).has_value());
+
+      sp.rollback_abis(5);   // fork switch: a new block 5 replaces the old one
+      BOOST_CHECK(!sp.lookup_abi_seq("x"_n, 500));
+      BOOST_CHECK(!sp.has_abi_entry("x"_n));
+
+      sp.append_abi(5, "x"_n, 501, std::vector<char>{'b'});
+      auto seq = sp.lookup_abi_seq("x"_n, 600);
+      BOOST_REQUIRE(seq.has_value());
+      BOOST_CHECK_EQUAL(*seq, 501u);
    }
 
 BOOST_AUTO_TEST_SUITE_END()
