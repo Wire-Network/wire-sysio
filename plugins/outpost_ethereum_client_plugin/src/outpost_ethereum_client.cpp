@@ -110,8 +110,7 @@ std::vector<char> outpost_ethereum_client::read_inbound_envelope(
    // cryptoeconomic finality. This is deliberately not operator-configurable: the read commitment is a
    // consensus parameter, and operators reading at different commitments would deliver divergent
    // envelopes for the same epoch, manufacturing disputes among honest operators.
-   const auto raw_hex_var = _opp_client->get_latest_outbound_envelope(
-      std::string(eth::block_tag_finalized));
+   const auto raw_hex_var = _opp_client->get_latest_outbound_envelope(eth::block_tag_t::finalized);
    if (!raw_hex_var.is_string()) {
       wlog("outpost_ethereum_client[{}]: getLatestOutboundEnvelope returned non-string variant",
            to_string());
