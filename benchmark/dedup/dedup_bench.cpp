@@ -111,8 +111,6 @@ namespace {
 struct chainbase_dedup {
    fc::temp_directory tmp;
    chainbase::database db;
-   std::vector<chainbase::database::session> trx_sessions;
-   std::optional<chainbase::database::session> block_session;
 
    explicit chainbase_dedup(uint64_t segment_bytes, chainbase::pinnable_mapped_file::map_mode mode)
    : db(tmp.path(), chainbase::database::read_write, segment_bytes, false, mode) {
@@ -135,28 +133,25 @@ struct chainbase_dedup {
       }
       return n;
    }
-   void push_session()   { trx_sessions.emplace_back(db.start_undo_session(true)); }
-   void squash_session() { trx_sessions.back().squash(); trx_sessions.pop_back(); }
-   void undo_session()   { trx_sessions.back().undo();   trx_sessions.pop_back(); }
-   void start_block_revision(uint32_t) { block_session.emplace(db.start_undo_session(true)); }
-   void commit_block_revision()        { block_session->push(); block_session.reset(); }
-   void abort_block_revision()         { block_session->undo(); block_session.reset(); }
-   void pop_block_revision()           { db.undo(); }
-   void commit_to_lib(int64_t rev)     { db.commit(rev); }   // chainbase commits by revision
+   // Unified undo lifecycle, mirroring transaction_dedup's: a block revision and a transaction
+   // session are the same add_undo_session, driven straight through the chainbase undo stack.
+   // start_undo_session(true).push() opens a revision and keeps it on the stack (exactly as the
+   // controller keeps a block's db session until LIB advances); commit(revision) drops it later.
+   void add_undo_session() { db.start_undo_session(true).push(); }
+   void squash()           { db.squash(); }
+   void undo()             { db.undo(); }
+   void commit(int64_t rev){ db.commit(rev); }
 
    int64_t revision() const { return db.revision(); }
    size_t  free_mem() const { return db.get_free_memory(); }
 };
 
-// --- Adapters bridging the small API differences between the two implementations ----------
-// (custom clear_expired returns {removed,total}; custom commit_to_lib takes a block_num while
-//  chainbase commits a revision; custom has no revision()).
+// --- Adapter bridging the one remaining API difference --------------------------------------
+// Both sides now present the same chainbase-aligned surface (add_undo_session / squash / undo /
+// commit(revision) / revision()); only clear_expired's return type still differs (the custom one
+// returns {removed,total}, chainbase a bare count), and the benchmark loop ignores it either way.
 uint32_t do_clear_expired(transaction_dedup& d, fc::time_point now) { return d.clear_expired(now).first; }
 uint32_t do_clear_expired(chainbase_dedup& d, fc::time_point now)   { return d.clear_expired(now); }
-int64_t  cur_revision(const transaction_dedup&)      { return 0; }
-int64_t  cur_revision(const chainbase_dedup& d)      { return d.revision(); }
-void     commit_lib(transaction_dedup& d, uint32_t lib_block, int64_t /*rev*/) { d.commit_to_lib(lib_block); }
-void     commit_lib(chainbase_dedup& d, uint32_t /*lib_block*/, int64_t rev)   { d.commit_to_lib(rev); }
 
 // --- Workload ------------------------------------------------------------
 
@@ -221,37 +216,36 @@ void bench_block_cycle(D& d, const workload& w, size_t start_idx, const params& 
    size_t idx = start_idx;
    uint32_t now_block = static_cast<uint32_t>(start_idx / p.per_block);
    volatile uint64_t sink = 0;
-   std::vector<std::pair<uint32_t, int64_t>> committed; // (block_num, revision) for LIB advance
+   std::vector<int64_t> committed; // block revisions, for LIB advance
 
    auto t0 = clk::now();
    for (size_t b = 0; b < p.blocks && idx + 2 * p.per_block < w.ids.size(); ++b) {
       ++now_block;
       if (relay) {
-         // Speculative block: clear + record a block's worth, then discard it.
-         d.start_block_revision(now_block);
+         // Speculative block: open a block session, clear + record a block's worth, then discard
+         // the whole block with one undo (the validator/relay worst case: an extra block + a full undo).
+         d.add_undo_session();
          do_clear_expired(d, fc::time_point(fc::seconds(now_block)));
          for (size_t k = 0; k < p.per_block; ++k) {
-            d.push_session();
+            d.add_undo_session();
             d.record(w.ids[idx + k], w.exps[idx + k]);
-            d.squash_session();
+            d.squash();
          }
-         d.abort_block_revision();
+         d.undo();
       }
-      // Real block.
-      d.start_block_revision(now_block);
+      // Real block: open a block session; each trx is a nested session squashed into the block.
+      // The block session is kept on the stack (no explicit commit) until LIB advances past it.
+      d.add_undo_session();
       do_clear_expired(d, fc::time_point(fc::seconds(now_block)));
       for (size_t k = 0; k < p.per_block; ++k, ++idx) {
          sink = sink + d.is_known(w.ids[idx]);
-         d.push_session();
+         d.add_undo_session();
          d.record(w.ids[idx], w.exps[idx]);
-         d.squash_session();
+         d.squash();
       }
-      d.commit_block_revision();
-      committed.emplace_back(now_block, cur_revision(d));
-      if (committed.size() > 5) {
-         auto [lib_block, lib_rev] = committed[committed.size() - 6];
-         commit_lib(d, lib_block, lib_rev);
-      }
+      committed.push_back(d.revision());
+      if (committed.size() > 5)
+         d.commit(committed[committed.size() - 6]);
    }
    double elapsed = ns_since(t0);
    if (relay) { pt.relay_ns += elapsed; pt.relay_trx += (idx - start_idx); }

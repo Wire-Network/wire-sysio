@@ -24,8 +24,10 @@ namespace sysio::chain {
 /// makes levels at or below a revision irreversible. Block revisions and transaction sessions are
 /// the SAME mechanism at different nesting depths -- this is what lets the database drive the
 /// dedup as a registered undo participant (see add_undo_participant / dedup_undo_index), so the
-/// controller no longer has to hand-pair every chainbase undo op with a dedup one. The legacy
-/// start_block_revision / push_session / ... names are retained as thin wrappers.
+/// controller no longer has to hand-pair every chainbase undo op with a dedup one. There are no
+/// block-specific entry points (start_block_revision / commit_block_revision / commit_to_lib / ...):
+/// a block revision and a transaction session are the same add_undo_session, the database drives
+/// them, and a block's revision is simply its block number.
 ///
 /// Determinism contract: the entry set and its serialized order are a pure function of the logical
 /// chain state, independent of the path a node took to reach it (live sync, replay, fork switches,
