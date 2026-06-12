@@ -655,6 +655,62 @@ BOOST_FIXTURE_TEST_CASE( get_table_next_key_test, validating_tester ) try {
       BOOST_CHECK(inputs.count("thirdinput"));
    }
 
+   // (sec-4b) hashobjs bysec1 (checksum256) with a `find` bound — exercises
+   //          be_key_codec::encode_field("checksum256", ...): the canonical
+   //          64-hex-char spelling maps to the raw 32 digest bytes (display
+   //          order; CDT to_key emits fixed_bytes' big-endian word packing).
+   //          Before checksum256 codec support this asserted
+   //          "Unsupported BE key type: checksum256".
+   {
+      chain_apis::read_only::get_table_rows_params p;
+      p.json = true;
+      p.code = "test"_n;
+      p.scope = "test";
+      p.table = "hashobjs";
+      p.index_name = "bysec1";
+      const auto second_hash = fc::sha256::hash("secondinput", 11).str();
+      p.find = std::string(R"({"bysec1":")") + second_hash + R"("})";
+      auto result = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(result.rows.size(), 1u);
+      BOOST_CHECK_EQUAL(
+         result.rows[0].get_object()["value"].get_object()["hash_input"].as_string(),
+         "secondinput");
+   }
+
+   // (sec-4c) hashobjs bysec1 (checksum256) pagination — next_key is produced
+   //          by decode_field("checksum256") and fed back through encode_field
+   //          as lower_bound, covering the decode/encode round-trip. Row order
+   //          is hash-value order, so assert page sizes + full coverage rather
+   //          than a fixed sequence.
+   {
+      chain_apis::read_only::get_table_rows_params p;
+      p.json = true;
+      p.code = "test"_n;
+      p.scope = "test";
+      p.table = "hashobjs";
+      p.index_name = "bysec1";
+      p.limit = 2;
+      auto page1 = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(page1.rows.size(), 2u);
+      BOOST_REQUIRE_EQUAL(page1.more, true);
+      BOOST_REQUIRE(!page1.next_key.empty());
+
+      p.lower_bound = page1.next_key;
+      p.limit       = 50;
+      auto page2 = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(page2.rows.size(), 1u);
+      BOOST_REQUIRE_EQUAL(page2.more, false);
+
+      std::set<std::string> inputs;
+      for (auto* page : {&page1, &page2})
+         for (auto& row : page->rows)
+            inputs.insert(row.get_object()["value"].get_object()["hash_input"].as_string());
+      BOOST_CHECK_EQUAL(inputs.size(), 3u);
+      BOOST_CHECK(inputs.count("firstinput"));
+      BOOST_CHECK(inputs.count("secondinput"));
+      BOOST_CHECK(inputs.count("thirdinput"));
+   }
+
    // (sec-5) Invalid index name on multi_index — should throw, not silently
    //         return primary rows.
    {

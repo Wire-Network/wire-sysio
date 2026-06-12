@@ -164,6 +164,13 @@ struct reader {
    uint32_t read_be32() { return read_be<uint32_t>(); }
    uint64_t read_be64() { return read_be<uint64_t>(); }
 
+   // Copy `n` raw bytes (already order-preserving, e.g. a checksum digest).
+   void read_bytes(char* out, size_t n) {
+      FC_ASSERT(remaining() >= n, "BE key underflow reading {} raw bytes", n);
+      std::memcpy(out, pos, n);
+      pos += n;
+   }
+
    // NUL-escape decoding: 0x00,0x01 = literal NUL byte, 0x00,0x00 = end of string.
    std::string read_nul_escaped_string() {
       std::string s;
@@ -201,6 +208,9 @@ struct writer {
    std::vector<char> buf;
 
    void write_u8(uint8_t v) { buf.push_back(static_cast<char>(v)); }
+
+   // Append `n` raw bytes verbatim (already order-preserving).
+   void write_bytes(const char* p, size_t n) { buf.insert(buf.end(), p, p + n); }
 
    void write_be16(uint16_t v) { write_be(v); }
 
@@ -257,6 +267,17 @@ inline fc::variant decode_field(reader& r, const std::string& type) {
       fc::to_variant(static_cast<fc::int128>(fc::to_uint128(hi, lo)), v);
       return v;
    }
+   if (type == "checksum256") {
+      // Raw 32 digest bytes in display order: fixed_bytes packs its words
+      // big-endian, so CDT's to_key emits the canonical byte sequence and
+      // memcmp order matches checksum256 ordering. Canonical hex spelling
+      // via fc::sha256's variant conversion.
+      fc::sha256 h;
+      r.read_bytes(h.data(), h.data_size());
+      fc::variant v;
+      fc::to_variant(h, v);
+      return v;
+   }
    if (type == "name")          return fc::variant(name(r.read_be64()).to_string());
    if (type == "bool")          return fc::variant(r.read_u8() != 0);
    if (type == "string")        return fc::variant(r.read_nul_escaped_string());
@@ -301,6 +322,12 @@ inline void encode_field(writer& w, const std::string& type, const fc::variant& 
       const auto u = static_cast<fc::uint128>(i);
       w.write_be64(static_cast<uint64_t>(u >> 64) ^ (uint64_t(1) << 63));
       w.write_be64(static_cast<uint64_t>(u));
+      return;
+   }
+   if (type == "checksum256") {
+      fc::sha256 h;
+      fc::from_variant(val, h);
+      w.write_bytes(h.data(), h.data_size());
       return;
    }
    if (type == "name")          { w.write_be64(name(val.as_string()).to_uint64_t()); return; }
