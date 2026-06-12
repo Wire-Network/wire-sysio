@@ -39,6 +39,26 @@ from TestHarness.TestHelper import AppArgs
 Print=Utils.Print
 errorExit=Utils.errorExit
 
+def waitForAttestationRecord(node, blockNum, timeout=90):
+    """Poll a node's sysio.snaprecords table until the attestation for ``blockNum`` appears.
+
+    A snapshot is created first and attested afterwards, so the votesnaphash transaction
+    lands in a block *after* the snapshot height. A node that bootstraps from that snapshot
+    therefore does not have the attestation in its loaded state -- it must sync forward past
+    the attestation block before the record becomes visible.
+
+    A single ``waitForLibToAdvance`` only guarantees one finality round (a few blocks), which
+    can fall far short of the attestation block when bootstrapping from an older snapshot
+    while the chain head is already many blocks ahead. Poll for the record itself instead so
+    the wait tracks the actual condition under test rather than a proxy that races it.
+
+    Returns True once the record is found, False on timeout.
+    """
+    def recordPresent():
+        records = node.getTableRows("sysio", "sysio", "snaprecords")
+        return records is not None and any(r["value"]["block_num"] == blockNum for r in records)
+    return Utils.waitForBool(recordPresent, timeout=timeout, sleepTime=1)
+
 appArgs = AppArgs()
 args=TestHelper.parse_args({"--dump-error-details","--keep-logs","-v","--leave-running","--unshared"},
                             applicationSpecificArgs=appArgs)
@@ -420,15 +440,11 @@ try:
         chainArg=f"--delete-all-blocks --snapshot-endpoint {endpointUrl}")
     assert isRelaunchSuccess, "Failed to relaunch bootstrap node from snapshot endpoint"
 
-    Print("Wait for bootstrap node to sync")
-    assert bootstrapNode.waitForLibToAdvance(timeout=60), \
-        "LIB did not advance on bootstrap node"
-
-    # Verify attestation records accessible on bootstrap node
-    records = bootstrapNode.getTableRows("sysio", "sysio", "snaprecords")
-    assert records is not None, "Failed to read snaprecords on bootstrap node"
-    found = any(r["value"]["block_num"] == snap2BlockNum for r in records)
-    assert found, f"Attestation for block {snap2BlockNum} not found on bootstrap node"
+    # The attestation is in blocks after the snapshot height, so wait for the bootstrap
+    # node to sync forward until the record is visible (not just one LIB advance).
+    Print("Wait for bootstrap node to sync past the attestation block")
+    assert waitForAttestationRecord(bootstrapNode, snap2BlockNum), \
+        f"Attestation for block {snap2BlockNum} not found on bootstrap node"
 
     Print("Test 8 PASSED")
 
@@ -464,12 +480,12 @@ try:
         addSwapFlags={"--snapshot-endpoint": endpointUrlWithBlock})
     assert isRelaunchSuccess, "Failed to relaunch with specific block number"
 
-    assert bootstrapNode.waitForLibToAdvance(timeout=60), \
-        "LIB did not advance on bootstrap node with specific block"
-
-    records = bootstrapNode.getTableRows("sysio", "sysio", "snaprecords")
-    found = any(r["value"]["block_num"] == snapBlockNum for r in records)
-    assert found, f"First snapshot attestation not found after specific-block bootstrap"
+    # Bootstrapped from the FIRST (older) snapshot, so the attestation block is many
+    # blocks ahead of the loaded state -- a single LIB advance is not enough. Poll for
+    # the record until the node syncs forward to it.
+    Print("Wait for bootstrap node to sync past the attestation block")
+    assert waitForAttestationRecord(bootstrapNode, snapBlockNum), \
+        "First snapshot attestation not found after specific-block bootstrap"
 
     Print("Test 9 PASSED")
 
