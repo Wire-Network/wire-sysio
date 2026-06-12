@@ -2,12 +2,17 @@
 #include <sysio/testing/tester.hpp>
 #include <sysio/chain/unapplied_transaction_queue.hpp>
 #include <sysio/chain/contract_types.hpp>
+#include <sysio/chain/merkle.hpp>
 #include <sysio/chain/s_root_extension.hpp>
+#include <fc/variant_object.hpp>
 
+#include <test_contracts.hpp>
 
 using namespace sysio;
 using namespace sysio::chain;
 using namespace sysio::testing;
+
+using mvo = fc::mutable_variant_object;
 
 BOOST_AUTO_TEST_SUITE(test_s_root_extension)
 
@@ -110,6 +115,120 @@ BOOST_AUTO_TEST_CASE(something_to_report) {
       BOOST_CHECK_EQUAL(brian_block->block_num(), crtd_s_header_multiple.previous_block_num);
       BOOST_CHECK(checksum256_type() != crtd_s_header_multiple.current_s_id);
       BOOST_CHECK(checksum256_type() != crtd_s_header_multiple.current_s_root);
+   } FC_LOG_AND_RETHROW()
+}
+
+namespace {
+
+// Extract the s_header from a block that must carry exactly one s_root_extension.
+s_header extract_single_s_header(const signed_block_ptr& block) {
+   flat_multimap<uint16_t, block_header_extension> header_exts = block->validate_and_extract_header_extensions();
+   BOOST_REQUIRE_EQUAL(1u, header_exts.count(s_root_extension::extension_id()));
+   auto itr = std::find_if(header_exts.begin(), header_exts.end(),
+      [](const auto& ext) { return ext.first == s_root_extension::extension_id(); });
+   BOOST_REQUIRE(itr != header_exts.end());
+   return std::get<s_root_extension>(itr->second).s_header_data;
+}
+
+} // namespace
+
+// The S-root merkle commits to the set of transactions that touched a matched
+// contract, so a transaction must contribute exactly one leaf per (contract, root)
+// no matter how many of its action traces match. A transfer notifying `from` and
+// `to` via require_recipient yields three matching traces (receiver = contract,
+// from, to) that all share one transaction id; before the dedup fix each trace
+// produced its own identical leaf.
+BOOST_AUTO_TEST_CASE(notification_produces_single_leaf) {
+   try {
+      contract_action_matches matches;
+      matches.push_back(contract_action_match("s"_n, "sysio.token"_n, contract_action_match::match_type::exact));
+      matches[0].add_action("transfer"_n, contract_action_match::match_type::exact);
+      tester chain(matches);
+
+      chain.create_accounts({"sysio.token"_n, "alice"_n});
+      chain.set_code("sysio.token"_n, test_contracts::sysio_token_wasm());
+      chain.set_abi("sysio.token"_n, test_contracts::sysio_token_abi());
+      // the token contract bills the currency stats row to the issuer account
+      chain.set_privileged("sysio.token"_n);
+      chain.produce_block();
+
+      // create/issue do not match the configured (sysio.token, transfer) pair, and
+      // issuing to the issuer avoids the contract's inline transfer on issue.
+      chain.push_action("sysio.token"_n, "create"_n, "sysio.token"_n, mvo()
+         ("issuer", name(config::system_account_name))
+         ("maximum_supply", core_from_string("1000000.0000")));
+      chain.push_action("sysio.token"_n, "issue"_n, config::system_account_name, mvo()
+         ("to", name(config::system_account_name))
+         ("quantity", core_from_string("1000.0000"))
+         ("memo", ""));
+      chain.produce_block();
+
+      auto trace = chain.push_action("sysio.token"_n, "transfer"_n, config::system_account_name, mvo()
+         ("from", name(config::system_account_name))
+         ("to", "alice"_n)
+         ("quantity", core_from_string("1.0000"))
+         ("memo", ""));
+      auto block = chain.produce_block();
+
+      const s_header header = extract_single_s_header(block);
+      BOOST_CHECK_EQUAL("sysio.token"_n, header.contract_name);
+      const deque<digest_type> expected_leaves{trace->id};
+      BOOST_CHECK_EQUAL(calculate_merkle(expected_leaves), header.current_s_root);
+   } FC_LOG_AND_RETHROW()
+}
+
+// Two matching actions in one transaction must also collapse to a single leaf.
+BOOST_AUTO_TEST_CASE(repeated_matching_actions_produce_single_leaf) {
+   try {
+      contract_action_matches matches;
+      matches.push_back(contract_action_match("s"_n, config::system_account_name, contract_action_match::match_type::exact));
+      matches[0].add_action("newaccount"_n, contract_action_match::match_type::exact);
+      tester chain(matches);
+      chain.produce_block();
+
+      // sysio.-prefixed accounts skip the tester's setalimits/ROA companion actions,
+      // leaving a transaction with exactly two matching newaccount actions.
+      signed_transaction trx;
+      chain.set_transaction_headers(trx);
+      for (const auto& account : {"sysio.aaa"_n, "sysio.bbb"_n}) {
+         trx.actions.emplace_back(vector<permission_level>{{config::system_account_name, config::active_name}},
+                                  newaccount{
+                                     .creator = config::system_account_name,
+                                     .name    = account,
+                                     .owner   = authority(chain.get_public_key(account, "owner")),
+                                     .active  = authority(chain.get_public_key(account, "active"))
+                                  });
+      }
+      chain.set_transaction_headers(trx);
+      trx.sign(chain.get_private_key(config::system_account_name, "active"), chain.control->get_chain_id());
+      auto trace = chain.push_transaction(trx);
+      auto block = chain.produce_block();
+
+      const s_header header = extract_single_s_header(block);
+      BOOST_CHECK_EQUAL(config::system_account_name, header.contract_name);
+      const deque<digest_type> expected_leaves{trace->id};
+      BOOST_CHECK_EQUAL(calculate_merkle(expected_leaves), header.current_s_root);
+   } FC_LOG_AND_RETHROW()
+}
+
+// Distinct transactions must keep one leaf each, in application order — the
+// dedup must only collapse traces of the same transaction, never across
+// transactions.
+BOOST_AUTO_TEST_CASE(distinct_transactions_produce_one_leaf_each) {
+   try {
+      contract_action_matches matches;
+      matches.push_back(contract_action_match("s"_n, config::system_account_name, contract_action_match::match_type::exact));
+      matches[0].add_action("newaccount"_n, contract_action_match::match_type::exact);
+      tester chain(matches);
+      chain.produce_block();
+
+      auto trace1 = chain.create_account("carol"_n);
+      auto trace2 = chain.create_account("dave"_n);
+      auto block = chain.produce_block();
+
+      const s_header header = extract_single_s_header(block);
+      const deque<digest_type> expected_leaves{trace1->id, trace2->id};
+      BOOST_CHECK_EQUAL(calculate_merkle(expected_leaves), header.current_s_root);
    } FC_LOG_AND_RETHROW()
 }
 
