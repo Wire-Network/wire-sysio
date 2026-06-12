@@ -588,6 +588,51 @@ BOOST_FIXTURE_TEST_CASE( get_table_next_key_test, validating_tester ) try {
       BOOST_CHECK_EQUAL(result.rows[2].get_object()["value"].get_object()["sec64"].as_uint64(), 7u);
    }
 
+   // (sec-3b) numobjs bysec2 (uint128) with a `find` bound — exercises
+   //          be_key_codec::encode_field("uint128", ...) on the decimal-string
+   //          JSON spelling. This is the exact shape batch_operator_plugin uses
+   //          for the msgch byoutepoch composite key; before uint128 codec
+   //          support it asserted "Unsupported BE key type: uint128".
+   {
+      chain_apis::read_only::get_table_rows_params p;
+      p.json = true;
+      p.code = "test"_n;
+      p.scope = "test";
+      p.table = "numobjs";
+      p.index_name = "bysec2";
+      p.find = R"({"bysec2":"5"})";
+      auto result = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(result.rows.size(), 1u);
+      BOOST_CHECK_EQUAL(result.rows[0].get_object()["value"].get_object()["sec64"].as_uint64(), 5u);
+   }
+
+   // (sec-3c) numobjs bysec2 (uint128) pagination — next_key is produced by
+   //          be_key_codec::decode_field("uint128", ...) and fed back through
+   //          encode_field, covering the full decode/encode round-trip and the
+   //          BE ordering of the 16-byte key.
+   {
+      chain_apis::read_only::get_table_rows_params p;
+      p.json = true;
+      p.code = "test"_n;
+      p.scope = "test";
+      p.table = "numobjs";
+      p.index_name = "bysec2";
+      p.limit = 2;
+      auto page1 = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(page1.rows.size(), 2u);
+      BOOST_REQUIRE_EQUAL(page1.more, true);
+      BOOST_REQUIRE(!page1.next_key.empty());
+      BOOST_CHECK_EQUAL(page1.rows[0].get_object()["value"].get_object()["sec64"].as_uint64(), 2u);
+      BOOST_CHECK_EQUAL(page1.rows[1].get_object()["value"].get_object()["sec64"].as_uint64(), 5u);
+
+      p.lower_bound = page1.next_key;
+      p.limit       = 50;
+      auto page2 = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(page2.rows.size(), 1u);
+      BOOST_REQUIRE_EQUAL(page2.more, false);
+      BOOST_CHECK_EQUAL(page2.rows[0].get_object()["value"].get_object()["sec64"].as_uint64(), 7u);
+   }
+
    // (sec-4) hashobjs by name index "bysec1" (checksum256) — exercises the
    //         canonical-RecordType translation path that was the motivating
    //         abigen fix. All three rows must come back, ABI-decoded.
