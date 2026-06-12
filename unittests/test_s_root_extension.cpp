@@ -232,6 +232,74 @@ BOOST_AUTO_TEST_CASE(distinct_transactions_produce_one_leaf_each) {
    } FC_LOG_AND_RETHROW()
 }
 
+// A transaction that touches TWO watched (contract, root) pairs must contribute
+// one leaf to EACH pair's merkle — each contract's S-root commits to the set of
+// transactions that touched that contract. This pins why the dedup is a
+// per-bucket check rather than a per-transaction early-out: stopping at the
+// first matching trace (e.g. returning from process_action_traces after the
+// first record) would drop the transaction from every other matched contract's
+// root, making it unprovable against that contract.
+BOOST_AUTO_TEST_CASE(multi_contract_transaction_records_in_each_root) {
+   try {
+      contract_action_matches matches;
+      matches.push_back(contract_action_match("ra"_n, "tokena"_n, contract_action_match::match_type::exact));
+      matches[0].add_action("transfer"_n, contract_action_match::match_type::exact);
+      matches.push_back(contract_action_match("rb"_n, "tokenb"_n, contract_action_match::match_type::exact));
+      matches[1].add_action("transfer"_n, contract_action_match::match_type::exact);
+      tester chain(matches);
+
+      chain.create_accounts({"tokena"_n, "tokenb"_n, "alice"_n});
+      for (const auto& token : {"tokena"_n, "tokenb"_n}) {
+         chain.set_code(token, test_contracts::sysio_token_wasm());
+         chain.set_abi(token, test_contracts::sysio_token_abi());
+         // the token contract bills the currency stats row to the issuer account
+         chain.set_privileged(token);
+      }
+      chain.produce_block();
+
+      for (const auto& token : {"tokena"_n, "tokenb"_n}) {
+         chain.push_action(token, "create"_n, token, mvo()
+            ("issuer", name(config::system_account_name))
+            ("maximum_supply", core_from_string("1000000.0000")));
+         chain.push_action(token, "issue"_n, config::system_account_name, mvo()
+            ("to", name(config::system_account_name))
+            ("quantity", core_from_string("1000.0000"))
+            ("memo", ""));
+      }
+      chain.produce_block();
+
+      // ONE transaction carrying a matching transfer on each token contract.
+      signed_transaction trx;
+      for (const auto& token : {"tokena"_n, "tokenb"_n}) {
+         trx.actions.push_back(chain.get_action(token, "transfer"_n,
+            vector<permission_level>{{config::system_account_name, config::active_name}}, mvo()
+            ("from", name(config::system_account_name))
+            ("to", "alice"_n)
+            ("quantity", core_from_string("1.0000"))
+            ("memo", "")));
+      }
+      chain.set_transaction_headers(trx);
+      trx.sign(chain.get_private_key(config::system_account_name, "active"), chain.control->get_chain_id());
+      chain.push_transaction(trx);
+      auto block = chain.produce_block();
+
+      flat_multimap<uint16_t, block_header_extension> header_exts = block->validate_and_extract_header_extensions();
+      BOOST_REQUIRE_EQUAL(2u, header_exts.count(s_root_extension::extension_id()));
+      std::map<name, s_header> headers_by_contract;
+      for (const auto& ext : header_exts) {
+         if (ext.first != s_root_extension::extension_id())
+            continue;
+         const s_header header = std::get<s_root_extension>(ext.second).s_header_data;
+         headers_by_contract.emplace(header.contract_name, header);
+      }
+      BOOST_REQUIRE_EQUAL(2u, headers_by_contract.size());
+      const deque<digest_type> expected_leaves{trx.id()};
+      const auto expected_root = calculate_merkle(expected_leaves);
+      BOOST_CHECK_EQUAL(expected_root, headers_by_contract.at("tokena"_n).current_s_root);
+      BOOST_CHECK_EQUAL(expected_root, headers_by_contract.at("tokenb"_n).current_s_root);
+   } FC_LOG_AND_RETHROW()
+}
+
 // Direct unit tests for the validate_s_root_extensions_match helper extracted
 // from apply_block. Each test builds received/constructed extension vectors by
 // hand and verifies the helper accepts or rejects as expected.
