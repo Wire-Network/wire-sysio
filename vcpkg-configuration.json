@@ -10,8 +10,8 @@
     {
       "kind": "git",
       "repository": "https://github.com/wire-network/wire-vcpkg-registry",
-      "baseline": "23aa4018992d85602a4b5c30104a623e708b4b3e",
-      "reference": "23aa4018992d85602a4b5c30104a623e708b4b3e",
+      "baseline": "fcfa97213e4d965b58871a8325a9b5ef54259d12",
+      "reference": "fcfa97213e4d965b58871a8325a9b5ef54259d12",
       "packages": [
         "boost",
         "softfloat",
@@ -24,7 +24,10 @@
         "secp256k1-internal",
         "bn256",
         "bls12-381",
-        "wire-sys-vm"
+        "wire-sys-vm",
+        "aws-sdk-cpp",
+        "aws-c-cal",
+        "s2n"
       ]
     }
   ]
