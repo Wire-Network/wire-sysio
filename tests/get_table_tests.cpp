@@ -711,6 +711,34 @@ BOOST_FIXTURE_TEST_CASE( get_table_next_key_test, validating_tester ) try {
       BOOST_CHECK(inputs.count("thirdinput"));
    }
 
+   // (sec-9) numobjs bysec4 (float128 / long double) pagination — covers the
+   //         float128 leaf in the BE key codec: next_key carries the canonical
+   //         fc float128 spelling ("0x" + 16 LE hex bytes) produced by
+   //         decode_field and is fed back through encode_field as lower_bound.
+   //         secldouble mirrors sec64 (2, 5, 7) in the contract's add path.
+   {
+      chain_apis::read_only::get_table_rows_params p;
+      p.json = true;
+      p.code = "test"_n;
+      p.scope = "test";
+      p.table = "numobjs";
+      p.index_name = "bysec4";
+      p.limit = 2;
+      auto page1 = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(page1.rows.size(), 2u);
+      BOOST_REQUIRE_EQUAL(page1.more, true);
+      BOOST_REQUIRE(!page1.next_key.empty());
+      BOOST_CHECK_EQUAL(page1.rows[0].get_object()["value"].get_object()["sec64"].as_uint64(), 2u);
+      BOOST_CHECK_EQUAL(page1.rows[1].get_object()["value"].get_object()["sec64"].as_uint64(), 5u);
+
+      p.lower_bound = page1.next_key;
+      p.limit       = 50;
+      auto page2 = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(page2.rows.size(), 1u);
+      BOOST_REQUIRE_EQUAL(page2.more, false);
+      BOOST_CHECK_EQUAL(page2.rows[0].get_object()["value"].get_object()["sec64"].as_uint64(), 7u);
+   }
+
    // (sec-5) Invalid index name on multi_index — should throw, not silently
    //         return primary rows.
    {
