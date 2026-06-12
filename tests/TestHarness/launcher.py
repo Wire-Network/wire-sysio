@@ -16,6 +16,10 @@ from .accounts import createAccountKeys
 
 block_dir = 'blocks'
 
+def _is_command_option(token):
+    """Return whether a command-line token is an option name rather than an option value."""
+    return token.startswith('--')
+
 class EnhancedEncoder(json.JSONEncoder):
     def default(self, o):
         if is_dataclass(o):
@@ -575,7 +579,7 @@ class cluster_generator:
                 if '-' in arg and arg not in repeatable:
                     if arg in sysdcmd:
                         i = sysdcmd.index(arg)
-                        if sysdcmd[i+1] != '-':
+                        if i + 1 < len(sysdcmd) and not _is_command_option(sysdcmd[i+1]):
                             sysdcmd.pop(i+1)
                         sysdcmd.pop(i)
             sysdcmd.extend(specificList)
