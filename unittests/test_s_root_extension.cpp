@@ -1,6 +1,7 @@
 #include <boost/test/unit_test.hpp>
 #include <sysio/testing/tester.hpp>
 #include <sysio/chain/unapplied_transaction_queue.hpp>
+#include <sysio/chain/contract_root_object.hpp>
 #include <sysio/chain/contract_types.hpp>
 #include <sysio/chain/merkle.hpp>
 #include <sysio/chain/s_root_extension.hpp>
@@ -229,6 +230,62 @@ BOOST_AUTO_TEST_CASE(distinct_transactions_produce_one_leaf_each) {
       const s_header header = extract_single_s_header(block);
       const deque<digest_type> expected_leaves{trace1->id, trace2->id};
       BOOST_CHECK_EQUAL(calculate_merkle(expected_leaves), header.current_s_root);
+   } FC_LOG_AND_RETHROW()
+}
+
+// contract_root_object ids must be assigned in (contract, root) order when
+// several (contract, root) pairs first appear in the same block. Object ids
+// feed chainbase state (snapshot row order, integrity hash), so id assignment
+// must not depend on the standard library's unordered_map iteration order.
+// The block itself is unaffected either way (the by_block_num index orders the
+// s_headers), which is why this test inspects the database ids directly.
+BOOST_AUTO_TEST_CASE(deterministic_contract_root_id_assignment) {
+   try {
+      contract_action_matches matches;
+      matches.push_back(contract_action_match("ra"_n, "tokena"_n, contract_action_match::match_type::exact));
+      matches[0].add_action("transfer"_n, contract_action_match::match_type::exact);
+      matches.push_back(contract_action_match("rb"_n, "tokenb"_n, contract_action_match::match_type::exact));
+      matches[1].add_action("transfer"_n, contract_action_match::match_type::exact);
+      tester chain(matches);
+
+      chain.create_accounts({"tokena"_n, "tokenb"_n, "alice"_n});
+      for (const auto& token : {"tokena"_n, "tokenb"_n}) {
+         chain.set_code(token, test_contracts::sysio_token_wasm());
+         chain.set_abi(token, test_contracts::sysio_token_abi());
+         // the token contract bills the currency stats row to the issuer account
+         chain.set_privileged(token);
+      }
+      chain.produce_block();
+
+      for (const auto& token : {"tokena"_n, "tokenb"_n}) {
+         chain.push_action(token, "create"_n, token, mvo()
+            ("issuer", name(config::system_account_name))
+            ("maximum_supply", core_from_string("1000000.0000")));
+         chain.push_action(token, "issue"_n, config::system_account_name, mvo()
+            ("to", name(config::system_account_name))
+            ("quantity", core_from_string("1000.0000"))
+            ("memo", ""));
+      }
+      chain.produce_block();
+
+      // Both (contract, root) pairs first appear in this block, exercising the
+      // multi-create path of block_root_processor::calculate_root_blocks.
+      for (const auto& token : {"tokena"_n, "tokenb"_n}) {
+         chain.push_action(token, "transfer"_n, config::system_account_name, mvo()
+            ("from", name(config::system_account_name))
+            ("to", "alice"_n)
+            ("quantity", core_from_string("1.0000"))
+            ("memo", ""));
+      }
+      chain.produce_block();
+
+      const auto& idx = chain.control->db().get_index<contract_root_multi_index, by_contract>();
+      auto itr_a = idx.find(boost::make_tuple("tokena"_n, "ra"_n));
+      auto itr_b = idx.find(boost::make_tuple("tokenb"_n, "rb"_n));
+      BOOST_REQUIRE(itr_a != idx.end());
+      BOOST_REQUIRE(itr_b != idx.end());
+      // ("tokena", "ra") < ("tokenb", "rb"), so its object id must be assigned first.
+      BOOST_CHECK(itr_a->id < itr_b->id);
    } FC_LOG_AND_RETHROW()
 }
 
