@@ -106,6 +106,13 @@ BOOST_AUTO_TEST_CASE( oc_interrupt_preserves_dedup_record ) { try {
       // identical behavior, distinct code hash, so this attempt compiles -- and can interrupt --
       // afresh. (A code hash that is already compiled executes directly under oc and can never
       // exercise the interrupt path again.)
+      //
+      // The custom section deliberately has a zero-length payload after the name. That is legal
+      // wasm, and the oc compile child deserializes it through wasm-jit's
+      // serializeBytes(InputStream&,...), which must tolerate an empty (null-data) byte range --
+      // under the ubsan CI build (-fno-sanitize-recover) a regression there kills the compile
+      // child, the compile reports unknownfailure, and this test fails its fired-interrupt
+      // requirement. Keep the payload empty so that coverage is exercised every run.
       std::vector<uint8_t> wasm = base_wasm;
       const uint8_t custom_section[] = { 0x00, 0x02, 0x01, static_cast<uint8_t>('A' + attempt) };
       wasm.insert( wasm.end(), std::begin(custom_section), std::end(custom_section) );
@@ -159,6 +166,92 @@ BOOST_AUTO_TEST_CASE( oc_interrupt_preserves_dedup_record ) { try {
 
    // Must still be deduplicated. Without the fix, the interrupt's reset() dropped the record.
    BOOST_CHECK( t.control->is_known_unexpired_transaction( interrupted_trx_id ) );
+#endif
+} FC_LOG_AND_RETHROW() }
+
+// A FAILED oc compile must not interrupt the executing transaction: there is no oc code to
+// switch to, so the interrupt would only force a pointless restart on the baseline runtime --
+// and worse. For a whitelisted account get_descriptor_for_code() un-blacklists the code and
+// queues a fresh compile on the restart, so a persistently failing compile interrupts the
+// restarted transaction again, exceeding the single interrupt-retry transaction_context::exec()
+// allows; the transaction then fails with interrupt_oc_exception, which on a node applying a
+// block means rejecting a valid block. (This is exactly how the ubsan CI failed before
+// wasm-jit's serializeBytes tolerated empty user-section payloads: the sanitizer killed the
+// compile child, the monitor reported unknownfailure, and the interrupt still fired.)
+//
+// Force a deterministic compile failure via the subjective generated-code size limit (enforced
+// only for non-whitelisted accounts; payloadless generates far more than 1 KiB of native code,
+// see sysvmoc_limits_tests/generated_code_size_limit) and run an action that spins until the
+// deadline. The compile failure lands mid-execution; before the fix it fired the interrupt
+// (observable as the interrupt count incrementing), with the fix the count must stay unchanged.
+BOOST_AUTO_TEST_CASE( oc_compile_failure_does_not_interrupt ) { try {
+#ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED
+   fc::temp_directory tempdir;
+   constexpr bool use_genesis = true;
+   savanna_validating_tester t(
+      tempdir,
+      [&](controller::config& cfg) {
+         if (cfg.wasm_runtime != wasm_interface::vm_type::sys_vm_oc)
+            cfg.sysvmoc_tierup = chain::wasm_interface::vm_oc_enable::oc_all; // tier up non-whitelisted accounts too
+         // libtester resets all subjective compile limits; re-enable only the generated code
+         // size limit, small enough that compiling payloadless always fails.
+         cfg.sysvmoc_config.non_whitelisted_limits.cpu_limit.reset();
+         cfg.sysvmoc_config.non_whitelisted_limits.vm_limit.reset();
+         cfg.sysvmoc_config.non_whitelisted_limits.stack_size_limit.reset();
+         cfg.sysvmoc_config.non_whitelisted_limits.generated_code_size_limit = 1024;
+      },
+      use_genesis
+   );
+   if( t.get_config().wasm_runtime == wasm_interface::vm_type::sys_vm_oc ) {
+      // With sys-vm-oc as the base runtime the compile is synchronous and its failure surfaces
+      // as wasm_execution_error (covered by sysvmoc_limits_tests); there is no interrupt path.
+      return;
+   }
+   t.execute_setup_policy( setup_policy::full );
+   t.produce_block();
+
+   t.create_account( "payloadless"_n );
+   t.set_code( "payloadless"_n, test_contracts::payloadless_wasm() );
+   t.set_abi( "payloadless"_n, test_contracts::payloadless_abi() );
+   t.produce_block();
+
+   const auto pre_count = t.control->get_wasm_interface().get_sys_vm_oc_compile_interrupt_count();
+
+   // doitforever spins until the block deadline below stops it; the failed compile result
+   // arrives well within that window. Explicit cpu billing takes the applying-block path where
+   // the oc interrupt is allowed.
+   signed_transaction trx;
+   action act;
+   act.account = "payloadless"_n;
+   act.name = "doitforever"_n;
+   act.authorization = vector<permission_level>{{"payloadless"_n, config::active_name}};
+   trx.actions.push_back( act );
+   t.set_transaction_headers( trx );
+   trx.sign( t.get_private_key( "payloadless"_n, "active" ), t.get_chain_id() );
+   const auto total_actions = trx.total_actions();
+
+   auto ptrx = std::make_shared<packed_transaction>( std::move(trx) );
+   auto fut = transaction_metadata::start_recover_keys( std::move(ptrx), t.control->get_thread_pool(),
+                                                        t.get_chain_id(), fc::microseconds::maximum(),
+                                                        transaction_metadata::trx_type::input );
+   auto trx_meta = fut.get();
+   cpu_usage_t billed_cpu_us;
+   billed_cpu_us.insert( billed_cpu_us.end(), total_actions, 1000u );
+
+   BOOST_CHECK_THROW(
+      ([&]() {
+         auto res = t.control->test_push_transaction( trx_meta, fc::time_point::now() + fc::seconds(8),
+                                                      fc::seconds(60), billed_cpu_us, /*explicit_bill*/ true );
+         if( res->except_ptr ) std::rethrow_exception( res->except_ptr );
+         if( res->except ) throw *res->except;
+      })(),
+      deadline_exception );
+
+   const auto post_count = t.control->get_wasm_interface().get_sys_vm_oc_compile_interrupt_count();
+   BOOST_TEST( post_count == pre_count );
+
+   t.produce_block();
+   BOOST_REQUIRE_EQUAL( t.validate(), true );
 #endif
 } FC_LOG_AND_RETHROW() }
 

@@ -80,7 +80,15 @@ void code_cache_async::wait_on_compile_monitor_message() {
       [[maybe_unused]] const bool p = _result_queue.push(msg);
       assert(p);
 
-      _compile_complete_func(_ctx, msg.code.code_id, msg.queued_time);
+      // Only notify (and thereby possibly interrupt a currently executing transaction) when the
+      // compile actually produced code to switch to. A failed compile must not interrupt: there is
+      // nothing to tier-up to, so the transaction would just be redone on the baseline runtime. Worse,
+      // for a whitelisted account get_descriptor_for_code() un-blacklists the code and queues a fresh
+      // compile, so a persistently failing compile would interrupt the restarted transaction again,
+      // exceeding the single interrupt-retry transaction_context::exec() allows and failing the
+      // transaction -- on a validating node that means rejecting a perfectly valid block.
+      if (std::holds_alternative<code_descriptor>(msg.result))
+         _compile_complete_func(_ctx, msg.code.code_id, msg.queued_time);
 
       process_queued_compiles();
 
