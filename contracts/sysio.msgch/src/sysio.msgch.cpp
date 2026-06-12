@@ -683,9 +683,8 @@ void dispatch_attestation(name self, uint64_t attestation_id,
 
       case AttestationType::ATTESTATION_TYPE_CHALLENGE_REQUEST:
       case AttestationType::ATTESTATION_TYPE_CHALLENGE_RESPONSE:
-         // Routed to sysio.chalg in Task 6 (the manual-msig flow has a
-         // different entry point — `initchal` / `submitres` — than the
-         // dispatch shape here).
+         // No depot-side handler. Envelope disputes are resolved on the WIRE side by evalcons
+         // opening a sysio.chalg dispute vote, not by inbound challenge attestations.
          break;
 
       case AttestationType::ATTESTATION_TYPE_STAKE:
