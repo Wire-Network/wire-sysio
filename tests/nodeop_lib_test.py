@@ -62,8 +62,7 @@ try:
     if localTest and not dontLaunch:
         Print("Stand up cluster")
 
-        abs_path = os.path.abspath(os.getcwd() + '/contracts/sysio.token/sysio.token.abi')
-        traceNodeopArgs=" --http-max-response-time-ms 990000 --trace-rpc-abi sysio.token=" + abs_path
+        traceNodeopArgs=" --http-max-response-time-ms 990000"
         extraNodeopArgs=traceNodeopArgs + " --plugin sysio::prometheus_plugin --database-map-mode mapped_private "
         specificNodeopInstances={0: "bin/nodeop"}
         if cluster.launch(totalNodes=total_nodes, pnodes=pnodes, topo=topo, prodCount=prodCount, activateIF=activateIF, onlyBios=onlyBios, dontBootstrap=dontBootstrap, extraNodeopArgs=extraNodeopArgs, specificNodeopInstances=specificNodeopInstances) is False:
@@ -290,8 +289,8 @@ try:
     amountVal=None
     key=""
     try:
-        key = "[actions][0][action]"
-        typeVal = transaction["actions"][0]["action"]
+        key = "[actions][0][name]"
+        typeVal = transaction["actions"][0]["name"]
         key = "[actions][0][params][quantity]"
         amountVal = transaction["actions"][0]["params"]["quantity"]
         amountVal = int(decimal.Decimal(amountVal.split()[0]) * 10000)

@@ -53,26 +53,7 @@ namespace fc {
 
     logger& logger::set_log_level(log_level ll) {
        my->_level = ll;
-       switch (ll) {
-       case fc::log_level::values::all:
-          my->_agent_logger->set_level(spdlog::level::trace);
-          break;
-       case fc::log_level::values::debug:
-          my->_agent_logger->set_level(spdlog::level::debug);
-          break;
-       case fc::log_level::values::info:
-          my->_agent_logger->set_level(spdlog::level::info);
-          break;
-       case fc::log_level::values::warn:
-          my->_agent_logger->set_level(spdlog::level::warn);
-          break;
-       case fc::log_level::values::error:
-          my->_agent_logger->set_level(spdlog::level::err);
-          break;
-       case fc::log_level::values::off:
-          my->_agent_logger->set_level(spdlog::level::off);
-          break;
-       }
+       my->_agent_logger->set_level(to_spdlog_level(ll));
        return *this;
     }
 

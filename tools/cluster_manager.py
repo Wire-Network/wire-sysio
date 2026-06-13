@@ -254,7 +254,6 @@ def _create_cluster(
         " --contracts-console"
         " --plugin sysio::producer_api_plugin"
         " --plugin sysio::trace_api_plugin"
-        " --trace-no-abis"
         " --http-max-response-time-ms 990000"
     )
     args_arr.extend(["--nodeop", nodeop_args])
