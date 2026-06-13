@@ -123,8 +123,15 @@ try:
         }),
         f"--permission {producerA}@active")
     assert success, f"Failed to register producer {producerA}: {trans}"
+    regProducerTransId = node0.getTransId(trans)
 
-    assert node0.waitForHeadToAdvance(), "Head did not advance after regproducer"
+    # Wait for regproducer to be in a block before setrank reads the on-chain
+    # producers table. waitForHeadToAdvance() does not guarantee this specific
+    # transaction was applied -- with multiple producers a transaction pushed to
+    # node0 can be forwarded into a peer's block -- which would make setrank fail
+    # with "producer not found".
+    assert node0.waitForTransactionInBlock(regProducerTransId, timeout=60), \
+        "regproducer transaction did not make it into a block before setrank"
 
     success, trans = node0.pushMessage("sysio", "setrank",
         json.dumps({"producer": producerA, "rank": 1}),
@@ -137,14 +144,19 @@ try:
         json.dumps({"producer": producerA, "snap_account": snapProv1.name}),
         f"--permission {producerA}@active")
     assert success, f"Failed to register snapshot provider: {trans}"
+    regSnapProvTransId = node0.getTransId(trans)
 
     # Set attestation config: min_providers=1, threshold_pct=50 (single vote = quorum)
     success, trans = node0.pushMessage("sysio", "setsnpcfg",
         json.dumps({"min_providers": 1, "threshold_pct": 50}),
         "--permission sysio@active")
     assert success, f"Failed to set snapshot config: {trans}"
+    setCfgTransId = node0.getTransId(trans)
 
-    assert node0.waitForHeadToAdvance(), "Head did not advance after config"
+    # Ensure provider registration and config are applied in a block before the
+    # snapshot/attestation flow below depends on them.
+    assert node0.waitForTransactionsInBlock([regSnapProvTransId, setCfgTransId], timeout=60), \
+        "regsnapprov/setsnpcfg transactions did not make it into a block"
 
     # ===================================================================
     # Snapshot API endpoint tests
