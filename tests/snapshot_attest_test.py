@@ -85,6 +85,7 @@ try:
         walletMgr.importKey(account, ignWallet, ignoreDupKeyWarning=True)
 
     # Register producers via regproducer (required before setrank)
+    regProducerTransIds = []
     for name in [producerA, producerB]:
         account = cluster.defProducerAccounts[name]
         success, trans = node0.pushMessage("sysio", "regproducer",
@@ -96,9 +97,18 @@ try:
             }),
             f"--permission {name}@active")
         assert success, f"Failed to register producer {name}: {trans}"
+        regProducerTransIds.append(node0.getTransId(trans))
         Print(f"Registered producer {name}")
 
-    assert node0.waitForHeadToAdvance(), "Head did not advance after regproducer"
+    # setrank reads the on-chain producers table and asserts "producer not found"
+    # if a registration is missing. pushMessage only confirms speculative
+    # execution, and waitForHeadToAdvance() does not guarantee these specific
+    # transactions were applied — with multiple producers a transaction pushed
+    # to node0 can be forwarded into a peer's block. Wait for both regproducer
+    # transactions to appear in a block so setrank speculatively executes
+    # against state that already contains the registrations.
+    assert node0.waitForTransactionsInBlock(regProducerTransIds, timeout=60), \
+        "regproducer transactions did not make it into a block before setrank"
 
     Print(f"Set rank for {producerA}")
     success, trans = node0.pushMessage("sysio", "setrank",
@@ -117,17 +127,20 @@ try:
     # ---------------------------------------------------------------
     # Register snapshot providers
     # ---------------------------------------------------------------
+    regSnapProvTransIds = []
     Print(f"Register snapshot provider {snapProv1.name} for {producerA}")
     success, trans = node0.pushMessage("sysio", "regsnapprov",
         json.dumps({"producer": producerA, "snap_account": snapProv1.name}),
         f"--permission {producerA}@active")
     assert success, f"Failed to register snapshot provider: {trans}"
+    regSnapProvTransIds.append(node0.getTransId(trans))
 
     Print(f"Register snapshot provider {snapProv2.name} for {producerB}")
     success, trans = node0.pushMessage("sysio", "regsnapprov",
         json.dumps({"producer": producerB, "snap_account": snapProv2.name}),
         f"--permission {producerB}@active")
     assert success, f"Failed to register snapshot provider: {trans}"
+    regSnapProvTransIds.append(node0.getTransId(trans))
 
     # ---------------------------------------------------------------
     # Set attestation config: min_providers=1, threshold_pct=50
@@ -145,6 +158,10 @@ try:
     # ---------------------------------------------------------------
     # Verify provider registration via table query
     # ---------------------------------------------------------------
+    # Ensure both regsnapprov registrations are in a block before reading the
+    # table, so the exact-count assertion below cannot race the registrations.
+    assert node0.waitForTransactionsInBlock(regSnapProvTransIds, timeout=60), \
+        "regsnapprov transactions did not make it into a block"
     Print("Verify snapshot providers registered")
     providers = node0.getTableRows("sysio", "sysio", "snapprovs")
     assert providers is not None, "Failed to read snapprovs table"
