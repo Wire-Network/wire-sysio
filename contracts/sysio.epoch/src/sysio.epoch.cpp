@@ -285,6 +285,11 @@ void epoch::advance() {
    const uint32_t target_epoch = state.current_epoch_index + 1;
    const auto gate = check_emissions_ready(cfg.epoch_duration_sec, target_epoch);
    if (!gate.ready) {
+      // OPP silent-return diagnostic: the epoch silently does NOT advance when the
+      // emissions gate is not ready. Also recorded to blocklog + EmissionsBlocked,
+      // but a console line makes "epoch stuck, no advance" greppable in cluster logs.
+      sysio::print_f("epoch::advance: epoch %u NOT advanced -- emissions gate not ready; retries on next chkcons\n",
+                     target_epoch);
       record_gate_block(get_self(), target_epoch, gate);
       return;
    }
