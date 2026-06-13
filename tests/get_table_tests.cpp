@@ -452,6 +452,11 @@ BOOST_FIXTURE_TEST_CASE( get_table_next_key_test, validating_tester ) try {
    push_action("test"_n, "addhashobj"_n, "test"_n, mutable_variant_object()("hashinput", "firstinput"));
    push_action("test"_n, "addhashobj"_n, "test"_n, mutable_variant_object()("hashinput", "secondinput"));
    push_action("test"_n, "addhashobj"_n, "test"_n, mutable_variant_object()("hashinput", "thirdinput"));
+   // structobjs: kv::table keyed by the reflected struct slug_name{value} — the
+   // sysio.chains `chains` key shape. Drives the struct-key path in (sec-10).
+   push_action("test"_n, "addstruct"_n, "test"_n, mutable_variant_object()("code", 10)("payload", 100));
+   push_action("test"_n, "addstruct"_n, "test"_n, mutable_variant_object()("code", 20)("payload", 200));
+   push_action("test"_n, "addstruct"_n, "test"_n, mutable_variant_object()("code", 30)("payload", 300));
    produce_block();
 
    // The result of the init will populate
@@ -709,6 +714,85 @@ BOOST_FIXTURE_TEST_CASE( get_table_next_key_test, validating_tester ) try {
       BOOST_CHECK(inputs.count("firstinput"));
       BOOST_CHECK(inputs.count("secondinput"));
       BOOST_CHECK(inputs.count("thirdinput"));
+   }
+
+   // (sec-9) numobjs bysec4 (float128 / long double) pagination — covers the
+   //         float128 leaf in the BE key codec: next_key carries the canonical
+   //         fc float128 spelling ("0x" + 16 LE hex bytes) produced by
+   //         decode_field and is fed back through encode_field as lower_bound.
+   //         secldouble mirrors sec64 (2, 5, 7) in the contract's add path.
+   {
+      chain_apis::read_only::get_table_rows_params p;
+      p.json = true;
+      p.code = "test"_n;
+      p.scope = "test";
+      p.table = "numobjs";
+      p.index_name = "bysec4";
+      p.limit = 2;
+      auto page1 = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(page1.rows.size(), 2u);
+      BOOST_REQUIRE_EQUAL(page1.more, true);
+      BOOST_REQUIRE(!page1.next_key.empty());
+      BOOST_CHECK_EQUAL(page1.rows[0].get_object()["value"].get_object()["sec64"].as_uint64(), 2u);
+      BOOST_CHECK_EQUAL(page1.rows[1].get_object()["value"].get_object()["sec64"].as_uint64(), 5u);
+
+      p.lower_bound = page1.next_key;
+      p.limit       = 50;
+      auto page2 = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(page2.rows.size(), 1u);
+      BOOST_REQUIRE_EQUAL(page2.more, false);
+      BOOST_CHECK_EQUAL(page2.rows[0].get_object()["value"].get_object()["sec64"].as_uint64(), 7u);
+   }
+
+   // (sec-10) structobjs primary key — kv::table keyed by the reflected struct
+   //          `slug_name { value: uint64 }`, the exact key shape of the v6
+   //          registry tables (sysio.chains `chains`, key_types ["slug_name"]).
+   //          Exercises the ABI-aware BE key codec's struct-key expansion on the
+   //          live get_table_rows path: a JSON bound of the documented nested
+   //          `{ "code": { "value": N } }` form (encode_key), and a `next_key`
+   //          pagination cursor that round-trips that same nested shape
+   //          (decode_key -> next_key -> encode_key). Before the codec became
+   //          ABI-aware, any JSON bound here asserted
+   //          "Unsupported BE key type: slug_name".
+   {
+      // (a) JSON bound of the documented nested struct shape filters inclusively.
+      chain_apis::read_only::get_table_rows_params p;
+      p.json  = true;
+      p.code  = "test"_n;
+      p.scope = "test";
+      p.table = "structobjs";
+      p.lower_bound = R"({"code":{"value":20}})";
+      auto bounded = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(bounded.rows.size(), 2u); // codes 20, 30
+      BOOST_CHECK_EQUAL(bounded.rows[0].get_object()["value"].get_object()["code"].get_object()["value"].as_uint64(), 20u);
+      BOOST_CHECK_EQUAL(bounded.rows[0].get_object()["value"].get_object()["payload"].as_uint64(), 200u);
+      BOOST_CHECK_EQUAL(bounded.rows[1].get_object()["value"].get_object()["code"].get_object()["value"].as_uint64(), 30u);
+
+      // (b) Pagination: limit=2 yields codes 10,20 plus a next_key that carries
+      //     the nested struct shape; feeding it back returns the final row (30).
+      p.lower_bound.clear();
+      p.limit = 2;
+      auto page1 = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(page1.rows.size(), 2u);
+      BOOST_REQUIRE_EQUAL(page1.more, true);
+      BOOST_REQUIRE(!page1.next_key.empty());
+      BOOST_CHECK_EQUAL(page1.rows[0].get_object()["value"].get_object()["code"].get_object()["value"].as_uint64(), 10u);
+      BOOST_CHECK_EQUAL(page1.rows[1].get_object()["value"].get_object()["code"].get_object()["value"].as_uint64(), 20u);
+
+      // next_key must be the documented nested object, not a flat scalar or hex
+      // fallback. Accessing the nested path throws (failing the test) if the
+      // codec emitted the wrong shape.
+      auto nk = fc::json::from_string(page1.next_key);
+      BOOST_REQUIRE(nk.is_object());
+      BOOST_CHECK_NO_THROW(nk.get_object()["code"].get_object()["value"].as_uint64());
+
+      p.lower_bound = page1.next_key;
+      p.limit       = 50;
+      auto page2 = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(page2.rows.size(), 1u);
+      BOOST_REQUIRE_EQUAL(page2.more, false);
+      BOOST_CHECK_EQUAL(page2.rows[0].get_object()["value"].get_object()["code"].get_object()["value"].as_uint64(), 30u);
+      BOOST_CHECK_EQUAL(page2.rows[0].get_object()["value"].get_object()["payload"].as_uint64(), 300u);
    }
 
    // (sec-5) Invalid index name on multi_index — should throw, not silently

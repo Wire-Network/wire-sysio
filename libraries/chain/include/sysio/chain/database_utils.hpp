@@ -1,6 +1,7 @@
 #pragma once
 
 #include <sysio/chain/types.hpp>
+#include <sysio/chain/abi_def.hpp>
 #include <fc/int128.hpp>
 #include <fc/io/raw.hpp>
 #include <fc/crypto/base64.hpp>
@@ -150,6 +151,16 @@ namespace detail {
 // Supports: uint8, int8, uint16, int16, uint32, int32, uint64, int64,
 //           name, bool, string, float64/double.
 // ---------------------------------------------------------------------------
+// Forward declarations: the fc float128_t variant conversions are defined at
+// the bottom of this header; the BE key codec below uses them.
+} // namespace sysio::chain
+namespace fc {
+   class variant;
+   inline void to_variant( const float128_t& f, variant& v );
+   inline void from_variant( const variant& v, float128_t& f );
+} // namespace fc
+namespace sysio::chain {
+
 namespace be_key_codec {
 
 struct reader {
@@ -295,6 +306,21 @@ inline fc::variant decode_field(reader& r, const std::string& type) {
       double v; memcpy(&v, &bits, 8);
       return fc::variant(v);
    }
+   if (type == "float128" || type == "long double") {
+      // Same IEEE sort-order trick as float32/64 at 128 bits — mirrors CDT's
+      // kv_multi_index encode_secondary(long double). Spelling is fc's
+      // canonical float128_t form ("0x" + 16 LE hex bytes).
+      const uint64_t hi_enc = r.read_be64();
+      const uint64_t lo_enc = r.read_be64();
+      fc::uint128 bits = fc::to_uint128(hi_enc, lo_enc);
+      if (bits >> 127) bits ^= (fc::uint128(1) << 127);
+      else             bits = ~bits;
+      float128_t v;
+      memcpy(&v, &bits, sizeof(v)); // little-endian platform assumption, as elsewhere in this file
+      fc::variant out;
+      fc::to_variant(v, out);
+      return out;
+   }
    FC_ASSERT(false, "Unsupported BE key type: {}", type);
 }
 
@@ -347,32 +373,134 @@ inline void encode_field(writer& w, const std::string& type, const fc::variant& 
       else            bits ^= (uint64_t(1) << 63);
       w.write_be64(bits); return;
    }
+   if (type == "float128" || type == "long double") {
+      float128_t f;
+      fc::from_variant(val, f);
+      fc::uint128 bits;
+      memcpy(&bits, &f, sizeof(bits)); // little-endian platform assumption, as elsewhere in this file
+      if (bits >> 127) bits = ~bits;
+      else             bits ^= (fc::uint128(1) << 127);
+      w.write_be64(static_cast<uint64_t>(bits >> 64));
+      w.write_be64(static_cast<uint64_t>(bits));
+      return;
+   }
    FC_ASSERT(false, "Unsupported BE key type: {}", type);
 }
 
-inline fc::variant decode_key(const char* data, size_t size,
-                              const vector<std::string>& key_names,
-                              const vector<std::string>& key_types) {
+// ── ABI-aware key shapes ────────────────────────────────────────────────────
+// kv/multi_index keys are not limited to the builtin leaf types above: CDT's
+// to_key reflects through typedefs and struct key types — e.g. `slug_name`
+// (struct { value: uint64 }) is the primary key of the v6 registry tables
+// (sysio.chains chains, sysio.tokens tokens/chaintokens, sysio.reserv
+// reserves). A key_shape is the resolved encode/decode plan for one key
+// field: a leaf with a codec-supported type, or a struct node whose children
+// encode in declaration order (matching to_key's reflected-field walk).
+
+/// Whether `type` (already typedef-resolved) is handled directly by
+/// encode_field / decode_field. Keep in lock-step with the branch lists above.
+inline bool leaf_key_type_supported(const std::string& t) {
+   return t == "uint8"   || t == "int8"   || t == "uint16"  || t == "int16"  ||
+          t == "uint32"  || t == "int32"  || t == "uint64"  || t == "int64"  ||
+          t == "uint128" || t == "int128" || t == "checksum256" ||
+          t == "name"    || t == "bool"   || t == "string"  ||
+          t == "float32" || t == "float"  || t == "float64" || t == "double" ||
+          t == "float128" || t == "long double";
+}
+
+/// Canonicalize abigen template spellings and chase ABI typedefs to a
+/// fixpoint (bounded by the typedef count, so alias cycles cannot loop).
+inline std::string resolve_key_type(const abi_def& abi, std::string type) {
+   for (size_t hops = 0; hops <= abi.types.size(); ++hops) {
+      if (type == "fixed_bytes<32>") { type = "checksum256"; continue; }
+      auto it = std::find_if(abi.types.begin(), abi.types.end(),
+                             [&](const type_def& td) { return td.new_type_name == type; });
+      if (it == abi.types.end()) break;
+      type = it->type;
+   }
+   return type;
+}
+
+/// Resolved encode/decode plan for one key field.
+struct key_shape {
+   std::string            name;     ///< field name (bound-object key / decoded-object key)
+   std::string            type;     ///< resolved type — leaf codec type, or struct name for nodes
+   std::vector<key_shape> children; ///< struct field shapes in declaration (encode) order
+
+   bool is_leaf() const { return children.empty(); }
+};
+
+/// Build the shape for one declared key field, expanding struct key types
+/// through the ABI. Struct bases are rejected (CDT's reflected to_key walks
+/// only the declared fields, so a based key struct has no defined order here).
+inline key_shape build_key_shape(const abi_def& abi, const std::string& field_name,
+                                 const std::string& declared_type, size_t depth = 0) {
+   FC_ASSERT(depth <= 8, "BE key struct nesting too deep at field '{}'", field_name);
+   key_shape shape;
+   shape.name = field_name;
+   shape.type = resolve_key_type(abi, declared_type);
+   if (leaf_key_type_supported(shape.type))
+      return shape;
+   auto it = std::find_if(abi.structs.begin(), abi.structs.end(),
+                          [&](const struct_def& sd) { return sd.name == shape.type; });
+   FC_ASSERT(it != abi.structs.end(), "Unsupported BE key type: {}", shape.type);
+   FC_ASSERT(it->base.empty(), "BE key struct '{}' with a base is not supported", shape.type);
+   shape.children.reserve(it->fields.size());
+   for (const auto& f : it->fields)
+      shape.children.push_back(build_key_shape(abi, f.name, f.type, depth + 1));
+   return shape;
+}
+
+/// Build shapes for a table's full key field list (ABI key_names/key_types).
+inline std::vector<key_shape> build_key_shapes(const abi_def& abi,
+                                               const vector<std::string>& key_names,
+                                               const vector<std::string>& key_types) {
    FC_ASSERT(key_names.size() == key_types.size(), "ABI key_names/key_types size mismatch");
+   std::vector<key_shape> shapes;
+   shapes.reserve(key_names.size());
+   for (size_t i = 0; i < key_names.size(); ++i)
+      shapes.push_back(build_key_shape(abi, key_names[i], key_types[i]));
+   return shapes;
+}
+
+inline void encode_shape(writer& w, const key_shape& shape, const fc::variant& val) {
+   if (shape.is_leaf()) {
+      encode_field(w, shape.type, val);
+      return;
+   }
+   const auto& obj = val.get_object();
+   for (const auto& child : shape.children) {
+      auto it = obj.find(child.name);
+      FC_ASSERT(it != obj.end(), "Key field '{}' not found in bound object for struct '{}'",
+                child.name, shape.type);
+      encode_shape(w, child, it->value());
+   }
+}
+
+inline fc::variant decode_shape(reader& r, const key_shape& shape) {
+   if (shape.is_leaf())
+      return decode_field(r, shape.type);
+   fc::mutable_variant_object obj;
+   for (const auto& child : shape.children)
+      obj(child.name, decode_shape(r, child));
+   return fc::variant(std::move(obj));
+}
+
+inline fc::variant decode_key(const char* data, size_t size, const std::vector<key_shape>& shapes) {
    reader r(data, size);
    fc::mutable_variant_object obj;
-   for (size_t i = 0; i < key_names.size(); ++i) {
-      obj(key_names[i], decode_field(r, key_types[i]));
-   }
+   for (const auto& shape : shapes)
+      obj(shape.name, decode_shape(r, shape));
    FC_ASSERT(r.remaining() == 0, "BE key has {} trailing bytes after decoding all fields", r.remaining());
    return fc::variant(std::move(obj));
 }
 
-inline std::vector<char> encode_key(const fc::variant& key_var,
-                                    const vector<std::string>& key_names,
-                                    const vector<std::string>& key_types) {
-   FC_ASSERT(key_names.size() == key_types.size(), "ABI key_names/key_types size mismatch");
+inline std::vector<char> encode_key(const fc::variant& key_var, const std::vector<key_shape>& shapes) {
    const auto& obj = key_var.get_object();
    writer w;
-   for (size_t i = 0; i < key_names.size(); ++i) {
-      auto it = obj.find(key_names[i]);
-      FC_ASSERT(it != obj.end(), "Key field '{}' not found in bound object", key_names[i]);
-      encode_field(w, key_types[i], it->value());
+   for (const auto& shape : shapes) {
+      auto it = obj.find(shape.name);
+      FC_ASSERT(it != obj.end(), "Key field '{}' not found in bound object", shape.name);
+      encode_shape(w, shape, it->value());
    }
    return w.release();
 }
