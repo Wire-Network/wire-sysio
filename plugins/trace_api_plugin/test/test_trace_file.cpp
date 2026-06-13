@@ -1577,8 +1577,8 @@ BOOST_AUTO_TEST_SUITE(slice_tests)
       BOOST_CHECK(!std::get<1>(*b5));
    }
 
-   // Build a single-transaction block trace whose only action is a recorded sysio::setabi -
-   // the shape store_provider::rebuild_reversible_abis scans for at startup.
+   // Build a single-transaction block trace whose only action is a recorded sysio::setabi - a
+   // realistic reversible block whose ABI capture is also mirrored to the abi_log journal.
    block_trace_v0 make_setabi_block_trace(uint32_t number, chain::name target, uint64_t global_seq,
                                           const std::vector<char>& abi) {
       chain::bytes abi_bytes(abi.begin(), abi.end());
@@ -1638,40 +1638,57 @@ BOOST_AUTO_TEST_SUITE(slice_tests)
       BOOST_CHECK(sp2.has_abi_entry("acct"_n));
    }
 
-   // A reversible (above-LIB) ABI record must NOT reach the file - but a restart must not
-   // lose it either: the startup rebuild re-extracts it from the recorded setabi action
-   // trace in the (LIB, last_recorded] window.  Once LIB later passes the block, the record
-   // moves to disk and the trace scan is no longer needed.
-   BOOST_FIXTURE_TEST_CASE(test_reversible_abi_rebuilt_from_traces_on_restart, test_fixture)
+   // Reversible (above-LIB) ABI records must not reach the main file, but a restart must not lose
+   // them either.  The abi_log restores its overlay from its durable journal sidecar - including
+   // the lazy global_seq-0 record, which is read from chain state and leaves no action trace, so a
+   // trace scan could never recover it.  Here "x" is lazily captured (seq 0 = its pre-setabi ABI)
+   // and also has a setabi at seq 500 in reversible block 5; both survive the restart, and a
+   // pre-setabi global_seq still resolves to the lazy bytes (the case the old design lost).
+   BOOST_FIXTURE_TEST_CASE(test_reversible_abi_restored_from_journal_on_restart, test_fixture)
    {
       fc::temp_directory tempdir;
-      const auto abi = std::vector<char>{'x', 'y', 'z'};
+      const auto v0 = std::vector<char>{'v', '0'};
+      const auto v1 = std::vector<char>{'v', '1'};
       {
          store_provider sp(tempdir.path(), 100, std::optional<uint32_t>(), std::optional<uint32_t>(), 0);
          sp.append(block_trace1);                                  // block 1
          sp.append_lib(1);                                         // LIB = 1
-         sp.append(make_setabi_block_trace(5, "x"_n, 500, abi));   // block 5, reversible
-         sp.append_abi(5, "x"_n, 500, abi);                        // live capture's commit
+         sp.append(make_setabi_block_trace(5, "x"_n, 500, v1));    // block 5, reversible
+         sp.append_abi(5, "x"_n, 0,   v0);                         // lazy capture: x's pre-setabi ABI
+         sp.append_abi(5, "x"_n, 500, v1);                         // setabi capture at its global_seq
          BOOST_REQUIRE(sp.lookup_abi_seq("x"_n, 500).has_value());
       }
 
-      // Restart: the overlay is memory-only, but the setabi is rebuilt from block 5's
-      // recorded trace (the live signals for blocks 2..5 do not re-fire on a clean restart).
+      // Restart: both records come back from the journal (the live signals for blocks 2..5 do not
+      // re-fire on a clean restart, and the lazy seq-0 record has no trace to scan).
       store_provider sp2(tempdir.path(), 100, std::optional<uint32_t>(), std::optional<uint32_t>(), 0);
-      auto seq = sp2.lookup_abi_seq("x"_n, 600);
-      BOOST_REQUIRE(seq.has_value());
-      BOOST_CHECK_EQUAL(*seq, 500u);
-      auto fetched = sp2.fetch_abi("x"_n, 500);
-      BOOST_REQUIRE(fetched.has_value());
-      BOOST_CHECK(*fetched == abi);
 
-      // LIB advances past block 5 -> the rebuilt record is flushed to disk; a further
-      // restart serves it from the file alone.
+      // Pre-setabi action (global_seq < 500) resolves to the lazy v0 - lost by the old rebuild.
+      auto pre = sp2.lookup_abi_seq("x"_n, 100);
+      BOOST_REQUIRE(pre.has_value());
+      BOOST_CHECK_EQUAL(*pre, 0u);
+      auto pre_blob = sp2.fetch_abi("x"_n, 0);
+      BOOST_REQUIRE(pre_blob.has_value());
+      BOOST_CHECK(*pre_blob == v0);
+
+      // Post-setabi action resolves to v1.
+      auto post = sp2.lookup_abi_seq("x"_n, 600);
+      BOOST_REQUIRE(post.has_value());
+      BOOST_CHECK_EQUAL(*post, 500u);
+      auto post_blob = sp2.fetch_abi("x"_n, 500);
+      BOOST_REQUIRE(post_blob.has_value());
+      BOOST_CHECK(*post_blob == v1);
+
+      // LIB advances past block 5 -> both records flush to disk; a further restart serves them from
+      // the file alone (the journal compacts to empty).
       sp2.append_lib(5);
       store_provider sp3(tempdir.path(), 100, std::optional<uint32_t>(), std::optional<uint32_t>(), 0);
-      auto final_seq = sp3.lookup_abi_seq("x"_n, 600);
-      BOOST_REQUIRE(final_seq.has_value());
-      BOOST_CHECK_EQUAL(*final_seq, 500u);
+      auto final_pre  = sp3.lookup_abi_seq("x"_n, 100);
+      auto final_post = sp3.lookup_abi_seq("x"_n, 600);
+      BOOST_REQUIRE(final_pre.has_value());
+      BOOST_REQUIRE(final_post.has_value());
+      BOOST_CHECK_EQUAL(*final_pre, 0u);
+      BOOST_CHECK_EQUAL(*final_post, 500u);
    }
 
    // rollback_abis discards reversible records for blocks at/above the given height (fork

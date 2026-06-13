@@ -29,9 +29,23 @@ namespace sysio::trace_api {
 //   - is discarded per-block by rollback_reversible() when a fork replaces a
 //     block ("last write wins per block", like slice re-writes), and
 //   - is flushed to the file by flush_irreversible() as LIB advances.
-// The overlay is rebuilt at startup by store_provider from the already
-// recorded on-disk traces for the (LIB, last_recorded] window, so a restart
-// does not lose reversible setabi records.
+//
+// Reversible journal: the overlay is also mirrored to a durable append-only
+// sidecar ("<stem>.journal") so a restart restores it exactly.  This cannot
+// be re-derived from the recorded block traces: setabi records leave an
+// action trace, but lazy-fetch (global_seq 0) records are read from chain
+// state at first-encounter and leave no trace - and once a later setabi
+// supersedes the account, chain state no longer holds the pre-setabi ABI, so
+// the lazy bytes are unrecoverable unless they were persisted before the
+// restart.  The journal records every reversible mutation in order (PUT on
+// append_reversible, ROLLBACK on rollback_reversible); flush_irreversible
+// writes nothing to it (a flushed record already lives in the main file and
+// is dropped from the overlay on replay).  On restart the journal is
+// replayed into the overlay - skipping any (account, global_seq) already on
+// disk - then compacted (rewritten to contain only the live, still-reversible
+// records).  A journal write failure is advisory: the in-memory overlay still
+// serves the current session; only restart durability of that one record is
+// lost.
 //
 // Appends stream records to the end of the file with no rewrite of
 // existing records.  The lookup index lives in memory and is rebuilt by
@@ -84,9 +98,37 @@ struct abi_log_header {
 };
 static_assert(sizeof(abi_log_header) == 16);
 
+// Header for the reversible journal sidecar.  Same 16-byte shape as the main
+// log header but a distinct magic so the two files can never be confused.
+struct abi_journal_header {
+   // Stored little-endian on disk so a hex dump of the first 4 bytes reads "ABIJ".
+   static constexpr uint32_t magic_value     = 0x4A494241; // bytes on disk: 'A','B','I','J'
+   static constexpr uint32_t current_version = 1;
+
+   uint32_t magic    = magic_value;
+   uint32_t version  = current_version;
+   uint64_t reserved = 0;
+};
+static_assert(sizeof(abi_journal_header) == 16);
+
+// One reversible-overlay mutation as recorded in the journal.  Persisted as a
+// single byte; converted to/from the wire value with magic_enum (never a raw
+// static_cast) so a rename cannot silently change the on-disk encoding.
+enum class abi_journal_op : uint8_t {
+   put      = 1, ///< add/overwrite a reversible record: (block_num, account, global_seq, blob)
+   rollback = 2, ///< discard reversible records with block_num >= the recorded height (fork replace)
+};
+
 class abi_log {
 public:
-   explicit abi_log(const std::filesystem::path& path);
+   // Once the reversible journal grows past this many bytes, flush_irreversible rewrites it down to
+   // just the live overlay (see compact_journal), so it cannot grow without bound on a node that runs
+   // for months without a restart.  The default suits production; tests pass a small value to drive
+   // the path cheaply.
+   static constexpr size_t default_journal_compaction_threshold = 8u << 20; // 8 MiB
+
+   explicit abi_log(const std::filesystem::path& path,
+                    size_t journal_compaction_threshold_bytes = default_journal_compaction_threshold);
 
    abi_log(const abi_log&)            = delete;
    abi_log& operator=(const abi_log&) = delete;
@@ -200,6 +242,45 @@ private:
 
    static uint32_t compute_record_crc(const record_header& hdr, const char* blob, uint64_t blob_size);
 
+   // --- reversible journal (durable mirror of the in-memory overlay) ---
+
+   // Derive the journal path from the main log path: same directory and stem,
+   // extension ".journal".
+   static std::filesystem::path derive_journal_path(const std::filesystem::path& log_path);
+
+   // Open (or create) the journal, replay it into the overlay, then compact.
+   // Constructor-only, after the main log has been validated.
+   void init_journal(const std::filesystem::path& journal_path);
+
+   // Write the journal header at offset 0 and flush.  Returns false on I/O error.
+   bool write_journal_header();
+
+   // Replay journal records in order into a working overlay (applying PUT and
+   // ROLLBACK), truncating any torn/corrupt tail.  Requires the journal open.
+   std::map<index_key, reversible_entry> replay_journal_records();
+
+   // Rewrite the journal so it holds only the current _reversible overlay
+   // (drops flushed/dead PUTs and collapses applied ROLLBACKs).  Atomic via a
+   // temp file + rename; reopens _journal_cfile for appending on success.
+   // Snapshots the overlay under _index_mtx, then does all file I/O under
+   // _journal_mtx, so it is safe to call live from flush_irreversible as well
+   // as from the constructor.
+   void compact_journal();
+
+   // Frame and append one already-encoded journal body.  No-op when journaling
+   // is disabled.  Returns false on write failure (the torn tail is truncated;
+   // journaling is disabled only if that truncation also fails).  Takes
+   // _journal_mtx; never nests with _index_mtx.
+   bool journal_append(const std::vector<char>& body);
+
+   // Encode a PUT / ROLLBACK body (op byte + fc::raw fields).  No file I/O.
+   static std::vector<char> encode_put_body(uint32_t block_num, chain::name account,
+                                            uint64_t global_seq, const std::vector<char>& abi_bytes);
+   static std::vector<char> encode_rollback_body(uint32_t block_num);
+
+   // Wrap a body as a journal record: 4-byte little-endian length, body, 4-byte crc32.
+   static std::vector<char> frame_journal_record(const std::vector<char>& body);
+
    // _append_mtx serializes the cfile write + _end_offset update.
    // _index_mtx guards _index and _reversible.  Separate so lookups never
    // block on a concurrent append's file I/O.  Append acquires _append_mtx
@@ -214,8 +295,23 @@ private:
    // Atomic because append() can flip it to false (failed tail truncation) while lookups on HTTP
    // threads read it concurrently.
    std::atomic<bool>                _valid{false};
+
+   // Journal sidecar state.  _journal_mtx serializes journal file writes and
+   // never nests with _append_mtx/_index_mtx.  _journal_enabled gates appends:
+   // false means the journal could not be opened (or a write failed
+   // irrecoverably), in which case the overlay still works for the current
+   // session but its records will not survive a restart.  Only the single
+   // extraction thread mutates the journal, so these need no atomicity beyond
+   // the mutex that orders the writes.
+   std::mutex                       _journal_mtx;
+   fc::cfile                        _journal_cfile;
+   std::filesystem::path            _journal_path;
+   uint64_t                         _journal_end_offset{0};
+   bool                             _journal_enabled{false};
+   size_t                           _journal_compaction_threshold{default_journal_compaction_threshold};
 };
 
 } // namespace sysio::trace_api
 
 FC_REFLECT(sysio::trace_api::abi_log_header, (magic)(version)(reserved))
+FC_REFLECT(sysio::trace_api::abi_journal_header, (magic)(version)(reserved))

@@ -661,13 +661,20 @@ not match the chain's new head. If chain head is within the recorded
 range, replay overlaps existing slices silently. If there's a gap, the
 startup continuity check aborts (see below).
 
-#### abi_log.log
+#### abi_log.log / abi_log.journal
 
 `abi_log.log` is append-only. If it is lost or corrupted, delete it and
 restart nodeop. The plugin will rebuild it as new `setabi` transactions
 are applied or previously-unseen contracts are touched (lazy current-ABI
 fetch). Historical ABI lookup for actions before the loss will fall back
 to raw hex.
+
+`abi_log.journal` durably mirrors the in-memory reversible overlay
+(records for blocks above LIB) so they survive a restart; it is replayed
+and then compacted at startup. If it is lost or corrupted, only the
+not-yet-irreversible ABI records are affected (they fall back to raw hex
+until their contract is touched again); the irreversible history in
+`abi_log.log` is unaffected. It is safe to delete alongside `abi_log.log`.
 
 ---
 
@@ -767,7 +774,11 @@ traces/
   trace_trx_idx_0000020000-0000030000.log
   trace_recv_bloom_0000020000-0000030000.log
   abi_log.log
+  abi_log.journal
 ```
+
+`abi_log.log` and `abi_log.journal` are global (not per-slice): the
+append-only ABI log and its durable reversible-overlay journal.
 
 #### Block-offset index
 
@@ -922,7 +933,8 @@ sidecar is only built for fully irreversible slices). A fork can
 therefore never invalidate a written record, so the file needs no block
 tagging, tombstones, or rewrite. Records for blocks above LIB live in an
 in-memory reversible overlay (see
-[ABI capture mechanics](#abi-capture-mechanics)).
+[ABI capture mechanics](#abi-capture-mechanics)) that is durably mirrored
+to `abi_log.journal`, so the overlay is restored exactly on restart.
 
 Format:
 
@@ -948,6 +960,48 @@ on a kernel crash. On startup the recovery scan detects torn or
 CRC-mismatched records and truncates the file at the first bad one —
 any lost records are rebuilt the next time their contract is touched
 (via an observed `setabi` or the lazy current-ABI fetch).
+
+##### Reversible journal (`abi_log.journal`)
+
+The in-memory reversible overlay is durably mirrored to a sibling
+append-only journal so a restart restores it exactly. This cannot be
+re-derived from the recorded block traces: a `setabi` leaves an action
+trace, but a lazy `global_seq = 0` record is read from chain state and
+leaves none — and once a later `setabi` supersedes the account, chain
+state no longer holds the pre-`setabi` ABI, so those lazy bytes are
+unrecoverable unless persisted before the restart.
+
+```
+Header  (16 bytes): magic "ABIJ" (u32), version 1 (u32), reserved (u64)
+Records (repeated until EOF):
+          body_len (u32)
+          body     (body_len bytes): op (u8) + fc::raw fields
+                     op = put      -> block_num (u32), account (u64),
+                                       global_seq (u64), blob (raw bytes)
+                     op = rollback -> block_num (u32)
+          crc32    (u32) over (body_len, body)
+```
+
+`append_reversible` writes a `put`; `rollback_reversible` writes a
+`rollback` (only when it actually discards something, so steady-state
+`block_start` adds nothing); `flush_irreversible` writes nothing (a
+flushed record already lives in `abi_log.log`). On startup the journal
+is replayed in order into the overlay — dropping any `(account,
+global_seq)` already on disk — then compacted (rewritten via a temp file
+and atomic rename to contain only the still-reversible records). Torn or
+CRC-mismatched tails are truncated like the main log; a journal write
+failure is advisory (the in-memory overlay still serves the session,
+only restart durability of that one record is lost).
+
+The journal is bounded so it cannot grow without limit on a node that
+runs for months without a restart. A flushed record's `put` stays in the
+file until reclaimed, so `flush_irreversible` reclaims it two ways: when
+the overlay fully drains it truncates the file back to its header (the
+common case on a healthy node, between capture bursts), and as a backstop
+for a busy node whose overlay rarely hits exactly empty, once the file
+passes a size threshold it is compacted down to just the live overlay.
+The journal size is therefore bounded by that threshold regardless of
+uptime.
 
 ---
 
@@ -998,15 +1052,15 @@ the fork switch begins.
 
 **Restarts.** The overlay is memory-only, and the accepted-block
 signals for blocks between LIB and head do not re-fire on a clean
-restart. The plugin instead rebuilds the overlay at startup from the
-already-recorded traces in that window: a recorded `setabi` action
-trace carries the exact `global_sequence` and ABI payload, so the
-rebuilt records are identical to live capture. Lazy-fetch (seq-0)
-records are not rebuilt — if the account had no in-window `setabi` the
-next encounter re-fetches the identical bytes from chain state, and if
-it did, the pre-`setabi` ABI is no longer reachable anywhere; the
-affected sliver of history returns raw hex rather than risking a wrong
-decode.
+restart. The overlay is instead restored from the durable reversible
+journal (`abi_log.journal`, see
+[ABI log](#abi-log)), which mirrors every overlay mutation in order.
+This preserves **both** kinds of reversible record — including lazy
+`global_seq = 0` captures, which leave no action trace and could never
+be recovered by scanning recorded traces. (An earlier design rebuilt
+only `setabi` records from traces and dropped the lazy bytes; a later
+`setabi` then suppressed any re-capture, so pre-`setabi` actions
+degraded to raw permanently. Journaling the overlay removes that loss.)
 
 #### Same-transaction `setabi` caveat
 

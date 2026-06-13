@@ -604,21 +604,10 @@ namespace sysio::trace_api {
       // cannot resolve the block - callers fall back to scanning the slice's trx_id log.
       std::optional<bool> confirm_trx_in_block(uint32_t block_num, const chain::transaction_id_type& trx_id);
 
-      // Constructor-time rebuild of the abi log's reversible overlay from the traces already
-      // recorded on disk for the (LIB, last_recorded] window.  Reversible ABI records live only
-      // in memory, so without this a restart would permanently lose every setabi committed in a
-      // block that had not yet reached LIB at shutdown (the live signals for those blocks do not
-      // re-fire on a clean restart).  The recorded setabi action traces carry the exact
-      // global_sequence and ABI bytes, so the rebuilt records are identical to what live capture
-      // produced.  Lazy-fetch (seq 0) records are intentionally NOT rebuilt: their bytes came
-      // from chain state at collection time; if the account had no in-window setabi the next
-      // encounter re-fetches the identical ABI, and if it did, the pre-setabi bytes are no
-      // longer reachable anywhere.  Advisory: per-block read failures are logged and skipped
-      // (decode degrades to raw hex), never fatal.
-      void rebuild_reversible_abis();
-
-      // ABI sidecar: one global append-only log in the slice directory.
-      // abi_log serialises its own writes and allows concurrent lookups.
+      // ABI sidecar: one global append-only log in the slice directory.  abi_log serialises its
+      // own writes, allows concurrent lookups, and restores its reversible overlay from its own
+      // durable journal sidecar on construction (so reversible records - both lazy global_seq-0
+      // and setabi - survive a restart without any rebuild step here).
       abi_log _abi_log;
    };
 
