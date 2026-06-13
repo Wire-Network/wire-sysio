@@ -860,16 +860,31 @@ void maybe_open_dispute(name self, uint64_t chain_code, uint32_t epoch_index,
                         const std::vector<checksum256>& seen_checksums,
                         const std::vector<uint32_t>& checksum_counts,
                         const std::vector<std::vector<name>>& checksum_operators) {
-   if (seen_checksums.size() < 3) return;
+   // OPP silent-return diagnostics: each branch below silently declines to open a
+   // dispute. Logged (visible under --contracts-console) so "the dispute never
+   // opened" is greppable instead of a black hole.
+   if (seen_checksums.size() < 3) {
+      sysio::print_f("msgch::maybe_open_dispute: no dispute for (chain=%llu, epoch=%u): %u distinct version(s), a vote needs >=3\n",
+                     chain_code, epoch_index, (uint32_t)seen_checksums.size());
+      return;
+   }
 
    epoch::epochstate_t state_tbl(EPOCH_ACCOUNT);
-   if (!state_tbl.exists() || current_time_point() < state_tbl.get().next_epoch_start) return;
+   if (!state_tbl.exists() || current_time_point() < state_tbl.get().next_epoch_start) {
+      sysio::print_f("msgch::maybe_open_dispute: no dispute for (chain=%llu, epoch=%u): epoch boundary not yet passed\n",
+                     chain_code, epoch_index);
+      return;
+   }
 
    uint32_t max_count = 0;
    for (auto c : checksum_counts) {
       if (c > max_count) max_count = c;
    }
-   if (max_count > operators_per_group / 2) return;  // a majority exists -> no vote needed
+   if (max_count > operators_per_group / 2) {  // a majority exists -> no vote needed
+      sysio::print_f("msgch::maybe_open_dispute: no dispute for (chain=%llu, epoch=%u): a version holds a majority (%u of group %u), resolved without a vote\n",
+                     chain_code, epoch_index, max_count, operators_per_group);
+      return;
+   }
 
    std::vector<chalg::dispute_candidate> candidates;
    candidates.reserve(seen_checksums.size());
