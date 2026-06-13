@@ -11,8 +11,10 @@
 #include <magic_enum/magic_enum.hpp>
 #include <zpp_bits.h>
 
+#include <algorithm>
 #include <cstring>
 #include <limits>
+#include <optional>
 
 namespace sysio {
 
@@ -30,6 +32,22 @@ namespace {
 // System-owned rows bill to the sysio RAM pool, not this contract account (privileged-contract
 // model, as sysio.token uses): the account stays finite at code+abi size; growth draws from the pool.
 constexpr name ram_payer = "sysio"_n;
+
+using sysio::slug_name_literals::operator""_s;
+
+/// The WIRE token's slug — both the depot-native token code and (by
+/// protocol convention) the depot chain's own registry code.
+constexpr sysio::slug_name WIRE_TOKEN = "WIRE"_s;
+
+/// WIRE token symbol (9 decimals) — the emissions/epoch denomination
+/// (`sysio.system/src/emissions.cpp:42`). Never opreg's CORE_SYM (SYS, 4):
+/// collateral and swap custody are different surfaces.
+constexpr sysio::symbol WIRE_SYMBOL{"WIRE", 9};
+
+/// High bit partitions depot-originated (swap-from-WIRE) uwreq ids from
+/// inbound attestation ids — msgch's `mint_att_id` counts monotonically
+/// from 1 and can never reach 2^63, so the two id spaces are disjoint.
+constexpr uint64_t DEPOT_ORIGIN_ID_BASE = 0x8000000000000000ULL;
 
 uint64_t current_time_ms() {
    return static_cast<uint64_t>(current_time_point().sec_since_epoch()) * 1000;
@@ -193,9 +211,6 @@ uint64_t swap_quote(sysio::slug_name src_chain_code,
                     sysio::slug_name dst_token_code,
                     sysio::slug_name dst_reserve_code,
                     uint64_t src_amount) {
-   using sysio::slug_name_literals::operator""_s;
-   static constexpr sysio::slug_name WIRE_TOKEN = "WIRE"_s;
-
    if (src_amount == 0) return 0;
    if (src_token_code == WIRE_TOKEN && dst_token_code == WIRE_TOKEN) {
       return src_amount;
@@ -302,22 +317,82 @@ std::optional<uint64_t> find_outpost_id_for_chain(sysio::slug_name chain_code) {
    return chain_code.value;
 }
 
+/// True iff `chain_code` is a REGISTERED chain row flagged `is_depot`.
+/// An unregistered chain is NOT the depot — `createuwreq` rejects swaps on
+/// unregistered chains outright rather than mistaking them for WIRE legs
+/// (which would silently waive that leg's signature/bond/lock).
+bool leg_is_depot(sysio::slug_name chain_code) {
+   sysio::chains::chains_t chains_tbl(uwrit::CHAINS_ACCOUNT);
+   sysio::chains::chain_key pk{chain_code};
+   if (!chains_tbl.contains(pk)) return false;
+   return chains_tbl.get(pk).is_depot;
+}
+
+/// True iff the chain is registered AND active in sysio.chains.
+bool chain_registered_active(sysio::slug_name chain_code) {
+   sysio::chains::chains_t chains_tbl(uwrit::CHAINS_ACCOUNT);
+   sysio::chains::chain_key pk{chain_code};
+   if (!chains_tbl.contains(pk)) return false;
+   return chains_tbl.get(pk).active;
+}
+
+/// The depot's own chain code (the singleton `is_depot` row in
+/// sysio.chains — `code = "WIRE"` by protocol convention). Scans the
+/// registry, which holds a handful of rows. Returns nullopt before the
+/// depot row is registered (pre-bootstrap).
+std::optional<sysio::slug_name> depot_chain_code() {
+   sysio::chains::chains_t tbl(uwrit::CHAINS_ACCOUNT);
+   for (auto it = tbl.begin(); it != tbl.end(); ++it) {
+      if (it->is_depot) return it->code;
+   }
+   return std::nullopt;
+}
+
+/// Find a reserve and require ACTIVE status — the shape every settlement
+/// pre-check needs. Returns nullopt when missing or not ACTIVE.
+std::optional<reserve::reserve_row> find_active_reserve(sysio::slug_name chain_code,
+                                                         sysio::slug_name token_code,
+                                                         sysio::slug_name reserve_code) {
+   auto row = find_reserve(chain_code, token_code, reserve_code);
+   if (!row) return std::nullopt;
+   if (row->status != ReserveStatus::RESERVE_STATUS_ACTIVE) return std::nullopt;
+   return row;
+}
+
+/// Parse a WIRE account name from its string-spelling bytes (the canonical
+/// `ChainAddress.address` encoding for CHAIN_KIND_WIRE). Length + charset
+/// are validated BEFORE constructing the `name`, so this never throws —
+/// it runs inside the evalcons dispatch chain.
+std::optional<name> parse_wire_name(const std::vector<char>& bytes) {
+   if (bytes.empty() || bytes.size() > 12) return std::nullopt;
+   for (char c : bytes) {
+      const bool ok = (c >= 'a' && c <= 'z') || (c >= '1' && c <= '5') || c == '.';
+      if (!ok) return std::nullopt;
+   }
+   return name{std::string_view{bytes.data(), bytes.size()}};
+}
+
+/// A WIRE account name as its string-spelling bytes — the inverse of
+/// `parse_wire_name`, used to stamp WIRE-side principals into
+/// ChainAddress-shaped fields (depositor, actor).
+std::vector<char> wire_name_bytes(name n) {
+   std::string s = n.to_string();
+   return {s.begin(), s.end()};
+}
+
 /// Build + queue the outbound SWAP_REMIT envelope for a confirmed race.
 ///
-/// Fired inline from `try_select_winner` after the depot has committed
-/// to a winning underwriter pair. Two side-effects, both must land in
-/// this transaction:
-///   1. Inline-action `sysio.reserv::debit(dst_chain_code, dst_token_code,
-///      dst_reserve_code, dst_amount)` — decrements the destination
-///      reserve's outpost-side balance so the depot's reserve view is
-///      tight against the outbound SWAP_REMIT. A failed debit
-///      (insufficient reserve / not ACTIVE) aborts the entire commit;
-///      no half-state.
-///   2. Inline-action `sysio.msgch::queueout(dst_outpost_id,
-///      ATTESTATION_TYPE_SWAP_REMIT, encoded)` — pushes the envelope
-///      for the next epoch's outbound drain. The destination outpost's
-///      Reserve.sol (ETH) / opp-outpost Reserve PDA (SOL) handles it
-///      via `_handleSwapRemit` / `handle_swap_remit`.
+/// Fired inline from `try_select_winner` after the depot has committed to
+/// a winning underwriter. The reserve-book mutation (`reserv::applyswap` /
+/// `applyfromwire`) is queued by the CALLER in the same transaction,
+/// BEFORE this queueout — by the time the remit leaves the depot, every
+/// intervening quote already prices the post-swap books. This function
+/// only resolves identities and queues the envelope:
+///   Inline-action `sysio.msgch::queueout(dst_outpost_id,
+///   ATTESTATION_TYPE_SWAP_REMIT, encoded)` — pushes the envelope for the
+///   next epoch's outbound drain. The destination outpost's
+///   ReserveManager (ETH) / opp-outpost reserve PDA (SOL) pays the
+///   recipient inline via `_handleSwapRemit` / `handle_swap_remit`.
 void emit_swap_remit(name self,
                       const uwrit::uw_request_t& req,
                       name candidate) {
@@ -340,21 +415,6 @@ void emit_swap_remit(name self,
    check(dst_outpost_opt.has_value(),
          "emit_swap_remit: no outpost registered for destination chain");
    const uint64_t dst_outpost_id = *dst_outpost_opt;
-
-   // Reserve debit FIRST — if the reserve is insufficient or not ACTIVE
-   // the entire commit aborts and the race is unwound by the caller's
-   // surrounding transaction failing. Depot is the ground truth; no
-   // half-state. The slug_name triple identifies a specific reserve on
-   // (chain_code, token_code), critical when multiple reserves exist for
-   // the same (chain, token) pair.
-   action(
-      permission_level{self, "active"_n},
-      uwrit::RESERVE_ACCOUNT, "debit"_n,
-      std::make_tuple(req.dst_chain_code,
-                       req.dst_token_code,
-                       req.dst_reserve_code,
-                       req.dst_amount)
-   ).send();
 
    // Build the SwapRemit. `original_message_id` encodes the uwreq_id
    // in its low 8 bytes; the destination outpost's reflected SWAP_REMIT
@@ -547,20 +607,32 @@ uint64_t next_lock_id(name self) {
    return id;
 }
 
+/// Allocate a depot-origin (swap-from-WIRE) id: the high-bit-tagged
+/// sequence that doubles as both the fwqueue row id and the eventual
+/// uwreq id. Disjoint from msgch's inbound attestation-id space.
+uint64_t next_fromwire_id(name self) {
+   uwrit::uwcounters_t ctr_tbl(self);
+   auto ctr = ctr_tbl.get_or_default(uwrit::uw_counters{});
+   uint64_t id = DEPOT_ORIGIN_ID_BASE | ctr.next_fromwire_seq;
+   ctr.next_fromwire_seq += 1;
+   ctr_tbl.set(ctr, ram_payer);
+   return id;
+}
+
 } // anonymous namespace
 
 // ---------------------------------------------------------------------------
 //  setconfig
 // ---------------------------------------------------------------------------
 void uwrit::setconfig(uint32_t fee_bps,
-                      uint32_t collateral_lock_duration_epoch_count,
+                      uint64_t collateral_lock_duration_ms,
                       uint8_t  fee_split_winner_pct,
                       uint8_t  fee_split_other_uw_pct,
                       uint8_t  fee_split_batch_op_pct) {
    require_auth(get_self());
    check(fee_bps <= 10000, "fee_bps cannot exceed 10000 (100%)");
-   check(collateral_lock_duration_epoch_count > 0,
-         "collateral_lock_duration_epoch_count must be positive");
+   check(collateral_lock_duration_ms > 0,
+         "collateral_lock_duration_ms must be positive");
    const uint32_t split_total = static_cast<uint32_t>(fee_split_winner_pct)
                               + static_cast<uint32_t>(fee_split_other_uw_pct)
                               + static_cast<uint32_t>(fee_split_batch_op_pct);
@@ -569,11 +641,11 @@ void uwrit::setconfig(uint32_t fee_bps,
 
    uwconfig_t cfg_tbl(get_self());
    uw_config cfg = cfg_tbl.get_or_default(uw_config{});
-   cfg.fee_bps                              = fee_bps;
-   cfg.collateral_lock_duration_epoch_count = collateral_lock_duration_epoch_count;
-   cfg.fee_split_winner_pct                 = fee_split_winner_pct;
-   cfg.fee_split_other_uw_pct               = fee_split_other_uw_pct;
-   cfg.fee_split_batch_op_pct               = fee_split_batch_op_pct;
+   cfg.fee_bps                     = fee_bps;
+   cfg.collateral_lock_duration_ms = collateral_lock_duration_ms;
+   cfg.fee_split_winner_pct        = fee_split_winner_pct;
+   cfg.fee_split_other_uw_pct      = fee_split_other_uw_pct;
+   cfg.fee_split_batch_op_pct      = fee_split_batch_op_pct;
    cfg_tbl.set(cfg, ram_payer);
 }
 
@@ -626,6 +698,42 @@ void uwrit::createuwreq(uint64_t attestation_id,
    const uint64_t        src_amount =
       static_cast<uint64_t>(static_cast<int64_t>(sr.source_amount.amount));
 
+   // Structural guards — refund via SwapRevert, never throw (we are inside
+   // the evalcons dispatch chain). Zero amounts are rejected up front so
+   // every downstream lock/settlement amount is provably positive (a
+   // zero-amount lock would trip `opreg::releaselock`'s amount check from
+   // inside `chklocks` at epoch advance — a consensus stall).
+   if (src_amount == 0 || sr.target_amount == 0) {
+      emit_swap_revert(get_self(), chain_code, attestation_id, sr,
+                       src_chain_code, src_reserve_code,
+                       "SwapRequest rejected: source and target amounts must be positive");
+      return;
+   }
+   if (!chain_registered_active(src_chain_code) || !chain_registered_active(dst_chain_code)) {
+      emit_swap_revert(get_self(), chain_code, attestation_id, sr,
+                       src_chain_code, src_reserve_code,
+                       "SwapRequest rejected: unregistered or inactive chain");
+      return;
+   }
+   const bool src_depot = leg_is_depot(src_chain_code);
+   const bool dst_depot = leg_is_depot(dst_chain_code);
+   if (src_depot && dst_depot) {
+      emit_swap_revert(get_self(), chain_code, attestation_id, sr,
+                       src_chain_code, src_reserve_code,
+                       "SwapRequest rejected: WIRE->WIRE swap is degenerate — "
+                       "use sysio.token::transfer");
+      return;
+   }
+   if (src_depot) {
+      // Swap-from-WIRE originates ON the depot (swapfromwire -> drainfwq);
+      // an outpost claiming WIRE as its source chain is bogus.
+      emit_swap_revert(get_self(), chain_code, attestation_id, sr,
+                       src_chain_code, src_reserve_code,
+                       "SwapRequest rejected: swap-from-WIRE cannot originate "
+                       "from an outpost");
+      return;
+   }
+
    // Hard-fail any SwapRequest without a populated `source_tx_id`. The
    // off-chain underwriter verify path uses this id to confirm a real
    // on-chain deposit backs the swap before committing collateral; a
@@ -642,6 +750,42 @@ void uwrit::createuwreq(uint64_t attestation_id,
                        "(no SwapRequest may be emitted without a "
                        "populated source-chain transaction id)");
       return;
+   }
+
+   // Privacy gate — a private reserve only swaps against a counterpart
+   // reserve owned by the same WIRE account (the authex-linked matcher
+   // recorded at match time), and is excluded from WIRE-endpoint swaps
+   // entirely. Ownership is immutable while a reserve is ACTIVE, so this
+   // ingestion-time gate needs no race-time recheck.
+   {
+      const auto src_r = find_reserve(src_chain_code, src_token_code, src_reserve_code);
+      if (dst_depot) {
+         // Swap-to-WIRE: only the source reserve exists — it must be public.
+         if (src_r && src_r->is_private) {
+            emit_swap_revert(get_self(), chain_code, attestation_id, sr,
+                             src_chain_code, src_reserve_code,
+                             "SwapRequest rejected: private reserves are "
+                             "excluded from WIRE-endpoint swaps");
+            return;
+         }
+      } else {
+         const auto dst_r = find_reserve(dst_chain_code, dst_token_code, dst_reserve_code);
+         const bool src_priv = src_r && src_r->is_private;
+         const bool dst_priv = dst_r && dst_r->is_private;
+         if (src_priv || dst_priv) {
+            const bool same_owner = src_r && dst_r
+                                    && src_r->owner != name{}
+                                    && src_r->owner == dst_r->owner;
+            if (!same_owner) {
+               emit_swap_revert(get_self(), chain_code, attestation_id, sr,
+                                src_chain_code, src_reserve_code,
+                                "SwapRequest rejected: private reserve pairing "
+                                "violation — counterpart reserve must be owned "
+                                "by the same WIRE account");
+               return;
+            }
+         }
+      }
    }
 
    // Variance-tolerance check via sysio.reserv mirror. If no matching
@@ -711,11 +855,21 @@ uwrit::commit_entry* find_or_create_commit(uwrit::uw_request_t& req, name underw
    return &req.commits_by.back();
 }
 
-/// Resolve the race once both legs of a (uwreq, underwriter) pair have
-/// arrived. If the underwriter has sufficient bond on each chain, push two
-/// lock rows + mark them winner + emit REMIT to the destination outpost.
-/// Otherwise mark their commit_entry as INSUFFICIENT_BOND (status=SLASHED in
-/// the proto enum, used here as a sentinel for "race-disqualified").
+/// Resolve the race once every REQUIRED leg of a (uwreq, underwriter) pair
+/// has arrived. A leg is required iff its chain is an outpost; a depot
+/// (WIRE) leg needs no UIC, no bond, and no lock — single-leg swaps
+/// (to/from WIRE) therefore resolve on their one outpost commit. On a win:
+/// verify the required legs' signatures + bond, pre-validate reserve
+/// liquidity against the local mirror (so the inline reserv settlement
+/// actions are unreachable-failure by construction), push one lock per
+/// required leg (a 12h wall-clock challenge window — released only by
+/// `chklocks`, never by delivery), mark CONFIRMED, then settle:
+///   * normal     — reserv::applyswap  + SWAP_REMIT to the dst outpost
+///   * from-WIRE  — reserv::applyfromwire + SWAP_REMIT to the dst outpost
+///   * to-WIRE    — reserv::paywire (REAL WIRE to the recipient; no remit)
+/// Disqualified candidates get their commit_entry marked (status=SLASHED
+/// as the "race-disqualified" sentinel); transient liquidity shortfalls
+/// log + skip, leaving the uwreq PENDING.
 void try_select_winner(name self, uint64_t uwreq_id, name candidate) {
    uwrit::uwreqs_t reqs(self);
    auto pk = uwrit::id_key{uwreq_id};
@@ -723,15 +877,18 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate) {
    auto req = reqs.get(pk);
    if (req.status != UnderwriteRequestStatus::UNDERWRITE_REQUEST_STATUS_PENDING) return;
 
-   // ── T7: signature verification on both legs ──────────────────────────
+   const bool src_needed = !leg_is_depot(req.src_chain_code);
+   const bool dst_needed = !leg_is_depot(req.dst_chain_code);
+
+   // ── T7: signature verification — required (outpost) legs only ────────
    // Look up the candidate's commit_entry to get the per-leg UIC bytes.
    const uwrit::commit_entry* ce_ptr = nullptr;
    for (const auto& c : req.commits_by) {
       if (c.underwriter == candidate) { ce_ptr = &c; break; }
    }
    if (!ce_ptr) return;
-   if (!verify_uic_signature(candidate, ce_ptr->source_uic_bytes) ||
-       !verify_uic_signature(candidate, ce_ptr->dest_uic_bytes)) {
+   if ((src_needed && !verify_uic_signature(candidate, ce_ptr->source_uic_bytes)) ||
+       (dst_needed && !verify_uic_signature(candidate, ce_ptr->dest_uic_bytes))) {
       // Per `feedback_opp_handlers_never_throw.md`: dispatch handlers
       // must NOT throw — a check() halts evalcons and stalls consensus.
       // Log + skip instead. The race resolves with the remaining valid
@@ -741,9 +898,13 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate) {
       return;
    }
 
-   uint64_t src_avail = available_via_mirrors(self, candidate, req.src_chain_code, req.src_token_code);
-   uint64_t dst_avail = available_via_mirrors(self, candidate, req.dst_chain_code, req.dst_token_code);
-   if (src_avail < req.src_amount || dst_avail < req.dst_amount) {
+   // Bond availability — required legs only (the WIRE leg carries no bond).
+   const uint64_t src_avail = src_needed
+      ? available_via_mirrors(self, candidate, req.src_chain_code, req.src_token_code) : 0;
+   const uint64_t dst_avail = dst_needed
+      ? available_via_mirrors(self, candidate, req.dst_chain_code, req.dst_token_code) : 0;
+   if ((src_needed && src_avail < req.src_amount) ||
+       (dst_needed && dst_avail < req.dst_amount)) {
       // Insufficient bond — mark the commit_entry but don't promote.
       reqs.modify(same_payer, pk, [&](auto& r) {
          auto* c = find_or_create_commit(r, candidate);
@@ -792,6 +953,21 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate) {
                   }
                }
             }
+            // Swap-from-WIRE: the user's escrowed WIRE was never credited
+            // to any reserve — refund it directly (there is no source
+            // outpost to route a SWAP_REVERT to).
+            if (!src_needed) {
+               if (auto user = parse_wire_name(req.depositor)) {
+                  action(
+                     permission_level{self, "active"_n},
+                     uwrit::RESERVE_ACCOUNT, "refundwire"_n,
+                     std::make_tuple(*user, req.src_amount)
+                  ).send();
+               } else {
+                  sysio::print("try_select_winner: cannot parse from-WIRE "
+                               "depositor for refund on uwreq ", uwreq_id, "\n");
+               }
+            }
             reqs.modify(same_payer, pk, [&](auto& r) {
                r.status           = UnderwriteRequestStatus::UNDERWRITE_REQUEST_STATUS_REJECTED;
                r.settled_at_ms    = current_time_ms();
@@ -808,44 +984,131 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate) {
       }
    }
 
-   // Winner — push two locks (one per leg) + mark uwreq CONFIRMED.
+   // ── Settlement pre-checks against the local reserve mirror ───────────
+   // The reserv-side settlement actions (`applyswap` / `applyfromwire` /
+   // `paywire`) `check()`-abort on violation; an abort inside this
+   // dispatch chain stalls consensus, so every condition is pre-validated
+   // here — making the inline actions unreachable-failure by construction
+   // (no other reserve mutation can interleave within this transaction).
+   // Transient shortfalls (another swap drained the reserve between quote
+   // and win) log + skip, leaving the uwreq PENDING for later resolution.
+   name towire_recipient{};
+   if (!dst_needed) {
+      // Swap-to-WIRE. Terminal first: a malformed recipient can never
+      // become valid — revert to the source outpost + REJECT.
+      opp::attestations::SwapRequest sr0;
+      {
+         auto in = zpp::bits::in{
+            std::span{req.attestation_inbound_data.data(),
+                       req.attestation_inbound_data.size()},
+            zpp::bits::no_size{}};
+         if (in(sr0) != zpp::bits::errc{}) {
+            sysio::print("try_select_winner: cannot decode stored SwapRequest "
+                         "for uwreq ", uwreq_id, "\n");
+            return;
+         }
+      }
+      std::vector<char> recipient_bytes{sr0.recipient.address.begin(),
+                                         sr0.recipient.address.end()};
+      auto rcpt = parse_wire_name(recipient_bytes);
+      if (!rcpt || !is_account(*rcpt)) {
+         auto src_outpost_opt = find_outpost_id_for_chain(req.src_chain_code);
+         if (src_outpost_opt) {
+            emit_swap_revert(self, *src_outpost_opt, req.id, sr0,
+                             req.src_chain_code, req.src_reserve_code,
+                             "swap-to-WIRE rejected: recipient is not a valid "
+                             "WIRE account");
+         }
+         reqs.modify(same_payer, pk, [&](auto& r) {
+            r.status           = UnderwriteRequestStatus::UNDERWRITE_REQUEST_STATUS_REJECTED;
+            r.settled_at_ms    = current_time_ms();
+            r.expires_at_epoch = get_current_epoch() + uwrit::UWREQ_RETENTION_EPOCHS;
+            for (auto& c : r.commits_by) {
+               if (c.status == UnderwriteStatus::UNDERWRITE_STATUS_INTENT_SUBMITTED) {
+                  c.status = UnderwriteStatus::UNDERWRITE_STATUS_RELEASED;
+                  c.reason = "uwreq rejected: invalid WIRE recipient";
+               }
+            }
+         });
+         return;
+      }
+      towire_recipient = *rcpt;
+      auto src_r = find_active_reserve(req.src_chain_code, req.src_token_code, req.src_reserve_code);
+      if (!src_r || src_r->reserve_wire_amount < req.dst_amount) {
+         sysio::print("try_select_winner: insufficient source-reserve WIRE for "
+                      "to-WIRE payout on uwreq ", uwreq_id, ", skipping\n");
+         return;
+      }
+   } else if (!src_needed) {
+      // Swap-from-WIRE. drainfwq validated at queue-drain; re-validate the
+      // live state (privacy is immutable, but liquidity can drift).
+      auto dst_r = find_active_reserve(req.dst_chain_code, req.dst_token_code, req.dst_reserve_code);
+      if (!dst_r || dst_r->is_private || dst_r->reserve_chain_amount < req.dst_amount) {
+         sysio::print("try_select_winner: destination reserve unavailable for "
+                      "from-WIRE swap on uwreq ", uwreq_id, ", skipping\n");
+         return;
+      }
+   } else {
+      // Normal outpost↔outpost swap — both rows must cover the four-leg
+      // apply (the WIRE intermediate is derived from the same pre-mutation
+      // source row `applyswap` will read).
+      auto src_r = find_active_reserve(req.src_chain_code, req.src_token_code, req.src_reserve_code);
+      auto dst_r = find_active_reserve(req.dst_chain_code, req.dst_token_code, req.dst_reserve_code);
+      const uint64_t w = src_r
+         ? cp_output(src_r->reserve_chain_amount, src_r->reserve_wire_amount, req.src_amount)
+         : 0;
+      if (!src_r || !dst_r || w == 0 ||
+          src_r->reserve_wire_amount < w ||
+          dst_r->reserve_chain_amount < req.dst_amount) {
+         sysio::print("try_select_winner: insufficient reserve liquidity for "
+                      "uwreq ", uwreq_id, ", skipping\n");
+         return;
+      }
+   }
+
+   // Winner — push one lock per REQUIRED leg + mark uwreq CONFIRMED.
    // Each lock_entry carries the matching leg's full slug_name triple
    // (`chain_code, token_code, reserve_code`) so a future slash routes
-   // unambiguously back to the originating reserve.
-   uint32_t now_ep = get_current_epoch();
-   // Lock duration comes from uwconfig; default (10 epochs) used when no
-   // setconfig has been issued yet.
+   // unambiguously back to the originating reserve. Locks are a
+   // wall-clock challenge window (12h default): they are NEVER released
+   // by delivery — only `chklocks` (epoch advance) sweeps them after
+   // `expires_at_ms`.
+   const uint64_t now_ms_v = current_time_ms();
    uwrit::uwconfig_t uwcfg_tbl(self);
    auto uwcfg = uwcfg_tbl.get_or_default(uwrit::uw_config{});
-   uint32_t expires_ep = now_ep + uwcfg.collateral_lock_duration_epoch_count;
+   const uint64_t expires_ms = now_ms_v + uwcfg.collateral_lock_duration_ms;
 
    uwrit::locks_t locks(self);
 
-   uint64_t src_lock_id = next_lock_id(self);
-   locks.emplace(ram_payer, uwrit::lock_key{src_lock_id}, uwrit::lock_entry{
-      .lock_id          = src_lock_id,
-      .uwreq_id         = uwreq_id,
-      .underwriter      = candidate,
-      .chain_code       = req.src_chain_code,
-      .token_code       = req.src_token_code,
-      .reserve_code     = req.src_reserve_code,
-      .amount           = req.src_amount,
-      .created_at_epoch = now_ep,
-      .expires_at_epoch = expires_ep,
-   });
+   if (src_needed) {
+      uint64_t src_lock_id = next_lock_id(self);
+      locks.emplace(ram_payer, uwrit::lock_key{src_lock_id}, uwrit::lock_entry{
+         .lock_id       = src_lock_id,
+         .uwreq_id      = uwreq_id,
+         .underwriter   = candidate,
+         .chain_code    = req.src_chain_code,
+         .token_code    = req.src_token_code,
+         .reserve_code  = req.src_reserve_code,
+         .amount        = req.src_amount,
+         .created_at_ms = now_ms_v,
+         .expires_at_ms = expires_ms,
+      });
+   }
 
-   uint64_t dst_lock_id = next_lock_id(self);
-   locks.emplace(ram_payer, uwrit::lock_key{dst_lock_id}, uwrit::lock_entry{
-      .lock_id          = dst_lock_id,
-      .uwreq_id         = uwreq_id,
-      .underwriter      = candidate,
-      .chain_code       = req.dst_chain_code,
-      .token_code       = req.dst_token_code,
-      .reserve_code     = req.dst_reserve_code,
-      .amount           = req.dst_amount,
-      .created_at_epoch = now_ep,
-      .expires_at_epoch = expires_ep,
-   });
+   if (dst_needed) {
+      uint64_t dst_lock_id = next_lock_id(self);
+      locks.emplace(ram_payer, uwrit::lock_key{dst_lock_id}, uwrit::lock_entry{
+         .lock_id       = dst_lock_id,
+         .uwreq_id      = uwreq_id,
+         .underwriter   = candidate,
+         .chain_code    = req.dst_chain_code,
+         .token_code    = req.dst_token_code,
+         .reserve_code  = req.dst_reserve_code,
+         .amount        = req.dst_amount,
+         .created_at_ms = now_ms_v,
+         .expires_at_ms = expires_ms,
+      });
+   }
 
    reqs.modify(same_payer, pk, [&](auto& r) {
       r.status          = UnderwriteRequestStatus::UNDERWRITE_REQUEST_STATUS_CONFIRMED;
@@ -863,23 +1126,50 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate) {
       }
    });
 
-   // Re-read the row post-modify so emit_swap_remit sees the
+   // Re-read the row post-modify so the settlement tail sees the
    // CONFIRMED snapshot (and gets a stable copy of the bytes /
    // chain / amount fields).
    auto confirmed = reqs.get(pk);
 
-   // Queue the outbound SWAP_REMIT envelope to the destination outpost
-   // + debit the depot's reserve view in the same transaction. Per
-   // protocol: the depot is the ground truth; SWAP_REMIT emission and
-   // the reserve's outpost-side debit are atomic. The reflected
-   // SWAP_REMIT envelope from the destination outpost back to msgch
-   // triggers `uwrit::release` (the depot doesn't wait on a separate
-   // confirmation message; reflection IS the ack). Outpost-side
-   // failures emit SWAP_REJECTED back, which calls
-   // sysio.reserv::onreject to undo this debit so the depot's view
-   // reconciles with the outpost's actual (still-holding-the-token)
-   // balance.
-   emit_swap_remit(self, confirmed, candidate);
+   // ── Settlement — reserve books move NOW, before any remit leaves ─────
+   // All reserve mutations are queued ahead of the SWAP_REMIT queueout in
+   // this same transaction, so every quote between emit and delivery
+   // prices the post-swap books. There is no failure path past this
+   // point: everything was verified above, and transport is
+   // consensus-gated (delivery either reaches consensus or nothing
+   // happens — the envelope dispute process covers divergence). Success
+   // is implicit; locks expire on their own 12h window via `chklocks`.
+   if (!dst_needed) {
+      // Swap-to-WIRE: pay the recipient REAL WIRE from reserve custody.
+      // The depot itself is the payer — no outbound remit, no ack.
+      action(
+         permission_level{self, "active"_n},
+         uwrit::RESERVE_ACCOUNT, "paywire"_n,
+         std::make_tuple(req.src_chain_code, req.src_token_code, req.src_reserve_code,
+                          req.src_amount, towire_recipient, req.dst_amount)
+      ).send();
+   } else if (!src_needed) {
+      // Swap-from-WIRE: the escrowed WIRE becomes dst-reserve liquidity,
+      // then the normal remit tail to the destination outpost.
+      action(
+         permission_level{self, "active"_n},
+         uwrit::RESERVE_ACCOUNT, "applyfromwire"_n,
+         std::make_tuple(req.dst_chain_code, req.dst_token_code, req.dst_reserve_code,
+                          req.src_amount, req.dst_amount)
+      ).send();
+      emit_swap_remit(self, confirmed, candidate);
+   } else {
+      // Normal swap: emit-time four-leg apply, then the remit tail.
+      action(
+         permission_level{self, "active"_n},
+         uwrit::RESERVE_ACCOUNT, "applyswap"_n,
+         std::make_tuple(req.src_chain_code, req.src_token_code, req.src_reserve_code,
+                          req.src_amount,
+                          req.dst_chain_code, req.dst_token_code, req.dst_reserve_code,
+                          req.dst_amount)
+      ).send();
+      emit_swap_remit(self, confirmed, candidate);
+   }
 }
 
 } // anonymous namespace
@@ -950,90 +1240,229 @@ void uwrit::rcrdcommit(uint64_t uwreq_id,
    });
 
    // Re-read after modify — try_select_winner needs the latest commit_entry.
+   // A leg is required iff its chain is an outpost; a depot (WIRE) leg is
+   // satisfied by construction (no outpost exists to send a UIC for it),
+   // so single-leg swaps arm the race on their one real commit.
    auto refreshed = reqs.get(pk);
+   const bool src_needed = !leg_is_depot(refreshed.src_chain_code);
+   const bool dst_needed = !leg_is_depot(refreshed.dst_chain_code);
    for (const auto& c : refreshed.commits_by) {
-      if (c.underwriter == underwriter &&
-          c.source_received_at_ms != 0 && c.dest_received_at_ms != 0) {
+      if (c.underwriter != underwriter) continue;
+      const bool src_ok = !src_needed || c.source_received_at_ms != 0;
+      const bool dst_ok = !dst_needed || c.dest_received_at_ms != 0;
+      if (src_ok && dst_ok) {
          try_select_winner(get_self(), uwreq_id, underwriter);
-         break;
       }
+      break;
    }
 }
 
 // ---------------------------------------------------------------------------
-//  release — settle an UWREQ; deferred-slash / deferred-remit each lock
+//  swapfromwire — queue a depot-originated swap (WIRE is the source)
 // ---------------------------------------------------------------------------
-void uwrit::release(uint64_t uwreq_id) {
-   // Two callers expected:
-   //   * sysio.msgch::dispatch on REMIT_CONFIRM inbound (msgch auth).
-   //   * uwrit::expirelock self-inline when a lock has aged past its deadline
-   //     (uwrit's own auth, sent from the expirelock action body).
-   check(has_auth(MSGCH_ACCOUNT) || has_auth(get_self()),
-         "release requires sysio.msgch or sysio.uwrit authority");
-
-   uwreqs_t reqs(get_self());
-   auto pk = id_key{uwreq_id};
-   check(reqs.contains(pk), "uwreq not found");
-   auto req = reqs.get(pk);
-   check(req.status == UnderwriteRequestStatus::UNDERWRITE_REQUEST_STATUS_CONFIRMED,
-         "uwreq not in CONFIRMED state");
-
-   // Iterate locks for this uwreq via secondary index, copy out keys (we'll
-   // erase as we go), then for each: call opreg::releaselock + erase.
-   // releaselock takes (account, chain_code, token_code, amount).
-   locks_t locks(get_self());
-   auto idx = locks.get_index<"byuwreq"_n>();
-   std::vector<lock_key> to_erase;
-   for (auto it = idx.lower_bound(uwreq_id);
-        it != idx.end() && it->uwreq_id == uwreq_id; ++it) {
-      action(
-         permission_level{get_self(), "active"_n},
-         OPREG_ACCOUNT, "releaselock"_n,
-         std::make_tuple(it->underwriter, it->chain_code, it->token_code, it->amount)
-      ).send();
-      to_erase.push_back(lock_key{it->lock_id});
-   }
-   for (const auto& k : to_erase) {
-      locks.erase(k);
+//
+// User transaction (require_auth(user)) — reverting on validation failure
+// is the correct mode here, exactly like opreg::deposit. The WIRE escrow
+// and the queue row land atomically; the uwreq itself is NOT created in
+// this transaction (that would short-circuit ledger consistency) — the
+// next sysio.epoch::advance drains the queue via drainfwq.
+void uwrit::swapfromwire(name                  user,
+                          uint64_t              wire_amount,
+                          sysio::slug_name       dst_chain_code,
+                          sysio::slug_name       dst_token_code,
+                          sysio::slug_name       dst_reserve_code,
+                          uint64_t              target_amount,
+                          uint32_t              target_tolerance_bps,
+                          opp::types::ChainKind recipient_kind,
+                          std::vector<char>     recipient_addr) {
+   require_auth(user);
+   check(wire_amount > 0, "swapfromwire: wire_amount must be positive");
+   check(target_amount > 0, "swapfromwire: target_amount must be positive");
+   check(!recipient_addr.empty() && recipient_addr.size() <= 64,
+         "swapfromwire: recipient address must be 1..64 bytes");
+   check(chain_registered_active(dst_chain_code),
+         "swapfromwire: target chain not registered or not active");
+   check(!leg_is_depot(dst_chain_code),
+         "swapfromwire: target must be an outpost chain (WIRE->WIRE is just "
+         "a token transfer)");
+   {
+      auto kind_opt = chain_kind_for_code(dst_chain_code);
+      check(kind_opt.has_value() && *kind_opt == recipient_kind,
+            "swapfromwire: recipient_kind does not match the target chain's kind");
    }
 
-   uint32_t now_ep = get_current_epoch();
-   reqs.modify(same_payer, pk, [&](auto& r) {
-      r.status           = UnderwriteRequestStatus::UNDERWRITE_REQUEST_STATUS_COMPLETED;
-      r.settled_at_ms    = current_time_ms();
-      r.expires_at_epoch = now_ep + UWREQ_RETENTION_EPOCHS;
+   // Advisory reserve checks for UX — drainfwq re-validates authoritatively
+   // at the epoch boundary (state may change in between; drain refunds).
+   {
+      auto r = find_reserve(dst_chain_code, dst_token_code, dst_reserve_code);
+      check(r.has_value(), "swapfromwire: target reserve not found");
+      check(r->status == ReserveStatus::RESERVE_STATUS_ACTIVE,
+            "swapfromwire: target reserve not ACTIVE");
+      check(!r->is_private,
+            "swapfromwire: private reserves are excluded from WIRE-endpoint swaps");
+   }
+
+   // Escrow REAL WIRE into reserve custody NOW. The queue row records the
+   // claim; until drainfwq either creates the uwreq (escrow becomes
+   // reserve liquidity at race win) or refunds, this sits as the
+   // in-flight-escrow term of the custody invariant.
+   action(
+      permission_level{user, "active"_n},
+      TOKEN_ACCOUNT, "transfer"_n,
+      std::make_tuple(user, RESERVE_ACCOUNT,
+         asset(static_cast<int64_t>(wire_amount), WIRE_SYMBOL),
+         std::string("sysio.uwrit::swapfromwire escrow"))
+   ).send();
+
+   uint64_t qid = next_fromwire_id(get_self());
+   fwqueue_t q(get_self());
+   q.emplace(ram_payer, fw_key{qid}, fromwire_q{
+      .id                     = qid,
+      .user                   = user,
+      .wire_amount            = wire_amount,
+      .dst_chain_code         = dst_chain_code,
+      .dst_token_code         = dst_token_code,
+      .dst_reserve_code       = dst_reserve_code,
+      .target_amount          = target_amount,
+      .variance_tolerance_bps = target_tolerance_bps,
+      .recipient_kind         = recipient_kind,
+      .recipient_addr         = std::move(recipient_addr),
+      .created_at_epoch       = get_current_epoch(),
    });
 }
 
 // ---------------------------------------------------------------------------
-//  expirelock — permissionless watchdog for stale locks
+//  drainfwq — epoch-boundary drain of the swap-from-WIRE queue
 // ---------------------------------------------------------------------------
-void uwrit::expirelock(uint64_t uwreq_id) {
+//
+// Inlined from sysio.epoch::advance. NEVER throws: every reachable
+// `check()` in the reserv actions it inlines (`refundwire`) is
+// pre-guaranteed (wire_amount > 0 enforced at swapfromwire; the user
+// account existed at escrow time and accounts are not deletable).
+// Validation failures refund + drop; only validated rows become PENDING
+// uwreqs.
+void uwrit::drainfwq() {
+   check(has_auth(EPOCH_ACCOUNT) || has_auth(get_self()),
+         "drainfwq requires sysio.epoch or sysio.uwrit authority");
+
+   fwqueue_t q(get_self());
+   std::vector<fromwire_q> rows;
+   for (auto it = q.begin(); it != q.end(); ++it) {
+      rows.push_back(*it);
+   }
+   if (rows.empty()) return;
+
    uwreqs_t reqs(get_self());
-   auto pk = id_key{uwreq_id};
-   check(reqs.contains(pk), "uwreq not found");
-   auto req = reqs.get(pk);
-   check(req.status == UnderwriteRequestStatus::UNDERWRITE_REQUEST_STATUS_CONFIRMED,
-         "uwreq not in CONFIRMED state");
+   const auto depot_code = depot_chain_code();
 
-   // Check the oldest lock for this uwreq has aged past the unlock deadline.
-   // The deadline is the 10-epoch UWREQ retention window — generous enough
-   // that the destination outpost has had ample time to confirm REMIT.
-   locks_t locks(get_self());
-   auto idx = locks.get_index<"byuwreq"_n>();
-   auto it = idx.lower_bound(uwreq_id);
-   check(it != idx.end() && it->uwreq_id == uwreq_id, "no locks for uwreq");
+   for (const auto& row : rows) {
+      auto refund_and_drop = [&](const char* why) {
+         sysio::print("drainfwq: ", why, " — refunding queued swap ", row.id, "\n");
+         action(
+            permission_level{get_self(), "active"_n},
+            RESERVE_ACCOUNT, "refundwire"_n,
+            std::make_tuple(row.user, row.wire_amount)
+         ).send();
+         q.erase(fw_key{row.id});
+      };
 
-   uint32_t now_ep = get_current_epoch();
-   check(now_ep >= it->created_at_epoch + UWREQ_RETENTION_EPOCHS,
-         "uwreq lock has not yet aged past the unlock deadline");
+      if (!depot_code) {
+         refund_and_drop("depot chain not registered");
+         continue;
+      }
+      auto r = find_reserve(row.dst_chain_code, row.dst_token_code, row.dst_reserve_code);
+      if (!r || r->status != ReserveStatus::RESERVE_STATUS_ACTIVE) {
+         refund_and_drop("target reserve missing or not ACTIVE");
+         continue;
+      }
+      if (r->is_private) {
+         refund_and_drop("target reserve is private (excluded from WIRE-endpoint swaps)");
+         continue;
+      }
+      // Authoritative variance check — same convention as createuwreq: a
+      // zero quote (unprovisioned LP) skips the check.
+      const uint64_t quote = swap_quote(*depot_code, WIRE_TOKEN, WIRE_TOKEN,
+                                         row.dst_chain_code, row.dst_token_code,
+                                         row.dst_reserve_code, row.wire_amount);
+      if (quote != 0 && row.target_amount != 0) {
+         const uint64_t diff = quote > row.target_amount
+                                  ? quote - row.target_amount
+                                  : row.target_amount - quote;
+         const uint128_t allowed = (static_cast<uint128_t>(row.target_amount)
+                                       * row.variance_tolerance_bps) / 10000u;
+         if (static_cast<uint128_t>(diff) > allowed) {
+            refund_and_drop("variance exceeded tolerance at drain");
+            continue;
+         }
+      }
 
-   // Self-call release inline.
-   action(
-      permission_level{get_self(), "active"_n},
-      get_self(), "release"_n,
-      std::make_tuple(uwreq_id)
-   ).send();
+      // Synthetic SwapRequest payload — the settlement tail
+      // (emit_swap_remit) decodes `recipient` from the stored bytes
+      // exactly as it does for outpost-originated swaps.
+      opp::attestations::SwapRequest sr;
+      sr.actor.kind = ChainKind::CHAIN_KIND_WIRE;
+      {
+         auto user_bytes = wire_name_bytes(row.user);
+         sr.actor.address.assign(user_bytes.begin(), user_bytes.end());
+      }
+      sr.source_amount.token_code = WIRE_TOKEN.value;
+      sr.source_amount.amount     = static_cast<int64_t>(row.wire_amount);
+      sr.source_chain_code        = depot_code->value;
+      sr.source_reserve_code      = WIRE_TOKEN.value;   // sentinel — no WIRE-side reserve
+      sr.target_chain_code        = row.dst_chain_code.value;
+      sr.target_token_code        = row.dst_token_code.value;
+      sr.target_reserve_code      = row.dst_reserve_code.value;
+      sr.recipient.kind           = row.recipient_kind;
+      sr.recipient.address.assign(row.recipient_addr.begin(), row.recipient_addr.end());
+      sr.target_amount            = row.target_amount;
+      sr.target_tolerance_bps     = row.variance_tolerance_bps;
+      sr.target_timestamp_ms      = 0;
+      // Synthetic but non-empty source_tx_id (8-byte LE row id) so the
+      // uwreq row shape matches outpost-originated swaps.
+      std::vector<char> stx(8);
+      for (size_t i = 0; i < 8; ++i) {
+         stx[i] = static_cast<char>((row.id >> (i * 8)) & 0xff);
+      }
+      sr.source_tx_id.assign(stx.begin(), stx.end());
+
+      std::vector<char> encoded;
+      auto out = zpp::bits::out{encoded, zpp::bits::no_size{}};
+      if (out(sr) != zpp::bits::errc{}) {
+         refund_and_drop("failed to encode synthetic SwapRequest");
+         continue;
+      }
+
+      auto pk = id_key{row.id};
+      if (reqs.contains(pk)) {
+         // Idempotency backstop — the id space makes this unreachable.
+         q.erase(fw_key{row.id});
+         continue;
+      }
+      reqs.emplace(ram_payer, pk, uw_request_t{
+         .id                        = row.id,
+         .type                      = AttestationType::ATTESTATION_TYPE_SWAP_REQUEST,
+         .status                    = UnderwriteRequestStatus::UNDERWRITE_REQUEST_STATUS_PENDING,
+         .src_chain_code            = *depot_code,
+         .src_token_code            = WIRE_TOKEN,
+         .src_reserve_code          = WIRE_TOKEN,
+         .src_amount                = row.wire_amount,
+         .dst_chain_code            = row.dst_chain_code,
+         .dst_token_code            = row.dst_token_code,
+         .dst_reserve_code          = row.dst_reserve_code,
+         .dst_amount                = row.target_amount,
+         .variance_tolerance_bps    = row.variance_tolerance_bps,
+         .source_tx_id              = std::move(stx),
+         .depositor                 = wire_name_bytes(row.user),
+         .commits_by                = {},
+         .winner                    = name{},
+         .committed_at_ms           = 0,
+         .settled_at_ms             = 0,
+         .expires_at_epoch          = 0,
+         .attestation_inbound_data  = std::move(encoded),
+         .attestation_outbound_data = {},
+      });
+      q.erase(fw_key{row.id});
+   }
 }
 
 // ---------------------------------------------------------------------------
@@ -1046,29 +1475,74 @@ uint64_t uwrit::sumlocks(name underwriter,
 }
 
 // ---------------------------------------------------------------------------
-//  chklocks — epoch-boundary sweep of expired locks
+//  chklocks — epoch-boundary sweep of expired locks (the ONLY release path)
 // ---------------------------------------------------------------------------
-void uwrit::chklocks(uint32_t up_to_epoch) {
+//
+// Locks are a wall-clock challenge window (12h default via uwconfig) and
+// are never released by delivery. This sweep:
+//   1. erases every lock whose `expires_at_ms` has elapsed,
+//   2. inlines `opreg::releaselock` per lock — the deferred-slash
+//      (SLASHED) / deferred-remit (TERMINATED) / no-op (healthy) hop that
+//      settles the underwriter's bond as the challenge window closes,
+//   3. flips a CONFIRMED uwreq to COMPLETED once its last lock is swept
+//      (delivery success is implicit — there is no SWAP_REMIT ack).
+//
+// Runs as one of the FIRST steps of sysio.epoch::advance so freshly freed
+// collateral is visible to the same advance's withdraw flushing. NEVER
+// throws on reachable state: lock amounts are provably positive (enforced
+// at uwreq/queue creation), so opreg::releaselock's amount check cannot
+// fire.
+void uwrit::chklocks() {
    // Two valid callers:
-   //   * sysio.epoch::advance — inlined at every epoch boundary so an
-   //     epoch advance naturally evicts whatever just aged out.
+   //   * sysio.epoch::advance — inlined at every epoch boundary.
    //   * sysio.uwrit — manual cleanup invocation, e.g. from a migration.
    check(has_auth(EPOCH_ACCOUNT) || has_auth(get_self()),
          "chklocks requires sysio.epoch or sysio.uwrit authority");
 
+   const uint64_t now_ms = current_time_ms();
    locks_t locks(get_self());
    auto idx = locks.get_index<"byexpire"_n>();
 
-   // Walk in ascending `expires_at_epoch` and erase while expired. We can't
-   // hold an iterator across `locks.erase(*it)` (it invalidates the index
-   // cursor), so collect keys first and erase in a second pass.
-   std::vector<lock_key> doomed;
+   // Walk in ascending `expires_at_ms` and collect full copies while
+   // expired — we erase in a second pass (an erase invalidates the index
+   // cursor) and need every field for the releaselock fan-out.
+   std::vector<lock_entry> expired;
    for (auto it = idx.begin();
-        it != idx.end() && it->expires_at_epoch <= up_to_epoch; ++it) {
-      doomed.push_back(lock_key{it->lock_id});
+        it != idx.end() && it->expires_at_ms <= now_ms; ++it) {
+      expired.push_back(*it);
    }
-   for (const auto& k : doomed) {
-      locks.erase(k);
+   if (expired.empty()) return;
+
+   std::vector<uint64_t> affected;
+   for (const auto& l : expired) {
+      action(
+         permission_level{get_self(), "active"_n},
+         OPREG_ACCOUNT, "releaselock"_n,
+         std::make_tuple(l.underwriter, l.chain_code, l.token_code, l.amount)
+      ).send();
+      locks.erase(lock_key{l.lock_id});
+      if (std::find(affected.begin(), affected.end(), l.uwreq_id) == affected.end()) {
+         affected.push_back(l.uwreq_id);
+      }
+   }
+
+   // COMPLETED flip — a CONFIRMED uwreq whose final lock just swept has
+   // exited its challenge window.
+   uwreqs_t reqs(get_self());
+   auto byuwreq = locks.get_index<"byuwreq"_n>();
+   const uint32_t now_ep = get_current_epoch();
+   for (uint64_t id : affected) {
+      auto lit = byuwreq.lower_bound(id);
+      if (lit != byuwreq.end() && lit->uwreq_id == id) continue;   // locks remain
+      auto pk = id_key{id};
+      if (!reqs.contains(pk)) continue;
+      auto r = reqs.get(pk);
+      if (r.status != UnderwriteRequestStatus::UNDERWRITE_REQUEST_STATUS_CONFIRMED) continue;
+      reqs.modify(same_payer, pk, [&](auto& row) {
+         row.status           = UnderwriteRequestStatus::UNDERWRITE_REQUEST_STATUS_COMPLETED;
+         row.settled_at_ms    = current_time_ms();
+         row.expires_at_epoch = now_ep + UWREQ_RETENTION_EPOCHS;
+      });
    }
 }
 

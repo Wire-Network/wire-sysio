@@ -88,6 +88,16 @@ struct uw_request {
    /// fee-payer (SOL) against this to confirm the recorded depositor
    /// actually authorized the deposit.
    std::vector<char>       depositor;
+
+   /// Per-leg depot flags — true when the leg's chain_code is the WIRE
+   /// depot's own registry row (`sysio.chains` `is_depot`). A depot leg is
+   /// not underwritten: no outpost commit, no bond, no source-deposit
+   /// verification. Stamped by `scan_pending_requests` from the exact
+   /// depot code captured in `read_outpost_registry` — NOT inferred from
+   /// `CHAIN_KIND_UNKNOWN`, which also matches genuinely-unregistered
+   /// chains.
+   bool                    src_is_depot = false;
+   bool                    dst_is_depot = false;
 };
 
 // ---------------------------------------------------------------------------
@@ -186,6 +196,13 @@ struct underwriter_plugin::impl {
 
    // Outpost chain_kind cache: chain_code -> ChainKind
    std::map<uint64_t, ChainKind>     outpost_chain_kinds;
+
+   /// The WIRE depot's own chain code (the `is_depot` row of
+   /// `sysio.chains::chains`), captured by `read_outpost_registry` each
+   /// cycle. Used for exact per-leg depot detection on uwreq rows —
+   /// to/from-WIRE swaps have one depot leg that the plugin must skip
+   /// (no commit, no bond) rather than error on.
+   std::optional<uint64_t>           depot_chain_code;
 
    /// SPI handles to the configured outposts, keyed by `ChainKind`. Built
    /// once at `plugin_startup` (after preflight) via the
@@ -612,17 +629,21 @@ struct underwriter_plugin::impl {
          return;
       }
 
-      // Step 5b: drop any uwreq whose BOTH legs are already confirmed —
-      // the dispatch lambda also gates per-leg, but checking here saves
-      // building UIC + signing for nothing.
+      // Step 5b: drop any uwreq whose every REQUIRED leg is already
+      // confirmed — the dispatch lambda also gates per-leg, but checking
+      // here saves building UIC + signing for nothing. A depot (WIRE) leg
+      // is implicitly done: it is never committed, so without this a
+      // single-leg swap would be reselected forever.
       std::erase_if(selected, [&](const uw_request& r) {
-         const commit_key src{r.id, r.src_chain, r.src_token_kind};
-         const commit_key dst{r.id, r.dst_chain, r.dst_token_kind};
-         return confirmed_commits.contains(src) && confirmed_commits.contains(dst);
+         const bool src_done = r.src_is_depot
+            || confirmed_commits.contains(commit_key{r.id, r.src_chain, r.src_token_kind});
+         const bool dst_done = r.dst_is_depot
+            || confirmed_commits.contains(commit_key{r.id, r.dst_chain, r.dst_token_kind});
+         return src_done && dst_done;
       });
 
       if (selected.empty()) {
-         ilog("underwriter: all selected uwreqs already have both legs confirmed locally");
+         ilog("underwriter: all selected uwreqs already have every required leg confirmed locally");
          return;
       }
 
@@ -649,17 +670,31 @@ struct underwriter_plugin::impl {
       //                  it out since underwriters don't commit to the
       //                  depot itself.
       auto rows = read_all("sysio.chains", "sysio.chains", "chains");
+      depot_chain_code.reset();
       for (auto& row : rows.rows) {
          auto obj = row.get_object();
-         if (obj.contains("is_depot") && obj["is_depot"].as_bool()) continue;
          // `code` is a `slug_name` — serialised as `{"value": <uint64>}`.
          const auto& code_obj = obj["code"].get_object();
          uint64_t chain_code = code_obj["value"].as_uint64();
+         if (obj.contains("is_depot") && obj["is_depot"].as_bool()) {
+            // Record the depot's own code for exact per-leg depot
+            // detection (to/from-WIRE swaps), then skip caching it as an
+            // outpost — underwriters never commit to the depot itself.
+            depot_chain_code = chain_code;
+            continue;
+         }
          // FC_REFLECT_ENUM in sysio/opp/opp.hpp gives us a direct enum
          // round-trip — the variant carries the symbolic name and `.as<T>()`
          // recovers the typed value without a string switch.
          outpost_chain_kinds[chain_code] = obj["kind"].as<ChainKind>();
       }
+   }
+
+   /// True iff `code` is the WIRE depot's own chain code. Exact compare
+   /// against the registry's `is_depot` row — never inferred from
+   /// CHAIN_KIND_UNKNOWN (which also matches unregistered chains).
+   bool is_depot_leg(fc::slug_name code) const {
+      return depot_chain_code && code.value == *depot_chain_code;
    }
 
    // -----------------------------------------------------------------------
@@ -958,6 +993,11 @@ struct underwriter_plugin::impl {
          req.src_token_kind = resolve_token_kind(req.src_token_code);
          req.dst_chain      = resolve_chain_kind(req.dst_chain_code);
          req.dst_token_kind = resolve_token_kind(req.dst_token_code);
+         // Depot-leg stamps — exact compare against the registry's
+         // is_depot row. A depot (WIRE) leg needs no commit / bond /
+         // source verification; downstream stages branch on these.
+         req.src_is_depot   = is_depot_leg(req.src_chain_code);
+         req.dst_is_depot   = is_depot_leg(req.dst_chain_code);
          // The ABI surfaces `bytes` as a hex string. Decode both
          // source_tx_id and depositor — the depot rejects any SwapRequest
          // with empty source_tx_id at createuwreq (emits SwapRevert), so
@@ -998,6 +1038,39 @@ struct underwriter_plugin::impl {
            |  static_cast<uint64_t>(magic_enum::enum_integer(token));
    }
 
+   /// Attempt to debit `r`'s per-leg bond requirements from `remaining`.
+   /// Returns true (and mutates `remaining`) iff every required leg fits.
+   /// Depot (WIRE) legs require ZERO bond — they have no outpost, no UIC,
+   /// and no lock — so they consult no bucket; a swap whose legs are both
+   /// depot is rejected (degenerate; the depot never creates such uwreqs).
+   /// Same-bucket dual-leg swaps (e.g. ERC20 → native on one outpost)
+   /// debit both legs from the single shared row.
+   static bool try_debit_buckets(std::map<uint64_t, uint64_t>& remaining,
+                                  const uw_request&              r) {
+      const uint64_t src_req = r.src_is_depot ? 0 : r.src_amount;
+      const uint64_t dst_req = r.dst_is_depot ? 0 : r.dst_amount;
+      if (src_req == 0 && dst_req == 0) return false;
+      const uint64_t src_k = bucket_key(r.src_chain, r.src_token_kind);
+      const uint64_t dst_k = bucket_key(r.dst_chain, r.dst_token_kind);
+      if (src_req > 0 && dst_req > 0 && src_k == dst_k) {
+         auto it = remaining.find(src_k);
+         if (it == remaining.end() || it->second < src_req + dst_req) return false;
+         it->second -= (src_req + dst_req);
+         return true;
+      }
+      if (src_req > 0) {
+         auto it = remaining.find(src_k);
+         if (it == remaining.end() || it->second < src_req) return false;
+      }
+      if (dst_req > 0) {
+         auto it = remaining.find(dst_k);
+         if (it == remaining.end() || it->second < dst_req) return false;
+      }
+      if (src_req > 0) remaining[src_k] -= src_req;
+      if (dst_req > 0) remaining[dst_k] -= dst_req;
+      return true;
+   }
+
    /// Branch-and-bound search that returns the subset of `candidates`
    /// maximizing `Σ(src_amount + dst_amount)` while each per-(chain,
    /// token_kind) credit bucket stays non-negative. Recurses depth-first
@@ -1031,28 +1104,8 @@ struct underwriter_plugin::impl {
       }
 
       const auto& r = candidates[i];
-      const uint64_t src_k = bucket_key(r.src_chain, r.src_token_kind);
-      const uint64_t dst_k = bucket_key(r.dst_chain, r.dst_token_kind);
-
-      bool feasible = false;
       std::map<uint64_t, uint64_t> after = remaining;
-      if (src_k == dst_k) {
-         auto it = after.find(src_k);
-         if (it != after.end() && it->second >= r.src_amount + r.dst_amount) {
-            it->second -= (r.src_amount + r.dst_amount);
-            feasible = true;
-         }
-      } else {
-         auto src_it = after.find(src_k);
-         auto dst_it = after.find(dst_k);
-         if (src_it != after.end() && dst_it != after.end()
-             && src_it->second >= r.src_amount
-             && dst_it->second >= r.dst_amount) {
-            src_it->second -= r.src_amount;
-            dst_it->second -= r.dst_amount;
-            feasible = true;
-         }
-      }
+      const bool feasible = try_debit_buckets(after, r);
 
       // Branch 1: include (if feasible).
       if (feasible) {
@@ -1082,22 +1135,7 @@ struct underwriter_plugin::impl {
                 });
       std::vector<uw_request> picked;
       for (auto& r : requests) {
-         const uint64_t src_k = bucket_key(r.src_chain, r.src_token_kind);
-         const uint64_t dst_k = bucket_key(r.dst_chain, r.dst_token_kind);
-         if (src_k == dst_k) {
-            auto it = remaining.find(src_k);
-            if (it == remaining.end()
-                || it->second < r.src_amount + r.dst_amount) continue;
-            it->second -= (r.src_amount + r.dst_amount);
-         } else {
-            auto src_it = remaining.find(src_k);
-            auto dst_it = remaining.find(dst_k);
-            if (src_it == remaining.end() || dst_it == remaining.end()
-                || src_it->second < r.src_amount
-                || dst_it->second < r.dst_amount) continue;
-            src_it->second -= r.src_amount;
-            dst_it->second -= r.dst_amount;
-         }
+         if (!try_debit_buckets(remaining, r)) continue;
          picked.push_back(r);
       }
       return picked;
@@ -1113,23 +1151,14 @@ struct underwriter_plugin::impl {
       }
 
       // Pre-filter requests that can never fit in isolation (no bucket
-      // even matches), so the search space stays small.
+      // even matches), so the search space stays small. Depot legs cost
+      // zero, so a single-leg (to/from-WIRE) request only needs its one
+      // real leg's bucket to cover.
       std::vector<uw_request> feasible_in_isolation;
       feasible_in_isolation.reserve(requests.size());
       for (auto& r : requests) {
-         const uint64_t src_k = bucket_key(r.src_chain, r.src_token_kind);
-         const uint64_t dst_k = bucket_key(r.dst_chain, r.dst_token_kind);
-         if (src_k == dst_k) {
-            auto it = initial_credit.find(src_k);
-            if (it == initial_credit.end()
-                || it->second < r.src_amount + r.dst_amount) continue;
-         } else {
-            auto src_it = initial_credit.find(src_k);
-            auto dst_it = initial_credit.find(dst_k);
-            if (src_it == initial_credit.end() || dst_it == initial_credit.end()
-                || src_it->second < r.src_amount
-                || dst_it->second < r.dst_amount) continue;
-         }
+         auto scratch = initial_credit;
+         if (!try_debit_buckets(scratch, r)) continue;
          feasible_in_isolation.push_back(r);
       }
 
@@ -1306,6 +1335,16 @@ struct underwriter_plugin::impl {
    /// read a row pre-validation; either way the safe move is to refuse to
    /// commit until the data is whole.
    bool verify_source_deposit(const uw_request& req) {
+      if (req.src_is_depot) {
+         // Swap-from-WIRE: the source funds were escrowed ON the depot by
+         // `sysio.uwrit::swapfromwire` before the uwreq existed — there is
+         // no outpost SwapDeposit to verify, and the synthetic
+         // source_tx_id is just the depot-origin queue id. This branch
+         // must precede the empty-source_tx_id hard-fail below.
+         dlog("underwriter: uwreq {} source is the WIRE depot — skipping "
+              "source-deposit verification", req.id);
+         return true;
+      }
       if (req.source_tx_id.empty()) {
          elog("underwriter: REFUSING to commit uwreq {} — source_tx_id empty. "
               "Every SwapRequest is required to carry a populated source_tx_id; "
@@ -1900,7 +1939,16 @@ struct underwriter_plugin::impl {
                                fc::slug_name chain_code,
                                fc::slug_name token_code,
                                fc::slug_name reserve_code,
-                               uint64_t     uw_request_id) {
+                               uint64_t     uw_request_id,
+                               bool         is_depot) {
+         if (is_depot) {
+            // Intended, not an error: depot (WIRE) legs are never
+            // underwritten — no outpost exists, no UIC is built, no bond
+            // is consumed. Single-leg swaps commit only their real leg.
+            dlog("underwriter: uwreq {} leg chain={} is the WIRE depot — "
+                 "no commit needed", uw_request_id, chain_code.to_string());
+            return;
+         }
          const commit_key key{uw_request_id, chain, token_kind};
          if (confirmed_commits.contains(key)) {
             ilog("underwriter: skip already-confirmed commit uwreq={} chain={} token={}",
@@ -1955,10 +2003,10 @@ struct underwriter_plugin::impl {
       };
       submit_one(req.src_chain, req.src_token_kind,
                  req.src_chain_code, req.src_token_code, req.src_reserve_code,
-                 req.id);
+                 req.id, req.src_is_depot);
       submit_one(req.dst_chain, req.dst_token_kind,
                  req.dst_chain_code, req.dst_token_code, req.dst_reserve_code,
-                 req.id);
+                 req.id, req.dst_is_depot);
    }
 
    // Outpost commit submission is delegated entirely to the `outpost_client`

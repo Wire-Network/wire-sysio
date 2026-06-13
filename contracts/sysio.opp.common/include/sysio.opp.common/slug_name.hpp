@@ -5,7 +5,7 @@
  *
  * `sysio::slug_name` is the contract-side type for slug_name-keyed entities
  * (Chain.code, Token.code, ChainToken.{chain,token}_code, Reserve.code,
- * ReserveTarget.{chain,reserve}_code, TokenAmount.token_code).
+ * ReserveAmount.{chain,reserve}_code, TokenAmount.token_code).
  *
  * Wire format: `uint64`. Protobuf fields are plain uint64; this type is the
  * C++ wrapper. Mirrored host-side as `fc::slug_name` (libfc/include/fc/slug_name.hpp)
