@@ -574,6 +574,30 @@ BOOST_FIXTURE_TEST_CASE(dispatch_silently_drops_out_of_scope_types, sysio_dispat
    BOOST_REQUIRE_EQUAL(0u, balances.size());
 } FC_LOG_AND_RETHROW() }
 
+// A second `deliver` from the SAME operator for the same outpost+epoch must REVERT, not land as a
+// recorded no-op: a reverted transaction is never included in a block and bills no CPU/NET, whereas
+// the previous soft print-and-return shape charged the operator and consumed block space for zero
+// state change. Matching deliveries from DISTINCT operators are not duplicates -- they are the
+// consensus tally itself (covered by the dispute/consensus suites).
+BOOST_FIXTURE_TEST_CASE(deliver_duplicate_from_same_operator_reverts, sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+
+   const auto eth_code = fc::slug_name{"ETH"}.value;
+   auto envelope = encode_envelope_with_one_attestation(
+      current_epoch(),
+      sysio::opp::types::ATTESTATION_TYPE_STAKE,
+      std::string{});
+
+   BOOST_REQUIRE_EQUAL(success(), deliver(/*chain_code=*/eth_code, envelope));
+   // Cross a block boundary so the re-submission is a distinct transaction —
+   // an identical push in the same block is rejected as tx_duplicate before
+   // the contract runs, which would mask the guard under test.
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(
+      wasm_assert_msg("operator already delivered for this outpost+epoch"),
+      deliver(/*chain_code=*/eth_code, envelope));
+} FC_LOG_AND_RETHROW() }
+
 // NodeOwnerRegistration: msgch decodes the attestation and inline-sends sysio.roa::newnameduser then
 // nodeownreg. CLAIM_ACCOUNT pre-exists with a single-key active, so newnameduser no-ops and the
 // claim's matching wire key drives nodeownreg's existing-account path to CONFIRMED (registers the

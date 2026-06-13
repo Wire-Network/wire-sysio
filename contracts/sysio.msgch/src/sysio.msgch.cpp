@@ -953,16 +953,20 @@ void msgch::deliver(name batch_op_name, uint64_t chain_code, std::vector<char> d
    // Compute checksum trustlessly inside the contract
    checksum256 cs = sha256(data.data(), data.size());
 
-   // Prevent duplicate delivery from same operator for same outpost+epoch
+   // Reject duplicate delivery from the same operator for the same outpost+epoch.
+   // A revert (check) is deliberate, NOT a soft print-and-return: a reverted
+   // transaction is never recorded in a block and bills no CPU/NET, whereas the
+   // previous soft-return shape landed every duplicate as a recorded, billed
+   // no-op. Distinct operators delivering matching content are NOT duplicates --
+   // each inserts its own row below, which is exactly what evalcons counts
+   // toward the per-checksum consensus tally.
    envelopes_t envs(get_self());
    auto oe_idx = envs.get_index<"byoutepoch"_n>();
    uint128_t composite = opp::outpost_epoch_key(chain_code, epoch);
    for (auto it = oe_idx.lower_bound(composite);
         it != oe_idx.end() && it->by_outpost_epoch() == composite; ++it) {
-      if (it->batch_op_name == batch_op_name) {
-         sysio::print_f("operator already delivered for this outpost+epoch: %s", batch_op_name.to_string().c_str());
-         return;
-      }
+      check(it->batch_op_name != batch_op_name,
+            "operator already delivered for this outpost+epoch");
    }
 
    // Store envelope
