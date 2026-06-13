@@ -143,7 +143,7 @@ DataStream& operator>>(DataStream& ds, EncodingFlags& t) {
 }
 
 // ---------------------------------------------------------------------------
-//  v6 registry-entity messages (Chain / Token / ChainToken / Reserve / ReserveTarget)
+//  v6 registry-entity messages (Chain / Token / ChainToken / Reserve / ReserveAmount)
 // ---------------------------------------------------------------------------
 
 template <typename DataStream>
@@ -197,11 +197,11 @@ DataStream& operator>>(DataStream& ds, Reserve& t) {
 }
 
 template <typename DataStream>
-DataStream& operator<<(DataStream& ds, const ReserveTarget& t) {
+DataStream& operator<<(DataStream& ds, const ReserveAmount& t) {
    return ds << t.chain_code << t.reserve_code << t.amount;
 }
 template <typename DataStream>
-DataStream& operator>>(DataStream& ds, ReserveTarget& t) {
+DataStream& operator>>(DataStream& ds, ReserveAmount& t) {
    return ds >> t.chain_code >> t.reserve_code >> t.amount;
 }
 
@@ -296,14 +296,16 @@ DataStream& operator>>(DataStream& ds, Envelope& t) {
 // ─────────────────────────────────────────────────────────────────────────────
 namespace sysio::opp::attestations {
 
-// ReserveBalanceSheet (v6, renamed from ChainReserveBalanceSheet)
+// ReserveBalanceSheet (v6, renamed from ChainReserveBalanceSheet; the
+// parallel amounts[]/reserve_codes[] arrays were replaced by
+// self-describing depot-frame `ReserveAmount` entries).
 template <typename DataStream>
 DataStream& operator<<(DataStream& ds, const ReserveBalanceSheet& t) {
-   return ds << t.chain_code << t.amounts << t.reserve_codes;
+   return ds << t.chain_code << t.reserves;
 }
 template <typename DataStream>
 DataStream& operator>>(DataStream& ds, ReserveBalanceSheet& t) {
-   return ds >> t.chain_code >> t.amounts >> t.reserve_codes;
+   return ds >> t.chain_code >> t.reserves;
 }
 
 // PretokenStakeChange (deprecated; pre-launch only)
@@ -540,9 +542,9 @@ DataStream& operator>>(DataStream& ds, BatchOperatorGroups& t) {
    return ds >> t.active_group_index >> t.epoch_index >> t.groups;
 }
 
-// ReserveTarget — v6: (chain_code, reserve_code, TokenAmount).
-// (NOTE: ReserveTarget lives in `sysio::opp::types` per v6 types.proto;
-//  the DataStream overloads below in the types namespace.)
+// ReserveAmount — v6: (chain_code, reserve_code, TokenAmount), depot-frame.
+// (NOTE: ReserveAmount lives in `sysio::opp::types` per v6 types.proto;
+//  the DataStream overloads are above in the types namespace.)
 
 // DepositRevert — v6: adds chain_code.
 template <typename DataStream>
@@ -587,19 +589,22 @@ DataStream& operator>>(DataStream& ds, StakingReward& t) {
 //  v6 reserve-flow attestations
 // ---------------------------------------------------------------------------
 
+// ReserveCreate — reserve identity + custodied amount travel together in
+// `external_amount` (a depot-frame `ReserveAmount`); field order mirrors
+// the generated struct (proto fields 4,5,7,8,9,10,11,12).
 template <typename DataStream>
 DataStream& operator<<(DataStream& ds, const ReserveCreate& t) {
-   return ds << t.chain_code << t.token_code << t.reserve_code
-             << t.name << t.description
-             << t.external_token_amount << t.requested_wire_amount
-             << t.connector_weight_bps << t.creator_addr;
+   return ds << t.name << t.description
+             << t.requested_wire_amount << t.connector_weight_bps
+             << t.creator_addr << t.is_private << t.creator_pub_key
+             << t.external_amount;
 }
 template <typename DataStream>
 DataStream& operator>>(DataStream& ds, ReserveCreate& t) {
-   return ds >> t.chain_code >> t.token_code >> t.reserve_code
-             >> t.name >> t.description
-             >> t.external_token_amount >> t.requested_wire_amount
-             >> t.connector_weight_bps >> t.creator_addr;
+   return ds >> t.name >> t.description
+             >> t.requested_wire_amount >> t.connector_weight_bps
+             >> t.creator_addr >> t.is_private >> t.creator_pub_key
+             >> t.external_amount;
 }
 
 template <typename DataStream>

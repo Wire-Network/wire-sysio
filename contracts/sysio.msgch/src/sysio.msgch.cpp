@@ -357,19 +357,32 @@ void dispatch_reserve_create(name self, const std::vector<char>& data) {
       if (err != zpp::bits::errc{}) return;
    }
 
+   // Reserve identity + the custodied amount travel together in
+   // `external_amount` (a `ReserveAmount`): the amount is ALREADY in the
+   // depot's canonical 9-decimal frame (the outpost converts chain-native
+   // units at the boundary, exactly like the swap paths). A negative
+   // TokenAmount clamps to 0 so `oncrtreserve`'s zero-amount guard cancels
+   // the request back (refunding the creator) instead of wrapping.
+   const auto&    ext        = rc.external_amount;
+   const uint64_t ext_amount = ext.amount.amount > 0
+                                  ? static_cast<uint64_t>(ext.amount.amount)
+                                  : 0;
+
    action(
       permission_level{self, "active"_n},
       RESERV_ACCOUNT, "oncrtreserve"_n,
-      std::make_tuple(sysio::slug_name{rc.chain_code},
-                      sysio::slug_name{rc.token_code},
-                      sysio::slug_name{rc.reserve_code},
+      std::make_tuple(sysio::slug_name{ext.chain_code},
+                      sysio::slug_name{ext.amount.token_code},
+                      sysio::slug_name{ext.reserve_code},
                       rc.name,
                       rc.description,
-                      rc.external_token_amount,
+                      ext_amount,
                       rc.requested_wire_amount,
                       rc.connector_weight_bps,
                       rc.creator_addr.kind,
-                      rc.creator_addr.address)
+                      rc.creator_addr.address,
+                      rc.is_private,
+                      rc.creator_pub_key)
    ).send();
 }
 
@@ -533,38 +546,15 @@ void dispatch_attestation(name self, uint64_t attestation_id,
          break;
 
       case AttestationType::ATTESTATION_TYPE_SWAP_REMIT:
-         // Inbound SWAP_REMIT — the destination outpost reflected our
-         // depot-emitted SwapRemit envelope back to us, which is the
-         // delivery acknowledgement. Use it as the release trigger.
-         //
-         // Renamed from the old REMIT_CONFIRM dispatch (which was a
-         // separate outpost-emitted confirm message — removed; the depot
-         // is the ground truth and every SwapRemit is depot-authorized,
-         // so success is implicit absent SWAP_REJECTED).
-         {
-            opp::attestations::SwapRemit remit;
-            auto in = zpp::bits::in{std::span{data.data(), data.size()}, zpp::bits::no_size{}};
-            auto rc = in(remit);
-            if (rc != zpp::bits::errc{}) break;
-            // The original_message_id field encodes the uwreq's 64-bit id in
-            // its low 8 bytes; treat the rest as zero-padding from the
-            // depot-side encoder. Future task: a dedicated uw_request_id
-            // field on SwapRemit would remove this dependency.
-            uint64_t uwreq_id = 0;
-            const auto& bytes = remit.original_message_id;
-            if (bytes.size() >= 8) {
-               for (size_t i = 0; i < 8; ++i) {
-                  uwreq_id |= static_cast<uint64_t>(static_cast<uint8_t>(bytes[i])) << (i * 8);
-               }
-            }
-            if (uwreq_id != 0) {
-               action(
-                  permission_level{self, "active"_n},
-                  UWRIT_ACCOUNT, "release"_n,
-                  std::make_tuple(uwreq_id)
-               ).send();
-            }
-         }
+         // Depot → outpost outbound-only. No outpost ever echoes a
+         // SwapRemit back (verified: ETH `_handleSwapRemit` and SOL
+         // `handle_swap_remit` only pay the recipient + emit local
+         // events; failure is SWAP_REJECTED). The old "reflected remit
+         // = delivery ack → uwrit::release" dispatch here was dead code:
+         // success is implicit absent SWAP_REJECTED, and underwriter
+         // locks are released exclusively by the wall-clock challenge
+         // window sweep (`sysio.uwrit::chklocks` at epoch advance). A
+         // misbehaving outpost relaying one inbound is a benign no-op.
          break;
 
       case AttestationType::ATTESTATION_TYPE_SWAP_REJECTED:

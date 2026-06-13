@@ -72,6 +72,7 @@ namespace sysio {
       static constexpr name CHAINS_ACCOUNT = "sysio.chains"_n;
       static constexpr name CHALG_ACCOUNT = "sysio.chalg"_n;
       static constexpr name RESERVE_ACCOUNT = "sysio.reserv"_n;
+      static constexpr name TOKEN_ACCOUNT = "sysio.token"_n;
 
       // Number of epochs an UWREQ row lives after settlement / abort. 10 epochs
       // matches the bootstrap doc's "losers retained 10 epochs for debugging"
@@ -84,16 +85,19 @@ namespace sysio {
 
       /// Set underwriting fee + lock config. Fields:
       ///   * `fee_bps` — per-spoke fee charged by the depot.
-      ///   * `collateral_lock_duration_epoch_count` — number of epochs after
-      ///     `lock_entry.created_at_epoch` that the lock auto-expires (swept
-      ///     by `sysio.epoch::advance -> chklocks`).
+      ///   * `collateral_lock_duration_ms` — wall-clock milliseconds after
+      ///     `lock_entry.created_at_ms` that the lock auto-expires (swept by
+      ///     `sysio.epoch::advance -> chklocks`). This is the challenge
+      ///     window: collateral stays locked for its full duration — it is
+      ///     never released by delivery. Default 43,200,000 (12 hours);
+      ///     test clusters shorten it via this action.
       ///   * `fee_split_winner_pct` / `fee_split_other_uw_pct` /
       ///     `fee_split_batch_op_pct` — distribution shares (sum to 100).
       ///     Distribution logic itself is deferred to a follow-up; today
       ///     these fields are persisted but not read by any code path.
       [[sysio::action]]
       void setconfig(uint32_t fee_bps,
-                     uint32_t collateral_lock_duration_epoch_count,
+                     uint64_t collateral_lock_duration_ms,
                      uint8_t  fee_split_winner_pct,
                      uint8_t  fee_split_other_uw_pct,
                      uint8_t  fee_split_batch_op_pct);
@@ -140,35 +144,60 @@ namespace sysio {
                       sysio::slug_name reserve_code,
                       std::vector<char> uic_bytes);
 
-      /// Settle an UWREQ. For each lock entry: erase the row and call
-      /// opreg::releaselock so opreg can deferred-slash / deferred-remit /
-      /// no-op based on the underwriter's current status. The UWREQ row
-      /// itself transitions to SETTLED with `expires_at_epoch = now + 10`
-      /// for off-chain debug retention.
+      /// Sweep all `locks` rows whose `expires_at_ms` has elapsed. Inlined
+      /// from `sysio.epoch::advance` (as one of its FIRST steps — freshly
+      /// freed collateral must be visible to the same advance's withdraw
+      /// flushing); can also be invoked by `sysio.uwrit` itself for manual
+      /// cleanup. The `byexpire` secondary index walks rows in ascending
+      /// expiry, so the loop stops at the first unexpired row.
       ///
-      /// auth=self: invoked inline from msgch dispatch on REMIT_CONFIRM /
-      /// SWAP_REVERT, or from `expirelock` when a lock has aged past
-      /// the unlock deadline.
+      /// For every expired lock the sweep inlines `opreg::releaselock`
+      /// (deferred-slash for SLASHED underwriters, deferred-remit for
+      /// TERMINATED, no-op for healthy) and erases the row. When the last
+      /// lock of a CONFIRMED uwreq is swept, the uwreq flips to COMPLETED
+      /// (delivery itself is implicit — there is no SWAP_REMIT ack; the
+      /// lock window expiring IS the settlement horizon).
+      ///
+      /// This sweep is the ONLY lock-release path: locks are a wall-clock
+      /// challenge window (12h default) and are never released by delivery.
       [[sysio::action]]
-      void release(uint64_t uwreq_id);
+      void chklocks();
 
-      /// Permissionless: trigger `release(uwreq_id)` if the UWREQ has been
-      /// COMMITTED for longer than its unlock deadline without settlement.
-      /// Used by watchdog scripts / cron to clear stale locks; the deadline
-      /// is intentionally generous to give the destination outpost time to
-      /// confirm REMIT.
+      /// Swap FROM WIRE (the depot is the source chain). `user` escrows
+      /// `wire_amount` REAL WIRE into `sysio.reserv` custody NOW and the
+      /// request is QUEUED — no uwreq is created in this transaction. The
+      /// next `sysio.epoch::advance` drains the queue (`drainfwq`): the
+      /// target reserve + variance are re-validated authoritatively and a
+      /// PENDING uwreq with `src = (WIRE, WIRE)` is created for the normal
+      /// single-leg underwriter race (target leg only). Validation failures
+      /// at drain time refund the escrow in full.
+      ///
+      /// `recipient_kind` / `recipient_addr` name the payout address on the
+      /// target chain (flattened ChainAddress — proto messages never appear
+      /// in action ABIs). The target reserve must be public: private
+      /// reserves are excluded from WIRE-endpoint swaps.
       [[sysio::action]]
-      void expirelock(uint64_t uwreq_id);
+      void swapfromwire(name                  user,
+                        uint64_t              wire_amount,
+                        sysio::slug_name       dst_chain_code,
+                        sysio::slug_name       dst_token_code,
+                        sysio::slug_name       dst_reserve_code,
+                        uint64_t              target_amount,
+                        uint32_t              target_tolerance_bps,
+                        opp::types::ChainKind recipient_kind,
+                        std::vector<char>     recipient_addr);
 
-      /// Sweep all `locks` rows whose `expires_at_epoch <= up_to_epoch`. Inlined
-      /// from `sysio.epoch::advance` at every epoch boundary; can also be
-      /// invoked by `sysio.uwrit` itself for manual cleanup. The
-      /// `byexpire` secondary index walks rows in ascending expiry, so the
-      /// loop stops at the first row that hasn't expired yet — the steady-
-      /// state cost is O(n) in the number of locks expiring this epoch, not
-      /// table size.
+      /// Drain the swap-from-WIRE queue. Inlined from `sysio.epoch::advance`
+      /// each epoch (after the roster attestations are queued, before
+      /// `buildenv`). Per row: re-validate the target reserve (exists,
+      /// ACTIVE, not private) and the variance tolerance against the live
+      /// quote — on failure, refund the user's escrowed WIRE via
+      /// `reserv::refundwire` and drop the row; on success, emplace the
+      /// PENDING uwreq (id = the queue row's depot-origin id) carrying a
+      /// synthetic SwapRequest payload so the settlement tail
+      /// (`emit_swap_remit`) can decode the recipient. NEVER throws.
       [[sysio::action]]
-      void chklocks(uint32_t up_to_epoch);
+      void drainfwq();
 
       /// Read-only rollup of an underwriter's active lock total on a given
       /// `(chain_code, token_code)`. Used by off-chain consumers + (eventually)
@@ -203,7 +232,7 @@ namespace sysio {
       ///
       /// `reserve_code` records which specific reserve this leg covers; on
       /// a slash, the outpost routes seized collateral to that reserve via
-      /// `ReserveTarget`, even when multiple reserves exist for the same
+      /// `ReserveAmount`, even when multiple reserves exist for the same
       /// `(chain_code, token_code)` pair.
       struct lock_key {
          uint64_t lock_id;
@@ -219,11 +248,13 @@ namespace sysio {
          sysio::slug_name         token_code;
          sysio::slug_name         reserve_code;
          uint64_t                amount           = 0;
-         uint32_t                created_at_epoch = 0;
-         /// `created_at_epoch + uwconfig.collateral_lock_duration_epoch_count`,
-         /// computed at insert time in `try_select_winner`. Indexed via
-         /// `byexpire` so `chklocks` can sweep expired locks in ascending order.
-         uint32_t                expires_at_epoch = 0;
+         uint64_t                created_at_ms    = 0;
+         /// `created_at_ms + uwconfig.collateral_lock_duration_ms`, computed
+         /// at insert time in `try_select_winner`. Wall-clock — the lock is
+         /// the 12h challenge window and is independent of epoch cadence
+         /// (epochs can stretch when `advance` gate-blocks). Indexed via
+         /// `byexpire` so `chklocks` sweeps expired locks in ascending order.
+         uint64_t                expires_at_ms    = 0;
 
          /// Composite checksum index for opreg's `available()` rollup:
          /// `sha256(underwriter.value || chain_code.value || token_code.value)`
@@ -240,13 +271,13 @@ namespace sysio {
          /// Split-index for cheap per-operator scans (plan §B.2). Callers
          /// pull all rows for a given underwriter and filter on
          /// chain_code / token_code / reserve_code in memory.
-         uint64_t by_underwriter()      const { return underwriter.value; }
-         uint64_t by_uwreq()            const { return uwreq_id; }
-         uint64_t by_expires_at_epoch() const { return expires_at_epoch; }
+         uint64_t by_underwriter()   const { return underwriter.value; }
+         uint64_t by_uwreq()         const { return uwreq_id; }
+         uint64_t by_expires_at_ms() const { return expires_at_ms; }
 
          SYSLIB_SERIALIZE(lock_entry,
             (lock_id)(uwreq_id)(underwriter)(chain_code)(token_code)(reserve_code)
-            (amount)(created_at_epoch)(expires_at_epoch))
+            (amount)(created_at_ms)(expires_at_ms))
       };
 
       // Per plan §B.2: split-index approach — keep only uint64 secondary
@@ -263,7 +294,7 @@ namespace sysio {
          sysio::kv::index<"byuwreq"_n,
             sysio::const_mem_fun<lock_entry, uint64_t, &lock_entry::by_uwreq>>,
          sysio::kv::index<"byexpire"_n,
-            sysio::const_mem_fun<lock_entry, uint64_t, &lock_entry::by_expires_at_epoch>>
+            sysio::const_mem_fun<lock_entry, uint64_t, &lock_entry::by_expires_at_ms>>
       >;
 
       /// Per-underwriter race entry inside an UWREQ row. Tracks when each
@@ -394,27 +425,76 @@ namespace sysio {
             sysio::const_mem_fun<uw_request_t, uint64_t, &uw_request_t::by_winner>>
       >;
 
-      /// Singleton holding the next-issued `lock_id`. Keeps the auto-
-      /// increment monotonic across action calls.
+      /// Singleton holding the next-issued `lock_id` + the depot-origin
+      /// swap-from-WIRE sequence. Keeps both auto-increments monotonic
+      /// across action calls.
       struct [[sysio::table("uwcounters")]] uw_counters {
          uint64_t next_lock_id = 1;
-         SYSLIB_SERIALIZE(uw_counters, (next_lock_id))
+         /// Sequence for depot-originated (swap-from-WIRE) uwreq ids. The
+         /// issued id is `0x8000000000000000 | seq` — the high bit
+         /// partitions the depot-origin id space away from inbound
+         /// attestation ids (msgch's `mint_att_id` counts monotonically
+         /// from 1 and can never reach 2^63), so `fwqueue` row ids double
+         /// as collision-free uwreq ids.
+         uint64_t next_fromwire_seq = 0;
+         SYSLIB_SERIALIZE(uw_counters, (next_lock_id)(next_fromwire_seq))
       };
 
       using uwcounters_t = sysio::kv::global<"uwcounters"_n, uw_counters>;
+
+      /// Queued swap-from-WIRE request. Written by `swapfromwire` (which
+      /// escrows the user's WIRE in the same transaction), drained by
+      /// `drainfwq` on the next `sysio.epoch::advance`. The row id is the
+      /// depot-origin uwreq id the drained request will be created under.
+      struct fw_key {
+         uint64_t id;
+         uint64_t primary_key() const { return id; }
+         SYSLIB_SERIALIZE(fw_key, (id))
+      };
+
+      struct [[sysio::table("fwqueue")]] fromwire_q {
+         uint64_t              id = 0;
+         name                  user;
+         uint64_t              wire_amount = 0;
+         sysio::slug_name       dst_chain_code;
+         sysio::slug_name       dst_token_code;
+         sysio::slug_name       dst_reserve_code;
+         uint64_t              target_amount = 0;
+         uint32_t              variance_tolerance_bps = 0;
+         opp::types::ChainKind recipient_kind = opp::types::CHAIN_KIND_UNKNOWN;
+         std::vector<char>     recipient_addr;
+         uint32_t              created_at_epoch = 0;
+
+         uint64_t by_epoch() const { return created_at_epoch; }
+
+         SYSLIB_SERIALIZE(fromwire_q,
+            (id)(user)(wire_amount)
+            (dst_chain_code)(dst_token_code)(dst_reserve_code)
+            (target_amount)(variance_tolerance_bps)
+            (recipient_kind)(recipient_addr)(created_at_epoch))
+      };
+
+      using fwqueue_t = sysio::kv::table<"fwqueue"_n, fw_key, fromwire_q,
+         sysio::kv::index<"byepoch"_n,
+            sysio::const_mem_fun<fromwire_q, uint64_t, &fromwire_q::by_epoch>>
+      >;
 
       /// Fee + lock-duration + fee-split configuration singleton. Distribution
       /// logic for the fee-split fields lands in a follow-up task; today they
       /// are persisted only.
       struct [[sysio::table("uwconfig")]] uw_config {
-         uint32_t fee_bps                              = 10;   // 0.1% per spoke
-         uint32_t collateral_lock_duration_epoch_count = 10;   // epochs from create to auto-expire
-         uint8_t  fee_split_winner_pct                 = 50;
-         uint8_t  fee_split_other_uw_pct               = 25;
-         uint8_t  fee_split_batch_op_pct               = 25;
+         uint32_t fee_bps                      = 10;           // 0.1% per spoke
+         /// Wall-clock collateral lock duration — the challenge window.
+         /// Locks are NEVER released by delivery; they expire this many ms
+         /// after creation and are swept by `chklocks` at epoch advance.
+         /// Default 12 hours.
+         uint64_t collateral_lock_duration_ms  = 43'200'000;
+         uint8_t  fee_split_winner_pct         = 50;
+         uint8_t  fee_split_other_uw_pct       = 25;
+         uint8_t  fee_split_batch_op_pct       = 25;
          SYSLIB_SERIALIZE(uw_config,
             (fee_bps)
-            (collateral_lock_duration_epoch_count)
+            (collateral_lock_duration_ms)
             (fee_split_winner_pct)(fee_split_other_uw_pct)(fee_split_batch_op_pct))
       };
 

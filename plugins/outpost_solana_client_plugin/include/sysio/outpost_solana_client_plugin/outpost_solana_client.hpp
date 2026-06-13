@@ -156,12 +156,15 @@ struct reserve_pda_seeds {
    uint64_t reserve_code;
 };
 
-/// Walk every `SWAP_REMIT` attestation in `envelope_bytes` and collect
-/// the (token_code, reserve_code) pair for each. Caller derives the
-/// Reserve PDA via Anchor's `find_program_address` with the
-/// `[RESERVE_SEED, &token_code.to_le_bytes(), &reserve_code.to_le_bytes()]`
-/// seed list against the program id. Per-envelope deduplication is the
-/// caller's responsibility.
+/// Walk every Reserve-PDA-consuming attestation in `envelope_bytes` —
+/// `SWAP_REMIT`, `RESERVE_READY`, and `RESERVE_CREATE_CANCELLED` — and
+/// collect the (token_code, reserve_code) pair for each (deduped).
+/// Caller derives the Reserve PDA via Anchor's `find_program_address`
+/// with the `[RESERVE_SEED, &token_code.to_le_bytes(),
+/// &reserve_code.to_le_bytes()]` seed list against the program id.
+/// RESERVE_READY is single-shot (queued once at `matchreserve`); a
+/// missing PDA strands the outpost-local reserve in PENDING forever, so
+/// the lifecycle types are first-class here, not best-effort.
 std::vector<reserve_pda_seeds>
 extract_inbound_swap_remit_reserve_seeds(const std::vector<char>& envelope_bytes);
 
