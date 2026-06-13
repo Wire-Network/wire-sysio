@@ -27,12 +27,11 @@ int main(int argc, char** argv) {
             .milliseconds = {cron_service::job_schedule::step_value{5000}}
          },
          [&]() {
-            auto now = std::chrono::utc_clock::now();
-            auto now_str = std::format("{:%H:%M:%S}", now);
-            ilog("{}: Getting ethereum gas price", now_str);
+            // The logging framework already timestamps log messages.
+            ilog("Getting ethereum gas price");
 
             auto current_price = eth_client->client->get_gas_price();
-            ilog("{}: Current Price> {}WEI", now_str, current_price.str());
+            ilog("Current Price> {}WEI", current_price.str());
          },
          cron_service::job_metadata_t{
             .one_at_a_time = true, .tags = {"ethereum", "gas"}, .label = "cron_5s_heartbeat"});

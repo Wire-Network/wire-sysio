@@ -1,5 +1,11 @@
 cmake_minimum_required(VERSION 3.19)
 
+# CMake 4 rejects dependency config files that still declare compatibility
+# with policy versions older than 3.5. Some vcpkg packages used by WIRE still
+# ship those legacy config files, so provide a floor while upstream ports catch
+# up.
+set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
+
 # Set vcpkg toolchain if not already set
 if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
     set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake"
@@ -81,8 +87,9 @@ if(CMAKE_SIZEOF_VOID_P EQUAL 8 AND NOT WIN32)
   endif()
 endif()
 
-# Native-module runtime: only in Debug builds (used for debugger-attached contract execution)
-if(DEBUG_ENABLED AND CMAKE_SIZEOF_VOID_P EQUAL 8 AND NOT WIN32)
+# Native-module runtime: only in Debug builds on hosts that can load native contract modules.
+if(DEBUG_ENABLED AND CMAKE_SIZEOF_VOID_P EQUAL 8 AND
+   (CMAKE_SYSTEM_NAME STREQUAL "Linux" OR APPLE))
   list(APPEND SYSIO_WASM_RUNTIMES native-module)
 endif()
 

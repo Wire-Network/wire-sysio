@@ -2342,7 +2342,7 @@ producer_plugin_impl::determine_pending_block_mode(const fc::time_point& now,
          if (now < start_block_time) {
             _pending_block_mode = pending_block_mode::speculating;
             fc_dlog(_log, "Not starting block until {}", start_block_time);
-            schedule_delayed_production_loop(weak_from_this(), start_block_time);
+            schedule_delayed_production_loop(this->weak_from_this(), start_block_time);
             return start_block_result::waiting_for_production;
          }
       }
@@ -2407,7 +2407,7 @@ producer_plugin_impl::start_block_result producer_plugin_impl::start_block() {
       };
       while (in_speculating_mode() || !chain.is_head_descendant_of_pending_lib() || fork_db_ahead_on_same_chain()) {
          if (is_configured_producer())
-            schedule_delayed_production_loop(weak_from_this(), _pending_block_deadline); // interrupt apply_blocks at deadline
+            schedule_delayed_production_loop(this->weak_from_this(), _pending_block_deadline); // interrupt apply_blocks at deadline
 
          auto result = apply_blocks();
          if (result.num_blocks_applied == 0) {
@@ -3020,7 +3020,7 @@ void producer_plugin_impl::schedule_production_loop() {
          fc_dlog(_log, "Waiting till another block is received and scheduling Speculative/Production Change");
          auto wake_time = block_timing_util::calculate_producer_wake_up_time(_produce_block_cpu_effort, chain.head().block_num(), calculate_pending_block_time(),
                                                                              _producers, chain.head_active_producers().producers);
-         schedule_delayed_production_loop(weak_from_this(), wake_time);
+         schedule_delayed_production_loop(this->weak_from_this(), wake_time);
       } else {
          fc_tlog(_log, "Waiting till another block is received");
          // nothing to do until more blocks arrive
@@ -3042,7 +3042,7 @@ void producer_plugin_impl::schedule_production_loop() {
          // if wake time has already passed then use the block deadline instead
          wake_time = _pending_block_deadline;
       }
-      schedule_delayed_production_loop(weak_from_this(), wake_time);
+      schedule_delayed_production_loop(this->weak_from_this(), wake_time);
    } else {
       fc_dlog(_log, "Speculative Block Created");
    }
@@ -3136,7 +3136,7 @@ bool producer_plugin_impl::maybe_produce_block() {
    // block failed to produce, wait until the next block to try again
    block_timestamp_type block_time = calculate_pending_block_time();
    fc_dlog(_log, "Not starting block until {}", block_time);
-   schedule_delayed_production_loop(weak_from_this(), block_time);
+   schedule_delayed_production_loop(this->weak_from_this(), block_time);
 
    return false;
 }

@@ -73,7 +73,7 @@ namespace sysio { namespace chain { namespace webassembly {
       });
    }
 
-   void interface::printsf( float32_t val ) {
+   void interface::printsf( softfloat32_t val ) {
 		predicated_print(context,
       [&]() {
 			// Assumes float representation on native side is the same as on the WASM side
@@ -85,7 +85,7 @@ namespace sysio { namespace chain { namespace webassembly {
       });
    }
 
-   void interface::printdf( float64_t val ) {
+   void interface::printdf( softfloat64_t val ) {
 		predicated_print(context,
       [&]() {
 			// Assumes double representation on native side is the same as on the WASM side
@@ -97,7 +97,7 @@ namespace sysio { namespace chain { namespace webassembly {
       });
    }
 
-   void interface::printqf( aligned_ptr<const float128_t> val ) {
+   void interface::printqf( aligned_ptr<const softfloat128_t> val ) {
       /*
        * Native-side long double uses an 80-bit extended-precision floating-point number.
        * The easiest solution for now was to use the Berkeley softfloat library to round the 128-bit

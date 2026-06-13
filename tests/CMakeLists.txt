@@ -121,7 +121,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/producer_rank_test.py ${CMAKE_CURRENT
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/split_blocklog_replay_test.py ${CMAKE_CURRENT_BINARY_DIR}/split_blocklog_replay_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/PerformanceHarnessScenarioRunner.py ${CMAKE_CURRENT_BINARY_DIR}/PerformanceHarnessScenarioRunner.py COPYONLY)
 
-if(DEFINED ENV{GITHUB_ACTIONS})
+if(DEFINED ENV{GITHUB_ACTIONS} AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
   set(UNSHARE "--unshared")
 else()
   set(UNSHARE "")
