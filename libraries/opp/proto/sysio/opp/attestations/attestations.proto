@@ -18,12 +18,15 @@ option cc_enable_arenas = true;
 message ReserveBalanceSheet {
   // Chain identifier (codename) on which these reserves live.
   uint64 chain_code = 1;
-  // One TokenAmount per reserve being reported. The matching reserve_code
-  // for each entry is at the same index in `reserve_codes` — this lets the
-  // depot disambiguate when a single (chain, token) pair has multiple
-  // reserves.
-  repeated sysio.opp.types.TokenAmount amounts        = 2;
-  repeated uint64                      reserve_codes  = 3;
+  // (fields 2-3 retired — the parallel `amounts[]` / `reserve_codes[]`
+  //  arrays were replaced by the self-describing `reserves` entries.)
+  reserved 2, 3;
+  reserved "amounts", "reserve_codes";
+  // One `ReserveAmount` per reserve being reported. Each entry is
+  // self-describing — (chain_code, reserve_code, token + amount) — and the
+  // amount is in the depot's canonical 9-decimal frame (the outpost
+  // converts chain-native units at the boundary; see `ReserveAmount`).
+  repeated sysio.opp.types.ReserveAmount reserves = 4;
 }
 
 // ---------------------------------------------------------------------------
@@ -99,8 +102,9 @@ message OperatorAction {
   // on log-only failure paths; empty otherwise.
   string                           reason      = 8;
   // SLASH-only — identifies WHICH reserve on (chain, token) receives the
-  // seized funds. The outpost routes via `ReserveTarget`. Empty (0) for
-  // non-SLASH action types.
+  // seized funds; (chain_code, reserve_code, amount) assemble into a
+  // `ReserveAmount` for the outpost's routing. Empty (0) for non-SLASH
+  // action types.
   uint64                           reserve_code = 9;
 }
 
@@ -375,15 +379,33 @@ message AttestationProcessingError {
 
 // Outpost -> Depot. Open a new PENDING reserve.
 message ReserveCreate {
-  uint64                       chain_code             = 1;   // the outpost's own chain
-  uint64                       token_code             = 2;
-  uint64                       reserve_code           = 3;
-  string                       name                   = 4;
-  string                       description            = 5;
-  uint64                       external_token_amount  = 6;
-  uint64                       requested_wire_amount  = 7;
-  uint32                       connector_weight_bps   = 8;
-  sysio.opp.types.ChainAddress creator_addr           = 9;   // refund target on cancel
+  // (fields 1-3 + 6 retired — the reserve identity and the custodied
+  //  amount now travel together in `external_amount`, see below.)
+  reserved 1, 2, 3, 6;
+  reserved "chain_code", "token_code", "reserve_code", "external_token_amount";
+  string                        name                   = 4;
+  string                        description            = 5;
+  uint64                        requested_wire_amount  = 7;
+  uint32                        connector_weight_bps   = 8;
+  sysio.opp.types.ChainAddress  creator_addr           = 9;   // refund target on cancel
+  // Private reserves restrict swap counterparts to reserve_codes owned by the
+  // same WIRE account (ownership = the authex-linked account that matches).
+  // Immutable after create.
+  bool                          is_private             = 10;
+  // The creator's chain public key, used by the depot to resolve the creator's
+  // authex link (`sysio.authex::links.bypubkey`). EVM chains: REQUIRED — the
+  // 33-byte compressed secp256k1 key, verified on-outpost to derive to
+  // msg.sender (a 20-byte EVM address cannot be reverse-mapped to a key).
+  // SVM chains: may be empty — `creator_addr.address` already IS the signer's
+  // 32-byte ed25519 public key and the depot falls back to it.
+  bytes                         creator_pub_key        = 11;
+  // Reserve identity — (chain_code = the outpost's own chain, reserve_code,
+  // amount.token_code) — plus the custodied external-token amount, in the
+  // depot's canonical 9-decimal frame. The outpost converts its chain-native
+  // escrow units at the boundary (EVM `PrecisionLib.toDepot`, SVM
+  // `precision::to_depot`) exactly like the swap paths; the outpost's LOCAL
+  // reserve record keeps the raw chain-native amount for refunds.
+  sysio.opp.types.ReserveAmount external_amount        = 12;
 }
 
 // Outpost -> Depot. Creator cancels their PENDING reserve.

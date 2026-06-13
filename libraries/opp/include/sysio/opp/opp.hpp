@@ -127,7 +127,8 @@ FC_REFLECT_ENUM(sysio::opp::attestations::OperatorAction_ActionType,
    (OperatorAction_ActionType_ACTION_TYPE_WITHDRAW_REMIT)
    (OperatorAction_ActionType_ACTION_TYPE_SLASH))
 
-// ReserveTarget_Kind removed in v6 — ReserveTarget is now (chain_code, reserve_code, TokenAmount).
+// ReserveTarget_Kind removed in v6 — the carrier (renamed `ReserveAmount`)
+// is now (chain_code, reserve_code, TokenAmount) in the depot 9-dec frame.
 
 FC_REFLECT_ENUM(sysio::opp::types::AttestationStatus,
    (ATTESTATION_STATUS_PENDING)

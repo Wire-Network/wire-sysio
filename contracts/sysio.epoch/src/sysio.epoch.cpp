@@ -292,6 +292,20 @@ void epoch::advance() {
    // attempt blocked and we're now succeeding) and proceed.
    clear_gate_block(get_self(), target_epoch);
 
+   // FIRST post-gate step: sweep expired underwriter collateral locks.
+   // Locks are a wall-clock challenge window (12h default; see
+   // sysio.uwrit::uwconfig.collateral_lock_duration_ms) — they are never
+   // released by delivery, only by this sweep. Running it before the
+   // delivery evaluation + withdraw flushing below means collateral freed
+   // by the closing window is visible to this same advance's
+   // `available()`-gated paths (flushwtdw, eligibility).
+   action(
+      permission_level{get_self(), "owner"_n},
+      UWRIT_ACCOUNT,
+      "chklocks"_n,
+      std::make_tuple()
+   ).send();
+
    // Before incrementing: evaluate per-op delivery state for the EXPIRING
    // epoch. The active group of the expiring epoch (`current_batch_op_group`
    // BEFORE the increment) is the set of ops responsible for delivering
@@ -652,6 +666,19 @@ void epoch::advance() {
       }
    }
 
+   // Drain the swap-from-WIRE queue: each row queued via
+   // `sysio.uwrit::swapfromwire` since the last advance is re-validated
+   // (target reserve ACTIVE + public, variance) and either becomes a
+   // PENDING uwreq for the single-leg underwriter race or is refunded.
+   // Runs before `buildenv` so this epoch's envelopes reflect any state
+   // the drain produced; never throws (refund-and-drop semantics).
+   action(
+      permission_level{get_self(), "owner"_n},
+      UWRIT_ACCOUNT,
+      "drainfwq"_n,
+      std::make_tuple()
+   ).send();
+
    // Build outbound envelopes for each outpost
    {
       sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
@@ -665,17 +692,6 @@ void epoch::advance() {
          ).send();
       }
    }
-
-   // Sweep underwriter locks whose `expires_at_epoch` is now in the past.
-   // The sweep walks `byexpire` ascending and stops at the first row that
-   // hasn't aged out yet, so the per-advance cost is O(expiring locks),
-   // not table size. An empty result is the steady-state case.
-   action(
-      permission_level{"sysio.epoch"_n, "owner"_n},
-      "sysio.uwrit"_n,
-      "chklocks"_n,
-      std::make_tuple(state.current_epoch_index)
-   ).send();
 
    // Emissions side. Two inline actions queued in FIFO order:
    //   1. accrueepoch: always queued. Records this epoch's per-epoch share

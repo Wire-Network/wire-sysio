@@ -141,7 +141,7 @@ enum ReserveStatus {
 }
 
 // ---------------------------------------------------------------------------
-//  Registry entities (Chain / Token / ChainToken / Reserve / ReserveTarget)
+//  Registry entities (Chain / Token / ChainToken / Reserve / ReserveAmount)
 //
 //  These are the proto carriers for the depot's registry tables on the new
 //  contracts `sysio.chains` and `sysio.tokens` (+ existing `sysio.reserv`).
@@ -205,10 +205,17 @@ message Reserve {
   uint64        cancelled_at_ms         = 15;
 }
 
-// Slash / reward routing target. Identifies (chain, reserve_code, amount)
-// so the outpost can find the matching reserve unambiguously even when
-// multiple reserves exist for the same (chain, token) pair.
-message ReserveTarget {
+// Canonical reserve-scoped amount carrier. Identifies WHICH reserve —
+// (chain_code, reserve_code, amount.token_code) — holds or receives the
+// amount, unambiguously even when multiple reserves exist for the same
+// (chain, token) pair. `amount.amount` is ALWAYS expressed in the depot's
+// canonical 9-decimal frame: outpost-side producers convert chain-native
+// units at the boundary (EVM `PrecisionLib.toDepot`, SVM
+// `precision::to_depot`) before shipping, exactly like the swap-request
+// paths. Carried by RESERVE_CREATE (custodied external amount),
+// RESERVE_BALANCE_SHEET (per-reserve balance entries), and SLASH routing
+// (seized-funds destination).
+message ReserveAmount {
   uint64      chain_code   = 1;
   uint64      reserve_code = 2;
   TokenAmount amount       = 3;
