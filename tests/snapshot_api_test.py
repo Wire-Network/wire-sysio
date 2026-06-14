@@ -71,9 +71,12 @@ testSuccessful=False
 
 pnodes=2
 totalNodes=pnodes+1
+port=Utils.getPort(Utils.PortNodeHttp)
+walletPort=Utils.getPort(Utils.PortWallet)
 
-cluster=Cluster(unshared=args.unshared, keepRunning=args.leave_running, keepLogs=args.keep_logs)
-walletMgr=WalletMgr(True)
+cluster=Cluster(port=port, walletPort=walletPort, unshared=args.unshared,
+                keepRunning=args.leave_running, keepLogs=args.keep_logs)
+walletMgr=WalletMgr(True, nodeopPort=port, port=walletPort)
 
 try:
     TestHelper.printSystemInfo("BEGIN")
