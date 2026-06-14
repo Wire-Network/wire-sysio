@@ -299,6 +299,16 @@
             ]
         },
         {
+            "name": "delsnapprov",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                }
+            ]
+        },
+        {
             "name": "emission_config",
             "base": "",
             "fields": [
@@ -593,6 +603,16 @@
                 {
                     "name": "amount",
                     "type": "int64"
+                }
+            ]
+        },
+        {
+            "name": "getsnaphash",
+            "base": "",
+            "fields": [
+                {
+                    "name": "block_num",
+                    "type": "uint32"
                 }
             ]
         },
@@ -1007,6 +1027,20 @@
             ]
         },
         {
+            "name": "regsnapprov",
+            "base": "",
+            "fields": [
+                {
+                    "name": "producer",
+                    "type": "name"
+                },
+                {
+                    "name": "snap_account",
+                    "type": "name"
+                }
+            ]
+        },
+        {
             "name": "rmvproducer",
             "base": "",
             "fields": [
@@ -1213,6 +1247,126 @@
             ]
         },
         {
+            "name": "setsnpcfg",
+            "base": "",
+            "fields": [
+                {
+                    "name": "min_providers",
+                    "type": "uint32"
+                },
+                {
+                    "name": "threshold_pct",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "snap_config",
+            "base": "",
+            "fields": [
+                {
+                    "name": "min_providers",
+                    "type": "uint32"
+                },
+                {
+                    "name": "threshold_pct",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "snap_provider",
+            "base": "",
+            "fields": [
+                {
+                    "name": "snap_account",
+                    "type": "name"
+                },
+                {
+                    "name": "producer",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "snap_provider_key_t",
+            "base": "",
+            "fields": [
+                {
+                    "name": "snap_account",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "snap_record",
+            "base": "",
+            "fields": [
+                {
+                    "name": "block_num",
+                    "type": "uint32"
+                },
+                {
+                    "name": "block_id",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "snapshot_hash",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "attested_at_block",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "snap_record_key_t",
+            "base": "",
+            "fields": [
+                {
+                    "name": "block_num",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "snap_vote",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "block_num",
+                    "type": "uint32"
+                },
+                {
+                    "name": "block_id",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "snapshot_hash",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "voters",
+                    "type": "name[]"
+                }
+            ]
+        },
+        {
+            "name": "snap_vote_key_t",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "sysio_global_state",
             "base": "blockchain_parameters",
             "fields": [
@@ -1363,6 +1517,24 @@
                 {
                     "name": "account_name",
                     "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "votesnaphash",
+            "base": "",
+            "fields": [
+                {
+                    "name": "snap_account",
+                    "type": "name"
+                },
+                {
+                    "name": "block_id",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "snapshot_hash",
+                    "type": "checksum256"
                 }
             ]
         },
@@ -1629,8 +1801,18 @@
             "ricardian_contract": ""
         },
         {
+            "name": "delsnapprov",
+            "type": "delsnapprov",
+            "ricardian_contract": ""
+        },
+        {
             "name": "fundclaim",
             "type": "fundclaim",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "getsnaphash",
+            "type": "getsnaphash",
             "ricardian_contract": ""
         },
         {
@@ -1681,6 +1863,11 @@
         {
             "name": "regproducer2",
             "type": "regproducer2",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "regsnapprov",
+            "type": "regsnapprov",
             "ricardian_contract": ""
         },
         {
@@ -1759,6 +1946,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "setsnpcfg",
+            "type": "setsnpcfg",
+            "ricardian_contract": ""
+        },
+        {
             "name": "unlinkauth",
             "type": "unlinkauth",
             "ricardian_contract": ""
@@ -1786,6 +1978,11 @@
         {
             "name": "viewnodedist",
             "type": "viewnodedist",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "votesnaphash",
+            "type": "votesnaphash",
             "ricardian_contract": ""
         },
         {
@@ -1936,6 +2133,52 @@
             ]
         },
         {
+            "name": "snapconfig",
+            "type": "snap_config",
+            "index_type": "i64",
+            "key_names": ["name"],
+            "key_types": ["name"],
+            "table_id": 45242
+        },
+        {
+            "name": "snapprovs",
+            "type": "snap_provider",
+            "index_type": "i64",
+            "key_names": ["snap_account"],
+            "key_types": ["uint64"],
+            "table_id": 42185,
+            "secondary_indexes": [
+                {
+                    "name": "byproducer",
+                    "key_type": "uint64",
+                    "table_id": 27665
+                }
+            ]
+        },
+        {
+            "name": "snaprecords",
+            "type": "snap_record",
+            "index_type": "i64",
+            "key_names": ["block_num"],
+            "key_types": ["uint64"],
+            "table_id": 43128
+        },
+        {
+            "name": "snapvotes",
+            "type": "snap_vote",
+            "index_type": "i64",
+            "key_names": ["id"],
+            "key_types": ["uint64"],
+            "table_id": 6736,
+            "secondary_indexes": [
+                {
+                    "name": "byblocknum",
+                    "key_type": "uint64",
+                    "table_id": 8321
+                }
+            ]
+        },
+        {
             "name": "t5state",
             "type": "t5_state",
             "index_type": "i64",
@@ -1996,6 +2239,10 @@
         }
     ],
     "action_results": [
+        {
+            "name": "getsnaphash",
+            "result_type": "snap_record"
+        },
         {
             "name": "viewemitcfg",
             "result_type": "emission_config"

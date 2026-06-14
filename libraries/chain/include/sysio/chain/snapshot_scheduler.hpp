@@ -2,6 +2,7 @@
 
 #include <sysio/chain/pending_snapshot.hpp>
 
+#include <fc/crypto/blake3.hpp>
 #include <sysio/chain/config.hpp>
 #include <sysio/chain/exceptions.hpp>
 #include <sysio/chain/resource_limits.hpp>
@@ -34,6 +35,7 @@ public:
       fc::time_point head_block_time;
       uint32_t version;
       std::string snapshot_name;
+      fc::crypto::blake3 root_hash;
    };
 
    struct snapshot_request_information {
@@ -174,6 +176,19 @@ private:
    // path to write the snapshots to
    fs::path _snapshots_dir;
 
+   std::vector<std::function<void(const snapshot_information&)>> _snapshot_finalized_cbs;
+
+   /**
+    * Invoke every registered snapshot-finalized callback with @p si, logging and swallowing
+    * callback exceptions so a misbehaving subscriber cannot affect other subscribers or the
+    * snapshot pipeline.
+    *
+    * Must be called exactly once per finalized snapshot: from create_snapshot() when the
+    * chain runs in irreversible read mode (the snapshot is final immediately), or from
+    * on_irreversible_block() when a pending snapshot's block becomes irreversible.
+    */
+   void notify_snapshot_finalized(const snapshot_information& si);
+
    void x_serialize() {
       auto& vec = _snapshot_requests.get<as_vector>();
       std::vector<snapshot_schedule_information> sr(vec.begin(), vec.end());
@@ -182,6 +197,18 @@ private:
 
 public:
    snapshot_scheduler() = default;
+
+   using snapshot_finalized_callback_t = std::function<void(const snapshot_information&)>;
+
+   /**
+    * Register a callback invoked exactly once for each snapshot that reaches finality --
+    * immediately on creation when the chain runs in irreversible read mode, otherwise when
+    * the snapshot's block becomes irreversible. Fires for scheduled and on-demand snapshots
+    * alike. Callback exceptions are logged and swallowed.
+    */
+   void add_snapshot_finalized_callback(snapshot_finalized_callback_t cb) {
+      _snapshot_finalized_cbs.push_back(std::move(cb));
+   }
 
    // snapshot scheduler listener
    void on_start_block(uint32_t height, chain::controller& chain);
@@ -193,6 +220,16 @@ public:
    snapshot_schedule_result schedule_snapshot(const snapshot_request_information& sri);
    snapshot_schedule_result unschedule_snapshot(uint32_t sri);
    get_snapshot_requests_result get_snapshot_requests();
+
+   /**
+    * Find a scheduled request by its recurrence parameters.
+    *
+    * @param block_spacing   recurrence interval in blocks (0 for a one-time request)
+    * @param start_block_num first eligible block height
+    * @param end_block_num   last eligible block height
+    * @return the matching request id, or std::nullopt when no such request is scheduled
+    */
+   std::optional<uint32_t> find_snapshot_request(uint32_t block_spacing, uint32_t start_block_num, uint32_t end_block_num) const;
 
    // initialize with storage
    void set_db_path(fs::path db_path);
@@ -213,7 +250,7 @@ public:
 
 }// namespace sysio::chain
 
-FC_REFLECT(sysio::chain::snapshot_scheduler::snapshot_information, (head_block_id) (head_block_num) (head_block_time) (version) (snapshot_name))
+FC_REFLECT(sysio::chain::snapshot_scheduler::snapshot_information, (head_block_id) (head_block_num) (head_block_time) (version) (snapshot_name) (root_hash))
 FC_REFLECT(sysio::chain::snapshot_scheduler::snapshot_request_information, (block_spacing) (start_block_num) (end_block_num) (snapshot_description))
 FC_REFLECT(sysio::chain::snapshot_scheduler::snapshot_request_params, (block_spacing) (start_block_num) (end_block_num) (snapshot_description))
 FC_REFLECT(sysio::chain::snapshot_scheduler::snapshot_request_id_information, (snapshot_request_id))

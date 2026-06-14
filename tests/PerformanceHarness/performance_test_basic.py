@@ -754,10 +754,11 @@ class PtbArgumentsHandler(object):
         ptbBaseParserGroup.add_argument("--wasm-file", type=str, help=argparse.SUPPRESS if suppressHelp else "WASM file name for contract", default="sysio.system.wasm")
         ptbBaseParserGroup.add_argument("--abi-file", type=str, help=argparse.SUPPRESS if suppressHelp else "ABI file name for contract", default="sysio.system.abi")
         ptbBaseParserGroup.add_argument("--user-trx-data-file", type=str, help=argparse.SUPPRESS if suppressHelp else "Path to transaction data JSON file")
-        ptbBaseParserGroup.add_argument("--wasm-runtime", type=str, help=argparse.SUPPRESS if suppressHelp else "Override default WASM runtime (\"sys-vm-jit\", \"sys-vm\")\
+        supportedWasmRuntimeHelp=", ".join(Utils.supportedWasmRuntimes())
+        ptbBaseParserGroup.add_argument("--wasm-runtime", type=str, help=argparse.SUPPRESS if suppressHelp else f"Override default WASM runtime ({supportedWasmRuntimeHelp}).\
                                          \"sys-vm-jit\" : A WebAssembly runtime that compiles WebAssembly code to native x86 code prior to\
                                          execution. \"sys-vm\" : A WebAssembly interpreter.",
-                                         choices=["sys-vm-jit", "sys-vm"], default="sys-vm-jit")
+                                         choices=Utils.supportedWasmRuntimes(), default=Utils.defaultWasmRuntime())
         ptbBaseParserGroup.add_argument("--contracts-console", help=argparse.SUPPRESS if suppressHelp else "print contract's output to console", action='store_true')
         ptbBaseParserGroup.add_argument("--sys-vm-oc-cache-size-mb", type=int, help=argparse.SUPPRESS if suppressHelp else "Maximum size (in MiB) of the SYS VM OC code cache", default=1024)
         ptbBaseParserGroup.add_argument("--sys-vm-oc-compile-threads", type=int, help=argparse.SUPPRESS if suppressHelp else "Number of threads to use for SYS VM OC tier-up", default=1)

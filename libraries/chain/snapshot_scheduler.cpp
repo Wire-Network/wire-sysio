@@ -1,6 +1,7 @@
 #include <sysio/chain/controller.hpp>
 #include <sysio/chain/exceptions.hpp>
 #include <sysio/chain/pending_snapshot.hpp>
+#include <sysio/chain/snapshot.hpp>
 #include <sysio/chain/snapshot_scheduler.hpp>
 
 namespace sysio::chain {
@@ -41,7 +42,9 @@ void snapshot_scheduler::on_irreversible_block(const signed_block_ptr& lib, cons
       auto next = pending->next;
 
       try {
-         next(pending->finalize(block_id, chain));
+         auto si = pending->finalize(block_id, chain);
+         next(snapshot_information{si});
+         notify_snapshot_finalized(si);
       }
       CATCH_AND_CALL(next);
 
@@ -64,10 +67,16 @@ void snapshot_scheduler::on_irreversible_block(const signed_block_ptr& lib, cons
    }
 }
 
+std::optional<uint32_t> snapshot_scheduler::find_snapshot_request(uint32_t block_spacing, uint32_t start_block_num, uint32_t end_block_num) const {
+   const auto& snapshot_by_value = _snapshot_requests.get<by_snapshot_value>();
+   auto existing = snapshot_by_value.find(std::make_tuple(block_spacing, start_block_num, end_block_num));
+   if (existing == snapshot_by_value.end())
+      return std::nullopt;
+   return existing->snapshot_request_id;
+}
+
 snapshot_scheduler::snapshot_schedule_result snapshot_scheduler::schedule_snapshot(const snapshot_request_information& sri) {
-   auto& snapshot_by_value = _snapshot_requests.get<by_snapshot_value>();
-   auto existing = snapshot_by_value.find(std::make_tuple(sri.block_spacing, sri.start_block_num, sri.end_block_num));
-   SYS_ASSERT(existing == snapshot_by_value.end(), chain::duplicate_snapshot_request, "Duplicate snapshot request");
+   SYS_ASSERT(!find_snapshot_request(sri.block_spacing, sri.start_block_num, sri.end_block_num), chain::duplicate_snapshot_request, "Duplicate snapshot request");
    SYS_ASSERT(sri.start_block_num <= sri.end_block_num, chain::invalid_snapshot_request, "End block number should be greater or equal to start block number");
    SYS_ASSERT(sri.start_block_num + sri.block_spacing <= sri.end_block_num, chain::invalid_snapshot_request, "Block spacing exceeds defined by start and end range");
 
@@ -148,6 +157,12 @@ void snapshot_scheduler::execute_snapshot(uint32_t srid, chain::controller& chai
                pending.erase(it, pending.end());
             });
          }
+
+         // Deliberately no notify_snapshot_finalized() here: this `next` is one of possibly
+         // several handlers chained onto the snapshot's completion, while the finalized
+         // callbacks fire once per snapshot from create_snapshot() (irreversible mode) or
+         // on_irreversible_block() (pending promotion). Notifying here as well would invoke
+         // every subscriber twice for scheduled snapshots.
       }
    };
    create_snapshot(next, chain, {});
@@ -167,12 +182,14 @@ void snapshot_scheduler::create_snapshot(next_function<snapshot_information> nex
       return;
    }
 
+   fc::crypto::blake3 captured_root_hash;
    auto write_snapshot = [&](const fs::path& p) -> void {
       if(predicate) predicate();
       fs::create_directory(p.parent_path());
       auto writer = std::make_shared<threaded_snapshot_writer>(p);
       chain.write_snapshot(writer);
       writer->finalize();
+      captured_root_hash = writer->get_root_hash();
    };
 
    // If in irreversible mode, create snapshot and return path to snapshot immediately.
@@ -187,7 +204,9 @@ void snapshot_scheduler::create_snapshot(next_function<snapshot_information> nex
                     head_block_num, ec.value(), ec.message());
 
          ilog("Snapshot creation at block {} complete; snapshot placed at {}", head_block_num, snapshot_path.string());
-         next(snapshot_information{head_id, head_block_num, head_block_time, chain_snapshot_header::current_version, snapshot_path.generic_string()});
+         snapshot_information si{head_id, head_block_num, head_block_time, chain_snapshot_header::current_version, snapshot_path.generic_string(), captured_root_hash};
+         next(snapshot_information{si});
+         notify_snapshot_finalized(si);
       }
       CATCH_AND_CALL(next);
       return;
@@ -223,10 +242,22 @@ void snapshot_scheduler::create_snapshot(next_function<snapshot_information> nex
                     temp_path.generic_string(), pending_path.generic_string(),
                     head_block_num, ec.value(), ec.message());
          ilog("Snapshot creation at block {} complete; snapshot will be available once block becomes irreversible", head_block_num);
-         _pending_snapshot_index.emplace(head_id, head_block_time, next, pending_path.generic_string(), snapshot_path.generic_string());
-         add_pending_snapshot_info(snapshot_information{head_id, head_block_num, head_block_time, chain_snapshot_header::current_version, pending_path.generic_string()});
+         _pending_snapshot_index.emplace(head_id, head_block_time, next, pending_path.generic_string(), snapshot_path.generic_string(), captured_root_hash);
+         add_pending_snapshot_info(snapshot_information{head_id, head_block_num, head_block_time, chain_snapshot_header::current_version, pending_path.generic_string(), captured_root_hash});
       }
       CATCH_AND_CALL(next);
+   }
+}
+
+void snapshot_scheduler::notify_snapshot_finalized(const snapshot_information& si) {
+   for(const auto& cb: _snapshot_finalized_cbs) {
+      try {
+         cb(si);
+      } catch (const fc::exception& e) {
+         elog("Snapshot finalized callback error: {}", e.to_detail_string());
+      } catch (const std::exception& e) {
+         elog("Snapshot finalized callback error: {}", e.what());
+      }
    }
 }
 

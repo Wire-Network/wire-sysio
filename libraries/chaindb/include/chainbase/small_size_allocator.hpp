@@ -149,7 +149,12 @@ private:
    static constexpr size_t max_size = num_allocators * size_increment;
 
    static constexpr size_t allocator_index(size_t sz_in_bytes) {
-      assert(sz_in_bytes > 0);
+      // Route zero-byte requests to the smallest size class rather than letting (0 - 1) wrap and
+      // index out of bounds when asserts are compiled out (malloc(0)-style semantics: a valid,
+      // unique pointer). allocate() and deallocate() share this mapping, so a zero-size
+      // allocation round-trips consistently through class 0.
+      if (sz_in_bytes == 0)
+         return 0;
       return (sz_in_bytes - 1) / size_increment;
    }
 

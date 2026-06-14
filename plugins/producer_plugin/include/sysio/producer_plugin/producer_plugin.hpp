@@ -96,6 +96,12 @@ public:
    chain::snapshot_scheduler::snapshot_schedule_result unschedule_snapshot(const chain::snapshot_scheduler::snapshot_request_id_information& schedule);
    chain::snapshot_scheduler::get_snapshot_requests_result get_snapshot_requests() const;
 
+   /// Register a callback invoked on each snapshot finalization (for snapshot_api_plugin catalog updates)
+   void add_snapshot_finalized_callback(chain::snapshot_scheduler::snapshot_finalized_callback_t cb);
+
+   /// Get the configured snapshots directory
+   std::filesystem::path get_snapshots_dir() const;
+
    scheduled_protocol_feature_activations get_scheduled_protocol_feature_activations() const;
    void schedule_protocol_feature_activations(const scheduled_protocol_feature_activations& schedule);
 
