@@ -107,6 +107,16 @@ jobs:
         run: |
           cmake --build "$BUILD_DIR" -- -j"$(sysctl -n hw.logicalcpu)"
 
+      - name: Restore CTest cost data
+        uses: actions/cache/restore@v5
+        with:
+          # CTest uses this file to schedule higher-cost tests first when running with -j.
+          path: ${{ env.BUILD_DIR }}/Testing/Temporary/CTestCostData.txt
+          key: ctest-cost-macos-arm64-${{ matrix.runner }}-${{ github.sha }}
+          restore-keys: |
+            ctest-cost-macos-arm64-${{ matrix.runner }}-
+            ctest-cost-macos-arm64-
+
       - name: Run parallelizable tests
         run: |
           cd "$BUILD_DIR"
@@ -115,17 +125,23 @@ jobs:
             --output-on-failure --timeout 1000 \
             2>&1 | tee "$RUNNER_TEMP/macos-arm64-${{ matrix.runner }}-parallel-ctest.log"
 
-      - name: Run nodeop nonparallelizable test
+      - name: Run sharded NP/LR tests
         run: |
           cd "$BUILD_DIR"
-          ctest --output-on-failure -R "^nodeop_run_test$" --timeout 1000 \
-            2>&1 | tee "$RUNNER_TEMP/macos-arm64-${{ matrix.runner }}-nodeop-run-test.log"
+          test_jobs="$(sysctl -n hw.logicalcpu)"
+          echo "Running sharded NP/LR tests with ${test_jobs} jobs"
+          ctest --output-on-failure -j "${test_jobs}" \
+            -L "(nonparallelizable_tests|long_running_tests)" \
+            --timeout 2700 \
+            2>&1 | tee "$RUNNER_TEMP/macos-arm64-${{ matrix.runner }}-np-lr-ctest.log"
 
-      - name: Run ship streamer test
-        run: |
-          cd "$BUILD_DIR"
-          ctest --output-on-failure -R "^ship_streamer_test$" --timeout 1000 \
-            2>&1 | tee "$RUNNER_TEMP/macos-arm64-${{ matrix.runner }}-ship-streamer-test.log"
+      - name: Save CTest cost data
+        if: ${{ always() && hashFiles(format('{0}/Testing/Temporary/CTestCostData.txt', env.BUILD_DIR)) != '' }}
+        uses: actions/cache/save@v5
+        with:
+          # Caches are immutable, so save each run under a unique key and restore by runner prefix.
+          path: ${{ env.BUILD_DIR }}/Testing/Temporary/CTestCostData.txt
+          key: ctest-cost-macos-arm64-${{ matrix.runner }}-${{ github.run_id }}-${{ github.run_attempt }}
 
       - name: Show diagnostics on failure
         if: failure()
