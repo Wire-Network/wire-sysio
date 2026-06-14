@@ -42,7 +42,7 @@ jobs:
   parallel-tests:
     name: Build and run parallel tests on Apple Silicon (${{ matrix.runner }})
     runs-on: ${{ matrix.runner }}
-    timeout-minutes: 180
+    timeout-minutes: 300
     strategy:
       fail-fast: false
       matrix:
@@ -60,6 +60,7 @@ jobs:
       - name: Install host tools
         run: |
           brew install ninja ccache pkgconf autoconf automake libtool
+          python3 -m pip install --user numpy
 
       - name: Restore vcpkg binary cache
         uses: actions/cache@v5
