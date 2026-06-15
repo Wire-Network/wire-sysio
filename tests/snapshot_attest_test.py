@@ -152,16 +152,19 @@ try:
         json.dumps({"min_providers": 1, "threshold_pct": 50}),
         "--permission sysio@active")
     assert success, f"Failed to set snapshot config: {trans}"
-
-    assert node0.waitForHeadToAdvance(), "Head did not advance after config"
+    setCfgTransId = node0.getTransId(trans)
 
     # ---------------------------------------------------------------
     # Verify provider registration via table query
     # ---------------------------------------------------------------
-    # Ensure both regsnapprov registrations are in a block before reading the
-    # table, so the exact-count assertion below cannot race the registrations.
-    assert node0.waitForTransactionsInBlock(regSnapProvTransIds, timeout=60), \
-        "regsnapprov transactions did not make it into a block"
+    # Ensure both provider registrations and the attestation config are applied
+    # in a block before proceeding. The exact-count assertion below depends on
+    # the registrations, and Test 1's single votesnaphash depends on setsnpcfg
+    # making quorum == 1 — if the config is forwarded into a peer's block and not
+    # yet applied, the vote runs against the default config (2 providers @ 67%,
+    # quorum 2), creates no snaprecords entry, and the test fails.
+    assert node0.waitForTransactionsInBlock(regSnapProvTransIds + [setCfgTransId], timeout=60), \
+        "regsnapprov/setsnpcfg transactions did not make it into a block"
     Print("Verify snapshot providers registered")
     providers = node0.getTableRows("sysio", "sysio", "snapprovs")
     assert providers is not None, "Failed to read snapprovs table"
