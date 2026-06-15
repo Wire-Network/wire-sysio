@@ -115,26 +115,39 @@ namespace sysio::trace_api {
 
    inline bool operator==(const authorization_trace_v0& lhs, const authorization_trace_v0& rhs) {
       return
-         lhs.account == rhs.account &&
+         lhs.actor == rhs.actor &&
          lhs.permission == rhs.permission;
+   }
+
+   inline bool operator==(const account_delta_v0& lhs, const account_delta_v0& rhs) {
+      return lhs.account == rhs.account && lhs.delta == rhs.delta;
    }
 
    inline bool operator==(const action_trace_v0& lhs, const action_trace_v0& rhs) {
       return
+         lhs.action_ordinal == rhs.action_ordinal &&
+         lhs.creator_action_ordinal == rhs.creator_action_ordinal &&
+         lhs.closest_unnotified_ancestor_action_ordinal == rhs.closest_unnotified_ancestor_action_ordinal &&
          lhs.global_sequence == rhs.global_sequence &&
+         lhs.recv_sequence == rhs.recv_sequence &&
+         lhs.auth_sequence == rhs.auth_sequence &&
+         lhs.code_sequence == rhs.code_sequence &&
+         lhs.abi_sequence == rhs.abi_sequence &&
          lhs.receiver == rhs.receiver &&
          lhs.account == rhs.account &&
          lhs.action == rhs.action &&
          lhs.authorization == rhs.authorization &&
          lhs.data == rhs.data &&
-         lhs.return_value == rhs.return_value;
+         lhs.return_value == rhs.return_value &&
+         lhs.account_ram_deltas == rhs.account_ram_deltas &&
+         lhs.cpu_usage_us == rhs.cpu_usage_us &&
+         lhs.net_usage == rhs.net_usage;
    }
 
    inline bool operator==(const transaction_trace_v0& lhs, const transaction_trace_v0& rhs) {
       return
          lhs.id == rhs.id &&
          lhs.actions == rhs.actions &&
-         lhs.status == rhs.status &&
          lhs.cpu_usage_us == rhs.cpu_usage_us &&
          lhs.net_usage_words == rhs.net_usage_words &&
          lhs.signatures == rhs.signatures &&
