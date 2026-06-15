@@ -45,6 +45,7 @@ jobs:
     timeout-minutes: 300
     env:
       BUILD_DIR: build/macos-arm64
+      CCACHE_DIR: ${{ github.workspace }}/.ccache
       VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/vcpkg-binary-cache,readwrite"
     steps:
       - uses: actions/checkout@v5
@@ -80,28 +81,25 @@ jobs:
           mkdir -p "$GITHUB_WORKSPACE/vcpkg-binary-cache"
           ./vcpkg/bootstrap-vcpkg.sh
 
-          export CCACHE_DIR="$GITHUB_WORKSPACE/.ccache"
-          export VCPKG_TARGET_TRIPLET=arm64-osx-release
-          export VCPKG_HOST_TRIPLET=arm64-osx-release
-          export VCPKG_OVERLAY_TRIPLETS="$GITHUB_WORKSPACE/.github/vcpkg-triplets"
           ccache -z || true
 
           cmake -B "$BUILD_DIR" -S . -G Ninja \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_TOOLCHAIN_FILE="$PWD/vcpkg/scripts/buildsystems/vcpkg.cmake" \
-            -DVCPKG_TARGET_TRIPLET="$VCPKG_TARGET_TRIPLET" \
-            -DVCPKG_HOST_TRIPLET="$VCPKG_HOST_TRIPLET" \
-            -DVCPKG_OVERLAY_TRIPLETS="$VCPKG_OVERLAY_TRIPLETS" \
-            -DBUILD_SYSTEM_CONTRACTS=OFF \
-            -DBUILD_TEST_CONTRACTS=OFF \
-            -DENABLE_CCACHE=ON \
-            -DENABLE_DISTCC=OFF \
-            -DENABLE_TESTS=ON \
-            -DDISABLE_WASM_SPEC_TESTS=OFF
+            -DVCPKG_TARGET_TRIPLET=arm64-osx-release \
+            -DVCPKG_HOST_TRIPLET=arm64-osx-release \
+            -DVCPKG_OVERLAY_TRIPLETS="$GITHUB_WORKSPACE/.github/vcpkg-triplets" \
+            -DENABLE_TESTS=ON
 
       - name: Build test targets
         run: |
           cmake --build "$BUILD_DIR" -- -j"$(sysctl -n hw.logicalcpu)"
+
+      - name: Enable macOS core dumps
+        run: |
+          mkdir -p "$RUNNER_TEMP/cores"
+          ulimit -c unlimited || true
+          sudo sysctl -w "kern.corefile=$RUNNER_TEMP/cores/core.%P" || true
 
       - name: Restore CTest cost data
         uses: actions/cache/restore@v5
@@ -123,21 +121,12 @@ jobs:
       - name: Run sharded NP/LR tests
         run: |
           cd "$BUILD_DIR"
-          test_jobs="$(sysctl -n hw.logicalcpu)"
+          test_jobs="2"
           echo "Running sharded NP/LR tests with ${test_jobs} jobs"
-          ctest --output-on-failure -j "${test_jobs}" \
+          ctest -j "${test_jobs}" \
             -L "(nonparallelizable_tests|long_running_tests)" \
-            -E "^read-only-trx-" \
             --timeout 2700 \
             2>&1 | tee "$RUNNER_TEMP/macos-arm64-np-lr-ctest.log"
-
-      - name: Run read-only transaction NP tests
-        run: |
-          cd "$BUILD_DIR"
-          ctest --output-on-failure -j 2 \
-            -R "^read-only-trx-" \
-            --timeout 2700 \
-            2>&1 | tee "$RUNNER_TEMP/macos-arm64-read-only-ctest.log"
 
       - name: Save CTest cost data
         if: ${{ always() && hashFiles(format('{0}/Testing/Temporary/CTestCostData.txt', env.BUILD_DIR)) != '' }}
@@ -146,6 +135,20 @@ jobs:
           # Caches are immutable, so save each run under a unique key and restore by runner prefix.
           path: ${{ env.BUILD_DIR }}/Testing/Temporary/CTestCostData.txt
           key: ctest-cost-macos-arm64-${{ github.run_id }}-${{ github.run_attempt }}
+
+      - name: Upload core files from failed tests
+        uses: actions/upload-artifact@v6
+        if: failure()
+        with:
+          name: macos-arm64-tests-logs
+          if-no-files-found: warn
+          path: |
+            ${{ runner.temp }}/cores/
+            ~/Library/Logs/DiagnosticReports/
+            ~/Library/Logs/CrashReporter/
+            ${{ env.BUILD_DIR }}/Testing/Temporary/
+            ${{ env.BUILD_DIR }}/TestLogs/
+            ${{ env.BUILD_DIR }}/PerformanceHarnessScenarioRunnerLogs/
 
       - name: Show diagnostics on failure
         if: failure()
