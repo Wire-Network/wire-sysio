@@ -22,16 +22,17 @@ BOOST_AUTO_TEST_CASE(snapshot_scheduler_test) {
    snapshot_scheduler scheduler;
 
    {
-      // add/remove test
+      // add/remove test; scheduling validation errors are thrown directly, the (empty) next
+      // callback is only invoked for snapshots produced by the request
       snapshot_request_information sri1 = {.block_spacing = 100, .start_block_num = 5000, .end_block_num = 10000, .snapshot_description = "Example of recurring snapshot"};
       snapshot_request_information sri2 = {.block_spacing = 0, .start_block_num = 5200, .end_block_num = 5200, .snapshot_description = "Example of one-time snapshot"};
 
-      scheduler.schedule_snapshot(sri1);
-      scheduler.schedule_snapshot(sri2);
+      scheduler.schedule_snapshot(sri1, {});
+      scheduler.schedule_snapshot(sri2, {});
 
       BOOST_CHECK_EQUAL(2u, scheduler.get_snapshot_requests().snapshot_requests.size());
 
-      BOOST_CHECK_EXCEPTION(scheduler.schedule_snapshot(sri1), duplicate_snapshot_request, [](const fc::assert_exception& e) {
+      BOOST_CHECK_EXCEPTION(scheduler.schedule_snapshot(sri1, {}), duplicate_snapshot_request, [](const fc::assert_exception& e) {
          return e.to_detail_string().find("Duplicate snapshot request") != std::string::npos;
       });
 
@@ -46,12 +47,12 @@ BOOST_AUTO_TEST_CASE(snapshot_scheduler_test) {
       BOOST_CHECK_EQUAL(0u, scheduler.get_snapshot_requests().snapshot_requests.size());
 
       snapshot_request_information sri_large_spacing = {.block_spacing = 1000, .start_block_num = 5000, .end_block_num = 5010};
-      BOOST_CHECK_EXCEPTION(scheduler.schedule_snapshot(sri_large_spacing), invalid_snapshot_request, [](const fc::assert_exception& e) {
+      BOOST_CHECK_EXCEPTION(scheduler.schedule_snapshot(sri_large_spacing, {}), invalid_snapshot_request, [](const fc::assert_exception& e) {
          return e.to_detail_string().find("Block spacing exceeds defined by start and end range") != std::string::npos;
       });
 
       snapshot_request_information sri_start_end = {.block_spacing = 1000, .start_block_num = 50000, .end_block_num = 5000};
-      BOOST_CHECK_EXCEPTION(scheduler.schedule_snapshot(sri_start_end), invalid_snapshot_request, [](const fc::assert_exception& e) {
+      BOOST_CHECK_EXCEPTION(scheduler.schedule_snapshot(sri_start_end, {}), invalid_snapshot_request, [](const fc::assert_exception& e) {
          return e.to_detail_string().find("End block number should be greater or equal to start block number") != std::string::npos;
       });
    }
@@ -247,8 +248,8 @@ BOOST_AUTO_TEST_CASE(snapshot_scheduler_old_json) {
 // ---------------------------------------------------------------------------------------------------
 // Snapshot-finalized callback contract: every registered callback fires exactly once per snapshot
 // that reaches finality, regardless of how the snapshot was initiated (scheduled request or direct
-// create_snapshot call), of the chain's read mode, and of how many completion handlers are attached
-// to the snapshot.
+// create_snapshot call), of the chain's read mode, and of whether a duplicate request for the same
+// block is issued.
 //
 // Regression coverage for a bug where scheduled snapshots notified the callbacks twice: once from
 // execute_snapshot()'s completion handler and again from on_irreversible_block() (or from
@@ -293,7 +294,7 @@ BOOST_AUTO_TEST_CASE(scheduled_snapshot_notifies_callbacks_once) {
    sri.start_block_num      = snapshot_height;
    sri.end_block_num        = snapshot_height;
    sri.snapshot_description = "single-fire scheduled snapshot";
-   f.scheduler.schedule_snapshot(sri);
+   f.scheduler.schedule_snapshot(sri, {});
 
    f.scheduler.on_start_block(snapshot_height + 1, *chain.control);
 
@@ -331,7 +332,7 @@ BOOST_AUTO_TEST_CASE(irreversible_mode_snapshot_notifies_callbacks_once) {
    sri.start_block_num      = snapshot_height;
    sri.end_block_num        = snapshot_height;
    sri.snapshot_description = "single-fire irreversible-mode snapshot";
-   f.scheduler.schedule_snapshot(sri);
+   f.scheduler.schedule_snapshot(sri, {});
 
    f.scheduler.on_start_block(snapshot_height + 1, *chain.control);
 
@@ -339,10 +340,12 @@ BOOST_AUTO_TEST_CASE(irreversible_mode_snapshot_notifies_callbacks_once) {
    BOOST_TEST(f.cb2_count == 1u);
 }
 
-// Direct create_snapshot() call (the producer_plugin create_snapshot API path) with two
-// handlers attached to the same pending snapshot: each handler completes once, and the
-// finalized callbacks still fire only once for the single underlying snapshot.
-BOOST_AUTO_TEST_CASE(api_snapshot_with_chained_handlers_notifies_callbacks_once) {
+// Direct create_snapshot() calls for the same head block: the second request finds a snapshot
+// already pending for that block and is ignored rather than chained onto the first. (In normal
+// operation the producer_plugin guards against this earlier -- schedule_snapshot throws
+// duplicate_snapshot_request -- so the dropped handler is not reachable through the HTTP API.)
+// The single underlying snapshot still notifies each finalized callback exactly once.
+BOOST_AUTO_TEST_CASE(api_snapshot_duplicate_block_request_ignored_notifies_callbacks_once) {
    testing::tester            chain;
    scheduler_callback_fixture f;
 
@@ -357,10 +360,10 @@ BOOST_AUTO_TEST_CASE(api_snapshot_with_chained_handlers_notifies_callbacks_once)
       };
    };
 
-   // two requests for a snapshot at the same head block: the second attaches its handler
-   // to the already-pending snapshot instead of writing a new one
-   f.scheduler.create_snapshot(count_success(next1_success), *chain.control, {});
-   f.scheduler.create_snapshot(count_success(next2_success), *chain.control, {});
+   // two create_snapshot calls for the same head block: the first writes the pending snapshot, the
+   // second sees it already pending and is ignored (its handler is never stored or invoked)
+   f.scheduler.create_snapshot(count_success(next1_success), *chain.control);
+   f.scheduler.create_snapshot(count_success(next2_success), *chain.control);
 
    BOOST_TEST(f.cb1_count == 0u);
    BOOST_TEST(f.cb2_count == 0u);
@@ -369,7 +372,7 @@ BOOST_AUTO_TEST_CASE(api_snapshot_with_chained_handlers_notifies_callbacks_once)
    f.scheduler.on_irreversible_block(lib_block, lib_block->calculate_id(), *chain.control);
 
    BOOST_TEST(next1_success == 1u);
-   BOOST_TEST(next2_success == 1u);
+   BOOST_TEST(next2_success == 0u); // duplicate request was ignored, not chained
    BOOST_TEST(f.cb1_count == 1u);
    BOOST_TEST(f.cb2_count == 1u);
 }

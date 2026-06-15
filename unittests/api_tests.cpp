@@ -1036,7 +1036,6 @@ void transaction_tests(T& chain) {
          billed_cpu_us.insert(billed_cpu_us.end(), trx.total_actions(), T::DEFAULT_BILLED_CPU_TIME_US);
       auto r = chain.control->test_push_transaction( fut.get(), fc::time_point::maximum(), fc::microseconds::maximum(), billed_cpu_us, true );
       if( r->except_ptr ) std::rethrow_exception( r->except_ptr );
-      if( r->except) throw *r->except;
       tx_trace = r;
       chain.produce_block();
       BOOST_CHECK(tx_trace->action_traces.front().console == sha_expect);

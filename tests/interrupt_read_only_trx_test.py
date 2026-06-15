@@ -21,7 +21,8 @@ errorExit=Utils.errorExit
 appArgs=AppArgs()
 appArgs.add(flag="--read-only-threads", type=int, help="number of read-only threads", default=0)
 appArgs.add(flag="--sys-vm-oc-enable", type=str, help="specify sys-vm-oc-enable option", default=Utils.SysVmOcEnableAuto)
-appArgs.add(flag="--wasm-runtime", type=str, help="if wanting sys-vm-oc, must use 'sys-vm-oc-forced'", default="sys-vm-jit")
+appArgs.add(flag="--wasm-runtime", type=str, help="if wanting sys-vm-oc, must use 'sys-vm-oc-forced'",
+            default=Utils.defaultWasmRuntime())
 
 args=TestHelper.parse_args({"-p","-n","-d","-s","--dump-error-details","-v","--leave-running"
                             ,"--keep-logs","--unshared"}, applicationSpecificArgs=appArgs)

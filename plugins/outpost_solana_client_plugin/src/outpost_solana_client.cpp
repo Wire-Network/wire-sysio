@@ -1,5 +1,6 @@
 #include <sysio/outpost_solana_client_plugin/outpost_solana_client.hpp>
 
+#include <bit>
 #include <cstring>
 #include <optional>
 #include <string>
@@ -38,8 +39,11 @@ constexpr size_t LATEST_VEC_LEN_OFF = LATEST_HEADER_LEN;
 constexpr size_t LATEST_DATA_OFF    = LATEST_HEADER_LEN + 4;
 constexpr size_t LATEST_EPOCH_OFF   = ANCHOR_DISCRIMINATOR_LEN;
 
-/// Read a little-endian u32 from `buf` at `off`.
+/// Read a little-endian u32 from `buf` at `off`. Borsh is little-endian on the wire; the native-endian
+/// `memcpy` below is correct only on a little-endian host. WIRE is x86_64-only today; the static_assert
+/// documents that dependency and fails the build if a future port to a big-endian host removes it.
 uint32_t read_u32_le(const std::vector<uint8_t>& buf, size_t off) {
+   static_assert(std::endian::native == std::endian::little, "read_u32_le assumes a little-endian host");
    if (off + 4 > buf.size()) FC_THROW("LatestOutboundEnvelope: truncated u32 at {}", off);
    uint32_t v;
    std::memcpy(&v, buf.data() + off, 4);
@@ -456,9 +460,15 @@ std::vector<char> outpost_solana_client::read_inbound_envelope(
    // time only the most-recent emitted envelope is in flight — so a
    // single-slot PDA is sufficient and historical reads are out of
    // scope (off-chain audit tooling owns them).
+   // Read at `finalized`, not `confirmed`. WIRE consensus on inbound is committed forward against this
+   // read: `confirmed` is supermajority lockout but can still revert below it during cluster instability,
+   // which would leave WIRE state derived from a Solana slot that no longer exists. `finalized` is the
+   // only commitment that cannot be rolled back. Deliberately not operator-configurable: the read
+   // commitment is a consensus parameter, and operators reading at different commitments would deliver
+   // divergent envelopes for the same epoch, manufacturing disputes among honest operators.
    auto info = _entry->client->get_account_info(
       _program_client->latest_outbound_envelope_pda,
-      fc::network::solana::commitment_t::confirmed);
+      fc::network::solana::commitment_t::finalized);
    if (!info.has_value()) {
       // PDA was init'd at outpost initialize — absence here means the
       // RPC is out of sync or the program redeployed mid-run. Surface.

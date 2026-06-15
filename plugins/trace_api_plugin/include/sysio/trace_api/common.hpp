@@ -1,10 +1,37 @@
 #pragma once
 
 #include <fc/utility.hpp>
+#include <fc/io/raw.hpp>
 #include <tuple>
+#include <utility>
 #include <sysio/trace_api/data_log.hpp>
+#include <sysio/chain/name.hpp>
 
 namespace sysio::trace_api {
+
+   // Compile-time constant for setabi detection so we don't pay a chain::name
+   // construction cost on every action.  string_to_name instead of the ""_n
+   // literal keeps using-directives out of this widely-included header.  Used by
+   // chain_extraction (live capture) and store_provider (startup rebuild of the
+   // reversible ABI overlay from recorded traces) - keep the two detection sites
+   // in lock-step.
+   inline constexpr chain::name setabi_action_name = chain::string_to_name("setabi");
+
+   /**
+    * Decode a sysio::setabi action payload into (target account, ABI bytes).
+    * Shared by chain_extraction (live capture) and store_provider (startup rebuild
+    * of the reversible ABI overlay) so the wire format is interpreted in exactly
+    * one place.  Throws fc unpack errors on a malformed payload; callers catch and
+    * log with their own context (global_sequence etc.).
+    */
+   inline std::pair<chain::name, chain::bytes> unpack_setabi_data(const chain::bytes& data) {
+      chain::name  target;
+      chain::bytes abi_bytes;
+      auto ds = fc::datastream<const char*>(data.data(), data.size());
+      fc::raw::unpack(ds, target);
+      fc::raw::unpack(ds, abi_bytes);
+      return { target, std::move(abi_bytes) };
+   }
    /**
     * A function used to separate cooperative or external concerns from long running tasks
     * calling code should expect that this can throw yield_exception and gracefully unwind if it does
