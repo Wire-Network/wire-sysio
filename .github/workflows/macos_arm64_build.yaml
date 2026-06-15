@@ -40,19 +40,11 @@ defaults:
 
 jobs:
   parallel-tests:
-    name: Build and run parallel tests on Apple Silicon (${{ matrix.runner }})
-    runs-on: ${{ matrix.runner }}
+    name: Build and run parallel tests on Apple Silicon
+    runs-on: macos-26
     timeout-minutes: 300
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - runner: macos-15
-            np_lr_jobs: 2
-          - runner: macos-26
-            np_lr_jobs: 2
     env:
-      BUILD_DIR: build/macos-arm64-${{ matrix.runner }}
+      BUILD_DIR: build/macos-arm64
       VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/vcpkg-binary-cache,readwrite"
     steps:
       - uses: actions/checkout@v5
@@ -71,18 +63,16 @@ jobs:
         uses: actions/cache@v5
         with:
           path: ${{ github.workspace }}/vcpkg-binary-cache
-          key: vcpkg-binaries-macos-arm64-${{ matrix.runner }}-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json', '.github/vcpkg-triplets/arm64-osx-release.cmake') }}
+          key: vcpkg-binaries-macos-arm64-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json', '.github/vcpkg-triplets/arm64-osx-release.cmake') }}
           restore-keys: |
-            vcpkg-binaries-macos-arm64-${{ matrix.runner }}-
             vcpkg-binaries-macos-arm64-
 
       - name: Restore ccache
         uses: actions/cache@v5
         with:
           path: ${{ github.workspace }}/.ccache
-          key: ccache-macos-arm64-${{ matrix.runner }}-${{ github.sha }}
+          key: ccache-macos-arm64-${{ github.sha }}
           restore-keys: |
-            ccache-macos-arm64-${{ matrix.runner }}-
             ccache-macos-arm64-
 
       - name: Configure
@@ -118,9 +108,8 @@ jobs:
         with:
           # CTest uses this file to schedule higher-cost tests first when running with -j.
           path: ${{ env.BUILD_DIR }}/Testing/Temporary/CTestCostData.txt
-          key: ctest-cost-macos-arm64-${{ matrix.runner }}-${{ github.sha }}
+          key: ctest-cost-macos-arm64-${{ github.sha }}
           restore-keys: |
-            ctest-cost-macos-arm64-${{ matrix.runner }}-
             ctest-cost-macos-arm64-
 
       - name: Run parallelizable tests
@@ -129,26 +118,26 @@ jobs:
           ctest -j "$(sysctl -n hw.logicalcpu)" \
             -LE "(nonparallelizable_tests|long_running_tests)" \
             --output-on-failure --timeout 1000 \
-            2>&1 | tee "$RUNNER_TEMP/macos-arm64-${{ matrix.runner }}-parallel-ctest.log"
+            2>&1 | tee "$RUNNER_TEMP/macos-arm64-parallel-ctest.log"
 
       - name: Run sharded NP/LR tests
         run: |
           cd "$BUILD_DIR"
-          test_jobs="${{ matrix.np_lr_jobs }}"
+          test_jobs="$(sysctl -n hw.logicalcpu)"
           echo "Running sharded NP/LR tests with ${test_jobs} jobs"
           ctest --output-on-failure -j "${test_jobs}" \
             -L "(nonparallelizable_tests|long_running_tests)" \
             -E "^read-only-trx-" \
             --timeout 2700 \
-            2>&1 | tee "$RUNNER_TEMP/macos-arm64-${{ matrix.runner }}-np-lr-ctest.log"
+            2>&1 | tee "$RUNNER_TEMP/macos-arm64-np-lr-ctest.log"
 
       - name: Run read-only transaction NP tests
         run: |
           cd "$BUILD_DIR"
-          ctest --output-on-failure -j 1 \
+          ctest --output-on-failure -j 2 \
             -R "^read-only-trx-" \
             --timeout 2700 \
-            2>&1 | tee "$RUNNER_TEMP/macos-arm64-${{ matrix.runner }}-read-only-ctest.log"
+            2>&1 | tee "$RUNNER_TEMP/macos-arm64-read-only-ctest.log"
 
       - name: Save CTest cost data
         if: ${{ always() && hashFiles(format('{0}/Testing/Temporary/CTestCostData.txt', env.BUILD_DIR)) != '' }}
@@ -156,7 +145,7 @@ jobs:
         with:
           # Caches are immutable, so save each run under a unique key and restore by runner prefix.
           path: ${{ env.BUILD_DIR }}/Testing/Temporary/CTestCostData.txt
-          key: ctest-cost-macos-arm64-${{ matrix.runner }}-${{ github.run_id }}-${{ github.run_attempt }}
+          key: ctest-cost-macos-arm64-${{ github.run_id }}-${{ github.run_attempt }}
 
       - name: Show diagnostics on failure
         if: failure()
