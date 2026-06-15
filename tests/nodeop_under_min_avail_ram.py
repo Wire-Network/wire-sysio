@@ -107,13 +107,30 @@ try:
     Print("push create action to %s contract" % (contract))
     action="store"
     numAmount=5000
-    keepProcessing=True
-    count=0
-    while keepProcessing:
+    successfulStoreActions=0
+    maxStoreActions=80
+    failedPushAttempts=0
+    maxFailedPushAttempts=12
+    lastFromIndex=0
+
+    def getLiveNodeIndexesOrFail(successfulStoreActions):
+        liveNodeIndexes=[i for i, node in enumerate(nodes) if node.verifyAlive()]
+        if successfulStoreActions>=maxStoreActions:
+            Utils.cmdError(
+                "Was able to send %d store actions without all nodes exiting" % (successfulStoreActions)
+            )
+            errorExit("Failure - All Nodes should have died")
+        return liveNodeIndexes
+
+    while True:
+        liveNodeIndexes=getLiveNodeIndexesOrFail(successfulStoreActions)
+        if not liveNodeIndexes:
+            break
         numAmount+=1
-        timeOutCount=0
         for fromIndex in range(namedAccounts.numAccounts):
-            count+=1
+            liveNodeIndexes=getLiveNodeIndexesOrFail(successfulStoreActions)
+            if not liveNodeIndexes:
+                break
             toIndex=fromIndex+1
             if toIndex==namedAccounts.numAccounts:
                 toIndex=0
@@ -122,32 +139,35 @@ try:
             data="{\"from\":\"%s\",\"to\":\"%s\",\"num\":%d}" % (fromAccount.name, toAccount.name, numAmount)
             opts="--permission %s@active --permission %s@active --expiration 90 --payer %s" % (contract, fromAccount.name, fromAccount.name)
             try:
-                trans=nodes[count % numNodes].pushMessage(contract, action, data, opts)
+                nodeIndex=liveNodeIndexes[successfulStoreActions % len(liveNodeIndexes)]
+                trans=nodes[nodeIndex].pushMessage(contract, action, data, opts)
                 if trans is None or not trans[0]:
-                    timeOutCount+=1
-                    if timeOutCount>=3:
-                        Print("Failed to push create action to sysio contract for %d consecutive times, looks like nodeop already exited." % (timeOutCount))
-                        keepProcessing=False
-                        break
-
                     Print("Failed to push create action to sysio contract. sleep for 5 seconds")
-                    count-=1 # failed attempt shouldn't be counted
+                    failedPushAttempts+=1
+                    if failedPushAttempts>=maxFailedPushAttempts:
+                        Utils.cmdError("Failed to push %d consecutive store actions" % (failedPushAttempts))
+                        errorExit("Failure - unable to keep applying RAM pressure to live nodes")
                     time.sleep(5)
                 else:
-                    timeOutCount=0
+                    successfulStoreActions+=1
+                    failedPushAttempts=0
+                    lastFromIndex=fromIndex
                 time.sleep(1)
             except TypeError as ex:
-                keepProcessing=False
-                break
+                Print("Failed to send %s action, nodeop may have exited" % (action))
+                failedPushAttempts+=1
+                if failedPushAttempts>=maxFailedPushAttempts:
+                    Utils.cmdError("Failed to push %d consecutive store actions" % (failedPushAttempts))
+                    errorExit("Failure - unable to keep applying RAM pressure to live nodes")
+                time.sleep(5)
 
     #spread the actions to all accounts, to use each accounts tps bandwidth
-    fromIndexStart=fromIndex+1 if fromIndex+1<namedAccounts.numAccounts else 0
+    fromIndexStart=lastFromIndex+1 if lastFromIndex+1<namedAccounts.numAccounts else 0
 
     # min and max are subjective, just assigned to make sure that many small changes in nodeop don't
     # result in the test not correctly validating behavior
-    if count < 12 or count > 24:
-        strMsg="little" if count < 25 else "much"
-        Utils.cmdError("Was able to send %d store actions which was too %s" % (count, strMsg))
+    if successfulStoreActions < 12:
+        Utils.cmdError("Was able to send %d store actions which was too little" % (successfulStoreActions))
         errorExit("Incorrect number of store actions sent")
 
     # Make sure all the nodes are shutdown (may take a little while for this to happen, so making multiple passes)
