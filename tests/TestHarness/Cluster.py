@@ -722,14 +722,15 @@ class Cluster(object):
         nodes += self.getNodes()
         return nodes
 
-    def launchUnstarted(self, numToLaunch=1):
+    def launchUnstarted(self, numToLaunch=1, timeout=Utils.systemWaitTimeout):
+        """Launch queued unstarted nodes and wait up to timeout seconds for each node to answer get_info."""
         assert(isinstance(numToLaunch, int))
         assert(numToLaunch>0)
         launchList=self.unstartedNodes[:numToLaunch]
         del self.unstartedNodes[:numToLaunch]
         for node in launchList:
             # the node number is indexed off of the started nodes list
-            node.launchUnstarted()
+            node.launchUnstarted(timeout=timeout)
             self.nodes.append(node)
 
     # Spread funds across accounts with transactions spread through cluster nodes.
@@ -1333,6 +1334,49 @@ class Cluster(object):
         if trans is None:
             Utils.Print("ERROR: Failed to set sysio.roa as privileged")
             return None
+
+        sysioAuthexAccount = copy.deepcopy(sysioAccount)
+        sysioAuthexAccount.name = 'sysio.authex'
+        contract="sysio.authex"
+        contractDir=str(self.libTestingContractsPath / contract)
+        wasmFile="%s.wasm" % (contract)
+        abiFile="%s.abi" % (contract)
+        Utils.Print("Publish %s contract" % (contract))
+        trans=biosNode.publishContract(sysioAuthexAccount, contractDir, wasmFile, abiFile, waitForTransBlock=True)
+        if trans is None:
+            Utils.Print("ERROR: Failed to publish contract %s." % (contract))
+            return None
+
+        trans=biosNode.setPriv(sysioAuthexAccount, sysioAccount, isPriv=True, waitForTransBlock=True)
+        if trans is None:
+            Utils.Print("ERROR: Failed to set sysio.authex as privileged")
+            return None
+
+        # Delegate sysio.authex.active to sysio.roa@sysio.code so sysio.roa::nodeownreg's inline
+        # sysio.authex::recordlink is authorized (mirrors the production ClusterManager grant).
+        # accounts is sorted by actor (sysio.authex < sysio.roa) as the authority encoding requires.
+        Utils.Print("Delegate sysio.authex.active to sysio.roa@sysio.code")
+        authexAuth=('{"account":"sysio.authex","permission":"active","parent":"owner","auth":'
+                    '{"threshold":1,"keys":[{"key":"%s","weight":1}],'
+                    '"accounts":[{"permission":{"actor":"sysio.authex","permission":"sysio.code"},"weight":1},'
+                    '{"permission":{"actor":"sysio.roa","permission":"sysio.code"},"weight":1}],'
+                    '"waits":[]}}' % sysioAuthexAccount.activePublicKey)
+        trans=biosNode.pushMessage('sysio', 'updateauth', authexAuth, '--permission sysio.authex@owner')
+        transId=Node.getTransId(trans[1])
+        if not biosNode.waitForTransactionInBlock(transId):
+            Utils.Print("ERROR: Failed to delegate sysio.authex.active to sysio.roa@sysio.code (tx %s)" % transId)
+            return None
+
+        if loadSystemContract:
+            Utils.Print("Set default emission config")
+            action="setemitcfg"
+            data='{"cfg":{"t1_allocation":"7500000000000000","t2_allocation":"1000000000000000","t3_allocation":"100000000000000","t1_duration":31104000,"t2_duration":62208000,"t3_duration":93312000,"min_claimable":"10000000000","t5_distributable":"375000000000000000","t5_floor":"125000000000000000","target_annual_decay_bps":6940,"annual_initial_emission":"205549750000000000","annual_max_emission":"1095000000000000000","annual_min_emission":"36500000000000000","compute_bps":4000,"capex_bps":2000,"governance_bps":1000,"producer_bps":7000,"batch_op_bps":3000,"standby_end_rank":28,"epoch_log_retention_count":8640,"pay_cadence_epochs":2}}'
+            opts="--permission %s@active" % (sysioAccount.name)
+            trans=biosNode.pushMessage(sysioAccount.name, action, data, opts)
+            transId=Node.getTransId(trans[1])
+            if not biosNode.waitForTransactionInBlock(transId):
+                Utils.Print("ERROR: Failed to set emission config (tx %s)" % transId)
+                return None
 
         Utils.Print("Activate ROA")
         action="activateroa"

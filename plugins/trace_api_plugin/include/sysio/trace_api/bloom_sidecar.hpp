@@ -62,9 +62,10 @@ using filter_t = boost::bloom::filter<uint64_t, k_hashes>;
 
 } // namespace bloom
 
-/// Accumulates distinct receivers and (receiver, action) pairs observed while a slice is being written.  Finalize
-/// sizes and materializes two blooms and writes the sidecar file atomically (temp + rename).  Memory cost is two
-/// hash sets keyed on uint64_t; at Wire-mainnet scale these stay a few tens of KB per open slice.
+/// Accumulates distinct receivers and (receiver, action) pairs from a slice's trace data log.  Driven by the
+/// maintenance thread once the slice is fully irreversible (build_recv_bloom streams the data log through
+/// add_block); finalize sizes and materializes two blooms and writes the sidecar file atomically (temp + rename).
+/// Memory cost is two hash sets keyed on uint64_t; at Wire-mainnet scale these stay a few tens of KB per slice.
 class bloom_builder {
 public:
    void add_action(const action_trace_v0& a) {
@@ -167,7 +168,7 @@ private:
          const auto file_size = std::filesystem::file_size(path, ec);
          if (ec || file_size < sizeof(bloom::header) + sizeof(uint32_t)) return;
 
-         fc::cfile in(path, fc::cfile::update_rw_mode);
+         fc::cfile in(path, fc::cfile::read_only_mode);
 
          bloom::header hdr;
          in.read(reinterpret_cast<char*>(&hdr), sizeof(hdr));

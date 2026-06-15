@@ -35,7 +35,7 @@ namespace sysio { namespace chain {
                  "action_name cannot be empty");
       switch(type) {
          case match_type::prefix:
-            action_matchers.push_back([action_name](const name& n) { return n == action_name; });
+            action_matchers.push_back([action_name](const name& n) { return n.prefix() == action_name; });
             break;
          case match_type::exact:
             action_matchers.push_back([action_name](const name& n) { return n == action_name; });

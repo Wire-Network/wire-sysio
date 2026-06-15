@@ -234,7 +234,7 @@ on receiver, account (contract code), and action name.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `block_num_start` | uint32 | `0` | First block to scan (inclusive). |
-| `block_num_end` | uint32 | `UINT32_MAX` | Last block to scan (inclusive). Silently clamped server-side to `block_num_start + trace-max-block-range - 1`. The response reports the actual range scanned. |
+| `block_num_end` | uint32 | `UINT32_MAX` | Last block to scan (inclusive). Silently clamped server-side to `block_num_start + trace-max-block-range - 1` AND to the last block actually recorded by this node, so the reported range never includes blocks that do not exist yet. The response reports the actual range scanned. |
 | `receiver` | string | *(any)* | Filter: match `act.receiver`. |
 | `account` | string | *(any)* | Filter: match `act.account` (the contract whose code ran). |
 | `action` | string | *(any)* | Filter: match action name. |
@@ -312,14 +312,19 @@ for the cursor pattern.
 
 `block_num_start` and `block_num_end` on the response reflect the actual
 range scanned (after clamping), so a client can detect a clamp and
-resume pagination from `block_num_end + 1`.
+resume pagination from `block_num_end + 1`.  Because the server also
+clamps to its last recorded block, resuming at `block_num_end + 1` can
+never skip blocks that had not been produced (or recorded) at the time
+of the request.  When nothing in the requested window has been recorded
+yet, the response carries `block_num_end == block_num_start - 1`
+("nothing scanned") — retry the same `block_num_start` later.
 
 **Response fields:**
 
 | Field | Description |
 |-------|-------------|
 | `block_num_start` | First block number actually scanned. |
-| `block_num_end` | Last block number actually scanned (after clamping). |
+| `block_num_end` | Last block number actually scanned (after clamping to the range cap and the last recorded block). |
 | `actions` | Array of matching action objects, ordered by `(block_num, global_sequence)`. |
 
 **Action object fields:**
@@ -345,7 +350,7 @@ resume pagination from `block_num_end + 1`.
 | `net_usage` | Producer-set NET usage in bytes for this action (present only for input/top-level actions). |
 | `params` | ABI-decoded action payload (omitted when ABI unavailable or decode failed). |
 | `return_data` | ABI-decoded return value (omitted when ABI unavailable or no return type defined). |
-| `decode_error` | Error message; present only when ABI decoding failed and the response falls back to raw hex. |
+| `decode_error` | Error message; present only when ABI decoding failed. The raw hex `data`/`return_value` fields are always emitted regardless of decode outcome. |
 | `trx_id` | ID of the transaction that contains this action. |
 | `block_num` | Block number. |
 | `block_time` | Block timestamp (ISO-8601). |
@@ -402,7 +407,7 @@ notifications are excluded).
 |-------|------|---------|-------------|
 | `token_contract` | string | `sysio.token` | Contract account to filter on. |
 | `block_num_start` | uint32 | `0` | First block to scan (inclusive). |
-| `block_num_end` | uint32 | `UINT32_MAX` | Last block to scan (inclusive). Silently clamped to `block_num_start + trace-max-block-range - 1`. |
+| `block_num_end` | uint32 | `UINT32_MAX` | Last block to scan (inclusive). Silently clamped to `block_num_start + trace-max-block-range - 1` and to the last recorded block (same semantics as `get_actions`). |
 
 **Request example:**
 
@@ -482,7 +487,13 @@ for more. The response always includes the actual `block_num_start` and
 Within that window, ALL matching actions are returned — there is no
 per-result limit and no in-window cursor.
 
-To page across a wide range, advance `block_num_start` by the response's
+The server clamps the reported `block_num_end` twice: to the
+`trace-max-block-range` window AND to the last block it has actually
+recorded.  Resuming at `block_num_end + 1` is therefore always safe:
+blocks that had not been produced (or had not reached this node) when
+you asked are never reported as scanned, so they cannot be skipped.
+
+To page across a wide range, advance `block_num_start` to the response's
 `block_num_end + 1` each call:
 
 ```
@@ -500,9 +511,11 @@ POST /v1/trace_api/get_actions
 ```
 
 Continue until `block_num_end` returned by the server equals the
-requested `block_num_end` (no clamp happened), or until you catch up to
-the chain head. Use `get_block` or out-of-band head-block knowledge to
-know when to stop.
+requested `block_num_end` (no clamp happened).  When you catch up to the
+chain head, the server's recorded-block clamp shrinks the reported
+window for you: a response with `block_num_end < block_num_start` means
+nothing new is scannable yet — wait and retry the same
+`block_num_start`.
 
 Notes:
 - Within each transaction, actions are sorted by `global_sequence`
@@ -511,6 +524,13 @@ Notes:
 - The maximum supported `trace-max-block-range` is 10,000. Raise it via
   `config.ini` on private/trusted nodes; public nodes should typically
   leave it at the default.
+- There is no per-response row cap: the range cap bounds scan work, not
+  result volume.  A busy receiver over a 10,000-block window can produce
+  a very large response — size your window to your traffic.
+- Retention pruning (`trace-minimum-irreversible-history-blocks`) deletes
+  old slices.  A query into a pruned range returns an empty result
+  indistinguishable from "no matches" — indexers backfilling history must
+  start within the node's retained range.
 
 ---
 
@@ -641,7 +661,7 @@ not match the chain's new head. If chain head is within the recorded
 range, replay overlaps existing slices silently. If there's a gap, the
 startup continuity check aborts (see below).
 
-#### abi_log.log
+#### abi_log.log / abi_log.journal
 
 `abi_log.log` is append-only. If it is lost or corrupted, delete it and
 restart nodeop. The plugin will rebuild it as new `setabi` transactions
@@ -649,13 +669,31 @@ are applied or previously-unseen contracts are touched (lazy current-ABI
 fetch). Historical ABI lookup for actions before the loss will fall back
 to raw hex.
 
+`abi_log.journal` durably mirrors the in-memory reversible overlay
+(records for blocks above LIB) so they survive a restart; it is replayed
+and then compacted at startup. If it is lost or corrupted, only the
+not-yet-irreversible ABI records are affected (they fall back to raw hex
+until their contract is touched again); the irreversible history in
+`abi_log.log` is unaffected. It is safe to delete alongside `abi_log.log`.
+
+**Operational note.** trace_api is a history/query plugin; run it only on
+dedicated query nodes. **Never enable it on a block-producing node** (test
+environments aside). A failed ABI write is fatal (the node shuts down
+rather than record incomplete history — see [ABI log](#abi-log)), so a
+node's liveness is tied to the writability of its `trace-dir`: a query node
+that fills or loses its trace storage exits cleanly and resumes without
+data loss once restarted with space — appropriate for a query node, and a
+further reason never to couple this plugin to block production. (This
+matches the existing startup continuity check, which also shuts the node
+down on unrecoverable trace-data gaps.)
+
 ---
 
 ### Startup continuity check
 
 On the first `block_start` signal after plugin startup, the trace
 store's recorded block range is compared against the chain's current
-head, and the plugin chooses one of four outcomes:
+head, and the plugin chooses one of five outcomes:
 
 | Situation | Behavior |
 |-----------|----------|
@@ -663,6 +701,7 @@ head, and the plugin chooses one of four outcomes:
 | Chain head is within `[first_recorded, last_recorded + 1]` (exact continuation OR overlap from a snapshot replay) | Silent — re-applied blocks naturally overwrite existing slice entries. |
 | Chain head is **before** the first recorded block | Plugin throws; `error` log, **node shuts down**. |
 | Chain head is **after** `last_recorded + 1` (forward gap) | Plugin throws; `error` log, **node shuts down**. |
+| Index slice files are missing in the **middle** of the recorded range (deleted or partially copied) | Plugin throws; `error` log, **node shuts down**. Detected by filename contiguity, so it catches removed slices, not corrupted-in-place ones. |
 
 The shutdown is intentional: a gap means the trace store is no longer a
 faithful continuous record of chain history, and silently accepting it
@@ -746,7 +785,11 @@ traces/
   trace_trx_idx_0000020000-0000030000.log
   trace_recv_bloom_0000020000-0000030000.log
   abi_log.log
+  abi_log.journal
 ```
+
+`abi_log.log` and `abi_log.journal` are global (not per-slice): the
+append-only ABI log and its durable reversible-overlay journal.
 
 #### Block-offset index
 
@@ -894,6 +937,16 @@ whatever sidecars exist for the slice covering a given block.
 each contract account across all `setabi` transactions observed since
 the node started (or since the file was first written).
 
+The file only ever contains records for **irreversible** blocks — a
+record is appended exactly when LIB passes the block that committed it,
+the same finality boundary the other trace files key off (e.g. the bloom
+sidecar is only built for fully irreversible slices). A fork can
+therefore never invalidate a written record, so the file needs no block
+tagging, tombstones, or rewrite. Records for blocks above LIB live in an
+in-memory reversible overlay (see
+[ABI capture mechanics](#abi-capture-mechanics)) that is durably mirrored
+to `abi_log.journal`, so the overlay is restored exactly on restart.
+
 Format:
 
 ```
@@ -908,9 +961,10 @@ Records (repeated until EOF):
 
 An in-memory index keyed by `(account, global_sequence)` is built at
 startup by walking the file record-by-record and validating each CRC.
-Runtime lookups go through the index; the matching blob is then read
-from the file via `pread()`. Appends stream new records to the end of
-the file under a mutex, with no rewrite of existing records.
+Runtime lookups resolve over the union of this index and the reversible
+overlay; a disk-resolved blob is then read from the file via `pread()`.
+Appends stream new records to the end of the file under a mutex, with no
+rewrite of existing records.
 
 Writes are not fsync'd; the on-disk tail may lose the last few records
 on a kernel crash. On startup the recovery scan detects torn or
@@ -918,11 +972,68 @@ CRC-mismatched records and truncates the file at the first bad one —
 any lost records are rebuilt the next time their contract is touched
 (via an observed `setabi` or the lazy current-ABI fetch).
 
+A write failure when persisting a record here (the flush at LIB, e.g.
+disk full) is **fatal**, uniform with the journal: the node shuts down
+cleanly rather than continuing without recording. No data is lost — the
+record is still in the reversible overlay and its journal entry, so a
+restart with storage available restores it from the journal and
+re-persists it on the next LIB advance.
+
+##### Reversible journal (`abi_log.journal`)
+
+The in-memory reversible overlay is durably mirrored to a sibling
+append-only journal so a restart restores it exactly. This cannot be
+re-derived from the recorded block traces: a `setabi` leaves an action
+trace, but a lazy `global_seq = 0` record is read from chain state and
+leaves none — and once a later `setabi` supersedes the account, chain
+state no longer holds the pre-`setabi` ABI, so those lazy bytes are
+unrecoverable unless persisted before the restart.
+
+```
+Header  (16 bytes): magic "ABIJ" (u32), version 1 (u32), reserved (u64)
+Records (repeated until EOF):
+          body_len (u32)
+          body     (body_len bytes): op (u8) + fc::raw fields
+                     op = put      -> block_num (u32), account (u64),
+                                       global_seq (u64), blob (raw bytes)
+                     op = rollback -> block_num (u32)
+          crc32    (u32) over (body_len, body)
+```
+
+`append_reversible` writes a `put`; `rollback_reversible` writes a
+`rollback` (only when it actually discards something, so steady-state
+`block_start` adds nothing); `flush_irreversible` writes nothing (a
+flushed record already lives in `abi_log.log`). On startup the journal
+is replayed in order into the overlay — dropping any `(account,
+global_seq)` already on disk — then compacted (rewritten via a temp file
+and atomic rename to contain only the still-reversible records). Torn or
+CRC-mismatched tails are truncated like the main log. A journal write
+failure is **fatal**: recording history is the point of a trace_api
+node, so the node shuts down cleanly rather than continuing with
+incomplete or inconsistent history. A failed rollback first rewrites the
+journal to the post-rollback overlay before shutting down — dropping only
+the orphaned forked records while keeping the canonical ones — so a
+restart neither resurrects a forked-out ABI nor loses the still-reversible
+window; if even that rewrite fails (e.g. disk full) it truncates the
+journal as a safe last resort (the current window then degrades to raw
+hex). On restart the chain re-applies the rolled-back block, so the
+aborted work is re-recorded.
+
+The journal is bounded so it cannot grow without limit on a node that
+runs for months without a restart. A flushed record's `put` stays in the
+file until reclaimed, so `flush_irreversible` reclaims it two ways: when
+the overlay fully drains it truncates the file back to its header (the
+common case on a healthy node, between capture bursts), and as a backstop
+for a busy node whose overlay rarely hits exactly empty, once the file
+passes a size threshold it is compacted down to just the live overlay.
+The journal size is therefore bounded by that threshold regardless of
+uptime.
+
 ---
 
 ### ABI capture mechanics
 
-ABI records enter `abi_log.log` through two paths:
+ABI records enter the ABI store through two paths:
 
 1. **`setabi` observation** — every time a transaction contains a
    `sysio::setabi` action, the plugin decodes the action's payload and
@@ -931,13 +1042,51 @@ ABI records enter `abi_log.log` through two paths:
    global_sequence.
 
 2. **Lazy current-ABI fetch** — on the first action observed for an
-   account that has no prior `abi_log` entry, the plugin reads the
+   account that has no prior ABI record, the plugin reads the
    account's current ABI from the chain DB and records it at
    `global_sequence = 0`. The `0` is a sentinel meaning "ABI as of
    first observation; exact recorded sequence unknown." Lookups step
    back from the query `global_sequence` to the largest recorded entry
    ≤ query, so a 0 sentinel matches any action of that account that
    predates the first recorded real setabi.
+
+#### Fork handling and irreversibility
+
+A captured record moves through three phases, mirroring how the trace
+slices treat blocks:
+
+1. **Collect** — candidates are gathered per transaction at execution
+   time; nothing is recorded for executions that never land in an
+   accepted block (speculative relays, aborted production rounds).
+2. **Commit (reversible)** — when a block is accepted, its
+   transactions' candidates enter an in-memory reversible overlay,
+   tagged with the accepting block's number. Overlay records
+   participate in lookups immediately, so actions in `pending` blocks
+   decode normally.
+3. **Flush (irreversible)** — when the chain's irreversible-block
+   signal passes a record's block, the record is appended to
+   `abi_log.log` and leaves the overlay. Only this phase writes to
+   disk.
+
+If a fork replaces an accepted block, the replacing block's
+`block_start` discards every overlay record tagged with an equal or
+higher block number — before the replacing block's transactions
+execute, so the lazy fetch's "first encounter" decision also sees the
+canonical state. A `setabi` that only ever existed on a forked-out
+branch therefore never reaches the file and stops resolving the moment
+the fork switch begins.
+
+**Restarts.** The overlay is memory-only, and the accepted-block
+signals for blocks between LIB and head do not re-fire on a clean
+restart. The overlay is instead restored from the durable reversible
+journal (`abi_log.journal`, see
+[ABI log](#abi-log)), which mirrors every overlay mutation in order.
+This preserves **both** kinds of reversible record — including lazy
+`global_seq = 0` captures, which leave no action trace and could never
+be recovered by scanning recorded traces. (An earlier design rebuilt
+only `setabi` records from traces and dropped the lazy bytes; a later
+`setabi` then suppressed any re-capture, so pre-`setabi` actions
+degraded to raw permanently. Journaling the overlay removes that loss.)
 
 #### Same-transaction `setabi` caveat
 

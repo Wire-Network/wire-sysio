@@ -18,7 +18,11 @@ namespace sysio { namespace chain { namespace sysvmoc {
 static constexpr size_t header_offset = 512u;
 static constexpr size_t header_size = 512u;
 static constexpr size_t total_header_size = header_offset + header_size;
-static constexpr uint64_t header_id = 0x32434f4d56534f45ULL; //"SYSVMOC2" little endian
+// Cache-file magic. Bumped (and moved off the inherited "EOSVMOC2" byte value) when the intrinsic table was
+// renumbered: OC bakes ordinal-derived dispatch offsets into the generated machine code, so a cache produced
+// under any other intrinsic table must be discarded even though its file format is otherwise readable.
+// Bump this (together with current_codegen_version) on ANY change to intrinsic ordinals or gs-region layout.
+static constexpr uint64_t header_id = 0x33434f4d56535953ULL; //"SYSVMOC3" little endian
 
 struct code_cache_header {
    uint64_t id = header_id;

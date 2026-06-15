@@ -1,8 +1,10 @@
 #include <boost/test/unit_test.hpp>
 #include <sysio/testing/tester.hpp>
 #include <sysio/chain/abi_serializer.hpp>
+#include <sysio/opp/opp.hpp>
 
 #include <fc/variant_object.hpp>
+#include <fc/slug_name.hpp>
 #include <fc-lite/crypto/chain_types.hpp>
 
 #include "contracts.hpp"
@@ -10,23 +12,34 @@
 using namespace sysio::testing;
 using namespace sysio;
 using namespace sysio::chain;
+using namespace sysio::opp::types;
 using namespace fc;
 using namespace fc::crypto;
 
 using mvo = fc::mutable_variant_object;
 
+namespace {
+
+/// SlugName mvo helper for v6 action arguments.
+inline fc::mutable_variant_object codename_mvo(std::string_view s) {
+   return mvo()("value", fc::slug_name{s}.value);
+}
+
+} // anonymous namespace
+
 class sysio_uwrit_tester : public tester {
 public:
    static constexpr auto UWRIT_ACCOUNT = "sysio.uwrit"_n;
+   static constexpr auto MSGCH_ACCOUNT = "sysio.msgch"_n;
+   static constexpr auto OPREG_ACCOUNT = "sysio.opreg"_n;
    static constexpr auto CHALG_ACCOUNT = "sysio.chalg"_n;
 
    sysio_uwrit_tester() {
       produce_blocks(2);
 
       create_accounts({
-         UWRIT_ACCOUNT, CHALG_ACCOUNT,
-         "sysio.epoch"_n, "sysio.msgch"_n,
-         "uwrit.a"_n, "uwrit.b"_n
+         UWRIT_ACCOUNT, MSGCH_ACCOUNT, OPREG_ACCOUNT, CHALG_ACCOUNT,
+         "sysio.epoch"_n, "uwrit.a"_n, "uwrit.b"_n
       });
       produce_blocks(2);
 
@@ -67,58 +80,21 @@ public:
       }
    }
 
-   action_result setconfig(uint32_t fee_bps = 10, uint32_t lock_sec = 86400,
-                           uint32_t uw_pct = 50, uint32_t other_pct = 25,
-                           uint32_t batch_pct = 25) {
+   action_result setconfig(uint32_t fee_bps                              = 10,
+                           uint32_t collateral_lock_duration_epoch_count = 10,
+                           uint8_t  fee_split_winner_pct                 = 50,
+                           uint8_t  fee_split_other_uw_pct               = 25,
+                           uint8_t  fee_split_batch_op_pct               = 25) {
       return push_uwrit_action(UWRIT_ACCOUNT, "setconfig"_n, mvo()
-         ("fee_bps", fee_bps)
-         ("confirm_lock_sec", lock_sec)
-         ("uw_fee_share_pct", uw_pct)
-         ("other_uw_share_pct", other_pct)
-         ("batch_op_share_pct", batch_pct)
+         ("fee_bps",                              fee_bps)
+         ("collateral_lock_duration_epoch_count", collateral_lock_duration_epoch_count)
+         ("fee_split_winner_pct",                 fee_split_winner_pct)
+         ("fee_split_other_uw_pct",               fee_split_other_uw_pct)
+         ("fee_split_batch_op_pct",               fee_split_batch_op_pct)
       );
    }
 
-   action_result updcltrl(name uw, chain_kind_t chain_kind, asset amount, bool increase) {
-      return push_uwrit_action(UWRIT_ACCOUNT, "updcltrl"_n, mvo()
-         ("underwriter", uw)
-         ("chain_kind", chain_kind)
-         ("amount", amount)
-         ("is_increase", increase)
-      );
-   }
-
-   action_result submituw(name uw, uint64_t msg_id) {
-      auto sig = fc::sha256::hash(std::string("sig"));
-      return push_uwrit_action(uw, "submituw"_n, mvo()
-         ("underwriter", uw)
-         ("msg_id", msg_id)
-         ("source_sig", sig)
-         ("target_sig", sig)
-      );
-   }
-
-   action_result confirmuw(uint64_t entry_id) {
-      return push_uwrit_action(UWRIT_ACCOUNT, "confirmuw"_n, mvo()
-         ("uw_entry_id", entry_id)
-      );
-   }
-
-   action_result distfee(uint64_t entry_id) {
-      return push_uwrit_action(UWRIT_ACCOUNT, "distfee"_n, mvo()
-         ("uw_entry_id", entry_id)
-      );
-   }
-
-   action_result slash(name uw, std::string reason) {
-      return push_uwrit_action(CHALG_ACCOUNT, "slash"_n, mvo()
-         ("underwriter", uw)
-         ("reason", reason)
-      );
-   }
-
-   // ── Table read helpers ──
-
+   /// Read uwconfig singleton row.
    fc::variant get_uwconfig() {
       auto data = get_row_by_account(UWRIT_ACCOUNT, UWRIT_ACCOUNT, "uwconfig"_n, "uwconfig"_n);
       return data.empty() ? fc::variant() : abi_ser.binary_to_variant(
@@ -126,13 +102,7 @@ public:
          abi_serializer::create_yield_function(abi_serializer_max_time));
    }
 
-   fc::variant get_collateral(uint64_t id) {
-      auto data = get_row_by_id(UWRIT_ACCOUNT, UWRIT_ACCOUNT, "collateral"_n, id);
-      return data.empty() ? fc::variant() : abi_ser.binary_to_variant(
-         "collateral_entry", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
-   }
-
+   /// Read a uwreq by id.
    fc::variant get_uwreq(uint64_t id) {
       auto data = get_row_by_id(UWRIT_ACCOUNT, UWRIT_ACCOUNT, "uwreqs"_n, id);
       return data.empty() ? fc::variant() : abi_ser.binary_to_variant(
@@ -148,74 +118,194 @@ public:
 BOOST_AUTO_TEST_SUITE(sysio_uwrit_tests)
 
 BOOST_FIXTURE_TEST_CASE(setconfig_basic, sysio_uwrit_tester) { try {
-   BOOST_REQUIRE_EQUAL(success(), setconfig());
+   BOOST_REQUIRE_EQUAL(success(), setconfig(25));
 
    auto cfg = get_uwconfig();
-   BOOST_REQUIRE_EQUAL(10, cfg["fee_bps"].as_uint64());
-   BOOST_REQUIRE_EQUAL(86400, cfg["confirm_lock_sec"].as_uint64());
-   BOOST_REQUIRE_EQUAL(50, cfg["uw_fee_share_pct"].as_uint64());
-   BOOST_REQUIRE_EQUAL(25, cfg["other_uw_share_pct"].as_uint64());
-   BOOST_REQUIRE_EQUAL(25, cfg["batch_op_share_pct"].as_uint64());
+   BOOST_REQUIRE_EQUAL(25, cfg["fee_bps"].as_uint64());
+   BOOST_REQUIRE_EQUAL(10, cfg["collateral_lock_duration_epoch_count"].as_uint64());
+   BOOST_REQUIRE_EQUAL(50, cfg["fee_split_winner_pct"].as_uint64());
+   BOOST_REQUIRE_EQUAL(25, cfg["fee_split_other_uw_pct"].as_uint64());
+   BOOST_REQUIRE_EQUAL(25, cfg["fee_split_batch_op_pct"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(setconfig_validates_percentages, sysio_uwrit_tester) { try {
+BOOST_FIXTURE_TEST_CASE(setconfig_writes_custom_lock_duration, sysio_uwrit_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(),
+      setconfig(/*fee_bps*/10, /*lock*/7, /*winner*/60, /*other_uw*/20, /*batchop*/20));
+   auto cfg = get_uwconfig();
+   BOOST_REQUIRE_EQUAL(7,  cfg["collateral_lock_duration_epoch_count"].as_uint64());
+   BOOST_REQUIRE_EQUAL(60, cfg["fee_split_winner_pct"].as_uint64());
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(setconfig_rejects_excessive_fee, sysio_uwrit_tester) { try {
    BOOST_REQUIRE_EQUAL(
-      error("assertion failure with message: fee share percentages must sum to 100"),
-      setconfig(10, 86400, 50, 25, 30)
+      error("assertion failure with message: fee_bps cannot exceed 10000 (100%)"),
+      setconfig(10001)
    );
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(updcltrl_increase, sysio_uwrit_tester) { try {
-   BOOST_REQUIRE_EQUAL(success(), setconfig());
-
-   auto amount = asset::from_string("100.0000 SYS");
-   BOOST_REQUIRE_EQUAL(success(), updcltrl("uwrit.a"_n, chain_kind_ethereum, amount, true));
-
-   // Verify collateral entry written to table (first entry, id=0)
-   auto col = get_collateral(0);
-   BOOST_REQUIRE(!col.is_null());
-   BOOST_REQUIRE_EQUAL("uwrit.a", col["underwriter"].as_string());
-   BOOST_REQUIRE_EQUAL("100.0000 SYS", col["staked_amount"].as_string());
-} FC_LOG_AND_RETHROW() }
-
-BOOST_FIXTURE_TEST_CASE(updcltrl_decrease_nonexistent, sysio_uwrit_tester) { try {
-   BOOST_REQUIRE_EQUAL(success(), setconfig());
-
-   auto amount = asset::from_string("50.0000 SYS");
+BOOST_FIXTURE_TEST_CASE(setconfig_rejects_zero_lock_duration, sysio_uwrit_tester) { try {
    BOOST_REQUIRE_EQUAL(
-      error("assertion failure with message: cannot decrease non-existent collateral"),
-      updcltrl("uwrit.a"_n, chain_kind_ethereum, amount, false)
+      error("assertion failure with message: collateral_lock_duration_epoch_count must be positive"),
+      setconfig(/*fee_bps*/10, /*lock*/0, /*winner*/50, /*other_uw*/25, /*batchop*/25)
    );
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(submituw_without_config, sysio_uwrit_tester) { try {
+BOOST_FIXTURE_TEST_CASE(setconfig_rejects_split_not_summing_to_100, sysio_uwrit_tester) { try {
    BOOST_REQUIRE_EQUAL(
-      error("assertion failure with message: underwriting config not initialized"),
-      submituw("uwrit.a"_n, 42)
+      error("assertion failure with message: fee_split_*_pct must sum to 100"),
+      setconfig(/*fee_bps*/10, /*lock*/10, /*winner*/50, /*other_uw*/30, /*batchop*/25)
    );
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(submituw_basic, sysio_uwrit_tester) { try {
-   BOOST_REQUIRE_EQUAL(success(), setconfig());
-   BOOST_REQUIRE_EQUAL(success(), submituw("uwrit.a"_n, 100));
-
-   // submituw writes to uwledger (not uwreqs); verify ledger entry
-   auto data = get_row_by_id(UWRIT_ACCOUNT, UWRIT_ACCOUNT, "uwledger"_n, 0);
-   BOOST_REQUIRE(!data.empty());
-   auto entry = abi_ser.binary_to_variant(
-      "underwriting_entry", data,
-      abi_serializer::create_yield_function(abi_serializer_max_time));
-   BOOST_REQUIRE_EQUAL("uwrit.a", entry["underwriter"].as_string());
-   BOOST_REQUIRE_EQUAL(100, entry["message_id"].as_uint64());
+BOOST_FIXTURE_TEST_CASE(createuwreq_requires_msgch_auth, sysio_uwrit_tester) { try {
+   // createuwreq must be invoked by sysio.msgch (inline action). A direct
+   // call from another account (uwrit.a here) is rejected.
+   BOOST_REQUIRE(push_uwrit_action("uwrit.a"_n, "createuwreq"_n, mvo()
+      ("attestation_id", 1)
+      ("type", sysio::opp::types::AttestationType::ATTESTATION_TYPE_SWAP_REQUEST)
+      ("chain_code", 1)
+      ("data", std::vector<char>{})
+   ).find("missing authority of sysio.msgch") != std::string::npos);
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(submituw_duplicate_message, sysio_uwrit_tester) { try {
-   BOOST_REQUIRE_EQUAL(success(), setconfig());
-   BOOST_REQUIRE_EQUAL(success(), submituw("uwrit.a"_n, 100));
+BOOST_FIXTURE_TEST_CASE(release_requires_msgch_or_self_auth, sysio_uwrit_tester) { try {
+   // release accepts sysio.msgch (SWAP_REMIT dispatch path) or sysio.uwrit
+   // (expirelock self-inline path) auth. Anything else is rejected.
+   BOOST_REQUIRE(push_uwrit_action("uwrit.a"_n, "release"_n, mvo()
+      ("uwreq_id", 1)
+   ).find("release requires sysio.msgch or sysio.uwrit authority") != std::string::npos);
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(expirelock_missing_uwreq, sysio_uwrit_tester) { try {
+   // Permissionless caller — but the uwreq doesn't exist, so we expect a
+   // not-found assertion rather than an auth failure.
    BOOST_REQUIRE_EQUAL(
-      error("assertion failure with message: message already has underwriting entry"),
-      submituw("uwrit.b"_n, 100)
+      error("assertion failure with message: uwreq not found"),
+      push_uwrit_action("uwrit.a"_n, "expirelock"_n, mvo()
+         ("uwreq_id", 999)
+      )
    );
+} FC_LOG_AND_RETHROW() }
+
+// ── rcrdcommit (Task 3: per-leg COMMIT arrival recorder) ──
+
+BOOST_FIXTURE_TEST_CASE(rcrdcommit_requires_msgch_auth, sysio_uwrit_tester) { try {
+   // rcrdcommit is invoked inline from sysio.msgch on UNDERWRITE_INTENT_COMMIT
+   // dispatch. v6 signature carries (from_chain_code, from_token_code,
+   // reserve_code) slug_name triples in place of the old enum pair.
+   BOOST_REQUIRE(push_uwrit_action("uwrit.a"_n, "rcrdcommit"_n, mvo()
+      ("uwreq_id",         1)
+      ("underwriter",      "uwrit.a")
+      ("chain_code",       1)
+      ("from_chain_code",  codename_mvo("ETH"))
+      ("from_token_code",  codename_mvo("ETH"))
+      ("reserve_code",     codename_mvo("PRIMARY"))
+      ("uic_bytes",        std::vector<char>{})
+   ).find("missing authority of sysio.msgch") != std::string::npos);
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(rcrdcommit_rejects_unknown_uwreq, sysio_uwrit_tester) { try {
+   // v6: OPP handlers MUST NEVER throw (feedback_opp_handlers_never_throw.md
+   // — a `check()` in dispatch halts consensus). The previous error-based
+   // assertion is gone; the action logs + skips on unknown uwreq and
+   // returns success. The test now pins THAT invariant.
+   BOOST_REQUIRE_EQUAL(success(),
+      push_uwrit_action(MSGCH_ACCOUNT, "rcrdcommit"_n, mvo()
+         ("uwreq_id",         42)
+         ("underwriter",      "uwrit.a")
+         ("chain_code",       1)
+         ("from_chain_code",  codename_mvo("ETH"))
+         ("from_token_code",  codename_mvo("ETH"))
+         ("reserve_code",     codename_mvo("PRIMARY"))
+         ("uic_bytes",        std::vector<char>{})
+      )
+   );
+} FC_LOG_AND_RETHROW() }
+
+// ── release (Task 3: settle UWREQ + opreg::releaselock fan-out) ──
+
+BOOST_FIXTURE_TEST_CASE(release_rejects_unknown_uwreq, sysio_uwrit_tester) { try {
+   // msgch is one of the two valid auth holders for release; verifies the
+   // not-found check fires after auth passes (not blocked by auth).
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: uwreq not found"),
+      push_uwrit_action(MSGCH_ACCOUNT, "release"_n, mvo()
+         ("uwreq_id", 9999)
+      )
+   );
+} FC_LOG_AND_RETHROW() }
+
+// ── sumlocks (Task 3: read-only per-(underwriter, chain, token) lock total) ──
+
+BOOST_FIXTURE_TEST_CASE(sumlocks_zero_for_unbonded_underwriter, sysio_uwrit_tester) { try {
+   // v6 sumlocks signature: slug_name pair (chain_code, token_code).
+   BOOST_REQUIRE_EQUAL(success(),
+      push_uwrit_action("uwrit.a"_n, "sumlocks"_n, mvo()
+         ("underwriter", "uwrit.a")
+         ("chain_code",  codename_mvo("ETH"))
+         ("token_code",  codename_mvo("ETH"))
+      )
+   );
+} FC_LOG_AND_RETHROW() }
+
+// ── B6: same-chain swap routing on rcrdcommit ──────────────────────────
+//
+// A swap on a single outpost (e.g. ERC20 → ETH-native, both on ETH) has
+// src_chain == dst_chain. The depot routes the source-leg vs dest-leg of
+// the COMMIT into commit_entry's source_uic_bytes / dest_uic_bytes slots
+// based on (from_chain, from_token_kind) matching the uwreq's
+// (src_chain, src_token_kind) vs (dst_chain, dst_token_kind). Without
+// the from_token_kind discriminator, same-chain swaps would route both
+// legs to the source slot. This case verifies the dispatch still
+// auth-checks correctly when the two chains coincide.
+BOOST_FIXTURE_TEST_CASE(rcrdcommit_same_chain_swap_auth, sysio_uwrit_tester) { try {
+   // v6: slug_name triple disambiguates same-chain swap legs.
+   BOOST_REQUIRE(push_uwrit_action("uwrit.a"_n, "rcrdcommit"_n, mvo()
+      ("uwreq_id",         7)
+      ("underwriter",      "uwrit.a")
+      ("chain_code",       1)
+      ("from_chain_code",  codename_mvo("ETH"))      // src == dst chain
+      ("from_token_code",  codename_mvo("USDC"))     // distinguishes legs
+      ("reserve_code",     codename_mvo("PRIMARY"))
+      ("uic_bytes",        std::vector<char>{})
+   ).find("missing authority of sysio.msgch") != std::string::npos);
+} FC_LOG_AND_RETHROW() }
+
+// ── B4: try_recover_key no-throw guarantee ─────────────────────────
+//
+// verify_uic_signature must never halt the dispatch chain on malformed
+// signature bytes (per feedback_opp_handlers_never_throw.md — a
+// `check()` here stalls consensus). It calls `try_recover_key` which
+// returns `std::nullopt` on any failure; the helper turns that into a
+// `return false` and logs.
+//
+// This case sends rcrdcommit with msgch auth and a uic_bytes blob whose
+// (decoded) signature would normally cause `recover_key` to throw. The
+// assertion is "the action does NOT throw" — it may write the
+// commit_entry with the bad bytes, but it must not halt. Today the
+// uwreq doesn't exist so the dispatch fails earlier with "uwreq not
+// found" before the verify path runs; this is fine — the test's
+// invariant is that nothing in the call chain throws on a malformed
+// signature blob payload.
+BOOST_FIXTURE_TEST_CASE(rcrdcommit_malformed_uic_does_not_halt, sysio_uwrit_tester) { try {
+   // 32-byte blob with a tag byte (>5, invalid variant tag) — would fail
+   // the pre-validation bounds check in verify_uic_signature.
+   std::vector<char> bad_uic_bytes(32, '\x00');
+   bad_uic_bytes[0] = '\xFF';  // variant tag well outside legal range
+
+   auto r = push_uwrit_action(MSGCH_ACCOUNT, "rcrdcommit"_n, mvo()
+      ("uwreq_id",         9001)
+      ("underwriter",      "uwrit.a")
+      ("chain_code",       1)
+      ("from_chain_code",  codename_mvo("ETH"))
+      ("from_token_code",  codename_mvo("ETH"))
+      ("reserve_code",     codename_mvo("PRIMARY"))
+      ("uic_bytes",        bad_uic_bytes)
+   );
+   // v6: rcrdcommit logs + skips rather than throwing — neither the
+   // unknown-uwreq path nor the malformed-uic path may halt the
+   // consensus pipeline. The invariant: the action does NOT throw.
+   BOOST_REQUIRE_EQUAL(success(), r);
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()

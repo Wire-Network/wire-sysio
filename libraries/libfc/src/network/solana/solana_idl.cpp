@@ -479,6 +479,15 @@ program parse_idl(const fc::variant& json) {
    else if (obj.contains("metadata") && obj["metadata"].get_object().contains("version"))
       prog.version = obj["metadata"]["version"].as_string();
 
+   // IDL v2 puts the program's deployed address at the top level;
+   // older Anchor variants nest it under `metadata.address`. Either
+   // shape populates `program.address` so consumers don't need to
+   // duplicate the program ID in their own configuration.
+   if (obj.contains("address"))
+      prog.address = obj["address"].as_string();
+   else if (obj.contains("metadata") && obj["metadata"].get_object().contains("address"))
+      prog.address = obj["metadata"]["address"].as_string();
+
    // Parse instructions
    if (obj.contains("instructions")) {
       for (const auto& instr : obj["instructions"].get_array()) {

@@ -16,7 +16,7 @@
 //the values ever slide which would be a PIC breaking event we'd want to know about at compile
 //time.
 #define SYS_VM_OC_CONTROL_BLOCK_OFFSET (-18944)
-#define SYS_VM_OC_MEMORY_STRIDE (UINT64_C(8589963264))
+#define SYS_VM_OC_MEMORY_STRIDE (UINT64_C(8589959168))
 
 #ifdef __cplusplus
 extern "C" {

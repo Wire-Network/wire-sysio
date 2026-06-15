@@ -1,0 +1,133 @@
+{
+    "____comment": "This file was generated with sysio-abigen. DO NOT EDIT ",
+    "version": "sysio::abi/1.2",
+    "types": [],
+    "structs": [
+        {
+            "name": "inlnotify",
+            "base": "",
+            "fields": [
+                {
+                    "name": "obs",
+                    "type": "name"
+                },
+                {
+                    "name": "inlt",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "mixedord",
+            "base": "",
+            "fields": [
+                {
+                    "name": "obs",
+                    "type": "name"
+                },
+                {
+                    "name": "inlt",
+                    "type": "name"
+                },
+                {
+                    "name": "cfat",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "nestedcall",
+            "base": "",
+            "fields": [
+                {
+                    "name": "obs",
+                    "type": "name"
+                },
+                {
+                    "name": "inlt",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "noop",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "notiffire",
+            "base": "",
+            "fields": [
+                {
+                    "name": "obs",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "notifyinl",
+            "base": "",
+            "fields": [
+                {
+                    "name": "obs",
+                    "type": "name"
+                },
+                {
+                    "name": "inlt",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "notifyme",
+            "base": "",
+            "fields": [
+                {
+                    "name": "obs",
+                    "type": "name"
+                }
+            ]
+        }
+    ],
+    "actions": [
+        {
+            "name": "inlnotify",
+            "type": "inlnotify",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "mixedord",
+            "type": "mixedord",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "nestedcall",
+            "type": "nestedcall",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "noop",
+            "type": "noop",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "notiffire",
+            "type": "notiffire",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "notifyinl",
+            "type": "notifyinl",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "notifyme",
+            "type": "notifyme",
+            "ricardian_contract": ""
+        }
+    ],
+    "tables": [],
+    "ricardian_clauses": [],
+    "variants": [],
+    "action_results": []
+}

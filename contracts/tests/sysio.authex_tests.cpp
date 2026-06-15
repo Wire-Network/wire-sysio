@@ -2,6 +2,7 @@
 #include <sysio/testing/tester.hpp>
 #include <sysio/chain/abi_serializer.hpp>
 #include <sysio/chain/authorization_manager.hpp>
+#include <sysio/chain/resource_limits.hpp>
 #include "contracts.hpp"
 
 #include <fc/variant_object.hpp>
@@ -13,7 +14,8 @@
 #include <fc/crypto/private_key.hpp>
 #include <fc/crypto/base58.hpp>
 #include <fc/crypto/ripemd160.hpp>
-#include <fc-lite/crypto/chain_types.hpp>
+#include <sysio/opp/opp.hpp>     // FC_REFLECT_ENUM for sysio::opp::types::ChainKind
+#include <magic_enum/magic_enum.hpp>
 
 using namespace sysio::testing;
 using namespace sysio;
@@ -23,6 +25,7 @@ using namespace fc::crypto;
 using namespace std;
 
 using mvo = fc::mutable_variant_object;
+using ChainKind = sysio::opp::types::ChainKind;
 
 // Replicate the contract's pubkey_to_string for EM keys:
 // "PUB_EM_" + hex(compressed_33_bytes)
@@ -36,11 +39,11 @@ static std::string contract_pubkey_to_string(const fc::crypto::public_key& pk) {
 static std::string build_link_message(
    const fc::crypto::public_key& pub_key,
    const std::string& account,
-   chain_kind_t chain_kind,
+   ChainKind chain_kind,
    uint64_t nonce
 ) {
     auto pub_key_str = contract_pubkey_to_string(pub_key);
-    auto chain_kind_str = std::to_string(static_cast<uint8_t>(chain_kind));
+    auto chain_kind_str = std::to_string(magic_enum::enum_integer(chain_kind));
     return pub_key_str + "|" + account + "|" + chain_kind_str + "|" + std::to_string(nonce) + "|createlink auth";
 }
 
@@ -84,14 +87,14 @@ public:
 
    action_result createlink(
       const account_name& signer,
-      chain_kind_t chain_kind,
+      ChainKind chain_kind,
       const std::string& account,
       const fc::crypto::signature& sig,
       const fc::crypto::public_key& pub_key,
       uint64_t nonce
    ) {
       return push_action( signer, "createlink"_n, mvo()
-         ("chain_kind", static_cast<uint8_t>(chain_kind))
+         ("chain_kind", chain_kind)
          ("account",    account)
          ("sig",        sig)
          ("pub_key",    pub_key)
@@ -117,7 +120,7 @@ public:
    em_link_data make_eth_link(const std::string& account, uint64_t nonce) {
       auto priv = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em);
       auto pub  = priv.get_public_key();
-      auto msg  = build_link_message(pub, account, chain_kind_ethereum, nonce);
+      auto msg  = build_link_message(pub, account, ChainKind::CHAIN_KIND_EVM, nonce);
 
       // keccak(msg) → 32 bytes, same as what the contract computes
       auto msg_hash = fc::crypto::keccak256::hash(msg);
@@ -155,7 +158,7 @@ BOOST_FIXTURE_TEST_CASE( createlink_requires_account_auth, sysio_authex_tester )
 
    BOOST_REQUIRE_EQUAL(
       error("missing authority of alice"),
-      createlink("bob"_n, chain_kind_ethereum, "alice", link.sig, link.pub, link.nonce)
+      createlink("bob"_n, ChainKind::CHAIN_KIND_EVM, "alice", link.sig, link.pub, link.nonce)
    );
 } FC_LOG_AND_RETHROW()
 
@@ -165,13 +168,13 @@ BOOST_FIXTURE_TEST_CASE( createlink_invalid_chain, sysio_authex_tester ) try {
    auto priv = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em);
    auto pub  = priv.get_public_key();
    uint64_t nonce = now_ms();
-   auto msg = build_link_message(pub, "alice", chain_kind_wire, nonce);
+   auto msg = build_link_message(pub, "alice", ChainKind::CHAIN_KIND_WIRE, nonce);
    auto msg_hash = fc::crypto::keccak256::hash(msg);
    auto sig = priv.sign(fc::sha256(reinterpret_cast<const char*>(msg_hash.data()), 32));
 
    BOOST_REQUIRE_EQUAL(
-      wasm_assert_msg("Invalid chain_kind. Supported: chain_kind_ethereum(2), chain_kind_solana(3), chain_kind_sui(4)."),
-      createlink("alice"_n, chain_kind_wire, "alice", sig, pub, nonce)
+      wasm_assert_msg("Invalid chain_kind. Supported: CHAIN_KIND_EVM(2), CHAIN_KIND_SVM(3)."),
+      createlink("alice"_n, ChainKind::CHAIN_KIND_WIRE, "alice", sig, pub, nonce)
    );
 } FC_LOG_AND_RETHROW()
 
@@ -183,7 +186,7 @@ BOOST_FIXTURE_TEST_CASE( createlink_stale_nonce, sysio_authex_tester ) try {
 
    BOOST_REQUIRE_EQUAL(
       wasm_assert_msg("Invalid nonce: must be within the last 10 minutes"),
-      createlink("alice"_n, chain_kind_ethereum, "alice", link.sig, link.pub, link.nonce)
+      createlink("alice"_n, ChainKind::CHAIN_KIND_EVM, "alice", link.sig, link.pub, link.nonce)
    );
 } FC_LOG_AND_RETHROW()
 
@@ -192,19 +195,38 @@ BOOST_FIXTURE_TEST_CASE( createlink_stale_nonce, sysio_authex_tester ) try {
 BOOST_FIXTURE_TEST_CASE( createlink_eth_success, sysio_authex_tester ) try {
    auto link = make_eth_link("alice", now_ms());
 
-   BOOST_REQUIRE_EQUAL( success(), createlink("alice"_n, chain_kind_ethereum, "alice", link.sig, link.pub, link.nonce) );
+   BOOST_REQUIRE_EQUAL( success(), createlink("alice"_n, ChainKind::CHAIN_KIND_EVM, "alice", link.sig, link.pub, link.nonce) );
    produce_blocks();
 
-   // Verify that alice now has a permission named "ex.eth" with the linked public key
+   // The verified EM key is recorded in the links table only -- it must NOT be added
+   // to `active` (or any) permission, and no `ex.*` permission is created.
    auto& auth_mgr = control->get_authorization_manager();
-   const auto* perm = auth_mgr.find_permission({"alice"_n, "ex.eth"_n});
-   BOOST_REQUIRE( perm != nullptr );
+   const auto* active = auth_mgr.find_permission({"alice"_n, "active"_n});
+   BOOST_REQUIRE( active != nullptr );
+   const auto auth = active->auth.to_authority();
+   for (const auto& kw : auth.keys)
+      BOOST_CHECK_MESSAGE( kw.key != link.pub, "EM key must not be added to active" );
+   BOOST_REQUIRE( auth_mgr.find_permission({"alice"_n, "ex.eth"_n}) == nullptr );
+} FC_LOG_AND_RETHROW()
 
-   auto auth = perm->auth.to_authority();
-   BOOST_REQUIRE_EQUAL( auth.keys.size(), 1u );
-   BOOST_REQUIRE_EQUAL( auth.keys[0].key, link.pub );
-   BOOST_REQUIRE_EQUAL( auth.keys[0].weight, 1u );
-   BOOST_REQUIRE_EQUAL( auth.threshold, 1u );
+// --- createlink: account bears no RAM cost (link row is sysio-paid) ---
+
+BOOST_FIXTURE_TEST_CASE( createlink_no_account_ram_cost, sysio_authex_tester ) try {
+   auto& rlm = control->get_resource_limits_manager();
+   int64_t q0, net, cpu;
+   rlm.get_account_limits("alice"_n, q0, net, cpu);
+   int64_t u0 = rlm.get_account_ram_usage("alice"_n);
+   auto link = make_eth_link("alice", now_ms());
+   BOOST_REQUIRE_EQUAL( success(), createlink("alice"_n, ChainKind::CHAIN_KIND_EVM, "alice", link.sig, link.pub, link.nonce) );
+   produce_blocks();
+
+   int64_t q1;
+   rlm.get_account_limits("alice"_n, q1, net, cpu);
+   int64_t u1 = rlm.get_account_ram_usage("alice"_n);
+   // The link row is billed to sysio and no permission is changed, so the account's
+   // own RAM usage and quota are untouched -- linking is free to the account.
+   BOOST_CHECK_EQUAL( u1, u0 );
+   BOOST_CHECK_EQUAL( q1, q0 );
 } FC_LOG_AND_RETHROW()
 
 // ——— createlink: duplicate pubkey ———
@@ -212,18 +234,18 @@ BOOST_FIXTURE_TEST_CASE( createlink_eth_success, sysio_authex_tester ) try {
 BOOST_FIXTURE_TEST_CASE( createlink_duplicate_pubkey, sysio_authex_tester ) try {
    auto link1 = make_eth_link("alice", now_ms());
 
-   BOOST_REQUIRE_EQUAL( success(), createlink("alice"_n, chain_kind_ethereum, "alice", link1.sig, link1.pub, link1.nonce) );
+   BOOST_REQUIRE_EQUAL( success(), createlink("alice"_n, ChainKind::CHAIN_KIND_EVM, "alice", link1.sig, link1.pub, link1.nonce) );
    produce_blocks();
 
    // Bob tries to link the same pubkey
    uint64_t nonce2 = now_ms();
-   auto msg2 = build_link_message(link1.pub, "bob", chain_kind_ethereum, nonce2);
+   auto msg2 = build_link_message(link1.pub, "bob", ChainKind::CHAIN_KIND_EVM, nonce2);
    auto hash2 = fc::crypto::keccak256::hash(msg2);
    auto sig2 = link1.priv.sign(fc::sha256(reinterpret_cast<const char*>(hash2.data()), 32));
 
    BOOST_REQUIRE_EQUAL(
       wasm_assert_msg("Public key already linked to a different account."),
-      createlink("bob"_n, chain_kind_ethereum, "bob", sig2, link1.pub, nonce2)
+      createlink("bob"_n, ChainKind::CHAIN_KIND_EVM, "bob", sig2, link1.pub, nonce2)
    );
 } FC_LOG_AND_RETHROW()
 
@@ -232,14 +254,14 @@ BOOST_FIXTURE_TEST_CASE( createlink_duplicate_pubkey, sysio_authex_tester ) try 
 BOOST_FIXTURE_TEST_CASE( createlink_duplicate_chain_for_user, sysio_authex_tester ) try {
    auto link1 = make_eth_link("alice", now_ms());
 
-   BOOST_REQUIRE_EQUAL( success(), createlink("alice"_n, chain_kind_ethereum, "alice", link1.sig, link1.pub, link1.nonce) );
+   BOOST_REQUIRE_EQUAL( success(), createlink("alice"_n, ChainKind::CHAIN_KIND_EVM, "alice", link1.sig, link1.pub, link1.nonce) );
    produce_blocks();
 
    auto link2 = make_eth_link("alice", now_ms());
 
    BOOST_REQUIRE_EQUAL(
       wasm_assert_msg("Account already has a link for this chain."),
-      createlink("alice"_n, chain_kind_ethereum, "alice", link2.sig, link2.pub, link2.nonce)
+      createlink("alice"_n, ChainKind::CHAIN_KIND_EVM, "alice", link2.sig, link2.pub, link2.nonce)
    );
 } FC_LOG_AND_RETHROW()
 
@@ -247,16 +269,26 @@ BOOST_FIXTURE_TEST_CASE( createlink_duplicate_chain_for_user, sysio_authex_teste
 
 BOOST_FIXTURE_TEST_CASE( clearlinks_then_recreate, sysio_authex_tester ) try {
    auto link1 = make_eth_link("alice", now_ms());
-   BOOST_REQUIRE_EQUAL( success(), createlink("alice"_n, chain_kind_ethereum, "alice", link1.sig, link1.pub, link1.nonce) );
+   BOOST_REQUIRE_EQUAL( success(), createlink("alice"_n, ChainKind::CHAIN_KIND_EVM, "alice", link1.sig, link1.pub, link1.nonce) );
    produce_blocks();
 
-   // Clear and re-create should work
+   // clearlinks wipes the links table; a fresh createlink for the same account+chain
+   // must then succeed (the prior link no longer trips the duplicate checks).
    BOOST_REQUIRE_EQUAL( success(), clearlinks(AUTHEX) );
    produce_blocks();
 
    auto link2 = make_eth_link("alice", now_ms());
-   BOOST_REQUIRE_EQUAL( success(), createlink("alice"_n, chain_kind_ethereum, "alice", link2.sig, link2.pub, link2.nonce) );
+   BOOST_REQUIRE_EQUAL( success(), createlink("alice"_n, ChainKind::CHAIN_KIND_EVM, "alice", link2.sig, link2.pub, link2.nonce) );
    produce_blocks();
+
+   // Linking never touches the account's permissions: neither EM key landed in `active`.
+   auto& auth_mgr = control->get_authorization_manager();
+   const auto* active = auth_mgr.find_permission({"alice"_n, "active"_n});
+   BOOST_REQUIRE( active != nullptr );
+   const auto auth = active->auth.to_authority();
+   for (const auto& kw : auth.keys)
+      BOOST_CHECK_MESSAGE( fc::variant(kw.key).as_string().rfind("PUB_EM_", 0) != 0,
+                           "no EM key should be in active" );
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_SUITE_END()

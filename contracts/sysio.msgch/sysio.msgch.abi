@@ -1,8 +1,65 @@
 {
     "____comment": "This file was generated with sysio-abigen. DO NOT EDIT ",
     "version": "sysio::abi/1.2",
-    "types": [],
+    "types": [
+        {
+            "new_type_name": "vuint32_t",
+            "type": "varint_uint32"
+        }
+    ],
     "structs": [
+        {
+            "name": "ChainId",
+            "base": "",
+            "fields": [
+                {
+                    "name": "kind",
+                    "type": "ChainKind"
+                },
+                {
+                    "name": "id",
+                    "type": "vuint32_t"
+                }
+            ]
+        },
+        {
+            "name": "Endpoints",
+            "base": "",
+            "fields": [
+                {
+                    "name": "start",
+                    "type": "ChainId"
+                },
+                {
+                    "name": "end",
+                    "type": "ChainId"
+                }
+            ]
+        },
+        {
+            "name": "att_seq_entry",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "next",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "att_seq_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                }
+            ]
+        },
         {
             "name": "attestation_entry",
             "base": "",
@@ -12,7 +69,7 @@
                     "type": "uint64"
                 },
                 {
-                    "name": "outpost_id",
+                    "name": "chain_code",
                     "type": "uint64"
                 },
                 {
@@ -55,7 +112,7 @@
             "base": "",
             "fields": [
                 {
-                    "name": "outpost_id",
+                    "name": "chain_code",
                     "type": "uint64"
                 }
             ]
@@ -66,16 +123,6 @@
             "fields": []
         },
         {
-            "name": "cleanup",
-            "base": "",
-            "fields": [
-                {
-                    "name": "before_epoch",
-                    "type": "uint32"
-                }
-            ]
-        },
-        {
             "name": "deliver",
             "base": "",
             "fields": [
@@ -84,7 +131,7 @@
                     "type": "name"
                 },
                 {
-                    "name": "outpost_id",
+                    "name": "chain_code",
                     "type": "uint64"
                 },
                 {
@@ -102,7 +149,7 @@
                     "type": "uint64"
                 },
                 {
-                    "name": "outpost_id",
+                    "name": "chain_code",
                     "type": "uint64"
                 },
                 {
@@ -132,11 +179,37 @@
             ]
         },
         {
+            "name": "envelope_log_entry",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "endpoints",
+                    "type": "Endpoints"
+                },
+                {
+                    "name": "epoch_index",
+                    "type": "uint32"
+                },
+                {
+                    "name": "checksum",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "emitted_at",
+                    "type": "time_point"
+                }
+            ]
+        },
+        {
             "name": "evalcons",
             "base": "",
             "fields": [
                 {
-                    "name": "outpost_id",
+                    "name": "chain_code",
                     "type": "uint64"
                 },
                 {
@@ -164,7 +237,7 @@
                     "type": "uint64"
                 },
                 {
-                    "name": "outpost_id",
+                    "name": "chain_code",
                     "type": "uint64"
                 },
                 {
@@ -210,7 +283,7 @@
                     "type": "uint64"
                 },
                 {
-                    "name": "outpost_id",
+                    "name": "chain_code",
                     "type": "uint64"
                 },
                 {
@@ -219,18 +292,6 @@
                 },
                 {
                     "name": "envelope_hash",
-                    "type": "checksum256"
-                },
-                {
-                    "name": "merkle_root",
-                    "type": "checksum256"
-                },
-                {
-                    "name": "start_message_id",
-                    "type": "checksum256"
-                },
-                {
-                    "name": "end_message_id",
                     "type": "checksum256"
                 },
                 {
@@ -248,7 +309,7 @@
             "base": "",
             "fields": [
                 {
-                    "name": "outpost_id",
+                    "name": "chain_code",
                     "type": "uint64"
                 },
                 {
@@ -258,6 +319,10 @@
                 {
                     "name": "consensus_reached",
                     "type": "bool"
+                },
+                {
+                    "name": "winning_checksum",
+                    "type": "checksum256"
                 }
             ]
         },
@@ -266,7 +331,7 @@
             "base": "",
             "fields": [
                 {
-                    "name": "outpost_id",
+                    "name": "chain_code",
                     "type": "uint64"
                 }
             ]
@@ -276,7 +341,7 @@
             "base": "",
             "fields": [
                 {
-                    "name": "outpost_id",
+                    "name": "chain_code",
                     "type": "uint64"
                 },
                 {
@@ -286,6 +351,34 @@
                 {
                     "name": "data",
                     "type": "bytes"
+                }
+            ]
+        },
+        {
+            "name": "resolvedisp",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "uint64"
+                },
+                {
+                    "name": "epoch_index",
+                    "type": "uint32"
+                },
+                {
+                    "name": "winning_checksum",
+                    "type": "checksum256"
+                }
+            ]
+        },
+        {
+            "name": "varint_uint32",
+            "base": "",
+            "fields": [
+                {
+                    "name": "value",
+                    "type": "uint32"
                 }
             ]
         }
@@ -307,11 +400,6 @@
             "ricardian_contract": ""
         },
         {
-            "name": "cleanup",
-            "type": "cleanup",
-            "ricardian_contract": ""
-        },
-        {
             "name": "deliver",
             "type": "deliver",
             "ricardian_contract": ""
@@ -324,6 +412,11 @@
         {
             "name": "queueout",
             "type": "queueout",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "resolvedisp",
+            "type": "resolvedisp",
             "ricardian_contract": ""
         }
     ],
@@ -354,6 +447,14 @@
             ]
         },
         {
+            "name": "attseq",
+            "type": "att_seq_entry",
+            "index_type": "i64",
+            "key_names": ["id"],
+            "key_types": ["uint64"],
+            "table_id": 1067
+        },
+        {
             "name": "envelopes",
             "type": "envelope_entry",
             "index_type": "i64",
@@ -363,7 +464,7 @@
             "secondary_indexes": [
                 {
                     "name": "byoutepoch",
-                    "key_type": "uint64",
+                    "key_type": "uint128",
                     "table_id": 57096
                 },
                 {
@@ -372,6 +473,14 @@
                     "table_id": 5961
                 }
             ]
+        },
+        {
+            "name": "envlog",
+            "type": "envelope_log_entry",
+            "index_type": "i64",
+            "key_names": ["id"],
+            "key_types": ["uint64"],
+            "table_id": 31386
         },
         {
             "name": "messages",
@@ -413,7 +522,7 @@
                 },
                 {
                     "name": "byoutepoch",
-                    "key_type": "uint64",
+                    "key_type": "uint128",
                     "table_id": 12275
                 }
             ]
@@ -422,7 +531,7 @@
             "name": "outpcons",
             "type": "outpost_consensus_entry",
             "index_type": "i64",
-            "key_names": ["outpost_id"],
+            "key_names": ["chain_code"],
             "key_types": ["uint64"],
             "table_id": 51836
         }
@@ -486,10 +595,6 @@
                     "value": 60928
                 },
                 {
-                    "name": "ATTESTATION_TYPE_NATIVE_YIELD_REWARD",
-                    "value": 60929
-                },
-                {
                     "name": "ATTESTATION_TYPE_WIRE_TOKEN_PURCHASE",
                     "value": 60930
                 },
@@ -498,31 +603,11 @@
                     "value": 60932
                 },
                 {
-                    "name": "ATTESTATION_TYPE_SLASH_OPERATOR",
-                    "value": 60933
-                },
-                {
-                    "name": "ATTESTATION_TYPE_SWAP",
+                    "name": "ATTESTATION_TYPE_SWAP_REQUEST",
                     "value": 60934
                 },
                 {
-                    "name": "ATTESTATION_TYPE_UNDERWRITE_INTENT",
-                    "value": 60935
-                },
-                {
-                    "name": "ATTESTATION_TYPE_UNDERWRITE_CONFIRM",
-                    "value": 60936
-                },
-                {
-                    "name": "ATTESTATION_TYPE_UNDERWRITE_REJECT",
-                    "value": 60937
-                },
-                {
-                    "name": "ATTESTATION_TYPE_UNDERWRITE_UNLOCK",
-                    "value": 60938
-                },
-                {
-                    "name": "ATTESTATION_TYPE_REMIT",
+                    "name": "ATTESTATION_TYPE_SWAP_REMIT",
                     "value": 60944
                 },
                 {
@@ -530,16 +615,8 @@
                     "value": 60945
                 },
                 {
-                    "name": "ATTESTATION_TYPE_EPOCH_SYNC",
-                    "value": 60946
-                },
-                {
                     "name": "ATTESTATION_TYPE_OPERATORS",
                     "value": 60947
-                },
-                {
-                    "name": "ATTESTATION_TYPE_REMIT_CONFIRM",
-                    "value": 60948
                 },
                 {
                     "name": "ATTESTATION_TYPE_BATCH_OPERATOR_GROUPS",
@@ -560,6 +637,42 @@
                 {
                     "name": "ATTESTATION_TYPE_ATTESTATION_PROCESSING_ERROR",
                     "value": 60952
+                },
+                {
+                    "name": "ATTESTATION_TYPE_UNDERWRITE_INTENT_COMMIT",
+                    "value": 60953
+                },
+                {
+                    "name": "ATTESTATION_TYPE_SWAP_REVERT",
+                    "value": 60955
+                },
+                {
+                    "name": "ATTESTATION_TYPE_DEPOSIT_REVERT",
+                    "value": 60956
+                },
+                {
+                    "name": "ATTESTATION_TYPE_SWAP_REJECTED",
+                    "value": 60957
+                },
+                {
+                    "name": "ATTESTATION_TYPE_RESERVE_CREATE",
+                    "value": 60958
+                },
+                {
+                    "name": "ATTESTATION_TYPE_RESERVE_CREATE_CANCEL",
+                    "value": 60959
+                },
+                {
+                    "name": "ATTESTATION_TYPE_RESERVE_CREATE_CANCELLED",
+                    "value": 60960
+                },
+                {
+                    "name": "ATTESTATION_TYPE_RESERVE_READY",
+                    "value": 60961
+                },
+                {
+                    "name": "ATTESTATION_TYPE_EMISSIONS_BLOCKED",
+                    "value": 60962
                 }
             ]
         },
@@ -576,16 +689,12 @@
                     "value": 1
                 },
                 {
-                    "name": "CHAIN_KIND_ETHEREUM",
+                    "name": "CHAIN_KIND_EVM",
                     "value": 2
                 },
                 {
-                    "name": "CHAIN_KIND_SOLANA",
+                    "name": "CHAIN_KIND_SVM",
                     "value": 3
-                },
-                {
-                    "name": "CHAIN_KIND_SUI",
-                    "value": 4
                 }
             ]
         },

@@ -131,6 +131,8 @@ if (ENABLE_TESTS)
     add_subdirectory(test)
 endif ()
 
+add_subdirectory(benchmark)
+
 install(
         TARGETS fc
         LIBRARY DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}

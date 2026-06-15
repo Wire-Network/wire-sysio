@@ -83,7 +83,7 @@ void apply_sysio_newaccount(apply_context& context) {
                  "Cannot create account named {}, as that name is already taken",
                  create.name);
 
-      int ram_delta = 0;
+      int64_t ram_delta = 0;
       db.create<account_object>([&](auto& a) {
          a.name = create.name;
       });
@@ -260,10 +260,7 @@ void apply_sysio_updateauth(apply_context& context) {
 
    auto update = context.get_action().data_as<updateauth>();
 
-   // ** NEW ADDED IF STATEMENT **
-   if( update.permission.prefix() != name("ex")) {
-      context.require_authorization(update.account); // only here to mark the single authority on this action as used
-   }
+   context.require_authorization(update.account); // only here to mark the single authority on this action as used
 
    auto& authorization = context.control.get_mutable_authorization_manager();
    auto& db = context.db;

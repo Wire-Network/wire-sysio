@@ -431,7 +431,7 @@ void finish_next(const block_header_state& prev,
          const auto& act = next_header_state.active_finalizer_policy;
          ilog("Finalizer policy generation change: {} -> {}",
               prev.active_finalizer_policy->generation, act->generation);
-         ilog("New finalizer policy becoming active in block $n:{}: {}",
+         ilog("New finalizer policy becoming active in block {}:{}: {}",
               block_header::num_from_id(id), id, fc::json::to_log_string(*act));
       }
 

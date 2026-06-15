@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <limits>
 #include <optional>
+#include <type_traits>
+#include <fc/exception/exception.hpp>
 #include <fc/variant.hpp>
 #include <fc/variant_object.hpp>
 #include <sysio/chain/name.hpp>
@@ -71,6 +73,70 @@ namespace sysio::trace_api {
    struct actions_result {
       fc::variants actions;
    };
+
+   /**
+    * Fill query.block_num_start / block_num_end from an already-parsed request body object.
+    *
+    * fc's as<uint32_t>() narrows with a raw static_cast of as_uint64(), so an oversized JSON value
+    * (e.g. 2^32) would silently wrap to a small block number instead of failing, and mixed oversized
+    * values could bypass the start <= end validation after truncation.  Parse through as_uint64()
+    * and range-check explicitly instead; out-of-range values throw, which the HTTP handlers
+    * translate into a 400 response.  Free function so the HTTP handlers' behaviour is unit-testable.
+    *
+    * @throws fc::exception when a present field does not fit in uint32_t.
+    */
+   inline void parse_query_block_range(const fc::variant_object& obj, action_query& query) {
+      auto parse_field = [&obj](const char* field, uint32_t& out) {
+         if (!obj.contains(field))
+            return;
+         const uint64_t value = obj[field].as_uint64();
+         FC_ASSERT(value <= std::numeric_limits<uint32_t>::max(), "{} out of range: {}", field, value);
+         out = static_cast<uint32_t>(value);
+      };
+      parse_field("block_num_start", query.block_num_start);
+      parse_field("block_num_end",   query.block_num_end);
+   }
+
+   /**
+    * Canonical-only defaulting for the get_actions HTTP layer: when the caller specifies exactly one
+    * of receiver/account and does not opt into notifications, mirror the specified value onto the
+    * missing one so only the canonical execution (receiver == account) matches - no notification
+    * copies.  Free function so the HTTP handler's behaviour is unit-testable.
+    */
+   inline void apply_canonical_default(action_query& query, bool include_notifications) {
+      if (include_notifications)
+         return;
+      if (query.account && !query.receiver)
+         query.receiver = query.account;
+      else if (query.receiver && !query.account)
+         query.account = query.receiver;
+   }
+
+   /**
+    * Clamp block_num_end so the scan spans at most max_block_range blocks.  Computed in 64-bit:
+    * block_num_start + range - 1 can exceed uint32_t near the top of the range, and reducing
+    * unconditionally keeps the bound robust regardless of the configured range.
+    */
+   inline void clamp_query_range(action_query& query, uint32_t max_block_range) {
+      const uint64_t max_end = uint64_t{query.block_num_start} + max_block_range - 1;
+      query.block_num_end    = static_cast<uint32_t>(std::min<uint64_t>(query.block_num_end, max_end));
+   }
+
+   /**
+    * Clamp block_num_end to the last block actually recorded by the store.  The response envelope
+    * reports the clamped range as "scanned", so without this a request spanning not-yet-produced
+    * (or never-recorded) blocks would report them as scanned and a client resuming at
+    * block_num_end + 1 would permanently skip them once they exist.  When nothing in the window is
+    * recorded yet, the window collapses to just below block_num_start ("nothing scanned") so
+    * resume-at-end+1 retries the same spot.
+    */
+   inline void clamp_query_end_to_recorded(action_query& query, uint32_t last_recorded_block) {
+      if (last_recorded_block < query.block_num_start) {
+         query.block_num_end = query.block_num_start == 0 ? 0 : query.block_num_start - 1;
+      } else {
+         query.block_num_end = std::min(query.block_num_end, last_recorded_block);
+      }
+   }
 
    template<typename LogfileProvider, typename DataHandlerProvider>
    class request_handler {
@@ -146,14 +212,27 @@ namespace sysio::trace_api {
                if (trx.id == trxid) {
                   // Build a single-transaction variant by calling the shared
                   // formatter on a synthesized block containing only this trx.
-                  // Avoids decoding any other transactions in the block.
-                  auto single = block_trace;           // copy
-                  single.transactions = {trx};
+                  // Copy the scalar header fields plus the one matching
+                  // transaction - copying the whole block first (and discarding
+                  // its transaction vector) would duplicate every action's data
+                  // buffers and decode nothing extra for it.
+                  std::decay_t<decltype(block_trace)> single;
+                  single.id                = block_trace.id;
+                  single.number            = block_trace.number;
+                  single.previous_id       = block_trace.previous_id;
+                  single.timestamp         = block_trace.timestamp;
+                  single.producer          = block_trace.producer;
+                  single.transaction_mroot = block_trace.transaction_mroot;
+                  single.finality_mroot    = block_trace.finality_mroot;
+                  single.transactions      = {trx};
                   auto block_var = detail::response_formatter::process_block(
-                     data_log_entry{single}, irreversible, data_handler);
-                  auto& txs = block_var.get_object()["transactions"];
-                  if (!txs.is_null() && txs.size() > 0)
-                     result = txs[size_t{0}];
+                     data_log_entry{std::move(single)}, irreversible, data_handler);
+                  const auto& obj = block_var.get_object();
+                  if (obj.contains("transactions")) {
+                     const auto& txs = obj["transactions"];
+                     if (!txs.is_null() && txs.size() > 0)
+                        result = txs[size_t{0}];
+                  }
                   return;
                }
             }
@@ -214,8 +293,14 @@ namespace sysio::trace_api {
          std::optional<uint32_t> current_slice;
          bool skip_current_slice = false;
 
-         const uint32_t end = query.block_num_end;
-         for (uint32_t block_num = query.block_num_start; block_num <= end; ++block_num) {
+         // Drive the scan with a 64-bit counter.  block_num_end can be UINT32_MAX (its default, and
+         // unvalidated client input on the HTTP path), so a uint32_t counter would wrap from UINT32_MAX
+         // back to 0 at ++block_num and spin forever.  bn stays in [start, end+1] and never wraps; the
+         // HTTP-side clamp is then only a range bound, not the sole thing preventing an infinite loop.
+         const uint64_t end = query.block_num_end;
+         for (uint64_t bn = query.block_num_start; bn <= end; ++bn) {
+            // bn <= end <= UINT32_MAX throughout the loop body, so this narrowing is value-preserving.
+            const uint32_t block_num = static_cast<uint32_t>(bn);
             if (skip_eligible) {
                const uint32_t slice = logfile_provider.slice_number(block_num);
                if (!current_slice || *current_slice != slice) {
@@ -232,11 +317,12 @@ namespace sysio::trace_api {
                   }
                }
                if (skip_current_slice) {
-                  // Jump block_num to the last block of this slice so the for-loop's ++block_num takes us to the
-                  // first block of the next slice.  Clamp to the query's end so we don't wrap around if this is
-                  // the last slice in the range.
-                  const uint32_t slice_last = (slice + 1) * stride - 1;
-                  block_num = std::min(slice_last, end);
+                  // Jump bn to the last block of this slice so the for-loop's ++bn takes us to the first block
+                  // of the next slice.  Compute in 64-bit: (slice+1)*stride overflows uint32_t near the top of
+                  // the range and would wrap slice_last to a small value, driving bn *backwards* into an
+                  // infinite loop.  Clamp to the query's end so the last slice in the range doesn't overshoot.
+                  const uint64_t slice_last = (uint64_t{slice} + 1) * stride - 1;
+                  bn = std::min(slice_last, end);
                   continue;
                }
             }

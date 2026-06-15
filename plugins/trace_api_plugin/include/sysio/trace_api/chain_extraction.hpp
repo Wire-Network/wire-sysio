@@ -15,14 +15,6 @@
 
 namespace sysio::trace_api {
 
-using chain::transaction_id_type;
-using chain::packed_transaction;
-using namespace sysio::chain::literals;
-
-// Compile-time constants for setabi detection: built from constexpr _n
-// literals so we don't pay a chain::name construction cost on every action.
-inline constexpr chain::name setabi_action_name = "setabi"_n;
-
 template <typename StoreProvider>
 class chain_extraction_impl_type {
 public:
@@ -34,7 +26,7 @@ public:
 
    /**
     * Chain Extractor for capturing transaction traces, action traces, and block info.
-    * @param store provider of append, append_lib, and append_abi
+    * @param store provider of append, append_lib, append_abi, and rollback_abis
     * @param except_handler called on exceptions, logging if any is left to the user
     * @param abi_fetcher optional callback to lazily fetch the current ABI for an account;
     *                    called on first encounter of each account; receives global_seq 0
@@ -75,9 +67,30 @@ private:
       } else {
          cached_traces[trace->id] = {trace, t};
       }
+      collect_abi_ops( *trace );
+   }
 
-      // ABI capture: scan all action traces (including inlines) in this transaction.
-      //
+   /**
+    * ABI capture, phase 1 of 3 (collect).  Nothing is written to the abi log here: at
+    * execution time it is unknowable whether this transaction's global_sequences become
+    * canonical.  A speculative relay execution may never land on-chain, and even a producer's
+    * own production round can be aborted and its transactions re-executed later with different
+    * sequences.  Gating on trace.producer_block_id is not the answer either: a producer never
+    * re-applies its own block, so such a gate permanently loses every ABI deployed in blocks
+    * the local node itself produced.  Instead this mirrors the long-standing trace pattern -
+    * collect per-transaction candidates here, commit them in store_block_trace only for
+    * transactions that appear in the accepted block.  on_block_start clears leftovers, so
+    * candidates from aborted or never-included executions are discarded, and a validating
+    * node's canonical re-execution of a relayed transaction overwrites any earlier speculative
+    * collection for the same transaction id (so a lazy fetch that read speculative state can
+    * never be committed - the execution that commits is the one whose state was canonical).
+    *
+    * Even an accepted block can later fork out, so commit (phase 2) only places records in
+    * the store's in-memory reversible overlay; they become permanent on disk in phase 3 when
+    * LIB passes their block (store.append_lib), and are discarded by store.rollback_abis when
+    * a fork replaces their block - see on_block_start.
+    */
+   void collect_abi_ops(const chain::transaction_trace& trace) {
       // First pass: collect setabi targets in this trx so the second pass can
       // skip the lazy fetch for any account whose ABI is being replaced here.
       // on_applied_transaction runs AFTER all actions in the trx have applied,
@@ -86,17 +99,12 @@ private:
       // that executed earlier in this same trx (they need the OLD ABI, which
       // is no longer reachable from post-apply state).
       std::unordered_set<chain::name> setabi_targets_this_trx;
-      for (const auto& at : trace->action_traces) {
+      for (const auto& at : trace.action_traces) {
          if (!at.receipt) continue;
          if (at.act.account == chain::config::system_account_name &&
              at.act.name    == setabi_action_name) {
             try {
-               chain::name target;
-               chain::bytes abi_bytes;
-               auto ds = fc::datastream<const char*>(at.act.data.data(), at.act.data.size());
-               fc::raw::unpack(ds, target);
-               fc::raw::unpack(ds, abi_bytes);
-               setabi_targets_this_trx.insert(target);
+               setabi_targets_this_trx.insert(unpack_setabi_data(at.act.data).first);
             } catch (const std::exception& e) {
                fc_wlog(_log, "trace_api: failed to unpack setabi data (collecting targets) at global_seq {}: {}",
                        at.receipt->global_sequence, e.what());
@@ -104,51 +112,93 @@ private:
          }
       }
 
-      // Second pass: lazy fetch + setabi record, skipping lazy fetch for any
-      // account whose ABI is being replaced in this trx.
-      for (const auto& at : trace->action_traces) {
+      // Second pass: collect lazy-fetch + setabi candidates, skipping the lazy
+      // fetch for any account whose ABI is being replaced in this trx.
+      std::vector<pending_abi_op>     ops;
+      std::unordered_set<chain::name> lazy_collected_this_trx;
+      for (const auto& at : trace.action_traces) {
          if (!at.receipt) continue; // skip context-free or failed actions
 
          const chain::name account = at.act.account;
 
          // Lazy ABI fetch: on first encounter of an account (that isn't having
-         // its ABI replaced in this same trx), record its current ABI at
-         // global_seq 0 so pre-plugin-start actions still decode.  "First
-         // encounter" is decided by the abi_log itself: if it has no record
-         // for this account, we trigger the fetch.  Once any record exists
-         // (lazy or setabi), we never re-fetch.  Using the log as
+         // its ABI replaced in this same trx), capture its current ABI for a
+         // global_seq 0 record so pre-plugin-start actions still decode.
+         // "First encounter" is decided by the abi_log itself: if it has no
+         // record for this account, we trigger the fetch.  Once any record
+         // exists (lazy or setabi), we never re-fetch.  Using the log as
          // source-of-truth avoids holding a per-node-lifetime set of all
-         // accounts ever observed.
+         // accounts ever observed.  The fetch happens NOW (state right after
+         // this trx applied), but the record is only committed if this trx
+         // lands in an accepted block; commit re-checks has_abi_entry since
+         // another transaction may record the account first.
          if (abi_fetcher
              && setabi_targets_this_trx.count(account) == 0
+             && lazy_collected_this_trx.count(account) == 0
              && !store.has_abi_entry(account))
          {
             try {
-               if (auto abi = abi_fetcher(account))
-                  store.append_abi(account, 0, std::move(*abi));
+               if (auto abi = abi_fetcher(account)) {
+                  ops.push_back({abi_op_kind::lazy_fetch, account, 0, std::move(*abi)});
+                  lazy_collected_this_trx.insert(account);
+               }
             } catch (const std::exception& e) {
                fc_dlog(_log, "trace_api: lazy ABI fetch for {} failed: {}", account, e.what());
             }
          }
 
-         // setabi: record the new ABI with its exact global_sequence.
+         // setabi: capture the new ABI with its exact global_sequence.
          if (at.act.account == chain::config::system_account_name &&
              at.act.name    == setabi_action_name) {
             try {
-               chain::name target_account;
-               chain::bytes abi_bytes;
-               auto ds = fc::datastream<const char*>(at.act.data.data(), at.act.data.size());
-               fc::raw::unpack(ds, target_account);
-               fc::raw::unpack(ds, abi_bytes);
-               store.append_abi(target_account,
-                                at.receipt->global_sequence,
-                                std::vector<char>(abi_bytes.begin(), abi_bytes.end()));
+               auto [target_account, abi_bytes] = unpack_setabi_data(at.act.data);
+               ops.push_back({abi_op_kind::setabi,
+                              target_account,
+                              at.receipt->global_sequence,
+                              std::vector<char>(abi_bytes.begin(), abi_bytes.end())});
             } catch (const std::exception& e) {
                fc_wlog(_log, "trace_api: failed to record setabi at global_seq {}: {}",
                        at.receipt->global_sequence, e.what());
             }
          }
       }
+
+      // Plain assignment (not insert) so a canonical re-execution supersedes any earlier
+      // speculative collection for the same transaction id; erase when empty for the same
+      // reason, and to keep the per-block map minimal.
+      if (ops.empty())
+         pending_abi_ops.erase(trace.id);
+      else
+         pending_abi_ops[trace.id] = std::move(ops);
+   }
+
+   /**
+    * ABI capture, phase 2 of 3 (commit): record the candidates collected for a transaction
+    * that made it into an accepted block.  Called from store_block_trace before the block's
+    * traces are appended, so a trace is never readable before the ABI that decodes it.
+    * has_abi_entry is re-checked for lazy fetches: an earlier transaction in this block, or
+    * a block accepted between collection and now, may have recorded the account already.
+    *
+    * The records carry the accepted block's number: they stay reversible (in-memory,
+    * discarded by store.rollback_abis if a fork replaces the block) until LIB passes
+    * block_num, at which point store.append_lib flushes them to the on-disk abi log
+    * (phase 3) - the same point at which the other trace files treat a block as final.
+    */
+   void commit_abi_ops(uint32_t block_num, const chain::transaction_id_type& trx_id) {
+      auto it = pending_abi_ops.find(trx_id);
+      if (it == pending_abi_ops.end()) return;
+      for (auto& op : it->second) {
+         switch (op.kind) {
+         case abi_op_kind::lazy_fetch:
+            if (!store.has_abi_entry(op.account))
+               store.append_abi(block_num, op.account, 0, std::move(op.abi_bytes));
+            break;
+         case abi_op_kind::setabi:
+            store.append_abi(block_num, op.account, op.global_sequence, std::move(op.abi_bytes));
+            break;
+         }
+      }
+      pending_abi_ops.erase(it);
    }
 
    void on_accepted_block(const chain::signed_block_ptr& block, const chain::block_id_type& id ) {
@@ -165,6 +215,24 @@ private:
          check_continuity(block_num);
       }
       clear_caches();
+      // Fork replacement for committed-but-reversible ABI records: a block_start at
+      // height H means any previously accepted block at height >= H is being replaced
+      // (fork switch) - its ABI records must stop participating in lookups, exactly as
+      // the trace slices overwrite per-block on re-application.  In normal forward
+      // operation no record at or above H exists and this is a no-op.  Records at or
+      // below LIB live on disk and are never touched (a fork cannot reach below LIB).
+      //
+      // rollback_abis throws if it cannot durably record the rollback (a trace_api node
+      // must record history, so a persistence failure is fatal).  Route it through
+      // except_handler like check_continuity so it becomes a clean controller shutdown
+      // (current block rolled back) rather than an unhandled signal-handler exception.
+      try {
+         store.rollback_abis(block_num);
+      } catch (const yield_exception&) {
+         throw;
+      } catch (...) {
+         except_handler(MAKE_EXCEPTION_WITH_CONTEXT(std::current_exception()));
+      }
    }
 
    void check_continuity(uint32_t block_num) {
@@ -176,6 +244,18 @@ private:
          }
          const uint32_t first = recorded->first;
          const uint32_t last  = recorded->second;
+
+         // The first/last range check below cannot see a hole in the MIDDLE of the recorded range
+         // (e.g. an operator deleted or partially copied middle slices); queries inside such a hole
+         // would quietly 404.  Cheap filename-level contiguity check, same recovery guidance.
+         if (const auto gap = store.find_index_slice_gap()) {
+            throw std::runtime_error(fmt::format(
+               "trace_api: trace data is missing slices covering blocks {}..{} (recorded range is [{}, {}]). "
+               "To recover: copy the trace files covering blocks {}..{} from another node, "
+               "or delete the trace directory to start fresh (loses historical traces).",
+               gap->first, gap->second, first, last, gap->first, gap->second));
+         }
+
          // Overlap or exact continuation: chain head is within or just past existing data.
          // Re-applied blocks will overwrite existing slice entries as they are re-recorded.
          if (block_num >= first && block_num <= last + 1)
@@ -210,6 +290,7 @@ private:
    void clear_caches() {
       cached_traces.clear();
       onblock_trace.reset();
+      pending_abi_ops.clear();
    }
 
    void store_block_trace( const chain::signed_block_ptr& block, const chain::block_id_type& id ) {
@@ -221,14 +302,17 @@ private:
          traces.reserve( block->transactions.size() + 1 );
          block_trxs_entry tt;
          tt.ids.reserve(block->transactions.size() + 1);
-         if( onblock_trace )
+         if( onblock_trace ) {
             traces.emplace_back( to_transaction_trace( *onblock_trace ));
+            commit_abi_ops( bt.number, onblock_trace->trace->id );
+         }
          for( const auto& r : block->transactions ) {
-            const transaction_id_type& id = r.trx.id();
+            const chain::transaction_id_type& id = r.trx.id();
             const auto it = cached_traces.find( id );
             if( it != cached_traces.end() ) {
                traces.emplace_back( to_transaction_trace( it->second ));
             }
+            commit_abi_ops( bt.number, id );
             tt.ids.emplace_back(id);
          }
          bt.transactions = std::move( traces );
@@ -253,11 +337,27 @@ private:
    }
 
 private:
+   /// Kind of a collected ABI record candidate (see collect_abi_ops / commit_abi_ops).
+   enum class abi_op_kind {
+      lazy_fetch,  ///< current ABI of a first-encountered account, recorded at global_seq 0
+      setabi       ///< ABI bytes carried by a setabi action, recorded at its global_sequence
+   };
+
+   /// One ABI record candidate, collected at execution time and committed only if its
+   /// transaction lands in an accepted block.
+   struct pending_abi_op {
+      abi_op_kind       kind;
+      chain::name       account;
+      uint64_t          global_sequence = 0;  ///< setabi: the receipt's sequence; lazy_fetch: unused (0)
+      std::vector<char> abi_bytes;
+   };
+
    StoreProvider                                                store;
    exception_handler                                            except_handler;
    abi_fetcher_t                                                abi_fetcher;
-   std::map<transaction_id_type, cache_trace>                   cached_traces;
+   std::map<chain::transaction_id_type, cache_trace>            cached_traces;
    std::optional<cache_trace>                                   onblock_trace;
+   std::map<chain::transaction_id_type, std::vector<pending_abi_op>> pending_abi_ops;
    bool                                                         startup_checked{false};
 
 };

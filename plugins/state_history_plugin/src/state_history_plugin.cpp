@@ -100,7 +100,7 @@ public:
 
    template <typename Protocol>
    void create_listener(const std::string& address) {
-      const boost::posix_time::milliseconds accept_timeout(200);
+      const std::chrono::milliseconds accept_timeout(200);
       // run listener on ship thread so that thread_pool.stop() will shutdown the listener since this captures `this`
       fc::create_listener<Protocol>(thread_pool.get_executor(), _log, accept_timeout, address, "",
          [this](const auto&) { return boost::asio::make_strand(thread_pool.get_executor()); },

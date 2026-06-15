@@ -1,6 +1,8 @@
 #include <boost/test/unit_test.hpp>
 
+#include <limits>
 #include <set>
+#include <stdexcept>
 
 #include <fc/filesystem.hpp>
 
@@ -24,6 +26,7 @@ struct get_actions_fixture {
       mock_logfile_provider(get_actions_fixture& f) : fixture(f) {}
 
       get_block_t get_block(uint32_t height) {
+         fixture.bump_scan_guard();
          auto it = fixture.blocks.find(height);
          if (it == fixture.blocks.end()) return {};
          // pending_blocks is a per-block override for tests that need to exercise
@@ -35,7 +38,8 @@ struct get_actions_fixture {
       // Stride/slice mapping is a fixture knob so tests can exercise the per-slice bloom skip path with a small
       // stride rather than the production default of 10,000 blocks.
       uint32_t slice_stride() const noexcept { return fixture.mock_slice_stride; }
-      uint32_t slice_number(uint32_t block_num) const noexcept { return block_num / fixture.mock_slice_stride; }
+      // Not noexcept: bump_scan_guard() may throw to break a non-terminating scan (see scan_guard).
+      uint32_t slice_number(uint32_t block_num) const { fixture.bump_scan_guard(); return block_num / fixture.mock_slice_stride; }
 
       // Default: no sidecar -> invalid bloom_reader -> may_contain_* returns true -> caller scans as before.  Tests
       // that want to exercise skipping install a function that returns a valid reader for specific slices.
@@ -96,6 +100,18 @@ struct get_actions_fixture {
    std::set<uint32_t>                 pending_blocks; // blocks that should report "pending" instead of the default "irreversible"
    uint32_t mock_slice_stride = 10;
    std::function<bloom_reader(uint32_t)> mock_get_bloom = [](uint32_t) { return bloom_reader{}; };
+
+   // Optional runaway-scan guard.  When non-zero, the mock throws once get_block + slice_number have
+   // together been called more than this many times.  This turns a scan loop that fails to terminate
+   // (e.g. a uint32_t block_num wrapping at UINT32_MAX) into a fast, localized failure instead of a hang
+   // that would stall the entire test binary.  Disabled (0) by default so the other tests are unaffected.
+   uint64_t scan_guard = 0;
+   uint64_t scan_calls = 0;
+   void bump_scan_guard() {
+      if (scan_guard != 0 && ++scan_calls > scan_guard)
+         throw std::runtime_error("get_actions_impl exceeded scan guard -- probable non-terminating scan");
+   }
+
    impl_type impl;
 };
 
@@ -631,6 +647,270 @@ BOOST_FIXTURE_TEST_CASE(bloom_not_consulted_when_no_filter, get_actions_fixture)
    q.block_num_end   = 14;
    auto r = get_actions(q);
    BOOST_CHECK_EQUAL(r.actions.size(), 14u);
+}
+
+// Regression: block_num_end defaults to (and the HTTP layer accepts) UINT32_MAX, which is unvalidated
+// client input.  The scan loop drove a uint32_t counter, so once block_num reached UINT32_MAX the
+// ++block_num wrapped back to 0 and the loop ran forever, re-scanning the whole range on every wrap.  A
+// single request with a high block_num_start and the default end was enough to hang the API thread.  A
+// 64-bit loop counter terminates correctly.  scan_guard turns a re-introduced wrap into a fast failure.
+BOOST_FIXTURE_TEST_CASE(scan_terminates_at_uint32_max_end, get_actions_fixture)
+{
+   constexpr uint32_t max_block = std::numeric_limits<uint32_t>::max();
+   blocks[max_block] = make_block(max_block, {
+      make_trx(TRX1, max_block, { make_action(1, "a"_n, "tok"_n, "transfer"_n) })
+   });
+
+   scan_guard = 1000; // far above the 3-block range below; trips fast if the counter wraps.
+
+   action_query q;
+   q.block_num_start = max_block - 2; // only blocks [max-2, max] are in range
+   q.block_num_end   = max_block;     // the value that used to wrap the uint32_t counter
+
+   auto r = get_actions(q);
+
+   BOOST_REQUIRE_EQUAL(r.actions.size(), 1u);
+   BOOST_TEST(r.actions[0].get_object()["block_num"].as<uint32_t>() == max_block);
+}
+
+// Regression for the per-slice bloom skip-jump near the top of the range.  slice_last was computed as
+// (slice+1)*stride - 1 in uint32_t; for block_num near UINT32_MAX, (slice+1)*stride overflows and wraps
+// to a small value, so std::min(slice_last, end) drove block_num *backwards* and the scan looped forever.
+// Computing the jump in 64-bit keeps it monotonic.  An empty-but-valid bloom makes every slice
+// skip-eligible, so the very first iteration exercises the jump from the top of the range.
+BOOST_FIXTURE_TEST_CASE(bloom_skip_jump_terminates_near_uint32_max, get_actions_fixture)
+{
+   fc::temp_directory tempdir;
+   mock_slice_stride = 10;
+
+   // Empty bloom: valid() is true, every receiver probe misses -> every slice is skip-eligible.
+   bloom_builder b;
+   const auto bloom_path = tempdir.path() / "empty_bloom.log";
+   b.finalize_and_write(bloom_path);
+   mock_get_bloom = [bloom_path](uint32_t) -> bloom_reader { return bloom_reader{bloom_path}; };
+
+   scan_guard = 1000; // trips fast if the slice jump sends block_num backwards and re-scans.
+
+   action_query q;
+   q.block_num_start = std::numeric_limits<uint32_t>::max() - 5;
+   q.block_num_end   = std::numeric_limits<uint32_t>::max();
+   q.receiver        = "alice"_n; // skip_eligible == true
+
+   // The bloom misses every slice, so nothing is scanned; the scan must still terminate.
+   auto r = get_actions(q);
+   BOOST_TEST(r.actions.empty());
+}
+
+// The composite (receiver, action) bloom can skip a slice even when the receiver alone is present:
+// alice exists in every slice, but only slice 1 ever pairs her with "transfer".  A (receiver, action)
+// query must therefore skip slices 0 and 2 on the composite probe.
+BOOST_FIXTURE_TEST_CASE(bloom_skips_slice_on_recv_action_composite, get_actions_fixture) {
+   fc::temp_directory tempdir;
+
+   mock_slice_stride = 10;
+   for (uint32_t n = 1; n < 30; ++n) {
+      const chain::name act = (n >= 10 && n < 20) ? "transfer"_n : "other"_n;
+      blocks[n] = make_block(n, { make_trx(TRX1, n, { make_action(n, "alice"_n, "alice"_n, act) }) });
+   }
+
+   auto bloom_for = [&tempdir](std::size_t idx, chain::name action) {
+      bloom_builder b;
+      action_trace_v0 a{};
+      a.receiver = "alice"_n;
+      a.account  = "alice"_n;
+      a.action   = action;
+      b.add_action(a);
+      const auto path = tempdir.path() / ("bloom_ra_slice_" + std::to_string(idx) + ".log");
+      b.finalize_and_write(path);
+      return path;
+   };
+   const auto slice0_path = bloom_for(0, "other"_n);
+   const auto slice1_path = bloom_for(1, "transfer"_n);
+   const auto slice2_path = bloom_for(2, "other"_n);
+
+   mock_get_bloom = [slice0_path, slice1_path, slice2_path](uint32_t slice) -> bloom_reader {
+      switch (slice) {
+         case 0: return bloom_reader{slice0_path};
+         case 1: return bloom_reader{slice1_path};
+         case 2: return bloom_reader{slice2_path};
+         default: return bloom_reader{};
+      }
+   };
+
+   action_query q;
+   q.block_num_start = 1;
+   q.block_num_end   = 29;
+   q.receiver        = "alice"_n;
+   q.action          = "transfer"_n;
+
+   auto r = get_actions(q);
+
+   // The receiver probe passes everywhere (alice is in every slice's bloom); only the composite
+   // probe can rule slices 0 and 2 out.  All hits must come from slice 1 (blocks 10..19).
+   BOOST_REQUIRE_EQUAL(r.actions.size(), 10u);
+   for (const auto& a : r.actions) {
+      const auto block_num = a.get_object()["block_num"].as_uint64();
+      BOOST_TEST(block_num >= 10u);
+      BOOST_TEST(block_num <= 19u);
+   }
+}
+
+// ---------------------------------------------------------------------------
+// HTTP-layer helpers (free functions shared with trace_api_plugin.cpp handlers)
+// ---------------------------------------------------------------------------
+
+BOOST_AUTO_TEST_CASE(parse_query_block_range_rejects_oversized_values) {
+   constexpr uint64_t too_big = uint64_t{std::numeric_limits<uint32_t>::max()} + 1;
+   // Present fields parse; absent fields keep their defaults.
+   {
+      action_query q;
+      parse_query_block_range(fc::mutable_variant_object()("block_num_start", 100)("block_num_end", 200), q);
+      BOOST_TEST(q.block_num_start == 100u);
+      BOOST_TEST(q.block_num_end == 200u);
+   }
+   {
+      action_query q;
+      parse_query_block_range(fc::mutable_variant_object()("block_num_start", 100), q);
+      BOOST_TEST(q.block_num_start == 100u);
+      BOOST_TEST(q.block_num_end == std::numeric_limits<uint32_t>::max());
+   }
+   {
+      action_query q;
+      parse_query_block_range(fc::mutable_variant_object(), q);
+      BOOST_TEST(q.block_num_start == 0u);
+      BOOST_TEST(q.block_num_end == std::numeric_limits<uint32_t>::max());
+   }
+   // Boundary: exactly uint32 max is accepted.
+   {
+      action_query q;
+      parse_query_block_range(
+         fc::mutable_variant_object()("block_num_end", uint64_t{std::numeric_limits<uint32_t>::max()}), q);
+      BOOST_TEST(q.block_num_end == std::numeric_limits<uint32_t>::max());
+   }
+   // 2^32 used to wrap to block 0 via as<uint32_t>(); it must throw (handler turns this into a 400).
+   {
+      action_query q;
+      BOOST_CHECK_THROW(parse_query_block_range(fc::mutable_variant_object()("block_num_start", too_big), q),
+                        fc::exception);
+   }
+   // Mixed oversized start with small end would have bypassed the start <= end validation after
+   // truncation (2^32 -> 0); it must throw instead of silently passing.
+   {
+      action_query q;
+      BOOST_CHECK_THROW(
+         parse_query_block_range(fc::mutable_variant_object()("block_num_start", too_big)("block_num_end", 5), q),
+         fc::exception);
+   }
+   // Negative values are rejected, not wrapped.
+   {
+      action_query q;
+      BOOST_CHECK_THROW(parse_query_block_range(fc::mutable_variant_object()("block_num_start", -1), q),
+                        fc::exception);
+   }
+}
+
+BOOST_AUTO_TEST_CASE(canonical_default_mirrors_single_filter) {
+   // receiver only -> account mirrored
+   {
+      action_query q;
+      q.receiver = "alice"_n;
+      apply_canonical_default(q, /*include_notifications=*/false);
+      BOOST_REQUIRE(q.account);
+      BOOST_TEST(*q.account == "alice"_n);
+   }
+   // account only -> receiver mirrored
+   {
+      action_query q;
+      q.account = "dex"_n;
+      apply_canonical_default(q, /*include_notifications=*/false);
+      BOOST_REQUIRE(q.receiver);
+      BOOST_TEST(*q.receiver == "dex"_n);
+   }
+   // both set -> untouched
+   {
+      action_query q;
+      q.receiver = "alice"_n;
+      q.account  = "dex"_n;
+      apply_canonical_default(q, /*include_notifications=*/false);
+      BOOST_TEST(*q.receiver == "alice"_n);
+      BOOST_TEST(*q.account  == "dex"_n);
+   }
+   // neither set -> untouched
+   {
+      action_query q;
+      apply_canonical_default(q, /*include_notifications=*/false);
+      BOOST_CHECK(!q.receiver);
+      BOOST_CHECK(!q.account);
+   }
+   // include_notifications opts out of mirroring entirely
+   {
+      action_query q;
+      q.receiver = "alice"_n;
+      apply_canonical_default(q, /*include_notifications=*/true);
+      BOOST_CHECK(!q.account);
+   }
+}
+
+BOOST_AUTO_TEST_CASE(clamp_query_range_bounds_span) {
+   // Within range: untouched.
+   {
+      action_query q;
+      q.block_num_start = 100;
+      q.block_num_end   = 150;
+      clamp_query_range(q, 1000);
+      BOOST_TEST(q.block_num_end == 150u);
+   }
+   // Over range: clamped to start + range - 1.
+   {
+      action_query q;
+      q.block_num_start = 100;
+      q.block_num_end   = std::numeric_limits<uint32_t>::max();
+      clamp_query_range(q, 1000);
+      BOOST_TEST(q.block_num_end == 1099u);
+   }
+   // Near the top of the uint32 range: 64-bit math keeps end at the requested value instead of wrapping.
+   {
+      action_query q;
+      q.block_num_start = std::numeric_limits<uint32_t>::max() - 2;
+      q.block_num_end   = std::numeric_limits<uint32_t>::max();
+      clamp_query_range(q, 1000);
+      BOOST_TEST(q.block_num_end == std::numeric_limits<uint32_t>::max());
+   }
+}
+
+BOOST_AUTO_TEST_CASE(clamp_query_end_to_recorded_bounds_scan) {
+   // Recorded watermark inside the window: end pulled back to it.
+   {
+      action_query q;
+      q.block_num_start = 100;
+      q.block_num_end   = 1099;
+      clamp_query_end_to_recorded(q, /*last_recorded=*/500);
+      BOOST_TEST(q.block_num_end == 500u);
+   }
+   // Watermark beyond the window: untouched.
+   {
+      action_query q;
+      q.block_num_start = 100;
+      q.block_num_end   = 1099;
+      clamp_query_end_to_recorded(q, /*last_recorded=*/5000);
+      BOOST_TEST(q.block_num_end == 1099u);
+   }
+   // Nothing recorded in the window yet: collapses to just below start so resume-at-end+1 retries.
+   {
+      action_query q;
+      q.block_num_start = 100;
+      q.block_num_end   = 1099;
+      clamp_query_end_to_recorded(q, /*last_recorded=*/50);
+      BOOST_TEST(q.block_num_end == 99u);
+   }
+   // Degenerate start == 0 with an empty store: end pinned at 0 (no uint32 underflow).
+   {
+      action_query q;
+      q.block_num_start = 0;
+      q.block_num_end   = 999;
+      clamp_query_end_to_recorded(q, /*last_recorded=*/0);
+      BOOST_TEST(q.block_num_end == 0u);
+   }
 }
 
 BOOST_AUTO_TEST_SUITE_END()

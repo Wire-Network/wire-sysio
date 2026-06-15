@@ -196,7 +196,7 @@ namespace fc
       FC_THROW_EXCEPTION( bad_cast_exception,
                           "invalid index '{}' in enum '{}'", i, e );
    }
-   void throw_bad_enum_cast( const char* k, const char* e )
+   void throw_bad_enum_cast( std::string_view k, const char* e )
    {
       FC_THROW_EXCEPTION( bad_cast_exception,
                           "invalid name '{}' in enum '{}'", k, e );

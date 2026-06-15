@@ -5,7 +5,6 @@ import time
 import signal
 import threading
 import os
-import platform
 import traceback
 
 from TestHarness import Account, Cluster, ReturnType, TestHelper, Utils, WalletMgr
@@ -25,8 +24,9 @@ errorExit=Utils.errorExit
 appArgs=AppArgs()
 appArgs.add(flag="--read-only-threads", type=int, help="number of read-only threads", default=0)
 appArgs.add(flag="--num-test-runs", type=int, help="number of times to run the tests", default=1)
-appArgs.add(flag="--sys-vm-oc-enable", type=str, help="specify sys-vm-oc-enable option", default="auto")
-appArgs.add(flag="--wasm-runtime", type=str, help="if wanting sys-vm-oc, must use 'sys-vm-oc-forced'", default="sys-vm-jit")
+appArgs.add(flag="--sys-vm-oc-enable", type=str, help="specify sys-vm-oc-enable option", default=Utils.SysVmOcEnableAuto)
+appArgs.add(flag="--wasm-runtime", type=str, help="if wanting sys-vm-oc, must use 'sys-vm-oc-forced'",
+            default=Utils.defaultWasmRuntime())
 
 args=TestHelper.parse_args({"-p","-n","-d","-s","--nodes-file","--seed"
                             ,"--activate-if","--dump-error-details","-v","--leave-running"
@@ -51,8 +51,9 @@ numTestRuns=args.num_test_runs
 Utils.Debug=debug
 testSuccessful=False
 errorInThread=False
-noOC = args.sys_vm_oc_enable == "none"
-allOC = args.sys_vm_oc_enable == "all"
+noOC = args.sys_vm_oc_enable == Utils.SysVmOcEnableNone
+ocSupported = Utils.nodeopSupportsSysVmOc()
+ocRequested = Utils.sysVmOcExecutionExpected(args.sys_vm_oc_enable)
 
 random.seed(seed) # Use a fixed seed for repeatability.
 # all debuglevel so that "executing ${h} with sys vm oc" is logged
@@ -111,16 +112,17 @@ def startCluster():
     specificExtraNodeopArgs[pnodes]+=" 10000 "
     specificExtraNodeopArgs[pnodes]+=" --read-only-read-window-time-us "
     specificExtraNodeopArgs[pnodes]+=" 510000 "
-    specificExtraNodeopArgs[pnodes]+=" --sys-vm-oc-cache-size-mb "
-    specificExtraNodeopArgs[pnodes]+=" 1 " # set small so there is churn
     specificExtraNodeopArgs[pnodes]+=" --read-only-threads "
     specificExtraNodeopArgs[pnodes]+=str(args.read_only_threads)
-    if args.sys_vm_oc_enable:
-        if platform.system() != "Linux":
-            Print("OC not run on Linux. Skip the test")
-            exit(True) # Do not fail the test
+    if Utils.shouldSkipBecauseSysVmOcUnavailable(args.sys_vm_oc_enable, args.wasm_runtime):
+        Print("sys-vm-oc is unavailable on this platform. Skip the test")
+        exit(0) # Do not fail the test
+    if ocSupported:
         specificExtraNodeopArgs[pnodes]+=" --sys-vm-oc-enable "
         specificExtraNodeopArgs[pnodes]+=args.sys_vm_oc_enable
+    if ocRequested:
+        specificExtraNodeopArgs[pnodes]+=" --sys-vm-oc-cache-size-mb "
+        specificExtraNodeopArgs[pnodes]+=" 1 " # set small so there is churn
     if args.wasm_runtime:
         specificExtraNodeopArgs[pnodes]+=" --wasm-runtime "
         specificExtraNodeopArgs[pnodes]+=args.wasm_runtime
@@ -137,12 +139,10 @@ def startCluster():
     apiNode = cluster.nodes[-1]
 
     sysioCodeHash = getCodeHash(producerNode, "sysio.token")
-    # sysio.* should be using oc unless oc tierup disabled
-    Utils.Print(f"search: executing {sysioCodeHash} with sys vm oc")
-    found = producerNode.findInLog(f"executing {sysioCodeHash} with sys vm oc")
-    assert( found or (noOC and not found) )
+    # sysio.* should be using oc unless oc tierup disabled.
+    Utils.assertInitialSysVmOcLogState(producerNode, apiNode, sysioCodeHash, args.sys_vm_oc_enable, ocSupported)
 
-    if args.sys_vm_oc_enable:
+    if ocRequested:
         verifyOcVirtualMemory()
 
 def verifyOcVirtualMemory():
@@ -335,13 +335,15 @@ def basicTests():
 
     testAccountCodeHash = getCodeHash(producerNode, testAccountName)
     found = producerNode.findInLog(f"executing {testAccountCodeHash} with sys vm oc")
-    assert( (allOC and found) or not found )
+    assert(not found)
 
     # verify the return value (age) from read-only is the same as created.
     Print("Send a read-only Get transaction to verify previous Insert")
     results = sendTransaction(testAccountName, 'getage', {"user": userAccountName}, opts='--read')
     assert(results[0])
     assert(results[1]['processed']['action_traces'][0]['return_value_data'] == 10)
+    if noOC or not ocSupported:
+        Utils.assertSysVmOcLogAbsent(apiNode, testAccountCodeHash, "apiNode")
 
     # verify non-read-only modification works
     Print("Send a non-read-only Modify transaction")

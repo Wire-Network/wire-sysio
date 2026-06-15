@@ -5,15 +5,17 @@
 namespace sysio::trace_api {
 
    std::shared_ptr<chain::abi_serializer> abi_data_handler::get_serializer(chain::name account, uint64_t action_global_seq) {
-      if (!_abi_lookup_fn) return nullptr;
+      if (!_abi_seq_resolver) return nullptr;
 
-      // Resolve the effective ABI version first.  Using it as the cache key means
-      // N actions sharing the same setabi all hit the same entry; keying on the
-      // action's global_seq instead (as a prior impl did) defeats the cache.
-      auto lookup = _abi_lookup_fn(account, action_global_seq);
-      if (!lookup || lookup->abi_bytes.empty()) return nullptr;
+      // Resolve the effective ABI version first - an index-only probe with no blob I/O.  Using it
+      // as the cache key means N actions sharing the same setabi all hit the same entry; keying on
+      // the action's global_seq instead (as a prior impl did) defeats the cache.  The blob itself
+      // is fetched only on a cache miss, so a bulk query over thousands of actions sharing one ABI
+      // version pays for a single blob read.
+      const std::optional<uint64_t> effective_seq = _abi_seq_resolver(account, action_global_seq);
+      if (!effective_seq) return nullptr;
 
-      const cache_key key{account, lookup->effective_global_seq};
+      const cache_key key{account, *effective_seq};
 
       {
          std::lock_guard lock(_cache_mtx);
@@ -25,12 +27,18 @@ namespace sysio::trace_api {
          }
       }
 
-      // Miss: build the serializer outside the lock to avoid blocking other
-      // cache users during a potentially slow unpack.
+      // Miss: fetch the blob and build the serializer outside the lock to avoid
+      // blocking other cache users during the read and a potentially slow unpack.
+      if (!_abi_blob_fetcher) return nullptr;
+      const std::optional<std::vector<char>> abi_bytes = _abi_blob_fetcher(account, *effective_seq);
+      // An empty blob is a recorded ABI *clear* (setabi with no abi): the version exists so the
+      // resolver finds it, but there is nothing to decode with.
+      if (!abi_bytes || abi_bytes->empty()) return nullptr;
+
       std::shared_ptr<chain::abi_serializer> serializer;
       try {
          chain::abi_def abi;
-         auto ds = fc::datastream<const char*>(lookup->abi_bytes.data(), lookup->abi_bytes.size());
+         auto ds = fc::datastream<const char*>(abi_bytes->data(), abi_bytes->size());
          fc::raw::unpack(ds, abi);
          serializer = std::make_shared<chain::abi_serializer>(std::move(abi),
             chain::abi_serializer::create_yield_function(fc::microseconds::maximum()));
@@ -69,7 +77,7 @@ namespace sysio::trace_api {
       auto abi_yield = [](size_t recursion_depth) {
          SYS_ASSERT( recursion_depth < chain::abi_serializer::max_recursion_depth,
                      chain::abi_recursion_depth_exception,
-                     "exceeded max_recursion_depth {} ", chain::abi_serializer::max_recursion_depth );
+                     "exceeded max_recursion_depth {}", chain::abi_serializer::max_recursion_depth );
       };
 
       // Separate try blocks so that a failure decoding return_value does not

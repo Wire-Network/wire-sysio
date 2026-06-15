@@ -3,12 +3,14 @@
 #include <fc/scoped_exit.hpp>
 #include <fc/static_variant.hpp>
 
+#include <filesystem>
+
 #include <boost/beast/core.hpp>
 #include <boost/beast/http.hpp>
 #include <boost/beast/version.hpp>
 #include <boost/asio/connect.hpp>
 #include <boost/asio/ip/tcp.hpp>
-#include <boost/asio/deadline_timer.hpp>
+#include <boost/asio/system_timer.hpp>
 #include <boost/asio/local/stream_protocol.hpp>
 
 using tcp = boost::asio::ip::tcp;       // from <boost/asio/ip/tcp.hpp>
@@ -33,7 +35,7 @@ public:
    using connection_map = std::map<host_key, connection>;
    using unix_url_split_map = std::map<std::string, fc::url>;
    using error_code = boost::system::error_code;
-   using deadline_type = boost::posix_time::ptime;
+   using deadline_type = std::chrono::system_clock::time_point;
 
    http_client_impl()
    :_ioc()
@@ -48,7 +50,7 @@ public:
    template<typename SyncReadStream, typename Fn, typename CancelFn>
    error_code sync_do_with_deadline( SyncReadStream& s, deadline_type deadline, Fn f, CancelFn cf ) {
       bool timer_expired = false;
-      boost::asio::deadline_timer timer(_ioc);
+      boost::asio::system_timer timer(_ioc);
 
       timer.expires_at(deadline);
       bool timer_cancelled = false;
@@ -128,6 +130,27 @@ public:
    error_code sync_read_with_timeout(SyncReadStream& s, boost::beast::flat_buffer& buffer, http::response<http::string_body>& res, const deadline_type& deadline ) {
       return sync_do_with_deadline(s, deadline, [&s, &buffer, &res](std::optional<error_code>& final_ec){
          http::async_read(s, buffer, res, [&final_ec]( const error_code& ec, std::size_t ) {
+            final_ec.emplace(ec);
+         });
+      });
+   }
+
+   /// Read only the response header into @p parser, honoring @p deadline. Used by the
+   /// streaming download path to inspect the status line before committing the body to a file.
+   template<typename SyncReadStream, typename Parser>
+   error_code sync_read_header_with_timeout(SyncReadStream& s, boost::beast::flat_buffer& buffer, Parser& parser, const deadline_type& deadline ) {
+      return sync_do_with_deadline(s, deadline, [&s, &buffer, &parser](std::optional<error_code>& final_ec){
+         http::async_read_header(s, buffer, parser, [&final_ec]( const error_code& ec, std::size_t ) {
+            final_ec.emplace(ec);
+         });
+      });
+   }
+
+   /// Read the remainder of the response (the body) into @p parser, honoring @p deadline.
+   template<typename SyncReadStream, typename Parser>
+   error_code sync_read_parser_with_timeout(SyncReadStream& s, boost::beast::flat_buffer& buffer, Parser& parser, const deadline_type& deadline ) {
+      return sync_do_with_deadline(s, deadline, [&s, &buffer, &parser](std::optional<error_code>& final_ec){
+         http::async_read(s, buffer, parser, [&final_ec]( const error_code& ec, std::size_t ) {
             final_ec.emplace(ec);
          });
       });
@@ -248,8 +271,7 @@ public:
    };
 
    variant post_sync(const url& dest, const variant& payload, const fc::time_point& _deadline) {
-      static const deadline_type epoch(boost::gregorian::date(1970, 1, 1));
-      auto deadline = epoch + boost::posix_time::microseconds(_deadline.time_since_epoch().count());
+      auto deadline = _deadline.to_system_clock();
       FC_ASSERT(dest.host(), "No host set on URL");
 
       std::string path = dest.path() ? dest.path()->generic_string() : "/";
@@ -366,6 +388,97 @@ public:
       return _unix_url_paths.emplace(full_url, fc::url("unix", socket_file.string(), ostring(), ostring(), url_path.string(), ostring(), ovariant_object(), std::optional<uint16_t>())).first->second;
    }
 
+   void post_to_file(const url& dest, const variant& payload, const std::filesystem::path& final_dest, const fc::time_point& deadline_time) {
+      auto deadline = deadline_time.to_system_clock();
+      FC_ASSERT(dest.host(), "No host set on URL");
+
+      std::string path = dest.path() ? dest.path()->generic_string() : "/";
+      if (dest.query()) {
+         path = path + "?" + *dest.query();
+      }
+
+      std::string host_str = *dest.host();
+      if (dest.port()) {
+         auto port = *dest.port();
+         auto proto_iter = default_proto_ports.find(dest.proto());
+         if (proto_iter != default_proto_ports.end() && proto_iter->second != port) {
+            host_str = host_str + ":" + std::to_string(port);
+         }
+      }
+
+      http::request<http::string_body> req{http::verb::post, path, 11};
+      req.set(http::field::host, host_str);
+      req.set(http::field::user_agent, BOOST_BEAST_VERSION_STRING);
+      req.set(http::field::content_type, "application/json");
+      req.keep_alive(false);
+      req.body() = json::to_string(payload, deadline_time);
+      req.prepare_payload();
+
+      auto conn_iter = get_connection(dest, deadline);
+      auto eraser = make_scoped_exit([this, &conn_iter](){
+         _connections.erase(conn_iter);
+      });
+
+      error_code ec = std::visit(write_request_visitor(this, req, deadline), conn_iter->second);
+      FC_ASSERT(!ec, "Failed to send POST request: {}", ec.message());
+
+      // Stream the response body straight to disk through a file_body parser: snapshot
+      // downloads are multi-GB, so buffering the payload in a string_body response could
+      // exhaust memory long before the data reaches its hash check.
+      boost::beast::flat_buffer buffer;
+      http::response_parser<http::file_body> parser;
+      // The download exceeds the parser's default body-size limit; the transfer is bounded
+      // by the caller's deadline and by available disk space instead.
+      parser.body_limit(boost::none);
+
+      ec = std::visit([&](auto& stream) {
+         return sync_read_header_with_timeout(*stream, buffer, parser, deadline);
+      }, conn_iter->second);
+      FC_ASSERT(!ec, "Failed to read response header: {}", ec.message());
+
+      // Require exactly 200 OK: this client never sends Range requests, so 206 Partial Content
+      // can only come from a broken or hostile endpoint/proxy, and renaming a partial body into
+      // the final destination would hand the caller a truncated file.
+      const auto status = parser.get().result();
+      if (status != http::status::ok) {
+         // Error responses carry small diagnostic bodies; read into memory for the message.
+         // Best effort: on a read failure the throw below reports whatever body arrived.
+         http::response_parser<http::string_body> err_parser{std::move(parser)};
+         if (!err_parser.is_done()) {
+            std::visit([&](auto& stream) {
+               return sync_read_parser_with_timeout(*stream, buffer, err_parser, deadline);
+            }, conn_iter->second);
+         }
+         FC_THROW("HTTP POST failed with status {}: {}", (int)status, err_parser.get().body().substr(0, 200));
+      }
+
+      // Write to temp file then rename
+      auto temp_path = final_dest;
+      temp_path += ".downloading";
+      auto cleanup = make_scoped_exit([&temp_path](){
+         std::error_code rm_ec;
+         std::filesystem::remove(temp_path, rm_ec);
+      });
+
+      http::file_body::value_type file;
+      file.open(temp_path.c_str(), boost::beast::file_mode::write, ec);
+      FC_ASSERT(!ec, "Failed to open temp file {} for writing: {}", temp_path.string(), ec.message());
+      parser.get().body() = std::move(file);
+
+      if (!parser.is_done()) {
+         ec = std::visit([&](auto& stream) {
+            return sync_read_parser_with_timeout(*stream, buffer, parser, deadline);
+         }, conn_iter->second);
+         FC_ASSERT(!ec, "Failed to read response body: {}", ec.message());
+      }
+      parser.get().body().close();
+
+      std::error_code rename_ec;
+      std::filesystem::rename(temp_path, final_dest, rename_ec);
+      FC_ASSERT(!rename_ec, "Failed to rename downloaded file: {}", rename_ec.message());
+      cleanup.cancel();
+   }
+
    boost::asio::io_context  _ioc;
    connection_map           _connections;
    unix_url_split_map       _unix_url_paths;
@@ -376,6 +489,10 @@ http_client::http_client()
 :_my(new http_client_impl())
 {
 
+}
+
+void http_client::post_to_file(const url& dest, const variant& payload, const std::filesystem::path& output, const fc::time_point& deadline) {
+   _my->post_to_file(dest, payload, output, deadline);
 }
 
 variant http_client::post_sync(const url& dest, const variant& payload, const fc::time_point& deadline) {

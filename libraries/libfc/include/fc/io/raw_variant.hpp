@@ -44,9 +44,14 @@ namespace fc { namespace raw {
          {
             fc::raw::pack( s, v );
          }
-         virtual void handle( const std::string& v )const
+         virtual void handle( std::string_view v )const
          {
-            fc::raw::pack( s, v );
+            // Inline the byte-write rather than going through fc::raw::pack(string_view)
+            // because partial ordering picks the generic pack<Stream, T> template over
+            // a concrete-typed string_view overload.
+            FC_ASSERT( v.size() <= MAX_SIZE_OF_BYTE_ARRAYS );
+            fc::raw::pack( s, unsigned_int((uint32_t)v.size()) );
+            if( v.size() ) s.write( v.data(), v.size() );
          }
          virtual void handle( const variant_object& v)const
          {
@@ -66,10 +71,13 @@ namespace fc { namespace raw {
     };
 
 
-    template<typename Stream> 
+    template<typename Stream>
     inline void pack( Stream& s, const variant& v )
     {
-       pack( s, uint8_t(v.get_type()) );
+       // Wire format uses string_type for both heap and SSO; payload bytes are identical.
+       uint8_t wire_type = uint8_t(v.get_type());
+       if (wire_type == variant::string_sso_type) wire_type = variant::string_type;
+       pack( s, wire_type );
        v.visit( variant_packer<Stream>(s) );
     }
     template<typename Stream> 

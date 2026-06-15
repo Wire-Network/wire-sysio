@@ -15,12 +15,20 @@ namespace {
       return fc::raw::pack(abi);
    }
 
-   // Build a lookup_fn that returns packed ABI bytes for a given account.
-   // effective_global_seq is fixed at 0 for test purposes -- the handler's
-   // cache key becomes (account, 0) regardless of the action's global_seq.
-   abi_data_handler::abi_lookup_fn make_lookup(chain::name account, std::vector<char> abi_bytes) {
-      return [account, bytes = std::move(abi_bytes)](chain::name a, uint64_t) -> std::optional<abi_data_handler::lookup_entry> {
-         if (a == account) return abi_data_handler::lookup_entry{0, bytes};
+   // Resolver half of the two-phase lookup: the account has exactly one ABI version, recorded at
+   // effective_global_seq 0, so the handler's cache key becomes (account, 0) regardless of the
+   // action's global_seq.
+   abi_data_handler::abi_seq_resolver_fn make_resolver(chain::name account) {
+      return [account](chain::name a, uint64_t) -> std::optional<uint64_t> {
+         if (a == account) return uint64_t{0};
+         return std::nullopt;
+      };
+   }
+
+   // Fetcher half: returns the packed ABI bytes for the (account, 0) version the resolver names.
+   abi_data_handler::abi_blob_fetcher_fn make_fetcher(chain::name account, std::vector<char> abi_bytes) {
+      return [account, bytes = std::move(abi_bytes)](chain::name a, uint64_t effective_seq) -> std::optional<std::vector<char>> {
+         if (a == account && effective_seq == 0) return bytes;
          return std::nullopt;
       };
    }
@@ -106,7 +114,7 @@ BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
       );
       abi.version = "sysio::abi/1.";
 
-      abi_data_handler handler(exception_handler{}, make_lookup("alice"_n, pack_abi(abi)));
+      abi_data_handler handler(exception_handler{}, make_resolver("alice"_n), make_fetcher("alice"_n, pack_abi(abi)));
 
       fc::variant expected = fc::mutable_variant_object()
          ("a", 0)
@@ -145,7 +153,7 @@ BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
       abi.version = "sysio::abi/1.";
       abi.action_results = { std::vector<chain::action_result_def>{ chain::action_result_def{ "foo"_n, "foor"} } };
 
-      abi_data_handler handler(exception_handler{}, make_lookup("alice"_n, pack_abi(abi)));
+      abi_data_handler handler(exception_handler{}, make_resolver("alice"_n), make_fetcher("alice"_n, pack_abi(abi)));
 
       fc::variant expected = fc::mutable_variant_object()
             ("a", 0)
@@ -187,7 +195,7 @@ BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
       );
       abi.version = "sysio::abi/1.";
 
-      abi_data_handler handler(exception_handler{}, make_lookup("alice"_n, pack_abi(abi)));
+      abi_data_handler handler(exception_handler{}, make_resolver("alice"_n), make_fetcher("alice"_n, pack_abi(abi)));
 
       auto expected = fc::variant();
 
@@ -222,7 +230,8 @@ BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
       bool log_called = false;
       abi_data_handler handler(
          [&log_called](const exception_with_context& ){log_called = true;},
-         make_lookup("alice"_n, pack_abi(abi))
+         make_resolver("alice"_n),
+         make_fetcher("alice"_n, pack_abi(abi))
       );
 
       auto expected = fc::variant();
@@ -258,7 +267,7 @@ BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
       );
       abi.version = "sysio::abi/1.";
 
-      abi_data_handler handler(exception_handler{}, make_lookup("alice"_n, pack_abi(abi)));
+      abi_data_handler handler(exception_handler{}, make_resolver("alice"_n), make_fetcher("alice"_n, pack_abi(abi)));
 
       fc::variant expected = fc::mutable_variant_object()
             ("a", 0)
