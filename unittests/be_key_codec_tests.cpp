@@ -137,6 +137,12 @@ BOOST_AUTO_TEST_CASE(rejections) {
    // Unknown type: neither leaf, typedef, nor struct.
    BOOST_CHECK_THROW(codec::build_key_shapes(abi, {"k"}, {"mystery_type"}), fc::exception);
 
+   // 256-bit integers have no codec leaf and no CDT producer. build_key_shapes
+   // must reject them — this is exactly what drives chain_plugin to leave
+   // key_shapes unset and fall back to hex bounds (the defensive nullopt path).
+   BOOST_CHECK_THROW(codec::build_key_shapes(abi, {"k"}, {"uint256"}), fc::exception);
+   BOOST_CHECK_THROW(codec::build_key_shapes(abi, {"k"}, {"int256"}), fc::exception);
+
    // Struct with a base has no defined to_key field order — rejected.
    BOOST_CHECK_THROW(codec::build_key_shapes(abi, {"k"}, {"based_key"}), fc::exception);
 
@@ -146,13 +152,71 @@ BOOST_AUTO_TEST_CASE(rejections) {
       "code", fc::mutable_variant_object("wrong_field", 1)));
    BOOST_CHECK_THROW(codec::encode_key(missing, shapes), fc::exception);
 
-   // Nesting depth guard.
+   // Nesting depth guard: a chain deeper than max_key_struct_depth is rejected.
+   // (Also bounds self-referential struct definitions, which recurse until this
+   // limit trips.)
+   const int too_deep = static_cast<int>(codec::max_key_struct_depth) + 2;
    abi_def deep;
    deep.structs.emplace_back(struct_def{"level0", "", {field_def{"v", "uint64"}}});
-   for (int i = 1; i <= 10; ++i)
+   for (int i = 1; i <= too_deep; ++i)
       deep.structs.emplace_back(struct_def{
          "level" + std::to_string(i), "", {field_def{"inner", "level" + std::to_string(i - 1)}}});
-   BOOST_CHECK_THROW(codec::build_key_shapes(deep, {"k"}, {"level10"}), fc::exception);
+   BOOST_CHECK_THROW(
+      codec::build_key_shapes(deep, {"k"}, {"level" + std::to_string(too_deep)}), fc::exception);
+}
+
+// Pins the invariant that supported_leaf_key_types is the single source of
+// truth: every entry must be handled by BOTH encode_field and decode_field.
+// A representative value is encoded and decoded for each; a list entry with no
+// matching codec branch would throw "Unsupported BE key type" and fail here,
+// rather than degrading silently (missing from the list -> hex fallback) or
+// asserting at request time (missing from the if-chain) in production.
+BOOST_AUTO_TEST_CASE(leaf_support_list_roundtrips) {
+   auto sample = [](std::string_view t) -> fc::variant {
+      if (t == "checksum256") return fc::variant(fc::sha256::hash(std::string("x")).str());
+      if (t == "name")        return fc::variant(std::string("alice"));
+      if (t == "bool")        return fc::variant(true);
+      if (t == "string")      return fc::variant(std::string("hi"));
+      if (t == "float128" || t == "long double") {
+         float128_t f = ::f64_to_f128(to_softfloat64(1.5));
+         fc::variant v; fc::to_variant(f, v); return v;
+      }
+      if (t == "float32" || t == "float" || t == "float64" || t == "double")
+         return fc::variant(1.5);
+      // 128-bit ints: use fc's matched to_variant/from_variant spelling.
+      if (t == "uint128") { fc::variant v; fc::to_variant(fc::uint128(7), v); return v; }
+      if (t == "int128")  { fc::variant v; fc::to_variant(static_cast<fc::int128>(-3), v); return v; }
+      if (t == "int8" || t == "int16" || t == "int32" || t == "int64")
+         return fc::variant(static_cast<int64_t>(-3));
+      return fc::variant(static_cast<uint64_t>(7)); // remaining unsigned ints
+   };
+
+   const abi_def abi; // builtin leaves need no typedefs/structs
+   for (std::string_view t : codec::supported_leaf_key_types) {
+      const std::string type{t};
+      std::vector<char> bytes;
+      BOOST_REQUIRE_NO_THROW(bytes = encode_single(abi, type, sample(t)));
+      auto shapes = codec::build_key_shapes(abi, {"k"}, {type});
+      BOOST_CHECK_NO_THROW(codec::decode_key(bytes.data(), bytes.size(), shapes));
+   }
+}
+
+// A struct key with zero fields is a node with no children: it must encode to
+// zero bytes (matching to_key's reflected walk over no fields) rather than be
+// misrouted to the leaf codec and rejected. Guards the explicit key_shape
+// is_leaf flag against the old `children.empty()` inference.
+BOOST_AUTO_TEST_CASE(empty_struct_key_encodes_to_zero_bytes) {
+   abi_def abi;
+   abi.structs.emplace_back(struct_def{"empty_key", "", {}});
+   auto shapes = codec::build_key_shapes(abi, {"k"}, {"empty_key"});
+
+   auto bytes = codec::encode_key(
+      fc::variant(fc::mutable_variant_object("k", fc::mutable_variant_object())), shapes);
+   BOOST_CHECK(bytes.empty());
+
+   auto decoded = codec::decode_key(bytes.data(), bytes.size(), shapes);
+   BOOST_REQUIRE(decoded.get_object()["k"].is_object());
+   BOOST_CHECK_EQUAL(decoded.get_object()["k"].get_object().size(), 0u);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

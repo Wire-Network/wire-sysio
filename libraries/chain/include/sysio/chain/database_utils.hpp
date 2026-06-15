@@ -7,6 +7,10 @@
 #include <fc/crypto/base64.hpp>
 #include <softfloat/softfloat.hpp>
 
+#include <algorithm>
+#include <array>
+#include <string_view>
+
 namespace sysio::chain {
 
    template<typename ...Indices>
@@ -307,9 +311,13 @@ inline fc::variant decode_field(reader& r, const std::string& type) {
       return fc::variant(v);
    }
    if (type == "float128" || type == "long double") {
-      // Same IEEE sort-order trick as float32/64 at 128 bits — mirrors CDT's
-      // kv_multi_index encode_secondary(long double). Spelling is fc's
-      // canonical float128_t form ("0x" + 16 LE hex bytes).
+      // Same IEEE sort-order trick as float32/64 at 128 bits. SOURCE OF TRUTH:
+      // these bytes were produced by CDT kv_multi_index::encode_secondary(long
+      // double) (wire-cdt kv_multi_index.hpp) and stored in the row's secondary
+      // key — this branch must invert that transform byte-for-byte. The e2e
+      // float128 pagination in get_table_tests (sec-9) pins the agreement; a
+      // change to CDT's long-double key encoding would break it there. Spelling
+      // is fc's canonical float128_t form ("0x" + 16 LE hex bytes).
       const uint64_t hi_enc = r.read_be64();
       const uint64_t lo_enc = r.read_be64();
       fc::uint128 bits = fc::to_uint128(hi_enc, lo_enc);
@@ -374,6 +382,10 @@ inline void encode_field(writer& w, const std::string& type, const fc::variant& 
       w.write_be64(bits); return;
    }
    if (type == "float128" || type == "long double") {
+      // Inverse of the decode_field float128 branch; must reproduce CDT
+      // kv_multi_index::encode_secondary(long double) byte-for-byte so a JSON
+      // bound compares against the stored secondary key (see that branch for the
+      // source-of-truth note).
       float128_t f;
       fc::from_variant(val, f);
       fc::uint128 bits;
@@ -396,15 +408,28 @@ inline void encode_field(writer& w, const std::string& type, const fc::variant& 
 // field: a leaf with a codec-supported type, or a struct node whose children
 // encode in declaration order (matching to_key's reflected-field walk).
 
-/// Whether `type` (already typedef-resolved) is handled directly by
-/// encode_field / decode_field. Keep in lock-step with the branch lists above.
+/// Single source of truth for the leaf key-type spellings handled directly by
+/// encode_field / decode_field. `leaf_key_type_supported` tests membership here,
+/// and `build_key_shape` uses that to decide leaf-vs-struct. INVARIANT: every
+/// entry MUST have a matching branch in BOTH encode_field and decode_field above
+/// — the be_key_codec_tests `leaf_support_list_roundtrips` case round-trips each
+/// entry to pin that, so a drift between this list and the if-chains is caught at
+/// test time rather than as a silent hex fallback (missing from the list) or a
+/// runtime "Unsupported BE key type" assert (missing from the if-chain).
+inline constexpr std::array<std::string_view, 20> supported_leaf_key_types{{
+   "uint8",   "int8",   "uint16",  "int16",  "uint32",  "int32",  "uint64", "int64",
+   "uint128", "int128", "checksum256",
+   "name",    "bool",   "string",
+   "float32", "float",  "float64", "double", "float128", "long double",
+}};
+
+/// Whether `type` (already typedef-resolved) is a codec leaf — i.e. a member of
+/// supported_leaf_key_types, encoded/decoded directly rather than expanded as a
+/// struct.
 inline bool leaf_key_type_supported(const std::string& t) {
-   return t == "uint8"   || t == "int8"   || t == "uint16"  || t == "int16"  ||
-          t == "uint32"  || t == "int32"  || t == "uint64"  || t == "int64"  ||
-          t == "uint128" || t == "int128" || t == "checksum256" ||
-          t == "name"    || t == "bool"   || t == "string"  ||
-          t == "float32" || t == "float"  || t == "float64" || t == "double" ||
-          t == "float128" || t == "long double";
+   const std::string_view sv{t};
+   return std::find(supported_leaf_key_types.begin(), supported_leaf_key_types.end(), sv)
+          != supported_leaf_key_types.end();
 }
 
 /// Canonicalize abigen template spellings and chase ABI typedefs to a
@@ -420,13 +445,17 @@ inline std::string resolve_key_type(const abi_def& abi, std::string type) {
    return type;
 }
 
+/// Maximum struct-key nesting depth. Bounds build_key_shape's recursion so a
+/// self-referential struct definition (a key struct with a field of its own
+/// type) is rejected with a clear error instead of overflowing the stack.
+inline constexpr size_t max_key_struct_depth = 8;
+
 /// Resolved encode/decode plan for one key field.
 struct key_shape {
-   std::string            name;     ///< field name (bound-object key / decoded-object key)
-   std::string            type;     ///< resolved type — leaf codec type, or struct name for nodes
-   std::vector<key_shape> children; ///< struct field shapes in declaration (encode) order
-
-   bool is_leaf() const { return children.empty(); }
+   std::string            name;            ///< field name (bound-object key / decoded-object key)
+   std::string            type;            ///< resolved type — leaf codec type, or struct name for nodes
+   bool                   is_leaf = false; ///< true → encode/decode via the leaf codec; false → struct node (recurse children)
+   std::vector<key_shape> children;        ///< struct field shapes in declaration (encode) order
 };
 
 /// Build the shape for one declared key field, expanding struct key types
@@ -434,12 +463,16 @@ struct key_shape {
 /// only the declared fields, so a based key struct has no defined order here).
 inline key_shape build_key_shape(const abi_def& abi, const std::string& field_name,
                                  const std::string& declared_type, size_t depth = 0) {
-   FC_ASSERT(depth <= 8, "BE key struct nesting too deep at field '{}'", field_name);
+   FC_ASSERT(depth <= max_key_struct_depth, "BE key struct nesting too deep at field '{}'", field_name);
    key_shape shape;
    shape.name = field_name;
    shape.type = resolve_key_type(abi, declared_type);
-   if (leaf_key_type_supported(shape.type))
+   if (leaf_key_type_supported(shape.type)) {
+      shape.is_leaf = true;
       return shape;
+   }
+   // Not a leaf: a struct node. A zero-field struct stays a node with no
+   // children and encodes to zero bytes, matching to_key's reflected walk.
    auto it = std::find_if(abi.structs.begin(), abi.structs.end(),
                           [&](const struct_def& sd) { return sd.name == shape.type; });
    FC_ASSERT(it != abi.structs.end(), "Unsupported BE key type: {}", shape.type);
@@ -462,8 +495,11 @@ inline std::vector<key_shape> build_key_shapes(const abi_def& abi,
    return shapes;
 }
 
+/// Encode one key field per its shape: a leaf goes straight to encode_field; a
+/// struct node reads each child by name from `val` (a JSON object) and encodes
+/// the children in declaration order, matching to_key's reflected-field walk.
 inline void encode_shape(writer& w, const key_shape& shape, const fc::variant& val) {
-   if (shape.is_leaf()) {
+   if (shape.is_leaf) {
       encode_field(w, shape.type, val);
       return;
    }
@@ -476,8 +512,11 @@ inline void encode_shape(writer& w, const key_shape& shape, const fc::variant& v
    }
 }
 
+/// Decode one key field per its shape: a leaf returns the decoded scalar; a
+/// struct node returns a nested object of its children, decoded in declaration
+/// order (the inverse of encode_shape).
 inline fc::variant decode_shape(reader& r, const key_shape& shape) {
-   if (shape.is_leaf())
+   if (shape.is_leaf)
       return decode_field(r, shape.type);
    fc::mutable_variant_object obj;
    for (const auto& child : shape.children)

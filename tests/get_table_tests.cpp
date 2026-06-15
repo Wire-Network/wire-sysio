@@ -720,7 +720,9 @@ BOOST_FIXTURE_TEST_CASE( get_table_next_key_test, validating_tester ) try {
    //         float128 leaf in the BE key codec: next_key carries the canonical
    //         fc float128 spelling ("0x" + 16 LE hex bytes) produced by
    //         decode_field and is fed back through encode_field as lower_bound.
-   //         secldouble mirrors sec64 (2, 5, 7) in the contract's add path.
+   //         The three numobjs rows were added earlier in this test; the contract
+   //         sets secldouble = sec64 = input, so the float128 sort order matches
+   //         the uint64 order (sec64 = 2, 5, 7) and pagination lands on the same rows.
    {
       chain_apis::read_only::get_table_rows_params p;
       p.json = true;
@@ -759,7 +761,8 @@ BOOST_FIXTURE_TEST_CASE( get_table_next_key_test, validating_tester ) try {
       chain_apis::read_only::get_table_rows_params p;
       p.json  = true;
       p.code  = "test"_n;
-      p.scope = "test";
+      // structobjs is an unscoped kv::table (key_names[0] == "code", not "scope"),
+      // so no `scope` is set — the rows live under code="test"/table_id.
       p.table = "structobjs";
       p.lower_bound = R"({"code":{"value":20}})";
       auto bounded = get_table_rows_full(plugin, p, fc::time_point::maximum());
