@@ -29,6 +29,9 @@ namespace fs = std::filesystem;
 
 class snapshot_scheduler {
 public:
+   template<typename T>
+   using next_function = sysio::chain::next_function<T>;
+
    struct snapshot_information {
       chain::block_id_type head_block_id;
       uint32_t head_block_num;
@@ -63,14 +66,12 @@ public:
 
    struct snapshot_schedule_information : public snapshot_request_id_information, public snapshot_request_information {
       std::vector<snapshot_information> pending_snapshots;
+      next_function<snapshot_information> next; // not serialized
    };
 
    struct get_snapshot_requests_result {
       std::vector<snapshot_schedule_information> snapshot_requests;
    };
-
-   template<typename T>
-   using next_function = sysio::chain::next_function<T>;
 
    struct by_height;
 
@@ -217,8 +218,13 @@ public:
    void on_irreversible_block(const signed_block_ptr& lib, const block_id_type& block_id, const chain::controller& chain);
 
    // snapshot scheduler handlers
-   snapshot_schedule_result schedule_snapshot(const snapshot_request_information& sri);
+   // schedule a snapshot request; scheduling validation errors are thrown to the caller.
+   // next (may be empty) is stored on the request and called with the snapshot_information
+   // (or execution error) when a snapshot produced by this request completes
+   snapshot_schedule_result schedule_snapshot(const snapshot_request_information& sri, next_function<snapshot_information> next);
    snapshot_schedule_result unschedule_snapshot(uint32_t sri);
+   // remove requests that are expired at the given irreversible block height
+   void unschedule_snapshot_requests(block_num_type lib_height);
    get_snapshot_requests_result get_snapshot_requests();
 
    /**
@@ -240,11 +246,12 @@ public:
    // add pending snapshot info to inflight snapshot request
    void add_pending_snapshot_info(const snapshot_information& si);
 
-   // execute snapshot
-   void execute_snapshot(uint32_t srid, chain::controller& chain);
+   // execute snapshot request srid; next (may be empty) receives the result of the snapshot in
+   // addition to the scheduler's own bookkeeping handler
+   void execute_snapshot(uint32_t srid, chain::controller& chain, next_function<snapshot_information> next);
 
    // former producer_plugin snapshot fn
-   void create_snapshot(next_function<snapshot_information> next, chain::controller& chain, std::function<void(void)> predicate);
+   void create_snapshot(next_function<snapshot_information> next, chain::controller& chain);
 };
 
 
