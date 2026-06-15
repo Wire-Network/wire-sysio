@@ -10,6 +10,8 @@
 #include <fc/task/retry.hpp>
 #include <iostream>
 
+#include <magic_enum/magic_enum.hpp>
+
 namespace fc::network::ethereum {
 
 namespace {
@@ -17,6 +19,31 @@ using namespace fc::crypto;
 using namespace fc::crypto::ethereum;
 using namespace fc::network::json_rpc;
 } // namespace
+
+/**
+ * @brief Converts a block tag to its JSON-RPC wire spelling
+ *
+ * The enumerator spelling is the wire format, so `magic_enum::enum_name` is the conversion.
+ *
+ * @param tag Named block tag
+ * @return Wire spelling of the tag (e.g. "finalized")
+ */
+std::string to_string(block_tag_t tag) {
+   return std::string(magic_enum::enum_name(tag));
+}
+
+/**
+ * @brief Converts a block parameter to the string form expected on the wire
+ *
+ * @param block Explicit block number (passed through) or named tag (wire spelling)
+ * @return String representation of the block parameter
+ */
+std::string to_block_tag(const block_number_or_tag_t& block) {
+   if (std::holds_alternative<std::string>(block)) {
+      return std::get<std::string>(block);
+   }
+   return to_string(std::get<block_tag_t>(block));
+}
 
 /**
  * @brief Checks if an ABI definition exists for the given contract name
@@ -78,17 +105,17 @@ fc::variant ethereum_client::execute(const std::string& method, const fc::varian
  *
  * @param contract_address The address of the smart contract
  * @param abi The ABI definition of the function to call
- * @param block_tag The block at which to execute the call (e.g., "latest", "pending")
+ * @param block The block parameter at which to execute the call (explicit number or named tag)
  * @param params The parameters to pass to the contract function
  * @return The result of the contract call as a variant
  * @throws fc::network::json_rpc::json_rpc_exception if the call fails
  */
 fc::variant ethereum_client::execute_contract_view_fn(const address& contract_address, const abi::contract& abi,
-                                                      const std::string& block_tag,
+                                                      const block_number_or_tag_t& block,
                                                       const contract_invoke_data_items& params) {
    auto abi_call_encoded = contract_encode_data(abi, params);
    auto to_data_mvo = fc::mutable_variant_object("to", to_hex(contract_address, true))("data", abi_call_encoded);
-   fc::variants rpc_params = {to_data_mvo, fc::variant(block_tag)};
+   fc::variants rpc_params = {to_data_mvo, fc::variant(to_block_tag(block))};
    return execute("eth_call", rpc_params);
 }
 
@@ -133,14 +160,15 @@ fc::variant ethereum_client::execute_contract_tx_fn(const eip1559_tx& source_tx,
  * This is commonly used to determine the nonce for the next transaction.
  *
  * @param address The Ethereum address to query
- * @param block_tag The block at which to query (e.g., "latest", "pending")
+ * @param block The block parameter at which to query (explicit number or named tag)
  * @return The transaction count as a uint256
  * @throws fc::network::json_rpc::json_rpc_exception if the RPC call fails
  */
-fc::uint256 ethereum_client::get_transaction_count(const address_compat_type& address, const std::string& block_tag) {
+fc::uint256 ethereum_client::get_transaction_count(const address_compat_type& address,
+                                                   const block_number_or_tag_t& block) {
    auto from_addr = fc::crypto::ethereum::to_address(address);
    auto from_addr_hex = to_hex(from_addr, true);
-   fc::variants params{from_addr_hex, block_tag};
+   fc::variants params{from_addr_hex, to_block_tag(block)};
    auto res = execute("eth_getTransactionCount", params);
    dlog("tx_count: {}", res.as_string());
    return to_uint256(res);
@@ -277,12 +305,12 @@ fc::uint256 ethereum_client::get_block_number() {
  * Fetches detailed information about a block identified by its number or a tag
  * like "latest", "earliest", or "pending".
  *
- * @param block_number_or_tag The block number (as string) or tag (e.g., "latest")
+ * @param block_number_or_tag Explicit block number (hex string) or named `block_tag_t`
  * @param full_transaction_data If true, returns full transaction objects; if false, only transaction hashes
  * @return Block data as a variant_object
  * @throws fc::network::json_rpc::json_rpc_exception if the RPC call fails
  */
-fc::variant_object ethereum_client::get_block_by_number(const block_tag_t& block_number_or_tag,
+fc::variant_object ethereum_client::get_block_by_number(const block_number_or_tag_t& block_number_or_tag,
                                                         bool full_transaction_data) {
    auto block_number = to_block_tag(block_number_or_tag);
    fc::variants params{block_number, full_transaction_data};
@@ -329,8 +357,9 @@ fc::variant ethereum_client::get_transaction_by_hash(const std::string& tx_hash)
  * @throws fc::network::json_rpc::json_rpc_exception if the RPC call fails
  */
 fc::uint256 ethereum_client::get_base_fee_per_gas() {
-   auto block = get_block_by_number(block_tag_latest);
-   FC_ASSERT_FMT(block.contains("baseFeePerGas"), "Block {} does not contain baseFeePerGas", block_tag_latest);
+   auto block = get_block_by_number(block_tag_t::latest);
+   FC_ASSERT_FMT(block.contains("baseFeePerGas"), "Block {} does not contain baseFeePerGas",
+                 to_string(block_tag_t::latest));
    return block["baseFeePerGas"].as_uint256();
 }
 
@@ -589,8 +618,8 @@ fc::variant ethereum_client::get_transaction_receipt(const std::string& tx_hash)
 std::vector<ethereum_event_data> ethereum_client::get_events(const address_compat_type& contract_addr,
                                                               const std::vector<std::string>& event_names,
                                                               const std::vector<abi::contract>& event_abis,
-                                                              const block_tag_t& from_block,
-                                                              const block_tag_t& to_block) {
+                                                              const block_number_or_tag_t& from_block,
+                                                              const block_number_or_tag_t& to_block) {
    // Build a map from topic hash hex -> abi::contract for decoding and name lookup
    std::map<std::string, const abi::contract*> topic_to_abi;
    fc::variants topic_hashes;
@@ -695,8 +724,8 @@ std::vector<ethereum_event_data> ethereum_client::get_events(const address_compa
  * delegates to ethereum_client::get_events.
  */
 std::vector<ethereum_event_data> ethereum_contract_client::query_events(const std::vector<std::string>& event_names,
-                                                                        const block_tag_t& from_block,
-                                                                        const block_tag_t& to_block) {
+                                                                        const block_number_or_tag_t& from_block,
+                                                                        const block_number_or_tag_t& to_block) {
    std::vector<abi::contract> event_abis;
    auto abi_map = _abi_map.readable();
    for (const auto& name : event_names) {

@@ -106,13 +106,6 @@ public:
 
    // ── Table read helpers ──
 
-   fc::variant get_message(uint64_t id) {
-      auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "messages"_n, id);
-      return data.empty() ? fc::variant() : abi_ser.binary_to_variant(
-         "message_entry", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
-   }
-
    fc::variant get_outbound_envelope(uint64_t id) {
       auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "outenvelopes"_n, id);
       return data.empty() ? fc::variant() : abi_ser.binary_to_variant(

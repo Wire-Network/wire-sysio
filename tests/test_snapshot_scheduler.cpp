@@ -245,4 +245,136 @@ BOOST_AUTO_TEST_CASE(snapshot_scheduler_old_json) {
    BOOST_REQUIRE_EQUAL(found, 3u);
 }
 
+// ---------------------------------------------------------------------------------------------------
+// Snapshot-finalized callback contract: every registered callback fires exactly once per snapshot
+// that reaches finality, regardless of how the snapshot was initiated (scheduled request or direct
+// create_snapshot call), of the chain's read mode, and of whether a duplicate request for the same
+// block is issued.
+//
+// Regression coverage for a bug where scheduled snapshots notified the callbacks twice: once from
+// execute_snapshot()'s completion handler and again from on_irreversible_block() (or from
+// create_snapshot() in irreversible read mode), which made provider mode submit duplicate
+// votesnaphash transactions.
+// ---------------------------------------------------------------------------------------------------
+
+namespace {
+
+/// Test fixture wiring a snapshot_scheduler to a temp directory with two counting callbacks.
+struct scheduler_callback_fixture {
+   fc::temp_directory temp_dir;
+   snapshot_scheduler scheduler;
+   uint32_t           cb1_count = 0;
+   uint32_t           cb2_count = 0;
+
+   scheduler_callback_fixture() {
+      scheduler.set_db_path(temp_dir.path());
+      scheduler.set_snapshots_path(temp_dir.path());
+      scheduler.add_snapshot_finalized_callback(
+         [this](const snapshot_scheduler::snapshot_information&) { ++cb1_count; });
+      scheduler.add_snapshot_finalized_callback(
+         [this](const snapshot_scheduler::snapshot_information&) { ++cb2_count; });
+   }
+};
+
+} // anonymous namespace
+
+// Scheduled snapshot with the chain NOT in irreversible read mode: the snapshot is pending
+// until its block becomes irreversible; each callback fires exactly once at promotion.
+BOOST_AUTO_TEST_CASE(scheduled_snapshot_notifies_callbacks_once) {
+   testing::tester            chain;
+   scheduler_callback_fixture f;
+
+   chain.produce_block();
+   chain.control->abort_block(); // snapshot creation requires no pending block
+   const uint32_t snapshot_height = chain.control->head().block_num();
+
+   // one-time request that on_start_block() executes at height snapshot_height + 1
+   snapshot_request_information sri;
+   sri.block_spacing        = 0;
+   sri.start_block_num      = snapshot_height;
+   sri.end_block_num        = snapshot_height;
+   sri.snapshot_description = "single-fire scheduled snapshot";
+   f.scheduler.schedule_snapshot(sri, {});
+
+   f.scheduler.on_start_block(snapshot_height + 1, *chain.control);
+
+   // snapshot of head is pending; nothing finalized yet
+   BOOST_TEST(f.cb1_count == 0u);
+   BOOST_TEST(f.cb2_count == 0u);
+
+   // a later irreversible block promotes the pending snapshot
+   auto lib_block = chain.produce_block();
+   f.scheduler.on_irreversible_block(lib_block, lib_block->calculate_id(), *chain.control);
+
+   BOOST_TEST(f.cb1_count == 1u);
+   BOOST_TEST(f.cb2_count == 1u);
+
+   // further irreversible blocks must not re-notify
+   auto next_block = chain.produce_block();
+   f.scheduler.on_irreversible_block(next_block, next_block->calculate_id(), *chain.control);
+
+   BOOST_TEST(f.cb1_count == 1u);
+   BOOST_TEST(f.cb2_count == 1u);
+}
+
+// Scheduled snapshot with the chain in irreversible read mode: the snapshot finalizes
+// immediately inside create_snapshot(); each callback fires exactly once.
+BOOST_AUTO_TEST_CASE(irreversible_mode_snapshot_notifies_callbacks_once) {
+   testing::tester            chain(testing::setup_policy::full, db_read_mode::IRREVERSIBLE);
+   scheduler_callback_fixture f;
+
+   chain.produce_blocks(3); // let finality advance so head (LIB) is past genesis
+   chain.control->abort_block(); // snapshot creation requires no pending block
+   const uint32_t snapshot_height = chain.control->head().block_num();
+
+   snapshot_request_information sri;
+   sri.block_spacing        = 0;
+   sri.start_block_num      = snapshot_height;
+   sri.end_block_num        = snapshot_height;
+   sri.snapshot_description = "single-fire irreversible-mode snapshot";
+   f.scheduler.schedule_snapshot(sri, {});
+
+   f.scheduler.on_start_block(snapshot_height + 1, *chain.control);
+
+   BOOST_TEST(f.cb1_count == 1u);
+   BOOST_TEST(f.cb2_count == 1u);
+}
+
+// Direct create_snapshot() calls for the same head block: the second request finds a snapshot
+// already pending for that block and is ignored rather than chained onto the first. (In normal
+// operation the producer_plugin guards against this earlier -- schedule_snapshot throws
+// duplicate_snapshot_request -- so the dropped handler is not reachable through the HTTP API.)
+// The single underlying snapshot still notifies each finalized callback exactly once.
+BOOST_AUTO_TEST_CASE(api_snapshot_duplicate_block_request_ignored_notifies_callbacks_once) {
+   testing::tester            chain;
+   scheduler_callback_fixture f;
+
+   chain.produce_block();
+   chain.control->abort_block(); // snapshot creation requires no pending block
+
+   uint32_t next1_success = 0, next2_success = 0;
+   auto count_success = [](uint32_t& counter) {
+      return [&counter](const next_function_variant<snapshot_scheduler::snapshot_information>& res) {
+         if (!std::holds_alternative<fc::exception_ptr>(res))
+            ++counter;
+      };
+   };
+
+   // two create_snapshot calls for the same head block: the first writes the pending snapshot, the
+   // second sees it already pending and is ignored (its handler is never stored or invoked)
+   f.scheduler.create_snapshot(count_success(next1_success), *chain.control);
+   f.scheduler.create_snapshot(count_success(next2_success), *chain.control);
+
+   BOOST_TEST(f.cb1_count == 0u);
+   BOOST_TEST(f.cb2_count == 0u);
+
+   auto lib_block = chain.produce_block();
+   f.scheduler.on_irreversible_block(lib_block, lib_block->calculate_id(), *chain.control);
+
+   BOOST_TEST(next1_success == 1u);
+   BOOST_TEST(next2_success == 0u); // duplicate request was ignored, not chained
+   BOOST_TEST(f.cb1_count == 1u);
+   BOOST_TEST(f.cb2_count == 1u);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

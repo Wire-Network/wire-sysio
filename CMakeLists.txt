@@ -49,8 +49,8 @@ set(SYS_UTIL_EXECUTABLE_NAME sys-util)
 
 # http://stackoverflow.com/a/18369825
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-  if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 10.2)
-    message(FATAL_ERROR "GCC version must be at least 10.2.0!")
+  if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 11.4)
+    message(FATAL_ERROR "GCC version must be at least 11.4.0!")
   endif()
 endif()
 

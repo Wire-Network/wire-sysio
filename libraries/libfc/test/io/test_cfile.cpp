@@ -57,6 +57,49 @@ BOOST_AUTO_TEST_SUITE(cfile_test_suite)
       BOOST_CHECK( !std::filesystem::exists( tempdir.path() / "test") );
    }
 
+   BOOST_AUTO_TEST_CASE(test_positional_io)
+   {
+      fc::temp_directory tempdir;
+
+      cfile t;
+      t.set_file_path( tempdir.path() / "test_positional" );
+      t.open( cfile::truncate_rw_mode );
+
+      // pwrite/pread bypass the FILE* buffer and the shared position indicator.
+      t.pwrite( "abcdef", 6, 0 );
+      std::vector<char> v(6);
+      t.pread( &v[0], 6, 0 );
+      BOOST_CHECK_EQUAL( std::string( v.begin(), v.end() ), "abcdef" );
+
+      // Overwrite mid-file at an explicit offset; surrounding bytes stay intact.
+      t.pwrite( "XY", 2, 2 );
+      t.pread( &v[0], 6, 0 );
+      BOOST_CHECK_EQUAL( std::string( v.begin(), v.end() ), "abXYef" );
+
+      // Positional reads do not move the stream position used by read()/write().
+      t.seek( 0 );
+      BOOST_CHECK_EQUAL( t.tellp(), 0u );
+      t.pread( &v[0], 2, 4 );
+      BOOST_CHECK_EQUAL( t.tellp(), 0u );
+      BOOST_CHECK_EQUAL( v[0], 'e' );
+      BOOST_CHECK_EQUAL( v[1], 'f' );
+
+      // Reading past EOF throws (short read).
+      BOOST_CHECK_THROW( t.pread( &v[0], 6, 4 ), std::ios_base::failure );
+
+      // pwrite on an append-mode fd: Linux appends at EOF regardless of the offset argument -
+      // the documented caveat that callers holding append-mode cfiles rely on.
+      t.close();
+      t.open( cfile::create_or_update_rw_mode );
+      t.pwrite( "gh", 2, 0 );
+      std::vector<char> w(8);
+      t.pread( &w[0], 8, 0 );
+      BOOST_CHECK_EQUAL( std::string( w.begin(), w.end() ), "abXYefgh" );
+
+      t.close();
+      std::filesystem::remove_all( t.get_file_path() );
+   }
+
    BOOST_AUTO_TEST_CASE(test_hole_punching)
    {
       if(!cfile::supports_hole_punching())

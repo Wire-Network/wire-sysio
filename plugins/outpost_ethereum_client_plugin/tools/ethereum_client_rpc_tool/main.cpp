@@ -114,7 +114,7 @@ int main(int argc, char* argv[]) {
          FC_ASSERT(eth_abi_files.size() >= 2, "2+ ABI file is required (--ethereum-abi-file <json-array-file>)");
          auto& [eth_abi_file, eth_abi_contracts] = eth_abi_files[1];
          auto opp_events = client->get_events("0x26B8d2fD1091b1B13a294791700FBEb0C152dF4b", {"OPPEnvelope"},
-                                              eth_abi_contracts, block_tag_latest);
+                                              eth_abi_contracts, block_tag_t::latest);
          for (auto& opp_event : opp_events) {
             auto json_str = fc::json::to_pretty_string(opp_event, time_point::maximum());
             ilog("event_data: {}", json_str);
@@ -148,7 +148,7 @@ int main(int argc, char* argv[]) {
 
          auto counter_contract =
          client->get_contract<ethereum_contract_test_counter_client>("0x5FbDB2315678afecb367f032d93F642f64180aa3",eth_abi_contracts);
-         auto counter_contract_num_res = counter_contract->get_number("pending");
+         auto counter_contract_num_res = counter_contract->get_number(block_tag_t::pending);
          auto counter_contract_num = fc::hex_to_number<fc::uint256>(counter_contract_num_res.as_string());
          ilog("Current counter value: {}", counter_contract_num.str());
 
@@ -157,7 +157,7 @@ int main(int argc, char* argv[]) {
          auto counter_contract_set_num_receipt = counter_contract->set_number(new_num);
          ilog("Counter set number receipt: {}", counter_contract_set_num_receipt.as_string());
 
-         counter_contract_num_res = counter_contract->get_number("pending");
+         counter_contract_num_res = counter_contract->get_number(block_tag_t::pending);
          counter_contract_num = fc::hex_to_number<fc::uint256>(counter_contract_num_res.as_string());
          ilog("New counter value: {}", counter_contract_num.str());
 

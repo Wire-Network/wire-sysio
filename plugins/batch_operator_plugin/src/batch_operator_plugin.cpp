@@ -1,5 +1,6 @@
 #include <fc/log/logger.hpp>
 #include <fc/crypto/sha256.hpp>
+#include <fc/int128.hpp>
 #include <fc/io/json.hpp>
 #include <fc/variant_object.hpp>
 #include <boost/endian/conversion.hpp>
@@ -274,7 +275,12 @@ struct batch_operator_plugin::impl {
    /// given outpost + epoch by querying msgch::envelopes via the
    /// byoutepoch secondary index.
    bool has_delivered_envelope(uint64_t chain_code, uint32_t epoch_index) {
-      uint64_t key = (static_cast<uint64_t>(chain_code) << 32) | epoch_index;
+      // Canonical (outpost, epoch) packing per sysio.opp.common/opp_keys.hpp —
+      // chain_code (a slug_name, up to 48 bits) occupies bits 32-79, epoch bits 0-31.
+      // The byoutepoch index is uint128; serialize the bound as a decimal string so
+      // the JSON round-trip stays lossless past 2^64.
+      const fc::uint128 key =
+         (static_cast<fc::uint128>(chain_code) << 32) | static_cast<fc::uint128>(epoch_index);
       auto op_account = operator_account;
       // chain_plugin::get_table_rows forwards secondary-index bounds through
       // be_key_codec::encode_key, which unconditionally calls get_object() on
@@ -288,7 +294,7 @@ struct batch_operator_plugin::impl {
       p.code        = chain::name(msgch::account);
       p.scope       = msgch::account;
       p.table       = msgch::table_envelopes;
-      p.find        = std::format("{{\"{}\":{}}}", msgch::index_byoutepoch, key);
+      p.find        = std::format("{{\"{}\":\"{}\"}}", msgch::index_byoutepoch, fc::to_string(key));
       p.index_name  = msgch::index_byoutepoch;
       p.values_only = true;
       p.filter      = [op_account](const fc::variant& row) {

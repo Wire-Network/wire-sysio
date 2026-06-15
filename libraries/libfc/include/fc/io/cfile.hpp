@@ -1,10 +1,12 @@
 #pragma once
 #include <fc/filesystem.hpp>
 #include <fc/io/datastream.hpp>
+#include <cerrno>
 #include <cstdio>
 #include <ios>
 #include <fcntl.h>
 #include <sys/stat.h>
+#include <unistd.h>
 
 #include <boost/interprocess/file_mapping.hpp>
 
@@ -38,6 +40,7 @@ public:
    static constexpr auto create_or_update_rw_mode = "ab+";
    static constexpr auto update_rw_mode = "rb+";
    static constexpr auto truncate_rw_mode = "wb+";
+   static constexpr auto read_only_mode = "rb";
 
    cfile()
      : _file(nullptr, &detail::close_file)
@@ -153,6 +156,68 @@ public:
       if( result != n ) {
          throw std::ios_base::failure( "cfile: " + _file_path.generic_string() +
                                        " unable to write " + std::to_string( n ) + " bytes; only wrote " + std::to_string( result ) );
+      }
+   }
+
+   /**
+    * Positional read on the underlying file descriptor (POSIX pread), bypassing the FILE* buffer.
+    * Retries on EINTR and short reads until all n bytes are read.  Safe to call concurrently with
+    * other pread()s on the same cfile: the fd's shared position is never touched.
+    * NOTE: bypasses stdio buffering entirely - buffered write()s must be flush()ed before their
+    * bytes are visible to pread().
+    * @throws std::ios_base::failure when n bytes cannot be read (EOF before n bytes, or I/O error)
+    */
+   void pread( char* d, size_t n, uint64_t offset ) const {
+      const int fd = fileno();
+      char*  p         = d;
+      size_t remaining = n;
+      while( remaining > 0 ) {
+         const ssize_t r = ::pread( fd, p, remaining, static_cast<off_t>( offset ) );
+         if( r > 0 ) {
+            p         += r;
+            offset    += static_cast<uint64_t>( r );
+            remaining -= static_cast<size_t>( r );
+         } else if( r == 0 ) {
+            throw std::ios_base::failure( "cfile: " + _file_path.generic_string() +
+                                          " unable to pread " + std::to_string( n ) + " bytes; eof after " +
+                                          std::to_string( n - remaining ) + " bytes" );
+         } else if( errno != EINTR ) {
+            throw std::ios_base::failure( "cfile: " + _file_path.generic_string() +
+                                          " unable to pread " + std::to_string( n ) + " bytes, error: " +
+                                          std::to_string( errno ) );
+         }
+      }
+   }
+
+   /**
+    * Positional write on the underlying file descriptor (POSIX pwrite), bypassing the FILE* buffer.
+    * Retries on EINTR and short writes until all n bytes are written.
+    * NOTE: on Linux, when the file is opened in an append mode (e.g. "ab+"), the kernel appends at
+    * EOF and IGNORES the offset argument (POSIX leaves this combination unspecified).  Callers
+    * holding an append-mode cfile must maintain offset == EOF themselves for the offset to be
+    * meaningful.
+    * NOTE: bypasses stdio buffering entirely - interleaving with buffered write() requires explicit
+    * flush() ordering by the caller.
+    * @throws std::ios_base::failure on error; some bytes may already have been written in that case
+    */
+   void pwrite( const char* d, size_t n, uint64_t offset ) {
+      const int fd = fileno();
+      const char* p         = d;
+      size_t      remaining = n;
+      while( remaining > 0 ) {
+         const ssize_t r = ::pwrite( fd, p, remaining, static_cast<off_t>( offset ) );
+         if( r > 0 ) {
+            p         += r;
+            offset    += static_cast<uint64_t>( r );
+            remaining -= static_cast<size_t>( r );
+         } else if( r < 0 && errno == EINTR ) {
+            continue;
+         } else { // r == 0 (no progress) or a real error: bail rather than spin
+            throw std::ios_base::failure( "cfile: " + _file_path.generic_string() +
+                                          " unable to pwrite " + std::to_string( n ) + " bytes; wrote " +
+                                          std::to_string( n - remaining ) + " bytes, error: " +
+                                          std::to_string( errno ) );
+         }
       }
    }
 

@@ -6,8 +6,10 @@
 #include <fc/log/logger.hpp>
 #include <boost/core/typeinfo.hpp>
 #include <boost/interprocess/exceptions.hpp>
+#include <cassert>
 #include <exception>
 #include <functional>
+#include <typeinfo>
 
 namespace fc
 {
@@ -121,9 +123,14 @@ namespace fc
          /**
           *  Rethrows this exception preserving its dynamic type. A plain `throw *ptr;` on an
           *  `exception_ptr` slices the thrown object to fc::exception; derived types override
-          *  this so catch sites can match on the original exception type.
+          *  this so catch sites can match on the original exception type. The assert fails (in
+          *  debug builds) when a derived type is missing its override: the throw below would
+          *  slice it to the static type of the most-derived class that does implement rethrow().
           */
-         virtual void rethrow() const { throw *this; }
+         virtual void rethrow() const {
+            assert(typeid(*this) == typeid(exception));
+            throw *this;
+         }
 
          friend void to_variant( const exception& e, variant& v );
          friend void from_variant( const variant& e, exception& ll );
@@ -164,7 +171,7 @@ namespace fc
        std::exception_ptr get_inner_exception()const;
 
        std::shared_ptr<exception>   dynamic_copy_exception()const override;
-       void rethrow() const override { throw *this; }
+       void rethrow() const override { assert(typeid(*this) == typeid(unhandled_exception)); throw *this; }
       private:
        std::exception_ptr _inner;
    };
@@ -189,7 +196,7 @@ namespace fc
        static std_exception_wrapper from_current_exception(const std::exception& e);
 
        std::shared_ptr<exception>   dynamic_copy_exception()const override;
-       void rethrow() const override { throw *this; }
+       void rethrow() const override { assert(typeid(*this) == typeid(std_exception_wrapper)); throw *this; }
       private:
        std::exception_ptr _inner;
    };
@@ -236,7 +243,7 @@ namespace fc
        \
        std::shared_ptr<fc::exception> dynamic_copy_exception()const override\
        { return std::make_shared<TYPE>( *this ); } \
-       void rethrow() const override { throw *this; } \
+       void rethrow() const override { assert(typeid(*this) == typeid(TYPE)); throw *this; } \
    };
 
   #define FC_DECLARE_EXCEPTION( TYPE, CODE, WHAT ) \

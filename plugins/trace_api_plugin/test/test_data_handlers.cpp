@@ -3,17 +3,45 @@
 #include <sysio/trace_api/abi_data_handler.hpp>
 
 #include <sysio/trace_api/test_common.hpp>
+#include <fc/io/raw.hpp>
 
 using namespace sysio;
 using namespace sysio::trace_api;
 using namespace sysio::trace_api::test_common;
 
+namespace {
+   // Pack an abi_def into raw bytes that abi_data_handler can unpack
+   std::vector<char> pack_abi(const chain::abi_def& abi) {
+      return fc::raw::pack(abi);
+   }
+
+   // Resolver half of the two-phase lookup: the account has exactly one ABI version, recorded at
+   // effective_global_seq 0, so the handler's cache key becomes (account, 0) regardless of the
+   // action's global_seq.
+   abi_data_handler::abi_seq_resolver_fn make_resolver(chain::name account) {
+      return [account](chain::name a, uint64_t) -> std::optional<uint64_t> {
+         if (a == account) return uint64_t{0};
+         return std::nullopt;
+      };
+   }
+
+   // Fetcher half: returns the packed ABI bytes for the (account, 0) version the resolver names.
+   abi_data_handler::abi_blob_fetcher_fn make_fetcher(chain::name account, std::vector<char> abi_bytes) {
+      return [account, bytes = std::move(abi_bytes)](chain::name a, uint64_t effective_seq) -> std::optional<std::vector<char>> {
+         if (a == account && effective_seq == 0) return bytes;
+         return std::nullopt;
+      };
+   }
+}
+
 BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
    BOOST_AUTO_TEST_CASE(empty_data)
    {
-      auto action = action_trace_v0 {
-         0, "alice"_n, "alice"_n, "foo"_n, {}, {}, {}
-      };
+      action_trace_v0 action;
+      action.global_sequence = 0;
+      action.receiver = "alice"_n;
+      action.account  = "alice"_n;
+      action.action   = "foo"_n;
       std::variant<action_trace_v0> action_trace_t = action;
       abi_data_handler handler(exception_handler{});
 
@@ -28,9 +56,12 @@ BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
    {
       // Without return_value
       {
-         auto action = action_trace_v0 {
-            0, "alice"_n, "alice"_n, "foo"_n, {}, {0x00, 0x01, 0x02, 0x03}, {}
-         };
+         action_trace_v0 action;
+         action.global_sequence = 0;
+         action.receiver = "alice"_n;
+         action.account  = "alice"_n;
+         action.action   = "foo"_n;
+         action.data     = {0x00, 0x01, 0x02, 0x03};
          std::variant<action_trace_v0> action_trace_t = action;
          abi_data_handler handler(exception_handler{});
 
@@ -43,9 +74,13 @@ BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
 
       // With return_value
       {
-         auto action = action_trace_v0 {
-            0, "alice"_n, "alice"_n, "foo"_n, {}, {0x00, 0x01, 0x02, 0x03}, {0x04, 0x05, 0x06, 0x07}
-         };
+         action_trace_v0 action;
+         action.global_sequence = 0;
+         action.receiver      = "alice"_n;
+         action.account       = "alice"_n;
+         action.action        = "foo"_n;
+         action.data          = {0x00, 0x01, 0x02, 0x03};
+         action.return_value  = {0x04, 0x05, 0x06, 0x07};
          std::variant<action_trace_v0> action_trace_t = action;
          abi_data_handler handler(exception_handler{});
 
@@ -59,9 +94,12 @@ BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
 
    BOOST_AUTO_TEST_CASE(basic_abi)
    {
-      auto action = action_trace_v0 {
-            0, "alice"_n, "alice"_n, "foo"_n, {}, {0x00, 0x01, 0x02, 0x03}, {}
-      };
+      action_trace_v0 action;
+      action.global_sequence = 0;
+      action.receiver = "alice"_n;
+      action.account  = "alice"_n;
+      action.action   = "foo"_n;
+      action.data     = {0x00, 0x01, 0x02, 0x03};
 
       std::variant<action_trace_v0> action_trace_t = action;
 
@@ -76,8 +114,7 @@ BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
       );
       abi.version = "sysio::abi/1.";
 
-      abi_data_handler handler(exception_handler{});
-      handler.add_abi("alice"_n, std::move(abi));
+      abi_data_handler handler(exception_handler{}, make_resolver("alice"_n), make_fetcher("alice"_n, pack_abi(abi)));
 
       fc::variant expected = fc::mutable_variant_object()
          ("a", 0)
@@ -93,9 +130,13 @@ BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
 
    BOOST_AUTO_TEST_CASE(basic_abi_with_return_value)
    {
-      auto action = action_trace_v0 {
-         0, "alice"_n, "alice"_n, "foo"_n, {}, {0x00, 0x01, 0x02, 0x03}, {0x04, 0x05, 0x06}
-      };
+      action_trace_v0 action;
+      action.global_sequence = 0;
+      action.receiver      = "alice"_n;
+      action.account       = "alice"_n;
+      action.action        = "foo"_n;
+      action.data          = {0x00, 0x01, 0x02, 0x03};
+      action.return_value  = {0x04, 0x05, 0x06};
 
       std::variant<action_trace_v0> action_trace_t = action;
 
@@ -112,8 +153,7 @@ BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
       abi.version = "sysio::abi/1.";
       abi.action_results = { std::vector<chain::action_result_def>{ chain::action_result_def{ "foo"_n, "foor"} } };
 
-      abi_data_handler handler(exception_handler{});
-      handler.add_abi("alice"_n, std::move(abi));
+      abi_data_handler handler(exception_handler{}, make_resolver("alice"_n), make_fetcher("alice"_n, pack_abi(abi)));
 
       fc::variant expected = fc::mutable_variant_object()
             ("a", 0)
@@ -134,9 +174,13 @@ BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
 
    BOOST_AUTO_TEST_CASE(basic_abi_wrong_type)
    {
-      auto action = action_trace_v0 {
-            0, "alice"_n, "alice"_n, "foo"_n, {}, {0x00, 0x01, 0x02, 0x03}, {0x04, 0x05, 0x06, 0x07}
-      };
+      action_trace_v0 action;
+      action.global_sequence = 0;
+      action.receiver      = "alice"_n;
+      action.account       = "alice"_n;
+      action.action        = "foo"_n;
+      action.data          = {0x00, 0x01, 0x02, 0x03};
+      action.return_value  = {0x04, 0x05, 0x06, 0x07};
 
       std::variant<action_trace_v0> action_trace_t = action;
 
@@ -151,8 +195,7 @@ BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
       );
       abi.version = "sysio::abi/1.";
 
-      abi_data_handler handler(exception_handler{});
-      handler.add_abi("alice"_n, std::move(abi));
+      abi_data_handler handler(exception_handler{}, make_resolver("alice"_n), make_fetcher("alice"_n, pack_abi(abi)));
 
       auto expected = fc::variant();
 
@@ -164,9 +207,12 @@ BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
 
    BOOST_AUTO_TEST_CASE(basic_abi_insufficient_data)
    {
-      auto action = action_trace_v0 {
-            0, "alice"_n, "alice"_n, "foo"_n, {}, {0x00, 0x01, 0x02}, {}
-      };
+      action_trace_v0 action;
+      action.global_sequence = 0;
+      action.receiver = "alice"_n;
+      action.account  = "alice"_n;
+      action.action   = "foo"_n;
+      action.data     = {0x00, 0x01, 0x02};
 
       std::variant<action_trace_v0> action_trace_t = action;
 
@@ -182,8 +228,11 @@ BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
       abi.version = "sysio::abi/1.";
 
       bool log_called = false;
-      abi_data_handler handler([&log_called](const exception_with_context& ){log_called = true;});
-      handler.add_abi("alice"_n, std::move(abi));
+      abi_data_handler handler(
+         [&log_called](const exception_with_context& ){log_called = true;},
+         make_resolver("alice"_n),
+         make_fetcher("alice"_n, pack_abi(abi))
+      );
 
       auto expected = fc::variant();
 
@@ -197,9 +246,13 @@ BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
    // If no ABI provided for return type then do not attempt to decode it
    BOOST_AUTO_TEST_CASE(basic_abi_no_return_abi_when_return_value_provided)
    {
-      auto action = action_trace_v0 {
-         0, "alice"_n, "alice"_n, "foo"_n, {}, {0x00, 0x01, 0x02, 0x03}, {0x04, 0x05, 0x06}
-      };
+      action_trace_v0 action;
+      action.global_sequence = 0;
+      action.receiver      = "alice"_n;
+      action.account       = "alice"_n;
+      action.action        = "foo"_n;
+      action.data          = {0x00, 0x01, 0x02, 0x03};
+      action.return_value  = {0x04, 0x05, 0x06};
 
       std::variant<action_trace_v0> action_trace_t = action;
 
@@ -214,8 +267,7 @@ BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
       );
       abi.version = "sysio::abi/1.";
 
-      abi_data_handler handler(exception_handler{});
-      handler.add_abi("alice"_n, std::move(abi));
+      abi_data_handler handler(exception_handler{}, make_resolver("alice"_n), make_fetcher("alice"_n, pack_abi(abi)));
 
       fc::variant expected = fc::mutable_variant_object()
             ("a", 0)

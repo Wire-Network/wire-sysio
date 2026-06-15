@@ -190,16 +190,16 @@ namespace sysio::chain {
          /// was called, both sessions are automatically undone.
          struct trx_session {
             chainbase::database::session db_session;
-            controller&                  ctrl;
-            bool                         active = true;
 
-            trx_session(chainbase::database& db, controller& c)
-               : db_session(db.start_undo_session(true)), ctrl(c) { ctrl.push_dedup_session(); }
+            explicit trx_session(chainbase::database& db)
+               : db_session(db.start_undo_session(true)) {}
             trx_session(trx_session&&) = delete;
 
-            void squash() { db_session.squash(); ctrl.squash_dedup_session(); active = false; }
-            void undo()   { db_session.undo();   ctrl.undo_dedup_session();   active = false; }
-            ~trx_session() { if (active) ctrl.undo_dedup_session(); }
+            // The dedup is a registered chainbase undo participant, so the database session drives
+            // its add_undo_session / squash / undo automatically -- including the implicit undo from
+            // db_session's destructor when neither squash() nor undo() is called.
+            void squash() { db_session.squash(); }
+            void undo()   { db_session.undo();   }
          };
 
          controller&                    control;

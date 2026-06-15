@@ -323,7 +323,7 @@ try {
       });
       if (!result.first.has_value()) {
          const sysio::chain::transaction_trace& trace = *result.second;
-         if (trace.except.has_value()) {
+         if (trace.except) {
             elog("{}", trace.except->to_detail_string());
          }
       }

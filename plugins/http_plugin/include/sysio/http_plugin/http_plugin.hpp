@@ -3,6 +3,7 @@
 #include <sysio/chain/application.hpp>
 #include <sysio/chain/exceptions.hpp>
 #include <sysio/http_plugin/api_category.hpp>
+#include <sysio/http_plugin/abstract_conn_fwd.hpp>
 #include <fc/exception/exception.hpp>
 #include <fc/reflect/reflect.hpp>
 #include <fc/io/json.hpp>
@@ -16,6 +17,9 @@ namespace sysio {
     * Arguments: response_code, response_body
     */
    using url_response_callback = std::function<void(int,std::optional<fc::variant>)>;
+
+   /// Handler that receives the connection directly (for binary/file responses)
+   using raw_url_handler = std::function<void(::sysio::detail::abstract_conn_ptr, string&&, string&&)>;
 
    /**
     * @brief Callback type for a URL handler
@@ -106,6 +110,10 @@ namespace sysio {
            for (auto& call : api)
               add_async_handler(std::move(call), content_type);
         }
+
+        /// Register a raw handler that receives the abstract_conn directly.
+        /// Use for endpoints that need to send binary/file responses.
+        void add_raw_handler(string path, api_category category, raw_url_handler handler);
 
         // standard exception handling for api handlers
         static void handle_exception( const char *api_name, const char *call_name, const string& body, const url_response_callback& cb );

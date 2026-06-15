@@ -43,34 +43,51 @@ struct ethereum_confirm_options {
 inline constexpr ethereum_confirm_options ethereum_confirm_option_defaults{};
 
 /**
- * @brief Type alias for Ethereum block tag or block number
+ * @brief Named block tags for the Ethereum JSON-RPC default-block parameter.
  *
- * Can hold either a string (for block numbers) or string_view (for tags like "latest", "pending")
+ * The enumerator spelling IS the wire format: conversion goes through `magic_enum::enum_name`,
+ * so the names must stay lowercase and in lock-step with the execution-apis spec. Ordered by
+ * chain position (oldest / strongest commitment first). Ethereum-side analog of
+ * `fc::network::solana::commitment_t`.
  */
-using block_tag_t = std::variant<std::string, std::string_view>;
+enum class block_tag_t {
+   /// Genesis block.
+   earliest,
+   /// Most recent beacon-chain-finalized block. Unlike `latest` (canonical head, routinely
+   /// reorged) this tag only advances on beacon-chain finality (~2 epochs, ~12.8 min), which
+   /// carries cryptoeconomic finality and cannot revert without a third of staked ETH being
+   /// slashed. Required for reads that downstream consensus commits against.
+   finalized,
+   /// Head of the beacon-chain-justified fork — will not reorg under honest-majority operation
+   /// but lacks the cryptoeconomic guarantee of `finalized`.
+   safe,
+   /// Canonical head; routinely reorged.
+   latest,
+   /// Next-block view including pending (mempool) transactions.
+   pending
+};
 
 /**
- * @brief Block tag constant representing pending transactions
- */
-constexpr std::string_view block_tag_pending = "pending";
-
-/**
- * @brief Block tag constant representing the latest block
- */
-constexpr std::string_view block_tag_latest = "latest";
-
-/**
- * @brief Converts a block_tag_t variant to a string
+ * @brief Converts a block tag to its JSON-RPC wire spelling (e.g. "finalized")
  *
- * @param tag Block tag variant (either string or string_view)
- * @return String representation of the block tag
+ * @param tag Named block tag
+ * @return Wire spelling of the tag
  */
-constexpr std::string to_block_tag(block_tag_t tag) {
-   if (std::holds_alternative<std::string>(tag)) {
-      return std::get<std::string>(tag);
-   }
-   return std::string(std::get<std::string_view>(tag));
-}
+std::string to_string(block_tag_t tag);
+
+/**
+ * @brief The JSON-RPC default-block parameter: an explicit block number (hex string,
+ *        e.g. "0x1b4") or a named block tag
+ */
+using block_number_or_tag_t = std::variant<std::string, block_tag_t>;
+
+/**
+ * @brief Converts a block parameter to the string form expected on the wire
+ *
+ * @param block Explicit block number (passed through) or named tag (wire spelling)
+ * @return String representation of the block parameter
+ */
+std::string to_block_tag(const block_number_or_tag_t& block);
 
 /**
  * @brief Type alias for contract call data - either raw hex string or structured parameters
@@ -125,7 +142,7 @@ using ethereum_client_ptr = std::shared_ptr<ethereum_client>;
  * @tparam Args Argument types for the contract function
  */
 template <typename RT, typename... Args>
-using ethereum_contract_call_fn = std::function<RT(const std::string& block_tag, Args&...)>;
+using ethereum_contract_call_fn = std::function<RT(const block_number_or_tag_t& block, Args&...)>;
 
 /**
  * @brief Function type for Ethereum contract transaction functions
@@ -214,8 +231,8 @@ public:
     * @throws std::out_of_range if an event name is not found in the ABI map
     */
    std::vector<ethereum_event_data> query_events(const std::vector<std::string>& event_names,
-                                                  const block_tag_t& from_block,
-                                                  const block_tag_t& to_block = block_tag_latest);
+                                                  const block_number_or_tag_t& from_block,
+                                                  const block_number_or_tag_t& to_block = block_tag_t::latest);
 
 protected:
 
@@ -325,7 +342,7 @@ public:
    fc::variant execute(const std::string& method, const fc::variant& params);
 
    fc::variant execute_contract_view_fn(const address& contract_address, const abi::contract& abi,
-                                        const std::string& block_tag, const contract_invoke_data_items& params);
+                                        const block_number_or_tag_t& block, const contract_invoke_data_items& params);
 
    fc::variant execute_contract_tx_fn(const eip1559_tx& tx, const abi::contract& abi,
                                       const contract_invoke_data_items& params = {}, bool sign = true);
@@ -340,11 +357,11 @@ public:
 
    /**
     * @brief Retrieves block information by block number.
-    * @param block_number_or_tag block # or tag (e.g., "latest", "pending").
+    * @param block_number_or_tag Explicit block number (hex string) or named `block_tag_t`.
     * @param full_transaction_data Flag to determine whether to fetch full transaction data.
     * @return The block data in JSON format.
     */
-   fc::variant_object get_block_by_number(const block_tag_t& block_number_or_tag = block_tag_latest,
+   fc::variant_object get_block_by_number(const block_number_or_tag_t& block_number_or_tag = block_tag_t::latest,
                                           bool full_transaction_data = false);
 
    /**
@@ -475,8 +492,8 @@ public:
    std::vector<ethereum_event_data> get_events(const address_compat_type& contract_address,
                                                 const std::vector<std::string>& event_names,
                                                 const std::vector<abi::contract>& event_abis,
-                                                const block_tag_t& from_block,
-                                                const block_tag_t& to_block = block_tag_latest);
+                                                const block_number_or_tag_t& from_block,
+                                                const block_number_or_tag_t& to_block = block_tag_t::latest);
 
    /**
     * @brief Retrieves the transaction receipt by transaction hash.
@@ -490,10 +507,12 @@ public:
    /**
     * @brief Retrieves the transaction count (nonce) for an address.
     * @param address The address for which to fetch the transaction count.
-    * @param block_tag
+    * @param block Block parameter at which to query. Defaults to `block_tag_t::pending` so the
+    *              count reflects queued-but-unmined transactions — the correct next nonce.
     * @return The transaction count (nonce).
     */
-   fc::uint256 get_transaction_count(const address_compat_type& address, const std::string& block_tag = "pending");
+   fc::uint256 get_transaction_count(const address_compat_type& address,
+                                     const block_number_or_tag_t& block = block_tag_t::pending);
 
    /**
     * @brief Retrieves the chain ID of the connected Ethereum network.
@@ -614,9 +633,9 @@ ethereum_contract_call_fn<RT, Args...> ethereum_contract_client::create_call(con
    }
 
    abi::contract& abi = abi_map[contract.name];
-   return [this, &abi](const std::string& block_tag, Args&... args) -> RT {
+   return [this, &abi](const block_number_or_tag_t& block, Args&... args) -> RT {
       contract_invoke_data_items params = {args...};
-      auto res_var = client->execute_contract_view_fn(contract_address, abi, block_tag, params);
+      auto res_var = client->execute_contract_view_fn(contract_address, abi, block, params);
 
       if constexpr (std::is_same_v<std::decay_t<RT>, fc::variant>) {
          return res_var;
@@ -714,6 +733,8 @@ std::expected<T, fc::ethereum_abi_decode_exception> ethereum_event_data::decode(
 }
 
 } // namespace fc::network::ethereum
+
+FC_REFLECT_ENUM(fc::network::ethereum::block_tag_t, (earliest)(finalized)(safe)(latest)(pending))
 
 FC_REFLECT(fc::network::ethereum::ethereum_event_data,
    (contract_address)

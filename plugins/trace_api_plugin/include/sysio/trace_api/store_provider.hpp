@@ -1,15 +1,20 @@
 #pragma once
 
+#include <atomic>
 #include <ios>
-#include <thread>
+#include <memory>
 #include <mutex>
+#include <thread>
 #include <condition_variable>
 #include <fc/io/cfile.hpp>
 #include <fc/variant.hpp>
+#include <sysio/trace_api/abi_log.hpp>
+#include <sysio/trace_api/bloom_sidecar.hpp>
 #include <sysio/trace_api/common.hpp>
-#include <sysio/trace_api/metadata_log.hpp>
-#include <sysio/trace_api/data_log.hpp>
 #include <sysio/trace_api/compressed_file.hpp>
+#include <sysio/trace_api/data_log.hpp>
+#include <sysio/trace_api/metadata_log.hpp>
+#include <sysio/trace_api/trx_id_index.hpp>
 
 namespace sysio::trace_api {
 
@@ -86,6 +91,30 @@ namespace sysio::trace_api {
 
    class store_provider;
 
+   // On-disk format: trace_blk_idx_<range>.log
+   //
+   // Layout: blk_offset_index_header (16 bytes) followed by a flat array of
+   // width uint64_t slots.  Slot (block_num - slice_base) holds offset+1,
+   // where offset is the position in trace_<range>.log of that block's trace
+   // data.  Slot value 0 means "not present"; this distinguishes a missing
+   // block from a block stored at offset 0 (the first block in a slice).
+   //
+   // The file is pre-allocated sparse at creation, so any slot write is a
+   // single 8-byte in-place update.  Forks naturally overwrite the slot.
+   //
+   // Native-endian, x86_64 Linux only (same convention as other slice files).
+   struct blk_offset_index_header {
+      // Stored little-endian on disk so a hex dump of the first 4 bytes reads "BLIX".
+      static constexpr uint32_t magic_value     = 0x58494C42; // bytes on disk: 'B','L','I','X'
+      static constexpr uint32_t current_version = 1;
+
+      uint32_t magic    = magic_value;
+      uint32_t version  = current_version;
+      uint32_t width    = 0; // slice width (block count per slice)
+      uint32_t reserved = 0;
+   };
+   static_assert(sizeof(blk_offset_index_header) == 16);
+
    /**
     * Provides access to the slice directory.  It is only intended to be used by store_provider
     * and unit tests.
@@ -109,6 +138,19 @@ namespace sysio::trace_api {
       uint32_t slice_number(uint32_t block_height) const {
          return block_height / _width;
       }
+
+      /**
+       * Slice stride (blocks per slice) as configured at construction.
+       */
+      uint32_t width() const noexcept { return _width; }
+
+      /**
+       * Filesystem path for a slice's receiver bloom sidecar.  The file is only read/written via the bloom_builder
+       * and bloom_reader helpers; no fc::cfile overload is provided because the sidecar is written exactly once by
+       * the maintenance thread when the slice becomes irreversible (temp + rename) and read in one pass by the
+       * query path.
+       */
+      std::filesystem::path bloom_slice_path(uint32_t slice_number) const;
 
       /**
        * Find or create the index file associated with the indicated slice_number
@@ -210,6 +252,85 @@ namespace sysio::trace_api {
       void for_each_trx_id_slice(std::function<bool(fc::cfile&)> callback) const;
 
       /**
+       * Derive the slice number from a trx_id slice file path.
+       * Parses the block-range start from the filename.  Returns nullopt if
+       * the filename does not parse (callers should fall back to a slower
+       * lookup path rather than skipping the file silently).
+       */
+      std::optional<uint32_t> slice_number_from_path(const std::filesystem::path& trx_id_path) const;
+
+      /**
+       * Find the trx_id index file for a given slice number (or return nullopt if not present).
+       */
+      std::optional<trx_id_index_reader> find_trx_id_index_slice(uint32_t slice_number) const;
+
+      /**
+       * Build the trx_id index for a given slice from its trx_id log file.
+       * No-op if the index already exists for that slice.
+       */
+      void build_trx_id_index(uint32_t slice_number, const log_handler& log);
+
+      /**
+       * Build the per-slice receiver bloom sidecar from the slice's trace data log.  Called on slices that are fully
+       * past LIB so the source data is final (no fork can reach back into an already-built sidecar).  No-op if the
+       * sidecar already exists or the slice has no uncompressed trace data.
+       */
+      void build_recv_bloom(uint32_t slice_number, const log_handler& log);
+
+      /**
+       * Return {first, last} block numbers recorded across all index slice files, or nullopt
+       * if no data exists.  Used at startup to detect gaps between existing trace data and the
+       * current chain head.  Atomic in the sense that both values come from a single directory
+       * scan, so callers don't need to guard against seeing `first` but not `last`.
+       */
+      std::optional<std::pair<uint32_t,uint32_t>> first_and_last_recorded_blocks() const;
+
+      /**
+       * Filename-based contiguity check over the index slice files: returns the block range
+       * {first_missing, last_missing} of the first hole between the lowest and highest slice
+       * files present, or nullopt when the sequence is contiguous (or fewer than two slices
+       * exist).  Cheap (directory listing only, no file parsing) - intended for the startup
+       * continuity check, where a middle slice deleted by an operator or lost to partial
+       * copying would otherwise go unnoticed until queries 404 inside the hole.
+       */
+      std::optional<std::pair<uint32_t,uint32_t>> find_index_slice_gap() const;
+
+      /**
+       * Record that a block's trace has been appended.  Maintains the monotonic last-recorded
+       * watermark reported by last_recorded_block().  Called by store_provider::append (single
+       * writer); thread-safe with respect to concurrent readers.
+       */
+      void note_recorded_block(uint32_t block_number);
+
+      /**
+       * Highest block number ever appended to the store (this run or, via the startup seed, a
+       * prior run).  The query layer clamps a scan range's reported end to this value so clients
+       * paginating with `block_num_end + 1` never silently skip blocks that have not been
+       * recorded yet.  Returns 0 when the store has never recorded a block.
+       */
+      uint32_t last_recorded_block() const;
+
+      /**
+       * Record the offset of a block's trace data in trace_<range>.log, via the block-offset
+       * sidecar trace_blk_idx_<range>.log.  Creates the sidecar on first write to a new slice.
+       * Writes to an existing slot naturally overwrite it (fork re-writes).
+       */
+      void write_block_offset(uint32_t block_height, uint64_t trace_offset) const;
+
+      /**
+       * O(1) lookup of the trace-log offset for a block via the block-offset sidecar.
+       * Returns nullopt when the sidecar is missing, the slot is empty, or the file is invalid.
+       * Callers should fall back to scanning the metadata log in that case.
+       */
+      std::optional<uint64_t> lookup_block_offset(uint32_t block_height) const;
+
+      /**
+       * Current best-known LIB as reported by append_lib.  Thread-safe; used by readers to
+       * determine whether a given block is irreversible without scanning the metadata log.
+       */
+      uint32_t best_known_lib() const;
+
+      /**
        * set the LIB for maintenance
        * @param lib
        */
@@ -244,6 +365,15 @@ namespace sysio::trace_api {
       // take an open index slice file and verify its header is valid and prepare the file to be appended to (or read from)
       void validate_existing_index_slice_file(fc::cfile& index_file, open_state state) const;
 
+      // One-time constructor scan of the newest index slices to recover _best_known_lib and
+      // _last_recorded_block from a previous run.  See the implementation for the rationale.
+      void seed_watermarks_from_disk();
+
+      // Open the block-offset sidecar for a slice; creates and pre-allocates if missing.
+      // Validates the header on open.  Returns false + leaves blk_idx at the sidecar path
+      // (unopened) if the existing file has a wrong magic/version/width.
+      bool open_or_create_blk_offset_slice(uint32_t slice_number, fc::cfile& blk_idx) const;
+
       // helper for methods that process irreversible slice files
       template<typename F>
       void process_irreversible_slice_range(uint32_t lib, uint32_t upper_bound_block, std::optional<uint32_t>& lower_bound_slice, F&& f);
@@ -254,13 +384,18 @@ namespace sysio::trace_api {
       std::optional<uint32_t> _last_cleaned_up_slice;
       const std::optional<uint32_t> _minimum_uncompressed_irreversible_history_blocks;
       std::optional<uint32_t> _last_compressed_slice;
+      std::optional<uint32_t> _last_indexed_slice;
+      std::optional<uint32_t> _last_bloomed_slice;
       const size_t _compression_seek_point_stride;
 
-      std::mutex _maintenance_mtx;
+      mutable std::mutex _maintenance_mtx;
       std::condition_variable _maintenance_condition;
       std::thread _maintenance_thread;
       bool _maintenance_shutdown{false};
       uint32_t _best_known_lib{0};
+      // Highest block number ever appended (monotonic).  Atomic instead of _maintenance_mtx-guarded
+      // because it is read on every query-envelope build; relaxed ordering suffices for a watermark.
+      std::atomic<uint32_t> _last_recorded_block{0};
    };
 
    /**
@@ -279,6 +414,66 @@ namespace sysio::trace_api {
       void append_trx_ids(block_trxs_entry tt);
 
       /**
+       * Slice stride used for all sidecars.  Exposed on the provider so callers (e.g. request_handler's block-range
+       * scan) can partition queries by slice without having to reach into slice_directory.
+       */
+      uint32_t slice_stride() const noexcept { return _slice_directory.width(); }
+
+      /**
+       * Slice number containing the given block.
+       */
+      uint32_t slice_number(uint32_t block_height) const noexcept { return _slice_directory.slice_number(block_height); }
+
+      /**
+       * Open the per-slice bloom sidecar for a given slice number.  Returns a bloom_reader whose valid() is false
+       * when the sidecar is missing, truncated, wrong-version, or CRC-corrupt - in which case the caller MUST fall
+       * back to a full scan of the slice (an invalid reader returns true from may_contain_*, honoring the fail-safe
+       * invariant).  A positive probe is not authoritative (standard bloom semantics); only a negative probe on a
+       * valid reader permits skipping.
+       */
+      bloom_reader get_bloom(uint32_t slice_number) const;
+
+      /**
+       * Record an ABI version for an account at a given global_sequence, committed by the
+       * accepted block block_num.  global_seq == 0 means "captured lazily; exact seq unknown".
+       * The record stays in the in-memory reversible overlay (immediately visible to lookups)
+       * until LIB passes block_num - append_lib then flushes it to the on-disk abi log - or
+       * until a fork replaces the block, in which case rollback_abis discards it.
+       * Thread-safe; may be called from the extraction thread.
+       */
+      void append_abi(uint32_t block_num, chain::name account, uint64_t global_seq, std::vector<char> abi_bytes);
+
+      /**
+       * Discard reversible ABI records for blocks at or above block_num.  Called by chain
+       * extraction on block_start: a block starting at that height means any previously
+       * accepted block at or above it is being replaced by a fork switch.  Records already
+       * flushed to disk (at or below LIB) are never touched.  Thread-safe.
+       */
+      void rollback_abis(uint32_t block_num);
+
+      /**
+       * Resolve the effective ABI version for account at global_seq: the global_seq of the recorded
+       * ABI with the largest recorded global_seq <= the query (0 for the lazy-capture sentinel), or
+       * nullopt if none is recorded.  Pure in-memory index lookup - no blob I/O - so decoders can call
+       * it per action to compute a cache key.  Thread-safe; may be called from the HTTP thread.
+       */
+      std::optional<uint64_t> lookup_abi_seq(chain::name account, uint64_t global_seq) const;
+
+      /**
+       * Fetch the ABI blob recorded at an exact (account, effective_global_seq) key, as previously
+       * resolved by lookup_abi_seq.  Performs the blob pread; decoders call this only on a serializer
+       * cache miss.  Returns nullopt when the key is not recorded.  Thread-safe.
+       */
+      std::optional<std::vector<char>> fetch_abi(chain::name account, uint64_t effective_global_seq) const;
+
+      /**
+       * Return true if any ABI record exists for the account.  Used by extraction
+       * to decide whether to trigger a lazy ABI fetch on first encounter.
+       * Thread-safe.
+       */
+      bool has_abi_entry(chain::name account) const;
+
+      /**
        * Read the trace for a given block
        * @param block_height : the height of the data being read
        * @return empty optional if the data cannot be read OTHERWISE
@@ -288,6 +483,30 @@ namespace sysio::trace_api {
 
       get_block_n get_trx_block_number(const chain::transaction_id_type& trx_id, const yield_function& yield= {});
 
+      /**
+       * Return {first, last} block numbers recorded across all index slice files, or nullopt
+       * if the slice directory is empty.  Used at startup to verify continuity between existing
+       * trace data and the current chain head.
+       */
+      std::optional<std::pair<uint32_t,uint32_t>> first_and_last_recorded_blocks() const;
+
+      /**
+       * First internal hole in the recorded slice sequence as a {first_missing_block,
+       * last_missing_block} range, or nullopt when the slices are contiguous.  Used by the
+       * startup continuity check.
+       */
+      std::optional<std::pair<uint32_t,uint32_t>> find_index_slice_gap() const {
+         return _slice_directory.find_index_slice_gap();
+      }
+
+      /**
+       * Highest block number ever recorded by this store (seeded from disk at startup, advanced
+       * on every append).  0 when nothing has been recorded.  Thread-safe.
+       */
+      uint32_t last_recorded_block() const {
+         return _slice_directory.last_recorded_block();
+      }
+
       void start_maintenance_thread( log_handler log ) {
          _slice_directory.start_maintenance_thread( std::move(log) );
       }
@@ -295,7 +514,7 @@ namespace sysio::trace_api {
          _slice_directory.stop_maintenance_thread();
       }
 
-      protected:
+   protected:
       /**
        * Read the metadata log font-to-back starting at an offset passing each entry to a provided functor/lambda
        *
@@ -350,16 +569,13 @@ namespace sysio::trace_api {
                return extract_store<data_log_entry>(*ctrace);
             }
 
-            const std::string offset_str = boost::lexical_cast<std::string>(offset);
-            const std::string bh_str = boost::lexical_cast<std::string>(block_height);
-            throw malformed_slice_file("Requested offset: " + offset_str + " to retrieve block number: " + bh_str + " but this trace file is new, so there are no traces present.");
+            throw malformed_slice_file("Requested offset: " + std::to_string(offset) + " to retrieve block number: " +
+                                       std::to_string(block_height) + " but this trace file is new, so there are no traces present.");
          }
          const uint64_t end = file_size(trace.get_file_path());
          if( offset >= end ) {
-            const std::string offset_str = boost::lexical_cast<std::string>(offset);
-            const std::string bh_str = boost::lexical_cast<std::string>(block_height);
-            const std::string end_str = boost::lexical_cast<std::string>(end);
-            throw malformed_slice_file("Requested offset: " + offset_str + " to retrieve block number: " + bh_str + " but this trace file only goes to offset: " + end_str);
+            throw malformed_slice_file("Requested offset: " + std::to_string(offset) + " to retrieve block number: " +
+                                       std::to_string(block_height) + " but this trace file only goes to offset: " + std::to_string(end));
          }
          trace.seek(offset);
          return extract_store<data_log_entry>(trace);
@@ -381,8 +597,21 @@ namespace sysio::trace_api {
       void validate_existing_index_slice_file(fc::cfile& index, open_state state);
 
       slice_directory _slice_directory;
+
+   private:
+      // Check whether the canonical trace recorded for block_num contains trx_id, resolving the
+      // block through the block-offset sidecar.  Returns nullopt when the sidecar or trace data
+      // cannot resolve the block - callers fall back to scanning the slice's trx_id log.
+      std::optional<bool> confirm_trx_in_block(uint32_t block_num, const chain::transaction_id_type& trx_id);
+
+      // ABI sidecar: one global append-only log in the slice directory.  abi_log serialises its
+      // own writes, allows concurrent lookups, and restores its reversible overlay from its own
+      // durable journal sidecar on construction (so reversible records - both lazy global_seq-0
+      // and setabi - survive a restart without any rebuild step here).
+      abi_log _abi_log;
    };
 
 }
 
 FC_REFLECT(sysio::trace_api::slice_directory::index_header, (version))
+FC_REFLECT(sysio::trace_api::blk_offset_index_header, (magic)(version)(width)(reserved))
