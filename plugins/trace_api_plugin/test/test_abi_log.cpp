@@ -617,6 +617,122 @@ BOOST_FIXTURE_TEST_CASE(journal_replay_partial_window_rollback, abi_log_fixture)
    });
 }
 
+// Fail-closed + fatal rollback: if a ROLLBACK cannot be journaled (a disk write error, or journaling
+// already disabled), continuing is unsafe - the orphaned PUT for the rolled-back block would survive
+// to a restart and resurrect a forked-out ABI.  A trace_api node exists to record history, so
+// rollback_reversible rewrites the journal without the orphaned record (so a restart cannot resurrect
+// it) and then throws, which the extraction signal handler turns into a clean node shutdown.  Here
+// the rolled-back record is the only one, so the rewrite leaves an empty journal.  Simulate the write
+// failure and confirm both: the abort, and that the record does not come back after a restart.
+BOOST_FIXTURE_TEST_CASE(rollback_journal_write_failure_is_fatal_and_fail_closed, abi_log_fixture) {
+   with_log([&](abi_log& log) {
+      log.append_reversible(10, "x"_n, 100, make_abi("forked")); // PUT durably journaled
+      BOOST_REQUIRE(log.has_entry("x"_n));
+
+      log.force_journal_write_failure_for_test(true); // the ROLLBACK write will "fail"
+      BOOST_CHECK_THROW(log.rollback_reversible(10), std::exception);
+      log.force_journal_write_failure_for_test(false);
+   });
+
+   // Restart: the journal was rewritten without the orphaned PUT before the abort, so it must NOT
+   // replay it (which would resurrect the forked-out ABI).  Without that, "x" would come back here.
+   with_log([&](abi_log& log) {
+      BOOST_CHECK(!log.has_entry("x"_n));
+      BOOST_CHECK(!log.lookup("x"_n, 150));
+      BOOST_CHECK_EQUAL(log.reversible_size(), 0u);
+   });
+}
+
+// Capture writes are fatal on failure too: append_reversible throws rather than silently dropping a
+// record it cannot persist, so a node that can no longer record history shuts down instead of
+// serving incomplete history.
+BOOST_FIXTURE_TEST_CASE(append_reversible_journal_write_failure_is_fatal, abi_log_fixture) {
+   abi_log log(log_path());
+   log.force_journal_write_failure_for_test(true);
+   BOOST_CHECK_THROW(log.append_reversible(10, "x"_n, 100, make_abi("v")), std::exception);
+}
+
+// When a ROLLBACK write fails, the journal is rewritten to the post-rollback overlay before the node
+// aborts, so a restart keeps the canonical (below-fork) records while dropping only the orphaned
+// forked ones - the node comes back complete, not just safe.  (The single-record case above leaves an
+// empty journal; this one proves an unrelated canonical record below the fork point survives.)
+BOOST_FIXTURE_TEST_CASE(rollback_write_failure_preserves_canonical_records, abi_log_fixture) {
+   with_log([&](abi_log& log) {
+      log.append_reversible(10, "canon"_n,  100, make_abi("canon-abi"));  // canonical, below the fork
+      log.append_reversible(20, "forked"_n, 200, make_abi("forked-abi")); // rolled out by the fork
+      log.force_journal_write_failure_for_test(true);
+      BOOST_CHECK_THROW(log.rollback_reversible(15), std::exception);     // fork at 15 drops block 20
+      log.force_journal_write_failure_for_test(false);
+   });
+
+   // Restart: the rewrite kept block 10 and dropped block 20.
+   with_log([&](abi_log& log) {
+      BOOST_CHECK_EQUAL(log.reversible_size(), 1u);
+      auto c = log.lookup("canon"_n, 150);
+      BOOST_REQUIRE(c.has_value());
+      BOOST_CHECK(c->abi_bytes == make_abi("canon-abi"));
+      BOOST_CHECK(!log.has_entry("forked"_n));
+   });
+}
+
+// If the post-rollback rewrite ALSO fails (e.g. disk full), the journal is truncated as a safe last
+// resort: the forked record is still not resurrected (the key guarantee), at the cost of the
+// canonical window degrading to raw hex.
+BOOST_FIXTURE_TEST_CASE(rollback_write_failure_truncates_when_compaction_also_fails, abi_log_fixture) {
+   with_log([&](abi_log& log) {
+      log.append_reversible(10, "canon"_n,  100, make_abi("canon-abi"));
+      log.append_reversible(20, "forked"_n, 200, make_abi("forked-abi"));
+      log.force_journal_write_failure_for_test(true);
+      log.force_journal_compaction_failure_for_test(true); // the rewrite cannot complete either
+      BOOST_CHECK_THROW(log.rollback_reversible(15), std::exception);
+      log.force_journal_write_failure_for_test(false);
+      log.force_journal_compaction_failure_for_test(false);
+   });
+
+   // Restart: forked record is NOT resurrected (the key guarantee); the canonical one was also
+   // sacrificed by the full truncate - the acceptable fail-safe direction (missing, never wrong).
+   with_log([&](abi_log& log) {
+      BOOST_CHECK(!log.has_entry("forked"_n));
+      BOOST_CHECK(!log.has_entry("canon"_n));
+      BOOST_CHECK_EQUAL(log.reversible_size(), 0u);
+   });
+}
+
+// A main-log (flush) write failure is fatal too - uniform with the journal - and loses no data: the
+// unflushed record stays in the reversible journal, so a restart with storage available restores it
+// and re-persists it to the main log on the next LIB advance.  This is the "disk full -> clean exit
+// -> restart picks up, nothing lost" guarantee.
+BOOST_FIXTURE_TEST_CASE(flush_write_failure_is_fatal_and_recovers_on_restart, abi_log_fixture) {
+   with_log([&](abi_log& log) {
+      log.append_reversible(10, "x"_n, 100, make_abi("abi")); // captured + journaled
+      log.force_main_log_write_failure_for_test(true);
+      BOOST_CHECK_THROW(log.flush_irreversible(10), std::exception); // cannot persist to the main log
+      log.force_main_log_write_failure_for_test(false);
+      // The record is still resolvable this session (from the overlay) and still reversible.
+      BOOST_CHECK(log.lookup("x"_n, 100).has_value());
+      BOOST_CHECK_EQUAL(log.reversible_size(), 1u);
+   });
+
+   // Restart with storage available: the journal restored the unflushed record; a flush now persists
+   // it to the main log, and it moves out of the reversible overlay.  Nothing lost.
+   with_log([&](abi_log& log) {
+      BOOST_REQUIRE(log.lookup("x"_n, 100).has_value());
+      BOOST_CHECK_EQUAL(log.reversible_size(), 1u); // restored as reversible (was never flushed)
+      log.flush_irreversible(10);
+      BOOST_CHECK_EQUAL(log.reversible_size(), 0u); // now on disk
+      auto r = log.lookup("x"_n, 100);
+      BOOST_REQUIRE(r.has_value());
+      BOOST_CHECK(r->abi_bytes == make_abi("abi"));
+   });
+
+   // Final restart: served purely from the main log.
+   with_log([&](abi_log& log) {
+      auto r = log.lookup("x"_n, 100);
+      BOOST_REQUIRE(r.has_value());
+      BOOST_CHECK(r->abi_bytes == make_abi("abi"));
+   });
+}
+
 // A record flushed to the main log before restart is served from disk afterwards; its now-dead PUT
 // is compacted out of the journal (which shrinks), and it is never double-counted in the overlay.
 BOOST_FIXTURE_TEST_CASE(flushed_record_compacted_out_of_journal_on_restart, abi_log_fixture) {

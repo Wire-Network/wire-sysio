@@ -221,7 +221,18 @@ private:
       // the trace slices overwrite per-block on re-application.  In normal forward
       // operation no record at or above H exists and this is a no-op.  Records at or
       // below LIB live on disk and are never touched (a fork cannot reach below LIB).
-      store.rollback_abis(block_num);
+      //
+      // rollback_abis throws if it cannot durably record the rollback (a trace_api node
+      // must record history, so a persistence failure is fatal).  Route it through
+      // except_handler like check_continuity so it becomes a clean controller shutdown
+      // (current block rolled back) rather than an unhandled signal-handler exception.
+      try {
+         store.rollback_abis(block_num);
+      } catch (const yield_exception&) {
+         throw;
+      } catch (...) {
+         except_handler(MAKE_EXCEPTION_WITH_CONTEXT(std::current_exception()));
+      }
    }
 
    void check_continuity(uint32_t block_num) {

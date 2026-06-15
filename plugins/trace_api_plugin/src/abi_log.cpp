@@ -8,6 +8,7 @@
 #include <magic_enum/magic_enum.hpp>
 
 #include <cstring>
+#include <stdexcept>
 
 namespace sysio::trace_api {
 
@@ -180,6 +181,9 @@ uint64_t abi_log::recover_from_disk(const std::filesystem::path& path) {
 // a duplicate record.  This is harmless given last-write-wins but not obvious.
 bool abi_log::append(chain::name account, uint64_t global_seq, std::vector<char> abi_bytes) {
    if (!valid()) return false;
+   // Test aid: simulate a main-log disk write error (no bytes written) so the fatal flush path can
+   // be exercised deterministically; always false in production.
+   if (_force_main_log_write_failure) return false;
 
    record_header rh{ account, global_seq, abi_bytes.size() };
    const uint32_t crc = compute_record_crc(rh, abi_bytes.data(), abi_bytes.size());
@@ -234,11 +238,19 @@ bool abi_log::append(chain::name account, uint64_t global_seq, std::vector<char>
 void abi_log::append_reversible(uint32_t block_num, chain::name account, uint64_t global_seq,
                                 std::vector<char> abi_bytes) {
    if (!valid()) return;
-   // Journal before the in-memory insert.  The overlay is volatile, so persisting the record first
-   // means a crash in between still restores it on the next start; the encode reads abi_bytes before
-   // it is moved into the overlay.  The journal write is advisory - on failure the overlay still
-   // serves the record for this session, only its restart durability is lost.
-   journal_append(encode_put_body(block_num, account, global_seq, abi_bytes));
+   // Journal before the in-memory insert: the overlay is volatile, so persisting first means a crash
+   // in between still restores the record on the next start (the encode reads abi_bytes before it is
+   // moved into the overlay).  Recording history is the whole point of a trace_api node, so a failure
+   // to persist is fatal, not a silent degradation: throw, which the extraction signal handler turns
+   // into a clean node shutdown.  Treating every persistence failure uniformly as fatal keeps the
+   // operator contract simple - the node either records completely or stops.
+   if (!journal_append(encode_put_body(block_num, account, global_seq, abi_bytes))) {
+      fc_elog(_log, "trace_api: abi_log could not persist reversible ABI record for {} at global_seq {}",
+              account, global_seq);
+      throw std::runtime_error("trace_api: failed to persist an ABI journal record - a trace_api node "
+                               "must record complete history. Resolve the storage error (disk full or "
+                               "I/O failure) and relaunch.");
+   }
    std::lock_guard<std::mutex> lock(_index_mtx);
    // std::map::operator[] — duplicate (account, global_seq) silently overwrites (last-write-wins).
    // A replay that re-commits a key already flushed to disk leaves both copies; fetch prefers the
@@ -263,14 +275,36 @@ void abi_log::rollback_reversible(uint32_t block_num) {
 
    // Journal the rollback before applying it: persisting the intent first means a crash in between
    // cannot resurrect the forked-out records on the next start (replay applies the ROLLBACK in order).
-   journal_append(encode_rollback_body(block_num));
+   const bool recorded = journal_append(encode_rollback_body(block_num));
 
-   std::lock_guard<std::mutex> lock(_index_mtx);
-   for (auto it = _reversible.begin(); it != _reversible.end();) {
-      if (it->second.block_num >= block_num)
-         it = _reversible.erase(it);
-      else
-         ++it;
+   {
+      std::lock_guard<std::mutex> lock(_index_mtx);
+      for (auto it = _reversible.begin(); it != _reversible.end();) {
+         if (it->second.block_num >= block_num)
+            it = _reversible.erase(it);
+         else
+            ++it;
+      }
+   }
+
+   // Fail-closed, then fatal.  A PUT for the rolled-back block may already be durable; if the ROLLBACK
+   // could not be recorded (write error, or journaling disabled), that PUT is now orphaned and a
+   // restart would replay it and resurrect a forked-out ABI - the exact wrong-decode this journal
+   // prevents.  Leave the on-disk journal both safe AND complete before aborting: the overlay has
+   // already had the rolled-back records erased, so rewrite the journal to it (compact_journal),
+   // which drops the orphaned forked PUTs (block >= block_num) while keeping the canonical records
+   // below the fork - so a restart neither resurrects forked data nor loses the still-reversible
+   // window.  If even that rewrite fails (e.g. the disk is full), fall back to truncating the journal
+   // to its header: safe, though the current window then degrades to raw hex.  Then abort - a
+   // trace_api node that cannot record must stop rather than serve incomplete/incorrect history.
+   if (!recorded) {
+      compact_journal();
+      if (!_journal_enabled)
+         reset_journal_fail_closed();
+      fc_elog(_log, "trace_api: abi_log could not persist ABI rollback at block {}", block_num);
+      throw std::runtime_error("trace_api: failed to persist an ABI journal rollback - a trace_api node "
+                               "must record complete history. Resolve the storage error (disk full or "
+                               "I/O failure) and relaunch.");
    }
 }
 
@@ -304,11 +338,17 @@ void abi_log::flush_irreversible(uint32_t lib) {
       // append() inserts into _index before we erase from the overlay, so concurrent lookups
       // always find the record in at least one of the two maps.
       if (!append(key.first, key.second, std::move(bytes))) {
-         // Disk write failed; the record is still in the overlay - leave it (and the rest of the
-         // flushable range) for retry on the next LIB advance rather than lose it.
-         fc_wlog(_log, "trace_api: abi_log flush at lib {} failed for account {} seq {}; will retry",
-                 lib, key.first, key.second);
-         return;
+         // Cannot persist this irreversible record to the main log.  Recording history is the point
+         // of a trace_api node, so this is fatal - uniform with the journal write paths - rather than
+         // serving incomplete history.  No data is lost: the record is still in the reversible overlay
+         // AND its journal PUT, so a restart with storage available restores it from the journal and
+         // re-flushes it on the next LIB advance.  The throw routes through the extraction store_lib
+         // handler to a clean controller shutdown.
+         fc_elog(_log, "trace_api: abi_log could not persist irreversible ABI record for {} at global_seq {}",
+                 key.first, key.second);
+         throw std::runtime_error("trace_api: failed to persist an ABI record to the main log - a "
+                                  "trace_api node must record complete history. Resolve the storage "
+                                  "error (disk full or I/O failure) and relaunch.");
       }
       std::lock_guard<std::mutex> lock(_index_mtx);
       _reversible.erase(key);
@@ -523,7 +563,10 @@ bool abi_log::write_journal_header() {
 }
 
 bool abi_log::journal_append(const std::vector<char>& body) {
-   if (!_journal_enabled)
+   // _force_journal_write_failure is a test aid that simulates a disk write error (false, no bytes
+   // written) so the fail-closed rollback path can be exercised deterministically; always false in
+   // production.
+   if (!_journal_enabled || _force_journal_write_failure)
       return false;
 
    auto rec = frame_journal_record(body);
@@ -548,6 +591,23 @@ bool abi_log::journal_append(const std::vector<char>& body) {
    }
    _journal_end_offset += rec.size();
    return true;
+}
+
+void abi_log::reset_journal_fail_closed() {
+   // A ROLLBACK could not be journaled, so the file may hold orphaned PUT(s) for the rolled-back
+   // block.  Best-effort truncate back to the header: that drops every record (the orphaned PUT and
+   // the still-live ones alike), so a restart starts from an empty overlay and cannot resurrect the
+   // forked-out ABI.  The caller aborts the node immediately after, so this only needs to leave the
+   // on-disk journal safe for the restart (re-applied reversible blocks repopulate it); sacrificing
+   // restart-durability of the current window degrades to a missing ABI (raw hex), never a wrong one.
+   std::lock_guard<std::mutex> lock(_journal_mtx);
+   std::error_code ec;
+   std::filesystem::resize_file(_journal_path, sizeof(abi_journal_header), ec);
+   if (!ec)
+      _journal_end_offset = sizeof(abi_journal_header);
+   else
+      fc_wlog(_log, "trace_api: abi_log journal {} could not be reset before shutdown: {}",
+              _journal_path.generic_string(), ec.message());
 }
 
 std::map<abi_log::index_key, abi_log::reversible_entry> abi_log::replay_journal_records() {
@@ -676,6 +736,10 @@ void abi_log::compact_journal() {
 
    std::lock_guard<std::mutex> lock(_journal_mtx);
    try {
+      // Test aid: simulate a rewrite that cannot complete (e.g. disk full), to exercise the
+      // truncate fallback in the fail-closed rollback path.  Always false in production.
+      if (_force_journal_compaction_failure)
+         throw std::runtime_error("forced journal compaction failure (test)");
       {
          fc::cfile t;
          t.set_file_path(tmp);

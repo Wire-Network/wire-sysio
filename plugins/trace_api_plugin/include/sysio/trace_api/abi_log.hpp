@@ -43,13 +43,21 @@ namespace sysio::trace_api {
 // is dropped from the overlay on replay).  On restart the journal is
 // replayed into the overlay - skipping any (account, global_seq) already on
 // disk - then compacted (rewritten to contain only the live, still-reversible
-// records).  A journal write failure is advisory: the in-memory overlay still
-// serves the current session; only restart durability of that one record is
-// lost.
+// records).  A journal write failure is fatal, not advisory: recording history
+// is the point of a trace_api node, so append_reversible/rollback_reversible
+// throw on a failed persist and the extraction signal handler turns that into a
+// clean node shutdown.  A failed rollback first rewrites the journal to the
+// post-rollback overlay (dropping only the orphaned forked records, keeping the
+// canonical ones) so a restart neither resurrects a forked-out ABI nor loses the
+// still-reversible window; if even that rewrite fails it truncates the journal as
+// a safe last resort (see reset_journal_fail_closed).
 //
 // Appends stream records to the end of the file with no rewrite of
 // existing records.  The lookup index lives in memory and is rebuilt by
-// scanning the file at startup.
+// scanning the file at startup.  A failed append during flush_irreversible
+// is fatal too (uniform with the journal): the node shuts down, but no data
+// is lost - the unflushed record is still in the reversible journal and is
+// re-persisted on the next LIB advance after a restart with storage free.
 //
 // On-disk format (fc::raw-packed little-endian, x86_64 Linux):
 //
@@ -177,6 +185,19 @@ public:
    // aid.  Thread-safe.
    size_t reversible_size() const;
 
+   // Test aid: force journal writes to fail (as if a disk write errored), to
+   // exercise the fail-closed rollback path deterministically.  No effect in
+   // production (always left false).
+   void force_journal_write_failure_for_test(bool fail) { _force_journal_write_failure = fail; }
+
+   // Test aid: force journal compaction (the rewrite) to fail, to exercise the
+   // truncate fallback in the fail-closed rollback path.  No effect in production.
+   void force_journal_compaction_failure_for_test(bool fail) { _force_journal_compaction_failure = fail; }
+
+   // Test aid: force main-log (flush) writes to fail, to exercise the fatal flush
+   // path and its lossless restart recovery.  No effect in production.
+   void force_main_log_write_failure_for_test(bool fail) { _force_main_log_write_failure = fail; }
+
    struct lookup_result {
       uint64_t          effective_global_seq = 0; // global_seq of the ABI record that matched
       std::vector<char> abi_bytes;
@@ -267,11 +288,20 @@ private:
    // as from the constructor.
    void compact_journal();
 
-   // Frame and append one already-encoded journal body.  No-op when journaling
-   // is disabled.  Returns false on write failure (the torn tail is truncated;
-   // journaling is disabled only if that truncation also fails).  Takes
-   // _journal_mtx; never nests with _index_mtx.
+   // Frame and append one already-encoded journal body.  Returns false when
+   // journaling is disabled or the write fails (the torn tail is truncated; the
+   // log is disabled only if that truncation also fails).  Callers treat a false
+   // return as a fatal failure to persist (see append_reversible /
+   // rollback_reversible).  Takes _journal_mtx; never nests with _index_mtx.
    bool journal_append(const std::vector<char>& body);
+
+   // Last-resort fallback when a ROLLBACK could not be recorded AND the
+   // post-rollback rewrite (compact_journal) also failed: best-effort truncate
+   // the journal back to its header so a restart cannot replay an orphaned PUT
+   // and resurrect a forked-out ABI.  The caller aborts the node immediately
+   // after, so this only needs to leave the on-disk journal safe for the
+   // restart.  Takes _journal_mtx.
+   void reset_journal_fail_closed();
 
    // Encode a PUT / ROLLBACK body (op byte + fc::raw fields).  No file I/O.
    static std::vector<char> encode_put_body(uint32_t block_num, chain::name account,
@@ -309,6 +339,9 @@ private:
    uint64_t                         _journal_end_offset{0};
    bool                             _journal_enabled{false};
    size_t                           _journal_compaction_threshold{default_journal_compaction_threshold};
+   bool                             _force_journal_write_failure{false};       // test aid only; see setter
+   bool                             _force_journal_compaction_failure{false};  // test aid only; see setter
+   bool                             _force_main_log_write_failure{false};      // test aid only; see setter
 };
 
 } // namespace sysio::trace_api

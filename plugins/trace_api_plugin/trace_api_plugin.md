@@ -676,6 +676,17 @@ not-yet-irreversible ABI records are affected (they fall back to raw hex
 until their contract is touched again); the irreversible history in
 `abi_log.log` is unaffected. It is safe to delete alongside `abi_log.log`.
 
+**Operational note.** trace_api is a history/query plugin; run it only on
+dedicated query nodes. **Never enable it on a block-producing node** (test
+environments aside). A failed ABI write is fatal (the node shuts down
+rather than record incomplete history — see [ABI log](#abi-log)), so a
+node's liveness is tied to the writability of its `trace-dir`: a query node
+that fills or loses its trace storage exits cleanly and resumes without
+data loss once restarted with space — appropriate for a query node, and a
+further reason never to couple this plugin to block production. (This
+matches the existing startup continuity check, which also shuts the node
+down on unrecoverable trace-data gaps.)
+
 ---
 
 ### Startup continuity check
@@ -961,6 +972,13 @@ CRC-mismatched records and truncates the file at the first bad one —
 any lost records are rebuilt the next time their contract is touched
 (via an observed `setabi` or the lazy current-ABI fetch).
 
+A write failure when persisting a record here (the flush at LIB, e.g.
+disk full) is **fatal**, uniform with the journal: the node shuts down
+cleanly rather than continuing without recording. No data is lost — the
+record is still in the reversible overlay and its journal entry, so a
+restart with storage available restores it from the journal and
+re-persists it on the next LIB advance.
+
 ##### Reversible journal (`abi_log.journal`)
 
 The in-memory reversible overlay is durably mirrored to a sibling
@@ -989,9 +1007,17 @@ flushed record already lives in `abi_log.log`). On startup the journal
 is replayed in order into the overlay — dropping any `(account,
 global_seq)` already on disk — then compacted (rewritten via a temp file
 and atomic rename to contain only the still-reversible records). Torn or
-CRC-mismatched tails are truncated like the main log; a journal write
-failure is advisory (the in-memory overlay still serves the session,
-only restart durability of that one record is lost).
+CRC-mismatched tails are truncated like the main log. A journal write
+failure is **fatal**: recording history is the point of a trace_api
+node, so the node shuts down cleanly rather than continuing with
+incomplete or inconsistent history. A failed rollback first rewrites the
+journal to the post-rollback overlay before shutting down — dropping only
+the orphaned forked records while keeping the canonical ones — so a
+restart neither resurrects a forked-out ABI nor loses the still-reversible
+window; if even that rewrite fails (e.g. disk full) it truncates the
+journal as a safe last resort (the current window then degrades to raw
+hex). On restart the chain re-applies the rolled-back block, so the
+aborted work is re-recorded.
 
 The journal is bounded so it cannot grow without limit on a node that
 runs for months without a restart. A flushed record's `put` stays in the
