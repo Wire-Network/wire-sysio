@@ -1,6 +1,7 @@
 #include <sysio/chain/webassembly/sys-vm-oc/executor.hpp>
 #include <sysio/chain/webassembly/sys-vm-oc/code_cache.hpp>
 #include <sysio/chain/webassembly/sys-vm-oc/memory.hpp>
+#include <sysio/chain/webassembly/sys-vm-oc/thread_exec_mem.hpp>
 #include <sysio/chain/webassembly/sys-vm-oc/intrinsic_mapping.hpp>
 #include <sysio/chain/webassembly/sys-vm-oc/intrinsic.hpp>
 #include <sysio/chain/webassembly/sys-vm-oc/sys-vm-oc.h>
@@ -280,5 +281,7 @@ executor::~executor() {
    sys_vm_oc_setgs(0);
    munmap(code_mapping, code_mapping_size);
 }
+
+thread_local thread_exec_mem::ro_thread_exec_mem thread_exec_mem::ro_thread_state{};
 
 } // namespace sysio::chain::sysvmoc
