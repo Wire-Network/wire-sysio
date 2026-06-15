@@ -46,9 +46,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        runner:
-          - macos-15
-          - macos-26
+        include:
+          - runner: macos-15
+            np_lr_jobs: 2
+          - runner: macos-26
+            np_lr_jobs: 2
     env:
       BUILD_DIR: build/macos-arm64-${{ matrix.runner }}
       VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/vcpkg-binary-cache,readwrite"
@@ -132,12 +134,21 @@ jobs:
       - name: Run sharded NP/LR tests
         run: |
           cd "$BUILD_DIR"
-          test_jobs="$(sysctl -n hw.logicalcpu)"
+          test_jobs="${{ matrix.np_lr_jobs }}"
           echo "Running sharded NP/LR tests with ${test_jobs} jobs"
           ctest --output-on-failure -j "${test_jobs}" \
             -L "(nonparallelizable_tests|long_running_tests)" \
+            -E "^read-only-trx-" \
             --timeout 2700 \
             2>&1 | tee "$RUNNER_TEMP/macos-arm64-${{ matrix.runner }}-np-lr-ctest.log"
+
+      - name: Run read-only transaction NP tests
+        run: |
+          cd "$BUILD_DIR"
+          ctest --output-on-failure -j 1 \
+            -R "^read-only-trx-" \
+            --timeout 2700 \
+            2>&1 | tee "$RUNNER_TEMP/macos-arm64-${{ matrix.runner }}-read-only-ctest.log"
 
       - name: Save CTest cost data
         if: ${{ always() && hashFiles(format('{0}/Testing/Temporary/CTestCostData.txt', env.BUILD_DIR)) != '' }}
