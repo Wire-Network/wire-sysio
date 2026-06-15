@@ -309,8 +309,18 @@ class PerformanceTestBasic:
         # The old trace_api/get_block serialized the entire block (including base58-encoded
         # signatures - OpenSSL BN_div alloc storm) even though the harness only needs trx id,
         # block num/time, cpu/net usage, and the block header.
-        # Filter by the configured action name (transfer/cpu/ram/net/newaccount/doit/...) so
-        # onblock and other unrelated trxs are skipped server-side without base58 work.
+        #
+        # get_actions filters by a SINGLE action name server-side. A user-trx config may list
+        # several distinct action names and the whole list is handed to the trx generator, so
+        # filtering on only the first name (cfgActions[0]) would silently drop every transaction
+        # built from the other actions -- they would be reported as missing/dropped and their
+        # cpu/net/TPS uncounted. We therefore push the server-side filter down only when exactly
+        # one distinct action name is configured (smaller payload, onblock dropped server-side).
+        # With multiple distinct names -- or no user-trx config at all -- we drop the server-side
+        # filter and skip just onblock client-side: one request per block instead of one per
+        # action name, and every harness trx is captured regardless of which configured action it
+        # carries. Transactions are deduped by trx_id below, so a trx bundling several matched
+        # actions is still recorded exactly once with its parent-transaction totals.
         # Per-trx cpu/net come from trx_cpu_usage_us / trx_net_usage_words on each action variant
         # (the parent transaction's totals); the action-level cpu_usage_us / net_usage would
         # undercount multi-action trxs and use different units (action net_usage is bytes; trx
@@ -322,9 +332,14 @@ class PerformanceTestBasic:
         # for that one block: empty blocks carry no harness-action trxs so the payload is small.
         actionFilter = None
         if getattr(self, 'userTrxDataDict', None):
-            cfgActions = self.userTrxDataDict.get('actions') or []
-            if cfgActions:
-                actionFilter = cfgActions[0].get('actionName')
+            # Distinct configured action names. get_actions can express only one server-side, so
+            # push the filter down only for single-action configs; multi-action configs fall back
+            # to the client-side onblock skip below, which captures all configured actions at once.
+            cfgActionNames = {act.get('actionName')
+                              for act in (self.userTrxDataDict.get('actions') or [])
+                              if act.get('actionName')}
+            if len(cfgActionNames) == 1:
+                actionFilter = next(iter(cfgActionNames))
         for blockNum in range(startBlockNum, endBlockNum + 1):
             blockCpuTotal, blockNetTotal, blockTransactionTotal = 0, 0, 0
             blockStatus = None
