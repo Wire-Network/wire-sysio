@@ -38,7 +38,7 @@ using namespace sysio;
       auto next = [cb=std::move(cb), body=std::move(body)](const chain::next_function_variant<call_result>& result){ \
          if (std::holds_alternative<fc::exception_ptr>(result)) {\
             try {\
-               throw *std::get<fc::exception_ptr>(result);\
+               std::get<fc::exception_ptr>(result)->rethrow();\
             } catch (...) {\
                http_plugin::handle_exception(#api_name, #call_name, body, cb);\
             }\

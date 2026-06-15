@@ -980,7 +980,7 @@ struct controller_impl {
          if( trace->except_ptr )
             std::rethrow_exception(trace->except_ptr);
          if( trace->except)
-            throw *trace->except;
+            assert(trace->except_ptr); // except/except_ptr always set together
          getpeerkeys_res_t res;
          if (!trace->action_traces.empty()) {
             const auto& act_trace = trace->action_traces[0];
@@ -2022,7 +2022,7 @@ struct controller_impl {
          auto handle_exception =[&](const auto& e)
          {
             trace->error_code = controller::convert_exception_to_error_code( e );
-            trace->except = e;
+            trace->except = e.dynamic_copy_exception(); // virtual copy preserves the dynamic exception type
             trace->except_ptr = std::current_exception();
             auto now = fc::time_point::now();
             trx_context.update_billed_cpu_time(now);
@@ -2255,7 +2255,8 @@ struct controller_impl {
             if( onblock_trace->except ) {
                if (onblock_trace->except->code() == interrupt_exception::code_value) {
                   ilog("Interrupt of onblock {}", chain_head.block_num() + 1);
-                  throw *onblock_trace->except;
+                  assert(onblock_trace->except_ptr); // always set together
+                  std::rethrow_exception(onblock_trace->except_ptr);
                }
                wlog("onblock {} is REJECTING: {}", chain_head.block_num() + 1, fc::json::to_log_string(*onblock_trace));
             }
@@ -2692,7 +2693,8 @@ struct controller_impl {
                   } else {
                      elog("{}", fc::json::to_log_string(*trace));
                   }
-                  throw *trace->except;
+                  assert(trace->except_ptr); // always set together
+                  std::rethrow_exception(trace->except_ptr);
                }
 
                SYS_ASSERT(trx_receipts.size() > 0, block_validate_exception,
