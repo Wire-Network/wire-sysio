@@ -795,6 +795,42 @@ BOOST_AUTO_TEST_CASE(pruned_out_of_range_block_num_is_damage) { try {
    BOOST_REQUIRE_THROW(log_utils::find_block_id(t.stem(), 20), plugin_exception);
 } FC_LOG_AND_RETHROW() }
 
+// find_block_id's fallback — taken when the on-disk index is missing or untrusted — recomputes the
+// index by walking the log. The pruned backward walk does not require contiguous block numbers, so a
+// damaged retained chain can leave a block inside the servable range with no entry of its own: a zero
+// slot. Reading that slot blindly unpacks the header at offset 0 (the pruned stub, whose id is a real
+// but unrelated block) and returns the wrong id. The fallback must validate the slot the same way the
+// fast path does and report the log as damaged instead. Verified to return block 2's stub id, not
+// throw, without the slot_holds_block check in the fallback.
+BOOST_AUTO_TEST_CASE(find_block_id_fallback_rejects_orphaned_servable_block) { try {
+   utils_fixture t(6 /*prune_blocks*/);
+   const size_t entry_size = 4096 + 2048; //large enough that hole punching actually frees blocks
+   t.add_range(2, 20, 'A', 'A', entry_size);
+   t.close();
+
+   const log_utils::log_summary s = log_utils::summarize_log(t.stem());
+   BOOST_REQUIRE(s.pruned && s.tail_ok);
+   const uint32_t first_servable = s.last_block - *s.pruned_block_count + 1;
+   const uint32_t orphan         = first_servable + 1; //comfortably inside (first_servable, last_block)
+   BOOST_REQUIRE(orphan > first_servable && orphan < s.last_block);
+
+   //forge the orphan's retained entry so it decodes as its successor — a block already covered by its
+   // own real entry. Nothing now decodes to `orphan`, so the recomputed index leaves its slot at zero,
+   // while positions are untouched so the trailer chain still walks cleanly (no damage detected there).
+   t.set_block_id_at(t.index_slot(orphan, 2), utils_fixture::id_for(orphan + 1, 'A'));
+
+   //force the fallback: with no on-disk index find_block_id must recompute by walking the log
+   std::filesystem::remove(t.index_path());
+
+   //the orphaned block is inside the servable range but absent from the log: report damage, never the
+   // stub's (block 2's) id that unpacking offset 0 would otherwise yield
+   BOOST_REQUIRE_THROW(log_utils::find_block_id(t.stem(), orphan), plugin_exception);
+
+   //blocks that are present still resolve to their real ids through the same fallback
+   BOOST_REQUIRE(log_utils::find_block_id(t.stem(), s.last_block) == utils_fixture::id_for(s.last_block, 'A'));
+   BOOST_REQUIRE(log_utils::find_block_id(t.stem(), first_servable) == utils_fixture::id_for(first_servable, 'A'));
+} FC_LOG_AND_RETHROW() }
+
 BOOST_AUTO_TEST_CASE(force_write_head_gap) { try {
    utils_fixture t;
    t.add_range(2, 10, 'A', 'A');

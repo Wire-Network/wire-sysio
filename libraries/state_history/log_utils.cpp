@@ -476,6 +476,23 @@ fc::random_access_file open_log_readonly(const std::filesystem::path& stem) {
    return fc::random_access_file(lp, fc::random_access_file::read_only);
 }
 
+/**
+ * True iff the entry at `pos` is a structurally valid ship header for exactly `block_num`. This is the
+ * shared "does this slot really hold the block we asked for" check behind every index lookup. An
+ * on-disk index can be stale, and a computed index legitimately carries zero slots for blocks a
+ * (possibly damaged) log does not retain; a zero or otherwise wrong slot would unpack the header at
+ * the wrong offset -- offset 0 is the log's first/stub header -- and silently misattribute a
+ * neighbouring block's id. A slot is therefore trusted only after its entry is read back and confirmed
+ * to decode to the requested block.
+ */
+bool slot_holds_block(fc::random_access_file& log, uint64_t log_size, uint64_t pos, uint32_t block_num) {
+   if(pos + packed_header_size > log_size)
+      return false;
+   const log_header hdr = log.unpack_from<log_header>(pos);
+   return is_ship(hdr.magic) && is_ship_supported_version(hdr.magic) &&
+          chain::block_header::num_from_id(hdr.block_id) == block_num;
+}
+
 /// positions of blocks in a log, from its index file when that is usable, otherwise from a forward walk
 struct position_lookup {
    position_lookup(fc::random_access_file& log, uint64_t log_size, const endpoints& e,
@@ -500,13 +517,7 @@ struct position_lookup {
          pos = index->unpack_from<uint64_t>((uint64_t(block_num) - first_block) * sizeof(uint64_t));
       else
          pos = computed->slots[block_num - first_block];
-      SYS_ASSERT(pos + packed_header_size <= log_size, chain::plugin_exception,
-                 "index entry for block {} of {}.log points outside the log; run make-index first", block_num,
-                 stem.string());
-      const log_header hdr = log.unpack_from<log_header>(pos);
-      SYS_ASSERT(is_ship(hdr.magic) && is_ship_supported_version(hdr.magic) &&
-                    chain::block_header::num_from_id(hdr.block_id) == block_num,
-                 chain::plugin_exception,
+      SYS_ASSERT(slot_holds_block(log, log_size, pos, block_num), chain::plugin_exception,
                  "index entry for block {} of {}.log does not point at that block; run make-index first", block_num,
                  stem.string());
       return pos;
@@ -1234,18 +1245,23 @@ std::optional<chain::block_id_type> find_block_id(const std::filesystem::path& s
       fc::random_access_file index(ip, fc::random_access_file::read_only);
       if(index.unpack_from<uint64_t>(expected_size - sizeof(uint64_t)) == e.last_entry_pos) {
          const uint64_t pos = index.unpack_from<uint64_t>((uint64_t(block_num) - e.first_block) * sizeof(uint64_t));
-         if(pos + packed_header_size <= size) {
-            const log_header hdr = log.unpack_from<log_header>(pos);
-            if(is_ship(hdr.magic) && is_ship_supported_version(hdr.magic) &&
-               chain::block_header::num_from_id(hdr.block_id) == block_num)
-               return hdr.block_id;
-         }
+         if(slot_holds_block(log, size, pos, block_num))
+            return log.unpack_from<log_header>(pos).block_id;
       }
    }
 
-   const computed_index ci = e.pruned ? compute_index_pruned(log, size, e, stem, progress)
-                                      : compute_index_forward(log, size, stem, progress);
-   return log.unpack_from<log_header>(ci.slots[uint64_t(block_num) - ci.index_first]).block_id;
+   //fallback: the on-disk index was missing or untrusted, so walk the log to recompute the slot. A
+   // computed slot can still be zero for a block the log fails to retain inside its servable range (a
+   // missing or duplicated entry in a damaged retained chain); validate that it points at the requested
+   // block before trusting it, exactly as the fast path above does, so a bad slot reports damage rather
+   // than unpacking offset 0's stub header and returning the wrong block's id.
+   const computed_index ci  = e.pruned ? compute_index_pruned(log, size, e, stem, progress)
+                                       : compute_index_forward(log, size, stem, progress);
+   const uint64_t       pos = ci.slots[uint64_t(block_num) - ci.index_first];
+   SYS_ASSERT(slot_holds_block(log, size, pos, block_num), chain::plugin_exception,
+              "{}.log is damaged: block {} is within its servable {}-{} range but has no valid entry", stem.string(),
+              block_num, first_servable, e.last_block);
+   return log.unpack_from<log_header>(pos).block_id;
 }
 
 } // namespace sysio::state_history::log_utils
