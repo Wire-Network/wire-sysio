@@ -250,8 +250,8 @@ void state_history_plugin::set_program_options(options_description& cli, options
    options("state-history-force-write", bpo::bool_switch()->default_value(false),
            "EMERGENCY RECOVERY option: never let damaged or inconsistent state history logs prevent the node from "
            "running. A log that fails its startup checks or cannot accept the next block is moved aside (kept on disk, "
-           "never deleted) and writing continues into a fresh log. This keeps the node up at the cost of completeness "
-           "-- blocks held only in the set-aside logs, plus any the node skips while recovering, will be missing from "
+           "never deleted) and writing continues into a fresh log. This keeps the node up at the cost of completeness. "
+           "Blocks held only in the set-aside logs, plus any the node skips while recovering, will be missing from "
            "the state history this node serves until those logs are repaired and merged back. Without this option such "
            "conditions are fatal. The sys-util ship-log utility can inspect, repair, and trim the logs this sets aside "
            "(and merge them once renamed off the -corrupt- suffix).");
