@@ -5,7 +5,6 @@ import json
 import os
 import shutil
 import signal
-import sys
 
 from TestHarness import Account, Cluster, TestHelper, Utils, WalletMgr
 from TestHarness.TestHelper import AppArgs
@@ -51,6 +50,13 @@ testSuccessful=False
 
 WalletdName=Utils.SysWalletName
 shipTempDir=None
+shipClientMaxRetries=2
+transientShipClientErrors=(
+    "End of file",
+    "No buffer space available",
+    "Connection reset",
+    "Connection refused",
+)
 
 try:
     TestHelper.printSystemInfo("BEGIN")
@@ -143,23 +149,112 @@ try:
     if args.finality_data_history:
         cmd += "  --fetch-finality-data"
     if Utils.Debug: Utils.Print(f"cmd: {cmd}")
-    clients = []
-    files = []
     shipTempDir = os.path.join(Utils.DataDir, "ship")
     os.makedirs(shipTempDir, exist_ok = True)
     shipClientFilePrefix = os.path.join(shipTempDir, "client")
 
-    starts = []
-    for i in range(0, args.num_clients):
+    def isTransientShipClientError(stderr):
+        """Return true when a ship_streamer failure is safe to retry."""
+        return any(error in stderr for error in transientShipClientErrors)
+
+    def shipClientLogPath(index, phase, attempt, extension):
+        """Return the stdout or stderr path for one ship_streamer client attempt."""
+        retrySuffix = "" if attempt == 0 else f"_retry{attempt}"
+        return f"{shipClientFilePrefix}{index}{phase}{retrySuffix}.{extension}"
+
+    def readTextFile(path):
+        """Read a text log file, returning an empty string when the file is absent."""
+        if not os.path.exists(path):
+            return ""
+        with open(path, "r") as logFile:
+            return logFile.read()
+
+    def startShipClient(index, cmd, phase="", attempt=0):
+        """Start one ship_streamer client and return its process and log handles."""
+        outPath = shipClientLogPath(index, phase, attempt, "out")
+        errPath = shipClientLogPath(index, phase, attempt, "err")
+        outFile = open(outPath, "w")
+        errFile = open(errPath, "w")
+        Print(f"Start client {index}" if attempt == 0 else f"Retry client {index}, attempt {attempt}")
         start = time.perf_counter()
-        outFile = open(f"{shipClientFilePrefix}{i}.out", "w")
-        errFile = open(f"{shipClientFilePrefix}{i}.err", "w")
-        Print(f"Start client {i}")
-        popen=Utils.delayedCheckOutput(cmd, stdout=outFile, stderr=errFile)
-        starts.append(time.perf_counter())
-        clients.append((popen, cmd))
-        files.append((outFile, errFile))
-        Print(f"Client {i} started, Ship node head is: {shipNode.getBlockNum()}")
+        popen = Utils.delayedCheckOutput(cmd, stdout=outFile, stderr=errFile)
+        Print(f"Client {index} started, Ship node head is: {shipNode.getBlockNum()}")
+        return (popen, outFile, errFile, start, outPath, errPath)
+
+    def waitForShipClient(index, popen, outFile, errFile, start, errPath):
+        """Wait for one ship_streamer client and return its exit code and stderr."""
+        returnCode = popen.wait()
+        Print(f"Stopped client {index}.  Ran for {time.perf_counter() - start:.3f} seconds.")
+        outFile.close()
+        errFile.close()
+        stderr = readTextFile(errPath)
+        return (returnCode, stderr)
+
+    def parseShipClientOutput(index, outPath, errPath):
+        """Load one ship_streamer JSON result, including log paths in failures."""
+        try:
+            with open(outPath, "r") as outFile:
+                return json.load(outFile)
+        except json.JSONDecodeError as ex:
+            stderr = readTextFile(errPath)
+            Utils.errorExit(
+                f"Client {index} produced invalid JSON in {outPath}: {ex}. "
+                f"stderr from {errPath}: {stderr}"
+            )
+            raise
+
+    def validateShipClientData(index, data, startBlockNum, endBlockNum, expectedField):
+        """Verify streamed SHiP results are contiguous and include the expected payload field."""
+        block_num = startBlockNum
+        for i in data:
+            # fork can cause block numbers to be repeated
+            this_block_num = i['get_blocks_result_v1']['this_block']['block_num']
+            if this_block_num < block_num:
+                block_num = this_block_num
+            assert block_num == this_block_num, f"client {index}: {block_num} != {this_block_num}"
+            assert isinstance(i['get_blocks_result_v1'][expectedField], str)
+            block_num += 1
+        assert block_num-1 == endBlockNum, f"client {index}: {block_num-1} != {endBlockNum}"
+
+    def retryShipClient(index, cmd, phase, startBlockNum, endBlockNum, expectedField):
+        """Retry one failed ship_streamer client when the failure is transient."""
+        stderr = ""
+        for attempt in range(1, shipClientMaxRetries + 1):
+            popen, outFile, errFile, start, outPath, errPath = startShipClient(index, cmd, phase, attempt)
+            returnCode, stderr = waitForShipClient(index, popen, outFile, errFile, start, errPath)
+            if returnCode == 0:
+                data = parseShipClientOutput(index, outPath, errPath)
+                validateShipClientData(index, data, startBlockNum, endBlockNum, expectedField)
+                return
+            if not isTransientShipClientError(stderr):
+                Utils.errorExit(f"Client {index} retry {attempt} failed with return code {returnCode}: {stderr}")
+            if attempt < shipClientMaxRetries:
+                Print(f"Client {index} retry {attempt} hit a transient SHiP error, retrying again")
+                time.sleep(attempt)
+        Utils.errorExit(f"Client {index} failed after {shipClientMaxRetries} retries: {stderr}")
+
+    def runShipClients(cmd, phase, startBlockNum, endBlockNum, expectedField):
+        """Run all ship_streamer clients concurrently, retrying transient per-client failures."""
+        clients = []
+        for i in range(0, args.num_clients):
+            clients.append((i, *startShipClient(i, cmd, phase)))
+
+        Print(f"Waiting for all {args.num_clients} clients")
+        for index, popen, outFile, errFile, start, outPath, errPath in clients:
+            returnCode, stderr = waitForShipClient(index, popen, outFile, errFile, start, errPath)
+            if returnCode == 0:
+                data = parseShipClientOutput(index, outPath, errPath)
+                validateShipClientData(index, data, startBlockNum, endBlockNum, expectedField)
+                continue
+            if isTransientShipClientError(stderr):
+                Print(f"Client {index} failed with transient SHiP error, retrying: {stderr}")
+                retryShipClient(index, cmd, phase, startBlockNum, endBlockNum, expectedField)
+                continue
+            Utils.errorExit(f"Client {index} failed with return code {returnCode}: {stderr}")
+
+    clients = []
+    for i in range(0, args.num_clients):
+        clients.append((i, *startShipClient(i, cmd)))
 
     # Generate a fork
     nonProdNode.waitForProducer("defproducera")
@@ -196,28 +291,21 @@ try:
     nonProdNode.waitForProducer(forkAtProducer)
     nonProdNode.waitForProducer(prodNode3Prod)
     nonProdNode.waitForIrreversibleBlock(restoreLIB+1)
-    afterForkBlockNum = nonProdNode.getBlockNum()
 
     assert shipNode.findInLog(f"successfully switched fork to new head"), f"No fork found in log {shipNode}"
 
-    Print(f"Stopping all {args.num_clients} clients")
-    for index, (popen, _), (out, err), start in zip(range(len(clients)), clients, files, starts):
-        popen.wait()
-        Print(f"Stopped client {index}.  Ran for {time.perf_counter() - start:.3f} seconds.")
-        out.close()
-        err.close()
-        outFile = open(f"{shipClientFilePrefix}{index}.out", "r")
-        data = json.load(outFile)
-        block_num = start_block_num
-        for i in data:
-            # fork can cause block numbers to be repeated
-            this_block_num = i['get_blocks_result_v1']['this_block']['block_num']
-            if this_block_num < block_num:
-                block_num = this_block_num
-            assert block_num == this_block_num, f"{block_num} != {this_block_num}"
-            assert isinstance(i['get_blocks_result_v1']['block'], str) # verify block in result
-            block_num += 1
-        assert block_num-1 == end_block_num, f"{block_num-1} != {end_block_num}"
+    Print(f"Waiting for all {args.num_clients} clients")
+    for index, popen, outFile, errFile, start, outPath, errPath in clients:
+        returnCode, stderr = waitForShipClient(index, popen, outFile, errFile, start, errPath)
+        if returnCode == 0:
+            data = parseShipClientOutput(index, outPath, errPath)
+            validateShipClientData(index, data, start_block_num, end_block_num, "block")
+            continue
+        if isTransientShipClientError(stderr):
+            Print(f"Client {index} failed with transient SHiP error, retrying: {stderr}")
+            retryShipClient(index, cmd, "", start_block_num, end_block_num, "block")
+            continue
+        Utils.errorExit(f"Client {index} failed with return code {returnCode}: {stderr}")
 
     Print("Generate snapshot")
     shipNode.createSnapshot()
@@ -242,38 +330,7 @@ try:
     if args.finality_data_history:
         cmd += "  --fetch-finality-data"
     if Utils.Debug: Utils.Print(f"cmd: {cmd}")
-    clients = []
-    files = []
-    starts = []
-    for i in range(0, args.num_clients):
-        start = time.perf_counter()
-        outFile = open(f"{shipClientFilePrefix}{i}_replay.out", "w")
-        errFile = open(f"{shipClientFilePrefix}{i}_replay.err", "w")
-        Print(f"Start client {i}")
-        popen=Utils.delayedCheckOutput(cmd, stdout=outFile, stderr=errFile)
-        starts.append(time.perf_counter())
-        clients.append((popen, cmd))
-        files.append((outFile, errFile))
-        Print(f"Client {i} started, Ship node head is: {shipNode.getBlockNum()}")
-
-    Print(f"Stopping all {args.num_clients} clients")
-    for index, (popen, _), (out, err), start in zip(range(len(clients)), clients, files, starts):
-        popen.wait()
-        Print(f"Stopped client {index}.  Ran for {time.perf_counter() - start:.3f} seconds.")
-        out.close()
-        err.close()
-        outFile = open(f"{shipClientFilePrefix}{index}_replay.out", "r")
-        data = json.load(outFile)
-        block_num = start_block_num
-        for i in data:
-            # fork can cause block numbers to be repeated
-            this_block_num = i['get_blocks_result_v1']['this_block']['block_num']
-            if this_block_num < block_num:
-                block_num = this_block_num
-            assert block_num == this_block_num, f"{block_num} != {this_block_num}"
-            assert isinstance(i['get_blocks_result_v1']['deltas'], str) # verify deltas in result
-            block_num += 1
-        assert block_num-1 == end_block_num, f"{block_num-1} != {end_block_num}"
+    runShipClients(cmd, "_replay", start_block_num, end_block_num, "deltas")
 
     Print("Shutdown state_history_plugin nodeop after replay")
     shipNode.kill(signal.SIGTERM)
@@ -293,38 +350,7 @@ try:
     if args.finality_data_history:
         cmd += "  --fetch-finality-data"
     if Utils.Debug: Utils.Print(f"cmd: {cmd}")
-    clients = []
-    files = []
-    starts = []
-    for i in range(0, args.num_clients):
-        start = time.perf_counter()
-        outFile = open(f"{shipClientFilePrefix}{i}_snapshot.out", "w")
-        errFile = open(f"{shipClientFilePrefix}{i}_snapshot.err", "w")
-        Print(f"Start client {i}")
-        popen=Utils.delayedCheckOutput(cmd, stdout=outFile, stderr=errFile)
-        starts.append(time.perf_counter())
-        clients.append((popen, cmd))
-        files.append((outFile, errFile))
-        Print(f"Client {i} started, Ship node head is: {shipNode.getBlockNum()}")
-
-    Print(f"Stopping all {args.num_clients} clients")
-    for index, (popen, _), (out, err), start in zip(range(len(clients)), clients, files, starts):
-        popen.wait()
-        Print(f"Stopped client {index}.  Ran for {time.perf_counter() - start:.3f} seconds.")
-        out.close()
-        err.close()
-        outFile = open(f"{shipClientFilePrefix}{index}_snapshot.out", "r")
-        data = json.load(outFile)
-        block_num = start_block_num
-        for i in data:
-            # fork can cause block numbers to be repeated
-            this_block_num = i['get_blocks_result_v1']['this_block']['block_num']
-            if this_block_num < block_num:
-                block_num = this_block_num
-            assert block_num == this_block_num, f"{block_num} != {this_block_num}"
-            assert isinstance(i['get_blocks_result_v1']['deltas'], str) # verify deltas in result
-            block_num += 1
-        assert block_num-1 == end_block_num, f"{block_num-1} != {end_block_num}"
+    runShipClients(cmd, "_snapshot", start_block_num, end_block_num, "deltas")
 
     testSuccessful = True
 finally:
