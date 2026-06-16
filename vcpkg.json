@@ -2,6 +2,7 @@
   "name": "wire-sysio",
   "version": "5.2.0-rc1",
   "dependencies": [
+    "blake3",
     "bzip2",
     "liblzma",
     "zstd",
@@ -70,6 +71,10 @@
     }
   ],
   "overrides": [
+    {
+      "name": "blake3",
+      "version": "1.8.1"
+    },
     {
       "name": "protobuf",
       "version": "6.33.4#1"

@@ -287,6 +287,9 @@ add_np_test(NAME interrupt_trx_test COMMAND tests/interrupt_trx_test.py -v)
 add_lr_test(NAME auto_bp_peering_test COMMAND tests/auto_bp_peering_test.py -v)
 add_lr_test(NAME auto_bp_gossip_peering_test COMMAND tests/auto_bp_gossip_peering_test.py -v)
 
+# Fast, cluster-free unit test for the PerformanceHarness post-test trx extraction logic.
+add_p_test(NAME performance_test_basic_query_test COMMAND tests/PerformanceHarness/performance_test_basic_query_test.py)
+
 add_lr_test(NAME performance_test_bp COMMAND tests/PerformanceHarnessScenarioRunner.py findMax testBpOpMode --max-tps-to-test 50 --test-iteration-min-step 10 --test-iteration-duration-sec 10 --final-iterations-duration-sec 10 --calc-chain-threads lmax overrideBasicTestConfig -v --tps-limit-per-generator 25 --chain-state-db-size-mb 200)
 add_lr_test(NAME performance_test_api COMMAND tests/PerformanceHarnessScenarioRunner.py findMax testApiOpMode --max-tps-to-test 50 --test-iteration-min-step 10 --test-iteration-duration-sec 10 --final-iterations-duration-sec 10 --calc-chain-threads lmax overrideBasicTestConfig -v --tps-limit-per-generator 25 --chain-state-db-size-mb 200)
 add_lr_test(NAME performance_test_read_only_trxs COMMAND tests/PerformanceHarnessScenarioRunner.py findMax testApiOpMode --max-tps-to-test 50 --test-iteration-min-step 10 --test-iteration-duration-sec 10 --final-iterations-duration-sec 10 overrideBasicTestConfig -v --tps-limit-per-generator 25 --api-nodes-read-only-threads 2 --read-only-write-window-time-us 1000 --read-only-read-window-time-us 375000 --account-name "payloadless" --abi-file payloadless.abi --wasm-file payloadless.wasm --contract-dir unittests/test-contracts/payloadless --user-trx-data-file tests/PerformanceHarness/readOnlySlowTrxData.json --chain-state-db-size-mb 200)

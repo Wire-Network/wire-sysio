@@ -96,7 +96,7 @@ class PluginHttpTest(unittest.TestCase):
                         "net_api_plugin", "producer_plugin", "producer_api_plugin", "chain_api_plugin",
                         "http_plugin", "db_size_api_plugin", "prometheus_plugin"]
         nodeop_plugins = "--plugin sysio::" +  " --plugin sysio::".join(plugin_names)
-        nodeop_flags = (" --data-dir=%s --config-dir=%s --trace-dir=%s --trace-no-abis --access-control-allow-origin=%s "
+        nodeop_flags = (" --data-dir=%s --config-dir=%s --trace-dir=%s --access-control-allow-origin=%s "
                         "--signature-provider wire-1,wire,wire,SYS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV,KEY:5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3 "
                         "--contracts-console --http-validate-host=%s --verbose-http-errors --max-transaction-time -1 --abi-serializer-max-time-ms 30000 --http-max-response-time-ms 30000 "
                         "%s--p2p-listen-endpoint 0.0.0.0:%d --p2p-server-address %s "

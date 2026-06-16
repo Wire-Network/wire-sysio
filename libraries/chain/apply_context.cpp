@@ -531,6 +531,16 @@ uint64_t apply_context::next_recv_sequence( const account_object& receiver_accou
    }
 }
 uint64_t apply_context::next_auth_sequence( account_name actor ) {
+   if ( trx_context.is_read_only() ) {
+      // To avoid confusion of duplicated auth sequence number, hard code to be 0.
+      // Mirrors next_global_sequence/next_recv_sequence. Currently unreachable:
+      // validate_referenced_accounts rejects any authorization on a read-only
+      // action before execution. Kept as defense-in-depth — read-only execution
+      // has no undo session and runs on parallel read-only-window threads, so if
+      // that guard ever changed, the modify below would persist state from a
+      // read-only transaction or race other read threads.
+      return 0;
+   }
    const auto& amo = db.get<account_object,by_name>( actor );
    db.modify( amo, [&](auto& am ){
       ++am.auth_sequence;

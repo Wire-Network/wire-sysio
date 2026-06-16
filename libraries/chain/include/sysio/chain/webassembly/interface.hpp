@@ -339,11 +339,15 @@ namespace webassembly {
           * Get the list of active producer names.
           *
           * @ingroup producer
-          * @param[out] producers - output buffer containing the names of the current active producer names.
+          * @param[out] producers - output byte buffer receiving the packed names of the
+          *    current active producers. The CDT-side ABI passes the buffer length in
+          *    bytes, so the parameter is a byte span; declaring it as a span of
+          *    account_name would validate (and bound the copy by) the raw length
+          *    multiplied by sizeof(account_name).
           *
           * @return number of bytes required (if the buffer is empty), or the number of bytes written to the buffer.
          */
-         int32_t get_active_producers(aligned_span<account_name> producers) const;
+         int32_t get_active_producers(span<char> producers) const;
 
          /**
           * Tests a given public key with the recovered public key from digest and signature.

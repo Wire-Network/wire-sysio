@@ -12,6 +12,7 @@
 #include <fc/io/fstream.hpp>
 #include <fc/io/json.hpp>
 #include <fc/network/ethereum/ethereum_abi.hpp>
+#include <fc/network/ethereum/ethereum_client.hpp>
 #include <fc/network/ethereum/ethereum_rlp_encoder.hpp>
 #include <format>
 #include <gsl-lite/gsl-lite.hpp>
@@ -82,6 +83,21 @@ BOOST_AUTO_TEST_CASE(can_encode_list_of_strings) try {
       auto actual_hex = rlp::to_hex(actual, false);
       BOOST_CHECK_EQUAL(actual_hex, expected);
    }
+}
+FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(block_tag_wire_spelling) try {
+   // The enumerator spelling IS the wire format — `to_string` goes through `magic_enum::enum_name`,
+   // so these literals pin the JSON-RPC execution-apis spellings against any enum rename.
+   BOOST_CHECK_EQUAL(eth::to_string(eth::block_tag_t::earliest), "earliest");
+   BOOST_CHECK_EQUAL(eth::to_string(eth::block_tag_t::finalized), "finalized");
+   BOOST_CHECK_EQUAL(eth::to_string(eth::block_tag_t::safe), "safe");
+   BOOST_CHECK_EQUAL(eth::to_string(eth::block_tag_t::latest), "latest");
+   BOOST_CHECK_EQUAL(eth::to_string(eth::block_tag_t::pending), "pending");
+
+   // Explicit block numbers pass through unchanged; named tags render their wire spelling.
+   BOOST_CHECK_EQUAL(eth::to_block_tag(std::string{"0x1b4"}), "0x1b4");
+   BOOST_CHECK_EQUAL(eth::to_block_tag(eth::block_tag_t::finalized), "finalized");
 }
 FC_LOG_AND_RETHROW();
 

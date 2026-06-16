@@ -188,9 +188,17 @@ namespace sysio::chain {
 
       state_t state() const { std::lock_guard g(*_mtx); return aggregating_state; };
 
-      std::optional<qc_sig_t> get_best_qc() const;
-      // return true if better qc
-      bool set_received_qc_sig(const qc_sig_t& qc);
+      // Thread-safe snapshots of the two qc_sig sources for this policy.
+      // aggregating_qc_t::get_best_qc combines per-policy parts of a SINGLE
+      // source into a qc_t; parts from different sources must never be mixed
+      // (see aggregating_qc_t::get_best_qc).
+      std::optional<qc_sig_t> received_qc_sig_copy() const;
+      // aggregated votes as a qc_sig_t, or nullopt when quorum has not been met
+      std::optional<qc_sig_t> aggregated_qc_sig() const;
+      bool has_received_qc_sig() const;
+      // Unconditional store. Whether a received qc replaces the stored one is
+      // decided by aggregating_qc_t::set_received_qc for the whole qc_t unit.
+      void set_received_qc_sig(const qc_sig_t& qc);
       bool received_qc_sig_is_strong() const;
    private:
       friend struct fc::reflector<aggregating_qc_sig_t>;

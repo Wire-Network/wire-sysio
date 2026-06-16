@@ -144,11 +144,16 @@ class blockData():
 
     @timestamp.setter
     def timestamp(self, time: str):
-        self._timestamp = time[:-1]
+        # Sources differ on the trailing 'Z': trace_api/get_block emits ISO8601 with a 'Z'
+        # suffix, while chain/get_block_info serializes block_timestamp_type via fc's
+        # to_iso_string() with no zone marker. Strip 'Z' only when it is present so we keep
+        # full sub-second precision (e.g. '.500') regardless of which endpoint produced the
+        # value, and so parsing tolerates either shape.
         # When we no longer support Python 3.6, would be great to update to use this
-        # self._calcdTimeEpoch = datetime.fromisoformat(time[:-1]).timestamp()
-        #Note block timestamp formatted like: '2022-09-30T16:48:13.500Z', but 'Z' is not part of python's recognized iso format, so strip it off the end
-        self._calcdTimeEpoch = datetime.strptime(time[:-1], "%Y-%m-%dT%H:%M:%S.%f").timestamp()
+        # self._calcdTimeEpoch = datetime.fromisoformat(stripped).timestamp()
+        stripped = time[:-1] if time.endswith('Z') else time
+        self._timestamp = stripped
+        self._calcdTimeEpoch = datetime.strptime(stripped, "%Y-%m-%dT%H:%M:%S.%f").timestamp()
 
     @timestamp.deleter
     def timestamp(self):

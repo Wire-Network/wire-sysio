@@ -121,7 +121,7 @@ jobs:
       - name: Run sharded NP/LR tests
         run: |
           cd "$BUILD_DIR"
-          test_jobs="2"
+          test_jobs="$(sysctl -n hw.logicalcpu)"
           echo "Running sharded NP/LR tests with ${test_jobs} jobs"
           ctest -j "${test_jobs}" \
             -L "(nonparallelizable_tests|long_running_tests)" \

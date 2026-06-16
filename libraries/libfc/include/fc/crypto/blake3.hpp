@@ -17,7 +17,8 @@ namespace fc { namespace crypto {
  * @brief BLAKE3 hash (32 bytes)
  *
  * Storage type for BLAKE3 digests. Does not include the hashing implementation
- * itself — callers use the LLVM BLAKE3 C API (llvm-c/blake3.h) directly.
+ * itself — callers hash via sysio::chain::blake3_encoder, which wraps the
+ * standalone BLAKE3 C API (blake3.h).
  */
 class blake3 {
 public:

@@ -9,7 +9,7 @@
 namespace sysio { namespace chain {
 
 /**
- * Incremental BLAKE3 hasher backed by LLVM's bundled implementation.
+ * Incremental BLAKE3 hasher backed by the standalone BLAKE3 library.
  *
  * Usage:
  *   blake3_encoder enc;

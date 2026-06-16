@@ -4,10 +4,10 @@
 #include <sysio/chain/abi_def.hpp>
 #include <sysio/chain/protocol_feature_activation.hpp>
 
-namespace sysio { namespace trace_api {
+namespace sysio::trace_api {
 
    using data_log_entry = std::variant<
       block_trace_v0
    >;
 
-}}
+} // namespace sysio::trace_api
