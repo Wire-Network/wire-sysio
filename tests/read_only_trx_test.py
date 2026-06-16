@@ -70,7 +70,11 @@ testAccountName = "test"
 userAccountName = "user"
 payloadlessAccountName = "payloadless"
 infiniteAccountName = "infinite"
-max_trx_time = args.read_only_read_window_time_us - 60000 # should be less than read-only-read-window-time-us and less than block time
+READ_WINDOW_ASSERTION_MARGIN_US = 60000
+if args.read_only_read_window_time_us <= READ_WINDOW_ASSERTION_MARGIN_US:
+    errorExit("--read-only-read-window-time-us must be greater than %d" % (READ_WINDOW_ASSERTION_MARGIN_US))
+# Keep the fallback assertion threshold below the read window.
+max_trx_time = args.read_only_read_window_time_us - READ_WINDOW_ASSERTION_MARGIN_US
 
 def getCodeHash(node, account):
     # Example get code result: code hash: 67d0598c72e2521a1d588161dad20bbe9f8547beb5ce6d14f3abd550ab27d3dc
