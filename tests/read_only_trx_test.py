@@ -85,6 +85,7 @@ def startCluster():
     global total_nodes
     global producerNode
     global apiNode
+    global testSuccessful
 
     TestHelper.printSystemInfo("BEGIN")
     cluster.setWalletMgr(walletMgr)
@@ -118,6 +119,7 @@ def startCluster():
     specificExtraNodeopArgs[pnodes]+=str(args.read_only_threads)
     if Utils.shouldSkipBecauseSysVmOcUnavailable(args.sys_vm_oc_enable, args.wasm_runtime):
         Print("sys-vm-oc is unavailable on this platform. Skip the test")
+        testSuccessful = True
         exit(0) # Do not fail the test
     if ocSupported:
         specificExtraNodeopArgs[pnodes]+=" --sys-vm-oc-enable "

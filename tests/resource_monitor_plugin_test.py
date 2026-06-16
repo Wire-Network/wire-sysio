@@ -63,7 +63,13 @@ logging="""{
 }"""
 
 def cleanDirectories():
+    """Remove resource monitor staging directories created by this test."""
     os.path.exists(stagingDir) and shutil.rmtree(stagingDir)
+
+def cleanTestLogDirectory():
+    """Remove this test's harness log directory after a successful run."""
+    if not args.keep_logs:
+        shutil.rmtree(Utils.DataPath, ignore_errors=True)
 
 def prepareDirectories():
     # Prepare own directories so we don't depend on others to make sure
@@ -220,6 +226,8 @@ try:
 finally:
     if debug: Print("Cleanup in finally block.")
     cleanDirectories()
+    if testSuccessful:
+        cleanTestLogDirectory()
 
 exitCode = 0 if testSuccessful else 1
 if debug: Print("Exiting test, exit value %d." % (exitCode))
