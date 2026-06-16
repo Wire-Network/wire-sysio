@@ -13,6 +13,7 @@
 #include <sysio/chain/protocol_state_object.hpp>
 #include <sysio/chain/kv_table_objects.hpp>
 #include <sysio/chain/transaction_dedup.hpp>
+#include <sysio/chain/transaction_dedup_undo_index.hpp>
 #include <sysio/chain/genesis_intrinsics.hpp>
 #include <sysio/chain/whitelisted_intrinsics.hpp>
 #include <sysio/chain/database_header_object.hpp>
@@ -729,8 +730,18 @@ struct controller_impl {
    controller::config              conf;
    // persist chain_head after vote_processor shutdown, avoids concurrent access, after chain_head & conf since this uses them
    fc::scoped_exit<std::function<void()>> write_chain_head = [&]() { chain_head.write(conf.state_dir / config::chain_head_filename); };
+   // Set true by init() once trx_dedup has been registered as an undo participant and is consistent
+   // with the database. Until then trx_dedup is empty at revision 0; writing it over a good file
+   // would brick the next existing_state restart (the empty range no longer matches the database).
+   bool                            okay_to_persist_dedup = false;
    transaction_dedup               trx_dedup;
-   fc::scoped_exit<std::function<void()>> write_trx_dedup = [&]() { trx_dedup.write_to_file(conf.state_dir / config::transaction_dedup_filename); };
+   // Persist the dedup undo stack only after a successful start (see okay_to_persist_dedup). A
+   // startup that aborts before init() registers the dedup -- e.g. a corrupt SHiP log failing
+   // state_history_plugin::plugin_initialize before chain_plugin::plugin_startup runs -- must NOT
+   // overwrite the previous good file with the still-empty revision-0 dedup.
+   fc::scoped_exit<std::function<void()>> write_trx_dedup = [&]() {
+      if( okay_to_persist_dedup ) trx_dedup.write_to_file(conf.state_dir / config::transaction_dedup_filename);
+   };
    const chain_id_type             chain_id; // read by thread_pool threads, value will not be changed
    std::atomic<bool>               replaying = false;
    bool                            is_producer_node = false; // true if node is configured as a block producer
@@ -743,7 +754,6 @@ struct controller_impl {
    struct chain; // chain is a namespace so use an embedded type for the named_thread_pool tag
    named_thread_pool<chain>        thread_pool;
    deep_mind_handler*              deep_mind_logger = nullptr;
-   fc::time_point                  pending_lib_time;  // used to skip dedup for expired trxs
    bool                            okay_to_print_integrity_hash_on_stop = false;
    bool                            testing_allow_voting = false; // used in unit tests to create long forks or simulate not getting votes
    async_t                         async_voting = async_t::yes;  // by default we post `create_and_send_vote_msg()` calls, used in tester
@@ -917,8 +927,7 @@ struct controller_impl {
 
    void pop_block() {
       uint32_t prev_block_num = pop_prev_block();
-      db.undo();
-      trx_dedup.pop_block_revision();
+      db.undo();   // drives the registered dedup participant to revert this block's reversible changes
       protocol_features.popped_blocks_to(prev_block_num);
    }
 
@@ -971,7 +980,7 @@ struct controller_impl {
          if( trace->except_ptr )
             std::rethrow_exception(trace->except_ptr);
          if( trace->except)
-            throw *trace->except;
+            assert(trace->except_ptr); // except/except_ptr always set together
          getpeerkeys_res_t res;
          if (!trace->action_traces.empty()) {
             const auto& act_trace = trace->action_traces[0];
@@ -980,6 +989,17 @@ struct controller_impl {
                // in some tests, the system contract is not set and the return value is empty.
                fc::datastream<const char*> ds(retval.data(), retval.size());
                fc::raw::unpack(ds, res);
+            } else {
+               // Action executed but returned no value: deployed system contract on `sysio`
+               // does not handle getpeerkeys (or its dispatcher doesn't propagate the return).
+               // BP peer-key gossip cannot bootstrap without this; warn once so the cause is
+               // visible (this path is otherwise silent and update_peer_keys() will keep retrying).
+               static std::atomic<bool> warned{false};
+               if (!warned.exchange(true)) {
+                  wlog("getpeerkeys inline read-only action returned empty payload. "
+                       "Deployed system contract on `sysio` may be missing the getpeerkeys handler "
+                       "or its return value. BP peer-key updates and BP-gossip peering will not function.");
+               }
             }
          }
 
@@ -1075,10 +1095,7 @@ struct controller_impl {
                      lib_num, fork_db_root_block_num() );
       }
 
-      auto [pending_lib_id, pending_lib_ts] = fork_db_.pending_savanna_lib();
-      pending_lib_time = pending_lib_ts.to_time_point();
-
-      const block_id_type new_lib_id = pending_lib_id;
+      const block_id_type new_lib_id = fork_db_.pending_savanna_lib().first;
       const block_num_type new_lib_num = block_header::num_from_id(new_lib_id);
 
       if( new_lib_num <= lib_num )
@@ -1126,8 +1143,7 @@ struct controller_impl {
             // Do it before commit so that in case it throws, DB can be rolled back.
             blog.append( (*bitr)->block, (*bitr)->id(), (*bitr)->block->packed_signed_block() );
 
-            db.commit( (*bitr)->block_num() );
-            trx_dedup.commit_to_lib( (*bitr)->block_num() );
+            db.commit( (*bitr)->block_num() );   // drives the dedup participant's commit (revision == block num)
             root_id = (*bitr)->id();
 
             if (irreversible_mode()) {
@@ -1475,6 +1491,47 @@ struct controller_impl {
       while( db.revision() > chain_head.block_num() ) {
          db.undo();
       }
+
+      // Register the transaction dedup as a chainbase undo participant, so the database drives its
+      // undo lifecycle (add_undo_session / squash / undo / commit) in lockstep with the segment
+      // indices -- the controller no longer hand-pairs dedup undo calls with the database's. The db
+      // is now at head revision and is the authoritative source of the reversible revision range;
+      // align the dedup to it before registering:
+      //  - genesis/snapshot loaded membership only (revision 0); a snapshot is an irreversible root,
+      //    so the db has no reversible undo sessions and a plain set_revision matches it.
+      //  - existing_state restored the dedup's revision and undo stack from its on-disk file. That
+      //    file is a best-effort cache, NOT an authoritative store like chainbase's mmap'd segment:
+      //    it can legitimately be missing (first start after upgrading to dedup persistence), stale,
+      //    or empty at revision 0 (a startup that aborts before the chain loads -- e.g. a corrupt
+      //    SHiP log failing another plugin's initialize -- still runs the write-on-exit; the guard on
+      //    write_trx_dedup prevents most such clobbers, but an older build or external tooling could
+      //    still leave one). If the loaded range does not match the db exactly, discard it and
+      //    rebuild an empty undo stack aligned to the db: the node starts with degraded dedup memory
+      //    (self-healing as reversible blocks become irreversible) instead of refusing to start. A
+      //    clean restart matches and keeps the full set -- the fast path.
+      // add_undo_participant re-validates the range, so a logic error here still fails loud rather
+      // than registering a divergent participant.
+      if (startup == startup_t::existing_state) {
+         const auto db_range = db.undo_stack_revision_range();
+         if (trx_dedup.undo_stack_revision_range() != db_range) {
+            const auto dedup_range = trx_dedup.undo_stack_revision_range();
+            wlog( "transaction dedup file revision range [{},{}] does not match database [{},{}]; "
+                  "rebuilding empty dedup aligned to the database (dedup replay protection over the "
+                  "reversible window is rebuilt as those blocks become irreversible)",
+                  dedup_range.first, dedup_range.second, db_range.first, db_range.second );
+            trx_dedup.reset();
+            trx_dedup.set_revision( db_range.first );
+            for( uint64_t r = db_range.first; r < db_range.second; ++r )
+               trx_dedup.add_undo_session();
+         }
+      } else {
+         trx_dedup.set_revision(static_cast<uint64_t>(db.revision()));
+      }
+      db.add_undo_participant(std::make_unique<dedup_undo_index>(trx_dedup));
+      // The dedup is now registered and consistent with the database; from here a clean shutdown (or
+      // an abort after this point) may safely persist it. Before this point trx_dedup is empty at
+      // revision 0 and must never be written over a good file.
+      okay_to_persist_dedup = true;
 
       SYS_ASSERT(conf.terminate_at_block == 0 || conf.terminate_at_block > chain_head.block_num(),
                  plugin_config_exception, "--terminate-at-block {} not greater than chain head {}",
@@ -1845,7 +1902,7 @@ struct controller_impl {
       authority system_auth(genesis.initial_key);
       create_native_account( genesis.initial_timestamp, sysio::chain::config::system_account_name, system_auth, system_auth, true );
 
-      auto empty_authority = authority(1, {}, {});
+      auto empty_authority = genesis_empty_authority();
       auto active_producers_authority = authority(1, {}, {});
       active_producers_authority.accounts.push_back({{sysio::chain::config::system_account_name, sysio::chain::config::active_name}, 1});
 
@@ -1965,7 +2022,7 @@ struct controller_impl {
          auto handle_exception =[&](const auto& e)
          {
             trace->error_code = controller::convert_exception_to_error_code( e );
-            trace->except = e;
+            trace->except = e.dynamic_copy_exception(); // virtual copy preserves the dynamic exception type
             trace->except_ptr = std::current_exception();
             auto now = fc::time_point::now();
             trx_context.update_billed_cpu_time(now);
@@ -2089,8 +2146,7 @@ struct controller_impl {
       }
 
       auto guard_pending = fc::make_scoped_exit([this, head_block_num=chain_head.block_num()]() {
-         trx_dedup.abort_block_revision(); // no-op if no pending revision
-         pending.reset();
+         pending.reset();   // destroying the unpushed block session drives the dedup participant's undo
          protocol_features.popped_blocks_to( head_block_num );
       });
 
@@ -2098,9 +2154,10 @@ struct controller_impl {
                   "db revision {} is not on par with head block {}, fork db head {}",
                   db.revision(), chain_head.block_num(), fork_db_head().block_num() );
 
+      // Opening the block's db undo session drives the dedup participant's add_undo_session; for
+      // skip_db_sessions blocks (irreversible/ephemeral) there is no session and the dedup records
+      // permanently, matching the database.
       maybe_session        session = skip_db_sessions(s) ? maybe_session() : maybe_session(db);
-      if (!skip_db_sessions(s))
-         trx_dedup.start_block_revision(chain_head.block_num() + 1);
       building_block_input bbi{chain_head.id(), chain_head.timestamp(), when, chain_head.internal()->get_producer_for_block_at(when).producer_name,
                                new_protocol_feature_activations};
       pending.emplace(std::move(session), *chain_head.internal(), bbi);
@@ -2198,7 +2255,8 @@ struct controller_impl {
             if( onblock_trace->except ) {
                if (onblock_trace->except->code() == interrupt_exception::code_value) {
                   ilog("Interrupt of onblock {}", chain_head.block_num() + 1);
-                  throw *onblock_trace->except;
+                  assert(onblock_trace->except_ptr); // always set together
+                  std::rethrow_exception(onblock_trace->except_ptr);
                }
                wlog("onblock {} is REJECTING: {}", chain_head.block_num() + 1, fc::json::to_log_string(*onblock_trace));
             }
@@ -2375,9 +2433,9 @@ struct controller_impl {
          throw;
       }
 
-      // push the state for pending.
+      // push the state for pending. The block's db undo session is kept (not undone), so the dedup
+      // participant's matching undo session likewise remains on its stack until LIB advances.
       pending->push();
-      trx_dedup.commit_block_revision();
    }
 
    void log_applied(controller::block_status s) const {
@@ -2635,7 +2693,8 @@ struct controller_impl {
                   } else {
                      elog("{}", fc::json::to_log_string(*trace));
                   }
-                  throw *trace->except;
+                  assert(trace->except_ptr); // always set together
+                  std::rethrow_exception(trace->except_ptr);
                }
 
                SYS_ASSERT(trx_receipts.size() > 0, block_validate_exception,
@@ -3034,8 +3093,7 @@ struct controller_impl {
             emit( irreversible_block, std::tie(bsp->block, bsp->id()), __FILE__, __LINE__ );
 
             if (!skip_db_sessions(controller::block_status::irreversible)) {
-               db.commit(bsp->block_num());
-               trx_dedup.commit_to_lib(bsp->block_num());
+               db.commit(bsp->block_num());   // drives the dedup participant's commit (revision == block num)
             }
          }
 
@@ -3205,8 +3263,7 @@ struct controller_impl {
       deque<transaction_metadata_ptr> applied_trxs;
       if( pending ) {
          applied_trxs = pending->extract_trx_metas();
-         trx_dedup.abort_block_revision();
-         pending.reset();
+         pending.reset();   // destroying the unpushed block session drives the dedup participant's undo
          protocol_features.popped_blocks_to( chain_head.block_num() );
       }
       return applied_trxs;
@@ -4089,10 +4146,6 @@ time_point controller::pending_block_time()const {
    return my->pending_block_time();
 }
 
-time_point controller::pending_lib_time()const {
-   return my->pending_lib_time;
-}
-
 uint32_t controller::pending_block_num()const {
    SYS_ASSERT( my->pending, block_validate_exception, "no pending block" );
    return my->pending->block_num();
@@ -4479,17 +4532,6 @@ void controller::record_transaction( const transaction_id_type& id, fc::time_poi
    my->trx_dedup.record(id, expire);
 }
 
-void controller::push_dedup_session() {
-   my->trx_dedup.push_session();
-}
-
-void controller::squash_dedup_session() {
-   my->trx_dedup.squash_session();
-}
-
-void controller::undo_dedup_session() {
-   my->trx_dedup.undo_session();
-}
 
 void controller::set_subjective_cpu_leeway(fc::microseconds leeway) {
    my->subjective_cpu_leeway = leeway;

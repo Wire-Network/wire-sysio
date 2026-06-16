@@ -85,7 +85,7 @@ class PerformanceTestBasic:
             def __str__(self) -> str:
                 args = []
                 for field in dataclasses.fields(self):
-                    match = re.search("\w*PluginArgs", field.name)
+                    match = re.search(r"\w*PluginArgs", field.name)
                     if match is not None:
                         args.append(f"{getattr(self, field.name)}")
                 return " ".join(args)
@@ -126,7 +126,7 @@ class PerformanceTestBasic:
             # Producer Nodes are index [0, producerNodeCount) and non-producer nodes (validationNodeCount, apiNodeCount) nodes follow the producer nodes [producerNodeCount, _totalNodes)
             self._producerNodeIds = list(range(0, self.producerNodeCount))
             self._validationNodeIds = list(range(self.producerNodeCount, self.producerNodeCount + self.validationNodeCount))
-            self._apiNodeIds = list(range(self.producerNodeCount + self.validationNodeCount, self.producerNodeCount + self.validationNodeCount + self.validationNodeCount))
+            self._apiNodeIds = list(range(self.producerNodeCount + self.validationNodeCount, self.producerNodeCount + self.validationNodeCount + self.apiNodeCount))
 
             def configureValidationNodes():
                 validationNodeSpecificNodeopStr = ""
@@ -300,29 +300,91 @@ class PerformanceTestBasic:
         return append_write
 
     def isOnBlockTransaction(self, transaction):
-        if transaction['actions'][0]['account'] != 'sysio' or transaction['actions'][0]['action'] != 'onblock':
+        if transaction['actions'][0]['account'] != 'sysio' or transaction['actions'][0]['name'] != 'onblock':
             return False
         return True
 
     def queryBlockTrxData(self, node, blockDataPath, blockTrxDataPath, startBlockNum, endBlockNum):
+        # Use trace_api/get_actions for trx-level data and chain/get_block_info for block metadata.
+        # The old trace_api/get_block serialized the entire block (including base58-encoded
+        # signatures - OpenSSL BN_div alloc storm) even though the harness only needs trx id,
+        # block num/time, cpu/net usage, and the block header.
+        #
+        # get_actions filters by a SINGLE action name server-side. A user-trx config may list
+        # several distinct action names and the whole list is handed to the trx generator, so
+        # filtering on only the first name (cfgActions[0]) would silently drop every transaction
+        # built from the other actions -- they would be reported as missing/dropped and their
+        # cpu/net/TPS uncounted. We therefore push the server-side filter down only when exactly
+        # one distinct action name is configured (smaller payload, onblock dropped server-side).
+        # With multiple distinct names -- or no user-trx config at all -- we drop the server-side
+        # filter and skip just onblock client-side: one request per block instead of one per
+        # action name, and every harness trx is captured regardless of which configured action it
+        # carries. Transactions are deduped by trx_id below, so a trx bundling several matched
+        # actions is still recorded exactly once with its parent-transaction totals.
+        # Per-trx cpu/net come from trx_cpu_usage_us / trx_net_usage_words on each action variant
+        # (the parent transaction's totals); the action-level cpu_usage_us / net_usage would
+        # undercount multi-action trxs and use different units (action net_usage is bytes; trx
+        # net_usage_words is ceil(bytes / 8)).
+        # Block finality (irreversible/pending) comes from block_status on each action -- trace_api
+        # is the single source of truth so we never mix in a chain/get_info LIB read that could
+        # disagree with what the trace data reflects. For blocks where the action filter dropped
+        # everything (typically the leading/trailing ramp window), fall back to trace_api/get_block
+        # for that one block: empty blocks carry no harness-action trxs so the payload is small.
+        actionFilter = None
+        if getattr(self, 'userTrxDataDict', None):
+            # Distinct configured action names. get_actions can express only one server-side, so
+            # push the filter down only for single-action configs; multi-action configs fall back
+            # to the client-side onblock skip below, which captures all configured actions at once.
+            cfgActionNames = {act.get('actionName')
+                              for act in (self.userTrxDataDict.get('actions') or [])
+                              if act.get('actionName')}
+            if len(cfgActionNames) == 1:
+                actionFilter = next(iter(cfgActionNames))
         for blockNum in range(startBlockNum, endBlockNum + 1):
             blockCpuTotal, blockNetTotal, blockTransactionTotal = 0, 0, 0
-            block = node.processUrllibRequest("trace_api", "get_block", {"block_num":blockNum}, silentErrors=False, exitOnError=True)
+            blockStatus = None
+            blockInfo = node.processUrllibRequest("chain", "get_block_info", {"block_num":blockNum}, silentErrors=False, exitOnError=True)
+            actionsQuery = {"block_num_start": blockNum, "block_num_end": blockNum}
+            if actionFilter:
+                actionsQuery["action"] = actionFilter
+            actionsResp = node.processUrllibRequest("trace_api", "get_actions", actionsQuery, silentErrors=False, exitOnError=True)
             btdf_append_write = self.fileOpenMode(blockTrxDataPath)
             with open(blockTrxDataPath, btdf_append_write) as trxDataFile:
-                for trx in block['payload']['transactions']:
-                    if not self.isOnBlockTransaction(trx):
-                        trx_data = trxData(blockNum=trx["block_num"], cpuUsageUs=trx["cpu_usage_us"],
-                                           netUsageUs=trx["net_usage_words"], blockTime=trx["block_time"])
-                        self.data.trxDict.update(dict([(trx["id"], trx_data)]))
-                        [ trxDataFile.write(f"{trx['id']},{trx['block_num']},{trx['block_time']},{trx['cpu_usage_us']},{trx['net_usage_words']},{trx['actions']}\n") ]
-                        blockCpuTotal += trx["cpu_usage_us"]
-                        blockNetTotal += trx["net_usage_words"]
-                        blockTransactionTotal += 1
-            block_data = blockData(blockId=block["payload"]["id"], blockNum=block['payload']['number'],
+                seen = set()  # one trxData entry per trx even if multiple actions match the filter
+                for action in actionsResp['payload']['actions']:
+                    # If no action filter configured, still skip onblock explicitly.
+                    if not actionFilter and action.get('account') == 'sysio' and action.get('name') == 'onblock':
+                        continue
+                    trxId = action['trx_id']
+                    if trxId in seen:
+                        continue
+                    seen.add(trxId)
+                    # All actions in a block share the same block_status; capture once.
+                    if blockStatus is None:
+                        blockStatus = action.get('block_status')
+                    cpu = action.get('trx_cpu_usage_us', 0) or 0
+                    net = action.get('trx_net_usage_words', 0) or 0
+                    trx_data = trxData(blockNum=action['block_num'], cpuUsageUs=cpu,
+                                       netUsageUs=net, blockTime=action['block_time'])
+                    self.data.trxDict.update({trxId: trx_data})
+                    trxDataFile.write(f"{trxId},{action['block_num']},{action['block_time']},{cpu},{net},\n")
+                    blockCpuTotal += cpu
+                    blockNetTotal += net
+                    blockTransactionTotal += 1
+            if blockStatus is None:
+                # No harness-relevant action in this block. Fall back to trace_api/get_block so
+                # the row's status still comes from trace_api's data log rather than mixing in a
+                # different source. Cost is bounded -- empty/onblock-only blocks have no trx
+                # signatures to base58-encode.
+                blockResp = node.processUrllibRequest("trace_api", "get_block", {"block_num": blockNum},
+                                                     silentErrors=False, exitOnError=True)
+                blockStatus = blockResp['payload'].get('status', 'unknown')
+            block_data = blockData(blockId=blockInfo["payload"]["id"],
+                                   blockNum=blockInfo['payload']['block_num'],
                                    transactions=blockTransactionTotal, net=blockNetTotal, cpu=blockCpuTotal,
-                                   producer=block["payload"]["producer"], status=block["payload"]["status"],
-                                   _timestamp=block["payload"]["timestamp"])
+                                   producer=blockInfo["payload"]["producer"],
+                                   status=blockStatus,
+                                   _timestamp=blockInfo["payload"]["timestamp"])
             self.data.blockList.append(block_data)
             self.data.blockDict[str(blockNum)] = block_data
             bdf_append_write = self.fileOpenMode(blockDataPath)
@@ -650,12 +712,30 @@ class PerformanceTestBasic:
 
     def setupClusterConfig(args) -> ClusterConfig:
 
-        chainPluginArgs = ChainPluginArgs(signatureCpuBillablePct=args.signature_cpu_billable_pct,
+        def supportedPluginArgs(pluginArgsClass, **kwargs):
+            """Drop only constructor arguments for chain-plugin options compiled out of this nodeop build."""
+            conditionallySupportedFields = {"sysVmOcCacheSizeMb", "sysVmOcCompileThreads"}
+            supportedFields = {field.name for field in dataclasses.fields(pluginArgsClass)}
+            supportedArgs = {}
+            for key, value in kwargs.items():
+                if key in supportedFields or key not in conditionallySupportedFields:
+                    supportedArgs[key] = value
+                else:
+                    print(f"Skipping unsupported chain_plugin argument '{key}' for this nodeop build")
+            return supportedArgs
+
+        if args.non_prods_sys_vm_oc_enable and not Utils.nodeopSupportsSysVmOc():
+            Utils.errorExit("--non-prods-sys-vm-oc-enable requires a nodeop build with SYS VM OC support")
+
+        chainPluginArgs = ChainPluginArgs(**supportedPluginArgs(
+                                        ChainPluginArgs,
+                                        signatureCpuBillablePct=args.signature_cpu_billable_pct,
                                         chainThreads=args.chain_threads, databaseMapMode=args.database_map_mode,
                                         wasmRuntime=args.wasm_runtime, contractsConsole=args.contracts_console,
-                                        sysVmOcCacheSizeMb=args.sys_vm_oc_cache_size_mb, sysVmOcCompileThreads=args.sys_vm_oc_compile_threads,
+                                        sysVmOcCacheSizeMb=args.sys_vm_oc_cache_size_mb,
+                                        sysVmOcCompileThreads=args.sys_vm_oc_compile_threads,
                                         blockLogRetainBlocks=args.block_log_retain_blocks,
-                                        chainStateDbSizeMb=args.chain_state_db_size_mb, abiSerializerMaxTimeMs=990000)
+                                        chainStateDbSizeMb=args.chain_state_db_size_mb, abiSerializerMaxTimeMs=990000))
 
         producerPluginArgs = ProducerPluginArgs(disableSubjectiveApiBilling=args.disable_subjective_billing,
                                                 disableSubjectiveP2pBilling=args.disable_subjective_billing,
@@ -734,10 +814,11 @@ class PtbArgumentsHandler(object):
         ptbBaseParserGroup.add_argument("--wasm-file", type=str, help=argparse.SUPPRESS if suppressHelp else "WASM file name for contract", default="sysio.system.wasm")
         ptbBaseParserGroup.add_argument("--abi-file", type=str, help=argparse.SUPPRESS if suppressHelp else "ABI file name for contract", default="sysio.system.abi")
         ptbBaseParserGroup.add_argument("--user-trx-data-file", type=str, help=argparse.SUPPRESS if suppressHelp else "Path to transaction data JSON file")
-        ptbBaseParserGroup.add_argument("--wasm-runtime", type=str, help=argparse.SUPPRESS if suppressHelp else "Override default WASM runtime (\"sys-vm-jit\", \"sys-vm\")\
+        supportedWasmRuntimeHelp=", ".join(Utils.supportedWasmRuntimes())
+        ptbBaseParserGroup.add_argument("--wasm-runtime", type=str, help=argparse.SUPPRESS if suppressHelp else f"Override default WASM runtime ({supportedWasmRuntimeHelp}).\
                                          \"sys-vm-jit\" : A WebAssembly runtime that compiles WebAssembly code to native x86 code prior to\
                                          execution. \"sys-vm\" : A WebAssembly interpreter.",
-                                         choices=["sys-vm-jit", "sys-vm"], default="sys-vm-jit")
+                                         choices=Utils.supportedWasmRuntimes(), default=Utils.defaultWasmRuntime())
         ptbBaseParserGroup.add_argument("--contracts-console", help=argparse.SUPPRESS if suppressHelp else "print contract's output to console", action='store_true')
         ptbBaseParserGroup.add_argument("--sys-vm-oc-cache-size-mb", type=int, help=argparse.SUPPRESS if suppressHelp else "Maximum size (in MiB) of the SYS VM OC code cache", default=1024)
         ptbBaseParserGroup.add_argument("--sys-vm-oc-compile-threads", type=int, help=argparse.SUPPRESS if suppressHelp else "Number of threads to use for SYS VM OC tier-up", default=1)

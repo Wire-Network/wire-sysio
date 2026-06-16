@@ -9,7 +9,6 @@
 #include <fc/crypto/k1_recover.hpp>
 #include <bn256/bn256.h>
 #include <bls12-381/bls12-381.hpp>
-#include <fc/crypto/elliptic_ed.hpp>
 #include <openssl/blake2.h>
 
 // local helpers
@@ -56,30 +55,13 @@ namespace sysio::chain::webassembly {
       if(context.control.is_speculative_block())
          SYS_ASSERT(s.variable_size() <= context.control.configured_subjective_signature_length_limit(),
                     sig_variable_size_limit_exception, "signature variable length component size greater than subjective maximum");
-      // Check if the signature is ED25519
-      if( s.contains<fc::crypto::ed::signature_shim>() ) {
-         // Extract 32 raw bytes from fc::sha256
-         auto sha_data = digest->data();
-         const unsigned char* msgptr = reinterpret_cast<const unsigned char*>(sha_data);
 
-         // Extract 32-byte pubkey (skip the 1-byte “which” prefix)
-         const unsigned char* pubptr = reinterpret_cast<const unsigned char*>(pub.data()) + 1;
-
-         // Extract 64-byte signature (skip 1-byte variant index + 32-byte embedded pubkey)
-         const unsigned char* sigptr = reinterpret_cast<const unsigned char*>(sig.data()) + 1 + crypto_sign_PUBLICKEYBYTES;
-
-         // d) Call libsodium’s raw ED25519 detached-verify
-         int ok = crypto_sign_verify_detached( sigptr,
-                                               msgptr,
-                                               32,
-                                               pubptr );
-         SYS_ASSERT( ok == 0,
-                     crypto_api_exception,
-                     "ED25519 signature verify failed" );
-         return;
-      }
-
-      // otherwise, fall back to the existing ECDSA‐style recover→compare path
+      // Every signature type, including ed25519, takes the same recover-then-compare path that recover_key and
+      // transaction authorization use. ed25519 signatures embed the signer's public key, and
+      // ed::signature_shim::recover verifies the signature (over the hex-encoded digest, matching sign_sha256)
+      // before returning that embedded key, so the comparison below still proves possession. A separate
+      // libsodium raw-digest verify previously lived here and silently disagreed with recover_key about
+      // which payload was signed; one shared path makes such divergence impossible by construction.
       auto check = fc::crypto::public_key::recover( s, *digest );
       SYS_ASSERT( check == p,
                   crypto_api_exception,

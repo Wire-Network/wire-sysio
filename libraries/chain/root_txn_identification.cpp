@@ -110,9 +110,21 @@ namespace sysio { namespace chain {
             if (root_contract_match.is_contract_match(contract) &&
                 root_contract_match.is_action_match(action)) {
                // We have a match, so we need to store the transaction id
-               // in the storage for this contract
+               // in the storage for this contract.
+               //
+               // A single transaction can carry several traces that match the same
+               // (contract, root): one per matching action plus one per
+               // require_recipient notification, which replicates act.account/act.name
+               // for every notified receiver. The S-root merkle commits to the set of
+               // transactions that touched the contract, so each transaction id must
+               // contribute exactly one leaf per (contract, root). All traces of a
+               // transaction are delivered in a single call and a transaction id is
+               // applied (with a receipt) at most once per block, so a duplicate can
+               // only ever be the most recently stored id.
                auto& contract_storage = this->storage[std::make_pair(contract, root_contract_match.root_name)];
-               contract_storage.push_back(action_trace.trx_id);
+               if (contract_storage.empty() || contract_storage.back() != action_trace.trx_id) {
+                  contract_storage.push_back(action_trace.trx_id);
+               }
                break;
             }
          }

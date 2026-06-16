@@ -531,6 +531,16 @@ uint64_t apply_context::next_recv_sequence( const account_object& receiver_accou
    }
 }
 uint64_t apply_context::next_auth_sequence( account_name actor ) {
+   if ( trx_context.is_read_only() ) {
+      // To avoid confusion of duplicated auth sequence number, hard code to be 0.
+      // Mirrors next_global_sequence/next_recv_sequence. Currently unreachable:
+      // validate_referenced_accounts rejects any authorization on a read-only
+      // action before execution. Kept as defense-in-depth — read-only execution
+      // has no undo session and runs on parallel read-only-window threads, so if
+      // that guard ever changed, the modify below would persist state from a
+      // read-only transaction or race other read threads.
+      return 0;
+   }
    const auto& amo = db.get<account_object,by_name>( actor );
    db.modify( amo, [&](auto& am ){
       ++am.auth_sequence;
@@ -777,10 +787,13 @@ int32_t apply_context::kv_it_next(uint32_t handle) {
          advanced = true;
       }
    }
-   // Slow path: re-seek by key bytes (current row was erased)
+   // Slow path: re-seek by key bytes (current row was erased). upper_bound, not lower_bound: "next"
+   // must advance strictly past the current key, and if the row was erased then reinserted at the
+   // same key within this transaction, lower_bound would land on it again and the iterator would
+   // never advance.
    if (!advanced) {
       auto sv_key = to_sv(slot.current_key.data(), slot.current_key.size());
-      itr = idx.lower_bound(boost::make_tuple(slot.code, slot.table_id, sv_key));
+      itr = idx.upper_bound(boost::make_tuple(slot.code, slot.table_id, sv_key));
    }
 
    if (itr != idx.end() && itr->code == slot.code && itr->table_id == slot.table_id && key_has_prefix(*itr, slot.prefix)) {
@@ -1125,11 +1138,15 @@ int32_t apply_context::kv_idx_next(uint32_t handle) {
          advanced = true;
       }
    }
-   // Slow path: re-seek by key bytes
+   // Slow path: re-seek by key bytes (current entry was erased). upper_bound on the full
+   // (sec_key, pri_key) tuple advances strictly past the current position even when the entry was
+   // erased and reinserted at the same keys within this transaction; with lower_bound the iterator
+   // would return the same position again and never advance. Entries sharing the secondary key but
+   // with a greater primary key still compare greater, so they are not skipped.
    if (!advanced) {
       auto sv_sec = to_sv(slot.current_sec_key.data(), slot.current_sec_key.size());
       auto sv_pri = to_sv(slot.current_pri_key.data(), slot.current_pri_key.size());
-      itr = idx.lower_bound(boost::make_tuple(slot.code, slot.table_id, sv_sec, sv_pri));
+      itr = idx.upper_bound(boost::make_tuple(slot.code, slot.table_id, sv_sec, sv_pri));
    }
 
    if (itr != idx.end() && itr->code == slot.code && itr->table_id == slot.table_id) {

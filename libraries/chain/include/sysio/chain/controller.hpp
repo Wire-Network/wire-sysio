@@ -317,7 +317,6 @@ namespace sysio::chain {
 
          time_point                     pending_block_time()const;
          block_timestamp_type           pending_block_timestamp()const;
-         time_point                     pending_lib_time()const;
          account_name                   pending_block_producer()const;
          const block_signing_authority& pending_block_signing_authority()const;
          std::optional<block_id_type>   pending_producer_block_id()const;
@@ -418,9 +417,6 @@ namespace sysio::chain {
          bool is_known_unexpired_transaction( const transaction_id_type& id) const;
 
          void record_transaction( const transaction_id_type& id, fc::time_point_sec expire );
-         void push_dedup_session();
-         void squash_dedup_session();
-         void undo_dedup_session();
 
          // called by host function
          int64_t set_proposed_producers( transaction_context& trx_context, vector<producer_authority> producers );

@@ -395,3 +395,13 @@ enum NodeOwnerTier {
   NODE_OWNER_TIER_T2      = 2;
   NODE_OWNER_TIER_T3      = 3;
 }
+
+// OPP envelope dispute lifecycle (sysio.chalg dispute-vote flow). A dispute opens when batch
+// operators deliver 3+ distinct envelope versions for one (outpost, epoch) with no majority; the
+// Tier-1 node owners then vote on the canonical envelope. OPEN until the tally resolves a winning
+// checksum, then RESOLVED (the winner is dispatched and the paused epoch is released).
+enum DisputeStatus {
+  DISPUTE_STATUS_UNKNOWN  = 0;
+  DISPUTE_STATUS_OPEN     = 1;
+  DISPUTE_STATUS_RESOLVED = 2;
+}

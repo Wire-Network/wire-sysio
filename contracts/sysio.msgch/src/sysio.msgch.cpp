@@ -2,6 +2,7 @@
 #include <sysio.epoch/sysio.epoch.hpp>
 #include <sysio.authex/sysio.authex.hpp>
 #include <sysio.chains/sysio.chains.hpp>
+#include <sysio.chalg/sysio.chalg.hpp>     // dispute trigger + open-dispute gate (disputes table)
 #include <sysio.opp.common/slug_name.hpp>
 #include <sysio/opp/opp.pb.hpp>
 #include <sysio/opp/attestations/attestations.pb.hpp>
@@ -682,9 +683,8 @@ void dispatch_attestation(name self, uint64_t attestation_id,
 
       case AttestationType::ATTESTATION_TYPE_CHALLENGE_REQUEST:
       case AttestationType::ATTESTATION_TYPE_CHALLENGE_RESPONSE:
-         // Routed to sysio.chalg in Task 6 (the manual-msig flow has a
-         // different entry point — `initchal` / `submitres` — than the
-         // dispatch shape here).
+         // No depot-side handler. Envelope disputes are resolved on the WIRE side by evalcons
+         // opening a sysio.chalg dispute vote, not by inbound challenge attestations.
          break;
 
       case AttestationType::ATTESTATION_TYPE_STAKE:
@@ -717,6 +717,185 @@ void dispatch_attestation(name self, uint64_t attestation_id,
       default:
          break;
    }
+}
+
+/// Apply a consensus-reached inbound envelope for one (outpost, epoch): decode it, store and
+/// dispatch its attestations, write the audit-log row, drain the working envelope rows, and record
+/// per-outpost consensus with the winning checksum. Shared by `evalcons` (majority/unanimous path)
+/// and `resolvedisp` (dispute-resolution path) so both routes process the winner identically.
+///
+/// `raw` is the winning envelope's bytes; `winning_checksum` is its sha256 — recorded on `outpcons`
+/// so `sysio.epoch::advance` can classify each operator's delivery as canonical or slashable.
+void apply_consensus(name self, uint64_t chain_code, uint32_t epoch_index,
+                     const std::vector<char>& raw, const checksum256& winning_checksum) {
+   const uint128_t composite = opp::outpost_epoch_key(chain_code, epoch_index);
+
+   // Idempotency guard, keyed off the DURABLE per-outpost consensus row. `outpcons.epoch_index` is
+   // written only here (apply_consensus) and never cleared, so `epoch_index == this epoch` reliably
+   // means the winning envelope for this (outpost, epoch) was already decoded, dispatched, and logged.
+   // chkcons keys its advance gate off this same signal.
+   //
+   // The guard matters because the consensus cleanup below clears `raw_data` from every delivery row.
+   // Without it, a post-quorum re-fire of evalcons would re-group the now-empty winning row and abort
+   // here on an empty-envelope decode -- turning a benign late delivery into a hard failure and, because
+   // the whole deliver tx reverts, dropping the late operator's own envelope row that epoch::advance
+   // needs to classify/slash. This no-op returns before any cleanup, so that row persists.
+   {
+      msgch::outpost_consensus_t opcons(self);
+      auto opc_pk = msgch::outpost_consensus_key{chain_code};
+      if (opcons.contains(opc_pk)) {
+         auto opc = opcons.get(opc_pk);
+         if (opc.epoch_index == epoch_index) {
+            sysio::print_f("apply_consensus: chain_code=%llu epoch=%u already dispatched, "
+                           "treating as benign no-op\n",
+                           static_cast<unsigned long long>(chain_code), epoch_index);
+            return;
+         }
+      }
+   }
+
+   const auto now     = current_time_point();
+   const auto now_sec = static_cast<uint64_t>(now.sec_since_epoch());
+
+   // Decode the protobuf Envelope (raw protobuf, no size prefix).
+   opp::Envelope envelope;
+   auto in = zpp::bits::in{std::span{raw.data(), raw.size()}, zpp::bits::no_size{}};
+   auto decode_result = in(envelope);
+   check(decode_result == zpp::bits::errc{}, "failed to decode inbound OPP Envelope");
+
+   // The `messages` row is intentionally not written here. The raw envelope bytes have already served
+   // their consensus purpose at this point: attestations are extracted + dispatched below, the durable
+   // trail lives in the metadata-only `envelope_log`, and idempotency keys off the durable `outpcons`
+   // row (see the guard above) -- never off a `messages` row. Emplacing a `message_entry` whose
+   // `raw_payload` mirrors `raw` (up to MAX_ENVELOPE_BYTES) only to erase it again at the end of this
+   // same action would burn KV serialisation, undo-log entries, and a peak-RAM blip on the payer for
+   // zero net storage. The `messages` / `message_entry` schema is left in place; if a downstream
+   // consumer of inbound message rows ever materialises, the emplace can be reintroduced (and the
+   // matching erase left out).
+
+   // Extract + dispatch each attestation in every message of the envelope.
+   msgch::attestations_t atts(self);
+   ChainKind from_chain = ChainKind::CHAIN_KIND_UNKNOWN;
+   {
+      sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
+      auto chain_pk = sysio::chains::chain_key{sysio::slug_name{chain_code}};
+      if (chains_tbl.contains(chain_pk)) {
+         from_chain = chains_tbl.get(chain_pk).kind;
+      }
+   }
+   for (auto& msg : envelope.messages) {
+      for (auto& entry : msg.payload.attestations) {
+         uint64_t att_id = mint_att_id(self);
+         atts.emplace(ram_payer, msgch::id_key{att_id}, msgch::attestation_entry{
+            .id                  = att_id,
+            .chain_code          = chain_code,
+            .epoch_index         = epoch_index,
+            .type                = entry.type,
+            .status              = AttestationStatus::ATTESTATION_STATUS_PROCESSED,
+            .data                = entry.data,
+            .pending_timestamp   = 0,
+            .ready_timestamp     = now_sec,
+            .processed_timestamp = now_sec,
+         });
+         // Reconstruct the OPP message_id as a checksum256 for downstream correlation.
+         checksum256 m_id;
+         {
+            auto& mid = msg.header.message_id;
+            std::array<uint8_t, 32> rawid{};
+            const size_t n = std::min<size_t>(mid.size(), 32);
+            for (size_t i = 0; i < n; ++i) rawid[i] = static_cast<uint8_t>(mid[i]);
+            m_id = checksum256{rawid};
+         }
+         dispatch_attestation(self, att_id, entry.type, entry.data,
+                              from_chain, chain_code, m_id);
+      }
+   }
+
+   // Audit log + inline cleanup of working state.
+   {
+      const auto op_row = [&]() {
+         sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
+         return chains_tbl.get(sysio::chains::chain_key{sysio::slug_name{chain_code}});
+      }();
+
+      sysio::opp::Endpoints endpoints;
+      endpoints.start.kind = op_row.kind;
+      endpoints.start.id   = op_row.external_chain_id;
+      endpoints.end.kind   = ChainKind::CHAIN_KIND_WIRE;
+      endpoints.end.id     = WIRE_CHAIN_ID;
+      write_envelope_log(self, endpoints, epoch_index, winning_checksum);
+
+      // Drop heavy raw_data from each per-batch-op envelope row but KEEP the metadata tuple so
+      // sysio.epoch::advance can still read per-op checksums + delivery for slash classification.
+      msgch::envelopes_t envs(self);
+      std::vector<uint64_t> ids_to_clear;
+      auto modify_idx = envs.get_index<"byoutepoch"_n>();
+      for (auto it = modify_idx.lower_bound(composite);
+           it != modify_idx.end() && it->by_outpost_epoch() == composite; ++it) {
+         ids_to_clear.push_back(it->id);
+      }
+      for (auto id : ids_to_clear) {
+         envs.modify(same_payer, msgch::id_key{id}, [](auto& r) {
+            r.raw_data.clear();
+            r.raw_data.shrink_to_fit();
+         });
+      }
+   }
+
+   // Record per-outpost consensus + the winning checksum.
+   msgch::outpost_consensus_t opcons(self);
+   auto opc_pk = msgch::outpost_consensus_key{chain_code};
+   if (!opcons.contains(opc_pk)) {
+      opcons.emplace(ram_payer, opc_pk, msgch::outpost_consensus_entry{
+         .chain_code        = chain_code,
+         .epoch_index       = epoch_index,
+         .consensus_reached = true,
+         .winning_checksum  = winning_checksum,
+      });
+   } else {
+      opcons.modify(same_payer, opc_pk, [&](auto& r) {
+         r.epoch_index       = epoch_index;
+         r.consensus_reached = true;
+         r.winning_checksum  = winning_checksum;
+      });
+   }
+}
+
+/// Evaluate the dispute trigger and, if met, open a Tier-1 dispute vote via sysio.chalg. Trigger:
+/// the epoch boundary has passed, 3+ distinct envelope versions exist, and no version holds a
+/// majority of the operator group. A majority — even within a 3+-way split — resolves without a
+/// vote, so it is not a trigger; a sub-3-way or pre-boundary split just waits for more deliveries.
+void maybe_open_dispute(name self, uint64_t chain_code, uint32_t epoch_index,
+                        uint32_t operators_per_group,
+                        const std::vector<checksum256>& seen_checksums,
+                        const std::vector<uint32_t>& checksum_counts,
+                        const std::vector<std::vector<name>>& checksum_operators) {
+   if (seen_checksums.size() < 3) return;
+
+   epoch::epochstate_t state_tbl(EPOCH_ACCOUNT);
+   if (!state_tbl.exists() || current_time_point() < state_tbl.get().next_epoch_start) return;
+
+   uint32_t max_count = 0;
+   for (auto c : checksum_counts) {
+      if (c > max_count) max_count = c;
+   }
+   if (max_count > operators_per_group / 2) return;  // a majority exists -> no vote needed
+
+   std::vector<chalg::dispute_candidate> candidates;
+   candidates.reserve(seen_checksums.size());
+   for (size_t g = 0; g < seen_checksums.size(); ++g) {
+      candidates.push_back(chalg::dispute_candidate{
+         .checksum  = seen_checksums[g],
+         .operators = checksum_operators[g],
+      });
+   }
+
+   action(
+      permission_level{self, "active"_n},
+      CHALG_ACCOUNT,
+      "opendispute"_n,
+      std::make_tuple(chain_code, epoch_index, candidates)
+   ).send();
 }
 
 } // anonymous namespace
@@ -763,9 +942,12 @@ void msgch::deliver(name batch_op_name, uint64_t chain_code, std::vector<char> d
       auto result = in(env_check);
       check(result == zpp::bits::errc{}, "failed to decode inbound envelope");
       uint32_t env_epoch = static_cast<uint32_t>(env_check.epoch_index);
-      check(env_epoch == epoch,
-         "envelope epoch_index mismatch: envelope=" + std::to_string(env_epoch) +
-         " current=" + std::to_string(epoch));
+      // Lambda overload: the formatted message (triple std::to_string concat) is built only on the
+      // failure path, not on every successful delivery.
+      check(env_epoch == epoch, [&] {
+         return "envelope epoch_index mismatch: envelope=" + std::to_string(env_epoch) +
+                " current=" + std::to_string(epoch);
+      });
    }
 
    // Compute checksum trustlessly inside the contract
@@ -774,7 +956,7 @@ void msgch::deliver(name batch_op_name, uint64_t chain_code, std::vector<char> d
    // Prevent duplicate delivery from same operator for same outpost+epoch
    envelopes_t envs(get_self());
    auto oe_idx = envs.get_index<"byoutepoch"_n>();
-   uint64_t composite = (static_cast<uint64_t>(chain_code) << 32) | epoch;
+   uint128_t composite = opp::outpost_epoch_key(chain_code, epoch);
    for (auto it = oe_idx.lower_bound(composite);
         it != oe_idx.end() && it->by_outpost_epoch() == composite; ++it) {
       if (it->batch_op_name == batch_op_name) {
@@ -819,12 +1001,24 @@ void msgch::evalcons(uint64_t chain_code, uint32_t epoch_index) {
 
    envelopes_t envs(get_self());
    auto oe_idx = envs.get_index<"byoutepoch"_n>();
-   uint64_t composite = (static_cast<uint64_t>(chain_code) << 32) | epoch_index;
+   uint128_t composite = opp::outpost_epoch_key(chain_code, epoch_index);
 
-   // Group envelopes by checksum (CDT-compatible parallel vectors)
+   // If a dispute has been opened for this (outpost, epoch), the dispute-vote flow owns its
+   // resolution and winner dispatch (via `resolvedisp`). evalcons is a no-op for this bucket so a
+   // late delivery cannot re-open the dispute or re-dispatch the envelope.
+   {
+      chalg::disputes_t disputes(CHALG_ACCOUNT);
+      auto d_idx = disputes.get_index<"byoutepoch"_n>();
+      if (d_idx.find(composite) != d_idx.end()) return;
+   }
+
+   // Group envelopes by checksum, tracking the operators that delivered each version (CDT-compatible
+   // parallel vectors). The per-version operator lists become the dispute candidates on a 3+-way
+   // split.
    std::vector<checksum256>       seen_checksums;
    std::vector<uint32_t>          checksum_counts;
    std::vector<std::vector<char>> checksum_data;
+   std::vector<std::vector<name>> checksum_operators;
    uint32_t total_deliveries = 0;
 
    for (auto it = oe_idx.lower_bound(composite);
@@ -833,6 +1027,7 @@ void msgch::evalcons(uint64_t chain_code, uint32_t epoch_index) {
       for (size_t g = 0; g < seen_checksums.size(); ++g) {
          if (seen_checksums[g] == it->checksum) {
             checksum_counts[g]++;
+            checksum_operators[g].push_back(it->batch_op_name);
             found = true;
             break;
          }
@@ -841,6 +1036,7 @@ void msgch::evalcons(uint64_t chain_code, uint32_t epoch_index) {
          seen_checksums.push_back(it->checksum);
          checksum_counts.push_back(1);
          checksum_data.push_back(it->raw_data);
+         checksum_operators.push_back(std::vector<name>{it->batch_op_name});
       }
       total_deliveries++;
    }
@@ -873,196 +1069,19 @@ void msgch::evalcons(uint64_t chain_code, uint32_t epoch_index) {
       }
    }
 
-   if (!consensus_reached) return;
-
-   // === CONSENSUS REACHED ===
-   //
-   // Idempotency guard: `evalcons` is re-fired by every `deliver` call. If a
-   // post-quorum batch op delivers (3rd-of-3 after a 2-of-3 reach), we hit
-   // this branch a second time and would otherwise re-store the envelope's
-   // messages + re-dispatch every attestation under fresh `att_id`s. That
-   // re-dispatch turns every late delivery into a duplicate `createuwreq`
-   // (etc.), surfacing as `assertion failure with message: ... already
-   // exists` even though the late delivery itself is a benign no-op per
-   // `opp-consensus.md`. Skip the dispatch block when an INBOUND message
-   // for this (chain_code, epoch) is already on file.
-   {
-      messages_t msgs(get_self());
-      auto ep_idx = msgs.get_index<"byepoch"_n>();
-      bool already_dispatched = false;
-      for (auto it = ep_idx.lower_bound(epoch_index);
-           it != ep_idx.end() && it->by_epoch() == epoch_index; ++it) {
-         if (it->chain_code == chain_code
-             && it->direction == MessageDirection::MESSAGE_DIRECTION_INBOUND) {
-            already_dispatched = true;
-            break;
-         }
-      }
-      if (already_dispatched) {
-         sysio::print_f("evalcons: chain_code=%llu epoch=%u already dispatched, "
-                        "treating post-quorum delivery as benign no-op\n",
-                        static_cast<unsigned long long>(chain_code), epoch_index);
-         return;
-      }
+   if (!consensus_reached) {
+      // No automatic consensus. On a 3+-way no-majority split past the epoch boundary, open a
+      // Tier-1 dispute vote; a smaller or pre-boundary split just waits for more deliveries.
+      maybe_open_dispute(get_self(), chain_code, epoch_index, operators_per_group,
+                         seen_checksums, checksum_counts, checksum_operators);
+      return;
    }
 
-   auto& raw    = checksum_data[consensus_group];
-   auto  now    = current_time_point();
-   auto  now_sec = static_cast<uint64_t>(now.sec_since_epoch());
-   uint32_t epoch = current_epoch_index();
-
-   // Decode protobuf Envelope from the consensus data (raw protobuf, no size prefix)
-   opp::Envelope envelope;
-   auto in = zpp::bits::in{std::span{raw.data(), raw.size()}, zpp::bits::no_size{}};
-   auto decode_result = in(envelope);
-   check(decode_result == zpp::bits::errc{}, "failed to decode inbound OPP Envelope");
-
-   // Store the raw envelope as an inbound message
-   messages_t msgs(get_self());
-   uint64_t msg_id = std::max<uint64_t>(1, msgs.available_primary_key());
-
-   msgs.emplace(ram_payer, id_key{msg_id}, message_entry{
-      .id           = msg_id,
-      .chain_code   = chain_code,
-      .epoch_index  = epoch,
-      .direction    = MessageDirection::MESSAGE_DIRECTION_INBOUND,
-      .status       = MessageStatus::MESSAGE_STATUS_PROCESSED,
-      .raw_payload  = raw,
-      .received_at  = now,
-      .processed_at = now,
-   });
-
-   // Extract individual AttestationEntries from each Message in the Envelope.
-   // Each attestation is BOTH (a) recorded in the `attestations` table for
-   // audit / re-dispatch / outbound packing AND (b) inline-dispatched to the
-   // matching depot-side handler contract. Dispatch is best-effort — unknown
-   // / out-of-scope types fall through silently so the inbound stream keeps
-   // flowing while later tasks land their handlers.
-   attestations_t atts(get_self());
-   ChainKind from_chain = ChainKind::CHAIN_KIND_UNKNOWN;
-   {
-      // Look up the originating chain row on `sysio.chains` (PK =
-      // slug_name value). `from_chain` is the VM-family receipt-trust
-      // signal passed to per-attestation dispatchers; the slug_name
-      // routing is sourced from each attestation's own `chain_code`
-      // field per the v6 data-model refactor.
-      sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
-      auto chain_pk = sysio::chains::chain_key{sysio::slug_name{chain_code}};
-      if (chains_tbl.contains(chain_pk)) {
-         from_chain = chains_tbl.get(chain_pk).kind;
-      }
-   }
-   for (auto& msg : envelope.messages) {
-      for (auto& entry : msg.payload.attestations) {
-         uint64_t att_id = mint_att_id(get_self());
-         // Inbound attestations land in the same `atts` table as
-         // outbound (queued by `queueout`) — but they must NEVER feed
-         // back into `buildenv` for the source outpost (the outpost
-         // doesn't have handlers for its own emitted types, e.g. ETH
-         // outpost reverts `OPP_UnhandledAttestationType(SwapRequest)`
-         // when an inbound SwapRequest gets echoed back). Store them
-         // with `status = PROCESSED` directly so the secondary index
-         // `bystatus` query in `buildenv` skips them — the dispatch
-         // call below is the row's full lifecycle on the depot.
-         atts.emplace(ram_payer, id_key{att_id}, attestation_entry{
-            .id                  = att_id,
-            .chain_code          = chain_code,
-            .epoch_index         = epoch,
-            .type                = entry.type,
-            .status              = AttestationStatus::ATTESTATION_STATUS_PROCESSED,
-            .data                = entry.data,
-            .pending_timestamp   = 0,
-            .ready_timestamp     = now_sec,
-            .processed_timestamp = now_sec,
-         });
-         // Reconstruct the OPP message_id as a checksum256 so downstream
-         // handlers (DEPOSIT_REVERT correlation, future audit trails) can
-         // pin per-attestation outcomes back to the originating message.
-         checksum256 msg_id;
-         {
-            auto& mid = msg.header.message_id;
-            std::array<uint8_t, 32> raw{};
-            const size_t n = std::min<size_t>(mid.size(), 32);
-            for (size_t i = 0; i < n; ++i) raw[i] = static_cast<uint8_t>(mid[i]);
-            msg_id = checksum256{raw};
-         }
-         dispatch_attestation(get_self(), att_id, entry.type, entry.data,
-                              from_chain, chain_code, msg_id);
-      }
-   }
-
-   // === AUDIT LOG + INLINE CLEANUP OF WORKING STATE ===
-   //
-   // The envelope's bytes have served their purpose at this point:
-   // consensus is reached, attestations are extracted and queued for
-   // outbound delivery via `buildenv`. The durable trail is the
-   // metadata-only `envelope_log` row written below; the four working
-   // tables are drained inline so they don't grow without bound.
-   {
-      // Resolve the originating chain row on `sysio.chains` (PK = slug_name
-      // value). `external_chain_id` projects to the `ChainId.id` field on
-      // the audit-log endpoint pair; `kind` projects to `ChainId.kind`.
-      const auto op_row = [&]() {
-         sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
-         return chains_tbl.get(sysio::chains::chain_key{sysio::slug_name{chain_code}});
-      }();
-
-      sysio::opp::Endpoints endpoints;
-      endpoints.start.kind = op_row.kind;
-      endpoints.start.id   = op_row.external_chain_id;
-      endpoints.end.kind   = ChainKind::CHAIN_KIND_WIRE;
-      endpoints.end.id     = WIRE_CHAIN_ID;
-
-      write_envelope_log(get_self(), endpoints, epoch, seen_checksums[consensus_group]);
-
-      // Drop the HEAVY `raw_data` from each per-batch-op `envelopes` row,
-      // but KEEP the metadata tuple `(chain_code, epoch_index, batch_op_name)`
-      // intact. `epoch::advance` reads this metadata via the `byoutepoch`
-      // index to compute `did_deliver` per group member — erasing the rows
-      // here destroys that signal and miscredits every batchop as
-      // `delivered=false`, cascading bootstrapped operators into termination
-      // within a few rotations. The metadata rows are evicted by
-      // `epoch::advance` after `recorddel` has read them.
-      std::vector<uint64_t> ids_to_clear;
-      auto modify_idx = envs.get_index<"byoutepoch"_n>();
-      for (auto it = modify_idx.lower_bound(composite);
-           it != modify_idx.end() && it->by_outpost_epoch() == composite; ++it) {
-         ids_to_clear.push_back(it->id);
-      }
-      for (auto id : ids_to_clear) {
-         envs.modify(same_payer, id_key{id}, [](auto& r) {
-            r.raw_data.clear();
-            r.raw_data.shrink_to_fit();
-         });
-      }
-
-      // Drop the just-inserted `messages` row. Its raw_payload mirrors
-      // the envelope bytes we already discarded; downstream consumers
-      // read the audit log for trail and the attestations table for
-      // queued outbound work.
-      if (msgs.contains(id_key{msg_id})) {
-         msgs.erase(id_key{msg_id});
-      }
-   }
-
-   // === RECORD PER-OUTPOST CONSENSUS ===
-   outpost_consensus_t opcons(get_self());
-   auto opc_pk = outpost_consensus_key{chain_code};
-   if (!opcons.contains(opc_pk)) {
-      opcons.emplace(ram_payer, opc_pk, outpost_consensus_entry{
-         .chain_code        = chain_code,
-         .epoch_index       = epoch_index,
-         .consensus_reached = true,
-      });
-   } else {
-      opcons.modify(same_payer, opc_pk, [&](auto& r) {
-         r.epoch_index       = epoch_index;
-         r.consensus_reached = true;
-      });
-   }
-
-   // Consensus state recorded — advance is triggered by chkcons
+   // Consensus reached: store + dispatch the winning envelope and record the per-outpost winner
+   // (so sysio.epoch::advance can classify each delivery). advance itself is triggered by chkcons
    // once next_epoch_start has passed.
+   apply_consensus(get_self(), chain_code, epoch_index,
+                   checksum_data[consensus_group], seen_checksums[consensus_group]);
 }
 
 // ---------------------------------------------------------------------------
@@ -1070,6 +1089,20 @@ void msgch::evalcons(uint64_t chain_code, uint32_t epoch_index) {
 // ---------------------------------------------------------------------------
 void msgch::chkcons() {
    uint32_t epoch = current_epoch_index();
+
+   // Open-dispute gate: if any OPP dispute for the current epoch is still OPEN, hold advancement.
+   // Two overlapping holds protect a disputed epoch: `sysio.epoch::is_paused` (set by opendispute)
+   // is the hard stop -- advance() itself throws while paused -- and this gate is the soft one that
+   // returns BEFORE chkcons triggers advance, so it never hits that throw mid-dispute. chkdispute
+   // clears both on resolution (resolvedisp + unpause).
+   {
+      chalg::disputes_t disputes(CHALG_ACCOUNT);
+      auto ep_idx = disputes.get_index<"byepoch"_n>();
+      for (auto it = ep_idx.lower_bound(epoch);
+           it != ep_idx.end() && it->by_epoch() == epoch; ++it) {
+         if (it->status == opp::types::DisputeStatus::DISPUTE_STATUS_OPEN) return;
+      }
+   }
 
    // Check all active outposts have consensus for the current epoch.
    // Outpost set is sourced from `sysio.chains::chains` filtered to
@@ -1089,7 +1122,13 @@ void msgch::chkcons() {
          break;
       }
       auto opc = opcons.get(opc_pk);
-      if (!opc.consensus_reached || opc.epoch_index != epoch) {
+      // Readiness is the durable `epoch_index == current epoch` signal that apply_consensus writes on
+      // dispatch. We intentionally do NOT also gate on `consensus_reached`: advance() can return without
+      // bumping the epoch (the emissions gate in sysio.epoch::advance returns gracefully), and that
+      // commit is not rolled back, so a pre-emptive reset of consensus_reached would strand the epoch
+      // with nothing to re-arm it -- apply_consensus does not re-fire once the delivery set is complete.
+      // A stale row from a prior epoch fails this check; a fresh dispatch for the new epoch overwrites it.
+      if (opc.epoch_index != epoch) {
          all_consensus = false;
          break;
       }
@@ -1103,18 +1142,49 @@ void msgch::chkcons() {
    auto state = estate.get();
    if (current_time_point() < state.next_epoch_start) return;
 
-   // All conditions met — reset consensus and advance
-   for (auto it = opcons.begin(); it != opcons.end(); ++it) {
-      auto opc_pk = outpost_consensus_key{it.key().chain_code};
-      opcons.modify(same_payer, opc_pk, [&](auto& r) { r.consensus_reached = false; });
-   }
-
+   // All conditions met. Trigger advance. Per-outpost consensus is intentionally NOT reset here:
+   // advance() can legally return without advancing (the emissions gate), and that graceful return does
+   // not roll back a reset done beforehand, which would permanently strand the epoch. Stale consensus is
+   // invalidated instead by the `epoch_index == epoch` check above once advance() actually bumps the
+   // epoch, and the next epoch's dispatch overwrites the row.
    action(
       permission_level{get_self(), "active"_n},
       EPOCH_ACCOUNT,
       "advance"_n,
       std::make_tuple()
    ).send();
+}
+
+// ---------------------------------------------------------------------------
+//  resolvedisp — dispatch the winning envelope of a resolved dispute
+// ---------------------------------------------------------------------------
+void msgch::resolvedisp(uint64_t chain_code, uint32_t epoch_index, checksum256 winning_checksum) {
+   require_auth(CHALG_ACCOUNT);
+
+   // Locate the winning envelope's raw bytes among this (outpost, epoch)'s deliveries. The dispute
+   // path never cleared raw_data (evalcons returned early before the consensus cleanup), so the
+   // bytes are still on file. Copy them out before apply_consensus drains the rows.
+   envelopes_t envs(get_self());
+   auto oe_idx = envs.get_index<"byoutepoch"_n>();
+   uint128_t composite = opp::outpost_epoch_key(chain_code, epoch_index);
+
+   std::vector<char> raw;
+   bool found = false;
+   for (auto it = oe_idx.lower_bound(composite);
+        it != oe_idx.end() && it->by_outpost_epoch() == composite; ++it) {
+      if (it->checksum == winning_checksum) {
+         raw   = it->raw_data;
+         found = true;
+         break;
+      }
+   }
+   // Asserted-unreachable in normal operation: the winning checksum is a dispute candidate, every
+   // candidate came from a delivered envelope, and the dispute path retains raw_data (above). If it
+   // ever fired it reverts the chkdispute crank (the dispute stays OPEN, the epoch stays paused) -- a
+   // safe stall, not state corruption.
+   check(found, "resolvedisp: winning envelope not found for this outpost+epoch");
+
+   apply_consensus(get_self(), chain_code, epoch_index, raw, winning_checksum);
 }
 
 // ---------------------------------------------------------------------------
@@ -1181,10 +1251,10 @@ void msgch::buildenv(uint64_t chain_code) {
 
    if (candidate_entries.empty()) return;
 
-   // ── Phase 2: packing loop. Walk candidates in order, accumulating a
-   //    conservative byte estimate; stop once the next one would push the
-   //    envelope over MAX_ENVELOPE_BYTES. The trailing serialised-size check
-   //    is the hard backstop in case the estimator under-counts.
+   // Phase 2: estimator-based initial pick. Walk candidates in order, accumulating a conservative byte
+   // estimate; stop once the next one would push the envelope over MAX_ENVELOPE_BYTES. The trim loop
+   // below is the source of truth for the size invariant; this estimator just keeps the typical case to
+   // a single serialise pass.
    size_t included_count  = 0;
    size_t estimated_bytes = ENVELOPE_BASELINE_BYTES;
    for (const auto& entry : candidate_entries) {
@@ -1196,22 +1266,67 @@ void msgch::buildenv(uint64_t chain_code) {
       ++included_count;
    }
 
-   // First-attestation-too-big guard — surface so the operator sees it
-   // instead of a silently-stuck queue. Never expected at protocol level
-   // because individual attestations are bounded well below MAX_ENVELOPE_BYTES.
+   // First-attestation-too-big guard. The estimator picks zero only when the first candidate alone
+   // overshoots the cap; the trim loop below would surface the same condition, but aborting upfront
+   // avoids building anything in the doomed case. Never expected at protocol level because individual
+   // attestations are bounded well below MAX_ENVELOPE_BYTES.
    check(included_count > 0,
          "sysio.msgch::buildenv: a single READY attestation exceeds "
-         "MAX_ENVELOPE_BYTES — cannot pack into an envelope");
+         "MAX_ENVELOPE_BYTES -- cannot pack into an envelope");
 
    std::vector<opp::AttestationEntry> entries(
       std::make_move_iterator(candidate_entries.begin()),
       std::make_move_iterator(candidate_entries.begin() + included_count));
-   const std::vector<uint64_t> included_ids(
+   std::vector<uint64_t> included_ids(
       candidate_ids.begin(),
       candidate_ids.begin() + included_count);
 
-   // Mark only the included attestations as PROCESSED. Remaining candidates
-   // stay READY for the next epoch's `buildenv` call.
+   // Serialise the OPP Envelope wrapping `src` into raw protobuf wire format (no size prefix). Pulled
+   // into a lambda so the trim loop below can re-run it after popping an entry. `src` is copied (not
+   // moved) because the trim loop may need to rebuild from a shorter prefix of `entries`.
+   auto build_packed = [&](const std::vector<opp::AttestationEntry>& src) {
+      opp::MessagePayload payload;
+      payload.version = zpp::bits::vuint32_t{1};
+      payload.attestations = src;
+
+      opp::MessageHeader header;
+      header.timestamp = zpp::bits::vuint64_t{now_sec};
+
+      opp::Message msg;
+      msg.header = std::move(header);
+      msg.payload = std::move(payload);
+
+      opp::Envelope env;
+      env.epoch_index = zpp::bits::vuint32_t{epoch};
+      env.epoch_timestamp = zpp::bits::vuint64_t{now_sec};
+      env.messages.push_back(std::move(msg));
+
+      std::vector<char> out_buf;
+      auto out_stream = zpp::bits::out{out_buf, zpp::bits::no_size{}};
+      (void)out_stream(env);
+      return out_buf;
+   };
+
+   // Phase 3: trim loop. Serialise; if the result overshoots MAX_ENVELOPE_BYTES (the estimator
+   // under-counted relative to the actual zpp::bits encoding for this candidate set), pop the last
+   // entry and retry. This loop -- not the estimator -- is the sole authority on the size invariant. It
+   // replaces the previous post-build hard abort, which left this action in a dead-letter loop on
+   // estimator drift: the PROCESSED markings would roll back with the aborted tx, the same set would
+   // re-pack against the same estimator next epoch, and the same check would trip again. Popped entries
+   // stay READY and ride the next `buildenv` call. PROCESSED marking is deferred until after the loop
+   // converges so a popped entry never needs a status revert.
+   std::vector<char> packed = build_packed(entries);
+   while (packed.size() > MAX_ENVELOPE_BYTES) {
+      check(entries.size() > 1,
+            "sysio.msgch::buildenv: a single READY attestation exceeds "
+            "MAX_ENVELOPE_BYTES -- cannot pack into an envelope");
+      entries.pop_back();
+      included_ids.pop_back();
+      packed = build_packed(entries);
+   }
+
+   // Mark the surviving attestations as PROCESSED. Remaining candidates (popped by the trim loop or
+   // never picked by the estimator) stay READY for the next epoch's `buildenv` call.
    for (uint64_t aid : included_ids) {
       auto att_pk = id_key{aid};
       if (atts.contains(att_pk)) {
@@ -1221,36 +1336,6 @@ void msgch::buildenv(uint64_t chain_code) {
          });
       }
    }
-
-   // Build a Message containing the included attestations.
-   opp::MessagePayload payload;
-   payload.version = zpp::bits::vuint32_t{1};
-   payload.attestations = std::move(entries);
-
-   opp::MessageHeader header;
-   header.timestamp = zpp::bits::vuint64_t{now_sec};
-
-   opp::Message msg;
-   msg.header = std::move(header);
-   msg.payload = std::move(payload);
-
-   // Build OPP Envelope wrapping the message
-   opp::Envelope env;
-   env.epoch_index = zpp::bits::vuint32_t{epoch};
-   env.epoch_timestamp = zpp::bits::vuint64_t{now_sec};
-   env.messages.push_back(std::move(msg));
-
-   // Serialize envelope (no size prefix — raw protobuf wire format)
-   std::vector<char> packed;
-   auto out = zpp::bits::out{packed, zpp::bits::no_size{}};
-   (void)out(env);
-
-   // Hard backstop — the estimator should always over-count, but a final
-   // size check guarantees the envelope cannot exceed the cross-chain cap
-   // even if the conservative estimator drifts.
-   check(packed.size() <= MAX_ENVELOPE_BYTES,
-         "sysio.msgch::buildenv: serialised envelope exceeds MAX_ENVELOPE_BYTES "
-         "(estimator drift)");
 
    // Store outbound envelope
    outenvelopes_t envelopes(get_self());

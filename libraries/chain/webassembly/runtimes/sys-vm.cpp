@@ -433,7 +433,7 @@ REGISTER_INJECTED_HOST_FUNCTION(_sysio_ui32_to_f64);
 REGISTER_INJECTED_HOST_FUNCTION(_sysio_ui64_to_f64);
 
 // producer api
-REGISTER_ALIGNED_HOST_FUNCTION(get_active_producers);
+REGISTER_HOST_FUNCTION(get_active_producers);
 
 // crypto api
 REGISTER_ALIGNED_CF_HOST_FUNCTION(assert_recover_key);

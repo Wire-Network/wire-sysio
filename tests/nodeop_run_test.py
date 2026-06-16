@@ -60,8 +60,7 @@ try:
     if localTest and not dontLaunch:
         Print("Stand up cluster")
 
-        abs_path = os.path.abspath(os.getcwd() + '/contracts/sysio.token/sysio.token.abi')
-        traceNodeopArgs=" --http-max-response-time-ms 990000 --trace-rpc-abi sysio.token=" + abs_path
+        traceNodeopArgs=" --http-max-response-time-ms 990000"
         extraNodeopArgs=traceNodeopArgs + " --plugin sysio::prometheus_plugin --database-map-mode mapped_private "
         specificNodeopInstances={0: "bin/nodeop"}
         if cluster.launch(totalNodes=2, prodCount=prodCount, activateIF=activateIF, onlyBios=onlyBios, dontBootstrap=dontBootstrap, extraNodeopArgs=extraNodeopArgs, specificNodeopInstances=specificNodeopInstances) is False:
@@ -288,8 +287,8 @@ try:
     amountVal=None
     key=""
     try:
-        key = "[actions][0][action]"
-        typeVal = transaction["actions"][0]["action"]
+        key = "[actions][0][name]"
+        typeVal = transaction["actions"][0]["name"]
         key = "[actions][0][params][quantity]"
         amountVal = transaction["actions"][0]["params"]["quantity"]
         amountVal = int(decimal.Decimal(amountVal.split()[0]) * 10000)
@@ -299,6 +298,45 @@ try:
 
     if typeVal != "transfer" or amountVal != 975311:
         errorExit("FAILURE - get transaction trans_id failed: %s %s %s" % (transId, typeVal, amountVal), raw=True)
+
+    # -------------------------------------------------------------------------
+    # Verify trace_api get_actions and get_token_transfers endpoints
+    # -------------------------------------------------------------------------
+    blockNum = transaction["block_num"]
+
+    Print("Verify trace_api get_actions returns transfer with decoded params")
+    actResult = node.processUrllibRequest("trace_api", "get_actions", {
+        "block_num_start": blockNum,
+        "block_num_end":   blockNum,
+        "account":         "sysio.token",
+        "action":          "transfer"
+    }, silentErrors=False, exitOnError=True)
+    assert actResult["code"] == 200, f"get_actions returned HTTP {actResult['code']}"
+    actionsPayload = actResult["payload"]
+    matchingActions = [a for a in actionsPayload["actions"] if a["trx_id"] == transId]
+    assert len(matchingActions) >= 1, \
+        f"get_actions: expected at least one action for trxid {transId}, got: {actionsPayload}"
+    assert "params" in matchingActions[0], \
+        f"get_actions: expected decoded 'params' field, got: {matchingActions[0]}"
+    assert "quantity" in matchingActions[0]["params"], \
+        f"get_actions: expected 'quantity' in params, got: {matchingActions[0]['params']}"
+
+    Print("Verify trace_api get_token_transfers returns exactly one entry per transfer")
+    xferResult = node.processUrllibRequest("trace_api", "get_token_transfers", {
+        "block_num_start": blockNum,
+        "block_num_end":   blockNum
+    }, silentErrors=False, exitOnError=True)
+    assert xferResult["code"] == 200, f"get_token_transfers returned HTTP {xferResult['code']}"
+    xfersPayload = xferResult["payload"]
+    matchingXfers = [t for t in xfersPayload["transfers"] if t["trx_id"] == transId]
+    assert len(matchingXfers) == 1, \
+        f"get_token_transfers: expected exactly 1 entry for trxid {transId} (receiver filter should exclude inline notifications), got {len(matchingXfers)}: {matchingXfers}"
+    assert matchingXfers[0]["receiver"] == "sysio.token", \
+        f"get_token_transfers: expected receiver 'sysio.token', got: {matchingXfers[0]['receiver']}"
+    assert "params" in matchingXfers[0], \
+        f"get_token_transfers: expected decoded 'params', got: {matchingXfers[0]}"
+    assert "quantity" in matchingXfers[0]["params"], \
+        f"get_token_transfers: expected 'quantity' in params, got: {matchingXfers[0]['params']}"
 
     Print("Currency Contract Tests")
     Print("verify no contract in place")

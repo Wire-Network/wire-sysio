@@ -139,6 +139,10 @@ add_library( sysio_chain
              )
 
 find_package(protobuf CONFIG REQUIRED)
+# blake3_encoder uses the standalone BLAKE3 library (not LLVM's bundled copy) so
+# that snapshot hashing links in every configuration, including builds without
+# the sys-vm-oc runtime (which is the only thing that otherwise pulls in LLVM).
+find_package(blake3 CONFIG REQUIRED)
 
 target_link_libraries(
   sysio_chain
@@ -152,6 +156,7 @@ target_link_libraries(
   WAST
   WASM
   softfloat::softfloat
+  BLAKE3::blake3
   ${CHAIN_SYSVM_LIBRARIES}
   ${CHAIN_NATIVE_MODULE_LIBRARIES}
   ${LLVM_LIBS}

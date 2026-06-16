@@ -141,18 +141,31 @@ namespace detail {
                   }
                   return false;
                }
-               // Threshold-1 multi-key (e.g. 1-of-3): find any matching key with sufficient weight
-               // No rollback needed since we only mark a key when returning success
+               // Threshold-1 multi-key (e.g. 1-of-3): find a matching key with sufficient weight.
+               // No rollback needed since we only mark a key when returning success.
+               // The general path visits keys in descending weight order (declaration
+               // order for equal weights) via the meta_permission_map, so when several
+               // provided keys could satisfy the authority it marks the highest-weight
+               // one as used. Select the same key here so the used/unused key sets are
+               // identical no matter which path evaluates the authority.
                if( authority.threshold == 1 ) {
+                  auto best = provided_keys.end();
+                  uint32_t best_weight = 0;
                   for( const auto& k : authority.keys ) {
-                     if( k.weight >= authority.threshold ) {
-                        const auto& search_key = resolve_key(k.key);
-                        auto itr = std::lower_bound( provided_keys.begin(), provided_keys.end(), search_key );
-                        if( itr != provided_keys.end() && *itr == search_key ) {
-                           _used_keys[itr - provided_keys.begin()] = true;
-                           return true;
-                        }
+                     // only a strictly greater weight can replace the current best,
+                     // keeping the earliest-declared key among equal weights
+                     if( k.weight < authority.threshold || k.weight <= best_weight )
+                        continue;
+                     const auto& search_key = resolve_key(k.key);
+                     auto itr = std::lower_bound( provided_keys.begin(), provided_keys.end(), search_key );
+                     if( itr != provided_keys.end() && *itr == search_key ) {
+                        best = itr;
+                        best_weight = k.weight;
                      }
+                  }
+                  if( best != provided_keys.end() ) {
+                     _used_keys[best - provided_keys.begin()] = true;
+                     return true;
                   }
                   return false;
                }

@@ -83,7 +83,7 @@ void apply_sysio_newaccount(apply_context& context) {
                  "Cannot create account named {}, as that name is already taken",
                  create.name);
 
-      int ram_delta = 0;
+      int64_t ram_delta = 0;
       db.create<account_object>([&](auto& a) {
          a.name = create.name;
       });

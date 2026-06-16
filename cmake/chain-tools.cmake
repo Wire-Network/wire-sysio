@@ -19,6 +19,7 @@ macro(chain_target TARGET)
             net_plugin
             cron_plugin
             producer_api_plugin
+            snapshot_api_plugin
             prometheus_plugin
             resource_monitor_plugin
             state_history_plugin
