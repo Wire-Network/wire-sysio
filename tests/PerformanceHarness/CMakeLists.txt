@@ -1,4 +1,5 @@
 configure_file(performance_test_basic.py . COPYONLY)
+configure_file(performance_test_basic_query_test.py . COPYONLY)
 configure_file(performance_test.py . COPYONLY)
 configure_file(log_reader.py . COPYONLY)
 configure_file(genesis.json . COPYONLY)
