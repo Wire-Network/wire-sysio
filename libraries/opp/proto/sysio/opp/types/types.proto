@@ -288,7 +288,9 @@ enum AttestationType {
   // 60954 was ATTESTATION_TYPE_UNDERWRITE_INTENT_REJECT — removed; do not reuse.
   ATTESTATION_TYPE_SWAP_REVERT    = 60955;
   ATTESTATION_TYPE_DEPOSIT_REVERT = 60956;
-  ATTESTATION_TYPE_SWAP_REJECTED  = 60957;
+  // 60957 was ATTESTATION_TYPE_SWAP_REJECTED — removed; do not reuse. Every REMIT is
+  // depot-initiated against a verified reserve ledger, so the destination outpost can
+  // always pay; there is no post-underwriting rejection path.
 
   // ---------------------------------------------------------------------------
   //  Reserve-flow attestations (v6 data-model refactor, 2026-05-19)

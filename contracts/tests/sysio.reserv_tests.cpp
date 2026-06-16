@@ -163,21 +163,6 @@ public:
          ("outpost_amount", outpost_amount));
    }
 
-   /// `onreject` v6 signature.
-   action_result onreject(name signer,
-                          std::string_view chain_code,
-                          std::string_view token_code,
-                          std::string_view reserve_code,
-                          uint64_t unremitted_amount) {
-      return push_action(signer, "onreject"_n, mvo()
-         ("original_swap_remit_id", std::string(64, '0'))
-         ("chain_code",             codename_mvo(chain_code))
-         ("token_code",             codename_mvo(token_code))
-         ("reserve_code",           codename_mvo(reserve_code))
-         ("unremitted_amount",      unremitted_amount)
-         ("recipient_address",      std::vector<char>{})
-         ("reason",                 "test rejection"));
-   }
 
    /// The contract's real WIRE token balance (raw units, 9 decimals).
    int64_t wire_balance(name account) {
@@ -388,29 +373,6 @@ BOOST_FIXTURE_TEST_CASE(onreward_silently_skips_unknown_reserve, sysio_reserve_t
 
    auto r = find_reserve("ETH", "ETH", "MISSING");
    BOOST_REQUIRE(r.is_null());
-} FC_LOG_AND_RETHROW() }
-
-// ── onreject ──
-
-BOOST_FIXTURE_TEST_CASE(onreject_requires_msgch_auth, sysio_reserve_tester) { try {
-   BOOST_REQUIRE_EQUAL(success(),
-      regreserve("ETH", "ETH", "PRIMARY", 1000, 1000));
-
-   BOOST_REQUIRE(onreject(RESERVE_ACCOUNT, "ETH", "ETH", "PRIMARY", 50)
-      .find("missing authority of sysio.msgch") != std::string::npos);
-} FC_LOG_AND_RETHROW() }
-
-BOOST_FIXTURE_TEST_CASE(onreject_re_adds_unremitted_amount, sysio_reserve_tester) { try {
-   BOOST_REQUIRE_EQUAL(success(),
-      regreserve("ETH", "ETH", "PRIMARY", 1000, 1000));
-
-   BOOST_REQUIRE_EQUAL(success(),
-      onreject(MSGCH_ACCOUNT, "ETH", "ETH", "PRIMARY", 50));
-
-   auto r = find_reserve("ETH", "ETH", "PRIMARY");
-   BOOST_REQUIRE(!r.is_null());
-   BOOST_REQUIRE_EQUAL(1050, r["reserve_chain_amount"].as_uint64());
-   BOOST_REQUIRE_EQUAL(1000, r["reserve_wire_amount"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
 // ── Emit-time settlement actions (auth = sysio.uwrit) ──

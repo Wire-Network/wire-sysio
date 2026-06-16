@@ -210,40 +210,6 @@
             ]
         },
         {
-            "name": "onreject",
-            "base": "",
-            "fields": [
-                {
-                    "name": "original_swap_remit_id",
-                    "type": "checksum256"
-                },
-                {
-                    "name": "chain_code",
-                    "type": "slug_name"
-                },
-                {
-                    "name": "token_code",
-                    "type": "slug_name"
-                },
-                {
-                    "name": "reserve_code",
-                    "type": "slug_name"
-                },
-                {
-                    "name": "unremitted_amount",
-                    "type": "uint64"
-                },
-                {
-                    "name": "recipient_address",
-                    "type": "bytes"
-                },
-                {
-                    "name": "reason",
-                    "type": "string"
-                }
-            ]
-        },
-        {
             "name": "onreward",
             "base": "",
             "fields": [
@@ -525,11 +491,6 @@
         {
             "name": "oncrtreserve",
             "type": "oncrtreserve",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "onreject",
-            "type": "onreject",
             "ricardian_contract": ""
         },
         {

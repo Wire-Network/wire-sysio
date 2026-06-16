@@ -557,53 +557,12 @@ void dispatch_attestation(name self, uint64_t attestation_id,
          // misbehaving outpost relaying one inbound is a benign no-op.
          break;
 
-      case AttestationType::ATTESTATION_TYPE_SWAP_REJECTED:
-         // Destination outpost couldn't pay a SwapRemit; reconcile the
-         // depot's view of the reserve so it matches the outpost's
-         // (still-holding-the-amount) balance. Flatten the SwapRejected
-         // proto message into primitive params on the inline action — the
-         // ABI never sees a proto-message-typed parameter per the
-         // no-proto-messages-in-actions rule.
-         //
-         // Post v6: `chain_code` and `reserve_code` come from the
-         // attestation payload (the destination reserve that failed to
-         // pay); `token_code` comes from the unremitted TokenAmount.
-         // The triple (chain_code, token_code, reserve_code) is the
-         // reserve PK on `sysio.reserv::reserves`.
-         {
-            opp::attestations::SwapRejected rejected;
-            auto in = zpp::bits::in{std::span{data.data(), data.size()}, zpp::bits::no_size{}};
-            auto rc = in(rejected);
-            if (rc != zpp::bits::errc{}) break;
-            checksum256 original_id;
-            // SwapRejected.original_swap_remit_id is a proto `bytes` field —
-            // OPP message ids are always 32 bytes (keccak/sha digests per the
-            // platform spec). Anything shorter implies a malformed
-            // attestation; drop it rather than silently truncate.
-            const auto& id_bytes = rejected.original_swap_remit_id;
-            if (id_bytes.size() == 32) {
-               std::array<uint8_t, 32> arr{};
-               std::copy(id_bytes.begin(), id_bytes.end(),
-                         reinterpret_cast<char*>(arr.data()));
-               original_id = checksum256(arr);
-            } else {
-               break;   // malformed; drop
-            }
-            const uint64_t unremitted_raw =
-               static_cast<uint64_t>(static_cast<int64_t>(rejected.unremitted_amount.amount));
-            action(
-               permission_level{self, "active"_n},
-               RESERV_ACCOUNT, "onreject"_n,
-               std::make_tuple(original_id,
-                               sysio::slug_name{rejected.chain_code},
-                               sysio::slug_name{rejected.unremitted_amount.token_code},
-                               sysio::slug_name{rejected.reserve_code},
-                               unremitted_raw,
-                               rejected.recipient.address,
-                               rejected.reason)
-            ).send();
-         }
-         break;
+      // ATTESTATION_TYPE_SWAP_REJECTED was dispatched here → sysio.reserv::onreject.
+      // REMOVED: outposts no longer echo a rejection. Every REMIT is depot-initiated
+      // against a verified reserve ledger, so the destination outpost can always pay
+      // (or log+skips locally on a misconfig) — there is no post-underwriting rejection
+      // and no reserve-ledger reconciliation. The retired type (enum slot 60957) no
+      // longer exists; any stray inbound falls through to the default drop below.
 
       case AttestationType::ATTESTATION_TYPE_STAKING_REWARD:
          // Per-staker staking reward -> sysio.dclaim claim ledger. The v6

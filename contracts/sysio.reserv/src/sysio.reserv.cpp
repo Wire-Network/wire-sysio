@@ -463,31 +463,8 @@ void reserve::debit(sysio::slug_name chain_code,
    });
 }
 
-void reserve::onreject(checksum256       /*original_swap_remit_id*/,
-                        sysio::slug_name   chain_code,
-                        sysio::slug_name   token_code,
-                        sysio::slug_name   reserve_code,
-                        uint64_t          unremitted_amount,
-                        std::vector<char> /*recipient_address*/,
-                        std::string       /*reason*/) {
-   require_auth(MSGCH_ACCOUNT);
-   if (unremitted_amount == 0) return;
-
-   reserves_t tbl(get_self());
-   auto pk = make_key(chain_code, token_code, reserve_code);
-   auto it = tbl.find(pk);
-   if (it == tbl.end()) {
-      sysio::print("onreject: reserve not found; silently skipping\n");
-      return;
-   }
-   if (it->status != opp::types::RESERVE_STATUS_ACTIVE) {
-      sysio::print("onreject: reserve not ACTIVE; silently skipping\n");
-      return;
-   }
-   tbl.modify(ram_payer, pk, [&](auto& row) {
-      row.reserve_chain_amount += unremitted_amount;
-   });
-}
+// onreject was removed — no SwapRejected attestation exists (every depot-initiated
+// REMIT is paid by the destination outpost; reserves need no rejection reconciliation).
 
 void reserve::onreward(sysio::slug_name chain_code,
                         sysio::slug_name token_code,

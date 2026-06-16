@@ -465,19 +465,8 @@ DataStream& operator>>(DataStream& ds, SwapRemit& t) {
              >> t.chain_code >> t.reserve_code;
 }
 
-// SwapRejected — v6: adds chain_code + reserve_code.
-template <typename DataStream>
-DataStream& operator<<(DataStream& ds, const SwapRejected& t) {
-   return ds << t.original_swap_remit_id << t.recipient
-             << t.unremitted_amount << t.reason
-             << t.chain_code << t.reserve_code;
-}
-template <typename DataStream>
-DataStream& operator>>(DataStream& ds, SwapRejected& t) {
-   return ds >> t.original_swap_remit_id >> t.recipient
-             >> t.unremitted_amount >> t.reason
-             >> t.chain_code >> t.reserve_code;
-}
+// SwapRejected DataStream operators removed — the SwapRejected message no longer
+// exists (no post-underwriting rejection path; every REMIT is depot-initiated).
 
 // ChallengeOperatorHash — field name `operator_` (trailing underscore) because
 // `operator` is a C++ keyword.

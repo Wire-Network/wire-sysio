@@ -230,15 +230,9 @@ message SwapRemit {
   uint64                       reserve_code         = 7;
 }
 
-// Swap-payout rejection (destination Outpost -> Depot).
-message SwapRejected {
-  bytes                        original_swap_remit_id = 1;
-  sysio.opp.types.ChainAddress recipient              = 2;
-  sysio.opp.types.TokenAmount  unremitted_amount      = 3;
-  string                       reason                 = 4;
-  uint64                       chain_code             = 5;
-  uint64                       reserve_code           = 6;
-}
+// SwapRejected (destination Outpost -> Depot) was here — REMOVED. Every REMIT is
+// depot-initiated against a verified reserve ledger, so the destination outpost can
+// always pay; there is no post-underwriting rejection path (enum slot 60957 retired).
 
 // ---------------------------------------------------------------------------
 //  Challenge attestations

@@ -173,16 +173,9 @@ namespace sysio {
                  sysio::slug_name reserve_code,
                  uint64_t        amount);
 
-      /// Auth=sysio.msgch. Reconcile a failed SwapRemit: re-add unremitted
-      /// amount to the matching reserve's outpost-side balance.
-      [[sysio::action]]
-      void onreject(checksum256       original_swap_remit_id,
-                    sysio::slug_name   chain_code,
-                    sysio::slug_name   token_code,
-                    sysio::slug_name   reserve_code,
-                    uint64_t          unremitted_amount,
-                    std::vector<char> recipient_address,
-                    std::string       reason);
+      // onreject was removed: no SwapRejected attestation exists — every
+      // depot-initiated REMIT is paid by the destination outpost (no rejection,
+      // so no reserve-ledger reconciliation is needed).
 
       /// Auth=sysio.msgch. Credit STAKING_REWARD into the matching reserve.
       [[sysio::action]]

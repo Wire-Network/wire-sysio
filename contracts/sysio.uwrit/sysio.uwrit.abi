@@ -677,10 +677,6 @@
                     "value": 60956
                 },
                 {
-                    "name": "ATTESTATION_TYPE_SWAP_REJECTED",
-                    "value": 60957
-                },
-                {
                     "name": "ATTESTATION_TYPE_RESERVE_CREATE",
                     "value": 60958
                 },
