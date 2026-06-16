@@ -134,8 +134,20 @@ public:
       head_log.reset();
       orphan_bundle(head_log_path_and_basename);
       open_head_log();
-      //with no retained logs and an empty head log there is nothing left for the write to conflict with
-      do_pack_and_write_entry(id, prev_id, pack_to);
+      //With no retained logs and an empty head log there is nothing left in the catalog for the write
+      // to conflict with. It can still be rejected by a disagreement with the chain itself -- the
+      // non-local block-id lookup says block-1 has an id other than prev_id -- which no amount of log
+      // rewriting can resolve. Honor force-write's promise to keep the node running by skipping the
+      // block (it cannot be represented in the state history) rather than throwing.
+      try {
+         do_pack_and_write_entry(id, prev_id, pack_to);
+      } catch(const std::bad_alloc&) {
+         throw;
+      } catch(const std::exception& e) {
+         elog("state-history-force-write could not write block {} even into a fresh empty log ({}); the block "
+              "conflicts with the chain rather than the log, so it is skipped and will not be served in the state "
+              "history", chain::block_header::num_from_id(id), e.what());
+      }
    }
 
 private:

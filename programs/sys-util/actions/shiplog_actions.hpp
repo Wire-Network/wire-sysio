@@ -10,6 +10,8 @@
 struct shiplog_options {
    std::string state_history_dir = "state-history";
    std::string log_name; ///< --log: a well-known stem (trace_history, ...) or a path to a bundle
+   //these two double as "not supplied" sentinels for trim (see trim()); block 0 and UINT32_MAX are
+   // never valid ship block numbers, so a user can never collide with them
    uint32_t    first_block = 0;
    uint32_t    last_block  = std::numeric_limits<uint32_t>::max();
    uint32_t    block_num   = 0; ///< --block: the block a block-id lookup asks about
@@ -48,7 +50,7 @@ protected:
    int trim();
    int extract();
    int repair();
-   int do_vacuum();
+   int do_vacuum(); ///< named to mirror blocklog_actions::do_vacuum (see class doc)
    int split();
    int merge();
 };

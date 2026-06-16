@@ -251,7 +251,8 @@ void state_history_plugin::set_program_options(options_description& cli, options
            "never let damaged or inconsistent state history logs prevent the node from running: a log that fails its "
            "startup checks or cannot accept the next block is moved aside (kept on disk, never deleted) and writing "
            "continues into a fresh log. Without this option such conditions are fatal. The sys-util ship-log utility "
-           "can inspect, repair, and merge the logs this sets aside.");
+           "can inspect, repair, and trim the logs this sets aside (and merge them once renamed off the -corrupt- "
+           "suffix).");
 }
 
 void state_history_plugin_impl::plugin_initialize(const variables_map& options) {

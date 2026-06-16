@@ -326,6 +326,9 @@ struct computed_index {
 
 void grow_slots(std::vector<uint64_t>& slots, uint32_t index_first, uint32_t block_num,
                 const std::filesystem::path& stem) {
+   //callers guarantee block_num >= index_first via check_entry's floor check; spell the precondition
+   // out so the unsigned subtraction below can never silently wrap into a huge allocation request
+   assert(block_num >= index_first);
    const uint64_t needed = uint64_t(block_num) - index_first + 1;
    SYS_ASSERT(needed <= max_in_memory_index_blocks, chain::plugin_exception,
               "{}.log spans more than {} blocks which exceeds what this tool supports", stem.string(),
@@ -913,6 +916,9 @@ uint64_t trim_front(const std::filesystem::path& stem_in, uint32_t first_block_t
 
    const uint64_t bytes = extract_blocks(stem, tmp_stem, first_block_to_keep, last_block, progress);
 
+   //the .log and .index renames are not atomic as a pair; a crash between them leaves the new log
+   // beside the old index, but state_history_log regenerates a wrong-sized index on its next open,
+   // so the bundle self-heals
    std::filesystem::rename(log_path_of(tmp_stem), log_path_of(stem));
    std::filesystem::rename(index_path_of(tmp_stem), index_path_of(stem));
    return old_size - bytes;
@@ -959,13 +965,17 @@ std::vector<std::filesystem::path> split_log(const std::filesystem::path& src_st
 
       const std::filesystem::path head = dst_dir / base;
       if(b <= e.last_block) {
-         extract_blocks(src_stem, head, b, e.last_block, progress);
+         extract_blocks(src_stem, head, b, e.last_block, progress); //self-cleans its partial bundle on throw
+         created.push_back(head);
       } else {
+         //register the head before creating its files so a throw during the resizes still cleans the
+         // partial bundle; the order also keeps assert_bundle_creatable from ever marking a
+         // pre-existing file (which we must not delete) for cleanup
          assert_bundle_creatable(head);
+         created.push_back(head);
          fc::random_access_file(log_path_of(head)).resize(0);
          fc::random_access_file(index_path_of(head)).resize(0);
       }
-      created.push_back(head);
    } catch(...) {
       for(const std::filesystem::path& stem : created)
          remove_bundle(stem);
@@ -1054,7 +1064,9 @@ repair_report repair_log(const std::filesystem::path& stem_in, repair_mode mode,
       }
       rep.bytes_kept = rep.scan.file_size;
       //the scan says nothing about the index; judge it cheaply first and verify slot-by-slot only
-      // when the cheap checks pass
+      // when the cheap checks pass. The full check (and a rebuild, if needed) each forward-walk the
+      // log again, so a healthy bundle is walked twice and a same-size-but-wrong index thrice; that
+      // redundancy is accepted because repair is an offline, infrequent operation
       index_status st = check_index(stem, false);
       if(st == index_status::ok)
          st = check_index(stem, true, progress);
@@ -1118,6 +1130,8 @@ repair_report repair_log(const std::filesystem::path& stem_in, repair_mode mode,
               "salvaged range {}-{} does not match the scan's {}-{}", got_first, got_last, rep.first_block,
               rep.last_block);
    if(!dst_stem_in) {
+      //as in trim_front, the two renames are not atomic as a pair; a crash between them leaves a
+      // wrong-sized index that state_history_log regenerates on next open, so the bundle self-heals
       std::filesystem::rename(log_path_of(dst_stem), log_path_of(stem));
       std::filesystem::rename(index_path_of(dst_stem), index_path_of(stem));
    }

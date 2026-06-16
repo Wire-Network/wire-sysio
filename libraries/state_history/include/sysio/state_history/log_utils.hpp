@@ -58,7 +58,9 @@ struct damaged_range {
 /// Result of a full scan of one ship log file.
 struct scan_result {
    uint64_t                file_size = 0;
-   uint16_t                version   = 0;     ///< ship format version from the first header
+   uint16_t                version   = 0;     ///< ship format version from the first header; meaningful only when
+                                              ///< at least one valid_range exists (stays 0 -- itself a valid version
+                                              ///< -- for a file whose first header is not a ship header)
    bool                    pruned    = false; ///< first header carries the pruned-log feature flag
    std::optional<uint32_t> pruned_block_count; ///< trailing block count, present only for pruned logs
    uint64_t                entries_scanned    = 0;
@@ -91,7 +93,8 @@ struct scan_result {
  */
 scan_result scan_log(const std::filesystem::path& stem, bool deep, const progress_func& progress = {});
 
-/// Index health, as judged against the log it belongs to.
+/// Index health, as judged against the log it belongs to. Use magic_enum::enum_name() for a
+/// human-readable spelling.
 enum class index_status {
    ok,         ///< present, expected size, and consistent with the log
    missing,    ///< no index file exists
@@ -99,9 +102,6 @@ enum class index_status {
    mismatched, ///< right size but at least one position disagrees with the log
    log_damaged ///< the log itself is damaged, so the index cannot be judged
 };
-
-/// Human-readable name of an index_status value.
-std::string_view to_string(index_status s);
 
 /**
  * Check a bundle's index against its log.

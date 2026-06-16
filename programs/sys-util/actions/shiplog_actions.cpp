@@ -152,10 +152,11 @@ void shiplog_actions::setup(CLI::App& app) {
    split->add_option("--output-dir", opt->output_dir, "The output directory for the split bundles.")->required();
 
    // subcommand - merge
-   auto* merge = sub->add_subcommand("merge", "Merge every contiguous <log>-<first>-<last> retained bundle in the "
-                                              "state-history directory into a single <log>.log/.index bundle in "
-                                              "--output-dir. Sources are left unchanged. Requires --log with a plain "
-                                              "log name.")
+   auto* merge = sub->add_subcommand("merge", "Merge every contiguous <log>-<first>-<last> retained bundle found "
+                                              "directly under --state-history-dir into a single <log>.log/.index "
+                                              "bundle in --output-dir (point --state-history-dir at the 'retained' "
+                                              "subdirectory if that is where the bundles live). Sources are left "
+                                              "unchanged. Requires --log with a plain log name.")
                     ->callback([err_guard]() { err_guard(&shiplog_actions::merge); });
    merge->add_option("--output-dir", opt->output_dir, "The output directory for the merged bundle.")->required();
 }
@@ -291,6 +292,8 @@ int shiplog_actions::make_index() {
 
 int shiplog_actions::trim() {
    const std::filesystem::path stem = resolve_stem();
+   //the option defaults double as "not supplied" sentinels: block 0 and UINT32_MAX are never valid
+   // ship block numbers, so this can never be confused with a real --first/--last the user passed
    const bool has_first             = opt->first_block != 0;
    const bool has_last              = opt->last_block != std::numeric_limits<uint32_t>::max();
    SYS_ASSERT(has_first || has_last, plugin_exception, "trim requires --first and/or --last");

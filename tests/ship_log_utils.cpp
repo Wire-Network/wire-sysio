@@ -844,6 +844,34 @@ BOOST_AUTO_TEST_CASE(force_write_below_retained_history) { try {
    BOOST_REQUIRE_EQUAL(orphans, 3u); //two retained bundles + the old head
 } FC_LOG_AND_RETHROW() }
 
+BOOST_AUTO_TEST_CASE(force_write_skips_block_the_chain_rejects) { try {
+   //the cascade's last resort -- writing into a fresh empty log -- can still be rejected when the
+   // disagreement is with the chain itself (the non-local block-id lookup), not with any log the
+   // catalog holds. force-write must skip such a block and keep running rather than throw.
+   utils_fixture t;
+   t.add_range(2, 10, 'A', 'A');
+   t.close();
+
+   //a non-local lookup that always disagrees stands in for a block whose parent id no log can ever
+   // satisfy, so every write tier -- existing head, fresh head, fresh head after orphaning all -- is
+   // rejected, exercising the final guarded attempt
+   auto always_disagrees = [](block_num_type) -> std::optional<block_id_type> {
+      return utils_fixture::id_for(1, 'Z');
+   };
+   sysio::state_history::log_catalog catalog(t.dir.path(), t.conf, t.name, always_disagrees, true /*force_write*/);
+
+   //block 50 skips over the head's next block (11) so the existing head rejects it outright, and the
+   // disagreeing lookup makes every fresh-log retry reject it too; the call must return, not throw
+   const std::vector<char> payload(64, 'A');
+   BOOST_REQUIRE_NO_THROW(catalog.pack_and_write_entry(
+      utils_fixture::id_for(50, 'A'), utils_fixture::id_for(49, 'A'),
+      [&](auto& f) { bio::write(f, payload.data(), payload.size()); }));
+
+   //the conflicting block was skipped (nothing serves it) while the original blocks were set aside
+   BOOST_REQUIRE(!catalog.get_entry(50));
+   BOOST_REQUIRE(std::filesystem::exists(t.dir.path() / (t.name + "-corrupt-1.log")));
+} FC_LOG_AND_RETHROW() }
+
 BOOST_AUTO_TEST_CASE(repaired_logs_reopen_and_continue) { try {
    //after a truncate repair, nodeop must be able to append right where the log now ends
    utils_fixture t;

@@ -188,8 +188,17 @@ private:
 
       const size_t first_data_pos = get_pos(_begin_block);
       const size_t last_data_pos = log.size();
-      if(last_data_pos - first_data_pos < *prune_config->vacuum_on_close)
-         vacuum();
+      //vacuum-on-close is a best-effort space reclamation; the log is fully valid whether or not it
+      // runs. Never let it throw out of the destructor (which would std::terminate): this also keeps
+      // force-write's head_log.reset() safe when it sets a damaged pruned log aside.
+      try {
+         if(last_data_pos - first_data_pos < *prune_config->vacuum_on_close)
+            vacuum();
+      } catch(const std::exception& e) {
+         wlog("vacuum-on-close of {} failed ({}); leaving the log un-vacuumed", log.display_path().string(), e.what());
+      } catch(...) {
+         wlog("vacuum-on-close of {} failed; leaving the log un-vacuumed", log.display_path().string());
+      }
    }
 
    //        begin     end
