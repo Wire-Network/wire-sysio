@@ -216,6 +216,11 @@ if(ENABLE_TESTS)
             sysio_testing
             sysio_chain_wrap
     )
+    # Absolute path to the source DEX bootstrap config examples, so
+    # test_dex_bootstrap_config can load them without a working-directory
+    # assumption (mirrors the unittests/test-data convention).
+    target_compile_definitions(${TEST_TARGET_NAME} PRIVATE
+            OPP_DEX_CONFIG_DIR="${CMAKE_SOURCE_DIR}/etc/config/dex")
     add_test(
             NAME ${TEST_TARGET_NAME}
             COMMAND ${CMAKE_CURRENT_BINARY_DIR}/${TEST_TARGET_NAME}
