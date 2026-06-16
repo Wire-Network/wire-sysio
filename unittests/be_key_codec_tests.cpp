@@ -244,4 +244,57 @@ BOOST_AUTO_TEST_CASE(empty_struct_key_encodes_to_zero_bytes) {
    BOOST_CHECK_EQUAL(decoded.get_object()["k"].get_object().size(), 0u);
 }
 
+// A typedef alias cycle must be reported precisely as a cycle, not as the
+// generic "Unsupported BE key type" the shape builder would otherwise surface
+// once the walk landed on the still-unresolved alias. Pins resolve_key_type's
+// visited-set guard and its diagnostic.
+BOOST_AUTO_TEST_CASE(typedef_cycle_is_rejected) {
+   auto has_cycle_msg = [](const fc::exception& e) {
+      return e.top_message().find("Typedef cycle") != std::string::npos;
+   };
+
+   // Two-hop cycle: a -> b -> a.
+   abi_def two;
+   two.types.emplace_back(type_def{"a", "b"});
+   two.types.emplace_back(type_def{"b", "a"});
+   BOOST_CHECK_EXCEPTION(codec::build_key_shapes(two, {"k"}, {"a"}), fc::exception, has_cycle_msg);
+
+   // Self-cycle: s -> s.
+   abi_def self;
+   self.types.emplace_back(type_def{"s", "s"});
+   BOOST_CHECK_EXCEPTION(codec::build_key_shapes(self, {"k"}, {"s"}), fc::exception, has_cycle_msg);
+}
+
+// Scoped table whose within-scope primary key is a struct (slug_name). The real
+// v6 registry tables are unscoped, but chain_plugin supports scoped tables by
+// stripping the leading scope field's shape from the bound shapes and encoding
+// only the within-scope portion (see get_table_rows' scope_key_count erase).
+// This pins that slice-then-encode path for a struct-typed within-scope key:
+// build the full [scope=name, code=slug_name] shapes, drop the scope shape as
+// the plugin does for a scoped JSON bound, and round-trip the struct remainder.
+BOOST_AUTO_TEST_CASE(scoped_struct_key_within_scope_roundtrip) {
+   auto abi = make_test_abi();
+
+   // Full key list: a leading "scope" leaf (name) followed by a struct "code"
+   // (slug_name) — the shape of a scoped kv table keyed by a struct per scope.
+   auto full = codec::build_key_shapes(abi, {"scope", "code"}, {"name", "slug_name"});
+   BOOST_REQUIRE_EQUAL(full.size(), 2u);
+   BOOST_CHECK(full[0].is_leaf);   // scope resolves to the name leaf
+   BOOST_CHECK(!full[1].is_leaf);  // code is the slug_name struct node
+
+   // chain_plugin strips the leading scope shape for a scoped bound; the
+   // remaining shapes encode/decode the within-scope key only.
+   std::vector<codec::key_shape> within_scope(full.begin() + 1, full.end());
+
+   auto bytes = codec::encode_key(fc::variant(fc::mutable_variant_object("code", slug(42))), within_scope);
+   BOOST_REQUIRE_EQUAL(bytes.size(), 8u); // single uint64 struct field, BE
+
+   auto decoded = codec::decode_key(bytes.data(), bytes.size(), within_scope);
+   BOOST_CHECK_EQUAL(decoded.get_object()["code"].get_object()["value"].as_uint64(), 42u);
+
+   // The leading scope is a pure prefix: the within-scope struct bytes are
+   // identical to that struct keyed on its own.
+   BOOST_CHECK(bytes == encode_single(abi, "slug_name", slug(42)));
+}
+
 BOOST_AUTO_TEST_SUITE_END()

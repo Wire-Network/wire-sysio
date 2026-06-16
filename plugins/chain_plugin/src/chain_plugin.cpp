@@ -2016,8 +2016,10 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
    auto key_types = tbl.key_types;
 
    // Resolve the ABI-aware encode/decode plan once per request. nullopt when a
-   // key type is genuinely unrepresentable — hex bounds and hex key output
-   // still work in that case; JSON bounds/keys fall back or reject below.
+   // key type is genuinely unrepresentable. The two JSON paths then diverge: a
+   // JSON bound is REJECTED (clear contract_table_query_exception below), while
+   // JSON key OUTPUT — the decoded `key` field and the `next_key` cursor — falls
+   // back to hex. Hex bounds and hex key output are unaffected either way.
    // No in-tree table declares such a key type today (uint256/int256 have no CDT
    // producer), so the nullopt branches below are defensive; the codec rejection
    // that drives them is unit-tested in be_key_codec_tests `rejections`.
@@ -2025,10 +2027,11 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
    try {
       key_shapes = chain::be_key_codec::build_key_shapes(abi, key_names, key_types);
    } catch (const fc::exception& e) {
-      // Unrepresentable key type (e.g. uint256/int256): leave key_shapes unset so
-      // JSON bounds reject with a clear error while hex bounds/output keep working.
-      // Log so the fall back to hex-only JSON keys is diagnosable rather than silent.
-      dlog("be_key_codec: table {} has no representable JSON key shape; JSON keys fall back to hex ({})",
+      // Unrepresentable key type (e.g. uint256/int256): leave key_shapes unset so a
+      // JSON bound is rejected with a clear error while JSON key output falls back to
+      // hex (hex bounds/output keep working). Log so the fallback is diagnosable.
+      dlog("be_key_codec: table {} has no representable JSON key shape; JSON bounds rejected, "
+           "JSON key output falls back to hex ({})",
            p.table, e.top_message());
    }
 

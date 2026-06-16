@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <array>
 #include <optional>
+#include <set>
 #include <string_view>
 
 namespace sysio::chain {
@@ -288,7 +289,9 @@ struct leaf_key_spelling {
 /// exhaustive over the enum, so under -Wswitch a new kind without a branch is a
 /// compile error; the be_key_codec_tests `leaf_support_list_roundtrips` case
 /// additionally round-trips every spelling here to pin the mapping at test time.
-inline constexpr std::array<leaf_key_spelling, 20> leaf_key_spellings{{
+/// The array size is deduced from the initializer (via std::to_array) so adding
+/// a spelling needs no count to be kept in sync.
+inline constexpr auto leaf_key_spellings = std::to_array<leaf_key_spelling>({
    {"uint8",       key_leaf_kind::uint8},
    {"int8",        key_leaf_kind::int8},
    {"uint16",      key_leaf_kind::uint16},
@@ -309,7 +312,7 @@ inline constexpr std::array<leaf_key_spelling, 20> leaf_key_spellings{{
    {"double",      key_leaf_kind::float64},
    {"float128",    key_leaf_kind::float128},
    {"long double", key_leaf_kind::float128},
-}};
+});
 
 /// Resolve an (already typedef-resolved) ABI type spelling to its leaf kind, or
 /// nullopt if it is not a codec leaf — i.e. it must be expanded as a struct key.
@@ -483,17 +486,23 @@ inline void encode_field(writer& w, key_leaf_kind kind, const fc::variant& val) 
 // types and their kinds are defined above, with the codec (key_leaf_kind /
 // leaf_key_spellings / leaf_kind_of).
 
-/// Canonicalize abigen template spellings and chase ABI typedefs to a
-/// fixpoint (bounded by the typedef count, so alias cycles cannot loop).
+/// Canonicalize abigen template spellings and chase ABI typedefs to a fixpoint.
+/// A visited set of resolved typedef names makes an alias cycle (a -> b -> ...
+/// -> a) a precise diagnostic instead of the generic "Unsupported BE key type"
+/// the caller would otherwise report once the loop landed on the unresolved
+/// alias. The set holds at most one entry per typedef, so the walk still
+/// terminates in O(typedef count).
 inline std::string resolve_key_type(const abi_def& abi, std::string type) {
-   for (size_t hops = 0; hops <= abi.types.size(); ++hops) {
-      if (type == "fixed_bytes<32>") { type = "checksum256"; continue; }
+   std::set<std::string> seen;
+   for (;;) {
+      if (type == "fixed_bytes<32>") { type = "checksum256"; } // checksum256-equivalent key spelling
       auto it = std::find_if(abi.types.begin(), abi.types.end(),
                              [&](const type_def& td) { return td.new_type_name == type; });
-      if (it == abi.types.end()) break;
+      if (it == abi.types.end())
+         return type; // not (or no longer) a typedef — fully resolved
+      FC_ASSERT(seen.insert(type).second, "Typedef cycle while resolving BE key type '{}'", type);
       type = it->type;
    }
-   return type;
 }
 
 /// Maximum struct-key nesting depth. Bounds build_key_shape's recursion so a
