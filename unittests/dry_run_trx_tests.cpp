@@ -352,6 +352,30 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( sequence_numbers_test, T, dry_run_trx_testers ) {
    BOOST_CHECK_EQUAL( prev_global_action_sequence, p.global_action_sequence );
    BOOST_CHECK_EQUAL( prev_recv_sequence, receiver_account.recv_sequence );
    BOOST_CHECK_EQUAL( prev_auth_sequence, amo.auth_sequence );
+
+   chain.produce_block();
+
+   // Unlike dry-run (authorizations permitted, signatures optional), read-only
+   // actions must carry NO authorizations: validate_referenced_accounts rejects
+   // them before execution. This is what keeps the read-only path away from the
+   // sequence-number state mutations above (read-only execution has no undo
+   // session and runs on parallel read threads), so pin the boundary and that
+   // the rejection leaves all sequence numbers untouched.
+   prev_global_action_sequence = p.global_action_sequence;
+   prev_recv_sequence = receiver_account.recv_sequence;
+   prev_auth_sequence = amo.auth_sequence;
+
+   BOOST_CHECK_EXCEPTION(
+      chain.send_db_api_transaction("getage"_n, chain.getage_data,
+         vector<permission_level>{{"alice"_n, config::active_name}}, transaction_metadata::trx_type::read_only),
+      transaction_exception,
+      [](const fc::exception& e) {
+         return expect_assert_message(e, "cannot have authorizations");
+      });
+
+   BOOST_CHECK_EQUAL( prev_global_action_sequence, p.global_action_sequence );
+   BOOST_CHECK_EQUAL( prev_recv_sequence, receiver_account.recv_sequence );
+   BOOST_CHECK_EQUAL( prev_auth_sequence, amo.auth_sequence );
 } FC_LOG_AND_RETHROW() }
 
 // Transient transactions (dry-run, read-only) must not leave transaction-dedup records: they

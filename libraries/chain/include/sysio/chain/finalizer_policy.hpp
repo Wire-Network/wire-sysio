@@ -62,6 +62,11 @@ namespace sysio::chain {
                        generation, f.description.size(), config::max_finalizer_description_size);
             SYS_ASSERT(f.weight > 0, invalid_finalizer_policy_exception,
                        "finalizer_policy generation {}: finalizer weight must be positive", generation);
+            // The all-zero encoding is the BLS identity (point at infinity); the g1
+            // deserialization accepts it without a curve check and signature
+            // verification degenerates for it, so it must never be a finalizer key.
+            SYS_ASSERT(f.public_key.valid(), invalid_finalizer_policy_exception,
+                       "finalizer_policy generation {}: public_key must not be the identity point", generation);
             SYS_ASSERT(sum <= std::numeric_limits<uint64_t>::max() - f.weight, invalid_finalizer_policy_exception,
                        "finalizer_policy generation {}: sum of weights overflows uint64_t", generation);
             sum += f.weight;

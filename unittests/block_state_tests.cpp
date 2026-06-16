@@ -1098,6 +1098,215 @@ BOOST_AUTO_TEST_CASE(get_best_qc_dual_finalizer_consistency) try {
 
 } FC_LOG_AND_RETHROW();
 
+namespace {
+
+// Shared fixture state for the cross-source get_best_qc tests below.
+// Active policy: { dual(w1), A1(w2), A2(w9) }, pending policy: { P0(w1), dual(w2), P2(w9) },
+// threshold 8 on both. The dual finalizer is active index 0 and pending index 1.
+struct dual_policy_fixture {
+   digest_type block_id{fc::sha256("0000000000000000000000000000001")};
+   digest_type strong_digest{fc::sha256("0000000000000000000000000000002")};
+   weak_digest_t weak_digest{create_weak_digest(strong_digest)};
+
+   static constexpr size_t num_finalizers = 3;
+   static constexpr uint32_t generation = 1;
+   static constexpr uint64_t threshold = 8; // 2/3 of total weights of 12
+
+   std::vector<bls_private_key> active_private_keys {
+      bls_private_key("PVT_BLS_tNAkC5MnI-fjHWSX7la1CPC2GIYgzW5TBfuKFPagmwVVsOeW"), // dual finalizer
+      bls_private_key("PVT_BLS_FWK1sk_DJnoxNvUNhwvJAYJFcQAFtt_mCtdQCUPQ4jN1K7eT"),
+      bls_private_key("PVT_BLS_foNjZTu0k6qM5ftIrqC5G_sim1Rg7wq3cRUaJGvNtm2rM89K"),
+   };
+   std::vector<bls_private_key> pending_private_keys {
+      bls_private_key("PVT_BLS_0d8dsux83r42Qg8CHgAqIuSsn9AV-QdCzx3tPj0K8yOJA_qb"),
+      bls_private_key("PVT_BLS_tNAkC5MnI-fjHWSX7la1CPC2GIYgzW5TBfuKFPagmwVVsOeW"), // dual finalizer
+      bls_private_key("PVT_BLS_Wfs3KzfTI2P5F85PnoHXLnmYgSbp-XpebIdS6BUCHXOKmKXK"),
+   };
+   std::vector<bls_public_key> active_public_keys;
+   std::vector<bls_public_key> pending_public_keys;
+
+   block_state_ptr bsp;
+
+   dual_policy_fixture() {
+      std::vector<finalizer_authority> active_finalizers(num_finalizers);
+      std::vector<finalizer_authority> pending_finalizers(num_finalizers);
+      active_public_keys.resize(num_finalizers);
+      pending_public_keys.resize(num_finalizers);
+      for (size_t i = 0; i < num_finalizers; ++i) {
+         const uint64_t weight = (i < num_finalizers - 1) ? i + 1 : 9;
+         active_public_keys[i] = active_private_keys[i].get_public_key();
+         active_finalizers[i] = finalizer_authority{ "test", weight, active_public_keys[i] };
+         pending_public_keys[i] = pending_private_keys[i].get_public_key();
+         pending_finalizers[i] = finalizer_authority{ "test", weight, pending_public_keys[i] };
+      }
+
+      bsp = std::make_shared<block_state>();
+      bsp->active_finalizer_policy = std::make_shared<finalizer_policy>( generation, threshold, active_finalizers );
+      bsp->pending_finalizer_policy = { bsp->block_num(), std::make_shared<finalizer_policy>( generation+1, threshold, pending_finalizers ) };
+      bsp->strong_digest = strong_digest;
+      bsp->weak_digest = weak_digest;
+      bsp->aggregating_qc = aggregating_qc_t{ bsp->active_finalizer_policy, bsp->pending_finalizer_policy->second };
+   }
+
+   // Builds a receiver-valid weak-unit qc_t: both parts meet quorum with one
+   // strong voter plus weak votes, and the dual finalizer votes weak in BOTH
+   // parts (verify_dual_finalizers_votes requires identical dual votes).
+   //   active part:  strong { A1(w2) },  weak { dual(w1), A2(w9) }  -> sum 12
+   //   pending part: strong { P0(w1) },  weak { dual(w2), P2(w9) }  -> sum 12
+   qc_t make_weak_received_qc() {
+      vote_bitset_t active_strong(num_finalizers);
+      active_strong.set(1);
+      vote_bitset_t active_weak(num_finalizers);
+      active_weak.set(0);
+      active_weak.set(2);
+      bls_aggregate_signature active_sig;
+      active_sig.aggregate(active_private_keys[1].sign_sha256(strong_digest));
+      active_sig.aggregate(active_private_keys[0].sign_raw(weak_digest));
+      active_sig.aggregate(active_private_keys[2].sign_raw(weak_digest));
+
+      vote_bitset_t pending_strong(num_finalizers);
+      pending_strong.set(0);
+      vote_bitset_t pending_weak(num_finalizers);
+      pending_weak.set(1);
+      pending_weak.set(2);
+      bls_aggregate_signature pending_sig;
+      pending_sig.aggregate(pending_private_keys[0].sign_sha256(strong_digest));
+      pending_sig.aggregate(pending_private_keys[1].sign_raw(weak_digest));
+      pending_sig.aggregate(pending_private_keys[2].sign_raw(weak_digest));
+
+      return qc_t{bsp->block_num(),
+                  qc_sig_t{active_strong, active_weak, active_sig},
+                  qc_sig_t{pending_strong, pending_weak, pending_sig}};
+   }
+
+   // Builds a receiver-valid qc_t whose active part is STRONG while its pending
+   // part is weak (unit-weak overall). The dual finalizer votes strong in both.
+   //   active part:  strong { dual(w1), A2(w9) }                  -> sum 10
+   //   pending part: strong { dual(w2) }, weak { P2(w9) }         -> sum 11
+   qc_t make_strong_active_weak_pending_qc() {
+      vote_bitset_t active_strong(num_finalizers);
+      active_strong.set(0);
+      active_strong.set(2);
+      bls_aggregate_signature active_sig;
+      active_sig.aggregate(active_private_keys[0].sign_sha256(strong_digest));
+      active_sig.aggregate(active_private_keys[2].sign_sha256(strong_digest));
+
+      vote_bitset_t pending_strong(num_finalizers);
+      pending_strong.set(1);
+      vote_bitset_t pending_weak(num_finalizers);
+      pending_weak.set(2);
+      bls_aggregate_signature pending_sig;
+      pending_sig.aggregate(pending_private_keys[1].sign_sha256(strong_digest));
+      pending_sig.aggregate(pending_private_keys[2].sign_raw(weak_digest));
+
+      return qc_t{bsp->block_num(),
+                  qc_sig_t{active_strong, {}, active_sig},
+                  qc_sig_t{pending_strong, pending_weak, pending_sig}};
+   }
+
+   // Builds a receiver-valid strong-unit qc_t (both parts strong, dual strong in both).
+   //   active part:  strong { dual(w1), A2(w9) }   -> sum 10
+   //   pending part: strong { dual(w2), P2(w9) }   -> sum 11
+   qc_t make_strong_received_qc() {
+      vote_bitset_t active_strong(num_finalizers);
+      active_strong.set(0);
+      active_strong.set(2);
+      bls_aggregate_signature active_sig;
+      active_sig.aggregate(active_private_keys[0].sign_sha256(strong_digest));
+      active_sig.aggregate(active_private_keys[2].sign_sha256(strong_digest));
+
+      vote_bitset_t pending_strong(num_finalizers);
+      pending_strong.set(1);
+      pending_strong.set(2);
+      bls_aggregate_signature pending_sig;
+      pending_sig.aggregate(pending_private_keys[1].sign_sha256(strong_digest));
+      pending_sig.aggregate(pending_private_keys[2].sign_sha256(strong_digest));
+
+      return qc_t{bsp->block_num(),
+                  qc_sig_t{active_strong, {}, active_sig},
+                  qc_sig_t{pending_strong, {}, pending_sig}};
+   }
+};
+
+} // namespace
+
+// get_best_qc must never combine the locally-aggregated signature of one policy
+// with the received signature of the other. Here local aggregation reaches a
+// STRONG quorum on the active policy only (the dual finalizer votes strong, so
+// its strong vote is in the local active aggregate), while a receiver-valid
+// all-parts-weak qc arrives from the network (the dual finalizer voted weak in
+// both of its parts). Selecting active=aggregated(strong) with
+// pending=received(weak) — the per-policy "best" — yields a qc in which the
+// dual finalizer votes strong in the active part and weak in the pending part;
+// every receiving node rejects such a qc via verify_dual_finalizers_votes.
+BOOST_FIXTURE_TEST_CASE(get_best_qc_no_cross_source_mixing, dual_policy_fixture) try {
+   // Local strong votes: dual (active idx 0 / pending idx 1) and the active-only
+   // heavy finalizer A2 (idx 2, w9). Active reaches strong quorum (1+9 >= 8);
+   // pending only accumulates the dual's weight 2 and has NO quorum.
+   {
+      vote_message vote{ block_id, true, active_public_keys[0], active_private_keys[0].sign_sha256(strong_digest) };
+      BOOST_REQUIRE(bsp->aggregate_vote(0, vote).result == vote_result_t::success);
+   }
+   {
+      vote_message vote{ block_id, true, active_public_keys[2], active_private_keys[2].sign_sha256(strong_digest) };
+      BOOST_REQUIRE(bsp->aggregate_vote(0, vote).result == vote_result_t::success);
+   }
+
+   qc_t received = make_weak_received_qc();
+   BOOST_CHECK_NO_THROW(bsp->verify_qc(received)); // sanity: the received qc is receiver-valid
+   BOOST_REQUIRE(bsp->set_received_qc(received));
+
+   auto best = bsp->get_best_qc();
+   BOOST_REQUIRE(best.has_value());
+   BOOST_REQUIRE(best->pending_policy_sig.has_value());
+   // The emitted qc must be valid on every receiving node. With cross-source
+   // mixing this throws: the dual finalizer is strong in the (aggregated)
+   // active part but weak in the (received) pending part.
+   BOOST_CHECK_NO_THROW(bsp->verify_qc(*best));
+   // No aggregated unit exists (pending has no local quorum), so the coherent
+   // received unit must be selected — and it is weak.
+   BOOST_CHECK(best->is_weak());
+} FC_LOG_AND_RETHROW();
+
+// set_received_qc must store/replace the received qc as a unit. Replacing the
+// per-policy parts independently can interleave two received QCs into a pair
+// that no peer ever produced: a first all-weak qc followed by a second qc with
+// a strong active part (dual finalizer strong) would keep the first qc's weak
+// pending part (dual finalizer weak) while upgrading the active part.
+BOOST_FIXTURE_TEST_CASE(set_received_qc_replaces_as_unit, dual_policy_fixture) try {
+   qc_t weak_unit = make_weak_received_qc();
+   qc_t mixed_unit = make_strong_active_weak_pending_qc();
+   BOOST_CHECK_NO_THROW(bsp->verify_qc(weak_unit));  // both inputs are receiver-valid
+   BOOST_CHECK_NO_THROW(bsp->verify_qc(mixed_unit));
+
+   BOOST_REQUIRE(bsp->set_received_qc(weak_unit));
+   // Not better as a unit (its pending part is weak), so it must not replace
+   // anything — and in particular must not replace only the active part.
+   BOOST_CHECK(!bsp->set_received_qc(mixed_unit));
+
+   auto best = bsp->get_best_qc();
+   BOOST_REQUIRE(best.has_value());
+   BOOST_REQUIRE(best->pending_policy_sig.has_value());
+   BOOST_CHECK_NO_THROW(bsp->verify_qc(*best));
+   BOOST_CHECK(best->is_weak());
+} FC_LOG_AND_RETHROW();
+
+// A received strong unit must replace a stored weak unit.
+BOOST_FIXTURE_TEST_CASE(set_received_qc_strong_unit_replaces_weak_unit, dual_policy_fixture) try {
+   qc_t weak_unit = make_weak_received_qc();
+   qc_t strong_unit = make_strong_received_qc();
+   BOOST_CHECK_NO_THROW(bsp->verify_qc(weak_unit));
+   BOOST_CHECK_NO_THROW(bsp->verify_qc(strong_unit));
+
+   BOOST_REQUIRE(bsp->set_received_qc(weak_unit));
+   BOOST_CHECK(bsp->set_received_qc(strong_unit));
+
+   auto best = bsp->get_best_qc();
+   BOOST_REQUIRE(best.has_value());
+   BOOST_CHECK_NO_THROW(bsp->verify_qc(*best));
+   BOOST_CHECK(best->is_strong());
+} FC_LOG_AND_RETHROW();
+
 // Concurrency test: verify that get_best_qc never observes a dual finalizer
 // vote in one policy without the other. One thread adds votes while another
 // repeatedly snapshots via get_best_qc and checks consistency.

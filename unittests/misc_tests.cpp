@@ -381,6 +381,45 @@ BOOST_AUTO_TEST_CASE( authority_checker )
    BOOST_TEST(make_auth_checker(GetNullAuthority, 2, {b}).satisfied(A));
    BOOST_TEST(!make_auth_checker(GetNullAuthority, 2, {c}).satisfied(A));
 
+   // The keys-only threshold-1 fast path must mark the same used key as the
+   // general weight-tally path: the highest-weight provided key, with
+   // declaration order breaking ties.
+   {
+      // higher weight declared second: b must be the used key
+      A = authority(1, {key_weight{a, 1}, key_weight{b, 2}});
+      auto checker = make_auth_checker(GetNullAuthority, 2, {a, b});
+      BOOST_TEST(checker.satisfied(A));
+      BOOST_TEST(checker.used_keys().size() == 1u);
+      BOOST_TEST(checker.used_keys().count(b) == 1u);
+      BOOST_TEST(checker.unused_keys().count(a) == 1u);
+   }
+   {
+      // higher weight declared first: a must be the used key
+      A = authority(1, {key_weight{a, 2}, key_weight{b, 1}});
+      auto checker = make_auth_checker(GetNullAuthority, 2, {a, b});
+      BOOST_TEST(checker.satisfied(A));
+      BOOST_TEST(checker.used_keys().size() == 1u);
+      BOOST_TEST(checker.used_keys().count(a) == 1u);
+      BOOST_TEST(checker.unused_keys().count(b) == 1u);
+   }
+   {
+      // equal weights: the first declared key wins, matching the general
+      // path's stable (weight, declaration order) visitation
+      A = authority(1, {key_weight{a, 1}, key_weight{b, 1}});
+      auto checker = make_auth_checker(GetNullAuthority, 2, {a, b});
+      BOOST_TEST(checker.satisfied(A));
+      BOOST_TEST(checker.used_keys().size() == 1u);
+      BOOST_TEST(checker.used_keys().count(a) == 1u);
+   }
+   {
+      // the highest-weight key is not provided: the best provided key is used
+      A = authority(1, {key_weight{a, 1}, key_weight{b, 2}});
+      auto checker = make_auth_checker(GetNullAuthority, 2, {a});
+      BOOST_TEST(checker.satisfied(A));
+      BOOST_TEST(checker.used_keys().size() == 1u);
+      BOOST_TEST(checker.used_keys().count(a) == 1u);
+   }
+
    const authority c_authority = authority(1, {key_weight{c, 1}});
    auto GetCAuthority = [&c_authority](auto){
       return &c_authority;
