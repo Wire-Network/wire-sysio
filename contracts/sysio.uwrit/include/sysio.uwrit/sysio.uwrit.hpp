@@ -84,23 +84,20 @@ namespace sysio {
       // -----------------------------------------------------------------------
 
       /// Set underwriting fee + lock config. Fields:
-      ///   * `fee_bps` — per-spoke fee charged by the depot.
+      ///   * `fee_bps` — per-spoke swap fee charged by the depot, taken out of
+      ///     the WIRE leg of every swap (so the ETH/SOL the recipient can
+      ///     receive is reduced). `sysio.reserv` routes the collected fee 50/50
+      ///     to its on-chain rewards bucket and the `sysio` emissions treasury
+      ///     (see `sysio.reserv::FEE_REWARD_SHARE_BPS`).
       ///   * `collateral_lock_duration_ms` — wall-clock milliseconds after
       ///     `lock_entry.created_at_ms` that the lock auto-expires (swept by
       ///     `sysio.epoch::advance -> chklocks`). This is the challenge
       ///     window: collateral stays locked for its full duration — it is
       ///     never released by delivery. Default 43,200,000 (12 hours);
       ///     test clusters shorten it via this action.
-      ///   * `fee_split_winner_pct` / `fee_split_other_uw_pct` /
-      ///     `fee_split_batch_op_pct` — distribution shares (sum to 100).
-      ///     Distribution logic itself is deferred to a follow-up; today
-      ///     these fields are persisted but not read by any code path.
       [[sysio::action]]
       void setconfig(uint32_t fee_bps,
-                     uint64_t collateral_lock_duration_ms,
-                     uint8_t  fee_split_winner_pct,
-                     uint8_t  fee_split_other_uw_pct,
-                     uint8_t  fee_split_batch_op_pct);
+                     uint64_t collateral_lock_duration_ms);
 
       /// Called inline from `sysio.msgch::dispatch` when a SWAP attestation
       /// arrives. Decodes the SwapRequest, runs the variance-tolerance check
@@ -479,9 +476,10 @@ namespace sysio {
             sysio::const_mem_fun<fromwire_q, uint64_t, &fromwire_q::by_epoch>>
       >;
 
-      /// Fee + lock-duration + fee-split configuration singleton. Distribution
-      /// logic for the fee-split fields lands in a follow-up task; today they
-      /// are persisted only.
+      /// Fee + lock-duration configuration singleton. `fee_bps` is the per-spoke
+      /// swap fee, charged out of the WIRE leg; the rewards/emissions split of
+      /// the collected fee is fixed in `sysio.reserv` (FEE_REWARD_SHARE_BPS), so
+      /// no fee-distribution shares live here.
       struct [[sysio::table("uwconfig")]] uw_config {
          uint32_t fee_bps                      = 10;           // 0.1% per spoke
          /// Wall-clock collateral lock duration — the challenge window.
@@ -489,13 +487,7 @@ namespace sysio {
          /// after creation and are swept by `chklocks` at epoch advance.
          /// Default 12 hours.
          uint64_t collateral_lock_duration_ms  = 43'200'000;
-         uint8_t  fee_split_winner_pct         = 50;
-         uint8_t  fee_split_other_uw_pct       = 25;
-         uint8_t  fee_split_batch_op_pct       = 25;
-         SYSLIB_SERIALIZE(uw_config,
-            (fee_bps)
-            (collateral_lock_duration_ms)
-            (fee_split_winner_pct)(fee_split_other_uw_pct)(fee_split_batch_op_pct))
+         SYSLIB_SERIALIZE(uw_config, (fee_bps)(collateral_lock_duration_ms))
       };
 
       using uwconfig_t = sysio::kv::global<"uwconfig"_n, uw_config>;

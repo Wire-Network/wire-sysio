@@ -190,8 +190,6 @@ std::vector<std::string> validate(const DexConfig& c) {
       const auto& u = c.uwrit();
       if (u.fee_bps() > 10000)                       e.push_back("V9 fee_bps > 10000");
       if (u.collateral_lock_duration_ms() == 0)      e.push_back("V9 collateral_lock_duration_ms must be > 0");
-      if (u.fee_split_winner_pct() + u.fee_split_other_uw_pct() + u.fee_split_batch_op_pct() != 100)
-         e.push_back("V9 fee splits must sum to 100");
    }
 
    return e;
@@ -256,8 +254,8 @@ BOOST_AUTO_TEST_CASE(validator_rejects_mutations) {
      BOOST_CHECK(!validate(c).empty()); }                               // V7 earmark too small
    { auto c = base; c.mutable_reserves(0)->set_is_private(true);        // V8 private without owner
      BOOST_CHECK(!validate(c).empty()); }
-   { auto c = base; c.mutable_uwrit()->set_fee_split_winner_pct(49);
-     BOOST_CHECK(!validate(c).empty()); }                               // V9 splits != 100
+   { auto c = base; c.mutable_uwrit()->set_fee_bps(10001);
+     BOOST_CHECK(!validate(c).empty()); }                               // V9 fee_bps > 10000
 }
 
 BOOST_AUTO_TEST_SUITE_END()

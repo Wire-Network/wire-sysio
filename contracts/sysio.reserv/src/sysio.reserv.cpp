@@ -3,7 +3,9 @@
 #include <sysio.msgch/sysio.msgch.hpp>
 #include <sysio.authex/sysio.authex.hpp>
 #include <sysio.chains/sysio.chains.hpp>
+#include <sysio.uwrit/sysio.uwrit.hpp>
 #include <sysio.opp.common/opp_table_types.hpp>
+#include <sysio.opp.common/amm_math.hpp>
 
 #include <zpp_bits.h>
 
@@ -39,15 +41,18 @@ void require_priv_caller() {
                 "sysio.reserv: privileged account required");
 }
 
-uint64_t cp_output(uint64_t reserve_src, uint64_t reserve_dst, uint64_t src_amount) {
-   if (reserve_src == 0 || reserve_dst == 0 || src_amount == 0) return 0;
-   uint128_t numerator   = static_cast<uint128_t>(reserve_dst) * src_amount;
-   uint128_t denominator = static_cast<uint128_t>(reserve_src) + src_amount;
-   uint128_t result      = numerator / denominator;
-   if (result > static_cast<uint128_t>(std::numeric_limits<uint64_t>::max())) {
-      return std::numeric_limits<uint64_t>::max();
-   }
-   return static_cast<uint64_t>(result);
+using sysio::slug_name_literals::operator""_s;
+
+/// The WIRE token / depot-chain slug. A reserve leg whose token code is WIRE is
+/// a depot (WIRE) endpoint with no token/WIRE pool of its own.
+constexpr sysio::slug_name WIRE_TOKEN = "WIRE"_s;
+
+/// Live per-spoke swap fee (basis points) — owned by `sysio.uwrit`. Read fresh
+/// so the read-only quote and settlement charge one and the same rate. Falls
+/// back to the `uw_config` default when uwrit has not been configured yet.
+uint32_t uwrit_fee_bps() {
+   sysio::uwrit::uwconfig_t cfg(reserve::UWRIT_ACCOUNT);
+   return cfg.get_or_default(sysio::uwrit::uw_config{}).fee_bps;
 }
 
 reserve::reserve_key make_key(sysio::slug_name chain_code,
@@ -126,6 +131,31 @@ void queue_attestation_out(name self,
       reserve::MSGCH_ACCOUNT, "queueout"_n,
       std::make_tuple(owning_chain.value, attest_type, encoded)
    ).send();
+}
+
+/// Route a collected WIRE swap fee: accrue the rewards share into the on-chain
+/// `rewards_bucket` (the WIRE stays in this contract's custody, earmarked for a
+/// future distribution) and transfer the emissions share back to the `sysio`
+/// treasury. No-op when there is no fee. The custody invariant is preserved:
+/// the rewards share moves from a reserve's WIRE side into `rewards.balance`
+/// (same custody), and only the emissions share leaves as a real transfer.
+void route_wire_fee(name self, const opp::amm::wire_fee& fee) {
+   if (fee.reward_share > 0) {
+      reserve::rewardbkt_t bkt(self);
+      auto rb = bkt.get_or_default(reserve::rewards_bucket{});
+      rb.balance          += fee.reward_share;
+      rb.lifetime_accrued += fee.reward_share;
+      bkt.set(rb, ram_payer);
+   }
+   if (fee.emissions_share > 0) {
+      action(
+         permission_level{self, "active"_n},
+         reserve::TOKEN_ACCOUNT, "transfer"_n,
+         std::make_tuple(self, reserve::TREASURY_ACCOUNT,
+            asset(static_cast<int64_t>(fee.emissions_share), WIRE_SYMBOL),
+            std::string("sysio.reserv::swap fee -> emissions"))
+      ).send();
+   }
 }
 
 } // namespace
@@ -426,20 +456,40 @@ uint64_t reserve::swapquote(sysio::slug_name from_chain_code,
                              sysio::slug_name to_reserve_code) {
    if (from_amount == 0) return 0;
 
-   reserves_t tbl(get_self());
-   auto src_pk = make_key(from_chain_code, from_token_code, from_reserve_code);
-   auto dst_pk = make_key(to_chain_code,   to_token_code,   to_reserve_code);
-   auto src_it = tbl.find(src_pk);
-   auto dst_it = tbl.find(dst_pk);
-   if (src_it == tbl.end() || dst_it == tbl.end()) return 0;
-   if (src_it->status != opp::types::RESERVE_STATUS_ACTIVE) return 0;
-   if (dst_it->status != opp::types::RESERVE_STATUS_ACTIVE) return 0;
+   const bool src_is_wire = (from_token_code == WIRE_TOKEN);
+   const bool dst_is_wire = (to_token_code   == WIRE_TOKEN);
+   if (src_is_wire && dst_is_wire) return from_amount; // WIRE->WIRE is a plain transfer
 
-   uint64_t wire_intermediate = cp_output(src_it->reserve_chain_amount,
-                                          src_it->reserve_wire_amount,
-                                          from_amount);
-   if (wire_intermediate == 0) return 0;
-   return cp_output(dst_it->reserve_wire_amount, dst_it->reserve_chain_amount, wire_intermediate);
+   reserves_t tbl(get_self());
+
+   // Resolve only the non-WIRE side(s); a WIRE endpoint has no token/WIRE pool
+   // (the depot IS the WIRE side). Any required reserve missing or not ACTIVE
+   // yields a 0 quote.
+   uint64_t src_chain = 0, src_wire = 0; uint32_t src_cw = 0;
+   if (!src_is_wire) {
+      auto it = tbl.find(make_key(from_chain_code, from_token_code, from_reserve_code));
+      if (it == tbl.end() || it->status != opp::types::RESERVE_STATUS_ACTIVE) return 0;
+      src_chain = it->reserve_chain_amount;
+      src_wire  = it->reserve_wire_amount;
+      src_cw    = it->connector_weight_bps;
+   }
+   uint64_t dst_chain = 0, dst_wire = 0; uint32_t dst_cw = 0;
+   if (!dst_is_wire) {
+      auto it = tbl.find(make_key(to_chain_code, to_token_code, to_reserve_code));
+      if (it == tbl.end() || it->status != opp::types::RESERVE_STATUS_ACTIVE) return 0;
+      dst_chain = it->reserve_chain_amount;
+      dst_wire  = it->reserve_wire_amount;
+      dst_cw    = it->connector_weight_bps;
+   }
+
+   return opp::amm::quote_swap(src_is_wire, src_chain, src_wire, src_cw,
+                               dst_is_wire, dst_chain, dst_wire, dst_cw,
+                               from_amount, uwrit_fee_bps());
+}
+
+uint64_t reserve::rewardbal() {
+   rewardbkt_t bkt(get_self());
+   return bkt.get_or_default(rewards_bucket{}).balance;
 }
 
 void reserve::debit(sysio::slug_name chain_code,
@@ -523,28 +573,37 @@ void reserve::applyswap(sysio::slug_name src_chain_code,
    sysio::check(dst_it->status == opp::types::RESERVE_STATUS_ACTIVE,
                 "applyswap: destination reserve not ACTIVE");
 
-   // The WIRE intermediate is derived from the PRE-mutation source row —
-   // the same forward-from-source definition `sysio.uwrit::swap_quote`
-   // uses, so the depot's books and its quotes share one curve.
-   const uint64_t w = cp_output(src_it->reserve_chain_amount,
-                                 src_it->reserve_wire_amount,
-                                 src_amount);
-   sysio::check(w > 0, "applyswap: WIRE intermediate is zero");
-   sysio::check(src_it->reserve_wire_amount >= w,
+   // The gross WIRE intermediate is derived from the PRE-mutation source row on
+   // the weighted curve (the source reserve's own `connector_weight_bps`) — the
+   // same definition `sysio.uwrit::swap_quote` uses, so the depot's books and
+   // its quotes share one curve. The fee is then taken OUT of this WIRE leg: the
+   // source side gives up the full gross WIRE, only `net` continues to the
+   // destination side, and `fee` is routed to rewards + emissions.
+   const uint64_t w_gross = opp::amm::token_to_wire(src_it->reserve_chain_amount,
+                                                    src_it->reserve_wire_amount,
+                                                    src_it->connector_weight_bps,
+                                                    src_amount);
+   sysio::check(w_gross > 0, "applyswap: WIRE intermediate is zero");
+   const auto fee = opp::amm::split_wire_fee(w_gross, uwrit_fee_bps(), FEE_REWARD_SHARE_BPS);
+   sysio::check(src_it->reserve_wire_amount >= w_gross,
                 "applyswap: insufficient source reserve WIRE for intermediate");
    sysio::check(dst_it->reserve_chain_amount >= dst_amount,
                 "applyswap: insufficient destination reserve balance");
 
    tbl.modify(ram_payer, src_pk, [&](auto& row) {
       row.reserve_chain_amount += src_amount;
-      row.reserve_wire_amount  -= w;
+      row.reserve_wire_amount  -= w_gross;
    });
    // Same-row swaps (identical triples) compose correctly: the second
-   // modify reads the post-first-modify state.
+   // modify reads the post-first-modify state. The destination receives only
+   // the post-fee WIRE.
    tbl.modify(ram_payer, dst_pk, [&](auto& row) {
-      row.reserve_wire_amount  += w;
+      row.reserve_wire_amount  += fee.net;
       row.reserve_chain_amount -= dst_amount;
    });
+
+   // Route the fee (rewards half stays in custody, emissions half leaves).
+   route_wire_fee(get_self(), fee);
 }
 
 void reserve::applyfromwire(sysio::slug_name dst_chain_code,
@@ -564,10 +623,19 @@ void reserve::applyfromwire(sysio::slug_name dst_chain_code,
    sysio::check(it->reserve_chain_amount >= dst_amount,
                 "applyfromwire: insufficient destination reserve balance");
 
+   // Fee out of the user's escrowed input WIRE: only the post-fee remainder
+   // becomes destination-reserve liquidity; the fee is routed to rewards +
+   // emissions. The full `wire_in` was escrowed in this contract at
+   // `swapfromwire` time, so custody stays balanced (net -> Σwire, rewards ->
+   // bucket, emissions -> transferred out).
+   const auto fee = opp::amm::split_wire_fee(wire_in, uwrit_fee_bps(), FEE_REWARD_SHARE_BPS);
+
    tbl.modify(ram_payer, pk, [&](auto& row) {
-      row.reserve_wire_amount  += wire_in;
+      row.reserve_wire_amount  += fee.net;
       row.reserve_chain_amount -= dst_amount;
    });
+
+   route_wire_fee(get_self(), fee);
 }
 
 void reserve::paywire(sysio::slug_name src_chain_code,
@@ -586,16 +654,29 @@ void reserve::paywire(sysio::slug_name src_chain_code,
    sysio::check(it != tbl.end(), "paywire: source reserve not found");
    sysio::check(it->status == opp::types::RESERVE_STATUS_ACTIVE,
                 "paywire: source reserve not ACTIVE");
-   sysio::check(it->reserve_wire_amount >= wire_out,
-                "paywire: insufficient source reserve WIRE for payout");
+
+   // Swap-to-WIRE: the recipient receives exactly `wire_out` (their target), and
+   // the fee is charged on the gross WIRE the source side produces — the same
+   // WIRE leg the quote priced. The source reserve gives up `wire_out + fee`
+   // and keeps any surplus (when the user targeted below the post-fee quote).
+   const uint64_t w_gross = opp::amm::token_to_wire(it->reserve_chain_amount,
+                                                    it->reserve_wire_amount,
+                                                    it->connector_weight_bps,
+                                                    src_amount);
+   sysio::check(w_gross > 0, "paywire: WIRE leg is zero");
+   const auto fee = opp::amm::split_wire_fee(w_gross, uwrit_fee_bps(), FEE_REWARD_SHARE_BPS);
+   const uint64_t wire_leaving = wire_out + fee.fee;
+   sysio::check(it->reserve_wire_amount >= wire_leaving,
+                "paywire: insufficient source reserve WIRE for payout + fee");
 
    tbl.modify(ram_payer, pk, [&](auto& row) {
       row.reserve_chain_amount += src_amount;
-      row.reserve_wire_amount  -= wire_out;
+      row.reserve_wire_amount  -= wire_leaving;
    });
 
-   // REAL WIRE leaves custody — `Σ reserve_wire_amount` and the contract's
-   // token balance drop together, preserving the custody invariant.
+   // REAL WIRE leaves custody to the recipient; the fee's emissions half also
+   // leaves (rewards half stays in the bucket). `Σ reserve_wire_amount` and the
+   // contract's token balance drop together, preserving the custody invariant.
    action(
       permission_level{get_self(), "active"_n},
       TOKEN_ACCOUNT, "transfer"_n,
@@ -603,6 +684,7 @@ void reserve::paywire(sysio::slug_name src_chain_code,
          asset(static_cast<int64_t>(wire_out), WIRE_SYMBOL),
          std::string("sysio.reserv::paywire swap-to-WIRE payout"))
    ).send();
+   route_wire_fee(get_self(), fee);
 }
 
 void reserve::refundwire(sysio::name recipient,

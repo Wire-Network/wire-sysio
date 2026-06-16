@@ -110,8 +110,8 @@ message ReserveSpec {
   uint64 initial_chain_amount  = 6;
   // WIRE-side seed, in WIRE subunits, drained from the earmark (quote in JSON).
   uint64 initial_wire_amount   = 7;
-  // Bancor connector weight in basis points: 1..10000; 5000 = pure
-  // constant product.
+  // Bancor connector weight (WIRE-side) in basis points: 1..10000; 5000 =
+  // 50/50 pure constant product. Honored by the weighted swap curve.
   uint32 connector_weight_bps  = 8;
 
   // Private-reserve support (live as of the reserve-and-swap beta). A private
@@ -124,25 +124,26 @@ message ReserveSpec {
   string owner      = 10;
 }
 
-// Global swap settings applied once via `sysio.uwrit::setconfig(fee_bps,
-// collateral_lock_duration_ms, fee_split_winner_pct, fee_split_other_uw_pct,
-// fee_split_batch_op_pct)`.
+// Global swap settings applied once via
+// `sysio.uwrit::setconfig(fee_bps, collateral_lock_duration_ms)`.
 //
-// The three `fee_split_*_pct` shares must sum to 100. The contract stores the
-// percentages as uint8; proto3's narrowest integer is uint32, so they are
-// uint32 here and the tool / contract narrow them (each is bounded to 100).
+// The collected swap fee is taken out of the WIRE leg of every swap and split
+// 50/50 between an on-chain rewards bucket and the emissions treasury inside
+// `sysio.reserv` (a fixed protocol constant, FEE_REWARD_SHARE_BPS), so no
+// fee-distribution shares are configured here.
 message UwritConfig {
-  // Per-spoke depot fee in basis points (<= 10000).
+  // Per-spoke depot swap fee in basis points (<= 10000), taken out of the WIRE
+  // leg of every swap.
   uint32 fee_bps                     = 1;
   // Wall-clock collateral lock window in MILLISECONDS (> 0). Contract default
   // is 43_200_000 (12h).
   uint64 collateral_lock_duration_ms = 2;
-  // Fee distribution share to the winning underwriter (percent).
-  uint32 fee_split_winner_pct        = 3;
-  // Fee distribution share to the other underwriters (percent).
-  uint32 fee_split_other_uw_pct      = 4;
-  // Fee distribution share to the batch operator (percent).
-  uint32 fee_split_batch_op_pct      = 5;
+
+  // Slots 3-5 were fee_split_winner_pct / fee_split_other_uw_pct /
+  // fee_split_batch_op_pct (whole-percent distribution shares) — removed; the
+  // fee split is now the fixed 50/50 rewards/emissions constant in sysio.reserv.
+  reserved 3, 4, 5;
+  reserved "fee_split_winner_pct", "fee_split_other_uw_pct", "fee_split_batch_op_pct";
 }
 
 // Top-level launch DEX configuration. One JSON instance per deployment.
