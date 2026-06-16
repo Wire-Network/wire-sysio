@@ -72,6 +72,16 @@ struct utils_fixture {
       return pos;
    }
 
+   /// rewrite the block id recorded by the header at log offset `pos`, leaving the entry otherwise
+   /// structurally intact (magic, payload, and position trailer untouched) so it still passes every
+   /// check_entry test except the block-number range — used to forge an out-of-range block number
+   void set_block_id_at(uint64_t pos, const block_id_type& id) {
+      std::fstream f(log_path(), std::ios::binary | std::ios::in | std::ios::out);
+      f.seekp(pos + sizeof(uint64_t)); //past the 8-byte magic, onto block_id
+      f.write(id.data(), id.data_size());
+      BOOST_REQUIRE(f.good());
+   }
+
    /// overwrite `len` bytes of the log at `pos` with bytes that can never look like a ship header
    void clobber(uint64_t pos, size_t len) {
       std::fstream f(log_path(), std::ios::binary | std::ios::in | std::ios::out);
@@ -710,6 +720,79 @@ BOOST_AUTO_TEST_CASE(pruned_log_scan_index_and_refusals) { try {
    BOOST_REQUIRE(!log_utils::scan_log(t.stem(), false).intact());
    BOOST_REQUIRE_THROW(log_utils::repair_log(t.stem(), log_utils::repair_mode::truncate, false, false),
                        plugin_exception);
+} FC_LOG_AND_RETHROW() }
+
+// A deep fork switch in a pruned log's retained tail leaves superseded entries whose block number is
+// ABOVE the final head (the library's "we see block 7 and 6 when reading" case). The library skips
+// them when regenerating the index rather than treating them as damage; make-index, full check-index
+// and block-id must do the same and never index past the slot vector. Without the high-side skip in
+// compute_index_pruned this backward walk writes out of bounds even though the log is perfectly valid.
+BOOST_AUTO_TEST_CASE(pruned_index_skips_superseded_above_head) { try {
+   utils_fixture t(6 /*prune_blocks*/);
+   const size_t entry_size = 4096 + 2048; //large enough that hole punching actually frees blocks
+   t.add_range(2, 20, 'A', 'A', entry_size); //head climbs to 20
+   //fork: rewrite block 19 on a 'B' lineage; the head retreats to 19 while the now-stale 'A' entry
+   // for block 20 stays in the retained tail with a block number above the head
+   t.add(19, 'B', 'A', entry_size);
+   t.close();
+
+   const log_utils::log_summary s = log_utils::summarize_log(t.stem());
+   BOOST_REQUIRE(s.pruned && s.tail_ok);
+   BOOST_REQUIRE_EQUAL(s.last_block, 19u);
+   const uint32_t first_servable = s.last_block - *s.pruned_block_count + 1;
+
+   //the library's regenerated index is the reference: it skips the above-head block-20 entry
+   t.open(); //library reopen (still pruned) confirms the forked log is accepted
+   t.close();
+   std::filesystem::remove(t.index_path());
+   t.open(); //library regenerates the index
+   t.close();
+   const std::vector<char> library_index = utils_fixture::slurp(t.index_path());
+
+   //ours must match it byte for byte rather than crash or diverge
+   std::filesystem::remove(t.index_path());
+   const auto [first, last] = log_utils::build_index(t.stem());
+   BOOST_REQUIRE_EQUAL(first, first_servable);
+   BOOST_REQUIRE_EQUAL(last, 19u);
+   BOOST_REQUIRE(utils_fixture::slurp(t.index_path()) == library_index);
+
+   BOOST_REQUIRE(log_utils::check_index(t.stem(), true) == log_utils::index_status::ok);
+   BOOST_REQUIRE(log_utils::scan_log(t.stem(), true).intact());
+
+   //id lookups return the canonical (latest-written) content and refuse the above-head block
+   BOOST_REQUIRE(log_utils::find_block_id(t.stem(), 19) == utils_fixture::id_for(19, 'B'));
+   BOOST_REQUIRE(log_utils::find_block_id(t.stem(), first_servable) == utils_fixture::id_for(first_servable, 'A'));
+   BOOST_REQUIRE(!log_utils::find_block_id(t.stem(), 20)); //above the head: not served
+
+   //the backward walk (index removed) reaches the same answer without indexing out of range
+   std::filesystem::remove(t.index_path());
+   BOOST_REQUIRE(log_utils::find_block_id(t.stem(), 19) == utils_fixture::id_for(19, 'B'));
+
+   t.check_serves(first_servable, 19);
+} FC_LOG_AND_RETHROW() }
+
+// A structurally valid entry whose recorded block number is BELOW the log's first block cannot occur
+// in a healthy log (nothing is ever written before the first block), so the inspection tooling must
+// report it as damage and fail cleanly instead of indexing below slot 0. This is the underflow half
+// of the ci.slots[c.block_num - ci.index_first] concern: build_index, full check-index, the scanner,
+// and find_block_id must all reject it rather than read out of bounds.
+BOOST_AUTO_TEST_CASE(pruned_out_of_range_block_num_is_damage) { try {
+   utils_fixture t(4 /*prune_blocks*/);
+   const size_t entry_size = 4096 + 2048;
+   t.add_range(2, 20, 'A', 'A', entry_size);
+   t.close();
+
+   //forge a retained entry so it decodes to block 1, before the log's first block (2); the magic,
+   // payload, and position trailer stay valid, so only the range check stands between this entry and
+   // an out-of-bounds slot index
+   t.set_block_id_at(t.index_slot(19, 2), utils_fixture::id_for(1, 'A'));
+
+   BOOST_REQUIRE_THROW(log_utils::build_index(t.stem()), plugin_exception);
+   BOOST_REQUIRE(log_utils::check_index(t.stem(), true) == log_utils::index_status::log_damaged);
+   BOOST_REQUIRE(!log_utils::scan_log(t.stem(), false).intact());
+
+   std::filesystem::remove(t.index_path());
+   BOOST_REQUIRE_THROW(log_utils::find_block_id(t.stem(), 20), plugin_exception);
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE(force_write_head_gap) { try {

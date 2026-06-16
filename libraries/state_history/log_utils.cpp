@@ -370,6 +370,56 @@ computed_index compute_index_forward(fc::random_access_file& log, uint64_t size,
    return ci;
 }
 
+/// where and why a backward pruned-chain walk stopped short of its begin block
+struct chain_break {
+   uint64_t    at_pos; ///< offset the walk could not get past
+   std::string reason;
+};
+
+/**
+ * Walk a pruned log's position-trailer chain from its tail entry back toward `begin_block` (the
+ * oldest retained block), invoking `visit(pos, entry_check&&)` for every entry, newest first. This
+ * is the one place the pruned trailer chain is validated; both index regeneration and the smoke-test
+ * scanner drive it so they cannot drift apart. It mirrors the library's pruned-index regeneration in
+ * state_history_log::check_index_on_init: entries must abut their successors and the chain is
+ * followed strictly backward.
+ *
+ * `floor_block` is the lowest block the log can describe — slot 0 of its index. A decoded block
+ * number below it cannot occur in a healthy log (nothing is ever written before the log's first
+ * block), so check_entry rejects it and the walk stops as damage, never indexing below slot 0. No
+ * upper bound is imposed: a deep fork switch in the retained tail legitimately leaves superseded
+ * entries whose block number exceeds the head's (the library's "we see block 7 and 6 when reading"
+ * case), so a caller that uses block_num as a slot index must range-check the high side itself.
+ *
+ * Returns std::nullopt once an entry for `begin_block` is visited, otherwise a chain_break naming the
+ * offset and reason the walk stopped early. With `deep`, each entry's payload is also validated; a
+ * payload-only failure does not stop the walk (the entry is still visited, with entry_check::ok
+ * false) so the caller can report it as a damaged region.
+ */
+template<typename Visit>
+std::optional<chain_break> walk_pruned_chain(window_reader& w, fc::random_access_file& log, uint64_t file_size,
+                                             uint64_t last_entry_pos, uint32_t begin_block, uint32_t floor_block,
+                                             bool deep, Visit&& visit) {
+   uint64_t next_begin = file_size - sizeof(uint32_t); //the pruned block-count trailer occupies the final 4 bytes
+   uint64_t pos        = last_entry_pos;
+   while(true) {
+      entry_check c = check_entry(w, log, pos, file_size, std::nullopt, floor_block, deep);
+      if(!c.structurally_ok || c.end_pos != next_begin)
+         return chain_break{pos, c.reason.empty() ? std::string("entry does not abut its successor") : c.reason};
+      const uint32_t block_num = c.block_num;
+      visit(pos, std::move(c));
+      if(block_num == begin_block)
+         return std::nullopt;
+      if(pos < packed_header_size + trailer_size)
+         return chain_break{pos, "ran out of entries before reaching block " + std::to_string(begin_block)};
+      const uint64_t trailer_at = pos - trailer_size;
+      next_begin                = pos;
+      pos                       = parse_at<uint64_t>(w.view(trailer_at, trailer_size), trailer_size);
+      if(pos + min_entry_size > next_begin)
+         return chain_break{trailer_at, "position trailer points outside the file"};
+   }
+}
+
 /**
  * Backward-walk a pruned log through its position-trailer chain, mirroring the library's index
  * regeneration: only the first-seen (i.e. latest-written) entry per block counts, and the walk ends
@@ -391,28 +441,20 @@ computed_index compute_index_pruned(fc::random_access_file& log, uint64_t size, 
               *e.pruned_count, ci.index_first);
    grow_slots(ci.slots, ci.index_first, ci.last_block, stem);
 
-   window_reader   w(log, size);
-   progress_ticker ticker(progress, size);
-   uint64_t        next_begin = size - sizeof(uint32_t); //walking backward: where the entry after the current one starts
-   uint64_t        pos        = e.last_entry_pos;
-   while(true) {
-      const entry_check c = check_entry(w, log, pos, size, std::nullopt, std::nullopt, false);
-      SYS_ASSERT(c.structurally_ok && c.end_pos == next_begin, chain::plugin_exception,
-                 "pruned log {}.log is damaged at offset {} ({}) and cannot be repaired", stem.string(), pos,
-                 c.reason.empty() ? "entry does not abut its successor" : c.reason);
-      if(ci.slots[c.block_num - ci.index_first] == 0)
-         ci.slots[c.block_num - ci.index_first] = pos;
-      ticker.tick(size - pos);
-      if(c.block_num == ci.first_block)
-         break;
-      next_begin = pos;
-      SYS_ASSERT(pos >= packed_header_size + trailer_size, chain::plugin_exception,
-                 "pruned log {}.log ran out of entries before reaching block {}", stem.string(), ci.first_block);
-      pos = parse_at<uint64_t>(w.view(pos - trailer_size, trailer_size), trailer_size);
-      SYS_ASSERT(pos + min_entry_size <= next_begin, chain::plugin_exception,
-                 "pruned log {}.log has a position trailer at {} pointing outside the file", stem.string(),
-                 next_begin - trailer_size);
-   }
+   window_reader                    w(log, size);
+   progress_ticker                  ticker(progress, size);
+   const std::optional<chain_break> stop = walk_pruned_chain(
+      w, log, size, e.last_entry_pos, ci.first_block, ci.index_first, false, [&](uint64_t pos, entry_check&& c) {
+         //a deep fork switch in the retained tail can leave superseded entries above the head; the
+         // library skips them when regenerating the index (read_block_num < _end_block), so do the same
+         // here rather than index past the slot vector — they are valid data, not damage. The chain
+         // walk's floor check already guarantees c.block_num >= ci.index_first.
+         if(c.block_num <= ci.last_block && ci.slots[c.block_num - ci.index_first] == 0)
+            ci.slots[c.block_num - ci.index_first] = pos;
+         ticker.tick(size - pos);
+      });
+   SYS_ASSERT(!stop, chain::plugin_exception, "pruned log {}.log is damaged at offset {} ({}) and cannot be repaired",
+              stem.string(), stop ? stop->at_pos : 0, stop ? stop->reason : std::string{});
    return ci;
 }
 
@@ -661,44 +703,26 @@ scan_result scan_log(const std::filesystem::path& stem_in, bool deep, const prog
       }
       const uint32_t begin_block = e.last_block - *r.pruned_block_count + 1;
 
-      //collect entries newest to oldest (bounded by the log's retained-block count), then build
-      // ranges in file order
+      //collect entries newest to oldest (bounded by the log's retained-block count) via the shared
+      // chain walk, then build ranges in file order. e.first_block is the index floor: a block number
+      // below it is corruption, not a valid (superseded) entry, so the walk reports it as damage.
       struct seen_entry {
          uint64_t    pos;
          entry_check check;
       };
-      std::vector<seen_entry> entries;
-      uint64_t                next_begin = r.file_size - sizeof(uint32_t);
-      uint64_t                pos        = e.last_entry_pos;
-      std::string             break_reason;
-      while(true) {
-         entry_check c = check_entry(w, log, pos, r.file_size, std::nullopt, std::nullopt, deep);
-         if(!c.structurally_ok || c.end_pos != next_begin) {
-            break_reason = c.reason.empty() ? "entry does not abut its successor" : c.reason;
-            break;
-         }
-         ++r.entries_scanned;
-         if(deep)
-            ++r.payloads_validated;
-         const uint32_t bnum = c.block_num;
-         entries.push_back({pos, std::move(c)});
-         ticker.tick(r.file_size - pos);
-         if(bnum == begin_block)
-            break;
-         if(pos < packed_header_size + trailer_size) {
-            break_reason = "ran out of entries before reaching the begin block";
-            break;
-         }
-         next_begin = pos;
-         pos        = parse_at<uint64_t>(w.view(pos - trailer_size, trailer_size), trailer_size);
-         if(pos + min_entry_size > next_begin) {
-            break_reason = "position trailer points outside the file";
-            break;
-         }
-      }
-      if(!break_reason.empty())
+      std::vector<seen_entry>          entries;
+      const std::optional<chain_break> stop = walk_pruned_chain(
+         w, log, r.file_size, e.last_entry_pos, begin_block, e.first_block, deep,
+         [&](uint64_t pos, entry_check&& c) {
+            ++r.entries_scanned;
+            if(deep)
+               ++r.payloads_validated;
+            entries.push_back({pos, std::move(c)});
+            ticker.tick(r.file_size - pos);
+         });
+      if(stop)
          r.damaged_ranges.push_back(
-            {0, entries.empty() ? r.file_size : entries.back().pos, "backward chain broken: " + break_reason});
+            {0, entries.empty() ? r.file_size : entries.back().pos, "backward chain broken: " + stop->reason});
 
       for(auto it = entries.rbegin(); it != entries.rend(); ++it) {
          if(it->check.ok) {

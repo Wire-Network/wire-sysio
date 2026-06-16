@@ -192,6 +192,13 @@ try:
     with open(chainStateLog, "ab") as f:
         f.write(b"\x5a" * 137)  # partial entry torn mid-write
     shipLogUtil("smoke-test", "--state-history-dir", shipDir, "--log", "chain_state_history", expectSuccess=False)
+    # block-id must report the damage and exit non-zero, never crash, on a log the chain can no longer
+    # open cleanly: returncode > 0 is a normal "damaged" exit; a negative returncode would be a signal
+    # (segfault/abort), which is exactly the operator-facing failure this tooling exists to prevent
+    rc, bidOut = shipLogUtil("block-id", "--state-history-dir", shipDir, "--log", "chain_state_history",
+                             "--block", headLast, expectSuccess=False)
+    assert rc > 0, f"block-id crashed (signal {-rc}) on a damaged log instead of reporting it:\n{bidOut}"
+    assert "damaged" in bidOut.lower(), f"block-id did not report the damage on a corrupt log:\n{bidOut}"
     shipLogUtil("repair", "--state-history-dir", shipDir, "--log", "chain_state_history")
     assert Utils.compareFiles(chainStateLog, origChainStateLog, mode="rb"), "repair did not restore the exact log"
     assert Utils.compareFiles(chainStateIndex, origChainStateIndex, mode="rb"), "repair did not rebuild the index"
