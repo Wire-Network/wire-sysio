@@ -20,8 +20,7 @@ class TraceApiPluginTest(unittest.TestCase):
     # start kiod and nodeop
     def startEnv(self) :
         account_names = ["alice", "bob", "charlie"]
-        abs_path = os.path.abspath(os.getcwd() + '/contracts/sysio.token/sysio.token.abi')
-        extraNodeopArgs = " --verbose-http-errors --trace-slice-stride 10000 --trace-rpc-abi sysio.token=" + abs_path
+        extraNodeopArgs = " --verbose-http-errors --trace-slice-stride 10000"
         extraNodeopArgs+=" --production-pause-vote-timeout-ms 0"
         self.cluster.launch(totalNodes=2, activateIF=True, extraNodeopArgs=extraNodeopArgs)
         self.walletMgr.launch()

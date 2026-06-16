@@ -79,6 +79,14 @@ namespace sysio::chain {
       *trace = transaction_trace{}; // reset trace
       trace->net_usage = net_usage;
       initialize();
+      // reset() runs only on the sys-vm-oc tier-up interrupt retry, which re-runs exec() but NOT
+      // init_for_input_trx. The undo() above reverted the dedup record made in init_for_input_trx,
+      // so it must be re-issued here under the freshly-initialized undo session -- otherwise an
+      // interrupting validator silently drops this transaction from its dedup set (diverging the
+      // integrity hash from non-interrupting nodes, and letting a still-unexpired resubmission
+      // double-execute). Gated exactly as the original record: input and non-transient.
+      if (is_input && !is_transient())
+         record_transaction(packed_trx.id(), packed_trx.get_transaction().expiration);
       if (!explicit_billed_cpu_time)
          billed_cpu_us.clear();
       trx_blk_context = trx_block_context{};

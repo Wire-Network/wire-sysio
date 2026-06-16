@@ -573,8 +573,7 @@ class cluster_generator:
                 '--p2p-peer-address', '--p2p-auto-bp-peer', '--peer-key', '--peer-private-key',
                 # producer_plugin
                 '--producer-name', '--signature-provider', '--greylist-account', '--disable-subjective-account-billing',
-                # trace_api_plugin
-                '--trace-rpc-abi']
+                ]
             for arg in specificList:
                 if '-' in arg and arg not in repeatable:
                     if arg in sysdcmd:

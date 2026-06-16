@@ -63,7 +63,13 @@ logging="""{
 }"""
 
 def cleanDirectories():
+    """Remove resource monitor staging directories created by this test."""
     os.path.exists(stagingDir) and shutil.rmtree(stagingDir)
+
+def cleanTestLogDirectory():
+    """Remove this test's harness log directory after a successful run."""
+    if not args.keep_logs:
+        shutil.rmtree(Utils.DataPath, ignore_errors=True)
 
 def prepareDirectories():
     # Prepare own directories so we don't depend on others to make sure
@@ -178,9 +184,9 @@ def testAll():
     testCommon("Resmon not enabled: no arguments", "", ["interval set to 2", "threshold set to 90", "Shutdown flag when threshold exceeded set to true", "snapshots's file system to be monitored", "blocks's file system to be monitored", "state's file system to be monitored"])
     
     # default arguments with registered directories
-    testCommon("Resmon not enabled: Producer, Chain, State History and Trace Api", f"--plugin sysio::state_history_plugin --state-history-endpoint 127.0.0.1:{Utils.getPort(Utils.PortStateHistory)} --state-history-dir=/tmp/state-history --disable-replay-opts --plugin sysio::trace_api_plugin --trace-dir=/tmp/trace --trace-no-abis", ["interval set to 2", "threshold set to 90", "Shutdown flag when threshold exceeded set to true", "snapshots's file system to be monitored", "blocks's file system to be monitored", "state's file system to be monitored", "state-history's file system to be monitored", "trace's file system to be monitored"])
+    testCommon("Resmon not enabled: Producer, Chain, State History and Trace Api", f"--plugin sysio::state_history_plugin --state-history-endpoint 127.0.0.1:{Utils.getPort(Utils.PortStateHistory)} --state-history-dir=/tmp/state-history --disable-replay-opts --plugin sysio::trace_api_plugin --trace-dir=/tmp/trace", ["interval set to 2", "threshold set to 90", "Shutdown flag when threshold exceeded set to true", "snapshots's file system to be monitored", "blocks's file system to be monitored", "state's file system to be monitored", "state-history's file system to be monitored", "trace's file system to be monitored"])
 
-    testCommon("Resmon enabled: Producer, Chain, State History and Trace Api", f"--plugin  sysio::resource_monitor_plugin --plugin sysio::state_history_plugin --state-history-endpoint 127.0.0.1:{Utils.getPort(Utils.PortStateHistory)} --state-history-dir=/tmp/state-history --disable-replay-opts --plugin sysio::trace_api_plugin --trace-dir=/tmp/trace --trace-no-abis --resource-monitor-space-threshold=80 --resource-monitor-interval-seconds=3", ["snapshots's file system to be monitored", "blocks's file system to be monitored", "state's file system to be monitored", "state-history's file system to be monitored", "trace's file system to be monitored", "threshold set to 80", "interval set to 3", "Shutdown flag when threshold exceeded set to true"])
+    testCommon("Resmon enabled: Producer, Chain, State History and Trace Api", f"--plugin  sysio::resource_monitor_plugin --plugin sysio::state_history_plugin --state-history-endpoint 127.0.0.1:{Utils.getPort(Utils.PortStateHistory)} --state-history-dir=/tmp/state-history --disable-replay-opts --plugin sysio::trace_api_plugin --trace-dir=/tmp/trace --resource-monitor-space-threshold=80 --resource-monitor-interval-seconds=3", ["snapshots's file system to be monitored", "blocks's file system to be monitored", "state's file system to be monitored", "state-history's file system to be monitored", "trace's file system to be monitored", "threshold set to 80", "interval set to 3", "Shutdown flag when threshold exceeded set to true"])
 
     # Only test minimum warning threshold (i.e. 6) to trigger warning as much as possible
     testInterval("Resmon enabled: set warning interval", 
@@ -220,6 +226,8 @@ try:
 finally:
     if debug: Print("Cleanup in finally block.")
     cleanDirectories()
+    if testSuccessful:
+        cleanTestLogDirectory()
 
 exitCode = 0 if testSuccessful else 1
 if debug: Print("Exiting test, exit value %d." % (exitCode))

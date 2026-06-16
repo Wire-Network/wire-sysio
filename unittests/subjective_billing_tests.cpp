@@ -634,7 +634,6 @@ BOOST_AUTO_TEST_CASE( subjective_billing_integration_test ) {
                      const cpu_usage_t& billed_cpu_us, bool explicit_billed_cpu_time ) {
       auto r = chain.control->test_push_transaction( trx, deadline, fc::microseconds::maximum(), billed_cpu_us, explicit_billed_cpu_time );
       if( r->except_ptr ) std::rethrow_exception( r->except_ptr );
-      if( r->except ) throw *r->except;
       return r;
    };
 

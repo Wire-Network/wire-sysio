@@ -102,7 +102,6 @@ void push_trx(Tester& test, T ac, uint32_t billed_cpu_time_us , uint32_t max_cpu
    auto res = test.control->test_push_transaction( trx_meta, fc::time_point::now() + fc::milliseconds(max_block_cpu_ms),
                                               fc::milliseconds(max_cpu_usage_ms), billed_cpu_us, explicit_bill );
    if( res->except_ptr ) std::rethrow_exception( res->except_ptr );
-   if( res->except ) throw *res->except;
 };
 
 static constexpr unsigned int DJBH(const char* cp) {

@@ -3,6 +3,7 @@
 import os
 import json
 import signal
+import threading
 
 from TestHarness import Account, Cluster, TestHelper, Utils, WalletMgr, CORE_SYMBOL
 from TestHarness.Node import BlockType
@@ -58,6 +59,11 @@ def getSnapshotsCount(nodeId):
     # disregard snapshot schedule config in same folder
     if snapshotScheduleDB in snapshotDirContents: snapshotDirContents.remove(snapshotScheduleDB)
     return len(snapshotDirContents)
+
+def createNodeSnapshot(nodeId, node):
+    """Issue a blocking v1/producer/create_snapshot request against the given node."""
+    Print("Creating snapshot for node %d" % nodeId)
+    node.createSnapshot()
 
 try:
     TestHelper.printSystemInfo("BEGIN")
@@ -129,7 +135,10 @@ try:
 
     # ***   Schedule snapshot, it should become pending
     prodAC.scheduleSnapshot()
-      
+    prodAC.waitForNextBlock()
+    prodAC.waitForNextBlock()
+    prodAC.createSnapshot()
+
     # ***   Killing the "bridge" node   ***
     Print("Sending command to kill \"bridge\" node to separate the 2 producer groups.")
     # kill at the beginning of the production window for defproducera, so there is time for the fork for
@@ -151,6 +160,14 @@ try:
    
     # schedule a snapshot that should get finalized
     prodB.scheduleSnapshot()
+    prodB.waitForNextBlock()
+    prodB.waitForNextBlock()
+
+    # create snapshot in a separate thread since it blocks until finalized; the snapshotted
+    # block is forked out when the network re-merges, so the snapshot is re-created on the
+    # adopted branch before the request completes
+    rpcThread = threading.Thread(target = createNodeSnapshot, args = (1, prodB))
+    rpcThread.start()
 
     assert not nonProdNode.verifyAlive(), "Bridge node should have been killed if test was functioning correctly."
 
@@ -169,7 +186,10 @@ try:
     Print("Wait for LIB to move, which indicates prodB has forked out the branch")
     assert prodB.waitForLibToAdvance(60), \
         "ERROR: Network did not reach consensus after bridge node was restarted."
- 
+
+    Print("Wait for rpc thread to complete")
+    rpcThread.join()
+
     for prodNode in prodNodes:
         info=prodNode.getInfo()
         Print(f"node info: {json.dumps(info, indent=1)}")

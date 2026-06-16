@@ -115,8 +115,9 @@
        :BASE(c){} \
        TYPE():BASE(CODE, BOOST_PP_STRINGIZE(TYPE), WHAT){}\
        \
-       virtual std::shared_ptr<fc::exception> dynamic_copy_exception()const\
+       std::shared_ptr<fc::exception> dynamic_copy_exception()const override\
        { return std::make_shared<TYPE>( *this ); } \
+       void rethrow() const override { assert(typeid(*this) == typeid(TYPE)); throw *this; } \
        std::optional<uint64_t> error_code; \
    };
 
