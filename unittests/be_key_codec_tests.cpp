@@ -165,12 +165,13 @@ BOOST_AUTO_TEST_CASE(rejections) {
       codec::build_key_shapes(deep, {"k"}, {"level" + std::to_string(too_deep)}), fc::exception);
 }
 
-// Pins the invariant that supported_leaf_key_types is the single source of
-// truth: every entry must be handled by BOTH encode_field and decode_field.
-// A representative value is encoded and decoded for each; a list entry with no
-// matching codec branch would throw "Unsupported BE key type" and fail here,
-// rather than degrading silently (missing from the list -> hex fallback) or
-// asserting at request time (missing from the if-chain) in production.
+// Pins the leaf_key_spellings table as the single source of truth: every
+// spelling must resolve (via leaf_kind_of) to a key_leaf_kind handled by BOTH
+// the encode_field and decode_field switches. A representative value is encoded
+// then decoded for each spelling; a spelling that maps to an unhandled kind
+// would trip the switches' defensive assert and fail here. The switches are
+// exhaustive over the enum, so under -Wswitch a kind with no branch is a compile
+// error; this test additionally exercises every spelling through the codec.
 BOOST_AUTO_TEST_CASE(leaf_support_list_roundtrips) {
    auto sample = [](std::string_view t) -> fc::variant {
       if (t == "checksum256") return fc::variant(fc::sha256::hash(std::string("x")).str());
@@ -192,13 +193,37 @@ BOOST_AUTO_TEST_CASE(leaf_support_list_roundtrips) {
    };
 
    const abi_def abi; // builtin leaves need no typedefs/structs
-   for (std::string_view t : codec::supported_leaf_key_types) {
+   for (const auto& entry : codec::leaf_key_spellings) {
+      const std::string_view t = entry.spelling;
       const std::string type{t};
       std::vector<char> bytes;
       BOOST_REQUIRE_NO_THROW(bytes = encode_single(abi, type, sample(t)));
       auto shapes = codec::build_key_shapes(abi, {"k"}, {type});
       BOOST_CHECK_NO_THROW(codec::decode_key(bytes.data(), bytes.size(), shapes));
    }
+}
+
+// The float aliases (and "bool") must collapse onto the same key_leaf_kind as
+// their canonical spelling — i.e. produce byte-identical encodings. The
+// round-trip test above only exercises each spelling on its own, so a
+// mis-mapped alias (e.g. "double" -> float32) would still round-trip and slip
+// past it; the encoded-size/byte mismatch is caught here.
+BOOST_AUTO_TEST_CASE(leaf_spelling_aliases_match_canonical) {
+   const abi_def abi;
+
+   auto f128_var = [](double d) {
+      float128_t f = ::f64_to_f128(to_softfloat64(d));
+      fc::variant v;
+      fc::to_variant(f, v);
+      return v;
+   };
+
+   BOOST_CHECK(encode_single(abi, "float", fc::variant(1.5))
+               == encode_single(abi, "float32", fc::variant(1.5)));
+   BOOST_CHECK(encode_single(abi, "double", fc::variant(1.5))
+               == encode_single(abi, "float64", fc::variant(1.5)));
+   BOOST_CHECK(encode_single(abi, "long double", f128_var(1.5))
+               == encode_single(abi, "float128", f128_var(1.5)));
 }
 
 // A struct key with zero fields is a node with no children: it must encode to
