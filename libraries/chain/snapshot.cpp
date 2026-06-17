@@ -616,6 +616,11 @@ void threaded_snapshot_reader::set_section(const string& section_name) {
       if(entry.name == section_name) {
          cur_row = 0;
          num_rows = entry.row_count;
+         // An empty section carries no data bytes (writer invariant). Enforce it so a tampered
+         // row_count of 0 cannot hide a non-empty, hash-pinned data range from ever being read.
+         SYS_ASSERT(num_rows != 0 || entry.data_size == 0, snapshot_exception,
+                    "Snapshot section '{}' has row_count 0 but {} bytes of data; file may be tampered",
+                    section_name, entry.data_size);
          ds = fc::datastream<const char*>(mapped_snap_addr + entry.data_offset, entry.data_size);
          return;
       }
@@ -626,7 +631,16 @@ void threaded_snapshot_reader::set_section(const string& section_name) {
 
 bool threaded_snapshot_reader::read_row(detail::abstract_snapshot_row_reader& row_reader) {
    row_reader.provide(ds);
-   return ++cur_row < num_rows;
+   if (++cur_row < num_rows)
+      return true;
+   // Last row consumed. A section's data_size is covered by the integrity/root hash but its
+   // row_count is not, so require the section data to be exactly consumed: a tampered (decreased)
+   // row_count would otherwise silently drop the trailing rows while still matching the attested
+   // hash, loading a node with state that diverges from the canonical chain.
+   SYS_ASSERT(ds.remaining() == 0, snapshot_exception,
+              "Snapshot section row_count does not match section data ({} bytes unread); "
+              "file may be tampered", ds.remaining());
+   return false;
 }
 
 bool threaded_snapshot_reader::empty ( ) {
