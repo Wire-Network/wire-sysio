@@ -39,3 +39,8 @@ void get_table_test::addhashobj(std::string hashinput) {
          obj.sec160 = ripemd160(hashinput.data(), hashinput.size());
       });
 }
+
+void get_table_test::addstruct(uint64_t code, uint64_t payload) {
+   structobjs structobjs_table( get_self() );
+   structobjs_table.emplace( get_self(), { slug_name{code} }, { slug_name{code}, payload } );
+}

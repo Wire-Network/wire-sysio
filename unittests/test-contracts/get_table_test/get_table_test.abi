@@ -24,6 +24,20 @@
             ]
         },
         {
+            "name": "addstruct",
+            "base": "",
+            "fields": [
+                {
+                    "name": "code",
+                    "type": "uint64"
+                },
+                {
+                    "name": "payload",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "erasenumobj",
             "base": "",
             "fields": [
@@ -90,6 +104,40 @@
                     "type": "float128"
                 }
             ]
+        },
+        {
+            "name": "slug_name",
+            "base": "",
+            "fields": [
+                {
+                    "name": "value",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "structobj",
+            "base": "",
+            "fields": [
+                {
+                    "name": "code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "payload",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "structobj_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "code",
+                    "type": "slug_name"
+                }
+            ]
         }
     ],
     "actions": [
@@ -101,6 +149,11 @@
         {
             "name": "addnumobj",
             "type": "addnumobj",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "addstruct",
+            "type": "addstruct",
             "ricardian_contract": ""
         },
         {
@@ -180,6 +233,14 @@
                     "table_id": 51630
                 }
             ]
+        },
+        {
+            "name": "structobjs",
+            "type": "structobj",
+            "index_type": "i64",
+            "key_names": ["code"],
+            "key_types": ["slug_name"],
+            "table_id": 12649
         }
     ],
     "ricardian_clauses": [],
