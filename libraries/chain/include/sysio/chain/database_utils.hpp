@@ -157,13 +157,13 @@ namespace detail {
 // directly-supported scalar leaf types is the `key_leaf_kind` enum below
 // (struct keys are expanded field-by-field on top of those leaves).
 // ---------------------------------------------------------------------------
-// Forward declarations: the fc float128_t variant conversions are defined at
+// Forward declarations: the fc softfloat128_t variant conversions are defined at
 // the bottom of this header; the BE key codec below uses them.
 } // namespace sysio::chain
 namespace fc {
    class variant;
-   inline void to_variant( const float128_t& f, variant& v );
-   inline void from_variant( const variant& v, float128_t& f );
+   inline void to_variant( const softfloat128_t& f, variant& v );
+   inline void from_variant( const variant& v, softfloat128_t& f );
 } // namespace fc
 namespace sysio::chain {
 
@@ -384,13 +384,13 @@ inline fc::variant decode_field(reader& r, key_leaf_kind kind) {
       // key — this branch must invert that transform byte-for-byte. The e2e
       // float128 pagination in get_table_tests (sec-9) pins the agreement; a
       // change to CDT's long-double key encoding would break it there. Spelling
-      // is fc's canonical float128_t form ("0x" + 16 LE hex bytes).
+      // is fc's canonical softfloat128_t form ("0x" + 16 LE hex bytes).
       const uint64_t hi_enc = r.read_be64();
       const uint64_t lo_enc = r.read_be64();
       fc::uint128 bits = fc::to_uint128(hi_enc, lo_enc);
       if (bits >> 127) bits ^= (fc::uint128(1) << 127);
       else             bits = ~bits;
-      float128_t v;
+      softfloat128_t v;
       memcpy(&v, &bits, sizeof(v)); // little-endian platform assumption, as elsewhere in this file
       fc::variant out;
       fc::to_variant(v, out);
@@ -458,7 +458,7 @@ inline void encode_field(writer& w, key_leaf_kind kind, const fc::variant& val) 
       // kv_multi_index::encode_secondary(long double) byte-for-byte so a JSON
       // bound compares against the stored secondary key (see that branch for the
       // source-of-truth note).
-      float128_t f;
+      softfloat128_t f;
       fc::from_variant(val, f);
       fc::uint128 bits;
       memcpy(&bits, &f, sizeof(bits)); // little-endian platform assumption, as elsewhere in this file
