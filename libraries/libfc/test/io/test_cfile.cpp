@@ -2,6 +2,8 @@
 
 #include <fc/io/cfile.hpp>
 
+#include <cerrno>
+
 using namespace fc;
 
 BOOST_AUTO_TEST_SUITE(cfile_test_suite)
@@ -14,6 +16,22 @@ BOOST_AUTO_TEST_SUITE(cfile_test_suite)
       t.open( "ab+" );
       BOOST_CHECK( t.is_open() );
       BOOST_CHECK( std::filesystem::exists( tempdir.path() / "test") );
+
+      cfile exclusive;
+      exclusive.set_file_path( tempdir.path() / "exclusive" );
+      exclusive.open( cfile::create_new_rw_mode );
+      BOOST_CHECK( exclusive.is_open() );
+      exclusive.close();
+      BOOST_CHECK_EXCEPTION( exclusive.open( cfile::create_new_rw_mode ), std::ios_base::failure,
+                             [](const std::ios_base::failure& e) { return e.code().value() == EEXIST; } );
+
+      cfile open_or_create;
+      open_or_create.set_file_path( tempdir.path() / "open_or_create" );
+      BOOST_CHECK( !open_or_create.open_existing_or_create_new() );
+      BOOST_CHECK( open_or_create.is_open() );
+      open_or_create.close();
+      BOOST_CHECK( open_or_create.open_existing_or_create_new() );
+      open_or_create.close();
 
       t.open( "rb+" );
       BOOST_CHECK( t.is_open() );
@@ -54,7 +72,11 @@ BOOST_AUTO_TEST_SUITE(cfile_test_suite)
 
       t.close();
       std::filesystem::remove_all( t.get_file_path() );
+      std::filesystem::remove_all( exclusive.get_file_path() );
+      std::filesystem::remove_all( open_or_create.get_file_path() );
       BOOST_CHECK( !std::filesystem::exists( tempdir.path() / "test") );
+      BOOST_CHECK( !std::filesystem::exists( tempdir.path() / "exclusive") );
+      BOOST_CHECK( !std::filesystem::exists( tempdir.path() / "open_or_create") );
    }
 
    BOOST_AUTO_TEST_CASE(test_positional_io)
@@ -87,14 +109,8 @@ BOOST_AUTO_TEST_SUITE(cfile_test_suite)
       // Reading past EOF throws (short read).
       BOOST_CHECK_THROW( t.pread( &v[0], 6, 4 ), std::ios_base::failure );
 
-      // pwrite on an append-mode cfile appends at EOF regardless of the offset argument.
-      t.close();
-      t.open( cfile::create_or_update_rw_mode );
-      t.pwrite( "gh", 2, 0 );
-      std::vector<char> w(8);
-      t.pread( &w[0], 8, 0 );
-      BOOST_CHECK_EQUAL( std::string( w.begin(), w.end() ), "abXYefgh" );
-
+      // pwrite() rejects O_APPEND descriptors via assert(); this suite avoids an aborting death
+      // test because there is no local Boost.Test pattern for native assert death checks.
       t.close();
       std::filesystem::remove_all( t.get_file_path() );
    }

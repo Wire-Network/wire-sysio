@@ -24,6 +24,30 @@ constexpr uint64_t record_trailer_size = sizeof(uint32_t);
 constexpr uint64_t journal_record_len_size = sizeof(uint32_t);
 constexpr uint64_t journal_record_crc_size = sizeof(uint32_t);
 
+constexpr uint64_t file_header_offset = 0;
+
+/**
+ * Read an fc::raw-packed fixed-size header through cfile's positional API.
+ */
+template<typename T>
+T pread_packed_header(const fc::cfile& file) {
+   std::vector<char> data(sizeof(T));
+   file.pread(data.data(), data.size(), file_header_offset);
+   fc::datastream<const char*> ds(data.data(), data.size());
+   T value;
+   fc::raw::unpack(ds, value);
+   return value;
+}
+
+/**
+ * Write an fc::raw-packed fixed-size header through cfile's positional API.
+ */
+template<typename T>
+void pwrite_packed_header(fc::cfile& file, const T& value) {
+   auto data = fc::raw::pack(value);
+   file.pwrite(data.data(), data.size(), file_header_offset);
+}
+
 } // namespace
 
 uint32_t abi_log::compute_record_crc(const record_header& hdr, const char* blob, uint64_t blob_size) {
@@ -36,35 +60,25 @@ uint32_t abi_log::compute_record_crc(const record_header& hdr, const char* blob,
 
 abi_log::abi_log(const std::filesystem::path& path, size_t journal_compaction_threshold_bytes)
    : _journal_compaction_threshold(journal_compaction_threshold_bytes) {
-   const bool existed = std::filesystem::exists(path);
    _cfile.set_file_path(path);
+   bool existed = false;
    try {
-      _cfile.open(fc::cfile::create_or_update_rw_mode);
+      existed = _cfile.open_existing_or_create_new();
    } catch (...) {
       fc_wlog(_log, "trace_api: abi_log failed to open {}", path.generic_string());
-      // Best-effort clean-up: a failed open on some libc versions leaves a zero-byte
-      // file behind, which would look like a valid-but-header-less log on the next
-      // start and fail an unpack inside the existing-file branch.
-      std::error_code ec;
-      if (!existed)
-         std::filesystem::remove(path, ec);
       return;
    }
 
    if (!existed) {
-      // Fresh file: write header, no records yet.  "ab+" mode always writes at
-      // EOF, so the seek below is advisory for the position indicator; the
-      // write lands at offset 0 by construction (file is freshly opened, EOF = 0).
-      abi_log_header hdr;
-      auto data = fc::raw::pack(hdr);
+      // Fresh file: write the header positionally, with no stdio buffering mixed into later pread()
+      // and pwrite() calls.
       try {
-         _cfile.write(data.data(), data.size());
-         _cfile.flush();
+         pwrite_packed_header(_cfile, abi_log_header{});
       } catch (...) {
          fc_wlog(_log, "trace_api: abi_log failed to write header to {}", path.generic_string());
          return;
       }
-      _end_offset = data.size();
+      _end_offset = sizeof(abi_log_header);
       _valid = true;
       init_journal(derive_journal_path(path));
       return;
@@ -72,10 +86,7 @@ abi_log::abi_log(const std::filesystem::path& path, size_t journal_compaction_th
 
    // Existing file: validate header, scan records, populate index, truncate any bad tail.
    try {
-      _cfile.seek(0);
-      auto ds = _cfile.create_datastream();
-      abi_log_header hdr;
-      fc::raw::unpack(ds, hdr);
+      abi_log_header hdr = pread_packed_header<abi_log_header>(_cfile);
       if (hdr.magic != abi_log_header::magic_value) {
          fc_wlog(_log, "trace_api: abi_log {} has wrong magic {:#x}, ignoring",
               path.generic_string(), hdr.magic);
@@ -100,8 +111,7 @@ uint64_t abi_log::recover_from_disk(const std::filesystem::path& path) {
    const uint64_t header_size = sizeof(abi_log_header);
    const uint64_t file_size = std::filesystem::file_size(path);
 
-   // pread correctness: the only buffered (FILE*) write on this cfile is the fresh-file header in
-   // the constructor, which flushes immediately; appends use raw-fd pwrite.  Never introduce
+   // pread correctness: all writes on this cfile go through raw-fd pwrite.  Never introduce
    // unflushed buffered writes on this cfile or pread may see stale data.
    uint64_t offset = header_size;
    while (offset < file_size) {
@@ -202,9 +212,8 @@ bool abi_log::append(chain::name account, uint64_t global_seq, std::vector<char>
    {
       std::lock_guard<std::mutex> lock(_append_mtx);
       try {
-         // NOTE: the cfile is opened with fopen("ab+"), so cfile::pwrite appends at EOF regardless
-         // of the offset argument.  That is exactly what we want: "file ends at
-         // _end_offset" is a maintained invariant (restored below on failure), so EOF == _end_offset.
+         // "_end_offset is EOF" is a maintained invariant (restored below on failure), so this
+         // positional write appends without relying on O_APPEND.
          _cfile.pwrite(record.data(), record.size(), _end_offset);
       } catch (const std::exception& e) {
          fc_wlog(_log, "trace_api: abi_log append of {} bytes at offset {} failed: {}; truncating torn tail",
@@ -547,13 +556,9 @@ std::vector<char> abi_log::frame_journal_record(const std::vector<char>& body) {
 }
 
 bool abi_log::write_journal_header() {
-   abi_journal_header hdr;
-   auto data = fc::raw::pack(hdr);
    try {
-      // "ab+" appends at EOF regardless of position, so on a fresh or just-truncated file the
-      // header lands at offset 0 by construction (matching the main log's fresh-file write).
-      _journal_cfile.write(data.data(), data.size());
-      _journal_cfile.flush();
+      // Positional header write keeps the journal on the same raw-fd I/O path as journal records.
+      pwrite_packed_header(_journal_cfile, abi_journal_header{});
    } catch (...) {
       fc_wlog(_log, "trace_api: abi_log journal failed to write header to {}",
               _journal_path.generic_string());
@@ -572,7 +577,7 @@ bool abi_log::journal_append(const std::vector<char>& body) {
    auto rec = frame_journal_record(body);
    std::lock_guard<std::mutex> lock(_journal_mtx);
    try {
-      // Like the main log, append-mode cfile::pwrite lands at EOF == _journal_end_offset.
+      // Like the main log, _journal_end_offset is maintained as EOF and used as the pwrite offset.
       _journal_cfile.pwrite(rec.data(), rec.size(), _journal_end_offset);
    } catch (const std::exception& e) {
       fc_wlog(_log, "trace_api: abi_log journal append of {} bytes at offset {} failed: {}; truncating torn tail",
@@ -758,7 +763,7 @@ void abi_log::compact_journal() {
       _journal_cfile.close();
       std::filesystem::rename(tmp, _journal_path); // atomic on POSIX
       _journal_cfile.set_file_path(_journal_path);
-      _journal_cfile.open(fc::cfile::create_or_update_rw_mode);
+      _journal_cfile.open(fc::cfile::update_rw_mode);
       _journal_end_offset = std::filesystem::file_size(_journal_path);
       _journal_enabled = true;
    } catch (const std::exception& e) {
@@ -772,16 +777,13 @@ void abi_log::compact_journal() {
 
 void abi_log::init_journal(const std::filesystem::path& journal_path) {
    _journal_path = journal_path;
-   const bool existed = std::filesystem::exists(journal_path);
    _journal_cfile.set_file_path(journal_path);
+   bool existed = false;
    try {
-      _journal_cfile.open(fc::cfile::create_or_update_rw_mode);
+      existed = _journal_cfile.open_existing_or_create_new();
    } catch (...) {
       fc_wlog(_log, "trace_api: abi_log journal failed to open {}; reversible ABI records will not "
                     "survive a restart", journal_path.generic_string());
-      std::error_code ec;
-      if (!existed)
-         std::filesystem::remove(journal_path, ec);
       _journal_enabled = false;
       return;
    }
@@ -799,10 +801,7 @@ void abi_log::init_journal(const std::filesystem::path& journal_path) {
    // Existing journal: validate the header.
    bool header_ok = false;
    try {
-      _journal_cfile.seek(0);
-      auto ds = _journal_cfile.create_datastream();
-      abi_journal_header hdr;
-      fc::raw::unpack(ds, hdr);
+      abi_journal_header hdr = pread_packed_header<abi_journal_header>(_journal_cfile);
       header_ok = (hdr.magic == abi_journal_header::magic_value &&
                    hdr.version == abi_journal_header::current_version);
       if (!header_ok)
