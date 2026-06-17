@@ -235,6 +235,64 @@ BOOST_AUTO_TEST_CASE(qc_state_transitions) try {
       }
    }
 
+   // -------------------------------------------------------------------------
+   //  weak_achieved-arm boundary at weak_sum == max_weak_sum_before_weak_final
+   // -------------------------------------------------------------------------
+   // weak_final means a strong QC can no longer form. The maximum still-achievable
+   // strong sum is (weight_sum - weak_sum), so at weak_sum == max_weak_sum_before_weak_final
+   // (== weight_sum - threshold) that maximum equals exactly the threshold: a strong QC is
+   // STILL reachable, and the state must remain weak_achieved (not weak_final). The
+   // add_weak_vote weak_achieved arm must therefore use strict '>' (matching the
+   // unrestricted/restricted arm), not '>='.
+   //
+   // The cases above all use max_weak_sum_before_weak_final == 1, where weak_achieved can
+   // only be entered once weak_sum >= 1 == max, so the weak vote that reaches the boundary
+   // is also the one that enters weak_achieved (via the '>' unrestricted arm) and the
+   // weak_achieved arm is never exercised AT the boundary. These cases use max == 3 so
+   // weak_achieved is entered (strong-assisted) while weak_sum < max, then a weak vote
+   // drives weak_sum to exactly max through the weak_achieved arm.
+   {
+      // weight_sum 8, threshold 5  ->  quorum 5, max_weak_sum_before_weak_final 3
+      constexpr uint64_t quorum = 5;
+      constexpr uint64_t max_weak_sum_before_weak_final = 3;
+      aggregating_qc_sig_t qc(6, quorum, max_weak_sum_before_weak_final);
+
+      strong_vote(qc, digest, 0, 3); // strong_sum = 3  (< quorum)
+      BOOST_CHECK_EQUAL(qc.state(), state_t::unrestricted);
+
+      weak_vote(qc, digest, 1, 1);   // weak_sum = 1, weak+strong = 4  (< quorum)
+      BOOST_CHECK_EQUAL(qc.state(), state_t::unrestricted);
+
+      weak_vote(qc, digest, 2, 1);   // weak_sum = 2, weak+strong = 5  -> weak_achieved (weak_sum < max)
+      BOOST_CHECK_EQUAL(qc.state(), state_t::weak_achieved);
+
+      weak_vote(qc, digest, 3, 1);   // weak_sum = 3 == max: strong still reachable -> stays weak_achieved
+      BOOST_CHECK_EQUAL(qc.state(), state_t::weak_achieved); // would be weak_final with the '>=' off-by-one
+
+      weak_vote(qc, digest, 4, 1);   // weak_sum = 4 > max -> weak_final
+      BOOST_CHECK_EQUAL(qc.state(), state_t::weak_final);
+   }
+
+   {
+      // From weak_sum == max the node must still be able to form a STRONG QC if the
+      // remaining (exactly-threshold) weight votes strong. The '>=' off-by-one would have
+      // latched weak_final at the boundary, so this strong vote could never upgrade it —
+      // needlessly downgrading the QC and delaying 2-chain finality.
+      constexpr uint64_t quorum = 5;
+      constexpr uint64_t max_weak_sum_before_weak_final = 3;
+      aggregating_qc_sig_t qc(6, quorum, max_weak_sum_before_weak_final);
+
+      strong_vote(qc, digest, 0, 3); // strong_sum = 3
+      weak_vote(qc, digest, 1, 1);   // weak_sum = 1
+      weak_vote(qc, digest, 2, 1);   // weak_sum = 2 -> weak_achieved
+      weak_vote(qc, digest, 3, 1);   // weak_sum = 3 == max -> stays weak_achieved (fixed)
+      BOOST_CHECK_EQUAL(qc.state(), state_t::weak_achieved);
+
+      strong_vote(qc, digest, 4, 2); // strong_sum = 5 == quorum -> strong
+      BOOST_CHECK_EQUAL(qc.state(), state_t::strong);
+      BOOST_CHECK(qc.is_quorum_met());
+   }
+
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_SUITE_END()
