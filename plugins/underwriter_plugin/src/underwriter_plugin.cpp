@@ -1530,8 +1530,17 @@ struct underwriter_plugin::impl {
                  "receipt missing blockNumber for tx {}", req.id, tx_hash_hex);
             return false;
          }
-         const uint64_t rcpt_blk = std::stoull(
-            rcpt_obj["blockNumber"].as_string().substr(2), nullptr, 16);
+         const std::string blk_str = rcpt_obj["blockNumber"].as_string();
+         // Require a 0x-prefixed, non-empty hex body before substr(2)/stoull so a malformed
+         // blockNumber defers this uwreq rather than throwing std::out_of_range / invalid_argument.
+         if (blk_str.size() <= 2 || blk_str[0] != '0' ||
+             (blk_str[1] != 'x' && blk_str[1] != 'X')) {
+            ilog("underwriter: source-deposit verify deferred for uwreq {} — "
+                 "receipt blockNumber not 0x-prefixed hex ('{}') for tx {}",
+                 req.id, blk_str, tx_hash_hex);
+            return false;
+         }
+         const uint64_t rcpt_blk = std::stoull(blk_str.substr(2), nullptr, 16);
          const uint64_t head_blk =
             entry->client->get_block_number().convert_to<uint64_t>();
          if (head_blk < rcpt_blk ||
@@ -1550,6 +1559,14 @@ struct underwriter_plugin::impl {
       } catch (const fc::exception& e) {
          elog("underwriter: source-deposit verify failed for uwreq {} — "
               "RPC error: {}", req.id, e.to_detail_string());
+         bump_mismatch();
+         return false;
+      } catch (const std::exception& e) {
+         // std::stoul/std::stoull on a malformed or non-hex RPC field throw std::invalid_argument /
+         // std::out_of_range, which are NOT fc::exception; catch them here so one bad response fails
+         // just this uwreq instead of escaping and aborting the whole scan cycle for every request.
+         elog("underwriter: source-deposit verify failed for uwreq {} — "
+              "malformed RPC response: {}", req.id, e.what());
          bump_mismatch();
          return false;
       }
@@ -1735,10 +1752,50 @@ struct underwriter_plugin::impl {
                    !meta_obj["logMessages"].is_array()) {
                   continue;
                }
+               // Solana interleaves every invoked program's logs in meta.logMessages. Attribute each
+               // "Program log:" payload to the program currently executing by tracking the
+               // "Program <id> invoke" / "Program <id> success|failed" bracket lines, and trust the
+               // SwapDeposit marker ONLY when opp-outpost (sol_program_id) is the top-of-stack
+               // program. Without this, a forged "Program log:" emitted by any attacker program in a
+               // transaction that merely references sol_program_id would pass verification.
+               std::vector<std::string> program_stack;
                for (const auto& line_var : meta_obj["logMessages"].get_array()) {
                   if (!line_var.is_string()) continue;
                   const std::string line = line_var.as_string();
+
+                  // Maintain the invocation stack from the bracket lines (which are not log payloads).
+                  if (boost::algorithm::starts_with(line, "Program ") &&
+                      !boost::algorithm::starts_with(line, "Program log:") &&
+                      !boost::algorithm::starts_with(line, "Program data:") &&
+                      !boost::algorithm::starts_with(line, "Program return:")) {
+                     std::string_view rest{line};
+                     rest.remove_prefix(8);                  // strip "Program "
+                     const size_t sp1 = rest.find(' ');
+                     if (sp1 != std::string_view::npos) {
+                        const std::string_view prog = rest.substr(0, sp1);
+                        std::string_view after = rest.substr(sp1 + 1);
+                        const size_t sp2 = after.find(' ');
+                        const std::string_view verb =
+                           (sp2 == std::string_view::npos) ? after : after.substr(0, sp2);
+                        if (verb == "invoke") {
+                           program_stack.emplace_back(prog);
+                        } else if (verb.starts_with("success") || verb.starts_with("failed")) {
+                           if (!program_stack.empty()) program_stack.pop_back();
+                        }
+                        // "consumed", etc. — no stack change.
+                     }
+                     continue;
+                  }
+
                   if (!boost::algorithm::starts_with(line, marker_prefix)) {
+                     continue;
+                  }
+                  // Attribution: the marker is a "Program log:" payload of the top-of-stack program.
+                  if (program_stack.empty() || program_stack.back() != sol_program_id) {
+                     ilog("underwriter: ignoring SwapDeposit marker for uwreq {} in tx {} — not "
+                          "emitted by opp-outpost program {} (attributed to {})",
+                          req.id, sig_b58, sol_program_id,
+                          program_stack.empty() ? std::string{"<none>"} : program_stack.back());
                      continue;
                   }
                   // Parse the 64-char lowercase hex hash that follows
