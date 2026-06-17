@@ -112,7 +112,10 @@ jobs:
         id: build
         env:
           SYSIO_PLATFORM_NAME: ${{ matrix.platform }}
+          VCPKG_TARGET_TRIPLET: x64-linux-release
+          VCPKG_HOST_TRIPLET: x64-linux-release
         run: |
+          chown -R "$(id -u):$(id -g)" "$PWD"
           bash .github/scripts/build-sysio.sh "${{ matrix.build_jobs }}"
 
       - name: Show vcpkg logs if failure
