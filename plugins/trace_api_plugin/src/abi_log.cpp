@@ -7,8 +7,10 @@
 
 #include <magic_enum/magic_enum.hpp>
 
+#include <cassert>
 #include <cstring>
 #include <stdexcept>
+#include <type_traits>
 
 namespace sysio::trace_api {
 
@@ -27,10 +29,11 @@ constexpr uint64_t journal_record_crc_size = sizeof(uint32_t);
 constexpr uint64_t file_header_offset = 0;
 
 /**
- * Read an fc::raw-packed fixed-size header through cfile's positional API.
+ * Read an fc::raw-packed fixed-size POD header through cfile's positional API.
  */
 template<typename T>
 T pread_packed_header(const fc::cfile& file) {
+   static_assert(std::is_trivially_copyable_v<T>);
    std::vector<char> data(sizeof(T));
    file.pread(data.data(), data.size(), file_header_offset);
    fc::datastream<const char*> ds(data.data(), data.size());
@@ -40,11 +43,13 @@ T pread_packed_header(const fc::cfile& file) {
 }
 
 /**
- * Write an fc::raw-packed fixed-size header through cfile's positional API.
+ * Write an fc::raw-packed fixed-size POD header through cfile's positional API.
  */
 template<typename T>
 void pwrite_packed_header(fc::cfile& file, const T& value) {
+   static_assert(std::is_trivially_copyable_v<T>);
    auto data = fc::raw::pack(value);
+   assert(data.size() == sizeof(T));
    file.pwrite(data.data(), data.size(), file_header_offset);
 }
 

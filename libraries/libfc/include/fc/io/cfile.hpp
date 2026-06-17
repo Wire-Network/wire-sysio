@@ -44,7 +44,7 @@ public:
    /// Open an existing file for binary update without truncating or forcing appends.
    static constexpr auto update_rw_mode = "rb+";
    /// Create a new file for binary update, failing if the file already exists.
-   static constexpr auto create_new_rw_mode = "wbx+";
+   static constexpr auto create_new_rw_mode = "wb+x";
    /// Create or truncate a file for binary update.
    static constexpr auto truncate_rw_mode = "wb+";
    /// Open an existing file for binary reads.
@@ -98,12 +98,13 @@ public:
    ///         "ab+" - open for binary update - create if does not exist
    ///         "rb+" - open for binary update - file must exist
    void open( const char* mode ) {
-      _file.reset( FC_FOPEN( _file_path.generic_string().c_str(), mode ) );
-      if( !_file ) {
+      FILE* new_file = FC_FOPEN( _file_path.generic_string().c_str(), mode );
+      if( !new_file ) {
          const int open_errno = errno;
          throw std::ios_base::failure( "cfile unable to open: " +  _file_path.generic_string() + " in mode: " +
                                        std::string( mode ), std::error_code(open_errno, std::generic_category()) );
       }
+      _file.reset( new_file );
 #ifndef _WIN32
       struct stat st;
       _file_blk_size = 4096;
