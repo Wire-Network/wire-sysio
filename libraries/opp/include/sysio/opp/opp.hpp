@@ -102,7 +102,6 @@ FC_REFLECT_ENUM(sysio::opp::types::AttestationType,
    (ATTESTATION_TYPE_UNDERWRITE_INTENT_COMMIT)
    (ATTESTATION_TYPE_SWAP_REVERT)
    (ATTESTATION_TYPE_DEPOSIT_REVERT)
-   (ATTESTATION_TYPE_SWAP_REJECTED)
    (ATTESTATION_TYPE_RESERVE_CREATE)
    (ATTESTATION_TYPE_RESERVE_CREATE_CANCEL)
    (ATTESTATION_TYPE_RESERVE_CREATE_CANCELLED)
@@ -127,7 +126,8 @@ FC_REFLECT_ENUM(sysio::opp::attestations::OperatorAction_ActionType,
    (OperatorAction_ActionType_ACTION_TYPE_WITHDRAW_REMIT)
    (OperatorAction_ActionType_ACTION_TYPE_SLASH))
 
-// ReserveTarget_Kind removed in v6 — ReserveTarget is now (chain_code, reserve_code, TokenAmount).
+// ReserveTarget_Kind removed in v6 — the carrier (renamed `ReserveAmount`)
+// is now (chain_code, reserve_code, TokenAmount) in the depot 9-dec frame.
 
 FC_REFLECT_ENUM(sysio::opp::types::AttestationStatus,
    (ATTESTATION_STATUS_PENDING)

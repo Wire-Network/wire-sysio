@@ -357,19 +357,32 @@ void dispatch_reserve_create(name self, const std::vector<char>& data) {
       if (err != zpp::bits::errc{}) return;
    }
 
+   // Reserve identity + the custodied amount travel together in
+   // `external_amount` (a `ReserveAmount`): the amount is ALREADY in the
+   // depot's canonical 9-decimal frame (the outpost converts chain-native
+   // units at the boundary, exactly like the swap paths). A negative
+   // TokenAmount clamps to 0 so `oncrtreserve`'s zero-amount guard cancels
+   // the request back (refunding the creator) instead of wrapping.
+   const auto&    ext        = rc.external_amount;
+   const uint64_t ext_amount = ext.amount.amount > 0
+                                  ? static_cast<uint64_t>(ext.amount.amount)
+                                  : 0;
+
    action(
       permission_level{self, "active"_n},
       RESERV_ACCOUNT, "oncrtreserve"_n,
-      std::make_tuple(sysio::slug_name{rc.chain_code},
-                      sysio::slug_name{rc.token_code},
-                      sysio::slug_name{rc.reserve_code},
+      std::make_tuple(sysio::slug_name{ext.chain_code},
+                      sysio::slug_name{ext.amount.token_code},
+                      sysio::slug_name{ext.reserve_code},
                       rc.name,
                       rc.description,
-                      rc.external_token_amount,
+                      ext_amount,
                       rc.requested_wire_amount,
                       rc.connector_weight_bps,
                       rc.creator_addr.kind,
-                      rc.creator_addr.address)
+                      rc.creator_addr.address,
+                      rc.is_private,
+                      rc.creator_pub_key)
    ).send();
 }
 
@@ -533,87 +546,23 @@ void dispatch_attestation(name self, uint64_t attestation_id,
          break;
 
       case AttestationType::ATTESTATION_TYPE_SWAP_REMIT:
-         // Inbound SWAP_REMIT — the destination outpost reflected our
-         // depot-emitted SwapRemit envelope back to us, which is the
-         // delivery acknowledgement. Use it as the release trigger.
-         //
-         // Renamed from the old REMIT_CONFIRM dispatch (which was a
-         // separate outpost-emitted confirm message — removed; the depot
-         // is the ground truth and every SwapRemit is depot-authorized,
-         // so success is implicit absent SWAP_REJECTED).
-         {
-            opp::attestations::SwapRemit remit;
-            auto in = zpp::bits::in{std::span{data.data(), data.size()}, zpp::bits::no_size{}};
-            auto rc = in(remit);
-            if (rc != zpp::bits::errc{}) break;
-            // The original_message_id field encodes the uwreq's 64-bit id in
-            // its low 8 bytes; treat the rest as zero-padding from the
-            // depot-side encoder. Future task: a dedicated uw_request_id
-            // field on SwapRemit would remove this dependency.
-            uint64_t uwreq_id = 0;
-            const auto& bytes = remit.original_message_id;
-            if (bytes.size() >= 8) {
-               for (size_t i = 0; i < 8; ++i) {
-                  uwreq_id |= static_cast<uint64_t>(static_cast<uint8_t>(bytes[i])) << (i * 8);
-               }
-            }
-            if (uwreq_id != 0) {
-               action(
-                  permission_level{self, "active"_n},
-                  UWRIT_ACCOUNT, "release"_n,
-                  std::make_tuple(uwreq_id)
-               ).send();
-            }
-         }
+         // Depot → outpost outbound-only. No outpost ever echoes a
+         // SwapRemit back (verified: ETH `_handleSwapRemit` and SOL
+         // `handle_swap_remit` only pay the recipient + emit local
+         // events; failure is SWAP_REJECTED). The old "reflected remit
+         // = delivery ack → uwrit::release" dispatch here was dead code:
+         // success is implicit absent SWAP_REJECTED, and underwriter
+         // locks are released exclusively by the wall-clock challenge
+         // window sweep (`sysio.uwrit::chklocks` at epoch advance). A
+         // misbehaving outpost relaying one inbound is a benign no-op.
          break;
 
-      case AttestationType::ATTESTATION_TYPE_SWAP_REJECTED:
-         // Destination outpost couldn't pay a SwapRemit; reconcile the
-         // depot's view of the reserve so it matches the outpost's
-         // (still-holding-the-amount) balance. Flatten the SwapRejected
-         // proto message into primitive params on the inline action — the
-         // ABI never sees a proto-message-typed parameter per the
-         // no-proto-messages-in-actions rule.
-         //
-         // Post v6: `chain_code` and `reserve_code` come from the
-         // attestation payload (the destination reserve that failed to
-         // pay); `token_code` comes from the unremitted TokenAmount.
-         // The triple (chain_code, token_code, reserve_code) is the
-         // reserve PK on `sysio.reserv::reserves`.
-         {
-            opp::attestations::SwapRejected rejected;
-            auto in = zpp::bits::in{std::span{data.data(), data.size()}, zpp::bits::no_size{}};
-            auto rc = in(rejected);
-            if (rc != zpp::bits::errc{}) break;
-            checksum256 original_id;
-            // SwapRejected.original_swap_remit_id is a proto `bytes` field —
-            // OPP message ids are always 32 bytes (keccak/sha digests per the
-            // platform spec). Anything shorter implies a malformed
-            // attestation; drop it rather than silently truncate.
-            const auto& id_bytes = rejected.original_swap_remit_id;
-            if (id_bytes.size() == 32) {
-               std::array<uint8_t, 32> arr{};
-               std::copy(id_bytes.begin(), id_bytes.end(),
-                         reinterpret_cast<char*>(arr.data()));
-               original_id = checksum256(arr);
-            } else {
-               break;   // malformed; drop
-            }
-            const uint64_t unremitted_raw =
-               static_cast<uint64_t>(static_cast<int64_t>(rejected.unremitted_amount.amount));
-            action(
-               permission_level{self, "active"_n},
-               RESERV_ACCOUNT, "onreject"_n,
-               std::make_tuple(original_id,
-                               sysio::slug_name{rejected.chain_code},
-                               sysio::slug_name{rejected.unremitted_amount.token_code},
-                               sysio::slug_name{rejected.reserve_code},
-                               unremitted_raw,
-                               rejected.recipient.address,
-                               rejected.reason)
-            ).send();
-         }
-         break;
+      // ATTESTATION_TYPE_SWAP_REJECTED was dispatched here → sysio.reserv::onreject.
+      // REMOVED: outposts no longer echo a rejection. Every REMIT is depot-initiated
+      // against a verified reserve ledger, so the destination outpost can always pay
+      // (or log+skips locally on a misconfig) — there is no post-underwriting rejection
+      // and no reserve-ledger reconciliation. The retired type (enum slot 60957) no
+      // longer exists; any stray inbound falls through to the default drop below.
 
       case AttestationType::ATTESTATION_TYPE_STAKING_REWARD:
          // Per-staker staking reward -> sysio.dclaim claim ledger. The v6
@@ -870,16 +819,31 @@ void maybe_open_dispute(name self, uint64_t chain_code, uint32_t epoch_index,
                         const std::vector<checksum256>& seen_checksums,
                         const std::vector<uint32_t>& checksum_counts,
                         const std::vector<std::vector<name>>& checksum_operators) {
-   if (seen_checksums.size() < 3) return;
+   // OPP silent-return diagnostics: each branch below silently declines to open a
+   // dispute. Logged (visible under --contracts-console) so "the dispute never
+   // opened" is greppable instead of a black hole.
+   if (seen_checksums.size() < 3) {
+      sysio::print_f("msgch::maybe_open_dispute: no dispute for (chain=%llu, epoch=%u): %u distinct version(s), a vote needs >=3\n",
+                     chain_code, epoch_index, (uint32_t)seen_checksums.size());
+      return;
+   }
 
    epoch::epochstate_t state_tbl(EPOCH_ACCOUNT);
-   if (!state_tbl.exists() || current_time_point() < state_tbl.get().next_epoch_start) return;
+   if (!state_tbl.exists() || current_time_point() < state_tbl.get().next_epoch_start) {
+      sysio::print_f("msgch::maybe_open_dispute: no dispute for (chain=%llu, epoch=%u): epoch boundary not yet passed\n",
+                     chain_code, epoch_index);
+      return;
+   }
 
    uint32_t max_count = 0;
    for (auto c : checksum_counts) {
       if (c > max_count) max_count = c;
    }
-   if (max_count > operators_per_group / 2) return;  // a majority exists -> no vote needed
+   if (max_count > operators_per_group / 2) {  // a majority exists -> no vote needed
+      sysio::print_f("msgch::maybe_open_dispute: no dispute for (chain=%llu, epoch=%u): a version holds a majority (%u of group %u), resolved without a vote\n",
+                     chain_code, epoch_index, max_count, operators_per_group);
+      return;
+   }
 
    std::vector<chalg::dispute_candidate> candidates;
    candidates.reserve(seen_checksums.size());
