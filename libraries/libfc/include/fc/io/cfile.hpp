@@ -1,11 +1,13 @@
 #pragma once
 #include <fc/filesystem.hpp>
 #include <fc/io/datastream.hpp>
+#include <cassert>
 #include <cerrno>
 #include <cstdio>
 #include <ios>
 #include <fcntl.h>
 #include <sys/stat.h>
+#include <system_error>
 #include <unistd.h>
 
 #include <boost/interprocess/file_mapping.hpp>
@@ -37,9 +39,15 @@ class cfile_datastream;
 class cfile {
    friend class temp_cfile;
 public:
+   /// Open for binary update in append mode; callers must not use pwrite() with this mode.
    static constexpr auto create_or_update_rw_mode = "ab+";
+   /// Open an existing file for binary update without truncating or forcing appends.
    static constexpr auto update_rw_mode = "rb+";
+   /// Create a new file for binary update, failing if the file already exists.
+   static constexpr auto create_new_rw_mode = "wb+x";
+   /// Create or truncate a file for binary update.
    static constexpr auto truncate_rw_mode = "wb+";
+   /// Open an existing file for binary reads.
    static constexpr auto read_only_mode = "rb";
 
    cfile()
@@ -90,10 +98,13 @@ public:
    ///         "ab+" - open for binary update - create if does not exist
    ///         "rb+" - open for binary update - file must exist
    void open( const char* mode ) {
-      _file.reset( FC_FOPEN( _file_path.generic_string().c_str(), mode ) );
-      if( !_file ) {
-         throw std::ios_base::failure( "cfile unable to open: " +  _file_path.generic_string() + " in mode: " + std::string( mode ) );
+      FILE* new_file = FC_FOPEN( _file_path.generic_string().c_str(), mode );
+      if( !new_file ) {
+         const int open_errno = errno;
+         throw std::ios_base::failure( "cfile unable to open: " +  _file_path.generic_string() + " in mode: " +
+                                       std::string( mode ), std::error_code(open_errno, std::generic_category()) );
       }
+      _file.reset( new_file );
 #ifndef _WIN32
       struct stat st;
       _file_blk_size = 4096;
@@ -101,6 +112,40 @@ public:
          _file_blk_size = st.st_blksize;
 #endif
       _open = true;
+   }
+
+   /**
+    * Open an existing file for binary update without truncating it, or exclusively create a new one.
+    * Use this only when existing contents must be preserved; use truncate_rw_mode for complete rewrites.
+    *
+    * @return true when an existing file was opened, false when a new file was created
+    */
+   bool open_existing_or_create_new() {
+      try {
+         open(update_rw_mode);
+         return true;
+      } catch (const std::ios_base::failure& e) {
+         if (e.code().value() != ENOENT)
+            throw;
+      }
+
+      try {
+         open(create_new_rw_mode);
+         return false;
+      } catch (const std::ios_base::failure& e) {
+         if (e.code().value() == EEXIST) {
+            open(update_rw_mode);
+            return true;
+         }
+
+         // Some libc implementations can create the file, then fail later inside fopen().  If that
+         // leaves a zero-byte placeholder, remove it so the next open can create a valid file.
+         std::error_code ec;
+         const auto size = std::filesystem::file_size(_file_path, ec);
+         if (!ec && size == 0)
+            std::filesystem::remove(_file_path, ec);
+         throw;
+      }
    }
 
    size_t tellp() const {
@@ -191,17 +236,16 @@ public:
 
    /**
     * Positional write on the underlying file descriptor (POSIX pwrite), bypassing the FILE* buffer.
-    * Retries on EINTR and short writes until all n bytes are written.
-    * NOTE: on Linux, when the file is opened in an append mode (e.g. "ab+"), the kernel appends at
-    * EOF and IGNORES the offset argument (POSIX leaves this combination unspecified).  Callers
-    * holding an append-mode cfile must maintain offset == EOF themselves for the offset to be
-    * meaningful.
+    * Retries on EINTR and short writes until all n bytes are written.  The offset is always honored;
+    * callers must not use this API on a file descriptor opened with O_APPEND.
     * NOTE: bypasses stdio buffering entirely - interleaving with buffered write() requires explicit
     * flush() ordering by the caller.
     * @throws std::ios_base::failure on error; some bytes may already have been written in that case
     */
    void pwrite( const char* d, size_t n, uint64_t offset ) {
       const int fd = fileno();
+      assert((::fcntl(fd, F_GETFL) & O_APPEND) == 0 &&
+             "cfile::pwrite is positional; not valid on an O_APPEND file");
       const char* p         = d;
       size_t      remaining = n;
       while( remaining > 0 ) {

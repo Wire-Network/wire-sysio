@@ -39,7 +39,8 @@ public:
 
       create_accounts({
          UWRIT_ACCOUNT, MSGCH_ACCOUNT, OPREG_ACCOUNT, CHALG_ACCOUNT,
-         "sysio.epoch"_n, "uwrit.a"_n, "uwrit.b"_n
+         "sysio.epoch"_n, "sysio.chains"_n, "sysio.reserv"_n,
+         "uwrit.a"_n, "uwrit.b"_n
       });
       produce_blocks(2);
 
@@ -80,17 +81,17 @@ public:
       }
    }
 
-   action_result setconfig(uint32_t fee_bps                              = 10,
-                           uint32_t collateral_lock_duration_epoch_count = 10,
-                           uint8_t  fee_split_winner_pct                 = 50,
-                           uint8_t  fee_split_other_uw_pct               = 25,
-                           uint8_t  fee_split_batch_op_pct               = 25) {
+   action_result setconfig(uint32_t fee_bps                     = 10,
+                           uint64_t collateral_lock_duration_ms = 43'200'000,
+                           uint8_t  fee_split_winner_pct        = 50,
+                           uint8_t  fee_split_other_uw_pct      = 25,
+                           uint8_t  fee_split_batch_op_pct      = 25) {
       return push_uwrit_action(UWRIT_ACCOUNT, "setconfig"_n, mvo()
-         ("fee_bps",                              fee_bps)
-         ("collateral_lock_duration_epoch_count", collateral_lock_duration_epoch_count)
-         ("fee_split_winner_pct",                 fee_split_winner_pct)
-         ("fee_split_other_uw_pct",               fee_split_other_uw_pct)
-         ("fee_split_batch_op_pct",               fee_split_batch_op_pct)
+         ("fee_bps",                     fee_bps)
+         ("collateral_lock_duration_ms", collateral_lock_duration_ms)
+         ("fee_split_winner_pct",        fee_split_winner_pct)
+         ("fee_split_other_uw_pct",      fee_split_other_uw_pct)
+         ("fee_split_batch_op_pct",      fee_split_batch_op_pct)
       );
    }
 
@@ -122,17 +123,19 @@ BOOST_FIXTURE_TEST_CASE(setconfig_basic, sysio_uwrit_tester) { try {
 
    auto cfg = get_uwconfig();
    BOOST_REQUIRE_EQUAL(25, cfg["fee_bps"].as_uint64());
-   BOOST_REQUIRE_EQUAL(10, cfg["collateral_lock_duration_epoch_count"].as_uint64());
+   BOOST_REQUIRE_EQUAL(43'200'000u, cfg["collateral_lock_duration_ms"].as_uint64());
    BOOST_REQUIRE_EQUAL(50, cfg["fee_split_winner_pct"].as_uint64());
    BOOST_REQUIRE_EQUAL(25, cfg["fee_split_other_uw_pct"].as_uint64());
    BOOST_REQUIRE_EQUAL(25, cfg["fee_split_batch_op_pct"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(setconfig_writes_custom_lock_duration, sysio_uwrit_tester) { try {
+   // Test clusters shorten the 12h challenge window via setconfig — e.g.
+   // two minutes here.
    BOOST_REQUIRE_EQUAL(success(),
-      setconfig(/*fee_bps*/10, /*lock*/7, /*winner*/60, /*other_uw*/20, /*batchop*/20));
+      setconfig(/*fee_bps*/10, /*lock_ms*/120'000, /*winner*/60, /*other_uw*/20, /*batchop*/20));
    auto cfg = get_uwconfig();
-   BOOST_REQUIRE_EQUAL(7,  cfg["collateral_lock_duration_epoch_count"].as_uint64());
+   BOOST_REQUIRE_EQUAL(120'000u, cfg["collateral_lock_duration_ms"].as_uint64());
    BOOST_REQUIRE_EQUAL(60, cfg["fee_split_winner_pct"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
@@ -145,8 +148,8 @@ BOOST_FIXTURE_TEST_CASE(setconfig_rejects_excessive_fee, sysio_uwrit_tester) { t
 
 BOOST_FIXTURE_TEST_CASE(setconfig_rejects_zero_lock_duration, sysio_uwrit_tester) { try {
    BOOST_REQUIRE_EQUAL(
-      error("assertion failure with message: collateral_lock_duration_epoch_count must be positive"),
-      setconfig(/*fee_bps*/10, /*lock*/0, /*winner*/50, /*other_uw*/25, /*batchop*/25)
+      error("assertion failure with message: collateral_lock_duration_ms must be positive"),
+      setconfig(/*fee_bps*/10, /*lock_ms*/0, /*winner*/50, /*other_uw*/25, /*batchop*/25)
    );
 } FC_LOG_AND_RETHROW() }
 
@@ -168,21 +171,71 @@ BOOST_FIXTURE_TEST_CASE(createuwreq_requires_msgch_auth, sysio_uwrit_tester) { t
    ).find("missing authority of sysio.msgch") != std::string::npos);
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(release_requires_msgch_or_self_auth, sysio_uwrit_tester) { try {
-   // release accepts sysio.msgch (SWAP_REMIT dispatch path) or sysio.uwrit
-   // (expirelock self-inline path) auth. Anything else is rejected.
-   BOOST_REQUIRE(push_uwrit_action("uwrit.a"_n, "release"_n, mvo()
-      ("uwreq_id", 1)
-   ).find("release requires sysio.msgch or sysio.uwrit authority") != std::string::npos);
+// ── chklocks — THE lock-release path (12h wall-clock challenge window) ──
+//
+// Locks are never released by delivery (there is no SWAP_REMIT ack); the
+// epoch-advance sweep is the only releaser. `release`/`expirelock` were
+// retired with the dead reflected-remit dispatch.
+
+BOOST_FIXTURE_TEST_CASE(chklocks_requires_epoch_or_self_auth, sysio_uwrit_tester) { try {
+   BOOST_REQUIRE(push_uwrit_action("uwrit.a"_n, "chklocks"_n, mvo()
+   ).find("chklocks requires sysio.epoch or sysio.uwrit authority") != std::string::npos);
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(expirelock_missing_uwreq, sysio_uwrit_tester) { try {
-   // Permissionless caller — but the uwreq doesn't exist, so we expect a
-   // not-found assertion rather than an auth failure.
+BOOST_FIXTURE_TEST_CASE(chklocks_noop_with_no_locks, sysio_uwrit_tester) { try {
+   // Steady-state: nothing expired, nothing to sweep — must be a clean
+   // no-op (it runs inside every epoch advance).
+   BOOST_REQUIRE_EQUAL(success(),
+      push_uwrit_action(UWRIT_ACCOUNT, "chklocks"_n, mvo()));
+} FC_LOG_AND_RETHROW() }
+
+// ── drainfwq — epoch-boundary swap-from-WIRE queue drain ──
+
+BOOST_FIXTURE_TEST_CASE(drainfwq_requires_epoch_or_self_auth, sysio_uwrit_tester) { try {
+   BOOST_REQUIRE(push_uwrit_action("uwrit.a"_n, "drainfwq"_n, mvo()
+   ).find("drainfwq requires sysio.epoch or sysio.uwrit authority") != std::string::npos);
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(drainfwq_noop_with_empty_queue, sysio_uwrit_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(),
+      push_uwrit_action(UWRIT_ACCOUNT, "drainfwq"_n, mvo()));
+} FC_LOG_AND_RETHROW() }
+
+// ── swapfromwire — queued depot-originated swap entry ──
+
+BOOST_FIXTURE_TEST_CASE(swapfromwire_rejects_zero_wire_amount, sysio_uwrit_tester) { try {
    BOOST_REQUIRE_EQUAL(
-      error("assertion failure with message: uwreq not found"),
-      push_uwrit_action("uwrit.a"_n, "expirelock"_n, mvo()
-         ("uwreq_id", 999)
+      error("assertion failure with message: swapfromwire: wire_amount must be positive"),
+      push_uwrit_action("uwrit.a"_n, "swapfromwire"_n, mvo()
+         ("user",                 "uwrit.a")
+         ("wire_amount",          0)
+         ("dst_chain_code",       codename_mvo("SOLANA"))
+         ("dst_token_code",       codename_mvo("SOL"))
+         ("dst_reserve_code",     codename_mvo("PRIMARY"))
+         ("target_amount",        100)
+         ("target_tolerance_bps", 50)
+         ("recipient_kind",       sysio::opp::types::ChainKind::CHAIN_KIND_SVM)
+         ("recipient_addr",       std::vector<char>(32, '\x01'))
+      )
+   );
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(swapfromwire_rejects_unregistered_target_chain, sysio_uwrit_tester) { try {
+   // No sysio.chains rows exist in this fixture — the target chain cannot
+   // be registered+active, so the escrow never happens.
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: swapfromwire: target chain not "
+            "registered or not active"),
+      push_uwrit_action("uwrit.a"_n, "swapfromwire"_n, mvo()
+         ("user",                 "uwrit.a")
+         ("wire_amount",          1000)
+         ("dst_chain_code",       codename_mvo("SOLANA"))
+         ("dst_token_code",       codename_mvo("SOL"))
+         ("dst_reserve_code",     codename_mvo("PRIMARY"))
+         ("target_amount",        100)
+         ("target_tolerance_bps", 50)
+         ("recipient_kind",       sysio::opp::types::ChainKind::CHAIN_KIND_SVM)
+         ("recipient_addr",       std::vector<char>(32, '\x01'))
       )
    );
 } FC_LOG_AND_RETHROW() }
@@ -218,19 +271,6 @@ BOOST_FIXTURE_TEST_CASE(rcrdcommit_rejects_unknown_uwreq, sysio_uwrit_tester) { 
          ("from_token_code",  codename_mvo("ETH"))
          ("reserve_code",     codename_mvo("PRIMARY"))
          ("uic_bytes",        std::vector<char>{})
-      )
-   );
-} FC_LOG_AND_RETHROW() }
-
-// ── release (Task 3: settle UWREQ + opreg::releaselock fan-out) ──
-
-BOOST_FIXTURE_TEST_CASE(release_rejects_unknown_uwreq, sysio_uwrit_tester) { try {
-   // msgch is one of the two valid auth holders for release; verifies the
-   // not-found check fires after auth passes (not blocked by auth).
-   BOOST_REQUIRE_EQUAL(
-      error("assertion failure with message: uwreq not found"),
-      push_uwrit_action(MSGCH_ACCOUNT, "release"_n, mvo()
-         ("uwreq_id", 9999)
       )
    );
 } FC_LOG_AND_RETHROW() }

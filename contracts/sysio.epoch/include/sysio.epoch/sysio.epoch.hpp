@@ -125,6 +125,7 @@ namespace sysio {
       static constexpr name OPREG_ACCOUNT  = "sysio.opreg"_n;
       static constexpr name AUTHEX_ACCOUNT = "sysio.authex"_n;
       static constexpr name CHAINS_ACCOUNT = "sysio.chains"_n;
+      static constexpr name UWRIT_ACCOUNT  = "sysio.uwrit"_n;
 
       /// Bounds on `epoch_duration_sec`. Floor is a typo-guard: well below this
       /// value, `expected_rounds` in sysio.system::payepoch falls back to 1

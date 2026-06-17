@@ -544,9 +544,7 @@ namespace sysio { namespace chain {
          explicit basic_block_log(std::filesystem::path log_dir) { open(log_dir); }
 
          static void ensure_file_exists(fc::cfile& f) {
-            if (std::filesystem::exists(f.get_file_path()))
-               return;
-            f.open(fc::cfile::create_or_update_rw_mode);
+            f.open_existing_or_create_new();
             f.close();
          }
 
