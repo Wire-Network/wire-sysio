@@ -190,10 +190,38 @@ extract_inbound_swap_remit_reserve_seeds(const std::vector<char>& envelope_bytes
 
    for (const auto& message : env.messages()) {
       for (const auto& entry : message.payload().attestations()) {
-         if (entry.type() != sysio::opp::types::ATTESTATION_TYPE_SWAP_REMIT) continue;
-         sysio::opp::attestations::SwapRemit sr;
-         if (!sr.ParseFromString(entry.data())) continue;
-         record_unique(sr.amount().token_code(), sr.reserve_code());
+         switch (entry.type()) {
+            case sysio::opp::types::ATTESTATION_TYPE_SWAP_REMIT: {
+               sysio::opp::attestations::SwapRemit sr;
+               if (!sr.ParseFromString(entry.data())) continue;
+               record_unique(sr.amount().token_code(), sr.reserve_code());
+               break;
+            }
+            // The reserve-lifecycle round-trips need the per-(token, reserve)
+            // Reserve PDA in remaining_accounts too: `handle_reserve_ready`
+            // flips its status field, and `handle_reserve_create_cancelled`
+            // reads the refund amount/creator off it. RESERVE_READY rides
+            // exactly ONE envelope (queued once at `matchreserve`), so a
+            // missing PDA here doesn't defer the flip — it strands the
+            // reserve in PENDING permanently. (The cancel path's refund
+            // additionally needs creator/vault accounts on-chain; those are
+            // looked up from the PDA at dispatch and remain log-and-skip
+            // until a SOL-side cancel flow lands.)
+            case sysio::opp::types::ATTESTATION_TYPE_RESERVE_READY: {
+               sysio::opp::attestations::ReserveReady rr;
+               if (!rr.ParseFromString(entry.data())) continue;
+               record_unique(rr.token_code(), rr.reserve_code());
+               break;
+            }
+            case sysio::opp::types::ATTESTATION_TYPE_RESERVE_CREATE_CANCELLED: {
+               sysio::opp::attestations::ReserveCreateCancelled rcc;
+               if (!rcc.ParseFromString(entry.data())) continue;
+               record_unique(rcc.token_code(), rcc.reserve_code());
+               break;
+            }
+            default:
+               break;
+         }
       }
    }
 

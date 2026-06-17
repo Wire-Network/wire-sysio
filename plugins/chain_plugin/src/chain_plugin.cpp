@@ -2015,6 +2015,26 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
    auto key_names = tbl.key_names;
    auto key_types = tbl.key_types;
 
+   // Resolve the ABI-aware encode/decode plan once per request. nullopt when a
+   // key type is genuinely unrepresentable. The two JSON paths then diverge: a
+   // JSON bound is REJECTED (clear contract_table_query_exception below), while
+   // JSON key OUTPUT — the decoded `key` field and the `next_key` cursor — falls
+   // back to hex. Hex bounds and hex key output are unaffected either way.
+   // No in-tree table declares such a key type today (uint256/int256 have no CDT
+   // producer), so the nullopt branches below are defensive; the codec rejection
+   // that drives them is unit-tested in be_key_codec_tests `rejections`.
+   std::optional<std::vector<chain::be_key_codec::key_shape>> key_shapes;
+   try {
+      key_shapes = chain::be_key_codec::build_key_shapes(abi, key_names, key_types);
+   } catch (const fc::exception& e) {
+      // Unrepresentable key type (e.g. uint256/int256): leave key_shapes unset so a
+      // JSON bound is rejected with a clear error while JSON key output falls back to
+      // hex (hex bounds/output keep working). Log so the fallback is diagnosable.
+      dlog("be_key_codec: table {} has no representable JSON key shape; JSON bounds rejected, "
+           "JSON key output falls back to hex ({})",
+           p.table, e.top_message());
+   }
+
    // Use table_id from ABI (set by CDT's compute_table_id at compile time).
    const uint16_t table_id = tbl.table_id;
 
@@ -2125,32 +2145,39 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
 
    // For secondary index queries, bounds are secondary key values (single field).
    // For primary queries, bounds are full primary key objects (minus scope if scoped).
-   auto bound_key_names = key_names;
-   auto bound_key_types = key_types;
+   auto bound_key_shapes = key_shapes;
    if (!resolved_index_name.empty()) {
       // Secondary index: bound is a single value matching the index's key_type
       for (const auto& si : tbl.secondary_indexes) {
          if (si.name == resolved_index_name) {
-            bound_key_names = {si.name};
-            bound_key_types = {si.key_type};
+            try {
+               bound_key_shapes = std::vector<chain::be_key_codec::key_shape>{
+                  chain::be_key_codec::build_key_shape(abi, si.name, si.key_type)};
+            } catch (const fc::exception& e) {
+               // Unrepresentable secondary key type: drop the shape so a JSON
+               // bound rejects cleanly and hex bounds still work. Log the fallback.
+               bound_key_shapes.reset();
+               dlog("be_key_codec: secondary index {} on table {} has no representable JSON key shape; "
+                    "JSON bounds will be rejected ({})", si.name, p.table, e.top_message());
+            }
             break;
          }
       }
-   } else if (scope_key_count > 0 && !p.scope.empty()) {
+   } else if (scope_key_count > 0 && !p.scope.empty() && bound_key_shapes) {
       // Primary query with scope set: bounds represent the within-scope portion
       // (all key fields after scope). Strip the scope field from bound metadata.
-      bound_key_names.erase(bound_key_names.begin(),
-                            bound_key_names.begin() + static_cast<ptrdiff_t>(scope_key_count));
-      bound_key_types.erase(bound_key_types.begin(),
-                            bound_key_types.begin() + static_cast<ptrdiff_t>(scope_key_count));
+      bound_key_shapes->erase(bound_key_shapes->begin(),
+                              bound_key_shapes->begin() + static_cast<ptrdiff_t>(scope_key_count));
    }
 
    // Parse bounds: when json=true, bounds are JSON key objects; when json=false, hex strings.
    std::vector<char> lb_bytes;
    if (!effective_lower.empty()) {
       if (p.json) {
+         SYS_ASSERT(bound_key_shapes, chain::contract_table_query_exception,
+                    "Table {} key type is not representable as a JSON bound; use hex bounds", p.table);
          auto lb_var = fc::json::from_string(effective_lower);
-         lb_bytes = chain::be_key_codec::encode_key(lb_var, bound_key_names, bound_key_types);
+         lb_bytes = chain::be_key_codec::encode_key(lb_var, *bound_key_shapes);
       } else {
          auto v = fc::from_hex(effective_lower);
          lb_bytes.assign(reinterpret_cast<const char*>(v.data()),
@@ -2161,8 +2188,10 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
    bool has_upper = !effective_upper.empty();
    if (has_upper) {
       if (p.json) {
+         SYS_ASSERT(bound_key_shapes, chain::contract_table_query_exception,
+                    "Table {} key type is not representable as a JSON bound; use hex bounds", p.table);
          auto ub_var = fc::json::from_string(effective_upper);
-         ub_bytes = chain::be_key_codec::encode_key(ub_var, bound_key_names, bound_key_types);
+         ub_bytes = chain::be_key_codec::encode_key(ub_var, *bound_key_shapes);
       } else {
          auto v = fc::from_hex(effective_upper);
          ub_bytes.assign(reinterpret_cast<const char*>(v.data()),
@@ -2286,8 +2315,8 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
                if (!scope_prefix_bytes.empty() && sv.size() >= scope_prefix_bytes.size()) {
                   sv.remove_prefix(scope_prefix_bytes.size());
                }
-               auto key_var = chain::be_key_codec::decode_key(sv.data(), sv.size(),
-                                                              bound_key_names, bound_key_types);
+               FC_ASSERT(bound_key_shapes, "be_key_codec: key shape unresolved (unrepresentable key type); falling back to hex");
+               auto key_var = chain::be_key_codec::decode_key(sv.data(), sv.size(), *bound_key_shapes);
                hp.next_key = fc::json::to_string(key_var, fc::time_point::maximum());
                return;
             } catch (...) {
@@ -2372,7 +2401,7 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
 
       // Phase 2: ABI decode on http thread pool
       return [p = std::move(hp), abi = std::move(abi), table_name = p.table,
-              key_names = std::move(key_names), key_types = std::move(key_types),
+              key_shapes = std::move(key_shapes),
               scope_key_count,
               abi_serializer_max_time = abi_serializer_max_time,
               shorten_abi_errors = shorten_abi_errors,
@@ -2393,8 +2422,9 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
             // For secondary queries, decode the primary key as the key field
             if (p.json) {
                try {
+                  FC_ASSERT(key_shapes, "be_key_codec: key shape unresolved (unrepresentable key type); falling back to hex");
                   auto full_key = chain::be_key_codec::decode_key(
-                     row.key.data(), row.key.size(), key_names, key_types);
+                     row.key.data(), row.key.size(), *key_shapes);
                   obj["key"] = strip_scope_fields(std::move(full_key), scope_key_count);
                } catch (...) {
                   obj["key"] = fc::to_hex(row.key.data(), row.key.size());
@@ -2443,7 +2473,8 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
       auto kv = obj.key_view();
       if (p.json) {
          try {
-            auto full_key = chain::be_key_codec::decode_key(kv.data(), kv.size(), key_names, key_types);
+            FC_ASSERT(key_shapes, "be_key_codec: key shape unresolved (unrepresentable key type); falling back to hex");
+            auto full_key = chain::be_key_codec::decode_key(kv.data(), kv.size(), *key_shapes);
             auto stripped = strip_scope_fields(std::move(full_key), scope_key_count);
             hp.next_key = fc::json::to_string(stripped, fc::time_point::maximum());
          } catch (...) {
@@ -2547,7 +2578,7 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
    }
 
    return [hp = std::move(hp), abi = std::move(abi), tbl_name = p.table,
-           key_names = std::move(key_names), key_types = std::move(key_types),
+           key_shapes = std::move(key_shapes),
            scope_key_count,
            abi_serializer_max_time = abi_serializer_max_time,
            shorten_abi_errors = shorten_abi_errors,
@@ -2567,8 +2598,9 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
          // Decode key -- fall back to hex if BE decode fails
          if (hp.json) {
             try {
+               FC_ASSERT(key_shapes, "be_key_codec: key shape unresolved (unrepresentable key type); falling back to hex");
                auto full_key = chain::be_key_codec::decode_key(
-                  row.key.data(), row.key.size(), key_names, key_types);
+                  row.key.data(), row.key.size(), *key_shapes);
                obj("key", strip_scope_fields(std::move(full_key), scope_key_count));
             } catch (...) {
                obj("key", fc::to_hex(row.key.data(), static_cast<uint32_t>(row.key.size())));
