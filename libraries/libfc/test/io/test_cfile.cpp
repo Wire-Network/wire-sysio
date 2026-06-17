@@ -87,8 +87,7 @@ BOOST_AUTO_TEST_SUITE(cfile_test_suite)
       // Reading past EOF throws (short read).
       BOOST_CHECK_THROW( t.pread( &v[0], 6, 4 ), std::ios_base::failure );
 
-      // pwrite on an append-mode fd: Linux appends at EOF regardless of the offset argument -
-      // the documented caveat that callers holding append-mode cfiles rely on.
+      // pwrite on an append-mode cfile appends at EOF regardless of the offset argument.
       t.close();
       t.open( cfile::create_or_update_rw_mode );
       t.pwrite( "gh", 2, 0 );

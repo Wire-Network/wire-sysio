@@ -48,6 +48,7 @@ public:
 
    cfile(cfile&& other)
      : _open(other._open)
+     , _append_mode(other._append_mode)
      , _file_path(std::move(other._file_path))
      , _file_blk_size(other._file_blk_size)
      , _file(std::move(other._file))
@@ -100,6 +101,7 @@ public:
       if( fstat(fileno(), &st) == 0 )
          _file_blk_size = st.st_blksize;
 #endif
+      _append_mode = mode_opens_for_append(mode);
       _open = true;
    }
 
@@ -191,11 +193,9 @@ public:
 
    /**
     * Positional write on the underlying file descriptor (POSIX pwrite), bypassing the FILE* buffer.
-    * Retries on EINTR and short writes until all n bytes are written.
-    * NOTE: on Linux, when the file is opened in an append mode (e.g. "ab+"), the kernel appends at
-    * EOF and IGNORES the offset argument (POSIX leaves this combination unspecified).  Callers
-    * holding an append-mode cfile must maintain offset == EOF themselves for the offset to be
-    * meaningful.
+    * Retries on EINTR and short writes until all n bytes are written.  When the file is opened in
+    * append mode (e.g. "ab+"), append at EOF on every supported POSIX platform; Linux does this for
+    * pwrite() on an O_APPEND fd, while BSD/macOS need write() to honor O_APPEND.
     * NOTE: bypasses stdio buffering entirely - interleaving with buffered write() requires explicit
     * flush() ordering by the caller.
     * @throws std::ios_base::failure on error; some bytes may already have been written in that case
@@ -205,7 +205,12 @@ public:
       const char* p         = d;
       size_t      remaining = n;
       while( remaining > 0 ) {
+#if !defined(__linux__)
+         const ssize_t r = _append_mode ? ::write( fd, p, remaining )
+                                        : ::pwrite( fd, p, remaining, static_cast<off_t>( offset ) );
+#else
          const ssize_t r = ::pwrite( fd, p, remaining, static_cast<off_t>( offset ) );
+#endif
          if( r > 0 ) {
             p         += r;
             offset    += static_cast<uint64_t>( r );
@@ -299,6 +304,7 @@ public:
    void close() {
       _file.reset();
       _open = false;
+      _append_mode = false;
    }
 
    boost::interprocess::mapping_handle_t get_mapping_handle() const {
@@ -311,13 +317,26 @@ public:
    friend void swap(cfile& lhs, cfile& rhs) {
       using std::swap;
       swap(lhs._open, rhs._open);
+      swap(lhs._append_mode, rhs._append_mode);
       swap(lhs._file_path, rhs._file_path);
       swap(lhs._file_blk_size, rhs._file_blk_size);
       swap(lhs._file, rhs._file);
    }
 
 private:
+   /**
+    * Return true when an fopen mode sets O_APPEND on the underlying file descriptor.
+    */
+   static bool mode_opens_for_append(const char* mode) {
+      for(; *mode != '\0'; ++mode) {
+         if(*mode == 'a')
+            return true;
+      }
+      return false;
+   }
+
    bool                  _open = false;
+   bool                  _append_mode = false;
    std::filesystem::path _file_path;
    size_t                _file_blk_size = 4096;
    detail::unique_file   _file;

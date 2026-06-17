@@ -202,8 +202,8 @@ bool abi_log::append(chain::name account, uint64_t global_seq, std::vector<char>
    {
       std::lock_guard<std::mutex> lock(_append_mtx);
       try {
-         // NOTE: the fd comes from fopen("ab+") and carries O_APPEND, so on Linux this pwrite appends
-         // at EOF regardless of the offset argument.  That is exactly what we want: "file ends at
+         // NOTE: the cfile is opened with fopen("ab+"), so cfile::pwrite appends at EOF regardless
+         // of the offset argument.  That is exactly what we want: "file ends at
          // _end_offset" is a maintained invariant (restored below on failure), so EOF == _end_offset.
          _cfile.pwrite(record.data(), record.size(), _end_offset);
       } catch (const std::exception& e) {
@@ -572,7 +572,7 @@ bool abi_log::journal_append(const std::vector<char>& body) {
    auto rec = frame_journal_record(body);
    std::lock_guard<std::mutex> lock(_journal_mtx);
    try {
-      // Like the main log, the fd carries O_APPEND, so this pwrite lands at EOF == _journal_end_offset.
+      // Like the main log, append-mode cfile::pwrite lands at EOF == _journal_end_offset.
       _journal_cfile.pwrite(rec.data(), rec.size(), _journal_end_offset);
    } catch (const std::exception& e) {
       fc_wlog(_log, "trace_api: abi_log journal append of {} bytes at offset {} failed: {}; truncating torn tail",
