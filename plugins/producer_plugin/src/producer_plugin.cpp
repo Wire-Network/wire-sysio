@@ -810,6 +810,14 @@ public:
    unapplied_transaction_queue                       _unapplied_transactions;
    alignas(hardware_destructive_interference_sz)
    std::atomic<int32_t>                              _max_transaction_time_ms; // modified by app thread, read by net_plugin thread pool
+   // Floor for the speculative-retry CPU cap applied in push_transaction(). That cap is normally
+   // 2x the transaction's previously measured wall-clock cost, which guards against "producer bombs"
+   // (transactions that speculate cheaply but consume large CPU when produced into a block). For very
+   // cheap transactions, however, 2x prev_elapsed can fall below the run-to-run wall-clock variance of
+   // re-execution during fork catch-up or node load, dropping a valid forked-out transaction (the only
+   // copy on this node, never rebroadcast) instead of re-applying it. Flooring the cap lets cheap
+   // transactions absorb that variance while still bounding the CPU a bomb can consume before rejection.
+   static constexpr fc::microseconds                 _speculative_retry_min_cpu_cap{5000}; // 5 ms
    alignas(hardware_destructive_interference_sz)
    std::atomic<uint32_t>                             _received_block{0};       // modified by net_plugin thread pool
    implicit_production_pause_vote_tracker            _implicit_pause_vote_tracker;
@@ -2831,8 +2839,11 @@ producer_plugin_impl::push_result producer_plugin_impl::push_transaction(const f
 
       // elapsed can be set on failure, but prev_succeeded indicates a real cost
       // measurement -- only then is 2x prev_elapsed a sound cap on this retry.
+      // Floor the cap at _speculative_retry_min_cpu_cap: for very cheap trxs, 2x prev_elapsed is below
+      // the wall-clock variance of re-execution during fork catch-up / node load and would otherwise
+      // drop a valid forked-out trx; the floor still bounds the CPU a producer bomb can consume.
       if (trx->prev_succeeded) {
-         max_trx_time = std::min(max_trx_time, prev_elapsed * 2);
+         max_trx_time = std::min(max_trx_time, std::max(prev_elapsed * 2, _speculative_retry_min_cpu_cap));
       }
    }
 
