@@ -303,7 +303,12 @@ vote_result_t aggregating_qc_sig_t::add_weak_vote(size_t index, const bls_signat
       break;
 
    case state_t::weak_achieved:
-      if (weak_sum >= max_weak_sum_before_weak_final)
+      // Use strict '>' to match the unrestricted/restricted arm above. weak_final means a strong
+      // QC can no longer form; the max achievable strong sum is (sum - weak_sum), so strong is
+      // still possible while weak_sum == max_weak_sum_before_weak_final (== sum - threshold), where
+      // the achievable strong sum equals exactly the threshold. '>=' declared weak_final one
+      // weight-unit early.
+      if (weak_sum > max_weak_sum_before_weak_final)
          aggregating_state = state_t::weak_final;
       break;
 
