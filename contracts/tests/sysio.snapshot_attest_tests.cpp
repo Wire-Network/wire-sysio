@@ -289,7 +289,7 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_duplicate_vote, snapshot_attest_tester) { t
    auto shash = make_snap_hash(1);
 
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, bid, shash));
-   BOOST_REQUIRE_EQUAL(wasm_assert_msg("snap_account has already voted for this snapshot"),
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("producer has already voted for this snapshot"),
                         votesnaphash("snapprov1"_n, bid, shash));
 } FC_LOG_AND_RETHROW() }
 
@@ -476,6 +476,42 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_enforces_byzantine_quorum_floor, snapshot_a
    // A second agreeing vote reaches the floor and attests.
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov2"_n, bid, hash));
    BOOST_REQUIRE(!getsnaphash(1000).is_null());
+} FC_LOG_AND_RETHROW() }
+
+// A single producer must not be able to clear the Byzantine floor by itself by rotating
+// snap_accounts: regsnapprov(A) -> vote -> delsnapprov(A) -> regsnapprov(B) -> vote again for the
+// SAME (block_id, snapshot_hash). Votes are counted by the stable producer identity, so the second
+// vote (fresh snap_account, same producer) is rejected and the lone producer cannot reach quorum.
+BOOST_FIXTURE_TEST_CASE(votesnaphash_rejects_snap_account_rotation_sybil, snapshot_attest_tester) { try {
+   // 4 providers -> floor = 4/3 + 1 = 2 is the binding quorum (threshold 1% rounds to 1).
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer3"_n, "snapprov3"_n));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer4"_n, "snapprov4"_n));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1, 1));
+   produce_blocks();
+
+   const auto bid  = make_block_id(7000);
+   const auto hash = make_snap_hash(7);
+
+   // producer1 votes via its first snap_account.
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, bid, hash));
+
+   // producer1 rotates its snap_account: drop snapprov1, register a fresh snapprov5.
+   // provider_count is unchanged (still 4), so the floor stays 2.
+   BOOST_REQUIRE_EQUAL(success(), delsnapprov("snapprov1"_n));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov5"_n));
+   produce_blocks();
+
+   // The rotated snap_account resolves to the same producer, which already voted -> rejected,
+   // and the snapshot is still NOT attested (one producer cannot reach the floor of 2).
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("producer has already voted for this snapshot"),
+                        votesnaphash("snapprov5"_n, bid, hash));
+   BOOST_REQUIRE(getsnaphash(7000).is_null());
+
+   // A genuinely distinct producer supplies the second, quorum-reaching vote.
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov2"_n, bid, hash));
+   BOOST_REQUIRE(!getsnaphash(7000).is_null());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()

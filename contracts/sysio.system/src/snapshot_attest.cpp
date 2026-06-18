@@ -64,10 +64,16 @@ void snapshot_attest::delsnapprov(name account) {
 void snapshot_attest::votesnaphash(name snap_account, checksum256 block_id, checksum256 snapshot_hash) {
    require_auth(snap_account);
 
-   // Validate snap_account is a registered provider
+   // Validate snap_account is a registered provider and resolve its delegating producer.
+   // Votes are tracked by the stable PRODUCER identity, not the snap_account: a producer can
+   // rotate its snap_account (delsnapprov + regsnapprov), so de-duplicating by snap_account
+   // would let a single producer accumulate several distinct names in `voters` and clear the
+   // Byzantine quorum floor on its own. The producer:provider mapping is 1:1 (enforced by
+   // regsnapprov), so the producer is the correct identity to count.
    snap_providers_table provs(get_self());
-   check(provs.contains(snap_provider_key_t{snap_account.value}),
-         "snap_account is not a registered snapshot provider");
+   auto prov_itr = provs.find(snap_provider_key_t{snap_account.value});
+   check(prov_itr != provs.end(), "snap_account is not a registered snapshot provider");
+   const name producer = prov_itr->producer;
 
    uint32_t block_num = block_info::block_height_from_id(block_id);
    check(block_num > 0, "invalid block_id");
@@ -98,9 +104,10 @@ void snapshot_attest::votesnaphash(name snap_account, checksum256 block_id, chec
    for (auto itr = by_bn.lower_bound(static_cast<uint64_t>(block_num));
         itr != by_bn.end() && itr->block_num == block_num; ++itr) {
       if (itr->block_id == block_id && itr->snapshot_hash == snapshot_hash) {
-         // Check voter hasn't already voted
+         // Reject a repeat vote from the same producer. `voters` stores producer identities,
+         // so this also blocks the snap_account-rotation Sybil described above.
          for (const auto& v : itr->voters) {
-            check(v != snap_account, "snap_account has already voted for this snapshot");
+            check(v != producer, "producer has already voted for this snapshot");
          }
          vote_id     = itr->id;
          voter_count = static_cast<uint32_t>(itr->voters.size()) + 1;
@@ -111,7 +118,7 @@ void snapshot_attest::votesnaphash(name snap_account, checksum256 block_id, chec
 
    if (found) {
       votes.modify(same_payer, snap_vote_key_t{vote_id}, [&](auto& row) {
-         row.voters.push_back(snap_account);
+         row.voters.push_back(producer);
       });
    } else {
       uint64_t new_id = votes.available_primary_key();
@@ -120,7 +127,7 @@ void snapshot_attest::votesnaphash(name snap_account, checksum256 block_id, chec
          row.block_num     = block_num;
          row.block_id      = block_id;
          row.snapshot_hash = snapshot_hash;
-         row.voters        = {snap_account};
+         row.voters        = {producer};
       });
       voter_count = 1;
    }

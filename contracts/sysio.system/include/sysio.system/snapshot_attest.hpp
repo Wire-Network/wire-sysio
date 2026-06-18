@@ -70,6 +70,9 @@ struct [[sysio::table("snapvotes"), sysio::contract("sysio.system")]] snap_vote 
    uint32_t           block_num;
    checksum256        block_id;
    checksum256        snapshot_hash;
+   // Delegating PRODUCER identities that have voted -- NOT snap_accounts. Counting by the
+   // stable producer prevents a producer from inflating the count (and clearing the Byzantine
+   // quorum floor) by rotating snap_accounts. See snapshot_attest::votesnaphash.
    std::vector<name>  voters;
 
    uint64_t by_block_num() const { return static_cast<uint64_t>(block_num); }
