@@ -216,8 +216,8 @@ if(ENABLE_TESTS)
             sysio_testing
             sysio_chain_wrap
     )
-    # Absolute path to the source DEX bootstrap config examples, so
-    # test_dex_bootstrap_config can load them without a working-directory
+    # Absolute path to the source platform bootstrap config examples, so
+    # test_bootstrap_platform_config can load them without a working-directory
     # assumption (mirrors the unittests/test-data convention).
     target_compile_definitions(${TEST_TARGET_NAME} PRIVATE
             OPP_DEX_CONFIG_DIR="${CMAKE_SOURCE_DIR}/etc/config/dex")

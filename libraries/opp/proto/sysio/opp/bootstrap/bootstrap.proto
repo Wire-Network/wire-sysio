@@ -7,10 +7,10 @@ import "sysio/opp/types/types.proto";
 option cc_enable_arenas = true;
 
 // ---------------------------------------------------------------------------
-//  DEX bootstrap configuration — launch-day input shape.
+//  Platform bootstrap configuration — launch-day input shape.
 //
-//  Human-authored JSON instances of `DexConfig` drive the launch bootstrap
-//  tool, replacing the hard-coded chain / token / reserve dataset in the
+//  Human-authored JSON instances of `BootstrapPlatformConfig` drive the launch
+//  bootstrap tool, replacing the hard-coded chain / token / reserve dataset in the
 //  cluster tooling. The tool replays the config onto the chain inside the
 //  bootstrap window (sysio.epoch current_epoch_index == 0): every registration
 //  is priv-gated and lands ACTIVE inline.
@@ -92,7 +92,7 @@ message TokenSpec {
 //
 // The WIRE side (`initial_wire_amount`) is drained from the `sysio` emissions
 // treasury into reserve custody at registration time (real WIRE transfer; see
-// `DexConfig.t5_reserve_allocation`).
+// `BootstrapPlatformConfig.t5_reserve_allocation`).
 message ReserveSpec {
   // Reserve codename slug, conventionally "PRIMARY".
   string code                  = 1;
@@ -146,8 +146,11 @@ message UwritConfig {
   reserved "fee_split_winner_pct", "fee_split_other_uw_pct", "fee_split_batch_op_pct";
 }
 
-// Top-level launch DEX configuration. One JSON instance per deployment.
-message DexConfig {
+// Top-level launch platform bootstrap configuration. One JSON instance per
+// deployment. (This is the WIRE *platform* bootstrap — chains, tokens, reserves
+// and global swap settings — not a DEX: it stands up the launch-day registry
+// state, of which the swap reserves are one part.)
+message BootstrapPlatformConfig {
   // Schema version; bump on a breaking shape change. Must be 1.
   uint32 schema_version = 1;
 
@@ -157,11 +160,21 @@ message DexConfig {
 
   // WIRE subunits earmarked from the T5 allotment to back the WIRE side of
   // launch reserves. Sits OUTSIDE `emission_config.t5_distributable`: at
-  // genesis, t5_distributable = T5_allotment - t5_reserve_allocation, so the
-  // sysio.epoch emissions readiness gate never sees a short treasury balance
-  // after `regreserve` drains the reserve backing. Invariant:
-  //   sum(reserves[].initial_wire_amount) <= t5_reserve_allocation.
+  // genesis, t5_distributable = T5_allotment - t5_reserve_allocation -
+  // t5_dex_allocation, so the sysio.epoch emissions readiness gate never sees a
+  // short treasury balance after `regreserve` drains the reserve backing.
+  // Invariant: sum(reserves[].initial_wire_amount) <= t5_reserve_allocation.
   uint64 t5_reserve_allocation = 3;
+
+  // WIRE subunits earmarked from the T5 allotment for launch DEX integration —
+  // at least one DEX is seeded at launch (more added later by council vote).
+  // Like `t5_reserve_allocation`, this sits OUTSIDE `t5_distributable`, so the
+  // total T5 carve-out is `t5_reserve_allocation + t5_dex_allocation`. The total
+  // is set per-deployment (Kyle / Ken own the launch figure). RESERVED: the
+  // on-chain DEX-seeding mechanism is not finalized, so this field is carried
+  // for forward compatibility and is not yet drained by the bootstrap tool;
+  // default 0 disables the earmark.
+  uint64 t5_dex_allocation = 8;
 
   // Chains to register (one must be the CHAIN_KIND_WIRE depot).
   repeated ChainSpec   chains   = 4;

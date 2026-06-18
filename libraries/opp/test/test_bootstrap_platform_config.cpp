@@ -1,7 +1,7 @@
 /**
- * @file test_dex_bootstrap_config.cpp
- * @brief Schema + invariant tests for the launch-day DEX bootstrap config
- *        (`sysio.opp.bootstrap.DexConfig`).
+ * @file test_bootstrap_platform_config.cpp
+ * @brief Schema + invariant tests for the launch-day platform bootstrap config
+ *        (`sysio.opp.bootstrap.BootstrapPlatformConfig`).
  *
  * Proves the committed example configs under `etc/config/dex/` parse against
  * the generated protobuf schema and satisfy the cross-field invariants the
@@ -32,7 +32,7 @@
 #include <vector>
 
 namespace gpb = google::protobuf;
-using sysio::opp::bootstrap::DexConfig;
+using sysio::opp::bootstrap::BootstrapPlatformConfig;
 using sysio::opp::types::ChainKind;
 using sysio::opp::types::TokenKind;
 
@@ -49,7 +49,7 @@ std::string slurp(const std::string& path) {
 
 /// Parse JSON into `out` with STRICT semantics (unknown fields rejected).
 /// Returns false and fills `err` on any parse error.
-bool parse_strict(const std::string& json, DexConfig& out, std::string& err) {
+bool parse_strict(const std::string& json, BootstrapPlatformConfig& out, std::string& err) {
    gpb::util::JsonParseOptions opts; // ignore_unknown_fields defaults to false
    const auto st = gpb::util::JsonStringToMessage(json, &out, opts);
    if (!st.ok()) {
@@ -102,7 +102,7 @@ bool account_name_ok(const std::string& s) {
 
 /// Validate a parsed config against the launch invariants V1..V9. Returns a
 /// list of human-readable failures (empty == valid).
-std::vector<std::string> validate(const DexConfig& c) {
+std::vector<std::string> validate(const BootstrapPlatformConfig& c) {
    std::vector<std::string> e;
 
    // V1 — version + label
@@ -200,11 +200,11 @@ const std::string CONFIG_DIR = OPP_DEX_CONFIG_DIR;
 
 } // namespace
 
-BOOST_AUTO_TEST_SUITE(dex_bootstrap_config)
+BOOST_AUTO_TEST_SUITE(bootstrap_platform_config)
 
 /// The launch example parses strictly and satisfies every invariant.
 BOOST_AUTO_TEST_CASE(launch_example_parses_and_validates) {
-   DexConfig cfg;
+   BootstrapPlatformConfig cfg;
    std::string err;
    BOOST_REQUIRE_MESSAGE(parse_strict(slurp(CONFIG_DIR + "/dex-config.launch.example.json"), cfg, err), err);
    for (const auto& v : validate(cfg)) BOOST_ERROR(v);
@@ -214,7 +214,7 @@ BOOST_AUTO_TEST_CASE(launch_example_parses_and_validates) {
 
 /// The dev-cluster mirror parses strictly and satisfies every invariant.
 BOOST_AUTO_TEST_CASE(dev_config_parses_and_validates) {
-   DexConfig cfg;
+   BootstrapPlatformConfig cfg;
    std::string err;
    BOOST_REQUIRE_MESSAGE(parse_strict(slurp(CONFIG_DIR + "/dex-config.dev.json"), cfg, err), err);
    for (const auto& v : validate(cfg)) BOOST_ERROR(v);
@@ -224,7 +224,7 @@ BOOST_AUTO_TEST_CASE(dev_config_parses_and_validates) {
 
 /// A typo'd / unknown JSON key must fail the strict parse, not be dropped.
 BOOST_AUTO_TEST_CASE(strict_parse_rejects_unknown_field) {
-   DexConfig cfg;
+   BootstrapPlatformConfig cfg;
    std::string err;
    const std::string bad = R"({"schema_version":1,"network":"x","totally_unknown_key":3})";
    BOOST_CHECK(!parse_strict(bad, cfg, err));
@@ -233,7 +233,7 @@ BOOST_AUTO_TEST_CASE(strict_parse_rejects_unknown_field) {
 /// Each single-field mutation of the valid dev config trips at least one
 /// invariant (one mutation per targeted check).
 BOOST_AUTO_TEST_CASE(validator_rejects_mutations) {
-   DexConfig base;
+   BootstrapPlatformConfig base;
    std::string err;
    BOOST_REQUIRE_MESSAGE(parse_strict(slurp(CONFIG_DIR + "/dex-config.dev.json"), base, err), err);
    BOOST_REQUIRE(validate(base).empty());
@@ -256,6 +256,28 @@ BOOST_AUTO_TEST_CASE(validator_rejects_mutations) {
      BOOST_CHECK(!validate(c).empty()); }
    { auto c = base; c.mutable_uwrit()->set_fee_bps(10001);
      BOOST_CHECK(!validate(c).empty()); }                               // V9 fee_bps > 10000
+}
+
+/// The reserved `t5_dex_allocation` earmark is part of the strict schema and is
+/// inert today: it defaults to 0, a non-zero value trips no launch invariant
+/// (the on-chain DEX-seeding mechanism is not finalized), and strict parsing
+/// accepts the key (an unknown key would be rejected — see the test above).
+BOOST_AUTO_TEST_CASE(t5_dex_allocation_is_accepted_and_inert) {
+   BootstrapPlatformConfig base;
+   std::string err;
+   BOOST_REQUIRE_MESSAGE(parse_strict(slurp(CONFIG_DIR + "/dex-config.dev.json"), base, err), err);
+   BOOST_REQUIRE(validate(base).empty());
+   BOOST_CHECK_EQUAL(base.t5_dex_allocation(), 0u);          // default: disabled
+
+   auto c = base;
+   c.set_t5_dex_allocation(1'000'000'000ull);                // non-zero earmark
+   BOOST_CHECK(validate(c).empty());                         // reserved: trips nothing
+
+   BootstrapPlatformConfig parsed;
+   std::string perr;
+   BOOST_CHECK(parse_strict(
+      R"({"schema_version":1,"network":"x","t5_dex_allocation":"5"})", parsed, perr));
+   BOOST_CHECK_EQUAL(parsed.t5_dex_allocation(), 5u);        // strict schema knows the key
 }
 
 BOOST_AUTO_TEST_SUITE_END()
