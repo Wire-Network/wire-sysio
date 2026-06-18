@@ -184,7 +184,7 @@ void reserve::regreserve(sysio::slug_name chain_code,
    sysio::check(is_bootstrap_window(),
                 "regreserve is bootstrap-window only; post-bootstrap reserves go through create_reserve");
    sysio::check(connector_weight_bps > 0 && connector_weight_bps <= MAX_CONNECTOR_WEIGHT_BPS,
-                "connector_weight_bps must be in (0, 10000]");
+                "connector_weight_bps must be in (0, 10000) — both pool-side weights must be positive");
    sysio::check(initial_chain_amount > 0 && initial_wire_amount > 0,
                 "bootstrap reserve must seed both chain_amount and wire_amount > 0");
    sysio::check(!is_private || owner != sysio::name{},

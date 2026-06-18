@@ -260,6 +260,16 @@ BOOST_FIXTURE_TEST_CASE(regreserve_rejects_invalid_connector_weight, sysio_reser
    BOOST_REQUIRE(
       regreserve("ETH", "ETH", "PRIMARY2", 100, 100, 10001)
          .find("connector_weight_bps") != std::string::npos);
+
+   // R10: cw == 10000 (== WEIGHT_TOTAL_BPS) makes the token-side weight zero, so the weighted
+   // curve returns 0 for every swap — a permanently dead reserve. It must be rejected (max is 9999).
+   BOOST_REQUIRE(
+      regreserve("ETH", "ETH", "PRIMARY3", 100, 100, 10000)
+         .find("connector_weight_bps") != std::string::npos);
+
+   // The boundary value just below the total is accepted (token side keeps 1 bps).
+   BOOST_REQUIRE_EQUAL(success(),
+      regreserve("ETH", "ETH", "PRIMARY4", 100, 100, 9999));
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(regreserve_private_requires_owner, sysio_reserve_tester) { try {
