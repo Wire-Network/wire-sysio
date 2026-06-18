@@ -367,124 +367,119 @@ std::vector<char> wire_name_bytes(name n) {
    return {s.begin(), s.end()};
 }
 
-/// Build + queue the outbound SWAP_REMIT envelope for a confirmed race.
+/// Disposition of a pre-settlement attempt to build the outbound SWAP_REMIT
+/// for a winning candidate. Lets `try_select_winner` unwind a race
+/// non-throwing instead of letting a `check()` abort the evalcons dispatch
+/// chain and stall OPP consensus chain-wide.
+enum class swap_remit_disp {
+   ok,            ///< envelope built — proceed to settle + `queue_swap_remit`
+   terminal,      ///< no underwriter can EVER remit this uwreq — REJECT + refund
+   disqualified,  ///< THIS candidate cannot remit — skip it, leave uwreq PENDING
+};
+
+/// Pre-validate + build (but do NOT send) the outbound SWAP_REMIT envelope
+/// for `candidate` winning `req`, mutating no state.
 ///
-/// Fired inline from `try_select_winner` after the depot has committed to
-/// a winning underwriter. The reserve-book mutation (`reserv::applyswap` /
-/// `applyfromwire`) is queued by the CALLER in the same transaction,
-/// BEFORE this queueout — by the time the remit leaves the depot, every
-/// intervening quote already prices the post-swap books. This function
-/// only resolves identities and queues the envelope:
-///   Inline-action `sysio.msgch::queueout(dst_outpost_id,
-///   ATTESTATION_TYPE_SWAP_REMIT, encoded)` — pushes the envelope for the
-///   next epoch's outbound drain. The destination outpost's
-///   ReserveManager (ETH) / opp-outpost reserve PDA (SOL) pays the
-///   recipient inline via `_handleSwapRemit` / `handle_swap_remit`.
-void emit_swap_remit(name self,
-                      const uwrit::uw_request_t& req,
-                      name candidate) {
-   // Decode the stored SwapRequest payload so we can populate the
-   // outbound SwapRemit's `recipient` field. The depot otherwise
-   // wouldn't know which address on the destination chain the swap
-   // user wants paid (the row only stores chain/kind/amount summaries).
+/// **Non-throwing.** The former `emit_swap_remit` ran AFTER the caller's
+/// `reserv::applyswap` / `applyfromwire` reserve mutation and resolved the
+/// recipient / destination outpost / underwriter identity with `check()`.
+/// Inside the synchronous evalcons → dispatch → rcrdcommit → try_select_winner
+/// chain, any such throw aborts consensus application for the whole outpost
+/// envelope and stalls OPP epoch advancement chain-wide. This function instead
+/// reports a `swap_remit_disp` so the caller can disqualify the candidate (or
+/// reject the uwreq) cleanly. It is called BEFORE any lock / CONFIRMED /
+/// reserve write; `queue_swap_remit` (below) only ships the pre-built envelope,
+/// AFTER the reserve books have moved (so every intervening quote prices the
+/// post-swap books).
+///
+/// On `ok`, `dst_outpost_id` + `encoded` carry the ready-to-send envelope.
+/// Failure classification:
+///   * stored-request decode / dst outpost / dst chain-kind — uwreq-wide and
+///     identical for every candidate ⇒ `terminal` (REJECT + refund/revert).
+///   * winner's destination-chain authex link / pubkey — candidate-specific
+///     (another underwriter may hold a valid link) ⇒ `disqualified`.
+swap_remit_disp try_build_swap_remit(const uwrit::uw_request_t& req,
+                                     name candidate,
+                                     uint64_t& dst_outpost_id,
+                                     std::vector<char>& encoded) {
+   // Decode the stored SwapRequest for its `recipient` (the row keeps only
+   // chain/kind/amount summaries). Same bytes for every candidate ⇒ terminal.
    opp::attestations::SwapRequest sr;
    {
       auto in = zpp::bits::in{
          std::span{req.attestation_inbound_data.data(),
                     req.attestation_inbound_data.size()},
          zpp::bits::no_size{}};
-      auto rc = in(sr);
-      check(rc == zpp::bits::errc{},
-            "emit_swap_remit: failed to decode stored SwapRequest");
+      if (in(sr) != zpp::bits::errc{}) return swap_remit_disp::terminal;
    }
 
+   // Destination outpost id + ChainKind from the `sysio.chains` registry —
+   // chain-level config; if unresolved, no winner can ever remit ⇒ terminal.
    auto dst_outpost_opt = find_outpost_id_for_chain(req.dst_chain_code);
-   check(dst_outpost_opt.has_value(),
-         "emit_swap_remit: no outpost registered for destination chain");
-   const uint64_t dst_outpost_id = *dst_outpost_opt;
+   if (!dst_outpost_opt) return swap_remit_disp::terminal;
+   auto dst_kind_opt = chain_kind_for_code(req.dst_chain_code);
+   if (!dst_kind_opt) return swap_remit_disp::terminal;
+   const ChainKind dst_kind = *dst_kind_opt;
 
-   // Build the SwapRemit. `original_message_id` encodes the uwreq_id
-   // in its low 8 bytes; the destination outpost's reflected SWAP_REMIT
-   // envelope back to msgch's dispatch uses this for the release-trigger
-   // decode (see sysio.msgch.cpp's SWAP_REMIT case).
+   // Resolve the winning underwriter's destination-chain pubkey from
+   // `sysio.authex::links` (`bynamechain`) so the SwapRemit carries the
+   // underwriter's auditable identity — the destination outpost
+   // cross-references it against the UNDERWRITE_INTENT_COMMIT it already saw.
+   // A winner without a dst-chain link cannot ship a SwapRemit with a
+   // populated underwriter, but this is candidate-specific: disqualify them
+   // so the race can resolve for another underwriter (NOT terminal).
+   sysio::authex::links_t links(uwrit::AUTHEX_ACCOUNT);
+   auto idx = links.get_index<"bynamechain"_n>();
+   auto it = idx.find(sysio::to_namechain_key(candidate, dst_kind));
+   if (it == idx.end()) return swap_remit_disp::disqualified;
+   std::vector<char> uw_addr = sysio::pubkey_to_bytes(it->pub_key);
+   if (uw_addr.empty()) return swap_remit_disp::disqualified;
+
+   // All identities resolved — build the envelope.
    opp::attestations::SwapRemit remit;
-   remit.recipient        = sr.recipient;
-   // FORCE recipient.kind to the destination chain's actual ChainKind.
-   // The ETH outpost's `requestSwap` deliberately ships SwapRequest with
-   // `recipient.kind = CHAIN_KIND_UNKNOWN` ("depot routes by chain_code,
-   // outposts decode by their own chain kind") — but the SOL outpost's
-   // off-chain cranker (`extract_inbound_recipient_pubkeys`) filters on
-   // `kind == CHAIN_KIND_SVM` to decide whether to forward the recipient
-   // pubkey as a `remaining_accounts` extra. UNKNOWN → dropped → on-chain
-   // `handle_swap_remit` rejects "recipient not in remaining_accounts".
-   // The depot resolves the dst chain's kind below from `sysio.chains`,
-   // so overwrite here so the off-chain cranker sees a coherent kind.
-   // Per the project rule against 0-as-sentinel for closed-set enums.
-   {
-      auto dst_kind_for_recipient = chain_kind_for_code(req.dst_chain_code);
-      check(dst_kind_for_recipient.has_value(),
-            "emit_swap_remit: cannot resolve dst chain kind for recipient");
-      remit.recipient.kind = *dst_kind_for_recipient;
-   }
-   remit.amount           = opp::types::TokenAmount{
+   remit.recipient = sr.recipient;
+   // FORCE recipient.kind to the dst chain's actual ChainKind. The ETH
+   // outpost ships SwapRequest with `recipient.kind = CHAIN_KIND_UNKNOWN`
+   // ("depot routes by chain_code, outposts decode by their own kind"), but
+   // the SOL off-chain cranker (`extract_inbound_recipient_pubkeys`) forwards
+   // the recipient pubkey only when `kind == CHAIN_KIND_SVM`; UNKNOWN → dropped
+   // → on-chain `handle_swap_remit` rejects "recipient not in
+   // remaining_accounts". Per the project rule against 0-as-sentinel enums.
+   remit.recipient.kind = dst_kind;
+   remit.amount = opp::types::TokenAmount{
       .token_code = req.dst_token_code.value,
       .amount     = static_cast<int64_t>(req.dst_amount),
    };
+   // `original_message_id` low 8 bytes encode uwreq_id; the reflected
+   // SWAP_REMIT envelope back to msgch's dispatch uses this for the
+   // release-trigger decode (see sysio.msgch.cpp's SWAP_REMIT case).
    remit.original_message_id.assign(32, 0);
    for (size_t i = 0; i < 8; ++i) {
       remit.original_message_id[i] =
          static_cast<char>((req.id >> (i * 8)) & 0xff);
    }
-   remit.chain_code   = req.dst_chain_code.value;
-   remit.reserve_code = req.dst_reserve_code.value;
-
-   // Resolve the winning underwriter's destination-chain pubkey from
-   // `sysio.authex::links` (`bynamechain` index) so the SwapRemit
-   // carries the underwriter's auditable identity on the dst chain.
-   // The destination outpost cross-references this against the
-   // matching UNDERWRITE_INTENT_COMMIT it already saw on its leg;
-   // downstream auditors / on-chain consumers can verify the
-   // payout against the underwriter that won the race without
-   // back-tracking through the depot.
-   //
-   // An underwriter without an authex link for the dst chain cannot
-   // be a valid race winner (they have no on-chain identity there to
-   // commit a signature against). `try_select_winner`'s caller has
-   // already accepted their COMMIT, so this lookup should always
-   // succeed; if it doesn't, abort the commit rather than ship a
-   // SwapRemit with a blank underwriter — auditing depends on the
-   // field being populated.
-   //
-   // The authex links table is still keyed by `(account, ChainKind)`
-   // because that table hasn't been migrated to codenames in this
-   // refactor wave; resolve via `chain_kind_for_code` first.
-   {
-      auto dst_kind_opt = chain_kind_for_code(req.dst_chain_code);
-      check(dst_kind_opt.has_value(),
-            "emit_swap_remit: destination chain_code not registered in sysio.chains");
-      const ChainKind dst_kind = *dst_kind_opt;
-
-      remit.underwriter.kind = dst_kind;
-      sysio::authex::links_t links(uwrit::AUTHEX_ACCOUNT);
-      auto idx = links.get_index<"bynamechain"_n>();
-      const uint128_t key = sysio::to_namechain_key(candidate, dst_kind);
-      auto it = idx.find(key);
-      check(it != idx.end(),
-            "emit_swap_remit: winning underwriter has no authex link "
-            "for the destination chain — cannot emit a SwapRemit "
-            "with a blank underwriter address (audit requirement)");
-      remit.underwriter.address = sysio::pubkey_to_bytes(it->pub_key);
-      check(!remit.underwriter.address.empty(),
-            "emit_swap_remit: underwriter's authex pub_key variant index "
-            "unsupported (pubkey_to_bytes returned empty)");
-   }
-   remit.unlock_timestamp = 0;
+   remit.chain_code          = req.dst_chain_code.value;
+   remit.reserve_code        = req.dst_reserve_code.value;
+   remit.underwriter.kind    = dst_kind;
+   remit.underwriter.address = std::move(uw_addr);
+   remit.unlock_timestamp    = 0;
 
    // `no_size{}` — see emit_swap_revert for the rationale.
-   std::vector<char> encoded;
+   encoded.clear();
    auto out = zpp::bits::out{encoded, zpp::bits::no_size{}};
    (void)out(remit);
+   dst_outpost_id = *dst_outpost_opt;
+   return swap_remit_disp::ok;
+}
 
+/// Queue a pre-built SWAP_REMIT envelope (from `try_build_swap_remit`) to the
+/// destination outpost. Sent by `try_select_winner` AFTER the reserve mutation
+/// in the same transaction, so every intervening quote prices the post-swap
+/// books. The destination outpost's ReserveManager (ETH) / reserve PDA (SOL)
+/// pays the recipient inline via `_handleSwapRemit` / `handle_swap_remit`.
+/// Non-throwing.
+void queue_swap_remit(name self, uint64_t dst_outpost_id,
+                      const std::vector<char>& encoded) {
    action(
       permission_level{self, "active"_n},
       uwrit::MSGCH_ACCOUNT, "queueout"_n,
@@ -831,15 +826,81 @@ uwrit::commit_entry* find_or_create_commit(uwrit::uw_request_t& req, name underw
    return &req.commits_by.back();
 }
 
+/// Mark a single candidate's commit_entry as race-disqualified — the
+/// `SLASHED` status doubles as the "lost on a hard disqualification" sentinel
+/// (vs `RELEASED` for a clean race loser) — and leave the uwreq PENDING so
+/// the race can still resolve for another valid underwriter. Non-throwing.
+void disqualify_candidate(uwrit::uwreqs_t& reqs, const uwrit::id_key& pk,
+                          name candidate, const std::string& reason) {
+   reqs.modify(same_payer, pk, [&](auto& r) {
+      auto* c = find_or_create_commit(r, candidate);
+      c->status = UnderwriteStatus::UNDERWRITE_STATUS_SLASHED;
+      c->reason = reason;
+   });
+}
+
+/// Terminally reject a uwreq that can never settle: refund the source side
+/// and mark the row REJECTED, releasing any in-flight commits. **Non-throwing**
+/// — safe inside the evalcons dispatch chain (a `check()` here would stall OPP
+/// consensus chain-wide). The refund routes by source-leg kind:
+///   * outpost source (`src_needed`): best-effort SWAP_REVERT back to the
+///     source outpost (requires the stored SwapRequest to decode; a depot
+///     source has no outpost to route to, so `find_outpost_id_for_chain`
+///     returns nullopt and the revert is skipped).
+///   * depot source   (from-WIRE):    refund the escrowed WIRE to the
+///     depositor via `reserv::refundwire`.
+void reject_and_refund(name self, uwrit::uwreqs_t& reqs, const uwrit::id_key& pk,
+                       const uwrit::uw_request_t& req, bool src_needed,
+                       const std::string& revert_reason,
+                       const std::string& commit_reason) {
+   if (src_needed) {
+      opp::attestations::SwapRequest sr;
+      auto in = zpp::bits::in{
+         std::span{req.attestation_inbound_data.data(),
+                    req.attestation_inbound_data.size()},
+         zpp::bits::no_size{}};
+      if (in(sr) == zpp::bits::errc{}) {
+         if (auto src_outpost_opt = find_outpost_id_for_chain(req.src_chain_code)) {
+            emit_swap_revert(self, *src_outpost_opt, req.id, sr,
+                             req.src_chain_code, req.src_reserve_code, revert_reason);
+         }
+      }
+   } else if (auto user = parse_wire_name(req.depositor)) {
+      // Swap-from-WIRE: the escrowed WIRE was never credited to a reserve —
+      // refund it directly (there is no source outpost to route a revert to).
+      action(
+         permission_level{self, "active"_n},
+         uwrit::RESERVE_ACCOUNT, "refundwire"_n,
+         std::make_tuple(*user, req.src_amount)
+      ).send();
+   } else {
+      sysio::print("reject_and_refund: cannot parse from-WIRE depositor for "
+                   "refund on uwreq ", req.id, "\n");
+   }
+   reqs.modify(same_payer, pk, [&](auto& r) {
+      r.status           = UnderwriteRequestStatus::UNDERWRITE_REQUEST_STATUS_REJECTED;
+      r.settled_at_ms    = current_time_ms();
+      r.expires_at_epoch = get_current_epoch() + uwrit::UWREQ_RETENTION_EPOCHS;
+      for (auto& c : r.commits_by) {
+         if (c.status == UnderwriteStatus::UNDERWRITE_STATUS_INTENT_SUBMITTED) {
+            c.status = UnderwriteStatus::UNDERWRITE_STATUS_RELEASED;
+            c.reason = commit_reason;
+         }
+      }
+   });
+}
+
 /// Resolve the race once every REQUIRED leg of a (uwreq, underwriter) pair
 /// has arrived. A leg is required iff its chain is an outpost; a depot
 /// (WIRE) leg needs no UIC, no bond, and no lock — single-leg swaps
 /// (to/from WIRE) therefore resolve on their one outpost commit. On a win:
 /// verify the required legs' signatures + bond, pre-validate reserve
-/// liquidity against the local mirror (so the inline reserv settlement
-/// actions are unreachable-failure by construction), push one lock per
-/// required leg (a 12h wall-clock challenge window — released only by
-/// `chklocks`, never by delivery), mark CONFIRMED, then settle:
+/// liquidity against the local mirror AND pre-build the outbound SWAP_REMIT
+/// envelope (so both the inline reserv settlement actions and the remit are
+/// unreachable-failure by construction — nothing past the CONFIRMED write can
+/// `check()`-abort and stall evalcons), push one lock per required leg (a 12h
+/// wall-clock challenge window — released only by `chklocks`, never by
+/// delivery), mark CONFIRMED, then settle:
 ///   * normal     — reserv::applyswap  + SWAP_REMIT to the dst outpost
 ///   * from-WIRE  — reserv::applyfromwire + SWAP_REMIT to the dst outpost
 ///   * to-WIRE    — reserv::paywire (REAL WIRE to the recipient; no remit)
@@ -881,12 +942,9 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate) {
       ? available_via_mirrors(self, candidate, req.dst_chain_code, req.dst_token_code) : 0;
    if ((src_needed && src_avail < req.src_amount) ||
        (dst_needed && dst_avail < req.dst_amount)) {
-      // Insufficient bond — mark the commit_entry but don't promote.
-      reqs.modify(same_payer, pk, [&](auto& r) {
-         auto* c = find_or_create_commit(r, candidate);
-         c->status = UnderwriteStatus::UNDERWRITE_STATUS_SLASHED;
-         c->reason = "insufficient bond on one or both legs";
-      });
+      // Insufficient bond — disqualify this candidate, leave the race open.
+      disqualify_candidate(reqs, pk, candidate,
+                           "insufficient bond on one or both legs");
       return;
    }
 
@@ -909,52 +967,14 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate) {
          const uint128_t allowed = (static_cast<uint128_t>(quoted)
                                        * req.variance_tolerance_bps) / 10000u;
          if (static_cast<uint128_t>(diff) > allowed) {
-            // Recover originating outpost from the swap-request payload
-            // so the SWAP_REVERT routes back correctly.
-            opp::attestations::SwapRequest sr;
-            {
-               auto in = zpp::bits::in{
-                  std::span{req.attestation_inbound_data.data(),
-                              req.attestation_inbound_data.size()},
-                  zpp::bits::no_size{}};
-               if (in(sr) == zpp::bits::errc{}) {
-                  auto src_outpost_opt = find_outpost_id_for_chain(req.src_chain_code);
-                  if (src_outpost_opt) {
-                     emit_swap_revert(self, *src_outpost_opt, req.id, sr,
-                        req.src_chain_code, req.src_reserve_code,
-                        "variance exceeded tolerance at race resolution: "
-                        "quoted=" + std::to_string(quoted)
-                        + " current=" + std::to_string(current_quote)
-                        + " tolerance_bps=" + std::to_string(req.variance_tolerance_bps));
-                  }
-               }
-            }
-            // Swap-from-WIRE: the user's escrowed WIRE was never credited
-            // to any reserve — refund it directly (there is no source
-            // outpost to route a SWAP_REVERT to).
-            if (!src_needed) {
-               if (auto user = parse_wire_name(req.depositor)) {
-                  action(
-                     permission_level{self, "active"_n},
-                     uwrit::RESERVE_ACCOUNT, "refundwire"_n,
-                     std::make_tuple(*user, req.src_amount)
-                  ).send();
-               } else {
-                  sysio::print("try_select_winner: cannot parse from-WIRE "
-                               "depositor for refund on uwreq ", uwreq_id, "\n");
-               }
-            }
-            reqs.modify(same_payer, pk, [&](auto& r) {
-               r.status           = UnderwriteRequestStatus::UNDERWRITE_REQUEST_STATUS_REJECTED;
-               r.settled_at_ms    = current_time_ms();
-               r.expires_at_epoch = get_current_epoch() + uwrit::UWREQ_RETENTION_EPOCHS;
-               for (auto& c : r.commits_by) {
-                  if (c.status == UnderwriteStatus::UNDERWRITE_STATUS_INTENT_SUBMITTED) {
-                     c.status = UnderwriteStatus::UNDERWRITE_STATUS_RELEASED;
-                     c.reason = "uwreq reverted at race resolution (variance drift)";
-                  }
-               }
-            });
+            // Drift now exceeds the user's tolerance — refund the source
+            // side and REJECT rather than lock a stale quote. Non-throwing.
+            reject_and_refund(self, reqs, pk, req, src_needed,
+               "variance exceeded tolerance at race resolution: "
+               "quoted=" + std::to_string(quoted)
+               + " current=" + std::to_string(current_quote)
+               + " tolerance_bps=" + std::to_string(req.variance_tolerance_bps),
+               "uwreq reverted at race resolution (variance drift)");
             return;
          }
       }
@@ -988,24 +1008,12 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate) {
                                          sr0.recipient.address.end()};
       auto rcpt = parse_wire_name(recipient_bytes);
       if (!rcpt || !is_account(*rcpt)) {
-         auto src_outpost_opt = find_outpost_id_for_chain(req.src_chain_code);
-         if (src_outpost_opt) {
-            emit_swap_revert(self, *src_outpost_opt, req.id, sr0,
-                             req.src_chain_code, req.src_reserve_code,
-                             "swap-to-WIRE rejected: recipient is not a valid "
-                             "WIRE account");
-         }
-         reqs.modify(same_payer, pk, [&](auto& r) {
-            r.status           = UnderwriteRequestStatus::UNDERWRITE_REQUEST_STATUS_REJECTED;
-            r.settled_at_ms    = current_time_ms();
-            r.expires_at_epoch = get_current_epoch() + uwrit::UWREQ_RETENTION_EPOCHS;
-            for (auto& c : r.commits_by) {
-               if (c.status == UnderwriteStatus::UNDERWRITE_STATUS_INTENT_SUBMITTED) {
-                  c.status = UnderwriteStatus::UNDERWRITE_STATUS_RELEASED;
-                  c.reason = "uwreq rejected: invalid WIRE recipient";
-               }
-            }
-         });
+         // A malformed recipient can never become valid (terminal). to-WIRE
+         // always has an outpost source leg, so this routes a SWAP_REVERT
+         // back to it.
+         reject_and_refund(self, reqs, pk, req, src_needed,
+            "swap-to-WIRE rejected: recipient is not a valid WIRE account",
+            "uwreq rejected: invalid WIRE recipient");
          return;
       }
       towire_recipient = *rcpt;
@@ -1052,6 +1060,40 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate) {
          sysio::print("try_select_winner: insufficient reserve liquidity for "
                       "uwreq ", uwreq_id, ", skipping\n");
          return;
+      }
+   }
+
+   // ── Pre-build the outbound SWAP_REMIT (dst-outpost paths only) ───────
+   // The remit's identity resolution — stored-request decode, destination
+   // outpost / chain-kind, and the winner's destination authex link — used to
+   // run inside the former `emit_swap_remit` AFTER the
+   // reserve mutation, with `check()` aborts that would halt evalcons and
+   // stall OPP consensus chain-wide. Build + validate the envelope HERE,
+   // before any lock / CONFIRMED / applyswap write, so a failure unwinds the
+   // race non-throwing. `queue_swap_remit` (in the settlement tail) only
+   // ships the pre-built bytes, after the reserve books have moved.
+   uint64_t remit_dst_outpost_id = 0;
+   std::vector<char> remit_encoded;
+   if (dst_needed) {
+      switch (try_build_swap_remit(req, candidate, remit_dst_outpost_id, remit_encoded)) {
+         case swap_remit_disp::ok:
+            break;
+         case swap_remit_disp::disqualified:
+            // This winner has no destination-chain authex link / usable
+            // pubkey — disqualify and let the race resolve for another.
+            disqualify_candidate(reqs, pk, candidate,
+               "winning candidate has no authex link for the destination "
+               "chain — cannot emit an auditable SwapRemit");
+            return;
+         case swap_remit_disp::terminal:
+            // No underwriter can ever remit this uwreq (stored request
+            // undecodable, or destination outpost / chain-kind unresolved) —
+            // refund the source side and REJECT.
+            reject_and_refund(self, reqs, pk, req, src_needed,
+               "swap unremittable at race resolution: destination outpost / "
+               "chain-kind unresolved or stored request undecodable",
+               "uwreq rejected: destination unremittable at race resolution");
+            return;
       }
    }
 
@@ -1115,11 +1157,6 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate) {
       }
    });
 
-   // Re-read the row post-modify so the settlement tail sees the
-   // CONFIRMED snapshot (and gets a stable copy of the bytes /
-   // chain / amount fields).
-   auto confirmed = reqs.get(pk);
-
    // ── Settlement — reserve books move NOW, before any remit leaves ─────
    // All reserve mutations are queued ahead of the SWAP_REMIT queueout in
    // this same transaction, so every quote between emit and delivery
@@ -1146,7 +1183,7 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate) {
          std::make_tuple(req.dst_chain_code, req.dst_token_code, req.dst_reserve_code,
                           req.src_amount, req.dst_amount)
       ).send();
-      emit_swap_remit(self, confirmed, candidate);
+      queue_swap_remit(self, remit_dst_outpost_id, remit_encoded);
    } else {
       // Normal swap: emit-time four-leg apply, then the remit tail.
       action(
@@ -1157,7 +1194,7 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate) {
                           req.dst_chain_code, req.dst_token_code, req.dst_reserve_code,
                           req.dst_amount)
       ).send();
-      emit_swap_remit(self, confirmed, candidate);
+      queue_swap_remit(self, remit_dst_outpost_id, remit_encoded);
    }
 }
 
@@ -1387,7 +1424,7 @@ void uwrit::drainfwq() {
       }
 
       // Synthetic SwapRequest payload — the settlement tail
-      // (emit_swap_remit) decodes `recipient` from the stored bytes
+      // (`try_build_swap_remit`) decodes `recipient` from the stored bytes
       // exactly as it does for outpost-originated swaps.
       opp::attestations::SwapRequest sr;
       sr.actor.kind = ChainKind::CHAIN_KIND_WIRE;
