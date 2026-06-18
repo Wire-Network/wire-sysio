@@ -66,7 +66,12 @@ namespace sysio {
       // the WIRE-side weight of the token/WIRE pool; the token side gets the
       // remainder. weight = 5000 is the symmetric 50/50 case (pure constant
       // product). The weighted swap curve lives in `sysio.opp.common/amm_math.hpp`.
-      static constexpr uint32_t MAX_CONNECTOR_WEIGHT_BPS     = 10000;
+      //
+      // Max is 9999, not 10000: both pool-side weights must be positive. At cw = 10000 the
+      // token-side weight (10000 - cw) is 0, so amm_math::out_given_in returns 0 for every
+      // token<->WIRE swap — a permanently unswappable (dead) reserve. Capping below the total
+      // keeps the token side >= 1 bps.
+      static constexpr uint32_t MAX_CONNECTOR_WEIGHT_BPS     = 9999;
       static constexpr uint32_t DEFAULT_CONNECTOR_WEIGHT_BPS = 5000;
 
       // Swap-fee split. Every swap charges sysio.uwrit's `fee_bps` out of the

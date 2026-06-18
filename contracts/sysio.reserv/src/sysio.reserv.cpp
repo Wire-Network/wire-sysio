@@ -47,6 +47,16 @@ using sysio::slug_name_literals::operator""_s;
 /// a depot (WIRE) endpoint with no token/WIRE pool of its own.
 constexpr sysio::slug_name WIRE_TOKEN = "WIRE"_s;
 
+/// Saturating uint64 credit for reserve balances / rewards-bucket counters. These accumulate from
+/// operator-relayed external-chain amounts (no on-chain supply cap), and the credit sites run
+/// inside the consensus dispatch chain (onreward via msgch::evalcons; applyswap / applyfromwire /
+/// paywire inline from uwrit::try_select_winner). A raw `+=` could wrap the uint64 and corrupt the
+/// weighted-AMM curve and the `>=` sufficiency checks; cap at UINT64_MAX instead — never wrap,
+/// never throw on the consensus path. The cap is unreachable for any real token amount.
+inline void add_capped_u64(uint64_t& balance, uint64_t amt) {
+   balance = (amt > UINT64_MAX - balance) ? UINT64_MAX : balance + amt;
+}
+
 /// Live per-spoke swap fee (basis points) — owned by `sysio.uwrit`. Read fresh
 /// so the read-only quote and settlement charge one and the same rate. Falls
 /// back to the `uw_config` default when uwrit has not been configured yet.
@@ -143,8 +153,8 @@ void route_wire_fee(name self, const opp::amm::wire_fee& fee) {
    if (fee.reward_share > 0) {
       reserve::rewardbkt_t bkt(self);
       auto rb = bkt.get_or_default(reserve::rewards_bucket{});
-      rb.balance          += fee.reward_share;
-      rb.lifetime_accrued += fee.reward_share;
+      add_capped_u64(rb.balance,          fee.reward_share);
+      add_capped_u64(rb.lifetime_accrued, fee.reward_share);
       bkt.set(rb, ram_payer);
    }
    if (fee.emissions_share > 0) {
@@ -535,7 +545,7 @@ void reserve::onreward(sysio::slug_name chain_code,
       return;
    }
    tbl.modify(ram_payer, pk, [&](auto& row) {
-      row.reserve_chain_amount += outpost_amount;
+      add_capped_u64(row.reserve_chain_amount, outpost_amount);
    });
 }
 
@@ -591,14 +601,14 @@ void reserve::applyswap(sysio::slug_name src_chain_code,
                 "applyswap: insufficient destination reserve balance");
 
    tbl.modify(ram_payer, src_pk, [&](auto& row) {
-      row.reserve_chain_amount += src_amount;
+      add_capped_u64(row.reserve_chain_amount, src_amount);
       row.reserve_wire_amount  -= w_gross;
    });
    // Same-row swaps (identical triples) compose correctly: the second
    // modify reads the post-first-modify state. The destination receives only
    // the post-fee WIRE.
    tbl.modify(ram_payer, dst_pk, [&](auto& row) {
-      row.reserve_wire_amount  += fee.net;
+      add_capped_u64(row.reserve_wire_amount, fee.net);
       row.reserve_chain_amount -= dst_amount;
    });
 
@@ -631,7 +641,7 @@ void reserve::applyfromwire(sysio::slug_name dst_chain_code,
    const auto fee = opp::amm::split_wire_fee(wire_in, uwrit_fee_bps(), FEE_REWARD_SHARE_BPS);
 
    tbl.modify(ram_payer, pk, [&](auto& row) {
-      row.reserve_wire_amount  += fee.net;
+      add_capped_u64(row.reserve_wire_amount, fee.net);
       row.reserve_chain_amount -= dst_amount;
    });
 
@@ -670,7 +680,7 @@ void reserve::paywire(sysio::slug_name src_chain_code,
                 "paywire: insufficient source reserve WIRE for payout + fee");
 
    tbl.modify(ram_payer, pk, [&](auto& row) {
-      row.reserve_chain_amount += src_amount;
+      add_capped_u64(row.reserve_chain_amount, src_amount);
       row.reserve_wire_amount  -= wire_leaving;
    });
 

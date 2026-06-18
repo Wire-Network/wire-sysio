@@ -24,7 +24,7 @@
  *     amount_out = balance_out * (1 - (balance_in/(balance_in+amount_in))^(w_in/w_out))
  *
  * ## Accuracy
- * The fractional power is evaluated in Q48 fixed point via integer `log2`/`exp2`
+ * The fractional power is evaluated in Q60 fixed point via integer `log2`/`exp2`
  * (relative error ~1e-13, far tighter than Bancor's ~1e-8 reference). The
  * subtracted term is rounded UP so `out` is floored — the reserve never
  * over-pays.
@@ -66,14 +66,14 @@ inline constexpr uint64_t EXP2_FRAC_TBL[FP_BITS] = {
    0x1000000000000006ULL, 0x1000000000000003ULL, 0x1000000000000001ULL, 0x1000000000000001ULL
 };
 
-/// `log2(x)` for a Q48 value `x_fp >= FP_ONE` (real `x >= 1`). Returns
-/// `log2(x)` in Q48 (`>= 0`). Bit-by-bit mantissa squaring.
+/// `log2(x)` for a Q60 value `x_fp >= FP_ONE` (real `x >= 1`). Returns
+/// `log2(x)` in Q60 (`>= 0`). Bit-by-bit mantissa squaring.
 inline u128 log2_fp(u128 x_fp) {
    u128 result = 0;
    // Integer part: bring the mantissa into [FP_ONE, 2*FP_ONE).
    while (x_fp >= (FP_ONE << 1)) { x_fp >>= 1; result += FP_ONE; }
    // Fractional part: square repeatedly; each carry past 2 contributes a bit.
-   u128 b = FP_ONE >> 1; // 0.5 in Q48
+   u128 b = FP_ONE >> 1; // 0.5 in Q60
    for (int i = 0; i < FP_BITS; ++i) {
       x_fp = (x_fp * x_fp) >> FP_BITS;
       if (x_fp >= (FP_ONE << 1)) { result += b; x_fp >>= 1; }
@@ -82,7 +82,7 @@ inline u128 log2_fp(u128 x_fp) {
    return result;
 }
 
-/// `2^f` for `f` in `[0, FP_ONE)` (real fraction `[0,1)`). Returns Q48 in
+/// `2^f` for `f` in `[0, FP_ONE)` (real fraction `[0,1)`). Returns Q60 in
 /// `[FP_ONE, 2*FP_ONE)`. Multiplies the precomputed `2^(2^-i)` for each set
 /// fractional bit of `f`.
 inline u128 exp2_frac(u128 f) {
@@ -98,7 +98,7 @@ inline u128 exp2_frac(u128 f) {
 }
 
 /// `base^e` where `base = num/den` in `(0,1]` (`num <= den`, both `> 0`) and
-/// `e = exp_num/exp_den > 0`. Returns the Q48 value of `base^e` in `(0, FP_ONE]`.
+/// `e = exp_num/exp_den > 0`. Returns the Q60 value of `base^e` in `(0, FP_ONE]`.
 ///
 /// `base^e = 2^(-e * log2(den/num))`. Computed as: `lr = log2(den/num) >= 0`,
 /// `g = e*lr >= 0`, then `2^(-g) = (1/2^gi) * (1/2^gf)`.
@@ -106,15 +106,15 @@ inline u128 pow_frac_fp(u128 num, u128 den, uint64_t exp_num, uint64_t exp_den) 
    if (exp_den == 0) return FP_ONE;
    if (num >= den)   return FP_ONE;            // base >= 1 -> 1 (only base==1 reaches here)
 
-   const u128 x_fp = (den << FP_BITS) / num;   // den/num >= 1, Q48 (den < 2^65 -> safe)
-   const u128 lr   = log2_fp(x_fp);            // log2(den/num) >= 0, Q48
-   const u128 g    = (lr * exp_num) / exp_den; // e * log2(den/num), Q48
+   const u128 x_fp = (den << FP_BITS) / num;   // den/num >= 1, Q60 (den < 2^65 -> safe)
+   const u128 lr   = log2_fp(x_fp);            // log2(den/num) >= 0, Q60
+   const u128 g    = (lr * exp_num) / exp_den; // e * log2(den/num), Q60
 
    const u128 gi = g >> FP_BITS;               // integer part of g
    if (gi >= static_cast<u128>(FP_BITS) + 2) return 0; // 2^(-g) below 1 ULP -> 0
    const u128 gf  = g - (gi << FP_BITS);       // fractional part [0, FP_ONE)
    const u128 e2  = exp2_frac(gf);             // 2^gf in [FP_ONE, 2*FP_ONE)
-   const u128 inv = (FP_ONE * FP_ONE) / e2;    // 2^(-gf) in (FP_ONE/2, FP_ONE], Q48
+   const u128 inv = (FP_ONE * FP_ONE) / e2;    // 2^(-gf) in (FP_ONE/2, FP_ONE], Q60
    return inv >> gi;                           // * 2^(-gi)
 }
 
@@ -139,7 +139,7 @@ inline uint64_t out_given_in(uint64_t balance_in,  uint64_t weight_in,
 
    const u128 num  = balance_in;
    const u128 den  = static_cast<u128>(balance_in) + amount_in;
-   const u128 bpow = pow_frac_fp(num, den, weight_in, weight_out); // base^(w_in/w_out), Q48
+   const u128 bpow = pow_frac_fp(num, den, weight_in, weight_out); // base^(w_in/w_out), Q60
    // out = balance_out * (1 - base^e). Round the subtracted term UP so out is
    // floored: the reserve never over-pays on rounding.
    const u128 term = (static_cast<u128>(balance_out) * bpow + (FP_ONE - 1)) >> FP_BITS;
