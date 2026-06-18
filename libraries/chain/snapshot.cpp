@@ -631,16 +631,7 @@ void threaded_snapshot_reader::set_section(const string& section_name) {
 
 bool threaded_snapshot_reader::read_row(detail::abstract_snapshot_row_reader& row_reader) {
    row_reader.provide(ds);
-   if (++cur_row < num_rows)
-      return true;
-   // Last row consumed. A section's data_size is covered by the integrity/root hash but its
-   // row_count is not, so require the section data to be exactly consumed: a tampered (decreased)
-   // row_count would otherwise silently drop the trailing rows while still matching the attested
-   // hash, loading a node with state that diverges from the canonical chain.
-   SYS_ASSERT(ds.remaining() == 0, snapshot_exception,
-              "Snapshot section row_count does not match section data ({} bytes unread); "
-              "file may be tampered", ds.remaining());
-   return false;
+   return ++cur_row < num_rows;
 }
 
 bool threaded_snapshot_reader::empty ( ) {
@@ -648,6 +639,21 @@ bool threaded_snapshot_reader::empty ( ) {
 }
 
 void threaded_snapshot_reader::clear_section() {
+   // A section's data_size is covered by the integrity/root hash but its row_count (in the section
+   // index) is not. Enforce exact consumption of every selected section here — the universal
+   // teardown reached after read_section's callback for both loop readers (read until read_row
+   // returns false) and singleton readers (one read_row, return value ignored). Requiring
+   // cur_row == num_rows AND a fully-consumed datastream pins row_count to the hashed data in all
+   // cases: a row_count tampered down drops trailing rows (caught here or by a datastream overrun),
+   // and one tampered up leaves a singleton reader with cur_row < num_rows (which a per-read check
+   // in read_row would miss). num_rows == 0 means no section is active (e.g. return_to_header
+   // before any read), so skip. Checked before the madvise seekp(0) below, while ds is at the
+   // read position.
+   if(num_rows) {
+      SYS_ASSERT(cur_row == num_rows && ds.remaining() == 0, snapshot_exception,
+                 "Snapshot section not fully consumed (read {} of {} rows, {} bytes unread); "
+                 "file may be tampered", cur_row, num_rows, ds.remaining());
+   }
 #ifdef __linux__
    //this might work elsewhere, but unsure about alignment requirements on madvise() elsewhere
    if(num_rows) {
