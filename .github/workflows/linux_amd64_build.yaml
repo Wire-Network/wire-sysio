@@ -124,11 +124,6 @@ jobs:
           echo "$PWD"
           echo "=== vcpkg-manifest-install.log ==="
           cat build/vcpkg-manifest-install.log || true
-          echo "=== Other vcpkg logs ==="
-          find build -type f -name '*.log' | while read f; do
-            echo "----- $f -----"
-            tail -n 40 "$f"
-          done
 
       - name: Debug environment and workspace
         run: |
