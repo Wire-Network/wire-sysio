@@ -136,7 +136,15 @@ void snapshot_attest::votesnaphash(name snap_account, checksum256 block_id, chec
       ++provider_count;
    }
 
-   uint32_t quorum = std::max(cfg.min_providers, (provider_count * cfg.threshold_pct + 99) / 100);
+   // Byzantine-safe quorum floor: under the standard < N/3 fault assumption an attestation must
+   // carry more than N/3 of registered providers, so a Byzantine minority cannot on its own attest
+   // an arbitrary (block_id, snapshot_hash) — and, combined with the disagreement reject above,
+   // cannot win the race to quorum. Enforced independently of the governance-set min_providers /
+   // threshold_pct (which could be misconfigured as low as 1, allowing a single-provider attest).
+   const uint32_t bft_floor = provider_count / 3 + 1;
+   uint32_t quorum = std::max(std::max(cfg.min_providers,
+                                       (provider_count * cfg.threshold_pct + 99) / 100),
+                              bft_floor);
 
    if (voter_count >= quorum) {
       // Attestation reached -- create the record if it does not already exist.
