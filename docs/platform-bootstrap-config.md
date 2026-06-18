@@ -1,4 +1,4 @@
-# DEX bootstrap configuration
+# Platform bootstrap configuration
 
 Launch-day chains, tokens, reserves, and swap settings are described by a
 single human-authored JSON file validated against a protobuf schema. The
@@ -6,18 +6,24 @@ bootstrap tool replays that file onto the chain inside the epoch-0 bootstrap
 window, replacing the dataset that was previously hard-coded in the cluster
 tooling.
 
+> This is the WIRE **platform** bootstrap config — the launch-day registry
+> state (chains, tokens, reserves, global swap settings). The swap reserves it
+> seeds are one part of that state; it is not itself a DEX. (Earlier drafts
+> called the top-level message `DexConfig`; it is now `BootstrapPlatformConfig`.)
+
 This addresses three launch needs:
 
 | Need | Artifact |
 |---|---|
-| A T5 allocation set aside to back the WIRE side of reserves | `DexConfig.t5_reserve_allocation` — a genesis-config WIRE amount; config + bootstrap arithmetic, **no contract change** |
-| A file the bootstrap tool reads for DEX settings | `etc/config/dex/dex-config.*.json` |
-| A defined input shape for that file | `libraries/opp/proto/sysio/opp/bootstrap/bootstrap.proto` → message `DexConfig` |
+| A T5 allocation set aside to back the WIRE side of reserves | `BootstrapPlatformConfig.t5_reserve_allocation` — a genesis-config WIRE amount; config + bootstrap arithmetic, **no contract change** |
+| A T5 allocation set aside for launch DEX integration | `BootstrapPlatformConfig.t5_dex_allocation` — reserved earmark (default 0); the on-chain DEX-seeding mechanism is TBD (launch total set by Kyle / Ken) |
+| A file the bootstrap tool reads for these settings | `etc/config/dex/dex-config.*.json` |
+| A defined input shape for that file | `libraries/opp/proto/sysio/opp/bootstrap/bootstrap.proto` → message `BootstrapPlatformConfig` |
 
 The schema lives with the other OPP protos, so the existing codegen pipelines
 emit the host C++ (`bootstrap.pb.h`), contract (`bootstrap.pb.hpp`), and
 TS/Solidity/Solana models with no build-system changes. The JSON file is the
-canonical protobuf-JSON encoding of `DexConfig`.
+canonical protobuf-JSON encoding of `BootstrapPlatformConfig`.
 
 ## Files
 
@@ -28,14 +34,14 @@ canonical protobuf-JSON encoding of `DexConfig`.
 - `etc/config/dex/dex-config.dev.json` — 1:1 mirror of the dev-cluster dataset
   (9 tokens, 8 reserves), proving the schema carries the full set and driving
   the test.
-- `libraries/opp/test/test_dex_bootstrap_config.cpp` — strict-parse + invariant
-  test in the `test_opp` binary.
+- `libraries/opp/test/test_bootstrap_platform_config.cpp` — strict-parse +
+  invariant test in the `test_opp` binary.
 
 ## Schema
 
-`DexConfig` holds the schema version, a deployment label, the T5 reserve
-earmark, and repeated `ChainSpec` / `TokenSpec` / `ReserveSpec` plus a single
-`UwritConfig`.
+`BootstrapPlatformConfig` holds the schema version, a deployment label, the two
+T5 earmarks (`t5_reserve_allocation`, `t5_dex_allocation`), and repeated
+`ChainSpec` / `TokenSpec` / `ReserveSpec` plus a single `UwritConfig`.
 
 The spec messages deliberately differ from the registry carriers in
 `sysio/opp/types/types.proto` (`Chain` / `Token` / `ChainToken` / `Reserve`),
@@ -67,6 +73,7 @@ lifecycle fields that are outputs. A hand-authored config wants the opposite:
 | `ReserveSpec` | `sysio.reserv::regreserve(chain_code, token_code, reserve_code, name, description, initial_chain_amount, initial_wire_amount, connector_weight_bps, is_private, owner)` |
 | `UwritConfig` | `sysio.uwrit::setconfig(fee_bps, collateral_lock_duration_ms, fee_split_winner_pct, fee_split_other_uw_pct, fee_split_batch_op_pct)` |
 | `t5_reserve_allocation` | none — feeds the `setemitcfg` arithmetic below |
+| `t5_dex_allocation` | none yet — reserved earmark; carved out of T5 alongside `t5_reserve_allocation` once the DEX-seeding path lands |
 
 The `regreserve` signature (with `is_private` + `owner`) and the ms-based
 `setconfig` are the reserve-and-swap-beta surface; this config slots directly
@@ -102,6 +109,21 @@ the outside-the-pool earmark.
 Each bootstrap `regreserve` transaction must carry `sysio@active` (for the
 treasury drain) alongside `sysio.reserv@active`.
 
+## T5 DEX earmark
+
+`t5_dex_allocation` (`D`) is a second, parallel carve-out of the T5 allotment,
+reserved for launch DEX integration — at least one DEX is seeded at launch, with
+more added later by council vote. It follows the same outside-the-pool rule as
+the reserve earmark, so the full T5 carve-out is `E + D` and
+`t5_distributable = A − E − D`.
+
+It is **reserved**: the on-chain DEX-seeding mechanism is not finalized, so the
+bootstrap tool does not yet drain `D` — the field is carried for forward
+compatibility and defaults to `0` (earmark disabled). The launch total is a
+per-deployment economics decision (Kyle / Ken own the figure). When the seeding
+path lands, the `A − E` arithmetic above generalizes to `A − E − D` with no
+shape change to this config.
+
 ## Validation
 
 Parsing is **strict**: unknown / misspelled keys are rejected, not dropped,
@@ -124,17 +146,17 @@ Run the test:
 
 ```bash
 ninja -C build test_opp
-./build/libraries/opp/test_opp --run_test=dex_bootstrap_config
+./build/libraries/opp/test_opp --run_test=bootstrap_platform_config
 ```
 
 ## Follow-ups
 
-- Wire the bootstrap tool to consume `DexConfig` (the cluster phases become a
+- Wire the bootstrap tool to consume `BootstrapPlatformConfig` (the cluster phases become a
   loop over the parsed config, same order: chains → tokens → bindings →
   reserves → uwrit), injecting per-deployment contract addresses from
   deployment artifacts into the dev config.
 - Regenerate the TS/Solidity/Solana model bundles so the tool imports the
-  generated `DexConfig` type.
+  generated `BootstrapPlatformConfig` type.
 - Fill in launch economics (`t5_reserve_allocation` + per-reserve amounts) and
   verified mainnet addresses; freeze `dex-config.mainnet.json`.
 
