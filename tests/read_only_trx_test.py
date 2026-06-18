@@ -23,7 +23,7 @@ errorExit=Utils.errorExit
 
 appArgs=AppArgs()
 appArgs.add(flag="--read-only-threads", type=int, help="number of read-only threads", default=0)
-appArgs.add(flag="--read-only-read-window-time-us", type=int, help="read-only read window in microseconds", default=750000)
+appArgs.add(flag="--read-only-read-window-time-us", type=int, help="read-only read window in microseconds", default=1000000)
 appArgs.add(flag="--num-test-runs", type=int, help="number of times to run the tests", default=1)
 appArgs.add(flag="--sys-vm-oc-enable", type=str, help="specify sys-vm-oc-enable option", default=Utils.SysVmOcEnableAuto)
 appArgs.add(flag="--wasm-runtime", type=str, help="if wanting sys-vm-oc, must use 'sys-vm-oc-forced'",
