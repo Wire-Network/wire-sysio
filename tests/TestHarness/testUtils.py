@@ -95,8 +95,137 @@ class Utils:
     ConfigDir=f"{DataPath}/"
 
     TimeFmt='%Y-%m-%dT%H:%M:%S.%f'
-    # Lock subprocess_results.log writes across threads.
+    TestPortOffsetEnvVar="SYSIO_TEST_PORT_OFFSET"
+    PortShip="ship"
+    PortStateHistory="state_history"
+    PortBiosHttp="bios_http"
+    PortBiosP2P="bios_p2p"
+    PortNodeHttp="node_http"
+    PortAlternateService="alternate_service"
+    PortPluginHttpPeer="plugin_http_peer"
+    PortPluginHttpLocal="plugin_http_local"
+    PortAlternateP2P="alternate_p2p"
+    PortP2P="p2p"
+    PortWallet="wallet"
+    PortTransactionOnly="transaction_only"
+    PortIpv6Probe="ipv6_probe"
+    WalletPortCount=5
+    TransactionOnlyPortCount=2
+    Ipv6ProbePortCount=4
+    PortWalletSlot=164
+    PortTransactionOnlySlot=PortWalletSlot + WalletPortCount
+    PortIpv6ProbeSlot=PortTransactionOnlySlot + TransactionOnlyPortCount
+    _testPortOffset=None
+    _nodeopHelpOutput=None
+    # Lock subprocess_results.log writes and cached nodeop option discovery across threads.
     _check_output_lock = threading.Lock()
+
+    @staticmethod
+    def getTestPortOffset():
+        """Return the configured per-test port shard offset."""
+        if Utils._testPortOffset is not None:
+            return Utils._testPortOffset
+
+        rawOffset=os.environ.get(Utils.TestPortOffsetEnvVar, "0")
+        if not re.fullmatch(r"[0-9]+", rawOffset):
+            raise RuntimeError(f"{Utils.TestPortOffsetEnvVar} must be an unsigned integer, got '{rawOffset}'")
+        offset=int(rawOffset)
+
+        Utils._testPortOffset=offset
+        return offset
+
+    @staticmethod
+    def getPort(port_category, index=0):
+        """Return a deterministic port from this test's compact port shard.
+
+        port_category names the listener class and index selects a listener
+        within that class.  CTest assigns each test a unique shard offset, and
+        this allocator keeps all known listener classes inside one bounded
+        192-port shard below the ephemeral range.
+        """
+        assert(isinstance(port_category, str))
+        assert(isinstance(index, int))
+        if index < 0:
+            raise RuntimeError(f"Port index must be non-negative, got {index}")
+
+        slotRanges={
+            Utils.PortShip: (0, 1),
+            Utils.PortStateHistory: (1, 1),
+            Utils.PortBiosHttp: (2, 1),
+            Utils.PortNodeHttp: (3, 88),
+            Utils.PortAlternateService: (91, 1),
+            Utils.PortPluginHttpPeer: (92, 1),
+            Utils.PortPluginHttpLocal: (93, 1),
+            Utils.PortBiosP2P: (94, 1),
+            Utils.PortAlternateP2P: (95, 46),
+            Utils.PortP2P: (141, 23),
+            Utils.PortWallet: (Utils.PortWalletSlot, Utils.WalletPortCount),
+            Utils.PortTransactionOnly: (Utils.PortTransactionOnlySlot, Utils.TransactionOnlyPortCount),
+            Utils.PortIpv6Probe: (Utils.PortIpv6ProbeSlot, Utils.Ipv6ProbePortCount),
+        }
+
+        if port_category not in slotRanges:
+            raise RuntimeError(f"Unknown port category '{port_category}'")
+
+        slotStart, slotCount=slotRanges[port_category]
+        if index >= slotCount:
+            raise RuntimeError(
+                f"Port index {index} is outside category '{port_category}' capacity {slotCount}")
+
+        offset=Utils.getTestPortOffset()
+        if offset == 0:
+            # The unsharded wallet and transaction-only defaults intentionally preserve
+            # historical manual-test ports, including their legacy overlap at 9902/9903.
+            defaultPorts={
+                Utils.PortShip: 7899,
+                Utils.PortStateHistory: 8080,
+                Utils.PortBiosHttp: 8788,
+                Utils.PortBiosP2P: 9776,
+                Utils.PortNodeHttp: 8888,
+                Utils.PortAlternateService: 8976,
+                Utils.PortPluginHttpPeer: 9009,
+                Utils.PortPluginHttpLocal: 9011,
+                Utils.PortAlternateP2P: 9777,
+                Utils.PortP2P: 9876,
+                Utils.PortWallet: 9899,
+                Utils.PortTransactionOnly: 9902,
+                Utils.PortIpv6Probe: 9997,
+            }
+            shiftedPort=defaultPorts[port_category] + index
+        else:
+            shiftedPort=8888 + offset + slotStart + index
+
+        if shiftedPort < 1 or shiftedPort > 65535:
+            raise RuntimeError(
+                f"Port category '{port_category}' index {index} shifted by "
+                f"{Utils.TestPortOffsetEnvVar}={Utils.getTestPortOffset()} "
+                f"produces invalid port {shiftedPort}")
+        return shiftedPort
+
+    @staticmethod
+    def nodeopSupportsOption(option):
+        """Return whether the built nodeop binary advertises the given command-line option."""
+        with Utils._check_output_lock:
+            if Utils._nodeopHelpOutput is None:
+                try:
+                    result=subprocess.run(
+                        [Utils.SysServerPath, "--help"],
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.STDOUT,
+                        text=True,
+                        check=False)
+                except OSError as ex:
+                    raise RuntimeError(
+                        f"Unable to inspect nodeop options with '{Utils.SysServerPath} --help': {ex}"
+                    ) from ex
+                if result.returncode != 0 or not result.stdout.strip():
+                    raise RuntimeError(
+                        f"Unable to inspect nodeop options with '{Utils.SysServerPath} --help': "
+                        f"return code {result.returncode}, output: {result.stdout}"
+                    )
+                Utils._nodeopHelpOutput=result.stdout
+
+        return re.search(rf"^\s*{re.escape(option)}([=\s]|$)", Utils._nodeopHelpOutput, re.MULTILINE) is not None
 
     @staticmethod
     def _wasmCapabilities():
@@ -468,7 +597,7 @@ class Utils:
 
     @staticmethod
     def arePortsAvailable(ports):
-        """Check if specified port (as int) or ports (as set) is/are available for listening on."""
+        """Check whether final, already-sharded ports are available for listening on."""
         assert(ports)
         if isinstance(ports, int):
             ports={ports}

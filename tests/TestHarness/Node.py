@@ -84,6 +84,44 @@ class Node(Transactions):
         return "Host: %s, Port:%d, NodeNum:%s, Pid:%s" % (self.host, self.port, self.nodeId, self.pid)
 
     @staticmethod
+    def _portFromEndpoint(endpoint):
+        """Return the numeric TCP port from a nodeop endpoint argument."""
+        if endpoint is None:
+            return None
+
+        portText = endpoint.rsplit(":", 1)[-1].strip("[]")
+        try:
+            return int(portText)
+        except ValueError:
+            return None
+
+    @staticmethod
+    def _listenerPortsFromCmd(cmd):
+        """Return final listener ports declared in a nodeop command line."""
+        listenerArgs = {
+            "--http-server-address",
+            "--p2p-listen-endpoint",
+            "--state-history-endpoint",
+        }
+        ports = set()
+        for index, arg in enumerate(cmd):
+            endpoint = None
+            if arg in listenerArgs and index + 1 < len(cmd):
+                endpoint = cmd[index + 1]
+            else:
+                for listenerArg in listenerArgs:
+                    prefix = listenerArg + "="
+                    if arg.startswith(prefix):
+                        endpoint = arg[len(prefix):]
+                        break
+
+            port = Node._portFromEndpoint(endpoint)
+            if port is not None:
+                ports.add(port)
+
+        return ports
+
+    @staticmethod
     def __printTransStructureError(trans, context):
         Utils.Print("ERROR: Failure in expected transaction structure. Missing trans%s." % (context))
         Utils.Print("Transaction: %s" % (json.dumps(trans, indent=1)))
@@ -499,18 +537,28 @@ class Node(Transactions):
                 self.popenProc.wait()
             self.pid=None
 
-    def launchCmd(self, cmd: List[str], data_dir: Path, launch_time: str):
+    def launchCmd(self, cmd: List[str], data_dir: Path, launch_time: str, waitForPorts=True):
+        """Launch a nodeop command, optionally waiting for declared listener ports before spawning."""
         dd = data_dir
         out = dd / 'stdout.txt'
         err_sl = dd / 'stderr.txt'
         err = dd / Path(f'stderr.{launch_time}.txt')
         pidf = dd / Path(f'{Utils.SysServerName}.pid')
+        ports = Node._listenerPortsFromCmd(cmd)
 
         # make sure unique file name to avoid overwrite of existing log file
         i = 0
         while err.is_file():
             i = i + 1
             err = dd / Path(f'stderr.{launch_time}-{i}.txt')
+
+        if waitForPorts and ports:
+            def areNodePortsAvailable():
+                """Wait until this node's concrete listener ports can be bound."""
+                return Utils.arePortsAvailable(ports)
+
+            if not Utils.waitForBool(areNodePortsAvailable, Utils.systemWaitTimeout, sleepTime=2):
+                Utils.errorExit("Failed to find free node listener ports: %s" % sorted(ports))
 
         Utils.Print(f'spawning child: {" ".join(cmd)}')
         dd.mkdir(parents=True, exist_ok=True)

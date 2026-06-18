@@ -108,7 +108,7 @@ try:
     throttlingNode.cmd[i+1] = throttlingNode.cmd[i+1] + ':20KB/s'
     throttleListenIP, throttleListenPort = throttleListenAddr.split(':')
     throttlingNode.cmd.append('--p2p-listen-endpoint')
-    unThrottleListenAddr = f'{throttleListenIP}:{int(throttleListenPort)+100}'
+    unThrottleListenAddr = f'{throttleListenIP}:{Utils.getPort(Utils.PortAlternateP2P, 0)}'
     throttlingNode.cmd.append(f'{unThrottleListenAddr}:1TB/s')
 
     cluster.biosNode.kill(signal.SIGTERM)

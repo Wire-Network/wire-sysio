@@ -66,13 +66,14 @@ try:
     # Configure unstarted nodes with auth args baked into their start commands.
     # JSON values must survive shlex.split in the launcher — protect with single quotes.
     # Node1 (authorized): trusts node0's key, provides its own identity
+    node0P2pEndpoint = cluster.getNodeP2pEndpoint(0)
     specificExtraNodeopArgs = {}
     specificExtraNodeopArgs[0] = "--plugin sysio::net_api_plugin"
     specificExtraNodeopArgs[1] = (
         f"--allowed-connection specified"
         f" --peer-key '{peer_key_json(KEY0_PUB)}'"
         f" --peer-private-key '{peer_private_key_json(KEY1_PUB, KEY1_PVT)}'"
-        f" --p2p-peer-address localhost:9876"
+        f" --p2p-peer-address {node0P2pEndpoint}"
     )
     # Node2 (unauthorized): authenticates itself with KEY2 (not trusted by node0).
     # Must trust node0's KEY0 so it doesn't preemptively reject node0 before
@@ -81,7 +82,7 @@ try:
         f"--allowed-connection specified"
         f" --peer-key '{peer_key_json(KEY0_PUB)}'"
         f" --peer-private-key '{peer_private_key_json(KEY2_PUB, KEY2_PVT)}'"
-        f" --p2p-peer-address localhost:9876"
+        f" --p2p-peer-address {node0P2pEndpoint}"
     )
 
     Print("Stand up cluster: 1 producer, 2 unstarted nodes")

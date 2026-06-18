@@ -37,8 +37,8 @@ class AppArgs:
 # pylint: disable=too-many-instance-attributes
 class TestHelper(object):
     LOCAL_HOST="localhost"
-    DEFAULT_PORT=8888
-    DEFAULT_WALLET_PORT=9899
+    DEFAULT_PORT=Utils.getPort(Utils.PortNodeHttp)
+    DEFAULT_WALLET_PORT=Utils.getPort(Utils.PortWallet)
 
     @staticmethod
     # pylint: disable=too-many-branches
@@ -195,3 +195,5 @@ class TestHelper(object):
             walletMgr.testFailed = not testSuccessful
 
         cluster.shutdown()
+        if walletMgr:
+            walletMgr.shutdown()

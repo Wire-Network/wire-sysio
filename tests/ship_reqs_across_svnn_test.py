@@ -49,7 +49,13 @@ try:
 
     shipNodeNum = 1
     specificExtraNodeopArgs={}
-    specificExtraNodeopArgs[shipNodeNum]="--plugin sysio::state_history_plugin --trace-history --chain-state-history --state-history-stride 200 --plugin sysio::net_api_plugin --plugin sysio::producer_api_plugin --finality-data-history"
+    specificExtraNodeopArgs[shipNodeNum]=(
+        "--plugin sysio::state_history_plugin "
+        "--trace-history --chain-state-history "
+        "--state-history-stride 200 "
+        f"--state-history-endpoint 127.0.0.1:{Utils.getPort(Utils.PortStateHistory)} "
+        "--plugin sysio::net_api_plugin --plugin sysio::producer_api_plugin --finality-data-history"
+    )
 
     if cluster.launch(topo="mesh", pnodes=totalProducerNodes, totalNodes=totalNodes,
                       activateIF=True,
@@ -71,7 +77,12 @@ try:
 
     # Start a SHiP client and request blocks between start_block_num and end_block_num
     shipClient = "tests/ship_streamer"
-    cmd = f"{shipClient} --start-block-num {start_block_num} --end-block-num {end_block_num} --fetch-block --fetch-traces --fetch-deltas --fetch-finality-data"
+    shipSocketAddress = f"127.0.0.1:{Utils.getPort(Utils.PortStateHistory)}"
+    cmd = (
+        f"{shipClient} --socket-address {shipSocketAddress} "
+        f"--start-block-num {start_block_num} --end-block-num {end_block_num} "
+        "--fetch-block --fetch-traces --fetch-deltas --fetch-finality-data"
+    )
     if Utils.Debug: Utils.Print(f"cmd: {cmd}")
     shipTempDir = os.path.join(Utils.DataDir, "ship")
     os.makedirs(shipTempDir, exist_ok = True)

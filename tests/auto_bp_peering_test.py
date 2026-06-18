@@ -41,11 +41,10 @@ cluster = Cluster(unshared=args.unshared, keepRunning=args.leave_running, keepLo
 cluster.setWalletMgr(walletMgr)
 
 def getHostName(nodeId):
-    port = cluster.p2pBasePort + nodeId
     if producer_name == 'defproducerf':
         hostname = 'ext-ip0:9999'
     else:
-        hostname = "localhost:" + str(port)
+        hostname = cluster.getNodeP2pEndpoint(nodeId)
     return hostname
 
 peer_names = {}
@@ -53,13 +52,12 @@ peer_names = {}
 auto_bp_peer_args = ""
 for nodeId in range(0, producerNodes):
     producer_name = "defproducer" + chr(ord('a') + nodeId)
-    port = cluster.p2pBasePort + nodeId
     hostname = getHostName(nodeId)
     peer_names[hostname] = producer_name
     auto_bp_peer_args += (" --p2p-auto-bp-peer " + producer_name + "," + hostname)
 
 
-peer_names["localhost:9776"] = "bios"
+peer_names[cluster.getBiosP2pEndpoint()] = "bios"
 
 testSuccessful = False
 try:

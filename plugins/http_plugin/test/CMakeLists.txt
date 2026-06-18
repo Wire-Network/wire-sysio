@@ -7,7 +7,8 @@ target_link_libraries( http_plugin_unit_tests
                        PRIVATE http_plugin        
                        ${CMAKE_DL_LIBS} ${PLATFORM_SPECIFIC_LIBS} )
 
-target_include_directories( http_plugin_unit_tests PUBLIC
-                            ${CMAKE_SOURCE_DIR}/plugins/http_plugin/include )
+target_include_directories( http_plugin_unit_tests PRIVATE
+                            ${CMAKE_SOURCE_DIR}/plugins/http_plugin/include
+                            ${CMAKE_SOURCE_DIR}/tests )
 
 add_np_test( NAME http_plugin_unit_tests COMMAND http_plugin_unit_tests )

@@ -49,22 +49,24 @@ try:
     Print("Stand up cluster")
     # Custom topology:
     #    prodNode00 <-> nonProdNode01
-    #                        -> noBlocks02 :9902 (p2p-listen-address with trx only) (speculative mode)
-    #                        -> noBlocks03 :9903 (p2p-listen-address with trx only)
+    #                        -> noBlocks02 : trx-only listener (speculative mode)
+    #                        -> noBlocks03 : trx-only listener
     #
     # 01-nonProdNode connects to 02 & 03, but 02 & 03 do not connect to 01 so they will not receive any blocks
     # 02 & 03 are connected to the bios node to get blocks until bios node is killed.
     #
     specificExtraNodeopArgs = {}
+    trxOnlyPort02 = Utils.getPort(Utils.PortTransactionOnly)
+    trxOnlyPort03 = Utils.getPort(Utils.PortTransactionOnly, 1)
     # nonProdNode01 will connect normally but will not send blocks because 02 & 03 have specified :trx only
-    specificExtraNodeopArgs[1] = f'--p2p-peer-address localhost:9902 --p2p-peer-address localhost:9903 '
+    specificExtraNodeopArgs[1] = f'--p2p-peer-address localhost:{trxOnlyPort02} --p2p-peer-address localhost:{trxOnlyPort03} '
     # add a trx only listen endpoint to noBlocks02 & noBlocks03
-    specificExtraNodeopArgs[2] =  f'--p2p-peer-address localhost:9776 --read-mode speculative ' # connect to bios
-    specificExtraNodeopArgs[2] += f'--p2p-listen-endpoint localhost:9878 --p2p-server-address localhost:9878 '
-    specificExtraNodeopArgs[2] += f'--p2p-listen-endpoint localhost:9902:trx --p2p-server-address localhost:9902:trx '
-    specificExtraNodeopArgs[3] =  f'--p2p-peer-address localhost:9776 ' # connect to bios
-    specificExtraNodeopArgs[3] += f'--p2p-listen-endpoint localhost:9879 --p2p-server-address localhost:9879 '
-    specificExtraNodeopArgs[3] += f'--p2p-listen-endpoint localhost:9903:trx --p2p-server-address localhost:9903:trx '
+    specificExtraNodeopArgs[2] =  f'--p2p-peer-address {cluster.getBiosP2pEndpoint()} --read-mode speculative ' # connect to bios
+    specificExtraNodeopArgs[2] += f'--p2p-listen-endpoint {cluster.getNodeP2pEndpoint(2)} --p2p-server-address {cluster.getNodeP2pEndpoint(2)} '
+    specificExtraNodeopArgs[2] += f'--p2p-listen-endpoint localhost:{trxOnlyPort02}:trx --p2p-server-address localhost:{trxOnlyPort02}:trx '
+    specificExtraNodeopArgs[3] =  f'--p2p-peer-address {cluster.getBiosP2pEndpoint()} ' # connect to bios
+    specificExtraNodeopArgs[3] += f'--p2p-listen-endpoint {cluster.getNodeP2pEndpoint(3)} --p2p-server-address {cluster.getNodeP2pEndpoint(3)} '
+    specificExtraNodeopArgs[3] += f'--p2p-listen-endpoint localhost:{trxOnlyPort03}:trx --p2p-server-address localhost:{trxOnlyPort03}:trx '
     if cluster.launch(pnodes=pnodes, unstartedNodes=2, totalNodes=total_nodes, prodCount=prod_count,
                       extraNodeopArgs="--connection-cleanup-period 3", specificExtraNodeopArgs=specificExtraNodeopArgs,
                       topo='./tests/p2p_no_blocks_test_shape.json', delay=delay, activateIF=activateIF, biosFinalizer=False) is False:

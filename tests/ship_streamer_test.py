@@ -71,7 +71,13 @@ try:
 
     shipNodeNum = 3
     specificExtraNodeopArgs={}
-    specificExtraNodeopArgs[shipNodeNum]="--plugin sysio::state_history_plugin --trace-history --chain-state-history --state-history-stride 200 --plugin sysio::net_api_plugin --plugin sysio::producer_api_plugin "
+    specificExtraNodeopArgs[shipNodeNum]=(
+        "--plugin sysio::state_history_plugin "
+        "--trace-history --chain-state-history "
+        "--state-history-stride 200 "
+        f"--state-history-endpoint 127.0.0.1:{Utils.getPort(Utils.PortStateHistory)} "
+        "--plugin sysio::net_api_plugin --plugin sysio::producer_api_plugin "
+    )
     if args.finality_data_history:
         specificExtraNodeopArgs[shipNodeNum]+=" --finality-data-history"
     # producer nodes will be mapped to 0 through totalProducerNodes-1, so the number totalProducerNodes will be the non-producing node
@@ -145,7 +151,17 @@ try:
     end_block_num = start_block_num + block_range
 
     shipClient = "tests/ship_streamer"
-    cmd = f"{shipClient} --start-block-num {start_block_num} --end-block-num {end_block_num} --fetch-block --fetch-traces --fetch-deltas"
+    shipSocketAddress = f"127.0.0.1:{Utils.getPort(Utils.PortStateHistory)}"
+
+    def makeShipStreamerCmd(startBlockNum, endBlockNum):
+        """Return a ship_streamer command targeting this test's sharded SHiP endpoint."""
+        return (
+            f"{shipClient} --socket-address {shipSocketAddress} "
+            f"--start-block-num {startBlockNum} --end-block-num {endBlockNum} "
+            "--fetch-block --fetch-traces --fetch-deltas"
+        )
+
+    cmd = makeShipStreamerCmd(start_block_num, end_block_num)
     if args.finality_data_history:
         cmd += "  --fetch-finality-data"
     if Utils.Debug: Utils.Print(f"cmd: {cmd}")
@@ -326,7 +342,7 @@ try:
     start_block_num = afterReplayBlockNum
     block_range = 0
     end_block_num = start_block_num + block_range
-    cmd = f"{shipClient} --start-block-num {start_block_num} --end-block-num {end_block_num} --fetch-block --fetch-traces --fetch-deltas"
+    cmd = makeShipStreamerCmd(start_block_num, end_block_num)
     if args.finality_data_history:
         cmd += "  --fetch-finality-data"
     if Utils.Debug: Utils.Print(f"cmd: {cmd}")
@@ -346,7 +362,7 @@ try:
     start_block_num = afterSnapshotBlockNum
     block_range = 0
     end_block_num = start_block_num + block_range
-    cmd = f"{shipClient} --start-block-num {start_block_num} --end-block-num {end_block_num} --fetch-block --fetch-traces --fetch-deltas"
+    cmd = makeShipStreamerCmd(start_block_num, end_block_num)
     if args.finality_data_history:
         cmd += "  --fetch-finality-data"
     if Utils.Debug: Utils.Print(f"cmd: {cmd}")
