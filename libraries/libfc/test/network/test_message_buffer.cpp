@@ -305,6 +305,30 @@ BOOST_AUTO_TEST_CASE(message_buffer_read_peek_bounds_multi) {
    BOOST_CHECK_THROW(mbuff.read(&throw_away_buffer, 1), fc::out_of_range_exception);
 }
 
+// A read advance must never exceed the buffered bytes. The net_plugin early-dedup path computed
+// `message_length - header_bytes` from a peer-declared frame length; a frame shorter than the
+// already-consumed header underflowed that unsigned subtraction to ~4.29e9, over-popping the
+// buffer deque (undefined behavior). The bound in advance_read_ptr converts that into a catchable
+// exception (the net read loop then closes the offending peer).
+BOOST_AUTO_TEST_CASE(message_buffer_advance_read_ptr_bounds) {
+   using my_message_buffer_t = fc::message_buffer<1024>;
+   my_message_buffer_t mbuff;
+   unsigned char stuff[12] = { 0 };
+   memcpy(mbuff.write_ptr(), stuff, sizeof(stuff));
+   mbuff.advance_write_ptr(sizeof(stuff));            // 12 bytes available to read
+   BOOST_CHECK_EQUAL(mbuff.bytes_to_read(), 12u);
+
+   // Advancing more than the buffered bytes must throw rather than corrupt the chain.
+   BOOST_CHECK_THROW(mbuff.advance_read_ptr(13), fc::assert_exception);
+   // The exact unsigned-underflow value (5 - 33 as uint32_t == 4294967268) must also throw, not wrap.
+   BOOST_CHECK_THROW(mbuff.advance_read_ptr(static_cast<uint32_t>(5) - static_cast<uint32_t>(33)),
+                     fc::assert_exception);
+   // State is unchanged after the rejected advances; an in-bounds advance still works.
+   BOOST_CHECK_EQUAL(mbuff.bytes_to_read(), 12u);
+   mbuff.advance_read_ptr(12);
+   BOOST_CHECK_EQUAL(mbuff.bytes_to_read(), 0u);
+}
+
 BOOST_AUTO_TEST_CASE(message_buffer_datastream) {
    using my_message_buffer_t = fc::message_buffer<1024>;
    my_message_buffer_t mbuff;

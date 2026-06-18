@@ -616,6 +616,11 @@ void threaded_snapshot_reader::set_section(const string& section_name) {
       if(entry.name == section_name) {
          cur_row = 0;
          num_rows = entry.row_count;
+         // An empty section carries no data bytes (writer invariant). Enforce it so a tampered
+         // row_count of 0 cannot hide a non-empty, hash-pinned data range from ever being read.
+         SYS_ASSERT(num_rows != 0 || entry.data_size == 0, snapshot_exception,
+                    "Snapshot section '{}' has row_count 0 but {} bytes of data; file may be tampered",
+                    section_name, entry.data_size);
          ds = fc::datastream<const char*>(mapped_snap_addr + entry.data_offset, entry.data_size);
          return;
       }
@@ -634,6 +639,21 @@ bool threaded_snapshot_reader::empty ( ) {
 }
 
 void threaded_snapshot_reader::clear_section() {
+   // A section's data_size is covered by the integrity/root hash but its row_count (in the section
+   // index) is not. Enforce exact consumption of every selected section here — the universal
+   // teardown reached after read_section's callback for both loop readers (read until read_row
+   // returns false) and singleton readers (one read_row, return value ignored). Requiring
+   // cur_row == num_rows AND a fully-consumed datastream pins row_count to the hashed data in all
+   // cases: a row_count tampered down drops trailing rows (caught here or by a datastream overrun),
+   // and one tampered up leaves a singleton reader with cur_row < num_rows (which a per-read check
+   // in read_row would miss). num_rows == 0 means no section is active (e.g. return_to_header
+   // before any read), so skip. Checked before the madvise seekp(0) below, while ds is at the
+   // read position.
+   if(num_rows) {
+      SYS_ASSERT(cur_row == num_rows && ds.remaining() == 0, snapshot_exception,
+                 "Snapshot section not fully consumed (read {} of {} rows, {} bytes unread); "
+                 "file may be tampered", cur_row, num_rows, ds.remaining());
+   }
 #ifdef __linux__
    //this might work elsewhere, but unsure about alignment requirements on madvise() elsewhere
    if(num_rows) {
