@@ -5,6 +5,7 @@
 #include <sysio.authex/sysio.authex.hpp>
 #include <sysio.chains/sysio.chains.hpp>
 #include <sysio.opp.common/slug_name.hpp>
+#include <sysio.opp.common/amm_math.hpp>
 #include <sysio/opp/attestations/attestations.pb.hpp>
 #include <sysio/permission.hpp>
 #include <sysio/crypto.hpp>
@@ -164,19 +165,12 @@ uint64_t available_via_mirrors(name self,
    return balance > reserved ? balance - reserved : 0;
 }
 
-/// Constant-product output computed locally — mirrors sysio.reserv::swapquote
-/// (the uwrit mirror reads the same `reserves` rows; the math is replicated
-/// here so uwrit doesn't need to action-call into reserv from inside
-/// createuwreq).
-uint64_t cp_output(uint64_t reserve_src, uint64_t reserve_dst, uint64_t src_amount) {
-   if (reserve_src == 0 || reserve_dst == 0 || src_amount == 0) return 0;
-   uint128_t numerator   = static_cast<uint128_t>(reserve_dst) * src_amount;
-   uint128_t denominator = static_cast<uint128_t>(reserve_src) + src_amount;
-   uint128_t result      = numerator / denominator;
-   if (result > static_cast<uint128_t>(std::numeric_limits<uint64_t>::max())) {
-      return std::numeric_limits<uint64_t>::max();
-   }
-   return static_cast<uint64_t>(result);
+/// Live per-spoke swap fee (basis points) from `uwconfig`, read fresh so the
+/// ingestion variance check, the race-time recheck, and settlement all charge
+/// one rate. `self` is the uwrit contract account (where the singleton lives).
+uint32_t current_fee_bps(name self) {
+   uwrit::uwconfig_t cfg(self);
+   return cfg.get_or_default(uwrit::uw_config{}).fee_bps;
 }
 
 /// Find a reserve by its triple key, returning the row pointer-equivalent
@@ -193,57 +187,50 @@ std::optional<reserve::reserve_row> find_reserve(sysio::slug_name chain_code,
 }
 
 /// Quote `src_amount` of (src_chain, src_token, src_reserve) into
-/// (dst_chain, dst_token, dst_reserve) via the WIRE-paired reserves on
-/// sysio.reserv. Returns 0 if any required reserve is missing or not
-/// ACTIVE — caller treats 0 as "no quote available, skip variance check".
-/// Mirrors the math in `sysio.reserv::swapquote` so the variance check at
-/// SWAP_REQUEST receipt time doesn't pay for an inline action call.
+/// (dst_chain, dst_token, dst_reserve) along the depot's live curve. Mirrors
+/// `sysio.reserv::swapquote` exactly — the shared weighted-Bancor kernel (each
+/// reserve's `connector_weight_bps`) and the SAME post-fee reduction (`fee_bps`
+/// out of the WIRE leg) — so the variance check at SWAP_REQUEST receipt time
+/// matches what settlement will deliver, without an inline action call into
+/// reserv. Returns 0 if any required reserve is missing or not ACTIVE (caller
+/// treats 0 as "no quote available, skip variance check").
 ///
-/// WIRE-to-WIRE round-trip (paying out WIRE on both sides) is a no-op
-/// transfer of `src_amount`. Otherwise the path is:
-///   * (outpost-side X) -> WIRE via the X reserve
-///   * WIRE -> (outpost-side Y) via the Y reserve
-/// with cp_output running on the side that carries the non-WIRE token.
+/// A WIRE endpoint skips that leg's reserve (the depot IS the WIRE side);
+/// WIRE->WIRE is a plain `src_amount` passthrough.
 uint64_t swap_quote(sysio::slug_name src_chain_code,
                     sysio::slug_name src_token_code,
                     sysio::slug_name src_reserve_code,
                     sysio::slug_name dst_chain_code,
                     sysio::slug_name dst_token_code,
                     sysio::slug_name dst_reserve_code,
-                    uint64_t src_amount) {
+                    uint64_t src_amount,
+                    uint32_t fee_bps) {
    if (src_amount == 0) return 0;
-   if (src_token_code == WIRE_TOKEN && dst_token_code == WIRE_TOKEN) {
-      return src_amount;
-   }
+   const bool src_is_wire = (src_token_code == WIRE_TOKEN);
+   const bool dst_is_wire = (dst_token_code == WIRE_TOKEN);
+   if (src_is_wire && dst_is_wire) return src_amount;
 
-   auto active_or_null = [](std::optional<reserve::reserve_row>&& r)
-                            -> std::optional<reserve::reserve_row> {
-      if (!r) return std::nullopt;
-      if (r->status != ReserveStatus::RESERVE_STATUS_ACTIVE) return std::nullopt;
+   auto active = [](std::optional<reserve::reserve_row>&& r)
+                    -> std::optional<reserve::reserve_row> {
+      if (!r || r->status != ReserveStatus::RESERVE_STATUS_ACTIVE) return std::nullopt;
       return r;
    };
 
-   if (src_token_code == WIRE_TOKEN) {
-      auto r = active_or_null(find_reserve(dst_chain_code, dst_token_code, dst_reserve_code));
+   uint64_t sc = 0, sw = 0; uint32_t scw = 0;
+   if (!src_is_wire) {
+      auto r = active(find_reserve(src_chain_code, src_token_code, src_reserve_code));
       if (!r) return 0;
-      return cp_output(r->reserve_wire_amount, r->reserve_chain_amount, src_amount);
+      sc = r->reserve_chain_amount; sw = r->reserve_wire_amount; scw = r->connector_weight_bps;
    }
-   if (dst_token_code == WIRE_TOKEN) {
-      auto r = active_or_null(find_reserve(src_chain_code, src_token_code, src_reserve_code));
+   uint64_t dc = 0, dw = 0; uint32_t dcw = 0;
+   if (!dst_is_wire) {
+      auto r = active(find_reserve(dst_chain_code, dst_token_code, dst_reserve_code));
       if (!r) return 0;
-      return cp_output(r->reserve_chain_amount, r->reserve_wire_amount, src_amount);
+      dc = r->reserve_chain_amount; dw = r->reserve_wire_amount; dcw = r->connector_weight_bps;
    }
-
-   auto src_r = active_or_null(find_reserve(src_chain_code, src_token_code, src_reserve_code));
-   auto dst_r = active_or_null(find_reserve(dst_chain_code, dst_token_code, dst_reserve_code));
-   if (!src_r || !dst_r) return 0;
-   uint64_t intermediate = cp_output(src_r->reserve_chain_amount,
-                                      src_r->reserve_wire_amount,
-                                      src_amount);
-   if (intermediate == 0) return 0;
-   return cp_output(dst_r->reserve_wire_amount,
-                     dst_r->reserve_chain_amount,
-                     intermediate);
+   return opp::amm::quote_swap(src_is_wire, sc, sw, scw,
+                               dst_is_wire, dc, dw, dcw,
+                               src_amount, fee_bps);
 }
 
 /// Encode + queue a SWAP_REVERT attestation back to the source outpost when
@@ -625,27 +612,16 @@ uint64_t next_fromwire_id(name self) {
 //  setconfig
 // ---------------------------------------------------------------------------
 void uwrit::setconfig(uint32_t fee_bps,
-                      uint64_t collateral_lock_duration_ms,
-                      uint8_t  fee_split_winner_pct,
-                      uint8_t  fee_split_other_uw_pct,
-                      uint8_t  fee_split_batch_op_pct) {
+                      uint64_t collateral_lock_duration_ms) {
    require_auth(get_self());
    check(fee_bps <= 10000, "fee_bps cannot exceed 10000 (100%)");
    check(collateral_lock_duration_ms > 0,
          "collateral_lock_duration_ms must be positive");
-   const uint32_t split_total = static_cast<uint32_t>(fee_split_winner_pct)
-                              + static_cast<uint32_t>(fee_split_other_uw_pct)
-                              + static_cast<uint32_t>(fee_split_batch_op_pct);
-   check(split_total == 100,
-         "fee_split_*_pct must sum to 100");
 
    uwconfig_t cfg_tbl(get_self());
    uw_config cfg = cfg_tbl.get_or_default(uw_config{});
    cfg.fee_bps                     = fee_bps;
    cfg.collateral_lock_duration_ms = collateral_lock_duration_ms;
-   cfg.fee_split_winner_pct        = fee_split_winner_pct;
-   cfg.fee_split_other_uw_pct      = fee_split_other_uw_pct;
-   cfg.fee_split_batch_op_pct      = fee_split_batch_op_pct;
    cfg_tbl.set(cfg, ram_payer);
 }
 
@@ -796,7 +772,7 @@ void uwrit::createuwreq(uint64_t attestation_id,
    // matching reserves are present.
    const uint64_t current_quote = swap_quote(src_chain_code, src_token_code, src_reserve_code,
                                               dst_chain_code, dst_token_code, dst_reserve_code,
-                                              src_amount);
+                                              src_amount, current_fee_bps(get_self()));
    if (current_quote != 0 && sr.target_amount != 0) {
       uint64_t target   = sr.target_amount;
       uint64_t diff     = current_quote > target ? current_quote - target : target - current_quote;
@@ -924,7 +900,7 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate) {
       const uint64_t current_quote = swap_quote(
          req.src_chain_code, req.src_token_code, req.src_reserve_code,
          req.dst_chain_code, req.dst_token_code, req.dst_reserve_code,
-         req.src_amount);
+         req.src_amount, current_fee_bps(self));
       const uint64_t quoted = req.dst_amount;
       if (current_quote != 0 && quoted != 0) {
          const uint64_t diff = current_quote > quoted
@@ -1034,7 +1010,16 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate) {
       }
       towire_recipient = *rcpt;
       auto src_r = find_active_reserve(req.src_chain_code, req.src_token_code, req.src_reserve_code);
-      if (!src_r || src_r->reserve_wire_amount < req.dst_amount) {
+      // paywire gives up `dst_amount` (to the recipient) + the fee (on the gross
+      // WIRE leg) out of the source reserve's WIRE; pre-validate that exact sum.
+      const uint64_t w_gross = src_r
+         ? opp::amm::token_to_wire(src_r->reserve_chain_amount, src_r->reserve_wire_amount,
+                                   src_r->connector_weight_bps, req.src_amount)
+         : 0;
+      const uint64_t to_wire_fee = opp::amm::split_wire_fee(
+         w_gross, current_fee_bps(self), reserve::FEE_REWARD_SHARE_BPS).fee;
+      if (!src_r || w_gross == 0 ||
+          src_r->reserve_wire_amount < req.dst_amount + to_wire_fee) {
          sysio::print("try_select_winner: insufficient source-reserve WIRE for "
                       "to-WIRE payout on uwreq ", uwreq_id, ", skipping\n");
          return;
@@ -1054,11 +1039,15 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate) {
       // source row `applyswap` will read).
       auto src_r = find_active_reserve(req.src_chain_code, req.src_token_code, req.src_reserve_code);
       auto dst_r = find_active_reserve(req.dst_chain_code, req.dst_token_code, req.dst_reserve_code);
-      const uint64_t w = src_r
-         ? cp_output(src_r->reserve_chain_amount, src_r->reserve_wire_amount, req.src_amount)
+      // applyswap debits the gross weighted WIRE intermediate from the source
+      // (the fee is taken from it before the net reaches dst); pre-validate the
+      // same conditions applyswap will check.
+      const uint64_t w_gross = src_r
+         ? opp::amm::token_to_wire(src_r->reserve_chain_amount, src_r->reserve_wire_amount,
+                                   src_r->connector_weight_bps, req.src_amount)
          : 0;
-      if (!src_r || !dst_r || w == 0 ||
-          src_r->reserve_wire_amount < w ||
+      if (!src_r || !dst_r || w_gross == 0 ||
+          src_r->reserve_wire_amount < w_gross ||
           dst_r->reserve_chain_amount < req.dst_amount) {
          sysio::print("try_select_winner: insufficient reserve liquidity for "
                       "uwreq ", uwreq_id, ", skipping\n");
@@ -1383,7 +1372,8 @@ void uwrit::drainfwq() {
       // zero quote (unprovisioned LP) skips the check.
       const uint64_t quote = swap_quote(*depot_code, WIRE_TOKEN, WIRE_TOKEN,
                                          row.dst_chain_code, row.dst_token_code,
-                                         row.dst_reserve_code, row.wire_amount);
+                                         row.dst_reserve_code, row.wire_amount,
+                                         current_fee_bps(get_self()));
       if (quote != 0 && row.target_amount != 0) {
          const uint64_t diff = quote > row.target_amount
                                   ? quote - row.target_amount

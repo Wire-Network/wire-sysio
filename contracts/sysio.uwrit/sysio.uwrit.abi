@@ -244,18 +244,6 @@
                 {
                     "name": "collateral_lock_duration_ms",
                     "type": "uint64"
-                },
-                {
-                    "name": "fee_split_winner_pct",
-                    "type": "uint8"
-                },
-                {
-                    "name": "fee_split_other_uw_pct",
-                    "type": "uint8"
-                },
-                {
-                    "name": "fee_split_batch_op_pct",
-                    "type": "uint8"
                 }
             ]
         },
@@ -340,18 +328,6 @@
                 {
                     "name": "collateral_lock_duration_ms",
                     "type": "uint64"
-                },
-                {
-                    "name": "fee_split_winner_pct",
-                    "type": "uint8"
-                },
-                {
-                    "name": "fee_split_other_uw_pct",
-                    "type": "uint8"
-                },
-                {
-                    "name": "fee_split_batch_op_pct",
-                    "type": "uint8"
                 }
             ]
         },

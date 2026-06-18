@@ -59,9 +59,6 @@
   ],
   "uwrit": {
     "fee_bps": 10,
-    "collateral_lock_duration_ms": "43200000",
-    "fee_split_winner_pct": 50,
-    "fee_split_other_uw_pct": 25,
-    "fee_split_batch_op_pct": 25
+    "collateral_lock_duration_ms": "43200000"
   }
 }

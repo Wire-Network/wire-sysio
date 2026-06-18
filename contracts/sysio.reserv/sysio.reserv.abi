@@ -418,6 +418,25 @@
             ]
         },
         {
+            "name": "rewardbal",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "rewards_bucket",
+            "base": "",
+            "fields": [
+                {
+                    "name": "balance",
+                    "type": "uint64"
+                },
+                {
+                    "name": "lifetime_accrued",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "slug_name",
             "base": "",
             "fields": [
@@ -514,6 +533,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "rewardbal",
+            "type": "rewardbal",
+            "ricardian_contract": ""
+        },
+        {
             "name": "swapquote",
             "type": "swapquote",
             "ricardian_contract": ""
@@ -539,11 +563,23 @@
                     "table_id": 46081
                 }
             ]
+        },
+        {
+            "name": "rewardbkt",
+            "type": "rewards_bucket",
+            "index_type": "i64",
+            "key_names": ["name"],
+            "key_types": ["name"],
+            "table_id": 15326
         }
     ],
     "ricardian_clauses": [],
     "variants": [],
     "action_results": [
+        {
+            "name": "rewardbal",
+            "result_type": "uint64"
+        },
         {
             "name": "swapquote",
             "result_type": "uint64"

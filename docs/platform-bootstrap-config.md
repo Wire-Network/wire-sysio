@@ -71,7 +71,7 @@ lifecycle fields that are outputs. A hand-authored config wants the opposite:
 | `ChainSpec` | `sysio.chains::regchain(kind, code, external_chain_id, name, description)` |
 | `TokenSpec` | `sysio.tokens::regtoken(kind, code, symbol_name, description, precision, address)` then `sysio.tokens::regctok(chain_code, token_code, contract_addr, is_native)` |
 | `ReserveSpec` | `sysio.reserv::regreserve(chain_code, token_code, reserve_code, name, description, initial_chain_amount, initial_wire_amount, connector_weight_bps, is_private, owner)` |
-| `UwritConfig` | `sysio.uwrit::setconfig(fee_bps, collateral_lock_duration_ms, fee_split_winner_pct, fee_split_other_uw_pct, fee_split_batch_op_pct)` |
+| `UwritConfig` | `sysio.uwrit::setconfig(fee_bps, collateral_lock_duration_ms)` |
 | `t5_reserve_allocation` | none — feeds the `setemitcfg` arithmetic below |
 | `t5_dex_allocation` | none yet — reserved earmark; carved out of T5 alongside `t5_reserve_allocation` once the DEX-seeding path lands |
 
@@ -140,7 +140,7 @@ because the file is hand-authored and drives irreversible actions. A validator
 | V6 | reserve `(chain, token, code)` unique; references a declared binding; not on the depot; `0 < connector_weight_bps ≤ 10000`; amounts > 0 |
 | V7 | Σ `initial_wire_amount` ≤ `t5_reserve_allocation` > 0 |
 | V8 | `is_private` ⇒ `owner` a valid account name; else `owner` empty |
-| V9 | `uwrit` present; `fee_bps ≤ 10000`; lock duration > 0; fee splits sum to 100 |
+| V9 | `uwrit` present; `fee_bps ≤ 10000`; lock duration > 0 |
 
 Run the test:
 

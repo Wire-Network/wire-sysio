@@ -170,6 +170,13 @@ public:
       return bal.get_amount();
    }
 
+   /// Read the `rewards_bucket` singleton (kv::global). Null when never accrued.
+   fc::variant get_rewardbkt() {
+      auto data = get_row_by_account(RESERVE_ACCOUNT, RESERVE_ACCOUNT, "rewardbkt"_n, "rewardbkt"_n);
+      return data.empty() ? fc::variant() : abi_ser.binary_to_variant(
+         "rewards_bucket", data, abi_serializer::create_yield_function(abi_serializer_max_time));
+   }
+
    /// Walk every row in `sysio.reserv::reserves` (KV-keyed by checksum256)
    /// via the DB index and return the row whose slug_name triple matches.
    /// `get_row_by_id` only supports uint64 keys; this scan is the test-side
@@ -413,8 +420,48 @@ BOOST_FIXTURE_TEST_CASE(applyswap_applies_four_legs, sysio_reserve_tester) { try
    BOOST_REQUIRE_EQUAL(910,  src["reserve_wire_amount"].as_uint64());
    BOOST_REQUIRE_EQUAL(1090, dst["reserve_wire_amount"].as_uint64());
    BOOST_REQUIRE_EQUAL(950,  dst["reserve_chain_amount"].as_uint64());
-   // Σ reserve_wire_amount unchanged (910 + 1090 == 2000) — the w hop is
-   // internal; no real WIRE moved.
+   // Σ reserve_wire_amount unchanged (910 + 1090 == 2000) — at these tiny
+   // amounts the 0.1% fee floors to 0, so the w hop stays fully internal.
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(applyswap_charges_fee_and_routes_50_50, sysio_reserve_tester) { try {
+   // Large amounts so the default 0.1% (10 bps) fee is non-zero and routes.
+   BOOST_REQUIRE_EQUAL(success(),
+      regreserve("ETH", "ETH", "PRIMARY", 1'000'000'000'000ULL, 1'000'000'000'000ULL));
+   BOOST_REQUIRE_EQUAL(success(),
+      regreserve("SOLANA", "SOL", "PRIMARY", 1'000'000'000'000ULL, 1'000'000'000'000ULL));
+
+   const int64_t sysio_before = wire_balance(SYSIO_ACCOUNT);
+   const int64_t resv_before  = wire_balance(RESERVE_ACCOUNT);
+
+   // w_gross = cp_output(1e12, 1e12, 1e9) = 999'000'999 (50/50 = constant product).
+   // fee = 999'000'999 * 10 / 10000 = 999'000 ; reward = emis = 499'500 ;
+   // net = 999'000'999 - 999'000 = 998'001'999.
+   BOOST_REQUIRE_EQUAL(success(), push_action(UWRIT_ACCOUNT, "applyswap"_n, mvo()
+      ("src_chain_code",   codename_mvo("ETH"))
+      ("src_token_code",   codename_mvo("ETH"))
+      ("src_reserve_code", codename_mvo("PRIMARY"))
+      ("src_amount",       1'000'000'000ULL)
+      ("dst_chain_code",   codename_mvo("SOLANA"))
+      ("dst_token_code",   codename_mvo("SOL"))
+      ("dst_reserve_code", codename_mvo("PRIMARY"))
+      ("dst_amount",       100'000'000ULL)));
+
+   auto src = find_reserve("ETH", "ETH", "PRIMARY");
+   auto dst = find_reserve("SOLANA", "SOL", "PRIMARY");
+   // Source gives up the full gross WIRE; destination receives only the net.
+   BOOST_REQUIRE_EQUAL(1'000'000'000'000ULL - 999'000'999ULL, src["reserve_wire_amount"].as_uint64());
+   BOOST_REQUIRE_EQUAL(1'000'000'000'000ULL + 998'001'999ULL, dst["reserve_wire_amount"].as_uint64());
+   BOOST_REQUIRE_EQUAL(1'000'000'000'000ULL + 1'000'000'000ULL, src["reserve_chain_amount"].as_uint64());
+   BOOST_REQUIRE_EQUAL(1'000'000'000'000ULL - 100'000'000ULL,   dst["reserve_chain_amount"].as_uint64());
+
+   // Fee routed 50/50: reward half accrues in the bucket (stays in custody),
+   // emissions half is transferred to `sysio`.
+   auto bkt = get_rewardbkt();
+   BOOST_REQUIRE_EQUAL(499'500ULL, bkt["balance"].as_uint64());
+   BOOST_REQUIRE_EQUAL(499'500ULL, bkt["lifetime_accrued"].as_uint64());
+   BOOST_REQUIRE_EQUAL(sysio_before + 499'500, wire_balance(SYSIO_ACCOUNT));   // emissions half left custody
+   BOOST_REQUIRE_EQUAL(resv_before  - 499'500, wire_balance(RESERVE_ACCOUNT)); // only emissions half left
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(applyfromwire_credits_wire_and_debits_chain, sysio_reserve_tester) { try {
@@ -461,7 +508,7 @@ BOOST_FIXTURE_TEST_CASE(paywire_rejects_overdraw, sysio_reserve_tester) { try {
    BOOST_REQUIRE_EQUAL(success(),
       regreserve("ETH", "ETH", "PRIMARY", 1000, 100));
    BOOST_REQUIRE_EQUAL(
-      error("assertion failure with message: paywire: insufficient source reserve WIRE for payout"),
+      error("assertion failure with message: paywire: insufficient source reserve WIRE for payout + fee"),
       push_action(UWRIT_ACCOUNT, "paywire"_n, mvo()
          ("src_chain_code",   codename_mvo("ETH"))
          ("src_token_code",   codename_mvo("ETH"))
