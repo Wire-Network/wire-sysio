@@ -455,4 +455,27 @@ BOOST_FIXTURE_TEST_CASE(getsnaphash_action_not_found, snapshot_attest_tester) { 
                            ("block_num", 99999)));
 } FC_LOG_AND_RETHROW() }
 
+// A misconfigured low quorum (min_providers=1) must NOT let a single provider attest an arbitrary
+// (block_id, snapshot_hash): votesnaphash enforces a Byzantine quorum floor (provider_count/3 + 1)
+// independently of the governance config, so a fault minority cannot attest on its own (which would
+// drive honest providers whose hash differs to self-shutdown).
+BOOST_FIXTURE_TEST_CASE(votesnaphash_enforces_byzantine_quorum_floor, snapshot_attest_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer3"_n, "snapprov3"_n));
+   // Low/misconfigured quorum — without the floor, one vote would attest.
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1, 1));
+
+   const auto bid  = make_block_id(1000);
+   const auto hash = make_snap_hash(1);
+
+   // 3 providers -> floor = 3/3 + 1 = 2. A single vote must NOT create an attested record.
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, bid, hash));
+   BOOST_REQUIRE(getsnaphash(1000).is_null());
+
+   // A second agreeing vote reaches the floor and attests.
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov2"_n, bid, hash));
+   BOOST_REQUIRE(!getsnaphash(1000).is_null());
+} FC_LOG_AND_RETHROW() }
+
 BOOST_AUTO_TEST_SUITE_END()
