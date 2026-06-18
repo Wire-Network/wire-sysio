@@ -212,7 +212,8 @@ static constexpr uint16_t GOV_BPS                = 1000;
 // lazily via sysio.dclaim::onreward -> sysio.system::fundclaim, not paid at
 // payepoch -- so it doesn't appear in t5state.total_distributed until the
 // underlying fundclaim transfer happens.
-static constexpr uint16_t IMPLICIT_CAPITAL_BPS   = 10000 - COMPUTE_BPS - CAPEX_BPS - GOV_BPS;
+// The implicit capital reserve at these defaults is
+// 10000 - COMPUTE_BPS - CAPEX_BPS - GOV_BPS = 3000 bps.
 static constexpr uint16_t PRODUCER_BPS           = 7000;
 
 // Performance-based pay constants (keep in sync with emissions.cpp)

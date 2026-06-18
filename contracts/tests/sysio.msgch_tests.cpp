@@ -330,7 +330,6 @@ using fc::slug_name_literals::operator""_s;
 /// tests register one EVM-class chain via `register_outpost(...)` which uses
 /// the spelling `"ETH"`. ETH_OUTPOST_ID is the slug_name's packed value.
 constexpr uint64_t ETH_OUTPOST_ID = "ETH"_s.value;
-constexpr uint64_t SOL_OUTPOST_ID = "SOL"_s.value;
 
 } // anonymous namespace
 
