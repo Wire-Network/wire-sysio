@@ -91,14 +91,16 @@ class nodeDefinition:
 
     @classmethod
     def create_p2p_port_generator(cls):
+        """Yield checked P2P ports from this test's shard."""
         while True:
-            yield cls.base_p2p_port + cls.p2p_count
+            yield Utils.getPort(Utils.PortP2P, cls.p2p_count)
             cls.p2p_count += 1
 
     @classmethod
     def create_http_port_generator(cls):
+        """Yield checked HTTP ports from this test's shard."""
         while True:
-            yield cls.base_http_port + cls.http_count
+            yield Utils.getPort(Utils.PortNodeHttp, cls.http_count)
             cls.http_count += 1
 
     @property

@@ -110,6 +110,11 @@ class Utils:
     PortTransactionOnly="transaction_only"
     PortIpv6Probe="ipv6_probe"
     WalletPortCount=5
+    TransactionOnlyPortCount=2
+    Ipv6ProbePortCount=4
+    PortWalletSlot=164
+    PortTransactionOnlySlot=PortWalletSlot + WalletPortCount
+    PortIpv6ProbeSlot=PortTransactionOnlySlot + TransactionOnlyPortCount
     _testPortOffset=None
     _nodeopHelpOutput=None
     # Lock subprocess_results.log writes and cached nodeop option discovery across threads.
@@ -122,13 +127,9 @@ class Utils:
             return Utils._testPortOffset
 
         rawOffset=os.environ.get(Utils.TestPortOffsetEnvVar, "0")
-        try:
-            offset=int(rawOffset)
-        except ValueError as ex:
-            raise RuntimeError(f"{Utils.TestPortOffsetEnvVar} must be an integer, got '{rawOffset}'") from ex
-
-        if offset < 0:
-            raise RuntimeError(f"{Utils.TestPortOffsetEnvVar} must be non-negative, got {offset}")
+        if not re.fullmatch(r"[0-9]+", rawOffset):
+            raise RuntimeError(f"{Utils.TestPortOffsetEnvVar} must be an unsigned integer, got '{rawOffset}'")
+        offset=int(rawOffset)
 
         Utils._testPortOffset=offset
         return offset
@@ -158,9 +159,9 @@ class Utils:
             Utils.PortBiosP2P: (94, 1),
             Utils.PortAlternateP2P: (95, 46),
             Utils.PortP2P: (141, 23),
-            Utils.PortWallet: (164, Utils.WalletPortCount),
-            Utils.PortTransactionOnly: (169, 2),
-            Utils.PortIpv6Probe: (171, 4),
+            Utils.PortWallet: (Utils.PortWalletSlot, Utils.WalletPortCount),
+            Utils.PortTransactionOnly: (Utils.PortTransactionOnlySlot, Utils.TransactionOnlyPortCount),
+            Utils.PortIpv6Probe: (Utils.PortIpv6ProbeSlot, Utils.Ipv6ProbePortCount),
         }
 
         if port_category not in slotRanges:
@@ -173,6 +174,8 @@ class Utils:
 
         offset=Utils.getTestPortOffset()
         if offset == 0:
+            # The unsharded wallet and transaction-only defaults intentionally preserve
+            # historical manual-test ports, including their legacy overlap at 9902/9903.
             defaultPorts={
                 Utils.PortShip: 7899,
                 Utils.PortStateHistory: 8080,

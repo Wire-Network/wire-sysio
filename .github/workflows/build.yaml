@@ -72,6 +72,8 @@ jobs:
             run_sharded_np_lr: true
     runs-on:
       group: core-repo-group
+    # Full-job ceiling for build, package, parallel tests, and sharded NP/LR tests whose per-test timeout is 45 minutes.
+    timeout-minutes: 360
     container:
       image: ${{fromJSON(needs.platform-cache.outputs.platforms)[matrix.platform].image}}
       credentials:
@@ -128,6 +130,7 @@ jobs:
           done
 
       - name: Debug environment and workspace
+        if: ${{ runner.debug == '1' }}
         run: |
           echo "=== SYSTEM INFO ==="
           whoami
@@ -194,6 +197,7 @@ jobs:
             ctest-cost-${{ matrix.platform }}-
 
       - name: Run Parallel Tests
+        if: ${{ steps.build.outcome == 'success' && !cancelled() }}
         env:
           DOCKER_HOST: ${{ env.DOCKER_HOST }}
           DOCKER_CONTEXT: ${{ env.DOCKER_CONTEXT }}
@@ -247,11 +251,13 @@ jobs:
           ../tools/tweak-deb.sh wire-sysio_*.deb
 
       - name: Install dev package
+        if: ${{ steps.build.outcome == 'success' && !cancelled() }}
         run: |
           apt-get update && apt-get upgrade -y
           apt-get install -y ./build/wire-sysio_*.deb
 
       - name: Upload dev package
+        if: ${{ steps.build.outcome == 'success' && !cancelled() }}
         uses: actions/upload-artifact@v6
         with:
           name: wire-sysio-dev-${{matrix.platform}}-amd64

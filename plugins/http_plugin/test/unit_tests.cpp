@@ -39,6 +39,7 @@ constexpr uint32_t category_rw_index = 1;
 constexpr uint32_t category_ro_index = 2;
 constexpr uint32_t bytes_in_flight_index = 3;
 constexpr uint32_t requests_in_flight_index = 4;
+// Keeps unsharded IPv6 probe coverage on the historical port 9999.
 constexpr uint32_t ipv6_probe_index = 2;
 
 /** Return the string form of a node HTTP port from this test's shard. */
