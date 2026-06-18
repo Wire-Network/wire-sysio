@@ -68,7 +68,7 @@ namespace sysio { namespace chain { namespace webassembly {
       for (const auto& p : candidate.proposer_schedule.producers) {
          SYS_ASSERT(context.is_account(p.producer_name), wasm_execution_error,
                     "producer schedule includes a nonexisting account");
-         std::visit([&p](const auto& a) {
+         std::visit([](const auto& a) {
             for (const auto& kw : a.keys) {
                SYS_ASSERT(kw.key.contains_type(key_type::k1, key_type::r1), unactivated_key_type,
                           "Unactivated key type used in proposed producer schedule");

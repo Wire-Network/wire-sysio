@@ -383,7 +383,7 @@ struct batch_operator_plugin::impl {
       is_active = sysio::depot::opreg_status::compute_is_active(status, was_active);
 
       if (was_active && !is_active) {
-         elog("batch_operator: own status flipped to {} — halting relay loop", ("s", status));
+         elog("batch_operator: own status flipped to {} — halting relay loop", status);
       } else if (!was_active && is_active) {
          ilog("batch_operator: own status flipped to ACTIVE — resuming relay loop");
       }
