@@ -74,7 +74,7 @@ struct sha3_impl {
 		{
 			uint8_t *v;
 			// convert the buffer to little endian
-			for (std::size_t i; i < number_of_words; i++)
+			for (std::size_t i = 0; i < number_of_words; i++)
 			{
 				v = reinterpret_cast<uint8_t *>(words + i);
 				words[i] = ((uint64_t)v[0]) | (((uint64_t)v[1]) << 8) |
@@ -125,8 +125,10 @@ struct sha3_impl {
 		{
 			uint8_t *v;
 			uint64_t tmp;
-			// convert back to big endian
-			for (std::size_t i = 0; i < sizeof(words); i++)
+			// convert back to big endian. Iterate over the state's 64-bit lanes by element count;
+			// `sizeof(words)` is the byte size of the (over-allocated) union member, so using it as
+			// the element bound wrote far past the lane array.
+			for (std::size_t i = 0; i < number_of_words; i++)
 			{
 				v = (uint8_t *)(words + i);
 				tmp = words[i];

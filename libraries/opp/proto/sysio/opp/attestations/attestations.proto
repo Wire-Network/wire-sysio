@@ -173,12 +173,14 @@ message SwapRequest {
   uint64                       target_token_code  = 6;
   uint64                       target_reserve_code = 7;
   sysio.opp.types.ChainAddress recipient    = 8;
-  // Target destination amount at deposit time, in destination-chain token units.
-  // The user expresses the minimum they accept; the depot's variance check
-  // compares the live `swapquote` output against this and rejects if drift
-  // exceeds `target_tolerance_bps`. The user need not have fetched a quote
-  // before submitting — they may be arbitraging, guessing, or simply naming
-  // a preferred minimum.
+  // Target destination amount at deposit time, in the depot's canonical
+  // 9-decimal frame (the SAME frame as `source_amount`; the outpost converts
+  // chain-native units at the boundary). This is the EXACT amount the recipient
+  // receives — never less — provided the depot's live POST-FEE `swapquote` is
+  // within `target_tolerance_bps` of it; if the quote has drifted outside that
+  // tolerance the swap is reverted (SwapRevert) rather than under-filled. The
+  // user need not have fetched a quote before submitting (they may be
+  // arbitraging or simply naming a preferred amount).
   uint64                       target_amount             = 9;
   // Variance tolerance in basis points (e.g. 50 = 0.5%).
   uint32                       target_tolerance_bps      = 10;

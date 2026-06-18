@@ -49,8 +49,8 @@ try:
     Print("Stand up cluster")
     # Custom topology:
     #    prodNode00 <-> nonProdNode01
-    #                        -> noBlocks02 :9902 (p2p-listen-address with trx only) (speculative mode)
-    #                        -> noBlocks03 :9903 (p2p-listen-address with trx only)
+    #                        -> noBlocks02 : trx-only listener (speculative mode)
+    #                        -> noBlocks03 : trx-only listener
     #
     # 01-nonProdNode connects to 02 & 03, but 02 & 03 do not connect to 01 so they will not receive any blocks
     # 02 & 03 are connected to the bios node to get blocks until bios node is killed.

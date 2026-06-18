@@ -53,12 +53,15 @@ class WalletMgr(object):
 
     def findAvailablePort(self):
         """Find an available wallet port within this test's shard."""
-        shardLimit=Utils.getPort(Utils.PortWallet, Utils.WalletPortCount - 1) if self.usesDefaultWalletPort else 65535
+        offset=Utils.getTestPortOffset()
+        shardLimit=(
+            Utils.getPort(Utils.PortWallet, Utils.WalletPortCount - 1)
+            if offset > 0 and self.usesDefaultWalletPort else 65535)
         for i in range(WalletMgr.__MaxPort):
             port=self.port+i  # pyright: ignore[reportOptionalOperand]
-            if Utils.getTestPortOffset() > 0 and port > shardLimit:
+            if port > shardLimit:
                 break
-            if Utils.getTestPortOffset() == 0 and port > WalletMgr.__MaxPort:
+            if offset == 0 and port > WalletMgr.__MaxPort:
                 port-=WalletMgr.__MaxPort
             if Utils.arePortsAvailable(port):
                 return port

@@ -12,7 +12,7 @@
 namespace sysio::testing {
 
 inline constexpr const char* test_port_offset_env_var = "SYSIO_TEST_PORT_OFFSET";
-inline constexpr uint16_t default_state_history_port = 8080;
+inline constexpr uint32_t default_state_history_port = 8080;
 inline constexpr uint32_t compact_shard_anchor_port = 8888;
 inline constexpr uint32_t compact_http_first_port = 8888;
 inline constexpr uint32_t compact_http_last_port = 8975;
@@ -21,8 +21,11 @@ inline constexpr uint32_t compact_alternate_first_port = 9777;
 inline constexpr uint32_t compact_alternate_last_port = 9822;
 inline constexpr uint32_t compact_p2p_first_port = 9876;
 inline constexpr uint32_t compact_p2p_last_port = 9898;
-inline constexpr uint32_t compact_wallet_first_port = 9900;
+inline constexpr uint32_t compact_wallet_first_port = 9899;
 inline constexpr uint32_t compact_wallet_last_port = 9903;
+// These unsharded transaction-only defaults intentionally preserve the legacy overlap with wallet ports 9902/9903.
+inline constexpr uint32_t compact_transaction_only_first_port = 9902;
+inline constexpr uint32_t compact_transaction_only_last_port = 9903;
 inline constexpr uint32_t compact_ipv6_probe_first_port = 9997;
 inline constexpr uint32_t compact_ipv6_probe_last_port = 10000;
 inline constexpr uint32_t compact_ship_slot = 0;
@@ -36,8 +39,11 @@ inline constexpr uint32_t compact_bios_p2p_slot = 94;
 inline constexpr uint32_t compact_alternate_p2p_slot = 95;
 inline constexpr uint32_t compact_p2p_slot = 141;
 inline constexpr uint32_t compact_wallet_base_slot = 164;
-inline constexpr uint32_t compact_ipv6_probe_slot = 171;
 inline constexpr uint32_t wallet_port_count = 5;
+inline constexpr uint32_t transaction_only_port_count =
+    compact_transaction_only_last_port - compact_transaction_only_first_port + 1;
+inline constexpr uint32_t compact_transaction_only_slot = compact_wallet_base_slot + wallet_port_count;
+inline constexpr uint32_t compact_ipv6_probe_slot = compact_transaction_only_slot + transaction_only_port_count;
 
 /** Logical listener classes inside a test's compact port shard. */
 enum class port_category {
@@ -130,12 +136,12 @@ inline uint16_t get_port(port_category category, uint32_t index = 0) {
    case port_category::wallet:
       slot_start = compact_wallet_base_slot;
       slot_count = wallet_port_count;
-      unsharded_base_port = 9899;
+      unsharded_base_port = compact_wallet_first_port;
       break;
    case port_category::transaction_only:
-      slot_start = compact_wallet_base_slot + wallet_port_count;
-      slot_count = 2;
-      unsharded_base_port = 9902;
+      slot_start = compact_transaction_only_slot;
+      slot_count = transaction_only_port_count;
+      unsharded_base_port = compact_transaction_only_first_port;
       break;
    case port_category::ipv6_probe:
       slot_start = compact_ipv6_probe_slot;

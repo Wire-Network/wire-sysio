@@ -17,9 +17,16 @@
 #include <test_contracts.hpp>
 #include "test_wasts.hpp"
 
+#include <fc/filesystem.hpp>
+
 using namespace sysio;
 using namespace testing;
 using namespace chain;
+
+// Minimal reflected row type for the binary-snapshot section-consumption regression test
+// (threaded_snapshot_requires_full_section_consumption) in snapshot_part1_tests below.
+namespace snapshot_consume_test { struct row { uint64_t v = 0; }; }
+FC_REFLECT(snapshot_consume_test::row, (v))
 
 
 namespace {
@@ -132,6 +139,52 @@ namespace {
 // Split the tests into multiple parts which run approximately the same time
 // so that they can finish within CICD time limits
 BOOST_AUTO_TEST_SUITE(snapshot_part1_tests)
+
+// A binary (v1) snapshot section's row_count is stored in the section index, which is NOT covered
+// by the integrity/root hash; only the row data (data_size) is. clear_section must therefore reject
+// any selected section that is not consumed exactly. The case a per-read check in read_row cannot
+// catch is the singleton-reader shape — one read_row with the returned "more" ignored — against a
+// row_count tampered upward: the single read succeeds and the callback returns with cur_row <
+// num_rows. Writing a genuine 2-row section and then reading only one row reproduces exactly that
+// shape, so teardown must throw.
+BOOST_AUTO_TEST_CASE(threaded_snapshot_requires_full_section_consumption)
+{
+   fc::temp_directory tmp_dir;
+   const std::filesystem::path snap_path = tmp_dir.path() / "consume_test.bin";
+
+   {
+      threaded_snapshot_writer writer(snap_path);
+      writer.write_section("test_section", [](auto& s) {
+         s.add_row(snapshot_consume_test::row{1});
+         s.add_row(snapshot_consume_test::row{2});
+      });
+      writer.finalize();
+   }
+
+   // Full consumption of the 2-row section loads cleanly.
+   {
+      threaded_snapshot_reader reader(snap_path);
+      reader.validate();
+      reader.read_section("test_section", [](auto& s) {
+         snapshot_consume_test::row r;
+         BOOST_CHECK(s.read_row(r));    // row 1 -> more rows remain
+         BOOST_CHECK(!s.read_row(r));   // row 2 -> section exhausted
+      });
+   }
+
+   // Under-consumption (read 1 of 2, ignoring the "more" signal, exactly as a singleton reader does
+   // against an upward-tampered row_count) must be rejected at section teardown.
+   {
+      threaded_snapshot_reader reader(snap_path);
+      reader.validate();
+      BOOST_CHECK_THROW(
+         reader.read_section("test_section", [](auto& s) {
+            snapshot_consume_test::row r;
+            s.read_row(r); // read only the first of two rows
+         }),
+         snapshot_exception);
+   }
+}
 
 template<typename TESTER, typename SNAPSHOT_SUITE>
 void exhaustive_snapshot_test()

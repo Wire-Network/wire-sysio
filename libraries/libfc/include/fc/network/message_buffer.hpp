@@ -157,6 +157,12 @@ namespace fc {
      *  start).
      */
     void advance_read_ptr(uint32_t bytes) {
+      // Advancing past the written data would push read_ind beyond write_ind and over-pop
+      // the buffer deque below (free()/pop_front() on an emptied deque is undefined behavior
+      // and underflows write_ind). Callers that derive the advance from untrusted, peer-supplied
+      // frame lengths must never exceed the buffered bytes; reject rather than corrupt the chain.
+      FC_ASSERT( bytes <= bytes_to_read(), "advance_read_ptr {} exceeds buffered bytes {}",
+                 bytes, bytes_to_read() );
       advance_index(read_ind, bytes);
       if (read_ind == write_ind) {
         reset();

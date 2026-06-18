@@ -3262,6 +3262,17 @@ namespace sysio {
       fc::raw::unpack( ds, trx_id );
       const auto header_bytes = bytes_before - pending_message_buffer.bytes_to_read();
 
+      // A well-formed transaction_message frame contains at least which + trx_id. If the
+      // peer-declared message_length is shorter than the bytes just consumed, the id was read
+      // by spilling past this frame into pipelined bytes; closing here avoids underflowing the
+      // unsigned `message_length - header_bytes` advance below (which would corrupt the buffer).
+      if( header_bytes > message_length ) {
+         peer_wlog( p2p_trx_log, this, "transaction_message frame too short: length {} < header {} - closing",
+                    message_length, header_bytes );
+         close();
+         return true;
+      }
+
       if( my_impl->dispatcher.have_peer_txn( trx_id, *this ) ) {
          peer_dlog( p2p_trx_log, this, "got a duplicate transaction - dropping {}", trx_id );
          pending_message_buffer.advance_read_ptr( message_length - header_bytes );
@@ -3371,6 +3382,15 @@ namespace sysio {
       vote_id_type vote_id;
       fc::raw::unpack( ds, vote_id );
       const auto header_bytes = bytes_before - pending_message_buffer.bytes_to_read();
+
+      // See process_next_trx_message: a frame shorter than which + vote_id means the id was read
+      // from pipelined bytes past this frame; close rather than underflow the advance below.
+      if( header_bytes > message_length ) {
+         peer_wlog( vote_logger, this, "vote_message frame too short: length {} < header {} - closing",
+                    message_length, header_bytes );
+         close();
+         return true;
+      }
 
       if( my_impl->dispatcher.have_vote( vote_id ) ) {
          peer_dlog( vote_logger, this, "duplicate vote - dropping {}", vote_id );

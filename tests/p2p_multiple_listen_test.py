@@ -69,8 +69,8 @@ try:
 
     # Be sure all nodes start out connected   (bios node omitted from diagram for brevity)
     #     node00              node01            node02            node03            node04
-    #   localhost:9876 -> localhost:9877 -> localhost:9878 -> localhost:9879 -> localhost:9880
-    # localhost:9779 ^                           |                                   |
+    #   default p2p  ->    default p2p  ->    default p2p  ->   default p2p  ->   default p2p
+    # alternate p2p ^                           |                                   |
     #       ^        +---------------------------+                                   |
     #       +------------------------------------------------------------------------+
     cluster.waitOnClusterSync(blockAdvancing=5)
@@ -82,8 +82,8 @@ try:
     cluster.getNode(3).kill(signal.SIGTERM)
     # Be sure all remaining nodes continue to sync via the two listen ports on node 00
     #     node00            node01              node02            node03            node04
-    #   localhost:9876     offline          localhost:9878       offline        localhost:9880
-    # localhost:9779 ^                           |                                   |
+    #   default p2p        offline          default p2p          offline       default p2p
+    # alternate p2p ^                           |                                   |
     #       ^        +---------------------------+                                   |
     #       +------------------------------------------------------------------------+
     cluster.waitOnClusterSync(blockAdvancing=5)

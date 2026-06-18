@@ -62,10 +62,20 @@ namespace sysio {
       /// `regreserve` drains the reserve's WIRE backing from it.
       static constexpr name TREASURY_ACCOUNT = "sysio"_n;
 
-      // Bancor connector_weight is stored in basis points (10000 = 100%).
-      // Pure constant-product corresponds to weight = 5000.
+      // Bancor connector_weight is stored in basis points (10000 = 100%) and is
+      // the WIRE-side weight of the token/WIRE pool; the token side gets the
+      // remainder. weight = 5000 is the symmetric 50/50 case (pure constant
+      // product). The weighted swap curve lives in `sysio.opp.common/amm_math.hpp`.
       static constexpr uint32_t MAX_CONNECTOR_WEIGHT_BPS     = 10000;
       static constexpr uint32_t DEFAULT_CONNECTOR_WEIGHT_BPS = 5000;
+
+      // Swap-fee split. Every swap charges sysio.uwrit's `fee_bps` out of the
+      // WIRE leg; this contract routes the collected fee 50/50 — half accrues to
+      // the on-chain `rewards_bucket` (kept in this contract's WIRE custody for a
+      // later distribution action), half is transferred back to the `sysio`
+      // emissions treasury. The fee RATE (`fee_bps`) is owned by sysio.uwrit.
+      static constexpr uint32_t FEE_REWARD_SHARE_BPS = 5000; // 50% rewards / 50% emissions
+      static constexpr uint32_t FEE_SPLIT_TOTAL_BPS  = 10000;
 
       // -----------------------------------------------------------------------
       //  Actions
@@ -153,9 +163,14 @@ namespace sysio {
                      opp::types::ChainKind creator_chain_kind,
                      std::vector<char>     creator_chain_addr);
 
-      /// Read-only quote across two reserves (src and dst). Requires both
-      /// reserves ACTIVE with the same connector model. Returns 0 when any
-      /// required reserve is missing or inactive.
+      /// Read-only swap quote. Prices `from_amount` of the source reserve into
+      /// the destination reserve along the depot's live curve — the SAME
+      /// weighted-Bancor math (each reserve's `connector_weight_bps`) and the
+      /// SAME post-fee reduction (`sysio.uwrit::fee_bps` out of the WIRE leg)
+      /// that settlement uses, so the quote equals what a swap would deliver.
+      /// Handles WIRE endpoints: a WIRE source/destination skips that leg's
+      /// reserve (the depot IS the WIRE side). Returns 0 when a required reserve
+      /// is missing or not ACTIVE (callers treat 0 as "no quote").
       [[sysio::action, sysio::read_only]]
       uint64_t swapquote(sysio::slug_name from_chain_code,
                          sysio::slug_name from_token_code,
@@ -164,6 +179,12 @@ namespace sysio {
                          sysio::slug_name to_chain_code,
                          sysio::slug_name to_token_code,
                          sysio::slug_name to_reserve_code);
+
+      /// Read-only: current rewards-bucket WIRE balance (the rewards half of
+      /// collected swap fees, held in this contract's custody pending a future
+      /// distribution action).
+      [[sysio::action, sysio::read_only]]
+      uint64_t rewardbal();
 
       /// Auth=sysio.uwrit. Inline-debit at SWAP_REMIT emit time. Asserts the
       /// reserve is ACTIVE and balance is sufficient.
@@ -184,16 +205,19 @@ namespace sysio {
                     sysio::slug_name reserve_code,
                     uint64_t        outpost_amount);
 
-      /// Auth=sysio.uwrit. Emit-time four-leg apply for a normal
-      /// (outpost ↔ outpost) swap, fired from `try_select_winner` BEFORE the
-      /// SWAP_REMIT is queued so every intervening quote prices post-swap.
-      /// Computes the WIRE intermediate internally from the pre-mutation
-      /// rows — `w = cp_output(src.chain, src.wire, src_amount)` — then:
-      ///   src: chain += src_amount, wire -= w
-      ///   dst: wire  += w,          chain -= dst_amount
-      /// All four legs balance-checked BEFORE any mutation; a failed check
-      /// aborts the surrounding race-resolution transaction (no half-state).
-      /// `Σ reserve_wire_amount` is unchanged (the `w` hop is internal).
+      /// Auth=sysio.uwrit. Emit-time apply for a normal (outpost ↔ outpost)
+      /// swap, fired from `try_select_winner` BEFORE the SWAP_REMIT is queued so
+      /// every intervening quote prices post-swap. Computes the GROSS WIRE
+      /// intermediate internally from the pre-mutation source row on the weighted
+      /// curve (the source reserve's own `connector_weight_bps`) —
+      /// `w_gross = amm::token_to_wire(src.chain, src.wire, src.cw, src_amount)`
+      /// — takes the swap fee out of that WIRE leg, then:
+      ///   src: chain += src_amount, wire -= w_gross
+      ///   dst: wire  += w_net,      chain -= dst_amount   (w_net = w_gross - fee)
+      /// The fee is routed 50/50 to the rewards bucket / `sysio` emissions.
+      /// Balances are checked BEFORE any mutation; a failed check aborts the
+      /// surrounding race-resolution transaction (no half-state). `Σ
+      /// reserve_wire_amount` drops by the fee (which leaves the reserve pair).
       [[sysio::action]]
       void applyswap(sysio::slug_name src_chain_code,
                      sysio::slug_name src_token_code,
@@ -206,11 +230,13 @@ namespace sysio {
 
       /// Auth=sysio.uwrit. Emit-time apply for a swap-FROM-WIRE (the depot
       /// is the source; only the target outpost leg exists). The user's
-      /// escrowed WIRE (already held by this contract since `swapfromwire`)
-      /// becomes the target reserve's WIRE-side liquidity:
-      ///   dst: wire += wire_in, chain -= dst_amount
-      /// `Σ reserve_wire_amount` rises by `wire_in`, matching the real WIRE
-      /// balance bump that happened at escrow time.
+      /// escrowed WIRE (already held by this contract since `swapfromwire`) has
+      /// the swap fee taken out of it; only the post-fee remainder becomes the
+      /// target reserve's WIRE-side liquidity:
+      ///   dst: wire += w_net, chain -= dst_amount   (w_net = wire_in - fee)
+      /// The fee is routed 50/50 to the rewards bucket / `sysio` emissions. The
+      /// escrowed `wire_in` splits into that liquidity plus the routed fee, so
+      /// custody stays balanced.
       [[sysio::action]]
       void applyfromwire(sysio::slug_name dst_chain_code,
                          sysio::slug_name dst_token_code,
@@ -219,12 +245,14 @@ namespace sysio {
                          uint64_t        dst_amount);
 
       /// Auth=sysio.uwrit. Settlement for a swap-TO-WIRE (the depot is the
-      /// target; only the source outpost leg exists). Pays the recipient
-      /// REAL WIRE from this contract's custody and books the source side:
-      ///   src: chain += src_amount, wire -= wire_out
+      /// target; only the source outpost leg exists). Pays the recipient exactly
+      /// `wire_out` REAL WIRE from custody, and charges the swap fee on the gross
+      /// weighted WIRE leg the source produces:
+      ///   src: chain += src_amount, wire -= (wire_out + fee)
       ///   inline sysio.token::transfer(sysio.reserv → recipient, wire_out)
-      /// `Σ reserve_wire_amount` drops by `wire_out`, matching the real
-      /// WIRE leaving custody.
+      /// The fee is routed 50/50 to the rewards bucket / `sysio` emissions; the
+      /// source reserve keeps any surplus when the user targeted below the
+      /// post-fee quote. `Σ reserve_wire_amount` drops by `wire_out + fee`.
       [[sysio::action]]
       void paywire(sysio::slug_name src_chain_code,
                    sysio::slug_name src_token_code,
@@ -309,6 +337,20 @@ namespace sysio {
          sysio::kv::index<"bychaintok"_n, sysio::const_mem_fun<reserve_row, uint128_t, &reserve_row::by_chain_token>>,
          sysio::kv::index<"bystatus"_n,   sysio::const_mem_fun<reserve_row, uint64_t,  &reserve_row::by_status>>
       >;
+
+      /// Singleton accumulator for the rewards half of swap fees. The WIRE
+      /// stays in this contract's custody — it is NOT transferred out — so the
+      /// custody invariant is `token_balance == Σ reserve_wire_amount +
+      /// rewards.balance + in-flight escrow`. `balance` is the portion
+      /// earmarked for a future rewards distribution; `lifetime_accrued` is an
+      /// audit total. (The emissions half of each fee IS transferred to the
+      /// `sysio` treasury at collection time and is therefore not tracked here.)
+      struct [[sysio::table("rewardbkt")]] rewards_bucket {
+         uint64_t balance          = 0;   // claimable WIRE held for distribution
+         uint64_t lifetime_accrued = 0;   // audit: total WIRE ever routed to rewards
+         SYSLIB_SERIALIZE(rewards_bucket, (balance)(lifetime_accrued))
+      };
+      using rewardbkt_t = sysio::kv::global<"rewardbkt"_n, rewards_bucket>;
 
    private:
       using ReserveStatus = opp::types::ReserveStatus;

@@ -82,16 +82,10 @@ public:
    }
 
    action_result setconfig(uint32_t fee_bps                     = 10,
-                           uint64_t collateral_lock_duration_ms = 43'200'000,
-                           uint8_t  fee_split_winner_pct        = 50,
-                           uint8_t  fee_split_other_uw_pct      = 25,
-                           uint8_t  fee_split_batch_op_pct      = 25) {
+                           uint64_t collateral_lock_duration_ms = 43'200'000) {
       return push_uwrit_action(UWRIT_ACCOUNT, "setconfig"_n, mvo()
          ("fee_bps",                     fee_bps)
          ("collateral_lock_duration_ms", collateral_lock_duration_ms)
-         ("fee_split_winner_pct",        fee_split_winner_pct)
-         ("fee_split_other_uw_pct",      fee_split_other_uw_pct)
-         ("fee_split_batch_op_pct",      fee_split_batch_op_pct)
       );
    }
 
@@ -124,19 +118,15 @@ BOOST_FIXTURE_TEST_CASE(setconfig_basic, sysio_uwrit_tester) { try {
    auto cfg = get_uwconfig();
    BOOST_REQUIRE_EQUAL(25, cfg["fee_bps"].as_uint64());
    BOOST_REQUIRE_EQUAL(43'200'000u, cfg["collateral_lock_duration_ms"].as_uint64());
-   BOOST_REQUIRE_EQUAL(50, cfg["fee_split_winner_pct"].as_uint64());
-   BOOST_REQUIRE_EQUAL(25, cfg["fee_split_other_uw_pct"].as_uint64());
-   BOOST_REQUIRE_EQUAL(25, cfg["fee_split_batch_op_pct"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(setconfig_writes_custom_lock_duration, sysio_uwrit_tester) { try {
    // Test clusters shorten the 12h challenge window via setconfig — e.g.
    // two minutes here.
    BOOST_REQUIRE_EQUAL(success(),
-      setconfig(/*fee_bps*/10, /*lock_ms*/120'000, /*winner*/60, /*other_uw*/20, /*batchop*/20));
+      setconfig(/*fee_bps*/10, /*lock_ms*/120'000));
    auto cfg = get_uwconfig();
    BOOST_REQUIRE_EQUAL(120'000u, cfg["collateral_lock_duration_ms"].as_uint64());
-   BOOST_REQUIRE_EQUAL(60, cfg["fee_split_winner_pct"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(setconfig_rejects_excessive_fee, sysio_uwrit_tester) { try {
@@ -149,14 +139,7 @@ BOOST_FIXTURE_TEST_CASE(setconfig_rejects_excessive_fee, sysio_uwrit_tester) { t
 BOOST_FIXTURE_TEST_CASE(setconfig_rejects_zero_lock_duration, sysio_uwrit_tester) { try {
    BOOST_REQUIRE_EQUAL(
       error("assertion failure with message: collateral_lock_duration_ms must be positive"),
-      setconfig(/*fee_bps*/10, /*lock_ms*/0, /*winner*/50, /*other_uw*/25, /*batchop*/25)
-   );
-} FC_LOG_AND_RETHROW() }
-
-BOOST_FIXTURE_TEST_CASE(setconfig_rejects_split_not_summing_to_100, sysio_uwrit_tester) { try {
-   BOOST_REQUIRE_EQUAL(
-      error("assertion failure with message: fee_split_*_pct must sum to 100"),
-      setconfig(/*fee_bps*/10, /*lock*/10, /*winner*/50, /*other_uw*/30, /*batchop*/25)
+      setconfig(/*fee_bps*/10, /*lock_ms*/0)
    );
 } FC_LOG_AND_RETHROW() }
 

@@ -7,11 +7,72 @@
 #define BOOST_TEST_MODULE trx_generator_tests
 #include <boost/test/included/unit_test.hpp>
 
+#include <array>
+#include <cstdlib>
+#include <optional>
+#include <stdexcept>
+#include <string>
+
 using namespace sysio;
 using namespace sysio::testing;
 using namespace std::literals::string_literals;
 
 static const char* api_name = "/v1/chain/test";
+
+namespace {
+/** Restore SYSIO_TEST_PORT_OFFSET after tests that exercise environment parsing. */
+class test_port_offset_env_guard {
+ public:
+   test_port_offset_env_guard() {
+      if(const char* value = std::getenv(test_port_offset_env_var))
+         _previous = value;
+   }
+
+   ~test_port_offset_env_guard() {
+      if(_previous)
+         setenv(test_port_offset_env_var, _previous->c_str(), 1);
+      else
+         unsetenv(test_port_offset_env_var);
+   }
+
+   /** Set the current process test port offset for this scoped test. */
+   void set(const char* value) const { setenv(test_port_offset_env_var, value, 1); }
+
+   /** Clear the current process test port offset for this scoped test. */
+   void clear() const { unsetenv(test_port_offset_env_var); }
+
+ private:
+   std::optional<std::string> _previous;
+};
+
+struct expected_port {
+   port_category category;
+   uint32_t      slot;
+   uint32_t      count;
+   uint16_t      unsharded_base;
+};
+
+constexpr std::array expected_ports{
+    expected_port{port_category::ship, compact_ship_slot, 1, 7899},
+    expected_port{port_category::state_history, compact_state_history_slot, 1, default_state_history_port},
+    expected_port{port_category::bios_http, compact_bios_http_slot, 1, 8788},
+    expected_port{port_category::bios_p2p, compact_bios_p2p_slot, 1, compact_bios_p2p_port},
+    expected_port{port_category::node_http, compact_http_slot, compact_http_last_port - compact_http_first_port + 1,
+                  compact_http_first_port},
+    expected_port{port_category::alternate_service, compact_alternate_service_slot, 1, 8976},
+    expected_port{port_category::plugin_http_peer, compact_plugin_http_peer_slot, 1, 9009},
+    expected_port{port_category::plugin_http_local, compact_plugin_http_local_slot, 1, 9011},
+    expected_port{port_category::alternate_p2p, compact_alternate_p2p_slot,
+                  compact_alternate_last_port - compact_alternate_first_port + 1, compact_alternate_first_port},
+    expected_port{port_category::p2p, compact_p2p_slot, compact_p2p_last_port - compact_p2p_first_port + 1,
+                  compact_p2p_first_port},
+    expected_port{port_category::wallet, compact_wallet_base_slot, wallet_port_count, compact_wallet_first_port},
+    expected_port{port_category::transaction_only, compact_transaction_only_slot, transaction_only_port_count,
+                  compact_transaction_only_first_port},
+    expected_port{port_category::ipv6_probe, compact_ipv6_probe_slot,
+                  compact_ipv6_probe_last_port - compact_ipv6_probe_first_port + 1, compact_ipv6_probe_first_port}};
+
+} // namespace
 
 namespace http = boost::beast::http;
 struct echo_server_impl : rest::simple_server<echo_server_impl> {
@@ -367,11 +428,59 @@ BOOST_AUTO_TEST_CASE(tps_cant_keep_up_monitored)
    BOOST_REQUIRE_LT(generator->_calls.size(), expected_trxs);
 }
 
+BOOST_AUTO_TEST_CASE(test_port_shard_unsharded_defaults)
+{
+   test_port_offset_env_guard env;
+   env.clear();
+
+   for(const auto& expected : expected_ports) {
+      BOOST_REQUIRE_EQUAL(get_port(expected.category), expected.unsharded_base);
+      BOOST_REQUIRE_EQUAL(get_port(expected.category, expected.count - 1),
+                          expected.unsharded_base + expected.count - 1);
+   }
+}
+
+BOOST_AUTO_TEST_CASE(test_port_shard_sharded_offsets)
+{
+   test_port_offset_env_guard env;
+   env.set("100");
+
+   constexpr uint32_t offset = 100;
+   for(const auto& expected : expected_ports) {
+      BOOST_REQUIRE_EQUAL(get_port(expected.category), compact_shard_anchor_port + offset + expected.slot);
+      BOOST_REQUIRE_EQUAL(get_port(expected.category, expected.count - 1),
+                          compact_shard_anchor_port + offset + expected.slot + expected.count - 1);
+   }
+}
+
+BOOST_AUTO_TEST_CASE(test_port_shard_rejects_invalid_indices)
+{
+   test_port_offset_env_guard env;
+   env.set("100");
+
+   for(const auto& expected : expected_ports) {
+      BOOST_REQUIRE_THROW(get_port(expected.category, expected.count), std::runtime_error);
+   }
+}
+
+BOOST_AUTO_TEST_CASE(test_port_shard_rejects_invalid_offsets)
+{
+   test_port_offset_env_guard env;
+
+   for(const char* value : {"-1", "+1", " 1", "1 ", "1_000"}) {
+      env.set(value);
+      BOOST_REQUIRE_THROW(test_port_offset(), std::runtime_error);
+   }
+
+   env.set("60000");
+   BOOST_REQUIRE_THROW(get_port(port_category::ipv6_probe, 3), std::runtime_error);
+}
+
 BOOST_AUTO_TEST_CASE(trx_generator_constructor)
 {
    trx_generator_base_config tg_config{1, chain::chain_id_type("999"), chain::name("sysio"), fc::seconds(3600),
                                        fc::variant("00000062989f69fd251df3e0b274c3364ffc2f4fce73de3f1c7b5e11a4c92f21").as<chain::block_id_type>(), ".", true};
-   provider_base_config p_config{"p2p", "127.0.0.1", 9876};
+   provider_base_config p_config{"p2p", "127.0.0.1", get_port(port_category::p2p)};
    const std::string abi_file = "../../contracts/sysio.token/sysio.token.abi";
    const std::string actions_data = "[{\"actionAuthAcct\": \"testacct1\",\"actionName\": \"transfer\",\"authorization\": {\"actor\": \"testacct1\",\"permission\": \"active\"},"
                                     "\"actionData\": {\"from\": \"testacct1\",\"to\": \"testacct2\",\"quantity\": \"0.0001 CUR\",\"memo\": \"transaction specified\"}}]";

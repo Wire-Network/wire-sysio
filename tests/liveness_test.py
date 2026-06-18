@@ -70,7 +70,7 @@ try:
 
     # verify head still advances but not LIB on node B
     assert prodB.waitForNextBlock(), "Head should continue to advance on node B without node A"
-    assert not prodB.waitForLibToAdvance(10), "LIB should not advance on node B without node A"
+    assert prodB.waitForLibNotToAdvance(10), "LIB should stop advancing on node B without node A"
 
     # relaunch node A so that quorum can be met
     Print("Relaunching node A to make quorum")
