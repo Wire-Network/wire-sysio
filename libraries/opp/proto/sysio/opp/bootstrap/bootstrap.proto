@@ -1,0 +1,186 @@
+syntax = "proto3";
+
+package sysio.opp.bootstrap;
+
+import "sysio/opp/types/types.proto";
+
+option cc_enable_arenas = true;
+
+// ---------------------------------------------------------------------------
+//  Platform bootstrap configuration — launch-day input shape.
+//
+//  Human-authored JSON instances of `BootstrapPlatformConfig` drive the launch
+//  bootstrap tool, replacing the hard-coded chain / token / reserve dataset in the
+//  cluster tooling. The tool replays the config onto the chain inside the
+//  bootstrap window (sysio.epoch current_epoch_index == 0): every registration
+//  is priv-gated and lands ACTIVE inline.
+//
+//  Authoring conventions — these differ DELIBERATELY from the registry
+//  carriers in sysio/opp/types/types.proto (`Chain` / `Token` / `ChainToken`
+//  / `Reserve`), which are wire messages with packed-uint64 codes, raw `bytes`
+//  addresses, and lifecycle fields that are outputs, not inputs:
+//
+//    * codes are STRINGS ("ETHEREUM", "USDC", "PRIMARY"); the tool packs them
+//      via slug_name (alphabet [A-Z0-9_], <= 8 chars). Packed uint64s are
+//      write-only for humans and render as opaque digit strings in JSON.
+//    * addresses are STRINGS in chain-native display form (0x-hex for EVM,
+//      base58 for SVM) so each one is eyeball-verifiable against a block
+//      explorer at launch review. `bytes` would render as base64 in JSON.
+//    * amounts are uint64 SUBUNITS (9-decimal unless the token's `precision`
+//      says otherwise), matching the contract action params exactly. Proto3
+//      canonical JSON renders 64-bit ints as QUOTED strings — always quote
+//      amounts in authored JSON, since launch-scale values exceed 2^53 and
+//      bare numbers get silently mangled by common JSON tooling.
+//    * enums appear by full value name in JSON ("TOKEN_KIND_ERC20").
+//    * field names are snake_case, exactly as declared here.
+//
+//  The bootstrap tool is the authority on cross-field invariants (declared
+//  references, exactly-one-native-per-chain, the WIRE earmark sum, etc.); a
+//  companion validator enforces the same set so a malformed config fails
+//  before any irreversible action is pushed.
+// ---------------------------------------------------------------------------
+
+// A chain to register via `sysio.chains::regchain(kind, code,
+// external_chain_id, name, description)`.
+//
+// There is no `is_depot` field: the depot row is implied by
+// `kind == CHAIN_KIND_WIRE` — exactly one entry carries it, with code "WIRE".
+message ChainSpec {
+  // VM family. CHAIN_KIND_WIRE marks the singleton depot chain.
+  sysio.opp.types.ChainKind kind              = 1;
+  // Chain codename slug, e.g. "ETHEREUM" (<= 8 chars, [A-Z0-9_]).
+  string                    code              = 2;
+  // External chain id: 1 = Ethereum mainnet; 0 = WIRE depot / Solana.
+  uint32                    external_chain_id = 3;
+  // Human-readable display name.
+  string                    name              = 4;
+  // Free-form description / provenance note.
+  string                    description       = 5;
+}
+
+// A token to register via `sysio.tokens::regtoken(...)` plus its single chain
+// binding via `sysio.tokens::regctok(...)`. The binding is FOLDED IN because a
+// token binds to exactly one chain in practice — multi-chain deployments of
+// the "same" asset use distinct codes (USDC vs USDCSOL), so a separate
+// chain-token array would only add a cross-reference spelling hazard to a
+// hand-edited file. (If a genuine multi-binding need ever appears, a
+// `repeated` additional-bindings field can be added without breaking JSON.)
+message TokenSpec {
+  // Token standard. NATIVE marks the chain's own gas asset.
+  sysio.opp.types.TokenKind kind             = 1;
+  // Token codename slug, e.g. "USDCSOL" (<= 8 chars, [A-Z0-9_]).
+  string                    code             = 2;
+  // Display symbol / name, e.g. "USD Coin".
+  string                    symbol_name      = 3;
+  // Free-form description / provenance note.
+  string                    description      = 4;
+  // Decimal precision; convention is 9 across the depot frame.
+  uint32                    precision        = 5;
+  // Chain this token binds to — must reference a declared `ChainSpec.code`.
+  string                    chain_code       = 6;
+  // Contract address in chain-native display form (0x-hex EVM / base58 SVM).
+  // EMPTY for a native token.
+  string                    contract_address = 7;
+  // True for the chain's native asset. Exactly one token per chain is native.
+  bool                      is_native        = 8;
+}
+
+// A launch reserve to seed via
+// `sysio.reserv::regreserve(chain_code, token_code, reserve_code, name,
+//  description, initial_chain_amount, initial_wire_amount,
+//  connector_weight_bps, is_private, owner)`.
+//
+// The WIRE side (`initial_wire_amount`) is drained from the `sysio` emissions
+// treasury into reserve custody at registration time (real WIRE transfer; see
+// `BootstrapPlatformConfig.t5_reserve_allocation`).
+message ReserveSpec {
+  // Reserve codename slug, conventionally "PRIMARY".
+  string code                  = 1;
+  // Outpost chain this reserve lives on — references a declared non-WIRE
+  // `ChainSpec.code`.
+  string chain_code            = 2;
+  // Token paired against WIRE — must reference a `TokenSpec` bound to
+  // `chain_code`.
+  string token_code            = 3;
+  // Human-readable display name.
+  string name                  = 4;
+  // Free-form description / provenance note.
+  string description           = 5;
+  // Outpost-side token seed, in that token's subunits (quote in JSON).
+  uint64 initial_chain_amount  = 6;
+  // WIRE-side seed, in WIRE subunits, drained from the earmark (quote in JSON).
+  uint64 initial_wire_amount   = 7;
+  // Bancor connector weight in basis points: 1..10000; 5000 = pure
+  // constant product.
+  uint32 connector_weight_bps  = 8;
+
+  // Private-reserve support (live as of the reserve-and-swap beta). A private
+  // reserve pairs same-owner only and is excluded from WIRE-endpoint swaps.
+  // Post-bootstrap creation derives ownership from the authex-linked matcher;
+  // the bootstrap `regreserve` path seeds it directly via these two fields.
+  bool   is_private = 9;
+  // Owning WIRE account name (regreserve's `owner`, a sysio::name). EMPTY for
+  // public reserves; REQUIRED (and a valid account name) when `is_private`.
+  string owner      = 10;
+}
+
+// Global swap settings applied once via `sysio.uwrit::setconfig(fee_bps,
+// collateral_lock_duration_ms, fee_split_winner_pct, fee_split_other_uw_pct,
+// fee_split_batch_op_pct)`.
+//
+// The three `fee_split_*_pct` shares must sum to 100. The contract stores the
+// percentages as uint8; proto3's narrowest integer is uint32, so they are
+// uint32 here and the tool / contract narrow them (each is bounded to 100).
+message UwritConfig {
+  // Per-spoke depot fee in basis points (<= 10000).
+  uint32 fee_bps                     = 1;
+  // Wall-clock collateral lock window in MILLISECONDS (> 0). Contract default
+  // is 43_200_000 (12h).
+  uint64 collateral_lock_duration_ms = 2;
+  // Fee distribution share to the winning underwriter (percent).
+  uint32 fee_split_winner_pct        = 3;
+  // Fee distribution share to the other underwriters (percent).
+  uint32 fee_split_other_uw_pct      = 4;
+  // Fee distribution share to the batch operator (percent).
+  uint32 fee_split_batch_op_pct      = 5;
+}
+
+// Top-level launch platform bootstrap configuration. One JSON instance per
+// deployment. (This is the WIRE *platform* bootstrap — chains, tokens, reserves
+// and global swap settings — not a DEX: it stands up the launch-day registry
+// state, of which the swap reserves are one part.)
+message BootstrapPlatformConfig {
+  // Schema version; bump on a breaking shape change. Must be 1.
+  uint32 schema_version = 1;
+
+  // Deployment label ("mainnet-launch" / "dev-cluster"); the bootstrap tool
+  // sanity-checks it against its target.
+  string network = 2;
+
+  // WIRE subunits earmarked from the T5 allotment to back the WIRE side of
+  // launch reserves. Sits OUTSIDE `emission_config.t5_distributable`: at
+  // genesis, t5_distributable = T5_allotment - t5_reserve_allocation -
+  // t5_dex_allocation, so the sysio.epoch emissions readiness gate never sees a
+  // short treasury balance after `regreserve` drains the reserve backing.
+  // Invariant: sum(reserves[].initial_wire_amount) <= t5_reserve_allocation.
+  uint64 t5_reserve_allocation = 3;
+
+  // WIRE subunits earmarked from the T5 allotment for launch DEX integration —
+  // at least one DEX is seeded at launch (more added later by council vote).
+  // Like `t5_reserve_allocation`, this sits OUTSIDE `t5_distributable`, so the
+  // total T5 carve-out is `t5_reserve_allocation + t5_dex_allocation`. The total
+  // is set per-deployment (Kyle / Ken own the launch figure). RESERVED: the
+  // on-chain DEX-seeding mechanism is not finalized, so this field is carried
+  // for forward compatibility and is not yet drained by the bootstrap tool;
+  // default 0 disables the earmark.
+  uint64 t5_dex_allocation = 8;
+
+  // Chains to register (one must be the CHAIN_KIND_WIRE depot).
+  repeated ChainSpec   chains   = 4;
+  // Tokens to register, each with its single chain binding.
+  repeated TokenSpec   tokens   = 5;
+  // Reserves to seed (WIRE side drained from the earmark).
+  repeated ReserveSpec reserves = 6;
+  // Global swap / underwriting settings.
+  UwritConfig          uwrit    = 7;
+}
