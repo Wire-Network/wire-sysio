@@ -9,11 +9,6 @@
 #include <sysio/dispatcher.hpp> // For SYSIO_DISPATCH of native action
 #include <sysio/privileged.hpp>
 
-/**
- *  ---- General TODOs ----
- *
- * TODO: Move network_gen to a global table as a single point of truth.
- */
 namespace sysio {
     class [[sysio::contract("sysio.roa")]] roa : public contract {
         public:
@@ -53,7 +48,7 @@ namespace sysio {
              * @param cpu_weight The amount of SYS allocated for CPU
              * @param ram_weight The amount of SYS allocated for RAM.
              * @param time_block A block number, the policy can't be reclaimed or reduced before this block.
-             * @param network_gen Generation of issuer, in cases were you are a Node Owner in multiple, specifies which allocation of SYS to pull from.
+             * @param network_gen Generation of issuer, in cases where you are a Node Owner in multiple, specifies which allocation of SYS to pull from.
              */
             [[sysio::action]]
             void addpolicy(const name& owner, const name& issuer, const asset& net_weight, const asset& cpu_weight, const asset& ram_weight, const uint32_t& time_block, const uint8_t& network_gen);
@@ -68,13 +63,13 @@ namespace sysio {
              * @param net_weight The amount in SYS to increase NET by.
              * @param cpu_weight The amount in SYS to increase CPU by.
              * @param ram_weight The amount in SYS to increase RAM by.
-             * @param network_gen Generation of issuer, in cases were you are a Node Owner in multiple, specifies which allocation of SYS to pull from.
+             * @param network_gen Generation of issuer, in cases where you are a Node Owner in multiple, specifies which allocation of SYS to pull from.
              */
             [[sysio::action]]
             void expandpolicy(const name& owner, const name& issuer, const asset& net_weight, const asset& cpu_weight, const asset& ram_weight, const uint8_t& network_gen);
 
             /**
-             * @brief Increases the policie's time_block extending the policies term.
+             * @brief Increases the policy's time_block extending the policies term.
              *
              * @param owner The account this policy is issued to.
              * @param issuer The Node Owner who issued this policy.
@@ -84,7 +79,7 @@ namespace sysio {
             void extendpolicy(const name& owner, const name& issuer, const uint32_t& new_time_block);
 
             /**
-             * @brief Decrease the resource limits on an existing policy. Subtracts new weights from existing values. Only callable after policie's time_block.
+             * @brief Decrease the resource limits on an existing policy. Subtracts new weights from existing values. Only callable after policy's time_block.
              *
              * Note: Will reclaim UPTO ram_weight worth of bytes, limited to the pool of unused bytes on 'owner's reslimit and upper bound by the policy ram_weight.
              *
@@ -93,7 +88,7 @@ namespace sysio {
              * @param net_weight The amount in SYS to decrease NET by.
              * @param cpu_weight The amount in SYS to decrease CPU by.
              * @param ram_weight The amount in SYS to attempt decreasing RAM by, returning only
-             * @param network_gen Generation of issuer, in cases were you are a Node Owner in multiple, specifies which allocation of SYS to adjust.
+             * @param network_gen Generation of issuer, in cases where you are a Node Owner in multiple, specifies which allocation of SYS to adjust.
              */
             [[sysio::action]]
             void reducepolicy(const name& owner, const name& issuer, const asset& net_weight, const asset& cpu_weight, const asset& ram_weight, const uint8_t& network_gen);
@@ -253,7 +248,7 @@ namespace sysio {
             /**
              * Scoped to network_gen
              *
-             * Basic table tracking who T1-3 Node Owners are and their availble vs allocated SYS.
+             * Basic table tracking who T1-3 Node Owners are and their available vs allocated SYS.
              */
             struct nodeowner_key {
                 uint64_t owner;
@@ -322,7 +317,7 @@ namespace sysio {
             using reslimit_t = kv::table<"reslimit"_n, reslimit_key, reslimit>;
 
             /**
-             * This table is scoped to Node Owner's acoount names and is used to track all the node registration actions.
+             * This table is scoped to Node Owner's account names and is used to track all the node registration actions.
              */
             struct nodeownerreg_key {
                 uint64_t owner;
@@ -432,12 +427,15 @@ namespace sysio {
              *        existing table keeps the claim outcome queryable on Wire without aborting the
              *        dispatching transaction.
              *
-             * @param owner   The claimed account name.
-             * @param tier    The claimed tier.
-             * @param status  reg_status to record (CONFIRMED or REJECTED).
-             * @param reason  reject_reason; reject_reason::NONE for a CONFIRMED row.
+             * @param owner       The claimed account name.
+             * @param tier        The claimed tier.
+             * @param status      reg_status to record (CONFIRMED or REJECTED).
+             * @param reason      reject_reason; reject_reason::NONE for a CONFIRMED row.
+             * @param network_gen Generation to scope the audit row under (the caller's live roastate
+             *                     network_gen; passed in so this helper does not re-read the singleton).
              */
-            void record_nodereg(const name& owner, const uint8_t& tier, uint8_t status, uint8_t reason);
+            void record_nodereg(const name& owner, const uint8_t& tier, uint8_t status, uint8_t reason,
+                                uint8_t network_gen);
 
             /**
              * @brief Whether `account`'s name satisfies the node-owner name-length rule for `tier`.

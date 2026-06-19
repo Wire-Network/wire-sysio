@@ -612,7 +612,7 @@ BOOST_FIXTURE_TEST_CASE( byteprice_divisibility_guard, sysio_roa_tester ) try {
    BOOST_REQUIRE_EXCEPTION(
       base_tester::push_action(ROA, "setbyteprice"_n, ROA, mvo()("bytes_per_unit", newaccount_ram + 1)),
       sysio_assert_message_exception,
-      sysio_assert_message_is("newaccount_ram needs to be evenly divisable to avoid dust"));
+      sysio_assert_message_is("newaccount_ram needs to be evenly divisible to avoid dust"));
 
    // zero would divide-by-zero in the unit conversion; rejected up front.
    BOOST_REQUIRE_EXCEPTION(
