@@ -24,7 +24,8 @@ BOOST_AUTO_TEST_CASE(self_assign_copy) {
 
 BOOST_AUTO_TEST_CASE(self_assign_move) {
    variant v{std::string{"y"}};
-   v = std::move(v);
+   variant& same = v;
+   v = std::move(same);
    BOOST_CHECK(v.is_string());
    BOOST_CHECK_EQUAL(v.get_string(), "y");
 }

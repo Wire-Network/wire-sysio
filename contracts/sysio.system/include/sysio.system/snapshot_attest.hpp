@@ -70,6 +70,9 @@ struct [[sysio::table("snapvotes"), sysio::contract("sysio.system")]] snap_vote 
    uint32_t           block_num;
    checksum256        block_id;
    checksum256        snapshot_hash;
+   // Delegating PRODUCER identities that have voted -- NOT snap_accounts. Counting by the
+   // stable producer prevents a producer from inflating the count (and clearing the Byzantine
+   // quorum floor) by rotating snap_accounts. See snapshot_attest::votesnaphash.
    std::vector<name>  voters;
 
    uint64_t by_block_num() const { return static_cast<uint64_t>(block_num); }
@@ -133,6 +136,17 @@ struct [[sysio::contract("sysio.system")]] snapshot_attest : public sysio::contr
 
    /**
     * Update snapshot attestation configuration. Requires contract authority.
+    *
+    * @param min_providers  minimum voters required to attest (must be >= 1).
+    * @param threshold_pct  percentage of registered providers required (1..100).
+    *
+    * For N registered providers the effective quorum is
+    *     max( max(min_providers, ceil(N * threshold_pct / 100)), floor(N/3) + 1 )
+    * The trailing floor(N/3)+1 is a Byzantine safety floor (see votesnaphash): an attestation
+    * must always carry more than N/3 providers so a misconfigured-low threshold cannot let a
+    * Byzantine minority attest an arbitrary snapshot. It is a no-op under the default
+    * threshold_pct = 67 (ceil(0.67*N) >= floor(N/3)+1 for every N) and only raises the bar when
+    * threshold_pct is set below ~33%. A single-provider chain (N = 1) attests with one vote.
     */
    [[sysio::action]]
    void setsnpcfg(uint32_t min_providers, uint32_t threshold_pct);
