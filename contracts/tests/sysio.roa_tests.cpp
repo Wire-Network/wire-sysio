@@ -438,7 +438,7 @@ BOOST_FIXTURE_TEST_CASE( verify_ram, sysio_roa_tester ) try {
       create_accounts({node_owners[i]}, false, false, false, false);
       register_node_owner(node_owners[i], 1);
       control->get_resource_limits_manager().get_account_limits( node_owners[i], ram, net, cpu );
-      BOOST_TEST(ram == 8320); // values set by contract, verify they don't change for this test
+      BOOST_TEST(ram == newaccount_ram + 80l*104); // creation gift (newaccount_ram) kept + personal (80 units * 104 bytes_per_unit)
       BOOST_TEST(net == 500);
       BOOST_TEST(cpu == 500);
    }

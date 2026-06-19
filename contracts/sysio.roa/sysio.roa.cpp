@@ -850,9 +850,15 @@ namespace sysio {
             });
         }
 
-        // Owner reslimits
-        set_reslimit(owner, net_cpu_weight, net_cpu_weight, personal_ram_bytes);
-        set_resource_limits(owner, personal_ram_bytes, net_cpu_weight.amount, net_cpu_weight.amount);
+        // Owner reslimits. The account keeps its account-creation gift -- newaccount_ram, the same
+        // consensus constant sysio.system::newaccount transfers at creation -- and the node-owner
+        // personal allocation stacks on top. Computed from constants (NOT a read of the live quota)
+        // so the node owner's RAM is an exact, deterministic value: newaccount_ram + personal_ram_bytes.
+        // This also avoids the prior overwrite, which discarded the gift (and silently drained sysio's
+        // pool by newaccount_ram per registration).
+        uint64_t owner_ram = sysiosystem::newaccount_ram + personal_ram_bytes;
+        set_reslimit(owner, net_cpu_weight, net_cpu_weight, owner_ram);
+        set_resource_limits(owner, owner_ram, net_cpu_weight.amount, net_cpu_weight.amount);
 
         // Sysio reslimit
         reslimit_t sysioreslimit(get_self());
