@@ -186,20 +186,8 @@
                     "type": "uint8"
                 },
                 {
-                    "name": "trx_id",
-                    "type": "checksum256"
-                },
-                {
-                    "name": "trx_signature",
-                    "type": "bytes"
-                },
-                {
                     "name": "tier",
                     "type": "uint8"
-                },
-                {
-                    "name": "block_num",
-                    "type": "uint128"
                 },
                 {
                     "name": "reason",
@@ -581,11 +569,6 @@
                     "name": "bystatus",
                     "key_type": "uint64",
                     "table_id": 13229
-                },
-                {
-                    "name": "bytrxid",
-                    "key_type": "checksum256",
-                    "table_id": 31764
                 }
             ]
         },

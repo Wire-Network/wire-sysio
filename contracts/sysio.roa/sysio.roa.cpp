@@ -749,8 +749,6 @@ namespace sysio {
             row.status = status;
             row.tier   = tier;
             row.reason = reason;
-            // trx_id / trx_signature / block_num are unused under trust-OPP (the OPP envelope is the
-            // deposit proof); leave them at their default-constructed values.
         };
 
         if (nodereg.contains(reg_key)) {
@@ -1006,16 +1004,19 @@ namespace sysio {
             std::make_tuple( get_self(), new_username, owner_auth, active_auth)
         ).send();
 
-        // Record sponsor mapping
+        // Record sponsor mapping. The sponsoring tier-1 node owner (creator) pays the RAM for both
+        // of its sponsorship rows -- the per-user sponsors entry here and its own sponsorcount row
+        // below -- since creator and sponsor are the same entity and a tier-1 owner is provisioned
+        // for it. The contract does not subsidize either.
         sponsors.emplace(creator, sp_key, sponsor{
             .nonce = nonce,
             .username = new_username,
         });
 
-        // Update sponsor count for creator
+        // Update sponsor count for creator (creator-paid, same as the sponsors row above).
         sponsorcount_t sponsorcount(get_self(), state.network_gen);
         auto sc_key = sponsorcount_key{creator.value};
-        sponsorcount.upsert(get_self(), sc_key,
+        sponsorcount.upsert(creator, sc_key,
             roa::sponsorcount{.owner = creator, .count = 1},
             [&](auto& row) { row.count += 1; });
 

@@ -345,26 +345,24 @@ namespace sysio {
                 LINK_KEY_MISMATCH    = 5   // account already carries a different external-chain link key
             };
 
+            // Under trust-OPP the OPP envelope is the deposit proof, so this audit row records only
+            // the claim outcome -- no Ethereum tx id / signature / block number is stored (those
+            // vestigial fields and the by_trxid index they fed were dropped pre-launch).
             struct [[sysio::table("nodeownerreg")]] nodeownerreg {
                 name owner;                     // Node Owners account name
                 uint8_t status;                 // Registration outcome (reg_status): 0 -> CONFIRMED / 1 -> REJECTED
-                checksum256 trx_id;             // Transaction Id of Ethereum deposit
-                bytes trx_signature;            // Transaction Signature of Ethereum deposit
                 uint8_t tier;                   // Tier of Node Owner
-                uint128_t block_num;            // Ethereum Block number the deposit transaction is included in
                 uint8_t reason;                 // Rejection reason (see reject_reason); NONE(0) unless status == REJECTED
 
                 uint64_t by_tier() const { return static_cast<uint64_t>(tier); }
                 uint64_t by_status() const {return static_cast<uint64_t>(status); }
-                checksum256 by_trxid() const {return trx_id; }
 
-                SYSLIB_SERIALIZE(nodeownerreg, (owner)(status)(trx_id)(trx_signature)(tier)(block_num)(reason))
+                SYSLIB_SERIALIZE(nodeownerreg, (owner)(status)(tier)(reason))
             };
 
             using nodeownerreg_t = kv::scoped_table<"nodeownerreg"_n, nodeownerreg_key, nodeownerreg,
                 kv::index<"bytier"_n, const_mem_fun<nodeownerreg, uint64_t, &nodeownerreg::by_tier>>,
-                kv::index<"bystatus"_n, const_mem_fun<nodeownerreg, uint64_t, &nodeownerreg::by_status>>,
-                kv::index<"bytrxid"_n, const_mem_fun<nodeownerreg, checksum256, &nodeownerreg::by_trxid>>
+                kv::index<"bystatus"_n, const_mem_fun<nodeownerreg, uint64_t, &nodeownerreg::by_status>>
             >;
 
 
