@@ -621,6 +621,19 @@ public:
       BOOST_REQUIRE_EQUAL(success(), reg("SOLANA", "SOL", "PRIMARY"));
    }
 
+   /// Register the WIRE depot chain (`is_depot = (kind == CHAIN_KIND_WIRE)`), so a
+   /// swap whose destination leg is `WIRE` is treated as a to-WIRE swap (depot
+   /// destination, no destination UIC, settled inline via reserv::paywire).
+   void register_wire_depot() {
+      BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT,
+         "regchain"_n, mvo()
+            ("kind",              ChainKind::CHAIN_KIND_WIRE)
+            ("code",              codename_mvo("WIRE"))
+            ("external_chain_id", 0)
+            ("name",              std::string("wire-depot"))
+            ("description",       std::string{})));
+   }
+
    abi_serializer msgch_abi, opreg_abi, uwrit_abi, epoch_abi, reserv_abi, authex_abi, chains_abi, roa_abi,
                   token_abi;
 
@@ -889,12 +902,138 @@ BOOST_FIXTURE_TEST_CASE(swap_winner_without_dst_authex_link_is_disqualified,
    for (const auto& c : req["commits_by"].get_array()) {
       if (c["underwriter"].as_string() == UWRIT_OP.to_string()) {
          found = true;
-         BOOST_REQUIRE_EQUAL("UNDERWRITE_STATUS_SLASHED", c["status"].as_string());
+         BOOST_REQUIRE_EQUAL("UNDERWRITE_STATUS_DISQUALIFIED", c["status"].as_string());
          BOOST_REQUIRE(c["reason"].as_string().find(
             "no authex link for the destination") != std::string::npos);
       }
    }
    BOOST_REQUIRE(found);
+} FC_LOG_AND_RETHROW() }
+
+// [P1] regression (r3444213199): an oversized to-WIRE target_amount must be
+// terminally REJECTED + refunded BEFORE settlement. dst_amount is the unbounded
+// cross-chain SwapRequest.target_amount; left unchecked, a value near UINT64_MAX
+// wraps the `dst_amount + to_wire_fee` sufficiency guard, slips into settlement,
+// and aborts reserv::paywire's asset(static_cast<int64_t>(dst_amount)) inside
+// evalcons — a chain-wide consensus stall. A representable-but-too-large target
+// (> asset::max_amount) must also be rejected, never left stuck PENDING forever.
+BOOST_FIXTURE_TEST_CASE(swap_to_wire_oversized_target_is_rejected_not_aborted,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();          // ETH source outpost + UWRIT_OP (EVM link)
+   register_wire_depot();             // WIRE depot => to-WIRE destination
+   setup_wire_token_and_reserves();   // ACTIVE ETH/ETH/PRIMARY source reserve w/ WIRE
+
+   const uint64_t eth     = fc::slug_name{"ETH"}.value;
+   const uint64_t wire    = fc::slug_name{"WIRE"}.value;
+   const uint64_t primary = fc::slug_name{"PRIMARY"}.value;
+   // src_amount large enough that the 0.1% to-WIRE fee rounds to >= 1, so the
+   // pre-fix `dst_amount + to_wire_fee` actually wraps for dst_amount near
+   // UINT64_MAX and slips into paywire (the abort being regressed).
+   constexpr int64_t SRC_AMOUNT = 1'000'000;
+   BOOST_REQUIRE_EQUAL(success(),
+      depositinle_credit(UWRIT_OP, "ETH", "ETH", uint64_t{1'000'000'000}));
+
+   // A valid existing WIRE recipient so the to-WIRE path reaches the amount
+   // guard (past the recipient-validity terminal check).
+   const std::string rs = UWRIT_OP.to_string();
+   const std::vector<char> rcpt(rs.begin(), rs.end());
+
+   constexpr uint64_t ASSET_MAX = (uint64_t{1} << 62) - 1;
+   auto run = [&](uint64_t att_id, uint64_t target) {
+      const auto sr = encode_swap_request(
+         ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0a'),
+         eth, eth, primary, SRC_AMOUNT,
+         wire, wire, primary, target,
+         /*tolerance_bps*/ 1'000'000, ChainKind::CHAIN_KIND_WIRE, rcpt);
+      BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(att_id, eth, sr));
+      const auto src_uic = make_signed_uic(UWRIT_OP, att_id, eth, eth, eth, primary);
+      // The push MUST succeed — a pre-fix wrap aborts paywire's asset() here and
+      // fails the whole transaction (the production consensus stall).
+      BOOST_REQUIRE_EQUAL(success(),
+         rcrdcommit_direct(att_id, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", src_uic));
+      const auto req = get_uwreq(att_id);
+      BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_REJECTED", req["status"].as_string());
+      // Pin the rejection to the amount guard (not the variance recheck, which
+      // the 100x tolerance above lets pass).
+      bool reason_ok = false;
+      for (const auto& c : req["commits_by"].get_array()) {
+         if (c["underwriter"].as_string() == UWRIT_OP.to_string())
+            reason_ok = c["reason"].as_string().find("asset") != std::string::npos;
+      }
+      BOOST_REQUIRE(reason_ok);
+   };
+
+   run(7001, ASSET_MAX + 1);        // target == asset::max_amount + 1 (boundary)
+   run(7002, uint64_t{1} << 63);    // high bit set (negative as int64)
+   run(7003, ~uint64_t{0});         // UINT64_MAX — wraps dst_amount + fee pre-fix
+} FC_LOG_AND_RETHROW() }
+
+// Regression (r3444212152): a candidate whose UIC signature does not recover to
+// its active/owner key must be DISQUALIFIED so the race state converges — not
+// silently left INTENT_SUBMITTED, keeping the uwreq pending/noisy until another
+// underwriter wins. The handler stays non-throwing (no consensus stall).
+BOOST_FIXTURE_TEST_CASE(swap_candidate_with_invalid_uic_signature_is_disqualified,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+   register_wire_depot();             // to-WIRE: a single (source) required leg
+
+   const uint64_t eth     = fc::slug_name{"ETH"}.value;
+   const uint64_t wire    = fc::slug_name{"WIRE"}.value;
+   const uint64_t primary = fc::slug_name{"PRIMARY"}.value;
+   constexpr uint64_t ATT_ID = 7200;
+   BOOST_REQUIRE_EQUAL(success(),
+      depositinle_credit(UWRIT_OP, "ETH", "ETH", uint64_t{1'000'000}));
+
+   const std::string rs = UWRIT_OP.to_string();
+   const std::vector<char> rcpt(rs.begin(), rs.end());
+   const auto sr = encode_swap_request(
+      ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0a'),
+      eth, eth, primary, /*src_amount*/ 100,
+      wire, wire, primary, /*target*/ 50,
+      5000, ChainKind::CHAIN_KIND_WIRE, rcpt);
+   BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(ATT_ID, eth, sr));
+
+   // Source UIC signed by the WRONG account (batchop.a): the recovered key does
+   // not match UWRIT_OP's active/owner permission, so verify_uic_signature
+   // returns false. The push must still succeed (non-throwing).
+   const auto bad_uic = make_signed_uic(BATCHOP, ATT_ID, eth, eth, eth, primary);
+   BOOST_REQUIRE_EQUAL(success(),
+      rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", bad_uic));
+
+   const auto req = get_uwreq(ATT_ID);
+   // Race left open (PENDING) but the bad candidate is DISQUALIFIED.
+   BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_PENDING", req["status"].as_string());
+   bool found = false;
+   for (const auto& c : req["commits_by"].get_array()) {
+      if (c["underwriter"].as_string() == UWRIT_OP.to_string()) {
+         found = true;
+         BOOST_REQUIRE_EQUAL("UNDERWRITE_STATUS_DISQUALIFIED", c["status"].as_string());
+         BOOST_REQUIRE(c["reason"].as_string().find("signature") != std::string::npos);
+      }
+   }
+   BOOST_REQUIRE(found);
+} FC_LOG_AND_RETHROW() }
+
+// Regression (r3444212155): a malformed inbound SwapRequest must NOT abort the
+// consensus-tipping delivery. createuwreq logs + skips (no row, no throw) when
+// the payload fails to decode — it cannot be refunded either, since the revert
+// needs the undecodable actor / source_amount.
+BOOST_FIXTURE_TEST_CASE(createuwreq_malformed_swaprequest_does_not_abort,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+
+   const uint64_t eth = fc::slug_name{"ETH"}.value;
+   constexpr uint64_t ATT_ID = 7300;
+   // A length-delimited protobuf field (tag 0x0a) claiming far more bytes than
+   // are present — the decoder underruns the buffer and returns an error. (Even
+   // a tolerant decoder yields random fields that name no registered chain, so
+   // no row is created either way.)
+   const std::vector<char> garbage{'\x0a', '\x80', '\x80', '\x80', '\x80', '\x08'};
+   const std::string garbage_str(garbage.begin(), garbage.end());
+   // Must NOT throw (a check() here would abort the delivery before any row
+   // exists) and must NOT create a uwreq row.
+   BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(ATT_ID, eth, garbage_str));
+   BOOST_REQUIRE(get_uwreq(ATT_ID).is_null());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()

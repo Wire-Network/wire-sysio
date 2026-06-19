@@ -6,6 +6,7 @@
 #include <sysio.chains/sysio.chains.hpp>
 #include <sysio.opp.common/slug_name.hpp>
 #include <sysio.opp.common/amm_math.hpp>
+#include <sysio.opp.common/safe_ops.hpp>
 #include <sysio/opp/attestations/attestations.pb.hpp>
 #include <sysio/permission.hpp>
 #include <sysio/crypto.hpp>
@@ -347,16 +348,18 @@ std::optional<reserve::reserve_row> find_active_reserve(sysio::slug_name chain_c
 }
 
 /// Parse a WIRE account name from its string-spelling bytes (the canonical
-/// `ChainAddress.address` encoding for CHAIN_KIND_WIRE). Length + charset
-/// are validated BEFORE constructing the `name`, so this never throws —
-/// it runs inside the evalcons dispatch chain.
+/// `ChainAddress.address` encoding for CHAIN_KIND_WIRE). Charset + length +
+/// final-symbol bounds are validated BEFORE constructing the `name`, so this
+/// never throws — it runs inside the evalcons dispatch chain. Validation is
+/// delegated to the shared `sysio::opp::safe::is_valid_name_string`, which
+/// mirrors CDT's exact rules and accepts the FULL CDT name domain — including a
+/// legitimate 13-byte name whose final symbol fits the 4-bit final slot. (The
+/// earlier `size() > 12` cap wrongly rejected every 13-character WIRE
+/// depositor/recipient.) An empty address is not a valid principal here.
 std::optional<name> parse_wire_name(const std::vector<char>& bytes) {
-   if (bytes.empty() || bytes.size() > 12) return std::nullopt;
-   for (char c : bytes) {
-      const bool ok = (c >= 'a' && c <= 'z') || (c >= '1' && c <= '5') || c == '.';
-      if (!ok) return std::nullopt;
-   }
-   return name{std::string_view{bytes.data(), bytes.size()}};
+   const std::string_view sv{bytes.data(), bytes.size()};
+   if (sv.empty() || !sysio::opp::safe::is_valid_name_string(sv)) return std::nullopt;
+   return name{sv};
 }
 
 /// A WIRE account name as its string-spelling bytes — the inverse of
@@ -645,15 +648,31 @@ void uwrit::createuwreq(uint64_t attestation_id,
    }
 
    // Only SWAP_REQUEST attestations create UWREQs — msgch's dispatch routes
-   // other types directly to their handlers, not through createuwreq.
-   check(type == AttestationType::ATTESTATION_TYPE_SWAP_REQUEST,
-         "createuwreq currently supports only SWAP_REQUEST attestations");
+   // other types directly to their handlers, not through createuwreq. A
+   // non-SWAP type can only arrive from a future/buggy dispatcher; per
+   // `feedback_opp_handlers_never_throw.md` a check() here would halt evalcons
+   // and stall consensus, so log + skip instead of asserting.
+   if (type != AttestationType::ATTESTATION_TYPE_SWAP_REQUEST) {
+      sysio::print("createuwreq: non-SWAP_REQUEST attestation ", attestation_id,
+                   " routed to createuwreq, skipping\n");
+      return;
+   }
 
+   // Decode the operator-supplied SwapRequest. A malformed payload cannot be
+   // refunded (emit_swap_revert needs the decoded actor / source_amount to
+   // tell the outpost which deposit to reverse — exactly what failed to
+   // decode), and a check() here would abort the consensus-tipping delivery
+   // before any uwreq row exists, stalling epoch advancement chain-wide. Log +
+   // skip: no row is created, so no state is corrupted and the relay
+   // continues. Per `feedback_opp_handlers_never_throw.md`.
    SwapRequest sr;
    {
       auto in = zpp::bits::in{std::span{data.data(), data.size()}, zpp::bits::no_size{}};
-      auto rc = in(sr);
-      check(rc == zpp::bits::errc{}, "failed to decode SwapRequest");
+      if (in(sr) != zpp::bits::errc{}) {
+         sysio::print("createuwreq: failed to decode SwapRequest for attestation ",
+                      attestation_id, ", skipping (undecodable — cannot revert)\n");
+         return;
+      }
    }
 
    // Pull the slug_name triples + amounts out of the decoded SwapRequest.
@@ -826,15 +845,24 @@ uwrit::commit_entry* find_or_create_commit(uwrit::uw_request_t& req, name underw
    return &req.commits_by.back();
 }
 
-/// Mark a single candidate's commit_entry as race-disqualified — the
-/// `SLASHED` status doubles as the "lost on a hard disqualification" sentinel
-/// (vs `RELEASED` for a clean race loser) — and leave the uwreq PENDING so
-/// the race can still resolve for another valid underwriter. Non-throwing.
+/// Mark a single candidate's commit_entry as race-disqualified and leave the
+/// uwreq PENDING so the race can still resolve for another valid underwriter.
+/// Non-throwing.
+///
+/// Uses the dedicated `UNDERWRITE_STATUS_DISQUALIFIED` status — a
+/// candidate-specific, pre-settlement invalidity (bad UIC signature,
+/// insufficient bond, or a missing destination authex link). It is
+/// deliberately distinct from `UNDERWRITE_STATUS_SLASHED` (an economic
+/// punishment that actually burned collateral) and from
+/// `UNDERWRITE_STATUS_RELEASED` (a clean race loser whose commit was valid):
+/// conflating the three would mislead downstream indexing and audits. A
+/// disqualified entry is reclaimable — a later `rcrdcommit` re-arms it to
+/// `INTENT_SUBMITTED` for re-evaluation.
 void disqualify_candidate(uwrit::uwreqs_t& reqs, const uwrit::id_key& pk,
                           name candidate, const std::string& reason) {
    reqs.modify(same_payer, pk, [&](auto& r) {
       auto* c = find_or_create_commit(r, candidate);
-      c->status = UnderwriteStatus::UNDERWRITE_STATUS_SLASHED;
+      c->status = UnderwriteStatus::UNDERWRITE_STATUS_DISQUALIFIED;
       c->reason = reason;
    });
 }
@@ -904,9 +932,9 @@ void reject_and_refund(name self, uwrit::uwreqs_t& reqs, const uwrit::id_key& pk
 ///   * normal     — reserv::applyswap  + SWAP_REMIT to the dst outpost
 ///   * from-WIRE  — reserv::applyfromwire + SWAP_REMIT to the dst outpost
 ///   * to-WIRE    — reserv::paywire (REAL WIRE to the recipient; no remit)
-/// Disqualified candidates get their commit_entry marked (status=SLASHED
-/// as the "race-disqualified" sentinel); transient liquidity shortfalls
-/// log + skip, leaving the uwreq PENDING.
+/// Disqualified candidates get their commit_entry marked
+/// (status=DISQUALIFIED); transient liquidity shortfalls log + skip, leaving
+/// the uwreq PENDING.
 void try_select_winner(name self, uint64_t uwreq_id, name candidate) {
    uwrit::uwreqs_t reqs(self);
    auto pk = uwrit::id_key{uwreq_id};
@@ -926,12 +954,17 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate) {
    if (!ce_ptr) return;
    if ((src_needed && !verify_uic_signature(candidate, ce_ptr->source_uic_bytes)) ||
        (dst_needed && !verify_uic_signature(candidate, ce_ptr->dest_uic_bytes))) {
-      // Per `feedback_opp_handlers_never_throw.md`: dispatch handlers
-      // must NOT throw — a check() halts evalcons and stalls consensus.
-      // Log + skip instead. The race resolves with the remaining valid
-      // commit if any.
-      // TODO: decide how to handle invalid sigs before launch @jglanz
-      sysio::print("invalid sig for uwreq ", uwreq_id, " from ", candidate, "\n");
+      // A candidate whose UIC signature does not recover to its active/owner
+      // key can never win — disqualify it (non-throwing) so the race state
+      // converges, instead of leaving a stale INTENT_SUBMITTED that keeps the
+      // uwreq pending/noisy until another underwriter wins. The race stays
+      // open for the remaining valid commits, and the disqualified candidate
+      // may re-arm via a later rcrdcommit. Per
+      // `feedback_opp_handlers_never_throw.md` a check() here would halt
+      // evalcons and stall consensus, so this path stays non-throwing.
+      disqualify_candidate(reqs, pk, candidate,
+                           "invalid underwrite-intent-commit signature on one "
+                           "or both required legs");
       return;
    }
 
@@ -1017,17 +1050,37 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate) {
          return;
       }
       towire_recipient = *rcpt;
+      // Terminal: the to-WIRE payout is sent as `asset(dst_amount, WIRE)` by
+      // reserv::paywire. `dst_amount` is the UNBOUNDED cross-chain
+      // `SwapRequest.target_amount`; a target exceeding asset::max_amount
+      // (2^62-1) can never be represented as a WIRE asset — for ANY winner or
+      // liquidity. Left unchecked it would (a) wrap the `dst_amount +
+      // to_wire_fee` sufficiency guard below for a target near UINT64_MAX,
+      // letting the swap slip into settlement, then (b) abort paywire's
+      // asset() constructor mid-evalcons and stall consensus. Reject + refund
+      // the source side here, BEFORE any CONFIRMED / lock / reserve write.
+      if (req.dst_amount > static_cast<uint64_t>(asset::max_amount)) {
+         reject_and_refund(self, reqs, pk, req, src_needed,
+            "swap-to-WIRE rejected: target amount exceeds the maximum "
+            "representable WIRE asset",
+            "uwreq rejected: to-WIRE target exceeds asset max_amount");
+         return;
+      }
       auto src_r = find_active_reserve(req.src_chain_code, req.src_token_code, req.src_reserve_code);
       // paywire gives up `dst_amount` (to the recipient) + the fee (on the gross
       // WIRE leg) out of the source reserve's WIRE; pre-validate that exact sum.
+      // `dst_amount` is bounded <= asset::max_amount above and `to_wire_fee`
+      // derives from the (asset-bounded) reserve WIRE, so the sum cannot wrap
+      // uint64 — but add saturating so the guard is provably overflow-free at
+      // the settlement boundary regardless of inputs.
       const uint64_t w_gross = src_r
          ? opp::amm::token_to_wire(src_r->reserve_chain_amount, src_r->reserve_wire_amount,
                                    src_r->connector_weight_bps, req.src_amount)
          : 0;
       const uint64_t to_wire_fee = opp::amm::split_wire_fee(
          w_gross, current_fee_bps(self), reserve::FEE_REWARD_SHARE_BPS).fee;
-      if (!src_r || w_gross == 0 ||
-          src_r->reserve_wire_amount < req.dst_amount + to_wire_fee) {
+      const uint64_t wire_needed = opp::safe::add_sat_u64(req.dst_amount, to_wire_fee);
+      if (!src_r || w_gross == 0 || src_r->reserve_wire_amount < wire_needed) {
          sysio::print("try_select_winner: insufficient source-reserve WIRE for "
                       "to-WIRE payout on uwreq ", uwreq_id, ", skipping\n");
          return;
@@ -1256,10 +1309,13 @@ void uwrit::rcrdcommit(uint64_t uwreq_id,
          c->dest_outpost_id     = chain_code;
          c->dest_uic_bytes      = uic_bytes;
       }
-      // Re-set status to INTENT_SUBMITTED if the underwriter is re-arming
-      // a previously-disqualified entry (e.g. they topped up bond and want
-      // back in the race). The next try_select_winner call re-evaluates.
-      if (c->status == UnderwriteStatus::UNDERWRITE_STATUS_SLASHED) {
+      // Re-arm a previously-disqualified entry to INTENT_SUBMITTED if the
+      // underwriter re-commits (e.g. they topped up bond, or added the missing
+      // destination authex link, and want back in the race). The next
+      // try_select_winner call re-evaluates. An economic SLASH is recorded on
+      // the lock, never on a commit_entry, so DISQUALIFIED is the only
+      // reclaimable terminal state here.
+      if (c->status == UnderwriteStatus::UNDERWRITE_STATUS_DISQUALIFIED) {
          c->status = UnderwriteStatus::UNDERWRITE_STATUS_INTENT_SUBMITTED;
          c->reason.clear();
       }

@@ -1,4 +1,5 @@
 #include <sysio.dclaim/sysio.dclaim.hpp>
+#include <sysio.opp.common/safe_ops.hpp>
 
 #include <cstdint>
 #include <string>
@@ -53,26 +54,10 @@ uint64_t next_id(name self, Pick pick) {
    return id;
 }
 
-/// Non-throwing validation of a string destined for `name(std::string_view)`. CDT's name
-/// constructor calls `check(false, ...)` (an abort) on a string longer than 13 chars, containing a
-/// character outside ".12345abcdefghijklmnopqrstuvwxyz", or whose 13th character exceeds the 4-bit
-/// final symbol. Inside the OPP inbound dispatch chain (msgch::evalcons -> dclaim::onreward) such
-/// an abort would roll back the consensus-tipping deliver and stall epoch advancement, so a
-/// cross-chain-supplied account string must be validated here and soft-skipped, never constructed
-/// blindly. Mirrors CDT basic_name's char_to_value + length rules.
-inline bool is_valid_name_string(std::string_view s) {
-   if (s.size() > 13) return false;
-   for (std::size_t i = 0; i < s.size(); ++i) {
-      const char c = s[i];
-      uint8_t v;
-      if      (c == '.')               v = 0;
-      else if (c >= '1' && c <= '5')   v = static_cast<uint8_t>(c - '1' + 1);
-      else if (c >= 'a' && c <= 'z')   v = static_cast<uint8_t>(c - 'a' + 6);
-      else return false;                       // character outside the name alphabet
-      if (i == 12 && v > 15) return false;     // 13th character encodes only 4 bits
-   }
-   return true;
-}
+/// Non-throwing validation of a string destined for `name(std::string_view)`. Shared with every
+/// other OPP inbound handler via `sysio.opp.common/safe_ops.hpp` so the never-throw name domain is
+/// defined and audited in exactly one place.
+using sysio::opp::safe::is_valid_name_string;
 
 /// Saturating WIRE credit. `asset::operator+=` aborts on overflow past `asset::max_amount`
 /// (2^62-1); credit_wire runs inside the never-throw OPP inbound path (via onreward), so cap at

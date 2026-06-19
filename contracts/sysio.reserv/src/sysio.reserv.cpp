@@ -6,6 +6,7 @@
 #include <sysio.uwrit/sysio.uwrit.hpp>
 #include <sysio.opp.common/opp_table_types.hpp>
 #include <sysio.opp.common/amm_math.hpp>
+#include <sysio.opp.common/safe_ops.hpp>
 
 #include <zpp_bits.h>
 
@@ -52,9 +53,10 @@ constexpr sysio::slug_name WIRE_TOKEN = "WIRE"_s;
 /// inside the consensus dispatch chain (onreward via msgch::evalcons; applyswap / applyfromwire /
 /// paywire inline from uwrit::try_select_winner). A raw `+=` could wrap the uint64 and corrupt the
 /// weighted-AMM curve and the `>=` sufficiency checks; cap at UINT64_MAX instead — never wrap,
-/// never throw on the consensus path. The cap is unreachable for any real token amount.
+/// never throw on the consensus path. The cap is unreachable for any real token amount. Delegates
+/// to the shared `sysio::opp::safe::add_sat_u64` so the never-wrap rule lives in one place.
 inline void add_capped_u64(uint64_t& balance, uint64_t amt) {
-   balance = (amt > UINT64_MAX - balance) ? UINT64_MAX : balance + amt;
+   balance = sysio::opp::safe::add_sat_u64(balance, amt);
 }
 
 /// Live per-spoke swap fee (basis points) — owned by `sysio.uwrit`. Read fresh
