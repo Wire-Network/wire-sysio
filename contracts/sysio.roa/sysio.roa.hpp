@@ -48,7 +48,8 @@ namespace sysio {
              * @param cpu_weight The amount of SYS allocated for CPU
              * @param ram_weight The amount of SYS allocated for RAM.
              * @param time_block A block number, the policy can't be reclaimed or reduced before this block.
-             * @param network_gen Generation of issuer, in cases where you are a Node Owner in multiple, specifies which allocation of SYS to pull from.
+             * @param network_gen Generation of issuer, in cases where you are a Node Owner in multiple,
+             *                     specifies which allocation of SYS to pull from.
              */
             [[sysio::action]]
             void addpolicy(const name& owner, const name& issuer, const asset& net_weight, const asset& cpu_weight, const asset& ram_weight, const uint32_t& time_block, const uint8_t& network_gen);
@@ -63,7 +64,8 @@ namespace sysio {
              * @param net_weight The amount in SYS to increase NET by.
              * @param cpu_weight The amount in SYS to increase CPU by.
              * @param ram_weight The amount in SYS to increase RAM by.
-             * @param network_gen Generation of issuer, in cases where you are a Node Owner in multiple, specifies which allocation of SYS to pull from.
+             * @param network_gen Generation of issuer, in cases where you are a Node Owner in multiple,
+             *                     specifies which allocation of SYS to pull from.
              */
             [[sysio::action]]
             void expandpolicy(const name& owner, const name& issuer, const asset& net_weight, const asset& cpu_weight, const asset& ram_weight, const uint8_t& network_gen);
@@ -79,7 +81,8 @@ namespace sysio {
             void extendpolicy(const name& owner, const name& issuer, const uint32_t& new_time_block);
 
             /**
-             * @brief Decrease the resource limits on an existing policy. Subtracts new weights from existing values. Only callable after policy's time_block.
+             * @brief Decrease the resource limits on an existing policy. Subtracts new weights from
+             *        existing values. Only callable after policy's time_block.
              *
              * Note: Will reclaim UPTO ram_weight worth of bytes, limited to the pool of unused bytes on 'owner's reslimit and upper bound by the policy ram_weight.
              *
@@ -88,7 +91,8 @@ namespace sysio {
              * @param net_weight The amount in SYS to decrease NET by.
              * @param cpu_weight The amount in SYS to decrease CPU by.
              * @param ram_weight The amount in SYS to attempt decreasing RAM by, returning only
-             * @param network_gen Generation of issuer, in cases where you are a Node Owner in multiple, specifies which allocation of SYS to adjust.
+             * @param network_gen Generation of issuer, in cases where you are a Node Owner in multiple,
+             *                     specifies which allocation of SYS to adjust.
              */
             [[sysio::action]]
             void reducepolicy(const name& owner, const name& issuer, const asset& net_weight, const asset& cpu_weight, const asset& ram_weight, const uint8_t& network_gen);
@@ -342,7 +346,8 @@ namespace sysio {
                 OWNER_NOT_ACCOUNT    = 2,  // account does not exist (creation did not occur)
                 ACCOUNT_KEY_MISMATCH = 3,  // existing account's active authority != the single claimed wire key
                 DUPLICATE            = 4,  // owner is already a registered node owner
-                LINK_KEY_MISMATCH    = 5   // account already carries a different external-chain link key
+                LINK_KEY_MISMATCH    = 5,  // account already carries a different external-chain link key
+                OWNER_HAS_RESLIMIT   = 6   // account already ROA-provisioned (regnodeowner can't create its reslimit)
             };
 
             // Under trust-OPP the OPP envelope is the deposit proof, so this audit row records only
@@ -432,7 +437,7 @@ namespace sysio {
              * @param network_gen Generation to scope the audit row under (the caller's live roastate
              *                     network_gen; passed in so this helper does not re-read the singleton).
              */
-            void record_nodereg(const name& owner, const uint8_t& tier, uint8_t status, uint8_t reason,
+            void record_nodereg(const name& owner, uint8_t tier, uint8_t status, uint8_t reason,
                                 uint8_t network_gen);
 
             /**

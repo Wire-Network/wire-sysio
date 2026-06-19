@@ -935,6 +935,60 @@ BOOST_FIXTURE_TEST_CASE( addpolicy_sysio_ram_only, sysio_roa_full_tester ) try {
    BOOST_TEST(p["cpu_weight"].as_string() == "0.0000 SYS");
 } FC_LOG_AND_RETHROW()
 
+// ===== 1b. shared boundary guards: core-SYS symbol + owner existence =====
+// These lock in the validation added across addpolicy/expandpolicy/reducepolicy. The symbol guard
+// matters specifically for the same-but-wrong-symbol case (all three weights in one non-SYS symbol):
+// asset::operator+ only checks operands share a symbol and the affordability gate compares raw
+// amounts, so without check_core_symbol such a weight is silently accepted and mis-scales reserve
+// accounting. Mixed symbols already fail at the asset addition; this is the case that did not.
+
+// addpolicy rejects a wrong-symbol (here TST) set of weights.
+BOOST_FIXTURE_TEST_CASE( addpolicy_wrong_symbol, sysio_roa_full_tester ) try {
+   auto user = create_newuser(node_owners[2]);
+   produce_block();
+
+   BOOST_CHECK_EXCEPTION(
+      add_roa_policy(node_owners[2], user, "1.0000 TST", "1.0000 TST", "1.0000 TST", 0, 0),
+      sysio_assert_message_exception,
+      sysio_assert_message_is("policy weights must be denominated in the core SYS symbol"));
+} FC_LOG_AND_RETHROW()
+
+// addpolicy rejects an owner account that does not exist (guards the reslimit / system-resource
+// writes that follow -- they would otherwise run against a non-account).
+BOOST_FIXTURE_TEST_CASE( addpolicy_nonexistent_owner, sysio_roa_full_tester ) try {
+   BOOST_CHECK_EXCEPTION(
+      add_roa_policy(node_owners[2], "ghostacct"_n, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0, 0),
+      sysio_assert_message_exception,
+      sysio_assert_message_is("owner account does not exist"));
+} FC_LOG_AND_RETHROW()
+
+// expandpolicy rejects a wrong-symbol increment on an existing (SYS) policy.
+BOOST_FIXTURE_TEST_CASE( expandpolicy_wrong_symbol, sysio_roa_full_tester ) try {
+   auto user = create_newuser(node_owners[2]);
+   produce_block();
+   add_roa_policy(node_owners[2], user, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0, 0);
+   produce_block();
+
+   BOOST_CHECK_EXCEPTION(
+      expand_roa_policy(node_owners[2], user, "1.0000 TST", "1.0000 TST", "1.0000 TST", 0),
+      sysio_assert_message_exception,
+      sysio_assert_message_is("policy weights must be denominated in the core SYS symbol"));
+} FC_LOG_AND_RETHROW()
+
+// reducepolicy rejects a wrong-symbol reduction on an existing (SYS) policy. The symbol guard fires
+// before the time_block / below-zero checks, so a time_block of 0 is enough to reach it.
+BOOST_FIXTURE_TEST_CASE( reducepolicy_wrong_symbol, sysio_roa_full_tester ) try {
+   auto user = create_newuser(node_owners[2]);
+   produce_block();
+   add_roa_policy(node_owners[2], user, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0, 0);
+   produce_block();
+
+   BOOST_CHECK_EXCEPTION(
+      reduce_roa_policy(node_owners[2], user, "1.0000 TST", "1.0000 TST", "1.0000 TST", 0),
+      sysio_assert_message_exception,
+      sysio_assert_message_is("policy weights must be denominated in the core SYS symbol"));
+} FC_LOG_AND_RETHROW()
+
 // ===== 2. expandpolicy validation =====
 
 // Expand non-existent policy should fail
@@ -1506,7 +1560,8 @@ public:
    // nodeownerreg reg_status + reject_reason values (mirror sysio.roa.hpp).
    static constexpr uint64_t CONFIRMED = 0, REJECTED = 1;
    static constexpr uint64_t R_NAME_INVALID = 1, R_OWNER_NOT_ACCOUNT = 2,
-                             R_ACCOUNT_KEY_MISMATCH = 3, R_DUPLICATE = 4, R_LINK_KEY_MISMATCH = 5;
+                             R_ACCOUNT_KEY_MISMATCH = 3, R_DUPLICATE = 4, R_LINK_KEY_MISMATCH = 5,
+                             R_OWNER_HAS_RESLIMIT = 6;
 
    abi_serializer authex_abi_ser;
 };
@@ -1555,6 +1610,32 @@ BOOST_FIXTURE_TEST_CASE( nodeownreg_account_key_mismatch, sysio_roa_nodeownreg_t
    auto audit = get_nodeownerreg(owner);
    BOOST_REQUIRE_EQUAL(audit["status"].as<uint64_t>(), REJECTED);
    BOOST_REQUIRE_EQUAL(audit["reason"].as<uint64_t>(), R_ACCOUNT_KEY_MISMATCH);
+} FC_LOG_AND_RETHROW()
+
+// Account already ROA-provisioned (carries a reslimit row from an earlier policy) -> nodeownreg
+// soft-fails OWNER_HAS_RESLIMIT instead of throwing in regnodeowner's set_reslimit and aborting the
+// depot dispatch. Trust-OPP: claim-resolution problems are recorded, never thrown.
+BOOST_FIXTURE_TEST_CASE( nodeownreg_owner_has_reslimit, sysio_roa_nodeownreg_tester ) try {
+   const auto owner    = "claimacct"_n;
+   const auto wire_pub = gen_k1_key();
+   const auto eth_pub  = gen_em_key();
+
+   // Create the claim account in-flow, then provision it under ROA via a RAM-only policy so it
+   // carries a reslimit row (NODE_DADDY is the tier-1 issuer seeded by init_roa in the base fixture).
+   BOOST_REQUIRE_EQUAL(success(), newnameduser(owner, wire_pub, 2));
+   produce_blocks();
+   add_roa_policy(NODE_DADDY, owner, "0.0000 SYS", "0.0000 SYS", "1.0000 SYS", 0, 0);
+   produce_blocks();
+   BOOST_REQUIRE(!get_reslimit(owner).is_null()); // precondition: owner now has a reslimit row
+
+   // The claim must commit (success) and soft-fail, not throw and abort the dispatch.
+   BOOST_REQUIRE_EQUAL(success(), nodeownreg(owner, 2, eth_pub, wire_pub));
+   produce_blocks();
+
+   BOOST_REQUIRE(get_nodeowner(owner).is_null());
+   auto audit = get_nodeownerreg(owner);
+   BOOST_REQUIRE_EQUAL(audit["status"].as<uint64_t>(), REJECTED);
+   BOOST_REQUIRE_EQUAL(audit["reason"].as<uint64_t>(), R_OWNER_HAS_RESLIMIT);
 } FC_LOG_AND_RETHROW()
 
 // Account already carries a DIFFERENT EVM link (e.g. an operator createlink or an earlier deposit

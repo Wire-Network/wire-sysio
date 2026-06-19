@@ -33,15 +33,17 @@ namespace sysio {
     // Per-tier SYS allocation as a fraction of total supply, with round-to-nearest (the "+half"
     // numerator term). Single source of truth shared by activateroa (which sizes the node-owner
     // reserve) and get_allocation_for_tier (which allocates an individual owner) so the fractions
-    // and rounding can never drift between the two. The caller bounds total_amount (activateroa caps
-    // the supply at activation), so total_amount * 15 stays within int64.
+    // and rounding can never drift between the two. Both callers keep total_amount within int64:
+    // activateroa bounds the supply at activation, and get_allocation_for_tier reads
+    // state.total_sys.amount, which was validated against that same bound before it was persisted --
+    // so total_amount * 15 cannot overflow.
     //   T1 = 4/100, T2 = 15/10,000 (0.0015), T3 = 3/100,000 (0.00003).
     static int64_t tier_sys_allocation(uint8_t tier, int64_t total_amount) {
         switch (tier) {
             case 1: return (total_amount * 4 + 50) / 100;
             case 2: return (total_amount * 15 + 5000) / 10000;
             case 3: return (total_amount * 3 + 50000) / 100000;
-            default: check(false, "Invalid tier"); return 0;
+            default: check(false, "Invalid tier"); return 0; // check() aborts; return is unreachable
         }
     }
 
@@ -134,12 +136,6 @@ namespace sysio {
         check(total_sys.symbol == symbol("SYS", 4), "Total SYS must be SYS.");
         check_divisible_byte_price(bytes_per_unit);
 
-        state.is_active = true;
-        state.total_sys = total_sys;
-        state.bytes_per_unit = bytes_per_unit;
-        state.network_gen = 0;
-        roastate.set(state, get_self());
-
         const int64_t total_amount = total_sys.amount; // smallest units
 
         // Bound the supply so the tier math below (e.g. total_amount * 15) and the later
@@ -147,8 +143,16 @@ namespace sysio {
         // call at bootstrap with a sane supply (~7.5e8 units), so this only rejects absurd inputs --
         // far above any real supply and well below where the derived math would overflow.
         // 1e15 units = 1e11 SYS: ~1e6x any real supply, ~8x below the binding overflow point.
+        // Validate the input BEFORE persisting state so a rejected supply never writes a half-set row
+        // (a throw rolls the row back regardless, but validate-then-mutate reads cleaner).
         constexpr int64_t max_total_sys_amount = 1'000'000'000'000'000; // 1e15
         check(total_amount > 0 && total_amount <= max_total_sys_amount, "Total SYS out of range");
+
+        state.is_active = true;
+        state.total_sys = total_sys;
+        state.bytes_per_unit = bytes_per_unit;
+        state.network_gen = 0;
+        roastate.set(state, get_self());
 
         // Per-node tier allocations via the shared helper (single source of truth for the fractions
         // and rounding; see tier_sys_allocation). Tier counts come from the shared constants in
@@ -726,6 +730,20 @@ namespace sysio {
             }
         }
 
+        // (6) the account must not already be resource-provisioned under ROA. regnodeowner creates the
+        // owner's reslimit row from scratch (set_reslimit asserts it is absent), so an account that
+        // already carries one -- e.g. it previously received a policy via addpolicy -- would throw and
+        // abort the depot dispatch instead of soft-failing. Per trust-OPP, detect it here and record a
+        // reject row so the claim stays a non-throwing no-op. (forcereg, the governance/test path, has
+        // no soft-fail contract and still hard-fails in set_reslimit, which is fine there.)
+        {
+            reslimit_t reslimit(get_self());
+            if (reslimit.contains(reslimit_key{owner.value})) {
+                record_nodereg(owner, tier, REJECTED, OWNER_HAS_RESLIMIT, gen);
+                return;
+            }
+        }
+
         // Record the depositor's ETH key as a sysio.authex link via the trusted depot-only path.
         // recordlink requires sysio.authex.active, satisfied by the sysio.roa@sysio.code delegation
         // on authex; it is idempotent and non-throwing. EVM-only by design (NFT deposits originate
@@ -739,7 +757,7 @@ namespace sysio {
 
     // ---- Private Helper Function ----
 
-    void roa::record_nodereg(const name& owner, const uint8_t& tier, uint8_t status, uint8_t reason,
+    void roa::record_nodereg(const name& owner, uint8_t tier, uint8_t status, uint8_t reason,
                              uint8_t network_gen) {
         nodeownerreg_t nodereg(get_self(), network_gen);
         auto reg_key = nodeownerreg_key{owner.value};
@@ -854,6 +872,11 @@ namespace sysio {
         // so the node owner's RAM is an exact, deterministic value: newaccount_ram + personal_ram_bytes.
         // This also avoids the prior overwrite, which discarded the gift (and silently drained sysio's
         // pool by newaccount_ram per registration).
+        //   Conservation note: in the production path (newnameduser -> nodeownreg) sysio funded that
+        //   newaccount_ram at creation, so keeping it here stays conservation-exact. forcereg (the
+        //   governance/test path) creates the account out-of-band, so its newaccount_ram was never
+        //   debited from sysio -- the absolute set below materializes it regardless, which is
+        //   acceptable for that bootstrap path (it is not the production conservation contract).
         uint64_t owner_ram = sysiosystem::newaccount_ram + personal_ram_bytes;
         set_reslimit(owner, net_cpu_weight, net_cpu_weight, owner_ram);
         set_resource_limits(owner, owner_ram, net_cpu_weight.amount, net_cpu_weight.amount);
