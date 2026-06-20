@@ -9,11 +9,6 @@
 #include <sysio/dispatcher.hpp> // For SYSIO_DISPATCH of native action
 #include <sysio/privileged.hpp>
 
-/**
- *  ---- General TODOs ----
- *
- * TODO: Move network_gen to a global table as a single point of truth.
- */
 namespace sysio {
     class [[sysio::contract("sysio.roa")]] roa : public contract {
         public:
@@ -53,7 +48,8 @@ namespace sysio {
              * @param cpu_weight The amount of SYS allocated for CPU
              * @param ram_weight The amount of SYS allocated for RAM.
              * @param time_block A block number, the policy can't be reclaimed or reduced before this block.
-             * @param network_gen Generation of issuer, in cases were you are a Node Owner in multiple, specifies which allocation of SYS to pull from.
+             * @param network_gen Generation of issuer, in cases where you are a Node Owner in multiple,
+             *                     specifies which allocation of SYS to pull from.
              */
             [[sysio::action]]
             void addpolicy(const name& owner, const name& issuer, const asset& net_weight, const asset& cpu_weight, const asset& ram_weight, const uint32_t& time_block, const uint8_t& network_gen);
@@ -68,13 +64,14 @@ namespace sysio {
              * @param net_weight The amount in SYS to increase NET by.
              * @param cpu_weight The amount in SYS to increase CPU by.
              * @param ram_weight The amount in SYS to increase RAM by.
-             * @param network_gen Generation of issuer, in cases were you are a Node Owner in multiple, specifies which allocation of SYS to pull from.
+             * @param network_gen Generation of issuer, in cases where you are a Node Owner in multiple,
+             *                     specifies which allocation of SYS to pull from.
              */
             [[sysio::action]]
             void expandpolicy(const name& owner, const name& issuer, const asset& net_weight, const asset& cpu_weight, const asset& ram_weight, const uint8_t& network_gen);
 
             /**
-             * @brief Increases the policie's time_block extending the policies term.
+             * @brief Increases the policy's time_block extending the policies term.
              *
              * @param owner The account this policy is issued to.
              * @param issuer The Node Owner who issued this policy.
@@ -84,7 +81,8 @@ namespace sysio {
             void extendpolicy(const name& owner, const name& issuer, const uint32_t& new_time_block);
 
             /**
-             * @brief Decrease the resource limits on an existing policy. Subtracts new weights from existing values. Only callable after policie's time_block.
+             * @brief Decrease the resource limits on an existing policy. Subtracts new weights from
+             *        existing values. Only callable after policy's time_block.
              *
              * Note: Will reclaim UPTO ram_weight worth of bytes, limited to the pool of unused bytes on 'owner's reslimit and upper bound by the policy ram_weight.
              *
@@ -93,7 +91,8 @@ namespace sysio {
              * @param net_weight The amount in SYS to decrease NET by.
              * @param cpu_weight The amount in SYS to decrease CPU by.
              * @param ram_weight The amount in SYS to attempt decreasing RAM by, returning only
-             * @param network_gen Generation of issuer, in cases were you are a Node Owner in multiple, specifies which allocation of SYS to adjust.
+             * @param network_gen Generation of issuer, in cases where you are a Node Owner in multiple,
+             *                     specifies which allocation of SYS to adjust.
              */
             [[sysio::action]]
             void reducepolicy(const name& owner, const name& issuer, const asset& net_weight, const asset& cpu_weight, const asset& ram_weight, const uint8_t& network_gen);
@@ -253,7 +252,7 @@ namespace sysio {
             /**
              * Scoped to network_gen
              *
-             * Basic table tracking who T1-3 Node Owners are and their availble vs allocated SYS.
+             * Basic table tracking who T1-3 Node Owners are and their available vs allocated SYS.
              */
             struct nodeowner_key {
                 uint64_t owner;
@@ -322,7 +321,7 @@ namespace sysio {
             using reslimit_t = kv::table<"reslimit"_n, reslimit_key, reslimit>;
 
             /**
-             * This table is scoped to Node Owner's acoount names and is used to track all the node registration actions.
+             * This table is scoped to Node Owner's account names and is used to track all the node registration actions.
              */
             struct nodeownerreg_key {
                 uint64_t owner;
@@ -347,29 +346,28 @@ namespace sysio {
                 OWNER_NOT_ACCOUNT    = 2,  // account does not exist (creation did not occur)
                 ACCOUNT_KEY_MISMATCH = 3,  // existing account's active authority != the single claimed wire key
                 DUPLICATE            = 4,  // owner is already a registered node owner
-                LINK_KEY_MISMATCH    = 5   // account already carries a different external-chain link key
+                LINK_KEY_MISMATCH    = 5,  // account already carries a different external-chain link key
+                OWNER_HAS_RESLIMIT   = 6   // account already ROA-provisioned (regnodeowner can't create its reslimit)
             };
 
+            // Under trust-OPP the OPP envelope is the deposit proof, so this audit row records only
+            // the claim outcome -- no Ethereum tx id / signature / block number is stored (those
+            // vestigial fields and the by_trxid index they fed were dropped pre-launch).
             struct [[sysio::table("nodeownerreg")]] nodeownerreg {
                 name owner;                     // Node Owners account name
                 uint8_t status;                 // Registration outcome (reg_status): 0 -> CONFIRMED / 1 -> REJECTED
-                checksum256 trx_id;             // Transaction Id of Ethereum deposit
-                bytes trx_signature;            // Transaction Signature of Ethereum deposit
                 uint8_t tier;                   // Tier of Node Owner
-                uint128_t block_num;            // Ethereum Block number the deposit transaction is included in
                 uint8_t reason;                 // Rejection reason (see reject_reason); NONE(0) unless status == REJECTED
 
                 uint64_t by_tier() const { return static_cast<uint64_t>(tier); }
                 uint64_t by_status() const {return static_cast<uint64_t>(status); }
-                checksum256 by_trxid() const {return trx_id; }
 
-                SYSLIB_SERIALIZE(nodeownerreg, (owner)(status)(trx_id)(trx_signature)(tier)(block_num)(reason))
+                SYSLIB_SERIALIZE(nodeownerreg, (owner)(status)(tier)(reason))
             };
 
             using nodeownerreg_t = kv::scoped_table<"nodeownerreg"_n, nodeownerreg_key, nodeownerreg,
                 kv::index<"bytier"_n, const_mem_fun<nodeownerreg, uint64_t, &nodeownerreg::by_tier>>,
-                kv::index<"bystatus"_n, const_mem_fun<nodeownerreg, uint64_t, &nodeownerreg::by_status>>,
-                kv::index<"bytrxid"_n, const_mem_fun<nodeownerreg, checksum256, &nodeownerreg::by_trxid>>
+                kv::index<"bystatus"_n, const_mem_fun<nodeownerreg, uint64_t, &nodeownerreg::by_status>>
             >;
 
 
@@ -432,12 +430,15 @@ namespace sysio {
              *        existing table keeps the claim outcome queryable on Wire without aborting the
              *        dispatching transaction.
              *
-             * @param owner   The claimed account name.
-             * @param tier    The claimed tier.
-             * @param status  reg_status to record (CONFIRMED or REJECTED).
-             * @param reason  reject_reason; reject_reason::NONE for a CONFIRMED row.
+             * @param owner       The claimed account name.
+             * @param tier        The claimed tier.
+             * @param status      reg_status to record (CONFIRMED or REJECTED).
+             * @param reason      reject_reason; reject_reason::NONE for a CONFIRMED row.
+             * @param network_gen Generation to scope the audit row under (the caller's live roastate
+             *                     network_gen; passed in so this helper does not re-read the singleton).
              */
-            void record_nodereg(const name& owner, const uint8_t& tier, uint8_t status, uint8_t reason);
+            void record_nodereg(const name& owner, uint8_t tier, uint8_t status, uint8_t reason,
+                                uint8_t network_gen);
 
             /**
              * @brief Whether `account`'s name satisfies the node-owner name-length rule for `tier`.
