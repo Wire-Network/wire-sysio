@@ -2838,8 +2838,9 @@ int main( int argc, char** argv ) {
    bool shouldSend = true;
    bool contract_clear = false;
    bool suppress_duplicate_check = false;
-   // Set true by the "set syscode"/"set sysabi" callbacks so the shared code/abi callbacks emit
-   // the sysio.roa-routed setsyscode/setsysabi action instead of the native setcode/setabi.
+   // Set true by the "system setcode"/"system setabi" callbacks so the shared code/abi callbacks
+   // emit the sysio.roa-routed setsyscode/setsysabi action instead of the native setcode/setabi.
+   // Those subcommands are registered under `system` (below) since they require sysio.roa deployed.
    bool sys_variant = false;
    auto code_cmd = set_cmd->add_subcommand("code", localized("Create or update the code on an account"));
    code_cmd->add_option("account", account, localized("The account to set code for"))->required();
@@ -2853,21 +2854,9 @@ int main( int argc, char** argv ) {
    abi_cmd->add_flag( "-c,--clear", contract_clear, localized("Remove abi on an account"));
    abi_cmd->add_flag( "--suppress-duplicate-check", suppress_duplicate_check, localized("Don't check for duplicate"));
 
-   // System-contract variants: deploy code/abi to an account through sysio.roa so the privileged
-   // roa contract makes the target privileged and gifts the exact RAM out of sysio's pool. These
-   // reuse the set code/abi callbacks (file reading, duplicate check, send) via sys_variant, and
-   // default to sysio@active because sysio.roa::setsyscode/setsysabi require sysio's authorization.
-   auto syscode_cmd = set_cmd->add_subcommand("syscode", localized("Deploy or update code on a system-contract account via sysio.roa (gifts RAM from sysio)"));
-   syscode_cmd->add_option("account", account, localized("The account to set system code for"))->required();
-   syscode_cmd->add_option("code-file", wasmPath, localized("The path containing the contract WASM"));
-   syscode_cmd->add_flag( "-c,--clear", contract_clear, localized("Remove code on an account"));
-   syscode_cmd->add_flag( "--suppress-duplicate-check", suppress_duplicate_check, localized("Don't check for duplicate"));
-
-   auto sysabi_cmd = set_cmd->add_subcommand("sysabi", localized("Set or update the abi on a system-contract account via sysio.roa (gifts RAM from sysio)"));
-   sysabi_cmd->add_option("account", account, localized("The account to set the system ABI for"))->required();
-   sysabi_cmd->add_option("abi-file", abiPath, localized("The path containing the contract ABI"));
-   sysabi_cmd->add_flag( "-c,--clear", contract_clear, localized("Remove abi on an account"));
-   sysabi_cmd->add_flag( "--suppress-duplicate-check", suppress_duplicate_check, localized("Don't check for duplicate"));
+   // Note: the system-contract code/abi variants (`system setcode` / `system setabi`, routed through
+   // sysio.roa) are registered under the `system` subcommand group further below, since they require
+   // sysio.roa to be deployed. They reuse the set code/abi callbacks defined here via sys_variant.
 
    auto contract_cmd = set_cmd->add_subcommand("contract", localized("Create or update the contract on an account"));
    contract_cmd->add_option("account", account, localized("The account to publish a contract for"))
@@ -3006,8 +2995,6 @@ int main( int argc, char** argv ) {
    add_standard_transaction_options_plus_signing(contract_cmd, "account@active");
    add_standard_transaction_options_plus_signing(code_cmd, "account@active");
    add_standard_transaction_options_plus_signing(abi_cmd, "account@active");
-   add_standard_transaction_options_plus_signing(syscode_cmd, "sysio@active");
-   add_standard_transaction_options_plus_signing(sysabi_cmd, "sysio@active");
    contract_cmd->callback([&] {
       if(!contract_clear) SYS_ASSERT( !contractPath.empty(), contract_exception, " contract-dir {} is null ", contractPath );
       shouldSend = false;
@@ -3024,8 +3011,6 @@ int main( int argc, char** argv ) {
    });
    code_cmd->callback(set_code_callback);
    abi_cmd->callback(set_abi_callback);
-   syscode_cmd->callback([&]() { sys_variant = true; set_code_callback(); });
-   sysabi_cmd->callback([&]() { sys_variant = true; set_abi_callback(); });
 
    // set account
    auto set_account_cmd = set_cmd->add_subcommand("account", localized("Set or update blockchain account state"))->require_subcommand();
@@ -4051,6 +4036,31 @@ int main( int argc, char** argv ) {
    auto claimRewards = claimrewards_subcommand(system);
 
    auto activate = activate_subcommand(system);
+
+   // System-contract code/abi deployment routed through sysio.roa: the privileged roa contract
+   // performs the inline setcode/setabi, makes the target privileged, and gifts the exact RAM out of
+   // sysio's pool (a conserving transfer, reclaimed on redeploy of smaller code). Grouped under
+   // `system` because they depend on sysio.roa being deployed -- unlike the native `set code`/`set
+   // abi`. They reuse the `set code`/`set abi` callbacks (file reading, duplicate check, send) via
+   // sys_variant, and default to sysio@active because sysio.roa::setsyscode/setsysabi require sysio's
+   // authorization. (set_code_callback/set_abi_callback and the shared option vars are declared in
+   // the `set` block above and remain in scope here.)
+   auto setcode_cmd = system->add_subcommand("setcode", localized("Deploy or update code on a system-contract account via sysio.roa (gifts RAM from sysio)"));
+   setcode_cmd->add_option("account", account, localized("The account to set system code for"))->required();
+   setcode_cmd->add_option("code-file", wasmPath, localized("The path containing the contract WASM"));
+   setcode_cmd->add_flag( "-c,--clear", contract_clear, localized("Remove code on an account"));
+   setcode_cmd->add_flag( "--suppress-duplicate-check", suppress_duplicate_check, localized("Don't check for duplicate"));
+
+   auto setabi_cmd = system->add_subcommand("setabi", localized("Set or update the abi on a system-contract account via sysio.roa (gifts RAM from sysio)"));
+   setabi_cmd->add_option("account", account, localized("The account to set the system ABI for"))->required();
+   setabi_cmd->add_option("abi-file", abiPath, localized("The path containing the contract ABI"));
+   setabi_cmd->add_flag( "-c,--clear", contract_clear, localized("Remove abi on an account"));
+   setabi_cmd->add_flag( "--suppress-duplicate-check", suppress_duplicate_check, localized("Don't check for duplicate"));
+
+   add_standard_transaction_options_plus_signing(setcode_cmd, "sysio@active");
+   add_standard_transaction_options_plus_signing(setabi_cmd, "sysio@active");
+   setcode_cmd->callback([&]() { sys_variant = true; set_code_callback(); });
+   setabi_cmd->callback([&]() { sys_variant = true; set_abi_callback(); });
 
    auto handle_error = [&](const auto& e)
    {

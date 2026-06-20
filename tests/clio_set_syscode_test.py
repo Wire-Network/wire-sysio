@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-"""clio_set_syscode_test.py -- integration test for `clio set syscode` / `set sysabi`.
+"""clio_set_syscode_test.py -- integration test for `clio system setcode` / `system setabi`.
 
 These two clio subcommands deploy code/abi to a system-contract account *through* sysio.roa
 (rather than the chain's native setcode/setabi): the privileged roa contract performs the inline
@@ -11,14 +11,14 @@ This drives the real commands end-to-end against a live chain. The action-data p
 sysio@active default are covered hermetically elsewhere (the packing round-trips through
 `clio convert pack_action_data --abi-file`, and the chain-side RAM-gift accounting is covered by
 contracts/tests/sysio.roa_tests.cpp). What only a live run can prove is exercised here: that
-`clio set syscode <acct> <wasm>` assembles a transaction the chain accepts and applies.
+`clio system setcode <acct> <wasm>` assembles a transaction the chain accepts and applies.
 
 Flow:
   1. Launch a cluster with sysio.roa active (loadSystemContract=False, activateIF=True).
   2. Create a ROA-managed (finite-RAM) target account via sysio.roa::newnameduser -- setsyscode's
      giftram step rejects an unlimited-RAM target, so the account must carry a finite quota first.
-  3. `clio set syscode <tgt> sysio.token.wasm -p sysio@active`  -> code deployed + account privileged.
-  4. `clio set sysabi  <tgt> sysio.token.abi  -p sysio@active`  -> abi deployed.
+  3. `clio system setcode <tgt> sysio.token.wasm -p sysio@active`  -> code deployed + account privileged.
+  4. `clio system setabi  <tgt> sysio.token.abi  -p sysio@active`  -> abi deployed.
 
 The privileged flag is the tell that the roa path (not a plain setcode) ran: native `set code`
 never flips privileged, but sysio.roa::setsyscode always does.
@@ -128,35 +128,35 @@ try:
     assert get_code_hash(node, target) == ZERO_CODE_HASH, "precondition: target must start with no code"
     assert not is_privileged(node, target), "precondition: target must start unprivileged"
 
-    # ---- Test 1: set syscode deploys code, makes the account privileged ----
-    Print("=== Test 1: clio set syscode ===")
-    node.processClioCmd(f"set syscode {target} {wasm} --permission sysio@active",
-                        "set syscode", silentErrors=False, exitOnError=True, returnType=ReturnType.raw)
+    # ---- Test 1: system setcode deploys code, makes the account privileged ----
+    Print("=== Test 1: clio system setcode ===")
+    node.processClioCmd(f"system setcode {target} {wasm} --permission sysio@active",
+                        "system setcode", silentErrors=False, exitOnError=True, returnType=ReturnType.raw)
     node.waitForNextBlock()
     code_hash = get_code_hash(node, target)
-    assert code_hash != ZERO_CODE_HASH, f"set syscode did not deploy code (hash still {code_hash})"
+    assert code_hash != ZERO_CODE_HASH, f"system setcode did not deploy code (hash still {code_hash})"
     # Native `set code` never sets privileged; sysio.roa::setsyscode does. This proves the roa path ran.
-    assert is_privileged(node, target), "set syscode did not make the account privileged (roa setpriv path)"
+    assert is_privileged(node, target), "system setcode did not make the account privileged (roa setpriv path)"
     Print(f"  Verified: code deployed (hash {code_hash}) and account privileged")
 
-    # ---- Test 2: set sysabi deploys the abi ----
-    Print("=== Test 2: clio set sysabi ===")
-    node.processClioCmd(f"set sysabi {target} {abi} --permission sysio@active",
-                        "set sysabi", silentErrors=False, exitOnError=True, returnType=ReturnType.raw)
+    # ---- Test 2: system setabi deploys the abi ----
+    Print("=== Test 2: clio system setabi ===")
+    node.processClioCmd(f"system setabi {target} {abi} --permission sysio@active",
+                        "system setabi", silentErrors=False, exitOnError=True, returnType=ReturnType.raw)
     node.waitForNextBlock()
     abi_out = node.processClioCmd(f"get abi {target}", "get abi", silentErrors=False, returnType=ReturnType.raw)
-    assert abi_out is not None and "transfer" in abi_out, "set sysabi did not deploy the token abi"
+    assert abi_out is not None and "transfer" in abi_out, "system setabi did not deploy the token abi"
     Print("  Verified: abi deployed (contains the token 'transfer' action)")
 
-    # ---- Test 3: re-deploy a smaller contract via set syscode (redeploy path) ----
+    # ---- Test 3: re-deploy a smaller contract via system setcode (redeploy path) ----
     # setsyscode is bidirectional: redeploying reclaims/gifts the RAM delta. A second deploy must
     # succeed and replace the code (the bios contract is a different, valid WASM than the token).
-    Print("=== Test 3: clio set syscode redeploy (different code) ===")
+    Print("=== Test 3: clio system setcode redeploy (different code) ===")
     bios_wasm = os.path.abspath(os.path.join(os.getcwd(), "libraries", "testing", "contracts",
                                              "sysio.bios", "sysio.bios.wasm"))
     if os.path.exists(bios_wasm):
-        node.processClioCmd(f"set syscode {target} {bios_wasm} --permission sysio@active",
-                            "set syscode redeploy", silentErrors=False, exitOnError=True, returnType=ReturnType.raw)
+        node.processClioCmd(f"system setcode {target} {bios_wasm} --permission sysio@active",
+                            "system setcode redeploy", silentErrors=False, exitOnError=True, returnType=ReturnType.raw)
         node.waitForNextBlock()
         new_hash = get_code_hash(node, target)
         assert new_hash != ZERO_CODE_HASH and new_hash != code_hash, \
@@ -166,7 +166,7 @@ try:
         Print(f"  SKIP redeploy: bios wasm not found at {bios_wasm}")
 
     testSuccessful = True
-    Print("=== All clio set syscode / set sysabi integration tests passed ===")
+    Print("=== All clio system setcode / system setabi integration tests passed ===")
 
 finally:
     TestHelper.shutdown(cluster, walletMgr, testSuccessful, dumpErrorDetails)
