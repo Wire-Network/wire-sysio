@@ -423,17 +423,21 @@ DataStream& operator>>(DataStream& ds, SwapRequest& t) {
 }
 
 // UnderwriteIntentCommit — v6: (token_code, chain_code, reserve_code) triple
-// disambiguates same-chain swap legs.
+// disambiguates same-chain swap legs. Field order MUST match the generated proto struct
+// (attestations.proto): uw_account, uw_ext_chain_addr, uw_request_id, outpost_id, signature,
+// token_code, chain_code, reserve_code. The previous operators wrote chain_code in outpost_id's
+// 4th slot — dropping outpost_id and double-encoding chain_code. These operators are currently
+// unreached (UIC always travels as raw zpp::bits proto bytes), so this is a latent-correctness fix.
 template <typename DataStream>
 DataStream& operator<<(DataStream& ds, const UnderwriteIntentCommit& t) {
    return ds << t.uw_account << t.uw_ext_chain_addr << t.uw_request_id
-             << t.chain_code << t.signature
+             << t.outpost_id << t.signature
              << t.token_code << t.chain_code << t.reserve_code;
 }
 template <typename DataStream>
 DataStream& operator>>(DataStream& ds, UnderwriteIntentCommit& t) {
    return ds >> t.uw_account >> t.uw_ext_chain_addr >> t.uw_request_id
-             >> t.chain_code >> t.signature
+             >> t.outpost_id >> t.signature
              >> t.token_code >> t.chain_code >> t.reserve_code;
 }
 

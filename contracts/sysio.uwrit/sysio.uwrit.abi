@@ -749,6 +749,10 @@
                 {
                     "name": "UNDERWRITE_STATUS_SLASHED",
                     "value": 10
+                },
+                {
+                    "name": "UNDERWRITE_STATUS_DISQUALIFIED",
+                    "value": 11
                 }
             ]
         }

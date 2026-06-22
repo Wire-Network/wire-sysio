@@ -202,6 +202,42 @@ std::string encode_node_owner_registration(
    return out;
 }
 
+/// Encode a SwapRequest attestation payload — the bytes `createuwreq` decodes.
+std::string encode_swap_request(
+   sysio::opp::types::ChainKind actor_kind,
+   const std::vector<char>&     actor_addr,
+   uint64_t src_chain_code_v, uint64_t src_token_code_v, uint64_t src_reserve_code_v,
+   int64_t  src_amount,
+   uint64_t dst_chain_code_v, uint64_t dst_token_code_v, uint64_t dst_reserve_code_v,
+   uint64_t target_amount, uint32_t tolerance_bps,
+   sysio::opp::types::ChainKind recipient_kind,
+   const std::vector<char>&     recipient_addr)
+{
+   sysio::opp::attestations::SwapRequest sr;
+   auto* actor = sr.mutable_actor();
+   actor->set_kind(actor_kind);
+   actor->set_address(actor_addr.data(), actor_addr.size());
+   auto* amt = sr.mutable_source_amount();
+   amt->set_token_code(src_token_code_v);
+   amt->set_amount(src_amount);
+   sr.set_source_chain_code(src_chain_code_v);
+   sr.set_source_reserve_code(src_reserve_code_v);
+   sr.set_target_chain_code(dst_chain_code_v);
+   sr.set_target_token_code(dst_token_code_v);
+   sr.set_target_reserve_code(dst_reserve_code_v);
+   sr.set_target_amount(target_amount);
+   sr.set_target_tolerance_bps(tolerance_bps);
+   auto* rcpt = sr.mutable_recipient();
+   rcpt->set_kind(recipient_kind);
+   rcpt->set_address(recipient_addr.data(), recipient_addr.size());
+   const std::vector<char> tx_id{'\x01', '\x02', '\x03', '\x04'};
+   sr.set_source_tx_id(tx_id.data(), tx_id.size());
+
+   std::string out;
+   sr.SerializeToString(&out);
+   return out;
+}
+
 } // anonymous namespace
 
 class sysio_dispatch_tester : public tester {
@@ -480,7 +516,126 @@ public:
       return fc::variant();
    }
 
-   abi_serializer msgch_abi, opreg_abi, uwrit_abi, epoch_abi, reserv_abi, authex_abi, chains_abi, roa_abi;
+   // ── uwrit swap-race helpers (direct msgch-auth action calls) ──
+
+   action_result depositinle_credit(name account, std::string_view chain_code,
+                                    std::string_view token_code, uint64_t amount) {
+      // depositinle does require_auth(get_self()); sign as opreg for a direct call.
+      return push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "depositinle"_n, mvo()
+         ("account",             account.to_string())
+         ("chain_code",          codename_mvo(chain_code))
+         ("token_code",          codename_mvo(token_code))
+         ("amount",              amount)
+         ("actor_chain",         ChainKind::CHAIN_KIND_EVM)
+         ("actor_address",       std::vector<char>(20, '\x06'))
+         ("original_message_id", fc::sha256()));
+   }
+
+   action_result createuwreq_direct(uint64_t attestation_id, uint64_t chain_code_v,
+                                    const std::string& swap_request_bytes) {
+      return push(UWRIT_ACCOUNT, uwrit_abi, MSGCH_ACCOUNT, "createuwreq"_n, mvo()
+         ("attestation_id", attestation_id)
+         ("type",           AttestationType::ATTESTATION_TYPE_SWAP_REQUEST)
+         ("chain_code",     chain_code_v)
+         ("data",           std::vector<char>(swap_request_bytes.begin(),
+                                              swap_request_bytes.end())));
+   }
+
+   action_result rcrdcommit_direct(uint64_t uwreq_id, name underwriter,
+                                   uint64_t outpost_chain_code,
+                                   std::string_view from_chain, std::string_view from_token,
+                                   std::string_view reserve, const std::vector<char>& uic_bytes) {
+      return push(UWRIT_ACCOUNT, uwrit_abi, MSGCH_ACCOUNT, "rcrdcommit"_n, mvo()
+         ("uwreq_id",        uwreq_id)
+         ("underwriter",     underwriter.to_string())
+         ("chain_code",      outpost_chain_code)
+         ("from_chain_code", codename_mvo(from_chain))
+         ("from_token_code", codename_mvo(from_token))
+         ("reserve_code",    codename_mvo(reserve))
+         ("uic_bytes",       uic_bytes));
+   }
+
+   /// Build + sign an UnderwriteIntentCommit so it passes verify_uic_signature:
+   /// serialize with signature EMPTY (matching the contract's blank-then-rehash;
+   /// set uw_ext_chain_addr.kind non-zero with an empty address per the
+   /// proto3/zpp encoder-parity rule), sha256 the RAW bytes, sign with the
+   /// underwriter's active key, embed the packed signature, serialize.
+   std::vector<char> make_signed_uic(name underwriter, uint64_t uwreq_id,
+                                     uint64_t outpost_id, uint64_t chain_code_v,
+                                     uint64_t token_code_v, uint64_t reserve_code_v) {
+      sysio::opp::attestations::UnderwriteIntentCommit uic;
+      uic.mutable_uw_account()->set_name(underwriter.to_string());
+      uic.mutable_uw_ext_chain_addr()->set_kind(sysio::opp::types::CHAIN_KIND_EVM);
+      uic.set_uw_request_id(uwreq_id);
+      uic.set_outpost_id(outpost_id);
+      uic.set_token_code(token_code_v);
+      uic.set_chain_code(chain_code_v);
+      uic.set_reserve_code(reserve_code_v);
+
+      std::string blanked;
+      uic.SerializeToString(&blanked);
+      const auto digest = fc::sha256::hash(blanked.data(), blanked.size());
+
+      const auto sig       = get_private_key(underwriter, "active").sign(digest);
+      const auto sig_bytes = fc::raw::pack(sig);
+      uic.set_signature(sig_bytes.data(), sig_bytes.size());
+
+      std::string full;
+      uic.SerializeToString(&full);
+      return std::vector<char>(full.begin(), full.end());
+   }
+
+   fc::variant get_uwreq(uint64_t id) {
+      auto data = get_row_by_id(UWRIT_ACCOUNT, UWRIT_ACCOUNT, "uwreqs"_n, id);
+      return data.empty() ? fc::variant() : uwrit_abi.binary_to_variant(
+         "uw_request_t", data,
+         abi_serializer::create_yield_function(abi_serializer_max_time));
+   }
+
+   /// Deploy sysio.token, issue a WIRE supply to the treasury, and seed two
+   /// ACTIVE bootstrap reserves (ETH/ETH and SOLANA/SOL) with ample balanced
+   /// liquidity so try_select_winner's reserve-liquidity gate passes and the
+   /// race reaches try_build_swap_remit. Bootstrap window is open (epoch 0:
+   /// bootstrap_for_dispatch's advance() gate-blocks on missing emissions).
+   void setup_wire_token_and_reserves() {
+      deploy(TOKEN_ACCOUNT, contracts::token_wasm(), contracts::token_abi(), token_abi);
+      BOOST_REQUIRE_EQUAL(success(), push(TOKEN_ACCOUNT, token_abi, TOKEN_ACCOUNT, "create"_n, mvo()
+         ("issuer", "sysio")("maximum_supply", "1000000000.000000000 WIRE")));
+      BOOST_REQUIRE_EQUAL(success(), push(TOKEN_ACCOUNT, token_abi, config::system_account_name,
+         "issue"_n, mvo()("to", "sysio")("quantity", "1000000000.000000000 WIRE")("memo", "seed")));
+
+      auto reg = [&](std::string_view c, std::string_view t, std::string_view r) {
+         return push(RESERV_ACCOUNT, reserv_abi, RESERV_ACCOUNT, "regreserve"_n, mvo()
+            ("chain_code",           codename_mvo(c))
+            ("token_code",           codename_mvo(t))
+            ("reserve_code",         codename_mvo(r))
+            ("name",                 std::string(c))
+            ("description",          std::string{})
+            ("initial_chain_amount", uint64_t{1'000'000'000'000ull})
+            ("initial_wire_amount",  uint64_t{1'000'000'000'000ull})
+            ("connector_weight_bps", uint32_t{5000})
+            ("is_private",           false)
+            ("owner",                ""));
+      };
+      BOOST_REQUIRE_EQUAL(success(), reg("ETH",    "ETH", "PRIMARY"));
+      BOOST_REQUIRE_EQUAL(success(), reg("SOLANA", "SOL", "PRIMARY"));
+   }
+
+   /// Register the WIRE depot chain (`is_depot = (kind == CHAIN_KIND_WIRE)`), so a
+   /// swap whose destination leg is `WIRE` is treated as a to-WIRE swap (depot
+   /// destination, no destination UIC, settled inline via reserv::paywire).
+   void register_wire_depot() {
+      BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT,
+         "regchain"_n, mvo()
+            ("kind",              ChainKind::CHAIN_KIND_WIRE)
+            ("code",              codename_mvo("WIRE"))
+            ("external_chain_id", 0)
+            ("name",              std::string("wire-depot"))
+            ("description",       std::string{})));
+   }
+
+   abi_serializer msgch_abi, opreg_abi, uwrit_abi, epoch_abi, reserv_abi, authex_abi, chains_abi, roa_abi,
+                  token_abi;
 
    std::vector<char> uwrit_op_eth_pubkey;
 };
@@ -697,6 +852,188 @@ BOOST_FIXTURE_TEST_CASE(chkcons_survives_non_advancing_advance, sysio_dispatch_t
    produce_blocks();
    BOOST_REQUIRE_EQUAL(current_epoch(), epoch0);
    BOOST_REQUIRE_EQUAL(retry_count(), rc1 + 1);
+} FC_LOG_AND_RETHROW() }
+
+// #5-residual: a race winner lacking a destination-chain authex link must be
+// DISQUALIFIED (skipped, uwreq left PENDING), reached via try_build_swap_remit
+// BEFORE any CONFIRMED / reserve write so nothing throws in evalcons.
+BOOST_FIXTURE_TEST_CASE(swap_winner_without_dst_authex_link_is_disqualified,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();   // registers ETH + UWRIT_OP (EVM link only)
+
+   BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT,
+      "regchain"_n, mvo()
+         ("kind",              ChainKind::CHAIN_KIND_SVM)
+         ("code",              codename_mvo("SOLANA"))
+         ("external_chain_id", 900)
+         ("name",              std::string("solana-test"))
+         ("description",       std::string{})));
+
+   const uint64_t eth       = fc::slug_name{"ETH"}.value;
+   const uint64_t sol_chain = fc::slug_name{"SOLANA"}.value;
+   const uint64_t sol_token = fc::slug_name{"SOL"}.value;
+   const uint64_t primary   = fc::slug_name{"PRIMARY"}.value;
+   constexpr uint64_t ATT_ID    = 5000;
+   constexpr int64_t  SRC_AMOUNT = 100;
+   constexpr uint64_t DST_AMOUNT = 100;
+
+   setup_wire_token_and_reserves();
+
+   BOOST_REQUIRE_EQUAL(success(), depositinle_credit(UWRIT_OP, "ETH",    "ETH", 1'000'000));
+   BOOST_REQUIRE_EQUAL(success(), depositinle_credit(UWRIT_OP, "SOLANA", "SOL", 1'000'000));
+
+   const auto sr = encode_swap_request(
+      ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0a'),
+      eth, eth, primary, SRC_AMOUNT,
+      sol_chain, sol_token, primary, DST_AMOUNT,
+      5000, ChainKind::CHAIN_KIND_SVM, std::vector<char>(32, '\x0b'));
+   BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(ATT_ID, eth, sr));
+
+   const auto src_uic = make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, eth, primary);
+   BOOST_REQUIRE_EQUAL(success(),
+      rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", src_uic));
+   const auto dst_uic = make_signed_uic(UWRIT_OP, ATT_ID, sol_chain, sol_chain, sol_token, primary);
+   BOOST_REQUIRE_EQUAL(success(),
+      rcrdcommit_direct(ATT_ID, UWRIT_OP, sol_chain, "SOLANA", "SOL", "PRIMARY", dst_uic));
+
+   const auto req = get_uwreq(ATT_ID);
+   BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_PENDING", req["status"].as_string());
+   bool found = false;
+   for (const auto& c : req["commits_by"].get_array()) {
+      if (c["underwriter"].as_string() == UWRIT_OP.to_string()) {
+         found = true;
+         BOOST_REQUIRE_EQUAL("UNDERWRITE_STATUS_DISQUALIFIED", c["status"].as_string());
+         BOOST_REQUIRE(c["reason"].as_string().find(
+            "no authex link for the destination") != std::string::npos);
+      }
+   }
+   BOOST_REQUIRE(found);
+} FC_LOG_AND_RETHROW() }
+
+// [P1] regression (r3444213199): an oversized to-WIRE target_amount must be
+// terminally REJECTED + refunded BEFORE settlement. dst_amount is the unbounded
+// cross-chain SwapRequest.target_amount; left unchecked, a value near UINT64_MAX
+// wraps the `dst_amount + to_wire_fee` sufficiency guard, slips into settlement,
+// and aborts reserv::paywire's asset(static_cast<int64_t>(dst_amount)) inside
+// evalcons — a chain-wide consensus stall. A representable-but-too-large target
+// (> asset::max_amount) must also be rejected, never left stuck PENDING forever.
+BOOST_FIXTURE_TEST_CASE(swap_to_wire_oversized_target_is_rejected_not_aborted,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();          // ETH source outpost + UWRIT_OP (EVM link)
+   register_wire_depot();             // WIRE depot => to-WIRE destination
+   setup_wire_token_and_reserves();   // ACTIVE ETH/ETH/PRIMARY source reserve w/ WIRE
+
+   const uint64_t eth     = fc::slug_name{"ETH"}.value;
+   const uint64_t wire    = fc::slug_name{"WIRE"}.value;
+   const uint64_t primary = fc::slug_name{"PRIMARY"}.value;
+   // src_amount large enough that the 0.1% to-WIRE fee rounds to >= 1, so the
+   // pre-fix `dst_amount + to_wire_fee` actually wraps for dst_amount near
+   // UINT64_MAX and slips into paywire (the abort being regressed).
+   constexpr int64_t SRC_AMOUNT = 1'000'000;
+   BOOST_REQUIRE_EQUAL(success(),
+      depositinle_credit(UWRIT_OP, "ETH", "ETH", uint64_t{1'000'000'000}));
+
+   // A valid existing WIRE recipient so the to-WIRE path reaches the amount
+   // guard (past the recipient-validity terminal check).
+   const std::string rs = UWRIT_OP.to_string();
+   const std::vector<char> rcpt(rs.begin(), rs.end());
+
+   constexpr uint64_t ASSET_MAX = (uint64_t{1} << 62) - 1;
+   auto run = [&](uint64_t att_id, uint64_t target) {
+      const auto sr = encode_swap_request(
+         ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0a'),
+         eth, eth, primary, SRC_AMOUNT,
+         wire, wire, primary, target,
+         /*tolerance_bps*/ 1'000'000, ChainKind::CHAIN_KIND_WIRE, rcpt);
+      BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(att_id, eth, sr));
+      const auto src_uic = make_signed_uic(UWRIT_OP, att_id, eth, eth, eth, primary);
+      // The push MUST succeed — a pre-fix wrap aborts paywire's asset() here and
+      // fails the whole transaction (the production consensus stall).
+      BOOST_REQUIRE_EQUAL(success(),
+         rcrdcommit_direct(att_id, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", src_uic));
+      const auto req = get_uwreq(att_id);
+      BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_REJECTED", req["status"].as_string());
+      // Pin the rejection to the amount guard (not the variance recheck, which
+      // the 100x tolerance above lets pass).
+      bool reason_ok = false;
+      for (const auto& c : req["commits_by"].get_array()) {
+         if (c["underwriter"].as_string() == UWRIT_OP.to_string())
+            reason_ok = c["reason"].as_string().find("asset") != std::string::npos;
+      }
+      BOOST_REQUIRE(reason_ok);
+   };
+
+   run(7001, ASSET_MAX + 1);        // target == asset::max_amount + 1 (boundary)
+   run(7002, uint64_t{1} << 63);    // high bit set (negative as int64)
+   run(7003, ~uint64_t{0});         // UINT64_MAX — wraps dst_amount + fee pre-fix
+} FC_LOG_AND_RETHROW() }
+
+// Regression (r3444212152): a candidate whose UIC signature does not recover to
+// its active/owner key must be DISQUALIFIED so the race state converges — not
+// silently left INTENT_SUBMITTED, keeping the uwreq pending/noisy until another
+// underwriter wins. The handler stays non-throwing (no consensus stall).
+BOOST_FIXTURE_TEST_CASE(swap_candidate_with_invalid_uic_signature_is_disqualified,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+   register_wire_depot();             // to-WIRE: a single (source) required leg
+
+   const uint64_t eth     = fc::slug_name{"ETH"}.value;
+   const uint64_t wire    = fc::slug_name{"WIRE"}.value;
+   const uint64_t primary = fc::slug_name{"PRIMARY"}.value;
+   constexpr uint64_t ATT_ID = 7200;
+   BOOST_REQUIRE_EQUAL(success(),
+      depositinle_credit(UWRIT_OP, "ETH", "ETH", uint64_t{1'000'000}));
+
+   const std::string rs = UWRIT_OP.to_string();
+   const std::vector<char> rcpt(rs.begin(), rs.end());
+   const auto sr = encode_swap_request(
+      ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0a'),
+      eth, eth, primary, /*src_amount*/ 100,
+      wire, wire, primary, /*target*/ 50,
+      5000, ChainKind::CHAIN_KIND_WIRE, rcpt);
+   BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(ATT_ID, eth, sr));
+
+   // Source UIC signed by the WRONG account (batchop.a): the recovered key does
+   // not match UWRIT_OP's active/owner permission, so verify_uic_signature
+   // returns false. The push must still succeed (non-throwing).
+   const auto bad_uic = make_signed_uic(BATCHOP, ATT_ID, eth, eth, eth, primary);
+   BOOST_REQUIRE_EQUAL(success(),
+      rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", bad_uic));
+
+   const auto req = get_uwreq(ATT_ID);
+   // Race left open (PENDING) but the bad candidate is DISQUALIFIED.
+   BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_PENDING", req["status"].as_string());
+   bool found = false;
+   for (const auto& c : req["commits_by"].get_array()) {
+      if (c["underwriter"].as_string() == UWRIT_OP.to_string()) {
+         found = true;
+         BOOST_REQUIRE_EQUAL("UNDERWRITE_STATUS_DISQUALIFIED", c["status"].as_string());
+         BOOST_REQUIRE(c["reason"].as_string().find("signature") != std::string::npos);
+      }
+   }
+   BOOST_REQUIRE(found);
+} FC_LOG_AND_RETHROW() }
+
+// Regression (r3444212155): a malformed inbound SwapRequest must NOT abort the
+// consensus-tipping delivery. createuwreq logs + skips (no row, no throw) when
+// the payload fails to decode — it cannot be refunded either, since the revert
+// needs the undecodable actor / source_amount.
+BOOST_FIXTURE_TEST_CASE(createuwreq_malformed_swaprequest_does_not_abort,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+
+   const uint64_t eth = fc::slug_name{"ETH"}.value;
+   constexpr uint64_t ATT_ID = 7300;
+   // A length-delimited protobuf field (tag 0x0a) claiming far more bytes than
+   // are present — the decoder underruns the buffer and returns an error. (Even
+   // a tolerant decoder yields random fields that name no registered chain, so
+   // no row is created either way.)
+   const std::vector<char> garbage{'\x0a', '\x80', '\x80', '\x80', '\x80', '\x08'};
+   const std::string garbage_str(garbage.begin(), garbage.end());
+   // Must NOT throw (a check() here would abort the delivery before any row
+   // exists) and must NOT create a uwreq row.
+   BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(ATT_ID, eth, garbage_str));
+   BOOST_REQUIRE(get_uwreq(ATT_ID).is_null());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()

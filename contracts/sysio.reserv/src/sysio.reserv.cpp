@@ -6,6 +6,7 @@
 #include <sysio.uwrit/sysio.uwrit.hpp>
 #include <sysio.opp.common/opp_table_types.hpp>
 #include <sysio.opp.common/amm_math.hpp>
+#include <sysio.opp.common/safe_ops.hpp>
 
 #include <zpp_bits.h>
 
@@ -46,6 +47,17 @@ using sysio::slug_name_literals::operator""_s;
 /// The WIRE token / depot-chain slug. A reserve leg whose token code is WIRE is
 /// a depot (WIRE) endpoint with no token/WIRE pool of its own.
 constexpr sysio::slug_name WIRE_TOKEN = "WIRE"_s;
+
+/// Saturating uint64 credit for reserve balances / rewards-bucket counters. These accumulate from
+/// operator-relayed external-chain amounts (no on-chain supply cap), and the credit sites run
+/// inside the consensus dispatch chain (onreward via msgch::evalcons; applyswap / applyfromwire /
+/// paywire inline from uwrit::try_select_winner). A raw `+=` could wrap the uint64 and corrupt the
+/// weighted-AMM curve and the `>=` sufficiency checks; cap at UINT64_MAX instead — never wrap,
+/// never throw on the consensus path. The cap is unreachable for any real token amount. Delegates
+/// to the shared `sysio::opp::safe::add_sat_u64` so the never-wrap rule lives in one place.
+inline void add_capped_u64(uint64_t& balance, uint64_t amt) {
+   balance = sysio::opp::safe::add_sat_u64(balance, amt);
+}
 
 /// Live per-spoke swap fee (basis points) — owned by `sysio.uwrit`. Read fresh
 /// so the read-only quote and settlement charge one and the same rate. Falls
@@ -143,8 +155,8 @@ void route_wire_fee(name self, const opp::amm::wire_fee& fee) {
    if (fee.reward_share > 0) {
       reserve::rewardbkt_t bkt(self);
       auto rb = bkt.get_or_default(reserve::rewards_bucket{});
-      rb.balance          += fee.reward_share;
-      rb.lifetime_accrued += fee.reward_share;
+      add_capped_u64(rb.balance,          fee.reward_share);
+      add_capped_u64(rb.lifetime_accrued, fee.reward_share);
       bkt.set(rb, ram_payer);
    }
    if (fee.emissions_share > 0) {
@@ -174,7 +186,7 @@ void reserve::regreserve(sysio::slug_name chain_code,
    sysio::check(is_bootstrap_window(),
                 "regreserve is bootstrap-window only; post-bootstrap reserves go through create_reserve");
    sysio::check(connector_weight_bps > 0 && connector_weight_bps <= MAX_CONNECTOR_WEIGHT_BPS,
-                "connector_weight_bps must be in (0, 10000]");
+                "connector_weight_bps must be in (0, 10000) — both pool-side weights must be positive");
    sysio::check(initial_chain_amount > 0 && initial_wire_amount > 0,
                 "bootstrap reserve must seed both chain_amount and wire_amount > 0");
    sysio::check(!is_private || owner != sysio::name{},
@@ -245,7 +257,18 @@ void reserve::oncrtreserve(sysio::slug_name       chain_code,
 
    reserves_t tbl(get_self());
    auto pk = make_key(chain_code, token_code, reserve_code);
-   if (tbl.find(pk) != tbl.end()) {
+   // Existence guard, status-aware. A live row (PENDING/ACTIVE) — or any
+   // non-CANCELLED row — is immutable here; skip idempotently. A CANCELLED
+   // row (a prior no-link rejection or an outpost-side cancel) is *reclaimable*
+   // by a later, properly-linked creator: fall through so the link probe below
+   // decides whether to overwrite it. Without this carve-out a CANCELLED row
+   // would permanently burn the (chain, token, reserve_code) identity for its
+   // rightful owner (namespace squatting), since no path ever erases a row.
+   auto existing = tbl.find(pk);
+   const bool reclaimable_cancelled =
+      existing != tbl.end() &&
+      existing->status == opp::types::RESERVE_STATUS_CANCELLED;
+   if (existing != tbl.end() && !reclaimable_cancelled) {
       sysio::print("oncrtreserve: reserve already exists; skipping\n");
       return;
    }
@@ -258,9 +281,11 @@ void reserve::oncrtreserve(sysio::slug_name       chain_code,
    // account ("the only requirement to create a reserve"). Reconstruct the
    // creator's key variant and probe `sysio.authex::links.bypubkey`. On
    // any failure — malformed key bytes OR no link — reject by inserting a
-   // CANCELLED row (idempotency + audit; mirrors the cancel path's
-   // code-burned semantics) and queueing RESERVE_CREATE_CANCELLED so the
-   // outpost refunds the creator's escrow. Never throws.
+   // CANCELLED row (for refund idempotency) and queueing
+   // RESERVE_CREATE_CANCELLED so the outpost refunds the creator's escrow.
+   // The CANCELLED row does NOT permanently burn the identity: a later,
+   // properly-linked creator reclaims it via the reclaim branch below
+   // (prevents namespace squatting). Never throws.
    std::vector<char> canonical_creator_key;
    {
       auto pk_variant = pubkey_from_raw(creator_chain_kind, creator_pub_key, creator.address);
@@ -274,6 +299,17 @@ void reserve::oncrtreserve(sysio::slug_name       chain_code,
          }
       }
       if (!linked) {
+         // A CANCELLED row already standing means this is a re-relay of the
+         // same no-link create (or a fresh unlinked squatter). Leave it and
+         // do NOT queue a second refund — the refund was queued when the row
+         // was first inserted, and the outpost refunds per
+         // (chain,token,reserve_code). The row stays reclaimable by a future
+         // linked creator.
+         if (reclaimable_cancelled) {
+            sysio::print("oncrtreserve: unlinked creator for an already-"
+                         "CANCELLED reserve; leaving it (no double refund)\n");
+            return;
+         }
          sysio::print("oncrtreserve: creator has no authex link (or malformed "
                       "creator key); rejecting with RESERVE_CREATE_CANCELLED\n");
          const auto now = current_time_ms();
@@ -309,7 +345,7 @@ void reserve::oncrtreserve(sysio::slug_name       chain_code,
    }
 
    const auto now = current_time_ms();
-   tbl.emplace(ram_payer, pk, reserve_row{
+   reserve_row fresh{
       .chain_code             = chain_code,
       .token_code             = token_code,
       .reserve_code           = reserve_code,
@@ -328,7 +364,16 @@ void reserve::oncrtreserve(sysio::slug_name       chain_code,
       .is_private             = is_private,
       .owner                  = {},
       .creator_pub_key        = std::move(canonical_creator_key),
-   });
+   };
+   if (reclaimable_cancelled) {
+      // A properly-linked creator reclaims a previously-CANCELLED identity:
+      // overwrite the dead row in place (re-indexing `bystatus`
+      // CANCELLED → PENDING). Every field is reset to this create — this is
+      // what makes the slot non-squattable.
+      tbl.modify(ram_payer, pk, [&](auto& row) { row = std::move(fresh); });
+   } else {
+      tbl.emplace(ram_payer, pk, std::move(fresh));
+   }
 }
 
 void reserve::matchreserve(sysio::slug_name chain_code,
@@ -535,7 +580,7 @@ void reserve::onreward(sysio::slug_name chain_code,
       return;
    }
    tbl.modify(ram_payer, pk, [&](auto& row) {
-      row.reserve_chain_amount += outpost_amount;
+      add_capped_u64(row.reserve_chain_amount, outpost_amount);
    });
 }
 
@@ -591,14 +636,14 @@ void reserve::applyswap(sysio::slug_name src_chain_code,
                 "applyswap: insufficient destination reserve balance");
 
    tbl.modify(ram_payer, src_pk, [&](auto& row) {
-      row.reserve_chain_amount += src_amount;
+      add_capped_u64(row.reserve_chain_amount, src_amount);
       row.reserve_wire_amount  -= w_gross;
    });
    // Same-row swaps (identical triples) compose correctly: the second
    // modify reads the post-first-modify state. The destination receives only
    // the post-fee WIRE.
    tbl.modify(ram_payer, dst_pk, [&](auto& row) {
-      row.reserve_wire_amount  += fee.net;
+      add_capped_u64(row.reserve_wire_amount, fee.net);
       row.reserve_chain_amount -= dst_amount;
    });
 
@@ -631,7 +676,7 @@ void reserve::applyfromwire(sysio::slug_name dst_chain_code,
    const auto fee = opp::amm::split_wire_fee(wire_in, uwrit_fee_bps(), FEE_REWARD_SHARE_BPS);
 
    tbl.modify(ram_payer, pk, [&](auto& row) {
-      row.reserve_wire_amount  += fee.net;
+      add_capped_u64(row.reserve_wire_amount, fee.net);
       row.reserve_chain_amount -= dst_amount;
    });
 
@@ -670,7 +715,7 @@ void reserve::paywire(sysio::slug_name src_chain_code,
                 "paywire: insufficient source reserve WIRE for payout + fee");
 
    tbl.modify(ram_payer, pk, [&](auto& row) {
-      row.reserve_chain_amount += src_amount;
+      add_capped_u64(row.reserve_chain_amount, src_amount);
       row.reserve_wire_amount  -= wire_leaving;
    });
 
