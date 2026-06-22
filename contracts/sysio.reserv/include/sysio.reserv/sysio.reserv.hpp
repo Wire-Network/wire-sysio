@@ -186,10 +186,24 @@ namespace sysio {
                          sysio::slug_name to_reserve_code);
 
       /// Read-only: current rewards-bucket WIRE balance (the rewards half of
-      /// collected swap fees, held in this contract's custody pending a future
-      /// distribution action).
+      /// collected swap fees, held in this contract's custody until `drainrewards`
+      /// sweeps it to the emissions treasury for distribution).
       [[sysio::action, sysio::read_only]]
       uint64_t rewardbal();
+
+      /// Auth = `sysio` (the emissions treasury / system account). Sweep `amount`
+      /// WIRE of accrued swap-fee rewards out of this contract's custody to the
+      /// `sysio` treasury, where `sysio.system::payepoch` folds it into the
+      /// per-epoch compute distribution to producers + batch operators. Called
+      /// inline by payepoch with the amount it read from `rewardbal()`, so the
+      /// swept WIRE lands in the treasury before payepoch's payout transfers
+      /// execute (inline actions run depth-first, drain queued before payouts).
+      ///
+      /// Decrements `rewards_bucket.balance` by `amount`; `lifetime_accrued`
+      /// (an audit total) is left untouched. `amount <= 0` is a defensive no-op;
+      /// `amount` exceeding the live balance throws (a bug in the caller).
+      [[sysio::action]]
+      void drainrewards(int64_t amount);
 
       /// Auth=sysio.uwrit. Inline-debit at SWAP_REMIT emit time. Asserts the
       /// reserve is ACTIVE and balance is sufficient.

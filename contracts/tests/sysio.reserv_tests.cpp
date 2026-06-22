@@ -622,6 +622,63 @@ BOOST_FIXTURE_TEST_CASE(applyswap_charges_fee_and_routes_50_50, sysio_reserve_te
    BOOST_REQUIRE_EQUAL(resv_before  - 499'500, wire_balance(RESERVE_ACCOUNT)); // only emissions half left
 } FC_LOG_AND_RETHROW() }
 
+// ── drainrewards: sweep the accrued rewards half to the emissions treasury ──
+// payepoch (sysio.system) calls this inline to fold swap fees into the per-epoch
+// producer + batch-operator distribution.
+
+BOOST_FIXTURE_TEST_CASE(drainrewards_sweeps_bucket_to_treasury, sysio_reserve_tester) { try {
+   // Seed the rewards bucket with a swap fee (same setup as the 50/50 routing test:
+   // reward half = 499'500 accrues into the bucket, staying in reserv custody).
+   BOOST_REQUIRE_EQUAL(success(),
+      regreserve("ETH", "ETH", "PRIMARY", 1'000'000'000'000ULL, 1'000'000'000'000ULL));
+   BOOST_REQUIRE_EQUAL(success(),
+      regreserve("SOLANA", "SOL", "PRIMARY", 1'000'000'000'000ULL, 1'000'000'000'000ULL));
+   BOOST_REQUIRE_EQUAL(success(), push_action(UWRIT_ACCOUNT, "applyswap"_n, mvo()
+      ("src_chain_code",   codename_mvo("ETH"))
+      ("src_token_code",   codename_mvo("ETH"))
+      ("src_reserve_code", codename_mvo("PRIMARY"))
+      ("src_amount",       1'000'000'000ULL)
+      ("dst_chain_code",   codename_mvo("SOLANA"))
+      ("dst_token_code",   codename_mvo("SOL"))
+      ("dst_reserve_code", codename_mvo("PRIMARY"))
+      ("dst_amount",       100'000'000ULL)));
+
+   auto bkt = get_rewardbkt();
+   const uint64_t reward   = bkt["balance"].as_uint64();
+   const uint64_t lifetime = bkt["lifetime_accrued"].as_uint64();
+   BOOST_REQUIRE_EQUAL(499'500ULL, reward);
+
+   const int64_t sysio_before = wire_balance(SYSIO_ACCOUNT);
+   const int64_t resv_before  = wire_balance(RESERVE_ACCOUNT);
+
+   // Sweep the whole bucket to the treasury (auth = sysio).
+   BOOST_REQUIRE_EQUAL(success(), push_action(SYSIO_ACCOUNT, "drainrewards"_n,
+      mvo()("amount", static_cast<int64_t>(reward))));
+
+   auto bkt_after = get_rewardbkt();
+   BOOST_REQUIRE_EQUAL(0ULL, bkt_after["balance"].as_uint64());                  // balance drained
+   BOOST_REQUIRE_EQUAL(lifetime, bkt_after["lifetime_accrued"].as_uint64());     // audit total untouched
+   BOOST_REQUIRE_EQUAL(sysio_before + static_cast<int64_t>(reward),
+                       wire_balance(SYSIO_ACCOUNT));                             // WIRE moved to treasury
+   BOOST_REQUIRE_EQUAL(resv_before - static_cast<int64_t>(reward),
+                       wire_balance(RESERVE_ACCOUNT));                          // left reserv custody
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(drainrewards_auth_and_overdrain_guarded, sysio_reserve_tester) { try {
+   // Only `sysio` (the treasury / system account) may drain.
+   BOOST_REQUIRE(push_action("alice"_n, "drainrewards"_n, mvo()("amount", int64_t(1)))
+      .find("missing authority of sysio") != std::string::npos);
+
+   // Draining more than the live balance (here: an empty bucket) is rejected,
+   // not silently clamped -- this only fires on a caller bug.
+   BOOST_REQUIRE(push_action(SYSIO_ACCOUNT, "drainrewards"_n, mvo()("amount", int64_t(1)))
+      .find("amount exceeds rewards bucket balance") != std::string::npos);
+
+   // Non-positive amounts are defensive no-ops.
+   BOOST_REQUIRE_EQUAL(success(),
+      push_action(SYSIO_ACCOUNT, "drainrewards"_n, mvo()("amount", int64_t(0))));
+} FC_LOG_AND_RETHROW() }
+
 BOOST_FIXTURE_TEST_CASE(applyfromwire_credits_wire_and_debits_chain, sysio_reserve_tester) { try {
    BOOST_REQUIRE_EQUAL(success(),
       regreserve("SOLANA", "SOL", "PRIMARY", 1000, 1000));
