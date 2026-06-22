@@ -2915,7 +2915,11 @@ int main( int argc, char** argv ) {
         code_bytes = bytes();
       }
 
-      if (!suppress_duplicate_check) {
+      // The ROA variant (system setcode) is never a no-op on byte-identical code: sysio.roa::setsyscode
+      // also flips the target privileged and reconciles gifted RAM out of sysio's pool. Skipping on a
+      // code match would leave those side effects unapplied, so only native set code may skip a
+      // duplicate redeploy -- the ROA path always emits the action.
+      if (!suppress_duplicate_check && !sys_variant) {
          if (code_bytes.size()) {
             new_hash = fc::sha256::hash(&(code_bytes[0]), code_bytes.size());
          }
@@ -2972,7 +2976,10 @@ int main( int argc, char** argv ) {
         abi_bytes = bytes();
       }
 
-      if (!suppress_duplicate_check) {
+      // The ROA variant (system setabi) is never a no-op on byte-identical abi: sysio.roa::setsysabi
+      // still reconciles gifted RAM out of sysio's pool. Only native set abi may skip a duplicate
+      // redeploy -- the ROA path always emits the action.
+      if (!suppress_duplicate_check && !sys_variant) {
          duplicate = (old_abi.size() == abi_bytes.size() && std::equal(old_abi.begin(), old_abi.end(), abi_bytes.begin()));
       }
 
