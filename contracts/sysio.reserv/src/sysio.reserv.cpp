@@ -543,7 +543,10 @@ void reserve::drainrewards(int64_t amount) {
    // operators at the next pay-epoch.
    require_auth(TREASURY_ACCOUNT);
 
-   if (amount <= 0) return; // defensive no-op (payepoch only calls with a positive amount)
+   // Internal treasury sweep: a non-positive amount means the caller's
+   // integration logic is wrong (payepoch only calls with a positive amount),
+   // so fail loudly rather than silently no-op.
+   sysio::check(amount > 0, "drainrewards: amount must be positive");
 
    const uint64_t req = static_cast<uint64_t>(amount);
 

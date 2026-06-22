@@ -130,4 +130,27 @@ BOOST_FIXTURE_TEST_CASE(regctok_records_precision_override, sysio_tokens_tester)
    BOOST_REQUIRE_EQUAL(6u, erc20["precision_override"].as<uint32_t>());
 } FC_LOG_AND_RETHROW() }
 
+// regctok rejects a precision beyond the maximum the asset/symbol math supports
+// (18); the boundary value is accepted.
+BOOST_FIXTURE_TEST_CASE(regctok_rejects_precision_over_max, sysio_tokens_tester) { try {
+   BOOST_REQUIRE(push_action(TOKENS_ACCOUNT, "regctok"_n, mvo()
+      ("chain_code",         codename("ETH"))
+      ("token_code",         codename("BAD"))
+      ("contract_addr",      "")
+      ("precision_override", 19u)
+      ("is_native",          false))
+      .find("precision_override exceeds maximum") != std::string::npos);
+
+   // Boundary: precision 18 is accepted.
+   BOOST_REQUIRE_EQUAL(success(), push_action(TOKENS_ACCOUNT, "regctok"_n, mvo()
+      ("chain_code",         codename("ETH"))
+      ("token_code",         codename("GUD"))
+      ("contract_addr",      "")
+      ("precision_override", 18u)
+      ("is_native",          false)));
+   auto ok = find_chaintoken("ETH", "GUD");
+   BOOST_REQUIRE(!ok.is_null());
+   BOOST_REQUIRE_EQUAL(18u, ok["precision_override"].as<uint32_t>());
+} FC_LOG_AND_RETHROW() }
+
 BOOST_AUTO_TEST_SUITE_END()

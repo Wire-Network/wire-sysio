@@ -674,9 +674,12 @@ BOOST_FIXTURE_TEST_CASE(drainrewards_auth_and_overdrain_guarded, sysio_reserve_t
    BOOST_REQUIRE(push_action(SYSIO_ACCOUNT, "drainrewards"_n, mvo()("amount", int64_t(1)))
       .find("amount exceeds rewards bucket balance") != std::string::npos);
 
-   // Non-positive amounts are defensive no-ops.
-   BOOST_REQUIRE_EQUAL(success(),
-      push_action(SYSIO_ACCOUNT, "drainrewards"_n, mvo()("amount", int64_t(0))));
+   // Non-positive amounts fail loudly (internal sweep -> a non-positive amount
+   // signals a caller bug, not a no-op).
+   BOOST_REQUIRE(push_action(SYSIO_ACCOUNT, "drainrewards"_n, mvo()("amount", int64_t(0)))
+      .find("amount must be positive") != std::string::npos);
+   BOOST_REQUIRE(push_action(SYSIO_ACCOUNT, "drainrewards"_n, mvo()("amount", int64_t(-5)))
+      .find("amount must be positive") != std::string::npos);
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(applyfromwire_credits_wire_and_debits_chain, sysio_reserve_tester) { try {

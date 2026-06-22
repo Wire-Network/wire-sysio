@@ -13,7 +13,6 @@
 #include <sysio.epoch/sysio.epoch.hpp>
 
 #include <algorithm>
-#include <limits>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -139,12 +138,15 @@ int64_t get_wire_balance(name account) {
    return acct_tbl.get(key).balance.amount;
 }
 
-// Local mirror of sysio.reserv's rewards_bucket singleton. The kv row is keyed
-// by table name ("rewardbkt") + the reserv account scope, so a mirror with the
-// same table name and field layout reads the exact bytes reserv wrote. Mirrored
-// rather than #include'd so sysio.system does not pull sysio.reserv's AMM /
-// attestation headers into its translation unit. Layout MUST stay in lockstep
-// with sysio.reserv.hpp's rewards_bucket (balance, lifetime_accrued).
+// Local layout-compatible view of sysio.reserv's rewards_bucket singleton. A
+// [[sysio::table]]-attributed struct cannot be shared into sysio.system's
+// translation unit -- doing so corrupts this contract's read-only-action return
+// codegen (getpeerkeys) -- so the layout is mirrored here. The kv row is keyed
+// by table name ("rewardbkt") + the reserv account scope, so this reads the
+// exact bytes reserv wrote. MUST stay in lockstep with sysio.reserv.hpp's
+// rewards_bucket (balance, lifetime_accrued); the cross-contract read is
+// exercised end-to-end by t5_emissions_tests/payepoch_folds_swap_fee_rewards,
+// which fails if the two layouts ever diverge.
 struct reserv_rewards_bucket {
    uint64_t balance          = 0;
    uint64_t lifetime_accrued = 0;
@@ -153,13 +155,15 @@ struct reserv_rewards_bucket {
 using reserv_rewardbkt_t = sysio::kv::global<"rewardbkt"_n, reserv_rewards_bucket>;
 
 // Read the live swap-fee rewards balance held in sysio.reserv's custody.
-// Returns 0 when never accrued. Clamps to int64 max defensively (reserv caps
-// the bucket at uint64 max via saturating add).
+// Returns 0 when never accrued. Clamps to asset::max_amount because the value is
+// later carried as a sysio::asset (drained + transferred as WIRE); the bucket is
+// backed by real WIRE so the clamp is only a defensive guard against accounting
+// drift constructing an out-of-range asset.
 int64_t get_reserv_rewards_balance() {
    reserv_rewardbkt_t bkt(RESERV_CONTRACT);
    const uint64_t bal = bkt.get_or_default(reserv_rewards_bucket{}).balance;
-   constexpr uint64_t int64_max = static_cast<uint64_t>(std::numeric_limits<int64_t>::max());
-   return bal > int64_max ? std::numeric_limits<int64_t>::max() : static_cast<int64_t>(bal);
+   constexpr uint64_t max_amt = static_cast<uint64_t>(sysio::asset::max_amount);
+   return bal > max_amt ? sysio::asset::max_amount : static_cast<int64_t>(bal);
 }
 
 // Returns true iff the account is registered in sysio.opreg with AVAILABLE

@@ -361,9 +361,17 @@ namespace sysio {
       /// stays in this contract's custody — it is NOT transferred out — so the
       /// custody invariant is `token_balance == Σ reserve_wire_amount +
       /// rewards.balance + in-flight escrow`. `balance` is the portion
-      /// earmarked for a future rewards distribution; `lifetime_accrued` is an
-      /// audit total. (The emissions half of each fee IS transferred to the
-      /// `sysio` treasury at collection time and is therefore not tracked here.)
+      /// earmarked for distribution (swept by `drainrewards` and folded into
+      /// `sysio.system::payepoch`); `lifetime_accrued` is an audit total. (The
+      /// emissions half of each fee IS transferred to the `sysio` treasury at
+      /// collection time and is therefore not tracked here.)
+      ///
+      /// NOTE: sysio.system reads this row through a layout-compatible local
+      /// definition (a `[[sysio::table]]`-attributed struct cannot be shared
+      /// into sysio.system's translation unit — it corrupts that contract's
+      /// read-only-action return codegen). The cross-contract read is exercised
+      /// end-to-end by t5_emissions_tests/payepoch_folds_swap_fee_rewards, which
+      /// fails if the two layouts ever diverge.
       struct [[sysio::table("rewardbkt")]] rewards_bucket {
          uint64_t balance          = 0;   // claimable WIRE held for distribution
          uint64_t lifetime_accrued = 0;   // audit: total WIRE ever routed to rewards
