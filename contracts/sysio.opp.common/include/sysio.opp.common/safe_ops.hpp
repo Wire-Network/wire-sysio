@@ -68,4 +68,22 @@ inline uint64_t add_sat_u64(uint64_t a, uint64_t b) {
    return (b > UINT64_MAX - a) ? UINT64_MAX : a + b;
 }
 
+/// Saturating signed 64-bit addition. Returns `a + b`, clamped to `INT64_MAX`
+/// on positive overflow and `INT64_MIN` on negative overflow, instead of
+/// invoking signed-overflow undefined behaviour.
+///
+/// `asset::amount` is an `int64_t`, so an unchecked `amount += amount` on a
+/// reslimit/policy accumulator is UB the instant the sum exceeds `INT64_MAX`.
+/// Several of those accumulators sit on the OPP inbound-consensus dispatch path
+/// (e.g. `sysio.roa::increase_reslimit`, reached from `nodeownreg` ->
+/// `regnodeowner` and from `newnameduser`), where a `check()`-abort would roll
+/// back the consensus-tipping delivery and stall epoch advancement. Saturating
+/// keeps the arithmetic well-defined and never throws; the cap is unreachable
+/// for any weight bounded by the SYS supply.
+inline int64_t add_sat_i64(int64_t a, int64_t b) {
+   if (b > 0 && a > INT64_MAX - b) return INT64_MAX;
+   if (b < 0 && a < INT64_MIN - b) return INT64_MIN;
+   return a + b;
+}
+
 } // namespace sysio::opp::safe

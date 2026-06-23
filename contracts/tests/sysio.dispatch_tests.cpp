@@ -268,10 +268,11 @@ public:
          RESERV_ACCOUNT, CHALG_ACCOUNT, TOKEN_ACCOUNT, CHAINS_ACCOUNT,
          BATCHOP, UWRIT_OP
       });
-      // CLAIM_ACCOUNT with NO roa policy (include_roa_policy=false) so it has no pre-existing
-      // reslimit -- regnodeowner creates that, and would throw "Resource limit already exist"
-      // otherwise. include_code=true leaves the standard <account>@sysio.code on active, which
-      // exercises active_key_matches against a real (non-single-entry) authority.
+      // CLAIM_ACCOUNT with NO roa policy (include_roa_policy=false) so regnodeowner exercises the
+      // fresh create-branch of increase_reslimit. (A pre-existing reslimit row would now be reconciled,
+      // not rejected -- SEC-087 -- but this dispatch test keeps the clean create path.) include_code=true
+      // leaves the standard <account>@sysio.code on active, which exercises active_key_matches against a
+      // real (non-single-entry) authority.
       create_account(CLAIM_ACCOUNT, config::system_account_name,
                      /*multisig=*/false, /*include_code=*/true, /*include_roa_policy=*/false);
       produce_blocks(2);

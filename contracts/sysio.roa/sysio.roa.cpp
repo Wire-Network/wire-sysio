@@ -3,6 +3,7 @@
 #include "sysio.system/emissions.hpp"
 
 #include <sysio.authex/sysio.authex.hpp>
+#include <sysio.opp.common/safe_ops.hpp>   // add_sat_u64 / add_sat_i64 -- never-throw saturating accumulators
 #include <sysio/permission.hpp>   // get_permission -- read an account's active authority in nodeownreg
 
 namespace sysio {
@@ -84,12 +85,21 @@ namespace sysio {
         bool exists = reslimit.contains(key);
         check(!require_to_exist || exists, "No resource limit exists for this account.");
 
+        // ram_bytes is always >= 0 by construction on every call path (a policy weight times the
+        // positive bytes_per_unit, or a fixed constant); a negative value is a depot/programming bug,
+        // never operator-supplied data, so asserting here is correct (and guards the unsigned cast in
+        // both branches below). The +=/accumulation itself uses saturating adds rather than a throw:
+        // increase_reslimit is reachable from the OPP never-throw dispatch path (nodeownreg ->
+        // regnodeowner, and newnameduser), where a check()-abort would stall epoch advancement. The
+        // saturation cap is unreachable for any weight bounded by the SYS supply.
+        check(ram_bytes >= 0, "increase_reslimit does not allow negative ram_bytes");
+
         if (!exists) {
             // add newaccount_ram for reslimit when created to account for gifted ram when created
             resources_t res = {
                 .net = sysio_acct ? asset(0, net_weight.symbol) : net_weight,
                 .cpu = sysio_acct ? asset(0, cpu_weight.symbol) : cpu_weight,
-                .ram_bytes = (uint64_t)ram_bytes + sysiosystem::newaccount_ram
+                .ram_bytes = opp::safe::add_sat_u64(static_cast<uint64_t>(ram_bytes), sysiosystem::newaccount_ram)
             };
             reslimit.emplace(get_self(), key, roa::reslimit{
                 .owner = owner,
@@ -101,11 +111,10 @@ namespace sysio {
         } else {
             reslimit.modify(get_self(), key, [&](auto& row) {
                 if (!sysio_acct) {
-                    row.net_weight.amount += net_weight.amount;
-                    row.cpu_weight.amount += cpu_weight.amount;
+                    row.net_weight.amount = opp::safe::add_sat_i64(row.net_weight.amount, net_weight.amount);
+                    row.cpu_weight.amount = opp::safe::add_sat_i64(row.cpu_weight.amount, cpu_weight.amount);
                 }
-                check(ram_bytes >= 0, "increase_reslimit does not allow negative ram_bytes");
-                row.ram_bytes += static_cast<uint64_t>(ram_bytes);
+                row.ram_bytes = opp::safe::add_sat_u64(row.ram_bytes, static_cast<uint64_t>(ram_bytes));
             });
             auto updated = reslimit.get(key);
             return resources_t{
@@ -730,19 +739,13 @@ namespace sysio {
             }
         }
 
-        // (6) the account must not already be resource-provisioned under ROA. regnodeowner creates the
-        // owner's reslimit row from scratch (set_reslimit asserts it is absent), so an account that
-        // already carries one -- e.g. it previously received a policy via addpolicy -- would throw and
-        // abort the depot dispatch instead of soft-failing. Per trust-OPP, detect it here and record a
-        // reject row so the claim stays a non-throwing no-op. (forcereg, the governance/test path, has
-        // no soft-fail contract and still hard-fails in set_reslimit, which is fine there.)
-        {
-            reslimit_t reslimit(get_self());
-            if (reslimit.contains(reslimit_key{owner.value})) {
-                record_nodereg(owner, tier, REJECTED, OWNER_HAS_RESLIMIT, gen);
-                return;
-            }
-        }
+        // (6) a pre-existing reslimit row no longer blocks registration. An attacker can plant one on
+        // any account via addpolicy (no target consent), which previously forced this claim into a
+        // permanent OWNER_HAS_RESLIMIT soft-fail -- a valid registration could be griefed indefinitely.
+        // regnodeowner now reconciles instead: it stacks the node-owner allocation onto the existing
+        // row via increase_reslimit rather than creating from scratch. The planted policy stays backed
+        // by its issuer's reserve and remains independently reclaimable via reducepolicy; no value is
+        // stolen and the claim reaches CONFIRMED. (SEC-087)
 
         // Record the depositor's ETH key as a sysio.authex link via the trusted depot-only path.
         // recordlink requires sysio.authex.active, satisfied by the sysio.roa@sysio.code delegation
@@ -866,20 +869,21 @@ namespace sysio {
             });
         }
 
-        // Owner reslimits. The account keeps its account-creation gift -- newaccount_ram, the same
-        // consensus constant sysio.system::newaccount transfers at creation -- and the node-owner
-        // personal allocation stacks on top. Computed from constants (NOT a read of the live quota)
-        // so the node owner's RAM is an exact, deterministic value: newaccount_ram + personal_ram_bytes.
-        // This also avoids the prior overwrite, which discarded the gift (and silently drained sysio's
-        // pool by newaccount_ram per registration).
-        //   Conservation note: in the production path (newnameduser -> nodeownreg) sysio funded that
-        //   newaccount_ram at creation, so keeping it here stays conservation-exact. forcereg (the
-        //   governance/test path) creates the account out-of-band, so its newaccount_ram was never
-        //   debited from sysio -- the absolute set below materializes it regardless, which is
-        //   acceptable for that bootstrap path (it is not the production conservation contract).
-        uint64_t owner_ram = sysiosystem::newaccount_ram + personal_ram_bytes;
-        set_reslimit(owner, net_cpu_weight, net_cpu_weight, owner_ram);
-        set_resource_limits(owner, owner_ram, net_cpu_weight.amount, net_cpu_weight.amount);
+        // Owner reslimits. Stack the node-owner personal allocation onto whatever the account already
+        // holds. increase_reslimit CREATES the row when absent -- folding in the one-time newaccount_ram
+        // gift, so a fresh node owner gets exactly newaccount_ram + personal_ram_bytes (identical to the
+        // prior set_reslimit + absolute set) -- or ADDS only the personal delta when a prior addpolicy
+        // already provisioned the account, reconciling SEC-087's pre-existing reslimit row instead of
+        // aborting, and never double-counting the gift. Then sync the on-chain quota to the resulting
+        // row totals so the reslimit row and the resource limits stay equal on BOTH the fresh and
+        // reconcile paths.
+        //   Conservation: production (newnameduser -> nodeownreg) funds newaccount_ram at creation, so
+        //   the create path stays conservation-exact; the reconcile path adds only the node-owner delta.
+        //   forcereg over a pre-existing row now reconciles too (previously threw in set_reslimit) --
+        //   acceptable for the governance/bootstrap path.
+        roa::resources_t owner_res = increase_reslimit(owner, net_cpu_weight, net_cpu_weight,
+                                                       (int64_t)personal_ram_bytes, /*require_to_exist=*/false);
+        set_resource_limits(owner, (int64_t)owner_res.ram_bytes, owner_res.net.amount, owner_res.cpu.amount);
 
         // Sysio reslimit
         reslimit_t sysioreslimit(get_self());
