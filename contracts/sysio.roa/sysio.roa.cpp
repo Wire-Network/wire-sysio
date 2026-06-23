@@ -261,16 +261,19 @@ namespace sysio {
         get_resource_limits(owner, current_ram, current_net, current_cpu);
         if (current_ram < 0) current_ram = 0; // if unlimited use the new limit
 
-        // Set the system resource limits
-        auto updated_ram = current_ram + ram;
+        // Set the system resource limits. Saturating adds keep this chain-quota sync UB-free and use the
+        // same safe arithmetic as increase_reslimit's reslimit-row accumulators, so the row and the quota
+        // are hardened identically; the cap is unreachable for any supply-bounded weight, so this is a
+        // no-op for realistic values.
+        auto updated_ram = opp::safe::add_sat_i64(current_ram, ram);
         if (sysio_acct) {
             // Infinite CPU/NET for sysio accounts
             set_resource_limits(owner, updated_ram, -1, -1);
         } else {
             if (current_net < 0) current_net = 0; // if unlimited use the new limit
             if (current_cpu < 0) current_cpu = 0; // if unlimited use the new limit
-            auto updated_net = current_net + net;
-            auto updated_cpu = current_cpu + cpu;
+            auto updated_net = opp::safe::add_sat_i64(current_net, net);
+            auto updated_cpu = opp::safe::add_sat_i64(current_cpu, cpu);
             set_resource_limits(owner, updated_ram, updated_net, updated_cpu);
         }
     }
@@ -892,7 +895,9 @@ namespace sysio {
 
         uint64_t sysio_bytes = sysio_allocation.amount * state.bytes_per_unit;
         sysioreslimit.modify(get_self(), sysio_res_key, [&](auto& row) {
-            row.ram_bytes += sysio_bytes;
+            // Saturating add, matching increase_reslimit -- this is the one reslimit-row accumulator that
+            // does not route through that helper, so harden it the same way (no-op for realistic values).
+            row.ram_bytes = opp::safe::add_sat_u64(row.ram_bytes, sysio_bytes);
         });
 
         // Re-read to get updated value for set_resource_limits
