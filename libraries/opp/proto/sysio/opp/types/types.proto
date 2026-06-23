@@ -203,6 +203,8 @@ message Reserve {
   uint64        registered_at_ms        = 13;
   uint64        activated_at_ms         = 14;
   uint64        cancelled_at_ms         = 15;
+  uint32        chain_precision         = 16;  // depot-frame precision of the token side = min(native, 9); self-describing, never assumed
+  uint32        wire_precision          = 17;  // the WIRE side's precision (the WIRE token's 9)
 }
 
 // Canonical reserve-scoped amount carrier. Identifies WHICH reserve —

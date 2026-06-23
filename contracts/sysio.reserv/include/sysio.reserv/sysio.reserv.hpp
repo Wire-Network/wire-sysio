@@ -74,6 +74,12 @@ namespace sysio {
       static constexpr uint32_t MAX_CONNECTOR_WEIGHT_BPS     = 9999;
       static constexpr uint32_t DEFAULT_CONNECTOR_WEIGHT_BPS = 5000;
 
+      // The WIRE token's decimal precision — the depot frame's reference side,
+      // and the cap for any token-side depot precision. WIRE custody is an
+      // `asset{"WIRE", 9}`, so this is the WIRE asset's definition, recorded
+      // explicitly on every reserve's `wire_precision` rather than assumed.
+      static constexpr uint32_t WIRE_PRECISION = 9;
+
       // Swap-fee split. Every swap charges sysio.uwrit's `fee_bps` out of the
       // WIRE leg; this contract routes the collected fee 50/50 — half accrues to
       // the on-chain `rewards_bucket` (kept in this contract's WIRE custody for a
@@ -103,6 +109,7 @@ namespace sysio {
                       std::string     description,
                       uint64_t        initial_chain_amount,
                       uint64_t        initial_wire_amount,
+                      uint32_t        chain_precision,
                       uint32_t        connector_weight_bps,
                       bool            is_private,
                       sysio::name     owner);
@@ -133,6 +140,7 @@ namespace sysio {
                         std::string           description,
                         uint64_t              external_token_amount,
                         uint64_t              requested_wire_amount,
+                        uint32_t              chain_precision,
                         uint32_t              connector_weight_bps,
                         opp::types::ChainKind creator_chain_kind,
                         std::vector<char>     creator_chain_addr,
@@ -318,6 +326,15 @@ namespace sysio {
          opp::types::ReserveStatus   status                 = opp::types::RESERVE_STATUS_UNKNOWN;
          uint64_t                    reserve_chain_amount   = 0;
          uint64_t                    reserve_wire_amount    = 0;
+         /// Depot-frame decimal precision of each pool side, recorded at
+         /// creation so the reserve is self-describing — nothing assumes a
+         /// precision. `chain_precision = min(token native precision, 9)` (the
+         /// outpost downscales anything above the 9-dec frame cap at its
+         /// boundary); `wire_precision` is the WIRE token's 9. The AMM curve is
+         /// precision-homogeneous, so these do NOT enter swap math — they exist
+         /// for unambiguous amount interpretation off the curve.
+         uint32_t                    chain_precision        = WIRE_PRECISION;
+         uint32_t                    wire_precision         = WIRE_PRECISION;
          uint32_t                    connector_weight_bps   = DEFAULT_CONNECTOR_WEIGHT_BPS;
          opp::types::ChainAddress    creator_addr;
          uint64_t                    requested_wire_amount  = 0;
@@ -346,7 +363,8 @@ namespace sysio {
 
          SYSLIB_SERIALIZE(reserve_row,
             (chain_code)(token_code)(reserve_code)(name)(description)
-            (status)(reserve_chain_amount)(reserve_wire_amount)(connector_weight_bps)
+            (status)(reserve_chain_amount)(reserve_wire_amount)
+            (chain_precision)(wire_precision)(connector_weight_bps)
             (creator_addr)(requested_wire_amount)(external_token_amount)
             (registered_at_ms)(activated_at_ms)(cancelled_at_ms)
             (is_private)(owner)(creator_pub_key))
