@@ -537,6 +537,37 @@ uint64_t reserve::rewardbal() {
    return bkt.get_or_default(rewards_bucket{}).balance;
 }
 
+void reserve::drainrewards(int64_t amount) {
+   // Only the system treasury (where sysio.system::payepoch runs) may sweep the
+   // rewards bucket. The swept WIRE is redistributed to producers + batch
+   // operators at the next pay-epoch.
+   require_auth(TREASURY_ACCOUNT);
+
+   // Internal treasury sweep: a non-positive amount means the caller's
+   // integration logic is wrong (payepoch only calls with a positive amount),
+   // so fail loudly rather than silently no-op.
+   sysio::check(amount > 0, "drainrewards: amount must be positive");
+
+   const uint64_t req = static_cast<uint64_t>(amount);
+
+   rewardbkt_t bkt(get_self());
+   auto rb = bkt.get_or_default(rewards_bucket{});
+   sysio::check(req <= rb.balance, "drainrewards: amount exceeds rewards bucket balance");
+
+   // Drop the accounting balance first, then move the backing WIRE out of
+   // custody. lifetime_accrued is a cumulative audit total — never decremented.
+   rb.balance -= req;
+   bkt.set(rb, ram_payer);
+
+   action(
+      permission_level{get_self(), "active"_n},
+      TOKEN_ACCOUNT, "transfer"_n,
+      std::make_tuple(get_self(), TREASURY_ACCOUNT,
+         asset(static_cast<int64_t>(req), WIRE_SYMBOL),
+         std::string("sysio.reserv::swap-fee rewards -> emissions payepoch"))
+   ).send();
+}
+
 void reserve::debit(sysio::slug_name chain_code,
                      sysio::slug_name token_code,
                      sysio::slug_name reserve_code,
