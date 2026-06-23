@@ -663,4 +663,27 @@ BOOST_FIXTURE_TEST_CASE(setconfig_stamps_collat_config_timestamp, sysio_opreg_te
    BOOST_REQUIRE(bops[0]["config_timestamp_ms"].as_uint64() > 0);
 } FC_LOG_AND_RETHROW() }
 
+// #3/#10: a TERMINATED operator with a still-queued withdraw must not abort flushwtdw. terminate
+// remits the operator's full unlocked balance (zeroing it), leaving the matured withdraw row to be
+// subtracted from a zero balance — pre-fix that underflowed and aborted the epoch-inline flushwtdw,
+// permanently stalling epoch advancement. The TERMINATED branch erases the row without subtracting.
+BOOST_FIXTURE_TEST_CASE(flushwtdw_terminated_operator_does_not_abort, sysio_opreg_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), setconfig());
+   BOOST_REQUIRE_EQUAL(success(),
+      regoperator("batchop.a"_n, OPERATOR_TYPE_BATCH, /*is_bootstrapped=*/false));
+   BOOST_REQUIRE_EQUAL(success(), depositinle("batchop.a"_n, "ETH", "ETH", 500));
+
+   // Queue a withdraw of the full balance, then terminate (remits + zeroes the balance), leaving
+   // the queued row matured against a now-zero balance.
+   BOOST_REQUIRE_EQUAL(success(), withdrawinle("batchop.a"_n, "ETH", "ETH", 500));
+   BOOST_REQUIRE(!get_wtdw(1).is_null());
+   BOOST_REQUIRE_EQUAL(success(), terminate("batchop.a"_n, "rolling-24h miss"));
+
+   // Flush at an epoch well past the withdraw's eligibility. Pre-fix this aborted with a
+   // "balance underflow"; the TERMINATED branch erases the matured row instead.
+   BOOST_REQUIRE_EQUAL(success(),
+      push_opreg_action(EPOCH_ACCOUNT, "flushwtdw"_n, mvo()("current_epoch", 1000000u)));
+   BOOST_REQUIRE(get_wtdw(1).is_null());   // matured row erased, not stuck re-throwing every advance
+} FC_LOG_AND_RETHROW() }
+
 BOOST_AUTO_TEST_SUITE_END()

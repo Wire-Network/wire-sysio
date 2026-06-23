@@ -298,10 +298,15 @@ struct [[sysio::table("epochlog"), sysio::contract("sysio.system")]] epoch_log {
    int64_t                compute_amount    = 0;
    int64_t                capex_amount      = 0;
    int64_t                governance_amount = 0;
+   // Swap-fee rewards (sysio.reserv rewards_bucket) actually distributed to
+   // producers + batch operators this period, ON TOP of the emission above.
+   // Sourced from collected swap fees, not the T5 treasury, so it is NOT
+   // included in total_emission / total_distributed.
+   int64_t                fee_distributed   = 0;
 
    SYSLIB_SERIALIZE(epoch_log,
       (sysio_epoch_index)(epoch_count)(timestamp)(total_emission)
-      (compute_amount)(capex_amount)(governance_amount))
+      (compute_amount)(capex_amount)(governance_amount)(fee_distributed))
 };
 
 using epochlog_t = sysio::kv::table<"epochlog"_n, epochlog_key, epoch_log>;

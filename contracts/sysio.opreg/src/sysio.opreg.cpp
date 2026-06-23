@@ -1039,12 +1039,27 @@ void opreg::flushwtdw(uint32_t current_epoch) {
          continue;
       }
 
-      // Re-validate available — should still cover (since available()
-      // subtracts pending withdraws), but a state shift is possible.
-      uint64_t avail_excluding_self = available_inline(op, row.chain_code, row.token_code) + row.amount;
-      if (avail_excluding_self < row.amount) {
+      if (op.status == OperatorStatus::OPERATOR_STATUS_TERMINATED) {
+         // Terminated during the wait — terminate_inline already remitted the operator's full
+         // unlocked balance (which covered this queued amount), so the row is moot. Erase without
+         // subtracting; otherwise subtract_balance would underflow and abort this epoch-inline
+         // action, permanently stalling epoch advancement (the balance was reduced to sum(locks)
+         // by terminate_inline, leaving nothing to cover the matured withdraw).
          append_action_log(ops, op_pk, remit_action, false,
-                           "insufficient available balance at flush (rollup mismatch)");
+                           "operator terminated during withdraw-wait window");
+         queue.erase(wkey);
+         continue;
+      }
+
+      // Re-validate the actual stored balance covers this withdraw before subtracting. The prior
+      // guard `available_inline(...) + row.amount < row.amount` was dead code — available_inline
+      // is unsigned so it reduces to `available_inline(...) < 0` and never fired. Compare the real
+      // (chain,token) balance against the debit and skip-and-log on a shortfall rather than let
+      // subtract_balance's underflow check abort this epoch-inline action.
+      const auto* bal = find_balance(op, row.chain_code, row.token_code);
+      if (!bal || bal->balance < row.amount) {
+         append_action_log(ops, op_pk, remit_action, false,
+                           "insufficient balance at flush (rollup mismatch)");
          queue.erase(wkey);
          continue;
       }

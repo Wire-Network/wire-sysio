@@ -37,6 +37,7 @@
 #include <fc/variant_object.hpp>
 #include <fc/io/raw.hpp>
 #include <fc/reflect/reflect.hpp>
+#include <fc/slug_name.hpp>
 
 using namespace sysio::testing;
 using namespace sysio;
@@ -434,6 +435,27 @@ public:
       set_code( DCLAIM, contracts::dclaim_wasm() );
       set_abi ( DCLAIM, contracts::dclaim_abi().data() );
       set_privileged( DCLAIM );
+      produce_blocks(1);
+   }
+
+   /// Deploy the real sysio.reserv contract (privileged) so the swap-fee
+   /// fold-in test can seed its rewards bucket via a swap. Mirrors
+   /// deploy_dclaim_for_signing's account + ROA-policy + code pattern.
+   void deploy_reserv() {
+      const account_name RESERV = "sysio.reserv"_n;
+      if (!control->db().find<account_object, by_name>(RESERV)) {
+         create_accounts({ RESERV });
+         produce_blocks(1);
+      }
+      if (get_roa_policy(RESERV, "nodedaddy"_n).is_null()) {
+         auto tr = addpolicy_ram_only("nodedaddy"_n, RESERV, asset::from_string("500.0000 SYS"));
+         BOOST_REQUIRE( tr );
+         BOOST_REQUIRE( !tr->except );
+         produce_blocks(1);
+      }
+      set_code( RESERV, contracts::reserve_wasm() );
+      set_abi ( RESERV, contracts::reserve_abi().data() );
+      set_privileged( RESERV );
       produce_blocks(1);
    }
 
@@ -1016,6 +1038,17 @@ public:
    // calling this for a second+ advance.
    action_result advance_epoch_state(account_name signer = EPOCH) {
       return push_epoch_action(signer, "advance"_n, mvo());
+   }
+
+   // Push an action against the (separately deployed) sysio.reserv contract.
+   // Only the swap-fee fold-in test deploys reserv and uses this.
+   action_result push_reserv_action(account_name signer, action_name act, const variant_object& data) {
+      try {
+         base_tester::push_action("sysio.reserv"_n, act, signer, data);
+         return success();
+      } catch (const fc::exception& ex) {
+         return error(ex.top_message());
+      }
    }
 
    // Convenience: set epoch config only. Genesis advance is deferred so each
@@ -3107,6 +3140,106 @@ BOOST_FIXTURE_TEST_CASE( single_active_producer_full_active_share, sysio_emissio
 
    // They must get something > 0 and <= producer_pool
    BOOST_REQUIRE( got <= producer_pool );
+} FC_LOG_AND_RETHROW()
+
+// Swap-fee rewards (sysio.reserv rewards_bucket) are folded into payepoch's
+// compute distribution: producers + batch operators receive them on top of
+// emissions, split by producer_bps / batch_op_bps. End-to-end: deploy reserv,
+// seed the bucket with a real swap fee, advance to the (cadence-1) pay-epoch,
+// and verify the single producer is paid producer_pool + its fee share, the
+// bucket is swept to 0, the fee is NOT counted against the emission treasury,
+// and the audit log records it.
+BOOST_FIXTURE_TEST_CASE( payepoch_folds_swap_fee_rewards, sysio_emissions_tester ) try {
+   const account_name RESERV = "sysio.reserv"_n;
+   const account_name UWRIT  = "sysio.uwrit"_n;
+
+   create_t5_holding_accounts();
+
+   // Deploy sysio.reserv (the single extra real contract this test stands up).
+   deploy_reserv();
+
+   // Local ABI serializer + slug_name helper for reserv reads/writes.
+   abi_serializer reserv_ser;
+   {
+      const auto* a = control->find_account_metadata( RESERV );
+      BOOST_REQUIRE( a != nullptr );
+      abi_def d;
+      BOOST_REQUIRE_EQUAL( abi_serializer::to_abi(a->abi, d), true );
+      reserv_ser.set_abi( d, abi_serializer::create_yield_function(abi_serializer_max_time) );
+   }
+   auto codename = [](std::string_view s) { return mvo()("value", fc::slug_name{s}.value); };
+   auto reward_balance = [&]() -> int64_t {
+      auto data = get_row_by_account(RESERV, RESERV, "rewardbkt"_n, "rewardbkt"_n);
+      if (data.empty()) return 0;
+      auto v = reserv_ser.binary_to_variant("rewards_bucket", data,
+                  abi_serializer::create_yield_function(abi_serializer_max_time));
+      return static_cast<int64_t>(v["balance"].as_uint64());
+   };
+
+   // --- Seed the rewards bucket via a real swap (still in the bootstrap window,
+   // current_epoch_index == 0, so regreserve is permitted) ---
+   BOOST_REQUIRE_EQUAL( success(), push_reserv_action(RESERV, "regreserve"_n, mvo()
+      ("chain_code", codename("ETH"))("token_code", codename("ETH"))("reserve_code", codename("PRIMARY"))
+      ("name", "eth")("description", "")
+      ("initial_chain_amount", 1'000'000'000'000ULL)("initial_wire_amount", 1'000'000'000'000ULL)
+      ("connector_weight_bps", 5000u)("is_private", false)("owner", name{}) ) );
+   BOOST_REQUIRE_EQUAL( success(), push_reserv_action(RESERV, "regreserve"_n, mvo()
+      ("chain_code", codename("SOLANA"))("token_code", codename("SOL"))("reserve_code", codename("PRIMARY"))
+      ("name", "sol")("description", "")
+      ("initial_chain_amount", 1'000'000'000'000ULL)("initial_wire_amount", 1'000'000'000'000ULL)
+      ("connector_weight_bps", 5000u)("is_private", false)("owner", name{}) ) );
+   BOOST_REQUIRE_EQUAL( success(), push_reserv_action(UWRIT, "applyswap"_n, mvo()
+      ("src_chain_code", codename("ETH"))("src_token_code", codename("ETH"))("src_reserve_code", codename("PRIMARY"))
+      ("src_amount", 1'000'000'000ULL)
+      ("dst_chain_code", codename("SOLANA"))("dst_token_code", codename("SOL"))("dst_reserve_code", codename("PRIMARY"))
+      ("dst_amount", 100'000'000ULL) ) );
+
+   const int64_t fee_total = reward_balance();
+   BOOST_REQUIRE_GT( fee_total, 0 );
+   const int64_t fee_producer_pool = test_split_bps(fee_total, PRODUCER_BPS);
+   BOOST_REQUIRE_GT( fee_producer_pool, 0 );
+
+   // --- Single full-round producer; advance to the cadence-1 pay-epoch ---
+   setup_producers(1);
+   wait_for_producer_schedule();
+   produce_complete_cycles(1, 2);
+
+   const uint32_t start = head_secs() - ONE_EPOCH - 1;
+   BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
+
+   const int64_t t5_before = get_t5_state()["total_distributed"].as<int64_t>();
+   const int64_t bal_before = get_wire_balance("producera"_n).get_amount();
+
+   // Must NOT overdraw: payepoch queues the reserv->sysio drain ahead of the
+   // payout transfers, so the swept fee lands in sysio's balance first.
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
+
+   const int64_t got = get_wire_balance("producera"_n).get_amount() - bal_before;
+
+   auto log = get_epoch_log(1);
+   const int64_t compute       = log["compute_amount"].as<int64_t>();
+   const int64_t capex         = log["capex_amount"].as<int64_t>();
+   const int64_t gov           = log["governance_amount"].as<int64_t>();
+   const int64_t producer_pool = test_split_bps(compute, PRODUCER_BPS);
+
+   // The producer received its full emission share PLUS its share of the fee
+   // (expected_rounds clamps to 1 at the 60s epoch, so the single active
+   // producer takes the whole producer pool).
+   BOOST_REQUIRE_EQUAL( got, producer_pool + fee_producer_pool );
+   BOOST_REQUIRE_GT( got, producer_pool ); // fee folded in: pure emission caps at producer_pool
+
+   // The audit log records the fee actually distributed (only the producer
+   // share; the batch-op share rolled to treasury with no active group).
+   BOOST_REQUIRE_EQUAL( log["fee_distributed"].as<int64_t>(), fee_producer_pool );
+
+   // The bucket was swept to zero by the inline drain.
+   BOOST_REQUIRE_EQUAL( reward_balance(), 0 );
+
+   // total_distributed counts emission only (producer_pool + capex + gov, with
+   // the empty batch group's share staying in treasury) -- the fee is NOT
+   // charged against the emission curve.
+   const int64_t t5_after = get_t5_state()["total_distributed"].as<int64_t>();
+   BOOST_REQUIRE_EQUAL( t5_after - t5_before, producer_pool + capex + gov );
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( standby_weight_decreases_by_rank, sysio_emissions_tester ) try {

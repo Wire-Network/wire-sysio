@@ -6,6 +6,7 @@
 
 #include <fc/variant_object.hpp>
 #include <fc/slug_name.hpp>
+#include <fc/crypto/public_key.hpp>
 
 #include "contracts.hpp"
 
@@ -16,6 +17,19 @@ using namespace sysio::opp::types;
 using namespace fc;
 
 using mvo = fc::mutable_variant_object;
+
+namespace {
+
+/// Extract the raw 33-byte compressed pubkey from an EM `public_key` — the
+/// `creator_pub_key` form `oncrtreserve` reconstructs via `pubkey_from_raw`
+/// (CHAIN_KIND_EVM → EM key). Mirrors the helper in `sysio.dispatch_tests`.
+std::vector<char> em_pubkey_bytes(const fc::crypto::public_key& pk) {
+   const auto& shim = pk.get<fc::em::public_key_shim>();
+   auto compressed = shim.serialize();  // std::array<char, 33>
+   return std::vector<char>(compressed.begin(), compressed.end());
+}
+
+} // anonymous namespace
 
 /// v6 data-model: reserves are keyed by the triple `(chain_code, token_code,
 /// reserve_code)` (each a `sysio::slug_name` packed uint64). The legacy
@@ -214,8 +228,43 @@ public:
       return fc::variant();
    }
 
+   // ── authex link seeding ──
+   // `oncrtreserve` gates a create on the creator being authex-linked (it
+   // probes `sysio.authex::links.bypubkey`). The base fixture deploys no
+   // authex code, so every creator reads as unlinked; tests that exercise the
+   // LINKED path (e.g. CANCELLED-row reclaim) deploy authex on demand and seed
+   // a link with `recordlink`.
+
+   /// Deploy sysio.authex (account is pre-created by the tester boot) and load
+   /// its ABI so `recordlink` can be pushed and the cross-contract
+   /// `links.bypubkey` read in oncrtreserve resolves.
+   void deploy_authex() {
+      set_code(AUTHEX_ACCOUNT, contracts::authex_wasm());
+      set_abi(AUTHEX_ACCOUNT, contracts::authex_abi().data());
+      set_privileged(AUTHEX_ACCOUNT);
+      produce_blocks();
+      const auto* a = control->find_account_metadata(AUTHEX_ACCOUNT);
+      BOOST_REQUIRE(a != nullptr);
+      abi_def abi;
+      BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(a->abi, abi), true);
+      authex_abi_ser.set_abi(std::move(abi),
+                             abi_serializer::create_yield_function(abi_serializer_max_time));
+   }
+
+   /// Seed an authex link for `pub` on `chain_kind` via the depot-only
+   /// `recordlink` (signed by sysio.authex itself). After this, a creator
+   /// presenting the matching raw pubkey reads as linked in oncrtreserve.
+   action_result recordlink_em(name account, ChainKind chain_kind,
+                               const fc::crypto::public_key& pub) {
+      return push_to(AUTHEX_ACCOUNT, authex_abi_ser, AUTHEX_ACCOUNT, "recordlink"_n, mvo()
+         ("account",    account)
+         ("chain_kind", chain_kind)
+         ("pub_key",    pub));
+   }
+
    abi_serializer abi_ser;
    abi_serializer token_abi_ser;
+   abi_serializer authex_abi_ser;
 };
 
 BOOST_AUTO_TEST_SUITE(sysio_reserve_tests)
@@ -260,6 +309,16 @@ BOOST_FIXTURE_TEST_CASE(regreserve_rejects_invalid_connector_weight, sysio_reser
    BOOST_REQUIRE(
       regreserve("ETH", "ETH", "PRIMARY2", 100, 100, 10001)
          .find("connector_weight_bps") != std::string::npos);
+
+   // R10: cw == 10000 (== WEIGHT_TOTAL_BPS) makes the token-side weight zero, so the weighted
+   // curve returns 0 for every swap — a permanently dead reserve. It must be rejected (max is 9999).
+   BOOST_REQUIRE(
+      regreserve("ETH", "ETH", "PRIMARY3", 100, 100, 10000)
+         .find("connector_weight_bps") != std::string::npos);
+
+   // The boundary value just below the total is accepted (token side keeps 1 bps).
+   BOOST_REQUIRE_EQUAL(success(),
+      regreserve("ETH", "ETH", "PRIMARY4", 100, 100, 9999));
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(regreserve_private_requires_owner, sysio_reserve_tester) { try {
@@ -320,6 +379,105 @@ BOOST_FIXTURE_TEST_CASE(oncrtreserve_unlinked_creator_is_cancelled, sysio_reserv
    auto r = find_reserve("ETH", "ETH", "USERRES");
    BOOST_REQUIRE(!r.is_null());
    BOOST_REQUIRE_EQUAL("RESERVE_STATUS_CANCELLED", r["status"].as_string());
+} FC_LOG_AND_RETHROW() }
+
+// A re-relay of the same unlinked create must be idempotent — it must NOT
+// re-insert the row or queue a second RESERVE_CREATE_CANCELLED refund. The
+// CANCELLED marker stays exactly as first written (the outpost refunds per
+// (chain,token,reserve_code), so a second refund would be a double spend).
+BOOST_FIXTURE_TEST_CASE(oncrtreserve_cancelled_relay_does_not_double_refund, sysio_reserve_tester) { try {
+   auto crt = [&]() {
+      return push_action(MSGCH_ACCOUNT, "oncrtreserve"_n, mvo()
+         ("chain_code",            codename_mvo("ETH"))
+         ("token_code",            codename_mvo("ETH"))
+         ("reserve_code",          codename_mvo("USERRES"))
+         ("name",                  "user reserve")
+         ("description",           "")
+         ("external_token_amount", 1000)
+         ("requested_wire_amount", 1000)
+         ("connector_weight_bps",  5000)
+         ("creator_chain_kind",    ChainKind::CHAIN_KIND_EVM)
+         ("creator_chain_addr",    std::vector<char>(20, '\x01'))
+         ("is_private",            false)
+         ("creator_pub_key",       std::vector<char>(33, '\x02')));
+   };
+
+   BOOST_REQUIRE_EQUAL(success(), crt());
+   auto r1 = find_reserve("ETH", "ETH", "USERRES");
+   BOOST_REQUIRE(!r1.is_null());
+   BOOST_REQUIRE_EQUAL("RESERVE_STATUS_CANCELLED", r1["status"].as_string());
+   const auto registered_at = r1["registered_at_ms"].as_uint64();
+
+   // Advance time, then re-relay the identical create.
+   produce_blocks(4);
+   BOOST_REQUIRE_EQUAL(success(), crt());
+
+   auto r2 = find_reserve("ETH", "ETH", "USERRES");
+   BOOST_REQUIRE(!r2.is_null());
+   BOOST_REQUIRE_EQUAL("RESERVE_STATUS_CANCELLED", r2["status"].as_string());
+   // The row is untouched: same registered_at_ms despite the advanced clock —
+   // proving the second relay did NOT re-insert (and therefore did not refund).
+   BOOST_REQUIRE_EQUAL(registered_at, r2["registered_at_ms"].as_uint64());
+} FC_LOG_AND_RETHROW() }
+
+// A CANCELLED row must NOT permanently burn the (chain,token,reserve_code)
+// identity. A later authex-LINKED creator reclaims the same triple — the row
+// flips CANCELLED → PENDING with the new creator's fields, rather than the
+// create being skipped by the existence guard. This is the namespace-squat fix.
+BOOST_FIXTURE_TEST_CASE(oncrtreserve_cancelled_is_reclaimable_by_linked_creator, sysio_reserve_tester) { try {
+   deploy_authex();
+
+   // 1) An UNLINKED creator squats the triple → CANCELLED.
+   BOOST_REQUIRE_EQUAL(success(), push_action(MSGCH_ACCOUNT, "oncrtreserve"_n, mvo()
+      ("chain_code",            codename_mvo("ETH"))
+      ("token_code",            codename_mvo("ETH"))
+      ("reserve_code",          codename_mvo("USERRES"))
+      ("name",                  "squatter")
+      ("description",           "squat")
+      ("external_token_amount", 1000)
+      ("requested_wire_amount", 1000)
+      ("connector_weight_bps",  5000)
+      ("creator_chain_kind",    ChainKind::CHAIN_KIND_EVM)
+      ("creator_chain_addr",    std::vector<char>(20, '\x09'))
+      ("is_private",            false)
+      ("creator_pub_key",       std::vector<char>(33, '\x07'))));   // unlinked key
+   {
+      auto r = find_reserve("ETH", "ETH", "USERRES");
+      BOOST_REQUIRE(!r.is_null());
+      BOOST_REQUIRE_EQUAL("RESERVE_STATUS_CANCELLED", r["status"].as_string());
+   }
+
+   // 2) The rightful owner is authex-linked. Seed the link for their EM key,
+   //    then register the SAME triple with the matching raw pubkey.
+   auto creator_priv = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em);
+   auto creator_pub  = creator_priv.get_public_key();
+   BOOST_REQUIRE_EQUAL(success(),
+      recordlink_em("alice"_n, ChainKind::CHAIN_KIND_EVM, creator_pub));
+
+   BOOST_REQUIRE_EQUAL(success(), push_action(MSGCH_ACCOUNT, "oncrtreserve"_n, mvo()
+      ("chain_code",            codename_mvo("ETH"))
+      ("token_code",            codename_mvo("ETH"))
+      ("reserve_code",          codename_mvo("USERRES"))
+      ("name",                  "rightful owner")
+      ("description",           "reclaimed")
+      ("external_token_amount", 5000)
+      ("requested_wire_amount", 4000)
+      ("connector_weight_bps",  5000)
+      ("creator_chain_kind",    ChainKind::CHAIN_KIND_EVM)
+      ("creator_chain_addr",    std::vector<char>(20, '\x01'))
+      ("is_private",            false)
+      ("creator_pub_key",       em_pubkey_bytes(creator_pub))));   // linked key
+
+   // The squat is gone: the row is PENDING and carries the reclaiming creator's
+   // create (proving overwrite, not the existence-guard skip).
+   auto r = find_reserve("ETH", "ETH", "USERRES");
+   BOOST_REQUIRE(!r.is_null());
+   BOOST_REQUIRE_EQUAL("RESERVE_STATUS_PENDING", r["status"].as_string());
+   BOOST_REQUIRE_EQUAL("reclaimed", r["description"].as_string());
+   BOOST_REQUIRE_EQUAL(5000u, r["external_token_amount"].as_uint64());
+   BOOST_REQUIRE_EQUAL(5000u, r["reserve_chain_amount"].as_uint64());
+   // The canonical creator pubkey is now stored (empty on the prior CANCELLED row).
+   BOOST_REQUIRE(!r["creator_pub_key"].as_string().empty());
 } FC_LOG_AND_RETHROW() }
 
 // ── matchreserve (gating preconditions) ──
@@ -462,6 +620,66 @@ BOOST_FIXTURE_TEST_CASE(applyswap_charges_fee_and_routes_50_50, sysio_reserve_te
    BOOST_REQUIRE_EQUAL(499'500ULL, bkt["lifetime_accrued"].as_uint64());
    BOOST_REQUIRE_EQUAL(sysio_before + 499'500, wire_balance(SYSIO_ACCOUNT));   // emissions half left custody
    BOOST_REQUIRE_EQUAL(resv_before  - 499'500, wire_balance(RESERVE_ACCOUNT)); // only emissions half left
+} FC_LOG_AND_RETHROW() }
+
+// ── drainrewards: sweep the accrued rewards half to the emissions treasury ──
+// payepoch (sysio.system) calls this inline to fold swap fees into the per-epoch
+// producer + batch-operator distribution.
+
+BOOST_FIXTURE_TEST_CASE(drainrewards_sweeps_bucket_to_treasury, sysio_reserve_tester) { try {
+   // Seed the rewards bucket with a swap fee (same setup as the 50/50 routing test:
+   // reward half = 499'500 accrues into the bucket, staying in reserv custody).
+   BOOST_REQUIRE_EQUAL(success(),
+      regreserve("ETH", "ETH", "PRIMARY", 1'000'000'000'000ULL, 1'000'000'000'000ULL));
+   BOOST_REQUIRE_EQUAL(success(),
+      regreserve("SOLANA", "SOL", "PRIMARY", 1'000'000'000'000ULL, 1'000'000'000'000ULL));
+   BOOST_REQUIRE_EQUAL(success(), push_action(UWRIT_ACCOUNT, "applyswap"_n, mvo()
+      ("src_chain_code",   codename_mvo("ETH"))
+      ("src_token_code",   codename_mvo("ETH"))
+      ("src_reserve_code", codename_mvo("PRIMARY"))
+      ("src_amount",       1'000'000'000ULL)
+      ("dst_chain_code",   codename_mvo("SOLANA"))
+      ("dst_token_code",   codename_mvo("SOL"))
+      ("dst_reserve_code", codename_mvo("PRIMARY"))
+      ("dst_amount",       100'000'000ULL)));
+
+   auto bkt = get_rewardbkt();
+   const uint64_t reward   = bkt["balance"].as_uint64();
+   const uint64_t lifetime = bkt["lifetime_accrued"].as_uint64();
+   BOOST_REQUIRE_EQUAL(499'500ULL, reward);
+
+   const int64_t sysio_before = wire_balance(SYSIO_ACCOUNT);
+   const int64_t resv_before  = wire_balance(RESERVE_ACCOUNT);
+
+   // Sweep the whole bucket to the treasury (auth = sysio).
+   BOOST_REQUIRE_EQUAL(success(), push_action(SYSIO_ACCOUNT, "drainrewards"_n,
+      mvo()("amount", static_cast<int64_t>(reward))));
+
+   auto bkt_after = get_rewardbkt();
+   BOOST_REQUIRE_EQUAL(0ULL, bkt_after["balance"].as_uint64());                  // balance drained
+   BOOST_REQUIRE_EQUAL(lifetime, bkt_after["lifetime_accrued"].as_uint64());     // audit total untouched
+   BOOST_REQUIRE_EQUAL(sysio_before + static_cast<int64_t>(reward),
+                       wire_balance(SYSIO_ACCOUNT));                             // WIRE moved to treasury
+   BOOST_REQUIRE_EQUAL(resv_before - static_cast<int64_t>(reward),
+                       wire_balance(RESERVE_ACCOUNT));                          // left reserv custody
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(drainrewards_auth_and_overdrain_guarded, sysio_reserve_tester) { try {
+   // Only `sysio` (the treasury / system account) may drain.
+   BOOST_REQUIRE(push_action("alice"_n, "drainrewards"_n, mvo()("amount", int64_t(1)))
+      .find("missing authority of sysio") != std::string::npos);
+
+   // Draining more than the live balance (here: an empty bucket) is rejected,
+   // not silently clamped -- this only fires on a caller bug.
+   BOOST_REQUIRE(push_action(SYSIO_ACCOUNT, "drainrewards"_n, mvo()("amount", int64_t(1)))
+      .find("amount exceeds rewards bucket balance") != std::string::npos);
+
+   // Non-positive amounts fail loudly (internal sweep -> a non-positive amount
+   // signals a caller bug, not a no-op).
+   BOOST_REQUIRE(push_action(SYSIO_ACCOUNT, "drainrewards"_n, mvo()("amount", int64_t(0)))
+      .find("amount must be positive") != std::string::npos);
+   BOOST_REQUIRE(push_action(SYSIO_ACCOUNT, "drainrewards"_n, mvo()("amount", int64_t(-5)))
+      .find("amount must be positive") != std::string::npos);
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(applyfromwire_credits_wire_and_debits_chain, sysio_reserve_tester) { try {

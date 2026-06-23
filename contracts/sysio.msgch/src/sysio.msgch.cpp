@@ -1161,6 +1161,17 @@ void msgch::resolvedisp(uint64_t chain_code, uint32_t epoch_index, checksum256 w
 void msgch::queueout(uint64_t chain_code,
                      opp::types::AttestationType attest_type,
                      std::vector<char> data) {
+   // Authorization gate: only the depot's own system contracts may queue an outbound
+   // attestation. queueout carries no ABI-level auth, so without this check ANY account could
+   // call it directly and inject a forged attestation that buildenv() then packs into the
+   // depot's group-signed outbound envelope — a forged SWAP_REMIT / WITHDRAW_REMIT / SLASH that
+   // the outpost authenticates by the group signature and executes. The intended callers
+   // (sysio.epoch / .opreg / .uwrit / .reserv) each send under their own {self, active} authority;
+   // get_self() permits msgch's own inline use and governance.
+   check(has_auth(EPOCH_ACCOUNT) || has_auth(OPREG_ACCOUNT) || has_auth(UWRIT_ACCOUNT) ||
+         has_auth(RESERV_ACCOUNT) || has_auth(get_self()),
+         "queueout: caller not authorized to queue outbound attestations");
+
    auto now_sec = static_cast<uint64_t>(current_time_point().sec_since_epoch());
 
    attestations_t atts(get_self());

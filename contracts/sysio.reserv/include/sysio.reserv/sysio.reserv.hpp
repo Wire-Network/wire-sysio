@@ -66,7 +66,12 @@ namespace sysio {
       // the WIRE-side weight of the token/WIRE pool; the token side gets the
       // remainder. weight = 5000 is the symmetric 50/50 case (pure constant
       // product). The weighted swap curve lives in `sysio.opp.common/amm_math.hpp`.
-      static constexpr uint32_t MAX_CONNECTOR_WEIGHT_BPS     = 10000;
+      //
+      // Max is 9999, not 10000: both pool-side weights must be positive. At cw = 10000 the
+      // token-side weight (10000 - cw) is 0, so amm_math::out_given_in returns 0 for every
+      // token<->WIRE swap — a permanently unswappable (dead) reserve. Capping below the total
+      // keeps the token side >= 1 bps.
+      static constexpr uint32_t MAX_CONNECTOR_WEIGHT_BPS     = 9999;
       static constexpr uint32_t DEFAULT_CONNECTOR_WEIGHT_BPS = 5000;
 
       // Swap-fee split. Every swap charges sysio.uwrit's `fee_bps` out of the
@@ -181,10 +186,24 @@ namespace sysio {
                          sysio::slug_name to_reserve_code);
 
       /// Read-only: current rewards-bucket WIRE balance (the rewards half of
-      /// collected swap fees, held in this contract's custody pending a future
-      /// distribution action).
+      /// collected swap fees, held in this contract's custody until `drainrewards`
+      /// sweeps it to the emissions treasury for distribution).
       [[sysio::action, sysio::read_only]]
       uint64_t rewardbal();
+
+      /// Auth = `sysio` (the emissions treasury / system account). Sweep `amount`
+      /// WIRE of accrued swap-fee rewards out of this contract's custody to the
+      /// `sysio` treasury, where `sysio.system::payepoch` folds it into the
+      /// per-epoch compute distribution to producers + batch operators. Called
+      /// inline by payepoch with the amount it read from `rewardbal()`, so the
+      /// swept WIRE lands in the treasury before payepoch's payout transfers
+      /// execute (inline actions run depth-first, drain queued before payouts).
+      ///
+      /// Decrements `rewards_bucket.balance` by `amount`; `lifetime_accrued`
+      /// (an audit total) is left untouched. `amount <= 0` is a defensive no-op;
+      /// `amount` exceeding the live balance throws (a bug in the caller).
+      [[sysio::action]]
+      void drainrewards(int64_t amount);
 
       /// Auth=sysio.uwrit. Inline-debit at SWAP_REMIT emit time. Asserts the
       /// reserve is ACTIVE and balance is sufficient.
@@ -342,9 +361,17 @@ namespace sysio {
       /// stays in this contract's custody — it is NOT transferred out — so the
       /// custody invariant is `token_balance == Σ reserve_wire_amount +
       /// rewards.balance + in-flight escrow`. `balance` is the portion
-      /// earmarked for a future rewards distribution; `lifetime_accrued` is an
-      /// audit total. (The emissions half of each fee IS transferred to the
-      /// `sysio` treasury at collection time and is therefore not tracked here.)
+      /// earmarked for distribution (swept by `drainrewards` and folded into
+      /// `sysio.system::payepoch`); `lifetime_accrued` is an audit total. (The
+      /// emissions half of each fee IS transferred to the `sysio` treasury at
+      /// collection time and is therefore not tracked here.)
+      ///
+      /// NOTE: sysio.system reads this row through a layout-compatible local
+      /// definition (a `[[sysio::table]]`-attributed struct cannot be shared
+      /// into sysio.system's translation unit — it corrupts that contract's
+      /// read-only-action return codegen). The cross-contract read is exercised
+      /// end-to-end by t5_emissions_tests/payepoch_folds_swap_fee_rewards, which
+      /// fails if the two layouts ever diverge.
       struct [[sysio::table("rewardbkt")]] rewards_bucket {
          uint64_t balance          = 0;   // claimable WIRE held for distribution
          uint64_t lifetime_accrued = 0;   // audit: total WIRE ever routed to rewards

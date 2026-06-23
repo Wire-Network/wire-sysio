@@ -1,4 +1,5 @@
 #include <sysio.dclaim/sysio.dclaim.hpp>
+#include <sysio.opp.common/safe_ops.hpp>
 
 #include <cstdint>
 #include <string>
@@ -53,6 +54,20 @@ uint64_t next_id(name self, Pick pick) {
    return id;
 }
 
+/// Non-throwing validation of a string destined for `name(std::string_view)`. Shared with every
+/// other OPP inbound handler via `sysio.opp.common/safe_ops.hpp` so the never-throw name domain is
+/// defined and audited in exactly one place.
+using sysio::opp::safe::is_valid_name_string;
+
+/// Saturating WIRE credit. `asset::operator+=` aborts on overflow past `asset::max_amount`
+/// (2^62-1); credit_wire runs inside the never-throw OPP inbound path (via onreward), so cap at
+/// the asset maximum rather than abort. A single staker balance approaching 2^62 atomic WIRE units
+/// is not reachable in practice — the cap exists purely to preserve the never-throw contract.
+inline void add_wire_capped(asset& balance, const asset& amt) {
+   const int64_t room = asset::max_amount - balance.amount;   // balance.amount in [0, max_amount]
+   balance.amount += (amt.amount <= room ? amt.amount : room);
+}
+
 /// Credit `amt` WIRE to the staker. Linked (`wacct` set) -> `pending_claims`;
 /// otherwise parked in `unmapped_tokens` keyed by (chain, addr). Either way
 /// the row's expiry is refreshed to now + window. Shared by `onreward`,
@@ -72,7 +87,7 @@ void credit_wire(name self, name wacct, ChainKind chain,
                                 .expires_at_sec = exp });
       } else {
          pclaims.modify(same_payer, dclaim::pclaim_key{wacct.value}, [&](auto& r) {
-            r.balance        += amt;
+            add_wire_capped(r.balance, amt);
             r.expires_at_sec  = exp;
          });
       }
@@ -99,7 +114,7 @@ void credit_wire(name self, name wacct, ChainKind chain,
    } else {
       uint64_t rid = it->id;
       unmapped.modify(same_payer, dclaim::unmapped_key{rid}, [&](auto& r) {
-         r.balance        += amt;
+         add_wire_capped(r.balance, amt);
          r.expires_at_sec  = exp;
       });
    }
@@ -227,8 +242,11 @@ void dclaim::onreward(uint64_t              chain_code,
 
    // Tolerate degenerate input rather than aborting the inbound OPP envelope
    // (the verifier role lives upstream in msgch::evalcons; dclaim trusts but
-   // must not break the message chain on a malformed row).
-   if (reward_amount == 0 || staker_native_addr.empty()) return;
+   // must not break the message chain on a malformed row). reward_amount is cross-chain-supplied;
+   // bound it to the asset range here so an oversized value soft-drops instead of aborting later
+   // when the WIRE asset is constructed/credited (asset()/operator+= range-check abort).
+   if (reward_amount == 0 || reward_amount > static_cast<uint64_t>(asset::max_amount) ||
+       staker_native_addr.empty()) return;
 
    // Dedupe at ingest so a replay / out-of-order duplicate is rejected.
    if (!cursor_admit(get_self(), chain_code, reward_chain,
@@ -237,7 +255,10 @@ void dclaim::onreward(uint64_t              chain_code,
    }
 
    name wacct;   // value 0 == not yet AuthX-linked
-   if (!staker_wire_account.empty()) {
+   // Validate the cross-chain-supplied account string before constructing name(): an invalid or
+   // oversized string is treated as unlinked (credit parked by native address) rather than
+   // aborting the inbound dispatch via name()'s internal check(). See is_valid_name_string.
+   if (!staker_wire_account.empty() && is_valid_name_string(staker_wire_account)) {
       wacct = name(staker_wire_account);
    }
 

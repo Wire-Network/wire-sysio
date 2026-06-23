@@ -505,6 +505,10 @@
                 {
                     "name": "governance_amount",
                     "type": "int64"
+                },
+                {
+                    "name": "fee_distributed",
+                    "type": "int64"
                 }
             ]
         },
