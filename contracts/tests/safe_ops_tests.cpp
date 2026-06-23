@@ -20,6 +20,7 @@
 #include <cstdint>
 #include <string>
 
+using sysio::opp::safe::add_sat_i64;
 using sysio::opp::safe::add_sat_u64;
 using sysio::opp::safe::is_valid_name_string;
 
@@ -77,6 +78,29 @@ BOOST_AUTO_TEST_CASE(add_sat_u64_saturates_instead_of_wrapping) {
    BOOST_CHECK_EQUAL(add_sat_u64(MAX - 3, 10), MAX);
    BOOST_CHECK_EQUAL(add_sat_u64(uint64_t{1} << 63, uint64_t{1} << 63), MAX);
    BOOST_CHECK_EQUAL(add_sat_u64(100, MAX - 50), MAX);
+}
+
+BOOST_AUTO_TEST_CASE(add_sat_i64_saturates_instead_of_wrapping) {
+   constexpr int64_t MAX = INT64_MAX;
+   constexpr int64_t MIN = INT64_MIN;
+
+   // Ordinary sums (including mixed sign) compute exactly.
+   BOOST_CHECK_EQUAL(add_sat_i64(0, 0), int64_t{0});
+   BOOST_CHECK_EQUAL(add_sat_i64(5, 7), int64_t{12});
+   BOOST_CHECK_EQUAL(add_sat_i64(10, -3), int64_t{7});
+   BOOST_CHECK_EQUAL(add_sat_i64(-10, 3), int64_t{-7});
+   BOOST_CHECK_EQUAL(add_sat_i64(MAX, 0), MAX);
+   BOOST_CHECK_EQUAL(add_sat_i64(MIN, 0), MIN);
+
+   // Exactly at the boundary does not saturate.
+   BOOST_CHECK_EQUAL(add_sat_i64(MAX - 10, 10), MAX);
+   BOOST_CHECK_EQUAL(add_sat_i64(MIN + 10, -10), MIN);
+
+   // One past the boundary clamps rather than wrapping to the opposite sign.
+   BOOST_CHECK_EQUAL(add_sat_i64(MAX, 1), MAX);
+   BOOST_CHECK_EQUAL(add_sat_i64(MAX - 3, 10), MAX);
+   BOOST_CHECK_EQUAL(add_sat_i64(MIN, -1), MIN);
+   BOOST_CHECK_EQUAL(add_sat_i64(MIN + 3, -10), MIN);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

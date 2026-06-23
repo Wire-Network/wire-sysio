@@ -346,8 +346,9 @@ namespace sysio {
                 OWNER_NOT_ACCOUNT    = 2,  // account does not exist (creation did not occur)
                 ACCOUNT_KEY_MISMATCH = 3,  // existing account's active authority != the single claimed wire key
                 DUPLICATE            = 4,  // owner is already a registered node owner
-                LINK_KEY_MISMATCH    = 5,  // account already carries a different external-chain link key
-                OWNER_HAS_RESLIMIT   = 6   // account already ROA-provisioned (regnodeowner can't create its reslimit)
+                LINK_KEY_MISMATCH    = 5   // account already carries a different external-chain link key
+                // (OWNER_HAS_RESLIMIT removed: a pre-existing reslimit row no longer rejects registration --
+                //  regnodeowner reconciles it via increase_reslimit. Pre-launch: no stored rows to migrate. SEC-087.)
             };
 
             // Under trust-OPP the OPP envelope is the deposit proof, so this audit row records only
@@ -485,7 +486,17 @@ namespace sysio {
             void set_reslimit(const name& owner, const asset& net_weight, const asset& cpu_weight, int64_t ram_bytes);
 
             /**
-             * @brief Increase values of reslimit entry, assert if not found
+             * @brief Add the given weights/bytes to an account's reslimit, creating the row if absent.
+             *
+             * When the row is absent and @p require_to_exist is false, the row is created and the
+             * one-time `newaccount_ram` gift is folded into its ram_bytes; when present, only the passed
+             * deltas are added (so the gift is never double-counted). Accumulation saturates rather than
+             * throwing on overflow (see safe_ops): this helper sits on the OPP never-throw dispatch path
+             * (nodeownreg -> regnodeowner, newnameduser).
+             *
+             * @param require_to_exist assert the row already exists (no create); used by callers that
+             *        must only ever top up a known account (e.g. sysio.acct funding).
+             * @return the resulting reslimit totals (net, cpu, ram_bytes) after the increase.
              */
             resources_t increase_reslimit(const name& owner, const asset& net_weight, const asset& cpu_weight, int64_t ram_bytes,
                                           bool require_to_exist);
