@@ -107,6 +107,7 @@ namespace sysio {
    using boost::asio::ip::address_v4;
    using boost::asio::ip::host_name;
    using boost::multi_index_container;
+
    using namespace boost::multi_index;
 
    using fc::time_point;
@@ -302,7 +303,7 @@ namespace sysio {
     *  The version value is sent directly as handshake_message::network_version.
     */
    enum class proto_version_t : uint16_t {
-      base = 1      // Wire genesis protocol (Savanna, block_nack, gossip_bp_peers, trx_notice, etc.)
+      base = wire_protocol_base_version // Wire genesis protocol (Savanna, block_nack, gossip_bp_peers, trx_notice, etc.)
    };
 
    constexpr proto_version_t net_version_min = proto_version_t::base;
@@ -759,6 +760,8 @@ namespace sysio {
       block_status_monitor    block_status_monitor_;
       std::atomic<time_point> last_vote_received;
       std::atomic<bool>       peer_authenticated{true}; // set false in recv_handshake when needs_auth()
+      /// True after this connection has accepted the peer's initial handshake.
+      std::atomic<bool>       peer_session_established{false};
 
       alignas(hardware_destructive_interference_sz)
       peer_scoring::peer_score peer_score_;
@@ -1393,6 +1396,7 @@ namespace sysio {
          last_block_nack_request_message_id = block_id_type{};
       }
       peer_authenticated.store(true, std::memory_order_relaxed); // reset; will be set false on next handshake if auth required
+      peer_session_established.store(false, std::memory_order_relaxed);
       peer_fork_db_root_num.store( 0, std::memory_order_relaxed );
       peer_ping_time_ns = std::numeric_limits<decltype(peer_ping_time_ns)::value_type>::max();
       peer_requested.reset();
@@ -3138,17 +3142,16 @@ namespace sysio {
 
          msg_type_t net_msg = to_msg_type_t(which.value);
 
-         // When auth is required, only allow handshake/go_away/time/peer_auth until authenticated.
-         // All other messages are dropped until the peer proves its identity.
-         if( !peer_authenticated.load(std::memory_order_relaxed) ) {
-            if( net_msg != msg_type_t::handshake_message &&
-                net_msg != msg_type_t::go_away_message &&
-                net_msg != msg_type_t::time_message &&
-                net_msg != msg_type_t::peer_auth_message ) {
-               peer_wlog( p2p_conn_log, this, "Dropping {} message from unauthenticated peer", static_cast<uint32_t>(net_msg) );
-               pending_message_buffer.advance_read_ptr( message_length );
-               return true;
-            }
+         // Keep expensive or stateful messages behind the session gate. The
+         // first accepted handshake establishes peer chain/protocol identity;
+         // optional peer_auth then proves the configured node key.
+         if( !(peer_session_established.load(std::memory_order_relaxed) &&
+               peer_authenticated.load(std::memory_order_relaxed)) &&
+             !is_pre_session_control_message(net_msg) ) {
+            peer_wlog( p2p_conn_log, this,
+                       "Dropping {} message before peer handshake/authentication completes", to_index(net_msg) );
+            pending_message_buffer.advance_read_ptr( message_length );
+            return true;
          }
 
          if( net_msg == msg_type_t::signed_block ) {
@@ -3697,6 +3700,7 @@ namespace sysio {
             }
          }
 
+         peer_session_established.store(true, std::memory_order_relaxed);
          send_gossip_bp_peers_initial_message();
       }
 
@@ -3704,7 +3708,8 @@ namespace sysio {
       // must complete before sync requests are sent, otherwise they get dropped
       // by the peer's message gate. handle_message(peer_auth_message) re-runs
       // recv_handshake after authentication succeeds.
-      if( peer_authenticated.load(std::memory_order_relaxed) ) {
+      if( peer_session_established.load(std::memory_order_relaxed) &&
+          peer_authenticated.load(std::memory_order_relaxed) ) {
          uint32_t nblk_combined_latency = calc_block_latency();
          my_impl->sync_master->recv_handshake( shared_from_this(), msg, nblk_combined_latency );
       }
@@ -3740,9 +3745,8 @@ namespace sysio {
       }
       peer_ilog( p2p_conn_log, this, "Peer authenticated successfully" );
       peer_authenticated.store(true, std::memory_order_relaxed);
-      // Re-process peer's handshake now that auth is complete. The initial
-      // recv_handshake sent sync requests that were dropped by the peer's
-      // message gate (we weren't authenticated yet), so re-trigger sync.
+      // Re-process peer's handshake now that auth is complete; initial
+      // handshake handling deferred sync negotiation while the peer was gated.
       {
          fc::unique_lock g_conn( conn_mtx );
          if( last_handshake_recv.generation > 0 ) {

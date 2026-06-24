@@ -115,7 +115,7 @@ namespace sysio::testing {
 
       ilog("Update each trx to qualify as unique and fresh timestamps, re-sign trx, and send each updated transactions via p2p transaction provider");
 
-      _provider.setup();
+      _provider.setup(_config._chain_id, _config._last_irr_block_id);
       return true;
    }
 
@@ -283,7 +283,7 @@ namespace sysio::testing {
       ilog("Update each trx to qualify as unique and fresh timestamps and update each action with unique generated account name if necessary,"
            " re-sign trx, and send each updated transactions via p2p transaction provider");
 
-      _provider.setup();
+      _provider.setup(_config._chain_id, _config._last_irr_block_id);
       return true;
    }
 
@@ -336,7 +336,8 @@ namespace sysio::testing {
 
    void trx_generator_base::push_transaction(signed_transaction_w_signer& trx, uint64_t& nonce_prefix, uint64_t& nonce,
                                              const fc::microseconds& trx_expiration, const chain::chain_id_type& chain_id, const chain::block_id_type& last_irr_block_id) {
-      update_resign_transaction(trx._trx, trx._signer, ++nonce_prefix, nonce, trx_expiration, chain_id, last_irr_block_id);
+      const auto reference_block_id = _provider.reference_block_id(last_irr_block_id);
+      update_resign_transaction(trx._trx, trx._signer, ++nonce_prefix, nonce, trx_expiration, chain_id, reference_block_id);
       if (_txcount == 0) {
          log_first_trx(_config._log_dir, trx._trx);
       }
