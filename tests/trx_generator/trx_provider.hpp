@@ -86,7 +86,7 @@ namespace sysio::testing {
       void trx_acknowledged(const sysio::chain::transaction_id_type& trx_id, const fc::time_point& ack_time);
 
       virtual acked_trx_trace_info get_acked_trx_trace_info(const sysio::chain::transaction_id_type& trx_id) = 0;
-      /// Returns the freshest known block ID suitable for TAPOS reference data.
+      /// Returns the latest known irreversible block ID suitable for TAPOS reference data.
       virtual chain::block_id_type reference_block_id(const chain::block_id_type& fallback) const;
       /// Throws when the provider transport has already observed an unrecoverable failure.
       virtual void throw_if_unhealthy() const;
@@ -140,11 +140,11 @@ namespace sysio::testing {
       fc::sha256 _node_id;
       /// Chain id advertised in all handshakes for this P2P session.
       chain::chain_id_type _chain_id = chain::chain_id_type::empty_chain_id();
-      /// Latest peer irreversible block mirrored back in heartbeat handshakes.
+      /// Latest peer irreversible block mirrored back in heartbeat handshakes and used for TAPOS reference data.
       chain::block_id_type _latest_fork_db_root_id;
       /// Latest peer fork DB head mirrored back in heartbeat handshakes.
       chain::block_id_type _latest_fork_db_head_id;
-      /// Latest peer chain head used as the preferred transaction reference block.
+      /// Latest peer chain head mirrored back in heartbeat handshakes.
       chain::block_id_type _latest_chain_head_id;
       /// Monotonic handshake generation sent by this generator session.
       int16_t _sent_handshake_generation{0};
@@ -175,8 +175,10 @@ namespace sysio::testing {
       bool send_handshake();
       /// Writes a fully-framed P2P message buffer and records transport errors.
       bool write_message(const send_buffer_type& msg, std::string_view label);
-      /// Marks the P2P transport failed and closes the socket to stop async reads.
+      /// Marks the P2P transport failed after a boost system error and closes the socket to stop async reads.
       void mark_transport_failed(std::string_view label, const boost::system::error_code& ec);
+      /// Marks the P2P transport failed after a protocol error and optionally increments the error counter.
+      void mark_transport_failed(std::string_view label, std::string_view detail, bool count_error);
       /// Closes the P2P socket without changing transport health counters.
       void close_socket();
       void connect(const sysio::chain::chain_id_type& chain_id,
@@ -191,7 +193,7 @@ namespace sysio::testing {
       void setup(const sysio::chain::chain_id_type& chain_id,
                  const sysio::chain::block_id_type& last_irreversible_block_id);
       void send(const chain::signed_transaction& trx);
-      /// Returns the provider's freshest known block ID for transaction TAPOS headers.
+      /// Returns the provider's latest known irreversible block ID for transaction TAPOS headers.
       chain::block_id_type reference_block_id(const chain::block_id_type& fallback) const;
       void log_trxs(const std::string& log_dir);
       void teardown();

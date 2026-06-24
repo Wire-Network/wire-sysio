@@ -107,7 +107,6 @@ namespace sysio {
    using boost::asio::ip::address_v4;
    using boost::asio::ip::host_name;
    using boost::multi_index_container;
-
    using namespace boost::multi_index;
 
    using fc::time_point;
@@ -759,7 +758,8 @@ namespace sysio {
       std::atomic<bp_connection_type> bp_connection = bp_connection_type::non_bp;
       block_status_monitor    block_status_monitor_;
       std::atomic<time_point> last_vote_received;
-      std::atomic<bool>       peer_authenticated{true}; // set false in recv_handshake when needs_auth()
+      // Set false in handle_message(handshake_message) when peer auth is required.
+      std::atomic<bool>       peer_authenticated{true};
       /// True after this connection has accepted the peer's initial handshake.
       std::atomic<bool>       peer_session_established{false};
 
@@ -1395,7 +1395,8 @@ namespace sysio {
          conn_node_id = fc::sha256();
          last_block_nack_request_message_id = block_id_type{};
       }
-      peer_authenticated.store(true, std::memory_order_relaxed); // reset; will be set false on next handshake if auth required
+      // Reset; the next handshake marks this false again if peer auth is required.
+      peer_authenticated.store(true, std::memory_order_relaxed);
       peer_session_established.store(false, std::memory_order_relaxed);
       peer_fork_db_root_num.store( 0, std::memory_order_relaxed );
       peer_ping_time_ns = std::numeric_limits<decltype(peer_ping_time_ns)::value_type>::max();
@@ -3700,8 +3701,15 @@ namespace sysio {
             }
          }
 
+         // The session gate opens after the initial generation-1 handshake passes
+         // validation; later heartbeat handshakes keep the session state current.
          peer_session_established.store(true, std::memory_order_relaxed);
-         send_gossip_bp_peers_initial_message();
+         // Queue initial gossip behind any handshake/auth frames posted above so
+         // the peer's own session gate can accept it.
+         boost::asio::post(strand, [c = shared_from_this()]() {
+            if( !c->closed() )
+               c->send_gossip_bp_peers_initial_message();
+         });
       }
 
       // Defer sync negotiation until peer is authenticated. The auth exchange

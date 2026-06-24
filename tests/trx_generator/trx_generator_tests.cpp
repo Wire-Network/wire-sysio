@@ -85,8 +85,10 @@ constexpr std::string_view expected_trx_generator_chain_id = "999";
 constexpr std::string_view expected_trx_generator_p2p_address = "127.0.0.1:0:trx";
 constexpr std::string_view expected_trx_generator_lib_id =
       "00000062989f69fd251df3e0b274c3364ffc2f4fce73de3f1c7b5e11a4c92f21";
-constexpr std::string_view expected_trx_generator_peer_head_id =
+constexpr std::string_view expected_trx_generator_peer_lib_id =
       "00000063989f69fd251df3e0b274c3364ffc2f4fce73de3f1c7b5e11a4c92f21";
+constexpr std::string_view expected_trx_generator_peer_head_id =
+      "00000064989f69fd251df3e0b274c3364ffc2f4fce73de3f1c7b5e11a4c92f21";
 constexpr std::string_view expected_trx_generator_peer_p2p_address = "127.0.0.1:0";
 constexpr std::string_view expected_trx_generator_peer_agent = "nodeop";
 constexpr std::string_view expected_trx_generator_peer_node_id_seed = "trx_generator_test_peer";
@@ -582,6 +584,7 @@ BOOST_AUTO_TEST_CASE(p2p_provider_sends_handshake_on_setup)
 
    const chain::chain_id_type chain_id{std::string(expected_trx_generator_chain_id)};
    const auto lib_id = fc::variant(std::string(expected_trx_generator_lib_id)).as<chain::block_id_type>();
+   const auto peer_lib_id = fc::variant(std::string(expected_trx_generator_peer_lib_id)).as<chain::block_id_type>();
    const auto peer_head_id = fc::variant(std::string(expected_trx_generator_peer_head_id)).as<chain::block_id_type>();
 
    std::promise<p2p_provider_exchange> exchange_promise;
@@ -592,7 +595,7 @@ BOOST_AUTO_TEST_CASE(p2p_provider_sends_handshake_on_setup)
 
       auto initial_handshake = read_test_net_message(socket);
 
-      write_test_net_message(socket, make_test_peer_handshake(chain_id, lib_id, peer_head_id));
+      write_test_net_message(socket, make_test_peer_handshake(chain_id, peer_lib_id, peer_head_id));
       auto handshake_response = read_test_net_message(socket);
 
       time_message ping;
@@ -609,7 +612,7 @@ BOOST_AUTO_TEST_CASE(p2p_provider_sends_handshake_on_setup)
 
    provider.setup(chain_id, lib_id);
    auto exchange = exchange_future.get();
-   BOOST_CHECK(provider.reference_block_id(lib_id) == peer_head_id);
+   BOOST_CHECK(provider.reference_block_id(lib_id) == peer_lib_id);
    provider.teardown();
    server.join();
 
@@ -630,7 +633,7 @@ BOOST_AUTO_TEST_CASE(p2p_provider_sends_handshake_on_setup)
    BOOST_CHECK_EQUAL(response_handshake->network_version, wire_protocol_base_version);
    BOOST_CHECK(response_handshake->chain_id == chain_id);
    BOOST_CHECK(response_handshake->node_id == handshake->node_id);
-   BOOST_CHECK(response_handshake->fork_db_root_id == lib_id);
+   BOOST_CHECK(response_handshake->fork_db_root_id == peer_lib_id);
    BOOST_CHECK(response_handshake->fork_db_head_id == peer_head_id);
    BOOST_CHECK(response_handshake->chain_head_id == peer_head_id);
    BOOST_CHECK_EQUAL(response_handshake->generation, expected_trx_generator_response_handshake_generation);

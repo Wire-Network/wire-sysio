@@ -33,6 +33,7 @@ namespace sysio::testing {
    constexpr std::string_view trx_generator_advertised_host = "127.0.0.1";
    constexpr std::string_view trx_generator_node_id_domain = "trx_generator_p2p_node";
    constexpr uint32_t bytes_per_kibibyte = 1024;
+   /// Maximum inbound peer control frame size; trx-only peers never receive block payloads from nodeop.
    constexpr uint32_t max_trx_generator_peer_message_bytes = bytes_per_kibibyte * bytes_per_kibibyte;
    constexpr int provider_disconnect_wait_seconds = 30;
 
@@ -164,7 +165,7 @@ namespace sysio::testing {
       _node_id = make_trx_generator_node_id(_config);
       _chain_id = chain_id;
       _sent_handshake_generation = 0;
-      _transport_failed.store(false, std::memory_order_relaxed);
+      _transport_failed.store(false, std::memory_order_release);
       {
          std::lock_guard<std::mutex> lock(_peer_chain_state_lock);
          _latest_fork_db_root_id = last_irreversible_block_id;
@@ -192,15 +193,27 @@ namespace sysio::testing {
    }
 
    void p2p_connection::mark_transport_failed(std::string_view label, const boost::system::error_code& ec) {
-      if (!_transport_failed.exchange(true, std::memory_order_relaxed)) {
+      if (!_transport_failed.exchange(true, std::memory_order_acq_rel)) {
          ++_errors;
          elog("P2P {} write failed: {}: {}", std::string(label), ec.value(), ec.message());
          close_socket();
       }
    }
 
+   void p2p_connection::mark_transport_failed(std::string_view label, std::string_view detail, bool count_error) {
+      if (!_transport_failed.exchange(true, std::memory_order_acq_rel)) {
+         if (count_error) {
+            ++_errors;
+            elog("P2P {} failed: {}", std::string(label), std::string(detail));
+         } else {
+            wlog("P2P {} closed: {}", std::string(label), std::string(detail));
+         }
+         close_socket();
+      }
+   }
+
    bool p2p_connection::write_message(const send_buffer_type& msg, std::string_view label) {
-      if (_transport_failed.load(std::memory_order_relaxed)) {
+      if (_transport_failed.load(std::memory_order_acquire)) {
          return false;
       }
 
@@ -215,7 +228,7 @@ namespace sysio::testing {
 
    bool p2p_connection::send_handshake() {
       if (_sent_handshake_generation == std::numeric_limits<int16_t>::max()) {
-         _sent_handshake_generation = 0;
+         _sent_handshake_generation = 1;
       }
       const int16_t generation = ++_sent_handshake_generation;
 
@@ -271,10 +284,8 @@ namespace sysio::testing {
          uint32_t payload_size = 0;
          std::memcpy(&payload_size, _read_header.data(), sizeof(payload_size));
          if (payload_size == 0 || payload_size > max_trx_generator_peer_message_bytes) {
-            ++_errors;
-            elog("P2P peer message length {} is outside the supported range", payload_size);
-            _transport_failed.store(true, std::memory_order_relaxed);
-            close_socket();
+            mark_transport_failed("peer message length", std::to_string(payload_size) + " is outside the supported range",
+                                  true);
             return;
          }
 
@@ -300,6 +311,10 @@ namespace sysio::testing {
             fc::datastream<const char*> ds(_read_payload.data(), payload_size);
             net_message msg;
             fc::raw::unpack(ds, msg);
+            if (ds.remaining() != 0) {
+               mark_transport_failed("peer message decode", "trailing bytes after net_message payload", true);
+               return;
+            }
 
             bool continue_reading = true;
             if (const auto* handshake = std::get_if<handshake_message>(&msg)) {
@@ -311,12 +326,11 @@ namespace sysio::testing {
                continue_reading = send_time_response(peer_time->xmt, receive_time);
             } else if (const auto* go_away = std::get_if<go_away_message>(&msg)) {
                wlog("P2P peer sent go_away_message: {}", reason_str(go_away->reason));
-               _transport_failed.store(true, std::memory_order_relaxed);
-               close_socket();
+               mark_transport_failed("peer go_away_message", reason_str(go_away->reason), false);
                continue_reading = false;
             }
 
-            if (!continue_reading || _transport_failed.load(std::memory_order_relaxed)) {
+            if (!continue_reading || _transport_failed.load(std::memory_order_acquire)) {
                return;
             }
          } catch (const fc::exception& e) {
@@ -337,7 +351,7 @@ namespace sysio::testing {
       int max    = provider_disconnect_wait_seconds;
       int waited = 0;
       for (uint64_t sent = _sent.load(), sent_callback_num = _sent_callback_num.load();
-           sent != sent_callback_num && !_transport_failed.load(std::memory_order_relaxed) && waited < max;
+           sent != sent_callback_num && !_transport_failed.load(std::memory_order_acquire) && waited < max;
            sent = _sent.load(), sent_callback_num = _sent_callback_num.load()) {
          ilog("disconnect waiting on ack - sent {} | acked {} | waited {}",
               sent, sent_callback_num, waited);
@@ -373,8 +387,8 @@ namespace sysio::testing {
 
    chain::block_id_type p2p_connection::reference_block_id(const chain::block_id_type& fallback) const {
       std::lock_guard<std::mutex> lock(_peer_chain_state_lock);
-      if (!is_default_block_id(_latest_chain_head_id)) {
-         return _latest_chain_head_id;
+      if (!is_default_block_id(_latest_fork_db_root_id)) {
+         return _latest_fork_db_root_id;
       }
       if (!is_default_block_id(_latest_fork_db_head_id)) {
          return _latest_fork_db_head_id;
@@ -383,7 +397,7 @@ namespace sysio::testing {
    }
 
    void p2p_connection::throw_if_unhealthy() const {
-      if (_transport_failed.load(std::memory_order_relaxed)) {
+      if (_transport_failed.load(std::memory_order_acquire)) {
          throw std::runtime_error("P2P provider transport failed");
       }
    }
