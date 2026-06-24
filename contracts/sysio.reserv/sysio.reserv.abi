@@ -198,7 +198,7 @@
                     "type": "uint64"
                 },
                 {
-                    "name": "chain_precision",
+                    "name": "source_token_precision",
                     "type": "uint32"
                 },
                 {
@@ -322,7 +322,7 @@
                     "type": "uint64"
                 },
                 {
-                    "name": "chain_precision",
+                    "name": "source_token_precision",
                     "type": "uint32"
                 },
                 {
@@ -394,11 +394,7 @@
                     "type": "uint64"
                 },
                 {
-                    "name": "chain_precision",
-                    "type": "uint32"
-                },
-                {
-                    "name": "wire_precision",
+                    "name": "source_token_precision",
                     "type": "uint32"
                 },
                 {

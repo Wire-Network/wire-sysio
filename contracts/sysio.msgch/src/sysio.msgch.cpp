@@ -378,7 +378,7 @@ void dispatch_reserve_create(name self, const std::vector<char>& data) {
                       rc.description,
                       ext_amount,
                       rc.requested_wire_amount,
-                      rc.chain_precision,
+                      rc.source_token_precision,
                       rc.connector_weight_bps,
                       rc.creator_addr.kind,
                       rc.creator_addr.address,

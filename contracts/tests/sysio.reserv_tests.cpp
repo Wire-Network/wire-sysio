@@ -150,7 +150,7 @@ public:
                             name owner = name{},
                             const std::string& name_str = "test reserve",
                             const std::string& description = "",
-                            uint32_t chain_precision = 9) {
+                            uint32_t source_token_precision = 9) {
       return push_action(RESERVE_ACCOUNT, "regreserve"_n, mvo()
          ("chain_code",            codename_mvo(chain_code))
          ("token_code",            codename_mvo(token_code))
@@ -159,7 +159,7 @@ public:
          ("description",           description)
          ("initial_chain_amount",  initial_chain_amount)
          ("initial_wire_amount",   initial_wire_amount)
-         ("chain_precision",       chain_precision)
+         ("source_token_precision", source_token_precision)
          ("connector_weight_bps",  weight)
          ("is_private",            is_private)
          ("owner",                 owner));
@@ -288,8 +288,7 @@ BOOST_FIXTURE_TEST_CASE(regreserve_creates_reserve_row, sysio_reserve_tester) { 
    BOOST_REQUIRE_EQUAL(false,     r["is_private"].as_bool());
    BOOST_REQUIRE_EQUAL("",        r["owner"].as_string());
    // Reserve self-describes its precision (default 9 here); never assumed.
-   BOOST_REQUIRE_EQUAL(9u, r["chain_precision"].as_uint64());
-   BOOST_REQUIRE_EQUAL(9u, r["wire_precision"].as_uint64());
+   BOOST_REQUIRE_EQUAL(9u, r["source_token_precision"].as_uint64());
 
    // Custody invariant: the row's WIRE side is REAL — drained from the
    // treasury into sysio.reserv's token balance.
@@ -304,21 +303,20 @@ BOOST_FIXTURE_TEST_CASE(regreserve_records_non_default_precision, sysio_reserve_
       regreserve("ETH", "USDC", "PRIMARY",
                  /*chain_amount*/ 1'000'000, /*wire_amount*/ 2'000'000,
                  /*weight*/ 5000, /*is_private*/ false, name{},
-                 "usdc reserve", "", /*chain_precision*/ 6u));
+                 "usdc reserve", "", /*source_token_precision*/ 6u));
 
    auto r = find_reserve("ETH", "USDC", "PRIMARY");
    BOOST_REQUIRE(!r.is_null());
-   BOOST_REQUIRE_EQUAL(6u, r["chain_precision"].as_uint64());
-   BOOST_REQUIRE_EQUAL(9u, r["wire_precision"].as_uint64());
+   BOOST_REQUIRE_EQUAL(6u, r["source_token_precision"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
-// chain_precision above the depot frame (9) is rejected — the outpost must
+// source_token_precision above the depot frame (9) is rejected — the outpost must
 // downscale to min(native, 9) at its boundary, so a higher value is malformed.
 BOOST_FIXTURE_TEST_CASE(regreserve_rejects_precision_over_frame, sysio_reserve_tester) { try {
    BOOST_REQUIRE(
       regreserve("ETH", "ETH", "PRIMARY",
-                 1'000'000, 2'000'000, 5000, false, name{}, "", "", /*chain_precision*/ 18u)
-      .find("chain_precision exceeds the depot frame") != std::string::npos);
+                 1'000'000, 2'000'000, 5000, false, name{}, "", "", /*source_token_precision*/ 18u)
+      .find("source_token_precision exceeds the depot frame") != std::string::npos);
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(regreserve_rejects_duplicate, sysio_reserve_tester) { try {
@@ -377,7 +375,7 @@ BOOST_FIXTURE_TEST_CASE(oncrtreserve_requires_msgch_auth, sysio_reserve_tester) 
       ("description",           "")
       ("external_token_amount", 1000)
       ("requested_wire_amount", 1000)
-      ("chain_precision",       9u)
+      ("source_token_precision", 9u)
       ("connector_weight_bps",  5000)
       ("creator_chain_kind",    ChainKind::CHAIN_KIND_EVM)
       ("creator_chain_addr",    std::vector<char>(20, '\x01'))
@@ -399,7 +397,7 @@ BOOST_FIXTURE_TEST_CASE(oncrtreserve_unlinked_creator_is_cancelled, sysio_reserv
       ("description",           "")
       ("external_token_amount", 1000)
       ("requested_wire_amount", 1000)
-      ("chain_precision",       9u)
+      ("source_token_precision", 9u)
       ("connector_weight_bps",  5000)
       ("creator_chain_kind",    ChainKind::CHAIN_KIND_EVM)
       ("creator_chain_addr",    std::vector<char>(20, '\x01'))
@@ -426,7 +424,7 @@ BOOST_FIXTURE_TEST_CASE(oncrtreserve_cancelled_relay_does_not_double_refund, sys
          ("description",           "")
          ("external_token_amount", 1000)
          ("requested_wire_amount", 1000)
-         ("chain_precision",       9u)
+         ("source_token_precision", 9u)
          ("connector_weight_bps",  5000)
          ("creator_chain_kind",    ChainKind::CHAIN_KIND_EVM)
          ("creator_chain_addr",    std::vector<char>(20, '\x01'))
@@ -468,7 +466,7 @@ BOOST_FIXTURE_TEST_CASE(oncrtreserve_cancelled_is_reclaimable_by_linked_creator,
       ("description",           "squat")
       ("external_token_amount", 1000)
       ("requested_wire_amount", 1000)
-      ("chain_precision",       9u)
+      ("source_token_precision", 9u)
       ("connector_weight_bps",  5000)
       ("creator_chain_kind",    ChainKind::CHAIN_KIND_EVM)
       ("creator_chain_addr",    std::vector<char>(20, '\x09'))
@@ -495,7 +493,7 @@ BOOST_FIXTURE_TEST_CASE(oncrtreserve_cancelled_is_reclaimable_by_linked_creator,
       ("description",           "reclaimed")
       ("external_token_amount", 5000)
       ("requested_wire_amount", 4000)
-      ("chain_precision",       9u)
+      ("source_token_precision", 9u)
       ("connector_weight_bps",  5000)
       ("creator_chain_kind",    ChainKind::CHAIN_KIND_EVM)
       ("creator_chain_addr",    std::vector<char>(20, '\x01'))
