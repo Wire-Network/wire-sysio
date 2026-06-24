@@ -6,6 +6,7 @@
 #include <sysio/state_history/abi.hpp>
 #include <sysio/state_history/create_deltas.hpp>
 #include <sysio/state_history/log_catalog.hpp>
+#include <sysio/state_history/status_request_queue.hpp>
 #include <sysio/state_history/trace_converter.hpp>
 #include <sysio/testing/tester.hpp>
 #include <fc/io/json.hpp>
@@ -18,6 +19,8 @@
 
 #include <boost/iostreams/device/back_inserter.hpp>
 #include <boost/iostreams/copy.hpp>
+
+#include <deque>
 
 using namespace sysio::chain;
 using namespace sysio::testing;
@@ -64,6 +67,31 @@ std::vector<table_delta> create_deltas(const chainbase::database& db, bool full_
 }
 
 BOOST_AUTO_TEST_SUITE(test_state_history)
+
+/// Verifies SHiP status requests are bounded, drained in FIFO order, and reusable after drain.
+BOOST_AUTO_TEST_CASE(status_request_queue_is_bounded)
+{
+   sysio::state_history::status_request_queue queue;
+
+   for(std::size_t i = 0; i < sysio::state_history::max_status_request_queue_depth; ++i) {
+      const bool is_v1_request = (i % 2) == 1;
+      BOOST_REQUIRE(queue.try_append(is_v1_request));
+   }
+
+   BOOST_REQUIRE_EQUAL(queue.size(), sysio::state_history::max_status_request_queue_depth);
+   BOOST_CHECK(!queue.try_append(false));
+
+   const std::deque<bool> pending = queue.pop_all();
+   BOOST_CHECK(queue.empty());
+   BOOST_REQUIRE_EQUAL(pending.size(), sysio::state_history::max_status_request_queue_depth);
+   for(std::size_t i = 0; i < pending.size(); ++i) {
+      const bool expected_is_v1_request = (i % 2) == 1;
+      BOOST_CHECK_EQUAL(pending[i], expected_is_v1_request);
+   }
+
+   BOOST_CHECK(queue.try_append(true));
+   BOOST_REQUIRE_EQUAL(queue.size(), 1u);
+}
 
 class table_deltas_tester : public tester {
 public:
