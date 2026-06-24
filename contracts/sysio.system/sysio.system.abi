@@ -157,6 +157,24 @@
             ]
         },
         {
+            "name": "block_info_record",
+            "base": "",
+            "fields": [
+                {
+                    "name": "version",
+                    "type": "uint8"
+                },
+                {
+                    "name": "block_height",
+                    "type": "uint32"
+                },
+                {
+                    "name": "block_timestamp",
+                    "type": "time_point"
+                }
+            ]
+        },
+        {
             "name": "block_signing_authority_v0",
             "base": "",
             "fields": [
@@ -253,6 +271,16 @@
                 {
                     "name": "max_kv_secondary_key_size",
                     "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "blockinfo_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "block_height",
+                    "type": "uint64"
                 }
             ]
         },
@@ -1553,7 +1581,7 @@
             ]
         },
         {
-            "name": "block_info_record",
+            "name": "limit_auth_change",
             "base": "",
             "fields": [
                 {
@@ -1561,21 +1589,25 @@
                     "type": "uint8"
                 },
                 {
-                    "name": "block_height",
-                    "type": "uint32"
+                    "name": "account",
+                    "type": "name"
                 },
                 {
-                    "name": "block_timestamp",
-                    "type": "time_point"
+                    "name": "allow_perms",
+                    "type": "name[]"
+                },
+                {
+                    "name": "disallow_perms",
+                    "type": "name[]"
                 }
             ]
         },
         {
-            "name": "blockinfo_key",
+            "name": "limitauthchg_key",
             "base": "",
             "fields": [
                 {
-                    "name": "block_height",
+                    "name": "account",
                     "type": "uint64"
                 }
             ]
@@ -1658,38 +1690,6 @@
                 {
                     "name": "pubkey",
                     "type": "public_key?"
-                }
-            ]
-        },
-        {
-            "name": "limit_auth_change",
-            "base": "",
-            "fields": [
-                {
-                    "name": "version",
-                    "type": "uint8"
-                },
-                {
-                    "name": "account",
-                    "type": "name"
-                },
-                {
-                    "name": "allow_perms",
-                    "type": "name[]"
-                },
-                {
-                    "name": "disallow_perms",
-                    "type": "name[]"
-                }
-            ]
-        },
-        {
-            "name": "limitauthchg_key",
-            "base": "",
-            "fields": [
-                {
-                    "name": "account",
-                    "type": "uint64"
                 }
             ]
         },
@@ -2030,6 +2030,14 @@
             "table_id": 49446
         },
         {
+            "name": "blockinfo",
+            "type": "block_info_record",
+            "index_type": "i64",
+            "key_names": ["block_height"],
+            "key_types": ["uint64"],
+            "table_id": 21782
+        },
+        {
             "name": "emissionmngr",
             "type": "emission_state",
             "index_type": "i64",
@@ -2191,12 +2199,12 @@
             "table_id": 22391
         },
         {
-            "name": "blockinfo",
-            "type": "block_info_record",
+            "name": "limitauthchg",
+            "type": "limit_auth_change",
             "index_type": "i64",
-            "key_names": ["block_height"],
+            "key_names": ["account"],
             "key_types": ["uint64"],
-            "table_id": 21782
+            "table_id": 43800
         },
         {
             "name": "peerkeys",
@@ -2205,14 +2213,6 @@
             "key_names": ["account"],
             "key_types": ["uint64"],
             "table_id": 40639
-        },
-        {
-            "name": "limitauthchg",
-            "type": "limit_auth_change",
-            "index_type": "i64",
-            "key_names": ["account"],
-            "key_types": ["uint64"],
-            "table_id": 43800
         },
         {
             "name": "trxpglobal",
