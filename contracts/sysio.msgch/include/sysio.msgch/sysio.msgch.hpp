@@ -75,10 +75,13 @@ namespace sysio {
       ///     SLASH) — once the v6 reserve-flow lands the same pattern
       ///     reaches every depot-authorised outbound.
       ///
-      /// No `require_auth` here — the calling contract's own auth signs
-      /// the inline action and the table is logically "append-only" from
-      /// the caller's perspective; abuse mitigation lives at the calling
-      /// contracts' privileged-action gates.
+      /// Gated to the depot's own system contracts (sysio.epoch / .opreg /
+      /// .uwrit / .reserv, plus msgch itself): each sends under its own
+      /// {self, active} authority. The gate is required because a forged
+      /// READY attestation rides out inside the next group-signed outbound
+      /// envelope, which the outpost authenticates by the group signature —
+      /// not per-attestation origin — so an ungated queueout would let any
+      /// account inject depot-authorised outbound commands.
       [[sysio::action]]
       void queueout(uint64_t chain_code,
                     opp::types::AttestationType attest_type,

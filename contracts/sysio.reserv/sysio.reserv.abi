@@ -104,6 +104,16 @@
             ]
         },
         {
+            "name": "drainrewards",
+            "base": "",
+            "fields": [
+                {
+                    "name": "amount",
+                    "type": "int64"
+                }
+            ]
+        },
+        {
             "name": "matchreserve",
             "base": "",
             "fields": [
@@ -495,6 +505,11 @@
         {
             "name": "debit",
             "type": "debit",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "drainrewards",
+            "type": "drainrewards",
             "ricardian_contract": ""
         },
         {

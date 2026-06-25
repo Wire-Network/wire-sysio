@@ -387,6 +387,12 @@ enum UnderwriteStatus {
   UNDERWRITE_STATUS_READY            = 3;
   UNDERWRITE_STATUS_RELEASED         = 5;
   UNDERWRITE_STATUS_SLASHED          = 10;
+  // Candidate-specific, pre-settlement invalidity in the underwriter race (bad
+  // UIC signature, insufficient bond, missing destination authex link). The
+  // candidate is removed from contention but NO collateral was slashed — kept
+  // distinct from SLASHED (economic punishment) and RELEASED (clean race
+  // loser) so indexing/audits do not conflate them.
+  UNDERWRITE_STATUS_DISQUALIFIED     = 11;
 }
 
 enum ChallengeStatus {

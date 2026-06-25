@@ -438,7 +438,7 @@ BOOST_FIXTURE_TEST_CASE( verify_ram, sysio_roa_tester ) try {
       create_accounts({node_owners[i]}, false, false, false, false);
       register_node_owner(node_owners[i], 1);
       control->get_resource_limits_manager().get_account_limits( node_owners[i], ram, net, cpu );
-      BOOST_TEST(ram == 8320); // values set by contract, verify they don't change for this test
+      BOOST_TEST(ram == newaccount_ram + 80l*104); // creation gift (newaccount_ram) kept + personal (80 units * 104 bytes_per_unit)
       BOOST_TEST(net == 500);
       BOOST_TEST(cpu == 500);
    }
@@ -612,7 +612,7 @@ BOOST_FIXTURE_TEST_CASE( byteprice_divisibility_guard, sysio_roa_tester ) try {
    BOOST_REQUIRE_EXCEPTION(
       base_tester::push_action(ROA, "setbyteprice"_n, ROA, mvo()("bytes_per_unit", newaccount_ram + 1)),
       sysio_assert_message_exception,
-      sysio_assert_message_is("newaccount_ram needs to be evenly divisable to avoid dust"));
+      sysio_assert_message_is("newaccount_ram needs to be evenly divisible to avoid dust"));
 
    // zero would divide-by-zero in the unit conversion; rejected up front.
    BOOST_REQUIRE_EXCEPTION(
@@ -933,6 +933,60 @@ BOOST_FIXTURE_TEST_CASE( addpolicy_sysio_ram_only, sysio_roa_full_tester ) try {
    BOOST_TEST(p["ram_weight"].as_string() == "1.0000 SYS");
    BOOST_TEST(p["net_weight"].as_string() == "0.0000 SYS");
    BOOST_TEST(p["cpu_weight"].as_string() == "0.0000 SYS");
+} FC_LOG_AND_RETHROW()
+
+// ===== 1b. shared boundary guards: core-SYS symbol + owner existence =====
+// These lock in the validation added across addpolicy/expandpolicy/reducepolicy. The symbol guard
+// matters specifically for the same-but-wrong-symbol case (all three weights in one non-SYS symbol):
+// asset::operator+ only checks operands share a symbol and the affordability gate compares raw
+// amounts, so without check_core_symbol such a weight is silently accepted and mis-scales reserve
+// accounting. Mixed symbols already fail at the asset addition; this is the case that did not.
+
+// addpolicy rejects a wrong-symbol (here TST) set of weights.
+BOOST_FIXTURE_TEST_CASE( addpolicy_wrong_symbol, sysio_roa_full_tester ) try {
+   auto user = create_newuser(node_owners[2]);
+   produce_block();
+
+   BOOST_CHECK_EXCEPTION(
+      add_roa_policy(node_owners[2], user, "1.0000 TST", "1.0000 TST", "1.0000 TST", 0, 0),
+      sysio_assert_message_exception,
+      sysio_assert_message_is("policy weights must be denominated in the core SYS symbol"));
+} FC_LOG_AND_RETHROW()
+
+// addpolicy rejects an owner account that does not exist (guards the reslimit / system-resource
+// writes that follow -- they would otherwise run against a non-account).
+BOOST_FIXTURE_TEST_CASE( addpolicy_nonexistent_owner, sysio_roa_full_tester ) try {
+   BOOST_CHECK_EXCEPTION(
+      add_roa_policy(node_owners[2], "ghostacct"_n, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0, 0),
+      sysio_assert_message_exception,
+      sysio_assert_message_is("owner account does not exist"));
+} FC_LOG_AND_RETHROW()
+
+// expandpolicy rejects a wrong-symbol increment on an existing (SYS) policy.
+BOOST_FIXTURE_TEST_CASE( expandpolicy_wrong_symbol, sysio_roa_full_tester ) try {
+   auto user = create_newuser(node_owners[2]);
+   produce_block();
+   add_roa_policy(node_owners[2], user, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0, 0);
+   produce_block();
+
+   BOOST_CHECK_EXCEPTION(
+      expand_roa_policy(node_owners[2], user, "1.0000 TST", "1.0000 TST", "1.0000 TST", 0),
+      sysio_assert_message_exception,
+      sysio_assert_message_is("policy weights must be denominated in the core SYS symbol"));
+} FC_LOG_AND_RETHROW()
+
+// reducepolicy rejects a wrong-symbol reduction on an existing (SYS) policy. The symbol guard fires
+// before the time_block / below-zero checks, so a time_block of 0 is enough to reach it.
+BOOST_FIXTURE_TEST_CASE( reducepolicy_wrong_symbol, sysio_roa_full_tester ) try {
+   auto user = create_newuser(node_owners[2]);
+   produce_block();
+   add_roa_policy(node_owners[2], user, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0, 0);
+   produce_block();
+
+   BOOST_CHECK_EXCEPTION(
+      reduce_roa_policy(node_owners[2], user, "1.0000 TST", "1.0000 TST", "1.0000 TST", 0),
+      sysio_assert_message_exception,
+      sysio_assert_message_is("policy weights must be denominated in the core SYS symbol"));
 } FC_LOG_AND_RETHROW()
 
 // ===== 2. expandpolicy validation =====
@@ -1555,6 +1609,116 @@ BOOST_FIXTURE_TEST_CASE( nodeownreg_account_key_mismatch, sysio_roa_nodeownreg_t
    auto audit = get_nodeownerreg(owner);
    BOOST_REQUIRE_EQUAL(audit["status"].as<uint64_t>(), REJECTED);
    BOOST_REQUIRE_EQUAL(audit["reason"].as<uint64_t>(), R_ACCOUNT_KEY_MISMATCH);
+} FC_LOG_AND_RETHROW()
+
+// SEC-087: an account that already carries a reslimit row must NOT be blocked from registering. Such a
+// row can be planted on any account by a node owner via addpolicy (no target consent), which previously
+// forced the claim into a permanent OWNER_HAS_RESLIMIT soft-fail -- a denial-of-registration grief.
+// nodeownreg now RECONCILES: regnodeowner stacks the node-owner allocation onto the existing row via
+// increase_reslimit, the claim reaches CONFIRMED, and the planted policy is preserved (still the
+// issuer's, reclaimable via reducepolicy). No value is stolen and the gift is not double-counted.
+BOOST_FIXTURE_TEST_CASE( nodeownreg_reconciles_existing_reslimit, sysio_roa_nodeownreg_tester ) try {
+   const auto owner    = "claimacct"_n;
+   const auto wire_pub = gen_k1_key();
+   const auto eth_pub  = gen_em_key();
+
+   // Create the claim account in-flow, then have NODE_DADDY plant a RAM-only policy on it so it carries
+   // a reslimit row before the claim is resolved (NODE_DADDY is the tier-1 issuer seeded by the fixture).
+   BOOST_REQUIRE_EQUAL(success(), newnameduser(owner, wire_pub, 2));
+   produce_blocks();
+   add_roa_policy(NODE_DADDY, owner, "0.0000 SYS", "0.0000 SYS", "1.0000 SYS", 0, 0);
+   produce_blocks();
+
+   // bytes_per_unit and the node-owner personal RAM are fixture constants (cf. verify_ram): the
+   // activation price is 104, regnodeowner's personal_ram_weight is 0.0080 SYS (80 units).
+   const int64_t bytes_per_unit     = 104;
+   const int64_t planted_ram_bytes  = 10000 * bytes_per_unit;   // 1.0000 SYS RAM-only policy
+   const int64_t personal_ram_bytes = 80    * bytes_per_unit;   // node-owner personal RAM (0.0080 SYS)
+
+   // Pre-state: the planted row exists with the one-time newaccount_ram gift folded in once (by the
+   // addpolicy create-branch), and net/cpu still zero.
+   auto r = get_reslimit(owner);
+   BOOST_REQUIRE_EQUAL(r.is_null(), false);
+   BOOST_REQUIRE_EQUAL(r["net_weight"].as_string(), "0.0000 SYS");
+   BOOST_REQUIRE_EQUAL(r["cpu_weight"].as_string(), "0.0000 SYS");
+   BOOST_REQUIRE_EQUAL(r["ram_bytes"].as_int64(), planted_ram_bytes + newaccount_ram);
+   const auto daddy_before = get_nodeowner(NODE_DADDY);
+
+   // The claim must commit AND register -- not soft-fail, not throw.
+   BOOST_REQUIRE_EQUAL(success(), nodeownreg(owner, 2, eth_pub, wire_pub));
+   produce_blocks();
+
+   // Registration completed (the SEC-087 outcome).
+   auto reg = get_nodeowner(owner);
+   BOOST_REQUIRE_EQUAL(reg.is_null(), false);
+   BOOST_REQUIRE_EQUAL(reg["tier"].as<uint32_t>(), 2);
+   auto audit = get_nodeownerreg(owner);
+   BOOST_REQUIRE_EQUAL(audit["status"].as<uint64_t>(), CONFIRMED);
+   BOOST_REQUIRE_EQUAL(audit["reason"].as<uint64_t>(), 0); // NONE
+
+   // reslimit reconciled: planted RAM kept, node-owner net/cpu/ram stacked on top, gift NOT re-added.
+   const int64_t expected_ram = planted_ram_bytes + newaccount_ram + personal_ram_bytes; // 1,049,464
+   r = get_reslimit(owner);
+   BOOST_REQUIRE_EQUAL(r["net_weight"].as_string(), "0.0500 SYS");
+   BOOST_REQUIRE_EQUAL(r["cpu_weight"].as_string(), "0.0500 SYS");
+   BOOST_REQUIRE_EQUAL(r["ram_bytes"].as_int64(), expected_ram);
+
+   // On-chain quota synced to the reconciled row totals (absolute set in regnodeowner).
+   int64_t ram = 0, net = 0, cpu = 0;
+   control->get_resource_limits_manager().get_account_limits(owner, ram, net, cpu);
+   BOOST_REQUIRE_EQUAL(ram, expected_ram);
+   BOOST_REQUIRE_EQUAL(net, 500);
+   BOOST_REQUIRE_EQUAL(cpu, 500);
+
+   // The planted policy is untouched: still issued by NODE_DADDY, still reclaimable via reducepolicy.
+   auto pol = get_policy(owner, NODE_DADDY);
+   BOOST_REQUIRE_EQUAL(pol.is_null(), false);
+   BOOST_REQUIRE_EQUAL(pol["net_weight"].as_string(), "0.0000 SYS");
+   BOOST_REQUIRE_EQUAL(pol["cpu_weight"].as_string(), "0.0000 SYS");
+   BOOST_REQUIRE_EQUAL(pol["ram_weight"].as_string(), "1.0000 SYS");
+
+   // Conservation: nodeownreg does not touch the planted-policy issuer's allocations (the planted
+   // resources stay backed by NODE_DADDY's reserve; the node-owner allocation is independently backed).
+   auto daddy_after = get_nodeowner(NODE_DADDY);
+   BOOST_REQUIRE_EQUAL(daddy_after["allocated_sys"].as_string(), daddy_before["allocated_sys"].as_string());
+   BOOST_REQUIRE_EQUAL(daddy_after["allocated_bw"].as_string(),  daddy_before["allocated_bw"].as_string());
+   BOOST_REQUIRE_EQUAL(daddy_after["allocated_ram"].as_string(), daddy_before["allocated_ram"].as_string());
+} FC_LOG_AND_RETHROW()
+
+// SEC-087 companion: a planted policy can carry NET/CPU as well as RAM. Verify the reconcile stacks
+// net/cpu too (the increase_reslimit MODIFY branch) and registration still reaches CONFIRMED.
+BOOST_FIXTURE_TEST_CASE( nodeownreg_reconciles_existing_reslimit_net_cpu, sysio_roa_nodeownreg_tester ) try {
+   const auto owner    = "claimacct"_n;
+   const auto wire_pub = gen_k1_key();
+   const auto eth_pub  = gen_em_key();
+
+   BOOST_REQUIRE_EQUAL(success(), newnameduser(owner, wire_pub, 2));
+   produce_blocks();
+   add_roa_policy(NODE_DADDY, owner, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0, 0);
+   produce_blocks();
+
+   const int64_t bytes_per_unit     = 104;
+   const int64_t planted_ram_bytes  = 10000 * bytes_per_unit;
+   const int64_t personal_ram_bytes = 80    * bytes_per_unit;
+
+   BOOST_REQUIRE_EQUAL(success(), nodeownreg(owner, 2, eth_pub, wire_pub));
+   produce_blocks();
+
+   BOOST_REQUIRE_EQUAL(get_nodeowner(owner).is_null(), false);
+   BOOST_REQUIRE_EQUAL(get_nodeownerreg(owner)["status"].as<uint64_t>(), CONFIRMED);
+
+   // net/cpu = planted 1.0000 + node-owner 0.0500 = 1.0500 SYS; ram = planted + gift + personal.
+   const int64_t expected_ram = planted_ram_bytes + newaccount_ram + personal_ram_bytes;
+   auto r = get_reslimit(owner);
+   BOOST_REQUIRE_EQUAL(r["net_weight"].as_string(), "1.0500 SYS");
+   BOOST_REQUIRE_EQUAL(r["cpu_weight"].as_string(), "1.0500 SYS");
+   BOOST_REQUIRE_EQUAL(r["ram_bytes"].as_int64(), expected_ram);
+
+   int64_t ram = 0, net = 0, cpu = 0;
+   control->get_resource_limits_manager().get_account_limits(owner, ram, net, cpu);
+   BOOST_REQUIRE_EQUAL(ram, expected_ram);
+   BOOST_REQUIRE_EQUAL(net, 10500); // 1.0500 SYS at precision 4
+   BOOST_REQUIRE_EQUAL(cpu, 10500);
 } FC_LOG_AND_RETHROW()
 
 // Account already carries a DIFFERENT EVM link (e.g. an operator createlink or an earlier deposit

@@ -341,7 +341,15 @@ class Transactions(NodeopQueries):
         signStr = NodeopQueries.sign_str(sign, [owner.activePublicKey])
         cmdDesc="push action"
         time_block = self.getHeadBlockNum()
-        argsStr = "{" + f'"issuer":"{issuer.name}", "owner":"{owner.name}", "net_weight":"{net} SYS", "cpu_weight":"{cpu} SYS", "ram_weight":"{ram} SYS", "time_block":{time_block}, "network_gen":0' + "}"
+        # sysio.roa::addpolicy requires every weight in the core SYS symbol (4-precision); a bare
+        # "{net} SYS" renders as a 0-precision asset and is rejected ("policy weights must be
+        # denominated in the core SYS symbol"). net/cpu/ram are smallest-unit integers, so format them
+        # with currencyIntToStr exactly like every other currency value in the harness -- this yields
+        # the correct 4-precision symbol while preserving the raw amounts (e.g. 10000 -> "1.0000 SYS").
+        netStr = NodeopQueries.currencyIntToStr(net, CORE_SYMBOL)
+        cpuStr = NodeopQueries.currencyIntToStr(cpu, CORE_SYMBOL)
+        ramStr = NodeopQueries.currencyIntToStr(ram, CORE_SYMBOL)
+        argsStr = "{" + f'"issuer":"{issuer.name}", "owner":"{owner.name}", "net_weight":"{netStr}", "cpu_weight":"{cpuStr}", "ram_weight":"{ramStr}", "time_block":{time_block}, "network_gen":0' + "}"
         cmd = (f"{cmdDesc} -j {signStr} sysio.roa addpolicy  '{argsStr}' -p {issuer.name}@active")
         trans=self.processClioCmd(cmd, cmdDesc, silentErrors=False, exitOnError=exitOnError)
         self.trackCmdTransaction(trans)

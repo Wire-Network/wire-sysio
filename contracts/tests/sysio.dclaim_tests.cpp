@@ -243,4 +243,28 @@ BOOST_FIXTURE_TEST_CASE(flushexpired_reverts_expired_pending, sysio_dclaim_teste
    BOOST_REQUIRE(pending_of("alice"_n).is_null());   // reverted to capital fund
 } FC_LOG_AND_RETHROW() }
 
+// onreward runs inside the OPP inbound dispatch chain (msgch::evalcons), where an abort rolls back
+// the consensus-tipping deliver and stalls epoch advancement. A cross-chain-supplied
+// staker_wire_account that name() would reject (>13 chars / bad alphabet) must NOT abort: it is
+// treated as unlinked and the credit is parked in unmapped_tokens by native address.
+BOOST_FIXTURE_TEST_CASE(onreward_invalid_wire_account_parks_unmapped, sysio_dclaim_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(),
+      onreward(MSGCH_ACCOUNT, 1, "thisnameistoolong", ChainKind::CHAIN_KIND_EVM, addr20,
+               1000, 7, 100));
+   // Soft-handled: credit parked as unmapped (unlinked), not aborted.
+   BOOST_REQUIRE(!unmapped_row(1).is_null());
+} FC_LOG_AND_RETHROW() }
+
+// A reward_amount above asset::max_amount (2^62-1) would abort the WIRE asset constructor. onreward
+// must soft-skip it (return early) rather than abort the inbound dispatch — no credit is created.
+BOOST_FIXTURE_TEST_CASE(onreward_oversized_amount_soft_skips, sysio_dclaim_tester) { try {
+   const uint64_t oversized = (uint64_t(1) << 62);   // asset::max_amount + 1
+   BOOST_REQUIRE_EQUAL(success(),
+      onreward(MSGCH_ACCOUNT, 1, "alice", ChainKind::CHAIN_KIND_EVM, addr20,
+               oversized, 7, 100));
+   // Soft-skipped: neither a pending claim (valid name "alice") nor an unmapped row was created.
+   BOOST_REQUIRE(pending_of("alice"_n).is_null());
+   BOOST_REQUIRE(unmapped_row(1).is_null());
+} FC_LOG_AND_RETHROW() }
+
 BOOST_AUTO_TEST_SUITE_END()
