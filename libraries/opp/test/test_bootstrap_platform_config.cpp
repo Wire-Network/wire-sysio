@@ -190,7 +190,9 @@ std::vector<std::string> validate(const BootstrapPlatformConfig& c) {
       e.push_back("V9 uwrit config missing");
    } else {
       const auto& u = c.uwrit();
-      if (u.fee_bps() > 10000)                       e.push_back("V9 fee_bps > 10000");
+      // fee_bps <= 9999: a 10000 (100%) fee zeroes the post-fee WIRE leg and is
+      // rejected on-chain by sysio.uwrit::setconfig (MAX_FEE_BPS).
+      if (u.fee_bps() > 9999)                        e.push_back("V9 fee_bps > 9999 (100%)");
       if (u.collateral_lock_duration_ms() == 0)      e.push_back("V9 collateral_lock_duration_ms must be > 0");
    }
 
@@ -256,8 +258,8 @@ BOOST_AUTO_TEST_CASE(validator_rejects_mutations) {
      BOOST_CHECK(!validate(c).empty()); }                               // V7 earmark too small
    { auto c = base; c.mutable_reserves(0)->set_is_private(true);        // V8 private without owner
      BOOST_CHECK(!validate(c).empty()); }
-   { auto c = base; c.mutable_uwrit()->set_fee_bps(10001);
-     BOOST_CHECK(!validate(c).empty()); }                               // V9 fee_bps > 10000
+   { auto c = base; c.mutable_uwrit()->set_fee_bps(10000);
+     BOOST_CHECK(!validate(c).empty()); }                               // V9 fee_bps 10000 rejected (100% zeroes post-fee WIRE)
 }
 
 /// The reserved `t5_dex_allocation` earmark is part of the strict schema and is

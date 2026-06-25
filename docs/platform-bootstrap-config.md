@@ -140,7 +140,7 @@ because the file is hand-authored and drives irreversible actions. A validator
 | V6 | reserve `(chain, token, code)` unique; references a declared binding; not on the depot; `0 < connector_weight_bps ≤ 9999`; amounts > 0 |
 | V7 | Σ `initial_wire_amount` ≤ `t5_reserve_allocation` > 0 |
 | V8 | `is_private` ⇒ `owner` a valid account name; else `owner` empty |
-| V9 | `uwrit` present; `fee_bps ≤ 10000`; lock duration > 0 |
+| V9 | `uwrit` present; `fee_bps ≤ 9999`; lock duration > 0 |
 
 Run the test:
 
