@@ -208,6 +208,42 @@ name resolve_account_from_op_address(const opp::types::ChainAddress& op_address)
    return it->username;
 }
 
+/// Inbound source-chain binding check (WSA-005).
+///
+/// A consensus-reached envelope is delivered for exactly ONE proven source outpost:
+/// `proven_chain_code`, which `deliver` validated as an active, non-depot row on
+/// `sysio.chains` before the envelope reached consensus. Every value-bearing attestation the
+/// envelope carries ALSO embeds its own chain identifier in the decoded payload
+/// (`OperatorAction.chain_code`, `UnderwriteIntentCommit.chain_code`, `StakingReward.chain_code`,
+/// `ReserveAmount.chain_code`, `ReserveCreateCancel.chain_code`). That embedded identifier MUST
+/// equal the proven source outpost: in the OPP model an attestation about chain X is always relayed
+/// by outpost X (confirmed across every leg in `sysio.dispatch_tests`, and stated in the proto —
+/// `ReserveCreate.external_amount.chain_code` is documented as "the outpost's own chain").
+///
+/// A mismatch means an envelope proven from outpost A is asking the depot to apply a value-bearing
+/// effect on a different chain B. Batch-operator consensus proves only that A's operators agree on
+/// the envelope bytes; it does NOT prove the depositor acted on B. Applying the effect anyway would
+/// let a compromised or malicious A-operator quorum drive deposits, withdrawals, swaps, underwrite
+/// commits, reserve mutations, or staking credits against an unrelated chain B's ledger — the
+/// cross-chain provenance forgery WSA-005 describes.
+///
+/// Per `feedback_opp_handlers_never_throw`, dispatch must never abort the envelope on a single bad
+/// attestation: a `check()` here would revert the whole `deliver` / `evalcons` transaction and stall
+/// consensus chain-wide. Instead we log the rejection (greppable under `--contracts-console`) and the
+/// caller drops the single offending attestation, leaving every well-formed attestation in the same
+/// envelope free to dispatch.
+///
+/// `path` labels the dispatch path in the diagnostic. Returns true iff the binding holds.
+[[nodiscard]] bool source_chain_binding_ok(uint64_t proven_chain_code,
+                                           uint64_t payload_chain_code,
+                                           const char* path) {
+   if (payload_chain_code == proven_chain_code) return true;
+   sysio::print("msgch::", path, ": DROP attestation -- payload chain_code=", payload_chain_code,
+                " does not match the proven source outpost chain_code=", proven_chain_code,
+                " (WSA-005 cross-chain provenance mismatch)\n");
+   return false;
+}
+
 /// Decode an OperatorAction sub-message and dispatch to the appropriate
 /// sysio.opreg action. Called from the inbound dispatch loop in `evalcons`.
 ///
@@ -225,19 +261,18 @@ name resolve_account_from_op_address(const opp::types::ChainAddress& op_address)
 ///                            attestation from a misbehaving operator (drop).
 ///   * UNKNOWN             → no-op
 ///
-/// `chain_code` is sourced from `OperatorAction.chain_code` (uint64 slug_name
-/// on the wire). The `from_chain` ChainKind argument is retained only as a
-/// trust-boundary check — the attestation was received from the outpost
-/// representing that VM family, so a mismatched payload `chain_code` (one
-/// whose owning chain row in `sysio.chains` has a different `kind`) is a
-/// red flag. Per `feedback_opp_handlers_never_throw`, we silently drop on
-/// mismatch rather than aborting the envelope.
+/// `chain_code` (the proven source outpost from `deliver`) is the escrow-holding chain the
+/// inline `depositinle` / `withdrawinle` is dispatched against. The payload's own
+/// `OperatorAction.chain_code` must equal it (WSA-005): the proto documents field 7 as "the
+/// outpost holding the escrow", which for a DEPOSIT_REQUEST / WITHDRAW_REQUEST is exactly the
+/// outpost that relayed this attestation. We dispatch using the proven `chain_code`, never the
+/// payload's, and drop the attestation when they diverge.
 ///
 /// `original_message_id` is the OPP message id of the attestation's parent
 /// Message — opreg::depositinle uses it to populate DEPOSIT_REVERT correlation
 /// when refunding an unaccepted deposit.
 void dispatch_operator_action(name self, const std::vector<char>& data,
-                              ChainKind from_chain,
+                              uint64_t chain_code,
                               const checksum256& original_message_id) {
    opp::attestations::OperatorAction oa;
    {
@@ -245,6 +280,11 @@ void dispatch_operator_action(name self, const std::vector<char>& data,
       auto rc = in(oa);
       if (rc != zpp::bits::errc{}) return;   // malformed; skip silently
    }
+
+   // WSA-005: bind the payload's escrow chain to the proven source outpost before crediting or
+   // debiting any operator collateral. A consensus envelope proven from outpost A must not be able
+   // to deposit/withdraw against a different chain B's operator ledger.
+   if (!source_chain_binding_ok(chain_code, oa.chain_code, "dispatch_operator_action")) return;
 
    // Resolve the operator's WIRE account from `op_address` via authex's
    // bypubkey index. Outposts emit the full chain pubkey (33 bytes for
@@ -257,17 +297,12 @@ void dispatch_operator_action(name self, const std::vector<char>& data,
    name account = resolve_account_from_op_address(oa.op_address);
    if (account == name{}) return;
 
-   // (void)from_chain — retained on the signature for future cross-checks
-   // against the chain row resolved from `oa.chain_code`. No-op for now
-   // because dispatch must never throw; if the cross-check were to fail
-   // we'd silently drop rather than abort the envelope.
-   (void)from_chain;
-
    using AT = opp::attestations::OperatorAction;
-   // TokenAmount + ChainAddress get split into (chain_code, token_code,
-   // amount) / (kind, address) on the inline-action tuples per the
+   // Dispatch against the PROVEN source chain (equal to `oa.chain_code`, enforced by the WSA-005
+   // binding check above), never the payload's own copy. TokenAmount + ChainAddress get split into
+   // (chain_code, token_code, amount) / (kind, address) on the inline-action tuples per the
    // no-proto-messages-in-actions rule.
-   const sysio::slug_name chain_code{oa.chain_code};
+   const sysio::slug_name chain_code_slug{chain_code};
    const sysio::slug_name token_code{oa.amount.token_code};
    const uint64_t raw_amount =
       static_cast<uint64_t>(static_cast<int64_t>(oa.amount.amount));
@@ -283,7 +318,7 @@ void dispatch_operator_action(name self, const std::vector<char>& data,
          action(
             permission_level{OPREG_ACCOUNT, "active"_n},
             OPREG_ACCOUNT, "depositinle"_n,
-            std::make_tuple(account, chain_code, token_code, raw_amount,
+            std::make_tuple(account, chain_code_slug, token_code, raw_amount,
                             oa.op_address.kind, oa.op_address.address,
                             original_message_id)
          ).send();
@@ -295,7 +330,7 @@ void dispatch_operator_action(name self, const std::vector<char>& data,
          action(
             permission_level{OPREG_ACCOUNT, "active"_n},
             OPREG_ACCOUNT, "withdrawinle"_n,
-            std::make_tuple(account, chain_code, token_code, raw_amount)
+            std::make_tuple(account, chain_code_slug, token_code, raw_amount)
          ).send();
          break;
       }
@@ -317,12 +352,14 @@ void dispatch_operator_action(name self, const std::vector<char>& data,
 /// covering this leg); the authoritative copy for verification is the
 /// bytes themselves, stored on `commit_entry.{source,dest}_uic_bytes`.
 ///
-/// Post v6: identity scalars on UIC are codenames (uint64) — `from_chain`
-/// (ChainKind, retained for receipt-trust checks) is no longer the routing
-/// key. (void)-cast for now; future trust-boundary checks may cross-
-/// reference `uic.chain_code`'s owning chain row against `from_chain`.
-void dispatch_underwrite_commit(name self, const std::vector<char>& data,
-                                ChainKind from_chain, uint64_t chain_code) {
+/// Post v6: identity scalars on UIC are codenames (uint64). `chain_code` is the proven source
+/// outpost from `deliver`; `uic.chain_code` is the leg this commit covers. WSA-005 requires the two
+/// to be identical — each leg's underwrite commit is emitted on, and relayed by, that leg's own
+/// outpost (a source-leg UIC rides the source outpost's envelope, a dest-leg UIC the dest outpost's;
+/// see `sysio.dispatch_tests`). `rcrdcommit` routes the commit to its src/dst slot by the leg chain
+/// code, so a forged `uic.chain_code` could misroute the commit onto the wrong leg; we bind it to the
+/// proven outpost and drop on divergence.
+void dispatch_underwrite_commit(name self, const std::vector<char>& data, uint64_t chain_code) {
    opp::attestations::UnderwriteIntentCommit uic;
    {
       auto in = zpp::bits::in{std::span{data.data(), data.size()}, zpp::bits::no_size{}};
@@ -331,13 +368,17 @@ void dispatch_underwrite_commit(name self, const std::vector<char>& data,
    }
    if (uic.uw_account.name.empty()) return;
 
-   (void)from_chain;   // routing now keyed on uic.chain_code (slug_name)
+   // WSA-005: the leg's chain (uic.chain_code) must be the proven delivering outpost before the
+   // commit is recorded against a swap leg.
+   if (!source_chain_binding_ok(chain_code, uic.chain_code, "dispatch_underwrite_commit")) return;
 
+   // Route with the proven `chain_code` (equal to `uic.chain_code`, enforced above) so the leg slot
+   // is keyed off provenance, not the payload's self-asserted chain.
    action(
       permission_level{self, "active"_n},
       UWRIT_ACCOUNT, "rcrdcommit"_n,
       std::make_tuple(uic.uw_request_id, name{uic.uw_account.name}, chain_code,
-                      sysio::slug_name{uic.chain_code},
+                      sysio::slug_name{chain_code},
                       sysio::slug_name{uic.token_code},
                       sysio::slug_name{uic.reserve_code},
                       data)
@@ -349,7 +390,7 @@ void dispatch_underwrite_commit(name self, const std::vector<char>& data,
 /// `feedback_opp_handlers_never_throw`, decode failures silently no-op.
 /// The downstream `oncrtreserve` is itself a never-throw handler — duplicate
 /// reserves are logged + dropped on the depot side.
-void dispatch_reserve_create(name self, const std::vector<char>& data) {
+void dispatch_reserve_create(name self, const std::vector<char>& data, uint64_t chain_code) {
    opp::attestations::ReserveCreate rc;
    {
       auto in = zpp::bits::in{std::span{data.data(), data.size()}, zpp::bits::no_size{}};
@@ -364,6 +405,12 @@ void dispatch_reserve_create(name self, const std::vector<char>& data) {
    // TokenAmount clamps to 0 so `oncrtreserve`'s zero-amount guard cancels
    // the request back (refunding the creator) instead of wrapping.
    const auto&    ext        = rc.external_amount;
+
+   // WSA-005: `external_amount.chain_code` is documented in the proto as "the outpost's own chain".
+   // Bind it to the proven delivering outpost so an envelope proven from outpost A cannot register a
+   // reserve whose external custody is claimed against a different chain B.
+   if (!source_chain_binding_ok(chain_code, ext.chain_code, "dispatch_reserve_create")) return;
+
    const uint64_t ext_amount = ext.amount.amount > 0
                                   ? static_cast<uint64_t>(ext.amount.amount)
                                   : 0;
@@ -391,13 +438,17 @@ void dispatch_reserve_create(name self, const std::vector<char>& data) {
 /// `matchreserve` call — see `oncnclrsv`. Per
 /// `feedback_opp_handlers_never_throw`, decode failures silently no-op
 /// and downstream race-loss is also a silent no-op on the reserv side.
-void dispatch_reserve_create_cancel(name self, const std::vector<char>& data) {
+void dispatch_reserve_create_cancel(name self, const std::vector<char>& data, uint64_t chain_code) {
    opp::attestations::ReserveCreateCancel cancel;
    {
       auto in = zpp::bits::in{std::span{data.data(), data.size()}, zpp::bits::no_size{}};
       auto err = in(cancel);
       if (err != zpp::bits::errc{}) return;
    }
+
+   // WSA-005: the cancel targets the reserve on `cancel.chain_code`; bind it to the proven
+   // delivering outpost so an envelope proven from outpost A cannot cancel a reserve on chain B.
+   if (!source_chain_binding_ok(chain_code, cancel.chain_code, "dispatch_reserve_create_cancel")) return;
 
    action(
       permission_level{self, "active"_n},
@@ -526,11 +577,11 @@ void dispatch_node_owner_reg(const std::vector<char>& data) {
 void dispatch_attestation(name self, uint64_t attestation_id,
                           AttestationType type,
                           const std::vector<char>& data,
-                          ChainKind from_chain, uint64_t chain_code,
+                          uint64_t chain_code,
                           const checksum256& original_message_id) {
    switch (type) {
       case AttestationType::ATTESTATION_TYPE_OPERATOR_ACTION:
-         dispatch_operator_action(self, data, from_chain, original_message_id);
+         dispatch_operator_action(self, data, chain_code, original_message_id);
          break;
 
       case AttestationType::ATTESTATION_TYPE_SWAP_REQUEST:
@@ -542,7 +593,7 @@ void dispatch_attestation(name self, uint64_t attestation_id,
          break;
 
       case AttestationType::ATTESTATION_TYPE_UNDERWRITE_INTENT_COMMIT:
-         dispatch_underwrite_commit(self, data, from_chain, chain_code);
+         dispatch_underwrite_commit(self, data, chain_code);
          break;
 
       case AttestationType::ATTESTATION_TYPE_SWAP_REMIT:
@@ -575,16 +626,20 @@ void dispatch_attestation(name self, uint64_t attestation_id,
             auto in = zpp::bits::in{std::span{data.data(), data.size()}, zpp::bits::no_size{}};
             auto rc = in(sr);
             if (rc != zpp::bits::errc{}) break;
+            // WSA-005: the reward-emitting chain (sr.chain_code) must be the proven delivering
+            // outpost before any claim credit is recorded.
+            if (!source_chain_binding_ok(chain_code, sr.chain_code, "staking_reward")) break;
             const uint64_t reward_raw =
                static_cast<uint64_t>(static_cast<int64_t>(sr.reward_amount.amount));
             // staker_wire_account.name is the raw account string (empty =>
             // staker not yet AuthX-linked, so sysio.dclaim parks by native
             // address). staker_native_address carries the chain (kind) and
-            // the raw address bytes.
+            // the raw address bytes. Credit against the PROVEN chain_code
+            // (equal to sr.chain_code, enforced above), never the payload's copy.
             action(
                permission_level{self, "active"_n},
                "sysio.dclaim"_n, "onreward"_n,
-               std::make_tuple(sr.chain_code,
+               std::make_tuple(chain_code,
                                sr.staker_wire_account.name,
                                sr.staker_native_address.kind,
                                sr.staker_native_address.address,
@@ -602,7 +657,7 @@ void dispatch_attestation(name self, uint64_t attestation_id,
          // creator's outpost-side custody is locked on the originating
          // outpost; refund (on RESERVE_CREATE_CANCELLED) targets
          // `creator_addr`.
-         dispatch_reserve_create(self, data);
+         dispatch_reserve_create(self, data, chain_code);
          break;
 
       case AttestationType::ATTESTATION_TYPE_RESERVE_CREATE_CANCEL:
@@ -610,7 +665,7 @@ void dispatch_attestation(name self, uint64_t attestation_id,
          // against `matchreserve` is lost the reserv contract no-ops; if
          // won it flips status to CANCELLED + queues a RESERVE_CREATE_CANCELLED
          // back to the originating outpost so the local custody is released.
-         dispatch_reserve_create_cancel(self, data);
+         dispatch_reserve_create_cancel(self, data, chain_code);
          break;
 
       case AttestationType::ATTESTATION_TYPE_RESERVE_CREATE_CANCELLED:
@@ -722,16 +777,10 @@ void apply_consensus(name self, uint64_t chain_code, uint32_t epoch_index,
    // consumer of inbound message rows ever materialises, the emplace can be reintroduced (and the
    // matching erase left out).
 
-   // Extract + dispatch each attestation in every message of the envelope.
+   // Extract + dispatch each attestation in every message of the envelope. The proven source
+   // outpost is `chain_code` (validated by `deliver`); the per-attestation dispatch binds every
+   // value-bearing payload's own chain identifier to it (WSA-005, `source_chain_binding_ok`).
    msgch::attestations_t atts(self);
-   ChainKind from_chain = ChainKind::CHAIN_KIND_UNKNOWN;
-   {
-      sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
-      auto chain_pk = sysio::chains::chain_key{sysio::slug_name{chain_code}};
-      if (chains_tbl.contains(chain_pk)) {
-         from_chain = chains_tbl.get(chain_pk).kind;
-      }
-   }
    for (auto& msg : envelope.messages) {
       for (auto& entry : msg.payload.attestations) {
          uint64_t att_id = mint_att_id(self);
@@ -756,7 +805,7 @@ void apply_consensus(name self, uint64_t chain_code, uint32_t epoch_index,
             m_id = checksum256{rawid};
          }
          dispatch_attestation(self, att_id, entry.type, entry.data,
-                              from_chain, chain_code, m_id);
+                              chain_code, m_id);
       }
    }
 

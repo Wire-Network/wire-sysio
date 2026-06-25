@@ -730,6 +730,142 @@ BOOST_FIXTURE_TEST_CASE(dispatch_silently_drops_out_of_scope_types, sysio_dispat
    BOOST_REQUIRE_EQUAL(0u, balances.size());
 } FC_LOG_AND_RETHROW() }
 
+// ───────────────────────────── WSA-005: inbound source-chain binding ─────────────────────────────
+//
+// A consensus envelope is delivered for exactly ONE proven source outpost (the `deliver` chain_code,
+// validated against `sysio.chains`). Every value-bearing attestation it carries embeds its own chain
+// identifier; that identifier MUST equal the proven outpost. These tests drive a payload chain that
+// diverges from the proven outpost and assert the depot applies NO value-bearing effect — and never
+// throws (a throw inside the evalcons dispatch chain stalls consensus chain-wide).
+
+// OPERATOR_ACTION: a DEPOSIT_REQUEST and a WITHDRAW_REQUEST proven-delivered from the ETH outpost but
+// whose payloads claim a different active chain (SOLANA) are both dropped — no operator collateral is
+// credited and no withdraw is queued. The matched-chain control is `dispatch_routes_deposit_to_opreg`
+// / `dispatch_routes_withdraw_request_to_opreg` above, which DO credit/queue.
+BOOST_FIXTURE_TEST_CASE(operator_action_mismatched_source_chain_is_dropped,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();   // ETH outpost + UWRIT_OP (EVM authex link)
+
+   const auto eth_code = fc::slug_name{"ETH"}.value;
+   const auto sol_code = fc::slug_name{"SOLANA"}.value;
+   constexpr int64_t DEPOSIT_AMOUNT  = 1'000'000;
+   constexpr int64_t WITHDRAW_AMOUNT =   400'000;
+
+   // SOLANA is a real, active outpost, so the ONLY thing wrong with the payloads below is that they
+   // were proven-delivered from ETH rather than SOLANA — the exact WSA-005 forgery.
+   BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, "regchain"_n, mvo()
+      ("kind", ChainKind::CHAIN_KIND_SVM)("code", codename_mvo("SOLANA"))
+      ("external_chain_id", 900)("name", std::string("solana-test"))("description", std::string{})));
+
+   auto deposit_sol = encode_operator_action(
+      sysio::opp::attestations::OperatorAction::ACTION_TYPE_DEPOSIT_REQUEST,
+      sysio::opp::types::CHAIN_KIND_EVM, uwrit_op_eth_pubkey,
+      /*chain_code_v=*/ sol_code, /*token_code_v=*/ sol_code, DEPOSIT_AMOUNT);
+   auto withdraw_sol = encode_operator_action(
+      sysio::opp::attestations::OperatorAction::ACTION_TYPE_WITHDRAW_REQUEST,
+      sysio::opp::types::CHAIN_KIND_EVM, uwrit_op_eth_pubkey,
+      /*chain_code_v=*/ sol_code, /*token_code_v=*/ sol_code, WITHDRAW_AMOUNT);
+
+   // Proven outpost = ETH; both payloads claim SOLANA. deliver() must SUCCEED (the binding drops the
+   // attestations inside dispatch — it must not abort the envelope).
+   BOOST_REQUIRE_EQUAL(success(), deliver(/*chain_code=*/eth_code,
+      encode_envelope_with_attestations(current_epoch(),
+         sysio::opp::types::ATTESTATION_TYPE_OPERATOR_ACTION, {deposit_sol, withdraw_sol})));
+
+   auto op = get_operator(UWRIT_OP);
+   BOOST_REQUIRE(!op.is_null());
+   BOOST_REQUIRE_EQUAL(0u, op["balances"].get_array().size());   // no collateral on any chain
+   BOOST_REQUIRE(get_wtdw(/*request_id=*/1).is_null());          // no withdraw queued
+} FC_LOG_AND_RETHROW() }
+
+// SWAP_REQUEST: a swap whose `source_chain_code` does not match the proven delivering outpost must be
+// refunded (SwapRevert) and create NO uwreq — settling it would draw against the named source reserve
+// while the user's deposit sits on a different chain. Same SwapRequest delivered from its real source
+// outpost is the control: it creates the uwreq.
+BOOST_FIXTURE_TEST_CASE(swap_request_mismatched_source_chain_is_refunded,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();   // ETH source outpost
+   BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, "regchain"_n, mvo()
+      ("kind", ChainKind::CHAIN_KIND_SVM)("code", codename_mvo("SOLANA"))
+      ("external_chain_id", 900)("name", std::string("solana-test"))("description", std::string{})));
+   setup_wire_token_and_reserves();   // ACTIVE ETH/ETH/PRIMARY + SOLANA/SOL/PRIMARY reserves
+   BOOST_REQUIRE_EQUAL(success(), depositinle_credit(UWRIT_OP, "ETH",    "ETH", 1'000'000'000));
+   BOOST_REQUIRE_EQUAL(success(), depositinle_credit(UWRIT_OP, "SOLANA", "SOL", 1'000'000'000));
+
+   const auto eth       = fc::slug_name{"ETH"}.value;
+   const auto sol_chain = fc::slug_name{"SOLANA"}.value;
+   const auto sol_token = fc::slug_name{"SOL"}.value;
+   const auto primary   = fc::slug_name{"PRIMARY"}.value;
+
+   // A fully valid ETH->SOLANA swap (source leg = ETH).
+   const auto sr = encode_swap_request(
+      ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0a'),
+      eth, eth, primary, /*src_amount*/ 100,
+      sol_chain, sol_token, primary, /*target*/ 100,
+      5000, ChainKind::CHAIN_KIND_SVM, std::vector<char>(32, '\x0b'));
+
+   // Mismatch: proven delivering outpost = SOLANA, but source_chain_code = ETH -> refund, no uwreq.
+   BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(/*att_id*/ 9001, /*proven=*/ sol_chain, sr));
+   BOOST_REQUIRE(get_uwreq(9001).is_null());
+
+   // Control: same SwapRequest proven-delivered from its real source outpost (ETH) -> uwreq created.
+   BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(/*att_id*/ 9002, /*proven=*/ eth, sr));
+   BOOST_REQUIRE(!get_uwreq(9002).is_null());
+} FC_LOG_AND_RETHROW() }
+
+// UNDERWRITE_INTENT_COMMIT: the same signed dest-leg (SOLANA) commit, delivered through the FULL
+// deliver->evalcons->apply_consensus->dispatch path, is recorded only when its proven outpost matches
+// `uic.chain_code`. Delivered from ETH it is dropped (no commit); delivered from SOLANA it lands.
+BOOST_FIXTURE_TEST_CASE(underwrite_commit_mismatched_source_chain_is_dropped,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+   BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, "regchain"_n, mvo()
+      ("kind", ChainKind::CHAIN_KIND_SVM)("code", codename_mvo("SOLANA"))
+      ("external_chain_id", 900)("name", std::string("solana-test"))("description", std::string{})));
+   setup_wire_token_and_reserves();
+   BOOST_REQUIRE_EQUAL(success(), depositinle_credit(UWRIT_OP, "ETH",    "ETH", 1'000'000'000));
+   BOOST_REQUIRE_EQUAL(success(), depositinle_credit(UWRIT_OP, "SOLANA", "SOL", 1'000'000'000));
+
+   const auto eth       = fc::slug_name{"ETH"}.value;
+   const auto sol_chain = fc::slug_name{"SOLANA"}.value;
+   const auto sol_token = fc::slug_name{"SOL"}.value;
+   const auto primary   = fc::slug_name{"PRIMARY"}.value;
+   constexpr uint64_t ATT_ID = 9100;
+
+   // Create the uwreq (ETH source, SOLANA dest) via the proven ETH outpost.
+   const auto sr = encode_swap_request(
+      ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0a'),
+      eth, eth, primary, 100, sol_chain, sol_token, primary, 100,
+      5000, ChainKind::CHAIN_KIND_SVM, std::vector<char>(32, '\x0b'));
+   BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(ATT_ID, /*proven=*/ eth, sr));
+   BOOST_REQUIRE(!get_uwreq(ATT_ID).is_null());
+
+   // One signed dest-leg (SOLANA) UIC, wrapped in an envelope. The outpost it is proven-delivered
+   // from is the ONLY thing that varies between the two deliveries below.
+   const auto uic_sol = make_signed_uic(UWRIT_OP, ATT_ID, /*outpost_id*/ sol_chain,
+                                        /*chain_code*/ sol_chain, sol_token, primary);
+   const auto uic_env = encode_envelope_with_one_attestation(
+      current_epoch(), sysio::opp::types::ATTESTATION_TYPE_UNDERWRITE_INTENT_COMMIT,
+      std::string(uic_sol.begin(), uic_sol.end()));
+
+   auto dest_committed = [&]() {
+      auto req = get_uwreq(ATT_ID);
+      for (const auto& c : req["commits_by"].get_array())
+         if (c["underwriter"].as_string() == UWRIT_OP.to_string() &&
+             c["dest_received_at_ms"].as_uint64() != 0)
+            return true;
+      return false;
+   };
+
+   // Mismatch: a SOLANA-leg commit proven-delivered from the ETH outpost is dropped — no commit.
+   BOOST_REQUIRE_EQUAL(success(), deliver(/*proven=*/ eth, uic_env));
+   BOOST_REQUIRE(!dest_committed());
+
+   // Control: the SAME commit proven-delivered from the SOLANA outpost is recorded.
+   BOOST_REQUIRE_EQUAL(success(), deliver(/*proven=*/ sol_chain, uic_env));
+   BOOST_REQUIRE(dest_committed());
+} FC_LOG_AND_RETHROW() }
+
 // A second `deliver` from the SAME operator for the same outpost+epoch must REVERT, not land as a
 // recorded no-op: a reverted transaction is never included in a block and bills no CPU/NET, whereas
 // the previous soft print-and-return shape charged the operator and consumed block space for zero
