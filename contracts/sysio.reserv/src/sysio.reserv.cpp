@@ -661,6 +661,12 @@ void reserve::applyswap(sysio::slug_name src_chain_code,
                                                     src_amount);
    sysio::check(w_gross > 0, "applyswap: WIRE intermediate is zero");
    const auto fee = opp::amm::split_wire_fee(w_gross, uwrit_fee_bps(), FEE_REWARD_SHARE_BPS);
+   // SEC-26 / WSA-042 settlement backstop: a zero post-fee WIRE leg credits no
+   // WIRE to the destination reserve below while still debiting its chain side
+   // — draining it at an arbitrary price. `net == 0` is only reachable at a
+   // 100% fee, which `sysio.uwrit::setconfig` rejects (MAX_FEE_BPS), so this is
+   // unreachable defense-in-depth rather than a live path.
+   sysio::check(fee.net > 0, "applyswap: zero post-fee WIRE would credit no destination liquidity");
    sysio::check(src_it->reserve_wire_amount >= w_gross,
                 "applyswap: insufficient source reserve WIRE for intermediate");
    sysio::check(dst_it->reserve_chain_amount >= dst_amount,
@@ -705,6 +711,10 @@ void reserve::applyfromwire(sysio::slug_name dst_chain_code,
    // `swapfromwire` time, so custody stays balanced (net -> Σwire, rewards ->
    // bucket, emissions -> transferred out).
    const auto fee = opp::amm::split_wire_fee(wire_in, uwrit_fee_bps(), FEE_REWARD_SHARE_BPS);
+   // SEC-26 / WSA-042 settlement backstop — see applyswap. A zero post-fee WIRE
+   // leg would debit the destination reserve below while crediting zero WIRE.
+   // Unreachable given `sysio.uwrit::setconfig`'s MAX_FEE_BPS cap.
+   sysio::check(fee.net > 0, "applyfromwire: zero post-fee WIRE would credit no destination liquidity");
 
    tbl.modify(ram_payer, pk, [&](auto& row) {
       add_capped_u64(row.reserve_wire_amount, fee.net);

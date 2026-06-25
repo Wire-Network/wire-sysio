@@ -612,7 +612,12 @@ uint64_t next_fromwire_id(name self) {
 void uwrit::setconfig(uint32_t fee_bps,
                       uint64_t collateral_lock_duration_ms) {
    require_auth(get_self());
-   check(fee_bps <= 10000, "fee_bps cannot exceed 10000 (100%)");
+   // Reject a 100% (or higher) fee: it zeroes the post-fee WIRE leg
+   // (`net == 0`), which let a swap debit destination reserve liquidity while
+   // crediting zero WIRE (SEC-26 / WSA-042). MAX_FEE_BPS == 9999 keeps the
+   // remainder positive for every positive input.
+   check(fee_bps <= MAX_FEE_BPS,
+         "fee_bps must be below 10000 (100%): a 100% fee zeroes the post-fee WIRE leg");
    check(collateral_lock_duration_ms > 0,
          "collateral_lock_duration_ms must be positive");
 
