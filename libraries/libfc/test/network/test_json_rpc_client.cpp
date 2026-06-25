@@ -25,6 +25,18 @@ using tcp = boost::asio::ip::tcp;
 constexpr size_t OVERSIZED_RESPONSE_BODY_BYTES = 2 * 1024 * 1024;
 
 /**
+ * Return a loopback port that has no listener after this function returns.
+ */
+uint16_t closed_loopback_port() {
+   boost::asio::io_context io;
+   tcp::acceptor acceptor(io, tcp::endpoint(boost::asio::ip::make_address("127.0.0.1"), 0));
+   const auto port = acceptor.local_endpoint().port();
+   boost::system::error_code ec;
+   acceptor.close(ec);
+   return port;
+}
+
+/**
  * HTTP endpoint that reads one request and deliberately withholds the response.
  */
 class hanging_http_server {
@@ -182,6 +194,13 @@ bool is_response_body_limit_error(const fc::exception& e) {
    return e.to_detail_string().find("response body limit") != std::string::npos;
 }
 
+/**
+ * Return true when the exception came from bounded DNS refresh.
+ */
+bool is_resolve_timeout_error(const fc::exception& e) {
+   return e.to_detail_string().find("JSON-RPC resolve timed out") != std::string::npos;
+}
+
 } // namespace
 
 BOOST_AUTO_TEST_SUITE(json_rpc_client_tests)
@@ -203,6 +222,22 @@ BOOST_AUTO_TEST_CASE(call_times_out_when_http_response_hangs) {
    const auto elapsed = fc::time_point::now() - start;
 
    BOOST_CHECK_LT(elapsed.count(), 1500 * 1000);
+}
+
+/// Refreshing stale cached endpoints must observe the active RPC deadline.
+BOOST_AUTO_TEST_CASE(stale_endpoint_refresh_respects_expired_deadline) {
+   fc::network::json_rpc::json_rpc_client client(
+      fc::url("http://127.0.0.1:" + std::to_string(closed_loopback_port())));
+
+   BOOST_CHECK_THROW(client.call("wire_stale_cache_probe"), fc::exception);
+
+   BOOST_CHECK_EXCEPTION(
+      [&] {
+         fc::task::deadline_scope deadline(fc::time_point::now() - fc::milliseconds(1));
+         client.call("wire_stale_cache_probe");
+      }(),
+      fc::timeout_exception,
+      is_resolve_timeout_error);
 }
 
 /// A peer that completes HTTP 200 with an oversized body must be rejected by

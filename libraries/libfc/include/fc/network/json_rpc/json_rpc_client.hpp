@@ -80,8 +80,11 @@ private:
    // Perform HTTP POST with JSON payload; optionally parse JSON body.
    variant send_json(const variant& payload, bool expect_json_body = true);
 
-   /// Resolve the configured host and replace the cached endpoint set.
+   /// Resolve the configured host and replace the cached endpoint set without a per-RPC deadline.
    void refresh_resolved_endpoints();
+
+   /// Refresh stale cached endpoints using the active RPC deadline when one exists.
+   void refresh_resolved_endpoints_with_active_deadline();
 
    /// Mark cached endpoints stale after a connection failure.
    void mark_resolved_endpoints_stale();

@@ -144,16 +144,26 @@ void run_async_op(asio::io_context& ioc,
    }
 }
 
-/// Resolve DNS for the long-lived client cache outside the per-RPC transport deadline.
+/// Resolve DNS for the long-lived client cache, optionally bounded by an RPC deadline.
 tcp::resolver::results_type resolve_endpoints(asio::io_context& ioc,
                                               const std::string& host,
-                                              const std::string& port) {
+                                              const std::string& port,
+                                              const std::optional<fc::time_point>& deadline_abs) {
    tcp::resolver resolver{ioc};
-   boost::system::error_code ec;
-   auto results = resolver.resolve(host, port, ec);
-   if (ec) {
-      throw_transport_error(ec, OP_RESOLVE);
-   }
+   tcp::resolver::results_type results;
+
+   run_async_op(ioc, deadline_abs, OP_RESOLVE,
+      [&](const async_complete_fn& complete) {
+         resolver.async_resolve(host, port,
+            [&results, complete](const boost::system::error_code& ec, tcp::resolver::results_type resolved) {
+               if (!ec) {
+                  results = std::move(resolved);
+               }
+               complete(ec);
+            });
+      },
+      [&] { resolver.cancel(); });
+
    return results;
 }
 
@@ -356,7 +366,12 @@ json_rpc_client::json_rpc_client(fc::url                           url,
 }
 
 void json_rpc_client::refresh_resolved_endpoints() {
-   _resolved_endpoints = resolve_endpoints(_io_ctx, _host, _port);
+   _resolved_endpoints = resolve_endpoints(_io_ctx, _host, _port, std::nullopt);
+   _resolved_endpoints_stale = false;
+}
+
+void json_rpc_client::refresh_resolved_endpoints_with_active_deadline() {
+   _resolved_endpoints = resolve_endpoints(_io_ctx, _host, _port, active_transport_deadline());
    _resolved_endpoints_stale = false;
 }
 
@@ -366,7 +381,7 @@ void json_rpc_client::mark_resolved_endpoints_stale() {
 
 const json_rpc_client::tcp::resolver::results_type& json_rpc_client::resolved_endpoints() {
    if (_resolved_endpoints_stale || _resolved_endpoints.empty()) {
-      refresh_resolved_endpoints();
+      refresh_resolved_endpoints_with_active_deadline();
    }
    return _resolved_endpoints;
 }
