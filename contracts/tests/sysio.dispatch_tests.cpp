@@ -922,6 +922,35 @@ BOOST_FIXTURE_TEST_CASE(dispatch_routes_node_owner_reg_to_roa, sysio_dispatch_te
    BOOST_REQUIRE_EQUAL(audit["status"].as<uint64_t>(), 0u);  // CONFIRMED
 } FC_LOG_AND_RETHROW() }
 
+// WSA-005: NodeOwnerRegistration is an Ethereum-family claim (ERC1155 NFT + ETH actor key) carrying
+// no exact chain code, so it is bound by VM family — a registration proven-delivered from a NON-EVM
+// outpost (SOLANA) must be dropped, with no Wire account / node-owner state created. The matched-chain
+// control is `dispatch_routes_node_owner_reg_to_roa` above, which registers from the ETH outpost.
+BOOST_FIXTURE_TEST_CASE(node_owner_reg_from_non_evm_outpost_is_dropped, sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();   // ETH (EVM) outpost
+   // A second, active, NON-EVM outpost the forged claim is proven-delivered from.
+   BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, "regchain"_n, mvo()
+      ("kind", ChainKind::CHAIN_KIND_SVM)("code", codename_mvo("SOLANA"))
+      ("external_chain_id", 900)("name", std::string("solana-test"))("description", std::string{})));
+   const auto sol_code = fc::slug_name{"SOLANA"}.value;
+
+   auto wire_key  = k1_pubkey_bytes(get_public_key(CLAIM_ACCOUNT, "active"));
+   auto eth_pub   = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em).get_public_key();
+   auto eth_bytes = em_pubkey_bytes(eth_pub);
+   auto payload   = encode_node_owner_registration(
+      CLAIM_ACCOUNT.to_string(), /*tier=*/2,
+      sysio::opp::types::WIRE_KEY_TYPE_K1, wire_key, eth_bytes);
+   auto envelope  = encode_envelope_with_one_attestation(
+      current_epoch(), sysio::opp::types::ATTESTATION_TYPE_NODE_OWNER_REG, payload);
+
+   // Proven outpost = SOLANA (SVM); the VM-family gate drops it. deliver() still succeeds (no throw).
+   BOOST_REQUIRE_EQUAL(success(), deliver(/*chain_code=*/sol_code, envelope));
+
+   // Nothing was sent to sysio.roa: no node-owner registration and no audit row.
+   BOOST_REQUIRE(get_nodeowner(CLAIM_ACCOUNT).is_null());
+   BOOST_REQUIRE(get_nodeownerreg(CLAIM_ACCOUNT).is_null());
+} FC_LOG_AND_RETHROW() }
+
 /// Regression: a non-advancing advance() must not permanently strand the epoch.
 ///
 /// When every active outpost has reached consensus and the wall clock has passed, chkcons triggers

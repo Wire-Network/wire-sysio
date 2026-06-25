@@ -244,6 +244,17 @@ name resolve_account_from_op_address(const opp::types::ChainAddress& op_address)
    return false;
 }
 
+/// Resolve the VM family (`ChainKind`) of an outpost by its `chain_code` (slug_name value), reading
+/// the authoritative `sysio.chains` registry. Returns `CHAIN_KIND_UNKNOWN` when no row exists — the
+/// caller treats that as "not the expected family, drop". Used by the value-bearing paths whose
+/// payload carries NO exact chain code to match (NodeOwnerRegistration), so binding is by family.
+ChainKind chain_kind_for(uint64_t chain_code) {
+   sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
+   auto pk = sysio::chains::chain_key{sysio::slug_name{chain_code}};
+   if (!chains_tbl.contains(pk)) return ChainKind::CHAIN_KIND_UNKNOWN;
+   return chains_tbl.get(pk).kind;
+}
+
 /// Decode an OperatorAction sub-message and dispatch to the appropriate
 /// sysio.opreg action. Called from the inbound dispatch loop in `evalcons`.
 ///
@@ -539,7 +550,23 @@ std::optional<sysio::public_key> em_pubkey_from_eth_bytes(const std::vector<char
 /// *claim* is bad (name wrong length for tier, account held by a different key, already registered)
 /// is soft-failed inside nodeownreg, which records a REJECTED audit row. Neither path aborts the
 /// dispatching transaction.
-void dispatch_node_owner_reg(const std::vector<char>& data) {
+///
+/// WSA-005 source binding: this path is value-bearing (it creates a Wire account, registers a node
+/// owner, and records an ETH authex link, with the consensus-reached attestation as the sole proof),
+/// but `NodeOwnerRegistration` carries no exact chain code to match against the proven source outpost
+/// -- the claim is an ERC1155 NFT deposit identified only by `ChainAddress` fields. So it is bound by
+/// VM family instead: the registration is an Ethereum-family claim (the depositor's `actor_pub_key`
+/// is an EVM secp256k1 key), and is accepted only when the proven source outpost (`chain_code`) is an
+/// EVM chain. This stops a quorum for a non-EVM (SVM/WIRE) outpost from driving Wire-side node-owner
+/// state off a forged claim. Exact single-chain binding would require a chain-code field on the
+/// claim proto (a coordinated outpost change); the family gate closes the cross-VM-family hole today.
+void dispatch_node_owner_reg(const std::vector<char>& data, uint64_t chain_code) {
+   if (chain_kind_for(chain_code) != ChainKind::CHAIN_KIND_EVM) {
+      sysio::print("msgch::dispatch_node_owner_reg: DROP -- proven source outpost chain_code=",
+                   chain_code, " is not an EVM outpost (node-owner registration is Ethereum-only)\n");
+      return;
+   }
+
    opp::attestations::NodeOwnerRegistration reg;
    {
       auto in = zpp::bits::in{std::span{data.data(), data.size()}, zpp::bits::no_size{}};
@@ -710,7 +737,7 @@ void dispatch_attestation(name self, uint64_t attestation_id,
       case AttestationType::ATTESTATION_TYPE_NODE_OWNER_REG:
          // NFT node-owner claim: create the account + register + record the ETH link. Self-contained
          // (decodes NodeOwnerRegistration, inline-sends sysio.roa); soft-drops a malformed envelope.
-         dispatch_node_owner_reg(data);
+         dispatch_node_owner_reg(data, chain_code);
          break;
 
       case AttestationType::ATTESTATION_TYPE_PRETOKEN_PURCHASE:
@@ -779,7 +806,9 @@ void apply_consensus(name self, uint64_t chain_code, uint32_t epoch_index,
 
    // Extract + dispatch each attestation in every message of the envelope. The proven source
    // outpost is `chain_code` (validated by `deliver`); the per-attestation dispatch binds every
-   // value-bearing payload's own chain identifier to it (WSA-005, `source_chain_binding_ok`).
+   // value-bearing payload to it (WSA-005) -- by exact chain_code via `source_chain_binding_ok`
+   // where the payload carries one, and by VM family for NodeOwnerRegistration, which carries no
+   // chain code and is gated to the EVM outpost family in `dispatch_node_owner_reg`.
    msgch::attestations_t atts(self);
    for (auto& msg : envelope.messages) {
       for (auto& entry : msg.payload.attestations) {
