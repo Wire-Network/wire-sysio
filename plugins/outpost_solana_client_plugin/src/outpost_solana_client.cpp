@@ -9,6 +9,7 @@
 #include <fc/crypto/sha256.hpp>
 #include <fc/exception/exception.hpp>
 #include <fc/log/logger.hpp>
+#include <fc/task/deadline.hpp>
 #include <fc/variant_object.hpp>
 
 #include <sysio/opp/opp.hpp>
@@ -319,6 +320,7 @@ std::string outpost_solana_client::deliver_outbound_envelope(
    const std::vector<char>& envelope_bytes,
    fc::microseconds         deadline) {
    const auto deadline_abs = fc::time_point::now() + deadline;
+   fc::task::deadline_scope rpc_deadline(deadline_abs);
 
    const size_t total = envelope_bytes.size();
    FC_ASSERT(total > 0,
@@ -480,6 +482,8 @@ std::vector<char> outpost_solana_client::read_inbound_envelope(
    uint32_t         epoch_index,
    fc::microseconds deadline) {
    const auto deadline_abs = fc::time_point::now() + deadline;
+   fc::task::deadline_scope rpc_deadline(deadline_abs);
+
    throw_if_past_deadline(deadline_abs, OP_READ_LATEST);
 
    // Single RPC: fetch the `latest_outbound_envelope` PDA. The Solana
@@ -537,6 +541,12 @@ std::vector<char> outpost_solana_client::read_inbound_envelope(
    }
 
    const uint32_t data_len = read_u32_le(buf, LATEST_VEC_LEN_OFF);
+   if (data_len > SOLANA_MAX_ENVELOPE_BYTES) {
+      wlog("outpost_solana_client[{}]: latest_outbound_envelope data length "
+           "{} exceeds envelope cap of {} bytes",
+           to_string(), data_len, SOLANA_MAX_ENVELOPE_BYTES);
+      return {};
+   }
    if (LATEST_DATA_OFF + data_len > buf.size()) {
       wlog("outpost_solana_client[{}]: latest_outbound_envelope data length "
            "{} exceeds account size {}",
@@ -573,6 +583,8 @@ std::string outpost_solana_client::uw_commit(
    const std::vector<char>& uic_bytes,
    fc::microseconds         deadline) {
    const auto deadline_abs = fc::time_point::now() + deadline;
+   fc::task::deadline_scope rpc_deadline(deadline_abs);
+
    throw_if_past_deadline(deadline_abs, OP_UW_COMMIT);
 
    // `commit_underwrite(uic_bytes: bytes)` — opaque relay. The typed
