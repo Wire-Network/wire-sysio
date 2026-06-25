@@ -524,6 +524,8 @@ namespace sysio {
        */
       bool is_key_authorized(const chain::public_key_type& key) const;
       bool needs_auth() const;
+      /// Return the configured initial ordinary-frame gate state for a connection.
+      bool initial_peer_authenticated() const;
       chain::public_key_type get_authentication_key() const;
       chain::signature_type sign_compact(const chain::public_key_type& signer, const fc::sha256& digest) const;
 
@@ -734,7 +736,8 @@ namespace sysio {
       std::atomic<bp_connection_type> bp_connection = bp_connection_type::non_bp;
       block_status_monitor    block_status_monitor_;
       std::atomic<time_point> last_vote_received;
-      std::atomic<bool>       peer_authenticated{true}; // set false in recv_handshake when needs_auth()
+      /// True once this peer may send ordinary frames to normal handlers.
+      std::atomic<bool>       peer_authenticated{false};
 
       alignas(hardware_destructive_interference_sz)
       peer_scoring::peer_score peer_score_;
@@ -869,6 +872,9 @@ namespace sysio {
 
       void cancel_sync_wait();
       void sync_wait();
+
+      /// Reset the ordinary-frame gate to the configured peer-auth policy's initial state.
+      void reset_peer_authentication_state();
 
       void queue_write(msg_type_t net_msg,
                        std::optional<block_num_type> block_num,
@@ -1133,6 +1139,7 @@ namespace sysio {
       listen_address = host + ":" + port; // do not include type in listen_address to avoid peer setting type on connection
       set_connection_type( peer_address() );
       my_impl->mark_configured_bp_connection(this);
+      reset_peer_authentication_state();
       fc_ilog( p2p_conn_log, "created connection - {} to {}", connection_id, endpoint );
    }
 
@@ -1149,6 +1156,7 @@ namespace sysio {
    {
       /// The locally configured address type is authoritative; a peer's advertised address may only narrow it later.
       set_connection_type( listen_address );
+      reset_peer_authentication_state();
       fc_dlog( p2p_conn_log, "new connection - {} object created for peer {}:{} from listener {}",
                connection_id, log_remote_endpoint_ip, log_remote_endpoint_port, listen_address );
    }
@@ -1257,6 +1265,10 @@ namespace sysio {
       conn_state = s;
    }
 
+   void connection::reset_peer_authentication_state() {
+      peer_authenticated.store(my_impl->initial_peer_authenticated(), std::memory_order_relaxed);
+   }
+
    connection_status connection::get_status()const {
       connection_status stat;
       stat.connection_id = connection_id;
@@ -1294,6 +1306,7 @@ namespace sysio {
          peer_dlog( p2p_conn_log, this, "connected" );
          socket_open = true;
          connection_start_time = get_time();
+         reset_peer_authentication_state();
          start_read_message();
          return true;
       }
@@ -1368,7 +1381,7 @@ namespace sysio {
          conn_node_id = fc::sha256();
          last_block_nack_request_message_id = block_id_type{};
       }
-      peer_authenticated.store(true, std::memory_order_relaxed); // reset; will be set false on next handshake if auth required
+      reset_peer_authentication_state();
       peer_fork_db_root_num.store( 0, std::memory_order_relaxed );
       peer_ping_time_ns = std::numeric_limits<decltype(peer_ping_time_ns)::value_type>::max();
       peer_requested.reset();
@@ -4359,6 +4372,10 @@ namespace sysio {
 
    bool net_plugin_impl::needs_auth() const {
       return auth_config.needs_auth();
+   }
+
+   bool net_plugin_impl::initial_peer_authenticated() const {
+      return auth_config.initial_peer_authenticated();
    }
 
    chain::public_key_type net_plugin_impl::get_authentication_key() const {
