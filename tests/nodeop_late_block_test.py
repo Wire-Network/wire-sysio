@@ -26,6 +26,10 @@ errorExit=Utils.errorExit
 args=TestHelper.parse_args({"-d","--keep-logs","--dump-error-details","-v","--leave-running","--unshared"})
 pnodes=4
 total_nodes=pnodes + 1
+canonicalConvergenceTimeout=90
+expectedIProducerBlocks=9
+forkSwitchLogTimeout=30
+producerSlotBlockCount=12
 delay=args.d
 debug=args.v
 dumpErrorDetails=args.dump_error_details
@@ -57,42 +61,93 @@ try:
     cluster.waitOnClusterSync(blockAdvancing=5)
 
     node3 = cluster.getNode(3)
+    node2 = cluster.getNode(2)
     node4 = cluster.getNode(4) # bridge between 2 & 3
+
+    def firstBlockForProducer(node, producer, blockNum):
+        """Return the first contiguous block produced by producer ending at blockNum."""
+        firstBlockNum = blockNum
+        while firstBlockNum > 1:
+            previousBlock = node.getBlock(firstBlockNum - 1, silentErrors=True, exitOnError=False)
+            if previousBlock is None or previousBlock["producer"] != producer:
+                break
+            firstBlockNum -= 1
+        return firstBlockNum
+
+    def getProducerBlockIds(node, producer, firstBlockNum, maxBlocks):
+        """Return contiguous producer block numbers and IDs starting at firstBlockNum."""
+        blocks = []
+        for blockNum in range(firstBlockNum, firstBlockNum + maxBlocks):
+            block = node.getBlock(blockNum, silentErrors=True, exitOnError=False)
+            if block is None:
+                return None
+            if block["producer"] != producer:
+                break
+            blocks.append({"block_num": blockNum, "id": block["id"]})
+        return blocks
 
     Print("Wait for producer before j")
     node3.waitForAnyProducer("defproducerh", exitOnError=True)
     node3.waitForAnyProducer("defproduceri", exitOnError=True)
     iProdBlockNum = node3.getHeadBlockNum()
+    firstIProdBlockNum = firstBlockForProducer(node3, "defproduceri", iProdBlockNum)
 
     node4.kill(signal.SIGTERM)
     assert not node4.verifyAlive(), "Node4 did not shutdown"
 
     Print("Wait until Node_03 is well into its isolated fork (defproducerl)")
     node3.waitForProducer("defproducerl", exitOnError=True)
+    isolatedForkInfo = node3.getInfo(exitOnError=True)
+    isolatedForkHeadId = isolatedForkInfo["head_block_id"]
+    isolatedForkHeadNum = isolatedForkInfo["head_block_num"]
+    def collectCanonicalIProducerBlocks():
+        """Return canonical defproduceri blocks once node_02 has the whole verification window."""
+        blocks = getProducerBlockIds(node2, "defproduceri", firstIProdBlockNum, producerSlotBlockCount)
+        if blocks is None or len(blocks) < expectedIProducerBlocks:
+            return None
+        return blocks[:expectedIProducerBlocks]
+    canonicalIProducerBlocks = Utils.waitForObj(collectCanonicalIProducerBlocks, timeout=forkSwitchLogTimeout)
+    assert canonicalIProducerBlocks, \
+        f"Expected at least {expectedIProducerBlocks} canonical defproduceri blocks from block {firstIProdBlockNum}"
 
     Print("Relaunch bridge to reconnect Node_02 and Node_03")
     node4.relaunch()
 
-    Print("Verify Node_03 fork switches even though it is producing")
-    node3.waitForProducer("defproduceri", exitOnError=True)
+    Print("Verify Node_03 converges from its isolated fork back to Node_02's canonical branch")
+    def node3ConvergedToCanonicalBranch():
+        """Return true when node_03 has adopted node_02's canonical block at the fork height."""
+        info = node3.getInfo(silentErrors=True, exitOnError=False)
+        if info is None or info["head_block_id"] == isolatedForkHeadId:
+            return False
+
+        node3Block = node3.getBlock(isolatedForkHeadNum, silentErrors=True, exitOnError=False)
+        node2Block = node2.getBlock(isolatedForkHeadNum, silentErrors=True, exitOnError=False)
+        return node3Block is not None \
+            and node2Block is not None \
+            and node3Block["id"] == node2Block["id"] \
+            and node3Block["id"] != isolatedForkHeadId
+
+    assert Utils.waitForBool(node3ConvergedToCanonicalBranch, timeout=canonicalConvergenceTimeout), \
+        f"Expected node_03 to leave isolated fork head #{isolatedForkHeadNum} {isolatedForkHeadId} " \
+        "and converge to node_02's canonical branch at that height"
 
     Print("Verify fork switch - poll for log entry in case sync is still settling")
     # The fork switch log may reference any of node_03's producers (j, k, or l) depending
     # on exactly when the bridge reconnects and blocks propagate.
     def findForkSwitch():
+        """Return the log line number for node_03 switching away from one of its fork producers."""
         return node3.findInLog("switching forks .* defproducer[jkl]")
-    switchForkLineNum = Utils.waitForBool(findForkSwitch, timeout=30)
+    switchForkLineNum = Utils.waitForObj(findForkSwitch, timeout=forkSwitchLogTimeout)
     assert switchForkLineNum, "Expected to find 'switching forks' from a node_03 producer in node_03 log"
 
     # Verify the lockout-detection optimization fired: when the bridge reconnects, node_03
-    # is still inside its producing slot, and the rest of the network's blocks (carrying a
-    # strong QC for a block on the canonical branch) reach node_03's fork database. The
-    # producer plugin's in_producing_mode early-return should fall through and apply blocks
-    # immediately rather than waiting for the slot to end. Without this optimization,
-    # node_03 would orphan its entire round.
+    # is still inside its producing slot, and the rest of the network's blocks reach node_03's
+    # fork database. The producer plugin should apply blocks immediately rather than waiting
+    # for the slot to end. The block-ID assertion above verifies the externally visible result.
     def findApplyDuringProducing():
+        """Return the log line number for the lockout fast-path diagnostic."""
         return node3.findInLog("applying blocks while producing: head's branch is locked out")
-    applyDuringProducingLine = Utils.waitForBool(findApplyDuringProducing, timeout=30)
+    applyDuringProducingLine = Utils.waitForObj(findApplyDuringProducing, timeout=forkSwitchLogTimeout)
     assert applyDuringProducingLine, \
         "Expected node_03 to apply blocks mid-slot upon detecting strong-QC lockout of its isolated fork"
 
@@ -101,9 +156,12 @@ try:
 
     # verify the LIB blocks of defproduceri made it into the canonical chain
     # defproducerk has produced at least one block, but possibly more by time of relaunch, so verify only some of the round
-    for i in range(9):
-        defprod=node3.getBlockProducerByNum(iProdBlockNum + i)
-        assert defprod == "defproduceri", f"expected defproduceri for block {iProdBlockNum + i}, instead: {defprod}"
+    for canonicalBlock in canonicalIProducerBlocks:
+        block = node3.getBlock(canonicalBlock["block_num"], exitOnError=True)
+        assert block["id"] == canonicalBlock["id"], \
+            f"expected canonical defproduceri block {canonicalBlock['id']} at block {canonicalBlock['block_num']}, instead: {block['id']}"
+        assert block["producer"] == "defproduceri", \
+            f"expected defproduceri for block {canonicalBlock['block_num']}, instead: {block['producer']}"
 
     # verify that defproducerk or defproducerl blocks made it into the canonical chain
     # It can take a while to resolve the fork, but should have at least one block from node_03's
