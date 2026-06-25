@@ -912,6 +912,51 @@ BOOST_FIXTURE_TEST_CASE(swap_winner_without_dst_authex_link_is_disqualified,
    BOOST_REQUIRE(found);
 } FC_LOG_AND_RETHROW() }
 
+// [P1] WSA-041: a zero AMM quote from ACTIVE reserves must FAIL CLOSED, not skip
+// the variance check. createuwreq overloaded a zero `swap_quote` to mean "no LP
+// provisioned, skip variance" — but a zero quote also arises from a degenerate
+// ACTIVE reserve (extreme connector weights, a drained side, or — as here — a
+// `src_amount` so small the weighted-Bancor kernel floors the output to 0). With
+// variance skipped, the caller-supplied target_amount flowed straight into the
+// uwreq and on to settlement, letting a ~0 input debit an arbitrary amount.
+// Post-fix: when every required reserve is ACTIVE, a zero quote emits SWAP_REVERT
+// and creates NO uwreq. (try_select_winner and drainfwq carry the same guard.)
+BOOST_FIXTURE_TEST_CASE(swap_zero_quote_from_active_reserve_fails_closed,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();   // registers ETH
+
+   BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT,
+      "regchain"_n, mvo()
+         ("kind",              ChainKind::CHAIN_KIND_SVM)
+         ("code",              codename_mvo("SOLANA"))
+         ("external_chain_id", 900)
+         ("name",              std::string("solana-test"))
+         ("description",       std::string{})));
+
+   const uint64_t eth       = fc::slug_name{"ETH"}.value;
+   const uint64_t sol_chain = fc::slug_name{"SOLANA"}.value;
+   const uint64_t sol_token = fc::slug_name{"SOL"}.value;
+   const uint64_t primary   = fc::slug_name{"PRIMARY"}.value;
+   constexpr uint64_t ATT_ID = 6100;
+
+   // Seeds ETH/ETH and SOLANA/SOL ACTIVE reserves at 1e12/1e12.
+   setup_wire_token_and_reserves();
+
+   // src_amount = 1 against a 1e12 reserve floors token_to_wire to 0, so the
+   // chained quote is 0 — but both reserves are ACTIVE. The (huge) target must
+   // NOT slip through on a skipped variance check.
+   const auto sr = encode_swap_request(
+      ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0a'),
+      eth, eth, primary, /*src_amount*/ 1,
+      sol_chain, sol_token, primary, /*target_amount*/ 900'000'000'000ull,
+      /*tolerance_bps*/ 5000, ChainKind::CHAIN_KIND_SVM, std::vector<char>(32, '\x0b'));
+   // createuwreq never throws (it emits SWAP_REVERT and returns).
+   BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(ATT_ID, eth, sr));
+
+   // Fail closed: no uwreq was created from the unpriceable, ACTIVE-reserve swap.
+   BOOST_REQUIRE(get_uwreq(ATT_ID).is_null());
+} FC_LOG_AND_RETHROW() }
+
 // [P1] regression (r3444213199): an oversized to-WIRE target_amount must be
 // terminally REJECTED + refunded BEFORE settlement. dst_amount is the unbounded
 // cross-chain SwapRequest.target_amount; left unchecked, a value near UINT64_MAX

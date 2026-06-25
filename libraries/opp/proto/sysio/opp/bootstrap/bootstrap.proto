@@ -110,8 +110,10 @@ message ReserveSpec {
   uint64 initial_chain_amount  = 6;
   // WIRE-side seed, in WIRE subunits, drained from the earmark (quote in JSON).
   uint64 initial_wire_amount   = 7;
-  // Bancor connector weight (WIRE-side) in basis points: 1..10000; 5000 =
-  // 50/50 pure constant product. Honored by the weighted swap curve.
+  // Bancor connector weight (WIRE-side) in basis points: 1..9999; 5000 =
+  // 50/50 pure constant product. Honored by the weighted swap curve. 10000 is
+  // rejected by regreserve: it zeroes the token-side weight, so every quote is 0
+  // (a dead, unpriceable reserve).
   uint32 connector_weight_bps  = 8;
 
   // Private-reserve support (live as of the reserve-and-swap beta). A private
