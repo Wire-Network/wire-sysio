@@ -382,7 +382,7 @@ message ReserveCreate {
   string                        name                   = 4;
   string                        description            = 5;
   uint64                        requested_wire_amount  = 7;
-  uint32                        connector_weight_bps   = 8;
+  uint32                        connector_weight_bps   = 8;   // Bancor WIRE-side weight in bps (1..9999); 10000 is rejected by oncrtreserve (zero token-side weight = dead reserve).
   sysio.opp.types.ChainAddress  creator_addr           = 9;   // refund target on cancel
   // Private reserves restrict swap counterparts to reserve_codes owned by the
   // same WIRE account (ownership = the authex-linked account that matches).
