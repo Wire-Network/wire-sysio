@@ -5,6 +5,7 @@
 #include <fc/io/json.hpp>
 #include <fc/log/logger.hpp>
 #include <fc/network/ethereum/ethereum_abi.hpp>
+#include <fc/task/deadline.hpp>
 
 #include <sysio/opp/opp.hpp>
 #include <sysio/opp/opp.pb.h>
@@ -67,6 +68,7 @@ std::string outpost_ethereum_client::deliver_outbound_envelope(
    const std::vector<char>& envelope_bytes,
    fc::microseconds         deadline) {
    const auto deadline_abs = fc::time_point::now() + deadline;
+   fc::task::deadline_scope rpc_deadline(deadline_abs);
 
    throw_if_past_deadline(deadline_abs, OP_DELIVER_OUTBOUND);
    FC_ASSERT(_opp_inbound_client,
@@ -86,6 +88,8 @@ std::vector<char> outpost_ethereum_client::read_inbound_envelope(
    uint32_t         epoch_index,
    fc::microseconds deadline) {
    const auto deadline_abs = fc::time_point::now() + deadline;
+   fc::task::deadline_scope rpc_deadline(deadline_abs);
+
    throw_if_past_deadline(deadline_abs, OP_READ_INBOUND);
    FC_ASSERT(_opp_client,
              "outpost_ethereum_client[{}]: read_inbound_envelope requires an OPP "
@@ -210,6 +214,8 @@ std::string outpost_ethereum_client::uw_commit(
    const std::vector<char>& uic_bytes,
    fc::microseconds         deadline) {
    const auto deadline_abs = fc::time_point::now() + deadline;
+   fc::task::deadline_scope rpc_deadline(deadline_abs);
+
    throw_if_past_deadline(deadline_abs, OP_UW_COMMIT);
 
    FC_ASSERT(_operator_registry_client,

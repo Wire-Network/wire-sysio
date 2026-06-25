@@ -66,6 +66,25 @@ BOOST_AUTO_TEST_CASE(throws_timeout_on_deadline_expiry) {
    BOOST_CHECK_GE(elapsed.count(), 90 * 1000); // at least 90ms — some tolerance
 }
 
+/// A caller-installed deadline scope must cap a retry loop even when the
+/// retry options carry a larger timeout budget.
+BOOST_AUTO_TEST_CASE(deadline_scope_clamps_total_timeout) {
+   auto opts = fast_opts();
+   opts.total_timeout = fc::seconds(5);
+
+   const auto start = fc::time_point::now();
+   BOOST_CHECK_THROW(
+      [&] {
+         fc::task::deadline_scope deadline(fc::time_point::now() + fc::milliseconds(100));
+         retry_until<int>("scoped-deadline", opts,
+            []() -> std::optional<int> { return std::nullopt; });
+      }(),
+      fc::timeout_exception);
+   const auto elapsed = fc::time_point::now() - start;
+
+   BOOST_CHECK_LT(elapsed.count(), 1000 * 1000);
+}
+
 // A fatal exception thrown from inside the predicate must propagate out
 // unchanged — retry_until does not swallow or retry on a throw.
 BOOST_AUTO_TEST_CASE(propagates_predicate_exception) {
