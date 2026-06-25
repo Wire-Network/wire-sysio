@@ -2639,7 +2639,8 @@ namespace sysio {
    {
       fc::lock_guard g( local_txns_mtx );
 
-      const auto result = local_txns.add_transaction_notice(id, c.connection_id);
+      const time_point_sec notice_expires{fc::time_point::now() + local_txn_cache::notice_only_lifetime};
+      const auto           result = local_txns.add_transaction_notice(id, notice_expires, c.connection_id);
       apply_trx_entry_delta(c, result.delta);
 
       if (c.trx_entries_size > def_max_trx_entries_per_conn_size) {
@@ -2675,7 +2676,8 @@ namespace sysio {
       {
          fc::lock_guard g( local_txns_mtx );
          start_size = local_txns.size();
-         const std::size_t removed = local_txns.expire(fc::time_point_sec{now - def_allowed_clock_skew}); // allow for some clock-skew
+         const std::size_t removed = local_txns.expire(fc::time_point_sec{now - def_allowed_clock_skew}, // allow for some clock-skew
+                                                       fc::time_point_sec{now});
          end_size = start_size - removed;
       }
 
