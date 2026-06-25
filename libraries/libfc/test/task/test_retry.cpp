@@ -85,6 +85,22 @@ BOOST_AUTO_TEST_CASE(deadline_scope_clamps_total_timeout) {
    BOOST_CHECK_LT(elapsed.count(), 1000 * 1000);
 }
 
+/// An already-expired caller scope must fail fast instead of invoking the
+/// predicate after the caller's budget has been exhausted.
+BOOST_AUTO_TEST_CASE(expired_deadline_scope_skips_first_attempt) {
+   int calls = 0;
+
+   BOOST_CHECK_THROW(
+      [&] {
+         fc::task::deadline_scope deadline(fc::time_point::now() - fc::milliseconds(1));
+         retry_until<int>("expired-scope", fast_opts(),
+            [&]() -> std::optional<int> { ++calls; return 1; });
+      }(),
+      fc::timeout_exception);
+
+   BOOST_CHECK_EQUAL(calls, 0);
+}
+
 // A fatal exception thrown from inside the predicate must propagate out
 // unchanged — retry_until does not swallow or retry on a throw.
 BOOST_AUTO_TEST_CASE(propagates_predicate_exception) {

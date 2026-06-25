@@ -48,6 +48,8 @@ std::optional<fc::time_point> active_transport_deadline() {
    if (deadline && *deadline < fc::time_point::maximum()) {
       return deadline;
    }
+   // Preserve legacy behavior for generic callers; outpost paths install a
+   // deadline_scope before entering retry and JSON-RPC transport code.
    return std::nullopt;
 }
 
@@ -130,25 +132,16 @@ void run_async_op(asio::io_context& ioc,
    }
 }
 
-/// Resolve DNS under the same deadline budget as the following HTTP operation.
-tcp::resolver::results_type resolve_with_deadline(asio::io_context& ioc,
-                                                  const std::string& host,
-                                                  const std::string& port,
-                                                  const std::optional<fc::time_point>& deadline_abs) {
+/// Resolve DNS for the long-lived client cache outside the per-RPC transport deadline.
+tcp::resolver::results_type resolve_endpoints(asio::io_context& ioc,
+                                              const std::string& host,
+                                              const std::string& port) {
    tcp::resolver resolver{ioc};
-   tcp::resolver::results_type results;
-
-   run_async_op(ioc, deadline_abs, OP_RESOLVE,
-      [&](const async_complete_fn& complete) {
-         resolver.async_resolve(host, port,
-            [&, complete](const boost::system::error_code& ec, tcp::resolver::results_type resolved) {
-               if (!ec) {
-                  results = std::move(resolved);
-               }
-               complete(ec);
-            });
-      },
-      [&] { resolver.cancel(); });
+   boost::system::error_code ec;
+   auto results = resolver.resolve(host, port, ec);
+   if (ec) {
+      throw_transport_error(ec, OP_RESOLVE);
+   }
    return results;
 }
 
@@ -163,18 +156,40 @@ http::verb to_beast_verb(http_verb v) {
    FC_THROW("Unknown http_verb value: {}", static_cast<int>(v));
 }
 
+/// Run a connection attempt and mark cached endpoints stale if the peer set fails.
+template <typename StartFn, typename CancelFn, typename MarkStaleFn>
+void connect_with_deadline(asio::io_context& ioc,
+                           const std::optional<fc::time_point>& deadline_abs,
+                           StartFn&& start,
+                           CancelFn&& cancel,
+                           MarkStaleFn&& mark_stale) {
+   try {
+      run_async_op(ioc,
+                   deadline_abs,
+                   OP_CONNECT,
+                   std::forward<StartFn>(start),
+                   std::forward<CancelFn>(cancel));
+   } catch (const fc::timeout_exception&) {
+      throw;
+   } catch (const fc::exception&) {
+      mark_stale();
+      throw;
+   }
+}
+
 /// Execute a single HTTP/HTTPS request and return the raw Beast response.
+template <typename MarkStaleFn>
 http::response<http::string_body> send_request(asio::io_context& ioc,
                                                const fc::url& url,
-                                               http::request<http::string_body>& req) {
+                                               const tcp::resolver::results_type& dest,
+                                               http::request<http::string_body>& req,
+                                               MarkStaleFn&& mark_stale) {
    const auto scheme = url.proto();
    FC_ASSERT(scheme == HTTP_SCHEME || scheme == HTTPS_SCHEME, "Unsupported URL scheme: {}", scheme);
    FC_ASSERT(url.host(), "JSON-RPC URL is missing host");
 
    const auto host = *url.host();
-   const auto port = default_port_for(url, scheme);
    const auto deadline_abs = active_transport_deadline();
-   const auto dest = resolve_with_deadline(ioc, host, port, deadline_abs);
 
    beast::flat_buffer                buffer;
    http::response<http::string_body> res;
@@ -189,14 +204,15 @@ http::response<http::string_body> send_request(asio::io_context& ioc,
          throw_transport_error(ec, OP_TLS_SNI);
       }
 
-      run_async_op(ioc, deadline_abs, OP_CONNECT,
+      connect_with_deadline(ioc, deadline_abs,
          [&](const async_complete_fn& complete) {
             beast::get_lowest_layer(stream).async_connect(dest,
                [complete](const boost::system::error_code& ec, const tcp::endpoint&) {
                   complete(ec);
                });
          },
-         [&] { beast::get_lowest_layer(stream).close(); });
+         [&] { beast::get_lowest_layer(stream).close(); },
+         mark_stale);
       run_async_op(ioc, deadline_abs, OP_TLS_HANDSHAKE,
          [&](const async_complete_fn& complete) {
             stream.async_handshake(asio::ssl::stream_base::client, complete);
@@ -232,14 +248,15 @@ http::response<http::string_body> send_request(asio::io_context& ioc,
    } else {
       beast::tcp_stream stream{ioc};
 
-      run_async_op(ioc, deadline_abs, OP_CONNECT,
+      connect_with_deadline(ioc, deadline_abs,
          [&](const async_complete_fn& complete) {
             stream.async_connect(dest,
                [complete](const boost::system::error_code& ec, const tcp::endpoint&) {
                   complete(ec);
                });
          },
-         [&] { stream.close(); });
+         [&] { stream.close(); },
+         mark_stale);
       run_async_op(ioc, deadline_abs, OP_HTTP_WRITE,
          [&](const async_complete_fn& complete) {
             http::async_write(stream, req,
@@ -300,8 +317,36 @@ json_rpc_client json_rpc_client::create(const std::variant<std::string, fc::url>
 json_rpc_client::json_rpc_client(fc::url                           url,
                                  const std::optional<std::string>& user_agent)
    : _url(std::move(url))
+     , _host()
+     , _port()
      , _user_agent(user_agent.value_or(BOOST_BEAST_VERSION_STRING))
-     , _next_id(1) {}
+     , _next_id(1)
+     , _resolved_endpoints()
+     , _resolved_endpoints_stale(false) {
+   const auto scheme = _url.proto();
+   FC_ASSERT(scheme == HTTP_SCHEME || scheme == HTTPS_SCHEME, "Unsupported URL scheme: {}", scheme);
+   FC_ASSERT(_url.host(), "JSON-RPC URL is missing host");
+
+   _host = *_url.host();
+   _port = default_port_for(_url, scheme);
+   refresh_resolved_endpoints();
+}
+
+void json_rpc_client::refresh_resolved_endpoints() {
+   _resolved_endpoints = resolve_endpoints(_io_ctx, _host, _port);
+   _resolved_endpoints_stale = false;
+}
+
+void json_rpc_client::mark_resolved_endpoints_stale() {
+   _resolved_endpoints_stale = true;
+}
+
+const json_rpc_client::tcp::resolver::results_type& json_rpc_client::resolved_endpoints() {
+   if (_resolved_endpoints_stale || _resolved_endpoints.empty()) {
+      refresh_resolved_endpoints();
+   }
+   return _resolved_endpoints;
+}
 
 variant json_rpc_client::call(const std::string& method, const fc::variant& params) {
    const auto id = _next_id++;
@@ -403,17 +448,18 @@ fc::variant json_rpc_client::call_batch(const std::vector<fc::variant>& requests
 variant json_rpc_client::send_json(const variant& payload, bool expect_json_body) {
    auto  body = fc::json::to_string(payload, fc::json::yield_function_t{});
 
-   auto        host   = _url.host().value();
    std::string path   = _url.path().value_or(std::string(DEFAULT_HTTP_PATH));
 
    // Build HTTP request
    http::request<http::string_body> req{http::verb::post, path, HTTP_VERSION};
-   req.set(http::field::host, host);
+   req.set(http::field::host, _host);
    req.set(http::field::user_agent, _user_agent);
    req.set(http::field::content_type, "application/json");
    req.body() = body;
    req.prepare_payload();
-   auto res = send_request(_io_ctx, _url, req);
+   auto res = send_request(_io_ctx, _url, resolved_endpoints(), req, [this] {
+      mark_resolved_endpoints_stale();
+   });
 
    // Check HTTP status
    if (res.result() != http::status::ok) {
@@ -445,7 +491,7 @@ std::string json_rpc_client::send_http(http_verb verb, const std::string& path,
                                        const std::string& body,
                                        const std::string& content_type) {
    http::request<http::string_body> req{to_beast_verb(verb), path, HTTP_VERSION};
-   req.set(http::field::host, _url.host().value());
+   req.set(http::field::host, _host);
    req.set(http::field::user_agent, _user_agent);
    if (!body.empty()) {
       req.set(http::field::content_type, content_type);
@@ -453,7 +499,9 @@ std::string json_rpc_client::send_http(http_verb verb, const std::string& path,
    }
    req.prepare_payload();
 
-   auto res = send_request(_io_ctx, _url, req);
+   auto res = send_request(_io_ctx, _url, resolved_endpoints(), req, [this] {
+      mark_resolved_endpoints_stale();
+   });
 
    if (res.result() != http::status::ok) {
       FC_THROW("HTTP {} {} failed ({}): {}",
