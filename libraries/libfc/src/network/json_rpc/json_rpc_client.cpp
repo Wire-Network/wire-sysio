@@ -10,6 +10,7 @@
 #include <boost/system/system_error.hpp>
 
 #include <chrono>
+#include <cstdint>
 #include <functional>
 #include <ranges>
 #include <string_view>
@@ -36,6 +37,7 @@ constexpr std::string_view OP_TLS_HANDSHAKE   = "JSON-RPC TLS handshake";
 constexpr std::string_view OP_TLS_SHUTDOWN    = "JSON-RPC TLS shutdown";
 constexpr std::string_view OP_HTTP_WRITE      = "JSON-RPC HTTP write";
 constexpr std::string_view OP_HTTP_READ       = "JSON-RPC HTTP read";
+constexpr std::uint64_t    MAX_RESPONSE_BODY_BYTES = 1ULL * 1024ULL * 1024ULL;
 
 /// Return the explicit URL port or the scheme's default JSON-RPC transport port.
 std::string default_port_for(const fc::url& url, std::string_view scheme) {
@@ -75,11 +77,21 @@ bool is_timeout_error(const boost::system::error_code& ec) {
           ec == boost::system::errc::make_error_code(boost::system::errc::timed_out);
 }
 
+/// Identify Beast parser admission failures for oversized response bodies.
+bool is_body_limit_error(const boost::system::error_code& ec) {
+   return ec == http::error::body_limit;
+}
+
 /// Convert a low-level transport error into an fc exception.
 void throw_transport_error(const boost::system::error_code& ec,
                            std::string_view op_label) {
    if (is_timeout_error(ec)) {
       throw_transport_timeout(op_label);
+   }
+   if (is_body_limit_error(ec)) {
+      FC_THROW("{} exceeded {} byte response body limit",
+               std::string(op_label),
+               MAX_RESPONSE_BODY_BYTES);
    }
    FC_THROW("{} failed: {}", std::string(op_label), ec.message());
 }
@@ -177,6 +189,29 @@ void connect_with_deadline(asio::io_context& ioc,
    }
 }
 
+/// Read an HTTP response through a parser with a fixed response body limit.
+template <typename Stream, typename CancelFn>
+http::response<http::string_body> read_response_with_deadline(
+   asio::io_context& ioc,
+   const std::optional<fc::time_point>& deadline_abs,
+   Stream& stream,
+   beast::flat_buffer& buffer,
+   CancelFn&& cancel) {
+   http::response_parser<http::string_body> parser;
+   parser.body_limit(MAX_RESPONSE_BODY_BYTES);
+
+   run_async_op(ioc, deadline_abs, OP_HTTP_READ,
+      [&](const async_complete_fn& complete) {
+         http::async_read(stream, buffer, parser,
+            [complete](const boost::system::error_code& ec, std::size_t) {
+               complete(ec);
+            });
+      },
+      std::forward<CancelFn>(cancel));
+
+   return parser.release();
+}
+
 /// Execute a single HTTP/HTTPS request and return the raw Beast response.
 template <typename MarkStaleFn>
 http::response<http::string_body> send_request(asio::io_context& ioc,
@@ -226,13 +261,7 @@ http::response<http::string_body> send_request(asio::io_context& ioc,
                });
          },
          [&] { beast::get_lowest_layer(stream).close(); });
-      run_async_op(ioc, deadline_abs, OP_HTTP_READ,
-         [&](const async_complete_fn& complete) {
-            http::async_read(stream, buffer, res,
-               [complete](const boost::system::error_code& ec, std::size_t) {
-                  complete(ec);
-               });
-         },
+      res = read_response_with_deadline(ioc, deadline_abs, stream, buffer,
          [&] { beast::get_lowest_layer(stream).close(); });
 
       try {
@@ -265,13 +294,7 @@ http::response<http::string_body> send_request(asio::io_context& ioc,
                });
          },
          [&] { stream.close(); });
-      run_async_op(ioc, deadline_abs, OP_HTTP_READ,
-         [&](const async_complete_fn& complete) {
-            http::async_read(stream, buffer, res,
-               [complete](const boost::system::error_code& ec, std::size_t) {
-                  complete(ec);
-               });
-         },
+      res = read_response_with_deadline(ioc, deadline_abs, stream, buffer,
          [&] { stream.close(); });
 
       beast::error_code ec;

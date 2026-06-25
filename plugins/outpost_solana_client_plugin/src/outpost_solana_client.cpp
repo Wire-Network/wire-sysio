@@ -541,6 +541,12 @@ std::vector<char> outpost_solana_client::read_inbound_envelope(
    }
 
    const uint32_t data_len = read_u32_le(buf, LATEST_VEC_LEN_OFF);
+   if (data_len > SOLANA_MAX_ENVELOPE_BYTES) {
+      wlog("outpost_solana_client[{}]: latest_outbound_envelope data length "
+           "{} exceeds envelope cap of {} bytes",
+           to_string(), data_len, SOLANA_MAX_ENVELOPE_BYTES);
+      return {};
+   }
    if (LATEST_DATA_OFF + data_len > buf.size()) {
       wlog("outpost_solana_client[{}]: latest_outbound_envelope data length "
            "{} exceeds account size {}",

@@ -20,6 +20,16 @@ namespace eth = fc::network::ethereum;
 constexpr std::string_view OP_DELIVER_OUTBOUND = "deliver_outbound_envelope";
 constexpr std::string_view OP_READ_INBOUND     = "read_inbound_envelope";
 constexpr std::string_view OP_UW_COMMIT        = "uw_commit";
+constexpr size_t EVM_ABI_WORD_BYTES            = 32;
+constexpr size_t HEX_PREFIX_CHARS              = 2;
+constexpr size_t HEX_CHARS_PER_BYTE            = 2;
+constexpr size_t MAX_ENVELOPE_HEX_CHARS =
+   HEX_PREFIX_CHARS + OPP_MAX_ENVELOPE_BYTES * HEX_CHARS_PER_BYTE;
+constexpr size_t MAX_LATEST_OUTBOUND_RPC_BYTES =
+   EVM_ABI_WORD_BYTES * 3 +
+   ((OPP_MAX_ENVELOPE_BYTES + EVM_ABI_WORD_BYTES - 1) / EVM_ABI_WORD_BYTES) * EVM_ABI_WORD_BYTES;
+constexpr size_t MAX_LATEST_OUTBOUND_RPC_HEX_CHARS =
+   HEX_PREFIX_CHARS + MAX_LATEST_OUTBOUND_RPC_BYTES * HEX_CHARS_PER_BYTE;
 
 } // namespace
 
@@ -131,6 +141,12 @@ std::vector<char> outpost_ethereum_client::read_inbound_envelope(
            to_string());
       return {};
    }
+   if (raw_hex.size() > MAX_LATEST_OUTBOUND_RPC_HEX_CHARS) {
+      wlog("outpost_ethereum_client[{}]: getLatestOutboundEnvelope raw hex "
+           "({} chars) exceeds ABI envelope cap of {} chars",
+           to_string(), raw_hex.size(), MAX_LATEST_OUTBOUND_RPC_HEX_CHARS);
+      return {};
+   }
 
    const auto decoded = eth::contract_decode_data(abi, raw_hex);
    dlog("outpost_ethereum_client[{}]: getLatestOutboundEnvelope decoded={}",
@@ -185,8 +201,20 @@ std::vector<char> outpost_ethereum_client::read_inbound_envelope(
       return {};
    }
    const std::string hex_data = data_var.as_string();
+   if (hex_data.size() > MAX_ENVELOPE_HEX_CHARS) {
+      wlog("outpost_ethereum_client[{}]: latestOutboundEnvelope data_ "
+           "({} chars) exceeds envelope cap of {} chars",
+           to_string(), hex_data.size(), MAX_ENVELOPE_HEX_CHARS);
+      return {};
+   }
    const auto raw = fc::crypto::ethereum::hex_to_bytes(hex_data);
    if (raw.empty()) return {};
+   if (raw.size() > OPP_MAX_ENVELOPE_BYTES) {
+      wlog("outpost_ethereum_client[{}]: latestOutboundEnvelope raw "
+           "envelope ({} bytes) exceeds cap of {} bytes",
+           to_string(), raw.size(), OPP_MAX_ENVELOPE_BYTES);
+      return {};
+   }
 
    sysio::opp::Envelope envelope;
    if (!envelope.ParseFromArray(raw.data(), static_cast<int>(raw.size()))) {
