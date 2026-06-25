@@ -2,6 +2,13 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Git and PR Review Follow-Ups
+
+- After addressing any PR review comment, re-read the full PR diff and commit list,
+  then update the PR description so it captures the complete current PR: all
+  material behavior changes, tests, validation, and reviewer-relevant notes. Do
+  not leave the description focused only on the latest follow-up commit.
+
 ## Code Quality Standards
 
 This is blockchain infrastructure code. **Prefer the best solution over the simplest one.** Correctness, robustness, and consensus safety always take priority over brevity or speed of implementation.
