@@ -167,7 +167,9 @@ std::vector<std::string> validate(const BootstrapPlatformConfig& c) {
       const auto it = chain_kind.find(r.chain_code());
       if (it != chain_kind.end() && it->second == ChainKind::CHAIN_KIND_WIRE)
          e.push_back("V6 reserve cannot live on the depot chain");
-      if (!(r.connector_weight_bps() > 0 && r.connector_weight_bps() <= 10000))
+      // 1..9999 only: 10000 zeroes the token-side weight (dead reserve) and is
+      // rejected on-chain by regreserve/oncrtreserve (MAX_CONNECTOR_WEIGHT_BPS).
+      if (!(r.connector_weight_bps() > 0 && r.connector_weight_bps() <= 9999))
          e.push_back("V6 connector_weight_bps out of range");
       if (r.initial_chain_amount() == 0 || r.initial_wire_amount() == 0)
          e.push_back("V6 reserve amounts must be > 0");
@@ -188,7 +190,9 @@ std::vector<std::string> validate(const BootstrapPlatformConfig& c) {
       e.push_back("V9 uwrit config missing");
    } else {
       const auto& u = c.uwrit();
-      if (u.fee_bps() > 10000)                       e.push_back("V9 fee_bps > 10000");
+      // fee_bps <= 9999: a 10000 (100%) fee zeroes the post-fee WIRE leg and is
+      // rejected on-chain by sysio.uwrit::setconfig (MAX_FEE_BPS).
+      if (u.fee_bps() > 9999)                        e.push_back("V9 fee_bps > 9999 (100%)");
       if (u.collateral_lock_duration_ms() == 0)      e.push_back("V9 collateral_lock_duration_ms must be > 0");
    }
 
@@ -248,14 +252,14 @@ BOOST_AUTO_TEST_CASE(validator_rejects_mutations) {
      tok->set_kind(TokenKind::TOKEN_KIND_NATIVE);
      tok->clear_contract_address();
      BOOST_CHECK(!validate(c).empty()); }
-   { auto c = base; c.mutable_reserves(0)->set_connector_weight_bps(10001);
-     BOOST_CHECK(!validate(c).empty()); }                               // V6 weight out of range
+   { auto c = base; c.mutable_reserves(0)->set_connector_weight_bps(10000);
+     BOOST_CHECK(!validate(c).empty()); }                               // V6 weight 10000 rejected (zero token-side weight)
    { auto c = base; c.set_t5_reserve_allocation(1);
      BOOST_CHECK(!validate(c).empty()); }                               // V7 earmark too small
    { auto c = base; c.mutable_reserves(0)->set_is_private(true);        // V8 private without owner
      BOOST_CHECK(!validate(c).empty()); }
-   { auto c = base; c.mutable_uwrit()->set_fee_bps(10001);
-     BOOST_CHECK(!validate(c).empty()); }                               // V9 fee_bps > 10000
+   { auto c = base; c.mutable_uwrit()->set_fee_bps(10000);
+     BOOST_CHECK(!validate(c).empty()); }                               // V9 fee_bps 10000 rejected (100% zeroes post-fee WIRE)
 }
 
 /// The reserved `t5_dex_allocation` earmark is part of the strict schema and is

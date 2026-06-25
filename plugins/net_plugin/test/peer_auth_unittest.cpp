@@ -93,6 +93,26 @@ BOOST_AUTO_TEST_CASE(specified_true) {
    BOOST_CHECK(cfg.needs_auth());
 }
 
+BOOST_AUTO_TEST_CASE(open_modes_start_authenticated) {
+   peer_auth_config cfg;
+
+   cfg.allowed_connections = None;
+   BOOST_CHECK(cfg.initial_peer_authenticated());
+
+   cfg.allowed_connections = Any;
+   BOOST_CHECK(cfg.initial_peer_authenticated());
+}
+
+BOOST_AUTO_TEST_CASE(auth_required_modes_start_unauthenticated) {
+   peer_auth_config cfg;
+
+   cfg.allowed_connections = Producers;
+   BOOST_CHECK(!cfg.initial_peer_authenticated());
+
+   cfg.allowed_connections = Specified;
+   BOOST_CHECK(!cfg.initial_peer_authenticated());
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 // ---------------------------------------------------------------------------

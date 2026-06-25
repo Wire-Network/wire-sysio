@@ -72,10 +72,6 @@
                     "type": "bytes"
                 },
                 {
-                    "name": "precision_override",
-                    "type": "uint32"
-                },
-                {
                     "name": "is_native",
                     "type": "bool"
                 },
@@ -108,10 +104,6 @@
                 {
                     "name": "contract_addr",
                     "type": "bytes"
-                },
-                {
-                    "name": "precision_override",
-                    "type": "uint32"
                 },
                 {
                     "name": "is_native",
