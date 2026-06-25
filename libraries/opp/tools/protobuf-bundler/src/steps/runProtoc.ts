@@ -126,6 +126,29 @@ export function resolvePluginBin(name: string, npmPkg: string): string {
 }
 
 /**
+ * Resolve the `protoc` compiler binary CWD-independently.
+ *
+ * The bundler depends on a pinned `protoc` (see package.json) that pnpm places
+ * in its own `node_modules/.bin`. Invoking bare `npx protoc` from the consumer
+ * repo root (the bundler's runtime CWD — see generate-opp-bundles.fish) does NOT
+ * find that pinned binary; npx instead downloads the LATEST `protoc` from the
+ * registry, which can be a major version ahead of what the `protoc-gen-*`
+ * plugins support and make code generation fail. Resolving from the bundler's
+ * own install tree pins the compatible version; the system PATH is the
+ * last-resort fallback.
+ *
+ * @return Absolute path to a `protoc` binary.
+ */
+export function resolveProtocBin(): string {
+  const fromInstall = resolveFromBundlerInstall("protoc")
+  if (fromInstall) {
+    log.debug("Resolved protoc from bundler install: %s", fromInstall)
+    return fromInstall
+  }
+  return resolveFromPathOrBin("protoc", "protoc")
+}
+
+/**
  * Determine the best --proto_path root. Proto files use import paths
  * relative to a root directory. If the cloned content has a "proto/" or
  * "protos/" subdirectory, that is likely the import root.
@@ -167,10 +190,11 @@ export async function runProtoc(opts: RunProtocOptions): Promise<string[]> {
     ...relativeProtos
   ]
 
-  log.info("Running: npx protoc %s", args.join(" "))
+  const protocBin = resolveProtocBin()
+  log.info("Running: %s %s", protocBin, args.join(" "))
 
   try {
-    execFileSync("npx", ["protoc", ...args], {
+    execFileSync(protocBin, args, {
       stdio: ["pipe", "pipe", "inherit"]
     })
   } catch (err: any) {
