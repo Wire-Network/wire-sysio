@@ -402,6 +402,12 @@ message ReserveCreate {
   // `precision::to_depot`) exactly like the swap paths; the outpost's LOCAL
   // reserve record keeps the raw chain-native amount for refunds.
   sysio.opp.types.ReserveAmount external_amount        = 12;
+  // Depot-frame decimal precision of the reserve's source token side = min(native, 9):
+  // the outpost downscales anything above the 9-dec frame cap at its boundary
+  // and reports the frame precision it used here, so the depot's reserve row is
+  // self-describing and never assumes 9. The WIRE/target side is always the WIRE
+  // token's 9 (WIRE_PRECISION), so it is not carried.
+  uint32                        source_token_precision = 13;
 }
 
 // Outpost -> Depot. Creator cancels their PENDING reserve.

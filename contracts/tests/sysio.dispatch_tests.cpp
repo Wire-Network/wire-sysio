@@ -614,6 +614,7 @@ public:
             ("description",          std::string{})
             ("initial_chain_amount", uint64_t{1'000'000'000'000ull})
             ("initial_wire_amount",  uint64_t{1'000'000'000'000ull})
+            ("source_token_precision", uint32_t{9})
             ("connector_weight_bps", uint32_t{5000})
             ("is_private",           false)
             ("owner",                ""));

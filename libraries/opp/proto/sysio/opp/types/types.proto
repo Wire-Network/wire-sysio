@@ -203,6 +203,9 @@ message Reserve {
   uint64        registered_at_ms        = 13;
   uint64        activated_at_ms         = 14;
   uint64        cancelled_at_ms         = 15;
+  uint32        source_token_precision  = 16;  // depot-frame precision of the source token side = min(native, 9); self-describing, never assumed. The WIRE/target side is always 9 (WIRE_PRECISION), so it is not carried.
+  reserved 17;                                 // was wire_precision (always 9 = WIRE_PRECISION); the target side is never carried, so there is no target_token_precision
+  reserved "wire_precision";
 }
 
 // Canonical reserve-scoped amount carrier. Identifies WHICH reserve —
