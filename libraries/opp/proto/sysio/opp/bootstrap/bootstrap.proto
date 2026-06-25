@@ -132,8 +132,8 @@ message ReserveSpec {
 // `sysio.reserv` (a fixed protocol constant, FEE_REWARD_SHARE_BPS), so no
 // fee-distribution shares are configured here.
 message UwritConfig {
-  // Per-spoke depot swap fee in basis points (<= 10000), taken out of the WIRE
-  // leg of every swap.
+  // Per-spoke depot swap fee in basis points (<= 9999; a 100% fee is rejected),
+  // taken out of the WIRE leg of every swap.
   uint32 fee_bps                     = 1;
   // Wall-clock collateral lock window in MILLISECONDS (> 0). Contract default
   // is 43_200_000 (12h).
