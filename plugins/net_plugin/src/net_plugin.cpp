@@ -6,6 +6,7 @@
 #include <sysio/net_plugin/net_logger.hpp>
 #include <sysio/net_plugin/net_utils.hpp>
 #include <sysio/net_plugin/auto_bp_peering.hpp>
+#include <sysio/net_plugin/local_txn_cache.hpp>
 #include <sysio/net_plugin/peer_auth.hpp>
 #include <sysio/net_plugin/peer_scoring.hpp>
 #include <sysio/chain/types.hpp>
@@ -36,8 +37,6 @@
 #include <boost/asio/post.hpp>
 #include <boost/multi_index/hashed_index.hpp>
 #include <boost/multi_index/key.hpp>
-#include <boost/unordered/unordered_flat_set.hpp>
-#include <boost/container/small_vector.hpp>
 
 #if __has_include(<sys/ioctl.h>)
 #include <sys/ioctl.h>
@@ -120,29 +119,6 @@ namespace sysio {
 
    static constexpr int64_t block_interval_ns =
       std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::milliseconds(config::block_interval_ms)).count();
-
-   using connection_id_set = boost::unordered_flat_set<connection_id_t>;
-   using connection_id_vector = boost::container::small_vector<connection_id_t, 64>;
-   struct node_transaction_state {
-      transaction_id_type        id;
-      time_point_sec             expires;           // time after which this may be purged.
-      mutable connection_id_set  connection_ids;    // all connections trx or trx notice received or trx sent
-      mutable bool               have_trx = false;  // trx received, not just trx notice, mutable because not indexed
-   };
-
-   typedef multi_index_container<
-      node_transaction_state,
-      indexed_by<
-         hashed_unique<
-            tag<by_id>,
-            member<node_transaction_state, transaction_id_type, &node_transaction_state::id>
-         >,
-         ordered_non_unique<
-            tag< struct by_expiry >,
-            member< node_transaction_state, fc::time_point_sec, &node_transaction_state::expires > >
-         >
-      >
-   node_transaction_index;
 
    struct peer_block_state {
       block_id_type      id;
@@ -239,7 +215,7 @@ namespace sysio {
 
       alignas(hardware_destructive_interference_sz)
       mutable fc::mutex      local_txns_mtx;
-      node_transaction_index  local_txns GUARDED_BY(local_txns_mtx);
+      local_txn_cache         local_txns GUARDED_BY(local_txns_mtx);
 
       // Vote dedup cache: tracks recently seen vote IDs to avoid expensive BLS deserialization for duplicates.
       // Indexed by vote_id for O(1) lookup and by block_num for LIB-based pruning.
@@ -739,7 +715,7 @@ namespace sysio {
       uint32_t                   trx_entries_size{0};
       fc::time_point             trx_entries_reset = fc::time_point::now();
       // does not account for the overhead of the multindex entry, but this is just an approximation
-      static constexpr uint32_t  trx_full_entry_size = sizeof(node_transaction_state);
+      static constexpr uint32_t  trx_full_entry_size = static_cast<uint32_t>(local_txn_cache::tracked_entry_size);
       static constexpr uint32_t  trx_conn_entry_size = sizeof(connection_id_t);
 
       fc::time_point          last_dropped_trx_msg_time;
@@ -2623,35 +2599,31 @@ namespace sysio {
       index.erase(p.first, p.second);
    }
 
+   namespace {
+      /// Applies the local transaction cache accounting delta to the connection-level memory estimate.
+      void apply_trx_entry_delta(connection& c, local_txn_cache::entry_delta delta) {
+         switch(delta) {
+         case local_txn_cache::entry_delta::none:
+            return;
+         case local_txn_cache::entry_delta::connection:
+            c.trx_entries_size += connection::trx_conn_entry_size;
+            return;
+         case local_txn_cache::entry_delta::full:
+            c.trx_entries_size += connection::trx_full_entry_size;
+            return;
+         }
+      }
+   } // namespace
+
    dispatch_manager::add_peer_txn_info dispatch_manager::add_peer_txn( const transaction_id_type& id, const time_point_sec& trx_expires, connection& c )
    {
       fc::lock_guard g( local_txns_mtx );
 
-      auto& id_idx = local_txns.get<by_id>();
-      bool already_have_trx = false;
-      if (auto tptr = id_idx.find( id ); tptr != id_idx.end()) {
-         if (tptr->connection_ids.insert(c.connection_id).second)
-            c.trx_entries_size += connection::trx_conn_entry_size;
-         already_have_trx = tptr->have_trx;
-         if (!already_have_trx) {
-            time_point_sec expires{fc::time_point::now() + my_impl->p2p_dedup_cache_expire_time_us};
-            expires = std::min( trx_expires, expires );
-            local_txns.modify(tptr, [&](auto& v) {
-               v.expires = expires;
-               v.have_trx = true;
-            });
-         }
-      } else {
-         // expire at either transaction expiration or configured max expire time whichever is less
-         time_point_sec expires{fc::time_point::now() + my_impl->p2p_dedup_cache_expire_time_us};
-         expires = std::min( trx_expires, expires );
-         local_txns.insert( node_transaction_state{
-            .id = id,
-            .expires = expires,
-            .connection_ids = {c.connection_id},
-            .have_trx = true } );
-         c.trx_entries_size += connection::trx_full_entry_size;
-      }
+      // expire at either transaction expiration or configured max expire time whichever is less
+      time_point_sec expires{fc::time_point::now() + my_impl->p2p_dedup_cache_expire_time_us};
+      expires = std::min( trx_expires, expires );
+      const auto result = local_txns.add_transaction(id, expires, c.connection_id);
+      apply_trx_entry_delta(c, result.delta);
 
       if (c.trx_entries_size > def_max_trx_entries_per_conn_size) {
          auto now = fc::time_point::now();
@@ -2660,26 +2632,16 @@ namespace sysio {
             c.trx_entries_reset = now;
          }
       }
-      return {c.trx_entries_size, already_have_trx};
+      return {c.trx_entries_size, result.already_have_trx};
    }
 
    size_t dispatch_manager::add_peer_txn_notice( const transaction_id_type& id, connection& c )
    {
       fc::lock_guard g( local_txns_mtx );
 
-      auto& id_idx = local_txns.get<by_id>();
-      if (auto tptr = id_idx.find( id ); tptr != id_idx.end()) {
-         if (tptr->connection_ids.insert(c.connection_id).second)
-            c.trx_entries_size += connection::trx_conn_entry_size;
-      } else {
-         time_point_sec expires{fc::time_point::now() + my_impl->p2p_dedup_cache_expire_time_us};
-         local_txns.insert( node_transaction_state{
-            .id = id,
-            .expires = expires,
-            .connection_ids = {c.connection_id},
-            .have_trx = false } );
-         c.trx_entries_size += connection::trx_full_entry_size;
-      }
+      const time_point_sec notice_expires{fc::time_point::now() + local_txn_cache::notice_only_lifetime};
+      const auto           result = local_txns.add_transaction_notice(id, notice_expires, c.connection_id);
+      apply_trx_entry_delta(c, result.delta);
 
       if (c.trx_entries_size > def_max_trx_entries_per_conn_size) {
          auto now = fc::time_point::now();
@@ -2693,11 +2655,9 @@ namespace sysio {
 
    bool dispatch_manager::have_peer_txn(const transaction_id_type& id, connection& c) {
       fc::lock_guard g( local_txns_mtx );
-      auto& id_idx = local_txns.get<by_id>();
-      auto tptr = id_idx.find( id );
-      if (tptr != id_idx.end() && tptr->have_trx) {
-         if (tptr->connection_ids.insert(c.connection_id).second)
-            c.trx_entries_size += connection::trx_conn_entry_size;
+      const auto result = local_txns.have_transaction(id, c.connection_id);
+      apply_trx_entry_delta(c, result.delta);
+      if (result.recorded) {
          return true;
       }
       return false;
@@ -2706,11 +2666,7 @@ namespace sysio {
    connection_id_vector
    dispatch_manager::peer_connections(const transaction_id_type& id) const {
       fc::lock_guard g( local_txns_mtx );
-      auto& id_idx = local_txns.get<by_id>();
-      if (auto tptr = id_idx.find(id); tptr != id_idx.end()) {
-         return {tptr->connection_ids.begin(), tptr->connection_ids.end()};
-      }
-      return {};
+      return local_txns.peer_connections(id);
    }
 
    void dispatch_manager::expire_txns() {
@@ -2720,11 +2676,9 @@ namespace sysio {
       {
          fc::lock_guard g( local_txns_mtx );
          start_size = local_txns.size();
-         auto& old = local_txns.get<by_expiry>();
-         auto ex_lo = old.lower_bound( fc::time_point_sec( 0 ) );
-         auto ex_up = old.upper_bound( fc::time_point_sec{now - def_allowed_clock_skew} ); // allow for some clock-skew
-         old.erase( ex_lo, ex_up );
-         end_size = local_txns.size();
+         const std::size_t removed = local_txns.expire(fc::time_point_sec{now - def_allowed_clock_skew}, // allow for some clock-skew
+                                                       fc::time_point_sec{now});
+         end_size = start_size - removed;
       }
 
       fc_dlog( p2p_trx_log, "expire_local_txns size {} removed {} in {}us", start_size, start_size - end_size, fc::time_point::now() - now );
