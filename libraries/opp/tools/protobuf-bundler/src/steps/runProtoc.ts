@@ -58,12 +58,48 @@ function resolveFromPathOrBin(name: string, npmPkg: string): string {
 }
 
 /**
+ * Resolve a protoc plugin binary from the bundler's OWN install tree.
+ *
+ * The bundler runs with its CWD set to the consumer repo root (see
+ * `generate-opp-bundles.fish`, which `cd`s to the repo before invoking the
+ * globally-linked CLI). Plugin binaries that live only in the bundler's own
+ * dependency tree — notably `protoc-gen-ts` from `@protobuf-ts/plugin`, which
+ * (unlike the workspace `protoc-gen-solana`/`protoc-gen-solidity`) is never
+ * `pnpm link --global`'d onto the system PATH — are therefore invisible to the
+ * CWD-relative and PATH lookups below. Anchoring on `__dirname` and walking up
+ * to the nearest `node_modules/.bin/<name>` finds them regardless of CWD.
+ *
+ * @param name Plugin executable name, e.g. `protoc-gen-ts`.
+ * @return Absolute path to the binary, or `undefined` when not found.
+ */
+function resolveFromBundlerInstall(name: string): string | undefined {
+  let dir = __dirname
+  for (;;) {
+    const candidate = Path.join(dir, "node_modules", ".bin", name)
+    if (Fs.existsSync(candidate)) return Path.resolve(candidate)
+    const parent = Path.dirname(dir)
+    if (parent === dir) return undefined
+    dir = parent
+  }
+}
+
+/**
  * Resolve a plugin binary. Search order:
- *   1. pkg binary inside the installed npm package (dist/bin/<name>)
- *   2. System PATH
- *   3. node_modules/.bin wrapper (fallback)
+ *   1. the bundler's own install tree, anchored on __dirname (CWD-independent)
+ *   2. pkg binary inside the installed npm package (dist/bin/<name>)
+ *   3. System PATH
+ *   4. node_modules/.bin wrapper (fallback)
  */
 export function resolvePluginBin(name: string, npmPkg: string): string {
+  // (1) Prefer the bundler's own install tree. This is CWD-independent and the
+  // only reliable way to find dependency-provided plugins (e.g. protoc-gen-ts)
+  // when the CWD is the consumer repo root rather than the bundler package dir.
+  const fromInstall = resolveFromBundlerInstall(name)
+  if (fromInstall) {
+    log.debug("Found pkg binary in bundler install: %s", fromInstall)
+    return fromInstall
+  }
+
   const pkgBinCandidates = [
     Path.join("node_modules", ".bin", name),
     Path.join("node_modules", npmPkg, "dist", "bin", name),
