@@ -179,12 +179,15 @@ void reserve::regreserve(sysio::slug_name chain_code,
                           std::string     description,
                           uint64_t        initial_chain_amount,
                           uint64_t        initial_wire_amount,
+                          uint32_t        source_token_precision,
                           uint32_t        connector_weight_bps,
                           bool            is_private,
                           sysio::name     owner) {
    require_priv_caller();
    sysio::check(is_bootstrap_window(),
                 "regreserve is bootstrap-window only; post-bootstrap reserves go through create_reserve");
+   sysio::check(source_token_precision <= WIRE_PRECISION,
+                "source_token_precision exceeds the depot frame (9) — the outpost must downscale to min(native, 9)");
    sysio::check(connector_weight_bps > 0 && connector_weight_bps <= MAX_CONNECTOR_WEIGHT_BPS,
                 "connector_weight_bps must be in (0, 10000) — both pool-side weights must be positive");
    sysio::check(initial_chain_amount > 0 && initial_wire_amount > 0,
@@ -218,6 +221,7 @@ void reserve::regreserve(sysio::slug_name chain_code,
       .status                 = opp::types::RESERVE_STATUS_ACTIVE,
       .reserve_chain_amount   = initial_chain_amount,
       .reserve_wire_amount    = initial_wire_amount,
+      .source_token_precision = source_token_precision,
       .connector_weight_bps   = connector_weight_bps,
       .creator_addr           = {},
       .requested_wire_amount  = initial_wire_amount,
@@ -238,6 +242,7 @@ void reserve::oncrtreserve(sysio::slug_name       chain_code,
                             std::string           description,
                             uint64_t              external_token_amount,
                             uint64_t              requested_wire_amount,
+                            uint32_t              source_token_precision,
                             uint32_t              connector_weight_bps,
                             opp::types::ChainKind creator_chain_kind,
                             std::vector<char>     creator_chain_addr,
@@ -252,6 +257,12 @@ void reserve::oncrtreserve(sysio::slug_name       chain_code,
    }
    if (external_token_amount == 0 || requested_wire_amount == 0) {
       sysio::print("oncrtreserve: zero deposit / requested amount; skipping\n");
+      return;
+   }
+   // The outpost downscales to min(native, 9) at its boundary, so a
+   // source_token_precision above the depot frame means a malformed attestation.
+   if (source_token_precision > WIRE_PRECISION) {
+      sysio::print("oncrtreserve: source_token_precision exceeds depot frame (9); skipping\n");
       return;
    }
 
@@ -322,6 +333,7 @@ void reserve::oncrtreserve(sysio::slug_name       chain_code,
             .status                 = opp::types::RESERVE_STATUS_CANCELLED,
             .reserve_chain_amount   = 0,
             .reserve_wire_amount    = 0,
+            .source_token_precision = source_token_precision,
             .connector_weight_bps   = connector_weight_bps,
             .creator_addr           = std::move(creator),
             .requested_wire_amount  = requested_wire_amount,
@@ -354,6 +366,7 @@ void reserve::oncrtreserve(sysio::slug_name       chain_code,
       .status                 = opp::types::RESERVE_STATUS_PENDING,
       .reserve_chain_amount   = external_token_amount,
       .reserve_wire_amount    = 0,
+      .source_token_precision = source_token_precision,
       .connector_weight_bps   = connector_weight_bps,
       .creator_addr           = std::move(creator),
       .requested_wire_amount  = requested_wire_amount,

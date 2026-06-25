@@ -1,9 +1,9 @@
 // contracts/tests/sysio.tokens_tests.cpp
 //
-// Focus: sysio.tokens registry — specifically the chain-token binding action
-// `regctok` and its `precision_override` field. Every (chain, token) binding
-// carries a chain-native decimal precision that defaults to the canonical
-// 9-decimal depot frame; `regctok` takes it as an input.
+// Focus: sysio.tokens registry — the chain-token binding action `regctok`
+// (contract address + is_native). Chain-native precision is not stored on the
+// binding; the depot's per-token precision lives on Token.precision and the
+// reserve row, and the outpost owns the chain-native ↔ depot-frame conversion.
 
 #include <boost/test/unit_test.hpp>
 #include <sysio/testing/tester.hpp>
@@ -99,58 +99,33 @@ private:
 
 BOOST_AUTO_TEST_SUITE(sysio_tokens_tests)
 
-// regctok records the precision_override input on the chain-token binding, and
-// defaults it to the canonical 9-decimal depot frame for normal tokens.
-BOOST_FIXTURE_TEST_CASE(regctok_records_precision_override, sysio_tokens_tester) { try {
-   // Canonical 9-decimal native binding (the common case: precision 9).
+// regctok records the (chain, token) binding (contract address + is_native),
+// active inline during the bootstrap window. Chain-native precision is NOT
+// stored on the binding — the depot's per-token precision lives on
+// Token.precision and the reserve row; the outpost owns the boundary conversion.
+BOOST_FIXTURE_TEST_CASE(regctok_records_binding, sysio_tokens_tester) { try {
+   // Native binding.
    BOOST_REQUIRE_EQUAL(success(), push_action(TOKENS_ACCOUNT, "regctok"_n, mvo()
-      ("chain_code",         codename("ETH"))
-      ("token_code",         codename("WIRE"))
-      ("contract_addr",      "")
-      ("precision_override", 9u)
-      ("is_native",          true)));
+      ("chain_code",    codename("ETH"))
+      ("token_code",    codename("WIRE"))
+      ("contract_addr", "")
+      ("is_native",     true)));
 
    auto native = find_chaintoken("ETH", "WIRE");
    BOOST_REQUIRE(!native.is_null());
-   BOOST_REQUIRE_EQUAL(9u,   native["precision_override"].as<uint32_t>());
    BOOST_REQUIRE_EQUAL(true, native["is_native"].as<bool>());
    BOOST_REQUIRE_EQUAL(true, native["active"].as<bool>()); // bootstrap window -> active
 
-   // A chain-native non-9 precision (e.g. a 6-decimal ERC-20) is honored as a
-   // real input, proving the field is not hard-coded.
+   // Non-native ERC-20 binding with a contract address.
    BOOST_REQUIRE_EQUAL(success(), push_action(TOKENS_ACCOUNT, "regctok"_n, mvo()
-      ("chain_code",         codename("ETH"))
-      ("token_code",         codename("USDC"))
-      ("contract_addr",      "01")
-      ("precision_override", 6u)
-      ("is_native",          false)));
+      ("chain_code",    codename("ETH"))
+      ("token_code",    codename("USDC"))
+      ("contract_addr", "01")
+      ("is_native",     false)));
 
    auto erc20 = find_chaintoken("ETH", "USDC");
    BOOST_REQUIRE(!erc20.is_null());
-   BOOST_REQUIRE_EQUAL(6u, erc20["precision_override"].as<uint32_t>());
-} FC_LOG_AND_RETHROW() }
-
-// regctok rejects a precision beyond the maximum the asset/symbol math supports
-// (18); the boundary value is accepted.
-BOOST_FIXTURE_TEST_CASE(regctok_rejects_precision_over_max, sysio_tokens_tester) { try {
-   BOOST_REQUIRE(push_action(TOKENS_ACCOUNT, "regctok"_n, mvo()
-      ("chain_code",         codename("ETH"))
-      ("token_code",         codename("BAD"))
-      ("contract_addr",      "")
-      ("precision_override", 19u)
-      ("is_native",          false))
-      .find("precision_override exceeds maximum") != std::string::npos);
-
-   // Boundary: precision 18 is accepted.
-   BOOST_REQUIRE_EQUAL(success(), push_action(TOKENS_ACCOUNT, "regctok"_n, mvo()
-      ("chain_code",         codename("ETH"))
-      ("token_code",         codename("GUD"))
-      ("contract_addr",      "")
-      ("precision_override", 18u)
-      ("is_native",          false)));
-   auto ok = find_chaintoken("ETH", "GUD");
-   BOOST_REQUIRE(!ok.is_null());
-   BOOST_REQUIRE_EQUAL(18u, ok["precision_override"].as<uint32_t>());
+   BOOST_REQUIRE_EQUAL(false, erc20["is_native"].as<bool>());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()

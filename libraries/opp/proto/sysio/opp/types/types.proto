@@ -196,13 +196,16 @@ message Reserve {
   ReserveStatus status                  = 6;
   uint64        reserve_chain_amount    = 7;
   uint64        reserve_wire_amount     = 8;
-  uint32        connector_weight_bps    = 9;   // Bancor WIRE-side weight in bps (1..10000); 5000 = 50/50 pure constant product. Honored by the weighted swap curve.
+  uint32        connector_weight_bps    = 9;   // Bancor WIRE-side weight in bps (1..9999); 5000 = 50/50 pure constant product. Honored by the weighted swap curve. 10000 is rejected by sysio.reserv: it zeroes the token-side weight, making every quote 0 (a dead, unpriceable reserve).
   ChainAddress  creator_addr            = 10;
   uint64        requested_wire_amount   = 11;
   uint64        external_token_amount   = 12;
   uint64        registered_at_ms        = 13;
   uint64        activated_at_ms         = 14;
   uint64        cancelled_at_ms         = 15;
+  uint32        source_token_precision  = 16;  // depot-frame precision of the source token side = min(native, 9); self-describing, never assumed. The WIRE/target side is always 9 (WIRE_PRECISION), so it is not carried.
+  reserved 17;                                 // was wire_precision (always 9 = WIRE_PRECISION); the target side is never carried, so there is no target_token_precision
+  reserved "wire_precision";
 }
 
 // Canonical reserve-scoped amount carrier. Identifies WHICH reserve —

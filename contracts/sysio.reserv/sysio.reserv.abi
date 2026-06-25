@@ -198,6 +198,10 @@
                     "type": "uint64"
                 },
                 {
+                    "name": "source_token_precision",
+                    "type": "uint32"
+                },
+                {
                     "name": "connector_weight_bps",
                     "type": "uint32"
                 },
@@ -318,6 +322,10 @@
                     "type": "uint64"
                 },
                 {
+                    "name": "source_token_precision",
+                    "type": "uint32"
+                },
+                {
                     "name": "connector_weight_bps",
                     "type": "uint32"
                 },
@@ -384,6 +392,10 @@
                 {
                     "name": "reserve_wire_amount",
                     "type": "uint64"
+                },
+                {
+                    "name": "source_token_precision",
+                    "type": "uint32"
                 },
                 {
                     "name": "connector_weight_bps",
