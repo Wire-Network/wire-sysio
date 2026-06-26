@@ -39,8 +39,8 @@ struct contracts {
 
    struct util {
       static std::vector<uint8_t> reject_all_wasm() { return read_wasm("${CMAKE_SOURCE_DIR}/contracts/test_contracts/reject_all.wasm"); }
-      static std::vector<uint8_t> reenter_deposit_wasm() { return read_wasm("${CMAKE_BINARY_DIR}/contracts/test_contracts/reenter_deposit/reenter_deposit.wasm"); }
-      static std::vector<char>    reenter_deposit_abi()  { return read_abi("${CMAKE_BINARY_DIR}/contracts/test_contracts/reenter_deposit/reenter_deposit.abi"); }
+      static std::vector<uint8_t> reenter_deposit_wasm() { return read_wasm("${CMAKE_SOURCE_DIR}/contracts/test_contracts/reenter_deposit/reenter_deposit.wasm"); }
+      static std::vector<char>    reenter_deposit_abi()  { return read_abi("${CMAKE_SOURCE_DIR}/contracts/test_contracts/reenter_deposit/reenter_deposit.abi"); }
    };
 };
 
