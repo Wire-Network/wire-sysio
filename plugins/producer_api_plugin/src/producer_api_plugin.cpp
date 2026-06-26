@@ -18,6 +18,21 @@ namespace sysio {
 
 using namespace sysio;
 
+namespace {
+constexpr const char* producer_rw_category_name = "producer_rw";
+constexpr const char* snapshot_category_name    = "snapshot";
+
+/**
+ * Reject producer administrative API categories on listeners reachable beyond loopback.
+ */
+void throw_if_not_loopback_only(const http_plugin& http, api_category category, const char* category_name) {
+   SYS_ASSERT(http.is_on_loopback(category), chain::plugin_config_exception,
+              "producer_api_plugin refuses to expose the {} API category on a non-loopback HTTP listener. "
+              "Bind {} to 127.0.0.1, localhost, or a Unix socket with --http-category-address.",
+              category_name, category_name);
+}
+} // namespace
+
 #define CALL_WITH_400(api_name, category, api_handle, call_name, INVOKE, http_response_code) \
 {std::string("/v1/" #api_name "/" #call_name), \
    api_category::category, \
@@ -143,28 +158,8 @@ void producer_api_plugin::plugin_startup() {
 void producer_api_plugin::plugin_initialize(const variables_map& options) {
    try {
       const auto& _http_plugin = app().get_plugin<http_plugin>();
-      if( !_http_plugin.is_on_loopback(api_category::producer_rw)) {
-         wlog( "\n"
-               "**********SECURITY WARNING**********\n"
-               "*                                  *\n"
-               "* --       Producer RW API      -- *\n"
-               "* - EXPOSED to the LOCAL NETWORK - *\n"
-               "* - USE ONLY ON SECURE NETWORKS! - *\n"
-               "*                                  *\n"
-               "************************************\n" );
-
-      }
-      if( !_http_plugin.is_on_loopback(api_category::snapshot)) {
-         wlog( "\n"
-               "**********SECURITY WARNING**********\n"
-               "*                                  *\n"
-               "* --         Snapshot API       -- *\n"
-               "* - EXPOSED to the LOCAL NETWORK - *\n"
-               "* - USE ONLY ON SECURE NETWORKS! - *\n"
-               "*                                  *\n"
-               "************************************\n" );
-
-      }
+      throw_if_not_loopback_only(_http_plugin, api_category::producer_rw, producer_rw_category_name);
+      throw_if_not_loopback_only(_http_plugin, api_category::snapshot, snapshot_category_name);
    } FC_LOG_AND_RETHROW()
 }
 
