@@ -724,8 +724,13 @@ void uwrit::createuwreq(uint64_t attestation_id,
    const sysio::slug_name dst_chain_code{sr.target_chain_code};
    const sysio::slug_name dst_token_code{sr.target_token_code};
    const sysio::slug_name dst_reserve_code{sr.target_reserve_code};
-   const uint64_t        src_amount =
-      static_cast<uint64_t>(static_cast<int64_t>(sr.source_amount.amount));
+   // WSA-028: source_amount is signed on the wire. Gate it through the shared
+   // fail-closed parser; a non-positive or out-of-range value yields nullopt and
+   // is reverted (refund on the proven outpost) by the positivity guard below,
+   // never wrapped into a huge src_amount that would corrupt the swap quote and
+   // reserve settlement. Never-throw: revert, do not check().
+   const std::optional<uint64_t> src_amount_opt =
+      opp::safe::to_depot_amount(static_cast<int64_t>(sr.source_amount.amount));
 
    // WSA-005 source-chain binding. `chain_code` is the source outpost `sysio.msgch::dispatch`
    // proved via `deliver` (an active, non-depot `sysio.chains` row); `sr.source_chain_code` is the
@@ -750,12 +755,13 @@ void uwrit::createuwreq(uint64_t attestation_id,
    // every downstream lock/settlement amount is provably positive (a
    // zero-amount lock would trip `opreg::releaselock`'s amount check from
    // inside `chklocks` at epoch advance — a consensus stall).
-   if (src_amount == 0 || sr.target_amount == 0) {
+   if (!src_amount_opt || sr.target_amount == 0) {
       emit_swap_revert(get_self(), chain_code, attestation_id, sr,
                        src_chain_code, src_reserve_code,
                        "SwapRequest rejected: source and target amounts must be positive");
       return;
    }
+   const uint64_t src_amount = *src_amount_opt;
    if (!chain_registered_active(src_chain_code) || !chain_registered_active(dst_chain_code)) {
       emit_swap_revert(get_self(), chain_code, attestation_id, sr,
                        src_chain_code, src_reserve_code,
